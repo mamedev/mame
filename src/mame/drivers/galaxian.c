@@ -1101,7 +1101,14 @@ static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 	static int direction = 0;
 	UINT8 ret;
 	UINT8 buttons = (input_port_read(device->machine,"IN0")&0xe0);
-	if ((lastdialread - dialread) < 0) direction = 1;
+    /* bad cases:
+	* bad: last = 255, dial = 0: direction should be 1 but ends up 0 instead.
+	* bad: last = 0, dial = 255: direction should be 0 but ends up 1 instead.
+	* to fix these, we explicitly set direction correctly when we hit those cases.
+	*/
+	if ((lastdialread > 250) && (dialread < 5)) direction = 1;
+	else if ((lastdialread < 5) && (dialread > 250)) direction = 0;
+	else if ((lastdialread - dialread) < 0) direction = 1;
 	else if ((lastdialread - dialread) > 0) direction = 0;
 	// note when lastdialread and dialread are the same direction is left alone.
 	dialoutput += abs(dialread - lastdialread);
@@ -1109,7 +1116,7 @@ static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 	
 	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
 
-	//fprintf(stderr, "dialread: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
+	fprintf(stderr, "dialread: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
 	lastdialread = dialread;
 	return ret;
 }

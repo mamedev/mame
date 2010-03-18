@@ -2606,11 +2606,11 @@ static INPUT_PORTS_START( calipso )
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
-
+// Note that in moon war, when in cocktail mode, NEITHER player seems to have a hyperflip button? Can someone check the code to see if this is true?
 static INPUT_PORTS_START( moonwar_common )
 	PORT_START("IN0")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* the spinner */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // cocktail: p2 mine
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
@@ -2622,10 +2622,11 @@ static INPUT_PORTS_START( moonwar_common )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x08) // cocktail: p2 thrust
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x00) // upright: p1&p2 hyperflip
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) // both: p1(upright: &p2) mine
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) // both: p1(upright: &p2) thrust
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) // both: p1(upright: &p2) fire
 INPUT_PORTS_END
 
 
@@ -2633,7 +2634,7 @@ static INPUT_PORTS_START( moonwar )
 	PORT_INCLUDE( moonwar_common )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // cocktail: p2 fire
 	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
@@ -2645,10 +2646,12 @@ static INPUT_PORTS_START( moonwar )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* output bits */
 
 	PORT_START("IN3")      /* IN3/4 - dummy ports for the dial */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x08) // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x00) // upright: dial works normally
 
 	PORT_START("IN4")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
 INPUT_PORTS_END
 
 /* same as above, but coinage is different */
@@ -2656,7 +2659,7 @@ static INPUT_PORTS_START( moonwara )
 	PORT_INCLUDE( moonwar_common )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // cocktail: p2 fire
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -2668,7 +2671,7 @@ static INPUT_PORTS_START( moonwara )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* output bits */
 
 	PORT_START("IN3")      /* IN3/4 - dummy ports for the dial */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) // both: p1 dial works normally, p2 dial is reversed, both share same port
 
 	PORT_START("IN4")		/* doesn't actually work due to bug in game code */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_COCKTAIL

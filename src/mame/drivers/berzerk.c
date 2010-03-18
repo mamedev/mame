@@ -845,7 +845,11 @@ static READ8_HANDLER( moonwarp_p1_r )
 	static int direction = 0;
 	UINT8 ret;
 	UINT8 buttons = (input_port_read(space->machine,"P1")&0xe0);
-	if ((lastdialread - dialread) < 0) direction = 1;
+	// following two lines are to fix the direction being wrong for one read
+	// when the 0xFF<->0x00 border is passed on IPT_DIAL
+	if ((lastdialread > 250) && (dialread < 5)) direction = 1;
+	else if ((lastdialread < 5) && (dialread > 250)) direction = 0;
+	else if ((lastdialread - dialread) < 0) direction = 1;
 	else if ((lastdialread - dialread) > 0) direction = 0;
 	// note when lastdialread and dialread are the same direction is left alone.
 	dialoutput += abs(dialread - lastdialread);
