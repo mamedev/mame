@@ -1078,7 +1078,7 @@ static WRITE8_DEVICE_HANDLER( snes_dsp_io_w )
 
 	if (offset == 0x7c)
 	{
-		/* Writes to register 0x7c (ENDX) works as follows */
+		/* Writes to register 0x7c (ENDX) clear ALL bits no matter which value is written */
 		spc700->dsp_regs[offset] = 0;
 	}
 	else
@@ -1177,8 +1177,9 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 			break;
 		case 0x2:		/* Register address */
 			break;
-		case 0x3:		/* Register data */
-			snes_dsp_io_w(device, spc700->ram[0xf2], data);
+		case 0x3:		/* Register data - 0x80-0xff is a read-only mirror of 0x00-0x7f */
+			if (!(spc700->ram[0xf2] & 0x80))
+				snes_dsp_io_w(device, spc700->ram[0xf2] & 0x7f, data);
 			break;
 		case 0x4:		/* Port 0 */
 		case 0x5:		/* Port 1 */
@@ -1309,15 +1310,15 @@ static DEVICE_START( snes_sound )
 	snes_sound_state *spc700 = get_safe_token(device);
 	running_machine *machine = device->machine;
 
-	state_register(device);
-
 	spc700->channel = stream_create(device, 0, 2, 32000, 0, snes_sh_update);
 
 	spc700->ram = auto_alloc_array_clear(device->machine, UINT8, SNES_SPCRAM_SIZE);
-	state_save_register_device_item_pointer(device, 0, spc700->ram, SNES_SPCRAM_SIZE);
 
 	/* default to ROM visible */
 	spc700->ram[0xf1] = 0x80;
+
+	/* put IPL image at the top of RAM */
+	memcpy(spc700->ipl_region, memory_region(machine, "user5"), 64);
 
 	/* Initialize the timers */
 	spc700->timer[0] = timer_alloc(machine, snes_spc_timer, spc700);
@@ -1329,16 +1330,15 @@ static DEVICE_START( snes_sound )
 	spc700->timer[2] = timer_alloc(machine, snes_spc_timer, spc700);
 	timer_adjust_periodic(spc700->timer[2], ATTOTIME_IN_HZ(64000), 2, ATTOTIME_IN_HZ(64000));
 	timer_enable(spc700->timer[2], 0);
+
+	state_register(device);
+	state_save_register_device_item_pointer(device, 0, spc700->ram, SNES_SPCRAM_SIZE);
 }
 
 static DEVICE_RESET( snes_sound )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
-	running_machine *machine = device->machine;
 	int ii;
-
-	/* put IPL image at the top of RAM */
-	memcpy(spc700->ipl_region, memory_region(machine, "user5"), 64);
 
 	/* Sort out the ports */
 	for (ii = 0; ii < 4; ii++)
