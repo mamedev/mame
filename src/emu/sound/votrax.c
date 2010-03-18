@@ -35,7 +35,7 @@ struct _votrax_state
 	UINT32		frac;
 	UINT32		step;
 
-	struct  loaded_samples *samples;
+	loaded_samples *samples;
 };
 
 INLINE votrax_state *get_safe_token(running_device *device)
@@ -71,7 +71,7 @@ static const char *const VotraxTable[65] =
 
 static STREAM_UPDATE( votrax_update_sound )
 {
-	votrax_state *info = param;
+	votrax_state *info = (votrax_state*) param;
 	stream_sample_t *buffer = outputs[0];
 
 	if (info->sample)

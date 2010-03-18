@@ -60,16 +60,10 @@ typedef union
     UINT8  b[16];   /* or as 8 bit registers */
 } necbasicregs;
 
-typedef struct _nec_config nec_config;
-struct _nec_config
-{
-	const UINT8*	v25v35_decryptiontable; // internal decryption table
-};
-
 /* default configuration */
 static const nec_config default_config =
 {
-	NULL
+	NULL		 // no internal decryption table
 };
 
 typedef struct _v30mz_state v30mz_state;
@@ -81,7 +75,7 @@ struct _v30mz_state
 	UINT16	ip;
 
 	INT32	SignVal;
-    UINT32  AuxVal, OverVal, ZeroVal, CarryVal, ParityVal; /* 0 or non-0 valued flags */
+	UINT32  AuxVal, OverVal, ZeroVal, CarryVal, ParityVal; /* 0 or non-0 valued flags */
 	UINT8	TF, IF, DF, MF; 	/* 0 or 1 valued flags */	/* OB[19.07.99] added Mode Flag V30 */
 	UINT32	int_vector;
 	UINT32	pending_irq;

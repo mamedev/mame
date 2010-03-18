@@ -3,6 +3,12 @@
 #define __NECINTRF_H__
 
 
+typedef struct _nec_config nec_config;
+struct _nec_config
+{
+	const UINT8*	v25v35_decryptiontable; // internal decryption table
+};
+
 enum
 {
 	NEC_PC=0,
