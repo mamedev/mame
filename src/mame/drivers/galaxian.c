@@ -1093,15 +1093,28 @@ static WRITE8_DEVICE_HANDLER( moonwar_port_select_w )
 
 static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 {
-	UINT8 sign;
-	UINT8 delta;
+	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
+	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
+	// one difference is it lacks the strobe input (does it?), which if not active causes
+	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
+	// and player 2 dials, which is emulated here.
+	static int lastdialread = -1;
+	int dialread = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
+	static int dialoutput = 0;
+	static int direction = 0;
+	UINT8 ret;
+	UINT8 buttons = (input_port_read(device->machine,"IN0")&0xe0);
+	if ((lastdialread - dialread) < 0) direction = 1;
+	else if ((lastdialread - dialread) > 0) direction = 0;
+	// note when lastdialread and dialread are the same direction is left alone.
+	dialoutput += abs(dialread - lastdialread);
+	dialoutput &= 0xf;
+	
+	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
 
-	delta = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
-
-	sign = (delta & 0x80) >> 3;
-	delta &= 0x0f;
-
-	return ((input_port_read(device->machine, "IN0") & 0xe0) | delta | sign );
+	//fprintf(stderr, "dialread: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
+	lastdialread = dialread;
+	return ret;
 }
 
 
