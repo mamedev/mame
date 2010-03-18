@@ -1113,7 +1113,7 @@ static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 	
 	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
 
-	fprintf(stderr, "dialread: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
+	//fprintf(stderr, "dialread: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
 	lastdialread = dialread;
 	return ret;
 }
