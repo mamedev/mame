@@ -96,7 +96,7 @@ static WRITE8_HANDLER( led_off_w )
  *
  *************************************/
 
-static void vpos_to_vysnc_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
+static void vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
 {
 	/* convert from a vertical position to the actual values on the vertical sync counters */
 	*v256 = ((vpos < VBEND) || (vpos >= VBSTART));
@@ -115,7 +115,7 @@ static void vpos_to_vysnc_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
 }
 
 
-static int vysnc_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
+static int vsync_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
 {
 	/* convert from the vertical sync counters to an actual vertical position */
 	int vpos;
@@ -166,7 +166,7 @@ static TIMER_CALLBACK( irq_callback )
 	next_counter = irq_trigger_counts[next_irq_number];
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
-	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
+	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
 	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_irq_number);
 }
 
@@ -179,7 +179,7 @@ static void create_irq_timer(running_machine *machine)
 
 static void start_irq_timer(running_machine *machine)
 {
-	int vpos = vysnc_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
+	int vpos = vsync_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
 	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
@@ -243,7 +243,7 @@ static TIMER_CALLBACK( nmi_callback )
 	next_counter = nmi_trigger_counts[next_nmi_number];
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
-	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
+	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
 	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_nmi_number);
 }
 
@@ -256,7 +256,7 @@ static void create_nmi_timer(running_machine *machine)
 
 static void start_nmi_timer(running_machine *machine)
 {
-	int vpos = vysnc_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
+	int vpos = vsync_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
 	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
@@ -377,7 +377,7 @@ static READ8_HANDLER( intercept_v256_r )
 	UINT8 counter;
 	UINT8 v256;
 
-	vpos_to_vysnc_chain_counter(video_screen_get_vpos(space->machine->primary_screen), &counter, &v256);
+	vpos_to_vsync_chain_counter(video_screen_get_vpos(space->machine->primary_screen), &counter, &v256);
 
 	return (!intercept << 7) | v256;
 }
@@ -985,7 +985,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
 
-PORT_START("F4")
+	PORT_START("F4")
 	BERZERK_COINAGE(1, F4)
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -1186,8 +1186,7 @@ ROM_END
 
    So far only 2 original boards of this have been found, one with only the sound roms on it, and the other
    with only the program roms on it.  This set is a combination of dumps from those two boards, so there
-   is a small chance they could be mismatched, however, the game seems to produce the correct voices at
-   the correct times, although it refers to 'Hyperflip' for which I haven't been able to locate a button yet
+   is a small chance they could be mismatched.
 */
 ROM_START( moonwarp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
