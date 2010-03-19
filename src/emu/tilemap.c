@@ -450,6 +450,16 @@ void tilemap_set_enable(tilemap_t *tmap, int enable)
 	tmap->enable = (enable != 0);
 }
 
+/*-------------------------------------------------
+    tilemap_get_scrolldx - return the enable flag
+    for the tilemap
+-------------------------------------------------*/
+
+int tilemap_get_enable(tilemap_t *tmap)
+{
+	return tmap->enable;
+}
+
 
 /*-------------------------------------------------
     tilemap_set_flip - set a global flip for the

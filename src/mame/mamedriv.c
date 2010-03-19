@@ -2411,7 +2411,7 @@ V-V                           TP-027
 	DRIVER( agalletj )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
 	DRIVER( agalletk )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
 	DRIVER( agallett )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
-	DRIVER( agalleth )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */	
+	DRIVER( agalleth )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
 	DRIVER( hotdogst )	/* (c) 1996 Marble */
 	DRIVER( ddonpach )	/* (c) 1997 Atlus/Cave */
 	DRIVER( ddonpachj )	/* (c) 1997 Atlus/Cave */
@@ -8030,7 +8030,7 @@ Other Sun games
 	DRIVER( gakusai2 )	/* (c) 1998 MakeSoft */
 	DRIVER( blzntrnd )	/* (c) 1994 Human Amusement */
 	DRIVER( gstrik2 )	/* (c) 1996 Human Amusement */
-	DRIVER( gstrik2e )
+	DRIVER( gstrik2j )
 	DRIVER( hyprduel )	/* (c) 1993 Technosoft (World) */
 	DRIVER( hyprdelj )	/* (c) 1993 Technosoft (Japan) */
 	DRIVER( magerror )	/* (c) 1994 Technosoft (Japan) (Arcade TV Game List - P.100, Left, 13 from Bottom) */

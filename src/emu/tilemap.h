@@ -439,6 +439,9 @@ void tilemap_set_palette_offset(tilemap_t *tmap, UINT32 offset);
 /* set an enable flag for the tilemap; if 0, requests to draw the tilemap are ignored */
 void tilemap_set_enable(tilemap_t *tmap, int enable);
 
+/* return enable flag for the tilemap */
+int tilemap_get_enable(tilemap_t *tmap);
+
 /* set a global flip for the tilemap */
 void tilemap_set_flip(tilemap_t *tmap, UINT32 attributes);
 
