@@ -877,13 +877,45 @@ static READ8_HANDLER( moonwarp_p1_r )
 	
 	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
 
-	//fprintf(stderr, "dialread: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
+	//fprintf(stderr, "dialread1: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
+	lastdialread = dialread;
+	return ret;
+}
+
+static READ8_HANDLER( moonwarp_p2_r )
+{
+	// This seems to be the same type of dial as the later 'moon war 2' set uses
+	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
+	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
+	// one difference is it lacks the strobe input (does it?), which if not active causes
+	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
+	// and player 2 dials.
+	static int lastdialread = -1;
+	int dialread = input_port_read(space->machine,"P2_DIAL");
+	static int dialoutput = 0;
+	static int direction = 0;
+	UINT8 ret;
+	UINT8 buttons = (input_port_read(space->machine,"P2")&0xe0);
+	// following two lines are to fix the direction being wrong for one read
+	// when the 0xFF<->0x00 border is passed on IPT_DIAL
+	if ((lastdialread > 250) && (dialread < 5)) direction = 1;
+	else if ((lastdialread < 5) && (dialread > 250)) direction = 0;
+	else if ((lastdialread - dialread) < 0) direction = 1;
+	else if ((lastdialread - dialread) > 0) direction = 0;
+	// note when lastdialread and dialread are the same direction is left alone.
+	dialoutput += abs(dialread - lastdialread);
+	dialoutput &= 0xf;
+	
+	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
+
+	//fprintf(stderr, "dialread2: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
 	lastdialread = dialread;
 	return ret;
 }
 
 static INPUT_PORTS_START( moonwarp )
 	PORT_START("P1")
+	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) // spinner/dial
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -895,38 +927,22 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // is wired high for upright harness, low for cocktail; if high, cocktail dipswitch is ignored.
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // Hyper flip button is common for both players in cocktail mode.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("P2") // doesn't seem to be read by moonwarp at all?
-	PORT_DIPNAME( 0x01, 0x00, "P2")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("P2")
+	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_COCKTAIL // spinner/dial
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	
+	PORT_START("P2_DIAL")
+    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL
+
 
 	/* fake port for monitor type */
 	PORT_START(MONITOR_TYPE_PORT_TAG)
@@ -970,9 +986,9 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Reverse Spinner" ) PORT_DIPLOCATION("F3:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Spinner Direction" ) PORT_DIPLOCATION("F3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Reverse ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Standard ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1011,10 +1027,9 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F5:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F5:8") // I'm nearly sure this is the cocktail/upright select bit but I can't make it consistently work in cocktail mode. Are there more bits which are depended on?
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("F5:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("F6")
 	BERZERK_COINAGE(3, F6)
@@ -1209,6 +1224,7 @@ static DRIVER_INIT( moonwarp )
 {
 	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	memory_install_read8_handler (io, 0x48, 0x48, 0, 0, moonwarp_p1_r);
+	memory_install_read8_handler (io, 0x4a, 0x4a, 0, 0, moonwarp_p2_r);
 }
 
 /*************************************
