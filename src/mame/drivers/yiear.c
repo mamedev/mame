@@ -220,10 +220,10 @@ static MACHINE_DRIVER_START( yiear )
 	MDRV_DRIVER_DATA(trackfld_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/16)   /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/12)   /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MDRV_CPU_PERIODIC_INT(yiear_nmi_interrupt,500)	/* music tempo (correct frequency unknown) */
+	MDRV_CPU_PERIODIC_INT(yiear_nmi_interrupt,480)	/* music tempo (correct frequency unknown) */
 
 	MDRV_MACHINE_START(yiear)
 	MDRV_MACHINE_RESET(yiear)
@@ -246,7 +246,7 @@ static MACHINE_DRIVER_START( yiear )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/16)   /* verified on pcb */
+	MDRV_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)   /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz)   /* verified on pcb */
