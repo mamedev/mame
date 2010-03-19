@@ -866,53 +866,35 @@ static READ8_HANDLER( moonwarp_p1_r )
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 	// one difference is it lacks the strobe input (does it?), which if not active causes
 	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
-	// and player 2 dials.
-	static int lastdialread = -1;
-	int dialread = input_port_read(space->machine,"P1_DIAL");
-	static int dialoutput = 0;
+	// and player 2 dials, which share a single port. moonwarp uses separate ports for the dials.
+	signed char dialread = input_port_read(space->machine,"P1_DIAL");
+	static int counter_74ls161 = 0;
 	static int direction = 0;
 	UINT8 ret;
 	UINT8 buttons = (input_port_read(space->machine,"P1")&0xe0);
-	// following two lines are to fix the direction being wrong for one read
-	// when the 0xFF<->0x00 border is passed on IPT_DIAL
-	if ((lastdialread > 250) && (dialread < 5)) direction = 1;
-	else if ((lastdialread < 5) && (dialread > 250)) direction = 0;
-	else if ((lastdialread - dialread) < 0) direction = 1;
-	else if ((lastdialread - dialread) > 0) direction = 0;
-	// note when lastdialread and dialread are the same direction is left alone.
-	dialoutput += abs(dialread - lastdialread);
-	dialoutput &= 0xf;
-	
-	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
-
-	//fprintf(stderr, "dialread1: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
-	lastdialread = dialread;
+	if (dialread < 0) direction = 0;
+	else if (dialread > 0) direction = 0x10;
+	counter_74ls161 += abs(dialread);
+	counter_74ls161 &= 0xf;
+	ret = counter_74ls161 | direction | buttons;
+	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161, ret);
 	return ret;
 }
 
 static READ8_HANDLER( moonwarp_p2_r )
 {
 	// same as above, but for player 2 in cocktail mode
-	static int lastdialread = -1;
-	int dialread = input_port_read(space->machine,"P2_DIAL");
-	static int dialoutput = 0;
+	signed char dialread = input_port_read(space->machine,"P2_DIAL");
+	static int counter_74ls161 = 0;
 	static int direction = 0;
 	UINT8 ret;
 	UINT8 buttons = (input_port_read(space->machine,"P2")&0xe0);
-	// following two lines are to fix the direction being wrong for one read
-	// when the 0xFF<->0x00 border is passed on IPT_DIAL
-	if ((lastdialread > 250) && (dialread < 5)) direction = 1;
-	else if ((lastdialread < 5) && (dialread > 250)) direction = 0;
-	else if ((lastdialread - dialread) < 0) direction = 1;
-	else if ((lastdialread - dialread) > 0) direction = 0;
-	// note when lastdialread and dialread are the same direction is left alone.
-	dialoutput += abs(dialread - lastdialread);
-	dialoutput &= 0xf;
-	
-	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
-
-	//fprintf(stderr, "dialread2: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
-	lastdialread = dialread;
+	if (dialread < 0) direction = 0;
+	else if (dialread > 0) direction = 0x10;
+	counter_74ls161 += abs(dialread);
+	counter_74ls161 &= 0xf;
+	ret = counter_74ls161 | direction | buttons;
+	//fprintf(stderr, "dialread2: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161, ret);
 	return ret;
 }
 
@@ -930,7 +912,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("P1_DIAL")
-    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
+    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET
 
 	PORT_START("P2")
 	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_COCKTAIL // spinner/dial
@@ -939,7 +921,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	
 	PORT_START("P2_DIAL")
-    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL
+    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL PORT_RESET
 
 	PORT_START("F2")
 	PORT_DIPNAME( 0x03, 0x00, "Hardware Tests" ) PORT_DIPLOCATION("F2:1,2")

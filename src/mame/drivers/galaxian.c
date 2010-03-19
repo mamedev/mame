@@ -1095,26 +1095,17 @@ static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 {
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
-	static int lastdialread = -1;
-	int dialread = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
-	static int dialoutput = 0;
+	signed char dialread = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
+	static int counter_74ls161 = 0;
 	static int direction = 0;
 	UINT8 ret;
 	UINT8 buttons = (input_port_read(device->machine,"IN0")&0xe0);
-	// following two lines are to fix the direction being wrong for one read
-	// when the 0xFF<->0x00 border is passed on IPT_DIAL
-	if ((lastdialread > 250) && (dialread < 5)) direction = 1;
-	else if ((lastdialread < 5) && (dialread > 250)) direction = 0;
-	else if ((lastdialread - dialread) < 0) direction = 1;
-	else if ((lastdialread - dialread) > 0) direction = 0;
-	// note when lastdialread and dialread are the same direction is left alone.
-	dialoutput += abs(dialread - lastdialread);
-	dialoutput &= 0xf;
-	
-	ret=  dialoutput | ((direction==1)?0x10:0) | buttons;
-
-	//fprintf(stderr, "dialread: %02x, lastdialread: %02x, dialoutput: %02x, spinner ret is %02x\n", dialread, lastdialread, dialoutput, ret);
-	lastdialread = dialread;
+	if (dialread < 0) direction = 0;
+	else if (dialread > 0) direction = 0x10;
+	counter_74ls161 += abs(dialread);
+	counter_74ls161 &= 0xf;
+	ret = counter_74ls161 | direction | buttons;
+	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161, ret);
 	return ret;
 }
 
