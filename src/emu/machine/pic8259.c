@@ -415,7 +415,7 @@ static DEVICE_START( pic8259 )
 static DEVICE_RESET( pic8259 ) {
 	pic8259_t	*pic8259 = get_safe_token(device);
 
-	pic8259->state = STATE_ICW1;	/* It is unclear from the original code whether this is correct */
+	pic8259->state = STATE_READY;
 	pic8259->irq_lines = 0;
 	pic8259->isr = 0;
 	pic8259->esr = 0;
