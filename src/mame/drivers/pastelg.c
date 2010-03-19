@@ -225,9 +225,7 @@ INPUT_PORTS_END
 // stops the game hanging..
 static CUSTOM_INPUT( nb1413m3_hackbusyflag_r )
 {
-	static int i = 0;
-	i ^= 1;
-	return i;
+	return mame_rand(field->port->machine) & 3;
 }
 
 static INPUT_PORTS_START( threeds )
@@ -382,8 +380,7 @@ static INPUT_PORTS_START( threeds )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(nb1413m3_hackbusyflag_r, NULL)	// DRAW BUSY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )			//
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(nb1413m3_hackbusyflag_r, NULL)	// DRAW BUSY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
@@ -548,4 +545,4 @@ ROM_END
 
 
 GAME( 1985, pastelg, 0, pastelg, pastelg, pastelg, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 )
-GAME( 1985, 3ds,     0, threeds, threeds, pastelg, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, 3ds,     0, threeds, threeds, pastelg, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", 0 )

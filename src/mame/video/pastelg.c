@@ -270,8 +270,11 @@ static void pastelg_gfxdraw(running_machine *machine)
 			}
 			else
 			{
-				color = ((pastelg_palbank * 0x10) + pastelg_clut[color]);
-				pastelg_videoram[(dy * width) + dx] = color;
+				if(pastelg_clut[color] != 0)
+				{
+					color = ((pastelg_palbank * 0x10) + pastelg_clut[color]);
+					pastelg_videoram[(dy * width) + dx] = color;
+				}
 			}
 
 			nb1413m3_busyctr++;
