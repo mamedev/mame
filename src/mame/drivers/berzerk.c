@@ -639,7 +639,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x08, "1 Coin/14 Credits" )
 
 
-static INPUT_PORTS_START( common )
+static INPUT_PORTS_START( joystick ) // used on all games except moonwarp
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -647,15 +647,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
+	
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -666,6 +658,16 @@ static INPUT_PORTS_START( common )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+INPUT_PORTS_END
+	
+static INPUT_PORTS_START( common ) // used on all games
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	/* fake port for monitor type */
 	PORT_START(MONITOR_TYPE_PORT_TAG)
@@ -673,9 +675,26 @@ static INPUT_PORTS_START( common )
 	PORT_CONFSETTING(    0x00, "Wells-Gardner" )
 	PORT_CONFSETTING(    0x01, "Electrohome" )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	
+	PORT_START("SW2")
+	/* port for the 'bookkeeping reset' and 'bookkeeping' buttons;
+	 * The 'bookkeeping reset' button is an actual button on the zpu-1000 and
+	 * zpu-1001 pcbs, labeled 'S2' or 'SW2'. It is wired to bit 0.
+	 * * pressing it while high scores are displayed will give a free game 
+	 *   without adding any coin info to the bookkeeping info in nvram.
+	 * The 'bookkeeping' button is wired to the control panel, usually hidden
+	 * underneath or only accessible through the coin door. Wired to bit 7.
+	 * * It displays various bookkeeping statistics when pressed sequentially.
+	 *   Pressing P1 fire (according to the manual) when stats are displayed
+	 *   will clear the stat shown on screen.
+	 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Free Game (not logged in bookkeeping)")
+	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Bookkeeping") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( berzerk )
+	PORT_INCLUDE( joystick )
 	PORT_INCLUDE( common )
 
 	PORT_START("F2")
@@ -714,13 +733,6 @@ static INPUT_PORTS_START( berzerk )
 	PORT_START("F6")
 	BERZERK_COINAGE(3, F6)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
-
-	PORT_START("SW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
 // this set has German speech roms, so default the language to German
@@ -736,6 +748,7 @@ static INPUT_PORTS_START( berzerkg )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( frenzy )
+	PORT_INCLUDE( joystick )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("SYSTEM")
@@ -844,11 +857,6 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0e, "14" )
 	PORT_DIPSETTING(    0x0f, "15" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
-
-	PORT_START("SW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_DIPLOCATION("SW2:1")
-	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
 static READ8_HANDLER( moonwarp_p1_r )
@@ -914,6 +922,12 @@ static READ8_HANDLER( moonwarp_p2_r )
 }
 
 static INPUT_PORTS_START( moonwarp )
+	PORT_INCLUDE( common )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // is wired high for upright harness, low for cocktail; if high, cocktail dipswitch is ignored.
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // Hyper flip button is common for both players in cocktail mode.
+	
 	PORT_START("P1")
 	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) // spinner/dial
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
@@ -923,17 +937,6 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_START("P1_DIAL")
     PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // is wired high for upright harness, low for cocktail; if high, cocktail dipswitch is ignored.
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // Hyper flip button is common for both players in cocktail mode.
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
 	PORT_START("P2")
 	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_COCKTAIL // spinner/dial
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
@@ -942,14 +945,6 @@ static INPUT_PORTS_START( moonwarp )
 	
 	PORT_START("P2_DIAL")
     PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL
-
-
-	/* fake port for monitor type */
-	PORT_START(MONITOR_TYPE_PORT_TAG)
-	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
-	PORT_CONFSETTING(    0x00, "Wells-Gardner" )
-	PORT_CONFSETTING(    0x01, "Electrohome" )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("F2")
 	PORT_DIPNAME( 0x03, 0x00, "Hardware Tests" ) PORT_DIPLOCATION("F2:1,2")
@@ -1044,32 +1039,6 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hard ) )
-
-	PORT_START("SW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Free Game")
-	//PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW2:1")
-	//PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	//PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
-
 
 INPUT_PORTS_END
 
