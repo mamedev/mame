@@ -752,7 +752,7 @@ static INPUT_PORTS_START( frenzy )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // frenzy lacks coin 3
 
 	PORT_START("F2")
 	/* Bit 0 does some more hardware tests. According to the manual, both bit 0 & 1 must be:
@@ -770,7 +770,7 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPNAME( 0x08, 0x00, "Crosshair Pattern" ) PORT_CODE(KEYCODE_F4) PORT_TOGGLE PORT_DIPLOCATION("F2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )		// F2:5,6,7,8
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_DIPLOCATION("F2:5,6,7,8")
 
 	PORT_START("F3")
 	PORT_DIPNAME( 0x0f, 0x03, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("F3:1,2,3,4")
@@ -790,7 +790,7 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0e, "14000" )
 	PORT_DIPSETTING(    0x0f, "15000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )	// F3:5,6
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_DIPLOCATION("F3:5,6")
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("F3:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
@@ -799,7 +799,7 @@ static INPUT_PORTS_START( frenzy )
 
 	/* The following 3 ports use all 8 bits, but I didn't feel like adding all 256 values :-) */
 	PORT_START("F4")
-	PORT_DIPNAME( 0x0f, 0x01, "Coin Multiplier" ) PORT_DIPLOCATION("F4:1,2,3,4")	// F4:1,8
+	PORT_DIPNAME( 0xff, 0x01, "Coin Multiplier" ) PORT_DIPLOCATION("F4:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -816,10 +816,10 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0d, "13" )
 	PORT_DIPSETTING(    0x0e, "14" )
 	PORT_DIPSETTING(    0x0f, "15" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
+	PORT_DIPSETTING(    0xff, "255" )
 
 	PORT_START("F5")
-	PORT_DIPNAME( 0x0f, 0x01, "Coins/Credit A" ) PORT_DIPLOCATION("F5:1,2,3,4")	// F5:1,8
+	PORT_DIPNAME( 0xff, 0x01, "Coins/Credit A" ) PORT_DIPLOCATION("F5:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0x00, "0 (invalid)" ) //   Can't insert coins
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -836,10 +836,10 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0d, "13" )
 	PORT_DIPSETTING(    0x0e, "14" )
 	PORT_DIPSETTING(    0x0f, "15" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
+	PORT_DIPSETTING(    0xff, "255" )
 
 	PORT_START("F6")
-	PORT_DIPNAME( 0x0f, 0x01, "Coins/Credit B" ) PORT_DIPLOCATION("F6:1,2,3,4")	// F6:1,8
+	PORT_DIPNAME( 0xff, 0x01, "Coins/Credit B" ) PORT_DIPLOCATION("F6:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0x00, "0 (invalid)" ) //   Can't insert coins
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -856,7 +856,7 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0d, "13" )
 	PORT_DIPSETTING(    0x0e, "14" )
 	PORT_DIPSETTING(    0x0f, "15" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
+	PORT_DIPSETTING(    0xff, "255" )
 INPUT_PORTS_END
 
 static READ8_HANDLER( moonwarp_p1_r )
@@ -892,12 +892,7 @@ static READ8_HANDLER( moonwarp_p1_r )
 
 static READ8_HANDLER( moonwarp_p2_r )
 {
-	// This seems to be the same type of dial as the later 'moon war 2' set uses
-	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
-	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
-	// one difference is it lacks the strobe input (does it?), which if not active causes
-	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
-	// and player 2 dials.
+	// same as above, but for player 2 in cocktail mode
 	static int lastdialread = -1;
 	int dialread = input_port_read(space->machine,"P2_DIAL");
 	static int dialoutput = 0;
