@@ -56,6 +56,13 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "video/konicdev.h"
 
 
+/* if I put these in the state I start getting heap errors on exit?
+  - doesn't seem video related, happens even if I disable video completely?! */
+int bg_tilemap_enable[3];
+int bg_tilemap_enable16[3];
+int bg_tilemap_scrolldx[3];
+
+
 static TILE_GET_INFO( metro_k053936_get_tile_info )
 {
 	metro_state *state = (metro_state *)machine->driver_data;
@@ -140,153 +147,108 @@ static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
 #define WIN_NX		(0x40)
 #define WIN_NY		(0x20)
 
-/* 8x8x4 tiles only */
-INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int layer, UINT16 *vram )
+// returns if to draw the pixel or not, pixel colour is placed in pix/
+// todo: readd tile flips
+INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8 y, int big, UINT16* pix )
 {
 	metro_state *state = (metro_state *)machine->driver_data;
-	UINT16 code;
 	int table_index;
 	UINT32 tile;
 
-	/* Fetch the code */
-	code = vram[tile_index];
-
-	/* Use it as an index into the tiles set table */
+	/* Use code as an index into the tiles set table */
 	table_index = ((code & 0x1ff0) >> 4) * 2;
 	tile = (state->tiletable[table_index + 0] << 16) + state->tiletable[table_index + 1];
 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
-		int _code = code & 0x000f;
-		tileinfo->pen_data = state->empty_tiles + _code * 16 * 16;
-		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
-		tileinfo->flags = 0;
-		tileinfo->category = 0;
+		*pix = (code & 0x0fff)+0x1000;
+		
+		if ((*pix & 0xf) != 0xf)
+			return 1;
+		else
+			return 0;
+
+	}
+	else if (((tile & 0x00f00000) == 0x00f00000)	&& (state->support_8bpp)) /* draw tile as 8bpp */
+	{
+		const gfx_element *gfx1 = machine->gfx[big?3:1];
+		UINT32 tile2 = big ? ((tile & 0xfffff) + 8*(code & 0xf)) :
+			                 ((tile & 0xfffff) + 2*(code & 0xf));
+		const UINT8* data;
+		UINT8 flipxy = (code & 0x6000) >> 13;
+
+		if (tile2 < gfx1->total_elements)
+			data = gfx_element_get_data(gfx1, tile2);
+		else 
+		{
+			*pix |= 0;
+			return 0;
+		}
+
+		switch (flipxy)
+		{
+			default:
+			case 0x0: *pix = data[(y * (big?16:8))     + x];
+		//	case 0x1: pix = data[((7-y) * 8) + x];
+		//	case 0x2: pix = data[(y * 8)     + (7-x)];
+		//	case 0x3: pix = data[((7-y) * 8) + (7-x)];
+		}
+		
+		*pix |= ((((tile & 0x0f000000) >> 24) + 0x10)*0x100);
+		
+		if ((*pix & 0xff) != 0xff)
+			return 1;
+		else
+			return 0;
+
 	}
 	else
-	{
-		tileinfo->category = 0;
-		SET_TILE_INFO(
-				0,
-				(tile & 0xfffff) + (code & 0xf),
-				(((tile & 0x0ff00000) >> 20)) + 0x100,
-				TILE_FLIPXY((code & 0x6000) >> 13));
+	{	
+		const gfx_element *gfx1 = machine->gfx[big?2:0];
+		UINT32 tile2 = big ? ((tile & 0xfffff) + 4*(code & 0xf)) :
+			                 ((tile & 0xfffff) +   (code & 0xf));
+		const UINT8* data;
+		UINT8 flipxy = (code & 0x6000) >> 13;
+		//UINT16 pix;
+
+		if (tile2 < gfx1->total_elements)
+			data = gfx_element_get_data(gfx1, tile2);
+		else 
+		{
+			*pix |= 0;
+			return 0;
+		}
+
+
+		switch (flipxy)
+		{
+			default:
+			case 0x0: *pix = data[(y * (big?8:4))     + (x>>1)];
+		//	case 0x1: pix = data[((7-y) * 4) + x];
+		//	case 0x2: pix = data[(y * 8)     + (7-x)];
+		//	case 0x3: pix = data[((7-y) * 8) + (7-x)];
+		}
+		
+		if (x&1) *pix >>= 4;
+		else *pix &= 0xf;
+
+		*pix |= (((((tile & 0x0ff00000) >> 20)) + 0x100)*0x10);
+		
+		if ((*pix & 0xf) != 0xf)
+			return 1;
+		else
+			return 0;
 	}
+
+	// shouldn't get here..
+	return 0;
 }
 
-/* 8x8x4 or 8x8x8 tiles. It's the tile's color that decides: if its low 4
-   bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-INLINE void get_tile_info_8bit( running_machine *machine, tile_data *tileinfo, int tile_index, int layer, UINT16 *vram )
-{
-	metro_state *state = (metro_state *)machine->driver_data;
-	UINT16 code;
-	int table_index;
-	UINT32 tile;
-
-	/* Fetch the code */
-	code = vram[tile_index];
-
-	/* Use it as an index into the tiles set table */
-	table_index = ((code & 0x1ff0) >> 4) * 2;
-	tile = (state->tiletable[table_index + 0] << 16) + state->tiletable[table_index + 1];
-
-	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
-	{
-		int _code = code & 0x000f;
-		tileinfo->pen_data = state->empty_tiles + _code * 16 * 16;
-		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
-		tileinfo->flags = 0;
-		tileinfo->category = 0;
-	}
-	else if ((tile & 0x00f00000) == 0x00f00000)	/* draw tile as 8bpp */
-	{
-		tileinfo->category = 1;
-		SET_TILE_INFO(
-				1,
-				(tile & 0xfffff) + 2*(code & 0xf),
-				((tile & 0x0f000000) >> 24) + 0x10,
-				TILE_FLIPXY((code & 0x6000) >> 13));
-	}
-	else
-	{
-		tileinfo->category = 0;
-		SET_TILE_INFO(
-				0,
-				(tile & 0xfffff) + (code & 0xf),
-				(((tile & 0x0ff00000) >> 20)) + 0x100,
-				TILE_FLIPXY((code & 0x6000) >> 13));
-	}
-}
-
-/* 16x16x4 or 16x16x8 tiles. It's the tile's color that decides: if its low 4
-   bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-INLINE void get_tile_info_16x16_8bit( running_machine *machine, tile_data *tileinfo, int tile_index, int layer, UINT16 *vram )
-{
-	metro_state *state = (metro_state *)machine->driver_data;
-	UINT16 code;
-	int table_index;
-	UINT32 tile;
-
-	/* Fetch the code */
-	code = vram[tile_index];
-
-	/* Use it as an index into the tiles set table */
-	table_index = ((code & 0x1ff0) >> 4) * 2;
-	tile = (state->tiletable[table_index + 0] << 16) + state->tiletable[table_index + 1];
-
-	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
-	{
-		int _code = code & 0x000f;
-		tileinfo->pen_data = state->empty_tiles + _code * 16 * 16;
-		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
-		tileinfo->flags = 0;
-		tileinfo->category = 0;
-	}
-	else if ((tile & 0x00f00000) == 0x00f00000)	/* draw tile as 8bpp */
-	{
-		tileinfo->category = 1;
-		SET_TILE_INFO(
-				3,
-				(tile & 0xfffff) + 8*(code & 0xf),
-				((tile & 0x0f000000) >> 24) + 0x10,
-				TILE_FLIPXY((code & 0x6000) >> 13));
-	}
-	else
-	{
-		tileinfo->category = 0;
-		SET_TILE_INFO(
-				2,
-				(tile & 0xfffff) + 4*(code & 0xf),
-				(((tile & 0x0ff00000) >> 20)) + 0x100,
-				TILE_FLIPXY((code & 0x6000) >> 13));
-
-	}
-}
 
 INLINE void metro_vram_w( running_machine *machine, offs_t offset, UINT16 data, UINT16 mem_mask, int layer, UINT16 *vram )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
-
 	COMBINE_DATA(&vram[offset]);
-
-	tilemap_mark_tile_dirty(state->bg_tilemap[layer], offset);
-	if (state->bg_tilemap_16x16[layer])
-		tilemap_mark_tile_dirty(state->bg_tilemap_16x16[layer], offset);
 }
-
-
-static TILE_GET_INFO( get_tile_info_0 ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info(machine, tileinfo, tile_index, 0, state->vram_0); }
-static TILE_GET_INFO( get_tile_info_1 ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info(machine, tileinfo, tile_index, 1, state->vram_1); }
-static TILE_GET_INFO( get_tile_info_2 ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info(machine, tileinfo, tile_index, 2, state->vram_2); }
-
-static TILE_GET_INFO( get_tile_info_0_8bit ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info_8bit(machine, tileinfo, tile_index, 0, state->vram_0); }
-static TILE_GET_INFO( get_tile_info_1_8bit ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info_8bit(machine, tileinfo, tile_index, 1, state->vram_1); }
-static TILE_GET_INFO( get_tile_info_2_8bit ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info_8bit(machine, tileinfo, tile_index, 2, state->vram_2); }
-
-static TILE_GET_INFO( get_tile_info_0_16x16_8bit ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info_16x16_8bit(machine, tileinfo, tile_index, 0, state->vram_0); }
-static TILE_GET_INFO( get_tile_info_1_16x16_8bit ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info_16x16_8bit(machine, tileinfo, tile_index, 1, state->vram_1); }
-static TILE_GET_INFO( get_tile_info_2_16x16_8bit ) { metro_state *state = (metro_state *)machine->driver_data;  get_tile_info_16x16_8bit(machine, tileinfo, tile_index, 2, state->vram_2); }
-
 
 WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = (metro_state *)space->machine->driver_data;  metro_vram_w(space->machine, offset, data, mem_mask, 0, state->vram_0); }
 WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = (metro_state *)space->machine->driver_data;  metro_vram_w(space->machine, offset, data, mem_mask, 1, state->vram_1); }
@@ -321,54 +283,6 @@ WRITE16_HANDLER( metro_window_w )
 */
 
 /* Dirty tilemaps when the tiles set changes */
-static void dirty_tiles( running_machine *machine, int layer, UINT16 *vram )
-{
-	metro_state *state = (metro_state *)machine->driver_data;
-	int col, row;
-	int offset = 0;
-
-	for (row = 0; row < BIG_NY; row++)
-	{
-		for (col = 0; col < BIG_NX; col++)
-		{
-			UINT16 code = vram[offset];
-
-			offset++;
-
-			if (!(code & 0x8000) && state->dirtyindex[(code & 0x1ff0) >> 4])
-			{
-				tilemap_mark_tile_dirty(state->bg_tilemap[layer], offset);
-				if (state->bg_tilemap_16x16[layer])
-					tilemap_mark_tile_dirty(state->bg_tilemap_16x16[layer], offset);
-			}
-		}
-	}
-}
-
-static STATE_POSTLOAD( metro_tile_dirty_postload )
-{
-	metro_state *state = (metro_state *)machine->driver_data;
-
-	/* FIXME: this is still not enough in some games (e.g. 3kokushi) */
-	memset(state->dirtyindex, 1, state->tiletable_size / 4);
-	dirty_tiles(machine, 0, state->vram_0);
-	dirty_tiles(machine, 1, state->vram_1);
-	dirty_tiles(machine, 2, state->vram_2);
-
-	memcpy(state->tiletable_old, state->tiletable, state->tiletable_size);
-}
-
-static void alloc_empty_tiles( running_machine *machine )
-{
-	metro_state *state = (metro_state *)machine->driver_data;
-	int code, i;
-
-	state->empty_tiles = auto_alloc_array(machine, UINT8, 16 * 16 * 16);
-
-	for (code = 0; code < 0x10; code++)
-		for (i = 0; i < 16 * 16; i++)
-			state->empty_tiles[16 * 16 * code + i] = code;
-}
 
 VIDEO_START( metro_14100 )
 {
@@ -378,21 +292,17 @@ VIDEO_START( metro_14100 )
 	state->support_16x16 = 0;
 	state->has_zoom = 0;
 
-	alloc_empty_tiles(machine);
+	bg_tilemap_enable[0] = 1;
+	bg_tilemap_enable[1] = 1;
+	bg_tilemap_enable[2] = 1;
 
-	state->tiletable_old = auto_alloc_array(machine, UINT16, state->tiletable_size / 2);
-	state->dirtyindex = auto_alloc_array(machine, UINT8, state->tiletable_size / 4);
+	bg_tilemap_enable16[0] = 0;
+	bg_tilemap_enable16[1] = 0;
+	bg_tilemap_enable16[2] = 0;
 
-	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-	state->bg_tilemap[2] = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-
-	state->bg_tilemap_16x16[0] = NULL;
-	state->bg_tilemap_16x16[1] = NULL;
-	state->bg_tilemap_16x16[2] = NULL;
-
-	state_save_register_global_pointer(machine, state->tiletable_old, state->tiletable_size / 2);
-	state_save_register_postload(machine, metro_tile_dirty_postload, NULL);
+	bg_tilemap_scrolldx[0] = 0;
+	bg_tilemap_scrolldx[1] = 0;
+	bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START( metro_14220 )
@@ -403,25 +313,17 @@ VIDEO_START( metro_14220 )
 	state->support_16x16 = 0;
 	state->has_zoom = 0;
 
-	alloc_empty_tiles(machine);
+	bg_tilemap_enable[0] = 1;
+	bg_tilemap_enable[1] = 1;
+	bg_tilemap_enable[2] = 1;
 
-	state->tiletable_old = auto_alloc_array(machine, UINT16, state->tiletable_size / 2);
-	state->dirtyindex = auto_alloc_array(machine, UINT8, state->tiletable_size / 4);
+	bg_tilemap_enable16[0] = 0;
+	bg_tilemap_enable16[1] = 0;
+	bg_tilemap_enable16[2] = 0;
 
-	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-	state->bg_tilemap[2] = tilemap_create(machine, get_tile_info_2_8bit, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-
-	state->bg_tilemap_16x16[0] = NULL;
-	state->bg_tilemap_16x16[1] = NULL;
-	state->bg_tilemap_16x16[2] = NULL;
-
-	tilemap_set_scrolldx(state->bg_tilemap[0], -2, 2);
-	tilemap_set_scrolldx(state->bg_tilemap[1], -2, 2);
-	tilemap_set_scrolldx(state->bg_tilemap[2], -2, 2);
-
-	state_save_register_global_pointer(machine, state->tiletable_old, state->tiletable_size / 2);
-	state_save_register_postload(machine, metro_tile_dirty_postload, NULL);
+	bg_tilemap_scrolldx[0] = -2;
+	bg_tilemap_scrolldx[1] = -2;
+	bg_tilemap_scrolldx[2] = -2;
 }
 
 VIDEO_START( metro_14300 )
@@ -432,21 +334,17 @@ VIDEO_START( metro_14300 )
 	state->support_16x16 = 1;
 	state->has_zoom = 0;
 
-	alloc_empty_tiles(machine);
+	bg_tilemap_enable[0] = 1;
+	bg_tilemap_enable[1] = 1;
+	bg_tilemap_enable[2] = 1;
 
-	state->tiletable_old = auto_alloc_array(machine, UINT16, state->tiletable_size / 2);
-	state->dirtyindex = auto_alloc_array(machine, UINT8, state->tiletable_size / 4);
+	bg_tilemap_enable16[0] = 0;
+	bg_tilemap_enable16[1] = 0;
+	bg_tilemap_enable16[2] = 0;
 
-	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-	state->bg_tilemap[2] = tilemap_create(machine, get_tile_info_2_8bit, tilemap_scan_rows, 8, 8, BIG_NX, BIG_NY);
-
-	state->bg_tilemap_16x16[0] = tilemap_create(machine, get_tile_info_0_16x16_8bit, tilemap_scan_rows, 16, 16, BIG_NX, BIG_NY);
-	state->bg_tilemap_16x16[1] = tilemap_create(machine, get_tile_info_1_16x16_8bit, tilemap_scan_rows, 16, 16, BIG_NX, BIG_NY);
-	state->bg_tilemap_16x16[2] = tilemap_create(machine, get_tile_info_2_16x16_8bit, tilemap_scan_rows, 16, 16, BIG_NX, BIG_NY);
-
-	state_save_register_global_pointer(machine, state->tiletable_old, state->tiletable_size / 2);
-	state_save_register_postload(machine, metro_tile_dirty_postload, NULL);
+	bg_tilemap_scrolldx[0] = 0;
+	bg_tilemap_scrolldx[1] = 0;
+	bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START( blzntrnd )
@@ -459,9 +357,9 @@ VIDEO_START( blzntrnd )
 
 	state->k053936_tilemap = tilemap_create(machine, metro_k053936_get_tile_info, tilemap_scan_rows, 8, 8, 256, 512);
 
-	tilemap_set_scrolldx(state->bg_tilemap[0], 8, -8);
-	tilemap_set_scrolldx(state->bg_tilemap[1], 8, -8);
-	tilemap_set_scrolldx(state->bg_tilemap[2], 8, -8);
+	bg_tilemap_scrolldx[0] = 8;
+	bg_tilemap_scrolldx[1] = 8;
+	bg_tilemap_scrolldx[2] = 8;
 }
 
 VIDEO_START( gstrik2 )
@@ -474,9 +372,9 @@ VIDEO_START( gstrik2 )
 
 	state->k053936_tilemap = tilemap_create(machine, metro_k053936_gstrik2_get_tile_info, tilemap_scan_gstrik2, 16, 16, 128, 256);
 
-	tilemap_set_scrolldx(state->bg_tilemap[0], 8, -8);
-	tilemap_set_scrolldx(state->bg_tilemap[1], 0, 0);
-	tilemap_set_scrolldx(state->bg_tilemap[2], 8, -8);
+	bg_tilemap_scrolldx[0] = 8;
+	bg_tilemap_scrolldx[1] = 0;
+	bg_tilemap_scrolldx[2] = 8;
 }
 
 /***************************************************************************
@@ -690,21 +588,17 @@ void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const recta
 
 /* copy a 'window' from the large 2048x2048 (or 4096x4096 for 16x16 tiles) tilemap */
 
-static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, UINT32 flags, UINT32 pcode,
-						 int sx, int sy, int wx, int wy )	// scroll & window values
+
+static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 pcode,
+						 int sx, int sy, int wx, int wy, int big, UINT16* tilemapram, int layer )
 {
 	metro_state *state = (metro_state *)machine->driver_data;
-
-	UINT16 *srcpixline;
-	UINT8 *srcflgline;
 	int y;
 
-	bitmap_t *pixdata = tilemap_get_pixmap(tmap);
-	bitmap_t *flgdata = tilemap_get_flagsmap(tmap);
 	bitmap_t *priority_bitmap = machine->priority_bitmap;
 
-	int width = pixdata->width;
-	int height = pixdata->height;
+	int width = big ? 4096 : 2048;//pixdata->width;
+	int height = big ? 4096 : 2048;//pixdata->height;
 	
 	int scrwidth = bitmap->width;
 	int scrheight = bitmap->height;
@@ -712,17 +606,23 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 	int windowwidth = width >> 2;
 	int windowheight = height >> 3;
 
-	if (tilemap_get_enable(tmap)==0) return;
-
-	if (!state->flip_screen)
+	if (!big)
 	{
-		sx -= tilemap_get_scrolldx(tmap);
-		sy -= tilemap_get_scrolldy(tmap);
+		if (!bg_tilemap_enable[layer]) return;
 	}
 	else
 	{
-		sx += tilemap_get_scrolldx(tmap);
-		sy += tilemap_get_scrolldy(tmap);
+		if (!bg_tilemap_enable16[layer]) return;
+	}
+
+
+	if (!state->flip_screen)
+	{
+		sx -= bg_tilemap_scrolldx[layer];
+	}
+	else
+	{
+		sx += bg_tilemap_scrolldx[layer];
 	}
 
 	for (y=0;y<scrheight;y++)
@@ -731,10 +631,9 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 		int x;
 		UINT16* dst;
 		UINT8 *priority_baseaddr;
+		int srcline = (wy+scrolly)&(height-1);
+		int srctilerow = srcline >> (big ? 4 : 3);
 
-		srcpixline = BITMAP_ADDR16(pixdata,(wy+scrolly)&(height-1), 0);
-		srcflgline = BITMAP_ADDR8(flgdata,(wy+scrolly)&(height-1), 0);
-		
 		if (!state->flip_screen)
 		{
 			dst = BITMAP_ADDR16(bitmap, y, 0);
@@ -743,31 +642,19 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 			for (x=0;x<scrwidth;x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
+				int srccol = (wx+scrollx)&(width-1);
+				int srctilecol = srccol >> (big ? 4 : 3);
+				int tileoffs = srctilecol + srctilerow * BIG_NX;
+
 				UINT16 dat;
-				UINT8 flg;
 
-				dat = srcpixline[(wx+scrollx)&(width-1)];
-				flg = srcflgline[(wx+scrollx)&(width-1)];
-
-				
-				if (flg&0xf) // check category bits to see if we're 4bpp/8bpp
+				UINT16 tile = tilemapram[tileoffs];
+				UINT8 draw = get_tile_pix(machine, tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
+								
+				if (draw)
 				{
-					// 8bpp tile data
-					if ((dat&0xff) != 0xff)
-					{
-						dst[x] = dat;
-						priority_baseaddr[x] = (priority_baseaddr[x] & (pcode >> 8)) | pcode;
-					}
-				}
-				else
-				{
-					// 4bpp tile data
-					if ((dat&0xf) != 0xf)
-					{
-						dst[x] = dat;
-						priority_baseaddr[x] = (priority_baseaddr[x] & (pcode >> 8)) | pcode;
-
-					}
+					dst[x] = dat;
+					priority_baseaddr[x] = (priority_baseaddr[x] & (pcode >> 8)) | pcode;
 				}
 			}
 		}
@@ -779,30 +666,19 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 			for (x=0;x<scrwidth;x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
+				int srccol = (wx+scrollx)&(width-1);
+				int srctilecol = srccol >> (big ? 4 : 3);
+				int tileoffs = srctilecol + srctilerow * BIG_NX;
+
 				UINT16 dat;
-				UINT8 flg;
 
-				dat = srcpixline[(wx+scrollx)&(width-1)];
-				flg = srcflgline[(wx+scrollx)&(width-1)];
-
-				
-				if (flg&0xf) // check category bits to see if we're 4bpp/8bpp
+				UINT16 tile = tilemapram[tileoffs];			
+				UINT8 draw = get_tile_pix(machine, tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
+			
+				if (draw)	
 				{
-					// 8bpp tile data
-					if ((dat&0xff) != 0xff)
-					{
-						dst[scrwidth-x-1] = dat;
-						priority_baseaddr[scrwidth-x-1] = (priority_baseaddr[scrwidth-x-1] & (pcode >> 8)) | pcode;
-					}
-				}
-				else
-				{
-					// 4bpp tile data
-					if ((dat&0xf) != 0xf)
-					{
-						dst[scrwidth-x-1] = dat;
-						priority_baseaddr[scrwidth-x-1] = (priority_baseaddr[scrwidth-x-1] & (pcode >> 8)) | pcode;
-					}
+					dst[scrwidth-x-1] = dat;
+					priority_baseaddr[scrwidth-x-1] = (priority_baseaddr[scrwidth-x-1] & (pcode >> 8)) | pcode;
 				}
 			}
 		}
@@ -827,9 +703,16 @@ static void draw_layers( running_machine *machine, bitmap_t *bitmap, const recta
 
 			if (BIT(layers_ctrl, layer))	// for debug
 			{
-				draw_tilemap(machine, bitmap, cliprect, state->bg_tilemap[layer], 0, 1 << (3 - pri), sx, sy, wx, wy);
-				if (state->bg_tilemap_16x16[layer]) 
-					draw_tilemap(machine, bitmap, cliprect, state->bg_tilemap_16x16[layer], 0, 1 << (3 - pri), sx, sy, wx, wy);
+				UINT16* tilemapram = 0;
+
+				if (layer==0) tilemapram = state->vram_0;
+				else if (layer==1) tilemapram = state->vram_1;
+				else if (layer==2) tilemapram = state->vram_2;
+		
+				draw_tilemap(machine, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, 0, tilemapram, layer);
+				
+				if (state->support_16x16) 
+					draw_tilemap(machine, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, 1, tilemapram, layer);
 			}
 		}
 	}
@@ -840,33 +723,8 @@ static void draw_layers( running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( metro )
 {
 	metro_state *state = (metro_state *)screen->machine->driver_data;
-	int i, pri, layers_ctrl = -1;
+	int pri, layers_ctrl = -1;
 	UINT16 screenctrl = *state->screenctrl;
-
-	{
-		int dirty = 0;
-
-		memset(state->dirtyindex, 0, state->tiletable_size / 4);
-		for (i = 0; i < state->tiletable_size / 4; i++)
-		{
-			UINT32 tile_new = (state->tiletable[2 * i + 0] << 16 ) + state->tiletable[2 * i + 1];
-			UINT32 tile_old = (state->tiletable_old[2 * i + 0] << 16 ) + state->tiletable_old[2 * i + 1];
-
-			if ((tile_new ^ tile_old) & 0x0fffffff)
-			{
-				state->dirtyindex[i] = 1;
-				dirty = 1;
-			}
-		}
-		memcpy(state->tiletable_old, state->tiletable, state->tiletable_size);
-
-		if (dirty)
-		{
-			dirty_tiles(screen->machine, 0, state->vram_0);
-			dirty_tiles(screen->machine, 1, state->vram_1);
-			dirty_tiles(screen->machine, 2, state->vram_2);
-		}
-	}
 
 	state->sprite_xoffs = state->videoregs[0x06 / 2] - video_screen_get_width(screen)  / 2;
 	state->sprite_yoffs = state->videoregs[0x04 / 2] - video_screen_get_height(screen) / 2;
@@ -903,8 +761,8 @@ VIDEO_UPDATE( metro )
 		{
 			int big = screenctrl & (0x0020 << layer);
 
-			tilemap_set_enable(state->bg_tilemap[layer],!big);
-			tilemap_set_enable(state->bg_tilemap_16x16[layer], big);
+			bg_tilemap_enable[layer] = !big;
+			bg_tilemap_enable16[layer] = big;
 		}
 	}
 
