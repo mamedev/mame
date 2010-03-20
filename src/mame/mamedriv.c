@@ -278,7 +278,8 @@ const game_driver * const drivers[] =
 	DRIVER( mrkougar2 )	/* (c) 1984 ATW */
 	DRIVER( mrkougb )	/* bootleg */
 	DRIVER( mrkougb2 )	/* bootleg */
-	DRIVER( hotshock )	/* (c) 1982 E.G. Felaco */
+	DRIVER( hotshock )	/* (c) 1982 E.G. Felaco (Domino license) */
+	DRIVER( hotshockb )	/* bootleg */
 	DRIVER( conquer )	/* (c) 1982 ???? */
 	DRIVER( hunchbks )	/* (c) 1983 Century */
 	DRIVER( hncholms )	/* (c) 1984 Century */
@@ -4299,6 +4300,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( fvipers2 )	/* 1998.04 Fighting Vipers 2 */
 	DRIVER( vs298 )		/* 1998.05 Virtua Striker 2 ver.98*/
 	DRIVER( vs299 )		/* 1998.12 Virtual Striker 2 ver.99 */
+	DRIVER( vs299a )	/* 1999.?? Virtual Striker 2 ver.99 (rev A) */
 	DRIVER( vs2v991 )	/* 1999.?? Virtual Striker 2 ver.99.1 */
 	DRIVER( von254g )	/* 1999.05 Dennou Senki Virtual-On Oratorio Tangram ver.5.4 */
 
