@@ -3027,6 +3027,7 @@ V-V                           TP-027
 	DRIVER( ts2 )		/* Battle Arena Toshinden 2 (USA 951124) */
 	DRIVER( ts2j )		/* Battle Arena Toshinden 2 (JAPAN 951124) */
 	DRIVER( starglad )	/* Star Gladiator (USA 960627) */
+	DRIVER( stargladj )	/* Star Gladiator (JAPAN 960627) */
 	DRIVER( sfex )		/* Street Fighter EX (EURO 961219) */
 	DRIVER( sfexu )		/* Street Fighter EX (USA 961219) */
 	DRIVER( sfexa )		/* Street Fighter EX (ASIA 961219) */
