@@ -29,20 +29,14 @@ public:
 	UINT16 *    screenctrl;
 	UINT16 *    input_sel;
 	UINT16 *    k053936_ram;
-	UINT8 *     dirtyindex;
-	UINT8 *     empty_tiles;
 
 	size_t      spriteram_size;
 	size_t      tiletable_size;
 
 	int			flip_screen;
-//	UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t   *k053936_tilemap;
-	tilemap_t   *bg_tilemap[3];
-	tilemap_t   *bg_tilemap_16x16[3];
-
 
 	int         support_8bpp, support_16x16;
 	int         has_zoom;
