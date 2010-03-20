@@ -1769,6 +1769,25 @@ ROM_END
 
 ROM_START( hotshock )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0d.l10", 0x0000, 0x1000, CRC(3e8aeaeb) SHA1(0572623928d36d106c9d8028d92fbd02375291a5) )
+	ROM_LOAD( "1d.l9",  0x1000, 0x1000, CRC(0eab3246) SHA1(fac21e341186a7b70893c48cc00b1209dc31bcca) )
+	ROM_LOAD( "2d.l8",  0x2000, 0x1000, CRC(e646bde3) SHA1(a0349a096ea00c077d162a945e4797e164a1508f) )
+	ROM_LOAD( "3d.l7",  0x3000, 0x1000, CRC(5bde9312) SHA1(d3ba06790c8210f41902bb8ad27a1e5abafccb33) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6d.b3",  0x0000, 0x1000, CRC(c5e02651) SHA1(105b28d28cad2cddfc0a32b5dec1d21d1ef3f663) )
+	ROM_LOAD( "7d.b4",  0x1000, 0x1000, CRC(49dc113d) SHA1(c59642d6cbd6e9c54c9802b8ec550b106e6a3ec3) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "4d.h3",  0x0000, 0x1000, CRC(751c850e) SHA1(067aaea400bbbcb0819d74a24fba5d7e035c2466) )
+	ROM_LOAD( "5d.h5",  0x1000, 0x1000, CRC(fc74282e) SHA1(9a7df0a972cba4ee3c317ef3617b1d69d516bebb) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "18s030.1k",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
+ROM_START( hotshockb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hotshock.l10", 0x0000, 0x1000, CRC(401078f7) SHA1(d4415a41eba1d3a2dcbb119f3136c177b02d1fb6) )
 	ROM_LOAD( "hotshock.l9",  0x1000, 0x1000, CRC(af76c237) SHA1(bb54e1652a2d2e56731434ed85b40dab4aad91c9) )
 	ROM_LOAD( "hotshock.l8",  0x2000, 0x1000, CRC(30486031) SHA1(bed06cb62afee6b000a0e21927559ac5d3538b38) )
@@ -1965,7 +1984,8 @@ GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, mrkougar,     ROT90, "ATW", 
 GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar (earlier)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mrkougb,  mrkougar, mrkougb,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, hotshock, 0,        hotshock, hotshock, hotshock,     ROT90, "E.G. Felaco", "Hot Shocker", GAME_SUPPORTS_SAVE )
+GAME( 1982, hotshock, 0,        hotshock, hotshock, hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker", GAME_SUPPORTS_SAVE )
+GAME( 1982, hotshockb,hotshock, hotshock, hotshock, hotshock,     ROT90, "bootleg", "Hot Shocker (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, conquer,  0,        hotshock, hotshock, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
 GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_ppi, ROT90, "Century Electronics", "Hunchback Olympic (Scramble hardware)", GAME_SUPPORTS_SAVE )
