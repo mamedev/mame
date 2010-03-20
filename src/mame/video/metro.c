@@ -147,8 +147,9 @@ static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
 #define WIN_NX		(0x40)
 #define WIN_NY		(0x20)
 
-// returns if to draw the pixel or not, pixel colour is placed in pix/
-// todo: readd tile flips
+// this looks up a single pixel in a tile, given the code
+// the metro hardware has an indirection table, which is used here
+// returns if to draw the pixel or not, pixel colour is placed in pix
 INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8 y, int big, UINT16* pix )
 {
 	metro_state *state = (metro_state *)machine->driver_data;
@@ -188,10 +189,10 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 		switch (flipxy)
 		{
 			default:
-			case 0x0: *pix = data[(y * (big?16:8))     + x];
-		//	case 0x1: pix = data[((7-y) * 8) + x];
-		//	case 0x2: pix = data[(y * 8)     + (7-x)];
-		//	case 0x3: pix = data[((7-y) * 8) + (7-x)];
+			case 0x0: *pix = data[(y              * (big?16:8)) + x];              break;
+			case 0x1: *pix = data[(((big?15:7)-y) * (big?16:8)) + x];              break;
+			case 0x2: *pix = data[(y              * (big?16:8)) + ((big?15:7)-x)]; break;
+			case 0x3: *pix = data[(((big?15:7)-y) * (big?16:8)) + ((big?15:7)-x)]; break;
 		}
 		
 		*pix |= ((((tile & 0x0f000000) >> 24) + 0x10)*0x100);
@@ -209,7 +210,6 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 			                 ((tile & 0xfffff) +   (code & 0xf));
 		const UINT8* data;
 		UINT8 flipxy = (code & 0x6000) >> 13;
-		//UINT16 pix;
 
 		if (tile2 < gfx1->total_elements)
 			data = gfx_element_get_data(gfx1, tile2);
@@ -223,14 +223,22 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 		switch (flipxy)
 		{
 			default:
-			case 0x0: *pix = data[(y * (big?8:4))     + (x>>1)];
-		//	case 0x1: pix = data[((7-y) * 4) + x];
-		//	case 0x2: pix = data[(y * 8)     + (7-x)];
-		//	case 0x3: pix = data[((7-y) * 8) + (7-x)];
+			case 0x0: *pix = data[(y              * (big?8:4)) + (x>>1)];             break;
+			case 0x1: *pix = data[(((big?15:7)-y) * (big?8:4)) + (x>>1)];             break;
+			case 0x2: *pix = data[(y              * (big?8:4)) + ((big?7:3)-(x>>1))]; break;
+			case 0x3: *pix = data[(((big?15:7)-y) * (big?8:4)) + ((big?7:3)-(x>>1))]; break;
 		}
 		
-		if (x&1) *pix >>= 4;
-		else *pix &= 0xf;
+		if (!(flipxy&2))
+		{
+			if (x&1) *pix >>= 4;
+			else *pix &= 0xf;
+		}
+		else
+		{
+			if (x&1) *pix  &= 0xf;
+			else *pix >>= 4;
+		}
 
 		*pix |= (((((tile & 0x0ff00000) >> 20)) + 0x100)*0x10);
 		
