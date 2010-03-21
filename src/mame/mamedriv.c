@@ -2428,6 +2428,7 @@ V-V                           TP-027
 	DRIVER( theroes )	/* (c) 2001 Primetek Investments */
 	DRIVER( korokoro )	/* (c) 1999 Takumi */
 	DRIVER( crusherm )	/* (c) 1999 Takumi */
+	DRIVER( tjumpman )	/* (c) 1999 Namco */
 
 	/* Kyugo games */
 	/* Kyugo only made four games: Repulse, Flash Gal, SRD Mission and Air Wolf. */
