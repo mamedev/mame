@@ -24,6 +24,7 @@
 DEVICE_GET_INFO( exidy_sound );
 #define SOUND_EXIDY DEVICE_GET_INFO_NAME( exidy_sound )
 
+READ8_HANDLER( exidy_sh6840_r );
 WRITE8_HANDLER( exidy_sh6840_w );
 WRITE8_HANDLER( exidy_sfxctrl_w );
 
