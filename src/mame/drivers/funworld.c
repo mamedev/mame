@@ -664,6 +664,19 @@
   - Flagged vegasfte as GAME_NOT_WORKING, since is not receiving
      any coins or remote credits anymore.
 
+  [2010/03/21]
+  - Added dual-state palette (addressable through PLDs).
+     This allow to choose which half of the palette will be addressed.
+  - Splitted the main Machine driver to cover both palette states.
+  - Reworked inputs / DIP switches for vegasslw, vagasfst and vegasfte.
+  - Created new default NVRAM for Royal Vegas Joker Card sets.
+     These need to be configurated to be valid ones. Now vegasfte can
+     receive remote credits, and all three in the family have valid
+     min-max bet value and payout.
+  - Removed the not working flag from vegasfte.
+  - Improved colors for Big Deal sets.
+  - Correct colors for Royal Vegas Joker Card sets.
+
 
 
   *** TO DO ***
@@ -677,7 +690,6 @@
   - Analyze the unknown writes to $2000/$4000 in some games.
   - Check for the reads to the ay8910 output ports in some games.
   - Implement the MCU in monglfir and soccernw.
-  - Analyze why vegasfte stopped to receive coins/remote credits.
 
 
 ***********************************************************************************/
@@ -1529,6 +1541,190 @@ static INPUT_PORTS_START( jolyjokra )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vegasslw )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Kasiraj (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Kockaj (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Ulog (Bet)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buch (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Velika (High)")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Mala (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreiben (Payout)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPSETTING(    0x20, "Without Joker" )
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "Auto Hold" )
+	PORT_DIPSETTING(    0x40, "No Auto Hold" )
+
+	/* after nvram init, set the following one to 'manual'
+    to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vegasfst )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Prihoduj (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Dupliraj (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Ulog (Bet)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buch (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Velika (High)")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Mala (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreiben (Payout)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Remote" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "100 Points/Pulse" )
+	PORT_DIPSETTING(    0x02, "1000 Points/Pulse" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPSETTING(    0x20, "Without Joker" )
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "Auto Hold" )
+	PORT_DIPSETTING(    0x40, "No Auto Hold" )
+
+	/* after nvram init, set the following one to 'manual'
+    to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vegasfte )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Kasiraj (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Kockaj (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / +Ulog (Add Bet)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buch (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Velika (High) / -Ulog (Remove Bet)")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Mala (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreiben (Payout)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Remote" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "100 Points/Pulse" )
+	PORT_DIPSETTING(    0x02, "1000 Points/Pulse" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPSETTING(    0x20, "Without Joker" )
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "Auto Hold" )
+	PORT_DIPSETTING(    0x40, "No Auto Hold" )
+
+	/* after nvram init, set the following one to 'manual'
+    to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( saloon )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
@@ -1686,8 +1882,12 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( funworld )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 16 )
+static GFXDECODE_START( fw1stpal )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( fw2ndpal )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x100, 16 )
 GFXDECODE_END
 
 
@@ -1814,7 +2014,7 @@ static const mc6845_interface mc6845_intf =
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_DRIVER_START( funworld )
+static MACHINE_DRIVER_START( fw1stpal )
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funworld_map)
@@ -1834,7 +2034,7 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06 */
 
-	MDRV_GFXDECODE(funworld)
+	MDRV_GFXDECODE(fw1stpal)
 
 	MDRV_PALETTE_LENGTH(0x200)
 	MDRV_PALETTE_INIT(funworld)
@@ -1851,8 +2051,18 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( fw2ndpal )
+	MDRV_IMPORT_FROM(fw1stpal)
+
+	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+
+	MDRV_GFXDECODE(fw2ndpal)
+MACHINE_DRIVER_END
+
+
+
 static MACHINE_DRIVER_START( funquiz )
-	MDRV_IMPORT_FROM(funworld)
+	MDRV_IMPORT_FROM(fw1stpal)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funquiz_map)
@@ -1864,12 +2074,11 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( magicrd2 )
-	MDRV_IMPORT_FROM(funworld)
+	MDRV_IMPORT_FROM(fw1stpal)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
 
-	MDRV_GFXDECODE(funworld)
 	MDRV_VIDEO_START(magicrd2)
 
 	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
@@ -1878,21 +2087,21 @@ static MACHINE_DRIVER_START( magicrd2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( royalcrd )
-	MDRV_IMPORT_FROM(funworld)
+	MDRV_IMPORT_FROM(fw1stpal)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cuoreuno )
-	MDRV_IMPORT_FROM(funworld)
+	MDRV_IMPORT_FROM(fw1stpal)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(cuoreuno_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( saloon )
-	MDRV_IMPORT_FROM(funworld)
+	MDRV_IMPORT_FROM(fw1stpal)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(saloon_map)
@@ -2061,6 +2270,9 @@ ROM_END
           - 1x KM6264AL-10
 
     - 1x Crystal : 16.000 MHz
+
+    These croatian sets are not meant to work with coins...
+    Only remote credits, as can be seen in test mode.
 */
 
 ROM_START( jolyccra )	/* Jolly Card (croatian, set 1) */
@@ -2162,6 +2374,9 @@ ROM_END
 
     jolycdib program seems to be the original for blue TAB PCB.
     jolycdit has some code patches and redirected parts to suspicious offsets (as d500, d000, etc)
+
+    This sets is not meant to work with coins...
+    Only remote credits, as can be seen in test mode.
 */
 
 ROM_START( jolycdib )	/* bootleg PCB, encrypted graphics */
@@ -2234,8 +2449,8 @@ ROM_START( bigdeal )
 	ROM_LOAD( "poker4.003", 0x0000, 0x8000, CRC(8c33a15f) SHA1(a1c8451c99a23eeffaedb21d1a1b69f54629f8ab) )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* using jollycrd palette till a correct dump appear */
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, BAD_DUMP CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
+	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -2247,8 +2462,8 @@ ROM_START( bigdealb )
 	ROM_LOAD( "poker4.003", 0x0000, 0x8000, CRC(8c33a15f) SHA1(a1c8451c99a23eeffaedb21d1a1b69f54629f8ab) )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* using jollycrd palette till a correct dump appear */
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, BAD_DUMP CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
+	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -2278,8 +2493,8 @@ ROM_START( jolycdat )	/* there are unused pieces of code that compare or jumps w
 	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
-	ROM_REGION( 0x0200, "proms", 0 )	/* using jollycrd palette till a correct dump appear */
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, BAD_DUMP CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
+	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -2957,10 +3172,10 @@ ROM_START( vegasslw )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "vegasslw_nvram.bin",  0x0000, 0x0800, CRC(59b84075) SHA1(964531320d29adc42c3d8f0a28df395354a51d9b) )
+	ROM_LOAD( "vegasslw_nvram.bin",  0x0000, 0x0800, CRC(1aa043e3) SHA1(c93d071effb2f2fe95e9dc751174c2c765595f74) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
+	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -2973,10 +3188,10 @@ ROM_START( vegasfst )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "vegasfst_nvram.bin",  0x0000, 0x0800, CRC(627d13d7) SHA1(03ac605c589c645b672c57b0695dcb90240068e1) )
+	ROM_LOAD( "vegasfst_nvram.bin",  0x0000, 0x0800, CRC(5034de7a) SHA1(ab2077a49d94676531c73ad8d8ce9548bbfa2b81) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
+	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -2989,10 +3204,10 @@ ROM_START( vegasfte )	/* Royal Vegas Joker Card (fast deal, english gfx) */
 	ROM_LOAD( "ch1.bin", 0x8000, 0x8000, CRC(0a3679c0) SHA1(ce8a067e1a2eccf9fabb16733ef3a14e0e8129e5) )	/* X & Y in txt layer */
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "vegasfte_nvram.bin",  0x0000, 0x0800, CRC(c09e49a2) SHA1(e95f444f1bfda0a2f2af6045f6079e16f13d244d) )
+	ROM_LOAD( "vegasfte_nvram.bin",  0x0000, 0x0800, CRC(166c6055) SHA1(db2143a2a3adc92578bd3707391d2f5030cc6a6f) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
+	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -3779,19 +3994,19 @@ static DRIVER_INIT( royalcdc )
 *************************/
 
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      INIT      ROT    COMPANY            FULLNAME                                          FLAGS                  LAYOUT */
-GAMEL( 1985, jollycrd,  0,        funworld, funworld,  0,        ROT0, "TAB-Austria",     "Jolly Card (austrian)",                           0,                     layout_jollycrd )
-GAMEL( 1985, jolyc3x3,  jollycrd, funworld, funworld,  0,        ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0,                     layout_jollycrd )
+GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  0,        ROT0, "TAB-Austria",     "Jolly Card (austrian)",                           0,                     layout_jollycrd )
+GAMEL( 1985, jolyc3x3,  jollycrd, fw1stpal, funworld,  0,        ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0,                     layout_jollycrd )
 GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  0,        ROT0, "Spale-Soft",      "Jolly Card Professional 2.0",                     0,                     layout_jollycrd )
-GAMEL( 1998, jolycdev,  jollycrd, funworld, funworld,  0,        ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0,                     layout_jollycrd )
+GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  0,        ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0,                     layout_jollycrd )
 GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  0,        ROT0, "TAB-Austria",     "Jolly Card (croatian, set 1)",                    0,                     layout_jollycrd )
 GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  0,        ROT0, "Soft Design",     "Jolly Card (croatian, set 2)",                    0,                     layout_jollycrd )
 GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  tabblue,  ROT0, "bootleg",         "Jolly Card (italian, blue TAB board, encrypted)", 0,                     layout_royalcrd )
 GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  tabblue,  ROT0, "bootleg",         "Jolly Card (italian, encrypted bootleg)",         0,                     layout_jollycrd )	/* not a real TAB blue PCB */
-GAMEL( 1985, sjcd2kx3,  jollycrd, funworld, funworld,  0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                     layout_jollycrd )
-GAME(  1986, jolycdab,  jollycrd, funworld, funworld,  0,        ROT0, "Inter Games",     "Jolly Card (austrian, Funworld, bootleg)",        GAME_NOT_WORKING )
-GAMEL( 1986, bigdeal,   0,        funworld, bigdeal,   0,        ROT0, "Funworld",        "Big Deal (hungarian, set 1)",                     GAME_IMPERFECT_COLORS, layout_bigdeal  )
-GAMEL( 1986, bigdealb,  bigdeal,  funworld, bigdeal,   0,        ROT0, "Funworld",        "Big Deal (hungarian, set 2)",                     GAME_IMPERFECT_COLORS, layout_bigdeal  )
-GAMEL( 1986, jolycdat,  bigdeal,  funworld, bigdeal,   0,        ROT0, "Funworld",        "Jolly Card (austrian, Funworld)",                 GAME_IMPERFECT_COLORS, layout_bigdeal  )
+GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                     layout_jollycrd )
+GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  0,        ROT0, "Inter Games",     "Jolly Card (austrian, Funworld, bootleg)",        GAME_NOT_WORKING )
+GAMEL( 1986, bigdeal,   0,        fw2ndpal, bigdeal,   0,        ROT0, "Funworld",        "Big Deal (hungarian, set 1)",                     GAME_IMPERFECT_COLORS, layout_bigdeal  )
+GAMEL( 1986, bigdealb,  bigdeal,  fw2ndpal, bigdeal,   0,        ROT0, "Funworld",        "Big Deal (hungarian, set 2)",                     GAME_IMPERFECT_COLORS, layout_bigdeal  )
+GAMEL( 1986, jolycdat,  bigdeal,  fw2ndpal, bigdeal,   0,        ROT0, "Funworld",        "Jolly Card (austrian, Funworld)",                 GAME_IMPERFECT_COLORS, layout_bigdeal  )
 GAMEL( 1996, cuoreuno,  0,        cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.",          "Cuore 1 (italian)",                               0,                     layout_jollycrd )
 GAMEL( 1997, elephfam,  0,        cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.",          "Elephant Family (italian, new)",                  0,                     layout_jollycrd )
 GAMEL( 1996, elephfmb,  elephfam, cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.",          "Elephant Family (italian, old)",                  0,                     layout_jollycrd )
@@ -3812,14 +4027,14 @@ GAMEL( 1991, lluck4x1,  royalcrd, royalcrd, royalcrd,  0,        ROT0, "TAB-Aust
 GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  0,        ROT0, "Impera",          "Magic Card II (bulgarian)",                       GAME_IMPERFECT_SOUND,  layout_jollycrd )
 GAME(  1996, magicd2a,  magicrd2, magicrd2, magicrd2,  magicd2a, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       GAME_NOT_WORKING )
 GAME(  1996, magicd2b,  magicrd2, magicrd2, magicrd2,  magicd2b, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       GAME_NOT_WORKING )
-GAMEL( 1993, vegasslw,  0,        funworld, funworld,  0,        ROT0, "Funworld",        "Royal Vegas Joker Card (slow deal)",              0,                     layout_jollycrd )
-GAMEL( 1993, vegasfst,  vegasslw, funworld, funworld,  0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0,                     layout_jollycrd )
-GAMEL( 1993, vegasfte,  vegasslw, funworld, funworld,  0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, english gfx)", GAME_NOT_WORKING,      layout_jollycrd )
-GAMEL( 198?, jolyjokr,  0,        funworld, funworld,  0,        ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                     layout_jollycrd )
-GAMEL( 198?, jolyjokra, jolyjokr, funworld, jolyjokra, 0,        ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                     layout_jollycrd )
-GAMEL( 198?, jolyjokrb, jolyjokr, funworld, funworld,  0,        ROT0, "Impera",          "Jolly Joker (40bet, croatian hack)",              0,                     layout_jollycrd )
-GAME(  1992, multiwin,  0,        funworld, funworld,  multiwin, ROT0, "Funworld",        "Multi Win (Ver.0167, encrypted)",                 GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME(  1993, jokercrd,  0,        funworld, funworld,  0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAMEL( 1993, vegasslw,  0,        fw2ndpal, vegasslw,  0,        ROT0, "Funworld",        "Royal Vegas Joker Card (slow deal)",              0,                     layout_jollycrd )
+GAMEL( 1993, vegasfst,  vegasslw, fw2ndpal, vegasfst,  0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0,                     layout_jollycrd )
+GAMEL( 1993, vegasfte,  vegasslw, fw2ndpal, vegasfte,  0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, english gfx)", 0,                     layout_jollycrd )
+GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  0,        ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                     layout_jollycrd )
+GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, 0,        ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                     layout_jollycrd )
+GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  0,        ROT0, "Impera",          "Jolly Joker (40bet, croatian hack)",              0,                     layout_jollycrd )
+GAME(  1992, multiwin,  0,        fw1stpal, funworld,  multiwin, ROT0, "Funworld",        "Multi Win (Ver.0167, encrypted)",                 GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME(  199?, mongolnw,  0,        royalcrd, royalcrd,  0,        ROT0, "bootleg",         "Mongolfier New (italian)",                        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME(  199?, soccernw,  0,        royalcrd, royalcrd,  soccernw, ROT0, "bootleg",         "Soccer New (italian)",                            GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME(  198?, saloon,    0,        saloon,   saloon,    saloon,   ROT0, "<unknown>",       "Saloon (french, encrypted)",                      GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
