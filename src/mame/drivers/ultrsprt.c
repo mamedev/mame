@@ -254,6 +254,9 @@ ROM_START( fiveside )
 	ROM_REGION(0x100000, "konami", 0)	/* Sound roms */
 	ROM_LOAD("479_a06.bin", 0x000000, 0x80000, CRC(8d6ac8a2) SHA1(7c4b8bd47cddc766cbdb6a486acc9221be55b579))
 	ROM_LOAD("479_a07.bin", 0x080000, 0x80000, CRC(75835df8) SHA1(105b95c16f2ce6902c2e4c9c2fd9f2f7a848c546))
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fiveside.nv", 0x0000, 0x0080, CRC(aad11072) SHA1(8f777ee47801faa7ce8420c3052034720225aae7) )	
 ROM_END
 
 GAME(1995, fiveside, 0, ultrsprt, ultrsprt, 0, ROT90, "Konami", "Five a Side Soccer (ver UAA)", GAME_IMPERFECT_SOUND)
