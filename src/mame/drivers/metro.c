@@ -3562,6 +3562,8 @@ static MACHINE_START( metro )
 	state_save_register_global(machine, state->gakusai_oki_bank_hi);
 	state_save_register_global(machine, state->sprite_xoffs);
 	state_save_register_global(machine, state->sprite_yoffs);
+	state_save_register_global_array(machine, state->bg_tilemap_enable);
+	state_save_register_global_array(machine, state->bg_tilemap_enable16);
 }
 
 static MACHINE_RESET( metro )

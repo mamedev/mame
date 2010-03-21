@@ -33,10 +33,13 @@ public:
 	size_t      spriteram_size;
 	size_t      tiletable_size;
 
-	int			flip_screen;
+	int         flip_screen;
 
 	/* video-related */
 	tilemap_t   *k053936_tilemap;
+	int         bg_tilemap_enable[3];
+	int         bg_tilemap_enable16[3];
+	int         bg_tilemap_scrolldx[3];
 
 	int         support_8bpp, support_16x16;
 	int         has_zoom;

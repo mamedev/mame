@@ -55,14 +55,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "includes/metro.h"
 #include "video/konicdev.h"
 
-
-/* if I put these in the state I start getting heap errors on exit?
-  - doesn't seem video related, happens even if I disable video completely?! */
-int bg_tilemap_enable[3];
-int bg_tilemap_enable16[3];
-int bg_tilemap_scrolldx[3];
-
-
 static TILE_GET_INFO( metro_k053936_get_tile_info )
 {
 	metro_state *state = (metro_state *)machine->driver_data;
@@ -300,17 +292,17 @@ VIDEO_START( metro_14100 )
 	state->support_16x16 = 0;
 	state->has_zoom = 0;
 
-	bg_tilemap_enable[0] = 1;
-	bg_tilemap_enable[1] = 1;
-	bg_tilemap_enable[2] = 1;
+	state->bg_tilemap_enable[0] = 1;
+	state->bg_tilemap_enable[1] = 1;
+	state->bg_tilemap_enable[2] = 1;
 
-	bg_tilemap_enable16[0] = 0;
-	bg_tilemap_enable16[1] = 0;
-	bg_tilemap_enable16[2] = 0;
+	state->bg_tilemap_enable16[0] = 0;
+	state->bg_tilemap_enable16[1] = 0;
+	state->bg_tilemap_enable16[2] = 0;
 
-	bg_tilemap_scrolldx[0] = 0;
-	bg_tilemap_scrolldx[1] = 0;
-	bg_tilemap_scrolldx[2] = 0;
+	state->bg_tilemap_scrolldx[0] = 0;
+	state->bg_tilemap_scrolldx[1] = 0;
+	state->bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START( metro_14220 )
@@ -321,17 +313,17 @@ VIDEO_START( metro_14220 )
 	state->support_16x16 = 0;
 	state->has_zoom = 0;
 
-	bg_tilemap_enable[0] = 1;
-	bg_tilemap_enable[1] = 1;
-	bg_tilemap_enable[2] = 1;
+	state->bg_tilemap_enable[0] = 1;
+	state->bg_tilemap_enable[1] = 1;
+	state->bg_tilemap_enable[2] = 1;
 
-	bg_tilemap_enable16[0] = 0;
-	bg_tilemap_enable16[1] = 0;
-	bg_tilemap_enable16[2] = 0;
+	state->bg_tilemap_enable16[0] = 0;
+	state->bg_tilemap_enable16[1] = 0;
+	state->bg_tilemap_enable16[2] = 0;
 
-	bg_tilemap_scrolldx[0] = -2;
-	bg_tilemap_scrolldx[1] = -2;
-	bg_tilemap_scrolldx[2] = -2;
+	state->bg_tilemap_scrolldx[0] = -2;
+	state->bg_tilemap_scrolldx[1] = -2;
+	state->bg_tilemap_scrolldx[2] = -2;
 }
 
 VIDEO_START( metro_14300 )
@@ -342,17 +334,17 @@ VIDEO_START( metro_14300 )
 	state->support_16x16 = 1;
 	state->has_zoom = 0;
 
-	bg_tilemap_enable[0] = 1;
-	bg_tilemap_enable[1] = 1;
-	bg_tilemap_enable[2] = 1;
+	state->bg_tilemap_enable[0] = 1;
+	state->bg_tilemap_enable[1] = 1;
+	state->bg_tilemap_enable[2] = 1;
 
-	bg_tilemap_enable16[0] = 0;
-	bg_tilemap_enable16[1] = 0;
-	bg_tilemap_enable16[2] = 0;
+	state->bg_tilemap_enable16[0] = 0;
+	state->bg_tilemap_enable16[1] = 0;
+	state->bg_tilemap_enable16[2] = 0;
 
-	bg_tilemap_scrolldx[0] = 0;
-	bg_tilemap_scrolldx[1] = 0;
-	bg_tilemap_scrolldx[2] = 0;
+	state->bg_tilemap_scrolldx[0] = 0;
+	state->bg_tilemap_scrolldx[1] = 0;
+	state->bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START( blzntrnd )
@@ -365,9 +357,9 @@ VIDEO_START( blzntrnd )
 
 	state->k053936_tilemap = tilemap_create(machine, metro_k053936_get_tile_info, tilemap_scan_rows, 8, 8, 256, 512);
 
-	bg_tilemap_scrolldx[0] = 8;
-	bg_tilemap_scrolldx[1] = 8;
-	bg_tilemap_scrolldx[2] = 8;
+	state->bg_tilemap_scrolldx[0] = 8;
+	state->bg_tilemap_scrolldx[1] = 8;
+	state->bg_tilemap_scrolldx[2] = 8;
 }
 
 VIDEO_START( gstrik2 )
@@ -380,9 +372,9 @@ VIDEO_START( gstrik2 )
 
 	state->k053936_tilemap = tilemap_create(machine, metro_k053936_gstrik2_get_tile_info, tilemap_scan_gstrik2, 16, 16, 128, 256);
 
-	bg_tilemap_scrolldx[0] = 8;
-	bg_tilemap_scrolldx[1] = 0;
-	bg_tilemap_scrolldx[2] = 8;
+	state->bg_tilemap_scrolldx[0] = 8;
+	state->bg_tilemap_scrolldx[1] = 0;
+	state->bg_tilemap_scrolldx[2] = 8;
 }
 
 /***************************************************************************
@@ -616,21 +608,21 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 
 	if (!big)
 	{
-		if (!bg_tilemap_enable[layer]) return;
+		if (!state->bg_tilemap_enable[layer]) return;
 	}
 	else
 	{
-		if (!bg_tilemap_enable16[layer]) return;
+		if (!state->bg_tilemap_enable16[layer]) return;
 	}
 
 
 	if (!state->flip_screen)
 	{
-		sx -= bg_tilemap_scrolldx[layer];
+		sx -= state->bg_tilemap_scrolldx[layer];
 	}
 	else
 	{
-		sx += bg_tilemap_scrolldx[layer];
+		sx += state->bg_tilemap_scrolldx[layer];
 	}
 
 	for (y=0;y<scrheight;y++)
@@ -769,8 +761,8 @@ VIDEO_UPDATE( metro )
 		{
 			int big = screenctrl & (0x0020 << layer);
 
-			bg_tilemap_enable[layer] = !big;
-			bg_tilemap_enable16[layer] = big;
+			state->bg_tilemap_enable[layer] = !big;
+			state->bg_tilemap_enable16[layer] = big;
 		}
 	}
 
