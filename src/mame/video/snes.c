@@ -85,14 +85,14 @@
 struct DEBUGOPTS
 {
 	UINT8 input_count;
-	UINT8 bg_disabled[6];
+	UINT8 bg_disabled[5];
 	UINT8 mode_disabled[8];
 	UINT8 draw_subscreen;
 	UINT8 windows_disabled;
 	UINT8 mosaic_disabled;
 	UINT8 colormath_disabled;
 	UINT8 sprite_reversed;
-	UINT8 select_oam;
+	UINT8 select_pri[5];
 };
 static struct DEBUGOPTS debug_options;
 /*                                    red   green  blue    purple  yellow cyan    grey    white */
@@ -791,6 +791,20 @@ INLINE void snes_update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UIN
 			pal += (layer << 5);
 		}
 
+#ifdef SNES_LAYER_DEBUG
+	/* if we want to draw only one of the priorities of this layer */
+	if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) || 
+		((debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
+	{
+		if (!hires && tile_size)
+			ii += 16;
+		else
+			ii += 8;
+		continue;
+	}
+#endif /* SNES_LAYER_DEBUG */
+
+
 		/* figure out which line to draw */
 		yscroll = ypos & ((8 << tile_size) - 1);
 
@@ -976,6 +990,13 @@ static void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_
 		{
 			priority = ((colour & 0x80) >> 7) ? priority_a : priority_b;
 			colour &= 0x7f;
+
+#ifdef SNES_LAYER_DEBUG
+	/* if we want to draw only one of the priorities of this layer */
+	if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) || 
+		((debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
+		continue;
+#endif /* SNES_LAYER_DEBUG */
 		}
 
 		if (scanlines[SNES_MAINSCREEN].enable)
@@ -1328,9 +1349,9 @@ static void snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8
 		pri = priority[oam_tilelist[tile].priority];
 
 #ifdef SNES_LAYER_DEBUG
-		if (debug_options.select_oam)
+		if (debug_options.select_pri[SNES_OAM])
 		{
-			int oam_draw = debug_options.select_oam - 1;
+			int oam_draw = debug_options.select_pri[SNES_OAM] - 1;
 			if (oam_draw != oam_tilelist[tile].priority)
 				continue;
 		}
@@ -1737,54 +1758,69 @@ static UINT8 snes_dbg_video( running_machine *machine, bitmap_t *bitmap, UINT16 
 	/* Check if the user has enabled or disabled stuff */
 	if (curline == 1)
 	{
-		//UINT16 y = 1;
-		static const char WINLOGIC[4] = { '|', '&', '^', '!' };
-
 		if (!debug_options.input_count--)
 		{
+			int i;
 			UINT8 toggles = input_port_read_safe(machine, "DEBUG1", 0);
-			debug_options.sprite_reversed = BIT(toggles, 7);
-			debug_options.select_oam = (toggles & 0x70) >> 4;
+			debug_options.select_pri[SNES_BG1] = (toggles & 0x03);
+			debug_options.select_pri[SNES_BG2] = (toggles & 0x0c) >> 2;
+			debug_options.select_pri[SNES_BG3] = (toggles & 0x30) >> 4;
+			debug_options.select_pri[SNES_BG4] = (toggles & 0xc0) >> 6;
 
 			toggles = input_port_read_safe(machine, "DEBUG2", 0);
-			if (BIT(toggles, 0))
-				debug_options.bg_disabled[0] = !debug_options.bg_disabled[0];
-			if (BIT(toggles, 1))
-				debug_options.bg_disabled[1] = !debug_options.bg_disabled[1];
-			if (BIT(toggles, 2))
-				debug_options.bg_disabled[2] = !debug_options.bg_disabled[2];
-			if (BIT(toggles, 3))
-				debug_options.bg_disabled[3] = !debug_options.bg_disabled[3];
+			for (i = 0; i < 4; i++)
+			{
+				if (BIT(toggles, i))
+				{
+					debug_options.bg_disabled[i] = !debug_options.bg_disabled[i];
+					popmessage("Debug: %s BG%d.\n", debug_options.bg_disabled[i] ? "Disabled" : "Enabled", i + 1);
+				}
+			}
 			if (BIT(toggles, 4))
-				debug_options.bg_disabled[4] = !debug_options.bg_disabled[4];
+			{
+				debug_options.bg_disabled[SNES_OAM] = !debug_options.bg_disabled[SNES_OAM];
+				popmessage("Debug: %s OAM.\n", debug_options.bg_disabled[SNES_OAM] ? "Disabled" : "Enabled");
+			}
 			if (BIT(toggles, 5))
+			{
 				debug_options.draw_subscreen = !debug_options.draw_subscreen;
+				popmessage("Debug: Switched screens.\n");
+			}
 			if (BIT(toggles, 6))
+			{
 				debug_options.colormath_disabled = !debug_options.colormath_disabled;
+				popmessage("Debug: %s Color Math.\n", debug_options.colormath_disabled ? "Disabled" : "Enabled");
+			}
 			if (BIT(toggles, 7))
+			{
 				debug_options.windows_disabled = !debug_options.windows_disabled;
+				popmessage("Debug: %s Window Masks.\n", debug_options.windows_disabled ? "Disabled" : "Enabled");
+			}
+
 			toggles = input_port_read_safe(machine, "DEBUG4", 0);
-			if (BIT(toggles, 0))
-				debug_options.mode_disabled[0] = !debug_options.mode_disabled[0];
-			if (BIT(toggles, 1))
-				debug_options.mode_disabled[1] = !debug_options.mode_disabled[1];
-			if (BIT(toggles, 2))
-				debug_options.mode_disabled[2] = !debug_options.mode_disabled[2];
-			if (BIT(toggles, 3))
-				debug_options.mode_disabled[3] = !debug_options.mode_disabled[3];
-			if (BIT(toggles, 4))
-				debug_options.mode_disabled[4] = !debug_options.mode_disabled[4];
-			if (BIT(toggles, 5))
-				debug_options.mode_disabled[5] = !debug_options.mode_disabled[5];
-			if (BIT(toggles, 6))
-				debug_options.mode_disabled[6] = !debug_options.mode_disabled[6];
-			if (BIT(toggles, 7))
-				debug_options.mode_disabled[7] = !debug_options.mode_disabled[7];
+			for (i = 0; i < 8; i++)
+			{
+				if (BIT(toggles, i))
+				{
+					debug_options.mode_disabled[i] = !debug_options.mode_disabled[i];
+					popmessage("Debug: %s Mode %d drawing.\n", debug_options.mode_disabled[i] ? "Disabled" : "Enabled", i);
+				}
+			}
+
 			toggles = input_port_read_safe(machine, "DEBUG3", 0);
 			if (toggles & 0x4)
+			{
 				debug_options.mosaic_disabled = !debug_options.mosaic_disabled;
+				popmessage("Debug: %s Mosaic.\n", debug_options.mosaic_disabled ? "Disabled" : "Enabled");
+			}
+			debug_options.sprite_reversed = BIT(toggles, 7);
+			debug_options.select_pri[SNES_OAM] = (toggles & 0x70) >> 4;
+
 			debug_options.input_count = 5;
 		}
+
+#ifdef MAME_DEBUG
+		static const char WINLOGIC[4] = { '|', '&', '^', '!' };
 
 		logerror("%s", debug_options.windows_disabled?" ":"W");
 		logerror("%s1 %s%s%s%s%s%c%s%s%d%s %d %4X %4X",
@@ -1872,9 +1908,9 @@ static UINT8 snes_dbg_video( running_machine *machine, bitmap_t *bitmap, UINT16 
 		logerror("Mode7: A %5d B %5d", snes_ppu.mode7.matrix_a, snes_ppu.mode7.matrix_b );
 		logerror(" %s%s%s   C %5d D %5d", (snes_ram[M7SEL] & 0xc0)?((snes_ram[M7SEL] & 0x40)?"0":"C"):"R", (snes_ram[M7SEL] & 0x1)?"H":" ", (snes_ram[M7SEL] & 0x2)?"V":" ", snes_ppu.mode7.matrix_c, snes_ppu.mode7.matrix_d );
 		logerror("       X %5d Y %5d", snes_ppu.mode7.origin_x, snes_ppu.mode7.origin_y );
+#endif
 	}
 
 	return 0;
 }
-
 #endif /* SNES_LAYER_DEBUG */
