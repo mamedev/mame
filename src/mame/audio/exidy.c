@@ -73,11 +73,11 @@ struct sh6840_timer_channel
 static struct sh6840_timer_channel sh6840_timer[3];
 static INT16 sh6840_volume[3];
 static UINT8 sh6840_MSB;
-static UINT8 sh6840_LFSR_oldxor = 0; /* should be saved in savestate */
-static UINT32 sh6840_LFSR_0;/* ditto */
-static UINT32 sh6840_LFSR_1;/* ditto */
-static UINT32 sh6840_LFSR_2;/* ditto */
-static UINT32 sh6840_LFSR_3;/* ditto */
+static UINT8 sh6840_LFSR_oldxor = 0;
+static UINT32 sh6840_LFSR_0;
+static UINT32 sh6840_LFSR_1;
+static UINT32 sh6840_LFSR_2;
+static UINT32 sh6840_LFSR_3;
 static UINT32 sh6840_clocks_per_sample;
 static UINT32 sh6840_clock_count;
 
@@ -606,7 +606,7 @@ static READ8_HANDLER( exidy_sh8253_r )
 
 READ8_HANDLER( exidy_sh6840_r )
 {
-	logerror("%04X:exidy_sh6840_r - unexpected read", cpu_get_pc(space->cpu));
+	logerror("%04X:exidy_sh6840_r - unexpected read\n", cpu_get_pc(space->cpu));
 	return 0;
 }
 
