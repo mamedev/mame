@@ -287,8 +287,13 @@ static WRITE8_HANDLER( jantouki_sound_rombank_w )
 static WRITE8_HANDLER( hnoridur_rombank_w )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
+	int bank_n = (memory_region_length(space->machine, "maincpu") - 0x10000) / 0x8000;
+
 	//logerror("%04x: rom bank = %02x\n", cpu_get_pc(space->cpu), data);
-	memory_set_bank(space->machine, "bank1", data);
+	if (data < bank_n)
+		memory_set_bank(space->machine, "bank1", data);
+	else
+		logerror("rom_bank = %02x (larger than the maximum bank %02x)\n", data, bank_n);
 	state->hnoridur_bank = data;
 }
 
