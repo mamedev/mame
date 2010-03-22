@@ -2,7 +2,7 @@
     Panasonic MN10200 emulator
 
     Written by Olivier Galibert
-    MAME conversion by R. Belmont
+    MAME conversion, timers, and IRQ controller by R. Belmont
 
 */
 
@@ -16,6 +16,10 @@
 #define MEM_BYTE (0)
 #define MEM_WORD (1)
 
+#define NUM_PRESCALERS (2)
+#define NUM_TIMERS_8BIT	(10)
+#define NUM_IRQ_GROUPS (31)
+
 extern int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom);
 
 typedef struct _mn102_info mn102_info;
@@ -27,30 +31,31 @@ struct _mn102_info
 	UINT32 a[4];
 
 	UINT8 nmicr, iagr;
-	UINT8 icrl[31], icrh[31];
+	UINT8 icrl[NUM_IRQ_GROUPS], icrh[NUM_IRQ_GROUPS];
 	UINT16 psw;
 	UINT16 mdr;
 
-	struct {
+	struct _simple_timer {
 	UINT8 mode;
 	UINT8 base;
 	UINT8 cur;
-	} simple_timer[10];
+	} simple_timer[NUM_TIMERS_8BIT];
 
-	struct {
+	emu_timer *timer_timers[NUM_TIMERS_8BIT];
+
+	struct _prescaler {
+	UINT8 cycles;
 	UINT8 mode;
-	UINT8 base;
-	UINT8 cur;
-	} prescaler[2];
+	} prescaler[NUM_PRESCALERS];
 
-	struct {
+	struct _dma {
 	UINT32 adr;
 	UINT32 count;
 	UINT16 iadr;
 	UINT8 ctrll, ctrlh, irq;
 	} dma[8];
 
-	struct {
+	struct _serial {
 	UINT8 ctrll, ctrlh;
 	UINT8 buf;
 	} serial[2];
@@ -121,6 +126,26 @@ INLINE void mn102_write_word(mn102_info *mn102, UINT32 address, UINT16 data)
 	memory_write_word_16le(mn102->program, address, data);
 }
 
+INLINE INT32 r24u(mn102_info *mn102, offs_t adr)
+{
+	return mn102_read_word(mn102, adr)|(mn102_read_byte(mn102, adr+2)<<16);
+}
+
+INLINE void w24(mn102_info *mn102, offs_t adr, UINT32 val)
+{
+/*	if(adr == 0x4075aa || adr == 0x40689a || adr == 0x4075a2) {
+		log_write("TRACE", adr, val, MEM_LONG);
+	}*/
+	mn102_write_byte(mn102, adr, val);
+	mn102_write_byte(mn102, adr+1, val>>8);
+	mn102_write_byte(mn102, adr+2, val>>16);
+}
+
+INLINE void mn102_change_pc(mn102_info *mn102, UINT32 pc)
+{
+	 mn102->pc = pc & 0xffffff;
+}
+
 INLINE mn102_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
@@ -131,20 +156,156 @@ INLINE mn102_info *get_safe_token(running_device *device)
 	return (mn102_info *)device->token;
 }
 
+static void mn102_take_irq(mn102_info *mn102, int level, int group)
+{
+	if(!(mn102->psw & 0x800))
+	{
+//		if (group != 8)	printf("MN10200: Dropping irq L %d G %d pc=%x, a3=%x\n", level, group, mn102->pc, mn102->a[3]);
+		return;
+	}
+
+//	if (group != 8) printf("MN10200: Taking irq L %d G %d pc=%x, a3=%x\n", level, group, mn102->pc, mn102->a[3]);
+
+	mn102->a[3] -= 6;
+	w24(mn102, mn102->a[3]+2, mn102->pc);
+	mn102_write_word(mn102, mn102->a[3], mn102->psw);
+	mn102_change_pc(mn102, 0x80008);
+	mn102->psw = (mn102->psw & 0xf0ff) | (level << 8);
+	mn102->iagr = group << 1;
+}
+
+static void refresh_timer(mn102_info *cpustate, int tmr)
+{
+	// enabled?
+	if (cpustate->simple_timer[tmr].mode & 0x80)
+	{
+		UINT8 source = (cpustate->simple_timer[tmr].mode & 3);
+
+		// source is a prescaler?
+		if (source >= 2)
+		{
+			INT32 rate; 
+
+			// is prescaler enabled?
+			if (cpustate->prescaler[source-2].mode & 0x80)
+			{
+				// rate = (sysclock / prescaler) / our count
+				rate = cpu_get_clock(cpustate->device) / cpustate->prescaler[source-2].cycles;
+				rate /= cpustate->simple_timer[tmr].base;
+
+				if (tmr != 8)	// HACK: timer 8 is run at 500 kHz by the Taito program for no obvious reason, which kills performance
+					timer_adjust_oneshot(cpustate->timer_timers[tmr], ATTOTIME_IN_HZ(rate), tmr);
+			}
+			else
+			{
+				logerror("MN10200: timer %d using prescaler %d which isn't enabled!\n", tmr, source-2);
+			}
+		}
+	}
+	else	// disabled, so stop it
+	{
+		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime_never, tmr);
+	}
+}
+
+INLINE void timer_tick_simple(mn102_info *cpustate, int tmr)
+{
+	cpustate->simple_timer[tmr].cur--;
+
+	// did we expire?
+	if (cpustate->simple_timer[tmr].cur == 0)
+	{
+		int group, irq_in_grp, level;
+
+		// does timer auto-reload?  apparently.
+		cpustate->simple_timer[tmr].cur = cpustate->simple_timer[tmr].base;
+
+		// signal the cascade if we're not timer 9
+		if (tmr < (NUM_TIMERS_8BIT-1))
+		{
+			// is next timer enabled?
+			if (cpustate->simple_timer[tmr+1].mode & 0x80)
+			{
+				// is it's source "cascade"?
+				if ((cpustate->simple_timer[tmr+1].mode & 0x3) == 1)
+				{
+					// recurse!
+					timer_tick_simple(cpustate, tmr+1);
+				}
+			}
+		}
+
+		// interrupt from this timer if possible
+		group = (tmr / 4);
+		irq_in_grp = (tmr % 4);
+		level = (cpustate->icrh[group]>>4) & 0x7;
+
+		// indicate interrupt pending
+		cpustate->icrl[group] |= (1 << (4 + irq_in_grp));
+
+		// interrupt detect = pending AND enable
+		cpustate->icrl[group] |= (cpustate->icrh[group]&0x0f) & (cpustate->icrl[group]>>4);
+
+		// is the result enabled?
+		if (cpustate->icrl[group] & (1 << irq_in_grp))
+		{
+//			printf("Timer %d IRQ! (Group %d in_grp %d ICRH %x ICRL %x\n", tmr, group, irq_in_grp, cpustate->icrh[group], cpustate->icrl[group]);
+			// try to take it now
+			mn102_take_irq(cpustate, level, group + 1);
+		}
+	}
+}
+
+static TIMER_CALLBACK( simple_timer_cb )
+{
+	mn102_info *cpustate = (mn102_info *)ptr;
+	int tmr = param;
+
+	// handle our expiring and also tick our cascaded children
+	cpustate->simple_timer[tmr].cur = 1;
+	timer_tick_simple(cpustate, tmr);
+
+	// refresh this timer
+	refresh_timer(cpustate, tmr);
+}
+
 static CPU_INIT(mn10200)
 {
 	mn102_info *cpustate = get_safe_token(device);
+	int tmr;
 
 	memset(cpustate, 0, sizeof(mn102_info));
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);
+
+	state_save_register_device_item(device, 0, cpustate->pc);
+	state_save_register_device_item_array(device, 0, cpustate->d);
+	state_save_register_device_item_array(device, 0, cpustate->a);
+	state_save_register_device_item(device, 0, cpustate->nmicr);
+	state_save_register_device_item(device, 0, cpustate->iagr);
+	state_save_register_device_item_array(device, 0, cpustate->icrl);
+	state_save_register_device_item_array(device, 0, cpustate->icrh);
+	state_save_register_device_item(device, 0, cpustate->psw);
+	state_save_register_device_item(device, 0, cpustate->mdr);
+//	state_save_register_device_item_array(device, 0, cpustate->simple_timer);
+//	state_save_register_device_item_array(device, 0, cpustate->prescaler);
+//	state_save_register_device_item_array(device, 0, cpustate->dma);
+//	state_save_register_device_item_array(device, 0, cpustate->serial);
+	state_save_register_device_item_array(device, 0, cpustate->ddr);
+
+	for (tmr = 0; tmr < NUM_TIMERS_8BIT; tmr++)
+	{
+		cpustate->timer_timers[tmr] = timer_alloc(device->machine, simple_timer_cb, cpustate);
+		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime_never, tmr);
+	}
 }
 
 static CPU_RESET(mn10200)
 {
 	mn102_info *cpustate = get_safe_token(device);
+	int tmr, grp;
 
 	memset(cpustate->d, 0, sizeof(cpustate->d));
 	memset(cpustate->a, 0, sizeof(cpustate->a));
@@ -153,6 +314,21 @@ static CPU_RESET(mn10200)
 	cpustate->nmicr = 0;
 	memset(cpustate->icrl, 0, sizeof(cpustate->icrl));
 	memset(cpustate->icrh, 0, sizeof(cpustate->icrh));
+
+	// reset all timers
+	for (tmr = 0; tmr < NUM_TIMERS_8BIT; tmr++)
+	{
+		cpustate->simple_timer[tmr].mode = 0;
+		cpustate->simple_timer[tmr].cur = 0;
+		cpustate->simple_timer[tmr].base = 0;
+		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime_never, tmr);
+	}
+
+	// clear all interrupt groups
+	for (grp = 0; grp < NUM_IRQ_GROUPS; grp++)
+	{
+		cpustate->icrl[grp] = cpustate->icrh[grp] = 0;
+	}
 }
 
 static CPU_EXIT(mn10200)
@@ -162,21 +338,6 @@ static CPU_EXIT(mn10200)
 static void unemul(mn102_info *mn102)
 {
 	fatalerror("MN10200: unknown opcode @ PC=%x\n", mn102->pc);
-}
-
-INLINE INT32 r24u(mn102_info *mn102, offs_t adr)
-{
-	return mn102_read_word(mn102, adr)|(mn102_read_byte(mn102, adr+2)<<16);
-}
-
-INLINE void w24(mn102_info *mn102, offs_t adr, UINT32 val)
-{
-	if(adr == 0x4075aa || adr == 0x40689a || adr == 0x4075a2) {
-		log_write("TRACE", adr, val, MEM_LONG);
-	}
-	mn102_write_byte(mn102, adr, val);
-	mn102_write_byte(mn102, adr+1, val>>8);
-	mn102_write_byte(mn102, adr+2, val>>16);
 }
 
 static UINT32 do_add(mn102_info *mn102, UINT32 a, UINT32 b)
@@ -302,11 +463,6 @@ INLINE void test_nz16(mn102_info *mn102, UINT16 v)
 		mn102->psw |= 1;
 }
 
-INLINE void mn102_change_pc(mn102_info *mn102, UINT32 pc)
-{
-	 mn102->pc = pc & 0xffffff;
-}
-
 INLINE void do_jsr(mn102_info *mn102, UINT32 to, UINT32 ret)
 {
 	mn102_change_pc(mn102, to & 0xffffff);
@@ -329,27 +485,29 @@ INLINE void do_jsr(mn102_info *mn102, UINT32 to, UINT32 ret)
 	    psw & 0x0001 ? 'z' : '-');
 #endif
 
-void mn102_force_irq(mn102_info *mn102, int level, int group, int entry)
+// take an external IRQ
+static void mn102_extirq(mn102_info *mn102, int irqnum, int status)
 {
-	if(!(mn102->psw & 0x800))
-	{
-		if(group != 1 || entry != 3){
-			log_event("MN102", "Dropping irq %d %d %d, pc=%x, a3=%x", level, group, entry, mn102->pc, mn102->a[3]);
-		}
-		return;
-	}
+	int level = (mn102->icrh[7]>>4)&0x7;
 
-	if(group != 1 || entry != 3) {
-		log_event("MN102", "Taking irq %d %d %d, pc=%x, a3=%x", level, group, entry, mn102->pc, mn102->a[3]);
+//	printf("mn102_extirq: irq %d status %d G8 ICRL %x\n", irqnum, status, mn102->icrl[7]);
+
+	// if interrupt is enabled, handle it
+	if (status)
+	{
+		// indicate interrupt pending
+		mn102->icrl[7] |= (1 << (4 + irqnum));
+
+		// set interrupt detect = pending AND enable
+		mn102->icrl[7] |= (mn102->icrh[7]&0x0f) & (mn102->icrl[7]>>4);
+
+		// is the result enabled?
+		if (mn102->icrl[7] & (1 << irqnum))
+		{
+			// try to take it now
+			mn102_take_irq(mn102, level, 8);
+		}
 	}
-	mn102->a[3] -= 6;
-	w24(mn102, mn102->a[3]+2, mn102->pc);
-	mn102_write_word(mn102, mn102->a[3], mn102->psw);
-	mn102_change_pc(mn102, 0x80008);
-	mn102->psw = (mn102->psw & 0xf0ff) | (level << 8);
-	mn102->iagr = group << 1;
-	if(group != 0)
-		mn102->icrl[group-1] |= 1 << entry;
 }
 
 static CPU_EXECUTE(mn10200)
@@ -1715,21 +1873,24 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
     // Maskable irq control
   case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
   case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
-    mn102->icrl[((adr & 0x3f)>>1)-1] = data;
+    {
+    	// note: writes here ack interrupts
+	mn102->icrl[((adr & 0x3f)>>1)-1] = data;
+    }
     break;
 
   case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
   case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055: {
     int irq = ((adr & 0x3f)>>1)-1;
     if((mn102->icrh[irq] != data) && (data & 15)) {
-      log_event("MN102", "irq %d enabled, level=%x, enable= %s %s %s %s", irq+1, (data >> 4) & 7,
+      printf("MN10200: irq %d enabled, level=%x, enable= %s %s %s %s\n", irq+1, (data >> 4) & 7,
 		data & 1 ? inames[irq][0] : "-",
 		data & 2 ? inames[irq][1] : "-",
 		data & 4 ? inames[irq][2] : "-",
 		data & 8 ? inames[irq][3] : "-");
 	}
     if((mn102->icrh[irq] != data) && !(data & 15)) {
-      log_event("MN102", "irq %d disabled", irq+1);
+        printf("MN10200: irq %d disabled\n", irq+1);
 	}
     mn102->icrh[irq] = data;
     break;
@@ -1783,65 +1944,82 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
     break;
   }
 
-  case 0x1a0:
-    log_event("MN102", "AN %s timer7=%s /%d %s %s",
-	      data & 0x80 ? "on" : "off", data & 0x40 ? "on" : "off",
-	      1 << ((data >> 2) & 3), data & 2 ? "continuous" : "single", data & 1 ? "one" : "multi");
-    break;
+	case 0x1a0:
+		log_event("MN102", "AN %s timer7=%s /%d %s %s",
+			data & 0x80 ? "on" : "off", data & 0x40 ? "on" : "off",
+			1 << ((data >> 2) & 3), data & 2 ? "continuous" : "single", data & 1 ? "one" : "multi");
+		break;
 
-  case 0x1a1:
-    log_event("MN102", "AN chans=0-%d current=%d", (data >> 4) & 7, data & 7);
-    break;
+	case 0x1a1:
+		log_event("MN102", "AN chans=0-%d current=%d", (data >> 4) & 7, data & 7);
+		break;
 
-  case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
-  case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
-    log_event("MN102", "Timer %d value set %02x", adr-0x210, data);
-    break;
+	case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
+	case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
+		mn102->simple_timer[adr-0x210].base = data + 1;
+//		printf("MN10200: Timer %d value set %02x\n", adr-0x210, data);
+		refresh_timer(mn102, adr-0x210);
+		break;
 
-  case 0x21a:
-    log_event("MN102", "Prescale 0 cycle count %02x", data);
-    break;
+	case 0x21a:
+		mn102->prescaler[0].cycles = data+1;
+//		printf("MN10200: Prescale 0 cycle count %d\n", data+1);
+		break;
 
-  case 0x21b:
-    log_event("MN102", "Prescale 1 cycle count %02x", data);
-    break;
+	case 0x21b:
+		mn102->prescaler[1].cycles = data+1;
+//		printf("MN10200: Prescale 1 cycle count %d\n", data+1);
+		break;
 
-  case 0x220: case 0x221: case 0x222: case 0x223: case 0x224:
-  case 0x225: case 0x226: case 0x227: case 0x228: case 0x229: {
-//    const char *source[4] = { "TMxIO", "cascade", "prescale 0", "prescale 1" };
-//    log_event("MN102", "Timer %d %s b6=%d, source=%s", adr-0x220, data & 0x80 ? "on" : "off", (data & 0x40) != 0, source[data & 3]);
-    break;
-  }
+	case 0x220: case 0x221: case 0x222: case 0x223: case 0x224:
+	case 0x225: case 0x226: case 0x227: case 0x228: case 0x229: 
+	{
+//		const char *source[4] = { "TMxIO", "cascade", "prescale 0", "prescale 1" };
+		mn102->simple_timer[adr-0x220].mode = data;
+//		printf("MN10200: Timer %d %s b6=%d, source=%s\n", adr-0x220, data & 0x80 ? "on" : "off", (data & 0x40) != 0, source[data & 3]);
 
-  case 0x22a:
-    log_event("MN102", "Prescale 0 %s, ps0bc %s",
-	      data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps0br" : "off");
-    break;
+		if (data & 0x40)
+		{
+//			printf("MN10200: loading timer %d\n", adr-0x220);
+			mn102->simple_timer[adr-0x220].cur = mn102->simple_timer[adr-0x220].base;
+		}
+		refresh_timer(mn102, adr-0x220);
+		break;
+	}
 
-  case 0x22b:
-    log_event("MN102", "Prescale 1 %s, ps1bc %s",
-	      data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps1br" : "off");
-    break;
+	case 0x22a:
+//		printf("MN10200: Prescale 0 %s, ps0bc %s\n",
+//			data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps0br" : "off");
+		mn102->prescaler[0].mode = data;
+		break;
 
-  case 0x230: case 0x240: case 0x250: {
-//    const char *modes[4] = { "single", "double", "ioa", "iob" };
-//    const char *sources[8] = { "pres.0", "pres.1", "iob", "sysclk", "*4", "*1", "6", "7" };
-//    log_event("MN102", "Timer %d comp=%s on_1=%s on_match=%s phase=%s source=%s",
-//        10 + ((adr-0x230) >> 4),
-//        modes[data >> 6], data & 0x20 ? "cleared" : "not cleared",  data & 0x10 ? "cleared" : "not cleared",
-//        data & 8 ? "tff" : "rsff", sources[data & 7]);
-    break;
-  }
+	case 0x22b:
+//		printf("MN10200: Prescale 1 %s, ps1bc %s\n",
+//			data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps1br" : "off");
+		mn102->prescaler[1].mode = data;
+		break;
 
-  case 0x231: case 0x241: case 0x251: {
-//    const char *modes[4] = { "up", "down", "up on ioa", "up on iob" };
-//    log_event("MN102", "Timer %d %s ff=%s op=%s ext_trig=%s %s",
-//        10 + ((adr-0x230) >> 4),
-//        data & 0x80 ? "enable" : "disable", data & 0x40 ? "operate" : "clear",
-//        modes[(data >> 4) & 3], data & 2 ? "on" : "off", data & 1 ? "one-shot" : "repeat");
+	case 0x230: case 0x240: case 0x250: 
+	{
+//		const char *modes[4] = { "single", "double", "ioa", "iob" };
+//		const char *sources[8] = { "pres.0", "pres.1", "iob", "sysclk", "*4", "*1", "6", "7" };
+//		printf("MN10200: Timer %d comp=%s on_1=%s on_match=%s phase=%s source=%s\n",
+//			10 + ((adr-0x230) >> 4),
+//			modes[data >> 6], data & 0x20 ? "cleared" : "not cleared",  data & 0x10 ? "cleared" : "not cleared",
+//			data & 8 ? "tff" : "rsff", sources[data & 7]);
+		break;
+	}
 
-    break;
-  }
+	case 0x231: case 0x241: case 0x251: 
+	{
+//		const char *modes[4] = { "up", "down", "up on ioa", "up on iob" };
+//		printf("MN10200: Timer %d %s ff=%s op=%s ext_trig=%s %s\n",
+//		10 + ((adr-0x230) >> 4),
+//		data & 0x80 ? "enable" : "disable", data & 0x40 ? "operate" : "clear",
+//		modes[(data >> 4) & 3], data & 2 ? "on" : "off", data & 1 ? "one-shot" : "repeat");
+
+		break;
+	}
 
   case 0x234: case 0x244: case 0x254:
     log_event("MN102", "Timer %d ca=--%02x", 10 + ((adr-0x230) >> 4), data);
@@ -1891,21 +2069,21 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   case 0x280: case 0x290: case 0x2a0: case 0x2b0: case 0x2c0: case 0x2d0: case 0x2e0: case 0x2f0: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x00ffff00) | data;
-    log_event("MN102", "DMA %d adr=%06x", dma, mn102->dma[dma].adr);
+    logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
     break;
   }
 
   case 0x281: case 0x291: case 0x2a1: case 0x2b1: case 0x2c1: case 0x2d1: case 0x2e1: case 0x2f1: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x00ff00ff) | (data << 8);
-    log_event("MN102", "DMA %d adr=%06x", dma, mn102->dma[dma].adr);
+    logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
     break;
   }
 
   case 0x282: case 0x292: case 0x2a2: case 0x2b2: case 0x2c2: case 0x2d2: case 0x2e2: case 0x2f2: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].adr = (mn102->dma[dma].adr & 0x0000ffff) | (data << 16);
-    log_event("MN102", "DMA %d adr=%06x", dma, mn102->dma[dma].adr);
+    logerror("MN10200: DMA %d adr=%06x\n", dma, mn102->dma[dma].adr);
     break;
   }
 
@@ -1915,21 +2093,21 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   case 0x284: case 0x294: case 0x2a4: case 0x2b4: case 0x2c4: case 0x2d4: case 0x2e4: case 0x2f4: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].count = (mn102->dma[dma].count & 0x00ffff00) | data;
-    log_event("MN102", "DMA %d count=%06x", dma, mn102->dma[dma].count);
+    logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
     break;
   }
 
   case 0x285: case 0x295: case 0x2a5: case 0x2b5: case 0x2c5: case 0x2d5: case 0x2e5: case 0x2f5: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].count = (mn102->dma[dma].count & 0x00ff00ff) | (data << 8);
-    log_event("MN102", "DMA %d count=%06x", dma, mn102->dma[dma].count);
+    logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
     break;
   }
 
   case 0x286: case 0x296: case 0x2a6: case 0x2b6: case 0x2c6: case 0x2d6: case 0x2e6: case 0x2f6: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].count = (mn102->dma[dma].count & 0x0000ffff) | (data << 16);
-    log_event("MN102", "DMA %d count=%06x", dma, mn102->dma[dma].count);
+    logerror("MN10200: DMA %d count=%06x\n", dma, mn102->dma[dma].count);
     break;
   }
 
@@ -1939,19 +2117,19 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   case 0x288: case 0x298: case 0x2a8: case 0x2b8: case 0x2c8: case 0x2d8: case 0x2e8: case 0x2f8: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].iadr = (mn102->dma[dma].iadr & 0xff00) | data;
-    log_event("MN102", "DMA %d iadr=%03x", dma, mn102->dma[dma].iadr);
+    logerror("MN10200: DMA %d iadr=%03x\n", dma, mn102->dma[dma].iadr);
     break;
   }
 
   case 0x289: case 0x299: case 0x2a9: case 0x2b9: case 0x2c9: case 0x2d9: case 0x2e9: case 0x2f9: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].iadr = (mn102->dma[dma].iadr & 0x00ff) | ((data & 3) << 8);
-    log_event("MN102", "DMA %d iadr=%03x", dma, mn102->dma[dma].iadr);
+    logerror("MN10200: DMA %d iadr=%03x\n", dma, mn102->dma[dma].iadr);
     break;
   }
 
   case 0x28a: case 0x29a: case 0x2aa: case 0x2ba: case 0x2ca: case 0x2da: case 0x2ea: case 0x2fa: {
-/*    static const char *trans[4] = { "M-IO", "M-M", "M-X1", "m-X2" };
+    static const char *trans[4] = { "M-IO", "M-M", "M-X1", "m-X2" };
     static const char *start[32] = {
       "soft", "a/d", "ser0tx", "set0rx", "ser1tx", "ser1rx",
       "timer0", "timer1", "timer2", "timer3", "timer4", "timer5", "timer6", "timer7", "timer8", "timer9",
@@ -1960,11 +2138,11 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
       "timer12a", "timer12b",
       "irq0", "irq1", "irq2", "irq3",
       "X0e", "X1e", "X0l", "X1l"
-    }; */
+    };
 
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].ctrll = data;
-    log_event("MN102", "DMA %d control ack=%s, trans=%s, start=%s",
+    logerror("MN10200: DMA %d control ack=%s, trans=%s, start=%s\n",
 	      dma,
 	      data & 0x80 ? "level" : "pulse",
 	      trans[(data >> 5) & 3],
@@ -1973,10 +2151,10 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   }
 
   case 0x28b: case 0x29b: case 0x2ab: case 0x2bb: case 0x2cb: case 0x2db: case 0x2eb: case 0x2fb: {
-//    static const char *tradr[4] = { "inc", "dec", "fixed", "reserved" };
+    static const char *tradr[4] = { "inc", "dec", "fixed", "reserved" };
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].ctrlh = data;
-/*    log_event("MN102", "DMA %d control %s irq=%s %s %s dir=%s %s %s",
+	logerror("MN10200: DMA %d control %s irq=%s %s %s dir=%s %s %s\n",
           dma,
           data & 0x80 ? "enable" : "disable",
           data & 0x40 ? "off" : "on",
@@ -1984,14 +2162,14 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
           data & 0x10 ? "burst" : "single",
           data & 0x08 ? "dst" : "src",
           data & 0x04 ? "continue" : "normal",
-          tradr[data & 3]);*/
+          tradr[data & 3]);
     break;
   }
 
   case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc: {
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].irq = data & 7;
-    log_event("MN102", "DMA %d irq=%d", dma, data & 7);
+    logerror("MN10200: DMA %d irq=%d\n", dma, data & 7);
     break;
   }
 
@@ -2084,8 +2262,10 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 
 static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 {
-  if(type == MEM_WORD)
-    return mn10200_r(mn102, adr, MEM_BYTE) | (mn10200_r(mn102, adr+1, MEM_BYTE) << 8);
+	if(type == MEM_WORD)
+	{
+		return mn10200_r(mn102, adr, MEM_BYTE) | (mn10200_r(mn102, adr+1, MEM_BYTE) << 8);
+	}
 
   switch(adr) {
   case 0x00e:
@@ -2120,16 +2300,23 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
     return zz++;
   }
 
-  case 0x183:
-    return 0x10;
-
-  case 0x200: case 0x201: case 0x202: case 0x203: case 0x204:
-  case 0x205: case 0x206: case 0x207: case 0x208: case 0x209:
-    log_event("MN102", "timer %d value read", adr-0x200);
-    break;
+	case 0x183:
+		return 0x10;
+	
+	case 0x200: case 0x201: case 0x202: case 0x203: case 0x204:
+	case 0x205: case 0x206: case 0x207: case 0x208: case 0x209:
+//		printf("MN10200: timer %d value read = %d\n", adr-0x200, mn102->simple_timer[adr-0x200].cur);
+		return mn102->simple_timer[adr-0x200].cur;
+		break;
 
 	case 0x264:	// port 1 data
 		return memory_read_byte_8le(mn102->io, MN10200_PORT1);
+
+	case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc: 
+		{
+			int dma = (adr-0x280) >> 4;
+			return mn102->dma[dma].irq;
+		}
 
 	case 0x3c0:	// port 0 data
 		return memory_read_byte_8le(mn102->io, MN10200_PORT0);
@@ -2168,6 +2355,11 @@ static CPU_SET_INFO(mn10200)
 		case CPUINFO_INT_REGISTER + MN10200_A3:            cpustate->a[3] = info->i;   break;
 		case CPUINFO_INT_REGISTER + MN10200_NMICR:         cpustate->nmicr = info->i;   break;
 		case CPUINFO_INT_REGISTER + MN10200_IAGR:          cpustate->iagr = info->i;   break;
+
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ0:	mn102_extirq(cpustate, 0, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ1:	mn102_extirq(cpustate, 1, info->i);	break;     
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ2:	mn102_extirq(cpustate, 2, info->i);	break;     
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ3:	mn102_extirq(cpustate, 3, info->i);	break;     
 	}
 }
 
@@ -2237,14 +2429,14 @@ CPU_GET_INFO( mn10200 )
 
 		case CPUINFO_STR_REGISTER + MN10200_MDR:           sprintf(info->s, "MDR:  %04x", cpustate->mdr); break;
 
-		case CPUINFO_STR_REGISTER + MN10200_D0:            sprintf(info->s, "D0:  %08x", cpustate->d[0]); break;
-		case CPUINFO_STR_REGISTER + MN10200_D1:            sprintf(info->s, "D1:  %08x", cpustate->d[1]); break;
-		case CPUINFO_STR_REGISTER + MN10200_D2:            sprintf(info->s, "D2:  %08x", cpustate->d[2]); break;
-		case CPUINFO_STR_REGISTER + MN10200_D3:            sprintf(info->s, "D3:  %08x", cpustate->d[3]); break;
-		case CPUINFO_STR_REGISTER + MN10200_A0:            sprintf(info->s, "A0:  %08x", cpustate->a[0]); break;
-		case CPUINFO_STR_REGISTER + MN10200_A1:            sprintf(info->s, "A1:  %08x", cpustate->a[1]); break;
-		case CPUINFO_STR_REGISTER + MN10200_A2:            sprintf(info->s, "A2:  %08x", cpustate->a[2]); break;
-		case CPUINFO_STR_REGISTER + MN10200_A3:            sprintf(info->s, "A3:  %08x", cpustate->a[3]); break;
+		case CPUINFO_STR_REGISTER + MN10200_D0:            sprintf(info->s, "D0: %06x", cpustate->d[0]); break;
+		case CPUINFO_STR_REGISTER + MN10200_D1:            sprintf(info->s, "D1: %06x", cpustate->d[1]); break;
+		case CPUINFO_STR_REGISTER + MN10200_D2:            sprintf(info->s, "D2: %06x", cpustate->d[2]); break;
+		case CPUINFO_STR_REGISTER + MN10200_D3:            sprintf(info->s, "D3: %06x", cpustate->d[3]); break;
+		case CPUINFO_STR_REGISTER + MN10200_A0:            sprintf(info->s, "A0: %06x", cpustate->a[0]); break;
+		case CPUINFO_STR_REGISTER + MN10200_A1:            sprintf(info->s, "A1: %06x", cpustate->a[1]); break;
+		case CPUINFO_STR_REGISTER + MN10200_A2:            sprintf(info->s, "A2: %06x", cpustate->a[2]); break;
+		case CPUINFO_STR_REGISTER + MN10200_A3:            sprintf(info->s, "A3: %06x", cpustate->a[3]); break;
 
 		case CPUINFO_STR_REGISTER + MN10200_NMICR:         sprintf(info->s, "MNICR:  %02x", cpustate->nmicr); break;
 		case CPUINFO_STR_REGISTER + MN10200_IAGR:          sprintf(info->s, "IAGR:  %02x", cpustate->iagr); break;

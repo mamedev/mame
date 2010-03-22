@@ -19,7 +19,7 @@ static ADDRESS_MAP_START(taitozoom_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE("zsg2", zsg2_r, zsg2_w)
-	AM_RANGE(0xe00000, 0xe000ff) AM_RAM	// main CPU comms?
+	AM_RANGE(0xe00000, 0xe000ff) AM_RAM	// main CPU comms (1fbe0xxx on FX-1B main CPU, banked with eeprom - raystorm writes command at PC=80015240)
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM	// TMS57002 comms
 ADDRESS_MAP_END
 
@@ -54,6 +54,7 @@ MACHINE_DRIVER_START( taito_zoom_sound )
 	MDRV_CPU_ADD("mn10200", MN10200, 25000000/2)
 	MDRV_CPU_PROGRAM_MAP(taitozoom_map)
 	MDRV_CPU_IO_MAP(taitozoom_io_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 
 	// we assume the parent machine has created lspeaker/rspeaker
 	MDRV_SOUND_ADD("zsg2", ZSG2, 25000000/2)
