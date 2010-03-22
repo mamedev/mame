@@ -15,13 +15,13 @@
 
 ***************************************************************************/
 
-typedef struct
+struct _snes_st010_state
 {
 	INT16 x1, y1, quadrant, theta, o1;
 	UINT8 *ram;
-} _snes_st010_t;
+};
 
-static _snes_st010_t snes_st010;
+static _snes_st010_state st010_state;
 
 static const INT16 st010_sin_table[256] = {
    0x0000,  0x0324,  0x0648,  0x096a,  0x0c8c,  0x0fab,  0x12c8,  0x15e2,
@@ -163,13 +163,12 @@ static INT16 st010_cos( INT16 theta )
 
 static UINT8 st010_readb( UINT16 address )
 {
-	return snes_st010.ram[address & 0xfff];
+	return st010_state.ram[address & 0xfff];
 }
 
 static UINT16 st010_readw( UINT16 address )
 {
-	return (st010_readb(address + 0) <<  0) |
-			(st010_readb(address + 1) <<  8);
+	return (st010_readb(address + 0) <<  0) | (st010_readb(address + 1) <<  8);
 }
 
 static UINT32 st010_readd( UINT16 address )
@@ -182,7 +181,7 @@ static UINT32 st010_readd( UINT16 address )
 
 static void st010_writeb( UINT16 address, UINT8 data )
 {
-	snes_st010.ram[address & 0xfff] = data;
+	st010_state.ram[address & 0xfff] = data;
 }
 
 static void st010_writew( UINT16 address, UINT16 data )
@@ -201,292 +200,341 @@ static void st010_writed( UINT16 address, UINT32 data )
 
 //
 
-static void st010_op_01_do_work(INT16 x0, INT16 y0) {
-  if((x0 < 0) && (y0 < 0)) {
-    snes_st010.x1 = -x0;
-    snes_st010.y1 = -y0;
-    snes_st010.quadrant = -0x8000;
-  } else if(x0 < 0) {
-    snes_st010.x1 = y0;
-    snes_st010.y1 = -x0;
-    snes_st010.quadrant = -0x4000;
-  } else if(y0 < 0) {
-    snes_st010.x1 = -y0;
-    snes_st010.y1 = x0;
-    snes_st010.quadrant = 0x4000;
-  } else {
-    snes_st010.x1 = x0;
-    snes_st010.y1 = y0;
-    snes_st010.quadrant = 0x0000;
-  }
+static void st010_op_01_do_work( INT16 x0, INT16 y0 )
+{
+	if ((x0 < 0) && (y0 < 0))
+	{
+		st010_state.x1 = -x0;
+		st010_state.y1 = -y0;
+		st010_state.quadrant = -0x8000;
+	}
+	else if (x0 < 0)
+	{
+		st010_state.x1 = y0;
+		st010_state.y1 = -x0;
+		st010_state.quadrant = -0x4000;
+	}
+	else if (y0 < 0)
+	{
+		st010_state.x1 = -y0;
+		st010_state.y1 = x0;
+		st010_state.quadrant = 0x4000;
+	}
+	else
+	{
+		st010_state.x1 = x0;
+		st010_state.y1 = y0;
+		st010_state.quadrant = 0x0000;
+	}
 
-  while((snes_st010.x1 > 0x1f) || (snes_st010.y1 > 0x1f)) {
-    if(snes_st010.x1 > 1) { snes_st010.x1 >>= 1; }
-    if(snes_st010.y1 > 1) { snes_st010.y1 >>= 1; }
-  }
+	while((st010_state.x1 > 0x1f) || (st010_state.y1 > 0x1f))
+	{
+		if (st010_state.x1 > 1)
+			st010_state.x1 >>= 1;
+		if (st010_state.y1 > 1)
+			st010_state.y1 >>= 1;
+	}
 
-  if(snes_st010.y1 == 0) { snes_st010.quadrant += 0x4000; }
+	if (st010_state.y1 == 0)
+		st010_state.quadrant += 0x4000;
 
-  snes_st010.theta = (st010_arctan[snes_st010.y1][snes_st010.x1] << 8) ^ snes_st010.quadrant;
+	st010_state.theta = (st010_arctan[st010_state.y1][st010_state.x1] << 8) ^ st010_state.quadrant;
 }
 
 //
 
-static void st010_op_01( void ) {
-  INT16 x0 = st010_readw(0x0000);
-  INT16 y0 = st010_readw(0x0002);
+static void st010_op_01( void )
+{
+	INT16 x0 = st010_readw(0x0000);
+	INT16 y0 = st010_readw(0x0002);
 
-  st010_op_01_do_work(x0, y0);
+	st010_op_01_do_work(x0, y0);
 
-  st010_writew(0x0000, snes_st010.x1);
-  st010_writew(0x0002, snes_st010.y1);
-  st010_writew(0x0004, snes_st010.quadrant);
-//st010_writew(0x0006, y0);  //Overload's docs note this write occurs, SNES9x disagrees
-  st010_writew(0x0010, snes_st010.theta);
+	st010_writew(0x0000, st010_state.x1);
+	st010_writew(0x0002, st010_state.y1);
+	st010_writew(0x0004, st010_state.quadrant);
+	//st010_writew(0x0006, y0);  //Overload's docs note this write occurs, SNES9x disagrees
+	st010_writew(0x0010, st010_state.theta);
 }
 
-static void st010_op_02( void ) {
-  INT16 positions = st010_readw(0x0024);
-  UINT16 *places  = (UINT16*)(snes_st010.ram + 0x0040);
-  UINT16 *drivers = (UINT16*)(snes_st010.ram + 0x0080);
+static void st010_op_02( void )
+{
+	INT16 positions = st010_readw(0x0024);
+	UINT16 *places  = (UINT16*)(st010_state.ram + 0x0040);
+	UINT16 *drivers = (UINT16*)(st010_state.ram + 0x0080);
 
-  UINT8 sorted;
-  UINT16 temp;
-  int i;
-  if(positions > 1) {
-    do {
-      sorted = 1;
-      for(i = 0; i < positions - 1; i++) {
-        if(places[i] < places[i + 1]) {
-          temp = places[i + 1];
-          places[i + 1] = places[i];
-          places[i] = temp;
+	UINT8 sorted;
+	UINT16 temp;
+	int i;
 
-          temp = drivers[i + 1];
-          drivers[i + 1] = drivers[i];
-          drivers[i] = temp;
+	if (positions > 1)
+	{
+		do
+		{
+			sorted = 1;
+			for (i = 0; i < positions - 1; i++)
+			{
+				if (places[i] < places[i + 1])
+				{
+					temp = places[i + 1];
+					places[i + 1] = places[i];
+					places[i] = temp;
 
-          sorted = 0;
-        }
-      }
-      positions--;
-    } while(!sorted);
-  }
+					temp = drivers[i + 1];
+					drivers[i + 1] = drivers[i];
+					drivers[i] = temp;
+
+					sorted = 0;
+				}
+			}
+			positions--;
+		} while(!sorted);
+	}
 }
 
-static void st010_op_03( void ) {
-  INT16 x0 = st010_readw(0x0000);
-  INT16 y0 = st010_readw(0x0002);
-  INT16 multiplier = st010_readw(0x0004);
-  INT32 x1, y1;
+static void st010_op_03( void )
+{
+	INT16 x0 = st010_readw(0x0000);
+	INT16 y0 = st010_readw(0x0002);
+	INT16 multiplier = st010_readw(0x0004);
+	INT32 x1, y1;
 
-  x1 = x0 * multiplier << 1;
-  y1 = y0 * multiplier << 1;
+	x1 = x0 * multiplier << 1;
+	y1 = y0 * multiplier << 1;
 
-  st010_writed(0x0010, x1);
-  st010_writed(0x0014, y1);
+	st010_writed(0x0010, x1);
+	st010_writed(0x0014, y1);
 }
 
-static void st010_op_04( void ) {
-  INT16 x = st010_readw(0x0000);
-  INT16 y = st010_readw(0x0002);
-  INT16 square;
-  //calculate the vector length of (x,y)
-  square = sqrt((double)(y * y + x * x));
+static void st010_op_04( void )
+{
+	INT16 x = st010_readw(0x0000);
+	INT16 y = st010_readw(0x0002);
+	INT16 square;
+	//calculate the vector length of (x,y)
+	square = sqrt((double)(y * y + x * x));
 
-  st010_writew(0x0010, square);
+	st010_writew(0x0010, square);
 }
 
 // same as op_01_do_work, but we are only interested in the angle!
-static void st010_op_05_do_work(INT16 x0, INT16 y0) {
-  INT16 x1, y1, quadrant;
-  if((x0 < 0) && (y0 < 0)) {
-    x1 = -x0;
-    y1 = -y0;
-    quadrant = -0x8000;
-  } else if(x0 < 0) {
-    x1 = y0;
-    y1 = -x0;
-    quadrant = -0x4000;
-  } else if(y0 < 0) {
-    x1 = -y0;
-    y1 = x0;
-    quadrant = 0x4000;
-  } else {
-    x1 = x0;
-    y1 = y0;
-    quadrant = 0x0000;
-  }
+static void st010_op_05_do_work( INT16 x0, INT16 y0 )
+{
+	INT16 x1, y1, quadrant;
+	if ((x0 < 0) && (y0 < 0))
+	{
+		x1 = -x0;
+		y1 = -y0;
+		quadrant = -0x8000;
+	}
+	else if (x0 < 0)
+	{
+		x1 = y0;
+		y1 = -x0;
+		quadrant = -0x4000;
+	}
+	else if (y0 < 0)
+	{
+		x1 = -y0;
+		y1 = x0;
+		quadrant = 0x4000;
+	}
+	else
+	{
+		x1 = x0;
+		y1 = y0;
+		quadrant = 0x0000;
+	}
 
-  while((x1 > 0x1f) || (y1 > 0x1f)) {
-    if(x1 > 1) { x1 >>= 1; }
-    if(y1 > 1) { y1 >>= 1; }
-  }
+	while((x1 > 0x1f) || (y1 > 0x1f))
+	{
+		if (x1 > 1)
+			x1 >>= 1;
+		if (y1 > 1)
+			y1 >>= 1;
+	}
 
-  if(y1 == 0) { quadrant += 0x4000; }
+	if (y1 == 0)
+		quadrant += 0x4000;
 
-  snes_st010.o1 = (st010_arctan[y1][x1] << 8) ^ quadrant;
+	st010_state.o1 = (st010_arctan[y1][x1] << 8) ^ quadrant;
 }
 
-static void st010_op_05( void ) {
-  INT32 dx, dy;
-  UINT16 o1 = 0;
-  UINT8 wrap = 0;
+static void st010_op_05( void )
+{
+	INT32 dx, dy;
+	UINT16 o1 = 0;
+	UINT8 wrap = 0;
 
-  //target (x,y) coordinates
-  INT16 ypos_max = st010_readw(0x00c0);
-  INT16 xpos_max = st010_readw(0x00c2);
+	//target (x,y) coordinates
+	INT16 ypos_max = st010_readw(0x00c0);
+	INT16 xpos_max = st010_readw(0x00c2);
 
-  //current coordinates and direction
-  INT32 ypos = st010_readd(0x00c4);
-  INT32 xpos = st010_readd(0x00c8);
-  UINT16 rot = st010_readw(0x00cc);
+	//current coordinates and direction
+	INT32 ypos = st010_readd(0x00c4);
+	INT32 xpos = st010_readd(0x00c8);
+	UINT16 rot = st010_readw(0x00cc);
 
-  //physics
-  UINT16 speed = st010_readw(0x00d4);
-  UINT16 accel = st010_readw(0x00d6);
-  UINT16 speed_max = st010_readw(0x00d8);
-  UINT16 old_speed;
+	//physics
+	UINT16 speed = st010_readw(0x00d4);
+	UINT16 accel = st010_readw(0x00d6);
+	UINT16 speed_max = st010_readw(0x00d8);
+	UINT16 old_speed;
 
-  //special condition acknowledgement
-  INT16 system = st010_readw(0x00da);
-  INT16 flags = st010_readw(0x00dc);
+	//special condition acknowledgement
+	INT16 system = st010_readw(0x00da);
+	INT16 flags = st010_readw(0x00dc);
 
-  //new target coordinates
-  INT16 ypos_new = st010_readw(0x00de);
-  INT16 xpos_new = st010_readw(0x00e0);
+	//new target coordinates
+	INT16 ypos_new = st010_readw(0x00de);
+	INT16 xpos_new = st010_readw(0x00e0);
 
-  //mask upper bit
-  xpos_new &= 0x7fff;
+	//mask upper bit
+	xpos_new &= 0x7fff;
 
-  //get the current distance
-  dx = xpos_max - (xpos >> 16);
-  dy = ypos_max - (ypos >> 16);
+	//get the current distance
+	dx = xpos_max - (xpos >> 16);
+	dy = ypos_max - (ypos >> 16);
 
-  //quirk: clear and move in9
-  st010_writew(0x00d2, 0xffff);
-  st010_writew(0x00da, 0x0000);
+	//quirk: clear and move in9
+	st010_writew(0x00d2, 0xffff);
+	st010_writew(0x00da, 0x0000);
 
-  //grab the target angle
-  st010_op_05_do_work(dy, dx);
-  o1 = (UINT16)snes_st010.o1;
+	//grab the target angle
+	st010_op_05_do_work(dy, dx);
+	o1 = (UINT16)st010_state.o1;
 
-  //check for wrapping
-  if(abs(o1 - rot) > 0x8000) {
-    o1 += 0x8000;
-    rot += 0x8000;
-    wrap = 1;
-  }
+	//check for wrapping
+	if (abs(o1 - rot) > 0x8000)
+	{
+		o1 += 0x8000;
+		rot += 0x8000;
+		wrap = 1;
+	}
 
-  old_speed = speed;
+	old_speed = speed;
 
-  //special case
-  if(abs(o1 - rot) == 0x8000) {
-    speed = 0x100;
-  }
+	//special case
+	if (abs(o1 - rot) == 0x8000)
+	{
+		speed = 0x100;
+	}
+	//slow down for sharp curves
+	else if (abs(o1 - rot) >= 0x1000)
+	{
+		UINT32 slow = abs(o1 - rot);
+		slow >>= 4;  //scaling
+		speed -= slow;
+	}
+	//otherwise accelerate
+	else
+	{
+		speed += accel;
+		if (speed > speed_max)
+			speed = speed_max;  //clip speed
+	}
 
-  //slow down for sharp curves
-  else if(abs(o1 - rot) >= 0x1000) {
-  UINT32 slow = abs(o1 - rot);
-    slow >>= 4;  //scaling
-    speed -= slow;
-  }
+	//prevent negative/positive overflow
+	if (abs(old_speed - speed) > 0x8000)
+	{
+		if (old_speed < speed)
+			speed = 0;
+		else
+			speed = 0xff00;
+	}
 
-  //otherwise accelerate
-  else {
-    speed += accel;
-    if(speed > speed_max) {
-      speed = speed_max;  //clip speed
-    }
-  }
+	//adjust direction by so many degrees
+	//be careful of negative adjustments
+	if ((o1 > rot && (o1 - rot) > 0x80) || (o1 < rot && (rot - o1) >= 0x80))
+	{
+		if (o1 < rot)
+			rot -= 0x280;
+		else if (o1 > rot)
+			rot += 0x280;
+	}
 
-  //prevent negative/positive overflow
-  if(abs(old_speed - speed) > 0x8000) {
-    if(old_speed < speed) { speed = 0; }
-    else speed = 0xff00;
-  }
+	//turn off wrapping
+	if (wrap)
+		rot -= 0x8000;
 
-  //adjust direction by so many degrees
-  //be careful of negative adjustments
-  if((o1 > rot && (o1 - rot) > 0x80) || (o1 < rot && (rot - o1) >= 0x80)) {
-    if(o1 < rot) { rot -= 0x280; }
-    else if(o1 > rot) { rot += 0x280; }
-  }
+	//now check the distances (store for later)
+	dx = (xpos_max << 16) - xpos;
+	dy = (ypos_max << 16) - ypos;
+	dx >>= 16;
+	dy >>= 16;
 
-  //turn off wrapping
-  if(wrap) { rot -= 0x8000; }
+	//if we're in so many units of the target, signal it
+	if ((system && (dy <= 6 && dy >= -8) && (dx <= 126 && dx >= -128)) || (!system && (dx <= 6 && dx >= -8) && (dy <= 126 && dy >= -128)))
+	{
+		//announce our new destination and flag it
+		xpos_max = xpos_new & 0x7fff;
+		ypos_max = ypos_new;
+		flags |= 0x08;
+	}
 
-  //now check the distances (store for later)
-  dx = (xpos_max << 16) - xpos;
-  dy = (ypos_max << 16) - ypos;
-  dx >>= 16;
-  dy >>= 16;
+	//update position
+	xpos -= (st010_cos(rot) * 0x400 >> 15) * (speed >> 8) << 1;
+	ypos -= (st010_sin(rot) * 0x400 >> 15) * (speed >> 8) << 1;
 
-  //if we're in so many units of the target, signal it
-  if((system && (dy <= 6 && dy >= -8) && (dx <= 126 && dx >= -128)) || (!system && (dx <= 6 && dx >= -8) && (dy <= 126 && dy >= -128))) {
-    //announce our new destination and flag it
-    xpos_max = xpos_new & 0x7fff;
-    ypos_max = ypos_new;
-    flags |= 0x08;
-  }
+	//quirk: mask upper byte
+	xpos &= 0x1fffffff;
+	ypos &= 0x1fffffff;
 
-  //update position
-  xpos -= (st010_cos(rot) * 0x400 >> 15) * (speed >> 8) << 1;
-  ypos -= (st010_sin(rot) * 0x400 >> 15) * (speed >> 8) << 1;
-
-  //quirk: mask upper byte
-  xpos &= 0x1fffffff;
-  ypos &= 0x1fffffff;
-
-  st010_writew(0x00c0, ypos_max);
-  st010_writew(0x00c2, xpos_max);
-  st010_writed(0x00c4, ypos);
-  st010_writed(0x00c8, xpos);
-  st010_writew(0x00cc, rot);
-  st010_writew(0x00d4, speed);
-  st010_writew(0x00dc, flags);
+	st010_writew(0x00c0, ypos_max);
+	st010_writew(0x00c2, xpos_max);
+	st010_writed(0x00c4, ypos);
+	st010_writed(0x00c8, xpos);
+	st010_writew(0x00cc, rot);
+	st010_writew(0x00d4, speed);
+	st010_writew(0x00dc, flags);
 }
 
-static void st010_op_06( void ) {
-  INT16 multiplicand = st010_readw(0x0000);
-  INT16 multiplier = st010_readw(0x0002);
-  INT32 product;
+static void st010_op_06( void )
+{
+	INT16 multiplicand = st010_readw(0x0000);
+	INT16 multiplier = st010_readw(0x0002);
+	INT32 product;
 
-  product = multiplicand * multiplier << 1;
+	product = multiplicand * multiplier << 1;
 
-  st010_writed(0x0010, product);
+	st010_writed(0x0010, product);
 }
 
-static void st010_op_07( void ) {
-  INT16 theta = st010_readw(0x0000);
+static void st010_op_07( void )
+{
+	INT16 theta = st010_readw(0x0000);
 
-  INT16 data;
-  int i, offset;
-  for(i = 0, offset = 0; i < 176; i++) {
-    data = st010_mode7_scale[i] * st010_cos(theta) >> 15;
-    st010_writew(0x00f0 + offset, data);
-    st010_writew(0x0510 + offset, data);
+	INT16 data;
+	int i, offset;
+	for (i = 0, offset = 0; i < 176; i++)
+	{
+		data = st010_mode7_scale[i] * st010_cos(theta) >> 15;
+		st010_writew(0x00f0 + offset, data);
+		st010_writew(0x0510 + offset, data);
 
-    data = st010_mode7_scale[i] * st010_sin(theta) >> 15;
-    st010_writew(0x0250 + offset, data);
-    if(data) { data = ~data; }
-    st010_writew(0x03b0 + offset, data);
+		data = st010_mode7_scale[i] * st010_sin(theta) >> 15;
+		st010_writew(0x0250 + offset, data);
+		if (data)
+			data = ~data;
 
-    offset += 2;
-  }
+		st010_writew(0x03b0 + offset, data);
+
+		offset += 2;
+	}
 }
 
-static void st010_op_08( void ) {
-  INT16 x0 = st010_readw(0x0000);
-  INT16 y0 = st010_readw(0x0002);
-  INT16 theta = st010_readw(0x0004);
-  INT16 x1, y1;
+static void st010_op_08( void )
+{
+	INT16 x0 = st010_readw(0x0000);
+	INT16 y0 = st010_readw(0x0002);
+	INT16 theta = st010_readw(0x0004);
+	INT16 x1, y1;
 
-  x1 = (y0 * st010_sin(theta) >> 15) + (x0 * st010_cos(theta) >> 15);
-  y1 = (y0 * st010_cos(theta) >> 15) - (x0 * st010_sin(theta) >> 15);
+	x1 = (y0 * st010_sin(theta) >> 15) + (x0 * st010_cos(theta) >> 15);
+	y1 = (y0 * st010_cos(theta) >> 15) - (x0 * st010_sin(theta) >> 15);
 
-  st010_writew(0x0010, x1);
-  st010_writew(0x0012, y1);
+	st010_writew(0x0010, x1);
+	st010_writew(0x0012, y1);
 }
 
 // init, reset & handlers
@@ -502,7 +550,7 @@ static void st010_write( UINT16 address, UINT8 data )
 
 	if ((address & 0xfff) == 0x0021 && (data & 0x80))
 	{
-		switch (snes_st010.ram[0x0020])
+		switch (st010_state.ram[0x0020])
 		{
 			case 0x01: st010_op_01(); break;
 			case 0x02: st010_op_02(); break;
@@ -514,21 +562,28 @@ static void st010_write( UINT16 address, UINT8 data )
 			case 0x08: st010_op_08(); break;
 		}
 
-		snes_st010.ram[0x0021] &= ~0x80;
+		st010_state.ram[0x0021] &= ~0x80;
 	}
 }
 
 
 static void st010_init( running_machine* machine )
 {
-	snes_st010.ram = (UINT8*)auto_alloc_array(machine, UINT8, 0x1000);
+	st010_state.ram = (UINT8*)auto_alloc_array_clear(machine, UINT8, 0x1000);
+
+	state_save_register_global(machine, st010_state.x1);
+	state_save_register_global(machine, st010_state.y1);
+	state_save_register_global(machine, st010_state.quadrant);
+	state_save_register_global(machine, st010_state.theta);
+	state_save_register_global(machine, st010_state.o1);
+
+	state_save_register_global_pointer(machine, st010_state.ram, 0x1000);
 }
 
 static void st010_reset( void )
 {
-	snes_st010.x1 = 0;
-	snes_st010.y1 = 0;
-	snes_st010.quadrant = 0;
-	snes_st010.theta = 0;
-	memset(snes_st010.ram, 0, 0x1000);
+	st010_state.x1 = 0;
+	st010_state.y1 = 0;
+	st010_state.quadrant = 0;
+	st010_state.theta = 0;
 }
