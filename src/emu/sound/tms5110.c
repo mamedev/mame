@@ -73,6 +73,9 @@
 #define SUBTYPE_TMS5100			1
 #define SUBTYPE_M58817			2
 #define SUBTYPE_TMS5110			4
+#define SUBTYPE_TMS5200			8
+#define SUBTYPE_TMS5220			16
+#define SUBTYPE_TMS5220C		32
 #define FIFO_SIZE				64
 #define MAX_CHIRP_SIZE			51
 

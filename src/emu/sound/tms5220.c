@@ -700,13 +700,7 @@ tryagain:
 	    }
         }
 
-        if (tms->old_energy == 0)
-        {
-            /* generate silent samples here */
-			tms->excitation_data = 0x00; /* This is NOT correct, the current_energy is forced to zero when we                         just passed a zero energy frame because thats what the tables hold for that value.
-                        However, this code does no harm. Will be removed later. */
-        }
-        else if (tms->old_pitch == 0)
+        if (tms->old_pitch == 0)
         {
             /* generate unvoiced samples here */
 			if (tms->RNG & 1)
