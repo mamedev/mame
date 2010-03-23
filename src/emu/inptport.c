@@ -4704,9 +4704,10 @@ static void record_port(const input_port_config *port)
 
 int input_machine_has_keyboard(running_machine *machine)
 {
+	int have_keyboard = FALSE;
+#ifdef MESS	
 	const input_field_config *field;
 	const input_port_config *port;
-	int have_keyboard = FALSE;
 	for (port = machine->portlist.first(); port != NULL; port = port->next)
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
@@ -4716,6 +4717,7 @@ int input_machine_has_keyboard(running_machine *machine)
 				break;
 		}
 	}
+#endif	
 	return have_keyboard;
 }
 
