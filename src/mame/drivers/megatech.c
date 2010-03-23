@@ -82,6 +82,7 @@ Wrestle War                171-5782    837-6963-48       610-0239-48         MPR
 Bonanza Bros.              171-5782    837-6963-49       610-0239-49         MPR-13905A-F   (23C4000)     EPR-12368-49   (27256)   n/a
 Streets of Rage            171-5782    837-6963-51       610-0239-51         MPR-14125-SM   (uPD23C4000)  EPR-12368-51   (27C256)  n/a
 Sonic The Hedgehog         171-5782    837-6963-52       610-0239-52         MPR-13913-F    (834200A)     EPR-12368-52   (27C256)  n/a
+Spider-Man                 171-5782    837-6963-54       610-0239-54         MPR-14027-SM   (uPD23C4000)  EPR-12368-54   (27C256)  n/a
 Mario Lemeux Hockey        171-5782    837-6963-59       610-0239-59         MPR-14376-H    (234000)      EPR-12368-59   (27256)   n/a
 Turbo Outrun               171-5782    837-6963-61       610-0239-61         MPR-14674      (uPD23C4000)  EPR-12368-61   (27256)   n/a
 Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR-15000A-F   (838200)      EPR-12368-62   (27256)   n/a
@@ -1051,6 +1052,18 @@ ROM_START( mt_fshrk ) /* Fire Shark */
 	MEGATECH_GAME53("game0", "inst0")
 ROM_END
 
+/* Game 54 - Spiderman */
+#define MEGATECH_GAME54(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp14027-sm.ic1", 0x000000, 0x080000, CRC(e2c08a06) SHA1(39e592eafd47e2aa6edbb4845d44750057bff890) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-54.ic2", 0x000000, 0x08000,  CRC(30b68988) SHA1(04eeb0fad732a791b6bc0c0846306d567573649f) ) \
+
+ROM_START( mt_spman ) /* Spiderman */
+	MEGATECH_BIOS
+	MEGATECH_GAME54("game0", "inst0")
+ROM_END
+
 /* Game 57 - Golden Axe 2 (Genesis) */
 #define MEGATECH_GAME57(GAME_REGION, INSTRUCTION_REGION) \
 	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
@@ -1211,7 +1224,7 @@ ROM_END
 /* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
 /*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
 /* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mtnew, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
-/* 54 */ // Spider-Man
+/* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mtnew, ROT0, "Marvel, Sega",          "Spider-Man vs The Kingpin (Mega-Tech)", GAME_NOT_WORKING )
 /* 55 */ // unknown
 /* 56 */ // unknown
 /* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
