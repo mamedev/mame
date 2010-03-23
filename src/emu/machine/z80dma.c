@@ -560,6 +560,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					z80dma->status = 0x38;
 					break;
 				case COMMAND_LOAD:
+					z80dma->force_ready = 0;
 					z80dma->addressA = PORTA_ADDRESS(z80dma);
 					z80dma->addressB = PORTB_ADDRESS(z80dma);
 					z80dma->count = BLOCKLEN(z80dma);
@@ -581,7 +582,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					break;
 				case COMMAND_CONTINUE:
 					if (LOG) logerror("Continue\n");
-					z80dma->count = 0;
+					z80dma->count = BLOCKLEN(z80dma);
 					z80dma->dma_enabled = 1;
 					//"match not found" & "end of block" status flags zeroed here
 					z80dma->status |= 0x30;
