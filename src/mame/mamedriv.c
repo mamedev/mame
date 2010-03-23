@@ -9079,6 +9079,7 @@ Other Sun games
 	/* Funworld */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyc3x3 )	/* (c) 1985 TAB-Austria */
+	DRIVER( jolycmzs )	/* (c) 1993 MZS Tech */
 	DRIVER( jolyc980 )	/* (c) 2000 Spale-Soft */
 	DRIVER( jolycdev )	/* (c) 1998 TAB/Evona */
 	DRIVER( jolyccra )	/* (c) 1985 TAB-Austria */
@@ -9113,6 +9114,7 @@ Other Sun games
 	DRIVER( vegasslw )	/* (c) 1993 Funworld */
 	DRIVER( vegasfst )	/* (c) 1993 Soft Design */
 	DRIVER( vegasfte )	/* (c) 1993 Soft Design */
+	DRIVER( vegasmil )	/* (c) 1993 Mile */
 	DRIVER( jolyjokr )	/* (c) 198? Impera */
 	DRIVER( jolyjokra )	/* (c) 198? Impera */
 	DRIVER( jolyjokrb )	/* (c) 198? Impera */

@@ -11,7 +11,8 @@
 
   * Jolly Card (austrian),                            TAB-Austria,        1985.
   * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
-  * Jolly Card Professional 2.0,                      Spale-Soft,         2000.
+  * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
+  * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
   * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
   * Jolly Card (croatian, set 1),                     TAB-Austria,        1985.
   * Jolly Card (croatian, set 2),                     Soft Design,        1993.
@@ -45,6 +46,7 @@
   * Royal Vegas Joker Card (slow deal),               Funworld,           1993.
   * Royal Vegas Joker Card (fast deal),               Soft Design,        1993.
   * Royal Vegas Joker Card (fast deal, english gfx),  Soft Design,        1993.
+  * Royal Vegas Joker Card (fast deal, Mile),         Mile,               1993.
   * Jolly Joker (98bet, set 1).                       Impera,             198?.
   * Jolly Joker (98bet, set 2).                       Impera,             198?.
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
@@ -208,13 +210,15 @@
   Going through the code, there's not any NVRAM initialization routine through service 1 & 2.
 
 
-  * Jolly Card Professional 2.0 (Spale-Soft)
+  * Jolly Card Professional 2.0 (MZS Tech & Spale Soft)
 
   Each 1st boot, this game show a generated code. You must enter this code in a DOS program to
   get the input codes necessary to allow boot the game.
 
   This set is one of the most wanted for customers because is a real SCAM.
   The program has 2 hidden menues that allow change parameters without knowledge of the players.
+
+  See more at ROM_LOAD section...
 
 
   * Jolly Card (Evona Electronic)
@@ -415,7 +419,7 @@
   - Cleaned up and renamed all sets. Made parent-clone relationship.
 
   [2005/12/15]
-  - Corrected CPU freq (2 MHz) in cuoreuno and elephfam (both have R65c02P2).
+  - Corrected CPU freq (2 MHz) in cuoreuno and elephfam (both have R65C02P2).
      (I suspect more games must have their CPU running at 2 MHz).
   - Corrected videoram and colorram offsets in cuoreuno and elephfam.
   - To initialize the NVRAM in cuoreuno and elephfam:
@@ -448,7 +452,8 @@
   - Splitted the driver to driver/video.
 
   - Corrected the screen size and visible area to magiccrd based on mc6845 registers.
-  - Added the remaining 2 GFX planes to magiccrd, but GFX are imperfect (bad decode or bad dump?). Color PROM need to be dumped.
+  - Added the remaining 2 GFX planes to magiccrd, but GFX are imperfect (bad decode or bad dump?).
+     Color PROM need to be dumped.
   - Royalcrd: Added all inputs and DIP switches.
      Fixed memory map, gfx decode
      Corrected screen size and visible area based on mc6845 registers.
@@ -463,18 +468,26 @@
   - Fixed CPU clock to 2MHz. in all remaining games.
   - Fixed ay8910 frequency based on elephfam audio.
   - Fixed ay8910 volume in all games to avoid clipping.
-  - Reworked jolycdcr inputs: The game was designed to work only with remote credits. After nvram init, set the payout dip to "manual".
-  - Reworked jolycdit inputs: After nvram init, set the payout dip to "manual" to allow work the remote mode.
-  - Set jolycdat as bigdeal clone. The game has the same layout/behaviour instead of the normal jolly card games, even when are sharing gfx roms.
+  - Reworked jolycdcr inputs: The game was designed to work only with remote credits.
+     After nvram init, set the payout dip to "manual".
+  - Reworked jolycdit inputs: After nvram init, set the payout dip
+     to "manual" to allow work the remote mode.
+  - Set jolycdat as bigdeal clone. The game has the same layout/behaviour instead of the normal
+     jolly card games, even when they are sharing gfx roms.
   - Added the bipolar PROM and GAL to jolycdit. Confirmed the GFX ROMs as good dumps.
-  - Added an alternate set of Elephant Family. This one lacks of test mode and doesn't allow to switch between min-max bets through stop1.
-  - Added color PROMs to cuoreuno and elephfam sets but still no routed. Also added PLDs (protected, bad dumps).
+  - Added an alternate set of Elephant Family. This one lacks of test mode and doesn't allow
+     to switch between min-max bets through stop1.
+  - Added color PROMs to cuoreuno and elephfam sets but still no routed.
+     Also added PLDs (protected, bad dumps).
   - Corrected jollycrd screen size and visible area based on mc6845 registers.
-  - Hooked, wired and decoded the color prom in jollycrd sets based on jolycdit redump. Now colors are perfect.
-  - Wired and decoded the color prom in cuoreuno and elephfam sets. Now colors are perfect.
+  - Hooked, wired and decoded the color prom in jollycrd sets based on jolycdit redump.
+     Now colors are perfect.
+  - Wired and decoded the color prom in cuoreuno and elephfam sets.
+     Now colors are perfect.
   - Wired and decoded the color prom in royalcrd. Now colors are perfect.
   - Hooked, wired and decoded the color prom in bigdeal sets based on jolycdat (jollycrd palette).
-     Colors seems to be correct, but need to check against the real thing. Flagged as IMPERFECT_COLORS till a color PROM dump appear.
+     Colors seems to be correct, but need to check against the real thing.
+     Flagged as IMPERFECT_COLORS till a color PROM dump appear.
   - Decrypted jolycdit gfx roms.
   - Added set Jolly Card (Austria, encrypted).
   - Decrypted jolycdae and managed the planes to show correct colors. The set is working properly.
@@ -586,7 +599,7 @@
   [2008/12/01]
   - Decripted saloon's program, graphics and color PROM.
   - Created a new memory map and machine driver for saloon.
-  - Removed set jolycdae (it's not coming from a real board).
+  - Removed set jolycdae (not coming from a real board).
   - Renamed the sets magiccrd, magiccda and magiccdb, to magicrd2, magicd2a and magicd2b.
   - Updated technical notes.
 
@@ -667,7 +680,7 @@
   [2010/03/21]
   - Added dual-state palette (addressable through PLDs).
      This allow to choose which half of the palette will be addressed.
-  - Splitted the main Machine driver to cover both palette states.
+  - Splitted the main machine driver to cover both palette states.
   - Reworked inputs / DIP switches for vegasslw, vagasfst and vegasfte.
   - Created new default NVRAM for Royal Vegas Joker Card sets.
      These need to be configurated to be valid ones. Now vegasfte can
@@ -676,6 +689,17 @@
   - Removed the not working flag from vegasfte.
   - Improved colors for Big Deal sets.
   - Correct colors for Royal Vegas Joker Card sets.
+
+  - Added a second set of Jolly Card Professional.
+     Documented the code differences.
+  - Added another Royal Vegas Joker Card set, from Mile.
+     These sets aren't intended to work with coins. Only remote credits
+     are allowed. There are external modules that can manage up to 4
+     machines simultaneously, adding/removing/watching credits.
+  - Added default NVRAM to the above sets.
+  - Added proper inputs and DIP switches to vegasmil.
+  - Replaced the jolyc980 default NVRAM with one totally clean.
+     Temporal and total meters are cleared to zero.
 
 
 
@@ -1576,16 +1600,16 @@ static INPUT_PORTS_START( vegasslw )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
@@ -1637,16 +1661,16 @@ static INPUT_PORTS_START( vegasfst )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Remote" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote" )			PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "100 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "1000 Points/Pulse" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
@@ -1698,16 +1722,16 @@ static INPUT_PORTS_START( vegasfte )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Remote" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote" )			PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "100 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "1000 Points/Pulse" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
@@ -1720,6 +1744,67 @@ static INPUT_PORTS_START( vegasfte )
 	/* after nvram init, set the following one to 'manual'
     to allow the remote credits mode to work */
 	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vegasmil )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Prihoduj (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Start / Dupliraj (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Ulog (Bet)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buch (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Velika (High)")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Mala (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )			PORT_NAME("Auszahlen") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreiben (Payout)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPSETTING(    0x20, "Without Joker" )
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "Auto Hold" )
+	PORT_DIPSETTING(    0x40, "No Auto Hold" )
+
+	/* after nvram init, set the following one to 'manual'
+    to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
@@ -2188,7 +2273,7 @@ ROM_START( jollycrd )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jollycrd_nvram.bin",  0x0000, 0x0800, CRC(8f0a86c9) SHA1(467bd4f601ac6aa818c036f1269c2d43d27854f6) )
+	ROM_LOAD( "jollycrd_nvram.bin", 0x0000, 0x0800, CRC(8f0a86c9) SHA1(467bd4f601ac6aa818c036f1269c2d43d27854f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2204,7 +2289,7 @@ ROM_START( jolyc3x3 )
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolyc3x3_nvram.bin",  0x0000, 0x0800, CRC(727c70cf) SHA1(3639b0891514064e21ebdb280791cc9c8f5ba481) )
+	ROM_LOAD( "jolyc3x3_nvram.bin", 0x0000, 0x0800, CRC(727c70cf) SHA1(3639b0891514064e21ebdb280791cc9c8f5ba481) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2212,14 +2297,82 @@ ROM_END
 
 
 /*
-    Jolly Card Professional 2.0
 
-    Special version with maximum bet up to 98 credits.
-    This game has an annoying password system through a DOS program.
+  Jolly Card Professional 2.0
+  ---------------------------
+
+  Special version with maximum bet up to 98/980 credits.
+  This game has an annoying password system through a DOS program.
+
+
+  differences:
+  ----------------------------------------------------------
+
+  MZS Soft:
+
+  - All manufacturer strings, phones and dates.
+  - Doesn't allow to clean partial IN/OUT meters.
+
+    $9FFF  LDX #$EA      ; Just clean 24 bytes from memory.
+    $A001  LDA #$00
+    $A003  STA $0300,X
+    $A006  INX
+    $A007  BNE $A003
+    $A009  RTS
+
+  - The following unknown bytes...
+
+    $47EB - $47FF: 05 05 01 04 04  ; Unknown.
+
+  ----------------------------------------------------------
+
+  Spale Soft:
+
+  - All manufacturer strings, phones and dates.
+
+  - Allow to clean partial IN/OUT meters.
+
+    $9FFF  LDX #$00      ; Just clean 255 bytes from memory.
+    $A001  LDA #$00
+    $A003  STA $0300,X
+    $A006  INX
+    $A007  BNE $A003
+    $A009  RTS
+
+  - The following unknown bytes...
+
+    $47EB - $47FF: 00 00 00 00 00  ; Unknown.
+
+  ----------------------------------------------------------
+
+  034E-034F: Partial IN.
+  0360-0361: Partial OUT.
+  044E-044F: Total IN.
+  0460-0461: Total OUT.
+
 */
 
+ROM_START( jolycmzs )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* MZS Tech */
+	ROM_LOAD( "mzstech.bin", 0x8000, 0x8000, CRC(cebd1e56) SHA1(24d88b3383cecf3829556d75460053663aab4ef1) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "jolycard.ch2", 0x0000, 0x8000, CRC(c512b103) SHA1(1f4e78e97855afaf0332fb75e1b5571aafd01c29) )
+	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
+
+/*  Load a default eeprom, otherwise an annoying password system should be inserted with
+    inputs correlated to a code that pops up on the screen.
+    This code should be inserted into a PC-DOS program, that program is nowhere to be found right now.
+*/
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_LOAD( "jolycmzs_nvram.bin", 0x0000, 0x0800, CRC(828ffeef) SHA1(6a52282231f1944ba79049f267a9c1941373aea2) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+ROM_END
+
 ROM_START( jolyc980 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Spale Soft */
 	ROM_LOAD( "j980.bin", 0x8000, 0x8000, CRC(48249fff) SHA1(390cd0eb3399446a66363dc6760458170e1970fd) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -2231,7 +2384,7 @@ ROM_START( jolyc980 )
     This code should be inserted into a PC-DOS program, that program is nowhere to be found right now.
 */
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolyc980_nvram.bin",  0x0000, 0x0800, CRC(c917f071) SHA1(fdcd974d3acd4acf2e0ff5fca820cfc65fe18867) )
+	ROM_LOAD( "jolyc980_nvram.bin", 0x0000, 0x0800, CRC(ef2c89c7) SHA1(a286001e205dcd16d914e07ba2b7c820335ab9c2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2247,7 +2400,7 @@ ROM_START( jolycdev )	/* Jolly Card (lipa) from Evona */
 	ROM_LOAD( "jollya.bin", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolycdev_nvram.bin",  0x0000, 0x0800, CRC(ae2c2fb8) SHA1(912d673ea8e26ff62520a7b86e702e5260cff4c0) )
+	ROM_LOAD( "jolycdev_nvram.bin", 0x0000, 0x0800, CRC(ae2c2fb8) SHA1(912d673ea8e26ff62520a7b86e702e5260cff4c0) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2284,7 +2437,7 @@ ROM_START( jolyccra )	/* Jolly Card (croatian, set 1) */
 	ROM_LOAD( "jollya.bin", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolyccra_nvram.bin",  0x0000, 0x0800, CRC(478ab0a9) SHA1(8c5160d2ac8d4a9db0ae1e478d3bb1513a04544f) )
+	ROM_LOAD( "jolyccra_nvram.bin", 0x0000, 0x0800, CRC(478ab0a9) SHA1(8c5160d2ac8d4a9db0ae1e478d3bb1513a04544f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2300,7 +2453,7 @@ ROM_START( jolyccrb )	/* Jolly Card (croatian, set 2) */
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolyccrb_nvram.bin",  0x0000, 0x0800, CRC(c1d49c88) SHA1(27ffdedfc7f09ff11c3b2537db3681473b776074) )
+	ROM_LOAD( "jolyccrb_nvram.bin", 0x0000, 0x0800, CRC(c1d49c88) SHA1(27ffdedfc7f09ff11c3b2537db3681473b776074) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2338,7 +2491,7 @@ ROM_START( jolycdit )	/* blue TAB PCB, encrypted graphics */
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolycdit_nvram.bin",  0x0000, 0x0800, CRC(c55c6706) SHA1(a38ae926f057fb47e48ca841b2d097fc4fd06416) )
+	ROM_LOAD( "jolycdit_nvram.bin", 0x0000, 0x0800, CRC(c55c6706) SHA1(a38ae926f057fb47e48ca841b2d097fc4fd06416) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2388,7 +2541,7 @@ ROM_START( jolycdib )	/* bootleg PCB, encrypted graphics */
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolycdib_nvram.bin",  0x0000, 0x0800, CRC(038a71fe) SHA1(99d3befbee8f9f86ce7f074de7f16fb25053c077) )
+	ROM_LOAD( "jolycdib_nvram.bin", 0x0000, 0x0800, CRC(038a71fe) SHA1(99d3befbee8f9f86ce7f074de7f16fb25053c077) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2407,7 +2560,7 @@ ROM_START( sjcd2kx3 )	/* Super Joly 2000 3x */
 	ROM_LOAD( "sj1.bin", 0x8000, 0x8000, CRC(82741749) SHA1(d0bf3073dff9ba1c4913fd754f965951e9cb5b03) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "sjcd2kx3_nvram.bin",  0x0000, 0x0800, CRC(1141368b) SHA1(b4af2d59b5e8115440e1219a621cfd2fb8c2c978) )
+	ROM_LOAD( "sjcd2kx3_nvram.bin", 0x0000, 0x0800, CRC(1141368b) SHA1(b4af2d59b5e8115440e1219a621cfd2fb8c2c978) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -2450,7 +2603,7 @@ ROM_START( bigdeal )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
-	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
+	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -2463,7 +2616,7 @@ ROM_START( bigdealb )
 	ROM_LOAD( "poker4.002", 0x8000, 0x8000, CRC(5f4e12d8) SHA1(014b2364879faaf4922cdb82ee07692389f20c2d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
-	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
+	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -2494,7 +2647,7 @@ ROM_START( jolycdat )	/* there are unused pieces of code that compare or jumps w
 	ROM_LOAD( "jolycard.ch1", 0x8000, 0x8000, CRC(0f24f39d) SHA1(ac1f6a8a4a2a37cbc0d45c15187b33c25371bffb) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* using joker card palette till a correct dump appear */
-	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
+	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, BAD_DUMP CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -2527,7 +2680,7 @@ ROM_START( cuoreuno )
 	ROM_LOAD( "cuore1c.u22", 0x8000, 0x8000, CRC(253fac84) SHA1(1ad104ab8e8d73df6397a840a4b26565b245d7a3) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "cuoreuno_nvram.bin",  0x0000, 0x0800, CRC(b5a1bf25) SHA1(c2996a28c080debf10ab7a7dc47c305aed172a83) )
+	ROM_LOAD( "cuoreuno_nvram.bin", 0x0000, 0x0800, CRC(b5a1bf25) SHA1(c2996a28c080debf10ab7a7dc47c305aed172a83) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29_cu.bin",    0x0000, 0x0200, CRC(7ea61749) SHA1(3167acd79f9bda2078c2af3e049ad6abf160aeae) )
@@ -2575,7 +2728,7 @@ ROM_START( elephfam )
 	ROM_IGNORE(                      0x8000 )	/* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "elephfam_nvram.bin",  0x0000, 0x0800, CRC(fb9b1100) SHA1(cf15ce55042f1c4399fec480c2f862622905a8b5) )
+	ROM_LOAD( "elephfam_nvram.bin", 0x0000, 0x0800, CRC(fb9b1100) SHA1(cf15ce55042f1c4399fec480c2f862622905a8b5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29_ef.u25",    0x0000, 0x0200, CRC(bca8b82a) SHA1(4aa19f5ecd9953bf8792dceb075a746f77c01cfc) )
@@ -2596,7 +2749,7 @@ ROM_START( elephfmb )
 	ROM_LOAD( "elephc.u20", 0x8000, 0x8000, CRC(448ba955) SHA1(2785cbc8cd42a7dda85bd8b81d5fbec01a1ba0bd) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "elephfmb_nvram.bin",  0x0000, 0x0800, CRC(13a0cfea) SHA1(9c8ce509ef1076e88ea853347b64c5591bc2e18c) )
+	ROM_LOAD( "elephfmb_nvram.bin", 0x0000, 0x0800, CRC(13a0cfea) SHA1(9c8ce509ef1076e88ea853347b64c5591bc2e18c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29_ef.u25",    0x0000, 0x0200, CRC(bca8b82a) SHA1(4aa19f5ecd9953bf8792dceb075a746f77c01cfc) )
@@ -2718,7 +2871,7 @@ ROM_START( pool10 )
 	ROM_LOAD( "pool10_nvram.bin",  0x0000, 0x0800, CRC(2f2fab43) SHA1(f815b70c171bad99fa6a60c256e4fdc85dd6b290) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
@@ -2747,10 +2900,10 @@ ROM_END
 	ROM_IGNORE(                  0x8000 )	/* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "pool10b_nvram.bin",  0x0000, 0x0800, CRC(d9f35299) SHA1(2c3608bc9c322a9cc86f74d8fa2f660804a8cf3c) )
+	ROM_LOAD( "pool10b_nvram.bin",   0x0000, 0x0800, CRC(d9f35299) SHA1(2c3608bc9c322a9cc86f74d8fa2f660804a8cf3c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+	ROM_LOAD( "n82s147an_p10.u25",   0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce16v8h_p10b.u5",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
@@ -2768,10 +2921,10 @@ ROM_START( pool10c )
 	ROM_LOAD( "c.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "pool10c_nvram.bin",  0x0000, 0x0800, CRC(396aefed) SHA1(066b87ff054dfb37f733a812ad0dc1b1bd2478e6) )
+	ROM_LOAD( "pool10c_nvram.bin", 0x0000, 0x0800, CRC(396aefed) SHA1(066b87ff054dfb37f733a812ad0dc1b1bd2478e6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
@@ -2795,10 +2948,10 @@ ROM_END
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "pool10d_nvram.bin",  0x0000, 0x0800, CRC(6b5984a0) SHA1(156a94e74e33b1a15222cffff9b62e65f6f5f2f5) )
+	ROM_LOAD( "pool10d_nvram.bin", 0x0000, 0x0800, CRC(6b5984a0) SHA1(156a94e74e33b1a15222cffff9b62e65f6f5f2f5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
@@ -2837,10 +2990,10 @@ ROM_START( tortufam )
 	ROM_LOAD( "tortu.c.u20", 0x8000, 0x8000, CRC(3cda6f73) SHA1(b4f3d2d3c652ebf6973358ae33b7808de5939acd) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "tortufam_nvram.bin",  0x0000, 0x0800, CRC(e5a08b1b) SHA1(6575ed3ec66ef0e42129225fe1679519e5e1c946) )
+	ROM_LOAD( "tortufam_nvram.bin", 0x0000, 0x0800, CRC(e5a08b1b) SHA1(6575ed3ec66ef0e42129225fe1679519e5e1c946) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "am27s29pc_tf.u25",    0x0000, 0x0200, CRC(c6d433fb) SHA1(065de832bbe8765eb0aacc2029e587a4f5362f8a) )
+	ROM_LOAD( "am27s29pc_tf.u25", 0x0000, 0x0200, CRC(c6d433fb) SHA1(065de832bbe8765eb0aacc2029e587a4f5362f8a) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce20v8h_tf.u5",  0x0000, 0x0157, NO_DUMP ) /* PAL is read protected */
@@ -2879,10 +3032,10 @@ ROM_START( bottle10 )
 	ROM_LOAD( "boat_1.bin", 0x8000, 0x8000, CRC(61fd8c19) SHA1(eb8fd8bd7de38a6c8a435e9e36daf699162138a5) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "bottle10_nvram.bin",  0x0000, 0x0800, CRC(82927c53) SHA1(8cde91588cb53fefc84f0b14fc5c0b26a3a445eb) )
+	ROM_LOAD( "bottle10_nvram.bin", 0x0000, 0x0800, CRC(82927c53) SHA1(8cde91588cb53fefc84f0b14fc5c0b26a3a445eb) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
@@ -2900,10 +3053,10 @@ ROM_START( bottl10b )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(61fd8c19) SHA1(eb8fd8bd7de38a6c8a435e9e36daf699162138a5) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "bottl10b_nvram.bin",  0x0000, 0x0800, CRC(59976182) SHA1(f8d26169e86444607bc5a6649f41e7f5c05ddbb4) )
+	ROM_LOAD( "bottl10b_nvram.bin", 0x0000, 0x0800, CRC(59976182) SHA1(f8d26169e86444607bc5a6649f41e7f5c05ddbb4) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+	ROM_LOAD( "n82s147an_p10.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
@@ -2946,15 +3099,15 @@ ROM_START( royalcrd )
 	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "royalcrd_nvram.bin",  0x0000, 0x0800, CRC(335bfa5a) SHA1(7e9cbb502f450c515ea03ffcf4b7fbae60af4e73) )
+	ROM_LOAD( "royalcrd_nvram.bin", 0x0000, 0x0800, CRC(335bfa5a) SHA1(7e9cbb502f450c515ea03ffcf4b7fbae60af4e73) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147.bin",    0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+	ROM_LOAD( "n82s147.bin", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h-4.bin",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "1-peel18cv8.bin",   0x0200, 0x0155, NO_DUMP ) /* PEEL is read protected */
-	ROM_LOAD( "2-peel18cv8.bin",   0x0400, 0x0155, CRC(8fdafd55) SHA1(fbb187ba682111648ea1586f400990cb81a3077a) )
+	ROM_LOAD( "palce16v8h-4.bin", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "1-peel18cv8.bin",  0x0200, 0x0155, NO_DUMP ) /* PEEL is read protected */
+	ROM_LOAD( "2-peel18cv8.bin",  0x0400, 0x0155, CRC(8fdafd55) SHA1(fbb187ba682111648ea1586f400990cb81a3077a) )
 ROM_END
 
 
@@ -2988,13 +3141,13 @@ ROM_START( royalcdb ) /* both halves have different programs. we're using the 2n
 	ROM_IGNORE(                 0x8000 )	/* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "royalcdb_nvram.bin",  0x0000, 0x0800, CRC(3b03440f) SHA1(49e51b8c9e1404d39c479a2d0619aab43f1a6529) )
+	ROM_LOAD( "royalcdb_nvram.bin", 0x0000, 0x0800, CRC(3b03440f) SHA1(49e51b8c9e1404d39c479a2d0619aab43f1a6529) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147.bin",    0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+	ROM_LOAD( "n82s147.bin", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "palce16v8h-4.bin",   0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "palce16v8h-4.bin", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
 
@@ -3030,12 +3183,12 @@ ROM_START( royalcdc )	/* encrypted program rom */
 	ROM_LOAD( "rc_2.bin", 0x8000, 0x8000, CRC(7f934488) SHA1(c537a09ef7e88a81ee9c2e1d971b3caf9d3dba0e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",    0x0000, 0x0200, CRC(44dbf086) SHA1(43a2d615c00605db75a4fd4d57d9e056c0356f10) )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(44dbf086) SHA1(43a2d615c00605db75a4fd4d57d9e056c0356f10) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8.bin",  0x0000, 0x0117, NO_DUMP )	/* not present in the set */
-	ROM_LOAD( "1-peel18cv8p.bin",   0x0200, 0x0155, NO_DUMP )	/* not present in the set */
-	ROM_LOAD( "2-peel18cv8p.bin",   0x0400, 0x0155, NO_DUMP )	/* not present in the set */
+	ROM_LOAD( "palce16v8.bin",    0x0000, 0x0117, NO_DUMP )	/* not present in the set */
+	ROM_LOAD( "1-peel18cv8p.bin", 0x0200, 0x0155, NO_DUMP )	/* not present in the set */
+	ROM_LOAD( "2-peel18cv8p.bin", 0x0400, 0x0155, NO_DUMP )	/* not present in the set */
 ROM_END
 
 
@@ -3064,10 +3217,10 @@ ROM_START( lluck3x3 )
 	ROM_LOAD( "l1.bin", 0x8000, 0x8000, CRC(beadc35c) SHA1(8a6a5954a827def8c4c3b904d8ee58a4bde53d85) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "lluck3x3_nvram.bin",  0x0000, 0x0800, CRC(2fe79cff) SHA1(7839c04336b7702c7bdcd2b6917a353f4376f824) )
+	ROM_LOAD( "lluck3x3_nvram.bin", 0x0000, 0x0800, CRC(2fe79cff) SHA1(7839c04336b7702c7bdcd2b6917a353f4376f824) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147.bin",    0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+	ROM_LOAD( "n82s147.bin", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
 ROM_END
 
 
@@ -3080,10 +3233,10 @@ ROM_START( lluck4x1 )
 	ROM_LOAD( "l1.bin", 0x8000, 0x8000, CRC(beadc35c) SHA1(8a6a5954a827def8c4c3b904d8ee58a4bde53d85) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "lluck4x1_nvram.bin",  0x0000, 0x0800, CRC(05d2d7b8) SHA1(1188b2b4835cadd95b1e9160c2948a2e3457afd2) )
+	ROM_LOAD( "lluck4x1_nvram.bin", 0x0000, 0x0800, CRC(05d2d7b8) SHA1(1188b2b4835cadd95b1e9160c2948a2e3457afd2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147.bin",    0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+	ROM_LOAD( "n82s147.bin", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
 ROM_END
 
 
@@ -3119,7 +3272,7 @@ ROM_START( magicrd2 )	/* Impera */
 	ROM_LOAD( "mc2gr1.bin",   0x8000, 0x8000, CRC(2406b8d2) SHA1(e9d7a25562fd5adee351d7ef6ba02fff6aab021a) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "magicrd2_nvram.bin",  0x0000, 0x0800, CRC(343b3162) SHA1(1524959dbbc0c6d7c5c3a4a6b20976382cfbe88f) )
+	ROM_LOAD( "magicrd2_nvram.bin", 0x0000, 0x0800, CRC(343b3162) SHA1(1524959dbbc0c6d7c5c3a4a6b20976382cfbe88f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "mc2-82s147.bin",	0x0000, 0x0200, CRC(aa91cc35) SHA1(79f9a755441500e618c4183f524f969fffd44100) )
@@ -3172,10 +3325,10 @@ ROM_START( vegasslw )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "vegasslw_nvram.bin",  0x0000, 0x0800, CRC(1aa043e3) SHA1(c93d071effb2f2fe95e9dc751174c2c765595f74) )
+	ROM_LOAD( "vegasslw_nvram.bin", 0x0000, 0x0800, CRC(1aa043e3) SHA1(c93d071effb2f2fe95e9dc751174c2c765595f74) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
-	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
+	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -3188,10 +3341,10 @@ ROM_START( vegasfst )
 	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "vegasfst_nvram.bin",  0x0000, 0x0800, CRC(5034de7a) SHA1(ab2077a49d94676531c73ad8d8ce9548bbfa2b81) )
+	ROM_LOAD( "vegasfst_nvram.bin", 0x0000, 0x0800, CRC(5034de7a) SHA1(ab2077a49d94676531c73ad8d8ce9548bbfa2b81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
-	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
+	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -3204,12 +3357,27 @@ ROM_START( vegasfte )	/* Royal Vegas Joker Card (fast deal, english gfx) */
 	ROM_LOAD( "ch1.bin", 0x8000, 0x8000, CRC(0a3679c0) SHA1(ce8a067e1a2eccf9fabb16733ef3a14e0e8129e5) )	/* X & Y in txt layer */
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "vegasfte_nvram.bin",  0x0000, 0x0800, CRC(166c6055) SHA1(db2143a2a3adc92578bd3707391d2f5030cc6a6f) )
+	ROM_LOAD( "vegasfte_nvram.bin", 0x0000, 0x0800, CRC(166c6055) SHA1(db2143a2a3adc92578bd3707391d2f5030cc6a6f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
-	ROM_LOAD( "jokercrd_prom.bin",	0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
+	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
+
+ROM_START( vegasmil )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Mile */
+	ROM_LOAD( "mile.bin", 0x8000, 0x8000, CRC(ef7e02e2) SHA1(7432b0e723dc528901c422ab1d7d01fd1bc1eb20) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "v2.bin", 0x0000, 0x8000, CRC(af7ab460) SHA1(01ea400424152c09c10eb83a1bd569019969ccb7) )
+	ROM_LOAD( "v1.bin", 0x8000, 0x8000, CRC(23e0d1c6) SHA1(98967b14d3264c444a1dfbd15c57cde70f41f09d) )
+
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_LOAD( "vegasmil_nvram.bin", 0x0000, 0x0800, CRC(d2608e5f) SHA1(ac936df71dbc0bfb811a3ba3c91444a2a3e7b036) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
+ROM_END
 
 /*
 
@@ -3302,7 +3470,7 @@ ROM_START( jolyjokr )	/* Jolly Joker (98bet, set 1) */
 	ROM_LOAD( "impera1.bin", 0x8000, 0x8000, CRC(c3ab44dd) SHA1(e46c0fd94da561f57033647f1703fa135777ece5) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolyjokr_nvram.bin",  0x0000, 0x0800, CRC(f33e66ed) SHA1(7a4b9a1b2f976d5d26f54915a213d5ac5eca0a42) )
+	ROM_LOAD( "jolyjokr_nvram.bin", 0x0000, 0x0800, CRC(f33e66ed) SHA1(7a4b9a1b2f976d5d26f54915a213d5ac5eca0a42) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(0b671bba) SHA1(92d512e02b50f98b7bc5a60deee4fee722656c4f) )
@@ -3318,7 +3486,7 @@ ROM_START( jolyjokra )	/* Jolly Joker (98bet, set 2) */
 	ROM_LOAD( "impera1.bin", 0x8000, 0x8000, CRC(c3ab44dd) SHA1(e46c0fd94da561f57033647f1703fa135777ece5) )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolyjokra_nvram.bin",  0x0000, 0x0800, CRC(ed43693c) SHA1(d4aa4e539ab12c97bc9b9b1077997195a11d782b) )
+	ROM_LOAD( "jolyjokra_nvram.bin", 0x0000, 0x0800, CRC(ed43693c) SHA1(d4aa4e539ab12c97bc9b9b1077997195a11d782b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(0b671bba) SHA1(92d512e02b50f98b7bc5a60deee4fee722656c4f) )
@@ -3354,10 +3522,10 @@ ROM_START( jolyjokrb )
 	ROM_IGNORE(                   0x8000 )	/* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-	ROM_LOAD( "jolyjokrb_nvram.bin",  0x0000, 0x0800, CRC(17007bb5) SHA1(72e08096293ce4fbde205a63b5ecd9641dbee017) )
+	ROM_LOAD( "jolyjokrb_nvram.bin", 0x0000, 0x0800, CRC(17007bb5) SHA1(72e08096293ce4fbde205a63b5ecd9641dbee017) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "am27s29_ic40.bin",	0x0000, 0x0200, CRC(0b671bba) SHA1(92d512e02b50f98b7bc5a60deee4fee722656c4f) )
+	ROM_LOAD( "am27s29_ic40.bin",	 0x0000, 0x0200, CRC(0b671bba) SHA1(92d512e02b50f98b7bc5a60deee4fee722656c4f) )
 ROM_END
 
 
@@ -3441,11 +3609,11 @@ ROM_START( jokercrd )
 	ROM_IGNORE(                      0x4000 )	/* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "vesely_zg_1.ic10",	0x0000, 0x8000, CRC(2bbd27ad) SHA1(37d37899398d95beac5f3cbffc4277c97aca1a23) )
-	ROM_LOAD( "vesely_zg_2.ic11",	0x8000, 0x8000, CRC(21d05a57) SHA1(156c18ec31b08e4c4af6f73b49cb5d5c68d1670f) ) /* bad dump, or sprite plane bug? */
+	ROM_LOAD( "vesely_zg_1.ic10", 0x0000, 0x8000, CRC(2bbd27ad) SHA1(37d37899398d95beac5f3cbffc4277c97aca1a23) )
+	ROM_LOAD( "vesely_zg_2.ic11", 0x8000, 0x8000, CRC(21d05a57) SHA1(156c18ec31b08e4c4af6f73b49cb5d5c68d1670f) ) /* bad dump, or sprite plane bug? */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic13.bin",	0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
+	ROM_LOAD( "ic13.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
 
@@ -3488,10 +3656,10 @@ ROM_START( mongolnw )
 	ROM_IGNORE(                        0x8000 )	/* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "am27s29pc_mf.u24",    0x0000, 0x0200, CRC(da9181af) SHA1(1b30d992f3b2a4b3bd81e3f99632311988e2e8d1) )
+	ROM_LOAD( "am27s29pc_mf.u24", 0x0000, 0x0200, CRC(da9181af) SHA1(1b30d992f3b2a4b3bd81e3f99632311988e2e8d1) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "palce16v8h_mf.u5",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "palce16v8h_mf.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
 
@@ -3541,10 +3709,10 @@ ROM_START( soccernw )
 	ROM_IGNORE(                     0x8000 )	/* Identical halves. Discarding 2nd half */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "am27s29pc_sn.u24",    0x0000, 0x0200, CRC(d02894fc) SHA1(adcdc912cc0b7a7f67b122fa94fca921c957b282) )
+	ROM_LOAD( "am27s29pc_sn.u24", 0x0000, 0x0200, CRC(d02894fc) SHA1(adcdc912cc0b7a7f67b122fa94fca921c957b282) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "palce16v8h_sn.u5",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "palce16v8h_sn.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
 
@@ -3694,7 +3862,7 @@ ROM_START( funquiz )	/* Fun World Quiz */
 	ROM_LOAD( "pop_2.bin",   0x60000, 0x8000, CRC(10103648) SHA1(6fdc1aa4dcc8919e46def1c19adc2b9686c0f72d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, BAD_DUMP CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+	ROM_LOAD( "82s147.bin",	 0x0000, 0x0200, BAD_DUMP CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
 
@@ -3996,7 +4164,8 @@ static DRIVER_INIT( royalcdc )
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      INIT      ROT    COMPANY            FULLNAME                                          FLAGS                  LAYOUT */
 GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  0,        ROT0, "TAB-Austria",     "Jolly Card (austrian)",                           0,                     layout_jollycrd )
 GAMEL( 1985, jolyc3x3,  jollycrd, fw1stpal, funworld,  0,        ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0,                     layout_jollycrd )
-GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  0,        ROT0, "Spale-Soft",      "Jolly Card Professional 2.0",                     0,                     layout_jollycrd )
+GAMEL( 1993, jolycmzs,  jollycrd, cuoreuno, jolyc980,  0,        ROT0, "MZS Tech",        "Jolly Card Professional 2.0 (MZS Tech)",          0,                     layout_jollycrd )
+GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  0,        ROT0, "Spale-Soft",      "Jolly Card Professional 2.0 (Spale Soft)",        0,                     layout_jollycrd )
 GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  0,        ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0,                     layout_jollycrd )
 GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  0,        ROT0, "TAB-Austria",     "Jolly Card (croatian, set 1)",                    0,                     layout_jollycrd )
 GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  0,        ROT0, "Soft Design",     "Jolly Card (croatian, set 2)",                    0,                     layout_jollycrd )
@@ -4030,6 +4199,7 @@ GAME(  1996, magicd2b,  magicrd2, magicrd2, magicrd2,  magicd2b, ROT0, "Impera",
 GAMEL( 1993, vegasslw,  0,        fw2ndpal, vegasslw,  0,        ROT0, "Funworld",        "Royal Vegas Joker Card (slow deal)",              0,                     layout_jollycrd )
 GAMEL( 1993, vegasfst,  vegasslw, fw2ndpal, vegasfst,  0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0,                     layout_jollycrd )
 GAMEL( 1993, vegasfte,  vegasslw, fw2ndpal, vegasfte,  0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, english gfx)", 0,                     layout_jollycrd )
+GAMEL( 1993, vegasmil,  vegasslw, fw2ndpal, vegasmil,  0,        ROT0, "Mile",            "Royal Vegas Joker Card (fast deal, Mile)",        0,                     layout_jollycrd )
 GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  0,        ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                     layout_jollycrd )
 GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, 0,        ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                     layout_jollycrd )
 GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  0,        ROT0, "Impera",          "Jolly Joker (40bet, croatian hack)",              0,                     layout_jollycrd )

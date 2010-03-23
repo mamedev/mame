@@ -11,7 +11,8 @@
 
   * Jolly Card (austrian),                            TAB-Austria,        1985.
   * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
-  * Jolly Card Professional 2.0,                      Spale-Soft,         2000.
+  * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
+  * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
   * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
   * Jolly Card (croatian, set 1),                     TAB-Austria,        1985.
   * Jolly Card (croatian, set 2),                     Soft Design,        1993.
@@ -45,6 +46,7 @@
   * Royal Vegas Joker Card (slow deal),               Funworld,           1993.
   * Royal Vegas Joker Card (fast deal),               Soft Design,        1993.
   * Royal Vegas Joker Card (fast deal, english gfx),  Soft Design,        1993.
+  * Royal Vegas Joker Card (fast deal, Mile),         Mile,               1993.
   * Jolly Joker (98bet, set 1).                       Impera,             198?.
   * Jolly Joker (98bet, set 2).                       Impera,             198?.
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
