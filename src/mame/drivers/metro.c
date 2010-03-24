@@ -149,7 +149,7 @@ static void update_irq_state( running_machine *machine )
 	}
 	else
 	{
-		/*  This is for games where every IRQ source generates the same IRQ level. The interrupt service routine 
+		/*  This is for games where every IRQ source generates the same IRQ level. The interrupt service routine
             then reads the actual source by peeking a register (metro_irq_cause_r) */
 
 		int irq_state = (irq ? ASSERT_LINE : CLEAR_LINE);
@@ -236,7 +236,7 @@ static INTERRUPT_GEN( msgogo_interrupt )
             update_irq_state(device->machine);
             break;
     }
-} 
+}
 
 
 static TIMER_CALLBACK( vblank_end_callback )
@@ -1823,6 +1823,38 @@ static WRITE16_HANDLER( puzzlet_irq_enable_w )
 		*state->irq_enable = data ^ 0xffff;
 }
 
+ /* FIXME: algorythm not yet understood. */
+static WRITE16_HANDLER( vram_0_clr_w )
+{
+	static int i;
+	metro_state *state = (metro_state *)space->machine->driver_data;
+
+//	printf("0 %04x %04x\n",offset,data);
+	for(i=0;i<0x20/2;i++)
+		state->vram_0[(offset*0x10+i)/2] = 0xffff;
+}
+
+static WRITE16_HANDLER( vram_1_clr_w )
+{
+	static int i;
+	metro_state *state = (metro_state *)space->machine->driver_data;
+
+//	printf("0 %04x %04x\n",offset,data);
+	for(i=0;i<0x20/2;i++)
+		state->vram_1[(offset*0x10+i)/2] = 0xffff;
+}
+
+static WRITE16_HANDLER( vram_2_clr_w )
+{
+	static int i;
+	metro_state *state = (metro_state *)space->machine->driver_data;
+
+//	printf("0 %04x %04x\n",offset,data);
+	for(i=0;i<0x20/2;i++)
+		state->vram_2[(offset*0x10+i)/2] = 0xffff;
+}
+
+
 // H8/3007 CPU
 static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -1842,7 +1874,9 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x772000, 0x773fff) AM_RAM
 	AM_RANGE(0x770000, 0x773fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 
-	AM_RANGE(0x775000, 0x777fff) AM_RAM
+	AM_RANGE(0x775000, 0x775fff) AM_RAM_WRITE(vram_0_clr_w)
+	AM_RANGE(0x776000, 0x776fff) AM_RAM_WRITE(vram_1_clr_w)
+	AM_RANGE(0x777000, 0x777fff) AM_RAM_WRITE(vram_2_clr_w)
 
 	AM_RANGE(0x778000, 0x7787ff) AM_RAM	AM_BASE_SIZE_MEMBER(metro_state, tiletable, tiletable_size)	// Tiles Set
 	AM_RANGE(0x778800, 0x778813) AM_WRITEONLY AM_BASE_MEMBER(metro_state, videoregs)			// Video Registers
@@ -3663,7 +3697,7 @@ static MACHINE_DRIVER_START( msgogo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(msgogo_map)
-	MDRV_CPU_VBLANK_INT_HACK(msgogo_interrupt,262)    /* ? */ 
+	MDRV_CPU_VBLANK_INT_HACK(msgogo_interrupt,262)    /* ? */
 
 	MDRV_MACHINE_START(metro)
 	MDRV_MACHINE_RESET(metro)
@@ -4306,8 +4340,8 @@ static MACHINE_DRIVER_START( pururun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(pururun_map)
-	//MDRV_CPU_VBLANK_INT_HACK(msgogo_interrupt,262)    /* fixes the title screen scroll in GunMaster, but makes the game painfully slow */ 
-	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)    /* ? */ 
+	//MDRV_CPU_VBLANK_INT_HACK(msgogo_interrupt,262)    /* fixes the title screen scroll in GunMaster, but makes the game painfully slow */
+	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)    /* ? */
 
 	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
