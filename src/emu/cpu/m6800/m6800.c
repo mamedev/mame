@@ -605,7 +605,7 @@ INLINE void CHECK_IRQ_LINES(m6800_state *cpustate)
 	{
 		if( cpustate->irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
 		{	/* standard IRQ */
-			enter_interrupt(cpustate, "M6800 '%s' take IRQ1n",0xfff8);
+			enter_interrupt(cpustate, "M6800 '%s' take IRQ1\n",0xfff8);
 			if( cpustate->irq_callback )
 				(void)(*cpustate->irq_callback)(cpustate->device, M6800_IRQ_LINE);
 		}
