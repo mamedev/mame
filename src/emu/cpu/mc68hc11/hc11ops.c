@@ -3229,6 +3229,36 @@ static void HC11OP(subd_imm)(hc11_state *cpustate)
 	CYCLES(cpustate, 4);
 }
 
+/* SUBD DIR        0x93 */
+static void HC11OP(subd_dir)(hc11_state *cpustate)
+{
+	UINT8 d = FETCH(cpustate);
+	UINT16 i = READ16(cpustate, d);
+	UINT32 r = REG_D - i;
+	CLEAR_NZVC(cpustate);
+	SET_N16(r);
+	SET_Z16(r);
+	SET_V_SUB16(r, i, REG_D);
+	SET_C16(r);
+	REG_D = (UINT16)r;
+	CYCLES(cpustate, 5);
+}
+
+/* SUBD EXT        0xB3 */
+static void HC11OP(subd_ext)(hc11_state *cpustate)
+{
+	UINT16 addr = FETCH16(cpustate);
+	UINT16 i = READ16(cpustate, addr);
+	UINT32 r = REG_D - i;
+	CLEAR_NZVC(cpustate);
+	SET_N16(r);
+	SET_Z16(r);
+	SET_V_SUB16(r, i, REG_D);
+	SET_C16(r);
+	REG_D = (UINT16)r;
+	CYCLES(cpustate, 6);
+}
+
 /* SUBD INDX        0xA3 */
 static void HC11OP(subd_indx)(hc11_state *cpustate)
 {
