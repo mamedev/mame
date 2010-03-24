@@ -33,7 +33,7 @@
  */
 
  /* quick note on derivative analysis:
- Judging by all the TI chips I (Lord Nightmare) have done this test on, the first derivative between sucessive values of the LPC tables should follow a roughly triangular or sine shaped curve, the secodn derivative should start at a value, increase slightly, then decrease smoothly and become negative right around where the lpc curve passes 0, finally increase slighty right near the end. If it doesn't do this, there is probably a wrong value in there somewhere. The pitch and energy tables follow similar patterns but aren't the same since they never cross 0. The chirp table doesn't follow this pattern at all.
+ Judging by all the TI chips I (Lord Nightmare) have done this test on, the first derivative between successive values of the LPC tables should follow a roughly triangular or sine shaped curve, the second derivative should start at a value, increase slightly, then decrease smoothly and become negative right around where the LPC curve passes 0, finally increase slightly right near the end. If it doesn't do this, there is probably a wrong value in there somewhere. The pitch and energy tables follow similar patterns but aren't the same since they never cross 0. The chirp table doesn't follow this pattern at all.
  */
   
  /* The following TMS5100/TMC0280/CD2801 coefficients come from US Patent 4,209,836 and several others, and have been verified using derivative analysis to show which values were bad (due to poor quality images or badly typed copies of the tables in the patents, depending on which patent you look at) which were then corrected by figuring out what the tiny remaining marks on the photocopied version of the coefficient sheet COULD have been which would make the derivatives play nice.
@@ -48,7 +48,7 @@ static const struct tms5100_coeffs pat4209836_coeff =
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E   */
-	{ 0, 0, 1, 1, 2, 3, 5, 7, 10, 15, 21, 30, 43, 61, 86, 511 }, /* last value is actually 0 in rom, but 511 is stop sentinel */
+	{ 0, 0, 1, 1, 2, 3, 5, 7, 10, 15, 21, 30, 43, 61, 86, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
 	/* P   note: value #20 may be 95; value #29 may be 140 */
 	{   0,  41,  43,  45,  47,  49,  51,  53,
 	   55,  58,  60,  63,  66,  70,  73,  76,
@@ -87,7 +87,7 @@ static const struct tms5100_coeffs pat4209836_coeff =
 		/* K10 */
 		{ -179, -122,  -61,    1,   63,  123, 179, 231 },
 	},
-	/* Chirptable */
+	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
 	    2, -31, -59,  2,  95, 90,  5, 15,
 	   38, -4,  -91,-91, -42,-35,-36, -4,
@@ -157,7 +157,7 @@ static const struct tms5100_coeffs pat4403965_coeff =
 		-190,-133,-73,-10,53,115,173,227,
 		},
 	},
-	/* Chirptable */
+	/* Chirp table */
 	{ 0,43,-44,51,-77,18,37,20,
 	2,-30,-58,3,96,91,5,15,
 	38,-4,-90,-91,-42,-35,-35,-3,
@@ -221,7 +221,7 @@ static const struct tms5100_coeffs tms5110a_coeff =
 		/* K10 */
 		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
 	},
-	/* Chirptable */
+	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
 	    2, -31, -59,  2,  95, 90,  5, 15,
 	   38, -4,  -91,-91, -42,-35,-36, -4,
@@ -236,7 +236,7 @@ static const struct tms5100_coeffs tms5110a_coeff =
 /* The following TMS5200/TMC0285 coefficients come from US Patent 4,335,277 and 4,581,757. However, the K10 row of coefficients are entirely missing from both of those patents.
 ***These values have not yet been verified against a real TMS5200 or TMC0285***
 */
-   // k* is followed by d if done transscription, c if checked for derivative abberations
+   // k* is followed by d if done transcription, c if checked for derivative aberrations
 static const struct tms5100_coeffs tms5200_coeff =
 {
 	/* subtype */
@@ -247,7 +247,7 @@ static const struct tms5100_coeffs tms5200_coeff =
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* Ed   */
 	{ 0,   1,   2,   3,   4,   6,   8,   11,
-	 16,  23,  33,  47,  63,  85,  114, 511 }, /* last value is actually 0 in rom, but 511 is stop sentinel */
+	 16,  23,  33,  47,  63,  85,  114, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
 	/* Pd   */
 	{ 0,  14,  15,  16,  17,  18,  19,  20,
 	 21,  22,  23,  24,  25,  26,  27,  28,
@@ -287,10 +287,10 @@ static const struct tms5100_coeffs tms5200_coeff =
 		{ -195, -117,  -32,   54,  137,  213,  279,  335 },
 		/* K9dc  */
 		{ -122,  -55,   15,   83, 149,  210,  264,  311  },
-		/* K10  - this was entirely missing from the patent, and I've simply copied the tms5220 one, which is wrong */
+		/* K10  - this was entirely missing from the patent, and I've simply copied the TMS5220 one, which is wrong */
 		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
 	},
-	/* Chirptable */
+	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
 	    2, -31, -59,  2,  95, 90,  5, 15,
 	   38, -4,  -91,-91, -42,-35,-36, -4,
@@ -302,8 +302,8 @@ static const struct tms5100_coeffs tms5200_coeff =
 	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
-/* The following TMS5220 coefficients come from the datasheet, and its addendum, with the exception of the energy table. The energy table is copied from the tms5110a dump and the tms5200 patent (which are both the same for energy), as the datasheet lists it in RMS notation which doesn't help us since I(Lord Nightmare) can't figure out the proper formula TI used for converting energy to RMS (the obvious 'take all the values in the chirp rom, multiply them by 1/2/3/4/etc, square each one, sum them up, divide by 51, which is # of rom entries in chirp rom, and take the square root of the result', doesn't QUITE work. It almost does, if you add 16 to the result, for the first 4 entries, but beyond that the entries become farther and farther offset).
-Note that all the LPC K* values match the tms5110a table exactly.
+/* The following TMS5220 coefficients come from the datasheet, and its addendum, with the exception of the energy table. The energy table is copied from the TMS5110a dump and the TMS5200 patent (which are both the same for energy), as the datasheet lists it in RMS notation which doesn't help us since I(Lord Nightmare) can't figure out the proper formula TI used for converting energy to RMS (the obvious 'take all the values in the chirp ROM, multiply them by 1/2/3/4/etc, square each one, sum them up, divide by 51, which is # of ROM entries in chirp ROM, and take the square root of the result', doesn't QUITE work. It almost does, if you add 16 to the result, for the first 4 entries, but beyond that the entries become farther and farther offset).
+Note that all the LPC K* values match the TMS5110a table exactly.
 ***These values have not yet been verified against a real TMS5220***
 */
 static const struct tms5100_coeffs tms5220_coeff =
@@ -316,7 +316,7 @@ static const struct tms5100_coeffs tms5220_coeff =
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E   */
 	{ 0,   1,   2,   3,   4,   6,   8,   11,
-	 16,  23,  33,  47,  63,  85,  114, 511 }, /* last value is actually 0 in rom, but 511 is stop sentinel */
+	 16,  23,  33,  47,  63,  85,  114, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
 	/* P   */
 	{ 0,  15,  16,  17,  18,  19,  20,  21,
 	 22,  23,  24,  25,  26,  27,  28,  29,
@@ -359,7 +359,7 @@ static const struct tms5100_coeffs tms5220_coeff =
 		/* K10 */
 		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
 	},
-	/* Chirptable */
+	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
 	    2, -31, -59,  2,  95, 90,  5, 15,
 	   38,  -4, -91,-91, -42,-35,-36, -4,
@@ -371,10 +371,10 @@ static const struct tms5100_coeffs tms5220_coeff =
 	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
-/* The following TMS5220C coefficients come from the tables in QBOXPRO, a program written at least in part by George "Larry" Brantingham of Quadravox, formerly of Texas Instruments, who had laid out the silicon for the TMS5100/TMC0280/CD2801. It is the same as the tms5220 but has a change in the energy table (is this actually correct? or is this one correct for both 5220s? or is this the wrong table and the tms5220 one correct for both?)
-Note: the energy table in qboxpro is also in RMS and was not used; however the energy values are offset by -1 compared to the 5220, which has been done here. the '152' is an educated guess.
-Note: the pitch table is the same as tms5220 but with +1 applied to each value, and the first and second values the same, as shown in QV5220.COD.
-Note: the Kx tables are taken directly from QV5220.COD but with /64 added to each value as the values are stored ranging from -32768 to 32767 in qboxpro instead of -512 to 511 as on the real chip.
+/* The following TMS5220C coefficients come from the tables in QBOXPRO, a program written at least in part by George "Larry" Brantingham of Quadravox, formerly of Texas Instruments, who had laid out the silicon for the TMS5100/TMC0280/CD2801. It is the same as the TMS5220 but has a change in the energy table (is this actually correct? or is this one correct for both 5220s? or is this the wrong table and the TMS5220 one correct for both?)
+Note: the energy table in QBOXPRO is also in RMS and was not used; however the energy values are offset by -1 compared to the 5220, which has been done here. the '152' is an educated guess.
+Note: the pitch table is the same as TMS5220 but with +1 applied to each value, and the first and second values the same, as shown in QV5220.COD.
+Note: the Kx tables are taken directly from QV5220.COD but with /64 added to each value as the values are stored ranging from -32768 to 32767 in QBOXPRO instead of -512 to 511 as on the real chip.
 ***These values have not yet been verified against a real TMS5220C, see below as for why***
 This has not yet been verified against a real TMS5220C, and doing so will require decapping one as the TMS5220C, unlike the TMS5220, has a nonfunctional PROMOUT pin. This makes reading the internal LPC tables out electronically (via PROMOUT) impossible.
 */
@@ -388,7 +388,7 @@ static const struct tms5100_coeffs tms5220c_coeff =
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E   */
 	{ 1,   2,   3,   4,   6,   8,   11,	 16,
-	 23,  33,  47,  63,  85,  114, 152, 511 }, /* last value is actually 0 in rom, but 511 is stop sentinel */
+	 23,  33,  47,  63,  85,  114, 152, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
 	/* P   */
 	{16,  16,  17,  18,  19,  20,  21,  22,
 	 23,  24,  25,  26,  27,  28,  29,  30,
@@ -431,7 +431,7 @@ static const struct tms5100_coeffs tms5220c_coeff =
 		/* K10 */
 		{ -13106/64, -8425/64, -3744/64,   936/64,  5617/64, 10298/64, 14979/64, 19660/64 },
 	},
-	/* Chirptable */
+	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
 	    2, -31, -59,  2,  95, 90,  5, 15,
 	   38, -4,  -91,-91, -42,-35,-36, -4,
