@@ -646,7 +646,7 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 				int srctilecol = srccol >> (big ? 4 : 3);
 				int tileoffs = srctilecol + srctilerow * BIG_NX;
 
-				UINT16 dat;
+				UINT16 dat = 0;
 
 				UINT16 tile = tilemapram[tileoffs];
 				UINT8 draw = get_tile_pix(machine, tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
@@ -670,7 +670,7 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 				int srctilecol = srccol >> (big ? 4 : 3);
 				int tileoffs = srctilecol + srctilerow * BIG_NX;
 
-				UINT16 dat;
+				UINT16 dat = 0;
 
 				UINT16 tile = tilemapram[tileoffs];			
 				UINT8 draw = get_tile_pix(machine, tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
