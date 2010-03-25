@@ -8344,46 +8344,49 @@ Other Sun games
 
 	/* IGS PGM System Games */
 	DRIVER( pgm )
-	DRIVER( orlegend )    /* (c) 1997 */
-	DRIVER( orlegende )    /* (c) 1997 */
-	DRIVER( orlegendc )    /* (c) 1997 */
-	DRIVER( orlegend111c )    /* (c) 1997 */
-	DRIVER( orlegend105k )    /* (c) 1997 */
-	DRIVER( drgw2 )        /* (c) 1997 */
-	DRIVER( drgw2c )    /* (c) 1997 */
-	DRIVER( drgw2j )    /* (c) 1997 */
-	DRIVER( drgw3 )        /* (c) 1998 */
-	DRIVER( drgw3k )    /* (c) 1998 */
-	DRIVER( kov )        /* (c) 1999 */
-	DRIVER( kovplus )    /* (c) 1999 */
-	DRIVER( kovplusa )    /* (c) 1999 */
-	DRIVER( kov115 )    /* (c) 1999 */
-	DRIVER( kov100 )    /* (c) 1999 */
-	DRIVER( kovsh )        /* (c) 1999 */
-	DRIVER( photoy2k )    /* (c) 1999 */
-	DRIVER( photoy2k102 )/* (c) 1999 */
-	DRIVER( killbld )    /* (c) 1998 */
-	DRIVER( killbld104 )/* (c) 1998 */
-	DRIVER( puzlstar )    /* (c) 1999 */
-	DRIVER( olds )        /* (c) 1999 */
-	DRIVER( olds100 )    /* (c) 1999 */
-	DRIVER( olds100a )    /* (c) 1999 */
-	DRIVER( kov2 )        /* (c) 2000 */
-	DRIVER( kov2106 )    /* (c) 2000 */
-	DRIVER( kov2103 )    /* (c) 2000 */
-	DRIVER( kov2102 )    /* (c) 2000 */
-	DRIVER( kov2100 )    /* (c) 2000 */
-	DRIVER( kov2p )        /* (c) 2000 */
-	DRIVER( kov2p205 )    /* (c) 2000 */
-	DRIVER( ddp2 )        /* (c) 2001 */
-	DRIVER( ddp2a )        /* (c) 2001 */
-	DRIVER( puzzli2 )    /* (c) 2001 */
-	DRIVER( martmast )    /* (c) 2001 */
-	DRIVER( martmastc )    /* (c) 2001 */
-	DRIVER( theglad )    /* (c) 2001 */
-	DRIVER( theglada )    /* (c) 2001 */
-	DRIVER( dmnfrnt )    /* (c) 2002 */
-	DRIVER( dmnfrnta )    /* (c) 2002 */
+	DRIVER( orlegend )		/* (c) 1997 */
+	DRIVER( orlegende )		/* (c) 1997 */
+	DRIVER( orlegendc )		/* (c) 1997 */
+	DRIVER( orlegendca )	/* (c) 1997 */
+	DRIVER( orlegend111c )	/* (c) 1997 */
+	DRIVER( orlegend105k )	/* (c) 1997 */
+	DRIVER( drgw2 )			/* (c) 1997 */
+	DRIVER( drgw2c )		/* (c) 1997 */
+	DRIVER( drgw2j )		/* (c) 1997 */
+	DRIVER( drgw3 )			/* (c) 1998 */
+	DRIVER( drgw3k )		/* (c) 1998 */
+	DRIVER( kov )			/* (c) 1999 */
+	DRIVER( kovplus )		/* (c) 1999 */
+	DRIVER( kovplusa )		/* (c) 1999 */
+	DRIVER( kov115 )		/* (c) 1999 */
+	DRIVER( kov100 )		/* (c) 1999 */
+	DRIVER( kovsh )			/* (c) 1999 */
+	DRIVER( kovsh103 )		/* (c) 1999 */
+	DRIVER( photoy2k )		/* (c) 1999 */
+	DRIVER( photoy2k102 )	/* (c) 1999 */
+	DRIVER( killbld )		/* (c) 1998 */
+	DRIVER( killbld104 )	/* (c) 1998 */
+	DRIVER( puzlstar )		/* (c) 1999 */
+	DRIVER( olds )			/* (c) 1999 */
+	DRIVER( olds100 )		/* (c) 1999 */
+	DRIVER( olds100a )		/* (c) 1999 */
+	DRIVER( kov2 )			/* (c) 2000 */
+	DRIVER( kov2106 )		/* (c) 2000 */
+	DRIVER( kov2103 )		/* (c) 2000 */
+	DRIVER( kov2102 )		/* (c) 2000 */
+	DRIVER( kov2100 )		/* (c) 2000 */
+	DRIVER( kov2p )			/* (c) 2000 */
+	DRIVER( kov2p205 )		/* (c) 2000 */
+	DRIVER( ddp2 )			/* (c) 2001 */
+	DRIVER( ddp2a )			/* (c) 2001 */
+	DRIVER( puzzli2 )		/* (c) 2001 */
+	DRIVER( martmast )		/* (c) 2001 */
+	DRIVER( martmastc )		/* (c) 2001 */
+	DRIVER( martmastc102 )	/* (c) 2001 */
+	DRIVER( theglad )		/* (c) 2001 */
+	DRIVER( theglada )		/* (c) 2001 */
+	DRIVER( dmnfrnt )		/* (c) 2002 */
+	DRIVER( dmnfrnta )		/* (c) 2002 */
 	DRIVER( kovshp )
 	DRIVER( oldsplus )
 	DRIVER( killbldp )
