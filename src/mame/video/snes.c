@@ -132,126 +132,16 @@ enum
 	SNES_COLOR_DEPTH_8BPP
 };
 
-/*****************************************
- * snes_draw_blend()
- *
- * Routine for additive/subtractive blending
- * between the main and sub screens.
- *****************************************/
-
-INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens )
-{
-#ifdef SNES_LAYER_DEBUG
-	if (debug_options.colormath_disabled)
-		return;
-#endif /* SNES_LAYER_DEBUG */
-
-	/* when color math is applied to subscreen pixels, the blending depends on the blending used by the previous mainscreen
-    pixel, except for subscreen pixel 0 which has no previous mainscreen pixel, see comments in snes_refresh_scanline */
-	if (switch_screens && offset > 0)
-		offset -= 1;
-
-	if ((black_pen_clip == SNES_CLIP_ALWAYS) ||
-		(black_pen_clip == SNES_CLIP_IN && snes_ppu.clipmasks[SNES_COLOR][offset]) ||
-		(black_pen_clip == SNES_CLIP_OUT && !snes_ppu.clipmasks[SNES_COLOR][offset]))
-		*colour = 0; //clip to black before color math
-
-	if (prevent_color_math == SNES_CLIP_ALWAYS) // blending mode 3 == always OFF
-		return;
-
-	if ((prevent_color_math == SNES_CLIP_NEVER) ||
-		(prevent_color_math == SNES_CLIP_IN  && !snes_ppu.clipmasks[SNES_COLOR][offset]) ||
-		(prevent_color_math == SNES_CLIP_OUT && snes_ppu.clipmasks[SNES_COLOR][offset]))
-	{
-		UINT16 r, g, b;
-		struct SCANLINE *subscreen;
-		int clip_max = 0;	// if add then clip to 0x1f, if sub then clip to 0
-
-#ifdef SNES_LAYER_DEBUG
-		/* Toggle drawing of SNES_SUBSCREEN or SNES_MAINSCREEN */
-		if (debug_options.draw_subscreen)
-		{
-			subscreen = switch_screens ? &scanlines[SNES_SUBSCREEN] : &scanlines[SNES_MAINSCREEN];
-		}
-		else
-#endif /* SNES_LAYER_DEBUG */
-		{
-			subscreen = switch_screens ? &scanlines[SNES_MAINSCREEN] : &scanlines[SNES_SUBSCREEN];
-		}
-
-		if (snes_ppu.sub_add_mode) /* SNES_SUBSCREEN*/
-		{
-			if (!BIT(snes_ppu.color_modes, 7))
-			{
-				/* 0x00 add */
-				r = (*colour & 0x1f) + (subscreen->buffer[offset] & 0x1f);
-				g = ((*colour & 0x3e0) >> 5) + ((subscreen->buffer[offset] & 0x3e0) >> 5);
-				b = ((*colour & 0x7c00) >> 10) + ((subscreen->buffer[offset] & 0x7c00) >> 10);
-				clip_max = 1;
-			}
-			else
-			{
-				/* 0x80 sub */
-				r = (*colour & 0x1f) - (subscreen->buffer[offset] & 0x1f);
-				g = ((*colour & 0x3e0) >> 5) - ((subscreen->buffer[offset] & 0x3e0) >> 5);
-				b = ((*colour & 0x7c00) >> 10) - ((subscreen->buffer[offset] & 0x7c00) >> 10);
-				if (r > 0x1f) r = 0;
-				if (g > 0x1f) g = 0;
-				if (b > 0x1f) b = 0;
-			}
-			/* only halve if the color is not the back colour */
-			if (BIT(snes_ppu.color_modes, 6) && (subscreen->buffer[offset] != snes_cgram[FIXED_COLOUR]))
-			{
-				r >>= 1;
-				g >>= 1;
-				b >>= 1;
-			}
-		}
-		else /* Fixed colour */
-		{
-			if (!BIT(snes_ppu.color_modes, 7))
-			{
-				/* 0x00 add */
-				r = (*colour & 0x1f) + (snes_cgram[FIXED_COLOUR] & 0x1f);
-				g = ((*colour & 0x3e0) >> 5) + ((snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
-				b = ((*colour & 0x7c00) >> 10) + ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
-				clip_max = 1;
-			}
-			else
-			{
-				/* 0x80: sub */
-				r = (*colour & 0x1f) - (snes_cgram[FIXED_COLOUR] & 0x1f);
-				g = ((*colour & 0x3e0) >> 5) - ((snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
-				b = ((*colour & 0x7c00) >> 10) - ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
-				if (r > 0x1f) r = 0;
-				if (g > 0x1f) g = 0;
-				if (b > 0x1f) b = 0;
-			}
-			/* halve if necessary */
-			if (BIT(snes_ppu.color_modes, 6))
-			{
-				r >>= 1;
-				g >>= 1;
-				b >>= 1;
-			}
-		}
-
-		/* according to anomie's docs, after addition has been performed, division by 2 happens *before* clipping to max, hence we clip now */
-		if (clip_max)
-		{
-			if (r > 0x1f) r = 0x1f;
-			if (g > 0x1f) g = 0x1f;
-			if (b > 0x1f) b = 0x1f;
-		}
-
-		*colour = ((r & 0x1f) | ((g & 0x1f) << 5) | ((b & 0x1f) << 10));
-	}
-}
+/**********************************************************************************
+ * TODO: the draw_tile routines below should be merged/reworked to reduce everything
+ * to a single routine with the additional parameters: OAM/BG (to decide if checking
+ * against priority or not) and tile length (16 for hires BG, 8 otherwise)
+ **********************************************************************************/
 
 /*****************************************
  * snes_draw_tile()
  *
- * Draw tiles with variable bit planes
+ * Draw BG tiles with variable bit planes
  *****************************************/
 
 INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT8 direct_colors, UINT16 pal, UINT8 hires )
@@ -546,9 +436,7 @@ INLINE void snes_draw_tile_x2( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16
 /*****************************************
  * snes_draw_tile_object()
  *
- * Draw tiles with 4 bit planes(16 colors)
- * The same as snes_draw_tile_4() except
- * that it takes a blend parameter.
+ * Draw OAM tiles with 4 bit planes(16 colors)
  *****************************************/
 
 INLINE void snes_draw_tile_object( UINT16 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT16 pal )
@@ -647,6 +535,23 @@ INLINE void snes_draw_tile_object( UINT16 tileaddr, INT16 x, UINT8 priority, UIN
 		}
 	}
 }
+
+/*************************************************************************************************
+ * SNES BG layers
+ *
+ * BG drawing theory of each scanline is quite easy: depending on the graphics Mode (0-7), there
+ * are up to 4 background layers. Pixels for each BG layer can have two different priorities.
+ * Depending on the line and on the BGHOFS and BGVOFS PPU registers, we first determine the tile
+ * address in snes_vram (by determining x,y coord and tile size and by calling snes_get_tmap_addr).
+ * Then, we load the correspondent data and we determine the tile properties: which priority to
+ * use, which palette etc. Finally, for each pixel of the tile appearing on screen, we check if
+ * the tile priority is higher than the BG/OAM already stored in that pixel for that line. If so
+ * we store the pixel in the buffer, otherwise we discard it.
+ *
+ * Of course, depending on the graphics Mode, it might be easier or harder to determine the proper
+ * tile address in vram (Mode 7 uses different registers, Mode 2, 4 and 6 uses OPT effect, etc.),
+ * but in general it works as described.
+ *************************************************************************************************/
 
 /*********************************************
  * snes_get_tmap_addr()
@@ -1071,12 +976,41 @@ static void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_
 	}
 }
 
-/*********************************************
- * snes_update_objects()
+/*************************************************************************************************
+ * SNES Sprites
  *
- * Update an entire line of sprites.
- * FIXME: We need to support high priority bit
- *********************************************/
+ * 1. First of all: sprites are drawn one line in advance. We emulate this by caching the
+ * starting vram address, the sprite size and the "name select" at each line, and by using
+ * them the next line to output the proper sprites - see snes_update_obsel.
+ *
+ * 2. Each line can select its sprites among 128 available ones in oam_ram, hence we start
+ * by creating a list of the available objects (each one with its x,y coordinate, its size,
+ * its tile address, etc.) - see snes_oam_list_build.
+ *
+ * 3. Next, we start finding out which sprites will appear in the line: starting from
+ * FirstSprite, we count 32 OBJs which intersect our line and we store their indexes in the
+ * oam_itemlist array (if more than 32 sprites intersect our line, we set the Range Over
+ * flag); then, selecting among these sprites, we count 34 8x8 tiles which are visible
+ * in our line (i.e. whose x coord is between -size and 256) and we store the corresponding
+ * coordinates/priorities/palettes/etc. in the oam_tilelist array (if more than 34 tiles would
+ * appear on screen, we set the Time Over flag).
+ * Notice that when we populate oam_tilelist, we proceed from oam_itemlist[31] (or from the last
+ * item which intersects the scanline), towards oam_itemlist[0], i.e. the higher tiles (say
+ * oam_tilelist[34], or the last tile which appear on screen) will contain FirstSprite object,
+ * or the sprites with closer index to FirstSprite which get displayed. This will play an
+ * important role for sprite priority - see snes_update_objects_rto.
+ *
+ * 4. All the above happens at the beginning of each VIDEO_UPDATE. When we finally draw the
+ * scanline, we pass through the oam_tilelist and we store the displayed pixels in our scanline
+ * buffer. Notice that, for each pixel of a SNES sprite, only the priority of the topmost sprite
+ * is tested against the priority of the BG pixel (because FirstSprite is on top of FirstSprite+1,
+ * which is on top of FirstSprite+2, etc., and therefore other sprites are already covered by the
+ * topmost one). To emulate this, we draw each tile over the previous ones no matter what
+ * priorities are (differently from what we did with BGs): in the end, we will have in each pixel z
+ * its topmost sprite and scanline.priority[z] will be the topmost sprite priority as expected.
+ * Of course, sprite drawing must happen before BG drawing, so that afterwords BG pixels properly
+ * test their priority with the one of the correct sprite - see snes_update_objects.
+ *************************************************************************************************/
 
 struct OAM
 {
@@ -1087,6 +1021,22 @@ struct OAM
 };
 
 static struct OAM oam_spritelist[SNES_SCR_WIDTH / 2];
+
+static UINT8 oam_itemlist[32];
+
+struct TILELIST {
+	INT16 x;
+	UINT16 priority, pal, tileaddr;
+	int hflip;
+};
+
+struct TILELIST oam_tilelist[34];
+
+/*********************************************
+ * snes_update_obsel()
+ *
+ * Update sprite settings for next line.
+ *********************************************/
 
 static void snes_update_obsel( void )
 {
@@ -1100,80 +1050,86 @@ static void snes_update_obsel( void )
 	}
 }
 
+/*********************************************
+ * snes_oam_list_build()
+ *
+ * Build a list of the available obj in OAM ram.
+ *********************************************/
+
 static void snes_oam_list_build( void )
 {
 	UINT8 *oamram = (UINT8 *)snes_oam;
 	INT16 oam = 0x1ff;
 	UINT16 oam_extra = oam + 0x20;
 	UINT16 extra = 0;
-	int i;
+	int ii;
 
 	snes_ppu.update_oam_list = 0;		// eventually, we can optimize the code by only calling this function when there is a change in size
 
-	for (i = 127; i >= 0; i--)
+	for (ii = 127; ii >= 0; ii--)
 	{
-		if (((i + 1) % 4) == 0)
+		if (((ii + 1) % 4) == 0)
 			extra = oamram[oam_extra--];
 
-		oam_spritelist[i].vflip = (oamram[oam] & 0x80) >> 7;
-		oam_spritelist[i].hflip = (oamram[oam] & 0x40) >> 6;
-		oam_spritelist[i].priority_bits = (oamram[oam] & 0x30) >> 4;
-		oam_spritelist[i].pal = 128 + ((oamram[oam] & 0x0e) << 3);
-		oam_spritelist[i].tile = (oamram[oam--] & 0x1) << 8;
-		oam_spritelist[i].tile |= oamram[oam--];
-		oam_spritelist[i].y = oamram[oam--] + 1;	/* We seem to need to add one here.... */
-		oam_spritelist[i].x = oamram[oam--];
-		oam_spritelist[i].size = (extra & 0x80) >> 7;
+		oam_spritelist[ii].vflip = (oamram[oam] & 0x80) >> 7;
+		oam_spritelist[ii].hflip = (oamram[oam] & 0x40) >> 6;
+		oam_spritelist[ii].priority_bits = (oamram[oam] & 0x30) >> 4;
+		oam_spritelist[ii].pal = 128 + ((oamram[oam] & 0x0e) << 3);
+		oam_spritelist[ii].tile = (oamram[oam--] & 0x1) << 8;
+		oam_spritelist[ii].tile |= oamram[oam--];
+		oam_spritelist[ii].y = oamram[oam--] + 1;	/* We seem to need to add one here.... */
+		oam_spritelist[ii].x = oamram[oam--];
+		oam_spritelist[ii].size = (extra & 0x80) >> 7;
 		extra <<= 1;
-		oam_spritelist[i].x |= ((extra & 0x80) << 1);
+		oam_spritelist[ii].x |= ((extra & 0x80) << 1);
 		extra <<= 1;
 
-		oam_spritelist[i].y *= snes_ppu.obj_interlace;
+		oam_spritelist[ii].y *= snes_ppu.obj_interlace;
 
 		/* Adjust if past maximum position */
-		if (oam_spritelist[i].y >= snes_ppu.beam.last_visible_line * snes_ppu.interlace)
-			oam_spritelist[i].y -= 256 * snes_ppu.interlace;
+		if (oam_spritelist[ii].y >= snes_ppu.beam.last_visible_line * snes_ppu.interlace)
+			oam_spritelist[ii].y -= 256 * snes_ppu.interlace;
 
-		oam_spritelist[i].x &= 0x1ff;
+		oam_spritelist[ii].x &= 0x1ff;
 
 		/* Determine object size */
 		switch (snes_ppu.oam.size)
 		{
 		case 0:			/* 8x8 or 16x16 */
-			oam_spritelist[i].width  = oam_spritelist[i].size ? 2 : 1;
-			oam_spritelist[i].height = oam_spritelist[i].size ? 2 : 1;
+			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 2 : 1;
+			oam_spritelist[ii].height = oam_spritelist[ii].size ? 2 : 1;
 			break;
 		case 1:			/* 8x8 or 32x32 */
-			oam_spritelist[i].width  = oam_spritelist[i].size ? 4 : 1;
-			oam_spritelist[i].height = oam_spritelist[i].size ? 4 : 1;
+			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 4 : 1;
+			oam_spritelist[ii].height = oam_spritelist[ii].size ? 4 : 1;
 			break;
 		case 2:			/* 8x8 or 64x64 */
-			oam_spritelist[i].width  = oam_spritelist[i].size ? 8 : 1;
-			oam_spritelist[i].height = oam_spritelist[i].size ? 8 : 1;
+			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 8 : 1;
+			oam_spritelist[ii].height = oam_spritelist[ii].size ? 8 : 1;
 			break;
 		case 3:			/* 16x16 or 32x32 */
-			oam_spritelist[i].width  = oam_spritelist[i].size ? 4 : 2;
-			oam_spritelist[i].height = oam_spritelist[i].size ? 4 : 2;
+			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 4 : 2;
+			oam_spritelist[ii].height = oam_spritelist[ii].size ? 4 : 2;
 			break;
 		case 4:			/* 16x16 or 64x64 */
-			oam_spritelist[i].width  = oam_spritelist[i].size ? 8 : 2;
-			oam_spritelist[i].height = oam_spritelist[i].size ? 8 : 2;
+			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 8 : 2;
+			oam_spritelist[ii].height = oam_spritelist[ii].size ? 8 : 2;
 			break;
 		case 5:			/* 32x32 or 64x64 */
-			oam_spritelist[i].width  = oam_spritelist[i].size ? 8 : 4;
-			oam_spritelist[i].height = oam_spritelist[i].size ? 8 : 4;
+			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 8 : 4;
+			oam_spritelist[ii].height = oam_spritelist[ii].size ? 8 : 4;
 			break;
 		case 6:			/* undocumented: 16x32 or 32x64 */
-			oam_spritelist[i].width  = oam_spritelist[i].size ? 4 : 2;
-			oam_spritelist[i].height = oam_spritelist[i].size ? 8 : 4;
-			if (snes_ppu.obj_interlace && !oam_spritelist[i].size)
-				oam_spritelist[i].height = 2;
+			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 4 : 2;
+			oam_spritelist[ii].height = oam_spritelist[ii].size ? 8 : 4;
+			if (snes_ppu.obj_interlace && !oam_spritelist[ii].size)
+				oam_spritelist[ii].height = 2;
 			break;
 		case 7:			/* undocumented: 16x32 or 32x32 */
-			oam_spritelist[i].width  = oam_spritelist[i].size ? 4 : 2;
-			oam_spritelist[i].height = oam_spritelist[i].size ? 4 : 4;
-			if (snes_ppu.obj_interlace && !oam_spritelist[i].size)
-				oam_spritelist[i].height = 2;
+			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 4 : 2;
+			oam_spritelist[ii].height = oam_spritelist[ii].size ? 4 : 4;
+			if (snes_ppu.obj_interlace && !oam_spritelist[ii].size)
+				oam_spritelist[ii].height = 2;
 			break;
 		default:
 			/* we should never enter here... */
@@ -1183,15 +1139,12 @@ static void snes_oam_list_build( void )
 	}
 }
 
-static UINT8 oam_itemlist[32];
-
-struct TILELIST {
-	INT16 x;
-	UINT16 priority, pal, tileaddr;
-	int hflip;
-};
-
-struct TILELIST oam_tilelist[34];
+/*********************************************
+ * is_sprite_on_scanline()
+ *
+ * Check if a given sprites intersect current
+ * scanline
+ *********************************************/
 
 static int is_sprite_on_scanline( UINT16 curline, UINT8 sprite )
 {
@@ -1211,15 +1164,22 @@ static int is_sprite_on_scanline( UINT16 curline, UINT8 sprite )
 	return 0;
 }
 
+/*********************************************
+ * snes_update_objects_rto()
+ *
+ * Determine which OBJs will be drawn on this
+ * scanline.
+ *********************************************/
+
 static void snes_update_objects_rto( UINT16 curline )
 {
-	int active_sprite;
+	int ii, jj, active_sprite;
 	UINT8 range_over, time_over;
 	INT8 xs, ys;
 	UINT8 line;
 	UINT8 height, width, vflip, hflip, priority, pal;
 	UINT16 tile;
-	INT16 i, x, y;
+	INT16 x, y;
 	UINT32 name_sel = 0;
 
 	snes_oam_list_build();
@@ -1236,9 +1196,9 @@ static void snes_update_objects_rto( UINT16 curline )
 	memset(oam_itemlist, 0xff, 32);
 
 	/* populate the list of 32 objects */
-	for (i = 0; i < 128; i++)
+	for (ii = 0; ii < 128; ii++)
 	{
-		active_sprite = (i + snes_ppu.oam.first_sprite) & 0x7f;
+		active_sprite = (ii + snes_ppu.oam.first_sprite) & 0x7f;
 
 		if (!is_sprite_on_scanline(curline, active_sprite))
 			continue;
@@ -1250,16 +1210,16 @@ static void snes_update_objects_rto( UINT16 curline )
 	}
 
 	/* reset the list of first 34 tiles to be drawn */
-	for (i = 0; i < 34; i++)
-		oam_tilelist[i].tileaddr = 0xffff;
+	for (ii = 0; ii < 34; ii++)
+		oam_tilelist[ii].tileaddr = 0xffff;
 
 	/* populate the list of 34 tiles */
-	for (i = 31; i >= 0; i--)
+	for (ii = 31; ii >= 0; ii--)
 	{
-		if (oam_itemlist[i] == 0xff)
+		if (oam_itemlist[ii] == 0xff)
 			continue;
 
-		active_sprite = oam_itemlist[i];
+		active_sprite = oam_itemlist[ii];
 
 		tile = oam_spritelist[active_sprite].tile;
 		x = oam_spritelist[active_sprite].x;
@@ -1284,11 +1244,9 @@ static void snes_update_objects_rto( UINT16 curline )
 		line <<= 1;
 		tile <<= 5;
 
-		int ii;
-
-		for (ii = 0; ii < width; ii++)
+		for (jj = 0; jj < width; jj++)
 		{
-			INT16 xx = (x + (ii << 3)) & 0x1ff;
+			INT16 xx = (x + (jj << 3)) & 0x1ff;
 
 			if (x != 256 && xx >= 256 && (xx + 7) < 512)
 				continue;
@@ -1296,7 +1254,7 @@ static void snes_update_objects_rto( UINT16 curline )
 			if (time_over++ >= 34)
 				break;
 
-			xs = (hflip) ? (width - 1 - ii) : ii;
+			xs = (hflip) ? (width - 1 - jj) : jj;
 			oam_tilelist[time_over - 1].tileaddr = name_sel + tile + table_obj_offset[ys][xs] + line;
 			oam_tilelist[time_over - 1].hflip = hflip;
 			oam_tilelist[time_over - 1].x = xx;
@@ -1314,11 +1272,17 @@ static void snes_update_objects_rto( UINT16 curline )
 		snes_ppu.stat77_flags |= 0x80;
 }
 
+/*********************************************
+ * snes_update_objects()
+ *
+ * Update an entire line of sprites.
+ *********************************************/
+
 static void snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8 priority_oam2, UINT8 priority_oam3 )
 {
 	UINT8 pri, priority[4];
 	UINT32 charaddr;
-	int i;
+	int ii;
 
 #ifdef SNES_LAYER_DEBUG
 	if (debug_options.bg_disabled[SNES_OAM])
@@ -1341,12 +1305,12 @@ static void snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8
 	priority[3] = priority_oam3;
 
 	/* finally draw the tiles from the tilelist */
-	for (i = 0; i < 34; i++)
+	for (ii = 0; ii < 34; ii++)
 	{
-		int tile = i;
+		int tile = ii;
 #ifdef SNES_LAYER_DEBUG
 		if (debug_options.sprite_reversed)
-			tile = 33 - i;
+			tile = 33 - ii;
 #endif /* SNES_LAYER_DEBUG */
 
 		if (oam_tilelist[tile].tileaddr == 0xffff)
@@ -1594,6 +1558,8 @@ static void snes_update_windowmasks( void )
  * snes_update_offsets()
  *
  * Update the offsets with the latest changes.
+ * This is currently unused, but it could
+ * possibly be handy for some minor optimization
  *********************************************/
 
 static void snes_update_offsets( void )
@@ -1605,10 +1571,140 @@ static void snes_update_offsets( void )
 	snes_ppu.update_offsets = 0;
 }
 
+/*****************************************
+ * snes_draw_blend()
+ *
+ * Routine for additive/subtractive blending
+ * between the main and sub screens, i.e.
+ * color math.
+ *****************************************/
+
+INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens )
+{
+#ifdef SNES_LAYER_DEBUG
+	if (debug_options.colormath_disabled)
+		return;
+#endif /* SNES_LAYER_DEBUG */
+
+	/* when color math is applied to subscreen pixels, the blending depends on the blending used by the previous mainscreen
+    pixel, except for subscreen pixel 0 which has no previous mainscreen pixel, see comments in snes_refresh_scanline */
+	if (switch_screens && offset > 0)
+		offset -= 1;
+
+	if ((black_pen_clip == SNES_CLIP_ALWAYS) ||
+		(black_pen_clip == SNES_CLIP_IN && snes_ppu.clipmasks[SNES_COLOR][offset]) ||
+		(black_pen_clip == SNES_CLIP_OUT && !snes_ppu.clipmasks[SNES_COLOR][offset]))
+		*colour = 0; //clip to black before color math
+
+	if (prevent_color_math == SNES_CLIP_ALWAYS) // blending mode 3 == always OFF
+		return;
+
+	if ((prevent_color_math == SNES_CLIP_NEVER) ||
+		(prevent_color_math == SNES_CLIP_IN  && !snes_ppu.clipmasks[SNES_COLOR][offset]) ||
+		(prevent_color_math == SNES_CLIP_OUT && snes_ppu.clipmasks[SNES_COLOR][offset]))
+	{
+		UINT16 r, g, b;
+		struct SCANLINE *subscreen;
+		int clip_max = 0;	// if add then clip to 0x1f, if sub then clip to 0
+
+#ifdef SNES_LAYER_DEBUG
+		/* Toggle drawing of SNES_SUBSCREEN or SNES_MAINSCREEN */
+		if (debug_options.draw_subscreen)
+		{
+			subscreen = switch_screens ? &scanlines[SNES_SUBSCREEN] : &scanlines[SNES_MAINSCREEN];
+		}
+		else
+#endif /* SNES_LAYER_DEBUG */
+		{
+			subscreen = switch_screens ? &scanlines[SNES_MAINSCREEN] : &scanlines[SNES_SUBSCREEN];
+		}
+
+		if (snes_ppu.sub_add_mode) /* SNES_SUBSCREEN*/
+		{
+			if (!BIT(snes_ppu.color_modes, 7))
+			{
+				/* 0x00 add */
+				r = (*colour & 0x1f) + (subscreen->buffer[offset] & 0x1f);
+				g = ((*colour & 0x3e0) >> 5) + ((subscreen->buffer[offset] & 0x3e0) >> 5);
+				b = ((*colour & 0x7c00) >> 10) + ((subscreen->buffer[offset] & 0x7c00) >> 10);
+				clip_max = 1;
+			}
+			else
+			{
+				/* 0x80 sub */
+				r = (*colour & 0x1f) - (subscreen->buffer[offset] & 0x1f);
+				g = ((*colour & 0x3e0) >> 5) - ((subscreen->buffer[offset] & 0x3e0) >> 5);
+				b = ((*colour & 0x7c00) >> 10) - ((subscreen->buffer[offset] & 0x7c00) >> 10);
+				if (r > 0x1f) r = 0;
+				if (g > 0x1f) g = 0;
+				if (b > 0x1f) b = 0;
+			}
+			/* only halve if the color is not the back colour */
+			if (BIT(snes_ppu.color_modes, 6) && (subscreen->buffer[offset] != snes_cgram[FIXED_COLOUR]))
+			{
+				r >>= 1;
+				g >>= 1;
+				b >>= 1;
+			}
+		}
+		else /* Fixed colour */
+		{
+			if (!BIT(snes_ppu.color_modes, 7))
+			{
+				/* 0x00 add */
+				r = (*colour & 0x1f) + (snes_cgram[FIXED_COLOUR] & 0x1f);
+				g = ((*colour & 0x3e0) >> 5) + ((snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
+				b = ((*colour & 0x7c00) >> 10) + ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
+				clip_max = 1;
+			}
+			else
+			{
+				/* 0x80: sub */
+				r = (*colour & 0x1f) - (snes_cgram[FIXED_COLOUR] & 0x1f);
+				g = ((*colour & 0x3e0) >> 5) - ((snes_cgram[FIXED_COLOUR] & 0x3e0) >> 5);
+				b = ((*colour & 0x7c00) >> 10) - ((snes_cgram[FIXED_COLOUR] & 0x7c00) >> 10);
+				if (r > 0x1f) r = 0;
+				if (g > 0x1f) g = 0;
+				if (b > 0x1f) b = 0;
+			}
+			/* halve if necessary */
+			if (BIT(snes_ppu.color_modes, 6))
+			{
+				r >>= 1;
+				g >>= 1;
+				b >>= 1;
+			}
+		}
+
+		/* according to anomie's docs, after addition has been performed, division by 2 happens *before* clipping to max, hence we clip now */
+		if (clip_max)
+		{
+			if (r > 0x1f) r = 0x1f;
+			if (g > 0x1f) g = 0x1f;
+			if (b > 0x1f) b = 0x1f;
+		}
+
+		*colour = ((r & 0x1f) | ((g & 0x1f) << 5) | ((b & 0x1f) << 10));
+	}
+}
+
 /*********************************************
  * snes_refresh_scanline()
  *
  * Redraw the current line.
+ *********************************************/
+/*********************************************
+ * Notice that in hires and pseudo hires modes,
+ * i.e. when 512 different pixels are present
+ * in a scanline, a crt TV monitor would end
+ * up blending adjacent pixels. To mimic this,
+ * we add a small (optional) hack which enters
+ * only in the very last stage of the scanline
+ * drawing and which simulates the TV by
+ * replacing the exact pixel color with an
+ * average of the current and next pixel colors.
+ * Credits (and thanks) to Blargg and Byuu for
+ * the optimized averaging algorithm.
  *********************************************/
 
 static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, UINT16 curline )
@@ -1619,7 +1715,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 	struct SCANLINE *scanline1, *scanline2;
 	UINT16 c;
 	UINT16 prev_colour = 0;
-	int average = input_port_read_safe(machine, "OPTIONS", 0) & 0x01;
+	int blurring = input_port_read_safe(machine, "OPTIONS", 0) & 0x01;
 
 	profiler_mark_start(PROFILER_VIDEO);
 
@@ -1726,10 +1822,11 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 				/* prepare the pixel from sub screen */
 				c = scanline2->buffer[x];
 
-				/* in hires, subscreen pixels are blended as well: for each subscreen pixel, color math is applied if
-                it had been applied to the previous mainscreen pixel. What happens at subscreen pixel 0 (which has no
-                previous mainscreen pixel) is undocumented. Until more info are discovered, we (arbitrarily) apply to it
-                the same color math as the *next* mainscreen pixel (i.e. mainscreen pixel 0) */
+				/* in hires/pseudo-hires, subscreen pixels are blended as well: for each subscreen pixel, color math
+                is applied if it had been applied to the previous mainscreen pixel. What happens at subscreen pixel 0
+                (which has no previous mainscreen pixel) is undocumented. Until more info are discovered, we (arbitrarily)
+                apply to it the same color math as the *next* mainscreen pixel (i.e. mainscreen pixel 0), which seems as good as
+                any other choice */
 				if (x == 0 && !scanline1->blend_exception[0] && snes_ppu.layer[scanline1->layer[0]].color_math)
 					snes_draw_blend(0, &c, snes_ppu.prevent_color_math, snes_ppu.clip_to_black, 1);
 				else if (x > 0  && !scanline1->blend_exception[x - 1] && snes_ppu.layer[scanline1->layer[x - 1]].color_math)
@@ -1738,8 +1835,8 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 				tmp_col[0] = c;
 
 				/* average the first pixel if required, or draw it directly*/
-				if (average)
-					c = (prev_colour + tmp_col[0] - ((prev_colour ^ tmp_col[0]) & 0x0421)) >> 1;
+				if (blurring)
+					c = (prev_colour + tmp_col[0] - ((prev_colour ^ tmp_col[0]) & 0x0421)) >> 1;	// Hack code to mimic TV pixel blurring
 				else
 					c = tmp_col[0];
 
@@ -1750,10 +1847,9 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 				*BITMAP_ADDR32(bitmap, curline, x * 2 + 0) = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 				prev_colour = tmp_col[0];
 
-
 				/* average the second pixel if required, or draw it directly*/
-				if (average)
-					c = (prev_colour + tmp_col[1] - ((prev_colour ^ tmp_col[1]) & 0x0421)) >> 1;
+				if (blurring)
+					c = (prev_colour + tmp_col[1] - ((prev_colour ^ tmp_col[1]) & 0x0421)) >> 1;	// Hack code to mimic TV pixel blurring
 				else
 					c = tmp_col[1];
 

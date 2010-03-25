@@ -301,11 +301,11 @@ static void snes_dynamic_res_change( running_machine *machine )
 	attoseconds_t refresh;
 
 	visarea.min_x = visarea.min_y = 0;
-	visarea.max_y = snes_ppu.beam.last_visible_line*snes_ppu.interlace - 1;
+	visarea.max_y = snes_ppu.beam.last_visible_line * snes_ppu.interlace - 1;
 	visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
 
 	// fixme: should compensate for SNES_DBG_video
-	if (snes_ppu.mode == 5 || snes_ppu.mode == 6 )
+	if (snes_ppu.mode == 5 || snes_ppu.mode == 6 || snes_ppu.pseudo_hires)
 		state->htmult = 2;
 	else
 		state->htmult = 1;
@@ -317,9 +317,9 @@ static void snes_dynamic_res_change( running_machine *machine )
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
 
 	if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
-		video_screen_configure(machine->primary_screen, SNES_HTOTAL*2, SNES_VTOTAL_NTSC*snes_ppu.interlace, &visarea, refresh);
+		video_screen_configure(machine->primary_screen, SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * snes_ppu.interlace, &visarea, refresh);
 	else
-		video_screen_configure(machine->primary_screen, SNES_HTOTAL*2, SNES_VTOTAL_PAL*snes_ppu.interlace, &visarea, refresh);
+		video_screen_configure(machine->primary_screen, SNES_HTOTAL * 2, SNES_VTOTAL_PAL * snes_ppu.interlace, &visarea, refresh);
 }
 
 static READ8_HANDLER( snes_open_bus_r )
