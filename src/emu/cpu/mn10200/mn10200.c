@@ -133,9 +133,9 @@ INLINE INT32 r24u(mn102_info *mn102, offs_t adr)
 
 INLINE void w24(mn102_info *mn102, offs_t adr, UINT32 val)
 {
-/*	if(adr == 0x4075aa || adr == 0x40689a || adr == 0x4075a2) {
-		log_write("TRACE", adr, val, MEM_LONG);
-	}*/
+/*  if(adr == 0x4075aa || adr == 0x40689a || adr == 0x4075a2) {
+        log_write("TRACE", adr, val, MEM_LONG);
+    }*/
 	mn102_write_byte(mn102, adr, val);
 	mn102_write_byte(mn102, adr+1, val>>8);
 	mn102_write_byte(mn102, adr+2, val>>16);
@@ -160,11 +160,11 @@ static void mn102_take_irq(mn102_info *mn102, int level, int group)
 {
 	if(!(mn102->psw & 0x800))
 	{
-//		if (group != 8)	printf("MN10200: Dropping irq L %d G %d pc=%x, a3=%x\n", level, group, mn102->pc, mn102->a[3]);
+//      if (group != 8) printf("MN10200: Dropping irq L %d G %d pc=%x, a3=%x\n", level, group, mn102->pc, mn102->a[3]);
 		return;
 	}
 
-//	if (group != 8) printf("MN10200: Taking irq L %d G %d pc=%x, a3=%x\n", level, group, mn102->pc, mn102->a[3]);
+//  if (group != 8) printf("MN10200: Taking irq L %d G %d pc=%x, a3=%x\n", level, group, mn102->pc, mn102->a[3]);
 
 	mn102->a[3] -= 6;
 	w24(mn102, mn102->a[3]+2, mn102->pc);
@@ -184,7 +184,7 @@ static void refresh_timer(mn102_info *cpustate, int tmr)
 		// source is a prescaler?
 		if (source >= 2)
 		{
-			INT32 rate; 
+			INT32 rate;
 
 			// is prescaler enabled?
 			if (cpustate->prescaler[source-2].mode & 0x80)
@@ -249,7 +249,7 @@ INLINE void timer_tick_simple(mn102_info *cpustate, int tmr)
 		// is the result enabled?
 		if (cpustate->icrl[group] & (1 << irq_in_grp))
 		{
-//			printf("Timer %d IRQ! (Group %d in_grp %d ICRH %x ICRL %x\n", tmr, group, irq_in_grp, cpustate->icrh[group], cpustate->icrl[group]);
+//          printf("Timer %d IRQ! (Group %d in_grp %d ICRH %x ICRL %x\n", tmr, group, irq_in_grp, cpustate->icrh[group], cpustate->icrl[group]);
 			// try to take it now
 			mn102_take_irq(cpustate, level, group + 1);
 		}
@@ -289,10 +289,10 @@ static CPU_INIT(mn10200)
 	state_save_register_device_item_array(device, 0, cpustate->icrh);
 	state_save_register_device_item(device, 0, cpustate->psw);
 	state_save_register_device_item(device, 0, cpustate->mdr);
-//	state_save_register_device_item_array(device, 0, cpustate->simple_timer);
-//	state_save_register_device_item_array(device, 0, cpustate->prescaler);
-//	state_save_register_device_item_array(device, 0, cpustate->dma);
-//	state_save_register_device_item_array(device, 0, cpustate->serial);
+//  state_save_register_device_item_array(device, 0, cpustate->simple_timer);
+//  state_save_register_device_item_array(device, 0, cpustate->prescaler);
+//  state_save_register_device_item_array(device, 0, cpustate->dma);
+//  state_save_register_device_item_array(device, 0, cpustate->serial);
 	state_save_register_device_item_array(device, 0, cpustate->ddr);
 
 	for (tmr = 0; tmr < NUM_TIMERS_8BIT; tmr++)
@@ -490,7 +490,7 @@ static void mn102_extirq(mn102_info *mn102, int irqnum, int status)
 {
 	int level = (mn102->icrh[7]>>4)&0x7;
 
-//	printf("mn102_extirq: irq %d status %d G8 ICRL %x\n", irqnum, status, mn102->icrl[7]);
+//  printf("mn102_extirq: irq %d status %d G8 ICRL %x\n", irqnum, status, mn102->icrl[7]);
 
 	// if interrupt is enabled, handle it
 	if (status)
@@ -1957,30 +1957,30 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 	case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
 	case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
 		mn102->simple_timer[adr-0x210].base = data + 1;
-//		printf("MN10200: Timer %d value set %02x\n", adr-0x210, data);
+//      printf("MN10200: Timer %d value set %02x\n", adr-0x210, data);
 		refresh_timer(mn102, adr-0x210);
 		break;
 
 	case 0x21a:
 		mn102->prescaler[0].cycles = data+1;
-//		printf("MN10200: Prescale 0 cycle count %d\n", data+1);
+//      printf("MN10200: Prescale 0 cycle count %d\n", data+1);
 		break;
 
 	case 0x21b:
 		mn102->prescaler[1].cycles = data+1;
-//		printf("MN10200: Prescale 1 cycle count %d\n", data+1);
+//      printf("MN10200: Prescale 1 cycle count %d\n", data+1);
 		break;
 
 	case 0x220: case 0x221: case 0x222: case 0x223: case 0x224:
-	case 0x225: case 0x226: case 0x227: case 0x228: case 0x229: 
+	case 0x225: case 0x226: case 0x227: case 0x228: case 0x229:
 	{
-//		const char *source[4] = { "TMxIO", "cascade", "prescale 0", "prescale 1" };
+//      const char *source[4] = { "TMxIO", "cascade", "prescale 0", "prescale 1" };
 		mn102->simple_timer[adr-0x220].mode = data;
-//		printf("MN10200: Timer %d %s b6=%d, source=%s\n", adr-0x220, data & 0x80 ? "on" : "off", (data & 0x40) != 0, source[data & 3]);
+//      printf("MN10200: Timer %d %s b6=%d, source=%s\n", adr-0x220, data & 0x80 ? "on" : "off", (data & 0x40) != 0, source[data & 3]);
 
 		if (data & 0x40)
 		{
-//			printf("MN10200: loading timer %d\n", adr-0x220);
+//          printf("MN10200: loading timer %d\n", adr-0x220);
 			mn102->simple_timer[adr-0x220].cur = mn102->simple_timer[adr-0x220].base;
 		}
 		refresh_timer(mn102, adr-0x220);
@@ -1988,35 +1988,35 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
 	}
 
 	case 0x22a:
-//		printf("MN10200: Prescale 0 %s, ps0bc %s\n",
-//			data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps0br" : "off");
+//      printf("MN10200: Prescale 0 %s, ps0bc %s\n",
+//          data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps0br" : "off");
 		mn102->prescaler[0].mode = data;
 		break;
 
 	case 0x22b:
-//		printf("MN10200: Prescale 1 %s, ps1bc %s\n",
-//			data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps1br" : "off");
+//      printf("MN10200: Prescale 1 %s, ps1bc %s\n",
+//          data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps1br" : "off");
 		mn102->prescaler[1].mode = data;
 		break;
 
-	case 0x230: case 0x240: case 0x250: 
+	case 0x230: case 0x240: case 0x250:
 	{
-//		const char *modes[4] = { "single", "double", "ioa", "iob" };
-//		const char *sources[8] = { "pres.0", "pres.1", "iob", "sysclk", "*4", "*1", "6", "7" };
-//		printf("MN10200: Timer %d comp=%s on_1=%s on_match=%s phase=%s source=%s\n",
-//			10 + ((adr-0x230) >> 4),
-//			modes[data >> 6], data & 0x20 ? "cleared" : "not cleared",  data & 0x10 ? "cleared" : "not cleared",
-//			data & 8 ? "tff" : "rsff", sources[data & 7]);
+//      const char *modes[4] = { "single", "double", "ioa", "iob" };
+//      const char *sources[8] = { "pres.0", "pres.1", "iob", "sysclk", "*4", "*1", "6", "7" };
+//      printf("MN10200: Timer %d comp=%s on_1=%s on_match=%s phase=%s source=%s\n",
+//          10 + ((adr-0x230) >> 4),
+//          modes[data >> 6], data & 0x20 ? "cleared" : "not cleared",  data & 0x10 ? "cleared" : "not cleared",
+//          data & 8 ? "tff" : "rsff", sources[data & 7]);
 		break;
 	}
 
-	case 0x231: case 0x241: case 0x251: 
+	case 0x231: case 0x241: case 0x251:
 	{
-//		const char *modes[4] = { "up", "down", "up on ioa", "up on iob" };
-//		printf("MN10200: Timer %d %s ff=%s op=%s ext_trig=%s %s\n",
-//		10 + ((adr-0x230) >> 4),
-//		data & 0x80 ? "enable" : "disable", data & 0x40 ? "operate" : "clear",
-//		modes[(data >> 4) & 3], data & 2 ? "on" : "off", data & 1 ? "one-shot" : "repeat");
+//      const char *modes[4] = { "up", "down", "up on ioa", "up on iob" };
+//      printf("MN10200: Timer %d %s ff=%s op=%s ext_trig=%s %s\n",
+//      10 + ((adr-0x230) >> 4),
+//      data & 0x80 ? "enable" : "disable", data & 0x40 ? "operate" : "clear",
+//      modes[(data >> 4) & 3], data & 2 ? "on" : "off", data & 1 ? "one-shot" : "repeat");
 
 		break;
 	}
@@ -2302,17 +2302,17 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 
 	case 0x183:
 		return 0x10;
-	
+
 	case 0x200: case 0x201: case 0x202: case 0x203: case 0x204:
 	case 0x205: case 0x206: case 0x207: case 0x208: case 0x209:
-//		printf("MN10200: timer %d value read = %d\n", adr-0x200, mn102->simple_timer[adr-0x200].cur);
+//      printf("MN10200: timer %d value read = %d\n", adr-0x200, mn102->simple_timer[adr-0x200].cur);
 		return mn102->simple_timer[adr-0x200].cur;
 		break;
 
 	case 0x264:	// port 1 data
 		return memory_read_byte_8le(mn102->io, MN10200_PORT1);
 
-	case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc: 
+	case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc:
 		{
 			int dma = (adr-0x280) >> 4;
 			return mn102->dma[dma].irq;
@@ -2357,9 +2357,9 @@ static CPU_SET_INFO(mn10200)
 		case CPUINFO_INT_REGISTER + MN10200_IAGR:          cpustate->iagr = info->i;   break;
 
 		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ0:	mn102_extirq(cpustate, 0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ1:	mn102_extirq(cpustate, 1, info->i);	break;     
-		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ2:	mn102_extirq(cpustate, 2, info->i);	break;     
-		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ3:	mn102_extirq(cpustate, 3, info->i);	break;     
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ1:	mn102_extirq(cpustate, 1, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ2:	mn102_extirq(cpustate, 2, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + MN10200_IRQ3:	mn102_extirq(cpustate, 3, info->i);	break;
 	}
 }
 

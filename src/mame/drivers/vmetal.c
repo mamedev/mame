@@ -371,7 +371,7 @@ static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
 	tile = (data & 0xf) | (lookup & 0x7fff0);
 	color = ((lookup >> 20) & 0x1f) + 0xe0;
 
-	if (data & 0x8000) 
+	if (data & 0x8000)
 		tile = 0;
 
 	SET_TILE_INFO(1, tile, color, TILE_FLIPYX(0x0));
@@ -385,7 +385,7 @@ static TILE_GET_INFO( get_vmetal_mid1tilemap_tile_info )
 
 	get_vmetal_tlookup(machine, data, &tile, &color);
 
-	if (data & 0x8000) 
+	if (data & 0x8000)
 		tile = 0;
 
 	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));
@@ -398,7 +398,7 @@ static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 
 	get_vmetal_tlookup(machine, data, &tile, &color);
 
-	if (data & 0x8000) 
+	if (data & 0x8000)
 		tile = 0;
 
 	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));

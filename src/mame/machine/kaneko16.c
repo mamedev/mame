@@ -2041,7 +2041,7 @@ DRIVER_INIT(calc3_scantables)
 	{
 		UINT8* tmpdstram = auto_alloc_array(machine, UINT8, 0x2000);
 #if CALC3_VERBOSE_OUTPUT
- 		int length;
+		int length;
 #endif
 
 		memset(tmpdstram, 0x00,0x2000);

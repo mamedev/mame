@@ -919,7 +919,7 @@ static WRITE16_HANDLER( tjumpman_leds_w )
 		set_led_status(space->machine, 6,	data & 0x0080);	// 3 bet
 	}
 
-//	popmessage("led %04X", data);
+//  popmessage("led %04X", data);
 }
 
 static CUSTOM_INPUT( tjumpman_hopper_r )
@@ -1122,7 +1122,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x17) AM_DEVWRITE("nmk112", nmk112_okibank_w)			// Samples bank
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)		//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)							// To Main CPU
-//  AM_RANGE(0x51, 0x51) AM_WRITENOP										 // ?? volume
+//  AM_RANGE(0x51, 0x51) AM_WRITENOP                                         // ?? volume
 	AM_RANGE(0x80, 0x80) AM_WRITE(pwrinst2_rombank_w)						// ROM bank
 	AM_RANGE(0x60, 0x60) AM_READ(soundlatch_hi_r)							// From Main CPU
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_lo_r)							//
@@ -2624,46 +2624,46 @@ BP962A.U77  23C16000    GFX
 	\
 	ROM_REGION( 0x240000, "oki2", 0 )	\
 	ROM_LOAD( "bp962a.u47", 0x040000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) ) \
-	
+
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
-ROM_START( agallet ) 
+ROM_START( agallet )
 	ROMS_AGALLET
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "agallet_europe.nv", 0x0000, 0x0080, CRC(ec38bf65) SHA1(cb8d9eacc0cf55a0c6b187e6673e3354554314b5) )
 ROM_END
 
-ROM_START( agalletu ) 
+ROM_START( agalletu )
 	ROMS_AGALLET
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "agallet_usa.nv", 0x0000, 0x0080, CRC(72e65056) SHA1(abf1a86df01064d9d5d8c418e8367817319ec335) )
 ROM_END
 
-ROM_START( agalletj ) 
+ROM_START( agalletj )
 	ROMS_AGALLET
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "agallet_japan.nv", 0x0000, 0x0080, CRC(0753f547) SHA1(aabb987470406b8729894108bc4d050f7200917d) )
 ROM_END
 
-ROM_START( agalletk ) 
+ROM_START( agalletk )
 	ROMS_AGALLET
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "agallet_korea.nv", 0x0000, 0x0080, CRC(7f41c253) SHA1(50793d4da0ad6eb590941d26a729a1cf4b3c25c2) )
 ROM_END
 
 ROM_START( agallett ) // the dumped board was this region
 	ROMS_AGALLET
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "agallet_taiwan.nv", 0x0000, 0x0080, CRC(0af46742) SHA1(37b704c4c573b2aabd6f016e9e8dd458f95148f7) )
 ROM_END
 
-ROM_START( agalleth ) 
+ROM_START( agalleth )
 	ROMS_AGALLET
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "agallet_hongkong.nv", 0x0000, 0x0080, CRC(998d1a74) SHA1(13e7e27a18417949d49e97d521781fc0feeef792) )
 ROM_END
@@ -3494,14 +3494,14 @@ U55
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( mazinger )
 	ROMS_MAZINGER
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "mazinger_world.nv", 0x0000, 0x0080, CRC(4f6225c6) SHA1(ed8e1c3ca9b961778cd317deb0dd8a0143eaab4f) )
 ROM_END
 
 ROM_START( mazingerj )
 	ROMS_MAZINGER
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "mazinger_japan.nv", 0x0000, 0x0080, CRC(f84a2a45) SHA1(2e8ad10994bba9a3952889ed0ec3bcaca9b41d03) )
 ROM_END
@@ -4548,12 +4548,12 @@ GAME( 1995, sailormnj,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpres
 GAME( 1995, sailormnk,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     0 )
 GAME( 1995, sailormnt,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    0 )
 GAME( 1995, sailormnh,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", 0 )
-GAME( 1995, sailormno,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     0 ) 
-GAME( 1995, sailormnou, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        0 ) 
-GAME( 1995, sailormnoj, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      0 ) 
-GAME( 1995, sailormnok, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      0 ) 
-GAME( 1995, sailormnot, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     0 ) 
-GAME( 1995, sailormnoh, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)"	, 0 ) 
+GAME( 1995, sailormno,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     0 )
+GAME( 1995, sailormnou, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        0 )
+GAME( 1995, sailormnoj, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      0 )
+GAME( 1995, sailormnok, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      0 )
+GAME( 1995, sailormnot, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     0 )
+GAME( 1995, sailormnoh, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)"	, 0 )
 
 // The EEPROM determines the region, program roms are the same between sets
 GAME( 1996, agallet,    0,        sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Europe)", 0 )

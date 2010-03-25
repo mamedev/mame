@@ -41,7 +41,7 @@ WRITE8_HANDLER( pbaction_scroll_w )
 {
 	pbaction_state *state = (pbaction_state *)space->machine->driver_data;
 	state->scroll = data - 3;
-	if (flip_screen_get(space->machine)) 
+	if (flip_screen_get(space->machine))
 		state->scroll = -state->scroll;
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll);
@@ -95,7 +95,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int sx, sy, flipx, flipy;
 
 		/* if next sprite is double size, skip this one */
-		if (offs > 0 && spriteram[offs - 4] & 0x80) 
+		if (offs > 0 && spriteram[offs - 4] & 0x80)
 			continue;
 
 		sx = spriteram[offs + 3];

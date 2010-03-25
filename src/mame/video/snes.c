@@ -799,7 +799,7 @@ INLINE void snes_update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UIN
 
 #ifdef SNES_LAYER_DEBUG
 	/* if we want to draw only one of the priorities of this layer */
-	if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) || 
+	if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) ||
 		((debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
 	{
 		if (!hires && tile_size)
@@ -999,7 +999,7 @@ static void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_
 
 #ifdef SNES_LAYER_DEBUG
 	/* if we want to draw only one of the priorities of this layer */
-	if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) || 
+	if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) ||
 		((debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
 		continue;
 #endif /* SNES_LAYER_DEBUG */

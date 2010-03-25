@@ -283,7 +283,7 @@
   * Multi Win (Funworld)
 
   These sets seems to run in the same modified hardware.
-  They are encrypted, and have a second program rom with unknown code/purposes. 
+  They are encrypted, and have a second program rom with unknown code/purposes.
 
 
   * Mongolfier New
@@ -316,13 +316,13 @@
   Beschreibung / Description
   --------------------------
 
-  Für OES 5,-- Einwurf werden 3 Kredite gegeben. Für einen Kredit bekommt der Spieler 
+  F?r OES 5,-- Einwurf werden 3 Kredite gegeben. F?r einen Kredit bekommt der Spieler
   500 Spielpunkte. Bei jeder Frage kann der Spieler 100, 500 oder alle Punkte einsetzen.
   Wird die Frage richtig beantwortet, wird der Einsatz aufaddiert. Erreicht der Spieler
   nach 5 Fragen mehr als 2500 Punkte, bekommt er Bonusfragen. Das Spiel endet bei einer
   falschen Beantwortung der Frage.
 
-  Insertion of ATS 5,- (Austrian Schilling coin) yields 5 credits. For 1 credit a player 
+  Insertion of ATS 5,- (Austrian Schilling coin) yields 5 credits. For 1 credit a player
   receives 500 points. At each question a player can bet 100, 500 or all points. If a
   question is answered correctly, the bet is added to the points. If a player reaches
   more than 2500 points after 5 questions, he gets bonus questions. The game is over
@@ -759,7 +759,7 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
 	coin_counter_w(device->machine, 0, data & 0x01);	/* credit in counter */
 	coin_counter_w(device->machine, 7, data & 0x04);	/* credit out counter, mapped as coin 8 */
 
-//	popmessage("Lamps A: %02X", data);
+//  popmessage("Lamps A: %02X", data);
 }
 
 static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
@@ -767,7 +767,7 @@ static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
 	output_set_lamp_value(4, (data >> 0) & 1);		/* button hold5/bet */
 	output_set_lamp_value(6, (data >> 1) & 1);		/* button 7 (start/play) */
 
-//	popmessage("Lamps B: %02X", data);
+//  popmessage("Lamps B: %02X", data);
 }
 
 static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
@@ -813,7 +813,7 @@ static READ8_HANDLER( questions_r )
 
 static WRITE8_HANDLER( question_bank_w )
 {
-//	printf("question bank write %02x\n", data);
+//  printf("question bank write %02x\n", data);
 	funquiz_question_bank = data;
 }
 
@@ -2936,7 +2936,7 @@ ROM_END
 /*
     - pool10d -
 
-	3.50.u2   1ST AND 2ND HALF IDENTICAL
+    3.50.u2   1ST AND 2ND HALF IDENTICAL
 */
 	ROM_START( pool10d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3553,7 +3553,7 @@ ROM_END
 
 /*  (Multi) Joker Card from Vesely Svet (Sprightly World). Czech poker game.
     Program roms seems encrypted. Seems to be a Big Deal clone, running in
-	Funworld Multi Win hardware.
+    Funworld Multi Win hardware.
 
     1x Custom Funworld CPU, based on 6502 family. Silkscreened "Fun World Elektronik".
     1x Maxim MAX690CPA - Microprocessor Supervisory IC (DIP 8).
@@ -3574,8 +3574,8 @@ ROM_END
     1x 8 DIP switches bank.
     1x Push button (SW2). (reset?)
     1x Variable Resistor (VR1).
-    1x 16 MHz. Crystal. 
-	1x CR2025 (3V) battery.
+    1x 16 MHz. Crystal.
+    1x CR2025 (3V) battery.
 
     1x 2x17 pin male connector.
     1x 2x22 Edge connector.
@@ -3763,7 +3763,7 @@ ROM_END
 /**** Fun World Quiz ****
 
   Fun World Quiz
-  Öhlinger Ges.m.b.H.
+  ?hlinger Ges.m.b.H.
 
   Horizontal Display
   Currents
@@ -3791,7 +3791,7 @@ ROM_END
             ... |N |12| 2P Start
     1P Action 1 |P |13| 1P Action 2
     2P Action 1 |R |14| 2P Action 2
-        1P Left |S |15| 1P Right 
+        1P Left |S |15| 1P Right
         1P Down |T |16| 1P Up
         2P Left |U |17| 2P Right
         2P Down |V |18| 2P Up
@@ -3828,12 +3828,12 @@ ROM_START( funquiz )	/* Fun World Quiz */
 	ROM_FILL(                0x0000, 0x4000, 0xff)
 	ROM_LOAD( "q_3.bin",     0x4000, 0x4000, CRC(0dafa07a) SHA1(5d6fa842c617f92fad14a597396249d5a4d28c9a) )
 	ROM_FILL(                0x8000, 0x4000, 0xff)
-//	ROM_LOAD( "q_2_nec.bin", 0xc000, 0x4000, BAD_DUMP CRC(8e3bfcc7) SHA1(81b35e786fab088a439a4423becf08a78a0b2df0) )
+//  ROM_LOAD( "q_2_nec.bin", 0xc000, 0x4000, BAD_DUMP CRC(8e3bfcc7) SHA1(81b35e786fab088a439a4423becf08a78a0b2df0) )
 
 	ROM_REGION( 0x10000, "badgfx", 0 ) /* just a temporal container */
 	ROM_LOAD( "q_2_nec.bin", 0xc000, 0x4000, BAD_DUMP CRC(8e3bfcc7) SHA1(81b35e786fab088a439a4423becf08a78a0b2df0) )
 
-	/* One unpopulated questions socket... Maybe sport_1 is missing */ 
+	/* One unpopulated questions socket... Maybe sport_1 is missing */
 	ROM_REGION( 0x100000, "questions", ROMREGION_ERASEFF )
 
 	/* 01 - Allgemein */
@@ -4077,7 +4077,7 @@ static DRIVER_INIT( multiwin )
 /*****************************************************
 
   This only decrypt the text strings.
-  Need more work to get the opcodes properly decrypted 
+  Need more work to get the opcodes properly decrypted
 
 ******************************************************/
 {
@@ -4089,12 +4089,12 @@ static DRIVER_INIT( multiwin )
 	for (x=0x8000; x < 0x10000; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x91;
-		UINT8 code; 
+		UINT8 code;
 
 		ROM[x] = BITSWAP8(ROM[x],5,6,7,2,3,0,1,4);
 
 		code = ROM[x];
-		
+
 		/* decrypt code here */
 
 		ROM[x+0x10000] = code;
@@ -4122,11 +4122,11 @@ static DRIVER_INIT( royalcdc )
 	for (x=0x8000; x < 0x10000; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x22;
-		UINT8 code; 
+		UINT8 code;
 
 		// this seems correct for the data, plaintext decrypts fine
 		ROM[x] = BITSWAP8(ROM[x],2,6,7,4,3,1,5,0);
-		
+
 		// the code uses different encryption, there are conflicts here
 		// so it's probably address based
 		code = ROM[x];

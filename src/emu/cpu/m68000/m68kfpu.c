@@ -642,7 +642,7 @@ static floatx80 READ_EA_FPE(m68ki_cpu_core *m68k, int ea)
 					}
 					break;
 
-				default:	
+				default:
 					fatalerror("M68kFPU: READ_EA_FPE0: unhandled mode %d, reg %d, at %08X\n", mode, reg, REG_PC);
 					break;
 			}
@@ -717,8 +717,8 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 	int opmode = w2 & 0x7f;
 	floatx80 source;
 
-	// fmovecr #$f, fp0	f200 5c0f
-	
+	// fmovecr #$f, fp0 f200 5c0f
+
 	if (rm)
 	{
 		switch (src)
@@ -837,7 +837,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 		source = REG_FP[src];
 	}
 
-	
+
 
 	switch (opmode)
 	{
@@ -877,7 +877,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			break;
 		}
 		case 0x1a:		// FNEG
-		{				    
+		{
 			REG_FP[dst] = source;
 			REG_FP[dst].high ^= 0x8000;
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
@@ -949,13 +949,13 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 1:		// Single-precision Real
 		{
-			UINT32 d = floatx80_to_float32(REG_FP[src]); 
+			UINT32 d = floatx80_to_float32(REG_FP[src]);
 			WRITE_EA_32(m68k, ea, d);
 			break;
 		}
 		case 2:		// Extended-precision Real
 		{
-		 	WRITE_EA_FPE(m68k, ea, REG_FP[src]);	
+			WRITE_EA_FPE(m68k, ea, REG_FP[src]);
 			break;
 		}
 		case 3:		// Packed-decimal Real with Static K-factor

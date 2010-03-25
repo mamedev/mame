@@ -3705,7 +3705,7 @@ ROM_START( cybrcomm )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 
 	ROM_REGION( 0x2000, "nvram", 0 )
-//	ROM_LOAD( "cy1eeprm.9e", 0x0000, 0x2000, CRC(4e1d294b) SHA1(954ce04dcdba65214f5d0690ca59264f9090a1d6) ) /* EPROM (dumped?) */
+//  ROM_LOAD( "cy1eeprm.9e", 0x0000, 0x2000, CRC(4e1d294b) SHA1(954ce04dcdba65214f5d0690ca59264f9090a1d6) ) /* EPROM (dumped?) */
 	ROM_LOAD( "cybrcomm.nv", 0x0000, 0x2000, CRC(8432c066) SHA1(99d4bfda3f8aec288dbeaf291bce85fe9009a1de) ) /* EPROM (useful defaults) */
 ROM_END
 
@@ -5166,10 +5166,10 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Note(s)
-	   The ranges here are based on the test mode which displays +-224
-	   The nvram is calibrated using these settings.  If the SUBCPU handling changes then these might
-	    end up needing to change again too
-	   Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
+       The ranges here are based on the test mode which displays +-224
+       The nvram is calibrated using these settings.  If the SUBCPU handling changes then these might
+        end up needing to change again too
+       Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
     */
 	PORT_START("STICKY1")		/* VOLUME 0 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: vertical */

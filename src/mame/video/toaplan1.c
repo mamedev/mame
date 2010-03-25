@@ -483,7 +483,7 @@ WRITE16_HANDLER( toaplan1_bcu_flipscreen_w )
 		if (bcu_flipscreen)
 		{
 			const rectangle *visarea = video_screen_get_visible_area(space->machine->primary_screen);
-			
+
 			scrollx_offs1 = 0x151 - 6;
 			scrollx_offs2 = 0x151 - 4;
 			scrollx_offs3 = 0x151 - 2;

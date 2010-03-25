@@ -31,11 +31,11 @@
   It ends up trashing the registers containing the return value for a function
 
     000018D6: MASK L51, L45, $1e00000
-	000018DC: CMPI L51, $c00000
-	000018E2: BE $18e6
-	000018E4: RET PC, L0
-	0003FA66: RET PC, L1  <-- no valid return value
-	00000000: CHK PC, PC     causes jump to 0
+    000018DC: CMPI L51, $c00000
+    000018E2: BE $18e6
+    000018E4: RET PC, L0
+    0003FA66: RET PC, L1  <-- no valid return value
+    00000000: CHK PC, PC     causes jump to 0
 
  It executes this code several times earlier before the crash, so I don't know
  if it's some kind of nested call problem, or simply beacuse it's using a
@@ -315,16 +315,16 @@ static ADDRESS_MAP_START( mrkicker_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(finalgdr_prot_w)
 	AM_RANGE(0x6400, 0x6403) AM_READ(finalgdr_prot_r)
 	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
-//	AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x0000ff00)
+//  AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x0000ff00)
 
-//	AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(finalgdr_backupram_bank_w)
-//	AM_RANGE(0xxxxx, 0xxxxx) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
-//	AM_RANGE(0xxxxx, 0xxxxx) AM_READ_PORT("P1_P2")
-//	AM_RANGE(0xxxxx, 0xxxxx) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0xxxxx, 0xxxxx) AM_READNOP //?
+//  AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(finalgdr_backupram_bank_w)
+//  AM_RANGE(0xxxxx, 0xxxxx) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
+//  AM_RANGE(0xxxxx, 0xxxxx) AM_READ_PORT("P1_P2")
+//  AM_RANGE(0xxxxx, 0xxxxx) AM_READ_PORT("SYSTEM")
+//  AM_RANGE(0xxxxx, 0xxxxx) AM_READNOP //?
 //  AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(flipscreen32_w) //?
-//	AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(finalgdr_prize_w)
-//	AM_RANGE(0xxxxx, 0xxxxx) AM_DEVWRITE("oki", finalgdr_oki_bank_w)
+//  AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(finalgdr_prize_w)
+//  AM_RANGE(0xxxxx, 0xxxxx) AM_DEVWRITE("oki", finalgdr_oki_bank_w)
 ADDRESS_MAP_END
 
 

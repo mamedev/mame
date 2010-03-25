@@ -60,11 +60,11 @@ To Do:
 -   Are the 16x16 tiles used by Mouja a Imagetek 14300-only feature?
 -   Interrupt timing needs figuring out properly, having it incorrect
     causes scrolling glitches in some games.  Test cases Mouse Go Go
-	title screen, GunMaster title screen.  Changing it can cause
-	excessive slowdown in said games however.
+    title screen, GunMaster title screen.  Changing it can cause
+    excessive slowdown in said games however.
 -   Bang Bang Ball / Bubble Buster slow to a crawl when you press a
     button between levels, on a real PCB it speeds up instead (related
-	to above?)
+    to above?)
 
 Notes:
 
@@ -1182,7 +1182,7 @@ static ADDRESS_MAP_START( kokushi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_BASE_MEMBER(metro_state, blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_BASE_MEMBER(metro_state, window)	// Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_BASE_MEMBER(metro_state, scroll)			// Scroll Regs - WRONG
-//  AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                            		// ? increasing
+//  AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                                    // ? increasing
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP									// ? increasing
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)		// IRQ Cause /  IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_BASE_MEMBER(metro_state, irq_enable)		// IRQ Enable
@@ -1491,7 +1491,7 @@ static ADDRESS_MAP_START( dokyusei_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_BASE_MEMBER(metro_state, irq_levels)			// IRQ Levels
 	AM_RANGE(0x478820, 0x47882f) AM_WRITEONLY AM_BASE_MEMBER(metro_state, irq_vectors)			// IRQ Vectors
 	AM_RANGE(0x478830, 0x478831) AM_WRITEONLY AM_BASE_MEMBER(metro_state, irq_enable)			// IRQ Enable
-//  AM_RANGE(0x478832, 0x478833) AM_READ(metro_irq_cause_r)                            			 // IRQ Cause
+//  AM_RANGE(0x478832, 0x478833) AM_READ(metro_irq_cause_r)                                      // IRQ Cause
 	AM_RANGE(0x478832, 0x478833) AM_WRITE(metro_irq_cause_w)							// IRQ Acknowledge
 	AM_RANGE(0x478836, 0x478837) AM_WRITENOP										// ? watchdog ?
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE_MEMBER(metro_state, blitter_regs)	// Tiles Blitter
@@ -1829,7 +1829,7 @@ static WRITE16_HANDLER( vram_0_clr_w )
 	static int i;
 	metro_state *state = (metro_state *)space->machine->driver_data;
 
-//	printf("0 %04x %04x\n",offset,data);
+//  printf("0 %04x %04x\n",offset,data);
 	for(i=0;i<0x20/2;i++)
 		state->vram_0[(offset*0x10+i)/2] = 0xffff;
 }
@@ -1839,7 +1839,7 @@ static WRITE16_HANDLER( vram_1_clr_w )
 	static int i;
 	metro_state *state = (metro_state *)space->machine->driver_data;
 
-//	printf("0 %04x %04x\n",offset,data);
+//  printf("0 %04x %04x\n",offset,data);
 	for(i=0;i<0x20/2;i++)
 		state->vram_1[(offset*0x10+i)/2] = 0xffff;
 }
@@ -1849,7 +1849,7 @@ static WRITE16_HANDLER( vram_2_clr_w )
 	static int i;
 	metro_state *state = (metro_state *)space->machine->driver_data;
 
-//	printf("0 %04x %04x\n",offset,data);
+//  printf("0 %04x %04x\n",offset,data);
 	for(i=0;i<0x20/2;i++)
 		state->vram_2[(offset*0x10+i)/2] = 0xffff;
 }

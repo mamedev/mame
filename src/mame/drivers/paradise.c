@@ -57,7 +57,7 @@ static WRITE8_HANDLER( paradise_rombank_w )
 
 static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
 {
-	if (data & ~0x02)	
+	if (data & ~0x02)
 		logerror("%s: unknown oki bank bits %02X\n", cpuexec_describe_context(device->machine), data);
 
 	okim6295_set_bank_base(device, (data & 0x02) ? 0x40000 : 0);
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	// OKI 1
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE_MEMBER(paradise_state, videoram) 	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE_MEMBER(paradise_state, videoram)	// Pixmap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_io_map, ADDRESS_SPACE_IO, 8 )
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( torus_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE_MEMBER(paradise_state, videoram) 	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE_MEMBER(paradise_state, videoram)	// Pixmap
 ADDRESS_MAP_END
 
 

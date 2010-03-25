@@ -1295,10 +1295,10 @@ INPUT_PORTS_END
    given
 
      Z, X - Steer Car
-	 Ctrl - Accelerate
-	 Alt - Brake
-	 Mouse - Aim Gun
-	 Left Shift - Fire Gun
+     Ctrl - Accelerate
+     Alt - Brake
+     Mouse - Aim Gun
+     Left Shift - Fire Gun
  */
 
 static INPUT_PORTS_START( luckywld )
@@ -2802,7 +2802,7 @@ ROM_START( finalap2 )
 	ROM_LOAD( "flsvoi2",  0x080000, 0x080000, CRC(204b3c27) SHA1(80cd13bfe2a4b3039b4a120b905674e46b8b3b9c) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "finalap2.nv",  0x000000, 0x2000, CRC(c7ae5d0a) SHA1(9527e44accec0ec9d1990138d1b0bfc71957cc8a) )			
+	ROM_LOAD( "finalap2.nv",  0x000000, 0x2000, CRC(c7ae5d0a) SHA1(9527e44accec0ec9d1990138d1b0bfc71957cc8a) )
 ROM_END
 
 /* FINAL LAP 2 (Japan) */
@@ -2859,7 +2859,7 @@ ROM_START( finalap2j )
 	ROM_LOAD( "flsvoi2",  0x080000, 0x080000, CRC(204b3c27) SHA1(80cd13bfe2a4b3039b4a120b905674e46b8b3b9c) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "finalap2.nv",  0x000000, 0x2000, CRC(c7ae5d0a) SHA1(9527e44accec0ec9d1990138d1b0bfc71957cc8a) )			
+	ROM_LOAD( "finalap2.nv",  0x000000, 0x2000, CRC(c7ae5d0a) SHA1(9527e44accec0ec9d1990138d1b0bfc71957cc8a) )
 ROM_END
 
 /* FINAL LAP 3 (WORLD) */
@@ -2919,7 +2919,7 @@ ROM_START( finalap3 ) // this set displays MOTION (Ver. 3) in the test mode menu
 	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )		
+	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
 ROM_END
 
 
@@ -2983,7 +2983,7 @@ ROM_START( finalap3a )
 	ROM_LOAD( "341.bin", 0x00000, 0x20000, CRC(8c90ca97) SHA1(dce2a680a5bc213f2f48d4baffc86ea27fe90209) ) // was read as 27c010
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )		
+	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
 ROM_END
 
 
@@ -3044,7 +3044,7 @@ ROM_START( finalap3j )
 	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )			
+	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
 ROM_END
 
 /* FINEST HOUR */
@@ -3495,7 +3495,7 @@ ROM_START( metlhawk )
 	ROM_LOAD( "pal12l10-sys87b-3.8d",   0x0400, 0x0040, CRC(d3ae64a6) SHA1(8e56f447908246e84d5a79df1a1cd3d5c8a040fb) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "metlhawk.nv",  0x000000, 0x2000, CRC(547cb0dc) SHA1(965ce5f8a42f5268cda2e77e4be115ccf57f1952) )			
+	ROM_LOAD( "metlhawk.nv",  0x000000, 0x2000, CRC(547cb0dc) SHA1(965ce5f8a42f5268cda2e77e4be115ccf57f1952) )
 ROM_END
 
 /* METAL HAWK (Japan) */
@@ -3566,7 +3566,7 @@ ROM_START( metlhawkj )
 	ROM_LOAD( "pal12l10-sys87b-3.8d",   0x0400, 0x0040, CRC(d3ae64a6) SHA1(8e56f447908246e84d5a79df1a1cd3d5c8a040fb) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "metlhawk.nv",  0x000000, 0x2000, CRC(547cb0dc) SHA1(965ce5f8a42f5268cda2e77e4be115ccf57f1952) )				
+	ROM_LOAD( "metlhawk.nv",  0x000000, 0x2000, CRC(547cb0dc) SHA1(965ce5f8a42f5268cda2e77e4be115ccf57f1952) )
 ROM_END
 
 /* MIRAI NINJA */
@@ -3935,7 +3935,7 @@ ROM_START( sgunner )
 	ROM_LOAD( "sn_voi2.3l",  0x080000, 0x080000, CRC(8c3251b5) SHA1(fa364c8462f490c636605262c5492a6a9b00e5b1) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "sgunner.nv",  0x000000, 0x2000, CRC(106026f8) SHA1(e4be6701d4eef6c18406593c6dee10644f29a15b) )		
+	ROM_LOAD( "sgunner.nv",  0x000000, 0x2000, CRC(106026f8) SHA1(e4be6701d4eef6c18406593c6dee10644f29a15b) )
 ROM_END
 
 /* STEEL GUNNER (Japan) */
@@ -3986,7 +3986,7 @@ ROM_START( sgunnerj )
 	ROM_LOAD( "sn_voi2.3l",  0x080000, 0x080000, CRC(8c3251b5) SHA1(fa364c8462f490c636605262c5492a6a9b00e5b1) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "sgunner.nv",  0x000000, 0x2000, CRC(106026f8) SHA1(e4be6701d4eef6c18406593c6dee10644f29a15b) )	
+	ROM_LOAD( "sgunner.nv",  0x000000, 0x2000, CRC(106026f8) SHA1(e4be6701d4eef6c18406593c6dee10644f29a15b) )
 ROM_END
 
 /* STEEL GUNNER 2 */
@@ -4041,7 +4041,7 @@ ROM_START( sgunner2 )
 	ROM_LOAD( "sns_voi2.bin",  0x080000, 0x080000, CRC(562ec86b) SHA1(c9874c7e1f38c5b38d21f45a82028651cf9089a5) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "sgunner2.nv",  0x000000, 0x2000, CRC(57a521c6) SHA1(d60b4f6f099b7f9fb1e575c5f9a74397986c6dac) )		
+	ROM_LOAD( "sgunner2.nv",  0x000000, 0x2000, CRC(57a521c6) SHA1(d60b4f6f099b7f9fb1e575c5f9a74397986c6dac) )
 ROM_END
 
 /* STEEL GUNNER 2 (Japan) */
@@ -4096,7 +4096,7 @@ ROM_START( sgunner2j )
 	ROM_LOAD( "sns_voi2.bin",  0x080000, 0x080000, CRC(562ec86b) SHA1(c9874c7e1f38c5b38d21f45a82028651cf9089a5) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "sgunner2j.nv",  0x000000, 0x2000, CRC(014bccf9) SHA1(b6437fadf3e71df7a71fde9ec7ffc95fe6c057b3) )			
+	ROM_LOAD( "sgunner2j.nv",  0x000000, 0x2000, CRC(014bccf9) SHA1(b6437fadf3e71df7a71fde9ec7ffc95fe6c057b3) )
 ROM_END
 
 /* SUPER WORLD STADIUM */
@@ -4870,7 +4870,7 @@ ROM_START( luckywld )
 	ROM_LOAD( "lw1ld8.10w", 0, 0x100, CRC(29058c73) SHA1(4916d6bdb7f78e6803698cab32d1586ea457dfc8) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration - see notes with inputs */
-	ROM_LOAD( "luckywld.nv",  0x000000, 0x2000, CRC(0c185d2a) SHA1(6a4876361731df423515a0f3b37ba1496d6b1964) )		
+	ROM_LOAD( "luckywld.nv",  0x000000, 0x2000, CRC(0c185d2a) SHA1(6a4876361731df423515a0f3b37ba1496d6b1964) )
 ROM_END
 
 /* LUCKY & WILD (Japan) */
@@ -4936,7 +4936,7 @@ ROM_START( luckywldj )
 	ROM_LOAD( "lw1ld8.10w", 0, 0x100, CRC(29058c73) SHA1(4916d6bdb7f78e6803698cab32d1586ea457dfc8) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration - see notes with inputs */
-	ROM_LOAD( "luckywld.nv",  0x000000, 0x2000, CRC(0c185d2a) SHA1(6a4876361731df423515a0f3b37ba1496d6b1964) )			
+	ROM_LOAD( "luckywld.nv",  0x000000, 0x2000, CRC(0c185d2a) SHA1(6a4876361731df423515a0f3b37ba1496d6b1964) )
 ROM_END
 
 

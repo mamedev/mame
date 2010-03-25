@@ -35,10 +35,10 @@
  /* quick note on derivative analysis:
  Judging by all the TI chips I (Lord Nightmare) have done this test on, the first derivative between successive values of the LPC tables should follow a roughly triangular or sine shaped curve, the second derivative should start at a value, increase slightly, then decrease smoothly and become negative right around where the LPC curve passes 0, finally increase slightly right near the end. If it doesn't do this, there is probably a wrong value in there somewhere. The pitch and energy tables follow similar patterns but aren't the same since they never cross 0. The chirp table doesn't follow this pattern at all.
  */
-  
+
  /* The following TMS5100/TMC0280/CD2801 coefficients come from US Patent 4,209,836 and several others, and have been verified using derivative analysis to show which values were bad (due to poor quality images or badly typed copies of the tables in the patents, depending on which patent you look at) which were then corrected by figuring out what the tiny remaining marks on the photocopied version of the coefficient sheet COULD have been which would make the derivatives play nice.
 ***These values have not yet been verified against a real TMS5100 or TMC0280 or CD2801 (from speak & spell, etc)***
-*/ 
+*/
 static const struct tms5100_coeffs pat4209836_coeff =
 {
 	/* subtype */

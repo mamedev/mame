@@ -2646,7 +2646,7 @@ static INPUT_PORTS_START( moonwar )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* output bits */
 
 	PORT_START("IN3")      /* IN3/4 - dummy ports for the dial */
-	
+
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_RESET PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x08) // cocktail: dial is reversed
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_CONDITION("IN2", 0x08, PORTCOND_EQUALS, 0x00) // upright: dial works normally
 

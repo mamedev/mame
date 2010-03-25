@@ -3766,10 +3766,10 @@ static RDP_COMMAND( rdp_load_block )
 
 	switch (ti_size) // slindwords Neededby Vigilante 8
 	{
-		case PIXEL_SIZE_4BIT:	ti_width2 >>= 1; 	slindwords >>= 3; 	width >>= 1;	break;
-		case PIXEL_SIZE_8BIT:	 					slindwords >>= 2;					break;
+		case PIXEL_SIZE_4BIT:	ti_width2 >>= 1;	slindwords >>= 3;	width >>= 1;	break;
+		case PIXEL_SIZE_8BIT:						slindwords >>= 2;					break;
 		case PIXEL_SIZE_16BIT:	ti_width2 <<= 1;	slindwords >>= 1;	width <<= 1;	break;
-		case PIXEL_SIZE_32BIT:	ti_width2 <<= 2; 						width <<= 2;	break;
+		case PIXEL_SIZE_32BIT:	ti_width2 <<= 2;						width <<= 2;	break;
 	}
 
 	if ((tb + (width >> 2)) > 0x400)

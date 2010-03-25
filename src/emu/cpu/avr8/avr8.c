@@ -853,8 +853,8 @@ static CPU_EXECUTE( avr8 )
                         opcycles = 2;
                         break;
                     case 0x0900:    // SBIC A,b
-                   		if(!(READ_IO_8(cpustate, ACONST5(op)) & (1 << RR3(op))))
-                   		{
+                		if(!(READ_IO_8(cpustate, ACONST5(op)) & (1 << RR3(op))))
+                		{
 							opcycles += avr8_is_long_opcode(op) ? 2 : 1;
                             cpustate->pc += avr8_is_long_opcode(op) ? 2 : 1;
 						}

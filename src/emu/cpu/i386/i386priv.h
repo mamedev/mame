@@ -432,7 +432,7 @@ INLINE UINT32 FETCH32(i386_state *cpustate)
 		{
 			translate_address(cpustate,&address);
 		}
-	
+
 		address &= cpustate->a20_mask;
 		value = memory_decrypted_read_dword(cpustate->program, address);
 		cpustate->eip += 4;
@@ -466,7 +466,7 @@ INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 		{
 			translate_address(cpustate,&address);
 		}
-	
+
 		address &= cpustate->a20_mask;
 		value = memory_read_word_32le( cpustate->program, address );
 	}
@@ -487,7 +487,7 @@ INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 		{
 			translate_address(cpustate,&address);
 		}
-	
+
 		address &= cpustate->a20_mask;
 		value = memory_read_dword_32le( cpustate->program, address );
 	}
@@ -513,7 +513,7 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 		{
 			translate_address(cpustate,&address);
 		}
-	
+
 		address &= cpustate->a20_mask;
 		value = (((UINT64) memory_read_dword_32le( cpustate->program, address+0 )) << 0) |
 				(((UINT64) memory_read_dword_32le( cpustate->program, address+4 )) << 32);
@@ -545,7 +545,7 @@ INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 		{
 			translate_address(cpustate,&address);
 		}
-	
+
 		address &= cpustate->a20_mask;
 		memory_write_word_32le(cpustate->program, address, value);
 	}
@@ -564,7 +564,7 @@ INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
 		{
 			translate_address(cpustate,&address);
 		}
-	
+
 		ea &= cpustate->a20_mask;
 		memory_write_dword_32le(cpustate->program, address, value);
 	}
@@ -588,7 +588,7 @@ INLINE void WRITE64(i386_state *cpustate,UINT32 ea, UINT64 value)
 		{
 			translate_address(cpustate,&address);
 		}
-	
+
 		ea &= cpustate->a20_mask;
 		memory_write_dword_32le(cpustate->program, address+0, value & 0xffffffff);
 		memory_write_dword_32le(cpustate->program, address+4, (value >> 32) & 0xffffffff);

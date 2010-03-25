@@ -155,7 +155,7 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		*pix = (code & 0x0fff)+0x1000;
-		
+
 		if ((*pix & 0xf) != 0xf)
 			return 1;
 		else
@@ -172,7 +172,7 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 
 		if (tile2 < gfx1->total_elements)
 			data = gfx_element_get_data(gfx1, tile2);
-		else 
+		else
 		{
 			*pix |= 0;
 			return 0;
@@ -186,9 +186,9 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 			case 0x2: *pix = data[(y              * (big?16:8)) + ((big?15:7)-x)]; break;
 			case 0x3: *pix = data[(((big?15:7)-y) * (big?16:8)) + ((big?15:7)-x)]; break;
 		}
-		
+
 		*pix |= ((((tile & 0x0f000000) >> 24) + 0x10)*0x100);
-		
+
 		if ((*pix & 0xff) != 0xff)
 			return 1;
 		else
@@ -196,7 +196,7 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 
 	}
 	else
-	{	
+	{
 		const gfx_element *gfx1 = machine->gfx[big?2:0];
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 4*(code & 0xf)) :
 			                 ((tile & 0xfffff) +   (code & 0xf));
@@ -205,7 +205,7 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 
 		if (tile2 < gfx1->total_elements)
 			data = gfx_element_get_data(gfx1, tile2);
-		else 
+		else
 		{
 			*pix |= 0;
 			return 0;
@@ -220,7 +220,7 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 			case 0x2: *pix = data[(y              * (big?8:4)) + ((big?7:3)-(x>>1))]; break;
 			case 0x3: *pix = data[(((big?15:7)-y) * (big?8:4)) + ((big?7:3)-(x>>1))]; break;
 		}
-		
+
 		if (!(flipxy&2))
 		{
 			if (x&1) *pix >>= 4;
@@ -233,7 +233,7 @@ INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8
 		}
 
 		*pix |= (((((tile & 0x0ff00000) >> 20)) + 0x100)*0x10);
-		
+
 		if ((*pix & 0xf) != 0xf)
 			return 1;
 		else
@@ -599,7 +599,7 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 
 	int width = big ? 4096 : 2048;//pixdata->width;
 	int height = big ? 4096 : 2048;//pixdata->height;
-	
+
 	int scrwidth = bitmap->width;
 	int scrheight = bitmap->height;
 
@@ -650,7 +650,7 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 
 				UINT16 tile = tilemapram[tileoffs];
 				UINT8 draw = get_tile_pix(machine, tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
-								
+
 				if (draw)
 				{
 					dst[x] = dat;
@@ -662,7 +662,7 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 		{
 			dst = BITMAP_ADDR16(bitmap, scrheight-y-1, 0);
 			priority_baseaddr = BITMAP_ADDR8(priority_bitmap, scrheight-y-1, 0);
-			
+
 			for (x=0;x<scrwidth;x++)
 			{
 				int scrollx = (sx+x-wx)&(windowwidth-1);
@@ -672,10 +672,10 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 
 				UINT16 dat = 0;
 
-				UINT16 tile = tilemapram[tileoffs];			
+				UINT16 tile = tilemapram[tileoffs];
 				UINT8 draw = get_tile_pix(machine, tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
-			
-				if (draw)	
+
+				if (draw)
 				{
 					dst[scrwidth-x-1] = dat;
 					priority_baseaddr[scrwidth-x-1] = (priority_baseaddr[scrwidth-x-1] & (pcode >> 8)) | pcode;
@@ -708,10 +708,10 @@ static void draw_layers( running_machine *machine, bitmap_t *bitmap, const recta
 				if (layer==0) tilemapram = state->vram_0;
 				else if (layer==1) tilemapram = state->vram_1;
 				else if (layer==2) tilemapram = state->vram_2;
-		
+
 				draw_tilemap(machine, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, 0, tilemapram, layer);
-				
-				if (state->support_16x16) 
+
+				if (state->support_16x16)
 					draw_tilemap(machine, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, 1, tilemapram, layer);
 			}
 		}

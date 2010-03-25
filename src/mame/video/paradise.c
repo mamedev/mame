@@ -45,7 +45,7 @@ WRITE8_HANDLER( paradise_palette_w )
 	paradise_state *state = (paradise_state *)space->machine->driver_data;
 	state->paletteram[offset] = data;
 	offset %= 0x800;
-	palette_set_color_rgb(space->machine, offset, state->paletteram[offset + 0x800 * 0], state->paletteram[offset + 0x800 * 1], 
+	palette_set_color_rgb(space->machine, offset, state->paletteram[offset + 0x800 * 0], state->paletteram[offset + 0x800 * 1],
 		state->paletteram[offset + 0x800 * 2]);
 }
 
@@ -254,7 +254,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 		return 0;
 
 	if (state->priority & 1)
-		if (layers_ctrl & 16)	
+		if (layers_ctrl & 16)
 			draw_sprites(screen->machine, bitmap, cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
@@ -266,15 +266,15 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 		if (!(state->priority & 1))
 			if (layers_ctrl & 16)
 				draw_sprites(screen->machine, bitmap, cliprect);
-		if (layers_ctrl & 8)	
+		if (layers_ctrl & 8)
 			tilemap_draw(bitmap,cliprect, state->tilemap_2, 0, 0);
 	}
 	else
 	{
-		if (layers_ctrl & 8)	
+		if (layers_ctrl & 8)
 			tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
 		if (!(state->priority & 1))
-			if (layers_ctrl & 16)	
+			if (layers_ctrl & 16)
 				draw_sprites(screen->machine, bitmap, cliprect);
 	}
 	return 0;

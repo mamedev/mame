@@ -179,7 +179,7 @@ typedef struct                      /* Voice state type             */
 	int             on_cnt;         /* Is it time to turn on yet?   */
 	int             pitch;          /* Sample pitch (4096->32000Hz) */
 	int             range;          /* Last header's range          */
- 	UINT32          samp_id;        /* Sample ID#                   */
+	UINT32          samp_id;        /* Sample ID#                   */
 	int             sampptr;        /* Where in sampbuf we are      */
 	signed long     smp1;           /* Last sample (for BRR filter) */
 	signed long     smp2;           /* Second-to-last sample decoded*/
@@ -202,7 +202,7 @@ struct _snes_sound_state
 	UINT8                   ipl_region[64];		/* SPC top 64 bytes */
 
 	int                     keyed_on;
-	int                     keys;      			/* 8-bits for 8 voices */
+	int                     keys;   			/* 8-bits for 8 voices */
 	voice_state_type        voice_state[8];
 
 	/* Noise stuff */
@@ -246,7 +246,7 @@ INLINE snes_sound_state *get_safe_token( running_device *device )
 
 
 /*-------------------------------------------------
- dsp_reset 
+ dsp_reset
 
  Reset emulated DSP
 -------------------------------------------------*/
@@ -285,9 +285,9 @@ static void dsp_reset( running_device *device )
 
 
 /*-------------------------------------------------
- dsp_update 
+ dsp_update
 
- Mix one sample of audio. sound_ptr is a pointer 
+ Mix one sample of audio. sound_ptr is a pointer
  to mix audio into
 -------------------------------------------------*/
 
@@ -320,10 +320,10 @@ static void dsp_update( running_device *device, short *sound_ptr )
 		dsp_reset(device);
 
 	/* Here we check for keys on/off.  Docs say that successive writes to KON/KOF
-	must be separated by at least 2 Ts periods or risk being neglected.
-	Therefore DSP only looks at these during an update, and not at the time of
-	the write.  Only need to do this once however, since the regs haven't
-	changed over the whole period we need to catch up with. */
+    must be separated by at least 2 Ts periods or risk being neglected.
+    Therefore DSP only looks at these during an update, and not at the time of
+    the write.  Only need to do this once however, since the regs haven't
+    changed over the whole period we need to catch up with. */
 #ifdef DBG_KEY
 	spc700->dsp_regs[0x4c] &= mask;
 #endif
@@ -332,8 +332,8 @@ static void dsp_update( running_device *device, short *sound_ptr )
 	spc700->dsp_regs[0x7c] &= ~spc700->dsp_regs[0x4c];
 
 	/* Question: what is the expected behavior when pitch modulation is enabled on
-	voice 0?  Jurassic Park 2 does this.  For now, using outx of zero for first
-	voice. */
+    voice 0?  Jurassic Park 2 does this.  For now, using outx of zero for first
+    voice. */
 	outx = 0;
 
 	/* Same table for noise and envelope */
@@ -377,10 +377,10 @@ static void dsp_update( running_device *device, short *sound_ptr )
 			vp->mixfrac    = 3 * 4096;
 
 			/* NOTE: Real SNES does *not* appear to initialize the envelope
-			counter to anything in particular.  The first cycle always seems to
-			come at a random time sooner than expected; as yet, I have been
-			unable to find any pattern.  I doubt it will matter though, so
-			we'll go ahead and do the full time for now. */
+            counter to anything in particular.  The first cycle always seems to
+            come at a random time sooner than expected; as yet, I have been
+            unable to find any pattern.  I doubt it will matter though, so
+            we'll go ahead and do the full time for now. */
 			vp->envcnt   = CNT_INIT;
 			vp->envstate = ATTACK;
 		}
@@ -419,7 +419,7 @@ static void dsp_update( running_device *device, short *sound_ptr )
 
 #ifndef NO_PMOD
 		/* Pitch mod uses OUTX from last voice for this one.  Luckily we haven't
-		modified OUTX since it was used for last voice. */
+        modified OUTX since it was used for last voice. */
 		if (spc700->dsp_regs[0x2d] & m)
 		{
 #ifdef DBG_PMOD
@@ -436,18 +436,18 @@ static void dsp_update( running_device *device, short *sound_ptr )
 			for ( ; vp->mixfrac >= 0; vp->mixfrac -= 4096)
 			{
 				/* This part performs the BRR decode 'on-the-fly'.  This is more
-				correct than the old way, which could be fooled if the data and/or
-				the loop point changed while the sample was playing, or if the BRR
-				decode didn't produce the same result every loop because of the
-				filters.  The event interface still has no chance of keeping up
-				with those kinds of tricks, though. */
+                correct than the old way, which could be fooled if the data and/or
+                the loop point changed while the sample was playing, or if the BRR
+                decode didn't produce the same result every loop because of the
+                filters.  The event interface still has no chance of keeping up
+                with those kinds of tricks, though. */
 				if (!vp->header_cnt)
 				{
 					if (vp->end & 1)
 					{
 						/* Docs say ENDX bit is set when decode of block with source
-						end flag set is done.  Does this apply to looping samples?
-						Some info I've seen suggests yes. */
+                        end flag set is done.  Does this apply to looping samples?
+                        Some info I've seen suggests yes. */
 						spc700->dsp_regs[0x7c] |= m;
 						if (vp->end & 2)
 						{
@@ -507,15 +507,15 @@ static void dsp_update( running_device *device, short *sound_ptr )
 #endif
 
 				/* For invalid ranges (D,E,F): if the nybble is negative, the result
-				is F000.  If positive, 0000.  Nothing else like previous range,
-				etc. seems to have any effect.  If range is valid, do the shift
-				normally.  Note these are both shifted right once to do the filters
-				properly, but the output will be shifted back again at the end. */
+                is F000.  If positive, 0000.  Nothing else like previous range,
+                etc. seems to have any effect.  If range is valid, do the shift
+                normally.  Note these are both shifted right once to do the filters
+                properly, but the output will be shifted back again at the end. */
 				if (vp->range <= 0xc)
 				{
 					outx = (outx << vp->range) >> 1;
 				}
- 				else
+				else
 				{
 					outx &= ~0x7ff;
 
@@ -581,19 +581,19 @@ static void dsp_update( running_device *device, short *sound_ptr )
 			else
 			{
 			/* Perform 4-Point Gaussian interpolation.  Take an approximation of a
-			Gaussian bell-curve, and move it through the sample data at a rate
-			determined by the pitch.  The sample output at any given time is
-			the sum of the products of each input sample point with the value
-			of the bell-curve corresponding to that point. */
+            Gaussian bell-curve, and move it through the sample data at a rate
+            determined by the pitch.  The sample output at any given time is
+            the sum of the products of each input sample point with the value
+            of the bell-curve corresponding to that point. */
 			vl  = vp->mixfrac >> 4;
 			vr  = ((G4[-vl] * vp->sampbuf[vp->sampptr]) >> 11 ) & ~1;
 			vr += ((G3[-vl] * vp->sampbuf[(vp->sampptr + 1) & 3]) >> 11) & ~1;
 			vr += ((G2[vl] * vp->sampbuf[(vp->sampptr + 2) & 3]) >> 11 ) & ~1;
 
 			/* This is to do the wrapping properly.  Based on my tests with the
-			SNES, it appears clipping is done only if it is the fourth addition
-			that would cause a wrap.  If it has already wrapped before the
-			fourth addition, it is not clipped. */
+            SNES, it appears clipping is done only if it is the fourth addition
+            that would cause a wrap.  If it has already wrapped before the
+            fourth addition, it is not clipped. */
 			vr  = (signed short)vr;
 			vr += ((G1[vl] * vp->sampbuf[(vp->sampptr + 3) & 3]) >> 11) & ~1;
 
@@ -643,7 +643,7 @@ static void dsp_update( running_device *device, short *sound_ptr )
 
 #ifndef NO_ECHO
 	/* Perform echo.  First, read mem at current location, and put those samples
-   	into the FIR filter queue. */
+    into the FIR filter queue. */
 #ifdef DBG_ECHO
 	logerror("Echo delay=%dms, feedback=%d%%\n", spc700->dsp_regs[0x7d] * 16,
 		((signed char)spc700->dsp_regs[0x0d] * 100) / 0x7f);
@@ -766,9 +766,9 @@ static void dsp_update( running_device *device, short *sound_ptr )
 
 
 /*-------------------------------------------------
- advance_envelope 
+ advance_envelope
 
- Run envelope step & return ENVX. v is the voice 
+ Run envelope step & return ENVX. v is the voice
  to process envelope for.
 -------------------------------------------------*/
 
@@ -785,11 +785,11 @@ static int advance_envelope( running_device *device, int v )
 	if (spc700->voice_state[v].envstate == RELEASE)
 	{
 		/* Docs: "When in the state of "key off". the "click" sound is prevented
-		by the addition of the fixed value 1/256"  WTF???  Alright, I'm going
-		to choose to interpret that this way:  When a note is keyed off, start
-		the RELEASE state, which subtracts 1/256th each sample period (32kHz).
-		Note there's no need for a count because it always happens every
-		update. */
+        by the addition of the fixed value 1/256"  WTF???  Alright, I'm going
+        to choose to interpret that this way:  When a note is keyed off, start
+        the RELEASE state, which subtracts 1/256th each sample period (32kHz).
+        Note there's no need for a count because it always happens every
+        update. */
 		envx -= 0x8;                    /* 0x8 / 0x800 = 1/256th        */
 		if (envx <= 0)
 		{
@@ -817,8 +817,8 @@ static int advance_envelope( running_device *device, int v )
 		{
 		case ATTACK:
 			/* Docs are very confusing.  "AR is multiplied by the fixed value
-			1/64..."  I believe it means to add 1/64th to ENVX once every
-			time ATTACK is updated, and that's what I'm going to implement. */
+            1/64..."  I believe it means to add 1/64th to ENVX once every
+            time ATTACK is updated, and that's what I'm going to implement. */
 			t = adsr1 & 0x0f;
 
 	            if (t == 0x0f)
@@ -855,8 +855,8 @@ static int advance_envelope( running_device *device, int v )
 
 		case DECAY:
 			/* Docs: "DR... [is multiplied] by the fixed value 1-1/256."
-			Well, at least that makes some sense.  Multiplying ENVX by
-			255/256 every time DECAY is updated. */
+            Well, at least that makes some sense.  Multiplying ENVX by
+            255/256 every time DECAY is updated. */
 			cnt -= ENVCNT[((adsr1 >> 3) & 0x0e) + 0x10];
 
 			if (cnt <= 0)
@@ -877,7 +877,7 @@ static int advance_envelope( running_device *device, int v )
 
 		case SUSTAIN:
 			/* Docs: "SR [is multiplied] by the fixed value 1-1/256."
-			Multiplying ENVX by 255/256 every time SUSTAIN is updated. */
+            Multiplying ENVX by 255/256 every time SUSTAIN is updated. */
 #ifdef DBG_ENV
 			if (ENVCNT[SR(v)] == 0)
 				logerror("ENV voice %d: envx=%03X, state=SUSTAIN, zero rate\n", v, envx);
@@ -906,14 +906,14 @@ static int advance_envelope( running_device *device, int v )
 	else
 	{
 		/* GAIN mode is set
-		Note: if the game switches between ADSR and GAIN modes partway
-		through, should the count be reset, or should it continue from
-		where it was?  Does the DSP actually watch for that bit to
-		change, or does it just go along with whatever it sees when it
-		performs the update?  I'm going to assume the latter and not
-		update the count, unless I see a game that obviously wants the
-		other behavior.  The effect would be pretty subtle, in any case.
-		*/
+        Note: if the game switches between ADSR and GAIN modes partway
+        through, should the count be reset, or should it continue from
+        where it was?  Does the DSP actually watch for that bit to
+        change, or does it just go along with whatever it sees when it
+        performs the update?  I'm going to assume the latter and not
+        update the count, unless I see a game that obviously wants the
+        other behavior.  The effect would be pretty subtle, in any case.
+        */
 		t = spc700->dsp_regs[(v << 4) + 7];
 
 		if (t < 0x80)
@@ -987,7 +987,7 @@ static int advance_envelope( running_device *device, int v )
 
 			case 7:
 				/* Docs: "Increase (bent line): Addition of the constant
-                  	 1/64 up to .75 of the constaint <sic> 1/256 from .75 to 1." */
+                     1/64 up to .75 of the constaint <sic> 1/256 from .75 to 1." */
 				cnt -= ENVCNT[t & 0x1f];
 
 				if (cnt > 0)
@@ -1052,7 +1052,7 @@ static STREAM_UPDATE( snes_sh_update )
 
 
 /***************************
-         I/O for DSP        
+         I/O for DSP
  ***************************/
 
 static READ8_DEVICE_HANDLER( snes_dsp_io_r )
@@ -1089,7 +1089,7 @@ static WRITE8_DEVICE_HANDLER( snes_dsp_io_w )
 }
 
 /***************************
-       I/O for SPC700       
+       I/O for SPC700
  ***************************/
 
 READ8_DEVICE_HANDLER( spc_io_r )
@@ -1192,7 +1192,7 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 		case 0xa:		/* Timer 0 */
 		case 0xb:		/* Timer 1 */
 		case 0xc:		/* Timer 2 */
-			if (data == 0) 
+			if (data == 0)
 				data = 255;
 			break;
 		case 0xd:		/* Counter 0 */
@@ -1249,7 +1249,7 @@ WRITE8_DEVICE_HANDLER( spc_port_in )
 UINT8 *spc_get_ram( running_device *device )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
-	
+
 	return spc700->ram;
 }
 
@@ -1296,8 +1296,8 @@ static void state_register( running_device *device )
 		state_save_register_device_item(device, v, spc700->voice_state[v].mixfrac);
 		state_save_register_device_item(device, v, spc700->voice_state[v].on_cnt);
 		state_save_register_device_item(device, v, spc700->voice_state[v].pitch);
- 		state_save_register_device_item(device, v, spc700->voice_state[v].range);
- 		state_save_register_device_item(device, v, spc700->voice_state[v].samp_id);
+		state_save_register_device_item(device, v, spc700->voice_state[v].range);
+		state_save_register_device_item(device, v, spc700->voice_state[v].samp_id);
 		state_save_register_device_item(device, v, spc700->voice_state[v].sampptr);
 		state_save_register_device_item(device, v, spc700->voice_state[v].smp1);
 		state_save_register_device_item(device, v, spc700->voice_state[v].smp2);

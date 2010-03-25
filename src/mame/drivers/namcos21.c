@@ -1880,7 +1880,7 @@ ROM_START( cybsled )
 	ROM_LOAD("cy1-voi3.12e",0x180000,0x80000,CRC(c902b4a4) SHA1(816357ec1a02a7ebf817ac1182e9c50ce5ca71f6) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "cybsled.nv",  0x000000, 0x2000, CRC(aa18bf9e) SHA1(3712d4d20e5f5f1c920e3f1f6a00101e874662d0) )			
+	ROM_LOAD( "cybsled.nv",  0x000000, 0x2000, CRC(aa18bf9e) SHA1(3712d4d20e5f5f1c920e3f1f6a00101e874662d0) )
 ROM_END
 
 ROM_START( cybsledj )
@@ -1937,7 +1937,7 @@ ROM_START( cybsledj )
 	ROM_LOAD("cy1-voi3.12e",0x180000,0x80000,CRC(c902b4a4) SHA1(816357ec1a02a7ebf817ac1182e9c50ce5ca71f6) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "cybsledj.nv",  0x000000, 0x2000, CRC(a73bb03e) SHA1(e074bfeae14178c867070e06f6690ed13115f5fa) )				
+	ROM_LOAD( "cybsledj.nv",  0x000000, 0x2000, CRC(a73bb03e) SHA1(e074bfeae14178c867070e06f6690ed13115f5fa) )
 ROM_END
 
 ROM_START( driveyes )

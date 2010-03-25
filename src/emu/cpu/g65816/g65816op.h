@@ -688,11 +688,11 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			r0 = REGISTER_A;	\
 			r1 = SRC;		\
 			carry = CFLAG_AS_1();	\
-			if (!FLAG_D) 	\
+			if (!FLAG_D)	\
 			{	\
 				result = r0 + r1 + carry;	\
-			} 	\
-			else 	\
+			}	\
+			else	\
 			{	\
 				result = (r0 & 0x000f) + (r1 & 0x000f) + (carry <<  0);	\
 				if(result > 0x0009) result += 0x0006;	\
@@ -710,7 +710,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			if (FLAG_D && result > 0x9fff) result += 0x6000;	\
 			FLAG_C = (result > 0xffff) ? 0x100 : 0;	\
 			FLAG_Z = REGISTER_A = MAKE_UINT_16(result);			\
-			FLAG_N = NFLAG_16(REGISTER_A);								
+			FLAG_N = NFLAG_16(REGISTER_A);
 #endif
 
 /* M6502   Logical AND with accumulator */
@@ -1548,11 +1548,11 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			r1 = SRC;		\
 			r1 ^= 0xffff;		\
 			carry = CFLAG_AS_1();	\
-			if (!FLAG_D) 	\
+			if (!FLAG_D)	\
 			{	\
 				result = r0 + r1 + carry;	\
-			} 	\
-			else 	\
+			}	\
+			else	\
 			{	\
 				result = (r0 & 0x000f) + (r1 & 0x000f) + (carry <<  0);	\
 				if(result <= 0x000f) result -= 0x0006;	\
@@ -1570,7 +1570,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			if (FLAG_D && result <= 0xffff) result -= 0x6000;	\
 			FLAG_C = (result > 0xffff) ? 0x100 : 0;	\
 			FLAG_Z = REGISTER_A = MAKE_UINT_16(result);			\
-			FLAG_N = NFLAG_16(REGISTER_A);								
+			FLAG_N = NFLAG_16(REGISTER_A);
 #endif
 
 

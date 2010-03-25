@@ -528,7 +528,7 @@ static READ8_HANDLER( berzerk_audio_r )
 	switch (offset)
 	{
 	/* offset 4 reads from the S14001A */
-	case 4: 
+	case 4:
 		return (!s14001a_bsy_r(device)) ? 0x40 : 0x00;
 	/* offset 6 is open bus */
 	case 6:
@@ -646,7 +646,7 @@ static INPUT_PORTS_START( joystick ) // used on all games except moonwarp
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -658,7 +658,7 @@ static INPUT_PORTS_START( joystick ) // used on all games except moonwarp
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
-	
+
 static INPUT_PORTS_START( common ) // used on all games
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -674,19 +674,19 @@ static INPUT_PORTS_START( common ) // used on all games
 	PORT_CONFSETTING(    0x00, "Wells-Gardner" )
 	PORT_CONFSETTING(    0x01, "Electrohome" )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("SW2")
 	/* port for the 'bookkeeping reset' and 'bookkeeping' buttons;
-	 * The 'bookkeeping reset' button is an actual button on the zpu-1000 and
-	 * zpu-1001 pcbs, labeled 'S2' or 'SW2'. It is wired to bit 0.
-	 * * pressing it while high scores are displayed will give a free game 
-	 *   without adding any coin info to the bookkeeping info in nvram.
-	 * The 'bookkeeping' button is wired to the control panel, usually hidden
-	 * underneath or only accessible through the coin door. Wired to bit 7.
-	 * * It displays various bookkeeping statistics when pressed sequentially.
-	 *   Pressing P1 fire (according to the manual) when stats are displayed
-	 *   will clear the stat shown on screen.
-	 */
+     * The 'bookkeeping reset' button is an actual button on the zpu-1000 and
+     * zpu-1001 pcbs, labeled 'S2' or 'SW2'. It is wired to bit 0.
+     * * pressing it while high scores are displayed will give a free game
+     *   without adding any coin info to the bookkeeping info in nvram.
+     * The 'bookkeeping' button is wired to the control panel, usually hidden
+     * underneath or only accessible through the coin door. Wired to bit 7.
+     * * It displays various bookkeeping statistics when pressed sequentially.
+     *   Pressing P1 fire (according to the manual) when stats are displayed
+     *   will clear the stat shown on screen.
+     */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Free Game (not logged in bookkeeping)")
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Bookkeeping") PORT_CODE(KEYCODE_F1)
@@ -743,7 +743,7 @@ static INPUT_PORTS_START( berzerkg )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )	
+	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( frenzy )
@@ -757,7 +757,7 @@ static INPUT_PORTS_START( frenzy )
 	/* Bit 0 does some more hardware tests. According to the manual, both bit 0 & 1 must be:
        - ON for Signature Analysis (S.A.)
        - OFF for game operation     */
-	//PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )	// F2:1,2
+	//PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )  // F2:1,2
 	PORT_DIPNAME( 0x03, 0x00, "Hardware Tests" ) PORT_DIPLOCATION("F2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, "Color test" )
@@ -903,7 +903,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // is wired high for upright harness, low for cocktail; if high, cocktail dipswitch is ignored.
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // Hyper flip button is common for both players in cocktail mode.
-	
+
 	PORT_START("P1")
 	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) // spinner/dial
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
@@ -918,7 +918,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	
+
 	PORT_START("P2_DIAL")
     PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL PORT_RESET
 

@@ -82,7 +82,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pasha2_state(machine)); }
 
 	pasha2_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT16 *     bitmap0;
 	UINT16 *     bitmap1;
