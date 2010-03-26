@@ -6925,6 +6925,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hiimpact )	/* (c) 1990 Williams */
 	DRIVER( hiimpact4 )	/* (c) 1990 Williams */
 	DRIVER( hiimpact3 )	/* (c) 1990 Williams */
+	DRIVER( hiimpact2 )	/* (c) 1990 Williams */
 	DRIVER( hiimpact1 )	/* (c) 1990 Williams */
 	DRIVER( hiimpactp )	/* (c) 1990 Williams */
 	DRIVER( shimpact )	/* (c) 1991 Midway */

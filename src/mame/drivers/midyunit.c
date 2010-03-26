@@ -1848,6 +1848,41 @@ ROM_START( hiimpact3 )
 ROM_END
 
 
+ROM_START( hiimpact2 )
+	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
+	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
+	ROM_LOAD ( "sl1u19.bin", 0x30000, 0x20000, CRC(0ea22c89) SHA1(6d4579f6b10cac685be01348451b3537a0626034) )
+	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "u105-la2",  0xc0000, 0x20000, CRC(25d83ba1) SHA1(4422a34b2957aabb3f0a26ca129e290dfc062933) )
+	ROM_LOAD16_BYTE( "u89-la2",   0xc0001, 0x20000, CRC(811f1253) SHA1(125a6cca26d37fae343b78046774f54ee6e8d996) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD ( "la1u111.bin",  0x000000, 0x20000, CRC(49560560) SHA1(03d51e6019afa9a396c91a484969be4922fa4c99) )
+	ROM_LOAD ( "la1u112.bin",  0x020000, 0x20000, CRC(4dd879dc) SHA1(ac4f02fcb933df38f1ebf51b109092b77563b684) )
+	ROM_LOAD ( "la1u113.bin",  0x040000, 0x20000, CRC(b67aeb70) SHA1(dd1512329c46da4254712712b6f847544f4487bd) )
+	ROM_LOAD ( "la1u114.bin",  0x060000, 0x20000, CRC(9a4bc44b) SHA1(309eb5214fe5e1fe64d724d515190a31fc524aae) )
+
+	ROM_LOAD (  "la1u95.bin",  0x200000, 0x20000, CRC(e1352dc0) SHA1(7faa2cfa9ebaf2d99b243232316221b672869703) )
+	ROM_LOAD (  "la1u96.bin",  0x220000, 0x20000, CRC(197d0f34) SHA1(2d544588c3241423188ac7fb7aff87043fdd063d) )
+	ROM_LOAD (  "la1u97.bin",  0x240000, 0x20000, CRC(908ea575) SHA1(79802d8df4e016d178be98333d2b1d047a27eccc) )
+	ROM_LOAD (  "la1u98.bin",  0x260000, 0x20000, CRC(6dcbab11) SHA1(7432172810fd4b922b61769c68d86f24769a42cf) )
+
+	ROM_LOAD ( "la1u106.bin",  0x400000, 0x20000, CRC(7d0ead0d) SHA1(1e65b6e7e629021d70603df37db5fa89cfe93175) )
+	ROM_LOAD ( "la1u107.bin",  0x420000, 0x20000, CRC(ef48e8fa) SHA1(538de37cd8342085ec27f67292a7eeb1007e3b1f) )
+	ROM_LOAD ( "la1u108.bin",  0x440000, 0x20000, CRC(5f363e12) SHA1(da398c0204f785aad4c52007d2f25031ecc1c63f) )
+	ROM_LOAD ( "la1u109.bin",  0x460000, 0x20000, CRC(3689fbbc) SHA1(d95c0a2e3abf977ba7a899e419c22d004020c560) )
+
+	ROM_REGION( 0x1100, "plds", 0 )
+	ROM_LOAD( "ep610.u8",    0x0000, 0x032f, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pls153a.u40", 0x0400, 0x00eb, CRC(69e5143f) SHA1(1a1e7b3233f7d5a1c161564710e8e984a9b0a16c) )
+	ROM_LOAD( "ep610.u51",   0x0500, 0x032f, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "ep610.u52",   0x0900, 0x032f, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "ep610.u65",   0x0d00, 0x032f, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+
 ROM_START( hiimpact1 )
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "sl1u4.bin", 0x10000, 0x20000, CRC(28effd6a) SHA1(4a839f15e1b453a22fdef7b1801b8cc5cfdf3c29) )
@@ -2402,7 +2437,7 @@ ROM_START( term2la1 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "t2-la1.105", 0x00000, 0x80000, CRC(ca52a8b0) SHA1(20b91bdd9fe8e7be6a3c3cb9684769733d66d401) )
-	ROM_LOAD16_BYTE( "t2-la1.89", 0x00001, 0x80000, CRC(08535210) SHA1(a7986541bc504294bd6523ce691e19e496f8be7c) )
+	ROM_LOAD16_BYTE( "t2-la1.89",  0x00001, 0x80000, CRC(08535210) SHA1(a7986541bc504294bd6523ce691e19e496f8be7c) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD ( "t2.111", 0x000000, 0x80000, CRC(916d0197) SHA1(3b53d3770955b10cc6002e3d3bf0f71429667af0) )
@@ -2515,6 +2550,7 @@ GAME( 1990, smashtv3, smashtv,  yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0,
 GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", GAME_SUPPORTS_SAVE )
 
