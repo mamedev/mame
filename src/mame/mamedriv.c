@@ -4030,7 +4030,8 @@ DokiDoki Penguin Land *not confirmed
 						/* 1990.05 G-LOC Air Battle (Japan) */
 	DRIVER( glocr360 )	/* 1990.?? G-LOC (R360, World?) */
 	DRIVER( strkfgtr )	/* 1991.06 Strike Fighter (Japan) */
-	DRIVER( rchase )	/* 1991.09 Rail Chase (Japan) */
+	DRIVER( rchase )	/* 1991.09 Rail Chase (World) */
+	DRIVER( rchasej )	/* 1991.09 Rail Chase (Japan) */
 						/* 1991.09 Rail Chase (US) */
 
 	/* Sega System 24 games */
