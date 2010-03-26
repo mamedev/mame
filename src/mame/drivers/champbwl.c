@@ -408,10 +408,13 @@ ROM_START( champbwl )
 	ROM_LOAD( "ab001009.u27", 0x0200, 0x0200, CRC(3bbd4bcd) SHA1(8c87ccc42ece2432b8ad25f8679cdf886e12a43c) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
-	ROM_LOAD( "ab003003.3-3", 0x00000, 0x40000, CRC(ad40ad10) SHA1(db0e5744ea3fcda87345b545031f82fcb3fec175) )
-	ROM_LOAD( "ab003002.3-2", 0x40000, 0x40000, CRC(7ede8f28) SHA1(b5519c09b4f0019dc76cadca725da1d581912540) )
-	ROM_LOAD( "ab002003.2-3", 0x80000, 0x40000, CRC(3051b8c3) SHA1(5f53596d7af1c79db1dde4bdca3878e07c67b5d1) )
-	ROM_LOAD( "ab002002.2-2", 0xc0000, 0x40000, CRC(42ebe997) SHA1(1808b9e5e996a395c1d48ac001067f736f96feec) )
+	ROM_LOAD( "ab002002.2-2", 0x00000, 0x40000, CRC(42ebe997) SHA1(1808b9e5e996a395c1d48ac001067f736f96feec) ) // jingles (for strike, spare etc.)
+	ROM_LOAD( "ab003002.3-2", 0x40000, 0x40000, CRC(7ede8f28) SHA1(b5519c09b4f0019dc76cadca725da1d581912540) ) // basic coin + ball sounds
+	ROM_LOAD( "ab002003.2-3", 0x80000, 0x40000, CRC(3051b8c3) SHA1(5f53596d7af1c79db1dde4bdca3878e07c67b5d1) ) // 'welcome to.. , strike' speech etc.
+	ROM_LOAD( "ab003003.3-3", 0xc0000, 0x40000, CRC(ad40ad10) SHA1(db0e5744ea3fcda87345b545031f82fcb3fec175) ) // 'spare' speech etc.
+
+	ROM_REGION( 0x800, "nvram", 0 ) /* default settings, allows game to boot first time without having to reset it */
+	ROM_LOAD( "champbwl.nv",  0x000, 0x800, CRC(1d46aa8e) SHA1(a733cf86cfb26d98fb4c491d7f779a7a1c8ff228) )				
 ROM_END
 
 GAME( 1989, champbwl, 0, champbwl, champbwl, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling", GAME_SUPPORTS_SAVE )
