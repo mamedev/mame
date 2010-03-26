@@ -301,11 +301,11 @@ static void snes_dynamic_res_change( running_machine *machine )
 	attoseconds_t refresh;
 
 	visarea.min_x = visarea.min_y = 0;
-	visarea.max_y = snes_ppu.beam.last_visible_line * snes_ppu.interlace - 1;
+	visarea.max_y = snes_ppu.beam.last_visible_line*snes_ppu.interlace - 1;
 	visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
 
 	// fixme: should compensate for SNES_DBG_video
-	if (snes_ppu.mode == 5 || snes_ppu.mode == 6 || snes_ppu.pseudo_hires)
+	if (snes_ppu.mode == 5 || snes_ppu.mode == 6 )
 		state->htmult = 2;
 	else
 		state->htmult = 1;
@@ -317,9 +317,9 @@ static void snes_dynamic_res_change( running_machine *machine )
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
 
 	if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
-		video_screen_configure(machine->primary_screen, SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * snes_ppu.interlace, &visarea, refresh);
+		video_screen_configure(machine->primary_screen, SNES_HTOTAL*2, SNES_VTOTAL_NTSC*snes_ppu.interlace, &visarea, refresh);
 	else
-		video_screen_configure(machine->primary_screen, SNES_HTOTAL * 2, SNES_VTOTAL_PAL * snes_ppu.interlace, &visarea, refresh);
+		video_screen_configure(machine->primary_screen, SNES_HTOTAL*2, SNES_VTOTAL_PAL*snes_ppu.interlace, &visarea, refresh);
 }
 
 static READ8_HANDLER( snes_open_bus_r )
@@ -411,37 +411,30 @@ READ8_HANDLER( snes_r_io )
 		case WBGLOG:
 			return snes_ppu.ppu1_open_bus;
 
-// According to BSNES, these should return snes_open_bus_r!
-//      case OAMADDL:
-//      case OAMADDH:
-//      case VMADDH:
-//      case CGADD:
-//      case CGDATA:
-//          return snes_ram[offset];
 		case MPYL:		/* Multiplication result (low) */
 			{
 				/* Perform 16bit * 8bit multiply */
-				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
+				UINT32 c = (INT16)snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
 				snes_ppu.ppu1_open_bus = c & 0xff;
 				return snes_ppu.ppu1_open_bus;
 			}
 		case MPYM:		/* Multiplication result (mid) */
 			{
 				/* Perform 16bit * 8bit multiply */
-				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
+				UINT32 c = (INT16)snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
 				snes_ppu.ppu1_open_bus = (c >> 8) & 0xff;
 				return snes_ppu.ppu1_open_bus;
 			}
 		case MPYH:		/* Multiplication result (high) */
 			{
 				/* Perform 16bit * 8bit multiply */
-				UINT32 c = snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
+				UINT32 c = (INT16)snes_ppu.mode7.matrix_a * (INT8)(snes_ppu.mode7.matrix_b >> 8);
 				snes_ppu.ppu1_open_bus = (c >> 16) & 0xff;
 				return snes_ppu.ppu1_open_bus;
 			}
 		case SLHV:		/* Software latch for H/V counter */
 			snes_latch_counters(space->machine);
-			return snes_open_bus_r(space,0);		/* Return value is meaningless */
+			return snes_open_bus_r(space, 0);		/* Return value is meaningless */
 		case ROAMDATA:	/* Read data from OAM (DR) */
 			{
 				int oam_addr = snes_ppu.oam.address;
@@ -489,8 +482,9 @@ READ8_HANDLER( snes_r_io )
 					snes_ram[VMADDL] = addr & 0xff;
 					snes_ram[VMADDH] = (addr >> 8) & 0xff;
 				}
+
+				return snes_ppu.ppu1_open_bus;
 			}
-			return snes_ppu.ppu1_open_bus;
 		case RVMDATAH:	/* Read data from VRAM (high) */
 			{
 				UINT32 addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
@@ -515,8 +509,9 @@ READ8_HANDLER( snes_r_io )
 					snes_ram[VMADDL] = addr & 0xff;
 					snes_ram[VMADDH] = (addr >> 8) & 0xff;
 				}
+
+				return snes_ppu.ppu1_open_bus;
 			}
-			return snes_ppu.ppu1_open_bus;
 		case RCGDATA:	/* Read data from CGRAM */
 				if (!(state->cgram_address & 0x01))
 				{
@@ -570,7 +565,7 @@ READ8_HANDLER( snes_r_io )
 			state->read_ophct = 0;
 			state->read_opvct = 0;
 			value = snes_ram[offset];
-			value |= (snes_ppu.ppu1_open_bus & 0x20);
+			value |= (snes_ppu.ppu2_open_bus & 0x20);
 			value |= (snes_ppu.ppu2_version & 0x0f);
 			snes_ram[offset] = value;	// not sure if this is needed...
 			snes_ppu.ppu2_open_bus = value;
@@ -618,11 +613,11 @@ READ8_HANDLER( snes_r_io )
 		case VTIMEH:
 			return snes_ram[offset];
 		case RDNMI:			/* NMI flag by v-blank and version number */
-			value = (snes_ram[offset] & 0x8f) | (snes_open_bus_r(space,0) & 0x70);
+			value = (snes_ram[offset] & 0x8f) | (snes_open_bus_r(space, 0) & 0x70);
 			snes_ram[offset] &= 0x7f;	/* NMI flag is reset on read */
 			return value;
 		case TIMEUP:		/* IRQ flag by H/V count timer */
-			value = (snes_open_bus_r(space,0) & 0x7f) | (snes_ram[TIMEUP] & 0x80);
+			value = (snes_open_bus_r(space, 0) & 0x7f) | (snes_ram[TIMEUP] & 0x80);
 			cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
 			snes_ram[TIMEUP] = 0;
 			return value;
@@ -630,7 +625,7 @@ READ8_HANDLER( snes_r_io )
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
 //          if (video_screen_get_hpos(space->machine->primary_screen) >= 363) snes_ram[offset] |= 0x40;
 //              else snes_ram[offset] &= ~0x40;
-			return (snes_ram[offset] & 0xc1) | (snes_open_bus_r(space,0) & 0x3e);
+			return (snes_ram[offset] & 0xc1) | (snes_open_bus_r(space, 0) & 0x3e);
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */
 			return snes_ram[WRIO];
 		case RDDIVL:		/* Quotient of divide result (low) */
@@ -654,31 +649,30 @@ READ8_HANDLER( snes_r_io )
 			return state->joy4l;
 		case JOY4H:			/* Joypad 4 status register (high) */
 			return state->joy4h;
-		case DMAP0:
-		case DMAP1:
-		case DMAP2:
-		case DMAP3:
-		case DMAP4:
-		case DMAP5:
-		case DMAP6:
-		case DMAP7:
-//          return (snes_ram[offset] & 0xdf) | (snes_open_bus_r(space,0) & 0x20);
-		case BBAD0: case A1T0L: case A1T0H: case A1B0: case DAS0L:
-		case DAS0H: case DSAB0: case A2A0L: case A2A0H: case NTRL0:
-		case BBAD1: case A1T1L: case A1T1H: case A1B1: case DAS1L:
-		case DAS1H: case DSAB1: case A2A1L: case A2A1H: case NTRL1:
-		case BBAD2: case A1T2L: case A1T2H: case A1B2: case DAS2L:
-		case DAS2H: case DSAB2: case A2A2L: case A2A2H: case NTRL2:
-		case BBAD3: case A1T3L: case A1T3H: case A1B3: case DAS3L:
-		case DAS3H: case DSAB3: case A2A3L: case A2A3H: case NTRL3:
-		case BBAD4: case A1T4L: case A1T4H: case A1B4: case DAS4L:
-		case DAS4H: case DSAB4: case A2A4L: case A2A4H: case NTRL4:
-		case BBAD5: case A1T5L: case A1T5H: case A1B5: case DAS5L:
-		case DAS5H: case DSAB5: case A2A5L: case A2A5H: case NTRL5:
-		case BBAD6: case A1T6L: case A1T6H: case A1B6: case DAS6L:
-		case DAS6H: case DSAB6: case A2A6L: case A2A6H: case NTRL6:
-		case BBAD7: case A1T7L: case A1T7H: case A1B7: case DAS7L:
-		case DAS7H: case DSAB7: case A2A7L: case A2A7H: case NTRL7:
+		case DMAP0:	case DMAP1: case DMAP2: case DMAP3: /*0x43n0*/
+		case DMAP4: case DMAP5: case DMAP6: case DMAP7:
+		case BBAD0: case BBAD1: case BBAD2: case BBAD3: /*0x43n1*/
+		case BBAD4: case BBAD5: case BBAD6: case BBAD7: 
+		case A1T0L: case A1T1L: case A1T2L: case A1T3L: /*0x43n2*/
+		case A1T4L: case A1T5L: case A1T6L: case A1T7L: 
+		case A1T0H: case A1T1H: case A1T2H: case A1T3H: /*0x43n3*/
+		case A1T4H: case A1T5H: case A1T6H: case A1T7H: 
+		case A1B0: case A1B1: case A1B2: case A1B3:     /*0x43n4*/
+		case A1B4: case A1B5: case A1B6: case A1B7: 
+		case DAS0L: case DAS1L: case DAS2L: case DAS3L: /*0x43n5*/ 
+		case DAS4L: case DAS5L: case DAS6L: case DAS7L: 
+		case DAS0H: case DAS1H: case DAS2H: case DAS3H: /*0x43n6*/ 
+		case DAS4H: case DAS5H: case DAS6H: case DAS7H: 
+		case DSAB0: case DSAB1: case DSAB2: case DSAB3: /*0x43n7*/ 
+		case DSAB4: case DSAB5: case DSAB6: case DSAB7: 
+		case A2A0L: case A2A1L: case A2A2L: case A2A3L: /*0x43n8*/
+		case A2A4L: case A2A5L: case A2A6L: case A2A7L: 
+		case A2A0H: case A2A1H: case A2A2H: case A2A3H: /*0x43n9*/
+		case A2A4H: case A2A5H: case A2A6H: case A2A7H: 
+		case NTRL0: case NTRL1: case NTRL2: case NTRL3: /*0x43na*/
+		case NTRL4: case NTRL5: case NTRL6: case NTRL7: 
+		case 0x430b: case 0x431b: case 0x432b: case 0x433b: /* according to bsnes, this does not return open_bus (even if its precise effect is unknown) */
+		case 0x434b: case 0x435b: case 0x436b: case 0x437b: 
 			return snes_ram[offset];
 
 #ifndef MESS
@@ -696,7 +690,7 @@ READ8_HANDLER( snes_r_io )
 	//printf("unsupported read: offset == %08x\n", offset);
 
 	/* Unsupported reads returns open bus */
-//  printf("%02x %02x\n",offset,snes_open_bus_r(space,0));
+//  printf("%02x %02x\n",offset,snes_open_bus_r(space, 0));
 	return snes_open_bus_r(space, 0);
 }
 
@@ -840,7 +834,6 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.update_offsets = 1;
 			break;
 		case MOSAIC:	/* Size and screen designation for mosaic */
-			/* FIXME: We support horizontal mosaic only partially */
 			snes_ppu.mosaic_size = (data & 0xf0) >> 4;
 			snes_ppu.layer[SNES_BG1].mosaic_enabled = BIT(data, 0);
 			snes_ppu.layer[SNES_BG2].mosaic_enabled = BIT(data, 1);
@@ -1299,7 +1292,7 @@ WRITE8_HANDLER( snes_w_io )
 		case TIMEUP:
 			snes_ram[TIMEUP] = data &~0x7f;
 			return;
-	/* Following are read-only */
+		/* Following are read-only */
 		case HVBJOY:	/* H/V blank and joypad enable */
 		case MPYL:		/* Multiplication result (low) */
 		case MPYM:		/* Multiplication result (mid) */
@@ -1321,23 +1314,31 @@ WRITE8_HANDLER( snes_w_io )
 			logerror( "Write to read-only register: %X value: %X", offset, data );
 #endif /* MAME_DEBUG */
 			return;
-	/* Below is all DMA related */
-		case DMAP0: case BBAD0: case A1T0L: case A1T0H: case A1B0: case DAS0L:
-		case DAS0H: case DSAB0: case A2A0L: case A2A0H: case NTRL0:
-		case DMAP1: case BBAD1: case A1T1L: case A1T1H: case A1B1: case DAS1L:
-		case DAS1H: case DSAB1: case A2A1L: case A2A1H: case NTRL1:
-		case DMAP2: case BBAD2: case A1T2L: case A1T2H: case A1B2: case DAS2L:
-		case DAS2H: case DSAB2: case A2A2L: case A2A2H: case NTRL2:
-		case DMAP3: case BBAD3: case A1T3L: case A1T3H: case A1B3: case DAS3L:
-		case DAS3H: case DSAB3: case A2A3L: case A2A3H: case NTRL3:
-		case DMAP4: case BBAD4: case A1T4L: case A1T4H: case A1B4: case DAS4L:
-		case DAS4H: case DSAB4: case A2A4L: case A2A4H: case NTRL4:
-		case DMAP5: case BBAD5: case A1T5L: case A1T5H: case A1B5: case DAS5L:
-		case DAS5H: case DSAB5: case A2A5L: case A2A5H: case NTRL5:
-		case DMAP6: case BBAD6: case A1T6L: case A1T6H: case A1B6: case DAS6L:
-		case DAS6H: case DSAB6: case A2A6L: case A2A6H: case NTRL6:
-		case DMAP7: case BBAD7: case A1T7L: case A1T7H: case A1B7: case DAS7L:
-		case DAS7H: case DSAB7: case A2A7L: case A2A7H: case NTRL7:
+		/* Below is all DMA related */
+		case DMAP0:	case DMAP1: case DMAP2: case DMAP3: /*0x43n0*/
+		case DMAP4: case DMAP5: case DMAP6: case DMAP7:
+		case BBAD0: case BBAD1: case BBAD2: case BBAD3: /*0x43n1*/
+		case BBAD4: case BBAD5: case BBAD6: case BBAD7: 
+		case A1T0L: case A1T1L: case A1T2L: case A1T3L: /*0x43n2*/
+		case A1T4L: case A1T5L: case A1T6L: case A1T7L: 
+		case A1T0H: case A1T1H: case A1T2H: case A1T3H: /*0x43n3*/
+		case A1T4H: case A1T5H: case A1T6H: case A1T7H: 
+		case A1B0: case A1B1: case A1B2: case A1B3:     /*0x43n4*/
+		case A1B4: case A1B5: case A1B6: case A1B7: 
+		case DAS0L: case DAS1L: case DAS2L: case DAS3L: /*0x43n5*/ 
+		case DAS4L: case DAS5L: case DAS6L: case DAS7L: 
+		case DAS0H: case DAS1H: case DAS2H: case DAS3H: /*0x43n6*/ 
+		case DAS4H: case DAS5H: case DAS6H: case DAS7H: 
+		case DSAB0: case DSAB1: case DSAB2: case DSAB3: /*0x43n7*/ 
+		case DSAB4: case DSAB5: case DSAB6: case DSAB7: 
+		case A2A0L: case A2A1L: case A2A2L: case A2A3L: /*0x43n8*/
+		case A2A4L: case A2A5L: case A2A6L: case A2A7L: 
+		case A2A0H: case A2A1H: case A2A2H: case A2A3H: /*0x43n9*/
+		case A2A4H: case A2A5H: case A2A6H: case A2A7H: 
+		case NTRL0: case NTRL1: case NTRL2: case NTRL3: /*0x43na*/
+		case NTRL4: case NTRL5: case NTRL6: case NTRL7: 
+		case 0x430b: case 0x431b: case 0x432b: case 0x433b:
+		case 0x434b: case 0x435b: case 0x436b: case 0x437b: 
 			break;
 	}
 
