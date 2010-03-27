@@ -402,8 +402,22 @@ public:
 	emu_timer             *mult_timer;
 
 	/* DMA/HDMA-related */
-	int                   dma_disabled[8];	// used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
-	UINT8                 hdma_chnl;	/* channels enabled for HDMA */
+	struct
+	{
+		UINT8  dmap;
+		UINT8  dest_addr;
+		UINT16 src_addr;
+		UINT16 trans_size;
+		UINT8  bank;
+		UINT8  ibank;
+		UINT16 hdma_addr;
+		UINT16 hdma_iaddr;
+		UINT8  hdma_line_counter;
+		UINT8  unk;
+
+		int    dma_disabled;	// used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
+	}dma_channel[8];
+	UINT8                 hdmaen;	/* channels enabled for HDMA */
 
 	/* input-related */
 	UINT8                 joy1l, joy1h, joy2l, joy2h, joy3l, joy3h, joy4l, joy4h;
