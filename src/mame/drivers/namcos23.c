@@ -1198,6 +1198,8 @@ static UINT32 c421_adr = 0;
 static INT16 s23_c422_regs[0x10];
 static int s23_subcpu_running;
 
+static emu_timer *c361_timer;
+
 static UINT32 p3d_address, p3d_size;
 
 static const UINT32 *ptrom;
@@ -1475,23 +1477,38 @@ static READ16_HANDLER(s23_ctl_r)
 	return 0xffff;
 }
 
+// raster timer.  TC2 indicates it's probably one-shot since it resets it each VBL...
+static int c361_scanline;
+static TIMER_CALLBACK( c361_timer_cb )
+{
+	if (c361_scanline != 511)
+	{
+		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
+		timer_adjust_oneshot(c361_timer, attotime_never, 0);                                                                                           
+	}
+}
+
 static WRITE16_HANDLER(s23_c361_w)
 {
 	switch(offset) {
+	case 0:
+		tilemap_set_scrollx(bgtilemap, 0, data&0xfff);
+		break;
+
+	case 1:
+		tilemap_set_scrolly(bgtilemap, 0, data&0xfff);
+		break;
+
 	case 4:	// interrupt control
-		if (data == 0xc8)
+		c361_scanline = data;
+		if (data == 0x1ff)
 		{
-			logerror("c361_w: raise IRQ 1\n");
-			cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
-		}
-		else if (data == 0x1ff)
-		{
-			logerror("c361_w: ack IRQ 1\n");
 			cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+			timer_adjust_oneshot(c361_timer, attotime_never, 0);
 		}
-		else
+		else if (data != 66)	// hack to avoid locking up Time Crisis 2
 		{
-			logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+			timer_adjust_oneshot(c361_timer, video_screen_get_time_until_pos(space->machine->primary_screen, c361_scanline, 0), 0);
 		}
 		break;
 
@@ -2039,6 +2056,18 @@ static VIDEO_START( ss23 )
 	gfx_element_set_source(machine->gfx[0], (UINT8 *)namcos23_charram);
 	bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
 	tilemap_set_transparent_pen(bgtilemap, 0xf);
+
+	// Gorgon's tilemap offset is 0, S23/SS23's is 860
+	if ((!strcmp(machine->gamedrv->name, "rapidrvr")) ||
+	    (!strcmp(machine->gamedrv->name, "rapidrvr2")) ||
+	    (!strcmp(machine->gamedrv->name, "finlflng")))
+	{
+		tilemap_set_scrolldx(bgtilemap, 0, 0);
+	}
+	else
+	{
+		tilemap_set_scrolldx(bgtilemap, 860, 860);
+	}
 	polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), POLYFLAG_NO_WORK_QUEUE);
 }
 
@@ -2066,6 +2095,11 @@ static INTERRUPT_GEN(s23_interrupt)
 	render_count[render_cur] = 0;
 }
 
+static MACHINE_START( s23 )
+{
+	c361_timer = timer_alloc(machine, c361_timer_cb, 0);
+	timer_adjust_oneshot(c361_timer, attotime_never, 0);
+}
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
@@ -2748,6 +2782,8 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
 
+	MDRV_MACHINE_START(s23)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2792,6 +2828,8 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
 
+	MDRV_MACHINE_START(s23)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2831,6 +2869,8 @@ static MACHINE_DRIVER_START( ss23 )
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
+
+	MDRV_MACHINE_START(s23)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
