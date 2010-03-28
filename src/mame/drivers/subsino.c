@@ -2059,6 +2059,32 @@ ROM_START( sharkpya )
 	ROM_LOAD( "sn82s129an.u13", 0x200, 0x100, CRC(0ef5f218) SHA1(a02cf266661385aa078563bd83240d36549c1cf0) )
 ROM_END
 
+
+ROM_START( sharkpye )
+	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_LOAD( "sharkpye.u18", 0x0a000, 0x6000, CRC(12473814) SHA1(9c24ed41781aefee0161add912e730ba0d4f4d3e) )
+	ROM_CONTINUE(0x0000, 0xa000)
+
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "sharkpye.u16", 0x00000, 0x08000, CRC(90862185) SHA1(9d632bfa707d3449a87d7f370eb2b5c36e61aadd) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+	ROM_CONTINUE(              0x08000, 0x08000 )
+	ROM_CONTINUE(              0x18000, 0x08000 )
+	ROM_LOAD( "sharkpye.u17", 0x20000, 0x08000, CRC(b7b6119a) SHA1(b61c77d2170d96fcb39ea31c4136387441b9037f) )
+	ROM_CONTINUE(              0x30000, 0x08000 )
+	ROM_CONTINUE(              0x28000, 0x08000 )
+	ROM_CONTINUE(              0x38000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "sharkpye.u54", 0x00000, 0x20000, CRC(9f384c59) SHA1(d2b087b8370b40b6f0944de661ea6aebaebea06f) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "n82s129an.u11", 0x000, 0x100, CRC(daf3657a) SHA1(93005938e2d60d54e7bbf1e234bba3802ee1af21) )
+	ROM_LOAD( "n82s129an.u12", 0x100, 0x100, CRC(5a7a25ed) SHA1(eebd679195e6ea50f64f3c46cd06ee21a1550491) )
+	ROM_LOAD( "n82s129an.u13", 0x200, 0x100, CRC(0ef5f218) SHA1(a02cf266661385aa078563bd83240d36549c1cf0) )
+ROM_END
+
 /***************************************************************************
 
 Super Rider (Italy Ver 1.6)
@@ -2211,136 +2237,108 @@ void dump_decrypted(running_machine* machine, UINT8* decrypt)
 }
 #endif
 
+unsigned char victor5_xors[8] =  { 0x99, 0x99, 0x33, 0x44, 0xbb, 0x88, 0x88, 0xbb };
+unsigned char victor21_xors[8] = { 0x44, 0xbb, 0x66, 0x44, 0xaa, 0x55, 0x88, 0x22 };
+unsigned char crsbingo_xors[8] = { 0xbb, 0xcc, 0xcc, 0xdd, 0xaa, 0x11, 0x44, 0xee };
+unsigned char sharkpy_xors[8] =  { 0xcc, 0xaa, 0x66, 0xaa, 0xee, 0x33, 0xff, 0xff };
 
-static DRIVER_INIT( victor5 )
+
+void victor5_bitswaps(UINT8* decrypt, int i)
 {
-	unsigned char xors[8] = { 0x99, 0x99, 0x33, 0x44, 0xBB, 0x88, 0x88, 0xBB };
+	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
+	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
+	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
+	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,0,7,2,5,4);
+	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
+}
+
+
+void victor21_bitswaps(UINT8* decrypt, int i)
+{
+	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,4,7,2,5,0);
+	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,4,7,6,5,0);
+	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],3,6,5,0,7,2,1,4);
+	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,4,7,6,5,0);
+}
+
+void crsbingo_bitswaps(UINT8* decrypt, int i)
+{
+	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],3,2,5,0,7,6,1,4);
+	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,0,3,6,1,4);
+	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
+	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
+	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
+}
+
+void sharkpy_bitswaps(UINT8* decrypt, int i)
+{
+	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
+	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
+	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,0,7,2,5,4);
+	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],3,2,5,4,7,6,1,0);
+	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,6,1,4,3,2,5,0);
+	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,4,7,2,5,0);
+}
+
+void subsino_decrypt(running_machine* machine, void (*bitswaps)(UINT8* decrypt, int i), UINT8* xors, int size)
+{
 	int i;
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8* region = memory_region(machine,"maincpu");
 
 	for (i=0;i<0x10000;i++)
 	{
-		if (i<0xc000)
+		if (i<size)
 		{
 			decrypt[i] = region[i]^xors[i&7];
-
-			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
-			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
-			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
-			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
-			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
-			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
-			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,0,7,2,5,4);
-			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
+			bitswaps(decrypt, i);
 		}
 		else
 		{
 			decrypt[i] = region[i];
 		}
 	}
-
 //  dump_decrypted(machine, decrypt);
-
 	memcpy(region, decrypt, 0x10000);
+}
+
+
+
+static DRIVER_INIT( victor5 )
+{
+	subsino_decrypt(machine, victor5_bitswaps, victor5_xors, 0xc000);
 }
 
 static DRIVER_INIT( victor21 )
 {
-	unsigned char xors[8] = { 0x44, 0xBB, 0x66, 0x44, 0xAA, 0x55, 0x88, 0x22 };
-	int i;
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8* region = memory_region(machine,"maincpu");
-
-	for (i=0;i<0x10000;i++)
-	{
-		if (i<0xc000)
-		{
-			decrypt[i] = region[i]^xors[i&7];
-
-			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
-			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,4,7,2,5,0);
-			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,4,7,6,5,0);
-			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
-			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
-			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],3,6,5,0,7,2,1,4);
-			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
-			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,4,7,6,5,0);
-		}
-		else
-		{
-			decrypt[i] = region[i];
-		}
-	}
-
-//  dump_decrypted(machine, decrypt);
-
-	memcpy(region, decrypt, 0x10000);
+	subsino_decrypt(machine, victor21_bitswaps, victor21_xors, 0xc000);
 }
 
 static DRIVER_INIT( crsbingo )
 {
-	unsigned char xors[8] = { 0x44, 0x33, 0x33, 0x22, 0x55, 0xEE, 0xBB, 0x11 };
-	int i;
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8* region = memory_region(machine,"maincpu");
-
-	for (i=0;i<0x10000;i++)
-	{
-		if (i<0xc000)
-		{
-			decrypt[i] = region[i]^xors[i&7]^0xff;
-
-			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
-			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
-			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],3,2,5,0,7,6,1,4);
-			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,0,3,6,1,4);
-			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
-			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
-			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
-			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
-		}
-		else
-		{
-			decrypt[i] = region[i];
-		}
-	}
-
-//  dump_decrypted(machine, decrypt);
-
-	memcpy(region, decrypt, 0x10000);
+	subsino_decrypt(machine, crsbingo_bitswaps, crsbingo_xors, 0xc000);
 }
 
 static DRIVER_INIT( sharkpy )
 {
-	unsigned char xors[8] = { 0x33, 0x55, 0x99, 0x55, 0x11, 0xCC, 0x00, 0x00 };
-	int i;
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8* region = memory_region(machine,"maincpu");
+	subsino_decrypt(machine, sharkpy_bitswaps, sharkpy_xors, 0xa000);
+}
 
-	for (i=0;i<0x10000;i++)
-	{
-		if (i<0xa000)
-		{
-			decrypt[i] = region[i]^xors[i&7]^0xff;
-			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
-			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
-			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
-			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,0,7,2,5,4);
-			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
-			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],3,2,5,4,7,6,1,0);
-			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,6,1,4,3,2,5,0);
-			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,4,7,2,5,0);
-		}
-		else
-		{
-			decrypt[i] = region[i];
-		}
-	}
-
-//  dump_decrypted(machine, decrypt);
-
-	memcpy(region, decrypt, 0x10000);
+static DRIVER_INIT( sharkpye )
+{
+	subsino_decrypt(machine, victor5_bitswaps, victor5_xors, 0xa000);
 }
 
 static DRIVER_INIT( smoto20 )
@@ -2371,10 +2369,11 @@ static DRIVER_INIT( tisub )
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                    FLAGS              LAYOUT      */
 GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0,                 layout_victor21 )
-GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0,                 layout_victor5 ) // board sticker says Victor 5, in-game says G.E.A with no manufacturer info?
+GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "G.E.A.",                  0,                 layout_victor5 ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
 GAMEL( 1991, tisub,    0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)", GAME_WRONG_COLORS, layout_tisub )
-GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,                 layout_crsbingo ) // alt version of Cross Bingo?
+GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,                 layout_crsbingo )
 GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0,                 layout_sharkpy ) // missing POST messages?
 GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0,                 layout_sharkpy ) // missing POST messages?
+GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpy,  sharkpye,  ROT0, "Alpha",           "Shark Party (English, Alpha license)", 0,                     layout_sharkpy ) // PCB black-box was marked 'victor 6'
 GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)", 0,                 layout_smoto )
 GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",  0,                 layout_smoto )
