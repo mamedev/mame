@@ -9,6 +9,7 @@
 #define TMS5110_CMD_RESET        (0) /*    0     0     0     x  |     1    */
 #define TMS5110_CMD_LOAD_ADDRESS (2) /*    0     0     1     x  |     2    */
 #define TMS5110_CMD_OUTPUT       (4) /*    0     1     0     x  |     3    */
+#define TMS5110_CMD_SPKSLOW      (6) /*    0     1     1     x  |     1    | Note: this command is undocumented on the datasheets, it only appears on the patents. It might not actually work properly on some of the real chips as manufactured. Acts the same as CMD_SPEAK, but makes the interpolator take two A cycles whereever it would normally only take one, effectively making speech of any given word take about twice as long as normal. */
 #define TMS5110_CMD_READ_BIT     (8) /*    1     0     0     x  |     1    */
 #define TMS5110_CMD_SPEAK       (10) /*    1     0     1     x  |     1    */
 #define TMS5110_CMD_READ_BRANCH (12) /*    1     1     0     x  |     1    */
