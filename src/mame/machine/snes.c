@@ -2535,7 +2535,7 @@ DRIVER_INIT( snes_hirom )
 
 *************************************/
 
-static int dma_abus_valid( UINT32 address )
+INLINE int dma_abus_valid( UINT32 address )
 {
 	if((address & 0x40ff00) == 0x2100) return 0;  //$[00-3f|80-bf]:[2100-21ff]
 	if((address & 0x40fe00) == 0x4000) return 0;  //$[00-3f|80-bf]:[4000-41ff]
@@ -2545,10 +2545,17 @@ static int dma_abus_valid( UINT32 address )
 	return 1;
 }
 
+INLINE UINT8 snes_abus_read( const address_space *space, UINT32 abus )
+{
+	if (!dma_abus_valid(abus))
+		return 0;
+
+	return memory_read_byte(space, abus);
+}
+
 INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abus, UINT16 bbus )
 {
 	snes_state *state = (snes_state *)space->machine->driver_data;
-	UINT32 src, dst;
 
 	if (state->dma_channel[dma].dmap & 0x80)	/* PPU->CPU */
 	{
@@ -2564,7 +2571,8 @@ INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abu
 			if (!dma_abus_valid(abus))
 				return;
 
-			src = bbus; dst = abus;
+			memory_write_byte(space, abus, memory_read_byte(space, bbus));
+			return;
 		}
 	}
 	else									/* CPU->PPU */
@@ -2578,11 +2586,10 @@ INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abu
 		}
 		else 
 		{
-			src = abus; dst = bbus;
+			memory_write_byte(space, bbus, snes_abus_read(space, abus));
+			return;
 		}
 	}
-
-	memory_write_byte(space, dst, memory_read_byte(space, src));
 }
 
 /* WIP: These have the advantage to automatically update the address, but then we would need to
@@ -2599,15 +2606,7 @@ INLINE UINT32 snes_get_hdma_iaddr( running_machine *machine, int dma )
 	return (state->dma_channel[dma].ibank << 16) | (state->dma_channel[dma].trans_size++);
 }
 
-static UINT8 snes_hdma_read( const address_space *space, UINT32 abus )
-{
-	if (!dma_abus_valid(abus))
-		return 0;
-
-	return memory_read_byte(space, abus);
-}
-
-static int is_last_active_channel( running_machine *machine, int dma )
+INLINE int is_last_active_channel( running_machine *machine, int dma )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
 	int i;
@@ -2627,7 +2626,7 @@ static void snes_hdma_update( const address_space *space, int dma )
 	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT32 abus = snes_get_hdma_addr(space->machine, dma);
 
-	state->dma_channel[dma].hdma_line_counter = snes_hdma_read(space, abus);
+	state->dma_channel[dma].hdma_line_counter = snes_abus_read(space, abus);
 
 	if (state->dma_channel[dma].dmap & 0x40) 
 	{
@@ -2636,14 +2635,14 @@ static void snes_hdma_update( const address_space *space, int dma )
 		otherwise expected */
 
 		abus = snes_get_hdma_addr(space->machine, dma);
-		state->dma_channel[dma].trans_size = snes_hdma_read(space, abus) << 8;
+		state->dma_channel[dma].trans_size = snes_abus_read(space, abus) << 8;
 
 		if (state->dma_channel[dma].hdma_line_counter || !is_last_active_channel(space->machine, dma))
 		{
 			// we enter here if we have more transfers to be done or if there are other active channels after this one
 			abus = snes_get_hdma_addr(space->machine, dma);
 			state->dma_channel[dma].trans_size >>= 8;
-			state->dma_channel[dma].trans_size |= snes_hdma_read(space, abus) << 8;
+			state->dma_channel[dma].trans_size |= snes_abus_read(space, abus) << 8;
 		}
 	}
 

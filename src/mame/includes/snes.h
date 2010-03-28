@@ -23,7 +23,7 @@
 #define DOTCLK_NTSC	(MCLK_NTSC/4)
 #define DOTCLK_PAL	(MCLK_PAL/4)
 
-#define SNES_LAYER_DEBUG  1
+#define SNES_LAYER_DEBUG  0
 
 /* Debug definitions */
 #ifdef MAME_DEBUG
