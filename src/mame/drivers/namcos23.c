@@ -1218,6 +1218,7 @@ static UINT32 tileid_mask, tile_mask, ptrom_limit;
 static INT16 matrices[256][9];
 static INT32 vectors[256][3];
 static INT32 light_vector[3];
+static UINT16 scaling;
 
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
@@ -1622,6 +1623,7 @@ struct namcos23_render_entry {
 	UINT16 model;
 	INT16 m[9];
 	INT32 v[3];
+	float scaling;
 };
 
 enum { RENDER_MAX_ENTRIES = 10000 };
@@ -1752,6 +1754,15 @@ static void p3d_vector_set(const UINT16 *p, int size)
 	}
 }
 
+static void p3d_scaling_set(const UINT16 *p, int size)
+{
+	if(size != 1) {
+		logerror("WARNING: p3d_scaling_set with size %d\n", size);
+		return;
+	}
+	scaling = *p;
+}
+
 static void p3d_vector_matrix_mul(const UINT16 *p, int size)
 {
 	if(size != 4) {
@@ -1813,14 +1824,14 @@ static void p3d_matrix_matrix_mul(const UINT16 *p, int size)
 	t[8] = INT16((m1[6]*m2[2] + m1[7]*m2[5] + m1[8]*m2[8]) >> 14);
 }
 
-static void p3d_render(const UINT16 *p, int size, bool mode)
+static void p3d_render(const UINT16 *p, int size, bool use_scaling)
 {
 	if(size != 3) {
 		logerror("WARNING: p3d_render with size %d\n", size);
 		return;
 	}
 
-	logerror("render model %x mode %c with matrix %x and vector %x\n", p[0], mode ? '2' : '1', p[1], p[2]);
+	logerror("render model %x %swith matrix %x and vector %x\n", p[0], use_scaling ? "scaled " : "", p[1], p[2]);
 
 	// Temporary gross hack for timecrs2
 	if(p[0] == 0xd96)
@@ -1837,6 +1848,7 @@ static void p3d_render(const UINT16 *p, int size, bool mode)
 
 	namcos23_render_entry *re = render_entries[render_cur] + render_count[render_cur];
 	re->model = p[0];
+	re->scaling = use_scaling ? scaling / 16384.0 : 1.0;
 	memcpy(re->m, m, sizeof(re->m));
 	memcpy(re->v, v, sizeof(re->v));
 	if(0)
@@ -1886,6 +1898,7 @@ static void p3d_dma(const address_space *space, UINT32 adr, UINT32 size)
 		case 0x0000: p3d_matrix_matrix_mul(buffer, psize); break;
 		case 0x0810: p3d_matrix_vector_mul(buffer, psize); break;
 		case 0x1010: p3d_vector_matrix_mul(buffer, psize); break;
+		case 0x4400: p3d_scaling_set(buffer, psize); break;
 		case 0x8000: p3d_render(buffer, psize, false); break;
 		case 0x8080: p3d_render(buffer, psize, true); break;
 		default: {
@@ -1927,9 +1940,9 @@ static WRITE32_HANDLER( p3d_w)
 
 static void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
 {
-	pv.x =    float(INT32((re->m[0]*INT64(xi) + re->m[3]*INT64(yi) + re->m[6]*INT64(zi)) >> 14) + re->v[0])/16384.0;
-	pv.y =    float(INT32((re->m[1]*INT64(xi) + re->m[4]*INT64(yi) + re->m[7]*INT64(zi)) >> 14) + re->v[1])/16384.0;
-	pv.p[0] = float(INT32((re->m[2]*INT64(xi) + re->m[5]*INT64(yi) + re->m[8]*INT64(zi)) >> 14) + re->v[2])/16384.0;
+	pv.x =    (INT32((re->m[0]*INT64(xi) + re->m[3]*INT64(yi) + re->m[6]*INT64(zi)) >> 14)*re->scaling + re->v[0])/16384.0;
+	pv.y =    (INT32((re->m[1]*INT64(xi) + re->m[4]*INT64(yi) + re->m[7]*INT64(zi)) >> 14)*re->scaling + re->v[1])/16384.0;
+	pv.p[0] = (INT32((re->m[2]*INT64(xi) + re->m[5]*INT64(yi) + re->m[8]*INT64(zi)) >> 14)*re->scaling + re->v[2])/16384.0;
 }
 
 static void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
