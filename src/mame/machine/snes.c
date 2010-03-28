@@ -232,7 +232,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		if (video_screen_get_vpos(machine->primary_screen) > 0)
 		{
 			/* Do HDMA */
-			if (state->hdmaen)
+			if (snes_ram[HDMAEN])
 				snes_hdma(cpu0space);
 
 			video_screen_update_partial(machine->primary_screen, (snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert*snes_ppu.interlace) : snes_ppu.beam.current_vert-1);
@@ -1335,8 +1335,7 @@ WRITE8_HANDLER( snes_w_io )
 			data = 0;	/* Once DMA is done we need to reset all bits to 0 */
 			break;
 		case HDMAEN:	/* HDMA channel designation */
-			state->hdmaen = data;
-			if (state->hdmaen) //if a HDMA is enabled, data is inited at the next scanline
+			if (data) //if a HDMA is enabled, data is inited at the next scanline
 				timer_set(space->machine, video_screen_get_time_until_pos(space->machine->primary_screen, snes_ppu.beam.current_vert + 1, 0), NULL, 0, snes_reset_hdma);
 			break;
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
@@ -2512,6 +2511,7 @@ static void snes_hdma_init( running_machine *machine )
 	snes_state *state = (snes_state *)machine->driver_data;
 	int i;
 
+	state->hdmaen = snes_ram[HDMAEN];
 	for (i = 0; i < 8; i++)
 	{
 		if (BIT(state->hdmaen, i))
