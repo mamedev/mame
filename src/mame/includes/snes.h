@@ -23,7 +23,7 @@
 #define DOTCLK_NTSC	(MCLK_NTSC/4)
 #define DOTCLK_PAL	(MCLK_PAL/4)
 
-#define SNES_LAYER_DEBUG  0
+#define SNES_LAYER_DEBUG  1
 
 /* Debug definitions */
 #ifdef MAME_DEBUG
@@ -414,6 +414,8 @@ public:
 		UINT16 hdma_iaddr;
 		UINT8  hdma_line_counter;
 		UINT8  unk;
+
+		int    do_transfer;
 
 		int    dma_disabled;	// used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
 	}dma_channel[8];
