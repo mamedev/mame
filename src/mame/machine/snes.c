@@ -36,7 +36,7 @@ static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
 static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 
 static void snes_dma(const address_space *space, UINT8 channels);
-static void snes_hdma_init(running_machine *machine);
+static void snes_hdma_init(const address_space *space);
 static void snes_hdma(const address_space *space);
 
 struct snes_cart_info snes_cart;
@@ -119,7 +119,9 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 
 static TIMER_CALLBACK( snes_reset_hdma )
 {
-	snes_hdma_init(machine);
+	snes_state *state = (snes_state *)machine->driver_data;
+	const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	snes_hdma_init(cpu0space);
 }
 
 static TIMER_CALLBACK( snes_scanline_tick )
@@ -190,7 +192,8 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	// hdma reset happens at scanline 0, H=~6
 	if (snes_ppu.beam.current_vert == 0)
 	{
-		snes_hdma_init(machine);
+		const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+		snes_hdma_init(cpu0space);
 	}
 
 	/* three lines after start of vblank we update the controllers (value from snes9x) */
@@ -440,6 +443,141 @@ static WRITE8_HANDLER( snes_vram_write )
 	}
 }
 
+/*************************************************
+
+ SNES OAM accesses:
+
+ OAM accesses during active display are allowed.
+ The actual address varies during rendering, as the 
+ PPU reads in data itself for processing. 
+ Unfortunately, no one has been able (yet) to 
+ determine how this works. The only known game to 
+ actually access OAM during active display is 
+ Uniracers and it expects accesses to map to 
+ offset 0x0218. Hence, following byuu's choice
+ we rerouted OAM accesses during active display 
+ to 0x0218 (0x010c in our snes_oam). 
+ This is a hack, but it is more accurate than 
+ writing to the 'expected' address set by 
+ $2102,$2103.
+
+ Notice that, since snes_ram[OAMDATA] is never
+ read/written directly, we use it as an index
+ to choose the high/low byte of the snes_oam word.
+*************************************************/
+
+static READ8_HANDLER( snes_oam_read )
+{
+	offset &= 0x1ff;
+
+	if (offset & 0x100)
+		offset &= 0x10f;
+
+	if (!snes_ppu.screen_disabled)
+	{
+		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
+
+		if (v < snes_ppu.beam.last_visible_line) 
+			offset = 0x010c;
+	}
+
+	return (snes_oam[offset] >> (snes_ram[OAMDATA] << 3)) & 0xff;;
+}
+
+static WRITE8_HANDLER( snes_oam_write )
+{
+	offset &= 0x1ff;
+
+	if (offset & 0x100)
+		offset &= 0x10f;
+
+	if (!snes_ppu.screen_disabled)
+	{
+		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
+
+		if (v < snes_ppu.beam.last_visible_line) 
+			offset = 0x010c;
+	}
+
+	if (!(snes_ram[OAMDATA]))
+		snes_oam[offset] = (snes_oam[offset] & 0xff00) | (data << 0);
+	else
+		snes_oam[offset] = (snes_oam[offset] & 0x00ff) | (data << 8);
+}
+
+/*************************************************
+
+ SNES CGRAM accesses: 
+
+ CGRAM writes during hblank are valid. During 
+ active display, the actual address the data 
+ is written to varies, as the PPU itself changes 
+ the address. Like OAM, it is not known the exact 
+ algorithm used, but no commercial software seems
+ to attempt this. While byuu, in his emu, maps 
+ those accesses to 0x01ff, because it is more
+ accurate to invalidate the 'expected' address 
+ than not, MESS has issues if we don't write to
+ the expected address (see e.g. Tokimeki Memorial).
+ This is because writes should work during hblank
+ (so that the game can produce color fading), but
+ ends up not working with the conditions below. 
+ Hence, for the moment, we only document the 
+ solution adopted by BSNES without enabling it.
+*************************************************/
+
+static READ8_HANDLER( snes_cgram_read )
+{
+	UINT8 res = 0; 
+	offset &= 0x1ff;
+
+#if 0
+	if (!snes_ppu.screen_disabled)
+	{
+		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
+		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
+
+		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096) 
+			offset = 0x1ff;
+	}
+#endif
+
+	res = ((UINT8 *)snes_cgram)[offset]; 
+
+	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr). 
+	// Highest bit is simply ignored.
+	if (offset & 0x01)
+		res &= 0x7f;
+
+	return res;
+}
+
+static WRITE8_HANDLER( snes_cgram_write )
+{
+	offset &= 0x1ff;
+
+#if 0
+	// FIXME: this currently breaks some games (e.g. Tokimeki Memorial),
+	// even if it's expected to be more accurate than allowing for
+	// writes to the cgram address
+	if (!snes_ppu.screen_disabled)
+	{
+		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
+		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
+
+		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096) 
+			offset = 0x1ff;
+	}
+#endif
+
+	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr). 
+	// Highest bit is simply ignored.
+	if (offset & 0x01)
+		data &= 0x7f;
+
+	((UINT8 *)snes_cgram)[offset] = data;
+}
+
 /*
  * DR   - Double read : address is read twice to return a 16bit value.
  * low  - This is the low byte of a 16 or 24 bit value
@@ -539,28 +677,15 @@ READ8_HANDLER( snes_r_io )
 			snes_latch_counters(space->machine);
 			return snes_open_bus_r(space, 0);		/* Return value is meaningless */
 		case ROAMDATA:	/* Read data from OAM (DR) */
+			snes_ppu.ppu1_open_bus = snes_oam_read(space, snes_ppu.oam.address);
+			snes_ram[OAMDATA] = (snes_ram[OAMDATA] + 1) % 2;
+			if (!snes_ram[OAMDATA])
 			{
-				int oam_addr = snes_ppu.oam.address;
-
-				if (oam_addr & 0x100)
-				{
-					oam_addr &= 0x10f;
-				}
-				else
-				{
-					oam_addr &= 0x1ff;
-				}
-
-				snes_ppu.ppu1_open_bus = (snes_oam[oam_addr] >> (snes_ram[OAMDATA] << 3)) & 0xff;
-				snes_ram[OAMDATA] = (snes_ram[OAMDATA] + 1) % 2;
-				if (!snes_ram[OAMDATA])
-				{
-					snes_ppu.oam.address++;
-					snes_ppu.oam.address &= 0x1ff;
-					snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
-				}
-				return snes_ppu.ppu1_open_bus;
+				snes_ppu.oam.address++;
+				snes_ppu.oam.address &= 0x1ff;
+				snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 			}
+			return snes_ppu.ppu1_open_bus;
 		case RVMDATAL:	/* Read data from VRAM (low) */
 			{
 				UINT32 addr = snes_get_vram_address(space->machine) << 1;
@@ -596,46 +721,40 @@ READ8_HANDLER( snes_r_io )
 				return snes_ppu.ppu1_open_bus;
 			}
 		case RCGDATA:	/* Read data from CGRAM */
-				if (!(state->cgram_address & 0x01))
-				{
-					snes_ppu.ppu2_open_bus = ((UINT8 *)snes_cgram)[state->cgram_address] & 0xff;
-				}
-				else
-				{
-					snes_ppu.ppu2_open_bus &= 0x80;
-					snes_ppu.ppu2_open_bus |= ((UINT8 *)snes_cgram)[state->cgram_address] & 0x7f;
-				}
+			if (!(state->cgram_address & 0x01))
+				snes_ppu.ppu2_open_bus = snes_cgram_read(space, state->cgram_address);
+			else
+			{
+				snes_ppu.ppu2_open_bus &= 0x80;
+				snes_ppu.ppu2_open_bus |= snes_cgram_read(space, state->cgram_address) & 0x7f;
+			}
 
-				state->cgram_address = (state->cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
-				return snes_ppu.ppu2_open_bus;
+			state->cgram_address = (state->cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
+			return snes_ppu.ppu2_open_bus;
 		case OPHCT:		/* Horizontal counter data by ext/soft latch */
+			if (state->read_ophct)
 			{
-				if (state->read_ophct)
-				{
-					snes_ppu.ppu2_open_bus &= 0xfe;
-					snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_horz >> 8) & 0x01;
-				}
-				else
-				{
-					snes_ppu.ppu2_open_bus = snes_ppu.beam.latch_horz & 0xff;
-				}
-				state->read_ophct ^= 1;
-				return snes_ppu.ppu2_open_bus;
+				snes_ppu.ppu2_open_bus &= 0xfe;
+				snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_horz >> 8) & 0x01;
 			}
+			else
+			{
+				snes_ppu.ppu2_open_bus = snes_ppu.beam.latch_horz & 0xff;
+			}
+			state->read_ophct ^= 1;
+			return snes_ppu.ppu2_open_bus;
 		case OPVCT:		/* Vertical counter data by ext/soft latch */
+			if (state->read_opvct)
 			{
-				if (state->read_opvct)
-				{
-					snes_ppu.ppu2_open_bus &= 0xfe;
-					snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_vert >> 8) & 0x01;
-				}
-				else
-				{
-					snes_ppu.ppu2_open_bus = snes_ppu.beam.latch_vert & 0xff;
-				}
-				state->read_opvct ^= 1;
-				return snes_ppu.ppu2_open_bus;
+				snes_ppu.ppu2_open_bus &= 0xfe;
+				snes_ppu.ppu2_open_bus |= (snes_ppu.beam.latch_vert >> 8) & 0x01;
 			}
+			else
+			{
+				snes_ppu.ppu2_open_bus = snes_ppu.beam.latch_vert & 0xff;
+			}
+			state->read_opvct ^= 1;
+			return snes_ppu.ppu2_open_bus;
 		case STAT77:	/* PPU status flag and version number */
 			value = snes_ppu.stat77_flags & 0xc0; // 0x80 & 0x40 are Time Over / Range Over Sprite flags, set by the video code
 			// 0x20 - Master/slave mode select. Little is known about this bit. We always seem to read back 0 here.
@@ -669,27 +788,19 @@ READ8_HANDLER( snes_r_io )
 		case WMADDH:	/* Address to read/write to wram (high) */
 			return snes_ram[offset];
 		case OLDJOY1:	/* Data for old NES controllers (JOYSER1) */
-			{
-				if (snes_ram[offset] & 0x1)
-				{
-					return 0 | (snes_open_bus_r(space, 0) & 0xfc); //correct?
-				}
+			if (snes_ram[offset] & 0x1)
+				return 0 | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 
-				value = state->oldjoy1_read(space->machine);
+			value = state->oldjoy1_read(space->machine);
 
-				return (value & 0x03) | (snes_open_bus_r(space, 0) & 0xfc); //correct?
-			}
+			return (value & 0x03) | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 		case OLDJOY2:	/* Data for old NES controllers (JOYSER2) */
-			{
-				if (snes_ram[OLDJOY1] & 0x1)
-				{
-					return 0 | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
-				}
+			if (snes_ram[OLDJOY1] & 0x1)
+				return 0 | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 
-				value = state->oldjoy2_read(space->machine);
+			value = state->oldjoy2_read(space->machine);
 
-				return value | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
-			}
+			return value | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 		case HTIMEL:
 		case HTIMEH:
 		case VTIMEL:
@@ -878,45 +989,31 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ram[OAMDATA] = 0;
 			break;
 		case OAMDATA:	/* Data for OAM write (DW) */
+			if (snes_ppu.oam.address >= 0x100)
+				snes_oam_write(space, snes_ppu.oam.address, data);
+			else
 			{
-				int oam_addr = snes_ppu.oam.address;
-
-				if (oam_addr >= 0x100)
-				{
-					oam_addr &= 0x10f;
-					if (!(snes_ram[OAMDATA]))
-					{
-						snes_oam[oam_addr] &= 0xff00;
-						snes_oam[oam_addr] |= data;
-					}
-					else
-					{
-						snes_oam[oam_addr] &= 0x00ff;
-						snes_oam[oam_addr] |= (data << 8);
-					}
-				}
+				if (!snes_ram[OAMDATA])
+					snes_ppu.oam.write_latch = data;
 				else
 				{
-					oam_addr &= 0x1ff;
-					if (!(snes_ram[OAMDATA]))
-					{
-						snes_ppu.oam.write_latch = data;
-					}
-					else
-					{
-						snes_oam[oam_addr] = (data << 8) | snes_ppu.oam.write_latch;
-					}
-				}
-				snes_ram[OAMDATA] = (snes_ram[OAMDATA] + 1) % 2;
-				if (snes_ram[OAMDATA] == 0)
-				{
+					// in this case, we not only write data to the upper byte of the word, 
+					// but also snes_ppu.oam.write_latch to the lower byte (recall that
+					// snes_ram[OAMDATA] is used to select high/low byte)
+					snes_oam_write(space, snes_ppu.oam.address, data);
 					snes_ram[OAMDATA] = 0;
-					snes_ppu.oam.address++;
-					snes_ppu.oam.address &= 0x1ff;
-					snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
+					snes_oam_write(space, snes_ppu.oam.address, snes_ppu.oam.write_latch);
+					snes_ram[OAMDATA] = 1;
 				}
-				return;
 			}
+			snes_ram[OAMDATA] = (snes_ram[OAMDATA] + 1) % 2;
+			if (!snes_ram[OAMDATA])
+			{
+				snes_ppu.oam.address++;
+				snes_ppu.oam.address &= 0x1ff;
+				snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
+			}
+			return;
 		case BGMODE:	/* BG mode and character size settings */
 			snes_ppu.mode = data & 0x07;
 			snes_dynamic_res_change(space->machine);
@@ -1084,12 +1181,11 @@ WRITE8_HANDLER( snes_w_io )
 			snes_ppu.mode7_last_scroll = data;
 			break;
 		case CGADD:		/* Initial address for colour RAM writing */
-			/* CGRAM is 16-bit, but when reading/writing we treat it as
-                 * 8-bit, so we need to double the address */
+			/* CGRAM is 16-bit, but when reading/writing we treat it as 8-bit, so we need to double the address */
 			state->cgram_address = data << 1;
 			break;
 		case CGDATA:	/* Data for colour RAM */
-			((UINT8 *)snes_cgram)[state->cgram_address] = data;
+			snes_cgram_write(space, state->cgram_address, data);
 			state->cgram_address = (state->cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:	/* Window mask settings for BG1-2 */
@@ -2489,10 +2585,8 @@ INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abu
 	memory_write_byte(space, dst, memory_read_byte(space, src));
 }
 
-#if 0
-// FIXME: we need to use snes_state->hdma_iaddr[i] where appropriate (we now still 
-// use snes_state->trans_size[i] to avoid regressions in this first wip)
-// and try to make the addr recovering/updating a bit more abstract 
+/* WIP: These have the advantage to automatically update the address, but then we would need to
+check again if the transfer is direct/indirect at each step... is it worth? */
 INLINE UINT32 snes_get_hdma_addr( running_machine *machine, int dma )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
@@ -2502,13 +2596,66 @@ INLINE UINT32 snes_get_hdma_addr( running_machine *machine, int dma )
 INLINE UINT32 snes_get_hdma_iaddr( running_machine *machine, int dma )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
-	return (state->dma_channel[dma].ibank << 16) | (state->dma_channel[dma].hdma_iaddr++);
+	return (state->dma_channel[dma].ibank << 16) | (state->dma_channel[dma].trans_size++);
 }
-#endif
 
-static void snes_hdma_init( running_machine *machine )
+static UINT8 snes_hdma_read( const address_space *space, UINT32 abus )
+{
+	if (!dma_abus_valid(abus))
+		return 0;
+
+	return memory_read_byte(space, abus);
+}
+
+static int is_last_active_channel( running_machine *machine, int dma )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
+	int i;
+
+	for (i = dma + 1; i < 8; i++)
+	{
+		if (BIT(state->hdmaen, i) && state->dma_channel[i].hdma_line_counter)
+			return 0;	// there is still at least another channel with incomplete HDMA
+	}
+
+	// if we arrive here, all hdma transfers from (dma + 1) to 7 are completed or not active
+	return 1;
+}
+
+static void snes_hdma_update( const address_space *space, int dma )
+{
+	snes_state *state = (snes_state *)space->machine->driver_data;
+	UINT32 abus = snes_get_hdma_addr(space->machine, dma);
+
+	state->dma_channel[dma].hdma_line_counter = snes_hdma_read(space, abus);
+
+	if (state->dma_channel[dma].dmap & 0x40) 
+	{
+		/* One oddity: if $43xA is 0 and this is the last active HDMA channel for this scanline, only load 
+		one byte for Address, and use the $00 for the low byte. So Address ends up incremented one less than
+		otherwise expected */
+
+		abus = snes_get_hdma_addr(space->machine, dma);
+		state->dma_channel[dma].trans_size = snes_hdma_read(space, abus) << 8;
+
+		if (state->dma_channel[dma].hdma_line_counter || !is_last_active_channel(space->machine, dma))
+		{
+			// we enter here if we have more transfers to be done or if there are other active channels after this one
+			abus = snes_get_hdma_addr(space->machine, dma);
+			state->dma_channel[dma].trans_size >>= 8;
+			state->dma_channel[dma].trans_size |= snes_hdma_read(space, abus) << 8;
+		}
+	}
+
+	if (!state->dma_channel[dma].hdma_line_counter)
+		state->hdmaen &= ~(1 << dma);
+
+	state->dma_channel[dma].do_transfer = 1;
+}
+
+static void snes_hdma_init( const address_space *space )
+{
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	int i;
 
 	state->hdmaen = snes_ram[HDMAEN];
@@ -2517,7 +2664,7 @@ static void snes_hdma_init( running_machine *machine )
 		if (BIT(state->hdmaen, i))
 		{
 			state->dma_channel[i].hdma_addr = state->dma_channel[i].src_addr;
-			state->dma_channel[i].hdma_line_counter = 0;
+			snes_hdma_update(space, i);
 		}
 	}
 }
@@ -2525,109 +2672,81 @@ static void snes_hdma_init( running_machine *machine )
 static void snes_hdma( const address_space *space )
 {
 	snes_state *state = (snes_state *)space->machine->driver_data;
-	UINT8 i, contmode;
 	UINT16 bbus;
 	UINT32 abus;
+	int i;
 
-	/* Assume priority of the 8 DMA channels is 0-7 */
 	for (i = 0; i < 8; i++)
 	{
 		if (BIT(state->hdmaen, i))
 		{
-			/* Check if we need to read a new line from the table */
-			if (!(state->dma_channel[i].hdma_line_counter & 0x7f))
+			if (state->dma_channel[i].do_transfer) 
 			{
-				abus = (state->dma_channel[i].bank << 16) + state->dma_channel[i].hdma_addr;
+				/* Get transfer addresses */
+				if (state->dma_channel[i].dmap & 0x40)	/* Indirect */
+					abus = (state->dma_channel[i].ibank << 16) + state->dma_channel[i].trans_size;
+				else									/* Absolute */
+					abus = (state->dma_channel[i].bank << 16) + state->dma_channel[i].hdma_addr;
 
-				/* Get the number of lines */
-				state->dma_channel[i].hdma_line_counter = memory_read_byte(space, abus);
-				if (!state->dma_channel[i].hdma_line_counter)
+				bbus = state->dma_channel[i].dest_addr + 0x2100;	
+
+				switch (state->dma_channel[i].dmap & 0x07)
 				{
-					/* No more lines so clear HDMA */
-					state->hdmaen &= ~(1 << i);
-					continue;
-				}
-				abus++;
-				state->dma_channel[i].hdma_addr = abus;
-				if (state->dma_channel[i].dmap & 0x40)
-				{
-					state->dma_channel[i].trans_size = memory_read_byte(space, abus++);
-					state->dma_channel[i].trans_size |= (memory_read_byte(space, abus++) << 8);
-					state->dma_channel[i].hdma_addr = abus;
-				}
-			}
-
-			contmode = (--state->dma_channel[i].hdma_line_counter) & 0x80;
-
-			/* Transfer addresses */
-			if (state->dma_channel[i].dmap & 0x40)	/* Indirect */
-				abus = (state->dma_channel[i].ibank << 16) + state->dma_channel[i].trans_size;
-			else									/* Absolute */
-				abus = (state->dma_channel[i].bank << 16) + state->dma_channel[i].hdma_addr;
-
-			bbus = state->dma_channel[i].dest_addr + 0x2100;
-
-#ifdef SNES_DBG_HDMA
-			mame_printf_debug( "HDMA-Ch: %d(%s) abus: %X bbus: %X type: %d(%X)\n", i, state->dma_channel[i].dmap & 0x40 ? "Indirect" : "Absolute", abus, bbus, state->dma_channel[i].dmap & 0x07, state->dma_channel[i].hdma_addr);
-#endif
-
-			switch (state->dma_channel[i].dmap & 0x07)
-			{
-			case 0:		/* 1 register write once             (1 byte:  p               ) */
-				snes_dma_transfer(space, i, abus++, bbus);
-				break;
-			case 5:		/* 2 registers write twice alternate (4 bytes: p, p+1, p,   p+1) */
-				snes_dma_transfer(space, i, abus++, bbus);
-				snes_dma_transfer(space, i, abus++, bbus + 1);
-				snes_dma_transfer(space, i, abus++, bbus);
-				snes_dma_transfer(space, i, abus++, bbus + 1);
-				break;
-			case 1:		/* 2 registers write once            (2 bytes: p, p+1          ) */
-				snes_dma_transfer(space, i, abus++, bbus);
-				snes_dma_transfer(space, i, abus++, bbus + 1);
-				break;
-			case 2:		/* 1 register write twice            (2 bytes: p, p            ) */
-			case 6:
-				snes_dma_transfer(space, i, abus++, bbus);
-				snes_dma_transfer(space, i, abus++, bbus);
-				break;
-			case 3:		/* 2 registers write twice each      (4 bytes: p, p,   p+1, p+1) */
-			case 7:
-				snes_dma_transfer(space, i, abus++, bbus);
-				snes_dma_transfer(space, i, abus++, bbus);
-				snes_dma_transfer(space, i, abus++, bbus + 1);
-				snes_dma_transfer(space, i, abus++, bbus + 1);
-				break;
-			case 4:		/* 4 registers write once            (4 bytes: p, p+1, p+2, p+3) */
-				snes_dma_transfer(space, i, abus++, bbus);
-				snes_dma_transfer(space, i, abus++, bbus + 1);
-				snes_dma_transfer(space, i, abus++, bbus + 2);
-				snes_dma_transfer(space, i, abus++, bbus + 3);
-				break;
-			default:
+				case 0:		/* 1 register write once             (1 byte:  p               ) */
+					snes_dma_transfer(space, i, abus++, bbus);
+					break;
+				case 5:		/* 2 registers write twice alternate (4 bytes: p, p+1, p,   p+1) */
+					snes_dma_transfer(space, i, abus++, bbus);
+					snes_dma_transfer(space, i, abus++, bbus + 1);
+					snes_dma_transfer(space, i, abus++, bbus);
+					snes_dma_transfer(space, i, abus++, bbus + 1);
+					break;
+				case 1:		/* 2 registers write once            (2 bytes: p, p+1          ) */
+					snes_dma_transfer(space, i, abus++, bbus);
+					snes_dma_transfer(space, i, abus++, bbus + 1);
+					break;
+				case 2:		/* 1 register write twice            (2 bytes: p, p            ) */
+				case 6:
+					snes_dma_transfer(space, i, abus++, bbus);
+					snes_dma_transfer(space, i, abus++, bbus);
+					break;
+				case 3:		/* 2 registers write twice each      (4 bytes: p, p,   p+1, p+1) */
+				case 7:
+					snes_dma_transfer(space, i, abus++, bbus);
+					snes_dma_transfer(space, i, abus++, bbus);
+					snes_dma_transfer(space, i, abus++, bbus + 1);
+					snes_dma_transfer(space, i, abus++, bbus + 1);
+					break;
+				case 4:		/* 4 registers write once            (4 bytes: p, p+1, p+2, p+3) */
+					snes_dma_transfer(space, i, abus++, bbus);
+					snes_dma_transfer(space, i, abus++, bbus + 1);
+					snes_dma_transfer(space, i, abus++, bbus + 2);
+					snes_dma_transfer(space, i, abus++, bbus + 3);
+					break;
+				default:
 #ifdef MAME_DEBUG
-				mame_printf_debug( "  HDMA of unsupported type: %d\n", state->dma_channel[i].dmap & 0x07);
+					mame_printf_debug( "  HDMA of unsupported type: %d\n", state->dma_channel[i].dmap & 0x07);
 #endif
-				break;
-			}
+					break;
+				}
 
-			/* Update address */
-			if (contmode)
-			{
 				if (state->dma_channel[i].dmap & 0x40)	/* Indirect */
 					state->dma_channel[i].trans_size = abus;
 				else									/* Absolute */
 					state->dma_channel[i].hdma_addr = abus;
+
 			}
+		}
+	}
+
+	for (i = 0; i < 8; i++)
+	{
+		if (BIT(state->hdmaen, i))
+		{
+			state->dma_channel[i].do_transfer = (--state->dma_channel[i].hdma_line_counter) & 0x80;
 
 			if (!(state->dma_channel[i].hdma_line_counter & 0x7f))
-			{
-				if (!(state->dma_channel[i].dmap & 0x40))	/* Absolute */
-				{
-					if (!contmode)
-						state->dma_channel[i].hdma_addr = abus;
-				}
-			}
+				snes_hdma_update(space, i);
 		}
 	}
 }
