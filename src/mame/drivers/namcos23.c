@@ -1623,6 +1623,21 @@ static inline INT32 u32_to_s24(UINT32 v)
   return v & 0x800000 ? v | 0xff000000 : v & 0xffffff;
 }
 
+static inline INT32 u32_to_s10(UINT32 v)
+{
+	return v & 0x200 ? v | 0xfffffe00 : v & 0x1ff;
+}
+
+
+static inline UINT8 light(UINT8 c, float l)
+{
+  if(l < 1)
+    l = l*c;
+  else
+    l = 255 - (255-c)/l;
+  return UINT8(l);
+}
+
 static UINT32 texture_lookup_nocache_point(const pen_t *pens, float x, float y)
 {
 	UINT32 xx = UINT32(x);
@@ -1648,9 +1663,11 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 	float w = extent->param[0].start;
 	float u = extent->param[1].start;
 	float v = extent->param[2].start;
+	float l = extent->param[3].start;
 	float dw = extent->param[0].dpdx;
 	float du = extent->param[1].dpdx;
 	float dv = extent->param[2].dpdx;
+	float dl = extent->param[3].dpdx;
 	bitmap_t *bitmap = (bitmap_t *)dest;
 	UINT32 *img = BITMAP_ADDR32(bitmap, scanline, extent->startx);
 	float *wbuf = &wbuffer[scanline][extent->startx];
@@ -1659,11 +1676,14 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 		if(w > *wbuf) {
 			*wbuf = w;
 			float z = w ? 1/w : 0;
-			*img = rd->texture_lookup(rd->pens, u*z, v*z);
+			UINT32 pcol = rd->texture_lookup(rd->pens, u*z, v*z);
+			float ll = l*z;
+			*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
 		}
 		w += dw;
 		u += du;
 		v += dv;
+		l += dl;
 		wbuf++;
 		img++;
 	}
@@ -1895,6 +1915,13 @@ static void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_
 	pv.p[0] = float(INT32((re->m[2]*INT64(xi) + re->m[5]*INT64(yi) + re->m[8]*INT64(zi)) >> 14) + re->v[2])/16384.0;
 }
 
+static void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
+{
+	x = (re->m[0]*xi + re->m[3]*yi + re->m[6]*zi) >> 14;
+	y = (re->m[1]*xi + re->m[4]*yi + re->m[7]*zi) >> 14;
+	z = (re->m[2]*xi + re->m[5]*yi + re->m[8]*zi) >> 14;
+}
+
 static void render_project(poly_vertex &pv)
 {
 	float w = pv.p[0] ? 1/pv.p[0] : 0;
@@ -1946,9 +1973,34 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
 			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
 			pv[i].p[2] = (((v1 >> 16) & 0xf00) | ((v3 >> 24 & 0xff))) + 0.5 + tbase;
+
+			switch(lmode) {
+			case 0: case 1:
+				pv[i].p[3] = ((light >> (8*(3-i))) & 0xff) / 64.0;
+				break;
+			case 2:
+				pv[i].p[3] = 1.0;
+				break;
+			case 3: {
+				UINT32 norm = ptrom[extptr++];
+				INT32 nx = u32_to_s10(norm >> 20);
+				INT32 ny = u32_to_s10(norm >> 10);
+				INT32 nz = u32_to_s10(norm);
+				INT32 nrx, nry, nrz;
+				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
+				
+				float lsi = float(nrx*light_vector[0] + nry*light_vector[1] + nrz*light_vector[2])/4194304.0;
+				if(lsi < 0)
+					lsi = 0;
+
+				// Mapping taken out of a hat
+				pv[i].p[3] = 0.5+lsi;
+				break;
+			}
+			}
 		}
 
-		int cv = poly_zclip_if_less(ne, pv, pvc, 3, 0.0001);
+		int cv = poly_zclip_if_less(ne, pv, pvc, 4, 0.0001);
 		
 		if(cv >= 3) {
 			for(int i=0; i<cv; i++) {
@@ -1956,12 +2008,13 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 				float w = pvc[i].p[0];
 				pvc[i].p[1] *= w;
 				pvc[i].p[2] *= w;
+				pvc[i].p[3] *= w;
 			}
 			namcos23_render_data *rd = (namcos23_render_data *)poly_get_extra_data(polymgr);
 			rd->texture_lookup = texture_lookup_nocache_point;
 			rd->pens = machine->pens + (color << 8);
 
-			poly_render_triangle_fan(polymgr, bitmap, &scissor, render_scanline, 3, cv, pvc);
+			poly_render_triangle_fan(polymgr, bitmap, &scissor, render_scanline, 4, cv, pvc);
 		}
 
 		if(type & 0x000010000)
