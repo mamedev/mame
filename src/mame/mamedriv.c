@@ -1255,7 +1255,8 @@ const game_driver * const drivers[] =
 	DRIVER( invadpt2 )	/* 852 [1980] Taito */
 	DRIVER( invaddlx )	/* 852 [1980] Midway */
 	DRIVER( vortex )	/* 852 [1980] Zilec Electronics Ltd. */
-	DRIVER( moonbase )	/* Zeta - Nichibutsu */
+	DRIVER( moonbase )	/* Taito */
+	DRIVER( moonbasea )	/* Zeta - Nichibutsu */
 						/* 870 - Space Invaders Deluxe cocktail */
 	DRIVER( searthin )	/* bootleg */
 	DRIVER( searthina )	/* bootleg */
@@ -5049,6 +5050,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( madmotor )	/* (c) [1989] Mitchell */
 		/* All these games have a unique code stamped on the mask roms */
 	DRIVER( vaportra )	/* MAA (c) 1989 Data East Corporation (World) */
+	DRIVER( vaportra3 )	/* MAA (c) 1989 Data East Corporation (World) */
 	DRIVER( vaportrau )	/* MAA (c) 1989 Data East Corporation (US) */
 	DRIVER( kuhga )		/* MAA (c) 1989 Data East Corporation (Japan) */
 	DRIVER( cbuster )	/* MAB (c) 1990 Data East Corporation (World) */
@@ -9494,6 +9496,7 @@ Other Sun games
 	DRIVER( cb3a )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3b )		/* (c) 199? Dyna Electronics */
+	DRIVER( cb3c )		/* (c) 199? Dyna Electronics */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cmv4 )		/* (c) 1992 Dyna Electronics */
 	DRIVER( cmv4a )		/* (c) 1992 Dyna Electronics */
@@ -10091,5 +10094,8 @@ Other Sun games
 
 	/* Diatec */
 	DRIVER( unclepoo )
+
+	/* Extrema Systems International Ltd. */
+	DRIVER( poker72 )
 
 #endif	/* DRIVER_RECURSIVE */

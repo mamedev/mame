@@ -1606,6 +1606,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/pntnpuzl.o \
 	$(DRIVERS)/policetr.o $(VIDEO)/policetr.o \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
+	$(DRIVERS)/poker72.o \
 	$(DRIVERS)/poo.o \
 	$(DRIVERS)/quakeat.o \
 	$(DRIVERS)/queen.o \

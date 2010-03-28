@@ -1990,6 +1990,7 @@ src/mame/drivers/playmark.c svneol=native#text/plain
 src/mame/drivers/plygonet.c svneol=native#text/plain
 src/mame/drivers/pntnpuzl.c svneol=native#text/plain
 src/mame/drivers/pokechmp.c svneol=native#text/plain
+src/mame/drivers/poker72.c svneol=native#text/plain
 src/mame/drivers/polepos.c svneol=native#text/plain
 src/mame/drivers/policetr.c svneol=native#text/plain
 src/mame/drivers/polyplay.c svneol=native#text/plain

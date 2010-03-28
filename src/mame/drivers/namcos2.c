@@ -4650,6 +4650,9 @@ ROM_START( gollygho )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "gl1voi1.3m",  0x000000, 0x080000, CRC(0eca0efb) SHA1(4e8e1b3118ee0b76c34dd6631047080ba1fcf576) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "gollygho.nv",  0x000000, 0x2000, CRC(b7e67b9d) SHA1(bb6e2d2cac1a2f3c26fa1327db0eb53b521005a3) )	
 ROM_END
 
 /* BUBBLE TROUBLE */
@@ -4697,6 +4700,9 @@ ROM_START( bubbletr )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
 	ROM_LOAD( "bt1-voi1.bin",  0x000000, 0x080000,  CRC(08b3a089) SHA1(5023c2c0d0a94f0a2f98605d9b93d2d6ce626aa8) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "bubbletr.nv",  0x000000, 0x2000, CRC(75ace624) SHA1(1acd2af0c825e50c542db975e1fbda8cbb009f1d) )		
 ROM_END
 
 

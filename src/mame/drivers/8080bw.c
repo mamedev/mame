@@ -2248,12 +2248,13 @@ ROM_START( vortex )
 	ROM_LOAD( "6.t31",        0x4800, 0x0800, CRC(271085d0) SHA1(a772cec8135bc746f6c56aa294eb22c0604e16f9) )
 ROM_END
 
+
 ROM_START( moonbase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ze3-1.a4",     0x0000, 0x0400, CRC(82dbf2c7) SHA1(c767d8b866db4a5059bd79f962a90ce3a962e1e6) )
 	ROM_LOAD( "ze3-2.c4",     0x0400, 0x0400, CRC(c867f5b4) SHA1(686318fda6edde297aecaf33f480bfa075fa6eca) )
 	ROM_LOAD( "ze3-3.e4",     0x0800, 0x0400, CRC(cb23ccc1) SHA1(86be2d14d52b3404e1a25c573bd25b97729d82a1) )
-	ROM_LOAD( "ze3-4.f4",     0x0c00, 0x0400, CRC(9a11abe2) SHA1(f5337183c7f279d75ddeeab24f4f132aa2ee103b) )
+	ROM_LOAD( "ze3-4.f4",     0x0c00, 0x0400, CRC(9a11abe2) SHA1(f5337183c7f279d75ddeeab24f4f132aa2ee103b) ) // 'Taito Corp' string hidden in ROM
 	ROM_LOAD( "ze3-5.h4",     0x1000, 0x0400, CRC(2b105ed3) SHA1(fa0767089b3aaec25be39e950e7163ecbdc2f39f) )
 	ROM_LOAD( "ze3-6.l4",     0x1400, 0x0400, CRC(cb3d6dcb) SHA1(b4923b12a141c76b7d50274f19a3224db26a5669) )
 	ROM_LOAD( "ze3-7.a5",     0x1800, 0x0400, CRC(774b52c9) SHA1(ddbbba874ac069fb930b364a890c45675ec389f7) )
@@ -2265,6 +2266,25 @@ ROM_START( moonbase )
 	ROM_LOAD( "cv02.h7",      0x0000, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 	ROM_LOAD( "cv01.g7",      0x0400, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 ROM_END
+
+ROM_START( moonbasea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ze3-1.a4",     0x0000, 0x0400, CRC(82dbf2c7) SHA1(c767d8b866db4a5059bd79f962a90ce3a962e1e6) )
+	ROM_LOAD( "ze3-2.c4",     0x0400, 0x0400, CRC(c867f5b4) SHA1(686318fda6edde297aecaf33f480bfa075fa6eca) )
+	ROM_LOAD( "ze3-3.e4",     0x0800, 0x0400, CRC(cb23ccc1) SHA1(86be2d14d52b3404e1a25c573bd25b97729d82a1) )
+	ROM_LOAD( "ze3-4_alt.f4", 0x0c00, 0x0400, CRC(86a00411) SHA1(f518f5098512d6d23a8887605707844c1b32e54f) ) // 'Nichibutsu' string hidden in ROM
+	ROM_LOAD( "ze3-5.h4",     0x1000, 0x0400, CRC(2b105ed3) SHA1(fa0767089b3aaec25be39e950e7163ecbdc2f39f) )
+	ROM_LOAD( "ze3-6.l4",     0x1400, 0x0400, CRC(cb3d6dcb) SHA1(b4923b12a141c76b7d50274f19a3224db26a5669) )
+	ROM_LOAD( "ze3-7.a5",     0x1800, 0x0400, CRC(774b52c9) SHA1(ddbbba874ac069fb930b364a890c45675ec389f7) )
+	ROM_LOAD( "ze3-8.c5",     0x1c00, 0x0400, CRC(e88ea83b) SHA1(ef05be4783c860369ee5ecd4844837207e99ad9f) )
+	ROM_LOAD( "ze3-9.e5",     0x4000, 0x0400, CRC(2dd5adfa) SHA1(62cb98cad1e48de0e0cbf30392d35834b38dadbd) )
+	ROM_LOAD( "ze3-10.f5",    0x4400, 0x0400, CRC(1e7c22a4) SHA1(b34173375494ffbf5400dd4014a683a9807f4f08) )
+
+	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_LOAD( "cv02.h7",      0x0000, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
+	ROM_LOAD( "cv01.g7",      0x0400, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
+ROM_END
+
 
 ROM_START( invrvnge )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2956,7 +2976,8 @@ GAMEL(19??, invasionb,invaders, invaders, invasion, 0, ROT270, "bootleg", "Invas
 GAMEL(19??, invasionrz,invaders,invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 3, R Z SRL BOLOGNA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
 GAMEL(19??, invasionrza,invaders,invaders,invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 4, R Z SRL BOLOGNA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
 GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu (Taito license?)", "Moon Base (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - how do you get it to display?
+GAME( 1979, moonbasea,invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )                  // this has the same string replaced with Nichibutsu, no other differences
 GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
 GAMEL(19??, invrvngea,invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
 GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "Taito", "Space Laser", GAME_SUPPORTS_SAVE )

@@ -341,6 +341,47 @@ ROM_START( vaportra )
 	ROM_LOAD( "pal16l8b.14h", 0x0800, 0x0104, CRC(bf421fce) SHA1(e8b0895b1fe99a3d5b3dcca004a7bfd1a09766b2) )
 ROM_END
 
+ROM_START( vaportra3 ) // 74 bytes of 68k code have been changed compared to vaportra set
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "fl02-3.bin", 0x00000, 0x20000, CRC(6c59be54) SHA1(ce60be53fb2cc3a26a28e8632c8638771d3db3c9) ) // == fl_02-1.bin (99.973297%)
+	ROM_LOAD16_BYTE( "fl00-3.bin", 0x00001, 0x20000, CRC(69f8bef4) SHA1(7249d097c33adac9b42dd98d1328ad1c496ff927) ) // == fl_00-1.bin (99.970245%)
+	ROM_LOAD16_BYTE( "fl_03.bin",   0x40000, 0x20000, CRC(80bd2844) SHA1(3fcaa409c7134388fa9458df8e8aaecc93f085e6) )
+	ROM_LOAD16_BYTE( "fl_01.bin",   0x40001, 0x20000, CRC(9474b085) SHA1(5510309ddab5fbf1dbb0a7b1e424a5dff5ec263d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_LOAD( "fj04",    0x00000, 0x10000, CRC(e9aedf9b) SHA1(f7bcf8f666015140aaad8ee5cf619636934b7066) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) // original DE board with mask rom split into 4 roms
+	ROM_LOAD16_BYTE( "fl23",   0x00000, 0x20000, CRC(6089f9e7) SHA1(a036068398a8e72c8fcf29fadaaad5a8930c2bfe) )
+	ROM_LOAD16_BYTE( "fl25",   0x00001, 0x20000, CRC(3989290a) SHA1(7d2d8a334d4c206298d806eac4f2cd46e7d4f918) )
+	ROM_LOAD16_BYTE( "fl24",   0x40000, 0x20000, CRC(41551bfa) SHA1(bc636fec6d610f651101656d6e9ad06656ce516a) )
+	ROM_LOAD16_BYTE( "fl26",   0x40001, 0x20000, CRC(dc67fa5c) SHA1(459a1ee059d6bb2fb2c6744fffeb25b915b29e67) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "vtmaa02.bin",   0x000000, 0x80000, CRC(091ff98e) SHA1(814dc08c055bad5368955a4b1fe6a706b58adc02) ) /* tiles 3 */
+	ROM_LOAD( "vtmaa01.bin",   0x080000, 0x80000, CRC(c217a31b) SHA1(e259d48190d6890781fb0338e17e14822876babb) ) /* tiles 2 */
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD( "vtmaa03.bin",   0x000000, 0x80000, CRC(1a30bf81) SHA1(00e6c713e12133a99d64ca80638c9cbc8e26b2c8) ) /* sprites */
+	ROM_LOAD( "vtmaa04.bin",   0x080000, 0x80000, CRC(b713e9cc) SHA1(af33943d75d2ee3a7385f624537008dca9e1d5d8) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )	/* ADPCM samples */
+	ROM_LOAD( "fj06",    0x00000, 0x20000, CRC(6e98a235) SHA1(374564b4e494d03cd1330c06e321b9452c22a075) )
+
+	ROM_REGION( 0x40000, "oki2", 0 )	/* ADPCM samples */
+	ROM_LOAD( "fj05",    0x00000, 0x20000, CRC(39cda2b5) SHA1(f5c5a305025d451ab48f84cd63e36a3bbdefda96) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "fj-27.bin",    0x00000, 0x00200, CRC(65045742) SHA1(5dfb6c85a70b208cd16d3bf8ec1897e77f4a9b7d) )
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD( "pal16l8a.6l",  0x0000, 0x0104, CRC(ee748e8f) SHA1(6ffe8b11f076305e82f64e0a12b76ffe725ce345) )
+	ROM_LOAD( "pal16l8b.13g", 0x0200, 0x0104, CRC(6da13bda) SHA1(d7bade089d87015e1e95fbf3f292db4688ee4624) )
+	ROM_LOAD( "pal16l8b.13h", 0x0400, 0x0104, CRC(62a9e098) SHA1(7b7c371c040d250d41fde021d191d62ce95bfc20) )
+	ROM_LOAD( "pal16l8b.14g", 0x0600, 0x0104, CRC(036768aa) SHA1(96185989031e0a9b38ff29bf4cf6162482d33964) )
+	ROM_LOAD( "pal16l8b.14h", 0x0800, 0x0104, CRC(bf421fce) SHA1(e8b0895b1fe99a3d5b3dcca004a7bfd1a09766b2) )
+ROM_END
+
 ROM_START( vaportrau )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "fj02",   0x00000, 0x20000, CRC(a2affb73) SHA1(0d49397cc9891047a0b92e92e2e3d0e7fcaf8db9) )
@@ -813,5 +854,6 @@ static DRIVER_INIT( vaportra )
 /******************************************************************************/
 
 GAME( 1989, vaportra, 0,        vaportra, vaportra, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, vaportra3,vaportra, vaportra, vaportra, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 3?)", GAME_SUPPORTS_SAVE )
 GAME( 1989, vaportrau,vaportra, vaportra, vaportra, vaportra, ROT270, "Data East USA", "Vapor Trail - Hyper Offence Formation (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, kuhga,    vaportra, vaportra, vaportra, vaportra, ROT270, "Data East Corporation", "Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)", GAME_SUPPORTS_SAVE )

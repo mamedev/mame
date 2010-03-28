@@ -1447,12 +1447,33 @@ ROM_END
 
 ROM_START( stocker )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "ab01.u8a", 0x10000, 0x4000, CRC(6a914d99) SHA1(0df23fcdcb3743d84ce0363424b7c5dd249c6dcf) )
+	ROM_LOAD( "ab23.u7a", 0x14000, 0x4000, CRC(48e432c2) SHA1(af87009089a3e83fab5c935696edbbf2a15215f9) )
+	ROM_LOAD( "cd6ef.u1a",0x2c000, 0x4000, CRC(83e6e5c9) SHA1(f0e38a95cb2ea385a587f330c48fc787db0cc65e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
+	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
+	ROM_LOAD( "gr01.u6b", 0x00000, 0x4000, CRC(2e66ac35) SHA1(c65b4991a88f8359c85f904f66a7fe73330aface) )
+	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(6fa43631) SHA1(7000907b914bf851b09811e3736af8c02e1aeda9) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+
+    MOTHERBOARD_PALS
+ROM_END
+
+// the old dump for reference, it had a different cart layout.
+#if 0
+ROM_START( stocker )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "stkr-ab0.bin", 0x10000, 0x2000, CRC(784a00ad) SHA1(33e76be44207bc24dbb9c2f04204df22ba5154ff) )
 	ROM_LOAD( "stkr-ab1.bin", 0x12000, 0x2000, CRC(cdae01dc) SHA1(7c2956acae639fd2f2cf061d1c32ae9edabe9270) )
 	ROM_LOAD( "stkr-ab2.bin", 0x14000, 0x2000, CRC(18527d57) SHA1(cbb85f9e0b6169f4c2e03dc54b4937043535fc42) )
 	ROM_LOAD( "stkr-ab3.bin", 0x16000, 0x2000, CRC(028f6c06) SHA1(f1d30efcd7e967b0390f441848bb655111fdde65) )
-	ROM_LOAD( "stkr-cd.bin",  0x2c000, 0x2000, CRC(53dbc4e5) SHA1(e389978b5472174681fa180c6a2edf49903a6514) )
-	ROM_LOAD( "stkr-ef.bin",  0x2e000, 0x2000, CRC(cdcf46bc) SHA1(8b1e801dab1efed002d484135264998d255dc041) )
+	ROM_LOAD( "stkr-cd.bin",  0x2c000, 0x2000, BAD_DUMP CRC(53dbc4e5) SHA1(e389978b5472174681fa180c6a2edf49903a6514) ) // 1 bad byte
+	ROM_LOAD( "stkr-ef.bin",  0x2e000, 0x2000, BAD_DUMP CRC(cdcf46bc) SHA1(8b1e801dab1efed002d484135264998d255dc041) ) // 1 bad byte
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
@@ -1461,14 +1482,14 @@ ROM_START( stocker )
 	ROM_LOAD( "stkr-gr0.bin", 0x00000, 0x2000, CRC(76d5694c) SHA1(e2b155fc7178886eb37a532d961b99b8c864397c) )
 	ROM_LOAD( "stkr-gr1.bin", 0x02000, 0x2000, CRC(4a5cc00b) SHA1(9ce46ed94e715a5997998aee6377baf2869ab3a6) )
 	ROM_LOAD( "stkr-gr2.bin", 0x04000, 0x2000, CRC(70002382) SHA1(c151ad3df2714a2f9f8b047894e7585ca16bd29e) )
-	ROM_LOAD( "stkr-gr3.bin", 0x06000, 0x2000, CRC(68c862d8) SHA1(302ce10e23d17af9aa7fa13d18c602656a262eaa) )
+	ROM_LOAD( "stkr-gr3.bin", 0x06000, 0x2000, CRC(68c862d8) SHA1(302ce10e23d17af9aa7fa13d18c602656a262eaa) ) // the data here also differs from the good set, although the change is meaningless (data at the end blanked out here)
 
     ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
     ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
 
     MOTHERBOARD_PALS
 ROM_END
-
+#endif
 
 ROM_START( triviag1 )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -2182,7 +2203,7 @@ GAME( 1984, snakepit, 0,        balsente, sentetst, snakepit, ROT0, "Bally/Sente
 GAME( 1984, snakjack, 0,        balsente, snakjack, snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", GAME_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
-GAMEL(1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente",  "Stocker", GAME_SUPPORTS_SAVE, layout_stocker )
+GAMEL(1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente",  "Stocker (3/19/85)", GAME_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
 GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break", GAME_SUPPORTS_SAVE )
 GAME( 1985, minigolf, 0,        balsente, minigolf, minigolf, ROT0, "Bally/Sente",  "Mini Golf (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, minigolf2,minigolf, balsente, minigolf2,minigolf2,ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )

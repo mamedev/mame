@@ -4928,6 +4928,30 @@ static const gfx_layout tiles8x32x5_layout =
 };
 #endif
 
+static const gfx_layout cb3c_tiles8x8_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 4,0,12,8,20,16,28,24 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
+};
+
+
+static const gfx_layout cb3c_tiles8x32_layout =
+{
+	8,32,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 4,0,12,8,20,16,28,24 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32,16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32,24*32,25*32,26*32,27*32,28*32,29*32,30*32,31*32 },
+	32*32
+};
+
+
 static GFXDECODE_START( goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128,  8 )
@@ -4946,6 +4970,11 @@ GFXDECODE_END
 static GFXDECODE_START( chry10 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_chry10,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_chry10, 128,  8 )
+GFXDECODE_END
+
+static GFXDECODE_START( cb3c )
+	GFXDECODE_ENTRY( "gfx1", 0, cb3c_tiles8x8_layout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, cb3c_tiles8x32_layout, 128,  8 )
 GFXDECODE_END
 
 static GFXDECODE_START( ncb3 )
@@ -5520,6 +5549,49 @@ static MACHINE_DRIVER_START( chrygld )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+
+
+static MACHINE_DRIVER_START( cb3c )
+
+	MDRV_DRIVER_DATA(goldstar_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(ncb3_map)
+	MDRV_CPU_IO_MAP(ncb3_readwriteport)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	/* 3x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", ncb3_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ncb3_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", ncb3_ppi8255_intf[2] )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(cb3c)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(cm)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(goldstar)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( ncb3 )
@@ -6306,6 +6378,7 @@ ROM_START( chrygld )
 ROM_END
 
 
+
 ROM_START( moonlght )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "4.bin",       0x0000, 0x20000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )
@@ -6424,6 +6497,19 @@ ROM_START( cb3b )
 	ROM_LOAD( "adatabin_0.bin",      0x00000, 0x100, CRC(f566e5e0) SHA1(754f04521b9eb73b34fe3de07e8f3679d1034870) )
 ROM_END
 
+ROM_START( cb3c )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.bin", 0x00000, 0x10000, CRC(c42533cd) SHA1(d55b54b31c910d97418f400fc1ba78460c7183a9) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "cbt1grk.bin", 0x00000, 0x20000, BAD_DUMP CRC(c6fdebc7) SHA1(736bbe5ae7b148e529f7cb80e9ae8903203c7869) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "rbt1grb.bin", 0x00000, 0x8000, CRC(ed635dd7) SHA1(350a4b10ccfddcd6f3aaf748c15d585f0b9dc09b) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // wasn't in this set..
+	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
+ROM_END
 
 
 ROM_START( cmv801 )
@@ -9563,6 +9649,7 @@ GAME( 199?, ncb3,      0,        ncb3,     ncb3,     0,         ROT0, "Dyna",   
 GAME( 199?, cb3a,      ncb3,     ncb3,     cb3a,     0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0 )
 GAME( 199?, cb3,       ncb3,     ncb3,     ncb3,     cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
 GAME( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",           0 )
+GAME( 199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)", GAME_NOT_WORKING)
 
 // cherry master hardware has a rather different mem map, but is basically the same
 GAME( 198?, cmv801,    0,        cm,       cmv801,   cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0 ) /* says ED-96 where the manufacturer is on some games.. */
