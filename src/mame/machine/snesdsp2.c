@@ -254,7 +254,7 @@ static void dsp2_init( running_machine *machine )
 	dsp2_register_save(machine);
 }
 
-static UINT8 dsp2_read( void )
+static UINT8 dsp2_dr_read( void )
 {
 	UINT8 r = 0xff;
 	if (dsp2_state.out_count)
@@ -267,7 +267,7 @@ static UINT8 dsp2_read( void )
 	return r;
 }
 
-static void dsp2_write(UINT8 data)
+static void dsp2_dr_write(UINT8 data)
 {
 	if (dsp2_state.waiting_for_command)
 	{
@@ -375,6 +375,16 @@ static void dsp2_write(UINT8 data)
 			break;
 		}
 	}
+}
+
+static UINT8 dsp2_sr_read( void )
+{
+	return 0x00;
+}
+
+static void dsp2_sr_write( UINT8 data )
+{
+	// do nothing
 }
 
 static void dsp2_register_save( running_machine *machine )

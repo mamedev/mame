@@ -52,9 +52,9 @@ static void srtc_update_time( running_machine *machine )
 	rtc_state.ram[6] = systime->local_time.mday % 10;
 	rtc_state.ram[7] = systime->local_time.mday / 10;
 	rtc_state.ram[8] = systime->local_time.month;
-	rtc_state.ram[9] = (systime->local_time.year - 1900) % 10;
-	rtc_state.ram[10] = ((systime->local_time.year - 1900) / 10) % 10;
-	rtc_state.ram[11] = (systime->local_time.year - 1900) / 100;
+	rtc_state.ram[9] = (systime->local_time.year - 1000) % 10;
+	rtc_state.ram[10] = ((systime->local_time.year - 1000) / 10) % 10;
+	rtc_state.ram[11] = (systime->local_time.year - 1000) / 100;
 	rtc_state.ram[12] = systime->local_time.weekday % 7;
 }
 
