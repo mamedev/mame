@@ -1184,10 +1184,10 @@ static UINT16 ctl_inp_buffer[2];
 
 static UINT16 c417_ram[0x10000], c417_adr = 0;
 
-static UINT16 c412_sdram_a[0x100000];
+static UINT16 c412_sdram_a[0x100000]; // Framebuffers, probably
 static UINT16 c412_sdram_b[0x100000];
-static UINT16 c412_sram[0x20000];
-static UINT16 c412_pczram[0x200];
+static UINT16 c412_sram[0x20000];     // Ram-based tiles for rendering
+static UINT16 c412_pczram[0x200];     // Ram-based tilemap for rendering, or something else
 static UINT32 c412_adr = 0;
 
 static UINT16 c421_dram_a[0x40000];
@@ -1368,7 +1368,7 @@ static WRITE16_HANDLER(s23_c412_w)
     switch(offset) {
 	case 8: c412_adr = (data & mem_mask) | (c412_adr & (0xffffffff ^ mem_mask)); break;
 	case 9: c412_adr = ((data & mem_mask) << 16) | (c412_adr & (0xffffffff ^ (mem_mask << 16))); break;
-	case 10: s23_c412_ram_w(space, c412_adr, data, mem_mask); break;
+	case 10: s23_c412_ram_w(space, c412_adr, data, mem_mask); c412_adr += 2; break;
     default:
         logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
         break;
@@ -1414,7 +1414,7 @@ static READ16_HANDLER(s23_c421_r)
 static WRITE16_HANDLER(s23_c421_w)
 {
     switch(offset) {
-	case 0: s23_c421_ram_w(space, c421_adr & 0xfffff, data, mem_mask); break;
+	case 0: s23_c421_ram_w(space, c421_adr & 0xfffff, data, mem_mask); c421_adr += 2; break;
 	case 2: c421_adr = ((data & mem_mask) << 16) | (c421_adr & (0xffffffff ^ (mem_mask << 16))); break;
 	case 3: c421_adr = (data & mem_mask) | (c421_adr & (0xffffffff ^ mem_mask)); break;
     default:
@@ -1507,7 +1507,7 @@ static WRITE16_HANDLER(s23_c361_w)
 			cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
 			timer_adjust_oneshot(c361_timer, attotime_never, 0);
 		}
-		else if (data != 66)	// hack to avoid locking up Time Crisis 2
+		else
 		{
 			timer_adjust_oneshot(c361_timer, video_screen_get_time_until_pos(space->machine->primary_screen, c361_scanline, 0), 0);
 		}
@@ -1521,7 +1521,7 @@ static WRITE16_HANDLER(s23_c361_w)
 static READ16_HANDLER(s23_c361_r)
 {
 	switch(offset) {
-	case 5: return video_screen_get_vpos(space->machine->primary_screen);
+	case 5: return video_screen_get_vpos(space->machine->primary_screen)*2;
 	case 6: return video_screen_get_vblank(space->machine->primary_screen);
 	}
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -1933,7 +1933,10 @@ static WRITE32_HANDLER( p3d_w)
 		if(data & 1)
 			p3d_dma(space, p3d_address, p3d_size);
 		return;
-	case 0x17: return;
+	case 0x17:
+		cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+		timer_adjust_oneshot(c361_timer, attotime_never, 0);
+		return;
 	}
 	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 }
