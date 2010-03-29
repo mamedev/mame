@@ -137,7 +137,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Vertical IRQ timer - only if horizontal isn't also enabled! */
 	if ((snes_ram[NMITIMEN] & 0x20) && !(snes_ram[NMITIMEN] & 0x10))
 	{
-		if (snes_ppu.beam.current_vert == (((snes_ram[VTIMEH] << 8) | snes_ram[VTIMEL]) & 0x1ff))
+		if (snes_ppu.beam.current_vert == state->vtime)
 		{
 			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
 			// IRQ latches the counters, do it now
@@ -149,12 +149,12 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	if (snes_ram[NMITIMEN] & 0x10)
 	{
 		int setirq = 1;
-		int pixel = ((snes_ram[HTIMEH] << 8) | snes_ram[HTIMEL]) & 0x1ff;
+		int pixel = state->htime;
 
 		// is the HIRQ on a specific scanline?
 		if (snes_ram[NMITIMEN] & 0x20)
 		{
-			if (snes_ppu.beam.current_vert != (((snes_ram[VTIMEH] << 8) | snes_ram[VTIMEL]) & 0x1ff) )
+			if (snes_ppu.beam.current_vert != state->vtime)
 			{
 				setirq = 0;
 			}
@@ -238,7 +238,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 			if (snes_ram[HDMAEN])
 				snes_hdma(cpu0space);
 
-			video_screen_update_partial(machine->primary_screen, (snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert*snes_ppu.interlace) : snes_ppu.beam.current_vert-1);
+			video_screen_update_partial(machine->primary_screen, (snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert * snes_ppu.interlace) : snes_ppu.beam.current_vert - 1);
 		}
 	}
 
@@ -773,20 +773,9 @@ READ8_HANDLER( snes_r_io )
 			snes_ppu.ppu2_open_bus = value;
 			return snes_ppu.ppu2_open_bus;
 		case WMDATA:	/* Data to read from WRAM */
-			{
-				UINT32 addr = ((snes_ram[WMADDH] & 0x1) << 16) | (snes_ram[WMADDM] << 8) | snes_ram[WMADDL];
-
-				value = memory_read_byte(space, 0x7e0000 + addr++);
-				addr &= 0x1ffff;
-				snes_ram[WMADDH] = (addr >> 16) & 0x1;
-				snes_ram[WMADDM] = (addr >> 8) & 0xff;
-				snes_ram[WMADDL] = addr & 0xff;
-				return value;
-			}
-		case WMADDL:	/* Address to read/write to wram (low) */
-		case WMADDM:	/* Address to read/write to wram (mid) */
-		case WMADDH:	/* Address to read/write to wram (high) */
-			return snes_ram[offset];
+			value = memory_read_byte(space, 0x7e0000 + state->wram_address++);
+			state->wram_address &= 0x1ffff;
+			return value;
 		case OLDJOY1:	/* Data for old NES controllers (JOYSER1) */
 			if (snes_ram[offset] & 0x1)
 				return 0 | (snes_open_bus_r(space, 0) & 0xfc); //correct?
@@ -801,11 +790,6 @@ READ8_HANDLER( snes_r_io )
 			value = state->oldjoy2_read(space->machine);
 
 			return value | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
-		case HTIMEL:
-		case HTIMEH:
-		case VTIMEL:
-		case VTIMEH:
-			return snes_ram[offset];
 		case RDNMI:			/* NMI flag by v-blank and version number */
 			value = (snes_ram[offset] & 0x8f) | (snes_open_bus_r(space, 0) & 0x70);
 			snes_ram[offset] &= 0x7f;	/* NMI flag is reset on read */
@@ -813,7 +797,7 @@ READ8_HANDLER( snes_r_io )
 		case TIMEUP:		/* IRQ flag by H/V count timer */
 			value = (snes_open_bus_r(space, 0) & 0x7f) | (snes_ram[TIMEUP] & 0x80);
 			cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
-			snes_ram[TIMEUP] = 0;
+			snes_ram[TIMEUP] = 0;	// flag is cleared on both read and write
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
@@ -1354,19 +1338,21 @@ WRITE8_HANDLER( snes_w_io )
 #endif
 			break;
 		case WMDATA:	/* Data to write to WRAM */
-			{
-				UINT32 addr = ((snes_ram[WMADDH] & 0x1) << 16) | (snes_ram[WMADDM] << 8) | snes_ram[WMADDL];
-				memory_write_byte(space, 0x7e0000 + addr++, data );
-				addr &= 0x1ffff;
-				snes_ram[WMADDH] = (addr >> 16) & 0x1;
-				snes_ram[WMADDM] = (addr >> 8) & 0xff;
-				snes_ram[WMADDL] = addr & 0xff;
-				return;
-			}
+			memory_write_byte(space, 0x7e0000 + state->wram_address++, data );
+			state->wram_address &= 0x1ffff;
+			return;
 		case WMADDL:	/* Address to read/write to wram (low) */
+			state->wram_address = (state->wram_address & 0xffff00) | (data <<  0);
+			state->wram_address &= 0x1ffff;
+			return;
 		case WMADDM:	/* Address to read/write to wram (mid) */
+			state->wram_address = (state->wram_address & 0xff00ff) | (data <<  8);
+			state->wram_address &= 0x1ffff;
+			return;
 		case WMADDH:	/* Address to read/write to wram (high) */
-			break;
+			state->wram_address = (state->wram_address & 0x00ffff) | (data << 16);
+			state->wram_address &= 0x1ffff;
+			return;
 		case OLDJOY1:	/* Old NES joystick support */
 			if (((!(data & 0x1)) && (snes_ram[offset] & 0x1)))
 			{
@@ -1422,10 +1408,21 @@ WRITE8_HANDLER( snes_w_io )
 			}
 			break;
 		case HTIMEL:	/* H-Count timer settings (low)  */
+			state->htime = (state->htime & 0xff00) | (data <<  0);
+			state->htime &= 0x1ff;
+			return;
 		case HTIMEH:	/* H-Count timer settings (high) */
+			state->htime = (state->htime & 0x00ff) | (data <<  8);
+			state->htime &= 0x1ff;
+			return;
 		case VTIMEL:	/* V-Count timer settings (low)  */
+			state->vtime = (state->vtime & 0xff00) | (data <<  0);
+			state->vtime &= 0x1ff;
+			return;
 		case VTIMEH:	/* V-Count timer settings (high) */
-			break;
+			state->vtime = (state->vtime & 0x00ff) | (data <<  8);
+			state->vtime &= 0x1ff;
+			return;
 		case MDMAEN:	/* DMA channel designation and trigger */
 			snes_dma(space, data);
 			data = 0;	/* Once DMA is done we need to reset all bits to 0 */
@@ -1443,8 +1440,8 @@ WRITE8_HANDLER( snes_w_io )
 				mame_printf_debug( "CPU speed: %f Mhz\n", (data & 0x1) ? 3.58 : 2.68 );
 #endif
 			break;
-		case TIMEUP:
-			snes_ram[TIMEUP] = data &~0x7f;
+		case TIMEUP:	// IRQ Flag is cleared on both read and write
+			snes_ram[TIMEUP] = 0;
 			return;
 		/* Following are read-only */
 		case HVBJOY:	/* H/V blank and joypad enable */
@@ -1606,7 +1603,6 @@ address               |         |          |       |     |         |        |   
 /* 0x000000 - 0x2fffff */
 READ8_HANDLER( snes_r_bank1 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value;
 	UINT16 address = offset & 0xffff;
 
@@ -1616,8 +1612,8 @@ READ8_HANDLER( snes_r_bank1 )
 		value = snes_r_io(space, address);
 	else if (address < 0x8000)
 	{
-		if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-			value = snes_ram[0x700000 + (address & 0x1fff)];
+		if (snes_has_addon_chip == HAS_SUPERFX)
+			value = snes_ram[0xf00000 + (address & 0x1fff)];	// here it should 0xe00000 but there are mirroring issues
 		else if (snes_has_addon_chip == HAS_OBC1)
 			value = obc1_read(space, offset);
 		else if ((snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
@@ -1627,9 +1623,7 @@ READ8_HANDLER( snes_r_bank1 )
 		else if (snes_has_addon_chip == HAS_CX4)
 			value = CX4_read(address - 0x6000);
 		else if (snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC)
-		{
 			value = snes_ram[0x306000 + (offset & 0x1fff)];
-		}
 		else
 		{
 			logerror( "snes_r_bank1: Unmapped external chip read: %04x\n", address );
@@ -1660,14 +1654,14 @@ READ8_HANDLER( snes_r_bank2 )
 		value = snes_r_io(space, address);
 	else if (address < 0x8000)										/* SRAM for mode_21, Reserved othewise */
 	{
-		if (snes_has_addon_chip == HAS_OBC1)
+		if (snes_has_addon_chip == HAS_SUPERFX)
+			value = snes_ram[0xf00000 + (address & 0x1fff)];	// here it should 0xe00000 but there are mirroring issues
+		else if (snes_has_addon_chip == HAS_OBC1)
 			value = obc1_read (space, offset);
 		else if (snes_has_addon_chip == HAS_DSP2)
 			value = (address < 0x7000) ? dsp2_read() : 0x00;
 		else if (snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC)
-		{
 			value = snes_ram[0x306000 + (offset & 0x1fff)];
-		}
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
 		{
 			int mask = ((snes_cart.sram * 1024) - 1);				/* Limit SRAM size to what's actually present */
@@ -1701,22 +1695,14 @@ READ8_HANDLER( snes_r_bank3 )
 	UINT8 value;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX)
+	if ((snes_cart.mode & 5) && !(snes_has_addon_chip == HAS_SUPERFX))	/* Mode 20 & 22 */
 	{
-		//printf( "snes_r_bank3: %08x\n", offset );
-		return snes_ram[0x400000 + offset];
-	}
-	else if (snes_cart.mode & 5)							/* Mode 20 & 22 */
-	{
-		if ((address < 0x8000) && (snes_cart.mode == SNES_MODE_20)) //FIXME: check this
-		{
+		if ((address < 0x8000) && (snes_cart.mode == SNES_MODE_20))
 			value = 0xff;							/* Reserved */
-			//value =  snes_ram[0x200000 + ((offset & ~0x8000) | 0x8000)];  // is this hack still needed?   /* Reserved */
-		}
 		else
 			value = snes_ram[0x400000 + offset];
 	}
-	else											/* Mode 21 & 25 */
+	else											/* Mode 21 & 25 + SuperFX games */
 		value = snes_ram[0x400000 + offset];
 
 	return value;
@@ -1725,18 +1711,13 @@ READ8_HANDLER( snes_r_bank3 )
 /* 0x600000 - 0x6fffff */
 READ8_HANDLER( snes_r_bank4 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-	{
-		value = snes_ram[0x600000 + offset];
-	}
+	if (snes_has_addon_chip == HAS_SUPERFX)
+		value = snes_ram[0xe00000 + offset];
 	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x80000 && address < 0x1000)
-	{
 		value = st010_read(address);
-	}
 	else if (snes_cart.mode & 5)							/* Mode 20 & 22 */
 	{
 		if (address >= 0x8000)
@@ -1759,15 +1740,12 @@ READ8_HANDLER( snes_r_bank4 )
 /* 0x700000 - 0x7dffff */
 READ8_HANDLER( snes_r_bank5 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-	{
-		value = snes_ram[0x700000 + offset];
-	}
-	else if ((snes_cart.mode & 5) &&(address < 0x8000))		/* Mode 20 & 22 */
+	if (snes_has_addon_chip == HAS_SUPERFX)
+		value = snes_ram[0xf00000 + offset];
+	else if ((snes_cart.mode & 5) && (address < 0x8000))		/* Mode 20 & 22 */
 	{
 		if (snes_cart.sram > 0)
 		{
@@ -1776,14 +1754,12 @@ READ8_HANDLER( snes_r_bank5 )
 		}
 		else
 		{
-			logerror( "snes_r_bank5: Unmapped external chip read: %04x\n", address );
+			logerror("snes_r_bank5: Unmapped external chip read: %04x\n", address);
 			value = 0xff;								/* Reserved */
 		}
 	}
 	else
-	{
 		value = snes_ram[0x700000 + offset];
-	}
 
 	return value;
 }
@@ -1791,15 +1767,14 @@ READ8_HANDLER( snes_r_bank5 )
 /* 0x800000 - 0xbfffff */
 READ8_HANDLER( snes_r_bank6 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
-	if (address < 0x8000)
+	if (snes_has_addon_chip == HAS_SUPERFX)
+		value = memory_read_byte(space, offset);
+	else if (address < 0x8000)
 	{
-		if (address >= 0x6000 && snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-			logerror( "snes_r_bank6 hit in Super FX mode, please fix me\n" );
-		else if (snes_cart.mode != SNES_MODE_25)
+		if (snes_cart.mode != SNES_MODE_25)
 			value = memory_read_byte(space, offset);
 		else if (snes_has_addon_chip == HAS_CX4)
 		{
@@ -1817,7 +1792,7 @@ READ8_HANDLER( snes_r_bank6 )
 			}
 			else						/* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
 			{
-				logerror( "snes_r_bank6: Unmapped external chip read: %04x\n", address );
+				logerror("snes_r_bank6: Unmapped external chip read: %04x\n", address);
 				value = 0xff;
 			}
 		}
@@ -1839,32 +1814,21 @@ READ8_HANDLER( snes_r_bank6 )
 /* 0xc00000 - 0xffffff */
 READ8_HANDLER( snes_r_bank7 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
 	if (snes_has_addon_chip == HAS_SDD1)
-	{
-		return sdd1_read(space->machine, offset);
-	}
-	else if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-	{
-		logerror( "snes_r_bank7 hit in Super FX mode, please fix me\n" );
-	}
+		value = sdd1_read(space->machine, offset);
 	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x280000 && offset < 0x300000 && address < 0x1000)
-	{
 		value = st010_read(address);
-	}
-	else if (snes_cart.mode & 5)				/* Mode 20 & 22 */
+	else if ((snes_cart.mode & 5) && !(snes_has_addon_chip == HAS_SUPERFX))		/* Mode 20 & 22 */
 	{
 		if (address < 0x8000)
-		{
 			value = memory_read_byte(space, 0x400000 + offset);
-		}
 		else
 			value = snes_ram[0xc00000 + offset];
 	}
-	else								/* Mode 21 & 25 */
+	else								/* Mode 21 & 25 + SuperFX Games */
 		value = snes_ram[0xc00000 + offset];
 
 	return value;
@@ -1883,7 +1847,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 	else if (address < 0x8000)
 	{
 		if (snes_has_addon_chip == HAS_SUPERFX)
-			snes_ram[0x700000 + (address & 0x1fff)] = data;
+			snes_ram[0xf00000 + (address & 0x1fff)] = data;	// here it should 0xe00000 but there are mirroring issues
 		else if (snes_has_addon_chip == HAS_OBC1)
 			obc1_write(space, offset, data);
 		else if ((snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
@@ -1920,7 +1884,9 @@ WRITE8_HANDLER( snes_w_bank2 )
 		snes_w_io(space, address, data);
 	else if (address < 0x8000)						/* SRAM for mode_21, Reserved othewise */
 	{
-		if (snes_has_addon_chip == HAS_OBC1)
+		if (snes_has_addon_chip == HAS_SUPERFX)
+			snes_ram[0xf00000 + (address & 0x1fff)] = data;	// here it should 0xe00000 but there are mirroring issues
+		else if (snes_has_addon_chip == HAS_OBC1)
 			obc1_write(space, offset, data);
 		else if (snes_has_addon_chip == HAS_DSP2)
 			dsp2_write(data);
@@ -1931,7 +1897,6 @@ WRITE8_HANDLER( snes_w_bank2 )
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
 		{
 			int mask = ((snes_cart.sram * 1024) - 1);			/* Limit SRAM size to what's actually present */
-			logerror( "snes_w_bank2 hit in Super FX mode, please fix me if necessary\n" );
 			offset -= 0x6000;
 			snes_ram[0x306000 + (offset & mask)] = data;
 		}
@@ -1954,48 +1919,32 @@ WRITE8_HANDLER( snes_w_bank2 )
 /* 0x600000 - 0x6fffff */
 WRITE8_HANDLER( snes_w_bank4 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-	{
-		snes_ram[0x600000 + offset] = data;
-	}
+	if (snes_has_addon_chip == HAS_SUPERFX)
+		snes_ram[0xe00000 + offset] = data;
 	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x80000 && address < 0x1000)
-	{
 		st010_write(address, data);
-	}
 	else if (snes_cart.mode & 5)					/* Mode 20 & 22 */
 	{
 		if (address >= 0x8000)
-		{
 			logerror("Attempt to write to ROM address: %X\n", offset + 0x600000);
-		}
 		else if (snes_has_addon_chip == HAS_DSP1)
-		{
 			dsp1_set_dr(data);
-		}
 		else
-		{
 			logerror("snes_w_bank4: Attempt to write to reserved address: %X = %02x\n", offset + 0x600000, data);
-		}
 	}
 	else if (snes_cart.mode & 0x0a)
-	{
 		logerror("Attempt to write to ROM address: %X\n", offset + 0x600000);
-	}
 }
 
 /* 0x700000 - 0x7dffff */
 WRITE8_HANDLER( snes_w_bank5 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-	{
-		snes_ram[0x700000 + offset] = data;
-	}
+	if (snes_has_addon_chip == HAS_SUPERFX)
+		snes_ram[0xf00000 + offset] = data;
 	else if ((snes_cart.mode & 5) && (address < 0x8000))			/* Mode 20 & 22 */
 	{
 		if (snes_cart.sram > 0)
@@ -2004,49 +1953,32 @@ WRITE8_HANDLER( snes_w_bank5 )
 			snes_ram[0x700000 + (offset & mask)] = data;
 		}
 		else
-		{
 			logerror("snes_w_bank5: Attempt to write to reserved address: %X = %02x\n", offset + 0x700000, data);
-		}
 	}
 	else if (snes_cart.mode & 0x0a)
-	{
 		logerror("Attempt to write to ROM address: %X\n", offset + 0x700000);
-	}
 }
 
 
 /* 0x800000 - 0xbfffff */
 WRITE8_HANDLER( snes_w_bank6 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT16 address = offset & 0xffff;
 
-	if (address < 0x8000)
+	if (snes_has_addon_chip == HAS_SUPERFX)
+		memory_write_byte(space, offset, data);
+	else if (address < 0x8000)
 	{
-		if (address >= 0x6000 && snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-		{
-			logerror( "snes_w_bank6 hit (RAM) in Super FX mode, please fix me\n" );
-		}
-		else if (snes_has_addon_chip == HAS_CX4)
+		if (snes_has_addon_chip == HAS_CX4)
 		{
 			//printf( "R: CX4 hit from 0x800000\n" );
 		}
 		if (snes_cart.mode != SNES_MODE_25)
-		{
-			if (offset < 0x300000)
-				snes_w_bank1(space, offset, data);
-			else
-				snes_w_bank2(space, offset - 0x300000, data);
-		}
+			memory_write_byte(space, offset, data);
 		else	/* Mode 25 has SRAM not mirrored from lower banks */
 		{
 			if (address < 0x6000)
-			{
-				if (offset < 0x300000)
-					snes_w_bank1(space, offset, data);
-				else
-					snes_w_bank2(space, offset - 0x300000, data);
-			}
+				memory_write_byte(space, offset, data);
 			else if ((offset >= 0x300000) && (snes_cart.sram > 0))
 			{
 				int mask = ((snes_cart.sram * 1024) - 1);			/* Limit SRAM size to what's actually present */
@@ -2065,8 +1997,6 @@ WRITE8_HANDLER( snes_w_bank6 )
 		dsp3_write(address, data);
 	else if ((snes_has_addon_chip == HAS_DSP4) && (offset >= 0x300000) && (address < 0xc000))
 		dsp4_write(data);
-	else if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
-		logerror( "snes_w_bank6 hit (ROM) in Super FX mode, please fix me\n" );
 	else
 		logerror("Attempt to write to ROM address: %X\n", offset + 0x800000);
 }
@@ -2075,24 +2005,17 @@ WRITE8_HANDLER( snes_w_bank6 )
 /* 0xc00000 - 0xffffff */
 WRITE8_HANDLER( snes_w_bank7 )
 {
-	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
+	if (snes_has_addon_chip == HAS_SUPERFX)
 	{
 		if (offset >= 0x200000)
-		{
-			logerror( "snes_w_bank7 hit (ROM) in Super FX mode, please fix me\n" );
-		}
+			snes_ram[0xc00000 + offset] = data;		// SFX RAM
 		else
-		{
-			logerror( "snes_w_bank7 hit (RAM) in Super FX mode, please fix me\n" );
-		}
+			logerror("Attempt to write to ROM address: %X\n", offset + 0xc00000);
 	}
 	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x280000 && offset < 0x300000 && address < 0x1000)
-	{
 		st010_write(address, data);
-	}
 	else if (snes_cart.mode & 5)				/* Mode 20 & 22 */
 	{
 		if (address < 0x8000)
@@ -2391,10 +2314,8 @@ MACHINE_RESET( snes )
 
 	// reset does this to these registers
 	snes_ram[NMITIMEN] = 0;
-	snes_ram[HTIMEL] = 0xff;
-	snes_ram[HTIMEH] = 0x1;
-	snes_ram[VTIMEL] = 0xff;
-	snes_ram[VTIMEH] = 0x1;
+	state->htime = 0x1ff;
+	state->vtime = 0x1ff;
 
 	state->htmult = 1;
 	snes_ppu.interlace = 1;
@@ -2884,24 +2805,30 @@ READ8_HANDLER( superfx_r_bank2 )
 
 READ8_HANDLER( superfx_r_bank3 )
 {
-	//printf( "superfx_r_bank3: %08x = %02x\n", 0x600000 + offset, snes_ram[0x600000 + offset] );
-	return snes_ram[0x600000 + offset];
+	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
+	has only access to 0x600000-0x7d00000 (because there is WRAM after that), hence we directly use the mirror
+	as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
+	//printf("superfx_r_bank3: %08x = %02x\n", offset, snes_ram[0xe00000 + offset]);
+	return snes_ram[0xe00000 + offset];
 }
 
 WRITE8_HANDLER( superfx_w_bank1 )
 {
-	printf( "Attempting to write to cart ROM: %08x = %02x\n", offset, data );
+	printf("Attempting to write to cart ROM: %08x = %02x\n", offset, data);
 	// Do nothing; can't write to cart ROM.
 }
 
 WRITE8_HANDLER( superfx_w_bank2 )
 {
-	printf( "Attempting to write to cart ROM: %08x = %02x\n", 0x400000 + offset, data );
+	printf("Attempting to write to cart ROM: %08x = %02x\n", 0x400000 + offset, data);
 	// Do nothing; can't write to cart ROM.
 }
 
 WRITE8_HANDLER( superfx_w_bank3 )
 {
-	//printf( "superfx_w_bank3: %08x = %02x\n", 0x600000 + offset, data );
-	snes_ram[0x600000 + offset] = data;
+	/* IMPORTANT: SFX RAM sits in 0x600000-0x7f00000, and it's mirrored in 0xe00000-0xff00000. However, SNES
+	has only access to 0x600000-0x7d00000 (because there is WRAM after that), hence we directly use the mirror
+	as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
+	//printf("superfx_w_bank3: %08x = %02x\n", offset, data);
+	snes_ram[0xe00000 + offset] = data;
 }

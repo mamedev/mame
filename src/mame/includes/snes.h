@@ -23,7 +23,7 @@
 #define DOTCLK_NTSC	(MCLK_NTSC/4)
 #define DOTCLK_PAL	(MCLK_PAL/4)
 
-#define SNES_LAYER_DEBUG  0
+#define SNES_LAYER_DEBUG  1
 
 /* Debug definitions */
 #ifdef MAME_DEBUG
@@ -392,6 +392,8 @@ public:
 	UINT8                 read_ophct, read_opvct;
 	UINT16                hblank_offset;
 	UINT16                vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift, vram_read_buffer;
+	UINT32                wram_address;
+	UINT16                htime, vtime;
 
 	/* timers */
 	emu_timer             *scanline_timer;
