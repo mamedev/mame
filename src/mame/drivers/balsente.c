@@ -1287,7 +1287,7 @@ ROM_START( sentetst )
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "sdiaggr0.bin", 0x00000, 0x2000, CRC(5e0ff62a) SHA1(3f0ebebb2f58530af7fac57a4780dfb37ef1ee1d) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1312,7 +1312,7 @@ ROM_START( cshift )
 	ROM_LOAD( "cs-gr3.bin", 0x06000, 0x2000, CRC(b43916a2) SHA1(8d42fb6ae7cf8b2d94eb0c14e00bb115f8ef01b4) )
 	ROM_LOAD( "cs-gr4.bin", 0x08000, 0x2000, CRC(a94cd35b) SHA1(0ca0497a1b055ff1ae6b7bc36ae45749dff50caa) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1338,17 +1338,13 @@ ROM_START( gghost )
 	ROM_LOAD( "ggh-gr4.bin", 0x08000, 0x2000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
 	ROM_LOAD( "ggh-gr5.bin", 0x0a000, 0x2000, CRC(d3da0093) SHA1(7474901b089ea62abad0a2f657fd8c4a1be09bf0) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
-/*
-    The Hat Trick cartridge does not have any PAL's.
-*/
-
 ROM_START( hattrick )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "rom-ab0.u9a", 0x10000, 0x2000, CRC(f25c1b99) SHA1(43b2334be7cfb8091eea963e10547295362372d3) )
+	ROM_LOAD( "rom-ab0.u9a", 0x10000, 0x2000, CRC(f25c1b99) SHA1(43b2334be7cfb8091eea963e10547295362372d3) ) /* The Hat Trick cartridge does not have any PAL's */
 	ROM_LOAD( "rom-ab1.u8a", 0x12000, 0x2000, CRC(c1df3d1f) SHA1(754f537d12efe8891638fd11a2ee8a5b234fb079) )
 	ROM_LOAD( "rom-ab2.u7a", 0x14000, 0x2000, CRC(f6c41257) SHA1(05f5e71d08241c559da3bfc286c76cbb22710586) )
 	ROM_LOAD( "rom-cd.u3a",  0x2c000, 0x2000, CRC(fc44f36c) SHA1(227d0c93c579d743b615b1fa6da56128e8202e51) )
@@ -1361,7 +1357,7 @@ ROM_START( hattrick )
 	ROM_LOAD( "rom-gr0.u9b", 0x00000, 0x2000, CRC(9f41baba) SHA1(fa817a8e4d2f7b86a2294132e3991f7b6d8cb11a) )
 	ROM_LOAD( "rom-gr1.u8b", 0x02000, 0x2000, CRC(951f08c9) SHA1(059a575dd35cd8e822e12ac2606b47b6272bbb41) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1387,7 +1383,7 @@ ROM_START( otwalls )
 	ROM_LOAD( "otw-gr4.bin", 0x08000, 0x2000, CRC(15985c8c) SHA1(94f21c348bfbe4db6d0cfa5b5e35d2df4b8f936d) )
 	ROM_LOAD( "otw-gr5.bin", 0x0a000, 0x2000, CRC(448f7e3c) SHA1(505724e90f17b05ccf0137dbed0d33e39db1d5ab) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1413,7 +1409,7 @@ ROM_START( snakepit )
 	ROM_LOAD( "spit-gr4.bin", 0x08000, 0x2000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
 	ROM_LOAD( "spit-gr5.bin", 0x0a000, 0x2000, CRC(dc27c970) SHA1(291ef10a8c330ef8e47622246b6301d2e5171df7) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1439,9 +1435,9 @@ ROM_START( snakjack )
 	ROM_LOAD( "rom-gr4.u5b", 0x08000, 0x2000, CRC(3fbfa686) SHA1(6c137d177c7aa2701497ac3ac922fdb8cd9f52b3) )
 	ROM_LOAD( "rom-gr5.u4b", 0x0a000, 0x2000, CRC(345f94fb) SHA1(0af24f4e1a797efe5272f64b8a34483fe6002436) )
 
-    /* From a picture in an eBay auction the board appears to have a PAL that needs to be dumped. */
+	/* From a picture in an eBay auction the board appears to have a PAL that needs to be dumped. */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1458,10 +1454,10 @@ ROM_START( stocker )
 	ROM_LOAD( "gr01.u6b", 0x00000, 0x4000, CRC(2e66ac35) SHA1(c65b4991a88f8359c85f904f66a7fe73330aface) )
 	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(6fa43631) SHA1(7000907b914bf851b09811e3736af8c02e1aeda9) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 // the old dump for reference, it had a different cart layout.
@@ -1484,10 +1480,10 @@ ROM_START( stocker )
 	ROM_LOAD( "stkr-gr2.bin", 0x04000, 0x2000, CRC(70002382) SHA1(c151ad3df2714a2f9f8b047894e7585ca16bd29e) )
 	ROM_LOAD( "stkr-gr3.bin", 0x06000, 0x2000, CRC(68c862d8) SHA1(302ce10e23d17af9aa7fa13d18c602656a262eaa) ) // the data here also differs from the good set, although the change is meaningless (data at the end blanked out here)
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 #endif
 
@@ -1513,7 +1509,7 @@ ROM_START( triviag1 )
 	ROM_LOAD( "tpg1-gr4.bin", 0x08000, 0x2000, CRC(673acf42) SHA1(7b36a86441732ba14576f9c1dd14fe0da575d4bf) )
 	ROM_LOAD( "tpg1-gr5.bin", 0x0a000, 0x2000, CRC(067bfd66) SHA1(32f5973f2f0aed67c8f9b5886f52b9dc516a611e) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 ROM_START( trivia12 )
@@ -1538,7 +1534,7 @@ ROM_START( trivia12 )
 	ROM_LOAD( "gr4.u5b", 0x08000, 0x2000, CRC(673acf42) SHA1(7b36a86441732ba14576f9c1dd14fe0da575d4bf) )
 	ROM_LOAD( "gr5.u4b", 0x0a000, 0x2000, CRC(d17d5431) SHA1(b92741f6eda01f2e360e73a9f4df728fc44d7e1b) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1559,7 +1555,7 @@ ROM_START( triviag2 )
 	ROM_LOAD( "gr23.bin",  0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "gr45.bin",  0x08000, 0x4000, CRC(1e870293) SHA1(32149c9c8047854f2b2ad8844c4bd00a8ded588e) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1580,7 +1576,7 @@ ROM_START( triviasp )
 	ROM_LOAD( "gr23.bin",    0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "allsport.3b", 0x08000, 0x4000, CRC(7415a7fc) SHA1(93d832434f359ce7b02aef276c89456b16438979) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1601,7 +1597,7 @@ ROM_START( triviayp )
 	ROM_LOAD( "gr23.bin", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "gr45.bin", 0x08000, 0x4000, CRC(1242033e) SHA1(1a3fe186bb261e2c7d9fbbb2a3103b39bf029b35) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1622,10 +1618,10 @@ ROM_START( triviabb )
 	ROM_LOAD( "gr23.bin", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "gr45.bin", 0x08000, 0x4000, CRC(92fb6fb1) SHA1(1a322bd3cfacdf82d4fcc4b4d47f78a701411919) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 ROM_START( triviaes )
@@ -1647,7 +1643,7 @@ ROM_START( triviaes )
 	ROM_LOAD( "tp_gr2.bin", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "tp_gr1.bin", 0x08000, 0x4000, CRC(1242033e) SHA1(1a3fe186bb261e2c7d9fbbb2a3103b39bf029b35) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1665,10 +1661,10 @@ ROM_START( gimeabrk )
 	ROM_LOAD( "gr01.u6b", 0x00000, 0x4000, CRC(e3cdc476) SHA1(2f17c3f84767850d45192dfb507dd2716ecadc20) )
 	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(0555d9c0) SHA1(da0d1f207ad056b2d82a5ad6382372066883d161) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1688,16 +1684,16 @@ ROM_START( minigolf )
 	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(3bf355ef) SHA1(691df25b35b00e21ad09d17a21fe98a353aa3dda) )
 	ROM_LOAD( "gr45.u4b", 0x08000, 0x4000, CRC(8eb14921) SHA1(fda8b8f8e801360310f7cb1aa4c6aea1fa0a4b25) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
 ROM_START( minigolf2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(348f827f) SHA1(a013ef3068e14e0738bcfa4de26c0c2df4c0a7f6) )
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(348f827f) SHA1(a013ef3068e14e0738bcfa4de26c0c2df4c0a7f6) ) /* Labeled as MINI GOLF UR, then name (like AB01) & dated 11/25/85 */
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(19a6ff47) SHA1(70b6da3b4186e5b9463f2ea0fefefad21ec80637) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(925d76eb) SHA1(29d2d7b26d2e81817c4d135935dab70a5aa2d146) )
 	ROM_LOAD( "ab67.u5a",  0x1c000, 0x4000, CRC(6a311c9a) SHA1(b0409e5f4bd3bf898b8701561aac6dbbc28417bd) )
@@ -1712,10 +1708,10 @@ ROM_START( minigolf2 )
 	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(3bf355ef) SHA1(691df25b35b00e21ad09d17a21fe98a353aa3dda) )
 	ROM_LOAD( "gr45.u4b", 0x08000, 0x4000, CRC(8eb14921) SHA1(fda8b8f8e801360310f7cb1aa4c6aea1fa0a4b25) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1737,7 +1733,7 @@ ROM_START( toggle )
 	ROM_LOAD( "tgle-gr0.bin", 0x00000, 0x2000, CRC(0e0e5d0e) SHA1(363858ce08767f8a9b8eaec56405377cdd74b178) )
 	ROM_LOAD( "tgle-gr1.bin", 0x02000, 0x2000, CRC(3b141ad2) SHA1(72430fd616adbc72d86a5f10672572a31bed0b5d) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1766,7 +1762,7 @@ ROM_START( nametune )
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "nttgr0.bin",  0x00000, 0x8000, CRC(6b75bb4b) SHA1(e7131d112fb0b36985c5b6383700f55728a1c4fd) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 ROM_START( nametune2 )
@@ -1794,10 +1790,10 @@ ROM_START( nametune2 )
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "nmetneur_gr_0.u3c", 0x00000, 0x8000, CRC(a0121b80) SHA1(ba38e9b738baac85fa33ae3751d02cb223fa3e65) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP )  /* PAL16R8ANC */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP )  /* PAL16R8ANC */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 /*
@@ -1827,16 +1823,16 @@ ROM_START( nstocker )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(734b858a) SHA1(71763789807021938b840a88af34aad7f4751298) )
 	ROM_LOAD( "gr67.u1c", 0x0c000, 0x4000, CRC(3311f9c0) SHA1(63b185c761b258113c31cc269ce0b1462bf37f40) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
 
-    ROM_REGION( 0x00004, "gun_io_bd_pals", 0) /* Gun I/O Board PALs */
-    ROM_LOAD( "pal16r8acn.u6", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
-    ROM_LOAD( "pal16r8acn.u7", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
-    ROM_LOAD( "pal16r8acn.u8", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
-    ROM_LOAD( "pal16r8acn.u9", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_REGION( 0x00004, "gun_io_bd_pals", 0) /* Gun I/O Board PALs */
+	ROM_LOAD( "pal16r8acn.u6", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_LOAD( "pal16r8acn.u7", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_LOAD( "pal16r8acn.u8", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_LOAD( "pal16r8acn.u9", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 ROM_START( nstocker2 )
@@ -1859,16 +1855,16 @@ ROM_START( nstocker2 )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(734b858a) SHA1(71763789807021938b840a88af34aad7f4751298) )
 	ROM_LOAD( "gr67.u1c", 0x0c000, 0x4000, CRC(3311f9c0) SHA1(63b185c761b258113c31cc269ce0b1462bf37f40) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
 
-    ROM_REGION( 0x00004, "gun_io_bd_pals", 0) /* Gun I/O Board PALs */
-    ROM_LOAD( "pal16r8acn.u6", 0x0000, 0x0001, NO_DUMP )
-    ROM_LOAD( "pal16r8acn.u7", 0x0000, 0x0001, NO_DUMP )
-    ROM_LOAD( "pal16r8acn.u8", 0x0000, 0x0001, NO_DUMP )
-    ROM_LOAD( "pal16r8acn.u9", 0x0000, 0x0001, NO_DUMP )
+	ROM_REGION( 0x00004, "gun_io_bd_pals", 0) /* Gun I/O Board PALs */
+	ROM_LOAD( "pal16r8acn.u6", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_LOAD( "pal16r8acn.u7", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_LOAD( "pal16r8acn.u8", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+	ROM_LOAD( "pal16r8acn.u9", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1888,10 +1884,10 @@ ROM_START( sfootbal )
 	ROM_LOAD( "sfbgr45.bin", 0x08000, 0x4000, CRC(e767251e) SHA1(3c05295317a673fb1de5924f27de276d2846d805) )
 	ROM_LOAD( "sfbgr67.bin", 0x0c000, 0x4000, CRC(42452a7a) SHA1(37479d6e9071ac775215a6815dbaf280b3c6a57f) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1909,10 +1905,10 @@ ROM_START( spiker )
 	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(970c81f6) SHA1(f22189e172a795d115597feb48ccbc04be3859b9) )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(90ddd737) SHA1(8e1dde2f42e9bf755dedeef218745d1fc54faac7) )
 
-    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
-    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
+	ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+	ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1934,7 +1930,7 @@ ROM_START( stompin )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(0d2cf2e6) SHA1(beccb1342127e79a845c4b6b20f20052097ebb98) )
 	ROM_LOAD( "gr67.u2c", 0x0c000, 0x4000, CRC(2bab2784) SHA1(a4020fd8f5ca2fdb37efd37cbccf86cae0468eb0) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1952,7 +1948,7 @@ ROM_START( rescraid )
 	ROM_LOAD( "gr0.a5",    0x00000, 0x8000, CRC(e0dfc133) SHA1(0b120b4410098d8db26b5819043d4fe7c426b948) )
 	ROM_LOAD( "gr4.a7",    0x08000, 0x8000, CRC(952ade30) SHA1(f065368f645616d6d84be469ba45a9afa8788eda) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1969,6 +1965,8 @@ ROM_START( rescraida )
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "gr0.a5",    0x00000, 0x8000, CRC(e0dfc133) SHA1(0b120b4410098d8db26b5819043d4fe7c426b948) )
 	ROM_LOAD( "gr4.a7",    0x08000, 0x8000, CRC(952ade30) SHA1(f065368f645616d6d84be469ba45a9afa8788eda) )
+
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1985,7 +1983,7 @@ ROM_START( grudge )
 	ROM_REGION( 0x8000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "grudge.gr0", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) )
 
-    MOTHERBOARD_PALS
+	MOTHERBOARD_PALS
 ROM_END
 
 
@@ -2025,6 +2023,8 @@ ROM_START( shrike )
 	ROM_LOAD( "savgu12.bin", 0x18000, 0x2000, CRC(ccdfedb1) SHA1(b87e885df46e814626f46102f323ccd8396bcf8f) )
 	ROM_LOAD( "savgu11.bin", 0x1a000, 0x2000, CRC(db11ff4c) SHA1(cd85486cd08ec4392421e9b94d380b81a575c811) )
 	ROM_LOAD( "savgu10.bin", 0x1c000, 0x2000, CRC(6f3d9aa1) SHA1(7616dd016f5c8990b4972cf6edf758e27857aa1e) )
+
+	MOTHERBOARD_PALS
 ROM_END
 
 
