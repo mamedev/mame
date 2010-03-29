@@ -296,6 +296,11 @@ static UINT32 dasm_read_imm_32(UINT32 advance)
 #define get_imm_str_u16() get_imm_str_u(1)
 #define get_imm_str_u32() get_imm_str_u(2)
 
+static int sext_7bit_int(int value)
+{
+	return (value & 0x40) ? (value | 0xffffff80) : (value & 0x7f);
+}
+
 
 /* 100% portable signed int generators */
 static int make_int_8(int value)
@@ -1510,13 +1515,27 @@ static void d68020_cpgen(void)
 static void d68020_cprestore(void)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "%drestore %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	if (((g_cpu_ir>>9)&7) == 1)
+	{
+		sprintf(g_dasm_str, "frestore %s", get_ea_mode_str_8(g_cpu_ir));
+	}
+	else
+	{
+		sprintf(g_dasm_str, "%drestore %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	}
 }
 
 static void d68020_cpsave(void)
 {
 	LIMIT_CPU_TYPES(M68020_PLUS);
-	sprintf(g_dasm_str, "%dsave   %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	if (((g_cpu_ir>>9)&7) == 1)
+	{
+		sprintf(g_dasm_str, "fsave   %s", get_ea_mode_str_8(g_cpu_ir));
+	}
+	else
+	{
+		sprintf(g_dasm_str, "%dsave   %s; (2-3)", (g_cpu_ir>>9)&7, get_ea_mode_str_8(g_cpu_ir));
+	}
 }
 
 static void d68020_cpscc(void)
@@ -1695,11 +1714,7 @@ static void d68040_fpu(void)
 {
 	char float_data_format[8][3] =
 	{
-		".l", ".s", ".x", ".p", ".w", ".d", ".b", ".?"
-	};
-	const char *spec_reg[8] =
-	{
-		"?", "FPIAR", "FPSR", "?", "FPCR", "?", "?", "?"
+		".l", ".s", ".x", ".p", ".w", ".d", ".b", ".p"
 	};
 
 	char mnemonic[40];
@@ -1794,19 +1809,41 @@ static void d68040_fpu(void)
 
 		case 0x3:
 		{
-			sprintf(g_dasm_str, "fmove   FP%d, %s", dst_reg, get_ea_mode_str_32(g_cpu_ir));
+			switch ((w2>>10)&7)
+			{
+				case 3:		// packed decimal w/fixed k-factor
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s {#%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir), sext_7bit_int(w2&0x7f));
+					break;
+
+				case 7:		// packed decimal w/dynamic k-factor (register)
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s {D%d}", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir), (w2>>4)&7);
+					break;
+
+				default:
+					sprintf(g_dasm_str, "fmove%s   FP%d, %s", float_data_format[(w2>>10)&7], dst_reg, get_ea_mode_str_32(g_cpu_ir));
+					break;
+			}
 			break;
 		}
 
 		case 0x4:	// ea to control
 		{
-			sprintf(g_dasm_str, "fmove.l   %s, %s", get_ea_mode_str_32(g_cpu_ir), spec_reg[(w2>>10)&7]);
+			sprintf(g_dasm_str, "fmovem.l   %s, ", get_ea_mode_str_32(g_cpu_ir));
+			if (w2 & 0x1000) strcat(g_dasm_str, "fpcr");
+			if (w2 & 0x0800) strcat(g_dasm_str, "/fpsr");
+			if (w2 & 0x0400) strcat(g_dasm_str, "/fpiar");
 			break;
 		}
 
 		case 0x5:	// control to ea
 		{
-			sprintf(g_dasm_str, "fmove.l   %s, %s", spec_reg[(w2>>10)&7], get_ea_mode_str_32(g_cpu_ir));
+			
+			strcpy(g_dasm_str, "fmovem.l   ");
+			if (w2 & 0x1000) strcat(g_dasm_str, "fpcr");
+			if (w2 & 0x0800) strcat(g_dasm_str, "/fpsr");
+			if (w2 & 0x0400) strcat(g_dasm_str, "/fpiar");
+			strcat(g_dasm_str, ", ");
+			strcat(g_dasm_str, get_ea_mode_str_32(g_cpu_ir));
 			break;
 		}
 

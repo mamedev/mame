@@ -585,6 +585,7 @@ struct _m68ki_cpu_core
 	UINT32 run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
 	int    has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
 	int    pmmu_enabled; /* Indicates if the PMMU is enabled */
+	int    fpu_just_reset; /* Indicates the FPU was just reset */
 
 	/* Clocks required for instructions / exceptions */
 	UINT32 cyc_bcc_notake_b;
