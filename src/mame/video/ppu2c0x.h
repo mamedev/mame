@@ -16,12 +16,12 @@
 ***************************************************************************/
 
 /* mirroring types */
-#define PPU_MIRROR_NONE		0
-#define PPU_MIRROR_VERT		1
-#define PPU_MIRROR_HORZ		2
-#define PPU_MIRROR_HIGH		3
-#define PPU_MIRROR_LOW		4
-#define PPU_MIRROR_4SCREEN	5	// Same effect as NONE, but signals that we should never mirror
+#define PPU_MIRROR_NONE       0
+#define PPU_MIRROR_VERT       1
+#define PPU_MIRROR_HORZ       2
+#define PPU_MIRROR_HIGH       3
+#define PPU_MIRROR_LOW        4
+#define PPU_MIRROR_4SCREEN    5	// Same effect as NONE, but signals that we should never mirror
 
 /* registers definition */
 enum
@@ -40,33 +40,33 @@ enum
 /* bit definitions for (some of) the registers */
 enum
 {
-	PPU_CONTROL0_INC			= 0x04,
-	PPU_CONTROL0_SPR_SELECT		= 0x08,
-	PPU_CONTROL0_CHR_SELECT		= 0x10,
-	PPU_CONTROL0_SPRITE_SIZE	= 0x20,
-	PPU_CONTROL0_NMI			= 0x80,
+	PPU_CONTROL0_INC              = 0x04,
+	PPU_CONTROL0_SPR_SELECT       = 0x08,
+	PPU_CONTROL0_CHR_SELECT       = 0x10,
+	PPU_CONTROL0_SPRITE_SIZE      = 0x20,
+	PPU_CONTROL0_NMI              = 0x80,
 
-	PPU_CONTROL1_DISPLAY_MONO	= 0x01,
-	PPU_CONTROL1_BACKGROUND_L8	= 0x02,
-	PPU_CONTROL1_SPRITES_L8		= 0x04,
-	PPU_CONTROL1_BACKGROUND		= 0x08,
-	PPU_CONTROL1_SPRITES		= 0x10,
-	PPU_CONTROL1_COLOR_EMPHASIS	= 0xe0,
+	PPU_CONTROL1_DISPLAY_MONO     = 0x01,
+	PPU_CONTROL1_BACKGROUND_L8    = 0x02,
+	PPU_CONTROL1_SPRITES_L8       = 0x04,
+	PPU_CONTROL1_BACKGROUND       = 0x08,
+	PPU_CONTROL1_SPRITES          = 0x10,
+	PPU_CONTROL1_COLOR_EMPHASIS   = 0xe0,
 
-	PPU_STATUS_8SPRITES			= 0x20,
-	PPU_STATUS_SPRITE0_HIT		= 0x40,
-	PPU_STATUS_VBLANK			= 0x80
+	PPU_STATUS_8SPRITES           = 0x20,
+	PPU_STATUS_SPRITE0_HIT        = 0x40,
+	PPU_STATUS_VBLANK             = 0x80
 };
 
 enum
 {
-	PPU_NTSC_SCANLINES_PER_FRAME	= 262,
-	PPU_PAL_SCANLINES_PER_FRAME		= 312,
+	PPU_NTSC_SCANLINES_PER_FRAME  = 262,
+	PPU_PAL_SCANLINES_PER_FRAME   = 312,
 
-	PPU_BOTTOM_VISIBLE_SCANLINE		= 239,
-	PPU_VBLANK_FIRST_SCANLINE		= 241,
-	PPU_VBLANK_LAST_SCANLINE_NTSC	= 260,
-	PPU_VBLANK_LAST_SCANLINE_PAL	= 310
+	PPU_BOTTOM_VISIBLE_SCANLINE   = 239,
+	PPU_VBLANK_FIRST_SCANLINE     = 241,
+	PPU_VBLANK_LAST_SCANLINE_NTSC = 260,
+	PPU_VBLANK_LAST_SCANLINE_PAL  = 310
 
 	// Both the sacnline immediately before and immediately after VBLANK
 	// are non-rendering and non-vblank.
@@ -87,10 +87,10 @@ typedef int  (*ppu2c0x_vidaccess_cb)( running_device *device, int address, int d
 typedef struct _ppu2c0x_interface ppu2c0x_interface;
 struct _ppu2c0x_interface
 {
-	int				gfx_layout_number;		/* gfx layout number used by each chip */
-	int				color_base;				/* color base to use per ppu */
-	int				mirroring;				/* mirroring options (PPU_MIRROR_* flag) */
-	ppu2c0x_nmi_cb	nmi_handler;			/* NMI handler */
+	int               gfx_layout_number;		/* gfx layout number used by each chip */
+	int               color_base;				/* color base to use per ppu */
+	int               mirroring;				/* mirroring options (PPU_MIRROR_* flag) */
+	ppu2c0x_nmi_cb    nmi_handler;			/* NMI handler */
 };
 
 
@@ -128,23 +128,23 @@ READ8_DEVICE_HANDLER( ppu2c0x_r );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PPU2C02_ADD(_tag, _intrf) \
+#define MDRV_PPU2C02_ADD(_tag, _intrf)   \
 	MDRV_DEVICE_ADD(_tag, PPU_2C02, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C03B_ADD(_tag, _intrf) \
+#define MDRV_PPU2C03B_ADD(_tag, _intrf)   \
 	MDRV_DEVICE_ADD(_tag, PPU_2C03B, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C04_ADD(_tag, _intrf) \
+#define MDRV_PPU2C04_ADD(_tag, _intrf)   \
 	MDRV_DEVICE_ADD(_tag, PPU_2C04, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C05_ADD(_tag, _intrf) \
+#define MDRV_PPU2C05_ADD(_tag, _intrf)   \
 	MDRV_DEVICE_ADD(_tag, PPU_2C05, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C07_ADD(_tag, _intrf) \
+#define MDRV_PPU2C07_ADD(_tag, _intrf)   \
 	MDRV_DEVICE_ADD(_tag, PPU_2C07, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
