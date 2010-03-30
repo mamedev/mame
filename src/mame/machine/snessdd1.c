@@ -590,7 +590,7 @@ static UINT8 sdd1_mmio_read(const address_space *space, UINT32 addr)
 			return (snes_sdd1.mmc[3] >> 20) & 7;
 	}
 
-	return 0xff;
+	return snes_open_bus_r(space, 0);
 }
 
 static void sdd1_mmio_write(const address_space *space, UINT32 addr, UINT8 data)

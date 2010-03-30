@@ -109,7 +109,7 @@ static UINT8 srtc_weekday( UINT32 year, UINT32 month, UINT32 day )
 	return (sum + 1) % 7; // 1900-01-01 was a Monday
 }
 
-static UINT8 srtc_read( running_machine *machine, UINT16 addr )
+static UINT8 srtc_read( const address_space *space, UINT16 addr )
 {
 	addr &= 0xffff;
 
@@ -122,7 +122,7 @@ static UINT8 srtc_read( running_machine *machine, UINT16 addr )
 
 		if (rtc_state.index < 0)
 		{
-			srtc_update_time(machine);
+			srtc_update_time(space->machine);
 			rtc_state.index++;
 			return 0x0f;
 		}
@@ -137,7 +137,7 @@ static UINT8 srtc_read( running_machine *machine, UINT16 addr )
 		}
 	}
 
-	return 0xff;
+	return snes_open_bus_r(space, 0);
 }
 
 static void srtc_write( running_machine *machine, UINT16 addr, UINT8 data )

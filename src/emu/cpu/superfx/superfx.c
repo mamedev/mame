@@ -472,6 +472,28 @@ INLINE UINT8 superfx_pipe(superfx_state *cpustate)
 
 /*****************************************************************************/
 
+/* reads to SuperFX RAM only happen if this returns 1 */
+int superfx_access_ram(running_device *cpu)
+{
+	superfx_state *cpustate = get_safe_token(cpu);
+
+	if ((cpustate->sfr & SUPERFX_SFR_G) && (cpustate->scmr & SUPERFX_SCMR_RAN))
+		return 0;
+
+	return 1;
+}
+
+/* reads to SuperFX ROM only happen if this returns 1 */
+int superfx_access_rom(running_device *cpu)
+{
+	superfx_state *cpustate = get_safe_token(cpu);
+
+	if ((cpustate->sfr & SUPERFX_SFR_G) && (cpustate->scmr & SUPERFX_SCMR_RON))
+		return 0;
+
+	return 1;
+}
+
 UINT8 superfx_mmio_read(running_device *cpu, UINT32 addr)
 {
 	superfx_state *cpustate = get_safe_token(cpu);

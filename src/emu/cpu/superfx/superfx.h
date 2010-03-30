@@ -99,5 +99,7 @@ extern offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, 
 UINT8 superfx_mmio_read(running_device *cpu, UINT32 addr);
 void superfx_mmio_write(running_device *cpu, UINT32 addr, UINT8 data);
 void superfx_add_clocks(running_device *cpu, INT32 clocks);
+int superfx_access_ram(running_device *cpu);
+int superfx_access_rom(running_device *cpu);
 
 #endif /* __SUPERFX_H__ */

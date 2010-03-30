@@ -38,6 +38,7 @@ static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 static void snes_dma(const address_space *space, UINT8 channels);
 static void snes_hdma_init(const address_space *space);
 static void snes_hdma(const address_space *space);
+static READ8_HANDLER(snes_open_bus_r);
 
 struct snes_cart_info snes_cart;
 
@@ -606,7 +607,7 @@ READ8_HANDLER( snes_r_io )
 	{
 		if (offset == 0x2800 || offset == 0x2801)
 		{
-			return srtc_read(space->machine, offset);
+			return srtc_read(space, offset);
 		}
 	}
 	else if (snes_has_addon_chip == HAS_SDD1)
@@ -625,7 +626,7 @@ READ8_HANDLER( snes_r_io )
 		UINT16 limit = (snes_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
 		if (offset >= 0x4800 && offset <= limit)
 		{
-			return spc7110_mmio_read(space->machine, offset);
+			return spc7110_mmio_read(space, offset);
 		}
 	}
 
@@ -1603,6 +1604,7 @@ address               |         |          |       |     |         |        |   
 /* 0x000000 - 0x2fffff */
 READ8_HANDLER( snes_r_bank1 )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
@@ -1612,8 +1614,13 @@ READ8_HANDLER( snes_r_bank1 )
 		value = snes_r_io(space, address);
 	else if (address < 0x8000)
 	{
-		if (snes_has_addon_chip == HAS_SUPERFX)
-			value = snes_ram[0xf00000 + (address & 0x1fff)];	// here it should be 0xe00000 but there are mirroring issues
+		if (snes_has_addon_chip == HAS_SUPERFX && state->superfx !=NULL)
+		{
+			if (superfx_access_ram(state->superfx))
+				value = snes_ram[0xf00000 + (offset & 0x1fff)];	// here it should be 0xe00000 but there are mirroring issues
+			else
+				value = snes_open_bus_r(space, 0);
+		}
 		else if (snes_has_addon_chip == HAS_OBC1)
 			value = obc1_read(space, offset);
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
@@ -1628,7 +1635,7 @@ READ8_HANDLER( snes_r_bank1 )
 		else
 		{
 			logerror("snes_r_bank1: Unmapped external chip read: %04x\n", address);
-			value = 0xff;											/* Reserved */
+			value = snes_open_bus_r(space, 0);								/* Reserved */
 		}
 	}
 	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
@@ -1646,6 +1653,7 @@ READ8_HANDLER( snes_r_bank1 )
 /* 0x300000 - 0x3fffff */
 READ8_HANDLER( snes_r_bank2 )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
@@ -1655,8 +1663,13 @@ READ8_HANDLER( snes_r_bank2 )
 		value = snes_r_io(space, address);
 	else if (address < 0x8000)										/* SRAM for mode_21, Reserved othewise */
 	{
-		if (snes_has_addon_chip == HAS_SUPERFX)
-			value = snes_ram[0xf00000 + (address & 0x1fff)];	// here it should be 0xe00000 but there are mirroring issues
+		if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
+		{
+			if (superfx_access_ram(state->superfx))
+				value = snes_ram[0xf00000 + (offset & 0x1fff)];	// here it should be 0xe00000 but there are mirroring issues
+			else
+				value = snes_open_bus_r(space, 0);
+		}
 		else if (snes_has_addon_chip == HAS_OBC1)
 			value = obc1_read (space, offset);
 		else if (snes_has_addon_chip == HAS_CX4)
@@ -1675,7 +1688,7 @@ READ8_HANDLER( snes_r_bank2 )
 		else
 		{
 			logerror( "snes_r_bank2: Unmapped external chip read: %04x\n", address );
-			value = 0xff;
+			value = snes_open_bus_r(space, 0);
 		}
 	}
 	/* some dsp1 games use these banks 0x30 to 0x3f at address 0x8000 */
@@ -1696,18 +1709,32 @@ READ8_HANDLER( snes_r_bank2 )
 /* 0x400000 - 0x5fffff */
 READ8_HANDLER( snes_r_bank3 )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
-	if ((snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC))
+	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
+	{
+		if (superfx_access_rom(state->superfx))
+			value = snes_ram[0x400000 + offset];
+		else
+		{
+			static const UINT8 sfx_data[16] = {
+				0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
+				0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
+			};
+			return sfx_data[offset & 0x0f];
+		}
+	}
+	else if ((snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC))
 	{
 		if (offset >= 0x100000 && offset < 0x110000)
-			value = spc7110_mmio_read(space->machine, 0x4800);
+			value = spc7110_mmio_read(space, 0x4800);
 	}
 	else if ((snes_cart.mode & 5) && !(snes_has_addon_chip == HAS_SUPERFX))	/* Mode 20 & 22 */
 	{
 		if ((address < 0x8000) && (snes_cart.mode == SNES_MODE_20))
-			value = 0xff;							/* Reserved */
+			value = snes_open_bus_r(space, 0);							/* Reserved */
 		else
 			value = snes_ram[0x400000 + offset];
 	}
@@ -1720,11 +1747,17 @@ READ8_HANDLER( snes_r_bank3 )
 /* 0x600000 - 0x6fffff */
 READ8_HANDLER( snes_r_bank4 )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX)
-		value = snes_ram[0xe00000 + offset];
+	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
+	{
+		if (superfx_access_ram(state->superfx))
+			value = snes_ram[0xe00000 + offset];
+		else
+			value = snes_open_bus_r(space, 0);
+	}
 	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x80000 && address < 0x1000)
 		value = st010_read(address);
 	else if (snes_cart.mode & 5)							/* Mode 20 & 22 */
@@ -1737,7 +1770,7 @@ READ8_HANDLER( snes_r_bank4 )
 		else
 		{
 			logerror("snes_r_bank4: Unmapped external chip read: %04x\n", address);
-			value = 0xff;							/* Reserved */
+			value = snes_open_bus_r(space, 0);							/* Reserved */
 		}
 	}
 	else if (snes_cart.mode & 0x0a)					/* Mode 21 & 25 */
@@ -1749,11 +1782,17 @@ READ8_HANDLER( snes_r_bank4 )
 /* 0x700000 - 0x7dffff */
 READ8_HANDLER( snes_r_bank5 )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value;
 	UINT16 address = offset & 0xffff;
 
-	if (snes_has_addon_chip == HAS_SUPERFX)
-		value = snes_ram[0xf00000 + offset];
+	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
+	{
+		if (superfx_access_ram(state->superfx))
+			value = snes_ram[0xf00000 + offset];
+		else
+			value = snes_open_bus_r(space, 0);
+	}
 	else if ((snes_cart.mode & 5) && (address < 0x8000))		/* Mode 20 & 22 */
 	{
 		if (snes_cart.sram > 0)
@@ -1764,7 +1803,7 @@ READ8_HANDLER( snes_r_bank5 )
 		else
 		{
 			logerror("snes_r_bank5: Unmapped external chip read: %04x\n", address);
-			value = 0xff;								/* Reserved */
+			value = snes_open_bus_r(space, 0);								/* Reserved */
 		}
 	}
 	else
@@ -1800,7 +1839,7 @@ READ8_HANDLER( snes_r_bank6 )
 			else						/* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
 			{
 				logerror("snes_r_bank6: Unmapped external chip read: %04x\n", address);
-				value = 0xff;
+				value = snes_open_bus_r(space, 0);
 			}
 		}
 	}
@@ -1821,11 +1860,36 @@ READ8_HANDLER( snes_r_bank6 )
 /* 0xc00000 - 0xffffff */
 READ8_HANDLER( snes_r_bank7 )
 {
+	snes_state *state = (snes_state *)space->machine->driver_data;
 	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
-	if ((snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC) && offset >= 0x100000)
-		value = spc7110_bank7_read(space->machine, offset);
+	if (snes_has_addon_chip == HAS_SUPERFX && state->superfx != NULL)
+	{
+		if (offset < 0x200000)	// ROM
+		{
+			if (superfx_access_rom(state->superfx))
+				value = snes_ram[0xc00000 + offset];
+			else
+			{
+				static const UINT8 sfx_data[16] = {
+					0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
+					0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
+				};
+				return sfx_data[offset & 0x0f];
+			}
+		}
+		else	// RAM
+		{
+			offset -= 0x200000;
+			if (superfx_access_ram(state->superfx))
+				value = snes_ram[0xe00000 + offset];
+			else
+				value = snes_open_bus_r(space, 0);
+		}
+	}
+	else if ((snes_has_addon_chip == HAS_SPC7110 || snes_has_addon_chip == HAS_SPC7110_RTC) && offset >= 0x100000)
+		value = spc7110_bank7_read(space, offset);
 	else if (snes_has_addon_chip == HAS_SDD1)
 		value = sdd1_read(space->machine, offset);
 	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x280000 && offset < 0x300000 && address < 0x1000)
@@ -1856,7 +1920,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 	else if (address < 0x8000)
 	{
 		if (snes_has_addon_chip == HAS_SUPERFX)
-			snes_ram[0xf00000 + (address & 0x1fff)] = data;	// here it should 0xe00000 but there are mirroring issues
+			snes_ram[0xf00000 + (offset & 0x1fff)] = data;	// here it should be 0xe00000 but there are mirroring issues
 		else if (snes_has_addon_chip == HAS_OBC1)
 			obc1_write(space, offset, data);
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
@@ -1898,7 +1962,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 	else if (address < 0x8000)						/* SRAM for mode_21, Reserved othewise */
 	{
 		if (snes_has_addon_chip == HAS_SUPERFX)
-			snes_ram[0xf00000 + (address & 0x1fff)] = data;	// here it should be 0xe00000 but there are mirroring issues
+			snes_ram[0xf00000 + (offset & 0x1fff)] = data;	// here it should be 0xe00000 but there are mirroring issues
 		else if (snes_has_addon_chip == HAS_OBC1)
 			obc1_write(space, offset, data);
 		else if (snes_has_addon_chip == HAS_CX4)
@@ -2032,7 +2096,10 @@ WRITE8_HANDLER( snes_w_bank7 )
 	if (snes_has_addon_chip == HAS_SUPERFX)
 	{
 		if (offset >= 0x200000)
-			snes_ram[0xc00000 + offset] = data;		// SFX RAM
+		{
+			offset -= 0x200000;
+			snes_ram[0xe00000 + offset] = data;		// SFX RAM
+		}
 		else
 			logerror("Attempt to write to ROM address: %X\n", offset + 0xc00000);
 	}
@@ -2830,7 +2897,7 @@ READ8_HANDLER( superfx_r_bank2 )
 READ8_HANDLER( superfx_r_bank3 )
 {
 	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
-	has only access to 0x600000-0x7d00000 (because there is WRAM after that), hence we directly use the mirror
+	has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
 	as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
 	//printf("superfx_r_bank3: %08x = %02x\n", offset, snes_ram[0xe00000 + offset]);
 	return snes_ram[0xe00000 + offset];
@@ -2850,8 +2917,8 @@ WRITE8_HANDLER( superfx_w_bank2 )
 
 WRITE8_HANDLER( superfx_w_bank3 )
 {
-	/* IMPORTANT: SFX RAM sits in 0x600000-0x7f00000, and it's mirrored in 0xe00000-0xff00000. However, SNES
-	has only access to 0x600000-0x7d00000 (because there is WRAM after that), hence we directly use the mirror
+	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
+	has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
 	as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
 	//printf("superfx_w_bank3: %08x = %02x\n", offset, data);
 	snes_ram[0xe00000 + offset] = data;
