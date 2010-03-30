@@ -394,6 +394,7 @@ public:
 	UINT16                vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift, vram_read_buffer;
 	UINT32                wram_address;
 	UINT16                htime, vtime;
+	UINT16                vmadd;
 
 	/* timers */
 	emu_timer             *scanline_timer;
@@ -492,6 +493,8 @@ extern DRIVER_INIT( snes_hirom );
 
 extern MACHINE_START( snes );
 extern MACHINE_RESET( snes );
+
+READ8_HANDLER( snes_open_bus_r );
 
 extern READ8_HANDLER( snes_r_io );
 extern WRITE8_HANDLER( snes_w_io );
@@ -651,5 +654,7 @@ extern struct SNES_PPU_STRUCT snes_ppu;
 extern VIDEO_START( snes );
 extern VIDEO_UPDATE( snes );
 
+extern READ8_HANDLER( snes_ppu_read );
+extern WRITE8_HANDLER( snes_ppu_write );
 
 #endif /* _SNES_H_ */
