@@ -98,7 +98,7 @@ struct _input_device
 typedef struct _input_device_list input_device_list;
 struct _input_device_list
 {
-	input_device *			list;					/* the array */
+	input_device **			list;					/* the array */
 	int						count;					/* elements in the array */
 	UINT8					enabled;				/* is this class enabled? */
 	UINT8					multi;					/* are multiple instances of this class allowed? */
@@ -453,7 +453,7 @@ INLINE input_device *input_code_device(running_machine *machine, input_code code
 		/* ...and the index is valid for that class, return a pointer to the device */
 		int devindex = INPUT_CODE_DEVINDEX(code);
 		if (devindex < device_list[devclass].count)
-			return &device_list[devclass].list[devindex];
+			return device_list[devclass].list[devindex];
 	}
 
 	/* otherwise, return NULL */
@@ -508,7 +508,7 @@ INLINE void input_item_update_value(running_machine *machine, input_device_item 
 {
 	input_device_list *device_list = machine->input_data->device_list;
 
-	item->current = (*item->getstate)(device_list[item->devclass].list[item->devindex].internal, item->internal);
+	item->current = (*item->getstate)(device_list[item->devclass].list[item->devindex]->internal, item->internal);
 }
 
 
@@ -677,7 +677,7 @@ int input_device_set_joystick_map(running_machine *machine, int devindex, const 
 
 	/* iterate over joysticks and set the map */
 	for (joynum = startindex; joynum <= stopindex; joynum++)
-		device_list[DEVICE_CLASS_JOYSTICK].list[joynum].joymap = map;
+		device_list[DEVICE_CLASS_JOYSTICK].list[joynum]->joymap = map;
 	return TRUE;
 }
 
@@ -700,7 +700,7 @@ static void input_frame(running_machine *machine)
 		/* iterate over keyboards */
 		for (devnum = 0; devnum < device_list[DEVICE_CLASS_KEYBOARD].count; devnum++)
 		{
-			input_device *device = &device_list[DEVICE_CLASS_KEYBOARD].list[devnum];
+			input_device *device = device_list[DEVICE_CLASS_KEYBOARD].list[devnum];
 			input_item_id itemid;
 			int changed = FALSE;
 
@@ -751,19 +751,19 @@ input_device *input_device_add(running_machine *machine, input_device_class devc
 {
 	input_private *state = machine->input_data;
 	input_device_list *devlist = &state->device_list[devclass];
-	input_device *device;
 
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call input_device_add at init time!");
 	assert(name != NULL);
 	assert(devclass != DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 
 	/* allocate a new device */
-	input_device *newlist = auto_alloc_array_clear(machine, input_device, devlist->count + 1);
+	input_device *device = auto_alloc_clear(machine, input_device);
+	input_device **newlist = auto_alloc_array(machine, input_device *, devlist->count + 1);
 	for (int devnum = 0; devnum < devlist->count; devnum++)
 		newlist[devnum] = devlist->list[devnum];
 	auto_free(machine, devlist->list);
 	devlist->list = newlist;
-	device = &devlist->list[devlist->count++];
+	devlist->list[devlist->count++] = device;
 
 	/* fill in the data */
 	device->machine = machine;
@@ -986,7 +986,7 @@ input_code input_code_from_input_item_id(running_machine *machine, input_item_id
 		/* iterate over devices within each class */
 		for (devnum = 0; devnum < devlist->count; devnum++)
 		{
-			input_device *device = &devlist->list[devnum];
+			input_device *device = devlist->list[devnum];
 			if (device->item[itemid] != NULL)
 				return device_item_to_code(device, itemid);
 		}
@@ -1020,7 +1020,7 @@ input_code input_code_poll_switches(running_machine *machine, int reset)
 		/* iterate over devices within each class */
 		for (devnum = 0; devnum < devlist->count; devnum++)
 		{
-			input_device *device = &devlist->list[devnum];
+			input_device *device = devlist->list[devnum];
 			input_item_id itemid;
 
 			/* iterate over items within each device */
@@ -1106,7 +1106,7 @@ input_code input_code_poll_keyboard_switches(running_machine *machine, int reset
 	/* iterate over devices within each class */
 	for (devnum = 0; devnum < devlist->count; devnum++)
 	{
-		input_device *device = &devlist->list[devnum];
+		input_device *device = devlist->list[devnum];
 		input_item_id itemid;
 
 		/* iterate over items within each device */
@@ -1191,7 +1191,7 @@ static void input_code_reset_axes(running_machine *machine)
 		/* iterate over devices within each class */
 		for (devnum = 0; devnum < devlist->count; devnum++)
 		{
-			input_device *device = &devlist->list[devnum];
+			input_device *device = devlist->list[devnum];
 			input_item_id itemid;
 
 			/* iterate over items within each device */
@@ -1237,7 +1237,7 @@ input_code input_code_poll_axes(running_machine *machine, int reset)
 		/* iterate over devices within each class */
 		for (devnum = 0; devnum < devlist->count; devnum++)
 		{
-			input_device *device = &devlist->list[devnum];
+			input_device *device = devlist->list[devnum];
 			input_item_id itemid;
 
 			/* iterate over items within each device */
@@ -1444,7 +1444,7 @@ input_code input_code_from_token(running_machine *machine, const char *_token)
 		/* if this is an invalid device, we have nothing to look up */
 		if (device_list == NULL || devindex >= device_list[devclass].count)
 			goto exit;
-		device = &device_list[devclass].list[devindex];
+		device = device_list[devclass].list[devindex];
 
 		/* if not a standard code, look it up in the device specific codes */
 		for (itemid = ITEM_ID_FIRST_VALID; itemid <= device->maxitem; itemid++)
@@ -1570,7 +1570,7 @@ static INT32 convert_absolute_value(running_machine *machine, input_code code, i
 		/* if we're doing a lightgun reload hack, override the value */
 		if (state->lightgun_reload_button && item->devclass == DEVICE_CLASS_LIGHTGUN)
 		{
-			input_device_item *button2_item = state->device_list[item->devclass].list[item->devindex].item[ITEM_ID_BUTTON2];
+			input_device_item *button2_item = state->device_list[item->devclass].list[item->devindex]->item[ITEM_ID_BUTTON2];
 			if (button2_item != NULL)
 			{
 				/* if it is pressed, return (min,max) */
@@ -1599,7 +1599,7 @@ static INT32 convert_absolute_value(running_machine *machine, input_code code, i
 		/* left/right/up/down: if this is a joystick, fetch the paired X/Y axis values and convert */
 		if (modifier >= ITEM_MODIFIER_LEFT && modifier <= ITEM_MODIFIER_DOWN && item->devclass == DEVICE_CLASS_JOYSTICK)
 		{
-			input_device *device = &state->device_list[item->devclass].list[item->devindex];
+			input_device *device = state->device_list[item->devclass].list[item->devindex];
 			input_device_item *xaxis_item = device->item[ITEM_ID_XAXIS];
 			input_device_item *yaxis_item = device->item[ITEM_ID_YAXIS];
 			if (xaxis_item != NULL && yaxis_item != NULL)
@@ -1687,7 +1687,7 @@ static INT32 convert_switch_value(running_machine *machine, input_code code, inp
 			/* button 1 is pressed if either button 1 or 2 are active */
 			if (INPUT_CODE_ITEMID(code) == ITEM_ID_BUTTON1)
 			{
-				input_device_item *button2_item = state->device_list[item->devclass].list[item->devindex].item[ITEM_ID_BUTTON2];
+				input_device_item *button2_item = state->device_list[item->devclass].list[item->devindex]->item[ITEM_ID_BUTTON2];
 				if (button2_item != NULL)
 				{
 					input_item_update_value(machine, button2_item);
