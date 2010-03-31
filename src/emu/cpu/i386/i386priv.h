@@ -109,6 +109,7 @@ enum
 	I386_CR1,
 	I386_CR2,
 	I386_CR3,
+	I386_CR4,
 
 	I386_DR0,
 	I386_DR1,
@@ -203,7 +204,7 @@ struct _i386_state
 
 	UINT8 performed_intersegment_jump;
 
-	UINT32 cr[4];		// Control registers
+	UINT32 cr[5];		// Control registers
 	UINT32 dr[8];		// Debug registers
 	UINT32 tr[8];		// Test registers
 
@@ -330,6 +331,8 @@ extern MODRM_TABLE i386_MODRM_table[256];
 #define STORE_RM16(x, value)	(REG16(i386_MODRM_table[x].rm.w) = value)
 #define STORE_RM32(x, value)	(REG32(i386_MODRM_table[x].rm.d) = value)
 
+#define SWITCH_ENDIAN_32(x) (((((x) << 24) & (0xff << 24)) | (((x) << 8) & (0xff << 16)) | (((x) >> 8) & (0xff << 8)) | (((x) >> 24) & (0xff << 0))))
+
 /***********************************************************************************/
 
 INLINE UINT32 i386_translate(i386_state *cpustate, int segment, UINT32 ip)
@@ -345,12 +348,21 @@ INLINE int translate_address(i386_state *cpustate, UINT32 *address)
 	UINT32 directory = (a >> 22) & 0x3ff;
 	UINT32 table = (a >> 12) & 0x3ff;
 	UINT32 offset = a & 0xfff;
+	UINT32 page_entry;
 
 	// TODO: 4MB pages
 	UINT32 page_dir = memory_read_dword_32le(cpustate->program, pdbr + directory * 4);
-	UINT32 page_entry = memory_read_dword_32le(cpustate->program, (page_dir & 0xfffff000) + (table * 4));
-
-	*address = (page_entry & 0xfffff000) | offset;
+	if (!(cpustate->cr[4] & 0x10)) {
+		page_entry = memory_read_dword_32le(cpustate->program, (page_dir & 0xfffff000) + (table * 4));
+		*address = (page_entry & 0xfffff000) | offset;
+	} else {
+		if (page_dir & 0x80)
+			*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
+		else {
+			page_entry = memory_read_dword_32le(cpustate->program, (page_dir & 0xfffff000) + (table * 4));
+			*address = (page_entry & 0xfffff000) | offset;
+		}
+	}
 	return 1;
 }
 

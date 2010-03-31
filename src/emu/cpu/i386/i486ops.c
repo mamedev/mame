@@ -375,3 +375,50 @@ static void I486OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 	}
 }
 
+static void I486OP(bswap_eax)(i386_state *cpustate)		// Opcode 0x0f 38
+{
+	REG32(EAX) = SWITCH_ENDIAN_32(REG32(EAX));
+	CYCLES(cpustate,1);		// TODO
+}
+
+static void I486OP(bswap_ecx)(i386_state *cpustate)		// Opcode 0x0f 39
+{
+	REG32(ECX) = SWITCH_ENDIAN_32(REG32(ECX));
+	CYCLES(cpustate,1);		// TODO
+}
+
+static void I486OP(bswap_edx)(i386_state *cpustate)		// Opcode 0x0f 3A
+{
+	REG32(EDX) = SWITCH_ENDIAN_32(REG32(EDX));
+	CYCLES(cpustate,1);		// TODO
+}
+
+static void I486OP(bswap_ebx)(i386_state *cpustate)		// Opcode 0x0f 3B
+{
+	REG32(EBX) = SWITCH_ENDIAN_32(REG32(EBX));
+	CYCLES(cpustate,1);		// TODO
+}
+
+static void I486OP(bswap_esp)(i386_state *cpustate)		// Opcode 0x0f 3C
+{
+	REG32(ESP) = SWITCH_ENDIAN_32(REG32(ESP));
+	CYCLES(cpustate,1);		// TODO
+}
+
+static void I486OP(bswap_ebp)(i386_state *cpustate)		// Opcode 0x0f 3D
+{
+	REG32(EBP) = SWITCH_ENDIAN_32(REG32(EBP));
+	CYCLES(cpustate,1);		// TODO
+}
+
+static void I486OP(bswap_esi)(i386_state *cpustate)		// Opcode 0x0f 3E
+{
+	REG32(ESI) = SWITCH_ENDIAN_32(REG32(ESI));
+	CYCLES(cpustate,1);		// TODO
+}
+
+static void I486OP(bswap_edi)(i386_state *cpustate)		// Opcode 0x0f 3F
+{
+	REG32(EDI) = SWITCH_ENDIAN_32(REG32(EDI));
+	CYCLES(cpustate,1);		// TODO
+}

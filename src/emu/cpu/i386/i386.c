@@ -842,6 +842,7 @@ static CPU_SET_INFO( i386 )
 		case CPUINFO_INT_REGISTER + I386_CR1:			cpustate->cr[1] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_CR2:			cpustate->cr[2] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_CR3:			cpustate->cr[3] = info->i;						break;
+		case CPUINFO_INT_REGISTER + I386_CR4:			cpustate->cr[4] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_DR0:			cpustate->dr[0] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_DR1:			cpustate->dr[1] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_DR2:			cpustate->dr[2] = info->i;						break;
@@ -958,6 +959,7 @@ CPU_GET_INFO( i386 )
 		case CPUINFO_INT_REGISTER + I386_CR1:			info->i = cpustate->cr[1];						break;
 		case CPUINFO_INT_REGISTER + I386_CR2:			info->i = cpustate->cr[2];						break;
 		case CPUINFO_INT_REGISTER + I386_CR3:			info->i = cpustate->cr[3];						break;
+		case CPUINFO_INT_REGISTER + I386_CR4:			info->i = cpustate->cr[4];						break;
 		case CPUINFO_INT_REGISTER + I386_DR0:			info->i = cpustate->dr[0];						break;
 		case CPUINFO_INT_REGISTER + I386_DR1:			info->i = cpustate->dr[1];						break;
 		case CPUINFO_INT_REGISTER + I386_DR2:			info->i = cpustate->dr[2];						break;
@@ -1057,6 +1059,7 @@ CPU_GET_INFO( i386 )
 		case CPUINFO_STR_REGISTER + I386_CR1:			sprintf(info->s, "CR1: %08X", cpustate->cr[1]); break;
 		case CPUINFO_STR_REGISTER + I386_CR2:			sprintf(info->s, "CR2: %08X", cpustate->cr[2]); break;
 		case CPUINFO_STR_REGISTER + I386_CR3:			sprintf(info->s, "CR3: %08X", cpustate->cr[3]); break;
+		case CPUINFO_STR_REGISTER + I386_CR4:			sprintf(info->s, "CR4: %08X", cpustate->cr[4]); break;
 		case CPUINFO_STR_REGISTER + I386_DR0:			sprintf(info->s, "DR0: %08X", cpustate->dr[0]); break;
 		case CPUINFO_STR_REGISTER + I386_DR1:			sprintf(info->s, "DR1: %08X", cpustate->dr[1]); break;
 		case CPUINFO_STR_REGISTER + I386_DR2:			sprintf(info->s, "DR2: %08X", cpustate->dr[2]); break;

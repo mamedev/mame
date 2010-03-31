@@ -365,5 +365,13 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xBF,		OP_2BYTE|OP_I386,			I386OP(invalid),				I386OP(movsx_r32_rm16),		},
 	{ 0xC0,		OP_2BYTE|OP_I486,			I486OP(xadd_rm8_r8),			I486OP(xadd_rm8_r8),		},
 	{ 0xC1,		OP_2BYTE|OP_I486,			I486OP(xadd_rm16_r16),			I486OP(xadd_rm32_r32),		},
-	{ 0xC7,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(cmpxchg8b_m64),		PENTIUMOP(cmpxchg8b_m64),	}
+	{ 0xC7,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(cmpxchg8b_m64),		PENTIUMOP(cmpxchg8b_m64),	},
+	{ 0xC8,		OP_2BYTE|OP_I486,			I486OP(bswap_eax),				I486OP(bswap_eax),			},
+	{ 0xC9,		OP_2BYTE|OP_I486,			I486OP(bswap_ecx),				I486OP(bswap_ecx),			},
+	{ 0xCA,		OP_2BYTE|OP_I486,			I486OP(bswap_edx),				I486OP(bswap_edx),			},
+	{ 0xCB,		OP_2BYTE|OP_I486,			I486OP(bswap_ebx),				I486OP(bswap_ebx),			},
+	{ 0xCC,		OP_2BYTE|OP_I486,			I486OP(bswap_esp),				I486OP(bswap_esp),			},
+	{ 0xCD,		OP_2BYTE|OP_I486,			I486OP(bswap_ebp),				I486OP(bswap_ebp),			},
+	{ 0xCE,		OP_2BYTE|OP_I486,			I486OP(bswap_esi),				I486OP(bswap_esi),			},
+	{ 0xCF,		OP_2BYTE|OP_I486,			I486OP(bswap_edi),				I486OP(bswap_edi),			}
 };
