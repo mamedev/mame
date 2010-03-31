@@ -38,9 +38,32 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "cpu/i386/i386.h"
 #include "includes/naomibd.h"
 
+/*
+St.     Instr.		 Comment
+0x02 	PEEK 		 ACC := MEM[OP1]
+0x03 	POKE 		 MEM[OP1] := OP2
+0x04 	POKEPCI 	 PCICONF[OP1] := OP2
+0x05 	PEEKPCI 	 ACC := PCICONF[OP1]
+0x06 	AND/OR 		 ACC := (ACC & OP1) | OP2
+0x07 	(prefix)	 execute the instruction code in OP1 with OP1 := OP2, OP2 := ACC
+0x08 	BNE 		 IF ACC = OP1 THEN PC := PC + OP2
+0x09 	BRA 		 PC := PC + OP2
+0x10 	AND/OR ACC2  (unused/defunct) ACC2 := (ACC2 & OP1) | OP2
+0x11 	OUTB 		 PORT[OP1] := OP2
+0x12 	INB 		 ACC := PORT(OP1)
+0xEE 	END 
+*/
+static READ32_HANDLER( chihiro_jamtable )
+{
+	return 0xEEEEEEEE;
+}
+
+
 static ADDRESS_MAP_START( xbox_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0x00000000, 0x004fffff) AM_RAM
+	AM_RANGE(0xff000080, 0xff000083) AM_READ( chihiro_jamtable )
+	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_SHARE("biosflash")
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_SHARE("biosflash")
 ADDRESS_MAP_END
 
 
