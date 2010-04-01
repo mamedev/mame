@@ -811,6 +811,29 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x0236740)  rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x023674e)  rv = 0xffffffff;
 			break;
+		case 16: // Dragoon Might ver. JAA
+			{
+				UINT32 cur_pc;
+
+				cur_pc = cpu_get_pc(space->cpu);
+
+				switch(cur_pc)
+				{
+					case 0x203534: break; //ffc0, OK
+					case 0x20358a: rv = 0; break; // != ffc0
+					case 0x2035e4: rv = 0xffffffff; break; // != 0
+					case 0x2036e4: rv = 0x0000ff00; break; // 00ff
+					case 0x203766: rv = 0x5500aa00; break; // 00ff
+					case 0x2037e8: rv = 0xaa005500; break; // 00ff
+					case 0x20386a: rv = 0xff000000; break;
+					case 0x203960: rv = 0; break;
+					case 0x2039f2: rv = 0x0100ff00; break;
+					//default:
+					//	if(cur_pc != 0x20358a && cur_pc != 0x2038aa && cur_pc != 0x2038d4)
+					//		printf("Read 68k @ %x (PC=%x)\n", reg, cur_pc);
+				}
+			}
+			break;
 	}
 
 	return(rv);
@@ -3681,7 +3704,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "puzldama",  7, 0, 0, BPP5 },
 	{ "tbyahhoo",  7, 0, 8, BPP5 },
 	{ "tkmmpzdm",  7, 0, 2, BPP6 },
-	{ "dragoonj",  7, 0, 3, BPP4 },
+	{ "dragoonj",  7, 16, 3, BPP4 },
 	{ "dragoona",  7, 0, 3, BPP4 },
 	{ "sexyparo",  7, 0, 4, BPP5 },
 	{ "daiskiss",  7, 0, 5, BPP5 },
