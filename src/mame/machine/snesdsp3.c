@@ -1101,6 +1101,7 @@ static void dsp3_init( running_machine *machine )
 	UINT32 i;
 	UINT8 *dspin = memory_region(machine, "addons");
 
+	dsp3_Reset();
 
 	// expand the DSP-3 data ROM
 	for (i = 0; i < 2048; i += 2)
