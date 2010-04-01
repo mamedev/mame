@@ -1,37 +1,70 @@
-/*
- Super Draw Poker (c) Stern 1983
+/************************************************************************
 
- driver by Pierpaolo Prazzoli
+  Super Draw Poker (c) Stern 1983
+
+  Driver by Pierpaolo Prazzoli.
+  Additional work by Angelo Salese & Roberto Fresca.
+
+*************************************************************************
+
+  Notes:
+
+  - According to some original screenshots floating around the net, this game
+    uses a weird coloring scheme for the char text that dynamically changes
+    the color of an entire column. For now I can only guess about how it
+    truly works.
+
+  - An original snap of these can be seen at:
+    http://mamedev.emulab.it/kale/fast/files/A00000211628-007.jpg
 
 
-A2-1C   8910
-A2-1D   Z80
-A1-1E
-A1-1H
-A3-1J
+*************************************************************************
 
-        A1-4K
-        A1-4L
-        A1-4N
-        A1-4P           A1-9N (6301)
-                        A1-9P
 
- Notes:
- - According to some original screenshots floating around the net, this game uses a weird coloring scheme for
-   the char text that dynamically changes the color of an entire column. For now I can only guess about how
-   it truly works.
-   An original snap of these can be seen at -> http://mamedev.emulab.it/kale/fast/files/A00000211628-007.jpg
+  Updates:
 
- To do:
- - Needs schematics to check if the current implementation of the "global column coloring" is correct.
- - Check unknown read/writes, too many of them.
+  - Reworked inputs to match the standard poker inputs names/layout.
+  - Hooked the payout switch.
+  - Hooked a watchdog circuitery, that seems intended to reset
+     the game and/or an external device.
+  - Added machine start & reset.
+  - All clocks pre defined.
+  - Added ay8910 interfase as a preliminary attempt to analyze the unknown
+     port writes when these ports are set as input.
+  - Figured out the following DIP switches:
+     Auto Bet (No, Yes).
+     Allow Raise (No, Yes).
+     Double-Up (No, Yes).
+     Minimal Winner Hand (Jacks or Better, Two Pair).
+     Deal Speed (Slow, Fast).
+     Aces Type (Normal Aces, Number 1).
+     Cards Deck Type (english cards, french cards).
+     Max Bet (5, 10, 15, 20).
+  - Added NVRAM support.
+  - Reorganized and cleaned-up the driver.
 
-*/
+
+  To do:
+
+  - Needs schematics to check if the current implementation of the
+    "global column coloring" is correct.
+  - Check unknown read/writes, too many of them.
+  - Check the correct CPU and AY8910 clocks from PCB.
+  - A workaround for writes to ay8910 ports when these are set as input.
+
+
+************************************************************************/
+
+
+#define MASTER_CLOCK	XTAL_12MHz
+#define CPU_CLOCK		MASTER_CLOCK/4	/* guess */
+#define SND_CLOCK		MASTER_CLOCK/8	/* guess */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
+UINT8 wdog;
 
 class supdrapo_state
 {
@@ -45,10 +78,167 @@ public:
 	UINT8 *videoram;
 };
 
+
+/*********************************************************************
+                           Video Hardware
+**********************************************************************/
+
+static VIDEO_START( supdrapo )
+{
+}
+
+
+static VIDEO_UPDATE( supdrapo )
+{
+	supdrapo_state *state = (supdrapo_state *)screen->machine->driver_data;
+	int x, y;
+	int count;
+	int color;
+
+	count = 0;
+
+	for(y = 0; y < 32; y++)
+	{
+		for(x = 0; x < 32; x++)
+		{
+			int tile = state->videoram[count] + state->char_bank[count] * 0x100;
+			/* Global Column Coloring, GUESS! */
+			color = state->col_line[(x*2) + 1] ? (state->col_line[(x*2) + 1] - 1) & 7 : 0;
+
+			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile,color, 0, 0, x*8, y*8);
+
+			count++;
+		}
+	}
+
+	return 0;
+}
+
+
+/*Maybe bit 2 & 3 of the second color prom are intensity bits? */
+static PALETTE_INIT( sdpoker )
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x100; ++i)
+	{
+		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 0) & 0x01;
+		bit2 = (color_prom[0] >> 1) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = 0;//(color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 2) & 0x01;
+		bit2 = (color_prom[0] >> 3) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0x100] >> 0) & 0x01;
+		bit2 = (color_prom[0x100] >> 1) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
+
+
+/*********************************************************************
+                            R/W Handlers
+**********************************************************************/
+
 static READ8_HANDLER( sdpoker_rng_r )
 {
 	return mame_rand(space->machine);
 }
+
+static WRITE8_HANDLER( wdog8000_w )
+{
+/*  Kind of state watchdog alternating 0x00 & 0x01 writes.
+	Used when exit the test mode (writes 2 consecutive 0's).
+	Seems to be intended to reset some external device.
+
+  Watchdog: 01
+  Watchdog: 00
+  Watchdog: 01
+  Watchdog: 00
+  Watchdog: 01
+  Watchdog: 00
+  Watchdog: 00 ---> Exit from test mode.
+
+  Debug3: 00
+  Watchdog: 00
+  Watchdog: 00
+
+  Debug3: 00
+  Watchdog: 01
+  Watchdog: 00
+  Watchdog: 01
+  Watchdog: 00
+  Watchdog: 01
+  Watchdog: 00
+
+*/
+	if (wdog == data)
+	{
+		watchdog_reset_w(space, 0, 0);	/* Reset */
+	}
+
+	wdog = data;
+//	logerror("Watchdog: %02X\n", data);
+}
+
+
+static WRITE8_HANDLER( debug8004_w )
+{
+/*  Writes 0x00 each time the machine is initialized */
+
+	logerror("debug8004: %02X\n", data);
+//	popmessage("written : %02X", data);
+}
+
+static WRITE8_HANDLER( debug7c00_w )
+{
+/*  This one write 0's constantly when the input test mode is running */
+	logerror("debug7c00: %02X\n", data);
+}
+
+
+/*********************************************************************
+                         Coin I/O Counters
+**********************************************************************/
+
+static WRITE8_HANDLER( coinin_w )
+{
+	coin_counter_w(space->machine, 0, data & 0x01);	/* Coin In */
+}
+
+static WRITE8_HANDLER( payout_w )
+{
+	coin_counter_w(space->machine, 1, data & 0x01);	/* Payout */
+}
+
+
+/*********************************************************************
+                        Machine Start & Reset
+**********************************************************************/
+
+static MACHINE_START( supdrapo )
+{
+	wdog = 1;
+}
+
+
+static MACHINE_RESET( supdrapo )
+{
+	wdog = 1;
+}
+
+
+/*********************************************************************
+                              Memory Map
+**********************************************************************/
 
 static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
@@ -59,29 +249,34 @@ static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_MEMBER(supdrapo_state,videoram)
 	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE_MEMBER(supdrapo_state,char_bank)
 	AM_RANGE(0x7000, 0x7bff) AM_RAM //$7600 seems watchdog
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITENOP //?
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") AM_WRITENOP
+	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(debug7c00_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") AM_WRITE(wdog8000_w)
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN0")
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1")
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN3") AM_WRITENOP
-	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("IN6")
-	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("IN5") //dips?
-	AM_RANGE(0x9000, 0x90ff) AM_RAM
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1") AM_WRITE(payout_w)
+	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN2") AM_WRITE(coinin_w)
+	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN3") AM_WRITE(debug8004_w)
+	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("SW2")
+	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("SW1")
+	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
 	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
+
+/*********************************************************************
+                             Input Ports
+**********************************************************************/
+
 static INPUT_PORTS_START( supdrapo )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("P1 Win") PORT_CODE(KEYCODE_D) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_S) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("P1 Bet") PORT_CODE(KEYCODE_A) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("Coin : 10")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin :  5")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin :  2")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin :  1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("P1 Win/Take") PORT_CODE(KEYCODE_4) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_N) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )  PORT_NAME("P1 Deal") PORT_CODE(KEYCODE_2) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("P1 Bet/Play") PORT_CODE(KEYCODE_1) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("Coin 4: 10")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin 3:  5")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin 2:  2")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin 1:  1")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Hold 5") PORT_CODE(KEYCODE_B) PORT_PLAYER(1)
@@ -89,15 +284,15 @@ static INPUT_PORTS_START( supdrapo )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Hold 3") PORT_CODE(KEYCODE_C) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Hold 2") PORT_CODE(KEYCODE_X) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Hold 1") PORT_CODE(KEYCODE_Z) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("P1 Black") PORT_CODE(KEYCODE_Q) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Red") PORT_CODE(KEYCODE_W) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("P1 Double Up") PORT_CODE(KEYCODE_E) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("P1 Black") PORT_CODE(KEYCODE_A) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Red") PORT_CODE(KEYCODE_S) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("P1 Double Up") PORT_CODE(KEYCODE_3) PORT_PLAYER(1)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Win") PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Win/Take") PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Cancel") PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Bet") PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Deal") PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Bet/Play") PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Coin : 10")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Coin :  5")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Coin :  2")
@@ -125,39 +320,39 @@ static INPUT_PORTS_START( supdrapo )
 	PORT_DIPNAME( 0x10, 0x00, "4-5" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Credit Clear")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, "1 Player" )
 	PORT_DIPSETTING(    0x80, "2 Players" )
 
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x01, 0x00, "5-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "5-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "5-3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "5-4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "5-5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "5-6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Auto Bet" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Allow Raise" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Minimal Winner Hand" )
+	PORT_DIPSETTING(    0x08, "Jacks or Better" )
+	PORT_DIPSETTING(    0x00, "Two Pair" )
+	PORT_DIPNAME( 0x10, 0x00, "Deal Speed" )
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x10, "Fast" )
+	PORT_DIPNAME( 0x20, 0x00, "Aces Type" )
+	PORT_DIPSETTING(    0x00, "Normal Aces" )
+	PORT_DIPSETTING(    0x20, "Number 1" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( French ) )
-	PORT_DIPNAME( 0x80, 0x00, "5-8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Cards Deck Type" )
+	PORT_DIPSETTING(    0x00, "English Cards" )
+	PORT_DIPSETTING(    0x80, "French Cards" )
 
-	PORT_START("IN6")
+	PORT_START("SW2")
 	PORT_DIPNAME( 0x01, 0x00, "6-1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -176,13 +371,17 @@ static INPUT_PORTS_START( supdrapo )
 	PORT_DIPNAME( 0x20, 0x00, "6-6" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "6-7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "6-8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x80, "15" )
+	PORT_DIPSETTING(    0xc0, "30" )
 INPUT_PORTS_END
+
+
+/*********************************************************************
+                      Graphics Decode / Layout
+**********************************************************************/
 
 static const gfx_layout charlayout =
 {
@@ -199,70 +398,49 @@ static GFXDECODE_START( supdrapo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 GFXDECODE_END
 
-static VIDEO_START( supdrapo )
+
+/*********************************************************************
+                         Sound Interface
+**********************************************************************/
+
+static WRITE8_DEVICE_HANDLER( ay8910_outputa_w )
 {
+//	popmessage("ay8910_outputa_w %02x",data);
 }
 
-static VIDEO_UPDATE( supdrapo )
+static WRITE8_DEVICE_HANDLER( ay8910_outputb_w )
 {
-	supdrapo_state *state = (supdrapo_state *)screen->machine->driver_data;
-	int x,y;
-	int count;
-	int color;
-
-	count = 0;
-
-	for(y=0;y<32;y++)
-	{
-		for(x=0;x<32;x++)
-		{
-			int tile = state->videoram[count] + state->char_bank[count] * 0x100;
-			/* Global Column Coloring, GUESS! */
-			color = state->col_line[(x*2)+1] ? (state->col_line[(x*2)+1]-1) & 0x7 : 0;
-
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
-
-			count++;
-		}
-	}
-
-	return 0;
+//	popmessage("ay8910_outputb_w %02x",data);
 }
 
 
-/*Maybe bit 2 & 3 of the second color prom are intensity bits? */
-static PALETTE_INIT( sdpoker )
+static const ay8910_interface ay8910_config =
 {
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ay8910_outputa_w),
+	DEVCB_HANDLER(ay8910_outputb_w)
+};
 
-	for (i = 0; i < 0x100; ++i)
-	{
-		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 0) & 0x01;
-		bit2 = (color_prom[0] >> 1) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;//(color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 2) & 0x01;
-		bit2 = (color_prom[0] >> 3) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0x100] >> 0) & 0x01;
-		bit2 = (color_prom[0x100] >> 1) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-		color_prom++;
-	}
-}
+/*********************************************************************
+                           Machine Driver
+**********************************************************************/
 
 static MACHINE_DRIVER_START( supdrapo )
 
 	MDRV_DRIVER_DATA( supdrapo_state )
 
-	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* ??? */
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(sdpoker_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(supdrapo)
+	MDRV_MACHINE_RESET(supdrapo)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -281,10 +459,29 @@ static MACHINE_DRIVER_START( supdrapo )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/2) /* ??? */
+	MDRV_SOUND_ADD("aysnd", AY8910, SND_CLOCK)	/* guess */
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+
+/*********************************************************************
+                            ROMs Load
+**********************************************************************/
+
+/*
+A2-1C   8910
+A2-1D   Z80
+A1-1E
+A1-1H
+A3-1J
+
+        A1-4K
+        A1-4L
+        A1-4N
+        A1-4P           A1-9N (6301)
+                        A1-9P
+*/
 ROM_START( supdrapo )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "a2-1c",        0x0000, 0x1000, CRC(b65af689) SHA1(b45cd15ca8f9c931d83a90f3cdbebf218070b195) )
@@ -304,5 +501,42 @@ ROM_START( supdrapo )
 	ROM_LOAD( "a1-9p",        0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
 ROM_END
 
+/*
+------------------------------------------
 
-GAME( 1983, supdrapo, 0, supdrapo, supdrapo, 0, ROT90, "Valadon Automation (Stern license)", "Super Draw Poker", 0 )
+  Jeutel (bootleg?)
+
+  1x MOSTEK 8236 / MK3880N-IRL / Z80-CPU
+  1x SOUND AY-3-8910
+  1x X-TAL 12,000
+  2x 8 DIP switches banks.
+
+------------------------------------------
+*/
+ROM_START( supdrapoa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.c1",	0x0000, 0x1000, CRC(63e2775a) SHA1(742e8db5378631fd93a22d2131f9523ee74c03a5) )
+	ROM_LOAD( "1.d1",	0x1000, 0x1000, CRC(aa1578de) SHA1(8f1a33864b2c8e09a25c7603522ebfc7e0757d56) )
+	ROM_LOAD( "2.e1",	0x2000, 0x1000, CRC(ffe0415c) SHA1(0233d192814ced0b32abd4b7d2e93431a339732f) )
+	ROM_LOAD( "3.h1",	0x3000, 0x1000, CRC(1bae52fa) SHA1(f89d48d67e52d0fca51eb23fee2d5cb94afcf7f4) )
+	ROM_LOAD( "4.j1",	0x4000, 0x1000, CRC(7af26f63) SHA1(aeeca69ef1c21acae4283183e4b073ec0d303f4a) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "8.p4",	0x0000, 0x1000, CRC(ef0700c5) SHA1(53f49d99f310fdf675e3b7339bdca1115e4a1935) )
+	ROM_LOAD( "7.n4",	0x1000, 0x1000, CRC(3f77031b) SHA1(2d282d39ea568aa44af8b56228b6e096c2713a15) )
+	ROM_LOAD( "6.l4",	0x2000, 0x1000, CRC(d70cd50e) SHA1(c3e3dcf79f8a25df5b878ef8734a6d0dc22004ba) )
+	ROM_LOAD( "5.k4",	0x3000, 0x1000, CRC(34564917) SHA1(90b49fe8a5371159388839d42913352cf58c60e6) )
+
+	ROM_REGION( 0x00200, "proms", 0 )	/* using the color PROMs from the parent set */
+	ROM_LOAD( "a1-9n",        0x0000, 0x0100, BAD_DUMP CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
+	ROM_LOAD( "a1-9p",        0x0100, 0x0100, BAD_DUMP CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
+ROM_END
+
+
+/*********************************************************************
+                           Games Drivers
+**********************************************************************/
+
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT  ROT     COMPANY                               FULLNAME                   FLAGS... */
+GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, 0,    ROT90, "Valadon Automation (Stern license)", "Super Draw Poker (set 1)", 0 )
+GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, 0,    ROT90, "Valadon Automation / Jeutel",        "Super Draw Poker (set 2)", 0 )

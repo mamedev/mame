@@ -6789,7 +6789,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( greatgun )	/* (c) 1983 */
 
 	/* Other Stern */
-	DRIVER( supdrapo )	/* (c) 1983 */
 	DRIVER( cliffhgr )	/* (c) 1983 */
 	DRIVER( cliffhgra )	/* (c) 1983 */
 	DRIVER( goaltogo )	/* (c) 1983 */
@@ -7151,9 +7150,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bagnarda )	/* (c) 1982 */
 	DRIVER( bagmans )	/* (c) 1982 + Stern license */
 	DRIVER( bagmans2 )	/* (c) 1982 + Stern license */
+	DRIVER( pickin )	/* (c) 1983 */
+	DRIVER( supdrapo )	/* (c) 1983 + Stern license */
+	DRIVER( supdrapoa )	/* (c) 1983 + Jeutel license? */
 	DRIVER( sbagman )	/* (c) 1984 */
 	DRIVER( sbagmans )	/* (c) 1984 + Stern license */
-	DRIVER( pickin )	/* (c) 1983 */
 	DRIVER( botanic )	/* (c) 1985 */
 	DRIVER( squaitsa )	/* (c) 1985 */
 	DRIVER( tankbust )	/* (c) 1985 */
