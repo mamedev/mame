@@ -29,19 +29,18 @@ enum
 	PARAM_REG2_16,		/* 16-bit register */
 	PARAM_RM8,			/* 8-bit memory or register */
 	PARAM_RM16,			/* 16-bit memory or register */
-	PARAM_I4,			/* 4-bit signed immediate */
+	PARAM_I3,			/* 3-bit immediate */
+	PARAM_I4,			/* 4-bit immediate */
 	PARAM_I8,			/* 8-bit signed immediate */
 	PARAM_I16,			/* 16-bit signed immediate */
 	PARAM_UI8,			/* 8-bit unsigned immediate */
-	PARAM_UI16,			/* 16-bit unsigned immediate */
 	PARAM_IMM,			/* 16-bit immediate */
 	PARAM_ADDR,			/* 16:16 address */
 	PARAM_REL8,			/* 8-bit PC-relative displacement */
 	PARAM_REL16,		/* 16-bit PC-relative displacement */
-	PARAM_MEM_OFFS_B,	/* 8-bit mem offset */
-	PARAM_MEM_OFFS_W,	/* 16-bit mem offset */
+	PARAM_MEM_OFFS,		/* 16-bit mem offset */
 	PARAM_SREG,			/* segment register */
-	PARAM_RBANK,		/* register bank (V25) */
+	PARAM_SFREG,		/* V25/V35 special function register */
 	PARAM_1,			/* used by shift/rotate instructions */
 	PARAM_AL,
 	PARAM_CL,
@@ -199,11 +198,11 @@ static const I386_OPCODE necv_opcode_table1[256] =
 	{"push    r",		0,				0,					0,					0				},
 	{"pop     r",		0,				0,					0,					0				},
 	{"chkind",			MODRM,			PARAM_REG16,		PARAM_RM16,			0				},
-	{"brkn",			MODRM,			PARAM_RM16,			PARAM_REG16,		0				},	/* break into native */
+	{"brkn",			0,				PARAM_UI8,			0,					0,				DASMFLAG_STEP_OVER},	/* V25S/V35S only */
 	{"repnc",			PREFIX,			0,					0,					0				},
 	{"repc",			PREFIX,			0,					0,					0				},
-	{"fpo2    0",		0,/*OP_SIZE*/	0,					0,					0				},
-	{"fpo2    1",		0,/*ADDR_SIZE*/	0,					0,					0				},
+	{"fpo2    0",		0,				0,					0,					0				},	/* for a coprocessor that was never made */
+	{"fpo2    1",		0,				0,					0,					0				},	/* for a coprocessor that was never made */
 	{"push",			0,				PARAM_IMM,			0,					0				},
 	{"mul",				MODRM,			PARAM_REG16,		PARAM_RM16,			PARAM_IMM		},
 	{"push",			0,				PARAM_I8,			0,					0				},
@@ -264,10 +263,10 @@ static const I386_OPCODE necv_opcode_table1[256] =
 	{"mov     psw,ah",	0,				0,					0,					0				},
 	{"mov     ah,psw",	0,				0,					0,					0				},
 	// 0xa0
-	{"mov",				0,				PARAM_AL,			PARAM_MEM_OFFS_W,	0				},
-	{"mov",				0,				PARAM_AW,			PARAM_MEM_OFFS_W,	0				},
-	{"mov",				0,				PARAM_MEM_OFFS_W,	PARAM_AL,			0				},
-	{"mov",				0,				PARAM_MEM_OFFS_W,	PARAM_AW,			0				},
+	{"mov",				0,				PARAM_AL,			PARAM_MEM_OFFS,		0				},
+	{"mov",				0,				PARAM_AW,			PARAM_MEM_OFFS,		0				},
+	{"mov",				0,				PARAM_MEM_OFFS,		PARAM_AL,			0				},
+	{"mov",				0,				PARAM_MEM_OFFS,		PARAM_AW,			0				},
 	{"movbkb",			0,				0,					0,					0				},
 	{"movbkw",			0,				0,					0,					0				},
 	{"cmpbkb",			0,				0,					0,					0				},
@@ -325,8 +324,8 @@ static const I386_OPCODE necv_opcode_table1[256] =
 	{"trans",			0,				0,					0,					0				},
 	{"escape",			FPU,			0,					0,					0				},
 	{"escape",			FPU,			0,					0,					0				},
-	{"premov",			MODRM,			PARAM_REG8,			PARAM_RM8,			0				},
-	{"premov",			MODRM,			PARAM_REG16,		PARAM_RM16,			0				},
+	{"premov",			MODRM,			PARAM_REG8,			PARAM_RM8,			0				},	/* ??? */
+	{"premov",			MODRM,			PARAM_REG16,		PARAM_RM16,			0				},	/* ??? */
 	{"escape",			FPU,			0,					0,					0				},
 	{"escape",			FPU,			0,					0,					0				},
 	{"escape",			FPU,			0,					0,					0				},
@@ -350,7 +349,7 @@ static const I386_OPCODE necv_opcode_table1[256] =
 	{"out",				0,				PARAM_DW,			PARAM_AW,			0				},
 	// 0xf0
 	{"buslock",			PREFIX,			0,					0,					0				},
-	{"brks",			0,				0,					0,					0				},	/* break into secure mode */
+	{"brks",			0,				PARAM_UI8,			0,					0,				DASMFLAG_STEP_OVER},	/* V25S/V35S only */
 	{"repne",			PREFIX,			0,					0,					0				},
 	{"rep",				PREFIX,			0,					0,					0				},
 	{"halt",			0,				0,					0,					0				},
@@ -386,30 +385,30 @@ static const I386_OPCODE necv_opcode_table2[256] =
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
-	// 0x10 - NEC V series only
-	{"test1",			MODRM,			PARAM_RM8,			PARAM_1,			0				},
-	{"test1",			MODRM,			PARAM_RM16,			PARAM_1,			0				},
-	{"clr1",			MODRM,			PARAM_RM8,			PARAM_1,			0				},
-	{"clr1",			MODRM,			PARAM_RM16,			PARAM_1,			0				},
-	{"set1",			MODRM,			PARAM_RM8,			PARAM_1,			0				},
-	{"set1",			MODRM,			PARAM_RM16,			PARAM_1,			0				},
-	{"not1",			MODRM,			PARAM_RM8,			PARAM_1,			0				},
-	{"not1",			MODRM,			PARAM_RM16,			PARAM_1,			0				},
-	{"test1",			MODRM,			PARAM_RM8,			PARAM_I8,			0				},
-	{"test1",			MODRM,			PARAM_RM16,			PARAM_I8,			0				},
-	{"clr1",			MODRM,			PARAM_RM8,			PARAM_I8,			0				},
-	{"clr1",			MODRM,			PARAM_RM16,			PARAM_I8,			0				},
-	{"set1",			MODRM,			PARAM_RM8,			PARAM_I8,			0				},
-	{"set1",			MODRM,			PARAM_RM16,			PARAM_I8,			0				},
-	{"not1",			MODRM,			PARAM_RM8,			PARAM_I8,			0				},
-	{"not1",			MODRM,			PARAM_RM16,			PARAM_I8,			0				},
+	// 0x10
+	{"test1",			MODRM,			PARAM_RM8,			PARAM_CL,			0				},
+	{"test1",			MODRM,			PARAM_RM16,			PARAM_CL,			0				},
+	{"clr1",			MODRM,			PARAM_RM8,			PARAM_CL,			0				},
+	{"clr1",			MODRM,			PARAM_RM16,			PARAM_CL,			0				},
+	{"set1",			MODRM,			PARAM_RM8,			PARAM_CL,			0				},
+	{"set1",			MODRM,			PARAM_RM16,			PARAM_CL,			0				},
+	{"not1",			MODRM,			PARAM_RM8,			PARAM_CL,			0				},
+	{"not1",			MODRM,			PARAM_RM16,			PARAM_CL,			0				},
+	{"test1",			MODRM,			PARAM_RM8,			PARAM_I3,			0				},
+	{"test1",			MODRM,			PARAM_RM16,			PARAM_I4,			0				},
+	{"clr1",			MODRM,			PARAM_RM8,			PARAM_I3,			0				},
+	{"clr1",			MODRM,			PARAM_RM16,			PARAM_I4,			0				},
+	{"set1",			MODRM,			PARAM_RM8,			PARAM_I3,			0				},
+	{"set1",			MODRM,			PARAM_RM16,			PARAM_I4,			0				},
+	{"not1",			MODRM,			PARAM_RM8,			PARAM_I3,			0				},
+	{"not1",			MODRM,			PARAM_RM16,			PARAM_I4,			0				},
 	// 0x20
 	{"add4s",			0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"sub4s",			0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
-	{"movspa",			0,				0,					0,					0				},	/* V25/35 only */
+	{"movspa",			0,				0,					0,					0				},	/* V25/V35 only */
 	{"cmp4s",			0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"rol4",			MODRM,			PARAM_RM8,			0,					0				},
@@ -417,7 +416,7 @@ static const I386_OPCODE necv_opcode_table2[256] =
 	{"ror4",			MODRM,			PARAM_RM8,			0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
-	{"brkcs",			MODRM,			PARAM_REG2_8,		0,					0				},	/* V25/35 only */
+	{"brkcs",			MODRM,			PARAM_REG2_16,		0,					0,				DASMFLAG_STEP_OVER},	/* V25/V35 only */
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	// 0x30
@@ -524,20 +523,20 @@ static const I386_OPCODE necv_opcode_table2[256] =
 	{"???",				0,				0,					0,					0				},
 	// 0x90
 	{"???",				0,				0,					0,					0				},
-	{"retrbi",			0,				0,					0,					0				},	/* V25/35 only */
-	{"fint",			0,				0,					0,					0				},	/* V25/35 only */
+	{"retrbi",			0,				0,					0,					0				},	/* V25/V35 only */
+	{"fint",			0,				0,					0,					0				},	/* V25/V35 only */
 	{"???",				0,				0,					0,					0				},
-	{"tsksw",			MODRM,			PARAM_REG2_8,		0,					0				},	/* V25/35 only */
-	{"movspb",			0,				PARAM_RBANK,		0,					0				},	/* V25/35 only */
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
+	{"tsksw",			MODRM,			PARAM_REG2_16,		0,					0				},	/* V25/V35 only */
+	{"movspb",			MODRM,			PARAM_REG2_16,		0,					0				},	/* V25/V35 only */
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
-	{"btclr",			MODRM,			PARAM_REG2_8,		PARAM_I8,			PARAM_REL8		},	/* V25/35 only */
 	{"???",				0,				0,					0,					0				},
-	{"stop",			0,				0,					0,					0				},	/* V25/35 only */
+	{"???",				0,				0,					0,					0				},
+	{"btclr",			MODRM,			PARAM_SFREG,		PARAM_I3,			PARAM_REL8		},	/* V25/V35 only */
+	{"???",				0,				0,					0,					0				},
+	{"stop",			0,				0,					0,					0				},	/* V25/V35 only */
 	{"???",				0,				0,					0,					0				},
 	// 0xa0
 	{"???",				0,				0,					0,					0				},
@@ -821,6 +820,57 @@ static const GROUP_OP group_op_table[] =
 static const char *const nec_reg[8] = { "aw",  "cw",  "dw",  "bw",  "sp",  "bp",  "ix",  "iy" };
 static const char *const neg_reg8[8] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 static const char *const nec_sreg[8] = { "ds1", "ps", "ss", "ds0", "???", "???", "???", "???" };
+static const char *const nec_sfreg[256] =
+{
+	/* 0x00 */
+	"p0",	"pm0",	"pmc0",	"???",	"???",	"???",	"???",	"???",
+	"p1",	"pm1",	"pmc1",	"???",	"???",	"???",	"???",	"???",
+	/* 0x10 */
+	"p2",	"pm2",	"pmc2",	"???",	"???",	"???",	"???",	"???",
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	/* 0x20 */
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	/* 0x30 */
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	"pt",	"???",	"???",	"pmt",	"???",	"???",	"???",	"???",
+	/* 0x40 */
+	"intm",	"???",	"???",	"???",	"ems0",	"ems1",	"ems2",	"???",
+	"???",	"???",	"???",	"???",	"exic0","exic1","exic2","???",
+	/* 0x50 */
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	/* 0x60 */
+	"rxb0",	"???",	"txb0",	"???",	"???",	"srms0","stms0","???",
+	"scm0",	"scc0",	"brg0",	"scs0",	"seic0","sric0","stic0","???",
+	/* 0x70 */
+	"rxb1",	"???",	"txb1",	"???",	"???",	"srms1","stms1","???",
+	"scm1",	"scc1",	"brg1",	"scs1",	"seic1","sric1","stic1","???",
+	/* 0x80 */
+	"tm0",	"???",	"md0",	"???",	"???",	"???",	"???",	"???",
+	"tm1",	"???",	"md1",	"???",	"???",	"???",	"???",	"???",
+	/* 0x90 */
+	"tmc0",	"tmc1",	"???",	"???",	"tmms0","tmms1","tmms2","???",
+	"???",	"???",	"???",	"???",	"tmic0","tmic1","tmic2","???",
+	/* 0xa0 */
+	"dmac0","dmam0","dmac1","dmam1","???",	"???",	"???",	"???",
+	"???",	"???",	"???",	"???",	"dic0",	"dic1",	"???",	"???",
+	/* 0xb0 */
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	/* 0xc0 */
+	"sar0l","sar0m","sar0h","???",	"dar0l","dar0m","dar0h","???",
+	"tc0l",	"tc0h",	"???",	"???",	"???",	"???",	"???",	"???",
+	/* 0xd0 */
+	"sar1l","sar1m","sar1h","???",	"dar1l","dar1m","dar1h","???",
+	"tc1l",	"tc1h",	"???",	"???",	"???",	"???",	"???",	"???",
+	/* 0xe0 */
+	"stbc",	"rfm",	"???",	"???",	"???",	"???",	"???",	"???",
+	"wtc",	"???",	"flag",	"prc",	"tbic",	"???",	"???",	"irqs",
+	/* 0xf0 */
+	"???",	"???",	"???",	"???",	"???",	"???",	"???",	"???",
+	"???",	"???",	"???",	"???",	"ispr",	"???",	"???",	"idb"
+};
 
 static UINT32 pc;
 static UINT8 modrm;
@@ -987,6 +1037,11 @@ static char* handle_param(char* s, UINT32 param)
 			}
 			break;
 
+		case PARAM_I3:
+			i8 = FETCHD();
+			s += sprintf( s, "%d", i8 & 0x07 );
+			break;
+
 		case PARAM_I4:
 			i8 = FETCHD();
 			s += sprintf( s, "%d", i8 & 0x0f );
@@ -1005,11 +1060,6 @@ static char* handle_param(char* s, UINT32 param)
 		case PARAM_UI8:
 			i8 = FETCHD();
 			s += sprintf( s, "%s", shexstring((UINT8)i8, 0, FALSE) );
-			break;
-
-		case PARAM_UI16:
-			i16 = FETCHD16();
-			s += sprintf( s, "%s", shexstring((UINT16)i16, 0, FALSE) );
 			break;
 
 		case PARAM_IMM:
@@ -1035,12 +1085,15 @@ static char* handle_param(char* s, UINT32 param)
 			s += sprintf( s, "%s", hexstring(pc + d8, 0) );
 			break;
 
-		case PARAM_MEM_OFFS_B:
-			d8 = FETCHD();
-			s += sprintf( s, "[%s]", hexstring(d8, 0) );
-			break;
+		case PARAM_MEM_OFFS:
+			switch(segment)
+			{
+				case SEG_PS: s += sprintf( s, "ps:" ); break;
+				case SEG_DS0: s += sprintf( s, "ds0:" ); break;
+				case SEG_DS1: s += sprintf( s, "ds1:" ); break;
+				case SEG_SS: s += sprintf( s, "ss:" ); break;
+			}
 
-		case PARAM_MEM_OFFS_W:
 			d16 = FETCHD16();
 			s += sprintf( s, "[%s]", hexstring(d16, 0) );
 			break;
@@ -1049,12 +1102,13 @@ static char* handle_param(char* s, UINT32 param)
 			s += sprintf( s, "%s", nec_sreg[MODRM_REG1] );
 			break;
 
-		case PARAM_1:
-			s += sprintf( s, "1" );
+		case PARAM_SFREG:
+			d8 = FETCHD();
+			s += sprintf( s, "%s", nec_sfreg[d8] );
 			break;
 
-		case PARAM_RBANK:
-			s += sprintf( s, "%d", FETCHD() & 7 );
+		case PARAM_1:
+			s += sprintf( s, "1" );
 			break;
 
 		case PARAM_AL: s += sprintf( s, "al" ); break;

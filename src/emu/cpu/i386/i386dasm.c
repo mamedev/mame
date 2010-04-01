@@ -40,8 +40,7 @@ enum
 	PARAM_ADDR,			/* 16:16 or 16:32 address */
 	PARAM_REL,			/* 16 or 32-bit PC-relative displacement */
 	PARAM_REL8,			/* 8-bit PC-relative displacement */
-	PARAM_MEM_OFFS_B,	/* 8-bit mem offset */
-	PARAM_MEM_OFFS_V,	/* 16 or 32-bit mem offset */
+	PARAM_MEM_OFFS,		/* 16 or 32-bit mem offset */
 	PARAM_SREG,			/* segment register */
 	PARAM_CREG,			/* control register */
 	PARAM_DREG,			/* debug register */
@@ -281,10 +280,10 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"sahf",			0,				0,					0,					0				},
 	{"lahf",			0,				0,					0,					0				},
 	// 0xa0
-	{"mov",				0,				PARAM_AL,			PARAM_MEM_OFFS_V,	0				},
-	{"mov",				0,				PARAM_EAX,			PARAM_MEM_OFFS_V,	0				},
-	{"mov",				0,				PARAM_MEM_OFFS_V,	PARAM_AL,			0				},
-	{"mov",				0,				PARAM_MEM_OFFS_V,	PARAM_EAX,			0				},
+	{"mov",				0,				PARAM_AL,			PARAM_MEM_OFFS,		0				},
+	{"mov",				0,				PARAM_EAX,			PARAM_MEM_OFFS,		0				},
+	{"mov",				0,				PARAM_MEM_OFFS,		PARAM_AL,			0				},
+	{"mov",				0,				PARAM_MEM_OFFS,		PARAM_EAX,			0				},
 	{"movsb",			0,				0,					0,					0				},
 	{"movsw\0movsd\0movsq",VAR_NAME,	0,					0,					0				},
 	{"cmpsb",			0,				0,					0,					0				},
@@ -1553,12 +1552,17 @@ static char* handle_param(char* s, UINT32 param)
 			s += sprintf( s, "%s", hexstringpc(pc + d8) );
 			break;
 
-		case PARAM_MEM_OFFS_B:
-			d8 = FETCHD();
-			s += sprintf( s, "[%s]", hexstring(d8, 0) );
-			break;
+		case PARAM_MEM_OFFS:
+			switch(segment)
+			{
+				case SEG_CS: s += sprintf( s, "cs:" ); break;
+				case SEG_DS: s += sprintf( s, "ds:" ); break;
+				case SEG_ES: s += sprintf( s, "es:" ); break;
+				case SEG_FS: s += sprintf( s, "fs:" ); break;
+				case SEG_GS: s += sprintf( s, "gs:" ); break;
+				case SEG_SS: s += sprintf( s, "ss:" ); break;
+			}
 
-		case PARAM_MEM_OFFS_V:
 			if( address_size ) {
 				d32 = FETCHD32();
 				s += sprintf( s, "[%s]", hexstring(d32, 0) );

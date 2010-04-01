@@ -540,7 +540,7 @@ CPU_GET_INFO( i8086 )
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 15;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 8;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 50;							break;
 
