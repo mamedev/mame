@@ -172,6 +172,30 @@ static READ16_HANDLER( term2_input_r )
 
 static WRITE16_HANDLER( term2_sound_w )
 {
+	/* Flash Lamp Output Data */
+	if  ( ((data & 0x800) != 0x800) and ((data & 0x400) == 0x400 ) )
+	{
+	output_set_value("Left_Flash_1", data & 0x1);
+	output_set_value("Left_Flash_2", (data & 0x2) >> 1);
+	output_set_value("Left_Flash_3", (data & 0x4) >> 2);
+	output_set_value("Left_Flash_4", (data & 0x8) >> 3);
+	output_set_value("Right_Flash_1", (data & 0x10) >> 4);
+	output_set_value("Right_Flash_2", (data & 0x20) >> 5);
+	output_set_value("Right_Flash_3", (data & 0x40) >> 6);
+	output_set_value("Right_Flash_4", (data & 0x80) >> 7);
+	}
+
+	/* Gun Output Data */
+	if  ( ((data & 0x800) == 0x800) and ((data & 0x400) != 0x400 ) )
+	{
+	output_set_value("Left_Gun_Recoil", data & 0x1);
+	output_set_value("Right_Gun_Recoil", (data & 0x2) >> 1);
+	output_set_value("Left_Gun_Green_Led", (~data & 0x20) >> 5);
+	output_set_value("Left_Gun_Red_Led", (~data & 0x10) >> 4);
+	output_set_value("Right_Gun_Green_Led", (~data & 0x80) >> 7);
+	output_set_value("Right_Gun_Red_Led", (~data & 0x40) >> 6);
+	}	
+
 	if (offset == 0)
 		term2_analog_select = (data >> 12) & 3;
 

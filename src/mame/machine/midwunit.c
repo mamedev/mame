@@ -149,6 +149,16 @@ WRITE16_HANDLER( midxunit_io_w )
 			break;
 
 		default:
+			/* Gun Outputs for RevX */
+			/* Note: The Gun for the Coin slot you use is supposed to rumble when you insert coins, and it doesn't for P3 */
+			/* Perhaps an Input is hooked up wrong??? */
+			output_set_value("Player1_Gun_Recoil", data & 0x1 );
+			output_set_value("Player2_Gun_Recoil", (data & 0x2) >> 1 );
+			output_set_value("Player3_Gun_Recoil", (data & 0x4) >> 2 );
+			output_set_value("Player1_Gun_LED", (~data & 0x10) >> 4 );
+			output_set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
+			output_set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );			
+
 			logerror("%08X:I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
 //          logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
 			break;

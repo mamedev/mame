@@ -155,8 +155,10 @@ Notes:
   Possible values are: 111 (max) 011 (high) -01 (med) --0 (low). It's a
   rotary control so only one bit is supposed to be low.
 
-- The keyboard leds I'm turning on are actually the gun solenoid outputs, which
+(Changed set led output to proper output port.  --HowardC)
+- The outputs I'm turning on are actually the gun solenoid outputs, which
   would rattle the gun while firing.
+
 
 - BM, 060108 - The original flyer for this game has screenshots which clearly
   show the background is 4 pixels to the left on several game stages (you can
@@ -327,8 +329,9 @@ static WRITE16_HANDLER( othunder_tc0220ioc_w )
                 0x000000    eeprom in data
                 x0000000    eeprom out data  */
 
-				set_led_status(space->machine, 0, data & 1);
-				set_led_status(space->machine, 1, data & 2);
+				/* Recoil Piston Motor Status */
+				output_set_value("Player1_Recoil_Piston", data & 0x1 );
+				output_set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
 
 				if (data & 4)
 					popmessage("OBPRI SET!");
