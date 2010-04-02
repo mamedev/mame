@@ -1,670 +1,80 @@
-static void render_spans_16_c1_ns_nt_nz_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_nzc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_nzc_dm(int start, int end, TILE* tex_tile);
+#ifndef _VIDEO_RDPSPAN_H_
+#define _VIDEO_RDPSPAN_H_
 
-static void render_spans_16_c1_ns_nt_nz_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_zc_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_zc_dm(int start, int end, TILE* tex_tile);
+#include "emu.h"
 
-static void render_spans_16_c1_ns_nt_nz_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_nzc_zu_dm(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_zc_zu_dm(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_nzc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_nzc_db(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_zc_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_zc_db(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_nzc_zu_db(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_zc_zu_db(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_zc_zu_db(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_nzc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_nzc_dn(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_zc_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_zc_dn(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_nzc_zu_dn(int start, int end, TILE* tex_tile);
-
-static void render_spans_16_c1_ns_nt_nz_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_nf_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_nz_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_nz_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_nt_z_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_nt_z_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_nz_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_nz_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_ns_t_z_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_ns_t_z_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_nz_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_nz_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_nt_z_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_nt_z_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_nz_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_nz_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c1_s_t_z_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-static void render_spans_16_c2_s_t_z_f_zc_zu_dn(int start, int end, TILE* tex_tile);
-
-static void (*rdp_render_spans_16_func[512])(int, int, TILE*) =
+namespace N64
 {
-	render_spans_16_c1_ns_nt_nz_nf_nzc_dm,	render_spans_16_c2_ns_nt_nz_nf_nzc_dm,
-	render_spans_16_c1_ns_nt_z_nf_nzc_dm,	render_spans_16_c2_ns_nt_z_nf_nzc_dm,
-	render_spans_16_c1_ns_t_nz_nf_nzc_dm,	render_spans_16_c2_ns_t_nz_nf_nzc_dm,
-	render_spans_16_c1_ns_t_z_nf_nzc_dm,	render_spans_16_c2_ns_t_z_nf_nzc_dm,
-	render_spans_16_c1_s_nt_nz_nf_nzc_dm,	render_spans_16_c2_s_nt_nz_nf_nzc_dm,
-	render_spans_16_c1_s_nt_z_nf_nzc_dm,	render_spans_16_c2_s_nt_z_nf_nzc_dm,
-	render_spans_16_c1_s_t_nz_nf_nzc_dm,	render_spans_16_c2_s_t_nz_nf_nzc_dm,
-	render_spans_16_c1_s_t_z_nf_nzc_dm, 	render_spans_16_c2_s_t_z_nf_nzc_dm,
-	render_spans_16_c1_ns_nt_nz_f_nzc_dm,	render_spans_16_c2_ns_nt_nz_f_nzc_dm,
-	render_spans_16_c1_ns_nt_z_f_nzc_dm,	render_spans_16_c2_ns_nt_z_f_nzc_dm,
-	render_spans_16_c1_ns_t_nz_f_nzc_dm,	render_spans_16_c2_ns_t_nz_f_nzc_dm,
-	render_spans_16_c1_ns_t_z_f_nzc_dm, 	render_spans_16_c2_ns_t_z_f_nzc_dm,
-	render_spans_16_c1_s_nt_nz_f_nzc_dm,	render_spans_16_c2_s_nt_nz_f_nzc_dm,
-	render_spans_16_c1_s_nt_z_f_nzc_dm, 	render_spans_16_c2_s_nt_z_f_nzc_dm,
-	render_spans_16_c1_s_t_nz_f_nzc_dm, 	render_spans_16_c2_s_t_nz_f_nzc_dm,
-	render_spans_16_c1_s_t_z_f_nzc_dm,		render_spans_16_c2_s_t_z_f_nzc_dm,
 
-	render_spans_16_c1_ns_nt_nz_nf_zc_dm,	render_spans_16_c2_ns_nt_nz_nf_zc_dm,
-	render_spans_16_c1_ns_nt_z_nf_zc_dm,	render_spans_16_c2_ns_nt_z_nf_zc_dm,
-	render_spans_16_c1_ns_t_nz_nf_zc_dm,	render_spans_16_c2_ns_t_nz_nf_zc_dm,
-	render_spans_16_c1_ns_t_z_nf_zc_dm, 	render_spans_16_c2_ns_t_z_nf_zc_dm,
-	render_spans_16_c1_s_nt_nz_nf_zc_dm,	render_spans_16_c2_s_nt_nz_nf_zc_dm,
-	render_spans_16_c1_s_nt_z_nf_zc_dm, 	render_spans_16_c2_s_nt_z_nf_zc_dm,
-	render_spans_16_c1_s_t_nz_nf_zc_dm, 	render_spans_16_c2_s_t_nz_nf_zc_dm,
-	render_spans_16_c1_s_t_z_nf_zc_dm,		render_spans_16_c2_s_t_z_nf_zc_dm,
-	render_spans_16_c1_ns_nt_nz_f_zc_dm,	render_spans_16_c2_ns_nt_nz_f_zc_dm,
-	render_spans_16_c1_ns_nt_z_f_zc_dm, 	render_spans_16_c2_ns_nt_z_f_zc_dm,
-	render_spans_16_c1_ns_t_nz_f_zc_dm, 	render_spans_16_c2_ns_t_nz_f_zc_dm,
-	render_spans_16_c1_ns_t_z_f_zc_dm,		render_spans_16_c2_ns_t_z_f_zc_dm,
-	render_spans_16_c1_s_nt_nz_f_zc_dm, 	render_spans_16_c2_s_nt_nz_f_zc_dm,
-	render_spans_16_c1_s_nt_z_f_zc_dm,		render_spans_16_c2_s_nt_z_f_zc_dm,
-	render_spans_16_c1_s_t_nz_f_zc_dm,		render_spans_16_c2_s_t_nz_f_zc_dm,
-	render_spans_16_c1_s_t_z_f_zc_dm,		render_spans_16_c2_s_t_z_f_zc_dm,
+namespace RDP
+{
 
-	render_spans_16_c1_ns_nt_nz_nf_nzc_zu_dm,	render_spans_16_c2_ns_nt_nz_nf_nzc_zu_dm,
-	render_spans_16_c1_ns_nt_z_nf_nzc_zu_dm,	render_spans_16_c2_ns_nt_z_nf_nzc_zu_dm,
-	render_spans_16_c1_ns_t_nz_nf_nzc_zu_dm,	render_spans_16_c2_ns_t_nz_nf_nzc_zu_dm,
-	render_spans_16_c1_ns_t_z_nf_nzc_zu_dm, 	render_spans_16_c2_ns_t_z_nf_nzc_zu_dm,
-	render_spans_16_c1_s_nt_nz_nf_nzc_zu_dm,	render_spans_16_c2_s_nt_nz_nf_nzc_zu_dm,
-	render_spans_16_c1_s_nt_z_nf_nzc_zu_dm, 	render_spans_16_c2_s_nt_z_nf_nzc_zu_dm,
-	render_spans_16_c1_s_t_nz_nf_nzc_zu_dm, 	render_spans_16_c2_s_t_nz_nf_nzc_zu_dm,
-	render_spans_16_c1_s_t_z_nf_nzc_zu_dm,		render_spans_16_c2_s_t_z_nf_nzc_zu_dm,
-	render_spans_16_c1_ns_nt_nz_f_nzc_zu_dm,	render_spans_16_c2_ns_nt_nz_f_nzc_zu_dm,
-	render_spans_16_c1_ns_nt_z_f_nzc_zu_dm, 	render_spans_16_c2_ns_nt_z_f_nzc_zu_dm,
-	render_spans_16_c1_ns_t_nz_f_nzc_zu_dm, 	render_spans_16_c2_ns_t_nz_f_nzc_zu_dm,
-	render_spans_16_c1_ns_t_z_f_nzc_zu_dm,		render_spans_16_c2_ns_t_z_f_nzc_zu_dm,
-	render_spans_16_c1_s_nt_nz_f_nzc_zu_dm, 	render_spans_16_c2_s_nt_nz_f_nzc_zu_dm,
-	render_spans_16_c1_s_nt_z_f_nzc_zu_dm,		render_spans_16_c2_s_nt_z_f_nzc_zu_dm,
-	render_spans_16_c1_s_t_nz_f_nzc_zu_dm,		render_spans_16_c2_s_t_nz_f_nzc_zu_dm,
-	render_spans_16_c1_s_t_z_f_nzc_zu_dm,		render_spans_16_c2_s_t_z_f_nzc_zu_dm,
+#define RDP_CVG_SPAN_MAX    1024
 
-	render_spans_16_c1_ns_nt_nz_nf_zc_zu_dm,	render_spans_16_c2_ns_nt_nz_nf_zc_zu_dm,
-	render_spans_16_c1_ns_nt_z_nf_zc_zu_dm, 	render_spans_16_c2_ns_nt_z_nf_zc_zu_dm,
-	render_spans_16_c1_ns_t_nz_nf_zc_zu_dm, 	render_spans_16_c2_ns_t_nz_nf_zc_zu_dm,
-	render_spans_16_c1_ns_t_z_nf_zc_zu_dm,		render_spans_16_c2_ns_t_z_nf_zc_zu_dm,
-	render_spans_16_c1_s_nt_nz_nf_zc_zu_dm, 	render_spans_16_c2_s_nt_nz_nf_zc_zu_dm,
-	render_spans_16_c1_s_nt_z_nf_zc_zu_dm,		render_spans_16_c2_s_nt_z_nf_zc_zu_dm,
-	render_spans_16_c1_s_t_nz_nf_zc_zu_dm,		render_spans_16_c2_s_t_nz_nf_zc_zu_dm,
-	render_spans_16_c1_s_t_z_nf_zc_zu_dm,		render_spans_16_c2_s_t_z_nf_zc_zu_dm,
-	render_spans_16_c1_ns_nt_nz_f_zc_zu_dm, 	render_spans_16_c2_ns_nt_nz_f_zc_zu_dm,
-	render_spans_16_c1_ns_nt_z_f_zc_zu_dm,		render_spans_16_c2_ns_nt_z_f_zc_zu_dm,
-	render_spans_16_c1_ns_t_nz_f_zc_zu_dm,		render_spans_16_c2_ns_t_nz_f_zc_zu_dm,
-	render_spans_16_c1_ns_t_z_f_zc_zu_dm,		render_spans_16_c2_ns_t_z_f_zc_zu_dm,
-	render_spans_16_c1_s_nt_nz_f_zc_zu_dm,		render_spans_16_c2_s_nt_nz_f_zc_zu_dm,
-	render_spans_16_c1_s_nt_z_f_zc_zu_dm,		render_spans_16_c2_s_nt_z_f_zc_zu_dm,
-	render_spans_16_c1_s_t_nz_f_zc_zu_dm,		render_spans_16_c2_s_t_nz_f_zc_zu_dm,
-	render_spans_16_c1_s_t_z_f_zc_zu_dm,		render_spans_16_c2_s_t_z_f_zc_zu_dm,
+class OtherModes;
+class MiscState;
+class Processor;
 
-	render_spans_16_c1_ns_nt_nz_nf_nzc_db, render_spans_16_c2_ns_nt_nz_nf_nzc_db,
-	render_spans_16_c1_ns_nt_z_nf_nzc_db,	render_spans_16_c2_ns_nt_z_nf_nzc_db,
-	render_spans_16_c1_ns_t_nz_nf_nzc_db,	render_spans_16_c2_ns_t_nz_nf_nzc_db,
-	render_spans_16_c1_ns_t_z_nf_nzc_db,	render_spans_16_c2_ns_t_z_nf_nzc_db,
-	render_spans_16_c1_s_nt_nz_nf_nzc_db,	render_spans_16_c2_s_nt_nz_nf_nzc_db,
-	render_spans_16_c1_s_nt_z_nf_nzc_db,	render_spans_16_c2_s_nt_z_nf_nzc_db,
-	render_spans_16_c1_s_t_nz_nf_nzc_db,	render_spans_16_c2_s_t_nz_nf_nzc_db,
-	render_spans_16_c1_s_t_z_nf_nzc_db, 	render_spans_16_c2_s_t_z_nf_nzc_db,
-	render_spans_16_c1_ns_nt_nz_f_nzc_db,	render_spans_16_c2_ns_nt_nz_f_nzc_db,
-	render_spans_16_c1_ns_nt_z_f_nzc_db,	render_spans_16_c2_ns_nt_z_f_nzc_db,
-	render_spans_16_c1_ns_t_nz_f_nzc_db,	render_spans_16_c2_ns_t_nz_f_nzc_db,
-	render_spans_16_c1_ns_t_z_f_nzc_db, 	render_spans_16_c2_ns_t_z_f_nzc_db,
-	render_spans_16_c1_s_nt_nz_f_nzc_db,	render_spans_16_c2_s_nt_nz_f_nzc_db,
-	render_spans_16_c1_s_nt_z_f_nzc_db, 	render_spans_16_c2_s_nt_z_f_nzc_db,
-	render_spans_16_c1_s_t_nz_f_nzc_db, 	render_spans_16_c2_s_t_nz_f_nzc_db,
-	render_spans_16_c1_s_t_z_f_nzc_db,	render_spans_16_c2_s_t_z_f_nzc_db,
-
-	render_spans_16_c1_ns_nt_nz_nf_zc_db,	render_spans_16_c2_ns_nt_nz_nf_zc_db,
-	render_spans_16_c1_ns_nt_z_nf_zc_db,	render_spans_16_c2_ns_nt_z_nf_zc_db,
-	render_spans_16_c1_ns_t_nz_nf_zc_db,	render_spans_16_c2_ns_t_nz_nf_zc_db,
-	render_spans_16_c1_ns_t_z_nf_zc_db, 	render_spans_16_c2_ns_t_z_nf_zc_db,
-	render_spans_16_c1_s_nt_nz_nf_zc_db,	render_spans_16_c2_s_nt_nz_nf_zc_db,
-	render_spans_16_c1_s_nt_z_nf_zc_db, 	render_spans_16_c2_s_nt_z_nf_zc_db,
-	render_spans_16_c1_s_t_nz_nf_zc_db, 	render_spans_16_c2_s_t_nz_nf_zc_db,
-	render_spans_16_c1_s_t_z_nf_zc_db,	render_spans_16_c2_s_t_z_nf_zc_db,
-	render_spans_16_c1_ns_nt_nz_f_zc_db,	render_spans_16_c2_ns_nt_nz_f_zc_db,
-	render_spans_16_c1_ns_nt_z_f_zc_db, 	render_spans_16_c2_ns_nt_z_f_zc_db,
-	render_spans_16_c1_ns_t_nz_f_zc_db, 	render_spans_16_c2_ns_t_nz_f_zc_db,
-	render_spans_16_c1_ns_t_z_f_zc_db,	render_spans_16_c2_ns_t_z_f_zc_db,
-	render_spans_16_c1_s_nt_nz_f_zc_db, 	render_spans_16_c2_s_nt_nz_f_zc_db,
-	render_spans_16_c1_s_nt_z_f_zc_db,	render_spans_16_c2_s_nt_z_f_zc_db,
-	render_spans_16_c1_s_t_nz_f_zc_db,	render_spans_16_c2_s_t_nz_f_zc_db,
-	render_spans_16_c1_s_t_z_f_zc_db,		render_spans_16_c2_s_t_z_f_zc_db,
-
-	render_spans_16_c1_ns_nt_nz_nf_nzc_zu_db,	render_spans_16_c2_ns_nt_nz_nf_nzc_zu_db,
-	render_spans_16_c1_ns_nt_z_nf_nzc_zu_db,	render_spans_16_c2_ns_nt_z_nf_nzc_zu_db,
-	render_spans_16_c1_ns_t_nz_nf_nzc_zu_db,	render_spans_16_c2_ns_t_nz_nf_nzc_zu_db,
-	render_spans_16_c1_ns_t_z_nf_nzc_zu_db, 	render_spans_16_c2_ns_t_z_nf_nzc_zu_db,
-	render_spans_16_c1_s_nt_nz_nf_nzc_zu_db,	render_spans_16_c2_s_nt_nz_nf_nzc_zu_db,
-	render_spans_16_c1_s_nt_z_nf_nzc_zu_db, 	render_spans_16_c2_s_nt_z_nf_nzc_zu_db,
-	render_spans_16_c1_s_t_nz_nf_nzc_zu_db, 	render_spans_16_c2_s_t_nz_nf_nzc_zu_db,
-	render_spans_16_c1_s_t_z_nf_nzc_zu_db,	render_spans_16_c2_s_t_z_nf_nzc_zu_db,
-	render_spans_16_c1_ns_nt_nz_f_nzc_zu_db,	render_spans_16_c2_ns_nt_nz_f_nzc_zu_db,
-	render_spans_16_c1_ns_nt_z_f_nzc_zu_db, 	render_spans_16_c2_ns_nt_z_f_nzc_zu_db,
-	render_spans_16_c1_ns_t_nz_f_nzc_zu_db, 	render_spans_16_c2_ns_t_nz_f_nzc_zu_db,
-	render_spans_16_c1_ns_t_z_f_nzc_zu_db,	render_spans_16_c2_ns_t_z_f_nzc_zu_db,
-	render_spans_16_c1_s_nt_nz_f_nzc_zu_db, 	render_spans_16_c2_s_nt_nz_f_nzc_zu_db,
-	render_spans_16_c1_s_nt_z_f_nzc_zu_db,	render_spans_16_c2_s_nt_z_f_nzc_zu_db,
-	render_spans_16_c1_s_t_nz_f_nzc_zu_db,	render_spans_16_c2_s_t_nz_f_nzc_zu_db,
-	render_spans_16_c1_s_t_z_f_nzc_zu_db,		render_spans_16_c2_s_t_z_f_nzc_zu_db,
-
-	render_spans_16_c1_ns_nt_nz_nf_zc_zu_db,	render_spans_16_c2_ns_nt_nz_nf_zc_zu_db,
-	render_spans_16_c1_ns_nt_z_nf_zc_zu_db, 	render_spans_16_c2_ns_nt_z_nf_zc_zu_db,
-	render_spans_16_c1_ns_t_nz_nf_zc_zu_db, 	render_spans_16_c2_ns_t_nz_nf_zc_zu_db,
-	render_spans_16_c1_ns_t_z_nf_zc_zu_db,	render_spans_16_c2_ns_t_z_nf_zc_zu_db,
-	render_spans_16_c1_s_nt_nz_nf_zc_zu_db, 	render_spans_16_c2_s_nt_nz_nf_zc_zu_db,
-	render_spans_16_c1_s_nt_z_nf_zc_zu_db,	render_spans_16_c2_s_nt_z_nf_zc_zu_db,
-	render_spans_16_c1_s_t_nz_nf_zc_zu_db,	render_spans_16_c2_s_t_nz_nf_zc_zu_db,
-	render_spans_16_c1_s_t_z_nf_zc_zu_db,		render_spans_16_c2_s_t_z_nf_zc_zu_db,
-	render_spans_16_c1_ns_nt_nz_f_zc_zu_db, 	render_spans_16_c2_ns_nt_nz_f_zc_zu_db,
-	render_spans_16_c1_ns_nt_z_f_zc_zu_db,	render_spans_16_c2_ns_nt_z_f_zc_zu_db,
-	render_spans_16_c1_ns_t_nz_f_zc_zu_db,	render_spans_16_c2_ns_t_nz_f_zc_zu_db,
-	render_spans_16_c1_ns_t_z_f_zc_zu_db,		render_spans_16_c2_ns_t_z_f_zc_zu_db,
-	render_spans_16_c1_s_nt_nz_f_zc_zu_db,	render_spans_16_c2_s_nt_nz_f_zc_zu_db,
-	render_spans_16_c1_s_nt_z_f_zc_zu_db,		render_spans_16_c2_s_nt_z_f_zc_zu_db,
-	render_spans_16_c1_s_t_nz_f_zc_zu_db,		render_spans_16_c2_s_t_nz_f_zc_zu_db,
-	render_spans_16_c1_s_t_z_f_zc_zu_db,		render_spans_16_c2_s_t_z_f_zc_zu_db,
-
-	render_spans_16_c1_ns_nt_nz_nf_nzc_dn, render_spans_16_c2_ns_nt_nz_nf_nzc_dn,
-	render_spans_16_c1_ns_nt_z_nf_nzc_dn,	render_spans_16_c2_ns_nt_z_nf_nzc_dn,
-	render_spans_16_c1_ns_t_nz_nf_nzc_dn,	render_spans_16_c2_ns_t_nz_nf_nzc_dn,
-	render_spans_16_c1_ns_t_z_nf_nzc_dn,	render_spans_16_c2_ns_t_z_nf_nzc_dn,
-	render_spans_16_c1_s_nt_nz_nf_nzc_dn,	render_spans_16_c2_s_nt_nz_nf_nzc_dn,
-	render_spans_16_c1_s_nt_z_nf_nzc_dn,	render_spans_16_c2_s_nt_z_nf_nzc_dn,
-	render_spans_16_c1_s_t_nz_nf_nzc_dn,	render_spans_16_c2_s_t_nz_nf_nzc_dn,
-	render_spans_16_c1_s_t_z_nf_nzc_dn, 	render_spans_16_c2_s_t_z_nf_nzc_dn,
-	render_spans_16_c1_ns_nt_nz_f_nzc_dn,	render_spans_16_c2_ns_nt_nz_f_nzc_dn,
-	render_spans_16_c1_ns_nt_z_f_nzc_dn,	render_spans_16_c2_ns_nt_z_f_nzc_dn,
-	render_spans_16_c1_ns_t_nz_f_nzc_dn,	render_spans_16_c2_ns_t_nz_f_nzc_dn,
-	render_spans_16_c1_ns_t_z_f_nzc_dn, 	render_spans_16_c2_ns_t_z_f_nzc_dn,
-	render_spans_16_c1_s_nt_nz_f_nzc_dn,	render_spans_16_c2_s_nt_nz_f_nzc_dn,
-	render_spans_16_c1_s_nt_z_f_nzc_dn, 	render_spans_16_c2_s_nt_z_f_nzc_dn,
-	render_spans_16_c1_s_t_nz_f_nzc_dn, 	render_spans_16_c2_s_t_nz_f_nzc_dn,
-	render_spans_16_c1_s_t_z_f_nzc_dn,	render_spans_16_c2_s_t_z_f_nzc_dn,
-
-	render_spans_16_c1_ns_nt_nz_nf_zc_dn,	render_spans_16_c2_ns_nt_nz_nf_zc_dn,
-	render_spans_16_c1_ns_nt_z_nf_zc_dn,	render_spans_16_c2_ns_nt_z_nf_zc_dn,
-	render_spans_16_c1_ns_t_nz_nf_zc_dn,	render_spans_16_c2_ns_t_nz_nf_zc_dn,
-	render_spans_16_c1_ns_t_z_nf_zc_dn, 	render_spans_16_c2_ns_t_z_nf_zc_dn,
-	render_spans_16_c1_s_nt_nz_nf_zc_dn,	render_spans_16_c2_s_nt_nz_nf_zc_dn,
-	render_spans_16_c1_s_nt_z_nf_zc_dn, 	render_spans_16_c2_s_nt_z_nf_zc_dn,
-	render_spans_16_c1_s_t_nz_nf_zc_dn, 	render_spans_16_c2_s_t_nz_nf_zc_dn,
-	render_spans_16_c1_s_t_z_nf_zc_dn,	render_spans_16_c2_s_t_z_nf_zc_dn,
-	render_spans_16_c1_ns_nt_nz_f_zc_dn,	render_spans_16_c2_ns_nt_nz_f_zc_dn,
-	render_spans_16_c1_ns_nt_z_f_zc_dn, 	render_spans_16_c2_ns_nt_z_f_zc_dn,
-	render_spans_16_c1_ns_t_nz_f_zc_dn, 	render_spans_16_c2_ns_t_nz_f_zc_dn,
-	render_spans_16_c1_ns_t_z_f_zc_dn,	render_spans_16_c2_ns_t_z_f_zc_dn,
-	render_spans_16_c1_s_nt_nz_f_zc_dn, 	render_spans_16_c2_s_nt_nz_f_zc_dn,
-	render_spans_16_c1_s_nt_z_f_zc_dn,	render_spans_16_c2_s_nt_z_f_zc_dn,
-	render_spans_16_c1_s_t_nz_f_zc_dn,	render_spans_16_c2_s_t_nz_f_zc_dn,
-	render_spans_16_c1_s_t_z_f_zc_dn,		render_spans_16_c2_s_t_z_f_zc_dn,
-
-	render_spans_16_c1_ns_nt_nz_nf_nzc_zu_dn,	render_spans_16_c2_ns_nt_nz_nf_nzc_zu_dn,
-	render_spans_16_c1_ns_nt_z_nf_nzc_zu_dn,	render_spans_16_c2_ns_nt_z_nf_nzc_zu_dn,
-	render_spans_16_c1_ns_t_nz_nf_nzc_zu_dn,	render_spans_16_c2_ns_t_nz_nf_nzc_zu_dn,
-	render_spans_16_c1_ns_t_z_nf_nzc_zu_dn, 	render_spans_16_c2_ns_t_z_nf_nzc_zu_dn,
-	render_spans_16_c1_s_nt_nz_nf_nzc_zu_dn,	render_spans_16_c2_s_nt_nz_nf_nzc_zu_dn,
-	render_spans_16_c1_s_nt_z_nf_nzc_zu_dn, 	render_spans_16_c2_s_nt_z_nf_nzc_zu_dn,
-	render_spans_16_c1_s_t_nz_nf_nzc_zu_dn, 	render_spans_16_c2_s_t_nz_nf_nzc_zu_dn,
-	render_spans_16_c1_s_t_z_nf_nzc_zu_dn,	render_spans_16_c2_s_t_z_nf_nzc_zu_dn,
-	render_spans_16_c1_ns_nt_nz_f_nzc_zu_dn,	render_spans_16_c2_ns_nt_nz_f_nzc_zu_dn,
-	render_spans_16_c1_ns_nt_z_f_nzc_zu_dn, 	render_spans_16_c2_ns_nt_z_f_nzc_zu_dn,
-	render_spans_16_c1_ns_t_nz_f_nzc_zu_dn, 	render_spans_16_c2_ns_t_nz_f_nzc_zu_dn,
-	render_spans_16_c1_ns_t_z_f_nzc_zu_dn,	render_spans_16_c2_ns_t_z_f_nzc_zu_dn,
-	render_spans_16_c1_s_nt_nz_f_nzc_zu_dn, 	render_spans_16_c2_s_nt_nz_f_nzc_zu_dn,
-	render_spans_16_c1_s_nt_z_f_nzc_zu_dn,	render_spans_16_c2_s_nt_z_f_nzc_zu_dn,
-	render_spans_16_c1_s_t_nz_f_nzc_zu_dn,	render_spans_16_c2_s_t_nz_f_nzc_zu_dn,
-	render_spans_16_c1_s_t_z_f_nzc_zu_dn,		render_spans_16_c2_s_t_z_f_nzc_zu_dn,
-
-	render_spans_16_c1_ns_nt_nz_nf_zc_zu_dn,	render_spans_16_c2_ns_nt_nz_nf_zc_zu_dn,
-	render_spans_16_c1_ns_nt_z_nf_zc_zu_dn, 	render_spans_16_c2_ns_nt_z_nf_zc_zu_dn,
-	render_spans_16_c1_ns_t_nz_nf_zc_zu_dn, 	render_spans_16_c2_ns_t_nz_nf_zc_zu_dn,
-	render_spans_16_c1_ns_t_z_nf_zc_zu_dn,	render_spans_16_c2_ns_t_z_nf_zc_zu_dn,
-	render_spans_16_c1_s_nt_nz_nf_zc_zu_dn, 	render_spans_16_c2_s_nt_nz_nf_zc_zu_dn,
-	render_spans_16_c1_s_nt_z_nf_zc_zu_dn,	render_spans_16_c2_s_nt_z_nf_zc_zu_dn,
-	render_spans_16_c1_s_t_nz_nf_zc_zu_dn,	render_spans_16_c2_s_t_nz_nf_zc_zu_dn,
-	render_spans_16_c1_s_t_z_nf_zc_zu_dn,		render_spans_16_c2_s_t_z_nf_zc_zu_dn,
-	render_spans_16_c1_ns_nt_nz_f_zc_zu_dn, 	render_spans_16_c2_ns_nt_nz_f_zc_zu_dn,
-	render_spans_16_c1_ns_nt_z_f_zc_zu_dn,	render_spans_16_c2_ns_nt_z_f_zc_zu_dn,
-	render_spans_16_c1_ns_t_nz_f_zc_zu_dn,	render_spans_16_c2_ns_t_nz_f_zc_zu_dn,
-	render_spans_16_c1_ns_t_z_f_zc_zu_dn,		render_spans_16_c2_ns_t_z_f_zc_zu_dn,
-	render_spans_16_c1_s_nt_nz_f_zc_zu_dn,	render_spans_16_c2_s_nt_nz_f_zc_zu_dn,
-	render_spans_16_c1_s_nt_z_f_zc_zu_dn,		render_spans_16_c2_s_nt_z_f_zc_zu_dn,
-	render_spans_16_c1_s_t_nz_f_zc_zu_dn,		render_spans_16_c2_s_t_nz_f_zc_zu_dn,
-	render_spans_16_c1_s_t_z_f_zc_zu_dn,		render_spans_16_c2_s_t_z_f_zc_zu_dn,
-
-	render_spans_16_c1_ns_nt_nz_nf_nzc_dn, render_spans_16_c2_ns_nt_nz_nf_nzc_dn,
-	render_spans_16_c1_ns_nt_z_nf_nzc_dn,	render_spans_16_c2_ns_nt_z_nf_nzc_dn,
-	render_spans_16_c1_ns_t_nz_nf_nzc_dn,	render_spans_16_c2_ns_t_nz_nf_nzc_dn,
-	render_spans_16_c1_ns_t_z_nf_nzc_dn,	render_spans_16_c2_ns_t_z_nf_nzc_dn,
-	render_spans_16_c1_s_nt_nz_nf_nzc_dn,	render_spans_16_c2_s_nt_nz_nf_nzc_dn,
-	render_spans_16_c1_s_nt_z_nf_nzc_dn,	render_spans_16_c2_s_nt_z_nf_nzc_dn,
-	render_spans_16_c1_s_t_nz_nf_nzc_dn,	render_spans_16_c2_s_t_nz_nf_nzc_dn,
-	render_spans_16_c1_s_t_z_nf_nzc_dn, 	render_spans_16_c2_s_t_z_nf_nzc_dn,
-	render_spans_16_c1_ns_nt_nz_f_nzc_dn,	render_spans_16_c2_ns_nt_nz_f_nzc_dn,
-	render_spans_16_c1_ns_nt_z_f_nzc_dn,	render_spans_16_c2_ns_nt_z_f_nzc_dn,
-	render_spans_16_c1_ns_t_nz_f_nzc_dn,	render_spans_16_c2_ns_t_nz_f_nzc_dn,
-	render_spans_16_c1_ns_t_z_f_nzc_dn, 	render_spans_16_c2_ns_t_z_f_nzc_dn,
-	render_spans_16_c1_s_nt_nz_f_nzc_dn,	render_spans_16_c2_s_nt_nz_f_nzc_dn,
-	render_spans_16_c1_s_nt_z_f_nzc_dn, 	render_spans_16_c2_s_nt_z_f_nzc_dn,
-	render_spans_16_c1_s_t_nz_f_nzc_dn, 	render_spans_16_c2_s_t_nz_f_nzc_dn,
-	render_spans_16_c1_s_t_z_f_nzc_dn,	render_spans_16_c2_s_t_z_f_nzc_dn,
-
-	render_spans_16_c1_ns_nt_nz_nf_zc_dn,	render_spans_16_c2_ns_nt_nz_nf_zc_dn,
-	render_spans_16_c1_ns_nt_z_nf_zc_dn,	render_spans_16_c2_ns_nt_z_nf_zc_dn,
-	render_spans_16_c1_ns_t_nz_nf_zc_dn,	render_spans_16_c2_ns_t_nz_nf_zc_dn,
-	render_spans_16_c1_ns_t_z_nf_zc_dn, 	render_spans_16_c2_ns_t_z_nf_zc_dn,
-	render_spans_16_c1_s_nt_nz_nf_zc_dn,	render_spans_16_c2_s_nt_nz_nf_zc_dn,
-	render_spans_16_c1_s_nt_z_nf_zc_dn, 	render_spans_16_c2_s_nt_z_nf_zc_dn,
-	render_spans_16_c1_s_t_nz_nf_zc_dn, 	render_spans_16_c2_s_t_nz_nf_zc_dn,
-	render_spans_16_c1_s_t_z_nf_zc_dn,	render_spans_16_c2_s_t_z_nf_zc_dn,
-	render_spans_16_c1_ns_nt_nz_f_zc_dn,	render_spans_16_c2_ns_nt_nz_f_zc_dn,
-	render_spans_16_c1_ns_nt_z_f_zc_dn, 	render_spans_16_c2_ns_nt_z_f_zc_dn,
-	render_spans_16_c1_ns_t_nz_f_zc_dn, 	render_spans_16_c2_ns_t_nz_f_zc_dn,
-	render_spans_16_c1_ns_t_z_f_zc_dn,	render_spans_16_c2_ns_t_z_f_zc_dn,
-	render_spans_16_c1_s_nt_nz_f_zc_dn, 	render_spans_16_c2_s_nt_nz_f_zc_dn,
-	render_spans_16_c1_s_nt_z_f_zc_dn,	render_spans_16_c2_s_nt_z_f_zc_dn,
-	render_spans_16_c1_s_t_nz_f_zc_dn,	render_spans_16_c2_s_t_nz_f_zc_dn,
-	render_spans_16_c1_s_t_z_f_zc_dn,		render_spans_16_c2_s_t_z_f_zc_dn,
-
-	render_spans_16_c1_ns_nt_nz_nf_nzc_zu_dn,	render_spans_16_c2_ns_nt_nz_nf_nzc_zu_dn,
-	render_spans_16_c1_ns_nt_z_nf_nzc_zu_dn,	render_spans_16_c2_ns_nt_z_nf_nzc_zu_dn,
-	render_spans_16_c1_ns_t_nz_nf_nzc_zu_dn,	render_spans_16_c2_ns_t_nz_nf_nzc_zu_dn,
-	render_spans_16_c1_ns_t_z_nf_nzc_zu_dn, 	render_spans_16_c2_ns_t_z_nf_nzc_zu_dn,
-	render_spans_16_c1_s_nt_nz_nf_nzc_zu_dn,	render_spans_16_c2_s_nt_nz_nf_nzc_zu_dn,
-	render_spans_16_c1_s_nt_z_nf_nzc_zu_dn, 	render_spans_16_c2_s_nt_z_nf_nzc_zu_dn,
-	render_spans_16_c1_s_t_nz_nf_nzc_zu_dn, 	render_spans_16_c2_s_t_nz_nf_nzc_zu_dn,
-	render_spans_16_c1_s_t_z_nf_nzc_zu_dn,	render_spans_16_c2_s_t_z_nf_nzc_zu_dn,
-	render_spans_16_c1_ns_nt_nz_f_nzc_zu_dn,	render_spans_16_c2_ns_nt_nz_f_nzc_zu_dn,
-	render_spans_16_c1_ns_nt_z_f_nzc_zu_dn, 	render_spans_16_c2_ns_nt_z_f_nzc_zu_dn,
-	render_spans_16_c1_ns_t_nz_f_nzc_zu_dn, 	render_spans_16_c2_ns_t_nz_f_nzc_zu_dn,
-	render_spans_16_c1_ns_t_z_f_nzc_zu_dn,	render_spans_16_c2_ns_t_z_f_nzc_zu_dn,
-	render_spans_16_c1_s_nt_nz_f_nzc_zu_dn, 	render_spans_16_c2_s_nt_nz_f_nzc_zu_dn,
-	render_spans_16_c1_s_nt_z_f_nzc_zu_dn,	render_spans_16_c2_s_nt_z_f_nzc_zu_dn,
-	render_spans_16_c1_s_t_nz_f_nzc_zu_dn,	render_spans_16_c2_s_t_nz_f_nzc_zu_dn,
-	render_spans_16_c1_s_t_z_f_nzc_zu_dn,		render_spans_16_c2_s_t_z_f_nzc_zu_dn,
-
-	render_spans_16_c1_ns_nt_nz_nf_zc_zu_dn,	render_spans_16_c2_ns_nt_nz_nf_zc_zu_dn,
-	render_spans_16_c1_ns_nt_z_nf_zc_zu_dn, 	render_spans_16_c2_ns_nt_z_nf_zc_zu_dn,
-	render_spans_16_c1_ns_t_nz_nf_zc_zu_dn, 	render_spans_16_c2_ns_t_nz_nf_zc_zu_dn,
-	render_spans_16_c1_ns_t_z_nf_zc_zu_dn,	render_spans_16_c2_ns_t_z_nf_zc_zu_dn,
-	render_spans_16_c1_s_nt_nz_nf_zc_zu_dn, 	render_spans_16_c2_s_nt_nz_nf_zc_zu_dn,
-	render_spans_16_c1_s_nt_z_nf_zc_zu_dn,	render_spans_16_c2_s_nt_z_nf_zc_zu_dn,
-	render_spans_16_c1_s_t_nz_nf_zc_zu_dn,	render_spans_16_c2_s_t_nz_nf_zc_zu_dn,
-	render_spans_16_c1_s_t_z_nf_zc_zu_dn,		render_spans_16_c2_s_t_z_nf_zc_zu_dn,
-	render_spans_16_c1_ns_nt_nz_f_zc_zu_dn, 	render_spans_16_c2_ns_nt_nz_f_zc_zu_dn,
-	render_spans_16_c1_ns_nt_z_f_zc_zu_dn,	render_spans_16_c2_ns_nt_z_f_zc_zu_dn,
-	render_spans_16_c1_ns_t_nz_f_zc_zu_dn,	render_spans_16_c2_ns_t_nz_f_zc_zu_dn,
-	render_spans_16_c1_ns_t_z_f_zc_zu_dn,		render_spans_16_c2_ns_t_z_f_zc_zu_dn,
-	render_spans_16_c1_s_nt_nz_f_zc_zu_dn,	render_spans_16_c2_s_nt_nz_f_zc_zu_dn,
-	render_spans_16_c1_s_nt_z_f_zc_zu_dn,		render_spans_16_c2_s_nt_z_f_zc_zu_dn,
-	render_spans_16_c1_s_t_nz_f_zc_zu_dn,		render_spans_16_c2_s_t_nz_f_zc_zu_dn,
-	render_spans_16_c1_s_t_z_f_zc_zu_dn,		render_spans_16_c2_s_t_z_f_zc_zu_dn,
+class SpanParam
+{
+	public:
+		union
+		{
+			UINT32 w;
+#ifdef LSB_FIRST
+			struct { UINT16 l; INT16 h; } h;
+#else
+			struct { INT16 h; UINT16 l; } h;
+#endif
+		};
 };
+
+class Span
+{
+	public:
+		Span() { }
+
+		void	Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, bool flip);
+		void	Dump();
+		void	SetMachine(running_machine* machine);
+
+	public:
+		int m_lx;
+		int m_rx;
+
+		SpanParam m_s;
+		SpanParam m_t;
+		SpanParam m_w;
+		SpanParam m_r;
+		SpanParam m_g;
+		SpanParam m_b;
+		SpanParam m_a;
+		SpanParam m_z;
+
+		UINT8 m_cvg[RDP_CVG_SPAN_MAX];
+
+		int m_dymax;
+
+		SpanParam m_ds;
+		SpanParam m_dt;
+		SpanParam m_dw;
+		SpanParam m_dr;
+		SpanParam m_dg;
+		SpanParam m_db;
+		SpanParam m_da;
+		SpanParam m_dz;
+
+		int m_dzpix;
+
+	private:
+		running_machine* m_machine;
+		Processor* m_rdp;
+		MiscState* m_misc_state;
+		OtherModes* m_other_modes;
+};
+
+} // namespace RDP
+
+} // namespace N64
+
+#endif // _VIDEO_RDPSPAN_H_

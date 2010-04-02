@@ -1,16 +1,54 @@
-static void fill_rectangle_16bit_c1_dm(RECTANGLE *rect);
-static void fill_rectangle_16bit_c1_db(RECTANGLE *rect);
-static void fill_rectangle_16bit_c1_dn(RECTANGLE *rect);
-static void fill_rectangle_16bit_c2_dm(RECTANGLE *rect);
-static void fill_rectangle_16bit_c2_db(RECTANGLE *rect);
-static void fill_rectangle_16bit_c2_dn(RECTANGLE *rect);
-static void fill_rectangle_16bit_cc(RECTANGLE *rect);
-static void fill_rectangle_16bit_cf(RECTANGLE *rect);
+#ifndef _VIDEO_RDPFILLRECT_H_
+#define _VIDEO_RDPFILLRECT_H_
 
-static void (*rdp_fill_rectangle_16bit_func[16])(RECTANGLE *) =
+#include "emu.h"
+#include "video/rdpblend.h"
+
+namespace N64
 {
-	fill_rectangle_16bit_c1_dm, fill_rectangle_16bit_c1_db, fill_rectangle_16bit_c1_dn, fill_rectangle_16bit_c1_dn,
-	fill_rectangle_16bit_c2_dm, fill_rectangle_16bit_c2_db, fill_rectangle_16bit_c2_dn, fill_rectangle_16bit_c2_dn,
-	fill_rectangle_16bit_cc,	fill_rectangle_16bit_cc,	fill_rectangle_16bit_cc,	fill_rectangle_16bit_cc,
-	fill_rectangle_16bit_cf,	fill_rectangle_16bit_cf,	fill_rectangle_16bit_cf,	fill_rectangle_16bit_cf,
+
+namespace RDP
+{
+
+class OtherModes;
+class MiscState;
+class Processor;
+class Blender;
+class Color;
+
+class Rectangle
+{
+	public:
+		Rectangle() {}
+		Rectangle(running_machine *machine, UINT32 *data)
+		{
+			SetMachine(machine);
+			InitFromBuffer(data);
+		}
+
+		void Draw();
+		void SetMachine(running_machine *machine);
+		void InitFromBuffer(UINT32 *data);
+
+		UINT16 m_xl;	// 10.2 fixed-point
+		UINT16 m_yl;	// 10.2 fixed-point
+		UINT16 m_xh;	// 10.2 fixed-point
+		UINT16 m_yh;	// 10.2 fixed-point
+
+	private:
+		void 				Draw1Cycle();
+		void 				Draw2Cycle();
+		void 				DrawFill();
+
+		running_machine*	m_machine;
+		Processor*			m_rdp;
+		MiscState*			m_misc_state;
+		OtherModes*			m_other_modes;
+		Blender*			m_blender;
 };
+
+} // namespace RDP
+
+} // namespace N64
+
+#endif // _VIDEO_RDPFILLRECT_H_

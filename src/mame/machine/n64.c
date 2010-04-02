@@ -719,11 +719,6 @@ WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
 }
 
 // RDP Interface
-UINT32 dp_start;
-UINT32 dp_end;
-UINT32 dp_current;
-UINT32 dp_status = 0x88;
-
 
 void dp_full_sync(running_machine *machine)
 {
@@ -732,19 +727,21 @@ void dp_full_sync(running_machine *machine)
 
 READ32_DEVICE_HANDLER( n64_dp_reg_r )
 {
+	_n64_state *state = (_n64_state *)device->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0x00/4:		// DP_START_REG
-			return dp_start;
+			return state->m_rdp.GetStartReg();
 
 		case 0x04/4:		// DP_END_REG
-			return dp_end;
+			return state->m_rdp.GetEndReg();
 
 		case 0x08/4:		// DP_CURRENT_REG
-			return dp_current;
+			return state->m_rdp.GetCurrentReg();
 
 		case 0x0c/4:		// DP_STATUS_REG
-			return dp_status;
+			return state->m_rdp.GetStatusReg();
 
 		default:
 			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(device));
@@ -756,28 +753,34 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 
 WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 {
+	_n64_state *state = (_n64_state *)device->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0x00/4:		// DP_START_REG
-			dp_start = data;
-			dp_current = dp_start;
+			state->m_rdp.SetStartReg(data);
+			state->m_rdp.SetCurrentReg(state->m_rdp.GetStartReg());
 			break;
 
 		case 0x04/4:		// DP_END_REG
-			dp_end = data;
+			state->m_rdp.SetEndReg(data);
 			profiler_mark_start(PROFILER_USER1);
-			rdp_process_list(device->machine);
+			state->m_rdp.ProcessList();
 			profiler_mark_end();
 			break;
 
 		case 0x0c/4:		// DP_STATUS_REG
-			if (data & 0x00000001)	dp_status &= ~DP_STATUS_XBUS_DMA;
-			if (data & 0x00000002)	dp_status |= DP_STATUS_XBUS_DMA;
-			if (data & 0x00000004)	dp_status &= ~DP_STATUS_FREEZE;
-			if (data & 0x00000008)	dp_status |= DP_STATUS_FREEZE;
-			if (data & 0x00000010)	dp_status &= ~DP_STATUS_FLUSH;
-			if (data & 0x00000020)	dp_status |= DP_STATUS_FLUSH;
+		{
+			UINT32 current_status = state->m_rdp.GetStatusReg();
+			if (data & 0x00000001)	current_status &= ~DP_STATUS_XBUS_DMA;
+			if (data & 0x00000002)	current_status |= DP_STATUS_XBUS_DMA;
+			if (data & 0x00000004)	current_status &= ~DP_STATUS_FREEZE;
+			if (data & 0x00000008)	current_status |= DP_STATUS_FREEZE;
+			if (data & 0x00000010)	current_status &= ~DP_STATUS_FLUSH;
+			if (data & 0x00000020)	current_status |= DP_STATUS_FLUSH;
+			state->m_rdp.SetStatusReg(current_status);
 			break;
+		}
 
 		default:
 			logerror("dp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(device));
@@ -811,6 +814,8 @@ static UINT32 n64_vi_intr,  n64_vi_vburst;
 
 static void n64_vi_recalculate_resolution(running_machine *machine)
 {
+	_n64_state *state = (_n64_state *)machine->driver_data;
+
     int x_start = (n64_vi_hstart & 0x03ff0000) >> 16;
     int x_end = n64_vi_hstart & 0x000003ff;
     int y_start = ((n64_vi_vstart & 0x03ff0000) >> 16) / 2;
@@ -846,7 +851,7 @@ static void n64_vi_recalculate_resolution(running_machine *machine)
     if (height > 480)
         height = 480;
 
-	fb_height = height;
+	state->m_rdp.GetMiscState()->m_fb_height = height;
 
     visarea.max_x = width - 1;
     visarea.max_y = height - 1;
@@ -908,6 +913,8 @@ READ32_HANDLER( n64_vi_reg_r )
 
 WRITE32_HANDLER( n64_vi_reg_w )
 {
+	_n64_state *state = (_n64_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0x00/4:		// VI_CONTROL_REG
@@ -925,7 +932,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
                 n64_vi_recalculate_resolution(space->machine);
 			}
             n64_vi_width = data;
-		    fb_width = data;
+		    state->m_rdp.GetMiscState()->m_fb_width = data;
 			break;
 
 		case 0x0c/4:		// VI_INTR_REG
@@ -1666,6 +1673,7 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 		case 0x03:
 		{
 			UINT32 address, checksum;
+			int i;
 			/*mame_printf_debug("Write to mempack, rlength = %d, slength = %d\n", rlength, slength);
             for (i=0; i < slength; i++)
             {
@@ -2029,11 +2037,6 @@ MACHINE_RESET( n64 )
 	sp_dma_count = 0;
 	sp_dma_skip = 0;
 	sp_semaphore = 0;
-
-	dp_start = 0;
-	dp_end = 0;
-	dp_current = 0;
-	dp_status = 0x88;
 
 	n64_vi_width = 0;
 	n64_vi_origin = 0;

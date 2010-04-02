@@ -1,732 +1,321 @@
-#define RELATIVE(x, y)	(((((x) >> 3) - (y)) << 3) | (x & 7))
+#include "emu.h"
+#include "includes/n64.h"
+#include "video/n64.h"
 
-	#if defined(COPY)
-		#define CLAMP(SSS, SST, maxs, maxt) \
-			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
-			SST = (SIGN17(SST) >> 5) & 0x1fff;
-	#else
-
-	#if defined(DOS) && defined(DOT)
-		#define CLAMP(SSS, SST, maxs, maxt) \
-			if (SSS & 0x10000) \
-			{ \
-				SSS = 0; \
-				SFRAC = 0; \
-			} \
-			else if (maxs) \
-			{ \
-				SSS = clamp_s_diff[tex_tile->num]; \
-				SFRAC = 0; \
-			} \
-			else \
-			{ \
-				SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
-			} \
- \
-			if (SST & 0x10000) \
-			{ \
-				SST = 0; \
-				TFRAC = 0; \
-			} \
-			else if (maxt) \
-			{ \
-				SST = clamp_t_diff[tex_tile->num]; \
-				TFRAC = 0; \
-			} \
-			else \
-			{ \
-				SST = (SIGN17(SST) >> 5) & 0x1fff; \
-			}
-	#elif defined(DOS) && !defined(DOT)
-		#define CLAMP(SSS, SST, maxs, maxt) \
-			if (SSS & 0x10000) \
-			{ \
-				SSS = 0; \
-				SFRAC = 0; \
-			} \
-			else if (maxs) \
-			{ \
-				SSS = clamp_s_diff[tex_tile->num]; \
-				SFRAC = 0; \
-			} \
-			else \
-			{ \
-				SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
-			} \
- \
-			SST = (SIGN17(SST) >> 5) & 0x1fff;
-	#elif !defined(DOS) && defined(DOT)
-		#define CLAMP(SSS, SST, maxs, maxt) \
-			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
- \
-			if (SST & 0x10000) \
-			{ \
-				SST = 0; \
-				TFRAC = 0; \
-			} \
-			else if (maxt) \
-			{ \
-				SST = clamp_t_diff[tex_tile->num]; \
-				TFRAC = 0; \
-			} \
-			else \
-			{ \
-				SST = (SIGN17(SST) >> 5) & 0x1fff; \
-			}
-	#else
-		#define CLAMP(SSS, SST, maxs, maxt) \
-			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
-			SST = (SIGN17(SST) >> 5) & 0x1fff;
-	#endif
-	#endif
-
-	#if defined(COPY)
-		#define CLAMP_LIGHT(SSS, SST) \
-			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
-			SST = (SIGN17(SST) >> 5) & 0x1fff;
-	#else
-	#if defined(DOS) && defined(DOT)
-		#define CLAMP_LIGHT(SSS, SST) \
-			if (SSS & 0x10000) \
-			{ \
-				SSS = 0; \
-			} \
-			else if (maxs) \
-			{ \
-				SSS = clamp_s_diff[tex_tile->num]; \
-			} \
-			else \
-			{ \
-				SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
-			} \
- \
-			if (SST & 0x10000) \
-			{ \
-				SST = 0; \
-			} \
-			else if (maxt) \
-			{ \
-				SST = clamp_t_diff[tex_tile->num]; \
-			} \
-			else \
-			{ \
-				SST = (SIGN17(SST) >> 5) & 0x1fff; \
-			}
-	#elif defined(DOS) && !defined(DOT)
-		#define CLAMP_LIGHT(SSS, SST) \
-			if (SSS & 0x10000) \
-			{ \
-				SSS = 0; \
-			} \
-			else if (maxs) \
-			{ \
-				SSS = clamp_s_diff[tex_tile->num]; \
-			} \
-			else \
-			{ \
-				SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
-			} \
- \
-			SST = (SIGN17(SST) >> 5) & 0x1fff;
-	#elif !defined(DOS) && defined(DOT)
-		#define CLAMP_LIGHT(SSS, SST) \
-			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
- \
-			if (SST & 0x10000) \
-			{ \
-				SST = 0; \
-			} \
-			else if (maxt) \
-			{ \
-				SST = clamp_t_diff[tex_tile->num]; \
-			} \
-			else \
-			{ \
-				SST = (SIGN17(SST) >> 5) & 0x1fff; \
-			}
-	#else
-		#define CLAMP_LIGHT(SSS, SST) \
-			SSS = (SIGN17(SSS) >> 5) & 0x1fff; \
-			SST = (SIGN17(SST) >> 5) & 0x1fff;
-	#endif
-	#endif
-
-	#if defined(SHIFT_S) && defined(SHIFT_T)
-		#define TEXSHIFT(SSS, SST, maxs, maxt) \
-			SSS = SIGN16(SSS); \
-			if (tex_tile->shift_s < 11) \
-			{ \
-				SSS >>= tex_tile->shift_s; \
-			} \
-			else \
-			{ \
-				SSS <<= (16 - tex_tile->shift_s); \
-			} \
-			SSS = SIGN16(SSS); \
-			SST = SIGN16(SST); \
-			if (tex_tile->shift_t < 11) \
-			{ \
-				SST >>= tex_tile->shift_t; \
-			} \
-			else \
-			{ \
-				SST <<= (16 - tex_tile->shift_t); \
-			} \
-			SST = SIGN16(SST); \
-			maxs = ((SSS >> 3) >= tex_tile->sh); \
-			maxt = ((SST >> 3) >= tex_tile->th);
-	#elif defined(SHIFT_S) && !defined(SHIFT_T)
-		#define TEXSHIFT(SSS, SST, maxs, maxt) \
-			SSS = SIGN16(SSS); \
-			if (tex_tile->shift_s < 11) \
-			{ \
-				SSS >>= tex_tile->shift_s; \
-			} \
-			else \
-			{ \
-				SSS <<= (16 - tex_tile->shift_s); \
-			} \
-			SSS = SIGN16(SSS); \
-			maxs = ((SSS >> 3) >= tex_tile->sh); \
-			maxt = ((SST >> 3) >= tex_tile->th);
-	#elif !defined(SHIFT_S) && defined(SHIFT_T)
-		#define TEXSHIFT(SSS, SST, maxs, maxt) \
-			SST = SIGN16(SST); \
-			if (tex_tile->shift_t < 11) \
-			{ \
-				SST >>= tex_tile->shift_t; \
-			} \
-			else \
-			{ \
-				SST <<= (16 - tex_tile->shift_t); \
-			} \
-			SST = SIGN16(SST); \
-			maxs = ((SSS >> 3) >= tex_tile->sh); \
-			maxt = ((SST >> 3) >= tex_tile->th);
-	#else
-		#define TEXSHIFT(SSS, SST, maxs, maxt) \
-			maxs = ((SSS >> 3) >= tex_tile->sh); \
-			maxt = ((SST >> 3) >= tex_tile->th);
-	#endif
-
-#if defined(SHIFT_T)
-	#if defined(SHIFT_S)
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_DOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_DOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_NDOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_NDOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_DOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_DOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_NDOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_NDOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#else
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_DOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_DOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_NDOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_NDOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_DOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_DOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_NDOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_NDOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#endif
-#else
-	#if defined(SHIFT_S)
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_DOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_DOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_NDOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_NDOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_DOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_DOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_NDOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_NDOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#else
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_DOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_DOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_NDOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_NDOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_DOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_DOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_C_NDOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_NMID_NC_NDOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#endif
-#endif
+namespace N64
 {
-	INT32 maxs, maxt;
-	int sss2 = SSS + 32;
-	int sst2 = SST + 32;
 
-	TEXSHIFT(SSS, SST, maxs, maxt)
+namespace RDP
+{
 
-	SSS = RELATIVE(SSS, tex_tile->sl);
-	SST = RELATIVE(SST, tex_tile->tl);
-	sss2 = RELATIVE(sss2, tex_tile->sl);
-	sst2 = RELATIVE(sst2, tex_tile->tl);
+#define RELATIVE(x, y) 	((((x) >> 3) - (y)) << 3) | (x & 7);
 
-	INT32 SFRAC = SSS & 0x1f;
-	INT32 TFRAC = SST & 0x1f;
+void TexturePipe::SetMachine(running_machine *machine)
+{
+	_n64_state *state = (_n64_state *)machine->driver_data;
 
-	CLAMP(SSS, SST, maxs, maxt)
-	CLAMP_LIGHT(sss2, sst2)
+	m_machine = machine;
+	m_rdp = &state->m_rdp;
+	m_other_modes = m_rdp->GetOtherModes();
 
-	MASK(&SSS, &SST, tex_tile);
-	MASK(&sss2, &sst2, tex_tile);
+	m_tex_fetch.SetMachine(m_machine);
+}
 
-	COLOR t1 = { { FETCH_TEXEL(sss2, SST) } };
-	COLOR t2 = { { FETCH_TEXEL(SSS, sst2) } };
-
-	COLOR TEX;
-	if ((SFRAC + TFRAC) < 0x20)
+void TexturePipe::CalculateClampDiffs(UINT32 prim_tile)
+{
+	int start;
+	int end;
+	if (m_other_modes->tex_lod_en || prim_tile == 7)
 	{
-		COLOR t0 = { { FETCH_TEXEL(SSS, SST) } };
-		INT32 R32 = t0.i.r + ((SFRAC*(t1.i.r - t0.i.r))>>5) + ((TFRAC*(t2.i.r - t0.i.r))>>5);
-		INT32 G32 = t0.i.g + ((SFRAC*(t1.i.g - t0.i.g))>>5) + ((TFRAC*(t2.i.g - t0.i.g))>>5);
-		INT32 B32 = t0.i.b + ((SFRAC*(t1.i.b - t0.i.b))>>5) + ((TFRAC*(t2.i.b - t0.i.b))>>5);
-		INT32 A32 = t0.i.a + ((SFRAC*(t1.i.a - t0.i.a))>>5) + ((TFRAC*(t2.i.a - t0.i.a))>>5);
-		TEX.i.r = (R32 < 0) ? 0 : R32;
-		TEX.i.g = (G32 < 0) ? 0 : G32;
-		TEX.i.b = (B32 < 0) ? 0 : B32;
-		TEX.i.a = (A32 < 0) ? 0 : A32;
+		start = 0;
+		end = 7;
 	}
 	else
 	{
-		INT32 INVSF = 0x20 - SFRAC;
-		INT32 INVTF = 0x20 - TFRAC;
-		COLOR t3 = { { FETCH_TEXEL(sss2, sst2) } };
-		INT32 R32 = t3.i.r + ((INVSF*(t2.i.r - t3.i.r))>>5) + ((INVTF*(t1.i.r - t3.i.r))>>5);
-		INT32 G32 = t3.i.g + ((INVSF*(t2.i.g - t3.i.g))>>5) + ((INVTF*(t1.i.g - t3.i.g))>>5);
-		INT32 B32 = t3.i.b + ((INVSF*(t2.i.b - t3.i.b))>>5) + ((INVTF*(t1.i.b - t3.i.b))>>5);
-		INT32 A32 = t3.i.a + ((INVSF*(t2.i.a - t3.i.a))>>5) + ((INVTF*(t1.i.a - t3.i.a))>>5);
-		TEX.i.r = (R32 < 0) ? 0 : R32;
-		TEX.i.g = (G32 < 0) ? 0 : G32;
-		TEX.i.b = (B32 < 0) ? 0 : B32;
-		TEX.i.a = (A32 < 0) ? 0 : A32;
+		start = prim_tile;
+		end = prim_tile + 1;
 	}
-
-	return TEX.c;
+	for (; start <= end; start++)
+	{
+		m_clamp_s_diff[start] = (m_rdp->GetTiles()[start].sh >> 2) - (m_rdp->GetTiles()[start].sl >> 2);
+		m_clamp_t_diff[start] = (m_rdp->GetTiles()[start].th >> 2) - (m_rdp->GetTiles()[start].tl >> 2);
+	}
 }
 
-#if defined(SHIFT_T)
-	#if defined(SHIFT_S)
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_DOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_DOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_NDOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_NDOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_DOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_DOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_NDOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_NDOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#else
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_DOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_DOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_NDOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_NDOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_DOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_DOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_NDOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_NDOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#endif
-#else
-	#if defined(SHIFT_S)
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_DOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_DOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_NDOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_NDOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_DOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_DOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_NDOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_NDOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#else
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_DOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_DOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_NDOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_NDOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_DOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_DOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_C_NDOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_BILINEAR_MID_NC_NDOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#endif
-#endif
+void TexturePipe::Mask(INT32* S, INT32* T, Tile* tile)
 {
-	INT32 maxs, maxt;
-	int sss2, sst2;
+	INT32 swrap, twrap;
 
-	TEXSHIFT(SSS, SST, maxs, maxt)
-
-	sss2 = SSS + 32; sst2 = SST + 32;
-
-	SSS = RELATIVE(SSS, tex_tile->sl);
-	SST = RELATIVE(SST, tex_tile->tl);
-	sss2 = RELATIVE(sss2, tex_tile->sl);
-	sst2 = RELATIVE(sst2, tex_tile->tl);
-
-	INT32 SFRAC = SSS & 0x1f;
-	INT32 TFRAC = SST & 0x1f;
-
-	CLAMP(SSS, SST, maxs, maxt)
-	CLAMP_LIGHT(sss2, sst2)
-
-	MASK(&SSS, &SST, tex_tile);
-	MASK(&sss2, &sst2, tex_tile);
-
-	COLOR t0 = { { FETCH_TEXEL(SSS, SST)   } };
-	COLOR t1 = { { FETCH_TEXEL(sss2, SST)  } };
-	COLOR t2 = { { FETCH_TEXEL(SSS, sst2)  } };
-	COLOR t3 = { { FETCH_TEXEL(sss2, sst2) } };
-
-	COLOR TEX;
-	if (SFRAC!= 0x10 || TFRAC != 0x10)
+	if (tile->mask_s) // Select clamp if mask == 0
 	{
-		if ((SFRAC + TFRAC) >= 0x20)
+		swrap = *S >> (tile->mask_s > 10 ? 10 : tile->mask_s);
+		swrap &= 1;
+		if (tile->ms && swrap)
 		{
-			INT32 INVSF = 0x20 - SFRAC;
-			INT32 INVTF = 0x20 - TFRAC;
-			INT32 R32 = t3.i.r + ((INVSF*(t2.i.r - t3.i.r))>>5) + ((INVTF*(t1.i.r - t3.i.r))>>5);
-			INT32 G32 = t3.i.g + ((INVSF*(t2.i.g - t3.i.g))>>5) + ((INVTF*(t1.i.g - t3.i.g))>>5);
-			INT32 B32 = t3.i.b + ((INVSF*(t2.i.b - t3.i.b))>>5) + ((INVTF*(t1.i.b - t3.i.b))>>5);
-			INT32 A32 = t3.i.a + ((INVSF*(t2.i.a - t3.i.a))>>5) + ((INVTF*(t1.i.a - t3.i.a))>>5);
-			TEX.i.r = (R32 < 0) ? 0 : R32;
-			TEX.i.g = (G32 < 0) ? 0 : G32;
-			TEX.i.b = (B32 < 0) ? 0 : B32;
-			TEX.i.a = (A32 < 0) ? 0 : A32;
+			*S = (~(*S)) & m_maskbits_table[tile->mask_s]; // Mirroring and masking
+		}
+		else if (tile->mask_s)
+		{
+			*S &= m_maskbits_table[tile->mask_s]; // Masking
+		}
+	}
+
+	if (tile->mask_t)
+	{
+		twrap = *T >> (tile->mask_t > 10 ? 10 : tile->mask_t);
+		twrap &= 1;
+		if (tile->mt && twrap)
+		{
+			*T = (~(*T)) & m_maskbits_table[tile->mask_t]; // Mirroring and masking
+		}
+		else if (tile->mask_t)
+		{
+			*T &= m_maskbits_table[tile->mask_t];
+		}
+	}
+}
+
+void TexturePipe::TexShift(INT32* S, INT32* T, bool* maxs, bool* maxt, Tile *tile)
+{
+	*S = SIGN16(*S);
+	*T = SIGN16(*T);
+
+	if (tile->shift_s)
+	{
+		if (tile->shift_s < 11)
+		{
+			*S >>= tile->shift_s;
 		}
 		else
 		{
-			INT32 R32 = t0.i.r + ((SFRAC*(t1.i.r - t0.i.r))>>5) + ((TFRAC*(t2.i.r - t0.i.r))>>5);
-			INT32 G32 = t0.i.g + ((SFRAC*(t1.i.g - t0.i.g))>>5) + ((TFRAC*(t2.i.g - t0.i.g))>>5);
-			INT32 B32 = t0.i.b + ((SFRAC*(t1.i.b - t0.i.b))>>5) + ((TFRAC*(t2.i.b - t0.i.b))>>5);
-			INT32 A32 = t0.i.a + ((SFRAC*(t1.i.a - t0.i.a))>>5) + ((TFRAC*(t2.i.a - t0.i.a))>>5);
-			TEX.i.r = (R32 < 0) ? 0 : R32;
-			TEX.i.g = (G32 < 0) ? 0 : G32;
-			TEX.i.b = (B32 < 0) ? 0 : B32;
-			TEX.i.a = (A32 < 0) ? 0 : A32;
+			*S <<= (16 - tile->shift_s);
+		}
+		*S = SIGN16(*S);
+	}
+
+	if (tile->shift_s)
+	{
+		if (tile->shift_t < 11)
+		{
+			*T >>= tile->shift_t;
+		}
+    	else
+    	{
+			*T <<= (16 - tile->shift_t);
+		}
+		*T = SIGN16(*T);
+	}
+
+	*maxs = ((*S >> 3) >= tile->sh);
+	*maxt = ((*T >> 3) >= tile->th);
+}
+
+void TexturePipe::Clamp(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, bool maxs, bool maxt, Tile* tile)
+{
+	bool notcopy = (m_other_modes->cycle_type != CYCLE_TYPE_COPY);
+	bool dosfrac = (tile->cs || !tile->mask_s);
+	bool dos = dosfrac && notcopy;
+	bool dotfrac = (tile->ct || !tile->mask_t);
+	bool dot = dotfrac && notcopy;
+	bool overunders = false;
+	bool overundert = false;
+	if (*S & 0x10000 && dos)
+	{
+		*S = 0;
+		overunders = true;
+	}
+	else if (maxs && dos)
+	{
+		*S = m_clamp_s_diff[tile->num];
+		overunders = true;
+	}
+	else
+	{
+		*S = (SIGN17(*S) >> 5) & 0x1fff;
+	}
+	if (overunders && dosfrac)
+	{
+		*SFRAC = 0;
+	}
+
+	if (*T & 0x10000 && dot)
+	{
+		*T = 0;
+		overundert = true;
+	}
+	else if (maxt && dot)
+	{
+		*T = m_clamp_t_diff[tile->num];
+		overundert = true;
+	}
+	else
+	{
+		*T = (SIGN17(*T) >> 5) & 0x1fff;
+	}
+	if (overundert && dotfrac)
+	{
+		*TFRAC = 0;
+	}
+}
+
+void TexturePipe::ClampLight(INT32* S, INT32* T, bool maxs, bool maxt, Tile* tile)
+{
+	bool notcopy = (m_other_modes->cycle_type != CYCLE_TYPE_COPY);
+	bool dos = (tile->cs || !tile->mask_s) && notcopy;
+	bool dot = (tile->ct || !tile->mask_t) && notcopy;
+
+	if (*S & 0x10000 && dos)
+	{
+		*S = 0;
+	}
+	else if (maxs && dos)
+	{
+		*S = m_clamp_s_diff[tile->num];
+	}
+	else
+	{
+		*S = (SIGN17(*S) >> 5) & 0x1fff;
+	}
+
+	if (*T & 0x10000 && dot)
+	{
+		*T = 0;
+	}
+	else if (maxt && dot)
+	{
+		*T = m_clamp_t_diff[tile->num];
+	}
+	else
+	{
+		*T = (SIGN17(*T) >> 5) & 0x1fff;
+	}
+}
+
+UINT32 TexturePipe::Fetch(INT32 SSS, INT32 SST, Tile* tile)
+{
+	Color TEX;
+	if (m_other_modes->sample_type)
+	{
+		INT32 rt[4] = { 0 };
+		INT32 gt[4] = { 0 };
+		INT32 bt[4] = { 0 };
+		INT32 at[4] = { 0 };
+		Color t0;
+		Color t1;
+		Color t2;
+		Color t3;
+
+		int sss1 = SSS;
+		int sst1 = SST;
+		bool maxs = false;
+		bool maxt = false;
+		TexShift(&sss1, &sst1, &maxs, &maxt, tile);
+
+		int sss2 = sss1 + 32;
+		int sst2 = sst1 + 32;
+		bool maxs2 = ((sss2 >> 3) >= tile->sh);
+		bool maxt2 = ((sst2 >> 3) >= tile->th);
+
+		sss1 = RELATIVE(sss1, tile->sl);
+		sst1 = RELATIVE(sst1, tile->tl);
+		sss2 = RELATIVE(sss2, tile->sl);
+		sst2 = RELATIVE(sst2, tile->tl);
+
+		INT32 SFRAC = sss1 & 0x1f;
+		INT32 TFRAC = sst1 & 0x1f;
+
+		Clamp(&sss1, &sst1, &SFRAC, &TFRAC, maxs, maxt, tile);
+		ClampLight(&sss2, &sst2, maxs2, maxt2, tile);
+
+		Mask(&sss1, &sst1, tile);
+        Mask(&sss2, &sst2, tile);
+
+		bool upper = ((SFRAC + TFRAC) >= 0x20);
+		INT32 INVSF = 0;
+		INT32 INVTF = 0;
+		if (upper)
+		{
+			INVSF = 0x20 - SFRAC;
+			INVTF = 0x20 - TFRAC;
+		}
+
+		t1.c = m_tex_fetch.Fetch(sss2, sst1, tile);
+		t2.c = m_tex_fetch.Fetch(sss1, sst2, tile);
+		if(m_other_modes->mid_texel || !upper)
+		{
+			t0.c = m_tex_fetch.Fetch(sss1, sst1, tile);
+			rt[0] = t0.i.r; gt[0] = t0.i.g; bt[0] = t0.i.b; at[0] = t0.i.a;
+		}
+		rt[1] = t1.i.r; gt[1] = t1.i.g; bt[1] = t1.i.b; at[1] = t1.i.a;
+		rt[2] = t2.i.r; gt[2] = t2.i.g; bt[2] = t2.i.b; at[2] = t2.i.a;
+		if (m_other_modes->mid_texel || upper)
+		{
+			t3.c = m_tex_fetch.Fetch(sss2, sst2, tile);
+			rt[3] = t3.i.r; gt[3] = t3.i.g; bt[3] = t3.i.b; at[3] = t3.i.a;
+		}
+
+		if (!m_other_modes->mid_texel || SFRAC!= 0x10 || TFRAC != 0x10)
+		{
+			if (upper)
+			{
+				INT32 R32 = rt[3] + ((INVSF*(rt[2] - rt[3]))>>5) + ((INVTF*(rt[1] - rt[3]))>>5);
+				INT32 G32 = gt[3] + ((INVSF*(gt[2] - gt[3]))>>5) + ((INVTF*(gt[1] - gt[3]))>>5);
+				INT32 B32 = bt[3] + ((INVSF*(bt[2] - bt[3]))>>5) + ((INVTF*(bt[1] - bt[3]))>>5);
+				INT32 A32 = at[3] + ((INVSF*(at[2] - at[3]))>>5) + ((INVTF*(at[1] - at[3]))>>5);
+				TEX.i.r = (R32 < 0) ? 0 : R32;
+				TEX.i.g = (G32 < 0) ? 0 : G32;
+				TEX.i.b = (B32 < 0) ? 0 : B32;
+				TEX.i.a = (A32 < 0) ? 0 : A32;
+			}
+			else
+			{
+				INT32 R32 = rt[0] + ((SFRAC*(rt[1] - rt[0]))>>5) + ((TFRAC*(rt[2] - rt[0]))>>5);
+				INT32 G32 = gt[0] + ((SFRAC*(gt[1] - gt[0]))>>5) + ((TFRAC*(gt[2] - gt[0]))>>5);
+				INT32 B32 = bt[0] + ((SFRAC*(bt[1] - bt[0]))>>5) + ((TFRAC*(bt[2] - bt[0]))>>5);
+				INT32 A32 = at[0] + ((SFRAC*(at[1] - at[0]))>>5) + ((TFRAC*(at[2] - at[0]))>>5);
+				TEX.i.r = (R32 < 0) ? 0 : R32;
+				TEX.i.g = (G32 < 0) ? 0 : G32;
+				TEX.i.b = (B32 < 0) ? 0 : B32;
+				TEX.i.a = (A32 < 0) ? 0 : A32;
+			}
+		}
+		else // Is this accurate?
+		{
+			TEX.i.r = (rt[0] + rt[1] + rt[2] + rt[3]) >> 2;
+			TEX.i.g = (gt[0] + gt[1] + gt[2] + gt[3]) >> 2;
+			TEX.i.b = (bt[0] + bt[1] + bt[2] + bt[3]) >> 2;
+			TEX.i.a = (at[0] + at[1] + at[2] + at[3]) >> 2;
 		}
 	}
-	else // Is this accurate?
+	else
 	{
-		TEX.i.r = (t0.i.r + t1.i.r + t2.i.r + t3.i.r) >> 2;
-		TEX.i.g = (t0.i.g + t1.i.g + t2.i.g + t3.i.g) >> 2;
-		TEX.i.b = (t0.i.b + t1.i.b + t2.i.b + t3.i.b) >> 2;
-		TEX.i.a = (t0.i.a + t1.i.a + t2.i.a + t3.i.a) >> 2;
+		int sss1 = SSS;
+		int sst1 = SST;
+
+		bool maxs = false;
+		bool maxt = false;
+		TexShift(&sss1, &sst1, &maxs, &maxt, tile);
+
+		sss1 = RELATIVE(sss1, tile->sl);
+		sst1 = RELATIVE(sst1, tile->tl);
+
+		sss1 += 0x10;
+		sst1 += 0x10;
+
+		INT32 SFRAC = sss1 & 0x1f;
+		INT32 TFRAC = sst1 & 0x1f;
+
+		Clamp(&sss1, &sst1, &SFRAC, &TFRAC, maxs, maxt, tile);
+
+        Mask(&sss1, &sst1, tile);
+
+		/* point sample */
+		TEX.c = m_tex_fetch.Fetch(sss1, sst1, tile);
 	}
 
 	return TEX.c;
 }
 
-#if defined(SHIFT_T)
-	#if defined(SHIFT_S)
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_DOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_DOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_NDOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_NDOS_DOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_DOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_DOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_NDOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_NDOS_NDOT_SS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#else
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_DOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_DOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_NDOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_NDOS_DOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_DOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_DOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_NDOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_NDOS_NDOT_NSS_ST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#endif
-#else
-	#if defined(SHIFT_S)
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_DOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_DOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_NDOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_NDOS_DOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_DOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_DOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_NDOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_NDOS_NDOT_SS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#else
-		#if defined(DOT)
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_DOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_DOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_NDOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_NDOS_DOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#else
-			#if defined(DOS)
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_DOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_DOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#else
-				#if defined(COPY)
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_C_NDOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#else
-					INLINE UINT32 TEXTURE_PIPELINE_NEAREST_NMID_NC_NDOS_NDOT_NSS_NST(INT32 SSS, INT32 SST, TILE* tex_tile)
-				#endif
-			#endif
-		#endif
-	#endif
-#endif
-{
-	INT32 maxs, maxt;
-	INT32 SFRAC, TFRAC;
+} // namespace RDP
 
-	TEXSHIFT(SSS, SST, maxs, maxt)
-	SSS = RELATIVE(SSS, tex_tile->sl);
-	SST = RELATIVE(SST, tex_tile->tl);
-
-	SSS += 0x10;
-	SST += 0x10;
-
-	SFRAC = SSS & 0x1f;
-	TFRAC = SST & 0x1f;
-
-	CLAMP(SSS, SST, maxs, maxt)
-
-	MASK(&SSS, &SST, tex_tile);
-
-	/* point sample */
-	return FETCH_TEXEL(SSS, SST);
-}
-
-#undef CLAMP
-#undef CLAMP_LIGHT
-#undef TEXSHIFT
+} // namespace N64

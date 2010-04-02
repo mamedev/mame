@@ -1,703 +1,165 @@
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_16_RDEN_CVGD0_COC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_16_RDEN_CVGD0_NCOC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#endif
+#include "emu.h"
+#include "includes/n64.h"
+#include "video/n64.h"
+
+namespace N64
+{
+
+bool RDP::Framebuffer::Write(void *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
+{
+	switch(m_misc_state->m_fb_size)
+	{
+		case PIXEL_SIZE_16BIT:
+			return Write16Bit((UINT16*)fb, hb, r, g, b);
+
+		case PIXEL_SIZE_32BIT:
+			return Write32Bit((UINT32*)fb, r, g, b);
+
+		default:
+			fatalerror("Unsupported bit depth: %d\n", m_misc_state->m_fb_size);
+			break;
+	}
+
+	return false;
+}
+
+bool RDP::Framebuffer::Write16Bit(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
 {
 #undef CVG_DRAW
-	UINT32 memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
+//#define CVG_DRAW
 #ifdef CVG_DRAW
 	int covdraw;
-	if (curpixel_cvg == 8)
+	if (m_misc_state->m_curpixel_cvg == 8)
 	{
-		covdraw=255;
+		covdraw = 255;
 	}
 	else
 	{
-		covdraw = curpixel_cvg << 5;
+		covdraw = m_misc_state->m_curpixel_cvg << 5;
 	}
-	r=covdraw; g=covdraw; b=covdraw;
+	r = covdraw;
+	g = covdraw;
+	b = covdraw;
 #endif
 
-	if (!other_modes.z_compare_en)
+	if (!m_other_modes->z_compare_en)
 	{
-		curpixel_overlap = 0;
+		m_misc_state->m_curpixel_overlap = 0;
 	}
 
-	UINT32 newcvg = curpixel_cvg + memory_cvg;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
+	UINT32 memory_cvg = 8;
+	if (m_other_modes->image_read_en)
+	{
+		memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
+	}
+
+	UINT32 newcvg = m_misc_state->m_curpixel_cvg + memory_cvg;
+	bool wrapped = newcvg > 8;
 
 	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
 
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
+	UINT32 clamped_cvg = wrapped ? 8 : newcvg;
+	newcvg = wrapped ? (newcvg - 8) : newcvg;
 
-	curpixel_cvg--;
+	m_misc_state->m_curpixel_cvg--;
 	newcvg--;
 	memory_cvg--;
-	clampcvg--;
+	clamped_cvg--;
 
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
+	if (m_other_modes->color_on_cvg && !wrapped)
 	{
 		*fb &= 0xfffe;
 		*fb |= ((newcvg >> 2) & 1);
 		*hb = (newcvg & 3);
-		return 0;
+		return false;
 	}
-#endif
 
-	if (!other_modes.force_blend && !curpixel_overlap)
+	switch(m_other_modes->cvg_dest)
 	{
-		*fb = finalcolor|((curpixel_cvg >>2)&1);
-		*hb = (curpixel_cvg & 3);
+		case 0:
+			if (!m_other_modes->force_blend && !m_misc_state->m_curpixel_overlap)
+			{
+				*fb = finalcolor | ((m_misc_state->m_curpixel_cvg >> 2) & 1);
+				*hb = (m_misc_state->m_curpixel_cvg & 3);
+			}
+			else
+			{
+				*fb = finalcolor | ((clamped_cvg >> 2) & 1);
+				*hb = (clamped_cvg & 3);
+			}
+			break;
+
+		case 1:
+			*fb = finalcolor | ((newcvg >> 2) & 1);
+			*hb = (newcvg & 3);
+			break;
+
+		case 2:
+			*fb = finalcolor | 1;
+			*hb = 3;
+			break;
+
+		case 3:
+			*fb = finalcolor | ((memory_cvg >> 2) & 1);
+			*hb = (memory_cvg & 3);
+			break;
 	}
-	else
-	{
-		*fb = finalcolor|((clampcvg>>2)&1);
-		*hb = (clampcvg&3);
-	}
-	return 1;
+
+	return true;
 }
 
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_16_RDEN_CVGD1_COC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_16_RDEN_CVGD1_NCOC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#endif
+bool RDP::Framebuffer::Write32Bit(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
 {
-#undef CVG_DRAW
-	UINT32 memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
-#ifdef CVG_DRAW
-	int covdraw;
-	if (curpixel_cvg == 8)
-	{
-		covdraw=255;
-	}
-	else
-	{
-		covdraw = curpixel_cvg << 5;
-	}
-	r=covdraw; g=covdraw; b=covdraw;
-#endif
-
-	if (!other_modes.z_compare_en)
-	{
-		curpixel_overlap = 0;
-	}
-
-	UINT32 newcvg = curpixel_cvg + memory_cvg;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-
-	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xfffe;
-		*fb |= ((newcvg >> 2) & 1);
-		*hb = (newcvg & 3);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor|((newcvg >> 2) & 1);
-	*hb = (newcvg & 3);
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_16_RDEN_CVGD2_COC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_16_RDEN_CVGD2_NCOC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-#undef CVG_DRAW
-	UINT32 memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
-#ifdef CVG_DRAW
-	int covdraw;
-	if (curpixel_cvg == 8)
-	{
-		covdraw=255;
-	}
-	else
-	{
-		covdraw = curpixel_cvg << 5;
-	}
-	r=covdraw; g=covdraw; b=covdraw;
-#endif
-
-	if (!other_modes.z_compare_en)
-	{
-		curpixel_overlap = 0;
-	}
-
-	UINT32 newcvg = curpixel_cvg + memory_cvg;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-
-	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xfffe;
-		*fb |= ((newcvg >> 2) & 1);
-		*hb = (newcvg & 3);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor|1;
-	*hb = 3;
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_16_RDEN_CVGD3_COC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_16_RDEN_CVGD3_NCOC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-#undef CVG_DRAW
-	UINT32 memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
-#ifdef CVG_DRAW
-	int covdraw;
-	if (curpixel_cvg == 8)
-	{
-		covdraw=255;
-	}
-	else
-	{
-		covdraw = curpixel_cvg << 5;
-	}
-	r=covdraw; g=covdraw; b=covdraw;
-#endif
-
-	if (!other_modes.z_compare_en)
-	{
-		curpixel_overlap = 0;
-	}
-
-	UINT32 newcvg = curpixel_cvg + memory_cvg;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-
-	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xfffe;
-		*fb |= ((newcvg >> 2) & 1);
-		*hb = (newcvg & 3);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor|((memory_cvg >> 2) & 1);
-	*hb = (memory_cvg & 3);
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_16_RDNEN_CVGD0_COC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_16_RDNEN_CVGD0_NCOC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-#undef CVG_DRAW
-#ifdef CVG_DRAW
-	int covdraw;
-	if (curpixel_cvg == 8)
-	{
-		covdraw=255;
-	}
-	else
-	{
-		covdraw = curpixel_cvg << 5;
-	}
-	r=covdraw; g=covdraw; b=covdraw;
-#endif
-
-	if (!other_modes.z_compare_en)
-	{
-		curpixel_overlap = 0;
-	}
-
-	UINT32 newcvg = curpixel_cvg + 8;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-
-	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xfffe;
-		*fb |= ((newcvg >> 2) & 1);
-		*hb = (newcvg & 3);
-		return 0;
-	}
-#endif
-
-	if (!other_modes.force_blend && !curpixel_overlap)
-	{
-		*fb = finalcolor|((curpixel_cvg >>2)&1);
-		*hb = (curpixel_cvg & 3);
-	}
-	else
-	{
-		*fb = finalcolor|((clampcvg>>2)&1);
-		*hb = (clampcvg&3);
-	}
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_16_RDNEN_CVGD1_COC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_16_RDNEN_CVGD1_NCOC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-#undef CVG_DRAW
-#ifdef CVG_DRAW
-	int covdraw;
-	if (curpixel_cvg == 8)
-	{
-		covdraw=255;
-	}
-	else
-	{
-		covdraw = curpixel_cvg << 5;
-	}
-	r=covdraw; g=covdraw; b=covdraw;
-#endif
-
-	if (!other_modes.z_compare_en)
-	{
-		curpixel_overlap = 0;
-	}
-
-	UINT32 newcvg = curpixel_cvg + 8;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-
-	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xfffe;
-		*fb |= ((newcvg >> 2) & 1);
-		*hb = (newcvg & 3);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor|1;
-	*hb = 3;
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_16_RDNEN_CVGD2_COC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_16_RDNEN_CVGD2_NCOC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-#undef CVG_DRAW
-#ifdef CVG_DRAW
-	int covdraw;
-	if (curpixel_cvg == 8)
-	{
-		covdraw=255;
-	}
-	else
-	{
-		covdraw = curpixel_cvg << 5;
-	}
-	r=covdraw; g=covdraw; b=covdraw;
-#endif
-
-	if (!other_modes.z_compare_en)
-	{
-		curpixel_overlap = 0;
-	}
-
-	UINT32 newcvg = curpixel_cvg + 8;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-
-	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xfffe;
-		*fb |= ((newcvg >> 2) & 1);
-		*hb = (newcvg & 3);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor|1;
-	*hb = 3;
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_16_RDNEN_CVGD3_COC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_16_RDNEN_CVGD3_NCOC(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-#undef CVG_DRAW
-#ifdef CVG_DRAW
-	int covdraw;
-	if (curpixel_cvg == 8)
-	{
-		covdraw=255;
-	}
-	else
-	{
-		covdraw = curpixel_cvg << 5;
-	}
-	r=covdraw; g=covdraw; b=covdraw;
-#endif
-
-	if (!other_modes.z_compare_en)
-	{
-		curpixel_overlap = 0;
-	}
-
-	UINT32 newcvg = curpixel_cvg + 8;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-
-	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xfffe;
-		*fb |= ((newcvg >> 2) & 1);
-		*hb = (newcvg & 3);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor|1;
-	*hb = 4;
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_32_RDEN_CVGD0_COC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_32_RDEN_CVGD0_NCOC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-	UINT32 memory_cvg = ((*fb >>5) & 7) + 1;
-
-	UINT32 newcvg = curpixel_cvg + memory_cvg;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xffffff00;
-		*fb |= ((newcvg << 5) & 0xff);
-		return 0;
-	}
-#endif
-
-	if (!other_modes.force_blend && !curpixel_overlap)
-	{
-		*fb = finalcolor|(curpixel_cvg << 5);
-	}
-	else
-	{
-		*fb = finalcolor|(clampcvg << 5);
-	}
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_32_RDEN_CVGD1_COC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_32_RDEN_CVGD1_NCOC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-	UINT32 memory_cvg = ((*fb >>5) & 7) + 1;
-
-	UINT32 newcvg = curpixel_cvg + memory_cvg;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xffffff00;
-		*fb |= ((newcvg << 5) & 0xff);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor | (newcvg << 5);
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_32_RDEN_CVGD2_COC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_32_RDEN_CVGD2_NCOC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-	UINT32 memory_cvg = ((*fb >>5) & 7) + 1;
-
-	UINT32 newcvg = curpixel_cvg + memory_cvg;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xffffff00;
-		*fb |= ((newcvg << 5) & 0xff);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor | 0xE0;
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_32_RDEN_CVGD3_COC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_32_RDEN_CVGD3_NCOC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-	UINT32 memory_alphachannel = *fb & 0xff;
-	UINT32 memory_cvg = ((*fb >>5) & 7) + 1;
-
-	UINT32 newcvg = curpixel_cvg + memory_cvg;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xffffff00;
-		*fb |= ((newcvg << 5) & 0xff);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor | memory_alphachannel;
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_32_RDNEN_CVGD0_COC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_32_RDNEN_CVGD0_NCOC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-
-	UINT32 newcvg = curpixel_cvg + 8;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xffffff00;
-		*fb |= ((newcvg << 5) & 0xff);
-		return 0;
-	}
-#endif
-
-	if (!other_modes.force_blend && !curpixel_overlap)
-	{
-		*fb = finalcolor|(curpixel_cvg << 5);
-	}
-	else
-	{
-		*fb = finalcolor|(clampcvg << 5);
-	}
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_32_RDNEN_CVGD1_COC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_32_RDNEN_CVGD1_NCOC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-
-	UINT32 newcvg = curpixel_cvg + 8;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xffffff00;
-		*fb |= ((newcvg << 5) & 0xff);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor | (newcvg << 5);
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_32_RDNEN_CVGD2_COC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_32_RDNEN_CVGD2_NCOC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
-
-	UINT32 newcvg = curpixel_cvg + 8;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
-
-	curpixel_cvg--;
-	newcvg--;
-	clampcvg--;
-
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
-	{
-		*fb &= 0xffffff00;
-		*fb |= ((newcvg << 5) & 0xff);
-		return 0;
-	}
-#endif
-
-	*fb = finalcolor | 0xE0;
-	return 1;
-}
-
-#if defined(COLOR_ON_CVG)
-	INLINE UINT32 FBWRITE_32_RDNEN_CVGD3_COC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#else
-	INLINE UINT32 FBWRITE_32_RDNEN_CVGD3_NCOC(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
-#endif
-{
-	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
+	UINT32 finalcolor = (r << 24) | (g << 16) | (b << 8);
 	UINT32 memory_alphachannel = *fb & 0xff;
 
-	UINT32 newcvg = curpixel_cvg + 8;
-	UINT32 wrapflag = (newcvg > 8) ? 1 : 0;
-	UINT32 clampcvg = (newcvg > 8) ? 8 : newcvg;
-	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
+	UINT32 memory_cvg = 8;
+	if (m_other_modes->image_read_en)
+	{
+		memory_cvg = ((*fb >>5) & 7) + 1;
+	}
 
-	curpixel_cvg--;
+	UINT32 newcvg = m_misc_state->m_curpixel_cvg + memory_cvg;
+	bool wrapped = (newcvg > 8);
+	UINT32 clamped_cvg = (wrapped > 8) ? 8 : newcvg;
+	newcvg = (wrapped) ? (newcvg - 8) : newcvg;
+
+	m_misc_state->m_curpixel_cvg--;
 	newcvg--;
-	clampcvg--;
+	memory_cvg--;
+	clamped_cvg--;
 
-#if defined(COLOR_ON_CVG)
-	if (!wrapflag)
+	if (m_other_modes->color_on_cvg && !wrapped)
 	{
 		*fb &= 0xffffff00;
 		*fb |= ((newcvg << 5) & 0xff);
 		return 0;
 	}
-#endif
 
-	*fb = finalcolor | memory_alphachannel;
-	return 1;
+	switch(m_other_modes->cvg_dest)
+	{
+		case 0:
+			if (!m_other_modes->force_blend && !m_misc_state->m_curpixel_overlap)
+			{
+				*fb = finalcolor|(m_misc_state->m_curpixel_cvg << 5);
+			}
+			else
+			{
+				*fb = finalcolor|(clamped_cvg << 5);
+			}
+			break;
+		case 1:
+			*fb = finalcolor | (newcvg << 5);
+			break;
+		case 2:
+			*fb = finalcolor | 0xE0;
+			break;
+		case 3:
+			*fb = finalcolor | memory_alphachannel;
+			break;
+	}
+
+	return true;
 }
+
+} // namespace N64

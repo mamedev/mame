@@ -2,6 +2,20 @@
 #define _INCLUDES_N64_H_
 
 #include "cpu/rsp/rsp.h"
+#include "video/n64.h"
+
+/*----------- driver state -----------*/
+
+class _n64_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _n64_state(machine)); }
+
+	_n64_state(running_machine &machine) { }
+
+	/* video-related */
+	N64::RDP::Processor m_rdp;
+};
 
 /*----------- defined in video/n64.c -----------*/
 
@@ -50,11 +64,6 @@ extern const rsp_config n64_rsp_config;
 extern UINT32 *rdram;
 extern UINT32 *rsp_imem;
 extern UINT32 *rsp_dmem;
-
-extern UINT32 dp_start;
-extern UINT32 dp_end;
-extern UINT32 dp_current;
-extern UINT32 dp_status;
 
 extern UINT32 n64_vi_width;
 extern UINT32 n64_vi_origin;

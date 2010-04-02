@@ -1,311 +1,60 @@
-#if defined(ZCOMPARE)
-	#if defined(ZUPDATE)
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_c1_zc_zu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_c1_zc_zu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_c1_zc_zu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#else
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_c1_zc_nzu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_c1_zc_nzu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_c1_zc_nzu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#endif
-#else
-	#if defined(ZUPDATE)
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_c1_nzc_zu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_c1_nzc_zu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_c1_nzc_zu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#else
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_c1_nzc_nzu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_c1_nzc_nzu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_c1_nzc_nzu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#endif
-#endif
+#include "emu.h"
+#include "includes/n64.h"
+#include "video/n64.h"
+
+namespace N64
 {
-	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
-	UINT8 *hb = &hidden_bits[fb_address >> 1];
-#if (defined(ZCOMPARE) || defined(ZUPDATE))
-	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
-	UINT8 *zhb = &hidden_bits[zb_address >> 1];
-#endif
 
-	UINT32 tilenum = rect->tilenum;
-	TILE *tex_tile = &tile[rect->tilenum];
+namespace RDP
+{
 
-	int x1 = rect->xh;
-	int x2 = rect->xl;
-	int y1 = rect->yh;
-	int y2 = rect->yl;
+#define LookUpCC(A, B, C, D) m_rdp->GetCCLUT2()[(m_rdp->GetCCLUT1()[(A << 16) | (B << 8) | C] << 8) | D]
 
-	if (x2 <= x1)
+void TexRectangle::SetMachine(running_machine* machine)
+{
+	_n64_state *state = (_n64_state *)machine->driver_data;
+
+	m_machine = machine;
+	m_rdp = &state->m_rdp;
+	m_other_modes = m_rdp->GetOtherModes();
+	m_misc_state = m_rdp->GetMiscState();
+}
+
+void TexRectangle::Draw()
+{
+	switch(m_other_modes->cycle_type)
 	{
-		x2 = x1 + 1;
-	}
-	if (y1 == y2)
-	{
-		y2 = y1 + 1; // Needed by Goldeneye
-	}
+		case CYCLE_TYPE_1:
+		case CYCLE_TYPE_2:
+			DrawDefault();
+			return;
 
-	if ((rect->xl & 3) == 3) // Needed by Mega Man 64
-	{
-		x2++;
-	}
-	if ((rect->yl & 3) == 3)
-	{
-		y2++;
-	}
+		case CYCLE_TYPE_COPY:
+			DrawCopy();
+			return;
 
-	calculate_clamp_diffs(tilenum);
-
-	shade_color.c = 0;	// Needed by Pilotwings 64
-
-	CACHE_TEXTURE_PARAMS(tex_tile);
-
-	if(y1 < clip.yh)
-	{
-		rect->t += rect->dtdy * (clip.yh - y1);
-		y1 = clip.yh;
-	}
-	if(y2 > clip.yl)
-	{
-		y2 = clip.yl;
-	}
-	if(x1 < clip.xh)
-	{
-		rect->s += rect->dsdx * (clip.xh - x1);
-		x1 = clip.xh;
-	}
-	if(x2 > clip.xl)
-	{
-		x2 = clip.xl;
-	}
-	rect->dsdx >>= 5;
-	rect->dtdy >>= 5;
-
-	int t = ((int)(rect->t));
-
-	if(rect->flip)
-	{
-		for (int j = y1; j < y2; j++)
-		{
-			int fb_index = j * fb_width;
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-			int mline = (j & 3) << 2;
-#endif
-			int s = ((int)(rect->s));
-
-			for (int i = x1; i < x2; i++)
-			{
-				COLOR c;
-#if defined(ZUPDATE)
-				int rendered = 0;
-#endif
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-				int dith = 0;
-#endif
-
-				int curpixel = fb_index + i;
-				UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
-				UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
-#if (defined(ZCOMPARE) || defined(ZUPDATE))
-				UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
-				UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
-#endif
-				curpixel_cvg = 8;
-
-				texel0_color.c = TEXTURE_PIPELINE(t, s, tex_tile);
-
-				COLOR_COMBINER1(c);
-
-#if defined(MAGICDITHER)
-				dith = magic_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
-#elif defined(BAYERDITHER)
-				dith = bayer_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
-#endif
-
-#if defined(ZCOMPARE)
-				if (z_compare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)primitive_z)<<3,primitive_delta_z))
-				{
-#endif
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-#if defined(ZUPDATE)
-					rendered = BLENDER1_16_DITH(fbcur, hbcur, c, dith);
-#else
-					BLENDER1_16_DITH(fbcur, hbcur, c, dith);
-#endif
-#else
-#if defined(ZUPDATE)
-					rendered = BLENDER1_16_NDITH(fbcur, hbcur, c);
-#else
-					BLENDER1_16_NDITH(fbcur, hbcur, c);
-#endif
-#endif
-#if defined(ZCOMPARE)
-				}
-#endif
-
-#if defined(ZUPDATE)
-				if(rendered)
-				{
-					z_store(zbcur, zhbcur, ((UINT32)primitive_z) << 3,primitive_delta_z);
-				}
-#endif
-
-
-				s += (int)(rect->dsdx);
-			}
-			t += (int)(rect->dtdy);
-		}
-	}
-	else
-	{
-		for (int j = y1; j < y2; j++)
-		{
-			int fb_index = j * fb_width;
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-			int mline = (j & 3) << 2;
-#endif
-
-			int s = ((int)(rect->s));
-
-			for (int i = x1; i < x2; i++)
-			{
-				COLOR c;
-#if defined(ZUPDATE)
-				int rendered = 0;
-#endif
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-				int dith = 0;
-#endif
-				int curpixel = fb_index + i;
-				UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
-				UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
-#if (defined(ZCOMPARE) || defined(ZUPDATE))
-				UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
-				UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
-#endif
-				curpixel_cvg = 8;
-
-				texel0_color.c = TEXTURE_PIPELINE(s, t, tex_tile);
-
-				COLOR_COMBINER1(c);
-
-#if defined(MAGICDITHER)
-				dith = magic_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
-#elif defined(BAYERDITHER)
-				dith = bayer_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
-#endif
-
-#if defined(ZCOMPARE)
-				if (z_compare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)primitive_z)<<3,primitive_delta_z))
-				{
-#endif
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-#if defined(ZUPDATE)
-					rendered = BLENDER1_16_DITH(fbcur, hbcur, c, dith);
-#else
-					BLENDER1_16_DITH(fbcur, hbcur, c, dith);
-#endif
-#else
-#if defined(ZUPDATE)
-					rendered = BLENDER1_16_NDITH(fbcur, hbcur, c);
-#else
-					BLENDER1_16_NDITH(fbcur, hbcur, c);
-#endif
-#endif
-#if defined(ZCOMPARE)
-				}
-#endif
-
-#if defined(ZUPDATE)
-				if(rendered)
-				{
-					z_store(zbcur, zhbcur, ((UINT32)primitive_z) << 3,primitive_delta_z);
-				}
-#endif
-
-
-				fbcur++;
-				hbcur++;
-#if (defined(ZCOMPARE) || defined(ZUPDATE))
-				zbcur++;
-				zhbcur++;
-#endif
-				s += (int)(rect->dsdx);
-			}
-			t += (int)(rect->dtdy);
-		}
+		default:
+			fatalerror("Unsupported cycle type for Textured Rectangle: %d\n", m_other_modes->cycle_type);
+			return;
 	}
 }
 
-#if defined(ZCOMPARE)
-	#if defined(ZUPDATE)
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_c2_zc_zu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_c2_zc_zu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_c2_zc_zu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#else
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_c2_zc_nzu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_c2_zc_nzu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_c2_zc_nzu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#endif
-#else
-	#if defined(ZUPDATE)
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_c2_nzc_zu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_c2_nzc_zu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_c2_nzc_zu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#else
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_c2_nzc_nzu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_c2_nzc_nzu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_c2_nzc_nzu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#endif
-#endif
+void TexRectangle::DrawDefault()
 {
-	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
-	UINT8 *hb = &hidden_bits[fb_address >> 1];
-#if (defined(ZCOMPARE) || defined(ZUPDATE))
-	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
-	UINT8 *zhb = &hidden_bits[zb_address >> 1];
-#endif
+	UINT16 *fb = (UINT16*)&rdram[(m_misc_state->m_fb_address / 4)];
+	UINT8 *hb = &m_rdp->GetHiddenBits()[m_misc_state->m_fb_address >> 1];
+	UINT16 *zb = (UINT16*)&rdram[m_misc_state->m_zb_address / 4];
+	UINT8 *zhb = &m_rdp->GetHiddenBits()[m_misc_state->m_zb_address >> 1];
 
-	UINT32 tilenum = rect->tilenum;
+	UINT32 tilenum = m_tilenum;
+	N64::RDP::Tile *tex_tile = &m_rdp->GetTiles()[m_tilenum];
 	UINT32 tilenum2 = 0;
-	TILE *tex_tile = &tile[rect->tilenum];
-	TILE *tex_tile2 = NULL;
+	N64::RDP::Tile *tex_tile2 = NULL;
 
-	int x1 = rect->xh;
-	int x2 = rect->xl;
-	int y1 = rect->yh;
-	int y2 = rect->yl;
+	int x1 = m_xh;
+	int x2 = m_xl;
+	int y1 = m_yh;
+	int y2 = m_yl;
 
 	if (x2 <= x1)
 	{
@@ -316,264 +65,311 @@
 		y2 = y1 + 1; // Needed by Goldeneye
 	}
 
-	if ((rect->xl & 3) == 3) // Needed by Mega Man 64
+	if ((m_xl & 3) == 3) // Needed by Mega Man 64
 	{
 		x2++;
 	}
-	if ((rect->yl & 3) == 3)
+	if ((m_yl & 3) == 3)
 	{
 		y2++;
 	}
 
-	calculate_clamp_diffs(tilenum);
+	m_rdp->GetTexPipe()->CalculateClampDiffs(tilenum);
 
-	if (!other_modes.tex_lod_en)
+	if(m_other_modes->cycle_type == CYCLE_TYPE_2)
 	{
-		tilenum2 = (tilenum + 1) & 7;
-		tex_tile2 = &tile[tilenum2];
-	}
-	else
-	{
-		tilenum2 = (tilenum + 1) & 7;
-		tex_tile2 = &tile[tilenum2];
+		if (!m_other_modes->tex_lod_en)
+		{
+			tilenum2 = (tilenum + 1) & 7;
+			tex_tile2 = &m_rdp->GetTiles()[tilenum2];
+		}
+		else
+		{
+			tilenum2 = (tilenum + 1) & 7;
+			tex_tile2 = &m_rdp->GetTiles()[tilenum2];
+		}
 	}
 
-	shade_color.c = 0;	// Needed by Pilotwings 64
+	m_rdp->GetShadeColor()->c = 0;	// Needed by Pilotwings 64
 
-	if(y1 < clip.yh)
+	if(y1 < m_rdp->GetScissor()->m_yh)
 	{
-		rect->t += rect->dtdy * (clip.yh - y1);
-		y1 = clip.yh;
+		m_t += m_dtdy * (m_rdp->GetScissor()->m_yh - y1);
+		y1 = m_rdp->GetScissor()->m_yh;
 	}
-	if(y2 > clip.yl)
+	if(y2 > m_rdp->GetScissor()->m_yl)
 	{
-		y2 = clip.yl;
+		y2 = m_rdp->GetScissor()->m_yl;
 	}
-	if(x1 < clip.xh)
+	if(x1 < m_rdp->GetScissor()->m_xh)
 	{
-		rect->s += rect->dsdx * (clip.xh - x1);
-		x1 = clip.xh;
+		m_s += m_dsdx * (m_rdp->GetScissor()->m_xh - x1);
+		x1 = m_rdp->GetScissor()->m_xh;
 	}
-	if(x2 > clip.xl)
+	if(x2 > m_rdp->GetScissor()->m_xl)
 	{
-		x2 = clip.xl;
+		x2 = m_rdp->GetScissor()->m_xl;
 	}
-	rect->dsdx >>= 5;
-	rect->dtdy >>= 5;
+	m_dsdx >>= 5;
+	m_dtdy >>= 5;
 
-	int t = ((int)(rect->t));
+	int t = ((int)(m_t));
 
-	if(rect->flip)
+	if(m_flip)
 	{
 		for (int j = y1; j < y2; j++)
 		{
+			int fb_index = j * m_misc_state->m_fb_width;
+			int mline = 0;
+			if(!(m_other_modes->rgb_dither_sel & 2))
 			{
-				int fb_index = j * fb_width;
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-				int mline = (j & 3) << 2;
-#endif
-				int s = (int)(rect->s);
-
-				for (int i = x1; i < x2; i++)
-				{
-					{
-						COLOR c1, c2;
-#if defined(ZUPDATE)
-						int rendered=0;
-#endif
-						int curpixel = fb_index + i;
-						UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
-						UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
-#if (defined(ZCOMPARE) || defined(ZUPDATE))
-						UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
-						UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
-#endif
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-						int dith = 0;
-#endif
-
-						curpixel_cvg = 8;
-
-						CACHE_TEXTURE_PARAMS(tex_tile);
-						texel0_color.c = TEXTURE_PIPELINE(t, s, tex_tile);
-
-						CACHE_TEXTURE_PARAMS(tex_tile2);
-						texel1_color.c = TEXTURE_PIPELINE(t, s, tex_tile2);
-
-						COLOR_COMBINER2_C0(c1);
-						COLOR_COMBINER2_C1(c2);
-
-#if defined(MAGICDITHER)
-						dith = magic_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
-#elif defined(BAYERDITHER)
-						dith = bayer_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
-#endif
-
-#if defined(ZCOMPARE)
-						if (z_compare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)primitive_z)<<3,primitive_delta_z))
-						{
-#endif
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-#if defined(ZUPDATE)
-							rendered = BLENDER2_16_DITH(fbcur, hbcur, c1, c2, dith);
-#else
-							BLENDER2_16_DITH(fbcur, hbcur, c1, c2, dith);
-#endif
-#else
-#if defined(ZUPDATE)
-							rendered = BLENDER2_16_NDITH(fbcur, hbcur, c1, c2);
-#else
-							BLENDER2_16_NDITH(fbcur, hbcur, c1, c2);
-#endif
-#endif
-#if defined(ZCOMPARE)
-						}
-#endif
-
-#if defined(ZUPDATE)
-						if(rendered)
-						{
-							z_store(zbcur, zhbcur, ((UINT32)primitive_z) << 3,primitive_delta_z);
-						}
-#endif
-					}
-
-					s += (rect->dsdx);
-				}
+				mline = (j & 3) << 2;
 			}
-			t += (rect->dtdy);
+			int s = ((int)(m_s));
+
+			for (int i = x1; i < x2; i++)
+			{
+				N64::RDP::Color c1;
+				N64::RDP::Color c2;
+				int dith = 0;
+				int curpixel = fb_index + i;
+				UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
+				UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
+				UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
+				UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
+
+				m_misc_state->m_curpixel_cvg = 8;
+
+				if(m_other_modes->cycle_type == CYCLE_TYPE_1)
+				{
+					m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(t, s, tex_tile);
+
+					c1.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[1]);
+					c1.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[1]);
+					c1.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[1]);
+					c1.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[1],
+									  *m_rdp->GetColorInputs()->combiner_alphasub_b[1],
+									  *m_rdp->GetColorInputs()->combiner_alphamul[1],
+									  *m_rdp->GetColorInputs()->combiner_alphaadd[1]);
+					m_rdp->GetAlphaCvg(&c1.i.a);
+				}
+				else
+				{
+					m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(t, s, tex_tile);
+					m_rdp->GetTexel1Color()->c = m_rdp->GetTexPipe()->Fetch(t, s, tex_tile2);
+
+					c1.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[0]);
+					c1.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[0]);
+					c1.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[0]);
+					c1.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[0],
+									  *m_rdp->GetColorInputs()->combiner_alphasub_b[0],
+									  *m_rdp->GetColorInputs()->combiner_alphamul[0],
+									  *m_rdp->GetColorInputs()->combiner_alphaadd[0]);
+					m_rdp->GetCombinedColor()->c = c1.c;
+					c2.c = m_rdp->GetTexel0Color()->c;
+					m_rdp->GetTexel0Color()->c = m_rdp->GetTexel1Color()->c;
+					m_rdp->GetTexel1Color()->c = c2.c;
+					c2.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[1]);
+					c2.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[1]);
+					c2.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[1]);
+					c2.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[1],
+									  *m_rdp->GetColorInputs()->combiner_alphasub_b[1],
+									  *m_rdp->GetColorInputs()->combiner_alphamul[1],
+									  *m_rdp->GetColorInputs()->combiner_alphaadd[1]);
+					m_rdp->GetAlphaCvg(&c2.i.a);
+				}
+
+				if(m_other_modes->rgb_dither_sel == 0)
+				{
+					dith = m_rdp->GetMagicMatrix()[mline + ((i ^ WORD_ADDR_XOR) & 3)];
+				}
+				else if(m_other_modes->rgb_dither_sel == 1)
+				{
+					dith = m_rdp->GetBayerMatrix()[mline + ((i ^ WORD_ADDR_XOR) & 3)];
+				}
+
+				bool z_compare_result = true;
+				if(m_other_modes->z_compare_en)
+				{
+					z_compare_result = m_rdp->ZCompare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)m_misc_state->m_primitive_z)<<3, m_misc_state->m_primitive_delta_z);
+				}
+
+				if(z_compare_result)
+				{
+					bool rendered = m_rdp->GetBlender()->Blend(fbcur, hbcur, c1, c2, dith);
+
+					if(m_other_modes->z_update_en && rendered)
+					{
+						m_rdp->ZStore(zbcur, zhbcur, ((UINT32)m_misc_state->m_primitive_z) << 3, m_misc_state->m_primitive_delta_z);
+					}
+				}
+
+				s += (int)(m_dsdx);
+			}
+			t += (int)(m_dtdy);
 		}
 	}
 	else
 	{
 		for (int j = y1; j < y2; j++)
 		{
+			int fb_index = j * m_misc_state->m_fb_width;
+			int mline = 0;
+			if(!(m_other_modes->rgb_dither_sel & 2))
 			{
-				int fb_index = j * fb_width;
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-				int mline = (j & 3) << 2;
-#endif
-				int s = (int)(rect->s);
-
-				for (int i = x1; i < x2; i++)
-				{
-					{
-						COLOR c1, c2;
-#if defined(ZUPDATE)
-						int rendered=0;
-#endif
-						int curpixel = fb_index + i;
-						UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
-						UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
-#if (defined(ZCOMPARE) || defined(ZUPDATE))
-						UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
-						UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
-#endif
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-						int dith = 0;
-#endif
-
-						curpixel_cvg = 8;
-
-						CACHE_TEXTURE_PARAMS(tex_tile);
-						texel0_color.c = TEXTURE_PIPELINE(s, t, tex_tile);
-
-						CACHE_TEXTURE_PARAMS(tex_tile2);
-						texel1_color.c = TEXTURE_PIPELINE(s, t, tex_tile2);
-
-						COLOR_COMBINER2_C0(c1);
-						COLOR_COMBINER2_C1(c2);
-
-#if defined(MAGICDITHER)
-						dith = magic_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
-#elif defined(BAYERDITHER)
-						dith = bayer_matrix[mline + ((i ^ WORD_ADDR_XOR) & 3)];
-#endif
-
-#if defined(ZCOMPARE)
-						if (z_compare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)primitive_z)<<3,primitive_delta_z))
-						{
-#endif
-#if defined(MAGICDITHER) || defined(BAYERDITHER)
-#if defined(ZUPDATE)
-							rendered = BLENDER2_16_DITH(fbcur, hbcur, c1, c2, dith);
-#else
-							BLENDER2_16_DITH(fbcur, hbcur, c1, c2, dith);
-#endif
-#else
-#if defined(ZUPDATE)
-							rendered = BLENDER2_16_NDITH(fbcur, hbcur, c1, c2);
-#else
-							BLENDER2_16_NDITH(fbcur, hbcur, c1, c2);
-#endif
-#endif
-#if defined(ZCOMPARE)
-						}
-#endif
-
-#if defined(ZUPDATE)
-						if(rendered)
-						{
-							z_store(zbcur, zhbcur, ((UINT32)primitive_z) << 3,primitive_delta_z);
-						}
-#endif
-					}
-
-					s += (rect->dsdx);
-				}
+				mline = (j & 3) << 2;
 			}
-			t += (rect->dtdy);
+
+			int s = ((int)(m_s));
+
+			for (int i = x1; i < x2; i++)
+			{
+				N64::RDP::Color c1;
+				N64::RDP::Color c2;
+				int dith = 0;
+				int curpixel = fb_index + i;
+				UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
+				UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
+				UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
+				UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
+
+				m_misc_state->m_curpixel_cvg = 8;
+
+				if(m_other_modes->cycle_type == CYCLE_TYPE_1)
+				{
+					m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(s, t, tex_tile);
+
+					c1.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[1]);
+					c1.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[1]);
+					c1.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[1]);
+					c1.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[1],
+									  *m_rdp->GetColorInputs()->combiner_alphasub_b[1],
+									  *m_rdp->GetColorInputs()->combiner_alphamul[1],
+									  *m_rdp->GetColorInputs()->combiner_alphaadd[1]);
+					m_rdp->GetAlphaCvg(&c1.i.a);
+				}
+				else
+				{
+					m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(s, t, tex_tile);
+					m_rdp->GetTexel1Color()->c = m_rdp->GetTexPipe()->Fetch(s, t, tex_tile2);
+
+					c1.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[0]);
+					c1.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[0]);
+					c1.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[0],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[0]);
+					c1.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[0],
+									  *m_rdp->GetColorInputs()->combiner_alphasub_b[0],
+									  *m_rdp->GetColorInputs()->combiner_alphamul[0],
+									  *m_rdp->GetColorInputs()->combiner_alphaadd[0]);
+					m_rdp->GetCombinedColor()->c = c1.c;
+					c2.c = m_rdp->GetTexel0Color()->c;
+					m_rdp->GetTexel0Color()->c = m_rdp->GetTexel1Color()->c;
+					m_rdp->GetTexel1Color()->c = c2.c;
+					c2.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[1]);
+					c2.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[1]);
+					c2.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[1],
+									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[1]);
+					c2.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[1],
+									  *m_rdp->GetColorInputs()->combiner_alphasub_b[1],
+									  *m_rdp->GetColorInputs()->combiner_alphamul[1],
+									  *m_rdp->GetColorInputs()->combiner_alphaadd[1]);
+					m_rdp->GetAlphaCvg(&c2.i.a);
+				}
+
+				if(m_other_modes->rgb_dither_sel == 0)
+				{
+					dith = m_rdp->GetMagicMatrix()[mline + ((i ^ WORD_ADDR_XOR) & 3)];
+				}
+				else if(m_other_modes->rgb_dither_sel == 1)
+				{
+					dith = m_rdp->GetBayerMatrix()[mline + ((i ^ WORD_ADDR_XOR) & 3)];
+				}
+
+				bool z_compare_result = true;
+				if(m_other_modes->z_compare_en)
+				{
+					z_compare_result = m_rdp->ZCompare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)m_misc_state->m_primitive_z)<<3, m_misc_state->m_primitive_delta_z);
+				}
+
+				if(z_compare_result)
+				{
+					bool rendered = m_rdp->GetBlender()->Blend(fbcur, hbcur, c1, c2, dith);
+
+					if(m_other_modes->z_update_en && rendered)
+					{
+						m_rdp->ZStore(zbcur, zhbcur, ((UINT32)m_misc_state->m_primitive_z) << 3, m_misc_state->m_primitive_delta_z);
+					}
+				}
+
+				s += (int)(m_dsdx);
+			}
+			t += (int)(m_dtdy);
 		}
 	}
 }
 
-#if defined(ZCOMPARE)
-	#if defined(ZUPDATE)
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_cc_zc_zu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_cc_zc_zu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_cc_zc_zu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#else
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_cc_zc_nzu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_cc_zc_nzu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_cc_zc_nzu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#endif
-#else
-	#if defined(ZUPDATE)
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_cc_nzc_zu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_cc_nzc_zu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_cc_nzc_zu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#else
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_cc_nzc_nzu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_cc_nzc_nzu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_cc_nzc_nzu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#endif
-#endif
+void TexRectangle::DrawCopy()
 {
-	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
+	UINT16 *fb = (UINT16*)&rdram[(m_misc_state->m_fb_address / 4)];
 
-	UINT32 tilenum = rect->tilenum;
-	TILE *tex_tile = &tile[rect->tilenum];
+	N64::RDP::Tile *tex_tile = &m_rdp->GetTiles()[m_tilenum];
 
-	int x1 = rect->xh;
-	int x2 = rect->xl;
-	int y1 = rect->yh;
-	int y2 = rect->yl;
+	int x1 = m_xh;
+	int x2 = m_xl;
+	int y1 = m_yh;
+	int y2 = m_yl;
 
 	if (x2 <= x1)
 	{
@@ -584,128 +380,81 @@
 		y2 = y1 + 1; // Needed by Goldeneye
 	}
 
-	rect->dsdx /= 4;
+	m_dsdx /= 4;
 	x2 += 1;
 	y2 += 1;
 
-	calculate_clamp_diffs(tilenum);
+	m_rdp->GetShadeColor()->c = 0;	// Needed by Pilotwings 64
 
-	shade_color.c = 0;	// Needed by Pilotwings 64
-
-	CACHE_TEXTURE_PARAMS(tex_tile);
-
-	if(y1 < clip.yh)
+	if(y1 < m_rdp->GetScissor()->m_yh)
 	{
-		rect->t += rect->dtdy * (clip.yh - y1);
-		y1 = clip.yh;
+		m_t += m_dtdy * (m_rdp->GetScissor()->m_yh - y1);
+		y1 = m_rdp->GetScissor()->m_yh;
 	}
-	if(y2 > clip.yl)
+	if(y2 > m_rdp->GetScissor()->m_yl)
 	{
-		y2 = clip.yl;
+		y2 = m_rdp->GetScissor()->m_yl;
 	}
-	if(x1 < clip.xh)
+	if(x1 < m_rdp->GetScissor()->m_xh)
 	{
-		rect->s += rect->dsdx * (clip.xh - x1);
-		x1 = clip.xh;
+		m_s += m_dsdx * (m_rdp->GetScissor()->m_xh - x1);
+		x1 = m_rdp->GetScissor()->m_xh;
 	}
-	if(x2 > clip.xl)
+	if(x2 > m_rdp->GetScissor()->m_xl)
 	{
-		x2 = clip.xl;
+		x2 = m_rdp->GetScissor()->m_xl;
 	}
-	rect->dsdx >>= 5;
-	rect->dtdy >>= 5;
+	m_dsdx >>= 5;
+	m_dtdy >>= 5;
 
-	int t = ((int)(rect->t));
+	int t = (int)m_t;
 
-	if(rect->flip)
+	if(m_flip)
 	{
 		for (int j = y1; j < y2; j++)
 		{
-			int fb_index = j * fb_width;
+			int fb_index = j * m_misc_state->m_fb_width;
+			int s = (int)(m_s);
+
+			for (int i = x1; i < x2; i++)
 			{
-				int s = (int)(rect->s);
+				m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(t, s, tex_tile);
 
-				for (int i = x1; i < x2; i++)
+				m_misc_state->m_curpixel_cvg = 8;
+
+				if ((m_rdp->GetTexel0Color()->i.a != 0)||(!m_other_modes->alpha_compare_en))
 				{
-					{
-						texel0_color.c = TEXTURE_PIPELINE(t, s, tex_tile);
-
-						curpixel_cvg = 8;
-
-						if ((texel0_color.i.a != 0)||(!other_modes.alpha_compare_en))
-						{
-							fb[(fb_index + i) ^ WORD_ADDR_XOR] = ((texel0_color.i.r >> 3) << 11) | ((texel0_color.i.g >> 3) << 6) | ((texel0_color.i.b >> 3) << 1)|1;
-						}
-					}
-					s += rect->dsdx;
+					fb[(fb_index + i) ^ WORD_ADDR_XOR] = ((m_rdp->GetTexel0Color()->i.r >> 3) << 11) | ((m_rdp->GetTexel0Color()->i.g >> 3) << 6) | ((m_rdp->GetTexel0Color()->i.b >> 3) << 1)|1;
 				}
+				s += m_dsdx;
 			}
-			t += rect->dtdy;
+			t += m_dtdy;
 		}
 	}
 	else
 	{
 		for (int j = y1; j < y2; j++)
 		{
-			int fb_index = j * fb_width;
+			int fb_index = j * m_misc_state->m_fb_width;
+			int s = (int)(m_s);
+
+			for (int i = x1; i < x2; i++)
 			{
-				int s = (int)(rect->s);
+				m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(s, t, tex_tile);
 
-				for (int i = x1; i < x2; i++)
+				m_misc_state->m_curpixel_cvg = 8;
+
+				if ((m_rdp->GetTexel0Color()->i.a != 0)||(!m_other_modes->alpha_compare_en))
 				{
-					texel0_color.c = TEXTURE_PIPELINE(s, t, tex_tile);
-
-					curpixel_cvg = 8;
-
-					if ((texel0_color.i.a != 0)||(!other_modes.alpha_compare_en))
-					{
-						fb[(fb_index + i) ^ WORD_ADDR_XOR] = ((texel0_color.i.r >> 3) << 11) | ((texel0_color.i.g >> 3) << 6) | ((texel0_color.i.b >> 3) << 1)|1;
-					}
-					s += rect->dsdx;
+					fb[(fb_index + i) ^ WORD_ADDR_XOR] = ((m_rdp->GetTexel0Color()->i.r >> 3) << 11) | ((m_rdp->GetTexel0Color()->i.g >> 3) << 6) | ((m_rdp->GetTexel0Color()->i.b >> 3) << 1)|1;
 				}
+				s += m_dsdx;
 			}
-			t += rect->dtdy;
+			t += m_dtdy;
 		}
 	}
 }
 
-#if defined(ZCOMPARE)
-	#if defined(ZUPDATE)
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_cf_zc_zu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_cf_zc_zu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_cf_zc_zu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#else
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_cf_zc_nzu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_cf_zc_nzu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_cf_zc_nzu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#endif
-#else
-	#if defined(ZUPDATE)
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_cf_nzc_zu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_cf_nzc_zu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_cf_nzc_zu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#else
-		#if defined(MAGICDITHER)
-			static void texture_rectangle_16bit_cf_nzc_nzu_dm(TEX_RECTANGLE *rect)
-		#elif defined(BAYERDITHER)
-			static void texture_rectangle_16bit_cf_nzc_nzu_db(TEX_RECTANGLE *rect)
-		#else
-			static void texture_rectangle_16bit_cf_nzc_nzu_dn(TEX_RECTANGLE *rect)
-		#endif
-	#endif
-#endif
-{
-	fatalerror("texture_rectangle with FILL cycle type is not supported\n");
-}
+} // namespace RDP
+
+} // namespace N64

@@ -1,69 +1,57 @@
-static void texture_rectangle_16bit_c1_nzc_nzu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_nzc_nzu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_nzc_nzu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_nzc_nzu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_nzc_nzu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_nzc_nzu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_nzc_nzu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_nzc_nzu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_nzc_nzu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_nzc_nzu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_nzc_nzu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_nzc_nzu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_zc_nzu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_zc_nzu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_zc_nzu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_zc_nzu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_zc_nzu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_zc_nzu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_zc_nzu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_zc_nzu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_zc_nzu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_zc_nzu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_zc_nzu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_zc_nzu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_nzc_zu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_nzc_zu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_nzc_zu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_nzc_zu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_nzc_zu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_nzc_zu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_nzc_zu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_nzc_zu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_nzc_zu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_nzc_zu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_nzc_zu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_nzc_zu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_zc_zu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_zc_zu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c1_zc_zu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_zc_zu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_zc_zu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_c2_zc_zu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_zc_zu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_zc_zu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cc_zc_zu_dn(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_zc_zu_dm(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_zc_zu_db(TEX_RECTANGLE *rect);
-static void texture_rectangle_16bit_cf_zc_zu_dn(TEX_RECTANGLE *rect);
+#ifndef _VIDEO_RDPTEXRECT_H_
+#define _VIDEO_RDPTEXRECT_H_
 
-static void (*rdp_texture_rectangle_16bit_func[64])(TEX_RECTANGLE *) =
+#include "emu.h"
+
+namespace N64
 {
-	texture_rectangle_16bit_c1_nzc_nzu_dm, texture_rectangle_16bit_c1_nzc_nzu_db, texture_rectangle_16bit_c1_nzc_nzu_dn, texture_rectangle_16bit_c1_nzc_nzu_dn,
-	texture_rectangle_16bit_c2_nzc_nzu_dm, texture_rectangle_16bit_c2_nzc_nzu_db, texture_rectangle_16bit_c2_nzc_nzu_dn, texture_rectangle_16bit_c2_nzc_nzu_dn,
-	texture_rectangle_16bit_cc_nzc_nzu_dm, texture_rectangle_16bit_cc_nzc_nzu_db, texture_rectangle_16bit_cc_nzc_nzu_dn, texture_rectangle_16bit_cc_nzc_nzu_dn,
-	texture_rectangle_16bit_cf_nzc_nzu_dm, texture_rectangle_16bit_cf_nzc_nzu_db, texture_rectangle_16bit_cf_nzc_nzu_dn, texture_rectangle_16bit_cf_nzc_nzu_dn,
-	texture_rectangle_16bit_c1_zc_nzu_dm, texture_rectangle_16bit_c1_zc_nzu_db, texture_rectangle_16bit_c1_zc_nzu_dn, texture_rectangle_16bit_c1_zc_nzu_dn,
-	texture_rectangle_16bit_c2_zc_nzu_dm, texture_rectangle_16bit_c2_zc_nzu_db, texture_rectangle_16bit_c2_zc_nzu_dn, texture_rectangle_16bit_c2_zc_nzu_dn,
-	texture_rectangle_16bit_cc_zc_nzu_dm, texture_rectangle_16bit_cc_zc_nzu_db, texture_rectangle_16bit_cc_zc_nzu_dn, texture_rectangle_16bit_cc_zc_nzu_dn,
-	texture_rectangle_16bit_cf_zc_nzu_dm, texture_rectangle_16bit_cf_zc_nzu_db, texture_rectangle_16bit_cf_zc_nzu_dn, texture_rectangle_16bit_cf_zc_nzu_dn,
-	texture_rectangle_16bit_c1_nzc_zu_dm, texture_rectangle_16bit_c1_nzc_zu_db, texture_rectangle_16bit_c1_nzc_zu_dn, texture_rectangle_16bit_c1_nzc_zu_dn,
-	texture_rectangle_16bit_c2_nzc_zu_dm, texture_rectangle_16bit_c2_nzc_zu_db, texture_rectangle_16bit_c2_nzc_zu_dn, texture_rectangle_16bit_c2_nzc_zu_dn,
-	texture_rectangle_16bit_cc_nzc_zu_dm, texture_rectangle_16bit_cc_nzc_zu_db, texture_rectangle_16bit_cc_nzc_zu_dn, texture_rectangle_16bit_cc_nzc_zu_dn,
-	texture_rectangle_16bit_cf_nzc_zu_dm, texture_rectangle_16bit_cf_nzc_zu_db, texture_rectangle_16bit_cf_nzc_zu_dn, texture_rectangle_16bit_cf_nzc_zu_dn,
-	texture_rectangle_16bit_c1_zc_zu_dm, texture_rectangle_16bit_c1_zc_zu_db, texture_rectangle_16bit_c1_zc_zu_dn, texture_rectangle_16bit_c1_zc_zu_dn,
-	texture_rectangle_16bit_c2_zc_zu_dm, texture_rectangle_16bit_c2_zc_zu_db, texture_rectangle_16bit_c2_zc_zu_dn, texture_rectangle_16bit_c2_zc_zu_dn,
-	texture_rectangle_16bit_cc_zc_zu_dm, texture_rectangle_16bit_cc_zc_zu_db, texture_rectangle_16bit_cc_zc_zu_dn, texture_rectangle_16bit_cc_zc_zu_dn,
-	texture_rectangle_16bit_cf_zc_zu_dm, texture_rectangle_16bit_cf_zc_zu_db, texture_rectangle_16bit_cf_zc_zu_dn, texture_rectangle_16bit_cf_zc_zu_dn,
+
+namespace RDP
+{
+
+class OtherModes;
+class MiscState;
+class Processor;
+class Color;
+
+class TexRectangle
+{
+	public:
+		TexRectangle() {}
+		TexRectangle(running_machine *machine, UINT32 *data, int flip)
+		{
+			SetMachine(machine);
+			InitFromBuffer(data);
+			m_flip = flip;
+		}
+
+		void Draw();
+		void SetMachine(running_machine *machine);
+		void InitFromBuffer(UINT32 *data);
+
+		int m_tilenum;
+		UINT16 m_xl;	// 10.2 fixed-point
+		UINT16 m_yl;	// 10.2 fixed-point
+		UINT16 m_xh;	// 10.2 fixed-point
+		UINT16 m_yh;	// 10.2 fixed-point
+		INT16 m_s;		// 10.5 fixed-point
+		INT16 m_t;		// 10.5 fixed-point
+		INT16 m_dsdx;	// 5.10 fixed-point
+		INT16 m_dtdy;	// 5.10 fixed-point
+		int m_flip;
+
+	private:
+		void 				DrawDefault();
+		void 				DrawCopy();
+
+		running_machine*	m_machine;
+		Processor*			m_rdp;
+		MiscState*			m_misc_state;
+		OtherModes*			m_other_modes;
 };
 
+} // namespace RDP
+
+} // namespace N64
+
+#endif // _VIDEO_RDPTEXRECT_H_
