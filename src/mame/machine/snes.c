@@ -412,37 +412,37 @@ READ8_HANDLER( snes_r_io )
 		case DMAP4: case DMAP5: case DMAP6: case DMAP7:
 			return state->dma_channel[(offset & 0x70) >> 4].dmap;
 		case BBAD0: case BBAD1: case BBAD2: case BBAD3: /*0x43n1*/
-		case BBAD4: case BBAD5: case BBAD6: case BBAD7: 
+		case BBAD4: case BBAD5: case BBAD6: case BBAD7:
 			return state->dma_channel[(offset & 0x70) >> 4].dest_addr;
 		case A1T0L: case A1T1L: case A1T2L: case A1T3L: /*0x43n2*/
-		case A1T4L: case A1T5L: case A1T6L: case A1T7L: 
+		case A1T4L: case A1T5L: case A1T6L: case A1T7L:
 			return state->dma_channel[(offset & 0x70) >> 4].src_addr & 0xff;
 		case A1T0H: case A1T1H: case A1T2H: case A1T3H: /*0x43n3*/
-		case A1T4H: case A1T5H: case A1T6H: case A1T7H: 
+		case A1T4H: case A1T5H: case A1T6H: case A1T7H:
 			return (state->dma_channel[(offset & 0x70) >> 4].src_addr >> 8) & 0xff;
 		case A1B0: case A1B1: case A1B2: case A1B3:     /*0x43n4*/
-		case A1B4: case A1B5: case A1B6: case A1B7: 
+		case A1B4: case A1B5: case A1B6: case A1B7:
 			return state->dma_channel[(offset & 0x70) >> 4].bank;
-		case DAS0L: case DAS1L: case DAS2L: case DAS3L: /*0x43n5*/ 
-		case DAS4L: case DAS5L: case DAS6L: case DAS7L: 
+		case DAS0L: case DAS1L: case DAS2L: case DAS3L: /*0x43n5*/
+		case DAS4L: case DAS5L: case DAS6L: case DAS7L:
 			return state->dma_channel[(offset & 0x70) >> 4].trans_size & 0xff;
-		case DAS0H: case DAS1H: case DAS2H: case DAS3H: /*0x43n6*/ 
-		case DAS4H: case DAS5H: case DAS6H: case DAS7H: 
+		case DAS0H: case DAS1H: case DAS2H: case DAS3H: /*0x43n6*/
+		case DAS4H: case DAS5H: case DAS6H: case DAS7H:
 			return (state->dma_channel[(offset & 0x70) >> 4].trans_size >> 8) & 0xff;
-		case DSAB0: case DSAB1: case DSAB2: case DSAB3: /*0x43n7*/ 
-		case DSAB4: case DSAB5: case DSAB6: case DSAB7: 
+		case DSAB0: case DSAB1: case DSAB2: case DSAB3: /*0x43n7*/
+		case DSAB4: case DSAB5: case DSAB6: case DSAB7:
 			return state->dma_channel[(offset & 0x70) >> 4].ibank;
 		case A2A0L: case A2A1L: case A2A2L: case A2A3L: /*0x43n8*/
-		case A2A4L: case A2A5L: case A2A6L: case A2A7L: 
+		case A2A4L: case A2A5L: case A2A6L: case A2A7L:
 			return state->dma_channel[(offset & 0x70) >> 4].hdma_addr & 0xff;
 		case A2A0H: case A2A1H: case A2A2H: case A2A3H: /*0x43n9*/
-		case A2A4H: case A2A5H: case A2A6H: case A2A7H: 
+		case A2A4H: case A2A5H: case A2A6H: case A2A7H:
 			return (state->dma_channel[(offset & 0x70) >> 4].hdma_addr >> 8) & 0xff;
 		case NTRL0: case NTRL1: case NTRL2: case NTRL3: /*0x43na*/
-		case NTRL4: case NTRL5: case NTRL6: case NTRL7: 
+		case NTRL4: case NTRL5: case NTRL6: case NTRL7:
 			return state->dma_channel[(offset & 0x70) >> 4].hdma_line_counter;
 		case 0x430b: case 0x431b: case 0x432b: case 0x433b: /* according to bsnes, this does not return open_bus (even if its precise effect is unknown) */
-		case 0x434b: case 0x435b: case 0x436b: case 0x437b: 
+		case 0x434b: case 0x435b: case 0x436b: case 0x437b:
 			return state->dma_channel[(offset & 0x70) >> 4].unk;
 
 #ifndef MESS
@@ -556,6 +556,12 @@ WRITE8_HANDLER( snes_w_io )
 			}
 			break;
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
+			if((snes_ram[NMITIMEN] & 0x30) == 0x00)
+			{
+				cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
+				snes_ram[TIMEUP] = 0;	// flag is cleared on both read and write
+			}
+			break;
 		case OLDJOY2:	/* Old NES joystick support */
 			break;
 		case WRIO:		/* Programmable I/O port - latches H/V counters on a 0->1 transition */
@@ -666,47 +672,47 @@ WRITE8_HANDLER( snes_w_io )
 			state->dma_channel[(offset & 0x70) >> 4].dmap = data;
 			break;
 		case BBAD0: case BBAD1: case BBAD2: case BBAD3: /*0x43n1*/
-		case BBAD4: case BBAD5: case BBAD6: case BBAD7: 
+		case BBAD4: case BBAD5: case BBAD6: case BBAD7:
 			state->dma_channel[(offset & 0x70) >> 4].dest_addr = data;
 			break;
 		case A1T0L: case A1T1L: case A1T2L: case A1T3L: /*0x43n2*/
-		case A1T4L: case A1T5L: case A1T6L: case A1T7L: 
+		case A1T4L: case A1T5L: case A1T6L: case A1T7L:
 			state->dma_channel[(offset & 0x70) >> 4].src_addr = (state->dma_channel[(offset & 0x70) >> 4].src_addr & 0xff00) | (data << 0);
 			break;
 		case A1T0H: case A1T1H: case A1T2H: case A1T3H: /*0x43n3*/
-		case A1T4H: case A1T5H: case A1T6H: case A1T7H: 
+		case A1T4H: case A1T5H: case A1T6H: case A1T7H:
 			state->dma_channel[(offset & 0x70) >> 4].src_addr = (state->dma_channel[(offset & 0x70) >> 4].src_addr & 0x00ff) | (data << 8);
 			break;
 		case A1B0: case A1B1: case A1B2: case A1B3:     /*0x43n4*/
-		case A1B4: case A1B5: case A1B6: case A1B7: 
+		case A1B4: case A1B5: case A1B6: case A1B7:
 			state->dma_channel[(offset & 0x70) >> 4].bank = data;
 			break;
-		case DAS0L: case DAS1L: case DAS2L: case DAS3L: /*0x43n5*/ 
-		case DAS4L: case DAS5L: case DAS6L: case DAS7L: 
+		case DAS0L: case DAS1L: case DAS2L: case DAS3L: /*0x43n5*/
+		case DAS4L: case DAS5L: case DAS6L: case DAS7L:
 			state->dma_channel[(offset & 0x70) >> 4].trans_size = (state->dma_channel[(offset & 0x70) >> 4].trans_size & 0xff00) | (data << 0);
 			break;
-		case DAS0H: case DAS1H: case DAS2H: case DAS3H: /*0x43n6*/ 
-		case DAS4H: case DAS5H: case DAS6H: case DAS7H: 
+		case DAS0H: case DAS1H: case DAS2H: case DAS3H: /*0x43n6*/
+		case DAS4H: case DAS5H: case DAS6H: case DAS7H:
 			state->dma_channel[(offset & 0x70) >> 4].trans_size = (state->dma_channel[(offset & 0x70) >> 4].trans_size & 0x00ff) | (data << 8);
 			break;
-		case DSAB0: case DSAB1: case DSAB2: case DSAB3: /*0x43n7*/ 
-		case DSAB4: case DSAB5: case DSAB6: case DSAB7: 
+		case DSAB0: case DSAB1: case DSAB2: case DSAB3: /*0x43n7*/
+		case DSAB4: case DSAB5: case DSAB6: case DSAB7:
 			state->dma_channel[(offset & 0x70) >> 4].ibank = data;
 			break;
 		case A2A0L: case A2A1L: case A2A2L: case A2A3L: /*0x43n8*/
-		case A2A4L: case A2A5L: case A2A6L: case A2A7L: 
+		case A2A4L: case A2A5L: case A2A6L: case A2A7L:
 			state->dma_channel[(offset & 0x70) >> 4].hdma_addr = (state->dma_channel[(offset & 0x70) >> 4].hdma_addr & 0xff00) | (data << 0);
 			break;
 		case A2A0H: case A2A1H: case A2A2H: case A2A3H: /*0x43n9*/
-		case A2A4H: case A2A5H: case A2A6H: case A2A7H: 
+		case A2A4H: case A2A5H: case A2A6H: case A2A7H:
 			state->dma_channel[(offset & 0x70) >> 4].hdma_addr = (state->dma_channel[(offset & 0x70) >> 4].hdma_addr & 0x00ff) | (data << 8);
 			break;
 		case NTRL0: case NTRL1: case NTRL2: case NTRL3: /*0x43na*/
-		case NTRL4: case NTRL5: case NTRL6: case NTRL7: 
+		case NTRL4: case NTRL5: case NTRL6: case NTRL7:
 			state->dma_channel[(offset & 0x70) >> 4].hdma_line_counter = data;
 			break;
 		case 0x430b: case 0x431b: case 0x432b: case 0x433b:
-		case 0x434b: case 0x435b: case 0x436b: case 0x437b: 
+		case 0x434b: case 0x435b: case 0x436b: case 0x437b:
 			state->dma_channel[(offset & 0x70) >> 4].unk = data;
 			break;
 	}
@@ -968,7 +974,7 @@ READ8_HANDLER( snes_r_bank4 )
 		}
 	}
 	else if (snes_cart.mode & 0x0a)					/* Mode 21 & 25 */
-		value = snes_ram[0x600000 + offset];	
+		value = snes_ram[0x600000 + offset];
 
 	return value;
 }
@@ -1772,7 +1778,7 @@ INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abu
 			memory_write_byte(space, abus, 0x00);
 			return;
 		}
-		else 
+		else
 		{
 			if (!dma_abus_valid(abus))
 				return;
@@ -1790,7 +1796,7 @@ INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abu
 			//read is irrelevent, as it cannot be observed by software
 			return;
 		}
-		else 
+		else
 		{
 			memory_write_byte(space, bbus, snes_abus_read(space, abus));
 			return;
@@ -1834,9 +1840,9 @@ static void snes_hdma_update( const address_space *space, int dma )
 
 	state->dma_channel[dma].hdma_line_counter = snes_abus_read(space, abus);
 
-	if (state->dma_channel[dma].dmap & 0x40) 
+	if (state->dma_channel[dma].dmap & 0x40)
 	{
-		/* One oddity: if $43xA is 0 and this is the last active HDMA channel for this scanline, only load 
+		/* One oddity: if $43xA is 0 and this is the last active HDMA channel for this scanline, only load
 		one byte for Address, and use the $00 for the low byte. So Address ends up incremented one less than
 		otherwise expected */
 
@@ -1885,7 +1891,7 @@ static void snes_hdma( const address_space *space )
 	{
 		if (BIT(state->hdmaen, i))
 		{
-			if (state->dma_channel[i].do_transfer) 
+			if (state->dma_channel[i].do_transfer)
 			{
 				/* Get transfer addresses */
 				if (state->dma_channel[i].dmap & 0x40)	/* Indirect */
@@ -1893,7 +1899,7 @@ static void snes_hdma( const address_space *space )
 				else									/* Absolute */
 					abus = (state->dma_channel[i].bank << 16) + state->dma_channel[i].hdma_addr;
 
-				bbus = state->dma_channel[i].dest_addr + 0x2100;	
+				bbus = state->dma_channel[i].dest_addr + 0x2100;
 
 				switch (state->dma_channel[i].dmap & 0x07)
 				{
