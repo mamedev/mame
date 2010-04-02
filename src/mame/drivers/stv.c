@@ -3892,6 +3892,22 @@ ROM_START( pclub2v3 ) // set to 1p / runs with the USA bios
 	ROM_LOAD( "pclub2v3.nv", 0x0000, 0x0080, CRC(a8a2d30c) SHA1(bdde3d62ff21190a23698058ff66e476a75a09aa) )
 ROM_END
 
+ROM_START( pclubpok ) // set to 1p / runs with the USA bios
+	STV_BIOS
+	ROM_DEFAULT_BIOS( "us" )
+
+	ROM_REGION32_BE( 0x3000000, "user1", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "ic22",    0x0200000, 0x0200000, CRC(48ab8371) SHA1(1c2124afad6bc1f4de2619e6b915f78e91addf05) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic24",    0x0400000, 0x0200000, CRC(9915faea) SHA1(b96f64a8cbb1b9496bb566d0469975fddb4fbe98) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic26",    0x0600000, 0x0200000, CRC(054ad120) SHA1(987e812af099bb0aa5d43a4c10ae8345370a2606) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic28",    0x0800000, 0x0200000, CRC(3a654b2a) SHA1(7398e25836bfbdeab6350759f25c420c3b496172) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic30",    0x0a00000, 0x0200000, CRC(98747bef) SHA1(8d452507a9842a48cd1a7db8fde11a070a6f068b) ) // OK
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "pclubpok.nv", 0x0000, 0x0080, CRC(4ba3f21a) SHA1(898a393fb2fc1961b68b7d4f383d5447e6c010e8) )
+ROM_END
+
 /*
 country codes:
 J = Japan
@@ -3992,6 +4008,7 @@ GAME( 1998, stress,    stvbios, stv, stv,		stv,    	ROT0,   "Sega", 	    				"St
 GAME( 1997, nclubv3,   stvbios, stv, stv,		nameclv3,	ROT0,   "Sega", 	    				"Name Club Ver.3 (J 970723 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1997, pclub2,    stvbios, stv, stv,		stv,    	ROT0,   "Atlus",	    				"Print Club 2 (U 970921 V1.000)", GAME_NOT_WORKING )
 GAME( 1999, pclub2v3,  pclub2,  stv, stv,		stv,    	ROT0,   "Atlus",	    				"Print Club 2 Vol. 3 (U 990310 V1.000)", GAME_NOT_WORKING )
+GAME( 1999, pclubpok,  stvbios, stv, stv,       stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", GAME_NOT_WORKING )
 
 /* Doing something.. but not enough yet */
 GAME( 1995, vfremix,   stvbios, stv, stv,		vfremix,	ROT0,   "Sega", 	    				"Virtua Fighter Remix (JUETBKAL 950428 V1.000)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
