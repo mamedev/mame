@@ -1737,7 +1737,7 @@ static void snes_dynamic_res_change( running_machine *machine )
 INLINE UINT32 snes_get_vram_address( running_machine *machine )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
-	UINT32 addr = (snes_ram[VMADDH] << 8) | snes_ram[VMADDL];
+	UINT32 addr = state->vmadd;
 
 	if (state->vram_fgr_count)
 	{
@@ -2027,9 +2027,7 @@ READ8_HANDLER( snes_ppu_read )
 					state->vram_read_buffer = snes_vram_read(space, addr);
 					state->vram_read_buffer |= (snes_vram_read(space, addr + 1) << 8);
 
-					addr = ((snes_ram[VMADDH] << 8) | snes_ram[VMADDL]) + state->vram_fgr_increment;
-					snes_ram[VMADDL] = addr & 0xff;
-					snes_ram[VMADDH] = (addr >> 8) & 0xff;
+					state->vmadd = (state->vmadd + state->vram_fgr_increment) & 0xffff;
 				}
 
 				return snes_ppu.ppu1_open_bus;
@@ -2044,9 +2042,7 @@ READ8_HANDLER( snes_ppu_read )
 					state->vram_read_buffer = snes_vram_read(space, addr);
 					state->vram_read_buffer |= (snes_vram_read(space, addr + 1) << 8);
 
-					addr = ((snes_ram[VMADDH] << 8) | snes_ram[VMADDL]) + state->vram_fgr_increment;
-					snes_ram[VMADDL] = addr & 0xff;
-					snes_ram[VMADDH] = (addr >> 8) & 0xff;
+					state->vmadd = (state->vmadd + state->vram_fgr_increment) & 0xffff;
 				}
 
 				return snes_ppu.ppu1_open_bus;
@@ -2270,10 +2266,18 @@ WRITE8_HANDLER( snes_ppu_write )
 //          printf("VMAIN: high %x inc %x count %x mask %x shift %x\n", state->vram_fgr_high, state->vram_fgr_increment, state->vram_fgr_count, state->vram_fgr_mask, state->vram_fgr_shift);
 			break;
 		case VMADDL:	/* Address for VRAM read/write (low) */
+			{
+				UINT32 addr;
+				state->vmadd = (state->vmadd & 0xff00) | (data << 0);
+				addr = snes_get_vram_address(space->machine) << 1;
+				state->vram_read_buffer = snes_vram_read(space, addr);
+				state->vram_read_buffer |= (snes_vram_read(space, addr + 1) << 8);
+			}
+			break;
 		case VMADDH:	/* Address for VRAM read/write (high) */
 			{
 				UINT32 addr;
-				snes_ram[offset] = data;
+				state->vmadd = (state->vmadd & 0x00ff) | (data << 8);
 				addr = snes_get_vram_address(space->machine) << 1;
 				state->vram_read_buffer = snes_vram_read(space, addr);
 				state->vram_read_buffer |= (snes_vram_read(space, addr + 1) << 8);
@@ -2285,11 +2289,7 @@ WRITE8_HANDLER( snes_ppu_write )
 				snes_vram_write(space, addr, data);
 
 				if (!state->vram_fgr_high)
-				{
-					addr = ((snes_ram[VMADDH] << 8) | snes_ram[VMADDL]) + state->vram_fgr_increment;
-					snes_ram[VMADDL] = addr & 0xff;
-					snes_ram[VMADDH] = (addr >> 8) & 0xff;
-				}
+					state->vmadd = (state->vmadd + state->vram_fgr_increment) & 0xffff;
 			}
 			return;
 		case VMDATAH:	/* 2119: Data for VRAM write (high) */
@@ -2298,11 +2298,7 @@ WRITE8_HANDLER( snes_ppu_write )
 				snes_vram_write(space, addr + 1, data);
 
 				if (state->vram_fgr_high)
-				{
-					addr = ((snes_ram[VMADDH] << 8) | snes_ram[VMADDL]) + state->vram_fgr_increment;
-					snes_ram[VMADDL] = addr & 0xff;
-					snes_ram[VMADDH] = (addr >> 8) & 0xff;
-				}
+					state->vmadd = (state->vmadd + state->vram_fgr_increment) & 0xffff;
 			}
 			return;
 		case M7SEL:		/* Mode 7 initial settings */
