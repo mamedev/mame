@@ -374,16 +374,16 @@ class Processor
 
 		// CPU-visible registers
 		void		SetStartReg(UINT32 val) { m_start = val; }
-		UINT32		GetStartReg() { return m_start; }
+		UINT32		GetStartReg() const { return m_start; }
 
 		void		SetEndReg(UINT32 val) { m_end = val; }
-		UINT32		GetEndReg() { return m_end; }
+		UINT32		GetEndReg() const { return m_end; }
 
 		void		SetCurrentReg(UINT32 val) { m_current = val; }
-		UINT32		GetCurrentReg() { return m_current; }
+		UINT32		GetCurrentReg() const { return m_current; }
 
 		void		SetStatusReg(UINT32 val) { m_status = val; }
-		UINT32		GetStatusReg() { return m_status; }
+		UINT32		GetStatusReg() const { return m_status; }
 
 		// Functional blocks
 		Blender*		GetBlender() { return &m_blender; }
@@ -464,18 +464,18 @@ class Processor
 		Tile*		GetTiles(){ return m_tiles; }
 
 		// Emulation Accelerators
-		UINT32		LookUp16To32(UINT16 in) { return m_rgb16_to_rgb32_lut[in]; }
-		UINT32		LookUpIA8To32(UINT16 in) { return m_ia8_to_rgb32_lut[in]; }
+		UINT32		LookUp16To32(UINT16 in) const { return m_rgb16_to_rgb32_lut[in]; }
+		UINT32		LookUpIA8To32(UINT16 in) const { return m_ia8_to_rgb32_lut[in]; }
 		UINT16*		GetCCLUT1() { return m_cc_lut1; }
 		UINT8*		GetCCLUT2() { return m_cc_lut2; }
 		UINT8		GetRandom() { return m_misc_state.m_random_seed += 0x13; }
 
 		// YUV Factors
 		void		SetYUVFactors(INT32 k0, INT32 k1, INT32 k2, INT32 k3, INT32 k4, INT32 k5) { m_k0 = k0; m_k1 = k1; m_k2 = k2; m_k3 = k3; m_k4 = k4; m_k5 = k5; }
-		INT32		GetK0() { return m_k0; }
-		INT32		GetK1() { return m_k1; }
-		INT32		GetK2() { return m_k2; }
-		INT32		GetK3() { return m_k3; }
+		INT32		GetK0() const { return m_k0; }
+		INT32		GetK1() const { return m_k1; }
+		INT32		GetK2() const { return m_k2; }
+		INT32		GetK3() const { return m_k3; }
 		INT32*		GetK4() { return &m_k4; }
 		INT32*		GetK5() { return &m_k5; }
 
@@ -489,11 +489,11 @@ class Processor
 		void 			RenderSpans(int start, int end, int tilenum, bool shade, bool texture, bool zbuffer, bool flip);
 		UINT8*			GetHiddenBits() { return m_hidden_bits; }
 		void			GetAlphaCvg(UINT8 *comb_alpha);
-		const UINT8*	GetBayerMatrix() { return s_bayer_matrix; }
-		const UINT8*	GetMagicMatrix() { return s_magic_matrix; }
+		const UINT8*	GetBayerMatrix() const { return s_bayer_matrix; }
+		const UINT8*	GetMagicMatrix() const { return s_magic_matrix; }
 		Span*			GetSpans() { return m_span; }
-		int				GetCurrFIFOIndex() { return m_cmd_cur; }
-		UINT32			GetFillColor32() { return m_fill_color; }
+		int				GetCurrFIFOIndex() const { return m_cmd_cur; }
+		UINT32			GetFillColor32() const { return m_fill_color; }
 
 		void			ZStore(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz);
 		UINT32 			DecompressZ(UINT16 *zb);
