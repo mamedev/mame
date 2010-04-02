@@ -7,14 +7,16 @@ Rasterizing code provided in part by Andrew Zaferakis.
 Notes:
   * The top board is likely identical for all revisions and all "versions" of the hardware.
     It contains the main MIPS CPU and a secondary communications KL5C80.
+
   * The bottom board is what changes between hardware "versions".  It has a Toshiba MCU with
     a protected internal ROM.  This MCU controls (at least) the inputs per game and communicates
     with the main board through dualport RAM.
+
   * I believe that this secondary board is used as a protection device.
     The "board type" code comes from it in dualport RAM, and each game reads its inputs differently through dualport.
     It's capable of changing the input ports dynamically (maybe explaining Roads Edge's "do not touch" quote below).
     It probably has a lot to do with the network (Roads Edge network connectors are on this board).
-    And since it can return any value at any time, it may be responsible for fatfurwa's missing palette.
+
   * The Toshiba CPU datasheet is here : http://www.semicon.toshiba.co.jp/openb2b/websearch/productDetails.jsp?partKey=TMP87CH40N
 
   * From the Roads Edge manual : "The Network Check screen will be displayed for about 40 seconds whether
@@ -28,21 +30,20 @@ Notes:
 
 ToDo:
   * Buriki One / Xrally and Roads Edge doesn't coin it up, irq issue?
-  * sprite garbage in Beast Busters 2nd Nightmare, another irq issue?
+  * Sprite garbage in Beast Busters 2nd Nightmare, another irq issue?
   * Samurai Shodown 64 2 puts "Press 1p & 2p button" msg in gameplay, known to be a MCU simulation issue, i/o port 4 doesn't
     seem to be just an input port but controls program flow too.
-  * work out the purpose of the interrupts and how many are needed
-  * correct game speed (seems too fast)
+  * Work out the purpose of the interrupts and how many are needed.
+  * Correct game speed (seems too fast).
 
   2d:
-  * scroll (base registers?)
-  * roz (4th tilemap in fatal fury should be floor [in progress], background should zoom)
-  * find registers to control tilemap mode (4bpp/8bpp, 8x8, 16x16)
-  * fix zooming sprites (zoom registers not understood, center versus edge pivot)
-  * priorities
-  * still some bad sprites/tiles (waterfall level 'splash' - health bar at 50% - intro top and bottom - fatfurwa test mode)
-  * is all the bitmap decoding right?
-  * upgrade to modern video timing.
+  * Scroll (base registers?)
+  * ROZ (4th tilemap in fatal fury should be floor [in progress], background should zoom)
+  * Find registers to control tilemap mode (4bpp/8bpp, 8x8, 16x16)
+  * Fix zooming sprites (zoom registers not understood, center versus edge pivot)
+  * Priorities
+  * Is all the bitmap decoding right?
+  * Upgrade to modern video timing.
 
   3d:
   * Find where the remainder of the 3d display list information is 'hiding'
@@ -53,11 +54,11 @@ ToDo:
 
   Other:
   * Translate KL5C80 docs and finish up the implementation
-  * figure out what IO $54 & $72 are on the communications CPU
-  * hook up CPU2 (v30 based?) no rom? (maybe its the 'sound driver' the game uploads?)
-  * add sound
-  * backup ram etc.
-  * correct cpu speed and find idle skips
+  * Figure out what IO $54 & $72 are on the communications CPU
+  * Hook up CPU2 (v30 based?) no rom? (maybe its the 'sound driver' the game uploads?)
+  * Add sound
+  * Backup ram etc.
+  * Correct cpu speed
   * What is ROM1?  Data for the KL5C80?  There's plenty of physical space to map it to.
 */
 
@@ -200,7 +201,6 @@ Notes:
 
 
 
-
 Hyper Neo Geo game cartridges
 -----------------------------
 
@@ -284,7 +284,6 @@ LVS-DG1
 
 Bottom
 ------
-
 LVS-DG1
 |----------------------------------------------------------------------------|
 |                         |----------------------|                           |
@@ -424,15 +423,9 @@ LVS-DG2
 
 info from Daemon
 
-(MACHINE CODE ERROR):
-Is given when you try to put a "RACING GAME" on a "FIGHTING" board.
-
 There are various types of neogeo64 boards:
-FIGHTING (revision 1 and 2)
-RACING
-SHOOTING
-and
-SAMURAI SHODOWN ONLY (Korean)
+FIGHTING (revision 1 & 2), RACING, SHOOTING, and SAMURAI SHODOWN ONLY (Korean)
+(MACHINE CODE ERROR): Is given when you try to put a "RACING GAME" on a "FIGHTING" board.
 
 FIGHTING boards will ONLY play fighting games.
 
@@ -480,8 +473,6 @@ VIDEO_START( hng64 );
 VIDEO_UPDATE( hng64 );
 
 static UINT32 activeBuffer;
-
-
 static UINT32 no_machine_error_code;
 static int hng64_interrupt_level_request;
 
@@ -493,11 +484,9 @@ static UINT32 *hng64_dl;
 
 /* Communications stuff */
 static UINT32 *hng64_com_ram;
-
-static UINT8 *hng64_com_virtual_mem;
-static UINT8 *hng64_com_op_base;
-
-static UINT8 *hng64_com_mmu_mem;
+static UINT8  *hng64_com_op_base;
+static UINT8  *hng64_com_mmu_mem;
+static UINT8  *hng64_com_virtual_mem;
 
 
 #ifdef UNUSED_FUNCTION
@@ -505,11 +494,7 @@ WRITE32_HANDLER( trap_write )
 {
     logerror("Remapped write... %08x %08x\n",offset,data);
 }
-#endif
 
-
-
-#if 0
 static READ32_HANDLER( hng64_random_read )
 {
 	return mame_rand(space->machine)&0xffffffff;
@@ -521,7 +506,6 @@ static READ32_HANDLER( hng64_com_r )
 	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, hng64_com_ram[offset]);
 	return hng64_com_ram[offset];
 }
-
 
 static WRITE32_HANDLER( hng64_com_w )
 {
@@ -554,8 +538,6 @@ static READ32_HANDLER( hng64_com_share_r )
 	return 0x00;
 }
 
-
-
 static WRITE32_HANDLER( hng64_pal_w )
 {
 	int r,g,b,a;
@@ -565,13 +547,6 @@ static WRITE32_HANDLER( hng64_pal_w )
 	g = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
 	r = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
 	a = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
-
-	// a sure ain't alpha.
-	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r);
-
-	//if (a != 0)
-	//  popmessage("Alpha is not zero!");
-
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
@@ -580,8 +555,8 @@ static READ32_HANDLER( hng64_sysregs_r )
 	mame_system_time systime;
 	mame_get_base_datetime(space->machine, &systime);
 
-//  if((offset*4) != 0x1084)
-//    printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
+//	if((offset*4) != 0x1084)
+//		printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
 	switch(offset*4)
 	{
@@ -612,9 +587,9 @@ static READ32_HANDLER( hng64_sysregs_r )
 		case 0x217c: return 0; //RTC status?
 	}
 
-//  printf("%08x\n",offset*4);
+//	printf("%08x\n",offset*4);
 
-	//return mame_rand(space->machine)&0xffffffff;
+//	return mame_rand(space->machine)&0xffffffff;
 	return hng64_sysregs[offset];
 }
 
@@ -623,7 +598,7 @@ static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
 
 static void hng64_do_dma(const address_space *space)
 {
-	//printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
+//	printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
 	while (hng_dma_len>=0)
 	{
@@ -647,20 +622,18 @@ static void hng64_do_dma(const address_space *space)
 //  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
 //  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
 //  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
-
 */
 
 static WRITE32_HANDLER( hng64_sysregs_w )
 {
 	COMBINE_DATA (&hng64_sysregs[offset]);
 
-//  if(((offset*4) & 0x1200) == 0x1200)
-//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+//	if(((offset*4) & 0x1200) == 0x1200)
+//		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
 
 	switch(offset*4)
 	{
-		//case 0x100c: Extremely likely to be involved with the ROZ groundplane.
-		//             Probably tells the groundplane which scanline to start drawing at.
+		//case 0x100c: *DOCUMENT*
 
 		case 0x1084: //MIPS->MCU latch port
 			hng_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
@@ -744,7 +717,7 @@ static READ32_HANDLER( shoot_io_r )
 		{
 			static UINT32 p1_trig;
 
-			/* quick kludge for use the input test items */
+			/* Quick kludge for use the input test items */
 			if(input_port_read(space->machine, "D_IN") & 0x01000000)
 				p1_trig = mame_rand(space->machine) & 0x01000000;
 
@@ -841,6 +814,7 @@ static WRITE32_HANDLER( hng64_dualport_w )
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
+
 // Hardware calls these '3d buffers'
 //   They're only read during the startup check of fatfurwa.  Z-buffer memory?  Front buffer, back buffer?
 //   They're definitely mirrored in the startup test.  Elsemi says:
@@ -870,10 +844,7 @@ static WRITE32_HANDLER( hng64_3d_2_w )
 	COMBINE_DATA (&hng64_3d_2[offset]);
 }
 
-
-
-// The 3d 'display list' - is it a fifo?
-// sams64 / sams64_2 access it in a very different way to fatal fury...
+// The 3d 'display list'
 static WRITE32_HANDLER( dl_w )
 {
 	int i;
@@ -908,19 +879,16 @@ static WRITE32_HANDLER( dl_w )
 #if 0
 static READ32_HANDLER( dl_r )
 {
-//  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
-//  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
+	//mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
+	//usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
 	return hng64_dl[offset];
 }
 #endif
 
-
-// A read at 0x20300217 ONLY happens if there are more display lists than what are readily available.
-
 // Some kind of buffering of the display lists, or 'render current buffer' write?
 static WRITE32_HANDLER( dl_control_w )
 {
-	//printf("\n");   // Debug - ajg
+//	printf("\n");   // Debug - ajg
 	// TODO: put this back in.
 	/*
     if (activeBuffer==0 || activeBuffer==1)
@@ -931,7 +899,7 @@ static WRITE32_HANDLER( dl_control_w )
         activeBuffer = 0;
     if (data & 2)
         activeBuffer = 1;
-    */
+	*/
 }
 
 #ifdef UNUSED_FUNCTION
@@ -957,7 +925,7 @@ static WRITE32_HANDLER( tcram_w )
 		max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
 		max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
 
-		if(max_x == 0 || max_y == 0) //bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
+		if(max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
 		{
 			hng64_screen_dis = 1;
 			return;
@@ -975,8 +943,7 @@ static WRITE32_HANDLER( tcram_w )
 
 static READ32_HANDLER( tcram_r )
 {
-//      printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
-
+//	printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
 	if(offset == 0x12)
 		return input_port_read(space->machine, "VBLANK");
 
@@ -992,24 +959,12 @@ static READ32_HANDLER( unk_vreg_r )
 }
 
 
-/*
-<ElSemi> 0xE0000000 sound
-<ElSemi> 0xD0100000 3D bank A
-<ElSemi> 0xD0200000 3D bank B
-<ElSemi> 0xC0000000-0xC000C000 Sprite
-<ElSemi> 0xC0200000-0xC0204000 palette
-<ElSemi> 0xC0100000-0xC0180000 Tilemap
-<ElSemi> 0xBF808000-0xBF808800 Dualport ram
-<ElSemi> 0xBF800000-0xBF808000 S-RAM
-<ElSemi> 0x60000000-0x60001000 Comm dualport ram
-*/
-
 static WRITE32_HANDLER( hng64_soundram_w )
 {
 	UINT32 mem_mask32 = mem_mask;
 	UINT32 data32 = data;
 
-	/* swap data around.. keep the v30 happy;-) */
+	/* swap data around.. keep the v55 happy */
 	data = data32 >> 16;
 	data = FLIPENDIAN_INT16(data);
 	mem_mask = mem_mask32 >> 16;
@@ -1076,6 +1031,17 @@ static WRITE32_HANDLER( hng64_sprite_clear_odd_w )
 	}
 }
 
+/*
+<ElSemi> 0xE0000000 sound
+<ElSemi> 0xD0100000 3D bank A
+<ElSemi> 0xD0200000 3D bank B
+<ElSemi> 0xC0000000-0xC000C000 Sprite
+<ElSemi> 0xC0200000-0xC0204000 palette
+<ElSemi> 0xC0100000-0xC0180000 Tilemap
+<ElSemi> 0xBF808000-0xBF808800 Dualport ram
+<ElSemi> 0xBF800000-0xBF808000 S-RAM
+<ElSemi> 0x60000000-0x60001000 Comm dualport ram
+*/
 static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE(&hng_mainram)
@@ -1134,113 +1100,9 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	/* a0000000-a3ffffff */
 ADDRESS_MAP_END
 
-/*
-roadedge_full:
-index=00000000  pagesize=01000000  vaddr=00000000C0000000  paddr=0000000020000000  asid=00  r=0  c=2  dvg=dvg
-index=00000000  pagesize=01000000  vaddr=00000000C1000000  paddr=0000000021000000  asid=00  r=0  c=2  dvg=dvg
-index=00000001  pagesize=01000000  vaddr=00000000D0000000  paddr=0000000030000000  asid=00  r=0  c=2  dvg=dvg
-index=00000001  pagesize=01000000  vaddr=00000000D1000000  paddr=0000000031000000  asid=00  r=0  c=2  dvg=dvg
-index=00000002  pagesize=01000000  vaddr=00000000D2000000  paddr=0000000032000000  asid=00  r=0  c=2  dvg=dvg
-index=00000002  pagesize=01000000  vaddr=00000000D3000000  paddr=0000000033000000  asid=00  r=0  c=2  dvg=dvg
-index=00000003  pagesize=01000000  vaddr=00000000D4000000  paddr=0000000034000000  asid=00  r=0  c=2  dvg=dvg
-index=00000003  pagesize=01000000  vaddr=00000000D5000000  paddr=0000000035000000  asid=00  r=0  c=2  dvg=dvg
-index=00000004  pagesize=01000000  vaddr=00000000E0000000  paddr=0000000060000000  asid=00  r=0  c=2  dvg=dvg
-index=00000004  pagesize=01000000  vaddr=00000000E1000000  paddr=0000000061000000  asid=00  r=0  c=2  dvg=dvg
-index=00000005  pagesize=01000000  vaddr=00000000E8000000  paddr=0000000068000000  asid=00  r=0  c=2  dvg=dvg
-index=00000005  pagesize=01000000  vaddr=00000000E9000000  paddr=0000000069000000  asid=00  r=0  c=2  dvg=dvg
-index=00000006  pagesize=01000000  vaddr=00000000EE000000  paddr=000000006E000000  asid=00  r=0  c=2  dvg=dvg
-index=00000006  pagesize=01000000  vaddr=00000000EF000000  paddr=000000006F000000  asid=00  r=0  c=2  dvg=dvg
-index=00000007  pagesize=01000000  vaddr=0000000060000000  paddr=00000000C0000000  asid=00  r=0  c=2  dvg=dvg
-index=00000007  pagesize=01000000  vaddr=0000000061000000  paddr=00000000C1000000  asid=00  r=0  c=2  dvg=dvg
-index=00000008  pagesize=01000000  vaddr=0000000000000000  paddr=0000000004000000  asid=00  r=0  c=2  dvg=dvg
-index=00000008  pagesize=01000000  vaddr=0000000001000000  paddr=0000000004000000  asid=00  r=0  c=2  dvg=dvg
-index=00000009  pagesize=01000000  vaddr=0000000010000000  paddr=0000000080000000  asid=00  r=0  c=2  dvg=dvg
-index=00000009  pagesize=01000000  vaddr=0000000011000000  paddr=0000000081000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000A  pagesize=01000000  vaddr=0000000020000000  paddr=0000000088000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000A  pagesize=01000000  vaddr=0000000021000000  paddr=0000000089000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000B  pagesize=01000000  vaddr=0000000030000000  paddr=0000000090000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000B  pagesize=01000000  vaddr=0000000031000000  paddr=0000000091000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000C  pagesize=01000000  vaddr=0000000032000000  paddr=0000000092000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000C  pagesize=01000000  vaddr=0000000033000000  paddr=0000000093000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000D  pagesize=01000000  vaddr=0000000034000000  paddr=0000000094000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000D  pagesize=01000000  vaddr=0000000035000000  paddr=0000000095000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000E  pagesize=01000000  vaddr=0000000036000000  paddr=0000000096000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000E  pagesize=01000000  vaddr=0000000037000000  paddr=0000000097000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000F  pagesize=01000000  vaddr=0000000040000000  paddr=0000000098000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000F  pagesize=01000000  vaddr=0000000041000000  paddr=0000000099000000  asid=00  r=0  c=2  dvg=dvg
-index=00000010  pagesize=01000000  vaddr=0000000042000000  paddr=000000009A000000  asid=00  r=0  c=2  dvg=dvg
-index=00000010  pagesize=01000000  vaddr=0000000043000000  paddr=000000009B000000  asid=00  r=0  c=2  dvg=dvg
-index=00000011  pagesize=01000000  vaddr=0000000050000000  paddr=00000000A0000000  asid=00  r=0  c=2  dvg=dvg
-index=00000011  pagesize=01000000  vaddr=0000000051000000  paddr=00000000A1000000  asid=00  r=0  c=2  dvg=dvg
-index=00000012  pagesize=01000000  vaddr=0000000052000000  paddr=00000000A2000000  asid=00  r=0  c=2  dvg=dvg
-index=00000012  pagesize=01000000  vaddr=0000000053000000  paddr=00000000A3000000  asid=00  r=0  c=2  dvg=dvg
-
-fatfurwa_full:
-index=00000000  pagesize=01000000  vaddr=00000000C0000000  paddr=0000000020000000  asid=00  r=0  c=2  dvg=dvg
-index=00000000  pagesize=01000000  vaddr=00000000C1000000  paddr=0000000021000000  asid=00  r=0  c=2  dvg=dvg
-index=00000001  pagesize=01000000  vaddr=00000000D0000000  paddr=0000000030000000  asid=00  r=0  c=2  dvg=dvg
-index=00000001  pagesize=01000000  vaddr=00000000D1000000  paddr=0000000031000000  asid=00  r=0  c=2  dvg=dvg
-index=00000002  pagesize=01000000  vaddr=00000000D2000000  paddr=0000000032000000  asid=00  r=0  c=2  dvg=dvg
-index=00000002  pagesize=01000000  vaddr=00000000D3000000  paddr=0000000033000000  asid=00  r=0  c=2  dvg=dvg
-index=00000003  pagesize=01000000  vaddr=00000000D4000000  paddr=0000000034000000  asid=00  r=0  c=2  dvg=dvg
-index=00000003  pagesize=01000000  vaddr=00000000D5000000  paddr=0000000035000000  asid=00  r=0  c=2  dvg=dvg
-index=00000004  pagesize=01000000  vaddr=00000000E0000000  paddr=0000000060000000  asid=00  r=0  c=2  dvg=dvg
-index=00000004  pagesize=01000000  vaddr=00000000E1000000  paddr=0000000061000000  asid=00  r=0  c=2  dvg=dvg
-index=00000006  pagesize=01000000  vaddr=00000000E8000000  paddr=0000000068000000  asid=00  r=0  c=2  dvg=dvg
-index=00000006  pagesize=01000000  vaddr=00000000E9000000  paddr=0000000069000000  asid=00  r=0  c=2  dvg=dvg
-index=00000009  pagesize=01000000  vaddr=00000000EE000000  paddr=000000006E000000  asid=00  r=0  c=2  dvg=dvg
-index=00000009  pagesize=01000000  vaddr=00000000EF000000  paddr=000000006F000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000B  pagesize=01000000  vaddr=0000000000000000  paddr=0000000004000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000B  pagesize=01000000  vaddr=0000000001000000  paddr=0000000004000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000C  pagesize=01000000  vaddr=0000000010000000  paddr=0000000080000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000C  pagesize=01000000  vaddr=0000000011000000  paddr=0000000081000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000D  pagesize=01000000  vaddr=0000000020000000  paddr=0000000088000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000D  pagesize=01000000  vaddr=0000000021000000  paddr=0000000089000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000E  pagesize=01000000  vaddr=0000000030000000  paddr=0000000090000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000E  pagesize=01000000  vaddr=0000000031000000  paddr=0000000091000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000F  pagesize=01000000  vaddr=0000000032000000  paddr=0000000092000000  asid=00  r=0  c=2  dvg=dvg
-index=0000000F  pagesize=01000000  vaddr=0000000033000000  paddr=0000000093000000  asid=00  r=0  c=2  dvg=dvg
-index=00000010  pagesize=01000000  vaddr=0000000034000000  paddr=0000000094000000  asid=00  r=0  c=2  dvg=dvg
-index=00000010  pagesize=01000000  vaddr=0000000035000000  paddr=0000000095000000  asid=00  r=0  c=2  dvg=dvg
-index=00000011  pagesize=01000000  vaddr=0000000036000000  paddr=0000000096000000  asid=00  r=0  c=2  dvg=dvg
-index=00000011  pagesize=01000000  vaddr=0000000037000000  paddr=0000000097000000  asid=00  r=0  c=2  dvg=dvg
-index=00000012  pagesize=01000000  vaddr=0000000040000000  paddr=0000000098000000  asid=00  r=0  c=2  dvg=dvg
-index=00000012  pagesize=01000000  vaddr=0000000041000000  paddr=0000000099000000  asid=00  r=0  c=2  dvg=dvg
-index=00000013  pagesize=01000000  vaddr=0000000042000000  paddr=000000009A000000  asid=00  r=0  c=2  dvg=dvg
-index=00000013  pagesize=01000000  vaddr=0000000043000000  paddr=000000009B000000  asid=00  r=0  c=2  dvg=dvg
-index=00000014  pagesize=01000000  vaddr=0000000050000000  paddr=00000000A0000000  asid=00  r=0  c=2  dvg=dvg
-index=00000014  pagesize=01000000  vaddr=0000000051000000  paddr=00000000A1000000  asid=00  r=0  c=2  dvg=dvg
-index=00000015  pagesize=01000000  vaddr=0000000052000000  paddr=00000000A2000000  asid=00  r=0  c=2  dvg=dvg
-index=00000015  pagesize=01000000  vaddr=0000000053000000  paddr=00000000A3000000  asid=00  r=0  c=2  dvg=dvg
-index=00000016  pagesize=01000000  vaddr=0000000060000000  paddr=00000000C0000000  asid=00  r=0  c=2  dvg=dvg
-index=00000016  pagesize=01000000  vaddr=0000000061000000  paddr=00000000C1000000  asid=00  r=0  c=2  dvg=dvg
-
-
-roadedge/fatfurwa/buriki:
-index=00000000  pagesize=01000000  vaddr=00000000C0000000  paddr=0000000020000000  asid=00  r=0  c=2  dvg=dvg
-index=00000000  pagesize=01000000  vaddr=00000000C1000000  paddr=0000000021000000  asid=00  r=0  c=2  dvg=dvg
-index=00000001  pagesize=01000000  vaddr=00000000D0000000  paddr=0000000030000000  asid=00  r=0  c=2  dvg=dvg
-index=00000001  pagesize=01000000  vaddr=00000000D1000000  paddr=0000000031000000  asid=00  r=0  c=2  dvg=dvg
-index=00000004  pagesize=01000000  vaddr=00000000E0000000  paddr=0000000060000000  asid=00  r=0  c=2  dvg=dvg
-index=00000004  pagesize=01000000  vaddr=00000000E1000000  paddr=0000000061000000  asid=00  r=0  c=2  dvg=dvg
-index=00000007  pagesize=01000000  vaddr=0000000060000000  paddr=00000000C0000000  asid=00  r=0  c=2  dvg=dvg
-index=00000007  pagesize=01000000  vaddr=0000000061000000  paddr=00000000C1000000  asid=00  r=0  c=2  dvg=dvg
-
-sams64_2:
-index=00000000  pagesize=01000000  vaddr=00000000C0000000  paddr=0000000020000000  asid=00  r=0  c=2  dvg=dvg
-index=00000000  pagesize=01000000  vaddr=00000000C1000000  paddr=0000000021000000  asid=00  r=0  c=2  dvg=dvg
-index=00000001  pagesize=01000000  vaddr=00000000C2000000  paddr=0000000030000000  asid=00  r=0  c=2  dvg=dvg
-index=00000001  pagesize=01000000  vaddr=00000000C3000000  paddr=0000000031000000  asid=00  r=0  c=2  dvg=dvg
-index=00000002  pagesize=01000000  vaddr=00000000C4000000  paddr=0000000060000000  asid=00  r=0  c=2  dvg=dvg
-index=00000002  pagesize=01000000  vaddr=00000000C5000000  paddr=0000000061000000  asid=00  r=0  c=2  dvg=dvg
-index=00000003  pagesize=01000000  vaddr=00000000C6000000  paddr=000000006E000000  asid=00  r=0  c=2  dvg=dvg
-index=00000003  pagesize=01000000  vaddr=00000000C7000000  paddr=000000006F000000  asid=00  r=0  c=2  dvg=dvg
-index=00000004  pagesize=01000000  vaddr=00000000C8000000  paddr=0000000068000000  asid=00  r=0  c=2  dvg=dvg
-index=00000004  pagesize=01000000  vaddr=00000000C9000000  paddr=0000000069000000  asid=00  r=0  c=2  dvg=dvg
-*/
-
-
-/* COMM CPU */
+/**************/
+/** COMM CPU **/
+/**************/
 #define KL5C_MMU_A(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[((xxx-1)*2)+1] << 2) | ((hng64_com_mmu_mem[(xxx-1)*2] & 0xc0) >> 6) )
 #define KL5C_MMU_B(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[(xxx-1)*2] & 0x3f) )
 
@@ -1336,12 +1198,10 @@ static READ8_HANDLER( hng64_comm_memory_r )
 
 static WRITE8_HANDLER( hng64_comm_memory_w )
 {
+	// Write to both virtual and physical memory
 //  UINT32 physical_address = KL5C80_translate_address(offset);
 //  logerror("WRITING 0x%02x to 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address);
-
-	// Write to both virtual and physical memory
 }
-
 
 /* KL5C80 I/O handlers */
 static WRITE8_HANDLER( hng64_comm_io_mmu )
@@ -1412,8 +1272,6 @@ static ADDRESS_MAP_START( hng_comm_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-
-
 static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe0000, 0xfffff) AM_ROMBANK("bank1")
@@ -1460,7 +1318,6 @@ static INPUT_PORTS_START( hng64 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SERVICE )
-
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -1554,7 +1411,7 @@ static const gfx_layout hng64_8x8x4_tilelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
-	{ 24, 28, 8,12,  16,20,    0,4},
+	{ 24, 28, 8, 12, 16, 20, 0, 4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
@@ -1565,7 +1422,8 @@ static const gfx_layout hng64_8x8x8_tilelayout =
 	RGN_FRAC(1,1),
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-	{ 24, 8, 16, 0, 256+24, 256+8, 256+16, 256+0},
+	{ 24,     8,     16,     0, 
+	  256+24, 256+8, 256+16, 256+0 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	16*32
 };
@@ -1576,11 +1434,10 @@ static const gfx_layout hng64_16x16x4_tilelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
-	{ 24, 28, 8,12,  16,20,    0,4,
-	256+24,256+28,256+8,256+12,256+16,256+20,256+0,256+4
-
-	},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32 },
+	{ 24,     28,     8,     12,     16,     20,     0,     4, 
+	  256+24, 256+28, 256+8, 256+12, 256+16, 256+20, 256+0, 256+4 },
+	{ 0*32,  1*32,  2*32,  3*32,  4*32,  5*32,  6*32,  7*32, 
+	  16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
 	32*32
 };
 
@@ -1591,14 +1448,12 @@ static const gfx_layout hng64_16x16x8_tilelayout =
 	RGN_FRAC(1,1),
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-	{ 24, 8, 16, 0,
-	256+24, 256+8, 256+16, 256+0,
-	1024+24,1024+8,1024+16,1024+0,
-	1280+24,1280+8,1280+16,1280+0,
-	},
+	{ 24,      8,      16,      0,
+	  256+24,  256+8,  256+16,  256+0,
+	  1024+24, 1024+8, 1024+16, 1024+0,
+	  1280+24, 1280+8, 1280+16, 1280+0, },
 	{ 0*32,  1*32,  2*32,  3*32,  4*32,  5*32,  6*32,  7*32,
-	  16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32
-	},
+	  16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
 	64*32
 };
 
@@ -1608,8 +1463,8 @@ static const gfx_layout hng64_16x16x4_spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
-	{  56,60, 24, 28,  48,52,   16, 20,40, 44, 8,12,  32,36,    0,4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+	{ 56, 60, 24, 28, 48, 52, 16, 20, 40, 44, 8, 12, 32, 36, 0, 4 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	16*64
 };
 
@@ -1619,25 +1474,14 @@ static const gfx_layout hng64_16x16x8_spritelayout =
 	RGN_FRAC(1,1),
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-
-	{ 56, 24, 48,16,  40, 8,  32, 0,
-	 1024+56, 1024+24, 1024+48,1024+16,  1024+40, 1024+8,  1024+32, 1024+0 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+	{ 56,      24,      48,      16,      40,      8,      32,      0,
+	  1024+56, 1024+24, 1024+48, 1024+16, 1024+40, 1024+8, 1024+32, 1024+0 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 	32*64
 };
 
-
-static const UINT32 texlayout_xoffset[1024] =
-{
-	STEP1024(0,8),
-
-};
-
-static const UINT32 texlayout_yoffset[512] =
-{
-	STEP512(0,8192),
-};
-
+static const UINT32 texlayout_xoffset[1024] = { STEP1024(0,8) };
+static const UINT32 texlayout_yoffset[512] = { STEP512(0,8192) };
 static const gfx_layout hng64_texlayout =
 {
 	1024, 512,
@@ -1686,9 +1530,7 @@ static void hng64_reorder(running_machine *machine, UINT8* gfxregion, size_t gfx
 	memcpy(gfxregion, buffer, gfxregionsize);
 
 	auto_free (machine, buffer);
-
 }
-
 
 static DRIVER_INIT( hng64_reorder_gfx )
 {
@@ -1696,8 +1538,6 @@ static DRIVER_INIT( hng64_reorder_gfx )
 }
 
 #define HACK_REGION
-
-
 #ifdef HACK_REGION
 static void hng64_patch_bios_region(running_machine* machine, int region)
 {
@@ -1710,8 +1550,6 @@ static void hng64_patch_bios_region(running_machine* machine, int region)
 		rom[0x4003] = region;
 
 	}
-
-
 }
 #endif
 
@@ -1754,7 +1592,6 @@ static DRIVER_INIT( ss64 )
 	hng64_mcu_type = SAMSHO_MCU;
 }
 
-
 static DRIVER_INIT(hng64_race)
 {
 	no_machine_error_code=0x02000000;
@@ -1768,7 +1605,6 @@ static DRIVER_INIT(hng64_shoot)
 	no_machine_error_code=0x03000000;
 	DRIVER_INIT_CALL(hng64);
 }
-
 
 
 /* ?? */
@@ -1833,7 +1669,6 @@ static MACHINE_RESET(hyperneo)
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
-
 	/* Comm CPU */
 	KL5C80_init();
 
@@ -1862,7 +1697,7 @@ static MACHINE_DRIVER_START( hng64 )
 	MDRV_CPU_PROGRAM_MAP(hng_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq_start,4)
 
-	MDRV_CPU_ADD("audiocpu", V30,8000000)				// v53, 16? mhz!
+	MDRV_CPU_ADD("audiocpu", V33, 8000000)				// v53, 16? mhz!
 	MDRV_CPU_PROGRAM_MAP(hng_sound_map)
 
 	MDRV_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
@@ -1889,7 +1724,6 @@ static MACHINE_DRIVER_START( hng64 )
 MACHINE_DRIVER_END
 
 
-
 ROM_START( hng64 )
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
@@ -1904,11 +1738,10 @@ ROM_START( hng64 )
 	ROM_REGION( 0x4000, "sprtile", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF )
 	ROM_REGION16_BE( 0x0c00000, "verts", ROMREGION_ERASEFF )
-	ROM_REGION( 0x1000000, "samples", ROMREGION_ERASEFF ) /* Sound Samples? */
+	ROM_REGION( 0x1000000, "samples", ROMREGION_ERASEFF ) /* Sound Samples */
 ROM_END
 
 
-/* roads edge might need a different bios (driving board bios?) */
 ROM_START( roadedge )
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
@@ -1962,7 +1795,7 @@ ROM_START( roadedge )
 	ROMX_LOAD( "001vt02a.18", 0x0000002, 0x400000, CRC(449f94d0) SHA1(2228690532d82d2661285aeb4260689b027597cb), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "001vt03a.19", 0x0000004, 0x400000, CRC(50ac8639) SHA1(dd2d3689466990a7c479bb8f11bd930ea45e47b5), ROM_GROUPWORD | ROM_SKIP(4) )
 
-	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
+	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples */
 	ROM_LOAD( "001sd01a.77", 0x0000000, 0x400000, CRC(a851da99) SHA1(2ba24feddafc5fadec155cdb7af305fdffcf6690) )
 	ROM_LOAD( "001sd02a.78", 0x0400000, 0x400000, CRC(ca5cec15) SHA1(05e91a602728a048d61bf86aa8d43bb4186aeac1) )
 ROM_END
@@ -2022,7 +1855,7 @@ ROM_START( sams64 )
 	ROMX_LOAD( "002-vt05a.21", 0x0c00002, 0x400000, CRC(d32ee9cb) SHA1(a768dfc15899924eb05eccbf8e85cb29c7b60396), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "002-vt06a.22", 0x0c00004, 0x400000, CRC(13bf3636) SHA1(7c704bf66b571350207bccc7a2d6ed1ec9de4cd5), ROM_GROUPWORD | ROM_SKIP(4) )
 
-	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
+	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples */
 	ROM_LOAD( "002-sd01a.77", 0x0000000, 0x400000, CRC(6215036b) SHA1(ded71dce98b7f7ef78ef32d966a292bbf0d15332) )
 	ROM_LOAD( "002-sd02a.78", 0x0400000, 0x400000, CRC(32b28310) SHA1(5b80750a66c12b035b493d06e3842741a3334d0f) )
 	ROM_LOAD( "002-sd03a.79", 0x0800000, 0x400000, CRC(53591413) SHA1(36c7efa1aced0ca38b3ce7b95af28755973698f3) )
@@ -2070,7 +1903,7 @@ ROM_START( xrally )
 	ROMX_LOAD( "003-vt02a.18", 0x0000002, 0x400000, CRC(da7b956e) SHA1(c57cbb8c51145ae224faba5b6a1a7e61cb2bee64), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "003-vt03a.19", 0x0000004, 0x400000, CRC(4fe72cb7) SHA1(9f8e662f0656f201924834d1ee78498d4223745e), ROM_GROUPWORD | ROM_SKIP(4) )
 
-	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
+	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples */
 	ROM_LOAD( "003-sd01a.77", 0x0000000, 0x400000, CRC(c43898ff) SHA1(0e49b87181b56c62a674d255d326f761942b99b1) )
 	ROM_LOAD( "003-sd02a.78", 0x0400000, 0x400000, CRC(079a3d5a) SHA1(a97b052de69fee7d605cae30f5a228e6ffeabb26) )
 	ROM_LOAD( "003-sd03a.79", 0x0800000, 0x400000, CRC(96c0991a) SHA1(01be872b3e307258236fe96a544417dd8a0bc8bd) )
@@ -2124,7 +1957,7 @@ ROM_START( bbust2 )
 	ROMX_LOAD( "004-vt02a.18", 0x0000002, 0x400000, CRC(279fc216) SHA1(eb90cc347745491c1d1b1fb611fd6e227310731c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "004-vt03a.19", 0x0000004, 0x400000, CRC(e0cf6a42) SHA1(dd09b3d05739cf030c820cd7dbaea2e7262764ab), ROM_GROUPWORD | ROM_SKIP(4) )
 
-	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
+	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples */
 	ROM_LOAD( "004-sd01a.77", 0x0000000, 0x400000, CRC(2ef868bd) SHA1(0a1ef002efe6738698ebe98a1c3695b151fdd282) )
 	ROM_LOAD( "004-sd02a.78", 0x0400000, 0x400000, CRC(07fb3135) SHA1(56cc8e29ba9b13f82a4c9248bff02e2b7a0c49b0) )
 	ROM_LOAD( "004-sd03a.79", 0x0800000, 0x400000, CRC(42571f1d) SHA1(425cbd3f7c8aea1c0f057ea8f186acffb0091dc0) )
@@ -2201,11 +2034,11 @@ ROM_START( sams64_2 )
 	ROMX_LOAD( "005vt05a.21", 0x0c00002, 0x400000, CRC(49c82bec) SHA1(09255279edb9a204bbe1cce8cef58d5c81e86d1f), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "005vt06a.22", 0x0c00004, 0x400000, CRC(7ba05b6c) SHA1(729c1d182d74998dd904b587a2405f55af9825e0), ROM_GROUPWORD | ROM_SKIP(4) )
 
-	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
+	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples */
 	ROM_LOAD( "005sd01a.77", 0x0000000, 0x400000, CRC(8f68150f) SHA1(a1e5efdfd1ed29f81e25c8da669851ddb7b0c826) )
 	ROM_LOAD( "005sd02a.78", 0x0400000, 0x400000, CRC(6b4da6a0) SHA1(8606c413c129635bdaaa37254edbfd19b10426bb) )
 	ROM_LOAD( "005sd03a.79", 0x0800000, 0x400000, CRC(a529fab3) SHA1(8559d402c8f66f638590b8b57ec9efa775010c96) )
-	ROM_LOAD( "005sd04a.80", 0x0800000, 0x400000, CRC(dca95ead) SHA1(39afdfba0e5262b524f25706a96be00e5d14548e) )
+	ROM_LOAD( "005sd04a.80", 0x0c00000, 0x400000, CRC(dca95ead) SHA1(39afdfba0e5262b524f25706a96be00e5d14548e) )
 ROM_END
 
 
@@ -2272,12 +2105,13 @@ ROM_START( fatfurwa )
 	ROMX_LOAD( "006vt02a.18", 0x0000002, 0x400000, CRC(150eb717) SHA1(9acb067346eb386256047c0f1d24dc8fcc2118ca), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt03a.19", 0x0000004, 0x400000, CRC(021cfcaf) SHA1(fb8b5f50d3490b31f0a4c3e6d3ae1b98bae41c97), ROM_GROUPWORD | ROM_SKIP(4) )
 
-	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
+	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples */
 	ROM_LOAD( "006sd01a.77", 0x0000000, 0x400000, CRC(790efb6d) SHA1(23ddd3ee8ae808e58cbcaf92a9ef56d3ca6289b5) )
 	ROM_LOAD( "006sd02a.78", 0x0400000, 0x400000, CRC(f7f020c7) SHA1(b72fde4ff6384b80166a3cb67d31bf7afda750bc) )
 	ROM_LOAD( "006sd03a.79", 0x0800000, 0x400000, CRC(1a678084) SHA1(f52efb6145102d289f332d8341d89a5d231ba003) )
-	ROM_LOAD( "006sd04a.80", 0x0800000, 0x400000, CRC(3c280a5c) SHA1(9d3fc78e18de45382878268db47ff9d9716f1505) )
+	ROM_LOAD( "006sd04a.80", 0x0c00000, 0x400000, CRC(3c280a5c) SHA1(9d3fc78e18de45382878268db47ff9d9716f1505) )
 ROM_END
+
 
 ROM_START( buriki )
 	/* BIOS */
@@ -2344,15 +2178,15 @@ ROM_START( buriki )
 	ROMX_LOAD( "007vt02a.18", 0x0000002, 0x400000, CRC(f365f608) SHA1(035fd9b829b7720c4aee6fdf204c080e6157994f), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt03a.19", 0x0000004, 0x400000, CRC(ba05654d) SHA1(b7fe532732c0af7860c8eded3c5abd304d74e08e), ROM_GROUPWORD | ROM_SKIP(4) )
 
-	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples? */
+	ROM_REGION( 0x1000000, "samples", 0 ) /* Sound Samples */
 	ROM_LOAD( "007sd01a.77", 0x0000000, 0x400000, CRC(1afb48c6) SHA1(b072d4fe72d6c5267864818d300b32e85b426213) )
 	ROM_LOAD( "007sd02a.78", 0x0400000, 0x400000, CRC(c65f1dd5) SHA1(7f504c585a10c1090dbd1ac31a3a0db920c992a0) )
 	ROM_LOAD( "007sd03a.79", 0x0800000, 0x400000, CRC(356f25c8) SHA1(5250865900894232960686f40c5da35b3868b78c) )
-	ROM_LOAD( "007sd04a.80", 0x0800000, 0x400000, CRC(dabfbbad) SHA1(7d58d5181705618e0e2d69c6fdb81b9b3d2b9e0f) )
+	ROM_LOAD( "007sd04a.80", 0x0c00000, 0x400000, CRC(dabfbbad) SHA1(7d58d5181705618e0e2d69c6fdb81b9b3d2b9e0f) )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,      hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,      hng64, hng64,  hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_IS_BIOS_ROOT )
 
 /* Games */
 GAME( 1997, roadedge, hng64,  hng64, hng64,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",		  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
