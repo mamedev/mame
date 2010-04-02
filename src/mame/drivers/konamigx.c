@@ -3705,7 +3705,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "tbyahhoo",  7, 0, 8, BPP5 },
 	{ "tkmmpzdm",  7, 0, 2, BPP6 },
 	{ "dragoonj",  7, 16, 3, BPP4 },
-	{ "dragoona",  7, 0, 3, BPP4 },
+	{ "dragoona",  7, 16, 3, BPP4 },
 	{ "sexyparo",  7, 0, 4, BPP5 },
 	{ "daiskiss",  7, 0, 5, BPP5 },
 	{ "tokkae",    7, 0, 0, BPP5 },
