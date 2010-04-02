@@ -38,7 +38,13 @@ static FILE *rdp_exec;
 // The functions in this file should be moved into the parent Processor class.
 #include "rdpfiltr.c"
 
-void N64::RDP::Processor::GetAlphaCvg(UINT8 *comb_alpha)
+namespace N64
+{
+
+namespace RDP
+{
+
+void Processor::GetAlphaCvg(UINT8 *comb_alpha)
 {
 	if(m_other_modes.cvg_times_alpha)
 	{
@@ -100,7 +106,7 @@ void N64::RDP::Processor::GetAlphaCvg(UINT8 *comb_alpha)
 
 /*****************************************************************************/
 
-void N64::RDP::Processor::VideoUpdate(bitmap_t *bitmap)
+void Processor::VideoUpdate(bitmap_t *bitmap)
 {
 	switch(n64_vi_control & 0x3)
 	{
@@ -118,7 +124,7 @@ void N64::RDP::Processor::VideoUpdate(bitmap_t *bitmap)
 	}
 }
 
-void N64::RDP::Processor::VideoUpdate16(bitmap_t *bitmap)
+void Processor::VideoUpdate16(bitmap_t *bitmap)
 {
     int fsaa = (((n64_vi_control >> 8) & 3) < 2);
     int divot = (n64_vi_control >> 4) & 1;
@@ -162,7 +168,7 @@ void N64::RDP::Processor::VideoUpdate16(bitmap_t *bitmap)
 
 			for(int i = 0; i < hres; i++)
 			{
-				N64::RDP::Color c;
+				Color c;
 				//int r, g, b;
 
 				UINT16 pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
@@ -253,7 +259,7 @@ void N64::RDP::Processor::VideoUpdate16(bitmap_t *bitmap)
 	}
 }
 
-void N64::RDP::Processor::VideoUpdate32(bitmap_t *bitmap)
+void Processor::VideoUpdate32(bitmap_t *bitmap)
 {
     int gamma = (n64_vi_control >> 3) & 1;
     int gamma_dither = (n64_vi_control >> 2) & 1;
@@ -336,7 +342,7 @@ void N64::RDP::Processor::VideoUpdate32(bitmap_t *bitmap)
 
 /*****************************************************************************/
 
-void N64::RDP::Processor::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
+void Processor::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 {
 	int shift;
 
@@ -362,7 +368,7 @@ void N64::RDP::Processor::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32*
 	}
 }
 
-void N64::RDP::Processor::SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+void Processor::SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
@@ -381,7 +387,7 @@ void N64::RDP::Processor::SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT
 	}
 }
 
-void N64::RDP::Processor::SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+void Processor::SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
@@ -400,7 +406,7 @@ void N64::RDP::Processor::SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT
 	}
 }
 
-void N64::RDP::Processor::SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+void Processor::SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0x1f)
 	{
@@ -428,7 +434,7 @@ void N64::RDP::Processor::SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8
 	}
 }
 
-void N64::RDP::Processor::SetAddInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+void Processor::SetAddInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0x7)
 	{
@@ -443,7 +449,7 @@ void N64::RDP::Processor::SetAddInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8
 	}
 }
 
-void N64::RDP::Processor::SetSubInputAlpha(UINT8 **input, int code)
+void Processor::SetSubInputAlpha(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
@@ -458,7 +464,7 @@ void N64::RDP::Processor::SetSubInputAlpha(UINT8 **input, int code)
 	}
 }
 
-void N64::RDP::Processor::SetMulInputAlpha(UINT8 **input, int code)
+void Processor::SetMulInputAlpha(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
@@ -473,7 +479,7 @@ void N64::RDP::Processor::SetMulInputAlpha(UINT8 **input, int code)
 	}
 }
 
-void N64::RDP::Processor::SetBlenderInput(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b)
+void Processor::SetBlenderInput(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b)
 {
 	switch (a & 0x3)
 	{
@@ -541,7 +547,7 @@ void N64::RDP::Processor::SetBlenderInput(int cycle, int which, UINT8 **input_r,
 	}
 }
 
-const UINT8 N64::RDP::Processor::s_bayer_matrix[16] =
+const UINT8 Processor::s_bayer_matrix[16] =
 { /* Bayer matrix */
 	 0,  4,  1, 5,
 	 6,  2,  7, 3,
@@ -549,7 +555,7 @@ const UINT8 N64::RDP::Processor::s_bayer_matrix[16] =
 	 7,  3,  6, 2
 };
 
-const UINT8 N64::RDP::Processor::s_magic_matrix[16] =
+const UINT8 Processor::s_magic_matrix[16] =
 { /* Magic square matrix */
 	 0,  6,  1, 7,
 	 4,  2,  5, 3,
@@ -557,7 +563,7 @@ const UINT8 N64::RDP::Processor::s_magic_matrix[16] =
 	 7,  1,  6, 0
 };
 
-const N64::RDP::Processor::ZDecompressEntry N64::RDP::Processor::m_z_decompress_table[8] =
+const Processor::ZDecompressEntry Processor::m_z_decompress_table[8] =
 {
 	{ 6, 0x00000 },
 	{ 5, 0x20000 },
@@ -571,7 +577,7 @@ const N64::RDP::Processor::ZDecompressEntry N64::RDP::Processor::m_z_decompress_
 
 /*****************************************************************************/
 
-void N64::RDP::Processor::BuildCompressedZTable()
+void Processor::BuildCompressedZTable()
 {
 	for(int j = 0; j < 0x40000; j++)
 	{
@@ -589,7 +595,7 @@ void N64::RDP::Processor::BuildCompressedZTable()
 	}
 }
 
-void N64::RDP::Processor::ZStore(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz)
+void Processor::ZStore(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz)
 {
 	UINT8 deltazmem = 15;
 	z &= 0x3ffff;
@@ -613,20 +619,20 @@ void N64::RDP::Processor::ZStore(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz
 	*zhb = (deltazmem & 3);
 }
 
-UINT32 N64::RDP::Processor::DecompressZ(UINT16 *zb)
+UINT32 Processor::DecompressZ(UINT16 *zb)
 {
 	UINT32 exponent = (*zb >> 13) & 7;
 	UINT32 mantissa = (*zb >> 2) & 0x7ff;
 	return ((mantissa << m_z_decompress_table[exponent].shift) + m_z_decompress_table[exponent].add);
 }
 
-UINT16 N64::RDP::Processor::DecompressDZ(UINT16* zb, UINT8* zhb)
+UINT16 Processor::DecompressDZ(UINT16* zb, UINT8* zhb)
 {
 	UINT32 dz_compressed = (((*zb & 3) << 2)|(*zhb & 3));
 	return (1 << dz_compressed);
 }
 
-INT32 N64::RDP::Processor::NormalizeDZPix(INT32 sum)
+INT32 Processor::NormalizeDZPix(INT32 sum)
 {
 	if (sum & 0xc000)
 	{
@@ -646,7 +652,7 @@ INT32 N64::RDP::Processor::NormalizeDZPix(INT32 sum)
     return 0;
 }
 
-bool N64::RDP::Processor::ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix)
+bool Processor::ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix)
 {
 	int force_coplanar = 0;
 	UINT32 oz = DecompressZ(zb);
@@ -755,7 +761,7 @@ bool N64::RDP::Processor::ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, 
 	}
 }
 
-UINT32 N64::RDP::Processor::GetLog2(UINT32 lod_clamp)
+UINT32 Processor::GetLog2(UINT32 lod_clamp)
 {
 	if (lod_clamp < 2)
 	{
@@ -773,364 +779,6 @@ UINT32 N64::RDP::Processor::GetLog2(UINT32 lod_clamp)
 	}
 
 	return 0;
-}
-
-/*****************************************************************************/
-
-static void fill_rectangle_32bit(running_machine *machine, N64::RDP::Rectangle *rect)
-{
-	_n64_state *state = (_n64_state *)machine->driver_data;
-
-	UINT32 *fb = (UINT32*)&rdram[(state->m_rdp.GetMiscState()->m_fb_address / 4)];
-	int x1 = rect->m_xh;
-	int x2 = rect->m_xl;
-	int y1 = rect->m_yh;
-	int y2 = rect->m_yl;
-	int fill_cvg = 0;
-
-	// clip
-	if (x1 < state->m_rdp.GetScissor()->m_xh)
-	{
-		x1 = state->m_rdp.GetScissor()->m_xh;
-	}
-	if (y1 < state->m_rdp.GetScissor()->m_yh)
-	{
-		y1 = state->m_rdp.GetScissor()->m_yh;
-	}
-	if (x2 >= state->m_rdp.GetScissor()->m_xl)
-	{
-		x2 = state->m_rdp.GetScissor()->m_xl - 1;
-	}
-	if (y2 >= state->m_rdp.GetScissor()->m_yl)
-	{
-		y2 = state->m_rdp.GetScissor()->m_yl - 1;
-	}
-
-	state->m_rdp.GetShadeColor()->c = 0;
-
-	fill_cvg = ((state->m_rdp.GetFillColor32() >> 5) & 7) + 1;
-
-	if (state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_FILL)
-	{
-		for (int j = y1; j <= y2; j++)
-		{
-			int index = j * state->m_rdp.GetMiscState()->m_fb_width;
-
-			for (int i = x1; i <= x2; i++)
-			{
-				fb[(index + i)^1] = state->m_rdp.GetFillColor32();
-			}
-		}
-	}
-	else if (state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_1)
-	{
-		for (int j = y1; j <= y2; j++)
-		{
-			N64::RDP::Color c1;
-			int index = j * state->m_rdp.GetMiscState()->m_fb_width;
-			for (int i = x1; i <= x2; i++)
-			{
-				state->m_rdp.GetMiscState()->m_curpixel_cvg = fill_cvg;
-
-				c1.i.r = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_r[1]);
-				c1.i.g = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_g[1]);
-				c1.i.b = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_b[1]);
-				c1.i.a = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_alphasub_a[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphasub_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphamul[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphaadd[1]);
-				state->m_rdp.GetAlphaCvg(&c1.i.a);
-
-				state->m_rdp.GetBlender()->Blend(&fb[(index + i)], NULL, c1, *state->m_rdp.GetZero(), 0);
-			}
-		}
-	}
-	else if (state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_2)
-	{
-		for (int j = y1; j <= y2; j++)
-		{
-			N64::RDP::Color c1, c2;
-			int index = j * state->m_rdp.GetMiscState()->m_fb_width;
-			for (int i = x1; i <= x2; i++)
-			{
-				state->m_rdp.GetMiscState()->m_curpixel_cvg = fill_cvg;
-
-				c1.i.r = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_r[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_r[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_r[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_r[0]);
-				c1.i.g = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_g[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_g[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_g[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_g[0]);
-				c1.i.b = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_b[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_b[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_b[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_b[0]);
-				c1.i.a = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_alphasub_a[0],
-								  *state->m_rdp.GetColorInputs()->combiner_alphasub_b[0],
-								  *state->m_rdp.GetColorInputs()->combiner_alphamul[0],
-								  *state->m_rdp.GetColorInputs()->combiner_alphaadd[0]);
-				state->m_rdp.GetCombinedColor()->c = c1.c;
-				c2.c = state->m_rdp.GetTexel0Color()->c;
-				state->m_rdp.GetTexel0Color()->c = state->m_rdp.GetTexel1Color()->c;
-				state->m_rdp.GetTexel1Color()->c = c2.c;
-				c2.i.r = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_r[1]);
-				c2.i.g = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_g[1]);
-				c2.i.b = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_b[1]);
-				c2.i.a = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_alphasub_a[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphasub_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphamul[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphaadd[1]);
-				state->m_rdp.GetAlphaCvg(&c2.i.a);
-
-				state->m_rdp.GetBlender()->Blend(&fb[(index + i)], NULL, c1, c2, 0);
-				//BLENDER2_32(&fb[(index + i)], c1, c2);
-			}
-		}
-	}
-	else
-	{
-		fatalerror("fill_rectangle_32bit: cycle type copy");
-	}
-}
-
-INLINE void texture_rectangle_32bit(running_machine *machine, N64::RDP::TexRectangle *rect)
-{	// TODO: Z-compare and Z-update
-	_n64_state *state = (_n64_state *)machine->driver_data;
-
-	UINT32 *fb = (UINT32*)&rdram[(state->m_rdp.GetMiscState()->m_fb_address / 4)];
-
-	UINT32 tilenum = rect->m_tilenum;
-	UINT32 tilenum2 = 0;
-	N64::RDP::Tile *tex_tile = &state->m_rdp.GetTiles()[rect->m_tilenum];
-	N64::RDP::Tile *tex_tile2 = NULL;
-
-	int x1 = rect->m_xh;
-	int x2 = rect->m_xl;
-	int y1 = rect->m_yh;
-	int y2 = rect->m_yl;
-
-	if (state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_FILL || state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_COPY)
-	{
-		rect->m_dsdx /= 4;
-		x2 += 1;
-		y2 += 1;
-	}
-
-	// clip
-	if (x1 < state->m_rdp.GetScissor()->m_xh)
-	{
-		x1 = state->m_rdp.GetScissor()->m_xh;
-	}
-	if (y1 < state->m_rdp.GetScissor()->m_yh)
-	{
-		y1 = state->m_rdp.GetScissor()->m_yh;
-	}
-	if (x2 >= state->m_rdp.GetScissor()->m_xl)
-	{
-		x2 = state->m_rdp.GetScissor()->m_xl - 1;
-	}
-	if (y2 >= state->m_rdp.GetScissor()->m_yl)
-	{
-		y2 = state->m_rdp.GetScissor()->m_yl - 1;
-	}
-
-	state->m_rdp.GetTexPipe()->CalculateClampDiffs(tex_tile->num);
-
-	if (state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_2)
-	{
-		if (!state->m_rdp.GetOtherModes()->tex_lod_en)
-		{
-			tilenum2 = (tilenum + 1) & 7;
-			tex_tile2 = &state->m_rdp.GetTiles()[tilenum2];
-		}
-		else
-		{
-			tilenum2 = (tilenum + 1) & 7;
-			tex_tile2 = &state->m_rdp.GetTiles()[tilenum2];
-		}
-	}
-
-	state->m_rdp.GetShadeColor()->c = 0;	// Needed by Pilotwings 64
-
-	int t = (int)(rect->m_t) << 5;
-
-	if (state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_1)
-	{
-		for (int j = y1; j < y2; j++)
-		{
-			int fb_index = j * state->m_rdp.GetMiscState()->m_fb_width;
-
-			int s = (int)(rect->m_s) << 5;
-
-			for (int i = x1; i < x2; i++)
-			{
-				N64::RDP::Color c1;
-				int ss = s >> 5;
-				int st = t >> 5;
-
-				state->m_rdp.GetMiscState()->m_curpixel_cvg = 8;
-
-				if (rect->m_flip)
-				{
-					state->m_rdp.GetTexel0Color()->c = state->m_rdp.GetTexPipe()->Fetch(st, ss, tex_tile);
-				}
-				else
-				{
-					state->m_rdp.GetTexel0Color()->c = state->m_rdp.GetTexPipe()->Fetch(ss, st, tex_tile);
-				}
-
-				c1.i.r = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_r[1]);
-				c1.i.g = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_g[1]);
-				c1.i.b = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_b[1]);
-				c1.i.a = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_alphasub_a[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphasub_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphamul[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphaadd[1]);
-				state->m_rdp.GetAlphaCvg(&c1.i.a);
-
-				state->m_rdp.GetBlender()->Blend(&fb[(fb_index + i)], NULL, c1, *state->m_rdp.GetZero(), 0);
-
-				s += rect->m_dsdx;
-			}
-
-			t += rect->m_dtdy;
-		}
-	}
-	else if (state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_2)
-	{
-		for (int j = y1; j < y2; j++)
-		{
-			int fb_index = j * state->m_rdp.GetMiscState()->m_fb_width;
-
-			int s = (int)(rect->m_s) << 5;
-
-			for (int i = x1; i < x2; i++)
-			{
-				N64::RDP::Color c1, c2;
-				int ss = s >> 5;
-				int st = t >> 5;
-
-				state->m_rdp.GetMiscState()->m_curpixel_cvg = 8;
-
-				if (rect->m_flip)
-				{
-					state->m_rdp.GetTexel0Color()->c = state->m_rdp.GetTexPipe()->Fetch(st, ss, tex_tile);
-					state->m_rdp.GetTexel1Color()->c = state->m_rdp.GetTexPipe()->Fetch(st, ss, tex_tile2);
-				}
-				else
-				{
-					state->m_rdp.GetTexel0Color()->c = state->m_rdp.GetTexPipe()->Fetch(ss, st, tex_tile);
-					state->m_rdp.GetTexel1Color()->c = state->m_rdp.GetTexPipe()->Fetch(ss, st, tex_tile2);
-				}
-
-				c1.i.r = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_r[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_r[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_r[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_r[0]);
-				c1.i.g = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_g[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_g[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_g[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_g[0]);
-				c1.i.b = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_b[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_b[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_b[0],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_b[0]);
-				c1.i.a = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_alphasub_a[0],
-								  *state->m_rdp.GetColorInputs()->combiner_alphasub_b[0],
-								  *state->m_rdp.GetColorInputs()->combiner_alphamul[0],
-								  *state->m_rdp.GetColorInputs()->combiner_alphaadd[0]);
-				state->m_rdp.GetCombinedColor()->c = c1.c;
-				c2.c = state->m_rdp.GetTexel0Color()->c;
-				state->m_rdp.GetTexel0Color()->c = state->m_rdp.GetTexel1Color()->c;
-				state->m_rdp.GetTexel1Color()->c = c2.c;
-				c2.i.r = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_r[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_r[1]);
-				c2.i.g = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_g[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_g[1]);
-				c2.i.b = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_rgbsub_a_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbsub_b_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbmul_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_rgbadd_b[1]);
-				c2.i.a = LookUpCC(*state->m_rdp.GetColorInputs()->combiner_alphasub_a[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphasub_b[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphamul[1],
-								  *state->m_rdp.GetColorInputs()->combiner_alphaadd[1]);
-				state->m_rdp.GetAlphaCvg(&c2.i.a);
-
-				state->m_rdp.GetBlender()->Blend(&fb[(fb_index + i)], NULL, c1, c2, 0);
-
-				s += rect->m_dsdx;
-			}
-
-			t += rect->m_dtdy;
-		}
-	}
-	else if (state->m_rdp.GetOtherModes()->cycle_type == CYCLE_TYPE_COPY)
-	{
-		for (int j = y1; j < y2; j++)
-		{
-			int fb_index = j * state->m_rdp.GetMiscState()->m_fb_width;
-
-			int s = (int)(rect->m_s) << 5;
-
-			for (int i = x1; i < x2; i++)
-			{
-				int ss = s >> 5;
-				int st = t >> 5;
-				if (rect->m_flip)
-				{
-					state->m_rdp.GetTexel0Color()->c = state->m_rdp.GetTexPipe()->Fetch(st, ss, tex_tile);
-				}
-				else
-				{
-					state->m_rdp.GetTexel0Color()->c = state->m_rdp.GetTexPipe()->Fetch(ss, st, tex_tile);
-				}
-
-				fb[fb_index + i] = (state->m_rdp.GetTexel0Color()->i.r << 24) | (state->m_rdp.GetTexel0Color()->i.g << 16) | (state->m_rdp.GetTexel0Color()->i.b << 8)|1;
-
-				s += rect->m_dsdx;
-			}
-
-			t += rect->m_dtdy;
-		}
-	}
-	else
-	{
-		fatalerror("texture_rectangle_32bit: unknown cycle type %d\n", state->m_rdp.GetOtherModes()->cycle_type);
-	}
 }
 
 /*****************************************************************************/
@@ -2133,27 +1781,13 @@ void N64::RDP::TexRectangle::InitFromBuffer(UINT32 *data)
 void N64::RDP::Processor::CmdTexRect(UINT32 w1, UINT32 w2)
 {
 	N64::RDP::TexRectangle rect(m_machine, m_cmd_data + m_cmd_cur, 0);
-
-	switch (m_misc_state.m_fb_size)
-	{
-		case PIXEL_SIZE_16BIT:
-			rect.Draw();
-			break;
-		case PIXEL_SIZE_32BIT:
-			texture_rectangle_32bit(m_machine, &rect);
-			break;
-	}
+	rect.Draw();
 }
 
 void N64::RDP::Processor::CmdTexRectFlip(UINT32 w1, UINT32 w2)
 {
 	N64::RDP::TexRectangle rect(m_machine, m_cmd_data + m_cmd_cur, 1);
-
-	switch (m_misc_state.m_fb_size)
-	{
-		case PIXEL_SIZE_16BIT:		rect.Draw(); break;
-		case PIXEL_SIZE_32BIT:		texture_rectangle_32bit(m_machine, &rect); break;
-	}
+	rect.Draw();
 }
 
 void N64::RDP::Processor::CmdSyncLoad(UINT32 w1, UINT32 w2)
@@ -2559,15 +2193,7 @@ void N64::RDP::Processor::CmdFillRect(UINT32 w1, UINT32 w2)
 {
 	N64::RDP::Rectangle rect(m_machine, m_cmd_data + m_cmd_cur);
 
-	switch (m_misc_state.m_fb_size)
-	{
-		case PIXEL_SIZE_16BIT:
-			rect.Draw();
-			break;
-		case PIXEL_SIZE_32BIT:
-			fill_rectangle_32bit(m_machine, &rect);
-			break;
-	}
+	rect.Draw();
 }
 
 void N64::RDP::Processor::CmdSetFogColor(UINT32 w1, UINT32 w2)
@@ -2869,6 +2495,10 @@ void N64::RDP::Processor::ProcessList()
 
 	m_start = m_current = m_end;
 }
+
+} // namespace RDP
+
+} // namespace N64
 
 /*****************************************************************************/
 
