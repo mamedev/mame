@@ -1160,6 +1160,7 @@ Notes:
 */
 
 #include "emu.h"
+#include <float.h>
 #include "video/poly.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/h83002/h8.h"
@@ -1619,23 +1620,39 @@ static READ32_HANDLER( s23_unk_status_r )
 
 // 3D hardware, to throw at least in part in video/namcos23.c
 
-struct namcos23_render_entry {
-	UINT16 model;
-	INT16 m[9];
-	INT32 v[3];
-	float scaling;
-};
+enum { MODEL, FLUSH };
 
-enum { RENDER_MAX_ENTRIES = 10000 };
-static namcos23_render_entry render_entries[2][RENDER_MAX_ENTRIES];
-static int render_count[2], render_cur;
-static poly_manager *polymgr;
-static float wbuffer[480][640];
+struct namcos23_render_entry {
+	int type;
+
+	union {
+		struct {
+			UINT16 model;
+			INT16 m[9];
+			INT32 v[3];
+			float scaling;
+		} model;
+	};
+};
 
 struct namcos23_render_data {
 	const pen_t *pens;
 	UINT32 (*texture_lookup)(const pen_t *pens, float x, float y);
 };
+
+struct namcos23_poly_entry {
+	namcos23_render_data rd;
+	float zkey;
+	int vertex_count;
+	poly_vertex pv[16];
+};
+
+enum { RENDER_MAX_ENTRIES = 1000, POLY_MAX_ENTRIES = 10000 };
+static namcos23_render_entry render_entries[2][RENDER_MAX_ENTRIES];
+static namcos23_poly_entry render_polys[POLY_MAX_ENTRIES];
+static int render_poly_order[POLY_MAX_ENTRIES];
+static int render_count[2], render_cur, render_poly_count;
+static poly_manager *polymgr;
 
 static inline INT32 u32_to_s24(UINT32 v)
 {
@@ -1689,21 +1706,17 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 	float dl = extent->param[3].dpdx;
 	bitmap_t *bitmap = (bitmap_t *)dest;
 	UINT32 *img = BITMAP_ADDR32(bitmap, scanline, extent->startx);
-	float *wbuf = &wbuffer[scanline][extent->startx];
 
 	for(int x = extent->startx; x < extent->stopx; x++) {
-		if(w > *wbuf) {
-			*wbuf = w;
-			float z = w ? 1/w : 0;
-			UINT32 pcol = rd->texture_lookup(rd->pens, u*z, v*z);
-			float ll = l*z;
-			*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
-		}
+		float z = w ? 1/w : 0;
+		UINT32 pcol = rd->texture_lookup(rd->pens, u*z, v*z);
+		float ll = l*z;
+		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
+
 		w += dw;
 		u += du;
 		v += dv;
 		l += dl;
-		wbuf++;
 		img++;
 	}
 }
@@ -1847,18 +1860,32 @@ static void p3d_render(const UINT16 *p, int size, bool use_scaling)
 	const INT32 *v = p3d_getv(p[2]);
 
 	namcos23_render_entry *re = render_entries[render_cur] + render_count[render_cur];
-	re->model = p[0];
-	re->scaling = use_scaling ? scaling / 16384.0 : 1.0;
-	memcpy(re->m, m, sizeof(re->m));
-	memcpy(re->v, v, sizeof(re->v));
+	re->type = MODEL;
+	re->model.model = p[0];
+	re->model.scaling = use_scaling ? scaling / 16384.0 : 1.0;
+	memcpy(re->model.m, m, sizeof(re->model.m));
+	memcpy(re->model.v, v, sizeof(re->model.v));
 	if(0)
 		fprintf(stderr, "Render %04x (%f %f %f %f %f %f %f %f %f) (%f %f %f)\n",
-				re->model,
-				re->m[0]/16384.0, re->m[1]/16384.0, re->m[2]/16384.0,
-				re->m[3]/16384.0, re->m[4]/16384.0, re->m[5]/16384.0,
-				re->m[6]/16384.0, re->m[7]/16384.0, re->m[8]/16384.0,
-				re->v[0]/16384.0, re->v[1]/16384.0, re->v[2]/16384.0);
+				re->model.model,
+				re->model.m[0]/16384.0, re->model.m[1]/16384.0, re->model.m[2]/16384.0,
+				re->model.m[3]/16384.0, re->model.m[4]/16384.0, re->model.m[5]/16384.0,
+				re->model.m[6]/16384.0, re->model.m[7]/16384.0, re->model.m[8]/16384.0,
+				re->model.v[0]/16384.0, re->model.v[1]/16384.0, re->model.v[2]/16384.0);
 
+	render_count[render_cur]++;
+}
+
+
+static void p3d_flush(const UINT16 *p, int size)
+{
+	if(size != 0) {
+		logerror("WARNING: p3d_flush with size %d\n", size);
+		return;
+	}
+
+	namcos23_render_entry *re = render_entries[render_cur] + render_count[render_cur];
+	re->type = FLUSH;
 	render_count[render_cur]++;
 }
 
@@ -1901,6 +1928,7 @@ static void p3d_dma(const address_space *space, UINT32 adr, UINT32 size)
 		case 0x4400: p3d_scaling_set(buffer, psize); break;
 		case 0x8000: p3d_render(buffer, psize, false); break;
 		case 0x8080: p3d_render(buffer, psize, true); break;
+		case 0xc000: p3d_flush(buffer, psize); break;
 		default: {
 			if(0) {
 				logerror("p3d - [%04x] %04x", h1, h);
@@ -1943,16 +1971,16 @@ static WRITE32_HANDLER( p3d_w)
 
 static void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
 {
-	pv.x =    (INT32((re->m[0]*INT64(xi) + re->m[3]*INT64(yi) + re->m[6]*INT64(zi)) >> 14)*re->scaling + re->v[0])/16384.0;
-	pv.y =    (INT32((re->m[1]*INT64(xi) + re->m[4]*INT64(yi) + re->m[7]*INT64(zi)) >> 14)*re->scaling + re->v[1])/16384.0;
-	pv.p[0] = (INT32((re->m[2]*INT64(xi) + re->m[5]*INT64(yi) + re->m[8]*INT64(zi)) >> 14)*re->scaling + re->v[2])/16384.0;
+	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[3]*INT64(yi) + re->model.m[6]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0;
+	pv.y =    (INT32((re->model.m[1]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[7]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0;
+	pv.p[0] = (INT32((re->model.m[2]*INT64(xi) + re->model.m[5]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0;
 }
 
 static void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
 {
-	x = (re->m[0]*xi + re->m[3]*yi + re->m[6]*zi) >> 14;
-	y = (re->m[1]*xi + re->m[4]*yi + re->m[7]*zi) >> 14;
-	z = (re->m[2]*xi + re->m[5]*yi + re->m[8]*zi) >> 14;
+	x = (re->model.m[0]*xi + re->model.m[3]*yi + re->model.m[6]*zi) >> 14;
+	y = (re->model.m[1]*xi + re->model.m[4]*yi + re->model.m[7]*zi) >> 14;
+	z = (re->model.m[2]*xi + re->model.m[5]*yi + re->model.m[8]*zi) >> 14;
 }
 
 static void render_project(poly_vertex &pv)
@@ -1968,18 +1996,16 @@ static void render_project(poly_vertex &pv)
 	pv.p[0] = w;
 }
 
-static void render_one_model(running_machine *machine, const namcos23_render_entry *re, bitmap_t *bitmap)
+static void render_one_model(running_machine *machine, const namcos23_render_entry *re)
 {
-	rectangle scissor = { 0, 639, 0, 479 };
-
-	UINT32 adr = ptrom[re->model];
+	UINT32 adr = ptrom[re->model.model];
 	if(adr >= ptrom_limit) {
-		logerror("WARNING: model %04x base address %08x out-of-bounds - pointram?\n", re->model, adr);
+		logerror("WARNING: model %04x base address %08x out-of-bounds - pointram?\n", re->model.model, adr);
 		return;
 	}
 
 	while(adr < ptrom_limit) {
-		poly_vertex pv[15], pvc[8];
+		poly_vertex pv[15];
 
 		UINT32 type = ptrom[adr++];
 		UINT32 h    = ptrom[adr++];
@@ -2003,6 +2029,9 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 		} else
 			light = ptrom[adr++];
 
+		float minz = FLT_MAX;
+		float maxz = FLT_MIN;
+
 		for(int i=0; i<ne; i++) {
 			UINT32 v1 = ptrom[adr++];
 			UINT32 v2 = ptrom[adr++];
@@ -2011,6 +2040,11 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
 			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
 			pv[i].p[2] = (((v1 >> 16) & 0xf00) | ((v3 >> 24 & 0xff))) + 0.5 + tbase;
+
+			if(pv[i].p[0] > maxz)
+				maxz = pv[i].p[0];
+			if(pv[i].p[0] < minz)
+				minz = pv[i].p[0];
 
 			switch(lmode) {
 			case 0: case 1:
@@ -2038,21 +2072,22 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 			}
 		}
 
-		int cv = poly_zclip_if_less(ne, pv, pvc, 4, 0.0001);
-		
-		if(cv >= 3) {
-			for(int i=0; i<cv; i++) {
-				render_project(pvc[i]);
-				float w = pvc[i].p[0];
-				pvc[i].p[1] *= w;
-				pvc[i].p[2] *= w;
-				pvc[i].p[3] *= w;
-			}
-			namcos23_render_data *rd = (namcos23_render_data *)poly_get_extra_data(polymgr);
-			rd->texture_lookup = texture_lookup_nocache_point;
-			rd->pens = machine->pens + (color << 8);
+		namcos23_poly_entry *p = render_polys + render_poly_count;
 
-			poly_render_triangle_fan(polymgr, bitmap, &scissor, render_scanline, 4, cv, pvc);
+		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.0001);
+		
+		if(p->vertex_count >= 3) {
+			for(int i=0; i<p->vertex_count; i++) {
+				render_project(p->pv[i]);
+				float w = p->pv[i].p[0];
+				p->pv[i].p[1] *= w;
+				p->pv[i].p[2] *= w;
+				p->pv[i].p[3] *= w;
+			}
+			p->zkey = 0.5*(minz+maxz);
+			p->rd.texture_lookup = texture_lookup_nocache_point;
+			p->rd.pens = machine->pens + (color << 8);
+			render_poly_count++;
 		}
 
 		if(type & 0x000010000)
@@ -2060,13 +2095,50 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 	}
 }
 
+static int render_poly_compare(const void *i1, const void *i2)
+{
+	const namcos23_poly_entry *p1 = render_polys + *(const int *)i1;
+	const namcos23_poly_entry *p2 = render_polys + *(const int *)i2;
+	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
+}
+
+static void render_flush(running_machine *machine, bitmap_t *bitmap)
+{
+	if(!render_poly_count)
+		return;
+
+	for(int i=0; i<render_poly_count; i++)
+		render_poly_order[i] = i;
+
+	qsort(render_poly_order, render_poly_count, sizeof(int), render_poly_compare);
+
+	const static rectangle scissor = { 0, 639, 0, 479 };
+
+	for(int i=0; i<render_poly_count; i++) {
+		const namcos23_poly_entry *p = render_polys + render_poly_order[i];
+		namcos23_render_data *rd = (namcos23_render_data *)poly_get_extra_data(polymgr);
+		*rd = p->rd;
+		poly_render_triangle_fan(polymgr, bitmap, &scissor, render_scanline, 4, p->vertex_count, p->pv);
+	}
+	render_poly_count = 0;
+}
+
 static void render_run(running_machine *machine, bitmap_t *bitmap)
 {
-	memset(wbuffer, 0, sizeof(wbuffer));
-
+	render_poly_count = 0;
 	const namcos23_render_entry *re = render_entries[!render_cur];
-	for(int i=0; i<render_count[!render_cur]; i++)
-		render_one_model(machine, re++, bitmap);
+	for(int i=0; i<render_count[!render_cur]; i++) {
+		switch(re->type) {
+		case MODEL:
+			render_one_model(machine, re);
+			break;
+		case FLUSH:
+			render_flush(machine, bitmap);
+			break;
+		}
+		re++;
+	}
+	render_flush(machine, bitmap);
 
 	poly_wait(polymgr, "render_run");
 }
