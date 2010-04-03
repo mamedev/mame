@@ -177,7 +177,7 @@ bool RDP::Blender::Blend16Bit2Cycle(UINT16* fb, UINT8* hb, RDP::Color c1, RDP::C
 	}
 	else
 	{
-		BlendEquation1Force(&r, &g, &b, special_bsel);
+		BlendEquation0NoForce(&r, &g, &b, special_bsel);
 	}
 
 	m_rdp->GetBlendedColor()->i.r = r;

@@ -745,12 +745,16 @@ bool Processor::ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz,
 	{
 		case 0: // Opaque
 			return (max || (overflow ? infront : nearer));
+			break;
 		case 1: // Interpenetrating
 			return (max || (overflow ? infront : nearer));
+			break;
 		case 2: // Transparent
 			return (infront || max);
+			break;
 		case 3: // Decal
 			return (farther && nearer && !max);
+			break;
 		default:
 			fatalerror( "z_mode = %d", m_other_modes.z_mode);
 			break;
@@ -1206,36 +1210,17 @@ void N64::RDP::Triangle::Draw()
 	INT32 maxxhx = 0;
 	INT32 minxhx = 0;
 
-	int shade_base = 0;
-	int texture_base = 0;
-	int zbuffer_base = 0;
-	if(m_shade)
+	int shade_base = m_rdp->GetCurrFIFOIndex() + 8;
+	int texture_base = m_rdp->GetCurrFIFOIndex() + 8;
+	int zbuffer_base = m_rdp->GetCurrFIFOIndex() + 8;
+	if(m_texture)
 	{
-		shade_base = 8;
-		if(m_texture)
-		{
-			texture_base = 24;
-			if(m_zbuffer)
-			{
-				zbuffer_base = 40;
-			}
-		}
-		else if(m_zbuffer)
-		{
-			zbuffer_base = 24;
-		}
+		texture_base += 16;
+		zbuffer_base += 16;
 	}
-	else if(m_texture)
+	if(m_zbuffer)
 	{
-		texture_base = 8;
-		if(m_zbuffer)
-		{
-			zbuffer_base = 24;
-		}
-	}
-	else if(m_zbuffer)
-	{
-		zbuffer_base = 8;
+		zbuffer_base += 16;
 	}
 
 	UINT32 w3 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+2];
@@ -1353,14 +1338,7 @@ void N64::RDP::Triangle::Draw()
 		dbdiff = (dbdeh*3 - dbdyh*3) << 7;
 		dadiff = (dadeh*3 - dadyh*3) << 7;
 		dzdiff = (dzdeh*3 - dzdyh*3) << 7;
-	}
-	else
-	{
-		dsdiff = dtdiff = dwdiff = drdiff = dgdiff = dbdiff = dadiff = dzdiff = 0;
-	}
 
-	if (do_offset)
-	{
 		dseoff = (dsdeh*3) << 7;
 		dteoff = (dtdeh*3) << 7;
 		dweoff = (dwdeh*3) << 7;
@@ -1372,6 +1350,7 @@ void N64::RDP::Triangle::Draw()
 	}
 	else
 	{
+		dsdiff = dtdiff = dwdiff = drdiff = dgdiff = dbdiff = dadiff = dzdiff = 0;
 		dseoff = dteoff = dweoff = dreoff = dgeoff = dbeoff = daeoff = dzeoff = 0;
 	}
 
@@ -1442,7 +1421,6 @@ void N64::RDP::Triangle::Draw()
 			{
 				m_rdp->GetSpans()[j].m_lx = maxxmx;
 				m_rdp->GetSpans()[j].m_rx = minxhx;
-				m_rdp->GetSpans()[j].m_dymax = (dsdylod > dtdylod)? dsdylod : dtdylod;
 				if(m_shade)
 				{
 					m_rdp->GetSpans()[j].m_dr.w = drdx & ~0x1f;
@@ -1450,17 +1428,38 @@ void N64::RDP::Triangle::Draw()
 					m_rdp->GetSpans()[j].m_db.w = dbdx & ~0x1f;
 					m_rdp->GetSpans()[j].m_da.w = dadx & ~0x1f;
 				}
+				else
+				{
+					m_rdp->GetSpans()[j].m_dr.w = 0;
+					m_rdp->GetSpans()[j].m_dg.w = 0;
+					m_rdp->GetSpans()[j].m_db.w = 0;
+					m_rdp->GetSpans()[j].m_da.w = 0;
+				}
 				if(m_texture)
 				{
 					m_rdp->GetSpans()[j].m_ds.w = dsdx;
 					m_rdp->GetSpans()[j].m_dt.w = dtdx;
 					m_rdp->GetSpans()[j].m_dw.w = dwdx;
 				}
+				else
+				{
+					m_rdp->GetSpans()[j].m_ds.w = 0;
+					m_rdp->GetSpans()[j].m_dt.w = 0;
+					m_rdp->GetSpans()[j].m_dw.w = 0;
+				}
 				if(m_zbuffer)
 				{
+					m_rdp->GetSpans()[j].m_dymax = (dsdylod > dtdylod)? dsdylod : dtdylod;
 					m_rdp->GetSpans()[j].m_dz.w = dzdx;
 					m_rdp->GetSpans()[j].m_dzpix = ((dzdy_dz & 0x8000) ? ((~dzdy_dz) & 0x7fff) : dzdy_dz) + ((dzdx_dz & 0x8000) ? ((~dzdx_dz) & 0x7fff) : dzdx_dz);
 					m_rdp->GetSpans()[j].m_dzpix = m_rdp->NormalizeDZPix(m_rdp->GetSpans()[j].m_dzpix);
+				}
+				else
+				{
+					m_rdp->GetSpans()[j].m_dymax = 0;
+					m_rdp->GetSpans()[j].m_dz.w = 0;
+					m_rdp->GetSpans()[j].m_dzpix = 0;
+					m_rdp->GetSpans()[j].m_dzpix = 0;
 				}
 			}
 
@@ -1476,15 +1475,27 @@ void N64::RDP::Triangle::Draw()
 					m_rdp->GetSpans()[j].m_b.w = b + dbdiff - (xfrac * dbdxh);
 					m_rdp->GetSpans()[j].m_a.w = a + dadiff - (xfrac * dadxh);
 				}
+				else
+				{
+					m_rdp->GetSpans()[j].m_r.w = m_rdp->GetSpans()[j].m_g.w = m_rdp->GetSpans()[j].m_b.w = m_rdp->GetSpans()[j].m_a.w = 0;
+				}
 				if(m_texture)
 				{
 					m_rdp->GetSpans()[j].m_s.w = (s + dsdiff - (xfrac * dsdxh)) & ~0x1f;
 					m_rdp->GetSpans()[j].m_t.w = (t + dtdiff - (xfrac * dtdxh)) & ~0x1f;
 					m_rdp->GetSpans()[j].m_w.w = (w + dwdiff - (xfrac * dwdxh)) & ~0x1f;
 				}
+				else
+				{
+					m_rdp->GetSpans()[j].m_s.w = m_rdp->GetSpans()[j].m_t.w = m_rdp->GetSpans()[j].m_w.w = 0;
+				}
 				if(m_zbuffer)
 				{
 					m_rdp->GetSpans()[j].m_z.w = z + dzdiff - (xfrac * dzdxh);
+				}
+				else
+				{
+					m_rdp->GetSpans()[j].m_z.w = 0;
 				}
 			}
 
@@ -1505,10 +1516,6 @@ void N64::RDP::Triangle::Draw()
 					else
 					{
 						m_rdp->GetSpans()[j].m_cvg[xend] -= (2 - m_rdp->AddLeftCvg(xright, k));
-						if (m_rdp->GetSpans()[j].m_cvg[xend] > 200)
-						{
-							m_rdp->GetSpans()[j].m_cvg[xend] = 0;
-						}
 					}
 				}
 				for (n = 0; n < (length - 1); n++)

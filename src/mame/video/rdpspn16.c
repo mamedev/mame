@@ -127,7 +127,7 @@ void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, 
 	int length = flip ? (m_lx - m_rx) : (m_rx - m_lx);
 
 	bool disable_lod = false;
-	if (m_other_modes->tex_lod_en && m_other_modes->cycle_type != CYCLE_TYPE_2) // Used by World Driver Championship
+	if (m_other_modes->cycle_type != CYCLE_TYPE_2) // Used by World Driver Championship
 	{
 		disable_lod = true;
 	}
@@ -153,10 +153,10 @@ void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, 
 		int sg = 0;
 		int sb = 0;
 		int sa = 0;
-		int ss = s.h.h;
-		int st = t.h.h;
-		int sw = w.h.h;
-		int sz = z.w >> 13;
+		int ss = 0;
+		int st = 0;
+		int sw = 0;
+		int sz = 0;
 		int sss = 0;
 		int sst = 0;
 		Color c1;
@@ -170,10 +170,22 @@ void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, 
 			sa = a.h.h;
 		}
 
-		if (m_other_modes->z_source_sel)
+		if(texture)
 		{
-			sz = (((UINT32)m_misc_state->m_primitive_z) << 3) & 0x3ffff;
-			dzpix = m_misc_state->m_primitive_delta_z;
+			ss = s.h.h;
+			st = t.h.h;
+			sw = w.h.h;
+		}
+
+		if(zbuffer)
+		{
+			sz = z.w >> 13;
+
+			if (m_other_modes->z_source_sel)
+			{
+				sz = (((UINT32)m_misc_state->m_primitive_z) << 3) & 0x3ffff;
+				dzpix = m_misc_state->m_primitive_delta_z;
+			}
 		}
 
 		if (x >= clipx1 && x < clipx2)
@@ -190,114 +202,127 @@ void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, 
 				UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
 				UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
 
-				if (m_other_modes->persp_tex_en)
-				{
-					m_rdp->TCDiv(ss, st, sw, &sss, &sst);
-				}
-				else // Hack for Bust-a-Move 2
-				{
-					sss = ss;
-					sst = st;
-				}
-
-				if (m_other_modes->tex_lod_en && !disable_lod)
+				if(texture)
 				{
 					if (m_other_modes->persp_tex_en)
 					{
-						nextsw = (w.w + dwinc) >> 16;
-						nexts = (s.w + dsinc) >> 16;
-						nextt = (t.w + dtinc) >> 16;
-						m_rdp->TCDiv(nexts, nextt, nextsw, &nexts, &nextt);
+						m_rdp->TCDiv(ss, st, sw, &sss, &sst);
 					}
-					else
+					else // Hack for Bust-a-Move 2
 					{
-						nexts = (s.w + dsinc)>>16;
-						nextt = (t.w + dtinc)>>16;
+						sss = ss;
+						sst = st;
 					}
 
-					INT32 horstep = SIGN17(nexts & 0x1ffff) - SIGN17(sss & 0x1ffff);
-					INT32 vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(sst & 0x1ffff);
-					if (horstep & 0x20000)
+					if (m_other_modes->tex_lod_en && !disable_lod)
 					{
-						horstep = ~horstep & 0x1ffff;
-					}
-					if (vertstep & 0x20000)
-					{
-						vertstep = ~vertstep & 0x1ffff;
-					}
-
-					int LOD = (horstep >= vertstep) ? horstep : vertstep;
-					LOD = (LOD >= m_dymax) ? LOD : m_dymax;
-
-					if (LOD & 0x1c000)
-					{
-						LOD = 0x7fff;
-					}
-					if (LOD < m_misc_state->m_min_level)
-					{
-						LOD = m_misc_state->m_min_level;
-					}
-
-					bool magnify = (LOD < 32);
-					INT32 l_tile = m_rdp->GetLog2((LOD >> 5) & 0xff);
-					bool distant = ((LOD & 0x6000) || (l_tile >= m_misc_state->m_max_level));
-
-					m_rdp->SetLODFrac(((LOD << 3) >> l_tile) & 0xff);
-
-					if (distant)
-					{
-						l_tile = m_misc_state->m_max_level;
-					}
-					if(!m_other_modes->sharpen_tex_en && !m_other_modes->detail_tex_en && magnify)
-					{
-						m_rdp->SetLODFrac(0);
-					}
-					if(!m_other_modes->sharpen_tex_en && !m_other_modes->detail_tex_en && distant)
-					{
-						m_rdp->SetLODFrac(0xff);
-					}
-					if(m_other_modes->sharpen_tex_en && magnify)
-					{
-						m_rdp->SetLODFrac(*(m_rdp->GetLODFrac()) | 0x100);
-					}
-
-					if (!m_other_modes->detail_tex_en)
-					{
-						tilenum = (prim_tile + l_tile);
-						tilenum &= 7;
-						if (m_other_modes->sharpen_tex_en)
+						if (m_other_modes->persp_tex_en)
 						{
-							tilenum2 = (tilenum + 1) & 7;
-						}
-						else if (!distant)
-						{
-							tilenum2 = (tilenum + 1) & 7;
+							nextsw = (w.w + dwinc) >> 16;
+							nexts = (s.w + dsinc) >> 16;
+							nextt = (t.w + dtinc) >> 16;
+							m_rdp->TCDiv(nexts, nextt, nextsw, &nexts, &nextt);
 						}
 						else
 						{
-							tilenum2 = tilenum;
+							nexts = (s.w + dsinc)>>16;
+							nextt = (t.w + dtinc)>>16;
 						}
-					}
-					else
-					{
-						if (!magnify)
+
+						INT32 horstep = SIGN17(nexts & 0x1ffff) - SIGN17(sss & 0x1ffff);
+						INT32 vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(sst & 0x1ffff);
+						if (horstep & 0x20000)
 						{
-							tilenum = (prim_tile + l_tile + 1);
+							horstep = ~horstep & 0x1ffff;
 						}
-						else
+						if (vertstep & 0x20000)
+						{
+							vertstep = ~vertstep & 0x1ffff;
+						}
+
+						int LOD = (horstep >= vertstep) ? horstep : vertstep;
+						LOD = (LOD >= m_dymax) ? LOD : m_dymax;
+
+						if (LOD & 0x1c000)
+						{
+							LOD = 0x7fff;
+						}
+						if (LOD < m_misc_state->m_min_level)
+						{
+							LOD = m_misc_state->m_min_level;
+						}
+
+						bool magnify = (LOD < 32);
+						INT32 l_tile = m_rdp->GetLog2((LOD >> 5) & 0xff);
+						bool distant = ((LOD & 0x6000) || (l_tile >= m_misc_state->m_max_level));
+
+						m_rdp->SetLODFrac(((LOD << 3) >> l_tile) & 0xff);
+
+						if (distant)
+						{
+							l_tile = m_misc_state->m_max_level;
+						}
+						if(!m_other_modes->sharpen_tex_en && !m_other_modes->detail_tex_en && magnify)
+						{
+							m_rdp->SetLODFrac(0);
+						}
+						if(!m_other_modes->sharpen_tex_en && !m_other_modes->detail_tex_en && distant)
+						{
+							m_rdp->SetLODFrac(0xff);
+						}
+						if(m_other_modes->sharpen_tex_en && magnify)
+						{
+							m_rdp->SetLODFrac(*(m_rdp->GetLODFrac()) | 0x100);
+						}
+
+						if (!m_other_modes->detail_tex_en)
 						{
 							tilenum = (prim_tile + l_tile);
-						}
-						tilenum &= 7;
-
-						if (!distant && !magnify)
-						{
-							tilenum2 = (prim_tile + l_tile + 2) & 7;
+							tilenum &= 7;
+							if (m_other_modes->sharpen_tex_en)
+							{
+								tilenum2 = (tilenum + 1) & 7;
+							}
+							else if (!distant)
+							{
+								tilenum2 = (tilenum + 1) & 7;
+							}
+							else
+							{
+								tilenum2 = tilenum;
+							}
 						}
 						else
 						{
-							tilenum2 = (prim_tile + l_tile + 1) & 7;
+							if (!magnify)
+							{
+								tilenum = (prim_tile + l_tile + 1);
+							}
+							else
+							{
+								tilenum = (prim_tile + l_tile);
+							}
+							tilenum &= 7;
+
+							if (!distant && !magnify)
+							{
+								tilenum2 = (prim_tile + l_tile + 2) & 7;
+							}
+							else
+							{
+								tilenum2 = (prim_tile + l_tile + 1) & 7;
+							}
 						}
+					}
+
+					if (m_other_modes->cycle_type == CYCLE_TYPE_1)
+					{
+						m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum]);
+					}
+					else
+					{
+						m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum]);
+						m_rdp->GetTexel1Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum2]);
 					}
 				}
 
@@ -315,19 +340,6 @@ void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, 
 					m_rdp->GetShadeColor()->i.g = sg;
 					m_rdp->GetShadeColor()->i.b = sb;
 					m_rdp->GetShadeColor()->i.a = sa;
-				}
-
-				if (texture)
-				{
-					if (m_other_modes->cycle_type == CYCLE_TYPE_1)
-					{
-						m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum]);
-					}
-					else
-					{
-						m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum]);
-						m_rdp->GetTexel1Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum2]);
-					}
 				}
 
 				if (m_other_modes->cycle_type == CYCLE_TYPE_1)
@@ -398,7 +410,7 @@ void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, 
 
 				if(z_compare_result)
 				{
-					bool rendered = true;
+					bool rendered = false;
 					int dith = 0;
 					if (!m_other_modes->rgb_dither_sel)
 					{
@@ -426,10 +438,16 @@ void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, 
 			b.w += dbinc;
 			a.w += dainc;
 		}
-		z.w += dzinc;
-		s.w += dsinc;
-		t.w += dtinc;
-		w.w += dwinc;
+		if (texture)
+		{
+			s.w += dsinc;
+			t.w += dtinc;
+			w.w += dwinc;
+		}
+		if (zbuffer)
+		{
+			z.w += dzinc;
+		}
 
 		x += xinc;
 	}
