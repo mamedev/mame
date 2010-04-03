@@ -51,10 +51,10 @@ void TexRectangle::DrawDefault()
 	UINT32 tilenum2 = 0;
 	N64::RDP::Tile *tex_tile2 = NULL;
 
-	int x1 = m_xh;
-	int x2 = m_xl;
-	int y1 = m_yh;
-	int y2 = m_yl;
+	int x1 = m_xh >> 2;
+	int x2 = m_xl >> 2;
+	int y1 = m_yh >> 2;
+	int y2 = m_yl >> 2;
 
 	if (x2 <= x1)
 	{
@@ -366,10 +366,10 @@ void TexRectangle::DrawCopy()
 
 	N64::RDP::Tile *tex_tile = &m_rdp->GetTiles()[m_tilenum];
 
-	int x1 = m_xh;
-	int x2 = m_xl;
-	int y1 = m_yh;
-	int y2 = m_yl;
+	int x1 = m_xh >> 2;
+	int x2 = m_xl >> 2;
+	int y1 = m_yh >> 2;
+	int y2 = m_yl >> 2;
 
 	if (x2 <= x1)
 	{
