@@ -745,16 +745,12 @@ bool Processor::ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz,
 	{
 		case 0: // Opaque
 			return (max || (overflow ? infront : nearer));
-			break;
 		case 1: // Interpenetrating
 			return (max || (overflow ? infront : nearer));
-			break;
 		case 2: // Transparent
 			return (infront || max);
-			break;
 		case 3: // Decal
 			return (farther && nearer && !max);
-			break;
 		default:
 			fatalerror( "z_mode = %d", m_other_modes.z_mode);
 			break;
