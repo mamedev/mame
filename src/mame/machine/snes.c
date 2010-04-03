@@ -105,6 +105,14 @@ static TIMER_CALLBACK( snes_reset_hdma )
 	snes_hdma_init(cpu0space);
 }
 
+static TIMER_CALLBACK( snes_update_io )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	state->io_read(cpu0space->machine);
+	snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
+}
+
 static TIMER_CALLBACK( snes_scanline_tick )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
@@ -168,6 +176,9 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
 			timer_adjust_oneshot(state->nmi_timer, cpu_clocks_to_attotime(state->maincpu, 12), 0);
 		}
+
+		/* three lines after start of vblank we update the controllers (value from snes9x) */
+		timer_adjust_oneshot(state->io_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert + 2, 0), 0);
 	}
 
 	// hdma reset happens at scanline 0, H=~6
@@ -175,13 +186,6 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	{
 		const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 		snes_hdma_init(cpu0space);
-	}
-
-	/* three lines after start of vblank we update the controllers (value from snes9x) */
-	if (snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line + 2)
-	{
-		state->io_read(machine);
-		snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
 	}
 
 	if (snes_ppu.beam.current_vert == 0)
@@ -196,6 +200,8 @@ static TIMER_CALLBACK( snes_scanline_tick )
 
 	timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
 	timer_adjust_oneshot(state->hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, state->hblank_offset * state->htmult), 0);
+
+//	printf("%02x %d\n",snes_ram[HVBJOY],snes_ppu.beam.current_vert);
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
@@ -559,7 +565,7 @@ WRITE8_HANDLER( snes_w_io )
 			if((snes_ram[NMITIMEN] & 0x30) == 0x00)
 			{
 				cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
-				snes_ram[TIMEUP] = 0;	// flag is cleared on both read and write
+				snes_ram[TIMEUP] = 0;	// clear pending IRQ if irq is disabled here, 3x3 Eyes - Seima Korin Den behaves on this
 			}
 			break;
 		case OLDJOY2:	/* Old NES joystick support */
@@ -1425,6 +1431,8 @@ static void snes_init_timers( running_machine *machine )
 	timer_adjust_oneshot(state->div_timer, attotime_never, 0);
 	state->mult_timer = timer_alloc(machine, snes_mult_callback, NULL);
 	timer_adjust_oneshot(state->mult_timer, attotime_never, 0);
+	state->io_timer = timer_alloc(machine, snes_update_io, NULL);
+	timer_adjust_oneshot(state->io_timer, attotime_never, 0);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.

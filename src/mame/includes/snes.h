@@ -403,6 +403,7 @@ public:
 	emu_timer             *hirq_timer;
 	emu_timer             *div_timer;
 	emu_timer             *mult_timer;
+	emu_timer             *io_timer;
 
 	/* DMA/HDMA-related */
 	struct
