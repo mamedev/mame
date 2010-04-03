@@ -1957,9 +1957,14 @@ static void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_ren
 
 static void render_project(poly_vertex &pv)
 {
+	// 768 validated by the title screen size on tc2:
+	// texture is 640x480, x range is 3.125, y range is 2.34375, z is 3.75
+	// 640/(3.125/3.75) = 768
+	// 480/(2.34375/3.75) = 768
+
 	float w = pv.p[0] ? 1/pv.p[0] : 0;
-	pv.x = 320 + 800*w*pv.x;
-	pv.y = 240 - 800*w*pv.y;
+	pv.x = 320 + 768*w*pv.x;
+	pv.y = 240 - 768*w*pv.y;
 	pv.p[0] = w;
 }
 
