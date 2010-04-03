@@ -86,12 +86,12 @@ static VIDEO_UPDATE( missb2 )
 
 			for (xc = 0; xc < 2; xc++)
 			{
-				int goffs, code, color, flipx, flipy, x, y;
+				int goffs, code, /*color,*/ flipx, flipy, x, y;
 
 				goffs = gfx_offs + xc * 0x40 + (yc & 7) * 0x02 +
 						(prom_line[yc/2] & 0x03) * 0x10;
 				code = state->videoram[goffs] + 256 * (state->videoram[goffs + 1] & 0x03) + 1024 * (gfx_attr & 0x0f);
-				color = (state->videoram[goffs + 1] & 0x3c) >> 2;
+				//color = (state->videoram[goffs + 1] & 0x3c) >> 2;
 				flipx = state->videoram[goffs + 1] & 0x40;
 				flipy = state->videoram[goffs + 1] & 0x80;
 				x = sx + xc * 8;

@@ -739,12 +739,10 @@ INLINE void write_texture8(int xpos, int ypos, int width, int height, int page, 
 		for(x=xpos; x < xpos+width; x+=8)
 		{
 			UINT16 *texture = &texture_ram[page][y*2048+x];
-			int b = 0;
 			for(j=y; j < y+4; j++) {
 				for(i=x; i < x+8; i++) {
 					*texture = color;
 					texture++;
-					++b;
 				}
 				texture += 2048-8;
 			}
@@ -1130,7 +1128,6 @@ static void draw_model(running_machine *machine, UINT32 addr)
 	poly_vertex prev_vertex[4];
 	poly_vertex clip_vert[10];
 
-	int polynum = 0;
 	MATRIX transform_matrix;
 	float center_x, center_y;
 
@@ -1307,8 +1304,6 @@ static void draw_model(running_machine *machine, UINT32 addr)
 				render_one(machine, &tri);
 			}
 		}
-
-		++polynum;
 	};
 }
 
@@ -1460,7 +1455,7 @@ static void draw_viewport(running_machine *machine, int pri, UINT32 address)
 	const UINT32 *node = get_memory_pointer(address);
 	UINT32 link_address;
 	float viewport_left, viewport_right, viewport_top, viewport_bottom;
-	float fov_x, fov_y;
+	float /*fov_x,*/ fov_y;
 
 	link_address = node[1];
 	if (link_address == 0)
@@ -1495,7 +1490,7 @@ static void draw_viewport(running_machine *machine, int pri, UINT32 address)
 	clip_plane[4].x = 0.0f;		clip_plane[4].y = 0.0f;		clip_plane[4].z = 1.0f;		clip_plane[4].d = 1.0f;
 
 	/* compute field of view */
-	fov_x = viewport_left + viewport_right;
+	//fov_x = viewport_left + viewport_right;
 	fov_y = viewport_top + viewport_bottom;
 	viewport_focal_length = (viewport_region_height / 2) / tan( (fov_y * M_PI / 180.0f) / 2.0f );
 

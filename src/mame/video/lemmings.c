@@ -139,9 +139,9 @@ WRITE16_HANDLER( lemmings_pixel_0_w )
 WRITE16_HANDLER( lemmings_pixel_1_w )
 {
 	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
-	int sx, sy, src, old, tile;
+	int sx, sy, src, /*old,*/ tile;
 
-	old = state->pixel_1_data[offset];
+//	old = state->pixel_1_data[offset];
 	COMBINE_DATA(&state->pixel_1_data[offset]);
 	src = state->pixel_1_data[offset];
 //  if (old == src)

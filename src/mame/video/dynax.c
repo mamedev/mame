@@ -1027,12 +1027,11 @@ static void hanamai_copylayer( running_machine *machine, bitmap_t *bitmap, const
 	}
 
 	{
-		int dy, length, pen, offs;
+		int dy, length, pen;
 		UINT8 *src1 = state->pixmap[i][1];
 		UINT8 *src2 = state->pixmap[i][0];
 
 		int palbase = 16 * color;
-		offs = 0;
 
 		for (dy = 0; dy < 256; dy++)
 		{
@@ -1095,12 +1094,11 @@ static void jantouki_copylayer( running_machine *machine, bitmap_t *bitmap, cons
 	}
 
 	{
-		int dy, length, pen, offs;
+		int dy, length, pen;
 		UINT8 *src1 = state->pixmap[i][1];
 		UINT8 *src2 = state->pixmap[i][0];
 
 		int palbase = 16 * color;
-		offs = 0;
 
 		for (dy = 0; dy < 256; dy++)
 		{
@@ -1160,11 +1158,10 @@ static void mjdialq2_copylayer( running_machine *machine, bitmap_t *bitmap, cons
 	scrolly = state->blit_scroll_y;
 
 	{
-		int dy, length, pen, offs;
+		int dy, length, pen;
 		UINT8 *src = state->pixmap[i][0];
 
 		int palbase = 16 * color;
-		offs = 0;
 
 		for (dy = 0; dy < 256; dy++)
 		{

@@ -102,7 +102,6 @@ PALETTE_INIT( carpolo )
 	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		UINT8 pen, r, g, b;
-		int bit0, bit1, bit2;
 
 		if (i < 0x18)
 			/* sprites */
@@ -131,20 +130,12 @@ PALETTE_INIT( carpolo )
 			pen = ((i - 0x38) & 0x01) ? ALPHA_COLOR_BASE   + ((i - 0x38) >> 1) : 0;
 
 		/* red component */
-		bit0 = (color_prom[pen] >> 7) & 0x01;
-		bit1 = (color_prom[pen] >> 6) & 0x01;
-		bit2 = (color_prom[pen] >> 5) & 0x01;
 		r = ((r_voltage[(color_prom[pen] >> 5) & 0x07] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
 
 		/* green component */
-		bit0 = (color_prom[pen] >> 4) & 0x01;
-		bit1 = (color_prom[pen] >> 3) & 0x01;
-		bit2 = (color_prom[pen] >> 2) & 0x01;
 		g = ((g_voltage[(color_prom[pen] >> 2) & 0x07] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
 
 		/* blue component */
-		bit0 = (color_prom[pen] >> 1) & 0x01;
-		bit1 = (color_prom[pen] >> 0) & 0x01;
 		b = ((b_voltage[(color_prom[pen] >> 0) & 0x03] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));

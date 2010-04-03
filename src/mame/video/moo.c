@@ -68,9 +68,8 @@ VIDEO_UPDATE(moo)
 	moo_state *state = (moo_state *)screen->machine->driver_data;
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layers[3];
-	int bg_colorbase, new_colorbase, plane, dirty, alpha;
+	int new_colorbase, plane, dirty, alpha;
 
-	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI1);
 	state->sprite_colorbase = k053251_get_palette_index(state->k053251, K053251_CI0);
 	state->layer_colorbase[0] = 0x70;
 

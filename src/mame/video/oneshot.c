@@ -69,15 +69,15 @@ VIDEO_START( oneshot )
 static void draw_crosshairs( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	oneshot_state *state = (oneshot_state *)machine->driver_data;
-	int xpos,ypos;
+	//int xpos,ypos;
 
 	/* get gun raw coordinates (player 1) */
 	state->gun_x_p1 = (input_port_read(machine, "LIGHT0_X") & 0xff) * 320 / 256;
 	state->gun_y_p1 = (input_port_read(machine, "LIGHT0_Y") & 0xff) * 240 / 256;
 
 	/* compute the coordinates for drawing (from routine at 0x009ab0) */
-	xpos = state->gun_x_p1;
-	ypos = state->gun_y_p1;
+	//xpos = state->gun_x_p1;
+	//ypos = state->gun_y_p1;
 
 	state->gun_x_p1 += state->gun_x_shift;
 
@@ -91,8 +91,8 @@ static void draw_crosshairs( running_machine *machine, bitmap_t *bitmap, const r
 	state->gun_y_p2 = (input_port_read(machine, "LIGHT1_Y") & 0xff) * 240 / 256;
 
 	/* compute the coordinates for drawing (from routine at 0x009b6e) */
-	xpos = state->gun_x_p2;
-	ypos = state->gun_y_p2;
+	//xpos = state->gun_x_p2;
+	//ypos = state->gun_y_p2;
 
 	state->gun_x_p2 += state->gun_x_shift - 0x0a;
 	if (state->gun_x_p2 < 0)

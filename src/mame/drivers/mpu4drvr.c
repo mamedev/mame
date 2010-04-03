@@ -495,7 +495,7 @@ static VIDEO_UPDATE( mpu4_vid )
 {
 	int i;
 
-	int x,y,count = 0;
+	int x, y/*, count = 0*/;
 
 	bitmap_fill(bitmap,cliprect,0);
 
@@ -526,7 +526,7 @@ static VIDEO_UPDATE( mpu4_vid )
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfxregion],tiledat,colattr,0,0,x*8,y*8);
 
-			count++;
+			//count++;
 		}
 
 		if (dbl_size&2) y++; /* skip a row? */

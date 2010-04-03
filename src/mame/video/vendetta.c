@@ -55,9 +55,8 @@ void vendetta_sprite_callback( running_machine *machine, int *code, int *color, 
 VIDEO_UPDATE( vendetta )
 {
 	vendetta_state *state = (vendetta_state *)screen->machine->driver_data;
-	int layer[3], bg_colorbase;
+	int layer[3];
 
-	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI0);
 	state->sprite_colorbase = k053251_get_palette_index(state->k053251, K053251_CI1);
 	state->layer_colorbase[0] = k053251_get_palette_index(state->k053251, K053251_CI2);
 	state->layer_colorbase[1] = k053251_get_palette_index(state->k053251, K053251_CI3);

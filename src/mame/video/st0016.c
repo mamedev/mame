@@ -263,7 +263,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
     */
 
 	gfx_element *gfx = machine->gfx[st0016_ramgfx];
-	int i,j,lx,ly,x,y,code,offset,length,sx,sy,color,flipx,flipy,scrollx,scrolly,plx,ply;
+	int i,j,lx,ly,x,y,code,offset,length,sx,sy,color,flipx,flipy,scrollx,scrolly/*,plx,ply*/;
 
 
 	for(i=0;i<ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK;i+=8)
@@ -308,8 +308,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		length=st0016_spriteram[i+0]+1+256*(st0016_spriteram[i+1]&1);
 
-		plx=(st0016_spriteram[i+5]>>2)&0x3;
-		ply=(st0016_spriteram[i+7]>>2)&0x3;
+		//plx=(st0016_spriteram[i+5]>>2)&0x3;
+		//ply=(st0016_spriteram[i+7]>>2)&0x3;
 
 		if(offset<ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK)
 		{

@@ -2922,7 +2922,7 @@ static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 	const int min_x=visarea->min_x,max_x=visarea->max_x;
 	const int min_y=visarea->min_y,max_y=visarea->max_y;
-	int offs,spritecont,flipx,flipy,old_x,old_y,color,x,y;
+	int offs,spritecont,flipx,flipy,old_x,color,x,y;
 	int sprite,global_x=0,global_y=0,subglobal_x=0,subglobal_y=0;
 	int block_x=0, block_y=0;
 	int last_color=0,last_x=0,last_y=0,block_zoom_x=0,block_zoom_y=0;
@@ -2938,9 +2938,9 @@ static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_
 	int total_sprites=0;
 
 	color=0;
-    flipx=flipy=0;
-    old_y=old_x=0;
-    y=x=0;
+	flipx=flipy=0;
+	old_x=0;
+	y=x=0;
 
 	sprite_top=0x1000;
 	for (offs = 0; offs < sprite_top && (total_sprites < 0x400); offs += 4)

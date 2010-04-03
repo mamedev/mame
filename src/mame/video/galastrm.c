@@ -269,8 +269,8 @@ static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitma
 	const int ly  = srcbitmap->height;
 
 	static int rsxb=0, rsyb=0, rsxoffs=0, rsyoffs=0;
-	int sx, sy, yx, yy, zx, zy, pxx, pxy, pyx, pyy;
-	float ssn, scs, ysn, ycs, zsn, zcs;
+	int yx, /*yy,*/ zx, zy, pxx, pxy, pyx, pyy;
+	float /*ssn, scs, ysn, ycs,*/ zsn, zcs;
 
 
 	pxx = 0;
@@ -347,14 +347,12 @@ static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitma
 	pxy = 0;
 	pyx = 0;
 	pyy = 0;
-	sx  = 0;
-	sy  = 0;
 	yx  = 0;
-	yy  = 0;
-	ssn = 0.0;
-	scs = 0.0;
-	ysn = 0.0;
-	ycs = 0.0;
+	//yy  = 0;
+	//ssn = 0.0;
+	//scs = 0.0;
+	//ysn = 0.0;
+	//ycs = 0.0;
 
 	if (galastrm_tc0610_ctrl_reg[1][7])
 	{
@@ -371,13 +369,13 @@ static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitma
 			{
 				pyy += ryx;
 				pyx += -ryy;
-				yy++;
+				//yy++;
 			}
 			if (yx >= 0.0)
 			{
 				yx = (int)((8.0 - log((double)yx) / log(2.0)) * 6.0);
-				ysn = sin(DEGREE_TO_RADIAN(yx));
-				ycs = 1.0 - ysn*ysn;
+				//ysn = sin(DEGREE_TO_RADIAN(yx));
+				//ycs = 1.0 - ysn*ysn;
 			}
 		}
 
@@ -392,17 +390,15 @@ static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitma
 			{
 				pxx += rsx;
 				pxy += rsy;
-				sx++;
 			}
 			while (sqrt(pow((float)pyy/65536.0, 2.0) + pow((float)pyx/65536.0, 2.0)) < (float)(ly / 2))
 			{
 				pyy += rsx;
 				pyx += -rsy;
-				sy++;
 			}
 		}
-		ssn = ((float)pxy/65536.0) / (float)(lx / 2);
-		scs = ((float)pyy/65536.0) / (float)(ly / 2);
+		//ssn = ((float)pxy/65536.0) / (float)(lx / 2);
+		//scs = ((float)pyy/65536.0) / (float)(ly / 2);
 	}
 
 

@@ -104,7 +104,7 @@ VIDEO_UPDATE( kikikai )
 	mexico86_state *state = (mexico86_state *)screen->machine->driver_data;
 	int offs;
 	int sx, sy, yc;
-	int gfx_num, gfx_attr, gfx_offs;
+	int gfx_num, /*gfx_attr,*/ gfx_offs;
 	int height;
 	int goffs, code, color, y;
 	int tx, ty;
@@ -119,7 +119,7 @@ VIDEO_UPDATE( kikikai )
 		ty = state->objectram[offs];
 		gfx_num = state->objectram[offs + 1];
 		tx = state->objectram[offs + 2];
-		gfx_attr = state->objectram[offs + 3];
+		//gfx_attr = state->objectram[offs + 3];
 
 		if (gfx_num & 0x80)
 		{

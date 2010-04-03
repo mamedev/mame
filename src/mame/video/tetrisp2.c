@@ -383,7 +383,6 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
 	int code, attr, color, size;
-	int flipscreen;
 	int pri;
 	int xzoom, yzoom;
 	UINT32 primask;
@@ -392,8 +391,6 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 
 	UINT16		*source	=	sprram_top;
 	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
-
-	flipscreen = flip;
 
 	if (reverseorder == 1)
 	{

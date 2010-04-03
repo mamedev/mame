@@ -1557,7 +1557,7 @@ void stvcd_exit(running_machine* machine)
 
 static void cd_readTOC(void)
 {
-	int i, ntrks, toclen, tocptr, fad;
+	int i, ntrks, /*toclen,*/ tocptr, fad;
 
 	xfertype = XFERTYPE_TOC;
 	xfercount = 0;
@@ -1571,7 +1571,7 @@ static void cd_readTOC(void)
 		ntrks = 0;
 	}
 
-	toclen = (4 * ntrks);	// toclen header entry
+	//toclen = (4 * ntrks);	// toclen header entry
 
 	// data format for Saturn TOC:
 	// no header.

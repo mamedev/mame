@@ -670,16 +670,16 @@ static void prescan_rle(const atarirle_data *mo, int which)
 		while (entry_count-- && base < end)
 		{
 			int word = *base++;
-			int count, value;
+			int count/*, value*/;
 
 			/* decode the low byte first */
 			count = table[word & 0xff];
-			value = count & 0xff;
+			//value = count & 0xff;
 			tempwidth += count >> 8;
 
 			/* decode the upper byte second */
 			count = table[word >> 8];
-			value = count & 0xff;
+			//value = count & 0xff;
 			tempwidth += count >> 8;
 		}
 
@@ -796,13 +796,13 @@ if (count++ == atarirle_hilite_index)
 
 if (hilite)
 {
-	int scale, code, which;
+	int scale, code/*, which*/;
 
 	/* extract scale and code */
 	obj = hilite;
 	scale = EXTRACT_DATA(obj, mo->scalemask);
 	code = EXTRACT_DATA(obj, mo->codemask);
-	which = EXTRACT_DATA(obj, mo->vrammask);
+	//which = EXTRACT_DATA(obj, mo->vrammask);
 
 	/* make sure they are in range */
 	if (scale > 0 && code < mo->objectcount)
@@ -841,15 +841,13 @@ if (hilite)
 			const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 			int scaled_width = (scale * info->width + 0x7fff) >> 12;
 			int scaled_height = (scale * info->height + 0x7fff) >> 12;
-			int dx, dy, ex, ey, sx = x, sy = y, tx, ty;
+			int ex, ey, sx = x, sy = y, tx, ty;
 
 			/* make sure we didn't end up with 0 */
 			if (scaled_width == 0) scaled_width = 1;
 			if (scaled_height == 0) scaled_height = 1;
 
 			/* compute the remaining parameters */
-			dx = (info->width << 12) / scaled_width;
-			dy = (info->height << 12) / scaled_height;
 			ex = sx + scaled_width - 1;
 			ey = sy + scaled_height - 1;
 

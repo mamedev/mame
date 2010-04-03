@@ -150,7 +150,7 @@ WRITE16_HANDLER( K055550_word_w )
 WRITE16_HANDLER( K053990_martchmp_word_w )
 {
 	int src_addr, src_count, src_skip;
-	int dst_addr, dst_count, dst_skip;
+	int dst_addr, /*dst_count,*/ dst_skip;
 	int mod_addr, mod_count, mod_skip, mod_offs;
 	int mode, i, element_size = 1;
 	UINT16 mod_val, mod_data;
@@ -171,7 +171,7 @@ WRITE16_HANDLER( K053990_martchmp_word_w )
 				dst_addr  = prot_data[0x2];
 				dst_addr |= prot_data[0x3]<<16 & 0xff0000;
 				src_count = prot_data[0x8]>>8;
-				dst_count = prot_data[0x9]>>8;
+				//dst_count = prot_data[0x9]>>8;
 				src_skip  = prot_data[0xa] & 0xff;
 				dst_skip  = prot_data[0xb] & 0xff;
 

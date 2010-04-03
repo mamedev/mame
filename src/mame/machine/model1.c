@@ -1390,14 +1390,14 @@ static TGP_FUNCTION( ram_setadr )
 static TGP_FUNCTION( groundbox_test )
 {
 	int out_x, out_y, out_z;
-	float x, y, z;
+	float x, /*y,*/ z;
 	float a = fifoin_pop_f();
 	float b = fifoin_pop_f();
 	float c = fifoin_pop_f();
 
 	logerror("TGP groundbox_test %f, %f, %f (%x)\n", a, b, c, pushpc);
 	x = cmat[0]*a+cmat[3]*b+cmat[6]*c+cmat[9];
-	y = cmat[1]*a+cmat[4]*b+cmat[7]*c+cmat[10];
+	//y = cmat[1]*a+cmat[4]*b+cmat[7]*c+cmat[10];
 	z = cmat[2]*a+cmat[5]*b+cmat[8]*c+cmat[11];
 
 	out_x = x < tgp_vf_xmin || x > tgp_vf_xmax;

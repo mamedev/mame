@@ -492,7 +492,7 @@ static void draw_sprites( running_device *device, UINT8 *line_priority )
 	int *ppu_regs = &ppu2c0x->regs[0];
 
 	int sprite_xpos, sprite_ypos, sprite_index;
-	int tile, index1, page;
+	int tile, index1;
 	int pri;
 
 	int flipx, flipy, color;
@@ -551,11 +551,7 @@ static void draw_sprites( running_device *device, UINT8 *line_priority )
 				tile &= ~0x01;
 				tile |= 0x100;
 			}
-			/* note that the sprite page value has no effect on 8x16 sprites */
-			page = tile >> 6;
 		}
-		else
-			page = (tile >> 6) | sprite_page;
 
 		if (ppu_latch)
 			(*ppu_latch)(device, (sprite_page << 10) | ((tile & 0xff) << 4));
@@ -737,7 +733,7 @@ static void render_scanline( running_device *device )
 static void update_scanline( running_device *device )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
-	int scanline = ppu2c0x->scanline;
+	const int scanline = ppu2c0x->scanline;
 	int *ppu_regs = &ppu2c0x->regs[0];
 
 	if (scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
@@ -756,7 +752,6 @@ static void update_scanline( running_device *device )
 		else
 		{
 			bitmap_t *bitmap = ppu2c0x->bitmap;
-			const int scanline = ppu2c0x->scanline;
 			UINT8 color_mask;
 			UINT16 back_pen;
 			int i;

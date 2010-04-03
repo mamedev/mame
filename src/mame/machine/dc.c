@@ -564,7 +564,7 @@ WRITE64_HANDLER( naomi_maple_w )
 	static int jvs_command = 0,jvs_address = 0;
 	int chk;
 	int a;
-	int off,len,func;
+	int off,len/*,func*/;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -609,7 +609,7 @@ WRITE64_HANDLER( naomi_maple_w )
 					command=buff[2] & 255;
 					dap=(buff[2] >> 8) & 255;
 					sap=(buff[2] >> 16) & 255;
-					func = buff[3];
+					//func = buff[3];
 					//buff[0]=0;
 					//if(buff[1] == 0x700)
 					//  printf("%08x %08x",buff[0],buff[2]);

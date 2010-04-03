@@ -220,7 +220,7 @@ WRITE32_HANDLER ( skns_pal_regs_w )
 WRITE32_HANDLER ( skns_palette_ram_w )
 {
 	int r,g,b;
-	int brightness_r, brightness_g, brightness_b, alpha;
+	int brightness_r, brightness_g, brightness_b/*, alpha*/;
 	int use_bright;
 
 	COMBINE_DATA(&skns_palette_ram[offset]);
@@ -229,7 +229,7 @@ WRITE32_HANDLER ( skns_palette_ram_w )
 	g = ((skns_palette_ram[offset] >> 5  ) & 0x1f);
 	r = ((skns_palette_ram[offset] >> 10  ) & 0x1f);
 
-	alpha = ((skns_palette_ram[offset] >> 15  ) & 0x1);
+	//alpha = ((skns_palette_ram[offset] >> 15  ) & 0x1);
 
 	if(offset<(0x40*256)) { // 1st half is for Sprites
 		use_bright = use_spc_bright;
@@ -262,13 +262,13 @@ WRITE32_HANDLER ( skns_palette_ram_w )
 
 static void palette_set_rgb_brightness (running_machine *machine, int offset, UINT8 brightness_r, UINT8 brightness_g, UINT8 brightness_b)
 {
-	int use_bright, r, g, b, alpha;
+	int use_bright, r, g, b/*, alpha*/;
 
 	b = ((skns_palette_ram[offset] >> 0  ) & 0x1f);
 	g = ((skns_palette_ram[offset] >> 5  ) & 0x1f);
 	r = ((skns_palette_ram[offset] >> 10  ) & 0x1f);
 
-	alpha = ((skns_palette_ram[offset] >> 15  ) & 0x1);
+	//alpha = ((skns_palette_ram[offset] >> 15  ) & 0x1);
 
 	if(offset<(0x40*256)) { // 1st half is for Sprites
 		use_bright = use_spc_bright;

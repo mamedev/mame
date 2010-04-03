@@ -103,8 +103,6 @@ static void ssio_compute_ay8910_modulation(running_machine *machine);
 
 void mcr_sound_init(running_machine *machine, UINT8 config)
 {
-	int sound_cpu = 1;
-
 	mcr_sound_config = config;
 
 	/* SSIO */
@@ -151,10 +149,7 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 
 	/* Advanced Audio */
 	if (mcr_sound_config & MCR_WILLIAMS_SOUND)
-	{
 		williams_cvsd_init(machine);
-		sound_cpu++;
-	}
 }
 
 

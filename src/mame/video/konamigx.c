@@ -1174,7 +1174,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 	int shadowon[3], shdpri[3], layerid[6], layerpri[6];
 
 	struct GX_OBJ *objpool, *objptr;
-	int wrapsize, xwraplim, ywraplim, cltc_shdpri, prflp, disp;
+	int wrapsize, xwraplim, ywraplim, cltc_shdpri, /*prflp,*/ disp;
 	int xa,ya,ox,oy,zw,zh,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
 	int screenwidth, flipscreenx, flipscreeny, offx, offy;
 	int nobj, i, j, k, l, temp, temp1, temp2, temp3, temp4, count;
@@ -1238,7 +1238,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 	}
 
 	// invert layer priority when this flag is set (not used by any GX game?)
-	prflp = K055555_read_register(K55_CONTROL) & K55_CTL_FLIPPRI;
+	//prflp = K055555_read_register(K55_CONTROL) & K55_CTL_FLIPPRI;
 
 	layerpri[0] = K055555_read_register(K55_PRIINP_0);
 	layerpri[1] = K055555_read_register(K55_PRIINP_3);

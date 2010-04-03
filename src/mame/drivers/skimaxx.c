@@ -177,9 +177,9 @@ static void skimaxx_scanline_update(running_device *screen, bitmap_t *bitmap, in
 		UINT16 *fg = &fg_buffer[rowaddr << 8];
 		UINT32 *bg = &skimaxx_bg_buffer_front[rowaddr/2 * 1024/2];
 		UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
-		int coladdr = params->coladdr;
+		//int coladdr = params->coladdr;
 		int x;
-		coladdr = 0;
+		//coladdr = 0;
 
 		dest += params->heblnk;
 		for (x = params->heblnk; x < params->hsblnk; x+=2)

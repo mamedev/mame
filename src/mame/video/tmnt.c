@@ -608,9 +608,7 @@ VIDEO_UPDATE( tmnt )
 VIDEO_UPDATE( punkshot )
 {
 	tmnt_state *state = (tmnt_state *)screen->machine->driver_data;
-	int bg_colorbase;
 
-	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI0);
 	state->sprite_colorbase = k053251_get_palette_index(state->k053251, K053251_CI1);
 	state->layer_colorbase[0] = k053251_get_palette_index(state->k053251, K053251_CI2);
 	state->layer_colorbase[1] = k053251_get_palette_index(state->k053251, K053251_CI4);

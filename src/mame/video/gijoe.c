@@ -80,7 +80,7 @@ VIDEO_UPDATE( gijoe )
 	gijoe_state *state = (gijoe_state *)screen->machine->driver_data;
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[4];
-	int vrc_mode, vrc_new, colorbase_new, primode, dirty, i;
+	int vrc_mode, vrc_new, colorbase_new, /*primode,*/ dirty, i;
 	int mask = 0;
 
 	// update tile offsets
@@ -145,7 +145,7 @@ VIDEO_UPDATE( gijoe )
 	}
 
 	// seems to switch the K053251 between different priority modes, detail unknown
-	primode = k053251_get_priority(state->k053251, K053251_CI1);
+	// primode = k053251_get_priority(state->k053251, K053251_CI1);
 
 	layer[0] = 0;
 	state->layer_pri[0] = 0; // not sure

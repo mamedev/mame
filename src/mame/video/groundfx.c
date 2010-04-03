@@ -84,7 +84,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	int sprites_flipscreen = 0;
 	int zoomx, zoomy, zx, zy;
 	int sprite_chunk,map_offset,code,j,k,px,py;
-	int dimension,total_chunks,bad_chunks;
+	int dimension,total_chunks;
 	static const int primasks[4] = {0xffff, 0xfffc, 0xfff0, 0xff00 };
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
@@ -128,7 +128,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		x -= x_offs;
 
-		bad_chunks = 0;
 		dimension = ((dblsize*2) + 2);	// 2 or 4
 		total_chunks = ((dblsize*3) + 1) << 2;	// 4 or 16
 		map_offset = tilenum << 2;
@@ -149,7 +148,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 				if (code==0xffff)
 				{
-					bad_chunks += 1;
 					continue;
 				}
 

@@ -109,7 +109,7 @@ static int plural;
 READ8_HANDLER( wow_speech_r )
 {
 	running_device *samples = devtag_get_device(space->machine, "samples");
-	int Phoneme,Intonation;
+	int Phoneme/*, Intonation*/;
 	int i = 0;
 
 	UINT8 data = offset >> 8;
@@ -118,7 +118,7 @@ READ8_HANDLER( wow_speech_r )
 	totalword_ptr = totalword;
 
 	Phoneme = data & 0x3F;
-	Intonation = data >> 6;
+//	Intonation = data >> 6;
 
 //  logerror("Data : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 

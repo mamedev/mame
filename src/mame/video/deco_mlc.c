@@ -228,7 +228,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 {
 	UINT32 *index_ptr=0;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
-	int xmult,ymult,xoffs,yoffs;
+	int xoffs,yoffs;
 	UINT8 *rom = memory_region(machine, "gfx2") + 0x20000, *index_ptr8;
 	UINT8 *rawrom = memory_region(machine, "gfx2");
 	int blockIsTilemapIndex=0;
@@ -402,9 +402,6 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 
 		if(fx1&1) fx^=0x8000;
 		if(fy1&1) fy^=0x4000;
-
-		if (fx) xmult=-1; else xmult=1;
-		if (fy) ymult=-1; else ymult=1;
 
 		ybase=y<<16;
 		if (fy)

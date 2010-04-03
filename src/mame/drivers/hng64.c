@@ -540,13 +540,13 @@ static READ32_HANDLER( hng64_com_share_r )
 
 static WRITE32_HANDLER( hng64_pal_w )
 {
-	int r,g,b,a;
+	int r, g, b/*, a*/;
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
 	b = ((space->machine->generic.paletteram.u32[offset] & 0x000000ff) >>0);
 	g = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
 	r = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
-	a = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
+	//a = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 

@@ -230,13 +230,12 @@ WRITE8_HANDLER( hnayayoi_palbank_w )
 static void draw_layer_interleaved( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int left_pixmap, int right_pixmap, int palbase, int transp )
 {
 	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
-	int county, countx, pen, offs;
+	int county, countx, pen;
 	UINT8 *src1 = state->pixmap[left_pixmap];
 	UINT8 *src2 = state->pixmap[right_pixmap];
 	UINT16 *dstbase = (UINT16 *)bitmap->base;
 
 	palbase *= 16;
-	offs = 0;
 
 	for (county = 255; county >= 0; county--, dstbase += bitmap->rowpixels)
 	{

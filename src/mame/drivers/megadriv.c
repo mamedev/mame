@@ -3986,7 +3986,7 @@ static void genesis_render_spriteline_to_spritebuffer(int scanline)
 		int spritenum;
 		int ypos,xpos,addr;
 		int drawypos;
-		int drawwidth,drawheight;
+		int /*drawwidth,*/ drawheight;
 		int spritemask = 0;
 		UINT8 height,width=0,link=0,xflip,yflip,colour,pri;
 
@@ -4042,7 +4042,7 @@ static void genesis_render_spriteline_to_spritebuffer(int scanline)
 					addr &=0x7ff;
 				}
 
-				drawwidth = (width+1)*8;
+				//drawwidth = (width+1)*8;
 				if (pri==1) pri = 0x80;
 				else pri = 0x40;
 

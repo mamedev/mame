@@ -530,7 +530,7 @@ static void wgp_piv_layer_draw( running_machine *machine, bitmap_t *bitmap, cons
 
 	/* I have a fairly strong feeling these should be UINT32's, x_index is
        falling through from max +ve to max -ve quite a lot in this routine */
-	int sx, x_index, x_step, x_max;
+	int sx, x_index, x_step;
 
 	UINT32 zoomx, zoomy;
 	UINT16 scanline[512];
@@ -604,7 +604,6 @@ static void wgp_piv_layer_draw( running_machine *machine, bitmap_t *bitmap, cons
 			x_step += (((0x7f - row_zoom) << 8) & 0xffff);
 		}
 
-		x_max = x_index + screen_width * x_step;
 		src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
 		tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
 		dst16 = scanline;

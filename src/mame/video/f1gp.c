@@ -188,7 +188,7 @@ static void f1gp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const
 	for (attr_start = 0x0200 - 8; attr_start >= first; attr_start -= 4)
 	{
 		int map_start;
-		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color, pri;
+		int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color/*, pri*/;
 		/* table hand made by looking at the ship explosion in attract mode */
 		/* it's almost a logarithmic scale but not exactly */
 		static const int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
@@ -204,7 +204,7 @@ static void f1gp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const
 		flipx = spram[attr_start + 2] & 0x0800;
 		flipy = spram[attr_start + 2] & 0x8000;
 		color = (spram[attr_start + 2] & 0x000f);// + 16 * spritepalettebank;
-		pri = 0;//spram[attr_start + 2] & 0x0010;
+		//pri = spram[attr_start + 2] & 0x0010;
 		map_start = spram[attr_start + 3];
 
 		zoomx = 16 - zoomtable[zoomx] / 8;
