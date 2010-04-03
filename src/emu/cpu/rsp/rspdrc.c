@@ -41,16 +41,16 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
 #define SINGLE_INSTRUCTION_MODE			(0)
 
-#define DRC_LSV							(1)
-#define DRC_LLV							(1)
-#define DRC_LDV							(1)
-#define DRC_LQV							(1)
-#define DRC_LPV							(1)
+#define DRC_LSV							(0)
+#define DRC_LLV							(0)
+#define DRC_LDV							(0)
+#define DRC_LQV							(0)
+#define DRC_LPV							(0)
 #define DRC_LUV							(0)
 
-#define DRC_SSV							(1)
-#define DRC_SLV							(1)
-#define DRC_SDV							(1)
+#define DRC_SSV							(0)
+#define DRC_SLV							(0)
+#define DRC_SDV							(0)
 #define DRC_SQV							(0)
 #define DRC_SPV							(0) // Todo
 
@@ -1265,11 +1265,11 @@ static void cfunc_rsp_ltv(void *param)
 
 static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	int loopdest;
+	//int loopdest;
 	UINT32 op = desc->opptr.l[0];
-	int dest = (op >> 16) & 0x1f;
+	//int dest = (op >> 16) & 0x1f;
 	//int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xf;
+	//int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	//int skip;
 	if (offset & 0x40)
@@ -1979,9 +1979,9 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 {
 //  int loopdest;
 	UINT32 op = desc->opptr.l[0];
-	int dest = (op >> 16) & 0x1f;
+	//int dest = (op >> 16) & 0x1f;
 	//int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xf;
+	//int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	//int skip;
 	if (offset & 0x40)
