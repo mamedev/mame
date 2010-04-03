@@ -111,6 +111,8 @@ static TIMER_CALLBACK( snes_update_io )
 	const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	state->io_read(cpu0space->machine);
 	snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
+
+	timer_adjust_oneshot(state->io_timer, attotime_never, 0);
 }
 
 static TIMER_CALLBACK( snes_scanline_tick )
@@ -178,7 +180,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		}
 
 		/* three lines after start of vblank we update the controllers (value from snes9x) */
-		timer_adjust_oneshot(state->io_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert + 2, 0), 0);
+		timer_adjust_oneshot(state->io_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert + 2, state->hblank_offset * state->htmult), 0);
 	}
 
 	// hdma reset happens at scanline 0, H=~6
