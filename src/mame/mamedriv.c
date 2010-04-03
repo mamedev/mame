@@ -3114,7 +3114,8 @@ V-V                           TP-027
 
 	/* Taito FX1a */
 	DRIVER( taitofx1 )
-	DRIVER( sfchamp )	/* Super Football Champ (Ver 2.5J) */
+	DRIVER( sfchamp )	/* Super Football Champ (Ver 2.5O) */
+	DRIVER( sfchamp24o )/* Super Football Champ (Ver 2.4O) */
 	DRIVER( sfchampj )	/* Super Football Champ (Ver 2.4J) */
 	DRIVER( psyforce )	/* Psychic Force (Ver 2.4O) */
 	DRIVER( psyforcej )	/* Psychic Force (Ver 2.4J) */
