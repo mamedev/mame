@@ -2074,7 +2074,7 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 
 		namcos23_poly_entry *p = render_polys + render_poly_count;
 
-		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.0001);
+		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.001);
 		
 		if(p->vertex_count >= 3) {
 			for(int i=0; i<p->vertex_count; i++) {
