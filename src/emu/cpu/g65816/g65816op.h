@@ -1115,6 +1115,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			REGISTER_X = MAKE_UINT_8(REGISTER_X+1);								\
 			REGISTER_Y = MAKE_UINT_8(REGISTER_Y+1);								\
 			REGISTER_A--;								\
+			REGISTER_A &= 0xff; \
 			if ((REGISTER_A&0xff) != 0xff) \
 			{\
 				REGISTER_PC -= 3; \
@@ -1122,6 +1123,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			else \
 			{ \
 				REGISTER_B -= 0x100;\
+				REGISTER_B &= 0xff00; \
 				if ((REGISTER_B & 0xff00) != 0xff00)\
 				{			  \
 					REGISTER_PC -= 3;\
@@ -1137,6 +1139,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			REGISTER_X = MAKE_UINT_16(REGISTER_X+1);								\
 			REGISTER_Y = MAKE_UINT_16(REGISTER_Y+1);								\
 			REGISTER_A--;								\
+			REGISTER_A &= 0xff; \
 			if ((REGISTER_A&0xff) != 0xff) \
 			{\
 				REGISTER_PC -= 3; \
@@ -1144,6 +1147,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			else \
 			{ \
 				REGISTER_B -= 0x100;\
+				REGISTER_B &= 0xff00; \
 				if ((REGISTER_B & 0xff00) != 0xff00)\
 				{			  \
 					REGISTER_PC -= 3;\
@@ -1197,6 +1201,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			REGISTER_X = MAKE_UINT_8(REGISTER_X-1);								\
 			REGISTER_Y = MAKE_UINT_8(REGISTER_Y-1);								\
 			REGISTER_A--;								\
+			REGISTER_A &= 0xff; \
 			if ((REGISTER_A&0xff) != 0xff) \
 			{\
 				REGISTER_PC -= 3; \
@@ -1204,6 +1209,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			else \
 			{ \
 				REGISTER_B -= 0x100;\
+				REGISTER_B &= 0xff00; \
 				if ((REGISTER_B & 0xff00) != 0xff00)\
 				{			  \
 					REGISTER_PC -= 3;\
@@ -1219,6 +1225,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			REGISTER_X = MAKE_UINT_16(REGISTER_X-1);								\
 			REGISTER_Y = MAKE_UINT_16(REGISTER_Y-1);								\
 			REGISTER_A--;								\
+			REGISTER_A &= 0xff; \
 			if ((REGISTER_A&0xff) != 0xff) \
 			{\
 				REGISTER_PC -= 3; \
@@ -1226,6 +1233,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			else \
 			{ \
 				REGISTER_B -= 0x100;\
+				REGISTER_B &= 0xff00; \
 				if ((REGISTER_B & 0xff00) != 0xff00)\
 				{			  \
 					REGISTER_PC -= 3;\
