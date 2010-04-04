@@ -57,10 +57,10 @@ static int info_verifysamples(core_options *options, const char *gamename);
 static int info_romident(core_options *options, const char *gamename);
 
 /* utilities */
-static void romident(const char *filename, romident_status *status);
-static void identify_file(const char *name, romident_status *status);
-static void identify_data(const char *name, const UINT8 *data, int length, romident_status *status);
-static void match_roms(const char *hash, int length, int *found);
+static void romident(core_options *options, const char *filename, romident_status *status);
+static void identify_file(core_options *options, const char *name, romident_status *status);
+static void identify_data(core_options *options, const char *name, const UINT8 *data, int length, romident_status *status);
+static void match_roms(core_options *options, const char *hash, int length, int *found);
 
 
 
@@ -97,6 +97,7 @@ static const options_entry cli_options[] =
 	{ "listdevices;ld",           "0",        OPTION_COMMAND,    "list available devices" },
 #ifdef MESS
 	{ "listmedia;lm",             "0",        OPTION_COMMAND,    "list available media for the system" },
+	{ "listsoftware",             "0",        OPTION_COMMAND,    "list known software for the system" },
 #endif
 
 	{ NULL }
@@ -274,6 +275,7 @@ static int execute_commands(core_options *options, const char *exename, const ga
 		{ CLIOPTION_VERIFYSAMPLES,	info_verifysamples },
 #ifdef MESS
 		{ CLIOPTION_LISTMEDIA,		info_listmedia },
+		{ CLIOPTION_LISTSOFTWARE,	info_listsoftware },
 #endif
 		{ CLIOPTION_ROMIDENT,		info_romident }
 	};
@@ -876,7 +878,7 @@ static int info_romident(core_options *options, const char *gamename)
 		return MAMERR_FATALERROR;
 
 	/* do the identification */
-	romident(gamename, &status);
+	romident(options, gamename, &status);
 
 	/* clear out any cached files */
 	zip_file_cache_clear();
@@ -902,7 +904,7 @@ static int info_romident(core_options *options, const char *gamename)
     romident - identify files
 -------------------------------------------------*/
 
-static void romident(const char *filename, romident_status *status)
+static void romident(core_options *options, const char *filename, romident_status *status)
 {
 	osd_directory *directory;
 
@@ -920,7 +922,7 @@ static void romident(const char *filename, romident_status *status)
 			if (entry->type == ENTTYPE_FILE)
 			{
 				astring curfile(filename, PATH_SEPARATOR, entry->name);
-				identify_file(curfile, status);
+				identify_file(options, curfile, status);
 			}
 		osd_closedir(directory);
 	}
@@ -945,7 +947,7 @@ static void romident(const char *filename, romident_status *status)
 						/* decompress data into RAM and identify it */
 						ziperr = zip_file_decompress(zip, data, entry->uncompressed_length);
 						if (ziperr == ZIPERR_NONE)
-							identify_data(entry->filename, data, entry->uncompressed_length, status);
+							identify_data(options, entry->filename, data, entry->uncompressed_length, status);
 						global_free(data);
 					}
 				}
@@ -957,7 +959,7 @@ static void romident(const char *filename, romident_status *status)
 
 	/* otherwise, identify as a raw file */
 	else
-		identify_file(filename, status);
+		identify_file(options, filename, status);
 }
 
 
@@ -967,7 +969,7 @@ static void romident(const char *filename, romident_status *status)
     files
 -------------------------------------------------*/
 
-static void identify_file(const char *name, romident_status *status)
+static void identify_file(core_options *options, const char *name, romident_status *status)
 {
 	file_error filerr;
 	osd_file *file;
@@ -985,7 +987,7 @@ static void identify_file(const char *name, romident_status *status)
 			/* read file data into RAM and identify it */
 			filerr = osd_read(file, data, 0, length, &bytes);
 			if (filerr == FILERR_NONE)
-				identify_data(name, data, bytes, status);
+				identify_data(options, name, data, bytes, status);
 			global_free(data);
 		}
 		osd_close(file);
@@ -999,7 +1001,7 @@ static void identify_file(const char *name, romident_status *status)
     fusemap into raw data first
 -------------------------------------------------*/
 
-static void identify_data(const char *name, const UINT8 *data, int length, romident_status *status)
+static void identify_data(core_options *options, const char *name, const UINT8 *data, int length, romident_status *status)
 {
 	char hash[HASH_BUF_SIZE];
 	UINT8 *tempjed = NULL;
@@ -1031,7 +1033,7 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
 	mame_printf_info("%-20s", basename.cstr());
 
 	/* see if we can find a match in the ROMs */
-	match_roms(hash, length, &found);
+	match_roms(options, hash, length, &found);
 
 	/* if we didn't find it, try to guess what it might be */
 	if (found == 0)
@@ -1062,7 +1064,7 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
     match_roms - scan for a matching ROM by hash
 -------------------------------------------------*/
 
-static void match_roms(const char *hash, int length, int *found)
+static void match_roms(core_options *options, const char *hash, int length, int *found)
 {
 	int drvindex;
 
@@ -1090,4 +1092,8 @@ static void match_roms(const char *hash, int length, int *found)
 
 		machine_config_free(config);
 	}
+
+#ifdef MESS
+	mess_match_roms( options, hash, length, found );
+#endif
 }

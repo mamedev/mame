@@ -39,6 +39,7 @@
 #define CLIOPTION_VERIFYSAMPLES			"verifysamples"
 #define CLIOPTION_ROMIDENT				"romident"
 #define CLIOPTION_LISTMEDIA				"listmedia"		// needed by MESS
+#define CLIOPTION_LISTSOFTWARE			"listsoftware"
 
 
 
