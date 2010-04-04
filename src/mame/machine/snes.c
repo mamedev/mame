@@ -380,9 +380,9 @@ READ8_HANDLER( snes_r_io )
 
 			return value | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 		case RDNMI:			/* NMI flag by v-blank and version number */
-			value = (snes_ram[offset] & 0x8f) | (snes_open_bus_r(space, 0) & 0x70);
-			snes_ram[offset] &= 0x7f;	/* NMI flag is reset on read */
-			return value;
+			value = (snes_ram[offset] & 0x80) | (snes_open_bus_r(space, 0) & 0x70);
+			snes_ram[offset] &= 0x70;	/* NMI flag is reset on read */
+			return value | 2; //CPU version number
 		case TIMEUP:		/* IRQ flag by H/V count timer */
 			value = (snes_open_bus_r(space, 0) & 0x7f) | (snes_ram[TIMEUP] & 0x80);
 			cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
@@ -2012,10 +2012,10 @@ static void snes_dma( const address_space *space, UINT8 channels )
 			if (!length)
 				length = 0x10000;	/* 0x0000 really means 0x10000 */
 
-//          printf( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, state->dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", state->dma_channel[i].dmap & 0x07);
+//          printf( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, state->dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", state->dma_channel[i].dmap & 0x07);
 
 #ifdef SNES_DBG_DMA
-			mame_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, state->dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", state->dma_channel[i].dmap & 0x07);
+			mame_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, state->dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", state->dma_channel[i].dmap & 0x07);
 #endif
 
 			switch (state->dma_channel[i].dmap & 0x07)
