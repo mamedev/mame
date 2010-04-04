@@ -1,3 +1,5 @@
+int pok;
+
 /***************************************************************************
 
     poly.c
@@ -235,18 +237,10 @@ INLINE void convert_tri_extent_to_poly_extent(poly_extent *dstextent, const tri_
 	dstextent->stopx = srcextent->stopx;
 
 	/* if we have parameters, process them as well */
-	if (polygon->numparams > 0)
+	for (int paramnum = 0; paramnum < polygon->numparams; paramnum++)
 	{
-		float dx = srcextent->startx - polygon->xorigin;
-		float dy = y - polygon->yorigin;
-		int paramnum;
-
-		/* iterate over parameters */
-		for (paramnum = 0; paramnum < polygon->numparams; paramnum++)
-		{
-			dstextent->param[paramnum].start = polygon->param[paramnum].start + dx * polygon->param[paramnum].dpdx + dy * polygon->param[paramnum].dpdy;
-			dstextent->param[paramnum].dpdx = polygon->param[paramnum].dpdx;
-		}
+		dstextent->param[paramnum].start = polygon->param[paramnum].start + srcextent->startx * polygon->param[paramnum].dpdx + y * polygon->param[paramnum].dpdy;
+		dstextent->param[paramnum].dpdx = polygon->param[paramnum].dpdx;
 	}
 }
 
@@ -616,30 +610,36 @@ UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle *cli
 	/* compute parameter starting points and deltas */
 	if (paramcount > 0)
 	{
-		float divisor, dx1, dx2, dy1, dy2, xoffset, yoffset;
-		int paramnum;
+		float a00 = v2->y - v3->y;
+		float a01 = v3->x - v2->x;
+		float a02 = v2->x*v3->y - v3->x*v2->y;
+		float a10 = v3->y - v1->y;
+		float a11 = v1->x - v3->x;
+		float a12 = v3->x*v1->y - v1->x*v3->y;
+		float a20 = v1->y - v2->y;
+		float a21 = v2->x - v1->x;
+		float a22 = v1->x*v2->y - v2->x*v1->y;
+		float det = a02 + a12 + a22;
 
-		/* compute the divisor */
-		divisor = 1.0f / ((v1->x - v2->x) * (v1->y - v3->y) - (v1->x - v3->x) * (v1->y - v2->y));
-
-		/* compute the dx/dy values */
-		dx1 = v1->y - v3->y;
-		dx2 = v1->y - v2->y;
-		dy1 = v1->x - v2->x;
-		dy2 = v1->x - v3->x;
-
-		/* determine x/y offset for subpixel correction so that the starting values are
-           relative to the integer coordinates */
-		xoffset = v1->x - ((float)polygon->xorigin + 0.5f);
-		yoffset = v1->y - ((float)polygon->yorigin + 0.5f);
-
-		/* iterate over parameters */
-		for (paramnum = 0; paramnum < paramcount; paramnum++)
+		if(fabsf(det) < 0.001) {
+			for (int paramnum = 0; paramnum < paramcount; paramnum++)
+			{
+				poly_param *params = &polygon->param[paramnum];
+				params->dpdx = 0;
+				params->dpdy = 0;
+				params->start = v1->p[paramnum];
+			}
+		}
+		else
 		{
-			poly_param *params = &polygon->param[paramnum];
-			params->dpdx = ((v1->p[paramnum] - v2->p[paramnum]) * dx1 - (v1->p[paramnum] - v3->p[paramnum]) * dx2) * divisor;
-			params->dpdy = ((v1->p[paramnum] - v3->p[paramnum]) * dy1 - (v1->p[paramnum] - v2->p[paramnum]) * dy2) * divisor;
-			params->start = v1->p[paramnum] - xoffset * params->dpdx - yoffset * params->dpdy;
+			float idet = 1/det;
+			for (int paramnum = 0; paramnum < paramcount; paramnum++)
+			{
+				poly_param *params = &polygon->param[paramnum];
+				params->dpdx  = idet*(v1->p[paramnum]*a00 + v2->p[paramnum]*a10 + v3->p[paramnum]*a20); 
+				params->dpdy  = idet*(v1->p[paramnum]*a01 + v2->p[paramnum]*a11 + v3->p[paramnum]*a21); 
+				params->start = idet*(v1->p[paramnum]*a02 + v2->p[paramnum]*a12 + v3->p[paramnum]*a22);
+			}
 		}
 	}
 
