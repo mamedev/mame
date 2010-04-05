@@ -2079,7 +2079,7 @@ static void init_port_state(running_machine *machine)
 			}
 
 			/* Name keyboard key names */
-			if ((field->type == IPT_KEYBOARD) && (field->name == NULL))
+			if ((field->type == IPT_KEYBOARD || field->type == IPT_KEYPAD) && (field->name == NULL))
 			{
 				astring *name = get_keyboard_key_name(field);
 				if (name != NULL)
@@ -5359,6 +5359,7 @@ int input_classify_port(const input_field_config *field)
 			result = INPUT_CLASS_CONTROLLER;
 			break;
 
+		case IPT_KEYPAD:
 		case IPT_KEYBOARD:
 			result = INPUT_CLASS_KEYBOARD;
 			break;

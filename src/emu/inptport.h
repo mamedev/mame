@@ -150,6 +150,7 @@ enum
 	IPT_VOLUME_DOWN,
 	IPT_START,					/* MESS only */
 	IPT_SELECT,					/* MESS only */
+	IPT_KEYPAD,					/* MESS only */
 	IPT_KEYBOARD,				/* MESS only */
 
 #define __ipt_digital_joystick_start IPT_JOYSTICK_UP
