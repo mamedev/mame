@@ -1643,6 +1643,7 @@ struct namcos23_render_data {
 struct namcos23_poly_entry {
 	namcos23_render_data rd;
 	float zkey;
+	int front;
 	int vertex_count;
 	poly_vertex pv[16];
 };
@@ -2085,6 +2086,7 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 				p->pv[i].p[3] *= w;
 			}
 			p->zkey = 0.5*(minz+maxz);
+			p->front = !(h & 0x00000001);
 			p->rd.texture_lookup = texture_lookup_nocache_point;
 			p->rd.pens = machine->pens + (color << 8);
 			render_poly_count++;
@@ -2099,6 +2101,10 @@ static int render_poly_compare(const void *i1, const void *i2)
 {
 	const namcos23_poly_entry *p1 = render_polys + *(const int *)i1;
 	const namcos23_poly_entry *p2 = render_polys + *(const int *)i2;
+
+	if(p1->front != p2->front)
+		return p1->front ? 1 : -1;
+
 	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
 }
 
