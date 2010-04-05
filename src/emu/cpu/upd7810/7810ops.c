@@ -9468,3 +9468,19 @@ static void STM_7801(upd7810_state *cpustate)
 	/* Reload the timer */
 	cpustate->ovc0 = 16 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
 }
+
+static void MOV_MC_A_7801(upd7810_state *cpustate)
+{
+	/* On the 7801 the mode C bits function as follows: */
+	/*       Cn=1   Cn=0         */
+	/* PC0  Input   Output       */
+	/* PC1  Input   Output       */
+	/* PC2  Input   -SCS Input   */
+	/* PC3  Output  SAK Output   */
+	/* PC4  Output  To Output    */
+	/* PC5  Output  IO/-M Output */
+	/* PC6  Output  HLDA Output  */
+	/* PC7  Input   HOLD Input   */
+	MC = 0x84 | ( ( A & 0x02 ) ? 0x02 : 0x00 ) | ( ( A & 0x01 ) ? 0x01 : 0x00 );
+}
+
