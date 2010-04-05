@@ -145,27 +145,6 @@ Notes about 'frogg' :
   bit 5 of IN1 is tested if "Cabinet" Dip Switch is set to "Cocktail".
 
 
-Notes about 'calipso' :
----------------------
-
-  Calipso was apperantly redesigned for two player simultanious play.
-  There is code at $298a to flip the screen, but location $8669 has to be
-  set to 2. It's set to 1 no matter how many players are playing.
-  It's possible that there is a cocktail version of the game.
-
-
-Notes about 'moonwar' :
----------------------
-
-  Moonwar: 8255 Port C bit 4 was originally designed so when bit4=0, 1P spinner
-  is selected, and when bit4=1, 2P spinner gets selected.  But they forgot to
-  change the 8255 initialization value and Port C was set to input, setting the
-  spinner select bit to HI regardless what was written to it. This bug has been
-  corrected in the newer set, but, to maintain hardware compatibility with
-  older PCB's, they had to reverse to active status of the select bit.  So in the
-  newer set, Bit4=1 selects the 1P spinner and Bit4=0 selects the 2P spinner.
-
-
 Galaxian Bootleg Single Board Layout:
 -------------------------------------
 
@@ -205,6 +184,215 @@ Galaxian Bootleg Single Board Layout:
       |----------------------------------------------------------------------------------------------|
         1           2        3        4        5        6        7        8        9        1
                                                                                             0
+
+
+Stephh's notes (based on the games Z80 code and some tests) for games based on 'scobra' MACHINE_DRIVER :
+
+1) 'scobra' and clones
+
+1a) 'scobra'
+
+  - Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch.
+  - COIN1 and SERVICE1 share the same coinage while COIN2 always awards 3 credits per coin;
+    when "Coinage" is set to "99 Credits", credits are always set to 99 when pressing COIN1 (code at 0x037d).
+  - There is an unused coinage routine at 0x0159 with the following settings :
+
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "A 2/1  B 99" )
+	PORT_DIPSETTING(    0x06, "A 1/2  B 1/1" )
+	PORT_DIPSETTING(    0x04, "A 1/5  B 1/1" )
+	PORT_DIPSETTING(    0x02, "A 1/7  B 1/1" )
+
+    I can't tell at the moment if it's a leftover from another Konami game on similar hardware.
+  - You can have 3 or 4 lives at start, and you can only continue 4 times (code at 0x0ebf).
+
+1b) 'scobrase'
+
+  - The only difference in main CPU with 'scobra' is not in code but in data :
+      * data at 0x1323+ and 0x1575+ displays " (c) SEGA   1981 " instead of "(c) KONAMI   1981".
+      * data from 0x3d0c to 0x3fff has an unknown effect (this area is filled with 0xff in 'scobra').
+      * data from 0x5b62 to 0x5b6f displays "SEGA" instead of "OSAKA" on the first building in the "BASE"
+        (last) level ("KONAMI" is always still displayed on other buildings).
+    As the code is the same, comments from 'scobra' also apply to this set.
+  - Audio CPU is different than the one in 'scobra'. More investigation is needed !
+
+1c) 'scobras'
+
+  - Main CPU is different than the one in 'scobra', but audio CPU is the same as 'scobrase' !
+  - Player 2 controls are used for player 2 regardless of the "Cabinet" Dip Switch.
+  - COIN1 and SERVICE1 share the same coinage while COIN2 always awards 3 credits per coin;
+    when "Coinage" is set to "99 Credits", credits are always set to 99 when pressing COIN1 (code at 0x0bec).
+  - There is NO unused coinage routine.
+  - You can have 3 or 5 lives at start, and you can only continue 255 times (code at 0x00e3).
+  - On the first building in the "BASE" (last) level is written "STERN" instead of "OSAKA".
+
+1d) 'scobrab'
+
+  - The only difference in main CPU with 'scobras' is not in code but in data :
+      * data from 0x0434 to 0x043e affects the addresses in ROM area of the strings to display.
+      * data from 0x0456 to 0x07a0 affects the strings which are displayed (almost all of them).
+  - Audio CPU is the same as the one in 'scobra' (with different ROM names though).
+
+1e) 'suprheli'
+
+  - The only difference in main CPU with 'scobras' is not in code but in data :
+      * data at 0x0522+ displays "- SUPER HELI - " instead of "- SUPER COBRA -".
+      * data at 0x0547+ and 0x0799+ displays "                 " instead of "(c) STERN  1981  ".
+      * data from 0x5b26 to 0x5b32 displays "APPLE" instead of "STERN" on the first building in the "BASE"
+        (last) level.
+      * data from 0x5bbb to 0x5bc9 displays "ORANGE" instead of "KONAMI" on the other buildings in the "BASE"
+        (last) level.
+    As the code is the same, comments from 'scobras' also apply to this set.
+  - There is only ONE byte of difference with audio CPU in 'scobrase' :
+
+      Z:\MAME\data>fc /B epr1277.5e 9.9d
+      Comparaison des fichiers epr1277.5e et 9.9D
+      00001332: FD FF
+
+    Could it be a rotten bit ? As I have no evidence of this, I don't flag the ROM as BAD_DUMP.
+
+2) 'moonwar' and clones
+
+  - "8255 Port C bit 4 was originally designed so when bit4=0, 1P spinner is selected, and when bit4=1,
+    2P spinner gets selected.  But they forgot to change the 8255 initialization value and Port C was set
+    to input, setting the spinner select bit to HI regardless what was written to it. This bug has been
+    corrected in the newer set, but, to maintain hardware compatibility with older PCB's, they had to reverse
+    to active status of the select bit.  So in the newer set, Bit4=1 selects the 1P spinner and Bit4=0 selects
+    the 2P spinner".
+
+2a) 'moonwar'
+
+  - Press START1 when reseting the game to enter sort of inputs "test mode".
+  - "Hyperflip" button is ignored when "Cabinet" is set to "Cocktail" (code at 0x108d).
+  - When in "Free Play" mode, you only 3 lives at start.
+
+2b) 'moonwara'
+
+  - Press START1 when reseting the game to enter sort of inputs "test mode".
+  - "Hyperflip" button is ignored when "Cabinet" is set to "Cocktail" (code at 0x107f).
+  - Besides the spinner bug, coinage is very weird in this set (no correlation between COIN1 and COIN2).
+
+3) 'armorcar' and clones
+
+3a) 'armorcar'
+
+  - Press P2 BUTTON2 when reseting the game to enter sort of inputs "test mode".
+    You'll notice that there is some leftover code from 'moonwar' as you can see 2 (muxed) PORT A
+    (and there are still writes to PORT C bit 4). This has no effect in the game though.
+  - After the 3 ports are read, when "Cabinet" is set to "Cocktail" and its player 2 turn, player 2 inputs
+    are "copied" into player 1 ones (code at 0x0fd2 : start reading inputs).
+
+3b) 'armorcar2'
+
+  - When IN1 bit 2 is ON when reseting the game, you enter sort of inputs "test mode".
+    You'll notice that there is some leftover code from 'moonwar' as you can see 2 (muxed) PORT A
+    (and there are still writes to IN2 bit 4). This has no effect in the game though.
+    As this bit is marked as "unused" (see below why), you can never access to this "test mode".
+  - IN2 bit 3 has no real effect in this set : even if contents of 0x8627 is updated each time player changes,
+    screen flipping (0xa806 and 0xa807) is always set to "normal" (0x00 * 2) due to code at 0x0598, there is a
+    missing call to 0x0abf at 0x0a8c (there is even a 'ret' for call from 0x15aa), and there is no code to "copy"
+    player 2 inputs into player 1 ones (code at 0x0fb2 : start reading inputs).
+    There is still a leftover from 'armorcar' code, so this bit affects display (how ?) when IN2 bit 3 is ON
+    and it is player 2 turn (code at 0x0b66 is the same as the one at 0x0b87 in 'armorcar').
+
+4) 'tazmania'
+
+  - Press P1 BUTTON2 when reseting the game to enter sort of inputs "test mode".
+  - After the 3 ports are read, when "Cabinet" is set to "Cocktail" and its player 2 turn, player 2 inputs
+    are "copied" into player 1 ones (code at 0x124e : start reading inputs).
+  - When "Cabinet" is set to "Upright", press any player 2 joystick direction to end current level
+    (code at 0x38dd). This trick does NOT work in bonus rooms though.
+
+5) 'anteater'
+
+  - Press P1 BUTTON1 when reseting the game to enter sort of inputs "test mode".
+  - IN2 bit 3 has no effect in this set : even if contents of 0x86c4 is updated each time player changes,
+    screen flipping (0xa806 and 0xa807) is always reset to "normal" (0x00 * 2) after possible screen inversion
+    due to code at 0x05c7, and there is no code to "copy" player 2 inputs into player 1 ones (code at 0x0f7a :
+    start reading inputs).
+
+6) 'calipso'
+
+  - Press P1 BUTTON1 when reseting the game to enter sort of inputs "test mode".
+  - Press P1 BUTTON1 to start a 1 player game or press P2 BUTTON1 to start a 2 players game ("Team-Play").
+  - IN2 bit 3 has no effect in this set : even if there is code to "copy" player 2 inputs into player 1 ones
+    (code at 0x1448 : start reading inputs), contents of 0x8669 is always set to 0x01 regardless of number players
+    and is NEVER updated (there is even no code for this). Furthermore, the screen flipping routine forces the
+    screen to be "normal" ([0xa806] = [0xa807] = 0x00) because of the 'jr' instruction at 0x2988.
+    It's possible that there is a cocktail version of the game, but I'm not really convinced about it.
+
+7) 'losttomb' and clones
+
+7a) 'losttomb'
+
+  - Press P1 right joystick UP when reseting the game to enter sort of inputs "test mode".
+  - There is no "Cabinet" Dip Switch for this game and no possible muxed input for a 2nd player.
+    Furthermore, the routine at 0x254b is NEVER called, so the screen NEVER flips !
+  - The routine that reads inputs (code at 0x0ef4) behaves differently if you are in "attract mode" or not :
+      * when playing ([0x865f] = 0x00), it reads the 3 inputs ports
+      * when in "attract mode" ([0x865f] = 0xff), it only reads IN0 (to get status of COINn and STARTn)
+        and IN1 (to get the status of the "Lives" Dip Switch), and IN2 is completely ignored
+    The side effect of such thing is that the status of the "Demo Sounds" Dip Switch will be taken into
+    consideration only after a game has been played (for example, the game will always be silenced in
+    "attract mode" after resetting the machine because 0x00 is stored at 0x8613 during initialisation).
+  - When in "Free Play" mode, you only 3 lives at start.
+
+7b) 'losttombh'
+
+  - The only difference with 'losttomb' is not in code but in data :
+
+      Z:\MAME\data>fc /B 2h-easy lthard
+      Comparaison des fichiers 2h-easy et LTHARD
+      00000399: 0A 0B
+      0000039E: 0D 11
+      000003A3: 0F 14
+      000003A8: 13 19
+      000003AD: 15 1A
+      000003B2: 18 1B
+      000003B7: 1A 1C
+      000003BC: 1B 1D
+      000003C1: 1C 1E
+      000003C6: 1D 1F
+      000003CB: 1E 20
+      000003D0: 1F 21
+      000003D5: 20 22
+      000003D9: 03 05
+      000003E6: 0E 10
+      000003F0: 12 15
+      000003FD: 14 17
+      00000409: 0E 10
+      00000415: 0E 10
+      0000099B: AA 76    altered value to please the checksum routine
+
+    So the game is harder, but it has the same ingame bugs as 'losttomb'.
+
+8) 'spdcoin'
+
+  - Press START1 or START2 when reseting the game to enter sort of inputs "test mode" (in fact, only IN0 is tested).
+    Press BOTH START1 and START2 to exit from it.
+  - Press START1 + START2 + P1 joystick LEFT when reseting the game to display some statistics (code at 0x0226).
+    Release BOTH START1 and START2 to exit this screen.
+
+9) 'superbon'
+
+  - This game is heavily based on 'losttomb', so not surprisingly is the code similar.
+  - The main difference in terms of gameplay is that you only have 1 joystick to control your character
+    and that you shoot in the direction you are running unless you press the "HOLD" button.
+  - There are no tests at startup and it's not possible to enter sort of inputs "test mode" (even if code exists)
+    by pressing P1 joystick UP because of 'jump' instruction at 0x007d. If you try to check the ROMS, you'll
+    notice that they have the same name as in 'losttomb' and that they fail the checksum routines.
+  - There is no "Cabinet" Dip Switch for this game and no possible muxed input for a 2nd player.
+    Furthermore, the routine at 0x2a48 is NEVER called, so the screen NEVER flips !
+  - The routine that reads inputs (code at 0x0eb7) behaves differently if you are in "attract mode" or not :
+      * when playing ([0x8667] = 0x00), it reads the 3 inputs ports
+      * when in "attract mode" ([0x8667] = 0xff), it only reads IN0 (to get status of COINn and STARTn)
+        and IN1 (to get the status of the "Lives" Dip Switch), and IN2 is completely ignored
+    The side effect of such thing is that the status of the "Demo Sounds" Dip Switch will be taken into
+    consideration only after a game has been played (for example, the game will always be silenced in
+    "attract mode" after resetting the machine because 0x00 is stored at 0x8613 during initialisation).
+  - When in "Free Play" mode, you only 3 lives at start.
+
+
 
 
 TO DO :
@@ -1091,28 +1279,9 @@ static WRITE8_DEVICE_HANDLER( moonwar_port_select_w )
 }
 
 
-static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
-{
-	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
-	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
-	signed char dialread = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
-	static int counter_74ls161 = 0;
-	static int direction = 0;
-	UINT8 ret;
-	UINT8 buttons = (input_port_read(device->machine,"IN0")&0xe0);
-	if (dialread < 0) direction = 0;
-	else if (dialread > 0) direction = 0x10;
-	counter_74ls161 += abs(dialread);
-	counter_74ls161 &= 0xf;
-	ret = counter_74ls161 | direction | buttons;
-	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161, ret);
-	return ret;
-}
-
-
 static const ppi8255_interface moonwar_ppi8255_0_intf =
 {
-	DEVCB_HANDLER(moonwar_input_port_0_r),	/* Port A read */
+	DEVCB_INPUT_PORT("IN0"),				/* Port A read */
 	DEVCB_INPUT_PORT("IN1"),				/* Port B read */
 	DEVCB_INPUT_PORT("IN2"),				/* Port C read */
 	DEVCB_NULL,								/* Port A write */
