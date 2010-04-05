@@ -1068,6 +1068,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST device mandatory CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST device interface CDATA #IMPLIED>\n"
 		"\t\t\t<!ELEMENT instance EMPTY>\n"
 		"\t\t\t\t<!ATTLIST instance name CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
