@@ -59,6 +59,12 @@ enum
 /* Main interface function */
 CPU_GET_INFO( g65816 );
 #define CPU_G65816 CPU_GET_INFO_NAME( g65816 )
+CPU_GET_INFO( 5a22 );
+#define CPU_5A22 CPU_GET_INFO_NAME( 5a22 )
+
+#define CPU_TYPE_G65816 0
+#define CPU_TYPE_5A22 1
+
 
 void g65816_set_read_vector_callback(running_device *device, read8_space_func read_vector);
 

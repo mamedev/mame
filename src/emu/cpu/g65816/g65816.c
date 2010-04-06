@@ -100,7 +100,7 @@ INLINE g65816i_cpu_struct *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_G65816);
+	assert(cpu_get_type(device) == CPU_G65816 || cpu_get_type(device) == CPU_5A22);
 	return (g65816i_cpu_struct *)device->token;
 }
 
@@ -339,6 +339,7 @@ static CPU_INIT( g65816 )
 	g65816_set_irq_callback(cpustate, irqcallback);
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->cpu_type = CPU_TYPE_G65816;
 
 	state_save_register_device_item(device, 0, cpustate->a);
 	state_save_register_device_item(device, 0, cpustate->b);
@@ -520,6 +521,34 @@ CPU_GET_INFO( g65816 )
 		case CPUINFO_STR_REGISTER + G65816_Y:			sprintf(info->s, "Y:%04X", cpustate->y); break;
 		case CPUINFO_STR_REGISTER + G65816_NMI_STATE:	sprintf(info->s, "NMI:%X", cpustate->line_nmi); break;
 		case CPUINFO_STR_REGISTER + G65816_IRQ_STATE:	sprintf(info->s, "IRQ:%X", cpustate->line_irq); break;
+	}
+}
+
+/*
+SNES specific, used to handle master cycles
+*/
+
+static CPU_INIT( 5a22 )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
+
+	CPU_INIT_CALL(g65816);
+
+	cpustate->cpu_type = CPU_TYPE_5A22;
+}
+
+
+CPU_GET_INFO( 5a22 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(5a22);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "5A22");			break;
+
+		default:										CPU_GET_INFO_CALL(g65816);				break;
 	}
 }
 

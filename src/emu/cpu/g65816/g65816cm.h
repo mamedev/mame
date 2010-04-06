@@ -106,6 +106,7 @@ struct _g65816i_cpu_struct
 	uint source;
 	uint destination;
 	int ICount;
+	int cpu_type;
 };
 
 extern void (*const *const g65816i_opcodes[])(g65816i_cpu_struct *cpustate);
@@ -242,7 +243,7 @@ INLINE void g65816i_set_execution_mode(g65816i_cpu_struct *cpustate, uint mode)
 #define CLK_W_S			2
 #define CLK_W_SIY		5
 
-#define CLK(A)			CLOCKS -= (A)
+#define CLK(A)			CLOCKS -= (cpustate->cpu_type == CPU_TYPE_G65816 ? A : A*6)
 #define USE_ALL_CLKS()	CLOCKS = 0
 
 
