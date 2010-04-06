@@ -842,7 +842,7 @@ READ8_HANDLER( snes_r_bank1 )
 		}
 		else
 		{
-			logerror("snes_r_bank1: Unmapped external chip read: %04x\n", address);
+			logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address);
 			value = snes_open_bus_r(space, 0);								/* Reserved */
 		}
 	}
@@ -895,7 +895,7 @@ READ8_HANDLER( snes_r_bank2 )
 		}
 		else
 		{
-			logerror( "snes_r_bank2: Unmapped external chip read: %04x\n", address );
+			logerror( "(PC=%06x) snes_r_bank2: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address );
 			value = snes_open_bus_r(space, 0);
 		}
 	}
@@ -977,7 +977,7 @@ READ8_HANDLER( snes_r_bank4 )
 			value = (address >= 0x4000) ? dsp1_get_sr() : dsp1_get_dr();
 		else
 		{
-			logerror("snes_r_bank4: Unmapped external chip read: %04x\n", address);
+			logerror("(PC=%06x) snes_r_bank4: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address);
 			value = snes_open_bus_r(space, 0);							/* Reserved */
 		}
 	}
@@ -1010,7 +1010,7 @@ READ8_HANDLER( snes_r_bank5 )
 		}
 		else
 		{
-			logerror("snes_r_bank5: Unmapped external chip read: %04x\n", address);
+			logerror("(PC=%06x) snes_r_bank5: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address);
 			value = snes_open_bus_r(space, 0);								/* Reserved */
 		}
 	}
@@ -1046,7 +1046,7 @@ READ8_HANDLER( snes_r_bank6 )
 			}
 			else						/* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
 			{
-				logerror("snes_r_bank6: Unmapped external chip read: %04x\n", address);
+				logerror("(PC=%06x) snes_r_bank6: Unmapped external chip read: %04x\n",cpu_get_pc(space->cpu),address);
 				value = snes_open_bus_r(space, 0);
 			}
 		}
@@ -1155,7 +1155,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 	else if ((snes_has_addon_chip == HAS_DSP3) && (offset >= 0x200000))
 		dsp3_write(address, data);
 	else
-		logerror( "Attempt to write to ROM address: %X\n", offset );
+		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset );
 }
 
 /* 0x300000 - 0x3fffff */
@@ -1204,7 +1204,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 	else if ((snes_has_addon_chip == HAS_DSP4) && (address < 0xc000))
 		dsp4_write(data);
 	else
-		logerror("Attempt to write to ROM address: %X\n", offset + 0x300000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x300000);
 }
 
 /* 0x600000 - 0x6fffff */
@@ -1219,14 +1219,14 @@ WRITE8_HANDLER( snes_w_bank4 )
 	else if (snes_cart.mode & 5)					/* Mode 20 & 22 */
 	{
 		if (address >= 0x8000)
-			logerror("Attempt to write to ROM address: %X\n", offset + 0x600000);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x600000);
 		else if (snes_has_addon_chip == HAS_DSP1)
 			dsp1_set_dr(data);
 		else
 			logerror("snes_w_bank4: Attempt to write to reserved address: %X = %02x\n", offset + 0x600000, data);
 	}
 	else if (snes_cart.mode & 0x0a)
-		logerror("Attempt to write to ROM address: %X\n", offset + 0x600000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x600000);
 }
 
 /* 0x700000 - 0x7dffff */
@@ -1247,7 +1247,7 @@ WRITE8_HANDLER( snes_w_bank5 )
 			logerror("snes_w_bank5: Attempt to write to reserved address: %X = %02x\n", offset + 0x700000, data);
 	}
 	else if (snes_cart.mode & 0x0a)
-		logerror("Attempt to write to ROM address: %X\n", offset + 0x700000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x700000);
 }
 
 
@@ -1292,7 +1292,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 	else if ((snes_has_addon_chip == HAS_DSP4) && (offset >= 0x300000) && (address < 0xc000))
 		dsp4_write(data);
 	else
-		logerror("Attempt to write to ROM address: %X\n", offset + 0x800000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x800000);
 }
 
 
@@ -1309,7 +1309,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 			snes_ram[0xe00000 + offset] = data;		// SFX RAM
 		}
 		else
-			logerror("Attempt to write to ROM address: %X\n", offset + 0xc00000);
+			logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
 	}
 	else if (snes_has_addon_chip == HAS_ST010 && offset >= 0x280000 && offset < 0x300000 && address < 0x1000)
 		st010_write(address, data);
@@ -1325,10 +1325,10 @@ WRITE8_HANDLER( snes_w_bank7 )
 				snes_w_bank4(space, offset - 0x200000, data);
 		}
 		else
-			logerror("snes_w_bank7: Attempt to write to ROM address: %X = %02x\n", offset + 0xc00000, data);
+			logerror("(PC=%06x) snes_w_bank7: Attempt to write to ROM address: %X = %02x\n",cpu_get_pc(space->cpu),offset + 0xc00000, data);
 	}
 	else if (snes_cart.mode & 0x0a)
-		logerror("Attempt to write to ROM address: %X\n", offset + 0xc00000);
+		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
 }
 
 
@@ -1779,6 +1779,9 @@ INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abu
 {
 	snes_state *state = (snes_state *)space->machine->driver_data;
 
+	/* every byte transfer takes 8 master cycles */
+	cpu_adjust_icount(space->cpu,-8);
+
 	if (state->dma_channel[dma].dmap & 0x80)	/* PPU->CPU */
 	{
 		if (bbus == 0x2180 && ((abus & 0xfe0000) == 0x7e0000 || (abus & 0x40e000) == 0x0000))
@@ -1980,6 +1983,11 @@ static void snes_dma( const address_space *space, UINT8 channels )
 	UINT16 bbus;
 	UINT32 abus, abus_bank, length;
 
+	/* FIXME: we also need to round to the nearest 8 master cycles */
+
+	/* overhead steals 8 master cycles, correct? */
+	cpu_adjust_icount(space->cpu,-8);
+
 	/* Assume priority of the 8 DMA channels is 0-7 */
 	for (i = 0; i < 8; i++)
 	{
@@ -2090,8 +2098,13 @@ static void snes_dma( const address_space *space, UINT8 channels )
 			/* We're done, so write the new abus back to the registers */
 			state->dma_channel[i].src_addr = abus;
 			state->dma_channel[i].trans_size = 0;
+			/* active channel takes 8 master cycles */
+			cpu_adjust_icount(space->cpu,-8);
 		}
 	}
+
+	/* finally, take yet another 8 master cycles for the aforementioned overhead */
+	cpu_adjust_icount(space->cpu,-8);
 }
 
 READ8_HANDLER( superfx_r_bank1 )
