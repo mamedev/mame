@@ -137,7 +137,7 @@ static void print_game_input(FILE *out, const game_driver *game, const ioport_li
 {
 	/* fix me -- this needs to be cleaned up to match the core style */
 
-enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal, ENDCONTROLTYPES};
+enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal, ckeypad, ckeyboard, ENDCONTROLTYPES};
 	int nplayer = 0;
 	int nbutton = 0;
 	int ncoin = 0;
@@ -146,12 +146,13 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	int i;
 	const char* service = 0;
 	const char* tilt = 0;
-	const char* const control_types[] = {"joy", "doublejoy", "stick", "dial", "trackball", "paddle", "lightgun", "pedal"};
+	const char* const control_types[] = {"joy", "doublejoy", "stick", "dial", "trackball", "paddle", "lightgun", "pedal", "keypad", "keyboard"};
 	static struct _input_info
 	{
 		const char *	type;			/* general type of input */
 		const char *	Xway;			/* 2, 4, or 8 way */
 		int				analog;
+		int				keyb;
 		int				min;			/* analog minimum value */
 		int				max;			/* analog maximum value  */
 		int				sensitivity;	/* default analog sensitivity */
@@ -161,11 +162,12 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	const input_port_config *port;
 	const input_field_config *field;
 
-	for (i=0;i<ENDCONTROLTYPES;i++)
+	for (i = 0; i < ENDCONTROLTYPES; i++)
 	{
 		control[i].type = control_types[i];
 		control[i].Xway = NULL;
 		control[i].analog = 0;
+		control[i].keyb = 0;
 		control[i].min = 0;
 		control[i].max = 0;
 		control[i].sensitivity = 0;
@@ -176,8 +178,8 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	for (port = portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			if (nplayer < field->player+1)
-				nplayer = field->player+1;
+			if (nplayer < field->player + 1)
+				nplayer = field->player + 1;
 
 			switch (field->type)
 			{
@@ -322,6 +324,14 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 				case IPT_TILT :
 					tilt = "yes";
 					break;
+
+				case IPT_KEYPAD:
+					control[ckeypad].keyb = 1;
+					break;
+
+				case IPT_KEYBOARD:
+					control[ckeyboard].keyb = 1;
+					break;
 			}
 
 			/* get the analog stats */
@@ -377,6 +387,10 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 				fprintf(out, " reverse=\"yes\"");
 
 			fprintf(out, "/>\n");
+		}
+		if (control[i].keyb)
+		{
+			fprintf(out, "\t\t\t<control type=\"%s\"/>\n", xml_normalize_string(control_types[i]));
 		}
 	}
 	fprintf(out, "\t\t</input>\n");
@@ -927,7 +941,8 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
 #ifdef MESS
-	print_mess_game_xml(out, game, config);
+	print_game_device(out, game, config);
+	print_game_ramoptions(out, game, config);
 #endif /* MESS */
 
 	/* close the topmost tag */
@@ -954,7 +969,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
 		"\t<!ATTLIST " XML_ROOT " mameconfig CDATA #REQUIRED>\n"
 #ifdef MESS
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*, softwarelist*)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*)>\n"
 #else
 		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?)>\n"
 #endif
@@ -1068,7 +1083,6 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST device mandatory CDATA #IMPLIED>\n"
-		"\t\t\t<!ATTLIST device interface CDATA #IMPLIED>\n"
 		"\t\t\t<!ELEMENT instance EMPTY>\n"
 		"\t\t\t\t<!ATTLIST instance name CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
@@ -1076,8 +1090,6 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
 		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
-		"\t\t<!ELEMENT softwarelist EMPTY>\n"
-		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 #endif
 		"]>\n\n"
 		"<" XML_ROOT " build=\"%s\" debug=\""
