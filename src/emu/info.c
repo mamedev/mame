@@ -941,8 +941,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
 #ifdef MESS
-	print_game_device(out, game, config);
-	print_game_ramoptions(out, game, config);
+	print_mess_game_xml(out, game, config);
 #endif /* MESS */
 
 	/* close the topmost tag */
@@ -969,7 +968,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
 		"\t<!ATTLIST " XML_ROOT " mameconfig CDATA #REQUIRED>\n"
 #ifdef MESS
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*, softwarelist*)>\n"
 #else
 		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?)>\n"
 #endif
@@ -1083,6 +1082,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST device mandatory CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST device interface CDATA #IMPLIED>\n"
 		"\t\t\t<!ELEMENT instance EMPTY>\n"
 		"\t\t\t\t<!ATTLIST instance name CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
@@ -1090,6 +1090,8 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
 		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
+		"\t\t<!ELEMENT softwarelist EMPTY>\n"
+		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 #endif
 		"]>\n\n"
 		"<" XML_ROOT " build=\"%s\" debug=\""
