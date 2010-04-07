@@ -809,7 +809,7 @@ address               |         |          |       |     |         |        |   
 
 */
 
-/*FIXME: missing work RAM access steal */
+/*FIXME: missing work RAM access steal / we need to do this less "aggressive" otherwise we lose too much CPU horsepower, why? */
 static int snes_bank_0x00_0x3f_cycles(running_machine *machine,UINT32 offset)
 {
 /*
@@ -825,15 +825,17 @@ static int snes_bank_0x00_0x3f_cycles(running_machine *machine,UINT32 offset)
          */
 
 	if(((offset & 0xff00) == 0x4000) || ((offset & 0xff00) == 0x4100))
-		return 12;
+		return 0; //TODO: 12
+	if(((offset & 0xff00) == 0x4200) || ((offset & 0xff00) == 0x4300))
+		return 0; //TODO: 6
 
 	if(((offset & 0xff00) >= 0x0000) && ((offset & 0xff00) <= 0x1f00))
-		return 8;
+		return 0; //TODO: 8
 
 	if((offset & 0xff00) >= 0x6000)
 		return 8;
 
-	return 6;
+	return 0; //TODO: 6
 }
 
 static int snes_bank_0x80_0xbf_cycles(running_machine *machine,UINT32 offset)
@@ -850,19 +852,23 @@ static int snes_bank_0x80_0xbf_cycles(running_machine *machine,UINT32 offset)
          | $8000-$FFFF | Note2 | Address Bus A + /CART
 */
 
+
 	if(((offset & 0xff00) == 0x4000) || ((offset & 0xff00) == 0x4100))
-		return 12;
+		return 0; //TODO: 12
+
+	if(((offset & 0xff00) == 0x4200) || ((offset & 0xff00) == 0x4300))
+		return 0; //TODO: 6
 
 	if(((offset & 0xff00) >= 0x0000) && ((offset & 0xff00) <= 0x1f00))
-		return 8;
+		return 0; //TODO: 8
 
 	if(((offset & 0xff00) >= 0x6000) && ((offset & 0xff00) <= 0x7f00))
-		return 8;
+		return 0; //TODO: 8
 
 	if(((offset & 0xff00) >= 0x8000) && ((offset & 0xff00) <= 0xff00))
 		return (snes_ram[MEMSEL] & 1) ? 6 : 8;
 
-	return 6;
+	return 0; //TODO: 6
 }
 
 /* 0x000000 - 0x2fffff */
