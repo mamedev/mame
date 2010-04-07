@@ -809,6 +809,62 @@ address               |         |          |       |     |         |        |   
 
 */
 
+/*FIXME: missing work RAM access steal */
+static int snes_bank_0x00_0x3f_cycles(running_machine *machine,UINT32 offset)
+{
+/*
+ $00-$3F | $0000-$1FFF | Slow  | Address Bus A + /WRAM (mirror $7E:0000-$1FFF)
+         | $2000-$20FF | Fast  | Address Bus A
+         | $2100-$21FF | Fast  | Address Bus B
+         | $2200-$3FFF | Fast  | Address Bus A
+         | $4000-$41FF | XSlow | Internal CPU registers (see Note 1 below)
+         | $4200-$43FF | Fast  | Internal CPU registers (see Note 1 below)
+         | $4400-$5FFF | Fast  | Address Bus A
+         | $6000-$7FFF | Slow  | Address Bus A
+         | $8000-$FFFF | Slow  | Address Bus A + /CART
+         */
+
+	if(((offset & 0xff00) == 0x4000) || ((offset & 0xff00) == 0x4100))
+		return 12;
+
+	if(((offset & 0xff00) >= 0x0000) && ((offset & 0xff00) <= 0x1f00))
+		return 8;
+
+	if((offset & 0xff00) >= 0x6000)
+		return 8;
+
+	return 6;
+}
+
+static int snes_bank_0x80_0xbf_cycles(running_machine *machine,UINT32 offset)
+{
+/*
+ $80-$BF | $0000-$1FFF | Slow  | Address Bus A + /WRAM (mirror $7E:0000-$1FFF)
+         | $2000-$20FF | Fast  | Address Bus A
+         | $2100-$21FF | Fast  | Address Bus B
+         | $2200-$3FFF | Fast  | Address Bus A
+         | $4000-$41FF | XSlow | Internal CPU registers (see Note 1 below)
+         | $4200-$43FF | Fast  | Internal CPU registers (see Note 1 below)
+         | $4400-$5FFF | Fast  | Address Bus A
+         | $6000-$7FFF | Slow  | Address Bus A
+         | $8000-$FFFF | Note2 | Address Bus A + /CART
+*/
+
+	if(((offset & 0xff00) == 0x4000) || ((offset & 0xff00) == 0x4100))
+		return 12;
+
+	if(((offset & 0xff00) >= 0x0000) && ((offset & 0xff00) <= 0x1f00))
+		return 8;
+
+	if(((offset & 0xff00) >= 0x6000) && ((offset & 0xff00) <= 0x7f00))
+		return 8;
+
+	if(((offset & 0xff00) >= 0x8000) && ((offset & 0xff00) <= 0xff00))
+		return (snes_ram[MEMSEL] & 1) ? 6 : 8;
+
+	return 6;
+}
+
 /* 0x000000 - 0x2fffff */
 READ8_HANDLER( snes_r_bank1 )
 {
@@ -855,6 +911,7 @@ READ8_HANDLER( snes_r_bank1 )
 	else
 		value = snes_ram[offset];
 
+	cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 	return value;
 }
 
@@ -911,6 +968,8 @@ READ8_HANDLER( snes_r_bank2 )
 	else
 		value = snes_ram[0x300000 + offset];
 
+	cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+
 	return value;
 }
 
@@ -949,6 +1008,7 @@ READ8_HANDLER( snes_r_bank3 )
 	else											/* Mode 21 & 25 + SuperFX games */
 		value = snes_ram[0x400000 + offset];
 
+	cpu_adjust_icount(space->cpu, -8);
 	return value;
 }
 
@@ -984,6 +1044,7 @@ READ8_HANDLER( snes_r_bank4 )
 	else if (snes_cart.mode & 0x0a)					/* Mode 21 & 25 */
 		value = snes_ram[0x600000 + offset];
 
+	cpu_adjust_icount(space->cpu, -8);
 	return value;
 }
 
@@ -1017,6 +1078,7 @@ READ8_HANDLER( snes_r_bank5 )
 	else
 		value = snes_ram[0x700000 + offset];
 
+	cpu_adjust_icount(space->cpu, -8);
 	return value;
 }
 
@@ -1062,6 +1124,7 @@ READ8_HANDLER( snes_r_bank6 )
 	else
 		value = snes_ram[0x800000 + offset];
 
+	cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
 	return value;
 }
 
@@ -1112,6 +1175,8 @@ READ8_HANDLER( snes_r_bank7 )
 	else								/* Mode 21 & 25 + SuperFX Games */
 		value = snes_ram[0xc00000 + offset];
 
+	cpu_adjust_icount(space->cpu, -(snes_ram[MEMSEL] & 1) ? 6 : 8);
+
 	return value;
 }
 
@@ -1156,6 +1221,8 @@ WRITE8_HANDLER( snes_w_bank1 )
 		dsp3_write(address, data);
 	else
 		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset );
+
+	cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 }
 
 /* 0x300000 - 0x3fffff */
@@ -1205,6 +1272,8 @@ WRITE8_HANDLER( snes_w_bank2 )
 		dsp4_write(data);
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x300000);
+
+	cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 }
 
 /* 0x600000 - 0x6fffff */
@@ -1227,6 +1296,8 @@ WRITE8_HANDLER( snes_w_bank4 )
 	}
 	else if (snes_cart.mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x600000);
+
+	cpu_adjust_icount(space->cpu, -8);
 }
 
 /* 0x700000 - 0x7dffff */
@@ -1248,6 +1319,8 @@ WRITE8_HANDLER( snes_w_bank5 )
 	}
 	else if (snes_cart.mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x700000);
+
+	cpu_adjust_icount(space->cpu, -8);
 }
 
 
@@ -1293,6 +1366,8 @@ WRITE8_HANDLER( snes_w_bank6 )
 		dsp4_write(data);
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x800000);
+
+	cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
 }
 
 
@@ -1329,6 +1404,8 @@ WRITE8_HANDLER( snes_w_bank7 )
 	}
 	else if (snes_cart.mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
+
+	cpu_adjust_icount(space->cpu, -(snes_ram[MEMSEL] & 1) ? 6 : 8);
 }
 
 
