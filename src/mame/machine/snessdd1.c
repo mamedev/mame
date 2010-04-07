@@ -620,6 +620,7 @@ static void sdd1_mmio_write(const address_space *space, UINT32 addr, UINT8 data)
 				break;
 		}
 		snes_ram[addr] = data;
+		snes_io_dma_w(space, addr, data);
 		return;
 	}
 
