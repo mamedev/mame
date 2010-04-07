@@ -2574,7 +2574,8 @@ V-V                           TP-027
 	DRIVER( blkdrgon )	/*  8/1987 (c) 1987 (Japan) */
 	DRIVER( blkdrgonb )	/* bootleg, hacked to say Black Tiger */
 	DRIVER( sf )		/*  8/1987 (c) 1987 (World) */
-	DRIVER( sfus )		/*  8/1987 (c) 1987 (US) */
+	DRIVER( sfu )		/*  8/1987 (c) 1987 (US) */
+	DRIVER( sfua )		/*  8/1987 (c) 1987 (US) */
 	DRIVER( sfj )		/*  8/1987 (c) 1987 (Japan) */
 	DRIVER( sfp )		/*  8/1987 (c) 1987 */
 	DRIVER( tigeroad )	/* 11/1987 (c) 1987 + Romstar (US) */
