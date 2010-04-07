@@ -1175,7 +1175,7 @@ READ8_HANDLER( snes_r_bank7 )
 	else								/* Mode 21 & 25 + SuperFX Games */
 		value = snes_ram[0xc00000 + offset];
 
-	cpu_adjust_icount(space->cpu, -(snes_ram[MEMSEL] & 1) ? 6 : 8);
+	cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 
 	return value;
 }
@@ -1405,7 +1405,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 	else if (snes_cart.mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
 
-	cpu_adjust_icount(space->cpu, -(snes_ram[MEMSEL] & 1) ? 6 : 8);
+	cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 }
 
 
