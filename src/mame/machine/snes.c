@@ -203,7 +203,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
 	timer_adjust_oneshot(state->hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, state->hblank_offset * state->htmult), 0);
 
-//	printf("%02x %d\n",snes_ram[HVBJOY],snes_ppu.beam.current_vert);
+//  printf("%02x %d\n",snes_ram[HVBJOY],snes_ppu.beam.current_vert);
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
@@ -418,40 +418,40 @@ READ8_HANDLER( snes_r_io )
 			return state->joy4h;
 		case DMAP0:	case DMAP1: case DMAP2: case DMAP3: /*0x43n0*/
 		case DMAP4: case DMAP5: case DMAP6: case DMAP7:
-			return state->dma_channel[(offset & 0x70) >> 4].dmap;
+			return state->dma_channel[(offset >> 4) & 0x07].dmap;
 		case BBAD0: case BBAD1: case BBAD2: case BBAD3: /*0x43n1*/
 		case BBAD4: case BBAD5: case BBAD6: case BBAD7:
-			return state->dma_channel[(offset & 0x70) >> 4].dest_addr;
+			return state->dma_channel[(offset >> 4) & 0x07].dest_addr;
 		case A1T0L: case A1T1L: case A1T2L: case A1T3L: /*0x43n2*/
 		case A1T4L: case A1T5L: case A1T6L: case A1T7L:
-			return state->dma_channel[(offset & 0x70) >> 4].src_addr & 0xff;
+			return state->dma_channel[(offset >> 4) & 0x07].src_addr & 0xff;
 		case A1T0H: case A1T1H: case A1T2H: case A1T3H: /*0x43n3*/
 		case A1T4H: case A1T5H: case A1T6H: case A1T7H:
-			return (state->dma_channel[(offset & 0x70) >> 4].src_addr >> 8) & 0xff;
+			return (state->dma_channel[(offset >> 4) & 0x07].src_addr >> 8) & 0xff;
 		case A1B0: case A1B1: case A1B2: case A1B3:     /*0x43n4*/
 		case A1B4: case A1B5: case A1B6: case A1B7:
-			return state->dma_channel[(offset & 0x70) >> 4].bank;
+			return state->dma_channel[(offset >> 4) & 0x07].bank;
 		case DAS0L: case DAS1L: case DAS2L: case DAS3L: /*0x43n5*/
 		case DAS4L: case DAS5L: case DAS6L: case DAS7L:
-			return state->dma_channel[(offset & 0x70) >> 4].trans_size & 0xff;
+			return state->dma_channel[(offset >> 4) & 0x07].trans_size & 0xff;
 		case DAS0H: case DAS1H: case DAS2H: case DAS3H: /*0x43n6*/
 		case DAS4H: case DAS5H: case DAS6H: case DAS7H:
-			return (state->dma_channel[(offset & 0x70) >> 4].trans_size >> 8) & 0xff;
+			return (state->dma_channel[(offset >> 4) & 0x07].trans_size >> 8) & 0xff;
 		case DSAB0: case DSAB1: case DSAB2: case DSAB3: /*0x43n7*/
 		case DSAB4: case DSAB5: case DSAB6: case DSAB7:
-			return state->dma_channel[(offset & 0x70) >> 4].ibank;
+			return state->dma_channel[(offset >> 4) & 0x07].ibank;
 		case A2A0L: case A2A1L: case A2A2L: case A2A3L: /*0x43n8*/
 		case A2A4L: case A2A5L: case A2A6L: case A2A7L:
-			return state->dma_channel[(offset & 0x70) >> 4].hdma_addr & 0xff;
+			return state->dma_channel[(offset >> 4) & 0x07].hdma_addr & 0xff;
 		case A2A0H: case A2A1H: case A2A2H: case A2A3H: /*0x43n9*/
 		case A2A4H: case A2A5H: case A2A6H: case A2A7H:
-			return (state->dma_channel[(offset & 0x70) >> 4].hdma_addr >> 8) & 0xff;
+			return (state->dma_channel[(offset >> 4) & 0x07].hdma_addr >> 8) & 0xff;
 		case NTRL0: case NTRL1: case NTRL2: case NTRL3: /*0x43na*/
 		case NTRL4: case NTRL5: case NTRL6: case NTRL7:
-			return state->dma_channel[(offset & 0x70) >> 4].hdma_line_counter;
+			return state->dma_channel[(offset >> 4) & 0x07].hdma_line_counter;
 		case 0x430b: case 0x431b: case 0x432b: case 0x433b: /* according to bsnes, this does not return open_bus (even if its precise effect is unknown) */
 		case 0x434b: case 0x435b: case 0x436b: case 0x437b:
-			return state->dma_channel[(offset & 0x70) >> 4].unk;
+			return state->dma_channel[(offset >> 4) & 0x07].unk;
 
 #ifndef MESS
 		case 0x4100:		/* NSS Dip-Switches */
@@ -677,51 +677,51 @@ WRITE8_HANDLER( snes_w_io )
 		/* Below is all DMA related */
 		case DMAP0:	case DMAP1: case DMAP2: case DMAP3: /*0x43n0*/
 		case DMAP4: case DMAP5: case DMAP6: case DMAP7:
-			state->dma_channel[(offset & 0x70) >> 4].dmap = data;
+			state->dma_channel[(offset >> 4) & 0x07].dmap = data;
 			break;
 		case BBAD0: case BBAD1: case BBAD2: case BBAD3: /*0x43n1*/
 		case BBAD4: case BBAD5: case BBAD6: case BBAD7:
-			state->dma_channel[(offset & 0x70) >> 4].dest_addr = data;
+			state->dma_channel[(offset >> 4) & 0x07].dest_addr = data;
 			break;
 		case A1T0L: case A1T1L: case A1T2L: case A1T3L: /*0x43n2*/
 		case A1T4L: case A1T5L: case A1T6L: case A1T7L:
-			state->dma_channel[(offset & 0x70) >> 4].src_addr = (state->dma_channel[(offset & 0x70) >> 4].src_addr & 0xff00) | (data << 0);
+			state->dma_channel[(offset >> 4) & 0x07].src_addr = (state->dma_channel[(offset >> 4) & 0x07].src_addr & 0xff00) | (data << 0);
 			break;
 		case A1T0H: case A1T1H: case A1T2H: case A1T3H: /*0x43n3*/
 		case A1T4H: case A1T5H: case A1T6H: case A1T7H:
-			state->dma_channel[(offset & 0x70) >> 4].src_addr = (state->dma_channel[(offset & 0x70) >> 4].src_addr & 0x00ff) | (data << 8);
+			state->dma_channel[(offset >> 4) & 0x07].src_addr = (state->dma_channel[(offset >> 4) & 0x07].src_addr & 0x00ff) | (data << 8);
 			break;
 		case A1B0: case A1B1: case A1B2: case A1B3:     /*0x43n4*/
 		case A1B4: case A1B5: case A1B6: case A1B7:
-			state->dma_channel[(offset & 0x70) >> 4].bank = data;
+			state->dma_channel[(offset >> 4) & 0x07].bank = data;
 			break;
 		case DAS0L: case DAS1L: case DAS2L: case DAS3L: /*0x43n5*/
 		case DAS4L: case DAS5L: case DAS6L: case DAS7L:
-			state->dma_channel[(offset & 0x70) >> 4].trans_size = (state->dma_channel[(offset & 0x70) >> 4].trans_size & 0xff00) | (data << 0);
+			state->dma_channel[(offset >> 4) & 0x07].trans_size = (state->dma_channel[(offset >> 4) & 0x07].trans_size & 0xff00) | (data << 0);
 			break;
 		case DAS0H: case DAS1H: case DAS2H: case DAS3H: /*0x43n6*/
 		case DAS4H: case DAS5H: case DAS6H: case DAS7H:
-			state->dma_channel[(offset & 0x70) >> 4].trans_size = (state->dma_channel[(offset & 0x70) >> 4].trans_size & 0x00ff) | (data << 8);
+			state->dma_channel[(offset >> 4) & 0x07].trans_size = (state->dma_channel[(offset >> 4) & 0x07].trans_size & 0x00ff) | (data << 8);
 			break;
 		case DSAB0: case DSAB1: case DSAB2: case DSAB3: /*0x43n7*/
 		case DSAB4: case DSAB5: case DSAB6: case DSAB7:
-			state->dma_channel[(offset & 0x70) >> 4].ibank = data;
+			state->dma_channel[(offset >> 4) & 0x07].ibank = data;
 			break;
 		case A2A0L: case A2A1L: case A2A2L: case A2A3L: /*0x43n8*/
 		case A2A4L: case A2A5L: case A2A6L: case A2A7L:
-			state->dma_channel[(offset & 0x70) >> 4].hdma_addr = (state->dma_channel[(offset & 0x70) >> 4].hdma_addr & 0xff00) | (data << 0);
+			state->dma_channel[(offset >> 4) & 0x07].hdma_addr = (state->dma_channel[(offset >> 4) & 0x07].hdma_addr & 0xff00) | (data << 0);
 			break;
 		case A2A0H: case A2A1H: case A2A2H: case A2A3H: /*0x43n9*/
 		case A2A4H: case A2A5H: case A2A6H: case A2A7H:
-			state->dma_channel[(offset & 0x70) >> 4].hdma_addr = (state->dma_channel[(offset & 0x70) >> 4].hdma_addr & 0x00ff) | (data << 8);
+			state->dma_channel[(offset >> 4) & 0x07].hdma_addr = (state->dma_channel[(offset >> 4) & 0x07].hdma_addr & 0x00ff) | (data << 8);
 			break;
 		case NTRL0: case NTRL1: case NTRL2: case NTRL3: /*0x43na*/
 		case NTRL4: case NTRL5: case NTRL6: case NTRL7:
-			state->dma_channel[(offset & 0x70) >> 4].hdma_line_counter = data;
+			state->dma_channel[(offset >> 4) & 0x07].hdma_line_counter = data;
 			break;
 		case 0x430b: case 0x431b: case 0x432b: case 0x433b:
 		case 0x434b: case 0x435b: case 0x436b: case 0x437b:
-			state->dma_channel[(offset & 0x70) >> 4].unk = data;
+			state->dma_channel[(offset >> 4) & 0x07].unk = data;
 			break;
 	}
 
@@ -1933,8 +1933,8 @@ static void snes_hdma_update( const address_space *space, int dma )
 	if (state->dma_channel[dma].dmap & 0x40)
 	{
 		/* One oddity: if $43xA is 0 and this is the last active HDMA channel for this scanline, only load
-		one byte for Address, and use the $00 for the low byte. So Address ends up incremented one less than
-		otherwise expected */
+        one byte for Address, and use the $00 for the low byte. So Address ends up incremented one less than
+        otherwise expected */
 
 		abus = snes_get_hdma_addr(space->machine, dma);
 		state->dma_channel[dma].trans_size = snes_abus_read(space, abus) << 8;
@@ -2058,9 +2058,10 @@ static void snes_dma( const address_space *space, UINT8 channels )
 	int i;
 	INT8 increment;
 	UINT16 bbus;
-	UINT32 abus, abus_bank, length;
+	UINT32 abus, abus_bank;
+	UINT16 length;
 
-	/* FIXME: we also need to round to the nearest 8 master cycles */
+    /* FIXME: we also need to round to the nearest 8 master cycles */
 
 	/* overhead steals 8 master cycles, correct? */
 	cpu_adjust_icount(space->cpu,-8);
@@ -2071,111 +2072,114 @@ static void snes_dma( const address_space *space, UINT8 channels )
 		if (BIT(channels, i))
 		{
 			/* FIXME: the following should be used to stop DMA if the same channel is used by HDMA (being set to 1 in snes_hdma)
-            However, this cannot be implemented as is atm, because currently DMA transfers always happen as soon as they are enabled... */
+             However, this cannot be implemented as is atm, because currently DMA transfers always happen as soon as they are enabled... */
 			state->dma_channel[i].dma_disabled = 0;
 
 			//printf( "Making a transfer on channel %d\n", i );
 			/* Find transfer addresses */
-			abus = state->dma_channel[i].src_addr;
-			abus_bank = state->dma_channel[i].bank << 16;
-			bbus = state->dma_channel[i].dest_addr + 0x2100;
+			abus = (snes_ram[SNES_DMA_BASE + (i * 0x10) + 3] << 8) + snes_ram[SNES_DMA_BASE + (i * 0x10) + 2];
+			abus_bank = (snes_ram[SNES_DMA_BASE + (i * 0x10) + 4] << 16);
+			bbus = 0x2100 + snes_ram[SNES_DMA_BASE + (i * 0x10) + 1];
 
-			//printf("Address: %06x\n", abus | abus_bank);
+			//printf( "Address: %06x\n", abus | abus_bank );
 			/* Auto increment */
-			if (state->dma_channel[i].dmap & 0x8)
+			if (snes_ram[SNES_DMA_BASE + (i * 0x10)] & 0x8)
+			{
 				increment = 0;
+			}
 			else
 			{
-				if (state->dma_channel[i].dmap & 0x10)
+				if (snes_ram[SNES_DMA_BASE + (i * 0x10)] & 0x10)
 					increment = -1;
 				else
 					increment = 1;
 			}
 
 			/* Number of bytes to transfer */
-			length = state->dma_channel[i].trans_size;
-			if (!length)
-				length = 0x10000;	/* 0x0000 really means 0x10000 */
+			length = (snes_ram[SNES_DMA_BASE + (i * 0x10) + 6] << 8) + snes_ram[SNES_DMA_BASE + (i * 0x10) + 5];
 
-//          printf( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, state->dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", state->dma_channel[i].dmap & 0x07);
+			//          printf( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + (i * 0x10)] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + (i * 0x10)] & 0x07);
 
 #ifdef SNES_DBG_DMA
-			mame_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, state->dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", state->dma_channel[i].dmap & 0x07);
+			mame_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus, bbus, increment, snes_ram[SNES_DMA_BASE + (i * 0x10)] & 0x80 ? "PPU->CPU" : "CPU->PPU", snes_ram[SNES_DMA_BASE + (i * 0x10)] & 0x07);
 #endif
 
-			switch (state->dma_channel[i].dmap & 0x07)
+			switch (snes_ram[SNES_DMA_BASE + (i * 0x10)] & 0x07)
 			{
-			case 0:		/* 1 register write once */
-			case 2:		/* 1 register write twice */
-			case 6:		/* 1 register write twice */
-				while (length-- && !state->dma_channel[i].dma_disabled)
-				{
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
-					abus += increment;
-				}
-				break;
-			case 1:		/* 2 registers write once */
-			case 5:		/* 2 registers write twice alternate */
-				while (length-- && !state->dma_channel[i].dma_disabled)
-				{
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
-					abus += increment;
-					if (!(length--) || state->dma_channel[i].dma_disabled)
-						break;
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
-					abus += increment;
-				}
-				break;
-			case 3:		/* 2 registers write twice each */
-			case 7:		/* 2 registers write twice each */
-				while (length-- && !state->dma_channel[i].dma_disabled)
-				{
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
-					abus += increment;
-					if (!(length--) || state->dma_channel[i].dma_disabled)
-						break;
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
-					abus += increment;
-					if (!(length--) || state->dma_channel[i].dma_disabled)
-						break;
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
-					abus += increment;
-					if (!(length--) || state->dma_channel[i].dma_disabled)
-						break;
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
-					abus += increment;
-				}
-				break;
-			case 4:		/* 4 registers write once */
-				while (length-- && !state->dma_channel[i].dma_disabled)
-				{
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
-					abus += increment;
-					if (!(length--) || state->dma_channel[i].dma_disabled)
-						break;
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
-					abus += increment;
-					if (!(length--) || state->dma_channel[i].dma_disabled)
-						break;
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 2);
-					abus += increment;
-					if (!(length--) || state->dma_channel[i].dma_disabled)
-						break;
-					snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 3);
-					abus += increment;
-				}
-				break;
-			default:
+				case 0:		/* 1 register write once */
+				case 2:		/* 1 register write twice */
+				case 6:		/* 1 register write twice */
+					do
+					{
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						abus += increment;
+					} while (--length && !state->dma_channel[i].dma_disabled);
+					break;
+				case 1:		/* 2 registers write once */
+				case 5:		/* 2 registers write twice alternate */
+					do
+					{
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						abus += increment;
+						if (!(--length) || state->dma_channel[i].dma_disabled)
+							break;
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
+						abus += increment;
+					} while (--length && !state->dma_channel[i].dma_disabled);
+					break;
+				case 3:		/* 2 registers write twice each */
+				case 7:		/* 2 registers write twice each */
+					do
+					{
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						abus += increment;
+						if (!(--length) || state->dma_channel[i].dma_disabled)
+							break;
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						abus += increment;
+						if (!(--length) || state->dma_channel[i].dma_disabled)
+							break;
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
+						abus += increment;
+						if (!(--length) || state->dma_channel[i].dma_disabled)
+							break;
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
+						abus += increment;
+					} while (--length && !state->dma_channel[i].dma_disabled);
+					break;
+				case 4:		/* 4 registers write once */
+					do
+					{
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						abus += increment;
+						if (!(--length) || state->dma_channel[i].dma_disabled)
+							break;
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
+						abus += increment;
+						if (!(--length) || state->dma_channel[i].dma_disabled)
+							break;
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 2);
+						abus += increment;
+						if (!(--length) || state->dma_channel[i].dma_disabled)
+							break;
+						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 3);
+						abus += increment;
+					} while (--length && !state->dma_channel[i].dma_disabled);
+					break;
+				default:
 #ifdef MAME_DEBUG
-				mame_printf_debug("  DMA of unsupported type: %d\n", state->dma_channel[i].dmap & 0x07);
+					mame_printf_debug("  DMA of unsupported type: %d\n", state->dma_channel[i].dmap & 0x07);
 #endif
-				break;
+					break;
 			}
 
-			/* We're done, so write the new abus back to the registers */
-			state->dma_channel[i].src_addr = abus;
-			state->dma_channel[i].trans_size = 0;
-			/* active channel takes 8 master cycles */
+			/* We're done so write the new abus back to the registers */
+			snes_w_io(space, SNES_DMA_BASE + (i * 0x10) + 2, abus & 0xff);
+			snes_w_io(space, SNES_DMA_BASE + (i * 0x10) + 3, (abus >> 8) & 0xff);
+			snes_w_io(space, SNES_DMA_BASE + (i * 0x10) + 5, 0);
+			snes_w_io(space, SNES_DMA_BASE + (i * 0x10) + 6, 0);
+
+            /* active channel takes 8 master cycles */
 			cpu_adjust_icount(space->cpu,-8);
 		}
 	}
@@ -2197,8 +2201,8 @@ READ8_HANDLER( superfx_r_bank2 )
 READ8_HANDLER( superfx_r_bank3 )
 {
 	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
-	has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
-	as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
+    has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
+    as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
 	//printf("superfx_r_bank3: %08x = %02x\n", offset, snes_ram[0xe00000 + offset]);
 	return snes_ram[0xe00000 + offset];
 }
@@ -2218,8 +2222,8 @@ WRITE8_HANDLER( superfx_w_bank2 )
 WRITE8_HANDLER( superfx_w_bank3 )
 {
 	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
-	has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
-	as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
+    has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
+    as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
 	//printf("superfx_w_bank3: %08x = %02x\n", offset, data);
 	snes_ram[0xe00000 + offset] = data;
 }
