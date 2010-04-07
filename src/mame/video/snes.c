@@ -542,7 +542,7 @@ INLINE void snes_update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UIN
 		yscroll = ypos & ((8 << tile_size) - 1);
 
 		if (tile_size)
-			if ((yscroll & 8) != vflip)
+			if (BIT(yscroll, 3) != vflip)
 				tile += 16;
 
 		if (yscroll > 7)
