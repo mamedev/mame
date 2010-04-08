@@ -5724,7 +5724,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sscope2 )	/* GX931 (c)2000 */
 	DRIVER( racingj )	/* GX676 (c)1998 */
 	DRIVER( racingj2 )	/* GX888 (c)1999 */
-	DRIVER( thrilld )	/* GX713 (c)1998 */
+	DRIVER( thrilld )	/* GX713 (c)1998 Japan JAE */
+	DRIVER( thrilldb )	/* GX713 (c)1998 Japan JAB */
 	DRIVER( midnrun )	/* GX476 (c)1995 */
 	DRIVER( windheat )	/* GX677 (c)1996 */
 	DRIVER( windheatu )	/* GX677 (c)1996 */
