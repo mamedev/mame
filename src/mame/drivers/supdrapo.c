@@ -156,8 +156,8 @@ static READ8_HANDLER( sdpoker_rng_r )
 static WRITE8_HANDLER( wdog8000_w )
 {
 /*  Kind of state watchdog alternating 0x00 & 0x01 writes.
-	Used when exit the test mode (writes 2 consecutive 0's).
-	Seems to be intended to reset some external device.
+    Used when exit the test mode (writes 2 consecutive 0's).
+    Seems to be intended to reset some external device.
 
   Watchdog: 01
   Watchdog: 00
@@ -186,7 +186,7 @@ static WRITE8_HANDLER( wdog8000_w )
 	}
 
 	wdog = data;
-//	logerror("Watchdog: %02X\n", data);
+//  logerror("Watchdog: %02X\n", data);
 }
 
 
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( debug8004_w )
 /*  Writes 0x00 each time the machine is initialized */
 
 	logerror("debug8004: %02X\n", data);
-//	popmessage("written : %02X", data);
+//  popmessage("written : %02X", data);
 }
 
 static WRITE8_HANDLER( debug7c00_w )
@@ -405,12 +405,12 @@ GFXDECODE_END
 
 static WRITE8_DEVICE_HANDLER( ay8910_outputa_w )
 {
-//	popmessage("ay8910_outputa_w %02x",data);
+//  popmessage("ay8910_outputa_w %02x",data);
 }
 
 static WRITE8_DEVICE_HANDLER( ay8910_outputb_w )
 {
-//	popmessage("ay8910_outputb_w %02x",data);
+//  popmessage("ay8910_outputb_w %02x",data);
 }
 
 

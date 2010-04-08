@@ -36,9 +36,9 @@ class Rectangle
 		UINT16 m_yh;	// 10.2 fixed-point
 
 	private:
-		void 				Draw1Cycle();
-		void 				Draw2Cycle();
-		void 				DrawFill();
+		void				Draw1Cycle();
+		void				Draw2Cycle();
+		void				DrawFill();
 
 		running_machine*	m_machine;
 		Processor*			m_rdp;

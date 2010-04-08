@@ -976,8 +976,8 @@ static void spc7110_set_data_adjust(UINT32 addr)
 	snes_spc7110.r4815 = addr >> 8;
 }
 
-// FIXME: SPC7110 RTC is capable of rounding/adding/zero-ing seconds, so 
-// we should probably keep track internally of the time rather than updating 
+// FIXME: SPC7110 RTC is capable of rounding/adding/zero-ing seconds, so
+// we should probably keep track internally of the time rather than updating
 // to the system time at each call with a "offset" tracking as we do now...
 // (and indeed current code fails to pass Tengai Makyou Zero tests)
 static void spc7110_update_time(running_machine *machine, UINT8 offset)
@@ -1221,10 +1221,10 @@ static UINT8 spc7110_mmio_read(const address_space *space, UINT32 addr)
 	//real-time clock unit
 	//====================
 	case 0x4840: return snes_spc7110.r4840;
-	case 0x4841: 
+	case 0x4841:
 		{
 			UINT8 data = 0;
-			if (snes_spc7110.rtc_state == RTCS_Inactive || snes_spc7110.rtc_state == RTCS_ModeSelect) 
+			if (snes_spc7110.rtc_state == RTCS_Inactive || snes_spc7110.rtc_state == RTCS_ModeSelect)
 				return 0x00;
 
 			snes_spc7110.r4842 = 0x80;
@@ -1232,7 +1232,7 @@ static UINT8 spc7110_mmio_read(const address_space *space, UINT32 addr)
 			snes_spc7110.rtc_index = (snes_spc7110.rtc_index + 1) & 15;
 			return data;
 		}
-	case 0x4842: 
+	case 0x4842:
 		{
 			UINT8 status = snes_spc7110.r4842;
 			snes_spc7110.r4842 &= 0x7f;
@@ -1372,7 +1372,7 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 	case 0x4817: snes_spc7110.r4817 = data; break;
 	case 0x4818:
 		{
-    			if(snes_spc7110.r481x != 0x07) 
+    			if(snes_spc7110.r481x != 0x07)
 				break;
 
 	    		snes_spc7110.r4818 = data;
@@ -1393,7 +1393,7 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 		{
 	    		snes_spc7110.r4825 = data;
 
-    			if(snes_spc7110.r482e & 1) 
+    			if(snes_spc7110.r482e & 1)
 			{
     				//signed 16-bit x 16-bit multiplication
     				INT16 r0 = (INT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
@@ -1404,8 +1404,8 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 	    			snes_spc7110.r4829 = result >> 8;
 	    			snes_spc7110.r482a = result >> 16;
 	    			snes_spc7110.r482b = result >> 24;
-			} 
-			else 
+			}
+			else
 			{
 	    			//unsigned 16-bit x 16-bit multiplication
 	    			UINT16 r0 = (UINT16)(snes_spc7110.r4824 + (snes_spc7110.r4825 << 8));
@@ -1535,32 +1535,32 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 	//real-time clock unit
 	//====================
 
-	case 0x4840: 
+	case 0x4840:
 		{
 			snes_spc7110.r4840 = data;
 
-			if (!(snes_spc7110.r4840 & 1)) 
+			if (!(snes_spc7110.r4840 & 1))
 			{
 				//disable RTC
 				snes_spc7110.rtc_state = RTCS_Inactive;
 				spc7110_update_time(machine, 0);
-			} 
-			else 
+			}
+			else
 			{
 				//enable RTC
 				snes_spc7110.r4842 = 0x80;
 				snes_spc7110.rtc_state = RTCS_ModeSelect;
 			}
-		} 
+		}
 		break;
 
-	case 0x4841: 
+	case 0x4841:
 		{
 			snes_spc7110.r4841 = data;
 
-			switch (snes_spc7110.rtc_state) 
+			switch (snes_spc7110.rtc_state)
 			{
-			case RTCS_ModeSelect: 
+			case RTCS_ModeSelect:
 				if (data == RTCM_Linear || data == RTCM_Indexed)
 				{
 					snes_spc7110.r4842 = 0x80;
@@ -1573,7 +1573,7 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 			case RTCS_IndexSelect:
 				snes_spc7110.r4842 = 0x80;
 				snes_spc7110.rtc_index = data & 15;
-				if (snes_spc7110.rtc_mode == RTCM_Linear) 
+				if (snes_spc7110.rtc_mode == RTCM_Linear)
 					snes_spc7110.rtc_state = RTCS_Write;
 				break;
 
@@ -1581,14 +1581,14 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 				snes_spc7110.r4842 = 0x80;
 
 				//control register 0
-				if (snes_spc7110.rtc_index == 13) 
+				if (snes_spc7110.rtc_index == 13)
 				{
 					//increment second counter
-					if (data & 2) 
+					if (data & 2)
 						spc7110_update_time(machine, 1);
 
 					//round minute counter
-					if (data & 8) 
+					if (data & 8)
 					{
 						spc7110_update_time(machine, 0);
 
@@ -1597,16 +1597,16 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 						snes_spc7110.rtc_ram[0] = 0;
 						snes_spc7110.rtc_ram[1] = 0;
 
-						if (second >= 30) 
+						if (second >= 30)
 							spc7110_update_time(machine, 60);
 					}
 				}
 
 				//control register 2
-				if (snes_spc7110.rtc_index == 15) 
+				if (snes_spc7110.rtc_index == 15)
 				{
 					//disable timer and clear second counter
-					if ((data & 1) && !(snes_spc7110.rtc_ram[15]  & 1)) 
+					if ((data & 1) && !(snes_spc7110.rtc_ram[15]  & 1))
 					{
 						spc7110_update_time(machine, 0);
 
@@ -1624,7 +1624,7 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 				snes_spc7110.rtc_index = (snes_spc7110.rtc_index + 1) & 15;
 				break;
 			}
-		} 
+		}
 		break;
 	}
 }

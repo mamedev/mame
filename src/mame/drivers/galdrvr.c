@@ -2359,7 +2359,7 @@ static CUSTOM_INPUT( moonwar_dial_r )
 
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
- 
+
 	static int counter_74ls161[2] = {0, 0};
 	static int direction[2] = {0, 0};
 	signed char dialread = input_port_read(field->port->machine, dialname[p]);
@@ -2368,10 +2368,10 @@ static CUSTOM_INPUT( moonwar_dial_r )
 
 	if (dialread < 0) direction[p] = 0x00;
 	else if (dialread > 0) direction[p] = 0x10;
-	
+
 	counter_74ls161[p] += abs(dialread);
 	counter_74ls161[p] &= 0xf;
-	
+
 	ret = counter_74ls161[p] | direction[p];
 	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161[p], ret);
 
@@ -2568,11 +2568,11 @@ static INPUT_PORTS_START( anteater )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
-//	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
-//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_COCKTAIL
-//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
+//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
+//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_COCKTAIL
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNUSED )                       /* see notes */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2583,9 +2583,9 @@ static INPUT_PORTS_START( anteater )
 	PORT_DIPSETTING(    0x00, "A 1/2  B 2/1" )
 	PORT_DIPSETTING(    0x04, "A 1/3  B 3/1" )
 	PORT_DIPSETTING(    0x06, "A 1/4  B 4/1" )
-//	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
-//	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+//  PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                             /* see notes */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xb0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2628,9 +2628,9 @@ static INPUT_PORTS_START( calipso )
 	PORT_DIPSETTING(    0x00, "A 1/2  B 2/1" )
 	PORT_DIPSETTING(    0x04, "A 1/3  B 3/1" )
 	PORT_DIPSETTING(    0x06, "A 1/4  B 4/1" )
-//	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
-//	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+//  PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                             /* see notes */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 

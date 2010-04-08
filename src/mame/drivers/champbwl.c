@@ -414,7 +414,7 @@ ROM_START( champbwl )
 	ROM_LOAD( "ab003003.3-3", 0xc0000, 0x40000, CRC(ad40ad10) SHA1(db0e5744ea3fcda87345b545031f82fcb3fec175) ) // 'spare' speech etc.
 
 	ROM_REGION( 0x800, "nvram", 0 ) /* default settings, allows game to boot first time without having to reset it */
-	ROM_LOAD( "champbwl.nv",  0x000, 0x800, CRC(1d46aa8e) SHA1(a733cf86cfb26d98fb4c491d7f779a7a1c8ff228) )				
+	ROM_LOAD( "champbwl.nv",  0x000, 0x800, CRC(1d46aa8e) SHA1(a733cf86cfb26d98fb4c491d7f779a7a1c8ff228) )
 ROM_END
 
 GAME( 1989, champbwl, 0, champbwl, champbwl, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling", GAME_SUPPORTS_SAVE )

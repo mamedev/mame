@@ -194,7 +194,7 @@ static WRITE16_HANDLER( term2_sound_w )
 	output_set_value("Left_Gun_Red_Led", (~data & 0x10) >> 4);
 	output_set_value("Right_Gun_Green_Led", (~data & 0x80) >> 7);
 	output_set_value("Right_Gun_Red_Led", (~data & 0x40) >> 6);
-	}	
+	}
 
 	if (offset == 0)
 		term2_analog_select = (data >> 12) & 3;

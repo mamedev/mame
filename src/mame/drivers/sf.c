@@ -7,9 +7,9 @@
     TODO:
     - is there a third coin input?
 
-	- Is sfj confirmed to have a 68705?, sfua has an i8751 and the actual
-	  gamecode is closer to sfua than the other sets.  The protection
-	  appears to be the same on both.
+    - Is sfj confirmed to have a 68705?, sfua has an i8751 and the actual
+      gamecode is closer to sfua than the other sets.  The protection
+      appears to be the same on both.
 
 ***************************************************************************/
 
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( sf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
-//	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
+//  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
 ADDRESS_MAP_END
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( sfus_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
-//	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
+//  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
 ADDRESS_MAP_END
@@ -943,7 +943,7 @@ ROM_START( sf )
 
 	ROM_REGION( 0x1c0000, "gfx3", 0 )
 	/* Sprites planes 1-2 */
-	ROM_LOAD( "sf-15.bin", 0x000000, 0x020000, CRC(fc0113db) SHA1(7c19603129be5f6e1ccd07fd8b7ee1cbf86468db) ) 
+	ROM_LOAD( "sf-15.bin", 0x000000, 0x020000, CRC(fc0113db) SHA1(7c19603129be5f6e1ccd07fd8b7ee1cbf86468db) )
 	ROM_LOAD( "sf-16.bin", 0x020000, 0x020000, CRC(82e4a6d3) SHA1(5ec519c2740c66f5da27ced1db99e19fe38fdad7) )
 	ROM_LOAD( "sf-11.bin", 0x040000, 0x020000, CRC(e112df1b) SHA1(3f9856f69b457d79fe085bf51dfb2efcd98f883d) )
 	ROM_LOAD( "sf-12.bin", 0x060000, 0x020000, CRC(42d52299) SHA1(6560c38f5fd5a47db7728cc7df83d2169157174f) )
@@ -1017,7 +1017,7 @@ ROM_START( sfu )
 	ROM_LOAD( "sf-08.bin", 0x0a0000, 0x020000, CRC(95ece9b1) SHA1(f0a15fce5cd9617fa5d4dd43bd5b6ea190dace85) )
 	ROM_LOAD( "sf-03.bin", 0x0c0000, 0x020000, CRC(5ca05781) SHA1(004f5ad34798471b39bd4612c797f0913ed0fb4a) )
 	/* Sprites planes 2-3 */
-	ROM_LOAD( "sf-17.bin", 0x0e0000, 0x020000, CRC(69fac48e) SHA1(c9272217256c73cb8ddb4fbbfb5905ce1122c746) ) 
+	ROM_LOAD( "sf-17.bin", 0x0e0000, 0x020000, CRC(69fac48e) SHA1(c9272217256c73cb8ddb4fbbfb5905ce1122c746) )
 	ROM_LOAD( "sf-18.bin", 0x100000, 0x020000, CRC(71cfd18d) SHA1(4c17e2124f3456d6b13ede8ad3ae916b53f9bb7e) )
 	ROM_LOAD( "sf-13.bin", 0x120000, 0x020000, CRC(fa2eb24b) SHA1(96f3bd54c340771577cc232ebde93965421f2557) )
 	ROM_LOAD( "sf-14.bin", 0x140000, 0x020000, CRC(ad955c95) SHA1(549d6a5125432aa45d03f15e76f6c2c8ab2e05a3) )
@@ -1087,7 +1087,7 @@ ROM_START( sfua )
 	ROM_LOAD( "sf-08.bin", 0x0a0000, 0x020000, CRC(95ece9b1) SHA1(f0a15fce5cd9617fa5d4dd43bd5b6ea190dace85) )
 	ROM_LOAD( "sf-03.bin", 0x0c0000, 0x020000, CRC(5ca05781) SHA1(004f5ad34798471b39bd4612c797f0913ed0fb4a) )
 	/* Sprites planes 2-3 */
-	ROM_LOAD( "sf-17.bin", 0x0e0000, 0x020000, CRC(69fac48e) SHA1(c9272217256c73cb8ddb4fbbfb5905ce1122c746) ) 
+	ROM_LOAD( "sf-17.bin", 0x0e0000, 0x020000, CRC(69fac48e) SHA1(c9272217256c73cb8ddb4fbbfb5905ce1122c746) )
 	ROM_LOAD( "sf-18.bin", 0x100000, 0x020000, CRC(71cfd18d) SHA1(4c17e2124f3456d6b13ede8ad3ae916b53f9bb7e) )
 	ROM_LOAD( "sf-13.bin", 0x120000, 0x020000, CRC(fa2eb24b) SHA1(96f3bd54c340771577cc232ebde93965421f2557) )
 	ROM_LOAD( "sf-14.bin", 0x140000, 0x020000, CRC(ad955c95) SHA1(549d6a5125432aa45d03f15e76f6c2c8ab2e05a3) )
@@ -1149,7 +1149,7 @@ ROM_START( sfj )
 
 	ROM_REGION( 0x1c0000, "gfx3", 0 )
 	/* Sprites planes 1-2 */
-	ROM_LOAD( "sf-15.bin", 0x000000, 0x020000, CRC(fc0113db) SHA1(7c19603129be5f6e1ccd07fd8b7ee1cbf86468db) ) 
+	ROM_LOAD( "sf-15.bin", 0x000000, 0x020000, CRC(fc0113db) SHA1(7c19603129be5f6e1ccd07fd8b7ee1cbf86468db) )
 	ROM_LOAD( "sf-16.bin", 0x020000, 0x020000, CRC(82e4a6d3) SHA1(5ec519c2740c66f5da27ced1db99e19fe38fdad7) )
 	ROM_LOAD( "sf-11.bin", 0x040000, 0x020000, CRC(e112df1b) SHA1(3f9856f69b457d79fe085bf51dfb2efcd98f883d) )
 	ROM_LOAD( "sf-12.bin", 0x060000, 0x020000, CRC(42d52299) SHA1(6560c38f5fd5a47db7728cc7df83d2169157174f) )
@@ -1157,7 +1157,7 @@ ROM_START( sfj )
 	ROM_LOAD( "sf-08.bin", 0x0a0000, 0x020000, CRC(95ece9b1) SHA1(f0a15fce5cd9617fa5d4dd43bd5b6ea190dace85) )
 	ROM_LOAD( "sf-03.bin", 0x0c0000, 0x020000, CRC(5ca05781) SHA1(004f5ad34798471b39bd4612c797f0913ed0fb4a) )
 	/* Sprites planes 2-3 */
-	ROM_LOAD( "sf-17.bin", 0x0e0000, 0x020000, CRC(69fac48e) SHA1(c9272217256c73cb8ddb4fbbfb5905ce1122c746) ) 
+	ROM_LOAD( "sf-17.bin", 0x0e0000, 0x020000, CRC(69fac48e) SHA1(c9272217256c73cb8ddb4fbbfb5905ce1122c746) )
 	ROM_LOAD( "sf-18.bin", 0x100000, 0x020000, CRC(71cfd18d) SHA1(4c17e2124f3456d6b13ede8ad3ae916b53f9bb7e) )
 	ROM_LOAD( "sf-13.bin", 0x120000, 0x020000, CRC(fa2eb24b) SHA1(96f3bd54c340771577cc232ebde93965421f2557) )
 	ROM_LOAD( "sf-14.bin", 0x140000, 0x020000, CRC(ad955c95) SHA1(549d6a5125432aa45d03f15e76f6c2c8ab2e05a3) )
@@ -1210,10 +1210,10 @@ ROM_START( sfp )
 	ROM_LOAD( "mchr.2h", 0x0e0000, 0x020000, CRC(cc6bf05c) SHA1(4e83dd55c88d5b539ab1dcae5bfd16195bcd2565) )
 
 	/* these graphic roms seem mismatched with this version of the prototype, they don't contain the graphics needed
-	   for the bonus round, or have complete tile sets graphic set for 2 of the characters which are used by the prototype
-	   (all of Joe is missing, many of Mike's poses are missing) If you use the original ROMs instead the graphics are
-	   correct, so the prototype is clearly already referencing the final tile arrangement for them.  The glitches
-	   therefore are not emulation bugs, if the PCB contained the same mismatched ROMs it would exhibit the same glitches. */
+       for the bonus round, or have complete tile sets graphic set for 2 of the characters which are used by the prototype
+       (all of Joe is missing, many of Mike's poses are missing) If you use the original ROMs instead the graphics are
+       correct, so the prototype is clearly already referencing the final tile arrangement for them.  The glitches
+       therefore are not emulation bugs, if the PCB contained the same mismatched ROMs it would exhibit the same glitches. */
 	ROM_REGION( 0x1c0000, "gfx3", ROMREGION_ERASE00 )
 	/* Sprites planes 1-2 */
 	ROM_LOAD( "b1m.bin", 0x000000, 0x010000, CRC(64758232) SHA1(20d21677b791a7f96afed54b286ee92adb80456d) )

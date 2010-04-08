@@ -555,8 +555,8 @@ static READ32_HANDLER( hng64_sysregs_r )
 	mame_system_time systime;
 	mame_get_base_datetime(space->machine, &systime);
 
-//	if((offset*4) != 0x1084)
-//		printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
+//  if((offset*4) != 0x1084)
+//      printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
 	switch(offset*4)
 	{
@@ -587,9 +587,9 @@ static READ32_HANDLER( hng64_sysregs_r )
 		case 0x217c: return 0; //RTC status?
 	}
 
-//	printf("%08x\n",offset*4);
+//  printf("%08x\n",offset*4);
 
-//	return mame_rand(space->machine)&0xffffffff;
+//  return mame_rand(space->machine)&0xffffffff;
 	return hng64_sysregs[offset];
 }
 
@@ -598,7 +598,7 @@ static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
 
 static void hng64_do_dma(const address_space *space)
 {
-//	printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
+//  printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
 	while (hng_dma_len>=0)
 	{
@@ -628,8 +628,8 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 {
 	COMBINE_DATA (&hng64_sysregs[offset]);
 
-//	if(((offset*4) & 0x1200) == 0x1200)
-//		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+//  if(((offset*4) & 0x1200) == 0x1200)
+//      printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
 
 	switch(offset*4)
 	{
@@ -888,7 +888,7 @@ static READ32_HANDLER( dl_r )
 // Some kind of buffering of the display lists, or 'render current buffer' write?
 static WRITE32_HANDLER( dl_control_w )
 {
-//	printf("\n");   // Debug - ajg
+//  printf("\n");   // Debug - ajg
 	// TODO: put this back in.
 	/*
     if (activeBuffer==0 || activeBuffer==1)
@@ -899,7 +899,7 @@ static WRITE32_HANDLER( dl_control_w )
         activeBuffer = 0;
     if (data & 2)
         activeBuffer = 1;
-	*/
+    */
 }
 
 #ifdef UNUSED_FUNCTION
@@ -943,7 +943,7 @@ static WRITE32_HANDLER( tcram_w )
 
 static READ32_HANDLER( tcram_r )
 {
-//	printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
+//  printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
 	if(offset == 0x12)
 		return input_port_read(space->machine, "VBLANK");
 
@@ -1422,7 +1422,7 @@ static const gfx_layout hng64_8x8x8_tilelayout =
 	RGN_FRAC(1,1),
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-	{ 24,     8,     16,     0, 
+	{ 24,     8,     16,     0,
 	  256+24, 256+8, 256+16, 256+0 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	16*32
@@ -1434,9 +1434,9 @@ static const gfx_layout hng64_16x16x4_tilelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
-	{ 24,     28,     8,     12,     16,     20,     0,     4, 
+	{ 24,     28,     8,     12,     16,     20,     0,     4,
 	  256+24, 256+28, 256+8, 256+12, 256+16, 256+20, 256+0, 256+4 },
-	{ 0*32,  1*32,  2*32,  3*32,  4*32,  5*32,  6*32,  7*32, 
+	{ 0*32,  1*32,  2*32,  3*32,  4*32,  5*32,  6*32,  7*32,
 	  16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
 	32*32
 };

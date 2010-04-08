@@ -41,8 +41,8 @@ class TexRectangle
 		int m_flip;
 
 	private:
-		void 				DrawDefault();
-		void 				DrawCopy();
+		void				DrawDefault();
+		void				DrawCopy();
 
 		running_machine*	m_machine;
 		Processor*			m_rdp;

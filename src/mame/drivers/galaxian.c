@@ -197,11 +197,11 @@ Stephh's notes (based on the games Z80 code and some tests) for games based on '
     when "Coinage" is set to "99 Credits", credits are always set to 99 when pressing COIN1 (code at 0x037d).
   - There is an unused coinage routine at 0x0159 with the following settings :
 
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 2/1  B 99" )
-	PORT_DIPSETTING(    0x06, "A 1/2  B 1/1" )
-	PORT_DIPSETTING(    0x04, "A 1/5  B 1/1" )
-	PORT_DIPSETTING(    0x02, "A 1/7  B 1/1" )
+    PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
+    PORT_DIPSETTING(    0x00, "A 2/1  B 99" )
+    PORT_DIPSETTING(    0x06, "A 1/2  B 1/1" )
+    PORT_DIPSETTING(    0x04, "A 1/5  B 1/1" )
+    PORT_DIPSETTING(    0x02, "A 1/7  B 1/1" )
 
     I can't tell at the moment if it's a leftover from another Konami game on similar hardware.
   - You can have 3 or 4 lives at start, and you can only continue 4 times (code at 0x0ebf).

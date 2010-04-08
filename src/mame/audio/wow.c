@@ -118,7 +118,7 @@ READ8_HANDLER( wow_speech_r )
 	totalword_ptr = totalword;
 
 	Phoneme = data & 0x3F;
-//	Intonation = data >> 6;
+//  Intonation = data >> 6;
 
 //  logerror("Data : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 

@@ -39,19 +39,19 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "includes/naomibd.h"
 
 /*
-St.     Instr.		 Comment
-0x02 	PEEK 		 ACC := MEM[OP1]
-0x03 	POKE 		 MEM[OP1] := OP2
-0x04 	POKEPCI 	 PCICONF[OP1] := OP2
-0x05 	PEEKPCI 	 ACC := PCICONF[OP1]
-0x06 	AND/OR 		 ACC := (ACC & OP1) | OP2
-0x07 	(prefix)	 execute the instruction code in OP1 with OP1 := OP2, OP2 := ACC
-0x08 	BNE 		 IF ACC = OP1 THEN PC := PC + OP2
-0x09 	BRA 		 PC := PC + OP2
-0x10 	AND/OR ACC2  (unused/defunct) ACC2 := (ACC2 & OP1) | OP2
-0x11 	OUTB 		 PORT[OP1] := OP2
-0x12 	INB 		 ACC := PORT(OP1)
-0xEE 	END 
+St.     Instr.       Comment
+0x02    PEEK         ACC := MEM[OP1]
+0x03    POKE         MEM[OP1] := OP2
+0x04    POKEPCI      PCICONF[OP1] := OP2
+0x05    PEEKPCI      ACC := PCICONF[OP1]
+0x06    AND/OR       ACC := (ACC & OP1) | OP2
+0x07    (prefix)     execute the instruction code in OP1 with OP1 := OP2, OP2 := ACC
+0x08    BNE          IF ACC = OP1 THEN PC := PC + OP2
+0x09    BRA          PC := PC + OP2
+0x10    AND/OR ACC2  (unused/defunct) ACC2 := (ACC2 & OP1) | OP2
+0x11    OUTB         PORT[OP1] := OP2
+0x12    INB          ACC := PORT(OP1)
+0xEE    END
 */
 static READ32_HANDLER( chihiro_jamtable )
 {

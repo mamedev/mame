@@ -261,7 +261,7 @@ int mame_execute(core_options *options)
 		firstgame = FALSE;
 
 		/* parse any INI files as the first thing */
-		if (options_get_bool(options, OPTION_READCONFIG)) 
+		if (options_get_bool(options, OPTION_READCONFIG))
 		{
 			options_revert(mame_options(), OPTION_PRIORITY_INI);
 			mame_parse_ini_files(mame_options(), driver);

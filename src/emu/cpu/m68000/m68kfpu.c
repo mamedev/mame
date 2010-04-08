@@ -12,19 +12,19 @@
 extern flag floatx80_is_nan( floatx80 a );
 
 // masks for packed dwords, positive k-factor
-static UINT32 pkmask2[18] = 
+static UINT32 pkmask2[18] =
 {
 	0xffffffff, 0, 0xf0000000, 0xff000000, 0xfff00000, 0xffff0000,
-	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff, 
+	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff,
 	0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
 	0xffffffff, 0xffffffff, 0xffffffff
 };
 
-static UINT32 pkmask3[18] = 
+static UINT32 pkmask3[18] =
 {
 	0xffffffff, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0xf0000000, 0xff000000, 0xfff00000, 0xffff0000, 
-	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff, 
+	0xf0000000, 0xff000000, 0xfff00000, 0xffff0000,
+	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff,
 };
 
 INLINE double fx80_to_double(floatx80 fx)
@@ -132,8 +132,8 @@ INLINE void store_pack_float80(m68ki_cpu_core *m68k, UINT32 ea, int k, floatx80 
 	dw1 = dw2 = dw3 = 0;
 	ch = &str[0];
 
-	sprintf(str, "%.16e", fx80_to_double(fpr));	
-	
+	sprintf(str, "%.16e", fx80_to_double(fpr));
+
 	if (*ch == '-')
 	{
 		ch++;
@@ -185,7 +185,7 @@ INLINE void store_pack_float80(m68ki_cpu_core *m68k, UINT32 ea, int k, floatx80 
 			ch[j] = '0';
 		}
 
-		// now zero out K to avoid tripping the positive K detection below 
+		// now zero out K to avoid tripping the positive K detection below
 		k = 0;
 	}
 
@@ -219,7 +219,7 @@ INLINE void store_pack_float80(m68ki_cpu_core *m68k, UINT32 ea, int k, floatx80 
 		{
 			dw2 &= pkmask2[17];
 			dw3 &= pkmask3[17];
-//			m68k->fpcr |=  (need to set OPERR bit)
+//          m68k->fpcr |=  (need to set OPERR bit)
 		}
 	}
 
@@ -227,12 +227,12 @@ INLINE void store_pack_float80(m68ki_cpu_core *m68k, UINT32 ea, int k, floatx80 
 	if (*ch == 'e' || *ch == 'E')
 	{
 		ch++;
-		if (*ch == '-') 
+		if (*ch == '-')
 		{
 			ch++;
 			dw1 |= 0x40000000;
 		}
-		
+
 		if (*ch == '+')
 		{
 			ch++;
@@ -604,7 +604,7 @@ static floatx80 READ_EA_FPE(m68ki_cpu_core *m68k, int ea)
 				case 2:	// (d16, PC)
 					{
 						UINT32 ea = EA_PCDI_32(m68k);
-					 	fpr = load_extended_float80(m68k, ea);	
+						fpr = load_extended_float80(m68k, ea);
 					}
 					break;
 
@@ -1204,7 +1204,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 0x25:		// FREM
 		{
-			REG_FP[dst] = floatx80_rem(REG_FP[dst], source); 
+			REG_FP[dst] = floatx80_rem(REG_FP[dst], source);
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
 			m68k->remaining_cycles -= 43;	// guess
 			break;
@@ -1496,7 +1496,7 @@ static void do_frestore_null(m68ki_cpu_core *m68k)
 
 	REG_FPCR = 0;
 	REG_FPSR = 0;
-	REG_FPIAR = 0;	
+	REG_FPIAR = 0;
 	for (i = 0; i < 8; i++)
 	{
 		REG_FP[i].high = 0x7fff;
@@ -1564,7 +1564,7 @@ void m68040_fpu_op1(m68ki_cpu_core *m68k)
 			{
 				case 2: // (An)
 					addr = REG_A[reg];
-					temp = m68ki_read_32(m68k, addr); 
+					temp = m68ki_read_32(m68k, addr);
 
 					// check for NULL frame
 					if (temp & 0xff000000)
@@ -1580,7 +1580,7 @@ void m68040_fpu_op1(m68ki_cpu_core *m68k)
 
 				case 3:	// (An)+
 		    			addr = EA_AY_PI_32(m68k);
-					temp = m68ki_read_32(m68k, addr); 
+					temp = m68ki_read_32(m68k, addr);
 
 					// check for NULL frame
 					if (temp & 0xff000000)

@@ -1890,7 +1890,7 @@ static WRITE16_HANDLER( zombraid_gun_w )
 				/* Gun Recoils */
 				/* Note:  In debug menu recoil solenoids strobe when held down.  Is this correct?? */
 				output_set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
-				output_set_value("Player2_Gun_Recoil", (data & 0x8)>>3 );				
+				output_set_value("Player2_Gun_Recoil", (data & 0x8)>>3 );
 
 				gun_input_bit = bit_count - 4;
 				gun_input_bit = 8 - gun_input_bit; // Reverse order

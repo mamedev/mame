@@ -157,7 +157,7 @@ WRITE16_HANDLER( midxunit_io_w )
 			output_set_value("Player3_Gun_Recoil", (data & 0x4) >> 2 );
 			output_set_value("Player1_Gun_LED", (~data & 0x10) >> 4 );
 			output_set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
-			output_set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );			
+			output_set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
 
 			logerror("%08X:I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
 //          logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);

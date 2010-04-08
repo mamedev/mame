@@ -1486,7 +1486,7 @@ static TIMER_CALLBACK( c361_timer_cb )
 	if (c361_scanline != 511)
 	{
 		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
-		timer_adjust_oneshot(c361_timer, attotime_never, 0);                                                                                           
+		timer_adjust_oneshot(c361_timer, attotime_never, 0);
 	}
 }
 
@@ -1826,7 +1826,7 @@ static void p3d_matrix_matrix_mul(const UINT16 *p, int size)
 	INT16 *t        = p3d_getm(p[0]);
 	const INT16 *m1 = p3d_getm(p[1]);
 	const INT16 *m2 = p3d_getm(p[3]);
-	
+
 	t[0] = INT16((m1[0]*m2[0] + m1[1]*m2[3] + m1[2]*m2[6]) >> 14);
 	t[1] = INT16((m1[0]*m2[1] + m1[1]*m2[4] + m1[2]*m2[7]) >> 14);
 	t[2] = INT16((m1[0]*m2[2] + m1[1]*m2[5] + m1[2]*m2[8]) >> 14);
@@ -2037,7 +2037,7 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 			UINT32 v1 = ptrom[adr++];
 			UINT32 v2 = ptrom[adr++];
 			UINT32 v3 = ptrom[adr++];
-      
+
 			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
 			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
 			pv[i].p[2] = (((v1 >> 16) & 0xf00) | ((v3 >> 24 & 0xff))) + 0.5 + tbase;
@@ -2061,7 +2061,7 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 				INT32 nz = u32_to_s10(norm);
 				INT32 nrx, nry, nrz;
 				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
-				
+
 				float lsi = float(nrx*light_vector[0] + nry*light_vector[1] + nrz*light_vector[2])/4194304.0;
 				if(lsi < 0)
 					lsi = 0;
@@ -2076,7 +2076,7 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 		namcos23_poly_entry *p = render_polys + render_poly_count;
 
 		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.001);
-		
+
 		if(p->vertex_count >= 3) {
 			for(int i=0; i<p->vertex_count; i++) {
 				render_project(p->pv[i]);

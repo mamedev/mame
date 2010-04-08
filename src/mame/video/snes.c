@@ -157,7 +157,7 @@ INLINE UINT16 snes_get_bgcolor( UINT8 direct_colors, UINT16 palette, UINT8 color
  * snes_set_scanline_pixel()
  *
  * Store pixel color, priority, layer and
- * color math exception (for OAM) in the 
+ * color math exception (for OAM) in the
  * proper scanline
  *****************************************/
 
@@ -188,7 +188,7 @@ INLINE void snes_set_scanline_pixel( int screen, INT16 x, UINT16 color, UINT8 pr
  * copy it to the scanline buffer when
  * appropriate. The actual way to perform
  * such operations depends on the source
- * (BG or OAM) and on the resolution (hires 
+ * (BG or OAM) and on the resolution (hires
  * or lores)
  *****************************************/
 
@@ -341,7 +341,7 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 tileaddr, INT16 x,
 			snes_draw_oamtile(ii, colour, pal, priority);
 		else if (!hires)
 		{
-			if (mosaic)	
+			if (mosaic)
 			{
 				for (x_mos = 0; x_mos < (snes_ppu.mosaic_size + 1); x_mos++)
 					snes_draw_bgtile_lores(layer, ii + x_mos, colour, pal, direct_colors, priority);
@@ -352,7 +352,7 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 tileaddr, INT16 x,
 		}
 		else /* hires */
 		{
-			if (mosaic)	
+			if (mosaic)
 			{
 				for (x_mos = 0; x_mos < (snes_ppu.mosaic_size + 1); x_mos++)
 					snes_draw_bgtile_hires(layer, ii + x_mos, colour, pal, direct_colors, priority);
@@ -748,7 +748,7 @@ static void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_
 				if (scanlines[screen].priority[xpos] <= priority && clr > 0)
 				{
 					/* Direct select, but only outside EXTBG! */
-					// Direct color format is: 0 | BB000 | GGG00 | RRR00, HW confirms that the data is zero padded. 
+					// Direct color format is: 0 | BB000 | GGG00 | RRR00, HW confirms that the data is zero padded.
 					// In other words, like normal direct color, with pal = 0
 					c = snes_get_bgcolor(snes_ppu.direct_color && layer == SNES_BG1, 0, clr);
 					snes_set_scanline_pixel(screen, xpos, c, priority, layer, 0);
@@ -1726,13 +1726,13 @@ static void snes_dynamic_res_change( running_machine *machine )
 
  SNES VRAM accesses:
 
- VRAM accesses during active display are invalid. 
- Unlike OAM and CGRAM, they will not be written 
- anywhere at all. Thanks to byuu's researches, 
- the ranges where writes are invalid have been 
- validated on hardware, as has the edge case where 
- the S-CPU open bus can be written if the write 
- occurs during the very last clock cycle of 
+ VRAM accesses during active display are invalid.
+ Unlike OAM and CGRAM, they will not be written
+ anywhere at all. Thanks to byuu's researches,
+ the ranges where writes are invalid have been
+ validated on hardware, as has the edge case where
+ the S-CPU open bus can be written if the write
+ occurs during the very last clock cycle of
  vblank.
  Our implementation could be not 100% accurate
  when interlace is active.
@@ -1755,7 +1755,7 @@ INLINE UINT32 snes_get_vram_address( running_machine *machine )
 
 static READ8_HANDLER( snes_vram_read )
 {
-	UINT8 res = 0; 
+	UINT8 res = 0;
 	offset &= 0x1ffff;
 
 	if (snes_ppu.screen_disabled)
@@ -1769,18 +1769,18 @@ static READ8_HANDLER( snes_vram_read )
 		if (snes_ppu.interlace == 2)
 			ls++;
 
-		if (v == ls && h == 1362) 
+		if (v == ls && h == 1362)
 			res = 0;
-		else if (v < snes_ppu.beam.last_visible_line - 1) 
+		else if (v < snes_ppu.beam.last_visible_line - 1)
 			res = 0;
-		else if (v == snes_ppu.beam.last_visible_line - 1) 
+		else if (v == snes_ppu.beam.last_visible_line - 1)
 		{
-			if (h == 1362) 
+			if (h == 1362)
 				res = snes_vram[offset];
-			else 
+			else
 				res = 0;
-		} 
-		else 
+		}
+		else
 			res = snes_vram[offset];
 	}
 	return res;
@@ -1796,31 +1796,31 @@ static WRITE8_HANDLER( snes_vram_write )
 	{
 		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
 		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
-		if (v == 0) 
+		if (v == 0)
 		{
-			if (h <= 4) 
+			if (h <= 4)
 				snes_vram[offset] = data;
-			else if (h == 6) 
+			else if (h == 6)
 				snes_vram[offset] = snes_open_bus_r(space, 0);
-			else 
+			else
 			{
 				//no write
 			}
-		} 
-		else if (v < snes_ppu.beam.last_visible_line) 
+		}
+		else if (v < snes_ppu.beam.last_visible_line)
 		{
 			//no write
-		} 
-		else if (v == snes_ppu.beam.last_visible_line) 
+		}
+		else if (v == snes_ppu.beam.last_visible_line)
 		{
-			if (h <= 4) 
+			if (h <= 4)
 			{
 				//no write
-			} 
-			else 
+			}
+			else
 				snes_vram[offset] = data;
 		}
-		else 
+		else
 			snes_vram[offset] = data;
 	}
 }
@@ -1830,17 +1830,17 @@ static WRITE8_HANDLER( snes_vram_write )
  SNES OAM accesses:
 
  OAM accesses during active display are allowed.
- The actual address varies during rendering, as the 
- PPU reads in data itself for processing. 
- Unfortunately, no one has been able (yet) to 
- determine how this works. The only known game to 
- actually access OAM during active display is 
- Uniracers and it expects accesses to map to 
+ The actual address varies during rendering, as the
+ PPU reads in data itself for processing.
+ Unfortunately, no one has been able (yet) to
+ determine how this works. The only known game to
+ actually access OAM during active display is
+ Uniracers and it expects accesses to map to
  offset 0x0218. Hence, following byuu's choice
- we rerouted OAM accesses during active display 
- to 0x0218 (0x010c in our snes_oam). 
- This is a hack, but it is more accurate than 
- writing to the 'expected' address set by 
+ we rerouted OAM accesses during active display
+ to 0x0218 (0x010c in our snes_oam).
+ This is a hack, but it is more accurate than
+ writing to the 'expected' address set by
  $2102,$2103.
 
  Notice that, since snes_ram[OAMDATA] is never
@@ -1859,7 +1859,7 @@ static READ8_HANDLER( snes_oam_read )
 	{
 		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
 
-		if (v < snes_ppu.beam.last_visible_line) 
+		if (v < snes_ppu.beam.last_visible_line)
 			offset = 0x010c;
 	}
 
@@ -1877,7 +1877,7 @@ static WRITE8_HANDLER( snes_oam_write )
 	{
 		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
 
-		if (v < snes_ppu.beam.last_visible_line) 
+		if (v < snes_ppu.beam.last_visible_line)
 			offset = 0x010c;
 	}
 
@@ -1889,28 +1889,28 @@ static WRITE8_HANDLER( snes_oam_write )
 
 /*************************************************
 
- SNES CGRAM accesses: 
+ SNES CGRAM accesses:
 
- CGRAM writes during hblank are valid. During 
- active display, the actual address the data 
- is written to varies, as the PPU itself changes 
- the address. Like OAM, it is not known the exact 
+ CGRAM writes during hblank are valid. During
+ active display, the actual address the data
+ is written to varies, as the PPU itself changes
+ the address. Like OAM, it is not known the exact
  algorithm used, but no commercial software seems
- to attempt this. While byuu, in his emu, maps 
+ to attempt this. While byuu, in his emu, maps
  those accesses to 0x01ff, because it is more
- accurate to invalidate the 'expected' address 
+ accurate to invalidate the 'expected' address
  than not, MESS has issues if we don't write to
  the expected address (see e.g. Tokimeki Memorial).
  This is because writes should work during hblank
  (so that the game can produce color fading), but
- ends up not working with the conditions below. 
- Hence, for the moment, we only document the 
+ ends up not working with the conditions below.
+ Hence, for the moment, we only document the
  solution adopted by BSNES without enabling it.
 *************************************************/
 
 static READ8_HANDLER( snes_cgram_read )
 {
-	UINT8 res = 0; 
+	UINT8 res = 0;
 	offset &= 0x1ff;
 
 #if 0
@@ -1919,14 +1919,14 @@ static READ8_HANDLER( snes_cgram_read )
 		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
 		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
 
-		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096) 
+		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;
 	}
 #endif
 
-	res = ((UINT8 *)snes_cgram)[offset]; 
+	res = ((UINT8 *)snes_cgram)[offset];
 
-	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr). 
+	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr).
 	// Highest bit is simply ignored.
 	if (offset & 0x01)
 		res &= 0x7f;
@@ -1947,12 +1947,12 @@ static WRITE8_HANDLER( snes_cgram_write )
 		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
 		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
 
-		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096) 
+		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;
 	}
 #endif
 
-	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr). 
+	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr).
 	// Highest bit is simply ignored.
 	if (offset & 0x01)
 		data &= 0x7f;
@@ -2152,7 +2152,7 @@ WRITE8_HANDLER( snes_ppu_write )
 					snes_ppu.oam.write_latch = data;
 				else
 				{
-					// in this case, we not only write data to the upper byte of the word, 
+					// in this case, we not only write data to the upper byte of the word,
 					// but also snes_ppu.oam.write_latch to the lower byte (recall that
 					// snes_ram[OAMDATA] is used to select high/low byte)
 					snes_oam_write(space, snes_ppu.oam.address, data);

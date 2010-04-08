@@ -66,9 +66,9 @@ static WRITE8_HANDLER( output_w )
 
 	printf("%02x\n",data);
 
-/*	if((data & 0xc) == 0xc)
-		memory_set_bankptr(space->machine, "bank1", &ROM[0x10000]);
-	else*/
+/*  if((data & 0xc) == 0xc)
+        memory_set_bankptr(space->machine, "bank1", &ROM[0x10000]);
+    else*/
 	if(data & 8)
 		memory_set_bankptr(space->machine, "bank1", &ROM[0x08000]);
 	else

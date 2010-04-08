@@ -75,7 +75,7 @@ WRITE16_HANDLER( opwolf_spritectrl_w )
 		/* other bits unknown */
 
 		pc090oj_set_sprite_ctrl(state->pc090oj, (data & 0xe0) >> 5);
-		
+
 		/* If data = 4, the Piston Motor is off, otherwise it's on. */
 		if (data == 4)
 		{

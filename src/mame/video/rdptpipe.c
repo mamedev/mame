@@ -8,7 +8,7 @@ namespace N64
 namespace RDP
 {
 
-#define RELATIVE(x, y) 	((((x) >> 3) - (y)) << 3) | (x & 7);
+#define RELATIVE(x, y)	((((x) >> 3) - (y)) << 3) | (x & 7);
 
 void TexturePipe::SetMachine(running_machine *machine)
 {

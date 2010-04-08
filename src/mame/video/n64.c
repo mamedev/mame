@@ -424,7 +424,7 @@ void Processor::SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 		case 11:	*input_r = &m_shade_color.i.a;		*input_g = &m_shade_color.i.a;		*input_b = &m_shade_color.i.a;		break;
 		case 12:	*input_r = &m_env_color.i.a;		*input_g = &m_env_color.i.a;		*input_b = &m_env_color.i.a;		break;
 		case 13:	*input_r = &m_lod_frac;				*input_g = &m_lod_frac;				*input_b = &m_lod_frac;				break;
-		case 14:	*input_r = &m_prim_lod_frac;		*input_g = &m_prim_lod_frac;		*input_b = &m_prim_lod_frac; 		break;
+		case 14:	*input_r = &m_prim_lod_frac;		*input_g = &m_prim_lod_frac;		*input_b = &m_prim_lod_frac;		break;
 		case 15:	*input_r = (UINT8*)&m_k5;			*input_g = (UINT8*)&m_k5;			*input_b = (UINT8*)&m_k5;			break;
 		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31:
@@ -1984,10 +1984,10 @@ void N64::RDP::Processor::CmdLoadBlock(UINT32 w1, UINT32 w2)
 
 	switch (m_misc_state.m_ti_size) // slindwords Neededby Vigilante 8
 	{
-		case PIXEL_SIZE_4BIT:	ti_width2 >>= 1; 	slindwords >>= 3; 	width >>= 1;	break;
-		case PIXEL_SIZE_8BIT:	 					slindwords >>= 2;					break;
+		case PIXEL_SIZE_4BIT:	ti_width2 >>= 1;	slindwords >>= 3;	width >>= 1;	break;
+		case PIXEL_SIZE_8BIT:						slindwords >>= 2;					break;
 		case PIXEL_SIZE_16BIT:	ti_width2 <<= 1;	slindwords >>= 1;	width <<= 1;	break;
-		case PIXEL_SIZE_32BIT:	ti_width2 <<= 2; 						width <<= 2;	break;
+		case PIXEL_SIZE_32BIT:	ti_width2 <<= 2;						width <<= 2;	break;
 	}
 
 	if ((tb + (width >> 2)) > 0x400)

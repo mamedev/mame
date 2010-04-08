@@ -634,8 +634,8 @@ UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle *cli
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			{
 				poly_param *params = &polygon->param[paramnum];
-				params->dpdx  = idet*(v1->p[paramnum]*a00 + v2->p[paramnum]*a10 + v3->p[paramnum]*a20); 
-				params->dpdy  = idet*(v1->p[paramnum]*a01 + v2->p[paramnum]*a11 + v3->p[paramnum]*a21); 
+				params->dpdx  = idet*(v1->p[paramnum]*a00 + v2->p[paramnum]*a10 + v3->p[paramnum]*a20);
+				params->dpdy  = idet*(v1->p[paramnum]*a01 + v2->p[paramnum]*a11 + v3->p[paramnum]*a21);
 				params->start = idet*(v1->p[paramnum]*a02 + v2->p[paramnum]*a12 + v3->p[paramnum]*a22);
 			}
 		}

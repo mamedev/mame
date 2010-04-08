@@ -32,20 +32,20 @@ class Blender
 		MiscState*			m_misc_state;
 		Processor*			m_rdp;
 
-		bool 				Blend16Bit(UINT16* fb, UINT8* hb, RDP::Color c1, RDP::Color c2, int dith);
-		bool 				Blend16Bit1Cycle(UINT16* fb, UINT8* hb, RDP::Color c, int dith);
-		bool 				Blend16Bit2Cycle(UINT16* fb, UINT8* hb, RDP::Color c1, RDP::Color c2, int dith);
-		bool 				Blend32Bit(UINT32* fb, RDP::Color c1, RDP::Color c2);
-		bool 				Blend32Bit1Cycle(UINT32* fb, RDP::Color c);
-		bool 				Blend32Bit2Cycle(UINT32* fb, RDP::Color c1, RDP::Color c2);
+		bool				Blend16Bit(UINT16* fb, UINT8* hb, RDP::Color c1, RDP::Color c2, int dith);
+		bool				Blend16Bit1Cycle(UINT16* fb, UINT8* hb, RDP::Color c, int dith);
+		bool				Blend16Bit2Cycle(UINT16* fb, UINT8* hb, RDP::Color c1, RDP::Color c2, int dith);
+		bool				Blend32Bit(UINT32* fb, RDP::Color c1, RDP::Color c2);
+		bool				Blend32Bit1Cycle(UINT32* fb, RDP::Color c);
+		bool				Blend32Bit2Cycle(UINT32* fb, RDP::Color c1, RDP::Color c2);
 		bool				AlphaCompare(UINT8 alpha);
 
-		void 				BlendEquation0Force(INT32* r, INT32* g, INT32* b, int bsel_special);
-		void 				BlendEquation0NoForce(INT32* r, INT32* g, INT32* b, int bsel_special);
-		void 				BlendEquation1Force(INT32* r, INT32* g, INT32* b, int bsel_special);
-		void 				BlendEquation1NoForce(INT32* r, INT32* g, INT32* b, int bsel_special);
+		void				BlendEquation0Force(INT32* r, INT32* g, INT32* b, int bsel_special);
+		void				BlendEquation0NoForce(INT32* r, INT32* g, INT32* b, int bsel_special);
+		void				BlendEquation1Force(INT32* r, INT32* g, INT32* b, int bsel_special);
+		void				BlendEquation1NoForce(INT32* r, INT32* g, INT32* b, int bsel_special);
 
-		void 				DitherRGB(INT32* r, INT32* g, INT32* b, int dith);
+		void				DitherRGB(INT32* r, INT32* g, INT32* b, int dith);
 };
 
 } // namespace RDP

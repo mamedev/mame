@@ -829,8 +829,8 @@ static READ32_HANDLER( sound020_r )
 					case 0x203960: rv = 0; break;
 					case 0x2039f2: rv = 0x0100ff00; break;
 					//default:
-					//	if(cur_pc != 0x20358a && cur_pc != 0x2038aa && cur_pc != 0x2038d4)
-					//		printf("Read 68k @ %x (PC=%x)\n", reg, cur_pc);
+					//  if(cur_pc != 0x20358a && cur_pc != 0x2038aa && cur_pc != 0x2038d4)
+					//      printf("Read 68k @ %x (PC=%x)\n", reg, cur_pc);
 				}
 			}
 			break;

@@ -41,7 +41,7 @@
 #define SUBTYPE_TMS5220			16
 #define SUBTYPE_TMS5220C		32
 
-/* coefficient defines */ 
+/* coefficient defines */
 #define MAX_K					10
 #define MAX_SCALE_BITS			6
 #define MAX_SCALE				(1<<MAX_SCALE_BITS)
@@ -61,10 +61,10 @@ struct tms5100_coeffs
 	INT8			chirptable[MAX_CHIRP_SIZE];
 	INT8			interp_coeff[8];
 };
-  
+
  /* The following TMS5100/TMC0280/CD2801 coefficients come from US Patent 4,209,836 and several others, and have been verified using derivative analysis to show which values were bad (due to poor quality images or badly typed copies of the tables in the patents, depending on which patent you look at) which were then corrected by figuring out what the tiny remaining marks on the photocopied version of the coefficient sheet COULD have been which would make the derivatives play nice.
 ***These values have not yet been verified against a real TMS5100 or TMC0280 or CD2801 (from speak & spell, etc)***
-*/ 
+*/
 static const struct tms5100_coeffs pat4209836_coeff =
 {
 	/* subtype */
