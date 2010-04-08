@@ -111,7 +111,7 @@ jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 UNIDASMOBJS = \
 	$(TOOLSOBJ)/unidasm.o \
 
-unidasm$(EXE): $(UNIDASMOBJS) $(LIBUTIL) $(LIBOCORE) $(LIBDASM) $(ZLIB) $(EXPAT)
+unidasm$(EXE): $(UNIDASMOBJS) $(LIBDASM) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
