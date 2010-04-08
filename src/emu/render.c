@@ -618,6 +618,18 @@ static void render_exit(running_machine *machine)
 		while (*texture_ptr != NULL && (*texture_ptr)->base != *texture_ptr)
 			*texture_ptr = (*texture_ptr)->next;
 
+	/* free the targets; this must be done before freeing the texture groups
+       as that will forcefully free everything, and if it goes first, we may
+       end up double-freeing textures of the render targets */
+	while (targetlist != NULL)
+		render_target_free(targetlist);
+
+	/* free the screen overlay; similarly, do this before any of the following
+       calls to avoid double-frees */
+	if (screen_overlay != NULL)
+		bitmap_free(screen_overlay);
+	screen_overlay = NULL;
+
 	/* free the texture groups */
 	while (render_texture_free_list != NULL)
 	{
@@ -649,15 +661,6 @@ static void render_exit(running_machine *machine)
 		container_item_free_list = temp->next;
 		global_free(temp);
 	}
-
-	/* free the targets */
-	while (targetlist != NULL)
-		render_target_free(targetlist);
-
-	/* free the screen overlay */
-	if (screen_overlay != NULL)
-		bitmap_free(screen_overlay);
-	screen_overlay = NULL;
 }
 
 
@@ -1557,6 +1560,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	root_xform.yscale = (float) visheight;
 	root_xform.color.r = root_xform.color.g = root_xform.color.b = root_xform.color.a = 1.0f;
 	root_xform.orientation = target->orientation;
+    root_xform.no_center = FALSE;
 
 	/* iterate over layers back-to-front, but only if we're running */
 	if (mame_get_phase(target->machine) >= MAME_PHASE_RESET)
@@ -1591,6 +1595,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 					item_xform.color.b = item->color.b * root_xform.color.b;
 					item_xform.color.a = item->color.a * root_xform.color.a;
 					item_xform.orientation = orientation_add(item->orientation, root_xform.orientation);
+                    item_xform.no_center = FALSE;
 
 					/* if there is no associated element, it must be a screen element */
 					if (item->element != NULL)
@@ -1667,6 +1672,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 		ui_xform.yscale = (float) target->height;
 		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = ui_xform.color.a = 1.0f;
 		ui_xform.orientation = target->orientation;
+        ui_xform.no_center = FALSE;
 
 		/* add UI elements */
 		add_container_primitives(target, &target->primlist[listnum], &ui_xform, ui_container, BLENDMODE_ALPHA);

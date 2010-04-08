@@ -236,15 +236,15 @@ public:
 	ioport_list				portlist;			/* points to a list of input port configurations */
 
 	/* CPU information */
-	running_device *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */
+	running_device *		firstcpu;			/* first CPU (allows for quick iteration via typenext) */
 
 	/* game-related information */
 	const game_driver *		gamedrv;			/* points to the definition of the game machine */
-	const char *			basename;			/* basename used for game-related paths */
+	char *					basename;			/* basename used for game-related paths */
 
 	/* video-related information */
 	gfx_element *			gfx[MAX_GFX_ELEMENTS];/* array of pointers to graphic sets (chars, sprites) */
-	running_device *	primary_screen;		/* the primary screen device, or NULL if screenless */
+	running_device *		primary_screen;		/* the primary screen device, or NULL if screenless */
 	palette_t *				palette;			/* global palette object */
 
 	/* palette-related information */

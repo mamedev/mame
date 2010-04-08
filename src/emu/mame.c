@@ -261,8 +261,11 @@ int mame_execute(core_options *options)
 		firstgame = FALSE;
 
 		/* parse any INI files as the first thing */
-		options_revert(mame_options(), OPTION_PRIORITY_INI);
-		mame_parse_ini_files(mame_options(), driver);
+		if (options_get_bool(options, OPTION_READCONFIG)) 
+		{
+			options_revert(mame_options(), OPTION_PRIORITY_INI);
+			mame_parse_ini_files(mame_options(), driver);
+		}
 
 		/* create the machine structure and driver */
 		machine = global_alloc(running_machine(driver));
@@ -1327,6 +1330,8 @@ running_machine::running_machine(const game_driver *driver)
 			auto_free(this, driver_data);
 		if (config != NULL)
 			machine_config_free((machine_config *)config);
+		if (basename != NULL)
+			osd_free(basename);
 		if (mame_data != NULL)
 			auto_free(this, mame_data);
 	}
@@ -1343,6 +1348,8 @@ running_machine::~running_machine()
 
 	if (config != NULL)
 		machine_config_free((machine_config *)config);
+	if (basename != NULL)
+		osd_free(basename);
 
 	global_machine = NULL;
 }
