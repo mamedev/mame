@@ -346,12 +346,6 @@ void free_file_line(void *memory, const char *file, int line)
 }
 
 
-void osd_break_into_debugger(const char *text)
-{
-	/* we don't have a complete debugger to break in */
-}
-
-
 void CLIB_DECL logerror(const char *format, ...)
 {
 	/* silent logerrors are allowed in disassemblers */
