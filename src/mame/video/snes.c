@@ -859,7 +859,7 @@ static void snes_oam_list_build( void )
 		oam_spritelist[ii].pal = 128 + ((oamram[oam] & 0x0e) << 3);
 		oam_spritelist[ii].tile = (oamram[oam--] & 0x1) << 8;
 		oam_spritelist[ii].tile |= oamram[oam--];
-		oam_spritelist[ii].y = oamram[oam--] + 1;	/* We seem to need to add one here.... */
+		oam_spritelist[ii].y = oamram[oam--] + 1;
 		oam_spritelist[ii].x = oamram[oam--];
 		oam_spritelist[ii].size = (extra & 0x80) >> 7;
 		extra <<= 1;
@@ -867,10 +867,7 @@ static void snes_oam_list_build( void )
 		extra <<= 1;
 
 		oam_spritelist[ii].y *= snes_ppu.obj_interlace;
-
-		/* Adjust if past maximum position */
-		if (oam_spritelist[ii].y >= snes_ppu.beam.last_visible_line * snes_ppu.interlace)
-			oam_spritelist[ii].y -= 256 * snes_ppu.interlace;
+		oam_spritelist[ii].y &= 0x1ff;
 
 		oam_spritelist[ii].x &= 0x1ff;
 
@@ -1013,35 +1010,42 @@ static void snes_update_objects_rto( UINT16 curline )
 		priority = oam_spritelist[active_sprite].priority_bits;
 		pal = oam_spritelist[active_sprite].pal;
 
-		/* Only objects using tiles over 255 use name select */
-		name_sel = (tile < 256) ? 0 : snes_ppu.oam.name_select;
+		/* Adjust y, if past maximum position (for sprites which overlap between top & bottom) */
+		if (y >= 256 * snes_ppu.interlace)
+			y -= 256 * snes_ppu.interlace;
 
-		ys = (curline - y) >> 3;
-		line = (curline - y) % 8;
-		if (vflip)
+		if (curline >= y && curline < (y + (height << 3)))
 		{
-			ys = height - ys - 1;
-			line = 7 - line;
-		}
-		line <<= 1;
-		tile <<= 5;
+			/* Only objects using tiles over 255 use name select */
+			name_sel = (tile < 256) ? 0 : snes_ppu.oam.name_select;
 
-		for (jj = 0; jj < width; jj++)
-		{
-			INT16 xx = (x + (jj << 3)) & 0x1ff;
+			ys = (curline - y) >> 3;
+			line = (curline - y) % 8;
+			if (vflip)
+			{
+				ys = height - ys - 1;
+				line = 7 - line;
+			}
+			line <<= 1;
+			tile <<= 5;
 
-			if (x != 256 && xx >= 256 && (xx + 7) < 512)
-				continue;
+			for (jj = 0; jj < width; jj++)
+			{
+				INT16 xx = (x + (jj << 3)) & 0x1ff;
 
-			if (time_over++ >= 34)
-				break;
+				if (x != 256 && xx >= 256 && (xx + 7) < 512)
+					continue;
 
-			xs = (hflip) ? (width - 1 - jj) : jj;
-			oam_tilelist[time_over - 1].tileaddr = name_sel + tile + table_obj_offset[ys][xs] + line;
-			oam_tilelist[time_over - 1].hflip = hflip;
-			oam_tilelist[time_over - 1].x = xx;
-			oam_tilelist[time_over - 1].pal = pal;
-			oam_tilelist[time_over - 1].priority = priority;
+				if (time_over++ >= 34)
+					break;
+
+				xs = (hflip) ? (width - 1 - jj) : jj;
+				oam_tilelist[time_over - 1].tileaddr = name_sel + tile + table_obj_offset[ys][xs] + line;
+				oam_tilelist[time_over - 1].hflip = hflip;
+				oam_tilelist[time_over - 1].x = xx;
+				oam_tilelist[time_over - 1].pal = pal;
+				oam_tilelist[time_over - 1].priority = priority;
+			}
 		}
 	}
 
