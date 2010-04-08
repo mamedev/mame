@@ -50,6 +50,9 @@
 
 #include "osdcomm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /***************************************************************************
@@ -882,6 +885,10 @@ file_error osd_get_full_path(char **dst, const char *path);
 
 -----------------------------------------------------------------------------*/
 const char *osd_get_volume_name(int idx);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif	/* __OSDEPEND_H__ */
