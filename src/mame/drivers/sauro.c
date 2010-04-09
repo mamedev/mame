@@ -71,6 +71,53 @@ Tricky Doc
 
 Addition by Reip
 
+
+Stephh's notes (based on the games Z80 code and some tests) :
+
+1) 'sauro'
+
+  - Press START1 while in "test mode" to cycle through different screens
+    (colors, Dip Switches, Inputs)
+  - When "Freeze" Dip Switch is ON, press START1 to freeze and START2 to unfreeze.
+    This setting (as well as others) must be defined before reseting the games.
+  - "Test mode" crashes when trying to display "Difficult" ("Hard") because the full string
+    is 15 bytes long while other string are 14, so the 15th "char" is NOT 0x00 :
+      * 0xd49f : mask (0x30)
+      * 0xd4a0-0xd4a7 : offset of settings to display (4 x 2 bytes, LSB first) :
+        0xd58e, 0xd5a5, 0xd5bc, 0xd5d4
+  - Player 2 uses player 2 inputs only when "Cabinet" Dip Switch is set to "Cocktail"
+    (code at 0x2e40 : start reading inputs).
+
+2) 'trckydoc' and clones
+
+  - Press START1 while in "test mode" to cycle through different screens
+    (colors, Dip Switches, Inputs)
+  - When "Freeze" Dip Switch is ON, press START1 to freeze and START2 to unfreeze.
+    This setting (as well as others) must be defined before reseting the games.
+
+2a) 'trckydoc'
+
+  - Settings are the SAME as in 'sauro', but there is NO bug in the "test mode" :
+      * 0xcd19 : mask (0x30)
+      * 0xcd1a-0xcd22 : offset of settings to display (4 x 2 bytes, LSB first) :
+        0xce0a, 0xce21, 0xce38, 0xce4f
+  - Player 2 uses player 2 inputs only when "Cabinet" Dip Switch is set to "Cocktail"
+    (extra code at 0xdf10 - code at 0x3f80 : start reading inputs).
+  - You can't get any extra life nor extra credit.
+
+2b) 'trckydoca'
+
+  - Coinage B is slightly different : you have 1C_1C instead of 1C_5C (table at 0x02e1).
+    Such change isn't notified in the "test mode" though.
+  - Player 2 uses player 2 inputs regardless of "Cabinet" Dip Switch
+    (NO extra code at 0xdf10 - code at 0x3f80 : start reading inputs).
+  - You can get an extra life at 90000 points and an extra credit at 500000 points
+    but there is no music/sound to tell that to you (extra code at 0xdf30).
+    This is only possible if you continue a game and have already got the life or
+    the credit (extra code at 0xdf90 resets the flags if you don't continue).
+    This info is written in "attract mode" when you don't have any credits
+    instead of displaying the "INSERT COIN" message.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -201,26 +248,27 @@ static ADDRESS_MAP_START( trckydoc_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+/* verified from Z80 code */
 static INPUT_PORTS_START( tecfri )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
 
-	PORT_START("P2")
+	PORT_START("P2")                                                  /* see notes */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )
@@ -234,9 +282,9 @@ static INPUT_PORTS_START( tecfri )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )	                      /* This crashes test mode!!! */
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )                       /* This crashes test mode in 'sauro' but not in other games !!! - see notes */
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -261,12 +309,21 @@ static INPUT_PORTS_START( tecfri )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
+INPUT_PORTS_END
+
+
+/* verified from Z80 code */
+static INPUT_PORTS_START( trckydoca )
+	PORT_INCLUDE(tecfri)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
 
@@ -488,7 +545,6 @@ static DRIVER_INIT( tecfri )
 	RAM[0xe000] = 1;
 }
 
-GAME( 1987, sauro,    0,        sauro,    tecfri, tecfri, ROT0, "Tecfri", "Sauro", 0 )
-GAME( 1987, trckydoc, 0,        trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 1)", 0 )
-GAME( 1987, trckydoca,trckydoc, trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 2)", 0 )
-
+GAME( 1987, sauro,    0,        sauro,    tecfri,    tecfri, ROT0, "Tecfri", "Sauro", 0 )
+GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    tecfri, ROT0, "Tecfri", "Tricky Doc (Set 1)", 0 )
+GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 2)", 0 )
