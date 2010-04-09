@@ -12,12 +12,10 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 #include "includes/vsnes.h"
 
 /* Globals */
-static int vsnes_gun_controller;
 static int vsnes_do_vrom_bank;
 
 /* Locals */
 static int input_latch[4];
-static const UINT8 *remapped_colortable;
 
 static int sound_fix=0;
 static UINT8 last_bank;
@@ -40,92 +38,6 @@ static WRITE8_HANDLER( vsnes_nt1_w );
 static READ8_HANDLER( vsnes_nt0_r );
 static READ8_HANDLER( vsnes_nt1_r );
 static void v_set_videorom_bank( running_machine* machine, int start, int count, int bank, int bank_size_in_kb );
-
-/*************************************
- *
- *  Color Mapping
- *
- *************************************/
-
-/* RP2C04-001 */
-/* check 0x08 */
-static const UINT8 rp2c04001_colortable[] =
-{
-	0x35, 0xff, 0x16, 0x22, 0x1c, 0xff, 0xff, 0x15, /* 0x00 - 0x07 */
-	0x20, 0x00, 0x27, 0x05, 0x04, 0x27, 0x08, 0x30, /* 0x08 - 0x0f */
-	0x21, 0xff, 0xff, 0x29, 0x3c, 0xff, 0x36, 0x12, /* 0x10 - 0x17 */
-	0xff, 0x2b, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01, /* 0x18 - 0x1f */
-	0xff, 0x31, 0xff, 0x2a, 0x2c, 0x0c, 0xff, 0xff, /* 0x20 - 0x27 */
-	0xff, 0x07, 0x34, 0x06, 0x13, 0xff, 0x26, 0x0f, /* 0x28 - 0x2f */
-	0xff, 0x19, 0x10, 0x0a, 0xff, 0xff, 0xff, 0x17, /* 0x30 - 0x37 */
-	0xff, 0x11, 0x09, 0xff, 0xff, 0x25, 0x18, 0xff  /* 0x38 - 0x3f */
-};
-
-/* RP2C04-002 */
-/* 0x04, 0x24 */
-static const UINT8 rp2c04002_colortable[] =
-{
-	0xff, 0x27, 0x18, 0xff, 0x3a, 0x25, 0x2b, 0x31, /* 0x00 - 0x07 */
-	0x15, 0x13, 0x38, 0x34, 0x20, 0x23, 0xff, 0x0b, /* 0x08 - 0x0f */
-	0xff, 0x21, 0x06, 0xff, 0x1b, 0x29, 0xff, 0x22, /* 0x10 - 0x17 */
-	0xff, 0x24, 0xff, 0xff, 0xff, 0x08, 0xff, 0x03, /* 0x18 - 0x1f */
-	0xff, 0x36, 0x26, 0x33, 0x11, 0xff, 0x10, 0x02, /* 0x20 - 0x27 */
-	0x14, 0xff, 0x10, 0x09, 0x12, 0x0f, 0xff, 0x30, /* 0x28 - 0x2f */
-	0xff, 0xff, 0x2a, 0x17, 0x0c, 0x11, 0x15, 0x19, /* 0x30 - 0x37 */
-	0xff, 0x2c, 0x07, 0x37, 0xff, 0x05, 0x3a, 0xff  /* 0x38 - 0x3f */
-};
-
-/* RP2C04-003 */
-/* check 0x0f, 0x2e, 0x34 */
-static const UINT8 rp2c04003_colortable[] =
-{
-	0xff, 0xff, 0xff, 0x10, 0x1a, 0x30, 0x31, 0x09, /* 0x00 - 0x07 */
-	0x01, 0x0f, 0x36, 0x08, 0x15, 0xff, 0xff, 0x30, /* 0x08 - 0x0f */
-	0x22, 0x1c, 0xff, 0x12, 0x19, 0x18, 0x17, 0x2a, /* 0x10 - 0x17 */
-	0x00, 0xff, 0xff, 0x02, 0x06, 0x07, 0xff, 0x35, /* 0x18 - 0x1f */
-	0x23, 0xff, 0x8b, 0xf7, 0xff, 0x27, 0x26, 0x20, /* 0x20 - 0x27 */
-	0x29, 0x03, 0x21, 0x24, 0x11, 0xff, 0xff, 0xff, /* 0x28 - 0x2f */
-	0x2c, 0xff, 0xff, 0xff, 0x07, 0xf9, 0x28, 0xff, /* 0x30 - 0x37 */
-	0x0a, 0xff, 0x32, 0x37, 0x13, 0x3a, 0xff, 0x0b  /* 0x38 - 0x3f */
-};
-
-/* RP2C05-004 */
-/* check 0x03 0x1d, 0x38, 0x3b*/
-static const UINT8 rp2c05004_colortable[] =
-{
-	0x18, 0xff, 0x1c, 0x89, 0xff, 0xff, 0x01, 0x17, /* 0x00 - 0x07 */
-	0x10, 0x0f, 0x2a, 0xff, 0x36, 0x37, 0x1a, 0xff, /* 0x08 - 0x0f */
-	0x25, 0xff, 0x12, 0xff, 0x0f, 0xff, 0xff, 0x26, /* 0x10 - 0x17 */
-	0xff, 0xff, 0x22, 0xff, 0xff, 0x0f, 0x3a, 0x21, /* 0x18 - 0x1f */
-	0x05, 0x0a, 0x07, 0xc2, 0x13, 0xff, 0x00, 0x15, /* 0x20 - 0x27 */
-	0x0c, 0xff, 0x11, 0xff, 0xff, 0x38, 0xff, 0xff, /* 0x28 - 0x2f */
-	0xff, 0xff, 0x08, 0x45, 0xff, 0xff, 0x30, 0x3c, /* 0x30 - 0x37 */
-	0x0f, 0x27, 0xff, 0x60, 0x29, 0xff, 0x30, 0x09  /* 0x38 - 0x3f */
-};
-
-
-
-/* remap callback */
-static int remap_colors( running_device *device, int addr, int data )
-{
-	/* this is the protection. color codes are shuffled around */
-	/* the ones with value 0xff are unknown */
-
-	if (addr >= 0x3f00)
-	{
-		int newdata = remapped_colortable[data & 0x3f];
-
-		if (newdata != 0xff)
-			data = newdata;
-
-		#ifdef MAME_DEBUG
-		else
-			popmessage("Unmatched color %02x, at address %04x", data & 0x3f, addr);
-		#endif
-	}
-
-	return data;
-}
 
 /*************************************
  *
@@ -239,16 +151,12 @@ READ8_HANDLER( vsnes_in1_1_r )
 
 MACHINE_RESET( vsnes )
 {
-	running_device *ppu = devtag_get_device(machine, "ppu1");
 
 	last_bank = 0xff;
 	sound_fix = 0;
 	input_latch[0] = input_latch[1] = 0;
 	input_latch[2] = input_latch[3] = 0;
 
-	/* if we need to remap, install the callback */
-	if (remapped_colortable)
-		ppu2c0x_set_vidaccess_callback(ppu, remap_colors);
 }
 
 /*************************************
@@ -259,18 +167,10 @@ MACHINE_RESET( vsnes )
 
 MACHINE_RESET( vsdual )
 {
-	running_device *ppu1 = devtag_get_device(machine, "ppu1");
-	running_device *ppu2 = devtag_get_device(machine, "ppu2");
 
 	input_latch[0] = input_latch[1] = 0;
 	input_latch[2] = input_latch[3] = 0;
 
-	/* if we need to remap, install the callback */
-	if (remapped_colortable)
-	{
-		ppu2c0x_set_vidaccess_callback(ppu1, remap_colors);
-		ppu2c0x_set_vidaccess_callback(ppu2, remap_colors);
-	}
 }
 
 /*************************************
@@ -427,26 +327,14 @@ static void v_set_videorom_bank( running_machine* machine, int start, int count,
 	}
 }
 
-/*************************************
- *
- *  Common init for all games
- *
- *************************************/
-
-static void init_vsnes(running_machine *machine)
-{
-	/* set the controller to default */
-	vsnes_gun_controller = 0;
-
-	/* no color remapping */
-	remapped_colortable = 0;
-}
-
 /**********************************************************************************
  *
  *  Game and Board-specific initialization
  *
  **********************************************************************************/
+
+/**********************************************************************************/
+/* Most games: VROM Banking in controller 0 write */
 
 static WRITE8_HANDLER( vsnormal_vrom_banking )
 {
@@ -459,51 +347,14 @@ static WRITE8_HANDLER( vsnormal_vrom_banking )
 	vsnes_in0_w(space, offset, data);
 }
 
-/* Most games switch VROM Banks in controller 0 write */
-/* they dont do any other trickery */
 DRIVER_INIT( vsnormal )
 {
 	/* vrom switching is enabled with bit 2 of $4016 */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vsnormal_vrom_banking);
 }
 
-static WRITE8_HANDLER( ppuRC2C05_protection )
-{
-	running_device *ppu1 = devtag_get_device(space->machine, "ppu1");
-
-	/* This PPU has registers mapped at $2000 and $2001 inverted */
-	/* and no remapped color */
-	if (offset == 0)
-	{
-		ppu2c0x_w(ppu1, 1, data);
-		return;
-	}
-
-	ppu2c0x_w(ppu1, 0, data);
-}
-
 /**********************************************************************************/
-/* Super Mario Bros. Extra ram at $6000 (NV?) and remapped colors */
-
-DRIVER_INIT( suprmrio )
-{
-	/* common init */
-	init_vsnes(machine);
-
-	/* normal banking */
-	DRIVER_INIT_CALL(vsnormal);
-
-	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL);
-
-	/* now override the vidaccess callback */
-	/* we need to remap color tables */
-	/* this *is* the VS games protection, I guess */
-	remapped_colortable = rp2c05004_colortable;
-}
-
-/**********************************************************************************/
-/* Gun Games - VROM Banking in controller 0 write */
+/* Gun games: VROM Banking in controller 0 write */
 
 static WRITE8_HANDLER( gun_in0_w )
 {
@@ -524,24 +375,21 @@ static WRITE8_HANDLER( gun_in0_w )
 		input_latch[0] = input_port_read(space->machine, "IN0");
 
 		/* do the gun thing */
-		if (vsnes_gun_controller)
+		int x = input_port_read(space->machine, "GUNX");
+		int y = input_port_read(space->machine, "GUNY");
+		UINT32 pix, color_base;
+
+		/* get the pixel at the gun position */
+		pix = ppu2c0x_get_pixel(ppu1, x, y);
+
+		/* get the color base from the ppu */
+		color_base = ppu2c0x_get_colorbase(ppu1);
+
+		/* look at the screen and see if the cursor is over a bright pixel */
+		if ((pix == color_base + 0x20 ) || (pix == color_base + 0x30) ||
+			(pix == color_base + 0x33 ) || (pix == color_base + 0x34))
 		{
-			int x = input_port_read(space->machine, "GUNX");
-			int y = input_port_read(space->machine, "GUNY");
-			UINT32 pix, color_base;
-
-			/* get the pixel at the gun position */
-			pix = ppu2c0x_get_pixel(ppu1, x, y);
-
-			/* get the color base from the ppu */
-			color_base = ppu2c0x_get_colorbase(ppu1);
-
-			/* look at the screen and see if the cursor is over a bright pixel */
-			if ((pix == color_base + 0x20 ) || (pix == color_base + 0x30) ||
-				(pix == color_base + 0x33 ) || (pix == color_base + 0x34))
-			{
-				input_latch[0] |= 0x40;
-			}
+			input_latch[0] |= 0x40;
 		}
 
 		input_latch[1] = input_port_read(space->machine, "IN1");
@@ -556,23 +404,17 @@ static WRITE8_HANDLER( gun_in0_w )
     zapstore = data;
 }
 
-DRIVER_INIT( duckhunt )
+DRIVER_INIT( vsgun )
 {
-	/* vrom switching is enabled with bit 2 of $4016 */
+	/* VROM switching is enabled with bit 2 of $4016 */
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w);
-
-	/* common init */
-	init_vsnes(machine);
-
-	/* enable gun controller */
-	vsnes_gun_controller = 1;
 	vsnes_do_vrom_bank = 1;
 }
 
 /**********************************************************************************/
-/* The Goonies, VS Gradius: ROMs bankings at $8000-$ffff */
+/* Konami games: ROMs bankings at $8000-$ffff */
 
-static WRITE8_HANDLER( goonies_rom_banking )
+static WRITE8_HANDLER( vskonami_rom_banking )
 {
 	int reg = (offset >> 12) & 0x07;
 	int bankoffset = (data & 7) * 0x2000 + 0x10000;
@@ -598,7 +440,7 @@ static WRITE8_HANDLER( goonies_rom_banking )
 	}
 }
 
-DRIVER_INIT( goonies )
+DRIVER_INIT( vskonami )
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -606,70 +448,11 @@ DRIVER_INIT( goonies )
 	memcpy(&prg[0x08000], &prg[0x18000], 0x8000);
 
 	/* banking is done with writes to the $8000-$ffff area */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, goonies_rom_banking);
-
-	/* common init */
-	init_vsnes(machine);
-
-	/* now override the vidaccess callback */
-	remapped_colortable = rp2c04003_colortable;
-}
-
-DRIVER_INIT( vsgradus )
-{
-	/* We do manual banking, in case the code falls through */
-	/* Copy the initial banks */
-	UINT8 *prg = memory_region(machine, "maincpu");
-	memcpy(&prg[0x08000], &prg[0x18000], 0x8000);
-
-	/* banking is done with writes to the $8000-$ffff area */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, goonies_rom_banking);
-
-	/* common init */
-	init_vsnes(machine);
-
-	/* now override the vidaccess callback */
-	remapped_colortable = rp2c04001_colortable;
-}
-
-DRIVER_INIT( vspinbal )
-{
-	/* common init */
-	init_vsnes(machine);
-
-	/* normal banking */
-	DRIVER_INIT_CALL(vsnormal);
-
-	/* now override the vidaccess callback */
-	remapped_colortable = rp2c04001_colortable;
-
-}
-
-DRIVER_INIT( hogalley )
-{
-
-	/* vrom switching is enabled with bit 2 of $4016 */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w);
-
-	/* common init */
-	init_vsnes(machine);
-
-	/* enable gun controller */
-	vsnes_gun_controller = 1;
-	vsnes_do_vrom_bank = 1;
-
-	/* now override the vidaccess callback */
-	remapped_colortable = rp2c04001_colortable;
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, vskonami_rom_banking);
 }
 
 /***********************************************************************/
 /* Vs. Gumshoe */
-
-static READ8_HANDLER( vsgshoe_security_r )
-{
-	/* low part must be 0x1c */
-	return ppu2c0x_r(devtag_get_device(space->machine, "ppu1"), 2) | 0x1c;
-}
 
 static WRITE8_HANDLER( vsgshoe_gun_in0_w )
 {
@@ -692,17 +475,9 @@ DRIVER_INIT( vsgshoe )
 	UINT8 *prg = memory_region(machine, "maincpu");
 	memcpy (&prg[0x08000], &prg[0x12000], 0x2000);
 
-	/* Protection */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2002, 0x2002, 0, 0, vsgshoe_security_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2001, 0, 0, ppuRC2C05_protection);
-
 	/* vrom switching is enabled with bit 2 of $4016 */
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, gun_in0_r, vsgshoe_gun_in0_w);
 
-	/* common init */
-	init_vsnes(machine);
-
-	vsnes_gun_controller = 1;
 	vsnes_do_vrom_bank = 1;
 }
 
@@ -837,81 +612,12 @@ DRIVER_INIT( drmario )
 
 	drmario_shiftreg = 0;
 	drmario_shiftcount = 0;
-
-	/* common init */
-	init_vsnes(machine);
-
-	/* now override the vidaccess callback */
-	remapped_colortable = rp2c04003_colortable;
-}
-
-/***********************************************************************/
-/* Excite Bike */
-
-DRIVER_INIT( excitebk )
-{
-	/* common init */
-	init_vsnes(machine);
-
-	/* normal banking */
-	DRIVER_INIT_CALL(vsnormal);
-
-	/* now override the vidaccess callback */
-	/* we need to remap color tables */
-	/* this *is* the VS games protection, I guess */
-	remapped_colortable = rp2c04003_colortable;
-}
-
-DRIVER_INIT( excitbkj )
-{
-	/* common init */
-	init_vsnes(machine);
-
-	/* normal banking */
-	DRIVER_INIT_CALL(vsnormal);
-
-	/* now override the vidaccess callback */
-	/* we need to remap color tables */
-	/* this *is* the VS games protection, I guess */
-	remapped_colortable = rp2c05004_colortable;
 }
 
 /**********************************************************************************/
-/* Mach Rider */
+/* Games with VRAM instead of graphics ROMs: ROMs bankings at $8000-$ffff */
 
-DRIVER_INIT( machridr )
-{
-
-	/* common init */
-	init_vsnes(machine);
-
-	/* normal banking */
-	DRIVER_INIT_CALL(vsnormal);
-
-	/* now override the vidaccess callback */
-	/* we need to remap color tables */
-	/* this *is* the VS games protection, I guess */
-	remapped_colortable = rp2c04002_colortable;
-}
-
-/**********************************************************************************/
-/* VS Slalom */
-
-DRIVER_INIT( vsslalom )
-{
-	/* common init */
-	init_vsnes(machine);
-
-	/* now override the vidaccess callback */
-	/* we need to remap color tables */
-	/* this *is* the VS games protection, I guess */
-	remapped_colortable = rp2c04002_colortable;
-}
-
-/**********************************************************************************/
-/* Castelvania: ROMs bankings at $8000-$ffff */
-
-static WRITE8_HANDLER( castlevania_rom_banking )
+static WRITE8_HANDLER( vsvram_rom_banking )
 {
 	int rombank = 0x10000 + (data & 7) * 0x4000;
 	UINT8 *prg = memory_region(space->machine, "maincpu");
@@ -919,55 +625,17 @@ static WRITE8_HANDLER( castlevania_rom_banking )
 	memcpy(&prg[0x08000], &prg[rombank], 0x4000);
 }
 
-DRIVER_INIT( cstlevna )
+DRIVER_INIT( vsvram )
 {
 	/* when starting the game, the 1st 16k and the last 16k are loaded into the 2 banks */
 	UINT8 *prg = memory_region(machine, "maincpu");
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* banking is done with writes to the $8000-$ffff area */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, castlevania_rom_banking);
-
-	/* common init */
-	init_vsnes(machine);
-
-	/* now override the vidaccess callback */
-	/* we need to remap color tables */
-	/* this *is* the VS games protection, I guess */
-	remapped_colortable = rp2c04002_colortable;
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, vsvram_rom_banking);
 
 	/* allocate vram */
 	vram = auto_alloc_array(machine, UINT8, 0x2000);
-}
-
-/**********************************************************************************/
-/* VS Top Gun: ROMs bankings at $8000-$ffff, plus some protection */
-
-static READ8_HANDLER( topgun_security_r )
-{
-	/* low part must be 0x1b */
-	return ppu2c0x_r(devtag_get_device(space->machine, "ppu1"), 2) | 0x1b;
-}
-
-DRIVER_INIT( topgun )
-{
-	/* when starting the game, the 1st 16k and the last 16k are loaded into the 2 banks */
-	UINT8 *prg = memory_region(machine, "maincpu");
-	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
-
-	/* banking is done with writes to the $8000-$ffff area */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, castlevania_rom_banking);
-
-	/* tap on the PPU, due to some tricky protection */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2002, 0x2002, 0, 0, topgun_security_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2001, 0, 0, ppuRC2C05_protection);
-
-	/* common init */
-	init_vsnes(machine);
-
-	/* allocate vram */
-	vram = auto_alloc_array(machine, UINT8, 0x2000);
-
 }
 
 /**********************************************************************************/
@@ -1132,9 +800,6 @@ DRIVER_INIT( MMC3 )
 
 	/* extra ram at $6000-$7fff */
 	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL);
-
-	/* common init */
-	init_vsnes(machine);
 }
 
 /* Vs. RBI Baseball */
@@ -1173,8 +838,6 @@ DRIVER_INIT( rbibb )
 
 	/* RBI Base ball hack */
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5e00, 0x5e01, 0, 0, rbi_hack_r) ;
-
-	remapped_colortable = rp2c04003_colortable;
 }
 
 /* Vs. Super Xevious */
@@ -1226,8 +889,6 @@ DRIVER_INIT( supxevs )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5678, 0x5678, 0, 0, supxevs_read_prot_2_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x578f, 0x578f, 0, 0, supxevs_read_prot_3_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5567, 0x5567, 0, 0, supxevs_read_prot_4_r);
-
-	remapped_colortable = rp2c04001_colortable;
 }
 
 /* Vs. TKO Boxing */
@@ -1258,11 +919,6 @@ DRIVER_INIT( tkoboxng )
 
 	/* security device at $5e00-$5e01 */
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5e00, 0x5e01, 0, 0, tko_security_r);
-
-	/* now override the vidaccess callback */
-	/* we need to remap color tables */
-	/* this *is* the VS games protection, I guess */
-	remapped_colortable = rp2c04003_colortable;
 }
 
 /* Vs. Freedom Force */
@@ -1273,10 +929,7 @@ DRIVER_INIT( vsfdf )
 
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w);
 
-	vsnes_gun_controller = 1;
 	vsnes_do_vrom_bank = 0;
-
-	remapped_colortable = rp2c04001_colortable;
 }
 
 /**********************************************************************************/
@@ -1325,11 +978,6 @@ DRIVER_INIT( platoon )
 	memcpy(&prg[0x0c000], &prg[0x2c000], 0x4000);
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mapper68_rom_banking);
-
-	init_vsnes(machine);
-
-	remapped_colortable = rp2c04001_colortable;
-
 }
 
 /**********************************************************************************/
@@ -1358,64 +1006,14 @@ DRIVER_INIT( bnglngby )
 
 	ret = 0;
 
-	/* common init */
-	init_vsnes(machine);
-
-	/* normal banking */
-	DRIVER_INIT_CALL(vsnormal);
-
-	remapped_colortable = rp2c04002_colortable;
-}
-
-/**********************************************************************************/
-/* Vs. Ninja Jajamaru Kun */
-
-static READ8_HANDLER( jajamaru_security_r )
-{
-	/* low part must be 0x40 */
-	return ppu2c0x_r(devtag_get_device(space->machine, "ppu1"), 2) | 0x40;
-}
-
-DRIVER_INIT( jajamaru )
-{
-	// It executes an illegal opcode: 0x04 at 0x9e67 and 0x9e1c
-	// At 0x9e5d and 0x9e12 there is a conditional jump to it
-	// Maybe it should be a DOP (double NOP)
-
-	/* Protection */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2002, 0x2002, 0, 0, jajamaru_security_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2001, 0, 0, ppuRC2C05_protection);
-
-	/* common init */
-	init_vsnes(machine);
-
 	/* normal banking */
 	DRIVER_INIT_CALL(vsnormal);
 }
 
-/***********************************************************************/
-/* Vs. Mighty Bomb Jack */
-
-static READ8_HANDLER( mightybj_security_r )
-{
-	/* low part must be 0x3d */
-	return ppu2c0x_r(devtag_get_device(space->machine, "ppu1"), 2) | 0x3d;
-}
-
-DRIVER_INIT( mightybj )
-{
-	/* Protection */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2002, 0x2002, 0, 0, mightybj_security_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2001, 0, 0, ppuRC2C05_protection);
-
-	/* common init */
-	init_vsnes(machine);
-}
-
 /**********************************************************************************/
-/* VS Tennis */
+/* VS Dualsystem */
 
-static WRITE8_HANDLER( vstennis_vrom_banking )
+static WRITE8_HANDLER( vsdual_vrom_banking )
 {
 	running_device *other_cpu = (space->cpu == devtag_get_device(space->machine, "maincpu")) ? devtag_get_device(space->machine, "sub") : devtag_get_device(space->machine, "maincpu");
 
@@ -1432,83 +1030,16 @@ static WRITE8_HANDLER( vstennis_vrom_banking )
 		vsnes_in0_1_w(space, offset, data);
 }
 
-DRIVER_INIT( vstennis )
+DRIVER_INIT( vsdual )
 {
 	UINT8 *prg = memory_region(machine, "maincpu");
 
 	/* vrom switching is enabled with bit 2 of $4016 */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vstennis_vrom_banking);
-	memory_install_write8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vstennis_vrom_banking);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vsdual_vrom_banking);
+	memory_install_write8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vsdual_vrom_banking);
 
 	/* shared ram at $6000 */
 	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, &prg[0x6000]);
 	memory_install_ram(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, &prg[0x6000]);
 }
 
-/**********************************************************************/
-/* VS Wrecking Crew */
-
-DRIVER_INIT( wrecking )
-{
-	/* only differance between this and vstennis is the colors */
-	DRIVER_INIT_CALL(vstennis);
-	remapped_colortable = rp2c04002_colortable;
-}
-
-/**********************************************************************/
-/* VS Balloon Fight */
-
-DRIVER_INIT( balonfgt )
-{
-	/* only differance between this and vstennis is the colors */
-	DRIVER_INIT_CALL(vstennis);
-
-	remapped_colortable = rp2c04003_colortable;
-}
-
-
-/**********************************************************************/
-/* VS Baseball */
-
-DRIVER_INIT( vsbball )
-{
-	/* only differance between this and vstennis is the colors */
-	DRIVER_INIT_CALL(vstennis);
-
-	remapped_colortable = rp2c04001_colortable;
-}
-
-
-/**********************************************************************/
-/* Dual Ice Climber Jpn */
-
-DRIVER_INIT( iceclmrj )
-{
-	/* only differance between this and vstennis is the colors */
-	DRIVER_INIT_CALL(vstennis);
-
-	remapped_colortable = rp2c05004_colortable;
-}
-
-/**********************************************************************/
-/* Battle City */
-
-DRIVER_INIT( btlecity )
-{
-	init_vsnes(machine);
-	DRIVER_INIT_CALL(vsnormal);
-	remapped_colortable = rp2c04003_colortable;
-}
-
-/***********************************************************************/
-/* Tetris */
-
-DRIVER_INIT( vstetris )
-{
-	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL);
-
-	init_vsnes(machine);
-	DRIVER_INIT_CALL(vsnormal);
-	remapped_colortable = rp2c04003_colortable;
-}

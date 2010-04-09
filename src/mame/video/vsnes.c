@@ -5,13 +5,13 @@
 
 PALETTE_INIT( vsnes )
 {
-	ppu2c0x_init_palette(machine, 0 );
+	ppu2c0x_init_palette_rgb(machine, 0 );
 }
 
 PALETTE_INIT( vsdual )
 {
-	ppu2c0x_init_palette(machine, 0 );
-	ppu2c0x_init_palette(machine, 8*4*16 );
+	ppu2c0x_init_palette_rgb(machine, 0 );
+	ppu2c0x_init_palette_rgb(machine, 8*4*16 );
 }
 
 static void ppu_irq_1( running_device *device, int *ppu_regs )
@@ -37,7 +37,7 @@ const ppu2c0x_interface vsnes_ppu_interface_1 =
 const ppu2c0x_interface vsnes_ppu_interface_2 =
 {
 	1,					/* gfxlayout num */
-	64,					/* color base */
+	512,				/* color base */
 	PPU_MIRROR_NONE,	/* mirroring */
 	ppu_irq_2			/* irq */
 };

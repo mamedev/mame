@@ -72,11 +72,15 @@ enum
 	// are non-rendering and non-vblank.
 };
 
-#define PPU_2C02	DEVICE_GET_INFO_NAME(ppu2c02)	// NTSC NES
-#define PPU_2C03B	DEVICE_GET_INFO_NAME(ppu2c03b)	// Playchoice 10
-#define PPU_2C04	DEVICE_GET_INFO_NAME(ppu2c04)	// Vs. Unisystem
-#define PPU_2C05	DEVICE_GET_INFO_NAME(ppu2c05)	// Vs. Unisystem, Famicom Titler
-#define PPU_2C07	DEVICE_GET_INFO_NAME(ppu2c07)	// PAL NES
+#define PPU_2C02	DEVICE_GET_INFO_NAME(ppu2c02)		// NTSC NES, Famicom
+#define PPU_2C03B	DEVICE_GET_INFO_NAME(ppu2c03b)		// Vs. Unisystem, Playchoice 10
+#define PPU_2C04	DEVICE_GET_INFO_NAME(ppu2c04)		// Vs. Unisystem (four versions with different colors)
+/* The PPU_2C05 variants have different protection value, set at DEVICE_START, but otherwise are all the same... */
+#define PPU_2C05_01	DEVICE_GET_INFO_NAME(ppu2c05)	// Vs. Unisystem (Ninja Jajamaru Kun)
+#define PPU_2C05_02	DEVICE_GET_INFO_NAME(ppu2c05)	// Vs. Unisystem (Mighty Bomb Jack)
+#define PPU_2C05_03	DEVICE_GET_INFO_NAME(ppu2c05)	// Vs. Unisystem (Gumshoe)
+#define PPU_2C05_04	DEVICE_GET_INFO_NAME(ppu2c05)	// Vs. Unisystem (Top Gun)
+#define PPU_2C07	DEVICE_GET_INFO_NAME(ppu2c07)		// PAL NES
 
 /* callback datatypes */
 typedef void (*ppu2c0x_scanline_cb)( running_device *device, int scanline, int vblank, int blanked );
@@ -106,6 +110,7 @@ DEVICE_GET_INFO(ppu2c07);
 
 /* routines */
 void ppu2c0x_init_palette(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
+void ppu2c0x_init_palette_rgb(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
 
 void ppu2c0x_spriteram_dma(const address_space *space, running_device *device, const UINT8 page ) ATTR_NONNULL(1);
 void ppu2c0x_render( running_device *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
@@ -140,9 +145,21 @@ READ8_DEVICE_HANDLER( ppu2c0x_r );
 	MDRV_DEVICE_ADD(_tag, PPU_2C04, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C05_ADD(_tag, _intrf)   \
-	MDRV_DEVICE_ADD(_tag, PPU_2C05, 0) \
+#define MDRV_PPU2C05_01_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, PPU_2C05_01, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_PPU2C05_02_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, PPU_2C05_02, 0) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_PPU2C05_03_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, PPU_2C05_03, 0) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_PPU2C05_04_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, PPU_2C05_04, 0) \
+ 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_PPU2C07_ADD(_tag, _intrf)   \
 	MDRV_DEVICE_ADD(_tag, PPU_2C07, 0) \

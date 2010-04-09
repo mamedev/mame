@@ -54,7 +54,7 @@ PALETTE_INIT( playch10 )
 		color_prom++;
 	}
 
-	ppu2c0x_init_palette(machine, 256 );
+	ppu2c0x_init_palette_rgb(machine, 256 );
 }
 
 static void ppu_irq( running_device *device, int *ppu_regs )

@@ -777,7 +777,9 @@ MACHINE_DRIVER_END
     ROM_REGION( 0x0300, "proms", 0 )						\
     ROM_LOAD( "pch1-c.6f",    0x0000, 0x0100, CRC(e5414ca3) SHA1(d2878411cda84ffe0afb2e538a67457f51bebffb) )	\
     ROM_LOAD( "pch1-c.6e",    0x0100, 0x0100, CRC(a2625c6e) SHA1(a448b47c9289902e26a3d3c4c7d5a7968c385e81) )	\
-    ROM_LOAD( "pch1-c.6d",    0x0200, 0x0100, CRC(1213ebd4) SHA1(0ad386fc3eab5e53c0288ad1de33639a9e461b7c) )
+    ROM_LOAD( "pch1-c.6d",    0x0200, 0x0100, CRC(1213ebd4) SHA1(0ad386fc3eab5e53c0288ad1de33639a9e461b7c) )	\
+	ROM_REGION( 0xc0, "palette", 0 )						\
+	ROM_LOAD( "rp2c0x.pal", 0x00, 0xc0, CRC(48de65dc) SHA1(d10acafc8da9ff479c270ec01180cca61efe62f5) )
 
 /******************************************************************************/
 
