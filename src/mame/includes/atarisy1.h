@@ -25,10 +25,6 @@ public:
 	UINT8			joystick_int_enable;
 	UINT8			joystick_value;
 
-	UINT8			tms5220_out_data;
-	UINT8			tms5220_in_data;
-	UINT8			tms5220_ctl;
-
 	/* playfield parameters */
 	UINT16			playfield_lookup[256];
 	UINT8			playfield_tile_bank;

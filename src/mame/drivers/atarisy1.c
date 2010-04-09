@@ -204,9 +204,6 @@ static MACHINE_START( atarisy1 )
 	state_save_register_global(machine, state->joystick_int);
 	state_save_register_global(machine, state->joystick_int_enable);
 	state_save_register_global(machine, state->joystick_value);
-	state_save_register_global(machine, state->tms5220_out_data);
-	state_save_register_global(machine, state->tms5220_in_data);
-	state_save_register_global(machine, state->tms5220_ctl);
 }
 
 
@@ -392,41 +389,33 @@ static READ8_HANDLER( switch_6502_r )
 
 static WRITE8_DEVICE_HANDLER( via_pa_w )
 {
-	atarisy1_state *state = (atarisy1_state *)device->machine->driver_data;
-	state->tms5220_out_data = data;
+	tms5220_data_w(devtag_get_device(device->machine, "tms"), 0, data);
 }
 
 
 static READ8_DEVICE_HANDLER( via_pa_r )
 {
-	atarisy1_state *state = (atarisy1_state *)device->machine->driver_data;
-	return state->tms5220_in_data;
+	return tms5220_status_r(devtag_get_device(device->machine, "tms"), 0);
 }
 
 
 static WRITE8_DEVICE_HANDLER( via_pb_w )
 {
-	atarisy1_state *state = (atarisy1_state *)device->machine->driver_data;
-	UINT8 old = state->tms5220_ctl;
-	state->tms5220_ctl = data;
-
 	/* write strobe */
-	if (!(old & 1) && (state->tms5220_ctl & 1))
-		tms5220_data_w(device, 0, state->tms5220_out_data);
+	tms5220_wsq_w(devtag_get_device(device->machine, "tms"), data & 1);
 
 	/* read strobe */
-	if (!(old & 2) && (state->tms5220_ctl & 2))
-		state->tms5220_in_data = tms5220_status_r(device, 0);
+	tms5220_rsq_w(devtag_get_device(device->machine, "tms"), (data & 2)>>1);
 
 	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
 	data = 5 | ((data >> 3) & 2);
-	tms5220_set_frequency(device, ATARI_CLOCK_14MHz/2 / (16 - data));
+	tms5220_set_frequency(devtag_get_device(device->machine, "tms"), ATARI_CLOCK_14MHz/2 / (16 - data));
 }
 
 
 static READ8_DEVICE_HANDLER( via_pb_r )
 {
-	return (tms5220_readyq_r(device) << 2) | (tms5220_intq_r(device) << 3);
+	return (tms5220_readyq_r(devtag_get_device(device->machine, "tms")) << 2) | (tms5220_intq_r(devtag_get_device(device->machine, "tms")) << 3);
 }
 
 
@@ -798,7 +787,7 @@ static MACHINE_DRIVER_START( atarisy1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("tms", TMS5220, ATARI_CLOCK_14MHz/2/11)
+	MDRV_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
