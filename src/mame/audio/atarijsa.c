@@ -275,7 +275,7 @@ static WRITE8_HANDLER( jsa1_io_w )
                 0x20 = coin counter 2
                 0x10 = coin counter 1
                 0x08 = squeak (tweaks the 5220 frequency)
-                0x04 = TMS5220 reset (active low)
+                0x04 = TMS5220 reset (actually the read strobe) (active low)
                 0x02 = TMS5220 write strobe (active low)
                 0x01 = YM2151 reset (active low)
             */
@@ -285,6 +285,8 @@ static WRITE8_HANDLER( jsa1_io_w )
 			{
 				int count;
 
+				tms5220_wsq_w(tms5220, (data&0x02)?1:0);
+				tms5220_rsq_w(tms5220, (data&0x04)?1:0);
 				if (((data ^ last_ctl) & 0x02) && (data & 0x02))
 					tms5220_data_w(tms5220, 0, speech_data);
 				count = 5 | ((data >> 2) & 2);
@@ -841,7 +843,7 @@ MACHINE_DRIVER_START( jsa_i_mono_speech )
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
 	MDRV_SOUND_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) /* potentially JSA_MASTER_CLOCK/9 as well */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 8.0)
 MACHINE_DRIVER_END
 
 
