@@ -72,7 +72,8 @@ struct sh6840_timer_channel
 };
 static struct sh6840_timer_channel sh6840_timer[3];
 static INT16 sh6840_volume[3];
-static UINT8 sh6840_MSB;
+static UINT8 sh6840_MSB_latch;
+static UINT8 sh6840_LSB_latch;
 static UINT8 sh6840_LFSR_oldxor = 0;
 static UINT32 sh6840_LFSR_0;
 static UINT32 sh6840_LFSR_1;
@@ -225,7 +226,8 @@ INLINE int sh6840_update_noise(int clocks)
 static void sh6840_register_state_globals(running_machine *machine)
 {
     state_save_register_global_array(machine, sh6840_volume);
-    state_save_register_global(machine, sh6840_MSB);
+    state_save_register_global(machine, sh6840_MSB_latch);
+	state_save_register_global(machine, sh6840_LSB_latch);
     state_save_register_global(machine, sh6840_LFSR_oldxor);
     state_save_register_global(machine, sh6840_LFSR_0);
     state_save_register_global(machine, sh6840_LFSR_1);
@@ -263,6 +265,7 @@ static void sh6840_register_state_globals(running_machine *machine)
 
 static STREAM_UPDATE( exidy_stream_update )
 {
+	/* hack to skip the expensive lfsr noise generation unless at least one of the 3 channels actually depends on it being generated */
 	int noisy = ((sh6840_timer[0].cr & sh6840_timer[1].cr & sh6840_timer[2].cr & 0x02) == 0);
 	stream_sample_t *buffer = outputs[0];
 
@@ -272,6 +275,7 @@ static STREAM_UPDATE( exidy_stream_update )
 		struct sh6840_timer_channel *t;
 		struct sh8253_timer_channel *c;
 		int clocks_this_sample;
+		int clocks;
 		INT16 sample = 0;
 
 		/* determine how many 6840 clocks this sample */
@@ -292,13 +296,10 @@ static STREAM_UPDATE( exidy_stream_update )
 			/* handle timer 0 if enabled */
 			t = &sh6840_timer[0];
 			chan0_clocks = t->clocks;
-			if (t->cr & 0x80)
-			{
-				int clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
-				sh6840_apply_clock(t, clocks);
-				if (t->state && !(exidy_sfxctrl & 0x02))
-					sample += sh6840_volume[0];
-			}
+			clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
+			sh6840_apply_clock(t, clocks);
+			if (t->state && !(exidy_sfxctrl & 0x02) && (t->cr & 0x80))
+				sample += sh6840_volume[0];
 
 			/* generate channel 0-clocked noise if configured to do so */
 			if (noisy && (exidy_sfxctrl & 0x01))
@@ -306,31 +307,24 @@ static STREAM_UPDATE( exidy_stream_update )
 
 			/* handle timer 1 if enabled */
 			t = &sh6840_timer[1];
-			if (t->cr & 0x80)
-			{
-				int clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
-				sh6840_apply_clock(t, clocks);
-				if (t->state)
-					sample += sh6840_volume[1];
-			}
+			clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
+			sh6840_apply_clock(t, clocks);
+			if (t->state && (t->cr & 0x80))
+				sample += sh6840_volume[1];
 
 			/* handle timer 2 if enabled */
 			t = &sh6840_timer[2];
-			if (t->cr & 0x80)
+			clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
+			/* prescale */
+			if (t->cr & 0x01)
 			{
-				int clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
-
-				/* prescale */
-				if (t->cr & 0x01)
-				{
-					clocks += t->leftovers;
-					t->leftovers = clocks % 8;
-					clocks /= 8;
-				}
-				sh6840_apply_clock(t, clocks);
-				if (t->state)
-					sample += sh6840_volume[2];
+				clocks += t->leftovers;
+				t->leftovers = clocks % 8;
+				clocks /= 8;
 			}
+			sh6840_apply_clock(t, clocks);
+			if (t->state && (t->cr & 0x80))
+				sample += sh6840_volume[2];
 		}
 
 		/* music (if present) */
@@ -410,7 +404,8 @@ static DEVICE_RESET( common_sh_reset )
 {
 	/* 6840 */
 	memset(sh6840_timer, 0, sizeof(sh6840_timer));
-	sh6840_MSB = 0;
+	sh6840_MSB_latch = 0;
+	sh6840_LSB_latch = 0;
 	sh6840_volume[0] = 0;
 	sh6840_volume[1] = 0;
 	sh6840_volume[2] = 0;
@@ -606,8 +601,26 @@ static READ8_HANDLER( exidy_sh8253_r )
 
 READ8_HANDLER( exidy_sh6840_r )
 {
-	logerror("%04X:exidy_sh6840_r - unexpected read\n", cpu_get_pc(space->cpu));
-	return 0;
+	/* force an update of the stream */
+	stream_update(exidy_stream);
+
+	switch (offset)
+	{
+		/* offset 0: Motorola datasheet says it isn't used, Hitachi datasheet says it reads as 0s always*/
+		case 0:
+		return 0;
+		/* offset 1 reads the status register: bits 2 1 0 correspond to ints on channels 2,1,0, and bit 7 is an 'OR' of bits 2,1,0 */
+		case 1:
+		logerror("%04X:exidy_sh6840_r - unexpected read, status register is TODO!\n", cpu_get_pc(space->cpu));
+		return 0;
+		/* offsets 2,4,6 read channel 0,1,2 MSBs and latch the LSB*/
+		case 2: case 4: case 6:
+		sh6840_LSB_latch = sh6840_timer[((offset<<1)-1)].counter.b.l;
+		return sh6840_timer[((offset<<1)-1)].counter.b.h;
+		/* offsets 3,5,7 read the LSB latch*/
+		default: /* case 3,5,7 */
+		return sh6840_LSB_latch;
+	}
 }
 
 
@@ -643,7 +656,7 @@ WRITE8_HANDLER( exidy_sh6840_w )
 		case 2:
 		case 4:
 		case 6:
-			sh6840_MSB = data;
+			sh6840_MSB_latch = data;
 			break;
 
 		/* offsets 3/5/7 write to the LSB controls */
@@ -653,7 +666,7 @@ WRITE8_HANDLER( exidy_sh6840_w )
 		{
 			/* latch the timer value */
 			int ch = (offset - 3) / 2;
-			sh6840_timer[ch].timer = (sh6840_MSB << 8) | (data & 0xff);
+			sh6840_timer[ch].timer = (sh6840_MSB_latch << 8) | (data & 0xff);
 
 			/* if CR4 is clear, the value is loaded immediately */
 			if (!(sh6840_timer[ch].cr & 0x10))
