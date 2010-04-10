@@ -572,6 +572,21 @@ ROM_START( bballoon )
 	ROM_LOAD( "qs1001a.u17",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
+ROM_START( hapytour ) /* Same hardware: GHOST Ver1.1 2003.03.28 */
+	ROM_REGION( 0x2000000, "user1", 0 ) /* ARM 32 bit code */
+	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, CRC(49deb7f9) SHA1(708a27d7177cf6261a49ded975c2bbb6c2427742) )
+
+	// banked every 0x10000 bytes ?
+	ROM_REGION( 0x080000, "user2", 0 )
+	ROM_LOAD( "ht.u20",       0x000000, 0x080000, CRC(c0581fce) SHA1(dafce679002534ffabed249a92e6b83301b8312b) )
+
+	ROM_REGION( 0x100000, "sfx", 0 ) /* QDSP samples (SFX) */
+	ROM_LOAD( "ht.u16",       0x000000, 0x100000, CRC(6a590a3a) SHA1(c1140f70c919661162334db66c6aa0ad656bfc47) )
+
+	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1001a.u17",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
 static DRIVER_INIT( bballoon )
 {
 	UINT8 *flash = (UINT8 *)memory_region(machine, "user1");
@@ -600,3 +615,4 @@ static DRIVER_INIT( bballoon )
 }
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "Balloon & Balloon", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 200?, hapytour, 0, bballoon, bballoon, 0,        ROT0, "Game Load", "Happy Tour", GAME_NO_SOUND | GAME_NOT_WORKING ) /* Likely will need simular flash ECC check patches */
