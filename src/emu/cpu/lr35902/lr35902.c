@@ -269,7 +269,7 @@ INLINE void lr35902_ProcessInterrupts (lr35902_state *cpustate)
 					cpustate->w.enable &= ~HALTED;
 					cpustate->w.PC++;
 					if ( cpustate->w.features & LR35902_FEATURE_HALT_BUG ) {
-						if ( ! cpustate->w.enable & IME ) {
+						if ( ! ( cpustate->w.enable & IME ) ) {
 							/* Old cpu core (dmg/mgb/sgb) */
 							cpustate->w.doHALTbug = 1;
 						}

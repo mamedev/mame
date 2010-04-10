@@ -188,7 +188,7 @@ CPU_DISASSEMBLE( sm8500 )
 
 	if ( instr->arguments )
 	{
-		if ( instr->arguments != AM_1A || instr->arguments != AM_1B || instr->arguments != AM_4F ) {
+		if ( instr->arguments != AM_1A && instr->arguments != AM_1B && instr->arguments != AM_4F ) {
 			dst += sprintf( dst, "%-4s ", s_mnemonic[ instr->mnemonic ] );
 		}
 		switch( instr->arguments ) {
