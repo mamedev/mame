@@ -239,7 +239,7 @@ INLINE void snes_draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8 colour, UINT16 
 			if (scanlines[screen].priority[ii >> 1] <= priority)
 			{
 				UINT8 clr = colour;
-				UINT8 clipmask = snes_ppu.clipmasks[layer][ii];
+				UINT8 clipmask = snes_ppu.clipmasks[layer][ii >> 1];
 
 #ifdef SNES_LAYER_DEBUG
 				if (debug_options.windows_disabled)
@@ -1320,13 +1320,13 @@ static void snes_update_windowmasks( void )
 				switch (snes_ppu.layer[jj].wlog_mask)
 				{
 					case 0x00:	/* OR */
-						snes_ppu.clipmasks[jj][ii] = w1 | w2 ? 0x00 : 0xff;
+						snes_ppu.clipmasks[jj][ii] = (w1 | w2) ? 0x00 : 0xff;
 						break;
 					case 0x01:	/* AND */
-						snes_ppu.clipmasks[jj][ii] = w1 & w2 ? 0x00 : 0xff;
+						snes_ppu.clipmasks[jj][ii] = (w1 & w2) ? 0x00 : 0xff;
 						break;
 					case 0x02:	/* XOR */
-						snes_ppu.clipmasks[jj][ii] = w1 ^ w2 ? 0x00 : 0xff;
+						snes_ppu.clipmasks[jj][ii] = (w1 ^ w2) ? 0x00 : 0xff;
 						break;
 					case 0x03:	/* XNOR */
 						snes_ppu.clipmasks[jj][ii] = !(w1 ^ w2) ? 0x00 : 0xff;
