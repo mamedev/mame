@@ -210,7 +210,7 @@ INLINE uint g65816i_pull_24(g65816i_cpu_struct *cpustate)
 {
 	uint res = g65816i_pull_8(cpustate);
 	res |= g65816i_pull_8(cpustate) << 8;
-	return res | (g65816i_pull_8(cpustate) << 16);
+	return ((res + 1) & 0xffff) | (g65816i_pull_8(cpustate) << 16);
 }
 
 
@@ -1505,7 +1505,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_RTL
 #define OP_RTL()															\
 			CLK(6);															\
-			g65816i_jump_24(cpustate, g65816i_pull_24(cpustate)+1)
+			g65816i_jump_24(cpustate, g65816i_pull_24(cpustate))
 
 /* M6502   Return from Subroutine */
 /* Unusual behavior: Gets PC and increments */
