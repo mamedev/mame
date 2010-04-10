@@ -208,23 +208,23 @@ static INPUT_PORTS_START( ironfort )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "Show Dip-switch Information" )
+	PORT_DIPNAME( 0x00000001, 0x00000001, "Show Dip-switch Information" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x00000002, 0x00000000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW4:2")
 	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0000000c, 0x0000000c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0000000c, 0x0000000c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW4:3,4")
 	PORT_DIPSETTING(          0x00000008, "1" )
 	PORT_DIPSETTING(          0x00000004, "2" )
 	PORT_DIPSETTING(          0x0000000c, "3" )
 	PORT_DIPSETTING(          0x00000000, "4" )
-	PORT_DIPNAME( 0x00000030, 0x00000030, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x00000030, 0x00000030, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(          0x00000010, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(          0x00000020, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(          0x00000030, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x000000c0, 0x000000c0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x000000c0, 0x000000c0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Very_Hard ) )
 	PORT_DIPSETTING(          0x00000040, DEF_STR( Hard ) )
 	PORT_DIPSETTING(          0x000000c0, DEF_STR( Normal ) )
@@ -235,6 +235,20 @@ static INPUT_PORTS_START( ironfort )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ironfortj )
+	PORT_INCLUDE(ironfort)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x00000002, 0x00000000, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00000030, 0x00000030, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(          0x00000010, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(          0x00000020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(          0x00000030, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hidnctch )
@@ -420,6 +434,32 @@ Notes:
 ROM_START( ironfort )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43", 0x00000, 0x80000, CRC(29f55825) SHA1(e048ec0f5d83d4b64aa48d706fa0947afcdc1a3d) ) /* 27C040 eprom with no label */
+
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "if00-00.u39", 0x0000000, 0x400000, CRC(63b74601) SHA1(c111ecf55359e9005a3ec1fe1202a34624f8b242) )
+	ROM_LOAD32_WORD_SWAP( "if00-01.u34", 0x0000002, 0x400000, CRC(890470b3) SHA1(57df122ab01744b47ebd38554eb6a7d780977be2) )
+	ROM_LOAD32_WORD_SWAP( "if00-02.u40", 0x0800000, 0x400000, CRC(63b5cca5) SHA1(4ec8b813c7e465f659a4a2361ddfbad763bf6e6a) )
+	ROM_LOAD32_WORD_SWAP( "if00-03.u35", 0x0800002, 0x400000, CRC(54a76cb5) SHA1(21fb3bedf065079d59f642b19487f76590f97558) )
+
+	ROM_REGION( 0x008000, "cpu1", 0 ) /* QDSP ('51) Code */
+	ROM_LOAD( "u107", 0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) ) /* 27C256 eprom with no label */
+
+	ROM_REGION( 0x08000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
+	ROM_LOAD( "u111", 0x0000, 0x8000, CRC(5d1d1387) SHA1(91c8aa4c7472b91c149bef9da64569a97df35298) ) /* 27C256 eprom with no label */
+
+	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
+	ROM_LOAD( "u108", 0x00000, 0x80000, CRC(89233144) SHA1(74e87679a7559450934b80fcfcb667d9845977a7) ) /* 27C040 eprom with no label */
+
+	ROM_REGION( 0x080000, "sfx", 0 ) /* QDSP samples (SFX) */
+	ROM_LOAD( "u97", 0x00000, 0x80000, CRC(47b9d43a) SHA1(e0bc42892480cb563dc694fcefa8ca0b984749dd) ) /* 27C040 eprom with no label */
+
+	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
+ROM_START( ironfortj )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "u43.bin", 0x00000, 0x80000, CRC(f1f19c9a) SHA1(98531ecedd1277e6d10395794a66d615df7ddbd6) ) /* 27C040 eprom with no label */
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "if00-00.u39", 0x0000000, 0x400000, CRC(63b74601) SHA1(c111ecf55359e9005a3ec1fe1202a34624f8b242) )
@@ -1042,14 +1082,15 @@ static DRIVER_INIT( hidctch3 )
 	init_eolith_speedup(machine);
 }
 
-GAME( 1998, ironfort, 0,       ironfort, ironfort, eolith,   ROT0, "Eolith", "Iron Fortress", GAME_NO_SOUND )
-GAME( 1998, hidnctch, 0,       eolith45, hidnctch, eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
-GAME( 1998, raccoon,  0,       eolith45, raccoon,  eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
-GAME( 1998, puzzlekg, 0,       eolith45, puzzlekg, eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
-GAME( 1999, hidctch2, 0,       eolith50, hidnctch, hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03)", GAME_NO_SOUND )
-GAME( 1999, landbrk,  0,       eolith45, landbrk,  landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
-GAME( 1999, landbrka, landbrk, eolith45, landbrk,  landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
-GAME( 1999, nhidctch, 0,       eolith45, hidnctch, eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ) // or New Teurrin Geurim Chajgi '98
-GAME( 2000, hidctch3, 0,       eolith50, hidctch3, hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_NO_SOUND )
-GAME( 2001, fort2b,   0,       eolith50, common,   eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND )
-GAME( 2001, fort2ba,  fort2b,  eolith50, common,   eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_NO_SOUND )
+GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith,   ROT0, "Eolith", "Iron Fortress", GAME_NO_SOUND )
+GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith,   ROT0, "Eolith", "Iron Fortress (Japan)", GAME_NO_SOUND )
+GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
+GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
+GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
+GAME( 1999, hidctch2,  0,        eolith50, hidnctch,  hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03)", GAME_NO_SOUND )
+GAME( 1999, landbrk,   0,        eolith45, landbrk,   landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
+GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
+GAME( 1999, nhidctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ) // or New Teurrin Geurim Chajgi '98
+GAME( 2000, hidctch3,  0,        eolith50, hidctch3,  hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_NO_SOUND )
+GAME( 2001, fort2b,    0,        eolith50, common,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND )
+GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_NO_SOUND )

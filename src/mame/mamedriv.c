@@ -8932,6 +8932,7 @@ Other Sun games
 	DRIVER( mrdig )		/* (c) 2000 Sun */
 	DRIVER( hidnctch )	/* (c) 1998 Eolith */
 	DRIVER( ironfort )	/* (c) 1998 Eolith */
+	DRIVER( ironfortj )	/* (c) 1998 Eolith */
 	DRIVER( puzzlekg )	/* (c) 1998 Eolith */
 	DRIVER( hidctch2 )	/* (c) 1999 Eolith */
 	DRIVER( nhidctch )	/* (c) 1999 Eolith */
