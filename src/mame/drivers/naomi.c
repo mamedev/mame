@@ -1926,8 +1926,6 @@ Airline Pilot specific Naomi BIOS roms:
 EPR-21801 - NAOMI BOOT ROM 1999 03/11  1.30 (USA)
 EPR-21802 - NAOMI BOOT ROM 1999 03/11  1.30 (Export)
 
-EPR-21801 & EPR-21802 differ by 7 bytes:
-
 0x4D148 is the region byte (only one region byte)
 0x1ffffa-0x1fffff is the BIOS checksum
 
@@ -4908,6 +4906,25 @@ ROM_START( ss2005 )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0031", 0, SHA1(83697f45f0ffbb964f0504b19171c554499cd709) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//ROM_LOAD("317-5108-jpn.data", 0x00, 0x50, CRC(6a2eb334) SHA1(cab407d2e994f33aa921d50f399b17e6fbf98eb0) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-5108-JPN)
+	//(sticker 253-5509-5108J)
+	ROM_LOAD("317-5108-jpn.pic", 0x00, 0x4000, CRC(4fa7dede) SHA1(f9011e951378364a12512d398f76be174dccce69) )
+ROM_END
+
+
+ROM_START( ss2005a )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0031a", 0, SHA1(6091525845fc2042ed43cae5a1b60c603e16cf97) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
@@ -4997,43 +5014,6 @@ ROM_START( undefeat )
 ROM_END
 
 
-ROM_START( meltyb )
-	NAOMIGD_BIOS
-	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0039", 0, SHA1(ffc7f6e113ad69422a4f22f318bdf9b1dc5c25db) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	//ROM_LOAD("317-5124-jpn.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
-
-	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	//PIC16C622A (317-5124-JPN)
-	//(sticker 253-5509-5124J)
-	ROM_LOAD("317-5124-jpn.pic", 0x00, 0x4000, CRC(ad162bfa) SHA1(0e9740ba65a724eb7cd70fb897e5cd9ac17aa55c) )
-ROM_END
-
-ROM_START( meltyba )
-	NAOMIGD_BIOS
-	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0039a", 0, SHA1(e6aa3d65b43a20606e6754bcb8665438770a1f8c) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	//ROM_LOAD("317-5124-jpn.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
-
-	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	//PIC16C622A (317-5124-JPN)
-	//(sticker 253-5509-5124J)
-	ROM_LOAD("317-5124-jpn.pic", 0x00, 0x4000, CRC(ad162bfa) SHA1(0e9740ba65a724eb7cd70fb897e5cd9ac17aa55c) )
-ROM_END
-
-
 ROM_START( trgheart )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -5070,6 +5050,62 @@ ROM_START( jingystm )
 	//PIC16C622A (317-5122-JPN)
 	//(sticker 253-5509-5122J)
 	ROM_LOAD("317-5122-jpn.pic", 0x00, 0x4000, CRC(88983220) SHA1(410ee292794c44d2249778c8b6adda023286eb04) )
+ROM_END
+
+
+ROM_START( senkosp )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0038", 0, SHA1(430572f7e76c4fe009e2de91bf891d85613366b7) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-5123-COM)
+	//(sticker 253-5509-5123)
+	ROM_LOAD("317-5123-com.pic", 0x00, 0x4000, CRC(7340df6e) SHA1(003a94e986335e959f9b1e8905fea8cbfdb5b2a1) )
+ROM_END
+
+
+ROM_START( meltyb )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0039", 0, SHA1(ffc7f6e113ad69422a4f22f318bdf9b1dc5c25db) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//ROM_LOAD("317-5124-jpn.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-5124-JPN)
+	//(sticker 253-5509-5124J)
+	ROM_LOAD("317-5124-jpn.pic", 0x00, 0x4000, CRC(ad162bfa) SHA1(0e9740ba65a724eb7cd70fb897e5cd9ac17aa55c) )
+ROM_END
+
+ROM_START( meltyba )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0039a", 0, SHA1(e6aa3d65b43a20606e6754bcb8665438770a1f8c) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//ROM_LOAD("317-5124-jpn.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-5124-JPN)
+	//(sticker 253-5509-5124J)
+	ROM_LOAD("317-5124-jpn.pic", 0x00, 0x4000, CRC(ad162bfa) SHA1(0e9740ba65a724eb7cd70fb897e5cd9ac17aa55c) )
 ROM_END
 
 
@@ -5586,8 +5622,8 @@ GAME( 2005, meltybld,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Ecole Sof
 //GDL-0029
 GAME( 2005, senko,     naomigd,  naomigd,  naomi,    naomi,   ROT0,   "G-Rev",                  "Senko No Ronde NEW ver. (Rev A) (GDL-0030A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, senkoo,    senko,    naomigd,  naomi,    naomi,   ROT0,   "G-Rev",                  "Senko No Ronde (GDL-0030)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-//GDL-0031 Super Shanghai 2005
-GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Starfish",               "Super Shanghai 2005 (Rev A) (GDL-0031A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Starfish",               "Super Shanghai 2005 (GDL-0031)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005a,   ss2005,   naomigd,  naomi,    naomi,   ROT0,   "Starfish",               "Super Shanghai 2005 (Rev A) (GDL-0031A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, radirgy,   naomigd,  naomigd,  naomi,    naomi,   ROT270, "Milestone",              "Radirgy (GDL-0032)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0033 Guilty Gear XX Slash
 GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi,    ggxxsla, ROT0,   "Arc System Works",       "Guilty Gear XX Slash (Rev A) (GDL-0033A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -5596,7 +5632,7 @@ GAME( 2005, undefeat,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "G-Rev",  
 //GDL-0036 Trigger Heart Exelica
 GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "Warashi",                "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, jingystm,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Atrativa Japan",         "Jingi Storm - The Arcade (GDL-0037)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-//GDL-0038 Senko No Ronde Special
+GAME( 2006, senkosp,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "G-Rev",                  "Senko No Ronde Special (GDL-0038)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, meltyb,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, meltyba,   meltyb,   naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, karous,    naomigd,  naomigd,  naomi,    naomi,   ROT270, "Milestone",              "Karous (GDL-0040)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
