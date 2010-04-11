@@ -228,8 +228,6 @@ static MACHINE_START( atarisy2 )
 	atarigen_init(machine);
 
 	state_save_register_global(machine, state->interrupt_enable);
-	state_save_register_global(machine, state->tms5220_data);
-	state_save_register_global(machine, state->tms5220_data_strobe);
 	state_save_register_global(machine, state->which_adc);
 	state_save_register_global(machine, state->p2portwr_state);
 	state_save_register_global(machine, state->p2portrd_state);
@@ -248,8 +246,6 @@ static MACHINE_RESET( atarisy2 )
 	atarigen_sound_io_reset(devtag_get_device(machine, "soundcpu"));
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 64);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
-
-	state->tms5220_data_strobe = 1;
 
 	state->p2portwr_state = 0;
 	state->p2portrd_state = 0;
@@ -381,10 +377,20 @@ static READ8_HANDLER( switch_6502_r )
 	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
 	int result = input_port_read(space->machine, "1840");
 
-	if (state->atarigen.cpu_to_sound_ready) result ^= 0x01;
-	if (state->atarigen.sound_to_cpu_ready) result ^= 0x02;
-	if (!state->has_tms5220 || !tms5220_readyq_r(devtag_get_device(space->machine, "tms"))) result ^= 0x04;
-	if (!(input_port_read(space->machine, "1801") & 0x80)) result ^= 0x10;
+	if (state->atarigen.cpu_to_sound_ready) result |= 0x01;
+	if (state->atarigen.sound_to_cpu_ready) result |= 0x02;
+	if (state->has_tms5220)
+	{
+		if (tms5220_readyq_r(devtag_get_device(space->machine, "tms")) == 0)
+		result &= ~0x04;
+		else
+		result |= 0x04;
+	}
+	else
+	{
+		result &= ~0x04;
+	}
+	if (!(input_port_read(space->machine, "1801") & 0x80)) result |= 0x10;
 
 	return result;
 }
@@ -628,9 +634,8 @@ static WRITE8_HANDLER( sound_reset_w )
 	/* a large number of signals are reset when this happens */
 	atarigen_sound_io_reset(devtag_get_device(space->machine, "soundcpu"));
 	devtag_reset(space->machine, "ymsnd");
+	devtag_reset(space->machine, "tms"); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.
 	mixer_w(space, 0, 0);
-	state->tms5220_data = 0;
-	state->tms5220_data_strobe = 0;
 }
 
 
@@ -683,22 +688,20 @@ static READ8_HANDLER( sound_6502_r )
 static WRITE8_HANDLER( tms5220_w )
 {
 	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
-	state->tms5220_data = data;
+	if (state->has_tms5220)
+	{
+		tms5220_data_w(devtag_get_device(space->machine, "tms"), 0, data);
+	}
 }
-
 
 static WRITE8_HANDLER( tms5220_strobe_w )
 {
 	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
-	if (!(offset & 1) && state->tms5220_data_strobe && state->has_tms5220)
+	if (state->has_tms5220)
 	{
-		running_device *tms = devtag_get_device(space->machine, "tms");
-		tms5220_data_w(tms, 0, state->tms5220_data);
+		tms5220_wsq_w(devtag_get_device(space->machine, "tms"), 1-(offset & 1));
 	}
-	state->tms5220_data_strobe = offset & 1;
 }
-
-
 
 /*************************************
  *
@@ -1187,7 +1190,7 @@ static MACHINE_DRIVER_START( atarisy2 )
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.35)
 
-	MDRV_SOUND_ADD("tms", TMS5220, MASTER_CLOCK/4/4/2)
+	MDRV_SOUND_ADD("tms", TMS5220C, MASTER_CLOCK/4/4/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_DRIVER_END
@@ -3056,6 +3059,7 @@ static DRIVER_INIT( paperboy )
 
 	state->pedal_count = 0;
 	state->has_tms5220 = 1;
+	tms5220_rsq_w(devtag_get_device(machine, "tms"),  1); // /RS is tied high on sys2 hw
 }
 
 
@@ -3096,6 +3100,7 @@ static DRIVER_INIT( 720 )
 
 	state->pedal_count = -1;
 	state->has_tms5220 = 1;
+	tms5220_rsq_w(devtag_get_device(machine, "tms"),  1); // /RS is tied high on sys2 hw
 }
 
 
@@ -3251,6 +3256,7 @@ static DRIVER_INIT( apb )
 
 	state->pedal_count = 2;
 	state->has_tms5220 = 1;
+	tms5220_rsq_w(devtag_get_device(machine, "tms"),  1); // /RS is tied high on sys2 hw
 }
 
 

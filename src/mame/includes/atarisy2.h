@@ -23,8 +23,6 @@ public:
 	INT8			pedal_count;
 
 	UINT8			has_tms5220;
-	UINT8			tms5220_data;
-	UINT8			tms5220_data_strobe;
 
 	UINT8			which_adc;
 
