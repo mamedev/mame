@@ -4713,11 +4713,14 @@ int input_machine_has_keyboard(running_machine *machine)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 			if (field->type == IPT_KEYBOARD)
+			{
 				have_keyboard = TRUE;
 				break;
+			}
 		}
 	}
 #endif
+
 	return have_keyboard;
 }
 
