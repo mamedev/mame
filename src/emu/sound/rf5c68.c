@@ -82,6 +82,13 @@ static STREAM_UPDATE( rf5c68_update )
 			{
 				int sample;
 
+				/* trigger sample callback */
+				if(chip->sample_callback)
+				{
+					if(((chan->addr >> 11) & 0xfff) == 0xfff)
+						chip->sample_callback(chip->device,((chan->addr >> 11)/0x2000));
+				}
+
 				/* fetch the sample and handle looping */
 				sample = chip->data[(chan->addr >> 11) & 0xffff];
 				if (sample == 0xff)
@@ -92,10 +99,6 @@ static STREAM_UPDATE( rf5c68_update )
 					/* if we loop to a loop point, we're effectively dead */
 					if (sample == 0xff)
 						break;
-
-					/* trigger sample callback */
-					if(chip->sample_callback)
-						chip->sample_callback(chip->device,i);
 				}
 				chan->addr += chan->step;
 
