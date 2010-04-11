@@ -176,7 +176,7 @@ static UINT8* reel3_ram;
 static UINT8* reel1_scroll;
 static UINT8* reel2_scroll;
 static UINT8* reel3_scroll;
-
+static UINT8 subsino_out_c;
 
 static WRITE8_HANDLER( subsino_tiles_offset_w )
 {
@@ -226,11 +226,12 @@ WRITE8_HANDLER( subsino_reel1_ram_w )
 static TILE_GET_INFO( get_subsino_reel1_tile_info )
 {
 	int code = reel1_ram[tile_index];
+	int colour = (subsino_out_c&0x7) + 8;
 
 	SET_TILE_INFO(
 			1,
 			code,
-			0,
+			colour,
 			0);
 }
 
@@ -244,11 +245,12 @@ WRITE8_HANDLER( subsino_reel2_ram_w )
 static TILE_GET_INFO( get_subsino_reel2_tile_info )
 {
 	int code = reel2_ram[tile_index];
+	int colour = (subsino_out_c&0x7) + 8;
 
 	SET_TILE_INFO(
 			1,
 			code,
-			0,
+			colour,
 			0);
 }
 
@@ -261,11 +263,12 @@ WRITE8_HANDLER( subsino_reel3_ram_w )
 static TILE_GET_INFO( get_subsino_reel3_tile_info )
 {
 	int code = reel3_ram[tile_index];
+	int colour = (subsino_out_c&0x7) + 8;
 
 	SET_TILE_INFO(
 			1,
 			code,
-			0,
+			colour,
 			0);
 }
 
@@ -309,9 +312,12 @@ static VIDEO_UPDATE( subsino_reels )
 		tilemap_set_scrolly(reel3_tilemap, i, reel3_scroll[i]);
 	}
 
-	tilemap_draw(bitmap, &visible1, reel1_tilemap, 0, 0);
-	tilemap_draw(bitmap, &visible2, reel2_tilemap, 0, 0);
-	tilemap_draw(bitmap, &visible3, reel3_tilemap, 0, 0);
+	if (subsino_out_c&0x08)
+	{
+		tilemap_draw(bitmap, &visible1, reel1_tilemap, 0, 0);
+		tilemap_draw(bitmap, &visible2, reel2_tilemap, 0, 0);
+		tilemap_draw(bitmap, &visible3, reel3_tilemap, 0, 0);
+	}
 
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;
@@ -715,6 +721,21 @@ static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
+WRITE8_HANDLER( subsino_out_c_w )
+{
+	// not 100% sure on this
+
+	// ???? eccc
+	// e = enable reels?
+	// c = reel colour bank?
+	subsino_out_c = data;
+
+	tilemap_mark_all_tiles_dirty (reel1_tilemap);
+	tilemap_mark_all_tiles_dirty (reel2_tilemap);
+	tilemap_mark_all_tiles_dirty (reel3_tilemap);
+//	popmessage("data %02x\n",data);
+}
+
 static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
@@ -727,6 +748,7 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
 
 	/* 0x09008: is marked as OUTPUT C in the test mode. */
+	AM_RANGE( 0x09008, 0x09008 ) AM_WRITE( subsino_out_c_w )
 	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
 	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
 
@@ -1857,9 +1879,9 @@ ROM_START( tisub )
 	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
-	ROM_LOAD( "rom_4.bin", 0x00000, 0x10000, CRC(37724fda) SHA1(084653662c9f77afef2a77c607e1fb093aaf3adf) )
-	ROM_LOAD( "rom_5.bin", 0x10000, 0x10000, CRC(3d18acd8) SHA1(179545c18ad880097366c07c8e2fa821701a2758) )
-	ROM_LOAD( "rom_6.bin", 0x20000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
+	ROM_LOAD( "rom_6.bin", 0x00000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
+	ROM_LOAD( "rom_4.bin", 0x10000, 0x10000, CRC(37724fda) SHA1(084653662c9f77afef2a77c607e1fb093aaf3adf) )
+	ROM_LOAD( "rom_5.bin", 0x20000, 0x10000, CRC(3d18acd8) SHA1(179545c18ad880097366c07c8e2fa821701a2758) )
 	ROM_LOAD( "rom_7.bin", 0x30000, 0x10000, CRC(9d7d99d8) SHA1(a3df5e023c2102028a5186101dc0b19d91e8965e) )
 
 	ROM_REGION( 0x8000, "reels", 0 )
@@ -1869,9 +1891,9 @@ ROM_START( tisub )
 	ROM_IGNORE(0x4000)
 
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "n82s129n.u39", 0x000, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.u40", 0x100, 0x100, NO_DUMP )
-	ROM_LOAD( "n82s129n.u41", 0x200, 0x100, NO_DUMP )
+	ROM_LOAD( "u39", 0x000, 0x100, CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
+	ROM_LOAD( "u40", 0x100, 0x100, CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
+	ROM_LOAD( "u41", 0x200, 0x100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
 ROM_END
 
 /***************************************************************************
@@ -2370,7 +2392,7 @@ static DRIVER_INIT( tisub )
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                    FLAGS              LAYOUT      */
 GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0,                 layout_victor21 )
 GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "G.E.A.",                  0,                 layout_victor5 ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
-GAMEL( 1991, tisub,    0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)", GAME_WRONG_COLORS, layout_tisub )
+GAMEL( 1991, tisub,    0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)", 0, layout_tisub )
 GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,                 layout_crsbingo )
 GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0,                 layout_sharkpy ) // missing POST messages?
 GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0,                 layout_sharkpy ) // missing POST messages?
