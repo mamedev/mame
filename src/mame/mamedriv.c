@@ -3617,6 +3617,8 @@ V-V                           TP-027
 	DRIVER( spacetrkc )	/* (c) 1980 Sega */
 	DRIVER( carnival )	/* 651-666 (c) 1980 Sega */
 	DRIVER( carnivalc )	/* 501-516 (c) 1980 Sega */
+	DRIVER( carnivalh )
+	DRIVER( carnivalha )
 	DRIVER( brdrline )	/* (c) 1980 Sega */
 	DRIVER( brdrlins )	/* Sidam bootleg */
 	DRIVER( brdrlinb )	/* Karateco bootleg */
@@ -6730,6 +6732,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ddragon )	/* TA-0021 (c) 1987 */
 	DRIVER( ddragonu )	/* TA-0021 (c) 1987 Taito America */
 	DRIVER( ddragonua )	/* TA-0021 (c) 1987 Taito America */
+	DRIVER( ddragonub )	/* TA-0021 (c) 1987 Taito America */
 	DRIVER( ddragonw )	/* TA-0021 (c) 1987 Taito */
 	DRIVER( ddragonw1 )	/* TA-0021 (c) 1987 Taito */
 	DRIVER( ddragonb )	/* bootleg */

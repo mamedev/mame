@@ -609,6 +609,8 @@ static INPUT_PORTS_START( headon )
 INPUT_PORTS_END
 
 
+
+
 static INPUT_PORTS_START( supcrash )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -1562,6 +1564,33 @@ static INPUT_PORTS_START( carnival )
 	PORT_COIN
 INPUT_PORTS_END
 
+/* not verified */
+static INPUT_PORTS_START( carnivalh )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_get_64v, NULL)
+	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_read_coin_status, NULL)
+
+	PORT_CABINET_COLOR_OR_BW
+
+	PORT_COIN
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( carnvckt )
 	PORT_START("IN0")
@@ -1900,6 +1929,20 @@ static MACHINE_DRIVER_START( carnival )
 	MDRV_IMPORT_FROM(carnival_audio)
 
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( carnivalh )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(vicdual_dualgame_root)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(headon_io_map)
+
+	/* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_IMPORT_FROM(carnival_audio)
+
+MACHINE_DRIVER_END
+
 
 
 static MACHINE_DRIVER_START( tranqgun )
@@ -3033,6 +3076,50 @@ ROM_START( carnivalc )
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )	/* control PROM */
 ROM_END
 
+ROM_START( carnivalh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-155.bin",   0x0000, 0x0800, CRC(0a5f1f65) SHA1(7830157ad378f92a8069debf78d50b9deafb4d40) )
+	ROM_LOAD( "epr-156.bin",   0x0800, 0x0800, CRC(422221ff) SHA1(57180236dd1cf5838131b35256c3d46cb8015804) )
+	ROM_LOAD( "epr-157.bin",   0x1000, 0x0800, CRC(1551dffb) SHA1(f91563a14c5febee64b45579acf49518cd54bec3) )
+	ROM_LOAD( "epr-158.bin",   0x1800, 0x0800, CRC(9238b5c0) SHA1(673f4fedd2e7beef6bc5e6371b2ed7722f3c141c) )
+	ROM_LOAD( "epr-159.bin",   0x2000, 0x0800, CRC(5c2b9a33) SHA1(2cc57ceebd2938e589c07892b6587b8571678fcc) )
+	ROM_LOAD( "epr-160.bin",   0x2800, 0x0800, CRC(dd70471f) SHA1(2d987e946873955998c428930592ea7734970b16) )
+	ROM_LOAD( "epr-161.bin",   0x3000, 0x0800, CRC(42714a0d) SHA1(96f8904912d85b2e7037d129ff2443e90693fe22) )
+	ROM_LOAD( "epr-162.bin",   0x3800, 0x0800, CRC(56e1c120) SHA1(24816b6a9bc238571ab8ea79bb876cf249ed4d60) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+
+	ROM_REGION( 0x0800, "audiocpu", 0 )	/* sound ROM */
+	ROM_LOAD( "epr-412.u5",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
+
+	ROM_REGION( 0x0040, "user1", 0 )	/* misc PROMs */
+	ROM_LOAD( "316-043.u65", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
+	ROM_LOAD( "316-042.u66", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
+ROM_END
+
+ROM_START( carnivalha )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-155.bin",   0x0000, 0x0800, CRC(0a5f1f65) SHA1(7830157ad378f92a8069debf78d50b9deafb4d40) )
+	ROM_LOAD( "epr-156.bin",   0x0800, 0x0800, CRC(422221ff) SHA1(57180236dd1cf5838131b35256c3d46cb8015804) )
+	ROM_LOAD( "epr-157.bin",   0x1000, 0x0800, CRC(1551dffb) SHA1(f91563a14c5febee64b45579acf49518cd54bec3) )
+	ROM_LOAD( "epr-158.bin",   0x1800, 0x0800, CRC(9238b5c0) SHA1(673f4fedd2e7beef6bc5e6371b2ed7722f3c141c) )
+	ROM_LOAD( "epr-159.bin",   0x2000, 0x0800, CRC(5c2b9a33) SHA1(2cc57ceebd2938e589c07892b6587b8571678fcc) )
+	ROM_LOAD( "epr-160.bin",   0x2800, 0x0800, CRC(dd70471f) SHA1(2d987e946873955998c428930592ea7734970b16) )
+	ROM_LOAD( "epr161x.u42",   0x3000, 0x0800, CRC(8133ba08) SHA1(fc314e847810140d99ad071667c10a1a57c9f892) ) // rom marked with 161X, probably modified in some way
+	ROM_LOAD( "epr-162.bin",   0x3800, 0x0800, CRC(56e1c120) SHA1(24816b6a9bc238571ab8ea79bb876cf249ed4d60) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+
+	ROM_REGION( 0x0800, "audiocpu", 0 )	/* sound ROM */
+	ROM_LOAD( "epr-412.u5",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
+
+	ROM_REGION( 0x0040, "user1", 0 )	/* misc PROMs */
+	ROM_LOAD( "316-043.u65", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
+	ROM_LOAD( "316-042.u66", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
+ROM_END
+
 ROM_START( brdrline )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1.bin",       0x0000, 0x0400, CRC(df182769) SHA1(2b1b70c6282b32e0a4ed80ab4e6b20f90630e910) )
@@ -3289,6 +3376,8 @@ GAME( 1980, spacetrk, 0,        spacetrk, spacetrk, 0, ROT270, "Sega", "Space Tr
 GAME( 1980, spacetrkc,spacetrk, spacetrk, sptrekct, 0, ROT270, "Sega", "Space Trek (cocktail)", GAME_NO_SOUND )
 GAME( 1980, carnival, 0,        carnival, carnival, 0, ROT270, "Sega", "Carnival (upright)", GAME_IMPERFECT_SOUND )
 GAME( 1980, carnivalc,carnival, carnival, carnvckt, 0, ROT270, "Sega", "Carnival (cocktail)",  GAME_IMPERFECT_SOUND )
+GAME( 1980, carnivalh,carnival, carnivalh,carnivalh,0, ROT270, "Sega", "Carnival (Head On hardware, set 1)",  GAME_IMPERFECT_SOUND )
+GAME( 1980, carnivalha,carnival,carnivalh,carnivalh,0, ROT270, "Sega", "Carnival (Head On hardware, set 2)",  GAME_IMPERFECT_SOUND )
 GAME( 1981, brdrline, 0,        brdrline, brdrline, 0, ROT270, "Sega", "Borderline", GAME_NO_SOUND )
 GAME( 1981, brdrlins, brdrline, brdrline, brdrline, 0, ROT270, "[Sega] (Sidam bootleg)", "Borderline (Sidam bootleg)", GAME_NO_SOUND )
 GAME( 1981, brdrlinb, brdrline, brdrline, brdrline, 0, ROT270, "[Sega] (Karateco bootleg)", "Borderline (Karateco bootleg)", GAME_NO_SOUND )
