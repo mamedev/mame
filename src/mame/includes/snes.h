@@ -23,7 +23,7 @@
 #define DOTCLK_NTSC	(MCLK_NTSC/4)
 #define DOTCLK_PAL	(MCLK_PAL/4)
 
-#define SNES_LAYER_DEBUG  1
+#define SNES_LAYER_DEBUG  0
 
 /* Debug definitions */
 #ifdef MAME_DEBUG
@@ -644,6 +644,7 @@ struct snes_cart_info
 	UINT8  mode;		/* ROM memory mode */
 	UINT32 sram;		/* Amount of sram in cart */
 	UINT32 sram_max;	/* Maximum amount sram in cart (based on ROM mode) */
+	int    small_sram;
 };
 
 extern struct snes_cart_info snes_cart;
