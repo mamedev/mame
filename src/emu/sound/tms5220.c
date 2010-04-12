@@ -208,14 +208,16 @@ device), PES Speech adapter (serial port connection)
 // above dumps the contents of each decoded speech frame as hex
 #undef DEBUG_FRAME_INFO
 // above dumps information about each decoded speech frame
-#undef DEBUG_COMMAND_DUMP 
+#undef DEBUG_FRAME_ERRORS
+// above dumps info if a frame ran out of data
+#undef DEBUG_COMMAND_DUMP
 // above dumps all non-speech-data command writes
+#undef DEBUG_PIN_READS
+// above spams the errorlog with i/o ready messages whenever the ready or irq pin is read
 #undef DEBUG_GENERATION
 // above dumps some debug information related to the sample generation loop, i.e. when ramp frames happen
 #undef DEBUG_IO_READY
 // above debugs the io ready callback
-#undef DEBUG_IO_READY_READ
-// above spams the errorlog with i/o ready messages whenever the ready pin is read
 #undef DEBUG_RS_WS
 // above debugs the new up-and-coming tms5220_data_r and data_w access methods which actually respect rs and ws
 
@@ -456,12 +458,12 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 			if (tms->speak_external)
 				tms->buffer_empty = 0;
 #ifdef DEBUG_FIFO
-			fprintf(stderr,"data_write: Added byte to FIFO (current count=%2d)\n", tms->fifo_count);
+			logerror("data_write: Added byte to FIFO (current count=%2d)\n", tms->fifo_count);
 		}
 		else
 		{
 
-			fprintf(stderr,"data_write: Ran out of room in the FIFO!\n");
+			logerror("data_write: Ran out of room in the FIFO!\n");
 			// at this point, /READY should remain HIGH/inactive until the fifo has at least one byte open in it.
 #endif
 		}
@@ -608,7 +610,7 @@ static int tms5220_status_read(tms5220_state *tms)
 
 		/* clear the interrupt pin on status read */
 		set_interrupt_state(tms, 0);
-#ifdef VERBOSE
+#ifdef DEBUG_PIN_READS
 		logerror("Status read: TS=%d BL=%d BE=%d\n", tms->talk_status, tms->buffer_low, tms->buffer_empty);
 #endif
 
@@ -626,10 +628,10 @@ static int tms5220_status_read(tms5220_state *tms)
 
 static int tms5220_ready_read(tms5220_state *tms)
 {
-#ifdef DEBUG_IO_READY_READ
-	logerror("io_ready %d\n", tms->io_ready);
+#ifdef DEBUG_PIN_READS
+	logerror("ready_read: ready pin read, io_ready is %d, fifo count is %d\n", tms->io_ready, tms->fifo_count); 
 #endif
-    return (tms->fifo_count < FIFO_SIZE) && tms->io_ready;
+    return ((tms->fifo_count < FIFO_SIZE)||(!tms->speak_external)) && tms->io_ready;
 }
 
 
@@ -682,6 +684,9 @@ static int tms5220_cycles_to_ready(tms5220_state *tms)
 
 static int tms5220_int_read(tms5220_state *tms)
 {
+#ifdef DEBUG_PIN_READS
+	logerror("int_read: irq pin read, state is %d\n", tms->irq_pin);
+#endif
     return tms->irq_pin;
 }
 
@@ -745,9 +750,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				tms->speaking_now = tms->talk_status = tms->speak_external = 0;
 				set_interrupt_state(tms, 1); // TS went inactive, so int is raised
 				tms->sample_count = reload_table[tms->tms5220c_rate&0x3]; // = 0;
-				//tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
 				update_flags_and_ints(tms);
-				tms->device->reset(); // shouldn't be necessary. code still needs work. - LN
 				goto empty;
 			}
 
@@ -1343,7 +1346,7 @@ static void parse_frame(tms5220_state *tms)
 	return;
 	
 	ranout:
-#ifdef DEBUG_FRAME_INFO
+#ifdef DEBUG_FRAME_ERRORS
     logerror("Ran out of bits on a parse!\n");
 #endif
     /* this is an error condition; mark the buffer empty and turn off speaking */
@@ -1367,6 +1370,9 @@ static void parse_frame(tms5220_state *tms)
 
 static void set_interrupt_state(tms5220_state *tms, int state)
 {
+#ifdef DEBUG_PIN_READS
+	logerror("irq pin set to state %d\n", state);
+#endif
     if (tms->irq_func.write && state != tms->irq_pin)
     	devcb_call_write_line(&tms->irq_func, !state);
     tms->irq_pin = state;
@@ -1496,8 +1502,8 @@ static TIMER_CALLBACK( io_ready_cb )
 			/* Write */
 		    /* bring up to date first */
 #ifdef DEBUG_IO_READY
-			logerror("Service write %02x\n", tms->write_latch);
-			fprintf(stderr, "Processed write data: %02X\n", tms->write_latch);
+			logerror("Serviced write: %02x\n", tms->write_latch);
+			//fprintf(stderr, "Processed write data: %02X\n", tms->write_latch);
 #endif
 		    stream_update(tms->stream);
 		    tms5220_data_write(tms, tms->write_latch);
@@ -1525,7 +1531,9 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 
 	tms->true_timing = 1;
 	state &= 0x01;
-
+#ifdef DEBUG_RS_WS
+	logerror("/RS written with data: %d\n", state);
+#endif
 	new_val = (tms->rs_ws & 0x01) | (state<<1);
 	if (new_val != tms->rs_ws)
 	{
@@ -1622,7 +1630,9 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 WRITE8_DEVICE_HANDLER( tms5220_data_w )
 {
 	tms5220_state *tms = get_safe_token(device);
-
+#ifdef DEBUG_RS_WS
+	logerror("tms5220_data_w: data %02x\n", data);
+#endif
 	if (!tms->true_timing)
 	{
 		/* bring up to date first */
