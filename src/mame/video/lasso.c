@@ -108,8 +108,8 @@ static void wwjgtin_set_last_four_colors( running_machine *machine, colortable_t
 	int i;
 
 	/* the last palette entries can be changed */
-	for (i = 0; i < 4; i++)
-		colortable_palette_set_color(colortable, 0x3f - i, get_color(state->last_colors[i]));
+	for(i = 0; i < 3; i++)
+		colortable_palette_set_color(colortable, 0x3d + i, get_color(state->last_colors[i]));
 }
 
 
