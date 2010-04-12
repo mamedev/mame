@@ -5511,6 +5511,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tmntu )		/* GX963 (c) 1989 (US) */
 	DRIVER( tmntua )	/* GX963 (c) 1989 (US) */
 	DRIVER( tmht )		/* GX963 (c) 1989 (UK) */
+	DRIVER( tmhta )		/* GX963 (c) 1989 (UK) */
 	DRIVER( tmntj )		/* GX963 (c) 1990 (Japan) */
 	DRIVER( tmht2p )	/* GX963 (c) 1989 (UK) */
 	DRIVER( tmht2pa )	/* GX963 (c) 1989 (UK) */
