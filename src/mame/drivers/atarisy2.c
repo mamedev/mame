@@ -379,17 +379,8 @@ static READ8_HANDLER( switch_6502_r )
 
 	if (state->atarigen.cpu_to_sound_ready) result |= 0x01;
 	if (state->atarigen.sound_to_cpu_ready) result |= 0x02;
-	if (state->has_tms5220)
-	{
-		if (tms5220_readyq_r(devtag_get_device(space->machine, "tms")) == 0)
+	if ((state->has_tms5220) && (tms5220_readyq_r(devtag_get_device(space->machine, "tms")) == 0))
 		result &= ~0x04;
-		else
-		result |= 0x04;
-	}
-	else
-	{
-		result &= ~0x04;
-	}
 	if (!(input_port_read(space->machine, "1801") & 0x80)) result |= 0x10;
 
 	return result;
@@ -634,7 +625,10 @@ static WRITE8_HANDLER( sound_reset_w )
 	/* a large number of signals are reset when this happens */
 	atarigen_sound_io_reset(devtag_get_device(space->machine, "soundcpu"));
 	devtag_reset(space->machine, "ymsnd");
-	devtag_reset(space->machine, "tms"); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.
+	if (state->has_tms5220)
+	{
+		devtag_reset(space->machine, "tms"); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.
+	}
 	mixer_w(space, 0, 0);
 }
 
