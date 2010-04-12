@@ -131,6 +131,10 @@ enum
 	SNES_COLOR_DEPTH_8BPP
 };
 
+static UINT8  *snes_vram;		/* Video RAM (Should be 16-bit, but it's easier this way) */
+static UINT16 *snes_cgram;		/* Colour RAM */
+static UINT16 *snes_oam;		/* Object Attribute Memory */
+
 /*****************************************
  * snes_get_bgcolor()
  *
@@ -1655,9 +1659,134 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 
 VIDEO_START( snes )
 {
+	int i,j;
+
 #ifdef SNES_LAYER_DEBUG
 	memset(&debug_options, 0, sizeof(debug_options));
 #endif
+
+	snes_vram = auto_alloc_array(machine, UINT8, SNES_VRAM_SIZE);
+	snes_cgram = auto_alloc_array(machine, UINT16, SNES_CGRAM_SIZE/2);
+	snes_oam = auto_alloc_array(machine, UINT16, SNES_OAM_SIZE/2);
+
+	/* Inititialize registers/variables */
+	snes_ppu.update_windows = 1;
+	snes_ppu.beam.latch_vert = 0;
+	snes_ppu.beam.latch_horz = 0;
+	snes_ppu.beam.current_vert = 0;
+	snes_ppu.beam.current_horz = 0;
+	snes_ppu.beam.last_visible_line = 240;
+	snes_ppu.mode = 0;
+	snes_ppu.ppu1_version = 1;	// 5C77 chip version number, read by STAT77, only '1' is known
+	snes_ppu.ppu2_version = 3;	// 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
+
+	/* Inititialize mosaic table */
+	for (j = 0; j < 16; j++)
+	{
+		for (i = 0; i < 4096; i++)
+			snes_ppu.mosaic_table[j][i] = (i / (j + 1)) * (j + 1);
+	}
+
+	/* Init VRAM */
+	memset(snes_vram, 0, SNES_VRAM_SIZE);
+
+	/* Init Colour RAM */
+	memset((UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE);
+
+	/* Init oam RAM */
+	memset(snes_oam, 0xff, SNES_OAM_SIZE);
+
+	for (i = 0; i < 6; i++)
+	{
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].window1_enabled);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].window1_invert);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].window2_enabled);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].window2_invert);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].wlog_mask);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].color_math);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].charmap);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].tilemap);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].tilemap_size);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].tile_size);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].mosaic_enabled);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].main_window_enabled);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].sub_window_enabled);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].main_bg_enabled);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].sub_bg_enabled);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].hoffs);
+		state_save_register_item(machine, "snes_ppu", NULL, i, snes_ppu.layer[i].voffs);
+
+		state_save_register_item_array(machine, "snes_ppu", NULL, i, snes_ppu.clipmasks[i]);
+	}
+
+	state_save_register_global(machine, snes_ppu.oam.address_low);
+	state_save_register_global(machine, snes_ppu.oam.address_high);
+	state_save_register_global(machine, snes_ppu.oam.saved_address_low);
+	state_save_register_global(machine, snes_ppu.oam.saved_address_high);
+	state_save_register_global(machine, snes_ppu.oam.address);
+	state_save_register_global(machine, snes_ppu.oam.priority_rotation);
+	state_save_register_global(machine, snes_ppu.oam.next_charmap);
+	state_save_register_global(machine, snes_ppu.oam.next_size);
+	state_save_register_global(machine, snes_ppu.oam.size);
+	state_save_register_global(machine, snes_ppu.oam.next_name_select);
+	state_save_register_global(machine, snes_ppu.oam.name_select);
+	state_save_register_global(machine, snes_ppu.oam.first_sprite);
+	state_save_register_global(machine, snes_ppu.oam.flip);
+	state_save_register_global(machine, snes_ppu.oam.write_latch);
+
+	state_save_register_global(machine, snes_ppu.beam.latch_horz);
+	state_save_register_global(machine, snes_ppu.beam.latch_vert);
+	state_save_register_global(machine, snes_ppu.beam.current_horz);
+	state_save_register_global(machine, snes_ppu.beam.current_vert);
+	state_save_register_global(machine, snes_ppu.beam.last_visible_line);
+	state_save_register_global(machine, snes_ppu.beam.interlace_count);
+
+	state_save_register_global(machine, snes_ppu.mode7.repeat);
+	state_save_register_global(machine, snes_ppu.mode7.hflip);
+	state_save_register_global(machine, snes_ppu.mode7.vflip);
+	state_save_register_global(machine, snes_ppu.mode7.matrix_a);
+	state_save_register_global(machine, snes_ppu.mode7.matrix_b);
+	state_save_register_global(machine, snes_ppu.mode7.matrix_c);
+	state_save_register_global(machine, snes_ppu.mode7.matrix_d);
+	state_save_register_global(machine, snes_ppu.mode7.origin_x);
+	state_save_register_global(machine, snes_ppu.mode7.origin_y);
+	state_save_register_global(machine, snes_ppu.mode7.hor_offset);
+	state_save_register_global(machine, snes_ppu.mode7.ver_offset);
+	state_save_register_global(machine, snes_ppu.mode7.extbg);
+
+	state_save_register_global(machine, snes_ppu.mosaic_size);
+	state_save_register_global(machine, snes_ppu.clip_to_black);
+	state_save_register_global(machine, snes_ppu.prevent_color_math);
+	state_save_register_global(machine, snes_ppu.sub_add_mode);
+	state_save_register_global(machine, snes_ppu.bg3_priority_bit);
+	state_save_register_global(machine, snes_ppu.direct_color);
+	state_save_register_global(machine, snes_ppu.ppu_last_scroll);
+	state_save_register_global(machine, snes_ppu.mode7_last_scroll);
+
+	state_save_register_global(machine, snes_ppu.ppu1_open_bus);
+	state_save_register_global(machine, snes_ppu.ppu2_open_bus);
+	state_save_register_global(machine, snes_ppu.ppu1_version);
+	state_save_register_global(machine, snes_ppu.ppu2_version);
+	state_save_register_global(machine, snes_ppu.window1_left);
+	state_save_register_global(machine, snes_ppu.window1_right);
+	state_save_register_global(machine, snes_ppu.window2_left);
+	state_save_register_global(machine, snes_ppu.window2_right);
+
+	state_save_register_global(machine, snes_ppu.update_windows);
+	state_save_register_global(machine, snes_ppu.update_offsets);
+	state_save_register_global(machine, snes_ppu.update_oam_list);
+	state_save_register_global(machine, snes_ppu.mode);
+	state_save_register_global(machine, snes_ppu.interlace);
+	state_save_register_global(machine, snes_ppu.obj_interlace);
+	state_save_register_global(machine, snes_ppu.screen_brightness);
+	state_save_register_global(machine, snes_ppu.screen_disabled);
+	state_save_register_global(machine, snes_ppu.pseudo_hires);
+	state_save_register_global(machine, snes_ppu.color_modes);
+	state_save_register_global(machine, snes_ppu.stat77_flags);
+
+	state_save_register_global_pointer(machine, snes_vram, SNES_VRAM_SIZE);
+	state_save_register_global_pointer(machine, snes_cgram, SNES_CGRAM_SIZE/2);
+	state_save_register_global_pointer(machine, snes_oam, SNES_OAM_SIZE/2);
 }
 
 VIDEO_UPDATE( snes )

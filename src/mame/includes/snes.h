@@ -23,7 +23,7 @@
 #define DOTCLK_NTSC	(MCLK_NTSC/4)
 #define DOTCLK_PAL	(MCLK_PAL/4)
 
-#define SNES_LAYER_DEBUG  1
+#define SNES_LAYER_DEBUG  0
 
 /* Debug definitions */
 #ifdef MAME_DEBUG
@@ -528,11 +528,10 @@ extern UINT32 snes_rom_size;
 
 extern void snes_latch_counters(running_machine *machine);
 
-/* (PPU) Video related */
-extern UINT8  *snes_vram;			/* Video RAM (Should be 16-bit, but it's easier this way) */
-extern UINT16 *snes_cgram;			/* Colour RAM */
-extern UINT16 *snes_oam;			/* Object Attribute Memory */
 extern UINT8  *snes_ram;			/* Main memory */
+
+
+/* (PPU) Video related */
 struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
 {
 	struct
