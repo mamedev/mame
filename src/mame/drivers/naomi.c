@@ -5127,6 +5127,45 @@ ROM_START( karous )
 	ROM_LOAD("317-5125-com.pic", 0x00, 0x4000, CRC(918efc4f) SHA1(e32502b8df0b432eebaf0286176dd3bcd3f65dbb) )
 ROM_END
 
+/*
+
+Title             GUILTY GEAR XX ACCENT CORE
+Media ID          D0D2
+Media Config      GD-ROM1/1
+Regions           J
+Peripheral String 0000000
+Product Number    GDL-0041
+Version           V1.002
+Release Date      20061107
+
+TOC         DISC
+Track       Start Sector  End Sector   Track Size
+track01.bin          150         599      1058400
+track02.raw          750        2882      5016816
+track03.bin        45150      549299   1185760800
+
+PIC16C621A-20 (317-5126-JPN)
+Sticker: 253-5509-5126J
+VER0001, TEST_OK, BMX.BIN, '70 1F 71 1F' 381F91D9624051F2
+
+*/
+ROM_START( ggxxac )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0041", 0, SHA1(3a589e1c79ead971c821a7566032b0187e339684) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-5126-JPN)
+	//(sticker 253-5509-5126J)
+	ROM_LOAD("317-5126-jpn.pic", 0x00, 0x4000, CRC(87c44284) SHA1(a53bcead58844fb877bc657dd5b09c1a380872ee) )
+ROM_END
+
 
 ROM_START( takoron )
 	NAOMIGD_BIOS
@@ -5636,7 +5675,7 @@ GAME( 2006, senkosp,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "G-Rev",  
 GAME( 2006, meltyb,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, meltyba,   meltyb,   naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, karous,    naomigd,  naomigd,  naomi,    naomi,   ROT270, "Milestone",              "Karous (GDL-0040)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-//GDL-0041 Guilty Gear XX Accent Core
+GAME( 2006, ggxxac,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Arc System Works",       "Guilty Gear XX Accent Core (GDL-0041)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, takoron,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Compile",                "Noukone Puzzle Takoron (GDL-0042)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 
