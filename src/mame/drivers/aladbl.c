@@ -154,56 +154,6 @@ ROM_START( mk3ghw ) // roms are scrambled, we take care of the address descrambl
 	ROM_CONTINUE(            0x300000, 0x040000)
 ROM_END
 
-// this should be correct, the areas of the rom that differ to the original
-// after this decode look like intentional changes
-static DRIVER_INIT( mk3ghw )
-{
-	DRIVER_INIT_CALL(megadriv);
-
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	int x;
-
-	for (x=0x000001;x<0x100001;x+=2)
-	{
-		if (x&0x80000)
-		{
-			ROM[x] = ROM[x]^0xff;
-			ROM[x] = BITSWAP8(ROM[x], 0,3,2,5,4,6,7,1);
-		}
-		else
-		{
-			ROM[x] = ROM[x]^0xff;
-			ROM[x] = BITSWAP8(ROM[x], 4,0,7,1,3,6,2,5);
-		}
-	}
-
-	for (x=0x100001;x<0x400000;x+=2)
-	{
-		if (x&0x80000)
-		{
-			ROM[x] = ROM[x]^0xff;
-			ROM[x] = BITSWAP8(ROM[x], 2,7,5,4,1,0,3,6);
-		}
-		else
-		{
-			ROM[x] = BITSWAP8(ROM[x], 6,1,4,2,7,0,3,5);
-		}
-	}
-
-	// boot vectors don't seem to be valid, so they are patched...
-	ROM[1] = 0x01;
-	ROM[0] = 0x00;
-	ROM[3] = 0x00;
-	ROM[2] = 0x00;
-	ROM[5] = 0x00;
-	ROM[4] = 0x00;
-	ROM[7] = 0x02;
-	ROM[6] = 0x10;
-
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770071, 0, 0, "DSWA");
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770072, 0x770073, 0, 0, "DSWB");
-}
-
 
 static WRITE16_HANDLER( aladbl_w )
 {
@@ -229,13 +179,72 @@ static READ16_HANDLER( aladbl_r )
 	return 0x0000;
 }
 
+
+static READ16_HANDLER( mk3ghw_dsw_r )
+{
+	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
+	return input_port_read(space->machine, dswname[offset]);
+}
+
+
 static DRIVER_INIT( aladbl )
 {
 	// 220000 = writes to mcu? 330000 = reads?
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x220000, 0x220001, 0, 0, aladbl_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x330000, 0x330001, 0, 0, aladbl_r);
+
 	DRIVER_INIT_CALL(megadrij);
 }
 
-GAME( 1993, aladbl ,  0,   megadriv,    aladbl,       aladbl,  ROT0,   "bootleg / Sega", "Aladdin (bootleg of Japanese Megadrive version)", 0)
-GAME( 1996, mk3ghw ,  0,   megadriv,    mk3ghw,       mk3ghw,  ROT0,   "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
+// this should be correct, the areas of the rom that differ to the original
+// after this decode look like intentional changes
+static DRIVER_INIT( mk3ghw )
+{
+	int x;
+	UINT8 *rom = memory_region(machine, "maincpu");
+
+	for (x=0x000001;x<0x100001;x+=2)
+	{
+		if (x&0x80000)
+		{
+			rom[x] = rom[x]^0xff;
+			rom[x] = BITSWAP8(rom[x], 0,3,2,5,4,6,7,1);
+		}
+		else
+		{
+			rom[x] = rom[x]^0xff;
+			rom[x] = BITSWAP8(rom[x], 4,0,7,1,3,6,2,5);
+		}
+	}
+
+	for (x=0x100001;x<0x400000;x+=2)
+	{
+		if (x&0x80000)
+		{
+			rom[x] = rom[x]^0xff;
+			rom[x] = BITSWAP8(rom[x], 2,7,5,4,1,0,3,6);
+		}
+		else
+		{
+			rom[x] = BITSWAP8(rom[x], 6,1,4,2,7,0,3,5);
+		}
+	}
+
+	// boot vectors don't seem to be valid, so they are patched...
+	rom[0x01] = 0x01;
+	rom[0x00] = 0x00;
+	rom[0x03] = 0x00;
+	rom[0x02] = 0x00;
+	rom[0x05] = 0x00;
+	rom[0x04] = 0x00;
+	rom[0x07] = 0x02;
+	rom[0x06] = 0x10;
+
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, mk3ghw_dsw_r );
+
+	DRIVER_INIT_CALL(megadriv);
+}
+
+
+GAME( 1993, aladbl,   0, megadriv, aladbl,   aladbl,   ROT0, "bootleg / Sega", "Aladdin (bootleg of Japanese Megadrive version)", 0)
+GAME( 1996, mk3ghw,   0, megadriv, mk3ghw,   mk3ghw,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)

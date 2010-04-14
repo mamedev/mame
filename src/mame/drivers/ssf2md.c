@@ -30,4 +30,4 @@ static DRIVER_INIT( ssf2ghw )
 
 }
 
-GAME( 1994, ssf2ghw,  0,   megadriv,    ssf2ghw,     ssf2ghw,  ROT0,   "bootleg / Capcom", "Super Street Fighter II - The New Challengers (Arcade bootleg of Japanese MegaDrive version)", 0 )
+GAME( 1994, ssf2ghw,  0, megadriv, ssf2ghw,  ssf2ghw,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (Arcade bootleg of Japanese MegaDrive version)", 0 )
