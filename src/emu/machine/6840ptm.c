@@ -78,8 +78,8 @@ static void ptm6840_timeout(running_device *device, int idx);
 typedef struct _ptm6840_state ptm6840_state;
 struct _ptm6840_state
 {
-	int internal_clock;
-	int external_clock[3];
+	double internal_clock;
+	double external_clock[3];
 	devcb_resolved_write8 out_func[3];	// function to call when output[idx] changes
 	devcb_resolved_write_line irq_func;	// function called if IRQ line changes
 
@@ -157,7 +157,7 @@ int ptm6840_get_irq( running_device *device )
 static void subtract_from_counter( running_device *device, int counter, int count )
 {
 	ptm6840_state *ptm6840 = get_safe_token(device);
-	int clock;
+	double clock;
 	attotime duration;
 
 	/* Determine the clock frequency for this timer */
@@ -264,7 +264,7 @@ INLINE void update_interrupts( running_device *device )
 				((ptm6840->status_reg & 0x02) && (ptm6840->control_reg[1] & 0x40)) ||
 				((ptm6840->status_reg & 0x04) && (ptm6840->control_reg[2] & 0x40));
 
-//  if (new_state != ptm6840->IRQ)
+	if (new_state != ptm6840->IRQ)
 	{
 		ptm6840->IRQ = new_state;
 
@@ -284,7 +284,7 @@ INLINE void update_interrupts( running_device *device )
 static UINT16 compute_counter( running_device *device, int counter )
 {
 	ptm6840_state *ptm6840 = get_safe_token(device);
-	int clock;
+	double clock;
 	int remaining = 0;
 
 	/* If there's no timer, return the count */
@@ -298,12 +298,12 @@ static UINT16 compute_counter( running_device *device, int counter )
 	if (ptm6840->control_reg[counter] & 0x02)
 	{
 		clock = ptm6840->internal_clock;
-		PLOG(("MC6840 #%s: %d internal clock freq %d \n", device->tag(), counter, clock));
+		PLOG(("MC6840 #%s: %d internal clock freq %f \n", device->tag(), counter, clock));
 	}
 	else
 	{
 		clock = ptm6840->external_clock[counter];
-		PLOG(("MC6840 #%s: %d external clock freq %d \n", device->tag(), counter, clock));
+		PLOG(("MC6840 #%s: %d external clock freq %f \n", device->tag(), counter, clock));
 	}
 	/* See how many are left */
 	remaining = attotime_to_double(attotime_mul(timer_timeleft(ptm6840->timer[counter]), clock));
@@ -327,7 +327,7 @@ static UINT16 compute_counter( running_device *device, int counter )
 static void reload_count( running_device *device, int idx )
 {
 	ptm6840_state *ptm6840 = get_safe_token(device);
-	int clock;
+	double clock;
 	int count;
 	attotime duration;
 
@@ -338,12 +338,12 @@ static void reload_count( running_device *device, int idx )
 	if (ptm6840->control_reg[idx] & 0x02)
 	{
 		clock = ptm6840->internal_clock;
-		PLOG(("MC6840 #%s: %d internal clock freq %d \n", device->tag(), idx, clock));
+		PLOG(("MC6840 #%s: %d internal clock freq %f \n", device->tag(), idx, clock));
 	}
 	else
 	{
 		clock = ptm6840->external_clock[idx];
-		PLOG(("MC6840 #%s: %d external clock freq %d \n", device->tag(), idx, clock));
+		PLOG(("MC6840 #%s: %d external clock freq %f \n", device->tag(), idx, clock));
 	}
 
 	/* Determine the number of clock periods before we expire */
@@ -363,7 +363,7 @@ static void reload_count( running_device *device, int idx )
 	}
 
 	/* Set the timer */
-	PLOG(("MC6840 #%s: reload_count(%d): clock = %d  count = %d\n", device->tag(), idx, clock, count));
+	PLOG(("MC6840 #%s: reload_count(%d): clock = %f  count = %d\n", device->tag(), idx, clock, count));
 
 	duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
 	if (idx == 2)
@@ -371,6 +371,7 @@ static void reload_count( running_device *device, int idx )
 
 	PLOG(("MC6840 #%s: reload_count(%d): output = %lf\n", device->tag(), idx, attotime_to_double(duration)));
 
+#if 0
 	if (!(ptm6840->control_reg[idx] & 0x02))
 	{
 		if (!ptm6840->external_clock[idx])
@@ -380,6 +381,7 @@ static void reload_count( running_device *device, int idx )
 		}
 	}
 	else
+#endif
 	{
 		ptm6840->enabled[idx] = 1;
 		timer_adjust_oneshot(ptm6840->timer[idx], duration, 0);
@@ -555,14 +557,11 @@ static void ptm6840_timeout( running_device *device, int idx )
 
 	PLOG(("**ptm6840 %s t%d timeout**\n", device->tag(), idx + 1));
 
-	if ( ptm6840->control_reg[idx] & 0x40 )
-	{
-		/* Interrupt enabled */
-		ptm6840->status_reg |= (1 << idx);
-		ptm6840->status_read_since_int &= ~(1 << idx);
-		update_interrupts(device);
-	}
-
+	/* Set the interrupt flag */
+	ptm6840->status_reg |= (1 << idx);
+	ptm6840->status_read_since_int &= ~(1 << idx);
+	update_interrupts(device);
+	
 	if ( ptm6840->control_reg[idx] & 0x80 )
 	{
 		if ((ptm6840->mode[idx] == 0)||(ptm6840->mode[idx] == 2))
@@ -700,7 +699,7 @@ UINT16 ptm6840_get_count( running_device *device, int counter )
     ptm6840_set_ext_clock - set external clock frequency
 ------------------------------------------------------------*/
 
-void ptm6840_set_ext_clock( running_device *device, int counter, int clock )
+void ptm6840_set_ext_clock( running_device *device, int counter, double clock )
 {
 	ptm6840_state *ptm6840 = get_safe_token(device);
 

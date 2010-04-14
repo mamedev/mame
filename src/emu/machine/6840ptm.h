@@ -29,8 +29,8 @@
 typedef struct _ptm6840_interface ptm6840_interface;
 struct _ptm6840_interface
 {
-	int internal_clock;
-	int external_clock[3];
+	double internal_clock;
+	double external_clock[3];
 
 	devcb_write8 out_func[3];	// function to call when output[idx] changes
 	devcb_write_line irq_func;	// function called if IRQ line changes
@@ -47,7 +47,7 @@ DEVICE_GET_INFO( ptm6840 );
 int ptm6840_get_status( running_device *device, int clock );	// get whether timer is enabled
 int ptm6840_get_irq( running_device *device );					// get IRQ state
 UINT16 ptm6840_get_count( running_device *device, int counter );// get counter value
-void ptm6840_set_ext_clock( running_device *device, int counter, int clock ); // set clock frequency
+void ptm6840_set_ext_clock( running_device *device, int counter, double clock ); // set clock frequency
 int ptm6840_get_ext_clock( running_device *device, int counter );// get clock frequency
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_g1 );	// set gate1 state
