@@ -8669,14 +8669,32 @@ Other Sun games
 	/* MPU4+Video Board Games */
 	DRIVER( bctvidbs )
 	DRIVER( dealem )	/* 1987 */
+	DRIVER( adders )	/* 1989 */
 	DRIVER( timemchn )	/* 1990 */
-	DRIVER( crmaze )	/* 1994 */
-	DRIVER( crmazea )	/* 1994 */
-	DRIVER( crmazeb )	/* 1994 */
 	DRIVER( turnover )	/* 199? */
-	DRIVER( skiltrek )	/* 1992 */
+	DRIVER( skiltrek )	/* 1990 */
+	DRIVER( crmaze )	/* 1994 */
+	DRIVER( crmazea )	/* 1993 */
+	DRIVER( crmazeb )	/* 1993 */
 	DRIVER( mating )	/* 199? */
-	DRIVER( matinga )	/* 199? */
+	DRIVER( matingd )	/* 199? */
+
+	DRIVER( strikeit )	/* 199? */
+	DRIVER( strikeitd )	/* 199? */
+	DRIVER( strikeit2 )	/* 199? */
+	DRIVER( strikeit2d )/* 199? */
+
+	DRIVER( quizgrid )	/* 199? */
+	DRIVER( quizgridd )	/* 199? */
+	DRIVER( quizgrid2 )	/* 199? */
+	DRIVER( quizgrid2d )/* 199? */
+
+	DRIVER( eyesdown )	/* 199? */
+	DRIVER( eyesdownd )	/* 199? */
+
+	DRIVER( blox )		/* 199? */
+	DRIVER( bloxd )		/* 199? */
+	DRIVER( prizeinv )	/* 199? */
 	DRIVER( vgpoker )	/* 199? */
 
 	/* ADP games */
