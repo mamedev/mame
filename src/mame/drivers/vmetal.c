@@ -59,13 +59,11 @@ Notes:
 
 *****
 i should fully merge video with metro.c, it uses the same imagetek chip (although with 16x16 tiles)
-this should fix most of the remaining gfx glitches
+this should fix most of the remaining gfx glitches - looks very similar to 'taidoa' (stephh)
 *****
 
 
 It has Sega and Taito logos in the roms ?!
-
-whats going on with the dipswitches
 
 ES8712 sound may not be quite right. Samples are currently looped, but
 whether they should and how, is unknown.
@@ -96,13 +94,6 @@ static READ16_HANDLER ( varia_crom_read )
 
 	return retdat;
 }
-
-
-static READ16_HANDLER ( varia_random )
-{
-	return 0xffff;
-}
-
 
 
 static void get_vmetal_tlookup(running_machine *machine, UINT16 data, UINT16 *tileno, UINT16 *color)
@@ -225,24 +216,23 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
-	/* i have no idea whats meant to be going on here .. it seems to read one bit of the dips from some of them, protection ??? */
-	AM_RANGE(0x30fffe, 0x30ffff) AM_READ(varia_random)  // nothing?
-	AM_RANGE(0x317ffe, 0x317fff) AM_READ(varia_random)  // nothing?
-	AM_RANGE(0x31bffe, 0x31bfff) AM_READ(varia_random)  // nothing?
-	AM_RANGE(0x31dffe, 0x31dfff) AM_READ(varia_random)  // nothing?
-	AM_RANGE(0x31effe, 0x31efff) AM_READ(varia_random)  // nothing?
-	AM_RANGE(0x31f7fe, 0x31f7ff) AM_READ(varia_random)  // nothing?
-	AM_RANGE(0x31fbfe, 0x31fbff) AM_READ(varia_random)  // nothing?
-	AM_RANGE(0x31fdfe, 0x31fdff) AM_READ(varia_random)  // nothing?
-	AM_RANGE(0x31fefe, 0x31feff) AM_READ(varia_dips_bit8_r)  // 0x40 = dip1-8 , 0x80 = dip2-8
-	AM_RANGE(0x31ff7e, 0x31ff7f) AM_READ(varia_dips_bit7_r)  // 0x40 = dip1-7 , 0x80 = dip2-7
-	AM_RANGE(0x31ffbe, 0x31ffbf) AM_READ(varia_dips_bit6_r)  // 0x40 = dip1-6 , 0x80 = dip2-6
-	AM_RANGE(0x31ffde, 0x31ffdf) AM_READ(varia_dips_bit5_r)  // 0x40 = dip1-5 , 0x80 = dip2-5
-	AM_RANGE(0x31ffee, 0x31ffef) AM_READ(varia_dips_bit4_r)  // 0x40 = dip1-4 , 0x80 = dip2-4
-	AM_RANGE(0x31fff6, 0x31fff7) AM_READ(varia_dips_bit3_r)  // 0x40 = dip1-3 , 0x80 = dip2-3
-	AM_RANGE(0x31fffa, 0x31fffb) AM_READ(varia_dips_bit2_r)  // 0x40 = dip1-2 , 0x80 = dip2-2
-	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r)  // 0x40 = dip1-1 , 0x80 = dip2-1
-	AM_RANGE(0x31fffe, 0x31ffff) AM_READ(varia_random )  // nothing?
+	/* same weird way to read Dip Switches as in many games in metro.c driver - use balcube_dsw_r read handler once the driver is merged */
+	AM_RANGE(0x30fffe, 0x30ffff) AM_READNOP					// 0x40 = dip1-16 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
+	AM_RANGE(0x317ffe, 0x317fff) AM_READNOP					// 0x40 = dip1-15 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
+	AM_RANGE(0x31bffe, 0x31bfff) AM_READNOP					// 0x40 = dip1-14 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
+	AM_RANGE(0x31dffe, 0x31dfff) AM_READNOP					// 0x40 = dip1-13 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
+	AM_RANGE(0x31effe, 0x31efff) AM_READNOP					// 0x40 = dip1-12 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
+	AM_RANGE(0x31f7fe, 0x31f7ff) AM_READNOP					// 0x40 = dip1-11 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
+	AM_RANGE(0x31fbfe, 0x31fbff) AM_READNOP					// 0x40 = dip1-10 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
+	AM_RANGE(0x31fdfe, 0x31fdff) AM_READNOP					// 0x40 = dip1-9  -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
+	AM_RANGE(0x31fefe, 0x31feff) AM_READ(varia_dips_bit8_r)	// 0x40 = dip1-8  -> 0xff0085 , 0x80 = dip2-8 -> 0xff0084
+	AM_RANGE(0x31ff7e, 0x31ff7f) AM_READ(varia_dips_bit7_r)	// 0x40 = dip1-7  -> 0xff0085 , 0x80 = dip2-7 -> 0xff0084
+	AM_RANGE(0x31ffbe, 0x31ffbf) AM_READ(varia_dips_bit6_r)	// 0x40 = dip1-6  -> 0xff0085 , 0x80 = dip2-6 -> 0xff0084
+	AM_RANGE(0x31ffde, 0x31ffdf) AM_READ(varia_dips_bit5_r)	// 0x40 = dip1-5  -> 0xff0085 , 0x80 = dip2-5 -> 0xff0084
+	AM_RANGE(0x31ffee, 0x31ffef) AM_READ(varia_dips_bit4_r)	// 0x40 = dip1-4  -> 0xff0085 , 0x80 = dip2-4 -> 0xff0084
+	AM_RANGE(0x31fff6, 0x31fff7) AM_READ(varia_dips_bit3_r)	// 0x40 = dip1-3  -> 0xff0085 , 0x80 = dip2-3 -> 0xff0084
+	AM_RANGE(0x31fffa, 0x31fffb) AM_READ(varia_dips_bit2_r)	// 0x40 = dip1-2  -> 0xff0085 , 0x80 = dip2-2 -> 0xff0084
+	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r)	// 0x40 = dip1-1  -> 0xff0085 , 0x80 = dip2-1 -> 0xff0084
 
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)	// Volume/channel info
@@ -252,20 +242,20 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-
+/* verified from M68000 code */
 static INPUT_PORTS_START( varia )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2  )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -275,13 +265,14 @@ static INPUT_PORTS_START( varia )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 ) // 'Test'
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_TILT )             /* 'Tilt' only in "test mode" - no effect ingame */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )         /* same coinage as COIN1 and COIN2 */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 )         /* 'Test' only in "test mode" - no effect ingame */
+	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	/* stored to 0xff0085.b (cpl'ed) */
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C )  )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C )  )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C )  )
@@ -290,43 +281,33 @@ static INPUT_PORTS_START( varia )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_4C )  )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_5C )  )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C )  )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x0008, IP_ACTIVE_LOW )                 /* 0x01 (OFF) or 0x02 (ON) written to 0xff0112.b but NEVER read back - old credits for 2 players game ? */
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )  /* 0x07c1 written to 0x1788ac.w (screen control ?) at first (code at 0x0001b8) */
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )          /* 0x07c1 written to 0xff0114.w (then 0x1788ac.w) during initialisation (code at 0x000436) */
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )           /* 0x07c0 written to 0xff0114.w (then 0x1788ac.w) during initialisation (code at 0x000436) */
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x0040, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x0080, IP_ACTIVE_LOW )
 
+	/* stored to 0xff0084.b (cpl'ed) */
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(      0x0008, "0"  )
-	PORT_DIPSETTING(      0x0004, "1"  )
-	PORT_DIPSETTING(      0x000c, "2"  )
-	PORT_DIPSETTING(      0x0000, "3"  )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0008, "1"  )
+	PORT_DIPSETTING(      0x0004, "2"  )
+	PORT_DIPSETTING(      0x000c, "3"  )
+	PORT_DIPSETTING(      0x0000, "4"  )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Bonus_Life ) )   /* code at 0x0004a4 */
+	PORT_DIPSETTING(      0x0010, "Every 30000" )
+	PORT_DIPSETTING(      0x0000, "Every 60000" )
+	PORT_DIPUNUSED( 0x0020, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x0040, IP_ACTIVE_LOW )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -516,5 +497,6 @@ ROM_START( vmetaln )
 	ROM_LOAD( "7.u12", 0x00000, 0x200000, CRC(a88c52f1) SHA1(d74a5a11f84ba6b1042b33a2c156a1071b6fbfe1) )
 ROM_END
 
-GAME( 1995, vmetal,  0,      varia, varia, 0, ROT270, "Excellent System",                        "Varia Metal",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1995, vmetaln, vmetal, varia, varia, 0, ROT270, "[Excellent System] New Ways Trading Co.", "Varia Metal (New Ways Trading Co.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+
+GAME( 1995, vmetal,  0,      varia, varia, 0, ROT270, "Excellent System",                        "Varia Metal",                        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, vmetaln, vmetal, varia, varia, 0, ROT270, "[Excellent System] New Ways Trading Co.", "Varia Metal (New Ways Trading Co.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
