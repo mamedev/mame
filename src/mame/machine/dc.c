@@ -738,7 +738,7 @@ WRITE64_HANDLER( naomi_maple_w )
 											case 0xf1: // set address
 												break;
 											case 0x10:
-												strcpy((char *)(maple0x86data2+0x11+10), "SEGA ENTERPRISES,LTD.\nI/O BD JVS\n837-13551"); // name
+												strcpy((char *)(maple0x86data2+0x11+10), "SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551"); // name
 												maple0x86data2[pos+7]=24+21+2;
 												tocopy += 24+21;
 												break;
