@@ -1709,15 +1709,13 @@ ROM_START( phrcraze )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "phrz.11",      0x00000, 0x8000, CRC(ccd33a0c) SHA1(869b66af4369f3b4bc19336ca2b8104c7f652de7) )
 
-	// probably over-dumped, 1st and 2nd half identical
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "phrz_u37.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) )
+	ROM_LOAD( "phrz_u37.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) ) /* 1st & 2nd half identical, but correct and verified */
 	ROM_LOAD( "phrz_u38.u38", 0x08000, 0x8000, CRC(bfa78b67) SHA1(1b51c0e00240f798fe717624e706cb15700bc2f9) )
 	ROM_LOAD( "phrz_u39.u39", 0x10000, 0x8000, CRC(9ce22cb3) SHA1(b653afb8f13decd993e434aaad69a6e09ab65f83) )
 
-	// probably over-dumped
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "phrz_u40.u40",0x00000, 0x8000, CRC(17dcddd4) SHA1(51682bdbfb67cd0ccf20b97e8fa12d72f0fe82ed) )
+	ROM_LOAD( "phrz_u40.u40", 0x00000, 0x8000, CRC(17dcddd4) SHA1(51682bdbfb67cd0ccf20b97e8fa12d72f0fe82ed) ) /* 1st & 2nd half identical, but correct and verified */
 
 	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) // questions
 	ROM_LOAD( "phrz1-07_std-1", 0x00000, 0x8000, CRC(0a016c5e) SHA1(1a24ecd7fe59b08c75a1b4575c7fe467cc7f0cf8) )
@@ -1730,15 +1728,36 @@ ROM_END
 
 ROM_START( phrcrazea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "5281-40_u5-3a.u5",0x00000, 0x8000, CRC(d04c7657) SHA1(0b59fbf553eb5b68544ee2f94cf8106ab30ff1ed) )
+	ROM_LOAD( "pc_u5.bin", 0x00000, 0x8000, CRC(f9642d0a) SHA1(6e9b9929bc28f6c26c70a8b762a2755dc097dbc4) ) /* Horizontal version */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "phrz_u27.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) )
+	ROM_LOAD( "phrz_u37.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) ) /* 1st & 2nd half identical, but correct and verified */
 	ROM_LOAD( "phrz_u38.u38", 0x08000, 0x8000, CRC(bfa78b67) SHA1(1b51c0e00240f798fe717624e706cb15700bc2f9) )
 	ROM_LOAD( "phrz_u39.u39", 0x10000, 0x8000, CRC(9ce22cb3) SHA1(b653afb8f13decd993e434aaad69a6e09ab65f83) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "phrz_u40.u40",0x00000, 0x8000, CRC(17dcddd4) SHA1(51682bdbfb67cd0ccf20b97e8fa12d72f0fe82ed) )
+	ROM_LOAD( "phrz_u40.u40", 0x00000, 0x8000, CRC(17dcddd4) SHA1(51682bdbfb67cd0ccf20b97e8fa12d72f0fe82ed) ) /* 1st & 2nd half identical, but correct and verified */
+
+	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
+	ROM_LOAD( "phrz1-07_std-1", 0x00000, 0x8000, CRC(0a016c5e) SHA1(1a24ecd7fe59b08c75a1b4575c7fe467cc7f0cf8) )
+	ROM_LOAD( "phrz1-07_std-2", 0x10000, 0x8000, CRC(e67dc49e) SHA1(5265af228531dc16db7f7ee78da6e51ef9a1d772) )
+	ROM_LOAD( "phrz1-07_std-3", 0x20000, 0x8000, CRC(5c79a653) SHA1(85a904465b347564e937074e2b18159604c83e51) )
+	ROM_LOAD( "phrz1-07_std-4", 0x30000, 0x8000, CRC(9837f757) SHA1(01106114b6997fe6432e519101f95c83a1f7cc1e) )
+	ROM_LOAD( "phrz1-07_std-5", 0x40000, 0x8000, CRC(dc9d8682) SHA1(46973da4298d0ed149c651498527c91b8ba57e0a) )
+	ROM_LOAD( "phrz1-07_std-6", 0x50000, 0x8000, CRC(48e24f17) SHA1(f50c85505f6ab2360f0885494001f174224f8575) )
+ROM_END
+
+ROM_START( phrcrazeb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "5281-40_u5-3a.u5",0x00000, 0x8000, CRC(d04c7657) SHA1(0b59fbf553eb5b68544ee2f94cf8106ab30ff1ed) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "phrz_u37.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) ) /* 1st & 2nd half identical, but correct and verified */
+	ROM_LOAD( "phrz_u38.u38", 0x08000, 0x8000, CRC(bfa78b67) SHA1(1b51c0e00240f798fe717624e706cb15700bc2f9) )
+	ROM_LOAD( "phrz_u39.u39", 0x10000, 0x8000, CRC(9ce22cb3) SHA1(b653afb8f13decd993e434aaad69a6e09ab65f83) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "phrz_u40.u40", 0x00000, 0x8000, CRC(17dcddd4) SHA1(51682bdbfb67cd0ccf20b97e8fa12d72f0fe82ed) ) /* 1st & 2nd half identical, but correct and verified */
 
 	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
 	ROM_LOAD( "phrz1-07_sex-2a", 0x00000, 0x8000, CRC(7ef3bca7) SHA1(f25cd01f996882a500e1a800d924759cd1de255d) )
@@ -1753,9 +1772,34 @@ ROM_START( phrcrazea )
 	ROM_LOAD( "phrz1-07_std-1a", 0x90000, 0x8000, CRC(367f1dfa) SHA1(01d69004c365acefb0e52ac12593a3874c16ab9d) )
 ROM_END
 
-ROM_START( phrcrazes )
+ROM_START( phrcrazec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u5.bin",       0x00000, 0x8000, CRC(6122b5bb) SHA1(9952b14334287a992eefefbdc887b9a9215304ef) )
+	ROM_LOAD( "6221-40_u5-1a.u5",0x00000, 0x8000, CRC(bd8b5612) SHA1(614436da4ed45e0d974b565c5c765bcc1b9d94b5) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "phrz_u37.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) ) /* 1st & 2nd half identical, but correct and verified */
+	ROM_LOAD( "phrz_u38.u38", 0x08000, 0x8000, CRC(bfa78b67) SHA1(1b51c0e00240f798fe717624e706cb15700bc2f9) )
+	ROM_LOAD( "phrz_u39.u39", 0x10000, 0x8000, CRC(9ce22cb3) SHA1(b653afb8f13decd993e434aaad69a6e09ab65f83) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "phrz_u40.u40", 0x00000, 0x8000, CRC(17dcddd4) SHA1(51682bdbfb67cd0ccf20b97e8fa12d72f0fe82ed) ) /* 1st & 2nd half identical, but correct and verified */
+
+	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
+	ROM_LOAD( "phrz1-07_sex-2a", 0x00000, 0x8000, CRC(7ef3bca7) SHA1(f25cd01f996882a500e1a800d924759cd1de255d) )
+	ROM_LOAD( "phrz1-07_sex-1a", 0x10000, 0x8000, CRC(ed7604b8) SHA1(b1e841b50b8ef6ae95fafac1c34b6d0337a05d18) )
+	ROM_LOAD( "phrz1-07_std-8a", 0x20000, 0x8000, CRC(423eecd6) SHA1(ca8d181ccba05acba8ebc57f20e0542eda00c917) )
+	ROM_LOAD( "phrz1-07_std-7a", 0x30000, 0x8000, CRC(05dd3900) SHA1(bb13a3c5f84771c450fa88560cc74c5a1be1b876) )
+	ROM_LOAD( "phrz1-07_std-6a", 0x40000, 0x8000, CRC(c5980f24) SHA1(a3b665c74aaa704ffa382f95adac70c7c46fb446) )
+	ROM_LOAD( "phrz1-07_std-5a", 0x50000, 0x8000, CRC(7cb395a9) SHA1(48b3ac524e6ae23f885b9b767e77930a89a81f5f) )
+	ROM_LOAD( "phrz1-07_std-4a", 0x60000, 0x8000, CRC(effc811b) SHA1(2479539965ed541be417bbe48a5e66a58a6294aa) )
+	ROM_LOAD( "phrz1-07_std-3a", 0x70000, 0x8000, CRC(c4c7dcee) SHA1(81d879df3da0fbe1cf2247d92b3853104a99689d) )
+	ROM_LOAD( "phrz1-07_std-2a", 0x80000, 0x8000, CRC(527b3025) SHA1(36dc129d2276909643e90ae3810c8341076fd88c) )
+	ROM_LOAD( "phrz1-07_std-1a", 0x90000, 0x8000, CRC(367f1dfa) SHA1(01d69004c365acefb0e52ac12593a3874c16ab9d) )
+ROM_END
+
+ROM_START( phrcrazev )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u5.bin",       0x00000, 0x8000, CRC(6122b5bb) SHA1(9952b14334287a992eefefbdc887b9a9215304ef) ) /* Vertical version */
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "u39.bin",      0x00000, 0x4000, BAD_DUMP CRC(adbd2cdc) SHA1(a1e9481bd6ee0f8915cea43eaad3ebdd54438eed) )
@@ -1766,12 +1810,12 @@ ROM_START( phrcrazes )
 	ROM_LOAD( "u40.bin",      0x00000, 0x4000, BAD_DUMP CRC(493172c8) SHA1(a76ff5d0d3dd56b0ee4352f03c9ce92f107d34ec) )
 
 	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
-	ROM_LOAD( "std1.bin",     0x00000, 0x8000, CRC(0a016c5e) SHA1(1a24ecd7fe59b08c75a1b4575c7fe467cc7f0cf8) )
-	ROM_LOAD( "std2.bin",     0x10000, 0x8000, CRC(e67dc49e) SHA1(5265af228531dc16db7f7ee78da6e51ef9a1d772) )
-	ROM_LOAD( "std3.bin",     0x20000, 0x8000, CRC(5c79a653) SHA1(85a904465b347564e937074e2b18159604c83e51) )
-	ROM_LOAD( "std4.bin",     0x30000, 0x8000, CRC(9837f757) SHA1(01106114b6997fe6432e519101f95c83a1f7cc1e) )
-	ROM_LOAD( "std5.bin",     0x40000, 0x8000, CRC(dc9d8682) SHA1(46973da4298d0ed149c651498527c91b8ba57e0a) )
-	ROM_LOAD( "std6.bin",     0x50000, 0x8000, CRC(48e24f17) SHA1(f50c85505f6ab2360f0885494001f174224f8575) )
+	ROM_LOAD( "phrz1-07_std-1", 0x00000, 0x8000, CRC(0a016c5e) SHA1(1a24ecd7fe59b08c75a1b4575c7fe467cc7f0cf8) )
+	ROM_LOAD( "phrz1-07_std-2", 0x10000, 0x8000, CRC(e67dc49e) SHA1(5265af228531dc16db7f7ee78da6e51ef9a1d772) )
+	ROM_LOAD( "phrz1-07_std-3", 0x20000, 0x8000, CRC(5c79a653) SHA1(85a904465b347564e937074e2b18159604c83e51) )
+	ROM_LOAD( "phrz1-07_std-4", 0x30000, 0x8000, CRC(9837f757) SHA1(01106114b6997fe6432e519101f95c83a1f7cc1e) )
+	ROM_LOAD( "phrz1-07_std-5", 0x40000, 0x8000, CRC(dc9d8682) SHA1(46973da4298d0ed149c651498527c91b8ba57e0a) )
+	ROM_LOAD( "phrz1-07_std-6", 0x50000, 0x8000, CRC(48e24f17) SHA1(f50c85505f6ab2360f0885494001f174224f8575) )
 	/* empty space as per instructions for other "sex" category roms */
 	/* "Sex" questions revision A */
 	ROM_LOAD( "phrz1-07_sex-2a", 0x80000, 0x8000, CRC(7ef3bca7) SHA1(f25cd01f996882a500e1a800d924759cd1de255d) )
@@ -1930,7 +1974,9 @@ GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic 
 
 GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 1)",                        GAME_SUPPORTS_SAVE )
 GAME( 1986, phrcrazea,phrcraze,phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 2)",                        GAME_SUPPORTS_SAVE )
-GAME( 1986, phrcrazes,phrcraze,phrcraze, phrcrazs, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit)",                      GAME_SUPPORTS_SAVE )
+GAME( 1986, phrcrazeb,phrcraze,phrcraze, phrcrazs, key_7,  ROT0,  "Merit", "Phraze Craze (Expanded Questions, set 1)",    GAME_SUPPORTS_SAVE )
+GAME( 1986, phrcrazec,phrcraze,phrcraze, phrcrazs, key_7,  ROT0,  "Merit", "Phraze Craze (Expanded Questions, set 2)",    GAME_SUPPORTS_SAVE )
+GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit, Vertical)",            GAME_SUPPORTS_SAVE )
 
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Big Apple Games",                             GAME_SUPPORTS_SAVE )
 

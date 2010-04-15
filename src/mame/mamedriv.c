@@ -9051,7 +9051,9 @@ Other Sun games
 	DRIVER( tictac )	/* (c) 1985 Merit */
 	DRIVER( phrcraze )	/* (c) 1986 Merit */
 	DRIVER( phrcrazea )	/* (c) 1986 Merit */
-	DRIVER( phrcrazes )	/* (c) 1986 Merit */
+	DRIVER( phrcrazeb )	/* (c) 1986 Merit */
+	DRIVER( phrcrazec )	/* (c) 1986 Merit */
+	DRIVER( phrcrazev )	/* (c) 1986 Merit */
 	DRIVER( bigappg )	/* (c) 1986 Merit */
 	DRIVER( dodge )		/* (c) 1986 Merit */
 	DRIVER( couple )	/* (c) 1988 Merit */
