@@ -1969,6 +1969,10 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 
 	switch (packmode)
 	{
+		case 0x00:
+			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (0555 KRGB)\n",x,y,packmode);
+			break;
+
 		case 0x01: //565 RGB 16 bit
 		{
 			int xcnt,ycnt;
@@ -1980,7 +1984,7 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 
 				for (xcnt=0;xcnt<32;xcnt++)
 				{
-					// data is 8888 format
+					// data starts in 8888 format, downsample it
 					UINT32 data = src[xcnt];
 					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
 					                ((((data & 0x0000fc00) >> 10)) << 5)  |
@@ -1991,6 +1995,42 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 			}
 		}
 		break;
+
+		case 0x02:
+			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (4444 ARGB)\n",x,y,packmode);
+			break;
+
+		case 0x03: // 1555 ARGB 16 bit
+		{
+			int xcnt,ycnt;
+			for (ycnt=0;ycnt<32;ycnt++)
+			{
+				UINT32 realwriteoffs = 0x05000000 + writeoffs + (y+ycnt) * (stride<<3) + (x*2);
+				src = BITMAP_ADDR32(fake_accumulationbuffer_bitmap, y+ycnt, x);
+
+
+				for (xcnt=0;xcnt<32;xcnt++)
+				{
+					// data starts in 8888 format, downsample it
+					UINT32 data = src[xcnt];
+					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+					                ((((data & 0x0000f800) >> 11)) << 5)  |
+									((((data & 0x00f80000) >> 19)) << 10);
+					// alpha?
+
+					memory_write_word(space,realwriteoffs+xcnt*2, newdat);
+				}
+			}
+		}
+		break;
+
+		case 0x04:
+			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (888 RGB 24-bit)\n",x,y,packmode);
+			break;
+
+		case 0x05:
+			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (0888 KGB 32-bit)\n",x,y,packmode);
+			break;
 
 		case 0x06: // 8888 ARGB 32 bit (HACK! should not downconvert and pvr_drawframebuffer should change accordingly)
 		{
@@ -2015,17 +2055,9 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 		}
 		break;
 
-
-		case 0x00:
-
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
 		case 0x07:
-		default:
-
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x\n",x,y,packmode);
+			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (Reserved! Don't Use!)\n",x,y,packmode);
+			break;
 	}
 
 
@@ -2040,29 +2072,85 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 	UINT32 c;
 	UINT32 r,g,b;
 
+	UINT32 wc = pvrta_regs[FB_R_CTRL];
+	UINT8 unpackmode = (wc & 0x0000000c) >>2;  // aka fb_depth
+	UINT8 enable = (wc & 0x00000001);
+
+	// ??
+	if (!enable) return;
+
 	// only for rgb565 framebuffer
 	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
 	dy=((pvrta_regs[FB_R_SIZE] >> 10) & 0x3ff)+1;
 
+//	dy++;
 	dy*=2; // probably depends on interlace mode, fields etc...
 
-
-	for (y=0;y < dy;y++)
+	switch (unpackmode)
 	{
-		addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-		for (x=0;x < xi;x++)
-		{
-			fbaddr=BITMAP_ADDR32(bitmap,y,x);
-			c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+		case 0x00: // 0555 RGB 16-bit
+			// should upsample back to 8-bit output using fb_concat
+			for (y=0;y < dy;y++)
+			{
+				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+				for (x=0;x < xi;x++)
+				{
+					fbaddr=BITMAP_ADDR32(bitmap,y,x);
+					c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
-			b = (c & 0x001f) << 3;
-			g = (c & 0x07e0) >> 3;
-			r = (c & 0xf800) >> 8;
+					b = (c & 0x001f) << 3;
+					g = (c & 0x03e0) >> 2;
+					r = (c & 0x7c00) >> 7;
 
-			if (y<cliprect->max_y)
-				*fbaddr = b | (g<<8) | (r<<16);
-			addrp+=2;
-		}
+					if (y<=cliprect->max_y)
+						*fbaddr = b | (g<<8) | (r<<16);
+					addrp+=2;
+				}
+			}
+
+			break;
+		case 0x01: // 0565 RGB 16-bit
+			// should upsample back to 8-bit output using fb_concat
+			for (y=0;y < dy;y++)
+			{
+				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+				for (x=0;x < xi;x++)
+				{
+					fbaddr=BITMAP_ADDR32(bitmap,y,x);
+					c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+
+					b = (c & 0x001f) << 3;
+					g = (c & 0x07e0) >> 3;
+					r = (c & 0xf800) >> 8;
+
+					if (y<=cliprect->max_y)
+						*fbaddr = b | (g<<8) | (r<<16);
+					addrp+=2;
+				}
+			}
+		break;
+
+		case 0x02: break; // 888 RGB 24-bit (not seen)
+
+		case 0x03:        // 0888 ARGB 32-bit - HACKED, see pvr_accumulationbuffer_to_framebuffer! 
+			for (y=0;y < dy;y++)
+			{
+				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+				for (x=0;x < xi;x++)
+				{
+					fbaddr=BITMAP_ADDR32(bitmap,y,x);
+					c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+
+					b = (c & 0x001f) << 3;
+					g = (c & 0x07e0) >> 3;
+					r = (c & 0xf800) >> 8;
+
+					if (y<=cliprect->max_y)
+						*fbaddr = b | (g<<8) | (r<<16);
+					addrp+=2;
+				}
+			}
+			break;
 	}
 }
 
