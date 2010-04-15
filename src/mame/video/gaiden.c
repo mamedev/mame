@@ -75,29 +75,46 @@ static TILE_GET_INFO( get_tx_tile_info )
 VIDEO_START( gaiden )
 {
 	gaiden_state *state = (gaiden_state *)machine->driver_data;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	/* set up tile layers */
+	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+
 	state->background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
-	state->foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
+	state->foreground = tilemap_create(machine, get_fg_tile_info_raiga, tilemap_scan_rows, 16, 16, 64, 32);
 	state->text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(state->background, 0);
 	tilemap_set_transparent_pen(state->foreground, 0);
 	tilemap_set_transparent_pen(state->text_layer, 0);
+
+	/* set up sprites */
+	state->sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 VIDEO_START( mastninj )
 {
+
 	gaiden_state *state = (gaiden_state *)machine->driver_data;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	/* set up tile layers */
+	state->tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+
 	state->background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
-	state->foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
+	state->foreground = tilemap_create(machine, get_fg_tile_info_raiga, tilemap_scan_rows, 16, 16, 64, 32);
 	state->text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 //  tilemap_set_transparent_pen(state->background, 15);
 	tilemap_set_transparent_pen(state->foreground, 15);
 	tilemap_set_transparent_pen(state->text_layer, 15);
+
+	/* set up sprites */
+	state->sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	tilemap_set_scrolldx(state->background, -248, 248);
 	tilemap_set_scrolldx(state->foreground, -252, 252);
@@ -302,7 +319,7 @@ static void blendbitmaps(running_machine *machine,
 
 #define NUM_SPRITES 256
 
-static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect )
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -344,9 +361,6 @@ static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 			int ypos = source[3] & 0x01ff;
 			int xpos = source[4] & 0x01ff;
 
-			if ((attributes & 0x20) && (video_screen_get_frame_number(machine->primary_screen) & 1))
-				goto skip_sprite;
-
 			color = (color >> 4) & 0x0f;
 
 			/* wraparound */
@@ -379,23 +393,49 @@ static void gaiden_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;	break;	/* obscured by bg and fg  */
 			}
 
-			for (row = 0; row < sizey; row++)
-			{
-				for (col = 0; col < sizex; col++)
-				{
-					int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
-					int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-					pdrawgfx_transpen_raw(bitmap, cliprect, gfx,
-						number + layout[row][col],
-						gfx->color_base + color * gfx->color_granularity,
-						flipx, flipy,
-						sx, sy,
-						machine->priority_bitmap, priority_mask, 0);
+			/* blending */
+			if (attributes & 0x20)
+			{
+				color |= 0x80;
+
+				for (row = 0; row < sizey; row++)
+				{
+					for (col = 0; col < sizex; col++)
+					{
+						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
+						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
+
+						pdrawgfx_transpen_raw(bitmap_sp, cliprect, gfx,
+							number + layout[row][col],
+							gfx->color_base + color * gfx->color_granularity,
+							flipx, flipy,
+							sx, sy,
+							machine->priority_bitmap, priority_mask, 0);
+					}
+				}
+			}
+			else
+			{
+				bitmap_t *bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
+
+				for (row = 0; row < sizey; row++)
+				{
+					for (col = 0; col < sizex; col++)
+					{
+						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
+						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
+
+						pdrawgfx_transpen_raw(bitmap, cliprect, gfx,
+							number + layout[row][col],
+							gfx->color_base + color * gfx->color_granularity,
+							flipx, flipy,
+							sx, sy,
+							machine->priority_bitmap, priority_mask, 0);
+					}
 				}
 			}
 		}
-skip_sprite:
 		source -= 8;
 	}
 }
@@ -585,15 +625,27 @@ static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 VIDEO_UPDATE( gaiden )
 {
 	gaiden_state *state = (gaiden_state *)screen->machine->driver_data;
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, 0x200);
+	bitmap_fill(screen->machine->priority_bitmap,    cliprect, 0);
 
-	tilemap_draw(bitmap, cliprect, state->background, 0, 1);
-	tilemap_draw(bitmap, cliprect, state->foreground, 0, 2);
-	tilemap_draw(bitmap, cliprect, state->text_layer, 0, 4);
+	bitmap_fill(state->tile_bitmap_bg, cliprect, 0x200);
+	bitmap_fill(state->tile_bitmap_fg, cliprect, 0);
+	bitmap_fill(state->sprite_bitmap, cliprect, 0);
 
-	gaiden_draw_sprites(screen->machine, bitmap, cliprect);
+	/* draw tilemaps into a 16-bit bitmap */
+	tilemap_draw(state->tile_bitmap_bg, cliprect, state->background, 0, 1);
+	tilemap_draw(state->tile_bitmap_fg, cliprect, state->foreground, 0, 2);
+	/* draw the blended tiles at a lower priority
+       so sprites covered by them will still be drawn */
+	tilemap_draw(state->tile_bitmap_fg, cliprect, state->foreground, 1, 0);
+	tilemap_draw(state->tile_bitmap_fg, cliprect, state->text_layer, 0, 4);
+
+	/* draw sprites into a 16-bit bitmap */
+	gaiden_draw_sprites(screen->machine, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, cliprect);
+
+	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
+	blendbitmaps(screen->machine, bitmap, state->tile_bitmap_bg, state->tile_bitmap_fg, state->sprite_bitmap, 0, 0, cliprect);
 	return 0;
+
 }
 
 VIDEO_UPDATE( raiga )

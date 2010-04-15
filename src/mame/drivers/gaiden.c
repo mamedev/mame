@@ -386,7 +386,6 @@ static ADDRESS_MAP_START( gaiden_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE_MEMBER(gaiden_state, videoram3)
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE_MEMBER(gaiden_state, spriteram, spriteram_size)
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x078800, 0x079fff) AM_READNOP   /* extra portion of palette RAM, not really used */
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
@@ -765,8 +764,8 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( gaiden )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x100, 16 )	/* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x300, 16 )	/* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x200, 16 )	/* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 16 )	/* sprites 8x8 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x200, 16+128 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0x000, 16+128 )	/* sprites 8x8 */
 GFXDECODE_END
 
 static GFXDECODE_START( raiga )
@@ -872,7 +871,7 @@ static MACHINE_DRIVER_START( shadoww )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
@@ -1056,7 +1055,7 @@ static MACHINE_DRIVER_START( mastninj )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
