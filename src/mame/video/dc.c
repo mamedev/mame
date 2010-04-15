@@ -1973,6 +1973,7 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (0555 KRGB)\n",x,y,packmode);
 			break;
 
+		// used by cleoftp
 		case 0x01: //565 RGB 16 bit
 		{
 			int xcnt,ycnt;
@@ -2024,9 +2025,29 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 		}
 		break;
 
-		case 0x04:
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (888 RGB 24-bit)\n",x,y,packmode);
-			break;
+		// used by Suchie3
+		case 0x04: // 888 RGB 24-bit (HACK! should not downconvert and pvr_drawframebuffer should change accordingly)
+		{
+			int xcnt,ycnt;
+			for (ycnt=0;ycnt<32;ycnt++)
+			{
+				UINT32 realwriteoffs = 0x05000000 + writeoffs + (y+ycnt) * (stride<<3) + (x*2);
+				src = BITMAP_ADDR32(fake_accumulationbuffer_bitmap, y+ycnt, x);
+
+
+				for (xcnt=0;xcnt<32;xcnt++)
+				{
+					// data is 8888 format
+					UINT32 data = src[xcnt];
+					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+					                ((((data & 0x0000fc00) >> 10)) << 5)  |
+									((((data & 0x00f80000) >> 19)) << 11);
+
+					memory_write_word(space,realwriteoffs+xcnt*2, newdat);
+				}
+			}
+		}
+		break;
 
 		case 0x05:
 			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (0888 KGB 32-bit)\n",x,y,packmode);
@@ -2088,7 +2109,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 
 	switch (unpackmode)
 	{
-		case 0x00: // 0555 RGB 16-bit
+		case 0x00: // 0555 RGB 16-bit, Cleo Fortune Plus
 			// should upsample back to 8-bit output using fb_concat
 			for (y=0;y < dy;y++)
 			{
@@ -2128,9 +2149,27 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 					addrp+=2;
 				}
 			}
-		break;
+			break;
 
-		case 0x02: break; // 888 RGB 24-bit (not seen)
+		case 0x02: ; // 888 RGB 24-bit - suchie3 - HACKED, see pvr_accumulationbuffer_to_framebuffer! 
+			for (y=0;y < dy;y++)
+			{
+				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+				for (x=0;x < xi;x++)
+				{
+					fbaddr=BITMAP_ADDR32(bitmap,y,x);
+					c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+
+					b = (c & 0x001f) << 3;
+					g = (c & 0x07e0) >> 3;
+					r = (c & 0xf800) >> 8;
+
+					if (y<=cliprect->max_y)
+						*fbaddr = b | (g<<8) | (r<<16);
+					addrp+=2;
+				}
+			}
+			break;
 
 		case 0x03:        // 0888 ARGB 32-bit - HACKED, see pvr_accumulationbuffer_to_framebuffer! 
 			for (y=0;y < dy;y++)
