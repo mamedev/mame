@@ -4616,6 +4616,24 @@ ROM_START( ggxx )
 ROM_END
 
 
+ROM_START( cleoftp )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0012", 0, SHA1(aae4c1321fdee37d5405c6cbe648e0596624ed13) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-5083-COM)
+	//(sticker 253-5509-5083)
+	ROM_LOAD("317-5083-com.pic", 0x00, 0x4000, CRC(096a0fc2) SHA1(8498a0d489a8e075268c07e2c076673904b04be9) )
+ROM_END
+
+
 ROM_START( moeru )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -4632,7 +4650,6 @@ ROM_START( moeru )
 	//PIC16C622A (317-5084-JPN)
 	//(sticker 253-5509-5084J)
 	ROM_LOAD("317-5084-jpn.pic", 0x00, 0x4000, CRC(db7dac1e) SHA1(b6f7afe9d9d2681005c1abcd4fde24867e65d1e4) )
-
 ROM_END
 
 
@@ -5635,7 +5652,7 @@ GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Capcom / 
 //GDL-0009
 GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi,    naomi,   ROT270, "Treasure",               "Ikaruga (GDL-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, ggxx,      naomigd,  naomigd,  naomi,    ggxx,    ROT0,   "Arc System Works",       "Guilty Gear XX (GDL-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-//GDL-0012 Cleopatra Fortune Plus
+GAME( 2002, cleoftp,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Altron",                 "Cleopatra Fortune Plus (GDL-0012)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, moeru,     naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Altron",                 "Moeru Casinyo (GDL-0013)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0014 Musapey's Choco Marker
 GAME( 2002, chocomk,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

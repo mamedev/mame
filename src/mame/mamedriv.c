@@ -4593,7 +4593,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( luptype )	/* 2002.04 Lupin the Third: the Typing */
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
-						/* 2002.05 Cleopatra Fortune + */
+	DRIVER( cleoftp )	/* 2002.05 Cleopatra Fortune + */
 	DRIVER( chocomk )	/* 2002.06 Musapey no Choco Marker */
 						/* 2002.07 Mazan */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
