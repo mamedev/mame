@@ -4110,7 +4110,7 @@ ROM_END
 /***************************************************************************
 
   Tobikose! Jumpman by Namco, 1999
-  PCB TJ0476
+  Namco EMG4 platform, PCB TJ0476
 
   TMP 68HC000P-16
 
@@ -4141,9 +4141,9 @@ ROM_START( tjumpman )
 	ROM_REGION( 0x40000, "oki1", 0 )	/* OKIM6295 #1 Samples */
 	ROM_LOAD( "tj1_voi-0a.u27", 0x00000, 0x40000, CRC(b5693aae) SHA1(8887ae98030cb5d184e3d57d2b4e48bf1e76a232) )
 
-    ROM_REGION( 0x0002, "plds", 0 )
-    ROM_LOAD( "tj1_gal.uxx", 0x0000, 0x0001, NO_DUMP )	// GAL16V8D-15LP
-    ROM_LOAD( "tj1_gal.uyy", 0x0000, 0x0001, NO_DUMP )	// GAL16V8D-15LP
+	ROM_REGION( 0x0002, "plds", 0 )
+	ROM_LOAD( "tj1_gal.uxx", 0x0000, 0x0001, NO_DUMP )	// GAL16V8D-15LP
+	ROM_LOAD( "tj1_gal.uyy", 0x0000, 0x0001, NO_DUMP )	// GAL16V8D-15LP
 ROM_END
 
 
