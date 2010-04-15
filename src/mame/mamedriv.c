@@ -9377,6 +9377,7 @@ Other Sun games
 	DRIVER( madzoo )	/* (c) 1995 Bordun International */
 	DRIVER( leader )	/* Bootleg? */
 	DRIVER( livequiz )	/* (c) 1999 Andamiro */
+	DRIVER( hammer )	/* (c) 2000 Andamiro */
 	DRIVER( cowrace )	/* (c) 20?? hack */
 	DRIVER( kingdrbb )  /* (c) 199? hack */
 	DRIVER( discoboy )	/* (c) 1993 Soft Art Co. */
