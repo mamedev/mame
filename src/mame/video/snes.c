@@ -2226,11 +2226,10 @@ READ8_HANDLER( snes_ppu_read )
 		case STAT78:	/* PPU status flag and version number */
 			state->read_ophct = 0;
 			state->read_opvct = 0;
-			value = snes_ram[offset];
-			value |= (snes_ppu.ppu2_open_bus & 0x20);
-			value |= (snes_ppu.ppu2_version & 0x0f);
-			snes_ram[offset] = value;	// not sure if this is needed...
-			snes_ppu.ppu2_open_bus = value;
+			if(snes_ram[WRIO] & 0x80)
+				snes_ram[STAT78] &= ~0x40; //clear ext latch if bit 7 of WRIO is set
+			snes_ram[STAT78] = (snes_ram[STAT78] & ~0x2f) | (snes_ppu.ppu2_open_bus & 0x20) | (snes_ppu.ppu2_version & 0x0f);
+			snes_ppu.ppu2_open_bus = snes_ram[STAT78];
 			return snes_ppu.ppu2_open_bus;
 	}
 
