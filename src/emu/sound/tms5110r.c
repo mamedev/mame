@@ -416,7 +416,7 @@ static const struct tms5100_coeffs tms5220c_coeff =
 	{ 1,   2,   3,   4,   6,   8,   11,	 16,
 	 23,  33,  47,  63,  85,  114, 152, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
 	/* P   */
-	{16,  16,  17,  18,  19,  20,  21,  22,
+	{ 0,  16,  17,  18,  19,  20,  21,  22, // first value is 16 in QV5220.COD but must be 0 for unvoiced speech to work properly
 	 23,  24,  25,  26,  27,  28,  29,  30,
 	 31,  32,  33,  34,  35,  36,  37,  38,
 	 39,  40,  41,  42,  43,  45,  47,  49,
