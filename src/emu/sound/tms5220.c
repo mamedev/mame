@@ -197,7 +197,8 @@ device), PES Speech adapter (serial port connection)
    between current and target to the current each frame */
 #undef OVERRIDE_INTERPOLATION
 
-
+/* defines how many times to leftshift the chirp rom before feeding to the lattice filter. default is 0 */
+#define CHIRPROM_LEFTSHIFT 0
 
 /* *****debugging defines***** */
 #undef VERBOSE
@@ -290,6 +291,8 @@ struct _tms5220_state
 
 	UINT16 previous_energy;         /* needed for lattice filter to match patent */
 
+	//UINT8 inhibit_interp;	/* TODO: equivalent to INHIBIT line on patent; when 1, the interpolation is disabled for this frame until the last count, when IP is 0 */
+	//UINT8 interp_period; /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
 	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
 	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
 	UINT8 tms5220c_rate; /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
@@ -543,6 +546,7 @@ static int extract_bits(tms5220_state *tms, int count)
 			if (tms->fifo_bits_taken >= 8)
 			{
 				tms->fifo_count--;
+				tms->fifo[tms->fifo_head] = 0; // zero the newly depleted fifo head byte
 				tms->fifo_head = (tms->fifo_head + 1) % FIFO_SIZE;
 				tms->fifo_bits_taken = 0;
 				update_flags_and_ints(tms);
@@ -558,22 +562,6 @@ static int extract_bits(tms5220_state *tms, int count)
 
     return val;
 }
-
-/*static void request_bits(tms5220_state *tms, int no)
-{
-int i;
-	for (i=0; i<no; i++)
-	{
-		if (tms->M0_callback)
-		{
-			int data = (*tms->M0_callback)(tms->device);
-			FIFO_data_write(tms, data);
-		}
-		else
-			if (DEBUG_5220) LOG("-->ERROR: TMS5220 missing M0 callback function\n");
-	}
-}
-*/
 
 /**********************************************************************************************
 
@@ -949,9 +937,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
              */
 #ifdef NORMALMODE
           if (tms->pitch_count > 50)
-              tms->excitation_data = tms->coeff->chirptable[50];
+              tms->excitation_data = tms->coeff->chirptable[50]<<CHIRPROM_LEFTSHIFT;
           else /*tms->pitch_count <= 50*/
-              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]<<CHIRPROM_LEFTSHIFT;
 #else
 			 tms->excitation_data = tms->pitch_count - 64;
 #endif
@@ -1210,20 +1198,23 @@ static void parse_frame(tms5220_state *tms)
 	int ene;
 #endif
 
-	/* count the total number of bits available */
-	bits = ((tms->fifo_count)*8)-tms->fifo_bits_taken;
-
+	// todo: we actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
+	if (tms->speak_external)
+	{
+		/* count the total number of bits available */
+		bits = ((tms->fifo_count)*8)-tms->fifo_bits_taken;
+	}
+	else
+	{
+		/* we're talking out of a vsm rom, hence we have an effectively infinite number of bits which are pullable. extract_bits will toggle M0 for us and grab what bits are needed */
+		bits = 131072; // == arbitrary large number
+	}
 	/* if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
 	has a 2 bit rate preceeding it, grab two bits here and store them as the rate; */
 	if ((tms->variant == SUBTYPE_TMS5220C) && (tms->tms5220c_rate & 0x04))
 	{	
 		bits -= 2;
-		if (bits < 0)
-		{
-			goto ranout;
-			//request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
-			//bits = 0;
-		}
+		if (bits < 0) goto ranout;
 		indx = extract_bits(tms, 2);
 		tms->sample_count = reload_table[indx];
 	}
@@ -1232,12 +1223,7 @@ static void parse_frame(tms5220_state *tms)
 
 	/* attempt to extract the energy index */
 	bits -= tms->coeff->energy_bits;
-	if (bits < 0)
-	{
-		goto ranout;
-		//request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
-		//bits = 0;
-	}
+	if (bits < 0) goto ranout;
 	indx = extract_bits(tms,tms->coeff->energy_bits);
 	tms->new_energy = tms->coeff->energytable[indx];
 #ifdef DEBUG_FRAME_DUMP
@@ -1256,22 +1242,12 @@ static void parse_frame(tms5220_state *tms)
 
 	/* attempt to extract the repeat flag */
 	bits -= 1;
-	if (bits < 0)
-	{
-		goto ranout;
-		//request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
-		//bits = 0;
-	}
+	if (bits < 0) goto ranout;
 	rep_flag = extract_bits(tms,1);
 
 	/* attempt to extract the pitch */
 	bits -= tms->coeff->pitch_bits;
-	if (bits < 0)
-	{
-		goto ranout;
-		//request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
-		//bits = 0;
-	}
+	if (bits < 0) goto ranout;
 	indx = extract_bits(tms,tms->coeff->pitch_bits);
 	tms->new_pitch = tms->coeff->pitchtable[indx];
 
@@ -1292,12 +1268,7 @@ static void parse_frame(tms5220_state *tms)
 	{
 		/* attempt to extract 4 K's */
 		bits -= 18;
-		if (bits < 0)
-		{
-				goto ranout;
-		//request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
-		//bits = 0;
-		}
+		if (bits < 0) goto ranout;
 		for (i = 0; i < 4; i++)
 			tms->new_k[i] = tms->coeff->ktable[i][extract_bits(tms,tms->coeff->kbits[i])];
 
@@ -1312,12 +1283,7 @@ static void parse_frame(tms5220_state *tms)
 
 	/* else we need 10 K's */
 	bits -= 39;
-	if (bits < 0)
-	{
-		goto ranout;
-		//request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
-		//bits = 0;
-	}
+	if (bits < 0) goto ranout;
 #ifdef DEBUG_FRAME_DUMP
 	logerror("FrameDump %02d ", ene);
 	for (i = 0; i < tms->coeff->num_k; i++)
@@ -1356,7 +1322,7 @@ static void parse_frame(tms5220_state *tms)
 
 	tms->RDB_flag = FALSE;
 
-    /* generate an interrupt if necessary */
+    /* generate an interrupt since TS went low */
     set_interrupt_state(tms, 1);
     return;
 
