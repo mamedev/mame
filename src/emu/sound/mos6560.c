@@ -124,7 +124,7 @@ INLINE mos6560_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == MOS656X);
+	assert(device->type == SOUND);
 
 	return (mos6560_state *)device->token;
 }
@@ -132,7 +132,7 @@ INLINE mos6560_state *get_safe_token( running_device *device )
 INLINE const mos6560_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == MOS656X));
+	assert((device->type == SOUND));
 	return (const mos6560_interface *) device->baseconfig().static_config;
 }
 
