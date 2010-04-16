@@ -2,6 +2,8 @@
 
 Per-game specific JVS settings / idle loop skips for the MAME Naomi driver.
 
+suchie3: check bp c0a6458
+
 ***************************************************************************/
 
 #include "emu.h"
