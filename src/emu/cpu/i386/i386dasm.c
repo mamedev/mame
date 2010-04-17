@@ -1584,6 +1584,10 @@ static char* handle_param(char* s, UINT32 param)
 			s += sprintf( s, "tr%d", MODRM_REG1 | regex );
 			break;
 
+		case PARAM_DREG:
+			s += sprintf( s, "dr%d", MODRM_REG1 | regex );
+			break;
+
 		case PARAM_1:
 			s += sprintf( s, "1" );
 			break;
