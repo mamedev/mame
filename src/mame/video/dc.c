@@ -29,7 +29,10 @@ VO_BORDER_COL
 ---- ---- ---- ---- xxxx xxxx ---- ---- Green
 ---- ---- ---- ---- ---- ---- xxxx xxxx Blue
 */
-
+#define vo_border_K ((pvrta_regs[VO_BORDER_COL] & 0x01000000) >> 24)
+#define vo_border_R ((pvrta_regs[VO_BORDER_COL] & 0x00ff0000) >> 16)
+#define vo_border_G ((pvrta_regs[VO_BORDER_COL] & 0x0000ff00) >> 8)
+#define vo_border_B ((pvrta_regs[VO_BORDER_COL] & 0x000000ff) >> 0)
 
 /*
 SPG_HBLANK
@@ -2607,9 +2610,9 @@ VIDEO_UPDATE(dc)
 	}
 #endif
 
-	if(pvrta_blank_video)
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine)); //FIXME: border color?
-	else
+	bitmap_fill(bitmap,cliprect,MAKE_ARGB(0xff,vo_border_R,vo_border_G,vo_border_B)); //FIXME: Chroma bit?
+
+	if(!pvrta_blank_video)
 		pvr_drawframebuffer(bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
