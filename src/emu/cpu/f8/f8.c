@@ -1214,7 +1214,7 @@ static void f8_xm(f8_Regs *cpustate)
 
 /***************************************************
  *  O Z C S 1000 1101
- *  0 x 0 x CM
+ *  x x x x CM
  ***************************************************/
 static void f8_cm(f8_Regs *cpustate)	/* SKR changed to match f8_ci(cpustate) */
 {
