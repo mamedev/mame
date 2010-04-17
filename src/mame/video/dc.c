@@ -23,8 +23,42 @@ static int vblc=0;
 
 /* PVR TA macro defines */
 /*
+VO_BORDER_COL
+---- ---x ---- ---- ---- ---- ---- ---- Chroma
+---- ---- xxxx xxxx ---- ---- ---- ---- Red
+---- ---- ---- ---- xxxx xxxx ---- ---- Green
+---- ---- ---- ---- ---- ---- xxxx xxxx Blue
+*/
+
+
+/*
+SPG_HBLANK
+---- ---- --xx xxxx xxxx ---- ---- ---- vbend
+---- ---- ---- ---- ---- --xx xxxx xxxx vbstart
+*/
+#define pvrta_hbend    ((pvrta_regs[SPG_HBLANK] & 0x03ff0000) >> 16)
+#define pvrta_hbstart  ((pvrta_regs[SPG_HBLANK] & 0x000003ff) >> 0)
+
+
+/*
+SPG_LOAD
+---- ---- --xx xxxx xxxx ---- ---- ---- vcount
+---- ---- ---- ---- ---- --xx xxxx xxxx hcount
+*/
+#define pvrta_vcount   ((pvrta_regs[SPG_LOAD] & 0x03ff0000) >> 16)
+#define pvrta_hcount   ((pvrta_regs[SPG_LOAD] & 0x000003ff) >> 0)
+
+/*
+SPG_VBLANK
+---- ---- --xx xxxx xxxx ---- ---- ---- vbend
+---- ---- ---- ---- ---- --xx xxxx xxxx vbstart
+*/
+#define pvrta_vbend    ((pvrta_regs[SPG_VBLANK] & 0x03ff0000) >> 16)
+#define pvrta_vbstart  ((pvrta_regs[SPG_VBLANK] & 0x000003ff) >> 0)
+
+
+/*
 VO_CONTROL
-xxxx xxxx xx-- ---- xxxx xxx- ---- ---- <Reserved>
 ---- ---- --xx xxxx ---- ---- ---- ---- pclk_delay
 ---- ---- ---- ---- ---- ---x ---- ---- pixel_double ;used in test mode
 ---- ---- ---- ---- ---- ---- xxxx ---- field_mode
@@ -41,6 +75,20 @@ xxxx xxxx xx-- ---- xxxx xxx- ---- ---- <Reserved>
 #define pvrta_vsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000002) >> 1)
 #define pvrta_hsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000001) >> 0)
 
+/*
+VO_STARTX
+---- ---- ---- ---- ---- ---x xxxx xxxx horzontal start position
+*/
+#define pvrta_horz_start_pos ((pvrta_regs[VO_STARTX] & 0x000003ff) >> 0)
+
+/*
+VO_STARTY
+---- ---x xxxx xxxx ---- ---- ---- ---- vertical start position on field 2
+---- ---- ---- ---- ---- ---x xxxx xxxx vertical start position on field 1
+*/
+
+#define pvrta_vert_start_pos_f2 ((pvrta_regs[VO_STARTY] & 0x03ff0000) >> 16)
+#define pvrta_vert_start_pos_f1 ((pvrta_regs[VO_STARTY] & 0x000003ff) >> 0)
 
 
 
@@ -1014,6 +1062,9 @@ READ64_HANDLER( pvr_ta_r )
 	case SPG_STATUS:
 		pvrta_regs[reg] = (video_screen_get_vblank(space->machine->primary_screen) << 13) | (video_screen_get_hblank(space->machine->primary_screen) << 12) | (video_screen_get_vpos(space->machine->primary_screen) & 0x3ff);
 		break;
+	case SPG_TRIGGER_POS:
+		printf("Warning: read at h/v counter ext latches\n");
+		break;
 	}
 
 	#if DEBUG_PVRTA_REGS
@@ -1254,6 +1305,22 @@ WRITE64_HANDLER( pvr_ta_w )
 	#endif
 		state_ta.tafifo_listtype= -1; // no list being received
 		state_ta.listtype_used |= (1+4);
+		break;
+	case SPG_VBLANK:
+	case SPG_HBLANK:
+	case SPG_LOAD:
+	case VO_STARTX:
+	case VO_STARTY:
+		{
+			rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
+			/* FIXME: right visible area calculations aren't known yet*/
+			visarea.min_x = 0;
+			visarea.max_x = ((pvrta_hbstart - pvrta_hbend - pvrta_horz_start_pos) <= 0x180 ? 320 : 640) - 1;
+			visarea.min_y = 0;
+			visarea.max_y = ((pvrta_vbstart - pvrta_vbend - pvrta_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
+
+			video_screen_configure(space->machine->primary_screen, pvrta_hbstart, pvrta_vbstart, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds );
+		}
 		break;
 	}
 
@@ -2369,8 +2436,15 @@ VIDEO_START(dc)
 	// if the next 2 registers do not have the correct values, the naomi bios will hang
 	pvrta_regs[PVRID]=0x17fd11db;
 	pvrta_regs[REVISION]=0x11;
+	/* FIXME: move the following regs inside MACHINE_RESET */
 	pvrta_regs[VO_CONTROL]=0x108;
 	pvrta_regs[SOFTRESET]=0x7;
+	pvrta_regs[VO_STARTX]=0x0000009d;
+	pvrta_regs[VO_STARTY]=0x00150015;
+	pvrta_regs[SPG_HBLANK]=0x007e0345;
+	pvrta_regs[SPG_LOAD]=0x01060359;
+	pvrta_regs[SPG_VBLANK]=01500104;
+
 	state_ta.tafifo_pos=0;
 	state_ta.tafifo_mask=7;
 	state_ta.tafifo_vertexwords=8;
@@ -2438,7 +2512,7 @@ VIDEO_UPDATE(dc)
 #endif
 
 	if(pvrta_blank_video)
-		bitmap_fill(bitmap, cliprect, MAKE_RGB(0x00,0x00,0x00)); //FIXME: border color?
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine)); //FIXME: border color?
 	else
 		pvr_drawframebuffer(bitmap,cliprect);
 
