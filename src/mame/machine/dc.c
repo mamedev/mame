@@ -1255,7 +1255,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 
 		default:
 			/* might access the unhandled DMAs, so tell us if this happens. */
-			printf("Unhandled G2 register [%08x] -> %08x\n",reg,dat);
+			//printf("Unhandled G2 register [%08x] -> %08x\n",reg,dat);
 			break;
 	}
 }

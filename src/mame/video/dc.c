@@ -21,6 +21,29 @@ static int vblc=0;
 
 #define NUM_BUFFERS 4
 
+/* PVR TA macro defines */
+/*
+VO_CONTROL
+xxxx xxxx xx-- ---- xxxx xxx- ---- ---- <Reserved>
+---- ---- --xx xxxx ---- ---- ---- ---- pclk_delay
+---- ---- ---- ---- ---- ---x ---- ---- pixel_double ;used in test mode
+---- ---- ---- ---- ---- ---- xxxx ---- field_mode
+---- ---- ---- ---- ---- ---- ---- x--- blank_video
+---- ---- ---- ---- ---- ---- ---- -x-- blank_pol
+---- ---- ---- ---- ---- ---- ---- --x- vsync_pol
+---- ---- ---- ---- ---- ---- ---- ---x hsync_pol
+*/
+#define pvrta_pclk_delay   ((pvrta_regs[VO_CONTROL] & 0x003f0000) >> 16)
+#define pvrta_pixel_double ((pvrta_regs[VO_CONTROL] & 0x00000100) >> 8)
+#define pvrta_field_mode   ((pvrta_regs[VO_CONTROL] & 0x000000f0) >> 4)
+#define pvrta_blank_video  ((pvrta_regs[VO_CONTROL] & 0x00000008) >> 3)
+#define pvrta_blank_pol    ((pvrta_regs[VO_CONTROL] & 0x00000004) >> 2)
+#define pvrta_vsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000002) >> 1)
+#define pvrta_hsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000001) >> 0)
+
+
+
+
 UINT32 pvrctrl_regs[0x100/4];
 static UINT32 pvrta_regs[0x2000/4];
 static const int pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
@@ -2151,7 +2174,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			}
 			break;
 
-		case 0x02: ; // 888 RGB 24-bit - suchie3 - HACKED, see pvr_accumulationbuffer_to_framebuffer! 
+		case 0x02: ; // 888 RGB 24-bit - suchie3 - HACKED, see pvr_accumulationbuffer_to_framebuffer!
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
@@ -2171,7 +2194,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			}
 			break;
 
-		case 0x03:        // 0888 ARGB 32-bit - HACKED, see pvr_accumulationbuffer_to_framebuffer! 
+		case 0x03:        // 0888 ARGB 32-bit - HACKED, see pvr_accumulationbuffer_to_framebuffer!
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
@@ -2346,7 +2369,7 @@ VIDEO_START(dc)
 	// if the next 2 registers do not have the correct values, the naomi bios will hang
 	pvrta_regs[PVRID]=0x17fd11db;
 	pvrta_regs[REVISION]=0x11;
-	pvrta_regs[VO_CONTROL]=0xC;
+	pvrta_regs[VO_CONTROL]=0x108;
 	pvrta_regs[SOFTRESET]=0x7;
 	state_ta.tafifo_pos=0;
 	state_ta.tafifo_mask=7;
@@ -2414,7 +2437,10 @@ VIDEO_UPDATE(dc)
 	}
 #endif
 
-	pvr_drawframebuffer(bitmap,cliprect);
+	if(pvrta_blank_video)
+		bitmap_fill(bitmap, cliprect, MAKE_RGB(0x00,0x00,0x00)); //FIXME: border color?
+	else
+		pvr_drawframebuffer(bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
 	debug_dip_status = input_port_read(screen->machine, "MAMEDEBUG");
