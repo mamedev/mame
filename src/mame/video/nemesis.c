@@ -200,21 +200,18 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 	bit4 = BIT(data, 3);
 	bit5 = BIT(data, 4);
 	r = MULTIPLIER;
-	r = pow(r/255.0, 2)*255;
 	bit1 = BIT(data, 5);
 	bit2 = BIT(data, 6);
 	bit3 = BIT(data, 7);
 	bit4 = BIT(data, 8);
 	bit5 = BIT(data, 9);
 	g = MULTIPLIER;
-	g = pow(g/255.0, 2)*255;
 	bit1 = BIT(data, 10);
 	bit2 = BIT(data, 11);
 	bit3 = BIT(data, 12);
 	bit4 = BIT(data, 13);
 	bit5 = BIT(data, 14);
 	b = MULTIPLIER;
-	b = pow(b/255.0, 2)*255;
 
 	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }
