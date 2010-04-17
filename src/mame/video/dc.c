@@ -2204,18 +2204,41 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-				for (x=0;x < xi;x++)
+				if(pvrta_pixel_double)
 				{
-					fbaddr=BITMAP_ADDR32(bitmap,y,x);
-					c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+					for (x=0;x < xi;x++)
+					{
+						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+0);
+						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
-					b = (c & 0x001f) << 3;
-					g = (c & 0x03e0) >> 2;
-					r = (c & 0x7c00) >> 7;
+						b = (c & 0x001f) << 3;
+						g = (c & 0x03e0) >> 2;
+						r = (c & 0x7c00) >> 7;
 
-					if (y<=cliprect->max_y)
-						*fbaddr = b | (g<<8) | (r<<16);
-					addrp+=2;
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+
+						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+1);
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+						addrp+=2;
+					}
+				}
+				else
+				{
+					for (x=0;x < xi;x++)
+					{
+						fbaddr=BITMAP_ADDR32(bitmap,y,x);
+						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+
+						b = (c & 0x001f) << 3;
+						g = (c & 0x03e0) >> 2;
+						r = (c & 0x7c00) >> 7;
+
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+						addrp+=2;
+					}
 				}
 			}
 
@@ -2225,18 +2248,43 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-				for (x=0;x < xi;x++)
+				if(pvrta_pixel_double)
 				{
-					fbaddr=BITMAP_ADDR32(bitmap,y,x);
-					c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+					for (x=0;x < xi;x++)
+					{
+						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+0);
+						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
-					b = (c & 0x001f) << 3;
-					g = (c & 0x07e0) >> 3;
-					r = (c & 0xf800) >> 8;
+						b = (c & 0x001f) << 3;
+						g = (c & 0x07e0) >> 3;
+						r = (c & 0xf800) >> 8;
 
-					if (y<=cliprect->max_y)
-						*fbaddr = b | (g<<8) | (r<<16);
-					addrp+=2;
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+
+						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+1);
+
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+
+						addrp+=2;
+					}
+				}
+				else
+				{
+					for (x=0;x < xi;x++)
+					{
+						fbaddr=BITMAP_ADDR32(bitmap,y,x);
+						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+
+						b = (c & 0x001f) << 3;
+						g = (c & 0x07e0) >> 3;
+						r = (c & 0xf800) >> 8;
+
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+						addrp+=2;
+					}
 				}
 			}
 			break;
@@ -2245,18 +2293,42 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-				for (x=0;x < xi;x++)
+				if(pvrta_pixel_double)
 				{
-					fbaddr=BITMAP_ADDR32(bitmap,y,x);
-					c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+					for (x=0;x < xi;x++)
+					{
+						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+0);
+						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
-					b = (c & 0x001f) << 3;
-					g = (c & 0x07e0) >> 3;
-					r = (c & 0xf800) >> 8;
+						b = (c & 0x001f) << 3;
+						g = (c & 0x07e0) >> 3;
+						r = (c & 0xf800) >> 8;
 
-					if (y<=cliprect->max_y)
-						*fbaddr = b | (g<<8) | (r<<16);
-					addrp+=2;
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+
+						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+1);
+
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+						addrp+=2;
+					}
+				}
+				else
+				{
+					for (x=0;x < xi;x++)
+					{
+						fbaddr=BITMAP_ADDR32(bitmap,y,x);
+						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+
+						b = (c & 0x001f) << 3;
+						g = (c & 0x07e0) >> 3;
+						r = (c & 0xf800) >> 8;
+
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+						addrp+=2;
+					}
 				}
 			}
 			break;
@@ -2265,18 +2337,42 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-				for (x=0;x < xi;x++)
+				if(pvrta_pixel_double)
 				{
-					fbaddr=BITMAP_ADDR32(bitmap,y,x);
-					c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+					for (x=0;x < xi;x++)
+					{
+						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+0);
+						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
-					b = (c & 0x001f) << 3;
-					g = (c & 0x07e0) >> 3;
-					r = (c & 0xf800) >> 8;
+						b = (c & 0x001f) << 3;
+						g = (c & 0x07e0) >> 3;
+						r = (c & 0xf800) >> 8;
 
-					if (y<=cliprect->max_y)
-						*fbaddr = b | (g<<8) | (r<<16);
-					addrp+=2;
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+
+						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+1);
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+
+						addrp+=2;
+					}
+				}
+				else
+				{
+					for (x=0;x < xi;x++)
+					{
+						fbaddr=BITMAP_ADDR32(bitmap,y,x);
+						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+
+						b = (c & 0x001f) << 3;
+						g = (c & 0x07e0) >> 3;
+						r = (c & 0xf800) >> 8;
+
+						if (y<=cliprect->max_y)
+							*fbaddr = b | (g<<8) | (r<<16);
+						addrp+=2;
+					}
 				}
 			}
 			break;
