@@ -33,6 +33,8 @@ extern DRIVER_INIT( qmegamis );
 
 extern DRIVER_INIT( vf4evoct );
 
+extern DRIVER_INIT( kick4csh );
+
 extern UINT64 *naomi_ram64;
 
 extern int jvsboard_type;

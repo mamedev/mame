@@ -4516,7 +4516,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jambo )		/* 1999.09 Jambo! Safari */
 						/* 1999.09 Super Major League 99 */
 	DRIVER( sgtetris )	/* 1999.10 Sega Tetris */
-	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club */
+	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club (Ver. C) */
+	DRIVER( derbyocb )	/* 1999.10 Derby Owners Club (Ver. B) */
 	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( otrigger )	/* 1999.11 Out Trigger */
 	DRIVER( dybb99 )	/* 1999.11 Dynamite Baseball '99 */
@@ -4550,7 +4551,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.09 Nittere Shiki! Mirai Yosou Studio */
 	DRIVER( crackndj )	/* 2000.10 Crackin' DJ */
 	DRIVER( cspike )	/* 2000.10 Gun Spike */
-						/* 2000.10 Sega Strike Fighter */
+	DRIVER( sstrkfgt )	/* 2000.10 Sega Strike Fighter */
 	DRIVER( deathcox )	/* 2000.10 Death Crimson OX */
 						/* 2000.11 Ninja Assault */
 	DRIVER( confmiss )	/* 2000.11 Confidential Mission */											/* First GD-ROM game? */
@@ -4610,6 +4611,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( puyofev )	/* 2003.11 Puyopuyo Fever */
 	DRIVER( shootopl )	/* Shootout Pool */
 	DRIVER( shootpl )	/* 2003.xx Shootout Pool / Shootout Pool Prize */
+	DRIVER( kick4csh )	/* 2004.xx Kick '4' Cash */
 	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom) */
 	DRIVER( cfield )	/* 2004.06 Chaos Field */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */

@@ -2543,7 +2543,7 @@ Serial: BAXE-02A1386
 
 */
 
-ROM_START( derbyoc )
+ROM_START( derbyocb )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -2564,6 +2564,22 @@ ROM_START( derbyoc )
 	ROM_LOAD("mpr-22096.ic12",  0x6000000, 0x0800000, CRC(d8c41648) SHA1(d465f4b841164da0738336e203c5bc6e1e799a76) )
 	ROM_LOAD("mpr-22097.ic13",  0x6800000, 0x0800000, CRC(f1dedac5) SHA1(9d4499cbafe80dd0b36be617de7994a96e1e9a01) )
 	ROM_LOAD("mpr-22098.ic14",  0x7000000, 0x0800000, CRC(f9824d2e) SHA1(f20f8cc2b1bef9077ede1cb874da8f2a335d39de) )
+ROM_END
+
+ROM_START( derbyoc )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x7800000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr-22336c.ic22", 0x000000, 0x400000, CRC(50053f82) SHA1(5b31abb480043ece3645b2479ba566ac6592acd8) ) 
+        ROM_LOAD( "mpr-22328.ic1", 0x0800000, 0x1000000, CRC(179cec02) SHA1(cbaba86082370a082d2e9f18427691d5cfa0e4f0) ) 
+        ROM_LOAD( "mpr-22329.ic2", 0x1800000, 0x1000000, CRC(e0d5b98c) SHA1(5bf1ac0d895fd7725d170a54f01cd717a5e54110) ) 
+        ROM_LOAD( "mpr-22330.ic3", 0x2800000, 0x1000000, CRC(6737cd62) SHA1(08429ca39fef3b36cb491813ddcd0feef3b24372) ) 
+        ROM_LOAD( "mpr-22331.ic4", 0x3800000, 0x1000000, CRC(8fb5cbcf) SHA1(c4e6cbbe7d3549e1841654b41b1946b9bc356e74) ) 
+        ROM_LOAD( "mpr-22332.ic5", 0x4800000, 0x1000000, CRC(c5e365a8) SHA1(5839ea24b8fd02552931175d35e2ceca75fca089) ) 
+        ROM_LOAD( "mpr-22333.ic6", 0x5800000, 0x1000000, CRC(96f324aa) SHA1(bc41e2097c1841771d786ba9ad1a31df1494a856) ) 
+        ROM_LOAD( "mpr-22334.ic7", 0x6800000, 0x1000000, CRC(5389b05a) SHA1(e206e4d82d7b1a59c33043ec0812eb69be08d9b3) ) 
 ROM_END
 
 /*
@@ -3418,6 +3434,37 @@ ROM_START( 18wheelr )
 	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
         ROM_LOAD( "epr-23000.ic8", 0x000000, 0x010000, CRC(e3b162f7) SHA1(52c7ad759c3c4a3148764e14d77ba5006bc8af48) )
 ROM_END
+
+/* Sega Strike Fighter */
+ROM_START( sstrkfgt )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr-23323a.ic22", 0x0000000, 0x400000, CRC(f3fd304b) SHA1(012eefebd857200195d9e2d80c24a793b258d7e2) ) 
+        ROM_LOAD( "mpr-23302.ic1",   0x0800000, 0x800000, CRC(3429321b) SHA1(6fc1be2ca71a690a2ceca9dc968183a1222177f7) ) 
+        ROM_LOAD( "mpr-23303.ic2",   0x1000000, 0x800000, CRC(f7b3ada2) SHA1(d2caea852241cb0d91243d84d1c5523dfddac721) ) 
+        ROM_LOAD( "mpr-23304.ic3",   0x1800000, 0x800000, CRC(3bf145e9) SHA1(a000e135ad640472418de418b92dbdb83dcf872b) ) 
+        ROM_LOAD( "mpr-23305.ic4",   0x2000000, 0x800000, CRC(924ee9fd) SHA1(dd56f8cd7e9dda87968abb810694bddeeb31db5c) ) 
+        ROM_LOAD( "mpr-23306.ic5",   0x2800000, 0x800000, CRC(4021e805) SHA1(75988ff8d710da6d90608cef87fc8b4408a617fb) ) 
+        ROM_LOAD( "mpr-23307.ic6",   0x3000000, 0x800000, CRC(090c1812) SHA1(e3e32d5c1f42191e188f91dbd4a753030894aa6f) ) 
+        ROM_LOAD( "mpr-23308.ic7",   0x3800000, 0x800000, CRC(f23d2198) SHA1(9775796a388ab903102126fb190867a0d192903e) ) 
+        ROM_LOAD( "mpr-23309.ic8",   0x4000000, 0x800000, CRC(0d6a7c9d) SHA1(0df846289d598efdf5605ca8e09758eb8b5878f9) ) 
+        ROM_LOAD( "mpr-23310.ic9",   0x4800000, 0x800000, CRC(f4ec4baa) SHA1(77e2ea1c5747ced4951286142bd429780f9d4115) ) 
+        ROM_LOAD( "mpr-23311.ic10",  0x5000000, 0x800000, CRC(a1467573) SHA1(cf38527b0e812ba90e7402aa53e4557ce756cf43) ) 
+        ROM_LOAD( "mpr-23312.ic11",  0x5800000, 0x800000, CRC(9b0ae703) SHA1(35f0e3cdbc206b91dad4a97feb3c533bc12a77f1) ) 
+        ROM_LOAD( "mpr-23313.ic12s", 0x6000000, 0x800000, CRC(d309fea9) SHA1(2ba2da81976126f0a79b066d855706d800279150) ) 
+        ROM_LOAD( "mpr-23314.ic13s", 0x6800000, 0x800000, CRC(0aeedeac) SHA1(5e5086a7a51a9576e786911a2c7f4b509d5bc2f4) ) 
+        ROM_LOAD( "mpr-23315.ic14s", 0x7000000, 0x800000, CRC(88f22650) SHA1(3425433d233b458ae73e30cc0c7d25fca2a9d589) ) 
+        ROM_LOAD( "mpr-23316.ic15s", 0x7800000, 0x800000, CRC(38ff3a9d) SHA1(56978183fe61fd2ad59ab2979cb61fbf2cde07e6) ) 
+        ROM_LOAD( "mpr-23317.ic16s", 0x8000000, 0x800000, CRC(d6d45776) SHA1(102963243f6e127d4c35d150eeb09aa99a3738d4) ) 
+        ROM_LOAD( "mpr-23318.ic17s", 0x8800000, 0x800000, CRC(5f33207e) SHA1(6eceb6bb9171da8634fcba9dd7409794447fe069) ) 
+        ROM_LOAD( "mpr-23319.ic18s", 0x9000000, 0x800000, CRC(ff42857a) SHA1(adbc025c4e02ad3b15ead9340aee494c16005ad5) ) 
+        ROM_LOAD( "mpr-23320.ic19s", 0x9800000, 0x800000, CRC(5ec75a45) SHA1(696e5d14678c794dec67246507bd580f7e5b5043) ) 
+        ROM_LOAD( "mpr-23321.ic20s", 0xa000000, 0x800000, CRC(018627d4) SHA1(2519f39ad046d14f602648fed39bc3719185b55e) ) 
+ROM_END
+
 
 /* Sega Tetris */
 ROM_START( sgtetris )
@@ -4278,6 +4325,30 @@ ROM_START( vtenis2c )
         ROM_LOAD( "01f169c0.bin", 0x000000, 0x000100, CRC(b0a330f4) SHA1(10c7a7f4d6c7f265a32887beaca73686c4cb1e03) )
 ROM_END
 
+ROM_START( kick4csh )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8800000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr-24212.ic11",   0x0000000, 0x400000, CRC(935453e8) SHA1(b34b3ac976229cba941843ffac9db420068999de) ) 
+        ROM_LOAD32_WORD( "opr-24213a.ic17s", 0x0800000, 0x800000, CRC(2ea4810b) SHA1(67e6c4b246993ca775120d145e1b129cd743b358) ) 
+        ROM_LOAD32_WORD( "opr-24214a.ic18",  0x0800002, 0x800000, CRC(0f574308) SHA1(699be7296650dcdb955048f2f5696a3b6d117afc) ) 
+        ROM_LOAD32_WORD( "opr-24215a.ic19s", 0x1800000, 0x800000, CRC(e7fcb265) SHA1(ef05e330206adb0ebdba6df2ff7aaeb570c0c7e4) ) 
+        ROM_LOAD32_WORD( "opr-24216a.ic20",  0x1800002, 0x800000, CRC(5101acc8) SHA1(2fbb4c8a450ecd070e2f18792a510e2cd4f7decb) ) 
+        ROM_LOAD32_WORD( "opr-24224a.ic21s", 0x2800000, 0x800000, CRC(a5480237) SHA1(a250a45750d3d63428bf73c85cd510e4252da2c9) ) 
+        ROM_LOAD32_WORD( "opr-24225a.ic22",  0x2800002, 0x800000, CRC(6b7e2856) SHA1(5b4a107ad654510b8282f4afe0c3856ca5a0fdf0) ) 
+        ROM_LOAD32_WORD( "opr-24226a.ic23s", 0x3800000, 0x800000, CRC(5a7b85fa) SHA1(9b7ef6bbff01e83f14513d8ea42cdb66b74303d0) ) 
+        ROM_LOAD32_WORD( "opr-24227a.ic24",  0x3800002, 0x800000, CRC(2b174c17) SHA1(9990268baf0091aef6cb3953b4da7fc2525d95af) ) 
+        ROM_LOAD32_WORD( "opr-24228a.ic25s", 0x4800000, 0x800000, CRC(92690697) SHA1(5de562751305a385b929702fc3b3dfa4883be23b) ) 
+        ROM_LOAD32_WORD( "opr-24229a.ic26",  0x4800002, 0x800000, CRC(fc3a6fbb) SHA1(1da1c011028c5b860a3d30e77a8dbdaabe997b63) ) 
+        ROM_LOAD32_WORD( "opr-24230a.ic27s", 0x5800000, 0x800000, CRC(40da73c4) SHA1(c48e5d119f3f5c40cf78f6cc7fb5b62b153743a1) ) 
+        ROM_LOAD32_WORD( "opr-24231a.ic28",  0x5800002, 0x800000, CRC(d04e33ec) SHA1(f7ed569bac47056955cb67f4ce0c1d36960f0c63) ) 
+        ROM_LOAD32_WORD( "opr-24232a.ic29",  0x6800000, 0x800000, CRC(3bec96c6) SHA1(d228959dec168af1a1800e9b0f03692a68f10b99) ) 
+        ROM_LOAD32_WORD( "opr-24233a.ic30s", 0x6800002, 0x800000, CRC(fc5bffec) SHA1(a6d63d80d11536c96d873c4ce492837ed83e3c9e) ) 
+        ROM_LOAD32_WORD( "opr-24234a.ic31",  0x7800000, 0x800000, BAD_DUMP CRC(0dc58105) SHA1(524cad7019ba87db5ea13c3370082885fb09dd08) ) 
+        ROM_LOAD32_WORD( "opr-24235a.ic32s", 0x7800002, 0x800000, BAD_DUMP CRC(1c55e3eb) SHA1(17a23c28d866b12f6249d513aea201edb2c43a68) )
+ROM_END								   
 
 /* GD-ROM titles - a PIC supplies a decryption key
 
@@ -4421,7 +4492,8 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0011C */ GAME( 1999, toyfight, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Toy Fighter", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0013C */ GAME( 1999, jambo,    naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Jambo! Safari (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0015C */ GAME( 1999, vtennis,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0016C */ GAME( 1999, derbyoc,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Derby Owners Club (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0016C */ GAME( 1999, derbyoc,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Derby Owners Club (JPN, USA, EXP, KOR, AUS Ver. C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0016C */ GAME( 1999, derbyocb, derbyoc,  naomi,    naomi,    naomi, ROT0, "Sega",            "Derby Owners Club (JPN, USA, EXP, KOR, AUS Ver. B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0017C */ GAME( 1999, otrigger, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "OutTrigger (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0018C */ GAME( 1999, sgtetris, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Sega Tetris", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0019C */ GAME( 1999, dybb99,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Dynamite Baseball '99 (JPN) / World Series '99 (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -4432,6 +4504,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0026C */ GAME( 2000, totd,     naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "The Typing of the Dead (JPN, USA, EXP, KOR, AUS)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0027C */ GAME( 2000, smarinef, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Sega Marine Fishing", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0030C */ GAME( 2000, qmegamis, naomi,    naomi,    naomi,    qmegamis, ROT0, "Sega",            "Quiz Ah Megamisama (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0035B */ GAME( 2000, sstrkfgt, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Sega Strike Fighter (rev. A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0037C */ GAME( 2000, 18wheelr, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "18 Wheeler (JPN)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0039C */ GAME( 2000, gram2000, naomi,    naomi,    naomi,    gram2000, ROT0, "Sega",            "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0040C */ GAME( 2000, wwfroyal, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "WWF Royal Rumble (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -4443,6 +4516,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0084C */ GAME( 2001, vtenis2c, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Power Smash 2 / Virtua Tennis 2 (cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0098C */ GAME( 2001, shootopl, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128C */ GAME( 2001, shootpl,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0140B */ GAME( 2004, kick4csh, naomi,    naomi,    naomi,    kick4csh, ROT0, "Sega",         "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* 841-xxxxx ("Licensed by Sega" games)*/
 /* 0001C */ GAME( 1999, pstone,   naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

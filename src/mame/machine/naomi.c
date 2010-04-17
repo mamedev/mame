@@ -252,3 +252,10 @@ DRIVER_INIT( vf4evoct )
 	DRIVER_INIT_CALL(naomi2);
 	actel_id = 0; //FIXME: correct value
 }
+
+DRIVER_INIT( kick4csh )
+{
+	DRIVER_INIT_CALL(naomi2);
+	actel_id = 0; //FIXME: correct value
+}
+
