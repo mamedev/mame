@@ -71,7 +71,7 @@
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="HALF">
+		<text string="BET/HALF">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>

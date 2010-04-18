@@ -9148,9 +9148,13 @@ Other Sun games
 	DRIVER( bottle10 )	/* (c) 1996 C.M.C. */
 	DRIVER( bottl10b )	/* (c) 1996 C.M.C. */
 	DRIVER( royalcrd )	/* (c) 1991 TAB-Austria */
-	DRIVER( royalcdb )	/* (c) 1991 TAB-Austria */
-	DRIVER( royalcdc )	/* (c) 1991 Evona Electronic */
-	DRIVER( royalcdp )	/* (c) 1993 Digital Dreams */
+	DRIVER( royalcrda )	/* (c) 1991 TAB-Austria */
+	DRIVER( royalcrdb )	/* (c) 1991 TAB-Austria */
+	DRIVER( royalcrdc )	/* (c) 1991 TAB-Austria */
+	DRIVER( royalcrdd )	/* (c) 1991 TAB-Austria */
+	DRIVER( royalcrde )	/* (c) 1991 TAB-Austria */
+	DRIVER( royalcrdf )	/* (c) 1991 Evona Electronic */
+	DRIVER( royalcrdp )	/* (c) 1993 Digital Dreams */
 	DRIVER( lluck3x3 )	/* (c) 1991 TAB-Austria */
 	DRIVER( lluck4x1 )	/* (c) 1991 TAB-Austria */
 	DRIVER( magicrd2 )	/* (c) 1996 Impera */

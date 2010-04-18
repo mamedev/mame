@@ -35,6 +35,10 @@
   * Bottle 10 (italian, set 2),                       C.M.C.,             1996.
   * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
   * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
+  * Royal Card (austrian/polish, set 3),              TAB-Austria,        1991.
+  * Royal Card (austrian, set 4),                     TAB-Austria,        1991.
+  * Royal Card (austrian, set 5),                     TAB-Austria,        1991.
+  * Royal Card (austrian, set 6),                     TAB-Austria,        1991.
   * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
   * Lucky Lady (3x3 deal),                            TAB-Austria,        1991.
