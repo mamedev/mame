@@ -23,8 +23,27 @@ static int vblc=0;
 
 /* PVR TA macro defines */
 /*
+SPG_HBLANK_INT
+---- --xx xxxx xxxx ---- ---- ---- ---- hblank_in_interrupt
+---- ---- ---- ---- --xx ---- ---- ---- hblank_int_mode
+---- ---- ---- ---- ---- --xx xxxx xxxx line_comp_val
+*/
+#define spg_hblank_in_irq   ((pvrta_regs[SPG_HBLANK_INT] & 0x03ff0000) >> 16)
+#define spg_hblank_int_mode ((pvrta_regs[SPG_HBLANK_INT] & 0x00003000) >> 12)
+#define spg_line_comp_val   ((pvrta_regs[SPG_HBLANK_INT] & 0x000003ff) >> 0)
+
+/*
+SPG_VBLANK_INT
+---- --xx xxxx xxxx ---- ---- ---- ---- vblank_out_interrupt_line_number
+---- ---- ---- ---- ---- --xx xxxx xxxx vblank_in_interrupt_line_number
+*/
+#define spg_vblank_out_irq_line_num ((pvrta_regs[SPG_VBLANK_INT] & 0x03ff0000) >> 16)
+#define spg_vblank_in_irq_line_num  ((pvrta_regs[SPG_VBLANK_INT] & 0x000003ff) >> 0)
+
+
+/*
 VO_BORDER_COL
----- ---x ---- ---- ---- ---- ---- ---- Chroma
+---- ---x ---- ---- ---- ---- ---- ---- Chroma ;suchie3 sets 0xff there, maybe it's 8 bits too?
 ---- ---- xxxx xxxx ---- ---- ---- ---- Red
 ---- ---- ---- ---- xxxx xxxx ---- ---- Green
 ---- ---- ---- ---- ---- ---- xxxx xxxx Blue
@@ -39,8 +58,8 @@ SPG_HBLANK
 ---- ---- --xx xxxx xxxx ---- ---- ---- vbend
 ---- ---- ---- ---- ---- --xx xxxx xxxx vbstart
 */
-#define pvrta_hbend    ((pvrta_regs[SPG_HBLANK] & 0x03ff0000) >> 16)
-#define pvrta_hbstart  ((pvrta_regs[SPG_HBLANK] & 0x000003ff) >> 0)
+#define spg_hbend    ((pvrta_regs[SPG_HBLANK] & 0x03ff0000) >> 16)
+#define spg_hbstart  ((pvrta_regs[SPG_HBLANK] & 0x000003ff) >> 0)
 
 
 /*
@@ -48,16 +67,16 @@ SPG_LOAD
 ---- ---- --xx xxxx xxxx ---- ---- ---- vcount
 ---- ---- ---- ---- ---- --xx xxxx xxxx hcount
 */
-#define pvrta_vcount   ((pvrta_regs[SPG_LOAD] & 0x03ff0000) >> 16)
-#define pvrta_hcount   ((pvrta_regs[SPG_LOAD] & 0x000003ff) >> 0)
+#define spg_vcount   ((pvrta_regs[SPG_LOAD] & 0x03ff0000) >> 16)
+#define spg_hcount   ((pvrta_regs[SPG_LOAD] & 0x000003ff) >> 0)
 
 /*
 SPG_VBLANK
 ---- ---- --xx xxxx xxxx ---- ---- ---- vbend
 ---- ---- ---- ---- ---- --xx xxxx xxxx vbstart
 */
-#define pvrta_vbend    ((pvrta_regs[SPG_VBLANK] & 0x03ff0000) >> 16)
-#define pvrta_vbstart  ((pvrta_regs[SPG_VBLANK] & 0x000003ff) >> 0)
+#define spg_vbend    ((pvrta_regs[SPG_VBLANK] & 0x03ff0000) >> 16)
+#define spg_vbstart  ((pvrta_regs[SPG_VBLANK] & 0x000003ff) >> 0)
 
 
 /*
@@ -70,19 +89,19 @@ VO_CONTROL
 ---- ---- ---- ---- ---- ---- ---- --x- vsync_pol
 ---- ---- ---- ---- ---- ---- ---- ---x hsync_pol
 */
-#define pvrta_pclk_delay   ((pvrta_regs[VO_CONTROL] & 0x003f0000) >> 16)
-#define pvrta_pixel_double ((pvrta_regs[VO_CONTROL] & 0x00000100) >> 8)
-#define pvrta_field_mode   ((pvrta_regs[VO_CONTROL] & 0x000000f0) >> 4)
-#define pvrta_blank_video  ((pvrta_regs[VO_CONTROL] & 0x00000008) >> 3)
-#define pvrta_blank_pol    ((pvrta_regs[VO_CONTROL] & 0x00000004) >> 2)
-#define pvrta_vsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000002) >> 1)
-#define pvrta_hsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000001) >> 0)
+#define spg_pclk_delay   ((pvrta_regs[VO_CONTROL] & 0x003f0000) >> 16)
+#define spg_pixel_double ((pvrta_regs[VO_CONTROL] & 0x00000100) >> 8)
+#define spg_field_mode   ((pvrta_regs[VO_CONTROL] & 0x000000f0) >> 4)
+#define spg_blank_video  ((pvrta_regs[VO_CONTROL] & 0x00000008) >> 3)
+#define spg_blank_pol    ((pvrta_regs[VO_CONTROL] & 0x00000004) >> 2)
+#define spg_vsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000002) >> 1)
+#define spg_hsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000001) >> 0)
 
 /*
 VO_STARTX
 ---- ---- ---- ---- ---- ---x xxxx xxxx horzontal start position
 */
-#define pvrta_horz_start_pos ((pvrta_regs[VO_STARTX] & 0x000003ff) >> 0)
+#define vo_horz_start_pos ((pvrta_regs[VO_STARTX] & 0x000003ff) >> 0)
 
 /*
 VO_STARTY
@@ -90,8 +109,8 @@ VO_STARTY
 ---- ---- ---- ---- ---- ---x xxxx xxxx vertical start position on field 1
 */
 
-#define pvrta_vert_start_pos_f2 ((pvrta_regs[VO_STARTY] & 0x03ff0000) >> 16)
-#define pvrta_vert_start_pos_f1 ((pvrta_regs[VO_STARTY] & 0x000003ff) >> 0)
+#define vo_vert_start_pos_f2 ((pvrta_regs[VO_STARTY] & 0x03ff0000) >> 16)
+#define vo_vert_start_pos_f1 ((pvrta_regs[VO_STARTY] & 0x000003ff) >> 0)
 
 
 
@@ -1069,14 +1088,14 @@ READ64_HANDLER( pvr_ta_r )
 			fieldnum = (video_screen_get_frame_number(space->machine->primary_screen) & 1) ? 1 : 0;
 
 			vsync = video_screen_get_vblank(space->machine->primary_screen) ? 1 : 0;
-			if(pvrta_vsync_pol) { vsync^=1; }
+			if(spg_vsync_pol) { vsync^=1; }
 
 			hsync = video_screen_get_hblank(space->machine->primary_screen) ? 1 : 0;
-			if(pvrta_hsync_pol) { hsync^=1; }
+			if(spg_hsync_pol) { hsync^=1; }
 
 			/* FIXME: following is just a wild guess */
 			blank = (video_screen_get_vblank(space->machine->primary_screen) | video_screen_get_hblank(space->machine->primary_screen)) ? 0 : 1;
-			if(pvrta_blank_pol) { blank^=1; }
+			if(spg_blank_pol) { blank^=1; }
 
 			pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (video_screen_get_vpos(space->machine->primary_screen) & 0x1ff);
 			break;
@@ -1334,11 +1353,11 @@ WRITE64_HANDLER( pvr_ta_w )
 			rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
 			/* FIXME: right visible area calculations aren't known yet*/
 			visarea.min_x = 0;
-			visarea.max_x = ((pvrta_hbstart - pvrta_hbend - pvrta_horz_start_pos) <= 0x180 ? 320 : 640) - 1;
+			visarea.max_x = ((spg_hbstart - spg_hbend - vo_horz_start_pos) <= 0x180 ? 320 : 640) - 1;
 			visarea.min_y = 0;
-			visarea.max_y = ((pvrta_vbstart - pvrta_vbend - pvrta_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
+			visarea.max_y = ((spg_vbstart - spg_vbend - vo_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
 
-			video_screen_configure(space->machine->primary_screen, pvrta_hbstart, pvrta_vbstart, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds );
+			video_screen_configure(space->machine->primary_screen, spg_hbstart, spg_vbstart, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds );
 		}
 		break;
 	}
@@ -2223,7 +2242,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-				if(pvrta_pixel_double)
+				if(spg_pixel_double)
 				{
 					for (x=0;x < xi;x++)
 					{
@@ -2267,7 +2286,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-				if(pvrta_pixel_double)
+				if(spg_pixel_double)
 				{
 					for (x=0;x < xi;x++)
 					{
@@ -2312,7 +2331,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-				if(pvrta_pixel_double)
+				if(spg_pixel_double)
 				{
 					for (x=0;x < xi;x++)
 					{
@@ -2356,7 +2375,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			for (y=0;y < dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
-				if(pvrta_pixel_double)
+				if(spg_pixel_double)
 				{
 					for (x=0;x < xi;x++)
 					{
@@ -2498,19 +2517,22 @@ static TIMER_CALLBACK(vbout)
 
 	scanline = 0;
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
-	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 640), 0);
+	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, spg_hblank_in_irq-1), 0);
 }
 
 static TIMER_CALLBACK(hbin)
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
-	dc_update_interrupt_status(machine);
+	if((scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2)) // FIXME: is there any real difference between modes 0 and 1?
+	{
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
+		dc_update_interrupt_status(machine);
+	}
 
 //  printf("hbin on scanline %d\n",scanline);
 
 	scanline++;
 
-	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 640), 0);
+	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, spg_hblank_in_irq-1), 0);
 }
 
 
@@ -2552,13 +2574,15 @@ VIDEO_START(dc)
 	pvrta_regs[PVRID]=0x17fd11db;
 	pvrta_regs[REVISION]=0x11;
 	/* FIXME: move the following regs inside MACHINE_RESET */
-	pvrta_regs[VO_CONTROL]=0x108;
-	pvrta_regs[SOFTRESET]=0x7;
-	pvrta_regs[VO_STARTX]=0x0000009d;
-	pvrta_regs[VO_STARTY]=0x00150015;
-	pvrta_regs[SPG_HBLANK]=0x007e0345;
-	pvrta_regs[SPG_LOAD]=0x01060359;
-	pvrta_regs[SPG_VBLANK]=01500104;
+	pvrta_regs[VO_CONTROL]=		0x00000108;
+	pvrta_regs[SOFTRESET]=		0x00000007;
+	pvrta_regs[VO_STARTX]=		0x0000009d;
+	pvrta_regs[VO_STARTY]=		0x00150015;
+	pvrta_regs[SPG_HBLANK]=		0x007e0345;
+	pvrta_regs[SPG_LOAD]=		0x01060359;
+	pvrta_regs[SPG_VBLANK]=		0x01500104;
+	pvrta_regs[SPG_HBLANK_INT]=	0x031d0000;
+	pvrta_regs[SPG_VBLANK_INT]=	0x01500104;
 
 	state_ta.tafifo_pos=0;
 	state_ta.tafifo_mask=7;
@@ -2628,7 +2652,7 @@ VIDEO_UPDATE(dc)
 
 	bitmap_fill(bitmap,cliprect,MAKE_ARGB(0xff,vo_border_R,vo_border_G,vo_border_B)); //FIXME: Chroma bit?
 
-	if(!pvrta_blank_video)
+	if(!spg_blank_video)
 		pvr_drawframebuffer(bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
