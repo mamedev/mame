@@ -257,7 +257,8 @@ static WRITE8_HANDLER( jsa1_io_w )
 			break;
 
 		case 0x200:		/* /VOICE */
-			tms5220_data_w(tms5220, 0, data);
+			if (tms5220 != NULL)
+				tms5220_data_w(tms5220, 0, data);
 			break;
 
 		case 0x202:		/* /WRP */
