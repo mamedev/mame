@@ -504,13 +504,13 @@ static VIDEO_UPDATE( mpu4_vid )
 		for(x = 0; x <= IR5_scn2674_character_per_row; x++)
 		{
 			UINT16 tiledat;
-			UINT16 colattr;
+			UINT16 attr;
 
 			tiledat = mpu4_vid_mainram[(rowbase+x)&0x7fff];
-			colattr = tiledat >>12;
-			tiledat &= 0x0fff;
+			attr = tiledat >>12;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfxregion],tiledat,colattr,0,0,x*8,y*8);
+			if (attr)
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfxregion],tiledat,0,0,0,x*8,y*8);
 
 			//count++;
 		}
