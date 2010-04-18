@@ -1,6 +1,5 @@
 /**********************************************************************************
 
-
   FUNWORLD / TAB.
   Video Hardware.
 
@@ -58,6 +57,40 @@
   * Fun World Quiz (austrian),                        Funworld,           198?.
 
 
+***********************************************************************************
+
+  TAB/Impera/FunWorld color system circuitry
+  ------------------------------------------
+
+  74HC174 - Hex D-type flip-flops with reset; positive-edge trigger.
+  N82S147 - 4K-bit TTL Bipolar PROM.
+  74LS374 - 3-STATE Octal D-Type transparent latches and edge-triggered flip-flops.
+
+                   N82S147         74LS374       RESNET        PULL-DOWN
+   74HC174        .-------.       .-------.
+  .-------.   (1)-|01   20|--VCC--|20   02|------[(1K)]---+              .-----.
+  |       |   (1)-|02   06|-------|03   05|------[(470)]--+--+-----------| RED |
+  |16: VCC|   (1)-|03   07|-------|04   06|------[(220)]--+  |           '-----'
+  |       |   (1)-|04   08|-------|07     |                  '--[(100)]--GND
+  |     02|-------|05   09|-------|08   09|------[(1K)]---+              .------.
+  |     05|-------|16   11|-------|13   12|------[(470)]--+--+-----------| BLUE |
+  |     07|-------|17   12|-------|14   15|------[(220)]--+  |           '------'
+  |     10|-------|18   13|-------|17     |                  '--[(100)]--GND
+  |     12|-------|19   14|-------|18   16|------[(470)]--+              .-------.
+  |     13|---+---|15   10|---+---|10   19|------[(220)]--+--+-----------| GREEN |
+  |15 08  |   |   |       |   |   |   01  |                  |           '-------'
+  '-+--+--'   |   '-------'   |   '----+--'                  '--[(100)]--GND
+    |  |      |               |        |
+    |  '------+------GND------'        |
+    '----------------------------------'
+
+  (1): Connected either to:
+       - A custom 40-pin GFX IC
+       - 2x HYxxx devices (TAB blue PCB).
+       - A little board with 4x 74LS138 or 74LS137 (Impera green PCB).
+ 
+  NOTE: The 74LS374 could be replaced by a 74HCT373.
+
 ***********************************************************************************/
 
 
@@ -68,23 +101,6 @@ static tilemap_t *bg_tilemap;
 UINT8 *funworld_colorram;
 UINT8 *funworld_videoram;
 
-
-/***** RESISTORS *****
-
-            74LS373
-           +-------+
-  bit 0 -->|03   02|--> 1  KOhms resistor --> \
-  bit 1 -->|04   05|--> 470 Ohms resistor -->  | 100 Ohms pulldown resistor --> RED
-  bit 2 -->|07   06|--> 220 Ohms resistor --> /
-  bit 3 -->|08   09|--> 1  KOhms resistor --> \
-  bit 4 -->|13   12|--> 470 Ohms resistor -->  | 100 Ohms pulldown resistor --> BLUE
-  bit 5 -->|14   15|--> 220 Ohms resistor --> /
-  bit 6 -->|17   16|--> 470 Ohms resistor --> \  100 Ohms pulldown resistor --> GREEN
-  bit 7 -->|18   19|--> 220 Ohms resistor --> /
-           +-------+
-  (G pulldown is silk labeled 220 Ohms, but a 100 Ohms resistor is there)
-
-*/
 
 PALETTE_INIT(funworld)
 {
