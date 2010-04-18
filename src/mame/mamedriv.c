@@ -9244,7 +9244,8 @@ Other Sun games
 	DRIVER( victor5 )	/* (c) 1990 Subsino */
 	DRIVER( victor21 )	/* (c) 1990 Subsino */
 	DRIVER( crsbingo )	/* (c) 1991 Subsino */
-	DRIVER( tisub )		/* (c) 1991 Subsino */
+	DRIVER( tisub )		/* (c) 1992 Subsino */
+	DRIVER( tisuba )	/* (c) 1992 Subsino */
 	DRIVER( sharkpy )	/* (c) 1996 Subsino */
 	DRIVER( sharkpya )	/* (c) 1996 Subsino */
 	DRIVER( sharkpye )	/* (c) 1996 Subsino */

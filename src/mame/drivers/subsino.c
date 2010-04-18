@@ -6,7 +6,12 @@
    Additional work by   David Haywood, Angelo Salese and Roberto Fresca.
 
 
-  CPU:    Z180 (in a black box)
+  CPU: Black epoxy box containing:
+       1x CXK58257M (32768 x 8-Bit) High Speed CMOS SRAM.
+       1x HD647180X0P6, HD643180X0P6 or HD641180X0P6 Z180-CPU.
+       1x X-TAL (unknown frequency).
+       1x Battery.
+
   GFX:    1 Tilemap (8x8 tiles, no scrolling)
   CUSTOM: 2 x SUBSINO SS9100, SUBSINO SS9101
   SOUND:  M6295, YM2413 or YM3812
@@ -1605,6 +1610,7 @@ static GFXDECODE_START( subsino_depth4_reels )
 	GFXDECODE_ENTRY( "reels", 0, layout_8x32x4, 0, 16 )
 GFXDECODE_END
 
+
 /***************************************************************************
 *                             Machine Drivers                              *
 ***************************************************************************/
@@ -1896,6 +1902,46 @@ ROM_START( tisub )
 	ROM_LOAD( "n82s129n.u41", 0x200, 0x100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
 ROM_END
 
+/*
+
+  Treasure Island (Alt version)...
+
+  ROMs 4 & 5 are missing. ROMs 6 & 7 are identical to parent set.
+  So... Assuming that 4 & 5 should have the same bitplanes.
+
+  ROM 3 is bad, but ROM 2 only has the first byte different,
+  getting different values in each dump. The rest remains identical.
+
+  Program ROM is different.
+
+  Color PROMs are from this set.
+
+*/
+
+ROM_START( tisuba )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "01.bin", 0x10000, 0x4000,  CRC(9967dd38) SHA1(63b74bc0c0952114b7321e8f399bd64dc293aade) )
+	ROM_CONTINUE(0x0000,0xc000)
+	ROM_COPY( "maincpu", 0x09000, 0x14000, 0x1000)
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "rom_6.bin", 0x00000, 0x10000, CRC(c2c226df) SHA1(39762b390d6b271c3252342e843a181dd152a0cc) )
+	ROM_LOAD( "rom_4.bin", 0x10000, 0x10000, CRC(37724fda) SHA1(084653662c9f77afef2a77c607e1fb093aaf3adf) )
+	ROM_LOAD( "rom_5.bin", 0x20000, 0x10000, CRC(3d18acd8) SHA1(179545c18ad880097366c07c8e2fa821701a2758) )
+	ROM_LOAD( "rom_7.bin", 0x30000, 0x10000, CRC(9d7d99d8) SHA1(a3df5e023c2102028a5186101dc0b19d91e8965e) )
+
+	ROM_REGION( 0x8000, "reels", 0 )
+	ROM_LOAD( "rom_2.bin", 0x0000, 0x4000, CRC(836c756d) SHA1(fca1d5b600861eea30ed73ee13be735e7d167097) )
+	ROM_IGNORE(0x4000)
+	ROM_LOAD( "rom_3.bin", 0x4000, 0x4000, CRC(2ad82222) SHA1(68780b9528393b28eaa2f90501efb5a8c39bed63) )
+	ROM_IGNORE(0x4000)
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "n82s129n.u39", 0x000, 0x100, CRC(971843e5) SHA1(4cb5fc1085503dae2f2f02eb49cca051ac84b890) )
+	ROM_LOAD( "n82s129n.u40", 0x100, 0x100, CRC(b4bd872c) SHA1(c0f9fe68186636d6d6bc6f81415459631cf38edd) )
+	ROM_LOAD( "n82s129n.u41", 0x200, 0x100, CRC(db99f6da) SHA1(d281a2fa06f1890ef0b1c4d099e6828827db14fd) )
+ROM_END
+
 /***************************************************************************
 
 Cross Bingo
@@ -2090,13 +2136,13 @@ ROM_START( sharkpye )
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
 	ROM_LOAD( "sharkpye.u16", 0x00000, 0x08000, CRC(90862185) SHA1(9d632bfa707d3449a87d7f370eb2b5c36e61aadd) )
-	ROM_CONTINUE(              0x10000, 0x08000 )
-	ROM_CONTINUE(              0x08000, 0x08000 )
-	ROM_CONTINUE(              0x18000, 0x08000 )
+	ROM_CONTINUE(             0x10000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_CONTINUE(             0x18000, 0x08000 )
 	ROM_LOAD( "sharkpye.u17", 0x20000, 0x08000, CRC(b7b6119a) SHA1(b61c77d2170d96fcb39ea31c4136387441b9037f) )
-	ROM_CONTINUE(              0x30000, 0x08000 )
-	ROM_CONTINUE(              0x28000, 0x08000 )
-	ROM_CONTINUE(              0x38000, 0x08000 )
+	ROM_CONTINUE(             0x30000, 0x08000 )
+	ROM_CONTINUE(             0x28000, 0x08000 )
+	ROM_CONTINUE(             0x38000, 0x08000 )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sharkpye.u54", 0x00000, 0x20000, CRC(9f384c59) SHA1(d2b087b8370b40b6f0944de661ea6aebaebea06f) )
@@ -2384,18 +2430,34 @@ static DRIVER_INIT( tisub )
 	rom[0x64cf] = 0x00;
 }
 
+static DRIVER_INIT( tisuba )
+{
+	UINT8 *rom = memory_region( machine, "maincpu" );
+
+	DRIVER_INIT_CALL(victor5);
+
+	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
+	rom[0x6491] = 0x00;
+	rom[0x6492] = 0x00;
+	rom[0x6493] = 0x00;
+	rom[0x6496] = 0x00;
+	rom[0x6497] = 0x00;
+	rom[0x6498] = 0x00;
+}
+
 
 /***************************************************************************
 *                               Game Drivers                               *
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                    FLAGS              LAYOUT      */
-GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0,                 layout_victor21 )
-GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "G.E.A.",                  0,                 layout_victor5 ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
-GAMEL( 1991, tisub,    0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino)", 0, layout_tisub )
-GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0,                 layout_crsbingo )
-GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0,                 layout_sharkpy ) // missing POST messages?
-GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0,                 layout_sharkpy ) // missing POST messages?
-GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpy,  sharkpye,  ROT0, "Alpha",           "Shark Party (English, Alpha license)", 0,                     layout_sharkpy ) // PCB black-box was marked 'victor 6'
-GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)", 0,                 layout_smoto )
-GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",  0,                 layout_smoto )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                               FLAGS   LAYOUT      */
+GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                            0,      layout_victor21 )
+GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "G.E.A.",                               0,      layout_victor5 ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
+GAMEL( 1992, tisub,    0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",     0,      layout_tisub )
+GAMEL( 1992, tisuba,   tisub,    tisub,    tisub,    tisuba,   ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",     0,      layout_tisub )
+GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",                       0,      layout_crsbingo )
+GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,      layout_sharkpy ) // missing POST messages?
+GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,      layout_sharkpy ) // missing POST messages?
+GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpy,  sharkpye, ROT0, "Alpha",           "Shark Party (English, Alpha license)", 0,      layout_sharkpy ) // PCB black-box was marked 'victor 6'
+GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,      layout_smoto )
+GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,      layout_smoto )
