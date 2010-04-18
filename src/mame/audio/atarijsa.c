@@ -28,6 +28,13 @@ Effects                                   2C00-2C0F   R/W  D0-D7
 Banked Program ROM (4 pages)              3000-3FFF   R    D0-D7
 Static Program ROM (48K bytes)            4000-FFFF   R    D0-D7
 
+TODO:
+JSA-i: stereo gating for POKEY/TMS5220C is currently only mono, only looking at ym2151_ct1;
+  the two commented-out lines would be correct if stereo volume-set functions were written.
+ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in the output
+  path for all channels is currently unimplemented; someone who knows analog magic will need
+  to handle this.
+  
 ****************************************************************************/
 
 #include "emu.h"
@@ -61,6 +68,8 @@ static UINT8 pokey_volume;
 static UINT8 ym2151_volume;
 static UINT8 tms5220_volume;
 static UINT8 oki6295_volume;
+static UINT8 ym2151_ct1;
+static UINT8 ym2151_ct2;
 
 static void update_all_volumes(running_machine *machine);
 
@@ -177,6 +186,8 @@ void atarijsa_reset(void)
 	ym2151_volume = 100;
 	tms5220_volume = 100;
 	oki6295_volume = 100;
+	ym2151_ct1 = 0;
+	ym2151_ct2 = 0;
 
 	/* Guardians of the Hood assumes we're reset to bank 0 on startup */
 	memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
@@ -705,6 +716,12 @@ static WRITE8_HANDLER( jsa3s_io_w )
 	}
 }
 
+static WRITE8_DEVICE_HANDLER( ym2151_ctl_w )
+{
+	ym2151_ct1 = data&0x1;
+	ym2151_ct2 = (data&0x2)>>1;
+	update_all_volumes(device->machine);
+}
 
 
 /*************************************
@@ -715,9 +732,11 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 static void update_all_volumes(running_machine *machine )
 {
-	if (pokey != NULL) atarigen_set_pokey_vol(machine, overall_volume * pokey_volume / 100);
+	if (pokey != NULL) atarigen_set_pokey_vol(machine, (overall_volume * pokey_volume / 100) * ym2151_ct1);
+	//if (pokey != NULL) atarigen_set_pokey_stereo_vol(machine, (overall_volume * pokey_volume / 100) * ym2151_ct1, (overall_volume * pokey_volume / 100) * ym2151_ct2);
 	if (ym2151 != NULL) atarigen_set_ym2151_vol(machine, overall_volume * ym2151_volume / 100);
-	if (tms5220 != NULL) atarigen_set_tms5220_vol(machine, overall_volume * tms5220_volume / 100);
+	if (tms5220 != NULL) atarigen_set_tms5220_vol(machine, (overall_volume * tms5220_volume / 100) * ym2151_ct1);
+	//if (tms5220 != NULL) atarigen_set_tms5220_stereo_vol(machine, (overall_volume * tms5220_volume / 100) * ym2151_ct1, (overall_volume * tms5220_volume / 100) * ym2151_ct2);
 	if (oki6295 != NULL || oki6295_l != NULL || oki6295_r != NULL) atarigen_set_oki6295_vol(machine, overall_volume * oki6295_volume / 100);
 }
 
@@ -771,7 +790,8 @@ ADDRESS_MAP_END
 
 static const ym2151_interface ym2151_config =
 {
-	atarigen_ym2151_irq_gen
+	atarigen_ym2151_irq_gen,
+	ym2151_ctl_w
 };
 
 
