@@ -1063,8 +1063,24 @@ READ64_HANDLER( pvr_ta_r )
 	switch (reg)
 	{
 	case SPG_STATUS:
-		pvrta_regs[reg] = (video_screen_get_vblank(space->machine->primary_screen) << 13) | (video_screen_get_hblank(space->machine->primary_screen) << 12) | (video_screen_get_vpos(space->machine->primary_screen) & 0x3ff);
-		break;
+		{
+			UINT8 fieldnum,vsync,hsync,blank;
+
+			fieldnum = (video_screen_get_frame_number(space->machine->primary_screen) & 1) ? 1 : 0;
+
+			vsync = video_screen_get_vblank(space->machine->primary_screen) ? 1 : 0;
+			if(pvrta_vsync_pol) { vsync^=1; }
+
+			hsync = video_screen_get_hblank(space->machine->primary_screen) ? 1 : 0;
+			if(pvrta_hsync_pol) { hsync^=1; }
+
+			/* FIXME: following is just a wild guess */
+			blank = (video_screen_get_vblank(space->machine->primary_screen) | video_screen_get_hblank(space->machine->primary_screen)) ? 0 : 1;
+			if(pvrta_blank_pol) { blank^=1; }
+
+			pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (video_screen_get_vpos(space->machine->primary_screen) & 0x1ff);
+			break;
+		}
 	case SPG_TRIGGER_POS:
 		printf("Warning: read at h/v counter ext latches\n");
 		break;
