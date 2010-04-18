@@ -163,28 +163,6 @@ device), PES Speech adapter (serial port connection)
 #include "tms5220.h"
 
 /* *****optional defines***** */
-/* transitions:
-	Setting 1 (the new way, which I believe is how the real chip works, leave #undef):
-	unvoiced/voiced is determined by the old pitch (i.e. capitalized frames are using the opposite noise source to what their name is)
-	on a voiced->unvoiced or unvoiced->voiced transition:
-	voiced>7|voiced>4|NOISED>6|noised>9
-	01234567|77665544|44444444|66778899
-	and likewise:
-	noised>7|noised>4|VOICED>6|voiced>9
-	01234567|77665544|44444444|66778899
-	i.e. on a transition boundary, hold params steady for one full frame before using new one
-	
-	Setting 2 (the old way, #define as 1)
-	unvoiced/voiced is determined by the current/new pitch
-	on a voiced->unvoiced or unvoiced->voiced transition:
-	voiced>7|voiced>4|noised>6|noised>9
-	01234567|77665544|66666666|66778899
-	and likewise:
-	noised>7|noised>4|voiced>6|voiced>9
-	01234567|77665544|66666666|66778899
-	i.e. on a transition boundary, hold the NEW params steady for one full frame
-*/
-#undef USE_OLD_UV_TRANSITIONS
 
 /* this ignores pitch, and uses a sawtooth wave for the voiced and unvoiced waveforms as a test, if not set */
 #define NORMALMODE 1
@@ -271,13 +249,19 @@ struct _tms5220_state
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
-	UINT16 old_energy;
-	UINT16 old_pitch;
-	INT32 old_k[10];
+#define OLD_FRAME_STOP_FLAG (tms->old_frame_energy == COEFF_ENERGY_SENTINEL) // 1 if this was a stop (E = 0xF) frame
+#define OLD_FRAME_SILENCE_FLAG (tms->old_frame_energy == 0) // 1 if this was a silence (E=0) frame
+#define OLD_FRAME_UNVOICED_FLAG (tms->old_frame_pitch == 0) // 1 if unvoiced, 0 if voiced
+	UINT16 old_frame_energy;
+	UINT16 old_frame_pitch;
+	INT32 old_frame_k[10];
 
-	UINT16 new_energy;
-	UINT16 new_pitch;
-	INT32 new_k[10];
+#define NEW_FRAME_STOP_FLAG (tms->new_frame_energy == COEFF_ENERGY_SENTINEL)  // ditto as above
+#define NEW_FRAME_SILENCE_FLAG (tms->new_frame_energy == 0) // ditto as above
+#define NEW_FRAME_UNVOICED_FLAG (tms->new_frame_pitch == 0) // ditto as above
+	UINT16 new_frame_energy;
+	UINT16 new_frame_pitch;
+	INT32 new_frame_k[10];
 
 
 	/* these are all used to contain the current state of the sound generation */
@@ -291,7 +275,6 @@ struct _tms5220_state
 
 	UINT16 previous_energy;         /* needed for lattice filter to match patent */
 
-	//UINT8 inhibit_interp;	/* TODO: equivalent to INHIBIT line on patent; when 1, the interpolation is disabled for this frame until the last count, when IP is 0 */
 	//UINT8 interp_period; /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
 	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
 	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
@@ -360,7 +343,7 @@ INLINE tms5220_state *get_safe_token(running_device *device)
 /* Static function prototypes */
 static void process_command(tms5220_state *tms, unsigned char data);
 static void parse_frame(tms5220_state *tms);
-static void update_flags_and_ints(tms5220_state *tms);
+static void update_status_and_ints(tms5220_state *tms);
 static void set_interrupt_state(tms5220_state *tms, int state);
 static INT16 lattice_filter(tms5220_state *tms);
 static INT16 clip_and_wrap(INT16 cliptemp);
@@ -402,13 +385,13 @@ static void register_for_save_states(tms5220_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->buffer_empty);
 	state_save_register_device_item(tms->device, 0, tms->irq_pin);
 
-	state_save_register_device_item(tms->device, 0, tms->old_energy);
-	state_save_register_device_item(tms->device, 0, tms->old_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->old_k);
+	state_save_register_device_item(tms->device, 0, tms->old_frame_energy);
+	state_save_register_device_item(tms->device, 0, tms->old_frame_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->old_frame_k);
 
-	state_save_register_device_item(tms->device, 0, tms->new_energy);
-	state_save_register_device_item(tms->device, 0, tms->new_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->new_k);
+	state_save_register_device_item(tms->device, 0, tms->new_frame_energy);
+	state_save_register_device_item(tms->device, 0, tms->new_frame_pitch);
+	state_save_register_device_item_array(tms->device, 0, tms->new_frame_k);
 
 	state_save_register_device_item(tms->device, 0, tms->current_energy);
 	state_save_register_device_item(tms->device, 0, tms->current_pitch);
@@ -471,7 +454,7 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 #endif
 		}
 
-		update_flags_and_ints(tms);
+		update_status_and_ints(tms);
 	}
 	else //(! tms->speak_external)
 		/* R Nabet : we parse commands at once.  It is necessary for such commands as read. */
@@ -480,11 +463,11 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 
 /**********************************************************************************************
 
-     update_flags_and_ints -- check to see if the buffer low flag should be on or off
+     update_status_and_ints -- check to see if the buffer low flag should be on or off
 
 ***********************************************************************************************/
 
-static void update_flags_and_ints(tms5220_state *tms)
+static void update_status_and_ints(tms5220_state *tms)
 {
 	/* update flags and set ints if needed */
 	/* BL is set if neither byte 9 nor 8 of the fifo are in use; this
@@ -549,7 +532,7 @@ static int extract_bits(tms5220_state *tms, int count)
 				tms->fifo[tms->fifo_head] = 0; // zero the newly depleted fifo head byte
 				tms->fifo_head = (tms->fifo_head + 1) % FIFO_SIZE;
 				tms->fifo_bits_taken = 0;
-				update_flags_and_ints(tms);
+				update_status_and_ints(tms);
 			}
 		}
 	}
@@ -705,10 +688,10 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
            goto empty;
 
 		/* we now have enough bytes; clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
-		tms->new_energy = 0;
-		tms->new_pitch = 0;
+		tms->new_frame_energy = 0;
+		tms->new_frame_pitch = 0;
 		for (i = 0; i < tms->coeff->num_k; i++)
-			tms->new_k[i] = 0;
+			tms->new_frame_k[i] = 0;
 		   
         tms->talk_status = 1;
 	}
@@ -721,119 +704,86 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
         if ((tms->interp_count == 0) && (tms->sample_count == 0))
         {
 
-			/* remember previous frame */
-			//if ((tms->current_pitch != tms->new_pitch) && !((tms->old_pitch == 0) || (tms->new_pitch == 0))) fprintf(stderr, "interpolation didn't work properly?\n");
-			tms->old_energy = tms->new_energy;
-			tms->old_pitch = tms->new_pitch;
+			/* remember previous frame energy, pitch, and coefficients */
+			tms->old_frame_energy = tms->new_frame_energy;
+			tms->old_frame_pitch = tms->new_frame_pitch;
 			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->old_k[i] = tms->new_k[i];
-
+				tms->old_frame_k[i] = tms->new_frame_k[i];
 
 			/* if the old frame was a stop frame, exit and do not process any more frames */
-			if (tms->old_energy == COEFF_ENERGY_SENTINEL)
+			if (OLD_FRAME_STOP_FLAG)
 			{
 #ifdef DEBUG_GENERATION
 				logerror("tms5220_process: processing frame: stop frame\n");
 #endif
 				tms->speaking_now = tms->talk_status = tms->speak_external = 0;
 				set_interrupt_state(tms, 1); // TS went inactive, so int is raised
-				tms->sample_count = reload_table[tms->tms5220c_rate&0x3]; // = 0;
-				update_flags_and_ints(tms);
+				tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
+				update_status_and_ints(tms);
 				goto empty;
 			}
 
 
-			/* Parse a new frame into the new_energy, new_pitch and new_k[] */
+			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame(tms);
 
 
-			/* Set old target as new start of frame */
-			tms->current_energy = tms->old_energy;
-			tms->current_pitch = tms->old_pitch;
-
+			/* Set old frame targets as starting point of new frame */
+			tms->current_energy = tms->old_frame_energy;
+			tms->current_pitch = tms->old_frame_pitch;
 			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->current_k[i] = tms->old_k[i];
+				tms->current_k[i] = tms->old_frame_k[i];
 
 
-			/* is this the stop (ramp down) frame? */
-			if (tms->new_energy == COEFF_ENERGY_SENTINEL)
+			/* in all cases where interpolation would be inhibited, set the target
+			   value equal to the current value.
+			   Interpolation inhibit cases:
+			   * Old frame was voiced, new is unvoiced
+			   * Old frame was silence/zero energy, new is unvoiced
+			   * Old frame was unvoiced, new is voiced
+			   * New frame is a silence/zero energy frame - ? not sure
+			   * New frame is a stop frame - ? not sure
+			*/
+			if ( ((NEW_FRAME_SILENCE_FLAG == 0) && (NEW_FRAME_STOP_FLAG == 0))
+			&& ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
+				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 1))
+				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0)) )
+				)
 			{
 #ifdef DEBUG_GENERATION
-				logerror("processing frame: ramp down\n");
+				logerror("processing frame: interpolation inhibited\n");
+				logerror("*** current Energy = %d\n",tms->current_energy);
+				logerror("*** next frame Energy = %d\n",tms->new_frame_energy);
+#endif
+				tms->target_energy = tms->current_energy;
+				tms->target_pitch = tms->current_pitch;
+				for (i = 0; i < tms->coeff->num_k; i++)
+					tms->target_k[i] = tms->current_k[i];
+			}
+			/* in cases where the new frame is a STOP or SILENCE frame,
+			   ramp the energy down to 0, leaving everything else alone. */
+			else if ((NEW_FRAME_SILENCE_FLAG == 1) || (NEW_FRAME_STOP_FLAG == 1))
+			{
+#ifdef DEBUG_GENERATION
+				logerror("processing frame: ramp-down (energy = 0 or STOP)\n";
 #endif
 				tms->target_energy = 0;
-				tms->target_pitch = tms->old_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->old_k[i];
-			}
-			else if ((tms->old_energy == 0) && (tms->new_energy != 0)) /* was the old frame a zero-energy frame? */
-			{
-				/* if so, and if the new frame is non-zero energy frame then the new parameters
-                   should become our current and target parameters immediately,
-                   i.e. we should NOT interpolate them slowly in.
-                */
-#ifdef DEBUG_GENERATION
-				logerror("processing non-zero energy frame after zero-energy frame\n");
-#endif
-				tms->target_energy = tms->new_energy;
-				tms->target_pitch = tms->current_pitch = tms->new_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i] = tms->new_k[i];
-			}
-			else if ((tms->old_pitch == 0) && (tms->new_pitch != 0))	/* is this a change from unvoiced to voiced frame ? */
-			{
-				/* if so, then the new parameters should become our current and target parameters immediately,
-                   i.e. we should NOT interpolate them slowly in.
-                */
-#ifdef DEBUG_GENERATION
-				logerror("processing frame: UNVOICED->VOICED frame change\n");
-#endif
-#ifdef USE_OLD_UV_TRANSITIONS
-				tms->target_energy = tms->new_energy;
-				tms->target_pitch = tms->current_pitch = tms->new_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i] = tms->new_k[i];
-#else
-				// instead of above, make the previous frame hold steady, unvoiced, for an extra frame before the new voiced frame starts. The patent implies this is correct.
-				tms->target_energy = tms->current_energy;
 				tms->target_pitch = tms->current_pitch;
 				for (i = 0; i < tms->coeff->num_k; i++)
 					tms->target_k[i] = tms->current_k[i];
-#endif
 			}
-			else if ((tms->old_pitch != 0) && (tms->new_pitch == 0))	/* is this a change from voiced to unvoiced frame ? */
-			{
-				/* if so, then the new parameters should become our current and target parameters immediately,
-                   i.e. we should NOT interpolate them slowly in.
-                */
-#ifdef DEBUG_GENERATION
-				logerror("processing frame: VOICED->UNVOICED frame change\n");
-#endif
-#ifdef USE_OLD_UV_TRANSITIONS
-				tms->target_energy = tms->new_energy;
-				tms->target_pitch = tms->current_pitch = tms->new_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i] = tms->new_k[i];
-#else
-				// instead of above, make the previous frame hold steady, voiced, for an extra frame before the new unvoiced frame starts. The patent implies this is correct.
-				tms->target_energy = tms->current_energy;
-				tms->target_pitch = tms->current_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i];
-#endif
-			}
-			else // normal frame
+			else // normal frame, normal interpolation
 			{
 #ifdef DEBUG_GENERATION
 				logerror("processing frame: Normal\n");
 				logerror("*** current Energy = %d\n",tms->current_energy);
-				logerror("*** new (target) Energy = %d\n",tms->new_energy);
+				logerror("*** new (target) Energy = %d\n",tms->new_frame_energy);
 #endif
 
-				tms->target_energy = tms->new_energy;
-				tms->target_pitch = tms->new_pitch;
+				tms->target_energy = tms->new_frame_energy;
+				tms->target_pitch = tms->new_frame_pitch;
 				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->new_k[i];
+					tms->target_k[i] = tms->new_frame_k[i];
 			}
 		}
 		else // Not a new frame, just interpolate the existing frame.
@@ -912,14 +862,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
         }
 
         /* calculate the output */
-
-#ifdef USE_OLD_UV_TRANSITIONS
-		if (tms->new_pitch == 0)
-#else
-		if (tms->old_pitch == 0) 
-#endif
-        {
-            /* generate unvoiced samples here */
+		if (OLD_FRAME_UNVOICED_FLAG == 1) 
+		{
+			/* generate unvoiced samples here */
 			if (tms->RNG & 1)
 				tms->excitation_data = -0x40; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so +-64 */
 			else
@@ -1182,7 +1127,7 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
     }
 
     /* update the buffer low state */
-    update_flags_and_ints(tms);
+    update_status_and_ints(tms);
 }
 
 /******************************************************************************************
@@ -1225,7 +1170,7 @@ static void parse_frame(tms5220_state *tms)
 	bits -= tms->coeff->energy_bits;
 	if (bits < 0) goto ranout;
 	indx = extract_bits(tms,tms->coeff->energy_bits);
-	tms->new_energy = tms->coeff->energytable[indx];
+	tms->new_frame_energy = tms->coeff->energytable[indx];
 #ifdef DEBUG_FRAME_DUMP
 	ene = indx;
 #endif
@@ -1235,7 +1180,7 @@ static void parse_frame(tms5220_state *tms)
 	if ((indx == 0) || (indx == 15))
 	{
 #ifdef DEBUG_FRAME_INFO
-		logerror("  (4-bit energy=%d frame)\n",tms->new_energy);
+		logerror("  (4-bit energy=%d frame)\n",tms->new_frame_energy);
 #endif
 		return;
 	}
@@ -1249,7 +1194,7 @@ static void parse_frame(tms5220_state *tms)
 	bits -= tms->coeff->pitch_bits;
 	if (bits < 0) goto ranout;
 	indx = extract_bits(tms,tms->coeff->pitch_bits);
-	tms->new_pitch = tms->coeff->pitchtable[indx];
+	tms->new_frame_pitch = tms->coeff->pitchtable[indx];
 
 	/* if this is a repeat frame, just copy the k's */
 	if (rep_flag)
@@ -1257,7 +1202,7 @@ static void parse_frame(tms5220_state *tms)
 	//actually, we do nothing because the k's were already loaded (on parsing the previous frame)
 
 #ifdef DEBUG_FRAME_INFO
-		logerror("  (10-bit energy=%d pitch=%d rep=%d frame)\n", tms->new_energy, tms->new_pitch, rep_flag);
+		logerror("  (10-bit energy=%d pitch=%d rep=%d frame)\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
 #endif
 		return;
 	}
@@ -1270,13 +1215,13 @@ static void parse_frame(tms5220_state *tms)
 		bits -= 18;
 		if (bits < 0) goto ranout;
 		for (i = 0; i < 4; i++)
-			tms->new_k[i] = tms->coeff->ktable[i][extract_bits(tms,tms->coeff->kbits[i])];
+			tms->new_frame_k[i] = tms->coeff->ktable[i][extract_bits(tms,tms->coeff->kbits[i])];
 
-	/* and clear the rest of the new_k[] */
+	/* and clear the rest of the new_frame_k[] */
 		for (i = 4; i < tms->coeff->num_k; i++)
-			tms->new_k[i] = 0;
+			tms->new_frame_k[i] = 0;
 #ifdef DEBUG_FRAME_INFO
-		logerror("  (29-bit energy=%d pitch=%d rep=%d 4K frame)\n", tms->new_energy, tms->new_pitch, rep_flag);
+		logerror("  (29-bit energy=%d pitch=%d rep=%d 4K frame)\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
 #endif
 		return;
 	}
@@ -1290,7 +1235,7 @@ static void parse_frame(tms5220_state *tms)
 	{
 		int x;
 		x = extract_bits(tms, tms->coeff->kbits[i]);
-		tms->new_k[i] = tms->coeff->ktable[i][x];
+		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
 		logerror("%02d ", x);
 	}
 	logerror("\n");
@@ -1299,11 +1244,11 @@ static void parse_frame(tms5220_state *tms)
 	{
 		int x;
 		x = extract_bits(tms, tms->coeff->kbits[i]);
-		tms->new_k[i] = tms->coeff->ktable[i][x];
+		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
 	}
 #endif
 #ifdef DEBUG_FRAME_INFO
-	logerror("  (50-bit energy=%d pitch=%d rep=%d 10K frame))\n", tms->new_energy, tms->new_pitch, rep_flag);
+	logerror("  (50-bit energy=%d pitch=%d rep=%d 10K frame))\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
 	if (tms->speak_external)
 		logerror("Parsed a frame successfully in FIFO - %d bits remaining\n", bits);
 	else
@@ -1431,10 +1376,10 @@ static DEVICE_RESET( tms5220 )
 	tms->RDB_flag = FALSE;
 
 	/* initialize the energy/pitch/k states */
-	tms->old_energy = tms->new_energy = tms->current_energy = tms->target_energy = 0;
-	tms->old_pitch = tms->new_pitch = tms->current_pitch = tms->target_pitch = 0;
-	memset(tms->old_k, 0, sizeof(tms->old_k));
-	memset(tms->new_k, 0, sizeof(tms->new_k));
+	tms->old_frame_energy = tms->new_frame_energy = tms->current_energy = tms->target_energy = 0;
+	tms->old_frame_pitch = tms->new_frame_pitch = tms->current_pitch = tms->target_pitch = 0;
+	memset(tms->old_frame_k, 0, sizeof(tms->old_frame_k));
+	memset(tms->new_frame_k, 0, sizeof(tms->new_frame_k));
 	memset(tms->current_k, 0, sizeof(tms->current_k));
 	memset(tms->target_k, 0, sizeof(tms->target_k));
 
