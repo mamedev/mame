@@ -137,7 +137,7 @@ static emu_timer *endofrender_timer_isp;
 static emu_timer *endofrender_timer_tsp;
 static emu_timer *endofrender_timer_video;
 
-static int scanline;
+static int scanline,next_y;
 
 // the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
 //  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
@@ -2516,13 +2516,23 @@ static TIMER_CALLBACK(vbout)
 	dc_update_interrupt_status(machine);
 
 	scanline = 0;
+	next_y = spg_line_comp_val;
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, spg_hblank_in_irq-1), 0);
 }
 
 static TIMER_CALLBACK(hbin)
 {
-	if((scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2)) // FIXME: is there any real difference between modes 0 and 1?
+	if(spg_hblank_int_mode & 1)
+	{
+		if(scanline == next_y)
+		{
+			dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
+			dc_update_interrupt_status(machine);
+			next_y+=spg_line_comp_val;
+		}
+	}
+	else if((scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2))
 	{
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
 		dc_update_interrupt_status(machine);
@@ -2600,6 +2610,7 @@ VIDEO_START(dc)
 	hbin_timer = timer_alloc(machine, hbin, 0);
 	timer_adjust_oneshot(hbin_timer, attotime_never, 0);
 	scanline = 0;
+	next_y = 0;
 
 	endofrender_timer_isp = timer_alloc(machine, endofrender_isp, 0);
 	endofrender_timer_tsp = timer_alloc(machine, endofrender_tsp, 0);
