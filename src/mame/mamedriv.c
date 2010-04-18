@@ -1493,6 +1493,8 @@ const game_driver * const drivers[] =
 	DRIVER( 10yardj )	/* (c) 1983 */
 	DRIVER( vs10yard )	/* (c) 1983/1984 */
 	DRIVER( vs10yardj )	/* (c) 1983/1984 */
+	DRIVER( vs10yardu ) /* (c) 1983/1984 */
+	DRIVER( 10yard85 )	/* (c) 1985 */
 	DRIVER( travrusa )	/* (c) 1983 */
 	DRIVER( motorace )	/* (c) 1983 Williams license */
 	DRIVER( shtrider )	/* (c) 1984 Seibu Kaihatsu */
