@@ -302,7 +302,7 @@ struct _tms5220_state
 	INT32 x[10];
 
 	INT32 RNG;      /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
-	INT8 excitation_data;
+	INT16 excitation_data;
 
 	/* R Nabet : These have been added to emulate speech Roms */
 	UINT8 schedule_dummy_read;			/* set after each load address, so that next read operation
