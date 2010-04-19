@@ -28,17 +28,8 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "includes/pushman.h"
 #include "sound/2203intf.h"
-
-VIDEO_UPDATE( pushman );
-WRITE16_HANDLER( pushman_scroll_w );
-WRITE16_HANDLER( pushman_videoram_w );
-VIDEO_START( pushman );
-
-static UINT8 shared_ram[8];
-static UINT16 latch,new_latch=0;
-
-/******************************************************************************/
 
 static WRITE16_HANDLER( pushman_flipscreen_w )
 {
@@ -58,68 +49,81 @@ static WRITE16_HANDLER( pushman_control_w )
 
 static READ16_HANDLER( pushman_68705_r )
 {
+	pushman_state *state = (pushman_state *)space->machine->driver_data;
+
 	if (offset == 0)
-		return latch;
+		return state->latch;
 
-	if (offset == 3 && new_latch) { new_latch = 0; return 0; }
-	if (offset == 3 && !new_latch) return 0xff;
+	if (offset == 3 && state->new_latch) 
+	{
+		state->new_latch = 0; 
+		return 0; 
+	}
+	if (offset == 3 && !state->new_latch) 
+		return 0xff;
 
-	return (shared_ram[2 * offset + 1] << 8) + shared_ram[2 * offset];
+	return (state->shared_ram[2 * offset + 1] << 8) + state->shared_ram[2 * offset];
 }
 
 static WRITE16_HANDLER( pushman_68705_w )
 {
+	pushman_state *state = (pushman_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
-		shared_ram[2 * offset] = data >> 8;
+		state->shared_ram[2 * offset] = data >> 8;
 	if (ACCESSING_BITS_0_7)
-		shared_ram[2 * offset + 1] = data & 0xff;
+		state->shared_ram[2 * offset + 1] = data & 0xff;
 
 	if (offset == 1)
 	{
-        cputag_set_input_line(space->machine, "mcu", M68705_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(state->mcu, M68705_IRQ_LINE, HOLD_LINE);
 		cpu_spin(space->cpu);
-		new_latch = 0;
+		state->new_latch = 0;
 	}
 }
 
 /* ElSemi - Bouncing balls protection. */
 static READ16_HANDLER( bballs_68705_r )
 {
+	pushman_state *state = (pushman_state *)space->machine->driver_data;
+
 	if (offset == 0)
-		return latch;
-	if(offset == 3 && new_latch)
+		return state->latch;
+	if (offset == 3 && state->new_latch)
 	{
-        	new_latch = 0;
+		state->new_latch = 0;
 		return 0;
 	}
-	if(offset == 3 && !new_latch)
+	if (offset == 3 && !state->new_latch)
 		return 0xff;
 
-	return (shared_ram[2 * offset + 1] << 8) + shared_ram[2 * offset];
+	return (state->shared_ram[2 * offset + 1] << 8) + state->shared_ram[2 * offset];
 }
 
 static WRITE16_HANDLER( bballs_68705_w )
 {
-	if (ACCESSING_BITS_8_15)
-		shared_ram[2 * offset] = data >> 8;
-	if (ACCESSING_BITS_0_7)
-		shared_ram[2 * offset + 1] = data & 0xff;
+	pushman_state *state = (pushman_state *)space->machine->driver_data;
 
-	if(offset == 0)
+	if (ACCESSING_BITS_8_15)
+		state->shared_ram[2 * offset] = data >> 8;
+	if (ACCESSING_BITS_0_7)
+		state->shared_ram[2 * offset + 1] = data & 0xff;
+
+	if (offset == 0)
 	{
-		latch = 0;
-		if(shared_ram[0] <= 0xf)
+		state->latch = 0;
+		if (state->shared_ram[0] <= 0xf)
 		{
-			latch = shared_ram[0] << 2;
-			if(shared_ram[1])
-				latch |= 2;
-			new_latch = 1;
+			state->latch = state->shared_ram[0] << 2;
+			if (state->shared_ram[1])
+				state->latch |= 2;
+			state->new_latch = 1;
 		}
-		else if(shared_ram[0])
+		else if (state->shared_ram[0])
 		{
-			if(shared_ram[1])
-				latch |= 2;
-			new_latch = 1;
+			if (state->shared_ram[1])
+				state->latch |= 2;
+			state->new_latch = 1;
 		}
 	}
 }
@@ -127,42 +131,40 @@ static WRITE16_HANDLER( bballs_68705_w )
 
 static READ8_HANDLER( pushman_68000_r )
 {
-	return shared_ram[offset];
+	pushman_state *state = (pushman_state *)space->machine->driver_data;
+	return state->shared_ram[offset];
 }
 
 static WRITE8_HANDLER( pushman_68000_w )
 {
-	if (offset == 2 && (shared_ram[2] & 2) == 0 && data & 2)
-	{
-		latch = (shared_ram[1] << 8) | shared_ram[0];
-		new_latch = 1;
-	}
-	shared_ram[offset] = data;
-}
+	pushman_state *state = (pushman_state *)space->machine->driver_data;
 
-static MACHINE_RESET( bballs )
-{
-	latch = 0x400;
+	if (offset == 2 && (state->shared_ram[2] & 2) == 0 && data & 2)
+	{
+		state->latch = (state->shared_ram[1] << 8) | state->shared_ram[0];
+		state->new_latch = 1;
+	}
+	state->shared_ram[offset] = data;
 }
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( pushman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_READWRITE(pushman_68705_r,pushman_68705_w)
-	AM_RANGE(0xfe0800, 0xfe17ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x060000, 0x060007) AM_READWRITE(pushman_68705_r, pushman_68705_w)
+	AM_RANGE(0xfe0800, 0xfe17ff) AM_RAM AM_BASE_MEMBER(pushman_state, spriteram)
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("INPUTS") AM_WRITE(pushman_flipscreen_w)
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE(pushman_control_w)
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP /* ? */
-	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_BASE_MEMBER(pushman_state, videoram)
 	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_READWRITE(pushman_68000_r,pushman_68000_w)
+	AM_RANGE(0x0000, 0x0007) AM_READWRITE(pushman_68000_r, pushman_68000_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0fff) AM_ROM
 ADDRESS_MAP_END
@@ -182,14 +184,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bballs_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x60000, 0x60007) AM_READWRITE(bballs_68705_r,bballs_68705_w)
-	AM_RANGE(0xe0800, 0xe17ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x60000, 0x60007) AM_READWRITE(bballs_68705_r, bballs_68705_w)
+	AM_RANGE(0xe0800, 0xe17ff) AM_RAM AM_BASE_MEMBER(pushman_state, spriteram)
 	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("INPUTS") AM_WRITE(pushman_flipscreen_w)
 	AM_RANGE(0xe4002, 0xe4003) AM_READ_PORT("SYSTEM") AM_WRITE(pushman_control_w)
 	AM_RANGE(0xe4004, 0xe4005) AM_READ_PORT("DSW")
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
-	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_BASE_MEMBER(pushman_state, videoram)
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfc000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
@@ -401,21 +403,51 @@ GFXDECODE_END
 
 static void irqhandler(running_device *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	pushman_state *state = (pushman_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
 {
 	{
-			AY8910_LEGACY_OUTPUT,
-			AY8910_DEFAULT_LOADS,
-			DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	},
 	irqhandler
 };
 
 
+static MACHINE_START( pushman )
+{
+	pushman_state *state = (pushman_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
+
+	state_save_register_global_array(machine, state->control);
+	state_save_register_global_array(machine, state->shared_ram);
+	state_save_register_global(machine, state->latch);
+	state_save_register_global(machine, state->new_latch);
+}
+
+static MACHINE_RESET( pushman )
+{
+	pushman_state *state = (pushman_state *)machine->driver_data;
+
+	state->latch = 0;
+	state->new_latch = 0;
+	state->control[0] = 0;
+	state->control[1] = 0;
+
+	memset(state->shared_ram, 0, ARRAY_LENGTH(state->shared_ram));
+}
+
 static MACHINE_DRIVER_START( pushman )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(pushman_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -431,6 +463,9 @@ static MACHINE_DRIVER_START( pushman )
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_QUANTUM_TIME(HZ(3600))
+
+	MDRV_MACHINE_START(pushman)
+	MDRV_MACHINE_RESET(pushman)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -457,7 +492,19 @@ static MACHINE_DRIVER_START( pushman )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
+static MACHINE_RESET( bballs )
+{
+	pushman_state *state = (pushman_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(pushman);
+
+	state->latch = 0x400;
+}
+
 static MACHINE_DRIVER_START( bballs )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(pushman_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -470,6 +517,7 @@ static MACHINE_DRIVER_START( bballs )
 
 	MDRV_QUANTUM_TIME(HZ(3600))
 
+	MDRV_MACHINE_START(pushman)
 	MDRV_MACHINE_RESET(bballs)
 
 	/* video hardware */
@@ -665,8 +713,8 @@ ROM_START( bballs )
 	ROM_LOAD( "bb_prom.e9",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )	/* priority (not used) N82S129 BPROM */
 ROM_END
 
-GAME( 1990, pushman,  0,       pushman, pushman, 0, ROT0, "Comad", "Pushman (Korea, set 1)", 0 )
-GAME( 1990, pushmana, pushman, pushman, pushman, 0, ROT0, "Comad", "Pushman (Korea, set 2)", 0 )
-GAME( 1990, pushmans, pushman, pushman, pushman, 0, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", 0 )
-GAME( 1990, pushmant, pushman, pushman, pushman, 0, ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", 0 )
-GAME( 1991, bballs,   0,       bballs,  bballs,  0, ROT0, "Comad", "Bouncing Balls", 0 )
+GAME( 1990, pushman,  0,       pushman, pushman, 0, ROT0, "Comad", "Pushman (Korea, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pushmana, pushman, pushman, pushman, 0, ROT0, "Comad", "Pushman (Korea, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pushmans, pushman, pushman, pushman, 0, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pushmant, pushman, pushman, pushman, 0, ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", GAME_SUPPORTS_SAVE )
+GAME( 1991, bballs,   0,       bballs,  bballs,  0, ROT0, "Comad", "Bouncing Balls", GAME_SUPPORTS_SAVE )

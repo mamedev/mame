@@ -2745,6 +2745,7 @@ src/mame/includes/psikyo.h svneol=native#text/plain
 src/mame/includes/psikyo4.h svneol=native#text/plain
 src/mame/includes/psikyosh.h svneol=native#text/plain
 src/mame/includes/psx.h svneol=native#text/plain
+src/mame/includes/pushman.h svneol=native#text/plain
 src/mame/includes/qix.h svneol=native#text/plain
 src/mame/includes/raiden2.h svneol=native#text/plain
 src/mame/includes/rainbow.h svneol=native#text/plain
