@@ -8688,10 +8688,10 @@ Other Sun games
 	DRIVER( strikeit2 )	/* 199? */
 	DRIVER( strikeit2d )/* 199? */
 
-	DRIVER( quizgrid )	/* 199? */
-	DRIVER( quizgridd )	/* 199? */
-	DRIVER( quizgrid2 )	/* 199? */
-	DRIVER( quizgrid2d )/* 199? */
+	DRIVER( quidgrid )	/* 199? */
+	DRIVER( quidgridd )	/* 199? */
+	DRIVER( quidgrid2 )	/* 199? */
+	DRIVER( quidgrid2d )/* 199? */
 
 	DRIVER( eyesdown )	/* 199? */
 	DRIVER( eyesdownd )	/* 199? */

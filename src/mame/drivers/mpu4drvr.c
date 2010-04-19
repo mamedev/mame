@@ -169,11 +169,11 @@ IRQ line connected to CPU
 TODO:
       - Correctly implement characteriser protection for each game.
       - Hook up trackball control for The Crystal Maze and The Mating Game
-      - Finish AVDC implementation to support split-screen interrupts (needed for mid-screen palette changes)
+      - Improve AVDC implementation, adding split-screen interrupts (needed for mid-screen palette changes)
       - Hook up OKIM6376 sound in The Mating Game
       - Get the BwB games running
+        * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
       - Find out what causes the games to reset in service mode (see jump taken at CPU1:c8e8)
-
       - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
       - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
         to give black on green.
@@ -2048,7 +2048,7 @@ mpu4_chr_table eyesdown_data[64] = {
 	{0x0D, 0x5C}, {0x1F, 0x5C}, {0x16, 0x7C}, {0x05, 0x6C}, {0x13, 0x54}, {0x1C, 0x04}, {0x02, 0x9C}, {0x00, 0x00}
 };
 
-mpu4_chr_table quizgrid_data[64] = {
+mpu4_chr_table quidgrid_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x64}, {0x04, 0x64}, {0x10, 0x24}, {0x18, 0x64}, {0x0F, 0x64}, {0x13, 0x24}, {0x1B, 0x64}, 
 	{0x03, 0x74}, {0x07, 0x54}, {0x17, 0x84}, {0x1D, 0xA4}, {0x36, 0x24}, {0x35, 0x24}, {0x2B, 0x64}, {0x28, 0x24}, 
 	{0x39, 0xE4}, {0x21, 0x64}, {0x22, 0x74}, {0x25, 0x44}, {0x2C, 0x34}, {0x29, 0x04}, {0x31, 0x24}, {0x34, 0x24}, 
@@ -2117,9 +2117,9 @@ static DRIVER_INIT (eyesdown)
 	mpu4_current_chr_table = eyesdown_data;
 }
 
-static DRIVER_INIT (quizgrid)
+static DRIVER_INIT (quidgrid)
 {
-	mpu4_current_chr_table = quizgrid_data;
+	mpu4_current_chr_table = quidgrid_data;
 }
 
 
@@ -2462,7 +2462,7 @@ ROM_START( eyesdownd )
 	ROM_LOAD( "eyesdown_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
 ROM_END
 
-ROM_START( quizgrid )
+ROM_START( quidgrid )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
@@ -2472,10 +2472,10 @@ ROM_START( quizgrid )
 	ROM_LOAD16_BYTE( "qg.p3",  0x020000, 0x010000, CRC(5dda7cd8) SHA1(246a801e862990aade98fa358477e53707714b42) )
 	ROM_LOAD16_BYTE( "qg.p4",  0x020001, 0x010000, CRC(2106cf5d) SHA1(2073589775139ad92daef05a67afb2c70ece168c) )
 
-	ROM_LOAD( "quizgrid_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_LOAD( "quidgrid_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
 ROM_END
 
-ROM_START( quizgridd )
+ROM_START( quidgridd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
@@ -2485,10 +2485,10 @@ ROM_START( quizgridd )
 	ROM_LOAD16_BYTE( "qg.p3",  0x020000, 0x010000, CRC(5dda7cd8) SHA1(246a801e862990aade98fa358477e53707714b42) )
 	ROM_LOAD16_BYTE( "qg.p4",  0x020001, 0x010000, CRC(2106cf5d) SHA1(2073589775139ad92daef05a67afb2c70ece168c) )
 
-	ROM_LOAD( "quizgrid_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_LOAD( "quidgrid_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
 ROM_END
 
-ROM_START( quizgrid2 )
+ROM_START( quidgrid2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
@@ -2498,10 +2498,10 @@ ROM_START( quizgrid2 )
 	ROM_LOAD16_BYTE( "q2g.p3",  0x020000, 0x010000, CRC(78555155) SHA1(e1218fc00f08c19a0cafb203e46044efa617ac16) )
 	ROM_LOAD16_BYTE( "q2g.p4",  0x020001, 0x010000, CRC(2a4295b6) SHA1(2aa0b5dbe6b934a7a4c8069c91fd6d85cae02836) )
 
-	ROM_LOAD( "quizgrid_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_LOAD( "quidgrid_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
 ROM_END
 
-ROM_START( quizgrid2d )
+ROM_START( quidgrid2d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
@@ -2511,7 +2511,7 @@ ROM_START( quizgrid2d )
 	ROM_LOAD16_BYTE( "q2g.p3",  0x020000, 0x010000, CRC(78555155) SHA1(e1218fc00f08c19a0cafb203e46044efa617ac16) )
 	ROM_LOAD16_BYTE( "q2g.p4",  0x020001, 0x010000, CRC(2a4295b6) SHA1(2aa0b5dbe6b934a7a4c8069c91fd6d85cae02836) )
 
-	ROM_LOAD( "quizgrid_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
+	ROM_LOAD( "quidgrid_questions",  0x040000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
 ROM_END
 
 
@@ -2582,6 +2582,10 @@ GAME( 1989,  timemchn,  bctvidbs, mpu4_vid, mpu4,     timemchn, ROT0, "Barcrest"
 GAME( 199?,  mating,    bctvidbs, mating,   mpu4,     mating,   ROT0, "Barcrest",		"The Mating Game (v0.2)",											GAME_NOT_WORKING )
 GAME( 199?,  matingd,   mating,   mating,   mpu4,     mating,   ROT0, "Barcrest",		"The Mating Game (v0.2d)",											GAME_NOT_WORKING )
 
+/* Barquest */
+/* Barquest II */
+/* Wize Move */
+
 /* Games below are missing question ROMs */
 GAME( 199?,  strikeit,  bctvidbs, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest",		"Strike it Lucky (v0.5)",											GAME_NOT_WORKING )
 GAME( 199?,  strikeitd, strikeit, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest",		"Strike it Lucky (v0.5d)",											GAME_NOT_WORKING )
@@ -2591,10 +2595,10 @@ GAME( 199?,  strikeit2d,strikeit, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest"
 GAME( 199?,  eyesdown,  bctvidbs, mpu4_vid, mpu4,     eyesdown, ROT0, "Barcrest",		"Eyes Down (v1.3)",													GAME_NOT_WORKING )
 GAME( 199?,  eyesdownd, eyesdown, mpu4_vid, mpu4,     eyesdown, ROT0, "Barcrest",		"Eyes Down (v1.3d)",												GAME_NOT_WORKING )
 
-GAME( 199?,  quizgrid,  bctvidbs, mpu4_vid, mpu4,     quizgrid, ROT0, "Barcrest",		"Quiz Grid (v1.2)",													GAME_NOT_WORKING )
-GAME( 199?,  quizgridd, quizgrid, mpu4_vid, mpu4,     quizgrid, ROT0, "Barcrest",		"Quiz Grid (v1.2d)",												GAME_NOT_WORKING )
-GAME( 199?,  quizgrid2, quizgrid, mpu4_vid, mpu4,     quizgrid, ROT0, "Barcrest",		"Quiz Grid (v2.4)",													GAME_NOT_WORKING )
-GAME( 199?,  quizgrid2d,quizgrid, mpu4_vid, mpu4,     quizgrid, ROT0, "Barcrest",		"Quiz Grid (v2.4d)",												GAME_NOT_WORKING )
+GAME( 199?,  quidgrid,  bctvidbs, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v1.2)",													GAME_NOT_WORKING )
+GAME( 199?,  quidgridd, quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v1.2d)",												GAME_NOT_WORKING )
+GAME( 199?,  quidgrid2, quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v2.4)",													GAME_NOT_WORKING )
+GAME( 199?,  quidgrid2d,quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v2.4d)",												GAME_NOT_WORKING )
 
 /* Games below are newer BwB games and use their own BIOS ROMs */
 GAME( 199?,  vgpoker,   0,        vgpoker,  mpu4,     0,        ROT0, "BwB",			"Vegas Poker (prototype, release 2)",								GAME_NOT_WORKING )
