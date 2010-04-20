@@ -2610,3 +2610,155 @@ GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino", 
 GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "Alpha",           "Shark Party (English, Alpha license)", 0,      layout_sharkpye ) // PCB black-box was marked 'victor 6'
 GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,      layout_smoto )
 GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,      layout_smoto )
+
+/* Super Treasure Island
+ - is this better here or in bishjan.c?
+*/
+
+ROM_START( stisub )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "trbon-rlu16.u12", 0x00000, 0x10000, CRC(07771290) SHA1(c485943045396d8580271504a1fec7c88579f4a2) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "sti-alpha_2-ver1.1.u30", 0x00000, 0x40000, CRC(3bc4c8c5) SHA1(12e868f4b4d4df6b59befcd785ab1fe5c1def58d) )
+	ROM_LOAD( "sti-alpha_3-ver1.1.u29", 0x40000, 0x40000, CRC(5473c41a) SHA1(94294887af8ffc4f2edbcbde1c51797f20c44efe) )
+	ROM_LOAD( "sti-alpha_4-ver1.1.u28", 0x80000, 0x40000, CRC(ccf895e1) SHA1(c12ecf0577b5b856d8202474f084003cc95da51c) )
+	ROM_LOAD( "sti-alpha_5-ver1.1.u27", 0xc0000, 0x40000, CRC(98eed855) SHA1(89291b1b143924caa79a6d694f10c14d93c57eac) )
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "sti-alpha_6-ver1.1.u25", 0x00000, 0x20000, CRC(83471a70) SHA1(c63e4c1a8cfb6e7feae4fd97f7d77feaf63c949b) )
+	ROM_LOAD( "sti-alpha_7-ver1.1.u24", 0x20000, 0x20000, CRC(05bc7ed2) SHA1(23ae716cd149ee940ac4bdc114fbfeb290e91b11) )
+	ROM_LOAD( "sti-alpha_8-ver1.1.u23", 0x40000, 0x20000, CRC(d3c11545) SHA1(0383358d223c9bfe67c3b5de7a9cc3e43a9769b2) )
+	ROM_LOAD( "sti-alpha_9-ver1.1.u22", 0x60000, 0x20000, CRC(9710a223) SHA1(76ef6bd77ae33d91a9b6a9a615d07caee3356dfb) )
+ROM_END
+
+
+
+static const gfx_layout layout_8x8x8 =
+{
+	8, 8,
+	RGN_FRAC(1,4),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4), RGN_FRAC(0,4)+8, RGN_FRAC(1,4)+8, RGN_FRAC(2,4)+8, RGN_FRAC(3,4)+8 },
+	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16 },
+	8*16
+};
+
+static const gfx_layout layout_8x32x8 =
+{
+	8, 32,
+	RGN_FRAC(1,4),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4), RGN_FRAC(0,4)+8, RGN_FRAC(1,4)+8, RGN_FRAC(2,4)+8, RGN_FRAC(3,4)+8 },
+	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16, 8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16,
+	 16*16,17*16,18*16,19*16,20*16,21*16,22*16,23*16,24*16,25*16,26*16,27*16,28*16,29*16,30*16,31*16},
+	32*16
+};
+
+
+static GFXDECODE_START( subsino_stisub )
+	GFXDECODE_ENTRY( "tilemap", 0, layout_8x8x8, 0, 1 )
+	GFXDECODE_ENTRY( "reels", 0, layout_8x32x8, 0, 1 )
+GFXDECODE_END
+
+
+// taken from bishjan.c, maybe the sti hardware is closer to that?
+static int colordac_offs;
+UINT8* stisub_colorram;
+
+static WRITE8_HANDLER(colordac_w)
+{
+	switch ( offset )
+	{
+		case 0:
+			colordac_offs = data * 3;
+			break;
+
+		case 1:
+			stisub_colorram[colordac_offs] = data;
+			palette_set_color_rgb(space->machine, colordac_offs/3,
+				pal6bit(stisub_colorram[(colordac_offs/3)*3+0]),
+				pal6bit(stisub_colorram[(colordac_offs/3)*3+1]),
+				pal6bit(stisub_colorram[(colordac_offs/3)*3+2])
+			);
+			colordac_offs = (colordac_offs+1) % (256*3);
+			break;
+
+		case 2:
+			// ff?
+			break;
+
+		case 3:
+			break;
+	}
+}
+
+
+
+static ADDRESS_MAP_START( stisub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
+
+	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
+
+	AM_RANGE( 0x0d000, 0x0d000 ) AM_READ_PORT( "SW1" )
+	AM_RANGE( 0x0d001, 0x0d001 ) AM_READ_PORT( "SW2" )
+	AM_RANGE( 0x0d002, 0x0d002 ) AM_READ_PORT( "SW3" )
+
+	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
+	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INA" )
+	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INB" )
+
+	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE( subsino_out_b_w )
+	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE( subsino_out_a_w )
+
+	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
+
+	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
+
+	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
+
+
+	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE( subsino_tiles_offset_w )
+
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
+ADDRESS_MAP_END
+
+static MACHINE_DRIVER_START( stisub )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
+	MDRV_CPU_PROGRAM_MAP(stisub_map)
+	MDRV_CPU_IO_MAP(subsino_iomap)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(512, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+
+	MDRV_GFXDECODE(subsino_stisub)
+
+	MDRV_PALETTE_LENGTH(0x100)
+	//MDRV_PALETTE_INIT(subsino_3proms)
+
+	MDRV_VIDEO_START(subsino)
+	MDRV_VIDEO_UPDATE(subsino)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+DRIVER_INIT( stisub )
+{
+	stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
+}
+
+
+GAMEL( 1992, stisub,   0,        stisub,   smoto20,  stisub,   ROT0, "Subsino",         "Super Treasure Island (Subsino)",     0,      layout_tisub )

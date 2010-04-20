@@ -9257,6 +9257,7 @@ Other Sun games
 	DRIVER( sharkpye )	/* (c) 1996 Subsino */
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
+	DRIVER( stisub )	/* (c) 199? Subsino */
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */
 	DRIVER( lastfght )	/* (c) 2000 Subsino */
