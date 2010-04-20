@@ -229,6 +229,12 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
+static TILE_GET_INFO( get_stisub_tile_info )
+{
+	UINT16 code = videoram[ tile_index ] + (colorram[ tile_index ] << 8);
+	code&= 0x3fff;
+	SET_TILE_INFO(0, code, 0, 0);
+}
 
 
 static VIDEO_START( subsino )
@@ -238,6 +244,11 @@ static VIDEO_START( subsino )
 	tiles_offset = 0;
 }
 
+static VIDEO_START( stisub )
+{
+	tmap = tilemap_create(	machine, get_stisub_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20 );
+	tilemap_set_transparent_pen( tmap, 0 );
+}
 
 
 WRITE8_HANDLER( subsino_reel1_ram_w )
@@ -2720,10 +2731,11 @@ static ADDRESS_MAP_START( stisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
 
-	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE( subsino_tiles_offset_w )
+//	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE( subsino_tiles_offset_w )
 
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
+	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM // reels gfxs (not all of it)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( stisub )
@@ -2745,7 +2757,7 @@ static MACHINE_DRIVER_START( stisub )
 	MDRV_PALETTE_LENGTH(0x100)
 	//MDRV_PALETTE_INIT(subsino_3proms)
 
-	MDRV_VIDEO_START(subsino)
+	MDRV_VIDEO_START(stisub)
 	MDRV_VIDEO_UPDATE(subsino)
 
 	/* sound hardware */
@@ -2757,8 +2769,10 @@ MACHINE_DRIVER_END
 
 DRIVER_INIT( stisub )
 {
+	UINT8 *rom = memory_region( machine, "maincpu" );
+	rom[0x1005] = 0x1d; //patch protection check
 	stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
 }
 
 
-GAMEL( 1992, stisub,   0,        stisub,   smoto20,  stisub,   ROT0, "Subsino",         "Super Treasure Island (Subsino)",     0,      layout_tisub )
+GAMEL( 1995, stisub,   0,        stisub,   smoto20,  stisub,   ROT0, "Alpha",         "Super Treasure Island (Subsino)",     0,      layout_tisub )
