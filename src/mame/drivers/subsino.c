@@ -151,6 +151,22 @@
   - Some clean-ups...
 
 
+  2010-04-20
+  ----------
+
+  Shark Party (English, Alpha license):
+
+  - Created complete inputs from the scratch.
+  - Added coin/keyin/keyout counters.
+  - Added main game and double-up rates DIP switches.
+  - Added minimum bet DIP switches.
+  - Added maximum bet DIP switches.
+  - Added complete coinage and remote credits DIP switches.
+  - Added jokers and demo sounds DIP switches.
+  - Figured out and documented all the game outputs.
+  - Created proper button-lamps layout.
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -163,8 +179,10 @@
 #include "victor21.lh"
 #include "crsbingo.lh"
 #include "sharkpy.lh"
+#include "sharkpye.lh"
 #include "smoto.lh"
 #include "tisub.lh"
+
 
 /***************************************************************************
 *                              Video Hardware                              *
@@ -391,7 +409,7 @@ static WRITE8_HANDLER( subsino_out_a_w )
 /***** COIN PULSE: *****
 
 
-  * Victor 5, Victor 21, Poker Carnival (crsbingo).
+  * Victor 5, Victor 21, Poker Carnival (crsbingo), Shark Party (English, Alpha license).
 
   7654 3210
   ---- ---x  Coin pulse.
@@ -514,6 +532,19 @@ static WRITE8_HANDLER( subsino_out_b_w )
   --x- ----  START / TAKE.
   -x-- ----  HOLD2.
   x--- ----  HOLD5 / SMALL.
+
+
+  * Shark Party (English, Alpha license).
+
+  7654 3210
+  ---- ---x  ???.
+  ---- --x-  HOLD3 / D-UP.
+  ---- -x--  START.
+  ---- x---  HOLD1 / BET.
+  ---x ----  ???.
+  --x- ----  HOLD2 / TAKE.
+  -x-- ----  ???.
+  x--- ----  HOLD4 & HOLD5.
 
 */
 
@@ -1371,6 +1402,114 @@ static INPUT_PORTS_START( sharkpy )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sharkpye )
+
+	PORT_START( "SW1" )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x07, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Remote Credits" )
+	PORT_DIPSETTING(    0x30, "1 Pulse / 1 Credits" )
+	PORT_DIPSETTING(    0x28, "1 Pulse / 2 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Pulse / 5 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Pulse / 10 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Pulse / 50 Credits" )
+	PORT_DIPSETTING(    0x38, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 500 Credits" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW2" )
+	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x04, "40" )
+	PORT_DIPSETTING(    0x0c, "50" )
+	PORT_DIPSETTING(    0x00, "80" )
+	PORT_DIPNAME( 0x10, 0x10, "Jokers" )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW3" )
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )
+	PORT_DIPSETTING(    0x00, "92%" )
+	PORT_DIPSETTING(    0x01, "93%" )
+	PORT_DIPSETTING(    0x02, "94%" )
+	PORT_DIPSETTING(    0x03, "95%" )
+	PORT_DIPSETTING(    0x04, "96%" )
+	PORT_DIPSETTING(    0x07, "97%" )
+	PORT_DIPSETTING(    0x05, "98%" )
+	PORT_DIPSETTING(    0x06, "99%" )
+	PORT_DIPNAME( 0x38, 0x38, "Double-Up Rate" )
+	PORT_DIPSETTING(    0x00, "82" )
+	PORT_DIPSETTING(    0x08, "84" )
+	PORT_DIPSETTING(    0x10, "86" )
+	PORT_DIPSETTING(    0x18, "88" )
+	PORT_DIPSETTING(    0x20, "90" )
+	PORT_DIPSETTING(    0x38, "92" )
+	PORT_DIPSETTING(    0x28, "94" )
+	PORT_DIPSETTING(    0x30, "96" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW4" )
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "INA" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 / Bet")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 / Double-Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "INB" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )			PORT_IMPULSE(3)	// coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_9)	PORT_NAME("Stats / Test")	// Bookkeeping.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_0)	PORT_NAME("Settings")	// Game Rate & others.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START( "INC" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Small")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_R)	PORT_NAME("Reset Switch")	// hard reset
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Take")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( smoto16 )
 
 	PORT_START( "SW1" )
@@ -2128,6 +2267,16 @@ ROM_START( sharkpya )
 ROM_END
 
 
+/***************************************************************************
+
+  Shark Party (English, Alpha license)
+
+  - Different inputs system.
+  - Different DIP Switches.
+  - Different Button-Lamps outputs.
+
+***************************************************************************/
+
 ROM_START( sharkpye )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "sharkpye.u18", 0x0a000, 0x6000, CRC(12473814) SHA1(9c24ed41781aefee0161add912e730ba0d4f4d3e) )
@@ -2458,6 +2607,6 @@ GAMEL( 1992, tisuba,   tisub,    tisub,    tisub,    tisuba,   ROT0, "Subsino", 
 GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",                       0,      layout_crsbingo )
 GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,      layout_sharkpy ) // missing POST messages?
 GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,      layout_sharkpy ) // missing POST messages?
-GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpy,  sharkpye, ROT0, "Alpha",           "Shark Party (English, Alpha license)", 0,      layout_sharkpy ) // PCB black-box was marked 'victor 6'
+GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "Alpha",           "Shark Party (English, Alpha license)", 0,      layout_sharkpye ) // PCB black-box was marked 'victor 6'
 GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,      layout_smoto )
 GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,      layout_smoto )
