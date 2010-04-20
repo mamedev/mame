@@ -9252,12 +9252,12 @@ Other Sun games
 	DRIVER( crsbingo )	/* (c) 1991 Subsino */
 	DRIVER( tisub )		/* (c) 1992 Subsino */
 	DRIVER( tisuba )	/* (c) 1992 Subsino */
+	DRIVER( stisub )	/* (c) 1995 Subsino (Alpha license) */
 	DRIVER( sharkpy )	/* (c) 1996 Subsino */
 	DRIVER( sharkpya )	/* (c) 1996 Subsino */
-	DRIVER( sharkpye )	/* (c) 1996 Subsino */
+	DRIVER( sharkpye )	/* (c) 1996 Subsino (Alpha license) */
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
-	DRIVER( stisub )	/* (c) 199? Subsino */
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */
 	DRIVER( lastfght )	/* (c) 2000 Subsino */
