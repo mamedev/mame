@@ -121,7 +121,7 @@ static WRITE16_HANDLER( playmark_snd_command_w )
 {
 	playmark_state *state = (playmark_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		state->snd_command = (data & 0xff);
 		state->snd_flag = 1;
@@ -134,12 +134,12 @@ static READ8_HANDLER( playmark_snd_command_r )
 	playmark_state *state = (playmark_state *)space->machine->driver_data;
 	int data = 0;
 
-	if ((state->oki_control & 0x38) == 0x30) 
+	if ((state->oki_control & 0x38) == 0x30)
 	{
 		data = state->snd_command;
 		// logerror("PC$%03x PortB reading %02x from the 68K\n", cpu_get_previouspc(space->cpu), data);
 	}
-	else if ((state->oki_control & 0x38) == 0x28) 
+	else if ((state->oki_control & 0x38) == 0x28)
 	{
 		data = (okim6295_r(state->oki, 0) & 0x0f);
 		// logerror("PC$%03x PortB reading %02x from the OKI status port\n", cpu_get_previouspc(space->cpu), data);
@@ -152,7 +152,7 @@ static READ8_HANDLER( playmark_snd_flag_r )
 {
 	playmark_state *state = (playmark_state *)space->machine->driver_data;
 
-	if (state->snd_flag) 
+	if (state->snd_flag)
 	{
 		state->snd_flag = 0;
 		return 0x00;
@@ -1490,13 +1490,13 @@ static DRIVER_INIT( bigtwin )
 			{
 				data_hi = playmark_asciitohex((playmark_PICROM_HEX[src_pos + offs + 0]));
 				data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + offs + 1]));
-				if ((data_hi <= 0x0f) && (data_lo <= 0x0f)) 
+				if ((data_hi <= 0x0f) && (data_lo <= 0x0f))
 				{
 					data = (data_hi <<  4) | (data_lo << 0);
 					data_hi = playmark_asciitohex((playmark_PICROM_HEX[src_pos + offs + 2]));
 					data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + offs + 3]));
 
-					if ((data_hi <= 0x0f) && (data_lo <= 0x0f)) 
+					if ((data_hi <= 0x0f) && (data_lo <= 0x0f))
 					{
 						data |= (data_hi << 12) | (data_lo << 8);
 						playmark_PICROM[dst_pos] = data;

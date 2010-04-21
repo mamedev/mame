@@ -381,7 +381,7 @@ static TILE_GET_INFO( powerbal_get_bg_tile_info )
 	int code = (state->videoram1[tile_index] & 0x07ff) + state->tilebank * 0x800;
 	int colr = state->videoram1[tile_index] & 0xf000;
 
-	if (state->videoram1[tile_index] & 0x800) 
+	if (state->videoram1[tile_index] & 0x800)
 		code |= 0x8000;
 
 	SET_TILE_INFO(1, code, colr >> 12, 0);
@@ -399,7 +399,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int sx, sy, code, color, flipx;
 
 		sy = spriteram[offs + 3 - 4];	/* typical Playmark style... */
-		if (sy & 0x8000) 
+		if (sy & 0x8000)
 			return;	/* end of list marker */
 
 		flipx = sy & 0x4000;

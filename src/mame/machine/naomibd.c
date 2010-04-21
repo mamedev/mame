@@ -242,7 +242,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "alpiltdx", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "capsnk", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "capsnka", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "crackndj", 0, 0xc2347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "crackndj", 0, 0xc2347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "crzytaxi", 0, 0xd2f45, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "csmash", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "csmasho", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },

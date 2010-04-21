@@ -92,7 +92,7 @@
        - A custom 40-pin GFX IC
        - 2x HYxxx devices (TAB blue PCB).
        - A little board with 4x 74LS138 or 74LS137 (Impera green PCB).
- 
+
   NOTE: The 74LS374 could be replaced by a 74HCT373.
 
 ***********************************************************************************/

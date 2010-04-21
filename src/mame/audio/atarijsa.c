@@ -34,7 +34,7 @@ JSA-i: stereo gating for POKEY/TMS5220C is currently only mono, only looking at 
 ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in the output
   path for all channels is currently unimplemented; someone who knows analog magic will need
   to handle this.
-  
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -296,7 +296,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 				count = 5 | ((data >> 2) & 2);
 				tms5220_set_frequency(tms5220, JSA_MASTER_CLOCK*2 / (16 - count));
 			}
-			
+
 			/* reset the YM2151 if needed */
 			if ((data&1) == 0) devtag_reset(space->machine, "ymsnd");
 
@@ -417,7 +417,7 @@ static WRITE8_HANDLER( jsa2_io_w )
                 0x02 = n/c
                 0x01 = YM2151 reset (active low)
             */
-			
+
 			/* reset the YM2151 if needed */
 			if ((data&1) == 0) devtag_reset(space->machine, "ymsnd");
 
@@ -542,7 +542,7 @@ static WRITE8_HANDLER( jsa3_io_w )
                 0x02 = OKI6295 bank bit 0
                 0x01 = YM2151 reset (active low)
             */
-			
+
 			/* reset the YM2151 if needed */
 			if ((data&1) == 0) devtag_reset(space->machine, "ymsnd");
 
@@ -676,7 +676,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
                 0x02 = left OKI6295 bank bit 0
                 0x01 = YM2151 reset (active low)
             */
-			
+
 			/* reset the YM2151 if needed */
 			if ((data&1) == 0) devtag_reset(space->machine, "ymsnd");
 

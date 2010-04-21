@@ -14,7 +14,7 @@ public:
 	/* memory pointers */
 	UINT16 *   videoram;
 	UINT16 *   spriteram;
-//	UINT16 *   paletteram;    // currently this uses generic palette handling
+//  UINT16 *   paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *bg_tilemap, *tx_tilemap;

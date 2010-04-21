@@ -13,7 +13,7 @@ public:
 	UINT16 *     videoram3;
 	UINT16 *     rowscroll;
 	UINT16 *     spriteram;
-//  	UINT16 *     paletteram;    // currently this uses generic palette handling
+//      UINT16 *     paletteram;    // currently this uses generic palette handling
 	size_t       spriteram_size;
 
 	/* video-related */

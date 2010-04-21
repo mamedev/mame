@@ -2232,7 +2232,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
 	dy=((pvrta_regs[FB_R_SIZE] >> 10) & 0x3ff)+1;
 
-//	dy++;
+//  dy++;
 	dy*=2; // probably depends on interlace mode, fields etc...
 
 	switch (unpackmode)

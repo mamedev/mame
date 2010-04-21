@@ -234,7 +234,7 @@ static WRITE16_HANDLER( livequiz_coin_w )
 		coin_counter_w(space->machine, 0, data & 0x0001);
 	}
 #ifdef MAME_DEBUG
-//	popmessage("coin %04X", data);
+//  popmessage("coin %04X", data);
 #endif
 }
 
@@ -290,7 +290,7 @@ static WRITE16_HANDLER( hammer_coin_w )
 		coin_counter_w(space->machine, 1, data & 0x0002);
 	}
 #ifdef MAME_DEBUG
-//	popmessage("coin %04X", data);
+//  popmessage("coin %04X", data);
 #endif
 }
 
@@ -304,14 +304,14 @@ static WRITE16_HANDLER( hammer_motor_w )
 		// data & 0x0080 ?
 	}
 #ifdef MAME_DEBUG
-//	popmessage("motor %04X", data);
+//  popmessage("motor %04X", data);
 #endif
 }
 
 static WRITE16_HANDLER( hammer_led_w )
 {
 #ifdef MAME_DEBUG
-//	popmessage("led %04X", data);
+//  popmessage("led %04X", data);
 #endif
 }
 
@@ -561,7 +561,7 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2     )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SERVICE1  )
- 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_SERVICE_NO_TOGGLE( 0x0040,   IP_ACTIVE_LOW )
@@ -932,7 +932,7 @@ ROM_START( hammer )
 
 	ROM_REGION( 0x080000, "tiles", ROMREGION_ERASE )
 	// Use the tiles rom from livequiz (not present in this set) to show some debug text
-//	ROM_LOAD( "27c4096.u23", 0x000000, 0x080000, CRC(25121de8) SHA1(edf24d87551639b871baf3243b452a4e2ba84107) )
+//  ROM_LOAD( "27c4096.u23", 0x000000, 0x080000, CRC(25121de8) SHA1(edf24d87551639b871baf3243b452a4e2ba84107) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )
 	ROM_LOAD( "s0.u25", 0x000000, 0x200000, CRC(c049a3e0) SHA1(0c7016c3128c170a84ad3f92fad1165775210e3d) )

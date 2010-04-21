@@ -33,7 +33,7 @@ public:
 	UINT16 *       tilemap_regs;
 	UINT16 *       video_regs;
 	UINT16 *       spriteram;
-//	UINT16 *       paletteram;    // currently this uses generic palette handling
+//  UINT16 *       paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t      *mid_tilemap, *txt_tilemap;

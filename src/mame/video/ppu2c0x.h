@@ -159,7 +159,7 @@ READ8_DEVICE_HANDLER( ppu2c0x_r );
 
 #define MDRV_PPU2C05_04_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, PPU_2C05_04, 0) \
- 	MDRV_DEVICE_CONFIG(_intrf)
+	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_PPU2C07_ADD(_tag, _intrf)   \
 	MDRV_DEVICE_ADD(_tag, PPU_2C07, 0) \

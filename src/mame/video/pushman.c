@@ -95,9 +95,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	{
 		/* Don't draw empty sprite table entries */
 		x = spriteram[offs + 3] & 0x1ff;
-		if (x == 0x180) 
+		if (x == 0x180)
 			continue;
-		if (x > 0xff) 
+		if (x > 0xff)
 			x = 0 - (0x200 - x);
 
 		y = 240 - spriteram[offs + 2];

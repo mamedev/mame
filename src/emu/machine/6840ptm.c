@@ -561,7 +561,7 @@ static void ptm6840_timeout( running_device *device, int idx )
 	ptm6840->status_reg |= (1 << idx);
 	ptm6840->status_read_since_int &= ~(1 << idx);
 	update_interrupts(device);
-	
+
 	if ( ptm6840->control_reg[idx] & 0x80 )
 	{
 		if ((ptm6840->mode[idx] == 0)||(ptm6840->mode[idx] == 2))

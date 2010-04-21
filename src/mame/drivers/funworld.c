@@ -2165,7 +2165,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( funquiz )
 	MDRV_IMPORT_FROM(fw1stpal)
-//	MDRV_IMPORT_FROM(fw2ndpal)
+//  MDRV_IMPORT_FROM(fw2ndpal)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funquiz_map)
@@ -3129,7 +3129,7 @@ ROM_END
     r.3   = 2a.bin   royalcrde   Royal Card (austrian, set 6)
 
     All ROMs are double sized, with identical halves.
-	The set is working properly, with Bet (Hold 5) and normal payout. No Remote.
+    The set is working properly, with Bet (Hold 5) and normal payout. No Remote.
 */
 ROM_START( royalcrda )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3182,9 +3182,9 @@ ROM_START( royalcrdc )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "roj.ic26", 0x0000, 0x10000, CRC(3883cdcb) SHA1(b71a786822fe8fcb2c6fcdc463facb2738ec8c01) )
-//	ROM_IGNORE(                   0x8000)
+//  ROM_IGNORE(                   0x8000)
 	ROM_LOAD( "roj.ic25", 0x8000, 0x10000, CRC(c5b787e8) SHA1(be88aa901c1f96d171af45c3602e0ce72b8fff34) )
-//	ROM_IGNORE(                   0x8000)
+//  ROM_IGNORE(                   0x8000)
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
 	ROM_LOAD( "royalcrdc_nvram.bin", 0x0000, 0x0800, CRC(eacb0c7b) SHA1(513816623aa3843dd5d0416fc012060c7a9f6c71) )

@@ -11,9 +11,9 @@
      Various fixes by Lord Nightmare
      Modularization by Lord Nightmare
      Sub-interpolation-cycle parameter updating added by Lord Nightmare
-	 Preliminary MASSIVE merge of tms5110 and tms5220 cores by Lord Nightmare
-	 Lattice Filter, Multiplier, and clipping redone by Lord Nightmare
-	 TMS5220C multi-rate feature added by Lord Nightmare
+     Preliminary MASSIVE merge of tms5110 and tms5220 cores by Lord Nightmare
+     Lattice Filter, Multiplier, and clipping redone by Lord Nightmare
+     TMS5220C multi-rate feature added by Lord Nightmare
 
      Much information regarding these lpc encoding comes from US patent 4,209,844
      US patent 4,331,836 describes the complete 51xx chip
@@ -49,7 +49,7 @@ TODO:
     If a command is still executing, /READY will be kept high until the command has
     finished if the next command is written.
     tomcat has a 5220 which is not hooked up at all
-	
+
 Progress list for drivers using old vs new interface:
 starwars: uses new interface (couriersud)
 gauntlet: uses new interface (couriersud
@@ -471,9 +471,9 @@ static void update_status_and_ints(tms5220_state *tms)
 {
 	/* update flags and set ints if needed */
 	/* BL is set if neither byte 9 nor 8 of the fifo are in use; this
-	translates to having fifo_count (which ranges from 0 bytes in use to 16
-	bytes used)	being less than or equal to 8. Victory/Victorba depends on this. */
-    if (tms->fifo_count <= 8) 
+    translates to having fifo_count (which ranges from 0 bytes in use to 16
+    bytes used) being less than or equal to 8. Victory/Victorba depends on this. */
+    if (tms->fifo_count <= 8)
     {
         /* generate an interrupt if necessary; if /BL was inactive and is now active, set int. */
         if (!tms->buffer_low)
@@ -482,9 +482,9 @@ static void update_status_and_ints(tms5220_state *tms)
 	}
 	else
 		tms->buffer_low = 0;
-		
+
 	/* BE is set if neither byte 15 nor 14 of the fifo are in use; this
-	translates to having fifo_count equal to exactly 0 */
+    translates to having fifo_count equal to exactly 0 */
 	if (tms->fifo_count == 0)
 	{
 	    /* generate an interrupt if necessary; if /BE was inactive and is now active, set int. */
@@ -495,9 +495,9 @@ static void update_status_and_ints(tms5220_state *tms)
 	else
 		tms->buffer_empty = 0;
 
-	/* TS is talk status and is set elsewhere in the fifo parser and in 
-	the SPEAK command handler; however, if /BE is true during speak external
-	mode, it is immediately unset here. */
+	/* TS is talk status and is set elsewhere in the fifo parser and in
+    the SPEAK command handler; however, if /BE is true during speak external
+    mode, it is immediately unset here. */
 	if ((tms->speak_external == 1) && (tms->buffer_empty == 1))
 	{
 		/* generate an interrupt if necessary; if /TS was active and is now inactive, set int. */
@@ -506,7 +506,7 @@ static void update_status_and_ints(tms5220_state *tms)
 		tms->talk_status = 0;
 	}
 	/* Note that TS being unset will also generate an interrupt when a STOP
-	frame is encountered; this is handled in the sample generator code and not here */
+    frame is encountered; this is handled in the sample generator code and not here */
 }
 
 /**********************************************************************************************
@@ -600,7 +600,7 @@ static int tms5220_status_read(tms5220_state *tms)
 static int tms5220_ready_read(tms5220_state *tms)
 {
 #ifdef DEBUG_PIN_READS
-	logerror("ready_read: ready pin read, io_ready is %d, fifo count is %d\n", tms->io_ready, tms->fifo_count); 
+	logerror("ready_read: ready pin read, io_ready is %d, fifo count is %d\n", tms->io_ready, tms->fifo_count);
 #endif
     return ((tms->fifo_count < FIFO_SIZE)||(!tms->speak_external)) && tms->io_ready;
 }
@@ -681,7 +681,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
         goto empty;
 
     /* if speak external is set, but talk status is not (yet) set,
-	wait for buffer low to clear */
+    wait for buffer low to clear */
 	if (!tms->talk_status && tms->speak_external)
     {
         if (tms->buffer_low == 1)
@@ -692,7 +692,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		tms->new_frame_pitch = 0;
 		for (i = 0; i < tms->coeff->num_k; i++)
 			tms->new_frame_k[i] = 0;
-		   
+
         tms->talk_status = 1;
 	}
 
@@ -736,14 +736,14 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
 
 			/* in all cases where interpolation would be inhibited, set the target
-			   value equal to the current value.
-			   Interpolation inhibit cases:
-			   * Old frame was voiced, new is unvoiced
-			   * Old frame was silence/zero energy, new is unvoiced
-			   * Old frame was unvoiced, new is voiced
-			   * New frame is a silence/zero energy frame - ? not sure
-			   * New frame is a stop frame - ? not sure
-			*/
+               value equal to the current value.
+               Interpolation inhibit cases:
+               * Old frame was voiced, new is unvoiced
+               * Old frame was silence/zero energy, new is unvoiced
+               * Old frame was unvoiced, new is voiced
+               * New frame is a silence/zero energy frame - ? not sure
+               * New frame is a stop frame - ? not sure
+            */
 			if ( ((NEW_FRAME_SILENCE_FLAG == 0) && (NEW_FRAME_STOP_FLAG == 0))
 			&& ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
 				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 1))
@@ -761,7 +761,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 					tms->target_k[i] = tms->current_k[i];
 			}
 			/* in cases where the new frame is a STOP or SILENCE frame,
-			   ramp the energy down to 0, leaving everything else alone. */
+               ramp the energy down to 0, leaving everything else alone. */
 			else if ((NEW_FRAME_SILENCE_FLAG == 1) || (NEW_FRAME_STOP_FLAG == 1))
 			{
 #ifdef DEBUG_GENERATION
@@ -862,7 +862,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
         }
 
         /* calculate the output */
-		if (OLD_FRAME_UNVOICED_FLAG == 1) 
+		if (OLD_FRAME_UNVOICED_FLAG == 1)
 		{
 			/* generate unvoiced samples here */
 			if (tms->RNG & 1)
@@ -944,17 +944,17 @@ empty:
 static INT16 clip_and_wrap(INT16 cliptemp)
 {
     /* clipping & wrapping, just like the patent shows:
-	   first of all the result should be clamped to 14 bits, between -16384 and 16383   
-	*/
+       first of all the result should be clamped to 14 bits, between -16384 and 16383
+    */
 	while (cliptemp > 16383) cliptemp -= 32768;
 	while (cliptemp < -16384) cliptemp += 32768;
 	/* the top 10 bits of this result are visible on the digital output IO pin.
-	   next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output, otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
-	   1x xxxx xxxx xxxx -> 0b10000000
-	   11 1bcd efgh xxxx -> 0b1bcdefgh
-	   00 0bcd efgh xxxx -> 0b0bcdefgh
-	   0x xxxx xxxx xxxx -> 0b01111111
-	   */
+       next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output, otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
+       1x xxxx xxxx xxxx -> 0b10000000
+       11 1bcd efgh xxxx -> 0b1bcdefgh
+       00 0bcd efgh xxxx -> 0b0bcdefgh
+       0x xxxx xxxx xxxx -> 0b01111111
+       */
 #ifdef DO_CLIP_AND_WRAP
 	if (cliptemp > 2047) cliptemp = 2047;
 	else if (cliptemp < -2048) cliptemp = -2048;
@@ -968,11 +968,11 @@ static INT16 clip_and_wrap(INT16 cliptemp)
 
 /**********************************************************************************************
 
-	 ti_matrix_multiply -- does the proper multiply and shift as the TI chips do.
-	 a is the k coefficient and is clamped to 10 bits (9 bits plus a sign)
-	 b is the running result and is clamped to 14 bits.
-	 output is 14 bits, but note the result LSB bit is always 1.
-	 
+     ti_matrix_multiply -- does the proper multiply and shift as the TI chips do.
+     a is the k coefficient and is clamped to 10 bits (9 bits plus a sign)
+     b is the running result and is clamped to 14 bits.
+     output is 14 bits, but note the result LSB bit is always 1.
+
 **********************************************************************************************/
 static INT16 matrix_multiply(INT16 a, INT16 b)
 {
@@ -988,7 +988,7 @@ static INT16 matrix_multiply(INT16 a, INT16 b)
 #endif
 	return result;
 }
-	 
+
 /**********************************************************************************************
 
      lattice_filter -- executes one 'full run' of the lattice filter on a specific byte of
@@ -1007,7 +1007,7 @@ static INT16 lattice_filter(tms5220_state *tms)
       Kn = tms->current_k[n-1]
       bn = tms->x[n-1]
     */
-		tms->u[10] = matrix_multiply(tms->current_energy, (tms->excitation_data*64));  //Y(11) 
+		tms->u[10] = matrix_multiply(tms->current_energy, (tms->excitation_data*64));  //Y(11)
 		//tms->u[10] = matrix_multiply((tms->excitation_data*64), tms->current_energy); // wrong but sounds better
         tms->u[9] = tms->u[10] - matrix_multiply(tms->current_k[9], tms->x[9]);
         tms->u[8] = tms->u[9] - matrix_multiply(tms->current_k[8], tms->x[8]);
@@ -1062,7 +1062,7 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 				tms->RDB_flag = TRUE;
 			}
 			break;
-			
+
 		case 0x00: case 0x20: /* set rate (tms5220c only), otherwise NOP */
 			if (tms->variant == SUBTYPE_TMS5220C)
 			{
@@ -1086,7 +1086,7 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 			if (tms->talk_status == 0) /* TALKST must be clear for LA */
 			{
 				/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
-				  This code does not care about this. */
+                  This code does not care about this. */
 				if (tms->intf->load_address)
 					(*tms->intf->load_address)(tms->device, cmd & 0x0f);
 				tms->schedule_dummy_read = TRUE;
@@ -1155,9 +1155,9 @@ static void parse_frame(tms5220_state *tms)
 		bits = 131072; // == arbitrary large number
 	}
 	/* if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
-	has a 2 bit rate preceeding it, grab two bits here and store them as the rate; */
+    has a 2 bit rate preceeding it, grab two bits here and store them as the rate; */
 	if ((tms->variant == SUBTYPE_TMS5220C) && (tms->tms5220c_rate & 0x04))
-	{	
+	{
 		bits -= 2;
 		if (bits < 0) goto ranout;
 		indx = extract_bits(tms, 2);
@@ -1255,7 +1255,7 @@ static void parse_frame(tms5220_state *tms)
 		logerror("Parsed a frame successfully in ROM\n");
 #endif
 	return;
-	
+
 	ranout:
 #ifdef DEBUG_FRAME_ERRORS
     logerror("Ran out of bits on a parse!\n");
@@ -1303,11 +1303,11 @@ static DEVICE_START( tms5220 )
 
 	tms->intf = device->baseconfig().static_config ? (const tms5220_interface *)device->baseconfig().static_config : &dummy;
 	//tms->table = *device->region;
-	
+
 	tms->device = device;
 	tms5220_set_variant(tms, TMS5220_IS_5220);
 	tms->clock = device->clock;
-	
+
 	assert_always(tms != NULL, "Error creating TMS5220 chip");
 
 	/* resolve irq line */
@@ -1317,17 +1317,17 @@ static DEVICE_START( tms5220 )
 	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5220_update);
 
 	/*if (tms->table == NULL)
-	{
-		assert_always(tms->intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5220 to call for a new single bit\n  needed to generate the speech when in VSM mode\n  Aborting startup...\n");
-	    tms->M0_callback = tms->intf->M0_callback;
-	    tms->set_load_address = tms->intf->load_address;
-	}
-	else
-	{
-	    tms->M0_callback = speech_rom_read_bit;
-	    tms->set_load_address = speech_rom_set_addr;
-	}*/
-	
+    {
+        assert_always(tms->intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5220 to call for a new single bit\n  needed to generate the speech when in VSM mode\n  Aborting startup...\n");
+        tms->M0_callback = tms->intf->M0_callback;
+        tms->set_load_address = tms->intf->load_address;
+    }
+    else
+    {
+        tms->M0_callback = speech_rom_read_bit;
+        tms->set_load_address = speech_rom_set_addr;
+    }*/
+
 	/* not during reset which is called frm within a write! */
 	tms->io_ready = 1;
 	tms->true_timing = 0;

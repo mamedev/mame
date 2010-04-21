@@ -54,12 +54,12 @@ static READ16_HANDLER( pushman_68705_r )
 	if (offset == 0)
 		return state->latch;
 
-	if (offset == 3 && state->new_latch) 
+	if (offset == 3 && state->new_latch)
 	{
-		state->new_latch = 0; 
-		return 0; 
+		state->new_latch = 0;
+		return 0;
 	}
-	if (offset == 3 && !state->new_latch) 
+	if (offset == 3 && !state->new_latch)
 		return 0xff;
 
 	return (state->shared_ram[2 * offset + 1] << 8) + state->shared_ram[2 * offset];

@@ -868,7 +868,7 @@ WRITE8_HANDLER( subsino_out_c_w )
 	tilemap_mark_all_tiles_dirty (reel1_tilemap);
 	tilemap_mark_all_tiles_dirty (reel2_tilemap);
 	tilemap_mark_all_tiles_dirty (reel3_tilemap);
-//	popmessage("data %02x\n",data);
+//  popmessage("data %02x\n",data);
 }
 
 static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1025,7 +1025,7 @@ static ADDRESS_MAP_START( stisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-//	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE( subsino_tiles_offset_w )
+//  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE( subsino_tiles_offset_w )
 
 	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
 	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
@@ -1504,12 +1504,12 @@ static INPUT_PORTS_START( stisub )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 /*
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Big")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 / Small")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_BET )		PORT_IMPULSE(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Big")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3 / Small")
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_BET )      PORT_IMPULSE(3)
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 */
 
 	PORT_START("INA")
