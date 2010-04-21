@@ -200,6 +200,9 @@ static UINT8* reel1_scroll;
 static UINT8* reel2_scroll;
 static UINT8* reel3_scroll;
 static UINT8 subsino_out_c;
+static UINT8* reel1_attr;
+static UINT8* reel2_attr;
+static UINT8* reel3_attr;
 
 static WRITE8_HANDLER( subsino_tiles_offset_w )
 {
@@ -244,11 +247,6 @@ static VIDEO_START( subsino )
 	tiles_offset = 0;
 }
 
-static VIDEO_START( stisub )
-{
-	tmap = tilemap_create(	machine, get_stisub_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20 );
-	tilemap_set_transparent_pen( tmap, 0 );
-}
 
 
 WRITE8_HANDLER( subsino_reel1_ram_w )
@@ -266,6 +264,18 @@ static TILE_GET_INFO( get_subsino_reel1_tile_info )
 			1,
 			code,
 			colour,
+			0);
+}
+
+static TILE_GET_INFO( get_stisub_reel1_tile_info )
+{
+	int code = reel1_ram[tile_index];
+	int attr = reel1_attr[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code | (attr << 8),
+			0,
 			0);
 }
 
@@ -288,6 +298,18 @@ static TILE_GET_INFO( get_subsino_reel2_tile_info )
 			0);
 }
 
+static TILE_GET_INFO( get_stisub_reel2_tile_info )
+{
+	int code = reel2_ram[tile_index];
+	int attr = reel2_attr[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code | (attr << 8),
+			0,
+			0);
+}
+
 WRITE8_HANDLER( subsino_reel3_ram_w )
 {
 	reel3_ram[offset] = data;
@@ -306,6 +328,17 @@ static TILE_GET_INFO( get_subsino_reel3_tile_info )
 			0);
 }
 
+static TILE_GET_INFO( get_stisub_reel3_tile_info )
+{
+	int code = reel3_ram[tile_index];
+	int attr = reel3_attr[tile_index];
+
+	SET_TILE_INFO(
+			1,
+			code | (attr << 8),
+			0,
+			0);
+}
 
 
 static VIDEO_START( subsino_reels )
@@ -321,6 +354,23 @@ static VIDEO_START( subsino_reels )
 	tilemap_set_scroll_cols(reel3_tilemap, 64);
 
 }
+
+static VIDEO_START( stisub )
+{
+	tmap = tilemap_create(	machine, get_stisub_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20 );
+	tilemap_set_transparent_pen( tmap, 0 );
+
+	reel1_tilemap = tilemap_create(machine,get_stisub_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	reel2_tilemap = tilemap_create(machine,get_stisub_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	reel3_tilemap = tilemap_create(machine,get_stisub_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+
+	tilemap_set_scroll_cols(reel1_tilemap, 64);
+	tilemap_set_scroll_cols(reel2_tilemap, 64);
+	tilemap_set_scroll_cols(reel3_tilemap, 64);
+
+	subsino_out_c = 0x08;
+}
+
 
 static VIDEO_UPDATE( subsino )
 {
@@ -356,6 +406,44 @@ static VIDEO_UPDATE( subsino_reels )
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;
 }
+
+// areas based on d-up game in attract mode
+static const rectangle stisub_visible1 = { 0, 511,  0,  87 };
+static const rectangle stisub_visible2 = { 0, 511,  88, 143 };
+static const rectangle stisub_visible3 = { 0, 511,  144, 223 };
+
+
+static VIDEO_UPDATE( stisub_reels )
+{
+	int i;
+	bitmap_fill(bitmap,cliprect,0);
+
+	if (reel1_attr)
+	{
+		tilemap_mark_all_tiles_dirty (reel1_tilemap);
+		tilemap_mark_all_tiles_dirty (reel2_tilemap);
+		tilemap_mark_all_tiles_dirty (reel3_tilemap);
+	}
+
+	for (i= 0;i < 64;i++)
+	{
+		tilemap_set_scrolly(reel1_tilemap, i, reel1_scroll[i]);
+		tilemap_set_scrolly(reel2_tilemap, i, reel2_scroll[i]);
+		tilemap_set_scrolly(reel3_tilemap, i, reel3_scroll[i]);
+	}
+
+	if (subsino_out_c&0x08)
+	{
+		tilemap_draw(bitmap, &stisub_visible1, reel1_tilemap, 0, 0);
+		tilemap_draw(bitmap, &stisub_visible2, reel2_tilemap, 0, 0);
+		tilemap_draw(bitmap, &stisub_visible3, reel3_tilemap, 0, 0);
+	}
+
+	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
+	return 0;
+}
+
+
 
 static PALETTE_INIT( subsino_2proms )
 {
@@ -2706,7 +2794,64 @@ static WRITE8_HANDLER(colordac_w)
 	}
 }
 
+UINT8 stisub_outc;
 
+WRITE8_HANDLER( stisub_out_c_w )
+{
+	stisub_outc = data;
+
+}
+
+// this stuff is banked..
+// not 100% sure on the bank bits.. other bits are also set
+WRITE8_HANDLER( reel_scrollattr_w )
+{
+	if (stisub_outc&0x20)
+	{
+		if (offset<0x200)
+		{
+			reel1_attr[offset&0x1ff] = data;
+		}
+		else if (offset<0x400)
+		{
+			reel2_attr[offset&0x1ff] = data;
+		}
+		else if (offset<0x600)
+		{
+			reel3_attr[offset&0x1ff] = data;
+		}
+		else
+		{
+			// ??
+		}
+	}
+	else
+	{
+		offset &=0xff;
+
+		if (offset<0x40)
+		{
+			// ??
+		}
+		else if (offset<0x80)
+		{
+			reel2_scroll[offset&0x3f] = data;
+		}
+		else if (offset<0xc0)
+		{
+			reel1_scroll[offset&0x3f] = data;
+		}
+		else
+		{
+			reel3_scroll[offset&0x3f] = data;
+		}
+	}
+}
+
+READ8_HANDLER( reel_scrollattr_r )
+{
+	return reel1_attr[offset];
+}
 
 static ADDRESS_MAP_START( stisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
@@ -2720,6 +2865,8 @@ static ADDRESS_MAP_START( stisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INB" )
+
+	AM_RANGE( 0x0d008, 0x0d008 ) AM_WRITE( stisub_out_c_w )
 
 	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE( subsino_out_b_w )
 	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE( subsino_out_a_w )
@@ -2735,7 +2882,24 @@ static ADDRESS_MAP_START( stisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
 	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
-	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM // reels gfxs (not all of it)
+	
+//	AM_RANGE( 0xf000, 0xf03f ) AM_RAM AM_BASE(&reel3_attr)
+//	AM_RANGE( 0xf040, 0xf07f ) AM_RAM AM_BASE(&reel2_attr)
+//	AM_RANGE( 0xf080, 0xf0bf ) AM_RAM AM_BASE(&reel1_attr)
+
+//	AM_RANGE( 0xf0c0, 0xf0ff ) AM_WRITE(stisub_reel3_scroll_w) AM_BASE(&reel3_scroll)
+//	AM_RANGE( 0xf140, 0xf17f ) AM_WRITE(stisub_reel2_scroll_w) AM_BASE(&reel2_scroll)
+//	AM_RANGE( 0xf180, 0xf1bf ) AM_WRITE(stisub_reel1_scroll_w) AM_BASE(&reel1_scroll)
+	//AM_RANGE( 0xf1c0, 0xf1ff ) AM_RAM 	
+
+	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(reel_scrollattr_r, reel_scrollattr_w)
+
+
+
+	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(&reel1_ram)
+	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(&reel2_ram)
+	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(&reel3_ram)
+	
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( stisub )
@@ -2758,7 +2922,7 @@ static MACHINE_DRIVER_START( stisub )
 	//MDRV_PALETTE_INIT(subsino_3proms)
 
 	MDRV_VIDEO_START(stisub)
-	MDRV_VIDEO_UPDATE(subsino)
+	MDRV_VIDEO_UPDATE(stisub_reels)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2772,7 +2936,16 @@ DRIVER_INIT( stisub )
 	UINT8 *rom = memory_region( machine, "maincpu" );
 	rom[0x1005] = 0x1d; //patch protection check
 	stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
+
+	reel1_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	reel2_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	reel3_scroll = auto_alloc_array(machine, UINT8, 0x40);
+
+	reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
+	reel2_attr = auto_alloc_array(machine, UINT8, 0x200);
+	reel3_attr = auto_alloc_array(machine, UINT8, 0x200);
+
 }
 
 
-GAMEL( 1995, stisub,   0,        stisub,   smoto20,  stisub,   ROT0, "Alpha",         "Super Treasure Island (Subsino)",     0,      layout_tisub )
+GAME( 1995, stisub,   0,        stisub,   smoto20,  stisub,   ROT0, "Alpha",         "Treasure Bonus (Subsino)",     GAME_NOT_WORKING ) // board CPU module marked 'Super Treasure Island' (alt title?)
