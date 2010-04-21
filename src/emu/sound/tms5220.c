@@ -946,8 +946,8 @@ static INT16 clip_and_wrap(INT16 cliptemp)
     /* clipping & wrapping, just like the patent shows:
 	   first of all the result should be clamped to 14 bits, between -16384 and 16383   
 	*/
-	while (cliptemp > 16383) cliptemp -= 16384;
-	while (cliptemp < -16384) cliptemp += 16384;
+	while (cliptemp > 16383) cliptemp -= 32768;
+	while (cliptemp < -16384) cliptemp += 32768;
 	/* the top 10 bits of this result are visible on the digital output IO pin.
 	   next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output, otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
 	   1x xxxx xxxx xxxx -> 0b10000000
@@ -977,10 +977,10 @@ static INT16 clip_and_wrap(INT16 cliptemp)
 static INT16 matrix_multiply(INT16 a, INT16 b)
 {
 	INT16 result;
-	while (a>511) { a-=512; }
-	while (a<-512) { a+=512; }
-	while (b>16383) { b-=16384; }
-	while (b<-16384) { b+=16384; }
+	while (a>511) { a-=1024; }
+	while (a<-512) { a+=1024; }
+	while (b>16383) { b-=32768; }
+	while (b<-16384) { b+=32768; }
 	result = ((a*b)>>9)|1;
 #ifdef VERBOSE
 	if (result>16383) fprintf(stderr,"matrix multiplier overflowed! a: %x, b: %x", a, b);
