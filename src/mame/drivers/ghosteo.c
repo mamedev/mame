@@ -615,4 +615,4 @@ static DRIVER_INIT( bballoon )
 }
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "Balloon & Balloon", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?, hapytour, 0, bballoon, bballoon, 0,        ROT0, "Game Load", "Happy Tour", GAME_NO_SOUND | GAME_NOT_WORKING ) /* Likely will need simular flash ECC check patches */
+GAME( 2005, hapytour, 0, bballoon, bballoon, 0,        ROT0, "GAV Company", "Happy Tour", GAME_NO_SOUND | GAME_NOT_WORKING ) /* Likely will need simular flash ECC check patches */
