@@ -3005,6 +3005,7 @@ src/mame/layout/sspeedr.lay svneol=native#text/plain
 src/mame/layout/stactics.lay svneol=native#text/plain
 src/mame/layout/starcas.lay svneol=native#text/plain
 src/mame/layout/stepstag.lay svneol=native#text/plain
+src/mame/layout/stisub.lay svneol=native#text/plain
 src/mame/layout/stocker.lay svneol=native#text/plain
 src/mame/layout/subroc3d.lay svneol=native#text/plain
 src/mame/layout/superchs.lay svneol=native#text/plain
