@@ -259,10 +259,7 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
-/* The following TMS5200/TMC0285 coefficients come from US Patent 4,335,277 and 4,581,757. However, the K10 row of coefficients are entirely missing from both of those patents.
-***These values have not yet been verified against a real TMS5200 or TMC0285***
-*/
-   // k* is followed by d if done transcription, c if checked for derivative aberrations
+/* The following TMS5200/TMC0285 coefficients have been directly dumped from a real TMS5200 chip by Lord Nightmare, and can be regarded as established fact. Note that the K coefficients are VERY different from the coefficients given in the US 4,335,277 patent, which may have been for some sort of prototype or otherwise intentionally scrambled. The energy and pitch tables, however, are identical to the patent. */
 static const struct tms5100_coeffs tms5200_coeff =
 {
 	/* subtype */
@@ -271,10 +268,10 @@ static const struct tms5100_coeffs tms5200_coeff =
 	4,
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	/* Ed   */
-	{ 0,   1,   2,   3,   4,   6,   8,   11,
-	 16,  23,  33,  47,  63,  85,  114, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
-	/* Pd   */
+	/* E */
+	{ 0,   1,   2,   3,   4,   6,   8,  11,
+	 16,  23,  33,  47,  63,  85, 114, 511 }, // last value is actually ? but code needs 511 as stop sentinel
+	/* P */
 	{ 0,  14,  15,  16,  17,  18,  19,  20,
 	 21,  22,  23,  24,  25,  26,  27,  28,
 	 29,  30,  31,  32,  34,  36,  38,  40,
@@ -284,37 +281,37 @@ static const struct tms5100_coeffs tms5200_coeff =
 	112, 117, 122, 127, 133, 139, 145, 151,
 	157, 164, 171, 178, 186, 194, 202, 211 },
 	{
-		/* K1dc  */
-		{ -507, -505, -503, -501, -497, -493, -488, -481,
-		  -473, -463, -450, -434, -414, -390, -362, -328,
-		  -288, -242, -191, -135,  -75,  -13,   49,  110,
-		   168,  221,  269,  311,  348,  379,  404,  426 },
-		/* K2dc  */
-		{ -294, -266, -235, -202, -167, -130,  -92,  -52,
-		   -12,   28,   68,  108,  145,  182,  216,  248,
-		   278,  305,  330,  352,  372,  390,  406,  420,
-		   432,  443,  453,  461,  468,  474,  479,  486 },
-		/* K3dc  */
-		{ -449, -432, -411, -385, -354, -317, -273, -223,
-		  -167, -107,  -43,   22,   87,  148,  206,  258 },
-		/* K4dc (first 4-5 values are probably wrong but close) */
-		{ -321, -270, -220, -157,  -97,  -40,   25,   89,
-		   150,  207,  259,  304,  343,  376,  403,  425 },
-		/* K5dc  */
-		{ -373, -347, -318, -284, -247, -206, -162, -115,
-		   -65,  -15,   36,   86,  135,  181,  224,  263 },
-		/* K6dc  */
-		{ -213, -176, -137,  -96,  -54,  -11,   33,   75,
-		   117,  157,  195,  231,  264,  294,  322,  347 },
-		/* K7dc  */
-		{ -294, -264, -232, -198, -161, -122,  -82,  -41,
-		     1,   43,   84,  125,  163,  200,  234,  266 },
-		/* K8dc  */
-		{ -195, -117,  -32,   54,  137,  213,  279,  335 },
-		/* K9dc  */
-		{ -122,  -55,   15,   83, 149,  210,  264,  311  },
-		/* K10  - this was entirely missing from the patent, and I've simply copied the TMS5220 one, which is wrong */
-		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
+		/* K1 */
+		{ -501, -498, -495, -490, -485, -478, -469, -459,
+		  -446, -431, -412, -389, -362, -331, -295, -253,
+		  -207, -156, -102,  -45,   13,   70,  126,  179,
+		   228,  272,  311,  345,  374,  399,  420,  437 },
+		/* K2 */
+		{ -376, -357, -335, -312, -286, -258, -227, -195,
+		  -161, -124,  -87,  -49,  -10,   29,   68,  106,
+		   143,  178,  212,  243,  272,  299,  324,  346,
+		   366,  384,  400,  414,  427,  438,  448,  506 },
+		/* K3 */
+		{ -407, -381, -349, -311, -268, -218, -162, -102,
+		   -39,   25,   89,  149,  206,  257,  302,  341 },
+		/* K4 */
+		{ -290, -252, -209, -163, -114,  -62,   -9,   44,
+		    97,  147,  194,  238,  278,  313,  344,  371 },
+		/* K5 */
+		{ -318, -283, -245, -202, -156, -107,  -56,   -3,
+		    49,  101,  150,  196,  239,  278,  313,  344 },
+		/* K6 */
+		{ -193, -152, -109,  -65,  -20,   26,   71,  115,
+		   158,  198,  235,  270,  301,  330,  355,  377 },
+		/* K7 */
+		{ -254, -218, -180, -140,  -97,  -53,   -8,   36,
+		    81,  124,  165,  204,  240,  274,  304,  332 },
+		/* K8 */
+		{ -205, -112,  -10,   92,  187,  269,  336,  387 },
+		/* K9 */
+		{ -249, -183, -110,  -32,   48,  126,  198,  261 },
+		/* K10 */
+		{ -190, -133,  -73,  -10,   53,  115,  173,  227 },
 	},
 	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
