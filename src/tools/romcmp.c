@@ -553,7 +553,7 @@ static int load_files(int i, int *found, const char *path)
 }
 
 
-int CLIB_DECL main(int argc,char **argv)
+int CLIB_DECL main(int argc,char *argv[])
 {
 	int	err;
 	int total_modes = MODE_NIB2;	/* by default, use only MODE_A, MODE_NIB1 and MODE_NIB2 */

@@ -3307,7 +3307,7 @@ static chd_error chdman_clone_metadata(chd_file *source, chd_file *dest)
     main - entry point
 -------------------------------------------------*/
 
-int CLIB_DECL main(int argc, char **argv)
+int CLIB_DECL main(int argc, char *argv[])
 {
 	static const struct
 	{
