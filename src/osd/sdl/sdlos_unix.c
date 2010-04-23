@@ -293,7 +293,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 	}
 	else
 	{
-		*dst = (char *)malloc(strlen(path_buffer)+strlen(path)+3);
+		*dst = (char *)osd_malloc(strlen(path_buffer)+strlen(path)+3);
 
 		// if it's already a full path, just pass it through
 		if (path[0] == '/')

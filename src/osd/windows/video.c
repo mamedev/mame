@@ -263,7 +263,7 @@ static void init_monitors(void)
 			if (utf8_device != NULL)
 			{
 				mame_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->handle, utf8_device, (monitor == primary_monitor) ? "(primary)" : "");
-				global_free(utf8_device);
+				osd_free(utf8_device);
 			}
 		}
 	}
@@ -349,7 +349,7 @@ static win_monitor_info *pick_monitor(int index)
 			if (utf8_device != NULL)
 			{
 				rc = strcmp(scrname, utf8_device);
-				global_free(utf8_device);
+				osd_free(utf8_device);
 			}
 			if (rc == 0)
 				goto finishit;

@@ -181,7 +181,7 @@ error:
 		free(*file);
 		*file = NULL;
 	}
-	free(t_path);
+	osd_free(t_path);
 	return filerr;
 }
 
@@ -276,7 +276,7 @@ file_error osd_rmfile(const char *filename)
 
 done:
 	if (tempstr)
-		free(tempstr);
+		osd_free(tempstr);
 	return filerr;
 }
 
@@ -302,7 +302,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 	if (t_filename == NULL)
 		return FALSE;
 	file = CreateFile(t_filename, GENERIC_READ, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, NULL);
-	free(t_filename);
+	osd_free(t_filename);
 	if (file == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -456,7 +456,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 done:
 	if (t_path != NULL)
-		free(t_path);
+		osd_free(t_path);
 	return result;
 }
 
@@ -497,7 +497,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 
 done:
 	if (t_path != NULL)
-		free(t_path);
+		osd_free(t_path);
 	return err;
 }
 

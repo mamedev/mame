@@ -489,7 +489,7 @@ void debug_view_end_update(debug_view *view)
 			if (size > view->viewdata_size)
 			{
 				view->viewdata_size = size;
-				global_free(view->viewdata);
+				auto_free(view->machine, view->viewdata);
 				view->viewdata = auto_alloc_array(view->machine, debug_view_char, view->viewdata_size);
 			}
 

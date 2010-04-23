@@ -247,7 +247,7 @@ void pool_clear(object_pool *pool)
 
 
 /*-------------------------------------------------
-    pool_free - frees a memory pool and all
+    pool_free_lib - frees a memory pool and all
     contained memory blocks
 -------------------------------------------------*/
 

@@ -60,7 +60,7 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 
 	/* free arguments */
 	for (i = 0; i < argc; i++)
-		free(utf8_argv[i]);
+		osd_free(utf8_argv[i]);
 	free(utf8_argv);
 
 #ifdef MALLOC_DEBUG

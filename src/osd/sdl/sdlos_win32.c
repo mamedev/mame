@@ -377,7 +377,7 @@ CHAR *astring_from_utf8(const char *utf8string)
 
 	// convert UTF-16 to "ANSI code page" string
 	char_count = WideCharToMultiByte(CP_ACP, 0, wstring, -1, NULL, 0, NULL, NULL);
-	result = (CHAR *)malloc(char_count * sizeof(*result));
+	result = (CHAR *)osd_malloc(char_count * sizeof(*result));
 	if (result != NULL)
 		WideCharToMultiByte(CP_ACP, 0, wstring, -1, result, char_count, NULL, NULL);
 
@@ -395,7 +395,7 @@ WCHAR *wstring_from_utf8(const char *utf8string)
 
 	// convert MAME string (UTF-8) to UTF-16
 	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
-	result = (WCHAR *)malloc(char_count * sizeof(*result));
+	result = (WCHAR *)osd_malloc(char_count * sizeof(*result));
 	if (result != NULL)
 		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
 
@@ -449,7 +449,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 done:
 	if (t_path)
-		free(t_path);
+		osd_free(t_path);
 	return result;
 }
 
@@ -549,7 +549,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 
 done:
 	if (t_path != NULL)
-		free(t_path);
+		osd_free(t_path);
 	return err;
 }
 

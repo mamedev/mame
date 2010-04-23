@@ -50,11 +50,13 @@
 //  FUNCTION PROTOTYPES
 //============================================================
 
-CHAR *astring_from_utf8(const char *s) ATTR_MALLOC;
-char *utf8_from_astring(const CHAR *s) ATTR_MALLOC;
+// the result of these functions has to be released with osd_free()
 
-WCHAR *wstring_from_utf8(const char *s) ATTR_MALLOC;
-char *utf8_from_wstring(const WCHAR *s) ATTR_MALLOC;
+CHAR *astring_from_utf8(const char *s);
+char *utf8_from_astring(const CHAR *s);
+
+WCHAR *wstring_from_utf8(const char *s);
+char *utf8_from_wstring(const WCHAR *s);
 
 #ifdef UNICODE
 #define tstring_from_utf8	wstring_from_utf8

@@ -60,7 +60,7 @@ void win_output_debug_string_utf8(const char *string)
 	if (t_string != NULL)
 	{
 		OutputDebugString(t_string);
-		free(t_string);
+		osd_free(t_string);
 	}
 }
 
@@ -83,7 +83,7 @@ DWORD win_get_module_file_name_utf8(HMODULE module, char *filename, DWORD size)
 		return 0;
 
 	size = (DWORD) snprintf(filename, size, "%s", utf8_filename);
-	free(utf8_filename);
+	osd_free(utf8_filename);
 	return size;
 }
 
@@ -102,7 +102,7 @@ BOOL win_set_file_attributes_utf8(const char* filename, DWORD fileattributes)
 
 	result = SetFileAttributes(t_filename, fileattributes);
 
-	free(t_filename);
+	osd_free(t_filename);
 
 	return result;
 }
@@ -125,14 +125,14 @@ BOOL win_copy_file_utf8(const char* existingfilename, const char* newfilename, B
 
 	t_newfilename = tstring_from_utf8(newfilename);
 	if( !t_newfilename ) {
-		free(t_existingfilename);
+		osd_free(t_existingfilename);
 		return result;
 	}
 
 	result = CopyFile(t_existingfilename, t_newfilename, failifexists);
 
-	free(t_newfilename);
-	free(t_existingfilename);
+	osd_free(t_newfilename);
+	osd_free(t_existingfilename);
 
 	return result;
 }
@@ -161,8 +161,8 @@ BOOL win_move_file_utf8(const char* existingfilename, const char* newfilename)
 
 	result = MoveFile(t_existingfilename, t_newfilename);
 
-	free(t_newfilename);
-	free(t_existingfilename);
+	osd_free(t_newfilename);
+	osd_free(t_existingfilename);
 
 	return result;
 }
@@ -197,9 +197,9 @@ int win_message_box_utf8(HWND window, const char *text, const char *caption, UIN
 
 done:
 	if (t_text)
-		free(t_text);
+		osd_free(t_text);
 	if (t_caption)
-		free(t_caption);
+		osd_free(t_caption);
 	return result;
 }
 
@@ -225,7 +225,7 @@ BOOL win_set_window_text_utf8(HWND window, const char *text)
 
 done:
 	if (t_text)
-		free(t_text);
+		osd_free(t_text);
 	return result;
 }
 
@@ -254,7 +254,7 @@ int win_get_window_text_utf8(HWND window, char *buffer, size_t buffer_size)
 
 done:
 	if (utf8_buffer)
-		free(utf8_buffer);
+		osd_free(utf8_buffer);
 	return result;
 }
 
@@ -278,15 +278,15 @@ HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char*
 
 	t_windowname = tstring_from_utf8(windowname);
 	if( !t_windowname ) {
-		free(t_classname);
+		osd_free(t_classname);
 		return result;
 	}
 
 	result = CreateWindowEx(exstyle, t_classname, t_windowname, style, x, y, width, height, parent,
 							menu, instance, param);
 
-	free(t_windowname);
-	free(t_classname);
+	osd_free(t_windowname);
+	osd_free(t_classname);
 
 	return result;
 }

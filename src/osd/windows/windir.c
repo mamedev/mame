@@ -110,7 +110,7 @@ osd_directory *osd_opendir(const char *dirname)
 error:
 	// cleanup
 	if (t_dirname != NULL)
-		free(t_dirname);
+		osd_free(t_dirname);
 	if (dirfilter != NULL)
 		free(dirfilter);
 	if (dir != NULL && dir->find == INVALID_HANDLE_VALUE)
@@ -131,7 +131,7 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 	// if we've previously allocated a name, free it now
 	if (dir->entry.name != NULL)
 	{
-		free((void *)dir->entry.name);
+		osd_free((void *)dir->entry.name);
 		dir->entry.name = NULL;
 	}
 
@@ -162,7 +162,7 @@ void osd_closedir(osd_directory *dir)
 {
 	// free any data associated
 	if (dir->entry.name != NULL)
-		free((void *)dir->entry.name);
+		osd_free((void *)dir->entry.name);
 	if (dir->find != INVALID_HANDLE_VALUE)
 		FindClose(dir->find);
 	free(dir);
@@ -180,7 +180,7 @@ int osd_is_absolute_path(const char *path)
 	if (t_path != NULL)
 	{
 		result = !PathIsRelative(t_path);
-		free(t_path);
+		osd_free(t_path);
 	}
 	return result;
 }

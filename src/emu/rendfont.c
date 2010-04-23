@@ -482,14 +482,14 @@ static int render_font_load_cached_bdf(render_font *font, const char *filename)
 		global_free(data);
 
 	/* close the file */
-	global_free(cachedname);
+	osd_free(cachedname);
 	mame_fclose(file);
 	return result;
 
 error:
 	/* close the file */
 	if (cachedname != NULL)
-		global_free(cachedname);
+		osd_free(cachedname);
 	if (data != NULL)
 		global_free(data);
 	mame_fclose(file);

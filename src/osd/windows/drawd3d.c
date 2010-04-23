@@ -1200,7 +1200,7 @@ static int config_adapter_mode(win_window_info *window)
 			if (utf8_device != NULL)
 			{
 				mame_printf_error("Device %s currently in an unsupported mode\n", utf8_device);
-				global_free(utf8_device);
+				osd_free(utf8_device);
 			}
 			return 1;
 		}
@@ -1228,7 +1228,7 @@ static int config_adapter_mode(win_window_info *window)
 		if (utf8_device != NULL)
 		{
 			mame_printf_error("Proposed video mode not supported on device %s\n", utf8_device);
-			global_free(utf8_device);
+			osd_free(utf8_device);
 		}
 		return 1;
 	}

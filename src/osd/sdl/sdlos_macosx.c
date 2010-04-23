@@ -277,7 +277,7 @@ char *osd_get_clipboard_text(void)
 							length = CFDataGetLength (data_ref);
 							range = CFRangeMake (0,length);
 
-							result = (char *)malloc (length+1);
+							result = (char *)osd_malloc (length+1);
 							if (result != NULL)
 							{
 								CFDataGetBytes (data_ref, range, (unsigned char *)result);
@@ -373,7 +373,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 	}
 	else
 	{
-		*dst = (char *)malloc(strlen(path_buffer)+strlen(path)+3);
+		*dst = (char *)osd_malloc(strlen(path_buffer)+strlen(path)+3);
 
 		// if it's already a full path, just pass it through
 		if (path[0] == '/')
