@@ -3993,9 +3993,9 @@ DokiDoki Penguin Land *not confirmed
 						/* 1989.04 Turbo Outrun (US) */
 						/* 1989.?? Turbo Outrun (World) */
 	DRIVER( toutrun )	/* 1987 (FD1094, decrypted) */
-	DRIVER( toutrun2 )	/* 1987 (FD1094, decrypted) */
-	DRIVER( toutrun1 )	/* 1987 (protected) */
-	DRIVER( toutrunu )	/* 1987 (FD1094, decrypted) */
+	DRIVER( toutrun3 )	/* 1987 (FD1094, decrypted) */
+	DRIVER( toutrun2 )	/* 1987 (protected) */
+	DRIVER( toutrun1 )	/* 1987 (FD1094, decrypted) */
 
 	/* X Board */
 	DRIVER( aburner )	/* 1987.07 After Burner (Japan) */
