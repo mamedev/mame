@@ -196,7 +196,7 @@ static const struct tms5100_coeffs pat4403965_coeff =
 	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
-/* The following TMS5110A LPC coefficients were read from an actual chip by Jarek Burczynski using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still came from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
+/* The following TMS5110A LPC coefficients were directly read from an actual TMS5110A chip by Jarek Burczynski using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still come from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
 */
 static const struct tms5100_coeffs tms5110a_coeff =
 {
@@ -259,7 +259,8 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
-/* The following TMS5200/TMC0285 coefficients have been directly dumped from a real TMS5200 chip by Lord Nightmare, and can be regarded as established fact. Note that the K coefficients are VERY different from the coefficients given in the US 4,335,277 patent, which may have been for some sort of prototype or otherwise intentionally scrambled. The energy and pitch tables, however, are identical to the patent. */
+/* The following TMS5200/TMC0285 coefficients were directly read from an actual TMS5200 chip by Lord Nightmare using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still come from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
+Note that the K coefficients are VERY different from the coefficients given in the US 4,335,277 patent, which may have been for some sort of prototype or otherwise intentionally scrambled. The energy and pitch tables, however, are identical to the patent. */
 static const struct tms5100_coeffs tms5200_coeff =
 {
 	/* subtype */
@@ -325,9 +326,9 @@ static const struct tms5100_coeffs tms5200_coeff =
 	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
-/* The following TMS5220 coefficients come from the datasheet, and its addendum, with the exception of the energy table. The energy table is copied from the TMS5110a dump and the TMS5200 patent (which are both the same for energy), as the datasheet lists it in RMS notation which doesn't help us since I(Lord Nightmare) can't figure out the proper formula TI used for converting energy to RMS (the obvious 'take all the values in the chirp ROM, multiply them by 1/2/3/4/etc, square each one, sum them up, divide by 51, which is # of ROM entries in chirp ROM, and take the square root of the result', doesn't QUITE work. It almost does, if you add 16 to the result, for the first 4 entries, but beyond that the entries become farther and farther offset).
+/* The following TMS5220 coefficients were directly read from an actual TMS5220 chip by Lord Nightmare using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still come from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
+Note: The coefficients match those from the datasheet, and its addendum, with the exception of the energy table. The energy table on the datasheet (and in the QV5220.COD from qboxpro) lists it in RMS notation which doesn't help us since I(Lord Nightmare) can't figure out the proper formula TI used for converting energy to RMS (the obvious 'take all the values in the chirp ROM, multiply them by 1/2/3/4/etc, square each one, sum them up, divide by 51, which is # of ROM entries in chirp ROM, and take the square root of the result', doesn't QUITE work. It almost does, if you add 16 to the result, for the first 4 entries, but beyond that the entries become farther and farther offset).
 Note that all the LPC K* values match the TMS5110a table exactly.
-***These values have not yet been verified against a real TMS5220***
 */
 static const struct tms5100_coeffs tms5220_coeff =
 {
@@ -338,8 +339,8 @@ static const struct tms5100_coeffs tms5220_coeff =
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E   */
-	{ 0,   1,   2,   3,   4,   6,   8,   11,
-	 16,  23,  33,  47,  63,  85,  114, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
+	{ 0,   1,   2,   3,   4,   6,   8,  11,
+	 16,  23,  33,  47,  63,  85, 114, 511 }, /* last value is actually ? in ROM, but 511 is stop sentinel */
 	/* P   */
 	{ 0,  15,  16,  17,  18,  19,  20,  21,
 	 22,  23,  24,  25,  26,  27,  28,  29,
@@ -362,7 +363,7 @@ static const struct tms5100_coeffs tms5220_coeff =
 		   422,  435,  445,  455,  463,  470,  476,  506 },
 		/* K3  */
 		{ -441, -387, -333, -279, -225, -171, -117,  -63,
-		    -9,   45,   98,  152,  206,  260,  314,  368 },
+		    -9,   45,   98,  152,  206,  260,  314,  368  },
 		/* K4  */
 		{ -328, -273, -217, -161, -106,  -50,    5,   61,
 		   116,  172,  228,  283,  339,  394,  450,  506  },
@@ -371,16 +372,16 @@ static const struct tms5100_coeffs tms5220_coeff =
 		    43,   90,  136,  182,  229,  275,  322,  368  },
 		/* K6  */
 		{ -256, -212, -168, -123,  -79,  -35,   10,   54,
-		    98,  143,  187,  232,  276,  320,  365,  409 },
+		    98,  143,  187,  232,  276,  320,  365,  409  },
 		/* K7  */
 		{ -308, -260, -212, -164, -117,  -69,  -21,   27,
 		    75,  122,  170,  218,  266,  314,  361,  409  },
 		/* K8  */
 		{ -256, -161,  -66,   29,  124,  219,  314,  409  },
 		/* K9  */
-		{ -256, -176,  -96,  -15,  65,  146,  226,  307  },
+		{ -256, -176,  -96,  -15,   65,  146,  226,  307  },
 		/* K10 */
-		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
+		{ -205, -132,  -59,   14,   87,  160,  234,  307  },
 	},
 	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
@@ -395,8 +396,7 @@ static const struct tms5100_coeffs tms5220_coeff =
 };
 
 /* The following TMS5220C coefficients come from the tables in QBOXPRO, a program written at least in part by George "Larry" Brantingham of Quadravox, formerly of Texas Instruments, who had laid out the silicon for the TMS5100/TMC0280/CD2801. It is the same as the TMS5220 but has a change in the energy table (is this actually correct? or is this one correct for both 5220s? or is this the wrong table and the TMS5220 one correct for both?)
-Note: the energy table in QBOXPRO is also in RMS and was not used; however the energy values are offset by -1 compared to the 5220, which has been done here. the '152' is an educated guess.
-Note: the pitch table is the same as TMS5220 but with +1 applied to each value, and the first and second values the same, as shown in QV5220.COD.
+Note: the energy table in QV5220.COD is also in RMS and was not used (it also may well be incorrect; the values in QV5220.COD have an offset by one index which looks wrong), instead the table from the 5200/5220 is used here.
 Note: the Kx tables are taken directly from QV5220.COD but with /64 added to each value as the values are stored ranging from -32768 to 32767 in QBOXPRO instead of -512 to 511 as on the real chip.
 ***These values have not yet been verified against a real TMS5220C, see below as for why***
 This has not yet been verified against a real TMS5220C, and doing so will require decapping one as the TMS5220C, unlike the TMS5220, has a nonfunctional PROMOUT pin. This makes reading the internal LPC tables out electronically (via PROMOUT) impossible.
@@ -410,10 +410,10 @@ static const struct tms5100_coeffs tms5220c_coeff =
 	6,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E   */
-	{ 0,   2,   3,   4,   6,   8,   11,   16, // first value is really 1, but must be 0 for zero energy frames to work properly
-	 23,  33,  47,  63,  85,  114, 152, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
+	{ 0,   1,   2,   3,   4,   6,   8,  11,
+	 16,  23,  33,  47,  63,  85, 114, 511 }, /* last value is actually ? in ROM, but 511 is stop sentinel */
 	//{ 0x0d,  0x16,  0x20,  0x2d,  0x40,  0x5b,  0x81,  0xb6,
-	// 0x101, 0x16c, 0x202, 0x2d6, 0x402, 0x5a9, 0x7ff, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
+	// 0x101, 0x16c, 0x202, 0x2d6, 0x402, 0x5a9, 0x7ff, 511 }, /* values from 5220_10.bin code for the tms50c10; last value is actually 0 in ROM, but 511 is stop sentinel */
 	/* P   */
 	{ 0,  16,  17,  18,  19,  20,  21,  22, // first value is 16 in QV5220.COD but must be 0 for unvoiced speech to work properly
 	 23,  24,  25,  26,  27,  28,  29,  30,

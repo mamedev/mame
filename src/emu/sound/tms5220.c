@@ -42,13 +42,14 @@ Note the standard naming for d* data bits with 7 as MSB and 0 as LSB is in lower
 TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 
 TODO:
-    Implement a ready callback for pc interfaces
+    * Implement a ready callback for pc interfaces
     - this will be quite a challenge since for it to be really accurate
       the whole emulation has to run in sync (lots of timers) with the
       cpu cores.
-    If a command is still executing, /READY will be kept high until the command has
-    finished if the next command is written.
-    tomcat has a 5220 which is not hooked up at all
+    * If a command is still executing, /READY will be kept high until the command has
+      finished if the next command is written.
+    * tomcat has a 5220 which is not hooked up at all
+    * the ranout: target in parse_frame isn't very accurate to hardware
 
 Progress list for drivers using old vs new interface:
 starwars: uses new interface (couriersud)
@@ -58,7 +59,7 @@ atarisy2: uses new interface (Lord Nightmare)
 atarijsa: uses new interface (Lord Nightmare)
 firefox: uses new interface (couriersud)
 mhavoc: uses old interface, and is in the machine file instead of the driver.
-monymony(zaccaria.c): uses new interface (couriersud)
+monymony/jackrabt(zaccaria.c): uses new interface (couriersud)
 victory(audio/exidy.c): uses new interface (couriersud)
 looping: uses old interface
 portraits: uses *NO* interface; the i/o cpu hasn't been hooked to anything!
@@ -67,6 +68,12 @@ dotron and midwayfb(mcr.c): uses old interface
 Notes:
     Looping has the tms5220 hookep up directly to the cpu. However currently the
     tms9900 cpu core does not support a ready line.
+
+Pedantic detail from observation of real chip:
+The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
+'idle' and not speaking, in this order:
+e[0] p[0] k1[0] k2[0] k3[0] k4[0] k5[f] k6[f] k7[f] k8[7] k9[7] k10[7]
+
 
     Email from Lord Nightmare having a lot more detail follows:
 
@@ -1260,15 +1267,14 @@ static void parse_frame(tms5220_state *tms)
 #ifdef DEBUG_FRAME_ERRORS
     logerror("Ran out of bits on a parse!\n");
 #endif
+	if (tms->speak_external != 1)
+		fatalerror("reached ranout when not in speak_external mode! should never happen! contact MAMEDEV!");
     /* this is an error condition; mark the buffer empty and turn off speaking */
-    tms->buffer_empty = 1;
-	tms->talk_status = tms->speak_external = tms->speaking_now = 0;
-    tms->fifo_count = tms->fifo_head = tms->fifo_tail = 0;
-
-	tms->RDB_flag = FALSE;
-
-    /* generate an interrupt since TS went low */
-    set_interrupt_state(tms, 1);
+	// TODO: stuff here needs to be made more accurate to hardware.
+	tms->new_frame_energy = COEFF_ENERGY_SENTINEL; // technically this isn't right, but should work.
+    tms->fifo_count = tms->fifo_head = tms->fifo_tail = 0; // remove any leftover bits in the fifo. In reality the pull should happen with any missing bits ending up as zeroes and a buffer empty speech halt occurring immediately afterward.
+	update_status_and_ints(tms);
+	tms->speaking_now = tms->speak_external = 0; // just in case. should fix glitches in jackrabt
     return;
 
 }
@@ -1476,12 +1482,12 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 #ifdef DEBUG_RS_WS
 			logerror("Schedule write ready\n");
 #endif
-			//tms->io_ready = 1;
-			///* 100 nsec from data sheet */
-			//timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb);
+			tms->io_ready = 1;
+			/* 100 nsec from data sheet */
+			timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb); // goes low nearly immediately, i.e. within 3 cycles
 			tms->io_ready = 0;
 			/* 25 usec in datasheet, but zaccaria won't work */
-			timer_set(tms->device->machine, ATTOTIME_IN_USEC(100), tms, 1, io_ready_cb);
+			timer_set(tms->device->machine, ATTOTIME_IN_USEC(100), tms, 1, io_ready_cb); // this should take around 12-15 cycles to complete
 		}
 	}
 }
@@ -1524,10 +1530,10 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		else
 		{
 			///* high to low - schedule ready cycle*/
-			//tms->io_ready = 1;
-			//timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb);
+			tms->io_ready = 1;
+			timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb); // goes low nearly immediately, i.e. within 3 ccyles
 			tms->io_ready = 0;
-			timer_set(tms->device->machine, ATTOTIME_IN_USEC(25), tms, 1, io_ready_cb);
+			timer_set(tms->device->machine, ATTOTIME_IN_USEC(25), tms, 1, io_ready_cb); // this should take around 12-15 cycles to complete
 		}
 	}
 }
