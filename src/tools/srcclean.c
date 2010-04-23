@@ -67,7 +67,7 @@ static UINT8 modified[MAX_FILE_SIZE];
 
 int main(int argc, char *argv[])
 {
-	int removed_tabs = 0, removed_spaces = 0, fixed_mac_style = 0, fixed_nix_style = 0;
+	int removed_tabs = 0, removed_spaces = 0, fixed_mac_style = 0, fixed_nix_style = 0, added_newline = 0;
 	int src = 0, dst = 0, in_c_comment = FALSE, in_cpp_comment = FALSE, in_c_string = FALSE;
 	int hichars = 0;
 	int is_c_file;
@@ -232,11 +232,19 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	if (is_c_file && modified[dst - 1] != 0x0a)
+	{
+		modified[dst++] = 0x0d;
+		modified[dst++] = 0x0a;
+		added_newline = 1;
+	}
+		
 	/* if the result == original, skip it */
 	if (dst != bytes || memcmp(original, modified, bytes))
 	{
 		/* explain what we did */
 		printf("Cleaned up %s:", argv[1]);
+		if (added_newline) printf(" added newline at end of file");
 		if (removed_spaces) printf(" removed %d space(s)", removed_spaces);
 		if (removed_tabs) printf(" removed %d tab(s)", removed_tabs);
 		if (hichars) printf(" fixed %d high-ASCII char(s)", hichars);
