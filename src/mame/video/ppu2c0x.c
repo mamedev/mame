@@ -203,7 +203,7 @@ void ppu2c0x_init_palette( running_machine *machine, int first_entry )
 	};
 
 	/* Loop through the emphasis modes (8 total) */
-	for (color_emphasis = 0; color_emphasis < 8; color_emphasis ++)
+	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)
 	{
 		/*
         double r_mod = 0.0;
@@ -1071,7 +1071,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 			if ((data & PPU_CONTROL1_COLOR_EMPHASIS) != (ppu2c0x->regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS))
 			{
 				int i;
-				for (i = 0; i <= 0x1f; i ++)
+				for (i = 0; i <= 0x1f; i++)
 				{
 					UINT8 oldColor = ppu2c0x->palette_ram[i];
 
@@ -1275,8 +1275,10 @@ static DEVICE_START( ppu2c0x )
 	memset(ppu2c0x, 0, sizeof(*ppu2c0x));
 	ppu2c0x->scanlines_per_frame = (int) device->get_config_int(PPU2C0XINFO_INT_SCANLINES_PER_FRAME);
 
+	/* usually, no security value... */
 	ppu2c0x->security_value = 0;
 
+	/* ...except for VS. games which specific PPU types */
 	if (device->type == PPU_2C05_01)
 		ppu2c0x->security_value = 0x1b;	// game (jajamaru) doesn't seem to ever actually check it
 
@@ -1443,7 +1445,7 @@ DEVICE_GET_INFO(ppu2c04)
 	}
 }
 
-DEVICE_GET_INFO(ppu2c05)
+DEVICE_GET_INFO(ppu2c05_01)
 {
 	switch (state)
 	{
@@ -1451,6 +1453,21 @@ DEVICE_GET_INFO(ppu2c05)
 		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
 		default:										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
+}
+
+DEVICE_GET_INFO(ppu2c05_02)
+{
+	DEVICE_GET_INFO_CALL(ppu2c05_01);
+}
+
+DEVICE_GET_INFO(ppu2c05_03)
+{
+	DEVICE_GET_INFO_CALL(ppu2c05_01);
+}
+
+DEVICE_GET_INFO(ppu2c05_04)
+{
+	DEVICE_GET_INFO_CALL(ppu2c05_01);
 }
 
 DEVICE_GET_INFO(ppu2c07)
