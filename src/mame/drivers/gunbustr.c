@@ -147,14 +147,36 @@ static WRITE32_HANDLER( motor_control_w )
     Standard value poked into MSW is 0x3c00
     (0x2000 and zero are written at startup)
 
-    Three bits are written in test mode to test
-    lamps and motors:
-
-    ......x. ........   Hit motor
-    .......x ........   Solenoid
-    ........ .....x..   Hit lamp
 */
+	if (data & 0x1000000)
+	{
+	output_set_value("Player1_Gun_Recoil",1);
+	}
+	else
+	{
+	output_set_value("Player1_Gun_Recoil",0);
+	}
+
+	if (data & 0x10000)
+	{
+	output_set_value("Player2_Gun_Recoil",1);
+	}
+	else
+	{
+	output_set_value("Player2_Gun_Recoil",0);
+	}
+
+	if (data & 0x40000)
+	{
+	output_set_value("Hit_lamp",1);
+	}
+	else
+	{
+	output_set_value("Hit_lamp",0);
+	}
+
 }
+
 
 
 static READ32_HANDLER( gunbustr_gun_r )

@@ -917,7 +917,8 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 		output_set_lamp_value(0, (data & 0x20) ? 1 : 0);
 		output_set_lamp_value(1, (data & 0x40) ? 1 : 0);
 	}
-
+		
+	if (state->dblaxle_vibration) output_set_value("Wheel_Vibration", (data & 0x04)>>2);
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
 }
 
@@ -1295,6 +1296,12 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
 	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu, 10000), NULL, 0, taitoz_cpub_interrupt5);
 }
 
+static WRITE16_HANDLER( spacegun_gun_output_w )
+{
+	output_set_value("Player1_Gun_Recoil",(data & 0x01));
+	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
+}
+
 
 static READ16_HANDLER( dblaxle_steer_input_r )
 {
@@ -1352,10 +1359,56 @@ logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(space->cpu
 static WRITE16_HANDLER( chasehq_motor_w )
 {
 	/* Writes $e00000-25 and $e00200-219 */
-
+	switch (offset)
+	{
+	case 0x0:
+	break;
+	case 0x101:
+	/* outputs will go here, but driver is still broken */
+	break;
+	}
 logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(space->cpu),data,offset);
 
 }
+
+
+static WRITE16_HANDLER( nightstr_motor_w )
+{
+	
+	/* Despite the informative notes at the top, the high end of the word doesn't seem to output any useful data. */
+	/* I've added this so someone else can finish it.  */
+	switch (offset)
+	{
+	case 0:
+		output_set_value("Motor_1_Direction",0);
+		if (data & 1) output_set_value("Motor_1_Direction",1);
+		if (data & 2) output_set_value("Motor_1_Direction",2);
+		output_set_value("Motor_1_Speed",(data & 60)/4);
+		
+		break;
+	
+	case 4:
+		output_set_value("Motor_2_Direction",0);
+		if (data & 1) output_set_value("Motor_2_Direction",1);
+		if (data & 2) output_set_value("Motor_2_Direction",2);
+		output_set_value("Motor_2_Speed",(data & 60)/4);
+		
+		break;
+	case 8:
+		output_set_value("Motor_3_Direction",0);
+		if (data & 1) output_set_value("Motor_3_Direction",1);
+		if (data & 2) output_set_value("Motor_3_Direction",2);
+		output_set_value("Motor_3_Speed",(data & 60)/4);
+		
+		break;
+	default:
+		output_set_value("motor_debug",data);
+	}
+	
+}
+
+
+
 
 static READ16_HANDLER( aquajack_unknown_r )
 {
@@ -1599,9 +1652,7 @@ static ADDRESS_MAP_START( nightstr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    /* Motor 1 (left) */
-	AM_RANGE(0xe00008, 0xe00009) AM_WRITENOP    /* Motor 2 (center) */
-	AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP    /* Motor 3 (right) */
+	AM_RANGE(0xe00000, 0xe00011) AM_WRITE(nightstr_motor_w)    /* Motor outputs */
 	AM_RANGE(0xe40000, 0xe40007) AM_READWRITE(nightstr_stick_r, bshark_stick_w)
 ADDRESS_MAP_END
 
@@ -1656,7 +1707,7 @@ static ADDRESS_MAP_START( spacegun_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000c, 0xc0000d) AM_NOP	// interrupt controller?
 	AM_RANGE(0xc0000e, 0xc0000f) AM_NOP
 	AM_RANGE(0xc20000, 0xc20007) AM_WRITE(spacegun_pancontrol)  /* pan */
-//  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    /* ??? */
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(spacegun_gun_output_w)    /* gun outputs */
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(spacegun_lightgun_r, spacegun_lightgun_w)
 ADDRESS_MAP_END
 
@@ -4845,6 +4896,14 @@ static DRIVER_INIT( taitoz )
 {
 	taitoz_state *state = (taitoz_state *)machine->driver_data;
 	state->chasehq_lamps = 0;
+	state->dblaxle_vibration = 0;
+}
+
+static DRIVER_INIT( dblaxle )
+{
+	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	state->chasehq_lamps = 0;
+	state->dblaxle_vibration = 1;
 }
 
 static STATE_POSTLOAD( bshark_postload )
@@ -4856,6 +4915,7 @@ static DRIVER_INIT( bshark )
 {
 	taitoz_state *state = (taitoz_state *)machine->driver_data;
 	state->chasehq_lamps = 0;
+	state->dblaxle_vibration = 0;
 	state->eep_latch = 0;
 
 	state_save_register_postload(machine, bshark_postload, NULL);
@@ -4866,6 +4926,7 @@ static DRIVER_INIT( chasehq )
 {
 	taitoz_state *state = (taitoz_state *)machine->driver_data;
 	state->chasehq_lamps = 1;
+	state->dblaxle_vibration = 0;
 }
 
 
@@ -4890,6 +4951,6 @@ GAME( 1989, nightstru,  nightstr, nightstr, nghtstru, taitoz,   ROT0,           
 GAME( 1990, aquajack,   0,        aquajack, aquajack, taitoz,   ROT0,               "Taito Corporation Japan",   "Aqua Jack (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, aquajackj,  aquajack, aquajack, aquajckj, taitoz,   ROT0,               "Taito Corporation",         "Aqua Jack (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, spacegun,   0,        spacegun, spacegun, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", GAME_SUPPORTS_SAVE )
-GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
-GAME( 1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, racingb,    0,        racingb,  dblaxle,  taitoz,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle,  dblaxle,   ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_dblaxle )
+GAME( 1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, dblaxle,   ROT0,               "Taito Corporation",         "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, racingb,    0,        racingb,  dblaxle,  dblaxle,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

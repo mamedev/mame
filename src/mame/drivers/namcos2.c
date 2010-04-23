@@ -511,9 +511,10 @@ GollyGhostUpdateDiorama_c0( int data )
 		output_set_value("bureau",      (data >> 2) & 1);
 		output_set_value("refrigerator",(data >> 3) & 1);
 		output_set_value("porch",       (data >> 4) & 1);
-		/* data&0x20 : player#1 (ZIP) force feedback
-         * data&0x40 : player#2 (ZAP) force feedback
-         */
+		/* gun recoils */
+		output_set_value("Player1_Gun_Recoil",(data & 0x20)>>5);
+		output_set_value("Player2_Gun_Recoil",(data & 0x40)>>6);
+         
 	}
 	else
 	{
@@ -523,6 +524,8 @@ GollyGhostUpdateDiorama_c0( int data )
 		output_set_value("bureau", 0);
 		output_set_value("refrigerator", 0);
 		output_set_value("porch", 0);
+		output_set_value("Player1_Gun_Recoil",0);
+		output_set_value("Player2_Gun_Recoil",0);
 	}
 }
 
@@ -542,7 +545,9 @@ static WRITE16_HANDLER( namcos2_68k_dpram_word_w )
 			switch( offset )
 			{
 			case 0xc0/2: GollyGhostUpdateDiorama_c0(data); break;
-			case 0xc2/2: break; /* unknown; 0x00 or 0x01 - probably lights up guns */
+			case 0xc2/2: 
+			 /* unknown; 0x00 or 0x01 - probably lights up guns */
+			break;
 			case 0xc4/2: GollyGhostUpdateLED_c4(data); break;
 			case 0xc6/2: GollyGhostUpdateLED_c6(data); break;
 			case 0xc8/2: GollyGhostUpdateLED_c8(data); break;
@@ -551,8 +556,12 @@ static WRITE16_HANDLER( namcos2_68k_dpram_word_w )
 				break;
 			}
 		}
+		/* Note:  Outputs for the other gun games pass through here as well, but I couldn't find the offsets. */
+		/* Steel Gunner 1 & 2 have 6 "damage lamps" (three on each side) as well as gun recoils. */
+		
 	}
 }
+
 
 static READ8_HANDLER( namcos2_dpram_byte_r )
 {
@@ -648,7 +657,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_sgunner_am, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(namco_obj16_r,namco_obj16_w)
-	AM_RANGE(0x818000, 0x818001) AM_WRITENOP
+	AM_RANGE(0x818000, 0x818001) AM_WRITENOP 
 	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(namcos2_68k_key_r,namcos2_68k_key_w)
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END

@@ -740,9 +740,10 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 
 	/* Check if this is a start of conversion */
 	/* Input ports 2 thru 9 are the analog channels */
+	
 	if(data & 0x40)
 	{
-		/* Set the conversion complete flag */
+	/* Set the conversion complete flag */
 		namcos2_mcu_analog_complete = 2;
 		/* We convert instantly, good eh! */
 		switch((data>>2) & 0x07)
@@ -771,6 +772,8 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 		case 7:
 			namcos2_mcu_analog_data=input_port_read(space->machine, "AN7");
 			break;
+		default:
+			output_set_value("anunk",data);
 		}
 #if 0
 		/* Perform the offset handling on the input port */

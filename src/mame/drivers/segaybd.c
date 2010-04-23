@@ -50,6 +50,9 @@ Known games currently not dumped:
 
 static UINT16 *backupram;
 
+static UINT16 output_type;
+static UINT16 pdrift_bank;
+
 /*************************************
  *
  *  Configuration
@@ -63,6 +66,7 @@ static void yboard_generic_init( running_machine *machine )
 	/* reset globals */
 	state->vblank_irq_state = 0;
 	state->timer_irq_state = 0;
+	
 }
 
 
@@ -319,15 +323,219 @@ static WRITE16_HANDLER( io_chip_w )
 	{
 		/* I/O ports */
 		case 0x00/2:
+		break;
 		case 0x02/2:
+		break;
 		case 0x04/2:
+		break;
 		case 0x06/2:
+		switch (output_type)
+		{
+		case 2:
+		/* pdrift */
+		
+			/* Note:  this is an approximation to get a relatively accurate bank value.  It is obviously not 100% */
+					
+			/* for some stupid reason the data is set to all on in the debug menu so we need to check for that */
+			if (data != 255)
+			{
+				/* this is a cheap hack to get some usable positional data in the service menu */
+				/* these values probably manually turn the motor left and right */
+				if (((data == 162) or (data == 161) or (data == 160)))
+				{
+					if ((data == 162))
+					/* moving left */
+					{
+						/* in this rare instance, the bottom bits are used for positional data */
+						output_set_value("bank_data_raw",data);
+						output_set_value("vibration_motor",0);
+						switch (pdrift_bank)
+						/* we want to go left one step at a time */
+						{
+						case 1:
+							/* all left */
+							output_set_value("bank_motor_position",1);
+							pdrift_bank=1;
+							break;
+						case 2:
+							output_set_value("bank_motor_position",1);
+							pdrift_bank=1;
+							break;
+						case 3:
+							output_set_value("bank_motor_position",2);
+							pdrift_bank=2;
+							break;
+						case 4:
+							/* centered */
+							output_set_value("bank_motor_position",3);
+							pdrift_bank=3;
+							break;
+						case 5:
+							output_set_value("bank_motor_position",4);
+							pdrift_bank=4;
+							break;
+						case 6:
+							output_set_value("bank_motor_position",5);
+							pdrift_bank=5;
+							break;
+						case 7:
+							/* all right */
+							output_set_value("bank_motor_position",6);
+							pdrift_bank=6;
+							break;
+						default:
+							output_set_value("bank_motor_position",4);
+							pdrift_bank=4;
+							break;
+							
+						}
+					}
+
+					if ((data == 161))
+					/* moving right */
+					{
+						/* in this rare instance, the bottom bits are used for positional data */
+						output_set_value("bank_data_raw",data);
+						output_set_value("vibration_motor",0);
+						switch (pdrift_bank)
+						/* we want to go right one step at a time */
+						{
+						case 1:
+							/* all left */
+							output_set_value("bank_motor_position",2);
+							pdrift_bank=2;
+							break;
+						case 2:
+							output_set_value("bank_motor_position",3);
+							pdrift_bank=3;
+							break;
+						case 3:
+							output_set_value("bank_motor_position",4);
+							pdrift_bank=4;
+							break;
+						case 4:
+							/* centered */
+							output_set_value("bank_motor_position",5);
+							pdrift_bank=5;
+							break;
+						case 5:
+							output_set_value("bank_motor_position",6);
+							pdrift_bank=6;
+							break;
+						case 6:
+							output_set_value("bank_motor_position",7);
+							pdrift_bank=7;
+							break;
+						case 7:
+							/* all right */
+							output_set_value("bank_motor_position",7);
+							pdrift_bank=7;
+							break;
+						default:
+							output_set_value("bank_motor_position",4);
+							pdrift_bank=4;
+							break;
+							
+						}
+				
+					}
+				}
+				else
+				{
+					/* the vibration value uses the first few bits to give a number between 0 and 7 */
+					output_set_value("vibration_motor",data & 7);
+					/* normalize the data and subtract the vibration value from it*/
+				
+					pdrift_bank = (data - (data & 7));
+					output_set_value("bank_data_raw",pdrift_bank);
+				
+					/* position values from left to right */
+					/* 56 48 40 120 72 80 88 */
+
+					/* the normalized values we'll use */
+					/*   1  2  3   4  5  6  7 */
+				
+					switch (pdrift_bank)
+					{
+					case 56:
+						/* all left */
+						output_set_value("bank_motor_position",1);
+						break;
+					case 48:
+						output_set_value("bank_motor_position",2);
+						break;
+					case 40:
+						output_set_value("bank_motor_position",3);
+						break;
+					case 120:
+						/* centered */
+						output_set_value("bank_motor_position",4);
+						break;
+					case 72:
+						output_set_value("bank_motor_position",5);
+						break;
+					case 80:
+						output_set_value("bank_motor_position",6);
+						break;
+					case 88:
+						/* all right */
+						output_set_value("bank_motor_position",7);
+						break;
+						/* these are the only valid values but 24 pops up sometimes when we crash */
+								
+					}
+				}
+				
+
+				
+			
+			}
+			break;
+		case 3:
+		/* gloc and strkfgtr */
+			if ((data < 32) )
+			{
+				output_set_value("right_motor_position",data);
+				
+				/* normalization here prevents strange data from being transferred */	
+				/* we do this because for some odd reason */ 
+                                /* gloc starts with one piston all up and one all down.... at least data-wise it does */
+				if ((data >1) and (data <29))
+				output_set_value("right_motor_position_nor",data);
+							
+			}
+
+			if((data < 40) and (data > 31))
+			{
+				output_set_value("right_motor_speed",data-32);
+			}
+
+			if ((data < 96) and (data > 63 ))
+			{
+				output_set_value("left_motor_position",data);
+				/* normalized version... you know... for the kids */
+				if (((data-64)>1) and ((data-64)<29))
+				output_set_value("left_motor_position_nor",data-64);
+				
+								
+			}
+		
+			if ((data < 104) and (data  > 95))
+			{
+				output_set_value("left_motor_speed",data-96);
+			}
+			break;
+
+		}
+		break;
 		case 0x0a/2:
 		case 0x0c/2:
-			break;
+		break;
 
 		/* miscellaneous output */
 		case 0x08/2:
+
+					
 			/*
                 D7 = /KILL
                 D6 = CONT
@@ -336,7 +544,7 @@ static WRITE16_HANDLER( io_chip_w )
                 D3 = XRES
                 D2 = YRES
                 D1-D0 = ADC0-1
-            */
+		*/
 			segaic16_set_display_enable(space->machine, data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(space, 0, 0);
 			cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -345,7 +553,46 @@ static WRITE16_HANDLER( io_chip_w )
 			break;
 
 		/* mute */
+		
 		case 0x0e/2:
+			
+			switch (output_type)
+			{
+			case 1:
+				/* gforce2 */
+				output_set_value("start_lamp",(data & 0x04)>>2);
+				break;
+
+			case 2:
+				/* pdrift */
+				output_set_value("start_lamp",(data & 0x04)>>2);
+					output_set_value("upright_wheel_motor",(data & 0x02)>>1);
+			break;
+	
+			case 3:
+				/* gloc & strkfgtr */
+				output_set_value("start_lamp",(data & 0x04)>>2);
+				output_set_value("danger_lamp",(data & 0x20)>>5);
+				output_set_value("crash_lamp",(data & 0x40)>>6);
+				break;
+	
+			case 4:
+				/* r360 cabinet */
+				output_set_value("start_lamp",(data & 0x04)>>2);
+				/* even though the same ouput is used, I've split them to avoid confusion. */
+				output_set_value("emergency_stop_lamp",(data & 0x04)>>2);
+				break;
+
+			case 5:
+				/* rchase */
+				output_set_value("left_start_lamp",(data & 0x04)>>2);
+				output_set_value("right_start_lamp",(data & 0x02)>>1);
+
+				output_set_value("P1_Gun_Recoil",(data & 0x40)>>6);
+				output_set_value("P2_Gun_Recoil",(data & 0x20)>>5);
+				break;
+			}
+
 			/* D7 = /MUTE */
 			/* D6-D0 = FLT31-25 */
 			sound_global_enable(space->machine, data & 0x80);
@@ -384,6 +631,7 @@ static WRITE16_HANDLER( analog_w )
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
 	int selected = ((offset & 3) == 3) ? (3 + (state->misc_io_data[0x08/2] & 3)) : (offset & 3);
 	int value = input_port_read_safe(space->machine, ports[selected], 0xff);
+
 	state->analog_data[offset & 3] = value;
 }
 
@@ -1900,12 +2148,59 @@ ROM_END
  *
  *  Generic driver initialization
  *
- *************************************/
+ *************************************
+
+ I had to split these out to set the output varible... sorry.  :-(
 
 static DRIVER_INIT( generic_yboard )
 {
+	output_type=0;	
 	yboard_generic_init(machine);
 }
+
+
+ *************************************
+ *
+ *  Game-Specific driver initialization
+ *
+ *************************************/
+static DRIVER_INIT( gforce2 )
+{
+	output_type=1;	
+	yboard_generic_init(machine);
+}
+
+static DRIVER_INIT( pdrift )
+{
+	output_type=2;
+	/* because some of the output data isn't fully understood we need to "center" the motor */	
+	pdrift_bank=4;
+	yboard_generic_init(machine);
+			
+}
+
+static DRIVER_INIT( gloc )
+{
+	output_type=3;
+	/* because some of the output data isn't fully understood we need to "center" the rams */
+	output_set_value("left_motor_position_nor",16);
+	output_set_value("right_motor_position_nor",16);	
+	yboard_generic_init(machine);
+}
+
+static DRIVER_INIT( r360 )
+{
+	output_type=4;	
+	yboard_generic_init(machine);
+}
+
+static DRIVER_INIT( rchase )
+{
+	output_type=5;	
+	yboard_generic_init(machine);
+}
+
+
 
 
 
@@ -1915,14 +2210,14 @@ static DRIVER_INIT( generic_yboard )
  *
  *************************************/
 
-GAME( 1988, gforce2,  0,       yboard, gforce2,  generic_yboard, ROT0, "Sega", "Galaxy Force 2" , GAME_SUPPORTS_SAVE )
-GAME( 1988, gforce2j, gforce2, yboard, gforce2,  generic_yboard, ROT0, "Sega", "Galaxy Force 2 (Japan)" , GAME_SUPPORTS_SAVE )
-GAME( 1990, gloc,     0,       yboard, gloc,     generic_yboard, ROT0, "Sega", "G-LOC Air Battle (US)" , GAME_SUPPORTS_SAVE )
-GAME( 1990, glocr360, gloc,    yboard, glocr360, generic_yboard, ROT0, "Sega", "G-LOC R360", GAME_SUPPORTS_SAVE )
-GAMEL(1988, pdrift,   0,       yboard, pdrift,   generic_yboard, ROT0, "Sega", "Power Drift (World, Rev A)", GAME_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdrifta,  pdrift,  yboard, pdrift,   generic_yboard, ROT0, "Sega", "Power Drift (World)", GAME_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdrifte,  pdrift,  yboard, pdrifte,  generic_yboard, ROT0, "Sega", "Power Drift (World, Earlier)", GAME_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdriftj,  pdrift,  yboard, pdriftj,  generic_yboard, ROT0, "Sega", "Power Drift (Japan)", GAME_SUPPORTS_SAVE, layout_pdrift )
-GAME( 1991, rchase,   0,       yboard, rchase,   generic_yboard, ROT0, "Sega", "Rail Chase (World)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rchasej,  rchase,  yboard, rchase,   generic_yboard, ROT0, "Sega", "Rail Chase (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, strkfgtr, 0,       yboard, strkfgtr, generic_yboard, ROT0, "Sega", "Strike Fighter (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, gforce2,  0,       yboard, gforce2,  gforce2, ROT0, "Sega", "Galaxy Force 2" , GAME_SUPPORTS_SAVE )
+GAME( 1988, gforce2j, gforce2, yboard, gforce2,  gforce2, ROT0, "Sega", "Galaxy Force 2 (Japan)" , GAME_SUPPORTS_SAVE )
+GAME( 1990, gloc,     0,       yboard, gloc,     gloc, ROT0, "Sega", "G-LOC Air Battle (US)" , GAME_SUPPORTS_SAVE )
+GAME( 1990, glocr360, gloc,    yboard, glocr360, r360, ROT0, "Sega", "G-LOC R360", GAME_SUPPORTS_SAVE )
+GAMEL(1988, pdrift,   0,       yboard, pdrift,   pdrift, ROT0, "Sega", "Power Drift (World, Rev A)", GAME_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdrifta,  pdrift,  yboard, pdrift,   pdrift, ROT0, "Sega", "Power Drift (World)", GAME_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdrifte,  pdrift,  yboard, pdrifte,  pdrift, ROT0, "Sega", "Power Drift (World, Earlier)", GAME_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdriftj,  pdrift,  yboard, pdriftj,  pdrift, ROT0, "Sega", "Power Drift (Japan)", GAME_SUPPORTS_SAVE, layout_pdrift )
+GAME( 1991, rchase,   0,       yboard, rchase,   rchase, ROT0, "Sega", "Rail Chase (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rchasej,  rchase,  yboard, rchase,   rchase, ROT0, "Sega", "Rail Chase (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, strkfgtr, 0,       yboard, strkfgtr, gloc, ROT0, "Sega", "Strike Fighter (Japan)", GAME_SUPPORTS_SAVE )

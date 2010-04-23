@@ -257,15 +257,20 @@ static READ16_HANDLER( sound_status_r )
 static WRITE8_HANDLER( sound_status_w )
 {
 	sound_status = data;
+
 }
 
 static WRITE16_HANDLER( sound_cpu_w )
 {
+	
 	if (ACCESSING_BITS_0_7)
 	{
+	
+	
 		soundlatch_w(space, 0, data&0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
+	
 }
 
 /* Eprom is byte wide, top half of word _must_ be 0xff */
@@ -292,9 +297,26 @@ static WRITE16_HANDLER( gun_select_w )
 	logerror("%08x: gun r\n",cpu_get_pc(space->cpu));
 
 	cpu_set_input_line(space->cpu, 2, HOLD_LINE);
-
-
+	
 	gun_select = data & 0xff;
+	
+}
+
+static WRITE16_HANDLER( two_gun_output_w )
+{
+	output_set_value("Player1_Gun_Recoil",(data & 0x01));
+	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
+	
+	
+}
+
+static WRITE16_HANDLER( three_gun_output_w )
+{
+	output_set_value("Player1_Gun_Recoil",(data & 0x01));
+	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
+	output_set_value("Player3_Gun_Recoil",(data & 0x04)>>2);
+	
+	
 }
 
 static READ16_HANDLER( kludge_r )
@@ -343,7 +365,8 @@ static ADDRESS_MAP_START( bbusters_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0018, 0x0e0019) AM_READ(sound_status_r)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(kludge_r, gun_select_w)
 	AM_RANGE(0x0e8002, 0x0e8003) AM_READ(control_3_r)
-	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP
+	/* AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP */
+	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(three_gun_output_w)
 	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(sound_cpu_w)
 	AM_RANGE(0x0f8000, 0x0f80ff) AM_READ(eprom_r) AM_WRITEONLY AM_BASE(&eprom_data) /* Eeprom */
 ADDRESS_MAP_END
@@ -364,7 +387,8 @@ static ADDRESS_MAP_START( mechatt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e0004, 0x0e0007) AM_READ(mechatt_gun_r)
-	AM_RANGE(0x0e4002, 0x0e4003) AM_WRITENOP /* Gun force feedback? */
+	/* AM_RANGE(0x0e4002, 0x0e4003) AM_WRITENOP  Gun force feedback? */
+	AM_RANGE(0x0e4002, 0x0e4003) AM_WRITE(two_gun_output_w)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(sound_status_r, sound_cpu_w)
 ADDRESS_MAP_END
 

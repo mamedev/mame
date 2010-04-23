@@ -190,7 +190,6 @@ WRITE8_DEVICE_HANDLER( tc0140syt_slave_comm_w )
 	tc0140syt_state *tc0140syt = get_safe_token(device);
 
 	data &= 0x0f;
-
 	switch (tc0140syt->submode)
 	{
 		case 0x00:		// mode #0

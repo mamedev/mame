@@ -205,6 +205,7 @@ static READ16_HANDLER( slapshot_service_input_r )
 	}
 }
 
+
 static READ16_HANDLER( opwolf3_adc_r )
 {
 	static const char *const adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
@@ -214,6 +215,24 @@ static READ16_HANDLER( opwolf3_adc_r )
 
 static WRITE16_HANDLER( opwolf3_adc_req_w )
 {
+	switch (offset)
+	{
+	case 0:
+	/* gun outputs... not 100% sure they are correct yet */
+	/* p2 gun recoil seems ever so slighty slower than p1 */
+	/* also you get a false fire every once in a while on the p1 gun */
+
+	if (((data & 0x100) == 0x100) and ((data & 0x400)==0))
+		output_set_value("Player1_Gun_Recoil",1);
+	else
+		output_set_value("Player1_Gun_Recoil",0);
+
+	if (((data & 0x100) == 0x100) and ((data & 0x400)==0x400))
+		output_set_value("Player2_Gun_Recoil",1);
+	else
+		output_set_value("Player2_Gun_Recoil",0);
+	break;
+	}
 	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
 
 	/* 4 writes a frame - one for each analogue port */
@@ -236,6 +255,11 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
+
+
+
+
+
 
 static WRITE16_HANDLER( slapshot_msb_sound_w )
 {
@@ -291,7 +315,7 @@ static ADDRESS_MAP_START( opwolf3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)	/* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)	/* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_halfword_byteswap_r, tc0640fio_halfword_byteswap_w)
-	AM_RANGE(0xc00020, 0xc0002f) AM_READ(slapshot_service_input_r)	/* service mirror */
+	AM_RANGE(0xc00020, 0xc0002f) AM_READ(slapshot_service_input_r)	 /* service mirror */
 	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(slapshot_msb_sound_r, slapshot_msb_sound_w)
 	AM_RANGE(0xe00000, 0xe00007) AM_READWRITE(opwolf3_adc_r, opwolf3_adc_req_w)
 ADDRESS_MAP_END

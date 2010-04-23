@@ -921,26 +921,14 @@ static WRITE8_DEVICE_HANDLER( tshoot_maxvol_w )
 static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
 {
 	/* set the grenade lamp */
-	set_led_status(device->machine, 0,data & 0x04);
-
+	output_set_value("Grenade_lamp", (~data & 0x4)>>2 );
 	/* set the gun lamp */
-	set_led_status(device->machine, 1,data & 0x08);
-
-#if 0
+	output_set_value("Gun_lamp", (~data & 0x8)>>3 );
 	/* gun coil */
-	if (data & 0x10)
-		mame_printf_debug("[gun coil] ");
-	else
-		mame_printf_debug("           ");
-
+	output_set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
 	/* feather coil */
-	if (data & 0x20)
-		mame_printf_debug("[feather coil] ");
-	else
-		mame_printf_debug("               ");
+	output_set_value("Feather_Blower", (data & 0x20)>>5 );
 
-	mame_printf_debug("\n");
-#endif
 }
 
 

@@ -124,14 +124,15 @@ WRITE8_DEVICE_HANDLER( tc0220ioc_w )
 	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
 
 	tc0220ioc->regs[offset] = data;
-
 	switch (offset)
 	{
+		
 		case 0x00:
 			watchdog_reset(device->machine);
 			break;
 
 		case 0x04:	/* coin counters and lockout, hi nibble irrelevant */
+			
 			coin_lockout_w(device->machine, 0, ~data & 0x01);
 			coin_lockout_w(device->machine, 1, ~data & 0x02);
 			coin_counter_w(device->machine, 0, data & 0x04);
@@ -433,9 +434,9 @@ WRITE8_DEVICE_HANDLER( tc0640fio_w )
 	tc0640fio_state *tc0640fio = tc0640fio_get_safe_token(device);
 
 	tc0640fio->regs[offset] = data;
-
 	switch (offset)
 	{
+		
 		case 0x00:
 			watchdog_reset(device->machine);
 			break;

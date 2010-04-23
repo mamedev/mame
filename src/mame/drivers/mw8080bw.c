@@ -431,7 +431,6 @@ MACHINE_DRIVER_END
 static WRITE8_HANDLER( gunfight_io_w )
 {
 	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
-
 	if (offset & 0x01)
 		gunfight_audio_w(space, 0, data);
 
@@ -440,6 +439,7 @@ static WRITE8_HANDLER( gunfight_io_w )
 
 	if (offset & 0x04)
 		mb14241_shift_data_w(state->mb14241, 0, data);
+	
 }
 
 

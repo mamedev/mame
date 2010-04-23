@@ -1290,7 +1290,7 @@ WRITE8_DEVICE_HANDLER( desertgu_audio_2_w )
 
 	discrete_sound_w(device, DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
 
-	output_set_value("KICKER", (data >> 2) & 0x01);
+	output_set_value("Player1_Gun_Recoil", (data >> 2) & 0x01);
 
 	state->desertgun_controller_select = (data >> 3) & 0x01;
 

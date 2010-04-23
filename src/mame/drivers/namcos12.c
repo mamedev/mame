@@ -1124,14 +1124,19 @@ static WRITE32_HANDLER( system11gun_w )
 {
 	if( ACCESSING_BITS_0_15 )
 	{
-		/* start 1 */
-		set_led_status(space->machine, 0, !(data & 0x08));
-		/* start 2 */
-		set_led_status(space->machine, 1, !(data & 0x04));
+		
 		/* blowback 1 */
-		/* !(data & 0x02) */
 		/* blowback 2 */
-		/* !(data & 0x01) */
+		/* Note: output label has been changed for the Engrish Impaired ;-) */
+		output_set_value("Player1_Gun_Recoil", (~data & 0x02)>>1);
+		output_set_value("Player2_Gun_Recoil", (~data & 0x01));		
+		
+		/* start 1 */
+		output_set_value("P2_Start_lamp", (~data & 0x08)>>3);
+		/* start 2 */
+		output_set_value("P2_Start_lamp", (~data & 0x04)>>2);
+
+
 		verboselog( space->machine, 1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
 	}
 	if( ACCESSING_BITS_16_31 )
