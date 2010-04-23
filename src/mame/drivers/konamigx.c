@@ -2887,13 +2887,7 @@ ROM_START( soccerssa )
 	ROM_LOAD( "soccerssa.nv", 0x0000, 0x080, CRC(e3a3f3d5) SHA1(374cf5bbcc459c56ebbba5068406f6d767bcb608) )
 ROM_END
 
-/* Vs. Net Soccer TODO:
-
- Redump sound ROM
- Hook up ROM tests.
-
-*/
-
+/* Vs. Net Soccer TODO: Hook up ROM tests. */
 
 /* Vs. Net Soccer (ver EAD) */
 ROM_START( vsnetscr )
@@ -2930,7 +2924,7 @@ ROM_START( vsnetscr )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
-	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, BAD_DUMP CRC(0917d7de) SHA1(f2447637b396a9c92553b2c1dbf4edecc55ccc24) ) // seems to have many bad sounds
+	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
 /* Vs. Net Soccer (ver EAB) */
@@ -2968,7 +2962,7 @@ ROM_START( vsnetscreb )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
-	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, BAD_DUMP CRC(0917d7de) SHA1(f2447637b396a9c92553b2c1dbf4edecc55ccc24) ) // seems to have many bad sounds
+	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
 /* Vs. Net Soccer (ver UAB) */
@@ -3006,7 +3000,7 @@ ROM_START( vsnetscru )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
-	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, BAD_DUMP CRC(0917d7de) SHA1(f2447637b396a9c92553b2c1dbf4edecc55ccc24) ) // seems to have many bad sounds
+	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
 
@@ -3170,7 +3164,7 @@ ROM_START( vsnetscrj )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
-	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, BAD_DUMP CRC(0917d7de) SHA1(f2447637b396a9c92553b2c1dbf4edecc55ccc24) ) // seems to have many bad sounds
+	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
 /* Vs. Net Soccer (ver AAA) */
@@ -3208,7 +3202,7 @@ ROM_START( vsnetscra )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
-	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, BAD_DUMP CRC(0917d7de) SHA1(f2447637b396a9c92553b2c1dbf4edecc55ccc24) ) // seems to have many bad sounds
+	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
 /* Lethal Enforcers II */
