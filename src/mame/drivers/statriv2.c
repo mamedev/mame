@@ -24,6 +24,10 @@
 *     it generates lots of errors in error.log, even though the  *
 *     sound seems to make sense. Can someone with a PCB stomach  *
 *     the game long enough to verify one way or the other?       *
+*                                                                *
+* RF: Reworked the Status Fun Casino inputs. Lowered the CPU     *
+*     clock to get it working properly. Added technical notes.   *
+*                                                                *
 ******************************************************************
 
 ******************************************************************
@@ -330,18 +334,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( funcsino )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Bet")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Deal")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Draw")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Card 1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Card 2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Card 3")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Card 4")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Card 5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )     PORT_NAME("Draw")      PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1 / Horse 1 / Point")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2 / Horse 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3 / Horse 3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4 / Horse 4")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5 / Horse 5 / No Point")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Stand")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Select Game")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
@@ -606,6 +610,13 @@ static MACHINE_DRIVER_START( statriv2v )
 	MDRV_GFXDECODE(vertical)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( funcsino )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(statriv2)
+
+    MDRV_CPU_REPLACE("maincpu", 8085A, MASTER_CLOCK/2)	/* 3 MHz?? seems accurate */
+MACHINE_DRIVER_END
+
 
 
 /*************************************
@@ -656,6 +667,24 @@ ROM_START( tripdraw )
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
 ROM_END
 
+/*
+
+Fun Casino
+Status Game Corp., 1982
+
+8085
+xtal 12.44MHz
+8255
+TMS9937
+AY3-8910
+5101 RAM x2
+2114 RAM x6
+2732 EPROMs x4
+74S287 PROM x1
+74S288 PROM x2
+4-position DSW x1
+
+*/
 ROM_START( funcsino )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u7", 0x0000, 0x1000, CRC(e7380a81) SHA1(dbc9646a33bd61cdfab9f8a5ac7db996cfc0eaf9) )
@@ -1083,7 +1112,7 @@ static DRIVER_INIT( laserdisc )
  *************************************/
 
 GAME( 1981, statusbj, 0,        statriv2,  statusbj, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_SUPPORTS_SAVE )
-GAME( 1981, funcsino, 0,        statriv2,  funcsino, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", GAME_SUPPORTS_SAVE )
+GAME( 1981, funcsino, 0,        funcsino,  funcsino, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", GAME_SUPPORTS_SAVE )
 GAME( 1981, tripdraw, 0,        statriv2,  funcsino, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1984, hangman,  0,        statriv2,  hangman,  addr_lmh,  ROT0, "Status Games", "Hangman", GAME_SUPPORTS_SAVE )
 GAME( 1984, trivquiz, 0,        statriv2,  statriv2, addr_lhx,  ROT0, "Status Games", "Triv Quiz", GAME_SUPPORTS_SAVE )
