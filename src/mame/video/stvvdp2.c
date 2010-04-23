@@ -2850,8 +2850,8 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 	//popmessage("%04x",STV_VDP2_SCRCTL);
 
 	int xsize = 0, xsizemask = 0;
-	int ysize = 0, ysizemask = 0;
-	int xlinesize = 0, xpixelsize = 0;
+	int ysize = 0/*, ysizemask = 0*/;
+	int xlinesize = 0/*, xpixelsize = 0*/;
 	int xcnt,ycnt;
 	UINT8* gfxdata = stv_vdp2_gfx_decode;
 	static UINT16 *destline;
@@ -2872,14 +2872,14 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 		case 3: xsize=1024; ysize=512; break;
 	}
 	xsizemask = xsize - 1;
-	ysizemask = ysize - 1;
+	/*ysizemask = ysize - 1;*/
 
 	switch( stv2_current_tilemap.colour_depth )
 	{
-		case 0: xlinesize = xsize / 2; xpixelsize = 0; break;
-		case 1: xlinesize = xsize; xpixelsize = 1; break;
-		case 2: case 3: xlinesize = xsize * 2; xpixelsize = 2; break;
-		case 4: xlinesize = xsize * 4; xpixelsize = 4; break;
+		case 0: xlinesize = xsize / 2; /*xpixelsize = 0;*/ break;
+		case 1: xlinesize = xsize; /*xpixelsize = 1;*/ break;
+		case 2: case 3: xlinesize = xsize * 2; /*xpixelsize = 2;*/ break;
+		case 4: xlinesize = xsize * 4; /*xpixelsize = 4;*/ break;
 	}
 
 	if(stv2_current_tilemap.colour_depth == 0)
@@ -3360,7 +3360,7 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitm
 	/* Plane Variables */
 	int pltiles_x, plpixels_x;
 	int pltiles_y, plpixels_y;
-	int plsize_bytes, plsize_dwords;
+	int plsize_bytes/*, plsize_dwords*/;
 
 	/* Map Variables */
 	int mptiles_x, mppixels_x;
@@ -3559,7 +3559,7 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitm
 	stv2_current_tilemap.scrolly &= mppixels_y-1;
 
 	pgsize_dwords = pgsize_bytes /4;
-	plsize_dwords = plsize_bytes /4;
+	//plsize_dwords = plsize_bytes /4;
 	mpsize_dwords = mpsize_bytes /4;
 
 //  if (stv2_current_tilemap.layer_name==3) popmessage ("well this is a bit  %08x", stv2_current_tilemap.map_offset[0]);

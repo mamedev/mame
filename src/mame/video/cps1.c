@@ -1761,7 +1761,7 @@ void cps1_get_video_base( running_machine *machine )
 	state->stars_enabled[0] = layercontrol & state->game_config->layer_enable_mask[3];
 	state->stars_enabled[1] = layercontrol & state->game_config->layer_enable_mask[4];
 
-
+#ifdef MAME_DEBUG
 {
 	int enablemask = 0;
 
@@ -1774,24 +1774,20 @@ void cps1_get_video_base( running_machine *machine )
 	if (state->game_config->layer_enable_mask[1] == state->game_config->layer_enable_mask[2])
 		enablemask = state->game_config->layer_enable_mask[1];
 
-#ifdef MAME_DEBUG
 	if (enablemask)
 	{
 		if (((layercontrol & enablemask) && (layercontrol & enablemask) != enablemask))
 			popmessage("layer %02x contact MAMEDEV", layercontrol & 0xc03f);
 	}
-#endif
 
 	enablemask = state->game_config->layer_enable_mask[0] | state->game_config->layer_enable_mask[1]
 			| state->game_config->layer_enable_mask[2]
 			| state->game_config->layer_enable_mask[3] | state->game_config->layer_enable_mask[4];
 
-#ifdef MAME_DEBUG
 	if (((layercontrol & ~enablemask) & 0x003e) != 0)
 		popmessage("layer %02x contact MAMEDEV", layercontrol & 0xc03f);
-#endif
-
 }
+#endif
 
 }
 

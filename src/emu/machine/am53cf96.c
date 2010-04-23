@@ -92,7 +92,7 @@ static TIMER_CALLBACK( am53cf96_irq )
 
 WRITE32_HANDLER( am53cf96_w )
 {
-	int reg, val, dma;
+	int reg, val/*, dma*/;
 
 	reg = offset * 2;
 	val = data;
@@ -133,7 +133,7 @@ WRITE32_HANDLER( am53cf96_w )
 	// command
 	if (reg == REG_COMMAND)
 	{
-		dma = (val & 0x80) ? 1 : 0;
+		//dma = (val & 0x80) ? 1 : 0;
 		fptr = 0;
 		switch (val & 0x7f)
 		{

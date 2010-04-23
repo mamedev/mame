@@ -166,7 +166,7 @@ CPU_DISASSEMBLE( pic16c62x )
 	int cnt = 1;
 	int code;
 	int bit;
-	char *buffertmp;
+	//char *buffertmp;
 	const char *cp;				/* character pointer in OpFormats */
 	UINT32 flags = 0;
 
@@ -195,7 +195,7 @@ CPU_DISASSEMBLE( pic16c62x )
 		sprintf(buffer,"???? dw %04Xh",code);
 		return cnt;
 	}
-	buffertmp = buffer;
+	//buffertmp = buffer;
 	if (Op[op].extcode)		/* Actually, theres no double length opcodes */
 	{
 		bit = 29;

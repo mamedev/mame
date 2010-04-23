@@ -1672,7 +1672,7 @@ static void stv_vpd1_draw_scaled_sprite(running_machine *machine, const rectangl
 
 static void stv_vpd1_draw_normal_sprite(running_machine *machine, const rectangle *cliprect, int sprite_type)
 {
-	UINT16 *destline;
+	//UINT16 *destline;
 
 	int y, ysize, drawypos;
 	int x, xsize, drawxpos;
@@ -1745,7 +1745,7 @@ static void stv_vpd1_draw_normal_sprite(running_machine *machine, const rectangl
 	maxdrawxpos = MIN(x+xsize-1,cliprect->max_x);
 	for (drawypos = y; drawypos <= maxdrawypos; drawypos++ )
 	{
-		destline = stv_framebuffer_draw_lines[drawypos];
+		//destline = stv_framebuffer_draw_lines[drawypos];
 		su = u;
 		for (drawxpos = x; drawxpos <= maxdrawxpos; drawxpos++ )
 		{

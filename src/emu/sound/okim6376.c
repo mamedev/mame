@@ -386,7 +386,7 @@ WRITE8_DEVICE_HANDLER( okim6376_w )
 	if (info->command != -1)
 	{
 		int temp = data >> 4, i, start;
-		unsigned char *base, *base_end;
+		unsigned char *base/*, *base_end*/;
 
 
 		/* FIX: Check if it's possible to start multiple voices at the same time */
@@ -405,7 +405,7 @@ WRITE8_DEVICE_HANDLER( okim6376_w )
 
 				/* determine the start position, max address space is 16Mbit */
 				base = &info->region_base[info->command * 4];
-				base_end = &info->region_base[(MAX_WORDS+1) * 4];
+				//base_end = &info->region_base[(MAX_WORDS+1) * 4];
 				start = ((base[0] << 16) + (base[1] << 8) + base[2]) & 0x1fffff;
 
 				if (start == 0)

@@ -1913,7 +1913,7 @@ static void get_register_string_value(running_device *device, void *baseptr, con
 #ifdef UNUSED_FUNCTION
 static int get_register_string_max_width(running_device *device, void *baseptr, const cpu_state_entry *entry)
 {
-	int leadzero = 0, width = 0, percent = 0, explicitsign = 0, reset;
+	int /*leadzero = 0,*/ width = 0, percent = 0, explicitsign = 0, reset;
 	int totalwidth = 0;
 	const char *fptr;
 
@@ -1927,7 +1927,7 @@ static int get_register_string_max_width(running_device *device, void *baseptr, 
 	{
 		/* reset any accumulated state */
 		if (reset)
-			leadzero = width = percent = explicitsign = reset = 0;
+			/*leadzero =*/ width = percent = explicitsign = reset = 0;
 
 		/* if we're not within a format, then anything other than a % outputs directly */
 		if (!percent && *fptr != '%')
@@ -1952,8 +1952,9 @@ static int get_register_string_max_width(running_device *device, void *baseptr, 
 
 			/* 0 means insert leading 0s, unless it follows another width digit */
 			case '0':
-				if (width == 0)
-					leadzero = TRUE;
+				if (width == 0) {
+					//leadzero = TRUE;
+				}
 				else
 					width *= 10;
 				break;

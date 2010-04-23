@@ -493,9 +493,9 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT(hitpoker)
 {
+	#if 1
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	#if 1
 	ROM[0x1220] = 0x01; //patch eeprom write?
 	ROM[0x1221] = 0x01;
 	ROM[0x1222] = 0x01;

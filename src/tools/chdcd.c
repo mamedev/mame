@@ -124,7 +124,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 {
 	FILE *infile;
 	int i, numtracks;
-	int chdpos=0;
+	//int chdpos=0;
 
 	infile = fopen(tocfname, "rt");
 
@@ -212,7 +212,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 		hunks = (outtoc->tracks[trknum].frames+CD_FRAMES_PER_HUNK - 1) / CD_FRAMES_PER_HUNK;
 		outtoc->tracks[trknum].extraframes = hunks * CD_FRAMES_PER_HUNK - outtoc->tracks[trknum].frames;
 
-		chdpos+=outtoc->tracks[trknum].frames+outtoc->tracks[trknum].extraframes;
+		//chdpos+=outtoc->tracks[trknum].frames+outtoc->tracks[trknum].extraframes;
 
 	}
 	/*

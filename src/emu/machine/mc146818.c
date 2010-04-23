@@ -113,7 +113,7 @@ static void mc146818_set_base_datetime(running_machine *machine);
 
 static TIMER_CALLBACK( mc146818_timer )
 {
-	int year, month;
+	int year/*, month*/;
 
 	if (BCD_MODE)
 	{
@@ -132,7 +132,7 @@ static TIMER_CALLBACK( mc146818_timer )
 					mc146818->data[4]=0;
 					WEEK_DAY=bcd_adjust(WEEK_DAY+1)%7;
 					DAY=bcd_adjust(DAY+1);
-					month=bcd_2_dec(MONTH);
+					//month=bcd_2_dec(MONTH);
 					year=bcd_2_dec(YEAR);
 					if (mc146818->type!=MC146818_IGNORE_CENTURY) year+=bcd_2_dec(CENTURY)*100;
 					else year+=2000; // save for julian_days_in_month calculation

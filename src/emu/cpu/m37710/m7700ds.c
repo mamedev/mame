@@ -375,12 +375,12 @@ int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 
 	signed char varS;
 	int length = 1;
 	unsigned int address;
-	unsigned int start;
+	//unsigned int start;
 	UINT32 flags = 0;
 
 	pb <<= 16;
 	address = pc | pb;
-	start = address;
+	//start = address;
 
 	instruction = read_8(oprom,0);
 

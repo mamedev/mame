@@ -53,13 +53,13 @@ static STREAM_UPDATE( cdda_update )
 
 static DEVICE_START( cdda )
 {
-	const struct CDDAinterface *intf;
+	//const struct CDDAinterface *intf;
 	cdda_info *info = get_safe_token(device);
 
 	/* allocate an audio cache */
 	info->audio_cache = auto_alloc_array( device->machine, UINT8, CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	intf = (const struct CDDAinterface *)device->baseconfig().static_config;
+	//intf = (const struct CDDAinterface *)device->baseconfig().static_config;
 
 	info->stream = stream_create(device, 0, 2, 44100, info, cdda_update);
 

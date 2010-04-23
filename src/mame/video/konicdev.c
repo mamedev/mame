@@ -10383,18 +10383,18 @@ WRITE32_DEVICE_HANDLER( k001604_tile_w )
 {
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
-	int x, y;
+	int x/*, y*/;
 	COMBINE_DATA(k001604->tile_ram + offset);
 
 	if (k001604->layer_size)
 	{
 		x = offset & 0xff;
-		y = offset / 256;
+		/*y = offset / 256;*/
 	}
 	else
 	{
 		x = offset & 0x7f;
-		y = offset / 128;
+		/*y = offset / 128;*/
 	}
 
 	if (k001604->layer_size)

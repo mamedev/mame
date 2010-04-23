@@ -1560,7 +1560,7 @@ INLINE void counter_update_count(int which)
 
 static READ16_HANDLER( pit8254_r )
 {
-	struct counter_state *ctr;
+	//struct counter_state *ctr;
 	int which = offset / 0x40;
 	int reg = offset & 3;
 
@@ -1572,7 +1572,7 @@ static READ16_HANDLER( pit8254_r )
 		case 2:
 			/* warning: assumes LSB/MSB addressing and no latching! */
 			which = (which * 3) + reg;
-			ctr = &counter[which];
+			//ctr = &counter[which];
 
 			/* update the count */
 			counter_update_count(which);

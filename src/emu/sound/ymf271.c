@@ -1225,11 +1225,11 @@ static void ymf271_write_fm(YMF271Chip *chip, int grp, int adr, int data)
 	int slotnum;
 	int slot_group;
 	int sync_mode, sync_reg;
-	YMF271Slot *slot;
+	//YMF271Slot *slot;
 
 	slotnum = 12*grp;
 	slotnum += fm_tab[adr & 0xf];
-	slot = &chip->slots[slotnum];
+	//slot = &chip->slots[slotnum];
 	slot_group = fm_tab[adr & 0xf];
 
 	reg = (adr >> 4) & 0xf;

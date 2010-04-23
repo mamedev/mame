@@ -1976,11 +1976,12 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 	char *newstring;
 	UINT32 hash_index;
 	int strindex;
-	int all_digits, i;
+	//int all_digits, i;
 
 //  assert_always(entry->table == table, "Mismatched symbol tables");
 
 	/* we cannot add numeric symbols */
+	/*
 	all_digits = TRUE;
 	for (i = 0; name[i]; i++)
 	{
@@ -1990,7 +1991,8 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 			break;
 		}
 	}
-//  assert_always(!all_digits, "All-digit symbols are not allowed");
+	assert_always(!all_digits, "All-digit symbols are not allowed");
+	*/
 
 	/* see if we already have an entry and just overwrite it if we do */
 	oldentry = (symbol_entry *)symtable_find(table, name);

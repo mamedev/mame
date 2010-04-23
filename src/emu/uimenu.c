@@ -3123,7 +3123,7 @@ static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parame
 		crosshair_user_settings settings;
 		crosshair_item_data *data = (crosshair_item_data *)event->itemref;
 		int changed = FALSE;
-		int set_def = FALSE;
+		//int set_def = FALSE;
 		int newval = data->cur;
 
 		/* retreive the user settings */
@@ -3134,7 +3134,7 @@ static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parame
 			/* if selected, reset to default value */
 			case IPT_UI_SELECT:
 				newval = data->defvalue;
-				set_def = TRUE;
+				//set_def = TRUE;
 				break;
 
 			/* left decrements */

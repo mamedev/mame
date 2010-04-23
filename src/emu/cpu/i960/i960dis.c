@@ -158,7 +158,7 @@ static char *dis_decode_reg(unsigned long iCode, char* tmpStr,unsigned char cnt)
 static char *i960_disassemble(disassemble_t *diss)
 {
 	unsigned char op,op2;
-	unsigned char mode, modeh, model;
+	unsigned char /*mode,*/ modeh, model;
 	unsigned char dst,abase,reg2;
 	unsigned short opc;
 	unsigned long iCode;
@@ -171,7 +171,7 @@ static char *i960_disassemble(disassemble_t *diss)
 
 	model = (unsigned char) (iCode >> 10) &0x3;
 	modeh = (unsigned char) (iCode >> 12) &0x3;
-	mode = (unsigned char) (iCode >> 10) &0x7;
+	//mode = (unsigned char) (iCode >> 10) &0x7;
 	dst = (unsigned char) (iCode >> 19) &0x1f;
 	abase = (unsigned char) (iCode>>14)&0x1f;
 	reg2 = (unsigned char) (iCode)&0x1f;

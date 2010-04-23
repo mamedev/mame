@@ -1349,7 +1349,7 @@ error:
 
 static avi_error extract_movie_info(avi_file *file)
 {
-	avi_stream *audiostream;
+	//avi_stream *audiostream;
 	avi_stream *stream;
 
 	/* get the video stream */
@@ -1380,7 +1380,7 @@ static avi_error extract_movie_info(avi_file *file)
 	}
 
 	/* now make sure all other audio streams are valid */
-	audiostream = stream;
+	//audiostream = stream;
 	while (1)
 	{
 		/* get the stream info */

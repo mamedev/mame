@@ -141,18 +141,18 @@ static void sharc_dma_exec(SHARC_REGS *cpustate, int channel)
 	UINT32 src, dst;
 	UINT32 src_count, dst_count;
 	UINT32 src_modifier, dst_modifier;
-	int chen, tran, dtype, pmode, mswf, master, ishake, intio, ext, flsh;
+	int chen, tran, dtype, pmode, /*mswf, master,*/ ishake, intio/*, ext, flsh*/;
 
 	chen = (cpustate->dma[channel].control >> 1) & 0x1;
 	tran = (cpustate->dma[channel].control >> 2) & 0x1;
 	dtype = (cpustate->dma[channel].control >> 5) & 0x1;
 	pmode = (cpustate->dma[channel].control >> 6) & 0x3;
-	mswf = (cpustate->dma[channel].control >> 8) & 0x1;
-	master = (cpustate->dma[channel].control >> 9) & 0x1;
+	//mswf = (cpustate->dma[channel].control >> 8) & 0x1;
+	//master = (cpustate->dma[channel].control >> 9) & 0x1;
 	ishake = (cpustate->dma[channel].control >> 10) & 0x1;
 	intio = (cpustate->dma[channel].control >> 11) & 0x1;
-	ext = (cpustate->dma[channel].control >> 12) & 0x1;
-	flsh = (cpustate->dma[channel].control >> 13) & 0x1;
+	//ext = (cpustate->dma[channel].control >> 12) & 0x1;
+	//flsh = (cpustate->dma[channel].control >> 13) & 0x1;
 
 	if (ishake)
 		fatalerror("SHARC: dma_exec: handshake not supported");

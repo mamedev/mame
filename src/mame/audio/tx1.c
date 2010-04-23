@@ -214,7 +214,7 @@ INLINE void update_engine (int eng[4])
 static STREAM_UPDATE( tx1_stream_update )
 {
 	UINT32 step_0, step_1, step_2;
-	double gain_0, gain_1, gain_2, gain_3;
+	double /*gain_0, gain_1,*/ gain_2, gain_3;
 
 	stream_sample_t *fl = &outputs[0][0];
 	stream_sample_t *fr = &outputs[1][0];
@@ -232,8 +232,8 @@ static STREAM_UPDATE( tx1_stream_update )
 	step_1 = pit8253.counts[1].val ? (TX1_PIT_CLOCK / pit8253.counts[1].val) * freq_to_step : 0;
 	step_2 = pit8253.counts[2].val ? (TX1_PIT_CLOCK / pit8253.counts[2].val) * freq_to_step : 0;
 
-	gain_0 = tx1_engine_gains[ay_outputa & 0xf];
-	gain_1 = tx1_engine_gains[ay_outputa >> 4];
+	//gain_0 = tx1_engine_gains[ay_outputa & 0xf];
+	//gain_1 = tx1_engine_gains[ay_outputa >> 4];
 	gain_2 = tx1_engine_gains[ay_outputb & 0xf];
 	gain_3 = BIT(ay_outputb, 5) ? 1.0f : 1.5f;
 

@@ -1264,7 +1264,7 @@ static DRIVER_INIT( kram3 )
 {
 	const address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const address_space *videospace = cputag_get_address_space(machine, "videocpu", ADDRESS_SPACE_PROGRAM);
-	const UINT8 *patch;
+	//const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i;
 
@@ -1283,7 +1283,7 @@ static DRIVER_INIT( kram3 )
      ********************************/
 
 	i = 0;
-	patch = memory_region(machine, "user1");
+	//patch = memory_region(machine, "user1");
 	rom = memory_region(machine, "maincpu");
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
@@ -1296,7 +1296,7 @@ static DRIVER_INIT( kram3 )
 	}
 
 	i = 0;
-	patch = memory_region(machine, "user2");
+	//patch = memory_region(machine, "user2");
 	rom = memory_region(machine, "videocpu");
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 

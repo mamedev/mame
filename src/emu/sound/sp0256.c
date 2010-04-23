@@ -1106,7 +1106,7 @@ static STREAM_UPDATE( sp0256_update )
 	sp0256_state *sp = (sp0256_state *)param;
 	stream_sample_t *output = outputs[0];
 	int output_index = 0;
-	int length, did_samp, old_idx;
+	int length, did_samp/*, old_idx*/;
 
 	while( output_index < samples )
 	{
@@ -1137,7 +1137,7 @@ static STREAM_UPDATE( sp0256_update )
 		/*  repeat count holds up and we have room in our scratch buffer.   */
 		/* ---------------------------------------------------------------- */
 		did_samp = 0;
-		old_idx  = sp->sc_head;
+		//old_idx  = sp->sc_head;
 		if (length > 0) do
 		{
 			int do_samp;

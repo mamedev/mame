@@ -72,7 +72,9 @@ if (!((data >> 4) & 1)) mame_printf_debug("/TRIG4\n");
 
 WRITE8_DEVICE_HANDLER( turbo_sound_a_w )
 {
+#if (!DISCRETE_TEST)
 	running_device *samples = devtag_get_device(device->machine, "samples");
+#endif
 	turbo_state *state = (turbo_state *)device->machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[0];
 	state->sound_state[0] = data;

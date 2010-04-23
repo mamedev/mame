@@ -944,7 +944,7 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
 				do
 				{
 					rom_entry modified_romp = *romp++;
-					int readresult;
+					//int readresult;
 
 					/* handle flag inheritance */
 					if (!ROM_INHERITSFLAGS(&modified_romp))
@@ -956,7 +956,7 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
 
 					/* attempt to read using the modified entry */
 					if (!ROMENTRY_ISIGNORE(&modified_romp) && !irrelevantbios)
-						readresult = read_rom_data(romdata, &modified_romp);
+						/*readresult = */read_rom_data(romdata, &modified_romp);
 				}
 				while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp));
 

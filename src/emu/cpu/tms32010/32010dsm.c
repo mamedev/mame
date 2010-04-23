@@ -231,7 +231,7 @@ CPU_DISASSEMBLE( tms32010 )
 	int cnt = 1;
 	int code;
 	int bit;
-	char *buffertmp;
+	//char *buffertmp;
 	const char *cp;				/* character pointer in OpFormats */
 
 	if (!OpInizialized) InitDasm32010();
@@ -255,7 +255,7 @@ CPU_DISASSEMBLE( tms32010 )
 		sprintf(buffer, "dw   %04Xh *(invalid op)", code);
 		return cnt | DASMFLAG_SUPPORTED;
 	}
-	buffertmp = buffer;
+	//buffertmp = buffer;
 	if (Op[op].extcode)
 	{
 		bit = 31;

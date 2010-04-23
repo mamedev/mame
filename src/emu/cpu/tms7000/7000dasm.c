@@ -361,7 +361,7 @@ static const opcodeinfo opcodes[] = {
 
 CPU_DISASSEMBLE( tms7000 )
 {
-	int opcode, i, size = 1;
+	int opcode, i/*, size = 1*/;
 	int pos = 0;
 	char tmpbuf[32];
 
@@ -395,32 +395,32 @@ CPU_DISASSEMBLE( tms7000 )
 					case UI8:
 						a = (UINT8)opram[pos++];
 						buffer += sprintf(buffer, of[j].opstr[k], (unsigned int)a);
-						size += 1;
+						//size += 1;
 						break;
 					case I8:
 						b = (INT8)opram[pos++];
 						buffer += sprintf (buffer, of[j].opstr[k], (INT8)b);
-						size += 1;
+						//size += 1;
 						break;
 					case UI16:
 						c = (UINT16)opram[pos++];
 						c <<= 8;
 						c += opram[pos++];
 						buffer += sprintf (buffer, of[j].opstr[k], (unsigned int)c);
-						size += 2;
+						//size += 2;
 						break;
 					case I16:
 						d = (INT16)opram[pos++];
 						d <<= 8;
 						d += opram[pos++];
 						buffer += sprintf (buffer, of[j].opstr[k], (signed int)d);
-						size += 2;
+						//size += 2;
 						break;
 					case PCREL:
 						b = (INT8)opram[pos++];
 						sprintf(tmpbuf, "$%04X", pc+2+k+b);
 						buffer += sprintf (buffer, of[j].opstr[k], tmpbuf);
-						size += 1;
+						//size += 1;
 						break;
 					case PCABS:
 						c = (UINT16)opram[pos++];
@@ -428,7 +428,7 @@ CPU_DISASSEMBLE( tms7000 )
 						c += opram[pos++];
 						sprintf(tmpbuf, "$%04X", c);
 						buffer += sprintf (buffer, of[j].opstr[k], tmpbuf);
-						size += 2;
+						//size += 2;
 						break;
 					case TRAP:
 						vector = 0xffff - ((0xff - opcode) * 2);
