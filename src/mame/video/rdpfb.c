@@ -121,7 +121,7 @@ bool RDP::Framebuffer::Write32Bit(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
 
 	UINT32 newcvg = m_misc_state->m_curpixel_cvg + memory_cvg;
 	bool wrapped = (newcvg > 8);
-	UINT32 clamped_cvg = (wrapped > 8) ? 8 : newcvg;
+	UINT32 clamped_cvg = wrapped ? 8 : newcvg;
 	newcvg = (wrapped) ? (newcvg - 8) : newcvg;
 
 	m_misc_state->m_curpixel_cvg--;
