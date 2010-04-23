@@ -980,8 +980,6 @@ int memory_set_direct_region(const address_space *space, offs_t *byteaddress)
 		/* ensure future updates to land here as well until we get back into a bank */
 		spacerw->direct.byteend = 0;
 		spacerw->direct.bytestart = 1;
-		if (!spacerw->debugger_access)
-			logerror("Device '%s': warning - attempt to direct-map address %s in %s space\n", space->cpu->tag(), core_i64_hex_format(overrideaddress, space->addrchars), space->name);
 		return FALSE;
 	}
 
