@@ -1818,6 +1818,8 @@ $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
 $(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
 
+$(DRIVERS)/sstrangr.o:	$(LAYOUT)/sstrangr.lh
+
 $(DRIVERS)/subsino.o:	$(LAYOUT)/victor5.lh \
 						$(LAYOUT)/victor21.lh \
 						$(LAYOUT)/tisub.lh \

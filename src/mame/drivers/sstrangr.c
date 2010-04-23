@@ -9,6 +9,8 @@
 #include "cpu/i8085/i8085.h"
 #include "deprecat.h"
 
+#include "sstrangr.lh"
+
 
 #define NUM_PENS	(8)
 
@@ -298,5 +300,5 @@ ROM_START( sstrangr2 )
 ROM_END
 
 
-GAME( 1978, sstrangr, 0,        sstrangr, sstrangr, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger", GAME_NO_SOUND )
+GAMEL( 1978, sstrangr, 0,        sstrangr, sstrangr, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger", GAME_NO_SOUND, layout_sstrangr )
 GAME( 1979, sstrangr2,sstrangr, sstrngr2, sstrngr2, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", GAME_NO_SOUND )
