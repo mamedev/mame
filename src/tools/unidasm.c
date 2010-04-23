@@ -37,6 +37,18 @@
 
 ****************************************************************************/
 
+void *malloc_file_line(size_t size, const char *file, int line)
+{
+	void *result = malloc(size);
+	return result;
+}
+
+
+void free_file_line(void *memory, const char *file, int line)
+{
+	free(memory);
+}
+
 #include "emu.h"
 #include <ctype.h>
 
@@ -332,18 +344,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "z80",		_8bit,  0, CPU_DISASSEMBLE_NAME(z80) },
 	{ "z8",			_8bit,  0, CPU_DISASSEMBLE_NAME(z8) },
 };
-
-void *malloc_file_line(size_t size, const char *file, int line)
-{
-	void *result = malloc(size);
-	return result;
-}
-
-
-void free_file_line(void *memory, const char *file, int line)
-{
-	free(memory);
-}
 
 
 void CLIB_DECL logerror(const char *format, ...)
