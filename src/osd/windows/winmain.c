@@ -1021,8 +1021,6 @@ static void start_profiler(void)
 	HANDLE currentThread;
 	BOOL result;
 
-	assert_always(
-
 	// parse the map file, if present
 	parse_map_file();
 
