@@ -3166,6 +3166,42 @@ ROM_START( warofbug )
 	ROM_LOAD( "warofbug.clr", 0x0000, 0x0020, CRC(8688e64b) SHA1(ed13414257f580b98b50c9892a14159c55e7838d) )
 ROM_END
 
+/*  Galaxian hardware mods for War of the Bugs warofbug/warofbugg
+
+(WotB using daughterboard that plugs into Z80 socket - has a socketed PAL, two other 20-pin ICs,
+a 16-pin IC (all with their markings sanded off) and five EPROMs)
+
+On the Galaxian board:
+
+2B, 74LS366 - cut pin 15 OR pin 1 (this disables the stars)
+8E, 74LS139 - cut pin 11 only, join the stub left ON THE CHIP to pin 13 on the chip
+
+Cut the track on the bottom of the board going to pin 21 of IC 1K
+(2716 eprom).
+
+Cut the track on the bottom of the board going to pin 21 of IC 1H
+(2716 eprom).
+
+Join pins 21 of IC's 1H and 1K together and connect both to +5 volts 
+(although I've seen one set of docs saying to connect to pin 1 of
+ic 2N (7408) instead)  */
+
+ROM_START( warofbugg )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "wotbg-u-1.bin",   0x0000, 0x0800, CRC(f43ff0a8) SHA1(b87abeb8af9105fa8fba78f9a68363bd89066e7f) )
+	ROM_LOAD( "wotbg-v-2.bin",   0x0800, 0x0800, CRC(eb7a028b) SHA1(8c822ae11d3cc04f749a7cd639d15b9fc830ab35) )
+	ROM_LOAD( "wotbg-w-3.bin",   0x1000, 0x0800, CRC(693e0e50) SHA1(00b19969cee0f95bfb8251c2df133ff2c9ae3b00) )
+	ROM_LOAD( "wotbg-y-4.bin",   0x1800, 0x0800, CRC(885d4982) SHA1(4aeaf514a9413a9cb9a971fd258c6cf46ca66fc4) )
+	ROM_LOAD( "wotbg-z-5.bin",   0x2000, 0x0800, CRC(60041ef2) SHA1(cced5837a037ac5cd8fa6260d69d8e33de5ecd48) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "warofbug.1k",  0x0000, 0x0800, CRC(8100fa85) SHA1(06641c431cace36dec98b87555f62e72f3e53a31) )
+	ROM_LOAD( "warofbug.1j",  0x0800, 0x0800, CRC(d1220ae9) SHA1(e892bc8b0b71d8b07503e474e9c30e6cab460682) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "warofbug.clr", 0x0000, 0x0020, CRC(8688e64b) SHA1(ed13414257f580b98b50c9892a14159c55e7838d) )
+ROM_END
+
 ROM_START( redufo ) /* Galaxian bootleg hardware known as Artic Multi-System */
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "ru1a",         0x0000, 0x0800, CRC(5a8e4f37) SHA1(c0957ede91e2dc3f80e4912b877843aed5d15779) )
@@ -5850,6 +5886,7 @@ GAME( 19??, omega,    theend,   galaxian, omega,    galaxian, ROT270, "bootleg?"
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
+GAME( 1981, warofbugg,warofbug, galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1981, redufo,   0,        galaxian, redufo,   nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE )
 GAME( 19??, exodus,   redufo,   galaxian, exodus,   nolock,   ROT90,  "Subelectro", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1983, tdpgal,   0,        galaxian, tdpgal,   nolock,   ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", GAME_SUPPORTS_SAVE )
