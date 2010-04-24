@@ -961,8 +961,8 @@ static INPUT_PORTS_START( cstlevna )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(	0x08, "2" )
 	PORT_DIPSETTING(	0x00, "3" )
-/* As near as I can tell, there is no adjustable bonus level where the manual states there should be (SW1:5,6)
-   The bonus liives, regardless settings, are 30000 and every 50000 thereafter.  Until someone can figure out
+/* As near as I can tell, there is no adjustable bonus level where the manual states there should be (SW1:5,6).
+   The bonus lives, regardless of settings, are at 30000 and every 50000 thereafter.  Until someone can figure out
    what these dips do - they will be kept UNKNOWN */
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
