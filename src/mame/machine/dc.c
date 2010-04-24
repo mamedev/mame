@@ -1138,6 +1138,10 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			dmaoffset = (UINT32)space->machine->device("rom_board")->get_runtime_int(DEVINFO_INT_DMAOFFSET);
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
 			ddtdata.length=g1bus_regs[SB_GDLEN] >> 5;		// words to transfer
+			/* data in the lower 5 bits makes the length size to round by 32 bytes, this'll be needed by Virtua Tennis to boot (according to Deunan) */
+			if(g1bus_regs[SB_GDLEN] & 0x1c)
+				ddtdata.length++;
+
 			ddtdata.size=32;			// bytes per word
 			ddtdata.buffer=ROM+dmaoffset;	// buffer address
 			ddtdata.direction=1;	// 0 source to buffer, 1 buffer to destination
