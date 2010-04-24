@@ -493,7 +493,6 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT(hitpoker)
 {
-	#if 1
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	ROM[0x1220] = 0x01; //patch eeprom write?
@@ -502,7 +501,6 @@ static DRIVER_INIT(hitpoker)
 
 	ROM[0x10c6] = 0x01;
 	ROM[0x10c7] = 0x01; //patch the checksum routine
-	#endif
 }
 
 ROM_START( hitpoker )
