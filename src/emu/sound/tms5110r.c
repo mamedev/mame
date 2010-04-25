@@ -40,6 +40,7 @@
 #define SUBTYPE_TMS5200			8
 #define SUBTYPE_TMS5220			16
 #define SUBTYPE_TMS5220C		32
+#define SUBTYPE_PAT4335277		64
 
 /* coefficient defines */
 #define MAX_K					10
@@ -259,8 +260,78 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
+/* The following coefficients come from US Patent 4,335,277 and 4,581,757. However, the K10 row of coefficients are entirely missing from both of those patents.
+The K values don't match the values read from an actual TMS5200 chip, but might match the CD2501 or some other undiscovered chip?
+*/
+   // k* is followed by d if done transcription, c if checked for derivative aberrations
+static const struct tms5100_coeffs pat4335277_coeff =
+{
+	/* subtype */
+	SUBTYPE_PAT4335277,
+	10,
+	4,
+	6,
+	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
+	/* Ed   */
+	{ 0,   1,   2,   3,   4,   6,   8,   11,
+	 16,  23,  33,  47,  63,  85,  114, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
+	/* Pd   */
+	{ 0,  14,  15,  16,  17,  18,  19,  20,
+	 21,  22,  23,  24,  25,  26,  27,  28,
+	 29,  30,  31,  32,  34,  36,  38,  40,
+	 41,  43,  45,  48,  49,  51,  54,  55,
+	 57,  60,  62,  64,  68,  72,  74,  76,
+	 81,  85,  87,  90,  96,  99, 103, 107,
+	112, 117, 122, 127, 133, 139, 145, 151,
+	157, 164, 171, 178, 186, 194, 202, 211 },
+	{
+		/* K1dc  */
+		{ -507, -505, -503, -501, -497, -493, -488, -481,
+		  -473, -463, -450, -434, -414, -390, -362, -328,
+		  -288, -242, -191, -135,  -75,  -13,   49,  110,
+		   168,  221,  269,  311,  348,  379,  404,  426 },
+		/* K2dc  */
+		{ -294, -266, -235, -202, -167, -130,  -92,  -52,
+		   -12,   28,   68,  108,  145,  182,  216,  248,
+		   278,  305,  330,  352,  372,  390,  406,  420,
+		   432,  443,  453,  461,  468,  474,  479,  486 },
+		/* K3dc  */
+		{ -449, -432, -411, -385, -354, -317, -273, -223,
+		  -167, -107,  -43,   22,   87,  148,  206,  258 },
+		/* K4dc (first 4-5 values are probably wrong but close) */
+		{ -321, -270, -220, -157,  -97,  -40,   25,   89,
+		   150,  207,  259,  304,  343,  376,  403,  425 },
+		/* K5dc  */
+		{ -373, -347, -318, -284, -247, -206, -162, -115,
+		   -65,  -15,   36,   86,  135,  181,  224,  263 },
+		/* K6dc  */
+		{ -213, -176, -137,  -96,  -54,  -11,   33,   75,
+		   117,  157,  195,  231,  264,  294,  322,  347 },
+		/* K7dc  */
+		{ -294, -264, -232, -198, -161, -122,  -82,  -41,
+		     1,   43,   84,  125,  163,  200,  234,  266 },
+		/* K8dc  */
+		{ -195, -117,  -32,   54,  137,  213,  279,  335 },
+		/* K9dc  */
+		{ -122,  -55,   15,   83, 149,  210,  264,  311  },
+		/* K10  - this was entirely missing from the patent, and I've simply copied the real TMS5220 one, which is wrong */
+		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
+	},
+	/* Chirp table */
+	{   0,  42, -44, 50, -78, 18, 37, 20,
+	    2, -31, -59,  2,  95, 90,  5, 15,
+	   38, -4,  -91,-91, -42,-35,-36, -4,
+       37, 43,   34, 33,  15, -1, -8,-18,
+	  -19,-17,   -9,-10,  -6,  0,  3,  2,
+	    1,  0,    0,  0,   0,  0,  0,  0,
+	    0,  0,    0 },
+	/* interpolation coefficients */
+	{ 3, 3, 3, 2, 2, 2, 1, 0 }
+};
+
 /* The following TMS5200/TMC0285 coefficients were directly read from an actual TMS5200 chip by Lord Nightmare using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still come from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
-Note that the K coefficients are VERY different from the coefficients given in the US 4,335,277 patent, which may have been for some sort of prototype or otherwise intentionally scrambled. The energy and pitch tables, however, are identical to the patent. */
+Note that the K coefficients are VERY different from the coefficients given in the US 4,335,277 patent, which may have been for some sort of prototype or otherwise intentionally scrambled. The energy and pitch tables, however, are identical to the patent.
+Also note, that the K coefficients are ALMOST identical to the coefficients from the CD2802, above. */
 static const struct tms5100_coeffs tms5200_coeff =
 {
 	/* subtype */
