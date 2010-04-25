@@ -1543,7 +1543,7 @@ static WRITE16_HANDLER(s23_c361_w)
 static READ16_HANDLER(s23_c361_r)
 {
 	switch(offset) {
-	case 5: return video_screen_get_vpos(space->machine->primary_screen)*2;
+	case 5: return video_screen_get_vpos(space->machine->primary_screen)*2 | (video_screen_get_vblank(space->machine->primary_screen) ? 1 : 0);
 	case 6: return video_screen_get_vblank(space->machine->primary_screen);
 	}
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
