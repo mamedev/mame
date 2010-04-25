@@ -17,67 +17,36 @@
 
 Sega Naomi is Dreamcast based Arcade hardware.
 
-Current Compatibility notes (GD-rom games only)
-|----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
-|romname   | Pl(s) | Rot | Test | Boot | Game | Control Type                   | Notes                                               |
-|----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
-|gundmgd   |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        |                                                     |
-|sfz3ugd   |   2   |  H  | Yes  | Yes  | No   | joystick with 6 buttons        | Hangs after pressing start                          |
-|cvsgd     |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | 2 + 2 extra buttons                                 |
-|gundmxgd  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        |                                                     |
-|cvs2gd    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 6 buttons        |                                                     |
-|ikaruga   |   2   |  V  | Yes  | Yes  | Yes  | joystick with 2 buttons        |                                                     |
-|ggxx      |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
-|moeru     |   2   |  H  | No   | No   | No   | joystick with 3 buttons        | Broken i/o, stuck at the "now loading" msg          |
-|chocomk   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 2 buttons        |                                                     |
-|quizqgd   |   2   |  V  | Yes  | Yes  | Yes  | joystick with 4 buttons        | Can play without joystick                           |
-|ggxxrl    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
-|tetkiwam  |   2   |  H  | No   | No   | No   | joystick with 3 buttons        | Black screen, tests the SCIF (UART) regs?           |
-|shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o, crashes on the proper gameplay          |
-|usagui    |   1   |  H  | Yes  | Yes  | No   | mahjong panel                  |                                                     |
-|bdrdown   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
-|psyvar2   |   1   |  V  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken i/o? Hangs after pressing start              |
-|cfield    |   1   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
-|trizeal   |   2   |  V  | No   | No   | No   | joystick with 3 buttons        |                                                     |
-|meltybld  |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | Crashes in attract mode                             |
-|senko     |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Senko no Londe SP (undumped) uses 5 buttons         |
-|senkoo    |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        |                                                     |
-|ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Calls a YUV FMV, crashes due of that                |
-|radirgy   |   1   |  V  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
-|ggxxsla   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
-|kurucham  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o, crashes in attract with wrong mask      |
-|undefeat  |   2   |  V  | No   | No   | No   | joystick with 2 buttons        | Stuck at the "now loading" msg                      |
-|trgheart  |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o                                          |
-|jingystm  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o                                          |
-|meltyb    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        | Crashes in attract mode                             |
-|meltyba   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        | Crashes in attract mode                             |
-|karous    |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o                                          |
-|takoron   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
---------------------------------------------------------------------------------------------------------------------------------------
-|confmiss  |   2   |  H  | Yes  | Yes  | No   | lightgun                       |                                                     |
-|sprtjam   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 2 buttons        |                                                     |
-|slashout  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        |                                                     |
-|spkrbtl   |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons        | Crashes when loading the gameplay                   |
-|monkeyba  |   1   |  H  | Yes  | Yes  | No   | ad stick                       | Crashes when loading the gameplay                   |
-|dygolf    |   2   |  H  | No   | No   | No   | trackball + 4 buttons          | Moans about the jvs settings                        |
-|wsbbgd    |   2   |  H  | No   | No   | No   | ad stick + 2 buttons           | Moans about the jvs settings                        |
-|vtennisg  |   2   |  H  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken gfxs, crashes after a while                  |
-|vathlete  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o                                          |
-|vtennis2  |   2   |  H  | No   | No   | No   | joystick with 3 buttons        |                                                     |
-|keyboard  |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, crashes after a while                   |
-|lupinsho  |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o, crashes after a while                   |
-|luptype   |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, ARM cpu crashes when inserting a coin   |
-|mok       |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o                                          |
-|ngdup23a  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
-|ngdup23c  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
-|puyofev   |   2   |  H  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken i/o? Hangs after pressing start              |
---------------------------------------------------------------------------------------------------------------------------------------
+ToDo:
+- many games needs proper per-game JVS settings, at least to let them boot:
+  - lightgun games (confmiss, lupinsho, mok);
+  - dygolf (trackball + 4 buttons / not actually needed to let it boot, just press start to bypass the moan msg);
+  - wsbbgd (ad stick + 2 buttons);
+  - monkeyba (ad stick, not actually needed to let it boot, but crashes at the proper gameplay, so it might);
+  - otrigger ?
+  - smarinef ?
+  - crackndj ?
+  - shootpl / shootopl ?
+  - kick4csh ?
 
-Test: If it enters into test mode (not actually working test mode, i.e. if inputs doesn't work)
-Boot: If game boots and draws some gfxs
-Game: If game can be coined up and can actually be played without problems.
-If the three aforementioned are all yes and there aren't any notes, game is fully working.
+- tetkiwam, keyboard, vtennis2, vtennisg, monkeyba: they all crashes at some point, might be due of a bad FPU opcode;
 
+- meltybld, meltyb, meltyba: crashes in attract mode;
+
+- all games that uses YUV just updates one frame then dies, why?
+
+- all or almost all games seems to have issues with the sound loops, for example sfz3ugd keeps to say "This-This-This ..." at start-up
+  instead of completing the phrase;
+
+- luptype: ARM crashes when you insert a coin;
+
+- suchie3: used to boot (at least go over the I/O test), it doesn't now, might be protection related.
+
+- ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
+
+- totd: emulation exits at some point during attract mode without any output.
+
+- spkrbtl: ARM CPU crashes sometimes? Also, it crashes when entering into the gameplay.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
