@@ -3226,6 +3226,20 @@ ROM_START( darkhleg )
 	DISK_IMAGE_READONLY( "706jaa02", 0, SHA1(58bd06855988250028086cba6b3670372b9d96a0) )
 ROM_END
 
+ROM_START( fmania )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
+	ROM_FILL( 0x000000, 0x000224, 0xff )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "918xxb02", 0, SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
+ROM_END
+
 ROM_START( ddrextrm )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
@@ -4731,6 +4745,7 @@ GAME( 2000, ddrusa,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami"
 GAME( 2000, ddr4mp,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2000, ddr4mps,  sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2000, dmx2m,    sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix (G*A39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2000, fmania,   sys573,   konami573, konami573, konami573,  ROT0, "Konami", "Fighting Mania (918 xx B02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 2001, gtrfrk5m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, ddr5m,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, dmx2majp, sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
