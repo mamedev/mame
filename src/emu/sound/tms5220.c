@@ -772,7 +772,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			else if ((NEW_FRAME_SILENCE_FLAG == 1) || (NEW_FRAME_STOP_FLAG == 1))
 			{
 #ifdef DEBUG_GENERATION
-				logerror("processing frame: ramp-down (energy = 0 or STOP)\n";
+				logerror("processing frame: ramp-down (energy = 0 or STOP)\n");
 #endif
 				tms->target_energy = 0;
 				tms->target_pitch = tms->current_pitch;
