@@ -529,9 +529,17 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			dc_sysctrl_regs[SB_ISTERR] = old & ~dat;
 			break;
 		case SB_SDST:
-			#if DEBUG_SYSCTRL
-			mame_printf_verbose("SYSCTRL: Sort-DMA not supported yet !!!\n");
-			#endif
+			//#if DEBUG_SYSCTRL
+			//mame_printf_verbose("SYSCTRL: Sort-DMA not supported yet !!!\n");
+			//#endif
+			if(dat & 1)
+			{
+				// TODO: Sort-DMA routine goes here
+				printf("Sort-DMA irq\n");
+
+				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_SORT;
+				dc_sysctrl_regs[SB_SDST] = 0;
+			}
 			break;
 	}
 	dc_update_interrupt_status(space->machine);
