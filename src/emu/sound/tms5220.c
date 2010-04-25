@@ -1483,11 +1483,11 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 			logerror("Schedule write ready\n");
 #endif
 			tms->io_ready = 1;
-			/* 100 nsec from data sheet */
-			timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb); // goes low nearly immediately, i.e. within 3 cycles
+			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // goes immediately, within one clock
 			tms->io_ready = 0;
 			/* 25 usec in datasheet, but zaccaria won't work */
-			timer_set(tms->device->machine, ATTOTIME_IN_USEC(100), tms, 1, io_ready_cb); // this should take around 12-15 cycles to complete
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/11), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11) cycles to complete
 		}
 	}
 }
@@ -1531,9 +1531,9 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		{
 			///* high to low - schedule ready cycle*/
 			tms->io_ready = 1;
-			timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb); // goes low nearly immediately, i.e. within 3 ccyles
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // goes immediately, within one clock
 			tms->io_ready = 0;
-			timer_set(tms->device->machine, ATTOTIME_IN_USEC(25), tms, 1, io_ready_cb); // this should take around 12-15 cycles to complete
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/15), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete
 		}
 	}
 }
