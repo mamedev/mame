@@ -32,13 +32,6 @@
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
       and displaying it I'm not going to meddle with it though.
 
-    - Point roms are accessed for checksumming through a port at a200000x:
-      - reset the port by writing 0000 to a2000006
-      - write offset >> 16  to a2000004
-      - write offset & ffff to a2000004 (yes, same address, hence the reset)
-      - read 2 bytes from one rom at a200000a
-      - read 2 bytes from one rom at a200000c
-
     - Add the sh2 in Gunmen Wars (no rom, controls the camera)
 
     - Super System 23 tests irqs in the post.  timecrs2c's code can
@@ -1184,6 +1177,7 @@ static UINT8 ctl_led;
 static UINT16 ctl_inp_buffer[2];
 
 static UINT16 c417_ram[0x10000], c417_adr = 0;
+static UINT32 c417_pointrom_adr = 0;
 
 static UINT16 c412_sdram_a[0x100000]; // Framebuffers, probably
 static UINT16 c412_sdram_b[0x100000];
@@ -1285,11 +1279,34 @@ static WRITE32_HANDLER( namcos23_paletteram_w )
 static READ16_HANDLER(s23_c417_r)
 {
 	switch(offset) {
+		/* According to timecrs2c, +0 is the status word with bits being:
+		   15: test mode flag (huh?)
+		   10: fifo data ready
+		   9:  cmd ram data ready
+		   8:  matrix busy
+		   7:  output unit busy (inverted)
+		   6:  hokan/tenso unit busy
+		   5:  point unit busy
+		   4:  access unit busy
+		   3:  c403 busy (inverted)
+		   2:  2nd c435 busy (inverted)
+		   1:  1st c435 busy (inverted)
+		   0:  xcpreq
+		 */
 	case 0: return 0x8e | (video_screen_get_vblank(space->machine->primary_screen) ? 0x0000 : 0x8000);
 	case 1: return c417_adr;
 	case 4:
 		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 		return c417_ram[c417_adr];
+	case 5:
+		if(c417_pointrom_adr >= ptrom_limit)
+			return 0xffff;
+		return ptrom[c417_pointrom_adr] >> 16;
+	case 6:
+		if(c417_pointrom_adr >= ptrom_limit)
+			return 0xffff;
+		return ptrom[c417_pointrom_adr];
+
 	}
 
 	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -1300,16 +1317,17 @@ static WRITE16_HANDLER(s23_c417_w)
 {
     switch(offset) {
     case 0:
-    	if (data == 1)
-	{
-		logerror("c417_w: raise IRQ 2\n");
-		cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ2, ASSERT_LINE);
-	}
-    	break;
+		logerror("p3d PIO %04x\n", data);
+		break;
     case 1:
         COMBINE_DATA(&c417_adr);
         break;
-
+	case 2:
+		c417_pointrom_adr = (c417_pointrom_adr << 16) | data;
+		break;
+	case 3:
+		c417_pointrom_adr = 0;
+		break;
     case 4:
 		//        logerror("c417_w %04x = %04x (%08x, %08x)\n", c417_adr, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
         COMBINE_DATA(c417_ram + c417_adr);
@@ -1355,6 +1373,9 @@ static WRITE16_HANDLER(s23_c412_ram_w)
 static READ16_HANDLER(s23_c412_r)
 {
 	switch(offset) {
+	case 3:
+		// 0001 = busy, 0002 = game uploads things
+		return 0x0002;
 	case 8: return c412_adr;
 	case 9: return c412_adr >> 16;
 	case 10: return s23_c412_ram_r(space, c412_adr, mem_mask);
@@ -2601,13 +2622,17 @@ static INPUT_PORTS_START( ss23 )
 	PORT_START("H8PORT")
 
 	// No idea if start is actually there, but we need buttons to pass error screens
-	// You can go to the pcb test mode by pressing start, but it crashes...
+	// You can go to the pcb test mode by pressing start, and it doesn't crash anymore somehow
+	// Use start1 to select, start1+start2 to exit, up/down to navigate
 	PORT_START("P1")
 	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xff7, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0xd07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TC2P0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
