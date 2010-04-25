@@ -165,6 +165,64 @@ static const UINT32 maple0x82answer_31kHz[]=
 	0x05200083,0x5245544e,0x53495250,0x43205345,0x544c2c4f,0x20202e44,0x38393931,0x5c525043
 };
 
+static struct {
+	UINT32 aica_addr;
+	UINT32 root_addr;
+	UINT32 size;
+	UINT8 dir;
+	UINT8 flag;
+	UINT8 indirect;
+	UINT8 start;
+	UINT8 sel;
+}wave_dma;
+
+
+static TIMER_CALLBACK( aica_dma_irq )
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
+	dc_update_interrupt_status(machine);
+}
+
+static void wave_dma_execute(const address_space *space)
+{
+	UINT32 src,dst,size;
+	dst = wave_dma.aica_addr;
+	src = wave_dma.root_addr;
+	size = 0;
+
+	/* 0 rounding size = 32 Mbytes */
+	if(wave_dma.size == 0) { wave_dma.size = 0x200000; }
+
+	if(wave_dma.dir == 0)
+	{
+		for(;size<wave_dma.size;size+=4)
+		{
+			memory_write_dword_64le(space,dst,memory_read_dword(space,src));
+			src+=4;
+			dst+=4;
+		}
+	}
+	else
+	{
+		for(;size<wave_dma.size;size+=4)
+		{
+			memory_write_dword_64le(space,src,memory_read_dword(space,dst));
+			src+=4;
+			dst+=4;
+		}
+	}
+
+	/* update the params*/
+	wave_dma.aica_addr = g2bus_regs[SB_ADSTAG] = dst;
+	wave_dma.root_addr = g2bus_regs[SB_ADSTAR] = src;
+	wave_dma.size = g2bus_regs[SB_ADLEN] = 0;
+	wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
+	wave_dma.start = g2bus_regs[SB_ADST] = 0;
+	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
+	/* TODO: timing of this */
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, aica_dma_irq);
+}
+
 // register decode helpers
 
 // this accepts only 32-bit accesses
@@ -247,7 +305,7 @@ int dc_compute_interrupt_level(running_machine *machine)
 
 void dc_update_interrupt_status(running_machine *machine)
 {
-int level;
+	int level;
 
 	if (dc_sysctrl_regs[SB_ISTERR])
 	{
@@ -269,6 +327,18 @@ int level;
 
 	level=dc_compute_interrupt_level(machine);
 	sh4_set_irln_input(devtag_get_device(machine, "maincpu"), 15-level);
+
+	/* Wave DMA HW trigger */
+	if(wave_dma.flag && ((wave_dma.sel & 2) == 2))
+	{
+		if((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
+		{
+			const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+			printf("Wave DMA HW trigger\n");
+			wave_dma_execute(space);
+		}
+	}
 }
 
 /******************************************************
@@ -478,8 +548,10 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			address=dc_sysctrl_regs[SB_C2DSTAT];
 			ddtdata.destination=address;
 			/* 0 rounding size = 16 Mbytes */
-			if(dc_sysctrl_regs[SB_C2DLEN] == 0) { dc_sysctrl_regs[SB_C2DLEN] = 0x1000000; }
-			ddtdata.length=dc_sysctrl_regs[SB_C2DLEN];
+			if(dc_sysctrl_regs[SB_C2DLEN] == 0)
+				ddtdata.length = 0x1000000;
+			else
+				ddtdata.length = dc_sysctrl_regs[SB_C2DLEN];
 			ddtdata.size=1;
 			ddtdata.direction=0;
 			ddtdata.channel=2;
@@ -1180,16 +1252,6 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
-	static struct {
-		UINT32 aica_addr;
-		UINT32 root_addr;
-		UINT32 size;
-		UINT8 dir;
-		UINT8 flag;
-		UINT8 indirect;
-		UINT8 start;
-		UINT8 sel;
-	}wave_dma;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -1211,6 +1273,10 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 		case SB_ADDIR: wave_dma.dir = (dat & 1); break;
 		/*dma flag (active HIGH, bug in docs)*/
 		case SB_ADEN: wave_dma.flag = (dat & 1); break;
+		/*
+		SB_ADTSEL
+		bit 1: (0) Wave DMA thru SB_ADST flag (1) Wave DMA thru irq trigger, defined by SB_G2DTNRM / SB_G2DTEXT
+		*/
 		case SB_ADTSEL: wave_dma.sel = dat & 7; break;
 		/*ready for dma'ing*/
 		case SB_ADST:
@@ -1223,43 +1289,8 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 			#endif
 
 			//mame_printf_verbose("SB_ADST data %08x\n",dat);
-			if(wave_dma.flag && wave_dma.start)
-			{
-				UINT32 src,dst,size;
-				dst = wave_dma.aica_addr;
-				src = wave_dma.root_addr;
-				size = 0;
-				/* 0 rounding size = 32 Mbytes */
-				if(wave_dma.size == 0) { wave_dma.size = 0x200000; }
-
-				if(wave_dma.dir == 0)
-				{
-					for(;size<wave_dma.size;size+=4)
-					{
-						memory_write_dword_64le(space,dst,memory_read_dword(space,src));
-						src+=4;
-						dst+=4;
-					}
-				}
-				else
-				{
-					for(;size<wave_dma.size;size+=4)
-					{
-						memory_write_dword_64le(space,src,memory_read_dword(space,dst));
-						src+=4;
-						dst+=4;
-					}
-				}
-				/* update the params*/
-				wave_dma.aica_addr = g2bus_regs[SB_ADSTAG] = dst;
-				wave_dma.root_addr = g2bus_regs[SB_ADSTAR] = src;
-				wave_dma.size = g2bus_regs[SB_ADLEN] = 0;
-				wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
-				wave_dma.start = g2bus_regs[SB_ADST] = 0;
-				/*TODO: this makes the sfz3upper to not play any bgm, understand why. */
-				//dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
-				//dc_update_interrupt_status(space->machine);
-			}
+			if(wave_dma.flag && wave_dma.start && ((wave_dma.sel & 2) == 0))
+				wave_dma_execute(space);
 			break;
 
 		case SB_ADSUSP:
