@@ -1033,9 +1033,9 @@ WRITE64_HANDLER( naomi_maple_w )
 			}
 			else
 			{
-				#if DEBUG_MAPLE
+				//#if DEBUG_MAPLE
 				printf("MAPLE: hardware trigger not supported yet\n");
-				#endif
+				//#endif
 			}
 		}
 		break;
@@ -1187,9 +1187,9 @@ WRITE64_HANDLER( dc_maple_w )
 			}
 			else
 			{
-				#if DEBUG_MAPLE
+				//#if DEBUG_MAPLE
 				printf("MAPLE: hardware trigger not supported yet\n");
-				#endif
+				//#endif
 			}
 		}
 		break;
