@@ -23,6 +23,7 @@
     * December 16, 2007 (kingshriek) Many EG bug fixes, implemented effects mixer,
                              implemented FM.
     * January 5, 2008   (kingshriek+RB) Working, good-sounding FM, removed obsolete non-USEDSP code.
+    * April 22, 2009   ("PluginNinja") Improved slot monitor, misc cleanups
 */
 
 #include "emu.h"
@@ -108,7 +109,6 @@ static const double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,118200.0,
 					14800.0,12700.0,11100.0,8900.0,7400.0,6300.0,5500.0,4400.0,3700.0,3200.0,2800.0,2200.0,1800.0,1600.0,1400.0,1100.0,
 					920.0,790.0,690.0,550.0,460.0,390.0,340.0,270.0,230.0,200.0,170.0,140.0,110.0,98.0,85.0,68.0,57.0,49.0,43.0,34.0,
 					28.0,25.0,22.0,18.0,14.0,12.0,11.0,8.5,7.1,6.1,5.4,4.3,3.6,3.1};
-static UINT32 FNS_Table[0x400];
 static INT32 EG_TABLE[0x400];
 
 typedef enum {ATTACK,DECAY1,DECAY2,RELEASE} _STATE;
@@ -389,9 +389,8 @@ static int Get_RR(struct _SCSP *SCSP,int base,int R)
 
 static void Compute_EG(struct _SCSP *SCSP,struct _SLOT *slot)
 {
-	int octave=OCT(slot);
+	int octave=(OCT(slot)^8)-8;
 	int rate;
-	if(octave&8) octave=octave-16;
 	if(KRS(slot)!=0xf)
 		rate=octave+2*KRS(slot)+((FNS(slot)>>9)&1);
 	else
@@ -460,16 +459,18 @@ static int EG_Update(struct _SLOT *slot)
 
 static UINT32 SCSP_Step(struct _SLOT *slot)
 {
-	int octave=OCT(slot);
-	UINT64 Fn;
-
-	Fn=(FNS_Table[FNS(slot)]);	//24.8
-	if(octave&8)
-		Fn>>=(16-octave);
-	else
+	int octave=(OCT(slot)^8)-8+SHIFT-10;
+	UINT32 Fn=FNS(slot)+(1 << 10);
+	if (octave >= 0)
+	{
 		Fn<<=octave;
+	}
+	else
+	{
+		Fn>>=-octave;
+	}
 
-	return Fn/(44100);
+	return Fn;
 }
 
 
@@ -496,6 +497,7 @@ static void SCSP_StartSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	slot->EG.volume=0x17F<<EG_SHIFT;
 	slot->Prev=0;
 	slot->Backwards=0;
+
 	Compute_LFO(slot);
 
 //  printf("StartSlot[%p]: SA %x PCM8B %x LPCTL %x ALFOS %x STWINH %x TL %x EFSDL %x\n", slot, SA(slot), PCM8B(slot), LPCTL(slot), ALFOS(slot), STWINH(slot), TL(slot), EFSDL(slot));
@@ -521,6 +523,8 @@ static void SCSP_Init(running_device *device, struct _SCSP *SCSP, const scsp_int
 	int i;
 
 	memset(SCSP,0,sizeof(*SCSP));
+
+	SCSPDSP_Init(&SCSP->DSP);
 
 	SCSP->device = device;
 	SCSP->IrqTimA = SCSP->IrqTimBC = SCSP->IrqMidi = 0;
@@ -549,14 +553,6 @@ static void SCSP_Init(running_device *device, struct _SCSP *SCSP, const scsp_int
 	SCSP->timerA = timer_alloc(device->machine, timerA_cb, SCSP);
 	SCSP->timerB = timer_alloc(device->machine, timerB_cb, SCSP);
 	SCSP->timerC = timer_alloc(device->machine, timerC_cb, SCSP);
-
-	for(i=0;i<0x400;++i)
-	{
-		//float fcent=(double) 1200.0*log_base_2((1024.0+(double)i)/1024.0);
-		//fcent=(double) 44100.0*pow(2.0,fcent/1200.0);
-		float fcent=44100.0f*(1024.0f+(float)i)/1024.0f;
-		FNS_Table[i]=(float) (1<<SHIFT) *fcent;
-	}
 
 	for(i=0;i<0x400;++i)
 	{
@@ -643,6 +639,7 @@ static void SCSP_Init(running_device *device, struct _SCSP *SCSP, const scsp_int
 		SCSP->Slots[i].slot=i;
 		SCSP->Slots[i].active=0;
 		SCSP->Slots[i].base=NULL;
+		SCSP->Slots[i].EG.state=RELEASE;
 	}
 
 	LFO_Init(device->machine);
@@ -856,10 +853,14 @@ static void SCSP_UpdateRegR(struct _SCSP *SCSP, int reg)
 		case 8:
 		case 9:
 			{
-				unsigned char slot=SCSP->udata.data[0x8/2]>>11;
-				unsigned int CA=SCSP->Slots[slot&0x1f].cur_addr>>(SHIFT+12);
-				SCSP->udata.data[0x8/2]&=~(0x780);
-				SCSP->udata.data[0x8/2]|=CA<<7;
+				// MSLC     |  CA   |SGC|EG
+				// f e d c b a 9 8 7 6 5 4 3 2 1 0
+				unsigned char MSLC=(SCSP->udata.data[0x8/2]>>11)&0x1f;
+				struct _SLOT *slot=SCSP->Slots + MSLC;
+				unsigned int SGC = (slot->EG.state) & 3;
+				unsigned int CA = (slot->cur_addr>>(SHIFT+12)) & 0xf;
+				unsigned int EG = (0x1f - (slot->EG.volume>>(EG_SHIFT+5))) & 0x1f;
+				SCSP->udata.data[0x8/2] =  (MSLC << 11) | (CA << 7) | (SGC << 5) | EG;
 			}
 			break;
 
@@ -905,11 +906,13 @@ static void SCSP_w16(struct _SCSP *SCSP,unsigned int addr,unsigned short val)
 		else if(addr<0x800)
 			*((unsigned short *) (SCSP->DSP.MADRS+(addr-0x780)/2))=val;
 		else if(addr<0xC00)
+		{
 			*((unsigned short *) (SCSP->DSP.MPRO+(addr-0x800)/2))=val;
 
-		if(addr==0xBF0)
-		{
-			SCSPDSP_Start(&SCSP->DSP);
+			if(addr==0xBF0)
+			{
+				SCSPDSP_Start(&SCSP->DSP);
+	    		}
 		}
 	}
 }
@@ -1069,21 +1072,32 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		}
 	}
 
-	if(ALFOS(slot)!=0)
+	if(!SDIR(slot))
 	{
-		sample=sample*ALFO_Step(&(slot->ALFO));
-		sample>>=SHIFT;
-	}
+		if(ALFOS(slot)!=0)
+		{
+			sample=sample*ALFO_Step(&(slot->ALFO));
+			sample>>=SHIFT;
+		}
 
-	if(slot->EG.state==ATTACK)
-		sample=(sample*EG_Update(slot))>>SHIFT;
-	else
-		sample=(sample*EG_TABLE[EG_Update(slot)>>(SHIFT-10)])>>SHIFT;
+		if(slot->EG.state==ATTACK)
+			sample=(sample*EG_Update(slot))>>SHIFT;
+		else
+			sample=(sample*EG_TABLE[EG_Update(slot)>>(SHIFT-10)])>>SHIFT;
+	}
 
 	if(!STWINH(slot))
 	{
-		unsigned short Enc=((TL(slot))<<0x0)|(0x7<<0xd);
-		*RBUFDST=(sample*SCSP->LPANTABLE[Enc])>>(SHIFT+1);
+		if(!SDIR(slot))
+		{
+			unsigned short Enc=((TL(slot))<<0x0)|(0x7<<0xd);
+			*RBUFDST=(sample*SCSP->LPANTABLE[Enc])>>(SHIFT+1);
+		}
+		else
+		{
+			unsigned short Enc=(0<<0x0)|(0x7<<0xd);
+			*RBUFDST=(sample*SCSP->LPANTABLE[Enc])>>(SHIFT+1);
+		}
 	}
 
 	return sample;
@@ -1118,10 +1132,8 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 
 				sample=SCSP_UpdateSlot(SCSP, slot);
 
-#ifdef USEDSP
 				Enc=((TL(slot))<<0x0)|((IMXL(slot))<<0xd);
 				SCSPDSP_SetSample(&SCSP->DSP,(sample*SCSP->LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
-#endif
 				Enc=((TL(slot))<<0x0)|((DIPAN(slot))<<0x8)|((DISDL(slot))<<0xd);
 				{
 					smpl+=(sample*SCSP->LPANTABLE[Enc])>>SHIFT;
