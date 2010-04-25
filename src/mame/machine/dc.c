@@ -24,6 +24,8 @@
 
 #define ENABLE_MAPLE_IRQ (0)
 
+static UINT8 mp_mux_data;
+
 #if DEBUG_SYSCTRL
 static const char *const sysctrl_names[] =
 {
@@ -415,8 +417,6 @@ The function packets goes like this:
 [2] Parameter of the device
 [3] End flag (always zero)
 ******************************************************/
-static int jvs_mux_data;
-
 static int jvsboard_init(int pos)
 {
 	// four bytes for every available function
@@ -426,7 +426,6 @@ static int jvsboard_init(int pos)
 	{
 		maple0x86data2[pos+11]=1; // number of players
 		maple0x86data2[pos+12]=22; // switches per player (27 = mahjong)
-		jvs_mux_data = 1;
 	}
 	else //if JVSBD_DEFAULT
 	{
@@ -470,19 +469,19 @@ static int jvsboard_indirect_read(running_machine *machine, int pos)
 	if(jvsboard_type == JVSBD_MAHJONG)
 	{
 		maple0x86data2[pos+11]=0;
-		switch(jvs_mux_data)
+		switch(mp_mux_data)
 		{
-			case 0x01: maple0x86data2[pos+12]=input_port_read(machine, "IN1"); break;
-			case 0x02: maple0x86data2[pos+12]=input_port_read(machine, "IN2"); break;
-			case 0x04: maple0x86data2[pos+12]=input_port_read(machine, "IN3"); break;
-			case 0x08: maple0x86data2[pos+12]=input_port_read(machine, "IN4"); break;
-			case 0x10: maple0x86data2[pos+12]=0; break;
+			case 0x01: maple0x86data2[pos+12]=input_port_read(machine, "KEY1"); break;
+			case 0x02: maple0x86data2[pos+12]=input_port_read(machine, "KEY2"); break;
+			case 0x04: maple0x86data2[pos+12]=input_port_read(machine, "KEY3"); break;
+			case 0x08: maple0x86data2[pos+12]=input_port_read(machine, "KEY4"); break;
+			case 0x10: maple0x86data2[pos+12]=input_port_read(machine, "KEY5"); break;
 		}
 		maple0x86data2[pos+13]=0;
 		maple0x86data2[pos+14]=0;
 
-		jvs_mux_data<<=1;
-		if(jvs_mux_data >= 0x20) { jvs_mux_data = 1; }
+		mp_mux_data<<=1;
+		if(mp_mux_data >= 0x20) { mp_mux_data = 1; }
 	}
 	else
 	{
@@ -539,10 +538,20 @@ static int jvsboard_direct_read(running_machine *machine)
 		maple0x86data2[0x1b]=2; //number of players
 	if(jvsboard_type == JVSBD_MAHJONG)
 	{
-		maple0x86data2[0x1c]=input_port_read(machine, "IN1");
-		maple0x86data2[0x1d]=input_port_read(machine, "IN2");
-		maple0x86data2[0x1e]=input_port_read(machine, "IN3");
-		maple0x86data2[0x1f]=input_port_read(machine, "IN4");
+		maple0x86data2[0x1c]=0;
+		switch(mp_mux_data)
+		{
+			case 0x01: maple0x86data2[0x1d]=input_port_read(machine, "KEY1"); break;
+			case 0x02: maple0x86data2[0x1d]=input_port_read(machine, "KEY2"); break;
+			case 0x04: maple0x86data2[0x1d]=input_port_read(machine, "KEY3"); break;
+			case 0x08: maple0x86data2[0x1d]=input_port_read(machine, "KEY4"); break;
+			case 0x10: maple0x86data2[0x1d]=input_port_read(machine, "KEY5"); break;
+		}
+		maple0x86data2[0x1e]=0;
+		maple0x86data2[0x1f]=0;
+
+		mp_mux_data<<=1;
+		if(mp_mux_data >= 0x20) { mp_mux_data = 1; }
 	}
 	else
 	{
@@ -778,6 +787,7 @@ WRITE64_HANDLER( naomi_maple_w )
 							case 3:
 								ddtdata.length=1;
 								#if DEBUG_MAPLE
+								if(port == 0)
 								printf("MAPLE: transfer command %x port %x length %x\n", command, port, length);
 								#endif
 								break;
@@ -910,6 +920,10 @@ WRITE64_HANDLER( naomi_maple_w )
 											case 0x14:
 												{
 													tocopy += jvsboard_init(pos);
+
+													//TODO: something sets 0 in the mux data, dunno what yet
+													if(jvsboard_type == JVSBD_MAHJONG)
+														mp_mux_data = 1;
 												}
 												break;
 											case 0x21:
@@ -1542,6 +1556,8 @@ MACHINE_RESET( dc )
 	timer_adjust_periodic(dc_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
+
+	mp_mux_data = 0;
 }
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )
