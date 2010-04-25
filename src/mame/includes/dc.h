@@ -36,6 +36,7 @@ MACHINE_RESET( dc );
 
 int dc_compute_interrupt_level(running_machine *machine);
 void dc_update_interrupt_status(running_machine *machine);
+
 INPUT_CHANGED( dc_coin_slots_callback );
 
 extern UINT32 dc_sysctrl_regs[0x200/4];

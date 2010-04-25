@@ -20,6 +20,7 @@
 #define DEBUG_MAPLE	(0)
 #define DEBUG_MAPLE_REGS	(0)
 #define DEBUG_AICA_DMA (0)
+#define DEBUG_PVRCTRL	(0)
 
 #define ENABLE_MAPLE_IRQ (0)
 
@@ -176,10 +177,25 @@ static struct {
 	UINT8 sel;
 }wave_dma;
 
+static struct {
+	UINT32 pvr_addr;
+	UINT32 sys_addr;
+	UINT32 size;
+	UINT8 sel;
+	UINT8 dir;
+	UINT8 flag;
+	UINT8 start;
+}pvr_dma;
 
 static TIMER_CALLBACK( aica_dma_irq )
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
+	dc_update_interrupt_status(machine);
+}
+
+static TIMER_CALLBACK( pvr_dma_irq )
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
 	dc_update_interrupt_status(machine);
 }
 
@@ -221,6 +237,44 @@ static void wave_dma_execute(const address_space *space)
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
 	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, aica_dma_irq);
+}
+
+static void pvr_dma_execute(const address_space *space)
+{
+	UINT32 src,dst,size;
+	dst = pvr_dma.pvr_addr;
+	src = pvr_dma.sys_addr;
+	size = 0;
+
+	/* used so far by usagui and sprtjam*/
+	//printf("PVR-DMA start\n");
+	//printf("%08x %08x %08x\n",pvr_dma.pvr_addr,pvr_dma.sys_addr,pvr_dma.size);
+	//printf("src %s dst %08x\n",pvr_dma.dir ? "->" : "<-",pvr_dma.sel);
+
+	/* 0 rounding size = 16 Mbytes */
+	if(pvr_dma.size == 0) { pvr_dma.size = 0x100000; }
+
+	if(pvr_dma.dir == 0)
+	{
+		for(;size<pvr_dma.size;size+=4)
+		{
+			memory_write_dword_64le(space,dst,memory_read_dword(space,src));
+			src+=4;
+			dst+=4;
+		}
+	}
+	else
+	{
+		for(;size<pvr_dma.size;size+=4)
+		{
+			memory_write_dword_64le(space,src,memory_read_dword(space,dst));
+			src+=4;
+			dst+=4;
+		}
+	}
+	/* Note: do not update the params, since this DMA type doesn't support it. */
+	/* TODO: timing of this */
+	timer_set(space->machine, ATTOTIME_IN_USEC(250), NULL, 0, pvr_dma_irq);
 }
 
 // register decode helpers
@@ -337,6 +391,18 @@ void dc_update_interrupt_status(running_machine *machine)
 
 			printf("Wave DMA HW trigger\n");
 			wave_dma_execute(space);
+		}
+	}
+
+	/* PVR-DMA HW trigger */
+	if(pvr_dma.flag && ((pvr_dma.sel & 1) == 1))
+	{
+		if((dc_sysctrl_regs[SB_PDTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_PDTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
+		{
+			const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+			printf("PVR-DMA HW trigger\n");
+			pvr_dma_execute(space);
 		}
 	}
 }
@@ -1305,6 +1371,80 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 			//printf("Unhandled G2 register [%08x] -> %08x\n",reg,dat);
 			break;
 	}
+}
+
+INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+{
+	int reg = offset * 2;
+
+	*shift = 0;
+
+	// non 32-bit accesses have not yet been seen here, we need to know when they are
+	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
+	{
+		/*assume to return the lower 32-bits ONLY*/
+		return reg & 0xffffffff;
+	}
+
+	if (mem_mask == U64(0xffffffff00000000))
+	{
+		reg++;
+		*shift = 32;
+	}
+
+	return reg;
+}
+
+READ64_HANDLER( pvr_ctrl_r )
+{
+	int reg;
+	UINT64 shift;
+
+	reg = decode_reg_64(offset, mem_mask, &shift);
+
+	#if DEBUG_PVRCTRL
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(space->cpu));
+	#endif
+
+	return (UINT64)pvrctrl_regs[reg] << shift;
+}
+
+WRITE64_HANDLER( pvr_ctrl_w )
+{
+	int reg;
+	UINT64 shift;
+	UINT32 dat;
+
+	reg = decode_reg_64(offset, mem_mask, &shift);
+	dat = (UINT32)(data >> shift);
+
+	switch (reg)
+	{
+		case SB_PDSTAP: pvr_dma.pvr_addr = dat; break;
+		case SB_PDSTAR: pvr_dma.sys_addr = dat; break;
+		case SB_PDLEN: pvr_dma.size = dat; break;
+		case SB_PDDIR: pvr_dma.dir = dat & 1; break;
+		case SB_PDTSEL:
+			pvr_dma.sel = dat & 1;
+			//if(pvr_dma.sel & 1)
+			//	printf("Warning: Unsupported irq mode trigger PVR-DMA\n");
+			break;
+		case SB_PDEN: pvr_dma.flag = dat & 1; break;
+		case SB_PDST:
+			pvr_dma.start = dat & 1;
+
+			if(pvr_dma.flag && pvr_dma.start && ((pvr_dma.sel & 1) == 0))
+				pvr_dma_execute(space);
+			break;
+	}
+
+	#if DEBUG_PVRCTRL
+	mame_printf_verbose("PVRCTRL: [%08x=%x] write %" I64FMT "x to %x (reg %x), mask %" I64FMT "x\n", 0x5f7c00+reg*4, dat, data>>shift, offset, reg, mem_mask);
+	#endif
+
+//  pvrctrl_regs[reg] |= dat;
+	pvrctrl_regs[reg] = dat;
+
 }
 
 READ64_HANDLER( dc_modem_r )
