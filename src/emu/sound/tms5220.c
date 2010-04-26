@@ -1231,7 +1231,6 @@ static void parse_frame(tms5220_state *tms)
 	/* if the pitch index was zero, we need 4 k's */
 	if (indx == 0)
 	{
-	tms->new_frame_energy *= 2; // HACK
 		/* attempt to extract 4 K's */
 		bits -= 18;
 		if (bits < 0) goto ranout;
