@@ -365,6 +365,7 @@ void tms5220_set_variant(tms5220_state *tms, int variant)
 			break;
 		case TMS5220_IS_5200:
 			tms->coeff = &tms5200_coeff;
+			//tms->coeff = &pat4335277_coeff;
 			break;
 		case TMS5220_IS_5220:
 			tms->coeff = &tms5220_coeff;
@@ -893,7 +894,12 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
           else /*tms->pitch_count <= 50*/
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]<<CHIRPROM_LEFTSHIFT;
 #else
-			 tms->excitation_data = tms->pitch_count - 64;
+          if (tms->pitch_count > 40)
+              tms->excitation_data = -128; // tms->coeff->chirptable[51];
+          else /*tms->pitch_count <= 40*/
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
+			 //tms->excitation_data = tms->pitch_count - 64;
+			 
 #endif
         }
 
@@ -917,14 +923,10 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
         size--;
         tms->sample_count = (tms->sample_count + 1) % 200;
-#ifdef NORMALMODE
         if (tms->current_pitch != 0)
             tms->pitch_count = (tms->pitch_count + 1) % tms->current_pitch;
         else
-            tms->pitch_count = 51; // blank spot in the chirp rom
-#else
-		    tms->pitch_count = (tms->pitch_count + 1) % 128;
-#endif
+            tms->pitch_count = 51; // forced to blank spot in the chirp rom
 
         tms->interp_count = (tms->interp_count + 1) % 25;
         buf_count++;
