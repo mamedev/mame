@@ -190,10 +190,8 @@ device), PES Speech adapter (serial port connection)
 // above is general, somewhat obsolete
 #undef DEBUG_FIFO
 // above debugs fifo stuff: writes, reads and flag updates
-#undef DEBUG_FRAME_DUMP
-// above dumps the contents of each decoded speech frame as hex
-#undef DEBUG_FRAME_INFO
-// above dumps information about each decoded speech frame
+#undef DEBUG_PARSE_FRAME_DUMP
+// above dumps each speech frame as a binary index listing
 #undef DEBUG_FRAME_ERRORS
 // above dumps info if a frame ran out of data
 #undef DEBUG_COMMAND_DUMP
@@ -431,6 +429,19 @@ static void register_for_save_states(tms5220_state *tms)
 }
 
 
+/**********************************************************************************************
+
+      printbits helper function: takes a long int input and prints the resulting bits to stderr
+
+ **********************************************************************************************/
+
+static void printbits(long data, int num)
+{
+	int i;
+	for (i=(num-1); i>=0; i--)
+		fprintf(stderr,"%0d", (int)(data>>i)&1);
+}
+ 
 /**********************************************************************************************
 
      tms5220_data_write -- handle a write to the TMS5220
@@ -734,7 +745,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame(tms);
-
+#ifdef DEBUG_PARSE_FRAME_DUMP
+			fprintf(stderr,"\n");
+#endif
 
 			/* Set old frame targets as starting point of new frame */
 			tms->current_energy = tms->old_frame_energy;
@@ -1148,9 +1161,6 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 static void parse_frame(tms5220_state *tms)
 {
 	int bits, indx, i, rep_flag;
-#ifdef DEBUG_FRAME_DUMP
-	int ene;
-#endif
 
 	// todo: we actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
 	if (tms->speak_external)
@@ -1170,6 +1180,10 @@ static void parse_frame(tms5220_state *tms)
 		bits -= 2;
 		if (bits < 0) goto ranout;
 		indx = extract_bits(tms, 2);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(indx,2);
+		fprintf(stderr," ");
+#endif
 		tms->sample_count = reload_table[indx];
 	}
 	else // non-5220C and 5220C in fixed rate mode
@@ -1180,84 +1194,74 @@ static void parse_frame(tms5220_state *tms)
 	if (bits < 0) goto ranout;
 	indx = extract_bits(tms,tms->coeff->energy_bits);
 	tms->new_frame_energy = tms->coeff->energytable[indx];
-#ifdef DEBUG_FRAME_DUMP
-	ene = indx;
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(indx,tms->coeff->energy_bits);
+	fprintf(stderr," ");
 #endif
 
 	/* if the energy index is 0 or 15, we're done */
-
 	if ((indx == 0) || (indx == 15))
-	{
-#ifdef DEBUG_FRAME_INFO
-		logerror("  (4-bit energy=%d frame)\n",tms->new_frame_energy);
-#endif
 		return;
-	}
 
 	/* attempt to extract the repeat flag */
 	bits -= 1;
 	if (bits < 0) goto ranout;
 	rep_flag = extract_bits(tms,1);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(rep_flag, 1);
+	fprintf(stderr," ");
+#endif
 
 	/* attempt to extract the pitch */
 	bits -= tms->coeff->pitch_bits;
 	if (bits < 0) goto ranout;
 	indx = extract_bits(tms,tms->coeff->pitch_bits);
 	tms->new_frame_pitch = tms->coeff->pitchtable[indx];
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(indx,tms->coeff->pitch_bits);
+	fprintf(stderr," ");
+#endif
 
 	/* if this is a repeat frame, just copy the k's */
 	if (rep_flag)
-	{
-	//actually, we do nothing because the k's were already loaded (on parsing the previous frame)
-
-#ifdef DEBUG_FRAME_INFO
-		logerror("  (10-bit energy=%d pitch=%d rep=%d frame)\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
-#endif
 		return;
-	}
-
 
 	/* if the pitch index was zero, we need 4 k's */
 	if (indx == 0)
 	{
+	tms->new_frame_energy *= 2; // HACK
 		/* attempt to extract 4 K's */
 		bits -= 18;
 		if (bits < 0) goto ranout;
 		for (i = 0; i < 4; i++)
-			tms->new_frame_k[i] = tms->coeff->ktable[i][extract_bits(tms,tms->coeff->kbits[i])];
-
+		{
+			indx = extract_bits(tms,tms->coeff->kbits[i]);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+			printbits(indx,tms->coeff->kbits[i]);
+			fprintf(stderr," ");
+#endif
+			tms->new_frame_k[i] = tms->coeff->ktable[i][indx];
+		}
 	/* and clear the rest of the new_frame_k[] */
 		for (i = 4; i < tms->coeff->num_k; i++)
 			tms->new_frame_k[i] = 0;
-#ifdef DEBUG_FRAME_INFO
-		logerror("  (29-bit energy=%d pitch=%d rep=%d 4K frame)\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
-#endif
 		return;
 	}
 
 	/* else we need 10 K's */
 	bits -= 39;
 	if (bits < 0) goto ranout;
-#ifdef DEBUG_FRAME_DUMP
-	logerror("FrameDump %02d ", ene);
 	for (i = 0; i < tms->coeff->num_k; i++)
 	{
 		int x;
 		x = extract_bits(tms, tms->coeff->kbits[i]);
-		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
-		logerror("%02d ", x);
-	}
-	logerror("\n");
-#else
-	for (i = 0; i < tms->coeff->num_k; i++)
-	{
-		int x;
-		x = extract_bits(tms, tms->coeff->kbits[i]);
-		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
-	}
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(indx,tms->coeff->kbits[i]);
+		fprintf(stderr," ");
 #endif
+		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
+	}
 #ifdef DEBUG_FRAME_INFO
-	logerror("  (50-bit energy=%d pitch=%d rep=%d 10K frame))\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
 	if (tms->speak_external)
 		logerror("Parsed a frame successfully in FIFO - %d bits remaining\n", bits);
 	else
