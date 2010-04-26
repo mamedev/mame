@@ -1258,7 +1258,7 @@ static void parse_frame(tms5220_state *tms)
 		int x;
 		x = extract_bits(tms, tms->coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
-		printbits(indx,tms->coeff->kbits[i]);
+		printbits(x,tms->coeff->kbits[i]);
 		fprintf(stderr," ");
 #endif
 		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
