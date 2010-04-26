@@ -435,13 +435,15 @@ static void register_for_save_states(tms5220_state *tms)
 
  **********************************************************************************************/
 
+#ifdef DEBUG_PARSE_FRAME_DUMP
 static void printbits(long data, int num)
 {
 	int i;
 	for (i=(num-1); i>=0; i--)
 		fprintf(stderr,"%0d", (int)(data>>i)&1);
 }
- 
+#endif
+
 /**********************************************************************************************
 
      tms5220_data_write -- handle a write to the TMS5220
