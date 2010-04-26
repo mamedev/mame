@@ -738,11 +738,15 @@ WRITE64_HANDLER( naomi_maple_w )
 	maple_regs[reg] = dat; // 5f6c00+reg*4=dat
 	switch (reg)
 	{
+	case SB_MDTSEL:
+		if((dat & 1) == 1)
+			printf("MAPLE: hardware trigger not supported yet\n");
+		break;
 	case SB_MDST:
 		maple_regs[reg] = old;
 		if (!(old & 1) && (dat & 1) && maple_regs[SB_MDEN] & 1) // 0 -> 1
 		{
-			if (!(maple_regs[SB_MDTSEL] & 1))
+			if (!(maple_regs[SB_MDTSEL] & 1)) // SW trigger
 			{
 				maple_regs[reg] = 1;
 				dat=maple_regs[SB_MDSTAR];
@@ -1045,12 +1049,7 @@ WRITE64_HANDLER( naomi_maple_w )
 				} // do transfers
 				maple_regs[reg] = 0;
 			}
-			else
-			{
-				//#if DEBUG_MAPLE
-				printf("MAPLE: hardware trigger not supported yet\n");
-				//#endif
-			}
+
 		}
 		break;
 	}
