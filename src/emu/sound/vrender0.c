@@ -108,12 +108,14 @@ static DEVICE_START( vrender0 )
 	const vr0_interface *intf;
 	vr0_state *VR0 = get_safe_token(device);
 
-	intf=(const vr0_interface *)device->baseconfig().static_config;
+	intf = (const vr0_interface *)device->baseconfig().static_config;
 
 	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));
 
 	VR0->stream = stream_create(device, 0, 2, 44100, VR0, VR0_Update);
+
+	state_save_register_device_item_array(device, 0, VR0->SOUNDREGS);	
 }
 
 WRITE32_DEVICE_HANDLER(vr0_snd_write)
