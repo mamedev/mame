@@ -3741,6 +3741,7 @@ src/mame/video/sbasketb.c svneol=native#text/plain
 src/mame/video/sbugger.c svneol=native#text/plain
 src/mame/video/scotrsht.c svneol=native#text/plain
 src/mame/video/sderby.c svneol=native#text/plain
+src/mame/video/sega16sp.c svneol=native#text/plain
 src/mame/video/segag80r.c svneol=native#text/plain
 src/mame/video/segag80v.c svneol=native#text/plain
 src/mame/video/segahang.c svneol=native#text/plain

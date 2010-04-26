@@ -1058,6 +1058,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hangon )
 	MDRV_IMPORT_FROM(hangon_base)
 	MDRV_IMPORT_FROM(sound_board_2203)
+
+	MDRV_SEGA16SP_ADD_HANGON("segaspr1")
 MACHINE_DRIVER_END
 
 
@@ -1068,6 +1070,8 @@ static MACHINE_DRIVER_START( shangupb )
 	/* not sure about these speeds, but at 6MHz, the road is not updated fast enough */
 	MDRV_CPU_REPLACE("maincpu", M68000, 10000000)
 	MDRV_CPU_REPLACE("sub", M68000, 10000000)
+
+	MDRV_SEGA16SP_ADD_HANGON("segaspr1")
 MACHINE_DRIVER_END
 
 
@@ -1078,24 +1082,32 @@ static MACHINE_DRIVER_START( sharrier )
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
 	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
+
+	MDRV_SEGA16SP_ADD_SHARRIER("segaspr1")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( enduror )
 	MDRV_IMPORT_FROM(sharrier_base)
 	MDRV_IMPORT_FROM(sound_board_2151)
+
+	MDRV_SEGA16SP_ADD_SHARRIER("segaspr1")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( enduror1 )
 	MDRV_IMPORT_FROM(sharrier_base)
 	MDRV_IMPORT_FROM(sound_board_2203)
+
+	MDRV_SEGA16SP_ADD_SHARRIER("segaspr1")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( endurob2 )
 	MDRV_IMPORT_FROM(sharrier_base)
 	MDRV_IMPORT_FROM(sound_board_2203x2)
+
+	MDRV_SEGA16SP_ADD_SHARRIER("segaspr1")
 MACHINE_DRIVER_END
 
 

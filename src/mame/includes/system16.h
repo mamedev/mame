@@ -41,7 +41,6 @@ public:
 	int back_yscroll;
 	int fore_yscroll;
 	int text_yscroll;
-	int sprite_xoffs;
 
 	int bg1_trans; // alien syn + sys18
 

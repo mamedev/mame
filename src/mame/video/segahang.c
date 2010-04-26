@@ -24,9 +24,6 @@ VIDEO_START( hangon )
 	/* initialize the tile/text layers */
 	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2);
 
-	/* initialize the sprites */
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_HANGON, 0x400, 0);
-
 	/* initialize the road */
 	segaic16_road_init(machine, 0, SEGAIC16_ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0);
 }
@@ -39,9 +36,6 @@ VIDEO_START( sharrier )
 
 	/* initialize the tile/text layers */
 	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2);
-
-	/* initialize the sprites */
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_SHARRIER, 0x400, 0);
 
 	/* initialize the road */
 	segaic16_road_init(machine, 0, SEGAIC16_ROAD_SHARRIER, 0x038, 0x7c0, 0x7c0, 0);

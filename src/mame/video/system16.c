@@ -435,7 +435,6 @@ VIDEO_START( system16 )
 	}
 
 	segaic16_palette_init(0x800);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16B, 0x400, state->sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 
 
@@ -613,28 +612,19 @@ VIDEO_START( s16a_bootleg )
 
 VIDEO_START( s16a_bootleg_wb3bl )
 {
-	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-
 	VIDEO_START_CALL(s16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_WB3BL, 0x400, state->sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 
 VIDEO_START( s16a_bootleg_shinobi )
 {
-	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-
 	VIDEO_START_CALL(s16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD, 0x400, state->sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 
 VIDEO_START( s16a_bootleg_passsht )
 {
-	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-
 	VIDEO_START_CALL(s16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_PASSHTBL, 0x400, state->sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 

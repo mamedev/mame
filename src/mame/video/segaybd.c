@@ -25,10 +25,6 @@ VIDEO_START( yboard )
 	/* allocate a bitmap for the yboard layer */
 	state->tmp_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 
-	/* initialize the sprites */
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_YBOARD_16B, 0x800, 0);
-	segaic16_sprites_init(machine, 1, SEGAIC16_SPRITES_YBOARD, 0x1000, 0);
-
 	/* initialize the rotation layer */
 	segaic16_rotate_init(machine, 0, SEGAIC16_ROTATE_YBOARD, 0x000);
 

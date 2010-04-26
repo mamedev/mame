@@ -1113,7 +1113,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( outrundx )
+static MACHINE_DRIVER_START( outrun_base )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(segas1x_state)
@@ -1145,6 +1145,7 @@ static MACHINE_DRIVER_START( outrundx )
 	MDRV_VIDEO_START(outrun)
 	MDRV_VIDEO_UPDATE(outrun)
 
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1158,21 +1159,30 @@ static MACHINE_DRIVER_START( outrundx )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( outrundx )
+	MDRV_IMPORT_FROM(outrun_base)
+	MDRV_SEGA16SP_ADD_OUTRUN("segaspr1")
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( outrun )
-	MDRV_IMPORT_FROM(outrundx)
+	MDRV_IMPORT_FROM(outrun_base)
 	MDRV_NVRAM_HANDLER(outrun)
+
+	MDRV_SEGA16SP_ADD_OUTRUN("segaspr1")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( shangon )
-	MDRV_IMPORT_FROM(outrun)
+	MDRV_IMPORT_FROM(outrun_base)
+	MDRV_NVRAM_HANDLER(outrun)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 321, 262, 0, 224)
 
 	MDRV_VIDEO_START(shangon)
 	MDRV_VIDEO_UPDATE(shangon)
+
+	MDRV_SEGA16SP_ADD_16B("segaspr1")
 MACHINE_DRIVER_END
 
 

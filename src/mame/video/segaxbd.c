@@ -23,9 +23,6 @@ VIDEO_START( xboard )
 	/* initialize the tile/text layers */
 	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2);
 
-	/* initialize the sprites */
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_XBOARD, 0x000, 0);
-
 	/* initialize the road */
 	segaic16_road_init(machine, 0, SEGAIC16_ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
 }

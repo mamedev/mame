@@ -50,8 +50,11 @@ Known games currently not dumped:
 
 static UINT16 *backupram;
 
-static UINT16 output_type;
+/* callbacks to handle output */
+typedef void (*yboard_output_callback)(UINT16 data);
+static yboard_output_callback ybd_output_cb1, ybd_output_cb2;
 static UINT16 pdrift_bank;
+
 
 /*************************************
  *
@@ -67,6 +70,8 @@ static void yboard_generic_init( running_machine *machine )
 	state->vblank_irq_state = 0;
 	state->timer_irq_state = 0;
 	
+	ybd_output_cb1 = NULL;
+	ybd_output_cb2 = NULL;
 }
 
 
@@ -323,214 +328,18 @@ static WRITE16_HANDLER( io_chip_w )
 	{
 		/* I/O ports */
 		case 0x00/2:
-		break;
+			break;
 		case 0x02/2:
-		break;
+			break;
 		case 0x04/2:
-		break;
+			break;
 		case 0x06/2:
-		switch (output_type)
-		{
-		case 2:
-		/* pdrift */
-		
-			/* Note:  this is an approximation to get a relatively accurate bank value.  It is obviously not 100% */
-					
-			/* for some stupid reason the data is set to all on in the debug menu so we need to check for that */
-			if (data != 255)
-			{
-				/* this is a cheap hack to get some usable positional data in the service menu */
-				/* these values probably manually turn the motor left and right */
-				if (((data == 162) or (data == 161) or (data == 160)))
-				{
-					if ((data == 162))
-					/* moving left */
-					{
-						/* in this rare instance, the bottom bits are used for positional data */
-						output_set_value("bank_data_raw",data);
-						output_set_value("vibration_motor",0);
-						switch (pdrift_bank)
-						/* we want to go left one step at a time */
-						{
-						case 1:
-							/* all left */
-							output_set_value("bank_motor_position",1);
-							pdrift_bank=1;
-							break;
-						case 2:
-							output_set_value("bank_motor_position",1);
-							pdrift_bank=1;
-							break;
-						case 3:
-							output_set_value("bank_motor_position",2);
-							pdrift_bank=2;
-							break;
-						case 4:
-							/* centered */
-							output_set_value("bank_motor_position",3);
-							pdrift_bank=3;
-							break;
-						case 5:
-							output_set_value("bank_motor_position",4);
-							pdrift_bank=4;
-							break;
-						case 6:
-							output_set_value("bank_motor_position",5);
-							pdrift_bank=5;
-							break;
-						case 7:
-							/* all right */
-							output_set_value("bank_motor_position",6);
-							pdrift_bank=6;
-							break;
-						default:
-							output_set_value("bank_motor_position",4);
-							pdrift_bank=4;
-							break;
-							
-						}
-					}
-
-					if ((data == 161))
-					/* moving right */
-					{
-						/* in this rare instance, the bottom bits are used for positional data */
-						output_set_value("bank_data_raw",data);
-						output_set_value("vibration_motor",0);
-						switch (pdrift_bank)
-						/* we want to go right one step at a time */
-						{
-						case 1:
-							/* all left */
-							output_set_value("bank_motor_position",2);
-							pdrift_bank=2;
-							break;
-						case 2:
-							output_set_value("bank_motor_position",3);
-							pdrift_bank=3;
-							break;
-						case 3:
-							output_set_value("bank_motor_position",4);
-							pdrift_bank=4;
-							break;
-						case 4:
-							/* centered */
-							output_set_value("bank_motor_position",5);
-							pdrift_bank=5;
-							break;
-						case 5:
-							output_set_value("bank_motor_position",6);
-							pdrift_bank=6;
-							break;
-						case 6:
-							output_set_value("bank_motor_position",7);
-							pdrift_bank=7;
-							break;
-						case 7:
-							/* all right */
-							output_set_value("bank_motor_position",7);
-							pdrift_bank=7;
-							break;
-						default:
-							output_set_value("bank_motor_position",4);
-							pdrift_bank=4;
-							break;
-							
-						}
-				
-					}
-				}
-				else
-				{
-					/* the vibration value uses the first few bits to give a number between 0 and 7 */
-					output_set_value("vibration_motor",data & 7);
-					/* normalize the data and subtract the vibration value from it*/
-				
-					pdrift_bank = (data - (data & 7));
-					output_set_value("bank_data_raw",pdrift_bank);
-				
-					/* position values from left to right */
-					/* 56 48 40 120 72 80 88 */
-
-					/* the normalized values we'll use */
-					/*   1  2  3   4  5  6  7 */
-				
-					switch (pdrift_bank)
-					{
-					case 56:
-						/* all left */
-						output_set_value("bank_motor_position",1);
-						break;
-					case 48:
-						output_set_value("bank_motor_position",2);
-						break;
-					case 40:
-						output_set_value("bank_motor_position",3);
-						break;
-					case 120:
-						/* centered */
-						output_set_value("bank_motor_position",4);
-						break;
-					case 72:
-						output_set_value("bank_motor_position",5);
-						break;
-					case 80:
-						output_set_value("bank_motor_position",6);
-						break;
-					case 88:
-						/* all right */
-						output_set_value("bank_motor_position",7);
-						break;
-						/* these are the only valid values but 24 pops up sometimes when we crash */
-								
-					}
-				}
-				
-
-				
-			
-			}
+			if (ybd_output_cb1)
+				ybd_output_cb1(data);
 			break;
-		case 3:
-		/* gloc and strkfgtr */
-			if ((data < 32) )
-			{
-				output_set_value("right_motor_position",data);
-				
-				/* normalization here prevents strange data from being transferred */	
-				/* we do this because for some odd reason */ 
-                                /* gloc starts with one piston all up and one all down.... at least data-wise it does */
-				if ((data >1) and (data <29))
-				output_set_value("right_motor_position_nor",data);
-							
-			}
-
-			if((data < 40) and (data > 31))
-			{
-				output_set_value("right_motor_speed",data-32);
-			}
-
-			if ((data < 96) and (data > 63 ))
-			{
-				output_set_value("left_motor_position",data);
-				/* normalized version... you know... for the kids */
-				if (((data-64)>1) and ((data-64)<29))
-				output_set_value("left_motor_position_nor",data-64);
-				
-								
-			}
-		
-			if ((data < 104) and (data  > 95))
-			{
-				output_set_value("left_motor_speed",data-96);
-			}
-			break;
-
-		}
-		break;
 		case 0x0a/2:
 		case 0x0c/2:
-		break;
+			break;
 
 		/* miscellaneous output */
 		case 0x08/2:
@@ -546,7 +355,8 @@ static WRITE16_HANDLER( io_chip_w )
                 D1-D0 = ADC0-1
 		*/
 			segaic16_set_display_enable(space->machine, data & 0x80);
-			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(space, 0, 0);
+			if (((old ^ data) & 0x20) && !(data & 0x20)) 
+				watchdog_reset_w(space, 0, 0);
 			cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			cpu_set_input_line(state->subx, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 			cpu_set_input_line(state->suby, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
@@ -555,43 +365,8 @@ static WRITE16_HANDLER( io_chip_w )
 		/* mute */
 		
 		case 0x0e/2:
-			
-			switch (output_type)
-			{
-			case 1:
-				/* gforce2 */
-				output_set_value("start_lamp",(data & 0x04)>>2);
-				break;
-
-			case 2:
-				/* pdrift */
-				output_set_value("start_lamp",(data & 0x04)>>2);
-					output_set_value("upright_wheel_motor",(data & 0x02)>>1);
-			break;
-	
-			case 3:
-				/* gloc & strkfgtr */
-				output_set_value("start_lamp",(data & 0x04)>>2);
-				output_set_value("danger_lamp",(data & 0x20)>>5);
-				output_set_value("crash_lamp",(data & 0x40)>>6);
-				break;
-	
-			case 4:
-				/* r360 cabinet */
-				output_set_value("start_lamp",(data & 0x04)>>2);
-				/* even though the same ouput is used, I've split them to avoid confusion. */
-				output_set_value("emergency_stop_lamp",(data & 0x04)>>2);
-				break;
-
-			case 5:
-				/* rchase */
-				output_set_value("left_start_lamp",(data & 0x04)>>2);
-				output_set_value("right_start_lamp",(data & 0x02)>>1);
-
-				output_set_value("P1_Gun_Recoil",(data & 0x40)>>6);
-				output_set_value("P2_Gun_Recoil",(data & 0x20)>>5);
-				break;
-			}
+			if (ybd_output_cb2)
+				ybd_output_cb2(data);
 
 			/* D7 = /MUTE */
 			/* D6-D0 = FLT31-25 */
@@ -603,7 +378,6 @@ static WRITE16_HANDLER( io_chip_w )
 			break;
 	}
 }
-
 
 
 /*************************************
@@ -1269,6 +1043,9 @@ static MACHINE_DRIVER_START( yboard )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+
+	MDRV_SEGA16SP_ADD_YBOARD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD_YBOARD("segaspr2")
 
 	MDRV_PALETTE_LENGTH(8192*3)
 
@@ -2146,64 +1923,281 @@ ROM_END
 
 /*************************************
  *
- *  Generic driver initialization
+ *  Output callbacks
  *
- *************************************
-
- I had to split these out to set the output varible... sorry.  :-(
-
-static DRIVER_INIT( generic_yboard )
+ *  TODO: kokoroj2 and jpark (SW2)
+ *
+ *  Additional notes:
+ *    - about jpark: the compression switch is broken/inoperative 
+ *      and because of that all piston data, which is in this 
+ *      section is frozen. bits x01, x04 and x10 when which == 0
+ *      (IO chip 0), seem to have something to do with the sensor 
+ *      switches we need to fix
+ *************************************/
+																  
+static void pdrift_output_cb1( UINT16 data )
 {
-	output_type=0;	
-	yboard_generic_init(machine);
+	/* Note:  this is an approximation to get a relatively accurate bank value.  It is obviously not 100% */
+	
+	/* for some stupid reason the data is set to all on in the debug menu so we need to check for that */
+	if (data != 255)
+	{
+		/* this is a cheap hack to get some usable positional data in the service menu */
+		/* these values probably manually turn the motor left and right */
+		if (((data == 162) || (data == 161) || (data == 160)))
+		{
+			if ((data == 162))
+			/* moving left */
+			{
+				/* in this rare instance, the bottom bits are used for positional data */
+				output_set_value("bank_data_raw", data);
+				output_set_value("vibration_motor", 0);
+				switch (pdrift_bank)
+				/* we want to go left one step at a time */
+				{
+					case 1:
+						/* all left */
+						output_set_value("bank_motor_position", 1);
+						pdrift_bank = 1;
+						break;
+					case 2:
+						output_set_value("bank_motor_position", 1);
+						pdrift_bank = 1;
+						break;
+					case 3:
+						output_set_value("bank_motor_position", 2);
+						pdrift_bank = 2;
+						break;
+					case 4:
+						/* centered */
+						output_set_value("bank_motor_position", 3);
+						pdrift_bank = 3;
+						break;
+					case 5:
+						output_set_value("bank_motor_position", 4);
+						pdrift_bank = 4;
+						break;
+					case 6:
+						output_set_value("bank_motor_position", 5);
+						pdrift_bank = 5;
+						break;
+					case 7:
+						/* all right */
+						output_set_value("bank_motor_position", 6);
+						pdrift_bank = 6;
+						break;
+					default:
+						output_set_value("bank_motor_position", 4);
+						pdrift_bank = 4;
+						break;
+						
+				}
+			}
+		
+			if ((data == 161))
+			/* moving right */
+			{
+				/* in this rare instance, the bottom bits are used for positional data */
+				output_set_value("bank_data_raw", data);
+				output_set_value("vibration_motor", 0);
+				switch (pdrift_bank)
+				/* we want to go right one step at a time */
+				{
+					case 1:
+						/* all left */
+						output_set_value("bank_motor_position", 2);
+						pdrift_bank = 2;
+						break;
+					case 2:
+						output_set_value("bank_motor_position", 3);
+						pdrift_bank = 3;
+						break;
+					case 3:
+						output_set_value("bank_motor_position", 4);
+						pdrift_bank = 4;
+						break;
+					case 4:
+						/* centered */
+						output_set_value("bank_motor_position", 5);
+						pdrift_bank = 5;
+						break;
+					case 5:
+						output_set_value("bank_motor_position", 6);
+						pdrift_bank = 6;
+						break;
+					case 6:
+						output_set_value("bank_motor_position", 7);
+						pdrift_bank = 7;
+						break;
+					case 7:
+						/* all right */
+						output_set_value("bank_motor_position", 7);
+						pdrift_bank = 7;
+						break;
+					default:
+						output_set_value("bank_motor_position", 4);
+						pdrift_bank = 4;
+						break;
+						
+				}
+				
+			}
+		}
+		else
+		{
+			/* the vibration value uses the first few bits to give a number between 0 and 7 */
+			output_set_value("vibration_motor", data & 7);
+			/* normalize the data and subtract the vibration value from it*/
+			
+			pdrift_bank = (data - (data & 7));
+			output_set_value("bank_data_raw", pdrift_bank);
+			
+			/* position values from left to right */
+			/* 56 48 40 120 72 80 88 */
+			
+			/* the normalized values we'll use */
+			/*   1  2  3   4  5  6  7 */
+			
+			switch (pdrift_bank)
+			{
+				case 56:
+					/* all left */
+					output_set_value("bank_motor_position", 1);
+					break;
+				case 48:
+					output_set_value("bank_motor_position", 2);
+					break;
+				case 40:
+					output_set_value("bank_motor_position", 3);
+					break;
+				case 120:
+					/* centered */
+					output_set_value("bank_motor_position", 4);
+					break;
+				case 72:
+					output_set_value("bank_motor_position", 5);
+					break;
+				case 80:
+					output_set_value("bank_motor_position", 6);
+					break;
+				case 88:
+					/* all right */
+					output_set_value("bank_motor_position", 7);
+					break;
+					/* these are the only valid values but 24 pops up sometimes when we crash */
+					
+			}
+		}
+	}
+}
+																  															  
+static void gloc_output_cb1( UINT16 data )
+{
+	if ((data < 32))
+	{
+		output_set_value("right_motor_position", data);
+		
+		/* normalization here prevents strange data from being transferred */	
+		/* we do this because for some odd reason */ 
+		/* gloc starts with one piston all up and one all down.... at least data-wise it does */
+		if ((data > 1) && (data < 29))
+			output_set_value("right_motor_position_nor", data);
+	}
+
+	if ((data < 40) && (data > 31))
+		output_set_value("right_motor_speed", data - 32);
+	
+	if ((data < 96) && (data > 63))
+	{
+		output_set_value("left_motor_position", data);
+		/* normalized version... you know... for the kids */
+		if (((data - 64) > 1) && ((data - 64) < 29))
+			output_set_value("left_motor_position_nor", data - 64);
+	}
+	
+	if ((data < 104) && (data > 95))
+		output_set_value("left_motor_speed", data - 96);
+}
+																  
+static void pdrift_output_cb2( UINT16 data )
+{
+	output_set_value("start_lamp", BIT(data, 2));
+	output_set_value("upright_wheel_motor", BIT(data, 1));
+}
+									  
+static void gforce2_output_cb2( UINT16 data )
+{
+	output_set_value("start_lamp", BIT(data, 2));
 }
 
+static void gloc_output_cb2( UINT16 data )
+{
+	output_set_value("start_lamp", BIT(data, 2));
+	output_set_value("danger_lamp", BIT(data, 5));
+	output_set_value("crash_lamp", BIT(data, 6));
+}
+	
+static void r360_output_cb2( UINT16 data )
+{
+	/* r360 cabinet */
+	output_set_value("start_lamp", BIT(data, 2));
+	/* even though the same ouput is used, I've split them to avoid confusion. */
+	output_set_value("emergency_stop_lamp", BIT(data, 2));
+}
+												  
+static void rchase_output_cb2( UINT16 data )
+{
+	output_set_value("left_start_lamp", BIT(data, 2));
+	output_set_value("right_start_lamp", BIT(data, 1));
 
- *************************************
+	output_set_value("P1_Gun_Recoil", BIT(data, 6));
+	output_set_value("P2_Gun_Recoil", BIT(data, 5));
+}
+
+/*************************************
  *
  *  Game-Specific driver initialization
  *
  *************************************/
+
 static DRIVER_INIT( gforce2 )
 {
-	output_type=1;	
 	yboard_generic_init(machine);
+	ybd_output_cb2 = gforce2_output_cb2;
 }
 
 static DRIVER_INIT( pdrift )
 {
-	output_type=2;
 	/* because some of the output data isn't fully understood we need to "center" the motor */	
-	pdrift_bank=4;
 	yboard_generic_init(machine);
 			
+	ybd_output_cb1 = pdrift_output_cb1;
+	ybd_output_cb2 = pdrift_output_cb2;
 }
 
 static DRIVER_INIT( gloc )
 {
-	output_type=3;
 	/* because some of the output data isn't fully understood we need to "center" the rams */
-	output_set_value("left_motor_position_nor",16);
-	output_set_value("right_motor_position_nor",16);	
+	output_set_value("left_motor_position_nor", 16);
+	output_set_value("right_motor_position_nor", 16);	
 	yboard_generic_init(machine);
+
+	ybd_output_cb1 = gloc_output_cb1;
+	ybd_output_cb2 = gloc_output_cb2;
 }
 
 static DRIVER_INIT( r360 )
 {
-	output_type=4;	
 	yboard_generic_init(machine);
+	ybd_output_cb2 = r360_output_cb2;
 }
 
 static DRIVER_INIT( rchase )
 {
-	output_type=5;	
 	yboard_generic_init(machine);
+	ybd_output_cb2 = rchase_output_cb2;
 }
-
-
-
-
-
+					 
 /*************************************
  *
  *  Game driver(s)

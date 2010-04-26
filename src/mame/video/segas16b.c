@@ -23,9 +23,6 @@ static void video_start_common(running_machine *machine, int type)
 
 	/* initialize the tile/text layers */
 	segaic16_tilemap_init(machine, 0, type, 0x000, 0, 2);
-
-	/* initialize the sprites */
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16B, 0x400, 0);
 }
 
 

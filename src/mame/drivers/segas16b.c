@@ -3312,6 +3312,8 @@ static MACHINE_DRIVER_START( system16b )
 	MDRV_VIDEO_START(system16b)
 	MDRV_VIDEO_UPDATE(system16b)
 
+	MDRV_SEGA16SP_ADD_16B("segaspr1")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 

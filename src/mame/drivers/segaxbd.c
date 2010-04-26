@@ -1401,6 +1401,8 @@ static MACHINE_DRIVER_START( xboard )
 	MDRV_VIDEO_START(xboard)
 	MDRV_VIDEO_UPDATE(xboard)
 
+	MDRV_SEGA16SP_ADD_XBOARD("segaspr1")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

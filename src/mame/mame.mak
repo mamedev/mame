@@ -1163,6 +1163,7 @@ $(MAMEOBJ)/sega.a: \
 	$(AUDIO)/pulsar.o \
 	$(AUDIO)/segasnd.o \
 	$(VIDEO)/segaic16.o \
+	$(VIDEO)/sega16sp.o \
 	$(VIDEO)/segaic24.o \
 	$(VIDEO)/stvvdp1.o $(VIDEO)/stvvdp2.o \
 
