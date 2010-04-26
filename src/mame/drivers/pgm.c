@@ -4121,7 +4121,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 		state->kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X", cpu_get_pc(space->cpu), state->kb_cmd, data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", cpu_get_pc(space->cpu), state->kb_cmd, data);
 		if (state->kb_cmd == 0)
 			state->kb_reg = data;
 		else if (state->kb_cmd == 2)
@@ -4192,8 +4192,42 @@ static WRITE16_HANDLER( killbld_prot_w )
 					param = mode >> 8;
 					mode &=0xf;  // what are the other bits?
 
-					if (mode == 1 || mode == 2)
+					if (mode == 0)
 					{
+						mame_printf_debug("unhandled copy mode %04x!\n", mode);
+						// not used by killing blade
+						/* plain byteswapped copy */
+					}
+					if (mode == 1)
+					{
+						/* mode1 seems a lot like mode2, but with an additional 0xffff xor applied
+						   mode2 isn't understood yet, see below */
+
+						/* for now, cheat -- the scramble isn't understood, it might
+                           be state based */
+						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+						for (x = 0; x < size; x++)
+						{
+							UINT16 dat;
+
+							dat = RAMDUMP[dst + x];
+							state->sharedprotram[dst + x] = dat;
+						}
+					}
+					else if (mode == 2)
+					{
+						/* mode2 acts a lot like mode3, but there is some kinda of additional
+						   xor on the data, and the conditions under which it gets applied are
+						   not clear, tests of 0x0001, 0x0002, 0x0004 etc. filled data have been
+						   passed through the device, and exhibit the same looping on blocks of
+						   0x100 as the main encryptin of mode3, and the same shifting of the
+						   additional data table when the extra parameter is used.
+
+						   However, the extra xor for 0x0003 isn't the same as 0x0001 and 0x0002
+						   combined.  This needs further study.
+					   */
+
 						/* for now, cheat -- the scramble isn't understood, it might
                            be state based */
 						int x;
@@ -4208,10 +4242,21 @@ static WRITE16_HANDLER( killbld_prot_w )
 					}
 					else if (mode == 3)
 					{
+						/* mode3 applies a xor from a 0x100 byte table to the data being
+						   transferred
+
+						   the table is stored at the start of the protection rom.
+
+						   the param used with the mode gives a start offset into the table
+
+						   odd offsets seem to change the table slightly (see rawDataOdd)
+
+					   */
+						  
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
 						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
 						
+						/*
 						unsigned char rawDataEven[256] = {
 							0xA8, 0x6A, 0x5D, 0xB6, 0x5D, 0xB1, 0xC1, 0x2C,
 							0x39, 0x4F, 0xB7, 0xCF, 0x85, 0x3A, 0xEE, 0x65,
@@ -4246,6 +4291,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 							0xDE, 0x31, 0x01, 0x4A, 0x85, 0x0C, 0xE5, 0x2B,
 							0x22, 0x2D, 0xB6, 0x13, 0x2D, 0x48, 0x9A, 0xF3
 						};
+						*/
 
 						/*
 						unsigned char rawDataOdd[256] = {
@@ -4286,74 +4332,27 @@ static WRITE16_HANDLER( killbld_prot_w )
 						
 						for (x = 0; x < size; x++)
 						{
-							UINT16 dat;
 							UINT16 dat2 = PROTROM[src + x];
 							UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
-							
-							UINT16 extraxor = ((rawDataEven[((x*2)+0+extraoffset)&0xff]) << 8) | (rawDataEven[((x*2)+1+extraoffset)&0xff] << 0);
-							
+							UINT8* dectable = (UINT8*)memory_region(space->machine, "user1");//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
+							UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
 							
 							dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
-							
-							dat2 ^= extraxor;
-							
-							dat = RAMDUMP[dst + x];
-							
-							
-							
-							if (dat2 != dat)
-							{
-								
-								printf("Mode 3 Param %04x | %04x %04x %04x Mismatch! %04x %04x %04x\n", param, src*2+x*2, dst*2+x*2, x*2, dat2, dat, extraxor);
-								/*  is this stuff wrong in the ram dump due to it being overwritten, or is there some other behavior of this mode, that's incorrect
-								
-									Mode 3 Param 0054 | 2120 2600 0000 Mismatch! 48e7 b461 72b3
-									Mode 3 Param 0054 | 2122 2602 0002 Mismatch! 3000 ba77 1cd4
-									Mode 3 Param 0054 | 2124 2604 0004 Mismatch! 4eb9 6cd6 97a0
-									Mode 3 Param 0054 | 2126 2606 0006 Mismatch! 0015 c691 b60b
-									Mode 3 Param 0054 | 2128 2608 0008 Mismatch! 92e0 4338 1f02
-									Mode 3 Param 0054 | 212a 260a 000a Mismatch! 23f9 4095 94c5
-									Mode 3 Param 0054 | 212c 260c 000c Mismatch! 0081 aae9 831b
-									Mode 3 Param 0054 | 212e 260e 000e Mismatch! 3664 6adc acc3
-									Mode 3 Param 0054 | 2130 2610 0010 Mismatch! 0080 1079 44aa
-									Mode 3 Param 0054 | 2132 2612 0012 Mismatch! cbb0 c59c d7d9
-									Mode 3 Param 0054 | 2134 2614 0014 Mismatch! 23f9 b8be db09
-									Mode 3 Param 0054 | 2136 2616 0016 Mismatch! 0081 e1ba a96c
-									Mode 3 Param 0054 | 2138 2618 0018 Mismatch! 3654 9fdf 6407
-									Mode 3 Param 0054 | 213a 261a 001a Mismatch! 0081 28ea f1ad
-									Mode 3 Param 0054 | 213c 261c 001c Mismatch! 2294 330a 0983
-									Mode 3 Param 0054 | 213e 261e 001e Mismatch! 23f9 f506 0e92
-									Mode 3 Param 0054 | 2140 2620 0020 Mismatch! 0080 9ffd 2fcd
-									Mode 3 Param 0054 | 2142 2622 0022 Mismatch! cbb0 ac6b f899
-									Mode 3 Param 0054 | 2144 2624 0024 Mismatch! 0080 02bd 63bc
-									Mode 3 Param 0054 | 2146 2626 0026 Mismatch! cbc4 e6b9 0a3c
-									Mode 3 Param 0054 | 2148 2628 0028 Mismatch! 23f9 1873 038f
-									Mode 3 Param 0054 | 214a 262a 002a Mismatch! 0081 1b6a 9133
-									Mode 3 Param 0054 | 214c 262c 002c Mismatch! 2294 89c2 ac84
-									Mode 3 Param 0054 | 214e 262e 002e Mismatch! 0081 6643 156c
-									Mode 3 Param 0054 | 2150 2630 0030 Mismatch! 3890 f4bb 673a
-									Mode 3 Param 0054 | 2152 2632 0032 Mismatch! 4eb9 b49a 69cb
-									Mode 3 Param 0054 | 2154 2634 0034 Mismatch! 0015 db70 92c7
-									Mode 3 Param 0054 | 2156 2636 0036 Mismatch! 92d6 a655 74a1
-									Mode 3 Param 0054 | 2158 2638 0038 Mismatch! 4eb9 262f 9099
-									Mode 3 Param 0054 | 215a 263a 003a Mismatch! 0010 3704 beee
-									Mode 3 Param 0054 | 215c 263c 003c Mismatch! ad5c 6002 300d
-									Mode 3 Param 0054 | 215e 263e 003e Mismatch! 2079 6d8e ba57
-								*/
-
-							}
-							else
-							{
-							
-							//	printf("Mode 3 Param %04x | %04x %04x %04x Good! %04x %04x %04x\n", param, src*2+x*2, dst*2+x*2, x*2, dat2, dat, extraxor);
-		
-							}
-							
+							dat2 ^= extraxor;						
+										
 							//state->sharedprotram[dst + x] = dat;
 							state->sharedprotram[dst + x] = dat2;
 						}
-					
-					
+	
+						/* hack, patches out some additional security checks... we need to emulate them instead!*/
+						if ((param==0x54) && (src*2==0x2120) && (dst*2==0x2600)) state->sharedprotram[0x2600 / 2] = 0x4e75;
+						
+					}
+					if (mode == 4)
+					{
+						mame_printf_debug("unhandled copy mode %04x!\n", mode);
+						// not used by killing blade
+						/* looks almost like a fixed value xor, but isn't */
 					}
 					else if (mode == 5)
 					{
@@ -4392,21 +4391,19 @@ static WRITE16_HANDLER( killbld_prot_w )
 							state->sharedprotram[dst + x] = dat;
 						}
 					}
+					else if (mode == 7)
+					{
+						mame_printf_debug("unhandled copy mode %04x!\n", mode);
+						// not used by killing blade
+						/* weird mode, the params get left in memory? */
+					}
 					else
 					{
-						mame_printf_debug("unknown copy mode!\n");
+						mame_printf_debug("unhandled copy mode %04x!\n", mode);
+						// not used by killing blade
+						/* invalid? */
+
 					}
-					/* hack.. it jumps here but there isn't valid code even when we do
-                       use what was in ram.. probably some more protection as the game
-                       still doesn't behave 100% correctly :-/
-
-                       the code is copied in 'mode 3' but even the code put here on
-                       the real ram dump is corrupt??? something _very_ strange is
-                       going on.. maybe more rom overlays, or ram overlays too??
-
-                    */
-					state->sharedprotram[0x2600 / 2] = 0x4e75;
-
 
 				}
 				state->kb_reg++;
@@ -4440,7 +4437,7 @@ static READ16_HANDLER( killbld_prot_r )
 			res = (protvalue >> (8 * (state->kb_ptr - 1))) & 0xff;
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X", cpu_get_pc(space->cpu), state->kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(space->cpu), state->kb_cmd, res);
 	return res;
 }
 
