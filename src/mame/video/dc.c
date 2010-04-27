@@ -111,6 +111,15 @@ VO_STARTY
 #define vo_vert_start_pos_f2 ((pvrta_regs[VO_STARTY] & 0x03ff0000) >> 16)
 #define vo_vert_start_pos_f1 ((pvrta_regs[VO_STARTY] & 0x000003ff) >> 0)
 
+/*
+SPG_STATUS
+---- ---- ---- ---- --x- ---- ---- ---- vsync
+---- ---- ---- ---- ---x ---- ---- ---- hsync
+---- ---- ---- ---- ---- x--- ---- ---- blank
+---- ---- ---- ---- ---- -x-- ---- ---- field number
+---- ---- ---- ---- ---- --xx xxxx xxxx scanline
+*/
+
 UINT32 pvrctrl_regs[0x100/4];
 static UINT32 pvrta_regs[0x2000/4];
 static const int pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
@@ -997,7 +1006,7 @@ READ64_HANDLER( pvr_ta_r )
 			blank = (video_screen_get_vblank(space->machine->primary_screen) | video_screen_get_hblank(space->machine->primary_screen)) ? 0 : 1;
 			if(spg_blank_pol) { blank^=1; }
 
-			pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (video_screen_get_vpos(space->machine->primary_screen) & 0x1ff);
+			pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (video_screen_get_vpos(space->machine->primary_screen) & 0x3ff);
 			break;
 		}
 	case SPG_TRIGGER_POS:
