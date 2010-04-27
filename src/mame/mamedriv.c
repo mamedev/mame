@@ -4520,8 +4520,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jambo )		/* 1999.09 Jambo! Safari */
 						/* 1999.09 Super Major League 99 */
 	DRIVER( sgtetris )	/* 1999.10 Sega Tetris */
-	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club (Ver. C) */
-	DRIVER( derbyocb )	/* 1999.10 Derby Owners Club (Ver. B) */
+	DRIVER( derbyocwe )	/* 1999.10 Derby Owners Club World Edition (Rev. C) */
+	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club */
 	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( otrigger )	/* 1999.11 Out Trigger */
 	DRIVER( dybb99 )	/* 1999.11 Dynamite Baseball '99 */
