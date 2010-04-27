@@ -191,13 +191,22 @@ static struct {
 
 static TIMER_CALLBACK( aica_dma_irq )
 {
+	wave_dma.start = g2bus_regs[SB_ADST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( pvr_dma_irq )
 {
+	pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+	dc_update_interrupt_status(machine);
+}
+
+static TIMER_CALLBACK( gdrom_dma_irq )
+{
+	g1bus_regs[SB_GDST]=0;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 	dc_update_interrupt_status(machine);
 }
 
@@ -235,7 +244,6 @@ static void wave_dma_execute(const address_space *space)
 	wave_dma.root_addr = g2bus_regs[SB_ADSTAR] = src;
 	wave_dma.size = g2bus_regs[SB_ADLEN] = 0;
 	wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
-	wave_dma.start = g2bus_regs[SB_ADST] = 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
 	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, aica_dma_irq);
@@ -1289,7 +1297,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 		{
 			if (g1bus_regs[SB_GDDIR] == 0)
 			{
-				mame_printf_verbose("G1CTRL: unsupported transfer\n");
+				printf("G1CTRL: unsupported transfer\n");
 				return;
 			}
 //          printf("ROM board DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(space->cpu));
@@ -1308,9 +1316,9 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			ddtdata.mode= -1;		// copy from/to buffer
 			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
 			sh4_dma_ddt(devtag_get_device(space->machine, "maincpu"), &ddtdata);
-			g1bus_regs[SB_GDST]=0;
-			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
-			dc_update_interrupt_status(space->machine);
+			/* Note: KOF Neowave definitely wants this to be delayed (!) */
+			/* FIXME: timing of this */
+			timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL, 0, gdrom_dma_irq);
 		}
 		break;
 	}
