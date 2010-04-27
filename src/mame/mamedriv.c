@@ -4520,7 +4520,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jambo )		/* 1999.09 Jambo! Safari */
 						/* 1999.09 Super Major League 99 */
 	DRIVER( sgtetris )	/* 1999.10 Sega Tetris */
-	DRIVER( derbyocwe )	/* 1999.10 Derby Owners Club World Edition (Rev. C) */
 	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club */
 	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( otrigger )	/* 1999.11 Out Trigger */
@@ -4566,6 +4565,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
 						/* 2000.?? World Kicks New ver. */
+	DRIVER( derbyocw )	/* 2001.?? Derby Owners Club World Edition (Rev. C) */
 	DRIVER( f355twn2 )	/* 2001.01 F355 Challenge 2 */
 	DRIVER( gwing2 )	/* 2001.01 Giga Wing 2 */
 	DRIVER( csmash )	/* 2001.01 Cosmic Smash */
@@ -8377,8 +8377,7 @@ Other Sun games
 	DRIVER( drgw2c )		/* (c) 1997 */
 	DRIVER( drgw2j )		/* (c) 1997 */
 	DRIVER( drgw3 )			/* (c) 1998 */
-	DRIVER( drgw3105 )		/* (c) 1998 */
-	DRIVER( drgw3100 )		/* (c) 1998 */
+	DRIVER( drgw3k )		/* (c) 1998 */
 	DRIVER( kov )			/* (c) 1999 */
 	DRIVER( kovplus )		/* (c) 1999 */
 	DRIVER( kovplusa )		/* (c) 1999 */
