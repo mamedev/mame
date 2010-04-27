@@ -157,7 +157,6 @@ public:
 	running_device *vr0video;
 };
 
-
 static void IntReq( running_machine *machine, int num )
 {
 	crystal_state *state = (crystal_state *)machine->driver_data;
@@ -442,24 +441,24 @@ INLINE void DMA_w( const address_space *space, int which, UINT32 data, UINT32 me
 	COMBINE_DATA(&state->DMActrl[which]);
 }
 
-static READ32_HANDLER(DMA0_r)
+static READ32_HANDLER( DMA0_r )
 {
 	crystal_state *state = (crystal_state *)space->machine->driver_data;
 	return state->DMActrl[0];
 }
 
-static WRITE32_HANDLER(DMA0_w)
+static WRITE32_HANDLER( DMA0_w )
 {
 	DMA_w(space, 0, data, mem_mask);
 }
 
-static READ32_HANDLER(DMA1_r)
+static READ32_HANDLER( DMA1_r )
 {
 	crystal_state *state = (crystal_state *)space->machine->driver_data;
 	return state->DMActrl[1];
 }
 
-static WRITE32_HANDLER(DMA1_w)
+static WRITE32_HANDLER( DMA1_w )
 {
 	DMA_w(space, 1, data, mem_mask);
 }
@@ -549,6 +548,16 @@ loop:
 #endif
 }
 
+static STATE_POSTLOAD( crystal_banksw_postload )
+{
+	crystal_state *state = (crystal_state *)machine->driver_data;
+
+	if (state->Bank <= 2)
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + state->Bank * 0x1000000);
+	else
+		memory_set_bankptr(machine, "bank1", memory_region(machine, "user2"));
+}
+
 static MACHINE_START( crystal )
 {
 	crystal_state *state = (crystal_state *)machine->driver_data;
@@ -564,7 +573,6 @@ static MACHINE_START( crystal )
 
 	PatchReset(machine);
 	
-	// save states
 #ifdef IDLE_LOOP_SPEEDUP
 	state_save_register_global(machine, state->FlipCntRead);
 #endif
@@ -573,11 +581,11 @@ static MACHINE_START( crystal )
 	state_save_register_global(machine, state->FlipCount);
 	state_save_register_global(machine, state->IntHigh);
 	state_save_register_global_array(machine, state->Timerctrl);
-	state_save_register_global(machine, state->OldPort4);
 	state_save_register_global(machine, state->FlashCmd);
 	state_save_register_global(machine, state->PIO);
 	state_save_register_global_array(machine, state->DMActrl);
 	state_save_register_global(machine, state->OldPort4);
+	state_save_register_postload(machine, crystal_banksw_postload, NULL);
 }
 
 static MACHINE_RESET( crystal )
