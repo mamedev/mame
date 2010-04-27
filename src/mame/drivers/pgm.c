@@ -105,7 +105,7 @@ Fix IRQs, maybe the protection device generates one of them on DW2 as I believe
 it's the only game that needs IRQ4 and Puzzli2 explicitly doesn't want IRQ4 to be
 active.
 
-Some dumps are suspicious (orlegend super clones are missing roms, drgw3k sets
+Some dumps are suspicious (orlegend super clones are missing roms, drgw3 sets
 might not have the right protection rom)  In many cases the external protection
 data roms change with each revision of the game.
 
@@ -147,21 +147,23 @@ ASIC 3:
     Oriental Legend
     function:
 
-ASIC 12 + ASIC 25
+ASIC 25 + ASIC 12 
     these seem to be used together
     ASIC 25 appears to perform some kind of bitswap operations
     used by:
     Dragon World 2
 
-ASIC 22 + ASIC 25
-    these seem to be used together, ASIC25 has an external software decrypted? data rom
-    ASIC 22 might be an updated version of ASIC12 ?
+ASIC 25 + ASIC 22 
+    ASIC25 provides some bitswap / maths etc. features
+	ASIC22 acts as an encrypted DMA device (ASIC22 can be swapped between games with no side-effects, ASIC25 can't)
     used by:
     Dragon World 3
     The Killing Blade
 
 ASIC 25 + ASIC 28
-    Oriental Legend Super
+    ASIC25 provides some bitswap / maths etc. features
+	ASIC28 acts as an encrypted DMA device (updated version of ASIC22 with different encryption etc.)
+	Oriental Legend Super
 
 ASIC 27 (55857E):
     performs a variety of calculations, quite complex, different per region, supplies region code
@@ -1098,6 +1100,23 @@ static INPUT_PORTS_START( sango )
 	PORT_DIPSETTING(      0x0005, DEF_STR( World ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dw3 )
+	PORT_INCLUDE ( pgm )
+
+	PORT_MODIFY("Region")	/* Region - supplied by protection device */
+	PORT_DIPNAME( 0x000f, 0x0006, DEF_STR( Region ) )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0001, "1" )
+	PORT_DIPSETTING(      0x0002, "2" )
+	PORT_DIPSETTING(      0x0003, "3" )
+	PORT_DIPSETTING(      0x0004, "4" )
+	PORT_DIPSETTING(      0x0005, "5" )
+	PORT_DIPSETTING(      0x0006, DEF_STR( World ) )
+	PORT_DIPSETTING(      0x0007, "7" )
+
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( olds )
 	PORT_INCLUDE ( pgm )
 
@@ -1394,6 +1413,19 @@ static MACHINE_DRIVER_START( killbld )
 	MDRV_CPU_PROGRAM_MAP(killbld_mem)
 
 	MDRV_MACHINE_RESET(killbld)
+
+MACHINE_DRIVER_END
+
+static MACHINE_RESET( dw3 );
+
+static MACHINE_DRIVER_START( dw3 )
+	MDRV_IMPORT_FROM(pgm)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(killbld_mem)
+	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+
+	MDRV_MACHINE_RESET(dw3)
 
 MACHINE_DRIVER_END
 
@@ -1884,6 +1916,91 @@ ROM_START( drgw2j )
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
 ROM_END
 
+
+
+/*
+
+Dragon World 3 (KOREA 106 Ver.)
+(c)1998 IGS
+
+PGM system
+IGS PCB NO-0189
+IGS PCB NO-0178
+
+
+DW3_V106.U12 [c3f6838b]
+DW3_V106.U13 [28284e22]
+
+
+*/
+
+ROM_START( drgw3 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
+	ROM_LOAD16_BYTE( "dw3_v106.u12",     0x100001, 0x080000,  CRC(c3f6838b) SHA1(c135b1d4dd62af308139d40d03c29be7508fb1e7) )
+	ROM_LOAD16_BYTE( "dw3_v106.u13",     0x100000, 0x080000,  CRC(28284e22) SHA1(4643a69881ddb7383ca10f3eb2aa2cf41be39e9f) )
+
+	/* CPU2 = Z80, romless, code uploaded by 68k */
+	
+	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
+	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
+
+	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data - is it correct for this set? */
+	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
+
+	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
+	ROM_LOAD( "dw3t0400.u18",   0x400000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
+
+	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
+	/* 32x32 Tile Data is put here for easier Decoding */
+
+	ROM_REGION( 0x1800000, "gfx3", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "dw3a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "dw3a0401.u10",    0x0400000, 0x400000, CRC(cab6557f) SHA1(1904dd86645eea27ac1ab8a2462b20f6531356f8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+
+	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "dw3b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
+	ROM_LOAD( "dw3m0400.u1",  0x400000, 0x400000, CRC(031eb9ce) SHA1(0673ec194732becc6648c2ae1396e894aa269f9a) )
+ROM_END
+
+
+ROM_START( drgw3105 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
+	ROM_LOAD16_BYTE( "dw3_v105.u12",     0x100001, 0x080000,  CRC(c5e24318) SHA1(c6954495bbc72c3985df75aecf6afd6826c8e30e) )
+	ROM_LOAD16_BYTE( "dw3_v105.u13",     0x100000, 0x080000,  CRC(8d6c9d39) SHA1(cb79303ab551e91f07e11414db4254d5b161d415) )
+	//ROM_LOAD( "dw3c_prg.rom", 0x100000, 0x100000, CRC(e274cf03) SHA1(2ba532446bd5b5dbccf43a6d1b1f6b36842b2c8d) )
+
+	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
+	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
+
+	/* CPU2 = Z80, romless, code uploaded by 68k */
+
+	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data - is it correct for this set? */
+	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
+
+	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
+	ROM_LOAD( "dw3t0400.u18",   0x400000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
+
+	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
+	/* 32x32 Tile Data is put here for easier Decoding */
+
+	ROM_REGION( 0x1800000, "gfx3", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "dw3a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "dw3a0401.u10",    0x0400000, 0x400000, CRC(cab6557f) SHA1(1904dd86645eea27ac1ab8a2462b20f6531356f8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+
+	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "dw3b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
+	ROM_LOAD( "dw3m0400.u1",  0x400000, 0x400000, CRC(031eb9ce) SHA1(0673ec194732becc6648c2ae1396e894aa269f9a) )
+ROM_END
 /*
 
 Dragon World 3
@@ -1908,61 +2025,18 @@ Bottom board contains.....
 
 */
 
-ROM_START( drgw3 )
+ROM_START( drgw3100 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
 	ROM_LOAD16_BYTE( "dw3_v100.u12",     0x100001, 0x080000,  CRC(47243906) SHA1(9cd46e3cba97f049bcb238ceb6edf27a760ef831) )
 	ROM_LOAD16_BYTE( "dw3_v100.u13",     0x100000, 0x080000,  CRC(b7cded21) SHA1(c1ae2af2e42227503c81bbcd2bd6862aa416bd78) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
+	
+	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
+	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
 
 	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data */
-	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
-
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
-	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
-	ROM_LOAD( "dw3t0400.u18",   0x400000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
-
-	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
-	/* 32x32 Tile Data is put here for easier Decoding */
-
-	ROM_REGION( 0x1800000, "gfx3", 0 ) /* Sprite Colour Data */
-	ROM_LOAD( "dw3a0400.u9",     0x0000000, 0x400000, CRC(dd7bfd40) SHA1(fb7ec5bf89a413c5208716083762a725ff63f5db) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
-	ROM_LOAD( "dw3a0401.u10",    0x0400000, 0x400000, CRC(cab6557f) SHA1(1904dd86645eea27ac1ab8a2462b20f6531356f8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
-
-	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "dw3b0400.u13",    0x0000000, 0x400000,  CRC(4bb87cc0) SHA1(71b2dc43fd11f7a6dffaba501e4e344b843583d8) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
-
-	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
-	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
-	ROM_LOAD( "dw3m0400.u1",  0x400000, 0x400000, CRC(031eb9ce) SHA1(0673ec194732becc6648c2ae1396e894aa269f9a) )
-ROM_END
-
-/*
-
-Dragon World 3 (KOREA 106 Ver.)
-(c)1998 IGS
-
-PGM system
-IGS PCB NO-0189
-IGS PCB NO-0178
-
-
-DW3_V106.U12 [c3f6838b]
-DW3_V106.U13 [28284e22]
-
-
-*/
-
-ROM_START( drgw3k )
-	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
-	ROM_LOAD16_BYTE( "dw3_v106.u12",     0x100001, 0x080000,  CRC(c3f6838b) SHA1(c135b1d4dd62af308139d40d03c29be7508fb1e7) )
-	ROM_LOAD16_BYTE( "dw3_v106.u13",     0x100000, 0x080000,  CRC(28284e22) SHA1(4643a69881ddb7383ca10f3eb2aa2cf41be39e9f) )
-
-	/* CPU2 = Z80, romless, code uploaded by 68k */
-
-	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data - is it correct for this set? */
 	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
 	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -2464,9 +2538,6 @@ ROM_START( killbld )
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
 	ROM_LOAD16_WORD_SWAP( "kb.u9", 0x100000, 0x200000, BAD_DUMP CRC(43da77d7) SHA1(f99e89da4587d6c9e3c2ae66fa139830d893fdda) ) // not verified to be correct
 
-	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* dump of RAM shared with protection device, todo, emulate protection device instead! */
-//	ROM_LOAD( "kb.ram", 0x000000, 0x04000,  CRC(6994c507) SHA1(8264c56709488b72282d6ddfce3a4b188c6cc109) )
-
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
 	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data */
@@ -2505,10 +2576,8 @@ ROM_START( killbld104 )
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
 	ROM_LOAD16_BYTE( "kb_u3_v104.u3",     0x100001, 0x080000, CRC(6db1d719) SHA1(804002f014d275aaf0368fb7f904938fe4ac07ee) )
 	ROM_LOAD16_BYTE( "kb_u6_v104.u6",     0x100000, 0x080000, CRC(31ecc978) SHA1(82666d534e4151775063af6d39f575faba0f1047) )
-	ROM_LOAD16_BYTE( "kb_u4_v104.u4",     0x200001, 0x080000, CRC(1ed8b2e7) SHA1(331c037640cfc1fe743cd0e65a1156c470b3303e) ) // order?
-	ROM_LOAD16_BYTE( "kb_u5_v104.u5",     0x200000, 0x080000, CRC(a0bafc29) SHA1(b20db7c16353c6f87ed3c08c9d037b07336711f1) ) // order?
-
-	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "kb_u4_v104.u4",     0x200001, 0x080000, CRC(1ed8b2e7) SHA1(331c037640cfc1fe743cd0e65a1156c470b3303e) )
+	ROM_LOAD16_BYTE( "kb_u5_v104.u5",     0x200000, 0x080000, CRC(a0bafc29) SHA1(b20db7c16353c6f87ed3c08c9d037b07336711f1) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
@@ -4092,21 +4161,13 @@ static DRIVER_INIT( dmnfrnt )
 	kov2_latch_init(machine);
 }
 
-static DRIVER_INIT( dw3 )
-{
-	pgm_basic_init(machine);
-
-//  memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xda0000, 0xdaffff, 0, 0, dw3_prot_r, dw3_prot_w);
-
-	pgm_dw3_decrypt(machine);
-}
 
 /* Killing Blade uses some kind of DMA protection device which can copy data from a data rom.  The
    MCU appears to have an internal ROM as if you remove the data ROM then the shared ram is filled
    with a constant value.
 
-   The device can perform various decryption operations on the data it copies.  for now we're just
-   using a dump of the shared RAM instead.  This will be improved later.
+   The device can perform various decryption operations on the data it copies.
+
 */
 
 
@@ -4182,7 +4243,7 @@ static WRITE16_HANDLER( killbld_prot_w )
                     Mode 5 direct
                     Mode 6 swap nibbles and bytes
 
-                    1,2,3 unk.
+                    1,2,3 table based ops
                     */
 
 					//mame_printf_debug("src %04x dst %04x size %04x mode %04x\n", src, dst, size, mode);
@@ -4211,43 +4272,6 @@ static WRITE16_HANDLER( killbld_prot_w )
 
 					   */
 						  					
-						/*
-						unsigned char rawDataEven[256] = {
-							0xA8, 0x6A, 0x5D, 0xB6, 0x5D, 0xB1, 0xC1, 0x2C,
-							0x39, 0x4F, 0xB7, 0xCF, 0x85, 0x3A, 0xEE, 0x65,
-							0x7B, 0xD9, 0x81, 0xDB, 0x6D, 0x5F, 0x07, 0x03,
-							0xB5, 0xEB, 0x59, 0x0F, 0x60, 0x61, 0x21, 0xCD,
-							0x99, 0x06, 0x27, 0xA0, 0xD7, 0xDD, 0x5B, 0x42,
-							0xC6, 0xC5, 0xA2, 0x3B, 0xF6, 0x4F, 0x61, 0x20,
-							0x46, 0x61, 0xCA, 0x8C, 0x0E, 0x8C, 0xE9, 0xE0,
-							0x0F, 0x2C, 0x6D, 0xBA, 0x1C, 0x45, 0x37, 0x36,
-							0x85, 0x18, 0xA4, 0xE7, 0x46, 0x89, 0x9B, 0x94,
-							0xF4, 0x30, 0x55, 0xB2, 0x63, 0x41, 0xEF, 0xA5,
-							0x18, 0x1C, 0xB1, 0xB7, 0x72, 0xB3, 0x1C, 0xD4,
-							0x97, 0xA0, 0xB6, 0x0B, 0x1F, 0x02, 0x94, 0xC5,
-							0x83, 0x1B, 0xAC, 0xC3, 0x44, 0xAA, 0xD7, 0xD9,
-							0xDB, 0x09, 0xA9, 0x6C, 0x64, 0x07, 0xF1, 0xAD,
-							0x09, 0x83, 0x0E, 0x92, 0x2F, 0xCD, 0xF8, 0x99,
-							0x63, 0xBC, 0x0A, 0x3C, 0x03, 0x8F, 0x91, 0x33,
-							0xAC, 0x84, 0x15, 0x6C, 0x67, 0x3A, 0x69, 0xCB,
-							0x92, 0xC7, 0x74, 0xA1, 0x90, 0x99, 0xBE, 0xEE, 
-							0x30, 0x0D, 0xBA, 0x57, 0xDE, 0xD1, 0xD6, 0xE5,
-							0x8C, 0xFA, 0x43, 0x83, 0x5E, 0xE4, 0x84, 0x36,
-							0x18, 0xCD, 0xB9, 0x1A, 0x48, 0x31, 0xA8, 0x20,
-							0x32, 0xE3, 0x90, 0x89, 0x80, 0xF0, 0xAE, 0x21,
-							0xA6, 0x33, 0x8C, 0x3C, 0x17, 0xB8, 0x0C, 0x72,
-							0x29, 0xD1, 0x38, 0x1A, 0xC9, 0xFA, 0xC7, 0x87,
-							0xDE, 0x6E, 0x6E, 0x05, 0x7E, 0x85, 0xED, 0x92,
-							0xD3, 0xD4, 0xD4, 0x5C, 0xCB, 0x03, 0x19, 0xFE,
-							0x83, 0x6C, 0x5B, 0x7A, 0x71, 0x79, 0xF4, 0xF6,
-							0x53, 0xBA, 0xC1, 0x37, 0xDB, 0xC9, 0xB1, 0xDE,
-							0x17, 0xDE, 0x0E, 0x64, 0xA2, 0x31, 0x8E, 0xD7,
-							0x8D, 0x13, 0x19, 0x52, 0x0B, 0xCB, 0x58, 0x3D,
-							0xDE, 0x31, 0x01, 0x4A, 0x85, 0x0C, 0xE5, 0x2B,
-							0x22, 0x2D, 0xB6, 0x13, 0x2D, 0x48, 0x9A, 0xF3
-						};
-						*/
-
 						/*
 						unsigned char rawDataOdd[256] = {
 							0xB6, 0xA8, 0xB1, 0x5D, 0x2C, 0x5D, 0x4F, 0xC1,
@@ -4326,14 +4350,11 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 5 seems to be a straight copy */
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
 						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
 						for (x = 0; x < size; x++)
 						{
 							UINT16 dat = PROTROM[src + x];
 
-							if (RAMDUMP[dst + x] != dat)
-								mame_printf_debug("Mismatch! %04x %04x\n", RAMDUMP[dst + x], dat);
 
 							state->sharedprotram[dst + x] = dat;
 						}
@@ -4342,7 +4363,6 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 6 seems to swap bytes and nibbles */
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
 						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
 						for (x = 0; x < size; x++)
 						{
@@ -4352,9 +4372,6 @@ static WRITE16_HANDLER( killbld_prot_w )
 								  ((dat & 0x0f00) >> 4)|
 								  ((dat & 0x00f0) << 4)|
 								  ((dat & 0x000f) << 12);
-
-							if (RAMDUMP[dst + x] != dat)
-								mame_printf_debug("Mismatch! Mode 6 %04x %04x\n", RAMDUMP[dst + x], dat);
 
 							state->sharedprotram[dst + x] = dat;
 						}
@@ -4420,6 +4437,7 @@ static MACHINE_RESET( killbld )
 	for (i = 0; i < 0x4000/2; i++)
 		state->sharedprotram[i] = 0xa5a5;
 }
+
 
 
 static DRIVER_INIT( killbld )
@@ -4508,6 +4526,116 @@ static DRIVER_INIT( killbld104 )
 	state_save_register_global_array(machine, state->kb_regs);
 }
 
+
+static MACHINE_RESET( dw3 )
+{
+	//pgm_state *state = (pgm_state *)machine->driver_data;
+	//int i;
+
+	MACHINE_RESET_CALL(pgm);
+
+	/* fill the protection ram with a5 - not until the DMA device is emulated! */
+	//for (i = 0; i < 0x4000/2; i++)
+	//	state->sharedprotram[i] = 0xa5a5;
+}
+
+
+
+static int reg;
+static int ptr=0;
+
+#define DW3BITSWAP(s,d,bs,bd)  d=((d&(~(1<<bd)))|(((s>>bs)&1)<<bd))
+static UINT8 dw3_swap;
+static WRITE16_HANDLER( dw3_prot_w )
+{
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
+	offset&=0xf;
+
+	if(offset==0)
+		state->kb_cmd=data;
+	else //offset==2
+	{
+		printf("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(space->cpu),state->kb_cmd,data);
+		if(state->kb_cmd==0)
+			reg=data;
+		else if(state->kb_cmd==3)	//ÃüÁî£¿£¿£¿
+		{
+			dw3_swap = data;
+
+			printf("SWAP %02x\n",dw3_swap);
+		}
+		//else if(kb_cmd==4)
+		//	ptr=data;
+		else if(state->kb_cmd==0x20)
+			ptr++;
+	}
+}
+
+static READ16_HANDLER( dw3_prot_r )
+{
+//  mame_printf_debug("killbld prot w\n");
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
+	UINT16 res ;
+
+	offset&=0xf;
+	res=0;
+
+	if(offset==1)
+	{
+		if(state->kb_cmd==0)	//swap
+		{
+				UINT8 v1=(dw3_swap+1)&0x7F;
+				UINT8 v2=0;
+				DW3BITSWAP(v1,v2,7,0);
+				DW3BITSWAP(v1,v2,6,1);
+				DW3BITSWAP(v1,v2,5,2);
+				DW3BITSWAP(v1,v2,4,3);
+				DW3BITSWAP(v1,v2,3,4);
+				DW3BITSWAP(v1,v2,2,5);
+				DW3BITSWAP(v1,v2,1,6);
+				DW3BITSWAP(v1,v2,0,7);
+
+				res=v2;
+
+		}
+		else if(state->kb_cmd==1)
+		{
+			res=reg&0x7f;
+		}
+		else if(state->kb_cmd==5)
+		{
+			UINT32 protvalue;
+			protvalue = 0x60000|input_port_read(space->machine, "Region");
+			res=(protvalue>>(8*(ptr-1)))&0xff;
+
+
+		}
+	}
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",cpu_get_pc(space->cpu),state->kb_cmd,res);
+	return res;
+}
+
+
+static DRIVER_INIT( dw3 )
+{
+	pgm_basic_init(machine);
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
+	{
+		int x;
+		UINT16 *RAMDUMP = (UINT16*)memory_region(machine, "user2");
+		for (x=0;x<(0x4000/2);x++)
+		{
+			state->sharedprotram[x] = RAMDUMP[x];
+			if((x>=0x100)&&(x<0x110)) printf("data 0x%4x, offset:%x\n",state->sharedprotram[x],x);
+		}
+	}
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xDA5610, 0xDA5613, 0, 0, dw3_prot_r, dw3_prot_w);
+
+	pgm_dw3_decrypt(machine);
+}
 
 static DRIVER_INIT( puzzli2 )
 {
@@ -4802,8 +4930,9 @@ GAME( 1998, olds100a,     olds,      olds,    olds,     olds,       ROT0,   "IGS
 /* -----------------------------------------------------------------------------------------------------------------------
    NOT Working (mostly due to needing internal protection roms dumped)
    -----------------------------------------------------------------------------------------------------------------------*/
-GAME( 1998, drgw3,        pgm,       pgm,     sango,    dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, drgw3k,       drgw3,     pgm,     sango,    dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, drgw3,        pgm,       dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, drgw3105,     drgw3,     dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, drgw3100,     drgw3,     dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Japan Only?
 
 GAME( 1999, kov,          pgm,       kov,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
 GAME( 1999, kov115,       kov,       kov,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18

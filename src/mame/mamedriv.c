@@ -8377,7 +8377,8 @@ Other Sun games
 	DRIVER( drgw2c )		/* (c) 1997 */
 	DRIVER( drgw2j )		/* (c) 1997 */
 	DRIVER( drgw3 )			/* (c) 1998 */
-	DRIVER( drgw3k )		/* (c) 1998 */
+	DRIVER( drgw3105 )		/* (c) 1998 */
+	DRIVER( drgw3100 )		/* (c) 1998 */
 	DRIVER( kov )			/* (c) 1999 */
 	DRIVER( kovplus )		/* (c) 1999 */
 	DRIVER( kovplusa )		/* (c) 1999 */
