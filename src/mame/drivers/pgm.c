@@ -2352,7 +2352,7 @@ ROM_START( kovsh103 )
 	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b0600.rom",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "b0601.rom",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
-	ROM_LOAD( "b0602.rom",    0x0c00000, 0x0100000, CRC(9df77934) SHA1(99a3fe337c13702c9aa2373bcd1bb1befd0e2a13) ) // tis dump had the same rom 4x bigger but with the data duplicated 4x, which is correct?
+	ROM_LOAD( "b0602.rom",    0x0c00000, 0x0100000, CRC(9df77934) SHA1(99a3fe337c13702c9aa2373bcd1bb1befd0e2a13) ) // this dump had the same rom 4x bigger but with the data duplicated 4x, which is correct?
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
@@ -2533,10 +2533,21 @@ Notes:
 */
 
 
+
+/*
+ the text on the chip are
+-----------------
+IGS
+PGM P0300 V109
+1A0577Y3
+J982846
+-----------------
+*/
+
 ROM_START( killbld )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
-	ROM_LOAD16_WORD_SWAP( "kb.u9", 0x100000, 0x200000, BAD_DUMP CRC(43da77d7) SHA1(f99e89da4587d6c9e3c2ae66fa139830d893fdda) ) // not verified to be correct
+	ROM_LOAD16_WORD_SWAP( "p0300_v109.u9", 0x100000, 0x200000, CRC(2fcee215) SHA1(855281a9090bfdf3da9f4d50c121765131a13400) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
@@ -2611,6 +2622,7 @@ ROM_START( killbld104 )
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
 	ROM_LOAD( "m0300.u1",     0x400000, 0x400000, CRC(93159695) SHA1(50c5976c9b681bd3d1ebefa3bfa9fe6e72dcb96f) )
 ROM_END
+
 
 
 
@@ -4440,37 +4452,14 @@ static MACHINE_RESET( killbld )
 
 
 
+
+/* ASIC025/ASIC022 don't provide rom patches like the DW2 protection does, the previous dump was bad :-) */
 static DRIVER_INIT( killbld )
 {
 	pgm_state *state = (pgm_state *)machine->driver_data;
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
 
 	pgm_basic_init(machine);
 	pgm_killbld_decrypt(machine);
-
-	/* this isn't a hack.. doing a rom dump while the game is running shows the
-       rom space to look like this.. there may be more overlays / enables tho */
-
-	/* the game actually performs a CRC check of the rom during the 'Please Wait'
-       screen, the checksum expected is that of the patched rom.  if the checksum
-       fails the please wait screen doesn't last as long and the region supplied
-       by the protection device is ignored and the attract sequence appears out
-       of order (for example, it shows the high score table THEN the disclaimer) */
-	
-	
-	mem16[0x108a2c / 2] = 0xb6aa;
-	mem16[0x108a30 / 2] = 0x6610;
-	mem16[0x108a32 / 2] = 0x13c2;
-	mem16[0x108a34 / 2] = 0x0080;
-	mem16[0x108a36 / 2] = 0x9c76;
-	mem16[0x108a38 / 2] = 0x23c3;
-	mem16[0x108a3a / 2] = 0x0080;
-	mem16[0x108a3c / 2] = 0x9c78;
-	mem16[0x108a3e / 2] = 0x1002;
-	mem16[0x108a40 / 2] = 0x6054;
-	mem16[0x108a42 / 2] = 0x5202;
-	mem16[0x108a44 / 2] = 0x0c02;
-	
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
 
@@ -4484,48 +4473,6 @@ static DRIVER_INIT( killbld )
 	state_save_register_global(machine, state->kb_ptr);
 	state_save_register_global_array(machine, state->kb_regs);
 }
-
-
-static DRIVER_INIT( killbld104 )
-{
-	pgm_state *state = (pgm_state *)machine->driver_data;
-//	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
-
-	pgm_basic_init(machine);
-	pgm_killbld_decrypt(machine);
-
-	/* todo, correct overlays for this set */
-	/* oddly the game doesn't exhibit the same problems as the board set without them,
-	   is this a proper dump, or was it dumped from a running board via trojan? or does
-	   the additional protection affect it in different ways? */
-	/*
-	mem16[0x108a2c / 2] = 0xb6aa;
-	mem16[0x108a30 / 2] = 0x6610;
-	mem16[0x108a32 / 2] = 0x13c2;
-	mem16[0x108a34 / 2] = 0x0080;
-	mem16[0x108a36 / 2] = 0x9c76;
-	mem16[0x108a38 / 2] = 0x23c3;
-	mem16[0x108a3a / 2] = 0x0080;
-	mem16[0x108a3c / 2] = 0x9c78;
-	mem16[0x108a3e / 2] = 0x1002;
-	mem16[0x108a40 / 2] = 0x6054;
-	mem16[0x108a42 / 2] = 0x5202;
-	mem16[0x108a44 / 2] = 0x0c02;
-	*/
-
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
-
-	state->kb_cmd = 0;
-	state->kb_reg = 0;
-	state->kb_ptr = 0;
-	memset(state->kb_regs, 0, 0x10);
-
-	state_save_register_global(machine, state->kb_cmd);
-	state_save_register_global(machine, state->kb_reg);
-	state_save_register_global(machine, state->kb_ptr);
-	state_save_register_global_array(machine, state->kb_regs);
-}
-
 
 static MACHINE_RESET( dw3 )
 {
@@ -4920,8 +4867,9 @@ GAME( 2001, martmastc102, martmast,  kov2,    sango,    martmast,   ROT0,   "IGS
    Partially Working, playable, but some imperfections
    -----------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1998, killbld,      pgm,       killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // it's playable, but one of the protection checks is still patched
-GAME( 1998, killbld104,   killbld,   killbld, killbld,  killbld104, ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // this set doesn't work, needs correct rom overlay
+ // it's playable, but one of the protection checks is still patched
+GAME( 1998, killbld,      pgm,       killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1998, killbld104,   killbld,   killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1998, olds,         pgm,       olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1998, olds100,      olds,      olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
@@ -4930,6 +4878,8 @@ GAME( 1998, olds100a,     olds,      olds,    olds,     olds,       ROT0,   "IGS
 /* -----------------------------------------------------------------------------------------------------------------------
    NOT Working (mostly due to needing internal protection roms dumped)
    -----------------------------------------------------------------------------------------------------------------------*/
+
+// should have DMA protection, like killbld, as well as the math / bitswap / memory manipulation stuff, but it never attempts to trigger the DMA? - we currently have a RAM dump to allow it to boot, but I think this stuff should be DMA copied into RAM, like killbld
 GAME( 1998, drgw3,        pgm,       dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1998, drgw3105,     drgw3,     dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1998, drgw3100,     drgw3,     dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Japan Only?
