@@ -10,6 +10,8 @@ vtennis: check wpset dee3ec8,8,w,wpdata==0xa8804000
 
 vtennis2: check bp c020130 / wpset c013ff0,f,w,wpdata==0x3f800000 -> 0xc020434 (test mode)
 
+smarinef: put cabinet in STD mode, bp c027968, wpset c0e66a6,4,w
+
 ***************************************************************************/
 
 #include "emu.h"
