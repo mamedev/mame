@@ -1904,6 +1904,19 @@ static CPU_INIT( f8 )
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->iospace = device->space(AS_IO);
+
+	state_save_register_device_item(device, 0, cpustate->pc0);
+	state_save_register_device_item(device, 0, cpustate->pc1);
+	state_save_register_device_item(device, 0, cpustate->dc0);
+	state_save_register_device_item(device, 0, cpustate->dc1);
+	state_save_register_device_item(device, 0, cpustate->a);
+	state_save_register_device_item(device, 0, cpustate->w);
+	state_save_register_device_item(device, 0, cpustate->is);
+	state_save_register_device_item(device, 0, cpustate->dbus);
+	state_save_register_device_item(device, 0, cpustate->io);
+	state_save_register_device_item(device, 0, cpustate->irq_vector);
+	state_save_register_device_item(device, 0, cpustate->irq_request);
+	state_save_register_device_item_array(device, 0, cpustate->r);
 }
 
 static CPU_SET_INFO( f8 )

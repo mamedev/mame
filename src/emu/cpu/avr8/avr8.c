@@ -194,6 +194,8 @@ static CPU_INIT( avr8 )
     cpustate->io = device->space(AS_IO);
 
     WRITE_IO_8(cpustate, AVR8_IO_SREG, 0);
+
+	state_save_register_device_item(device, 0, cpustate->pc);
 }
 
 static CPU_EXIT( avr8 )

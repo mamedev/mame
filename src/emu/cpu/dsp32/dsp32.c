@@ -311,6 +311,47 @@ static void update_pcr(dsp32_state *cpustate, UINT16 newval)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
+static void dsp32_register_save( running_device *device )
+{
+	dsp32_state *cpustate = get_safe_token(device);
+
+	state_save_register_device_item_array(device, 0, cpustate->r);
+	state_save_register_device_item(device, 0, cpustate->pin);
+	state_save_register_device_item(device, 0, cpustate->pout);
+	state_save_register_device_item(device, 0, cpustate->ivtp);
+	state_save_register_device_item(device, 0, cpustate->nzcflags);
+	state_save_register_device_item(device, 0, cpustate->vflags);
+	state_save_register_device_item(device, 0, cpustate->pin);
+	state_save_register_device_item(device, 0, cpustate->pin);
+	state_save_register_device_item_array(device, 0, cpustate->a);
+	state_save_register_device_item(device, 0, cpustate->NZflags);
+	state_save_register_device_item(device, 0, cpustate->VUflags);
+	state_save_register_device_item_array(device, 0, cpustate->abuf);
+	state_save_register_device_item_array(device, 0, cpustate->abufreg);
+	state_save_register_device_item_array(device, 0, cpustate->abufVUflags);
+	state_save_register_device_item_array(device, 0, cpustate->abufNZflags);
+	state_save_register_device_item_array(device, 0, cpustate->abufcycle);
+	state_save_register_device_item(device, 0, cpustate->abuf_index);
+	state_save_register_device_item_array(device, 0, cpustate->mbufaddr);
+	state_save_register_device_item_array(device, 0, cpustate->mbufdata);
+	state_save_register_device_item(device, 0, cpustate->par);
+	state_save_register_device_item(device, 0, cpustate->pare);
+	state_save_register_device_item(device, 0, cpustate->pdr);
+	state_save_register_device_item(device, 0, cpustate->pdr2);
+	state_save_register_device_item(device, 0, cpustate->pir);
+	state_save_register_device_item(device, 0, cpustate->pcr);
+	state_save_register_device_item(device, 0, cpustate->emr);
+	state_save_register_device_item(device, 0, cpustate->esr);
+	state_save_register_device_item(device, 0, cpustate->pcw);
+	state_save_register_device_item(device, 0, cpustate->piop);
+	state_save_register_device_item(device, 0, cpustate->ibuf);
+	state_save_register_device_item(device, 0, cpustate->isr);
+	state_save_register_device_item(device, 0, cpustate->obuf);
+	state_save_register_device_item(device, 0, cpustate->osr);
+	state_save_register_device_item(device, 0, cpustate->lastpins);
+	state_save_register_device_item(device, 0, cpustate->ppc);
+}
+
 static CPU_INIT( dsp32c )
 {
 	const dsp32_config *configdata = (const dsp32_config *)device->baseconfig().static_config;
@@ -322,6 +363,8 @@ static CPU_INIT( dsp32c )
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+
+	dsp32_register_save(device);
 }
 
 

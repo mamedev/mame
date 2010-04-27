@@ -805,6 +805,15 @@ static CPU_INIT( apexc )
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);
+
+	state_save_register_device_item(device, 0, cpustate->a);
+	state_save_register_device_item(device, 0, cpustate->r);
+	state_save_register_device_item(device, 0, cpustate->cr);
+	state_save_register_device_item(device, 0, cpustate->ml);
+	state_save_register_device_item(device, 0, cpustate->working_store);
+	state_save_register_device_item(device, 0, cpustate->current_word);
+	state_save_register_device_item(device, 0, cpustate->running);
+	state_save_register_device_item(device, 0, cpustate->pc);
 }
 
 static CPU_RESET( apexc )

@@ -448,6 +448,18 @@ static CPU_INIT( asap )
 	asap->irq_callback = irqcallback;
 	asap->device = device;
 	asap->program = device->space(AS_PROGRAM);
+
+
+	state_save_register_device_item(device, 0, asap->pc);
+	state_save_register_device_item(device, 0, asap->pflag);
+	state_save_register_device_item(device, 0, asap->iflag);
+	state_save_register_device_item(device, 0, asap->cflag);
+	state_save_register_device_item(device, 0, asap->vflag);
+	state_save_register_device_item(device, 0, asap->znflag);
+	state_save_register_device_item(device, 0, asap->op);
+	state_save_register_device_item(device, 0, asap->ppc);
+	state_save_register_device_item(device, 0, asap->nextpc);
+	state_save_register_device_item(device, 0, asap->irq_state);
 }
 
 static CPU_RESET( asap )
