@@ -22,8 +22,6 @@
 #define DEBUG_AICA_DMA (0)
 #define DEBUG_PVRCTRL	(0)
 
-#define ENABLE_MAPLE_IRQ (0)
-
 static UINT8 mp_mux_data;
 
 #if DEBUG_SYSCTRL
@@ -205,8 +203,15 @@ static TIMER_CALLBACK( pvr_dma_irq )
 
 static TIMER_CALLBACK( gdrom_dma_irq )
 {
-	g1bus_regs[SB_GDST]=0;
+	g1bus_regs[SB_GDST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+	dc_update_interrupt_status(machine);
+}
+
+static TIMER_CALLBACK( maple_dma_irq )
+{
+	maple_regs[SB_MDST] = 0;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
 	dc_update_interrupt_status(machine);
 }
 
@@ -751,12 +756,12 @@ WRITE64_HANDLER( naomi_maple_w )
 			printf("MAPLE: hardware trigger not supported yet\n");
 		break;
 	case SB_MDST:
-		maple_regs[reg] = old;
+		maple_regs[SB_MDST] = old;
 		if (!(old & 1) && (dat & 1) && maple_regs[SB_MDEN] & 1) // 0 -> 1
 		{
 			if (!(maple_regs[SB_MDTSEL] & 1)) // SW trigger
 			{
-				maple_regs[reg] = 1;
+				maple_regs[SB_MDST] = dat & 1;
 				dat=maple_regs[SB_MDSTAR];
 //              printf("Maple DMA: %08x %08x %08x %08x\n",maple_regs[SB_MDSTAR],maple_regs[SB_MDTSEL],maple_regs[SB_MDEN],maple_regs[SB_MDST]);
 //              printf("           %08x %08x %08x %08x\n",maple_regs[SB_MSYS],maple_regs[SB_MST],maple_regs[SB_MSHTCL],maple_regs[SB_MMSEL]);
@@ -771,7 +776,6 @@ WRITE64_HANDLER( naomi_maple_w )
 					ddtdata.mode= -1;		// copy from/to buffer
 					sh4_dma_ddt(devtag_get_device(space->machine, "maincpu"), &ddtdata);
 
-					maple_regs[reg] = 0;
 					endflag=buff[0] & 0x80000000;
 					port=(buff[0] >> 16) & 3;
 					pattern=(buff[0] >> 8) & 7;
@@ -1043,11 +1047,7 @@ WRITE64_HANDLER( naomi_maple_w )
 
 					if (endflag)
 					{
-						#if 1 //ENABLE_MAPLE_IRQ
-						/*TODO: this fixes moeru but breaks other games, understand why.*/
-						dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
-						dc_update_interrupt_status(space->machine);
-						#endif
+						timer_set(space->machine, ATTOTIME_IN_USEC(200), NULL, 0, maple_dma_irq);
 						break;
 					}
 					// skip fixed packet header
@@ -1055,7 +1055,7 @@ WRITE64_HANDLER( naomi_maple_w )
 					// skip transfer data
 					dat += (length + 1) * 4;
 				} // do transfers
-				maple_regs[reg] = 0;
+
 			}
 
 		}
@@ -1097,13 +1097,17 @@ WRITE64_HANDLER( dc_maple_w )
 	maple_regs[reg] = dat; // 5f6c00+reg*4=dat
 	switch (reg)
 	{
+	case SB_MDTSEL:
+		if((dat & 1) == 1)
+			printf("MAPLE: hardware trigger not supported yet\n");
+		break;
 	case SB_MDST:
-		maple_regs[reg] = old;
+		maple_regs[SB_MDST] = old;
 		if (!(old & 1) && (dat & 1) && maple_regs[SB_MDEN] & 1) // 0 -> 1
 		{
 			if (!(maple_regs[SB_MDTSEL] & 1))
 			{
-				maple_regs[reg] = 1;
+				maple_regs[SB_MDST] = dat & 1;
 				dat=maple_regs[SB_MDSTAR];
 //              printf("Maple DMA: %08x %08x %08x %08x\n",maple_regs[SB_MDSTAR],maple_regs[SB_MDTSEL],maple_regs[SB_MDEN],maple_regs[SB_MDST]);
 //              printf("           %08x %08x %08x %08x\n",maple_regs[SB_MSYS],maple_regs[SB_MST],maple_regs[SB_MSHTCL],maple_regs[SB_MMSEL]);
@@ -1118,7 +1122,6 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.mode= -1;		// copy from/to buffer
 					sh4_dma_ddt(devtag_get_device(space->machine, "maincpu"), &ddtdata);
 
-					maple_regs[reg] = 0;
 					endflag=buff[0] & 0x80000000;
 					port=(buff[0] >> 16) & 3;
 					pattern=(buff[0] >> 8) & 7;
@@ -1193,10 +1196,7 @@ WRITE64_HANDLER( dc_maple_w )
 
 					if (endflag)
 					{
-						#if ENABLE_MAPLE_IRQ
-						dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
-						dc_update_interrupt_status(space->machine);
-						#endif
+						timer_set(space->machine, ATTOTIME_IN_USEC(200), NULL, 0, maple_dma_irq);
 						break;
 					}
 					// skip fixed packet header
@@ -1204,13 +1204,7 @@ WRITE64_HANDLER( dc_maple_w )
 					// skip transfer data
 					dat += (length + 1) * 4;
 				} // do transfers
-				maple_regs[reg] = 0;
-			}
-			else
-			{
-				//#if DEBUG_MAPLE
-				printf("MAPLE: hardware trigger not supported yet\n");
-				//#endif
+
 			}
 		}
 		break;
@@ -1293,13 +1287,15 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	switch (reg)
 	{
 	case SB_GDST:
-		if (dat & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
+		g1bus_regs[SB_GDST] = old;
+		if (((old & 1) == 0) && (dat & 1) && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
 		{
 			if (g1bus_regs[SB_GDDIR] == 0)
 			{
 				printf("G1CTRL: unsupported transfer\n");
 				return;
 			}
+			g1bus_regs[SB_GDST] = dat & 1;
 //          printf("ROM board DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(space->cpu));
 			ROM = (UINT8 *)space->machine->device("rom_board")->get_runtime_ptr(DEVINFO_PTR_MEMORY);
 			dmaoffset = (UINT32)space->machine->device("rom_board")->get_runtime_int(DEVINFO_INT_DMAOFFSET);
@@ -1339,6 +1335,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
+	UINT8 old;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -1367,6 +1364,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 		case SB_ADTSEL: wave_dma.sel = dat & 7; break;
 		/*ready for dma'ing*/
 		case SB_ADST:
+			old = wave_dma.start & 1;
 			wave_dma.start = dat & 1;
 
 			#if DEBUG_AICA_DMA
@@ -1376,7 +1374,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 			#endif
 
 			//mame_printf_verbose("SB_ADST data %08x\n",dat);
-			if(wave_dma.flag && wave_dma.start && ((wave_dma.sel & 2) == 0))
+			if(((old & 1) == 0) && wave_dma.flag && wave_dma.start && ((wave_dma.sel & 2) == 0)) // 0 -> 1
 				wave_dma_execute(space);
 			break;
 
@@ -1435,6 +1433,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
+	UINT8 old;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -1452,9 +1451,10 @@ WRITE64_HANDLER( pvr_ctrl_w )
 			break;
 		case SB_PDEN: pvr_dma.flag = dat & 1; break;
 		case SB_PDST:
+			old = pvr_dma.start & 1;
 			pvr_dma.start = dat & 1;
 
-			if(pvr_dma.flag && pvr_dma.start && ((pvr_dma.sel & 1) == 0))
+			if(((old & 1) == 0) && pvr_dma.flag && pvr_dma.start && ((pvr_dma.sel & 1) == 0)) // 0 -> 1
 				pvr_dma_execute(space);
 			break;
 	}
