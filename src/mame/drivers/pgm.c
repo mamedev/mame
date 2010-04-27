@@ -2464,8 +2464,8 @@ ROM_START( killbld )
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
 	ROM_LOAD16_WORD_SWAP( "kb.u9", 0x100000, 0x200000, BAD_DUMP CRC(43da77d7) SHA1(f99e89da4587d6c9e3c2ae66fa139830d893fdda) ) // not verified to be correct
 
-	ROM_REGION( 0x4000, "user2", 0 ) /* dump of RAM shared with protection device, todo, emulate protection device instead! */
-	ROM_LOAD( "kb.ram", 0x000000, 0x04000,  CRC(6994c507) SHA1(8264c56709488b72282d6ddfce3a4b188c6cc109) )
+	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* dump of RAM shared with protection device, todo, emulate protection device instead! */
+//	ROM_LOAD( "kb.ram", 0x000000, 0x04000,  CRC(6994c507) SHA1(8264c56709488b72282d6ddfce3a4b188c6cc109) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
@@ -4198,49 +4198,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 						// not used by killing blade
 						/* plain byteswapped copy */
 					}
-					if (mode == 1)
-					{
-						/* mode1 seems a lot like mode2, but with an additional 0xffff xor applied
-						   mode2 isn't understood yet, see below */
-
-						/* for now, cheat -- the scramble isn't understood, it might
-                           be state based */
-						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
-						for (x = 0; x < size; x++)
-						{
-							UINT16 dat;
-
-							dat = RAMDUMP[dst + x];
-							state->sharedprotram[dst + x] = dat;
-						}
-					}
-					else if (mode == 2)
-					{
-						/* mode2 acts a lot like mode3, but there is some kinda of additional
-						   xor on the data, and the conditions under which it gets applied are
-						   not clear, tests of 0x0001, 0x0002, 0x0004 etc. filled data have been
-						   passed through the device, and exhibit the same looping on blocks of
-						   0x100 as the main encryptin of mode3, and the same shifting of the
-						   additional data table when the extra parameter is used.
-
-						   However, the extra xor for 0x0003 isn't the same as 0x0001 and 0x0002
-						   combined.  This needs further study.
-					   */
-
-						/* for now, cheat -- the scramble isn't understood, it might
-                           be state based */
-						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
-						for (x = 0; x < size; x++)
-						{
-							UINT16 dat;
-
-							dat = RAMDUMP[dst + x];
-							state->sharedprotram[dst + x] = dat;
-						}
-					}
-					else if (mode == 3)
+					if ((mode == 1) || (mode == 2) || (mode == 3))
 					{
 						/* mode3 applies a xor from a 0x100 byte table to the data being
 						   transferred
@@ -4252,10 +4210,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 						   odd offsets seem to change the table slightly (see rawDataOdd)
 
 					   */
-						  
-						int x;
-						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
-						
+						  					
 						/*
 						unsigned char rawDataEven[256] = {
 							0xA8, 0x6A, 0x5D, 0xB6, 0x5D, 0xB1, 0xC1, 0x2C,
@@ -4329,23 +4284,36 @@ static WRITE16_HANDLER( killbld_prot_w )
 							0x13, 0x22, 0x48, 0xB6,	0xF3, 0x2D, 0x00, 0x9A
 						};
 						*/
-						
+						int x;
+						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
+
 						for (x = 0; x < size; x++)
 						{
+							//UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+							//UINT16 dat = RAMDUMP[dst + x];
+
 							UINT16 dat2 = PROTROM[src + x];
+
 							UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
 							UINT8* dectable = (UINT8*)memory_region(space->machine, "user1");//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
 							UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
 							
 							dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
-							dat2 ^= extraxor;						
-										
-							//state->sharedprotram[dst + x] = dat;
+							
+							if (mode==3) dat2 ^= extraxor;						
+							if (mode==2) dat2 += extraxor;
+							if (mode==1) dat2 -= extraxor;
+							
+							//if (dat!=dat2)
+							//	printf("Mode %04x Param %04x Mismatch %04x %04x\n", mode, param, dat, dat2);
+
 							state->sharedprotram[dst + x] = dat2;
 						}
 	
-						/* hack, patches out some additional security checks... we need to emulate them instead!*/
-						if ((param==0x54) && (src*2==0x2120) && (dst*2==0x2600)) state->sharedprotram[0x2600 / 2] = 0x4e75;
+						/* hack, patches out some additional security checks... we need to emulate them instead!
+						  they occur before it displays the disclaimer, so if you remove the overlay patches it will display
+						  the highscore table before coming up with this error... */
+						if ((mode==3) && (param==0x54) && (src*2==0x2120) && (dst*2==0x2600)) state->sharedprotram[0x2600 / 2] = 0x4e75;
 						
 					}
 					if (mode == 4)
@@ -4395,7 +4363,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						mame_printf_debug("unhandled copy mode %04x!\n", mode);
 						// not used by killing blade
-						/* weird mode, the params get left in memory? */
+						/* weird mode, the params get left in memory? - maybe it's a NOP? */
 					}
 					else
 					{
@@ -4469,7 +4437,9 @@ static DRIVER_INIT( killbld )
        screen, the checksum expected is that of the patched rom.  if the checksum
        fails the please wait screen doesn't last as long and the region supplied
        by the protection device is ignored and the attract sequence appears out
-       of order */
+       of order (for example, it shows the high score table THEN the disclaimer) */
+	
+	
 	mem16[0x108a2c / 2] = 0xb6aa;
 	mem16[0x108a30 / 2] = 0x6610;
 	mem16[0x108a32 / 2] = 0x13c2;
@@ -4482,6 +4452,7 @@ static DRIVER_INIT( killbld )
 	mem16[0x108a40 / 2] = 0x6054;
 	mem16[0x108a42 / 2] = 0x5202;
 	mem16[0x108a44 / 2] = 0x0c02;
+	
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
 
@@ -4495,6 +4466,48 @@ static DRIVER_INIT( killbld )
 	state_save_register_global(machine, state->kb_ptr);
 	state_save_register_global_array(machine, state->kb_regs);
 }
+
+
+static DRIVER_INIT( killbld104 )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+//	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+
+	pgm_basic_init(machine);
+	pgm_killbld_decrypt(machine);
+
+	/* todo, correct overlays for this set */
+	/* oddly the game doesn't exhibit the same problems as the board set without them,
+	   is this a proper dump, or was it dumped from a running board via trojan? or does
+	   the additional protection affect it in different ways? */
+	/*
+	mem16[0x108a2c / 2] = 0xb6aa;
+	mem16[0x108a30 / 2] = 0x6610;
+	mem16[0x108a32 / 2] = 0x13c2;
+	mem16[0x108a34 / 2] = 0x0080;
+	mem16[0x108a36 / 2] = 0x9c76;
+	mem16[0x108a38 / 2] = 0x23c3;
+	mem16[0x108a3a / 2] = 0x0080;
+	mem16[0x108a3c / 2] = 0x9c78;
+	mem16[0x108a3e / 2] = 0x1002;
+	mem16[0x108a40 / 2] = 0x6054;
+	mem16[0x108a42 / 2] = 0x5202;
+	mem16[0x108a44 / 2] = 0x0c02;
+	*/
+
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
+
+	state->kb_cmd = 0;
+	state->kb_reg = 0;
+	state->kb_ptr = 0;
+	memset(state->kb_regs, 0, 0x10);
+
+	state_save_register_global(machine, state->kb_cmd);
+	state_save_register_global(machine, state->kb_reg);
+	state_save_register_global(machine, state->kb_ptr);
+	state_save_register_global_array(machine, state->kb_regs);
+}
+
 
 static DRIVER_INIT( puzzli2 )
 {
@@ -4779,8 +4792,8 @@ GAME( 2001, martmastc102, martmast,  kov2,    sango,    martmast,   ROT0,   "IGS
    Partially Working, playable, but some imperfections
    -----------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1998, killbld,      pgm,       killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // it's playable, but there are some things unclear about the protection
-GAME( 1998, killbld104,   killbld,   killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // this set doesn't work, needs the DMA device emulating properly rather than using extracted data
+GAME( 1998, killbld,      pgm,       killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // it's playable, but one of the protection checks is still patched
+GAME( 1998, killbld104,   killbld,   killbld, killbld,  killbld104, ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // this set doesn't work, needs correct rom overlay
 
 GAME( 1998, olds,         pgm,       olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1998, olds100,      olds,      olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
