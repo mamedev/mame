@@ -1,36 +1,25 @@
 /**********************************************************************************************************
 
-PACHI FEVER / SANKI DENSHI KOGYO
-
-
-GEN6480830 (TEXAS INSTRUMENTS)
-XTAL:12.000MHZ
-RY050012   (TEXAS INSTRUMENTS)
-XTAL:10.738MHZ
-
-SOUND   :MSM5205 & ?
-
-DIP SWITCH:8BIT x 3
+PACHI FEVER / (c) 1983 SANKI DENSHI KOGYO
 
 ===========================================================================================================
 
 Many thanks to Olivier Galibert and Wilbert Pol for identify the CPU
 
+Driver by Tomasz Slanina 
 
-Tomasz Slanina 10.02.2010:
----------------------------
-
-There's very little info about the game or hardware, so all the above (except for clocks and MSM ) is
-just a guess:
-
-- CPU (GEN6480830 ?) is TMS9995 or derivative ( decrementer + lvl3 interrupt, internal ram)
-- RY050012 could be a VDP ( probably TMS9928A )
-- SN76469A (or similar) used for music
+- CPU has scratched surface and custom marks "GEN480830   DBS 30102" plus TI logo.
+  There's "GENZUK 01" print on the PCB, near the chip.
+  It's  TMS9995 or derivative ( decrementer + lvl3 interrupt, internal ram) 
+  XTAL:12.000MHZ
+- VDP has also custom label ( "RY 050012    DDU 30600" ) plus TI logo
+  Seems to be TMS9928A
+  XTAL:10.738MHZ
+- 2xY2404 ( SN76489A comaptible? ) for music and sfx
 - MSM5205 - sample player (see below)
 
 - TODO:
   - what's the correct game title - Pachifever ? Fever 777 ?
-  - ic48.50 ROM redump (probably more adpcm samples + lookuptable .. mapped at $c000)
   - remaing DSW
   - unknown writes ($ffxx range)
   - controls : unused bits (is the BUTTON1 used _only_ for entering initials?)
@@ -62,9 +51,9 @@ just a guess:
 class pachifev_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pachifev_state(machine)); }
+    static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pachifev_state(machine)); }
 
-	pachifev_state(running_machine &machine) { }
+    pachifev_state(running_machine &machine) { }
 
  /* controls related */
 
@@ -85,7 +74,7 @@ static WRITE8_HANDLER(controls_w)
         /*end of input read*/
         state->power=0;
         state->max_power=state->input_power;
-        if(--state->cnt <= 0) /* why to do it N times? no ide.. someone should fix it */
+        if(--state->cnt <= 0) /* why to do it N times? no idea.. someone should fix it */
         {
             state->cnt=0;
             state->input_power=0;
@@ -102,9 +91,7 @@ static READ8_HANDLER(controls_r)
 }
 
 static ADDRESS_MAP_START( pachifev_map, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x9fff) AM_ROM
-
-    AM_RANGE(0xc000, 0xc0ff) AM_NOP /* game is expecting here some kind of lookup table (adpcm samples start?) */
+    AM_RANGE(0x0000, 0xdfff) AM_ROM
 
     AM_RANGE(0xe000, 0xe7ff) AM_RAM
     AM_RANGE(0xf000, 0xf0fb) AM_NOP  /* internal ram */
@@ -115,8 +102,8 @@ static ADDRESS_MAP_START( pachifev_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0xff08, 0xff08) AM_READ_PORT("DSW3")
     AM_RANGE(0xff10, 0xff10) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
     AM_RANGE(0xff12, 0xff12) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-    AM_RANGE(0xff20, 0xff20) AM_WRITENOP /* unknown */
-    AM_RANGE(0xff30, 0xff30) AM_DEVWRITE("sn76", sn76496_w)
+    AM_RANGE(0xff20, 0xff20) AM_DEVWRITE("sn76_1", sn76496_w)
+    AM_RANGE(0xff30, 0xff30) AM_DEVWRITE("sn76_2", sn76496_w)
     AM_RANGE(0xff40, 0xff40) AM_WRITE(controls_w)
     AM_RANGE(0xff50, 0xff50) AM_WRITENOP /* unknown */
     AM_RANGE(0xfffa, 0xfffb) AM_NOP /* decrementer */
@@ -129,7 +116,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pachifev )
     PORT_START("IN0")
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )  /* used on enter player initials in top 5 */
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )  /* used to enter player initials in top 5 */
     PORT_BIT( 0x4d, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
@@ -322,11 +309,13 @@ static MACHINE_DRIVER_START( pachifev )
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
 #if USE_MSM
-    MDRV_SOUND_ADD("adpcm", MSM5205, 288000)  /* guess */
+    MDRV_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)  /* guess */
     MDRV_SOUND_CONFIG(msm5205_config)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
-    MDRV_SOUND_ADD("sn76", SN76489, XTAL_10_738635MHz/3) /* guess */
+    MDRV_SOUND_ADD("sn76_1", SN76489A, XTAL_10_738635MHz/3) /* guess */
+    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+    MDRV_SOUND_ADD("sn76_2", SN76489A, XTAL_10_738635MHz/3) /* guess */
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -337,13 +326,12 @@ ROM_START( pachifev )
     ROM_LOAD( "ic44.02",   0x04000, 0x2000, CRC(98b3841f) SHA1(0563139877bf01e1673767ee1798bbcf68adadea) )
     ROM_LOAD( "ic45.03",   0x06000, 0x2000, CRC(6b76e6fa) SHA1(5be10ab0b76e2061fc7e9c77649572955bee7661) )
     ROM_LOAD( "ic46.04",   0x08000, 0x2000, CRC(1c8c66d7) SHA1(3b9b05f35b20d798651c7d5fdb35e6af956615a1) )
+    /* empty ROM socket  - no data for 0xa000 - 0xbfff */
+	ROM_LOAD( "ic48.50",   0x0c000, 0x2000, CRC(4ff52b70) SHA1(a459b52712250d2ecdbe6aeb8c400806867e9857) )
 
     ROM_REGION( 0x4000, "adpcm", 0 )
     ROM_LOAD( "ic66.10",   0x0000, 0x2000, CRC(217c573e) SHA1(6fb90865d1d81f5ea00fa7916d0ccb6756ef5ce5) )
-
-    ROM_REGION( 0x2000, "user1", 0 )
-    ROM_LOAD( "ic48.50",   0x00000, 0x2000, BAD_DUMP CRC(1c8c66d7) SHA1(3b9b05f35b20d798651c7d5fdb35e6af956615a1) )
+    
 ROM_END
 
 GAME( 1983, pachifev,  0,       pachifev,  pachifev,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", GAME_IMPERFECT_SOUND )
-
