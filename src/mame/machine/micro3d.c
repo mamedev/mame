@@ -661,6 +661,28 @@ WRITE16_HANDLER( micro3d_adc_w )
 	timer_set(space->machine, ATTOTIME_IN_USEC(40), NULL, data & ~4, adc_done_callback);
 }
 
+CUSTOM_INPUT( botssa_hwchk_r )
+{
+	micro3d_state *state = (micro3d_state*)field->port->machine->driver_data;
+
+	return state->botssa_latch;
+}
+
+READ16_HANDLER( botssa_140000_r )
+{
+	micro3d_state *state = (micro3d_state*)space->machine->driver_data;
+
+	state->botssa_latch = 0;
+	return 0xffff;
+}
+
+READ16_HANDLER( botssa_180000_r )
+{
+	micro3d_state *state = (micro3d_state*)space->machine->driver_data;
+
+	state->botssa_latch = 1;
+	return 0xffff;
+}
 
 /*************************************
  *
@@ -741,6 +763,17 @@ DRIVER_INIT( micro3d )
     overwrites memory in use by the Am29000. Slowing down the 68000 slightly
     avoids this */
 	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.945f);
+}
+
+DRIVER_INIT( botssa )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	/* Required to pass the hardware version check */
+	memory_install_read16_handler(space, 0x140000, 0x140001, 0, 0, botssa_140000_r );
+	memory_install_read16_handler(space, 0x180000, 0x180001, 0, 0, botssa_180000_r );
+
+	DRIVER_INIT_CALL(micro3d);
 }
 
 MACHINE_RESET( micro3d )

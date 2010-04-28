@@ -9,7 +9,7 @@
 
 #define HOST_MONITOR_DISPLAY		0
 #define VGB_MONITOR_DISPLAY			0
-#define DRMATH_MONITOR_DISPLAY		1
+#define DRMATH_MONITOR_DISPLAY		0
 
 class micro3d_state
 {
@@ -70,6 +70,9 @@ public:
 
 	/* ADC */
 	UINT8				adc_val;
+
+	/* Hardware version-check latch for BOTSS 1.1a */
+	UINT8				botssa_latch;
 
 	/* MAC */
 	UINT32				*mac_sram;
@@ -139,6 +142,10 @@ WRITE16_HANDLER( micro3d_reset_w );
 READ16_HANDLER( micro3d_encoder_l_r );
 READ16_HANDLER( micro3d_encoder_h_r );
 
+CUSTOM_INPUT( botssa_hwchk_r );
+READ16_HANDLER( botssa_140000_r );
+READ16_HANDLER( botssa_180000_r );
+
 READ32_HANDLER( micro3d_shared_r );
 WRITE32_HANDLER( micro3d_shared_w );
 
@@ -156,6 +163,7 @@ void micro3d_duart_tx(running_device *device, int channel, UINT8 data);
 
 MACHINE_RESET( micro3d );
 DRIVER_INIT( micro3d );
+DRIVER_INIT( botssa );
 
 /*----------- defined in audio/micro3d.c -----------*/
 WRITE8_DEVICE_HANDLER( micro3d_upd7759_w );
