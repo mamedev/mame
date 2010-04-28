@@ -558,7 +558,9 @@ static void display_loading_rom_message(rom_load_data *romdata, const char *name
 {
 	char buffer[200];
 
-	if (name != NULL)
+	// 2010-04, FP - FIXME: in MESS, load_software_part_region sometimes calls this with romstotalsize = 0!
+	// as a temp workaround, I added a check for romstotalsize !=0.
+	if (name != NULL && romdata->romstotalsize)
 		sprintf(buffer, "Loading (%d%%)", (UINT32)(100 * (UINT64)romdata->romsloadedsize / (UINT64)romdata->romstotalsize));
 	else
 		sprintf(buffer, "Loading Complete");
