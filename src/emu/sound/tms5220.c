@@ -187,11 +187,15 @@ device), PES Speech adapter (serial port connection)
 
 /* *****debugging defines***** */
 #undef VERBOSE
-// above is general, somewhat obsolete
+// above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
 #undef DEBUG_FIFO
 // above debugs fifo stuff: writes, reads and flag updates
 #undef DEBUG_PARSE_FRAME_DUMP
-// above dumps each speech frame as a binary index listing
+// above dumps each frame to stderr: be sure to select one of the options below if you define it!
+#undef DEBUG_PARSE_FRAME_DUMP_BIN
+// dumps each speech frame as binary
+#undef DEBUG_PARSE_FRAME_DUMP_HEX
+// dumps each speech frame as hex
 #undef DEBUG_FRAME_ERRORS
 // above dumps info if a frame ran out of data
 #undef DEBUG_COMMAND_DUMP
@@ -435,12 +439,35 @@ static void register_for_save_states(tms5220_state *tms)
 
  **********************************************************************************************/
 
-#ifdef DEBUG_PARSE_FRAME_DUMP
+#ifdef DEBUG_PARSE_FRAME_DUMP_BIN
 static void printbits(long data, int num)
 {
 	int i;
 	for (i=(num-1); i>=0; i--)
-		fprintf(stderr,"%0d", (int)(data>>i)&1);
+		fprintf(stderr,"%0ld", (data>>i)&1);
+}
+#endif
+#ifdef DEBUG_PARSE_FRAME_DUMP_HEX
+static void printbits(long data, int num)
+{
+	switch((num-1)&0xFC)
+	{
+		case 0:
+			fprintf(stderr,"%0lx", data);
+			break;
+		case 4:
+			fprintf(stderr,"%02lx", data);
+			break;
+		case 8:
+			fprintf(stderr,"%03lx", data);
+			break;
+		case 12:
+			fprintf(stderr,"%03lx", data);
+			break;
+		default:
+			fprintf(stderr,"%04lx", data);
+			break;
+	}
 }
 #endif
 
@@ -460,22 +487,33 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 			tms->fifo[tms->fifo_tail] = data;
 			tms->fifo_tail = (tms->fifo_tail + 1) % FIFO_SIZE;
 			tms->fifo_count++;
-
-			/* if we were speaking, then we're no longer empty */
-			if (tms->speak_external)
-				tms->buffer_empty = 0;
 #ifdef DEBUG_FIFO
 			logerror("data_write: Added byte to FIFO (current count=%2d)\n", tms->fifo_count);
+#endif
+			update_status_and_ints(tms);
+			if ((tms->talk_status == 0) && (tms->buffer_low == 0)) // we just unset buffer low with that last write, and talk status *was* zero...
+			{
+			int i;
+#ifdef DEBUG_FIFO
+			logerror("data_write triggered talk status to go active!\n");
+#endif
+				/* ...then we now have enough bytes to start talking; clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
+				tms->new_frame_energy = 0;
+				tms->new_frame_pitch = 0;
+				for (i = 0; i < tms->coeff->num_k; i++)
+					tms->new_frame_k[i] = 0;
+				tms->talk_status = 1;
+			}
 		}
 		else
 		{
-
-			logerror("data_write: Ran out of room in the FIFO!\n");
+#ifdef DEBUG_FIFO
+			logerror("data_write: Ran out of room in the tms52xx FIFO! this should never happen!\n");
 			// at this point, /READY should remain HIGH/inactive until the fifo has at least one byte open in it.
 #endif
 		}
 
-		update_status_and_ints(tms);
+
 	}
 	else //(! tms->speak_external)
 		/* R Nabet : we parse commands at once.  It is necessary for such commands as read. */
@@ -703,19 +741,8 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
     /* if speak external is set, but talk status is not (yet) set,
     wait for buffer low to clear */
-	if (!tms->talk_status && tms->speak_external)
-    {
-        if (tms->buffer_low == 1)
+	if (!tms->talk_status && tms->speak_external && tms->buffer_low == 1)
            goto empty;
-
-		/* we now have enough bytes; clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
-		tms->new_frame_energy = 0;
-		tms->new_frame_pitch = 0;
-		for (i = 0; i < tms->coeff->num_k; i++)
-			tms->new_frame_k[i] = 0;
-
-        tms->talk_status = 1;
-	}
 
     /* loop until the buffer is full or we've stopped speaking */
 	while ((size > 0) && tms->talk_status)
@@ -888,10 +915,17 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		if (OLD_FRAME_UNVOICED_FLAG == 1)
 		{
 			/* generate unvoiced samples here */
+#ifdef NORMALMODE
 			if (tms->RNG & 1)
 				tms->excitation_data = -0x40; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so +-64 */
 			else
 				tms->excitation_data = 0x40;
+#else
+			if (tms->RNG & 1)
+				tms->excitation_data = ~0x7F;
+			else
+				tms->excitation_data = 0x80;
+#endif
         }
         else
         {
@@ -910,7 +944,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]<<CHIRPROM_LEFTSHIFT;
 #else
           if (tms->pitch_count > 40)
-              tms->excitation_data = -128; // tms->coeff->chirptable[51];
+              tms->excitation_data = ~0x7F; // tms->coeff->chirptable[51];
           else /*tms->pitch_count <= 40*/
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
 			 //tms->excitation_data = tms->pitch_count - 64;
@@ -1262,7 +1296,7 @@ static void parse_frame(tms5220_state *tms)
 #endif
 		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
 	}
-#ifdef DEBUG_FRAME_INFO
+#ifdef VERBOSE
 	if (tms->speak_external)
 		logerror("Parsed a frame successfully in FIFO - %d bits remaining\n", bits);
 	else
@@ -1489,12 +1523,13 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 #ifdef DEBUG_RS_WS
 			logerror("Schedule write ready\n");
 #endif
-			tms->io_ready = 1;
+			//tms->io_ready = 1;
 			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // goes immediately, within one clock
+			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
 			tms->io_ready = 0;
-			/* 25 usec in datasheet, but zaccaria won't work */
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/11), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11) cycles to complete
+			/* 25 usec (16 clocks) in datasheet, but zaccaria games glitch or fail to talk if that value is used. The zaccaria glitching may be buggy game code or may be a bug with the MAME 6821 PIA code which interfaces with the tms5200, particularly its handling of updates of the CA1 and CA2 lines? */
+			//timer_set(tms->device->machine, ATTOTIME_IN_USEC(100), tms, 1, io_ready_cb);
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
 		}
 	}
 }
@@ -1537,10 +1572,11 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		else
 		{
 			///* high to low - schedule ready cycle*/
-			tms->io_ready = 1;
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // goes immediately, within one clock
+			//tms->io_ready = 1;
+			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
+			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
 			tms->io_ready = 0;
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/15), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete
 		}
 	}
 }
