@@ -1012,6 +1012,8 @@ READ64_HANDLER( pvr_ta_r )
 	case SPG_TRIGGER_POS:
 		printf("Warning: read at h/v counter ext latches\n");
 		break;
+	case TA_LIST_INIT:
+		return 0; //bit 31 always return 0, a probable left-over in Crazy Taxi reads this and discards the read (?)
 	}
 
 	#if DEBUG_PVRTA_REGS
@@ -1170,70 +1172,73 @@ WRITE64_HANDLER( pvr_ta_w )
 		assert_always(0, "TA grabber error A!\n");
 		break;
 	case TA_LIST_INIT:
-		state_ta.tafifo_pos=0;
-		state_ta.tafifo_mask=7;
-		state_ta.tafifo_vertexwords=8;
-		state_ta.tafifo_listtype= -1;
+		if(dat & 0x80000000)
+		{
+			state_ta.tafifo_pos=0;
+			state_ta.tafifo_mask=7;
+			state_ta.tafifo_vertexwords=8;
+			state_ta.tafifo_listtype= -1;
 	#if DEBUG_PVRTA
-		mame_printf_verbose("TA_OL_BASE       %08x TA_OL_LIMIT  %08x\n", pvrta_regs[TA_OL_BASE], pvrta_regs[TA_OL_LIMIT]);
-		mame_printf_verbose("TA_ISP_BASE      %08x TA_ISP_LIMIT %08x\n", pvrta_regs[TA_ISP_BASE], pvrta_regs[TA_ISP_LIMIT]);
-		mame_printf_verbose("TA_ALLOC_CTRL    %08x\n", pvrta_regs[TA_ALLOC_CTRL]);
-		mame_printf_verbose("TA_NEXT_OPB_INIT %08x\n", pvrta_regs[TA_NEXT_OPB_INIT]);
+			mame_printf_verbose("TA_OL_BASE       %08x TA_OL_LIMIT  %08x\n", pvrta_regs[TA_OL_BASE], pvrta_regs[TA_OL_LIMIT]);
+			mame_printf_verbose("TA_ISP_BASE      %08x TA_ISP_LIMIT %08x\n", pvrta_regs[TA_ISP_BASE], pvrta_regs[TA_ISP_LIMIT]);
+			mame_printf_verbose("TA_ALLOC_CTRL    %08x\n", pvrta_regs[TA_ALLOC_CTRL]);
+			mame_printf_verbose("TA_NEXT_OPB_INIT %08x\n", pvrta_regs[TA_NEXT_OPB_INIT]);
 	#endif
-		pvrta_regs[TA_NEXT_OPB] = pvrta_regs[TA_NEXT_OPB_INIT];
-		pvrta_regs[TA_ITP_CURRENT] = pvrta_regs[TA_ISP_BASE];
-		state_ta.alloc_ctrl_OPB_Mode = pvrta_regs[TA_ALLOC_CTRL] & 0x100000; // 0 up 1 down
-		state_ta.alloc_ctrl_PT_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 16) & 3)) & 0x38; // number of 32 bit words (0,8,16,32)
-		state_ta.alloc_ctrl_TM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 12) & 3)) & 0x38;
-		state_ta.alloc_ctrl_T_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 8) & 3)) & 0x38;
-		state_ta.alloc_ctrl_OM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 4) & 3)) & 0x38;
-		state_ta.alloc_ctrl_O_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 0) & 3)) & 0x38;
-		state_ta.listtype_used |= (1+4);
-		// use TA_ISP_BASE and select buffer for grab data
-		state_ta.grabsel = -1;
-		// try to find already used buffer but not busy
-		for (a=0;a < NUM_BUFFERS;a++)
-		{
-			if ((state_ta.grab[a].ispbase == pvrta_regs[TA_ISP_BASE]) && (state_ta.grab[a].busy == 0) && (state_ta.grab[a].valid == 1))
-			{
-				state_ta.grabsel=a;
-				break;
-			}
-		}
-		// try a buffer not used yet
-		if (state_ta.grabsel < 0)
-		{
+			pvrta_regs[TA_NEXT_OPB] = pvrta_regs[TA_NEXT_OPB_INIT];
+			pvrta_regs[TA_ITP_CURRENT] = pvrta_regs[TA_ISP_BASE];
+			state_ta.alloc_ctrl_OPB_Mode = pvrta_regs[TA_ALLOC_CTRL] & 0x100000; // 0 up 1 down
+			state_ta.alloc_ctrl_PT_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 16) & 3)) & 0x38; // number of 32 bit words (0,8,16,32)
+			state_ta.alloc_ctrl_TM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 12) & 3)) & 0x38;
+			state_ta.alloc_ctrl_T_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 8) & 3)) & 0x38;
+			state_ta.alloc_ctrl_OM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 4) & 3)) & 0x38;
+			state_ta.alloc_ctrl_O_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 0) & 3)) & 0x38;
+			state_ta.listtype_used |= (1+4);
+			// use TA_ISP_BASE and select buffer for grab data
+			state_ta.grabsel = -1;
+			// try to find already used buffer but not busy
 			for (a=0;a < NUM_BUFFERS;a++)
 			{
-				if (state_ta.grab[a].valid == 0)
+				if ((state_ta.grab[a].ispbase == pvrta_regs[TA_ISP_BASE]) && (state_ta.grab[a].busy == 0) && (state_ta.grab[a].valid == 1))
 				{
 					state_ta.grabsel=a;
 					break;
 				}
 			}
-		}
-		// find a non busy buffer starting from the last one used
-		if (state_ta.grabsel < 0)
-		{
-			for (a=0;a < 3;a++)
+			// try a buffer not used yet
+			if (state_ta.grabsel < 0)
 			{
-				if (state_ta.grab[(state_ta.grabsellast+1+a) & 3].busy == 0)
+				for (a=0;a < NUM_BUFFERS;a++)
 				{
-					state_ta.grabsel=a;
-					break;
+					if (state_ta.grab[a].valid == 0)
+					{
+						state_ta.grabsel=a;
+						break;
+					}
 				}
 			}
-		}
-		if (state_ta.grabsel < 0)
-			assert_always(0, "TA grabber error B!\n");
-		state_ta.grabsellast=state_ta.grabsel;
-		state_ta.grab[state_ta.grabsel].ispbase=pvrta_regs[TA_ISP_BASE];
-		state_ta.grab[state_ta.grabsel].busy=0;
-		state_ta.grab[state_ta.grabsel].valid=1;
-		state_ta.grab[state_ta.grabsel].verts_size=0;
-		state_ta.grab[state_ta.grabsel].strips_size=0;
+			// find a non busy buffer starting from the last one used
+			if (state_ta.grabsel < 0)
+			{
+				for (a=0;a < 3;a++)
+				{
+					if (state_ta.grab[(state_ta.grabsellast+1+a) & 3].busy == 0)
+					{
+						state_ta.grabsel=a;
+						break;
+					}
+				}
+			}
+			if (state_ta.grabsel < 0)
+				assert_always(0, "TA grabber error B!\n");
+			state_ta.grabsellast=state_ta.grabsel;
+			state_ta.grab[state_ta.grabsel].ispbase=pvrta_regs[TA_ISP_BASE];
+			state_ta.grab[state_ta.grabsel].busy=0;
+			state_ta.grab[state_ta.grabsel].valid=1;
+			state_ta.grab[state_ta.grabsel].verts_size=0;
+			state_ta.grab[state_ta.grabsel].strips_size=0;
 
-		profiler_mark_end();
+			profiler_mark_end();
+		}
 		break;
 //#define TA_YUV_TEX_BASE       ((0x005f8148-0x005f8000)/4)
 	case TA_YUV_TEX_BASE:
