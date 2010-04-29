@@ -2669,6 +2669,7 @@ V-V                           TP-027
 	DRIVER( sf2ja )		/* 14/02/1991 (c) 1991 (Japan) */
 	DRIVER( sf2jc )		/* 06/03/1991 (c) 1991 (Japan) */
 	DRIVER( sf2qp1 )	/* hack */
+	DRIVER( sf2thndr )	/* hack */
 	DRIVER( 3wonders )	/* 20/05/1991 (c) 1991 (World) */
 	DRIVER( 3wondersu )	/* 20/05/1991 (c) 1991 (US)    */
 	DRIVER( wonder3 )	/* 20/05/1991 (c) 1991 (Japan) */

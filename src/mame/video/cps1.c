@@ -1234,6 +1234,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ja",    CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2jc",    CPS_B_12,     mapper_STF29,  0x36 },
 	{"sf2qp1",   CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2thndr", CPS_B_17,     mapper_STF29,  0x36 },
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
 	{"3wonders", CPS_B_21_BT1, mapper_RT24B },
 	{"3wondersu",CPS_B_21_BT1, mapper_RT24B },
