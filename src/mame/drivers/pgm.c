@@ -148,27 +148,34 @@ ASIC 3:
     function:
 
 ASIC 25 + ASIC 12 
-    these seem to be used together
-    ASIC 25 appears to perform some kind of bitswap operations
-    used by:
+    ASIC25 is a logic device (not MCU) which performs bitswap operations
+    ASIC12 is ... ? (rom overlays?)
+	
+	used by:
     Dragon World 2
 
 ASIC 25 + ASIC 22 
-    ASIC25 provides some bitswap / maths etc. features
-	ASIC22 acts as an encrypted DMA device (ASIC22 can be swapped between games with no side-effects, ASIC25 can't)
-    used by:
+    ASIC25 is a logic device (not MCU) which performs bitswap operations, and connects to the ASIC22.  It differs per region.
+	ASIC22 is an MCU and acts as an encrypted DMA device
+	
+	(ASIC22 can be swapped between games with no side-effects, ASIC25 can't)
+    
+	used by:
     Dragon World 3
     The Killing Blade
 
 ASIC 25 + ASIC 28
-    ASIC25 provides some bitswap / maths etc. features
+    ASIC25 (see above)
 	ASIC28 acts as an encrypted DMA device (updated version of ASIC22 with different encryption etc.)
+	
+	used by:
 	Oriental Legend Super
 
 ASIC 27 (55857E):
     performs a variety of calculations, quite complex, different per region, supplies region code
-    used by:
-    Knights of Valour 1 / Plus
+    
+	used by:
+    Knights of Valour 1 / (Plus?)
     Photo Y2k / Real and Fake
 
 ASIC 27A(55857F/55857G):
@@ -294,6 +301,7 @@ Notes:
 #include "includes/pgm.h"
 
 UINT16 *pgm_mainram;
+static void IGS022_reset(running_machine* machine);
 
 static WRITE16_HANDLER( pgm_videoram_w )
 {
@@ -1945,8 +1953,8 @@ ROM_START( drgw3 )
 	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
 	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
 
-	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data - is it correct for this set? */
-	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
+	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data - is it correct for this set? */
+	ROM_LOAD16_WORD_SWAP( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
 	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
@@ -1980,8 +1988,8 @@ ROM_START( drgw3105 )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data - is it correct for this set? */
-	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
+	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data - is it correct for this set? */
+	ROM_LOAD16_WORD_SWAP( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
 	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
@@ -2036,8 +2044,8 @@ ROM_START( drgw3100 )
 	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
 	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
 
-	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data */
-	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
+	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data */
+	ROM_LOAD16_WORD_SWAP( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
 	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
@@ -2551,7 +2559,7 @@ ROM_START( killbld )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data */
+	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data */
 	ROM_LOAD16_WORD_SWAP( "kb_u2.rom", 0x000000, 0x010000,  CRC(de3eae63) SHA1(03af767ef764055bda528b5cc6a24b9e1218cca8) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -2592,7 +2600,7 @@ ROM_START( killbld104 )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data */
+	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data */
 	ROM_LOAD16_WORD_SWAP( "kb_u2_v104.u2", 0x000000, 0x010000,  CRC(c970f6d5) SHA1(399fc6f80262784c566363c847dc3fdc4fb37494) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -2773,7 +2781,7 @@ ROM_START( olds )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x010000, "user1", 0 ) /* ASIC25? Protection Data */
+	ROM_REGION( 0x010000, "user1", 0 ) /* IGS028 Protection Data */
 	ROM_LOAD( "sp_v101.u6", 0x000000, 0x010000,  CRC(097046bc) SHA1(6d75db85cf4c79b63e837897785c253014b2126d) )
 
 	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
@@ -2824,7 +2832,7 @@ ROM_START( olds100 )
 	// used to simulate encrypted DMA protection device for now ..
 	ROM_LOAD( "ram_dump", 0x000000, 0x04000, CRC(280cfb4e) SHA1(cd2bdcaa21347952c2bf38b105a204d327fde39e) )
 
-	ROM_REGION( 0x010000, "user1", 0 ) /* ASIC25? Protection Data */
+	ROM_REGION( 0x010000, "user1", 0 ) /* IGS028 Protection Data */
 	ROM_LOAD( "kd-u6.512", 0x000000, 0x010000,  CRC(e7613dda) SHA1(0d7c043b90e2f9a36a45066f22e3e305dc716676) )
 
 	ROM_REGION( 0xc00000, "gfx1",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -2864,7 +2872,7 @@ ROM_START( olds100a )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x010000, "user1", ROMREGION_ERASEFF ) /* ASIC25? Protection Data */
+	ROM_REGION( 0x010000, "user1", ROMREGION_ERASEFF ) /* IGS028 Protection Data */
 	/* missing from this set .. */
 
 	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
@@ -4174,16 +4182,253 @@ static DRIVER_INIT( dmnfrnt )
 }
 
 
-/* Killing Blade uses some kind of DMA protection device which can copy data from a data rom.  The
-   MCU appears to have an internal ROM as if you remove the data ROM then the shared ram is filled
-   with a constant value.
-
-   The device can perform various decryption operations on the data it copies.
-
+/* The IGS022 is an MCU which performs encrypted DMA used by
+ - The Killing Blade
+ - Dragon World 3
+ 
+ There is also an automatic transfer which happens on startup using params stored in the data ROM.
+ This has been verified on real hardware running without any 68k game program.
+ 
 */
 
 
-static WRITE16_HANDLER( killbld_prot_w )
+static void IGS022_do_dma(running_machine* machine, UINT16 src, UINT16 dst, UINT16 size, UINT16 mode)
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	UINT16 param;
+	/*
+	P_SRC =0x300290 (offset from prot rom base)
+	P_DST =0x300292 (words from 0x300000)
+	P_SIZE=0x300294 (words)
+	P_MODE=0x300296
+
+	Mode 5 direct
+	Mode 6 swap nibbles and bytes
+
+	1,2,3 table based ops
+	*/
+
+	//mame_printf_debug("src %04x dst %04x size %04x mode %04x\n", src, dst, size, mode);
+
+	//if (src&1) mame_printf_debug("odd offset\n");
+
+	param = mode >> 8;
+	mode &=0xf;  // what are the other bits?
+
+
+	if ((mode == 0) || (mode == 1) || (mode == 2) || (mode == 3))
+	{
+		/* mode3 applies a xor from a 0x100 byte table to the data being
+		   transferred
+
+		   the table is stored at the start of the protection rom.
+
+		   the param used with the mode gives a start offset into the table
+
+		   odd offsets seem to change the table slightly (see rawDataOdd)
+
+	   */
+							
+		/*
+		unsigned char rawDataOdd[256] = {
+			0xB6, 0xA8, 0xB1, 0x5D, 0x2C, 0x5D, 0x4F, 0xC1,
+			0xCF, 0x39, 0x3A, 0xB7,	0x65, 0x85, 0xD9, 0xEE,
+			0xDB, 0x7B, 0x5F, 0x81, 0x03, 0x6D, 0xEB, 0x07,
+			0x0F, 0xB5, 0x61, 0x59, 0xCD, 0x60, 0x06, 0x21,
+			0xA0, 0x99, 0xDD, 0x27,	0x42, 0xD7, 0xC5, 0x5B,
+			0x3B, 0xC6, 0x4F, 0xA2, 0x20, 0xF6, 0x61, 0x61,
+			0x8C, 0x46, 0x8C, 0xCA, 0xE0, 0x0E, 0x2C, 0xE9,
+			0xBA, 0x0F, 0x45, 0x6D,	0x36, 0x1C, 0x18, 0x37,
+			0xE7, 0x85, 0x89, 0xA4, 0x94, 0x46, 0x30, 0x9B,
+			0xB2, 0xF4, 0x41, 0x55, 0xA5, 0x63, 0x1C, 0xEF,
+			0xB7, 0x18, 0xB3, 0xB1,	0xD4, 0x72, 0xA0, 0x1C,
+			0x0B, 0x97, 0x02, 0xB6, 0xC5, 0x1F, 0x1B, 0x94,
+			0xC3, 0x83, 0xAA, 0xAC, 0xD9, 0x44, 0x09, 0xD7,
+			0x6C, 0xDB, 0x07, 0xA9,	0xAD, 0x64, 0x83, 0xF1,
+			0x92, 0x09, 0xCD, 0x0E, 0x99, 0x2F, 0xBC, 0xF8,
+			0x3C, 0x63, 0x8F, 0x0A, 0x33, 0x03, 0x84, 0x91,
+			0x6C, 0xAC, 0x3A, 0x15,	0xCB, 0x67, 0xC7, 0x69,
+			0xA1, 0x92, 0x99, 0x74, 0xEE, 0x90, 0x0D, 0xBE,
+			0x57, 0x30, 0xD1, 0xBA, 0xE5, 0xDE, 0xFA, 0xD6,
+			0x83, 0x8C, 0xE4, 0x43,	0x36, 0x5E, 0xCD, 0x84,
+			0x1A, 0x18, 0x31, 0xB9, 0x20, 0x48, 0xE3, 0xA8,
+			0x89, 0x32, 0xF0, 0x90, 0x21, 0x80, 0x33, 0xAE,
+			0x3C, 0xA6, 0xB8, 0x8C,	0x72, 0x17, 0xD1, 0x0C,
+			0x1A, 0x29, 0xFA, 0x38, 0x87, 0xC9, 0x6E, 0xC7,
+			0x05, 0xDE, 0x85, 0x6E, 0x92, 0x7E, 0xD4, 0xED,
+			0x5C, 0xD3, 0x03, 0xD4,	0xFE, 0xCB, 0x6C, 0x19,
+			0x7A, 0x83, 0x79, 0x5B, 0xF6, 0x71, 0xBA, 0xF4,
+			0x37, 0x53, 0xC9, 0xC1, 0xDE, 0xDB, 0xDE, 0xB1,
+			0x64, 0x17, 0x31, 0x0E,	0xD7, 0xA2, 0x13, 0x8E,
+			0x52, 0x8D, 0xCB, 0x19, 0x3D, 0x0B, 0x31, 0x58,
+			0x4A, 0xDE, 0x0C, 0x01, 0x2B, 0x85, 0x2D, 0xE5,
+			0x13, 0x22, 0x48, 0xB6,	0xF3, 0x2D, 0x00, 0x9A
+		};
+		*/
+		int x;
+		UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
+
+		for (x = 0; x < size; x++)
+		{
+			//UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+			//UINT16 dat = RAMDUMP[dst + x];
+
+			UINT16 dat2 = PROTROM[src + x];
+
+			UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
+			UINT8* dectable = (UINT8*)memory_region(machine, "igs022data");//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
+			UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
+			
+			dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
+			
+			//  mode==0 plain
+			if (mode==3) dat2 ^= extraxor;						
+			if (mode==2) dat2 += extraxor;
+			if (mode==1) dat2 -= extraxor;
+			
+			//if (dat!=dat2)
+			//	printf("Mode %04x Param %04x Mismatch %04x %04x\n", mode, param, dat, dat2);
+
+			state->sharedprotram[dst + x] = dat2;
+		}
+
+		/* hack, patches out some additional security checks... we need to emulate them instead!
+		  they occur before it displays the disclaimer, so if you remove the overlay patches it will display
+		  the highscore table before coming up with this error... */
+		if ((mode==3) && (param==0x54) && (src*2==0x2120) && (dst*2==0x2600)) state->sharedprotram[0x2600 / 2] = 0x4e75;
+		
+	}
+	if (mode == 4)
+	{
+		mame_printf_debug("unhandled copy mode %04x!\n", mode);
+		// not used by killing blade
+		/* looks almost like a fixed value xor, but isn't */
+	}
+	else if (mode == 5)
+	{
+		/* mode 5 seems to be a straight copy */
+		int x;
+		UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
+		for (x = 0; x < size; x++)
+		{
+			UINT16 dat = PROTROM[src + x];
+
+
+			state->sharedprotram[dst + x] = dat;
+		}
+	}
+	else if (mode == 6)
+	{
+		/* mode 6 seems to swap bytes and nibbles */
+		int x;
+		UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
+		for (x = 0; x < size; x++)
+		{
+			UINT16 dat = PROTROM[src + x];
+
+			dat = ((dat & 0xf000) >> 12)|
+				  ((dat & 0x0f00) >> 4)|
+				  ((dat & 0x00f0) << 4)|
+				  ((dat & 0x000f) << 12);
+
+			state->sharedprotram[dst + x] = dat;
+		}
+	}
+	else if (mode == 7)
+	{
+		mame_printf_debug("unhandled copy mode %04x!\n", mode);
+		// not used by killing blade
+		/* weird mode, the params get left in memory? - maybe it's a NOP? */
+	}
+	else
+	{
+		mame_printf_debug("unhandled copy mode %04x!\n", mode);
+		// not used by killing blade
+		/* invalid? */
+
+	}
+}
+
+// the internal MCU boot code automatically does this DMA
+static void IGS022_reset(running_machine* machine)
+{
+	int i;
+	UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
+	// fill ram with A5 patern
+	for (i = 0; i < 0x4000/2; i++)
+		state->sharedprotram[i] = 0xa5a5;
+
+	// the auto-dma
+	UINT16 src = PROTROM[0x100 / 2];
+	UINT32 dst = PROTROM[0x102 / 2];
+	UINT16 size = PROTROM[0x104/ 2];
+	UINT16 mode = PROTROM[0x106 / 2];
+	
+	src = ((src & 0xff00) >> 8) | ((src & 0x00ff) << 8);
+	dst = ((dst & 0xff00) >> 8) | ((dst & 0x00ff) << 8);
+	size = ((size & 0xff00) >> 8) | ((size & 0x00ff) << 8);
+	mode &= 0xff;
+	
+	src >>= 1;
+	
+	printf("Auto-DMA %04x %04x %04x %04x\n",src,dst,size,mode);
+
+	IGS022_do_dma(machine,src,dst,size,mode);
+
+}
+
+static void IGS022_handle_command(running_machine* machine)
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	UINT16 cmd = state->sharedprotram[0x200/2];
+	//mame_printf_debug("command %04x\n", cmd);
+	if (cmd == 0x6d)	//Store values to asic ram
+	{
+		UINT32 p1 = (state->sharedprotram[0x298/2] << 16) | state->sharedprotram[0x29a/2];
+		UINT32 p2 = (state->sharedprotram[0x29c/2] << 16) | state->sharedprotram[0x29e/2];
+
+		if ((p2 & 0xffff) == 0x9)	//Set value
+		{
+			int reg = (p2 >> 16) & 0xffff;
+			if (reg & 0x200)
+				state->kb_regs[reg & 0xff] = p1;
+		}
+		if ((p2 & 0xffff) == 0x6)	//Add value
+		{
+			int src1 = (p1 >> 16) & 0xff;
+			int src2 = (p1 >> 0) & 0xff;
+			int dst = (p2 >> 16) & 0xff;
+			state->kb_regs[dst] = state->kb_regs[src2] - state->kb_regs[src1];
+		}
+		if ((p2 & 0xffff) == 0x1)	//Add Imm?
+		{
+			int reg = (p2 >> 16) & 0xff;
+			int imm = (p1 >> 0) & 0xffff;
+			state->kb_regs[reg] += imm;
+		}
+		if ((p2 & 0xffff) == 0xa)	//Get value
+		{
+			int reg = (p1 >> 16) & 0xFF;
+			state->sharedprotram[0x29c/2] = (state->kb_regs[reg] >> 16) & 0xffff;
+			state->sharedprotram[0x29e/2] = state->kb_regs[reg] & 0xffff;
+		}
+	}
+	if(cmd == 0x4f)	//memcpy with encryption / scrambling
+	{
+		UINT16 src = state->sharedprotram[0x290 / 2] >> 1; // ?
+		UINT32 dst = state->sharedprotram[0x292 / 2];
+		UINT16 size = state->sharedprotram[0x294 / 2];
+		UINT16 mode = state->sharedprotram[0x296 / 2];
+
+		IGS022_do_dma(machine, src,dst,size,mode);
+	}
+	
+}
+
+
+static WRITE16_HANDLER( killbld_igs025_prot_w )
 {
 //  mame_printf_debug("killbrd prot r\n");
 //  return 0;
@@ -4201,208 +4446,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 		{
 			if (data == 1)	//Execute cmd
 			{
-				UINT16 cmd = state->sharedprotram[0x200/2];
-				//mame_printf_debug("command %04x\n", cmd);
-				if (cmd == 0x6d)	//Store values to asic ram
-				{
-					UINT32 p1 = (state->sharedprotram[0x298/2] << 16) | state->sharedprotram[0x29a/2];
-					UINT32 p2 = (state->sharedprotram[0x29c/2] << 16) | state->sharedprotram[0x29e/2];
-
-					if ((p2 & 0xffff) == 0x9)	//Set value
-					{
-						int reg = (p2 >> 16) & 0xffff;
-						if (reg & 0x200)
-							state->kb_regs[reg & 0xff] = p1;
-					}
-					if ((p2 & 0xffff) == 0x6)	//Add value
-					{
-						int src1 = (p1 >> 16) & 0xff;
-						int src2 = (p1 >> 0) & 0xff;
-						int dst = (p2 >> 16) & 0xff;
-						state->kb_regs[dst] = state->kb_regs[src2] - state->kb_regs[src1];
-					}
-					if ((p2 & 0xffff) == 0x1)	//Add Imm?
-					{
-						int reg = (p2 >> 16) & 0xff;
-						int imm = (p1 >> 0) & 0xffff;
-						state->kb_regs[reg] += imm;
-					}
-					if ((p2 & 0xffff) == 0xa)	//Get value
-					{
-						int reg = (p1 >> 16) & 0xFF;
-						state->sharedprotram[0x29c/2] = (state->kb_regs[reg] >> 16) & 0xffff;
-						state->sharedprotram[0x29e/2] = state->kb_regs[reg] & 0xffff;
-					}
-				}
-				if(cmd == 0x4f)	//memcpy with encryption / scrambling
-				{
-					UINT16 src = state->sharedprotram[0x290 / 2] >> 1; // ?
-					UINT32 dst = state->sharedprotram[0x292 / 2];
-					UINT16 size = state->sharedprotram[0x294 / 2];
-					UINT16 mode = state->sharedprotram[0x296 / 2];
-
-					UINT16 param;
-					
-				//  int a=1;
-				//  if(src==0x580)
-				//      int a=1;
-					/*
-                    P_SRC =0x300290 (offset from prot rom base)
-                    P_DST =0x300292 (words from 0x300000)
-                    P_SIZE=0x300294 (words)
-                    P_MODE=0x300296
-
-                    Mode 5 direct
-                    Mode 6 swap nibbles and bytes
-
-                    1,2,3 table based ops
-                    */
-
-					//mame_printf_debug("src %04x dst %04x size %04x mode %04x\n", src, dst, size, mode);
-
-					//if (src&1) mame_printf_debug("odd offset\n");
-	
-					param = mode >> 8;
-					mode &=0xf;  // what are the other bits?
-
-					if (mode == 0)
-					{
-						mame_printf_debug("unhandled copy mode %04x!\n", mode);
-						// not used by killing blade
-						/* plain byteswapped copy */
-					}
-					if ((mode == 1) || (mode == 2) || (mode == 3))
-					{
-						/* mode3 applies a xor from a 0x100 byte table to the data being
-						   transferred
-
-						   the table is stored at the start of the protection rom.
-
-						   the param used with the mode gives a start offset into the table
-
-						   odd offsets seem to change the table slightly (see rawDataOdd)
-
-					   */
-						  					
-						/*
-						unsigned char rawDataOdd[256] = {
-							0xB6, 0xA8, 0xB1, 0x5D, 0x2C, 0x5D, 0x4F, 0xC1,
-							0xCF, 0x39, 0x3A, 0xB7,	0x65, 0x85, 0xD9, 0xEE,
-							0xDB, 0x7B, 0x5F, 0x81, 0x03, 0x6D, 0xEB, 0x07,
-							0x0F, 0xB5, 0x61, 0x59, 0xCD, 0x60, 0x06, 0x21,
-							0xA0, 0x99, 0xDD, 0x27,	0x42, 0xD7, 0xC5, 0x5B,
-							0x3B, 0xC6, 0x4F, 0xA2, 0x20, 0xF6, 0x61, 0x61,
-							0x8C, 0x46, 0x8C, 0xCA, 0xE0, 0x0E, 0x2C, 0xE9,
-							0xBA, 0x0F, 0x45, 0x6D,	0x36, 0x1C, 0x18, 0x37,
-							0xE7, 0x85, 0x89, 0xA4, 0x94, 0x46, 0x30, 0x9B,
-							0xB2, 0xF4, 0x41, 0x55, 0xA5, 0x63, 0x1C, 0xEF,
-							0xB7, 0x18, 0xB3, 0xB1,	0xD4, 0x72, 0xA0, 0x1C,
-							0x0B, 0x97, 0x02, 0xB6, 0xC5, 0x1F, 0x1B, 0x94,
-							0xC3, 0x83, 0xAA, 0xAC, 0xD9, 0x44, 0x09, 0xD7,
-							0x6C, 0xDB, 0x07, 0xA9,	0xAD, 0x64, 0x83, 0xF1,
-							0x92, 0x09, 0xCD, 0x0E, 0x99, 0x2F, 0xBC, 0xF8,
-							0x3C, 0x63, 0x8F, 0x0A, 0x33, 0x03, 0x84, 0x91,
-							0x6C, 0xAC, 0x3A, 0x15,	0xCB, 0x67, 0xC7, 0x69,
-							0xA1, 0x92, 0x99, 0x74, 0xEE, 0x90, 0x0D, 0xBE,
-							0x57, 0x30, 0xD1, 0xBA, 0xE5, 0xDE, 0xFA, 0xD6,
-							0x83, 0x8C, 0xE4, 0x43,	0x36, 0x5E, 0xCD, 0x84,
-							0x1A, 0x18, 0x31, 0xB9, 0x20, 0x48, 0xE3, 0xA8,
-							0x89, 0x32, 0xF0, 0x90, 0x21, 0x80, 0x33, 0xAE,
-							0x3C, 0xA6, 0xB8, 0x8C,	0x72, 0x17, 0xD1, 0x0C,
-							0x1A, 0x29, 0xFA, 0x38, 0x87, 0xC9, 0x6E, 0xC7,
-							0x05, 0xDE, 0x85, 0x6E, 0x92, 0x7E, 0xD4, 0xED,
-							0x5C, 0xD3, 0x03, 0xD4,	0xFE, 0xCB, 0x6C, 0x19,
-							0x7A, 0x83, 0x79, 0x5B, 0xF6, 0x71, 0xBA, 0xF4,
-							0x37, 0x53, 0xC9, 0xC1, 0xDE, 0xDB, 0xDE, 0xB1,
-							0x64, 0x17, 0x31, 0x0E,	0xD7, 0xA2, 0x13, 0x8E,
-							0x52, 0x8D, 0xCB, 0x19, 0x3D, 0x0B, 0x31, 0x58,
-							0x4A, 0xDE, 0x0C, 0x01, 0x2B, 0x85, 0x2D, 0xE5,
-							0x13, 0x22, 0x48, 0xB6,	0xF3, 0x2D, 0x00, 0x9A
-						};
-						*/
-						int x;
-						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
-
-						for (x = 0; x < size; x++)
-						{
-							//UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
-							//UINT16 dat = RAMDUMP[dst + x];
-
-							UINT16 dat2 = PROTROM[src + x];
-
-							UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
-							UINT8* dectable = (UINT8*)memory_region(space->machine, "user1");//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
-							UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
-							
-							dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
-							
-							if (mode==3) dat2 ^= extraxor;						
-							if (mode==2) dat2 += extraxor;
-							if (mode==1) dat2 -= extraxor;
-							
-							//if (dat!=dat2)
-							//	printf("Mode %04x Param %04x Mismatch %04x %04x\n", mode, param, dat, dat2);
-
-							state->sharedprotram[dst + x] = dat2;
-						}
-	
-						/* hack, patches out some additional security checks... we need to emulate them instead!
-						  they occur before it displays the disclaimer, so if you remove the overlay patches it will display
-						  the highscore table before coming up with this error... */
-						if ((mode==3) && (param==0x54) && (src*2==0x2120) && (dst*2==0x2600)) state->sharedprotram[0x2600 / 2] = 0x4e75;
-						
-					}
-					if (mode == 4)
-					{
-						mame_printf_debug("unhandled copy mode %04x!\n", mode);
-						// not used by killing blade
-						/* looks almost like a fixed value xor, but isn't */
-					}
-					else if (mode == 5)
-					{
-						/* mode 5 seems to be a straight copy */
-						int x;
-						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
-						for (x = 0; x < size; x++)
-						{
-							UINT16 dat = PROTROM[src + x];
-
-
-							state->sharedprotram[dst + x] = dat;
-						}
-					}
-					else if (mode == 6)
-					{
-						/* mode 6 seems to swap bytes and nibbles */
-						int x;
-						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
-						for (x = 0; x < size; x++)
-						{
-							UINT16 dat = PROTROM[src + x];
-
-							dat = ((dat & 0xf000) >> 12)|
-								  ((dat & 0x0f00) >> 4)|
-								  ((dat & 0x00f0) << 4)|
-								  ((dat & 0x000f) << 12);
-
-							state->sharedprotram[dst + x] = dat;
-						}
-					}
-					else if (mode == 7)
-					{
-						mame_printf_debug("unhandled copy mode %04x!\n", mode);
-						// not used by killing blade
-						/* weird mode, the params get left in memory? - maybe it's a NOP? */
-					}
-					else
-					{
-						mame_printf_debug("unhandled copy mode %04x!\n", mode);
-						// not used by killing blade
-						/* invalid? */
-
-					}
-
-				}
+				IGS022_handle_command(space->machine);
 				state->kb_reg++;
 			}
 		}
@@ -4413,7 +4457,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 	}
 }
 
-static READ16_HANDLER( killbld_prot_r )
+static READ16_HANDLER( killbld_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
@@ -4438,16 +4482,13 @@ static READ16_HANDLER( killbld_prot_r )
 	return res;
 }
 
+
+
 static MACHINE_RESET( killbld )
 {
-	pgm_state *state = (pgm_state *)machine->driver_data;
-	int i;
-
-	MACHINE_RESET_CALL(pgm);
-
-	/* fill the protection ram with a5 */
-	for (i = 0; i < 0x4000/2; i++)
-		state->sharedprotram[i] = 0xa5a5;
+	MACHINE_RESET_CALL(pgm);	
+	/* fill the protection ram with a5 + auto dma */	
+	IGS022_reset(machine);
 }
 
 
@@ -4461,7 +4502,7 @@ static DRIVER_INIT( killbld )
 	pgm_basic_init(machine);
 	pgm_killbld_decrypt(machine);
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_igs025_prot_r, killbld_igs025_prot_w);
 
 	state->kb_cmd = 0;
 	state->kb_reg = 0;
@@ -4476,14 +4517,11 @@ static DRIVER_INIT( killbld )
 
 static MACHINE_RESET( dw3 )
 {
-	//pgm_state *state = (pgm_state *)machine->driver_data;
-	//int i;
-
 	MACHINE_RESET_CALL(pgm);
-
-	/* fill the protection ram with a5 - not until the DMA device is emulated! */
-	//for (i = 0; i < 0x4000/2; i++)
-	//	state->sharedprotram[i] = 0xa5a5;
+	/* fill the protection ram with a5 + auto dma - causes issues at the moment due to broken igs025/22 emulation for this game! */
+	if (0)
+		IGS022_reset(machine);
+	
 }
 
 
@@ -4493,7 +4531,7 @@ static int ptr=0;
 
 #define DW3BITSWAP(s,d,bs,bd)  d=((d&(~(1<<bd)))|(((s>>bs)&1)<<bd))
 static UINT8 dw3_swap;
-static WRITE16_HANDLER( dw3_prot_w )
+static WRITE16_HANDLER( drgw3_igs025_prot_w )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
@@ -4519,7 +4557,7 @@ static WRITE16_HANDLER( dw3_prot_w )
 	}
 }
 
-static READ16_HANDLER( dw3_prot_r )
+static READ16_HANDLER( drgw3_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
@@ -4579,7 +4617,7 @@ static DRIVER_INIT( dw3 )
 			if((x>=0x100)&&(x<0x110)) printf("data 0x%4x, offset:%x\n",state->sharedprotram[x],x);
 		}
 	}
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xDA5610, 0xDA5613, 0, 0, dw3_prot_r, dw3_prot_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xDA5610, 0xDA5613, 0, 0, drgw3_igs025_prot_r, drgw3_igs025_prot_w);
 
 	pgm_dw3_decrypt(machine);
 }
@@ -4903,6 +4941,8 @@ GAME( 2001, puzzli2,      pgm,       kov,     sango,    puzzli2,    ROT0,   "IGS
 
 GAME( 2002, dmnfrnt,      pgm,       svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2002, dmnfrnta,     dmnfrnt,   svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+
+/* Games below this point are known to have an 'execute only' internal ROM area covering an area at the start of the internal ROM.  This can't be read when running code from either internal or external ROM space. */
 
 GAME( 2003, theglad,      pgm,       svg,     sango,    theglad,    ROT0,   "IGS", "The Gladiator (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2003, theglada,     theglad,   svg,     sango,    theglad,    ROT0,   "IGS", "The Gladiator (ver. 101)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
