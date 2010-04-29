@@ -828,6 +828,7 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_IMPORT_FROM( lwings )
 
 	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_12MHz/4)	/* verified by PCB */
 	MDRV_CPU_PROGRAM_MAP(trojan_map)
 
 	MDRV_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)	/* verified on pcb */
