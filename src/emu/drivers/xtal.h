@@ -142,6 +142,7 @@ enum
 	XTAL_27_2109MHz		= 27210900,		/* LA Girl */
 	XTAL_28MHz  		= 28000000,
 	XTAL_28_37516MHz	= 28375160,		/* Amiga PAL systems */
+	XTAL_28_48MHz  		= 28480000,		/* Chromatics CGC-7900 */
 	XTAL_28_63636MHz	= 28636360,		/* Later Leland games and Atari GT, Amiga NTSC , Raiden2 h/w */
 	XTAL_30MHz  		= 30000000,		/* Impera Magic Card */
 	XTAL_30_4761MHz 	= 30476100,		/* Taito JC */
