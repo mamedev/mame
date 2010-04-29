@@ -25,6 +25,16 @@ Technical Notes:
       It also provides the real time clock DS1287 to the CPU.
 
 
+	  27/04/10 - FrasheR
+	  2 x Sound Chips connected to the 6522 VIA.
+	  Notes
+	  The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
+	  The remaining 4 bits are connected to other hardware, read via the VIA.
+
+	  The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
+	  The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. I
+	  -- I have not coded these and such a warning will be received when data is written to port A and port B of AY2.
+
 ***********************************************************************************************************************************************/
 
 #define MAIN_CLOCK	XTAL_12MHz
@@ -40,6 +50,9 @@ Technical Notes:
 
 
 static UINT8 *mkiv_vram;
+static UINT8 psg_data;
+static int AY8910_1;
+static int AY8910_2;
 
 static VIDEO_START(aristmk4)
 {
@@ -243,24 +256,171 @@ VERSATILE INTERFACE ADAPTER CONFIGURATION
 
 static READ8_DEVICE_HANDLER(via_a_r)
 {
-    return 0;
+	int psg_ret=0;
+
+    	if (AY8910_1&0x03) // SW1 read.
+    		{
+			psg_ret = ay8910_r(devtag_get_device(device->machine, "ay1"), 0);
+			//logerror("PSG porta ay1 returned %02X\n",psg_ret);
+		}
+
+	else
+		if (AY8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
+			{
+				psg_ret = ay8910_r(devtag_get_device(device->machine, "ay2"), 0);
+				//logerror("PSG porta ay2 returned %02X\n",psg_ret);
+			};
+	return psg_ret;
+
 }
 
 static READ8_DEVICE_HANDLER(via_b_r)
 {
-    return 0;
+	// Not expecting to read anything from port B on the AY8910's ( controls BC1, BC2 and BDIR )
+	// However there are extra 4 bits not going to the AY8910's on the schematics, which get read in here.
+	// These haven't been implemented as yet as they're not fully understood.
+	/*   OPTA1  - Bit4  */
+	/*   OPTB2  - Bit5  */
+	/*   HOPCO1 - Bit6  */
+	/*   CBOPT1 - Bit7  */
+
+	return 0x00;
+
 }
 
 static WRITE8_DEVICE_HANDLER(via_a_w)
-{
+{   //via_b_w will handle sending the data to the ay8910, so just write the data for it to use later
+
+	//logerror("VIA port A write %02X\n",data);
+	psg_data = data;
 
 }
 
 static WRITE8_DEVICE_HANDLER(via_b_w)
 {
+	AY8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
+                                 //NOTE: when bit 4 is off, we write to AY1, when bit 4 is on, we write to AY2
+	AY8910_2 = AY8910_1;
+
+	if ( AY8910_2 & 0x08 ) // is bit 4 on ?
+		{
+			AY8910_2  = (AY8910_2 | 0x02) ; // bit 2 is turned on as bit 4 hooks to bit 2 in the schematics
+			AY8910_1  = 0x00; // write only to ay2
+		}
+	else
+		{
+			AY8910_2 = 0x00; // write only to ay1
+		};
+
+	//only need bc1/bc2 and bdir so drop bit 4.
+
+	AY8910_1 = (AY8910_1 & 0x07);
+	AY8910_2 = (AY8910_2 & 0x07);
+
+	//PSG ay1
+
+	switch(AY8910_1)
+	{
+
+		case 0x00:	//INACT -Nothing to do here. Inactive PSG
+			break;
+
+		case 0x03:  //READ - Nothing to do here. The read happens in via_a_r
+			break;
+
+		case 0x06:  //WRITE
+			{
+				ay8910_data_w( devtag_get_device(device->machine, "ay1"), 0 , psg_data );
+				//logerror("VIA Port A write data ay1: %02X\n",psg_data);
+				break;
+			}
+
+		case 0x07:  //LATCH Address (set register)
+			{
+				ay8910_address_w( devtag_get_device(device->machine, "ay1"), 0 , psg_data );
+				//logerror("VIA Port B write register ay1: %02X\n",psg_data);
+				break;
+			}
+
+		default:
+			//logerror("Unknown PSG state on ay1: %02X\n",AY8910_1);
+			break;
+	}
+
+	//PSG ay2
+
+	switch(AY8910_2)
+	{
+
+		case 0x00:	//INACT - Nothing to do here. Inactive PSG
+			break;
+
+		case 0x02:	//INACT - '010' Nothing to do here. Inactive PSG. this will only happen on ay2 due to the bit 2 swap on 'inactive'
+			break;
+
+		case 0x03:  //READ - Nothing to do here. The read happens in via_a_r
+			break;
+
+		case 0x06:  //WRITE
+			{
+				ay8910_data_w( devtag_get_device(device->machine, "ay2"), 0 , psg_data );
+				//logerror("VIA Port A write data ay2: %02X\n",psg_data);
+				break;
+			}
+
+		case 0x07:  //LATCH Address (set register)
+			{
+				ay8910_address_w( devtag_get_device(device->machine, "ay2"), 0 , psg_data );
+				//logerror("VIA Port B write register ay2: %02X\n",psg_data);
+				break;
+			}
+
+		default:
+			//logerror("Unknown PSG state on ay2: %02X\n",AY8910_2);
+			break;
+
+	}
 
 }
 
+static READ8_DEVICE_HANDLER(via_ca2_r)
+{
+    //logerror("Via Port CA2 read %02X\n",0) ;
+	// CA2 is connected to CDSOL1 on schematics ?
+
+	return 0 ;
+
+}
+
+static READ8_DEVICE_HANDLER(via_cb2_r)
+{
+    //logerror("Via Port CB2 read %02X\n",0) ;
+    // CB2 is connected to HOPMO1 on schematics ?
+
+	return 0 ;
+
+}
+
+
+static WRITE8_DEVICE_HANDLER(via_ca2_w)
+{
+    //logerror("Via Port CA2 write %02X\n",data) ;
+}
+
+
+static WRITE8_DEVICE_HANDLER(via_cb2_w)
+{
+    //logerror("Via Port CB2 write %02X\n",data) ;
+}
+
+
+static WRITE8_DEVICE_HANDLER(zn434_w)
+{
+
+	// Introducted to prevent warning in log for write to AY1 PORT B
+	// this is a write to the ZN434 DA convertors..
+
+}
 
 
 static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -364,40 +524,32 @@ static const ay8910_interface ay8910_config1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW1"),
+    DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_HANDLER(zn434_w) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
 };
-
 
 static const ay8910_interface ay8910_config2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_INPUT_PORT("DSW1"),
-    DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL, // Port A read
+	DEVCB_NULL, // Port B read
+	DEVCB_NULL, // Port A write - goes to lamps on the buttons x8
+	DEVCB_NULL  // Port B write - goes to lamps on the buttons x4 and light tower x4
 };
 
-/*
-static const via6522_interface via_interface =
-{
-    // DEVCB_HANDLER(via_a_in), DEVCB_HANDLER(via_b_in),
-    // DEVCB_HANDLER(input_ca1), DEVCB_HANDLER(input_cb1), DEVCB_HANDLER(input_ca2), DEVCB_HANDLER(input_cb2),
-    /// DEVCB_NULL, DEVCB_HANDLER(output_b),
-    // DEVCB_HANDLER(output_ca1), DEVCB_HANDLER(output_cb1), DEVCB_HANDLER(output_ca2), DEVCB_HANDLER(output_cb2),
-   //  DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
-}; */
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_HANDLER(via_a_w), DEVCB_HANDLER(via_b_w),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
+	/*inputs : A/B  	         */ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
+	/*inputs : CA/B1,CA/B2       */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_r),DEVCB_HANDLER(via_cb2_r),
+	/*outputs: A/B               */ DEVCB_HANDLER(via_a_w), DEVCB_HANDLER(via_b_w),
+	/*outputs: CA/B1,CA/B2       */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_w),DEVCB_HANDLER(via_cb2_w),
+	/*irq                        */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
+
+	// CA1 is connected to +5V, CB1 is not connected.
 };
 
 static const pia6821_interface aristmk4_pia1_intf =
@@ -492,10 +644,14 @@ static MACHINE_DRIVER_START( aristmk4 )
     MDRV_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)
 
     MDRV_SPEAKER_STANDARD_MONO("mono")
+
     // the Mark IV has X 2 AY8910 sound chips which are tied to the VIA
-    MDRV_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8)
+    MDRV_SOUND_ADD("ay1", AY8910 , MAIN_CLOCK/8)
+    MDRV_SOUND_CONFIG(ay8910_config1)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-    MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
+
+    MDRV_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
+    MDRV_SOUND_CONFIG(ay8910_config2)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 MACHINE_DRIVER_END
@@ -817,16 +973,16 @@ static DRIVER_INIT( aristmk4 )
 	//...
 }
 
-GAME( 1994, eforest,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, eforesta,eforest, aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 4VXFC818", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, eforestb,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 3VXFC5343 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1994, 3bagflnz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "3 Bags Full - 3VXFC5345 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, blkrhino,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Black Rhino - 3VXFC5344 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, kgbird,			0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 87.98%)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, kgbirda,kgbird,   aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 91.97%)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, swtht2nz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Sweet Hearts II - 1VXFC5461 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, goldenc,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Golden Canaries - 1VXFC5462", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, topgear,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Top Gear - 4VXFC969", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, wtigernz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "White Tiger - 3VXFC5342 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, phantomp,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Phantom Pays - 4VXFC5431 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, coralr2,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Coral Riches II - 1VXFC5472 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1994, eforest,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902", GAME_NOT_WORKING )
+GAME( 1995, eforesta,eforest, aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 4VXFC818", GAME_NOT_WORKING )
+GAME( 1996, eforestb,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 3VXFC5343 (New Zealand)", GAME_NOT_WORKING )
+GAME( 1994, 3bagflnz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "3 Bags Full - 3VXFC5345 (New Zealand)", GAME_NOT_WORKING )
+GAME( 1996, blkrhino,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Black Rhino - 3VXFC5344 (New Zealand)", GAME_NOT_WORKING )
+GAME( 1996, kgbird,			0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 87.98%)", GAME_NOT_WORKING )
+GAME( 1996, kgbirda,kgbird,   aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 91.97%)", GAME_NOT_WORKING )
+GAME( 1998, swtht2nz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Sweet Hearts II - 1VXFC5461 (New Zealand)", GAME_NOT_WORKING )
+GAME( 1996, goldenc,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Golden Canaries - 1VXFC5462", GAME_NOT_WORKING )
+GAME( 1996, topgear,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Top Gear - 4VXFC969", GAME_NOT_WORKING )
+GAME( 1996, wtigernz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "White Tiger - 3VXFC5342 (New Zealand)", GAME_NOT_WORKING )
+GAME( 1998, phantomp,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Phantom Pays - 4VXFC5431 (New Zealand)", GAME_NOT_WORKING )
+GAME( 2000, coralr2,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Coral Riches II - 1VXFC5472 (New Zealand)", GAME_NOT_WORKING )
