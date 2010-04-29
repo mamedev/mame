@@ -49,7 +49,25 @@ TODO:
     * If a command is still executing, /READY will be kept high until the command has
       finished if the next command is written.
     * tomcat has a 5220 which is not hooked up at all
-    * the ranout: target in parse_frame isn't very accurate to hardware
+
+Pedantic detail from observation of real chip:
+The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
+'idle' and not speaking, in this order:
+e[0 or f] p[0] k1[0] k2[0] k3[0] k4[0] k5[f] k6[f] k7[f] k8[7] k9[7] k10[7]
+
+Driver specific notes:
+
+    Looping has the tms5220 hookep up directly to the cpu. However currently the
+    tms9900 cpu core does not support a ready line.
+
+    Victory's initial audio selftest is pretty brutal to the FIFO: it sends a
+    sequence of bytes to the FIFO and checks the status bits after each one; if
+    even one bit is in the wrong state (i.e. speech starts one byte too early or
+    late), the test fails!
+    The sample in Victory 'Shields up!' after you activate shields, the 'up' part
+    of the sample is missing the STOP frame at the end of it; this causes the
+    speech core to run out of bits to parse from the FIFO, cutting the sample off
+    by one frame. This appears to be an original game code bug.
 
 Progress list for drivers using old vs new interface:
 starwars: uses new interface (couriersud)
@@ -64,16 +82,6 @@ victory(audio/exidy.c): uses new interface (couriersud)
 looping: uses old interface
 portraits: uses *NO* interface; the i/o cpu hasn't been hooked to anything!
 dotron and midwayfb(mcr.c): uses old interface
-
-Notes:
-    Looping has the tms5220 hookep up directly to the cpu. However currently the
-    tms9900 cpu core does not support a ready line.
-
-Pedantic detail from observation of real chip:
-The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
-'idle' and not speaking, in this order:
-e[0] p[0] k1[0] k2[0] k3[0] k4[0] k5[f] k6[f] k7[f] k8[7] k9[7] k10[7]
-
 
     Email from Lord Nightmare having a lot more detail follows:
 
@@ -250,9 +258,9 @@ struct _tms5220_state
         speaking_now is true.  Else, we can play nothing as well, which is a
         speed-up...
     */
-	UINT8 speaking_now;		/* Speak or Speak External command in progress */
-	UINT8 speak_external;	/* Speak External command in progress, writes go to FIFO. */
-	UINT8 talk_status;		/* TS status bit is 1, i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared when a STOP command has just been processed in the speech stream, and a new command is about to be processed. */
+	UINT8 speaking_now;		/* SPK is 1, i.e. Speak or Speak External command in progress */
+	UINT8 speak_external;	/* DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
+	UINT8 talk_status;		/* TS status bit is 1 i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared by 3 things: 1. when a STOP command has just been processed in the speech stream, and a new command is about to be processed; 2. if the fifo runs out in speak external mode; 3. on power-up/during a reset command; When it gets cleared, speaking_now and speak_external are also cleared, and an interrupt is generated. */
 	UINT8 buffer_low;		/* FIFO has less than 8 bytes in it */
 	UINT8 buffer_empty;		/* FIFO is empty*/
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
@@ -559,13 +567,15 @@ static void update_status_and_ints(tms5220_state *tms)
     mode, it is immediately unset here. */
 	if ((tms->speak_external == 1) && (tms->buffer_empty == 1))
 	{
-		/* generate an interrupt if necessary; if /TS was active and is now inactive, set int. */
-        if (tms->talk_status == 1)
-            set_interrupt_state(tms, 1);
-		tms->talk_status = 0;
+		/* generate an interrupt: /TS was active, and is now inactive. */
+		if (tms->talk_status == 1)
+		{
+			tms->talk_status = tms->speak_external = tms->speaking_now = 0;
+			set_interrupt_state(tms, 1);
+		}
 	}
 	/* Note that TS being unset will also generate an interrupt when a STOP
-    frame is encountered; this is handled in the sample generator code and not here */
+	frame is encountered; this is handled in the sample generator code and not here */
 }
 
 /**********************************************************************************************
@@ -764,8 +774,8 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #ifdef DEBUG_GENERATION
 				logerror("tms5220_process: processing frame: stop frame\n");
 #endif
-				tms->speaking_now = tms->talk_status = tms->speak_external = 0;
-				set_interrupt_state(tms, 1); // TS went inactive, so int is raised
+				tms->talk_status = tms->speak_external = tms->speaking_now = 0;
+				set_interrupt_state(tms, 1);
 				tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
 				update_status_and_ints(tms);
 				goto empty;
@@ -1196,25 +1206,14 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 
 static void parse_frame(tms5220_state *tms)
 {
-	int bits, indx, i, rep_flag;
+	int indx, i, rep_flag;
 
-	// todo: we actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
-	if (tms->speak_external)
-	{
-		/* count the total number of bits available */
-		bits = ((tms->fifo_count)*8)-tms->fifo_bits_taken;
-	}
-	else
-	{
-		/* we're talking out of a vsm rom, hence we have an effectively infinite number of bits which are pullable. extract_bits will toggle M0 for us and grab what bits are needed */
-		bits = 131072; // == arbitrary large number
-	}
+	// We actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
+
 	/* if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
     has a 2 bit rate preceeding it, grab two bits here and store them as the rate; */
 	if ((tms->variant == SUBTYPE_TMS5220C) && (tms->tms5220c_rate & 0x04))
 	{
-		bits -= 2;
-		if (bits < 0) goto ranout;
 		indx = extract_bits(tms, 2);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(indx,2);
@@ -1225,23 +1224,24 @@ static void parse_frame(tms5220_state *tms)
 	else // non-5220C and 5220C in fixed rate mode
 	tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
 
+	update_status_and_ints(tms);
+	if (!tms->talk_status) goto ranout;
+
 	/* attempt to extract the energy index */
-	bits -= tms->coeff->energy_bits;
-	if (bits < 0) goto ranout;
 	indx = extract_bits(tms,tms->coeff->energy_bits);
 	tms->new_frame_energy = tms->coeff->energytable[indx];
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(indx,tms->coeff->energy_bits);
 	fprintf(stderr," ");
 #endif
-
+	update_status_and_ints(tms);
+	if (!tms->talk_status) goto ranout;
 	/* if the energy index is 0 or 15, we're done */
 	if ((indx == 0) || (indx == 15))
 		return;
 
+
 	/* attempt to extract the repeat flag */
-	bits -= 1;
-	if (bits < 0) goto ranout;
 	rep_flag = extract_bits(tms,1);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(rep_flag, 1);
@@ -1249,52 +1249,51 @@ static void parse_frame(tms5220_state *tms)
 #endif
 
 	/* attempt to extract the pitch */
-	bits -= tms->coeff->pitch_bits;
-	if (bits < 0) goto ranout;
 	indx = extract_bits(tms,tms->coeff->pitch_bits);
 	tms->new_frame_pitch = tms->coeff->pitchtable[indx];
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(indx,tms->coeff->pitch_bits);
 	fprintf(stderr," ");
 #endif
-
+	update_status_and_ints(tms);
+	if (!tms->talk_status) goto ranout;
 	/* if this is a repeat frame, just copy the k's */
 	if (rep_flag)
 		return;
 
-	/* if the pitch index was zero, we need 4 k's */
-	if (indx == 0)
+	/* extract first 4 K coefficients */
+	for (i = 0; i < 4; i++)
 	{
-		/* attempt to extract 4 K's */
-		bits -= 18;
-		if (bits < 0) goto ranout;
-		for (i = 0; i < 4; i++)
-		{
-			indx = extract_bits(tms,tms->coeff->kbits[i]);
+		indx = extract_bits(tms,tms->coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
-			printbits(indx,tms->coeff->kbits[i]);
-			fprintf(stderr," ");
+		printbits(indx,tms->coeff->kbits[i]);
+		fprintf(stderr," ");
 #endif
-			tms->new_frame_k[i] = tms->coeff->ktable[i][indx];
-		}
-	/* and clear the rest of the new_frame_k[] */
+		tms->new_frame_k[i] = tms->coeff->ktable[i][indx];
+		update_status_and_ints(tms);
+		if (!tms->talk_status) goto ranout;
+	}
+
+	/* if the pitch index was zero, we only need 4 K's... */
+	if (tms->new_frame_pitch == 0)
+	{
+		/* and the rest of the coefficients are zeroed */
 		for (i = 4; i < tms->coeff->num_k; i++)
 			tms->new_frame_k[i] = 0;
 		return;
 	}
 
-	/* else we need 10 K's */
-	bits -= 39;
-	if (bits < 0) goto ranout;
-	for (i = 0; i < tms->coeff->num_k; i++)
+	/* If we got here, we need the remaining 6 K's */
+	for (i = 4; i < tms->coeff->num_k; i++)
 	{
-		int x;
-		x = extract_bits(tms, tms->coeff->kbits[i]);
+		indx = extract_bits(tms, tms->coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
-		printbits(x,tms->coeff->kbits[i]);
+		printbits(indx,tms->coeff->kbits[i]);
 		fprintf(stderr," ");
 #endif
-		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
+		tms->new_frame_k[i] = tms->coeff->ktable[i][indx];
+		update_status_and_ints(tms);
+		if (!tms->talk_status) goto ranout;
 	}
 #ifdef VERBOSE
 	if (tms->speak_external)
@@ -1308,16 +1307,7 @@ static void parse_frame(tms5220_state *tms)
 #ifdef DEBUG_FRAME_ERRORS
     logerror("Ran out of bits on a parse!\n");
 #endif
-	if (tms->speak_external != 1)
-		fatalerror("reached ranout when not in speak_external mode! should never happen! contact MAMEDEV!");
-    /* this is an error condition; mark the buffer empty and turn off speaking */
-	// TODO: stuff here needs to be made more accurate to hardware.
-	tms->new_frame_energy = COEFF_ENERGY_SENTINEL; // technically this isn't right, but should work.
-    tms->fifo_count = tms->fifo_head = tms->fifo_tail = 0; // remove any leftover bits in the fifo. In reality the pull should happen with any missing bits ending up as zeroes and a buffer empty speech halt occurring immediately afterward.
-	update_status_and_ints(tms);
-	tms->speaking_now = tms->speak_external = 0; // just in case. should fix glitches in jackrabt
-    return;
-
+	return;
 }
 
 /**********************************************************************************************
