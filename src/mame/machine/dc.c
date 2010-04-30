@@ -1378,6 +1378,13 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				wave_dma_execute(space);
 			break;
 
+		case SB_E1ST:
+		case SB_E2ST:
+		case SB_DDST:
+			if(dat & 1)
+				printf("Warning: enabled G2 Debug / External DMA %02x (reg=%08x)\n",reg);
+			break;
+
 		case SB_ADSUSP:
 		case SB_E1SUSP:
 		case SB_E2SUSP:
@@ -1504,6 +1511,7 @@ READ64_HANDLER( dc_rtc_r )
 
 	reg = decode_reg3216_64(space->machine, offset, mem_mask, &shift);
 	mame_printf_verbose("RTC:  Unmapped read %08x\n", 0x710000+reg*4);
+
 	return (UINT64)dc_rtcregister[reg] << shift;
 }
 
