@@ -1,6 +1,6 @@
 /*******************************************************************************************
 
-Fever Soccer (c) 2000 Seibu
+Fever Soccer (c) 2004 Seibu
 
 A down-grade of the Seibu SPI Hardware with SH-2 as main cpu.
 
@@ -16,7 +16,7 @@ Fever Soccer (JAMMA based Gambling Game)
 
 Seibu Kaihatsu Inc.
 
-PCB (c) 2000 SYS_SH2B + SYS_SH2B Rom Board
+PCB (c) 2004 SYS_SH2B + SYS_SH2B Rom Board
 
 Very simple PCB contains:
 
