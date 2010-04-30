@@ -1382,7 +1382,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 		case SB_E2ST:
 		case SB_DDST:
 			if(dat & 1)
-				printf("Warning: enabled G2 Debug / External DMA %02x (reg=%08x)\n",reg);
+				printf("Warning: enabled G2 Debug / External DMA %08x\n",reg);
 			break;
 
 		case SB_ADSUSP:

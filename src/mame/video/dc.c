@@ -1271,6 +1271,7 @@ WRITE64_HANDLER( pvr_ta_w )
 			visarea.min_y = 0;
 			visarea.max_y = ((spg_vbstart - spg_vbend - vo_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
 
+
 			video_screen_configure(space->machine->primary_screen, spg_hbstart, spg_vbstart, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds );
 		}
 		break;
@@ -1281,10 +1282,39 @@ WRITE64_HANDLER( pvr_ta_w )
 		mame_printf_verbose("PVRTA: [%08x=%x] write %" I64FMT "x to %x (reg %x %x), mask %" I64FMT "x\n", 0x5f8000+reg*4, dat, data>>shift, offset, reg, (reg*4)+0x8000, mem_mask);
 	#endif
 }
+
+static TIMER_CALLBACK( transfer_opaque_list_irq )
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
+	dc_update_interrupt_status(machine);
+}
+
+static TIMER_CALLBACK( transfer_opaque_modifier_volume_list_irq )
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
+	dc_update_interrupt_status(machine);
+}
+
+static TIMER_CALLBACK( transfer_translucent_list_irq )
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
+	dc_update_interrupt_status(machine);
+}
+
+static TIMER_CALLBACK( transfer_translucent_modifier_volume_list_irq )
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
+	dc_update_interrupt_status(machine);
+}
+
+static TIMER_CALLBACK( transfer_punch_through_list_irq )
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= (1 << 21);
+	dc_update_interrupt_status(machine);
+}
+
 static void process_ta_fifo(running_machine* machine)
 {
-	UINT32 a;
-
 	/* first byte in the buffer is the Parameter Control Word
 
      pppp pppp gggg gggg oooo oooo oooo oooo
@@ -1365,28 +1395,16 @@ static void process_ta_fifo(running_machine* machine)
 		#if DEBUG_PVRDLIST
 		mame_printf_verbose("Para Type 0 End of List\n");
 		#endif
-		a=0; // 6-10 0-3
+		/* Process transfer FIFO done irqs here */
+		/* FIXME: timing of these */
 		switch (state_ta.tafifo_listtype)
 		{
-		case 0:
-			a = 1 << 7;
-			break;
-		case 1:
-			a = 1 << 8;
-			break;
-		case 2:
-			a = 1 << 9;
-			break;
-		case 3:
-			a = 1 << 10;
-			break;
-		case 4:
-			a = 1 << 21;
-			break;
+		case 0: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_opaque_list_irq); break;
+		case 1: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_opaque_modifier_volume_list_irq); break;
+		case 2: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_translucent_list_irq); break;
+		case 3: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_translucent_modifier_volume_list_irq); break;
+		case 4: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_punch_through_list_irq); break;
 		}
-
-		dc_sysctrl_regs[SB_ISTNRM] |= a;
-		dc_update_interrupt_status(machine);
 		state_ta.tafifo_listtype= -1; // no list being received
 		state_ta.listtype_used |= (2+8);
 	}
@@ -2422,11 +2440,7 @@ static void pvr_build_parameterconfig(void)
 
 static TIMER_CALLBACK(vbout)
 {
-	UINT32 a;
-	//printf("vbout\n");
-
-	a=dc_sysctrl_regs[SB_ISTNRM] | IST_VBL_OUT;
-	dc_sysctrl_regs[SB_ISTNRM] = a; // V Blank-out interrupt
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
 	dc_update_interrupt_status(machine);
 
 	scanline = 0;
