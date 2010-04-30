@@ -15,7 +15,7 @@ static int vblc=0;
 #define DEBUG_FIFO_POLY (0)
 #define DEBUG_PVRTA	(0)
 #define DEBUG_PVRTA_REGS (0)
-#define DEBUG_PVRDLIST	(1)
+#define DEBUG_PVRDLIST	(0)
 #define DEBUG_PALRAM (1)
 
 #define NUM_BUFFERS 4
@@ -1245,9 +1245,12 @@ WRITE64_HANDLER( pvr_ta_w )
 		printf("TA_YUV_TEX_BASE initialized to %08x\n", dat);
 
 		// hack, this interrupt is generated after transfering a set amount of data
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
-		dc_update_interrupt_status(space->machine);
+		//dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
+		//dc_update_interrupt_status(space->machine);
 
+		break;
+	case TA_YUV_TEX_CTRL:
+		printf("TA_YUV_TEX_CTRL initialized to %08x\n", dat);
 		break;
 
 
@@ -1639,7 +1642,7 @@ WRITE64_HANDLER( ta_fifo_yuv_w )
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
-	mame_printf_verbose("YUV FIFO: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x10800000+reg*4, dat, data, offset, mem_mask);
+//	printf("YUV FIFO: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x %08x\n", 0x10800000+reg*4, dat, data, offset, mem_mask,test);
 }
 
 /* test video start */

@@ -220,6 +220,13 @@ static TIMER_CALLBACK( ch2_dma_irq )
 	dc_sysctrl_regs[SB_C2DLEN]=0;
 	dc_sysctrl_regs[SB_C2DST]=0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
+	dc_update_interrupt_status(machine);
+}
+
+static TIMER_CALLBACK( yuv_fifo_irq )
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
+	dc_update_interrupt_status(machine);
 }
 
 static void wave_dma_execute(const address_space *space)
@@ -669,7 +676,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 					else
 						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
 				else if ((address >= 0x10800000) && (address <= 0x10ffffff))
-					mame_printf_verbose("SYSCTRL: Ch2 YUV dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+					printf("SYSCTRL: Ch2 YUV dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
 				else if ((address >= 0x10000000) && (address <= 0x107fffff))
 					mame_printf_verbose("SYSCTRL: Ch2 TA Display List dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
 				else
@@ -682,35 +689,38 @@ WRITE64_HANDLER( dc_sysctrl_w )
 					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				timer_set(space->machine, ATTOTIME_IN_USEC(200), NULL, 0, ch2_dma_irq);
+				/* simulate YUV FIFO processing here */
+				if((address & 0x1800000) == 0x0800000)
+					timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL, 0, yuv_fifo_irq);
 			}
 			break;
 
 		case SB_ISTNRM:
 			dc_sysctrl_regs[SB_ISTNRM] = old & ~(dat | 0xC0000000); // bits 31,30 ro
+			dc_update_interrupt_status(space->machine);
 			break;
 
 		case SB_ISTEXT:
 			dc_sysctrl_regs[SB_ISTEXT] = old;
+			dc_update_interrupt_status(space->machine);
 			break;
 
 		case SB_ISTERR:
 			dc_sysctrl_regs[SB_ISTERR] = old & ~dat;
+			dc_update_interrupt_status(space->machine);
 			break;
 		case SB_SDST:
-			//#if DEBUG_SYSCTRL
-			//mame_printf_verbose("SYSCTRL: Sort-DMA not supported yet !!!\n");
-			//#endif
 			if(dat & 1)
 			{
 				// TODO: Sort-DMA routine goes here
 				printf("Sort-DMA irq\n");
 
-				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_SORT;
 				dc_sysctrl_regs[SB_SDST] = 0;
+				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_SORT;
+				dc_update_interrupt_status(space->machine);
 			}
 			break;
 	}
-	dc_update_interrupt_status(space->machine);
 
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x42) && (reg > 2))	// filter out IRQ acks and ch2 dma
