@@ -94,7 +94,7 @@ INLINE vr0video_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == VRENDER0_VIDEO);
+	assert(device->type == VIDEO_VRENDER0);
 	
 	return (vr0video_state *)device->token;
 }
@@ -102,7 +102,7 @@ INLINE vr0video_state *get_safe_token( running_device *device )
 INLINE const vr0video_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == VRENDER0_VIDEO);
+	assert(device->type == VIDEO_VRENDER0);
 	return (const vr0video_interface *) device->baseconfig().static_config;
 }
 
