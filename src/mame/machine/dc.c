@@ -215,6 +215,13 @@ static TIMER_CALLBACK( maple_dma_irq )
 	dc_update_interrupt_status(machine);
 }
 
+static TIMER_CALLBACK( ch2_dma_irq )
+{
+	dc_sysctrl_regs[SB_C2DLEN]=0;
+	dc_sysctrl_regs[SB_C2DST]=0;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
+}
+
 static void wave_dma_execute(const address_space *space)
 {
 	UINT32 src,dst,size;
@@ -633,48 +640,49 @@ WRITE64_HANDLER( dc_sysctrl_w )
 	switch (reg)
 	{
 		case SB_C2DST:
-			address=dc_sysctrl_regs[SB_C2DSTAT];
-			ddtdata.destination=address;
-			/* 0 rounding size = 16 Mbytes */
-			if(dc_sysctrl_regs[SB_C2DLEN] == 0)
-				ddtdata.length = 0x1000000;
-			else
-				ddtdata.length = dc_sysctrl_regs[SB_C2DLEN];
-			ddtdata.size=1;
-			ddtdata.direction=0;
-			ddtdata.channel=2;
-			ddtdata.mode=25; //011001
-			sh4_dma_ddt(devtag_get_device(space->machine, "maincpu"),&ddtdata);
-			#if DEBUG_SYSCTRL
-			if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
-				if (dc_sysctrl_regs[SB_LMMODE0])
-					printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
-				else
-					mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
-			else if ((address >= 0x13000000) && (address <= 0x13FFFFFF))
-				if (dc_sysctrl_regs[SB_LMMODE1])
-					printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
-				else
-					mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
-			else if ((address >= 0x10800000) && (address <= 0x10ffffff))
-				mame_printf_verbose("SYSCTRL: Ch2 YUV dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
-			else if ((address >= 0x10000000) && (address <= 0x107fffff))
-				mame_printf_verbose("SYSCTRL: Ch2 TA Display List dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
-			else
-				mame_printf_verbose("SYSCTRL: Ch2 unknown dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
-			#endif
-			if ((address >= 0x10000000) && (address <= 0x10ffffff))
+			if(((old & 1) == 0) && (dat & 1)) // 0 -> 1
 			{
-				dc_sysctrl_regs[SB_C2DSTAT]=address;
-			}
-			else
-			{
-				dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
-			}
+				address=(dc_sysctrl_regs[SB_C2DSTAT] & 0x03ffffe0) | 0x10000000;
+				if(dc_sysctrl_regs[SB_C2DSTAT] & 0x1f)
+					printf("C2DSTAT just used to reserved bits %02x\n",dc_sysctrl_regs[SB_C2DSTAT] & 0x1f);
 
-			dc_sysctrl_regs[SB_C2DLEN]=0;
-			dc_sysctrl_regs[SB_C2DST]=0;
-			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
+				ddtdata.destination=address;
+				/* 0 rounding size = 16 Mbytes */
+				if(dc_sysctrl_regs[SB_C2DLEN] == 0)
+					ddtdata.length = 0x1000000;
+				else
+					ddtdata.length = dc_sysctrl_regs[SB_C2DLEN];
+				ddtdata.size=1;
+				ddtdata.direction=0;
+				ddtdata.channel=2;
+				ddtdata.mode=25; //011001
+				sh4_dma_ddt(devtag_get_device(space->machine, "maincpu"),&ddtdata);
+				#if DEBUG_SYSCTRL
+				if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
+					if (dc_sysctrl_regs[SB_LMMODE0])
+						printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
+					else
+						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
+				else if ((address >= 0x13000000) && (address <= 0x13FFFFFF))
+					if (dc_sysctrl_regs[SB_LMMODE1])
+						printf("SYSCTRL: Ch2 direct display lists dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 1
+					else
+						mame_printf_verbose("SYSCTRL: Ch2 direct textures dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]); // 0
+				else if ((address >= 0x10800000) && (address <= 0x10ffffff))
+					mame_printf_verbose("SYSCTRL: Ch2 YUV dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+				else if ((address >= 0x10000000) && (address <= 0x107fffff))
+					mame_printf_verbose("SYSCTRL: Ch2 TA Display List dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+				else
+					mame_printf_verbose("SYSCTRL: Ch2 unknown dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
+				#endif
+
+				if ((!(address & 0x01000000)))
+					dc_sysctrl_regs[SB_C2DSTAT]=address;
+				else //direct texture path
+					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
+
+				timer_set(space->machine, ATTOTIME_IN_USEC(200), NULL, 0, ch2_dma_irq);
+			}
 			break;
 
 		case SB_ISTNRM:
