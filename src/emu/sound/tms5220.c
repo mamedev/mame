@@ -49,6 +49,7 @@ TODO:
     * If a command is still executing, /READY will be kept high until the command has
       finished if the next command is written.
     * tomcat has a 5220 which is not hooked up at all
+	* documentation is inconsistent in the patents about what data is returned for chirp rom addresses (base 0) 41 to 51; the patent says the 'rom returns zeroes for locations beyond 40', but at the same time the rom stores the complement of the actual chirp rom value, so are locations beyond 40 = 0x00(0) or = 0xFF(-1)? The latter seems more likely to me, and that is how it is currently implemented. (LN).
 
 Pedantic detail from observation of real chip:
 The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
@@ -212,6 +213,8 @@ device), PES Speech adapter (serial port connection)
 // above spams the errorlog with i/o ready messages whenever the ready or irq pin is read
 #undef DEBUG_GENERATION
 // above dumps some debug information related to the sample generation loop, i.e. when ramp frames happen
+#undef DEBUG_CLIP_WRAP
+// above dumps info to stderr whenever the clip/wrap hardware is (or would be) clipping the signal.
 #undef DEBUG_IO_READY
 // above debugs the io ready callback
 #undef DEBUG_RS_WS
@@ -251,29 +254,21 @@ struct _tms5220_state
 
 
 	/* these contain global status bits */
-	/*
-        R Nabet : speak_external is only set when a speak external command is going on.
-        speaking_now is set whenever a speak or speak external command is going on.
-        Note that we really need to do anything in tms5220_process and play samples only when
-        speaking_now is true.  Else, we can play nothing as well, which is a
-        speed-up...
-    */
-	UINT8 speaking_now;		/* SPK is 1, i.e. Speak or Speak External command in progress */
+	UINT8 speaking_now;		/* True only if actual speech is being generated right now. Is set when a speak vsm command happens OR when speak external happens and buffer low becomes nontrue; Is cleared when speech halts after the last stop frame or the last frame after talk status is otherwise cleared.*/
 	UINT8 speak_external;	/* DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
-	UINT8 talk_status;		/* TS status bit is 1 i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared by 3 things: 1. when a STOP command has just been processed in the speech stream, and a new command is about to be processed; 2. if the fifo runs out in speak external mode; 3. on power-up/during a reset command; When it gets cleared, speaking_now and speak_external are also cleared, and an interrupt is generated. */
+	UINT8 talk_status;		/* TS status bit is 1 i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared by 3 things: 1. when a STOP command has just been processed as a new frame in the speech stream; 2. if the fifo runs out in speak external mode; 3. on power-up/during a reset command; When it gets cleared, speak_external is also cleared, an interrupt is generated, and speaking_now will be cleared when the next frame starts. */
 	UINT8 buffer_low;		/* FIFO has less than 8 bytes in it */
 	UINT8 buffer_empty;		/* FIFO is empty*/
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
-#define OLD_FRAME_STOP_FLAG (tms->old_frame_energy == COEFF_ENERGY_SENTINEL) // 1 if this was a stop (E = 0xF) frame
 #define OLD_FRAME_SILENCE_FLAG (tms->old_frame_energy == 0) // 1 if this was a silence (E=0) frame
 #define OLD_FRAME_UNVOICED_FLAG (tms->old_frame_pitch == 0) // 1 if unvoiced, 0 if voiced
 	UINT16 old_frame_energy;
 	UINT16 old_frame_pitch;
 	INT32 old_frame_k[10];
 
-#define NEW_FRAME_STOP_FLAG (tms->new_frame_energy == COEFF_ENERGY_SENTINEL)  // ditto as above
+#define NEW_FRAME_STOP_FLAG (tms->new_frame_energy == COEFF_ENERGY_SENTINEL) // 1 if this is a stop (Energy = 0xF) frame
 #define NEW_FRAME_SILENCE_FLAG (tms->new_frame_energy == 0) // ditto as above
 #define NEW_FRAME_UNVOICED_FLAG (tms->new_frame_pitch == 0) // ditto as above
 	UINT16 new_frame_energy;
@@ -470,7 +465,7 @@ static void printbits(long data, int num)
 			fprintf(stderr,"%03lx", data);
 			break;
 		case 12:
-			fprintf(stderr,"%03lx", data);
+			fprintf(stderr,"%04lx", data);
 			break;
 		default:
 			fprintf(stderr,"%04lx", data);
@@ -510,7 +505,7 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 				tms->new_frame_pitch = 0;
 				for (i = 0; i < tms->coeff->num_k; i++)
 					tms->new_frame_k[i] = 0;
-				tms->talk_status = 1;
+				tms->talk_status = tms->speaking_now = 1;
 			}
 		}
 		else
@@ -570,7 +565,7 @@ static void update_status_and_ints(tms5220_state *tms)
 		/* generate an interrupt: /TS was active, and is now inactive. */
 		if (tms->talk_status == 1)
 		{
-			tms->talk_status = tms->speak_external = tms->speaking_now = 0;
+			tms->talk_status = tms->speak_external = 0;
 			set_interrupt_state(tms, 1);
 		}
 	}
@@ -751,16 +746,18 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
     /* if speak external is set, but talk status is not (yet) set,
     wait for buffer low to clear */
-	if (!tms->talk_status && tms->speak_external && tms->buffer_low == 1)
+	if (!tms->talk_status && tms->speak_external && (tms->buffer_low == 1))
            goto empty;
 
     /* loop until the buffer is full or we've stopped speaking */
-	while ((size > 0) && tms->talk_status)
+	while ((size > 0) && tms->speaking_now)
     {
 
         /* if we're ready for a new frame */
         if ((tms->interp_count == 0) && (tms->sample_count == 0))
         {
+			/* appropriately override the initial sample count */
+			tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
 
 			/* remember previous frame energy, pitch, and coefficients */
 			tms->old_frame_energy = tms->new_frame_energy;
@@ -768,16 +765,13 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			for (i = 0; i < tms->coeff->num_k; i++)
 				tms->old_frame_k[i] = tms->new_frame_k[i];
 
-			/* if the old frame was a stop frame, exit and do not process any more frames */
-			if (OLD_FRAME_STOP_FLAG)
+			/* if the talk status was clear last frame, halt speech now. */
+			if (tms->talk_status == 0)
 			{
 #ifdef DEBUG_GENERATION
-				logerror("tms5220_process: processing frame: stop frame\n");
+				logerror("tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
 #endif
-				tms->talk_status = tms->speak_external = tms->speaking_now = 0;
-				set_interrupt_state(tms, 1);
-				tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
-				update_status_and_ints(tms);
+				tms->speaking_now = 0; // finally halt speech
 				goto empty;
 			}
 
@@ -820,9 +814,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				for (i = 0; i < tms->coeff->num_k; i++)
 					tms->target_k[i] = tms->current_k[i];
 			}
-			/* in cases where the new frame is a STOP or SILENCE frame,
+			/* in cases where the new frame is a STOP or SILENCE frame, or if TS is now 0,
                ramp the energy down to 0, leaving everything else alone. */
-			else if ((NEW_FRAME_SILENCE_FLAG == 1) || (NEW_FRAME_STOP_FLAG == 1))
+			else if ((NEW_FRAME_SILENCE_FLAG == 1) || (NEW_FRAME_STOP_FLAG == 1) || (tms->talk_status == 0))
 			{
 #ifdef DEBUG_GENERATION
 				logerror("processing frame: ramp-down (energy = 0 or STOP)\n");
@@ -831,6 +825,12 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				tms->target_pitch = tms->current_pitch;
 				for (i = 0; i < tms->coeff->num_k; i++)
 					tms->target_k[i] = tms->current_k[i];
+				if (NEW_FRAME_STOP_FLAG == 1)
+				{
+					tms->talk_status = tms->speak_external = 0;
+					set_interrupt_state(tms, 1);
+					update_status_and_ints(tms);
+				}
 			}
 			else // normal frame, normal interpolation
 			{
@@ -927,7 +927,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			/* generate unvoiced samples here */
 #ifdef NORMALMODE
 			if (tms->RNG & 1)
-				tms->excitation_data = -0x40; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so +-64 */
+				tms->excitation_data = ~0x3F; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so either 01000000(0x40) or 11000000(0xC0)*/
 			else
 				tms->excitation_data = 0x40;
 #else
@@ -942,24 +942,15 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             /* generate voiced samples here */
             /* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
              * function has a chirp/peak and then a long chain of zeroes.
-             * The last entry of the chirp rom is at address 0b110011 (50d), the 51st sample,
+             * The last entry of the chirp rom is at address 0b110011 (51d), the 52nd sample,
              * and if the address reaches that point the ADDRESS incrementer is
-             * disabled, forcing all samples beyond 50d to be == 50d
-             * (address 50d holds zeroes)
+             * disabled, forcing all samples beyond 51d to be == 51d
+             * (address 51d holds zeroes, which may or may not be inverted to -1)
              */
-#ifdef NORMALMODE
-          if (tms->pitch_count > 50)
-              tms->excitation_data = tms->coeff->chirptable[50]<<CHIRPROM_LEFTSHIFT;
-          else /*tms->pitch_count <= 50*/
+          if (tms->pitch_count >= 51)
+              tms->excitation_data = tms->coeff->chirptable[51]<<CHIRPROM_LEFTSHIFT;
+          else /*tms->pitch_count < 51*/
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]<<CHIRPROM_LEFTSHIFT;
-#else
-          if (tms->pitch_count > 40)
-              tms->excitation_data = ~0x7F; // tms->coeff->chirptable[51];
-          else /*tms->pitch_count <= 40*/
-              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
-			 //tms->excitation_data = tms->pitch_count - 64;
-			 
-#endif
         }
 
         /* Update LFSR *20* times every sample, like patent shows */
@@ -985,7 +976,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
         if (tms->current_pitch != 0)
             tms->pitch_count = (tms->pitch_count + 1) % tms->current_pitch;
         else
-            tms->pitch_count = 51; // forced to blank spot in the chirp rom
+            tms->pitch_count = 0; // forced to blank spot in the chirp rom
 
         tms->interp_count = (tms->interp_count + 1) % 25;
         buf_count++;
@@ -997,7 +988,7 @@ empty:
     {
 		tms->sample_count = (tms->sample_count + 1) % 200;
 		tms->interp_count = (tms->interp_count + 1) % 25;
-		buffer[buf_count] = 0x00;	/* should be (-1 << 8) ??? (cf note in data sheet, p 10, table 4) */
+		buffer[buf_count] = -1<<4;	/* should be (-1 << 8) ??? (cf note in data sheet, p 10, table 4) */
         buf_count++;
         size--;
     }
@@ -1023,9 +1014,13 @@ static INT16 clip_and_wrap(INT16 cliptemp)
        00 0bcd efgh xxxx -> 0b0bcdefgh
        0x xxxx xxxx xxxx -> 0b01111111
        */
+#ifdef DEBUG_CLIP_WRAP
+	if ((cliptemp > 2047) || (cliptemp < -2048)) fprintf(stderr,"clipping cliptemp to range; was %d\n", cliptemp);
+#endif
 #ifdef DO_CLIP_AND_WRAP
 	if (cliptemp > 2047) cliptemp = 2047;
 	else if (cliptemp < -2048) cliptemp = -2048;
+	//cliptemp &= 0xFFF0;
 	/* at this point the analog output is tapped*/
 	return cliptemp << 4;
 #else
@@ -1039,7 +1034,7 @@ static INT16 clip_and_wrap(INT16 cliptemp)
      ti_matrix_multiply -- does the proper multiply and shift as the TI chips do.
      a is the k coefficient and is clamped to 10 bits (9 bits plus a sign)
      b is the running result and is clamped to 14 bits.
-     output is 14 bits, but note the result LSB bit is always 1.
+     output is 14 bits, but note the result LSB bit is always 1. (or is it?)
 
 **********************************************************************************************/
 static INT16 matrix_multiply(INT16 a, INT16 b)
@@ -1049,7 +1044,11 @@ static INT16 matrix_multiply(INT16 a, INT16 b)
 	while (a<-512) { a+=1024; }
 	while (b>16383) { b-=32768; }
 	while (b<-16384) { b+=32768; }
+#ifdef NORMALMODE
 	result = ((a*b)>>9)|1;
+#else
+	result = (a*b)>>9;
+#endif
 #ifdef VERBOSE
 	if (result>16383) fprintf(stderr,"matrix multiplier overflowed! a: %x, b: %x", a, b);
 	if (result<-16384) fprintf(stderr,"matrix multiplier underflowed! a: %x, b: %x", a, b);
@@ -1178,7 +1177,7 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 			{
 				//SPKEXT going active activates SPKEE which clears the fifo
 				tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
-				tms->speaking_now = tms->speak_external = 1;
+				tms->speak_external = 1;
 				tms->RDB_flag = FALSE;
 			}
 			break;
