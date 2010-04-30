@@ -1950,8 +1950,8 @@ ROM_START( drgw3 )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 	
-	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
-	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
+//	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
+//	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
 
 	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data - is it correct for this set? */
 	ROM_LOAD16_WORD_SWAP( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
@@ -1983,8 +1983,8 @@ ROM_START( drgw3105 )
 	ROM_LOAD16_BYTE( "dw3_v105.u13",     0x100000, 0x080000,  CRC(8d6c9d39) SHA1(cb79303ab551e91f07e11414db4254d5b161d415) )
 	//ROM_LOAD( "dw3c_prg.rom", 0x100000, 0x100000, CRC(e274cf03) SHA1(2ba532446bd5b5dbccf43a6d1b1f6b36842b2c8d) )
 
-	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
-	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
+//	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
+//	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
@@ -2041,8 +2041,8 @@ ROM_START( drgw3100 )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 	
-	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
-	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
+//	ROM_REGION( 0x40000, "user2", 0 ) /* RAM dump - to be removed once the DMA is hooked up */
+//	ROM_LOAD16_WORD_SWAP( "dw3c_prot_ramdump", 0x0000, 0x4000, CRC(6b4fc08b) SHA1(61583637c2f1767df4bc637f922987c9510a584f) )
 
 	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data */
 	ROM_LOAD16_WORD_SWAP( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
@@ -4350,15 +4350,17 @@ static void IGS022_do_dma(running_machine* machine, UINT16 src, UINT16 dst, UINT
 }
 
 // the internal MCU boot code automatically does this DMA
+// and puts the version # of the data rom in ram
 static void IGS022_reset(running_machine* machine)
 {
 	int i;
 	UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
 	pgm_state *state = (pgm_state *)machine->driver_data;
-
+	UINT16 tmp;
+	
 	// fill ram with A5 patern
 	for (i = 0; i < 0x4000/2; i++)
-		state->sharedprotram[i] = 0xa5a5;
+		state->sharedprotram[i] = 0xa55a;
 
 	// the auto-dma
 	UINT16 src = PROTROM[0x100 / 2];
@@ -4376,7 +4378,12 @@ static void IGS022_reset(running_machine* machine)
 	printf("Auto-DMA %04x %04x %04x %04x\n",src,dst,size,mode);
 
 	IGS022_do_dma(machine,src,dst,size,mode);
-
+	
+	// there is also a version ID? (or is it some kind of checksum) that is stored in the data rom, and gets copied..
+	// Dragon World 3 checks it
+	tmp = PROTROM[0x114/2];
+	tmp = ((tmp & 0xff00) >> 8) | ((tmp & 0x00ff) << 8);
+	state->sharedprotram[0x2a2/2] = tmp;
 }
 
 static void IGS022_handle_command(running_machine* machine)
@@ -4517,11 +4524,50 @@ static DRIVER_INIT( killbld )
 
 static MACHINE_RESET( dw3 )
 {
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
+
 	MACHINE_RESET_CALL(pgm);
-	/* fill the protection ram with a5 + auto dma - causes issues at the moment due to broken igs025/22 emulation for this game! */
-	if (0)
-		IGS022_reset(machine);
+	/* fill the protection ram with a5 + auto dma */
+	IGS022_reset(machine);
+
+	/* game won't boot unless various values are in protection RAM
+	 - these should almost certainly end up there as the result of executing the protection
+	   commands are startup, but which, and how? */
 	
+//	state->sharedprotram[0x200/2] = 0x006d;
+	state->sharedprotram[0x202/2] = 0x007c; // it cares about this, operation status flag?
+	
+//	state->sharedprotram[0x20c/2] = 0x0000;
+//	state->sharedprotram[0x20e/2] = 0x0007;
+//	state->sharedprotram[0x210/2] = 0x0000;
+//	state->sharedprotram[0x212/2] = 0x0004;
+//	state->sharedprotram[0x214/2] = 0x0000;
+//	state->sharedprotram[0x216/2] = 0x0007;
+//	state->sharedprotram[0x218/2] = 0x0000;
+//	state->sharedprotram[0x21a/2] = 0x0004;
+
+//	state->sharedprotram[0x288/2] = 0x0000;
+//	state->sharedprotram[0x28a/2] = 0x00c2;
+//	state->sharedprotram[0x28c/2] = 0x0000;
+//	state->sharedprotram[0x28e/2] = 0x00c2;
+//	state->sharedprotram[0x290/2] = 0x0500;
+//	state->sharedprotram[0x292/2] = 0x1000;
+//	state->sharedprotram[0x294/2] = 0x00c3;
+//	state->sharedprotram[0x296/2] = 0x7104;
+//	state->sharedprotram[0x298/2] = 0x0000;
+//	state->sharedprotram[0x29a/2] = 0x0003;
+//	state->sharedprotram[0x29c/2] = 0x0108;
+//	state->sharedprotram[0x29e/2] = 0x0009;
+
+//	state->sharedprotram[0x2a2/2] = 0x84f6; // it cares about this, it's the version number of the data rom, copied automatically!
+	
+//	state->sharedprotram[0x2ac/2] = 0x006d;
+//	state->sharedprotram[0x2ae/2] = 0x0000;
+
+//	state->sharedprotram[0x2b0/2] = 0xaf56;
+	
+
 }
 
 
@@ -4603,9 +4649,11 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 }
 
 
-static DRIVER_INIT( dw3 )
+static DRIVER_INIT( drgw3 )
 {
 	pgm_basic_init(machine);
+
+/*
 	pgm_state *state = (pgm_state *)machine->driver_data;
 
 	{
@@ -4617,6 +4665,7 @@ static DRIVER_INIT( dw3 )
 			if((x>=0x100)&&(x<0x110)) printf("data 0x%4x, offset:%x\n",state->sharedprotram[x],x);
 		}
 	}
+*/
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xDA5610, 0xDA5613, 0, 0, drgw3_igs025_prot_r, drgw3_igs025_prot_w);
 
 	pgm_dw3_decrypt(machine);
@@ -4918,9 +4967,9 @@ GAME( 1998, olds100a,     olds,      olds,    olds,     olds,       ROT0,   "IGS
    -----------------------------------------------------------------------------------------------------------------------*/
 
 // should have DMA protection, like killbld, as well as the math / bitswap / memory manipulation stuff, but it never attempts to trigger the DMA? - we currently have a RAM dump to allow it to boot, but I think this stuff should be DMA copied into RAM, like killbld
-GAME( 1998, drgw3,        pgm,       dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, drgw3105,     drgw3,     dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, drgw3100,     drgw3,     dw3,     dw3,      dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Japan Only?
+GAME( 1998, drgw3,        pgm,       dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, drgw3105,     drgw3,     dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, drgw3100,     drgw3,     dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Japan Only?
 
 GAME( 1999, kov,          pgm,       kov,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
 GAME( 1999, kov115,       kov,       kov,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18
