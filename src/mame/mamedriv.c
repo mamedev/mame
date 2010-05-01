@@ -956,6 +956,7 @@ const game_driver * const drivers[] =
 	DRIVER( tekken4 )
 	DRIVER( tekken4a )
 	DRIVER( tekken4b )
+	DRIVER( timecrs3 )
 	DRIVER( zgundm )
 	DRIVER( fghtjam )
 	DRIVER( sukuinuf )
@@ -4500,6 +4501,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	DRIVER( hod2bios )	/* 1998.11 The House of the Dead 2 */
 	DRIVER( hotd2 )		/* 1998.11 The House of the Dead 2 */
+	DRIVER( hotd2o )     	/* 1998.11 The House of the Dead 2 */
 	DRIVER( dybbnao )	/* 1998.12 Dynamite Baseball NAOMI */
 	DRIVER( smlg99 )        /* 1999.?? Super Major League '99 */
 	DRIVER( pstone )	/* 1999.02 Power Stone */
