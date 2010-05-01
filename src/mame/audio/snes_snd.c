@@ -126,7 +126,7 @@ static const int gauss[]=
 static const int *const G1 = &gauss[256];
 static const int *const G2 = &gauss[512];
 static const int *const G3 = &gauss[255];
-static const int *const G4 = &gauss[511];
+static const int *const G4 = &gauss[0];
 
 static const int        mask = 0xFF;
 
@@ -588,7 +588,7 @@ static void dsp_update( running_device *device, short *sound_ptr )
             the sum of the products of each input sample point with the value
             of the bell-curve corresponding to that point. */
 			vl  = vp->mixfrac >> 4;
-			vr  = ((G4[-vl] * vp->sampbuf[vp->sampptr]) >> 11 ) & ~1;
+			vr  = ((G4[-vl-1] * vp->sampbuf[vp->sampptr]) >> 11 ) & ~1;
 			vr += ((G3[-vl] * vp->sampbuf[(vp->sampptr + 1) & 3]) >> 11) & ~1;
 			vr += ((G2[vl] * vp->sampbuf[(vp->sampptr + 2) & 3]) >> 11 ) & ~1;
 
@@ -614,7 +614,7 @@ static void dsp_update( running_device *device, short *sound_ptr )
 				vp->sampbuf[(vp->sampptr + 2) & 3],
 				G3[-vl],
 				vp->sampbuf[(vp->sampptr + 1) & 3],
-				G4[-vl],
+				G4[-vl-1],
 				vp->sampbuf[vp->sampptr],
 				outx);
 #endif
