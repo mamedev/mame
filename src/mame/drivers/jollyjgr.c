@@ -344,10 +344,17 @@ static INPUT_PORTS_START( fspider )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW2:!3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW2:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!3,!4") // nothing confirmed
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPSETTING(    0x08, "30000" )
+	PORT_DIPSETTING(    0x0c, "40000" )
+	PORT_DIPNAME( 0x10, 0x10, "Display Coinage Settings" )	PORT_DIPLOCATION("SW2:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Show only 1P Coinage" )	PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -691,8 +698,8 @@ ROM_START( fspiderb )
 //	ROM_COPY( "gfx_bank", 0x2800, 0x1000, 0x800)
 //	ROM_COPY( "gfx_bank", 0x3800, 0x1800, 0x800)
 
-	ROM_REGION( 0x1000, "proms", 0 )  // borrowed from jollyjgr
-	ROM_LOAD( "82s123.1f", 0x0000, 0x1000, CRC(4f4e4e13) SHA1(a8fe0e1fd354e6cc2cf65eab66882c3b98c82100) BAD_DUMP )
+	ROM_REGION( 0x1000, "proms", 0 )
+	ROM_LOAD( "82s123.1f", 0x0000, 0x0020, CRC(cda6001a) SHA1(e10fe848e8123e53bd2db8a14cfa2d8c6621d6aa) )
 ROM_END
 
 
@@ -703,5 +710,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fspiderb, 0, fspider, fspider, 0, ROT90,  "Taito Corporation", "Frog & Spiders (bootleg)", GAME_NOT_WORKING | GAME_WRONG_COLORS ) //comes from a Fawaz Group bootleg board
+GAME( 1981, fspiderb, 0, fspider, fspider, 0, ROT90,  "Taito Corporation", "Frog & Spiders (bootleg)", GAME_NOT_WORKING ) //comes from a Fawaz Group bootleg board
 GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, 0, ROT90, "Taito Corporation", "Jolly Jogger", GAME_SUPPORTS_SAVE )
