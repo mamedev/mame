@@ -11,7 +11,6 @@
 #include "profiler.h"
 #include "video/rgbutil.h"
 
-static int vblc=0;
 #define DEBUG_FIFO_POLY (0)
 #define DEBUG_PVRTA	(0)
 #define DEBUG_PVRTA_REGS (0)
@@ -54,8 +53,8 @@ VO_BORDER_COL
 
 /*
 SPG_HBLANK
----- ---- --xx xxxx xxxx ---- ---- ---- vbend
----- ---- ---- ---- ---- --xx xxxx xxxx vbstart
+---- ---- --xx xxxx xxxx ---- ---- ---- hbend
+---- ---- ---- ---- ---- --xx xxxx xxxx hbstart
 */
 #define spg_hbend    ((pvrta_regs[SPG_HBLANK] & 0x03ff0000) >> 16)
 #define spg_hbstart  ((pvrta_regs[SPG_HBLANK] & 0x000003ff) >> 0)
@@ -2446,10 +2445,7 @@ static TIMER_CALLBACK(vbout)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
 	dc_update_interrupt_status(machine);
 
-	scanline = 0;
-	next_y = spg_line_comp_val;
-	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
-	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, spg_hblank_in_irq-1), 0);
+	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
 }
 
 static TIMER_CALLBACK(hbin)
@@ -2472,6 +2468,12 @@ static TIMER_CALLBACK(hbin)
 //  printf("hbin on scanline %d\n",scanline);
 
 	scanline++;
+
+	if(scanline >= spg_vblank_in_irq_line_num)
+	{
+		scanline = 0;
+		next_y = spg_line_comp_val;
+	}
 
 	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, spg_hblank_in_irq-1), 0);
 }
@@ -2536,10 +2538,10 @@ VIDEO_START(dc)
 	computedilated();
 
 	vbout_timer = timer_alloc(machine, vbout, 0);
-	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
+	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
 
 	hbin_timer = timer_alloc(machine, hbin, 0);
-	timer_adjust_oneshot(hbin_timer, attotime_never, 0);
+	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, spg_hblank_in_irq-1), 0);
 	scanline = 0;
 	next_y = 0;
 
@@ -2603,13 +2605,9 @@ VIDEO_UPDATE(dc)
 	return 0;
 }
 
+/* TODO: remove this and add a new vblin timer, register generally sets V Blank-IN event to happen at line 260 (0x104), not 480! */
 void dc_vblank(running_machine *machine)
 {
-	//printf("vblankin\n");
-
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	dc_update_interrupt_status(machine);
-	vblc++;
-
-	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
