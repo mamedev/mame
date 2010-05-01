@@ -1709,6 +1709,7 @@ const game_driver * const drivers[] =
 	DRIVER( grchamp )	/* GM  (c) 1981 Taito Corporation */
 	DRIVER( marinedt )	/* MG  (c) 1981 Taito Corporation */
 	DRIVER( changela )	/* ??? (c) 1983 Taito Corporation */
+	DRIVER( fspiderb )	/* bootleg */
 	DRIVER( jollyjgr )	/* KD  (c) 1982 Taito Corporation */
 	DRIVER( bking )		/* DM  (c) 1982 Taito Corporation */
 	DRIVER( bking2 )	/* AD6 (c) 1983 Taito Corporation */

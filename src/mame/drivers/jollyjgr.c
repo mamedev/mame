@@ -189,15 +189,33 @@ static ADDRESS_MAP_START( jollyjgr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
+	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE_MEMBER(jollyjgr_state, videoram)
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE_MEMBER(jollyjgr_state, colorram)
 	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(jollyjgr_state, spriteram)
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE_MEMBER(jollyjgr_state, bitmap)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fspider_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
+	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
+	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
+	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
+	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE_MEMBER(jollyjgr_state, videoram)
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE_MEMBER(jollyjgr_state, colorram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(jollyjgr_state, spriteram)
+	AM_RANGE(0x9880, 0x9bff) AM_RAM
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE_MEMBER(jollyjgr_state, bitmap)
+ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -515,6 +533,14 @@ static MACHINE_DRIVER_START( jollyjgr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( fspider )
+	MDRV_IMPORT_FROM( jollyjgr )
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(fspider_map)
+
+MACHINE_DRIVER_END
+
 /*************************************
  *
  *  ROM definition(s)
@@ -545,10 +571,36 @@ ROM_START( jollyjgr )
 	ROM_LOAD( "kd13.1f",      0x0000, 0x1000, CRC(4f4e4e13) SHA1(a8fe0e1fd354e6cc2cf65eab66882c3b98c82100) )
 ROM_END
 
+ROM_START( fspiderb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.5l",   0x0000, 0x1000, CRC(3679cab1) SHA1(21c055a1e6e42dda7070452a5de9bce01fa256b1) )
+	ROM_RELOAD(         0x1000, 0x1000 )
+	ROM_LOAD( "2.8b",   0x7000, 0x1000, CRC(6e543acf) SHA1(45b66068654aabfe9745c8c893424a6d360a1748) )
+	ROM_LOAD( "3.8c",   0x6000, 0x1000, CRC(f74f83d9) SHA1(18fdd7ebf5096b022207de4504e254860428f469) )
+	ROM_LOAD( "4.8e",   0x5000, 0x1000, CRC(26add629) SHA1(96a2691f81ea7d0215d99c45f7f6dad4a4a6844e) )
+	ROM_LOAD( "5.8f",   0x4000, 0x1000, CRC(0457de7b) SHA1(e7a7765d971d328333e8784178762c6fe4e2d783) )
+	ROM_LOAD( "6.8h",   0x2000, 0x1000, CRC(329d4716) SHA1(898d0f3d053a8ac90c731f39c1d05769882cdcf6) )
+	ROM_LOAD( "7.8j",   0x3000, 0x1000, CRC(a7d8fc3c) SHA1(3b39155001d21e75f16196bf3c11b34fb6d5fa0b) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD(  "8.1c",   0x0000, 0x1000, CRC(4e39abad) SHA1(225a2a08a7afe404e6b74789aab8c97a39a21214) )
+	ROM_LOAD(  "9.2c",   0x1000, 0x1000, CRC(04dd1604) SHA1(9e686b09e2fc59fa879fd62982adb1c681f3eb73) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "10.5h",   0x0000, 0x1000, CRC(d4bce323) SHA1(f49df8318aa9e8bd49fad1931480dfd483a0248a) )
+	ROM_LOAD( "11.7h",   0x1000, 0x1000, CRC(7ab56309) SHA1(b43f542a7359c3a4ccf6f116e3a84bd13af6876f) )
+
+	ROM_REGION( 0x1000, "proms", 0 )
+	ROM_LOAD( "prom",      0x0000, 0x1000, NO_DUMP )
+ROM_END
+
+
+
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
+GAME( 1981, fspiderb, 0, fspider, jollyjgr, 0, ROT90,  "Taito Corporation", "Frog & Spiders (bootleg)", GAME_NOT_WORKING ) //comes from a Fawaz Group bootleg board
 GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, 0, ROT90, "Taito Corporation", "Jolly Jogger", GAME_SUPPORTS_SAVE )
