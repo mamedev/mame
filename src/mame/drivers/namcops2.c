@@ -240,7 +240,7 @@ ROM_START( tekken51 )
 	DISK_IMAGE_READONLY( "te510b", 0, SHA1(2a0ac3723725572c1810b0ef4bcfa7aa114062f8) )
 ROM_END
 
-ROM_START( zgundm )
+ROM_START( zgundm )	      
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM246_BIOS
 
@@ -249,6 +249,18 @@ ROM_START( zgundm )
         ROM_LOAD( "zga1vera_spr.ic002", 0x800000, 0x040000, CRC(8e4c715b) SHA1(a2218051f54d5ce4cdd21ef021b9acf7a384b766) )
 
 	DISK_REGION("dvd")
+ROM_END
+
+ROM_START( timecrs3 )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+        ROM_LOAD( "tst1vera.ic002", 0x000000, 0x800000, CRC(2c7ede91) SHA1(b3d3547f5aac402da2fe76ef51dca3841a982a5e) ) 
+        ROM_LOAD( "tst1vera_spr.ic002", 0x800000, 0x040000, CRC(ee9c8132) SHA1(fb00e102389e2163d2c7efcfefd4f680f0b4d4e8) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tst1dvd0", 0, SHA1(f8a447d9a4224282516bea590f5217c751bdc4ae) )
 ROM_END
 
 ROM_START( zgundmdx )
@@ -270,6 +282,7 @@ GAME(2002, soulcl2a, soulclb2, system246, system246, 0, ROT0, "Namco", "Soul Cal
 GAME(2002, tekken4,    sys246, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, tekken4a,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, tekken4b,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2003, timecrs3,   sys246, system246, system246, 0, ROT0, "Namco", "Time Crisis 3 (TST1)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2003, zgundm,     sys246, system246, system246, 0, ROT0, "Capcom/Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2004, fghtjam,    sys246, system246, system246, 0, ROT0, "Capcom/Namco", "Capcom Fighting Jam (JAM1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2004, sukuinuf,   sys246, system246, system246, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
