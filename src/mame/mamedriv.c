@@ -1306,6 +1306,7 @@ const game_driver * const drivers[] =
 	DRIVER( spcewarl )	/* (c) 1979 Leijac Corporation (Konami) */
 	DRIVER( polaris )	/* PS  (c) 1980 Taito */
 	DRIVER( polarisa )	/* PS  (c) 1980 Taito */
+	DRIVER( polariso )	/* PS  (c) 1980 Taito */
 	DRIVER( ballbomb )	/* TN  (c) 1980 Taito */
 	DRIVER( indianbt )	/* (c) 1980 Taito */
 	DRIVER( steelwkr )	/* (c) 1980 Taito */

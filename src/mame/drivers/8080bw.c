@@ -2720,35 +2720,51 @@ ROM_END
 
 ROM_START( polaris )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ps-01",        0x0000, 0x0800, CRC(c04ce5a9) SHA1(62cc9b3b682ebecfb7600393862c65e26ff5263f) )
-	ROM_LOAD( "ps-09",        0x0800, 0x0800, CRC(9a5c8cb2) SHA1(7a8c5d74f8b431072d9476d3ef65a3fe1d639813) )
-	ROM_LOAD( "ps-08",        0x1000, 0x0800, CRC(8680d7ea) SHA1(7fd4b8a415666c36842fed80d2798b48f8b29d0d) )
-	ROM_LOAD( "ps-04",        0x1800, 0x0800, CRC(65694948) SHA1(de92a7f3e3ef732b573254baa60df60f8e068a5d) )
-	ROM_LOAD( "ps-05",        0x4000, 0x0800, CRC(772e31f3) SHA1(fa0b866b6df1a9217e286ca880b3bb3fb0644bf3) )
-	ROM_LOAD( "ps-10",        0x4800, 0x0800, CRC(3df77bac) SHA1(b3275c34b8d42df83df2c404c5b7d220aae651fa) )
+	ROM_LOAD( "ps01-1.30",   0x0000, 0x0800, CRC(7d41007c) SHA1(168f002fe997aac6e4141292de826d389859bb04) )
+	ROM_LOAD( "ps09.36",     0x0800, 0x0800, CRC(9a5c8cb2) SHA1(7a8c5d74f8b431072d9476d3ef65a3fe1d639813) )
+	ROM_LOAD( "ps03-1.31",   0x1000, 0x0800, CRC(21f32415) SHA1(6ac9ae9b55e342729fe260147021ed3911a24dc2) )
+	ROM_LOAD( "ps04.37",     0x1800, 0x0800, CRC(65694948) SHA1(de92a7f3e3ef732b573254baa60df60f8e068a5d) )
+	ROM_LOAD( "ps05.32",     0x4000, 0x0800, CRC(772e31f3) SHA1(fa0b866b6df1a9217e286ca880b3bb3fb0644bf3) )
+	ROM_LOAD( "ps10.38",     0x4800, 0x0800, CRC(3df77bac) SHA1(b3275c34b8d42df83df2c404c5b7d220aae651fa) )
+	ROM_LOAD( "ps26",        0x5000, 0x0800, CRC(9d5c3d50) SHA1(a6acf9ca6e807625156cb1759269014d5830a44f) )
 
 	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
-	ROM_LOAD( "ps07",         0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) )
+	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
 
 	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics */
-	ROM_LOAD( "mb7052.2c",    0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) )
+	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
 ROM_END
 
 ROM_START( polarisa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ps01-1",       0x0000, 0x0800, CRC(7d41007c) SHA1(168f002fe997aac6e4141292de826d389859bb04) )
-	ROM_LOAD( "ps-09",        0x0800, 0x0800, CRC(9a5c8cb2) SHA1(7a8c5d74f8b431072d9476d3ef65a3fe1d639813) )
-	ROM_LOAD( "ps03-1",       0x1000, 0x0800, CRC(21f32415) SHA1(6ac9ae9b55e342729fe260147021ed3911a24dc2) )
-	ROM_LOAD( "ps-04",        0x1800, 0x0800, CRC(65694948) SHA1(de92a7f3e3ef732b573254baa60df60f8e068a5d) )
-	ROM_LOAD( "ps-05",        0x4000, 0x0800, CRC(772e31f3) SHA1(fa0b866b6df1a9217e286ca880b3bb3fb0644bf3) )
-	ROM_LOAD( "ps-10",        0x4800, 0x0800, CRC(3df77bac) SHA1(b3275c34b8d42df83df2c404c5b7d220aae651fa) )
-	ROM_LOAD( "ps26",         0x5000, 0x0800, CRC(9d5c3d50) SHA1(a6acf9ca6e807625156cb1759269014d5830a44f) )
+	ROM_LOAD( "ps01.30",     0x0000, 0x0800, CRC(c04ce5a9) SHA1(62cc9b3b682ebecfb7600393862c65e26ff5263f) )
+	ROM_LOAD( "ps09.36",     0x0800, 0x0800, CRC(9a5c8cb2) SHA1(7a8c5d74f8b431072d9476d3ef65a3fe1d639813) )
+	ROM_LOAD( "ps03.31",     0x1000, 0x0800, CRC(8680d7ea) SHA1(7fd4b8a415666c36842fed80d2798b48f8b29d0d) )
+	ROM_LOAD( "ps04.37",     0x1800, 0x0800, CRC(65694948) SHA1(de92a7f3e3ef732b573254baa60df60f8e068a5d) )
+	ROM_LOAD( "ps05.32",     0x4000, 0x0800, CRC(772e31f3) SHA1(fa0b866b6df1a9217e286ca880b3bb3fb0644bf3) )
+	ROM_LOAD( "ps10.38",     0x4800, 0x0800, CRC(3df77bac) SHA1(b3275c34b8d42df83df2c404c5b7d220aae651fa) )
 
 	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
-	ROM_LOAD( "ps07",         0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) )
+	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
 
 	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics */
-	ROM_LOAD( "mb7052.2c",    0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) )
+	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
+ROM_END
+
+ROM_START( polariso )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps01.30",     0x0000, 0x0800, CRC(c04ce5a9) SHA1(62cc9b3b682ebecfb7600393862c65e26ff5263f) )
+	ROM_LOAD( "ps02.36",     0x0800, 0x0800, CRC(18648e4f) SHA1(9f672e108177d5d9bc004b41eec00dc4d19269ff) )
+	ROM_LOAD( "ps03.31",     0x1000, 0x0800, CRC(8680d7ea) SHA1(7fd4b8a415666c36842fed80d2798b48f8b29d0d) )
+	ROM_LOAD( "ps04.37",     0x1800, 0x0800, CRC(65694948) SHA1(de92a7f3e3ef732b573254baa60df60f8e068a5d) )
+	ROM_LOAD( "ps05.32",     0x4000, 0x0800, CRC(772e31f3) SHA1(fa0b866b6df1a9217e286ca880b3bb3fb0644bf3) )
+	ROM_LOAD( "ps06.38",     0x4800, 0x0800, CRC(f577cb72) SHA1(7a931b5ebaf0d6941191f21afb9ed670d0251e07) )
+
+	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
+
+	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics */
+	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
 ROM_END
 
 ROM_START( ozmawars )
@@ -2941,8 +2957,9 @@ GAME( 1979, schasercv,schaser,  schasercv,schasercv,0, ROT270, "Taito", "Space C
 GAME( 1979, sflush,   0,        sflush,   sflush,   0, ROT270, "Taito", "Straight Flush",GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
 GAME( 1980, lupin3,   0,        lupin3,   lupin3,   0, ROT270, "Taito", "Lupin III (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, lupin3a,  lupin3,   lupin3a,  lupin3a,  0, ROT270, "Taito", "Lupin III (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, polarisa, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris (Latest version)", GAME_SUPPORTS_SAVE )
+GAME( 1980, polarisa, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (First revision)", GAME_SUPPORTS_SAVE )
+GAME( 1980, polariso, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (Original version)", GAME_SUPPORTS_SAVE )
 GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )	/* missing clouds */
 GAME( 1980, indianbt, 0,        indianbt, indianbt, 0, ROT270, "Taito", "Indian Battle", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, steelwkr, 0,        steelwkr, steelwkr, 0, ROT0  , "Taito", "Steel Worker", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
@@ -2958,7 +2975,7 @@ GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microse
 GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "Test ROM", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninv, invaders, invaders, alieninv, 0, ROT270, "Margamatics", "Alien Invasion", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, alieninvp2,invaders, invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, alieninvp2,invaders, invaders, searthin,0, ROT270, "bootleg", "Alien Invasion Part II", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "Sanritsu", "Space War (Sanritsu)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders )
 GAME (19??, astropal, 0,        astropal, astropal, 0, ROT0,   "Sidam?", "Astropal", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
