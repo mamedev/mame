@@ -95,6 +95,10 @@ Notes:
   The hardware is very similar to Galaxian but has some differencies, like the 3bpp bitmap addition
   To advance input tests, press Tilt button
 
+TODO (Frog & Spiders):
+- Missing projectiles;
+- inputs needs to be done from scratch;
+
 */
 
 #include "emu.h"
@@ -119,7 +123,7 @@ public:
 	tilemap_t  *bg_tilemap;
 
 	/* misc */
-	int      nmi_enable, flip_x, flip_y;
+	UINT8      nmi_enable, flip_x, flip_y, bitmap_disable, tilemap_bank;
 };
 
 
@@ -163,6 +167,10 @@ static WRITE8_HANDLER( jollyjgr_misc_w )
 	// they could be swapped, because it always set "data & 3"
 	state->flip_x = data & 1;
 	state->flip_y = data & 2;
+
+	// same for these two (used by Frog & Spiders)
+	state->bitmap_disable = data & 0x40;
+	state->tilemap_bank = data & 0x20;
 
 	tilemap_set_flip(state->bg_tilemap, (state->flip_x ? TILEMAP_FLIPX : 0) | (state->flip_y ? TILEMAP_FLIPY : 0));
 
@@ -336,7 +344,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	jollyjgr_state *state = (jollyjgr_state *)machine->driver_data;
 	int color = state->colorram[((tile_index & 0x1f) << 1) | 1] & 7;
-	SET_TILE_INFO(0, state->videoram[tile_index], color, 0);
+	int region = (state->tilemap_bank & 0x20) ? 2 : 0;
+	SET_TILE_INFO(region, state->videoram[tile_index], color, 0);
 }
 
 static VIDEO_START( jollyjgr )
@@ -395,7 +404,8 @@ static VIDEO_UPDATE( jollyjgr )
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
-	draw_bitmap(screen->machine, bitmap);
+	if(!(state->bitmap_disable))
+		draw_bitmap(screen->machine, bitmap);
 
 	/* Sprites are the same as in Galaxian */
 	for (offs = 0; offs < 0x40; offs += 4)
@@ -463,6 +473,7 @@ static const gfx_layout jollyjgr_spritelayout =
 static GFXDECODE_START( jollyjgr )
 	GFXDECODE_ENTRY( "gfx1", 0, jollyjgr_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, jollyjgr_spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, jollyjgr_charlayout,   0, 8 )
 GFXDECODE_END
 
 
@@ -566,6 +577,8 @@ ROM_START( jollyjgr )
 	ROM_LOAD( "kd11.5h",      0x0000, 0x0800, CRC(d686245c) SHA1(73567b15d9399e450121ad01ad2dcb91bedc1099) )
 	ROM_LOAD( "kd12.7h",      0x0800, 0x0800, CRC(d69cbb4e) SHA1(f33cc161f93cae9cc314067fa2453838fa8ac3ba) )
 
+	ROM_REGION( 0x2000, "gfx3", ROMREGION_ERASE00 )
+
 	/* it's identical to kd14.8a, except for the first 32 bytes which are palette bytes */
 	ROM_REGION( 0x1000, "proms", 0 )
 	ROM_LOAD( "kd13.1f",      0x0000, 0x1000, CRC(4f4e4e13) SHA1(a8fe0e1fd354e6cc2cf65eab66882c3b98c82100) )
@@ -582,13 +595,25 @@ ROM_START( fspiderb )
 	ROM_LOAD( "7.8j",   0x3000, 0x1000, CRC(a7d8fc3c) SHA1(3b39155001d21e75f16196bf3c11b34fb6d5fa0b) )
 	ROM_RELOAD(         0x1000, 0x1000 )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx_bank", 0 )
 	ROM_LOAD(  "8.1c",   0x0000, 0x1000, CRC(4e39abad) SHA1(225a2a08a7afe404e6b74789aab8c97a39a21214) )
 	ROM_LOAD(  "9.2c",   0x1000, 0x1000, CRC(04dd1604) SHA1(9e686b09e2fc59fa879fd62982adb1c681f3eb73) )
+	ROM_LOAD( "10.5h",   0x2000, 0x1000, CRC(d4bce323) SHA1(f49df8318aa9e8bd49fad1931480dfd483a0248a) )
+	ROM_LOAD( "11.7h",   0x3000, 0x1000, CRC(7ab56309) SHA1(b43f542a7359c3a4ccf6f116e3a84bd13af6876f) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "10.5h",   0x0000, 0x1000, CRC(d4bce323) SHA1(f49df8318aa9e8bd49fad1931480dfd483a0248a) )
-	ROM_LOAD( "11.7h",   0x1000, 0x1000, CRC(7ab56309) SHA1(b43f542a7359c3a4ccf6f116e3a84bd13af6876f) )
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_COPY( "gfx_bank", 0x0000, 0x0000, 0x800)
+	ROM_COPY( "gfx_bank", 0x1000, 0x0800, 0x800)
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_COPY( "gfx_bank", 0x2000, 0x0000, 0x800)
+	ROM_COPY( "gfx_bank", 0x3000, 0x0800, 0x800)
+
+	ROM_REGION( 0x1000, "gfx3", ROMREGION_ERASE00 )
+	ROM_COPY( "gfx_bank", 0x0800, 0x0400, 0x400)
+	ROM_COPY( "gfx_bank", 0x1800, 0x0c00, 0x400)
+//	ROM_COPY( "gfx_bank", 0x2800, 0x1000, 0x800)
+//	ROM_COPY( "gfx_bank", 0x3800, 0x1800, 0x800)
 
 	ROM_REGION( 0x1000, "proms", 0 )
 	ROM_LOAD( "prom",      0x0000, 0x1000, NO_DUMP )
