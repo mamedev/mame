@@ -93,7 +93,7 @@ VIDEO_UPDATE( finalizr )
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	tilemap_mark_all_tiles_dirty(state->fg_tilemap);
 
-	tilemap_set_scrollx(state->bg_tilemap, 0, *state->scroll - 16);
+	tilemap_set_scrollx(state->bg_tilemap, 0, *state->scroll - 32);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* Draw the sprites. */
@@ -109,7 +109,7 @@ VIDEO_UPDATE( finalizr )
 			int sx, sy, flipx, flipy, code, color, size;
 
 
-			sx = 16 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
+			sx = 32 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
 			sy = sr[offs + 2];
 			flipx = sr[offs + 4] & 0x20;
 			flipy = sr[offs + 4] & 0x40;
@@ -218,14 +218,8 @@ VIDEO_UPDATE( finalizr )
 
 		/* draw top status region */
 		clip.min_x = visarea->min_x;
-		clip.max_x = visarea->min_x + 15;
-		tilemap_set_scrolldx(state->fg_tilemap,  0,-16);
-		tilemap_draw(bitmap, &clip, state->fg_tilemap, 0, 0);
-
-		/* draw bottom status region */
-		clip.min_x = visarea->max_x - 15;
-		clip.max_x = visarea->max_x;
-		tilemap_set_scrolldx(state->fg_tilemap,-16,  0);
+		clip.max_x = visarea->min_x + 31;
+		tilemap_set_scrolldx(state->fg_tilemap,  0,-32);
 		tilemap_draw(bitmap, &clip, state->fg_tilemap, 0, 0);
 	}
 	return 0;
