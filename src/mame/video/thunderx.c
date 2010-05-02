@@ -55,6 +55,8 @@ VIDEO_START( scontra )
 	state->layer_colorbase[1] = 0;
 	state->layer_colorbase[2] = 16;
 	state->sprite_colorbase = 32;
+
+	palette_set_shadow_factor(machine,7.0/8.0);
 }
 
 
