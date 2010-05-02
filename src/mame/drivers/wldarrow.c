@@ -441,6 +441,15 @@ ROM_START( mdrawpkr )
 	ROM_LOAD( "tms2516.k3", 0x2800, 0x0800, CRC(30904dc8) SHA1(c82276aa0eb8f48d136ad8c15dd309c9b880c294) )
 ROM_END
 
+ROM_START( mdrawpkra )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "meyco.k8", 0x0000, 0x0800, CRC(b4f6994d) SHA1(46fb2784b7b333f6755522fd27741a2fc4a4bc99) )
+	ROM_LOAD( "meyco.k7", 0x0800, 0x0800, CRC(8830365d) SHA1(044bc92880b78fa2a6ed5e133b484ac7d34c455a) )
+	ROM_LOAD( "meyco.k6", 0x1000, 0x0800, CRC(e1d5d38d) SHA1(523029185e2edc0351fa128d6494a5002cb2d7e7) )
+	ROM_LOAD( "meyco.k5", 0x1800, 0x0800, CRC(27c8dbcc) SHA1(996732b16c46460400957b3ed7bc36f537258dd7) )
+	ROM_LOAD( "meyco.k4", 0x2000, 0x0800, CRC(e3f18769) SHA1(7c98ca3f8b423200eb51ebe432591a98394ef952) )
+	ROM_LOAD( "meyco.k3", 0x2800, 0x0800, CRC(72aee07f) SHA1(a6d6086f3a6181d5111d05ae779c3f7b363c7f14) )
+ROM_END
 
 
 /*************************************
@@ -459,5 +468,6 @@ static DRIVER_INIT( wldarrow )
 }
 
 
-GAME( 1982, wldarrow,  0, wldarrow, wldarrow, wldarrow, ROT0, "Meyco Games", "Wild Arrow (Standard V4.8)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 198?, mdrawpkr,  0, wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Draw Poker Joker's Wild", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1982, wldarrow,  0,        wldarrow, wldarrow, wldarrow, ROT0, "Meyco Games", "Wild Arrow (Standard V4.8)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 198?, mdrawpkr,  0,        wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Draw Poker Joker's Wild (Standard)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 198?, mdrawpkra, mdrawpkr, wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Draw Poker Joker's Wild (02-11)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

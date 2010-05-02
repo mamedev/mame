@@ -7327,6 +7327,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( cupsocs )	/* (c) 1992 Seibu */
 	DRIVER( cupsocs2 )	/* (c) 1992 Seibu */
 	DRIVER( cupsocsb )	/* bootleg */
+	DRIVER( cupsocsb2 )	/* bootleg */
 	DRIVER( olysoc92 )	/* (c) 1992 Seibu */
 	DRIVER( goal92 )	/* bootleg */
 
@@ -9110,6 +9111,7 @@ Other Sun games
 	DRIVER( spaceg )	/* (c) 19?? */
 	DRIVER( wldarrow )	/* (c) 1982 */
 	DRIVER( mdrawpkr )	/* (c) 19?? */
+	DRIVER( mdrawpkra )	/* (c) 19?? */
 	DRIVER( laserbas )	/* (c) 1981 Amstar/HOEI */
 	DRIVER( laserbasa )	/* (c) 1981 Amstar/HOEI */
 	DRIVER( futflash )	/* (c) 1981 HOEI (Arcade TV Game List - P.96, Right, 18 from top) */
