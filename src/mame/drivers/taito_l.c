@@ -2947,10 +2947,10 @@ GAME( 1990, horshoes,  0,        horshoes, horshoes, 0,        ROT270, "Taito Am
 GAME( 1990, palamed,   0,        palamed,  palamed,  0,        ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 GAME( 1993, cachat,    0,        cachat,   cachat,   0,        ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
 GAME( 1993, tubeit,    cachat,   cachat,   tubeit,   0,        ROT0,   "Taito Corporation", "Tube-It", 0 )  // No (c) message
-GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Taito Corporation", "Cuby Bop (Location Test)", 0 ) // No (c) message
 
-GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B.",  "Play Girls", 0 )
+GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Hot-B",   "Cuby Bop (Location Test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
+GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B",   "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,   plgirls,  0,        ROT270, "bootleg", "LA Girl", 0 ) /* bootleg hardware with changed title & backgrounds */
-GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.",  "Play Girls 2", 0 )
+GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B",   "Play Girls 2", 0 )
 
 GAME( 1990, evilston,  0,        evilston, evilston, evilston, ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )

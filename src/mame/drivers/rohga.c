@@ -5,7 +5,7 @@
     Rogha Armour Attack         (c) 1991 Data East Corporation
     Wizard Fire                 (c) 1992 Data East Corporation
     Nitro Ball/Gun Ball         (c) 1992 Data East Corporation
-    Schmeiser Robo              (c) 1993 Hot B
+    Schmeiser Robo              (c) 1993 Hot-B
 
     This hardware is capable of alpha-blending on sprites and playfields
 
@@ -1566,4 +1566,4 @@ GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, wizdfire, ROT0,   "Data Eas
 GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", GAME_SUPPORTS_SAVE )
 GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (US)", GAME_SUPPORTS_SAVE )
 GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, schmeisr, ROT0,   "Hot B",                 "Schmeiser Robo (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", GAME_SUPPORTS_SAVE )
