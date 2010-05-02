@@ -342,7 +342,7 @@ static const struct tms5100_coeffs tms5200_coeff =
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E */
 	{ 0,   1,   2,   3,   4,   6,   8,  11,
-	 16,  23,  33,  47,  63,  85, 114, 511 }, // last value is actually ? but code needs 511 as stop sentinel
+	 16,  23,  33,  47,  63,  85, 114,  0 },
 	/* P */
 	{ 0,  14,  15,  16,  17,  18,  19,  20,
 	 21,  22,  23,  24,  25,  26,  27,  28,
@@ -411,7 +411,7 @@ static const struct tms5100_coeffs tms5220_coeff =
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E   */
 	{ 0,   1,   2,   3,   4,   6,   8,  11,
-	 16,  23,  33,  47,  63,  85, 114, 511 }, /* last value is actually ? in ROM, but 511 is stop sentinel */
+	 16,  23,  33,  47,  63,  85, 114,  0 },
 	/* P   */
 	{ 0,  15,  16,  17,  18,  19,  20,  21,
 	 22,  23,  24,  25,  26,  27,  28,  29,
@@ -482,9 +482,9 @@ static const struct tms5100_coeffs tms5220c_coeff =
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E   */
 	{ 0,   1,   2,   3,   4,   6,   8,  11,
-	 16,  23,  33,  47,  63,  85, 114, 511 }, /* last value is actually ? in ROM, but 511 is stop sentinel */
+	 16,  23,  33,  47,  63,  85, 114,  0 },
 	//{ 0x0d,  0x16,  0x20,  0x2d,  0x40,  0x5b,  0x81,  0xb6,
-	// 0x101, 0x16c, 0x202, 0x2d6, 0x402, 0x5a9, 0x7ff, 511 }, /* values from 5220_10.bin code for the tms50c10; last value is actually 0 in ROM, but 511 is stop sentinel */
+	// 0x101, 0x16c, 0x202, 0x2d6, 0x402, 0x5a9, 0x7ff, 0 }, /* values from 5220_10.bin code for the tms50c10 */
 	/* P   */
 	{ 0,  16,  17,  18,  19,  20,  21,  22, // first value is 16 in QV5220.COD but must be 0 for unvoiced speech to work properly
 	 23,  24,  25,  26,  27,  28,  29,  30,

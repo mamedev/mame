@@ -50,6 +50,7 @@ TODO:
       finished if the next command is written.
     * tomcat has a 5220 which is not hooked up at all
 	* documentation is inconsistent in the patents about what data is returned for chirp rom addresses (base 0) 41 to 51; the patent says the 'rom returns zeroes for locations beyond 40', but at the same time the rom stores the complement of the actual chirp rom value, so are locations beyond 40 = 0x00(0) or = 0xFF(-1)? The latter seems more likely to me, and that is how it is currently implemented. (LN).
+	* Is the TS=0 forcing energy to 0 for next frame in the interpolator actually correct?
 
 Pedantic detail from observation of real chip:
 The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
@@ -262,18 +263,16 @@ struct _tms5220_state
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
-#define OLD_FRAME_SILENCE_FLAG (tms->old_frame_energy == 0) // 1 if this was a silence (E=0) frame
-#define OLD_FRAME_UNVOICED_FLAG (tms->old_frame_pitch == 0) // 1 if unvoiced, 0 if voiced
-	UINT16 old_frame_energy;
-	UINT16 old_frame_pitch;
-	INT32 old_frame_k[10];
+#define OLD_FRAME_UNVOICED_FLAG (tms->old_frame_pitch_idx == 0) // 1 if unvoiced, 0 if voiced
+	UINT8 old_frame_energy_idx;
+	UINT8 old_frame_pitch_idx;
+	UINT8 old_frame_k_idx[10];
 
-#define NEW_FRAME_STOP_FLAG (tms->new_frame_energy == COEFF_ENERGY_SENTINEL) // 1 if this is a stop (Energy = 0xF) frame
-#define NEW_FRAME_SILENCE_FLAG (tms->new_frame_energy == 0) // ditto as above
-#define NEW_FRAME_UNVOICED_FLAG (tms->new_frame_pitch == 0) // ditto as above
-	UINT16 new_frame_energy;
-	UINT16 new_frame_pitch;
-	INT32 new_frame_k[10];
+#define NEW_FRAME_STOP_FLAG (tms->new_frame_energy_idx == 0xF) // 1 if this is a stop (Energy = 0xF) frame
+#define NEW_FRAME_UNVOICED_FLAG (tms->new_frame_pitch_idx == 0) // ditto as above
+	UINT8 new_frame_energy_idx;
+	UINT8 new_frame_pitch_idx;
+	UINT8 new_frame_k_idx[10];
 
 
 	/* these are all used to contain the current state of the sound generation */
@@ -398,13 +397,13 @@ static void register_for_save_states(tms5220_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->buffer_empty);
 	state_save_register_device_item(tms->device, 0, tms->irq_pin);
 
-	state_save_register_device_item(tms->device, 0, tms->old_frame_energy);
-	state_save_register_device_item(tms->device, 0, tms->old_frame_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->old_frame_k);
+	state_save_register_device_item(tms->device, 0, tms->old_frame_energy_idx);
+	state_save_register_device_item(tms->device, 0, tms->old_frame_pitch_idx);
+	state_save_register_device_item_array(tms->device, 0, tms->old_frame_k_idx);
 
-	state_save_register_device_item(tms->device, 0, tms->new_frame_energy);
-	state_save_register_device_item(tms->device, 0, tms->new_frame_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->new_frame_k);
+	state_save_register_device_item(tms->device, 0, tms->new_frame_energy_idx);
+	state_save_register_device_item(tms->device, 0, tms->new_frame_pitch_idx);
+	state_save_register_device_item_array(tms->device, 0, tms->new_frame_k_idx);
 
 	state_save_register_device_item(tms->device, 0, tms->current_energy);
 	state_save_register_device_item(tms->device, 0, tms->current_pitch);
@@ -501,10 +500,10 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 			logerror("data_write triggered talk status to go active!\n");
 #endif
 				/* ...then we now have enough bytes to start talking; clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
-				tms->new_frame_energy = 0;
-				tms->new_frame_pitch = 0;
+				tms->new_frame_energy_idx = 0;
+				tms->new_frame_pitch_idx = 0;
 				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->new_frame_k[i] = 0;
+					tms->new_frame_k_idx[i] = 0;
 				tms->talk_status = tms->speaking_now = 1;
 			}
 		}
@@ -760,10 +759,10 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
 
 			/* remember previous frame energy, pitch, and coefficients */
-			tms->old_frame_energy = tms->new_frame_energy;
-			tms->old_frame_pitch = tms->new_frame_pitch;
+			tms->old_frame_energy_idx = tms->new_frame_energy_idx;
+			tms->old_frame_pitch_idx = tms->new_frame_pitch_idx;
 			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->old_frame_k[i] = tms->new_frame_k[i];
+				tms->old_frame_k_idx[i] = tms->new_frame_k_idx[i];
 
 			/* if the talk status was clear last frame, halt speech now. */
 			if (tms->talk_status == 0)
@@ -783,67 +782,72 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #endif
 
 			/* Set old frame targets as starting point of new frame */
-			tms->current_energy = tms->old_frame_energy;
-			tms->current_pitch = tms->old_frame_pitch;
-			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->current_k[i] = tms->old_frame_k[i];
+			/* If old pitch index was 0, consider the k params > 4 to be zero */
+			tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
+			tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
+			for (i = 0; i < 4; i++)
+				tms->current_k[i] = tms->coeff->ktable[i][tms->old_frame_k_idx[i]];
+			if (tms->current_pitch == 0) // unvoiced frame, ZPAR is true
+			{
+				for (i = 4; i < tms->coeff->num_k; i++)
+					tms->current_k[i] = 0;
+			}
+			else
+			{
+				for (i = 4; i < tms->coeff->num_k; i++)
+					tms->current_k[i] = tms->coeff->ktable[i][tms->old_frame_k_idx[i]];
+			}
 
+			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
+			if (NEW_FRAME_STOP_FLAG == 1)
+				{
+					tms->talk_status = tms->speak_external = 0;
+					set_interrupt_state(tms, 1);
+					update_status_and_ints(tms);
+				}
 
 			/* in all cases where interpolation would be inhibited, set the target
                value equal to the current value.
                Interpolation inhibit cases:
                * Old frame was voiced, new is unvoiced
-               * Old frame was silence/zero energy, new is unvoiced
+               * Old frame was silence/zero energy, new has nonzero energy
                * Old frame was unvoiced, new is voiced
-               * New frame is a silence/zero energy frame - ? not sure
-               * New frame is a stop frame - ? not sure
             */
-			if ( ((NEW_FRAME_SILENCE_FLAG == 0) && (NEW_FRAME_STOP_FLAG == 0))
-			&& ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
-				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 1))
-				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0)) )
-				)
+			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
+				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
+				|| ((tms->current_energy == 0) && (tms->coeff->energytable[tms->new_frame_energy_idx] != 0)) )
 			{
 #ifdef DEBUG_GENERATION
 				logerror("processing frame: interpolation inhibited\n");
 				logerror("*** current Energy = %d\n",tms->current_energy);
-				logerror("*** next frame Energy = %d\n",tms->new_frame_energy);
+				logerror("*** next frame Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
 #endif
 				tms->target_energy = tms->current_energy;
 				tms->target_pitch = tms->current_pitch;
 				for (i = 0; i < tms->coeff->num_k; i++)
 					tms->target_k[i] = tms->current_k[i];
 			}
-			/* in cases where the new frame is a STOP or SILENCE frame, or if TS is now 0,
-               ramp the energy down to 0, leaving everything else alone. */
-			else if ((NEW_FRAME_SILENCE_FLAG == 1) || (NEW_FRAME_STOP_FLAG == 1) || (tms->talk_status == 0))
-			{
-#ifdef DEBUG_GENERATION
-				logerror("processing frame: ramp-down (energy = 0 or STOP)\n");
-#endif
-				tms->target_energy = 0;
-				tms->target_pitch = tms->current_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i];
-				if (NEW_FRAME_STOP_FLAG == 1)
-				{
-					tms->talk_status = tms->speak_external = 0;
-					set_interrupt_state(tms, 1);
-					update_status_and_ints(tms);
-				}
-			}
 			else // normal frame, normal interpolation
 			{
 #ifdef DEBUG_GENERATION
 				logerror("processing frame: Normal\n");
 				logerror("*** current Energy = %d\n",tms->current_energy);
-				logerror("*** new (target) Energy = %d\n",tms->new_frame_energy);
+				logerror("*** new (target) Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
 #endif
 
-				tms->target_energy = tms->new_frame_energy;
-				tms->target_pitch = tms->new_frame_pitch;
+				tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
+				tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
 				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->new_frame_k[i];
+					tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
+			}
+
+			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
+			if ( (tms->talk_status == 0))
+			{
+#ifdef DEBUG_GENERATION
+				logerror("talk status is 0, forcing target energy to 0\n");
+#endif
+				tms->target_energy = 0;
 			}
 		}
 		else // Not a new frame, just interpolate the existing frame.
@@ -1074,7 +1078,7 @@ static INT16 lattice_filter(tms5220_state *tms)
       Kn = tms->current_k[n-1]
       bn = tms->x[n-1]
     */
-		tms->u[10] = matrix_multiply(tms->current_energy, (tms->excitation_data*64));  //Y(11)
+		tms->u[10] = matrix_multiply(tms->previous_energy, (tms->excitation_data*64));  //Y(11)
 		//tms->u[10] = matrix_multiply((tms->excitation_data*64), tms->current_energy); // wrong but sounds better
         tms->u[9] = tms->u[10] - matrix_multiply(tms->current_k[9], tms->x[9]);
         tms->u[8] = tms->u[9] - matrix_multiply(tms->current_k[8], tms->x[8]);
@@ -1227,16 +1231,15 @@ static void parse_frame(tms5220_state *tms)
 	if (!tms->talk_status) goto ranout;
 
 	/* attempt to extract the energy index */
-	indx = extract_bits(tms,tms->coeff->energy_bits);
-	tms->new_frame_energy = tms->coeff->energytable[indx];
+	tms->new_frame_energy_idx = extract_bits(tms,tms->coeff->energy_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
-	printbits(indx,tms->coeff->energy_bits);
+	printbits(tms->new_frame_energy_idx,tms->coeff->energy_bits);
 	fprintf(stderr," ");
 #endif
 	update_status_and_ints(tms);
 	if (!tms->talk_status) goto ranout;
 	/* if the energy index is 0 or 15, we're done */
-	if ((indx == 0) || (indx == 15))
+	if ((tms->new_frame_energy_idx == 0) || (tms->new_frame_energy_idx == 15))
 		return;
 
 
@@ -1248,10 +1251,9 @@ static void parse_frame(tms5220_state *tms)
 #endif
 
 	/* attempt to extract the pitch */
-	indx = extract_bits(tms,tms->coeff->pitch_bits);
-	tms->new_frame_pitch = tms->coeff->pitchtable[indx];
+	tms->new_frame_pitch_idx = extract_bits(tms,tms->coeff->pitch_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
-	printbits(indx,tms->coeff->pitch_bits);
+	printbits(tms->new_frame_pitch_idx,tms->coeff->pitch_bits);
 	fprintf(stderr," ");
 #endif
 	update_status_and_ints(tms);
@@ -1263,34 +1265,32 @@ static void parse_frame(tms5220_state *tms)
 	/* extract first 4 K coefficients */
 	for (i = 0; i < 4; i++)
 	{
-		indx = extract_bits(tms,tms->coeff->kbits[i]);
+		tms->new_frame_k_idx[i] = extract_bits(tms,tms->coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
-		printbits(indx,tms->coeff->kbits[i]);
+		printbits(tms->new_frame_k_idx[i],tms->coeff->kbits[i]);
 		fprintf(stderr," ");
 #endif
-		tms->new_frame_k[i] = tms->coeff->ktable[i][indx];
 		update_status_and_ints(tms);
 		if (!tms->talk_status) goto ranout;
 	}
 
 	/* if the pitch index was zero, we only need 4 K's... */
-	if (tms->new_frame_pitch == 0)
+	if (tms->new_frame_pitch_idx == 0)
 	{
 		/* and the rest of the coefficients are zeroed */
 		for (i = 4; i < tms->coeff->num_k; i++)
-			tms->new_frame_k[i] = 0;
+			tms->new_frame_k_idx[i] = 0;
 		return;
 	}
 
 	/* If we got here, we need the remaining 6 K's */
 	for (i = 4; i < tms->coeff->num_k; i++)
 	{
-		indx = extract_bits(tms, tms->coeff->kbits[i]);
+		tms->new_frame_k_idx[i] = extract_bits(tms, tms->coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
-		printbits(indx,tms->coeff->kbits[i]);
+		printbits(tms->new_frame_k_idx[i],tms->coeff->kbits[i]);
 		fprintf(stderr," ");
 #endif
-		tms->new_frame_k[i] = tms->coeff->ktable[i][indx];
 		update_status_and_ints(tms);
 		if (!tms->talk_status) goto ranout;
 	}
@@ -1412,10 +1412,10 @@ static DEVICE_RESET( tms5220 )
 	tms->RDB_flag = FALSE;
 
 	/* initialize the energy/pitch/k states */
-	tms->old_frame_energy = tms->new_frame_energy = tms->current_energy = tms->target_energy = 0;
-	tms->old_frame_pitch = tms->new_frame_pitch = tms->current_pitch = tms->target_pitch = 0;
-	memset(tms->old_frame_k, 0, sizeof(tms->old_frame_k));
-	memset(tms->new_frame_k, 0, sizeof(tms->new_frame_k));
+	tms->old_frame_energy_idx = tms->new_frame_energy_idx = tms->current_energy = tms->target_energy = 0;
+	tms->old_frame_pitch_idx = tms->new_frame_pitch_idx = tms->current_pitch = tms->target_pitch = 0;
+	memset(tms->old_frame_k_idx, 0, sizeof(tms->old_frame_k_idx));
+	memset(tms->new_frame_k_idx, 0, sizeof(tms->new_frame_k_idx));
 	memset(tms->current_k, 0, sizeof(tms->current_k));
 	memset(tms->target_k, 0, sizeof(tms->target_k));
 
