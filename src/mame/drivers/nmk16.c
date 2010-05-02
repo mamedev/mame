@@ -7140,7 +7140,7 @@ GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, 0,        ROT270, "NMK",    
 GAME( 1993, tdragon2a,tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL )
 GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL )
 
-GAME( 1994, raphero,  0,        raphero,  raphero,  0,        ROT270, "Media Trading Corp",           "Rapid Hero", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1994, raphero,  0,        raphero,  raphero,  0,        ROT270, "NMK / Media Shoji",            "Rapid Hero", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
