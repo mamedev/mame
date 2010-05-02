@@ -133,7 +133,7 @@ static VIDEO_UPDATE( skyarmy )
 		pal = BITSWAP8(spriteram[offs+2], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
 		sx = spriteram[offs+3];
-		sy = 242-spriteram[offs];
+		sy = 240-(spriteram[offs]+1);
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
