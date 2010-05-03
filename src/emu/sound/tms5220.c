@@ -74,7 +74,7 @@ Driver specific notes:
 
 Progress list for drivers using old vs new interface:
 starwars: uses new interface (couriersud)
-gauntlet: uses new interface (couriersud
+gauntlet: uses new interface (couriersud)
 atarisy1: uses new interface (Lord Nightmare)
 atarisy2: uses new interface (Lord Nightmare)
 atarijsa: uses new interface (Lord Nightmare)
@@ -265,12 +265,14 @@ struct _tms5220_state
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
-#define OLD_FRAME_UNVOICED_FLAG (tms->old_frame_pitch_idx == 0) // 1 if unvoiced, 0 if voiced
+#define OLD_FRAME_SILENCE_FLAG (tms->old_frame_energy_idx == 0) // 1 if E=0, 0 otherwise.
+#define OLD_FRAME_UNVOICED_FLAG (tms->old_frame_pitch_idx == 0) // 1 if P=0 (unvoiced), 0 if voiced
 	UINT8 old_frame_energy_idx;
 	UINT8 old_frame_pitch_idx;
 	UINT8 old_frame_k_idx[10];
 
 #define NEW_FRAME_STOP_FLAG (tms->new_frame_energy_idx == 0xF) // 1 if this is a stop (Energy = 0xF) frame
+#define NEW_FRAME_SILENCE_FLAG (tms->new_frame_energy_idx == 0) // ditto as above
 #define NEW_FRAME_UNVOICED_FLAG (tms->new_frame_pitch_idx == 0) // ditto as above
 	UINT8 new_frame_energy_idx;
 	UINT8 new_frame_pitch_idx;
@@ -774,7 +776,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			if (tms->talk_status == 0)
 			{
 #ifdef DEBUG_GENERATION
-				logerror("tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
+				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
 #endif
 				tms->speaking_now = 0; // finally halt speech
 				goto empty;
@@ -786,23 +788,6 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #ifdef DEBUG_PARSE_FRAME_DUMP
 			fprintf(stderr,"\n");
 #endif
-
-			/* Set old frame targets as starting point of new frame */
-			/* If old pitch index was 0, consider the k params > 4 to be zero */
-			tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
-			tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
-			for (i = 0; i < 4; i++)
-				tms->current_k[i] = tms->coeff->ktable[i][tms->old_frame_k_idx[i]];
-			if (tms->current_pitch == 0) // unvoiced frame, ZPAR is true
-			{
-				for (i = 4; i < tms->coeff->num_k; i++)
-					tms->current_k[i] = 0;
-			}
-			else
-			{
-				for (i = 4; i < tms->coeff->num_k; i++)
-					tms->current_k[i] = tms->coeff->ktable[i][tms->old_frame_k_idx[i]];
-			}
 
 			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
 			if (NEW_FRAME_STOP_FLAG == 1)
@@ -821,12 +806,12 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             */
 			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
 				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
-				|| ((tms->current_energy == 0) && (tms->coeff->energytable[tms->new_frame_energy_idx] != 0)) )
+				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
 			{
 #ifdef DEBUG_GENERATION
-				logerror("processing frame: interpolation inhibited\n");
-				logerror("*** current Energy = %d\n",tms->current_energy);
-				logerror("*** next frame Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
+				fprintf(stderr,"processing frame: interpolation inhibited\n");
+				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
+				fprintf(stderr,"*** next frame Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
 #endif
 				tms->target_energy = tms->current_energy;
 				tms->target_pitch = tms->current_pitch;
@@ -836,9 +821,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			else // normal frame, normal interpolation
 			{
 #ifdef DEBUG_GENERATION
-				logerror("processing frame: Normal\n");
-				logerror("*** current Energy = %d\n",tms->current_energy);
-				logerror("*** new (target) Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
+				fprintf(stderr,"processing frame: Normal\n");
+				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
+				fprintf(stderr,"*** new (target) Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
 #endif
 
 				tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
@@ -861,7 +846,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			if ( (tms->talk_status == 0))
 			{
 #ifdef DEBUG_GENERATION
-				logerror("talk status is 0, forcing target energy to 0\n");
+				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
 #endif
 				tms->target_energy = 0;
 			}
@@ -873,6 +858,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #else
 			interp_period = tms->sample_count / 25;
 #endif
+#define PC_COUNT_LOAD 0
 		switch(tms->interp_count)
 			{
 				/*         PC=X  X cycle, rendering change (change for next cycle which chip is actually doing) */
@@ -881,61 +867,97 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				case 1: /* PC=0, B cycle, nothing happens (update energy) */
 				break;
 				case 2: /* PC=1, A cycle, update energy (calc pitch) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
 				tms->current_energy += ((tms->target_energy - tms->current_energy) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 3: /* PC=1, B cycle, nothing happens (update pitch) */
 				break;
 				case 4: /* PC=2, A cycle, update pitch (calc K1) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
 				tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 5: /* PC=2, B cycle, nothing happens (update K1) */
 				break;
 				case 6: /* PC=3, A cycle, update K1 (calc K2) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[0] = tms->coeff->ktable[0][tms->old_frame_k_idx[0]];
 				tms->current_k[0] += ((tms->target_k[0] - tms->current_k[0]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 7: /* PC=3, B cycle, nothing happens (update K2) */
 				break;
 				case 8: /* PC=4, A cycle, update K2 (calc K3) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[1] = tms->coeff->ktable[1][tms->old_frame_k_idx[1]];
 				tms->current_k[1] += ((tms->target_k[1] - tms->current_k[1]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 9: /* PC=4, B cycle, nothing happens (update K3) */
 				break;
 				case 10: /* PC=5, A cycle, update K3 (calc K4) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[2] = tms->coeff->ktable[2][tms->old_frame_k_idx[2]];
 				tms->current_k[2] += ((tms->target_k[2] - tms->current_k[2]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 11: /* PC=5, B cycle, nothing happens (update K4) */
 				break;
 				case 12: /* PC=6, A cycle, update K4 (calc K5) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[3] = tms->coeff->ktable[3][tms->old_frame_k_idx[3]];
 				tms->current_k[3] += ((tms->target_k[3] - tms->current_k[3]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 13: /* PC=6, B cycle, nothing happens (update K5) */
 				break;
 				case 14: /* PC=7, A cycle, update K5 (calc K6) */
+				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
+					tms->current_k[4] = tms->coeff->ktable[4][tms->old_frame_k_idx[4]];
+				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
+					tms->current_k[4] = 0;
 				tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 15: /* PC=7, B cycle, nothing happens (update K6) */
 				break;
 				case 16: /* PC=8, A cycle, update K6 (calc K7) */
+				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
+					tms->current_k[5] = tms->coeff->ktable[5][tms->old_frame_k_idx[5]];
+				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
+					tms->current_k[5] = 0;
 				tms->current_k[5] += ((tms->target_k[5] - tms->current_k[5]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 17: /* PC=8, B cycle, nothing happens (update K7) */
 				break;
 				case 18: /* PC=9, A cycle, update K7 (calc K8) */
+				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
+					tms->current_k[6] = tms->coeff->ktable[6][tms->old_frame_k_idx[6]];
+				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
+					tms->current_k[6] = 0;
 				tms->current_k[6] += ((tms->target_k[6] - tms->current_k[6]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 19: /* PC=9, B cycle, nothing happens (update K8) */
 				break;
 				case 20: /* PC=10, A cycle, update K8 (calc K9) */
+				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
+					tms->current_k[7] = tms->coeff->ktable[7][tms->old_frame_k_idx[7]];
+				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
+					tms->current_k[7] = 0;
 				tms->current_k[7] += ((tms->target_k[7] - tms->current_k[7]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 21: /* PC=10, B cycle, nothing happens (update K9) */
 				break;
 				case 22: /* PC=11, A cycle, update K9 (calc K10) */
+				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
+					tms->current_k[8] = tms->coeff->ktable[8][tms->old_frame_k_idx[8]];
+				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
+					tms->current_k[8] = 0;
 				tms->current_k[8] += ((tms->target_k[8] - tms->current_k[8]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 23: /* PC=11, B cycle, nothing happens (update K10) */
 				break;
 				case 24: /* PC=12, A cycle, update K10 (do nothing) */
+				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
+					tms->current_k[9] = tms->coeff->ktable[9][tms->old_frame_k_idx[9]];
+				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
+					tms->current_k[9] = 0;
 				tms->current_k[9] += ((tms->target_k[9] - tms->current_k[9]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 			}
