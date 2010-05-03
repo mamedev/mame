@@ -290,6 +290,7 @@ struct _tms5220_state
 
 	//UINT8 interp_period; /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
 	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
+	//UINT8 spkslow_delay;	/* delay counter for interp count, only used on tms51xx */
 	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
 	UINT8 tms5220c_rate; /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
 	UINT16 pitch_count;		/* pitch counter; provides chirp rom address */
@@ -990,7 +991,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             tms->RNG |= bitout << 12;
 	}
 #ifdef DEBUG_GENERATION_VERBOSE
-		fprintf(stderr,"X:%04d; E:%04d; P:%04d; ",tms->excitation_data, tms->current_energy, tms->current_pitch);
+		fprintf(stderr,"X:%04d; E:%04d; P:%04d; Pc:%04d ",tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
 		for (i=0; i<10; i++)
 			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
 		fprintf(stderr,"\n");
@@ -1004,10 +1005,8 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
         size--;
         tms->sample_count = (tms->sample_count + 1) % 200;
-        if (tms->current_pitch != 0)
-            tms->pitch_count = (tms->pitch_count + 1) % tms->current_pitch;
-        else
-            tms->pitch_count = 0; // forced to blank spot in the chirp rom
+        tms->pitch_count++;
+        if (tms->pitch_count >= tms->current_pitch) tms->pitch_count = 0;
 
         tms->interp_count = (tms->interp_count + 1) % 25;
         buf_count++;
@@ -1304,9 +1303,7 @@ static void parse_frame(tms5220_state *tms)
 	/* if the pitch index was zero, we only need 4 K's... */
 	if (tms->new_frame_pitch_idx == 0)
 	{
-		/* and the rest of the coefficients are zeroed */
-		for (i = 4; i < tms->coeff->num_k; i++)
-			tms->new_frame_k_idx[i] = 0;
+		/* and the rest of the coefficients are zeroed, but that's done in the generator code */
 		return;
 	}
 
