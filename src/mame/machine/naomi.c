@@ -12,6 +12,11 @@ vtennis2: check bp c020130 / wpset c013ff0,f,w,wpdata==0x3f800000 -> 0xc020434 (
 
 smarinef: put cabinet in STD mode, bp c027968, wpset c0e66a6,4,w
 
+
+hotd2: bp 0xc0ba235, modify work RAM 0xc9c35e8 to be zero, bpclear
+
+hotd2o: bp 0xc0ba1f6, modify work RAM 0xc9c35a8 to be zero, bpclear
+
 ***************************************************************************/
 
 #include "emu.h"
