@@ -1255,11 +1255,11 @@ WRITE64_HANDLER( pvr_ta_w )
 
 	case SPG_VBLANK_INT:
 		/* clear pending irqs and modify them with the updated ones */
-		timer_adjust_oneshot(vbin_timer, attotime_never, 0), 0);
-		timer_adjust_oneshot(vbout_timer, attotime_never, 0), 0);
+		timer_adjust_oneshot(vbin_timer, attotime_never, 0);
+		timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 
-		timer_adjust_oneshot(vbin_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_in_irq_line_num, 0), 0);
-		timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
+		timer_adjust_oneshot(vbin_timer, video_screen_get_time_until_pos(space->machine->primary_screen, spg_vblank_in_irq_line_num, 0), 0);
+		timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(space->machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
 		break;
 	/* TODO: timer adjust for SPG_HBLANK_INT too */
 	case TA_LIST_CONT:
