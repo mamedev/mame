@@ -14,6 +14,7 @@
      Preliminary MASSIVE merge of tms5110 and tms5220 cores by Lord Nightmare
      Lattice Filter, Multiplier, and clipping redone by Lord Nightmare
      TMS5220C multi-rate feature added by Lord Nightmare
+     Massive rewrite and reorganization by Lord Nightmare
 
      Much information regarding these lpc encoding comes from US patent 4,209,844
      US patent 4,331,836 describes the complete 51xx chip
@@ -192,12 +193,11 @@ device), PES Speech adapter (serial port connection)
    between current and target to the current each frame */
 #undef OVERRIDE_INTERPOLATION
 
-/* defines how many times to leftshift the chirp rom before feeding to the lattice filter. default is 0 */
-#define CHIRPROM_LEFTSHIFT 0
-
 /* *****debugging defines***** */
 #undef VERBOSE
 // above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
+#undef DEBUG_DUMP_INPUT_DATA
+// above dumps the data input to the tms52xx to stdout, useful for making logged data dumps for real hardware tests
 #undef DEBUG_FIFO
 // above debugs fifo stuff: writes, reads and flag updates
 #undef DEBUG_PARSE_FRAME_DUMP
@@ -214,6 +214,8 @@ device), PES Speech adapter (serial port connection)
 // above spams the errorlog with i/o ready messages whenever the ready or irq pin is read
 #undef DEBUG_GENERATION
 // above dumps some debug information related to the sample generation loop, i.e. when ramp frames happen
+#undef DEBUG_GENERATION_VERBOSE
+// above dumps MUCH MORE debug information related to the sample generation loop, namely the k, pitch and energy values for EVERY SINGLE SAMPLE.
 #undef DEBUG_CLIP_WRAP
 // above dumps info to stderr whenever the clip/wrap hardware is (or would be) clipping the signal.
 #undef DEBUG_IO_READY
@@ -278,11 +280,11 @@ struct _tms5220_state
 	/* these are all used to contain the current state of the sound generation */
 	UINT16 current_energy;
 	UINT16 current_pitch;
-	INT32 current_k[10];
+	INT16 current_k[10];
 
 	UINT16 target_energy;
 	UINT16 target_pitch;
-	INT32 target_k[10];
+	INT16 target_k[10];
 
 	UINT16 previous_energy;         /* needed for lattice filter to match patent */
 
@@ -481,6 +483,9 @@ static void printbits(long data, int num)
 
 static void tms5220_data_write(tms5220_state *tms, int data)
 {
+#ifdef DEBUG_DUMP_INPUT_DATA
+	fprintf(stdout, "%c",data);
+#endif
 	if (tms->speak_external) // If we're in speak external mode
 	{
 		/* add this byte to the FIFO */
@@ -837,8 +842,18 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
 				tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
 				tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
-				for (i = 0; i < tms->coeff->num_k; i++)
+				for (i = 0; i < 4; i++)
 					tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
+				if (tms->current_pitch == 0) // unvoiced frame, ZPAR is true
+				{
+					for (i = 4; i < tms->coeff->num_k; i++)
+						tms->target_k[i] = 0;
+				}
+				else
+				{
+					for (i = 4; i < tms->coeff->num_k; i++)
+						tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
+				}
 			}
 
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
@@ -951,10 +966,17 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
              * disabled, forcing all samples beyond 51d to be == 51d
              * (address 51d holds zeroes, which may or may not be inverted to -1)
              */
+#ifdef NORMALMODE
           if (tms->pitch_count >= 51)
-              tms->excitation_data = tms->coeff->chirptable[51]<<CHIRPROM_LEFTSHIFT;
+              tms->excitation_data = tms->coeff->chirptable[51];
           else /*tms->pitch_count < 51*/
-              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]<<CHIRPROM_LEFTSHIFT;
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
+#else
+          if (tms->pitch_count >= 51)
+              tms->excitation_data = tms->coeff->chirptable[51]^0xFF;
+          else /*tms->pitch_count < 51*/
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]^0xFF;
+#endif
         }
 
         /* Update LFSR *20* times every sample, like patent shows */
@@ -967,7 +989,12 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             tms->RNG >>= 1;
             tms->RNG |= bitout << 12;
 	}
-
+#ifdef DEBUG_GENERATION_VERBOSE
+		fprintf(stderr,"X:%04d; E:%04d; P:%04d; ",tms->excitation_data, tms->current_energy, tms->current_pitch);
+		for (i=0; i<10; i++)
+			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
+		fprintf(stderr,"\n");
+#endif
 		buffer[buf_count] = clip_and_wrap(lattice_filter(tms)); /* execute lattice filter and clipping/wrapping */
 
         //if (tms->digital_select == 0) /* if digital is NOT selected... */
