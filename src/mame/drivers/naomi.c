@@ -1151,11 +1151,6 @@ static UINT32 *dc_sound_ram;
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
-static INTERRUPT_GEN( naomi_vblank )
-{
-	dc_vblank(device->machine);
-}
-
 static READ64_HANDLER( naomi_arm_r )
 {
 	return *((UINT64 *)dc_sound_ram+offset);
@@ -1663,6 +1658,7 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_START("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+
 	PORT_START("KEY1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) //TODO: mahjong panel test & service buttons are presumably here
 
@@ -1828,7 +1824,6 @@ static MACHINE_DRIVER_START( naomi_base )
 	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(naomi_map)
 	MDRV_CPU_IO_MAP(naomi_port)
-	MDRV_CPU_VBLANK_INT("screen", naomi_vblank)
 
 	MDRV_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map)
@@ -2999,7 +2994,7 @@ ROM_START( hotd2o )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xa800000, "user1", ROMREGION_ERASEFF)
-        ROM_LOAD( "epr-21385.ic22", 0x0000000, 0x200000, CRC(dedffe5f) SHA1(98b2a4c67ecb30cb096b9cea9061d904cf495937) ) 
+        ROM_LOAD( "epr-21385.ic22", 0x0000000, 0x200000, CRC(dedffe5f) SHA1(98b2a4c67ecb30cb096b9cea9061d904cf495937) )
         ROM_LOAD( "mpr-21386.ic1",  0x0800000, 0x800000, CRC(88fb0562) SHA1(185a0eab68d86617cb6325d64c48a2dd4854622b) )
         ROM_LOAD( "mpr-21387.ic2",  0x1000000, 0x800000, CRC(5f4dd576) SHA1(5483c3949e587bbcca7e8fc7db9aff4cd2a33f02) )
         ROM_LOAD( "mpr-21388.ic3",  0x1800000, 0x800000, CRC(3e62fca4) SHA1(8cdebdebabc88160f458e1e779d9ebb4e6a14523) )

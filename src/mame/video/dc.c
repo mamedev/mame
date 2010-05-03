@@ -137,6 +137,7 @@ UINT64 *dc_texture_ram; // '64-bit access area'
 static UINT32 tafifo_buff[32];
 
 static emu_timer *vbout_timer;
+static emu_timer *vbin_timer;
 static emu_timer *hbin_timer;
 static emu_timer *endofrender_timer_isp;
 static emu_timer *endofrender_timer_tsp;
@@ -1252,13 +1253,24 @@ WRITE64_HANDLER( pvr_ta_w )
 		printf("TA_YUV_TEX_CTRL initialized to %08x\n", dat);
 		break;
 
+	case SPG_VBLANK_INT:
+		/* clear pending irqs and modify them with the updated ones */
+		timer_adjust_oneshot(vbin_timer, attotime_never, 0), 0);
+		timer_adjust_oneshot(vbout_timer, attotime_never, 0), 0);
 
+		timer_adjust_oneshot(vbin_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_in_irq_line_num, 0), 0);
+		timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
+		break;
+	/* TODO: timer adjust for SPG_HBLANK_INT too */
 	case TA_LIST_CONT:
 	#if DEBUG_PVRTA
 		mame_printf_verbose("List continuation processing\n");
 	#endif
-		state_ta.tafifo_listtype= -1; // no list being received
-		state_ta.listtype_used |= (1+4);
+		if(dat & 0x80000000)
+		{
+			state_ta.tafifo_listtype= -1; // no list being received
+			state_ta.listtype_used |= (1+4);
+		}
 		break;
 	case SPG_VBLANK:
 	case SPG_HBLANK:
@@ -2444,6 +2456,14 @@ static void pvr_build_parameterconfig(void)
 			pvr_parameterconfig[a] = pvr_parameterconfig[a-1];
 }
 
+static TIMER_CALLBACK(vbin)
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
+	dc_update_interrupt_status(machine);
+
+	timer_adjust_oneshot(vbin_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_in_irq_line_num, 0), 0);
+}
+
 static TIMER_CALLBACK(vbout)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
@@ -2544,8 +2564,12 @@ VIDEO_START(dc)
 	vbout_timer = timer_alloc(machine, vbout, 0);
 	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
 
+	vbin_timer = timer_alloc(machine, vbin, 0);
+	timer_adjust_oneshot(vbin_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_in_irq_line_num, 0), 0);
+
 	hbin_timer = timer_alloc(machine, hbin, 0);
 	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, spg_hblank_in_irq-1), 0);
+
 	scanline = 0;
 	next_y = 0;
 
@@ -2607,11 +2631,4 @@ VIDEO_UPDATE(dc)
 	debug_dip_status = input_port_read(screen->machine, "MAMEDEBUG");
 
 	return 0;
-}
-
-/* TODO: remove this and add a new vblin timer, register generally sets V Blank-IN event to happen at line 260 (0x104), not 480! */
-void dc_vblank(running_machine *machine)
-{
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
-	dc_update_interrupt_status(machine);
 }
