@@ -47,12 +47,10 @@ static VIDEO_START( wcvol95 )
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
 	state->pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
 	state->pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
-	machine->generic.paletteram.u16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	/* and register the allocated ram so that save states still work */
 	state_save_register_global_pointer(machine, state->pf1_rowscroll, 0x800/2);
 	state_save_register_global_pointer(machine, state->pf2_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, 0x1000/2);
 }
 
 /* spriteram is really 16-bit.. this can be changed to use 16-bit ram like the tilemaps
