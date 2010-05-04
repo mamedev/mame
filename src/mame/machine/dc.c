@@ -1569,11 +1569,53 @@ static TIMER_CALLBACK(dc_rtc_increment)
     dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
     if (dc_rtcregister[RTC2] == 0)
         dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
+
+	popmessage("%d",dc_rtcregister[RTC1] << 16 | dc_rtcregister[RTC2]);
+}
+
+/* fill the RTC registers with the proper start-up values */
+static void rtc_initial_setup(running_machine *machine)
+{
+	static UINT32 current_time;
+	static int year_count,cur_year,i;
+	static const int month_to_day_conversion[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+	mame_system_time systime;
+	mame_get_base_datetime(machine, &systime);
+
+	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
+
+	/* put the seconds */
+	current_time = systime.local_time.second;
+	/* put the minutes */
+	current_time+= systime.local_time.minute*60;
+	/* put the hours */
+	current_time+= systime.local_time.hour*60*60;
+	/* put the days (note -1) */
+	current_time+= (systime.local_time.mday-1)*60*60*24;
+	/* take the current year here for calculating leaps */
+	cur_year = (systime.local_time.year);
+
+	/* take the months - despite popular beliefs, leap years aren't just evenly divisible by 4 */
+	if(((((cur_year % 4) == 0) && ((cur_year % 100) != 0)) || ((cur_year % 400) == 0)) && systime.local_time.month > 2)
+		current_time+= (month_to_day_conversion[systime.local_time.month]+1)*60*60*24;
+	else
+		current_time+= (month_to_day_conversion[systime.local_time.month])*60*60*24;
+
+	/* put the years */
+	year_count = (cur_year-1949);
+
+	for(i=0;i<year_count-1;i++)
+		current_time += (((((i+1950) % 4) == 0) && (((i+1950) % 100) != 0)) || (((i+1950) % 400) == 0)) ? 60*60*24*366 : 60*60*24*365;
+
+	dc_rtcregister[RTC2] = current_time & 0x0000ffff;
+	dc_rtcregister[RTC1] = (current_time & 0xffff0000) >> 16;
+
+	dc_rtc_timer = timer_alloc(machine, dc_rtc_increment, 0);
 }
 
 MACHINE_START( dc )
 {
-	dc_rtc_timer = timer_alloc(machine, dc_rtc_increment, 0);
+	rtc_initial_setup(machine);
 }
 
 MACHINE_RESET( dc )
@@ -1583,7 +1625,6 @@ MACHINE_RESET( dc )
 
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 	memset(maple_regs, 0, sizeof(maple_regs));
-	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
 	memset(dc_coin_counts, 0, sizeof(dc_coin_counts));
 
 	timer_adjust_periodic(dc_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
