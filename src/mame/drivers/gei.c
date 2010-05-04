@@ -115,6 +115,16 @@ static PALETTE_INIT(gei)
 	}
 }
 
+static PALETTE_INIT(quizvid)
+{
+	int i;
+
+	for (i = 0; i < 8; i++ )
+	{
+		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
+	}
+}
+
 static WRITE8_DEVICE_HANDLER( lamps_w )
 {
 	/* 5 button lamps */
@@ -1086,6 +1096,8 @@ static MACHINE_DRIVER_START( quizvid )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(quizvid_map)
+
+	MDRV_PALETTE_INIT(quizvid)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gselect )
@@ -1525,9 +1537,20 @@ ROM_START( suprpokr )
 	ROM_LOAD( "10-19s-1.e2",  0x08000, 0x4000, BAD_DUMP CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) ) /* Self test reports this ROM bad */
 ROM_END
 
-ROM_START( reelfun ) /* v7.01 */
+ROM_START( reelfun ) /* v7.03 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "reelfun.cnt",          0x00000, 0x4000, CRC(d9d1e92b) SHA1(337f66a37b3734d565b3ff3d912e0f690fd7c445) )
+	ROM_LOAD( "reelfun.cnt",          0x00000, 0x4000, CRC(ce42e0ea) SHA1(87f703b14aa819c54e54b42e639448521c01f76b) )
+	ROM_LOAD( "reelfun.prg",          0x08000, 0x2000, CRC(615d846a) SHA1(ffa1c47393f4f364aa34d14cf3ac2f56d9eaecb0) )	/* banked */
+	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) )	/* banked ROMs for solution data */
+	ROM_LOAD( "reelfun-2-place",      0x18000, 0x8000, CRC(a0066bfd) SHA1(b6f031ab50eb396be79e79e06f2101400683ec3e) )
+	ROM_LOAD( "reelfun-3-phrase",     0x20000, 0x8000, CRC(199e36b0) SHA1(d9dfe39c9a4fca1169150f8941f8ebc499dfbaf5) )
+	ROM_LOAD( "reelfun-4-person",     0x28000, 0x8000, CRC(49b0710b) SHA1(a38b3251bcb8683d43bdb903036970140a9735e6) )
+	ROM_LOAD( "reelfun-5-song_title", 0x30000, 0x8000, CRC(cce01c45) SHA1(c484f5828928edf39335cedf21acab0b9e2a6881) )
+ROM_END
+
+ROM_START( reelfun1 ) /* v7.01 */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "reelfun701.cnt",       0x00000, 0x4000, CRC(d9d1e92b) SHA1(337f66a37b3734d565b3ff3d912e0f690fd7c445) )
 	ROM_LOAD( "reelfun.prg",          0x08000, 0x2000, CRC(615d846a) SHA1(ffa1c47393f4f364aa34d14cf3ac2f56d9eaecb0) )	/* banked */
 	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) )	/* banked ROMs for solution data */
 	ROM_LOAD( "reelfun-2-place",      0x18000, 0x8000, CRC(a0066bfd) SHA1(b6f031ab50eb396be79e79e06f2101400683ec3e) )
@@ -1811,7 +1834,7 @@ GAME( 1982, gs4002,   0,        gselect,  gselect,  0,       ROT0, "Greyhound El
 GAME( 1982, gs4002a,  gs4002,   gselect,  gselect,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 2)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1982, amuse,    0,        amuse,    gepoker,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 50.08 IBA)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1982, amuse1, 0,          amuse1,   gepoker,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 30.08 IBA)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1982, amuse1,   amuse,    amuse1,   gepoker,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 30.08 IBA)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1984, gepoker,  0,        gepoker,  gepoker,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gepoker1, gepoker,  gepoker,  gepoker,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -1843,9 +1866,10 @@ GAME( 1986, gt5,      0,        findout,  gt103,    0,       ROT0, "Grayhound El
 
 GAME( 1986, quiz,     0,        findout,  quiz,     0,       ROT0, "Italian bootleg",       "Quiz (Revision 2)",                       GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-GAME( 1986, quizvid,  0,        quizvid,  quiz,     0,       ROT0, "Greyhound Electronics", "Video Quiz",                              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, quizvid,  0,        quizvid,  quiz,     0,       ROT0, "bootleg",               "Video Quiz",                              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-GAME( 1986, reelfun,  0,        findout,  reelfun,  0,       ROT0, "Grayhound Electronics", "Reel Fun (Version 7.01)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, reelfun,  0,        findout,  reelfun,  0,       ROT0, "Grayhound Electronics", "Reel Fun (Version 7.03)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, reelfun1, reelfun,  findout,  reelfun,  0,       ROT0, "Grayhound Electronics", "Reel Fun (Version 7.01)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1987, findout,  0,        findout,  findout,  0,       ROT0, "Elettronolo",           "Find Out (Version 4.04)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1987, suprpokr, 0,        suprpokr, suprpokr, 0,       ROT0, "Grayhound Electronics", "Super Poker",                             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
