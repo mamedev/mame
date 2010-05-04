@@ -620,24 +620,71 @@ ROM_END
 
 Skill Drop Georgia
 
-"Sep 13 2002 09:17:54" in code rom.
+"Sep 13 2002 09:17:54" in code rom and AAI276832 on sticker.
 
-AAI276832 on sticker
+No specific PCB model or numer....
+
+ Astro V02 0022 160pin PQFP ("ASTRO02" silkscreened under chip)
+ JX-1689F1028N GRC586.V5 (68K core, has direct connection to program roms)
+ Lattice IspLSI 1016 60LJ socketted FPGA
+ OKI 6295 clone chip (AD-65 or U6295)
+
+EEPROM Atmel 93C46
+Batery 3.6V
+OSC    24.000MHz
+
+PC1 is a push button for test mode
+VR1 is for sound volume
+
+      +---------+   +----------------------------+ +----+
+  +---+Connector+---+         Connector          +-+    |
+  |                                                  VR1|
+  |                                                     |
++-+             +------+                                |
+|      ULN2003A |IspLSI| UT6264CPC     ROM#4*           |
+|  ULN2003A     | 1016 |             +---------+        |
+|8              +------++----------+ |ROM#6 U26|        |
+|                       |ROM#2  U20| +---------+  +----+|
+|L        +-------+     +----------+   ROM#3*     |6295||
+|i        | JX-   |                               +----+|
+|n        | 1689F | +--------------+                    |
+|e        | 1028N | |  ROM#7 U100  |                    |
+|r        +-------+ +--------------+                    |
+|                                    +----------+   +---+
+|C                      +----------+ |          |   |   |
+|o                      |ROM#1  U21| |  Astro   |   | R |
+|n                      +----------+ |  V02     |   | O |
+|n                                   |  0022    |   | M |
+|e                                   +----------+   | # |
+|c                       UT6264CPC                  | 5 |
+|t                                                  |   |
+|o                                                  +---+
+|r     93C46              6116      6116      RAM1      |
+|                                                  24MHz|
++-+ BAT1 PC1              6116      6116      RAM1      |
+  +-----------------------------------------------------+
+
+ROM#1 & ROM#2 are 32pin sockets
+ROM#7 is a 40pin socket
+ROM#3 & ROM#4 at U25 & U27 are optional unpopulated 32pin sockets and overlap with ROM#6
+ROM#6 is 29F1610MC flash rom
+
+RAM1 are SEC KM681000BLG-7L RAM chips
 
 ***************************************************************************/
 
 ROM_START( skilldrp )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.0s.bc133", 0x00000, 0x40000, CRC(f968b783) SHA1(1d693b1d460e659ca94aae8625ea26e120053f84) )
+	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.0s.u100", 0x00000, 0x40000, CRC(f968b783) SHA1(1d693b1d460e659ca94aae8625ea26e120053f84) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "mx29f1610amc.u26", 0x000000, 0x200000, CRC(4fdac800) SHA1(bcafceb6c34866c474714347e23f9e819b5fcfa6) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "5-skill_drop.bc52", 0x00000, 0x80000, CRC(a479e06d) SHA1(ee690d39188b8a43652c4aa5bf8267c1f6632d2f) )
+	ROM_LOAD( "5-skill_drop", 0x00000, 0x80000, CRC(a479e06d) SHA1(ee690d39188b8a43652c4aa5bf8267c1f6632d2f) ) /* No chip location just "ROM#5" silkscreened under socket */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "skilldrp.nv", 0x00, 0x80, CRC(57886a3d) SHA1(bad8fa2ec2262ccb5ef8ec50959aec3f3bf8b90b) )
+	ROM_LOAD( "skilldrp.u6", 0x00, 0x80, CRC(57886a3d) SHA1(bad8fa2ec2262ccb5ef8ec50959aec3f3bf8b90b) )
 ROM_END
 
 static DRIVER_INIT( showhand )
