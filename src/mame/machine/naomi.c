@@ -2,20 +2,9 @@
 
 Per-game specific JVS settings / idle loop skips for the MAME Naomi driver.
 
-suchie3: check bp c0a6458 (might be protection related)
-
-tetkiwam: check bp c09613a
-
-vtennis: check wpset dee3ec8,8,w,wpdata==0xa8804000
+suchie3: check bp c0a6458
 
 vtennis2: check bp c020130 / wpset c013ff0,f,w,wpdata==0x3f800000 -> 0xc020434 (test mode)
-
-smarinef: put cabinet in STD mode, bp c027968, wpset c0e66a6,4,w
-
-
-hotd2: bp 0xc0ba235, modify work RAM 0xc9c35e8 to be zero, bpclear
-
-hotd2o: bp 0xc0ba1f6, modify work RAM 0xc9c35a8 to be zero, bpclear
 
 ***************************************************************************/
 
@@ -235,12 +224,27 @@ static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 	return naomi_ram64[0x18d6c8/8];
 }
 
-
 DRIVER_INIT( ggxxrl )
 {
 	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
 }
+
+/* at least speeds up the annoying copyright screens ;-) */
+static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
+{
+	if (cpu_get_pc(space->cpu)==0xc36a2dc)
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+
+	return naomi_ram64[0x5dc900/8];
+}
+
+DRIVER_INIT( sfz3ugd )
+{
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc5dc900, 0xc5dc907, 0, 0, naomigd_sfz3ugd_idle_skip_r);
+	DRIVER_INIT_CALL(naomi);
+}
+
 
 DRIVER_INIT( qmegamis )
 {

@@ -688,7 +688,8 @@ WRITE64_HANDLER( dc_sysctrl_w )
 				else //direct texture path
 					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
-				timer_set(space->machine, ATTOTIME_IN_USEC(200), NULL, 0, ch2_dma_irq);
+				/* 200 usecs breaks sfz3upper */
+				timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, ch2_dma_irq);
 				/* simulate YUV FIFO processing here */
 				if((address & 0x1800000) == 0x0800000)
 					timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL, 0, yuv_fifo_irq);
