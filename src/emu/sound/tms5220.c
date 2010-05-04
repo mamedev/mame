@@ -743,7 +743,7 @@ static int tms5220_int_read(tms5220_state *tms)
 static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size)
 {
     int buf_count=0;
-    int i, interp_period, bitout;
+    int i, interp_period, bitout, zpar;
 
 //tryagain:
 
@@ -828,18 +828,11 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
 				tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
 				tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
+				zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 				for (i = 0; i < 4; i++)
 					tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
-				if (tms->current_pitch == 0) // unvoiced frame, ZPAR is true
-				{
-					for (i = 4; i < tms->coeff->num_k; i++)
-						tms->target_k[i] = 0;
-				}
-				else
-				{
-					for (i = 4; i < tms->coeff->num_k; i++)
-						tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
-				}
+				for (i = 4; i < tms->coeff->num_k; i++)
+						tms->target_k[i] = (tms->coeff->ktable[i][tms->new_frame_k_idx[i]] * (1-zpar));
 			}
 
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
@@ -859,6 +852,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			interp_period = tms->sample_count / 25;
 #endif
 #define PC_COUNT_LOAD 0
+		zpar = OLD_FRAME_UNVOICED_FLAG;
 		switch(tms->interp_count)
 			{
 				/*         PC=X  X cycle, rendering change (change for next cycle which chip is actually doing) */
@@ -909,55 +903,43 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				case 13: /* PC=6, B cycle, nothing happens (update K5) */
 				break;
 				case 14: /* PC=7, A cycle, update K5 (calc K6) */
-				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
-					tms->current_k[4] = tms->coeff->ktable[4][tms->old_frame_k_idx[4]];
-				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
-					tms->current_k[4] = 0;
+				if (interp_period == PC_COUNT_LOAD) 
+					tms->current_k[4] = (tms->coeff->ktable[4][tms->old_frame_k_idx[4]] * (1-zpar));
 				tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 15: /* PC=7, B cycle, nothing happens (update K6) */
 				break;
 				case 16: /* PC=8, A cycle, update K6 (calc K7) */
-				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
-					tms->current_k[5] = tms->coeff->ktable[5][tms->old_frame_k_idx[5]];
-				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
-					tms->current_k[5] = 0;
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[5] = (tms->coeff->ktable[5][tms->old_frame_k_idx[5]] * (1-zpar));
 				tms->current_k[5] += ((tms->target_k[5] - tms->current_k[5]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 17: /* PC=8, B cycle, nothing happens (update K7) */
 				break;
 				case 18: /* PC=9, A cycle, update K7 (calc K8) */
-				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
-					tms->current_k[6] = tms->coeff->ktable[6][tms->old_frame_k_idx[6]];
-				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
-					tms->current_k[6] = 0;
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[6] = (tms->coeff->ktable[6][tms->old_frame_k_idx[6]] * (1-zpar));
 				tms->current_k[6] += ((tms->target_k[6] - tms->current_k[6]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 19: /* PC=9, B cycle, nothing happens (update K8) */
 				break;
 				case 20: /* PC=10, A cycle, update K8 (calc K9) */
-				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
-					tms->current_k[7] = tms->coeff->ktable[7][tms->old_frame_k_idx[7]];
-				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
-					tms->current_k[7] = 0;
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[7] = (tms->coeff->ktable[7][tms->old_frame_k_idx[7]] * (1-zpar));
 				tms->current_k[7] += ((tms->target_k[7] - tms->current_k[7]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 21: /* PC=10, B cycle, nothing happens (update K9) */
 				break;
 				case 22: /* PC=11, A cycle, update K9 (calc K10) */
-				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
-					tms->current_k[8] = tms->coeff->ktable[8][tms->old_frame_k_idx[8]];
-				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
-					tms->current_k[8] = 0;
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[8] = (tms->coeff->ktable[8][tms->old_frame_k_idx[8]] * (1-zpar));
 				tms->current_k[8] += ((tms->target_k[8] - tms->current_k[8]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 23: /* PC=11, B cycle, nothing happens (update K10) */
 				break;
 				case 24: /* PC=12, A cycle, update K10 (do nothing) */
-				if ((interp_period == PC_COUNT_LOAD) && (tms->old_frame_pitch_idx != 0)) // ZPAR clear
-					tms->current_k[9] = tms->coeff->ktable[9][tms->old_frame_k_idx[9]];
-				else if ((interp_period = PC_COUNT_LOAD) && (tms->old_frame_pitch_idx == 0)) // ZPAR set
-					tms->current_k[9] = 0;
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[9] = (tms->coeff->ktable[9][tms->old_frame_k_idx[9]] * (1-zpar));
 				tms->current_k[9] += ((tms->target_k[9] - tms->current_k[9]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 			}
