@@ -7159,6 +7159,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Photon hardware games */
 	DRIVER( phtetris )
 	DRIVER( phpython )
+	DRIVER( phklad )
 
 	/* Photon IK2 hardware */
 	DRIVER( kok )

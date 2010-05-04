@@ -10,7 +10,9 @@
     Following games were produced for this system:
     - Tetris
     - Python
-    - Treasure/Labyrinth
+    - Klad/Labyrinth
+
+	Use joystick left and right in Klad/Labyrinth attract mode to select a game to play.
 */
 
 #include "emu.h"
@@ -164,7 +166,6 @@ static INPUT_PORTS_START( photon )
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-
 static INTERRUPT_GEN( pk8000_interrupt )
 {
 	cpu_set_input_line(device, 0, HOLD_LINE);
@@ -229,11 +230,11 @@ MACHINE_DRIVER_END
     0000...07FFh - ROM1 (D41)
     0800...0FFFh - ROM2 (D42)
     1000...17FFh - ROM3 (D43)
-    1800...1FFFh - not chip sealed (D44)
+    1800...1FFFh - not populated (D44)
     2000...27FFh - ROM5 (D45)
     2800...2FFFh - ROM6 (D46)
     3000...37FFh - ROM7 (D47)
-    3000...37FFh - ROM8 (D48)
+    3800...3FFFh - ROM8 (D48)
 */
 ROM_START( phtetris )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -253,5 +254,15 @@ ROM_START( phpython )
 	ROM_LOAD( "foton_piton.bin", 0x10000, 0x1800, BAD_DUMP CRC(4eac925a) SHA1(26f9a18c7aed31b7daacdc003bafb60a5e6d6300) )
 ROM_END
 
+
+/*
+    Dump was made using custom adaptor, hence it is marked as bad dump.
+*/
+ROM_START( phklad )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "klad.bin", 0x10000, 0x4000, BAD_DUMP CRC(49cc7d65) SHA1(d966cfc1d973a533df8044a71fad37f7177da554) )
+ROM_END
+
 GAME( 19??,  phtetris, 0,      photon, photon, 0, ROT0, "<unknown>", "Tetris (Photon System)", 0 )
 GAME( 1989?, phpython,  0,     photon, photon, 0, ROT0, "<unknown>", "Python (Photon System)", 0 )
+GAME( 19??,  phklad,   0,      photon, photon, 0, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", 0 )
