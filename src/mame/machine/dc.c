@@ -1569,8 +1569,6 @@ static TIMER_CALLBACK(dc_rtc_increment)
     dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
     if (dc_rtcregister[RTC2] == 0)
         dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
-
-	popmessage("%d",dc_rtcregister[RTC1] << 16 | dc_rtcregister[RTC2]);
 }
 
 /* fill the RTC registers with the proper start-up values */
