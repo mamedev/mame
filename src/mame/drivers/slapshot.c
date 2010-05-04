@@ -222,12 +222,12 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
 	/* p2 gun recoil seems ever so slighty slower than p1 */
 	/* also you get a false fire every once in a while on the p1 gun */
 
-	if (((data & 0x100) == 0x100) and ((data & 0x400)==0))
+	if (((data & 0x100) == 0x100) && ((data & 0x400)==0))
 		output_set_value("Player1_Gun_Recoil",1);
 	else
 		output_set_value("Player1_Gun_Recoil",0);
 
-	if (((data & 0x100) == 0x100) and ((data & 0x400)==0x400))
+	if (((data & 0x100) == 0x100) && ((data & 0x400)==0x400))
 		output_set_value("Player2_Gun_Recoil",1);
 	else
 		output_set_value("Player2_Gun_Recoil",0);
