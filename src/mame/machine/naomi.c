@@ -2,10 +2,20 @@
 
 Per-game specific JVS settings / idle loop skips for the MAME Naomi driver.
 
-suchie3: check bp c0a6458
+suchie3: check bp c0a6458 (might be protection related)
+
+tetkiwam: check bp c09613a
+
+vtennis: check wpset dee3ec8,8,w,wpdata==0xa8804000
 
 vtennis2: check bp c020130 / wpset c013ff0,f,w,wpdata==0x3f800000 -> 0xc020434 (test mode)
 
+smarinef: put cabinet in STD mode, bp c027968, wpset c0e66a6,4,w
+
+
+hotd2: bp 0xc0ba235, modify work RAM 0xc9c35e8 to be zero, bpclear
+
+hotd2o: bp 0xc0ba1f6, modify work RAM 0xc9c35a8 to be zero, bpclear
 ***************************************************************************/
 
 #include "emu.h"
