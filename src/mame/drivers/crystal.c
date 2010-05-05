@@ -128,9 +128,9 @@ class crystal_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crystal_state(machine)); }
-	
+
 	crystal_state(running_machine &machine) { }
-	
+
 	/* memory pointers */
 	UINT32 *  workram;
 	UINT32 *  textureram;
@@ -138,7 +138,7 @@ public:
 	UINT32 *  sysregs;
 	UINT32 *  vidregs;
 //  UINT32 *  nvram;    // currently this uses generic nvram handling
-	
+
 #ifdef IDLE_LOOP_SPEEDUP
 	UINT8     FlipCntRead;
 #endif
@@ -566,17 +566,17 @@ static MACHINE_START( crystal )
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->ds1302 = devtag_get_device(machine, "rtc");
 	state->vr0video = devtag_get_device(machine, "vr0");
-	
+
 	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), icallback);
 	for (i = 0; i < 4; i++)
 		state->Timer[i] = timer_alloc(machine, Timercb, (void*)(FPTR)i);
 
 	PatchReset(machine);
-	
+
 #ifdef IDLE_LOOP_SPEEDUP
 	state_save_register_global(machine, state->FlipCntRead);
 #endif
-	
+
 	state_save_register_global(machine, state->Bank);
 	state_save_register_global(machine, state->FlipCount);
 	state_save_register_global(machine, state->IntHigh);

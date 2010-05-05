@@ -740,7 +740,7 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 
 	/* Check if this is a start of conversion */
 	/* Input ports 2 thru 9 are the analog channels */
-	
+
 	if(data & 0x40)
 	{
 	/* Set the conversion complete flag */

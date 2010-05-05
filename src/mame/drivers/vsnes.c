@@ -513,19 +513,19 @@ static INPUT_PORTS_START( golf )
 	PORT_DIPSETTING(	0x00, DEF_STR( Easier ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( Harder ) )
 /*
-Stroke Play	OFF/ON
-Hole in 1	+5  +4
-Double Eagle	+4  +3
-Eagle		+3  +2
-Birdie		+2  +1
-Par		+1   0
-Bogey		 0  -1
-Other		 0  -2
+Stroke Play OFF/ON
+Hole in 1   +5  +4
+Double Eagle    +4  +3
+Eagle       +3  +2
+Birdie      +2  +1
+Par     +1   0
+Bogey        0  -1
+Other        0  -2
 
-Match Play	OFF/ON
-Win Hole	+1  +2
-Tie		 0   0
-Lose Hole	-1  -2
+Match Play  OFF/ON
+Win Hole    +1  +2
+Tie      0   0
+Lose Hole   -1  -2
 */
 	PORT_DIPNAME( 0x60, 0x00, "Starting Points" )		PORT_DIPLOCATION("SW1:!6,7")
 	PORT_DIPSETTING(	0x00, "10" )
@@ -712,7 +712,7 @@ static INPUT_PORTS_START( vsbball )
 	PORT_DIPSETTING(	0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( Medium ) )
 	PORT_DIPSETTING(	0x0c, "Strong" )
-	PORT_DIPNAME( 0x30, 0x20, "Computer Defense Strength" )	PORT_DIPLOCATION("SW1:!5,!6") 
+	PORT_DIPNAME( 0x30, 0x20, "Computer Defense Strength" )	PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(	0x00, "Weak" )
 	PORT_DIPSETTING(	0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( Medium ) )
@@ -739,7 +739,7 @@ static INPUT_PORTS_START( vsbball )
 	PORT_DIPSETTING(	0x28, "300 Pts" )
 	PORT_DIPSETTING(	0x18, "350 Pts" )
 	PORT_DIPSETTING(	0x38, "400 Pts" )
-	PORT_DIPNAME( 0x40, 0x00, "Bonus Play" )		PORT_DIPLOCATION("SW2:!7")		
+	PORT_DIPNAME( 0x40, 0x00, "Bonus Play" )		PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:!8")
@@ -818,7 +818,7 @@ static INPUT_PORTS_START( iceclmrj )
 	PORT_DIPSETTING(	0x18, "7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
-	PORT_DIPNAME( 0x80, 0x00, "Service Mode (Left Side)" )	PORT_TOGGLE PORT_CODE(KEYCODE_F2)	PORT_DIPLOCATION("SW1:!8")	
+	PORT_DIPNAME( 0x80, 0x00, "Service Mode (Left Side)" )	PORT_TOGGLE PORT_CODE(KEYCODE_F2)	PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 
@@ -885,7 +885,7 @@ static INPUT_PORTS_START( rbibb )
 	PORT_DIPSETTING(	0x0c, "2, 2, 4" )
 	PORT_DIPSETTING(	0x00, "3, 2, 6" )
 	PORT_DIPSETTING(	0x08, "4, 3, 7" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!5") 
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )			PORT_DIPLOCATION("SW1:!6,!7,!8")
@@ -1396,7 +1396,7 @@ static INPUT_PORTS_START( goonies )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(	0x00, "4" )
 	PORT_DIPSETTING(	0x08, "3" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!5,!6")	
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(	0x00, "40000" )
 	PORT_DIPSETTING(	0x20, "50000" )
 	PORT_DIPSETTING(	0x10, "60000" )
@@ -2427,7 +2427,7 @@ ROM_START( vsbball )
 	ROM_LOAD( "bb-2b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) )
 	ROM_LOAD( "bb-2a",  0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) )
 
-/*	ROM_LOAD( "bb-2a",  0x2000, 0x2000, CRC(ebb88502) SHA1(010fdffbd1cddcde8176aaaae5ca8e9c3411c02a) )
+/*  ROM_LOAD( "bb-2a",  0x2000, 0x2000, CRC(ebb88502) SHA1(010fdffbd1cddcde8176aaaae5ca8e9c3411c02a) )
 This rom dump is suspected either bad or an operator hacked version.  The GFX roms for all the other Vs. Baseball sets have mirrored
 GFX roms.  In this case, the bb-8a "gfx2" dump was placed in this slot to allow the Service Mode to green light all the roms.
 

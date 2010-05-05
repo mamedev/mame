@@ -317,7 +317,7 @@ MIB.42
 Output Notes:
 All outputs are hooked up properly with the following exceptions:
 radm:  Motors aren't hooked up, as the board isn't emulated. Also the 2nd and 3rd lamps "die" when the cabinet dip is set to deluxe.
-	They probably get moved over to the motor driver board.
+    They probably get moved over to the motor driver board.
 
 radr:  See radm
 
@@ -325,7 +325,7 @@ kokoroj: This driver isn't finished enough to flesh out the outputs, but a space
 
 jpark:  Since the piston driver board isn't fully emulated, they aren't hooked up.  offset 0c of the common chip function seems to have something to do with it.
 
-orunners:  Interleaved with the dj and << >> buttons is the data the drives the lcd display.  
+orunners:  Interleaved with the dj and << >> buttons is the data the drives the lcd display.
 ****************************************************************************/
 
 #include "emu.h"
@@ -835,19 +835,19 @@ static READ32_HANDLER( io_expansion_0_r )
 static WRITE32_HANDLER( io_expansion_0_w )
 {
 	/* only LSB matters */
-	
-	
+
+
 	if (ACCESSING_BITS_0_7)
 	{
 		/* harddunk uses bits 4,5 for output lamps */
 		if (segas32_sw3_output)
 			segas32_sw3_output(0, data & 0xff);
-		
+
 		if (custom_io_w[0])
 			(*custom_io_w[0])(space, offset*2+0, data, mem_mask);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
-		
+
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -3814,10 +3814,10 @@ static void segas32_common_init(read16_space_func custom_r, write16_space_func c
  *  TODO: kokoroj2 and jpark (SW2)
  *
  *  Additional notes:
- *    - about jpark: the compression switch is broken/inoperative 
- *      and because of that all piston data, which is in this 
+ *    - about jpark: the compression switch is broken/inoperative
+ *      and because of that all piston data, which is in this
  *      section is frozen. bits x01, x04 and x10 when which == 0
- *      (IO chip 0), seem to have something to do with the sensor 
+ *      (IO chip 0), seem to have something to do with the sensor
  *      switches we need to fix
  *************************************/
 

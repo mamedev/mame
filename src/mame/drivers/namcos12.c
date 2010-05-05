@@ -1124,13 +1124,13 @@ static WRITE32_HANDLER( system11gun_w )
 {
 	if( ACCESSING_BITS_0_15 )
 	{
-		
+
 		/* blowback 1 */
 		/* blowback 2 */
 		/* Note: output label has been changed for the Engrish Impaired ;-) */
 		output_set_value("Player1_Gun_Recoil", (~data & 0x02)>>1);
-		output_set_value("Player2_Gun_Recoil", (~data & 0x01));		
-		
+		output_set_value("Player2_Gun_Recoil", (~data & 0x01));
+
 		/* start 1 */
 		output_set_value("P2_Start_lamp", (~data & 0x08)>>3);
 		/* start 2 */

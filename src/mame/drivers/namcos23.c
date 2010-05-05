@@ -1280,19 +1280,19 @@ static READ16_HANDLER(s23_c417_r)
 {
 	switch(offset) {
 		/* According to timecrs2c, +0 is the status word with bits being:
-		   15: test mode flag (huh?)
-		   10: fifo data ready
-		   9:  cmd ram data ready
-		   8:  matrix busy
-		   7:  output unit busy (inverted)
-		   6:  hokan/tenso unit busy
-		   5:  point unit busy
-		   4:  access unit busy
-		   3:  c403 busy (inverted)
-		   2:  2nd c435 busy (inverted)
-		   1:  1st c435 busy (inverted)
-		   0:  xcpreq
-		 */
+           15: test mode flag (huh?)
+           10: fifo data ready
+           9:  cmd ram data ready
+           8:  matrix busy
+           7:  output unit busy (inverted)
+           6:  hokan/tenso unit busy
+           5:  point unit busy
+           4:  access unit busy
+           3:  c403 busy (inverted)
+           2:  2nd c435 busy (inverted)
+           1:  1st c435 busy (inverted)
+           0:  xcpreq
+         */
 	case 0: return 0x8e | (video_screen_get_vblank(space->machine->primary_screen) ? 0x0000 : 0x8000);
 	case 1: return c417_adr;
 	case 4:

@@ -25,15 +25,15 @@ Technical Notes:
       It also provides the real time clock DS1287 to the CPU.
 
 
-	  27/04/10 - FrasheR
-	  2 x Sound Chips connected to the 6522 VIA.
-	  Notes
-	  The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
-	  The remaining 4 bits are connected to other hardware, read via the VIA.
+      27/04/10 - FrasheR
+      2 x Sound Chips connected to the 6522 VIA.
+      Notes
+      The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
+      The remaining 4 bits are connected to other hardware, read via the VIA.
 
-	  The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
-	  The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. I
-	  -- I have not coded these and such a warning will be received when data is written to port A and port B of AY2.
+      The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
+      The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. I
+      -- I have not coded these and such a warning will be received when data is written to port A and port B of AY2.
 
 ***********************************************************************************************************************************************/
 
@@ -543,7 +543,7 @@ static const ay8910_interface ay8910_config2 =
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B  	         */ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
+	/*inputs : A/B               */ DEVCB_HANDLER(via_a_r),DEVCB_HANDLER(via_b_r),
 	/*inputs : CA/B1,CA/B2       */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_r),DEVCB_HANDLER(via_cb2_r),
 	/*outputs: A/B               */ DEVCB_HANDLER(via_a_w), DEVCB_HANDLER(via_b_w),
 	/*outputs: CA/B1,CA/B2       */ DEVCB_NULL,DEVCB_NULL,DEVCB_HANDLER(via_ca2_w),DEVCB_HANDLER(via_cb2_w),

@@ -381,21 +381,21 @@ static void copy_screen(bitmap_t *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( model3 )
 {
 /*
-	int layer_scroll_x[4], layer_scroll_y[4];
-	UINT32 layer_data[4];
+    int layer_scroll_x[4], layer_scroll_y[4];
+    UINT32 layer_data[4];
 
-	layer_data[0] = BYTE_REVERSE32((UINT32)(layer_scroll[0] >> 32));
-	layer_data[1] = BYTE_REVERSE32((UINT32)(layer_scroll[0] >> 0));
-	layer_data[2] = BYTE_REVERSE32((UINT32)(layer_scroll[1] >> 32));
-	layer_data[3] = BYTE_REVERSE32((UINT32)(layer_scroll[1] >> 0));
-	layer_scroll_x[0] = (layer_data[0] & 0x8000) ? (layer_data[0] & 0x1ff) : -(layer_data[0] & 0x1ff);
-	layer_scroll_y[0] = (layer_data[0] & 0x8000) ? (layer_data[0] & 0x1ff) : -(layer_data[0] & 0x1ff);
-	layer_scroll_x[1] = (layer_data[1] & 0x8000) ? (layer_data[1] & 0x1ff) : -(layer_data[1] & 0x1ff);
-	layer_scroll_y[1] = (layer_data[1] & 0x8000) ? (layer_data[1] & 0x1ff) : -(layer_data[1] & 0x1ff);
-	layer_scroll_x[2] = (layer_data[2] & 0x8000) ? (layer_data[2] & 0x1ff) : -(layer_data[2] & 0x1ff);
-	layer_scroll_y[2] = (layer_data[2] & 0x8000) ? (layer_data[2] & 0x1ff) : -(layer_data[2] & 0x1ff);
-	layer_scroll_x[3] = (layer_data[3] & 0x8000) ? (layer_data[3] & 0x1ff) : -(layer_data[3] & 0x1ff);
-	layer_scroll_y[3] = (layer_data[3] & 0x8000) ? (layer_data[3] & 0x1ff) : -(layer_data[3] & 0x1ff);
+    layer_data[0] = BYTE_REVERSE32((UINT32)(layer_scroll[0] >> 32));
+    layer_data[1] = BYTE_REVERSE32((UINT32)(layer_scroll[0] >> 0));
+    layer_data[2] = BYTE_REVERSE32((UINT32)(layer_scroll[1] >> 32));
+    layer_data[3] = BYTE_REVERSE32((UINT32)(layer_scroll[1] >> 0));
+    layer_scroll_x[0] = (layer_data[0] & 0x8000) ? (layer_data[0] & 0x1ff) : -(layer_data[0] & 0x1ff);
+    layer_scroll_y[0] = (layer_data[0] & 0x8000) ? (layer_data[0] & 0x1ff) : -(layer_data[0] & 0x1ff);
+    layer_scroll_x[1] = (layer_data[1] & 0x8000) ? (layer_data[1] & 0x1ff) : -(layer_data[1] & 0x1ff);
+    layer_scroll_y[1] = (layer_data[1] & 0x8000) ? (layer_data[1] & 0x1ff) : -(layer_data[1] & 0x1ff);
+    layer_scroll_x[2] = (layer_data[2] & 0x8000) ? (layer_data[2] & 0x1ff) : -(layer_data[2] & 0x1ff);
+    layer_scroll_y[2] = (layer_data[2] & 0x8000) ? (layer_data[2] & 0x1ff) : -(layer_data[2] & 0x1ff);
+    layer_scroll_x[3] = (layer_data[3] & 0x8000) ? (layer_data[3] & 0x1ff) : -(layer_data[3] & 0x1ff);
+    layer_scroll_y[3] = (layer_data[3] & 0x8000) ? (layer_data[3] & 0x1ff) : -(layer_data[3] & 0x1ff);
 */
 	screen_clip = (rectangle*)cliprect;
 
@@ -1478,8 +1478,8 @@ static void draw_viewport(running_machine *machine, int pri, UINT32 address)
 	viewport_region_height	= ((node[20] >> 16) & 0xffff) >> 2;
 
 	/* frustum plane angles */
-	//viewport_left			= RADIAN_TO_DEGREE(asin(*(float *)&node[12]));
-	//viewport_right			= RADIAN_TO_DEGREE(asin(*(float *)&node[16]));
+	//viewport_left         = RADIAN_TO_DEGREE(asin(*(float *)&node[12]));
+	//viewport_right            = RADIAN_TO_DEGREE(asin(*(float *)&node[16]));
 	viewport_top			= RADIAN_TO_DEGREE(asin(*(float *)&node[14]));
 	viewport_bottom			= RADIAN_TO_DEGREE(asin(*(float *)&node[18]));
 

@@ -1490,7 +1490,7 @@ void segaic16_sprites_draw(running_device *screen, bitmap_t *bitmap, const recta
 void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum, int offset)
 {
 	running_device* device = 0;
-	
+
 	if (!which)
 		device = devtag_get_device(machine,"segaspr1");
 	else
@@ -1520,7 +1520,7 @@ void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum,
 void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 {
 	running_device* device = 0;
-	
+
 	if (!which)
 		device = devtag_get_device(machine,"segaspr1");
 	else
@@ -1551,12 +1551,12 @@ void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow)
 {
 	running_device* device = 0;
-	
+
 	if (!which)
 		device = devtag_get_device(machine,"segaspr1");
 	else
 		device = devtag_get_device(machine,"segaspr2");
-	
+
 	if (!device)
 		fatalerror("segaic16_sprites_set_shadow device not found\n");
 
@@ -1614,9 +1614,9 @@ static void segaic16_sprites_buffer(running_device* device)
 WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 {
 	running_device* device = 0;
-	
+
 	device = devtag_get_device(space->machine,"segaspr1");
-	
+
 	if (!device)
 		fatalerror("segaic16_sprites_draw_0_w device not found\n");
 
@@ -1627,9 +1627,9 @@ WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 WRITE16_HANDLER( segaic16_sprites_draw_1_w )
 {
 	running_device* device = 0;
-	
+
 	device = devtag_get_device(space->machine,"segaspr2");
-	
+
 	if (!device)
 		fatalerror("segaic16_sprites_draw_1_w device not found\n");
 

@@ -1982,17 +1982,17 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 
 	/* we cannot add numeric symbols */
 	/*
-	all_digits = TRUE;
-	for (i = 0; name[i]; i++)
-	{
-		if (!isdigit((UINT8)name[i]))
-		{
-			all_digits = FALSE;
-			break;
-		}
-	}
-	assert_always(!all_digits, "All-digit symbols are not allowed");
-	*/
+    all_digits = TRUE;
+    for (i = 0; name[i]; i++)
+    {
+        if (!isdigit((UINT8)name[i]))
+        {
+            all_digits = FALSE;
+            break;
+        }
+    }
+    assert_always(!all_digits, "All-digit symbols are not allowed");
+    */
 
 	/* see if we already have an entry and just overwrite it if we do */
 	oldentry = (symbol_entry *)symtable_find(table, name);

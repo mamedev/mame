@@ -3097,7 +3097,7 @@ WRITE16_DEVICE_HANDLER( tc0480scp_ctrl_word_w )
 			break;
 
 		/* offset 0x0e unused */
-		
+
 		case 0x0f:   /* control register */
 		{
 			int old_width = (tc0480scp->pri_reg & 0x80) >> 7;

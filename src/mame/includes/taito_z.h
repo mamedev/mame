@@ -29,7 +29,7 @@ public:
 	INT32       dblaxle_int6;
 	INT32       ioc220_port;
 	UINT16      eep_latch;
-	
+
 //  UINT8       pandata[4];
 
 	/* devices */
@@ -42,7 +42,7 @@ public:
 	running_device *tc0100scn;
 	running_device *tc0220ioc;
 	running_device *tc0140syt;
-	
+
 	/* dblaxle motor flag */
 	int	    dblaxle_vibration;
 };

@@ -439,7 +439,7 @@ static WRITE8_HANDLER( gunfight_io_w )
 
 	if (offset & 0x04)
 		mb14241_shift_data_w(state->mb14241, 0, data);
-	
+
 }
 
 

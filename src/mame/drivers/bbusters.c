@@ -262,15 +262,15 @@ static WRITE8_HANDLER( sound_status_w )
 
 static WRITE16_HANDLER( sound_cpu_w )
 {
-	
+
 	if (ACCESSING_BITS_0_7)
 	{
-	
-	
+
+
 		soundlatch_w(space, 0, data&0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
-	
+
 }
 
 /* Eprom is byte wide, top half of word _must_ be 0xff */
@@ -297,17 +297,17 @@ static WRITE16_HANDLER( gun_select_w )
 	logerror("%08x: gun r\n",cpu_get_pc(space->cpu));
 
 	cpu_set_input_line(space->cpu, 2, HOLD_LINE);
-	
+
 	gun_select = data & 0xff;
-	
+
 }
 
 static WRITE16_HANDLER( two_gun_output_w )
 {
 	output_set_value("Player1_Gun_Recoil",(data & 0x01));
 	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
-	
-	
+
+
 }
 
 static WRITE16_HANDLER( three_gun_output_w )
@@ -315,8 +315,8 @@ static WRITE16_HANDLER( three_gun_output_w )
 	output_set_value("Player1_Gun_Recoil",(data & 0x01));
 	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
 	output_set_value("Player3_Gun_Recoil",(data & 0x04)>>2);
-	
-	
+
+
 }
 
 static READ16_HANDLER( kludge_r )

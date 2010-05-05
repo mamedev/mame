@@ -95,7 +95,7 @@ INLINE vr0video_state *get_safe_token( running_device *device )
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == VIDEO_VRENDER0);
-	
+
 	return (vr0video_state *)device->token;
 }
 
@@ -597,7 +597,7 @@ static DEVICE_START( vr0video )
 static DEVICE_RESET( vr0video )
 {
 	vr0video_state *vr0 = get_safe_token(device);
-	
+
 	memset(vr0->InternalPalette, 0, sizeof(vr0->InternalPalette));
 	vr0->LastPalUpdate = 0xffffffff;
 }

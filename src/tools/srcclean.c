@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
 		modified[dst++] = 0x0a;
 		added_newline = 1;
 	}
-		
+
 	/* if the result == original, skip it */
 	if (dst != bytes || memcmp(original, modified, bytes))
 	{

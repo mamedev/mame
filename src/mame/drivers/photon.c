@@ -12,7 +12,7 @@
     - Python
     - Klad/Labyrinth
 
-	Use joystick left and right in Klad/Labyrinth attract mode to select a game to play.
+    Use joystick left and right in Klad/Labyrinth attract mode to select a game to play.
 */
 
 #include "emu.h"

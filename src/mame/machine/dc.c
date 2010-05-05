@@ -1377,9 +1377,9 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 		/*dma flag (active HIGH, bug in docs)*/
 		case SB_ADEN: wave_dma.flag = (dat & 1); break;
 		/*
-		SB_ADTSEL
-		bit 1: (0) Wave DMA thru SB_ADST flag (1) Wave DMA thru irq trigger, defined by SB_G2DTNRM / SB_G2DTEXT
-		*/
+        SB_ADTSEL
+        bit 1: (0) Wave DMA thru SB_ADST flag (1) Wave DMA thru irq trigger, defined by SB_G2DTNRM / SB_G2DTEXT
+        */
 		case SB_ADTSEL: wave_dma.sel = dat & 7; break;
 		/*ready for dma'ing*/
 		case SB_ADST:
@@ -1473,7 +1473,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 		case SB_PDTSEL:
 			pvr_dma.sel = dat & 1;
 			//if(pvr_dma.sel & 1)
-			//	printf("Warning: Unsupported irq mode trigger PVR-DMA\n");
+			//  printf("Warning: Unsupported irq mode trigger PVR-DMA\n");
 			break;
 		case SB_PDEN: pvr_dma.flag = dat & 1; break;
 		case SB_PDST:

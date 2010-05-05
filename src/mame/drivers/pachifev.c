@@ -6,11 +6,11 @@ PACHI FEVER / (c) 1983 SANKI DENSHI KOGYO
 
 Many thanks to Olivier Galibert and Wilbert Pol for identify the CPU
 
-Driver by Tomasz Slanina 
+Driver by Tomasz Slanina
 
 - CPU has scratched surface and custom marks "GEN480830   DBS 30102" plus TI logo.
   There's "GENZUK 01" print on the PCB, near the chip.
-  It's  TMS9995 or derivative ( decrementer + lvl3 interrupt, internal ram) 
+  It's  TMS9995 or derivative ( decrementer + lvl3 interrupt, internal ram)
   XTAL:12.000MHZ
 - VDP has also custom label ( "RY 050012    DDU 30600" ) plus TI logo
   Seems to be TMS9928A
@@ -331,7 +331,7 @@ ROM_START( pachifev )
 
     ROM_REGION( 0x4000, "adpcm", 0 )
     ROM_LOAD( "ic66.10",   0x0000, 0x2000, CRC(217c573e) SHA1(6fb90865d1d81f5ea00fa7916d0ccb6756ef5ce5) )
-    
+
 ROM_END
 
 GAME( 1983, pachifev,  0,       pachifev,  pachifev,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", GAME_IMPERFECT_SOUND )

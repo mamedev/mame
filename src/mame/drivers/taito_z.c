@@ -917,7 +917,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 		output_set_lamp_value(0, (data & 0x20) ? 1 : 0);
 		output_set_lamp_value(1, (data & 0x40) ? 1 : 0);
 	}
-		
+
 	if (state->dblaxle_vibration) output_set_value("Wheel_Vibration", (data & 0x04)>>2);
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(space->cpu), data);
 }
@@ -1374,7 +1374,7 @@ logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(s
 
 static WRITE16_HANDLER( nightstr_motor_w )
 {
-	
+
 	/* Despite the informative notes at the top, the high end of the word doesn't seem to output any useful data. */
 	/* I've added this so someone else can finish it.  */
 	switch (offset)
@@ -1384,27 +1384,27 @@ static WRITE16_HANDLER( nightstr_motor_w )
 		if (data & 1) output_set_value("Motor_1_Direction",1);
 		if (data & 2) output_set_value("Motor_1_Direction",2);
 		output_set_value("Motor_1_Speed",(data & 60)/4);
-		
+
 		break;
-	
+
 	case 4:
 		output_set_value("Motor_2_Direction",0);
 		if (data & 1) output_set_value("Motor_2_Direction",1);
 		if (data & 2) output_set_value("Motor_2_Direction",2);
 		output_set_value("Motor_2_Speed",(data & 60)/4);
-		
+
 		break;
 	case 8:
 		output_set_value("Motor_3_Direction",0);
 		if (data & 1) output_set_value("Motor_3_Direction",1);
 		if (data & 2) output_set_value("Motor_3_Direction",2);
 		output_set_value("Motor_3_Speed",(data & 60)/4);
-		
+
 		break;
 	default:
 		output_set_value("motor_debug",data);
 	}
-	
+
 }
 
 

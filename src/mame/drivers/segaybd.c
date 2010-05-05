@@ -69,7 +69,7 @@ static void yboard_generic_init( running_machine *machine )
 	/* reset globals */
 	state->vblank_irq_state = 0;
 	state->timer_irq_state = 0;
-	
+
 	ybd_output_cb1 = NULL;
 	ybd_output_cb2 = NULL;
 }
@@ -344,7 +344,7 @@ static WRITE16_HANDLER( io_chip_w )
 		/* miscellaneous output */
 		case 0x08/2:
 
-					
+
 			/*
                 D7 = /KILL
                 D6 = CONT
@@ -353,9 +353,9 @@ static WRITE16_HANDLER( io_chip_w )
                 D3 = XRES
                 D2 = YRES
                 D1-D0 = ADC0-1
-		*/
+        */
 			segaic16_set_display_enable(space->machine, data & 0x80);
-			if (((old ^ data) & 0x20) && !(data & 0x20)) 
+			if (((old ^ data) & 0x20) && !(data & 0x20))
 				watchdog_reset_w(space, 0, 0);
 			cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			cpu_set_input_line(state->subx, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -363,7 +363,7 @@ static WRITE16_HANDLER( io_chip_w )
 			break;
 
 		/* mute */
-		
+
 		case 0x0e/2:
 			if (ybd_output_cb2)
 				ybd_output_cb2(data);
@@ -1928,17 +1928,17 @@ ROM_END
  *  TODO: kokoroj2 and jpark (SW2)
  *
  *  Additional notes:
- *    - about jpark: the compression switch is broken/inoperative 
- *      and because of that all piston data, which is in this 
+ *    - about jpark: the compression switch is broken/inoperative
+ *      and because of that all piston data, which is in this
  *      section is frozen. bits x01, x04 and x10 when which == 0
- *      (IO chip 0), seem to have something to do with the sensor 
+ *      (IO chip 0), seem to have something to do with the sensor
  *      switches we need to fix
  *************************************/
-																  
+
 static void pdrift_output_cb1( UINT16 data )
 {
 	/* Note:  this is an approximation to get a relatively accurate bank value.  It is obviously not 100% */
-	
+
 	/* for some stupid reason the data is set to all on in the debug menu so we need to check for that */
 	if (data != 255)
 	{
@@ -1990,10 +1990,10 @@ static void pdrift_output_cb1( UINT16 data )
 						output_set_value("bank_motor_position", 4);
 						pdrift_bank = 4;
 						break;
-						
+
 				}
 			}
-		
+
 			if ((data == 161))
 			/* moving right */
 			{
@@ -2038,9 +2038,9 @@ static void pdrift_output_cb1( UINT16 data )
 						output_set_value("bank_motor_position", 4);
 						pdrift_bank = 4;
 						break;
-						
+
 				}
-				
+
 			}
 		}
 		else
@@ -2048,16 +2048,16 @@ static void pdrift_output_cb1( UINT16 data )
 			/* the vibration value uses the first few bits to give a number between 0 and 7 */
 			output_set_value("vibration_motor", data & 7);
 			/* normalize the data and subtract the vibration value from it*/
-			
+
 			pdrift_bank = (data - (data & 7));
 			output_set_value("bank_data_raw", pdrift_bank);
-			
+
 			/* position values from left to right */
 			/* 56 48 40 120 72 80 88 */
-			
+
 			/* the normalized values we'll use */
 			/*   1  2  3   4  5  6  7 */
-			
+
 			switch (pdrift_bank)
 			{
 				case 56:
@@ -2085,20 +2085,20 @@ static void pdrift_output_cb1( UINT16 data )
 					output_set_value("bank_motor_position", 7);
 					break;
 					/* these are the only valid values but 24 pops up sometimes when we crash */
-					
+
 			}
 		}
 	}
 }
-																  															  
+
 static void gloc_output_cb1( UINT16 data )
 {
 	if ((data < 32))
 	{
 		output_set_value("right_motor_position", data);
-		
-		/* normalization here prevents strange data from being transferred */	
-		/* we do this because for some odd reason */ 
+
+		/* normalization here prevents strange data from being transferred */
+		/* we do this because for some odd reason */
 		/* gloc starts with one piston all up and one all down.... at least data-wise it does */
 		if ((data > 1) && (data < 29))
 			output_set_value("right_motor_position_nor", data);
@@ -2106,7 +2106,7 @@ static void gloc_output_cb1( UINT16 data )
 
 	if ((data < 40) && (data > 31))
 		output_set_value("right_motor_speed", data - 32);
-	
+
 	if ((data < 96) && (data > 63))
 	{
 		output_set_value("left_motor_position", data);
@@ -2114,17 +2114,17 @@ static void gloc_output_cb1( UINT16 data )
 		if (((data - 64) > 1) && ((data - 64) < 29))
 			output_set_value("left_motor_position_nor", data - 64);
 	}
-	
+
 	if ((data < 104) && (data > 95))
 		output_set_value("left_motor_speed", data - 96);
 }
-																  
+
 static void pdrift_output_cb2( UINT16 data )
 {
 	output_set_value("start_lamp", BIT(data, 2));
 	output_set_value("upright_wheel_motor", BIT(data, 1));
 }
-									  
+
 static void gforce2_output_cb2( UINT16 data )
 {
 	output_set_value("start_lamp", BIT(data, 2));
@@ -2136,7 +2136,7 @@ static void gloc_output_cb2( UINT16 data )
 	output_set_value("danger_lamp", BIT(data, 5));
 	output_set_value("crash_lamp", BIT(data, 6));
 }
-	
+
 static void r360_output_cb2( UINT16 data )
 {
 	/* r360 cabinet */
@@ -2144,7 +2144,7 @@ static void r360_output_cb2( UINT16 data )
 	/* even though the same ouput is used, I've split them to avoid confusion. */
 	output_set_value("emergency_stop_lamp", BIT(data, 2));
 }
-												  
+
 static void rchase_output_cb2( UINT16 data )
 {
 	output_set_value("left_start_lamp", BIT(data, 2));
@@ -2168,9 +2168,9 @@ static DRIVER_INIT( gforce2 )
 
 static DRIVER_INIT( pdrift )
 {
-	/* because some of the output data isn't fully understood we need to "center" the motor */	
+	/* because some of the output data isn't fully understood we need to "center" the motor */
 	yboard_generic_init(machine);
-			
+
 	ybd_output_cb1 = pdrift_output_cb1;
 	ybd_output_cb2 = pdrift_output_cb2;
 }
@@ -2179,7 +2179,7 @@ static DRIVER_INIT( gloc )
 {
 	/* because some of the output data isn't fully understood we need to "center" the rams */
 	output_set_value("left_motor_position_nor", 16);
-	output_set_value("right_motor_position_nor", 16);	
+	output_set_value("right_motor_position_nor", 16);
 	yboard_generic_init(machine);
 
 	ybd_output_cb1 = gloc_output_cb1;
@@ -2197,7 +2197,7 @@ static DRIVER_INIT( rchase )
 	yboard_generic_init(machine);
 	ybd_output_cb2 = rchase_output_cb2;
 }
-					 
+
 /*************************************
  *
  *  Game driver(s)

@@ -367,7 +367,7 @@ static int EG_Update(struct _SLOT *slot)
 			slot->EG.volume+=slot->EG.AR;
 			if(slot->EG.volume>=(0x3ff<<EG_SHIFT))
 			{
-				if (!LPSLNK(slot) && slot->EG.D1R) 
+				if (!LPSLNK(slot) && slot->EG.D1R)
 				{
 					slot->EG.state=DECAY1;
 					if(slot->EG.D1R>=(1024<<EG_SHIFT) && slot->EG.D2R) //Skip DECAY1, go directly to DECAY2
@@ -856,7 +856,7 @@ static void AICA_UpdateRegR(aica_state *AICA, int reg)
 				}
 			}
 			break;
-			
+
 		case 0x14:	// CA (slot address)
 		case 0x15:
 			{
@@ -1186,7 +1186,7 @@ static void AICA_DoMasterSamples(aica_state *AICA, int nsamples)
 		for(sl=0;sl<64;++sl)
 		{
 			struct _SLOT *slot=AICA->Slots+sl;
- 			RBUFDST=AICA->RINGBUF+AICA->BUFPTR;
+			RBUFDST=AICA->RINGBUF+AICA->BUFPTR;
 			if(AICA->Slots[sl].active)
 			{
 				unsigned int Enc;

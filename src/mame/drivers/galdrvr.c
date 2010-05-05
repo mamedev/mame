@@ -3182,7 +3182,7 @@ Cut the track on the bottom of the board going to pin 21 of IC 1K
 Cut the track on the bottom of the board going to pin 21 of IC 1H
 (2716 eprom).
 
-Join pins 21 of IC's 1H and 1K together and connect both to +5 volts 
+Join pins 21 of IC's 1H and 1K together and connect both to +5 volts
 (although I've seen one set of docs saying to connect to pin 1 of
 ic 2N (7408) instead)  */
 

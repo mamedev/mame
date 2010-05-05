@@ -1571,7 +1571,7 @@ static void cd_readTOC(void)
 		ntrks = 0;
 	}
 
-	//toclen = (4 * ntrks);	// toclen header entry
+	//toclen = (4 * ntrks); // toclen header entry
 
 	// data format for Saturn TOC:
 	// no header.

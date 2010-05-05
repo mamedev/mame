@@ -300,8 +300,8 @@ static WRITE16_HANDLER( io_chip_w )
 		output_set_value("P1_Gun_Recoil",(~data & 0x01));
 		output_set_value("P2_Gun_Recoil",(~data & 0x02)>>1);
 		output_set_value("P3_Gun_Recoil",(~data & 0x04)>>2);
-		}	
-	
+		}
+
 			break;
 
 		/* miscellaneous output */
@@ -2261,7 +2261,7 @@ static DRIVER_INIT( lghost )
 {
 	has_guns=1;
 	segas1x_state *state = (segas1x_state *)machine->driver_data;
-	
+
 	DRIVER_INIT_CALL(generic_5987);
 	state->custom_io_r = lghost_custom_io_r;
 	state->custom_io_w = lghost_custom_io_w;

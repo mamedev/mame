@@ -50,8 +50,8 @@ TODO:
     * If a command is still executing, /READY will be kept high until the command has
       finished if the next command is written.
     * tomcat has a 5220 which is not hooked up at all
-	* documentation is inconsistent in the patents about what data is returned for chirp rom addresses (base 0) 41 to 51; the patent says the 'rom returns zeroes for locations beyond 40', but at the same time the rom stores the complement of the actual chirp rom value, so are locations beyond 40 = 0x00(0) or = 0xFF(-1)? The latter seems more likely to me, and that is how it is currently implemented. (LN).
-	* Is the TS=0 forcing energy to 0 for next frame in the interpolator actually correct?
+    * documentation is inconsistent in the patents about what data is returned for chirp rom addresses (base 0) 41 to 51; the patent says the 'rom returns zeroes for locations beyond 40', but at the same time the rom stores the complement of the actual chirp rom value, so are locations beyond 40 = 0x00(0) or = 0xFF(-1)? The latter seems more likely to me, and that is how it is currently implemented. (LN).
+    * Is the TS=0 forcing energy to 0 for next frame in the interpolator actually correct?
 
 Pedantic detail from observation of real chip:
 The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
@@ -292,7 +292,7 @@ struct _tms5220_state
 
 	//UINT8 interp_period; /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
 	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
-	//UINT8 spkslow_delay;	/* delay counter for interp count, only used on tms51xx */
+	//UINT8 spkslow_delay;  /* delay counter for interp count, only used on tms51xx */
 	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
 	UINT8 tms5220c_rate; /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
 	UINT16 pitch_count;		/* pitch counter; provides chirp rom address */
@@ -577,7 +577,7 @@ static void update_status_and_ints(tms5220_state *tms)
 		}
 	}
 	/* Note that TS being unset will also generate an interrupt when a STOP
-	frame is encountered; this is handled in the sample generator code and not here */
+    frame is encountered; this is handled in the sample generator code and not here */
 }
 
 /**********************************************************************************************
@@ -903,7 +903,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				case 13: /* PC=6, B cycle, nothing happens (update K5) */
 				break;
 				case 14: /* PC=7, A cycle, update K5 (calc K6) */
-				if (interp_period == PC_COUNT_LOAD) 
+				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[4] = (tms->coeff->ktable[4][tms->old_frame_k_idx[4]] * (1-zpar));
 				tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
