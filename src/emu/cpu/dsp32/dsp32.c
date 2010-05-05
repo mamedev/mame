@@ -321,8 +321,8 @@ static void dsp32_register_save( running_device *device )
 	state_save_register_device_item(device, 0, cpustate->ivtp);
 	state_save_register_device_item(device, 0, cpustate->nzcflags);
 	state_save_register_device_item(device, 0, cpustate->vflags);
-	state_save_register_device_item(device, 0, cpustate->pin);
-	state_save_register_device_item(device, 0, cpustate->pin);
+//	state_save_register_device_item(device, 0, cpustate->pin);
+//	state_save_register_device_item(device, 0, cpustate->pin);
 	state_save_register_device_item_array(device, 0, cpustate->a);
 	state_save_register_device_item(device, 0, cpustate->NZflags);
 	state_save_register_device_item(device, 0, cpustate->VUflags);
