@@ -45,6 +45,7 @@
 #include <winioctl.h>
 #include <tchar.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 // MAME headers
 #include "osdcore.h"
