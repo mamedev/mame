@@ -368,7 +368,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_BASE(&workram)										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k053252", k056832_word_w)										/* video reg */
+	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_word_w)										/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE("k053252", k053252_word_r, k053252_word_w)					/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")											/* battery power & service */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")											/* inputport */
@@ -617,21 +617,17 @@ static MACHINE_START( qdrmfgp )
 	state_save_register_global(machine, gp2_irq_control);
 }
 
+static MACHINE_START( qdrmfgp2 )
+{
+	/* sound irq (CCU? 240Hz) */
+	timer_pulse(machine, ATTOTIME_IN_HZ(18432000/76800), NULL, 0, gp2_timer_callback);
+
+	MACHINE_START_CALL( qdrmfgp );
+}
+
 static MACHINE_RESET( qdrmfgp )
 {
 	sndram = memory_region(machine, "konami") + 0x100000;
-
-	/* reset the IDE controller */
-	gp2_irq_control = 0;
-	devtag_reset(machine, "ide");
-}
-
-static MACHINE_RESET( qdrmfgp2 )
-{
-	sndram = memory_region(machine, "konami") + 0x100000;
-
-	/* sound irq (CCU? 240Hz) */
-	timer_pulse(machine, ATTOTIME_IN_HZ(18432000/76800), NULL, 0, gp2_timer_callback);
 
 	/* reset the IDE controller */
 	gp2_irq_control = 0;
@@ -690,8 +686,8 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	MDRV_CPU_PROGRAM_MAP(qdrmfgp2_map)
 	MDRV_CPU_VBLANK_INT("screen", qdrmfgp2_interrupt)
 
-	MDRV_MACHINE_START(qdrmfgp)
-	MDRV_MACHINE_RESET(qdrmfgp2)
+	MDRV_MACHINE_START(qdrmfgp2)
+	MDRV_MACHINE_RESET(qdrmfgp)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", gp2_ide_interrupt)
@@ -770,4 +766,4 @@ ROM_END
 
 /*     year  rom       clone     machine   inputs    init */
 GAME(  1994, qdrmfgp,  0,        qdrmfgp,  qdrmfgp,  0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix (Japan)", 0 )
-GAME(  1995, qdrmfgp2, 0,        qdrmfgp2, qdrmfgp2, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix2 - Shin-Kyoku Nyuukadayo (Japan)", 0 )
+GAME(  1995, qdrmfgp2, 0,        qdrmfgp2, qdrmfgp2, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix 2 - Shin-Kyoku Nyuukadayo (Japan)", 0 )
