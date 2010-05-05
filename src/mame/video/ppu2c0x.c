@@ -914,9 +914,11 @@ static WRITE8_HANDLER( ppu2c0x_palette_write )
 {
 	ppu2c0x_state *ppu2c0x = get_token(space->cpu);
 	int color_base = ppu2c0x->color_base;
-
 	int color_emphasis = (ppu2c0x->regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
-	// it's a palette
+
+	// palette RAM is only 6 bits wide
+	data &= 0x3f;
+	
 	// transparent pens are mirrored!
 	if (offset & 0x3)
 	{
@@ -948,7 +950,7 @@ static READ8_HANDLER( ppu2c0x_palette_read )
 			return (ppu2c0x->palette_ram[offset & 0x1f] & 0x30);
 
 		else
-			return (ppu2c0x->palette_ram[offset & 0x1f] & 0x3f);
+			return (ppu2c0x->palette_ram[offset & 0x1f]);
 	}
 }
 
