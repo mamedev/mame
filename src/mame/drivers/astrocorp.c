@@ -666,7 +666,7 @@ VR1 is for sound volume
 
 ROM#1 & ROM#2 are 32pin sockets
 ROM#7 is a 40pin socket
-ROM#3 & ROM#4 at U25 & U27 are optional unpopulated 32pin sockets and overlap with ROM#6
+ROM#3 & ROM#4 at U27 & U25 are optional unpopulated 32pin sockets and overlap with ROM#6
 ROM#6 is 29F1610MC flash rom
 
 RAM1 are SEC KM681000BLG-7L RAM chips
