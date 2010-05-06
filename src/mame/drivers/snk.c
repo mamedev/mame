@@ -3984,11 +3984,6 @@ static MACHINE_DRIVER_START( gwar )
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(gwar_cpuB_map)
 
-	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	// this visible area matches pcb screenshots
-	MDRV_SCREEN_SIZE(49*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 48*8-1, 0*8, 28*8-1)
 MACHINE_DRIVER_END
 
 
