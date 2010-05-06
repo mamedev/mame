@@ -1490,6 +1490,34 @@ ROM_START( armedf )
 	ROM_LOAD( "af_12.rom", 0x20000, 0x20000, CRC(23cb6bfe) SHA1(34cb013827206bea71f5336b308ba92bee688506) )
 ROM_END
 
+ROM_START( armedf2 )
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "06.3d", 0x00000, 0x10000, CRC(0f9015e2) SHA1(0dc9c2cda0220bb9d03048c0eac62bc512d30622) )
+	ROM_LOAD16_BYTE( "01.3f", 0x00001, 0x10000, CRC(816ff7c5) SHA1(1013883f2389aba4b8f397aacc0d681807a31cd5) )
+	ROM_LOAD16_BYTE( "07.5d", 0x20000, 0x10000, CRC(5b3144a5) SHA1(98dd45049f242480c9ac0903fb38dfb2b8906be7) )
+	ROM_LOAD16_BYTE( "02.4f", 0x20001, 0x10000, CRC(fa10c29d) SHA1(9c772ff6f749a542248c2ca260ac3460ae4f0cc6) )
+	ROM_LOAD16_BYTE( "af_08.rom", 0x40000, 0x10000, CRC(d1d43600) SHA1(1a473b4958a02a33c0a02e7e72a70a9ee0c68c50) )
+	ROM_LOAD16_BYTE( "af_03.rom", 0x40001, 0x10000, CRC(bbe1fe2d) SHA1(f47be23c7564b106d636d49d5f1da47daecd31df) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
+	ROM_LOAD( "af_10.rom", 0x00000, 0x10000, CRC(c5eacb87) SHA1(33af84b48fbda26729975b02cfb70f23c0bce6a2) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "09.11c", 0x00000, 0x08000, CRC(5c6993d5) SHA1(3991851e5c4d2b3d72c372afdfbb710796874c15) ) /* characters */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "af_04.rom", 0x00000, 0x10000, CRC(44d3af4f) SHA1(0c2cb54357c314e43cec6f959fe9d4a2c8bc8834) ) /* foreground tiles */
+	ROM_LOAD( "af_05.rom", 0x10000, 0x10000, CRC(92076cab) SHA1(f47424817373a6735da2b2049b53da5b38178cec) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "af_14.rom", 0x00000, 0x10000, CRC(8c5dc5a7) SHA1(758140ddb9e60fb3950fe58bf53c7aea769a1a94) ) /* background tiles */
+	ROM_LOAD( "af_13.rom", 0x10000, 0x10000, CRC(136a58a3) SHA1(5481e3ce404881a0470f8740f0de6e42283bedf2) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "af_11.rom", 0x00000, 0x20000, CRC(b46c473c) SHA1(d8573225e2d8b133b3bdd4fa5a12d445c71d5e0e) ) /* sprites */
+	ROM_LOAD( "af_12.rom", 0x20000, 0x20000, CRC(23cb6bfe) SHA1(34cb013827206bea71f5336b308ba92bee688506) )
+ROM_END
+
 
 /*************************************
  *
@@ -1575,3 +1603,4 @@ GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibuts
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )
+GAME( 1988, armedf2,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation (alt)", GAME_SUPPORTS_SAVE )

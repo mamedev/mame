@@ -837,6 +837,48 @@ ROM_START( youma )
 	ROM_LOAD( "yncp-7f.bin",  0x0000, 0x0100, CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450) )	/* sprite palette bank */
 ROM_END
 
+ROM_START( youma2 )
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* main cpu code */
+	ROM_LOAD( "1.1d",    0x00000, 0x8000, CRC(171dbe99) SHA1(c9fdca3849e20ab702415984b4039cf2cfa34cb8) )	// x
+	ROM_LOAD( "2.3d",    0x08000, 0x4000, CRC(e502d62a) SHA1(fdfb44c17557a513fe855b14140fe48921d6802b) )	// x
+	ROM_LOAD( "3.4d",    0x10000, 0x8000, CRC(cb84745c) SHA1(a961c329be26c423212078d04d5f783c796136b4) )	// x
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu code */
+	ROM_LOAD( "12.14b",  0x0000, 0x4000, CRC(3d1cd329) SHA1(6abd8e0dbecddfd67c4d358b958c850136fd3c29) )
+	ROM_LOAD( "13.15b",  0x4000, 0x8000, CRC(ac3a0b81) SHA1(39f2c305706e313d5256c357a3c8b57bbe45d3d7) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "4.7d",    0x00000, 0x8000, CRC(40aeffd8) SHA1(f31e723323a0cdb8efa8b320f1c4efd646401ca4) )	/* chars x */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "ninjemak.8",   0x00000, 0x8000, CRC(655f0a58) SHA1(8ffe73cec68d52c7b09651b546289613d6d4dde4) ) /* tiles */
+	ROM_LOAD( "ninjemak.9",   0x08000, 0x8000, CRC(934e1703) SHA1(451f8d01d9035d91c969cdc3fb582a00007da7df) )
+	ROM_LOAD( "ninjemak.10",  0x10000, 0x8000, CRC(955b5c45) SHA1(936bfe2599228dd0861bbcfe15152ac5e9b906d1) )
+	ROM_LOAD( "ninjemak.11",  0x18000, 0x8000, CRC(bbd2e51c) SHA1(51bc266cf8161610204e5d98e56346b1d8d3c009) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "ninjemak.16",  0x00000, 0x8000, CRC(8df93fed) SHA1(ef37c78d4abbdbe9f427e3d9345f52464261116d) )  /* sprites */
+	ROM_LOAD( "ninjemak.17",  0x08000, 0x8000, CRC(a3efd0fc) SHA1(69d40707b0570c2f1be6247f0209ba9e60a83ed0) )
+	ROM_LOAD( "ninjemak.14",  0x10000, 0x8000, CRC(bff332d3) SHA1(d277ba18034b083eaafa969d90685563994416fa) )
+	ROM_LOAD( "ninjemak.15",  0x18000, 0x8000, CRC(56430ed4) SHA1(68356a0f68404ef70d8dc17d5cbdf5e1f28badcf) )
+
+	ROM_REGION( 0x8000, "gfx4", 0 )	/* background tilemaps */
+	ROM_LOAD( "ninjemak.7",   0x0000, 0x4000, CRC(80c20d36) SHA1(f20724754824030d62059388f3ea2224f5b7a60e) )
+	ROM_LOAD( "ninjemak.6",   0x4000, 0x4000, CRC(1da7a651) SHA1(5307452058164a0bc39d144dd204627a9ead7543) )
+
+	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter? */
+	ROM_LOAD( "5.15d",    0x0000, 0x4000, CRC(1b4f64aa) SHA1(2cb2db946bf93e0928d6aa2e2dd29acb92981567) )	/* text layer data x */
+
+	ROM_REGION( 0x0400, "proms", 0 )	/* Region 3 - color data */
+	ROM_LOAD( "bpr.6e",  0x0000, 0x0100, CRC(8a62d4e4) SHA1(99ca4da01ea1b5585f6e3ebf162c3f988ab317e5) )	/* red x */
+	ROM_LOAD( "bpr.7e",  0x0100, 0x0100, CRC(2ccf976f) SHA1(b804ee761793697087fbe3372352f301a22feeab) )	/* green x */
+	ROM_LOAD( "bpr.8e",  0x0200, 0x0100, CRC(16b2a7a4) SHA1(53c410b439c8a835447f15f2ab250b363b3f7888) )	/* blue x */
+	ROM_LOAD( "bpr.2d",  0x0300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) )	/* sprite lookup table */
+
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "bpr.7f",  0x0000, 0x0100, CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450) )	/* sprite palette bank */
+ROM_END
+
 ROM_START( youmab )
 	ROM_REGION( 0x18000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "electric1.3u", 0x00000, 0x8000, CRC(cc4fdb92) SHA1(9ce963db23f91f91e775a0b9a819f00db869120f) )
@@ -1043,5 +1085,6 @@ GAME( 1986, dangar2,  dangar,   galivan,  dangar2,  0, ROT270, "Nichibutsu", "Da
 GAME( 1986, dangarb,  dangar,   galivan,  dangarb,  0, ROT270, "bootleg", "Dangar - Ufo Robo (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, 0, ROT270, "Nichibutsu", "Ninja Emaki (US)", GAME_SUPPORTS_SAVE )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, 0, ROT270, "Nichibutsu", "Youma Ninpou Chou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, 0, ROT270, "Nichibutsu", "Youma Ninpou Chou (Japan, alt)", GAME_SUPPORTS_SAVE )
 GAME( 1986, youmab,   ninjemak, ninjemak, ninjemak, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE ) // scrolling doesn't work
 GAME( 1986, youmab2,  ninjemak, ninjemak, ninjemak, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE ) // scrolling doesn't work

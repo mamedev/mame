@@ -414,6 +414,7 @@ const game_driver * const drivers[] =
 	DRIVER( dangarb )	/* bootleg */
 	DRIVER( ninjemak )	/* (c) 1986 (US?) */
 	DRIVER( youma )		/* (c) 1986 (Japan) */
+	DRIVER( youma2 )		/* (c) 1986 (Japan) */
 	DRIVER( youmab )	/* bootleg */
 	DRIVER( youmab2 )	/* bootleg */
 	DRIVER( legion )	/* (c) 1986 */
@@ -424,6 +425,7 @@ const game_driver * const drivers[] =
 	DRIVER( terrafu )	/* (c) 1987 Nichibutsu USA */
 	DRIVER( kodure )	/* (c) 1987 (Japan) */
 	DRIVER( armedf )	/* (c) 1988 */
+	DRIVER( armedf2 )	/* (c) 1988 */
 	DRIVER( cclimbr2 )	/* (c) 1988 (Japan) */
 	DRIVER( cclimbr2a )	/* (c) 1988 (Japan) */
 	DRIVER( skyrobo )	/* (c) 1989 */
@@ -3967,8 +3969,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( ddcrew1 )	/* 1991.?? D.D.Crew (World, FD1094, decrypted) */
 	DRIVER( wwallyj )	/* 1992.06 Wally wo Sagase! (Japan, FD1094, decrypted) */
 	DRIVER( wwallyja )	/* 1992.06 Wally wo Sagase! (Japan, FD1094, decrypted) */
-						/* 1992.10 Desert Breaker (Japan) */
 	DRIVER( desertbr )	/* 1993.?? Desert Breaker (World, FD1094, decrypted) */
+	DRIVER( desertbrj )	/* 1992.10 Desert Breaker (Japan) */
 	DRIVER( pontoon )
 
 	/* System18 Bootlegs */
@@ -6674,6 +6676,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( champbasja )/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( champbb2 )	/* (c) 1983 Sega */
 	DRIVER( champbb2a )	/* (c) 1983 ? */
+	DRIVER( champbb2j )	/* (c) 1983 ? */
 	DRIVER( exctsccr )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccra )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccrj )	/* (c) 1983 Alpha Denshi Co. */

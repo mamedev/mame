@@ -949,6 +949,34 @@ ROM_START( champbb2a )
 	ROM_LOAD( "pr5956", 0x0020, 0x100, CRC(872dd450) SHA1(6c1e2c4a2fc072f4bf4996c731adb0b01b347506) ) /* look-up table */
 ROM_END
 
+ROM_START( champbb2j )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.10g", 0x0000, 0x2000, CRC(c76056d5) SHA1(2aaec9ede0f85bf67f6cf04fabdba66f7e0d6004) )
+	ROM_LOAD( "2.10h", 0x2000, 0x2000, CRC(7a1ea3ea) SHA1(ce2f61be4cc7cd7b739d89a4838408912c2e2784) )
+	ROM_LOAD( "3.10i", 0x4000, 0x2000, CRC(4b2f6ac4) SHA1(367b25665fc37140dc38be8bb525859c20bd2529) )
+	ROM_LOAD( "0.11g", 0x7800, 0x0800, CRC(700fae78) SHA1(04f24fe24b2d33f6b2de19333fc01b299e107022) )
+
+	/* not in this set, but probably the same */
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "6.15c", 0x0000, 0x2000, CRC(24c482ee) SHA1(c25bdf77014e095fc11a9a6b17f16858f19db451) )
+	ROM_LOAD( "7.15d", 0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
+	ROM_LOAD( "8.15e", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
+
+	// the pcb has a 8302 on it, though only the 8201 instructions are used
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_LOAD( "4.6a", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )	// chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_LOAD( "5.6b", 0x0000, 0x2000, CRC(5c80ec42) SHA1(9b79737577e48a6b2ec20ce145252545955e82c3) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "bpr.7h", 0x0000, 0x020, CRC(500db3d9) SHA1(7317ba2c6ffef3561acb3b2adb811def846756cf) ) /* palette */
+	ROM_LOAD( "bpr.5e", 0x0020, 0x100, CRC(2e481ffa) SHA1(bc8979efd43bee8be0ce96ebdacc873a5821e06e) ) /* look-up table */
+ROM_END
+
 ROM_START( exctsccr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_g10.bin",    0x0000, 0x2000, CRC(aa68df66) SHA1(f10cac5a4c5aad1e1eb8835174dc8d517bb2921a) )
@@ -1213,6 +1241,7 @@ GAME( 1983, champbasj,  champbas, champmcu, champbas, champbas, ROT0,   "Alpha D
 GAME( 1983, champbasja, champbas, champbas, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1983, champbb2,   0,        champmcu, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, champbb2a,  champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )	// no dump
+GAME( 1983, champbb2j,  champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (Japan)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 GAME( 1983, exctsccr,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", GAME_SUPPORTS_SAVE )
 GAME( 1983, exctsccra,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", GAME_SUPPORTS_SAVE )
