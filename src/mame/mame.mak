@@ -1735,6 +1735,8 @@ $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 						$(LAYOUT)/pmpoker.lh \
 
+$(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh
+
 $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh

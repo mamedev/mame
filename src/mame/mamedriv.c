@@ -9663,6 +9663,7 @@ Other Sun games
 	DRIVER( unkch4 )	/* bootleg */
 
 	DRIVER( ns8lines )	/* unknown */
+	DRIVER( ns8linew )	/* unknown */
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( wcat3 )
