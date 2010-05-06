@@ -133,6 +133,7 @@ static const struct
 	{ "sfex2",    cp10, cp08 }, /* OK ( random crashes on garuda ) */
 	{ "sfex2j",   cp10, cp08 }, /* OK ( random crashes on garuda ) */
 	{ "sfex2a",   cp10, cp08 }, /* OK ( random crashes on garuda ) */
+	{ "sfex2h",   cp10, cp08 }, /* OK ( random crashes on garuda ) */
 	{ "techromn", cp10, cp09 }, /* OK */
 	{ "techromnu",cp10, cp09 }, /* OK */
 	{ "kikaioh",  cp10, cp09 }, /* OK */
@@ -3245,7 +3246,7 @@ ROM_START( sfex2 )
 	CPZN2_BIOS
 
 	ROM_REGION32_LE( 0x80000, "user3", 0 )
-	ROM_LOAD( "ex2u-04a", 0x0000000, 0x080000, CRC(8dc5317f) SHA1(c35224caf70662a0e45a74cbead294a51f9b9e16) )
+	ROM_LOAD( "ex2u-04a.2h", 0x0000000, 0x080000, CRC(8dc5317f) SHA1(c35224caf70662a0e45a74cbead294a51f9b9e16) )
 
 	ROM_REGION32_LE( 0x3000000, "user2", 0 )
 	ROM_LOAD( "ex2-05m", 0x0000000, 0x800000, CRC(78726b17) SHA1(2da449df335ef133ebc3997bbad73ef4137f4771) )
@@ -3266,7 +3267,7 @@ ROM_START( sfex2j )
 	CPZN2_BIOS
 
 	ROM_REGION32_LE( 0x80000, "user3", 0 )
-	ROM_LOAD( "ex2j-04", 0x0000000, 0x080000, CRC(5d603586) SHA1(ff546d3bd011d6441e9672b88bab763d3cd89be2) )
+	ROM_LOAD( "ex2j-04.2h", 0x0000000, 0x080000, CRC(5d603586) SHA1(ff546d3bd011d6441e9672b88bab763d3cd89be2) )
 
 	ROM_REGION32_LE( 0x3000000, "user2", 0 )
 	ROM_LOAD( "ex2-05m", 0x0000000, 0x800000, CRC(78726b17) SHA1(2da449df335ef133ebc3997bbad73ef4137f4771) )
@@ -3287,7 +3288,28 @@ ROM_START( sfex2a )
 	CPZN2_BIOS
 
 	ROM_REGION32_LE( 0x80000, "user3", 0 )
-	ROM_LOAD( "ex2a-04", 0x0000000, 0x080000, CRC(ac9a872d) SHA1(4e237f5e2e5de58e587e9abc5767509b8d750004) )
+	ROM_LOAD( "ex2a-04.2h", 0x0000000, 0x080000, CRC(ac9a872d) SHA1(4e237f5e2e5de58e587e9abc5767509b8d750004) )
+
+	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_LOAD( "ex2-05m", 0x0000000, 0x800000, CRC(78726b17) SHA1(2da449df335ef133ebc3997bbad73ef4137f4771) )
+	ROM_LOAD( "ex2-06m", 0x0800000, 0x800000, CRC(be1075ed) SHA1(36dc673372f30f8b3ff5689ae568c5cd01fe2c07) )
+	ROM_LOAD( "ex2-07m", 0x1000000, 0x800000, CRC(6496c6ed) SHA1(054bcecbb04033abea14d9ffe6634b2bd11ca88b) )
+	ROM_LOAD( "ex2-08m", 0x1800000, 0x800000, CRC(3194132e) SHA1(d1324fcf0a8528fc683791d6342697a7e08674f4) )
+	ROM_LOAD( "ex2-09m", 0x2000000, 0x400000, CRC(075ae585) SHA1(6b88851db618fc3e96f1d740c46c1bc5be0ee21b) )
+
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ex2-02",  0x00000, 0x08000, CRC(9489875e) SHA1(1fc9985ff98232c63ea8d05a69f7d77cdf72919f) )
+	ROM_CONTINUE(        0x10000, 0x18000 )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
+	ROM_LOAD16_WORD_SWAP( "ex2-01m", 0x0000000, 0x400000, CRC(14a5bb0e) SHA1(dfe3c3a53bd4c58743d8039b5344d3afbe2a9c24) )
+ROM_END
+
+ROM_START( sfex2h )
+	CPZN2_BIOS
+
+	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_LOAD( "ex2h-04.2h", 0x0000000, 0x080000, CRC(68f2ef80) SHA1(212bb3c0d935c64f5e3b20e427e06d97404709d8) )
 
 	ROM_REGION32_LE( 0x3000000, "user2", 0 )
 	ROM_LOAD( "ex2-05m", 0x0000000, 0x800000, CRC(78726b17) SHA1(2da449df335ef133ebc3997bbad73ef4137f4771) )
@@ -4481,6 +4503,7 @@ GAME( 1997, jgakuen,   rvschool, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Just
 GAME( 1998, sfex2,     cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 (USA 980526)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, sfex2j,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 (JAPAN 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, sfex2a,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 (ASIA 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2h,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 (HISPANIC 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, plsmaswd,  cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Plasma Sword (USA 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, stargld2,  plsmaswd, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Star Gladiator 2 (JAPAN 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, plsmaswda, plsmaswd, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Plasma Sword (ASIA 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

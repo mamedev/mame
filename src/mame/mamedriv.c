@@ -3059,6 +3059,7 @@ V-V                           TP-027
 	DRIVER( sfex2 )		/* Street Fighter EX 2 (USA 980526) */
 	DRIVER( sfex2j )	/* Street Fighter EX 2 (JAPAN 980312) */
 	DRIVER( sfex2a )	/* Street Fighter EX 2 (ASIA 980312) */
+	DRIVER( sfex2h )	/* Street Fighter EX 2 (HISPANIC 980312) */
 	DRIVER( plsmaswd )	/* Plasma Sword (USA 980316) */
 	DRIVER( stargld2 )	/* Star Gladiator 2 (JAPAN 980316) */
 	DRIVER( plsmaswda )	/* Plasma Sword (ASIA 980316) */
