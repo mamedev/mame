@@ -425,7 +425,7 @@ const game_driver * const drivers[] =
 	DRIVER( terrafu )	/* (c) 1987 Nichibutsu USA */
 	DRIVER( kodure )	/* (c) 1987 (Japan) */
 	DRIVER( armedf )	/* (c) 1988 */
-	DRIVER( armedf2 )	/* (c) 1988 */
+	DRIVER( armedff )	/* (c) 1988 Fillmore license */
 	DRIVER( cclimbr2 )	/* (c) 1988 (Japan) */
 	DRIVER( cclimbr2a )	/* (c) 1988 (Japan) */
 	DRIVER( skyrobo )	/* (c) 1989 */
