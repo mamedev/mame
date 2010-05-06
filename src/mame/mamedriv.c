@@ -4150,6 +4150,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( vformula )	/* 1993.?? Virtua Formula */
 	DRIVER( swa )		/* 1994.04 Star Wars Arcade */
 	DRIVER( wingwar )	/* 1994.06 Wing War */
+	DRIVER( wingwarj )	/* 1994.06 Wing War */
 	DRIVER( wingwara )	/* 1994.09 Wing War (US) */
 
 	/* Sega H1 games */
