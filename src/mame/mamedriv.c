@@ -2775,6 +2775,7 @@ V-V                           TP-027
 	DRIVER( ecofghtru )	/* 15/02/1994 (c) 1993 (US) */
 	DRIVER( ecofghtru1 )/* 03/12/1993 (c) 1993 (US) */
 	DRIVER( ecofghtra )	/* 03/12/1993 (c) 1993 (Asia) */
+	DRIVER( ecofghtrh )	/* 03/12/1993 (c) 1993 (Hispanic) */
 	DRIVER( uecology )	/* 03/12/1993 (c) 1993 (Japan) */
 	DRIVER( ddtod )		/* 12/04/1994 (c) 1993 (Euro) */
 	DRIVER( ddtodr1 )	/* 13/01/1994 (c) 1993 (Euro) */
@@ -2786,6 +2787,7 @@ V-V                           TP-027
 	DRIVER( ddtoda )	/* 13/01/1994 (c) 1993 (Asia) */
 	DRIVER( ddtodh )	/* 12/04/1994 (c) 1993 (Hispanic) */
 	DRIVER( ddtodhr1 )	/* 25/01/1994 (c) 1993 (Hispanic) */
+	DRIVER( ddtodhr2 )	/* 13/01/1994 (c) 1993 (Hispanic) */
 	DRIVER( ssf2t )		/* 23/02/1994 (c) 1994 (World) */
 	DRIVER( ssf2tu )	/* 23/03/1994 (c) 1994 (US) */
 	DRIVER( ssf2tur1 )	/* 23/02/1994 (c) 1994 (US) */
@@ -2817,7 +2819,8 @@ V-V                           TP-027
 	DRIVER( armwara )	/* 20/09/1994 (c) 1994 (Asia) */
 	DRIVER( xmcota )	/* 05/01/1995 (c) 1994 (Euro) */
 	DRIVER( xmcotau )	/* 05/01/1995 (c) 1994 (US) */
-	DRIVER( xmcotah )	/* 31/03/1995 (c) 1994 (Hispanic) */
+	DRIVER( xmcotah )	/* 05/01/1995 (c) 1994 (Hispanic) */
+	DRIVER( xmcotahr1 )	/* 31/03/1995 (c) 1994 (Hispanic) */
 	DRIVER( xmcotaj )	/* 05/01/1995 (c) 1994 (Japan) */
 	DRIVER( xmcotaj1 )	/* 22/12/1994 (c) 1994 (Japan) */
 	DRIVER( xmcotaj2 )	/* 19/12/1994 (c) 1994 (Japan) */
@@ -2949,6 +2952,7 @@ V-V                           TP-027
 	DRIVER( sfa3 )		/* 04/09/1998 (c) 1998 (US) */
 	DRIVER( sfa3u )		/* 04/09/1998 (c) 1998 (US) */
 	DRIVER( sfa3ur1 )	/* 29/06/1998 (c) 1998 (US) */
+	DRIVER( sfa3h )		/* 29/06/1998 (c) 1998 (Hispanic) */
 	DRIVER( sfa3b )		/* 29/06/1998 (c) 1998 (Brazil) */
 	DRIVER( sfz3j )		/* 04/09/1998 (c) 1998 (Japan) */
 	DRIVER( sfz3jr1 )	/* 27/07/1998 (c) 1998 (Japan) */
@@ -2958,6 +2962,7 @@ V-V                           TP-027
 	DRIVER( gigawing )	/* 22/02/1999 (c) 1999 Takumi (US) */
 	DRIVER( gigawingj )	/* 23/02/1999 (c) 1999 Takumi (Japan) */
 	DRIVER( gigawinga )	/* 22/02/1999 (c) 1999 Takumi (Asia) */
+	DRIVER( gigawingh )	/* 22/02/1999 (c) 1999 Takumi (Hispanic) */
 	DRIVER( gigawingb )	/* 22/02/1999 (c) 1999 Takumi (Brazil) */
 	DRIVER( jyangoku )	/* 27/05/1999 (c) 1999 (Japan) */
 	DRIVER( dimahoo )	/* 21/01/2000 (c) 2000 Eighting/Raizing (US) */
