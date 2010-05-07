@@ -716,8 +716,9 @@ const game_driver * const drivers[] =
 	DRIVER( polepos2bi )/* bootleg */
 	/* no custom I/O in the following, HD63701 (or compatible) microcontroller instead */
 	DRIVER( pacland )	/* (c) 1984 */
-	DRIVER( pacland2 )	/* (c) 1984 */
-	DRIVER( pacland3 )	/* (c) 1984 */
+	DRIVER( paclandj )	/* (c) 1984 */
+	DRIVER( paclandjo )	/* (c) 1984 */
+	DRIVER( paclandjo2 )/* (c) 1984 */
 	DRIVER( paclandm )	/* (c) 1984 Midway */
 	DRIVER( drgnbstr )	/* (c) 1984 */
 	DRIVER( skykid )	/* (c) 1985 */
