@@ -16,7 +16,7 @@ Year + Game         Game     PCB         Epoxy CPU    Notes
 88  Hard Head       KRB-14   60138-0083  S562008      Encryption + Protection
 88  Rough Ranger    K030087  ?           S562008
 89  Spark Man       KRB-16   60136-081   T568009      Not Working (Protection)
-90  Star Fighter    ?        ?           ?            Not Working
+90  Star Fighter    KRB-17   60484-0082  T568009      Not Working
 91  Hard Head 2     ?        ?           T568009      Encryption + Protection
 92  Brick Zone      ?        ?           Yes          Not Working
 ---------------------------------------------------------------------------
