@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( f3_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("share1")	// mirror
 ADDRESS_MAP_END
 
-static SOUND_RESET( taito_f3_soundsystem_reset )
+SOUND_RESET( taito_f3_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
 	UINT16 *ROM = (UINT16 *)memory_region(machine, "audiocpu");
