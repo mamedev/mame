@@ -435,9 +435,8 @@ static void jaguar_set_palette(UINT16 vmode)
 			}
 			break;
 
-		/* YCC/RGB VARMOD */
+		/* YCC VARMOD */
 		case 0x100:
-		case 0x106:
 			for (i = 0; i < 65536; i++)
 			{
 				UINT8 r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
@@ -455,6 +454,17 @@ static void jaguar_set_palette(UINT16 vmode)
 					b = (b << 3) | (b >> 2);
 				}
 				pen_table[i] = MAKE_RGB(r, g, b);
+			}
+			break;
+
+		/* RGB VARMOD */
+		case 0x106:
+			for (i = 0; i < 65536; i++)
+			{
+				if (i & 1) // FIXME: controls RGB 5-5-5 / 5-6-5 format or it's just ignored? Used by UBI Soft logo in Rayman
+					pen_table[i] = MAKE_RGB(pal5bit(i >> 11), pal5bit(i >> 1), pal5bit(i >> 6));
+				else
+					pen_table[i] = MAKE_RGB(pal5bit(i >> 11), pal6bit(i >> 0), pal5bit(i >> 6));
 			}
 			break;
 
