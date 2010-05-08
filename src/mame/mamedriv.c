@@ -965,12 +965,13 @@ const game_driver * const drivers[] =
 	DRIVER( sukuinuf )
 	DRIVER( zgundmdx )
 	DRIVER( soulclb3 )
-	DRIVER( kinniku )
-	DRIVER( taiko9 )
 
 	/* Namco System 256 */
 	DRIVER( sys256 )
 	DRIVER( tekken51 )
+	DRIVER( kinniku )
+	DRIVER( taiko9 )
+	DRIVER( taiko10 )
 
 	/* Misc Namco games */
 	DRIVER( 20pacgal )	/* (c) 2000 Ver 1.04 */

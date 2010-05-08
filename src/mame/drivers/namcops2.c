@@ -122,6 +122,7 @@ ROM_START( kinniku )
         ROM_LOAD( "kn1vera_spr.ic002", 0x800000, 0x040000, CRC(a601f981) SHA1(39485ab3c10f3d58a2c9651cca82a73617b2fe52) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "kn1vera", 0, SHA1(2f0f9ebe74cdafe3713890221532b4d1dc18c74f) )
 ROM_END
 
 ROM_START( netchu02 )
@@ -145,6 +146,7 @@ ROM_START( soulclb2 )
         ROM_LOAD( "sc23vera_spr.ic002", 0x800000, 0x040000, CRC(8f548cbc) SHA1(81b844dc5873bb397cd4cd5aca101d7486d60385) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "sc210d", 0, SHA1(9a7b1ea836adc9d78481928a3067530e0f8d74a6) )
 ROM_END
 
 ROM_START( soulcl2a )
@@ -192,6 +194,18 @@ ROM_START( taiko9 )
         ROM_LOAD( "tk91001-na-a_spr.ic002", 0x800000, 0x040000, CRC(99ece8c0) SHA1(871b1c76ccc0311da04b81c59240e65117cbc9f4) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tk91naa", 0, SHA1(6bd40b2c19f30a81689601c3dd46b6dac6d0a2f1) )
+ROM_END
+
+ROM_START( taiko10 )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM256_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+        ROM_LOAD( "t101001-na-a.ic002", 0x000000, 0x800000, CRC(fa7f4c4d) SHA1(4f6b24243f2c2fdffadc7acaa3a6fb668e497606) ) 
+        ROM_LOAD( "t101001-na-a_spr.ic002", 0x800000, 0x040000, CRC(0a2926c4) SHA1(fb3d23545b5f9a649c4a14b6424c606139723bd5) ) 
+
+	DISK_REGION("dvd")
 ROM_END
 
 ROM_START( tekken4 )
@@ -203,6 +217,7 @@ ROM_START( tekken4 )
         ROM_LOAD( "tef3verc_spr.ic002", 0x800000, 0x040000, CRC(af248bf7) SHA1(b99193fcdad683c0bbd684f37dfea5c5412b398e) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tef1dvd0", 0, SHA1(f39aa37156245f622a6e19e8a0e081418e247b36) )
 ROM_END
 
 ROM_START( tekken4a )
@@ -214,6 +229,7 @@ ROM_START( tekken4a )
         ROM_LOAD( "tef2vera_spr.ic002", 0x800000, 0x040000, CRC(a95fd114) SHA1(669229d47d49a511ab77a6f9b8c8541c00d478cf) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tef1dvd0", 0, SHA1(f39aa37156245f622a6e19e8a0e081418e247b36) )
 ROM_END
 
 ROM_START( tekken4b )
@@ -249,6 +265,7 @@ ROM_START( zgundm )
         ROM_LOAD( "zga1vera_spr.ic002", 0x800000, 0x040000, CRC(8e4c715b) SHA1(a2218051f54d5ce4cdd21ef021b9acf7a384b766) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "zga1vera", 0, SHA1(7930e5a65f6079851438669dfb1f0e5f9e11329a) )
 ROM_END
 
 ROM_START( timecrs3 )
@@ -272,6 +289,7 @@ ROM_START( zgundmdx )
         ROM_LOAD( "zdx1vera_spr.ic002", 0x800000, 0x040000, CRC(16446b28) SHA1(65bdcf216917beec7a36ff640e16aa5cf413c5e4) )
 
 	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "zdx1vera", 0, SHA1(fa21626f771106e2441c4515a0e5dff478187ccd) )
 ROM_END
 
 GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 246 BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
@@ -293,4 +311,5 @@ GAME(2004, sys256,          0, system256, system246, 0, ROT0, "Namco", "System 2
 GAME(2005, tekken51,   sys256, system256, system246, 0, ROT0, "Namco", "Tekken 5.1 (TE51 Ver. B)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2006, kinniku,    sys256, system256, system246, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2006, taiko9,     sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2007, taiko10,    sys256, system256, system246, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 
