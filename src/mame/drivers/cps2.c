@@ -7845,7 +7845,7 @@ GAME( 1993, ecofghtru,  ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "
 GAME( 1993, ecofghtru1, ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Eco Fighters (USA 931203)", GAME_SUPPORTS_SAVE )
 GAME( 1993, uecology,   ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Ultimate Ecology (Japan 931203)", GAME_SUPPORTS_SAVE )
 GAME( 1993, ecofghtra,  ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Eco Fighters (Asia 931203)", GAME_SUPPORTS_SAVE )
-GAME( 1993, ecofghtrh,  ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Eco Fighters (Hispanic 931203)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) /* Need's decrypt key */
+GAME( 1993, ecofghtrh,  ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Eco Fighters (Hispanic 931203)", GAME_SUPPORTS_SAVE )
 GAME( 1993, ddtod,      0,        cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940412)", GAME_SUPPORTS_SAVE )
 GAME( 1993, ddtodr1,    ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940113)", GAME_SUPPORTS_SAVE )
 GAME( 1993, ddtodu,     ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940125)", GAME_SUPPORTS_SAVE )
