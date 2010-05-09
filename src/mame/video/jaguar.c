@@ -681,6 +681,16 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 
 		switch (offset)
 		{
+			case MEMCON1:
+				if((gpu_regs[offset] & 1) == 0)
+					printf("Warning: ROMHI = 0!\n");
+
+				break;
+			case PIT0:
+			case PIT1:
+				if(gpu_regs[PIT0] && reg_store != gpu_regs[offset])
+					printf("Warning: PIT irq used\n");
+				break;
 #if 0
 			case PIT1:
 				if (gpu_regs[PIT0])
