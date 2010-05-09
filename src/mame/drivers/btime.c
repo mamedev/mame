@@ -1628,6 +1628,9 @@ static MACHINE_DRIVER_START( zoar )
 	MDRV_CPU_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
+	MDRV_DEVICE_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+
 	MDRV_GFXDECODE(zoar)
 	MDRV_PALETTE_LENGTH(64)
 
