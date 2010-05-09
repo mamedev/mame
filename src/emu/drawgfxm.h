@@ -268,6 +268,8 @@ do																					\
 				(PRIORITY) = pridata | 0x80;										\
 			}																		\
 		}																			\
+		else if (entry == DRAWMODE_SOURCE)											\
+			(PRIORITY) = 31;														\
 	}																				\
 }																					\
 while (0)																			\
@@ -293,6 +295,8 @@ do																					\
 				(PRIORITY) = pridata | 0x80;										\
 			}																		\
 		}																			\
+		else if (entry == DRAWMODE_SOURCE)											\
+			(PRIORITY) = 31;														\
 	}																				\
 }																					\
 while (0)																			\
