@@ -185,8 +185,11 @@ device), PES Speech adapter (serial port connection)
 /* this ignores pitch, and uses a sawtooth wave for the voiced and unvoiced waveforms as a test, if not set */
 #define NORMALMODE 1
 
-/* if not defined, output the waveform as if it was tapped on the i/o pin */
-#define DO_CLIP_AND_WRAP 1
+/* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
+#define FORCE_DIGITAL 0
+
+/* if defined, outputs the low 4 bits of the lattice filter to the i/o or clip logic, even though the real hardware doesn't do this */
+#undef ALLOW_4_LSB
 
 /* if defined, uses impossibly perfect 'straight line' interpolation */
 #undef PERFECT_INTERPOLATION_HACK
@@ -221,8 +224,8 @@ device), PES Speech adapter (serial port connection)
 // above dumps MUCH MORE debug information related to the sample generation loop, namely the k, pitch and energy values for EVERY SINGLE SAMPLE.
 #undef DEBUG_LATTICE
 // above dumps the lattice filter state data each sample. 
-#undef DEBUG_CLIP_WRAP
-// above dumps info to stderr whenever the clip/wrap hardware is (or would be) clipping the signal.
+#undef DEBUG_CLIP
+// above dumps info to stderr whenever the analog clip hardware is (or would be) clipping the signal.
 #undef DEBUG_IO_READY
 // above debugs the io ready callback
 #undef DEBUG_RS_WS
@@ -348,7 +351,7 @@ struct _tms5220_state
        resolution of the output data.
        TODO: add a way to set/reset this
      */
-    UINT8 digital_select;
+	UINT8 digital_select;
 	running_device *device;
 
 	const tms5220_interface *intf;
@@ -379,7 +382,7 @@ static void parse_frame(tms5220_state *tms);
 static void update_status_and_ints(tms5220_state *tms);
 static void set_interrupt_state(tms5220_state *tms, int state);
 static INT32 lattice_filter(tms5220_state *tms);
-static INT32 clip_and_wrap(INT32 cliptemp);
+static INT16 clip_analog(INT16 clip);
 static STREAM_UPDATE( tms5220_update );
 
 void tms5220_set_variant(tms5220_state *tms, int variant)
@@ -766,6 +769,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 {
     int buf_count=0;
     int i, interp_period, bitout, zpar;
+    INT32 this_sample;
 
 //tryagain:
 
@@ -1012,11 +1016,27 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
 		fprintf(stderr,"\n");
 #endif
-		if (tms->digital_select == 0) // analog SPK pin output is only 8 bits
-			buffer[buf_count] = clip_and_wrap(lattice_filter(tms)) & ~0xFF; /* execute lattice filter and clipping/wrapping */
+		this_sample = lattice_filter(tms); /* execute lattice filter */
+		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
+		while (this_sample > 16383) this_sample -= 32768;
+		while (this_sample < -16384) this_sample += 32768;
+		if (tms->digital_select == 0) // analog SPK pin output is only 8 bits, with clipping
+			buffer[buf_count] = clip_analog(this_sample);
 		else // digital I/O pin output is 12 bits
-			buffer[buf_count] = clip_and_wrap(lattice_filter(tms)) & ~0xF; /* execute lattice filter and clipping/wrapping */
-
+			{
+#ifdef ALLOW_4_LSB
+			// input:  ssss ssss ssss ssss ssnn nnnn nnnn nnnn
+			// N taps:                       ^                 = 0x2000;
+			// output: ssss ssss ssss ssss snnn nnnn nnnn nnnN
+			buffer[buf_count] = (this_sample<<1)|((this_sample&0x2000)>>13);
+#else
+			this_sample &= ~0xF;
+			// input:  ssss ssss ssss ssss ssnn nnnn nnnn 0000
+			// N taps:                       ^^ ^^^            = 0x3E00;
+			// output: ssss ssss ssss ssss snnn nnnn nnnN NNNN
+			buffer[buf_count] = (this_sample<<1)|((this_sample&0x3E00)>>9);
+#endif
+			}
         /* Update all counts */
 
         size--;
@@ -1034,7 +1054,7 @@ empty:
     {
 		tms->sample_count = (tms->sample_count + 1) % 200;
 		tms->interp_count = (tms->interp_count + 1) % 25;
-		buffer[buf_count] = -1<<4;	/* should be (-1 << 8) ??? (cf note in data sheet, p 10, table 4) */
+		buffer[buf_count] = -1;	/* should be just -1; actual chip outputs -1 every idle sample; (cf note in data sheet, p 10, table 4) */
         buf_count++;
         size--;
     }
@@ -1042,34 +1062,38 @@ empty:
 
 /**********************************************************************************************
 
-     clip_and_wrap -- clips and wraps the 14 bit return value from the lattice filter to its final 10 bit value (-512 to 511), and upshifts this to 16 bits
+     clip_analog -- clips the 14 bit return value from the lattice filter to its final 10 bit value (-512 to 511), and upshifts/range extends this to 16 bits
 
 ***********************************************************************************************/
 
-static INT32 clip_and_wrap(INT32 cliptemp)
+static INT16 clip_analog(INT16 cliptemp)
 {
-    /* clipping & wrapping, just like the patent shows:
-       first of all the result should be clamped to 14 bits, between -16384 and 16383
-    */
-	while (cliptemp > 16383) cliptemp -= 32768;
-	while (cliptemp < -16384) cliptemp += 32768;
-	/* the top 10 bits of this result are visible on the digital output IO pin.
+    /* clipping, just like the patent shows:
+       the top 10 bits of this result are visible on the digital output IO pin.
        next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output, otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
        1x xxxx xxxx xxxx -> 0b10000000
        11 1bcd efgh xxxx -> 0b1bcdefgh
        00 0bcd efgh xxxx -> 0b0bcdefgh
        0x xxxx xxxx xxxx -> 0b01111111
        */
-#ifdef DEBUG_CLIP_WRAP
+#ifdef DEBUG_CLIP
 	if ((cliptemp > 2047) || (cliptemp < -2048)) fprintf(stderr,"clipping cliptemp to range; was %d\n", cliptemp);
 #endif
-#ifdef DO_CLIP_AND_WRAP
 	if (cliptemp > 2047) cliptemp = 2047;
 	else if (cliptemp < -2048) cliptemp = -2048;
 	/* at this point the analog output is tapped */
-	return cliptemp << 4;
+#ifdef ALLOW_4_LSB
+	// input:  ssss snnn nnnn nnnn
+	// N taps:       ^^^ ^         = 0x0780
+	// output: snnn nnnn nnnn NNNN
+	return (cliptemp << 4)|((cliptemp&0x780)>>7); // upshift and range adjust
 #else
-	return cliptemp << 1;
+	cliptemp &= ~0xF;
+	// input:  ssss snnn nnnn 0000
+	// N taps:       ^^^ ^^^^      = 0x07F0
+	// P taps:       ^             = 0x0400
+	// output: snnn nnnn NNNN NNNP
+	return (cliptemp << 4)|((cliptemp&0x7F0)>>3)|((cliptemp&0x400)>>10); // upshift and range adjust
 #endif
 }
 
@@ -1457,7 +1481,7 @@ static DEVICE_RESET( tms5220 )
 {
 	tms5220_state *tms = get_safe_token(device);
 
-	tms->digital_select = 0;
+	tms->digital_select = FORCE_DIGITAL; // assume analog output
 	/* initialize the FIFO */
 	/*memset(tms->fifo, 0, sizeof(tms->fifo));*/
 	tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
