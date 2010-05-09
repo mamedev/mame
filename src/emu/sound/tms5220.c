@@ -60,7 +60,7 @@ e[0 or f] p[0] k1[0] k2[0] k3[0] k4[0] k5[f] k6[f] k7[f] k8[7] k9[7] k10[7]
 
 Driver specific notes:
 
-    Looping has the tms5220 hookep up directly to the cpu. However currently the
+    Looping has the tms5220 hooked up directly to the cpu. However currently the
     tms9900 cpu core does not support a ready line.
 
     Victory's initial audio selftest is pretty brutal to the FIFO: it sends a
@@ -346,8 +346,9 @@ struct _tms5220_state
        The internal DAC used to feed the analog pin is only 8 bits, and has the
        funny clipping/clamping logic, while the digital pin gives full 12? bit
        resolution of the output data.
+       TODO: add a way to set/reset this
      */
-	UINT8 digital_select;
+    UINT8 digital_select;
 	running_device *device;
 
 	const tms5220_interface *intf;
@@ -1011,10 +1012,10 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
 		fprintf(stderr,"\n");
 #endif
-		buffer[buf_count] = clip_and_wrap(lattice_filter(tms)); /* execute lattice filter and clipping/wrapping */
-
-        //if (tms->digital_select == 0) /* if digital is NOT selected... */
-		//  buffer[buf_count] &= 0xff00; /* mask out all but the 8 dac bits */
+		if (tms->digital_select == 0) // analog SPK pin output is only 8 bits
+			buffer[buf_count] = clip_and_wrap(lattice_filter(tms)) & ~0xFF; /* execute lattice filter and clipping/wrapping */
+		else // digital I/O pin output is 12 bits
+			buffer[buf_count] = clip_and_wrap(lattice_filter(tms)) & ~0xF; /* execute lattice filter and clipping/wrapping */
 
         /* Update all counts */
 
@@ -1065,7 +1066,6 @@ static INT32 clip_and_wrap(INT32 cliptemp)
 #ifdef DO_CLIP_AND_WRAP
 	if (cliptemp > 2047) cliptemp = 2047;
 	else if (cliptemp < -2048) cliptemp = -2048;
-	cliptemp &= ~0xF;
 	/* at this point the analog output is tapped */
 	return cliptemp << 4;
 #else
@@ -1457,6 +1457,7 @@ static DEVICE_RESET( tms5220 )
 {
 	tms5220_state *tms = get_safe_token(device);
 
+	tms->digital_select = 0;
 	/* initialize the FIFO */
 	/*memset(tms->fifo, 0, sizeof(tms->fifo));*/
 	tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
