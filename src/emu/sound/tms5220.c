@@ -307,6 +307,7 @@ struct _tms5220_state
 
 	//UINT8 interp_period; /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
 	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
+	UINT8 inhibit;			/* interpolation is inhibited until the DIV1 period */
 	//UINT8 spkslow_delay;  /* delay counter for interp count, only used on tms51xx */
 	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
 	UINT8 tms5220c_rate; /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
@@ -436,6 +437,7 @@ static void register_for_save_states(tms5220_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->previous_energy);
 
 	state_save_register_device_item(tms->device, 0, tms->interp_count);
+	state_save_register_device_item(tms->device, 0, tms->inhibit);
 	state_save_register_device_item(tms->device, 0, tms->sample_count);
 	state_save_register_device_item(tms->device, 0, tms->tms5220c_rate);
 	state_save_register_device_item(tms->device, 0, tms->pitch_count);
@@ -816,8 +818,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 					update_status_and_ints(tms);
 				}
 
-			/* in all cases where interpolation would be inhibited, set the target
-               value equal to the current value.
+			/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
                Interpolation inhibit cases:
                * Old frame was voiced, new is unvoiced
                * Old frame was silence/zero energy, new has nonzero energy
@@ -825,17 +826,14 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             */
 			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
 				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
-				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) ) 
+				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
 			{
 #ifdef DEBUG_GENERATION
 				fprintf(stderr,"processing frame: interpolation inhibited\n");
 				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
 				fprintf(stderr,"*** next frame Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
 #endif
-				tms->target_energy = tms->current_energy;
-				tms->target_pitch = tms->current_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i];
+				tms->inhibit = 1;
 			}
 			else // normal frame, normal interpolation
 			{
@@ -844,15 +842,17 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
 				fprintf(stderr,"*** new (target) Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
 #endif
-
-				tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
-				tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
-				zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
-				for (i = 0; i < 4; i++)
-					tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
-				for (i = 4; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = (tms->coeff->ktable[i][tms->new_frame_k_idx[i]] * (1-zpar));
+				tms->inhibit = 0;
 			}
+
+
+			tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
+			tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
+			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
+			for (i = 0; i < 4; i++)
+				tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
+			for (i = 4; i < tms->coeff->num_k; i++)
+				tms->target_k[i] = (tms->coeff->ktable[i][tms->new_frame_k_idx[i]] * (1-zpar));
 
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if ( (tms->talk_status == 0))
@@ -870,7 +870,8 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #else
 			interp_period = tms->sample_count / 25;
 #endif
-#define PC_COUNT_LOAD 0
+#define PC_COUNT_LOAD 7
+		if (interp_period == 7) tms->inhibit = 0; // disable inhibit when reaching the last interp period
 		zpar = OLD_FRAME_UNVOICED_FLAG;
 #ifdef PERFECT_INTERPOLATION_HACK
 		tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
@@ -880,10 +881,10 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		for (i = 4; i < tms->coeff->num_k; i++)
 			tms->current_k[i] = (tms->coeff->ktable[i][tms->old_frame_k_idx[i]] * (1-zpar));
 		// now adjust each value to be exactly correct for the 200 samples per frsme
-		tms->current_energy += ((tms->target_energy - tms->current_energy)*tms->sample_count)/200;
-		tms->current_pitch += ((tms->target_pitch - tms->current_pitch)*tms->sample_count)/200;
+		tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit))*tms->sample_count)/200;
+		tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit))*tms->sample_count)/200;
 		for (i = 0; i < tms->coeff->num_k; i++)
-			tms->current_k[i] += ((tms->target_k[i] - tms->current_k[i])*tms->sample_count)/200;
+			tms->current_k[i] += (((tms->target_k[i] - tms->current_k[i])*(1-tms->inhibit))*tms->sample_count)/200;
 #else
 		switch(tms->interp_count)
 			{
@@ -895,84 +896,84 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				case 2: /* PC=1, A cycle, update energy (calc pitch) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
-				tms->current_energy += ((tms->target_energy - tms->current_energy) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 3: /* PC=1, B cycle, nothing happens (update pitch) */
 				break;
 				case 4: /* PC=2, A cycle, update pitch (calc K1) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
-				tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 5: /* PC=2, B cycle, nothing happens (update K1) */
 				break;
 				case 6: /* PC=3, A cycle, update K1 (calc K2) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[0] = tms->coeff->ktable[0][tms->old_frame_k_idx[0]];
-				tms->current_k[0] += ((tms->target_k[0] - tms->current_k[0]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[0] += (((tms->target_k[0] - tms->current_k[0])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 7: /* PC=3, B cycle, nothing happens (update K2) */
 				break;
 				case 8: /* PC=4, A cycle, update K2 (calc K3) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[1] = tms->coeff->ktable[1][tms->old_frame_k_idx[1]];
-				tms->current_k[1] += ((tms->target_k[1] - tms->current_k[1]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[1] += (((tms->target_k[1] - tms->current_k[1])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 9: /* PC=4, B cycle, nothing happens (update K3) */
 				break;
 				case 10: /* PC=5, A cycle, update K3 (calc K4) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[2] = tms->coeff->ktable[2][tms->old_frame_k_idx[2]];
-				tms->current_k[2] += ((tms->target_k[2] - tms->current_k[2]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[2] += (((tms->target_k[2] - tms->current_k[2])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 11: /* PC=5, B cycle, nothing happens (update K4) */
 				break;
 				case 12: /* PC=6, A cycle, update K4 (calc K5) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[3] = tms->coeff->ktable[3][tms->old_frame_k_idx[3]];
-				tms->current_k[3] += ((tms->target_k[3] - tms->current_k[3]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[3] += (((tms->target_k[3] - tms->current_k[3])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 13: /* PC=6, B cycle, nothing happens (update K5) */
 				break;
 				case 14: /* PC=7, A cycle, update K5 (calc K6) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[4] = (tms->coeff->ktable[4][tms->old_frame_k_idx[4]] * (1-zpar));
-				tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[4] += (((tms->target_k[4] - tms->current_k[4])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 15: /* PC=7, B cycle, nothing happens (update K6) */
 				break;
 				case 16: /* PC=8, A cycle, update K6 (calc K7) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[5] = (tms->coeff->ktable[5][tms->old_frame_k_idx[5]] * (1-zpar));
-				tms->current_k[5] += ((tms->target_k[5] - tms->current_k[5]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[5] += (((tms->target_k[5] - tms->current_k[5])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 17: /* PC=8, B cycle, nothing happens (update K7) */
 				break;
 				case 18: /* PC=9, A cycle, update K7 (calc K8) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[6] = (tms->coeff->ktable[6][tms->old_frame_k_idx[6]] * (1-zpar));
-				tms->current_k[6] += ((tms->target_k[6] - tms->current_k[6]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[6] += (((tms->target_k[6] - tms->current_k[6])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 19: /* PC=9, B cycle, nothing happens (update K8) */
 				break;
 				case 20: /* PC=10, A cycle, update K8 (calc K9) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[7] = (tms->coeff->ktable[7][tms->old_frame_k_idx[7]] * (1-zpar));
-				tms->current_k[7] += ((tms->target_k[7] - tms->current_k[7]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[7] += (((tms->target_k[7] - tms->current_k[7])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 21: /* PC=10, B cycle, nothing happens (update K9) */
 				break;
 				case 22: /* PC=11, A cycle, update K9 (calc K10) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[8] = (tms->coeff->ktable[8][tms->old_frame_k_idx[8]] * (1-zpar));
-				tms->current_k[8] += ((tms->target_k[8] - tms->current_k[8]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[8] += (((tms->target_k[8] - tms->current_k[8])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 23: /* PC=11, B cycle, nothing happens (update K10) */
 				break;
 				case 24: /* PC=12, A cycle, update K10 (do nothing) */
 				if (interp_period == PC_COUNT_LOAD)
 					tms->current_k[9] = (tms->coeff->ktable[9][tms->old_frame_k_idx[9]] * (1-zpar));
-				tms->current_k[9] += ((tms->target_k[9] - tms->current_k[9]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[9] += (((tms->target_k[9] - tms->current_k[9])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 			}
 #endif
@@ -1500,6 +1501,7 @@ static DEVICE_RESET( tms5220 )
 	memset(tms->target_k, 0, sizeof(tms->target_k));
 
 	/* initialize the sample generators */
+	tms->inhibit = 1;
 	tms->interp_count = tms->tms5220c_rate = tms->pitch_count = 0;
 	tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
     tms->RNG = 0x1FFF;
