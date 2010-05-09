@@ -272,7 +272,7 @@ INLINE int get_sprite_xy(UINT8 which, UINT8* sx, UINT8* sy)
 {
 	offs_t offs = which * 4;
 
-	*sx =       taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 0];
+	*sx =       taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 0] - 1;
 	*sy = 240 - taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 1];
 
 	return (*sy < 240);
