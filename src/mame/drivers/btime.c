@@ -1593,8 +1593,7 @@ static MACHINE_DRIVER_START( mmonkey )
 	MDRV_MACHINE_RESET(mmonkey)
 MACHINE_DRIVER_END
 
-
-static MACHINE_DRIVER_START( bnj )
+static MACHINE_DRIVER_START( sdtennis )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
@@ -1607,6 +1606,17 @@ static MACHINE_DRIVER_START( bnj )
 
 	MDRV_VIDEO_START(bnj)
 	MDRV_VIDEO_UPDATE(bnj)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( bnj )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(sdtennis)
+
+	/* video hardware */
+	MDRV_DEVICE_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 MACHINE_DRIVER_END
 
 
@@ -2215,4 +2225,4 @@ GAME( 1982, caractn,  brubber, bnj,      bnj,      bnj,      ROT270, "bootleg", 
 GAME( 1982, zoar,     0,       zoar,     zoar,     zoar,     ROT270, "Data East USA", "Zoar", GAME_SUPPORTS_SAVE )
 GAME( 1982, disco,    0,       disco,    disco,    disco,    ROT270, "Data East", "Disco No.1", GAME_SUPPORTS_SAVE )
 GAME( 1982, discof,   disco,   disco,    disco,    disco,    ROT270, "Data East", "Disco No.1 (Rev.F)", GAME_SUPPORTS_SAVE )
-GAME( 1983, sdtennis, 0,       bnj,      sdtennis, sdtennis, ROT270, "Data East Corporation", "Super Doubles Tennis", GAME_SUPPORTS_SAVE )
+GAME( 1983, sdtennis, 0,       sdtennis, sdtennis, sdtennis, ROT270, "Data East Corporation", "Super Doubles Tennis", GAME_SUPPORTS_SAVE )
