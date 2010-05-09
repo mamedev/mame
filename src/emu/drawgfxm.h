@@ -255,21 +255,19 @@ do																					\
 	if (entry != DRAWMODE_NONE)														\
 	{																				\
 		UINT8 pridata = (PRIORITY);													\
-		if (((1 << (pridata & 0x1f)) & pmask) == 0)									\
+		if (entry == DRAWMODE_SOURCE)												\
 		{																			\
-			if (entry == DRAWMODE_SOURCE)											\
-			{																		\
+			if (((1 << (pridata & 0x1f)) & pmask) == 0)								\
 				(DEST) = paldata[srcdata];											\
-				(PRIORITY) = 31;													\
-			}																		\
-			else if ((pridata & 0x80) == 0)											\
-			{																		\
-				(DEST) = shadowtable[DEST];											\
-				(PRIORITY) = pridata | 0x80;										\
-			}																		\
+			else if (pridata & 0x80)												\
+				(DEST) = shadowtable[paldata[srcdata]]; /* reapply */				\
+			(PRIORITY) = pridata | 0x1f;											\
 		}																			\
-		else if (entry == DRAWMODE_SOURCE)											\
-			(PRIORITY) = 31;														\
+		else if (((pridata & 0x80) | ((1 << (pridata & 0x1f)) & pmask)) == 0)		\
+		{																			\
+			(DEST) = shadowtable[DEST];												\
+			(PRIORITY) = 0x9f;														\
+		}																			\
 	}																				\
 }																					\
 while (0)																			\
@@ -282,21 +280,19 @@ do																					\
 	if (entry != DRAWMODE_NONE)														\
 	{																				\
 		UINT8 pridata = (PRIORITY);													\
-		if (((1 << (pridata & 0x1f)) & pmask) == 0)									\
+		if (entry == DRAWMODE_SOURCE)												\
 		{																			\
-			if (entry == DRAWMODE_SOURCE)											\
-			{																		\
+			if (((1 << (pridata & 0x1f)) & pmask) == 0)								\
 				(DEST) = paldata[srcdata];											\
-				(PRIORITY) = 31;													\
-			}																		\
-			else if ((pridata & 0x80) == 0)											\
-			{																		\
-				(DEST) = shadowtable[rgb_to_rgb15(DEST)];							\
-				(PRIORITY) = pridata | 0x80;										\
-			}																		\
+			else if (pridata & 0x80)												\
+				(DEST) = shadowtable[rgb_to_rgb15(paldata[srcdata])];				\
+			(PRIORITY) = pridata | 0x1f;											\
 		}																			\
-		else if (entry == DRAWMODE_SOURCE)											\
-			(PRIORITY) = 31;														\
+		else if (((pridata & 0x80) | ((1 << (pridata & 0x1f)) & pmask)) == 0)		\
+		{																			\
+			(DEST) = shadowtable[rgb_to_rgb15(DEST)];								\
+			(PRIORITY) = 0x9f;														\
+		}																			\
 	}																				\
 }																					\
 while (0)																			\
