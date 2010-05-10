@@ -259,14 +259,12 @@ do																					\
 		{																			\
 			if (((1 << (pridata & 0x1f)) & pmask) == 0)								\
 				(DEST) = paldata[srcdata];											\
-			else if (pridata & 0x80)												\
-				(DEST) = shadowtable[paldata[srcdata]]; /* reapply */				\
-			(PRIORITY) = pridata | 0x1f;											\
+			(PRIORITY) = 31;														\
 		}																			\
-		else if (((pridata & 0x80) | ((1 << (pridata & 0x1f)) & pmask)) == 0)		\
+		else if ((pridata & 0x80) == 0 && ((1 << (pridata & 0x1f)) & pmask) == 0)	\
 		{																			\
 			(DEST) = shadowtable[DEST];												\
-			(PRIORITY) = 0x9f;														\
+			(PRIORITY) = pridata | 0x80;											\
 		}																			\
 	}																				\
 }																					\
@@ -284,14 +282,12 @@ do																					\
 		{																			\
 			if (((1 << (pridata & 0x1f)) & pmask) == 0)								\
 				(DEST) = paldata[srcdata];											\
-			else if (pridata & 0x80)												\
-				(DEST) = shadowtable[rgb_to_rgb15(paldata[srcdata])];				\
-			(PRIORITY) = pridata | 0x1f;											\
+			(PRIORITY) = 31;														\
 		}																			\
-		else if (((pridata & 0x80) | ((1 << (pridata & 0x1f)) & pmask)) == 0)		\
+		else if ((pridata & 0x80) == 0 && ((1 << (pridata & 0x1f)) & pmask) == 0)	\
 		{																			\
 			(DEST) = shadowtable[rgb_to_rgb15(DEST)];								\
-			(PRIORITY) = 0x9f;														\
+			(PRIORITY) = pridata | 0x80;											\
 		}																			\
 	}																				\
 }																					\
