@@ -574,7 +574,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 	for (toc->numtrks = 0; toc->numtrks < CD_MAX_TRACKS; toc->numtrks++)
 	{
 		int tracknum = -1, frames = 0, hunks;
-		char type[11], subtype[11];
+		char type[16], subtype[16];
 		cdrom_track_info *track;
 
 		/* fetch the metadata for this track */
