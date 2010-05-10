@@ -157,6 +157,28 @@ static ADDRESS_MAP_START( psurge_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( chkun_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x67ff) AM_RAM
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(timeplt_colorram_w) AM_BASE_MEMBER(timeplt_state, colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(timeplt_videoram_w) AM_BASE_MEMBER(timeplt_state, videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM
+	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram)
+	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram2)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_nmi_enable_w)
+	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_flipscreen_w)
+	AM_RANGE(0xc304, 0xc304) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_sh_irqtrigger_w)
+	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_coin_counter_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ(timeplt_scanline_r)
+	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
+	AM_RANGE(0xc320, 0xc320) AM_MIRROR(0x0c9f) AM_READ_PORT("IN1")
+	AM_RANGE(0xc340, 0xc340) AM_MIRROR(0x0c9f) AM_READ_PORT("IN2")
+	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -257,6 +279,36 @@ static INPUT_PORTS_START( psurge )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( chkun )
+	PORT_INCLUDE(timeplt)
+
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) //service mode
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 
 /*************************************
@@ -370,7 +422,15 @@ static MACHINE_DRIVER_START( psurge )
 	MDRV_MACHINE_RESET(0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( chkun )
+	MDRV_IMPORT_FROM(timeplt)
 
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(chkun_main_map)
+
+	MDRV_VIDEO_START(chkun)
+MACHINE_DRIVER_END
 
 /*************************************
  *
@@ -495,7 +555,30 @@ ROM_START( psurge )
 	ROM_LOAD( "timeplt.e12",  0x0140, 0x0100, BAD_DUMP CRC(f7b7663e) SHA1(151bd2dff4e4ef76d6438c1ab2cae71f987b9dad)  ) /* char lookup table */
 ROM_END
 
+ROM_START( chkun )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "n1.16a",   0x0000, 0x4000, CRC(c5879f9b) SHA1(68e3a87dfe6b3d1e0cdadd1ed8ad115a9d3055f9) )
+	ROM_LOAD( "12.14a",   0x4000, 0x2000, CRC(80cc55da) SHA1(68727721479624cd0d38d895b98dcef4edac13e9) )
 
+	ROM_REGION( 0x12000, "tpsound", 0 )
+	ROM_LOAD( "15.3l",    0x0000, 0x2000, CRC(1f1463ca) SHA1(870abbca35236fcce6a2f640a238e20b9e57f10f))
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "13.4d",   0x0000, 0x4000, CRC(776427c0) SHA1(1e8387685f7e86aad31577f2186596b2a2dfc4de) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "14.8h",   0x0000, 0x4000, CRC(0cb76a48) SHA1(0beebbc3d30eb978f6fe7b15c0a7b0c2152815b7) )
+
+	ROM_REGION( 0x20000, "sample_data", 0 )
+	ROM_LOAD( "v1.8k",   0x00000, 0x10000, CRC(d5ca802d) SHA1(0c2867c86132745063e36d03f41e6c3e150fd3ad) )
+	ROM_LOAD( "v2.9k",   0x10000, 0x10000, CRC(70e902eb) SHA1(e1b2392446f2878f9e811a63bbbbdc56fd517a9c) )
+
+	ROM_REGION( 0x0240,  "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "3.2j",   0x0000, 0x0020, CRC(34c91839) SHA1(f62e279e21fce171231d3139be7adabe1f4b8c2e) ) /* palette */
+	ROM_LOAD( "2.1h",   0x0020, 0x0020, CRC(463b2b07) SHA1(9ad275365eba4869f94749f39ff8705d92056a10) ) /* palette */
+	ROM_LOAD( "4.10h",  0x0040, 0x0100, CRC(4bbb2150) SHA1(678433b21aae1daa938e32d3293eeed529a42ef9) ) /* sprite lookup table */
+	ROM_RELOAD(         0x0140, 0x0100 )
+ROM_END
 
 /*************************************
  *
@@ -507,4 +590,5 @@ GAME( 1982, timeplt,  0,       timeplt, timeplt, 0, ROT90,  "Konami", "Time Pilo
 GAME( 1982, timepltc, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", GAME_SUPPORTS_SAVE )
 GAME( 1982, timeplta, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", GAME_SUPPORTS_SAVE )
 GAME( 1982, spaceplt, timeplt, timeplt, timeplt, 0, ROT90,  "bootleg", "Space Pilot", GAME_SUPPORTS_SAVE )
+GAME( 1982, chkun,    0,       chkun,   chkun,  0, ROT90,  "<unknown>", "Chance Kun", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1988, psurge,   0,       psurge,  psurge,  0, ROT270, "<unknown>", "Power Surge", GAME_SUPPORTS_SAVE )

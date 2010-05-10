@@ -101,6 +101,18 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(0, code, color, flags);
 }
 
+static TILE_GET_INFO( get_chkun_tile_info )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0x60) << 3);
+	int color = attr & 0x1f;
+	int flags = 0;//TILE_FLIPYX(attr >> 6);
+
+	tileinfo->category = (attr & 0x80) >> 7;
+	SET_TILE_INFO(0, code, color, flags);
+}
+
 
 
 /*************************************
@@ -113,6 +125,12 @@ VIDEO_START( timeplt )
 {
 	timeplt_state *state = (timeplt_state *)machine->driver_data;
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+}
+
+VIDEO_START( chkun )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_chkun_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 

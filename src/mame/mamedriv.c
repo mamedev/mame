@@ -10173,4 +10173,6 @@ Other Sun games
 	/* Extrema Systems International Ltd. */
 	DRIVER( poker72 )
 
+	DRIVER( chkun )
+
 #endif	/* DRIVER_RECURSIVE */

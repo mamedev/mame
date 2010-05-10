@@ -125,6 +125,7 @@ WRITE8_HANDLER( timeplt_flipscreen_w );
 
 PALETTE_INIT( timeplt );
 VIDEO_START( timeplt );
+VIDEO_START( chkun );
 VIDEO_UPDATE( timeplt );
 
 /*----------- defined in video/tutankhm.c -----------*/
