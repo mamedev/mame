@@ -569,7 +569,7 @@ ROM_START( chkun )
 	ROM_REGION( 0x4000, "gfx2", 0 )
 	ROM_LOAD( "14.8h",   0x0000, 0x4000, CRC(0cb76a48) SHA1(0beebbc3d30eb978f6fe7b15c0a7b0c2152815b7) )
 
-	ROM_REGION( 0x20000, "sample_data", 0 )
+	ROM_REGION( 0x20000, "sample_data", 0 ) //unemulated Toshiba TC8830F sound chip
 	ROM_LOAD( "v1.8k",   0x00000, 0x10000, CRC(d5ca802d) SHA1(0c2867c86132745063e36d03f41e6c3e150fd3ad) )
 	ROM_LOAD( "v2.9k",   0x10000, 0x10000, CRC(70e902eb) SHA1(e1b2392446f2878f9e811a63bbbbdc56fd517a9c) )
 
@@ -578,6 +578,10 @@ ROM_START( chkun )
 	ROM_LOAD( "2.1h",   0x0020, 0x0020, CRC(463b2b07) SHA1(9ad275365eba4869f94749f39ff8705d92056a10) ) /* palette */
 	ROM_LOAD( "4.10h",  0x0040, 0x0100, CRC(4bbb2150) SHA1(678433b21aae1daa938e32d3293eeed529a42ef9) ) /* sprite lookup table */
 	ROM_RELOAD(         0x0140, 0x0100 )
+
+	ROM_REGION( 0x0200, "pld", 0 )
+	ROM_LOAD( "a.16c",  0x0000, 0x00eb, CRC(e0d54999) SHA1(9e1c749873572ade2b925ce1519d31a6e19f841f) )
+	ROM_LOAD( "b.9f",   0x0100, 0x00eb, CRC(e3857f83) SHA1(674e70dc960fc02a9fbda4a0ef0770eb8214c466) )
 ROM_END
 
 /*************************************
