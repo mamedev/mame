@@ -832,24 +832,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
 				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
 				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
-			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"processing frame: interpolation inhibited\n");
-				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
-				fprintf(stderr,"*** next frame Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
-#endif
 				tms->inhibit = 1;
-			}
 			else // normal frame, normal interpolation
-			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"processing frame: Normal\n");
-				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
-				fprintf(stderr,"*** new (target) Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
-#endif
 				tms->inhibit = 0;
-			}
-
 
 			tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
 			tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
@@ -858,6 +843,16 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
 			for (i = 4; i < tms->coeff->num_k; i++)
 				tms->target_k[i] = (tms->coeff->ktable[i][tms->new_frame_k_idx[i]] * (1-zpar));
+
+#ifdef DEBUG_GENERATION
+				fprintf(stderr,"Processing frame: ");
+				if (tms->inhibit == 0)
+					fprintf(stderr, "Normal Frame\n");
+				else
+					fprintf(stderr,"Interpolation Inhibited\n");
+				fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",tms->current_energy, tms->current_pitch, tms->current_k[0], tms->current_k[1], tms->current_k[2], tms->current_k[3], tms->current_k[4], tms->current_k[5], tms->current_k[6], tms->current_k[7], tms->current_k[8], tms->current_k[9]);
+				fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",tms->target_energy, tms->new_frame_energy_idx, tms->target_pitch, tms->target_k[0], tms->target_k[1], tms->target_k[2], tms->target_k[3], tms->target_k[4], tms->target_k[5], tms->target_k[6], tms->target_k[7], tms->target_k[8], tms->target_k[9]);
+#endif
 
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if ( (tms->talk_status == 0))
@@ -876,8 +871,8 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			interp_period = tms->sample_count / 25;
 #endif
 		if (interp_period == 7) tms->inhibit = 0; // disable inhibit when reaching the last interp period
-		zpar = OLD_FRAME_UNVOICED_FLAG;
 #ifdef PERFECT_INTERPOLATION_HACK
+		zpar = OLD_FRAME_UNVOICED_FLAG;
 		// reset the current energy, pitch, etc to what it was at frame start
 		tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
 		tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
