@@ -446,6 +446,7 @@ const game_driver * const drivers[] =
 	DRIVER( nightgal )	/* (c) 1984 */
 	DRIVER( ngtbunny )	/* (c) 1984 */
 	DRIVER( royalngt )	/* (c) 1984 Royal Denshi */
+	DRIVER( royalqn )
 	DRIVER( sexygal  )	/* (c) 1985 */
 	DRIVER( sweetgal )	/* (c) 1985 */
 	DRIVER( ngalsumr )	/* (c) 1985 */

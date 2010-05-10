@@ -7,7 +7,7 @@ a.k.a. same Jangou blitter but with NCS CPU for displaying graphics as protectio
 preliminary driver by David Haywood & Angelo Salese
 
 TODO:
--Get Night Gal Summer to boot;
+-Get Night Gal Summer and Royal Queen to boot;
 -Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi
  wrong firing);
 -Proper Z80<->MCU comms,many video problems because of that;
@@ -302,6 +302,7 @@ static WRITE8_HANDLER( nsc_latch_w )
 static READ8_HANDLER( nsc_latch_r )
 {
 	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+
 	return state->z80_latch;
 }
 
@@ -1104,6 +1105,31 @@ ROM_START( ngalsumr )
 ROM_END
 
 
+ROM_START( royalqn )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "b10.3s", 0x00000, 0x02000, CRC(67a4abfe) SHA1(1f408f7540185ce136507a8aca8d3beb234979d5) )
+	ROM_LOAD( "a11.3t", 0x02000, 0x02000, CRC(e7c5395b) SHA1(5131ab9b0fbf1b7b4d410aa2a57eceaf47f8ec3a) )
+	ROM_LOAD( "a12.3v", 0x04000, 0x02000, CRC(4e8efda4) SHA1(1959491fd899a4d85fd067d7674592ec25188a75) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "rq9.3p",  0x0e000, 0x02000, CRC(34b4cf82) SHA1(01f49ca11a695d41c181e92217e228bc1656ee57) )
+
+	ROM_REGION( 0xc000, "samples", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "rq1.3a",  0x00000, 0x02000, CRC(066449dc) SHA1(34838f5e3569b313306ce465e481b934e938c837) )
+	ROM_LOAD( "rq2.3c",  0x02000, 0x02000, CRC(c467adb5) SHA1(755ebde6229bbf0c7d9293e0becb7506d9aa9d49) )
+	ROM_LOAD( "rq3.3d",  0x04000, 0x02000, CRC(7e5a7a2d) SHA1(5770cd832de59ff4f61ac40eca8c2238ff7b582d) )
+	ROM_LOAD( "rq4.3f",  0x06000, 0x02000, CRC(afb3e333) SHA1(a3ddf800925df748db4f71a9dcb05ff0e838d767) )
+	ROM_LOAD( "rq5.3j",  0x08000, 0x02000, CRC(1e81d0f6) SHA1(f38fbaf1f2cfabb5ba0e4a06964f9a2862b7569d) )
+	ROM_LOAD( "rq6.3k",  0x0a000, 0x02000, CRC(45b2bb9c) SHA1(935e72d45585576b8f8c140ef2fdedfe6578d1c8) )
+	ROM_LOAD( "rq7.3l",  0x0c000, 0x02000, CRC(c43ee2dd) SHA1(235e15d0a5e3ccbdf47960241faf747eaa2524f6) )
+	ROM_LOAD( "rq8.3n",  0x0e000, 0x02000, CRC(3a79b3cc) SHA1(0b7b13cd1ee35ec3475d33c734c6d8f757dddd96) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "ng.6s", 0x00, 0x20, CRC(19255a7d) SHA1(4ac6316f7d8b575f28d33564b422b68993a4e484) )
+ROM_END
+
 /* Type 1 HW*/
 GAME( 1984, nightgal, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1984, ngtbunny, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
@@ -1113,3 +1139,4 @@ GAME( 1985, sexygal,  0,        sexygal,  sexygal,  0, ROT0, "Nichibutsu",   "Se
 GAME( 1985, sweetgal, sexygal,  sexygal,  sexygal,  0, ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 /* Type 3 HW*/
 GAME( 1985, ngalsumr, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, royalqn,  0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Royal Queen", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
