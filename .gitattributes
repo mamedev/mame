@@ -3756,7 +3756,6 @@ src/mame/video/segas16b.c svneol=native#text/plain
 src/mame/video/segas18.c svneol=native#text/plain
 src/mame/video/segas24.c svneol=native#text/plain
 src/mame/video/segas32.c svneol=native#text/plain
-src/mame/video/segasyse.c svneol=native#text/plain
 src/mame/video/segaxbd.c svneol=native#text/plain
 src/mame/video/segaybd.c svneol=native#text/plain
 src/mame/video/sei_crtc.c svneol=native#text/plain
