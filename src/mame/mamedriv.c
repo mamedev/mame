@@ -8398,6 +8398,9 @@ Other Sun games
 	DRIVER( drgw3 )			/* (c) 1998 */
 	DRIVER( drgw3105 )		/* (c) 1998 */
 	DRIVER( drgw3100 )		/* (c) 1998 */
+	DRIVER( dwex )			/* (c) 1998 */
+	DRIVER( killbld )		/* (c) 1998 */
+	DRIVER( killbld104 )	/* (c) 1998 */
 	DRIVER( kov )			/* (c) 1999 */
 	DRIVER( kovplus )		/* (c) 1999 */
 	DRIVER( kovplusa )		/* (c) 1999 */
@@ -8407,8 +8410,7 @@ Other Sun games
 	DRIVER( kovsh103 )		/* (c) 1999 */
 	DRIVER( photoy2k )		/* (c) 1999 */
 	DRIVER( photoy2k102 )	/* (c) 1999 */
-	DRIVER( killbld )		/* (c) 1998 */
-	DRIVER( killbld104 )	/* (c) 1998 */
+	DRIVER( photoy2k104 )	/* (c) 1999 */
 	DRIVER( puzlstar )		/* (c) 1999 */
 	DRIVER( olds )			/* (c) 1999 */
 	DRIVER( olds100 )		/* (c) 1999 */
@@ -8428,6 +8430,7 @@ Other Sun games
 	DRIVER( martmastc102 )	/* (c) 2001 */
 	DRIVER( theglad )		/* (c) 2001 */
 	DRIVER( theglada )		/* (c) 2001 */
+	DRIVER( dw2001 )		/* (c) 2001 */
 	DRIVER( dmnfrnt )		/* (c) 2002 */
 	DRIVER( dmnfrnta )		/* (c) 2002 */
 	DRIVER( kovshp )
