@@ -7101,6 +7101,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( embargo )
 	DRIVER( tripool )	/* (c) 1981 Noma (Casino Tech license) */
 	DRIVER( tripoola )	/* (c) 1981 Noma (Costal Games license) */
+	DRIVER( unclepoo )	/* (c) 1983 Diatec */
 	DRIVER( joinem )	/* (c) 1986 Global */
 	DRIVER( loverboy )	/* (c) 1983 Global */
 	DRIVER( striv )		/* (c) 1985 Hara Industries */
@@ -10167,9 +10168,6 @@ Other Sun games
 
 	DRIVER( neptunp2 )
 	DRIVER( rgum )
-
-	/* Diatec */
-	DRIVER( unclepoo )
 
 	/* Extrema Systems International Ltd. */
 	DRIVER( poker72 )
