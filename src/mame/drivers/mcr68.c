@@ -515,7 +515,7 @@ static INPUT_PORTS_START( xenophob )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Hard ) )
-/*  PORT_DIPSETTING(      0x00c0, DEF_STR( Medium ) )*/
+	PORT_DIPSETTING(      0x00c0, "Medium (duplicate)" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -555,7 +555,7 @@ static INPUT_PORTS_START( spyhunt2 )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )
-	/*PORT_DIPSETTING(      0x0000, DEF_STR( 1C_2C ) )*/
+	PORT_DIPSETTING(      0x0000, "1C/2C (duplicate)" )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -620,12 +620,12 @@ static INPUT_PORTS_START( blasted )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )
-	/*PORT_DIPSETTING(      0x0000, DEF_STR( 1C_2C ) )*/
+	PORT_DIPSETTING(      0x0000, "1C/2C (duplicate)" )
 	PORT_DIPNAME( 0x000c, 0x0000, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
-/*  PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )*/
+	PORT_DIPSETTING(      0x000c, "Medium (duplicate)" )
 	PORT_DIPNAME( 0x0020, 0x0020, "Dollar Receptor" )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -635,6 +635,68 @@ static INPUT_PORTS_START( blasted )
 	PORT_DIPNAME( 0x0080, 0x0080, "Rack Advance (Cheat)" ) PORT_CODE(KEYCODE_F1)
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tlaser )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	
+	PORT_START("DSW")
+    PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -953,6 +1015,15 @@ static MACHINE_DRIVER_START( xenophob )
 	MDRV_IMPORT_FROM(sounds_good)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( tlaser )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(mcr68)
+	MDRV_IMPORT_FROM(sounds_good)
+	
+	MDRV_WATCHDOG_VBLANK_INIT(800)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( spyhunt2 )
 
@@ -1223,6 +1294,40 @@ ROM_START( blasted )
 	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
+ROM_START( tlaser )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "3c.bin",  0x00000, 0x10000, CRC(ddab582a) SHA1(db124e35b7b33d282f71104412a8dab71ce71cb4) )
+	ROM_LOAD16_BYTE( "3b.bin",  0x00001, 0x10000, CRC(e4498eca) SHA1(69cbc80ab9a801e957a74278475869d3b54e9a2a) )
+	ROM_LOAD16_BYTE( "2c.bin",  0x20000, 0x10000, CRC(d2cca853) SHA1(69e4ee8203c6dda7b4ec97c247fbcdc9fdc9ff8d) )
+	ROM_LOAD16_BYTE( "2b.bin",  0x20001, 0x10000, CRC(3802cfe2) SHA1(d10c802500bae14acc3230ca34c2d1806b68ce4a) )
+
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
+	ROM_LOAD16_BYTE( "u7.bin",  0x00000, 0x10000, CRC(19ad1e45) SHA1(838ad7304248690d3fdf9e4edf3856936bf36d42) )
+	ROM_LOAD16_BYTE( "u17.bin", 0x00001, 0x10000, CRC(d6118949) SHA1(9e059f28d9eb8dee10301662a65588cffaf6fd16) )
+	ROM_LOAD16_BYTE( "u8.bin",  0x20000, 0x10000, CRC(d6cc99aa) SHA1(b970d6e87778959cf7322158b8df26c5028e3f45) )
+	ROM_LOAD16_BYTE( "u18.bin", 0x20001, 0x10000, CRC(3488a5cd) SHA1(9b8d37ee7de01982eee074244e14d33eef3644c8) )
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "11d.bin",  0x00000, 0x08000, CRC(ce508d5f) SHA1(2118f3654b4306739cdeed9204dff3eda9de3cb7) )
+	ROM_LOAD( "12d.bin",  0x08000, 0x08000, CRC(fbcb3391) SHA1(7fbb59e86ac7c01581786f2e46fa9f400d75647b) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "7j.bin",  0x00000, 0x20000, CRC(ac050bd7) SHA1(1a5e67661039ec4d1fa078315c09941dfb2b98d8) )
+	ROM_LOAD( "8j.bin",  0x20000, 0x20000, CRC(f10b12b3) SHA1(30770ed5c803a9937d90f9f27204e51f665652d7) )
+	ROM_LOAD( "9j.bin",  0x40000, 0x20000, CRC(a18f6911) SHA1(6b50d0c8ca4886f04493756995a0ea27a7ca5433) )
+	ROM_LOAD( "10j.bin", 0x60000, 0x20000, CRC(203b55b8) SHA1(72311af32039d09f3b0f4641b71eaf836302fc9a) )
+
+	ROM_REGION( 0x0006, "plds", 0 )
+    /* According to the manual these pal's are located on the Video Game board */
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
+    /* According to the manual this pal is located on the "Sounds Good" board */
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
+ROM_END
+
 
 ROM_START( archrivl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -1457,6 +1562,19 @@ static DRIVER_INIT( blasted )
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0a0000, 0x0a000f, 0, 0, mcr68_6840_lower_r, mcr68_6840_lower_w);
 }
 
+static DRIVER_INIT( tlaser )
+{
+	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
+
+	/* Copied from Blasted */
+	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16));
+
+	/* handle control writes */
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, blasted_control_w);
+
+}
+
+
 
 static DRIVER_INIT( archrivl )
 {
@@ -1510,6 +1628,7 @@ GAME( 1987, xenophob, 0,        xenophob, xenophob, xenophob, ROT0,   "Bally Mid
 GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, blasted,  0,        xenophob, blasted,  blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE )
+GAME( 1987, tlaser,   blasted,  tlaser,   tlaser,   tlaser,   ROT0,   "Bally Midway", "International Team Laser (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1989, archrivl, 0,        archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0)", GAME_SUPPORTS_SAVE )
 GAME( 1989, archrivl2,archrivl, archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0)", GAME_SUPPORTS_SAVE )
 GAME( 1989, trisport, 0,        trisport, trisport, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE )

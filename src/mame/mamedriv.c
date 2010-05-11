@@ -1436,6 +1436,7 @@ const game_driver * const drivers[] =
 	DRIVER( xenophob )	/* (c) 1987 */
 	DRIVER( spyhunt2 )	/* (c) 1987 */
 	DRIVER( spyhunt2a )	/* (c) 1987 */
+	DRIVER( tlaser )	/* (c) 1987 */
 	DRIVER( blasted )	/* (c) 1988 */
 	DRIVER( archrivl )	/* (c) 1989 */
 	DRIVER( archrivl2 )	/* (c) 1989 */
