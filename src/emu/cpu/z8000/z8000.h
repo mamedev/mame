@@ -24,8 +24,10 @@ enum
 #define Z8000_HALT		0x0100	/* halted flag  */
 
 /* PUBLIC FUNCTIONS */
-extern CPU_GET_INFO( z8000 );
-#define CPU_Z8000 CPU_GET_INFO_NAME( z8000 )
+extern CPU_GET_INFO( z8001 );
+#define CPU_Z8001 CPU_GET_INFO_NAME( z8001 )
+extern CPU_GET_INFO( z8002 );
+#define CPU_Z8002 CPU_GET_INFO_NAME( z8002 )
 
 CPU_DISASSEMBLE( z8000 );
 

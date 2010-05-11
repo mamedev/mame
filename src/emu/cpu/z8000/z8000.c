@@ -367,7 +367,15 @@ static CPU_RESET( z8000 )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);
 	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
-	cpustate->pc	= RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */
+	if(cpustate->fcw & F_SEG)
+	{
+		//cpustate->seg_pc = RDMEM_W(cpustate, 4);
+		cpustate->pc = RDMEM_W(cpustate,  6);
+	}
+	else
+	{
+		cpustate->pc = RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */
+	}
 }
 
 static CPU_EXIT( z8000 )
@@ -468,7 +476,7 @@ static void set_irq_line(z8000_state *cpustate, int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static CPU_SET_INFO( z8000 )
+static CPU_SET_INFO( z8002 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
@@ -514,7 +522,7 @@ static CPU_SET_INFO( z8000 )
  * Generic get_info
  **************************************************************************/
 
-CPU_GET_INFO( z8000 )
+CPU_GET_INFO( z8002 )
 {
 	z8000_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
@@ -576,7 +584,7 @@ CPU_GET_INFO( z8000 )
 		case CPUINFO_INT_REGISTER + Z8000_R15:			info->i = cpustate->RW(15);						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(z8000);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(z8002);		break;
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(z8000);				break;
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(z8000);			break;
 		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(z8000);				break;
@@ -636,5 +644,22 @@ CPU_GET_INFO( z8000 )
 		case CPUINFO_STR_REGISTER + Z8000_R13:			sprintf(info->s, "R13:%04X", cpustate->RW(13)); break;
 		case CPUINFO_STR_REGISTER + Z8000_R14:			sprintf(info->s, "R14:%04X", cpustate->RW(14)); break;
 		case CPUINFO_STR_REGISTER + Z8000_R15:			sprintf(info->s, "R15:%04X", cpustate->RW(15)); break;
+	}
+}
+
+/*
+handling for the z8001
+*/
+
+CPU_GET_INFO( z8001 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Zilog Z8001");			break;
+
+		default:										CPU_GET_INFO_CALL(z8002);				break;
 	}
 }

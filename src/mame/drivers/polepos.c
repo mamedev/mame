@@ -922,11 +922,11 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_CPU_IO_MAP(z80_io)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
 
-	MDRV_CPU_ADD("sub", Z8000, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z8002, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z8000, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z8002, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
@@ -1005,11 +1005,11 @@ static MACHINE_DRIVER_START( topracern )
 	MDRV_CPU_IO_MAP(z80_io)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
 
-	MDRV_CPU_ADD("sub", Z8000, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z8002, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z8000, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z8002, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
