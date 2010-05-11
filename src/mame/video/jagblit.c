@@ -236,8 +236,8 @@ static void FUNCNAME(running_machine *machine, UINT32 command, UINT32 a1flags, U
 	/* set up the A2 mask */
 	if (A2FIXED & 0x00008000)
 	{
-		a2_xmask = (blitter_regs[A2_MASK] << 16) | 0xffff;
-		a2_ymask = (blitter_regs[A2_MASK] & 0xffff) | 0xffff;
+		a2_xmask = ((blitter_regs[A2_MASK] & 0x0000ffff) << 16) | 0xffff;
+		a2_ymask = (blitter_regs[A2_MASK] & 0xffff0000) | 0xffff;
 	}
 
 	/* modify outer loop steps based on command */
@@ -431,7 +431,7 @@ static void FUNCNAME(running_machine *machine, UINT32 command, UINT32 a1flags, U
 			if (adest_phrase_mode || (command & 0x10000000) || !inhibit)
 				{
 					/* write to the destination */
-				WRITE_PIXEL(adest, adestflags, writedata);
+					WRITE_PIXEL(adest, adestflags, writedata);
 					if (COMMAND & 0x00000020)
 					WRITE_ZDATA(adest, adestflags, srczdata);
 				}
