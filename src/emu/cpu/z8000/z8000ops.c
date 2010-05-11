@@ -3094,6 +3094,29 @@ static void Z4C_0000_1000_addr(z8000_state *cpustate)
 	WRMEM_B(cpustate,  addr, 0);
 }
 
+static void Z4C_0000_1000_addr_seg(z8000_state *cpustate)
+{
+	static UINT32 offset;
+	UINT16 operand1 = fetch(cpustate);
+
+	if(operand1 & 0x8000)
+	{
+		UINT16 operand2 = fetch(cpustate);
+
+		offset = (operand1 & 0x0700) << 8;
+		offset|= (operand2 & 0xffff);
+		WRMEM_B(cpustate,  offset, 0);
+		cycles(cpustate, 14);
+	}
+	else
+	{
+		offset = (operand1 & 0x0700) << 8;
+		offset|= (operand1 & 0x00ff);
+		WRMEM_B(cpustate,  offset, 0);
+		cycles(cpustate, 12);
+	}
+}
+
 /******************************************
  comb    addr(rd)
  flags:  -ZSP--
@@ -3252,6 +3275,29 @@ static void Z4D_0000_1000_addr(z8000_state *cpustate)
 {
 	GET_ADDR(OP1);
 	WRMEM_W(cpustate,  addr, 0);
+}
+
+static void Z4D_0000_1000_addr_seg(z8000_state *cpustate)
+{
+	static UINT32 offset;
+	UINT16 operand1 = fetch(cpustate);
+
+	if(operand1 & 0x8000)
+	{
+		UINT16 operand2 = fetch(cpustate);
+
+		offset = (operand1 & 0x0700) << 8;
+		offset|= (operand2 & 0xffff);
+		WRMEM_W(cpustate,  offset, 0);
+		cycles(cpustate, 15);
+	}
+	else
+	{
+		offset = (operand1 & 0x0700) << 8;
+		offset|= (operand1 & 0x00ff);
+		WRMEM_W(cpustate,  offset, 0);
+		cycles(cpustate, 12);
+	}
 }
 
 /******************************************
@@ -4313,6 +4359,34 @@ static void Z76_0000_dddd_addr(z8000_state *cpustate)
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
 	cpustate->RW(dst) = addr;
+}
+
+static void Z76_0000_dddd_addr_seg(z8000_state *cpustate)
+{
+	static UINT32 offset;
+	UINT16 operand1;
+
+	GET_DST(OP0,NIB3);
+	operand1 = fetch(cpustate);
+
+	if(operand1 & 0x8000)
+	{
+		UINT16 operand2 = fetch(cpustate);
+
+		offset = (operand1 & 0x0700) << 8;
+		offset|= (operand2 & 0xffff);
+		cpustate->RW(dst) = (offset & 0x70000) >> 16;
+		cpustate->RW(dst+1) = offset & 0xffff;
+		cycles(cpustate, 15);
+	}
+	else
+	{
+		offset = (operand1 & 0x0700) << 8;
+		offset|= (operand1 & 0x00ff);
+		cpustate->RW(dst) = (offset & 0x70000) >> 16;
+		cpustate->RW(dst+1) = offset & 0x00ff;
+		cycles(cpustate, 13);
+	}
 }
 
 /******************************************

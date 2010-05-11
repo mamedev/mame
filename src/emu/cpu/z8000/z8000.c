@@ -41,6 +41,9 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
+ *     TODO:
+ *     - make the z8001 opcodes to be dynamic (i.e. to take segmented mode flag into account and use the non-segmented mode)
+ *
  *****************************************************************************/
 
 #include "emu.h"
@@ -130,18 +133,18 @@ INLINE UINT32 RDMEM_L(z8000_state *cpustate, UINT16 addr)
 	return result + memory_read_word_16be(cpustate->program, addr + 2);
 }
 
-INLINE void WRMEM_B(z8000_state *cpustate, UINT16 addr, UINT8 value)
+INLINE void WRMEM_B(z8000_state *cpustate, UINT32 addr, UINT8 value)
 {
 	memory_write_byte_16be(cpustate->program, addr, value);
 }
 
-INLINE void WRMEM_W(z8000_state *cpustate, UINT16 addr, UINT16 value)
+INLINE void WRMEM_W(z8000_state *cpustate, UINT32 addr, UINT16 value)
 {
 	addr &= ~1;
 	memory_write_word_16be(cpustate->program, addr, value);
 }
 
-INLINE void WRMEM_L(z8000_state *cpustate, UINT16 addr, UINT32 value)
+INLINE void WRMEM_L(z8000_state *cpustate, UINT32 addr, UINT32 value)
 {
 	addr &= ~1;
 	memory_write_word_16be(cpustate->program, addr, value >> 16);
@@ -198,6 +201,20 @@ INLINE void WRPORT_W(z8000_state *cpustate, int mode, UINT16 addr, UINT16 value)
 	{
 		/* how to handle MMU writes? */
     }
+}
+
+INLINE UINT16 fetch(z8000_state *cpustate)
+{
+	UINT16 data = memory_decrypted_read_word(cpustate->program, cpustate->pc);
+
+	cpustate->pc+=2;
+
+	return data;
+}
+
+INLINE void cycles(z8000_state *cpustate, int cycles)
+{
+	cpustate->icount -= cycles;
 }
 
 #include "z8000ops.c"
@@ -342,7 +359,7 @@ INLINE void Interrupt(z8000_state *cpustate)
     }
 }
 
-static CPU_INIT( z8000 )
+static CPU_INIT( z8001 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
@@ -353,10 +370,24 @@ static CPU_INIT( z8000 )
 
 	/* already initialized? */
 	if(z8000_exec == NULL)
-		z8000_init_tables();
+		z8001_init_tables();
 }
 
-static CPU_RESET( z8000 )
+static CPU_INIT( z8002 )
+{
+	z8000_state *cpustate = get_safe_token(device);
+
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
+
+	/* already initialized? */
+	if(z8000_exec == NULL)
+		z8002_init_tables();
+}
+
+static CPU_RESET( z8001 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
@@ -376,6 +407,20 @@ static CPU_RESET( z8000 )
 	{
 		cpustate->pc = RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */
 	}
+}
+
+static CPU_RESET( z8002 )
+{
+	z8000_state *cpustate = get_safe_token(device);
+
+	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
+	memset(cpustate, 0, sizeof(*cpustate));
+	cpustate->irq_callback = save_irqcallback;
+	cpustate->device = device;
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
+	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
+	cpustate->pc = RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */
 }
 
 static CPU_EXIT( z8000 )
@@ -585,8 +630,8 @@ CPU_GET_INFO( z8002 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(z8002);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(z8000);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(z8000);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(z8002);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(z8002);			break;
 		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(z8000);				break;
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(z8000);		break;
 		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
@@ -655,7 +700,14 @@ CPU_GET_INFO( z8001 )
 {
 	switch (state)
 	{
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 20;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(z8001);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(z8001);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Zilog Z8001");			break;

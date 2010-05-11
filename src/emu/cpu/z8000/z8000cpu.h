@@ -209,6 +209,7 @@ typedef struct {
 /* opcode execution table */
 extern Z8000_exec *z8000_exec;
 
-extern void z8000_init_tables(void);
+extern void z8001_init_tables(void);
+extern void z8002_init_tables(void);
 extern void z8000_deinit_tables(void);
 

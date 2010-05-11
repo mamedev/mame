@@ -88,7 +88,7 @@ CPU_DISASSEMBLE( z8000 )
 
 	/* already initialized? */
 	if(z8000_exec == NULL)
-		z8000_init_tables();
+		z8002_init_tables();
 
     GET_OP(oprom, 0, new_pc - pc);
 	new_pc += 2;
