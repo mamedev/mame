@@ -95,10 +95,6 @@ Notes:
   The hardware is very similar to Galaxian but has some differencies, like the 3bpp bitmap addition
   To advance input tests, press Tilt button
 
-TODO (Frog & Spiders):
-- Missing projectiles;
-- inputs needs to be done from scratch;
-
 */
 
 #include "emu.h"
@@ -117,6 +113,7 @@ public:
 	UINT8 *  videoram;
 	UINT8 *  colorram;
 	UINT8 *  spriteram;
+	UINT8 *  bulletram;
 	UINT8 *  bitmap;
 
 	/* video-related */
@@ -220,7 +217,9 @@ static ADDRESS_MAP_START( fspider_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE_MEMBER(jollyjgr_state, videoram)
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE_MEMBER(jollyjgr_state, colorram)
 	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(jollyjgr_state, spriteram)
-	AM_RANGE(0x9880, 0x9bff) AM_RAM
+	AM_RANGE(0x9880, 0x989f) AM_RAM // ?
+	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_BASE_MEMBER(jollyjgr_state, bulletram)
+	AM_RANGE(0x98b0, 0x9bff) AM_RAM // ?
 	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE_MEMBER(jollyjgr_state, bitmap)
 ADDRESS_MAP_END
 
@@ -365,12 +364,12 @@ static INPUT_PORTS_START( fspider )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -523,6 +522,36 @@ static VIDEO_UPDATE( jollyjgr )
 	return 0;
 }
 
+static VIDEO_UPDATE( fspider )
+{
+	jollyjgr_state *state = (jollyjgr_state *)screen->machine->driver_data;
+
+	// Draw bg and sprites
+	VIDEO_UPDATE_CALL(jollyjgr);
+
+	/* Draw bullets
+	16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
+	Assume bullets to look the same as on Galaxian hw,
+	that is, simply 4 pixels. Colours are unknown. */
+	for (int offs=0;offs<0x10;offs+=2) {
+		UINT8 sy=~state->bulletram[offs];
+		UINT8 sx=~state->bulletram[offs|1];
+		UINT16 bc=(offs<4)?
+			32+7: // player, white
+			32+3; // enemy, yellow
+
+		if (state->flip_y) sy^=0xff;
+		if (state->flip_x) sx+=8;
+
+		if (sy>=cliprect->min_y && sy<=cliprect->max_y)
+			for (int x=sx-4;x<sx;x++)
+				if (x>=cliprect->min_x && x<=cliprect->max_x)
+					*BITMAP_ADDR16(bitmap,sy,x)=bc;
+	}
+
+	return 0;
+}
+
 /*************************************
  *
  *  Graphics definitions
@@ -581,6 +610,8 @@ static MACHINE_START( jollyjgr )
 	state_save_register_global(machine, state->nmi_enable);
 	state_save_register_global(machine, state->flip_x);
 	state_save_register_global(machine, state->flip_y);
+	state_save_register_global(machine, state->bitmap_disable);
+	state_save_register_global(machine, state->tilemap_bank);
 }
 
 static MACHINE_RESET( jollyjgr )
@@ -590,6 +621,8 @@ static MACHINE_RESET( jollyjgr )
 	state->nmi_enable = 0;
 	state->flip_x = 0;
 	state->flip_y = 0;
+	state->bitmap_disable = 0;
+	state->tilemap_bank = 0;
 }
 
 static MACHINE_DRIVER_START( jollyjgr )
@@ -632,6 +665,8 @@ static MACHINE_DRIVER_START( fspider )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(fspider_map)
+
+	MDRV_VIDEO_UPDATE(fspider)
 
 MACHINE_DRIVER_END
 
@@ -710,5 +745,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fspiderb, 0, fspider, fspider, 0, ROT90,  "Taito Corporation", "Frog & Spiders (bootleg)", GAME_NOT_WORKING ) //comes from a Fawaz Group bootleg board
+GAME( 1981, fspiderb, 0, fspider,  fspider,  0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", GAME_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
 GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, 0, ROT90, "Taito Corporation", "Jolly Jogger", GAME_SUPPORTS_SAVE )
