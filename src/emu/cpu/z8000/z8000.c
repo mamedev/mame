@@ -68,8 +68,8 @@ union _z8000_reg_file
 struct _z8000_state
 {
     UINT16  op[4];      /* opcodes/data of current instruction */
-	UINT16	ppc;		/* previous program counter */
-    UINT16  pc;         /* program counter */
+	UINT32	ppc;		/* previous program counter */
+    UINT32  pc;         /* program counter */
     UINT16  psap;       /* program status pointer */
     UINT16  fcw;        /* flags and control word */
     UINT16  refresh;    /* refresh timer/counter */
@@ -114,18 +114,18 @@ INLINE UINT16 RDOP(z8000_state *cpustate)
     return res;
 }
 
-INLINE UINT8 RDMEM_B(z8000_state *cpustate, UINT16 addr)
+INLINE UINT8 RDMEM_B(z8000_state *cpustate, UINT32 addr)
 {
 	return memory_read_byte_16be(cpustate->program, addr);
 }
 
-INLINE UINT16 RDMEM_W(z8000_state *cpustate, UINT16 addr)
+INLINE UINT16 RDMEM_W(z8000_state *cpustate, UINT32 addr)
 {
 	addr &= ~1;
 	return memory_read_word_16be(cpustate->program, addr);
 }
 
-INLINE UINT32 RDMEM_L(z8000_state *cpustate, UINT16 addr)
+INLINE UINT32 RDMEM_L(z8000_state *cpustate, UINT32 addr)
 {
 	UINT32 result;
 	addr &= ~1;
@@ -400,8 +400,7 @@ static CPU_RESET( z8001 )
 	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
 	if(cpustate->fcw & F_SEG)
 	{
-		//cpustate->seg_pc = RDMEM_W(cpustate, 4);
-		cpustate->pc = RDMEM_W(cpustate,  6);
+		cpustate->pc = ((RDMEM_W(cpustate,  4) & 0x0700) << 8) | (RDMEM_W(cpustate, 6) & 0xffff); /* get reset cpustate->pc  */
 	}
 	else
 	{
@@ -665,7 +664,7 @@ CPU_GET_INFO( z8002 )
 				cpustate->fcw & 0x0001 ? '?':'.');
             break;
 
-		case CPUINFO_STR_REGISTER + Z8000_PC:			sprintf(info->s, "pc :%04X", cpustate->pc);		break;
+		case CPUINFO_STR_REGISTER + Z8000_PC:			sprintf(info->s, "pc :%08X", cpustate->pc);		break;
 		case CPUINFO_STR_REGISTER + Z8000_NSP:			sprintf(info->s, "SP :%04X", cpustate->nsp);	break;
 		case CPUINFO_STR_REGISTER + Z8000_FCW:			sprintf(info->s, "fcw:%04X", cpustate->fcw);	break;
 		case CPUINFO_STR_REGISTER + Z8000_PSAP:			sprintf(info->s, "nsp:%04X", cpustate->psap);	break;

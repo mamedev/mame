@@ -1865,6 +1865,17 @@ static void Z20_ssN0_dddd(z8000_state *cpustate)
 	cpustate->RB(dst) = RDMEM_B(cpustate,  cpustate->RW(src));
 }
 
+static void Z20_ssN0_dddd_seg(z8000_state *cpustate)
+{
+	UINT32 addr;
+	GET_DST(OP0,NIB3);
+	GET_SRC(OP0,NIB2);
+	addr = (cpustate->RW(src) & 0x0007) << 16;
+	addr|= cpustate->RW(src+1) & 0xffff;
+	cpustate->RB(dst) = RDMEM_B(cpustate,  addr);
+	//cycles?
+}
+
 /******************************************
  ld      rd,imm16
  flags:  ------

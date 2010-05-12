@@ -610,7 +610,7 @@ static const Z8000_init seg_table[] = {
 {0x1d10,0x1dff, 1,1, 11,Z1D_ddN0_ssss,							 "ldl     @%rw2,%rl3",				0},
 {0x1e10,0x1eff, 1,1, 10,Z1E_ddN0_cccc,							 "jp      %c3,@%rl2",				0},
 {0x1f10,0x1ff0,16,1, 10,Z1F_ddN0_0000,							 "call    %rw2",					DASMFLAG_STEP_OVER},
-{0x2010,0x20ff, 1,1,  7,Z20_ssN0_dddd,							 "ldb     %rb3,@%rw2",				0},
+{0x2010,0x20ff, 1,1,  7,Z20_ssN0_dddd_seg,						 "ldb     %rb3,@%rw2",				0},
 {0x2100,0x210f, 1,2,  7,Z21_0000_dddd_imm16,					 "ld      %rw3,%#w1",				0},
 {0x2110,0x21ff, 1,1,  7,Z21_ssN0_dddd,							 "ld      %rw3,@%rw2",				0},
 {0x2200,0x220f, 1,2, 10,Z22_0000_ssss_0000_dddd_0000_0000,		 "resb    %rb5,%rw3",				0},
