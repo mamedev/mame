@@ -182,7 +182,14 @@ device), PES Speech adapter (serial port connection)
 
 /* *****optional defines***** */
 
-/* this ignores pitch, and uses a sawtooth wave for the voiced and unvoiced waveforms as a test, if not set */
+/* this define controls the interpolation shift logic. one of the following two lines should be used, and the other commented; the second line is more accurate mathematically but less accurate to hardware (Unless I (LN) misunderstand the way the shifter works, which is quite likely) */
+#define INTERP_SHIFT >> tms->coeff->interp_coeff[interp_period]
+//#define INTERP_SHIFT / (1<<tms->coeff->interp_coeff[interp_period])
+
+/* this define controls whether the excitation waveform for a new frame is activated on IP=7/interp_period = 0 (the first period of the next frame) or IP=0/interp_period = 7 (the last period of this frame) when interpolation is inhibited for this frame. The patent is unclear on this point and either way could be correct. if undefined it does the latter case, if defined it does the former case. */
+#undef INTERP_INHIBIT_EXCITE_DELAY
+
+/* if undefined, various hacky improvements are used, such as inverting excitation waveform, and increasing the magnitude of unvoiced speech excitation */
 #define NORMALMODE 1
 
 /* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
@@ -196,7 +203,8 @@ device), PES Speech adapter (serial port connection)
 
 /* if defined, interpolation is only using the said slot of the 8,8,8,4,4,4,2,1 slots
    i.e. setting to 7 effectively disables interpolation, as it adds 1/1 of the difference
-   between current and target to the current each frame */
+   between current and target to the current each frame;
+   ***Be warned that setting this will mess up the inhibit logic!*** */
 #undef OVERRIDE_INTERPOLATION
 
 /* *****debugging defines***** */
@@ -349,7 +357,7 @@ struct _tms5220_state
        The internal DAC used to feed the analog pin is only 8 bits, and has the
        funny clipping/clamping logic, while the digital pin gives full 12? bit
        resolution of the output data.
-       TODO: add a way to set/reset this
+       TODO: add a way to set/reset this other than the FORCE_DIGITAL define
      */
 	UINT8 digital_select;
 	running_device *device;
@@ -894,63 +902,65 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				case 1: /* PC=0, B cycle, nothing happens (update energy) */
 				break;
 				case 2: /* PC=1, A cycle, update energy (calc pitch) */
-				tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 3: /* PC=1, B cycle, nothing happens (update pitch) */
 				break;
 				case 4: /* PC=2, A cycle, update pitch (calc K1) */
-				if (interp_period == 7) tms->old_frame_pitch_idx = tms->new_frame_pitch_idx; // this is to make it so the unvoiced behavior is correct during interpolation
-				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+#ifndef INTERP_INHIBIT_EXCITE_DELAY 
+				if (interp_period == 7) tms->old_frame_pitch_idx = tms->new_frame_pitch_idx; // this is to make it so the voiced/unvoiced select during interpolation takes effect at the same time as inhibit stops.
+#endif
+				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 5: /* PC=2, B cycle, nothing happens (update K1) */
 				break;
 				case 6: /* PC=3, A cycle, update K1 (calc K2) */
-				tms->current_k[0] += (((tms->target_k[0] - tms->current_k[0])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[0] += (((tms->target_k[0] - tms->current_k[0])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 7: /* PC=3, B cycle, nothing happens (update K2) */
 				break;
 				case 8: /* PC=4, A cycle, update K2 (calc K3) */
-				tms->current_k[1] += (((tms->target_k[1] - tms->current_k[1])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[1] += (((tms->target_k[1] - tms->current_k[1])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 9: /* PC=4, B cycle, nothing happens (update K3) */
 				break;
 				case 10: /* PC=5, A cycle, update K3 (calc K4) */
-				tms->current_k[2] += (((tms->target_k[2] - tms->current_k[2])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[2] += (((tms->target_k[2] - tms->current_k[2])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 11: /* PC=5, B cycle, nothing happens (update K4) */
 				break;
 				case 12: /* PC=6, A cycle, update K4 (calc K5) */
-				tms->current_k[3] += (((tms->target_k[3] - tms->current_k[3])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[3] += (((tms->target_k[3] - tms->current_k[3])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 13: /* PC=6, B cycle, nothing happens (update K5) */
 				break;
 				case 14: /* PC=7, A cycle, update K5 (calc K6) */
-				tms->current_k[4] += (((tms->target_k[4] - tms->current_k[4])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[4] += (((tms->target_k[4] - tms->current_k[4])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 15: /* PC=7, B cycle, nothing happens (update K6) */
 				break;
 				case 16: /* PC=8, A cycle, update K6 (calc K7) */
-				tms->current_k[5] += (((tms->target_k[5] - tms->current_k[5])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[5] += (((tms->target_k[5] - tms->current_k[5])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 17: /* PC=8, B cycle, nothing happens (update K7) */
 				break;
 				case 18: /* PC=9, A cycle, update K7 (calc K8) */
-				tms->current_k[6] += (((tms->target_k[6] - tms->current_k[6])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[6] += (((tms->target_k[6] - tms->current_k[6])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 19: /* PC=9, B cycle, nothing happens (update K8) */
 				break;
 				case 20: /* PC=10, A cycle, update K8 (calc K9) */
-				tms->current_k[7] += (((tms->target_k[7] - tms->current_k[7])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[7] += (((tms->target_k[7] - tms->current_k[7])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 21: /* PC=10, B cycle, nothing happens (update K9) */
 				break;
 				case 22: /* PC=11, A cycle, update K9 (calc K10) */
-				tms->current_k[8] += (((tms->target_k[8] - tms->current_k[8])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[8] += (((tms->target_k[8] - tms->current_k[8])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 23: /* PC=11, B cycle, nothing happens (update K10) */
 				break;
 				case 24: /* PC=12, A cycle, update K10 (do nothing) */
-				tms->current_k[9] += (((tms->target_k[9] - tms->current_k[9])*(1-tms->inhibit)) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[9] += (((tms->target_k[9] - tms->current_k[9])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 			}
 #endif
@@ -989,9 +999,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
 #else
           if (tms->pitch_count >= 51)
-              tms->excitation_data = tms->coeff->chirptable[51]^0xFF;
+              tms->excitation_data = tms->coeff->chirptable[51]^~0x0;
           else /*tms->pitch_count < 51*/
-              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]^0xFF;
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]^~0x0;
 #endif
         }
 
@@ -1005,20 +1015,21 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             tms->RNG >>= 1;
             tms->RNG |= bitout << 12;
 	}
+		this_sample = lattice_filter(tms); /* execute lattice filter */
 #ifdef DEBUG_GENERATION_VERBOSE
 		fprintf(stderr,"X:%04d; E:%04d; P:%04d; Pc:%04d ",tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
 		for (i=0; i<10; i++)
 			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
+		fprintf(stderr,"Out:%06d", this_sample);
 		fprintf(stderr,"\n");
 #endif
-		this_sample = lattice_filter(tms); /* execute lattice filter */
 		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
 		while (this_sample > 16383) this_sample -= 32768;
 		while (this_sample < -16384) this_sample += 32768;
 		if (tms->digital_select == 0) // analog SPK pin output is only 8 bits, with clipping
 			buffer[buf_count] = clip_analog(this_sample);
 		else // digital I/O pin output is 12 bits
-			{
+		{
 #ifdef ALLOW_4_LSB
 			// input:  ssss ssss ssss ssss ssnn nnnn nnnn nnnn
 			// N taps:                       ^                 = 0x2000;
@@ -1031,7 +1042,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			// output: ssss ssss ssss ssss snnn nnnn nnnN NNNN
 			buffer[buf_count] = (this_sample<<1)|((this_sample&0x3E00)>>9);
 #endif
-			}
+		}
         /* Update all counts */
 
         size--;
@@ -1108,11 +1119,7 @@ static INT32 matrix_multiply(INT32 a, INT32 b)
 	while (a<-512) { a+=1024; }
 	while (b>16383) { b-=32768; }
 	while (b<-16384) { b+=32768; }
-#ifdef NORMALMODE
 	result = ((a*b)>>9)|1;
-#else
-	result = (a*b)>>9;
-#endif
 #ifdef VERBOSE
 	if (result>16383) fprintf(stderr,"matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
 	if (result<-16384) fprintf(stderr,"matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
