@@ -638,7 +638,7 @@ static INPUT_PORTS_START( blasted )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tlaser )
+static INPUT_PORTS_START( intlaser )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1015,7 +1015,7 @@ static MACHINE_DRIVER_START( xenophob )
 	MDRV_IMPORT_FROM(sounds_good)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( tlaser )
+static MACHINE_DRIVER_START( intlaser )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mcr68)
@@ -1294,7 +1294,7 @@ ROM_START( blasted )
 	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
-ROM_START( tlaser )
+ROM_START( intlaser )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3c.bin",  0x00000, 0x10000, CRC(ddab582a) SHA1(db124e35b7b33d282f71104412a8dab71ce71cb4) )
 	ROM_LOAD16_BYTE( "3b.bin",  0x00001, 0x10000, CRC(e4498eca) SHA1(69cbc80ab9a801e957a74278475869d3b54e9a2a) )
@@ -1562,7 +1562,7 @@ static DRIVER_INIT( blasted )
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0a0000, 0x0a000f, 0, 0, mcr68_6840_lower_r, mcr68_6840_lower_w);
 }
 
-static DRIVER_INIT( tlaser )
+static DRIVER_INIT( intlaser )
 {
 	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
 
@@ -1628,7 +1628,7 @@ GAME( 1987, xenophob, 0,        xenophob, xenophob, xenophob, ROT0,   "Bally Mid
 GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, blasted,  0,        xenophob, blasted,  blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE )
-GAME( 1987, tlaser,   blasted,  tlaser,   tlaser,   tlaser,   ROT0,   "Bally Midway", "International Team Laser (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1987, intlaser, blasted,  intlaser, intlaser, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1989, archrivl, 0,        archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0)", GAME_SUPPORTS_SAVE )
 GAME( 1989, archrivl2,archrivl, archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0)", GAME_SUPPORTS_SAVE )
 GAME( 1989, trisport, 0,        trisport, trisport, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE )
