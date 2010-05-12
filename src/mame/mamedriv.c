@@ -8434,6 +8434,7 @@ Other Sun games
 	DRIVER( theglad )		/* (c) 2001 */
 	DRIVER( theglada )		/* (c) 2001 */
 	DRIVER( dw2001 )		/* (c) 2001 */
+	DRIVER( py2k2 )			/* (c) 2001 */
 	DRIVER( dmnfrnt )		/* (c) 2002 */
 	DRIVER( dmnfrnta )		/* (c) 2002 */
 	DRIVER( kovshp )

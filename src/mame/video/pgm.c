@@ -10,8 +10,8 @@
 static void pgm_prepare_sprite( running_machine *machine, int wide, int high, int palt, int boffset )
 {
 	pgm_state *state = (pgm_state *)machine->driver_data;
-	UINT8 *bdata = memory_region(machine, "gfx4");
-	size_t  bdatasize = memory_region_length(machine, "gfx4") - 1;
+	UINT8 *bdata = memory_region(machine, "sprmask");
+	size_t  bdatasize = memory_region_length(machine, "sprmask") - 1;
 	UINT8 *adata = state->sprite_a_region;
 	size_t  adatasize = state->sprite_a_region_size - 1;
 	int xcnt, ycnt;

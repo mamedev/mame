@@ -41,6 +41,7 @@ public:
 	int           kb_cmd;
 	int           kb_reg;
 	int           kb_ptr;
+	int			  kb_region_sequence_position;
 	UINT32        kb_regs[0x10];
 	UINT16        olds_bs, olds_cmd3;
 	// pstars
@@ -80,7 +81,8 @@ void pgm_kov2_decrypt(running_machine *machine);
 void pgm_kov2p_decrypt(running_machine *machine);
 void pgm_mm_decrypt(running_machine *machine);
 void pgm_dw2_decrypt(running_machine *machine);
-void pgm_djlzz_decrypt(running_machine *machine);
+void pgm_photoy2k_decrypt(running_machine *machine);
+void pgm_py2k2_decrypt(running_machine *machine);
 void pgm_dw3_decrypt(running_machine *machine);
 void pgm_killbld_decrypt(running_machine *machine);
 void pgm_pstar_decrypt(running_machine *machine);
