@@ -43,6 +43,7 @@
  *
  *     TODO:
  *     - make the z8001 opcodes to be dynamic (i.e. to take segmented mode flag into account and use the non-segmented mode)
+ *     - dissassembler doesn't work at all with the z8001
  *
  *****************************************************************************/
 
