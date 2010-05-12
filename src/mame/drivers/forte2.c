@@ -40,11 +40,8 @@ static ADDRESS_MAP_START( io_mem, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r)
 
-//Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
-//( http://map.tni.nl/resources/msx_io_ports.php#ppi )
-//Since this arcade board doesn't have one, those ports should be
-//unmapped, so setting a8 to RAM is wrong. The ROM hasn't been hacked
-//cleanly by removing all references to the PPI. PCB pics showing eg. lack
+/* Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
+Since this arcade board doesn't have one, those ports should be unmapped. */
 //  AM_RANGE(0xa8, 0xa8) AM_RAM
 //  AM_RANGE(0xa9, 0xab) AM_NOP
 ADDRESS_MAP_END
@@ -171,4 +168,4 @@ ROM_START( pesadelo )
 	ROM_LOAD( "epr2764.15", 0x00000, 0x10000, CRC(1ae2f724) SHA1(12880dd7ad82acf04861843fb9d4f0f926d18f6b) )
 ROM_END
 
-GAME( 1989, pesadelo, 0,      pesadelo, pesadelo, pesadelo, ROT0, "bootleg", "Pesadelo (Brazilian bootleg of Konami's Knightmare on MSX)", GAME_SUPPORTS_SAVE )
+GAME( 1989, pesadelo, 0, pesadelo, pesadelo, pesadelo, ROT0, "bootleg / Konami", "Pesadelo (bootleg of Knightmare on MSX)", GAME_SUPPORTS_SAVE )

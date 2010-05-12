@@ -4,9 +4,7 @@ Penguin Adventure bootleg
 
 Driver by Mariusz Wojcieszek
 
-Game is playable, but coin system is missing.
-
-This seems to be the console version possibly hacked
+This seems to be the MSX version possibly hacked
 to run on cheap Korean bootleg hardware.
 
 Basic components include.....
@@ -148,6 +146,7 @@ static WRITE8_HANDLER(mem_w)
 	}
 }
 
+
 static ADDRESS_MAP_START( program_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank21")
@@ -170,19 +169,30 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pengadvb )
 	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(1)
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
+
+
+static READ8_DEVICE_HANDLER( pengadvb_psg_port_a_r )
+{
+	return input_port_read(device->machine, "IN0");
+}
 
 static const ay8910_interface pengadvb_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
+	DEVCB_HANDLER(pengadvb_psg_port_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -196,15 +206,10 @@ static WRITE8_DEVICE_HANDLER ( pengadvb_ppi_port_a_w )
 
 static READ8_DEVICE_HANDLER( pengadvb_ppi_port_b_r )
 {
-	UINT8 result = 0xff;
-	int row;
+	if ((i8255a_r(device, 2) & 0x0f) == 0)
+		return input_port_read(device->machine, "IN1");
 
-	row = i8255a_r(device, 2) & 0x0f;
-	if (row == 8)
-	{
-		result = input_port_read(device->machine, "IN0");
-	}
-	return result;
+	return 0xff;
 }
 
 static I8255A_INTERFACE(pengadvb_ppi8255_interface)
@@ -233,6 +238,10 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( pengadvb )
 {
 	TMS9928A_configure(&tms9928a_interface);
+
+	state_save_register_global_pointer(machine, main_mem, 0x4000);
+	state_save_register_global(machine, mem_map);
+	state_save_register_global_array(machine, mem_banks);
 }
 
 static MACHINE_RESET( pengadvb )
@@ -320,4 +329,4 @@ ROM_START( pengadvb )
 
 ROM_END
 
-GAME( 1988, pengadvb, 0,      pengadvb, pengadvb, pengadvb, ROT0, "bootleg", "Penguin Adventure (bootleg)", GAME_NOT_WORKING )
+GAME( 1988, pengadvb, 0, pengadvb, pengadvb, pengadvb, ROT0, "bootleg / Konami", "Penguin Adventure (bootleg of MSX version)", GAME_SUPPORTS_SAVE )
