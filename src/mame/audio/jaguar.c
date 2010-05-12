@@ -156,7 +156,7 @@ enum
 	JPIT3,		DSP2,		JPIT4,		DSP3,
 	CLK1,		CLK2,		CLK3,
 	JINTCTRL = 0x20/2,
-	ASIDATA = 0x30/2,		ASICTRL,	ASICLK,
+	ASIDATA = 0x30/2,	ASICTRL,	ASICLK,
 	DSP_REGS
 };
 
@@ -283,6 +283,8 @@ READ16_HANDLER( jaguar_jerry_regs_r )
 	{
 		case JINTCTRL:
 			return gpu_irq_state;
+		case ASICTRL:
+			return (dsp_regs[offset] & 0xfeff) | 0x100; // assume fifo empty
 	}
 
 	return dsp_regs[offset];
