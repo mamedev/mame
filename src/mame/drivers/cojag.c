@@ -371,6 +371,9 @@ static MACHINE_RESET( cojag )
 	/* halt the CPUs */
 	jaguargpu_ctrl_w(devtag_get_device(machine, "gpu"), G_CTRL, 0, 0xffffffff);
 	jaguardsp_ctrl_w(devtag_get_device(machine, "audiocpu"), D_CTRL, 0, 0xffffffff);
+
+	/* set blitter idle flag */
+	blitter_status = 1;
 }
 
 

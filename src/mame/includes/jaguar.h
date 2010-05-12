@@ -26,6 +26,7 @@ extern UINT32 *jaguar_gpu_clut;
 extern UINT32 *jaguar_dsp_ram;
 extern UINT32 *jaguar_wave_rom;
 
+extern UINT8 blitter_status;
 
 /*----------- defined in audio/jaguar.c -----------*/
 

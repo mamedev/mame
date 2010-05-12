@@ -200,6 +200,7 @@ static bitmap_t *screen_bitmap;
 
 static pen_t *pen_table;
 
+UINT8 blitter_status;
 
 
 /*************************************
@@ -602,13 +603,17 @@ if (++reps % 100 == 99)
 	profiler_mark_end();
 }
 
+static TIMER_CALLBACK( blitter_done )
+{
+	blitter_status = 1;
+}
 
 READ32_HANDLER( jaguar_blitter_r )
 {
 	switch (offset)
 	{
 		case B_CMD:	/* B_CMD */
-			return 1;
+			return blitter_status & 3;
 
 		default:
 			logerror("%08X:Blitter read register @ F022%02X\n", cpu_get_previouspc(space->cpu), offset * 4);
@@ -621,7 +626,11 @@ WRITE32_HANDLER( jaguar_blitter_w )
 {
 	COMBINE_DATA(&blitter_regs[offset]);
 	if (offset == B_CMD)
+	{
+		blitter_status = 0;
+		timer_set(space->machine, ATTOTIME_IN_USEC(100), NULL, 0, blitter_done);
 		blitter_run(space->machine);
+	}
 
 	if (LOG_BLITTER_WRITE)
 	logerror("%08X:Blitter write register @ F022%02X = %08X\n", cpu_get_previouspc(space->cpu), offset * 4, data);
@@ -649,8 +658,16 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return video_screen_get_hpos(space->machine->primary_screen) % (video_screen_get_width(space->machine->primary_screen) / 2);
 
 		case VC:
-			return video_screen_get_vpos(space->machine->primary_screen) * 2 + gpu_regs[VBE];
+		{
+			UINT8 half_line;
 
+			if(video_screen_get_hpos(space->machine->primary_screen) >= (video_screen_get_width(space->machine->primary_screen) / 2))
+				half_line = 1;
+			else
+				half_line = 0;
+
+			return video_screen_get_vpos(space->machine->primary_screen) * 2 + half_line;
+		}
 	}
 
 	return gpu_regs[offset];
