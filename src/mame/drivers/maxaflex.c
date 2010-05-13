@@ -53,7 +53,7 @@ static READ8_HANDLER( mcu_portA_r )
 static WRITE8_HANDLER( mcu_portA_w )
 {
 	portA_out = data;
-	speaker_level_w(0, data >> 7);
+	speaker_level_w(devtag_get_device(space->machine, "speaker"), data >> 7);
 }
 
 /* Port B:
