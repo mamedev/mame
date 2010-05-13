@@ -161,7 +161,7 @@ endif
 # uncomment and specify architecture-specific optimizations here
 # some examples:
 #   optimize for I686:   ARCHOPTS = -march=pentiumpro
-#   optimize for Core 2: ARCHOPTS = -march=pentium-m -msse3
+#   optimize for Core 2: ARCHOPTS = -march=core2
 #   optimize for G4:     ARCHOPTS = -mcpu=G4
 # note that we leave this commented by default so that you can
 # configure this in your environment and never have to think about it
