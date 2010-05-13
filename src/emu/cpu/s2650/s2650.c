@@ -679,7 +679,7 @@ INLINE UINT8 ARG(s2650_regs *s2650c)
  ***************************************************************/
 #define M_SPSU()												\
 {																\
-	R0 = ((s2650c->psu & ~PSU34) | (memory_read_byte_8le(s2650c->io, S2650_SENSE_PORT) & SI)); \
+	R0 = ((s2650c->psu & ~PSU34) | (memory_read_byte_8le(s2650c->io, S2650_SENSE_PORT) ? SI : 0)); \
 	SET_CC(R0); 												\
 }
 
@@ -748,7 +748,7 @@ INLINE UINT8 ARG(s2650_regs *s2650c)
 #define M_TPSU()												\
 {																\
 	UINT8 tpsu = ARG(s2650c);										\
-    UINT8 rpsu = (s2650c->psu | (memory_read_byte_8le(s2650c->io, S2650_SENSE_PORT) & SI)); \
+    UINT8 rpsu = (s2650c->psu | (memory_read_byte_8le(s2650c->io, S2650_SENSE_PORT) ? SI : 0)); \
 	s2650c->psl &= ~CC;												\
 	if( (rpsu & tpsu) != tpsu )									\
 		s2650c->psl |= 0x80;											\
