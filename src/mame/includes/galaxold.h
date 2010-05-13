@@ -110,6 +110,7 @@ WRITE8_HANDLER( galaxold_nmi_enable_w );
 
 MACHINE_RESET( galaxold );
 MACHINE_RESET( devilfsg );
+MACHINE_RESET( hunchbkg );
 
 WRITE8_HANDLER( galaxold_coin_lockout_w );
 WRITE8_HANDLER( galaxold_coin_counter_w );

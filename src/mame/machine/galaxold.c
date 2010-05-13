@@ -16,6 +16,21 @@ static running_device *int_timer;
 
 static UINT8 _4in1_bank;
 
+static IRQ_CALLBACK(hunchbkg_irq_callback)
+{
+	/* for some reason a call to cputag_set_input_line
+	 * is significantly delayed ....
+	 *
+	 * cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
+	 *
+	 * Therefore we reset the line without any detour ....
+	 */
+	//cpu_set_input_line(device->machine->firstcpu, 0, CLEAR_LINE);
+	cpu_set_info(device->machine->firstcpu, CPUINFO_INT_INPUT_STATE + irq_line, CLEAR_LINE);
+	return 0x03;
+}
+
+
 void galaxold_7474_9m_2_callback(running_device *device)
 {
 	/* Q bar clocks the other flip-flop,
@@ -47,7 +62,7 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 	ttl7474_d_w(target, (param & 0xe0) != 0xe0);
 
 	/* 16V clocks the flip-flop */
-	ttl7474_clock_w(target, param & 0x10);
+	ttl7474_clock_w(target, (param & 0x10) == 0x10);
 
 	param = (param + 0x10) & 0xff;
 
@@ -86,6 +101,11 @@ MACHINE_RESET( devilfsg )
 	machine_reset_common(machine, 0);
 }
 
+MACHINE_RESET( hunchbkg )
+{
+	machine_reset_common(machine, 0);
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), hunchbkg_irq_callback);
+}
 
 WRITE8_HANDLER( galaxold_coin_lockout_w )
 {
