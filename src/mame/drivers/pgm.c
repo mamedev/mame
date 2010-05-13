@@ -1306,7 +1306,7 @@ static const gfx_layout pgm8_charlayout =
 static const gfx_layout pgm32_charlayout =
 {
 	32,32,
-	NULL, // determined in init
+	0, // determined in init
 	5,
 	{ 3,4,5,6,7 },
 	{ 0  , 8 ,16 ,24 ,32 ,40 ,48 ,56 ,
