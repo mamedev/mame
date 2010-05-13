@@ -349,64 +349,64 @@ MACHINE_DRIVER_END
 
 ROM_START( tp84 )
 	ROM_REGION( 0x10000, "cpu1", 0 )
-	ROM_LOAD( "tp84_7j.bin",  0x8000, 0x2000, CRC(605f61c7) SHA1(6848ef35ec7f92cccefb0fb2de42c4b0e9ec476f) )
-	ROM_LOAD( "tp84_8j.bin",  0xa000, 0x2000, CRC(4b4629a4) SHA1(f3bb1ee66c9e47d050370ac9ca74f3020cb9cfa3) )
-	ROM_LOAD( "tp84_9j.bin",  0xc000, 0x2000, CRC(dbd5333b) SHA1(65dee1fd4c940a5423d57cb55a7f2ad89c59c5c6) )
-	ROM_LOAD( "tp84_10j.bin", 0xe000, 0x2000, CRC(a45237c4) SHA1(896e31c59aedf1c7e73e6f30fbe78cc020b457ab) )
+	ROM_LOAD( "388_f04.7j",  0x8000, 0x2000, CRC(605f61c7) SHA1(6848ef35ec7f92cccefb0fb2de42c4b0e9ec476f) )
+	ROM_LOAD( "388_05.8j",   0xa000, 0x2000, CRC(4b4629a4) SHA1(f3bb1ee66c9e47d050370ac9ca74f3020cb9cfa3) )
+	ROM_LOAD( "388_f06.9j",  0xc000, 0x2000, CRC(dbd5333b) SHA1(65dee1fd4c940a5423d57cb55a7f2ad89c59c5c6) )
+	ROM_LOAD( "388_07.10j",  0xe000, 0x2000, CRC(a45237c4) SHA1(896e31c59aedf1c7e73e6f30fbe78cc020b457ab) )
 
 	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
-	ROM_LOAD( "tp84_10d.bin", 0xe000, 0x2000, CRC(36462ff1) SHA1(118a1b46ee01a583e6cf39af59b073321c76dbff) )
+	ROM_LOAD( "388_f08.10d", 0xe000, 0x2000, CRC(36462ff1) SHA1(118a1b46ee01a583e6cf39af59b073321c76dbff) ) /* E08? */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for code of sound cpu Z80 */
-	ROM_LOAD( "tp84s_6a.bin", 0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
+	ROM_LOAD( "388j13.6a",   0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "tp84_2j.bin",  0x0000, 0x2000, CRC(05c7508f) SHA1(1a3c7cd47ad34e37a7b0f3014e10c055cbb2b559) ) /* chars */
-	ROM_LOAD( "tp84_1j.bin",  0x2000, 0x2000, CRC(498d90b7) SHA1(6975f3a1603b14132aab58329195a4845a6e28bb) )
+	ROM_LOAD( "388_h02.2j",  0x0000, 0x2000, CRC(05c7508f) SHA1(1a3c7cd47ad34e37a7b0f3014e10c055cbb2b559) ) /* chars */
+	ROM_LOAD( "388_d01.1j",  0x2000, 0x2000, CRC(498d90b7) SHA1(6975f3a1603b14132aab58329195a4845a6e28bb) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "tp84_12a.bin", 0x0000, 0x2000, CRC(cd682f30) SHA1(6f48d3efc53d63171ec655e64b225412de1374e4) ) /* sprites */
-	ROM_LOAD( "tp84_13a.bin", 0x2000, 0x2000, CRC(888d4bd6) SHA1(7e2dde080bb614709561431a81b0490b2aaa42a9) )
-	ROM_LOAD( "tp84_14a.bin", 0x4000, 0x2000, CRC(9a220b39) SHA1(792aaa4daedc8eb807d5a66d87da4641739b1660) )
-	ROM_LOAD( "tp84_15a.bin", 0x6000, 0x2000, CRC(fac98397) SHA1(d90f99b19ab3cddfdfd37a273fb437be098088bc) )
+	ROM_LOAD( "388_e09.12a", 0x0000, 0x2000, CRC(cd682f30) SHA1(6f48d3efc53d63171ec655e64b225412de1374e4) ) /* sprites */
+	ROM_LOAD( "388_e10.13a", 0x2000, 0x2000, CRC(888d4bd6) SHA1(7e2dde080bb614709561431a81b0490b2aaa42a9) )
+	ROM_LOAD( "388_e11.14a", 0x4000, 0x2000, CRC(9a220b39) SHA1(792aaa4daedc8eb807d5a66d87da4641739b1660) )
+	ROM_LOAD( "388_e12.15a", 0x6000, 0x2000, CRC(fac98397) SHA1(d90f99b19ab3cddfdfd37a273fb437be098088bc) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "tp84_2c.bin",  0x0000, 0x0100, CRC(d737eaba) SHA1(e39026f87f5b995cf4a38b5d3d3fee7561762ae6) ) /* palette red component */
-	ROM_LOAD( "tp84_2d.bin",  0x0100, 0x0100, CRC(2f6a9a2a) SHA1(f09d8b92c7f9bf046cdd815c5282d0510e61b6e0) ) /* palette green component */
-	ROM_LOAD( "tp84_1e.bin",  0x0200, 0x0100, CRC(2e21329b) SHA1(9ba8af294dbd6f3a5d039c74a56e0605a913c037) ) /* palette blue component */
-	ROM_LOAD( "tp84_1f.bin",  0x0300, 0x0100, CRC(61d2d398) SHA1(3f74ad733b07b6a31cf9d4956d171eb9253dd6bf) ) /* char lookup table */
-	ROM_LOAD( "tp84_16c.bin", 0x0400, 0x0100, CRC(13c4e198) SHA1(42ab23206be99e840bd9c52cefa175c12fac8e5b) ) /* sprite lookup table */
+	ROM_LOAD( "388d14.2c",   0x0000, 0x0100, CRC(d737eaba) SHA1(e39026f87f5b995cf4a38b5d3d3fee7561762ae6) ) /* palette red component */
+	ROM_LOAD( "388d15.2d",   0x0100, 0x0100, CRC(2f6a9a2a) SHA1(f09d8b92c7f9bf046cdd815c5282d0510e61b6e0) ) /* palette green component */
+	ROM_LOAD( "388d16.1e",   0x0200, 0x0100, CRC(2e21329b) SHA1(9ba8af294dbd6f3a5d039c74a56e0605a913c037) ) /* palette blue component */
+	ROM_LOAD( "388d18.1f",   0x0300, 0x0100, CRC(61d2d398) SHA1(3f74ad733b07b6a31cf9d4956d171eb9253dd6bf) ) /* char lookup table */
+	ROM_LOAD( "388j17.16c", 0x0400, 0x0100, CRC(13c4e198) SHA1(42ab23206be99e840bd9c52cefa175c12fac8e5b) ) /* sprite lookup table */
 ROM_END
 
 ROM_START( tp84a )
 	ROM_REGION( 0x10000, "cpu1", 0 )
-	ROM_LOAD( "tp84_7j.bin",  0x8000, 0x2000, CRC(605f61c7) SHA1(6848ef35ec7f92cccefb0fb2de42c4b0e9ec476f) )
-	ROM_LOAD( "f05",          0xa000, 0x2000, CRC(e97d5093) SHA1(c76c119574d19d2ac10e6987150744542803ef5b) )
-	ROM_LOAD( "tp84_9j.bin",  0xc000, 0x2000, CRC(dbd5333b) SHA1(65dee1fd4c940a5423d57cb55a7f2ad89c59c5c6) )
-	ROM_LOAD( "f07",          0xe000, 0x2000, CRC(8fbdb4ef) SHA1(e615c4d9964ab00f6776147c54925b4b6100b360) )
+	ROM_LOAD( "388_f04.7j",  0x8000, 0x2000, CRC(605f61c7) SHA1(6848ef35ec7f92cccefb0fb2de42c4b0e9ec476f) )
+	ROM_LOAD( "388_f05.8j",  0xa000, 0x2000, CRC(e97d5093) SHA1(c76c119574d19d2ac10e6987150744542803ef5b) )
+	ROM_LOAD( "388_f06.9j",  0xc000, 0x2000, CRC(dbd5333b) SHA1(65dee1fd4c940a5423d57cb55a7f2ad89c59c5c6) )
+	ROM_LOAD( "388_f07.10j", 0xe000, 0x2000, CRC(8fbdb4ef) SHA1(e615c4d9964ab00f6776147c54925b4b6100b360) )
 
 	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for the second CPU */
-	ROM_LOAD( "tp84_10d.bin", 0xe000, 0x2000, CRC(36462ff1) SHA1(118a1b46ee01a583e6cf39af59b073321c76dbff) )
+	ROM_LOAD( "388_f08.10d", 0xe000, 0x2000, CRC(36462ff1) SHA1(118a1b46ee01a583e6cf39af59b073321c76dbff) ) /* E08? */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for code of sound cpu Z80 */
-	ROM_LOAD( "tp84s_6a.bin", 0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
+	ROM_LOAD( "388j13.6a",   0x0000, 0x2000, CRC(c44414da) SHA1(981289f5bdf7dc1348f4ca547ac933ef503b6588) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "tp84_2j.bin",  0x0000, 0x2000, CRC(05c7508f) SHA1(1a3c7cd47ad34e37a7b0f3014e10c055cbb2b559) ) /* chars */
-	ROM_LOAD( "tp84_1j.bin",  0x2000, 0x2000, CRC(498d90b7) SHA1(6975f3a1603b14132aab58329195a4845a6e28bb) )
+	ROM_LOAD( "388_h02.2j",  0x0000, 0x2000, CRC(05c7508f) SHA1(1a3c7cd47ad34e37a7b0f3014e10c055cbb2b559) ) /* chars */
+	ROM_LOAD( "388_d01.1j",  0x2000, 0x2000, CRC(498d90b7) SHA1(6975f3a1603b14132aab58329195a4845a6e28bb) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "tp84_12a.bin", 0x0000, 0x2000, CRC(cd682f30) SHA1(6f48d3efc53d63171ec655e64b225412de1374e4) ) /* sprites */
-	ROM_LOAD( "tp84_13a.bin", 0x2000, 0x2000, CRC(888d4bd6) SHA1(7e2dde080bb614709561431a81b0490b2aaa42a9) )
-	ROM_LOAD( "tp84_14a.bin", 0x4000, 0x2000, CRC(9a220b39) SHA1(792aaa4daedc8eb807d5a66d87da4641739b1660) )
-	ROM_LOAD( "tp84_15a.bin", 0x6000, 0x2000, CRC(fac98397) SHA1(d90f99b19ab3cddfdfd37a273fb437be098088bc) )
+	ROM_LOAD( "388_e09.12a", 0x0000, 0x2000, CRC(cd682f30) SHA1(6f48d3efc53d63171ec655e64b225412de1374e4) ) /* sprites */
+	ROM_LOAD( "388_e10.13a", 0x2000, 0x2000, CRC(888d4bd6) SHA1(7e2dde080bb614709561431a81b0490b2aaa42a9) )
+	ROM_LOAD( "388_e11.14a", 0x4000, 0x2000, CRC(9a220b39) SHA1(792aaa4daedc8eb807d5a66d87da4641739b1660) )
+	ROM_LOAD( "388_e12.15a", 0x6000, 0x2000, CRC(fac98397) SHA1(d90f99b19ab3cddfdfd37a273fb437be098088bc) )
 
 	ROM_REGION( 0x0500, "proms", 0 )
-	ROM_LOAD( "tp84_2c.bin",  0x0000, 0x0100, CRC(d737eaba) SHA1(e39026f87f5b995cf4a38b5d3d3fee7561762ae6) ) /* palette red component */
-	ROM_LOAD( "tp84_2d.bin",  0x0100, 0x0100, CRC(2f6a9a2a) SHA1(f09d8b92c7f9bf046cdd815c5282d0510e61b6e0) ) /* palette green component */
-	ROM_LOAD( "tp84_1e.bin",  0x0200, 0x0100, CRC(2e21329b) SHA1(9ba8af294dbd6f3a5d039c74a56e0605a913c037) ) /* palette blue component */
-	ROM_LOAD( "tp84_1f.bin",  0x0300, 0x0100, CRC(61d2d398) SHA1(3f74ad733b07b6a31cf9d4956d171eb9253dd6bf) ) /* char lookup table */
-	ROM_LOAD( "tp84_16c.bin", 0x0400, 0x0100, CRC(13c4e198) SHA1(42ab23206be99e840bd9c52cefa175c12fac8e5b) ) /* sprite lookup table */
+	ROM_LOAD( "388d14.2c",   0x0000, 0x0100, CRC(d737eaba) SHA1(e39026f87f5b995cf4a38b5d3d3fee7561762ae6) ) /* palette red component */
+	ROM_LOAD( "388d15.2d",   0x0100, 0x0100, CRC(2f6a9a2a) SHA1(f09d8b92c7f9bf046cdd815c5282d0510e61b6e0) ) /* palette green component */
+	ROM_LOAD( "388d16.1e",   0x0200, 0x0100, CRC(2e21329b) SHA1(9ba8af294dbd6f3a5d039c74a56e0605a913c037) ) /* palette blue component */
+	ROM_LOAD( "388d18.1f",   0x0300, 0x0100, CRC(61d2d398) SHA1(3f74ad733b07b6a31cf9d4956d171eb9253dd6bf) ) /* char lookup table */
+	ROM_LOAD( "388d17.16c",  0x0400, 0x0100, CRC(af8f839c) SHA1(b469785a4153a221403fcf72c65c9c35ae75df5d) ) /* sprite lookup table (dump miss?)*/
 ROM_END
 
 ROM_START( tp84b )
