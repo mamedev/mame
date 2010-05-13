@@ -422,7 +422,7 @@ static HRESULT d3d_device_set_texture_stage_state(d3d_device *dev, DWORD stage, 
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 
 	// some state which was here got pushed into sampler state in D3D9
-	switch (state)
+	switch ((DWORD)state)
 	{
 		case D3DTSS_ADDRESSU:
 			return IDirect3DDevice9_SetSamplerState(device, stage, D3DSAMP_ADDRESSU, value);
