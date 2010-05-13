@@ -403,7 +403,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 		for (offs = 0; offs < 0x100; offs++)
 		{
-			int x = 240 - (16 * (offs / 16) + scroll);
+			int x = 240 - (16 * (offs / 16) + scroll) - 1;
 			int y = 16 * (offs % 16);
 
 			if (flip_screen_get(machine))
