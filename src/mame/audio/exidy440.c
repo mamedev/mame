@@ -670,8 +670,6 @@ static void play_cvsd(running_machine *machine, int ch)
 	int length = m6844_channel[ch].counter;
 	INT16 *base;
 
-	assert(length <= MAX_CACHE_ENTRIES);
-
 	/* add the bank number to the address */
 	if (sound_banks[ch] & 1)
 		address += 0x00000;
