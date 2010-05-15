@@ -925,9 +925,6 @@ OP( 0xd6, i_setalc ) { nec_state->regs.b[AL] = (CF)?0xff:0x00; nec_state->icount
 OP( 0xd7, i_trans  ) { UINT32 dest = (nec_state->regs.w[BW]+nec_state->regs.b[AL])&0xffff; nec_state->regs.b[AL] = GetMemB(DS0, dest); CLKS(9,9,5); }
 OP( 0xd8, i_fpo    ) { GetModRM; nec_state->icount-=2;	logerror("%06x: Unimplemented floating point control %04x\n",PC(nec_state),ModRM); }
 
-OP( 0xda, i_mov_pre_r8b   ) { UINT8  src; GetModRM; src = GetPreRMByte(ModRM);	RegByte(ModRM)=src;	CLKM(2,2,2,11,11,5);		} // cycles wrong
-OP( 0xdb, i_mov_pre_r16w  ) { UINT16 src; GetModRM; src = GetPreRMWord(ModRM);	RegWord(ModRM)=src; 	CLKR(15,15,7,15,11,5,2,EA); 	} // cycles wrong
-
 OP( 0xe0, i_loopne ) { INT8 disp = (INT8)FETCH(); nec_state->regs.w[CW]--; if (!ZF && nec_state->regs.w[CW]) { nec_state->ip = (WORD)(nec_state->ip+disp); /*CHANGE_PC;*/ CLKS(14,14,6); } else CLKS(5,5,3); }
 OP( 0xe1, i_loope  ) { INT8 disp = (INT8)FETCH(); nec_state->regs.w[CW]--; if ( ZF && nec_state->regs.w[CW]) { nec_state->ip = (WORD)(nec_state->ip+disp); /*CHANGE_PC;*/ CLKS(14,14,6); } else CLKS(5,5,3); }
 OP( 0xe2, i_loop   ) { INT8 disp = (INT8)FETCH(); nec_state->regs.w[CW]--; if (nec_state->regs.w[CW]) { nec_state->ip = (WORD)(nec_state->ip+disp); /*CHANGE_PC;*/ CLKS(13,13,6); } else CLKS(5,5,3); }

@@ -15,9 +15,6 @@ static struct {
 #define GetRMWord(ModRM) \
 	((ModRM) >= 0xc0 ? nec_state->regs.w[Mod_RM.RM.w[ModRM]] : ( (*GetEA[ModRM])(nec_state), read_word( EA ) ))
 
-#define GetPreRMWord(ModRM) \
-	((ModRM) >= 0xc0 ? nec_state->regs.w[Mod_RM.RM.w[ModRM]] : ( (*GetEA[ModRM])(nec_state), ( EA ) ))
-
 #define PutbackRMWord(ModRM,val)			     \
 {							     \
 	if (ModRM >= 0xc0) nec_state->regs.w[Mod_RM.RM.w[ModRM]]=val; \
@@ -50,8 +47,6 @@ static struct {
 
 #define GetRMByte(ModRM) \
 	((ModRM) >= 0xc0 ? nec_state->regs.b[Mod_RM.RM.b[ModRM]] : read_byte( (*GetEA[ModRM])(nec_state) ))
-#define GetPreRMByte(ModRM) \
-	((ModRM) >= 0xc0 ? nec_state->regs.b[Mod_RM.RM.b[ModRM]] :          ( (*GetEA[ModRM])(nec_state) ))
 
 #define PutRMByte(ModRM,val)				\
 {							\
