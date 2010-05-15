@@ -134,7 +134,7 @@ static sym_get_line_from_addr_64_ptr sym_get_line_from_addr_64;
 static get_module_information_ptr get_module_information;
 
 static char mapfile_name[MAX_PATH];
-static LPTOP_LEVEL_EXCEPTION_FILTER pass_thru_filter;
+static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI pass_thru_filter;
 
 static HANDLE watchdog_reset_event;
 static HANDLE watchdog_exit_event;
@@ -164,7 +164,7 @@ static void osd_exit(running_machine *machine);
 static void soft_link_functions(void);
 static int is_double_click_start(int argc);
 static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter);
-static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info);
+static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info);
 static const char *lookup_symbol(FPTR address);
 
 static void start_profiler(void);
@@ -463,7 +463,7 @@ static void soft_link_functions(void)
 	{
 		image_nt_header = (image_nt_header_ptr)GetProcAddress(library, "ImageNtHeader");
 		stack_walk_64 = (stack_walk_64_ptr)GetProcAddress(library, "StackWalk64");
-		sym_initialize = (sym_initialize_ptr)GetProcAddress(library, "SymInitialize" UNICODE_POSTFIX);
+		sym_initialize = (sym_initialize_ptr)GetProcAddress(library, "SymInitialize");
 		sym_function_table_access_64 = (sym_function_table_access_64_ptr)GetProcAddress(library, "SymFunctionTableAccess64");
 		sym_get_module_base_64 = (sym_get_module_base_64_ptr)GetProcAddress(library, "SymGetModuleBase64");
 		sym_from_addr = (sym_from_addr_ptr)GetProcAddress(library, "SymFromAddr");
@@ -541,7 +541,7 @@ void winmain_watchdog_ping(void)
 //  exception_filter
 //============================================================
 
-static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
+static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info)
 {
 	static const struct
 	{
