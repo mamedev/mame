@@ -873,6 +873,10 @@ static WRITE8_HANDLER( mcu_control_w )
 	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
 	int irqline;
 
+	/* if we have a fake i8751 handler, ignore writes by the actual 8751 */
+	if (state->i8751_vblank_hook != NULL)
+		return;
+
 	cpu_set_input_line(state->maincpu, INPUT_LINE_RESET, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	for (irqline = 1; irqline <= 7; irqline++)
 		cpu_set_input_line(state->maincpu, irqline, ((~data & 7) == irqline) ? ASSERT_LINE : CLEAR_LINE);
