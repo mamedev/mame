@@ -530,9 +530,9 @@ static VIDEO_UPDATE( fspider )
 	VIDEO_UPDATE_CALL(jollyjgr);
 
 	/* Draw bullets
-	16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
-	Assume bullets to look the same as on Galaxian hw,
-	that is, simply 4 pixels. Colours are unknown. */
+    16 bytes, 2 bytes per bullet (y,x). 2 player bullets, 6 enemy bullets.
+    Assume bullets to look the same as on Galaxian hw,
+    that is, simply 4 pixels. Colours are unknown. */
 	for (int offs=0;offs<0x10;offs+=2) {
 		UINT8 sy=~state->bulletram[offs];
 		UINT8 sx=~state->bulletram[offs|1];

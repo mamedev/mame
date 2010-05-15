@@ -1344,13 +1344,13 @@ ROM_END
 ROM_START( spaceftr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fortrest7.7t", 0x0000, 0x0800, CRC(65d0a225) SHA1(e1fbee5ff42dd040ab2e90bbe2189fcb76d6167e) )
-	
+
 	/* The original fortresp7.7p ROM image was a bad dump, a comparison showed only two bytes difference between it
-	and	starcast.p7 from starcas1. A disassembly proved that the two affected bytes resulted in bogus opcodes, which
-	ultimately caused the game to fail. The current ROM taken from starcas1 can be assumed to be equal to a correct
-	dump of fortresp7.7p. The BAD_DUMP flag is kept in just to be sure. */
+    and starcast.p7 from starcas1. A disassembly proved that the two affected bytes resulted in bogus opcodes, which
+    ultimately caused the game to fail. The current ROM taken from starcas1 can be assumed to be equal to a correct
+    dump of fortresp7.7p. The BAD_DUMP flag is kept in just to be sure. */
 	ROM_LOAD16_BYTE( "fortresp7.7p", 0x0001, 0x0800, BAD_DUMP CRC(d8f58d9a) SHA1(abba459431dcacc75099b0d340b957be71b89cfd) ) // taken from starcas1, read note above
-	
+
 	ROM_LOAD16_BYTE( "fortresu7.7u", 0x1000, 0x0800, CRC(13b0287c) SHA1(366a23fd10684975bd5ee190e5227e47a0298ad5) )
 	ROM_LOAD16_BYTE( "fortresr7.7r", 0x1001, 0x0800, CRC(a2c1ed52) SHA1(ed9743f44ee98c9e7c2a6819ec681af7c7a97fc9) )
 

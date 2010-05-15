@@ -918,7 +918,7 @@ static WRITE8_HANDLER( ppu2c0x_palette_write )
 
 	// palette RAM is only 6 bits wide
 	data &= 0x3f;
-	
+
 	// transparent pens are mirrored!
 	if (offset & 0x3)
 	{

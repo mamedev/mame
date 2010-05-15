@@ -231,7 +231,7 @@ device), PES Speech adapter (serial port connection)
 #undef DEBUG_GENERATION_VERBOSE
 // above dumps MUCH MORE debug information related to the sample generation loop, namely the k, pitch and energy values for EVERY SINGLE SAMPLE.
 #undef DEBUG_LATTICE
-// above dumps the lattice filter state data each sample. 
+// above dumps the lattice filter state data each sample.
 #undef DEBUG_CLIP
 // above dumps info to stderr whenever the analog clip hardware is (or would be) clipping the signal.
 #undef DEBUG_IO_READY
@@ -907,7 +907,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				case 3: /* PC=1, B cycle, nothing happens (update pitch) */
 				break;
 				case 4: /* PC=2, A cycle, update pitch (calc K1) */
-#ifndef INTERP_INHIBIT_EXCITE_DELAY 
+#ifndef INTERP_INHIBIT_EXCITE_DELAY
 				if (interp_period == 7) tms->old_frame_pitch_idx = tms->new_frame_pitch_idx; // this is to make it so the voiced/unvoiced select during interpolation takes effect at the same time as inhibit stops.
 #endif
 				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit)) INTERP_SHIFT);

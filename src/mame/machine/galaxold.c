@@ -19,12 +19,12 @@ static UINT8 _4in1_bank;
 static IRQ_CALLBACK(hunchbkg_irq_callback)
 {
 	/* for some reason a call to cputag_set_input_line
-	 * is significantly delayed ....
-	 *
-	 * cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
-	 *
-	 * Therefore we reset the line without any detour ....
-	 */
+     * is significantly delayed ....
+     *
+     * cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
+     *
+     * Therefore we reset the line without any detour ....
+     */
 	//cpu_set_input_line(device->machine->firstcpu, 0, CLEAR_LINE);
 	cpu_set_info(device->machine->firstcpu, CPUINFO_INT_INPUT_STATE + irq_line, CLEAR_LINE);
 	return 0x03;

@@ -370,7 +370,7 @@ static WRITE8_HANDLER( lucky8_outport_w )
 	output_set_lamp_value(3, (data >> 4) & 1);	/* INFO Lamp */
 	output_set_lamp_value(4, (data >> 5) & 1);	/* START Lamp */
 
-//	popmessage("lucky8_outb850_w %02x\n", data);
+//  popmessage("lucky8_outb850_w %02x\n", data);
 
 }
 
