@@ -3551,6 +3551,7 @@ V-V                           TP-027
 	DRIVER( gt99t400 )	/* (c) 1999 Incredible Technologies */
 	DRIVER( gtroyal )	/* (c) 1999 Incredible Technologies */
 	DRIVER( gt2k )		/* (c) 2000 Incredible Technologies */
+	DRIVER( gt2kp100 )	/* (c) 2000 Incredible Technologies */
 	DRIVER( gt2ks100 )	/* (c) 2000 Incredible Technologies */
 	DRIVER( gt2kt500 )	/* (c) 2000 Incredible Technologies */
 	DRIVER( gtsuprem )	/* (c) 2000 Incredible Technologies */

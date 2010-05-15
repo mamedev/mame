@@ -19,7 +19,7 @@
         * Golden Tee Golf '97 (7 sets)
         * Golden Tee Golf '98 (4 sets)
         * Golden Tee Golf '99 (4 Sets)
-        * Golden Tee Golf 2K (4 Sets)
+        * Golden Tee Golf 2K (5 Sets)
         * Golden Tee Classic (3 Sets)
 
     Known issues:
@@ -634,6 +634,12 @@ static READ32_HANDLER( itech020_prot_result_r )
 	UINT32 result = ((UINT32 *)main_ram)[itech020_prot_address >> 2];
 	result >>= (~itech020_prot_address & 3) * 8;
 	return (result & 0xff) << 8;
+}
+
+
+static READ32_HANDLER( gt2kp_prot_result_r )
+{
+	return 0x00010000;	/* 32 bit value at 680000 to 680003 will return the needed value of 0x01 */
 }
 
 
@@ -3666,6 +3672,40 @@ ROM_START( gt2k ) /* Version 1.00 */
 ROM_END
 
 
+ROM_START( gt2kp100 ) /* Version 1.00 Infinite Loop Protection */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "gt2kprm0.10p", 0x00000, 0x80000, CRC(16e8502d) SHA1(8bdf90793ae6d38dc0638c74a1c804c395ac5868) )
+	ROM_LOAD32_BYTE( "gt2kprm1.10p", 0x00001, 0x80000, CRC(bf47cd95) SHA1(f63ac0dbe2668dfc2ba675862b0b0c754f89a9a8) )
+	ROM_LOAD32_BYTE( "gt2kprm2.10p", 0x00002, 0x80000, CRC(204ddf15) SHA1(395659f4852021ef19967af5f3966c14cef6f327) )
+	ROM_LOAD32_BYTE( "gt2kprm3.10p", 0x00003, 0x80000, CRC(45b9dd56) SHA1(819f5aa04cacebfb7f000e35df2b4a5ec4d8895e) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
+	ROM_CONTINUE(          0x08000, 0x08000 )
+
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "gt2k_grm.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
+	ROM_LOAD32_BYTE( "gt2k_grm.0_1", 0x000001, 0x80000, CRC(d6d6be57) SHA1(fda20185e842dd4aa1a1601f95e5cc787644f4c3) )
+	ROM_LOAD32_BYTE( "gt2k_grm.0_2", 0x000002, 0x80000, CRC(005d4791) SHA1(b03d5835465ccc4fe73f4adb1342ef2b38aad90c) )
+	ROM_LOAD32_BYTE( "gt2k_grm.0_3", 0x000003, 0x80000, CRC(0c998eb7) SHA1(2950a56192dd794e3f34459c52edf7ea484d6901) )
+	ROM_LOAD32_BYTE( "gt2k_grm.1_0", 0x200000, 0x80000, CRC(8b79d6e2) SHA1(b4aeac78a470bd8b9f557ded39775cb56f525cce) )
+	ROM_LOAD32_BYTE( "gt2k_grm.1_1", 0x200001, 0x80000, CRC(84ef1803) SHA1(c4e2f0451a35874603cc767b4dbb566b2507ae39) )
+	ROM_LOAD32_BYTE( "gt2k_grm.1_2", 0x200002, 0x80000, CRC(d73d8afc) SHA1(2fced1ee7dd11c6db07750f617356c6608ac0291) )
+	ROM_LOAD32_BYTE( "gt2k_grm.1_3", 0x200003, 0x80000, CRC(59f48688) SHA1(37b2c84e487f4f3a9145bef34c573a3716b4a6a7) )
+
+	/* GT99, GT2K & GT Classic all share the above listed 8 graphics roms and may be labeled GT99, GT2K or GTClassic */
+
+	ROM_LOAD32_BYTE( "gt2k_grm.2_0", 0x400000, 0x80000, CRC(cc11b93f) SHA1(f281448c8fa23595dd2664cc8c168565b60d4fc1) )
+	ROM_LOAD32_BYTE( "gt2k_grm.2_1", 0x400001, 0x80000, CRC(1c3a0126) SHA1(3f9de1239dd64b9f50220842ffcf3e0f8928d2dc) )
+	ROM_LOAD32_BYTE( "gt2k_grm.2_2", 0x400002, 0x80000, CRC(97814df5) SHA1(fcbb9ca08cbcef20231e602c99cd14e7905b2110) )
+	ROM_LOAD32_BYTE( "gt2k_grm.2_3", 0x400003, 0x80000, CRC(f0f7373f) SHA1(6d71f338992598feffd9b4ac26bd0cf2f9edb53e) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "gt_srom0.nr", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) )
+	ROM_LOAD16_BYTE( "gt_srom1.nr", 0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) )
+ROM_END
+
+
 ROM_START( gt2ks100 )	/* Version 1.00S for the 3 tier type PCB with short ROM board P/N 1088 Rev 0 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt2kprm0.10s", 0x00000, 0x80000, CRC(3aab67c8) SHA1(c08dcad9e7c2440058ee4d683b2257c6ae42ad4d) ) /* chips labeled as "GT2K KIT PROM0 v1.00M" ect */
@@ -4094,6 +4134,27 @@ static DRIVER_INIT( gt3dl )
 }
 
 
+static DRIVER_INIT( gt2kp )
+{
+	/* a little extra protection */
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680000, 0x680003, 0, 0, gt2kp_prot_result_r);
+	DRIVER_INIT_CALL(aama);
+
+	/* The protection code is:
+
+        addq #1,    1132.w
+        clr.l       d0
+        clr.l       d1
+        move.b      680002,d0       ; Read protection result
+        move.b      112f.w,d1
+        andi.b      #$01,d0
+Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
+        nop                         ; Otherwise just return to the game :-)
+
+    */
+}
+
+
 static DRIVER_INIT( gtclasscp )
 {
 	/* a little extra protection */
@@ -4223,10 +4284,11 @@ GAME( 1999, gt99t400, gt99,     tourny,  gt98s, aamat,    ROT0, "Incredible Tech
 GAME( 1999, gtroyal,  gt99,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee Royal Edition Tournament (v4.02)" , 0) /* PIC 16C54 labeled as ITGF99I */
 
 GAME( 2000, gt2k,     0,        sftm,    aama,  aama,     ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00)" , 0) /* PIC 16C54 labeled as ITGF2K */
+GAME( 2000, gt2kp100, gt2k,     sftm,    aama,  gt2kp,    ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00) with Infinite Loop Protection" , 0) /* PIC 16C54 labeled as ???? */
 GAME( 2000, gt2ks100, gt2k,     sftm,    s_ver, s_ver,    ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00S)" , 0) /* PIC 16C54 labeled as ITGF2K-M */
 GAME( 2000, gt2kt500, gt2k,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee 2K Tournament (v5.00)" , 0) /* PIC 16C54 labeled as ITGF2K */
 GAME( 2002, gtsuprem, gt2k,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee Supreme Edition Tournament (v5.10)" , 0) /* PIC 16C54 labeled as ITGF2K-I */
 
 GAME( 2001, gtclassc,  0,        sftm,    aama,  aama,      ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00)" , 0) /* PIC 16C54 labeled as ITGFCL */
 GAME( 2001, gtclasscp, gtclassc, sftm,    aama,  gtclasscp, ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00) with Infinite Loop Protection" , 0) /* PIC 16C54 labeled as ITGFCL */
-GAME( 2001, gtclasscs, gtclassc, sftm,    s_ver, s_ver,    ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00S)" , 0) /* PIC 16C54 labeled as ITGFCL-M */
+GAME( 2001, gtclasscs, gtclassc, sftm,    s_ver, s_ver,     ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00S)" , 0) /* PIC 16C54 labeled as ITGFCL-M */
