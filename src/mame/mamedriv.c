@@ -3849,8 +3849,9 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( afighter )	/* (c) 1986 (FD1089A, decrypted) */
 	DRIVER( alexkidd )	/* (c) 1986 (FD1089A, decrypted) */
 	DRIVER( alexkidd1 )	/* (c) 1986 */
-	DRIVER( fantzone )	/* (c) 1986 */
-	DRIVER( fantzone1 )	/* (c) 1986 */
+	DRIVER( fantzone )	/* (c) 1986 (Unprotected Rev A) */
+	DRIVER( fantzone1 )	/* (c) 1986 (Unprotected) */
+	DRIVER( fantzonep )	/* (c) 1986 (NEC 0317-5000, encrypted)*/
 	DRIVER( sdi )		/* (c) 1987 (FD1089B, decrypted) */
 	DRIVER( shinobi )	/* (c) 1987 */
 	DRIVER( shinobi1 )	/* (c) 1987 (FD1094, decrypted) */
