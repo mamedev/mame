@@ -642,7 +642,7 @@ No specific PCB model or numer....
  OKI 6295 clone chip (AD-65 or U6295)
 
 EEPROM Atmel 93C46
-Batery 3.6V
+Battery 3.6V
 OSC    24.000MHz
 
 PC1 is a push button for test mode
@@ -716,7 +716,7 @@ RAM:
  2 x BSI BS62LV1023SC-70
 
 EEPROM 93C46
-Batery 3.6V
+Battery 3.6V
 OSC    24MHz
 
 PC1 is a push button for test mode
@@ -808,7 +808,7 @@ RAM:
  2 x BSI BS62LV1025SC-70
 
 EEPROM 93C46
-Batery 3.6V
+Battery 3.6V
 OSC    26.824MHz
 
 PC1 is a push button for test mode
