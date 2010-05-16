@@ -2825,11 +2825,15 @@ static int memory_view_needs_recompute(debug_view *view)
 	/* handle expression changes */
 	if (debug_view_expression_changed_value(view, &memdata->expression, (space != NULL && space->cpu != NULL && space->cpu->type == CPU) ? space->cpu : NULL))
 	{
+		offs_t resultbyte;
+
 		recompute = TRUE;
 		view->topleft.y = (memdata->expression.result - memdata->byte_offset) / memdata->bytes_per_row;
 		view->topleft.y = MAX(view->topleft.y, 0);
 		view->topleft.y = MIN(view->topleft.y, view->total.y - 1);
-		memory_view_set_cursor_pos(view, memdata->expression.result, memdata->bytes_per_chunk * 8 - 4);
+		resultbyte  = memory_address_to_byte(space, memdata->expression.result) & space->logbytemask;
+
+		memory_view_set_cursor_pos(view, resultbyte, memdata->bytes_per_chunk * 8 - 4);
 	}
 
 	/* expression is clean at this point, and future recomputation is not necessary */
