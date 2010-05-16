@@ -2578,7 +2578,8 @@ V-V                           TP-027
 	DRIVER( bionicc1 )	/*  3/1987 (c) 1987 (US) */
 	DRIVER( bionicc2 )	/*  3/1987 (c) 1987 (US) */
 	DRIVER( topsecrt )	/*  3/1987 (c) 1987 (Japan) */
-	DRIVER( 1943 )		/*  6/1987 (c) 1987 (US) */
+	DRIVER( 1943 )		/*  6/1987 (c) 1987 (Euro) */
+	DRIVER( 1943u )		/*  6/1987 (c) 1987 (US) */
 	DRIVER( 1943j )		/*  6/1987 (c) 1987 (Japan) */
 	DRIVER( blktiger )	/*  8/1987 (c) 1987 (US) */
 	DRIVER( blktigerb1 )/* bootleg */
