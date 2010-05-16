@@ -855,11 +855,6 @@ RAM1 are BSI BS62LV1025SC-70 RAM chips
 
 J1 is an 2 pin connector, unknown purpose
 
-ASTRO M1.2 PCB is nearly the same as M1.1 but with the following differences:
- Astro F02 FPGA is dated 2005-09-17 (at least for Win Win Bingo)
- OSC is 24MHz
- Boards are known to have either Astro V06 0430 or Astro V07 0610
-
 ***************************************************************************/
 
 ROM_START( zoo )
