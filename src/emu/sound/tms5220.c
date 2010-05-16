@@ -50,8 +50,8 @@ TODO:
     * If a command is still executing, /READY will be kept high until the command has
       finished if the next command is written.
     * tomcat has a 5220 which is not hooked up at all
-    * documentation is inconsistent in the patents about what data is returned for chirp rom addresses (base 0) 41 to 51; the patent says the 'rom returns zeroes for locations beyond 40', but at the same time the rom stores the complement of the actual chirp rom value, so are locations beyond 40 = 0x00(0) or = 0xFF(-1)? The latter seems more likely to me, and that is how it is currently implemented. (LN).
-    * Is the TS=0 forcing energy to 0 for next frame in the interpolator actually correct?
+    * documentation is inconsistent in the patents about what data is returned for chirp rom addresses (base 0) 41 to 51; the patent says the 'rom returns zeroes for locations beyond 40', but at the same time the rom stores the complement of the actual chirp rom value, so are locations beyond 40 = 0x00(0) or = 0xFF(-1)? The patent text and images imply 0x00, but I'm (LN) not completely convinced yet.
+    * Is the TS=0 forcing energy to 0 for next frame in the interpolator actually correct? I'm (LN) guessing no. The patent schematics state that TS=0 shuts off the output dac completely, though doesn't affect the I/O pin.
 
 Pedantic detail from observation of real chip:
 The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
@@ -86,57 +86,37 @@ looping: uses old interface
 portraits: uses *NO* interface; the i/o cpu hasn't been hooked to anything!
 dotron and midwayfb(mcr.c): uses old interface
 
-    Email from Lord Nightmare having a lot more detail follows:
 
-    Yes, there is at least two more differences:
-The 5220 is 'noisier' when playing unvoiced frames than the 5220C is; I
-think the 5220C may use a different energy table (or use one value lower
-in the normal energy table) than the 5220 does, possibly only when
-playing unvoiced frames, but I can't prove this without a decap; the
-5220C's PROMOUT pin (for dumping the lpc tables as played) is
-nonfunctional due to changed design or a die bug.
-In addition, the NOP commands on the FIFO interface have been changed
-and data passed in the low bits has a meaning regarding frame length:
-commands :
-(lsb is right, msb is left; x means don't care)
-x0x0xbcc : (5220: NOP) (5220C: select frame length by cc, and b selects
-whether every frame is preceeded by 2 bits to select the frame length
-(instead of using the value set by cc)) (default is 00 for frame length
-(200 samples) and 0 for whether the preceeding 2 bits are enabled (off))
-x001xxxx: sends eight read bit commands (M0 high M1 low) to VSM and
-reads the resulting bits serially into a temporary register, which
-becomes readable as the next byte read from the tms52xx once ready goes
-active.
+    Documentation of chip commands:
+    x0x0xbcc : on 5200/5220: NOP (does nothing); on 5220C: Select frame length by cc, and b selects whether every frame is preceeded by 2 bits to select the frame length (instead of using the value set by cc); the default (and after a reset command) is as if '0x00' was written, i.e. for frame length (200 samples) and 0 for whether the preceeding 2 bits are enabled (off)
 
-Note the bit order of the byte read from the TMS52xx is BACKWARDS as
-compared to the actual data order as in the rom on the VSM chips! This
-was IMHO a rather silly design decision of TI. (I asked Larry
-Brantingham about this but he wasn't involved with the TMS52xx chips,
-just the 5100)
-There's ASCII data in the TI 99/4 speech module VSMs which has the bit
-order reversed on purpose because of this!
+    x001xxxx: READ BYTE (RDBY) Sends eight read bit commands (M0 high M1 low) to VSM and reads the resulting bits serially into a temporary register, which becomes readable as the next byte read from the tms52xx once ready goes active. Note the bit order of the byte read from the TMS52xx is BACKWARDS as compared to the actual data order as in the rom on the VSM chips; the read byte command of the tms5100 reads the bits in the 'correct' order. This was IMHO a rather silly design decision of TI. (I (LN) asked Larry Brantingham about this but he wasn't involved with the TMS52xx chips, just the 5100); There's ASCII data in the TI 99/4 speech module VSMs which has the bit order reversed on purpose because of this!
+    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
 
-x011xxxx: sends a read and branch command (M0 high, M1 high) to force
-VSM to set its data pointer to whatever the data is at its current
-pointer location is)
-x100aaaa: send a load address command (M0 low M1 high) to vsm with the 4
-'a' bits
-x101xxxx: 'speak' begins speaking from current address in the data
-pointer of the vsms
-x110xxxx: 'speak external' begins speaking from the 16 byte fifo
-x111xxxx: resets the speech synthesis core immediately; clears the bit
-offset counter in the fifo to the nearest byte 'forward ', but does NOT
-clear the fifo, annoyingly!
+    x011xxxx: READ AND BRANCH (RB) Sends a read and branch command (M0 high, M1 high) to force VSM to set its data pointer to whatever the data is at its current pointer location is)
+    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
 
-Its also possible but inconclusive that the chirp table was changed.
-The LPC tables between the 5220 and 5220C are MOSTLY the same of not
-completely so, but as mentioned above the energy table has some sort of
-difference.
+    x100aaaa: LOAD ADDRESS (LA) Send a load address command (M0 low M1 high) to VSM with the 4 'a' bits; Note you need to send four or five of these in sequence to actually specify an address to the vsm.
+    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
+
+    x101xxxx: SPEAK (SPK) Begins speaking, pulling spech data from the current address pointer location of the VSM modules.
+
+    x110xxxx: SPEAK EXTERNAL (SPKEXT) Clears the FIFO using SPKEE line, then sets TALKD (TALKST remains zero) until 8 bytes have been written to the FIFO, at which point it begins speaking, pulling data from the 16 byte fifo.
+    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
+
+    x111xxxx: RESET (RST) Resets the speech synthesis core immediately, and clears the FIFO.
 
 
-As for which games used which chips, from the TMS5220 wikipedia page:
+    Other chip differences:
+    The 5220 is 'noisier' when playing unvoiced frames than the 5220C is; I (LN) think the 5220C may use a different energy table (or use one value lower in the normal energy table) than the 5220 does, possibly only when playing unvoiced frames, but I can't prove this without a decap; the 5220C's PROMOUT pin (for dumping the lpc tables as played) is non-functional due to a changed design or a die bug (or may need special timing to know exactly when to read it, different than the 5200 and 5220 which are both easily readable).
+    In addition, the NOP commands on the FIFO interface have been changed on the 5220C and data passed in the low bits has a meaning regarding frame length, see above.
 
-TMS5200 AKA TMC0285: (1981 to 1983ish when supplies ran low)
+    It is also possible but inconclusive that the chirp table was changed; The LPC tables between the 5220 and 5220C are MOSTLY the same of not completely so, but as mentioned above the energy table has some sort of difference.
+
+
+As for which games used which chips:
+
+TMS5200 AKA TMC0285: (1980 to 1983)
     Arcade: Zaccaria's 'money money' and 'jack rabbit'; Bally/Midway's
 'Discs of Tron' (all environmental cabs and a few upright cabs; the code
 exists on all versions for the speech though, and upright cabs can be
@@ -147,7 +127,7 @@ upgraded to add it by hacking on a 'Squawk & Talk' pinball speech board
 serial chips); Street Electronics Corp.'s Apple II 'Echo 2' Speech
 synthesizer (early cards only)
 
-TMS5220: (mostly on things made between 1982 and 1984-1985)
+TMS5220: (mostly on things made between 1981 and 1984-1985)
     Arcade: Bally/Midway's 'NFL Football'; Atari's 'Star Wars',
 'Firefox', 'Return of the Jedi', 'Road Runner', 'The Empire Strikes
 Back' (all verified with schematics); Venture Line's 'Looping' and 'Sky
@@ -168,11 +148,6 @@ this), mostly on later pinballs with LPC speech)
     Home computer: Street Electronics Corp.'s 'ECHO' parallel/hobbyist
 module (6511 based), IBM PS/2 Speech adapter (parallel port connection
 device), PES Speech adapter (serial port connection)
-
-  Changes by R. Nabet (from 2001)
-   * added Speech ROM support
-   * modified code so that the beast only start speaking at the start of next frame, like the data
-     sheet says
 
 ***********************************************************************************************/
 
@@ -227,9 +202,9 @@ device), PES Speech adapter (serial port connection)
 #undef DEBUG_PIN_READS
 // above spams the errorlog with i/o ready messages whenever the ready or irq pin is read
 #undef DEBUG_GENERATION
-// above dumps some debug information related to the sample generation loop, i.e. when ramp frames happen
+// above dumps debug information related to the sample generation loop, i.e. whether interpolation is inhibited or not, and what the current and target values for each frame are.
 #undef DEBUG_GENERATION_VERBOSE
-// above dumps MUCH MORE debug information related to the sample generation loop, namely the k, pitch and energy values for EVERY SINGLE SAMPLE.
+// above dumps MUCH MORE debug information related to the sample generation loop, namely the excitation, energy, pitch, k*, and output values for EVERY SINGLE SAMPLE during a frame.
 #undef DEBUG_LATTICE
 // above dumps the lattice filter state data each sample.
 #undef DEBUG_CLIP
@@ -237,7 +212,7 @@ device), PES Speech adapter (serial port connection)
 #undef DEBUG_IO_READY
 // above debugs the io ready callback
 #undef DEBUG_RS_WS
-// above debugs the new up-and-coming tms5220_data_r and data_w access methods which actually respect rs and ws
+// above debugs the new tms5220_data_r and data_w access methods which actually respect rs and ws
 
 #define MAX_SAMPLE_CHUNK	512
 #define FIFO_SIZE 16
@@ -274,10 +249,10 @@ struct _tms5220_state
 
 	/* these contain global status bits */
 	UINT8 speaking_now;		/* True only if actual speech is being generated right now. Is set when a speak vsm command happens OR when speak external happens and buffer low becomes nontrue; Is cleared when speech halts after the last stop frame or the last frame after talk status is otherwise cleared.*/
-	UINT8 speak_external;	/* DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
-	UINT8 talk_status;		/* TS status bit is 1 i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared by 3 things: 1. when a STOP command has just been processed as a new frame in the speech stream; 2. if the fifo runs out in speak external mode; 3. on power-up/during a reset command; When it gets cleared, speak_external is also cleared, an interrupt is generated, and speaking_now will be cleared when the next frame starts. */
-	UINT8 buffer_low;		/* FIFO has less than 8 bytes in it */
-	UINT8 buffer_empty;		/* FIFO is empty*/
+	UINT8 speak_external;	/* If 1, DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
+	UINT8 talk_status;		/* If 1, TS status bit is 1, i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared by 3 things: 1. when a STOP command has just been processed as a new frame in the speech stream; 2. if the fifo runs out in speak external mode; 3. on power-up/during a reset command; When it gets cleared, speak_external is also cleared, an interrupt is generated, and speaking_now will be cleared when the next frame starts. */
+	UINT8 buffer_low;		/* If 1, FIFO has less than 8 bytes in it */
+	UINT8 buffer_empty;		/* If 1, FIFO is empty */
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
@@ -314,37 +289,33 @@ struct _tms5220_state
 	INT32 target_k[10];
 #endif
 
-	UINT16 previous_energy;         /* needed for lattice filter to match patent */
+	UINT16 previous_energy;	/* needed for lattice filter to match patent */
 
-	//UINT8 interp_period; /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
-	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
-	UINT8 inhibit;			/* interpolation is inhibited until the DIV1 period */
+	//UINT8 interp_period;	/* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
+	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24; TODO: rename this variable to PC/merge into PC function */
+	UINT8 inhibit;			/* If 1, interpolation is inhibited until the DIV1 period */
 	//UINT8 spkslow_delay;  /* delay counter for interp count, only used on tms51xx */
-	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
-	UINT8 tms5220c_rate; /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
+	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199; TODO: merge into PC function */
+	UINT8 tms5220c_rate;	/* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
 	UINT16 pitch_count;		/* pitch counter; provides chirp rom address */
 
 	INT32 u[11];
 	INT32 x[10];
 
-	INT32 RNG;      /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
+	UINT16 RNG;      /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
 	INT16 excitation_data;
 
 	/* R Nabet : These have been added to emulate speech Roms */
-	UINT8 schedule_dummy_read;			/* set after each load address, so that next read operation
-                                              is preceded by a dummy read */
-
+	UINT8 schedule_dummy_read;			/* set after each load address, so that next read operation is preceded by a dummy read */
 	UINT8 data_register;				/* data register, used by read command */
 	UINT8 RDB_flag;					/* whether we should read data register or status register */
 
 	/* io_ready: page 3 of the datasheet specifies that READY will be asserted until
      * data is available or processed by the system.
      */
-
 	UINT8 io_ready;
 
 	/* flag for "true" timing involving rs/ws */
-
 	UINT8 true_timing;
 
 	/* rsws - state, rs bit 1, ws bit 0 */
@@ -565,7 +536,24 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 
 /**********************************************************************************************
 
-     update_status_and_ints -- check to see if the buffer low flag should be on or off
+     update_status_and_ints -- check to see if the various flags should be on or off
+     Description of flags, and their position in the status register:
+      From the data sheet:
+        bit D0(bit 7) = TS - Talk Status is active (high) when the VSP is processing speech data.
+                Talk Status goes active at the initiation of a Speak command or after nine
+                bytes of data are loaded into the FIFO following a Speak External command. It
+                goes inactive (low) when the stop code (Energy=1111) is processed, or
+                immediately by a buffer empty condition or a reset command.
+        bit D1(bit 6) = BL - Buffer Low is active (high) when the FIFO buffer is more than half empty.
+                Buffer Low is set when the "Last-In" byte is shifted down past the half-full
+                boundary of the stack. Buffer Low is cleared when data is loaded to the stack
+                so that the "Last-In" byte lies above the half-full boundary and becomes the
+                eighth data byte of the stack.
+        bit D2(bit 5) = BE - Buffer Empty is active (high) when the FIFO buffer has run out of data
+                while executing a Speak External command. Buffer Empty is set when the last bit
+                of the "Last-In" byte is shifted out to the Synthesis Section. This causes
+                Talk Status to be cleared. Speed is terminated at some abnormal point and the
+                Speak External command execution is terminated.
 
 ***********************************************************************************************/
 
@@ -654,23 +642,6 @@ static int extract_bits(tms5220_state *tms, int count)
 
      tms5220_status_read -- read status or data from the TMS5220
 
-      From the data sheet:
-        bit D0(bit 7) = TS - Talk Status is active (high) when the VSP is processing speech data.
-                Talk Status goes active at the initiation of a Speak command or after nine
-                bytes of data are loaded into the FIFO following a Speak External command. It
-                goes inactive (low) when the stop code (Energy=1111) is processed, or
-                immediately by a buffer empty condition or a reset command.
-        bit D1(bit 6) = BL - Buffer Low is active (high) when the FIFO buffer is more than half empty.
-                Buffer Low is set when the "Last-In" byte is shifted down past the half-full
-                boundary of the stack. Buffer Low is cleared when data is loaded to the stack
-                so that the "Last-In" byte lies above the half-full boundary and becomes the
-                ninth data byte of the stack.
-        bit D2(bit 5) = BE - Buffer Empty is active (high) when the FIFO buffer has run out of data
-                while executing a Speak External command. Buffer Empty is set when the last bit
-                of the "Last-In" byte is shifted out to the Synthesis Section. This causes
-                Talk Status to be cleared. Speed is terminated at some abnormal point and the
-                Speak External command execution is terminated.
-
 ***********************************************************************************************/
 
 static int tms5220_status_read(tms5220_state *tms)
@@ -694,7 +665,6 @@ static int tms5220_status_read(tms5220_state *tms)
 }
 
 
-
 /**********************************************************************************************
 
      tms5220_ready_read -- returns the ready state of the TMS5220
@@ -713,6 +683,8 @@ static int tms5220_ready_read(tms5220_state *tms)
 /**********************************************************************************************
 
      tms5220_cycles_to_ready -- returns the number of cycles until ready is asserted
+     NOTE: this function is deprecated and is known to be VERY inaccurate.
+     Use at your own peril!
 
 ***********************************************************************************************/
 
@@ -766,7 +738,6 @@ static int tms5220_int_read(tms5220_state *tms)
 }
 
 
-
 /**********************************************************************************************
 
      tms5220_process -- fill the buffer with a specific number of samples
@@ -778,8 +749,6 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
     int buf_count=0;
     int i, interp_period, bitout, zpar;
     INT32 this_sample;
-
-//tryagain:
 
     /* if we're empty and still not speaking, fill with nothingness */
 	if (!tms->speaking_now)
@@ -975,7 +944,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				tms->excitation_data = ~0x3F; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so either 01000000(0x40) or 11000000(0xC0)*/
 			else
 				tms->excitation_data = 0x40;
-#else
+#else // hack to double unvoiced strength, doesn't match patent
 			if (tms->RNG & 1)
 				tms->excitation_data = ~0x7F;
 			else
@@ -997,11 +966,11 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
               tms->excitation_data = tms->coeff->chirptable[51];
           else /*tms->pitch_count < 51*/
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
-#else
-          if (tms->pitch_count >= 51)
-              tms->excitation_data = tms->coeff->chirptable[51]^~0x0;
-          else /*tms->pitch_count < 51*/
-              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]^~0x0;
+#else // hack based sort of on the D68_10.ASM file from qboxpro, which has  0x580 and 0x3A80 at the end of its chirp table
+          if (tms->pitch_count >= 45)
+              tms->excitation_data = -128;
+          else /*tms->pitch_count < 45*/
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
 #endif
         }
 
@@ -1009,11 +978,11 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 	for (i=0; i<20; i++)
 	{
             bitout = ((tms->RNG >> 12) & 1) ^
-                     ((tms->RNG >> 10) & 1) ^
-                     ((tms->RNG >>  9) & 1) ^
+                     ((tms->RNG >>  3) & 1) ^
+                     ((tms->RNG >>  2) & 1) ^
                      ((tms->RNG >>  0) & 1);
-            tms->RNG >>= 1;
-            tms->RNG |= bitout << 12;
+            tms->RNG <<= 1;
+            tms->RNG |= bitout;
 	}
 		this_sample = lattice_filter(tms); /* execute lattice filter */
 #ifdef DEBUG_GENERATION_VERBOSE
@@ -1651,7 +1620,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
 			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
 			tms->io_ready = 0;
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 		}
 	}
 }
