@@ -6576,19 +6576,17 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const
 
 DRIVER_INIT( _32x )
 {
-
-
 	_32x_dram0 = auto_alloc_array(machine, UINT16, 0x40000/2);
 	_32x_dram1 = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	memset(_32x_dram0, 0x00, 0x40000);
 	memset(_32x_dram1, 0x00, 0x40000);
 
-	_32x_palette = auto_alloc_array(machine, UINT16, 0x200/2);
 	_32x_palette_lookup = auto_alloc_array(machine, UINT16, 0x200/2);
+	_32x_palette = auto_alloc_array(machine, UINT16, 0x200/2);
 
-	memset(_32x_palette, 0x00, 0x200);
 	memset(_32x_palette_lookup, 0x00, 0x200);
+	memset(_32x_palette, 0x00, 0x200);
 
 
 	_32x_display_dram = _32x_dram0;
