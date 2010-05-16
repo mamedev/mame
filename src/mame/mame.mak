@@ -1213,6 +1213,7 @@ $(MAMEOBJ)/sigma.a: \
 	$(DRIVERS)/nyny.o \
 	$(DRIVERS)/r2dtank.o \
 	$(DRIVERS)/sigmab52.o \
+	$(DRIVERS)/sigmab98.o \
 	$(DRIVERS)/spiders.o $(AUDIO)/spiders.o \
 	$(DRIVERS)/sub.o \
 

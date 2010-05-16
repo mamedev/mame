@@ -142,6 +142,7 @@ WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split1_w );  /* uses paletteram */
 WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split2_w );  /* uses paletteram2 */
 
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_le_w );
+WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_be_w );
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_split1_w );
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_split2_w );
 WRITE16_HANDLER( paletteram16_xRRRRRGGGGGBBBBB_word_w );

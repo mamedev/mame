@@ -927,6 +927,12 @@ WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_le_w )
 	set_color_555(space->machine, offset / 2, 10, 5, 0, paletteram16_le(space->machine, offset));
 }
 
+WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_be_w )
+{
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_555(space->machine, offset / 2, 10, 5, 0, paletteram16_be(space->machine, offset));
+}
+
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_split1_w )
 {
 	space->machine->generic.paletteram.u8[offset] = data;

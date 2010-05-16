@@ -106,23 +106,25 @@ const eeprom_interface eeprom_interface_93C46 =
 	"*111",			// erase        1 11 aaaaaa
 	"*10000xxxx",	// lock         1 00 00xxxx
 	"*10011xxxx",	// unlock       1 00 11xxxx
-	1,
+	1,				// enable_multi_read
+	0				// reset_delay
 //  "*10001xxxx"    // write all    1 00 01xxxx dddddddddddddddd
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
 const eeprom_interface eeprom_interface_93C66B =
 {
-	8,				/* address bits */
-	16,				/* data bits */
-	"*110",			/* read command */
-	"*101",			/* write command */
-	"*111",			/* erase command */
-	"*10000xxxxxx",	/* lock command */
-	"*10011xxxxxx", /* unlock command */
-	1,
-//  "*10001xxxxxx", /* write all */
-//  "*10010xxxxxx", /* erase all */
+	8,				// address bits
+	16,				// data bits
+	"*110",			// read command
+	"*101",			// write command
+	"*111",			// erase command
+	"*10000xxxxxx",	// lock command
+	"*10011xxxxxx", // unlock command
+	1,				// enable_multi_read
+	0				// reset_delay
+//  "*10001xxxxxx", // write all
+//  "*10010xxxxxx", // erase all
 };
 
 static void eeprom_write(running_device *device, int bit)

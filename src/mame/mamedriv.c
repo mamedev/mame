@@ -8308,6 +8308,9 @@ Other Sun games
 	DRIVER( jwildb52a )	/* (c) 199? Sigma */
 	DRIVER( jwildb52h )	/* (c) 199? Sigma */
 
+	/* Sigma B98 */
+	DRIVER( gegege )	/* (c) 1997 Banpresto / Sigma */
+
 	/* IGS games ( www.igs.com.tw ) */
 	DRIVER( goldstar )	/* (c) 198? IGS */
 	DRIVER( goldstbl )	/* (c) 198? IGS */
@@ -9568,9 +9571,11 @@ Other Sun games
 	DRIVER( supjolly )	/* (c) 200? unknown */
 
 	/* Astro Corp. */
-	DRIVER( showhand )	/* (c) 1999? Astro Corp. */
-	DRIVER( showhanc )	/* (c) 1999? Astro Corp. */
+	DRIVER( showhand )	/* (c) 2000  Astro Corp. */
+	DRIVER( showhanc )	/* (c) 2000  Astro Corp. */
 	DRIVER( skilldrp )	/* (c) 2002  Astro Corp. */
+	DRIVER( winbingo )	/* (c) 2005? Astro Corp. */
+	DRIVER( winbingoa )	/* (c) 2005? Astro Corp. */
 
 	/* Dyna */
 	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
