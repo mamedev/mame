@@ -649,7 +649,7 @@ PC1 is a push button for test mode
 VR1 is for sound volume
 
       +---------+   +----------------------------+ +----+
-  +---+Connector+---+         Connector          +-+    |
+  +---+Connector+---+   28 Pin Edge  Connector   +-+    |
   |                                                  VR1|
   |                                                     |
 +-+             +------+                                |
@@ -703,84 +703,62 @@ ROM_END
 
 Win Win Bingo
 
-------------------------------------------------------------------------
-ASTRO M1.2
+ASTRO M1.2 PCB:
+ Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
+   Boards are known to have either Astro V06 0430 or Astro V07 0610
+ Astro V102PX-006 at U10 (68K core, has direct connection to program roms)
+ Astro F02 2005-09-17 socketted FPGA type chip (used for encryption?)
+ OKI 6295 clone chip (AD-65 or U6295)
 
-                  ------
-                  |    |
-                  | os1|
-                  |    |
-                  ------
+RAM:
+ 2 x HMI HM62C64P-70
+ 4 x HMI HM6116P-70
+ 2 x BSI BS62LV1023SC-70
 
+EEPROM 93C46
+Batery 3.6V
+OSC    24MHz
 
+PC1 is a push button for test mode
+VR1 is for sound volume
 
-        ---------       ---------       ---------
-        |       |       |       |       |       |
-        | U1    |       |  U24  |       | U30   |
-        |       |       |       |       |       |
-        |       |       |       |       |       |
-        ---------       ---------       ---------
+      +---------+   +----------------------------+ +----+
+  +---+Connector+---+   28 Pin Edge  Connector   +-+    |
+  |                                                  VR1|
+  |                    24MHz        +---------+         |
++-+          +-------+              |ROM#4 U30|         |
+|            | Astro |   HM62C64P   +---------+         |
+|            |  F2   | +----------+ +---------+         |
+|8           |       | |ROM#2  U25| |ROM#3 U26|         |
+|   ULN2003A +-------+ +----------+ +---------+         |
+|L                                                      |
+|i  ULN2003A +------+                                   |
+|n           |Astro |      ROM#7*                 +----+|
+|e           |V102PX|                             |6295||
+|r           +------+                             +----+|
+|                                    +----------+       |
+|C                     +----------+  |          |   +---+
+|o                     |ROM#1  U26|  |  Astro   |   |   |
+|n                     +----------+  |  V06     |   | R |
+|n                                   |  0430    |   | O |
+|e                                   +----------+   | M |
+|c                       HM62C64P                   | # |
+|t                                               J1 | 5 |
+|o            93C46                                 |   |
+|r                        6116      6116      RAM1  +---+
+|                                                       |
++-+ BAT1 PC1              6116      6116      RAM1      |
+  +-----------------------------------------------------+
 
-                        ---------       ---------       
-                        |       |       |       |       
-                        | U25   |       |  U26  |       
-                        |       |       |       |       
-                        |       |       |       |       
-                        ---------       ---------       
-          ------
-          |     |
-          | U10 |
-          |     |
-          ------
+ROM#7 at U16 is an unpopulated 40pin socket
+ROM#1 & ROM#2 are SYNCMOS F29C51001T
+ROM#3 is a 29F1610MC flash rom
+ROM#4 is a 29F1610MC flash rom (optionally populated based on game)
+ROM#5 is a MX 27C4000PC-12
 
+RAM1 are BSI BS62LV1023SC-70 RAM chips
 
-                        ---------       ---------       
-                        |       |       |       |       
-                        | U31   |       |  U32  |       
-                        |       |       |       |       
-                        |       |       |       |       
-                        ---------       ---------       
-
-
-                        ---------                       ---------       
-                        |       |                       |       |       
-                        | U27   |                       |  U35  |       
-                        |       |                       |       |       
-                        |       |                       |       |       
-                        ---------                       ---------       
-
-                        ---------       ---------       ---------
-                        |       |       |       |       |       |
-                        | U28   |       |  U33  |       | U39   |
-                        |       |       |       |       |       |
-                        |       |       |       |       |       |
-                        ---------       ---------       ---------
-                
-                        ---------       ---------       ---------
-                        |       |       |       |       |       |
-                        | U29   |       |  U34  |       | U41   |
-                        |       |       |       |       |       |
-                        |       |       |       |       |       |
-                        ---------       ---------       ---------
---------------------------------------------------------------------
-
-U1= ASTRO F02 2005-09-17
-U10= ASTRO V102PX-006
-U32= ASTRO V06 0430
-OS1= QUARTZ 24.000MHZ
-U25= SYNCMOS F29C51001T
-U31= SYNCMOS F29C51001T
-U30= MX 29F1610MC
-U26= MX 29F1610MC
-U35= MX 27C4000PC-12
-U24= HMI HM62C64P
-U27= HMI HM62C64P
-U28= HMI HM6116P
-U29= HMI HM6116P
-U33= HMI HM6116P
-U34= HMI HM6116P
-U39= BSI BS62LV1023SC
-U41= BSI BS62LV1023SC
+J1 is an 2 pin connector, unknown purpose
 
 ***************************************************************************/
 
@@ -791,7 +769,7 @@ ROM_START( winbingo )
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE )
 	ROM_LOAD( "mxf291610mc.u26",          0x000000, 0x200000, CRC(ad1f61e7) SHA1(845aa01d49c50bcadaed16d76c0dd9131a425b46) )
-	ROM_LOAD( "mx29f1610mc.u30.bad.dump", 0x200000, 0x0a0000, BAD_DUMP CRC(6da439c5) SHA1(6afc0c800fe57b9b34ca317f4d1c040b11d3d988) )
+	ROM_LOAD( "mx29f1610mc.u30.bad.dump", 0x200000, 0x0a0000, BAD_DUMP CRC(6da439c5) SHA1(6afc0c800fe57b9b34ca317f4d1c040b11d3d988) ) /* Should be same as U30 below?? */
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "mx27c4000pc.u35", 0x00000, 0x80000, CRC(445d81c0) SHA1(cacb9c262740c31ea42f406e9f960a1edd1b3ead) )
@@ -814,32 +792,73 @@ ROM_END
 
 Zoo by Astro
 
-Astro M1.1 PCB
+ZOO Z0.02.D at both U25 & U26 are Winbond W27C512 roms and are program code
+5 ZOO is a MX 27C4000 rom and is the sample rom
+29F1610mc at U26 (yes "U26" is present twice on the PCB) are the graphics
+
+ASTRO M1.1 PCB:
  Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
- Astro V102PX-005 T042652846 at U10 (68K core? has direct connection to program roms)
- Astro F02 2005-02-18 socketted FPGA type chip
- OKI 6295 clone chip (AD-65)
+ Astro V102PX-005 T042652846 at U10 (68K core, has direct connection to program roms)
+ Astro F02 2005-02-18 socketted FPGA type chip (used for encryption?)
+ OKI 6295 clone chip (AD-65 or U6295)
 
 RAM:
  2 x KTC KT76C88-70LL
  4 x HM6116L-70
  2 x BSI BS62LV1025SC-70
 
-EEPROM
- Atmel 93C46
+EEPROM 93C46
+Batery 3.6V
+OSC    26.824MHz
 
-OSC
- 26.824MHz
+PC1 is a push button for test mode
+VR1 is for sound volume
 
-Battery
- 3.6V
-
-One push button for reset or test mode
-One VR pot for sound volume
 
 ZOO Z0.02.D at both U25 & U26 are Winbond W27C512 roms and are program code
 5 ZOO is a MX 27C4000 rom and is the sample rom
 29F1610mc at U26 (yes "U26" is present twice on the PCB) are the graphics
+
+      +---------+   +----------------------------+ +----+
+  +---+Connector+---+   28 Pin Edge  Connector   +-+    |
+  |                                                  VR1|
+  |                   26.824MHz     +---------+         |
++-+          +-------+              |ROM#4 U30|         |
+|            | Astro |   KT76C88    +---------+         |
+|            |  F2   | +----------+ +---------+         |
+|8           |       | |ROM#2  U25| |ROM#3 U26|         |
+|   ULN2003A +-------+ +----------+ +---------+         |
+|L                                                      |
+|i  ULN2003A +------+                                   |
+|n           |Astro |      ROM#7*                 +----+|
+|e           |V102PX|                             |6295||
+|r           +------+                             +----+|
+|                                    +----------+       |
+|C                     +----------+  |          |   +---+
+|o                     |ROM#1  U26|  |  Astro   |   |   |
+|n                     +----------+  |  V06     |   | R |
+|n                                   |  0430    |   | O |
+|e                                   +----------+   | M |
+|c                       KT76C88                    | # |
+|t                                               J1 | 5 |
+|o            93C46                                 |   |
+|r                        6116      6116      RAM1  +---+
+|                                                       |
++-+ BAT1 PC1              6116      6116      RAM1      |
+  +-----------------------------------------------------+
+
+ROM#7 at U16 is an unpopulated 40pin socket
+ROM#3 is a 29F1610MC flash rom
+ROM#4 is a 29F1610MC flash rom (optionally populated based on game)
+
+RAM1 are BSI BS62LV1025SC-70 RAM chips
+
+J1 is an 2 pin connector, unknown purpose
+
+ASTRO M1.2 PCB is nearly the same as M1.1 but with the following differences:
+ Astro F02 FPGA is dated 2005-09-17 (at least for Win Win Bingo)
+ OSC is 24MHz
+ Boards are known to have either Astro V06 0430 or Astro V07 0610
 
 ***************************************************************************/
 
