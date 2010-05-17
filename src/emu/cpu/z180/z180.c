@@ -45,6 +45,16 @@
 
 /*****************************************************************************
 
+	TODO:
+		- HALT processing is not yet perfect. The manual states that
+		  during HALT, all dma and internal i/o incl. timers continue to
+		  work. Currently, only timers are implemented. Ideally, the
+		  burn_cycles routine would go away and halt processing be
+		  implemented in cpu_execute.
+ *****************************************************************************/
+
+/*****************************************************************************
+
 Z180 Info:
 
 Known clock speeds (from ZiLOG): 6, 8, 10, 20 & 33MHz
@@ -122,6 +132,7 @@ struct _z180_state
 	UINT8	rtemp;
 	UINT32	ioltemp;
 	int icount;
+	int old_icount;				/* for burning cycles */
 	UINT8 *cc[6];
 };
 
@@ -1447,7 +1458,16 @@ static void z180_writecontrol(z180_state *cpustate, offs_t port, UINT8 data)
 
 	case Z180_TCR:
 		LOG(("Z180 '%s' TCR    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TCR_WMASK));
-		cpustate->IO_TCR = (cpustate->IO_TCR & ~Z180_TCR_WMASK) | (data & Z180_TCR_WMASK);
+		{
+			UINT16 old = cpustate->IO_TCR;
+			/* Force reload on state change */
+			cpustate->IO_TCR = (cpustate->IO_TCR & ~Z180_TCR_WMASK) | (data & Z180_TCR_WMASK);
+			if (!(old & Z180_TCR_TDE0) && (cpustate->IO_TCR & Z180_TCR_TDE0))
+				cpustate->tmdr_value[0] = 0; //cpustate->IO_RLDR0L | (cpustate->IO_RLDR0H << 8);
+			if (!(old & Z180_TCR_TDE1) && (cpustate->IO_TCR & Z180_TCR_TDE1))
+				cpustate->tmdr_value[1] = 0; //cpustate->IO_RLDR1L | (cpustate->IO_RLDR1H << 8);
+		}
+
 		break;
 
 	case Z180_IO11:
@@ -2230,6 +2250,9 @@ static CPU_RESET( z180 )
 	cpustate->IO_OMCR    = Z180_OMCR_RESET;
 	cpustate->IO_IOCR    = Z180_IOCR_RESET;
 
+	/* reset old_icount */
+	cpustate->old_icount = 0;
+
 	if (cpustate->daisy)
 		z80daisy_reset(cpustate->daisy);
 	z180_mmu(cpustate);
@@ -2246,23 +2269,25 @@ static int handle_timers(z180_state *cpustate, int current_icount, int previous_
 		/* Programmable Reload Timer 0 */
 		if(cpustate->IO_TCR & Z180_TCR_TDE0)
 		{
-			cpustate->tmdr_value[0]--;
 			if(cpustate->tmdr_value[0] == 0)
 			{
 				cpustate->tmdr_value[0] = cpustate->IO_RLDR0L | (cpustate->IO_RLDR0H << 8);
 				cpustate->tif[0] = 1;
 			}
+			else
+				cpustate->tmdr_value[0]--;
 		}
 
 		/* Programmable Reload Timer 1 */
 		if(cpustate->IO_TCR & Z180_TCR_TDE1)
 		{
-			cpustate->tmdr_value[1]--;
 			if(cpustate->tmdr_value[1] == 0)
 			{
 				cpustate->tmdr_value[1] = cpustate->IO_RLDR1L | (cpustate->IO_RLDR1H << 8);
 				cpustate->tif[1] = 1;
 			}
+			else
+				cpustate->tmdr_value[1]--;
 		}
 
 		if((cpustate->IO_TCR & Z180_TCR_TIE0) && cpustate->tif[0])
@@ -2312,7 +2337,9 @@ static void check_interrupts(z180_state *cpustate)
 static CPU_EXECUTE( z180 )
 {
 	z180_state *cpustate = get_safe_token(device);
-	int old_icount = cycles;
+
+	cpustate->old_icount = cycles;
+
 	cpustate->icount = cycles;
 
 	/* check for NMIs on the way in; they can only be set externally */
@@ -2346,7 +2373,7 @@ again:
 			debugger_instruction_hook(device, cpustate->_PCD);
 
 			z180_dma0(cpustate);
-			old_icount = handle_timers(cpustate, cpustate->icount, old_icount);
+			cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 		}
 		else
 		{
@@ -2360,13 +2387,13 @@ again:
 				cpustate->R++;
 
 				EXEC_INLINE(op,ROP(cpustate));
-				old_icount = handle_timers(cpustate, cpustate->icount, old_icount);
+				cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 
 				z180_dma0(cpustate);
-				old_icount = handle_timers(cpustate, cpustate->icount, old_icount);
+				cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 
 				z180_dma1(cpustate);
-				old_icount = handle_timers(cpustate, cpustate->icount, old_icount);
+				cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 
 				/* If DMA is done break out to the faster loop */
 				if ((cpustate->IO_DSTAT & Z180_DSTAT_DME) != Z180_DSTAT_DME)
@@ -2386,7 +2413,7 @@ again:
 			debugger_instruction_hook(device, cpustate->_PCD);
 			cpustate->R++;
 			EXEC_INLINE(op,ROP(cpustate));
-			old_icount = handle_timers(cpustate, cpustate->icount, old_icount);
+			cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 
 			/* If DMA is started go to check the mode */
 			if ((cpustate->IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
@@ -2394,6 +2421,7 @@ again:
         } while( cpustate->icount > 0 );
 	}
 
+    //cpustate->old_icount -= cpustate->icount;
 	return cycles - cpustate->icount;
 }
 
@@ -2403,12 +2431,13 @@ again:
 static CPU_BURN( z180 )
 {
 	z180_state *cpustate = get_safe_token(device);
-	if( cycles > 0 )
+	while ( (cycles > 0) && cpustate->HALT )
 	{
+		cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 		/* NOP takes 3 cycles per instruction */
-		int n = (cycles + 2) / 3;
-		cpustate->R += n;
-		cpustate->icount -= 3 * n;
+		cpustate->R += 1;
+		cpustate->icount -= 3;
+		cycles -= 3;
 	}
 }
 
