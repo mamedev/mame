@@ -49,7 +49,7 @@ PO-080-A (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
 ?                       93 Athena no Hatena?                    Athena
 ?                       93 J.J.Squawkers                        Athena / Able
 ?        (93111A)       93 War Of Aero                          Yang Cheng
-P0-081-A                93 Mobile Suit Gundam                   Banpresto
+P0-081-A (BP933KA)      93 Mobile Suit Gundam                   Banpresto
 PO-083-A (BP931)        93 Ultra Toukon Densetsu                Banpresto + Tsuburaya Prod.
 PO-092-A                93 Daioh                                Athena
 PO-096-A (BP934KA)      93 Kamen Rider                          Banpresto
