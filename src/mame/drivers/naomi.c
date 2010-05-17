@@ -4,6 +4,7 @@
 
   Driver by Samuele Zannoli, R. Belmont, ElSemi,
             David Haywood, Angelo Salese and Olivier Galibert
+  Special thanks to CaH4e3, Deunan Knute, drkIIRaziel, Guru, Psyman and ZeZu for the help given.
 
  Notes:
   Several early Naomi games are running on an earlier revision mainboard (HOTD2 etc.) which appears to have an earlier
