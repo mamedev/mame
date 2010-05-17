@@ -2912,6 +2912,7 @@ V-V                           TP-027
 	DRIVER( xmvsfjr2 )	/* 09/09/1996 (c) 1996 (Japan) */
 	DRIVER( xmvsfa )	/* 23/10/1996 (c) 1996 (Asia) */
 	DRIVER( xmvsfar1 )	/* 19/09/1996 (c) 1996 (Asia) */
+	DRIVER( xmvsfar2 )	/* 10/09/1996 (c) 1996 (Asia) */
 	DRIVER( xmvsfh )	/* 04/10/1996 (c) 1996 (Hispanic) */
 	DRIVER( xmvsfb )	/* 23/10/1996 (c) 1996 (Brazil) */
 	DRIVER( batcir )	/* 19/03/1997 (c) 1997 (Euro) */
