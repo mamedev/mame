@@ -201,7 +201,7 @@ static READ16_HANDLER( mk3ghw_dsw_r )
 static DRIVER_INIT( aladbl )
 {
 	/*
-	 * Game does a check @ 1afc00 with work ram fff57c that makes it play like it was intended (i.e. 8 energy hits instead of 2)
+	 * Game does a check @ 1afc00 with work ram fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
 	 */
 	#if ENERGY_CONSOLE_MODE
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
