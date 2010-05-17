@@ -4284,7 +4284,7 @@ GAME( 1999, gt99t400, gt99,     tourny,  gt98s, aamat,    ROT0, "Incredible Tech
 GAME( 1999, gtroyal,  gt99,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee Royal Edition Tournament (v4.02)" , 0) /* PIC 16C54 labeled as ITGF99I */
 
 GAME( 2000, gt2k,     0,        sftm,    aama,  aama,     ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00)" , 0) /* PIC 16C54 labeled as ITGF2K */
-GAME( 2000, gt2kp100, gt2k,     sftm,    aama,  gt2kp,    ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00) with Infinite Loop Protection" , 0) /* PIC 16C54 labeled as ???? */
+GAME( 2000, gt2kp100, gt2k,     sftm,    aama,  gt2kp,    ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00) (more protected)" , 0) /* PIC 16C54 labeled as ???? */
 GAME( 2000, gt2ks100, gt2k,     sftm,    s_ver, s_ver,    ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00S)" , 0) /* PIC 16C54 labeled as ITGF2K-M */
 GAME( 2000, gt2kt500, gt2k,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee 2K Tournament (v5.00)" , 0) /* PIC 16C54 labeled as ITGF2K */
 GAME( 2002, gtsuprem, gt2k,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee Supreme Edition Tournament (v5.10)" , 0) /* PIC 16C54 labeled as ITGF2K-I */
