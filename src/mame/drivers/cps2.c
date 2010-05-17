@@ -537,6 +537,14 @@ Known problems with this driver.
   - Progear slows down more than it should when compared to real hardware. See
     the explanation above for the most likely cause of this problem.
 
+  - Some Hispanic/Brazil region sets have settings adjustable for a card dispenser.
+    Many times, this is defaulted to ON.  Since MAME at this time does not emulate
+    this unique dispenser, you will get a "NO CARD" message flashing on the screen
+    for these sets unless you enter Service Mode and adjust CONFIGURATION > SYSTEM >
+    C. DISPENSER to OFF.  An example of a game which does this is Street Fighter 3
+    Alpha.
+
+
 Driver Note:
 
   - Any new region sets will need full encryption tables dumped to extract the proper
