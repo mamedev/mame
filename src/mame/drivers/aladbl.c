@@ -169,7 +169,17 @@ static WRITE16_HANDLER( aladbl_w )
 
 static READ16_HANDLER( aladbl_r )
 {
-	if (cpu_get_pc(space->cpu)==0x1b2a56) return (input_port_read(space->machine, "MCU") & 0xff0f);             // coins
+	if (cpu_get_pc(space->cpu)==0x1b2a56)
+	{
+		static UINT16 mcu_port;
+
+		mcu_port = input_port_read(space->machine, "MCU");
+
+		if(mcu_port & 0x100)
+			return ((mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
+		else
+			return (0x100); //MCU status, needed if you fall into a pitfall
+	}
 	if (cpu_get_pc(space->cpu)==0x1b2a72) return 0x0000;
 	if (cpu_get_pc(space->cpu)==0x1b2d24) return (input_port_read(space->machine, "MCU") & 0x00f0) | 0x1200;    // difficulty
 	if (cpu_get_pc(space->cpu)==0x1b2d4e) return 0x0000;
@@ -192,7 +202,6 @@ static DRIVER_INIT( aladbl )
 {
 	/*
 	 * Game does a check @ 1afc00 with work ram fff57c that makes it play like it was intended (i.e. 8 energy hits instead of 2)
-	 * It's possible that a DIP-Switch controls this, but game resets as soon as you try to enable it (protection?)
 	 */
 	#if ENERGY_CONSOLE_MODE
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
