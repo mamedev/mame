@@ -3500,7 +3500,7 @@ GAME( 1986, alexkidd,   0,        system16a,        alexkidd,   generic_16a, ROT
 GAME( 1986, alexkidd1,  alexkidd, system16a,        alexkidd,   fd1089a_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", GAME_SUPPORTS_SAVE )
 GAME( 1986, fantzone,   0,        system16a_no7751, fantzone,   generic_16a, ROT0,   "Sega",           "Fantasy Zone (Rev A, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1986, fantzone1,  fantzone, system16a_no7751, fantzone,   generic_16a, ROT0,   "Sega",           "Fantasy Zone (unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1986, fantzonep,  fantzone, system16a_no7751, fantzone,   generic_16a, ROT0,   "Sega",           "Fantasy Zone (NEC 0317-5000 encrypted Z80)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1986, fantzonep,  fantzone, system16a_no7751, fantzone,   generic_16a, ROT0,   "Sega",           "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1988, passsht16a, passsht,  system16a,        passsht16a, passsht16a,  ROT270, "Sega",           "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sdi,        0,        system16a_no7751, sdi,        sdi,         ROT0,   "Sega",           "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinobi,    0,        system16a,        shinobi,    generic_16a, ROT0,   "Sega",           "Shinobi (set 6, System 16A, unprotected)", GAME_SUPPORTS_SAVE )
