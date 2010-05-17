@@ -5,10 +5,8 @@ TODO:
   hardcoded in the drivers; there might be a control bit somewhere.
   Games requiring shadows to affect sprites behind them:
   - Surprise Attack (dark glass walls in level 3)
-  - 88 Games (angle indicator in the long jump event)
+  - 88 Games (angle indicator in the long jump event).
   - Sunset Riders (bull's eye in the saloon cutscene)
-  - TMNT 2 (lightbeam in level 4 cave)
-  - Metamorphic Force (double! lightbeam just before the last boss)
   Games requiring shadows to NOT affect sprites behind them:
   - Asterix (Asterix's shadow would be over his feet otherwise)
   - X-Men is dubious, see enemies halfway through level 1 coming from above with
@@ -4098,6 +4096,7 @@ static DEVICE_START( k05324x )
 
 	k05324x->ramsize = 0x800;
 
+	k05324x->z_rejection = -1;
 	k05324x->memory_region = intf->gfx_memory_region;
 	k05324x->gfx = machine->gfx[intf->gfx_num];
 	k05324x->dx = intf->dx;
@@ -4119,7 +4118,6 @@ static DEVICE_RESET( k05324x )
 	k05324x_state *k05324x = k05324x_get_safe_token(device);
 	int i;
 
-	k05324x->z_rejection = -1;
 	k05324x->rombank = 0;
 
 	for (i = 0; i < 0x10; i++)
