@@ -255,7 +255,7 @@ ROM_START( kicker )
 	ROM_LOAD( "477-l05.d11",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "477-k06.a10",  0x0000, 0x4000, CRC(63202dc4) SHA1(0ffb9cfe3737c2b4f842b57607550a656b013d66) )
+	ROM_LOAD( "477-k06.a10",  0x0000, 0x4000, BAD_DUMP CRC(63202dc4) SHA1(0ffb9cfe3737c2b4f842b57607550a656b013d66) )
 //  ROM_LOAD( "kikra10.a10",  0x0000, 0x2000, CRC(4d156afc) SHA1(29eb66e2ebcf2f1c1d5ece5413d1ebf54663f9cf) ) /* proper Konami rom labels unknown */
 //  ROM_LOAD( "kikra11.a11",  0x2000, 0x2000, CRC(ff6ca5df) SHA1(dfcd445c8b233a0a4168eb249472e53784eda25d) ) /* proper Konami rom labels unknown */
 
