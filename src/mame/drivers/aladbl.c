@@ -186,9 +186,19 @@ static READ16_HANDLER( mk3ghw_dsw_r )
 	return input_port_read(space->machine, dswname[offset]);
 }
 
+#define ENERGY_CONSOLE_MODE 0
 
 static DRIVER_INIT( aladbl )
 {
+	/*
+	 * Game does a check @ 1afc00 with work ram fff57c that makes it play like it was intended (i.e. 8 energy hits instead of 2)
+	 * It's possible that a DIP-Switch controls this, but game resets as soon as you try to enable it (protection?)
+	 */
+	#if ENERGY_CONSOLE_MODE
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	rom[0x1afc08/2] = 0x6600;
+	#endif
+
 	// 220000 = writes to mcu? 330000 = reads?
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x220000, 0x220001, 0, 0, aladbl_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x330000, 0x330001, 0, 0, aladbl_r);
