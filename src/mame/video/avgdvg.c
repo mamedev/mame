@@ -510,7 +510,7 @@ static int avg_latch0(vgdata *vg)
 static int quantum_st2st3(vgdata *vg)
 {
 	/* Quantum doesn't decode latch0 or latch2 but ST2 and ST3 are fed
-     * into the address controller which incremets the PC
+     * into the address controller which increments the PC
      */
 	vg->pc++;
 	return 0;
@@ -548,7 +548,7 @@ static int bzone_latch1(vgdata *vg)
 	/*
      * Battle Zone has clipping hardware. We need to remember the
      * position of the beam when the analog switches hst or lst get
-     * turened off.
+     * turned off.
      */
 
 	if (vg->hst == 0)
@@ -835,9 +835,15 @@ static int tempest_strobe2(vgdata *vg)
 	if ((OP2 == 0) && (vg->dvy12 == 0))
 	{
 		if (vg->dvy & 0x800)
+		{
 			vg->color = vg->dvy & 0xf;
+			vg->enspkl = 0;
+		}
 		else
+		{
 			vg->intensity = (vg->dvy >> 4) & 0xf;
+			vg->enspkl = 1;
+		}
 	}
 
 	return  avg_common_strobe2(vg);
@@ -960,7 +966,14 @@ static int tempest_strobe3(vgdata *vg)
 
 	if ((vg->op & 5) == 0)
 	{
-		data = tempest_colorram[vg->color];
+		if (vg->enspkl)
+		{
+			/* exact pseudorandom sparkle generation is unknown */
+			data = mame_rand(vg->machine) & 0xf;
+		}
+		else
+			data = tempest_colorram[vg->color];
+
 		bit3 = (~data >> 3) & 1;
 		bit2 = (~data >> 2) & 1;
 		bit1 = (~data >> 1) & 1;
