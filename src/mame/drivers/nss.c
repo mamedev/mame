@@ -296,6 +296,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "emu.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
+#include "cpu/z80/z80.h"
 #include "includes/snes.h"
 #include "audio/snes_snd.h"
 
@@ -327,6 +328,138 @@ static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD("spc700", spc_ram_100_r)
 	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
 ADDRESS_MAP_END
+
+/* NSS specific */
+/*
+Notes of interest:
+
+nss_smw
+
+bp 2914 onward is a crc check with the Instruction ROM
+c0fe - c0ff pointers to the checksum
+
+bp 6b9e EEPROM write
+bp 6bf9 EEPROM read
+8080 - 8081 EEPROM checksummed value
+
+8700 - 870c  EEPROM2 checksummed value (0x8707 value and'ed with 0x03)
+bp 6f8d check the EEPROM2 results
+870d EEPROM2 result of checksum
+
+bp 6dce onward looks bogus, but it's probably the way it's intended to be
+
+*/
+
+static READ8_HANDLER( nss_eeprom_r )
+{
+	return 0x40; // eeprom read bit
+}
+
+static WRITE8_HANDLER( nss_eeprom_w )
+{
+	/*
+	x--- ---- EEPROM CS bit?
+	---x ---- EEPROM clock bit?
+	---- x--- EEPROM write bit
+	---- ---x EEPROM reset bit? (active low)
+	*/
+
+//	printf("EEPROM write %02x\n",data);
+}
+
+static ADDRESS_MAP_START( bios_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8fff) AM_RAM // vram perhaps?
+	AM_RANGE(0x9000, 0x9fff) AM_ROM AM_REGION("ibios_rom", 0x7000) // some kind of data that is putted on the above 0x8800-0x8fff range
+	AM_RANGE(0xa000, 0xa000) AM_READ(nss_eeprom_r)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(nss_eeprom_w)
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_RAM AM_REGION("ibios_rom", 0x6000)
+ADDRESS_MAP_END
+
+static READ8_HANDLER( port00_r )
+{
+	/*
+	-x-- ---- almost certainly tied to the vblank signal
+	*/
+
+	static UINT8 vblank_bit;
+
+	vblank_bit^=0x40;
+
+	return vblank_bit | 0xbf;
+}
+
+
+static READ8_HANDLER( port01_r )
+{
+	return 0xff;
+}
+
+static READ8_HANDLER( port02_r )
+{
+	/*
+	---- -x-- (makes the BIOS to jump at 0x4258, sets 0x80 bit 1 and then jumps to unmapped area of the BIOS (bankswitch?))
+	---- ---x
+	*/
+
+	return 0xfb;
+}
+
+static READ8_HANDLER( port03_r )
+{
+	/*
+	x--- ---- EEPROM2 read bit
+	---- ---x tested at 7006, some status bit
+
+	*/
+
+	return 0xfe;
+}
+
+static WRITE8_HANDLER( port80_w )
+{
+	/*
+	---- -x-- written when 0x9000-0x9fff is read, probably a bankswitch
+	---- --x- see port 0x02 note
+	---- ---x BIOS bankswitch
+	*/
+
+	memory_set_bank(space->machine, "bank1", data & 1);
+}
+
+static WRITE8_HANDLER( port82_w ) // EEPROM2?
+{
+	/*
+	---- x--- EEPROM2 clock bit?
+	---- -x-- EEPROM2 write bit
+	---- --x- EEPROM2 CS bit?
+	*/
+}
+
+static ADDRESS_MAP_START( bios_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
+	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
+	AM_RANGE(0x03, 0x03) AM_READ(port03_r)
+	AM_RANGE(0x72, 0x72) AM_WRITENOP //?
+	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(port82_w)
+	AM_RANGE(0xea, 0xea) AM_WRITENOP //?
+
+ADDRESS_MAP_END
+
+
+static MACHINE_START( nss )
+{
+	UINT8 *ROM = memory_region(machine, "bios");
+
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
+	memory_set_bank(machine, "bank1", 0);
+
+	MACHINE_START_CALL(snes);
+}
 
 static INPUT_PORTS_START( snes )
 	PORT_START("SERIAL1_DATA1_L")
@@ -475,6 +608,18 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( nss )
+	MDRV_IMPORT_FROM( snes )
+
+	MDRV_CPU_ADD("bios", Z80, 4000000)
+	MDRV_CPU_PROGRAM_MAP(bios_map)
+	MDRV_CPU_IO_MAP(bios_io_map)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MDRV_CPU_FLAGS(CPU_DISABLE)
+
+	MDRV_MACHINE_START( nss )
+MACHINE_DRIVER_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -486,16 +631,16 @@ MACHINE_DRIVER_END
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION(0x1000,           "addons", 0)		/* add-on chip ROMs (DSP1 could be needed if we dump smk). the second 0x800 host DSP3 ROM in MESS */\
 	ROM_LOAD("dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1))\
-	ROM_REGION(0x10000,         "bios",  0)		/* Bios CPU (what is it?) */ \
-	ROM_LOAD("nss-c.dat"  , 0, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
-	ROM_LOAD("nss-ic14.02", 0, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
+	ROM_REGION(0x20000,         "bios",  0)		/* Bios CPU (what is it?) */ \
+	ROM_LOAD("nss-c.dat"  , 0x10000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
+	ROM_LOAD("nss-ic14.02", 0x18000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
 
 ROM_START( nss )
 	NSS_BIOS
 	ROM_REGION( 0x100000, "user3", ROMREGION_ERASEFF )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "ibios_rom", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -506,7 +651,7 @@ ROM_START( nss_actr )
 	ROM_LOAD( "act-rais.ic2", 0x80000, 0x80000, CRC(4df9cc63) SHA1(3e98d9693d60d125a1257ba79701f27bda688261) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "act-rais.ic8", 0x0000, 0x8000, CRC(08b38ce6) SHA1(4cbb7fd28d98ffef0f17747201625883af954e3a) )
 ROM_END
 
@@ -517,7 +662,7 @@ ROM_START( nss_con3 )
 	ROM_LOAD( "contra3.ic2", 0x80000, 0x80000, CRC(2f3e3b5b) SHA1(0186b92f022701f6ae29984252e6d346acf6550b) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "contra3.ic8", 0x0000, 0x8000, CRC(0fbfa23b) SHA1(e7a1a78a58c64297e7b9623350ec57aed8035a4f) )
 ROM_END
 
@@ -528,7 +673,7 @@ ROM_START( nss_adam )
 	ROM_LOAD( "addams.ic2", 0x80000, 0x80000, CRC(6196adcf) SHA1(a450f278a37d5822f607aa3631831a461e8b147e) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "addams.ic8", 0x0000, 0x8000, CRC(57c7f72c) SHA1(2e3642b4b5438f6c535d6d1eb668e1663062cf78) )
 ROM_END
 
@@ -539,7 +684,7 @@ ROM_START( nss_aten )
 	ROM_LOAD( "amtennis.ic2", 0x80000, 0x80000, CRC(7738c5f2) SHA1(eb0089e9724c7b3834d9f6c47b92f5a1bb26fc77) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "amtennis.ic8", 0x0000, 0x8000, CRC(d2cd3926) SHA1(49fc253b1b9497ef1374c7db0bd72c163ffb07e7) )
 ROM_END
 
@@ -550,7 +695,7 @@ ROM_START( nss_rob3 )
 	ROM_LOAD( "robocop3.ic2", 0x80000, 0x80000, CRC(a94e1b56) SHA1(7403d70504310ad5949a3b45b4a1e71e7d2bce77) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "robocop3.ic8", 0x0000, 0x8000, CRC(90d13c51) SHA1(6751dab14b7d178350ac333f07dd2c3852e4ae23) )
 ROM_END
 
@@ -561,7 +706,7 @@ ROM_START( nss_ncaa )
 	ROM_LOAD( "ncaa.ic2", 0x80000, 0x80000, CRC(83ef6936) SHA1(8e0f38c763861e33684c6ddb742385b0522af78a) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "ncaa.ic8", 0x0000, 0x8000, CRC(b9fa28d5) SHA1(bc538bcff5c19eae4becc6582b5c111d287b76fa) )
 ROM_END
 
@@ -572,7 +717,7 @@ ROM_START( nss_skin )
 	ROM_LOAD( "skins.ic2", 0x80000, 0x80000, CRC(365fd19e) SHA1(f60d7ac39fe83fb98730e73fbef410c90a4ff35b) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "skins.ic8", 0x0000, 0x8000, CRC(9f33d5ce) SHA1(4d279ad3665bd94c7ca9cb2778572bed42c5b298) )
 ROM_END
 
@@ -583,7 +728,7 @@ ROM_START( nss_lwep )
 	ROM_LOAD( "nss-lw.ic2", 0x80000, 0x80000, CRC(86365042) SHA1(f818024c6f858fd2780396b6c83d3a37a97fa08a) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "nss-lw.ic8", 0x0000, 0x8000, CRC(1acc1d5d) SHA1(4c8b100ac5847915aaf3b5bfbcb4f632606c97de) )
 ROM_END
 
@@ -593,7 +738,7 @@ ROM_START( nss_ssoc )
 	ROM_LOAD( "s-soccer.ic1", 0x00000, 0x80000,  CRC(70b7f50e) SHA1(92856118528995e3a0b7d22340d440bef5fd61ac) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "s-soccer.ic3", 0x0000, 0x8000, CRC(c09211c3) SHA1(b274a57f93ae0a8774664df3d3615fb7dbecfa2e) )
 ROM_END
 
@@ -603,7 +748,7 @@ ROM_START( nss_smw )
 	ROM_LOAD( "nss-mw-0_prg.ic1", 0x000000, 0x80000, CRC(c46766f2) SHA1(06a6efc246c6fdb83efab1d402d61d2179a84494) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "mw.ic3", 0x0000, 0x8000, CRC(f2c5466e) SHA1(e116f01342fcf359498ed8750741c139093b1fb2) )
 ROM_END
 
@@ -613,7 +758,7 @@ ROM_START( nss_fzer )
 	ROM_LOAD( "nss-fz-0.ic2", 0x000000, 0x100000, CRC(e9b3cdf1) SHA1(ab616eecd292b94ca74c55446bddd23e9dc3e3bb) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "fz.ic7", 0x0000, 0x8000, CRC(48ae570d) SHA1(934f9fec47dcf9e49936388968d2db50c69950da) )
 ROM_END
 
@@ -623,20 +768,20 @@ ROM_START( nss_sten )
 	ROM_LOAD( "nss-st-0.ic1", 0x000000, 0x100000, CRC(f131611f) SHA1(0797936e1fc9e705cd7e029097fc013a58e69002) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, "user4", 0 )
+	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "st.ic3", 0x0000, 0x8000, CRC(8880596e) SHA1(ec6d68fc2f51f7d94f496cd72cf898db65324542) )
 ROM_END
 
-GAME( 199?, nss,       0,     snes,      snes,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1992, nss_actr,  nss,   snes,      snes,    snes,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // sound sometimes dies, timing issues
-GAME( 1992, nss_adam,  nss,   snes,      snes,    snes,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1992, nss_aten,  nss,   snes,      snes,    snes,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_con3,  nss,   snes,      snes,    snes,    ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_lwep,  nss,   snes,      snes,    snes,    ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_ncaa,  nss,   snes,      snes,    snes,    ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_rob3,  nss,   snes,      snes,    snes,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // any sprite minus Robocop is missing
-GAME( 1992, nss_skin,  nss,   snes,      snes,    snes,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // gfx issue caused by timing at start-up
-GAME( 1992, nss_ssoc,  nss,   snes,      snes,    snes,    ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, nss_smw,   nss,   snes,      snes,    snes,    ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, nss_fzer,  nss,   snes,      snes,    snes,    ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, nss_sten,  nss,   snes,      snes,    snes,    ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 199?, nss,       0,     nss,      snes,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1992, nss_actr,  nss,   nss,      snes,    snes,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // sound sometimes dies, timing issues
+GAME( 1992, nss_adam,  nss,   nss,      snes,    snes,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1992, nss_aten,  nss,   nss,      snes,    snes,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_con3,  nss,   nss,      snes,    snes,    ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_lwep,  nss,   nss,      snes,    snes,    ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_ncaa,  nss,   nss,      snes,    snes,    ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_rob3,  nss,   nss,      snes,    snes,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // any sprite minus Robocop is missing
+GAME( 1992, nss_skin,  nss,   nss,      snes,    snes,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // gfx issue caused by timing at start-up
+GAME( 1992, nss_ssoc,  nss,   nss,      snes,    snes,    ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_smw,   nss,   nss,      snes,    snes,    ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_fzer,  nss,   nss,      snes,    snes,    ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_sten,  nss,   nss,      snes,    snes,    ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
