@@ -769,7 +769,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 		}
 	}
 
-	if (offset != INT2 && offset != VI)
+	if (offset != INT2 && offset != VI && offset != INT1)
 		logerror("%08X:TOM write register @ F00%03X = %04X\n", cpu_get_previouspc(space->cpu), offset * 2, data);
 }
 
