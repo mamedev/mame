@@ -834,16 +834,12 @@ static int tempest_strobe2(vgdata *vg)
 {
 	if ((OP2 == 0) && (vg->dvy12 == 0))
 	{
+		/* Contrary to previous documentation in MAME,
+		Tempest does not have the vg->enspkl bit. */
 		if (vg->dvy & 0x800)
-		{
 			vg->color = vg->dvy & 0xf;
-			vg->enspkl = 0;
-		}
 		else
-		{
 			vg->intensity = (vg->dvy >> 4) & 0xf;
-			vg->enspkl = 1;
-		}
 	}
 
 	return  avg_common_strobe2(vg);
@@ -966,14 +962,7 @@ static int tempest_strobe3(vgdata *vg)
 
 	if ((vg->op & 5) == 0)
 	{
-		if (vg->enspkl)
-		{
-			/* exact pseudorandom sparkle generation is unknown */
-			data = mame_rand(vg->machine) & 0xf;
-		}
-		else
-			data = tempest_colorram[vg->color];
-
+		data = tempest_colorram[vg->color];
 		bit3 = (~data >> 3) & 1;
 		bit2 = (~data >> 2) & 1;
 		bit1 = (~data >> 1) & 1;
