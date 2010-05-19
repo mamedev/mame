@@ -140,14 +140,23 @@ static READ8_HANDLER( dsw0_port_r )
    Paul Priest: tourniquet@mameworld.net */
 
 //static int popflame_prot_count = 0;
+static UINT8 popflame_prot_seed;
+static int r_index;
 
 static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 {
-	static const int values[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
+	static const int seed00[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
+	static const int seed10[4] = { 0x68, 0x60, 0x68, 0x60|0x80 };
 	static int count;
+	static UINT8 seedxx;
+
+	seedxx = (r_index < 0x89) ? 1 : 0;
 
 	count = (count + 1) % 4;
-	return values[count];
+	if(popflame_prot_seed == 0x10)
+		return seed10[count] | seedxx;
+	else
+		return seed00[count] | seedxx;
 
 #if 0
 	if ( cpu_get_pc(space->cpu) == (0x26F2 + 0x03) )
@@ -172,6 +181,67 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 	logerror("CPU #0 PC %06x: unmapped protection read\n", cpu_get_pc(space->cpu));
 	return 0x00;
 #endif
+}
+
+static WRITE8_HANDLER( popflame_protection_w )
+{
+	/*
+	Alternative protection check is executed at the end of stage 3, it seems some kind of pseudo "EEPROM" device:
+2720: 21 98 B0      ld   hl,$B098
+2723: 36 01         ld   (hl),$01
+2725: 0E 40         ld   c,$40
+2727: 73            ld   (hl),e ;reset write index buffer
+2728: 06 40         ld   b,$40
+272A: 1A            ld   a,(de) ;reads the "random" data (ROM index base = 0x3000)
+272B: AB            xor  e
+272C: E6 02         and  $02
+272E: 77            ld   (hl),a ;puts a bit there
+272F: 13            inc  de
+2730: 05            dec  b
+2731: C2 2A 27      jp   nz,$272A ;loops for 0x40 iterations
+2734: 70            ld   (hl),b
+2735: 06 10         ld   b,$10
+2737: 36 04         ld   (hl),$04 ;reset the read buffer index
+2739: CD 6F 27      call $276F
+    276F: 36 08         ld   (hl),$08
+    2771: 3A 90 90      ld   a,($9090) ;reads the protection buffer, it probably rearrange the aforementioned write bits into a bit 2-1-0 packet format
+    2774: E6 07         and  $07
+    2776: 85            add  a,l
+    2777: 6F            ld   l,a
+    2778: 36 00         ld   (hl),$00
+    277A: 05            dec  b
+    277B: C2 6F 27      jp   nz,$276F ;loops for 0x10 iterations
+    277E: 0D            dec  c
+    277F: C9            ret
+273C: C2 28 27      jp   nz,$2728
+273F: 7A            ld   a,d ;total n of iterations = 0x400
+2740: FE 40         cp   $40
+2742: C3 04 25      jp   $2504
+2504: 7D            ld   a,l
+2505: C8            ret  z
+0CF1: FE 20         cp   $20
+0CF3: C8            ret  z ;if A == 0x20 then fine, otherwise ...
+0CF4: 21 10 41      ld   hl,$4110
+0CF7: 25            dec  h
+0CF8: 36 00         ld   (hl),$00 ; ... reset the game
+0CFA: C9            ret
+
+	For now, we use a kludge to feed what the game needs, there could be many possible combinations of this so a PCB tracing / trojan is needed
+	to determine the behaviour of this.
+
+	---x ---- enables alternative protection seed
+	---- x--- increments read index buffer
+	---- -x-- reset read index buffer
+	---- --x- puts a bit into the write buffer
+	---- ---x reset write index buffer
+	*/
+	if(data & 1 && ((popflame_prot_seed & 1) == 0)) //Note: we use the write buffer index
+		r_index = 0;
+	if(data & 8 && ((popflame_prot_seed & 8) == 0))
+		r_index++;
+
+	popflame_prot_seed = data & 0x10;
+
 }
 
 
@@ -785,6 +855,9 @@ static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9000, 0x9000, 0, 0, popflame_protection_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9090, 0x9090, 0, 0, popflame_protection_r);
+
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb000, 0xb0ff, 0, 0, popflame_protection_w);
 }
 
 static int question_offset = 0;
