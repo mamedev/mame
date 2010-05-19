@@ -610,8 +610,8 @@ ROM_START( popflame )
 	ROM_LOAD( "ic38.pop",	  0x1000, 0x1000, CRC(dd2d9601) SHA1(7f495705d6b61c5416e87557a69da7e6457567ac) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic53",		  0x0000, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette low bits */
-	ROM_LOAD( "ic54",		  0x0100, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette high bits */
+	ROM_LOAD( "ic54",		  0x0000, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette low bits */
+	ROM_LOAD( "ic53",		  0x0100, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette high bits */
 ROM_END
 
 ROM_START( popflamea )
@@ -630,8 +630,8 @@ ROM_START( popflamea )
 	ROM_LOAD( "ic38.pop",	  0x1000, 0x1000, CRC(dd2d9601) SHA1(7f495705d6b61c5416e87557a69da7e6457567ac) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic53",		  0x0000, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette low bits */
-	ROM_LOAD( "ic54",		  0x0100, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette high bits */
+	ROM_LOAD( "ic54",		  0x0000, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette low bits */
+	ROM_LOAD( "ic53",		  0x0100, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette high bits */
 ROM_END
 
 ROM_START( popflameb )
@@ -650,8 +650,8 @@ ROM_START( popflameb )
 	ROM_LOAD( "ic38.pop",	  0x1000, 0x1000, CRC(dd2d9601) SHA1(7f495705d6b61c5416e87557a69da7e6457567ac) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic53",		  0x0000, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette low bits */
-	ROM_LOAD( "ic54",		  0x0100, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette high bits */
+	ROM_LOAD( "ic54",		  0x0000, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette low bits */
+	ROM_LOAD( "ic53",		  0x0100, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette high bits */
 ROM_END
 
 /*
@@ -696,8 +696,8 @@ ROM_START( popflamen )
 	ROM_LOAD( "pfb2-10.bin",	  0x1800, 0x0800, CRC(7fe61ed3) SHA1(9654543089ceeec8a3d398eb591abc500dbeaf28) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic53",		  0x0000, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette low bits */
-	ROM_LOAD( "ic54",		  0x0100, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette high bits */
+	ROM_LOAD( "ic54",		  0x0000, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette low bits */
+	ROM_LOAD( "ic53",		  0x0100, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette high bits */
 ROM_END
 
 

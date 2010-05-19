@@ -88,15 +88,38 @@ static const res_net_info naughtyb_net_info =
 
 PALETTE_INIT( naughtyb )
 {
-	rgb_t	*rgb;
+	static const int resistances[2] = { 270, 130 };
+	double weights[2];
 	int i;
 
-	rgb = compute_res_net_all(machine, color_prom, &naughtyb_decode_info, &naughtyb_net_info);
-	for (i = 0; i < 0x100; i++)
-		palette_set_color(machine, BITSWAP8(i,5,7,6,2,1,0,4,3), rgb[i]);
-	auto_free(machine, rgb);
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0, 255, -1.0,
+			2, resistances, weights, 0, 0,
+			2, resistances, weights, 0, 0,
+			0, 0, 0, 0, 0);
 
-	palette_normalize_range(machine->palette, 0, 255, 0, 255);
+	for (i = 0;i < machine->config->total_colors; i++)
+	{
+		int bit0, bit1;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i+0x100] >> 0) & 0x01;
+		r = combine_2_weights(weights, bit0, bit1);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit1 = (color_prom[i+0x100] >> 2) & 0x01;
+		g = combine_2_weights(weights, bit0, bit1);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 1) & 0x01;
+		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
+		b = combine_2_weights(weights, bit0, bit1);
+
+		palette_set_color(machine, BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
+	}
 }
 
 
