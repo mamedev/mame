@@ -2083,6 +2083,16 @@ static MACHINE_DRIVER_START( system16_datsu_sound )
 MACHINE_DRIVER_END
 
 
+static const sega16sp_interface shinobld_sega16sp_intf =
+{
+	0,	   // which spriteram
+	1024,  // colorbase
+	0x800, // ramsize
+	117,     // xoffs
+	segaic16_sprites_16a_bootleg_shinobld_draw, // draw function
+	0, // use buffer
+};
+
 static MACHINE_DRIVER_START( shinobib )
 
 	/* basic machine hardware */
@@ -2090,11 +2100,21 @@ static MACHINE_DRIVER_START( shinobib )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(shinobib_map)
 
-	MDRV_SEGA16SP_ADD_SHINOBI_BOOTLEG("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", shinobld_sega16sp_intf)
 
 	MDRV_VIDEO_START( s16a_bootleg_shinobi )
 	MDRV_VIDEO_UPDATE( s16a_bootleg )
 MACHINE_DRIVER_END
+
+static const sega16sp_interface passshtb_sega16sp_intf =
+{
+	0,	   // which spriteram
+	1024,  // colorbase
+	0x800, // ramsize
+	117,     // xoffs
+	segaic16_sprites_16a_bootleg_passhtb_draw, // draw function
+	0, // use buffer
+};
 
 static MACHINE_DRIVER_START( passshtb )
 
@@ -2103,7 +2123,7 @@ static MACHINE_DRIVER_START( passshtb )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(passshtb_map)
 
-	MDRV_SEGA16SP_ADD_PASSINGSHOT_BOOTLEG("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", passshtb_sega16sp_intf)
 
 	MDRV_VIDEO_START( s16a_bootleg_passsht )
 	MDRV_VIDEO_UPDATE( s16a_bootleg )
@@ -2118,11 +2138,21 @@ static MACHINE_DRIVER_START( passsht4b )
 	MDRV_CPU_PROGRAM_MAP(passht4b_map)
 
 	// wrong
-	MDRV_SEGA16SP_ADD_PASSINGSHOT_BOOTLEG("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", passshtb_sega16sp_intf)
 
 	MDRV_VIDEO_START( s16a_bootleg_passsht )
 	MDRV_VIDEO_UPDATE( s16a_bootleg_passht4b )
 MACHINE_DRIVER_END
+
+static const sega16sp_interface wb3bbl_sega16sp_intf =
+{
+	0,	   // which spriteram
+	1024,  // colorbase
+	0x800, // ramsize
+	117,     // xoffs
+	segaic16_sprites_16a_bootleg_wb3bl_draw, // draw function
+	0, // use buffer
+};
 
 static MACHINE_DRIVER_START( wb3bb )
 
@@ -2131,12 +2161,22 @@ static MACHINE_DRIVER_START( wb3bb )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wb3bbl_map)
 
-	MDRV_SEGA16SP_ADD_WONDERBOY3_BOOTLEG("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", wb3bbl_sega16sp_intf)
 
 	MDRV_VIDEO_START( s16a_bootleg_wb3bl )
 	MDRV_VIDEO_UPDATE( s16a_bootleg )
 MACHINE_DRIVER_END
 
+
+static const sega16sp_interface s16bbl_x121_sega16sp_intf =
+{
+	0,	   // which spriteram
+	1024,  // colorbase
+	0x800, // ramsize
+	121,     // xoffs
+	segaic16_sprites_16b_draw, // draw function
+	0, // use buffer
+};
 
 static MACHINE_DRIVER_START( goldnaxeb1 )
 
@@ -2160,7 +2200,7 @@ static MACHINE_DRIVER_START( goldnaxeb1 )
 	MDRV_GFXDECODE(sys16)
 	MDRV_PALETTE_LENGTH(2048*SHADOW_COLORS_MULTIPLIER)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x121_sega16sp_intf)
 
 	MDRV_PALETTE_INIT( all_black )
 	MDRV_VIDEO_START(system16)
@@ -2183,6 +2223,16 @@ static MACHINE_DRIVER_START( bayrouteb1 )
 	MDRV_CPU_PROGRAM_MAP(bayrouteb1_map)
 MACHINE_DRIVER_END
 
+static const sega16sp_interface s16bbl_x107_sega16sp_intf =
+{
+	0,	   // which spriteram
+	1024,  // colorbase
+	0x800, // ramsize
+	107,     // xoffs
+	segaic16_sprites_16b_draw, // draw function
+	0, // use buffer
+};
+
 static MACHINE_DRIVER_START( bayrouteb2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(goldnaxeb1)
@@ -2190,6 +2240,9 @@ static MACHINE_DRIVER_START( bayrouteb2 )
 	MDRV_CPU_PROGRAM_MAP(bayrouteb2_map)
 
 	MDRV_IMPORT_FROM(system16_datsu_sound)
+
+	MDRV_DEVICE_REMOVE("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tturfbl )
@@ -2209,8 +2262,18 @@ static MACHINE_DRIVER_START( tturfbl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
 MACHINE_DRIVER_END
+
+static const sega16sp_interface s16bbl_x112_sega16sp_intf =
+{
+	0,	   // which spriteram
+	1024,  // colorbase
+	0x800, // ramsize
+	112,     // xoffs
+	segaic16_sprites_16b_draw, // draw function
+	0, // use buffer
+};
 
 static MACHINE_DRIVER_START( dduxbl )
 
@@ -2219,8 +2282,18 @@ static MACHINE_DRIVER_START( dduxbl )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dduxbl_map)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
 MACHINE_DRIVER_END
+
+static const sega16sp_interface s16bbl_x124_sega16sp_intf =
+{
+	0,	   // which spriteram
+	1024,  // colorbase
+	0x800, // ramsize
+	124,     // xoffs
+	segaic16_sprites_16b_draw, // draw function
+	0, // use buffer
+};
 
 static MACHINE_DRIVER_START( eswatbl )
 
@@ -2229,7 +2302,7 @@ static MACHINE_DRIVER_START( eswatbl )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(eswatbl_map)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x124_sega16sp_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fpointbl )
@@ -2242,7 +2315,7 @@ static MACHINE_DRIVER_START( fpointbl )
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(fpointbl_sound_map)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tetrisbl )
@@ -2252,7 +2325,7 @@ static MACHINE_DRIVER_START( tetrisbl )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tetrisbl_map)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
 MACHINE_DRIVER_END
 
 
@@ -2263,7 +2336,7 @@ static MACHINE_DRIVER_START( beautyb )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(beautyb_map)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
 MACHINE_DRIVER_END
 
 
@@ -2295,7 +2368,7 @@ static MACHINE_DRIVER_START( system18 )
 	MDRV_VIDEO_START(system18old)
 	MDRV_VIDEO_UPDATE(system18old)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3221,12 +3294,6 @@ static DRIVER_INIT( common )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
 
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
-
-	sega16sp->xoffs = 107;
-
-
 	state->bg1_trans = 0;
 	state->splittab_bg_x = 0;
 	state->splittab_bg_y = 0;
@@ -3237,8 +3304,6 @@ static DRIVER_INIT( common )
 	state->back_yscroll = 0;
 	state->fore_yscroll = 0;
 	state->text_yscroll = 0;
-
-
 
 	state->sample_buffer = 0;
 	state->sample_select = 0;
@@ -3255,41 +3320,31 @@ static DRIVER_INIT( common )
 static DRIVER_INIT( shinobl )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
 
 	DRIVER_INIT_CALL(common);
 
 	state->spritebank_type = 1;
-	sega16sp->xoffs = 117;
 }
 
 static DRIVER_INIT( passsht )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
 
 	DRIVER_INIT_CALL(common);
 
 	state->spritebank_type = 1;
 	state->back_yscroll = 3;
-	sega16sp->xoffs = 117;
 }
 
 static DRIVER_INIT( wb3bbl )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
-
 
 	DRIVER_INIT_CALL(common);
 
 	state->spritebank_type = 1;
 	state->back_yscroll = 2;
 	state->fore_yscroll = 2;
-	sega16sp->xoffs = 117;
 }
 
 
@@ -3302,8 +3357,6 @@ static DRIVER_INIT( goldnaxeb1 )
 	UINT8 *KEY = memory_region(machine, "decryption");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 data[0x1000];
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
 
 	// the decryption key is in a rom (part of an MSDOS executable...)
 	for (i = 0; i < 0x800; i++)
@@ -3326,7 +3379,6 @@ static DRIVER_INIT( goldnaxeb1 )
 	DRIVER_INIT_CALL(common);
 
 	state->spritebank_type = 1;
-	sega16sp->xoffs = 121;
 }
 
 
@@ -3370,13 +3422,10 @@ static DRIVER_INIT( bayrouteb2 )
 static DRIVER_INIT( goldnaxeb2 )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
 
 	DRIVER_INIT_CALL(common);
 
 	state->spritebank_type = 1;
-	sega16sp->xoffs = 121;
 }
 
 static DRIVER_INIT( tturfbl )
@@ -3390,25 +3439,17 @@ static DRIVER_INIT( tturfbl )
 
 static DRIVER_INIT( dduxbl )
 {
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
-
 	DRIVER_INIT_CALL(common);
-
-	sega16sp->xoffs = 112;
 }
 
 static DRIVER_INIT( eswatbl )
 {
 	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
 
 	DRIVER_INIT_CALL(common);
 	//state->splittab_fg_x = &sys16_textram[0x0f80];
 
 	state->spritebank_type = 1;
-	sega16sp->xoffs = 124;
 }
 
 static DRIVER_INIT( fpointbl )
@@ -3427,8 +3468,6 @@ static DRIVER_INIT( beautyb )
 {
 	UINT16*rom = (UINT16*)memory_region( machine, "maincpu" );
 	int x;
-	running_device* device = devtag_get_device(machine, "segaspr1");
-	sega16sp_state *sega16sp = (sega16sp_state *)device->token;
 
 	for (x = 0; x < 0x8000; x++)
 	{
@@ -3439,8 +3478,6 @@ static DRIVER_INIT( beautyb )
 	}
 
 	DRIVER_INIT_CALL(common);
-
-	sega16sp->xoffs = 112;
 }
 
 

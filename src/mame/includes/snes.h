@@ -43,10 +43,14 @@
 #define SNES_VTOTAL_PAL       312		/* Maximum number of lines for PAL systems */
 #define SNES_HTOTAL           341		/* Maximum number pixels per line (incl. hblank) */
 #define SNES_DMA_BASE         0x4300	/* Base DMA register address */
-#define SNES_MODE_20          0x1		/* Lo-ROM cart */
-#define SNES_MODE_21          0x2		/* Hi-ROM cart */
-#define SNES_MODE_22          0x4		/* Extended Lo-ROM cart - SDD-1 */
-#define SNES_MODE_25          0x8		/* Extended Hi-ROM cart */
+#define SNES_MODE_20          0x01		/* Lo-ROM cart */
+#define SNES_MODE_21          0x02		/* Hi-ROM cart */
+#define SNES_MODE_22          0x04		/* Extended Lo-ROM cart - SDD-1 */
+#define SNES_MODE_25          0x08		/* Extended Hi-ROM cart */
+#define SNES_MODE_BSX         0x10
+#define SNES_MODE_BSLO        0x20
+#define SNES_MODE_BSHI        0x40
+#define SNES_MODE_ST          0x80
 #define SNES_NTSC             0x00
 #define SNES_PAL              0x10
 #define SNES_VRAM_SIZE        0x20000	/* 128kb of video ram */
@@ -354,6 +358,15 @@
 #define DSP_FIR_C6		0x6F
 #define DSP_FIR_C7		0x7F
 
+struct snes_cart_info
+{
+	UINT8  mode;		/* ROM memory mode */
+	UINT32 sram;		/* Amount of sram in cart */
+	UINT32 sram_max;	/* Maximum amount sram in cart (based on ROM mode) */
+	int    small_sram;
+	int    slot_in_use;	/* this is needed by Sufami Turbo slots (to check if SRAM has to be saved) */
+};
+
 struct snes_joypad
 {
 	UINT16 buttons;
@@ -436,6 +449,11 @@ public:
 	/* input callbacks (to allow MESS to have its own input handlers) */
 	snes_io_read          io_read;
 	snes_oldjoy_read      oldjoy1_read, oldjoy2_read;
+
+	/* cart related */
+	UINT8 has_addon_chip;
+	UINT32 cart_size;
+	snes_cart_info cart[2];	// the second one is used by MESS for Sufami Turbo and, eventually, BS-X
 
 	/* devices */
 	running_device *maincpu;
@@ -523,8 +541,6 @@ extern WRITE8_HANDLER( superfx_w_bank3 );
 
 WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w );
 
-extern UINT8 snes_has_addon_chip;
-extern UINT32 snes_rom_size;
 
 extern void snes_latch_counters(running_machine *machine);
 
@@ -636,14 +652,6 @@ struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it woul
 	UINT8 pseudo_hires;
 	UINT8 color_modes;
 	UINT8 stat77_flags;
-};
-
-struct snes_cart_info
-{
-	UINT8  mode;		/* ROM memory mode */
-	UINT32 sram;		/* Amount of sram in cart */
-	UINT32 sram_max;	/* Maximum amount sram in cart (based on ROM mode) */
-	int    small_sram;
 };
 
 extern struct snes_cart_info snes_cart;

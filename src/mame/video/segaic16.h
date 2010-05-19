@@ -290,38 +290,6 @@ static const sega16sp_interface xboard_sega16sp_intf =
 	1, // use buffer
 };
 
-static const sega16sp_interface shinobld_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	117,     // xoffs
-	segaic16_sprites_16a_bootleg_shinobld_draw, // draw function
-	0, // use buffer
-};
-
-static const sega16sp_interface passshtb_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	117,     // xoffs
-	segaic16_sprites_16a_bootleg_passhtb_draw, // draw function
-	0, // use buffer
-};
-
-static const sega16sp_interface wb3bbl_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	117,     // xoffs
-	segaic16_sprites_16a_bootleg_wb3bl_draw, // draw function
-	0, // use buffer
-};
-
-
-
 
 
 #define MDRV_SEGA16SP_ADD(_tag, _interface) \
@@ -359,18 +327,6 @@ static const sega16sp_interface wb3bbl_sega16sp_intf =
 #define MDRV_SEGA16SP_ADD_XBOARD(_tag) \
 	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
 	MDRV_DEVICE_CONFIG(xboard_sega16sp_intf)
-
-#define MDRV_SEGA16SP_ADD_SHINOBI_BOOTLEG(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(shinobld_sega16sp_intf)
-
-#define MDRV_SEGA16SP_ADD_PASSINGSHOT_BOOTLEG(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(passshtb_sega16sp_intf)
-
-#define MDRV_SEGA16SP_ADD_WONDERBOY3_BOOTLEG(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(wb3bbl_sega16sp_intf)
 
 
 extern struct palette_info palette;

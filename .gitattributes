@@ -3186,6 +3186,7 @@ src/mame/machine/slapstic.c svneol=native#text/plain
 src/mame/machine/slikshot.c svneol=native#text/plain
 src/mame/machine/snes.c svneol=native#text/plain
 src/mame/machine/snes7110.c svneol=native#text/plain
+src/mame/machine/snesbsx.c svneol=native#text/plain
 src/mame/machine/snescx4.c svneol=native#text/plain
 src/mame/machine/snescx4.h svneol=native#text/plain
 src/mame/machine/snesdsp1.c svneol=native#text/plain

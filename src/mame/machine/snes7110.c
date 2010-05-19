@@ -121,7 +121,7 @@ static const UINT8 spc7110_mode2_context_table[32][2] =
 typedef struct
 {
 	running_machine *machine;
-
+	
 	UINT32 decomp_mode;
 	UINT32 decomp_offset;
 
@@ -138,9 +138,11 @@ typedef struct
 
 	UINT32 morton16[2][256];
 	UINT32 morton32[4][256];
+	
+	UINT32 rom_size;
 } SPC7110Decomp;
 
-static SPC7110Decomp* SPC7110Decomp_ctor(running_machine *machine);
+static SPC7110Decomp* SPC7110Decomp_ctor(running_machine *machine, UINT32 size);
 static void SPC7110Decomp_reset(SPC7110Decomp *thisptr);
 static void SPC7110Decomp_init(SPC7110Decomp *thisptr, running_machine *machine, UINT32 mode, UINT32 offset, UINT32 index);
 static UINT8 SPC7110Decomp_read(SPC7110Decomp *thisptr);
@@ -156,7 +158,7 @@ static UINT8 SPC7110Decomp_toggle_invert(SPC7110Decomp *thisptr, UINT32 n);
 static UINT32 SPC7110Decomp_morton_2x8(SPC7110Decomp *thisptr, UINT32 data);
 static UINT32 SPC7110Decomp_morton_4x8(SPC7110Decomp *thisptr, UINT32 data);
 
-static SPC7110Decomp* SPC7110Decomp_ctor(running_machine *machine)
+static SPC7110Decomp* SPC7110Decomp_ctor(running_machine *machine, UINT32 size)
 {
 	UINT32 i;
 	SPC7110Decomp* newclass = (SPC7110Decomp*)auto_alloc_array(machine, UINT8, sizeof(SPC7110Decomp));
@@ -182,6 +184,8 @@ static SPC7110Decomp* SPC7110Decomp_ctor(running_machine *machine)
                                  + map(3, 24) + map(2, 16) + map(1,  8) + map(0,  0);
 		#undef map
 	}
+
+	newclass->rom_size = size;
 
 	return newclass;
 }
@@ -271,7 +275,7 @@ static void SPC7110Decomp_write(SPC7110Decomp *thisptr, UINT8 data)
 static UINT8 SPC7110Decomp_dataread(SPC7110Decomp *thisptr)
 {
 	UINT8 *ROM = memory_region(thisptr->machine, "cart");
-	UINT32 size = snes_rom_size - 0x100000;
+	UINT32 size = thisptr->rom_size - 0x100000;
 	while(thisptr->decomp_offset >= size)
 	{
 		thisptr->decomp_offset -= size;
@@ -863,12 +867,16 @@ typedef struct
 	UINT64 rtc_offset;
 
 	UINT8 rtc_ram[16];	// 0-12 secs, min, hrs, etc.; 13-14-15 control registers
+	
+	UINT32 size;
 } _snes_spc7110_t;
 
 static _snes_spc7110_t snes_spc7110;
 
 static void spc7110_init(running_machine* machine)
 {
+	snes_state *state = (snes_state *)machine->driver_data;
+
 	snes_spc7110.r4801 = 0x00;
 	snes_spc7110.r4802 = 0x00;
 	snes_spc7110.r4803 = 0x00;
@@ -921,8 +929,10 @@ static void spc7110_init(running_machine* machine)
 	snes_spc7110.r4840 = 0x00;
 	snes_spc7110.r4841 = 0x00;
 	snes_spc7110.r4842 = 0x00;
-
-	snes_spc7110.decomp = SPC7110Decomp_ctor(machine);
+	
+	snes_spc7110.size = state->cart_size;	
+	
+	snes_spc7110.decomp = SPC7110Decomp_ctor(machine, snes_spc7110.size);
 }
 
 static void spc7110rtc_init(running_machine* machine)
@@ -940,7 +950,7 @@ static void spc7110rtc_init(running_machine* machine)
 
 static UINT32 spc7110_datarom_addr(UINT32 addr)
 {
-	UINT32 size = snes_rom_size - 0x100000;
+	UINT32 size = snes_spc7110.size - 0x100000;
 	while(addr >= size)
 	{
 		addr -= size;
