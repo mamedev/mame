@@ -510,7 +510,7 @@ static INPUT_PORTS_START( dips )
 	PORT_DIPSETTING(	0x04, DEF_STR( Cocktail ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )	/* Not Used according to the manual */
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )	/* Not Used according to the manual */
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING( 0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING( 0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING( 0x20, DEF_STR( Difficult ) )
