@@ -777,6 +777,90 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+/* Rygar
+Tecmo 1986
+
+PCB Layouts
+-----------
+
+6002-A
+|-----------------------------------------------------------------|
+|DSW2               4MHz                            24MHz         |
+|DSW1                    M4069                                    |
+|                                                                |-|
+|                   Z80B                            MN50005XTA   | |
+|1                            5.5P                               | |
+|8                                                               | |
+|W                            4.5M                               | |
+|A                  MA7053                6116                   |-|
+|Y   DIP28                    6264                                |
+|                   Z80A                  6.7K                    |
+|                             3.5J                                |
+|                   2.4H                                          |
+|                                                                |-|
+|                   6116                                         | |
+|    1.1E                                                        | |
+|         M5205     YM3526                                       | |
+|         400kHz                                                 | |
+|    VOL                 M4066           MBM2148                 |-|
+|         M5224                          MBM2148                  |
+|M51516         M5224  YM3014            MBM2148              CN4 |
+|-----------------------------------------------------------------|
+Notes:
+      Z80B       - clock 6.000MHz [24/4]
+      Z80A       - clock 4.000MHz
+      M5205      - clock 400kHz
+      YM3526     - clock 4.000MHz
+      CN4        - RGB/Sync connector for video output to monitor
+      MN50005XTA - Mitsubishi DIP28 custom chip. On the bootleg this chip
+                   is replaced by a plug-in daughterboard containing a
+                   few logic chips
+      MA7053     - Mitsubishi SIL28 custom ceramic module
+      M5224      - Equivalent to LM324 OP AMP
+      DIP28      - unpopulated socket
+      DSW1/2     - 8-position Dip Switches
+      6116       - 2kx8 SRAM
+      6264       - 8kx8 SRAM
+      2148       - 1kx4 SRAM
+
+      Measurements -
+                    OSC1  - 23.99999MHz
+                    XTAL1 - 3.999187MHz
+                    VSync - 59.1856Hz
+                    HSync - 15.1436kHz
+
+
+6002B
+|-----------------------------------------------------------------|
+|                            6116                                 |
+|                            18.6R                                |
+|                            17.6P                               |-|
+|                            16.6N                               | |
+|4164 4164 4164 4164         15.6M                               | |
+|4164 4164 4164 4164         14.6L                               | |
+|4164 4164 4164 4164         13.6K                               | |
+|4164 4164 4164 4164                                             |-|
+|4164 4164 4164 4164         12.6J                                |
+|                                                                 |
+|                            11.6H                                |
+|                                                                 |
+|                            10.6E                               |-|
+|                                                                | |
+|                            9.6D                                | |
+|                                                                | |
+|                            8.6C                                | |
+|                  M60002-0118P                                  |-|
+|      6116                  7.6B                                 |
+|                            6116                                 |
+|-----------------------------------------------------------------|
+Notes:
+      M60002-0118P - Mitsubishi DIP42 custom chip. On the bootleg this chip
+                     is replaced by a plug-in daughterboard containing a
+                     few logic chips
+      4164         - 64kx1 DRAM
+      6116         - 2kx8 SRAM
+*/
+
 ROM_START( rygar )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "5.5p",         0x00000, 0x08000, CRC(062cd55d) SHA1(656e29c890f5de964920b7841b3e11469cd20051) ) /* code */
@@ -987,7 +1071,8 @@ sound cpu Z80A* see note
 sound ic ym3812 + 3014
 Osc 8Mhz and 24Mhz
 
-*Note:The sound cpu was protected inside a epoxy block fit on a 40 pin socket in reverse of cpu board (solder side).By dissolving resin the small sub pcb contains Z80A (identified by pins),76c28 (6116),a 74ls00 and 74ls138.
+*Note:The sound cpu was protected inside a epoxy block fit on a 40 pin socket in reverse of cpu board (solder side).
+ By dissolving resin the small sub pcb contains Z80A (identified by pins),76c28 (6116),a 74ls00 and 74ls138.
 
 ROMs    B4,B5 main program
 B2 sound program
@@ -1091,8 +1176,6 @@ static DRIVER_INIT( backfirt )
 	memory_nop_write(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0);
 	memory_nop_write(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xd000, 0xd000, 0, 0);
 	memory_nop_write(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe000, 0, 0);
-
-
 }
 
 
