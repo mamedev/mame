@@ -8715,8 +8715,15 @@ Other Sun games
 	DRIVER( turnover )	/* 199? */
 	DRIVER( skiltrek )	/* 1990 */
 	DRIVER( crmaze )	/* 1994 */
+	DRIVER( crmazed )	/* 1993 */
 	DRIVER( crmazea )	/* 1993 */
-	DRIVER( crmazeb )	/* 1993 */
+	DRIVER( crmaze2 )	/* 1993 */
+	DRIVER( crmaze2d )	/* 1993 */
+	DRIVER( crmaze2a )	/* 1993 */
+	DRIVER( crmaze3 )	/* 1993 */
+	DRIVER( crmaze3d )	/* 1993 */
+	DRIVER( crmaze3a )	/* 1993 */
+
 	DRIVER( mating )	/* 199? */
 	DRIVER( matingd )	/* 199? */
 

@@ -3,7 +3,6 @@ Barcrest MPU4 highly preliminary driver by J.Wallace, and Anonymous.
 
 Any MAME-approved games should go here.
 
-See http://www.mameworld.net/agemame/techinfo/mpu4.php for Information.
 
 --- Board Setup ---
 For the Barcrest MPU4 Video system, the GAME CARD (cartridge) contains the MPU4 video bios in the usual ROM
@@ -17,9 +16,7 @@ The VIDEO BOARD is driven by a 10mhz 68000 processor, and contains a 6840PTM, 68
 The VIDEO CARTRIDGE plugs into the video board, and contains the program ROMs for the video based game.
 Like the MPU4 game card, in some cases an extra OKI sound chip is added to the video board's game card,
 as well as extra RAM.
-There is a protection chip similar to and replacing the MPU4 Characteriser, which is often fed question
-data to descramble (unknown how it works). In non-question cases, however, the protection chip works
-near identically to the original.
+There is a protection chip similar to and replacing the MPU4 Characteriser.
 
 No video card schematics ever left the PCB factory, but some decent scans of the board have been made,
 now also available for review.
@@ -168,7 +165,8 @@ IRQ line connected to CPU
 -----------+---+-----------------+--------------------------------------------------------------------------
 TODO:
       - Correctly implement characteriser protection for each game.
-      - Hook up trackball control for The Crystal Maze and The Mating Game
+      - Hook up trackball control for The Crystal Maze and The Mating Game - done, but game response is v. slow
+	  - Fix meter sense error when coining up in Team Challenge - different cabinet
       - Improve AVDC implementation, adding split-screen interrupts (needed for mid-screen palette changes)
       - Hook up OKIM6376 sound in The Mating Game
       - Get the BwB games running
@@ -1120,50 +1118,98 @@ static READ16_HANDLER( ef9369_r )
 
 /*************************************
  *
+ *  Trackball interface
+ *
+ *************************************/
+
+static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
+{
+	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
+	mainboard. As per usual, they've taken the cheap route here, reading and processing the 
+	raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
+	additional hardware to simplify matters. For our purposes, two fake ports give the X and Y positions,
+	which are then worked back into the signal levels.
+	We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
+	clean up the pulses and flip the active phase.*/
+
+	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",cpuexec_describe_context(device->machine)));
+
+	UINT8 data = input_port_read(device->machine, "AUX1");
+
+	UINT16 dx = input_port_read(device->machine, "TRACKX");
+	UINT16 dy = input_port_read(device->machine, "TRACKY");
+
+	UINT8 xa, xb, ya, yb;
+
+	/* generate pulses for the input port (A and B are 1 unit out of phase for direction sensing)*/
+	xa = ((dx + 1) & 3) <= 1;
+	xb = (dx & 3) <= 1;
+	ya = ((dy + 1) & 3) <= 1;
+	yb = (dy & 3) <= 1;
+
+	data |= (xa << 4); // XA
+	data |= (ya << 5); // YA
+	data |= (xb << 6); // XB
+	data |= (yb << 7); // YB
+
+	return data;
+}
+
+static const pia6821_interface pia_ic5t_intf =
+{
+	DEVCB_HANDLER(pia_ic5_porta_track_r),		/* port A in */
+	DEVCB_HANDLER(pia_ic5_portb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_LINE(pia_ic5_ca2_w),		/* line CA2 out */
+	DEVCB_LINE(pia_ic5_cb2_w),		/* port CB2 out */
+	DEVCB_LINE(cpu0_irq),			/* IRQA */
+	DEVCB_LINE(cpu0_irq)			/* IRQB */
+};
+
+/*************************************
+ *
  *  Input defintions
  *
  *************************************/
 
 static INPUT_PORTS_START( crmaze )
 	PORT_START("ORANGE1")
-//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")
-//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")
-//  PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")
-//  PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")
-//  PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
-//  PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("05")
-//  PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("06")
-//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("07")
+	PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("ORANGE2")
-//  PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("08")
-//  PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("09")
-//  PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10")
-//  PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("11")
-//  PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("12")
-//  PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("13")
-//  PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("14")
-//  PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("200p?")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("08")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("09")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("11")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("12")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("13")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("14")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("200p")
 
 	PORT_START("BLACK1")
-//  PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("16")
-//  PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("17")
-//  PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("18")
-//  PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("19")
-//  PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("20")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("16")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("17")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("18")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("19")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("20")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Switch")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Door Switch?") PORT_TOGGLE
 
 	PORT_START("BLACK2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right Yellow")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right Red")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("26")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left Yellow")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left Red")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Yellow")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Red")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Left Red")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Left Yellow")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Getout Yellow")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Getout Red")/* Labelled Escape on cabinet */
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("100p Service?")PORT_IMPULSE(100)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Getout Red")/* Labelled Escape on cabinet */
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("DIL1")
 	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
@@ -1218,14 +1264,14 @@ static INPUT_PORTS_START( crmaze )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("4")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("5")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("6")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)//resets game if pressed - sometimes hoppers run here, but crmaze has tubes
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL)//XA
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL)//YA
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL)//XB
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL)//YB
 
 	PORT_START("AUX2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
@@ -1236,6 +1282,11 @@ static INPUT_PORTS_START( crmaze )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")
+
+	PORT_START("TRACKX")//FAKE
+    PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_INVERT
+	PORT_START("TRACKY")//FAKE
+    PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_INVERT
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mating )
@@ -1331,15 +1382,15 @@ static INPUT_PORTS_START( mating )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
-	PORT_START("AUX1")/* Presumed to be trackball, but only one phase available? */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("4")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("5")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("6")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
+	PORT_START("AUX1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL)//XA
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL)//YA
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL)//XB
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL)//YB
 
 	PORT_START("AUX2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
@@ -1350,6 +1401,12 @@ static INPUT_PORTS_START( mating )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")
+
+	PORT_START("TRACKX")//FAKE
+    PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_INVERT
+	PORT_START("TRACKY")//FAKE
+    PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_INVERT
+
 INPUT_PORTS_END
 
 
@@ -1481,6 +1538,347 @@ static INPUT_PORTS_START( dealem )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( skiltrek )
+	PORT_START("ORANGE1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("ORANGE2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("BLACK1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pass")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("C")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("B")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("A")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)	
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+
+	PORT_START("BLACK2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Continue")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("C")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("B")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("A")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "1 Pound for change" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "Attract mode inhibit" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coin alarm inhibit" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "Single coin entry" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("AUX1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("AUX2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( turnover )
+	PORT_START("ORANGE1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("ORANGE2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("BLACK1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pass")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("C")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("B")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("A")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+
+	PORT_START("BLACK2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Continue")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("C")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("B")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("A")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START1)
+
+	PORT_START("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "1 Pound for change" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "Attract mode inhibit" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coin alarm inhibit" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "Single coin entry" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("AUX1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("AUX2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( adders )
+	PORT_START("ORANGE1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("ORANGE2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("BLACK1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("C")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("B")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("A")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Pass")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+
+	PORT_START("BLACK2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("C")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("B")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("A")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "1 Pound for change" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "Attract mode inhibit" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coin alarm inhibit" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "Single coin entry" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("AUX1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("AUX2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+INPUT_PORTS_END
 
 /* OKI M6376 (for Mating Game) FIXME */
 static READ16_DEVICE_HANDLER( oki_r )
@@ -1801,8 +2199,13 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_ACIA6850_ADD("acia6850_1", m68k_acia_if)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( mating )
+static MACHINE_DRIVER_START( crmaze )
 	MDRV_IMPORT_FROM( mpu4_vid )
+	MDRV_PIA6821_MODIFY("pia_ic5", pia_ic5t_intf)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mating )
+	MDRV_IMPORT_FROM( crmaze )
 
 	MDRV_SOUND_ADD("oki", OKIM6376, 64000) //?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1861,18 +2264,11 @@ MACHINE_DRIVER_END
 
 /*
 Characteriser (CHR)
-Despite the potential to radically overhaul the design, the 68k version of the chip appears to just be a
-16-bit version of the previous design, with some endian-swapping necessary. It is unclear, however, if it has any
-capacity to affect lamp matrices in the same way as before, as no software seen makes any request for the 'lamp' row.
-It has been left in the table, as it clearly exists, but is unused.
-The 'quiz' games on the board did use an address-scrambling PAL for encryption, and the very last mod of this board had
-a characteriser capable of scrambling the ROM address lines.
-
-^^ I think this is wrong (DH)
-
  The question data on the quiz games gets passed through the characterizer, the tables tested at startup are just a
  very specific test with known responses to make sure the device functions properly.  Unless there is extra encryption
  applied to just the question ROMs then the assumptions made here are wrong, because the questions don't decode.
+
+ Perhaps the address lines for the question ROMS are scrambled somehow to make things decode, but how?
 
  It seems more likely that the Characterizer (PAL) acts as a challenge / response system, but various writes cause
  'latching' behavior because if you study the sequence written at startup you can see that the same write value should
@@ -1880,24 +2276,13 @@ a characteriser capable of scrambling the ROM address lines.
 
  Note:
  the 'challenge' part of the startup check is always the same
-
-
 */
-
-struct mpu4_chr_table
-{
-	UINT8 call;
-	UINT8 response;
-};
-
-mpu4_chr_table* mpu4_current_chr_table;
 
 static WRITE16_HANDLER( characteriser16_w )
 {
 	int x;
 	int call=data;
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(space->cpu),offset,data));
-	//printf("%04x Characteriser write offset %02X data %02X\n", cpu_get_previouspc(space->cpu),offset,data);
 
 	if (!mpu4_current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
@@ -1914,8 +2299,6 @@ static WRITE16_HANDLER( characteriser16_w )
 			{
 				prot_col = x;
 				LOG_CHR(("Characteriser find column %02X\n",prot_col));
-				//printf("Characteriser find column %02X\n",prot_col);
-
 				break;
 			}
 		}
@@ -1928,10 +2311,6 @@ static READ16_HANDLER( characteriser16_r )
 	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(space->cpu),offset,mpu4_current_chr_table[prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",mpu4_current_chr_table[prot_col].response));
-
-//  printf("%04x Characteriser read offset %02X,data %02X\n", cpu_get_previouspc(space->cpu),offset,mpu4_current_chr_table[prot_col].response);
-//  printf("Characteriser read offset %02X \n",offset);
-//  printf("Characteriser read data %02X \n",mpu4_current_chr_table[prot_col].response);
 
 	if (!mpu4_current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
@@ -1947,8 +2326,6 @@ static READ16_HANDLER( characteriser16_r )
 }
 
 
-
-
 mpu4_chr_table adders_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x8C}, {0x04, 0x64}, {0x10, 0x84}, {0x18, 0x84}, {0x0F, 0xC4}, {0x13, 0x84}, {0x1B, 0x84},
 	{0x03, 0x9C}, {0x07, 0xF4}, {0x17, 0x04}, {0x1D, 0xCC}, {0x36, 0x24}, {0x35, 0x84}, {0x2B, 0xC4}, {0x28, 0x94},
@@ -1961,14 +2338,14 @@ mpu4_chr_table adders_data[64] = {
 };
 
 mpu4_chr_table crmaze_data[64] = {
-	{0x00, 0x00}, {0x1A, 0x84}, {0x04, 0x94}, {0x10, 0x3C}, {0x18, 0xEC}, {0x0F, 0x5C}, {0x13, 0xEC}, {0x1B, 0x50},
-	{0x03, 0x2C}, {0x07, 0x68}, {0x17, 0x60}, {0x1D, 0xAC}, {0x36, 0x74}, {0x35, 0x00}, {0x2B, 0xAC}, {0x28, 0x58},
-	{0x39, 0xEC}, {0x21, 0x7C}, {0x22, 0xEC}, {0x25, 0x58}, {0x2C, 0xE0}, {0x29, 0x90}, {0x31, 0x18}, {0x34, 0xEC},
-	{0x0A, 0x54}, {0x1F, 0x28}, {0x06, 0x68}, {0x0E, 0x44}, {0x1C, 0x84}, {0x12, 0xB4}, {0x1E, 0x10}, {0x0D, 0x20},
-	{0x14, 0x84}, {0x0A, 0xBC}, {0x19, 0xE8}, {0x15, 0x70}, {0x06, 0x24}, {0x0F, 0x84}, {0x08, 0xB8}, {0x1B, 0xE0},
-	{0x1E, 0x94}, {0x04, 0x14}, {0x01, 0x2C}, {0x0C, 0x64}, {0x18, 0x8C}, {0x1A, 0x50}, {0x11, 0x28}, {0x0B, 0x4C},
-	{0x03, 0x6C}, {0x17, 0x60}, {0x10, 0xA0}, {0x1D, 0xBC}, {0x0E, 0xCC}, {0x07, 0x78}, {0x12, 0xE8}, {0x09, 0x50},
-	{0x0D, 0x20}, {0x1F, 0xAC}, {0x16, 0x74}, {0x05, 0x04}, {0x13, 0xA4}, {0x1C, 0x94}, {0x02, 0x3C}, {0x00, 0x00}
+	{0x00, 0x00}, {0x1A, 0x34}, {0x04, 0x14}, {0x10, 0x0C}, {0x18, 0x54}, {0x0F, 0x04}, {0x13, 0x24}, {0x1B, 0x34},
+	{0x03, 0x94}, {0x07, 0x94}, {0x17, 0x0C}, {0x1D, 0x5C}, {0x36, 0x6C}, {0x35, 0x44}, {0x2B, 0x24}, {0x28, 0x24},
+	{0x39, 0x3C}, {0x21, 0x6C}, {0x22, 0xCC}, {0x25, 0x4C}, {0x2C, 0xC4}, {0x29, 0xA4}, {0x31, 0x24}, {0x34, 0x24},
+	{0x0A, 0x34}, {0x1F, 0x84}, {0x06, 0xB4}, {0x0E, 0x1C}, {0x1C, 0x64}, {0x12, 0x24}, {0x1E, 0x34}, {0x0D, 0x04},
+	{0x14, 0x24}, {0x0A, 0x34}, {0x19, 0x8C}, {0x15, 0xC4}, {0x06, 0xB4}, {0x0F, 0x1C}, {0x08, 0xE4}, {0x1B, 0x24},
+	{0x1E, 0x34}, {0x04, 0x14}, {0x01, 0x10}, {0x0C, 0x84}, {0x18, 0x24}, {0x1A, 0x34}, {0x11, 0x04}, {0x0B, 0x24},
+	{0x03, 0xB4}, {0x17, 0x04}, {0x10, 0x24}, {0x1D, 0x3C}, {0x0E, 0x74}, {0x07, 0x94}, {0x12, 0x0C}, {0x09, 0xC4},
+	{0x0D, 0xA4}, {0x1F, 0x24}, {0x16, 0x24}, {0x05, 0x34}, {0x13, 0x04}, {0x1C, 0x34}, {0x02, 0x94}, {0x00, 0x00}
 };
 
 mpu4_chr_table crmazea_data[64] = {
@@ -1980,6 +2357,39 @@ mpu4_chr_table crmazea_data[64] = {
 	{0x1E, 0x0C}, {0x04, 0x90}, {0x01, 0xE8}, {0x0C, 0xF8}, {0x18, 0xD4}, {0x1A, 0x60}, {0x11, 0x44}, {0x0B, 0x4C},
 	{0x03, 0xD8}, {0x17, 0xD4}, {0x10, 0xE8}, {0x1D, 0xF8}, {0x0E, 0x9C}, {0x07, 0xD4}, {0x12, 0xE8}, {0x09, 0x30},
 	{0x0D, 0x48}, {0x1F, 0xD8}, {0x16, 0xDC}, {0x05, 0x94}, {0x13, 0xE8}, {0x1C, 0x38}, {0x02, 0xDC}, {0x00, 0x00}
+};
+
+mpu4_chr_table crmaze2_data[64] = {
+	{0x00, 0x00}, {0x1A, 0x88}, {0x04, 0x54}, {0x10, 0x40}, {0x18, 0x88}, {0x0F, 0x54}, {0x13, 0x40}, {0x1B, 0x88},
+	{0x03, 0x74}, {0x07, 0x28}, {0x17, 0x30}, {0x1D, 0x60}, {0x36, 0x80}, {0x35, 0x84}, {0x2B, 0xC4}, {0x28, 0xA4},
+	{0x39, 0xC4}, {0x21, 0x8C}, {0x22, 0x74}, {0x25, 0x08}, {0x2C, 0x30}, {0x29, 0x00}, {0x31, 0x80}, {0x34, 0x84},
+	{0x0A, 0xC4}, {0x1F, 0x84}, {0x06, 0xAC}, {0x0E, 0x5C}, {0x1C, 0x90}, {0x12, 0x44}, {0x1E, 0x88}, {0x0D, 0x74},
+	{0x14, 0x00}, {0x0A, 0x80}, {0x19, 0xC4}, {0x15, 0x84}, {0x06, 0xAC}, {0x0F, 0x5C}, {0x08, 0xB0}, {0x1B, 0x24},
+	{0x1E, 0x88}, {0x04, 0x54}, {0x01, 0x08}, {0x0C, 0x30}, {0x18, 0x00}, {0x1A, 0x88}, {0x11, 0x34}, {0x0B, 0x08},
+	{0x03, 0x70}, {0x17, 0x00}, {0x10, 0x80}, {0x1D, 0xC4}, {0x0E, 0x84}, {0x07, 0xAC}, {0x12, 0x34}, {0x09, 0x00},
+	{0x0D, 0xA0}, {0x1F, 0x84}, {0x16, 0x84}, {0x05, 0x8C}, {0x13, 0x34}, {0x1C, 0x00}, {0x02, 0xA8}, {0x00, 0x00}
+};
+
+mpu4_chr_table crmaze3_data[64] = {
+	{0x00, 0x00}, {0x1A, 0x84}, {0x04, 0x94}, {0x10, 0x3C}, {0x18, 0xEC}, {0x0F, 0x5C}, {0x13, 0xEC}, {0x1B, 0x50},
+	{0x03, 0x2C}, {0x07, 0x68}, {0x17, 0x60}, {0x1D, 0xAC}, {0x36, 0x74}, {0x35, 0x00}, {0x2B, 0xAC}, {0x28, 0x58},
+	{0x39, 0xEC}, {0x21, 0x7C}, {0x22, 0xEC}, {0x25, 0x58}, {0x2C, 0xE0}, {0x29, 0x90}, {0x31, 0x18}, {0x34, 0xEC},
+	{0x0A, 0x54}, {0x1F, 0x28}, {0x06, 0x68}, {0x0E, 0x44}, {0x1C, 0x84}, {0x12, 0xB4}, {0x1E, 0x10}, {0x0D, 0x20},
+	{0x14, 0x84}, {0x0A, 0xBC}, {0x19, 0xE8}, {0x15, 0x70}, {0x06, 0x24}, {0x0F, 0x84}, {0x08, 0xB8}, {0x1B, 0xE0},
+	{0x1E, 0x94}, {0x04, 0x14}, {0x01, 0x2C}, {0x0C, 0x64}, {0x18, 0x8C}, {0x1A, 0x50}, {0x11, 0x28}, {0x0B, 0x4C},
+	{0x03, 0x6C}, {0x17, 0x60}, {0x10, 0xA0}, {0x1D, 0xBC}, {0x0E, 0xCC}, {0x07, 0x78}, {0x12, 0xE8}, {0x09, 0x50},
+	{0x0D, 0x20}, {0x1F, 0xAC}, {0x16, 0x74}, {0x05, 0x04}, {0x13, 0xA4}, {0x1C, 0x94}, {0x02, 0x3C}, {0x00, 0x00}
+};
+
+mpu4_chr_table crmaze3a_data[64] = {
+	{0x00, 0x00}, {0x1A, 0x0C}, {0x04, 0x60}, {0x10, 0x84}, {0x18, 0x34}, {0x0F, 0x08}, {0x13, 0xC0}, {0x1B, 0x14},
+	{0x03, 0xA8}, {0x07, 0xF0}, {0x17, 0x10}, {0x1D, 0xA0}, {0x36, 0x1C}, {0x35, 0xE4}, {0x2B, 0x1C}, {0x28, 0xE4},
+	{0x39, 0x34}, {0x21, 0xA8}, {0x22, 0xF8}, {0x25, 0x64}, {0x2C, 0x8C}, {0x29, 0xF0}, {0x31, 0x30}, {0x34, 0x08},
+	{0x0A, 0xE8}, {0x1F, 0xF8}, {0x06, 0xE4}, {0x0E, 0x3C}, {0x1C, 0x44}, {0x12, 0x8C}, {0x1E, 0x58}, {0x0D, 0xC4},
+	{0x14, 0x3C}, {0x0A, 0x6C}, {0x19, 0x68}, {0x15, 0xC0}, {0x06, 0x9C}, {0x0F, 0x64}, {0x08, 0x04}, {0x1B, 0x0C},
+	{0x1E, 0x48}, {0x04, 0x60}, {0x01, 0xAC}, {0x0C, 0xF8}, {0x18, 0xE4}, {0x1A, 0x14}, {0x11, 0xA8}, {0x0B, 0x78},
+	{0x03, 0xEC}, {0x17, 0xD0}, {0x10, 0xB0}, {0x1D, 0xB0}, {0x0E, 0x38}, {0x07, 0xE4}, {0x12, 0x9C}, {0x09, 0xE4},
+	{0x0D, 0xBC}, {0x1F, 0xE4}, {0x16, 0x1C}, {0x05, 0x64}, {0x13, 0x8C}, {0x1C, 0x58}, {0x02, 0xEC}, {0x00, 0x00}
 };
 
 mpu4_chr_table mating_data[64] = {
@@ -2064,18 +2474,30 @@ static DRIVER_INIT (adders)
 	mpu4_current_chr_table = adders_data;
 }
 
-
 static DRIVER_INIT (crmaze)
 {
 	mpu4_current_chr_table = crmaze_data;
 }
-
 
 static DRIVER_INIT (crmazea)
 {
 	mpu4_current_chr_table = crmazea_data;
 }
 
+static DRIVER_INIT (crmaze2)
+{
+	mpu4_current_chr_table = crmaze2_data;
+}
+
+static DRIVER_INIT (crmaze3)
+{
+	mpu4_current_chr_table = crmaze3_data;
+}
+	
+static DRIVER_INIT (crmaze3a)
+{
+	mpu4_current_chr_table = crmaze3a_data;
+}
 
 static DRIVER_INIT (mating)
 {
@@ -2189,22 +2611,38 @@ ROM_START( bloxd )
 	ROM_LOAD16_BYTE( "blxv___2.0_6",  0x040001, 0x10000, CRC(a3d92b5b) SHA1(1e7042d5eae4a19a01a3ef7d806c434886dc9f4d) )
 ROM_END
 
-
 ROM_START( crmaze )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "cm3.p1",  0x000000, 0x80000,  CRC(2d2edee5) SHA1(0281ec97aaaaf4c7969340bd5995ac1541dbad54) )
-	ROM_LOAD16_BYTE( "cm3.p2",  0x000001, 0x80000,  CRC(c223d7b9) SHA1(da9d730716a30d0e93f2a02c1efa7f19457ae010) )
-	ROM_LOAD16_BYTE( "cm3.p3",  0x100000, 0x80000,  CRC(2959c77b) SHA1(8de533bfad48ad19a635dddcafa2a0825133b4de) )
-	ROM_LOAD16_BYTE( "cm3.p4",  0x100001, 0x80000,  CRC(b7873e9a) SHA1(a71fac883e02d5f49aee0a20f92dbdb00640ce8d) )
-	ROM_LOAD16_BYTE( "cm3.p5",  0x200000, 0x80000,  CRC(c8375070) SHA1(da2ba6591d8765f896c40d6526da8e945d02a182) )
-	ROM_LOAD16_BYTE( "cm3.p6",  0x200001, 0x80000,  CRC(1ea36938) SHA1(43f62935b21232d23f662e1e124663267edb1283) )
-	ROM_LOAD16_BYTE( "cm3.p7",  0x300000, 0x80000,  CRC(9de3802e) SHA1(ec792f115a0708d68046ba0beb314b7e1f1eb422) )
-	ROM_LOAD16_BYTE( "cm3.p8",  0x300001, 0x80000,  CRC(1e6e60b0) SHA1(5e71714747073dd89852a84585642388ee440325) )
-	ROM_LOAD16_BYTE( "cm3.p9",  0x400000, 0x80000,  CRC(bfba55a7) SHA1(22eb9b1f9fe83d3b424fd521b68e2976a1940df9) )
-	ROM_LOAD16_BYTE( "cm3.pa",  0x400001, 0x80000,  CRC(07edda81) SHA1(e94525be03f30e407051992925bb0d693f3d809b) )
+	ROM_LOAD16_BYTE( "crys.p1", 0x000000, 0x80000,  CRC(40fbde50) SHA1(91bd21c0aaffb9c9b89a114affbc485b12ae9bb4) )
+	ROM_LOAD16_BYTE( "cry.p2",  0x000001, 0x80000,  CRC(fa7d006f) SHA1(ecc03b4d7a4089feccc53ad05313c35b33e061d7) )
+	ROM_LOAD16_BYTE( "cry.p3",  0x100000, 0x80000,  CRC(e8cf8203) SHA1(e9f42e5c18b97807f51284ad2416346578ed73c4) )
+	ROM_LOAD16_BYTE( "cry.p4",  0x100001, 0x80000,  CRC(7b036151) SHA1(7b0040c296059b1e1798ddedf0ecb4582d67ee70) )
+	ROM_LOAD16_BYTE( "cry.p5",  0x200000, 0x80000,  CRC(48f17b20) SHA1(711c46fcfd86ded8ff7da883188d70560d20e42f) )
+	ROM_LOAD16_BYTE( "cry.p6",  0x200001, 0x80000,  CRC(2b3d9a97) SHA1(7468fffd90d840d245a70475b42308f1e48c5017) )
+	ROM_LOAD16_BYTE( "cry.p7",  0x300000, 0x80000,  CRC(20f73433) SHA1(593b40ac17591ac312ad41b4d3a5772626137bba) )
+	ROM_LOAD16_BYTE( "cry.p8",  0x300001, 0x80000,  CRC(835da1f2) SHA1(f93e075916d370466832871410591570ad7b9f3b) )
+	ROM_LOAD16_BYTE( "cry.p9",  0x400000, 0x80000,  CRC(c0e442ee) SHA1(a3877b200538642fe2bc96cfe8b33f04d8a82a98) )
+	ROM_LOAD16_BYTE( "cry.p10", 0x400001, 0x80000,  CRC(500172fa) SHA1(d83a37612daa79ba8425fdb28f39b8324b5736b6) )
+ROM_END
+
+ROM_START( crmazed )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "cryd.p1", 0x000000, 0x80000,  CRC(b245f661) SHA1(85a8baca8797fea74bc36eea077be56bde8e54a9) )
+	ROM_LOAD16_BYTE( "cry.p2",  0x000001, 0x80000,  CRC(fa7d006f) SHA1(ecc03b4d7a4089feccc53ad05313c35b33e061d7) )
+	ROM_LOAD16_BYTE( "cry.p3",  0x100000, 0x80000,  CRC(e8cf8203) SHA1(e9f42e5c18b97807f51284ad2416346578ed73c4) )
+	ROM_LOAD16_BYTE( "cry.p4",  0x100001, 0x80000,  CRC(7b036151) SHA1(7b0040c296059b1e1798ddedf0ecb4582d67ee70) )
+	ROM_LOAD16_BYTE( "cry.p5",  0x200000, 0x80000,  CRC(48f17b20) SHA1(711c46fcfd86ded8ff7da883188d70560d20e42f) )
+	ROM_LOAD16_BYTE( "cry.p6",  0x200001, 0x80000,  CRC(2b3d9a97) SHA1(7468fffd90d840d245a70475b42308f1e48c5017) )
+	ROM_LOAD16_BYTE( "cry.p7",  0x300000, 0x80000,  CRC(20f73433) SHA1(593b40ac17591ac312ad41b4d3a5772626137bba) )
+	ROM_LOAD16_BYTE( "cry.p8",  0x300001, 0x80000,  CRC(835da1f2) SHA1(f93e075916d370466832871410591570ad7b9f3b) )
+	ROM_LOAD16_BYTE( "cry.p9",  0x400000, 0x80000,  CRC(c0e442ee) SHA1(a3877b200538642fe2bc96cfe8b33f04d8a82a98) )
+	ROM_LOAD16_BYTE( "cry.p10", 0x400001, 0x80000,  CRC(500172fa) SHA1(d83a37612daa79ba8425fdb28f39b8324b5736b6) )
 ROM_END
 
 ROM_START( crmazea )
@@ -2224,7 +2662,38 @@ ROM_START( crmazea )
 	ROM_LOAD16_BYTE( "am1g.p8",  0x400001, 0x80000,  CRC(6f0f855b) SHA1(ab411d1af0f88049a6c435bafd4b1fa63f5519b1) )
 ROM_END
 
-ROM_START( crmazeb )
+//The New Crystal Maze Featuring Ocean Zone
+ROM_START( crmaze2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "cm2s.p1", 0x000000, 0x80000,  CRC(2bcdff56) SHA1(5ae4d4960db032ec9b8d66c53bc151830d009f61) )
+	ROM_LOAD16_BYTE( "cm2s.p2", 0x000001, 0x80000,  CRC(92126def) SHA1(531593dee05954000d9836018aeff9460aecbd26) )
+	ROM_LOAD16_BYTE( "cm2.p3",  0x100000, 0x80000,  CRC(88324715) SHA1(c6c8de4e5aeda14232ec7b026da389774b3c7bb1) )
+	ROM_LOAD16_BYTE( "cm2.p4",  0x100001, 0x80000,  CRC(8d54a81d) SHA1(37753cf8595647aaf8b8267ca177b6744de9c6d4) )
+	ROM_LOAD16_BYTE( "cm2.p5",  0x200000, 0x80000,  CRC(5cf8a2bf) SHA1(2514e78e82842fa5c85d26de35637269cd08b21d) )
+	ROM_LOAD16_BYTE( "cm2.p6",  0x200001, 0x80000,  CRC(cf793d2d) SHA1(579c759f57fb6bb87aa27c9d5fb684058913dedc) )
+	ROM_LOAD16_BYTE( "cm2.p7",  0x300000, 0x80000,  CRC(008aa4b0) SHA1(b4cec6d11abd0e111c295533700595398ff59075) )
+	ROM_LOAD16_BYTE( "cm2.p8",  0x300001, 0x80000,  CRC(bac04f5a) SHA1(130721b7abf28dea1f8162705c8bfc5a4bb78152) )
+ROM_END
+
+ROM_START( crmaze2d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "cm2d.p1", 0x000000, 0x80000,  CRC(a150027b) SHA1(f737b0e3b8954c1589a929b7e567cb55df4a3997) )
+	ROM_LOAD16_BYTE( "cm2d.p2", 0x000001, 0x80000,  CRC(84ed6bce) SHA1(7a11473e7ec277508952f7ae6cfc7ed28e1b5c99) )
+	ROM_LOAD16_BYTE( "cm2.p3",  0x100000, 0x80000,  CRC(88324715) SHA1(c6c8de4e5aeda14232ec7b026da389774b3c7bb1) )
+	ROM_LOAD16_BYTE( "cm2.p4",  0x100001, 0x80000,  CRC(8d54a81d) SHA1(37753cf8595647aaf8b8267ca177b6744de9c6d4) )
+	ROM_LOAD16_BYTE( "cm2.p5",  0x200000, 0x80000,  CRC(5cf8a2bf) SHA1(2514e78e82842fa5c85d26de35637269cd08b21d) )
+	ROM_LOAD16_BYTE( "cm2.p6",  0x200001, 0x80000,  CRC(cf793d2d) SHA1(579c759f57fb6bb87aa27c9d5fb684058913dedc) )
+	ROM_LOAD16_BYTE( "cm2.p7",  0x300000, 0x80000,  CRC(008aa4b0) SHA1(b4cec6d11abd0e111c295533700595398ff59075) )
+	ROM_LOAD16_BYTE( "cm2.p8",  0x300001, 0x80000,  CRC(bac04f5a) SHA1(130721b7abf28dea1f8162705c8bfc5a4bb78152) )
+ROM_END
+
+ROM_START( crmaze2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
@@ -2239,6 +2708,58 @@ ROM_START( crmazeb )
 	ROM_LOAD16_BYTE( "am2g.p6",  0x300001, 0x80000,  CRC(3e134ecc) SHA1(1f8cdce62e693eb07c4620b64cc467339c0563de) )
 	ROM_LOAD16_BYTE( "am2g.p7",  0x400000, 0x80000,  CRC(6eb36f1d) SHA1(08b9ec184d64bdbdfa61d3e991a3647e74a7756f) )
 	ROM_LOAD16_BYTE( "am2g.p8",  0x400001, 0x80000,  CRC(dda353ef) SHA1(56a5b43f0b0bd9dbf348946a5758ebe63eadb8cf) )
+ROM_END
+
+//The Crystal Maze Team Challenge
+ROM_START( crmaze3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "cm3.p1",  0x000000, 0x80000,  CRC(2d2edee5) SHA1(0281ec97aaaaf4c7969340bd5995ac1541dbad54) )
+	ROM_LOAD16_BYTE( "cm3.p2",  0x000001, 0x80000,  CRC(c223d7b9) SHA1(da9d730716a30d0e93f2a02c1efa7f19457ae010) )
+	ROM_LOAD16_BYTE( "cm3.p3",  0x100000, 0x80000,  CRC(2959c77b) SHA1(8de533bfad48ad19a635dddcafa2a0825133b4de) )
+	ROM_LOAD16_BYTE( "cm3.p4",  0x100001, 0x80000,  CRC(b7873e9a) SHA1(a71fac883e02d5f49aee0a20f92dbdb00640ce8d) )
+	ROM_LOAD16_BYTE( "cm3.p5",  0x200000, 0x80000,  CRC(c8375070) SHA1(da2ba6591d8765f896c40d6526da8e945d02a182) )
+	ROM_LOAD16_BYTE( "cm3.p6",  0x200001, 0x80000,  CRC(1ea36938) SHA1(43f62935b21232d23f662e1e124663267edb1283) )
+	ROM_LOAD16_BYTE( "cm3.p7",  0x300000, 0x80000,  CRC(9de3802e) SHA1(ec792f115a0708d68046ba0beb314b7e1f1eb422) )
+	ROM_LOAD16_BYTE( "cm3.p8",  0x300001, 0x80000,  CRC(1e6e60b0) SHA1(5e71714747073dd89852a84585642388ee440325) )
+	ROM_LOAD16_BYTE( "cm3.p9",  0x400000, 0x80000,  CRC(bfba55a7) SHA1(22eb9b1f9fe83d3b424fd521b68e2976a1940df9) )
+	ROM_LOAD16_BYTE( "cm3.p10",  0x400001, 0x80000,  CRC(07edda81) SHA1(e94525be03f30e407051992925bb0d693f3d809b) )
+ROM_END
+
+ROM_START( crmaze3d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "cm3d.p1",  0x000000, 0x80000,  CRC(245f00fa) SHA1(ff5ae1a2ae024dfc0b4104360626e4106f4cd36f) )
+	ROM_LOAD16_BYTE( "cm3d.p2",  0x000001, 0x80000,  CRC(091adbcb) SHA1(1466b036d06f6335c90426095ad0f60ea958a29d) )
+	ROM_LOAD16_BYTE( "cm3.p3",  0x100000, 0x80000,  CRC(2959c77b) SHA1(8de533bfad48ad19a635dddcafa2a0825133b4de) )
+	ROM_LOAD16_BYTE( "cm3.p4",  0x100001, 0x80000,  CRC(b7873e9a) SHA1(a71fac883e02d5f49aee0a20f92dbdb00640ce8d) )
+	ROM_LOAD16_BYTE( "cm3.p5",  0x200000, 0x80000,  CRC(c8375070) SHA1(da2ba6591d8765f896c40d6526da8e945d02a182) )
+	ROM_LOAD16_BYTE( "cm3.p6",  0x200001, 0x80000,  CRC(1ea36938) SHA1(43f62935b21232d23f662e1e124663267edb1283) )
+	ROM_LOAD16_BYTE( "cm3.p7",  0x300000, 0x80000,  CRC(9de3802e) SHA1(ec792f115a0708d68046ba0beb314b7e1f1eb422) )
+	ROM_LOAD16_BYTE( "cm3.p8",  0x300001, 0x80000,  CRC(1e6e60b0) SHA1(5e71714747073dd89852a84585642388ee440325) )
+	ROM_LOAD16_BYTE( "cm3.p9",  0x400000, 0x80000,  CRC(bfba55a7) SHA1(22eb9b1f9fe83d3b424fd521b68e2976a1940df9) )
+	ROM_LOAD16_BYTE( "cm3.p10",  0x400001, 0x80000,  CRC(07edda81) SHA1(e94525be03f30e407051992925bb0d693f3d809b) )
+ROM_END
+
+ROM_START( crmaze3a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "am3z.p1",  0x000000, 0x80000,  CRC(9484e656) SHA1(3c35a8ebeddea56d73ce8db4e93c51cdd9546d59) )
+	ROM_LOAD16_BYTE( "am3z.p2",  0x000001, 0x80000,  CRC(1865ee80) SHA1(b3ff8e1631d811b8e88664dd84ae82231ce1f5aa) )
+	ROM_LOAD16_BYTE( "am3g.p1",  0x100000, 0x80000,  CRC(49fe36af) SHA1(7c39223b07f53ff57a56c3817299734491372170) )
+	ROM_LOAD16_BYTE( "am3g.p2",  0x100001, 0x80000,  CRC(b8823cbd) SHA1(206d3b1b2daff1979f97841041661f8407c35d4d) )
+	ROM_LOAD16_BYTE( "am3g.p3",  0x200000, 0x80000,  CRC(b1870f17) SHA1(54c6cabb56e4daa4ccf801d5e44b2789b116d562) )
+	ROM_LOAD16_BYTE( "am3g.p4",  0x200001, 0x80000,  CRC(c015d446) SHA1(669007e841afeb1084d9062d0a47c159e4c83cc9) )
+	ROM_LOAD16_BYTE( "am3g.p5",  0x300000, 0x80000,  CRC(9de3802e) SHA1(ec792f115a0708d68046ba0beb314b7e1f1eb422) )
+	ROM_LOAD16_BYTE( "am3g.p6",  0x300001, 0x80000,  CRC(1e6e60b0) SHA1(5e71714747073dd89852a84585642388ee440325) )
+	ROM_LOAD16_BYTE( "am3g.p7",  0x400000, 0x80000,  CRC(a4611e29) SHA1(91b164eea5dbdd1129ad12d7af2dbdb3cd68bcec) )
+	ROM_LOAD16_BYTE( "am3g.p8",  0x400001, 0x80000,  CRC(1a10c22e) SHA1(8533a5db3922b80b6e9f74e4e432a2b64bc24fc0) )
 ROM_END
 
 ROM_START( turnover )
@@ -2567,20 +3088,32 @@ GAME( 1987,  dealem,    0,        dealem,   dealem,   0,        ROT0, "Zenitone"
 GAME( 199?,  bctvidbs,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
 
 /* Complete sets */
-GAME( 1994,  crmaze,    bctvidbs, mpu4_vid, crmaze,   crmaze,   ROT0, "Barcrest",		"The Crystal Maze Team Challenge (SWP)",							GAME_NOT_WORKING )
-GAME( 1993,  crmazea,   crmaze,   mpu4_vid, crmaze,   crmazea,  ROT0, "Barcrest",		"The Crystal Maze (AMLD Version)",									GAME_NOT_WORKING )
-GAME( 1993,  crmazeb,   crmaze,   mpu4_vid, crmaze,   0,        ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (AMLD Version)",			GAME_NOT_WORKING ) /* unprotected? bootleg? */
+/* Standard sets are the most common setups, while Datapak releases use a BACTA datalogger (not emulated) to record more information about the game operation, for security etc.
+AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
+The AMLD versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
 
-GAME( 199?,  turnover,  bctvidbs, mpu4_vid, mpu4,     turnover, ROT0, "Barcrest",		"Turnover (v2.3)",													GAME_NOT_WORKING )
+GAME( 1993,  crmaze,    bctvidbs, crmaze,   crmaze,   crmaze,   ROT0, "Barcrest",		"The Crystal Maze (v1.3)",											GAME_NOT_WORKING )//SWP 0.9
+GAME( 1993,  crmazed,   crmaze,   crmaze,   crmaze,   crmaze,   ROT0, "Barcrest",		"The Crystal Maze (v1.3, Datapak)",									GAME_NOT_WORKING )//SWP 0.9D
+GAME( 1993,  crmazea,   crmaze,   crmaze,   crmaze,   crmazea,  ROT0, "Barcrest",		"The Crystal Maze (v0.1, AMLD)",									GAME_NOT_WORKING )//SWP 0.9
 
-GAME( 1990,  skiltrek,  bctvidbs, mpu4_vid, mpu4,     skiltrek, ROT0, "Barcrest",		"Skill Trek (v1.1)",												GAME_NOT_WORKING )
+GAME( 1993,  crmaze2,   bctvidbs, crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2)",					GAME_NOT_WORKING )//SWP 1.0
+GAME( 1993,  crmaze2d,  crmaze2,  crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2d)",				GAME_NOT_WORKING )//SWP 1.0D
+GAME( 1993,  crmaze2a,  crmaze2,  crmaze,   crmaze,   0,        ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD)",			GAME_NOT_WORKING )//SWP 1.0 /* unprotected? bootleg? */
 
-GAME( 1989,  adders,    bctvidbs, mpu4_vid, mpu4,     adders,   ROT0, "Barcrest",		"Adders and Ladders (v2.0)",										GAME_NOT_WORKING )
+GAME( 1994,  crmaze3,   bctvidbs, crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9)",							GAME_NOT_WORKING )//SWP 0.7
+GAME( 1994,  crmaze3d,  crmaze3,  crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9, Datapak)",					GAME_NOT_WORKING )//SWP 0.7D
+GAME( 1994,  crmaze3a,  crmaze3,  crmaze,   crmaze,   crmaze3a, ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v1.2, AMLD)",						GAME_NOT_WORKING )//SWP 0.7
 
-GAME( 1989,  timemchn,  bctvidbs, mpu4_vid, mpu4,     timemchn, ROT0, "Barcrest",		"Time Machine (v2.0)",												GAME_NOT_WORKING )
+GAME( 199?,  turnover,  bctvidbs, mpu4_vid, turnover, turnover, ROT0, "Barcrest",		"Turnover (v2.3)",													GAME_NOT_WORKING )
 
-GAME( 199?,  mating,    bctvidbs, mating,   mpu4,     mating,   ROT0, "Barcrest",		"The Mating Game (v0.2)",											GAME_NOT_WORKING )
-GAME( 199?,  matingd,   mating,   mating,   mpu4,     mating,   ROT0, "Barcrest",		"The Mating Game (v0.2d)",											GAME_NOT_WORKING )
+GAME( 1990,  skiltrek,  bctvidbs, mpu4_vid, skiltrek, skiltrek, ROT0, "Barcrest",		"Skill Trek (v1.1)",												GAME_NOT_WORKING )
+
+GAME( 1989,  adders,    bctvidbs, mpu4_vid, adders,   adders,   ROT0, "Barcrest",		"Adders and Ladders (v2.0)",										GAME_NOT_WORKING )
+
+GAME( 1989,  timemchn,  bctvidbs, mpu4_vid, skiltrek, timemchn, ROT0, "Barcrest",		"Time Machine (v2.0)",												GAME_NOT_WORKING )
+
+GAME( 199?,  mating,    bctvidbs, mating,   mating,   mating,   ROT0, "Barcrest",		"The Mating Game (v0.4)",											GAME_NOT_WORKING )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
+GAME( 199?,  matingd,   mating,   mating,   mating,   mating,   ROT0, "Barcrest",		"The Mating Game (v0.4, Datapak)",									GAME_NOT_WORKING )//SWP 0.2D
 
 /* Barquest */
 /* Barquest II */
@@ -2588,23 +3121,23 @@ GAME( 199?,  matingd,   mating,   mating,   mpu4,     mating,   ROT0, "Barcrest"
 
 /* Games below are missing question ROMs */
 GAME( 199?,  strikeit,  bctvidbs, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest",		"Strike it Lucky (v0.5)",											GAME_NOT_WORKING )
-GAME( 199?,  strikeitd, strikeit, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest",		"Strike it Lucky (v0.5d)",											GAME_NOT_WORKING )
+GAME( 199?,  strikeitd, strikeit, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest",		"Strike it Lucky (v0.5, Datapak)",									GAME_NOT_WORKING )
 GAME( 199?,  strikeit2, strikeit, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest",		"Strike it Lucky (v0.53)",											GAME_NOT_WORKING )
-GAME( 199?,  strikeit2d,strikeit, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest",		"Strike it Lucky (v0.53d)",											GAME_NOT_WORKING )
+GAME( 199?,  strikeit2d,strikeit, mpu4_vid, mpu4,     strikeit, ROT0, "Barcrest",		"Strike it Lucky (v0.53, Datapak)",									GAME_NOT_WORKING )
 
 GAME( 199?,  eyesdown,  bctvidbs, mpu4_vid, mpu4,     eyesdown, ROT0, "Barcrest",		"Eyes Down (v1.3)",													GAME_NOT_WORKING )
-GAME( 199?,  eyesdownd, eyesdown, mpu4_vid, mpu4,     eyesdown, ROT0, "Barcrest",		"Eyes Down (v1.3d)",												GAME_NOT_WORKING )
+GAME( 199?,  eyesdownd, eyesdown, mpu4_vid, mpu4,     eyesdown, ROT0, "Barcrest",		"Eyes Down (v1.3, Datapak)",										GAME_NOT_WORKING )
 
-GAME( 199?,  quidgrid,  bctvidbs, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v1.2)",													GAME_NOT_WORKING )
-GAME( 199?,  quidgridd, quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v1.2d)",												GAME_NOT_WORKING )
-GAME( 199?,  quidgrid2, quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v2.4)",													GAME_NOT_WORKING )
-GAME( 199?,  quidgrid2d,quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v2.4d)",												GAME_NOT_WORKING )
+GAME( 199?,  quidgrid,  bctvidbs, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v1.2)",												GAME_NOT_WORKING )
+GAME( 199?,  quidgridd, quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v1.2, Datapak)",									GAME_NOT_WORKING )
+GAME( 199?,  quidgrid2, quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v2.4)",												GAME_NOT_WORKING )
+GAME( 199?,  quidgrid2d,quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v2.4, Datapak)",									GAME_NOT_WORKING )
 
 /* Games below are newer BwB games and use their own BIOS ROMs */
 GAME( 199?,  vgpoker,   0,        vgpoker,  mpu4,     0,        ROT0, "BwB",			"Vegas Poker (prototype, release 2)",								GAME_NOT_WORKING )
 GAME( 199?,  prizeinv,  0,        mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Prize Space Invaders (20\" v1.1)",									GAME_NOT_WORKING )
 GAME( 199?,  blox,      0,        mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0)",														GAME_NOT_WORKING )
-GAME( 199?,  bloxd,     blox,     mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0, datapak)",												GAME_NOT_WORKING )
+GAME( 199?,  bloxd,     blox,     mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0, Datapak)",												GAME_NOT_WORKING )
 
 /* Games below are non-video (why are they in this file? not mpu4.c?) */
 GAMEL(1989?, connect4,  0,        mpu4mod2, connect4, connect4, ROT0, "Dolbeck Systems","Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
