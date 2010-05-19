@@ -231,7 +231,7 @@ OP(op,c7) { RST(0x00);												} /* RST  0           */
 OP(op,c8) { RET_COND( cpustate->_F & ZF, 0xc8 );								} /* RET  Z           */
 OP(op,c9) { POP(cpustate, PC);												} /* RET              */
 OP(op,ca) { JP_COND( cpustate->_F & ZF );									} /* JP   Z,a         */
-OP(op,cb) { cpustate->R++; EXEC(cb,ROP(cpustate));									} /* **** CB xx       */
+OP(op,cb) { cpustate->R++; cpustate->extra_cycles += exec_cb(cpustate,ROP(cpustate));									} /* **** CB xx       */
 OP(op,cc) { CALL_COND( cpustate->_F & ZF, 0xcc );							} /* CALL Z,a         */
 OP(op,cd) { CALL(); 												} /* CALL a           */
 OP(op,ce) { ADC(ARG(cpustate)); 											} /* ADC  A,n         */
@@ -251,7 +251,7 @@ OP(op,d9) { EXX;													} /* EXX              */
 OP(op,da) { JP_COND( cpustate->_F & CF );									} /* JP   C,a         */
 OP(op,db) { unsigned n = ARG(cpustate) | (cpustate->_A << 8); cpustate->_A = IN( cpustate, n );			} /* IN   A,(n)       */
 OP(op,dc) { CALL_COND( cpustate->_F & CF, 0xdc );							} /* CALL C,a         */
-OP(op,dd) { cpustate->R++; EXEC(dd,ROP(cpustate));									} /* **** DD xx       */
+OP(op,dd) { cpustate->R++; cpustate->extra_cycles += exec_dd(cpustate,ROP(cpustate));									} /* **** DD xx       */
 OP(op,de) { SBC(ARG(cpustate)); 											} /* SBC  A,n         */
 OP(op,df) { RST(0x18);												} /* RST  3           */
 
@@ -269,7 +269,7 @@ OP(op,e9) { cpustate->_PC = cpustate->_HL;												} /* JP   (HL)        */
 OP(op,ea) { JP_COND( cpustate->_F & PF );									} /* JP   PE,a        */
 OP(op,eb) { EX_DE_HL;												} /* EX   DE,HL       */
 OP(op,ec) { CALL_COND( cpustate->_F & PF, 0xec );							} /* CALL PE,a        */
-OP(op,ed) { cpustate->R++; EXEC(ed,ROP(cpustate));									} /* **** ED xx       */
+OP(op,ed) { cpustate->R++; cpustate->extra_cycles += exec_ed(cpustate,ROP(cpustate));									} /* **** ED xx       */
 OP(op,ee) { XOR(ARG(cpustate)); 											} /* XOR  n           */
 OP(op,ef) { RST(0x28);												} /* RST  5           */
 
@@ -287,14 +287,15 @@ OP(op,f9) { cpustate->_SP = cpustate->_HL;												} /* LD   SP,HL       */
 OP(op,fa) { JP_COND(cpustate->_F & SF);										} /* JP   M,a         */
 OP(op,fb) { EI; 													} /* EI               */
 OP(op,fc) { CALL_COND( cpustate->_F & SF, 0xfc );							} /* CALL M,a         */
-OP(op,fd) { cpustate->R++; EXEC(fd,ROP(cpustate));									} /* **** FD xx       */
+OP(op,fd) { cpustate->R++; cpustate->extra_cycles += exec_fd(cpustate,ROP(cpustate));									} /* **** FD xx       */
 OP(op,fe) { CP(ARG(cpustate));												} /* CP   n           */
 OP(op,ff) { RST(0x38);												} /* RST  7           */
 
 
-static void take_interrupt(z180_state *cpustate, int irq)
+static int take_interrupt(z180_state *cpustate, int irq)
 {
 	int irq_vector;
+	int cycles = 0;
 
 	/* there isn't a valid previous program counter */
 	cpustate->_PPC = -1;
@@ -325,7 +326,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 			RM16( cpustate, irq_vector, &cpustate->PC );
 			LOG(("Z180 '%s' IM2 [$%04x] = $%04x\n",cpustate->device->tag() , irq_vector, cpustate->_PCD));
 			/* CALL opcode timing */
-			cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xcd];
+			cycles += cpustate->cc[Z180_TABLE_op][0xcd];
 		}
 		else
 		/* Interrupt mode 1. RST 38h */
@@ -335,7 +336,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 			PUSH(cpustate,  PC );
 			cpustate->_PCD = 0x0038;
 			/* RST $38 + 'interrupt latency' cycles */
-			cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xff] - cpustate->cc[Z180_TABLE_ex][0xff];
+			cycles += cpustate->cc[Z180_TABLE_op][0xff] - cpustate->cc[Z180_TABLE_ex][0xff];
 		}
 		else
 		{
@@ -349,18 +350,18 @@ static void take_interrupt(z180_state *cpustate, int irq)
 					PUSH(cpustate,  PC );
 					cpustate->_PCD = irq_vector & 0xffff;
 						/* CALL $xxxx + 'interrupt latency' cycles */
-					cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xcd] - cpustate->cc[Z180_TABLE_ex][0xff];
+					cycles += cpustate->cc[Z180_TABLE_op][0xcd] - cpustate->cc[Z180_TABLE_ex][0xff];
 					break;
 				case 0xc30000:	/* jump */
 					cpustate->_PCD = irq_vector & 0xffff;
 					/* JP $xxxx + 2 cycles */
-					cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xc3] - cpustate->cc[Z180_TABLE_ex][0xff];
+					cycles += cpustate->cc[Z180_TABLE_op][0xc3] - cpustate->cc[Z180_TABLE_ex][0xff];
 					break;
 				default:		/* rst (or other opcodes?) */
 					PUSH(cpustate,  PC );
 					cpustate->_PCD = irq_vector & 0x0038;
 					/* RST $xx + 2 cycles */
-					cpustate->icount -= cpustate->cc[Z180_TABLE_op][cpustate->_PCD] - cpustate->cc[Z180_TABLE_ex][cpustate->_PCD];
+					cycles += cpustate->cc[Z180_TABLE_op][cpustate->_PCD] - cpustate->cc[Z180_TABLE_ex][cpustate->_PCD];
 					break;
 			}
 		}
@@ -373,7 +374,9 @@ static void take_interrupt(z180_state *cpustate, int irq)
 		RM16( cpustate, irq_vector, &cpustate->PC );
 		LOG(("Z180 '%s' INT%d [$%04x] = $%04x\n", cpustate->device->tag(), irq, irq_vector, cpustate->_PCD));
 		/* CALL opcode timing */
-		cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xcd];
+		cycles += cpustate->cc[Z180_TABLE_op][0xcd];
 	}
+
+	return cycles;
 }
 

@@ -234,7 +234,7 @@ OP(dd,c7) { illegal_1(cpustate); op_c7(cpustate);									}		  /* DB   DD       
 OP(dd,c8) { illegal_1(cpustate); op_c8(cpustate);									} /* DB   DD          */
 OP(dd,c9) { illegal_1(cpustate); op_c9(cpustate);									} /* DB   DD          */
 OP(dd,ca) { illegal_1(cpustate); op_ca(cpustate);									} /* DB   DD          */
-OP(dd,cb) { cpustate->R++; EAX(cpustate); EXEC(xycb,ARG(cpustate));							} /* **   DD CB xx    */
+OP(dd,cb) { cpustate->R++; EAX(cpustate); cpustate->extra_cycles += exec_xycb(cpustate,ARG(cpustate));							} /* **   DD CB xx    */
 OP(dd,cc) { illegal_1(cpustate); op_cc(cpustate);									} /* DB   DD          */
 OP(dd,cd) { illegal_1(cpustate); op_cd(cpustate);									} /* DB   DD          */
 OP(dd,ce) { illegal_1(cpustate); op_ce(cpustate);									} /* DB   DD          */

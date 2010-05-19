@@ -229,7 +229,7 @@ OP(fd,c7) { illegal_1(cpustate); op_c7(cpustate);									} /* DB   FD          
 OP(fd,c8) { illegal_1(cpustate); op_c8(cpustate);									} /* DB   FD          */
 OP(fd,c9) { illegal_1(cpustate); op_c9(cpustate);									} /* DB   FD          */
 OP(fd,ca) { illegal_1(cpustate); op_ca(cpustate);									} /* DB   FD          */
-OP(fd,cb) { cpustate->R++; EAY(cpustate); EXEC(xycb,ARG(cpustate));							} /* **   FD CB xx    */
+OP(fd,cb) { cpustate->R++; EAY(cpustate); cpustate->extra_cycles += exec_xycb(cpustate,ARG(cpustate));							} /* **   FD CB xx    */
 OP(fd,cc) { illegal_1(cpustate); op_cc(cpustate);									} /* DB   FD          */
 OP(fd,cd) { illegal_1(cpustate); op_cd(cpustate);									} /* DB   FD          */
 OP(fd,ce) { illegal_1(cpustate); op_ce(cpustate);									} /* DB   FD          */

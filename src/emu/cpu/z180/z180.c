@@ -133,6 +133,7 @@ struct _z180_state
 	UINT32	ioltemp;
 	int icount;
 	int old_icount;				/* for burning cycles */
+	int extra_cycles;			/* extra cpu cycles */
 	UINT8 *cc[6];
 };
 
@@ -782,6 +783,21 @@ static void set_irq_line(z180_state *cpustate, int irqline, int state);
 #define Z180_IOCR_RMASK 		0xff
 #define Z180_IOCR_WMASK 		0xff
 
+/***************************************************************************
+    CPU PREFIXES
+
+    order is important here - see z180tbl.h
+***************************************************************************/
+
+#define Z180_PREFIX_op			0
+#define Z180_PREFIX_cb			1
+#define Z180_PREFIX_dd			2
+#define Z180_PREFIX_ed			3
+#define Z180_PREFIX_fd			4
+#define Z180_PREFIX_xycb		5
+
+#define Z180_PREFIX_COUNT		(Z180_PREFIX_xycb + 1)
+
 
 /***************************************************************************
     CPU STATE DESCRIPTION
@@ -919,8 +935,8 @@ static UINT8 *SZHVC_sub;
 
 static UINT8 z180_readcontrol(z180_state *cpustate, offs_t port);
 static void z180_writecontrol(z180_state *cpustate, offs_t port, UINT8 data);
-static void z180_dma0(z180_state *cpustate);
-static void z180_dma1(z180_state *cpustate);
+static int z180_dma0(z180_state *cpustate, int max_cycles);
+static int z180_dma1(z180_state *cpustate);
 static CPU_BURN( z180 );
 static CPU_SET_INFO( z180 );
 
@@ -1716,17 +1732,18 @@ static void z180_writecontrol(z180_state *cpustate, offs_t port, UINT8 data)
 	}
 }
 
-static void z180_dma0(z180_state *cpustate)
+static int z180_dma0(z180_state *cpustate, int max_cycles)
 {
 	offs_t sar0 = 65536 * cpustate->IO_SAR0B + 256 * cpustate->IO_SAR0H + cpustate->IO_SAR0L;
 	offs_t dar0 = 65536 * cpustate->IO_DAR0B + 256 * cpustate->IO_DAR0H + cpustate->IO_DAR0L;
 	int bcr0 = 256 * cpustate->IO_BCR0H + cpustate->IO_BCR0L;
 	int count = (cpustate->IO_DMODE & Z180_DMODE_MMOD) ? bcr0 : 1;
+	int cycles = 0;
 
 	if (bcr0 == 0)
 	{
 		cpustate->IO_DSTAT &= ~Z180_DSTAT_DE0;
-		return;
+		return 0;
 	}
 
 	while (count-- > 0)
@@ -1821,7 +1838,8 @@ static void z180_dma0(z180_state *cpustate)
 		}
 		bcr0--;
 		count--;
-		if ((cpustate->icount -= 6) < 0)
+		cycles += 6;
+		if (cycles > max_cycles)
 			break;
 	}
 
@@ -1841,24 +1859,26 @@ static void z180_dma0(z180_state *cpustate)
 		cpustate->IO_DSTAT &= ~Z180_DSTAT_DE0;
 		/* terminal count interrupt enabled? */
 		if (cpustate->IO_DSTAT & Z180_DSTAT_DIE0 && cpustate->IFF1)
-			take_interrupt(cpustate, Z180_INT_DMA0);
+			cycles += take_interrupt(cpustate, Z180_INT_DMA0);
 	}
+	return cycles;
 }
 
-static void z180_dma1(z180_state *cpustate)
+static int z180_dma1(z180_state *cpustate)
 {
 	offs_t mar1 = 65536 * cpustate->IO_MAR1B + 256 * cpustate->IO_MAR1H + cpustate->IO_MAR1L;
 	offs_t iar1 = 256 * cpustate->IO_IAR1H + cpustate->IO_IAR1L;
 	int bcr1 = 256 * cpustate->IO_BCR1H + cpustate->IO_BCR1L;
+	int cycles = 0;
 
 	if ((cpustate->iol & Z180_DREQ1) == 0)
-		return;
+		return 0;
 
 	/* counter is zero? */
 	if (bcr1 == 0)
 	{
 		cpustate->IO_DSTAT &= ~Z180_DSTAT_DE1;
-		return;
+		return 0;
 	}
 
 	/* last transfer happening now? */
@@ -1899,11 +1919,11 @@ static void z180_dma1(z180_state *cpustate)
 		cpustate->iol &= ~Z180_TEND1;
 		cpustate->IO_DSTAT &= ~Z180_DSTAT_DE1;
 		if (cpustate->IO_DSTAT & Z180_DSTAT_DIE1 && cpustate->IFF1)
-			take_interrupt(cpustate, Z180_INT_DMA1);
+			cycles += take_interrupt(cpustate, Z180_INT_DMA1);
 	}
 
 	/* six cycles per transfer (minimum) */
-	cpustate->icount -= 6;
+	return 6 + cycles;
 }
 
 static void z180_write_iolines(z180_state *cpustate, UINT32 data)
@@ -2263,6 +2283,8 @@ static int handle_timers(z180_state *cpustate, int current_icount, int previous_
 {
 	int diff = previous_icount - current_icount;
 	int new_icount_base;
+	/* FIXME: move interrupt handling elsewhere */
+	int cycles = 0;
 
 	if(diff >= 20)
 	{
@@ -2295,7 +2317,7 @@ static int handle_timers(z180_state *cpustate, int current_icount, int previous_
 			// check if we can take the interrupt
 			if(cpustate->IFF1 && !cpustate->after_EI)
 			{
-				take_interrupt(cpustate, Z180_INT_PRT0);
+				cycles += take_interrupt(cpustate, Z180_INT_PRT0);
 			}
 		}
 
@@ -2304,7 +2326,7 @@ static int handle_timers(z180_state *cpustate, int current_icount, int previous_
 			// check if we can take the interrupt
 			if(cpustate->IFF1 && !cpustate->after_EI)
 			{
-				take_interrupt(cpustate, Z180_INT_PRT1);
+				cycles += take_interrupt(cpustate, Z180_INT_PRT1);
 			}
 		}
 
@@ -2318,17 +2340,20 @@ static int handle_timers(z180_state *cpustate, int current_icount, int previous_
 	return new_icount_base;
 }
 
-static void check_interrupts(z180_state *cpustate)
+static int check_interrupts(z180_state *cpustate)
 {
 	int i;
+	int cycles = 0;
+
 	for(i = 0; i <= 2; i++)
 	{
 		/* check for IRQs before each instruction */
 		if(cpustate->irq_state[i] != CLEAR_LINE && cpustate->IFF1 && !cpustate->after_EI)
 		{
-			take_interrupt(cpustate, Z180_INT0 + i);
+			cycles += take_interrupt(cpustate, Z180_INT0 + i);
 		}
 	}
+	return cycles;
 }
 
 /****************************************************************************
@@ -2372,27 +2397,38 @@ again:
 		{
 			debugger_instruction_hook(device, cpustate->_PCD);
 
-			z180_dma0(cpustate);
+			cpustate->icount -= z180_dma0(cpustate, cpustate->icount);
 			cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 		}
 		else
 		{
 			do
 			{
-				check_interrupts(cpustate);
+				cpustate->icount -= check_interrupts(cpustate);
 				cpustate->after_EI = 0;
 
 				cpustate->_PPC = cpustate->_PCD;
 				debugger_instruction_hook(device, cpustate->_PCD);
 				cpustate->R++;
 
-				EXEC_INLINE(op,ROP(cpustate));
+				cpustate->extra_cycles = 0;
+				cpustate->icount -= exec_op(cpustate,ROP(cpustate));
+				cpustate->icount -= cpustate->extra_cycles;
+
 				cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 
-				z180_dma0(cpustate);
+				/* FIXME:
+				 * For simultaneous DREQ0 and DREQ1 requests, channel 0 has priority
+				 * over channel 1. When channel 0 is performing a memory to/from memory
+				 * transfer, channel 1 cannot operate until the channel 0 operation has
+				 * terminated. If channel 1 is operating, channel 0 cannot operate until
+				 * channel 1 releases control of the bus.
+				 *
+				 */
+				cpustate->icount -= z180_dma0(cpustate, cpustate->icount);
 				cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 
-				z180_dma1(cpustate);
+				cpustate->icount -= z180_dma1(cpustate);
 				cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 
 				/* If DMA is done break out to the faster loop */
@@ -2406,13 +2442,17 @@ again:
     {
         do
 		{
-			check_interrupts(cpustate);
+        	int xx;
+        	cpustate->icount -= check_interrupts(cpustate);
 			cpustate->after_EI = 0;
 
 			cpustate->_PPC = cpustate->_PCD;
 			debugger_instruction_hook(device, cpustate->_PCD);
+			cpustate->extra_cycles = 0;
 			cpustate->R++;
-			EXEC_INLINE(op,ROP(cpustate));
+			xx = exec_op(cpustate,ROP(cpustate));
+			cpustate->icount -= xx;
+			cpustate->icount -= cpustate->extra_cycles;
 			cpustate->old_icount = handle_timers(cpustate, cpustate->icount, cpustate->old_icount);
 
 			/* If DMA is started go to check the mode */
