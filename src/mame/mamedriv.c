@@ -1631,7 +1631,7 @@ const game_driver * const drivers[] =
 	DRIVER( leaguemn )	/* (c) 1993 Irem (Japan) */
 	DRIVER( ssoldier )	/* (c) 1993 Irem America (US) */
 	DRIVER( psoldier )	/* (c) 1993 Irem (Japan) */
-	DRIVER( dsccr94j )	/* (c) 1994 Irem (Japan) */
+	DRIVER( dsoccr94j )	/* (c) 1994 Irem (Japan) */
 	DRIVER( gunforc2 )	/* (c) 1994 Irem */
 	DRIVER( geostorm )	/* (c) 1994 Irem (Japan) */
 	/* M107 */

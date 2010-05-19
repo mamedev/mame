@@ -187,7 +187,7 @@ Notes:
 
 2008-08
 Dip locations verified for:
-    - dsccr94j, gunforce, inthunt, majtitl2, uccops [manual]
+    - dsoccr94j, gunforce, inthunt, majtitl2, uccops [manual]
     - bmaster, hook, lethalt, mysticri, rtypeleo [dip listing]
 psoldier dip locations still need veritication.
 
@@ -789,7 +789,7 @@ static INPUT_PORTS_START( psoldier )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( dsccr94j )
+static INPUT_PORTS_START( dsoccr94j )
 	PORT_INCLUDE(m92_4player)
 	/* Dip Switch 2, dip 2 is listed as "Don't Change" and is "OFF" */
 
@@ -1080,7 +1080,7 @@ static MACHINE_DRIVER_START( psoldier )
 MACHINE_DRIVER_END
 
 static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
-static MACHINE_DRIVER_START( dsccr94j )
+static MACHINE_DRIVER_START( dsoccr94j )
 	MDRV_IMPORT_FROM(m92)
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_CONFIG(dsoccr94_config)
@@ -1968,7 +1968,7 @@ ROM_START( psoldier )
 	ROM_LOAD( "f3_w95.da", 0x000000, 0x080000, CRC(f7ca432b) SHA1(274458b68f906e6043bc36110a4903280647ac2d) )
 ROM_END
 
-ROM_START( dsccr94j )
+ROM_START( dsoccr94j )
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("a3_-h0-e.bin", 0x000001, 0x040000, CRC(8de1dbcd) SHA1(3726c7f8bc1e61a488ab7ef0b79a7a45054235c2) )
 	ROM_LOAD16_BYTE("a3_-l0-e.bin", 0x000000, 0x040000, CRC(d3df8bfd) SHA1(b98064579491aef8eb8ccb94195412e79674a0c1) )
@@ -2173,7 +2173,7 @@ static DRIVER_INIT( psoldier )
 	sound_status = 0x80;
 }
 
-static DRIVER_INIT( dsccr94j )
+static DRIVER_INIT( dsoccr94j )
 {
 	init_m92(machine, 1);
 }
@@ -2217,6 +2217,6 @@ GAME( 1993, nbbatman, 0,        nbbatman,      nbbatman, nbbatman, ROT0,   "Irem
 GAME( 1993, leaguemn, nbbatman, nbbatman,      nbbatman, nbbatman, ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, ssoldier, 0,        psoldier,      psoldier, ssoldier, ROT0,   "Irem America", "Superior Soldiers (US)", GAME_IMPERFECT_SOUND )
 GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, psoldier, ROT0,   "Irem",         "Perfect Soldiers (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1994, dsccr94j, dsoccr94, dsccr94j,      dsccr94j, dsccr94j, ROT0,   "Irem",         "Dream Soccer '94 (Japan)", 0 )
+GAME( 1994, dsoccr94j,dsoccr94, dsoccr94j,     dsoccr94j,dsoccr94j,ROT0,   "Irem",         "Dream Soccer '94 (Japan)", 0 )
 GAME( 1994, gunforc2, 0,        gunforc2,      gunforc2, gunforc2, ROT0,   "Irem",         "Gunforce 2 (US)", 0 )
 GAME( 1994, geostorm, gunforc2, gunforc2,      gunforc2, gunforc2, ROT0,   "Irem",         "Geostorm (Japan)", 0 )
