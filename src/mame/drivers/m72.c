@@ -11,6 +11,7 @@ Battle Chopper / Mr. Heli          1987  M72             Y
 Ninja Spirit                       1988  M72             Y
 Image Fight                        1988  M72             Y
 Legend of Hero Tonma               1989  M72             Y
+X Multiply                         1989  M81             N
 X Multiply                         1989  M72(1)          Y
 Dragon Breed                       1989  M81             N
 Dragon Breed                       1989  M72             Y
@@ -433,13 +434,13 @@ static WRITE16_HANDLER( loht_sample_trigger_w )
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( xmultipl_sample_trigger_w )
+static WRITE16_HANDLER( xmultiplm72_sample_trigger_w )
 {
 	static const int a[3] = { 0x0000, 0x0020, 0x1a40 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 3) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( dbreed72_sample_trigger_w )
+static WRITE16_HANDLER( dbreedm72_sample_trigger_w )
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(a[data & 0xff]);
@@ -627,19 +628,19 @@ static const UINT8 loht_crc[CRC_LEN] =	  {	0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0
 /* service mode crashes at the moment (119u2), so I can't add the CRCs for lohtj */
 
 /* X Multiply */
-static const UINT8 xmultipl_code[CODE_LEN] =
+static const UINT8 xmultiplm72_code[CODE_LEN] =
 {
 	0xea,0x30,0x02,0x00,0x0e	// jmp  0e00:$0230
 };
-static const UINT8 xmultipl_crc[CRC_LEN] =  {	0x73,0x82,0x4e,0x3f, 0xfc,0x56,0x59,0x06,
+static const UINT8 xmultiplm72_crc[CRC_LEN] =  {	0x73,0x82,0x4e,0x3f, 0xfc,0x56,0x59,0x06,
 												0x05,0x48,0xa8,0xf4, 0x00,0x00 };
 
 /* Dragon Breed */
-static const UINT8 dbreed72_code[CODE_LEN] =
+static const UINT8 dbreedm72_code[CODE_LEN] =
 {
 	0xea,0x6c,0x00,0x00,0x00	// jmp  0000:$006c
 };
-static const UINT8 dbreed72_crc[CRC_LEN] =	  {	0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
+static const UINT8 dbreedm72_crc[CRC_LEN] =	  {	0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
 												0x84,0xe6,0xd6,0xca, 0x00,0x00 };
 
 /* Air Duel */
@@ -741,18 +742,18 @@ static DRIVER_INIT( loht )
 	memset(m72_videoram2,0,0x4000);
 }
 
-static DRIVER_INIT( xmultipl )
+static DRIVER_INIT( xmultiplm72 )
 {
-	install_protection_handler(machine, xmultipl_code,xmultipl_crc);
+	install_protection_handler(machine, xmultiplm72_code,xmultiplm72_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, xmultipl_sample_trigger_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, xmultiplm72_sample_trigger_w);
 }
 
-static DRIVER_INIT( dbreed72 )
+static DRIVER_INIT( dbreedm72 )
 {
-	install_protection_handler(machine, dbreed72_code,dbreed72_crc);
+	install_protection_handler(machine, dbreedm72_code,dbreedm72_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dbreed72_sample_trigger_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dbreedm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( airduel )
@@ -836,15 +837,27 @@ static ADDRESS_MAP_START( NAME##_map, ADDRESS_SPACE_PROGRAM, 16 )		\
 	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)		\
 	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)		\
 	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM										\
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM									\
 ADDRESS_MAP_END
 
 
-/*                     ROMSIZE  WORKRAM */
-CPU1_MEMORY( rtype,    0x40000, 0x40000 )
-CPU1_MEMORY( m72,      0x80000, 0xa0000 )
-CPU1_MEMORY( xmultipl, 0x80000, 0x80000 )
-CPU1_MEMORY( dbreed72, 0x80000, 0x90000 )
+/*                        ROMSIZE  WORKRAM */
+CPU1_MEMORY( m72,         0x80000, 0xa0000 )
+CPU1_MEMORY( rtype,       0x40000, 0x40000 )
+CPU1_MEMORY( xmultiplm72, 0x80000, 0x80000 )
+CPU1_MEMORY( dbreedm72,   0x80000, 0x90000 )
+
+static ADDRESS_MAP_START( xmultipl_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0x9c000, 0x9ffff) AM_RAM	/* work RAM */
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbreed_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
@@ -1008,7 +1021,7 @@ static ADDRESS_MAP_START( kengo_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
-//AM_RANGE(0x8c, 0x8f) AM_WRITENOP   /* ??? */
+//	AM_RANGE(0x8c, 0x8f) AM_WRITENOP	/* ??? */
 ADDRESS_MAP_END
 
 
@@ -1046,6 +1059,7 @@ static ADDRESS_MAP_START( rtype2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", m72_sample_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(m72_sound_irq_ack_w)
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
+//	AM_RANGE(0x87, 0x87) AM_WRITENOP	/* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1777,44 +1791,6 @@ static const ym2151_interface ym2151_config =
 
 
 
-static MACHINE_DRIVER_START( rtype )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(rtype_map)
-	MDRV_CPU_IO_MAP(m72_portmap)
-
-	MDRV_CPU_ADD("soundcpu",Z80, SOUND_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(sound_ram_map)
-	MDRV_CPU_IO_MAP(rtype_sound_portmap)
-								/* IRQs are generated by main Z80 and YM2151 */
-
-	MDRV_MACHINE_START(m72)
-	MDRV_MACHINE_RESET(m72)
-
-	MDRV_SOUND_START(m72)
-	MDRV_SOUND_RESET(m72)
-
-	/* video hardware */
-	MDRV_GFXDECODE(m72)
-	MDRV_PALETTE_LENGTH(512)
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-
-	MDRV_VIDEO_START(m72)
-	MDRV_VIDEO_UPDATE(m72)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
-
 static MACHINE_DRIVER_START( m72_base )
 
 	/* basic machine hardware */
@@ -1864,7 +1840,6 @@ static MACHINE_DRIVER_START( m72 )
 							/* IRQs are generated by main Z80 and YM2151 */
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( m72_8751 )
 
 	MDRV_IMPORT_FROM(m72_base)
@@ -1876,17 +1851,55 @@ static MACHINE_DRIVER_START( m72_8751 )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( dkgenm72 )
+static MACHINE_DRIVER_START( rtype )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(m72_map)
+	MDRV_CPU_PROGRAM_MAP(rtype_map)
 	MDRV_CPU_IO_MAP(m72_portmap)
 
 	MDRV_CPU_ADD("soundcpu",Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_ram_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(fake_nmi,128)	/* clocked by V1? (Vigilante) */
+	MDRV_CPU_IO_MAP(rtype_sound_portmap)
+								/* IRQs are generated by main Z80 and YM2151 */
+
+	MDRV_MACHINE_START(m72)
+	MDRV_MACHINE_RESET(m72)
+
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
+
+	/* video hardware */
+	MDRV_GFXDECODE(m72)
+	MDRV_PALETTE_LENGTH(512)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
+	MDRV_VIDEO_START(m72)
+	MDRV_VIDEO_UPDATE(m72)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
+	MDRV_SOUND_CONFIG(ym2151_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( xmultipl )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
+	MDRV_CPU_PROGRAM_MAP(xmultipl_map)
+	MDRV_CPU_IO_MAP(hharry_portmap)
+
+	MDRV_CPU_ADD("soundcpu",Z80, SOUND_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(sound_rom_map)
+	MDRV_CPU_IO_MAP(rtype2_sound_portmap)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	MDRV_MACHINE_START(m72)
@@ -1919,12 +1932,11 @@ static MACHINE_DRIVER_START( dkgenm72 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
 
-
-static MACHINE_DRIVER_START( xmultipl )
+static MACHINE_DRIVER_START( xmultiplm72 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(xmultipl_map)
+	MDRV_CPU_PROGRAM_MAP(xmultiplm72_map)
 	MDRV_CPU_IO_MAP(m72_portmap)
 
 	MDRV_CPU_ADD("soundcpu",Z80, SOUND_CLOCK)
@@ -1962,7 +1974,6 @@ static MACHINE_DRIVER_START( xmultipl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( dbreed )
 
@@ -2007,11 +2018,11 @@ static MACHINE_DRIVER_START( dbreed )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( dbreed72 )
+static MACHINE_DRIVER_START( dbreedm72 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(dbreed72_map)
+	MDRV_CPU_PROGRAM_MAP(dbreedm72_map)
 	MDRV_CPU_IO_MAP(m72_portmap)
 
 	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CLOCK)
@@ -2049,7 +2060,6 @@ static MACHINE_DRIVER_START( dbreed72 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( rtype2 )
 
@@ -2180,7 +2190,6 @@ static MACHINE_DRIVER_START( hharry )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( hharryu )
 
 	/* basic machine hardware */
@@ -2224,6 +2233,48 @@ static MACHINE_DRIVER_START( hharryu )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( dkgenm72 )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
+	MDRV_CPU_PROGRAM_MAP(m72_map)
+	MDRV_CPU_IO_MAP(m72_portmap)
+
+	MDRV_CPU_ADD("soundcpu",Z80, SOUND_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(sound_ram_map)
+	MDRV_CPU_IO_MAP(sound_portmap)
+	MDRV_CPU_VBLANK_INT_HACK(fake_nmi,128)	/* clocked by V1? (Vigilante) */
+								/* IRQs are generated by main Z80 and YM2151 */
+
+	MDRV_MACHINE_START(m72)
+	MDRV_MACHINE_RESET(xmultipl)
+
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
+
+	/* video hardware */
+	MDRV_GFXDECODE(m72)
+	MDRV_PALETTE_LENGTH(512)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
+	MDRV_VIDEO_START(m72)
+	MDRV_VIDEO_UPDATE(m72)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK)
+	MDRV_SOUND_CONFIG(ym2151_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( poundfor )
 
@@ -2486,9 +2537,9 @@ ROM_START( rtypeb )
 	ROM_LOAD16_BYTE( "7.512", 0x00001, 0x10000, CRC(eacc8024) SHA1(6bcf1d4ea182b7341eac736d2a5d5f70deec0758) )
 	ROM_LOAD16_BYTE( "1.512", 0x00000, 0x10000, CRC(2e5fe27b) SHA1(a3364be5ab9c67aaa2152baf39ea12c571eca3cc) )
 	ROM_LOAD16_BYTE( "8.512", 0x20001, 0x10000, CRC(22cc4950) SHA1(ada5cffc13c38391a334411632237166a6be4938) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
+	ROM_RELOAD(               0xe0001, 0x10000 )
 	ROM_LOAD16_BYTE( "2.512", 0x20000, 0x10000, CRC(ada7b90e) SHA1(c9d2caed95b95d1c1718a10766bc88b2f8f51619) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_RELOAD(               0xe0000, 0x10000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* Roms located on the M72-ROM-C rom board */
 	ROM_LOAD( "rt_r-00.1h", 0x00000, 0x10000, CRC(dad53bc0) SHA1(1e3bc498861946278a0b1fe24259f5d224e265d7) )	/* sprites */
@@ -2645,7 +2696,7 @@ ROM_START( nspiritj )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "nin_c-pr.bin",  0x00000, 0x1000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) ) /* checksum correct for Japan version only (see test mode) */
+	ROM_LOAD( "nin_c-pr.bin", 0x00000, 0x01000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) )	/* checksum correct for Japan version only (see test mode) */
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "nin-r00.rom",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )	/* sprites */
@@ -2846,10 +2897,10 @@ ROM_START( lohtj )
 	ROM_LOAD( "lohtj_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "r200",  0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )	/* sprites */
-	ROM_LOAD( "r210",  0x20000, 0x20000, CRC(8ec5f6f3) SHA1(210f2753f5eeb06396758d21ab1778d459add247) )
-	ROM_LOAD( "r220",  0x40000, 0x20000, CRC(a41d3bfd) SHA1(536fb7c0321dbbc1a8b73e9647fba9c53a253fcc) )
-	ROM_LOAD( "r230",  0x60000, 0x20000, CRC(9d81a25b) SHA1(a354537c2fbba85f06485aa8487d7583a7133357) )
+	ROM_LOAD( "r200",     0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )	/* sprites */
+	ROM_LOAD( "r210",     0x20000, 0x20000, CRC(8ec5f6f3) SHA1(210f2753f5eeb06396758d21ab1778d459add247) )
+	ROM_LOAD( "r220",     0x40000, 0x20000, CRC(a41d3bfd) SHA1(536fb7c0321dbbc1a8b73e9647fba9c53a253fcc) )
+	ROM_LOAD( "r230",     0x60000, 0x20000, CRC(9d81a25b) SHA1(a354537c2fbba85f06485aa8487d7583a7133357) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "r2a0.a0",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )	/* tiles #1 */
@@ -2858,13 +2909,13 @@ ROM_START( lohtj )
 	ROM_LOAD( "r2a3.a3",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "078.b0",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )	/* tiles #2 */
-	ROM_LOAD( "079.b1",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
-	ROM_LOAD( "080.b2",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
-	ROM_LOAD( "081.b3",  0x30000, 0x10000, CRC(f01fe899) SHA1(c5ab967b7af55a757638bcdc9975f4b15064022d) )
+	ROM_LOAD( "078.b0",   0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )	/* tiles #2 */
+	ROM_LOAD( "079.b1",   0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
+	ROM_LOAD( "080.b2",   0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
+	ROM_LOAD( "081.b3",   0x30000, 0x10000, CRC(f01fe899) SHA1(c5ab967b7af55a757638bcdc9975f4b15064022d) )
 
 	ROM_REGION( 0x10000, "samples", 0 )	/* samples */
-	ROM_LOAD( "082",  0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+	ROM_LOAD( "082",      0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
 ROM_END
 
 /*
@@ -2912,11 +2963,10 @@ ROM_START( lohtb )
 	ROM_REGION( 0x10000, "samples", ROMREGION_ERASEFF )	/* -- no sample roms on bootleg, included with z80 code */
 ROM_END
 
-
 ROM_START( lohtb2 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "loht-a2.bin", 0x00001, 0x10000, CRC(ccc90e54) SHA1(860da001d9b0782adc25cfc3b453383225253d9e) )
-	ROM_LOAD16_BYTE( "loht-a3.bin", 0x20001, 0x10000, CRC(ff8a98de) SHA1(ccb8275241bea81abc01dc36e62557712c1b5a8c) )
+	ROM_LOAD16_BYTE( "loht-a2.bin",  0x00001, 0x10000, CRC(ccc90e54) SHA1(860da001d9b0782adc25cfc3b453383225253d9e) )
+	ROM_LOAD16_BYTE( "loht-a3.bin",  0x20001, 0x10000, CRC(ff8a98de) SHA1(ccb8275241bea81abc01dc36e62557712c1b5a8c) )
 	ROM_LOAD16_BYTE( "loht-a10.bin", 0x00000, 0x10000, CRC(3aa06730) SHA1(483b135f8ee0fc54b1953c7c28e909a88aa2fa2e) )
 	ROM_LOAD16_BYTE( "loht-a11.bin", 0x20000, 0x10000, CRC(eab1d7bc) SHA1(ec50fe89f05ae46e91b9f2f3d4e4383aa764e71d) )
 
@@ -2930,7 +2980,7 @@ ROM_START( lohtb2 )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "loht-a26.bin",  0x00000, 0x2000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) ) // unprotected??
+	ROM_LOAD( "loht-a26.bin",  0x00000, 0x02000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) ) // unprotected??
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "loht-a16.bin",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
@@ -2956,11 +3006,52 @@ ROM_START( lohtb2 )
 	ROM_LOAD( "loht-a22.bin",  0x30000, 0x10000, CRC(f01fe899) SHA1(c5ab967b7af55a757638bcdc9975f4b15064022d) )
 
 	ROM_REGION( 0x10000, "samples", 0 )	/* samples */
-	ROM_LOAD( "loht-a1.bin",  0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+	ROM_LOAD( "loht-a1.bin",   0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
 ROM_END
 
-
 ROM_START( xmultipl )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "xm-a-h1-.ic58", 0x00001, 0x20000, CRC(449048cf) SHA1(871b588177fb018937d143f76eda18aa53b0f6c4) )
+	ROM_LOAD16_BYTE( "xm-a-l1-.ic67", 0x00000, 0x20000, CRC(26ce39b0) SHA1(18ae2e8c2c826c6ecfa66f7af5afdeeac3936543) )
+	ROM_LOAD16_BYTE( "xm-a-h0-.ic59", 0x40001, 0x10000, CRC(509bc970) SHA1(44bb4ecedf8f127792e9a8da70b3a42c8ff30ad2) )
+	ROM_RELOAD(                       0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "xm-a-l0-.ic68", 0x40000, 0x10000, CRC(490a9ebc) SHA1(55d9d3a4f82f120faabca78c2e47922831f62a5d) )
+	ROM_RELOAD(                       0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "xm-a-sp-.ic14", 0x00000, 0x10000, CRC(006eef56) SHA1(917b26b200fa4c1692d4c7ca0ea0f7897e3e3b7b) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "t44.00",        0x00000, 0x20000, CRC(db45186e) SHA1(8c8edeb4b7e6b0516f2597823dc27eba9c5d9528) )	/* sprites */
+	ROM_LOAD( "t45.01",        0x20000, 0x20000, CRC(4d0764d4) SHA1(4942333336a110b033f16ac1afa06ffef7b2dad6) )
+	ROM_LOAD( "t46.10",        0x40000, 0x20000, CRC(f0c465a4) SHA1(69c107c860d4e8736431fd86b6821b70a8367eb3) )
+	ROM_LOAD( "t47.11",        0x60000, 0x20000, CRC(1263b24b) SHA1(0445a5381df3a868bed6967c8e5de7169e4be6a3) )
+	ROM_LOAD( "t48.20",        0x80000, 0x20000, CRC(4129944f) SHA1(988b072032d1667c3ac0731fada32fb6978505dc) )
+	ROM_LOAD( "t49.21",        0xa0000, 0x20000, CRC(2346e6f9) SHA1(b3de017dd0353e04d279f57e151c47f5fcc70e9c) )
+	ROM_LOAD( "t50.30",        0xc0000, 0x20000, CRC(e322543e) SHA1(b4c3a7f202d81485d5f0a7b7668ee89fc1edb215) )
+	ROM_LOAD( "t51.31",        0xe0000, 0x20000, CRC(229bf7b1) SHA1(ae42c7efbb6278dd3fa56842361138391f2d49ca) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "t53.a0",       0x00000, 0x20000, CRC(1a082494) SHA1(63a3a84a262833d2cafab41e35df8f10a5e317b1) )	/* tiles #1 */
+	ROM_LOAD( "t54.a1",       0x20000, 0x20000, CRC(076c16c5) SHA1(4be858806b916953d59aceee550e721eaf3996a6) )
+	ROM_LOAD( "t55.a2",       0x40000, 0x20000, CRC(25d877a5) SHA1(48c948bf714c432f534c098123c8f50d5561756f) )
+	ROM_LOAD( "t56.a3",       0x60000, 0x20000, CRC(5b1213f5) SHA1(87782aa0bd04d4378c4ba78b63028ae2709da2f1) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "t57.b0",       0x00000, 0x20000, CRC(0a84e0c7) SHA1(67ad181a7d2c431cb4bf45955e09754549a03576) )	/* tiles #2 */
+	ROM_LOAD( "t58.b1",       0x20000, 0x20000, CRC(a874121d) SHA1(1351d5901d55059c6472a4588a2e560396903861) )
+	ROM_LOAD( "t59.b2",       0x40000, 0x20000, CRC(69deb990) SHA1(1eed3183efbe576376661b45152a0a21240ecfc8) )
+	ROM_LOAD( "t60.b3",       0x60000, 0x20000, CRC(14c69f99) SHA1(4bea72f8bd421ef3ca559363f7473ce2e7038699) )
+
+	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_LOAD( "t52.v0",        0x00000, 0x20000, CRC(2db1bd80) SHA1(657006d0642ec7fb949bb52821d78fe51a599415) )
+
+	ROM_REGION( 0x0200, "proms", 0 )	/* proms */
+	ROM_LOAD( "m81_a-9l-.ic72", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
+	ROM_LOAD( "m81_a-9p-.ic74", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+ROM_END
+
+ROM_START( xmultiplm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ch3.h3",       0x00001, 0x20000, CRC(20685021) SHA1(92f4216320bf525045223b9454fb5bb224c536d8) )
 	ROM_LOAD16_BYTE( "cl3.l3",       0x00000, 0x20000, CRC(93fdd200) SHA1(dd4244ba0ce6c621136b0648374179da44363c01) )
@@ -3008,7 +3099,7 @@ ROM_START( dbreed )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "db-a-sp-.14",   0x0000, 0x10000, CRC(54a61560) SHA1(e5fccfcedcadbab1667900f98370043c1907dd89) )
+	ROM_LOAD( "db-a-sp-.14", 0x00000, 0x10000, CRC(54a61560) SHA1(e5fccfcedcadbab1667900f98370043c1907dd89) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )	/* sprites */
@@ -3036,7 +3127,7 @@ ROM_START( dbreedm72 )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "dbreed72_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_LOAD( "dbreedm72_i8751.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )	/* sprites */
@@ -3070,7 +3161,7 @@ ROM_START( rtype2 )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ic17.4f",      0x0000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
+	ROM_LOAD( "ic17.4f",      0x00000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "ic31.6l",      0x00000, 0x20000, CRC(2cd8f913) SHA1(a53752b35da95b420dd29a09176d265d292b3938) )	/* sprites */
@@ -3102,7 +3193,7 @@ ROM_START( rtype2j )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ic17.4f",      0x0000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
+	ROM_LOAD( "ic17.4f",      0x00000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "ic31.6l",      0x00000, 0x20000, CRC(2cd8f913) SHA1(a53752b35da95b420dd29a09176d265d292b3938) )	/* sprites */
@@ -3134,7 +3225,7 @@ ROM_START( rtype2jc )
 	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ic17.4f",      0x0000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
+	ROM_LOAD( "ic17.4f",      0x00000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "ic31.6l",      0x00000, 0x20000, CRC(2cd8f913) SHA1(a53752b35da95b420dd29a09176d265d292b3938) )	/* sprites */
@@ -3156,7 +3247,6 @@ ROM_START( rtype2jc )
 	ROM_LOAD( "ic14.4c",      0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
 ROM_END
 
-
 ROM_START( majtitle )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mt_h0-a.bin",    0x00001, 0x20000, CRC(36aadb67) SHA1(11cb9f190431ef7b68bcad691191c810b00452be) )
@@ -3167,7 +3257,7 @@ ROM_START( majtitle )
 	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "mt_sp.bin",    0x0000, 0x10000, CRC(e44260a9) SHA1(a2512033c8cca9a8064eae1ada721202edf06e8e) )
+	ROM_LOAD( "mt_sp.bin",    0x00000, 0x10000, CRC(e44260a9) SHA1(a2512033c8cca9a8064eae1ada721202edf06e8e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mt_n0.bin",    0x00000, 0x40000, CRC(5618cddc) SHA1(16d34b431ab9b72067fa669d694e635c88aeb261) )	/* sprites #1 */
@@ -3201,7 +3291,7 @@ ROM_START( majtitlej )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "mt_sp.bin",    0x0000, 0x10000, CRC(e44260a9) SHA1(a2512033c8cca9a8064eae1ada721202edf06e8e) )
+	ROM_LOAD( "mt_sp.bin",    0x00000, 0x10000, CRC(e44260a9) SHA1(a2512033c8cca9a8064eae1ada721202edf06e8e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "mt_n0.bin",    0x00000, 0x40000, CRC(5618cddc) SHA1(16d34b431ab9b72067fa669d694e635c88aeb261) )	/* sprites #1 */
@@ -3235,7 +3325,7 @@ ROM_START( hharry )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "a-sp-0.rom",   0x0000, 0x10000, CRC(80e210e7) SHA1(66cff58fb37c52e1d8e0567e13b774253e862585) )
+	ROM_LOAD( "a-sp-0.rom",   0x00000, 0x10000, CRC(80e210e7) SHA1(66cff58fb37c52e1d8e0567e13b774253e862585) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "hh_00.rom",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )	/* sprites */
@@ -3263,7 +3353,7 @@ ROM_START( hharryu )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "a-sp-0.rom",   0x0000, 0x10000, CRC(80e210e7) SHA1(66cff58fb37c52e1d8e0567e13b774253e862585) )
+	ROM_LOAD( "a-sp-0.rom",   0x00000, 0x10000, CRC(80e210e7) SHA1(66cff58fb37c52e1d8e0567e13b774253e862585) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "hh_00.rom",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )	/* sprites */
@@ -3291,7 +3381,7 @@ ROM_START( dkgensan )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "gen-a-sp.bin", 0x0000, 0x10000, CRC(e83cfc2c) SHA1(3193bdd06a9712fc499e6fc90a33140463ef59fe) )
+	ROM_LOAD( "gen-a-sp.bin", 0x00000, 0x10000, CRC(e83cfc2c) SHA1(3193bdd06a9712fc499e6fc90a33140463ef59fe) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "hh_00.rom",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )	/* sprites */
@@ -3353,7 +3443,7 @@ ROM_START( poundfor )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ppa-sp.4j",    0x0000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
+	ROM_LOAD( "ppa-sp.4j",    0x00000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ppb-n0.bin",   0x00000, 0x40000, CRC(951a41f8) SHA1(59b64f63ea2452c2b42ff7ebf1ff6fc4e7879ce3) )	/* sprites */
@@ -3381,7 +3471,7 @@ ROM_START( poundforj )
 	ROM_RELOAD(                     0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ppa-sp.4j",    0x0000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
+	ROM_LOAD( "ppa-sp.4j",    0x00000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ppb-n0.bin",   0x00000, 0x40000, CRC(951a41f8) SHA1(59b64f63ea2452c2b42ff7ebf1ff6fc4e7879ce3) )	/* sprites */
@@ -3409,7 +3499,7 @@ ROM_START( poundforu )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ppa-sp.4j",    0x0000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
+	ROM_LOAD( "ppa-sp.4j",    0x00000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ppb-n0.bin",   0x00000, 0x40000, CRC(951a41f8) SHA1(59b64f63ea2452c2b42ff7ebf1ff6fc4e7879ce3) )	/* sprites */
@@ -3469,7 +3559,7 @@ ROM_START( cosmccop )
 	ROM_RELOAD(                      0x80000, 0x40000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "cc-d-sp.bin", 0x0000, 0x10000, CRC(3e3ace60) SHA1(d89b1b84de2887598bb7bcb17b1df1ec8d1862a9) )
+	ROM_LOAD( "cc-d-sp.bin", 0x00000, 0x10000, CRC(3e3ace60) SHA1(d89b1b84de2887598bb7bcb17b1df1ec8d1862a9) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "cc-c-00.bin", 0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )	// cc-b-n0
@@ -3526,7 +3616,7 @@ ROM_START( kengo )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ken_d-sp.rom", 0x0000, 0x10000, CRC(233ca1cf) SHA1(4ebb6162773bd586a10016ccd77998a9b880f474) )
+	ROM_LOAD( "ken_d-sp.rom", 0x00000, 0x10000, CRC(233ca1cf) SHA1(4ebb6162773bd586a10016ccd77998a9b880f474) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "ken_m31.rom",  0x00000, 0x20000, CRC(e00b95a6) SHA1(6efcd8d58f8ebe3a42c60a0aa790b42c0e132777) )	/* sprites */
@@ -3547,37 +3637,38 @@ ROM_END
 
 
 
-GAME( 1987, rtype,       0,        rtype,    rtype,    0,        ROT0,   "Irem", "R-Type (World)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypej,      rtype,    rtype,    rtype,    0,        ROT0,   "Irem", "R-Type (Japan)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypejp,     rtype,    rtype,    rtypep,   0,        ROT0,   "Irem", "R-Type (Japan prototype)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypeu,      rtype,    rtype,    rtype,    0,        ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypeb,      rtype,    rtype,    rtype,    0,        ROT0,   "bootleg", "R-Type (World bootleg)", GAME_NO_COCKTAIL )
-GAME( 1987, bchopper,    0,        m72,      bchopper, bchopper, ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
-GAME( 1987, mrheli,      bchopper, m72,      bchopper, mrheli,   ROT0,   "Irem", "Mr. HELI no Dai-Bouken", GAME_NO_COCKTAIL )
-GAME( 1988, nspirit,     0,        m72,      nspirit,  nspirit,  ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )
-GAME( 1988, nspiritj,    nspirit,  m72_8751, nspirit,  m72_8751, ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL ) /* some corruption on warning screen (layer enable?) */
-GAME( 1988, imgfight,    0,        m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (Japan, revision A)", 0 )
-GAME( 1988, imgfighto,   imgfight, m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (Japan)", 0 )
-GAME( 1989, loht,        0,        m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )
-GAME( 1989, lohtj,       loht,     m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
-GAME( 1989, lohtb,       loht,     m72,      loht,     0,        ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 1)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
-GAME( 1989, lohtb2,      loht,     m72_8751, loht,     m72_8751, ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
-GAME( 1989, xmultipl,    0,        xmultipl, xmultipl, xmultipl, ROT0,   "Irem", "X Multiply (Japan)", GAME_NO_COCKTAIL )
-GAME( 1989, dbreed,      0,        dbreed,   dbreed,   0,        ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL )
-GAME( 1989, dbreedm72,   dbreed,   dbreed72, dbreed,   dbreed72, ROT0,   "Irem", "Dragon Breed (M72 PCB version)", GAME_NO_COCKTAIL )
-GAME( 1989, rtype2,      0,        rtype2,   rtype2,   0,        ROT0,   "Irem", "R-Type II", GAME_NO_COCKTAIL )
-GAME( 1989, rtype2j,     rtype2,   rtype2,   rtype2,   0,        ROT0,   "Irem", "R-Type II (Japan)", GAME_NO_COCKTAIL )
-GAME( 1989, rtype2jc,    rtype2,   rtype2,   rtype2,   0,        ROT0,   "Irem", "R-Type II (Japan, revision C)", GAME_NO_COCKTAIL )
-GAME( 1990, majtitle,    0,        majtitle, rtype2,   0,        ROT0,   "Irem", "Major Title (World)", GAME_NO_COCKTAIL )
-GAME( 1990, majtitlej,   majtitle, majtitle, rtype2,   0,        ROT0,   "Irem", "Major Title (Japan)", GAME_NO_COCKTAIL )
-GAME( 1990, hharry,      0,        hharry,   hharry,   0,        ROT0,   "Irem", "Hammerin' Harry (World)", GAME_NO_COCKTAIL )
-GAME( 1990, hharryu,     hharry,   hharryu,  hharry,   0,        ROT0,   "Irem America", "Hammerin' Harry (US)", GAME_NO_COCKTAIL )
-GAME( 1990, dkgensan,    hharry,   hharryu,  hharry,   0,        ROT0,   "Irem", "Daiku no Gensan (Japan)", GAME_NO_COCKTAIL )
-GAME( 1990, dkgensanm72, hharry,   dkgenm72, hharry,   dkgenm72, ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", GAME_NO_COCKTAIL )
-GAME( 1990, poundfor,    0,        poundfor, poundfor, 0,        ROT270, "Irem", "Pound for Pound (World)", GAME_NO_COCKTAIL )
-GAME( 1990, poundforj,   poundfor, poundfor, poundfor, 0,        ROT270, "Irem", "Pound for Pound (Japan)", GAME_NO_COCKTAIL )
-GAME( 1990, poundforu,   poundfor, poundfor, poundfor, 0,        ROT270, "Irem America", "Pound for Pound (US)", GAME_NO_COCKTAIL )
-GAME( 1990, airduel,     0,        m72,      airduel,  airduel,  ROT270, "Irem", "Air Duel (Japan)", 0 )
-GAME( 1991, cosmccop,    0,        cosmccop, gallop,   0,        ROT0,   "Irem", "Cosmic Cop (World)", GAME_NO_COCKTAIL )
-GAME( 1991, gallop,      cosmccop, m72,      gallop,   gallop,   ROT0,   "Irem", "Gallop - Armed police Unit (Japan)", GAME_NO_COCKTAIL )
-GAME( 1991, kengo,       0,        kengo,    kengo,    0,        ROT0,   "Irem", "Ken-Go", GAME_NO_COCKTAIL )
+GAME( 1987, rtype,       0,        rtype,       rtype,    0,           ROT0,   "Irem", "R-Type (World)", GAME_NO_COCKTAIL )
+GAME( 1987, rtypej,      rtype,    rtype,       rtype,    0,           ROT0,   "Irem", "R-Type (Japan)", GAME_NO_COCKTAIL )
+GAME( 1987, rtypejp,     rtype,    rtype,       rtypep,   0,           ROT0,   "Irem", "R-Type (Japan prototype)", GAME_NO_COCKTAIL )
+GAME( 1987, rtypeu,      rtype,    rtype,       rtype,    0,           ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", GAME_NO_COCKTAIL )
+GAME( 1987, rtypeb,      rtype,    rtype,       rtype,    0,           ROT0,   "bootleg", "R-Type (World bootleg)", GAME_NO_COCKTAIL )
+GAME( 1987, bchopper,    0,        m72,         bchopper, bchopper,    ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
+GAME( 1987, mrheli,      bchopper, m72,         bchopper, mrheli,      ROT0,   "Irem", "Mr. HELI no Dai-Bouken", GAME_NO_COCKTAIL )
+GAME( 1988, nspirit,     0,        m72,         nspirit,  nspirit,     ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )
+GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit,  m72_8751,    ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL ) /* some corruption on warning screen (layer enable?) */
+GAME( 1988, imgfight,    0,        m72,         imgfight, imgfight,    ROT270, "Irem", "Image Fight (Japan, revision A)", 0 )
+GAME( 1988, imgfighto,   imgfight, m72,         imgfight, imgfight,    ROT270, "Irem", "Image Fight (Japan)", 0 )
+GAME( 1989, loht,        0,        m72,         loht,     loht,        ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )
+GAME( 1989, lohtj,       loht,     m72,         loht,     loht,        ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
+GAME( 1989, lohtb,       loht,     m72,         loht,     0,           ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 1)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
+GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_8751,    ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
+GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, 0,           ROT0,   "Irem", "X Multiply (Japan, M81)", GAME_NO_COCKTAIL )
+GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, xmultiplm72, ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL )
+GAME( 1989, dbreed,      0,        dbreed,      dbreed,   0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL )
+GAME( 1989, dbreedm72,   dbreed,   dbreedm72,   dbreed,   dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", GAME_NO_COCKTAIL )
+GAME( 1989, rtype2,      0,        rtype2,      rtype2,   0,           ROT0,   "Irem", "R-Type II", GAME_NO_COCKTAIL )
+GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   0,           ROT0,   "Irem", "R-Type II (Japan)", GAME_NO_COCKTAIL )
+GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", GAME_NO_COCKTAIL )
+GAME( 1990, majtitle,    0,        majtitle,    rtype2,   0,           ROT0,   "Irem", "Major Title (World)", GAME_NO_COCKTAIL )
+GAME( 1990, majtitlej,   majtitle, majtitle,    rtype2,   0,           ROT0,   "Irem", "Major Title (Japan)", GAME_NO_COCKTAIL )
+GAME( 1990, hharry,      0,        hharry,      hharry,   0,           ROT0,   "Irem", "Hammerin' Harry (World)", GAME_NO_COCKTAIL )
+GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   0,           ROT0,   "Irem America", "Hammerin' Harry (US)", GAME_NO_COCKTAIL )
+GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M82)", GAME_NO_COCKTAIL )
+GAME( 1990, dkgensanm72, hharry,   dkgenm72,    hharry,   dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", GAME_NO_COCKTAIL )
+GAME( 1990, poundfor,    0,        poundfor,    poundfor, 0,           ROT270, "Irem", "Pound for Pound (World)", GAME_NO_COCKTAIL )
+GAME( 1990, poundforj,   poundfor, poundfor,    poundfor, 0,           ROT270, "Irem", "Pound for Pound (Japan)", GAME_NO_COCKTAIL )
+GAME( 1990, poundforu,   poundfor, poundfor,    poundfor, 0,           ROT270, "Irem America", "Pound for Pound (US)", GAME_NO_COCKTAIL )
+GAME( 1990, airduel,     0,        m72,         airduel,  airduel,     ROT270, "Irem", "Air Duel (Japan)", 0 )
+GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   0,           ROT0,   "Irem", "Cosmic Cop (World)", GAME_NO_COCKTAIL )
+GAME( 1991, gallop,      cosmccop, m72,         gallop,   gallop,      ROT0,   "Irem", "Gallop - Armed police Unit (Japan)", GAME_NO_COCKTAIL )
+GAME( 1991, kengo,       0,        kengo,       kengo,    0,           ROT0,   "Irem", "Ken-Go", GAME_NO_COCKTAIL )

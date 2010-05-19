@@ -1560,6 +1560,7 @@ const game_driver * const drivers[] =
 	DRIVER( lohtb )		/* (c) 1989 (bootleg) */
 	DRIVER( lohtb2 )	/* (c) 1989 (bootleg) */
 	DRIVER( xmultipl )	/* (c) 1989 (Japan) */
+	DRIVER( xmultiplm72 )	/* (c) 1989 (Japan) */
 	DRIVER( dbreed )	/* (c) 1989 */
 	DRIVER( dbreedm72 )	/* (c) 1989 */
 	DRIVER( rtype2 )	/* (c) 1989 */
