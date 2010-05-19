@@ -310,10 +310,9 @@ static VIDEO_UPDATE( cntsteer )
 	{
 		int p1, p2, p3, p4;
 		int rot_val, x, y;
-		state->rotation_x |= state->rotation_x | (state->rotation_sign & 3) << 8;
 
-		rot_val = (state->rotation_sign & 4) ? (state->rotation_x) : (-state->rotation_x);
-
+		rot_val = (state->rotation_x) | ((state->rotation_sign & 3) << 8);
+		rot_val = (state->rotation_sign & 4) ? (rot_val) : (-rot_val);
 //      popmessage("%d %02x %02x", rot_val, state->rotation_sign, state->rotation_x);
 
 		/*
