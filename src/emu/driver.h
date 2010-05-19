@@ -97,7 +97,7 @@ struct game_driver
 	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
 
 #define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)	\
-extern const game_driver GAME_NAME(NAME) =			\
+extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
 	#PARENT,								\
@@ -105,10 +105,10 @@ extern const game_driver GAME_NAME(NAME) =			\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
-	MACHINE_DRIVER_NAME(MACHINE),				\
-	INPUT_PORTS_NAME(INPUT),							\
-	DRIVER_INIT_NAME(INIT),						\
-	ROM_NAME(NAME),								\
+	MACHINE_DRIVER_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	DRIVER_INIT_NAME(INIT),					\
+	ROM_NAME(NAME),							\
 	NULL,									\
 	(MONITOR)|(FLAGS),						\
 	&LAYOUT[0]								\
