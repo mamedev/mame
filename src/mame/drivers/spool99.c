@@ -15,12 +15,14 @@ Notes:
  "EP V31 PIPPO BELLISSIMA TI AMO" (translated: "beautiful Pippo I love you",the beautiful word
  is actually used as a female gender adverb). While the pippo name is a common joke for naming
  printfs variables for newbie programmers,I'll let others interpret what it means the rest...
+-vcarn: tries to write a nop at 0x744, if it succeeds it glitches the text when you win. This means that
+ the ROM can be written only at the first 0x100 bytes on this HW.
 
 TODO:
--EEPROM barely hooked up,enough to let this to boot but it doesn't save settings at the
+-spool99: EEPROM barely hooked up,enough to let this to boot but it doesn't save settings at the
  moment;
--An "input BAD" msg pops up at start-up,probably because there are inputs not yet hooked up.
--Visible area might be wrong (384x240),but this doesn't even have a cross-hatch test,so I
+-spool99: An "input BAD" msg pops up at start-up,probably because there are inputs not yet hooked up.
+-spool99: Visible area might be wrong (384x240),but this doesn't even have a cross-hatch test,so I
  need a snapshot from the original thing...
 
 ============================================================================================
@@ -183,6 +185,7 @@ static READ8_HANDLER( spool99_io_r )
 	return ROM[0xaf00+offset];
 }
 
+
 static WRITE8_DEVICE_HANDLER( eeprom_resetline_w )
 {
 	// reset line asserted: reset.
@@ -202,16 +205,64 @@ static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 }
 
 static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xaeff) AM_RAM AM_BASE_MEMBER(spool99_state,main)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,main)
+	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
 	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE("eeprom", eeprom_resetline_w )
 	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE("eeprom", eeprom_clockline_w )
 	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE("eeprom", eeprom_dataline_w )
 	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram) // palette
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,vram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,cram)
+ADDRESS_MAP_END
+
+static READ8_HANDLER( vcarn_io_r )
+{
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+
+//  if(!(io_switch))
+	{
+		switch(offset+0xa700)
+		{
+			case 0xa720: return input_port_read(space->machine,"SERVICE1");//attract mode
+			case 0xa722: return input_port_read(space->machine,"COIN1");
+			case 0xa723: return input_port_read(space->machine,"COIN2");
+			case 0xa724: return input_port_read(space->machine,"SERVICE2");//attract mode
+			case 0xa725: return input_port_read(space->machine,"HOLD3");
+			case 0xa726: return input_port_read(space->machine,"HOLD4");
+			case 0xa727: return input_port_read(space->machine,"HOLD2");
+			case 0xa780: return okim6295_r(devtag_get_device(space->machine, "oki"),0);
+			case 0xa7a0: return input_port_read(space->machine,"HOLD1");
+			case 0xa7a1: return input_port_read(space->machine,"HOLD5");
+			case 0xa7a2: return input_port_read(space->machine,"START");
+			case 0xa7a3: return input_port_read(space->machine,"BET");//system 2
+
+			case 0xa7a7: return eeprom_read_bit(devtag_get_device(space->machine,"eeprom"));
+
+		}
+	}
+// 	printf("%04x\n",offset+0xa700);
+
+	return ROM[0xa700+offset];
+}
+
+static ADDRESS_MAP_START( vcarn_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,main)
+	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
+	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
+	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE("eeprom", eeprom_resetline_w )
+	AM_RANGE(0xa746, 0xa746) AM_DEVWRITE("eeprom", eeprom_clockline_w )
+	AM_RANGE(0xa747, 0xa747) AM_DEVWRITE("eeprom", eeprom_dataline_w )
+	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_w)
+
+	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+
+	AM_RANGE(0xb000, 0xdfff) AM_RAM
+//	AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE(&vcarn_io)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,vram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,cram)
 ADDRESS_MAP_END
@@ -315,6 +366,16 @@ static MACHINE_DRIVER_START( spool99 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( vcarn )
+
+	MDRV_IMPORT_FROM( spool99)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(vcarn_map)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1) //512x240, raw guess
+
+MACHINE_DRIVER_END
 
 
 ROM_START( spool99 )
@@ -340,6 +401,17 @@ ROM_START( spool99a )
 	ROM_LOAD( "u15.bin", 0x000000, 0x80000, CRC(707f062f) SHA1(e237a03192d7ce79509418fd8811ecad14890739) )
 ROM_END
 
+ROM_START( vcarn )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code
+	ROM_LOAD( "3.u2", 0x00000, 0x10000, CRC(e7c33032) SHA1(e769c83b6d2b48e347ad6112b4379f6e16bcc6e0) ) // first half empty!
+	ROM_CONTINUE( 0x00000, 0x10000) // 0x0000 - 0xafff used
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "1.u32", 0x00000, 0x80000, CRC(8a0aa6b5) SHA1(dc39cb26607fabdcb3e74a60943cf88456172d09) )
+
+	ROM_REGION( 0x080000, "gfx", 0 )
+	ROM_LOAD( "2.u15", 0x000000, 0x80000, CRC(a647f378) SHA1(4c8a49afe8bd63d7e30242fb016fc76b38859ea8) )
+ROM_END
 
 
 static DRIVER_INIT( spool99 )
@@ -348,10 +420,11 @@ static DRIVER_INIT( spool99 )
 
 	UINT8 *ROM = memory_region(machine, "maincpu");
 //  vram = auto_alloc_array(machine, UINT8, 0x2000);
-	memcpy(state->main, ROM, 0xae00);
+	memcpy(state->main, ROM, 0x100);
 }
 
 
 
 GAME( 1998, spool99,    0,        spool99,    spool99,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.36)", 0 )
 GAME( 1998, spool99a,   spool99,  spool99,    spool99,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.31)", 0 )
+GAME( 1998, vcarn,      0,        vcarn,      spool99,    spool99, ROT0,  "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", 0 ) //MAME screen says '98, PCB screen says '99?
