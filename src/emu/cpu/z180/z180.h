@@ -123,16 +123,10 @@ enum
 };
 
 
-#define Z180_INT0		0			/* Execute INT1 */
-#define Z180_INT1		1			/* Execute INT1 */
-#define Z180_INT2		2			/* Execute INT2 */
-#define Z180_INT_PRT0	3			/* Internal PRT channel 0 */
-#define Z180_INT_PRT1	4			/* Internal PRT channel 1 */
-#define Z180_INT_DMA0	5			/* Internal DMA channel 0 */
-#define Z180_INT_DMA1	6			/* Internal DMA channel 1 */
-#define Z180_INT_CSIO	7			/* Internal CSI/O */
-#define Z180_INT_ASCI0	8			/* Internal ASCI channel 0 */
-#define Z180_INT_ASCI1	9			/* Internal ASCI channel 1 */
+#define Z180_IRQ0		0			/* Execute IRQ1 */
+#define Z180_IRQ1		1			/* Execute IRQ1 */
+#define Z180_IRQ2		2			/* Execute IRQ2 */
+
 
 #ifdef UNUSED_DEFINITION
 /* MMU mapped memory lookup */

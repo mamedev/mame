@@ -154,7 +154,7 @@ static const UINT8 *const cc_default[6] = { cc_op, cc_cb, cc_ed, cc_xy, cc_xycb,
 #define Z180_TABLE_dd	 Z180_TABLE_xy
 #define Z180_TABLE_fd	 Z180_TABLE_xy
 
-static int take_interrupt(z180_state *cpustate, int irqline);
+static int take_interrupt(z180_state *cpustate, int irq);
 
 #define PROTOTYPES(tablename,prefix) \
 	INLINE void prefix##_00(z180_state *cpustate); INLINE void prefix##_01(z180_state *cpustate); INLINE void prefix##_02(z180_state *cpustate); INLINE void prefix##_03(z180_state *cpustate); \

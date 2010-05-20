@@ -306,7 +306,7 @@ static int take_interrupt(z180_state *cpustate, int irq)
 	/* Clear both interrupt flip flops */
 	cpustate->IFF1 = cpustate->IFF2 = 0;
 
-	if( irq == Z180_INT0 )
+	if( irq == Z180_INT_IRQ0 )
 	{
 		/* Daisy chain mode? If so, call the requesting device */
 		if (cpustate->daisy)
@@ -368,7 +368,7 @@ static int take_interrupt(z180_state *cpustate, int irq)
 	}
 	else
 	{
-		irq_vector = (cpustate->IO(Z180_IL) & Z180_IL_IL) + (irq - Z180_INT1) * 2;
+		irq_vector = (cpustate->IO(Z180_IL) & Z180_IL_IL) + (irq - Z180_INT_IRQ1) * 2;
 		irq_vector = (cpustate->I << 8) + (irq_vector & 0xff);
 		PUSH(cpustate,  PC );
 		RM16( cpustate, irq_vector, &cpustate->PC );

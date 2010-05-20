@@ -4,8 +4,6 @@
 #define ENTER_HALT(cs) {										\
 	(cs)->_PC--;												\
 	(cs)->HALT = 1;												\
-	if( !(cs)->after_EI )										\
-		CPU_BURN_NAME(z180)( (cs)->device, (cs)->icount );		\
 }
 
 /***************************************************************
@@ -54,11 +52,11 @@ INLINE void z180_mmu(z180_state *cpustate)
 		if (page >= bb)
 		{
 			if (page >= cb)
-				addr += cpustate->IO_CBR << 12;
+				addr += (cpustate->IO_CBR << 12);
 			else
-				addr += cpustate->IO_BBR << 12;
+				addr += (cpustate->IO_BBR << 12);
 		}
-		cpustate->mmu[page] = addr;
+		cpustate->mmu[page] = (addr & 0xfffff);
 	}
 }
 
