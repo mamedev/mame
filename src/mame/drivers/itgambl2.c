@@ -780,6 +780,133 @@ ROM_START( pirati )
 	ROM_LOAD( "m.s.g.0", 0x00000, 0x20000, CRC(01ed1dcd) SHA1(69b0b4ff2633ca4ca7b3a01830582c8b6df059e8) )
 ROM_END
 
+/*
+
+Magic Number
+
+CPUs
+1x 	 H8/3337  	 	 	 32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x 	D7759 			     ADPCM Speech Synthesizer LSIs - sound
+1x 	TDA2003 		     Audio Amplifier - sound
+1x 	oscillator 	14.31818MHz
+1x 	oscillator 	16.000
+ROMs
+3x 	M27C4001 	1,2,3 	dumped
+1x 	M27C1001 	MSG 	dumped
+RAMs
+3x 	CXK581000BM-70LL
+PLDs
+2x 	ispLSI1032E-70Lj 		not dumped
+Others
+
+1x 28x2 edge connector
+1x 7x2 legs ISP connector
+1x RS232 connector
+2x trimmer
+2x 8x2 switches DIP
+1x jumper
+1x red LED
+1x battery 3.6V
+*/
+
+ROM_START( mnumitg )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "mnum_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "mnum-ep1.bin", 0x000000, 0x80000, CRC(ee80b8d6) SHA1(49dd3323f4369759c38c168d172f7716a9132f98) )
+	ROM_LOAD( "mnum-ep2.bin", 0x080000, 0x80000, CRC(685cb1cf) SHA1(7815ec3dcbf2c78f85520e533d9cbf51a119255d) )
+	ROM_LOAD( "mnum-ep3.bin", 0x100000, 0x80000, CRC(ebebd71c) SHA1(98902e43c69d207aa7dbca23d10bbeb81272292f) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "mnum-msg0.bin", 0x00000, 0x20000, CRC(b25e1c8a) SHA1(a211412c3354a9f1a9662445b4cc379dad27813b) )
+ROM_END
+
+/*
+
+CPUs
+1x 	 H8/3337            32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x 	D7759 			    ADPCM Speech Synthesizer LSIs - sound
+1x 	TDA2003 			Audio Amplifier - sound
+1x 	oscillator 	14.31818MHz
+1x 	oscillator 	16.000
+ROMs
+3x 	M27C4001 	1,2,3   dumped
+1x 	M27C1001 	SND     dumped
+RAMs
+3x 	MX66C1024MC-70
+PLDs
+2x 	ispLSI1032E-70Lj    not dumped
+Others
+
+1x 28x2 edge connector
+1x 17x2 legs ISP connector
+1x 7x2 legs ISP connector
+1x 10 legs connector
+1x 4 legs connector
+1x RS232 connector
+2x trimmer (unknown)
+2x 8x2 switches DIP
+1x jumper
+1x battery 3.6V
+
+*/
+
+ROM_START( mclass )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "mclass_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "magicclass1.bin", 0x000000, 0x80000, CRC(12927480) SHA1(380e980cf5d869fbcba224d75c7eaee650465227) )
+	ROM_LOAD( "magicclass2.bin", 0x080000, 0x80000, CRC(b472dda6) SHA1(e23202157dfa6f1f76f9dc410ef7e1f12b5031bf) )
+	ROM_LOAD( "magicclass3.bin", 0x100000, 0x80000, CRC(b1bc38e4) SHA1(7dfa352535baae7d048ef4537f2d9ac72c46dedc) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "magicclasssnd.bin", 0x00000, 0x20000, CRC(9dab99a6) SHA1(ce34056dd964be32359acd2e53a6101cb4d9ddff) )
+ROM_END
+
+/*
+
+CPUs
+1x 	H8/3337 			32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x 	D7759 			    ADPCM Speech Synthesizer LSIs - sound
+1x 	TDA2003 			Audio Amplifier - sound
+1x 	oscillator 	14.31818MHz
+1x 	oscillator 	16.000
+ROMs
+3x 	M27C4001 	1,2,3 	dumped
+1x 	M27C1001 	SND 	dumped
+RAMs
+3x 	V62C5181024L-35W
+PLDs
+2x 	ispLSI1032E-70Lj    not dumped
+Others
+
+1x 28x2 edge connector
+1x 7x2 legs ISP connector
+1x RS232 connector
+1x trimmer (unknown)
+1x trimmer (volume)
+2x 8x2 switches DIP
+1x jumper
+1x red LED
+1x battery 3.6V
+
+*/
+
+ROM_START( europass )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "europass_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "europass1.bin", 0x000000, 0x80000, CRC(93c54f02) SHA1(b0371c70363b6b2097dc478320bdae0856211d2e) )
+	ROM_LOAD( "europass2.bin", 0x080000, 0x80000, CRC(62bcb3de) SHA1(fc35f534635340f5ae22ae838bc10605ae0b7a4b) )
+	ROM_LOAD( "europass3.bin", 0x100000, 0x80000, CRC(0f2b2c21) SHA1(c4706585e4176e4a5f5ce40046e6e14b93952816) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "xninesnd.bin", 0x00000, 0x20000, CRC(9dab99a6) SHA1(ce34056dd964be32359acd2e53a6101cb4d9ddff) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
@@ -798,3 +925,7 @@ GAME( 200?, sspac2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "<unknown>", "Super
 GAME( 200?, elvis,    0,      itgambl2, itgambl2, 0,   ROT0, "<unknown>", "Elvis?",                                GAME_NOT_WORKING )
 GAME( 200?, sstar,    0,      itgambl2, itgambl2, 0,   ROT0, "<unknown>", "Super Star",                            GAME_NOT_WORKING )
 GAME( 2001, pirati,   0,      itgambl2, itgambl2, 0,   ROT0, "Cin", 	  "Pirati",                                GAME_NOT_WORKING )
+GAME( 200?, mnumitg,  0,      itgambl2, itgambl2, 0,   ROT0, "<unknown>", "Magic Number (Italian Gambling Game, Ver 1.5)", GAME_NOT_WORKING )
+GAME( 200?, mclass,   0,      itgambl2, itgambl2, 0,   ROT0, "<unknown>", "Magic Class (Ver 2.2)",                 GAME_NOT_WORKING )
+GAME( 200?, europass, 0,      itgambl2, itgambl2, 0,   ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   GAME_NOT_WORKING )
+

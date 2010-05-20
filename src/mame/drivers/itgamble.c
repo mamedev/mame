@@ -553,6 +553,84 @@ ROM_START( euro2k2s )
 	ROM_LOAD( "1-a.ic25", 0x00000, 0x20000, CRC(8fcb283d) SHA1(9e95c72967da13606eed6d16f84145273b9ffddf) )
 ROM_END
 
+/*
+
+CPUs
+1x 	H8/3048 		ic1 	16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x 	AD-65 		ic24 	4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x 	LM358N 		ic27 	Dual Operational Amplifier - sound
+1x 	TDA2003 		ic26 	Audio Amplifier - sound
+1x 	oscillator 	30.000MHz 	osc1
+1x 	blu resonator 	1000J 	x1
+1x 	oscillator 	KDS0D 	x2
+ROMs
+1x 	W27C020 	1 	dumped
+2x 	M27C4001 	2,3 	dumped
+RAMs
+2x 	LST62832I-70LL-10L 	ic13,ic14
+PLDs
+1x 	ispLSI2064-80LJ 	ic12 	not dumped
+
+Others
+1x 28x2 edge connector
+1x 50 pins flat cable connector (CN4)
+1x 12 legs connector (CN1)
+2x trimmer (volume,spark)
+1x 12x2 switches DIP
+1x battery 3.6V
+
+*/
+
+ROM_START( abacus )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "abacus_ver1.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_LOAD( "abacus2.ic18", 0x000000, 0x80000, CRC(9884ee09) SHA1(85875dbcd6821c8173457df0216145b4208d5c06) )
+	ROM_LOAD( "abacus3.ic17", 0x080000, 0x80000, CRC(ec6473c4) SHA1(49980b94ccf77fbfdaa151fccaeb3c2ddad3c119) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
+ROM_END
+
+/*
+
+CPUs
+1x 	H8/3048 		ic1 	16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x 	AD-65 		ic24 	4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x 	LM358N 		ic27 	Dual Operational Amplifier - sound
+1x 	TDA2003 		ic26 	Audio Amplifier - sound
+1x 	oscillator 	30.000MHz 	osc1
+1x 	red resonator 	ZTB1000J 	x1
+ROMs
+1x 	W27C020 	1 	dumped
+2x 	M27C4001 	2,3 	dumped
+RAMs
+2x 	MB8464C-10L 	ic13,ic14
+PLDs
+1x 	ispLSI2064-80LJ 	ic12 	not dumped
+
+Others
+1x 28x2 edge connector
+1x 50 pins flat cable connector (CN4)
+1x 12 legs connector (CN1)
+2x trimmer (volume,spark)
+1x 12x2 switches DIP
+1x battery 3V
+
+*/
+
+ROM_START( bookthr )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "bookthr_ver1.2_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) //bigger than 8bpps?
+	ROM_LOAD( "2.ic18", 0x000000, 0x80000, CRC(39433a74) SHA1(088944bfb43b4f239f22d0d2213efd19cea7db30) )
+	ROM_LOAD( "3.ic17", 0x080000, 0x80000, CRC(893abdcc) SHA1(4dd28fd46bec8be5549d679d31c771888fcb1286) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) //same as Abacus
+ROM_END
 
 /********** DIFFERENT HARDWARE **********/
 
@@ -609,6 +687,8 @@ GAME( 2001, laperlag, 0,       itgamble, itgamble, 0,   ROT0, "Nazionale Elettro
 GAME( 2001, euro2k2,  0,       itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  GAME_NOT_WORKING )
 GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  GAME_NOT_WORKING )
 GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   GAME_NOT_WORKING )
+GAME( 200?, abacus,   0,       itgamble, itgamble, 0,   ROT0, "<unknown>",             "Abacus (Ver 1.0)",              GAME_NOT_WORKING )
+GAME( 200?, bookthr,  0,       itgamble, itgamble, 0,   ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        GAME_NOT_WORKING )
 
 /* different hardware */
 GAME( 200?, mnumber,  0,       mnumber,  itgamble, 0,   ROT0, "M.M. - B.R.L.",         "Mystery Number",                GAME_NOT_WORKING )

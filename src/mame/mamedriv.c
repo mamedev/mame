@@ -9535,6 +9535,8 @@ Other Sun games
 	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2s )	/* (c) 2002 Nazionale Elettronica */
 	DRIVER( mnumber )	/* (c) 200? M.M. - B.R.L. */
+	DRIVER( abacus )	/* (c) 200? unknown */
+	DRIVER( bookthr )	/* (c) 200? unknown */
 
 	/* H8/3337 italian gambling games */
 	DRIVER( ntcash )	/* (c) 1999 unknown */
@@ -9549,6 +9551,9 @@ Other Sun games
 	DRIVER( elvis )		/* (c) 200? unknown */
 	DRIVER( sstar )		/* (c) 200? unknown */
 	DRIVER( pirati )	/* (c) 2001 Cin */
+	DRIVER( mnumitg )	/* (c) 200? unknown */
+	DRIVER( mclass )	/* (c) 200? unknown */
+	DRIVER( europass )	/* (c) 200? unknown */
 
 	/* Intel 8086-based italian gambling games */
 	DRIVER( newmcard )	/* (c) 19?? unknown */
@@ -9580,6 +9585,7 @@ Other Sun games
 	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */
 	DRIVER( grandprx )	/* (c) 200? 4fun */
 	DRIVER( supjolly )	/* (c) 200? unknown */
+	DRIVER( x5jokers )	/* (c) 200? Electronic Projects */
 
 	/* Astro Corp. */
 	DRIVER( showhand )	/* (c) 2000  Astro Corp. */
