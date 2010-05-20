@@ -28,6 +28,9 @@ public:
 	/* devices */
 	running_device *maincpu;
 	running_device *eeprom;
+
+	/* bank support */
+	UINT8 *ram_48000;
 };
 
 
