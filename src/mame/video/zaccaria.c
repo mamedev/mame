@@ -204,11 +204,24 @@ WRITE8_HANDLER( zaccaria_flip_screen_y_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+/* sprite format:
+
+  76543210
+0 xxxxxxxx x
+1 x....... flipy
+  .x...... flipx
+  ..xxxxxx code low
+2 xx...... code high
+  ..xxx... ?
+  .....xxx color
+3 xxxxxxxx y
+
+offsets 1 and 2 are swapped with spriteram2
+
+*/
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT8 *spriteram,int color,int section)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
-	int offs;
+	int offs,o1 = 1,o2 = 2;
 	rectangle clip = *cliprect;
 
 	if (flip_screen_x_get(machine))
@@ -216,51 +229,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	else
 		sect_rect(&clip, &spritevisiblearea);
 
-	/*
-      TODO: sprites have 32 color codes, but we are using only 8. In Jack
-      Rabbit the extra codes are all duplicates, but there is a quadruple
-      of codes in Money Money which contains two different combinations. That
-      color code seems to be used only by crocodiles, so the one we are picking
-      seems the correct one (otherwise they would be red).
-    */
-
-	/*
-      TODO: sprite placement is not perfect, I made the Jack Rabbit mouth
-      animation correct but this moves one pixel to the left the sprite
-      which masks the holes when you fall in them. The hardware is probably
-      similar to Amidar, but the code in the Amidar driver is not good either.
-    */
-	for (offs = 0;offs < machine->generic.spriteram2_size;offs += 4)
+	if (section)
 	{
-		int sx = spriteram_2[offs + 3] + 1;
-		int sy = 242 - spriteram_2[offs];
-		int flipx = spriteram_2[offs + 2] & 0x40;
-		int flipy = spriteram_2[offs + 2] & 0x80;
-
-		if (flip_screen_x_get(machine))
-		{
-			sx = 240 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get(machine))
-		{
-			sy = 240 - sy;
-			flipy = !flipy;
-		}
-
-		drawgfx_transpen(bitmap,&clip,machine->gfx[1],
-				(spriteram_2[offs + 2] & 0x3f) + (spriteram_2[offs + 1] & 0xc0),
-				4 * (spriteram_2[offs + 1] & 0x07),
-				flipx,flipy,
-				sx,sy,0);
+		o1 = 2;
+		o2 = 1;
 	}
 
-	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
+	for (offs = 0;offs < 0x20;offs += 4)
 	{
 		int sx = spriteram[offs + 3] + 1;
 		int sy = 242 - spriteram[offs];
-		int flipx = spriteram[offs + 1] & 0x40;
-		int flipy = spriteram[offs + 1] & 0x80;
+		int flipx = spriteram[offs + o1] & 0x40;
+		int flipy = spriteram[offs + o1] & 0x80;
 
 		if (flip_screen_x_get(machine))
 		{
@@ -274,17 +254,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		}
 
 		drawgfx_transpen(bitmap,&clip,machine->gfx[1],
-				(spriteram[offs + 1] & 0x3f) + (spriteram[offs + 2] & 0xc0),
-				4 * (spriteram[offs + 2] & 0x07),
-				flipx,flipy,
-				sx,sy,0);
+				(spriteram[offs + o1] & 0x3f) + (spriteram[offs + o2] & 0xc0),
+				((spriteram[offs + o2] & 0x07) << 2) | color,
+				flipx,flipy,sx,sy,0);
 	}
 }
-
 
 VIDEO_UPDATE( zaccaria )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
+
+	// 3 layers of sprites, each with their own palette and priorities
+	draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.spriteram2.u8,2,1);
+	draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.spriteram.u8,1,0);
+	draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.spriteram2.u8+0x20,0,1);
+	
 	return 0;
 }
