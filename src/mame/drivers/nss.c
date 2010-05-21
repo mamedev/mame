@@ -367,11 +367,44 @@ static WRITE8_HANDLER( nss_eeprom_w )
 //	printf("EEPROM write %02x\n",data);
 }
 
+static UINT8 m50458_rom_bank;
+
+static READ8_HANDLER( m50458_r )
+{
+	if(m50458_rom_bank)
+	{
+		UINT8 *gfx_rom = memory_region(space->machine, "m50458_gfx");
+
+		return gfx_rom[offset & 0x7ff];
+	}
+	else
+	{
+		UINT8 *gfx_ram = memory_region(space->machine, "m50458_vram");
+
+		return gfx_ram[offset & 0x7ff];
+	}
+
+	return 0;
+}
+
+static WRITE8_HANDLER( m50458_w )
+{
+	if(m50458_rom_bank)
+		logerror("Warning: write to M50458 GFX ROM!\n");
+	else
+	{
+		UINT8 *gfx_ram = memory_region(space->machine, "m50458_vram");
+
+		gfx_ram[offset & 0x7ff] = data;
+	}
+}
+
+
 static ADDRESS_MAP_START( bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM // vram perhaps?
-	AM_RANGE(0x9000, 0x9fff) AM_ROM AM_REGION("ibios_rom", 0x7000) // some kind of data that is putted on the above 0x8800-0x8fff range
+	AM_RANGE(0x9000, 0x97ff) AM_MIRROR(0x800) AM_READWRITE(m50458_r,m50458_w) // M50458 vram & GFX rom routes here
 	AM_RANGE(0xa000, 0xa000) AM_READ(nss_eeprom_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(nss_eeprom_w)
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_RAM AM_REGION("ibios_rom", 0x6000)
@@ -420,12 +453,13 @@ static READ8_HANDLER( port03_r )
 static WRITE8_HANDLER( port80_w )
 {
 	/*
-	---- -x-- written when 0x9000-0x9fff is read, probably a bankswitch
+	---- x--- written when 0x9000-0x9fff is read, probably a bankswitch
 	---- --x- see port 0x02 note
 	---- ---x BIOS bankswitch
 	*/
 
 	memory_set_bank(space->machine, "bank1", data & 1);
+	m50458_rom_bank = data & 8;
 }
 
 static WRITE8_HANDLER( port82_w ) // EEPROM2?
@@ -457,6 +491,8 @@ static MACHINE_START( nss )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank1", 0);
+
+	m50458_rom_bank = 0;
 
 	MACHINE_START_CALL(snes);
 }
@@ -615,7 +651,7 @@ static MACHINE_DRIVER_START( nss )
 	MDRV_CPU_PROGRAM_MAP(bios_map)
 	MDRV_CPU_IO_MAP(bios_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-	MDRV_CPU_FLAGS(CPU_DISABLE)
+//	MDRV_CPU_FLAGS(CPU_DISABLE)
 
 	MDRV_MACHINE_START( nss )
 MACHINE_DRIVER_END
@@ -634,6 +670,9 @@ MACHINE_DRIVER_END
 	ROM_REGION(0x20000,         "bios",  0)		/* Bios CPU (what is it?) */ \
 	ROM_LOAD("nss-c.dat"  , 0x10000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
 	ROM_LOAD("nss-ic14.02", 0x18000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
+	ROM_REGION( 0x800, "m50458_gfx", ROMREGION_ERASEFF ) \
+	ROM_LOAD("m50458_char", 0x000, 0x800, NO_DUMP ) \
+	ROM_REGION( 0x800, "m50458_vram", ROMREGION_ERASE00 ) \
 
 ROM_START( nss )
 	NSS_BIOS
