@@ -2831,7 +2831,10 @@ static int memory_view_needs_recompute(debug_view *view)
 		view->topleft.y = (memdata->expression.result - memdata->byte_offset) / memdata->bytes_per_row;
 		view->topleft.y = MAX(view->topleft.y, 0);
 		view->topleft.y = MIN(view->topleft.y, view->total.y - 1);
-		resultbyte  = memory_address_to_byte(space, memdata->expression.result) & space->logbytemask;
+		if (space != NULL)
+			resultbyte  = memory_address_to_byte(space, memdata->expression.result) & space->logbytemask;
+		else
+			resultbyte = memdata->expression.result;
 
 		memory_view_set_cursor_pos(view, resultbyte, memdata->bytes_per_chunk * 8 - 4);
 	}
