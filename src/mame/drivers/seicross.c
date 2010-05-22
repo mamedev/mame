@@ -598,5 +598,5 @@ ROM_END
 GAME( 1981, friskyt,  0,        nvram,    friskyt,  0, ROT0,  "Nichibutsu", "Frisky Tom (set 1)", GAME_NO_COCKTAIL )
 GAME( 1981, friskyta, friskyt,  nvram,    friskyt,  0, ROT0,  "Nichibutsu", "Frisky Tom (set 2)", GAME_NO_COCKTAIL )
 GAME( 1982, radrad,   0,        no_nvram, radrad,   0, ROT0,  "Nichibutsu USA", "Radical Radial", GAME_NO_COCKTAIL )
-GAME( 1984, seicross, 0,        no_nvram, seicross, 0, ROT90, "Nichibutsu + Alice", "Seicross", GAME_NO_COCKTAIL )
-GAME( 1984, sectrzon, seicross, no_nvram, seicross, 0, ROT90, "Nichibutsu + Alice", "Sector Zone", GAME_NO_COCKTAIL )
+GAME( 1984, seicross, 0,        no_nvram, seicross, 0, ROT90, "Nichibutsu / Alice", "Seicross", GAME_NO_COCKTAIL )
+GAME( 1984, sectrzon, seicross, no_nvram, seicross, 0, ROT90, "Nichibutsu / Alice", "Sector Zone", GAME_NO_COCKTAIL )

@@ -515,4 +515,4 @@ static DRIVER_INIT( gpworld )
 
 
 /*    YEAR  NAME      PARENT   MACHINE  INPUT    INIT     MONITOR  COMPANY  FULLNAME    FLAGS) */
-GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld, ROT0,    "SEGA",  "GP World",	GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld, ROT0,    "Sega",  "GP World",	GAME_NOT_WORKING|GAME_NO_SOUND)

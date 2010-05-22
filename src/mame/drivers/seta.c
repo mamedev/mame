@@ -43,14 +43,14 @@ P0-068-B (M6100723A)    92 Block Carnival                       Visco
 P0-072-2 (prototype)    92 Blandia (prototype)                  Allumer
 P0-077-A (BP922)        92 Ultraman Club                        Banpresto
 PO-078-A                92 Blandia                              Allumer
-P0-079-A                92 Zing Zing Zip                        Allumer + Tecmo
+P0-079-A                92 Zing Zing Zip                        Allumer / Tecmo
 P0-079-A                94 Eight Forces                         Tecmo
 PO-080-A (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
 ?                       93 Athena no Hatena?                    Athena
 ?                       93 J.J.Squawkers                        Athena / Able
 ?        (93111A)       93 War Of Aero                          Yang Cheng
 P0-081-A (BP933KA)      93 Mobile Suit Gundam                   Banpresto
-PO-083-A (BP931)        93 Ultra Toukon Densetsu                Banpresto + Tsuburaya Prod.
+PO-083-A (BP931)        93 Ultra Toukon Densetsu                Banpresto / Tsuburaya Prod.
 PO-092-A                93 Daioh                                Athena
 PO-096-A (BP934KA)      93 Kamen Rider                          Banpresto
 P0-097-A                93 Oishii Puzzle ..                     Sunsoft + Atlus
@@ -10073,7 +10073,7 @@ GAME( 1992, blockcar, 0,        blockcar, blockcar, 0,        ROT90,  "Visco",  
 GAME( 1992, qzkklogy, 0,        drgnunit, qzkklogy, 0,        ROT0,   "Tecmo",                  "Quiz Kokology", 0 )
 GAME( 1992, neobattl, 0,        umanclub, neobattl, 0,        ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
 GAME( 1992, umanclub, 0,        umanclub, umanclub, 0,        ROT0,   "Tsuburaya Prod. / Banpresto", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
-GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer + Tecmo",        "Zing Zing Zip", 0 )
+GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer / Tecmo",        "Zing Zing Zip", 0 )
 GAME( 1993, atehate,  0,        atehate,  atehate,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh", 0 )
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
@@ -10082,10 +10082,10 @@ GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, 0,        ROT0,   "Toei / Ba
 GAME( 1993, madshark, 0,        madshark, madshark, 0,        ROT270, "Allumer",                "Mad Shark", 0 )
 GAME( 1993, msgundam, 0,        msgundam, msgundam, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
 GAME( 1993, msgundam1,msgundam, msgundam, msgunda1, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam (Japan)", 0 )
-GAME( 1993, oisipuzl, 0,        oisipuzl, oisipuzl, 0,        ROT0,   "Sunsoft + Atlus",        "Oishii Puzzle Ha Irimasenka", 0 )
+GAME( 1993, oisipuzl, 0,        oisipuzl, oisipuzl, 0,        ROT0,   "Sunsoft / Atlus",        "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, qzkklgy2, 0,        qzkklgy2, qzkklgy2, 0,        ROT0,   "Tecmo",                  "Quiz Kokology 2", 0 )
 GAME( 1993, triplfun, oisipuzl, triplfun, oisipuzl, 0,        ROT0,   "bootleg",                "Triple Fun", 0 )
-GAME( 1993, utoukond, 0,        utoukond, utoukond, 0,        ROT0,   "Banpresto + Tsuburaya Prod.", "Ultra Toukon Densetsu (Japan)", 0 )
+GAME( 1993, utoukond, 0,        utoukond, utoukond, 0,        ROT0,   "Banpresto / Tsuburaya Prod.", "Ultra Toukon Densetsu (Japan)", 0 )
 GAME( 1993, wrofaero, 0,        wrofaero, wrofaero, 0,        ROT270, "Yang Cheng",             "War of Aero - Project MEIOU", 0 )
 GAME( 1994, eightfrc, 0,        eightfrc, eightfrc, eightfrc, ROT90,  "Tecmo",                  "Eight Forces", 0 )
 GAME( 1994, kiwame,   0,        kiwame,   kiwame,   kiwame,   ROT0,   "Athena",                 "Pro Mahjong Kiwame", 0 )

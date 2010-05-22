@@ -353,4 +353,4 @@ ROM_END
 /*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    INIT, MONITOR, COMPANY,  FULLNAME,                    FLAGS */
 GAME( 1985, kicker,   0,      shaolins, shaolins, 0,    ROT90,  "Konami",  "Kicker",                    0 )
 GAME( 1985, shaolins, kicker, shaolins, shaolins, 0,    ROT90,  "Konami",  "Shao-lin's Road",           0 )
-GAME( 1985, shaolinb, kicker, shaolinb, shaolins, 0,    ROT90,  "Bootleg", "Shao-lin's Road (bootleg)", GAME_IMPERFECT_COLORS )
+GAME( 1985, shaolinb, kicker, shaolinb, shaolins, 0,    ROT90,  "bootleg", "Shao-lin's Road (bootleg)", GAME_IMPERFECT_COLORS )
