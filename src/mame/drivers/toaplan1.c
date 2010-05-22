@@ -733,7 +733,7 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPNAME( 0x30, 0x20, "Territory" )                 /* bits 4 and 5 listed as unused in the Dip Switches screen */
 	PORT_DIPSETTING(    0x20, DEF_STR( Europe ) )           /* Taito Corp. Japan */
 	PORT_DIPSETTING(    0x10, DEF_STR( USA ) )              /* Taito America Corp. */
-	PORT_DIPSETTING(    0x30, "USA (Romstar licence)" )     /* Taito America Corp. */
+	PORT_DIPSETTING(    0x30, "USA (Romstar license)" )     /* Taito America Corp. */
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */
 	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
@@ -794,7 +794,7 @@ static INPUT_PORTS_START( truxton )
 //  PORT_DIPSETTING(    0x07, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
 //  PORT_DIPSETTING(    0x05, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x01, "USA (Romstar licence)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x01, "USA (Romstar license)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )

@@ -306,7 +306,7 @@
 
     El Grande - 5 Card Draw:
 
-    This game was created by Tuni Electro Service and was licenced to E.T. Marketing,Inc.
+    This game was created by Tuni Electro Service and was licensed to E.T. Marketing,Inc.
     This is the new version. The old one is still undumped, but looks like Golden Poker D-Up.
 
     Flyer: http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4542

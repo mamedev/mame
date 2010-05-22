@@ -1,7 +1,7 @@
 mos metal oxid semiconductor
 bought by cbm
 
-licence to produce chips
+license to produce chips
  rockwell
 
 transistor, logic gate designs:

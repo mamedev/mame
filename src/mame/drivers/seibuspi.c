@@ -3494,9 +3494,9 @@ ROM_END
 /* SPI */
 GAME( 1995, senkyu,    0,       spi,      spi_3button, senkyu,   ROT0,   "Seibu Kaihatsu", "Senkyu (Japan, set 1)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, senkyua,   senkyu,  spi,      spi_3button, senkyua,  ROT0,   "Seibu Kaihatsu", "Senkyu (Japan, set 2)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, batlball,  senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Tuning License)", "Battle Balls (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, batlballa, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Metrotainment License)", "Battle Balls (Asia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, batlballu, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Fabtek License)", "Battle Balls (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, batlball,  senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Tuning license)", "Battle Balls (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, batlballa, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Asia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, batlballu, senkyu,  spi,      spi_3button, batlball, ROT0,   "Seibu Kaihatsu (Fabtek license)", "Battle Balls (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 GAME( 1995, viprp1,    0,       spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (World, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, viprp1u,   viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu (Fabtek license)", "Viper Phase 1 (USA, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* New version, "=U.S.A=" seems part of title */
@@ -3504,8 +3504,8 @@ GAME( 1995, viprp1j,   viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu K
 GAME( 1995, viprp1s,   viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Switzerland, New Version)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 GAME( 1995, viprp1oj,  viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu Kaihatsu", "Viper Phase 1 (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, viprp1ot,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Tuning License)", "Viper Phase 1 (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1995, viprp1hk,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Metrotainment License)", "Viper Phase 1 (Hong Kong)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
+GAME( 1995, viprp1ot,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Tuning license)", "Viper Phase 1 (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, viprp1hk,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
 
 GAME( 1996, ejanhs,    0,       spi,      spi_ejanhs,  ejanhs,   ROT0,   "Seibu Kaihatsu", "E-Jan High School (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 

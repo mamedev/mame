@@ -200,7 +200,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 'topspeed' : region = 0x0003
       * 'topspedu' : region = 0x0004
   - Coinage relies on the region (code at 0x00dd10) :
-      * 0x0001 (Japan), 0x0002 (US) and 0x0004 (US, Romstar licence) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0001 (Japan), 0x0002 (US) and 0x0004 (US, Romstar license) use TAITO_COINAGE_JAPAN_OLD
       * 0x0003 (World) uses TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0001
   - Game name : "Top Speed"

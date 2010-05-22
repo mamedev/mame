@@ -179,7 +179,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - These 3 games are 100% the same, only region differs !
   - Coinage relies on the region (code at 0x000db2) :
       * 0x0001 (Japan) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
-      * 0x0003 (World) and 0x0004 (licenced to xxx) use TAITO_COINAGE_WORLD
+      * 0x0003 (World) and 0x0004 (licensed to xxx) use TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0001
   - According to the manual, DSWB bit 6 determines continue pricing :
 

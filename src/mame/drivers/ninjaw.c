@@ -249,7 +249,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 'ninjawj' : region = 0x0000
   - Coinage relies on the region (code at 0x0013bc) :
       * 0x0000 (Japan), 0x0001 (?) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
-      * 0x0003 (World) and 0x0004 (licenced to xxx) use TAITO_COINAGE_WORLD
+      * 0x0003 (World) and 0x0004 (licensed to xxx) use TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0000
   - According to the manual, DSWB bit 6 determines continue pricing :
 
@@ -273,7 +273,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 'darius2' : region = 0x0001
   - Coinage relies on the region (code at 0x00f37a) :
       * 0x0000 (?), 0x0001 (Japan) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
-      * 0x0002 (US, licenced to ROMSTAR) uses slighlty different TAITO_COINAGE_US :
+      * 0x0002 (US, licensed to ROMSTAR) uses slighlty different TAITO_COINAGE_US :
         4C_3C instead of 4C_1C, same other settings otherwise
       * 0x0003 (World) uses TAITO_COINAGE_WORLD
   - Texts and game name rely on the region :

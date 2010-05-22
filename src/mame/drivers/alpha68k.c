@@ -110,7 +110,7 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
     undumped ! Set the SBASEBAL_HACK to 1 and you'll notice the following
     differences :
 
-      * different manufacturer (no more SNK licence)
+      * different manufacturer (no more SNK license)
       * different coinage (check code at 0x00035c) and additional COIN2
       * different game time (check code at 0x001d20)
       * different table for "Unknown" Dip Switch

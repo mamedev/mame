@@ -5442,7 +5442,7 @@ GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan",
 GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Licensed to Unite Trading For Korea)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 

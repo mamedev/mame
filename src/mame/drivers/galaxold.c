@@ -3094,9 +3094,9 @@ GAME( 1983, harem,    0,        harem,    harem,    0,        ROT90,  "I.G.R.", 
 
 /* S2650 games */
 GAME( 1983, hunchbkg, hunchbak,	hunchbkg, hunchbkg, 0,        ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "Shinkai Inc. (Magic Eletronics USA licence)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "Shinkai Inc. (Magic Eletronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, 0,        ROT90,  "bootleg", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, racknrol, 0,        racknrol, racknrol, 0,	      ROT0,   "Status (Shinkai License)", "Rack + Roll", GAME_SUPPORTS_SAVE )
+GAME( 1986, racknrol, 0,        racknrol, racknrol, 0,	      ROT0,   "Status (Shinkai license)", "Rack + Roll", GAME_SUPPORTS_SAVE )
 GAME( 1986, hexpool,  racknrol, racknrol, racknrol, 0,	      ROT90,  "Shinkai", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE )
 GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, 0,	      ROT90,  "Senko", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
-GAME( 1985, trvchlng, 0,        racknrol, trvchlng, 0,	      ROT90,  "Joyland (Senko License)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1985, trvchlng, 0,        racknrol, trvchlng, 0,	      ROT90,  "Joyland (Senko license)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

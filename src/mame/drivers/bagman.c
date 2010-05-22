@@ -918,7 +918,7 @@ Note
 1x 8 switches dip
 
 This is a strange thing: the PCB is marked "Valadon Automation (C) 1983" and "Fabrique
-sous licence par GECAS/MILANO" (manufactured under license from GECAS/MILANO)
+sous license par GECAS/MILANO" (manufactured under license from GECAS/MILANO)
 
 But if you look in rom 7 with an hex editor you can see the following: "(C) 1984 ITISA"
 and "UN BONJOUR A JACQUES DE PEPE PETIT ET HENK" (a good morning to Jacques from Pepe
@@ -928,7 +928,7 @@ Morillas, the very same 3 persons working on BOTANIC (1984)(ITISA).
 Game writings in the eprom are in English and Spanish.
 
 So we have an English/Spanish game with a French easter egg on a French PCB manufactured
-under licence from an Italian company! Let's call it melting pot!
+under license from an Italian company! Let's call it melting pot!
 
 */
 

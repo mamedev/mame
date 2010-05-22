@@ -216,7 +216,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - These 2 games are 100% the same, only region and gun offsets differ !
   - Coinage relies on the region (code at 0x00bea4) :
       * 0x0001 (Japan) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
-      * 0x0003 (World) and 0x0004 (Japan, licenced to Taito America ?) use TAITO_COINAGE_WORLD
+      * 0x0003 (World) and 0x0004 (Japan, licensed to Taito America ?) use TAITO_COINAGE_WORLD
   - Gun offsets are stored at 0x03ffaf.b (Y) and 0x03ffb1.b (X);
     these values are checked via routine at 0x000b76
   - Notice screen only if region = 0x0001

@@ -533,4 +533,4 @@ GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible 
 GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Capcom Bowling (set 3)", 0 )
 GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Capcom Bowling (set 4)", 0 )
 GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Coors Light Bowling", 0 )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, 0,        ROT270, "P & P Marketing", "Bowl-O-Rama", 0 )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, 0,        ROT270, "P&P Marketing", "Bowl-O-Rama", 0 )

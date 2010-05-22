@@ -348,7 +348,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 2a) 'getstar'
 
-  - US version, licenced to Kitkorp - name "Guardian".
+  - US version, licensed to Kitkorp - name "Guardian".
   - MCU missing and simulated.
   - Difficulty determines the number of energy bars you get.
   - Each hit removes 1 enegy bar.

@@ -124,7 +124,7 @@ Address          Dir Data     Name      Description
 
 
 Tokio
-1986, Taito (Romstar License)
+1986, Taito (Romstar license)
 
 PCB Layout                                                                   G Pinout
 ----------                                                                   --------

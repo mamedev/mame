@@ -1148,4 +1148,4 @@ GAME( 1995, charlien, 0,        mitchell156, simpl156, charlien, ROT0,  "Mitchel
 GAME( 1995, prtytime, 0,        mitchell156, simpl156, prtytime, ROT90, "Mitchell", "Party Time: Gonta the Diver II / Ganbare! Gonta!! 2 (World Release)", GAME_SUPPORTS_SAVE ) /* language in service mode */
 GAME( 1995, gangonta, prtytime, mitchell156, simpl156, prtytime, ROT90, "Mitchell", "Ganbare! Gonta!! 2 / Party Time: Gonta the Diver II (Japan Release)", GAME_SUPPORTS_SAVE ) /* language in service mode */
 GAME( 1996, osman,    0,        mitchell156, simpl156, osman,    ROT0,  "Mitchell", "Osman (World)", GAME_SUPPORTS_SAVE )
-GAME( 1996, candance, osman,    mitchell156, simpl156, osman,    ROT0,  "Mitchell (Atlus License)", "Cannon Dancer (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1996, candance, osman,    mitchell156, simpl156, osman,    ROT0,  "Mitchell (Atlus license)", "Cannon Dancer (Japan)", GAME_SUPPORTS_SAVE )

@@ -59,7 +59,7 @@ Chips:
   CPU: IDT 79R3041-25J (MIPS R3000 core)
 Sound: BSMT2000
 Other: Bt481AKPJ110 (44 Pin PQFP, Brooktree RAMDAC)
-       AT001 (160 Pin PQFP, P & P Marketing, custom programmed XILINX XC4310)
+       AT001 (160 Pin PQFP, P&P Marketing, custom programmed XILINX XC4310)
        ATMEL 93C66 (EEPROM)
        CN7 - 4 pin connector for stero speaker output
 PLDs:
@@ -721,13 +721,13 @@ static DRIVER_INIT( sshoot12 )
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3)", 0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.1)", 0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, policetr, ROT0, "P & P Marketing", "Police Trainer (Rev 1.0)", 0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)", 0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)", 0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)", 0 )
 
-GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3B)", 0 )
+GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)", 0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.7)", 0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.2)", 0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.1)", 0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)", 0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)", 0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)", 0 )

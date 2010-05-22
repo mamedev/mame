@@ -113,9 +113,9 @@ const game_driver * const drivers[] =
 	DRIVER( cannonbp )	/* hack */
 
 	/* S2650 Pacman Kits */
-	DRIVER( drivfrcp )	/* (c) 1984 Shinkai Inc. (Magic Eletronics Inc. licence) */
-	DRIVER( 8bpm )		/* (c) 1985 Seatongrove Ltd (Magic Eletronics USA licence) */
-	DRIVER( porky )		/* (c) 1985 Shinkai Inc. (Magic Eletronics Inc. licence) */
+	DRIVER( drivfrcp )	/* (c) 1984 Shinkai Inc. (Magic Eletronics Inc. license) */
+	DRIVER( 8bpm )		/* (c) 1985 Seatongrove Ltd (Magic Eletronics USA license) */
+	DRIVER( porky )		/* (c) 1985 Shinkai Inc. (Magic Eletronics Inc. license) */
 
 	DRIVER( pengo )		/* 834-0386 (c) 1982 Sega */
 	DRIVER( pengo2 )	/* 834-0386 (c) 1982 Sega */
@@ -1069,11 +1069,11 @@ const game_driver * const drivers[] =
 	DRIVER( marioj )	/* (c) 1983 Nintendo */
 	DRIVER( masao )		/* bootleg */
 	DRIVER( pestplce )	/* bootleg on donkey kong hw */
-	DRIVER( spclforc )	/* (c) 1985 Senko Industries (Magic Eletronics Inc. licence) */
-	DRIVER( spcfrcii )	/* (c) 1985 Senko Industries (Magic Eletronics Inc. licence) */
-	DRIVER( 8ballact )	/* (c) 1984 Seatongrove Ltd (Magic Eletronics USA licence) */
-	DRIVER( 8ballact2 )	/* (c) 1984 Seatongrove Ltd (Magic Eletronics USA licence) */
-	DRIVER( shootgal )	/* (c) 1984 Seatongrove Ltd (Zaccaria licence) */
+	DRIVER( spclforc )	/* (c) 1985 Senko Industries (Magic Eletronics Inc. license) */
+	DRIVER( spcfrcii )	/* (c) 1985 Senko Industries (Magic Eletronics Inc. license) */
+	DRIVER( 8ballact )	/* (c) 1984 Seatongrove Ltd (Magic Eletronics USA license) */
+	DRIVER( 8ballact2 )	/* (c) 1984 Seatongrove Ltd (Magic Eletronics USA license) */
+	DRIVER( shootgal )	/* (c) 1984 Seatongrove Ltd (Zaccaria license) */
 	DRIVER( drakton )	/* (c) 1984 Epos Corporation */
 	DRIVER( drktnjr )	/* (c) 1984 Epos Corporation */
 	DRIVER( strtheat )	/* (c) 1985 Epos Corporation */

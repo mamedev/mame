@@ -126,7 +126,7 @@ Notes:
 Guardians
 Banpresto, 1995
 
-This hardware is not common Banpresto hardware. Possibly licenced
+This hardware is not common Banpresto hardware. Possibly licensed
 to them from another manufacturer? Or an early design that they decided
 not to use for future games? Either way, this game is _extremely_ rare :-)
 

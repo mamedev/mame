@@ -501,7 +501,7 @@ Notes:   LB - CPU board        S-0086-002-0B
          TB - GFX board        S-0087-807
 
          The PCB looks like a prototype, due to the modifications
-         to the PCB. The game is probably licenced from Seibu.
+         to the PCB. The game is probably licensed from Seibu.
 
          The bipolar PROMs are not used for colour.
 

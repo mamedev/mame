@@ -318,7 +318,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Coinage relies on the region (code at 0x00dd10) :
       * 0x0000 (Japan) use TAITO_COINAGE_JAPAN_NEW
       * 0x0001 (US) use TAITO_COINAGE_US
-      * 0x0002 (World), 0x0003 (US, licenced to ROMSTAR) and 0x0004 (licenced to PHOENIX ELECTRONICS CO.)
+      * 0x0002 (World), 0x0003 (US, licensed to ROMSTAR) and 0x0004 (licensed to PHOENIX ELECTRONICS CO.)
         use slighlty different TAITO_COINAGE_WORLD : 1C_7C instead of 1C_6C for Coin B
   - GP order relies on the sub-region (code at 0x00bc9c) :
       * 0x0000 : 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07

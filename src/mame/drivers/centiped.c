@@ -2019,4 +2019,4 @@ GAME( 1982, millipdd, milliped, milliped, milliped, 0,        ROT270, "hack",   
 GAME( 1980, warlords, 0,        warlords, warlords, 0,        ROT0,   "Atari",   "Warlords", GAME_SUPPORTS_SAVE )
 GAME( 1981, mazeinv,  0,        mazeinv,  mazeinv,  0,        ROT270, "Atari",   "Maze Invaders (prototype)", 0 )
 
-GAME( 1985, bullsdrt, 0,        bullsdrt, bullsdrt, bullsdrt, ROT270, "Shinkai Inc. (Magic Eletronics Inc. licence)", "Bulls Eye Darts", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1985, bullsdrt, 0,        bullsdrt, bullsdrt, bullsdrt, ROT270, "Shinkai Inc. (Magic Eletronics Inc. license)", "Bulls Eye Darts", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

@@ -47,13 +47,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 3) 'gunsmokeu'
 
-  - US version licenced to Romstar.
+  - US version licensed to Romstar.
     You can enter 3 chars for your initials.
 
 
 4) 'gunsmokeua'
 
-  - US version licenced to Romstar.
+  - US version licensed to Romstar.
     You can enter 3 chars for your initials.
   - This is probably a later version of the game because some code
     has been added for the "Lives" Dip Switch that replaces the
