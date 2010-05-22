@@ -2971,7 +2971,7 @@ GAME( 1984, dkong3b,  dkong3,   dkong3b,  dkong3b,        0,  ROT90, "bootleg", 
 GAME( 1983, pestplce, mario,    pestplce, pestplce,       0,  ROT180, "bootleg", "Pest Place", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* 2650 based */
-GAME( 1984, herbiedk, huncholy, s2650,    herbiedk,       0,  ROT90, "CVS", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, herbiedk, huncholy, s2650,    herbiedk,       0,  ROT90, "Century Electronics", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1983, hunchbkd, hunchbak, s2650,    hunchbkd,       0,  ROT90, "Century Electronics", "Hunchback (DK conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1984, sbdk,     superbik, s2650,    sbdk,           0,  ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1984, herodk,   hero,     s2650,    herodk,    herodk,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", GAME_SUPPORTS_SAVE )
