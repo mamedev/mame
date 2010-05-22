@@ -365,5 +365,5 @@ ROM_START( flowers ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Komax",      "Flower (Komax)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, flowers, flower, flower, flower, 0, ROT0, "Sega/Alpha", "Flower (Sega/Alpha)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Komax",        "Flower (Komax)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, flowers, flower, flower, flower, 0, ROT0, "Sega / Alpha", "Flower (Sega / Alpha)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)

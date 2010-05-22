@@ -4100,11 +4100,11 @@ GAME( 1988, orangeci, orangec,  mbmj_p16bit,     orangeci, orangeci, ROT0, "Daii
 GAME( 1988, vipclub,  orangec,  mbmj_p16bit,     vipclub,  vipclub,  ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880310)", GAME_IMPERFECT_GRAPHICS )
 
 /* pure 12-bit palette */
-GAME( 1988, kaguya,   0,        mbmj_p12bit,     kaguya,   kaguya,   ROT0, "MIKI SYOUJI", "Mahjong Kaguyahime [BET] (Japan 880521)", 0 )
-GAME( 1989, kaguya2,  0,        mbmj_p12bit,     kaguya2,  kaguya2,  ROT0, "MIKI SYOUJI", "Mahjong Kaguyahime Sono2 [BET] (Japan 890829)", 0 )
-GAME( 1989, kaguya2f, kaguya2,  mbmj_p12bit,     kaguya2,  kaguya2,  ROT0, "MIKI SYOUJI", "Mahjong Kaguyahime Sono2 Fukkokuban [BET] (Japan 010808)", 0 )
+GAME( 1988, kaguya,   0,        mbmj_p12bit,     kaguya,   kaguya,   ROT0, "Miki Syouji", "Mahjong Kaguyahime [BET] (Japan 880521)", 0 )
+GAME( 1989, kaguya2,  0,        mbmj_p12bit,     kaguya2,  kaguya2,  ROT0, "Miki Syouji", "Mahjong Kaguyahime Sono2 [BET] (Japan 890829)", 0 )
+GAME( 1989, kaguya2f, kaguya2,  mbmj_p12bit,     kaguya2,  kaguya2,  ROT0, "Miki Syouji", "Mahjong Kaguyahime Sono2 Fukkokuban [BET] (Japan 010808)", 0 )
 GAME( 1988, kanatuen, 0,        mbmj_p12bit,     kanatuen, kanatuen, ROT0, "Panac", "Kanatsuen no Onna [BET] (Japan 880905)", 0 )
-GAME( 1988, kyuhito,  kanatuen, mbmj_p12bit,     kyuhito,  kyuhito,  ROT0, "ROLLER TRON", "Kyukyoku no Hito [BET] (Japan 880824)", 0 )
+GAME( 1988, kyuhito,  kanatuen, mbmj_p12bit,     kyuhito,  kyuhito,  ROT0, "Roller Tron", "Kyukyoku no Hito [BET] (Japan 880824)", 0 )
 GAME( 1989, idhimitu, 0,        mbmj_p12bit,     idhimitu, idhimitu, ROT0, "Digital Soft", "Idol no Himitsu [BET] (Japan 890304)", 0 )
 
 /* pure 12-bit palette + YM3812 instead of AY-3-8910 */
@@ -4114,7 +4114,7 @@ GAME( 1988, mjsikakc, mjsikaku, mjsikaku,        mjsikaku, mjsikaku, ROT0, "Nich
 GAME( 1988, mjsikakd, mjsikaku, mjsikaku,        mjsikaku, mjsikaku, ROT0, "Nichibutsu", "Mahjong Shikaku (Japan 880802)", 0 )
 GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, mmsikaku, ROT0, "Nichibutsu", "Mahjong Shikaku [BET] (Japan 880929)", 0 )
 GAME( 1988, otonano,  0,        otonano,         otonano,  otonano,  ROT0, "Apple", "Otona no Mahjong (Japan 880628)", 0 )
-GAME( 1988, mjcamera, 0,        otonano,         mjcamera, mjcamera, ROT0, "MIKI SYOUJI", "Mahjong Camera Kozou (set 1) (Japan 881109)", 0 )
+GAME( 1988, mjcamera, 0,        otonano,         mjcamera, mjcamera, ROT0, "Miki Syouji", "Mahjong Camera Kozou (set 1) (Japan 881109)", 0 )
 
 
 /*
