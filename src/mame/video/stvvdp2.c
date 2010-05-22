@@ -2861,6 +2861,8 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 	int tw = 0;
 	/*Transparency code 1=opaque,0=transparent*/
 	int t_pen;
+	int screen_x,screen_y;
+
 	if (!stv2_current_tilemap.enabled) return;
 
 	/* size for n0 / n1 */
@@ -2909,6 +2911,9 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 	stv2_current_tilemap.bitmap_palette_number+=stv2_current_tilemap.colour_ram_address_offset;
 	stv2_current_tilemap.bitmap_palette_number&=7;//safety check
 
+	screen_x = video_screen_get_visible_area(machine->primary_screen)->max_x;
+	screen_y = video_screen_get_visible_area(machine->primary_screen)->max_y;
+
 	switch(stv2_current_tilemap.colour_depth)
 	{
 		/*Palette Format*/
@@ -2924,10 +2929,13 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
+							if (((xcnt + 1) < screen_x) && (ycnt < screen_y))
+							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt+1) = machine->pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 							else
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt+1) = alpha_blend_r16(*BITMAP_ADDR16(bitmap, ycnt, xcnt+1), machine->pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
+							}
 						}
 					}
 					tw = stv_vdp2_window_process(xcnt,ycnt);
@@ -2937,10 +2945,13 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
+							if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = machine->pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 							else
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = alpha_blend_r16(*BITMAP_ADDR16(bitmap, ycnt, xcnt), machine->pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
+							}
 						}
 					}
 					gfxdata++;
@@ -2969,10 +2980,13 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 							if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 							if(t_pen)
 							{
+								if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 									*BITMAP_ADDR16(bitmap, ycnt, xcnt) = machine->pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 								else
 									*BITMAP_ADDR16(bitmap, ycnt, xcnt) = alpha_blend_r16(*BITMAP_ADDR16(bitmap, ycnt, xcnt), machine->pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
+								}
 							}
 						}
 						if ( (gfxdata + xs) >= gfxdatahigh )
@@ -3012,10 +3026,13 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 							if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 							if(t_pen)
 							{
+								if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 									*BITMAP_ADDR16(bitmap, ycnt, xcnt) = machine->pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 								else
 									*BITMAP_ADDR16(bitmap, ycnt, xcnt) = alpha_blend_r16(*BITMAP_ADDR16(bitmap, ycnt, xcnt), machine->pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset], stv2_current_tilemap.alpha);
+								}
 							}
 						}
 
@@ -3037,10 +3054,13 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
+							if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = machine->pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset];
 							else
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = alpha_blend_r16(*BITMAP_ADDR16(bitmap, ycnt, xcnt), machine->pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset], stv2_current_tilemap.alpha);
+							}
 						}
 					}
 
@@ -3081,10 +3101,13 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						tw = stv_vdp2_window_process(xcnt,ycnt);
 						if(tw == 0)
 						{
+							if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 								destline[xcnt] = b | g << 5 | r << 10;
 							else
 								destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
+							}
 						}
 
 						if ( (gfxdata + 2*xs) >= gfxdatahigh ) gfxdata = gfxdatalow;
@@ -3123,10 +3146,13 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 						{
 							if(t_pen)
 							{
+								if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 1 )
 									destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
 								else
 									destline[xcnt] = b | g << 5 | r << 10;
+								}
 							}
 						}
 
@@ -3167,7 +3193,8 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 					if(tw == 0)
 					{
 						if(t_pen)
-							destline[xcnt] = b | g << 5 | r << 10;
+							if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								destline[xcnt] = b | g << 5 | r << 10;
 					}
 					gfxdata+=4;
 					/*This is not used for this type,see shanhigw Sunsoft logo*/
@@ -3979,11 +4006,11 @@ static void stv_vdp2_check_tilemap(running_machine *machine, bitmap_t *bitmap, c
 		/*elandore doesn't like current cliprect code,will be worked on...*/
 		if ( window_applied && stv2_current_tilemap.colour_depth != 0)
 			stv2_current_tilemap.window_control = 0;
+
 		stv_vdp2_draw_basic_bitmap(machine, bitmap, &mycliprect);
 	}
 	else
 	{
-
 		stv_vdp2_draw_basic_tilemap(machine, bitmap, &mycliprect);
 
 		if((stv2_current_tilemap.window_control & 6) != 0 && VDP2_ERR(1))
@@ -5450,22 +5477,6 @@ VIDEO_START( stv_vdp2 )
 
 /*TODO: frame_period should be different for every kind of resolution (needs tests on actual boards)*/
 /*    & height / width not yet understood (docs-wise MUST be bigger than normal visible area)*/
-static TIMER_CALLBACK( dyn_res_change )
-{
-	int vblank_period,hblank_period;
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
-	visarea.min_x = 0;
-	visarea.max_x = horz_res-1;
-	visarea.min_y = 0;
-	visarea.max_y = vert_res-1;
-
-	vblank_period = get_vblank_duration(machine);
-	hblank_period = get_hblank_duration(machine);
-//  popmessage("%d",vblank_period);
-//  hblank_period = get_hblank_duration(machine->primary_screen);
-	video_screen_configure(machine->primary_screen, (horz_res+hblank_period), (vert_res+vblank_period), &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
-}
-
 static void stv_vdp2_dynamic_res_change(running_machine *machine)
 {
 	static UINT8 old_vres = 0,old_hres = 0;
@@ -5501,7 +5512,19 @@ static void stv_vdp2_dynamic_res_change(running_machine *machine)
 //  vert_res*=2;
 	if(old_vres != vert_res || old_hres != horz_res)
 	{
-		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, dyn_res_change);
+		int vblank_period,hblank_period;
+		rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+		visarea.min_x = 0;
+		visarea.max_x = horz_res-1;
+		visarea.min_y = 0;
+		visarea.max_y = vert_res-1;
+
+		vblank_period = get_vblank_duration(machine);
+		hblank_period = get_hblank_duration(machine);
+//		popmessage("%d",vblank_period);
+//		hblank_period = get_hblank_duration(machine->primary_screen);
+		video_screen_configure(machine->primary_screen, (horz_res+hblank_period), (vert_res+vblank_period), &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
+
 		old_vres = vert_res;
 		old_hres = horz_res;
 	}
