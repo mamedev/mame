@@ -321,4 +321,4 @@ ROM_END
  *************************************/
 
 GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, 0, ROT90, "Konami", "Tutankham", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, 0, ROT90, "[Konami] (Stern license)", "Tutankham (Stern)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, 0, ROT90, "Konami (Stern license)", "Tutankham (Stern)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)

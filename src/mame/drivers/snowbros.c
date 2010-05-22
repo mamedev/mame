@@ -2751,7 +2751,7 @@ GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow B
 GAME( 1990, snowbrosc, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 4)", 0 )
 GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (Japan)", 0 )
 GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, 0, ROT0, "Toaplan (Dooyong license)", "Snow Bros. - Nick & Tom (Dooyong license)", 0 )
-GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, 0, ROT0, "[Toaplan] (Sakowa Project Korea bootleg)", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
+GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, 0, ROT0, "bootleg", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
 
 GAME( 1995, honeydol, 0,        honeydol, honeydol, 0, ROT0, "Barko Corp.", "Honey Dolls", 0 ) // based on snowbros code..
 GAME( 1995, twinadv,  0,        twinadv,  twinadv,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", 0 )

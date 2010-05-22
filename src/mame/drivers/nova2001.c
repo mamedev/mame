@@ -1036,7 +1036,7 @@ static DRIVER_INIT( raiders5 )
 
 GAME( 1983, nova2001, 0,        nova2001, nova2001, 0,        ROT0, "UPL", "Nova 2001 (Japan)", 0 )
 GAME( 1983, nova2001u,nova2001, nova2001, nova2001, 0,        ROT0, "UPL (Universal license)", "Nova 2001 (US)", 0 )
-GAME( 1984, ninjakun, 0,        ninjakun, ninjakun, 0,        ROT0, "[UPL] (Taito license)", "Ninjakun Majou no Bouken", 0 )
+GAME( 1984, ninjakun, 0,        ninjakun, ninjakun, 0,        ROT0, "UPL (Taito license)", "Ninjakun Majou no Bouken", 0 )
 GAME( 1985, pkunwar,  0,        pkunwar,  pkunwar,  pkunwar,  ROT0, "UPL", "Penguin-Kun Wars (US)", 0 )
 GAME( 1985, pkunwarj, pkunwar,  pkunwar,  pkunwar,  pkunwar,  ROT0, "UPL", "Penguin-Kun Wars (Japan)", 0 )
 GAME( 1985, raiders5, 0,        raiders5, raiders5, raiders5, ROT0, "UPL", "Raiders5", 0 )

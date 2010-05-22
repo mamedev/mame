@@ -1855,8 +1855,8 @@ static DRIVER_INIT( slapfigh )
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR  COMPANY    FULLNAME     FLAGS ) */
-GAME( 1985, perfrman, 0,        perfrman, perfrman, 0,        ROT270, "[Toaplan] Data East Corporation", "Performan (Japan)", 0 )
-GAME( 1985, perfrmanu,perfrman, perfrman, perfrman, 0,        ROT270, "[Toaplan] Data East USA",         "Performan (US)", 0 )
+GAME( 1985, perfrman, 0,        perfrman, perfrman, 0,        ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
+GAME( 1985, perfrmanu,perfrman, perfrman, perfrman, 0,        ROT270, "Toaplan / Data East USA",         "Performan (US)", 0 )
 GAME( 1985, tigerh,   0,        tigerh,   tigerh,   tigerh,   ROT270, "Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
 GAME( 1985, tigerhj,  tigerh,   tigerh,   tigerh,   tigerh,   ROT270, "Taito",   "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
 GAME( 1985, tigerhb1, tigerh,   tigerhb,  tigerh,   tigerhb,  ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )

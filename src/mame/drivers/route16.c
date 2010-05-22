@@ -1004,7 +1004,7 @@ GAME( 1981, route16a, route16,  route16,  route16,  route16a, ROT270, "Tehkan/Su
 GAME( 1981, route16b, route16,  route16,  route16,  0,        ROT270, "bootleg", "Route 16 (bootleg)", 0 )
 GAME( 1981, routex,   route16,  routex,   route16,  0,        ROT270, "bootleg", "Route X (bootleg)", 0 )
 GAME( 1980, speakres, 0,        speakres, speakres, 0,        ROT270, "Sun Electronics", "Speak & Rescue", 0 )
-GAME( 1980, stratvox, speakres, stratvox, stratvox, 0,        ROT270, "[Sun Electronics] (Taito license)", "Stratovox", 0 )
+GAME( 1980, stratvox, speakres, stratvox, stratvox, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox", 0 )
 GAME( 1980, stratvoxb,speakres, stratvox, stratvox, 0,        ROT270, "bootleg", "Stratovox (bootleg)", 0 )
 GAME( 1980, spacecho, speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo (set 1)", 0 )
 GAME( 1980, spacecho2,speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo (set 2)", 0 )

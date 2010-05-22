@@ -406,6 +406,6 @@ ROM_START( rollace2 )
 ROM_END
 
 
-GAME( 1983, fightrol, 0,        rollrace, rollrace, 0, ROT270, "[Kaneko] (Taito license)", "Fighting Roller", GAME_IMPERFECT_SOUND )
-GAME( 1983, rollace,  fightrol, rollrace, rollrace, 0, ROT270, "[Kaneko] (Williams license)", "Roller Aces (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1983, rollace2, fightrol, rollace2, rollrace, 0, ROT90,  "[Kaneko] (Williams license)", "Roller Aces (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1983, fightrol, 0,        rollrace, rollrace, 0, ROT270, "Kaneko (Taito license)", "Fighting Roller", GAME_IMPERFECT_SOUND )
+GAME( 1983, rollace,  fightrol, rollrace, rollrace, 0, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1983, rollace2, fightrol, rollace2, rollrace, 0, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", GAME_IMPERFECT_SOUND )

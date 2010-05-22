@@ -1103,5 +1103,5 @@ GAME( 1984, scionc,   scion,   scion,   scion,    scion,   ROT0,   "Seibu Denshi
 GAME( 1984, kungfut,  0,       kungfut, kungfut,  0,       ROT0,   "Seibu Kaihatsu Inc.", "Kung-Fu Taikun", 0 )
 GAME( 1984, kungfuta, kungfut, kungfut, kungfut,  0,       ROT0,   "Seibu Kaihatsu Inc.", "Kung-Fu Taikun (alt)" , 0) /* board was a bootleg but set might still be original */
 GAME( 1985, wiz,      0,       wiz,     wiz,      wiz,     ROT270, "Seibu Kaihatsu Inc.", "Wiz", 0 )
-GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz,     ROT270, "[Seibu] (Taito license)", "Wiz (Taito, set 1)", 0 )
-GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz,     ROT270, "[Seibu] (Taito license)", "Wiz (Taito, set 2)", 0 )
+GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz,     ROT270, "Seibu Kaihatsu Inc. (Taito license)", "Wiz (Taito, set 1)", 0 )
+GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz,     ROT270, "Seibu Kaihatsu Inc. (Taito license)", "Wiz (Taito, set 2)", 0 )

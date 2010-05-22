@@ -631,4 +631,4 @@ GAME( 1984, pacland,   0,       pacland, pacland, 0, ROT0, "Namco", "Pac-Land (W
 GAME( 1984, paclandj,  pacland, pacland, pacland, 0, ROT0, "Namco", "Pac-Land (Japan new)", GAME_SUPPORTS_SAVE )
 GAME( 1984, paclandjo, pacland, pacland, pacland, 0, ROT0, "Namco", "Pac-Land (Japan old)", GAME_SUPPORTS_SAVE )
 GAME( 1984, paclandjo2,pacland, pacland, pacland, 0, ROT0, "Namco", "Pac-Land (Japan older)", GAME_SUPPORTS_SAVE )
-GAME( 1984, paclandm,  pacland, pacland, pacland, 0, ROT0, "[Namco] (Bally Midway license)", "Pac-Land (Midway)", GAME_SUPPORTS_SAVE )
+GAME( 1984, paclandm,  pacland, pacland, pacland, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", GAME_SUPPORTS_SAVE )

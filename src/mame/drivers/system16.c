@@ -3548,7 +3548,7 @@ static DRIVER_INIT( astormbl )
  *************************************/
 
 /* System 16A based bootlegs (less complex tilemap system) */
-GAME( 1987, shinobld,    shinobi,   shinobib,    shinobi,   shinobl,    ROT0,   "[Sega] (Datsu bootleg)", "Shinobi (Datsu bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1987, shinobld,    shinobi,   shinobib,    shinobi,   shinobl,    ROT0,   "bootleg", "Shinobi (Datsu bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1988, passshtb,    passsht,   passshtb,    passsht,   passsht,    ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1988, passht4b,    passsht,   passsht4b,   passht4b,  shinobl,    ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1988, wb3bbl,      wb3,       wb3bb,       wb3b,      wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", GAME_NOT_WORKING )

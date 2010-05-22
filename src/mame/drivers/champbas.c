@@ -1236,10 +1236,10 @@ static DRIVER_INIT( exctsccr )
 
 GAME( 1982, talbot,     0,        talbot,   talbot,   0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", GAME_SUPPORTS_SAVE )
 
-GAME( 1983, champbas,   0,        champbas, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball", GAME_SUPPORTS_SAVE )
+GAME( 1983, champbas,   0,        champbas, champbas, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", GAME_SUPPORTS_SAVE )
 GAME( 1983, champbasj,  champbas, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, champbasja, champbas, champbas, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, champbb2,   0,        champmcu, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, champbb2,   0,        champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, champbb2a,  champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )	// no dump
 GAME( 1983, champbb2j,  champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (Japan)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 

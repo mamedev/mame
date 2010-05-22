@@ -2944,7 +2944,7 @@ GAMEL(1979, galxwars2,galxwars, invaders, galxwars, 0, ROT270, "Universal", "Gal
 GAMEL(1979, galxwarst,galxwars, invaders, galxwars, 0, ROT270, "Taito?", "Galaxy Wars (Taito?)" , GAME_SUPPORTS_SAVE, layout_invaders) /* Copyright Not Displayed */
 GAMEL(1979, starw,    galxwars, invaders, galxwars, 0, ROT270, "bootleg", "Star Wars", GAME_SUPPORTS_SAVE, layout_invaders )
 GAME( 1979, lrescue,  0,        lrescue,  lrescue,  0, ROT270, "Taito", "Lunar Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, mlander,  lrescue,  invaders, lrescue,  0, ROT270, "[Taito] (Leisure Time Electronics bootleg)", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mlander,  lrescue,  invaders, lrescue,  0, ROT270, "bootleg", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
 GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Model Racing bootleg)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )

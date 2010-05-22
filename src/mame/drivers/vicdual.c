@@ -3360,12 +3360,12 @@ GAME( 1979, sspaceatc,sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space At
 GAME( 1979, sspacaho, 0,        sspacaho, sspacaho, 0, ROT270, "Sega", "Space Attack / Head On", GAME_NO_SOUND )
 GAME( 1979, headon,   0,        headon,   headon,   0, ROT0,   "Gremlin", "Head On (2 players)",  GAME_IMPERFECT_SOUND )
 GAME( 1979, headonb,  headon,   headon,   headon,   0, ROT0,   "Gremlin", "Head On (1 player)",  GAME_IMPERFECT_SOUND )
-GAME( 1979, headons,  headon,   headons,  headon,   0, ROT0,   "[Gremlin] (Sidam bootleg)", "Head On (Sidam bootleg, set 1)",  GAME_IMPERFECT_SOUND )
-GAME( 1979, headonsa, headon,   headons,  headon,   0, ROT0,   "Sidam (bootleg)",           "Head On (Sidam bootleg, set 2)",  GAME_NOT_WORKING ) // won't coin up?
-GAME( 1979, supcrash, headon,   headons,  supcrash, 0, ROT0,   "[Gremlim] (Video G Electronic Games bootleg)", "Super Crash (bootleg of Head On)", GAME_NO_SOUND )
+GAME( 1979, headons,  headon,   headons,  headon,   0, ROT0,   "bootleg", "Head On (Sidam bootleg, set 1)",  GAME_IMPERFECT_SOUND )
+GAME( 1979, headonsa, headon,   headons,  headon,   0, ROT0,   "Sidam (bootleg)", "Head On (Sidam bootleg, set 2)",  GAME_NOT_WORKING ) // won't coin up?
+GAME( 1979, supcrash, headon,   headons,  supcrash, 0, ROT0,   "bootleg", "Super Crash (bootleg of Head On)", GAME_NO_SOUND )
 GAME( 1979, headon2,  0,        headon2,  headon2,  0, ROT0,   "Sega", "Head On 2",  GAME_IMPERFECT_SOUND )
-GAME( 1979, headon2s, headon2,  headon2bw,car2,     0, ROT0,   "Sidam (bootleg)", "Head On 2 (Sidam bootleg)",  GAME_NOT_WORKING ) // won't coin up?
-GAME( 1979, car2,     headon2,  headon2bw,car2,     0, ROT0,   "[Sega] (RZ Bologna bootleg)", "Car 2 (bootleg of Head On 2)",  GAME_IMPERFECT_SOUND ) // title still says 'HeadOn 2'
+GAME( 1979, headon2s, headon2,  headon2bw,car2,     0, ROT0,   "bootleg", "Head On 2 (Sidam bootleg)",  GAME_NOT_WORKING ) // won't coin up?
+GAME( 1979, car2,     headon2,  headon2bw,car2,     0, ROT0,   "bootleg", "Car 2 (bootleg of Head On 2)",  GAME_IMPERFECT_SOUND ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,   0,        invho2,   invho2,   0, ROT270, "Sega", "Invinco / Head On 2", GAME_IMPERFECT_SOUND )
 GAME( 1980, nsub,     0,        nsub,     nsub,     0, ROT270, "Sega", "N-Sub (upright)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1980, samurai,  0,        samurai,  samurai,  0, ROT270, "Sega", "Samurai", GAME_NO_SOUND )
@@ -3379,8 +3379,8 @@ GAME( 1980, carnivalc,carnival, carnival, carnvckt, 0, ROT270, "Sega", "Carnival
 GAME( 1980, carnivalh,carnival, carnivalh,carnivalh,0, ROT270, "Sega", "Carnival (Head On hardware, set 1)",  GAME_IMPERFECT_SOUND )
 GAME( 1980, carnivalha,carnival,carnivalh,carnivalh,0, ROT270, "Sega", "Carnival (Head On hardware, set 2)",  GAME_IMPERFECT_SOUND )
 GAME( 1981, brdrline, 0,        brdrline, brdrline, 0, ROT270, "Sega", "Borderline", GAME_NO_SOUND )
-GAME( 1981, brdrlins, brdrline, brdrline, brdrline, 0, ROT270, "[Sega] (Sidam bootleg)", "Borderline (Sidam bootleg)", GAME_NO_SOUND )
-GAME( 1981, brdrlinb, brdrline, brdrline, brdrline, 0, ROT270, "[Sega] (Karateco bootleg)", "Borderline (Karateco bootleg)", GAME_NO_SOUND )
+GAME( 1981, brdrlins, brdrline, brdrline, brdrline, 0, ROT270, "bootleg", "Borderline (Sidam bootleg)", GAME_NO_SOUND )
+GAME( 1981, brdrlinb, brdrline, brdrline, brdrline, 0, ROT270, "bootleg", "Borderline (Karateco bootleg)", GAME_NO_SOUND )
 GAME( 1980, digger,   0,        digger,   digger,   0, ROT270, "Sega", "Digger", GAME_NO_SOUND )
 GAME( 1981, pulsar,   0,        pulsar,   pulsar,   0, ROT270, "Sega", "Pulsar", GAME_IMPERFECT_SOUND )
 GAME( 1979, heiankyo, 0,        heiankyo, heiankyo, 0, ROT270, "Denki Onkyo", "Heiankyo Alien", GAME_NO_SOUND )

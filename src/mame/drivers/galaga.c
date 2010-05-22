@@ -3265,14 +3265,14 @@ static DRIVER_INIT( battles )
 GAME( 1981, bosco,    0,       bosco,   bosco,    0,       ROT0,  "Namco", "Bosconian (new version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, boscoo,   bosco,   bosco,   bosco,    0,       ROT0,  "Namco", "Bosconian (old version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, boscoo2,  bosco,   bosco,   bosco,    0,       ROT0,  "Namco", "Bosconian (older version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, boscomd,  bosco,   bosco,   boscomd,  0,       ROT0,  "[Namco] (Midway license)", "Bosconian (Midway, new version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, boscomdo, bosco,   bosco,   boscomd,  0,       ROT0,  "[Namco] (Midway license)", "Bosconian (Midway, old version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, boscomd,  bosco,   bosco,   boscomd,  0,       ROT0,  "Namco (Midway license)", "Bosconian (Midway, new version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, boscomdo, bosco,   bosco,   boscomd,  0,       ROT0,  "Namco (Midway license)", "Bosconian (Midway, old version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1981, galaga,   0,       galaga,  galaga,   galaga,  ROT90, "Namco", "Galaga (Namco rev. B)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, galagao,  galaga,  galaga,  galaga,   galaga,  ROT90, "Namco", "Galaga (Namco)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, galagamw, galaga,  galaga,  galagamw, galaga,  ROT90, "[Namco] (Midway license)", "Galaga (Midway set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, galagamk, galaga,  galaga,  galaga,   galaga,  ROT90, "[Namco] (Midway license)", "Galaga (Midway set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, galagamf, galaga,  galaga,  galaga,   galaga,  ROT90, "[Namco] (Midway license)", "Galaga (Midway set 1 with fast shoot hack)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, galagamw, galaga,  galaga,  galagamw, galaga,  ROT90, "Namco (Midway license)", "Galaga (Midway set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, galagamk, galaga,  galaga,  galaga,   galaga,  ROT90, "Namco (Midway license)", "Galaga (Midway set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1981, galagamf, galaga,  galaga,  galaga,   galaga,  ROT90, "Namco (Midway license)", "Galaga (Midway set 1 with fast shoot hack)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1982, xevious,  0,       xevious, xevious,  xevious, ROT90, "Namco", "Xevious (Namco)", GAME_SUPPORTS_SAVE )
 GAME( 1982, xeviousa, xevious, xevious, xeviousa, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari set 1)", GAME_SUPPORTS_SAVE )
@@ -3283,9 +3283,9 @@ GAME( 1984, sxeviousj,xevious, xevious, sxevious, xevious, ROT90, "Namco", "Supe
 
 GAME( 1982, digdug,   0,       digdug,  digdug,   0,       ROT90, "Namco", "Dig Dug (rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digdug1,  digdug,  digdug,  digdug,   0,       ROT90, "Namco", "Dig Dug (rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digdugat, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digdugat1,digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digsid,   digdug,  digdug,  digdug,   0,       ROT90, "Namco [Sidam license]", "Dig Dug (manufactured by Sidam)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digdugat, digdug,  digdug,  digdug,   0,       ROT90, "Namco (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digdugat1,digdug,  digdug,  digdug,   0,       ROT90, "Namco (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digsid,   digdug,  digdug,  digdug,   0,       ROT90, "Namco (Sidam license)", "Dig Dug (manufactured by Sidam)", GAME_SUPPORTS_SAVE )
 
 /* Bootlegs with replacement I/O chips */
 

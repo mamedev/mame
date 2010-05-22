@@ -1853,10 +1853,10 @@ GAME( 1991, polluxa,  pollux,   pollux,   pollux,   0, ROT270, "Dooyong",  "Poll
 GAME( 1991, polluxa2, pollux,   pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 3)",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
 GAME( 1992, flytiger, 0,        flytiger, flytiger, 0, ROT270, "Dooyong",  "Flying Tiger",         GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, 0, ROT270, "Dooyong",  "Blue Hawk",            GAME_SUPPORTS_SAVE )
-GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, 0, ROT270, "[Dooyong] (NTC license)", "Blue Hawk (NTC)", GAME_SUPPORTS_SAVE )
-GAME( 1993, sadari,   0,        primella, sadari,   0, ROT0,   "[Dooyong] (NTC license)", "Sadari", GAME_SUPPORTS_SAVE )
+GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, 0, ROT270, "Dooyong (NTC license)", "Blue Hawk (NTC)", GAME_SUPPORTS_SAVE )
+GAME( 1993, sadari,   0,        primella, sadari,   0, ROT0,   "Dooyong (NTC license)", "Sadari",  GAME_SUPPORTS_SAVE )
 GAME( 1994, gundl94,  0,        primella, primella, 0, ROT0,   "Dooyong",  "Gun Dealer '94",       GAME_SUPPORTS_SAVE )
-GAME( 1994, primella, gundl94,  primella, primella, 0, ROT0,   "[Dooyong] (NTC license)", "Primella", GAME_SUPPORTS_SAVE )
+GAME( 1994, primella, gundl94,  primella, primella, 0, ROT0,   "Dooyong (NTC license)", "Primella",GAME_SUPPORTS_SAVE )
 GAME( 1994, superx,   0,        superx,   superx,   0, ROT270, "NTC",      "Super-X (NTC)",        GAME_SUPPORTS_SAVE )
 GAME( 1994, superxm,  superx,   superx,   superx,   0, ROT270, "Mitchell", "Super-X (Mitchell)",   GAME_SUPPORTS_SAVE )
 GAME( 1995, rshark,   0,        rshark,   rshark,   0, ROT270, "Dooyong",  "R-Shark",              GAME_SUPPORTS_SAVE )

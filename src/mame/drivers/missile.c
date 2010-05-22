@@ -1199,5 +1199,5 @@ GAME( 1981, suprmatk, missile, missile, suprmatk, suprmatk, ROT0, "Atari / Genco
 GAME( 1981, suprmatkd,missile, missile, suprmatk,        0, ROT0, "Atari / Gencomp", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE )
 
 /* the bootlegs are on different hardware and don't work */
-GAME( 198?, mcombat,  missile, missile, missile,         0, ROT0, "[Atari] (Videotron bootleg)", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )
-GAME( 198?, mcombata, missile, missile, missile,         0, ROT0, "[Atari] (Videotron bootleg)", "Missile Combat (Videotron bootleg, set 2)", GAME_NOT_WORKING )
+GAME( 198?, mcombat,  missile, missile, missile,         0, ROT0, "bootleg", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )
+GAME( 198?, mcombata, missile, missile, missile,         0, ROT0, "bootleg", "Missile Combat (Videotron bootleg, set 2)", GAME_NOT_WORKING )

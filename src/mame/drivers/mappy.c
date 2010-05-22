@@ -2271,7 +2271,7 @@ static DRIVER_INIT( digdug2 )
 
 /* 2x6809, static tilemap, 2bpp sprites (Super Pacman type)  */
 GAME( 1982, superpac, 0,        superpac, superpac, 0,        ROT90, "Namco", "Super Pac-Man", GAME_SUPPORTS_SAVE )
-GAME( 1982, superpacm,superpac, superpac, superpac, 0,        ROT90, "[Namco] (Bally Midway license)", "Super Pac-Man (Midway)", GAME_SUPPORTS_SAVE )
+GAME( 1982, superpacm,superpac, superpac, superpac, 0,        ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", GAME_SUPPORTS_SAVE )
 GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal,  0,        ROT90, "Namco", "Pac & Pal", GAME_SUPPORTS_SAVE )
 GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal,  0,        ROT90, "Namco", "Pac & Pal (older)", GAME_SUPPORTS_SAVE )
 GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal,  0,        ROT90, "Namco", "Pac-Man & Chomp Chomp", GAME_SUPPORTS_SAVE )

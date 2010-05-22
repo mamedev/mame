@@ -2568,14 +2568,14 @@ static DRIVER_INIT( vimana )
 
 
 
-GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", 0 )
-GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", 0 )
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
+GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
 GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver.)", 0 )
 GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )
 GAME( 1989, hellfire2,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
 GAME( 1989, hellfire3,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver., alt)", 0 )
 GAME( 1989, zerowing,   0,        zerowing, zerowing,  toaplan1, ROT0,   "Toaplan", "Zero Wing (single players)", 0 )
-GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (dual players)", 0 )
+GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1, ROT0,   "Toaplan / Williams Electronics Games, Inc", "Zero Wing (dual players)", 0 )
 GAME( 1990, demonwld,   0,        demonwld, demonwld,  demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
 GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (Taito license, set 2)", 0 )
 GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )

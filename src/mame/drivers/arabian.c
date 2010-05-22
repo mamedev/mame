@@ -484,5 +484,5 @@ static DRIVER_INIT( arabian )
  *
  *************************************/
 
-GAME( 1983, arabian,  0,        arabian,  arabian,  arabian,  ROT270, "Sun Electronics",                   "Arabian",         GAME_SUPPORTS_SAVE )
-GAME( 1983, arabiana, arabian,  arabian,  arabiana, arabian,  ROT270, "[Sun Electronics] (Atari license)", "Arabian (Atari)", GAME_SUPPORTS_SAVE )
+GAME( 1983, arabian,  0,        arabian,  arabian,  arabian,  ROT270, "Sun Electronics",                 "Arabian",         GAME_SUPPORTS_SAVE )
+GAME( 1983, arabiana, arabian,  arabian,  arabiana, arabian,  ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", GAME_SUPPORTS_SAVE )

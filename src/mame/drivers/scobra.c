@@ -1409,7 +1409,7 @@ ROM_END
 
 
 GAME( 1981, stratgyx, 0,        stratgyx, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
-GAME( 1981, stratgys, stratgyx, stratgyx, stratgyx, stratgyx,     ROT0,   "[Konami] (Stern license)", "Strategy X (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1981, stratgys, stratgyx, stratgyx, stratgyx, stratgyx,     ROT0,   "Konami (Stern license)", "Strategy X (Stern)", GAME_SUPPORTS_SAVE )
 GAME( 1982, strongx,  stratgyx, stratgyx, stratgyx, stratgyx,	  ROT0,	  "bootleg", "Strong X", GAME_SUPPORTS_SAVE )
 GAME( 1982, darkplnt, 0,        darkplnt, darkplnt, darkplnt,     ROT180, "Stern", "Dark Planet", GAME_SUPPORTS_SAVE )
 GAME( 1982, tazmani2, tazmania, type2,    tazmania, tazmani2,     ROT90,  "Stern", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
@@ -1422,6 +1422,6 @@ GAME( 1981, hustler,  0,        hustler,  hustler,  hustler,      ROT90,  "Konam
 GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?
 GAME( 1981, hustlerb2,hustler,  hustler,  hustler,  scramble_ppi, ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, mimonkey, 0,	mimonkey, mimonkey, mimonkey,	  ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
+GAME( 1982, mimonkey, 0,        mimonkey, mimonkey, mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonsco, mimonkey, mimonkey, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 

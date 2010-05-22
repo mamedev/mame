@@ -946,7 +946,7 @@ static DRIVER_INIT( stonebal )
  *************************************/
 
 GAME( 1993, ultennis, 0,        artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", GAME_SUPPORTS_SAVE )
-GAME( 1993, ultennisj,ultennis, artmagic, ultennis, ultennis, ROT0, "[Art & Magic] (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, ultennisj,ultennis, artmagic, ultennis, ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1994, cheesech, 0,        cheesech, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal, 0,        stonebal, stonebal, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal2,stonebal, stonebal, stoneba2, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", GAME_SUPPORTS_SAVE )

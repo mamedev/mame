@@ -3505,8 +3505,8 @@ GAME( 1988, passsht16a, passsht,  system16a,        passsht16a, passsht16a,  ROT
 GAME( 1987, sdi,        0,        system16a_no7751, sdi,        sdi,         ROT0,   "Sega",           "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinobi,    0,        system16a,        shinobi,    generic_16a, ROT0,   "Sega",           "Shinobi (set 6, System 16A, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinobi1,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "Sega",           "Shinobi (set 1, System 16A, FD1094 317-0050)", GAME_SUPPORTS_SAVE )
-GAME( 1987, shinobls,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "[Sega] (Star bootleg)", "Shinobi (Star bootleg, System 16A)", GAME_SUPPORTS_SAVE )
-GAME( 1987, shinoblb,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "[Sega] (Beta bootleg)", "Shinobi (Beta bootleg)", GAME_SUPPORTS_SAVE ) // should have different sound hw? using original ATM
+GAME( 1987, shinobls,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "bootleg",        "Shinobi (Star bootleg, System 16A)", GAME_SUPPORTS_SAVE )
+GAME( 1987, shinoblb,   shinobi,  system16a,        shinobi,    generic_16a, ROT0,   "bootleg",        "Shinobi (Beta bootleg)", GAME_SUPPORTS_SAVE ) // should have different sound hw? using original ATM
 GAME( 1987, sjryuko1,   sjryuko,  system16a,        sjryuko,    sjryukoa,    ROT0,   "White Board",    "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", GAME_SUPPORTS_SAVE )
 GAME( 1988, tetris,     0,        system16a_no7751, tetris,     generic_16a, ROT0,   "Sega",           "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", GAME_SUPPORTS_SAVE )
 GAME( 1988, tetris3,    tetris,   system16a_no7751, tetris,     generic_16a, ROT0,   "Sega",           "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", GAME_SUPPORTS_SAVE )

@@ -698,7 +698,7 @@ static DRIVER_INIT( cshootere )
 
 
 
-GAME( 1987, cshooter,  0,       cshooter, cshooter, cshooter,  ROT270, "[Seibu Kaihatsu] (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, cshootere, cshooter, airraid, cshooter, cshootere, ROT270, "[Seibu Kaihatsu] (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, airraid,   cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu",                    "Air Raid (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshooter,  0,       cshooter, cshooter, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshootere, cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, airraid,   cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
 

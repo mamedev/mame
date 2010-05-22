@@ -2094,11 +2094,11 @@ static DRIVER_INIT( ddragon6809 )
  *************************************/
 
 GAME( 1987, ddragon,     0,        ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan", "Double Dragon (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonw,    ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito license)", "Double Dragon (World Set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonw1,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito license)", "Double Dragon (World Set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonu,    ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonua,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonub,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonw,    ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan (Taito license)", "Double Dragon (World Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonw1,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan (Taito license)", "Double Dragon (World Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonu,    ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan (Taito America license)", "Double Dragon (US Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonua,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan (Taito America license)", "Double Dragon (US Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonub,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan (Taito America license)", "Double Dragon (US Set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragonb2,   ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragonb,    ddragon,  ddragonb, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with HD6309)", GAME_SUPPORTS_SAVE ) // according to dump notes
 GAME( 1987, ddragonba,   ddragon,  ddragonba,   ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )

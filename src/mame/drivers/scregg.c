@@ -409,5 +409,5 @@ static DRIVER_INIT( rockduck )
 
 GAME( 1983, dommy,    0,        dommy,  scregg, 0, ROT270, "Technos Japan", "Dommy", GAME_SUPPORTS_SAVE )
 GAME( 1983, scregg,   0,        scregg, scregg, 0, ROT270, "Technos Japan", "Scrambled Egg", GAME_SUPPORTS_SAVE )
-GAME( 1983, eggs,     scregg,   scregg, scregg, 0, ROT270, "[Technos Japan] Universal USA", "Eggs", GAME_SUPPORTS_SAVE )
+GAME( 1983, eggs,     scregg,   scregg, scregg, 0, ROT270, "Technos Japan / Universal USA", "Eggs", GAME_SUPPORTS_SAVE )
 GAME( 1983, rockduck, 0,        scregg, rockduck, rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

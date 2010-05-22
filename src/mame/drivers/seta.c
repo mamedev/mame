@@ -10041,8 +10041,8 @@ static DRIVER_INIT( inttootea )
 ***************************************************************************/
 
 /* 68000 + 65C02 */
-GAME( 1987, tndrcade, 0,        tndrcade, tndrcade, 0,        ROT270, "[Seta] (Taito license)", "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej,tndrcade, tndrcade, tndrcadj, 0,        ROT270, "[Seta] (Taito license)", "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade, 0,        tndrcade, tndrcade, 0,        ROT270, "Seta (Taito license)",   "Thundercade / Twin Formation" , 0) // Title/License: DSW
+GAME( 1987, tndrcadej,tndrcade, tndrcade, tndrcadj, 0,        ROT270, "Seta (Taito license)",   "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 GAME( 1988, twineagl, 0,        twineagl, twineagl, twineagl, ROT270, "Seta (Taito license)",   "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 GAME( 1989, downtown, 0,        downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Set 1)" , 0) // Country/License: DSW
 GAME( 1989, downtown2,downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Set 2)" , 0) // Country/License: DSW
@@ -10060,7 +10060,7 @@ GAME( 1989, wits,     0,        wits,     wits,     0,        ROT0,   "Athena (V
 GAME( 1990, thunderl, 0,        thunderl, thunderl, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
 GAME( 1994, wiggie,   0,        wiggie,   thunderl, wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar, wiggie,   superbar, thunderl, wiggie,   ROT270, "Promat",                 "Super Bar", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
-GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc,  0,        ROT0,   "[Seta] (Visco license)", "Jockey Club", 0 )
+GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc,  0,        ROT0,   "Seta (Visco license)",   "Jockey Club", 0 )
 GAME( 1998, inttoote, jockeyc,  inttoote, inttoote, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1993, inttootea,jockeyc,  inttoote, inttoote, inttootea,ROT0,   "Coinmaster",             "International Toote II (World?)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1991, rezon,    0,        rezon,    rezon,    rezon,    ROT0,   "Allumer",                "Rezon", 0 )

@@ -750,7 +750,7 @@ ROM_START( stfighta )
 ROM_END
 
 GAME( 1986, empcity,  0,       stfight, stfight, empcity, ROT0, "Seibu Kaihatsu", "Empire City: 1931 (bootleg?)", 0 )
-GAME( 1986, empcityu, empcity, stfight, stfight, stfight, ROT0, "[Seibu Kaihatsu] (Taito / Romstar license)", "Empire City: 1931 (US)", 0 )
-GAME( 1986, empcityj, empcity, stfight, stfight, stfight, ROT0, "[Seibu Kaihatsu] (Taito license)", "Empire City: 1931 (Japan)", 0 )
+GAME( 1986, empcityu, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)", 0 )
+GAME( 1986, empcityj, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu (Taito license)", "Empire City: 1931 (Japan)", 0 )
 GAME( 1986, stfight,  empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu", "Street Fight (Germany)", 0 )
 GAME( 1986, stfighta, empcity, stfight, stfight, stfight, ROT0, "Seibu Kaihatsu", "Street Fight", 0 )

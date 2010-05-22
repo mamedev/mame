@@ -2732,7 +2732,7 @@ ROM_END
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
 GAME( 1987, plumppop, 0,        drtoppel, plumppop, plumpop,  ROT0,   "Taito Corporation", "Plump Pop (Japan)", 0 )
 GAME( 1987, extrmatn, 0,        arknoid2, extrmatn, extrmatn, ROT270, "Taito Corporation Japan", "Extermination (World)", 0 )
-GAME( 1987, extrmatnu,extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "[Taito] World Games", "Extermination (US)", 0 )
+GAME( 1987, extrmatnu,extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "Taito / World Games", "Extermination (US)", 0 )
 GAME( 1987, extrmatnj,extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "Taito Corporation", "Extermination (Japan)", 0 )
 GAME( 1987, arknoid2, 0,        arknoid2, arknoid2, arknoid2, ROT270, "Taito Corporation Japan", "Arkanoid - Revenge of DOH (World)", 0 )
 GAME( 1987, arknoid2u,arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)", 0 )

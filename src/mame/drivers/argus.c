@@ -777,7 +777,7 @@ ROM_START( butasan )
 ROM_END
 
 
-/*  ( YEAR   NAME     PARENT  MACHINE   INPUT     INIT  MONITOR  COMPANY                   FULLNAME ) */
-GAME( 1986, argus,    0,      argus,    argus,    0,    ROT270,  "[NMK] (Jaleco license)", "Argus"          , GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, valtric,  0,      valtric,  valtric,  0,    ROT270,  "[NMK] (Jaleco license)", "Valtric"        , GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, butasan,  0,      butasan,  butasan,  0,    ROT0,    "[NMK] (Jaleco license)", "Butasan (Japan)", GAME_IMPERFECT_GRAPHICS )
+/*  ( YEAR   NAME     PARENT  MACHINE   INPUT     INIT  MONITOR  COMPANY                  FULLNAME ) */
+GAME( 1986, argus,    0,      argus,    argus,    0,    ROT270,  "NMK (Jaleco license)", "Argus"          , GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, valtric,  0,      valtric,  valtric,  0,    ROT270,  "NMK (Jaleco license)", "Valtric"        , GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, butasan,  0,      butasan,  butasan,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan)", GAME_IMPERFECT_GRAPHICS )
