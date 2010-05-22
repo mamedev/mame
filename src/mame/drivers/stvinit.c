@@ -249,23 +249,6 @@ DRIVER_INIT(fhboxers)
 	DRIVER_INIT_CALL(stv);
 }
 
-
-
-
-static READ32_HANDLER( groovef_hack1_r )
-{
-	if(cpu_get_pc(space->cpu) == 0x6005e7c) stv_workram_h[0x0fffcc/4] = 0x00000000;
-//  popmessage("1 %08x",cpu_get_pc(space->cpu));
-	return stv_workram_h[0x0fffcc/4];
-}
-
-static READ32_HANDLER( groovef_hack2_r )
-{
-	if(cpu_get_pc(space->cpu) == 0x6005e86) stv_workram_h[0x0ca6cc/4] = 0x00000000;
-//  popmessage("2 %08x",cpu_get_pc(space->cpu));
-	return stv_workram_h[0x0ca6cc/4];
-}
-
 DRIVER_INIT( groovef )
 {
 	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x6005e7c);
@@ -273,10 +256,6 @@ DRIVER_INIT( groovef )
 	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x60a4970);
 
 	sh2drc_add_pcflush(devtag_get_device(machine, "slave"), 0x60060c2);
-
-	/* prevent game from hanging on startup -- todo: remove these hacks */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60ca6cc, 0x60ca6cf, 0, 0, groovef_hack2_r );
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60fffcc, 0x60fffcf, 0, 0, groovef_hack1_r );
 
 	DRIVER_INIT_CALL(stv);
 

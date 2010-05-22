@@ -113,8 +113,6 @@ ToDo / Notes:
 
 (per-game issues)
 -stress: accesses the Sound Memory Expansion Area (0x05a00000-0x05afffff), unknown purpose;
--groovef: hangs soon after loaded,caused by two memory addresses in the Work RAM-H range.
- Kludged for now to work.
 -smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MDRV_INTERLEAVE number,might need strict
  SH-2 synching.
 -various: find idle skip if possible.
