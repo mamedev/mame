@@ -1467,6 +1467,11 @@ ROM_START( spclords )
 
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
+
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -1508,6 +1513,11 @@ ROM_START( spclordsb )
 
 	ROM_REGION( 0x80000, "adpcmr", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
+
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -1551,9 +1561,9 @@ ROM_START( spclordsg )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
-	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
-	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -1597,9 +1607,9 @@ ROM_START( spclordsa )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "094-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
-	ROM_LOAD( "094-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
-	ROM_LOAD( "094-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -1944,14 +1954,10 @@ ROM_END
 
 ROM_START( rrreveng )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
-	ROM_LOAD32_BYTE( "rrprghh.23e", 0x00000, 0x20000, CRC(d2903e9d) SHA1(8782cd6ee39e2159b9ebc68ecdc3ecefcdeb8623) )
-	ROM_LOAD32_BYTE( "rrprghl.23j", 0x00001, 0x20000, CRC(1afd500c) SHA1(6d24087a839e5e7d9c764026a9f3089e52785cdb) )
-	ROM_LOAD32_BYTE( "rrprglh.37e", 0x00002, 0x20000, CRC(2b03a6fc) SHA1(7c95a0307b854bd37fd327ff1af1b69aa60fb2fd) )
-	ROM_LOAD32_BYTE( "rrprgll.37j", 0x00003, 0x20000, CRC(acf078da) SHA1(3506e105d3b208864ce12ab20e6250cb3a0005d6) )
-
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
-	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
-	ROM_CONTINUE(            0x04000, 0xc000 )
+	ROM_LOAD32_BYTE( "revenge.23e", 0x00000, 0x20000, CRC(3ade13a6) SHA1(672dd0800d6a1cf6cbb2adcebe452a0df71b3236) ) /* Test menu shows 06SEP1994 14:25:13 */
+	ROM_LOAD32_BYTE( "revenge.23j", 0x00001, 0x20000, CRC(aff623d5) SHA1(3ad419deb2f40d62f5a6803035c5d08fe82833f4) )
+	ROM_LOAD32_BYTE( "revenge.37e", 0x00002, 0x20000, CRC(b5e2a3e2) SHA1(b6ad6d03120ad6699af31d09474b82979ead65bb) )
+	ROM_LOAD32_BYTE( "revenge.37j", 0x00003, 0x20000, CRC(6c7f114b) SHA1(2b9a627ec0a211da8080ea33a5486367b043952a) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "rralpl.2d", 0x000000, 0x80000, CRC(00488dad) SHA1(604f08a219db0438dcbf21337ebd497f353bd812) ) /* playfield, planes 0-1 */
@@ -1959,25 +1965,19 @@ ROM_START( rrreveng )
 	ROM_LOAD( "rralph.8d", 0x100000, 0x80000, CRC(ef04f04e) SHA1(e518133096978c4a0152253231625c385a84530f) ) /* playfield, planes 4-5 */
 
 	ROM_REGION( 0x020000, "gfx2", 0 )
-	ROM_LOAD( "rralalph.13n", 0x000000, 0x20000, CRC(7ca93790) SHA1(5e2f069be4b15d63f418c8693e8550eb0ae22381) ) /* alphanumerics */
+	ROM_LOAD( "alpha.13n", 0x000000, 0x20000, CRC(f2efbd66) SHA1(d5339f0b3de7a102d659f7459b5f4800cab31829) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x500000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "rrmo0h.31n", 0x000000, 0x80000, CRC(9b7e0315) SHA1(856804e89f586a4e777da5f47dc29c4e34175f44) )
-	ROM_LOAD16_BYTE( "rrmo0l.31l", 0x000001, 0x80000, CRC(10478697) SHA1(9682e82cfbdc20f63d5c49303265c598a334c15b) )
-	ROM_LOAD16_BYTE( "rrmo1h.33n", 0x100000, 0x80000, CRC(c7a48389) SHA1(a263aa4829cb243440ebe0496dd4f0158d97e2cc) )
-	ROM_LOAD16_BYTE( "rrmo1l.33l", 0x100001, 0x80000, CRC(085a67c1) SHA1(0449abb5fec9014bd0ad14ce4802f726a90bc48c) )
-	ROM_LOAD16_BYTE( "rrmo2h.35n", 0x200000, 0x80000, CRC(aea35aff) SHA1(2e02d2e877d356f9fb07e8b55ce252a148192d59) )
-	ROM_LOAD16_BYTE( "rrmo2l.35l", 0x200001, 0x80000, CRC(b256d6d6) SHA1(0f0a05e3e58a00662f99988a050f2f5a11592d29) )
-	ROM_LOAD16_BYTE( "rrmo3h.37n", 0x300000, 0x80000, CRC(e02549d7) SHA1(8b373d4969c77a14b15588f8a7e2977277fc9752) )
-	ROM_LOAD16_BYTE( "rrmo3l.37l", 0x300001, 0x80000, CRC(8c81b537) SHA1(16cf8804687590aedf9020f9619bd14240f3b628) )
-	ROM_LOAD16_BYTE( "rrmo4h.31t", 0x400000, 0x80000, CRC(12bf3e11) SHA1(37b1a7fe0b50202030f5c1938b95a449bbd51add) )
-	ROM_LOAD16_BYTE( "rrmo4l.31r", 0x400001, 0x80000, CRC(a80175f6) SHA1(db621902fdfa99ec532713f4314c6cbb8353a773) )
-
-	ROM_REGION( 0x80000, "adpcml", 0 )
-	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
-
-	ROM_REGION( 0x80000, "adpcmr", 0 )
-	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
+	ROM_LOAD16_BYTE( "mo0h.31n",    0x000000, 0x80000, CRC(fc2755d5) SHA1(e24319161307efbb3828b21a6250869051f1ccc1) )
+	ROM_LOAD16_BYTE( "mo0l.31l",    0x000001, 0x80000, CRC(f9f6bfe3) SHA1(c7e1479bb86646691d5ca7ee9127553cfd86571e) )
+	ROM_LOAD16_BYTE( "rrmo1h.33n",  0x100000, 0x80000, CRC(c7a48389) SHA1(a263aa4829cb243440ebe0496dd4f0158d97e2cc) )
+	ROM_LOAD16_BYTE( "rrmo1l.33l",  0x100001, 0x80000, CRC(085a67c1) SHA1(0449abb5fec9014bd0ad14ce4802f726a90bc48c) )
+	ROM_LOAD16_BYTE( "rrmo2h.35n",  0x200000, 0x80000, CRC(aea35aff) SHA1(2e02d2e877d356f9fb07e8b55ce252a148192d59) )
+	ROM_LOAD16_BYTE( "rrmo2l.35l",  0x200001, 0x80000, CRC(b256d6d6) SHA1(0f0a05e3e58a00662f99988a050f2f5a11592d29) )
+	ROM_LOAD16_BYTE( "mo3h.37n",    0x300000, 0x80000, CRC(563baaeb) SHA1(e356aa2048c6addefa62d10a17fe5736afa54b16) )
+	ROM_LOAD16_BYTE( "mo3l.37l",    0x300001, 0x80000, CRC(e0cf3396) SHA1(544863e5c18cce002ced8f96d5dfaedffdcfff1e) )
+	ROM_LOAD16_BYTE( "revenge.31t", 0x400000, 0x80000, CRC(086fb896) SHA1(5ca3aea3a52e73a1054c88759d957709c2ad22a2) )
+	ROM_LOAD16_BYTE( "revenge.31r", 0x400001, 0x80000, CRC(518fdd7c) SHA1(ccee646efb178aa3720e75524646e20d18b27694) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "136094-0001a.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* 74S472AN BPROM */
@@ -1999,12 +1999,24 @@ ROM_START( rrreveng )
 	ROM_LOAD( "136094-0013a.24c", 0x0000, 0x0117, CRC(11934654) SHA1(a230c4e9abc190a62872961d60f9f96dedb273cd) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0018a.24j", 0x0000, 0x0117, CRC(9def4158) SHA1(11c168e2c16046e1213786c065906455fdb5a63c) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0017a.25c", 0x0000, 0x0117, CRC(76d8fa5b) SHA1(5fcb7b75f37f918331d99422ea3f0ea202665d5e) ) /* GAL16V8A */
+
+	/* all roms above are from this PCB however the sound board was missing - assumed to be the same */
+
+	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
+	ROM_CONTINUE(            0x04000, 0xc000 )
+
+	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
+
+	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 ROM_END
 
 
-ROM_START( rrrevenga )
+ROM_START( rrrevenga ) /* Same program roms as the set below, but shares more roms with the most current version (parent) */
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
-	ROM_LOAD32_BYTE( "rrprghh.23e", 0x00000, 0x20000, CRC(d2903e9d) SHA1(8782cd6ee39e2159b9ebc68ecdc3ecefcdeb8623) )
+	ROM_LOAD32_BYTE( "rrprghh.23e", 0x00000, 0x20000, CRC(d2903e9d) SHA1(8782cd6ee39e2159b9ebc68ecdc3ecefcdeb8623) ) /* Test menu shows 27JAN1994 17:02:20 */
 	ROM_LOAD32_BYTE( "rrprghl.23j", 0x00001, 0x20000, CRC(1afd500c) SHA1(6d24087a839e5e7d9c764026a9f3089e52785cdb) )
 	ROM_LOAD32_BYTE( "rrprglh.37e", 0x00002, 0x20000, CRC(2b03a6fc) SHA1(7c95a0307b854bd37fd327ff1af1b69aa60fb2fd) )
 	ROM_LOAD32_BYTE( "rrprgll.37j", 0x00003, 0x20000, CRC(acf078da) SHA1(3506e105d3b208864ce12ab20e6250cb3a0005d6) )
@@ -2064,10 +2076,14 @@ ROM_END
 
 ROM_START( rrrevengb )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
-	ROM_LOAD32_BYTE( "revenge.23e", 0x00000, 0x20000, CRC(3ade13a6) SHA1(672dd0800d6a1cf6cbb2adcebe452a0df71b3236) )
-	ROM_LOAD32_BYTE( "revenge.23j", 0x00001, 0x20000, CRC(aff623d5) SHA1(3ad419deb2f40d62f5a6803035c5d08fe82833f4) )
-	ROM_LOAD32_BYTE( "revenge.37e", 0x00002, 0x20000, CRC(b5e2a3e2) SHA1(b6ad6d03120ad6699af31d09474b82979ead65bb) )
-	ROM_LOAD32_BYTE( "revenge.37j", 0x00003, 0x20000, CRC(6c7f114b) SHA1(2b9a627ec0a211da8080ea33a5486367b043952a) )
+	ROM_LOAD32_BYTE( "rrprghh.23e", 0x00000, 0x20000, CRC(d2903e9d) SHA1(8782cd6ee39e2159b9ebc68ecdc3ecefcdeb8623) )
+	ROM_LOAD32_BYTE( "rrprghl.23j", 0x00001, 0x20000, CRC(1afd500c) SHA1(6d24087a839e5e7d9c764026a9f3089e52785cdb) )
+	ROM_LOAD32_BYTE( "rrprglh.37e", 0x00002, 0x20000, CRC(2b03a6fc) SHA1(7c95a0307b854bd37fd327ff1af1b69aa60fb2fd) )
+	ROM_LOAD32_BYTE( "rrprgll.37j", 0x00003, 0x20000, CRC(acf078da) SHA1(3506e105d3b208864ce12ab20e6250cb3a0005d6) )
+
+	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
+	ROM_CONTINUE(            0x04000, 0xc000 )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "rralpl.2d", 0x000000, 0x80000, CRC(00488dad) SHA1(604f08a219db0438dcbf21337ebd497f353bd812) ) /* playfield, planes 0-1 */
@@ -2075,19 +2091,25 @@ ROM_START( rrrevengb )
 	ROM_LOAD( "rralph.8d", 0x100000, 0x80000, CRC(ef04f04e) SHA1(e518133096978c4a0152253231625c385a84530f) ) /* playfield, planes 4-5 */
 
 	ROM_REGION( 0x020000, "gfx2", 0 )
-	ROM_LOAD( "alpha.13n", 0x000000, 0x20000, CRC(f2efbd66) SHA1(d5339f0b3de7a102d659f7459b5f4800cab31829) ) /* alphanumerics */
+	ROM_LOAD( "rralalph.13n", 0x000000, 0x20000, CRC(7ca93790) SHA1(5e2f069be4b15d63f418c8693e8550eb0ae22381) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x500000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "mo0h.31n",    0x000000, 0x80000, CRC(fc2755d5) SHA1(e24319161307efbb3828b21a6250869051f1ccc1) )
-	ROM_LOAD16_BYTE( "mo0l.31l",    0x000001, 0x80000, CRC(f9f6bfe3) SHA1(c7e1479bb86646691d5ca7ee9127553cfd86571e) )
-	ROM_LOAD16_BYTE( "rrmo1h.33n",  0x100000, 0x80000, CRC(c7a48389) SHA1(a263aa4829cb243440ebe0496dd4f0158d97e2cc) )
-	ROM_LOAD16_BYTE( "rrmo1l.33l",  0x100001, 0x80000, CRC(085a67c1) SHA1(0449abb5fec9014bd0ad14ce4802f726a90bc48c) )
-	ROM_LOAD16_BYTE( "rrmo2h.35n",  0x200000, 0x80000, CRC(aea35aff) SHA1(2e02d2e877d356f9fb07e8b55ce252a148192d59) )
-	ROM_LOAD16_BYTE( "rrmo2l.35l",  0x200001, 0x80000, CRC(b256d6d6) SHA1(0f0a05e3e58a00662f99988a050f2f5a11592d29) )
-	ROM_LOAD16_BYTE( "mo3h.37n",    0x300000, 0x80000, CRC(563baaeb) SHA1(e356aa2048c6addefa62d10a17fe5736afa54b16) )
-	ROM_LOAD16_BYTE( "mo3l.37l",    0x300001, 0x80000, CRC(e0cf3396) SHA1(544863e5c18cce002ced8f96d5dfaedffdcfff1e) )
-	ROM_LOAD16_BYTE( "revenge.31t", 0x400000, 0x80000, CRC(086fb896) SHA1(5ca3aea3a52e73a1054c88759d957709c2ad22a2) )
-	ROM_LOAD16_BYTE( "revenge.31r", 0x400001, 0x80000, CRC(518fdd7c) SHA1(ccee646efb178aa3720e75524646e20d18b27694) )
+	ROM_LOAD16_BYTE( "rrmo0h.31n", 0x000000, 0x80000, CRC(9b7e0315) SHA1(856804e89f586a4e777da5f47dc29c4e34175f44) )
+	ROM_LOAD16_BYTE( "rrmo0l.31l", 0x000001, 0x80000, CRC(10478697) SHA1(9682e82cfbdc20f63d5c49303265c598a334c15b) )
+	ROM_LOAD16_BYTE( "rrmo1h.33n", 0x100000, 0x80000, CRC(c7a48389) SHA1(a263aa4829cb243440ebe0496dd4f0158d97e2cc) )
+	ROM_LOAD16_BYTE( "rrmo1l.33l", 0x100001, 0x80000, CRC(085a67c1) SHA1(0449abb5fec9014bd0ad14ce4802f726a90bc48c) )
+	ROM_LOAD16_BYTE( "rrmo2h.35n", 0x200000, 0x80000, CRC(aea35aff) SHA1(2e02d2e877d356f9fb07e8b55ce252a148192d59) )
+	ROM_LOAD16_BYTE( "rrmo2l.35l", 0x200001, 0x80000, CRC(b256d6d6) SHA1(0f0a05e3e58a00662f99988a050f2f5a11592d29) )
+	ROM_LOAD16_BYTE( "rrmo3h.37n", 0x300000, 0x80000, CRC(e02549d7) SHA1(8b373d4969c77a14b15588f8a7e2977277fc9752) )
+	ROM_LOAD16_BYTE( "rrmo3l.37l", 0x300001, 0x80000, CRC(8c81b537) SHA1(16cf8804687590aedf9020f9619bd14240f3b628) )
+	ROM_LOAD16_BYTE( "rrmo4h.31t", 0x400000, 0x80000, CRC(12bf3e11) SHA1(37b1a7fe0b50202030f5c1938b95a449bbd51add) )
+	ROM_LOAD16_BYTE( "rrmo4l.31r", 0x400001, 0x80000, CRC(a80175f6) SHA1(db621902fdfa99ec532713f4314c6cbb8353a773) )
+
+	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
+
+	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "136094-0001a.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* 74S472AN BPROM */
@@ -2109,19 +2131,6 @@ ROM_START( rrrevengb )
 	ROM_LOAD( "136094-0013a.24c", 0x0000, 0x0117, CRC(11934654) SHA1(a230c4e9abc190a62872961d60f9f96dedb273cd) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0018a.24j", 0x0000, 0x0117, CRC(9def4158) SHA1(11c168e2c16046e1213786c065906455fdb5a63c) ) /* GAL16V8A */
 	ROM_LOAD( "136094-0017a.25c", 0x0000, 0x0117, CRC(76d8fa5b) SHA1(5fcb7b75f37f918331d99422ea3f0ea202665d5e) ) /* GAL16V8A */
-
-	/* all roms above are from this PCB however the sound board was missing - assumed to be the same */
-
-	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
-	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
-	ROM_CONTINUE(            0x04000, 0xc000 )
-
-	ROM_REGION( 0x80000, "adpcml", 0 )
-	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
-
-	ROM_REGION( 0x80000, "adpcmr", 0 )
-	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
-
 ROM_END
 
 
@@ -2213,6 +2222,6 @@ GAME( 1992, motofrenmd, motofren, atarigx2, motofren, motofren, ROT0, "Atari Gam
 GAME( 1992, motofrenft, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, motofrenmf, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1993, rrreveng,  0,        atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, rrrevenga, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, rrrevengb, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, set 3)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrreveng,  0,        atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrrevenga, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrrevengb, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
