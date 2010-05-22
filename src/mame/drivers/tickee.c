@@ -9,10 +9,12 @@
         * Tickee Tickats
         * Ghost Hunter
         * Tuts Tomb
+        * Mouse Attack
         * Rapid Fire
 
     Known bugs:
         * (Tickee) gun sometimes misfires
+        * Mouse Attack dips and inputs need fixing
 
 ***************************************************************************/
 
@@ -383,6 +385,22 @@ static ADDRESS_MAP_START( ghoshunt_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( mouseatk_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&tickee_vram)
+	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x04100000, 0x041000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8("ym", ay8910_r, 0x00ff)
+	AM_RANGE(0x04200000, 0x0420000f) AM_DEVWRITE8("ym", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE(&tickee_control)
+	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2") // ?
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
+	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
+ADDRESS_MAP_END
+
+
 /* newer hardware */
 static ADDRESS_MAP_START( rapidfir_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&tickee_vram)
@@ -531,6 +549,52 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("GUNY2")			/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( mouseatk )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x01, "Game Time/Diff" )
+	PORT_DIPSETTING(    0x03, "Very Fast/Very Easy" )
+	PORT_DIPSETTING(    0x02, "Fast/Easy" )
+	PORT_DIPSETTING(    0x01, "Average/Hard" )
+	PORT_DIPSETTING(    0x00, "Slow/Very Hard" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ))
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x00, "Last Box Tickets" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x08, "25" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Unknown ))
+	PORT_DIPSETTING(    0x30, "0" )
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ))
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ))
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket2", ticket_dispenser_line_r) /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket1", ticket_dispenser_line_r)	/* left ticket status */
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -732,6 +796,37 @@ static MACHINE_DRIVER_START( rapidfir )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( mouseatk )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
+	MDRV_CPU_CONFIG(tms_config)
+	MDRV_CPU_PROGRAM_MAP(mouseatk_map)
+
+	MDRV_MACHINE_RESET(tickee)
+	MDRV_NVRAM_HANDLER(generic_1fill)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(tms340x0)
+	MDRV_TICKET_DISPENSER_ADD("ticket1", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	MDRV_TICKET_DISPENSER_ADD("ticket2", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym", YM2149, OKI_CLOCK)
+	MDRV_SOUND_CONFIG(ay8910_interface_1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("oki", OKIM6295, OKI_CLOCK)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_DRIVER_END
+
 
 /*************************************
  *
@@ -847,6 +942,45 @@ ROM_START( tutstomb )
 	ROM_LOAD16_BYTE( "tutstomb.7k",  0x100000, 0x80000, CRC(bc362df8) SHA1(7b15c646e99c916d850629e4e758b1dbb329639a) )
 ROM_END
 
+
+/*
+
+Mouse Attack
+ICE, 1996
+
+MA Video Board C ICE Inc. 1996
++--------------------------------------+
+|                                 VOL  |
+|      U202                            |
+|   M6295             ADV476           |
+|   1MHz               RAM             |
+|J                     RAM             |
+|A  YM2149             RAM        U10  |
+|M                     RAM         U9  |
+|M     DSW8                        U8  |
+|A                  TMS34010-50    U7  |
+|                                      |
+|                  MACH110       40MHz |
+|   +--------+ +------+                |
+|   |  DB25  | | DB15 |     14.31818MHz|
++---+--------+-+------+----------------+
+
+DB25 and DB15 are not populated.
+
+*/
+
+ROM_START( mouseatk )
+	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "ms-attk2-rev.a1.u8",  0x000000, 0x80000, CRC(a150525c) SHA1(a6be8524ae435502eeeeeaafa856dc812121d4e3) )
+	ROM_LOAD16_BYTE( "ms-attk3-rev.a1.u9",  0x000001, 0x80000, CRC(f060091d) SHA1(b3a2099d5ca5a658a7a87bb11a20c27a6a2f11f2) )
+	ROM_LOAD16_BYTE( "ms-attk4-rev.a1.u10", 0x100000, 0x80000, CRC(19806349) SHA1(3431dc70897f50e1be7578dd4ef99fa9be4450cf) )
+	ROM_LOAD16_BYTE( "ms-attk1-rev.a1.u7",  0x100001, 0x80000, CRC(b936194b) SHA1(33a2038a56fb4a4301ee04ca7a32a70ab5870fad) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "ms-snd-rev.a.u202", 0x000000, 0x80000, CRC(ce4af0f2) SHA1(f054ac27faf52ae5ec6910ecfca164a21eefe4ca) )
+ROM_END
+
+
 /*
 
 Rapid Fire (v1.1)
@@ -937,7 +1071,6 @@ ROM_START( rapidfire ) /* Version 1.0, test menu shows "Build 236" */
 ROM_END
 
 
-
 /*************************************
  *
  *  Game drivers
@@ -947,5 +1080,6 @@ ROM_END
 GAME( 1994, tickee,    0,        tickee,   tickee,   0, ROT0, "Raster Elite",  "Tickee Tickats", 0 )
 GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, 0, ROT0, "Hanaho Games",  "Ghost Hunter", 0 )
 GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, 0, ROT0, "Island Design", "Tut's Tomb", 0 )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, 0, ROT0, "ICE",           "Mouse Attack", 0 )
 GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1", 0 )
 GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0", 0 )
