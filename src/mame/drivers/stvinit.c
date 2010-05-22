@@ -352,6 +352,8 @@ DRIVER_INIT( danchih )
 
 TODO: understand where it gets 0x02020000,it must be 0x0000000
 
+wpset 60cf888,4,r
+
 */
 
 static READ32_HANDLER( astrass_hack_r )
