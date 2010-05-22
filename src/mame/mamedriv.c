@@ -1028,6 +1028,7 @@ const game_driver * const drivers[] =
 	DRIVER( jjack )		/* ???? (c) 1984 */
 	DRIVER( kickridr )	/* ???? (c) 1984 */
 	DRIVER( idsoccer )	/* ???? (c) 1985 */
+	DRIVER( idsoccera )	/* ???? (c) 1985 */
 	DRIVER( superdq )	/* ???? (c) 1984 */
 	DRIVER( superdqs )	/* ???? (c) 1984 */
 	DRIVER( superdqa )	/* ???? (c) 1984 */
@@ -1223,6 +1224,15 @@ const game_driver * const drivers[] =
 	DRIVER( nss_smw )	/* 1991 Nintendo */
 	DRIVER( nss_fzer )	/* 1991 Nintendo */
 	DRIVER( nss_sten )	/* 199? Nintendo */
+
+	/* Super Famicom Box Games */
+	DRIVER( sfcbox )
+	//pss61 - Super Mario Kart / Super Mario Collection / Star Fox
+	DRIVER( pss62 )		/* 199? T & E Soft / I'Max */
+	//pss63 - Super Donkey Kong / Super Tetris 2 + Bombliss
+	//pss64 - Super Donkey Kong / Super Bomberman 2
+
+
 
 	/* SNES-based hacks */
 	DRIVER( kinstb )	/* bootleg */
@@ -6269,7 +6279,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( spclordsa )	/* 136095           (c) 1992 */
 	DRIVER( spclordsg )	/* 136095           (c) 1992 */
 	DRIVER( rrreveng )	/*     ??           (c) 1993 */
-	DRIVER( rrrevengp )	/*     ??           (c) 1993 */
+	DRIVER( rrrevenga )	/*     ??           (c) 1993 */
+	DRIVER( rrrevengb )	/*     ??           (c) 1993 */
 	DRIVER( beathead )	/* (proto)          (c) 1993 */
 	DRIVER( tmek )		/* 136100           (c) 1994 */
 	DRIVER( tmek51p )	/* 136100           (c) 1994 */

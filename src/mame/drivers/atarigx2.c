@@ -5,7 +5,7 @@
     driver by Aaron Giles
 
     Games supported:
-        * Space Lords (1992) [2 sets]
+        * Space Lords (1992)
         * Moto Frenzy (1992)
         * Road Riot's Revenge Rally (1993)
 
@@ -1986,7 +1986,7 @@ ROM_START( rrreveng )
 ROM_END
 
 
-ROM_START( rrrevengp )
+ROM_START( rrrevenga )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "rrprghh.bin", 0x00000, 0x20000, CRC(d2903e9d) SHA1(8782cd6ee39e2159b9ebc68ecdc3ecefcdeb8623) )
 	ROM_LOAD32_BYTE( "rrprghl.bin", 0x00001, 0x20000, CRC(1afd500c) SHA1(6d24087a839e5e7d9c764026a9f3089e52785cdb) )
@@ -2029,6 +2029,69 @@ ROM_START( rrrevengp )
 	ROM_LOAD( "rrmoprg3.bin",  0x0400, 0x0200, NO_DUMP )
 ROM_END
 
+
+ROM_START( rrrevengb )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 8*64k for 68000 code */
+	ROM_LOAD32_BYTE( "revenge.23e", 0x00000, 0x20000, CRC(3ade13a6) SHA1(672dd0800d6a1cf6cbb2adcebe452a0df71b3236) )
+	ROM_LOAD32_BYTE( "revenge.23j", 0x00001, 0x20000, CRC(aff623d5) SHA1(3ad419deb2f40d62f5a6803035c5d08fe82833f4) )
+	ROM_LOAD32_BYTE( "revenge.37e", 0x00002, 0x20000, CRC(b5e2a3e2) SHA1(b6ad6d03120ad6699af31d09474b82979ead65bb) )
+	ROM_LOAD32_BYTE( "revenge.37j", 0x00003, 0x20000, CRC(6c7f114b) SHA1(2b9a627ec0a211da8080ea33a5486367b043952a) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "revenge.2d", 0x000000, 0x80000, CRC(00488dad) SHA1(604f08a219db0438dcbf21337ebd497f353bd812) ) /* playfield, planes 0-1 */
+	ROM_LOAD( "revenge.5d", 0x080000, 0x80000, CRC(ade27447) SHA1(641fdca97a4b08251e111425d8467e4640433df7) ) /* playfield, planes 2-3 */
+	ROM_LOAD( "revenge.8d", 0x100000, 0x80000, CRC(ef04f04e) SHA1(e518133096978c4a0152253231625c385a84530f) ) /* playfield, planes 4-5 */
+
+	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_LOAD( "revenge.13n", 0x000000, 0x20000, CRC(f2efbd66) SHA1(d5339f0b3de7a102d659f7459b5f4800cab31829) ) /* alphanumerics */
+
+	ROM_REGION16_BE( 0x500000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "revenge.31n", 0x000000, 0x80000, CRC(fc2755d5) SHA1(e24319161307efbb3828b21a6250869051f1ccc1) )
+	ROM_LOAD16_BYTE( "revenge.31l", 0x000001, 0x80000, CRC(f9f6bfe3) SHA1(c7e1479bb86646691d5ca7ee9127553cfd86571e) )
+	ROM_LOAD16_BYTE( "revenge.33n", 0x100000, 0x80000, CRC(c7a48389) SHA1(a263aa4829cb243440ebe0496dd4f0158d97e2cc) )
+	ROM_LOAD16_BYTE( "revenge.33l", 0x100001, 0x80000, CRC(085a67c1) SHA1(0449abb5fec9014bd0ad14ce4802f726a90bc48c) )
+	ROM_LOAD16_BYTE( "revenge.35n", 0x200000, 0x80000, CRC(aea35aff) SHA1(2e02d2e877d356f9fb07e8b55ce252a148192d59) )
+	ROM_LOAD16_BYTE( "revenge.35l", 0x200001, 0x80000, CRC(b256d6d6) SHA1(0f0a05e3e58a00662f99988a050f2f5a11592d29) )
+	ROM_LOAD16_BYTE( "revenge.37n", 0x300000, 0x80000, CRC(563baaeb) SHA1(e356aa2048c6addefa62d10a17fe5736afa54b16) )
+	ROM_LOAD16_BYTE( "revenge.37l", 0x300001, 0x80000, CRC(e0cf3396) SHA1(544863e5c18cce002ced8f96d5dfaedffdcfff1e) )
+	ROM_LOAD16_BYTE( "revenge.31t", 0x400000, 0x80000, CRC(086fb896) SHA1(5ca3aea3a52e73a1054c88759d957709c2ad22a2) )
+	ROM_LOAD16_BYTE( "revenge.31r", 0x400001, 0x80000, CRC(518fdd7c) SHA1(ccee646efb178aa3720e75524646e20d18b27694) )
+
+	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
+	ROM_LOAD( "revenge.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
+	ROM_LOAD( "revenge.21s",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
+	ROM_LOAD( "revenge.20s",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+
+	ROM_REGION( 0x0600, "pals", 0 )	/* none of these have been verified as good */
+	ROM_LOAD( "revenge.3n.bin",  0x0000, 0x0157, CRC(598d5009) SHA1(9804f05fbf1b9324f8c3937e0953da02870d988b) )
+	ROM_LOAD( "revenge.5n.bin",  0x0000, 0x0117, CRC(87ff6393) SHA1(df1f0a5450485598c0ef7fa4981cc0e40a6a5073) )
+	ROM_LOAD( "revenge.5r.bin",  0x0000, 0x0117, CRC(832671eb) SHA1(85232128a4b03c4e3dffb4f2e6381a89f4f9aac5) )
+	ROM_LOAD( "revenge.7n.bin",  0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) )
+	ROM_LOAD( "revenge.7r.bin",  0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) )
+	ROM_LOAD( "revenge.12l.bin", 0x0000, 0x0117, CRC(145b1474) SHA1(f1983732c36a444d38aeba94adaffa305d4c0398) )
+	ROM_LOAD( "revenge.13r.bin", 0x0000, 0x0117, CRC(d5c84926) SHA1(22d2821ed77ad070163e3d188b1412f8d8d52977) )
+	ROM_LOAD( "revenge.17l.bin", 0x0000, 0x0117, CRC(b85ab18d) SHA1(eabcc2e54c2b6bc393603a31d22418edf60593ad) )
+	ROM_LOAD( "revenge.22r.bin", 0x0000, 0x0117, CRC(9dc3831d) SHA1(553c289801eb1e15118bc045ddca226343e6a623) )
+	ROM_LOAD( "revenge.23r.bin", 0x0000, 0x0117, CRC(87d3a1d6) SHA1(33437f6b39b263a3064b34da41a7eed922036a56) )
+	ROM_LOAD( "revenge.23s.bin", 0x0000, 0x0117, CRC(9404e122) SHA1(fb1db0fdb10ddeb7247dd254b3e725b9ef85097b) )
+	ROM_LOAD( "revenge.24c.bin", 0x0000, 0x0117, CRC(11934654) SHA1(a230c4e9abc190a62872961d60f9f96dedb273cd) )
+	ROM_LOAD( "revenge.24j.bin", 0x0000, 0x0117, CRC(9def4158) SHA1(11c168e2c16046e1213786c065906455fdb5a63c) )
+	ROM_LOAD( "revenge.25c.bin", 0x0000, 0x0117, CRC(76d8fa5b) SHA1(5fcb7b75f37f918331d99422ea3f0ea202665d5e) )
+
+	/* all roms above are from this PCB however the
+	  sound board was missing - assuming to be the same */
+
+	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k for 6502 code */
+	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
+	ROM_CONTINUE(            0x04000, 0xc000 )
+
+	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
+
+	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
+
+ROM_END
 
 
 
@@ -2119,5 +2182,6 @@ GAME( 1992, motofrenmd, motofren, atarigx2, motofren, motofren, ROT0, "Atari Gam
 GAME( 1992, motofrenft, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, motofrenmf, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1994, rrreveng,  0,        atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1994, rrrevengp, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype alt)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrreveng,  0,        atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrrevenga, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrrevengb, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, set 3)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

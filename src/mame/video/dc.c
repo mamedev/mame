@@ -2005,7 +2005,11 @@ static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bit
 		}
 
 		for(i=sv; i <= ev-2; i++)
-			render_tri(bitmap, &ts->ti, state_ta.grab[rs].verts + i);
+		{
+			if (!(debug_dip_status&0x2))
+				render_tri(bitmap, &ts->ti, state_ta.grab[rs].verts + i);
+
+		}
 	}
 	state_ta.grab[rs].busy=0;
 }
@@ -2182,14 +2186,14 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
 	dy=((pvrta_regs[FB_R_SIZE] >> 10) & 0x3ff)+1;
 
-//  dy++;
+	dy++;
 	dy*=2; // probably depends on interlace mode, fields etc...
 
 	switch (unpackmode)
 	{
 		case 0x00: // 0555 RGB 16-bit, Cleo Fortune Plus
 			// should upsample back to 8-bit output using fb_concat
-			for (y=0;y < dy;y++)
+			for (y=0;y <= dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
 				if(spg_pixel_double)
@@ -2233,7 +2237,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			break;
 		case 0x01: // 0565 RGB 16-bit
 			// should upsample back to 8-bit output using fb_concat
-			for (y=0;y < dy;y++)
+			for (y=0;y <= dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
 				if(spg_pixel_double)
@@ -2278,7 +2282,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			break;
 
 		case 0x02: ; // 888 RGB 24-bit - suchie3 - HACKED, see pvr_accumulationbuffer_to_framebuffer!
-			for (y=0;y < dy;y++)
+			for (y=0;y <= dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
 				if(spg_pixel_double)
@@ -2322,7 +2326,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			break;
 
 		case 0x03:        // 0888 ARGB 32-bit - HACKED, see pvr_accumulationbuffer_to_framebuffer!
-			for (y=0;y < dy;y++)
+			for (y=0;y <= dy;y++)
 			{
 				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
 				if(spg_pixel_double)

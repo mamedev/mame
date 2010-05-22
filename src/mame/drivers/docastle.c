@@ -1036,6 +1036,38 @@ ROM_START( idsoccer )
 	ROM_LOAD( "id_3d.clr",   0x0000, 0x0200, CRC(a433ff62) SHA1(db9afe5fc917d25aafa21576cb1cecec7481d4cb) )
 ROM_END
 
+ROM_START( idsoccera )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "indoor.e10",           0x0000, 0x2000, CRC(ed086bd1) SHA1(e1351fe53779c73a8631d4c33fa9508ddac8b4c1) )
+	ROM_LOAD( "indoor.f10",           0x2000, 0x2000, CRC(54e5c6fc) SHA1(2c5a1e7bb9c8d5877eb99e8d20498986b85a8af4) )
+	ROM_LOAD( "indoor.h10",           0x6000, 0x2000, CRC(f0ca1ac8) SHA1(fa5724ba8ab0ff82a1ef22ddd56e57b4c2b6ab74) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "indoor.e2",           0x0000, 0x4000, CRC(c4bacc14) SHA1(d457a24b084726fe6b2f97a1be44e67c0a61a97b) ) // different
+
+	ROM_REGION( 0x10000, "cpu3", 0 )
+	ROM_LOAD( "indoor.p8",          0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "indoor.e6",          0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
+
+	// some graphic / sound roms also differ on this set - verify them
+	// the sound rom causes bad sound, but the implementation is hacked anyway so I'm not 100% convinced it's bad yet
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "indoor.p3",           0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
+	ROM_LOAD( "indoor.n3",           0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
+	ROM_LOAD( "indoor.l3",           0x10000, 0x8000, CRC(2663405c) SHA1(16c054c5c16ace80941523a64654afa3a77d7611) ) // different
+	ROM_LOAD( "indoor.k3",           0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
+
+	ROM_REGION( 0x10000, "adpcm", 0 )
+	ROM_LOAD( "indoor.ic1",            0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // different (causes bad sound in attract, but doesn't simply look like a bad dump?)
+	ROM_LOAD( "indoor.ic3",            0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
+	ROM_LOAD( "indoor.ic4",            0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "indoor.d3",   0x0000, 0x0200, CRC(d9b2550c) SHA1(074253b1ede42a743f1a8858756640693126209f) ) // different
+ROM_END
+
 /* Game Drivers */
 
 GAME( 1983, docastle,  0,        docastle, docastle, 0, ROT270, "Universal", "Mr. Do's Castle (set 1)", GAME_SUPPORTS_SAVE )
@@ -1050,4 +1082,5 @@ GAME( 1987, spiero,    dorunrun, dorunrun, dorunrun, 0, ROT0,   "Universal", "Su
 GAME( 1984, dowild,    0,        dorunrun, dowild,   0, ROT0,   "Universal", "Mr. Do's Wild Ride", GAME_SUPPORTS_SAVE )
 GAME( 1984, jjack,     0,        dorunrun, jjack,    0, ROT270, "Universal", "Jumping Jack", GAME_SUPPORTS_SAVE )
 GAME( 1984, kickridr,  0,        dorunrun, kickridr, 0, ROT0,   "Universal", "Kick Rider", GAME_SUPPORTS_SAVE )
-GAME( 1985, idsoccer,  0,        idsoccer, idsoccer, 0, ROT0,   "Universal", "Indoor Soccer", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1985, idsoccer,  0,        idsoccer, idsoccer, 0, ROT0,   "Universal", "Indoor Soccer (set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1985, idsoccera, idsoccer, idsoccer, idsoccer, 0, ROT0,   "Universal", "Indoor Soccer (set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )

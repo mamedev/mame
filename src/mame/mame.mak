@@ -1007,6 +1007,7 @@ $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/playch10.o $(MACHINE)/playch10.o $(VIDEO)/playch10.o \
 	$(DRIVERS)/popeye.o $(VIDEO)/popeye.o \
 	$(DRIVERS)/punchout.o $(VIDEO)/punchout.o \
+	$(DRIVERS)/sfcbox.o \
 	$(DRIVERS)/spacefb.o $(AUDIO)/spacefb.o  $(VIDEO)/spacefb.o \
 	$(DRIVERS)/vsnes.o $(MACHINE)/vsnes.o $(VIDEO)/vsnes.o \
 	$(VIDEO)/ppu2c0x.o \

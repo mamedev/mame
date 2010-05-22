@@ -1595,6 +1595,9 @@ ADDRESS_MAP_END
 	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x02, 0x00, "Disable Render Calls" ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) ) \
 
 #define NAOMI_DIP_SW \
 	PORT_START("DSW") \
