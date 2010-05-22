@@ -4763,7 +4763,7 @@ GAME( 1987, wbmljo,     wbml,     sys2,     wbml,      wbml,     ROT0,   "Sega /
 GAME( 1987, wbmljb,     wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmlb,      wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_SUPPORTS_SAVE)
 GAME( 1987, wbmlbg,     wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_SUPPORTS_SAVE)
-GAME( 1987, dakkochn,   0,        sys2,     dakkochn,  dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_SUPPORTS_SAVE )
+GAME( 1987, dakkochn,   0,        sys2,     dakkochn,  dakkochn, ROT0,   "White Board",     "DakkoChan House (MC-8123, 317-0014)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blockgalb,  blockgal, sys2,     blockgal,  bootleg,  ROT90,  "bootleg",         "Block Gal (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensi,   0,        sys2row,  ufosensi,  ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensib,  ufosensi, sys2row,  ufosensi,  bootsys2, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )
