@@ -43,7 +43,7 @@ This cartridge is required for the machine to operate
 - Star Fox (Nintendo)
 
 PSS-62  - SUPER FAMICOM BOX Commercial Optional Cart
-- New Super 3D Golf Simulation - Waialae No Kiseki (Waialae Golf) (T & E SOFT)
+- New Super 3D Golf Simulation - Waialae No Kiseki (Waialae Golf) (T&E SOFT)
 - Super Mahjong 2 (I'MAX)
 
 PSS-63  - SUPER FAMICOM BOX Commercial Optional Cart
@@ -288,6 +288,6 @@ ROM_END
 
 GAME( 199?, sfcbox,      0,     sfcbox,      snes,    snes,    ROT0, "Nintendo",                   "Super Famicom Box BIOS", GAME_IS_BIOS_ROOT )
 //pss61 - Super Mario Kart / Super Mario Collection / Star Fox
-GAME( 199?, pss62,       sfcbox,     sfcbox,      snes,    snes,    ROT0,  "T & E Soft / I'Max",         "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", GAME_NOT_WORKING )
+GAME( 199?, pss62,       sfcbox,     sfcbox,      snes,    snes,    ROT0,  "T&E Soft / I'Max",         "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", GAME_NOT_WORKING )
 //pss63 - Super Donkey Kong / Super Tetris 2 + Bombliss
 //pss64 - Super Donkey Kong / Super Bomberman 2
