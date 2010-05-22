@@ -4114,7 +4114,27 @@ ROM_START( pacgal )
 ROM_END
 
 
-ROM_START( mschamp )
+ROM_START( mschamp ) /* "Original" Zola-Puc board.  FORCE ELECTRONICS KM-001 PCB copyright by RAYGLO MFG CO  1992/1993 */
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "9fg.bin", 0x10000, 0x10000, CRC(04dba113) SHA1(6260fb58c47a506a60385fb7536fc4fbd8e02c7c) )	/* banked */
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "8e.bin",  0x0000, 0x0800, CRC(17435f53) SHA1(e844a7dfdb56a6f6cce5a3cf505d018434294470) )
+	ROM_CONTINUE(        0x1000, 0x0800 )
+	ROM_CONTINUE(        0x0800, 0x0800 )
+	ROM_CONTINUE(        0x1800, 0x0800 )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 )
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+ROM_END
+
+
+ROM_START( mschamps ) /* Hack of hack???  Hack of the above "Rayglo" set??? */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pm4.bin", 0x10000, 0x10000, CRC(7d6b6303) SHA1(65ad72a9188422653c02a48c07ed2661e1e36961) )	/* banked */
 
@@ -5814,5 +5834,6 @@ GAME( 1985, 8bpm,     8ballact, 8bpm,     8bpm,     8bpm,     ROT90,  "Seatongro
 GAME( 1985, porky,    0,        porky,    porky,    porky,    ROT90,  "Shinkai Inc. (Magic Eletronics Inc. licence)", "Porky", GAME_SUPPORTS_SAVE )
 GAME( 1986, rocktrv2, 0,        rocktrv2, rocktrv2, rocktrv2, ROT90,  "Triumph Software Inc.", "MTV Rock-N-Roll Trivia (Part 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, bigbucks, 0,        bigbucks, bigbucks, 0,        ROT90,  "Dynasoft Inc.", "Big Bucks", GAME_SUPPORTS_SAVE )
-GAME( 1995, mschamp,  mspacman, mschamp,  mschamp,  0,        ROT90,  "hack", "Ms. Pacman Champion Edition / Super Zola Pac Gal", GAME_SUPPORTS_SAVE )
+GAME( 1992, mschamp,  mspacman, mschamp,  mschamp,  0,        ROT90,  "hack", "Ms. Pacman Champion Edition / Zola-Puc Gal", GAME_SUPPORTS_SAVE ) /* Rayglo version */
+GAME( 1995, mschamps, mspacman, mschamp,  mschamp,  0,        ROT90,  "hack", "Ms. Pacman Champion Edition / Super Zola-Puc Gal", GAME_SUPPORTS_SAVE )
 GAME( 198?, cannonbp, 0,        pacman,   cannonbp, cannonbp, ROT90,  "Novomatic", "Cannon Ball (Pacman Hardware)", GAME_WRONG_COLORS|GAME_SUPPORTS_SAVE )

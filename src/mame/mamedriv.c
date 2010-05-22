@@ -108,7 +108,8 @@ const game_driver * const drivers[] =
 	DRIVER( beastf )	/* (c) 1984 Epos Corporation */
 	DRIVER( rocktrv2 )	/* (c) 1986 Triumph Software Inc */
 	DRIVER( bigbucks )	/* (c) 1986 Dynasoft Inc. */
-	DRIVER( mschamp )	/* hack */
+	DRIVER( mschamp )	/* hack by RAYGLO MFG "Zola-Puc" (c) 1992/1993 */
+	DRIVER( mschamps )	/* hack (hack of the Rayglo hack?) */
 	DRIVER( cannonbp )	/* hack */
 
 	/* S2650 Pacman Kits */
