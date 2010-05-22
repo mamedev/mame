@@ -8053,6 +8053,9 @@ Other Sun games
 	DRIVER( mrflea )	/* (c) 1982 */
 
 	/* Tecfri games */
+	DRIVER( ambush )	/* (c) 1983 */
+	DRIVER( ambushj )	/* (c) 1983 Nippon Amuse license */
+	DRIVER( ambushv )	/* (c) 1983 Volt Electronics license */
 	DRIVER( holeland )	/* (c) 1984 */
 	DRIVER( crzrally )	/* (c) 1985 */
 	DRIVER( crzrallya )	/* (c) 1985 */
@@ -8820,9 +8823,6 @@ Other Sun games
 	DRIVER( ringking2 )	/* (c) 1985 Data East USA */
 	DRIVER( ringking3 )	/* (c) 1985 Data East USA */
 	DRIVER( ringkingw )	/* (c) 1985 Woodplace Inc. */
-	DRIVER( ambush )	/* (c) 1983 Nippon Amuse Co-Ltd */
-	DRIVER( ambusht )	/* (c) 1983 Tecfri */
-	DRIVER( ambushv )	/* (c) 1983 Volt Elec co-ltd */
 	DRIVER( homo )		/* bootleg */
 	DRIVER( dlair )		/* (c) 1983 Cinematronics */
 	DRIVER( dlairf )	/* (c) 1983 Cinematronics */

@@ -269,27 +269,8 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+/* displays an M next to ROM 1 during the test, why is internal checksum wrong (0x02 instead of 0x00) ? */
 ROM_START( ambush )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ambush.h7",    0x0000, 0x2000, CRC(ce306563) SHA1(c69b5c4465187a8eda6367d6cd3e0b71a57588d1) )
-	ROM_LOAD( "ambush.g7",    0x2000, 0x2000, CRC(90291409) SHA1(82f1e109bd066ad9fdea1ce0086be6c334e2658a) )
-	ROM_LOAD( "ambush.f7",    0x4000, 0x2000, CRC(d023ca29) SHA1(1ac44960cf6d79936517a9ad4bae6ccd825c9496) )
-	ROM_LOAD( "ambush.e7",    0x6000, 0x2000, CRC(6cc2d3ee) SHA1(dccb417d156460ca745d7b62f1df733cbf85d092) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "ambush.n4",    0x0000, 0x2000, CRC(ecc0dc85) SHA1(577304bb575293b97b50eea4faafb5394e3da0f5) )
-	ROM_LOAD( "ambush.m4",    0x2000, 0x2000, CRC(e86ca98a) SHA1(fae0786bb78ead81653adddd2edb3058371ca5bc) )
-
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "a.bpr",        0x0000, 0x0100, CRC(5f27f511) SHA1(fe3ae701443ff50d3d03c0a5d0e0ab0e716b05cc) )  /* color PROMs */
-
-	ROM_LOAD( "b.bpr",        0x0100, 0x0100, CRC(1b03fd3b) SHA1(1a58b212476cacace6065056f23b59a69053a2f6) )	/* How is this selected, */
-	ROM_LOAD( "13.bpr",		  0x0200, 0x0100, CRC(547e970f) SHA1(e2ec0bece49fb283e43549703d6d5d6f561c69a6) )  /* I'm not sure what these do. */
-	ROM_LOAD( "14.bpr",		  0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
-ROM_END
-
-/* displays an M next to ROM 1 during the test, why is internal cheksum wrong (0x02 instead of 0x00) ? */
-ROM_START( ambusht )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a1.i7",    0x0000, 0x2000, CRC(a7cd149d) SHA1(470ebe60bc23a7908fb96caef8074d65f8c57625) )
 	ROM_LOAD( "a2.g7",    0x2000, 0x2000, CRC(8328d88a) SHA1(690f0af10a0550566b67ee570f849b2764448d15) )
@@ -299,6 +280,25 @@ ROM_START( ambusht )
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "fa2.n4",    0x0000, 0x2000, CRC(e7f134ba) SHA1(c38321f3da049f756337cba5b3c71f6935922f80) )
 	ROM_LOAD( "fa1.m4",    0x2000, 0x2000, CRC(ad10969e) SHA1(4cfccdc4ca377693e92d77cde16f88bbdb840b38) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "a.bpr",        0x0000, 0x0100, CRC(5f27f511) SHA1(fe3ae701443ff50d3d03c0a5d0e0ab0e716b05cc) )  /* color PROMs */
+
+	ROM_LOAD( "b.bpr",        0x0100, 0x0100, CRC(1b03fd3b) SHA1(1a58b212476cacace6065056f23b59a69053a2f6) )	/* How is this selected, */
+	ROM_LOAD( "13.bpr",		  0x0200, 0x0100, CRC(547e970f) SHA1(e2ec0bece49fb283e43549703d6d5d6f561c69a6) )  /* I'm not sure what these do. */
+	ROM_LOAD( "14.bpr",		  0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
+ROM_END
+
+ROM_START( ambushj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ambush.h7",    0x0000, 0x2000, CRC(ce306563) SHA1(c69b5c4465187a8eda6367d6cd3e0b71a57588d1) )
+	ROM_LOAD( "ambush.g7",    0x2000, 0x2000, CRC(90291409) SHA1(82f1e109bd066ad9fdea1ce0086be6c334e2658a) )
+	ROM_LOAD( "ambush.f7",    0x4000, 0x2000, CRC(d023ca29) SHA1(1ac44960cf6d79936517a9ad4bae6ccd825c9496) )
+	ROM_LOAD( "ambush.e7",    0x6000, 0x2000, CRC(6cc2d3ee) SHA1(dccb417d156460ca745d7b62f1df733cbf85d092) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "ambush.n4",    0x0000, 0x2000, CRC(ecc0dc85) SHA1(577304bb575293b97b50eea4faafb5394e3da0f5) )
+	ROM_LOAD( "ambush.m4",    0x2000, 0x2000, CRC(e86ca98a) SHA1(fae0786bb78ead81653adddd2edb3058371ca5bc) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "a.bpr",        0x0000, 0x0100, CRC(5f27f511) SHA1(fe3ae701443ff50d3d03c0a5d0e0ab0e716b05cc) )  /* color PROMs */
@@ -333,6 +333,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, ambush,   0,        ambush,   ambush,   0, ROT0, "Nippon Amuse Co-Ltd", "Ambush", GAME_SUPPORTS_SAVE )
-GAME( 1983, ambushv,  ambush,   ambush,   ambush,   0, ROT0, "Volt Elec co-ltd",    "Ambush (Volt Elec co-ltd)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ambusht,  ambush,   ambush,   ambusht,  0, ROT0, "Tecfri",              "Ambush (Tecfri)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambush,  0,      ambush,   ambusht,  0, ROT0, "Tecfri",                            "Ambush", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambushj, ambush, ambush,   ambush,   0, ROT0, "Tecfri (Nippon Amuse license)",     "Ambush (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambushv, ambush, ambush,   ambush,   0, ROT0, "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)", GAME_SUPPORTS_SAVE )
