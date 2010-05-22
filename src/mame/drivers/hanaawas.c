@@ -262,4 +262,4 @@ ROM_START( hanaawas )
 ROM_END
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, 0, ROT0, "Setakikaku, Ltd.", "Hana Awase", GAME_SUPPORTS_SAVE )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, 0, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", GAME_SUPPORTS_SAVE )
