@@ -2969,7 +2969,7 @@ GAME( 1980, steelwkr, 0,        steelwkr, steelwkr, 0, ROT0  , "Taito", "Steel W
 GAMEL(1980, searthin, invaders, invaders, searthin, 0, ROT270, "bootleg", "Super Earth Invasion (set 1)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, searthina,invaders, invaders, searthin, 0, ROT270, "bootleg", "Super Earth Invasion (set 2)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, invadrmr, invaders, invaders, invadrmr, 0, ROT270, "Model Racing", "Space Invaders (Model Racing)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, spaceatt, invaders, invaders, sicv,     0, ROT270, "Video Games GMBH", "Space Attack", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spaceatt, invaders, invaders, sicv,     0, ROT270, "Video Games GmbH", "Space Attack", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Space Attack II", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", GAME_SUPPORTS_SAVE, layout_invaders )
