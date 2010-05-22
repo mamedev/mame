@@ -997,7 +997,7 @@ GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb,  geebee,   ROT90, "Namco (F.l
 GAMEL(1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (Gremlin)", 0, layout_geebee )
 GAME( 1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND )
 GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 )
-GAME( 1980, kaiteik,  kaitei,   navarone, kaiteik,  kaiteik,  ROT90, "K.K. Tokki", "Kaitei Takara Sagashi (K'K-Tokki)", 0 )
+GAME( 1980, kaiteik,  kaitei,   navarone, kaiteik,  kaiteik,  ROT90, "K.K. Tokki", "Kaitei Takara Sagashi (prototype?)", 0 )
 GAMEL(1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND, layout_sos )
 
 /* Color games */
