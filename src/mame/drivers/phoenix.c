@@ -1087,4 +1087,4 @@ GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiadbl, 0,        ROT90, "bootleg", 
 GAME( 1981, pleiadce, pleiads,  pleiads,  pleiadce, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS )
 GAME( 1981, capitol,  pleiads,  phoenix,  capitol,  0,        ROT90, "Universal Video Spiel", "Capitol", GAME_IMPERFECT_COLORS )
 
-GAME( 1982, survival, 0,        survival, survival, 0,        ROT90, "Rock-ola", "Survival", GAME_IMPERFECT_COLORS )
+GAME( 1982, survival, 0,        survival, survival, 0,        ROT90, "Rock-Ola", "Survival", GAME_IMPERFECT_COLORS )
