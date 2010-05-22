@@ -15,17 +15,6 @@ UINT8 *zaccaria_videoram,*zaccaria_attributesram;
 
 static tilemap_t *bg_tilemap;
 
-static const rectangle spritevisiblearea =
-{
-	2*8+1, 29*8-1,
-	2*8, 30*8-1
-};
-static const rectangle spritevisiblearea_flipx =
-{
-	3*8+1, 30*8-1,
-	2*8, 30*8-1
-};
-
 
 
 /***************************************************************************
@@ -216,18 +205,12 @@ WRITE8_HANDLER( zaccaria_flip_screen_y_w )
   .....xxx color
 3 xxxxxxxx y
 
-offsets 1 and 2 are swapped with spriteram2
+offsets 1 and 2 are swapped if accessed from spriteram2
 
 */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT8 *spriteram,int color,int section)
 {
 	int offs,o1 = 1,o2 = 2;
-	rectangle clip = *cliprect;
-
-	if (flip_screen_x_get(machine))
-		sect_rect(&clip, &spritevisiblearea_flipx);
-	else
-		sect_rect(&clip, &spritevisiblearea);
 
 	if (section)
 	{
@@ -242,6 +225,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		int flipx = spriteram[offs + o1] & 0x40;
 		int flipy = spriteram[offs + o1] & 0x80;
 
+		if (sx == 1) continue;
+
 		if (flip_screen_x_get(machine))
 		{
 			sx = 240 - sx;
@@ -253,7 +238,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,&clip,machine->gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 				(spriteram[offs + o1] & 0x3f) + (spriteram[offs + o2] & 0xc0),
 				((spriteram[offs + o2] & 0x07) << 2) | color,
 				flipx,flipy,sx,sy,0);
