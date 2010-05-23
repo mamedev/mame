@@ -36,10 +36,6 @@
     Known issues/to-do's:
         * Analog sound missing in many games
         * Missing color PROM for "Alpha Fighter / Head On"
-        * Colors are wrong in N-Sub.  It uses a different resistor
-          ladder.  There appears to be a color fade effect missing
-          as well. See the screen shot at:
-          http://www.system16.com/hardware.php?id=685&page=1#1772
         * A few of the games have an extra 18K pull-up resistor on the
           blue color gun, Carnival, for example.
           Colors inaccurate?  Blue background?
