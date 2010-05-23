@@ -2462,11 +2462,11 @@ V-V                           TP-027
 	DRIVER( gyrodine )	/* (c) 1984 Crux (Taito Corporation license) */
 	DRIVER( gyrodinec )	/* (c) 1984 Crux */
 	DRIVER( buzzard )	/* (c) 1984 Crux */
-	DRIVER( sonofphx )	/* (c) 1985 Associated Overseas MFR */
 	DRIVER( repulse )	/* (c) 1985 Sega */
 	DRIVER( 99lstwar )	/* (c) 1985 Proma */
 	DRIVER( 99lstwara )	/* (c) 1985 Proma */
 	DRIVER( 99lstwark )	/* (c) 1985 Kyugo */
+	DRIVER( sonofphx )	/* bootleg */
 	DRIVER( flashgal )	/* (c) 1985 Sega */
 	DRIVER( flashgala )	/* (c) 1985 Sega */
 	DRIVER( srdmissn )	/* (c) 1986 Taito Corporation */
