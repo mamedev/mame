@@ -631,8 +631,8 @@ const game_driver * const drivers[] =
 	DRIVER( bombbee )	/* [1979] Namco */
 	DRIVER( cutieq )	/* (c) 1979 Namco */
 	DRIVER( navarone )	/* (c) 1980 Namco */
-	DRIVER( kaitei )	/* [1980] Namco */
-	DRIVER( kaiteik )	/* [1980] K.K. Tokki (prototype?) */
+	DRIVER( kaitein )	/* [1980] Namco */
+	DRIVER( kaitei )	/* [1980] K.K. Tokki */
 	DRIVER( sos )		/* [1980] Namco */
 	DRIVER( tankbatt )	/* (c) 1980 Namco */
 	DRIVER( warpwarp )	/* (c) 1981 Namco */

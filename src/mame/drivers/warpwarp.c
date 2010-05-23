@@ -89,20 +89,21 @@ Notes:
   the correct sizes by checking how the games handle the ball position in
   cocktail mode (the ball isn't automatically flipped by the hardware).
 
-- kaitei and kaiteik are intriguing. The game is more or less the same, but the
+- kaitein and kaitei are intriguing. The game is more or less the same, but the
   code is radically different, and the gfx ROMs are arranged differently.
-  kaitei is by Namco and kaiteik is by "K'K-TOKKI". kaitei does a ROM/RAM
-  test on startup, while kaiteik jumps straight into the game. kaitei is
-  locked in cocktail mode, while kaiteik has support for a cabinet dip
-  switch. The title screen in kaitei is nice and polished, while in kaiteik
+  kaitein is by Namco and kaitei is by "K'K-TOKKI". kaitein does a ROM/RAM
+  test on startup, while kaitei jumps straight into the game. kaitein is
+  locked in cocktail mode, while kaitei has support for a cabinet dip
+  switch. The title screen in kaitein is nice and polished, while in kaitei
   it's confused, with fishes going over the text. There are several other
   differences.
-  The code in kaiteik is longer (0x1800 bytes vs. just 0x1000 in kaitei) and
-  less efficient, while kaitei has some clever space optimizations.
-  My opinion is that kaiteik is the prototype version, developed by a third
-  party and sold to Namco, where it was rewritten.
+  The code in kaitei is longer (0x1800 bytes vs. just 0x1000 in kaitein) and
+  less efficient, while kaitein has some clever space optimizations.
 
-- The coin counter doesn't work in kaiteik. This might be the expected behaviour.
+  Kaitei (and SOS) is developed by Kazuharu Yoshioka of K.K.Tokki (Universal Tokki).
+  Namco acquired license for these games.
+  
+- The coin counter doesn't work in kaitei. This might be the expected behaviour.
 
 - sos does a "coffee break" every 2000 points, showing a girl. The first times,
   she wears a bikini. If the "nudity" switch is on, after 6000 points she's
@@ -446,7 +447,7 @@ static INPUT_PORTS_START( navarone )
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kaitei )
+static INPUT_PORTS_START( kaitein )
 	PORT_START("SW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,	IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,	IPT_BUTTON1 ) PORT_COCKTAIL
@@ -486,7 +487,7 @@ static INPUT_PORTS_START( kaitei )
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kaiteik )
+static INPUT_PORTS_START( kaitei )
 	PORT_START("SW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,	IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,	IPT_START1 )
@@ -841,7 +842,7 @@ ROM_START( navarone )
 	ROM_LOAD( "navalone.chr", 0x0000, 0x0800, CRC(b26c6170) SHA1(ae0aec2b60e1fd3b212e311afb1c588b2b286433) )
 ROM_END
 
-ROM_START( kaitei )
+ROM_START( kaitein )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kaitein.p1",   0x0000, 0x0800, CRC(d88e10ae) SHA1(76d6cd46b6e59e528e7a8fff9965375a1446a91d) )
 	ROM_LOAD( "kaitein.p2",   0x0800, 0x0800, CRC(aa9b5763) SHA1(64a6c8f25b0510841dcce0b57505731aa0deeda7) )
@@ -850,7 +851,7 @@ ROM_START( kaitei )
 	ROM_LOAD( "kaitein.chr",  0x0000, 0x0800, CRC(3125af4d) SHA1(9e6b161636665ee48d6bde2d5fc412fde382c687) )
 ROM_END
 
-ROM_START( kaiteik )
+ROM_START( kaitei )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kaitei_7.1k",  0x0000, 0x0800, CRC(32f70d48) SHA1(c5ae606df1d0e513daea909f5474309a176096c1) )
 	ROM_RELOAD(               0x0800, 0x0800 )
@@ -944,7 +945,7 @@ static DRIVER_INIT( navarone )
 	warpwarp_ball_sizey = 4;
 }
 
-static DRIVER_INIT( kaitei )
+static DRIVER_INIT( kaitein )
 {
 	handle_joystick = 1;
 	geebee_handleoverlay = 0;
@@ -953,7 +954,7 @@ static DRIVER_INIT( kaitei )
 	warpwarp_ball_sizey = 16;
 }
 
-static DRIVER_INIT( kaiteik )
+static DRIVER_INIT( kaitei )
 {
 	handle_joystick = 0;
 	geebee_handleoverlay = 0;
@@ -996,8 +997,8 @@ GAMEL(1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "G
 GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb,  geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (F.lli Bertolino license)", 0, layout_geebee )
 GAMEL(1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (Gremlin)", 0, layout_geebee )
 GAME( 1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND )
-GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 )
-GAME( 1980, kaiteik,  kaitei,   navarone, kaiteik,  kaiteik,  ROT90, "K.K. Tokki", "Kaitei Takara Sagashi (prototype?)", 0 )
+GAME( 1980, kaitein,  kaitei,   navarone, kaitein,  kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 )
+GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", 0 )
 GAMEL(1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND, layout_sos )
 
 /* Color games */
