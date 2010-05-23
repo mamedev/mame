@@ -1721,5 +1721,5 @@ GAME( 1983, hunchbak,  0,        cvs,     hunchbak, 0,        ROT90, "Century El
 GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, hunchbaka,ROT90, "Century Electronics", "Hunchback (set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, superbik,  0,        cvs,     superbik, superbik, ROT90, "Century Electronics", "Superbike", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, raiders,   0,        cvs,     raiders,  raiders,  ROT90, "Century Electronics", "Raiders", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, hero,      0,        cvs,     hero,     hero,     ROT90, "Seatongrove Ltd",     "Hero", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, huncholy,  0,        cvs,     huncholy, huncholy, ROT90, "Seatongrove Ltd",     "Hunchback Olympic", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, hero,      0,        cvs,     hero,     hero,     ROT90, "Century Electronics / Seatongrove Ltd", "Hero", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
+GAME( 1984, huncholy,  0,        cvs,     huncholy, huncholy, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
