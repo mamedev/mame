@@ -4374,7 +4374,7 @@ GAME( 1991, ssridersubc, ssriders, ssriders, ssriders, 0,        ROT0,  "Konami"
 GAME( 1991, ssridersabd, ssriders, ssriders, ssriders, 0,        ROT0,  "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps, 0,        ROT0,  "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders, 0,        ROT0,  "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl, 0,        ROT0,  "Konami", "Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl, 0,        ROT0,  "bootleg","Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,  0,        ROT0,  "Konami", "Thunder Cross II (World)", GAME_SUPPORTS_SAVE )
 GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,  0,        ROT0,  "Konami", "Thunder Cross II (Asia)", GAME_SUPPORTS_SAVE )
