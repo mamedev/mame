@@ -1209,6 +1209,7 @@ const game_driver * const drivers[] =
 	DRIVER( multigm2 )	/* 1992 */
 	DRIVER( multigm3 )	/* 19?? */
 	DRIVER( multigmt )
+	DRIVER( supergm3 )  /* 1996 */
 	DRIVER( cham24 )	/* 2002 */
 
 	/* Nintendo Super System Games */

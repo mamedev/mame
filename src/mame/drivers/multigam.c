@@ -39,6 +39,30 @@
     RAM used by Super Mario Bros 3.
 
     Multi Game (Tung Sheng Electronics): 10 games included, selectable by dip switches.
+
+	Super Game III:
+
+PCB Layout
+----------
+
+|------------------------------------|
+|UPC1242H 3.579545MHz  6264          |
+|  4066        UPC1352 6116     ROM14|
+|                               ROM15|
+|J                              ROM16|
+|A     UA6527  UA6528           ROM17|
+|M                                   |
+|M       PAL   DIP40*           IC36 |
+|A             DIP24*           ROM18|
+| 21.47727MHz                   ROM10|
+|                               ROM11|
+|                 PLSI1016      ROM12|
+|DIPSW(8)  6264          6264   ROM13|
+|------------------------------------|
+* - chip surface scratched
+
+	Super Game III features 15 games, updated hardware with several NES mappers allowing newer NES
+	games to run.
 */
 
 #include "emu.h"
@@ -54,6 +78,7 @@
 *******************************************************/
 
 static UINT8* nt_ram;
+static UINT8* vram;
 static UINT8* nt_page[4];
 
 static void set_mirroring(int mirroring)
@@ -112,6 +137,18 @@ static void set_videorom_bank(running_machine* machine, int start, int count, in
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
 		memory_set_bankptr(machine, banknames[i + start], memory_region(machine, "gfx1") + offset);
+	}
+}
+
+static void set_videoram_bank(running_machine* machine, int start, int count, int bank, int bank_size_in_kb)
+{
+	int i;
+	int offset = bank * (bank_size_in_kb * 0x400);
+	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
+	/* count determines the size of the area mapped in KB */
+	for (i = 0; i < count; i++, offset += 0x400)
+	{
+		memory_set_bankptr(machine, banknames[i + start], vram + offset);
 	}
 }
 
@@ -174,7 +211,7 @@ static WRITE8_HANDLER( multigam_IN0_w )
 	in_1 = input_port_read(space->machine, "P2");
 
 	multigam_in_dsw_shift = 0;
-	multigam_in_dsw = input_port_read(space->machine, "DSW");
+	multigam_in_dsw = input_port_read_safe(space->machine, "DSW", 0);
 }
 
 static READ8_HANDLER( multigam_IN1_r )
@@ -293,6 +330,9 @@ static int multigam3_mmc3_banks[2];
 static int multigam3_mmc3_4screen;
 static int multigam3_mmc3_last_bank;
 static UINT8* multigmc_mmc3_6000_ram;
+static UINT8* multigam3_mmc3_prg_base;
+static int multigam3_mmc3_prg_size;
+static int multigam3_mmc3_chr_bank_base;
 
 static void multigam3_mmc3_scanline_cb( running_device *device, int scanline, int vblank, int blanked )
 {
@@ -312,6 +352,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 
 	/* basically, a MMC3 mapper from the nes */
 	static int multigam3_mmc3_command;
+	int bankmask = multigam3_mmc3_prg_size == 0x40000 ? 0x1f : 0x0f;
 
 	switch(offset & 0x7001)
 	{
@@ -322,29 +363,28 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 			{
 				int bank;
 				UINT8 *prg = memory_region(space->machine, "maincpu");
-				UINT8 *src = memory_region(space->machine, "user1");
 
 				/* reset the banks */
 				if (multigam3_mmc3_command & 0x40)
 				{
 					/* high bank */
-					bank = multigam3_mmc3_banks[0] * 0x2000 + 0xa0000;
+					bank = (multigam3_mmc3_banks[0] & bankmask) * 0x2000;
 
-					memcpy(&prg[0x0c000], &src[bank], 0x2000);
-					memcpy(&prg[0x08000], &src[0xa0000 + 0x3c000], 0x2000);
+					memcpy(&prg[0x0c000], &multigam3_mmc3_prg_base[bank], 0x2000);
+					memcpy(&prg[0x08000], &multigam3_mmc3_prg_base[multigam3_mmc3_prg_size - 0x4000], 0x2000);
 				}
 				else
 				{
 					/* low bank */
-					bank = multigam3_mmc3_banks[0] * 0x2000 + 0xa0000;
+					bank = (multigam3_mmc3_banks[0] & bankmask) * 0x2000;
 
-					memcpy(&prg[0x08000], &src[bank], 0x2000);
-					memcpy(&prg[0x0c000], &src[0xa0000 + 0x3c000], 0x2000);
+					memcpy(&prg[0x08000], &multigam3_mmc3_prg_base[bank], 0x2000);
+					memcpy(&prg[0x0c000], &multigam3_mmc3_prg_base[multigam3_mmc3_prg_size - 0x4000], 0x2000);
 				}
 
 				/* mid bank */
-				bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
-				memcpy(&prg[0x0a000], &src[bank], 0x2000);
+				bank = (multigam3_mmc3_banks[1] & bankmask) * 0x2000;
+				memcpy(&prg[0x0a000], &multigam3_mmc3_prg_base[bank], 0x2000);
 
 				multigam3_mmc3_last_bank = data & 0xc0;
 			}
@@ -362,7 +402,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 1: /* char banking */
 						data &= 0xfe;
 						page ^= (cmd << 1);
-						set_videorom_bank(space->machine, page, 2, 0x180 + data, 1);
+						set_videorom_bank(space->machine, page, 2, multigam3_mmc3_chr_bank_base + data, 1);
 					break;
 
 					case 2: /* char banking */
@@ -370,30 +410,29 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 4: /* char banking */
 					case 5: /* char banking */
 						page ^= cmd + 2;
-						set_videorom_bank(space->machine, page, 1, 0x180 + data, 1);
+						set_videorom_bank(space->machine, page, 1, multigam3_mmc3_chr_bank_base + data, 1);
 					break;
 
 					case 6: /* program banking */
 					{
 						UINT8 *prg = memory_region(space->machine, "maincpu");
-						UINT8 *src = memory_region(space->machine, "user1");
 						if (multigam3_mmc3_command & 0x40)
 						{
 							/* high bank */
-							multigam3_mmc3_banks[0] = data & 0x1f;
-							bank = (multigam3_mmc3_banks[0]) * 0x2000 + 0xa0000;
+							multigam3_mmc3_banks[0] = data & bankmask;
+							bank = (multigam3_mmc3_banks[0]) * 0x2000;
 
-							memcpy(&prg[0x0c000], &src[bank], 0x2000);
-							memcpy(&prg[0x08000], &src[0xa0000 + 0x3c000], 0x2000);
+							memcpy(&prg[0x0c000], &multigam3_mmc3_prg_base[bank], 0x2000);
+							memcpy(&prg[0x08000], &multigam3_mmc3_prg_base[multigam3_mmc3_prg_size - 0x4000], 0x2000);
 						}
 						else
 						{
 							/* low bank */
-							multigam3_mmc3_banks[0] = data & 0x1f;
-							bank = (multigam3_mmc3_banks[0]) * 0x2000 + 0xa0000;
+							multigam3_mmc3_banks[0] = data & bankmask;
+							bank = (multigam3_mmc3_banks[0]) * 0x2000;
 
-							memcpy(&prg[0x08000], &src[bank], 0x2000);
-							memcpy(&prg[0x0c000], &src[0xa0000 + 0x3c000], 0x2000);
+							memcpy(&prg[0x08000], &multigam3_mmc3_prg_base[bank], 0x2000);
+							memcpy(&prg[0x0c000], &multigam3_mmc3_prg_base[multigam3_mmc3_prg_size - 0x4000], 0x2000);
 						}
 					}
 					break;
@@ -402,12 +441,11 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 						{
 							/* mid bank */
 							UINT8 *prg = memory_region(space->machine, "maincpu");
-							UINT8 *src = memory_region(space->machine, "user1");
 
-							multigam3_mmc3_banks[1] = data & 0x1f;
-							bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
+							multigam3_mmc3_banks[1] = data & bankmask;
+							bank = multigam3_mmc3_banks[1] * 0x2000;
 
-							memcpy(&prg[0x0a000], &src[bank], 0x2000);
+							memcpy(&prg[0x0a000], &multigam3_mmc3_prg_base[bank], 0x2000);
 						}
 					break;
 				}
@@ -425,7 +463,18 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		break;
 
 		case 0x2001: /* enable ram at $6000 */
-			/* ignored - we always enable it */
+			if (data & 0x80)
+			{
+				memory_set_bankptr(space->machine, "bank10", multigmc_mmc3_6000_ram);
+			}
+			else
+			{
+				memory_set_bankptr(space->machine, "bank10", memory_region(space->machine, "maincpu") + 0x6000);
+			}
+			if (data & 0x40)
+			{
+				logerror("Write protect for 6000 enabled\n");
+			}
 		break;
 
 		case 0x4000: /* scanline counter */
@@ -446,17 +495,14 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 	}
 }
 
-static void multigam_init_smb3(running_machine *machine)
+static void multigam_init_mmc3(running_machine *machine, UINT8 *prg_base, int prg_size, int chr_bank_base)
 {
 	UINT8* dst = memory_region(machine, "maincpu");
-	UINT8* src = memory_region(machine, "user1");
 
-	memcpy(&dst[0x8000], &src[0xa0000 + 0x3c000], 0x4000);
-	memcpy(&dst[0xc000], &src[0xa0000 + 0x3c000], 0x4000);
+	memcpy(&dst[0x8000], prg_base + (prg_size - 0x4000), 0x4000);
+	memcpy(&dst[0xc000], prg_base + (prg_size - 0x4000), 0x4000);
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
-
-	memory_set_bankptr(machine, "bank10", multigmc_mmc3_6000_ram);
 
 	multigam3_mmc3_banks[0] = 0x1e;
 	multigam3_mmc3_banks[1] = 0x1f;
@@ -464,7 +510,9 @@ static void multigam_init_smb3(running_machine *machine)
 	multigam3_mmc3_scanline_latch = 0;
 	multigam3_mmc3_4screen = 0;
 	multigam3_mmc3_last_bank = 0xff;
-
+	multigam3_mmc3_prg_base = prg_base;
+	multigam3_mmc3_chr_bank_base = chr_bank_base;
+	multigam3_mmc3_prg_size = prg_size;
 };
 
 static WRITE8_HANDLER(multigm3_mapper2_w)
@@ -494,7 +542,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 
 	if (data == 0xa8)
 	{
-		multigam_init_smb3(space->machine);
+		multigam_init_mmc3(space->machine, src + 0xa0000, 0x40000, 0x180);
 		return;
 	}
 	else
@@ -541,6 +589,308 @@ static ADDRESS_MAP_START( multigm3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank10")
 	AM_RANGE(0x6fff, 0x6fff) AM_WRITENOP /* 0x00 in attract mode, 0xff during play */
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigm3_mapper2_w)
+ADDRESS_MAP_END
+
+/******************************************************
+
+   Mapper 02
+
+*******************************************************/
+
+static UINT8* multigam_mapper02_prg_base;
+static int multigam_mapper02_prg_size;
+
+static WRITE8_HANDLER(multigam3_mapper02_rom_switch_w)
+{
+	UINT8* mem = memory_region(space->machine, "maincpu");
+	int bankmask = (multigam_mapper02_prg_size/0x4000) - 1;
+	memcpy(mem + 0x8000, multigam_mapper02_prg_base + 0x4000*(data & bankmask), 0x4000);
+}
+
+static void multigam_init_mapper02(running_machine *machine, UINT8* prg_base, int prg_size)
+{
+	UINT8* mem = memory_region(machine, "maincpu");
+	memcpy(mem + 0x8000, prg_base + prg_size - 0x8000, 0x8000);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mapper02_rom_switch_w );
+
+	multigam_mapper02_prg_base = prg_base;
+	multigam_mapper02_prg_size = prg_size;
+
+	ppu2c0x_set_scanline_callback(devtag_get_device(machine, "ppu"), 0);
+}
+
+/******************************************************
+
+   MMC1 mapper
+
+*******************************************************/
+
+static int mmc1_shiftreg;
+static int mmc1_shiftcount;
+static int mmc1_rom_mask;
+static UINT8* multigam_mmc1_prg_base;
+static int multigam_mmc1_prg_size;
+static int multigam_mmc1_chr_bank_base;
+
+static WRITE8_HANDLER( mmc1_rom_switch_w )
+{
+	/* basically, a MMC1 mapper from the nes */
+	static int size16k, switchlow, vrom4k;
+
+	int reg = (offset >> 13);
+
+	/* reset mapper */
+	if (data & 0x80)
+	{
+		mmc1_shiftreg = mmc1_shiftcount = 0;
+
+		size16k = 1;
+		switchlow = 1;
+		vrom4k = 0;
+
+		return;
+	}
+
+	/* see if we need to clock in data */
+	if (mmc1_shiftcount < 5)
+	{
+		mmc1_shiftreg >>= 1;
+		mmc1_shiftreg |= (data & 1) << 4;
+		mmc1_shiftcount++;
+	}
+
+	/* are we done shifting? */
+	if (mmc1_shiftcount == 5)
+	{
+		/* reset count */
+		mmc1_shiftcount = 0;
+
+		/* apply data to registers */
+		switch (reg)
+		{
+			case 0:		/* mirroring and options */
+				{
+					int _mirroring;
+
+					vrom4k = mmc1_shiftreg & 0x10;
+					size16k = mmc1_shiftreg & 0x08;
+					switchlow = mmc1_shiftreg & 0x04;
+
+					switch (mmc1_shiftreg & 3)
+					{
+						case 0:
+							_mirroring = PPU_MIRROR_LOW;
+						break;
+
+						case 1:
+							_mirroring = PPU_MIRROR_HIGH;
+						break;
+
+						case 2:
+							_mirroring = PPU_MIRROR_VERT;
+						break;
+
+						default:
+						case 3:
+							_mirroring = PPU_MIRROR_HORZ;
+						break;
+					}
+
+					/* apply mirroring */
+					set_mirroring(_mirroring);
+				}
+			break;
+
+			case 1:	/* video rom banking - bank 0 - 4k or 8k */
+				if (multigam_mmc1_chr_bank_base == 0)
+					set_videoram_bank(space->machine, 0, (vrom4k) ? 4 : 8, (mmc1_shiftreg & 0x1f), 4);
+				else
+					set_videorom_bank(space->machine, 0, (vrom4k) ? 4 : 8, multigam_mmc1_chr_bank_base + (mmc1_shiftreg & 0x1f), 4);
+			break;
+
+			case 2: /* video rom banking - bank 1 - 4k only */
+				if (vrom4k)
+				{
+					if (multigam_mmc1_chr_bank_base == 0)
+						set_videoram_bank(space->machine, 0, (vrom4k) ? 4 : 8, (mmc1_shiftreg & 0x1f), 4);
+					else
+						set_videorom_bank(space->machine, 4, 4, multigam_mmc1_chr_bank_base + (mmc1_shiftreg & 0x1f), 4);
+				}
+			break;
+
+			case 3:	/* program banking */
+				{
+					int bank = (mmc1_shiftreg & mmc1_rom_mask) * 0x4000;
+					UINT8 *prg = memory_region(space->machine, "maincpu");
+
+					if (!size16k)
+					{
+						/* switch 32k */
+						memcpy(&prg[0x08000], multigam_mmc1_prg_base + bank, 0x8000);
+					}
+					else
+					{
+						/* switch 16k */
+						if (switchlow)
+						{
+							/* low */
+							memcpy(&prg[0x08000], multigam_mmc1_prg_base + bank, 0x4000);
+							memcpy(&prg[0x0c000], multigam_mmc1_prg_base + (0x0f & mmc1_rom_mask) * 0x4000, 0x4000);
+						}
+						else
+						{
+							/* high */
+							memcpy(&prg[0x08000], multigam_mmc1_prg_base + (0x00 & mmc1_rom_mask) * 0x4000, 0x4000);
+							memcpy(&prg[0x0c000], multigam_mmc1_prg_base + bank, 0x4000);
+						}
+					}
+				}
+			break;
+		}
+	}
+}
+
+static void multigam_init_mmc1(running_machine *machine, UINT8 *prg_base, int prg_size, int chr_bank_base)
+{
+	UINT8* dst = memory_region(machine, "maincpu");
+
+	memcpy(&dst[0x8000], prg_base + (prg_size - 0x8000), 0x8000);
+
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+
+	mmc1_rom_mask = (prg_size / 0x4000) - 1;
+	multigam_mmc1_prg_base = prg_base;
+	multigam_mmc1_prg_size = prg_size;
+	multigam_mmc1_chr_bank_base = chr_bank_base;
+
+	ppu2c0x_set_scanline_callback(devtag_get_device(machine, "ppu"), 0);
+
+};
+
+
+/******************************************************
+
+   ROM/VROM banking (Super Game III)
+
+*******************************************************/
+
+/*
+      76543210
+5001: x         select rom at 0x8000: 0 - control program, 1 - game
+       x        mapper for game: 0 - mapper 02, 1 - MMC1/MMC3
+	    x       game rom size: 0 - 256KB, 1 - 128KB
+         xxxxx  rom bank, each bank has 0x20000 bytes (128KB)
+
+	  76543210
+5002: x         unknown, always 0
+       x        CHR rom size: 0 - 256KB, 1 - 128KB
+	    x       CHR rom flag: 0 - no CHR rom, 1 - CHR rom present
+		 x      mapper for game: 0 - MMC1, 1 - MMC3
+          xxxx  CHR rom bank, each bank has 0x8000 bytes (32KB)
+*/
+
+static UINT8 supergm3_prg_bank;
+static UINT8 supergm3_chr_bank;
+
+static void supergm3_set_bank(running_machine *machine)
+{
+	running_device *ppu = devtag_get_device(machine, "ppu");
+	UINT8* mem = memory_region(machine, "maincpu");
+
+	// video bank
+	if (supergm3_chr_bank == 0x10 ||
+		supergm3_chr_bank == 0x40 )
+	{
+		// VRAM
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+		memory_install_write_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+		memory_set_bankptr(machine, "bank1", vram);
+
+		if (supergm3_chr_bank == 0x40)
+			set_mirroring(PPU_MIRROR_VERT);
+	}
+	else
+	{
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
+		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
+		memory_unmap_write(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0);
+
+		set_videorom_bank(machine, 0, 8, 0, 8);
+	}
+
+	// prg bank
+	if ((supergm3_prg_bank & 0x80) == 0)
+	{
+		// title screen
+		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
+		memory_set_bankptr(machine, "bank10", mem + 0x6000);
+		ppu2c0x_set_scanline_callback(ppu, 0);
+	}
+	else if ((supergm3_prg_bank & 0x40) == 0)
+	{
+		// mapper 02
+		multigam_init_mapper02(machine, 
+			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000, 
+			0x20000);
+	}
+	else if (supergm3_chr_bank & 0x10)
+	{
+		// MMC3
+		multigam_init_mmc3(machine, 
+			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000, 
+			(supergm3_prg_bank & 0x20) ? 0x20000 : 0x40000, 
+			(supergm3_chr_bank & 0x0f)*0x80);
+	}
+	else
+	{
+		//MMC1
+		multigam_init_mmc1(machine, 
+			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000, 
+			0x20000, 
+			(supergm3_chr_bank & 0x0f)*0x80/4 );
+	}
+}
+
+static WRITE8_HANDLER(supergm3_prg_bank_w)
+{
+	supergm3_prg_bank = data;
+}
+
+static WRITE8_HANDLER(supergm3_chr_bank_w)
+{
+	supergm3_chr_bank = data;
+	supergm3_set_bank(space->machine);
+}
+
+/******************************************************
+
+   Memory map (Super Game III)
+
+*******************************************************/
+
+static ADDRESS_MAP_START( supergm3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
+	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
+	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)	/* IN0 - input port 1 */
+	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r) AM_DEVWRITE("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4fff, 0x4fff) AM_READ_PORT("IN0")
+	AM_RANGE(0x5000, 0x5fff) AM_ROM
+	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
+	AM_RANGE(0x5001, 0x5001) AM_WRITE(supergm3_prg_bank_w)
+	AM_RANGE(0x5002, 0x5002) AM_WRITE(supergm3_chr_bank_w)
+	AM_RANGE(0x5fff, 0x5fff) AM_WRITENOP
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank10")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************
@@ -608,7 +958,7 @@ static INPUT_PORTS_START( multigm3 )
 	PORT_DIPSETTING(    0x06, "5 min" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( multigmt )
+static INPUT_PORTS_START( multigmt )
 	PORT_INCLUDE( multigam_common )
 
 	PORT_START("DSW")
@@ -631,6 +981,25 @@ INPUT_PORTS_START( multigmt )
 	PORT_DIPSETTING( 0x06, "10 min" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( supergm3 )
+	PORT_INCLUDE( multigam_common )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x03, 0x00, "Play Time per Credit" )
+	PORT_DIPSETTING(    0x00, "3 min" )
+	PORT_DIPSETTING(    0x02, "5 min" )
+	PORT_DIPSETTING(    0x01, "8 min" )
+	PORT_DIPSETTING(    0x03, "10 min" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x10, 0x00, "Enable 2 players" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+INPUT_PORTS_END
 /******************************************************
 
    PPU/Video interface
@@ -728,6 +1097,20 @@ static MACHINE_START( multigm3 )
 	set_videorom_bank(machine, 0, 8, 0, 8);
 };
 
+static MACHINE_START( supergm3 )
+{
+	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	nt_page[0] = nt_ram;
+	nt_page[1] = nt_ram + 0x400;
+	nt_page[2] = nt_ram + 0x800;
+	nt_page[3] = nt_ram + 0xc00;
+
+	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+
+	vram = auto_alloc_array(machine, UINT8, 0x2000);
+	multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
+}
+
 static MACHINE_DRIVER_START( multigam )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
@@ -776,6 +1159,14 @@ static MACHINE_DRIVER_START( multigmt )
 	MDRV_IMPORT_FROM(multigam)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(multigmt_map)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( supergm3 )
+	MDRV_IMPORT_FROM(multigam)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(supergm3_map)
+
+	MDRV_MACHINE_START(supergm3)
 MACHINE_DRIVER_END
 
 ROM_START( multigam )
@@ -875,6 +1266,25 @@ ROM_START( multigmt )
 
 ROM_END
 
+ROM_START( supergm3 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "sg3.ic36", 0x0000, 0x10000, CRC(f79dd9ef) SHA1(31b84097f4f14bdb6e87a7a624e9974abe680c80) )
+	ROM_COPY("maincpu", 0x0000, 0x10000, 0x10000)
+
+	ROM_REGION( 0x400000, "user1", 0 )
+	ROM_LOAD( "sg3.rom18", 0x000000, 0x80000, CRC(aa7b8631) SHA1(4d6695da2baef7cc5b0d3f9f620f6b49d8f89e23) )
+	ROM_LOAD( "sg3.rom10", 0x080000, 0x80000, CRC(4581454f) SHA1(ce3b43e80e4893a7c9ad3adf7c1edb02e14b351a) )
+	ROM_LOAD( "sg3.rom11", 0x100000, 0x80000, CRC(14490668) SHA1(d5076d2466ea974bf6867c3cf3052242b0242ffb) )
+	ROM_LOAD( "sg3.rom12", 0x180000, 0x80000, CRC(6ce8781f) SHA1(cf75fccb3d22bbbcfbc7e8b8104eb79353a24c97) )
+	ROM_LOAD( "sg3.rom13", 0x300000, 0x40000, CRC(bbc9ab4f) SHA1(4a833b4cc73330461ee519715b56ba0ba2e7ce50) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "sg3.rom14", 0x000000, 0x80000, CRC(197cd696) SHA1(a5a9ee2c5f63b730b9e93d46a1745fabfdc02db2) )
+	ROM_LOAD( "sg3.rom15", 0x080000, 0x20000, CRC(e18eff5f) SHA1(d865b5a23a248b7d582fe3ccb3ff46fbbff9a2a9) )
+	ROM_LOAD( "sg3.rom16", 0x100000, 0x80000, CRC(151f4ffa) SHA1(8055b9c275f539707aca45f3e57fd4b1fc2c3fc5) )
+	ROM_LOAD( "sg3.rom17", 0x180000, 0x80000, CRC(7be7fbb8) SHA1(03cda9c098eaf21326b001d5c227ad85502b6378) )
+ROM_END
+
 static DRIVER_INIT( multigam )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -951,3 +1361,4 @@ GAME( 1992, multigmb, multigam, multigam, multigam, multigam, ROT0, "<unknown>",
 GAME( 1992, multigm2, 0,        multigm3, multigm2, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
 GAME( 1992, multigm3, 0,        multigm3, multigm3, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
 GAME( 1992, multigmt, 0,        multigmt, multigmt, multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
+GAME( 1996, supergm3, 0,        supergm3, supergm3, 0,        ROT0, "<unknown>", "Super Game III", 0 )
