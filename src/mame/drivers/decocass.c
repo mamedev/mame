@@ -885,20 +885,22 @@ MACHINE_DRIVER_END
 
 #define DECOCASS_BIOS \
 	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "rms8.cpu" ) \
-	ROM_LOAD_BIOS( 0, "rms8.cpu",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "dsp3.p0b & dsp3.p1b" ) \
-	ROM_LOAD_BIOS( 1, "dsp3.p0b",     0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
-	ROM_LOAD_BIOS( 1, "dsp3.p1b",     0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "v0a.7e, older 1-chip bios?" ) \
+	ROM_LOAD_BIOS( 0, "v0a.7e",     0xf000, 0x1000, CRC(3D33AC34) SHA1(909D59E7A993AFFD10224402B4370E82A5F5545C) ) /* from RMS-8 board; has HDRA01HDR string in it, 2732 EPROM */ \
+	ROM_SYSTEM_BIOS( 1, "bios1", "rms8.7e, newer 1-chip bios?" ) \
+	ROM_LOAD_BIOS( 1, "rms8.7e",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board; has HDRB01HDR string in it, maybe should be called v0b.7e? */ \
+	ROM_SYSTEM_BIOS( 2, "bios2", "dsp3.p0b & dsp3.p1b 2-chip bios?" ) /* from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
+	ROM_LOAD_BIOS( 2, "dsp3.p0b",     0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
+	ROM_LOAD_BIOS( 2, "dsp3.p1b",     0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
 
 #define DECOCASS_COMMON_ROMS	\
 	DECOCASS_BIOS \
 \
 	ROM_REGION( 0x10000, "audiocpu", 0 )	  \
-	ROM_LOAD( "rms8.snd",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) \
+	ROM_LOAD( "v1.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* was rms8.snd; is 2716 eprom at 5A on RMS-8 board, with V1 label, may be on DSP-3 board version as well*/ \
 \
 	ROM_REGION( 0x10000, "mcu", 0 )	  /* 4k for the MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
-	ROM_LOAD( "cass8041.bin", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) ) \
+	ROM_LOAD( "d8041-535.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) )  /* "NEC // JAPAN // X1202D-108 // D8041C 535"@1C on B10-8 board */ \
 \
 	ROM_REGION( 0x00060, "proms", 0 )	  /* PROMS */ \
 	ROM_LOAD( "dsp8.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) \
