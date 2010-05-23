@@ -21,6 +21,8 @@ public:
 	UINT8 *sprite_ram;
 	UINT8 *sprite_color_lookup;
 	UINT8 *flip;
+	UINT8 *stars_seed;
+	UINT8 *stars_ctrl;
 
 	/* machine state */
 	UINT8 game_selected;	/* 0 = Ms. Pac-Man, 1 = Galaga */

@@ -13,7 +13,7 @@
 #define SCREEN_HEIGHT	(224)
 #define SCREEN_WIDTH	(288)
 #define NUM_PENS		(0x1000)
-
+#define NUM_STAR_PENS	(64)
 
 
 /*************************************
@@ -53,13 +53,30 @@ static void get_pens(running_machine *machine, const _20pacgal_state *state, pen
 
 		color_prom++;
 	}
+	/* Star field */
+
+	/* palette for the stars */
+	for (offs = 0;offs < 64;offs++)
+	{
+		int bits,r,g,b;
+		static const int map[4] = { 0x00, 0x47, 0x97 ,0xde };
+
+		bits = (offs >> 0) & 0x03;
+		r = map[bits];
+		bits = (offs >> 2) & 0x03;
+		g = map[bits];
+		bits = (offs >> 4) & 0x03;
+		b = map[bits];
+
+		pens[NUM_PENS + offs] = MAKE_RGB(r, g, b);
+	}
 }
 
 
 static void do_pen_lookup(running_machine *machine, const _20pacgal_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y, x;
-	pen_t pens[NUM_PENS];
+	pen_t pens[NUM_PENS + NUM_STAR_PENS];
 
 	get_pens(machine, state, pens);
 
@@ -255,7 +272,8 @@ static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
 				UINT32 col = ((data & 0x8000) >> 14) | ((data & 0x0800) >> 11);
 
 				/* pen bits A4-A11 */
-				*BITMAP_ADDR32(bitmap, y, x) = (color_base | col) << 4;
+				if ( col != 0 )
+					*BITMAP_ADDR32(bitmap, y, x) = (color_base | col) << 4;
 
 				/* next pixel */
 				if (flip)
@@ -282,6 +300,103 @@ static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
 	}
 }
 
+/*************************************
+ *
+ *  Draw stars
+ *
+ *************************************/
+
+/* starfield lfsr code is at d616 and at d648
+ *
+ * Code at d616:
+ *
+ * bit 6 (0x40) from 4be4 (port 8A) is rotated into top bit of 586D/586C
+ * Based on bit 4 (0x10) and the carry out , bit 6 of 4be4 is set to:
+ *
+ * Carry out   bit 4    Result
+ *    1          1         1
+ *    1          0         0
+ *    0          1         0
+ *    0          0         1
+ *
+ * Code at d648 is opposite direction.
+ *
+ * The two videos show, that the starfield is covering the whole screen.
+ * Galaga is different, the 256H signal is delivered with 12 pixels
+ * delay ( NAND of 1H,2H,4H) to the starfield generator 05xx.
+ *
+ *    http://www.youtube.com/watch?v=c1zIitLkpGs
+ *
+ *    http://www.youtube.com/watch?v=bS2Zcin6OwM&feature=PlayList&p=649FD471A1803ABB&playnext_from=PL&playnext=1&index=8
+ *
+ * Galaga (for comparison)
+ *
+ *    http://www.youtube.com/watch?v=-R4CCB2g5bE
+ *
+ * The typical lfsr star count pattern is
+ *
+ * 132 stars
+ * 125 stars
+ * 129 stars
+ * 68 stars
+ * 132 stars
+ * 125 stars
+ * 129 stars
+ * 68 stars
+ *
+ * This is close to Galaga's 63/126
+ *
+ */
+
+static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle *cliprect )
+{
+	if ( (state->stars_ctrl[0] >> 5) & 1 )
+	{
+		int clock;
+		UINT16 lfsr =   state->stars_seed[0] + state->stars_seed[1]*256;
+		UINT8 feedback = (state->stars_ctrl[0] >> 6) & 1;
+		UINT16 star_seta = (state->stars_ctrl[0] >> 3) & 0x01;
+		UINT16 star_setb = (state->stars_ctrl[0] >> 3) & 0x02;
+		int cnt = 0;
+
+		/* This is a guess based on galaga star sets */
+		star_seta = 0x3fc0 | (star_seta << 14);
+		star_setb = 0x3fc0 | (star_setb << 14);
+
+
+		for (clock=0; clock < 288*224; clock++)
+		{
+			int x, y;
+			int carryout;
+
+			x = clock % 288;
+			y = clock / 288;
+
+			/* code at d616 translates into:
+			 * carryout = lfsr & 1;
+			 * lfsr = lfsr>>1;
+			 * lfsr = (feedback << 15) | lfsr;
+			 * feedback = (((lfsr>>4) & 1) ^ (carryout & 1)) ^ 1;
+			 *
+			 * and needs a Hack:
+			 * 	x = 288 - x;
+			 *
+			 */
+
+			/* code at d648 */
+			carryout = ((lfsr >> 4) ^ feedback ^ 1) & 1;
+			feedback = (lfsr >> 15) & 1;
+			lfsr = (lfsr << 1) | carryout;
+
+			if (((lfsr & 0xffc0) == star_seta) || ((lfsr & 0xffc0) == star_setb))
+			{
+				if (y >= cliprect->min_y && y <= cliprect->max_y)
+					*BITMAP_ADDR32(bitmap, y, x) = NUM_PENS + (lfsr & 0x3f);
+				cnt++;
+			}
+		}
+	}
+}
 
 
 /*************************************
@@ -292,8 +407,10 @@ static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
 
 static VIDEO_UPDATE( 20pacgal )
 {
-	const _20pacgal_state *state = (_20pacgal_state *)screen->machine->driver_data;
+	_20pacgal_state *state = (_20pacgal_state *)screen->machine->driver_data;
 
+	bitmap_fill(bitmap,cliprect,0);
+	draw_stars(state, bitmap,cliprect);
 	draw_chars(state, bitmap);
 	draw_sprites(state, bitmap);
 	do_pen_lookup(screen->machine, state, bitmap, cliprect);
