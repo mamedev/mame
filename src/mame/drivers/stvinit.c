@@ -263,49 +263,11 @@ DRIVER_INIT( groovef )
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
 }
 
-/* danchih hangs on the title screen without this hack .. */
-
-/*  info from Saturnin Author
-
-> seems to be fully playable, can you be more specific about the scu level 2
-> dma stuff? i'd prefer a real solution than this hack, it could affect
-other
-> games too for all i know.
-
-Unfortunalely I don't know much more about it : I got this info from a
-person
-who ran the SGL object files through objdump ...
-
-0x060ffcbc _DMASt_SCU1
-0x060ffcbd _DMASt_SCU2
-
-But when I got games looping on thoses locations, the problem was related to
-a
-SCU interrupt (in indirect mode) which was registered but never triggered, a
-bug in my SH2 core prevented the SR bits to be correctly filled in some
-cases ...
-When the interrupt is correctly triggered, I don't have these loops anymore,
-and Hanafuda works without hack now (unless the sound ram one)
-
-
-*/
-
-static READ32_HANDLER( danchih_hack_r )
-{
-	logerror( "DMASt_SCU1: Read at PC=%08x, value = %08x\n", cpu_get_pc(space->cpu), stv_workram_h[0x0ffcbc/4] );
-	if (cpu_get_pc(space->cpu)==0x06028b28) return 0x0e0c0000;
-
-	return stv_workram_h[0x0ffcbc/4];
-}
-
 DRIVER_INIT( danchih )
 {
 	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x6028b28);
 	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x6028c8e);
 	sh2drc_add_pcflush(devtag_get_device(machine, "slave"), 0x602ae26);
-
-	/* prevent game from hanging on title screen -- todo: remove these hacks */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60ffcbc, 0x60ffcbf, 0, 0, danchih_hack_r );
 
 	DRIVER_INIT_CALL(stv);
 
