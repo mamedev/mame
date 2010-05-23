@@ -1707,8 +1707,8 @@ ROM_START( motofrenmd )
 	ROM_LOAD( "136094-002a.21s",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
 	ROM_LOAD( "136094-003a.20s",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 
-	ROM_REGION( 0x80000, "clarn", 0 )	/* ADSP2105 (40 MHz) CPU code for communications / Game Link with another PCB */
-	ROM_LOAD( "136094-0071a.1j",  0x00000, 0x80000, CRC(089bc0a4) SHA1(677f95aac18fecfc6067d93f488999775889be4c) )
+	ROM_REGION( 0x10000, "clarn", 0 )	/* ADSP2105 (40 MHz) CPU code for communications / Game Link with another PCB */
+	ROM_LOAD( "136094-0071a.1j",  0x00000, 0x10000, CRC(089bc0a4) SHA1(677f95aac18fecfc6067d93f488999775889be4c) )
 ROM_END
 
 
