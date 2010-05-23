@@ -2973,7 +2973,7 @@ GAMEL(1978, spaceatt, invaders, invaders, sicv,     0, ROT270, "Video Games GmbH
 GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Space Attack II", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "Test ROM", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "<unknown>", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninv, invaders, invaders, alieninv, 0, ROT270, "Margamatics", "Alien Invasion", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninvp2,invaders, invaders, searthin,0, ROT270, "bootleg", "Alien Invasion Part II", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", GAME_SUPPORTS_SAVE, layout_invaders )

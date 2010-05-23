@@ -5874,7 +5874,7 @@ GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian, ROT90,  "Petaco S.
 GAME( 1979, starfght, galaxian, galaxian, swarm,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, supergx,  galaxian, galaxian, superg,   galaxian, ROT90,  "Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian, ROT90,  "Test ROM", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
+GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,  0,        galaxian, blkhole,  galaxian, ROT90,  "TDS", "Black Hole", GAME_SUPPORTS_SAVE )
@@ -5981,8 +5981,8 @@ GAME( 1983, levers,   0,        jumpbug,  levers,   jumpbug,  ROT90,  "Rock-Ola"
 /* 2nd CPU driving AY8910 for sound */
 GAME( 1982, checkman, 0,        checkman, checkman, checkman, ROT90,  "Zilec-Zenitone", "Check Man", GAME_SUPPORTS_SAVE )
 GAME( 1982, checkmanj,checkman, checkmaj, checkmaj, checkmaj, ROT90,  "Jaleco", "Check Man (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, dingo,    0,        checkmaj, dingo,    dingo,    ROT90,  "Ashby Computers and Graphics LTD. (Jaleco license)", "Dingo", GAME_SUPPORTS_SAVE )
-GAME( 1983, dingoe,   dingo,    checkman, dingo,    dingoe,   ROT90,  "Ashby Computers and Graphics LTD.", "Dingo (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1983, dingo,    0,        checkmaj, dingo,    dingo,    ROT90,  "Ashby Computers and Graphics Ltd. (Jaleco license)", "Dingo", GAME_SUPPORTS_SAVE )
+GAME( 1983, dingoe,   dingo,    checkman, dingo,    dingoe,   ROT90,  "Ashby Computers and Graphics Ltd.", "Dingo (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Crazy Climber sound plus AY8910 instead of galaxian sound, plus INT instead of NMI */
 GAME( 1981, mshuttle,  0,        mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US?)", GAME_SUPPORTS_SAVE )
@@ -6025,7 +6025,7 @@ GAME( 1981, 600,      turtles,  turtles,  turtles,  turtles,  ROT90,  "Konami", 
 GAME( 1981, amidar,   0,        turtles,  amidar,   turtles,  ROT90,  "Konami", "Amidar", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidaru,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "Konami (Stern license)", "Amidar (Stern)", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidaro,  amidar,   turtles,  amidaro,  turtles,  ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", GAME_SUPPORTS_SAVE )
-GAME( 1982, amidarb,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amidar (Bootleg)", GAME_SUPPORTS_SAVE ) /* Simular to Amigo bootleg */
+GAME( 1982, amidarb,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amidar (bootleg)", GAME_SUPPORTS_SAVE ) /* Simular to Amigo bootleg */
 GAME( 1982, amigo,    amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amigo", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidars,  amidar,   scramble, amidars,  scramble, ROT90,  "Konami", "Amidar (Scramble hardware)", GAME_SUPPORTS_SAVE )
 

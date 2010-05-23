@@ -332,4 +332,4 @@ static DRIVER_INIT( fortecar )
 {
 }
 
-GAME( 19??, fortecar, 0, fortecar, fortecar, fortecar, ROT0, "Fortex LTD", "Forte Card",GAME_NOT_WORKING | GAME_WRONG_COLORS)
+GAME( 19??, fortecar, 0, fortecar, fortecar, fortecar, ROT0, "Fortex Ltd", "Forte Card",GAME_NOT_WORKING | GAME_WRONG_COLORS)

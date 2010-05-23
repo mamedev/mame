@@ -7177,7 +7177,7 @@ GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,   "Tuning", 
 GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, bubl2000, ROT0,   "Pandora",                           "Hot Bubble" , 0 ) // on an afega board ..
 GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,   "Afega",                             "Pop's Pop's", 0 )
 GAME( 2000, mangchi,  0,        popspops, mangchi,  bubl2000, ROT0,   "Afega",                             "Mang-Chi", 0 )
-GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "YONA Tech",             "Spectrum 2000 (Euro)", 0 )
+GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (Euro)", 0 )
 GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk", 0 )
 
 // bee-oh board - different display / interrupt timing to others?

@@ -654,4 +654,4 @@ GAME( 1985, skykidd,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky K
 
 // no license text is displayed but the PCB was licensed by Namco for production by Sipem (formerly Sidam) with Namco supplying the Custom chips (MCU etc.)
 // the level select is handled in a much more user-friendly way in this set and the dip for it is inverted (although this is displayed incorrectly in the test mode)
-GAME( 1985, skykids,  skykid, skykid, skykids,  skykid,  ROT180, "Namco [Sipem license]", "Sky Kid (Sipem)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykids,  skykid, skykid, skykids,  skykid,  ROT180, "Namco (Sipem license)", "Sky Kid (Sipem)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
