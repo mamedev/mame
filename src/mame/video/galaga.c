@@ -13,15 +13,6 @@
 #define MAX_STARS 252
 #define STARS_COLOR_BASE (64*4+64*4)
 
-UINT8 *galaga_videoram;
-UINT8 *galaga_ram1,*galaga_ram2,*galaga_ram3;
-UINT8 galaga_starcontrol[6];
-static UINT32 stars_scrollx,stars_scrolly;
-
-static INT32 galaga_gfxbank; // used by catsbee
-
-static tilemap_t *tx_tilemap;
-
 /*
 Galaga star line and pixel locations pulled directly from
 a clocked stepping of the 05 starfield. The chip was clocked
@@ -421,10 +412,11 @@ static TILE_GET_INFO( get_tile_info )
        timing signals, while x flip is done by selecting the 2nd character set.
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
-    int color = galaga_videoram[tile_index + 0x400] & 0x3f;
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
+    int color = state->videoram[tile_index + 0x400] & 0x3f;
 	SET_TILE_INFO(
 			0,
-			(galaga_videoram[tile_index] & 0x7f) | (flip_screen_get(machine) ? 0x80 : 0) | (galaga_gfxbank << 8),
+			(state->videoram[tile_index] & 0x7f) | (flip_screen_get(machine) ? 0x80 : 0) | (state->galaga_gfxbank << 8),
 			color,
 			flip_screen_get(machine) ? TILE_FLIPX : 0);
 	tileinfo->group = color;
@@ -440,15 +432,15 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( galaga )
 {
-	tx_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
-	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0x1f);
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
+	state->fg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
+	colortable_configure_tilemap_groups(machine->colortable, state->fg_tilemap, machine->gfx[0], 0x1f);
 
-	galaga_gfxbank = 0;
+	state->galaga_gfxbank = 0;
 
-	state_save_register_global_array(machine, galaga_starcontrol);
-	state_save_register_global(machine, stars_scrollx);
-	state_save_register_global(machine, stars_scrolly);
-	state_save_register_global(machine, galaga_gfxbank);
+	state_save_register_global(machine, state->stars_scrollx);
+	state_save_register_global(machine, state->stars_scrolly);
+	state_save_register_global(machine, state->galaga_gfxbank);
 }
 
 
@@ -459,26 +451,21 @@ VIDEO_START( galaga )
 
 ***************************************************************************/
 
-READ8_HANDLER( galaga_videoram_r )
-{
-	return galaga_videoram[offset];
-}
 
 WRITE8_HANDLER( galaga_videoram_w )
 {
-	galaga_videoram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
-}
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
 
-WRITE8_HANDLER( galaga_starcontrol_w )
-{
-	galaga_starcontrol[offset] = data & 1;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER ( gatsbee_bank_w )
 {
-	galaga_gfxbank = data & 0x1;
-	tilemap_mark_all_tiles_dirty(tx_tilemap);
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
+
+	state->galaga_gfxbank = data & 0x1;
+	tilemap_mark_all_tiles_dirty(state->fg_tilemap);
 }
 
 
@@ -491,9 +478,11 @@ WRITE8_HANDLER ( gatsbee_bank_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = galaga_ram1 + 0x380;
-	UINT8 *spriteram_2 = galaga_ram2 + 0x380;
-	UINT8 *spriteram_3 = galaga_ram3 + 0x380;
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
+
+	UINT8 *spriteram = state->galaga_ram1 + 0x380;
+	UINT8 *spriteram_2 = state->galaga_ram2 + 0x380;
+	UINT8 *spriteram_3 = state->galaga_ram3 + 0x380;
 	int offs;
 
 
@@ -540,22 +529,23 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
 	/* draw the stars */
 
 	/* $a005 controls the stars ON/OFF */
 
 
-	if ( galaga_starcontrol[5] == 1 )
+	if ( (state->galaga_starcontrol[5] & 1) == 1 )
 	{
 		int star_cntr;
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */
 
-		set_a = galaga_starcontrol[3];
-		set_b = galaga_starcontrol[4] | 0x2;
+		set_a = (state->galaga_starcontrol[3] & 1);
+		set_b = (state->galaga_starcontrol[4] & 1) | 0x2;
 
 
 		for (star_cntr = 0;star_cntr < MAX_STARS ;star_cntr++)
@@ -564,8 +554,8 @@ static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect )
 
 			if   ( (set_a == star_seed_tab[star_cntr].set) ||  ( set_b == star_seed_tab[star_cntr].set) )
 			{
-				x = (star_seed_tab[star_cntr].x + stars_scrollx) % 256 + 16;
-				y = (112 + star_seed_tab[star_cntr].y + stars_scrolly) % 256;
+				x = (star_seed_tab[star_cntr].x + state->stars_scrollx) % 256 + 16;
+				y = (112 + star_seed_tab[star_cntr].y + state->stars_scrolly) % 256;
 			   /* 112 is a tweak to get alignment about perfect */
 
 				if (y >= cliprect->min_y && y <= cliprect->max_y)
@@ -578,10 +568,12 @@ static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect )
 
 VIDEO_UPDATE( galaga )
 {
+	_galaga_state *state = (_galaga_state *) screen->machine->driver_data;
+
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	draw_stars(bitmap,cliprect);
+	draw_stars(screen->machine,bitmap,cliprect);
 	draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
 }
 
@@ -589,16 +581,17 @@ VIDEO_UPDATE( galaga )
 
 VIDEO_EOF( galaga )
 {
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
 	/* this function is called by galaga_interrupt_1() */
 	int s0,s1,s2;
 	static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
 
 
-	s0 = galaga_starcontrol[0];
-	s1 = galaga_starcontrol[1];
-	s2 = galaga_starcontrol[2];
+	s0 = (state->galaga_starcontrol[0] & 1);
+	s1 = (state->galaga_starcontrol[1] & 1);
+	s2 = (state->galaga_starcontrol[2] & 1);
 
-	stars_scrollx += speeds[s0 + s1*2 + s2*4];
+	state->stars_scrollx += speeds[s0 + s1*2 + s2*4];
 }
 
 

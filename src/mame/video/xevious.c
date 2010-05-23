@@ -9,14 +9,6 @@
 #include "emu.h"
 #include "includes/galaga.h"
 
-
-UINT8 *xevious_fg_videoram,*xevious_fg_colorram;
-UINT8 *xevious_bg_videoram,*xevious_bg_colorram;
-UINT8 *xevious_sr1,*xevious_sr2,*xevious_sr3;
-
-static tilemap_t *fg_tilemap,*bg_tilemap;
-static INT32 xevious_bs[2];
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -184,7 +176,9 @@ PALETTE_INIT( battles )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	UINT8 attr = xevious_fg_colorram[tile_index];
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
+
+	UINT8 attr = state->xevious_fg_colorram[tile_index];
 
 	/* the hardware has two character sets, one normal and one x-flipped. When
        screen is flipped, character y flip is done by the hardware inverting the
@@ -194,15 +188,17 @@ static TILE_GET_INFO( get_fg_tile_info )
 	UINT8 color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
 	SET_TILE_INFO(
 			0,
-			xevious_fg_videoram[tile_index] | (flip_screen_get(machine) ? 0x100 : 0),
+			state->xevious_fg_videoram[tile_index] | (flip_screen_get(machine) ? 0x100 : 0),
 			color,
 			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen_get(machine) ? TILE_FLIPX : 0));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 code = xevious_bg_videoram[tile_index];
-	UINT8 attr = xevious_bg_colorram[tile_index];
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
+
+	UINT8 code = state->xevious_bg_videoram[tile_index];
+	UINT8 attr = state->xevious_bg_colorram[tile_index];
 	UINT8 color = ((attr & 0x3c) >> 2) | ((code & 0x80) >> 3) | ((attr & 0x03) << 5);
 	SET_TILE_INFO(
 			1,
@@ -221,16 +217,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( xevious )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     8,8,64,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
 
-	tilemap_set_scrolldx(bg_tilemap,-20,288+27);
-	tilemap_set_scrolldy(bg_tilemap,-16,-16);
-	tilemap_set_scrolldx(fg_tilemap,-32,288+32);
-	tilemap_set_scrolldy(fg_tilemap,-18,-10);
-	tilemap_set_transparent_pen(fg_tilemap,0);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     8,8,64,32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	state_save_register_global_array(machine, xevious_bs);
+	tilemap_set_scrolldx(state->bg_tilemap,-20,288+27);
+	tilemap_set_scrolldy(state->bg_tilemap,-16,-16);
+	tilemap_set_scrolldx(state->fg_tilemap,-32,288+32);
+	tilemap_set_scrolldy(state->fg_tilemap,-18,-10);
+	tilemap_set_transparent_pen(state->fg_tilemap,0);
+	state->xevious_bs[0] = 0;
+	state->xevious_bs[1] = 0;
+
+	state_save_register_global_array(machine, state->xevious_bs);
 }
 
 
@@ -241,52 +241,42 @@ VIDEO_START( xevious )
 
 ***************************************************************************/
 
-READ8_HANDLER( xevious_fg_videoram_r )
-{
-	return xevious_fg_videoram[offset];
-}
-
-READ8_HANDLER( xevious_fg_colorram_r )
-{
-	return xevious_fg_colorram[offset];
-}
-
-READ8_HANDLER( xevious_bg_videoram_r )
-{
-	return xevious_bg_videoram[offset];
-}
-
-READ8_HANDLER( xevious_bg_colorram_r )
-{
-	return xevious_bg_colorram[offset];
-}
-
 WRITE8_HANDLER( xevious_fg_videoram_w )
 {
-	xevious_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
+
+	state->xevious_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( xevious_fg_colorram_w )
 {
-	xevious_fg_colorram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
+
+	state->xevious_fg_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( xevious_bg_videoram_w )
 {
-	xevious_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
+
+	state->xevious_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( xevious_bg_colorram_w )
 {
-	xevious_bg_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
+
+	state->xevious_bg_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( xevious_vh_latch_w )
 {
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
+
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
 
@@ -295,16 +285,16 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 	switch (reg)
 	{
 	case 0:
-		tilemap_set_scrollx(bg_tilemap,0,scroll);
+		tilemap_set_scrollx(state->bg_tilemap,0,scroll);
 		break;
 	case 1:
-		tilemap_set_scrollx(fg_tilemap,0,scroll);
+		tilemap_set_scrollx(state->fg_tilemap,0,scroll);
 		break;
 	case 2:
-		tilemap_set_scrolly(bg_tilemap,0,scroll);
+		tilemap_set_scrolly(state->bg_tilemap,0,scroll);
 		break;
 	case 3:
-		tilemap_set_scrolly(fg_tilemap,0,scroll);
+		tilemap_set_scrolly(state->fg_tilemap,0,scroll);
 		break;
 	case 7:
 		flip_screen_set(space->machine, scroll & 1);
@@ -319,11 +309,15 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 /* emulation for schematic 9B */
 WRITE8_HANDLER( xevious_bs_w )
 {
-	xevious_bs[offset & 1] = data;
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
+
+	state->xevious_bs[offset & 1] = data;
 }
 
 READ8_HANDLER( xevious_bb_r )
 {
+	_galaga_state *state = (_galaga_state *) space->machine->driver_data;
+
 	UINT8 *rom2a = memory_region(space->machine, "gfx4");
 	UINT8 *rom2b = rom2a+0x1000;
 	UINT8 *rom2c = rom2a+0x3000;
@@ -331,7 +325,7 @@ READ8_HANDLER( xevious_bb_r )
 	int dat1,dat2;
 
 	/* get BS to 12 bit data from 2A,2B */
-	adr_2b = ((xevious_bs[1] & 0x7e) << 6) | ((xevious_bs[0] & 0xfe) >> 1);
+	adr_2b = ((state->xevious_bs[1] & 0x7e) << 6) | ((state->xevious_bs[0] & 0xfe) >> 1);
 
 	if (adr_2b & 1)
 	{
@@ -344,7 +338,7 @@ READ8_HANDLER( xevious_bb_r )
 	    dat1 = ((rom2a[adr_2b >> 1] & 0x0f) << 8) | rom2b[adr_2b];
 	}
 
-	adr_2c = ((dat1 & 0x1ff) << 2) | ((xevious_bs[1] & 1) << 1) | (xevious_bs[0] & 1);
+	adr_2c = ((dat1 & 0x1ff) << 2) | ((state->xevious_bs[1] & 1) << 1) | (state->xevious_bs[0] & 1);
 	if (dat1 & 0x400) adr_2c ^= 1;
 	if (dat1 & 0x200) adr_2c ^= 2;
 
@@ -422,9 +416,11 @@ ROM 3M,3L color replace table for sprite
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = xevious_sr3 + 0x780;
-	UINT8 *spriteram_2 = xevious_sr1 + 0x780;
-	UINT8 *spriteram_3 = xevious_sr2 + 0x780;
+	_galaga_state *state = (_galaga_state *) machine->driver_data;
+
+	UINT8 *spriteram = state->xevious_sr3 + 0x780;
+	UINT8 *spriteram_2 = state->xevious_sr1 + 0x780;
+	UINT8 *spriteram_3 = state->xevious_sr2 + 0x780;
 	int offs,sx,sy;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -503,8 +499,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( xevious )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	_galaga_state *state = (_galaga_state *) screen->machine->driver_data;
+
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
 }
