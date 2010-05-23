@@ -2891,11 +2891,11 @@ GAME( 1980, defender,   0,        defender,            defender, defender, ROT0,
 GAME( 1980, defenderg,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (Green label)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defenderb,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (Blue label)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defenderw,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (White label)", GAME_SUPPORTS_SAVE )
-GAME( 1980, defndjeu,   defender, defender,            defender, defndjeu, ROT0,   "Jeutel", "Defender (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1980, tornado1,   defender, defender,            defender, defndjeu, ROT0,   "Jeutel", "Tornado (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, tornado2,   defender, defender,            defender, defndjeu, ROT0,   "Jeutel", "Tornado (bootleg set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // bad dump?
-GAME( 1980, zero,       defender, defender,            defender, defndjeu, ROT0,   "Jeutel", "Zero (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, zero2,      defender, defender,            defender, defndjeu, ROT0,   "Amtec", "Zero (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, defndjeu,   defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Defender (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1980, tornado1,   defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, tornado2,   defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (bootleg set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // bad dump?
+GAME( 1980, zero,       defender, defender,            defender, defndjeu, ROT0,   "bootleg (Jeutel)", "Zero (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, zero2,      defender, defender,            defender, defndjeu, ROT0,   "bootleg (Amtec)", "Zero (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defcmnd,    defender, defender,            defender, defender, ROT0,   "bootleg", "Defense Command", GAME_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,            defender, defender, ROT0,   "Outer Limits", "Defence Command", GAME_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,            defender, defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", GAME_SUPPORTS_SAVE )

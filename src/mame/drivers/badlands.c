@@ -785,4 +785,4 @@ ROM_START( badlandsb )
 ROM_END
 
 
-GAME( 1989, badlandsb, badlands, badlandsb, badlands, 0, ROT0, "bootleg", "Bad Lands (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, badlandsb, badlands, badlandsb, badlands, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", GAME_NOT_WORKING )

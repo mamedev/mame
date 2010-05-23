@@ -2376,7 +2376,7 @@ GAME( 1990, hatena,    0,        pang,    qtono1,   hatena,   ROT0,   "Capcom", 
 GAME( 1990, spang,     0,        pang,    pang,     spang,    ROT0,   "Mitchell", "Super Pang (World 900914)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spangj,    spang,    pang,    pang,     spangj,   ROT0,   "Mitchell", "Super Pang (Japan 901023)", GAME_SUPPORTS_SAVE )
 GAME( 1990, spangbl,   spang,    spangbl, spangbl,  spangbl,  ROT0,   "bootleg", "Super Pang (World 900914, bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // different sound hardware
-GAME( 1994, mstworld,  0,        mstworld,mstworld, mstworld, ROT0,   "TCH", "Monsters World (bootleg of Super Pang)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, mstworld,  0,        mstworld,mstworld, mstworld, ROT0,   "bootleg (TCH)", "Monsters World (bootleg of Super Pang)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, sbbros,    spang,    pang,    pang,     sbbros,   ROT0,   "Mitchell / Capcom", "Super Buster Bros. (US 901001)", GAME_SUPPORTS_SAVE )
 GAME( 1990, marukin,   0,        marukin, marukin,  marukin,  ROT0,   "Yuga", "Super Marukin-Ban (Japan 901017)", GAME_SUPPORTS_SAVE )
 GAME( 1991, qtono1,    0,        pang,    qtono1,   qtono1,   ROT0,   "Capcom", "Quiz Tonosama no Yabou (Japan)", GAME_SUPPORTS_SAVE )

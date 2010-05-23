@@ -5871,7 +5871,7 @@ GAME( 1979, galap1,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "S
 GAME( 1979, galap4,   galaxian, galaxian, superg,   galaxian, ROT90,  "G.G.I", "Galaxian Part 4 (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, swarm,    galaxian, galaxian, swarm,    galaxian, ROT90,  "Subelectro", "Swarm (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian, ROT90,  "Petaco S.A.", "Zero Time", GAME_SUPPORTS_SAVE )
-GAME( 1979, starfght, galaxian, galaxian, swarm,    galaxian, ROT90,  "Jeutel", "Star Fighter", GAME_SUPPORTS_SAVE )
+GAME( 1979, starfght, galaxian, galaxian, swarm,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, supergx,  galaxian, galaxian, superg,   galaxian, ROT90,  "Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian, ROT90,  "Test ROM", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )

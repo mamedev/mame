@@ -2941,11 +2941,11 @@ GAME( 1978, sisv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space I
 GAME( 1978, sisv2,    invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAMEL(1979, galxwars, 0,        invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 1)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, galxwars2,galxwars, invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 2)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, galxwarst,galxwars, invaders, galxwars, 0, ROT270, "Taito?", "Galaxy Wars (Taito?)" , GAME_SUPPORTS_SAVE, layout_invaders) /* Copyright Not Displayed */
+GAMEL(1979, galxwarst,galxwars, invaders, galxwars, 0, ROT270, "Universal (Taito license?)", "Galaxy Wars (Taito?)" , GAME_SUPPORTS_SAVE, layout_invaders) /* Copyright Not Displayed */
 GAMEL(1979, starw,    galxwars, invaders, galxwars, 0, ROT270, "bootleg", "Star Wars", GAME_SUPPORTS_SAVE, layout_invaders )
 GAME( 1979, lrescue,  0,        lrescue,  lrescue,  0, ROT270, "Taito", "Lunar Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1980, mlander,  lrescue,  invaders, lrescue,  0, ROT270, "bootleg", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
-GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Model Racing bootleg)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, mlander,  lrescue,  invaders, lrescue,  0, ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
+GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
@@ -2998,7 +2998,7 @@ GAME( 1979, moonbasea,invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Mo
 GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
 GAMEL(19??, invrvngea,invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
 GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "Taito", "Space Laser", GAME_SUPPORTS_SAVE )
-GAME( 1980, intruder, spclaser, invadpt2, spclaser, 0, ROT270, "GamePlan (Taito)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, intruder, spclaser, invadpt2, spclaser, 0, ROT270, "Taito (GamePlan license?)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, laser,    spclaser, invaders, spclaser, 0, ROT270, "Leisure Time Electronics Inc.", "Astro Laser", GAME_SUPPORTS_SAVE )
 GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation (Konami)","Space War (Leijac Corporation)", GAME_SUPPORTS_SAVE )
 GAME( 1979, rollingc, 0,        rollingc, rollingc, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

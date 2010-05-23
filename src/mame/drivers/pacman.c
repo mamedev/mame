@@ -5788,7 +5788,7 @@ GAME( 1981, maketrxb, crush,    pacman,   maketrax, maketrax, ROT270, "Kural (Wi
 GAME( 1981, korosuke, crush,    pacman,   korosuke, korosuke, ROT90,  "Kural Electric", "Korosuke Roller", GAME_SUPPORTS_SAVE )
 GAME( 1981, mbrush,   crush,    pacman,   mbrush,   maketrax, ROT90,  "bootleg", "Magic Brush", GAME_SUPPORTS_SAVE )
 GAME( 1981, paintrlr, crush,    pacman,   paintrlr, 0,        ROT90,  "bootleg", "Paint Roller", GAME_SUPPORTS_SAVE )
-GAME( 19??, crushs,   crush,    crushs,   crushs,   0,        ROT90,  "bootleg", "Crush Roller (Sidam bootleg)", GAME_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
+GAME( 19??, crushs,   crush,    crushs,   crushs,   0,        ROT90,  "bootleg (Sidam)", "Crush Roller (Sidam bootleg)", GAME_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
 GAME( 1982, pacplus,  0,        pacman,   pacman,   pacplus,  ROT90,  "Namco (Midway license)", "Pac-Man Plus", GAME_SUPPORTS_SAVE )
 GAME( 1982, joyman,   puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Joyman", GAME_SUPPORTS_SAVE )
 GAME( 1982, ctrpllrp, puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Caterpillar Pacman Hack", GAME_SUPPORTS_SAVE )
