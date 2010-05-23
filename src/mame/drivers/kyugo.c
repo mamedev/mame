@@ -585,7 +585,7 @@ MACHINE_DRIVER_END
 
 ROM_START( gyrodine )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a21.02", 0x0000, 0x2000, CRC(c5ec4a50) SHA1(4d012aabdc248143a4d3bab190ecb6e335c93427) )
+	ROM_LOAD( "rom2",   0x0000, 0x2000, CRC(85ddea38) SHA1(fe7e8d7962850b17c39cac627994d78768b094f8) )
 	ROM_LOAD( "a21.03", 0x2000, 0x2000, CRC(4e9323bd) SHA1(86ae4c6a29898fdb0e559ec2aac99fc874910fea) )
 	ROM_LOAD( "a21.04", 0x4000, 0x2000, CRC(57e659d4) SHA1(4c0e73d0661360731691a32a6e94f41b69315f93) )
 	ROM_LOAD( "a21.05", 0x6000, 0x2000, CRC(1e7293f3) SHA1(64695b80b409b02314334fb325f4d0c42a6d4d5b) )
@@ -623,9 +623,9 @@ ROM_START( gyrodine )
 	ROM_LOAD( "m1.2c",  0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
-ROM_START( gyrodinec )
+ROM_START( gyrodinet )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom2",   0x0000, 0x2000, CRC(85ddea38) SHA1(fe7e8d7962850b17c39cac627994d78768b094f8) )
+	ROM_LOAD( "a21.02", 0x0000, 0x2000, CRC(c5ec4a50) SHA1(4d012aabdc248143a4d3bab190ecb6e335c93427) )
 	ROM_LOAD( "a21.03", 0x2000, 0x2000, CRC(4e9323bd) SHA1(86ae4c6a29898fdb0e559ec2aac99fc874910fea) )
 	ROM_LOAD( "a21.04", 0x4000, 0x2000, CRC(57e659d4) SHA1(4c0e73d0661360731691a32a6e94f41b69315f93) )
 	ROM_LOAD( "a21.05", 0x6000, 0x2000, CRC(1e7293f3) SHA1(64695b80b409b02314334fb325f4d0c42a6d4d5b) )
@@ -1319,8 +1319,8 @@ static DRIVER_INIT( srdmissn )
  *
  *************************************/
 
-GAME( 1984, gyrodine,  0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", GAME_SUPPORTS_SAVE )
-GAME( 1984, gyrodinec, gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", GAME_SUPPORTS_SAVE )
+GAME( 1984, gyrodine,  0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", GAME_SUPPORTS_SAVE )
+GAME( 1984, gyrodinet, gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", GAME_SUPPORTS_SAVE )
 GAME( 1984, buzzard,   gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Buzzard", GAME_SUPPORTS_SAVE )
 GAME( 1985, repulse,   0,        repulse,  repulse,  0,        ROT90, "Sega", "Repulse", GAME_SUPPORTS_SAVE )
 GAME( 1985, 99lstwar,  repulse,  repulse,  repulse,  0,        ROT90, "Sega (Proma license)", "'99: The Last War", GAME_SUPPORTS_SAVE )

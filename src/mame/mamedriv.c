@@ -2459,8 +2459,8 @@ V-V                           TP-027
 	/* Kyugo games */
 	/* Kyugo only made four games: Repulse, Flash Gal, SRD Mission and Air Wolf. */
 	/* Gyrodine was made by Crux. Crux was antecedent of Toa Plan, and spin-off from Orca. */
-	DRIVER( gyrodine )	/* (c) 1984 Crux (Taito Corporation license) */
-	DRIVER( gyrodinec )	/* (c) 1984 Crux */
+	DRIVER( gyrodine )	/* (c) 1984 Crux */
+	DRIVER( gyrodinet )	/* (c) 1984 Crux (Taito Corporation license) */
 	DRIVER( buzzard )	/* (c) 1984 Crux */
 	DRIVER( repulse )	/* (c) 1985 Sega */
 	DRIVER( 99lstwar )	/* (c) 1985 Proma */
