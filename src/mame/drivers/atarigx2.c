@@ -1515,9 +1515,9 @@ ROM_START( spclordsb )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "136094-001a.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* These are correct according to the Space Lord manual */
-	ROM_LOAD( "136094-002a.21s",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
-	ROM_LOAD( "136094-003a.20s",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
@@ -1561,9 +1561,10 @@ ROM_START( spclordsg )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "136094-001a.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* These are correct according to the Space Lord manual */
-	ROM_LOAD( "136094-002a.21s",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
-	ROM_LOAD( "136094-003a.20s",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+ROM_END
 
 
 ROM_START( spclordsa )
@@ -1606,9 +1607,9 @@ ROM_START( spclordsa )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
-	ROM_LOAD( "136094-001a.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* These are correct according to the Space Lord manual */
-	ROM_LOAD( "136094-002a.21s",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
-	ROM_LOAD( "136094-003a.20s",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+	ROM_LOAD( "136095-001a.bin",  0x0000, 0x0200, NO_DUMP CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* Not dumped from actual PCB, but seems common to the platform */
+	ROM_LOAD( "136095-002a.bin",  0x0200, 0x0200, NO_DUMP CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) ) /* Confirmed for Moto Frenzy & Road Riot's Revenge */
+	ROM_LOAD( "136095-003a.bin",  0x0400, 0x0200, NO_DUMP CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
 ROM_END
 
 
