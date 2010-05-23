@@ -1095,7 +1095,7 @@ ROM_START( astrob1 )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 ROM_END
 
-ROM_START( astrode )
+ROM_START( astrobg )
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "829b.u25",   0x0000, 0x0800, CRC(14ae953c) SHA1(eb63d1b95faa5193db7fa6ab245e99325d519b5e) )
 	ROM_LOAD( "834b.u01",   0x0800, 0x0800, CRC(82630950) SHA1(6e13cf5868d64835d9de823801cc4162b3c7b316) )
@@ -1572,7 +1572,7 @@ GAME( 1981, astrob,   0,       astrob,   astrob,   astrob,   ROT270, "Sega", "As
 GAME( 1981, astrob2,  astrob,  astrob,   astrob2,  astrob,   ROT270, "Sega", "Astro Blaster (version 2)", GAME_IMPERFECT_SOUND )
 GAME( 1981, astrob2a, astrob,  astrob,   astrob2,  astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", GAME_IMPERFECT_SOUND )
 GAME( 1981, astrob1,  astrob,  astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (version 1)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
-GAME( 1981, astrode,  astrob,  astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (German)", GAME_IMPERFECT_SOUND )
+GAME( 1981, astrobg,  astrob,  astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (German)", GAME_IMPERFECT_SOUND )
 GAME( 1981, 005,      0,       005,      005,      005,      ROT270, "Sega", "005", GAME_IMPERFECT_SOUND )
 
 
