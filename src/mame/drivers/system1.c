@@ -4693,7 +4693,7 @@ static DRIVER_INIT( shtngmst )
 
 /* PPI-based System 1 */
 GAME( 1983, starjack,   0,        sys1ppis, starjack,  bank00,   ROT270, "Sega",            "Star Jacker (Sega)", GAME_SUPPORTS_SAVE )
-GAME( 1983, starjacks,  starjack, sys1ppis, starjacks, bank00,   ROT270, "Stern",           "Star Jacker (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1983, starjacks,  starjack, sys1ppis, starjacks, bank00,   ROT270, "Sega (Stern license)", "Star Jacker (Stern)", GAME_SUPPORTS_SAVE )
 GAME( 1983, upndown,    0,        sys1ppi,  upndown,   nprinces, ROT270, "Sega",            "Up'n Down (315-5030)", GAME_SUPPORTS_SAVE )
 GAME( 1983, upndownu,   upndown,  sys1ppi,  upndown,   bank00,   ROT270, "Sega",            "Up'n Down (not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1983, regulus,    0,        sys1ppi,  regulus,   regulus,  ROT270, "Sega",            "Regulus (315-5033, Rev A.)", GAME_SUPPORTS_SAVE )
