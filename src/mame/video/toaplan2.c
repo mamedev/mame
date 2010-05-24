@@ -155,6 +155,7 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #define TOAPLAN2_FG_VRAM_SIZE   0x1000	/* Foreground RAM size */
 #define TOAPLAN2_TOP_VRAM_SIZE  0x1000	/* Top Layer  RAM size */
 #define TOAPLAN2_SPRITERAM_SIZE 0x800	/* Sprite     RAM size */
+#define TOAPLAN2_UNUSEDRAM_SIZE 0x800	/* Unused     RAM size */
 #define RAIZING_TX_GFXRAM_SIZE  0x8000	/* GFX data decode RAM size */
 size_t toaplan2_tx_vram_size;		 /* 0x2000 Text layer RAM size */
 size_t toaplan2_tx_offs_vram_size;	 /* 0x200 Text layer tile flip and positon ? */
@@ -175,6 +176,7 @@ size_t batrider_paletteram16_size;
 static UINT16 *bgvideoram16[2];
 static UINT16 *fgvideoram16[2];
 static UINT16 *topvideoram16[2];
+static UINT16 *unusedvideoram16[2];
 static UINT16 *spriteram16_now[2];	/* Sprites to draw this frame */
 static UINT16 *spriteram16_new[2];	/* Sprites to add to next frame */
 static UINT16 *spriteram16_n[2];
@@ -183,7 +185,6 @@ UINT16 *toaplan2_txvideoram16_offs;	/* Text layer tile flip and positon ? */
 UINT16 *toaplan2_txscrollram16;		/* Text layer scroll ? */
 UINT16 *toaplan2_tx_gfxram16;			/* Text Layer RAM based tiles */
 static UINT16 *raizing_tx_gfxram16;			/* Text Layer RAM based tiles (Batrider) */
-static UINT16 toaplan2_overflow_vram;		/* Teki Paki VRAM test is bugged. It goes out of range */
 
 static UINT16 toaplan2_scroll_reg[2];
 static UINT16 toaplan2_voffs[2];
@@ -197,6 +198,12 @@ static UINT16 sprite_scrollx[2];
 static UINT16 sprite_scrolly[2];
 static int objectbank_dirty = 0;		/* dirty flag of object bank (for Batrider) */
 static UINT16 batrider_object_bank[8];		/* Batrider object bank */
+
+
+static bitmap_t* toaplan2_custom_priority_bitmap;
+static UINT16 tile_limit[2]; // prevent bad tile in Batsugun, might be something like the CPS1 tile addressing limits?
+static int toaplan2_banked_gfx;
+
 
 #ifdef MAME_DEBUG
 static int display_bg[2];
@@ -249,14 +256,28 @@ static TILE_GET_INFO( get_top0_tile_info )
 	int color, tile_number, attrib;
 
 	attrib = topvideoram16[0][2*tile_index];
+
 	tile_number = topvideoram16[0][2*tile_index+1];
-	color = attrib & 0x7f;
+
+	if (toaplan2_banked_gfx)
+	{
+		tile_number = ( batrider_object_bank[(tile_number >> 13) & 7] << 13 ) | ( tile_number & 0x1fff );
+	}
+	else
+	{
+		if (tile_number>tile_limit[0])
+		{
+			tile_number = 0;
+		}
+	}
+
+	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO(
 			0,
 			tile_number,
 			color,
 			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
+	//tileinfo->category = (attrib & 0x0f00) >> 8;
 }
 
 static TILE_GET_INFO( get_fg0_tile_info )
@@ -264,14 +285,27 @@ static TILE_GET_INFO( get_fg0_tile_info )
 	int color, tile_number, attrib;
 
 	attrib = fgvideoram16[0][2*tile_index];
+
 	tile_number = fgvideoram16[0][2*tile_index+1];
-	color = attrib & 0x7f;
+
+
+	if (toaplan2_banked_gfx)
+	{
+		tile_number = ( batrider_object_bank[(tile_number >> 13) & 7] << 13 ) | ( tile_number & 0x1fff );
+	}
+	else
+	{
+		if (tile_number>tile_limit[0]) tile_number = 0;
+	}
+
+
+	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO(
 			0,
 			tile_number,
 			color,
 			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
+	//tileinfo->category = (attrib & 0x0f00) >> 8;
 }
 
 static TILE_GET_INFO( get_bg0_tile_info )
@@ -279,15 +313,25 @@ static TILE_GET_INFO( get_bg0_tile_info )
 	int color, tile_number, attrib;
 
 	attrib = bgvideoram16[0][2*tile_index];
+
 	tile_number = bgvideoram16[0][2*tile_index+1];
-	color = attrib & 0x7f;
+
+	if (toaplan2_banked_gfx)
+	{
+		tile_number = ( batrider_object_bank[(tile_number >> 13) & 7] << 13 ) | ( tile_number & 0x1fff );
+	}
+	else
+	{
+		if (tile_number>tile_limit[0]) tile_number = 0;
+	}
+
+	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO(
 			0,
 			tile_number,
 			color,
 			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
-/// if ((attrib & 0x0f00) == 0) tileinfo->flags |= TILE_FORCE_LAYER0;
+	//tileinfo->category = (attrib & 0x0f00) >> 8;
 }
 
 static TILE_GET_INFO( get_top1_tile_info )
@@ -296,13 +340,16 @@ static TILE_GET_INFO( get_top1_tile_info )
 
 	attrib = topvideoram16[1][2*tile_index];
 	tile_number = topvideoram16[1][2*tile_index+1];
-	color = attrib & 0x7f;
+
+	if (tile_number>tile_limit[1]) tile_number = 0;
+
+	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO(
 			2,
 			tile_number,
 			color,
 			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
+	//tileinfo->category = (attrib & 0x0f00) >> 8;
 }
 
 static TILE_GET_INFO( get_fg1_tile_info )
@@ -311,13 +358,16 @@ static TILE_GET_INFO( get_fg1_tile_info )
 
 	attrib = fgvideoram16[1][2*tile_index];
 	tile_number = fgvideoram16[1][2*tile_index+1];
-	color = attrib & 0x7f;
+
+	if (tile_number>tile_limit[1]) tile_number = 0;
+
+	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO(
 			2,
 			tile_number,
 			color,
 			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
+	//tileinfo->category = (attrib & 0x0f00) >> 8;
 }
 
 static TILE_GET_INFO( get_bg1_tile_info )
@@ -326,62 +376,18 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 	attrib = bgvideoram16[1][2*tile_index];
 	tile_number = bgvideoram16[1][2*tile_index+1];
-	color = attrib & 0x7f;
+
+	if (tile_number>tile_limit[1]) tile_number = 0;
+
+	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO(
 			2,
 			tile_number,
 			color,
 			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
+	//tileinfo->category = (attrib & 0x0f00) >> 8;
 }
 
-static TILE_GET_INFO( batrider_get_top0_tile_info )
-{
-	int color, tile_number, attrib, tile;
-
-	attrib = topvideoram16[0][2*tile_index];
-	tile = topvideoram16[0][2*tile_index+1];
-	tile_number = ( batrider_object_bank[(tile >> 13) & 7] << 13 ) | ( tile & 0x1fff );
-	color = attrib & 0x7f;
-	SET_TILE_INFO(
-			0,
-			tile_number,
-			color,
-			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
-}
-
-static TILE_GET_INFO( batrider_get_fg0_tile_info )
-{
-	int color, tile_number, attrib, tile;
-
-	attrib = fgvideoram16[0][2*tile_index];
-	tile = fgvideoram16[0][2*tile_index+1];
-	tile_number = ( batrider_object_bank[(tile >> 13) & 7] << 13 ) | ( tile & 0x1fff );
-	color = attrib & 0x7f;
-	SET_TILE_INFO(
-			0,
-			tile_number,
-			color,
-			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
-}
-
-static TILE_GET_INFO( batrider_get_bg0_tile_info )
-{
-	int color, tile_number, attrib, tile;
-
-	attrib = bgvideoram16[0][2*tile_index];
-	tile = bgvideoram16[0][2*tile_index+1];
-	tile_number = ( batrider_object_bank[(tile >> 13) & 7] << 13 ) | ( tile & 0x1fff );
-	color = attrib & 0x7f;
-	SET_TILE_INFO(
-			0,
-			tile_number,
-			color,
-			0);
-	tileinfo->category = (attrib & 0x0f00) >> 8;
-}
 
 static TILE_GET_INFO( get_text_tile_info )
 {
@@ -395,7 +401,6 @@ static TILE_GET_INFO( get_text_tile_info )
 			tile_number,
 			color,
 			0);
-	tileinfo->category = 0;
 }
 
 /***************************************************************************
@@ -408,6 +413,7 @@ static void create_tilemaps_0(running_machine *machine)
 	top_tilemap[0] = tilemap_create(machine, get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
 	fg_tilemap[0] = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
 	bg_tilemap[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	tile_limit[0] = 0xffff;
 
 	tilemap_set_transparent_pen(top_tilemap[0],0);
 	tilemap_set_transparent_pen(fg_tilemap[0],0);
@@ -419,6 +425,7 @@ static void create_tilemaps_1(running_machine *machine)
 	top_tilemap[1] = tilemap_create(machine, get_top1_tile_info,tilemap_scan_rows,16,16,32,32);
 	fg_tilemap[1] = tilemap_create(machine, get_fg1_tile_info,tilemap_scan_rows,16,16,32,32);
 	bg_tilemap[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows,16,16,32,32);
+	tile_limit[1] = 0xffff;
 
 	tilemap_set_transparent_pen(top_tilemap[1],0);
 	tilemap_set_transparent_pen(fg_tilemap[1],0);
@@ -427,34 +434,23 @@ static void create_tilemaps_1(running_machine *machine)
 
 static void truxton2_create_tilemaps_0(running_machine *machine)
 {
-	tx_tilemap = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,32);
-	top_tilemap[0] = tilemap_create(machine, get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
-	fg_tilemap[0] = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
-	bg_tilemap[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	create_tilemaps_0(machine);
 
+	tx_tilemap = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,32);
 	tilemap_set_scroll_rows(tx_tilemap,8*32);	/* line scrolling */
 	tilemap_set_scroll_cols(tx_tilemap,1);
-
 	tilemap_set_transparent_pen(tx_tilemap,0);
-	tilemap_set_transparent_pen(top_tilemap[0],0);
-	tilemap_set_transparent_pen(fg_tilemap[0],0);
-	tilemap_set_transparent_pen(bg_tilemap[0],0);
 }
 
 static void batrider_create_tilemaps_0(running_machine *machine)
 {
+	create_tilemaps_0(machine);
+
 	tx_tilemap = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,32);
-	top_tilemap[0] = tilemap_create(machine, batrider_get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
-	fg_tilemap[0] = tilemap_create(machine, batrider_get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
-	bg_tilemap[0] = tilemap_create(machine, batrider_get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_scroll_rows(tx_tilemap,8*32);	/* line scrolling */
 	tilemap_set_scroll_cols(tx_tilemap,1);
-
 	tilemap_set_transparent_pen(tx_tilemap,0);
-	tilemap_set_transparent_pen(top_tilemap[0],0);
-	tilemap_set_transparent_pen(fg_tilemap[0],0);
-	tilemap_set_transparent_pen(bg_tilemap[0],0);
 }
 
 
@@ -465,13 +461,19 @@ static void toaplan2_vram_alloc(running_machine *machine, int controller)
 	topvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_TOP_VRAM_SIZE/2);
 	fgvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_FG_VRAM_SIZE/2);
 	bgvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_BG_VRAM_SIZE/2);
+	unusedvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_UNUSEDRAM_SIZE/2);
 
 	spriteram16_n[controller] = spriteram16_now[controller];
 }
 
 static void toaplan2_vh_start(running_machine *machine, int controller)
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	toaplan2_vram_alloc(machine, controller);
+
+	toaplan2_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
 
 	if (controller == 0)
 	{
@@ -545,6 +547,7 @@ VIDEO_START( toaplan2_0 )
 	defaultOffsets();
 	toaplan2_vh_start(machine, 0);
 	register_state_save(machine,1);
+	toaplan2_banked_gfx = 0;
 }
 
 VIDEO_START( toaplan2_1 )
@@ -553,12 +556,18 @@ VIDEO_START( toaplan2_1 )
 	toaplan2_vh_start(machine, 1);
 	defaultOffsets();
 	register_state_save(machine,2);
+	toaplan2_banked_gfx = 0;
 }
 
 VIDEO_START( truxton2_0 )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	toaplan2_vram_alloc(machine, 0);
 	truxton2_create_tilemaps_0(machine);
+
+	toaplan2_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
 
 	if (machine->gfx[2]->srcdata == NULL)
 		gfx_element_set_source(machine->gfx[2], (UINT8 *)toaplan2_tx_gfxram16);
@@ -584,10 +593,16 @@ VIDEO_START( truxton2_0 )
 
 	display_sp[0] = 1;
 	register_state_save(machine,1);
+	toaplan2_banked_gfx = 0;
 }
 
 VIDEO_START( bgaregga_0 )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
+	toaplan2_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
+
 	toaplan2_vram_alloc(machine, 0);
 	truxton2_create_tilemaps_0(machine);
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
@@ -595,10 +610,17 @@ VIDEO_START( bgaregga_0 )
 	display_sp[0] = 1;
 	display_sp[1] = 1;
 	register_state_save(machine,1);
+	toaplan2_banked_gfx = 0;
 }
 
 VIDEO_START( batrider_0 )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
+	toaplan2_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
+
+
 	raizing_tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
 	state_save_register_global_pointer(machine, raizing_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
 
@@ -614,6 +636,7 @@ VIDEO_START( batrider_0 )
 	display_sp[0] = 1;
 	display_sp[1] = 1;
 	register_state_save(machine,1);
+	toaplan2_banked_gfx = 1;
 }
 
 
@@ -632,11 +655,15 @@ static void toaplan2_voffs_w(offs_t offset, UINT16 data, UINT16 mem_mask, int co
 
 WRITE16_HANDLER( toaplan2_0_voffs_w )
 {
+	//printf("toaplan2_0_voffs_w %04x %04x\n",offset,data);
+
 	toaplan2_voffs_w(offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_voffs_w )
 {
+	//printf("toaplan2_1_voffs_w %04x %04x\n",offset,data);
+
 	toaplan2_voffs_w(offset, data, mem_mask, 1);
 }
 
@@ -778,45 +805,34 @@ WRITE16_HANDLER( batrider_objectbank_w )
 
 static int toaplan2_videoram16_r(offs_t offset, int controller)
 {
-	UINT16 video_data = 0;
-	offs_t vram_offset;
-
-
-	switch (toaplan2_voffs[controller] & 0xfc00)
-	{
-		case 0x8400:
-		case 0x8000:
-		case 0x0400:
-		case 0x0000:
-				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_BG_VRAM_SIZE/2)-1);
-				video_data = bgvideoram16[controller][vram_offset];
-				break;
-		case 0x8c00:
-		case 0x8800:
-		case 0x0c00:
-		case 0x0800:
-				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_FG_VRAM_SIZE/2)-1);
-				video_data = fgvideoram16[controller][vram_offset];
-				break;
-		case 0x9400:
-		case 0x9000:
-		case 0x1400:
-		case 0x1000:
-				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_TOP_VRAM_SIZE/2)-1);
-				video_data = topvideoram16[controller][vram_offset];
-				break;
-		case 0x9800:
-		case 0x1800:
-				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_SPRITERAM_SIZE/2)-1);
-				video_data = spriteram16_new[controller][vram_offset];
-				break;
-		default:
-				video_data = toaplan2_overflow_vram;
-				logerror("Hmmm, reading %04x from unknown VC:%01x layer address %06x  Offset:%01x !!!\n",video_data,controller,toaplan2_voffs[controller],offset);
-				break;
-	}
+	int offs = (toaplan2_voffs[controller] &0x1fff);
 	toaplan2_voffs[controller]++;
-	return video_data;
+
+	if (offs<0x0800)
+	{
+		offs&=0x7ff;
+		return bgvideoram16[controller][offs];
+	}
+	else if (offs<0x1000)
+	{
+		offs&=0x7ff;
+		return fgvideoram16[controller][offs];
+	}
+	else if (offs<0x1800)
+	{
+		offs&=0x7ff;
+		return topvideoram16[controller][offs];
+	}
+	else if (offs<0x1c00)
+	{
+		offs&=0x3ff;
+		return spriteram16_new[controller][offs];
+	}
+	else // wouldn't surprise me if this mirrors spriteram on real hw
+	{
+		offs&=0x3ff;
+		return unusedvideoram16[controller][offs];
+	}
 }
 
 READ16_HANDLER( toaplan2_0_videoram16_r )
@@ -831,45 +847,37 @@ READ16_HANDLER( toaplan2_1_videoram16_r )
 
 static void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
 {
-	offs_t vram_offset;
-
-	switch (toaplan2_voffs[controller] & 0xfc00)
-	{
-		case 0x8400:
-		case 0x8000:
-		case 0x0400:
-		case 0x0000:
-				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_BG_VRAM_SIZE/2)-1);
-				COMBINE_DATA(&bgvideoram16[controller][vram_offset]);
-				tilemap_mark_tile_dirty(bg_tilemap[controller],vram_offset/2);
-				break;
-		case 0x8c00:
-		case 0x8800:
-		case 0x0c00:
-		case 0x0800:
-				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_FG_VRAM_SIZE/2)-1);
-				COMBINE_DATA(&fgvideoram16[controller][vram_offset]);
-				tilemap_mark_tile_dirty(fg_tilemap[controller],vram_offset/2);
-				break;
-		case 0x9400:
-		case 0x9000:
-		case 0x1400:
-		case 0x1000:
-				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_TOP_VRAM_SIZE/2)-1);
-				COMBINE_DATA(&topvideoram16[controller][vram_offset]);
-				tilemap_mark_tile_dirty(top_tilemap[controller],vram_offset/2);
-				break;
-		case 0x9800:
-		case 0x1800:
-				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_SPRITERAM_SIZE/2)-1);
-				COMBINE_DATA(&spriteram16_new[controller][vram_offset]);
-				break;
-		default:
-				toaplan2_overflow_vram = data;
-				logerror("Hmmm, writing %04x to unknown VC:%01x layer address %06x  Offset:%01x\n",data,controller,toaplan2_voffs[controller],offset);
-				break;
-	}
+	int offs = (toaplan2_voffs[controller] &0x1fff);
 	toaplan2_voffs[controller]++;
+
+	if (offs<0x0800)
+	{
+		offs&=0x7ff;
+		COMBINE_DATA(&bgvideoram16[controller][offs]);
+		tilemap_mark_tile_dirty(bg_tilemap[controller],offs/2);
+	}
+	else if (offs<0x1000)
+	{
+		offs&=0x7ff;
+		COMBINE_DATA(&fgvideoram16[controller][offs]);
+		tilemap_mark_tile_dirty(fg_tilemap[controller],offs/2);
+	}
+	else if (offs<0x1800)
+	{
+		offs&=0x7ff;
+		COMBINE_DATA(&topvideoram16[controller][offs]);
+		tilemap_mark_tile_dirty(top_tilemap[controller],offs/2);
+	}
+	else if (offs<0x1c00)
+	{
+		offs&=0x3ff;
+		COMBINE_DATA(&spriteram16_new[controller][offs]);
+	}
+	else // wouldn't surprise me if this mirrors spriteram on real hw
+	{
+		offs&=0x3ff;
+		COMBINE_DATA(&unusedvideoram16[controller][offs]);
+	}
 }
 
 WRITE16_HANDLER( toaplan2_0_videoram16_w )
@@ -899,11 +907,15 @@ static void toaplan2_scroll_reg_select_w(offs_t offset, UINT16 data, UINT16 mem_
 
 WRITE16_HANDLER( toaplan2_0_scroll_reg_select_w )
 {
+//	printf("toaplan2_scroll_reg_select_w %04x %04x\n",offset,data);
+
 	toaplan2_scroll_reg_select_w(offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_scroll_reg_select_w )
 {
+//	printf("toaplan2_scroll_1_reg_select_w %04x %04x\n",offset,data);
+
 	toaplan2_scroll_reg_select_w(offset, data, mem_mask, 1);
 }
 
@@ -914,6 +926,7 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 	/***** layer X and Y flips can be set independantly, so emulate it ******/
 	/************************************************************************/
 
+	//printf("toaplan2_scroll_reg_data_w %04x %04x\n", offset, data);
 #ifdef MAME_DEBUG
 	int vid_controllers = 1;
 #endif
@@ -1330,16 +1343,13 @@ static void toaplan2_log_vram(running_machine *machine)
     Sprite Handlers
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int controller, int priority_to_display, int bank_sel )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int controller, UINT8* primap )
 {
 	const gfx_element *gfx = machine->gfx[ ((controller*2)+1) ];
 
 	int offs, old_x, old_y;
 
 	UINT16 *source = (UINT16 *)(spriteram16_n[controller]);
-
-
-	priority_to_display <<= 8;
 
 	old_x = (-(sprite_scrollx[controller]+xoffset[3])) & 0x1ff;
 	old_y = (-(sprite_scrolly[controller]+yoffset[3])) & 0x1ff;
@@ -1351,11 +1361,11 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int bank, sprite_num;
 
 		attrib = source[offs];
-		priority = (attrib & 0x0f00);
+		priority = primap[((attrib & 0x0f00)>>8)]+1;
 
-		if ((priority == priority_to_display) && (attrib & 0x8000))
+		if ((attrib & 0x8000))
 		{
-			if (!bank_sel)	/* No Sprite select bank switching needed */
+			if (!toaplan2_banked_gfx)	/* No Sprite select bank switching needed */
 			{
 				sprite = ((attrib & 3) << 16) | source[offs + 1];	/* 18 bit */
 			}
@@ -1430,11 +1440,85 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				{
 					if (flipx) sx = sx_base - dim_x;
 					else       sx = sx_base + dim_x;
-
+				
+					/*
 					drawgfx_transpen(bitmap,cliprect,gfx,sprite,
 						color,
 						flipx,flipy,
 						sx,sy,0);
+					*/
+					sprite %= gfx->total_elements;
+					color %= gfx->total_colors;
+				
+					{
+						int yy, xx;
+						const pen_t *paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+						const UINT8* srcdata = gfx_element_get_data(gfx, sprite);	
+						int count = 0;
+						int ystart, yend, yinc;
+						int xstart, xend, xinc;
+
+						if (flipy)
+						{
+							ystart = 7;
+							yend = -1;
+							yinc = -1;
+						}
+						else
+						{
+							ystart = 0;
+							yend = 8;
+							yinc = 1;
+						}
+
+						if (flipx)
+						{
+							xstart = 7;
+							xend = -1;
+							xinc = -1;
+						}
+						else
+						{
+							xstart = 0;
+							xend = 8;
+							xinc = 1;
+						}
+
+						for (yy=ystart;yy!=yend;yy+=yinc)
+						{
+							int drawyy = yy+sy;
+							
+
+							for (xx=xstart;xx!=xend;xx+=xinc)
+							{
+								int drawxx = xx+sx;
+
+								if (drawxx>=cliprect->min_x && drawxx<cliprect->max_x && drawyy>=cliprect->min_y && drawyy<cliprect->max_y)
+								{
+									UINT8 pix = srcdata[count];
+									UINT16* dstptr = BITMAP_ADDR16(bitmap,drawyy,drawxx);
+									UINT8* dstpri = BITMAP_ADDR8(toaplan2_custom_priority_bitmap, drawyy, drawxx);
+									
+									if (priority >= dstpri[0])
+									{
+										if (pix&0xf)
+										{
+											dstptr[0] = paldata[pix];
+											dstpri[0] = priority;
+
+										}
+									}
+								}
+
+
+								count++;
+							}
+						}
+
+
+					}
+					
+
 
 					sprite++ ;
 				}
@@ -1445,195 +1529,122 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 
 /***************************************************************************
-    Mark the sprite priority used list.
-***************************************************************************/
-static void mark_sprite_priority(int controller)
-{
-	int priority, offs;
-
-	UINT16 *source = (UINT16 *)(spriteram16_n[controller]);
-
-
-	for (priority = 0; priority < 16; priority++)
-		sprite_priority[controller][priority] = 0;		/* Clear priorities used list */
-
-	for (offs = 0; offs < (TOAPLAN2_SPRITERAM_SIZE/2); offs += 4)
-	{
-		priority = (source[offs] & 0x0f00) >> 8;
-		sprite_priority[controller][priority] = display_sp[controller];
-	}
-}
-
-/***************************************************************************
-    Mark the tile priority used list.
-***************************************************************************/
-static void mark_tile_priority(int controller)
-{
-	int priority, offs;
-
-	for (priority = 0; priority < 16; priority++)
-	{
-		top_tile_priority[controller][priority] = 0;
-		fg_tile_priority[controller][priority] = 0;
-		bg_tile_priority[controller][priority] = 0;
-	}
-
-	for (offs = 0; offs < (TOAPLAN2_BG_VRAM_SIZE/2); offs += 2)
-	{
-		top_tile_priority[controller][(topvideoram16[controller][offs] & 0x0f00) >> 8] = 1;
-		fg_tile_priority[controller][(fgvideoram16[controller][offs] & 0x0f00) >> 8] = 1;
-		bg_tile_priority[controller][(bgvideoram16[controller][offs] & 0x0f00) >> 8] = 1;
-	}
-
-#if 0
-	{
-		static int bg[2]={0,0},fg[2]={0,0},top[2]={0,0};
-		bg[controller]=0;fg[controller]=0;top[controller]=0;
-		for (priority = 0; priority < 16; priority++)
-		{
-			if (bg_tile_priority[controller][priority]) bg[controller]++;
-			if (fg_tile_priority[controller][priority]) fg[controller]++;
-			if (top_tile_priority[controller][priority]) top[controller]++;
-		}
-		popmessage("b=%2d:%2d f=%2d:%2d t=%2d:%2d",bg[0],bg[1],fg[0],fg[1],top[0],top[1]);
-	}
-#endif
-}
-
-/***************************************************************************
     Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
+void toaplan2_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, tilemap_t* tilemap, UINT8* priremap, UINT8* pri_enable )
+{
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+	int y,x;
+	bitmap_t *tmb = tilemap_get_pixmap(tilemap);
+	UINT16* srcptr;
+	UINT16* dstptr;
+	UINT8* dstpriptr;
+
+	int scrollx = tilemap_get_scrollx(tilemap, 0);
+	int scrolly = tilemap_get_scrolly(tilemap, 0);
+
+	for (y=0;y<height;y++)
+	{
+		int realy = (y+scrolly)&0x1ff;
+
+		srcptr = BITMAP_ADDR16(tmb, realy, 0);
+		dstptr = BITMAP_ADDR16(bitmap, y, 0);
+		dstpriptr = BITMAP_ADDR8(toaplan2_custom_priority_bitmap, y, 0);
+
+		for (x=0;x<width;x++)
+		{
+			int realx = (x+scrollx)&0x1ff;
+	
+			UINT16 pixdat = srcptr[realx];
+			UINT8 pixpri = ((pixdat & 0xf000)>>12);
+			
+			if (pri_enable[pixpri])
+			{
+				pixpri = priremap[pixpri]+1; // priority of 0 isn't desireable
+				pixdat &=0x07ff;
+
+				if (pixdat&0xf)
+				{
+					if (pixpri >= dstpriptr[x])
+					{
+						dstptr[x] = pixdat;
+						dstpriptr[x] = pixpri;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+UINT8 toaplan2_primap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
+//UINT8 toaplan2_sprprimap1[16] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
+UINT8 toaplan2_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
+
+UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
+
+
 VIDEO_UPDATE( toaplan2_0 )
 {
-	int priority;
-
-	toaplan2_log_vram(screen->machine);
-
-	mark_sprite_priority(0);
-	mark_tile_priority(0);
-
 	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(toaplan2_custom_priority_bitmap, cliprect, 0);
 
-	for (priority = 0; priority < 16; priority++)
-	{
-		if (bg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,bg_tilemap[0],priority,0);
-		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);
-		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
-		if (sprite_priority[0][priority])
-			draw_sprites(screen->machine,bitmap,cliprect,0,priority,0);
-	}
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	draw_sprites(screen->machine,bitmap,cliprect,0, toaplan2_sprprimap1);
+
 	return 0;
 }
 
+
+/* How do the dual VDP games mix? The internal mixing of each VDP chip is independent, if you view only a single
+   VDP then the priorities for that VDP are correct, however, it is completely unclear how the priorities of the
+   two VDPs should actually mix together, as a result these games are broken for now. */
 VIDEO_UPDATE( dogyuun_1 )
 {
-	int priority;
-
 	toaplan2_log_vram(screen->machine);
 
-	mark_sprite_priority(0);
-	mark_sprite_priority(1);
-	mark_tile_priority(0);
-	mark_tile_priority(1);
-
 	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(toaplan2_custom_priority_bitmap, cliprect, 0);
 
-	for (priority = 0; priority < 16; priority++)
-	{
-		if (bg_tile_priority[1][priority]) tilemap_draw(bitmap,cliprect,bg_tilemap[1],priority,0);
-		if (fg_tile_priority[1][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[1],priority,0);
-		if (top_tile_priority[1][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[1],priority,0);
-		if (sprite_priority[1][priority])
-			draw_sprites(screen->machine,bitmap,cliprect,1,priority,0);
-	}
-	for (priority = 0; priority < 16; priority++)
-	{
-		if (bg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,bg_tilemap[0],priority,0);
-		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);
-		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
-		if (sprite_priority[0][priority])
-			draw_sprites(screen->machine,bitmap,cliprect,0,priority,0);
-	}
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	draw_sprites(screen->machine,bitmap,cliprect,0, toaplan2_sprprimap1);
+
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[1], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[1], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[1], toaplan2_primap1, batsugun_prienable0); // priority 0 of this MUST be below priority 0 of bg_tilemap[0] for lev 3, but above for lev 2?!
+	draw_sprites(screen->machine,bitmap,cliprect,1, toaplan2_sprprimap1);
+
+
 	return 0;
 }
+
 
 VIDEO_UPDATE( batsugun_1 )
 {
-	int priority;
-	static int bg1=0,fg1=0,tp1=0;						// Fix
-	UINT32 *vramp;										// Fix
-	static int bg[2]={0,0},fg[2]={0,0},top[2]={0,0};	// Fix
 
 	toaplan2_log_vram(screen->machine);
-
-	mark_sprite_priority(0);
-	mark_sprite_priority(1);
-	mark_tile_priority(0);
-	mark_tile_priority(1);
-
+	
 	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(toaplan2_custom_priority_bitmap, cliprect, 0);
 
-//Fix
-	bg[0]=0;fg[0]=0;top[0]=0;
-	bg[1]=0;fg[1]=0;top[1]=0;
+	tile_limit[1] = 0x1fff; // 0x2000-0x3fff seem to be for sprites only? (corruption on level 1 otherwise)
 
-	for (priority = 0; priority < 16; priority++)
-	{
-		if (bg_tile_priority[0][priority]) bg[0]++;
-		if (fg_tile_priority[0][priority]) fg[0]++;
-		if (top_tile_priority[0][priority]) top[0]++;
-		if (bg_tile_priority[1][priority]) bg[1]++;
-		if (fg_tile_priority[1][priority]) fg[1]++;
-		if (top_tile_priority[1][priority]) top[1]++;
-	}
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	draw_sprites(screen->machine,bitmap,cliprect,0, toaplan2_sprprimap1);
 
-	if( (bg[0]==1 && bg[1]==1 && fg[0]==1 && fg[1]==1 && top[0]==1 && top[1]==1)||
-		(bg[0]==1 && bg[1]==2 && fg[0]==1 && fg[1]==1 && top[0]==1 && top[1]==1)||
-		(bg[0]==1 && bg[1]==2 && fg[0]==1 && fg[1]==2 && top[0]==1 && top[1]==1)){
-		tp1=1;
-	} else {
-		tp1=0;
-	}
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[1], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[1], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[1], toaplan2_primap1, batsugun_prienable0); // priority 0 of this MUST be below priority 0 of bg_tilemap[0] for lev 3, but above for lev 2?!
+	draw_sprites(screen->machine,bitmap,cliprect,1, toaplan2_sprprimap1);
 
-	vramp = (UINT32*)bgvideoram16[1];
-	if(*(vramp+28)==0x225e027a){
-		bg1=0;
-		fg1=1;
-	} else if(*(vramp+28)==0x0aa50060){
-		bg1=2;
-		fg1=1;
-	} else if(*(vramp+28)==0x02040032){
-		bg1=1;
-		fg1=2;
-	} else {
-		bg1=1;
-		fg1=1;
-	}
-
-	vramp = (UINT32*)fgvideoram16[1];
-	if(*vramp==0x09cb006d||*vramp==0x09ab006d||*vramp==0x01c4006e){
-		fg1=3;
-	}
-
-	for (priority = 0; priority < 16; priority++){
-		if (top_tile_priority[1][priority] && tp1==1) tilemap_draw(bitmap,cliprect,top_tilemap[1],priority,0);  /* 3 */
-		if (bg_tile_priority[1][priority] && bg1==2) tilemap_draw(bitmap,cliprect,bg_tilemap[1],priority,0);    /* 5 */
-		if (fg_tile_priority[1][priority] && fg1==3) tilemap_draw(bitmap,cliprect,fg_tilemap[1],priority,0);    /* 4 */
-		if (bg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,bg_tilemap[0],priority,0);				/* 2 */
-		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);				/* 1 */
-		if (bg_tile_priority[1][priority] && bg1==1) tilemap_draw(bitmap,cliprect,bg_tilemap[1],priority,0);    /* 5 */
-		if (fg_tile_priority[1][priority] && fg1==1) tilemap_draw(bitmap,cliprect,fg_tilemap[1],priority,0);    /* 4 */
-		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);			/* 0 */
-		if (sprite_priority[0][priority]) draw_sprites(screen->machine,bitmap,cliprect,0,priority,0);
-	}
-	for (priority = 0; priority < 16; priority++){
-		if (fg_tile_priority[1][priority] && fg1==2) tilemap_draw(bitmap,cliprect,fg_tilemap[1],priority,0);    /* 4 */
-		if (top_tile_priority[1][priority] && tp1==0) tilemap_draw(bitmap,cliprect,top_tilemap[1],priority,0);  /* 3 */
-		if (sprite_priority[1][priority]) draw_sprites(screen->machine,bitmap,cliprect,1,priority,0);
-		if (bg_tile_priority[1][priority] && tp1==1) tilemap_draw(bitmap,cliprect,bg_tilemap[1],priority,0);    /* 5 */
-	}
-//Fix END
 	return 0;
 }
 
@@ -1646,16 +1657,11 @@ VIDEO_UPDATE( truxton2_0 )
 
 VIDEO_UPDATE( batrider_0 )
 {
-	int priority;
-
 	int line;
 	rectangle clip;
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
 	toaplan2_log_vram(screen->machine);
-
-	mark_sprite_priority(0);
-	mark_tile_priority(0);
 
 	/* If object bank is changed, all tile must be redrawn to blow off glitches. */
 	/* This causes serious slow down. Is there better algorithm ?                */
@@ -1666,16 +1672,7 @@ VIDEO_UPDATE( batrider_0 )
 		objectbank_dirty = 0;
 	}
 
-	bitmap_fill(bitmap,cliprect,0);
-
-	for (priority = 0; priority < 16; priority++)
-	{
-		if (bg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,bg_tilemap[0],priority,0);
-		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);
-		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
-		if (sprite_priority[0][priority])
-			draw_sprites(screen->machine,bitmap,cliprect,0,priority,1);	/* consider bank select */
-	}
+	VIDEO_UPDATE_CALL( toaplan2_0 );
 
 	clip.min_x = visarea->min_x;
 	clip.max_x = visarea->max_x;
@@ -1695,28 +1692,10 @@ VIDEO_UPDATE( batrider_0 )
 
 VIDEO_UPDATE( mahoudai_0 )
 {
-	int priority;
-
 	toaplan2_log_vram(screen->machine);
+	
+	VIDEO_UPDATE_CALL( toaplan2_0 );
 
-	mark_sprite_priority(0);
-	mark_tile_priority(0);
-
-	bitmap_fill(bitmap,cliprect,0);
-
-	if (bg_tile_priority[0][0]) tilemap_draw(bitmap,cliprect,bg_tilemap[0],0,0);
-	if (fg_tile_priority[0][0]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],0,0);
-	if (top_tile_priority[0][0]) tilemap_draw(bitmap,cliprect,top_tilemap[0],0,0);
-	for (priority = 1; priority < 16; priority++)
-	{
-		if (bg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,bg_tilemap[0],priority,0);
-		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);
-		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
-		if (sprite_priority[0][priority-1])
-			draw_sprites(screen->machine,bitmap,cliprect,0,priority-1,0);
-	}
-	if (sprite_priority[0][15])
-		draw_sprites(screen->machine,bitmap,cliprect,0,15,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

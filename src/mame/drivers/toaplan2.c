@@ -3353,41 +3353,38 @@ static const gfx_layout fixeighblayout =
 };
 
 static GFXDECODE_START( toaplan2 )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 128 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,  64 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 0x1000 )
 GFXDECODE_END
 
 static GFXDECODE_START( 2 )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 128 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,  64 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0,  64 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x1000 )
 GFXDECODE_END
 
 static GFXDECODE_START( truxton2 )
-	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout            , 0, 128 )
-	GFXDECODE_ENTRY( "gfx1", 0,       spritelayout          , 0,  64 )
-//  GFXDECODE_ENTRY( "maincpu", 0x40000, truxton2_tx_tilelayout, 0, 128 )  /* Truxton 2 */
-//  GFXDECODE_ENTRY( "maincpu", 0x68000, truxton2_tx_tilelayout, 0, 128 )  /* Fix Eight */
+	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout            , 0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0,       spritelayout          , 0, 0x1000 )
 	GFXDECODE_ENTRY( NULL, 0, truxton2_tx_tilelayout,  0, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( raizing )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,         0, 128 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,       0,  64 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,         0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,       0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx2", 0, raizing_textlayout, 0, 128 )		/* Extra-text layer */
 GFXDECODE_END
 
-/* This is wrong a bit. Text layer is dynamically changed. */
 static GFXDECODE_START( batrider )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,             0, 128 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,           0,  64 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,             0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,           0, 0x1000 )
 	GFXDECODE_ENTRY( NULL,           0, batrider_tx_tilelayout, 0,  16 )
 GFXDECODE_END
 
 static GFXDECODE_START( fixeighb )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout     , 0, 128 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout   , 0,  64 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout     , 0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout   , 0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx2", 0, fixeighblayout , 0, 128 )
 GFXDECODE_END
 
@@ -3434,7 +3431,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3473,7 +3470,7 @@ static MACHINE_DRIVER_START( ghox )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3535,7 +3532,7 @@ static MACHINE_DRIVER_START( dogyuun )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_1)
 	MDRV_VIDEO_EOF(toaplan2_1)
@@ -3625,7 +3622,7 @@ static MACHINE_DRIVER_START( kbash )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3661,7 +3658,7 @@ static MACHINE_DRIVER_START( kbash2 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3699,7 +3696,7 @@ static MACHINE_DRIVER_START( truxton2 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(truxton2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(truxton2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3741,7 +3738,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3781,7 +3778,7 @@ static MACHINE_DRIVER_START( whoopee )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3820,7 +3817,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3888,7 +3885,7 @@ static MACHINE_DRIVER_START( fixeight )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(truxton2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(truxton2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3924,7 +3921,7 @@ static MACHINE_DRIVER_START( fixeighb )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(fixeighb)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(truxton2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3993,7 +3990,7 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4083,7 +4080,7 @@ static MACHINE_DRIVER_START( batsugun )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_1)
 	MDRV_VIDEO_EOF(toaplan2_1)
@@ -4121,7 +4118,7 @@ static MACHINE_DRIVER_START( snowbro2 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4163,7 +4160,7 @@ static MACHINE_DRIVER_START( mahoudai )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(raizing)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(bgaregga_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4205,7 +4202,7 @@ static MACHINE_DRIVER_START( shippumd )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(raizing)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(bgaregga_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4247,7 +4244,7 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(raizing)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(bgaregga_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4292,7 +4289,7 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(batrider)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(batrider_0)
 	MDRV_VIDEO_UPDATE(batrider_0)
@@ -4341,7 +4338,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_GFXDECODE(batrider)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_VIDEO_START(batrider_0)
 	MDRV_VIDEO_UPDATE(batrider_0)
@@ -5441,8 +5438,8 @@ GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan",
 GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Licensed to Unite Trading For Korea)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
@@ -5453,7 +5450,7 @@ GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan",
 GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, pipibibsa,pipibibs, pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z80,   ROT0,   "Toaplan", "Whoopee!! / Pipi & Bibis", GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead
-GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "Toaplan / Ryouta Kikaku", "Pipi & Bibis / Whoopee!! (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "[Toaplan] Ryouta Kikaku", "Pipi & Bibis / Whoopee!! (bootleg?)", GAME_SUPPORTS_SAVE )
 
 GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightb,fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (bootleg)", GAME_SUPPORTS_SAVE )
@@ -5462,11 +5459,11 @@ GAME( 1992, grindstm, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan",
 GAME( 1992, grindstma,vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1993, vfive,    0,        vfive,    vfive,    T2_V25,   ROT270, "Toaplan", "V-Five (Japan)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1993, batsugun,  0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1993, batsuguna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1993, batsugunsp,batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugun,  0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // dual vdp mixing is broken ATM
+GAME( 1993, batsuguna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // dual vdp mixing is broken ATM
+GAME( 1993, batsugunsp,batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // dual vdp mixing is broken ATM
 
-GAME( 1994, snowbro2, 0,        snowbro2, snowbro2, T2_noZ80, ROT0,   "Toaplan / Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
+GAME( 1994, snowbro2, 0,        snowbro2, snowbro2, T2_noZ80, ROT0,   "[Toaplan] Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, mahoudai, 0,        mahoudai, mahoudai, T2_Z80,   ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1993, sstriker, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World)" , GAME_SUPPORTS_SAVE ) // from korean board
