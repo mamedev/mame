@@ -580,7 +580,8 @@ GFXDECODE_END
 
 static const tms5220_interface tms5220_config =
 {
-	DEVCB_LINE(looping_spcint)
+	DEVCB_LINE(looping_spcint),		// IRQ
+	DEVCB_NULL						// READYQ
 };
 
 static const ay8910_interface ay8910_config =

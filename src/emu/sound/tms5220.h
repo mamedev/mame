@@ -11,7 +11,8 @@
 typedef struct _tms5220_interface tms5220_interface;
 struct _tms5220_interface
 {
-	devcb_write_line irq_func;		/* IRQ callback function */
+	devcb_write_line irq_func;		/* IRQ callback function, active low, i.e. state=0 */
+	devcb_write_line readyq_func;	/* Ready callback function, active low, i.e. state=0 */
 
 	int (*read)(running_device *device, int count);			/* speech ROM read callback */
 	void (*load_address)(running_device *device, int data);	/* speech ROM load address callback */

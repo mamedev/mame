@@ -238,6 +238,7 @@ struct _tms5220_state
 
 	/* callbacks */
 	devcb_resolved_write_line	irq_func;
+	devcb_resolved_write_line	readyq_func;
 
 	/* these contain data that describes the 128-bit data FIFO */
 	UINT8 fifo[FIFO_SIZE];
@@ -254,6 +255,7 @@ struct _tms5220_state
 	UINT8 buffer_low;		/* If 1, FIFO has less than 8 bytes in it */
 	UINT8 buffer_empty;		/* If 1, FIFO is empty */
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
+	UINT8 ready_pin;		/* state of the READY pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
 #define OLD_FRAME_SILENCE_FLAG (tms->old_frame_energy_idx == 0) // 1 if E=0, 0 otherwise.
@@ -362,6 +364,7 @@ static void update_status_and_ints(tms5220_state *tms);
 static void set_interrupt_state(tms5220_state *tms, int state);
 static INT32 lattice_filter(tms5220_state *tms);
 static INT16 clip_analog(INT16 clip);
+static void update_ready_state(tms5220_state *tms);
 static STREAM_UPDATE( tms5220_update );
 
 void tms5220_set_variant(tms5220_state *tms, int variant)
@@ -400,6 +403,7 @@ static void register_for_save_states(tms5220_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->buffer_low);
 	state_save_register_device_item(tms->device, 0, tms->buffer_empty);
 	state_save_register_device_item(tms->device, 0, tms->irq_pin);
+	state_save_register_device_item(tms->device, 0, tms->ready_pin);
 
 	state_save_register_device_item(tms->device, 0, tms->old_frame_energy_idx);
 	state_save_register_device_item(tms->device, 0, tms->old_frame_pitch_idx);
@@ -560,6 +564,9 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 static void update_status_and_ints(tms5220_state *tms)
 {
 	/* update flags and set ints if needed */
+
+	update_ready_state(tms);
+
 	/* BL is set if neither byte 9 nor 8 of the fifo are in use; this
     translates to having fifo_count (which ranges from 0 bytes in use to 16
     bytes used) being less than or equal to 8. Victory/Victorba depends on this. */
@@ -1378,6 +1385,23 @@ static void set_interrupt_state(tms5220_state *tms, int state)
     tms->irq_pin = state;
 }
 
+/**********************************************************************************************
+
+     update_ready_state -- update the ready line
+
+***********************************************************************************************/
+
+static void update_ready_state(tms5220_state *tms)
+{
+	int state = tms5220_ready_read(tms);
+#ifdef DEBUG_PIN_READS
+	logerror("ready pin set to state %d\n", state);
+#endif
+    if (tms->readyq_func.write && state != tms->ready_pin)
+    	devcb_call_write_line(&tms->readyq_func, !state);
+    tms->ready_pin = state;
+}
+
 
 /**********************************************************************************************
 
@@ -1399,8 +1423,9 @@ static DEVICE_START( tms5220 )
 
 	assert_always(tms != NULL, "Error creating TMS5220 chip");
 
-	/* resolve irq line */
+	/* resolve irq and readyq line */
 	devcb_resolve_write_line(&tms->irq_func, &tms->intf->irq_func, device);
+	devcb_resolve_write_line(&tms->readyq_func, &tms->intf->readyq_func, device);
 
 	/* initialize a stream */
 	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5220_update);
@@ -1459,8 +1484,9 @@ static DEVICE_RESET( tms5220 )
 
 	/* initialize the chip state */
 	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if tms->buffer_empty or tms->buffer_low are 0 */
-	tms->speaking_now = tms->speak_external = tms->talk_status = tms->irq_pin = 0;
+	tms->speaking_now = tms->speak_external = tms->talk_status = tms->irq_pin = tms->ready_pin = 0;
 	set_interrupt_state(tms, 0);
+	update_ready_state(tms);
 	tms->buffer_empty = tms->buffer_low = 1;
 
 	tms->RDB_flag = FALSE;
@@ -1524,6 +1550,7 @@ static TIMER_CALLBACK( io_ready_cb )
 		}
 	}
 	tms->io_ready = param;
+	update_ready_state(tms);
 }
 
 WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
@@ -1571,8 +1598,8 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
 			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
 			tms->io_ready = 0;
-			/* 25 usec (16 clocks) in datasheet, but zaccaria games glitch or fail to talk if that value is used. The zaccaria glitching may be buggy game code or may be a bug with the MAME 6821 PIA code which interfaces with the tms5200, particularly its handling of updates of the CA1 and CA2 lines? */
-			//timer_set(tms->device->machine, ATTOTIME_IN_USEC(100), tms, 1, io_ready_cb);
+			update_ready_state(tms);
+			/* 25 usec (16 clocks) in datasheet */
 			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
 		}
 	}
@@ -1620,6 +1647,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
 			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
 			tms->io_ready = 0;
+			update_ready_state(tms);
 			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 		}
 	}
