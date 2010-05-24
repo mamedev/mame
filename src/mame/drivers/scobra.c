@@ -1409,15 +1409,15 @@ ROM_END
 
 
 GAME( 1981, stratgyx, 0,        stratgyx, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
-GAME( 1981, stratgys, stratgyx, stratgyx, stratgyx, stratgyx,     ROT0,   "Konami (Stern license)", "Strategy X (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1981, stratgys, stratgyx, stratgyx, stratgyx, stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
 GAME( 1982, strongx,  stratgyx, stratgyx, stratgyx, stratgyx,	  ROT0,	  "bootleg", "Strong X", GAME_SUPPORTS_SAVE )
-GAME( 1982, darkplnt, 0,        darkplnt, darkplnt, darkplnt,     ROT180, "Stern", "Dark Planet", GAME_SUPPORTS_SAVE )
-GAME( 1982, tazmani2, tazmania, type2,    tazmania, tazmani2,     ROT90,  "Stern", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, anteatgb, anteater, anteatgb, anteatgb, scramble_ppi, ROT90,  "Stern (Free Enterprise Games license)", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
-GAME( 1983, anteatg,  anteater, anteatg,  anteatg,  scramble_ppi, ROT90,  "Stern (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
-GAME( 1982, rescue,   0,        rescue,   rescue,   rescue,       ROT90,  "Stern", "Rescue", GAME_SUPPORTS_SAVE )
+GAME( 1982, darkplnt, 0,        darkplnt, darkplnt, darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
+GAME( 1982, tazmani2, tazmania, type2,    tazmania, tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, anteatgb, anteater, anteatgb, anteatgb, scramble_ppi, ROT90,  "Stern Electronics (Free Enterprise Games license)", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
+GAME( 1983, anteatg,  anteater, anteatg,  anteatg,  scramble_ppi, ROT90,  "Stern Electronics (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
+GAME( 1982, rescue,   0,        rescue,   rescue,   rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
 GAME( 1982, aponow,   rescue,   rescue,   rescue,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
-GAME( 1983, minefld,  0,        minefld,  minefld,  minefld,      ROT90,  "Stern", "Minefield", GAME_SUPPORTS_SAVE )
+GAME( 1983, minefld,  0,        minefld,  minefld,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustler,  0,        hustler,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?

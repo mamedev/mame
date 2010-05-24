@@ -1178,8 +1178,8 @@ static DRIVER_INIT( moonwarp )
  *
  *************************************/
 
-GAME( 1980, berzerk,  0,       berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 1)", 0 )
-GAME( 1980, berzerk1, berzerk, berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 2)", 0 )
-GAME( 1980, berzerkg, berzerk, berzerk, berzerkg,0, ROT0, "Stern", "Berzerk (German Speech)", 0 )
-GAME( 1981, frenzy,   0,       frenzy,  frenzy,  0, ROT0, "Stern", "Frenzy", 0 )
-GAME( 1981, moonwarp, 0,       frenzy,  moonwarp,moonwarp, ROT0, "Stern", "Moon War (prototype on Frenzy hardware)", 0)
+GAME( 1980, berzerk,  0,       berzerk, berzerk, 0, ROT0, "Stern Electronics", "Berzerk (set 1)", 0 )
+GAME( 1980, berzerk1, berzerk, berzerk, berzerk, 0, ROT0, "Stern Electronics", "Berzerk (set 2)", 0 )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg,0, ROT0, "Stern Electronics", "Berzerk (German Speech)", 0 )
+GAME( 1981, frenzy,   0,       frenzy,  frenzy,  0, ROT0, "Stern Electronics", "Frenzy", 0 )
+GAME( 1981, moonwarp, 0,       frenzy,  moonwarp,moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", 0)

@@ -41,7 +41,7 @@
    * HI-LO Double Up Joker Poker,         1983,  SMS Manufacturing Corp.
    * DRHL Poker (v.2.89),                 1986,  Drews Inc.
    * Turbo Poker 2,                       1993,  Micro Manufacturing, Inc.
-   * Fast Draw (poker conversion kit)?,   198?,  Stern/Seeburg?.
+   * Fast Draw (poker conversion kit)?,   198?,  Stern Electronics?
    * Draw Poker HI-LO (unknown, rev 1),   198?,  SMS Manufacturing Corp?.
    * Draw Poker HI-LO (unknown, rev 2),   198?,  SMS Manufacturing Corp?.
 
@@ -3195,7 +3195,7 @@ ROM_END
 
 /*
 
-  Fast Draw (Stern)?
+  Fast Draw (Stern Electronics)?
 
   Text font is different to other similar games.
 
@@ -3435,6 +3435,6 @@ GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,   ROT0, "Micro Manufactur
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
 
-GAME(  198?, fastdrwp, 0,       dphl,     norautp,  0,   ROT0, "Stern/Seeburg?",           "Fast Draw (poker conversion kit)?",   GAME_NOT_WORKING )
+GAME(  198?, fastdrwp, 0,       dphl,     norautp,  0,   ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   GAME_NOT_WORKING )
 GAME(  198?, dphlunka, 0,       dphl,     norautp,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   GAME_NOT_WORKING )
 GAME(  198?, dphlunkb, 0,       dphl,     norautp,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   GAME_NOT_WORKING )

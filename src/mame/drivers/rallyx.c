@@ -1389,7 +1389,7 @@ GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   0, ROT0,  "Namco (Midway lic
 GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  0, ROT0,  "Namco", "New Rally X", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx,  0, ROT0,  "Namco", "New Rally X (bootleg?) ", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, jungler,  0,        jungler,  jungler,  0, ROT90, "Konami", "Jungler", GAME_SUPPORTS_SAVE )
-GAME( 1981, junglers, jungler,  jungler,  jungler,  0, ROT90, "Konami (Stern license)", "Jungler (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1981, junglers, jungler,  jungler,  jungler,  0, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", GAME_SUPPORTS_SAVE )
 GAME( 1982, tactcian, 0,        tactcian, tactcian, 0, ROT90, "Konami (Sega license)", "Tactician (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, tactcian2,tactcian, tactcian, tactcian, 0, ROT90, "Konami (Sega license)", "Tactician (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, locomotn, 0,        locomotn, locomotn, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", GAME_SUPPORTS_SAVE )

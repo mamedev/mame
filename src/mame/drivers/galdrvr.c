@@ -6018,12 +6018,12 @@ GAME( 1981, frogg,    frogger,  galaxian, frogg,    frogg,    ROT90,  "bootleg",
     CPU/Video Board: KT-4108-2
     Sound Board:     KT-4108-1
 */
-GAME( 1981, turtles,  0,        turtles,  turtles,  turtles,  ROT90,  "Konami (Stern license)", "Turtles", GAME_SUPPORTS_SAVE )
+GAME( 1981, turtles,  0,        turtles,  turtles,  turtles,  ROT90,  "Konami (Stern Electronics license)", "Turtles", GAME_SUPPORTS_SAVE )
 GAME( 1981, turpin,   turtles,  turtles,  turpin,   turtles,  ROT90,  "Konami (Sega license)", "Turpin", GAME_SUPPORTS_SAVE )
 GAME( 1981, 600,      turtles,  turtles,  turtles,  turtles,  ROT90,  "Konami", "600", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, amidar,   0,        turtles,  amidar,   turtles,  ROT90,  "Konami", "Amidar", GAME_SUPPORTS_SAVE )
-GAME( 1982, amidaru,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "Konami (Stern license)", "Amidar (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1982, amidaru,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidaro,  amidar,   turtles,  amidaro,  turtles,  ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidarb,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amidar (bootleg)", GAME_SUPPORTS_SAVE ) /* Simular to Amigo bootleg */
 GAME( 1982, amigo,    amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amigo", GAME_SUPPORTS_SAVE )
@@ -6032,10 +6032,10 @@ GAME( 1982, amidars,  amidar,   scramble, amidars,  scramble, ROT90,  "Konami", 
 
 /* The End/Scramble based hardware */
 GAME( 1980, theend,   0,        theend,   theend,   theend,   ROT90,  "Konami", "The End", GAME_SUPPORTS_SAVE )
-GAME( 1980, theends,  theend,   theend,   theend,   theend,   ROT90,  "Konami (Stern license)", "The End (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1980, theends,  theend,   theend,   theend,   theend,   ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, scramble, 0,        scramble, scramble, scramble, ROT90,  "Konami", "Scramble", GAME_SUPPORTS_SAVE )
-GAME( 1981, scrambles,scramble, scramble, scramble, scramble, ROT90,  "Konami (Stern license)", "Scramble (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scrambles,scramble, scramble, scramble, scramble, ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics)", GAME_SUPPORTS_SAVE )
 GAME( 1981, strfbomb, scramble, scramble, strfbomb, scramble, ROT90,  "Omni", "Strafe Bomb", GAME_SUPPORTS_SAVE )
 GAME( 1981, explorer, scramble, explorer, explorer, explorer, ROT90,  "bootleg", "Explorer", GAME_SUPPORTS_SAVE )
 GAME( 1981, scramblebf,scramble,scramble, scramble, scramble, ROT90,  "Karateko (bootleg)", "Scramble (Karateko, French bootleg)", GAME_SUPPORTS_SAVE )
@@ -6059,26 +6059,26 @@ GAME( 1982, monsterz, 0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X
 /* scobra */
 GAME( 1981, scobra,    0,        scobra,   scobra,    scobra,   ROT90,  "Konami", "Super Cobra", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrase,  scobra,   scobra,   scobra,    scobra,   ROT90,  "Konami (Sega license)", "Super Cobra (Sega)", GAME_SUPPORTS_SAVE )
-GAME( 1981, scobras,   scobra,   scobra,   scobras,   scobra,   ROT90,  "Konami (Stern license)", "Super Cobra (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scobras,   scobra,   scobra,   scobras,   scobra,   ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrab,   scobra,   scobra,   scobras,   scobra,   ROT90,  "bootleg", "Super Cobra (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, suprheli,  scobra,   scobra,   scobras,   scobra,   ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, moonwar,   0,        moonwar,  moonwar,   moonwar,  ROT90,  "Stern", "Moonwar", GAME_SUPPORTS_SAVE )
-GAME( 1981, moonwara,  moonwar,  moonwar,  moonwara,  moonwar,  ROT90,  "Stern", "Moonwar (older)", GAME_SUPPORTS_SAVE )
+GAME( 1981, moonwar,   0,        moonwar,  moonwar,   moonwar,  ROT90,  "Stern Electronics", "Moonwar", GAME_SUPPORTS_SAVE )
+GAME( 1981, moonwara,  moonwar,  moonwar,  moonwara,  moonwar,  ROT90,  "Stern Electronics", "Moonwar (older)", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, armorcar,  0,        scobra,   armorcar,  scobra,   ROT90,  "Stern", "Armored Car (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, armorcar2, armorcar, scobra,   armorcar2, scobra,   ROT90,  "Stern", "Armored Car (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, armorcar,  0,        scobra,   armorcar,  scobra,   ROT90,  "Stern Electronics", "Armored Car (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, armorcar2, armorcar, scobra,   armorcar2, scobra,   ROT90,  "Stern Electronics", "Armored Car (set 2)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, tazmania,  0,        scobra,   tazmania,  scobra,   ROT90,  "Stern", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tazmania,  0,        scobra,   tazmania,  scobra,   ROT90,  "Stern Electronics", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, anteater,  0,        anteater, anteater,  anteater, ROT90,  "Stern (Tago license)", "Anteater", GAME_SUPPORTS_SAVE )
+GAME( 1982, anteater,  0,        anteater, anteater,  anteater, ROT90,  "Stern Electronics (Tago license)", "Anteater", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, calipso,   0,        scobra,   calipso,   calipso,  ROT90,  "Stern (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
+GAME( 1982, calipso,   0,        scobra,   calipso,   calipso,  ROT90,  "Stern Electronics (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, losttomb,  0,        scobra,   losttomb,  losttomb, ROT90,  "Stern", "Lost Tomb (easy)", GAME_SUPPORTS_SAVE )
-GAME( 1982, losttombh, losttomb, scobra,   losttomb,  losttomb, ROT90,  "Stern", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
+GAME( 1982, losttomb,  0,        scobra,   losttomb,  losttomb, ROT90,  "Stern Electronics", "Lost Tomb (easy)", GAME_SUPPORTS_SAVE )
+GAME( 1982, losttombh, losttomb, scobra,   losttomb,  losttomb, ROT90,  "Stern Electronics", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
 
-GAME( 1984, spdcoin,   0,        scobra,   spdcoin,   scobra,   ROT90,  "Stern", "Speed Coin (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1984, spdcoin,   0,        scobra,   spdcoin,   scobra,   ROT90,  "Stern Electronics", "Speed Coin (prototype)", GAME_SUPPORTS_SAVE )
 
 GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatron USA", "Agent Super Bond (Scobra Hardware)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
@@ -6130,14 +6130,14 @@ GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatr
 
 /* currently in scobra.c and should be moved here */
 //GAME( 1981, stratgyx, 0,        scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
-//GAME( 1981, stratgys, stratgyx, scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "Konami (Stern license)", "Strategy X (Stern)", GAME_SUPPORTS_SAVE )
-//GAME( 1982, darkplnt, 0,        scobra/*darkplnt*/, darkplnt, darkplnt,     ROT180, "Stern", "Dark Planet", GAME_SUPPORTS_SAVE )
-//GAME( 1982, tazmani2, tazmania, scobra/*type2*/,    tazmania, tazmani2,     ROT90,  "Stern", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
+//GAME( 1981, stratgys, stratgyx, scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
+//GAME( 1982, darkplnt, 0,        scobra/*darkplnt*/, darkplnt, darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
+//GAME( 1982, tazmani2, tazmania, scobra/*type2*/,    tazmania, tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, anteatg,  anteater, scobra/*anteatg*/,  anteatg,  scramble_ppi, ROT90,  "TV-Tuning (F.E.G. license)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, anteatgb, anteater, scobra/*anteatgb*/, anteatgb, scramble_ppi, ROT90,  "Free Enterprise Games", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
-//GAME( 1982, rescue,   0,        scobra/*rescue*/,   rescue,   rescue,       ROT90,  "Stern", "Rescue", GAME_SUPPORTS_SAVE )
+//GAME( 1982, rescue,   0,        scobra/*rescue*/,   rescue,   rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
 //GAME( 1982, aponow,   rescue,   scobra/*rescue*/,   rescue,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
-//GAME( 1983, minefld,  0,        scobra/*minefld*/,  minefld,  minefld,      ROT90,  "Stern", "Minefield", GAME_SUPPORTS_SAVE )
+//GAME( 1983, minefld,  0,        scobra/*minefld*/,  minefld,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
 //GAME( 1981, hustler,  0,        scobra/*hustler*/,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 //GAME( 1981, billiard, hustler,  scobra/*hustler*/,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards", GAME_SUPPORTS_SAVE )
 //GAME( 1981, hustlerb, hustler,  scobra/*hustlerb*/, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )

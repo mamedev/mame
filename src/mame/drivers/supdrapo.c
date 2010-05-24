@@ -1,6 +1,6 @@
 /************************************************************************
 
-  Super Draw Poker (c) Stern 1983
+  Super Draw Poker (c) Stern Electronics 1983
 
   Driver by Pierpaolo Prazzoli.
   Additional work by Angelo Salese & Roberto Fresca.
@@ -538,5 +538,5 @@ ROM_END
 **********************************************************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT  ROT     COMPANY                               FULLNAME                   FLAGS... */
-GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, 0,    ROT90, "Valadon Automation (Stern license)", "Super Draw Poker (set 1)", 0 )
-GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, 0,    ROT90, "Valadon Automation / Jeutel",        "Super Draw Poker (set 2)", 0 )
+GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)", 0 )
+GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, 0,    ROT90, "Valadon Automation / Jeutel", "Super Draw Poker (set 2)", 0 )

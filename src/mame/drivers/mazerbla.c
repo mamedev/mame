@@ -1,7 +1,7 @@
 /****************************************************************************
 
-Mazer Blazer by Stern (c) 1983
-Great Guns by Stern (c) 1983
+Mazer Blazer by Stern Electronics (c) 1983
+Great Guns by Stern Electronics (c) 1983
 
 
 Driver by Jarek Burczynski
@@ -1705,6 +1705,6 @@ static DRIVER_INIT( greatgun )
 	rom[0x0380] = 0;
 }
 
-GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla, ROT0, "Stern", "Mazer Blazer (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerbla, mazerbla, ROT0, "Stern", "Mazer Blazer (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1983, greatgun,  0,        greatgun,  greatgun, greatgun, ROT0, "Stern", "Great Guns", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerbla, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1983, greatgun,  0,        greatgun,  greatgun, greatgun, ROT0, "Stern Electronics", "Great Guns", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
