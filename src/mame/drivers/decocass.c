@@ -1,6 +1,29 @@
 /***********************************************************************
 
     DECO Cassette System driver
+    by Juergen Buchmueller
+    with contributions by:
+    David Widel
+    Nicola Salmoria
+    Aaron Giles
+    Brian Troha
+    Fabio Priuli
+    Lord Nightmare
+    The Dumping Union
+
+    The DECO cassette system consists of three PCBS in a card cage:
+    One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
+    Older systems may have a DSP-3 board instead of an RMS-8 board, only difference seems to be the layout of the rom on that board (3 x 2716 instead of 1 x 2716 and 1 x 2732)
+    TODO: verify DSP-3 info.
+
+    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor and graphics)
+
+    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it (cassette control, inputs)
+
+
+    The actual cassettes use a custom player hooked to the BIO-8 board, and are roughly microcassette form factor, but are larger and will not fit in a microcassette player.
+
+
 
  ***********************************************************************/
 
@@ -886,9 +909,9 @@ MACHINE_DRIVER_END
 #define DECOCASS_BIOS \
 	ROM_REGION( 0x10000, "maincpu", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "v0a.7e, older 1-chip bios?" ) \
-	ROM_LOAD_BIOS( 0, "v0a.7e",     0xf000, 0x1000, CRC(3D33AC34) SHA1(909D59E7A993AFFD10224402B4370E82A5F5545C) ) /* from RMS-8 board; has HDRA01HDR string in it, 2732 EPROM */ \
+	ROM_LOAD_BIOS( 0, "v0a.7e",     0xf000, 0x1000, CRC(3D33AC34) SHA1(909D59E7A993AFFD10224402B4370E82A5F5545C) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A' label (has HDRA01HDR string inside it), bios code */ \
 	ROM_SYSTEM_BIOS( 1, "bios1", "rms8.7e, newer 1-chip bios?" ) \
-	ROM_LOAD_BIOS( 1, "rms8.7e",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board; has HDRB01HDR string in it, maybe should be called v0b.7e? */ \
+	ROM_LOAD_BIOS( 1, "rms8.7e",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/unknown label (probably 'V0B', needs checking; has HDRB01HDR string in it), bios code */ \
 	ROM_SYSTEM_BIOS( 2, "bios2", "dsp3.p0b & dsp3.p1b 2-chip bios?" ) /* from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
 	ROM_LOAD_BIOS( 2, "dsp3.p0b",     0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
 	ROM_LOAD_BIOS( 2, "dsp3.p1b",     0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
@@ -897,15 +920,15 @@ MACHINE_DRIVER_END
 	DECOCASS_BIOS \
 \
 	ROM_REGION( 0x10000, "audiocpu", 0 )	  \
-	ROM_LOAD( "v1.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* was rms8.snd; is 2716 eprom at 5A on RMS-8 board, with V1 label, may be on DSP-3 board version as well*/ \
+	ROM_LOAD( "v1.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1 label,  contains audio cpu code */ \
 \
-	ROM_REGION( 0x10000, "mcu", 0 )	  /* 4k for the MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
-	ROM_LOAD( "d8041-535.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) )  /* "NEC // JAPAN // X1202D-108 // D8041C 535"@1C on B10-8 board */ \
+	ROM_REGION( 0x10000, "mcu", 0 )	  /* 4k for the 8041 MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
+	ROM_LOAD( "d8041-535.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) )  /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff */ \
 \
 	ROM_REGION( 0x00060, "proms", 0 )	  /* PROMS */ \
-	ROM_LOAD( "dsp8.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) \
-	ROM_LOAD( "dsp8.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) \
-	ROM_LOAD( "rms8.j3",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* DRAM banking and timing */ \
+	ROM_LOAD( "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD( "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD( "v3.j3",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @J3 w/'V3' stamp, handles DRAM banking and timing */ \
 
 
 ROM_START( decocass )
