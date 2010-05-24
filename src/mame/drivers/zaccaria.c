@@ -570,7 +570,7 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(60.57) /* verified from pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -598,7 +598,7 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
 	/* 162kHz measured on pin 3 20 minutesa fter power on. Clock would then be 162*4=648kHz. */
-	MDRV_SOUND_ADD("tms", TMS5200, 640000)
+	MDRV_SOUND_ADD("tms", TMS5200, 649200) /* ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that) */
 	MDRV_SOUND_CONFIG(tms5220_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
