@@ -5868,9 +5868,9 @@ GAME( 1979, superg,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "S
 GAME( 1979, galturbo, galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Galaxian Turbo (superg hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galapx,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Galaxian Part X (moonaln hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galap1,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Space Invaders Galactica (galaxiana hack)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galap4,   galaxian, galaxian, superg,   galaxian, ROT90,  "G.G.I", "Galaxian Part 4 (hack)", GAME_SUPPORTS_SAVE )
-GAME( 1979, swarm,    galaxian, galaxian, swarm,    galaxian, ROT90,  "Subelectro", "Swarm (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian, ROT90,  "Petaco S.A.", "Zero Time", GAME_SUPPORTS_SAVE )
+GAME( 1979, galap4,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack (G.G.I)", "Galaxian Part 4 (hack)", GAME_SUPPORTS_SAVE )
+GAME( 1979, swarm,    galaxian, galaxian, swarm,    galaxian, ROT90,  "bootleg? (Subelectro)", "Swarm (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian, ROT90,  "bootleg? (Petaco S.A.)", "Zero Time", GAME_SUPPORTS_SAVE )
 GAME( 1979, starfght, galaxian, galaxian, swarm,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, supergx,  galaxian, galaxian, superg,   galaxian, ROT90,  "Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
@@ -5888,7 +5888,7 @@ GAME( 19??, omega,    theend,   galaxian, omega,    galaxian, ROT270, "bootleg?"
 GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
 GAME( 1981, warofbugg,warofbug, galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1981, redufo,   0,        galaxian, redufo,   nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE )
-GAME( 19??, exodus,   redufo,   galaxian, exodus,   nolock,   ROT90,  "Subelectro", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 19??, exodus,   redufo,   galaxian, exodus,   nolock,   ROT90,  "bootleg? (Subelectro)", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1983, tdpgal,   0,        galaxian, tdpgal,   nolock,   ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", GAME_SUPPORTS_SAVE )
 GAME( 1979, kamakazi3,galaxian, galaxian, superg,   nolock,	  ROT90,  "hack", "Kamakazi III (superg hack)", GAME_SUPPORTS_SAVE )
 
@@ -5922,8 +5922,8 @@ GAME( 1982, tenspot,  0,        tenspot,  tenspot,  tenspot,  ROT270, "Thomas Au
 GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )
 
 /* sound hardware replaced with AY8910 */
-GAME( 1982, zigzag,   0,        zigzag,   zigzag,   zigzag,   ROT90,  "LAX", "Zig Zag (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, zigzag2,  zigzag,   zigzag,   zigzag,   zigzag,   ROT90,  "LAX", "Zig Zag (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zigzag,   0,        zigzag,   zigzag,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zigzag2,  zigzag,   zigzag,   zigzag,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
 
 /* multi-game select via external switch */
 GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax,  gmgalax,  ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
@@ -5944,18 +5944,18 @@ GAME( 1980, mooncrst,  0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibut
 GAME( 1980, mooncrstuk,mooncrst, mooncrst, mooncrst, mooncrst, ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrstu, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu USA, unencrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrsto, mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrstg, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Gremlin", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrstg, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
 
 /* straight Moon Cresta ripoffs on basic mooncrst hardware */
 GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
-GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, mooncrsu, ROT90,  "Subelectro", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Centuri", "Eagle (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Centuri", "Eagle (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Centuri", "Eagle (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Fortrek", "Space Thunderbird", GAME_SUPPORTS_SAVE )
-GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "Gremlin", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
+GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, mooncrsu, ROT90,  "bootleg? (Subelectro)", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 3)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", GAME_SUPPORTS_SAVE )
+GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
 GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 // The boards were marked 'Space Dragon' although this doesn't appear in the games.
 GAME( 1980, spcdrag,  mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
@@ -5967,7 +5967,7 @@ GAME( 1980, moonal2,  galaxian, mooncrst, moonal2,  galaxian, ROT90,  "Nichibuts
 GAME( 1980, moonal2b, galaxian, mooncrst, moonal2,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2 (older version)", GAME_SUPPORTS_SAVE )
 
 /* larger romspace, interrupt enable moved */
-GAME( 198?, thepitm,  thepit,   mooncrst, thepitm,  thepitm,  ROT90,  "KZH", "The Pit (bootleg on Moon Quasar hardware)", GAME_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
+GAME( 198?, thepitm,  thepit,   mooncrst, thepitm,  thepitm,  ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", GAME_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
 
 
 /* other games on basic mooncrst hardware */
@@ -6008,7 +6008,7 @@ GAME( 1981, froggers1, frogger, frogger,  frogger,  frogger,  ROT90,  "Konami (S
 GAME( 1981, froggers2, frogger, frogger,  frogger,  frogger,  ROT90,  "Konami (Sega license)", "Frogger (Sega set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, froggermc, frogger, froggrmc, froggrmc, froggrmc, ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1981, froggers, frogger,  froggers, frogger,  froggers, ROT90,  "bootleg", "Frog", GAME_SUPPORTS_SAVE )
-GAME( 1981, frogf,    frogger,  frogf,    frogger,  froggers, ROT90,  "Falcon", "Frog (Falcon bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, frogf,    frogger,  frogf,    frogger,  froggers, ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, frogg,    frogger,  galaxian, frogg,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 
 
@@ -6036,9 +6036,9 @@ GAME( 1980, theends,  theend,   theend,   theend,   theend,   ROT90,  "Konami (S
 
 GAME( 1981, scramble, 0,        scramble, scramble, scramble, ROT90,  "Konami", "Scramble", GAME_SUPPORTS_SAVE )
 GAME( 1981, scrambles,scramble, scramble, scramble, scramble, ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1981, strfbomb, scramble, scramble, strfbomb, scramble, ROT90,  "Omni", "Strafe Bomb", GAME_SUPPORTS_SAVE )
+GAME( 1981, strfbomb, scramble, scramble, strfbomb, scramble, ROT90,  "bootleg? (Omni)", "Strafe Bomb", GAME_SUPPORTS_SAVE )
 GAME( 1981, explorer, scramble, explorer, explorer, explorer, ROT90,  "bootleg", "Explorer", GAME_SUPPORTS_SAVE )
-GAME( 1981, scramblebf,scramble,scramble, scramble, scramble, ROT90,  "Karateko (bootleg)", "Scramble (Karateko, French bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scramblebf,scramble,scramble, scramble, scramble, ROT90,  "bootleg (Karateko)", "Scramble (Karateko, French bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, atlantis, 0,        theend,   atlantis, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, atlantis2,atlantis, theend,   atlantis, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 2)", GAME_SUPPORTS_SAVE )
