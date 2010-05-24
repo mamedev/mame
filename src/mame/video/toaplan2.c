@@ -1561,8 +1561,9 @@ VIDEO_UPDATE( dogyuun_1 )
 VIDEO_UPDATE( batsugun_1 )
 {
 	int priority;
-	static int bg1=0,fg1=0,tp1=0; // Fix
-	UINT32 *vramp;    // Fix
+	static int bg1=0,fg1=0,tp1=0;						// Fix
+	UINT32 *vramp;										// Fix
+	static int bg[2]={0,0},fg[2]={0,0},top[2]={0,0};	// Fix
 
 	toaplan2_log_vram(screen->machine);
 
@@ -1574,6 +1575,27 @@ VIDEO_UPDATE( batsugun_1 )
 	bitmap_fill(bitmap,cliprect,0);
 
 //Fix
+	bg[0]=0;fg[0]=0;top[0]=0;
+	bg[1]=0;fg[1]=0;top[1]=0;
+
+	for (priority = 0; priority < 16; priority++)
+	{
+		if (bg_tile_priority[0][priority]) bg[0]++;
+		if (fg_tile_priority[0][priority]) fg[0]++;
+		if (top_tile_priority[0][priority]) top[0]++;
+		if (bg_tile_priority[1][priority]) bg[1]++;
+		if (fg_tile_priority[1][priority]) fg[1]++;
+		if (top_tile_priority[1][priority]) top[1]++;
+	}
+
+	if( (bg[0]==1 && bg[1]==1 && fg[0]==1 && fg[1]==1 && top[0]==1 && top[1]==1)||
+		(bg[0]==1 && bg[1]==2 && fg[0]==1 && fg[1]==1 && top[0]==1 && top[1]==1)||
+		(bg[0]==1 && bg[1]==2 && fg[0]==1 && fg[1]==2 && top[0]==1 && top[1]==1)){
+		tp1=1;
+	} else {
+		tp1=0;
+	}
+
 	vramp = (UINT32*)bgvideoram16[1];
 	if(*(vramp+28)==0x225e027a){
 		bg1=0;
@@ -1594,15 +1616,6 @@ VIDEO_UPDATE( batsugun_1 )
 		fg1=3;
 	}
 
-	vramp = (UINT32*)topvideoram16[1];
-	if(*(vramp+28)==0x0000007f){
-		tp1=0;
-	} else {
-		tp1=1;
-	}
-
-//	popmessage("bg1=%d  fg1=%d  tp1=%d",bg1,fg1,tp1);
-
 	for (priority = 0; priority < 16; priority++){
 		if (top_tile_priority[1][priority] && tp1==1) tilemap_draw(bitmap,cliprect,top_tilemap[1],priority,0);  /* 3 */
 		if (bg_tile_priority[1][priority] && bg1==2) tilemap_draw(bitmap,cliprect,bg_tilemap[1],priority,0);    /* 5 */
@@ -1618,9 +1631,9 @@ VIDEO_UPDATE( batsugun_1 )
 		if (fg_tile_priority[1][priority] && fg1==2) tilemap_draw(bitmap,cliprect,fg_tilemap[1],priority,0);    /* 4 */
 		if (top_tile_priority[1][priority] && tp1==0) tilemap_draw(bitmap,cliprect,top_tilemap[1],priority,0);  /* 3 */
 		if (sprite_priority[1][priority]) draw_sprites(screen->machine,bitmap,cliprect,1,priority,0);
+		if (bg_tile_priority[1][priority] && tp1==1) tilemap_draw(bitmap,cliprect,bg_tilemap[1],priority,0);    /* 5 */
 	}
 //Fix END
-
 	return 0;
 }
 
