@@ -3916,6 +3916,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( goldnaxe2 )	/* (c) 1989 (8751) */
 	DRIVER( goldnaxe1 )	/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( hwchamp )	/* (c) 1987 */
+	DRIVER( hwchampj )	/* (c) 1987 (FD1094, decrypted) */
 	DRIVER( mvp )		/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( mvpj )		/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( passsht )	/* (c) 1988 (FD1094, decrypted) */
