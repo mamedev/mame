@@ -4523,8 +4523,8 @@ static DRIVER_INIT( korokoro )
 
 ***************************************************************************/
 
-GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus/Cave",                           "Power Instinct 2 (US, Ver. 94/04/08)",                   0 )
-GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)",           0 )
+GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus",                                "Power Instinct 2 (US, Ver. 94/04/08)",                   0 )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)",           0 )
 
 // The EEPROM determines the region, program roms are the same between sets
 GAME( 1994, mazinger,   0,        mazinger, cave,     mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (World)",                                     0 )
@@ -4538,8 +4538,8 @@ GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/C
 GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Metamoqester (International)",                           0 )
 GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Oni - The Ninja Master (Japan)",                         0 )
 
-GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Power Instinct Legends (US, Ver. 95/06/20)",             0 )
-GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus/Cave",                           "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                "Power Instinct Legends (US, Ver. 95/06/20)",             0 )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
 
 // The EEPROM determines the region, program roms are the same between sets
 GAME( 1995, sailormn,   0,        sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    0 )
