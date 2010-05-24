@@ -1515,7 +1515,12 @@ INT32 debug_global_input_code_pressed(input_code code)
 	return input_code_pressed(stashed_machine, code);
 }
 
-
+INT32 debug_global_input_code_pressed_once(input_code code)
+{
+	if (!mame_is_valid_machine(stashed_machine))
+		return 0;
+	return input_code_pressed_once(stashed_machine, code);
+}
 
 /***************************************************************************
     INTERNAL FUNCTIONS
