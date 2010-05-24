@@ -9231,9 +9231,9 @@ GAME( 1993, dinohunt, dino,     wofhfh,     dinoh,    dinohunt, ROT0,   "bootleg
 GAME( 1993, punisher, 0,        qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (World 930422)", GAME_SUPPORTS_SAVE )		// "ETC"
 GAME( 1993, punisheru,punisher, qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (US 930422)", GAME_SUPPORTS_SAVE )
 GAME( 1993, punisherj,punisher, qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (Japan 930422)", GAME_SUPPORTS_SAVE )
-GAME( 1993, punipic,  punisher, cpspicb,    punipic,  punisher, ROT0,   "Capcom", "The Punisher (bootleg with PIC16c57, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, punipic2, punisher, cpspicb,    punipic,  punisher, ROT0,   "Capcom", "The Punisher (bootleg with PIC16c57, set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, punipic3, punisher, cpspicb,    punipic,  punisher, ROT0,   "Capcom", "The Punisher (bootleg with PIC16c57, set 3)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, punipic,  punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, punipic2, punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, punipic3, punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1993, punisherbz,punisher,wofhfh,   punisherbz, cps1,     ROT0,   "bootleg","Biaofeng Zhanjing (Chinese bootleg of The Punisher)", GAME_SUPPORTS_SAVE ) // (c)2002, they ripped the sound from Final Fight!
 
 GAME( 1993, slammast, 0,        qsound,     slammast, slammast, ROT0,   "Capcom", "Saturday Night Slam Masters (World 930713)", GAME_SUPPORTS_SAVE )		// "ETC"

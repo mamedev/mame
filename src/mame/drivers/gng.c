@@ -731,8 +731,8 @@ static DRIVER_INIT( diamond )
 
 GAME( 1985, gng,       0,   gng, gng,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gnga,      gng, gng, gng,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gngbl,     gng, gng, gng,      0,       ROT0, "Capcom", "Ghosts'n Goblins (bootleg with Cross)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gngblita,  gng, gng, gng,      0,       ROT0, "Capcom", "Ghosts'n Goblins (Italian bootleg, harder)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gngbl,     gng, gng, gng,      0,       ROT0, "bootleg", "Ghosts'n Goblins (bootleg with Cross)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gngblita,  gng, gng, gng,      0,       ROT0, "bootleg", "Ghosts'n Goblins (Italian bootleg, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gngc,      gng, gng, gng,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 3)", GAME_SUPPORTS_SAVE ) // rev c?
 GAME( 1985, gngt,      gng, gng, gng,      0,       ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", GAME_SUPPORTS_SAVE )
 GAME( 1985, makaimur,  gng, gng, makaimur, 0,       ROT0, "Capcom", "Makai-Mura (Japan)", GAME_SUPPORTS_SAVE )
