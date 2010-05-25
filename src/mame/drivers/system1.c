@@ -4711,7 +4711,7 @@ GAME( 1985, nprincesu,  seganinj, sys1ppi,  seganinj,  bank00,   ROT0,   "Sega",
 GAME( 1986, wboy2,      wboy,     sys1ppi,  wboy,      wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,     wboy,     sys1ppi,  wboy,      bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe,   wboy,     sys1ppi,  wbdeluxe,  bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1986, nob,        0,        nobm,     nob,       nob,      ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, nob,        0,        nobm,     nob,       nob,      ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, nobb,       nob,      nob,      nob,       nobb,     ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
 
 /* PIO-based System 1 */
@@ -4732,7 +4732,7 @@ GAME( 1985, imsorry,    0,        sys1pio,  imsorry,   imsorry,  ROT0,   "Corela
 GAME( 1985, imsorryj,   imsorry,  sys1pio,  imsorry,   imsorry,  ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, teddybb,    0,        sys1pio,  teddybb,   teddybb,  ROT0,   "Sega",            "TeddyBoy Blues (315-5115, New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, teddybbo,   teddybb,  sys1pio,  teddybb,   teddybb,  ROT0,   "Sega",            "TeddyBoy Blues (315-5115, Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1985, myhero,     0,        sys1pio,  myhero,    bank00,   ROT0,   "Sega",            "My Hero (US, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, myhero,     0,        sys1pio,  myhero,    bank00,   ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1985, sscandal,   myhero,   sys1pio,  myhero,    myheroj,  ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, myherok,    myhero,   sys1pio,  myhero,    myherok,  ROT0,   "Coreland / Sega", "My Hero (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 4dwarrio,   0,        sys1pio,  4dwarrio,  4dwarrio, ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", GAME_SUPPORTS_SAVE )
