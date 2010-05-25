@@ -76,7 +76,7 @@ Graphic hack games:
 
 Needed roms:
 - Babel no Tou               (by Namco, 1986)
-- Family Boxing              (by Namco/Woodplace, 1987; Japan version of TKO Boxing)
+- Family Boxing              (by Namco/Wood Place, 1987; Japan version of TKO Boxing)
 - Family Stadium '87         (by Namco, 1987; sequel to RBI Baseball)
 - Family Stadium '88         (by Namco, 1988; sequel to RBI Baseball)
 - Family Tennis              (by Namco, 1987)

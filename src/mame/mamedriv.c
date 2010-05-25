@@ -391,7 +391,7 @@ const game_driver * const drivers[] =
 	DRIVER( seicross )	/* (c) 1984 + Alice */
 	DRIVER( sectrzon )	/* (c) 1984 + Alice */
 	DRIVER( firebatl )	/* (c) 1984 Taito */
-	DRIVER( clshroad )	/* (c) 1986 Woodplace Inc. */
+	DRIVER( clshroad )	/* (c) 1986 Wood Place Inc. */
 	DRIVER( clshroads )	/* (c) 1986 Status Games */
 	DRIVER( tubep )		/* (c) 1984 + Fujitek */
 	DRIVER( tubepb )	/* (c) 1984 + bootleg */
@@ -3818,8 +3818,6 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( suprlocoa )	/* (c) 1982 Sega */
 	DRIVER( dotrikun )	/* cabinet test board */
 	DRIVER( dotrikun2 )	/* cabinet test board */
-	DRIVER( flower )	/* (c) 1986 Komax license */
-	DRIVER( flowerj )	/* 834-5998 (c) 1986 Sega / Alpha */
 	DRIVER( spcpostn )	/* (c) 1986 Sega / Nasco" */
 	DRIVER( angelkds )	/* 833-6599 (c) 1988 Sega / Nasco? */
 	DRIVER( calorie )	/* (c) 1986 Sega */
@@ -8822,11 +8820,13 @@ Other Sun games
 	DRIVER( ddayc )		/* (c) 1982 Olympia + Centuri license */
 	DRIVER( stactics )	/* [1981 Sega] */
 	DRIVER( exterm )	/* (c) 1989 Premier Technology - a Gottlieb game */
-	DRIVER( kingofb )	/* (c) 1985 Woodplace Inc. */
+	DRIVER( flower )	/* (c) 1986 Komax license */
+	DRIVER( flowerj )	/* 834-5998 (c) 1986 Sega / Alpha license? */
+	DRIVER( kingofb )	/* (c) 1985 Wood Place Inc. */
 	DRIVER( ringking )	/* (c) 1985 Data East USA */
 	DRIVER( ringking2 )	/* (c) 1985 Data East USA */
 	DRIVER( ringking3 )	/* (c) 1985 Data East USA */
-	DRIVER( ringkingw )	/* (c) 1985 Woodplace Inc. */
+	DRIVER( ringkingw )	/* (c) 1985 Wood Place Inc. */
 	DRIVER( homo )		/* bootleg */
 	DRIVER( dlair )		/* (c) 1983 Cinematronics */
 	DRIVER( dlairf )	/* (c) 1983 Cinematronics */
@@ -8982,7 +8982,7 @@ Other Sun games
 	DRIVER( crgolfbt )	/* bootleg */
 	DRIVER( crgolfhi )	/* (c) 1984 Nasco Japan */
 	DRIVER( truco )		/* (c) 198? Playtronic SRL */
-	DRIVER( thedeep )	/* (c) 1987 Woodplace */
+	DRIVER( thedeep )	/* (c) 1987 Wood Place */
 	DRIVER( rundeep )	/* (c) 1988 Cream (bootleg?) */
 	DRIVER( wallc )		/* (c) 1984 Midcoin */
 	DRIVER( wallca )	/* (c) 1984 Midcoin */

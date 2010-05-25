@@ -464,5 +464,5 @@ die once, it would be nice to avoid the hack however
 }
 
 GAME( 1984, firebatl, 0,        firebatl, firebatl, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, clshroad, 0,        clshroad, clshroad, 0,        ROT0,  "Woodplace Inc.", "Clash-Road", 0 )
-GAME( 1986, clshroads,clshroad, clshroad, clshroad, 0,        ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )
+GAME( 1986, clshroad, 0,        clshroad, clshroad, 0,        ROT0,  "Wood Place Inc.", "Clash-Road", 0 )
+GAME( 1986, clshroads,clshroad, clshroad, clshroad, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )

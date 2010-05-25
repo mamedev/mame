@@ -365,5 +365,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Sega / Alpha Denshi Co. (Komax license)", "Flower (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, flowerj, flower, flower, flower, 0, ROT0, "Sega / Alpha Denshi Co.", "Flower (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Wood Place Inc. (Komax license)", "Flower (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, flowerj, flower, flower, flower, 0, ROT0, "Wood Place Inc. (Sega / Alpha license)", "Flower (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
