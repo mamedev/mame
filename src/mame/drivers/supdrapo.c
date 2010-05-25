@@ -527,10 +527,68 @@ ROM_START( supdrapoa )
 	ROM_LOAD( "6.l4",	0x2000, 0x1000, CRC(d70cd50e) SHA1(c3e3dcf79f8a25df5b878ef8734a6d0dc22004ba) )
 	ROM_LOAD( "5.k4",	0x3000, 0x1000, CRC(34564917) SHA1(90b49fe8a5371159388839d42913352cf58c60e6) )
 
-	ROM_REGION( 0x00200, "proms", 0 )	/* using the color PROMs from the parent set */
-	ROM_LOAD( "a1-9n",        0x0000, 0x0100, BAD_DUMP CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
-	ROM_LOAD( "a1-9p",        0x0100, 0x0100, BAD_DUMP CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
+	ROM_REGION( 0x00200, "proms", 0 )	/* using the color PROMs from the parent set - no reason to think they differ */
+	ROM_LOAD( "a1-9n",        0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
+	ROM_LOAD( "a1-9p",        0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
 ROM_END
+
+/*
+Poker Relance Gamble
+EMU Infos dumper 	f205v
+manufacturer 	Valadon Automation
+
+Technical references
+
+CPUs
+QTY		Type 		clock 		position 	function
+1x		NEC D780C 				2c 			8-bit Microprocessor - main
+1x		AY-3-8910 				2a 			Programmable Sound Generator - sound
+1x		LM380N 					10b 		Audio Amplifier - sound
+1x 		oscillator 	12.000MHz 	5b 	
+
+ROMs
+QTY 	Type 					position 	status
+9x 		ET2732Q 				0-8 		dumped
+1x		DM74S287N 				9n,9p 		dumped
+
+RAMs
+QTY 	Type 					position
+8x 		MM2114N-3 				1k,1l,1m,1n,2f,3f,3h,3j
+1x 		MWS5101AEL2 			2p
+
+Others
+
+1x 22x2 edge connector
+1x 31x2 thin edge connector
+1x trimmer (volume)(10a)
+2x 8x2 switches DIP (8a,9a)
+
+Notes
+
+At 2l there is an empty space with "batt." handwritten on the PCB
+At 1p there is an unmarked DIP20 mil.300 chip. 
+
+*/
+
+ROM_START( supdrapob )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pok0.1c",	0x0000, 0x1000, CRC(b53f0470) SHA1(79003cc957e22d5bde720b6f4caed5481edd2c7e) )
+	ROM_LOAD( "pok1.1d",	0x1000, 0x1000, CRC(9797a42d) SHA1(65446317e6f1a2de53dd10146338fb63bd5b0a99) )
+	ROM_LOAD( "pok2.1ef",	0x2000, 0x1000, CRC(2b7a5baa) SHA1(dd86bb35692eabc1482768cf0bc082f3e0bd90fe) )
+	ROM_LOAD( "pok3.1h",	0x3000, 0x1000, CRC(9c3ea609) SHA1(612f455515f367b7d59608528d06221665da8876) )
+	ROM_LOAD( "pok4.1j",	0x4000, 0x1000, CRC(52025ba3) SHA1(923de6110a3608698a31baf552d4854b1053cc0e) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "pok8.4p",	0x0000, 0x1000, CRC(82b387e1) SHA1(d7b7e4f7b5b8082438444ce1fa585917ae737bcf) )
+	ROM_LOAD( "pok7.4n",	0x1000, 0x1000, CRC(6ab0ad02) SHA1(86b22ab3ceb69f981aa32247c93411631c33a6e8) )
+	ROM_LOAD( "pok6.4lm",	0x2000, 0x1000, CRC(c8eab65c) SHA1(c4d37fed9675d8bb051e6f97e56f27450a24ddb8) )
+	ROM_LOAD( "pok5.4k",	0x3000, 0x1000, CRC(2c0bb656) SHA1(aa2f309afcdefda5e40be0a354d0b3e5548c44bb) )
+
+	ROM_REGION( 0x00200, "proms", 0 )
+	ROM_LOAD( "dm74s287n.9n",        0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
+	ROM_LOAD( "dm74s287n.9p",        0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
+ROM_END
+
 
 
 /*********************************************************************
@@ -540,3 +598,4 @@ ROM_END
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT  ROT     COMPANY                               FULLNAME                   FLAGS... */
 GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)", 0 )
 GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, 0,    ROT90, "Valadon Automation / Jeutel", "Super Draw Poker (set 2)", 0 )
+GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, 0,    ROT90, "bootleg", "Super Draw Poker (bootleg)", 0 )

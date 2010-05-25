@@ -7209,6 +7209,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pickin )	/* (c) 1983 */
 	DRIVER( supdrapo )	/* (c) 1983 + Stern license */
 	DRIVER( supdrapoa )	/* (c) 1983 + Jeutel license? */
+	DRIVER( supdrapob )	/* bootleg */
 	DRIVER( sbagman )	/* (c) 1984 */
 	DRIVER( sbagmans )	/* (c) 1984 + Stern license */
 	DRIVER( botanic )	/* (c) 1985 */
