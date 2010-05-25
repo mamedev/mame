@@ -780,11 +780,11 @@ static MACHINE_DRIVER_START( lwings )
 	MDRV_DRIVER_DATA(lwings_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* Trojan is /4, but lwings needs more.  Still needs to be verified by PCB */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on PCB */
 	MDRV_CPU_PROGRAM_MAP(lwings_map)
 	MDRV_CPU_VBLANK_INT("screen", lwings_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4)	/* verified with trojan pcb */
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_12MHz/3)	/* verified on PCB */
 	MDRV_CPU_PROGRAM_MAP(lwings_sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* ??? */
 
@@ -811,13 +811,13 @@ static MACHINE_DRIVER_START( lwings )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2203a", YM2203, XTAL_12MHz/8)	/* verified with trojan pcb */
+	MDRV_SOUND_ADD("2203a", YM2203, XTAL_12MHz/8)	/* verified on PCB */
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.10)
 
-	MDRV_SOUND_ADD("2203b", YM2203, XTAL_12MHz/8)	/* verified with trojan pcb */
+	MDRV_SOUND_ADD("2203b", YM2203, XTAL_12MHz/8)	/* verified on PCB */
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
@@ -828,10 +828,12 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_IMPORT_FROM( lwings )
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_12MHz/4)	/* verified by PCB */
+	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_12MHz/4)	/* verified on PCB */
 	MDRV_CPU_PROGRAM_MAP(trojan_map)
 
-	MDRV_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)	/* verified on pcb */
+	MDRV_CPU_REPLACE("soundcpu", Z80, XTAL_12MHz/4)	/* verified on PCB */
+
+	MDRV_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)	/* verified on PCB */
 	MDRV_CPU_PROGRAM_MAP(trojan_adpcm_map)
 	MDRV_CPU_IO_MAP(trojan_adpcm_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4000)
@@ -843,7 +845,7 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_VIDEO_UPDATE(trojan)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("5205", MSM5205, XTAL_455kHz)	/* verified on pcb */
+	MDRV_SOUND_ADD("5205", MSM5205, XTAL_455kHz)	/* verified on PCB */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
