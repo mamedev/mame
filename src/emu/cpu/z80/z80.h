@@ -3,6 +3,12 @@
 #ifndef __Z80_H__
 #define __Z80_H__
 
+enum
+{
+	NSC800_RSTA = 1,
+	NSC800_RSTB,
+	NSC800_RSTC
+};
 
 enum
 {
@@ -20,6 +26,8 @@ enum
 
 CPU_GET_INFO( z80 );
 #define CPU_Z80 CPU_GET_INFO_NAME( z80 )
+CPU_GET_INFO( nsc800 );
+#define CPU_NSC800 CPU_GET_INFO_NAME( nsc800 )
 
 CPU_DISASSEMBLE( z80 );
 

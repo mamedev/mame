@@ -145,6 +145,7 @@ struct _z80_state
 	UINT8			nmi_state;			/* nmi line state */
 	UINT8			nmi_pending;		/* nmi pending */
 	UINT8			irq_state;			/* irq line state */
+	UINT8			nsc800_irq_state[4];/* state of NSC800 restart interrupts A, B, C */
 	UINT8			after_ei;			/* are we in the EI shadow? */
 	UINT32			ea;
 	cpu_irq_callback irq_callback;
@@ -405,6 +406,7 @@ static const UINT8 cc_ex[0x100] = {
 #define cc_fd	cc_xy
 
 static void take_interrupt(z80_state *z80);
+static void take_interrupt_nsc800(z80_state *z80);
 static CPU_BURN( z80 );
 
 typedef void (*funcptr)(z80_state *z80);
@@ -3349,6 +3351,39 @@ static void take_interrupt(z80_state *z80)
 	z80->WZ=z80->PCD;
 }
 
+static void take_interrupt_nsc800(z80_state *z80)
+{
+	/* there isn't a valid previous program counter */
+	z80->PRVPC = -1;
+
+	/* Check if processor was halted */
+	LEAVE_HALT(z80);
+
+	/* Clear both interrupt flip flops */
+	z80->iff1 = z80->iff2 = 0;
+
+	if (z80->nsc800_irq_state[NSC800_RSTA])
+	{
+		PUSH(z80, pc);
+		z80->PCD = 0x003c;
+	}
+	else if (z80->nsc800_irq_state[NSC800_RSTB])
+	{
+		PUSH(z80, pc);
+		z80->PCD = 0x0034;
+	}
+	else if (z80->nsc800_irq_state[NSC800_RSTC])
+	{
+		PUSH(z80, pc);
+		z80->PCD = 0x002c;
+	}
+
+	/* 'interrupt latency' cycles */
+	z80->icount -= z80->cc_op[0xff] + cc_ex[0xff];
+
+	z80->WZ=z80->PCD;
+}
+
 /****************************************************************************
  * Processor initialization
  ****************************************************************************/
@@ -3486,6 +3521,13 @@ static CPU_INIT( z80 )
 	z80->cc_ex = cc_ex;
 }
 
+static CPU_INIT( nsc800 )
+{
+	z80_state *z80 = get_safe_token(device);
+	state_save_register_device_item_array(device, 0, z80->nsc800_irq_state);
+	CPU_INIT_CALL (z80);
+}
+
 /****************************************************************************
  * Do a reset
  ****************************************************************************/
@@ -3506,6 +3548,13 @@ static CPU_RESET( z80 )
 		z80daisy_reset(z80->daisy);
 
 	z80->WZ=z80->PCD;
+}
+
+ static CPU_RESET( nsc800 )
+{
+	z80_state *z80 = get_safe_token(device);
+	memset(z80->nsc800_irq_state, 0, sizeof(z80->nsc800_irq_state));
+	CPU_RESET_CALL(z80);
 }
 
 static CPU_EXIT( z80 )
@@ -3558,6 +3607,52 @@ static CPU_EXECUTE( z80 )
 	return cycles - z80->icount;
 }
 
+ static CPU_EXECUTE( nsc800 )
+{
+	z80_state *z80 = get_safe_token(device);
+
+	z80->icount = cycles;
+
+	/* check for NMIs on the way in; they can only be set externally */
+	/* via timers, and can't be dynamically enabled, so it is safe */
+	/* to just check here */
+	if (z80->nmi_pending)
+	{
+		LOG(("Z80 '%s' take NMI\n", z80->device->tag()));
+		z80->PRVPC = -1;			/* there isn't a valid previous program counter */
+		LEAVE_HALT(z80);			/* Check if processor was halted */
+
+		z80->iff1 = 0;
+		PUSH(z80, pc);
+		z80->PCD = 0x0066;
+		z80->WZ=z80->PCD;
+		z80->icount -= 11;
+		z80->nmi_pending = FALSE;
+	}
+
+	do
+	{
+		/* check for NSC800 IRQs line RSTA, RSTB, RSTC */
+		if ((z80->nsc800_irq_state[NSC800_RSTA] != CLEAR_LINE ||
+			z80->nsc800_irq_state[NSC800_RSTB] != CLEAR_LINE ||
+			z80->nsc800_irq_state[NSC800_RSTC] != CLEAR_LINE) && z80->iff1 && !z80->after_ei)
+				take_interrupt_nsc800(z80);
+
+		/* check for IRQs before each instruction */
+		if (z80->irq_state != CLEAR_LINE && z80->iff1 && !z80->after_ei)
+			take_interrupt(z80);
+
+		z80->after_ei = FALSE;
+
+		z80->PRVPC = z80->PCD;
+		debugger_instruction_hook(device, z80->PCD);
+		z80->r++;
+		EXEC_INLINE(z80,op,ROP(z80));
+	} while (z80->icount > 0);
+
+	return cycles - z80->icount;
+}
+
 /****************************************************************************
  * Burn 'cycles' T-states. Adjust z80->r register for the lost time
  ****************************************************************************/
@@ -3597,6 +3692,32 @@ static void set_irq_line(z80_state *z80, int irqline, int state)
 	}
 }
 
+
+static void set_irq_line_nsc800(z80_state *z80, int irqline, int state)
+{
+	if (irqline == INPUT_LINE_NMI)
+	{
+		/* mark an NMI pending on the rising edge */
+		if (z80->nmi_state == CLEAR_LINE && state != CLEAR_LINE)
+			z80->nmi_pending = TRUE;
+		z80->nmi_state = state;
+	}
+	else if (irqline == NSC800_RSTA)
+		z80->nsc800_irq_state[NSC800_RSTA] = state;
+	else if (irqline == NSC800_RSTB)
+		z80->nsc800_irq_state[NSC800_RSTB] = state;
+	else if (irqline == NSC800_RSTC)
+		z80->nsc800_irq_state[NSC800_RSTC] = state;
+	else
+	{
+		/* update the IRQ state via the daisy chain */
+		z80->irq_state = state;
+		if (z80->daisy)
+			z80->irq_state = z80daisy_update_irq_state(z80->daisy);
+
+		/* the main execute loop will take the interrupt */
+	}
+}
 
 
 /**************************************************************************
@@ -3650,6 +3771,20 @@ static CPU_SET_INFO( z80 )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(z80, INPUT_LINE_NMI, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(z80, 0, info->i);				break;
+	}
+}
+
+static CPU_SET_INFO( nsc800 )
+{
+	z80_state *z80 = get_safe_token(device);
+	switch (state)
+	{
+		/* --- the following bits of info are set as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line_nsc800(z80, INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + NSC800_RSTA:			set_irq_line_nsc800(z80, NSC800_RSTA, info->i); 	break;
+		case CPUINFO_INT_INPUT_STATE + NSC800_RSTB:			set_irq_line_nsc800(z80, NSC800_RSTB, info->i); 	break;
+		case CPUINFO_INT_INPUT_STATE + NSC800_RSTC:			set_irq_line_nsc800(z80, NSC800_RSTC, info->i); 	break;
+		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line_nsc800(z80, 0, info->i);				break;
 	}
 }
 
@@ -3729,5 +3864,27 @@ CPU_GET_INFO( z80 )
 				z80->F & 0x02 ? 'N':'.',
 				z80->F & 0x01 ? 'C':'.');
 			break;
+	}
+}
+
+CPU_GET_INFO( nsc800 )
+{
+	z80_state *z80 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	switch (state)
+	{
+		case CPUINFO_INT_INPUT_LINES:					info->i = 4;									break;
+
+		case CPUINFO_INT_INPUT_STATE + NSC800_RSTA:		info->i = z80->nsc800_irq_state[NSC800_RSTA];	break;
+		case CPUINFO_INT_INPUT_STATE + NSC800_RSTB:		info->i = z80->nsc800_irq_state[NSC800_RSTB];	break;
+		case CPUINFO_INT_INPUT_STATE + NSC800_RSTC:		info->i = z80->nsc800_irq_state[NSC800_RSTC];	break;
+
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nsc800);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(nsc800);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(nsc800);			break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(nsc800);		break;
+
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NSC800");						break;
+
+		default:										CPU_GET_INFO_CALL(z80); 						break;
 	}
 }
