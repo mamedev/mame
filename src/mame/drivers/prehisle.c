@@ -338,5 +338,5 @@ ROM_END
 
 
 GAME( 1989, prehisle, 0,        prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, prehisleu,prehisle, prehisle, prehisle, 0, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, prehisleu,prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, gensitou, prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )

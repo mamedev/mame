@@ -4523,69 +4523,69 @@ static DRIVER_INIT( korokoro )
 
 ***************************************************************************/
 
-GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus",                                "Power Instinct 2 (US, Ver. 94/04/08)",                   0 )
-GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)",           0 )
+GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94/04/08)",                   0 )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)",           0 )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1994, mazinger,   0,        mazinger, cave,     mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (World)",                                     0 )
-GAME( 1994, mazingerj,  mazinger, mazinger, cave,     mazinger, ROT90,  "Banpresto/Dynamic Pl. Toei Animation", "Mazinger Z (Japan)",                                     0 )
+GAME( 1994, mazinger,   0,        mazinger, cave,     mazinger, ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)",                                     0 )
+GAME( 1994, mazingerj,  mazinger, mazinger, cave,     mazinger, ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)",                                     0 )
 
-GAME( 1995, donpachi,   0,        donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (US)",                                          0 )
-GAME( 1995, donpachij,  donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Japan)",                                       0 )
-GAME( 1995, donpachikr, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Korea)",                                       0 )
-GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Atlus/Cave",                           "DonPachi (Hong Kong)",                                   0 )
+GAME( 1995, donpachi,   0,        donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (US)",                                          0 )
+GAME( 1995, donpachij,  donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",                                       0 )
+GAME( 1995, donpachikr, donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",                                       0 )
+GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)",                                   0 )
 
-GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Metamoqester (International)",                           0 )
-GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto/Pandorabox",                 "Oni - The Ninja Master (Japan)",                         0 )
+GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",                           0 )
+GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)",                         0 )
 
-GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                "Power Instinct Legends (US, Ver. 95/06/20)",             0 )
-GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
-
-// The EEPROM determines the region, program roms are the same between sets
-GAME( 1995, sailormn,   0,        sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    0 )
-GAME( 1995, sailormnu,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",       0 )
-GAME( 1995, sailormnj,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)",     0 )
-GAME( 1995, sailormnk,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     0 )
-GAME( 1995, sailormnt,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    0 )
-GAME( 1995, sailormnh,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", 0 )
-GAME( 1995, sailormno,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     0 )
-GAME( 1995, sailormnou, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        0 )
-GAME( 1995, sailormnoj, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      0 )
-GAME( 1995, sailormnok, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      0 )
-GAME( 1995, sailormnot, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     0 )
-GAME( 1995, sailormnoh, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)"	, 0 )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Power Instinct Legends (US, Ver. 95/06/20)",             0 )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1996, agallet,    0,        sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Europe)", 0 )
-GAME( 1996, agalletu,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (USA)", 0 )
-GAME( 1996, agalletj,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Japan)", 0 )
-GAME( 1996, agalletk,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Korea)", 0 )
-GAME( 1996, agallett,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Taiwan)", 0 )
-GAME( 1996, agalleth,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                  "Air Gallet (Hong Kong)",                               0 )
+GAME( 1995, sailormn,   0,        sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    0 )
+GAME( 1995, sailormnu,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",       0 )
+GAME( 1995, sailormnj,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)",     0 )
+GAME( 1995, sailormnk,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     0 )
+GAME( 1995, sailormnt,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    0 )
+GAME( 1995, sailormnh,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", 0 )
+GAME( 1995, sailormno,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     0 )
+GAME( 1995, sailormnou, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        0 )
+GAME( 1995, sailormnoj, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      0 )
+GAME( 1995, sailormnok, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      0 )
+GAME( 1995, sailormnot, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     0 )
+GAME( 1995, sailormnoh, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",	0 )
 
-GAME( 1996, hotdogst,   0,        hotdogst, cave,     hotdogst, ROT90,  "Marble",                               "Hotdog Storm (International)",                         0 )
+// The EEPROM determines the region, program roms are the same between sets
+GAME( 1996, agallet,    0,        sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Europe)", 0 )
+GAME( 1996, agalletu,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (USA)", 0 )
+GAME( 1996, agalletj,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Japan)", 0 )
+GAME( 1996, agalletk,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Korea)", 0 )
+GAME( 1996, agallett,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Taiwan)", 0 )
+GAME( 1996, agalleth,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Hong Kong)",                               0 )
 
-GAME( 1997, ddonpach,   0,        ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (International, Master Ver. 97/02/05)",     0 )
-GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     ddonpach, ROT270, "Atlus/Cave",                           "DoDonPachi (Japan, Master Ver. 97/02/05)",             0 )
+GAME( 1996, hotdogst,   0,        hotdogst, cave,     hotdogst, ROT90,  "Marble",                                 "Hotdog Storm (International)",                         0 )
 
-GAME( 1998, dfeveron,   feversos, dfeveron, cave,     dfeveron, ROT270, "Cave (Nihon System license)",          "Dangun Feveron (Japan, Ver. 98/09/17)",                0 )
-GAME( 1998, feversos,   0,        dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",          "Fever SOS (International, Ver. 98/09/25)",             0 )
+GAME( 1997, ddonpach,   0,        ddonpach, cave,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)",     0 )
+GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",             0 )
 
-GAME( 1998, esprade,    0,        esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (International, Ver. 98/04/22)",            0 )
-GAME( 1998, espradej,   esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan, Ver. 98/04/21)",                    0 )
-GAME( 1998, espradejo,  esprade,  esprade,  cave,     esprade,  ROT270, "Atlus/Cave",                           "ESP Ra.De. (Japan, Ver. 98/04/14)",                    0 )
+GAME( 1998, dfeveron,   feversos, dfeveron, cave,     dfeveron, ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",                0 )
+GAME( 1998, feversos,   0,        dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)",             0 )
 
-GAME( 1998, uopoko,     0,        uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                "Puzzle Uo Poko (International)",                       0 )
-GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                "Puzzle Uo Poko (Japan)",                               0 )
+GAME( 1998, esprade,    0,        esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)",            0 )
+GAME( 1998, espradej,   esprade,  esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/21)",                    0 )
+GAME( 1998, espradejo,  esprade,  esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/14)",                    0 )
 
-GAME( 1999, guwange,    0,        guwange,  guwange,  guwange,  ROT270, "Atlus/Cave",                           "Guwange (Japan, Master Ver. 99/06/24)",                0 )
+GAME( 1998, uopoko,     0,        uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (International)",                       0 )
+GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",                               0 )
 
-GAME( 1999, gaia,       0,        gaia,     gaia,     gaia,     ROT0,   "Noise Factory",                        "Gaia Crusaders",		                                GAME_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 1999, guwange,    0,        guwange,  guwange,  guwange,  ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)",                0 )
 
-GAME( 2001, theroes,    0,        gaia,     theroes,  gaia,     ROT0,   "Primetek Investments",                 "Thunder Heroes",		                                GAME_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 1999, gaia,       0,        gaia,     gaia,     gaia,     ROT0,   "Noise Factory",                          "Gaia Crusaders",		                                  GAME_IMPERFECT_SOUND ) // cuts out occasionally
 
-GAME( 1999, korokoro,   0,        korokoro, korokoro, korokoro, ROT0,   "Takumi",                               "Koro Koro Quest (Japan)",                              0 )
+GAME( 2001, theroes,    0,        gaia,     theroes,  gaia,     ROT0,   "Primetek Investments",                   "Thunder Heroes",		                                  GAME_IMPERFECT_SOUND ) // cuts out occasionally
 
-GAME( 1999, crusherm,   0,        crusherm, korokoro, korokoro, ROT0,   "Takumi",                               "Crusher Makochan (Japan)",                             0 )
+GAME( 1999, korokoro,   0,        korokoro, korokoro, korokoro, ROT0,   "Takumi",                                 "Koro Koro Quest (Japan)",                              0 )
 
-GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, tjumpman, ROT0,   "Namco",                                "Tobikose! Jumpman",                                    0 )
+GAME( 1999, crusherm,   0,        crusherm, korokoro, korokoro, ROT0,   "Takumi",                                 "Crusher Makochan (Japan)",                             0 )
+
+GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, tjumpman, ROT0,   "Namco",                                  "Tobikose! Jumpman",                                    0 )

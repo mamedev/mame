@@ -466,5 +466,5 @@ static DRIVER_INIT( pktgaldx )
 }
 
 GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", GAME_SUPPORTS_SAVE )
-GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx,  ROT0, "Nihon System",          "Pocket Gal Deluxe (Japan v3.00)", GAME_SUPPORTS_SAVE )
+GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx,  ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", GAME_SUPPORTS_SAVE )
 GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

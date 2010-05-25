@@ -3225,7 +3225,7 @@ ROM_END
 /* 645 */ GAME( 1980, spcenctr, 0,        spcenctr, spcenctr, 0, ROT0,   "Midway", "Space Encounters", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 652 */ GAMEL(1979, phantom2, 0,        phantom2, phantom2, 0, ROT0,   "Midway", "Phantom II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoa0a0ff )
 /* 730 */ GAME( 1978, bowler,   0,        bowler,   bowler,   0, ROT90,  "Midway", "Bowling Alley", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
-/* 739 */ GAMEL(1978, invaders, 0,        invaders, invaders, 0, ROT270, "Midway / Taito", "Space Invaders / Space Invaders M", GAME_SUPPORTS_SAVE , layout_invaders )
+/* 739 */ GAMEL(1978, invaders, 0,        invaders, invaders, 0, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", GAME_SUPPORTS_SAVE , layout_invaders )
 /* 742 */ GAME( 1978, blueshrk, 0,        blueshrk, blueshrk, 0, ROT0,   "Midway", "Blue Shark", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */
 /* 851 */ GAMEL(1980, invad2ct, 0,        invad2ct, invad2ct, 0, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invad2ct )

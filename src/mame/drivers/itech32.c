@@ -4183,34 +4183,34 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x80
  *
  *************************************/
 
-GAME( 1992, timekill,    0,        timekill, timekill, timekill, ROT0, "Strata/Incredible Technologies", "Time Killers (v1.32)", 0 )
-GAME( 1992, timekill131, timekill, timekill, timekill, timekill, ROT0, "Strata/Incredible Technologies", "Time Killers (v1.31)", 0 )
-GAME( 1993, hardyard,    0,        bloodstm, hardyard, hardyard, ROT0, "Strata/Incredible Technologies", "Hard Yardage (v1.20)", 0 )
-GAME( 1993, hardyard10,  hardyard, bloodstm, hardyard, hardyard, ROT0, "Strata/Incredible Technologies", "Hard Yardage (v1.00)", 0 )
-GAME( 1994, bloodstm,    0,        bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies", "Blood Storm (v2.22)", 0 )
-GAME( 1994, bloodstm22,  bloodstm, bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies", "Blood Storm (v2.20)", 0 )
-GAME( 1994, bloodstm21,  bloodstm, bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies", "Blood Storm (v2.10)", 0 )
-GAME( 1994, bloodstm11,  bloodstm, bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies", "Blood Storm (v1.10)", 0 )
-GAME( 1994, pairs,       0,        bloodstm, pairs,    bloodstm, ROT0, "Strata/Incredible Technologies", "Pairs (V1.2, 09/30/94)", 0 )
-GAME( 1994, pairsa,      pairs,    bloodstm, pairs,    bloodstm, ROT0, "Strata/Incredible Technologies", "Pairs (09/07/94)", 0 )
-GAME( 1994, hotmemry,    pairs,    bloodstm, pairs,    bloodstm, ROT0, "Tuning/Incredible Technologies", "Hot Memory (V1.2, Germany)", 0 )
-GAME( 1994, drivedge,    0,        drivedge, drivedge, drivedge, ROT0, "Strata/Incredible Technologies", "Driver's Edge", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, wcbowl,      0,        sftm,     wcbowln,  wcbowln,  ROT0, "Incredible Technologies",        "World Class Bowling (v1.66)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl165,   wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",        "World Class Bowling (v1.65)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl161,   wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",        "World Class Bowling (v1.61)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl16,    wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",        "World Class Bowling (v1.6)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl15,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",        "World Class Bowling (v1.5)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl13,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",        "World Class Bowling (v1.3)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl12,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",        "World Class Bowling (v1.2)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, sftm,        0,        sftm,     sftm,     sftm,     ROT0, "Capcom/Incredible Technologies", "Street Fighter: The Movie (v1.12)" , 0) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftm111,     sftm,     sftm,     sftm,     sftm110,  ROT0, "Capcom/Incredible Technologies", "Street Fighter: The Movie (v1.11)" , 0) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftm110,     sftm,     sftm,     sftm,     sftm110,  ROT0, "Capcom/Incredible Technologies", "Street Fighter: The Movie (v1.10)" , 0) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftmj,       sftm,     sftm,     sftm,     sftm,     ROT0, "Capcom/Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , 0) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1997, shufshot,    0,        sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.40)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, shufshot139, shufshot, sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.39)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, shufshot137, shufshot, sftm,     shufbowl, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.37)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, wcbowl140,   wcbowldx, tourny,   wcbowldx, wcbowlt,  ROT0, "Incredible Technologies",        "World Class Bowling Tournament (v1.40)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1999, wcbowldx,    0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible Technologies",        "World Class Bowling Deluxe (v2.00)" , 0) /* PIC 16C54 labeled as ITBWL-4 */
+GAME( 1992, timekill,    0,        timekill, timekill, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32)", 0 )
+GAME( 1992, timekill131, timekill, timekill, timekill, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.31)", 0 )
+GAME( 1993, hardyard,    0,        bloodstm, hardyard, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.20)", 0 )
+GAME( 1993, hardyard10,  hardyard, bloodstm, hardyard, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", 0 )
+GAME( 1994, bloodstm,    0,        bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.22)", 0 )
+GAME( 1994, bloodstm22,  bloodstm, bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.20)", 0 )
+GAME( 1994, bloodstm21,  bloodstm, bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.10)", 0 )
+GAME( 1994, bloodstm11,  bloodstm, bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.10)", 0 )
+GAME( 1994, pairs,       0,        bloodstm, pairs,    bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1.2, 09/30/94)", 0 )
+GAME( 1994, pairsa,      pairs,    bloodstm, pairs,    bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (09/07/94)", 0 )
+GAME( 1994, hotmemry,    pairs,    bloodstm, pairs,    bloodstm, ROT0, "Tuning/Incredible Technologies",   "Hot Memory (V1.2, Germany)", 0 )
+GAME( 1994, drivedge,    0,        drivedge, drivedge, drivedge, ROT0, "Strata/Incredible Technologies",   "Driver's Edge", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, wcbowl,      0,        sftm,     wcbowln,  wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.66)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl165,   wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.65)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl161,   wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl16,    wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.6)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl15,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.5)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl13,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.3)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl12,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.2)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, sftm,        0,        sftm,     sftm,     sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , 0) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftm111,     sftm,     sftm,     sftm,     sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.11)" , 0) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftm110,     sftm,     sftm,     sftm,     sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.10)" , 0) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftmj,       sftm,     sftm,     sftm,     sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , 0) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1997, shufshot,    0,        sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, shufshot139, shufshot, sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, shufshot137, shufshot, sftm,     shufbowl, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, wcbowl140,   wcbowldx, tourny,   wcbowldx, wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1999, wcbowldx,    0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , 0) /* PIC 16C54 labeled as ITBWL-4 */
 
 /*
     The following naming conventions are used:

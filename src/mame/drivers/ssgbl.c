@@ -64,4 +64,4 @@ static DRIVER_INIT( ssgbl )
 	DRIVER_INIT_CALL(megadriv);
 }
 
-GAME( 1993, ssgbl,    0, megadriv, ssgbl,    ssgbl,    ROT0, "bootleg", "Sunset Riders (bootleg of Megadrive version)", 0)
+GAME( 1993, ssgbl,    0, megadriv, ssgbl,    ssgbl,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)

@@ -3122,9 +3122,9 @@ GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino", 
 GAMEL( 1992, tisub,    0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",     0,      layout_tisub )
 GAMEL( 1992, tisuba,   tisub,    tisub,    tisub,    tisuba,   ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",     0,      layout_tisub )
 GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",                       0,      layout_crsbingo )
-GAMEL( 1995, stisub,   0,        stisub,   stisub,   stisub,   ROT0, "Alpha",           "Treasure Bonus (Subsino)",     		0,      layout_stisub )		// board CPU module marked 'Super Treasure Island' (alt title?)
+GAMEL( 1995, stisub,   0,        stisub,   stisub,   stisub,   ROT0, "American Alpha",  "Treasure Bonus (Subsino)",     		0,      layout_stisub )		// board CPU module marked 'Super Treasure Island' (alt title?)
 GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,      layout_sharkpy )	// missing POST messages?
 GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,      layout_sharkpy )	// missing POST messages?
-GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "Alpha",           "Shark Party (English, Alpha license)", 0,      layout_sharkpye )	// PCB black-box was marked 'victor 6'
+GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Shark Party (English, Alpha license)", 0,      layout_sharkpye )	// PCB black-box was marked 'victor 6'
 GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,      layout_smoto )
 GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,      layout_smoto )

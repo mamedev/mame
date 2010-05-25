@@ -1639,7 +1639,7 @@ static DRIVER_INIT( vcircle )
  *************************************/
 
 GAME( 1996, area51,    0,        cojagr3k,  area51,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
-GAME( 1995, area51t,   area51,   cojag68k,  area51,   area51a,  ROT0, "Time Warner", "Area 51 (Time Warner license)", 0 )
+GAME( 1995, area51t,   area51,   cojag68k,  area51,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license)", 0 )
 GAME( 1995, area51a,   area51,   cojag68k,  area51,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games license)", 0 )
 GAME( 1995, fishfren,  0,        cojagr3k,  fishfren, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
 GAME( 1996, freezeat,  0,        cojagr3k,  freezeat, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )

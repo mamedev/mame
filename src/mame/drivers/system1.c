@@ -4712,7 +4712,7 @@ GAME( 1986, wboy2,      wboy,     sys1ppi,  wboy,      wboy2,    ROT0,   "Sega (
 GAME( 1986, wboy2u,     wboy,     sys1ppi,  wboy,      bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe,   wboy,     sys1ppi,  wbdeluxe,  bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
 GAME( 1986, nob,        0,        nobm,     nob,       nob,      ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1986, nobb,       nob,      nob,      nob,       nobb,     ROT270, "bootleg",               "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, nobb,       nob,      nob,      nob,       nobb,     ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
 
 /* PIO-based System 1 */
 GAME( 1984, flicky,     0,        sys1pio,  flicky,    flicky,   ROT0,   "Sega",            "Flicky (128k Version, System 2, 315-5051)", GAME_SUPPORTS_SAVE )
@@ -4762,7 +4762,7 @@ GAME( 1987, wbml,       0,        sys2,     wbml,      wbml,     ROT0,   "Sega /
 GAME( 1987, wbmljo,     wbml,     sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmljb,     wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmlb,      wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_SUPPORTS_SAVE)
-GAME( 1987, wbmlbg,     wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_SUPPORTS_SAVE)
+GAME( 1987, wbmlbg,     wbml,     sys2,     wbml,      bootsys2, ROT0,   "bootleg (Galaxy Electronics)", "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_SUPPORTS_SAVE)
 GAME( 1987, dakkochn,   0,        sys2,     dakkochn,  dakkochn, ROT0,   "White Board",     "DakkoChan House (MC-8123, 317-0014)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blockgalb,  blockgal, sys2,     blockgal,  bootleg,  ROT90,  "bootleg",         "Block Gal (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensi,   0,        sys2row,  ufosensi,  ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )

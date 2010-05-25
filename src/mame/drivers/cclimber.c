@@ -2047,9 +2047,9 @@ GAME( 1980, ccboot2,  cclimber, cclimber, cclimber, cclimberj,ROT0,   "bootleg",
 GAME( 1981, ckong,    0,        cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", 0 )
 GAME( 1981, ckonga,   ckong,    cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", 0 )
 GAME( 1981, ckong2j,  ckong,    cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", 0 )
-GAME( 1981, ckongjeu, ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong Part II (Jeutel bootleg)", 0 )
-GAME( 1981, ckongo,   ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong (Orca bootleg)", 0 )
-GAME( 1981, ckongalc, ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong (Alca bootleg)", 0 )
+GAME( 1981, ckongjeu, ckong,    cclimber, ckong,    0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", 0 )
+GAME( 1981, ckongo,   ckong,    cclimber, ckong,    0,        ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", 0 )
+GAME( 1981, ckongalc, ckong,    cclimber, ckong,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", 0 )
 GAME( 1981, bigkong,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
 GAME( 1981, monkeyd,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
 GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", 0 )
@@ -2057,9 +2057,9 @@ GAME( 1981, bagmanf,  bagman,   cclimber, ckong,    0,        ROT270, "bootleg",
 GAME( 1981, rpatrol,  0,        cclimber, rpatrol,  0,        ROT0,   "Orca", "River Patrol (Orca)", 0 )
 GAME( 1981, rpatrolb, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
 GAME( 1981, silvland, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "Falcon", "Silver Land", 0 )
-GAME( 1985, cannonb,  cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "Soft", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , GAME_IMPERFECT_GRAPHICS ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb2, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "TV Game Gruenberg", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", 0 ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb3, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "Soft", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", 0 ) // the bonus game is patched out, thus avoiding the protection issue
+GAME( 1985, cannonb,  cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , GAME_IMPERFECT_GRAPHICS ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb2, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", 0 ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb3, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", 0 ) // the bonus game is patched out, thus avoiding the protection issue
 GAME( 1982, swimmer,  0,        swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", 0 )
 GAME( 1982, swimmera, swimmer,  swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", 0 )
 GAME( 1982, swimmerb, swimmer,  swimmer,  swimmerb, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", 0 )

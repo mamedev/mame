@@ -1707,11 +1707,11 @@ GAME( 1991, pc_ngai3, playch10, playch10, playch10, pcgboard, ROT0, "Tecmo (Nint
 GAME( 1991, pc_pwbld, playch10, playch10, playch10, pcgboard, ROT0, "Taito (Nintendo of America license)",		"Power Blade (PlayChoice-10)", 0 )
 GAME( 1991, pc_rkats, playch10, playch10, playch10, pcgboard, ROT0, "Atlus (Nintendo of America license)",		"Rockin' Kats (PlayChoice-10)", 0 )
 /* variant with 4 screen mirror */
-GAME( 1990, pc_radr2, playch10, playch10, playch10, pcgboard_type2, ROT0, "Square (Nintendo of America license)",		"Rad Racer II (PlayChoice-10)", 0 )
-GAME( 1985, pc_gntlt, playch10, playch10, playch10, pcgboard_type2, ROT0, "Atari/Tengen (Nintendo of America license)",	"Gauntlet (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, pc_radr2, playch10, playch10, playch10, pcgboard_type2, ROT0, "Square (Nintendo of America license)",			"Rad Racer II (PlayChoice-10)", 0 )
+GAME( 1985, pc_gntlt, playch10, playch10, playch10, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)",	"Gauntlet (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
 
 /* H-Board Games */
-GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, pchboard, ROT0, "Rare (Nintendo of America license)",		"PinBot (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, pchboard, ROT0, "Rare (Nintendo of America license)",			"PinBot (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
 
 /* i-Board Games */
 GAME( 1989, pc_cshwk, playch10, playch10, playch10, pciboard, ROT0, "Rare (Nintendo of America license)",		"Captain Sky Hawk (PlayChoice-10)", 0 )

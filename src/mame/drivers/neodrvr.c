@@ -8002,7 +8002,7 @@ GAME( 1995, whp,       neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "ADK / SNK"
 GAME( 1995, mosyougi,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "ADK / SNK",        "Syougi No Tatsujin - Master of Syougi", GAME_SUPPORTS_SAVE )
 GAME( 1996, overtop,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "ADK",              "Over Top", GAME_SUPPORTS_SAVE )
 GAME( 1996, ninjamas,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "ADK / SNK",        "Ninja Master's - haoh-ninpo-cho", GAME_SUPPORTS_SAVE )
-GAME( 1996, twinspri,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "ADK",              "Twinkle Star Sprites", GAME_SUPPORTS_SAVE )
+GAME( 1996, twinspri,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "ADK / SNK",        "Twinkle Star Sprites", GAME_SUPPORTS_SAVE )
 GAME( 1996, zintrckb,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "hack",             "Zintrick / Oshidashi Zentrix (hack)", GAME_SUPPORTS_SAVE )
 
 /* Aicom (was a part of Sammy) / Yumekobo (changed name in 1996) */

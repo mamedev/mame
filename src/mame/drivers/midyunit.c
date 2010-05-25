@@ -2569,6 +2569,6 @@ GAME( 1992, mkla2,    mk,       yunit_adpcm_6bit_fast,   mkla2,    mkyunit,  ROT
 GAME( 1992, mkla3,    mk,       yunit_adpcm_6bit_fast,   mkla4,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mkla4,    mk,       yunit_adpcm_6bit_fast,   mkla4,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mkyturbo, mk,       yunit_adpcm_6bit_fast,   mkla4,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkyawdim, mk,       mkyawdim,                mkla4,    mkyawdim, ROT0, "bootleg",  "Mortal Kombat (Yawdim bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mkyawdim, mk,       mkyawdim,                mkla4,    mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast,   totcarn,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", GAME_SUPPORTS_SAVE )
 GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast,   totcarn,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", GAME_SUPPORTS_SAVE )

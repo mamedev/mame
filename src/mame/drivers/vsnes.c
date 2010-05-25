@@ -2649,7 +2649,7 @@ GAME( 1984, smgolfj,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  
 GAME( 1984, ladygolf, smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Ladies Version)", 0 )
 GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnormal, ROT0, "Nintendo",  "Vs. Pinball", 0 )
 GAME( 1984, vspinbalj,vspinbal, vsnes,   vspinblj, vsnormal, ROT0, "Nintendo",  "Vs. Pinball (Japan)", 0 )
-GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnormal, ROT0, "Rare Ltd.", "Vs. Slalom", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnormal, ROT0, "Rare",      "Vs. Slalom", GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, vssoccer, 0,        vsnes,   vssoccer, vsnormal, ROT0, "Nintendo",  "Vs. Soccer", 0 )
 GAME( 1985, vssoccerj,vssoccer, vsnes,   vssoccer, bnglngby, ROT0, "Nintendo",  "Vs. Soccer (Japan)", 0 )
 GAME( 1986, vsgradus, 0,        vsnes,   vsgradus, vskonami, ROT0, "Konami",    "Vs. Gradius", 0 )

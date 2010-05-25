@@ -1603,4 +1603,4 @@ GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibuts
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )
-GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )
+GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )

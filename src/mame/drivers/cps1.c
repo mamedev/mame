@@ -9132,7 +9132,7 @@ GAME( 1989, ffightub, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom"
 GAME( 1989, ffightj,  ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightj1, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900305)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightj2, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900112)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ffightjh, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Street Smart / Final Fight (Japan, hack)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ffightjh, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "hack",   "Street Smart / Final Fight (Japan, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 1941,     0,        cps1_10MHz, 1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 1941j,    1941,     cps1_10MHz, 1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, mercs,    0,        cps1_10MHz, mercs,    cps1,     ROT270, "Capcom", "Mercs (World 900302)", GAME_SUPPORTS_SAVE )					// "ETC"
@@ -9180,7 +9180,7 @@ GAME( 1991, captcommb,captcomm, cps1_10MHz, captcomm, cps1,     ROT0,   "bootleg
 GAME( 1991, knights,  0,        cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (World 911127)", GAME_SUPPORTS_SAVE )		// "ETC"
 GAME( 1991, knightsu, knights,  cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (US 911127)", GAME_SUPPORTS_SAVE )
 GAME( 1991, knightsj, knights,  cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127)", GAME_SUPPORTS_SAVE )
-GAME( 1991, knightsb, knights,  knightsb,   knights,  cps1,     ROT0,   "bootleg", "Knights of the Round (World 911127, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1991, knightsb, knights,  knightsb,   knights,  cps1,     ROT0,   "bootleg","Knights of the Round (World 911127, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2ce,    0,        cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (World 920313)", GAME_SUPPORTS_SAVE )	// "ETC"
 GAME( 1992, sf2ceua,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920313)", GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2ceub,  sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Champion Edition (US 920513)", GAME_SUPPORTS_SAVE )
@@ -9225,15 +9225,15 @@ GAME( 1999, wofhfh,   wof,      wofhfh,     wofhfh,   cps1,     ROT0,   "bootleg
 GAME( 1993, dino,     0,        qsound,     dino,     dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (World 930201)", GAME_SUPPORTS_SAVE )		// "ETC"
 GAME( 1993, dinou,    dino,     qsound,     dino,     dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (US 930201)", GAME_SUPPORTS_SAVE )
 GAME( 1993, dinoj,    dino,     qsound,     dino,     dino,     ROT0,   "Capcom", "Cadillacs Kyouryuu-Shinseiki (Japan 930201)", GAME_SUPPORTS_SAVE )
-GAME( 1993, dinopic,  dino,     cpspicb,    dinopic,  dino,     ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, dinopic2, dino,     cpspicb,    dinopic,  dino,     ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, dinohunt, dino,     wofhfh,     dinoh,    dinohunt, ROT0,   "bootleg", "Dinosaur Hunter (Chinese bootleg of Cadillacs and Dinosaurs)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1993, dinopic,  dino,     cpspicb,    dinopic,  dino,     ROT0,   "bootleg","Cadillacs and Dinosaurs (bootleg with PIC16c57, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, dinopic2, dino,     cpspicb,    dinopic,  dino,     ROT0,   "bootleg","Cadillacs and Dinosaurs (bootleg with PIC16c57, set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, dinohunt, dino,     wofhfh,     dinoh,    dinohunt, ROT0,   "bootleg","Dinosaur Hunter (Chinese bootleg of Cadillacs and Dinosaurs)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1993, punisher, 0,        qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (World 930422)", GAME_SUPPORTS_SAVE )		// "ETC"
 GAME( 1993, punisheru,punisher, qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (US 930422)", GAME_SUPPORTS_SAVE )
 GAME( 1993, punisherj,punisher, qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (Japan 930422)", GAME_SUPPORTS_SAVE )
-GAME( 1993, punipic,  punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, punipic2, punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, punipic3, punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, punipic,  punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg","The Punisher (bootleg with PIC16c57, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, punipic2, punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg","The Punisher (bootleg with PIC16c57, set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, punipic3, punisher, cpspicb,    punipic,  punisher, ROT0,   "bootleg","The Punisher (bootleg with PIC16c57, set 3)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1993, punisherbz,punisher,wofhfh,   punisherbz, cps1,     ROT0,   "bootleg","Biaofeng Zhanjing (Chinese bootleg of The Punisher)", GAME_SUPPORTS_SAVE ) // (c)2002, they ripped the sound from Final Fight!
 
 GAME( 1993, slammast, 0,        qsound,     slammast, slammast, ROT0,   "Capcom", "Saturday Night Slam Masters (World 930713)", GAME_SUPPORTS_SAVE )		// "ETC"

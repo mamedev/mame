@@ -432,5 +432,5 @@ ROM_END
 ***************************************************************************/
 
 GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (World)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rockragea,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (Prototype?)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rockragea,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (prototype?)", GAME_SUPPORTS_SAVE )
 GAME( 1986, rockragej,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", GAME_SUPPORTS_SAVE )

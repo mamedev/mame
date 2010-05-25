@@ -302,10 +302,10 @@ GAME(2002, tekken4,    sys246, system246, system246, 0, ROT0, "Namco", "Tekken 4
 GAME(2002, tekken4a,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, tekken4b,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2003, timecrs3,   sys246, system246, system246, 0, ROT0, "Namco", "Time Crisis 3 (TST1)", GAME_NO_SOUND|GAME_NOT_WORKING)
-GAME(2003, zgundm,     sys246, system246, system246, 0, ROT0, "Capcom/Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
-GAME(2004, fghtjam,    sys246, system246, system246, 0, ROT0, "Capcom/Namco", "Capcom Fighting Jam (JAM1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2003, zgundm,     sys246, system246, system246, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2004, fghtjam,    sys246, system246, system246, 0, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2004, sukuinuf,   sys246, system246, system246, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
-GAME(2004, zgundmdx,   sys246, system246, system246, 0, ROT0, "Capcom/Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2004, zgundmdx,   sys246, system246, system246, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2005, soulclb3,   sys246, system246, system246, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 
 GAME(2004, sys256,          0, system256, system246, 0, ROT0, "Namco", "System 256 BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)

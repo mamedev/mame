@@ -3554,15 +3554,15 @@ GAME( 1988, passht4b,    passsht,   passsht4b,   passht4b,  shinobl,    ROT270, 
 GAME( 1988, wb3bbl,      wb3,       wb3bb,       wb3b,      wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", GAME_NOT_WORKING )
 
 /* System 16B based bootlegs */
-GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,  bayroute,  bayrouteb1, ROT0,   "bootleg", "Bay Route (encrypted, protected bootleg)", GAME_NO_SOUND | GAME_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)
-GAME( 1989, bayrouteb2,  bayroute,  bayrouteb2,  bayroute,  bayrouteb2, ROT0,   "bootleg", "Bay Route (Datsu bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,  bayroute,  bayrouteb1, ROT0,   "bootleg (Datsu)", "Bay Route (encrypted, protected bootleg)", GAME_NO_SOUND | GAME_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)
+GAME( 1989, bayrouteb2,  bayroute,  bayrouteb2,  bayroute,  bayrouteb2, ROT0,   "bootleg (Datsu)", "Bay Route (Datsu bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, goldnaxeb1,  goldnaxe,  goldnaxeb1,  goldnaxe,  goldnaxeb1, ROT0,   "bootleg", "Golden Axe (encrypted bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,  goldnaxe,  goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1989, tturfbl,     tturf,     tturfbl,     tturf,     tturfbl,    ROT0,   "bootleg", "Tough Turf (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1989, dduxbl,      ddux,      dduxbl,      ddux,      dduxbl,     ROT0,   "bootleg", "Dynamite Dux (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, tturfbl,     tturf,     tturfbl,     tturf,     tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, dduxbl,      ddux,      dduxbl,      ddux,      dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (bootleg)", GAME_NOT_WORKING )
 GAME( 1989, eswatbl,     eswat,     eswatbl,     eswat,     eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl,  fpointbl,   ROT0,   "bootleg", "Flash Point (World, bootleg)", GAME_NOT_WORKING )
-GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl,  fpointbl,   ROT0,   "bootleg", "Flash Point (Japan, bootleg)", GAME_NOT_WORKING )
+GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl,  fpointbl,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", GAME_NOT_WORKING )
+GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl,  fpointbl,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg)", GAME_NOT_WORKING )
 GAME( 1988, tetrisbl,    tetris,    tetrisbl,    tetris,    dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 
 /* Tetris-based hardware */

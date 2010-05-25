@@ -1306,7 +1306,7 @@ GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg", 
 GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg?",   "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,        ROT0, "bootleg",    "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "Videomat (polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "Videomat (Polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, rabbitpk, ROT0, "bootleg",    "Rabbit Poker (Arizona Poker v1.1?)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, 0,        ROT0, "Sigma Inc.", "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
 GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  0,        ROT0, "Sigma Inc.", "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )

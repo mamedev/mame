@@ -21,39 +21,39 @@
     * Royale (set 1).                           198?, Unknown.
     * Royale (set 2).                           198?, Unknown.
     * Witch Card (Video Klein).                 1991, Video Klein.
-    * Witch Card (spanish, witch game, set 1).  1991, Unknown.
-    * Witch Card (spanish, witch game, set 2).  1991, Unknown.
-    * Witch Card (english, no witch game).      1991, Unknown.
-    * Witch Card (german, set 1).               1994, Proma.
-    * Witch Card (german, set 2).               1994, Unknown.
-    * Witch Card (english, witch game, lamps).  1985, PlayMan.
-    * Super Loco 93 (spanish, set 1).           1993, Unknown.
-    * Super Loco 93 (spanish, set 2).           1993, Unknown.
+    * Witch Card (Spanish, witch game, set 1).  1991, Unknown.
+    * Witch Card (Spanish, witch game, set 2).  1991, Unknown.
+    * Witch Card (English, no witch game).      1991, Unknown.
+    * Witch Card (German, set 1).               1994, Proma.
+    * Witch Card (German, set 2).               1994, Unknown.
+    * Witch Card (English, witch game, lamps).  1985, PlayMan.
+    * Super Loco 93 (Spanish, set 1).           1993, Unknown.
+    * Super Loco 93 (Spanish, set 2).           1993, Unknown.
     * Maverik.                                  198?, Unknown.
     * Brasil'89.                                1989, Unknown.
     * Poker 91.                                 1991, Unknown.
-    * Buena Suerte (spanish, set 1).            1990, Unknown.
-    * Buena Suerte (spanish, set 2).            1991, Unknown.
-    * Buena Suerte (spanish, set 3).            1991, Unknown.
-    * Buena Suerte (spanish, set 4).            1991, Unknown.
-    * Buena Suerte (spanish, set 5).            1991, Unknown.
-    * Buena Suerte (spanish, set 6).            1991, Unknown.
-    * Buena Suerte (spanish, set 7).            1991, Unknown.
-    * Buena Suerte (spanish, set 8).            1991, Unknown.
-    * Buena Suerte (spanish, set 9).            1991, Unknown.
-    * Buena Suerte (spanish, set 10).           1991, Unknown.
-    * Buena Suerte (spanish, set 11).           1991, Unknown.
-    * Buena Suerte (spanish, set 12).           1991, Unknown.
-    * Buena Suerte (spanish, set 13).           1991, Unknown.
-    * Buena Suerte (spanish, set 14).           1991, Unknown.
-    * Buena Suerte (spanish, set 15).           1991, Unknown.
-    * Buena Suerte (spanish, set 16).           1991, Unknown.
-    * Buena Suerte (spanish, set 17).           1991, Unknown.
-    * Buena Suerte (spanish, set 18).           1991, Unknown.
-    * Buena Suerte (spanish, set 19).           1991, Unknown.
-    * Buena Suerte (spanish, set 20).           1991, Unknown.
-    * Buena Suerte (spanish, set 21).           1991, Unknown.
-    * Buena Suerte (spanish, set 22).           1991, Unknown.
+    * Buena Suerte (Spanish, set 1).            1990, Unknown.
+    * Buena Suerte (Spanish, set 2).            1991, Unknown.
+    * Buena Suerte (Spanish, set 3).            1991, Unknown.
+    * Buena Suerte (Spanish, set 4).            1991, Unknown.
+    * Buena Suerte (Spanish, set 5).            1991, Unknown.
+    * Buena Suerte (Spanish, set 6).            1991, Unknown.
+    * Buena Suerte (Spanish, set 7).            1991, Unknown.
+    * Buena Suerte (Spanish, set 8).            1991, Unknown.
+    * Buena Suerte (Spanish, set 9).            1991, Unknown.
+    * Buena Suerte (Spanish, set 10).           1991, Unknown.
+    * Buena Suerte (Spanish, set 11).           1991, Unknown.
+    * Buena Suerte (Spanish, set 12).           1991, Unknown.
+    * Buena Suerte (Spanish, set 13).           1991, Unknown.
+    * Buena Suerte (Spanish, set 14).           1991, Unknown.
+    * Buena Suerte (Spanish, set 15).           1991, Unknown.
+    * Buena Suerte (Spanish, set 16).           1991, Unknown.
+    * Buena Suerte (Spanish, set 17).           1991, Unknown.
+    * Buena Suerte (Spanish, set 18).           1991, Unknown.
+    * Buena Suerte (Spanish, set 19).           1991, Unknown.
+    * Buena Suerte (Spanish, set 20).           1991, Unknown.
+    * Buena Suerte (Spanish, set 21).           1991, Unknown.
+    * Buena Suerte (Spanish, set 22).           1991, Unknown.
 
 
 *******************************************************************************
@@ -3236,7 +3236,7 @@ static DRIVER_INIT( royale )
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                      FULLNAME                                  FLAGS             LAYOUT  */
 GAMEL( 1981, goldnpkr, 0,        goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd",  "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
 GAMEL( 1981, goldnpkb, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd",  "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
-GAMEL( 1981, pmpoker,  0,        goldnpkr, pmpoker,  0,        ROT0,   "PlayMan",                   "PlayMan Poker (german)",                  0,                layout_pmpoker  )
+GAMEL( 1981, pmpoker,  0,        goldnpkr, pmpoker,  0,        ROT0,   "PlayMan",                   "PlayMan Poker (German)",                  0,                layout_pmpoker  )
 GAMEL( 198?, pottnpkr, 0,        pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                   "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkra, pottnpkr, pottnpkr, potnpkra, 0,        ROT0,   "bootleg",                   "Jack Potten's Poker (set 2)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrb, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                   "Jack Potten's Poker (set 3)",             0,                layout_goldnpkr )
@@ -3247,36 +3247,36 @@ GAMEL( 1991, goodluck, 0,        witchcrd, goodluck, 0,        ROT0,   "<unknown
 GAMEL( 198?, royale,   0,        goldnpkr, royale,   royale,   ROT0,   "<unknown>",                 "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, royalea,  royale,   goldnpkr, royale,   royale,   ROT0,   "<unknown>",                 "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
 GAME(  1991, witchcrd, 0,        witchcrd, witchcrd, 0,        ROT0,   "Video Klein",               "Witch Card (Video Klein)",                GAME_NOT_WORKING )
-GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                 "Witch Card (spanish, witch game, set 1)", 0 )
-GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                 "Witch Card (spanish, witch game, set 2)", 0 )
-GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, 0,        ROT0,   "<unknown>",                 "Witch Card (english, no witch game)",     0 )
-GAMEL( 1994, witchcdd, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                     "Witch Card (german, set 1)",              0,                layout_goldnpkr )
-GAME(  1994, witchcde, witchcrd, witchcrd, witchcde, 0,        ROT0,   "<unknown>",                 "Witch Card (german, set 2)",              GAME_NOT_WORKING )
-GAMEL( 1985, witchcdf, witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PlayMan",                   "Witch Card (english, witch game, lamps)", 0,                layout_goldnpkr )
-GAME(  1993, sloco93,  0,        witchcrd, sloco93,  0,        ROT0,   "<unknown>",                 "Super Loco 93 (spanish, set 1)",          0 )
-GAME(  1993, sloco93a, sloco93,  witchcrd, sloco93,  0,        ROT0,   "<unknown>",                 "Super Loco 93 (spanish, set 2)",          0 )
+GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                 "Witch Card (Spanish, witch game, set 1)", 0 )
+GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                 "Witch Card (Spanish, witch game, set 2)", 0 )
+GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, 0,        ROT0,   "<unknown>",                 "Witch Card (English, no witch game)",     0 )
+GAMEL( 1994, witchcdd, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                     "Witch Card (German, set 1)",              0,                layout_goldnpkr )
+GAME(  1994, witchcde, witchcrd, witchcrd, witchcde, 0,        ROT0,   "<unknown>",                 "Witch Card (German, set 2)",              GAME_NOT_WORKING )
+GAMEL( 1985, witchcdf, witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PlayMan",                   "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
+GAME(  1993, sloco93,  0,        witchcrd, sloco93,  0,        ROT0,   "<unknown>",                 "Super Loco 93 (Spanish, set 1)",          0 )
+GAME(  1993, sloco93a, sloco93,  witchcrd, sloco93,  0,        ROT0,   "<unknown>",                 "Super Loco 93 (Spanish, set 2)",          0 )
 GAME(  198?, maverik,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Maverik",                                 0 )
 GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Brasil 89",                               0,                layout_goldnpkr )
 GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                 "Poker 91",                                0 )
-GAMEL( 1990, bsuerte,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 1)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertea, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 2)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteb, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 3)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertec, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 4)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerted, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 5)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertee, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 6)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertef, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 7)",           0,                layout_goldnpkr )
-GAME(  1991, bsuerteg, bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 8)",           0 )
-GAME(  1991, bsuerteh, bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 9)",           0 )
-GAMEL( 1991, bsuertei, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 10)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertej, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 11)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertek, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 12)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertel, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 13)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertem, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 14)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerten, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 15)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteo, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 16)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertep, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 17)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteq, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 18)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 19)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 20)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 21)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (spanish, set 22)",          0,                layout_goldnpkr )
+GAMEL( 1990, bsuerte,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 1)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertea, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 2)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteb, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 3)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertec, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 4)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerted, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 5)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertee, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 6)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertef, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 7)",           0,                layout_goldnpkr )
+GAME(  1991, bsuerteg, bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 8)",           0 )
+GAME(  1991, bsuerteh, bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 9)",           0 )
+GAMEL( 1991, bsuertei, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 10)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertej, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 11)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertek, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 12)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertel, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 13)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertem, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 14)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerten, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 15)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteo, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 16)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertep, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 17)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteq, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 18)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 19)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )

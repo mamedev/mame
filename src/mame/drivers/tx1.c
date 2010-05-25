@@ -1247,6 +1247,6 @@ ROM_END
  *************************************/
 
 GAMEL( 1983, tx1,        0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1",                                   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1a,       tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1a,       tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (Atari/Namco/Taito license)", GAME_IMPERFECT_SOUND, layout_tx1 )
 GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (cockpit)",        0, layout_buggyboy )
 GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (upright)", 0, layout_buggybjr )

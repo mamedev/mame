@@ -1440,4 +1440,4 @@ GAME( 1982, pballoon, 0,        pballoon, pballoon, 0, ROT90, "SNK", "Pioneer Ba
 GAME( 1982, nibbler,  0,        nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 1)", 0 )
 GAME( 1982, nibblera, nibbler,  nibbler,  nibblera, 0, ROT90, "Rock-Ola", "Nibbler (set 2)", 0 )
 GAME( 1982, nibblerb, nibbler,  nibbler,  nibblerb, 0, ROT90, "Rock-Ola", "Nibbler (set 3)", 0 )
-GAME( 1983, nibblero, nibbler,  nibbler,  nibblerb, 0, ROT90, "Olympia",  "Nibbler (Olympia)", 0 )
+GAME( 1983, nibblero, nibbler,  nibbler,  nibblerb, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia)", 0 )

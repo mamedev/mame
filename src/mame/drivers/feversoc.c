@@ -1,6 +1,6 @@
 /*******************************************************************************************
 
-Fever Soccer (c) 2004 Seibu
+Fever Soccer (c) 2004 Seibu Kaihatsu
 
 A down-grade of the Seibu SPI Hardware with SH-2 as main cpu.
 
@@ -285,4 +285,4 @@ static DRIVER_INIT( feversoc )
 	seibuspi_rise11_sprite_decrypt_feversoc(memory_region(machine, "gfx1"), 0x200000);
 }
 
-GAME( 2004, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu", "Fever Soccer", 0 )
+GAME( 2004, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

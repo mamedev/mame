@@ -1213,4 +1213,4 @@ GAME( 1990, pitfight5, pitfight, atarig1, pitfight, pitfight7, ROT0, "Atari Game
 GAME( 1990, pitfight4, pitfight, atarig1, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
 GAME( 1990, pitfight3, pitfight, atarig1, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
 GAME( 1990, pitfightj, pitfight, atarig1, pitfightj,pitfightj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfightb, pitfight, atarig1, pitfight, pitfightb, ROT0, "Atari Games", "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightb, pitfight, atarig1, pitfight, pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )

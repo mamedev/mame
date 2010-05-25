@@ -1499,7 +1499,7 @@ GAMEL(1980, starcas,  0,       starcas,  starcas,  0,        ORIENTATION_FLIP_Y,
 GAMEL(1980, starcas1, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (older)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_starcas )
 GAMEL(1980, starcasp, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_starcas )
 GAMEL(1980, starcase, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_starcas )
-GAMEL(1980, stellcas, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "bootleg", "Stellar Castle (Elettronolo)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_starcas )
+GAMEL(1980, stellcas, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "bootleg (Elettronolo)", "Stellar Castle (Elettronolo)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_starcas )
 GAMEL(1981, spaceftr, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Cinematronics (Zaccaria license)", "Space Fortress (Zaccaria)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_starcas )
 GAMEL(1981, solarq,   0,       solarq,   solarq,   0,        ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_solarq )
 GAME( 1981, boxingb,  0,       boxingb,  boxingb,  boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

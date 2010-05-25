@@ -3396,7 +3396,7 @@ static DRIVER_INIT( tnextspc )
 /******************************************************************************/
 
 GAME( 1986, sstingry,  0,        sstingry,       sstingry, sstingry, ROT90, "Alpha Denshi Co.",   "Super Stingray", GAME_SUPPORTS_SAVE )
-GAME( 1987, kyros,     0,        kyros,          kyros,    kyros,    ROT90, "World Games Inc",    "Kyros", GAME_SUPPORTS_SAVE )
+GAME( 1987, kyros,     0,        kyros,          kyros,    kyros,    ROT90, "Alpha Denshi Co. (World Games Inc. license)", "Kyros", GAME_SUPPORTS_SAVE )
 GAME( 1986, kyrosj,    kyros,    kyros,          kyros,    kyros,    ROT90, "Alpha Denshi Co.",   "Kyros No Yakata (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, jongbou,   0,        jongbou,        jongbou,  jongbou,  ROT90, "SNK",                "Mahjong Block Jongbou (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, paddlema,  0,        alpha68k_I,     paddlema, paddlema, ROT90, "SNK",                "Paddle Mania", GAME_SUPPORTS_SAVE )

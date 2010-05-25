@@ -4475,48 +4475,48 @@ ROM_END
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000c.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, cpzn1,    0,        coh1000c, zn,   coh1000c, ROT0, "Sony/Capcom", "ZN1", GAME_IS_BIOS_ROOT )
+GAME( 1995, cpzn1,    0,        coh1000c, zn,   coh1000c, ROT0, "Sony / Capcom", "ZN1", GAME_IS_BIOS_ROOT )
 
-GAME( 1995, ts2,       cpzn1,    coh1000c, zn6b, coh1000c, ROT0, "Capcom/Takara", "Battle Arena Toshinden 2 (USA 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, ts2j,      ts2,      coh1000c, zn6b, coh1000c, ROT0, "Capcom/Takara", "Battle Arena Toshinden 2 (JAPAN 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, ts2,       cpzn1,    coh1000c, zn6b, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, ts2j,      ts2,      coh1000c, zn6b, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Japan 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, starglad,  cpzn1,    coh1000c, zn6b, coh1000c, ROT0, "Capcom", "Star Gladiator (USA 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, stargladj, starglad, coh1000c, zn6b, coh1000c, ROT0, "Capcom", "Star Gladiator (JAPAN 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sfex,      cpzn1,    coh1002c, zn6b, coh1000c, ROT0, "Capcom/Arika", "Street Fighter EX (EURO 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sfexu,     sfex,     coh1002c, zn6b, coh1000c, ROT0, "Capcom/Arika", "Street Fighter EX (USA 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sfexa,     sfex,     coh1002c, zn6b, coh1000c, ROT0, "Capcom/Arika", "Street Fighter EX (ASIA 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sfexj,     sfex,     coh1002c, zn6b, coh1000c, ROT0, "Capcom/Arika", "Street Fighter EX (JAPAN 961130)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, glpracr,   cpzn1,    coh1000c, zn,   coh1000c, ROT0, "Tecmo", "Gallop Racer (JAPAN Ver 9.01.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, sfexp,     cpzn1,    coh1002c, zn6b, coh1000c, ROT0, "Capcom/Arika", "Street Fighter EX Plus (USA 970407)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, sfexpu1,   sfexp,    coh1002c, zn6b, coh1000c, ROT0, "Capcom/Arika", "Street Fighter EX Plus (USA 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, coh1000c, ROT0, "Capcom/Arika", "Street Fighter EX Plus (JAPAN 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, stargladj, starglad, coh1000c, zn6b, coh1000c, ROT0, "Capcom", "Star Gladiator (Japan 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sfex,      cpzn1,    coh1002c, zn6b, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Euro 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sfexu,     sfex,     coh1002c, zn6b, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (USA 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sfexa,     sfex,     coh1002c, zn6b, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Asia 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sfexj,     sfex,     coh1002c, zn6b, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Japan 961130)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, glpracr,   cpzn1,    coh1000c, zn,   coh1000c, ROT0, "Tecmo", "Gallop Racer (Japan Ver 9.01.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexp,     cpzn1,    coh1002c, zn6b, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (USA 970407)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexpu1,   sfexp,    coh1002c, zn6b, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (USA 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (Japan 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Capcom ZN2 */
 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-3002c.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, cpzn2,    0,        coh3002c, zn,   coh3002c, ROT0, "Sony/Capcom", "ZN2", GAME_IS_BIOS_ROOT )
+GAME( 1997, cpzn2,    0,        coh3002c, zn,   coh3002c, ROT0, "Sony / Capcom", "ZN2", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, rvschool,  cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Rival Schools (USA 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, rvschoola, rvschool, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Rival Schools (ASIA 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, jgakuen,   rvschool, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Justice Gakuen (JAPAN 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, sfex2,     cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 (USA 980526)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, sfex2j,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 (JAPAN 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, sfex2a,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 (ASIA 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, sfex2h,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 (HISPANIC 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, rvschoola, rvschool, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Rival Schools (Asia 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, jgakuen,   rvschool, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Justice Gakuen (Japan 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2,     cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX 2 (USA 980526)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2j,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX 2 (Japan 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2a,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX 2 (Asia 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2h,    sfex2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX 2 (Hispanic 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, plsmaswd,  cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Plasma Sword (USA 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, stargld2,  plsmaswd, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Star Gladiator 2 (JAPAN 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, plsmaswda, plsmaswd, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Plasma Sword (ASIA 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, tgmj,      cpzn2,    coh3002c, zn,   coh3002c, ROT0, "Capcom/Arika", "Tetris The Grand Master (JAPAN 980710)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, techromn,  cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Tech Romancer (EURO 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, stargld2,  plsmaswd, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Star Gladiator 2 (Japan 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, plsmaswda, plsmaswd, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Plasma Sword (Asia 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, tgmj,      cpzn2,    coh3002c, zn,   coh3002c, ROT0, "Arika / Capcom", "Tetris The Grand Master (Japan 980710)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, techromn,  cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Tech Romancer (Euro 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, techromnu, techromn, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Tech Romancer (USA 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, kikaioh,   techromn, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Kikaioh (JAPAN 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, sfex2p,    cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 Plus (USA 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, sfex2pa,   sfex2p,   coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 Plus (ASIA 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, sfex2pj,   sfex2p,   coh3002c, zn6b, coh3002c, ROT0, "Capcom/Arika", "Street Fighter EX 2 Plus (JAPAN 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, kikaioh,   techromn, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Kikaioh (Japan 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, sfex2p,    cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX 2 Plus (USA 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, sfex2pa,   sfex2p,   coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX 2 Plus (Asia 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, sfex2pj,   sfex2p,   coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX 2 Plus (Japan 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, strider2,  cpzn2,    coh3002c, zn,   coh3002c, ROT0, "Capcom", "Strider 2 (USA 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, strider2a, strider2, coh3002c, zn,   coh3002c, ROT0, "Capcom", "Strider 2 (ASIA 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, shiryu2,   strider2, coh3002c, zn,   coh3002c, ROT0, "Capcom", "Strider Hiryu 2 (JAPAN 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, strider2a, strider2, coh3002c, zn,   coh3002c, ROT0, "Capcom", "Strider 2 (Asia 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, shiryu2,   strider2, coh3002c, zn,   coh3002c, ROT0, "Capcom", "Strider Hiryu 2 (Japan 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Atari */
 
@@ -4543,40 +4543,40 @@ GAME( 1996, jdreddb,  jdredd,   coh1000a_ide, jdredd, coh1000a, ROT0, "Acclaim",
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002m.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, tps,      0,        coh1002m, zn, coh1002m, ROT0, "Sony/Tecmo", "TPS", GAME_IS_BIOS_ROOT )
+GAME( 1997, tps,      0,        coh1002m, zn, coh1002m, ROT0, "Sony / Tecmo", "TPS", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, glpracr2,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1997, glpracr2j, glpracr2, coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1997, glpracr2l, glpracr2, coh1002ml,zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 Link HW (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1998, doapp,     tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Dead Or Alive ++ (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, glpracr2j, glpracr2, coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1997, glpracr2l, glpracr2, coh1002ml,zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 Link HW (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1998, doapp,     tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Dead Or Alive ++ (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, cbaj,      tps,      coh1002msnd, zn, coh1002m, ROT0, "Tecmo", "Cool Boarders Arcade Jam", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, shngmtkb,  tps,      coh1002m, zn, coh1002m, ROT0, "Sunsoft / Activision", "Shanghai Matekibuyuu", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, tondemo,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tondemo Crisis (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, glpracr3,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 3 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, flamegun,  tps,      coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, flamegunj, flamegun, coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, tondemo,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tondemo Crisis (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, glpracr3,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, flamegun,  tps,      coh1002m, zn, coh1002m, ROT0, "Gaps Inc.", "Flame Gunner", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, flamegunj, flamegun, coh1002m, zn, coh1002m, ROT0, "Gaps Inc.", "Flame Gunner (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, lpadv,     tps,      coh1002m, zn, coh1002m, ROT0, "Amuse World", "Logic Pro Adventure (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, tblkkuzu,  tps,      coh1002m, zn, coh1002m, ROT0, "Tamsoft/D3 Publisher", "The Block Kuzushi (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, 1on1gov,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "1 on 1 Government (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, tecmowcm,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tecmo World Cup Millennium (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2001, mfjump,    tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Monster Farm Jump (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, tblkkuzu,  tps,      coh1002m, zn, coh1002m, ROT0, "Tamsoft / D3 Publisher", "The Block Kuzushi (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, 1on1gov,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "1 on 1 Government (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, tecmowcm,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tecmo World Cup Millennium (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2001, mfjump,    tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Monster Farm Jump (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Video System */
 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002v.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, vspsx,    0,        coh1002v, zn, coh1002v, ROT0,   "Video System", "Video System PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, vspsx,    0,        coh1002v, zn, coh1002v, ROT0,   "Video System Co.", "Video System PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, aerofgts, vspsx,    coh1002v, zn, coh1002v, ROT270, "Video System", "Aero Fighters Special (TAIWAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, coh1002v, ROT270, "Video System", "Sonic Wings Limited (JAPAN)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, aerofgts, vspsx,    coh1002v, zn, coh1002v, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, coh1002v, ROT270, "Video System Co.", "Sonic Wings Limited (Japan)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Taito */
 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000t.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, taitofx1, 0,        coh1000ta,zn, coh1000ta, ROT0, "Sony/Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
+GAME( 1995, taitofx1, 0,        coh1000ta,zn, coh1000ta, ROT0, "Sony / Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
 
 GAME( 1995, sfchamp,   taitofx1, coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.5O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, sfchamp24o,sfchamp,  coh1000ta,zn, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4595,30 +4595,30 @@ GAME( 1997, gdarius,   gdarius2, coh1000tb,zn, coh1000tb, ROT0, "Taito", "G-Dari
 GAME( 1997, gdariusb,  gdarius2, coh1000tb,zn, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, gdarius2,  taitofx1, coh1000tb,zn, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-/* Eighting/Raizing */
+/* Eighting / Raizing */
 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002e.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, psarc95,  0,        coh1002e, zn,   coh1002e, ROT0, "Sony/Eighting/Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
+GAME( 1997, psarc95,  0,        coh1002e, zn,   coh1002e, ROT0, "Sony / Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
 
-GAME( 1997, beastrzr,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, beastrzr,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "Eighting / Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, beastrzb,  psarc95,  coh1002e, zn,   coh1002e, ROT0, "bootleg", "Beastorizer (USA bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (WORLD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (ASIA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2j, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, brvblade,  tps,      coh1002e, zn,   coh1002e, ROT270, "Eighting/Raizing", "Brave Blade (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2j, bldyror2, coh1002e, zn6b, coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, brvblade,  tps,      coh1002e, zn,   coh1002e, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Bust a Move 2 uses the PSARC95 bios and ET series security but the top board is completely different */
-GAME( 1999, bam2,     psarc95,  bam2,     zn, bam2,     ROT0, "Metro/Enix/Namco", "Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, bam2,     psarc95,  bam2,     zn, bam2,     ROT0, "Metro / Enix / Namco", "Bust a Move 2 (Japanese ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 /* Atlus */
 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002l.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, atluspsx,  0,       coh1001l, zn, coh1001l, ROT0, "Sony/Atlus", "Atlus PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, atluspsx,  0,       coh1001l, zn, coh1001l, ROT0, "Sony / Atlus", "Atlus PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, hvnsgate, atluspsx, coh1001l, zn, coh1001l, ROT0, "Atlus/Racdym", "Heaven's Gate", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, hvnsgate, atluspsx, coh1001l, zn, coh1001l, ROT0, "Atlus / Racdym", "Heaven's Gate", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

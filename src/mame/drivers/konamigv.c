@@ -876,9 +876,9 @@ ROM_END
 /* BIOS placeholder */
 GAME( 1995, konamigv, 0, konamigv, konamigv, konamigv, ROT0, "Konami", "Baby Phoenix/GV System", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, pbball96, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Powerful Baseball '96 (GV017 JAPAN 1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Hyper Athlete (GV021 JAPAN 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, susume,   konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 JAPAN 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, pbball96, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Powerful Baseball '96 (GV017 Japan 1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, susume,   konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  btchamp,  ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, kdeadeye, ROT0, "Konami", "Dead Eye (GV054 UA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, weddingr, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

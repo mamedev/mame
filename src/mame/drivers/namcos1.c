@@ -2716,7 +2716,7 @@ GAME( 1987, youkaidk, shadowld, ns1,     shadowld, shadowld, ROT180, "Namco", "Y
 GAME( 1987, youkaidko,shadowld, ns1,     shadowld, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan old version)", 0 )
 GAME( 1987, dspirit,  0,        ns1,     dspirit,  dspirit,  ROT90,  "Namco", "Dragon Spirit (new version)", 0 )
 GAME( 1987, dspirito, dspirit,  ns1,     dspirit,  dspirit,  ROT90,  "Namco", "Dragon Spirit (old version)", 0 )
-GAME( 1987, dspirita, dspirit,  ns1,     dspirit,  dspirit,  ROT90,  "Namco", "Dragon Spirit (Atari license)", 0 )
+GAME( 1987, dspirita, dspirit,  ns1,     dspirit,  dspirit,  ROT90,  "Namco (Atari license)", "Dragon Spirit (Atari license)", 0 )
 GAME( 1987, blazer,   0,        ns1,     ns1,      blazer,   ROT90,  "Namco", "Blazer (Japan)", 0 )
 GAME( 1987, quester,  0,        ns1,     quester,  quester,  ROT90,  "Namco", "Quester (Japan)", 0 )
 GAME( 1987, pacmania, 0,        ns1,     pacmania, pacmania, ROT270, "Namco", "Pac-Mania", 0 )

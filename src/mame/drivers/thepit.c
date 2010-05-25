@@ -1070,14 +1070,14 @@ static DRIVER_INIT( rtriv )
 }
 
 
-GAME( 1981, roundup,  0,        thepit,   roundup,  0,     ROT90, "Amenip/Centuri", "Round-Up", 0 )
+GAME( 1981, roundup,  0,        thepit,   roundup,  0,     ROT90, "Taito Corporation (Amenip/Centuri license)", "Round-Up", 0 )
 GAME( 1981, fitter,   roundup,  thepit,   fitter,   0,     ROT90, "Taito Corporation", "Fitter", 0 )
 GAME( 1981, fitterbl, roundup,  thepit,   fitter,   0,     ROT90, "bootleg", "Fitter (bootleg)", 0 )
 GAME( 1982, thepit,   0,        thepit,   thepit,   0,     ROT90, "Taito", "The Pit", 0 )
-GAME( 1982, thepitc,  thepit,   thepit,   thepit,   0,     ROT90, "Centuri", "The Pit (Centuri)", 0 )
+GAME( 1982, thepitc,  thepit,   thepit,   thepit,   0,     ROT90, "Taito (Centuri license)", "The Pit (Centuri)", 0 )
 GAME( 1982, thepitb,  thepit,   thepit,   thepit,   0,     ROT90, "bootleg", "The Pit (bootleg)", 0 ) /* based off the Centuri version */
 GAME( 1982, dockman,  0,        intrepid, dockman,  0,     ROT90, "Taito Corporation", "Dock Man", 0 )
-GAME( 1982, portman,  dockman,  intrepid, dockman,  0,     ROT90, "Nova Games Ltd.", "Port Man", 0 )
+GAME( 1982, portman,  dockman,  intrepid, dockman,  0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", 0 )
 GAME( 1982, funnymou, 0,        suprmous, suprmous, 0,     ROT90, "Chuo Co. Ltd", "Funny Mouse", 0 )
 GAME( 1982, suprmous, funnymou, suprmous, suprmous, 0,     ROT90, "Taito Corporation", "Super Mouse", 0 )
 GAME( 1982, machomou, 0,        suprmous, suprmous, 0,     ROT90, "Techstar", "Macho Mouse", 0 )

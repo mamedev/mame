@@ -1858,6 +1858,6 @@ GAME( 1993, sadari,   0,        primella, sadari,   0, ROT0,   "Dooyong (NTC lic
 GAME( 1994, gundl94,  0,        primella, primella, 0, ROT0,   "Dooyong",  "Gun Dealer '94",       GAME_SUPPORTS_SAVE )
 GAME( 1994, primella, gundl94,  primella, primella, 0, ROT0,   "Dooyong (NTC license)", "Primella",GAME_SUPPORTS_SAVE )
 GAME( 1994, superx,   0,        superx,   superx,   0, ROT270, "NTC",      "Super-X (NTC)",        GAME_SUPPORTS_SAVE )
-GAME( 1994, superxm,  superx,   superx,   superx,   0, ROT270, "Mitchell", "Super-X (Mitchell)",   GAME_SUPPORTS_SAVE )
+GAME( 1994, superxm,  superx,   superx,   superx,   0, ROT270, "NTC (Mitchell license)", "Super-X (Mitchell)", GAME_SUPPORTS_SAVE )
 GAME( 1995, rshark,   0,        rshark,   rshark,   0, ROT270, "Dooyong",  "R-Shark",              GAME_SUPPORTS_SAVE )
 GAME( 1996, popbingo, 0,        popbingo, popbingo, 0, ROT0,   "Dooyong",  "Pop Bingo",            GAME_SUPPORTS_SAVE )

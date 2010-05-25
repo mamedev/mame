@@ -8072,37 +8072,37 @@ GAME( 2004, hsf2j,      hsf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "
 
 /* Games released on CPS-2 hardware by Takumi */
 
-GAME( 1999, gigawing,   0,        cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (USA 990222)", GAME_SUPPORTS_SAVE )
-GAME( 1999, gigawingj,  gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Japan 990223)", GAME_SUPPORTS_SAVE )
-GAME( 1999, gigawinga,  gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Asia 990222)", GAME_SUPPORTS_SAVE )
-GAME( 1999, gigawingh,  gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Hispanic 990222)", GAME_SUPPORTS_SAVE )
-GAME( 1999, gigawingb,  gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Brazil 990222)", GAME_SUPPORTS_SAVE )
-GAME( 2000, mmatrix,    0,        cps2, cps2_2p1b, cps2,     ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (USA 000412)", GAME_SUPPORTS_SAVE )
-GAME( 2000, mmatrixj,   mmatrix,  cps2, cps2_2p1b, cps2,     ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (Japan 000412)", GAME_SUPPORTS_SAVE )
+GAME( 1999, gigawing,   0,        cps2, cps2_2p2b, cps2,     ROT0,   "Takumi (Capcom license)", "Giga Wing (USA 990222)", GAME_SUPPORTS_SAVE )
+GAME( 1999, gigawingj,  gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Takumi (Capcom license)", "Giga Wing (Japan 990223)", GAME_SUPPORTS_SAVE )
+GAME( 1999, gigawinga,  gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Takumi (Capcom license)", "Giga Wing (Asia 990222)", GAME_SUPPORTS_SAVE )
+GAME( 1999, gigawingh,  gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Takumi (Capcom license)", "Giga Wing (Hispanic 990222)", GAME_SUPPORTS_SAVE )
+GAME( 1999, gigawingb,  gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Takumi (Capcom license)", "Giga Wing (Brazil 990222)", GAME_SUPPORTS_SAVE )
+GAME( 2000, mmatrix,    0,        cps2, cps2_2p1b, cps2,     ROT0,   "Takumi (Capcom license)", "Mars Matrix: Hyper Solid Shooting (USA 000412)", GAME_SUPPORTS_SAVE )
+GAME( 2000, mmatrixj,   mmatrix,  cps2, cps2_2p1b, cps2,     ROT0,   "Takumi (Capcom license)", "Mars Matrix: Hyper Solid Shooting (Japan 000412)", GAME_SUPPORTS_SAVE )
 
 /* Games released on CPS-2 hardware by Mitchell */
 
-GAME( 2000, mpang,      0,        cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (Euro 001010)", GAME_SUPPORTS_SAVE )
-GAME( 2000, mpangr1,    mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (Euro 000925)", GAME_SUPPORTS_SAVE )
-GAME( 2000, mpangu,     mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (USA 001010)", GAME_SUPPORTS_SAVE )
-GAME( 2000, mpangj,     mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (Japan 001011)", GAME_SUPPORTS_SAVE )
-GAME( 2001, pzloop2,    0,        cps2, pzloop2,   pzloop2,  ROT0,   "Mitchell, distributed by Capcom", "Puzz Loop 2 (Euro 010302)", GAME_SUPPORTS_SAVE )
-GAME( 2001, pzloop2j,   pzloop2,  cps2, pzloop2,   pzloop2,  ROT0,   "Mitchell, distributed by Capcom", "Puzz Loop 2 (Japan 010205)", GAME_SUPPORTS_SAVE )
-GAME( 2001, choko,      0,        cps2, choko,     cps2,     ROT0,   "Mitchell, distributed by Capcom", "Janpai Puzzle Choukou (Japan 010820)", GAME_SUPPORTS_SAVE )
+GAME( 2000, mpang,      0,        cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Euro 001010)", GAME_SUPPORTS_SAVE )
+GAME( 2000, mpangr1,    mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Euro 000925)", GAME_SUPPORTS_SAVE )
+GAME( 2000, mpangu,     mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (USA 001010)", GAME_SUPPORTS_SAVE )
+GAME( 2000, mpangj,     mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Japan 001011)", GAME_SUPPORTS_SAVE )
+GAME( 2001, pzloop2,    0,        cps2, pzloop2,   pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Euro 010302)", GAME_SUPPORTS_SAVE )
+GAME( 2001, pzloop2j,   pzloop2,  cps2, pzloop2,   pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010205)", GAME_SUPPORTS_SAVE )
+GAME( 2001, choko,      0,        cps2, choko,     cps2,     ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820)", GAME_SUPPORTS_SAVE )
 
 /* Games released on CPS-2 hardware by Eighting/Raizing */
 
-GAME( 2000, dimahoo,    0,        cps2, cps2_2p3b, cps2,     ROT270, "Eighting/Raizing, distributed by Capcom", "Dimahoo (Euro 000121)", GAME_SUPPORTS_SAVE )
-GAME( 2000, dimahoou,   dimahoo,  cps2, cps2_2p3b, cps2,     ROT270, "Eighting/Raizing, distributed by Capcom", "Dimahoo (USA 000121)", GAME_SUPPORTS_SAVE )
-GAME( 2000, gmahou,     dimahoo,  cps2, cps2_2p3b, cps2,     ROT270, "Eighting/Raizing, distributed by Capcom", "Great Mahou Daisakusen (Japan 000121)", GAME_SUPPORTS_SAVE )
-GAME( 2000, 1944,       0,        cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (USA 000620)", GAME_SUPPORTS_SAVE )
-GAME( 2000, 1944j,      1944,     cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (Japan 000620)", GAME_SUPPORTS_SAVE )
+GAME( 2000, dimahoo,    0,        cps2, cps2_2p3b, cps2,     ROT270, "Eighting / Raizing (Capcom license)", "Dimahoo (Euro 000121)", GAME_SUPPORTS_SAVE )
+GAME( 2000, dimahoou,   dimahoo,  cps2, cps2_2p3b, cps2,     ROT270, "Eighting / Raizing (Capcom license)", "Dimahoo (USA 000121)", GAME_SUPPORTS_SAVE )
+GAME( 2000, gmahou,     dimahoo,  cps2, cps2_2p3b, cps2,     ROT270, "Eighting / Raizing (Capcom license)", "Great Mahou Daisakusen (Japan 000121)", GAME_SUPPORTS_SAVE )
+GAME( 2000, 1944,       0,        cps2, cps2_2p2b, cps2,     ROT0,   "Eighting / Raizing (Capcom license)", "1944: The Loop Master (USA 000620)", GAME_SUPPORTS_SAVE )
+GAME( 2000, 1944j,      1944,     cps2, cps2_2p2b, cps2,     ROT0,   "Eighting / Raizing (Capcom license)", "1944: The Loop Master (Japan 000620)", GAME_SUPPORTS_SAVE )
 
 /* Games released on CPS-2 hardware by Cave */
 
-GAME( 2001, progear,    0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom, supported by Cave", "Progear (USA 010117)", GAME_SUPPORTS_SAVE )
-GAME( 2001, progearj,   progear,  cps2, cps2_2p3b, cps2,     ROT0,   "Capcom, supported by Cave", "Progear no Arashi (Japan 010117)", GAME_SUPPORTS_SAVE )
-GAME( 2001, progeara,   progear,  cps2, cps2_2p3b, cps2,     ROT0,   "Capcom, supported by Cave", "Progear (Asia 010117)", GAME_SUPPORTS_SAVE )
+GAME( 2001, progear,    0,        cps2, cps2_2p3b, cps2,     ROT0,   "Cave (Capcom license)", "Progear (USA 010117)", GAME_SUPPORTS_SAVE )
+GAME( 2001, progearj,   progear,  cps2, cps2_2p3b, cps2,     ROT0,   "Cave (Capcom license)", "Progear no Arashi (Japan 010117)", GAME_SUPPORTS_SAVE )
+GAME( 2001, progeara,   progear,  cps2, cps2_2p3b, cps2,     ROT0,   "Cave (Capcom license)", "Progear (Asia 010117)", GAME_SUPPORTS_SAVE )
 
 /*
  ------------------------

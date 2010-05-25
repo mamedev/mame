@@ -4593,7 +4593,7 @@ GAME( 1994,  eaglshot, 0,        eaglshot, eaglshot, eaglshot, ROT0,   "Sammy", 
 GAME( 1995,  hypreact, 0,        hypreact, hypreact, hypreact, ROT0,   "Sammy",              "Mahjong Hyper Reaction (Japan)",                   GAME_NO_COCKTAIL )
 GAME( 1994,  twineag2, 0,        twineag2, twineag2, twineag2, ROT270, "Seta",               "Twin Eagle II - The Rescue Mission",               GAME_NO_COCKTAIL )
 GAME( 1995,  gdfs,     0,        gdfs,     gdfs,     gdfs,     ROT0,   "Banpresto",          "Mobil Suit Gundam Final Shooting (Japan)",         GAME_NO_COCKTAIL )
-GAME( 1995,  ultrax,   0,        ultrax,   ultrax,   ultrax,   ROT270, "Banpresto / Tsuburaya Prod.", "Ultra X Weapons / Ultra Keibitai",        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995,  ultrax,   0,        ultrax,   ultrax,   ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai",  GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996,  janjans1, 0,        janjans1, janjans1, janjans1, ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho (Japan)",     GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996?, meosism,  0,        meosism,  meosism,  meosism,  ROT0,   "Sammy",              "Meosis Magic (Japan)",                             GAME_NO_COCKTAIL )
 GAME( 1996,  stmblade, 0,        stmblade, stmblade, stmblade, ROT270, "Visco",              "Storm Blade (US)",                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )

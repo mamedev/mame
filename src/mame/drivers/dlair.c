@@ -952,10 +952,10 @@ GAMEL( 1983, dlaird,   dlair,    dlair_ldv1000, dlair,  fixed,    ROT0, "Cinemat
 GAMEL( 1983, dlairc,   dlair,    dlair_pr7820,  dlair,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. C, Pioneer PR-7820)",  GAME_NOT_WORKING, layout_dlair )
 GAMEL( 1983, dlairb,   dlair,    dlair_pr7820,  dlair,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. B, Pioneer PR-7820)",  GAME_NOT_WORKING, layout_dlair )
 GAMEL( 1983, dlaira,   dlair,    dlair_pr7820,  dlair,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. A, Pioneer PR-7820)",  GAME_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dleuro,   dlair,    dleuro,        dleuro, fixed,    ROT0, "Atari",         "Dragon's Lair (European)",  GAME_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlital,   dlair,    dleuro,        dleuro, fixed,    ROT0, "Sidam",         "Dragon's Lair (Italian)",  GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dleuro,   dlair,    dleuro,        dleuro, fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlital,   dlair,    dleuro,        dleuro, fixed,    ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  GAME_NOT_WORKING, layout_dlair )
 
 GAMEL( 1983, spaceace, 0,        dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", GAME_NOT_WORKING, layout_dlair )
 GAMEL( 1983, spaceaa2, spaceace, dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", GAME_NOT_WORKING, layout_dlair )
 GAMEL( 1983, spaceaa,  spaceace, dlair_ldv1000, dlaire, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A)", GAME_NOT_WORKING, layout_dlair )
-GAMEL( 1983, saeuro,   spaceace, dleuro,        dleuro, fixed,    ROT0, "Atari",         "Space Ace (European)",  GAME_NOT_WORKING, layout_dlair )
+GAMEL( 1983, saeuro,   spaceace, dleuro,        dleuro, fixed,    ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  GAME_NOT_WORKING, layout_dlair )

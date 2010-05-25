@@ -5795,7 +5795,7 @@ GAME( 1982, ctrpllrp, puckman,  pacman,   pacman,   0,        ROT90,  "hack", "C
 GAME( 1982, eyes,     0,        pacman,   eyes,     eyes,     ROT90,  "Digitrex Techstar (Rock-Ola license)", "Eyes (Digitrex Techstar)", GAME_SUPPORTS_SAVE )
 GAME( 1982, eyes2,    eyes,     pacman,   eyes,     eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (Techstar)", GAME_SUPPORTS_SAVE )
 GAME( 1982, eyeszac,  eyes,     pacman,   eyes,     0,        ROT90,  "bootleg (Zaccaria)", "Eyes (Zaccaria)", GAME_SUPPORTS_SAVE )
-GAME( 1983, mrtnt,    0,        pacman,   mrtnt,    eyes,     ROT90,  "Telko", "Mr. TNT", GAME_SUPPORTS_SAVE )
+GAME( 1983, mrtnt,    0,        pacman,   mrtnt,    eyes,     ROT90,  "Techstar (Telko license)", "Mr. TNT", GAME_SUPPORTS_SAVE )
 GAME( 1983, gorkans,  mrtnt,    pacman,   mrtnt,    0,        ROT90,  "Techstar", "Gorkans", GAME_SUPPORTS_SAVE )
 GAME( 1983, eggor,    0,        pacman,   mrtnt,    eyes,     ROT90,  "Telko", "Eggor", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, jumpshot, ROT90,  "Bally Midway", "Jump Shot", GAME_SUPPORTS_SAVE )
@@ -5821,8 +5821,8 @@ GAME( 1985, lizwiz,   0,        woodpek,  lizwiz,   0,        ROT90,  "Techstar 
 GAME( 1982, alibaba,  0,        alibaba,  alibaba,  0,        ROT90,  "Sega", "Ali Baba and 40 Thieves", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1982, dremshpr, 0,        dremshpr, dremshpr, 0,        ROT270, "Sanritsu", "Dream Shopper", GAME_SUPPORTS_SAVE )
 GAME( 1983, vanvan,   0,        vanvan,   vanvan,   0,        ROT270, "Sanritsu", "Van-Van Car", GAME_SUPPORTS_SAVE )
-GAME( 1983, vanvank,  vanvan,   vanvan,   vanvank,  0,        ROT270, "Karateco", "Van-Van Car (Karateco)", GAME_SUPPORTS_SAVE )
-GAME( 1983, vanvanb,  vanvan,   vanvan,   vanvank,  0,        ROT270, "Karateco", "Van-Van Car (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1983, vanvank,  vanvan,   vanvan,   vanvank,  0,        ROT270, "Sanritsu (Karateco license?)", "Van-Van Car (Karateco set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1983, vanvanb,  vanvan,   vanvan,   vanvank,  0,        ROT270, "Sanritsu (Karateco license?)", "Van-Van Car (Karateco set 2)", GAME_SUPPORTS_SAVE ) // "
 GAME( 1983, bwcasino, 0,        acitya,   bwcasino, 0,        ROT90,  "Epos Corporation", "Boardwalk Casino", GAME_SUPPORTS_SAVE )
 GAME( 1983, acitya,   bwcasino, acitya,   acitya,   0,        ROT90,  "Epos Corporation", "Atlantic City Action", GAME_SUPPORTS_SAVE )
 GAME( 1983, theglobp, suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "The Glob (Pac-Man hardware)", GAME_SUPPORTS_SAVE )

@@ -2061,6 +2061,6 @@ GAME( 1995, s1945a,   s1945,    s1945,    s1945a,   s1945a,   ROT270, "Psikyo", 
 GAME( 1995, s1945j,   s1945,    s1945,    s1945j,   s1945j,   ROT270, "Psikyo", "Strikers 1945 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945jn,  s1945,    gunbird,  s1945j,   s1945jn,  ROT270, "Psikyo", "Strikers 1945 (Japan, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945k,   s1945,    s1945,    s1945j,   s1945,    ROT270, "Psikyo", "Strikers 1945 (Korea)", GAME_SUPPORTS_SAVE )
-GAME( 1995, s1945bl,  s1945,    s1945bl,  s1945bl,  s1945bl,  ROT270, "Psikyo", "Strikers 1945 (Hong Kong, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1995, s1945bl,  s1945,    s1945bl,  s1945bl,  s1945bl,  ROT270, "bootleg","Strikers 1945 (Hong Kong, bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, tengai,   0,        s1945,    tengai,   tengai,   ROT0,   "Psikyo", "Tengai (World)", GAME_SUPPORTS_SAVE )
 GAME( 1996, tengaij,  tengai,   s1945,    tengaij,  tengai,   ROT0,   "Psikyo", "Sengoku Blade: Sengoku Ace Episode II / Tengai", GAME_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World

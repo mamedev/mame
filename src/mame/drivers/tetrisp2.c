@@ -1830,14 +1830,14 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           GAME_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan)",           GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan)",           GAME_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal, 0,        nndmseal, nndmseal, rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max/Jaleco", "Nandemo Seal Iinkai",         GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1997, nndmseal, 0,        nndmseal, nndmseal, rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",       GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 GAME( 1999, rockn,    0,        rockn,    rockn,   rockn,    ROT270, "Jaleco",                      "Rock'n Tread (Japan)",            GAME_SUPPORTS_SAVE )
 GAME( 1999, rockna,   rockn,    rockn,    rockn,   rockn1,   ROT270, "Jaleco",                      "Rock'n Tread (Japan, alternate)", GAME_SUPPORTS_SAVE )
 GAME( 1999, rockn2,   0,        rockn2,   rockn,   rockn2,   ROT270, "Jaleco",                      "Rock'n Tread 2 (Japan)",          GAME_SUPPORTS_SAVE )
 GAME( 1999, rocknms,  0,        rocknms,  rocknms, rocknms,  ROT0,   "Jaleco",                      "Rock'n MegaSession (Japan)",      GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, rockn3,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco",                      "Rock'n 3 (Japan)",                GAME_SUPPORTS_SAVE )
-GAME( 2000, rockn4,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco (PCCWJ)",              "Rock'n 4 (Japan, prototype)",     GAME_SUPPORTS_SAVE )
+GAME( 2000, rockn4,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco /PCCWJ",               "Rock'n 4 (Japan, prototype)",     GAME_SUPPORTS_SAVE )

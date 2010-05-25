@@ -476,5 +476,5 @@ static DRIVER_INIT( ashnojoe )
 	memory_set_bank(machine, "bank4", 0);
 }
 
-GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Success Joe (World)",   GAME_SUPPORTS_SAVE )
-GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Ashita no Joe (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe, ROT0, "Wave / Taito Corporation", "Success Joe (World)",   GAME_SUPPORTS_SAVE )
+GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe, ROT0, "Wave / Taito Corporation", "Ashita no Joe (Japan)", GAME_SUPPORTS_SAVE )

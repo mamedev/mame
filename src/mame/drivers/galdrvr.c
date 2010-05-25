@@ -5951,9 +5951,9 @@ GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg",
 GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
 GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, mooncrsu, ROT90,  "bootleg? (Subelectro)", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
-GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
-GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 3)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license?)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Nichibutsu (Centuri license?)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license?)", "Eagle (set 3)", GAME_SUPPORTS_SAVE ) // "
 GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", GAME_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
 GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
@@ -5980,7 +5980,7 @@ GAME( 1983, levers,   0,        jumpbug,  levers,   jumpbug,  ROT90,  "Rock-Ola"
 
 /* 2nd CPU driving AY8910 for sound */
 GAME( 1982, checkman, 0,        checkman, checkman, checkman, ROT90,  "Zilec-Zenitone", "Check Man", GAME_SUPPORTS_SAVE )
-GAME( 1982, checkmanj,checkman, checkmaj, checkmaj, checkmaj, ROT90,  "Jaleco", "Check Man (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1982, checkmanj,checkman, checkmaj, checkmaj, checkmaj, ROT90,  "Zilec-Zenitone (Jaleco license)", "Check Man (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1983, dingo,    0,        checkmaj, dingo,    dingo,    ROT90,  "Ashby Computers and Graphics Ltd. (Jaleco license)", "Dingo", GAME_SUPPORTS_SAVE )
 GAME( 1983, dingoe,   dingo,    checkman, dingo,    dingoe,   ROT90,  "Ashby Computers and Graphics Ltd.", "Dingo (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
@@ -6047,8 +6047,8 @@ GAME( 1981, atlantis2,atlantis, theend,   atlantis, atlantis, ROT90,  "Comsoft",
 GAME( 1982, scorpion, 0,		scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1982, scorpiona,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1982, scorpionb,scorpion, scorpion, scorpion, scorpion, ROT90,  "Zaccaria", "Scorpion (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 19??, scorpionmc,scorpion, mooncrst, scorpnmc, scorpnmc, ROT90,  "Dorneer",  "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
-GAME( 19??, aracnis,   scorpion, mooncrst, aracnis,  scorpnmc, ROT90,  "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 19??, scorpionmc,scorpion, mooncrst, scorpnmc, scorpnmc, ROT90, "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
+GAME( 19??, aracnis,   scorpion, mooncrst, aracnis,  scorpnmc, ROT90, "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
 GAME( 1983, sfx,      0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", GAME_SUPPORTS_SAVE )

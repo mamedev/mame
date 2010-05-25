@@ -4634,7 +4634,7 @@ GAME( 1993, daytona93, daytona, model2o, daytona, 0,        ROT0, "Sega", "Dayto
 GAME( 1993, daytonas,  daytona, model2o, daytona, 0,        ROT0, "Sega", "Daytona USA (With Saturn Adverts)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, daytonat,  daytona, model2o, daytona, 0,        ROT0, "Sega", "Daytona USA (Japan, Turbo hack)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, daytonam,  daytona, model2o, daytona, daytonam, ROT0, "Sega", "Daytona USA (Japan, To The MAXX)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, desert,          0, model2o, desert,  0,        ROT0, "Sega/Martin Marietta", "Desert Tank", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, desert,          0, model2o, desert,  0,        ROT0, "Sega / Martin Marietta", "Desert Tank", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, vcop,            0, model2o, daytona, 0,        ROT0, "Sega", "Virtua Cop (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
@@ -4686,6 +4686,6 @@ GAME( 1997, overrev,         0, model2c, model2, 0, ROT0, "Jaleco", "Over Rev (R
 GAME( 1997, segawski,        0, model2c, model2, 0, ROT0, "Sega", "Sega Water Ski (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,        0, model2c, model2, 0, ROT0, "Sega", "Top Skater (Export, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatru,topskatr, model2c, model2, 0, ROT0, "Sega", "Top Skater (USA)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, bel,             0, model2c, bel,    0, ROT0, "Sega/EPL Productions", "Behind Enemy Lines", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, bel,             0, model2c, bel,    0, ROT0, "Sega / EPL Productions", "Behind Enemy Lines", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcopc,dynamcop, model2c, model2, 0, ROT0, "Sega", "Dynamite Cop (USA, Model 2C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 

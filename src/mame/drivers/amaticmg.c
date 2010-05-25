@@ -714,6 +714,6 @@ static DRIVER_INIT( amaticmg )
 ************************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY                FULLNAME                     FLAGS  */
-GAME( 1996, am_uslot, 0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GMBH", "Amatic Unknown Slots Game",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, am_mg24,  0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GMBH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, am_mg3,   0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GMBH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1996, am_uslot, 0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Amatic Unknown Slots Game",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, am_mg24,  0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, am_mg3,   0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )

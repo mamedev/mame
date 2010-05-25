@@ -297,5 +297,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, avalnche, 0,        avalnche, avalnche, 0, ROT0, "Atari",  "Avalanche", GAME_SUPPORTS_SAVE, layout_avalnche )
-GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  0, ROT0, "Sidam",  "Cascade",   GAME_SUPPORTS_SAVE, layout_avalnche )
+GAMEL( 1978, avalnche, 0,        avalnche, avalnche, 0, ROT0, "Atari", "Avalanche", GAME_SUPPORTS_SAVE, layout_avalnche )
+GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  0, ROT0, "bootleg? (Sidam)", "Cascade", GAME_SUPPORTS_SAVE, layout_avalnche )

@@ -6272,7 +6272,7 @@ GAME( 1996, balcube,   0,        balcube,  balcube,  balcube,  ROT0,   "Metro", 
 GAME( 1996, bangball,  0,        bangball, bangball, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse", "Bang Bang Ball (v1.05)",            GAME_SUPPORTS_SAVE )
 GAME( 1996, gstrik2,   0,        gstrik2,  gstrik2,  blzntrnd, ROT0,   "Human Amusement",                        "Grand Striker 2 (Europe and Oceania)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1996, gstrik2j,  gstrik2,  gstrik2,  gstrik2,  blzntrnd, ROT0,   "Human Amusement",                        "Grand Striker 2 (Japan)",           GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // priority between rounds
-GAME( 1999, batlbubl,  bangball, batlbubl, batlbubl, balcube,  ROT0,   "Limenko",                                "Battle Bubble (v2.00)",             GAME_SUPPORTS_SAVE )
+GAME( 1999, batlbubl,  bangball, batlbubl, batlbubl, balcube,  ROT0,   "Banpresto (Limenko license?)",           "Battle Bubble (v2.00)",             GAME_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1996, mouja,     0,        mouja,    mouja,    mouja,    ROT0,   "Etona",                                  "Mouja (Japan)",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1997, gakusai,   0,        gakusai,  gakusai,  gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai (Japan)",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1998, gakusai2,  0,        gakusai2, gakusai,  gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai 2 (Japan)",       GAME_SUPPORTS_SAVE )

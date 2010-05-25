@@ -402,4 +402,4 @@ GAME( 1994, msbingo,  0,        mspuzzle, msbingo,  0, ROT0,  "Min Corp.", "Miss
 GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle", GAME_SUPPORTS_SAVE )
 GAME( 1994, mspuzzlen,mspuzzle, mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle (Nudes)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1995, dblpoint, 0,        dblpoint, dblpoint, 0, ROT0,  "Min Corp.", "Double Point", GAME_SUPPORTS_SAVE )
-GAME( 1995, dblpointd,dblpoint, dblpoint, dblpoint, 0, ROT0,  "Dong Bang Electron", "Double Point (Dong Bang Electron, bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1995, dblpointd,dblpoint, dblpoint, dblpoint, 0, ROT0,  "bootleg? (Dong Bang Electron)", "Double Point (Dong Bang Electron, bootleg?)", GAME_SUPPORTS_SAVE )
