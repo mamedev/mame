@@ -1322,7 +1322,7 @@ static DRIVER_INIT( srdmissn )
 GAME( 1984, gyrodine,  0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", GAME_SUPPORTS_SAVE )
 GAME( 1984, gyrodinet, gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", GAME_SUPPORTS_SAVE )
 GAME( 1984, buzzard,   gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Buzzard", GAME_SUPPORTS_SAVE )
-GAME( 1985, repulse,   0,        repulse,  repulse,  0,        ROT90, "Sega", "Repulse", GAME_SUPPORTS_SAVE )
+GAME( 1985, repulse,   0,        repulse,  repulse,  0,        ROT90, "Sega", "Repulse", GAME_SUPPORTS_SAVE ) // by Crux?
 GAME( 1985, 99lstwar,  repulse,  repulse,  repulse,  0,        ROT90, "Sega (Proma license)", "'99: The Last War", GAME_SUPPORTS_SAVE )
 GAME( 1985, 99lstwara, repulse,  repulse,  repulse,  0,        ROT90, "Sega (Proma license)", "'99: The Last War (alternate)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 99lstwark, repulse,  repulse,  repulse,  0,        ROT90, "Sega (Kyugo license)", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE )

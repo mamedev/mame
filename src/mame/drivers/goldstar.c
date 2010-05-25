@@ -9912,14 +9912,14 @@ GAME(  1991, cmast91,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",  
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           GAME_NOT_WORKING ) // no gfx roms are dumped
 
 
-GAMEL( 1989, lucky8,    0,        lucky8,   lucky8,   0,         ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )
-GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  lucky8a,   ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2, W-4)",                           0,                     layout_lucky8 )
-GAMEL( 1989, lucky8b,   lucky8,   lucky8,   ns8lines, 0,         ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8 )
-GAMEL( 198?, ns8lines,  0,        lucky8,   ns8lines, 0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8 )
-GAMEL( 198?, ns8linew,  0,        lucky8,   ns8linew, 0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )
-GAMEL( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "hack",              "Kkoj Noli (Kill the Bees)",                                GAME_IMPERFECT_COLORS, layout_lucky8 )
-GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB-Austria",       "Lady Liner",                                               0 )
-GAME(  198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",            "Wild Cat 3",                                               GAME_NOT_WORKING )
+GAMEL( 1989, lucky8,    0,        lucky8,   lucky8,   0,         ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )
+GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  lucky8a,   ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 2, W-4)",                           0,                     layout_lucky8 )
+GAMEL( 1989, lucky8b,   lucky8,   lucky8,   ns8lines, 0,         ROT0, "Wing Co., Ltd. / GEI", "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8 )
+GAMEL( 198?, ns8lines,  0,        lucky8,   ns8lines, 0,         ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8 )
+GAMEL( 198?, ns8linew,  0,        lucky8,   ns8linew, 0,         ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )
+GAMEL( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "hack",                 "Kkoj Noli (Kill the Bees)",                                GAME_IMPERFECT_COLORS, layout_lucky8 )
+GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",          "Lady Liner",                                               0 )
+GAME(  198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",               "Wild Cat 3",                                               GAME_NOT_WORKING )
 
 GAME(  1992, magical,   0,        magical,  magical,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
 GAME(  1991, mtonic,    magical,  magical,  mtonic,   mtonic,    ROT0, "Pal Company",                            "Magical Odds (set 2, alt hardware)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND) // Magical Odds logo / company in GFX

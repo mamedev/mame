@@ -9,12 +9,12 @@
 
   Games running on this hardware:
 
-  * Jolly Card (austrian),                            TAB-Austria,        1985.
-  * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
+  * Jolly Card (austrian),                            TAB Austria,        1985.
+  * Jolly Card (3x3 deal),                            TAB Austria,        1985.
   * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
   * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
   * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
-  * Jolly Card (croatian, set 1),                     TAB-Austria,        1985.
+  * Jolly Card (croatian, set 1),                     TAB Austria,        1985.
   * Jolly Card (croatian, set 2),                     Soft Design,        1993.
   * Jolly Card (italian, blue TAB board, encrypted),  bootleg,            199?.
   * Jolly Card (italian, encrypted bootleg),          bootleg,            1990.
@@ -34,16 +34,16 @@
   * Pot Game (italian),                               C.M.C.,             1996.
   * Bottle 10 (italian, set 1),                       C.M.C.,             1996.
   * Bottle 10 (italian, set 2),                       C.M.C.,             1996.
-  * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
-  * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
-  * Royal Card (austrian/polish, set 3),              TAB-Austria,        1991.
-  * Royal Card (austrian, set 4),                     TAB-Austria,        1991.
-  * Royal Card (austrian, set 5),                     TAB-Austria,        1991.
-  * Royal Card (austrian, set 6),                     TAB-Austria,        1991.
+  * Royal Card (austrian, set 1),                     TAB Austria,        1991.
+  * Royal Card (austrian, set 2),                     TAB Austria,        1991.
+  * Royal Card (austrian/polish, set 3),              TAB Austria,        1991.
+  * Royal Card (austrian, set 4),                     TAB Austria,        1991.
+  * Royal Card (austrian, set 5),                     TAB Austria,        1991.
+  * Royal Card (austrian, set 6),                     TAB Austria,        1991.
   * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
-  * Lucky Lady (3x3 deal),                            TAB-Austria,        1991.
-  * Lucky Lady (4x1 aces),                            TAB-Austria,        1991.
+  * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
+  * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
   * Magic Card II (bulgarian),                        Impera,             1996.
   * Magic Card II (green TAB or Impera board),        Impera,             1996.
   * Magic Card II (blue TAB board, encrypted),        Impera,             1996.
@@ -4301,12 +4301,12 @@ static DRIVER_INIT( royalcdc )
 *************************/
 
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      INIT      ROT    COMPANY            FULLNAME                                          FLAGS                  LAYOUT */
-GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  0,        ROT0, "TAB-Austria",     "Jolly Card (Austrian)",                           0,                       layout_jollycrd )
-GAMEL( 1985, jolyc3x3,  jollycrd, fw1stpal, funworld,  0,        ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0,                       layout_jollycrd )
+GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian)",                           0,                       layout_jollycrd )
+GAMEL( 1985, jolyc3x3,  jollycrd, fw1stpal, funworld,  0,        ROT0, "TAB Austria",     "Jolly Card (3x3 deal)",                           0,                       layout_jollycrd )
 GAMEL( 1993, jolycmzs,  jollycrd, cuoreuno, jolyc980,  0,        ROT0, "MZS Tech",        "Jolly Card Professional 2.0 (MZS Tech)",          0,                       layout_jollycrd )
-GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  0,        ROT0, "Spale-Soft",      "Jolly Card Professional 2.0 (Spale Soft)",        0,                       layout_jollycrd )
-GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  0,        ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0,                       layout_jollycrd )
-GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  0,        ROT0, "TAB-Austria",     "Jolly Card (Croatian, set 1)",                    0,                       layout_jollycrd )
+GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  0,        ROT0, "Spale Soft",      "Jolly Card Professional 2.0 (Spale Soft)",        0,                       layout_jollycrd )
+GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  0,        ROT0, "TAB Austria / Evona Electronic", "Jolly Card (Evona Electronic)",    0,                       layout_jollycrd )
+GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  0,        ROT0, "TAB Austria",     "Jolly Card (Croatian, set 1)",                    0,                       layout_jollycrd )
 GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  0,        ROT0, "Soft Design",     "Jolly Card (Croatian, set 2)",                    0,                       layout_jollycrd )
 GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, blue TAB board, encrypted)", 0,                       layout_royalcrd )
 GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg)",         0,                       layout_jollycrd )	/* not a real TAB blue PCB */
@@ -4326,16 +4326,16 @@ GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.",
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  0,        ROT0, "TAB-Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
-GAMEL( 1991, royalcrda, royalcrd, royalcd2, royalcrd,  0,        ROT0, "TAB-Austria",     "Royal Card (Austrian, set 2)",                    0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdb, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB-Austria",     "Royal Card (Austrian/Polish, set 3)",             0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  0,        ROT0, "TAB-Austria",     "Royal Card (Austrian, set 4)",                    GAME_IMPERFECT_GRAPHICS, layout_jollycrd )
-GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB-Austria",     "Royal Card (Austrian, set 5)",                    0,                       layout_royalcrd )
-GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB-Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrda, royalcrd, royalcd2, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 2)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdb, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian/Polish, set 3)",             0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 4)",                    GAME_IMPERFECT_GRAPHICS, layout_jollycrd )
+GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 5)",                    0,                       layout_royalcrd )
+GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  GAME_NOT_WORKING )
 GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    GAME_NOT_WORKING )
-GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  0,        ROT0, "TAB-Austria",     "Lucky Lady (3x3 deal)",                           0,                       layout_jollycrd )
-GAMEL( 1991, lluck4x1,  royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB-Austria",     "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
+GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  0,        ROT0, "TAB Austria",     "Lucky Lady (3x3 deal)",                           0,                       layout_jollycrd )
+GAMEL( 1991, lluck4x1,  royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB Austria",     "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
 GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  0,        ROT0, "Impera",          "Magic Card II (Bulgarian)",                       GAME_IMPERFECT_SOUND,    layout_jollycrd )
 GAME(  1996, magicd2a,  magicrd2, magicrd2, magicrd2,  magicd2a, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       GAME_NOT_WORKING )
 GAME(  1996, magicd2b,  magicrd2, magicrd2, magicrd2,  magicd2b, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       GAME_NOT_WORKING )

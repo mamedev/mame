@@ -278,5 +278,5 @@ ROM_START( luckgrln )
 	ROM_LOAD( "falcon.6", 0x40000, 0x20000, CRC(bfb02c87) SHA1(1b5ca562ed76eb3f1b4a52d379a6af07e79b6ee5))
 ROM_END
 
-GAME( 1991, luckgrln,  0,    luckgrln, luckgrln,  luckgrln, ROT0, "Wing", "Lucky Girl (newer Z180 based hardware)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1991, luckgrln,  0,    luckgrln, luckgrln,  luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_NOT_WORKING|GAME_NO_SOUND )
 

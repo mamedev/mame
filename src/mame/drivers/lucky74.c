@@ -1380,6 +1380,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************
 
-       YEAR  NAME      PARENT   MACHINE  INPUT     INIT  ROT    COMPANY          FULLNAME                    FLAGS             LAYOUT  */
-GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  0,    ROT0, "Wing Co.Ltd", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
-GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74,  0,    ROT0, "Wing Co.Ltd", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )
+       YEAR  NAME      PARENT   MACHINE  INPUT     INIT  ROT    COMPANY          FULLNAME                     FLAGS             LAYOUT  */
+GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
+GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )

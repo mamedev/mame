@@ -9153,7 +9153,7 @@ GAME( 1990, nemo,     0,        cps1_10MHz, nemo,     cps1,     ROT0,   "Capcom"
 GAME( 1990, nemoj,    nemo,     cps1_10MHz, nemo,     cps1,     ROT0,   "Capcom", "Nemo (Japan 901120)", GAME_SUPPORTS_SAVE )
 GAME( 1991, sf2,      0,        cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (World 910522)", GAME_SUPPORTS_SAVE )	// "ETC"
 GAME( 1991, sf2eb,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (World 910214)", GAME_SUPPORTS_SAVE )	// "ETC"
-GAME( 1992, sf2ebbl,  sf2,      cps1_10MHz, sf2hack,  sf2hack,  ROT0,   "bootleg","Street Fighter II - The World Warrior (World 910214, TAB Austria bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1992, sf2ebbl,  sf2,      cps1_10MHz, sf2hack,  sf2hack,  ROT0,   "bootleg (TAB Austria)", "Street Fighter II - The World Warrior (World 910214, TAB Austria bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1991, sf2ua,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910206)", GAME_SUPPORTS_SAVE )
 GAME( 1991, sf2ub,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910214)", GAME_SUPPORTS_SAVE )
 GAME( 1991, sf2ud,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910318)", GAME_SUPPORTS_SAVE )
