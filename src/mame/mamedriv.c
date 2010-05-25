@@ -7174,8 +7174,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( thepitm )	/* bootleg */
 	DRIVER( dockman )	/* (c) 1982 Taito Corp. */
 	DRIVER( portman )	/* (c) 1982 Nova Games Ltd. */
-	DRIVER( funnymou )	/* (c) 1982 Chuo Co. Ltd */
 	DRIVER( suprmous )	/* (c) 1982 Taito */
+	DRIVER( funnymou )	/* (c) 1982 Chuo Co. Ltd */
 	DRIVER( machomou )	/* (c) 1982 Techstar */
 	DRIVER( intrepid )	/* (c) 1983 Nova Games Ltd. */
 	DRIVER( intrepid2 )	/* (c) 1983 Nova Games Ltd. */
