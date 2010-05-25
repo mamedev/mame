@@ -209,7 +209,7 @@ Knuckle Bash                   Working, but sound FX only (missing music). MCU t
                                         Some PCBs use another version stamped 'NITRO' which is the same chip type.
 Truxton 2                      Working.
 Pipi & Bibis                   Working.
-Whoopee                        Working. Missing sound MCU dump. It's a Hitachi HD647180. Using bootleg sound CPU dump for now.
+Whoopee                        Working, but no sound. Missing sound MCU dump. It's a Hitachi HD647180.
 Pipi & Bibis (Ryouta Kikaku)   Working.
 FixEight                       Not working properly. Missing background GFX, and sound FX only (missing music). Both controlled by PLCC94 NEC V25+ MCU stamped 'TS-001-TURBO'
 FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
@@ -234,9 +234,6 @@ Notes:
 To Do / Unknowns:
     - Whoopee/Teki Paki sometimes tests bit 5 of the territory port
         just after testing for vblank. Why ?
-    - Whoppee is currently using the sound CPU ROM (Z80) from a differnt
-        (pirate ?) version of Pipi and Bibis (Ryouta Kikaku copyright).
-        It really has a HD647180 CPU, and its internal ROM needs to be dumped.
     - Fix top character text layer (implement the line position table).
     - Priority problem on 2nd player side of selection screen in FixEight (both original and bootleg)
     - Fixeight bootleg text in sound check mode does not display properly
@@ -3760,11 +3757,10 @@ static MACHINE_DRIVER_START( whoopee )
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* This should be a HD647180 */
-											/* Change this to 10MHz when HD647180 gets dumped. 10MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(sound_z80_mem)
-
-	MDRV_QUANTUM_TIME(HZ(600))
+#ifdef USE_HD64x180
+	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
+	MDRV_CPU_PROGRAM_MAP(hd647180_mem)
+#endif
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -4373,7 +4369,7 @@ ROM_START( tekipaki )
 	ROM_LOAD16_BYTE( "tp020-1.bin", 0x000000, 0x010000, CRC(d8420bd5) SHA1(30c1ad9e053cd7e79adb42aa428ebee28e144755) )
 	ROM_LOAD16_BYTE( "tp020-2.bin", 0x000001, 0x010000, CRC(7222de8e) SHA1(8352ae23efc24a2e20cc24b6d37cb8fc6b1a730c) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.020", 0x00000, 0x08000, NO_DUMP )
 
@@ -4388,7 +4384,7 @@ ROM_START( ghox ) /* Spinner with single axis (up/down) controls */
 	ROM_LOAD16_BYTE( "tp021-01.u10", 0x000000, 0x020000, CRC(9e56ac67) SHA1(daf241d9e55a6e60fc004ed61f787641595b1e62) )
 	ROM_LOAD16_BYTE( "tp021-02.u11", 0x000001, 0x020000, CRC(15cac60f) SHA1(6efa3a50a5dfe6ef4072738d6a7d0d95dca8a675) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, NO_DUMP )
 
@@ -4403,7 +4399,7 @@ ROM_START( ghoxj ) /* 8-way joystick for controls */
 	ROM_LOAD16_BYTE( "tp021-01a.u10", 0x000000, 0x020000, CRC(c11b13c8) SHA1(da7defc1d3b6ddded910ba56c31fbbdb5ed57b09) )
 	ROM_LOAD16_BYTE( "tp021-02a.u11", 0x000001, 0x020000, CRC(8d426767) SHA1(1ed4a8bcbf4352257e7d58cb5c2c91eb48c2f047) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, NO_DUMP )
 
@@ -4575,10 +4571,9 @@ ROM_START( whoopee )
 	ROM_LOAD16_BYTE( "whoopee.1", 0x000000, 0x020000, CRC(28882e7e) SHA1(8fcd278a7d005eb81cd9e461139c0c0f756a4fa4) )
 	ROM_LOAD16_BYTE( "whoopee.2", 0x000001, 0x020000, CRC(6796f133) SHA1(d4e657be260ba3fd3f0556ade617882513b52685) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
-	/* use the Z80 version from the bootleg Pipi & Bibis set for now */
-	ROM_LOAD( "hd647180.025", 0x00000, 0x08000, BAD_DUMP CRC(101c0358) SHA1(162e02d00b7bdcdd3b48a0cd0527b7428435ec50)  )
+	ROM_LOAD( "hd647180.025", 0x00000, 0x08000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "tp025-4.bin", 0x000000, 0x100000, CRC(ab97f744) SHA1(c1620e614345dbd5c6567e4cb6f55c61b900d0ee) )
@@ -5429,8 +5424,6 @@ ROM_END
 
 /* The following is in order of Toaplan Board/game numbers */
 /* See list at top of file */
-/* Whoopee machine to be changed to Teki Paki when (if) HD647180 is dumped */
-/* Whoopee  init   to be changed to T2_Z180   when (if) HD647180 is dumped */
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
 GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
@@ -5449,7 +5442,7 @@ GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan",
 
 GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, pipibibsa,pipibibs, pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z80,   ROT0,   "Toaplan", "Whoopee!! / Pipi & Bibis", GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead
+GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z180,  ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Whoopee!! board)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "bootleg? (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg?)", GAME_SUPPORTS_SAVE )
 
 GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
