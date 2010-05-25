@@ -87,7 +87,6 @@ static READ8_HANDLER( zaccaria_dsw_r )
 }
 
 
-
 static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 {
 	/* bits 0-2 go to a 74LS156 with open collector outputs
@@ -185,51 +184,6 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 	// bit 4 = led (for testing?)
 	set_led_status(device->machine, 0,~data & 0x10);
 }
-
-
-static const pia6821_interface pia_0_intf =
-{
-	DEVCB_HANDLER(zaccaria_port0a_r),	/* port A in */
-	DEVCB_NULL,							/* port B in */
-	DEVCB_NULL,							/* line CA1 in */
-	DEVCB_NULL,							/* line CB1 in */
-	DEVCB_NULL,							/* line CA2 in */
-	DEVCB_NULL,							/* line CB2 in */
-	DEVCB_HANDLER(zaccaria_port0a_w),	/* port A out */
-	DEVCB_HANDLER(zaccaria_port0b_w),	/* port B out */
-	DEVCB_NULL,							/* line CA2 out */
-	DEVCB_NULL,							/* port CB2 out */
-	DEVCB_LINE(zaccaria_irq0a),			/* IRQA */
-	DEVCB_LINE(zaccaria_irq0b)			/* IRQB */
-};
-
-
-static const pia6821_interface pia_1_intf =
-{
-	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),	/* port A in */
-	DEVCB_NULL,										/* port B in */
-	DEVCB_NULL,										/* line CA1 in */
-	DEVCB_NULL,										/* line CB1 in */
-	DEVCB_NULL,										/* line CA2 in */
-	DEVCB_NULL,										/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),	/* port A out */
-	DEVCB_HANDLER(zaccaria_port1b_w),				/* port B out */
-	DEVCB_NULL,										/* line CA2 out */
-	DEVCB_NULL,										/* port CB2 out */
-	DEVCB_NULL,										/* IRQA */
-	DEVCB_NULL										/* IRQB */
-};
-
-
-static const ppi8255_interface ppi8255_intf =
-{
-	DEVCB_INPUT_PORT("P1"),				/* Port A read */
-	DEVCB_INPUT_PORT("P2"),				/* Port B read */
-	DEVCB_INPUT_PORT("SYSTEM"),			/* Port C read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(zaccaria_dsw_sel_w)	/* Port C write */
-};
 
 
 static WRITE8_HANDLER( sound_command_w )
@@ -524,6 +478,16 @@ static GFXDECODE_START( zaccaria )
 GFXDECODE_END
 
 
+static const ppi8255_interface ppi8255_config =
+{
+	DEVCB_INPUT_PORT("P1"),				/* Port A read */
+	DEVCB_INPUT_PORT("P2"),				/* Port B read */
+	DEVCB_INPUT_PORT("SYSTEM"),			/* Port C read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(zaccaria_dsw_sel_w)	/* Port C write */
+};
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -532,6 +496,38 @@ static const ay8910_interface ay8910_config =
 	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch2_r),
 	DEVCB_HANDLER(ay8910_port0a_w),
 	DEVCB_NULL
+};
+
+static const pia6821_interface pia_0_config =
+{
+	DEVCB_HANDLER(zaccaria_port0a_r),	/* port A in */
+	DEVCB_NULL,							/* port B in */
+	DEVCB_NULL,							/* line CA1 in */
+	DEVCB_NULL,							/* line CB1 in */
+	DEVCB_NULL,							/* line CA2 in */
+	DEVCB_NULL,							/* line CB2 in */
+	DEVCB_HANDLER(zaccaria_port0a_w),	/* port A out */
+	DEVCB_HANDLER(zaccaria_port0b_w),	/* port B out */
+	DEVCB_NULL,							/* line CA2 out */
+	DEVCB_NULL,							/* port CB2 out */
+	DEVCB_LINE(zaccaria_irq0a),			/* IRQA */
+	DEVCB_LINE(zaccaria_irq0b)			/* IRQB */
+};
+
+static const pia6821_interface pia_1_config =
+{
+	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),	/* port A in */
+	DEVCB_NULL,										/* port B in */
+	DEVCB_NULL,										/* line CA1 in */
+	DEVCB_NULL,										/* line CB1 in */	// tms5220_intq_r, handled below in tms5220_config
+	DEVCB_NULL,										/* line CA2 in */	// tms5220_readyq_r, "
+	DEVCB_NULL,										/* line CB2 in */
+	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),	/* port A out */
+	DEVCB_HANDLER(zaccaria_port1b_w),				/* port B out */
+	DEVCB_NULL,										/* line CA2 out */
+	DEVCB_NULL,										/* port CB2 out */
+	DEVCB_NULL,										/* IRQA */
+	DEVCB_NULL										/* IRQB */
 };
 
 static const tms5220_interface tms5220_config =
@@ -559,9 +555,9 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_CPU_PROGRAM_MAP(sound_map_2)
 	MDRV_QUANTUM_TIME(HZ(1000000))
 
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
-	MDRV_PIA6821_ADD( "pia0", pia_0_intf )
-	MDRV_PIA6821_ADD( "pia1", pia_1_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_config )
+	MDRV_PIA6821_ADD( "pia0", pia_0_config )
+	MDRV_PIA6821_ADD( "pia1", pia_1_config )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
