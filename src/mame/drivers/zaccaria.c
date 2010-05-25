@@ -161,6 +161,15 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 	last_port0b = data;
 }
 
+static INTERRUPT_GEN( zaccaria_cb1_toggle )
+{
+	running_device *pia0 = devtag_get_device(device->machine, "pia0");
+	static int toggle = 0;
+
+	pia6821_cb1_w(pia0,0, toggle & 1);
+	toggle ^= 1;
+}
+
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
 	running_device *tms = devtag_get_device(device->machine, "tms");
@@ -180,35 +189,35 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 
 static const pia6821_interface pia_0_intf =
 {
-	DEVCB_HANDLER(zaccaria_port0a_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(zaccaria_port0a_w),		/* port A out */
-	DEVCB_HANDLER(zaccaria_port0b_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(zaccaria_irq0a),		/* IRQA */
-	DEVCB_LINE(zaccaria_irq0b)		/* IRQB */
+	DEVCB_HANDLER(zaccaria_port0a_r),	/* port A in */
+	DEVCB_NULL,							/* port B in */
+	DEVCB_NULL,							/* line CA1 in */
+	DEVCB_NULL,							/* line CB1 in */
+	DEVCB_NULL,							/* line CA2 in */
+	DEVCB_NULL,							/* line CB2 in */
+	DEVCB_HANDLER(zaccaria_port0a_w),	/* port A out */
+	DEVCB_HANDLER(zaccaria_port0b_w),	/* port B out */
+	DEVCB_NULL,							/* line CA2 out */
+	DEVCB_NULL,							/* port CB2 out */
+	DEVCB_LINE(zaccaria_irq0a),			/* IRQA */
+	DEVCB_LINE(zaccaria_irq0b)			/* IRQB */
 };
 
 
 static const pia6821_interface pia_1_intf =
 {
-	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL, //DEVCB_DEVICE_LINE("tms", tms5220_intq_r), 			/* line CB1 in */
-	DEVCB_NULL, //DEVCB_DEVICE_LINE("tms", tms5220_readyq_r), 		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),		/* port A out */
-	DEVCB_HANDLER(zaccaria_port1b_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
+	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),	/* port A in */
+	DEVCB_NULL,										/* port B in */
+	DEVCB_NULL,										/* line CA1 in */
+	DEVCB_NULL,										/* line CB1 in */
+	DEVCB_NULL,										/* line CA2 in */
+	DEVCB_NULL,										/* line CB2 in */
+	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),	/* port A out */
+	DEVCB_HANDLER(zaccaria_port1b_w),				/* port B out */
+	DEVCB_NULL,										/* line CA2 out */
+	DEVCB_NULL,										/* port CB2 out */
+	DEVCB_NULL,										/* IRQA */
+	DEVCB_NULL										/* IRQB */
 };
 
 
@@ -528,7 +537,7 @@ static const ay8910_interface ay8910_config =
 static const tms5220_interface tms5220_config =
 {
 	DEVCB_DEVICE_HANDLER("pia1", pia6821_cb1_w),	/* IRQ handler */
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_ca2_w)	/* READYQ handler */
+	DEVCB_DEVICE_HANDLER("pia1", pia6821_ca2_w)		/* READYQ handler */
 };
 
 
@@ -543,12 +552,12 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	MDRV_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_1)
+	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)XTAL_3_579545MHz/4096)
 	MDRV_QUANTUM_TIME(HZ(1000000))
 
 	MDRV_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_2)
 	MDRV_QUANTUM_TIME(HZ(1000000))
-
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 	MDRV_PIA6821_ADD( "pia0", pia_0_intf )
@@ -556,7 +565,7 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.57) /* verified from pcb */
+	MDRV_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
