@@ -836,10 +836,10 @@ static DRIVER_INIT(jujub)
 }
 
 
-GAME( 1989, toki,  0,    toki,  toki,  toki,  ROT0, "Tad", "Toki (World set 1)", 0 )
-GAME( 1989, tokia, toki, toki,  toki,  toki,  ROT0, "Tad", "Toki (World set 2)", 0 )
-GAME( 1989, tokiu, toki, toki,  toki,  toki,  ROT0, "Tad (Fabtek license)", "Toki (US)", 0 )
-GAME( 1989, juju,  toki, toki,  toki,  toki,  ROT0, "Tad", "JuJu Densetsu (Japan)", 0 )
+GAME( 1989, toki,  0,    toki,  toki,  toki,  ROT0, "TAD Corporation", "Toki (World set 1)", 0 )
+GAME( 1989, tokia, toki, toki,  toki,  toki,  ROT0, "TAD Corporation", "Toki (World set 2)", 0 )
+GAME( 1989, tokiu, toki, toki,  toki,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US)", 0 )
+GAME( 1989, juju,  toki, toki,  toki,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", 0 )
 GAME( 1990, tokib, toki, tokib, tokib, tokib, ROT0, "bootleg", "Toki (Datsu bootleg)", 0 )
 /* Sound hardware seems to have been slightly modified, the coins are handled ok, but there is no music and bad sfx.  Program roms have a slight bitswap, Flipscreen also seems to be ignored */
 GAME( 1989, jujub, toki, toki,  toki,  jujub, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND ) // bootleg of tokia/tokij revison

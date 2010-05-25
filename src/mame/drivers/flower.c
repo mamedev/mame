@@ -5,9 +5,10 @@ Flower (c)1986 Komax (USA license)
 
  - Driver by InsideOutBoy
 
-There is a PCB picture that shows two stickers, the first
-      says "Flower (c) 1986 Clarue" while the second one
-      is an original serial number tag also showing "Clarue"
+There is a PCB picture that shows two stickers, the first says
+ "Flower (c) 1986 Clarue" while the second one is an original
+ serial number tag also showing "Clarue". GFX ROM contents also
+ show (C) 1986 CLARUE. A Wood Place Inc. spinoff perhaps?
 
 
 todo:
@@ -365,5 +366,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Wood Place Inc. (Komax license)", "Flower (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, flowerj, flower, flower, flower, 0, ROT0, "Wood Place Inc. (Sega / Alpha license)", "Flower (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Clarue (Komax license)", "Flower (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, flowerj, flower, flower, flower, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
