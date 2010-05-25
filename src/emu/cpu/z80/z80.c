@@ -169,7 +169,7 @@ INLINE z80_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_Z80);
+	assert(cpu_get_type(device) == CPU_Z80 || cpu_get_type(device) == CPU_NSC800);
 	return (z80_state *)device->token;
 }
 
