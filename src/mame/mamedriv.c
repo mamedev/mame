@@ -3818,6 +3818,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( suprlocoa )	/* (c) 1982 Sega */
 	DRIVER( dotrikun )	/* cabinet test board */
 	DRIVER( dotrikun2 )	/* cabinet test board */
+	DRIVER( flower )	/* (c) 1986 Komax license */
+	DRIVER( flowerj )	/* 834-5998 (c) 1986 Sega / Alpha */
 	DRIVER( spcpostn )	/* (c) 1986 Sega / Nasco" */
 	DRIVER( angelkds )	/* 833-6599 (c) 1988 Sega / Nasco? */
 	DRIVER( calorie )	/* (c) 1986 Sega */
@@ -8924,8 +8926,6 @@ Other Sun games
 	DRIVER( fitfight )	/* bootleg of Art of Fighting */
 	DRIVER( histryma )	/* bootleg of Fighter's History */
 	DRIVER( bbprot )	/* unfinished prototype */
-	DRIVER( flower )	/* (c) 1986 Komax */
-	DRIVER( flowers )	/* (c) 1986 Sega/Alpha */
 	DRIVER( beaminv )	/* (c) 1979 Tekunon Kougyou (Arcade TV Game List - P.95, Left, 9 from top) */
 	DRIVER( beaminva )	/* (c) 1979 Tekunon Kougyou (Arcade TV Game List - P.95, Left, 9 from top) */
 	DRIVER( mcatadv )	/* (c) 1993 Wintechno */

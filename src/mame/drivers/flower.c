@@ -1,6 +1,6 @@
 /*
 
-Flower (c)1986 Komax
+Flower (c)1986 Komax (USA license)
        (c)1986 Sega/Alpha (Sega game number 834-5998)
 
  - Driver by InsideOutBoy
@@ -321,9 +321,9 @@ ROM_START( flower ) /* Komax version */
 	ROM_LOAD( "82s129.a1",  0x0420, 0x0100, CRC(c8dad3fc) SHA1(8e852efac70223d02e45b20ed8a12e38c5010a78) )
 ROM_END
 
-ROM_START( flowers ) /* Sega/Alpha version.  Sega game number 834-5998 */
+ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main cpu */
-	ROM_LOAD( "1",   0x0000, 0x8000, CRC(63a2ef04) SHA1(0770f5a18d58b780abcda7e000c2a5e46f96d319) )
+	ROM_LOAD( "1",   0x0000, 0x8000, CRC(63a2ef04) SHA1(0770f5a18d58b780abcda7e000c2a5e46f96d319) ) // hacked? "AKINA.N" changed to "JUKYUNG"
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sub cpu */
 	ROM_LOAD( "2.5f",   0x0000, 0x8000, CRC(7c7ee2d8) SHA1(1e67bfe0f3585be5a6e6719ccf9db764bafbcb01) )
@@ -365,5 +365,5 @@ ROM_START( flowers ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Komax",        "Flower (Komax)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, flowers, flower, flower, flower, 0, ROT0, "Sega / Alpha", "Flower (Sega / Alpha)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Sega / Alpha Denshi Co. (Komax license)", "Flower (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, flowerj, flower, flower, flower, 0, ROT0, "Sega / Alpha Denshi Co.", "Flower (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
