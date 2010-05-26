@@ -912,10 +912,10 @@ MACHINE_DRIVER_END
 
 #define DECOCASS_BIOS \
 	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "v0a.7e, New boardset bios, revision A" ) \
-	ROM_LOAD_BIOS( 0, "v0a.7e",     0xf000, 0x1000, CRC(3D33AC34) SHA1(909D59E7A993AFFD10224402B4370E82A5F5545C) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A' label (has HDRA01HDR string inside it), bios code */ \
-	ROM_SYSTEM_BIOS( 1, "bios1", "rms8.7e, New boardset bios, revision B" ) \
-	ROM_LOAD_BIOS( 1, "rms8.7e",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/unknown label (probably 'V0B', needs checking; has HDRB01HDR string in it), bios code */ \
+	ROM_SYSTEM_BIOS( 0, "bios1", "rms8.7e, New boardset bios, revision B" ) \
+	ROM_LOAD_BIOS( 0, "rms8.7e",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/unknown label (probably 'V0B', needs checking; has HDRB01HDR string in it), bios code */ \
+	ROM_SYSTEM_BIOS( 1, "bios0", "v0a.7e, New boardset bios, revision A" ) \
+	ROM_LOAD_BIOS( 1, "v0a.7e",     0xf000, 0x1000, CRC(3D33AC34) SHA1(909D59E7A993AFFD10224402B4370E82A5F5545C) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A' label (has HDRA01HDR string inside it), bios code; doesn't seem to work properly yet (gives cassette 01 error, might use a different mcu revision?) */ \
 	ROM_SYSTEM_BIOS( 2, "bios2", "dsp3.p0b/p1b, Old boardset bios, revision B?" ) /* from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
 	ROM_LOAD_BIOS( 2, "dsp3.p0b",     0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
 	ROM_LOAD_BIOS( 2, "dsp3.p1b",     0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
@@ -927,7 +927,7 @@ MACHINE_DRIVER_END
 	ROM_LOAD( "v1.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1 label,  contains audio cpu code */ \
 \
 	ROM_REGION( 0x10000, "mcu", 0 )	  /* 4k for the 8041 MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
-	ROM_LOAD( "d8041-535.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) )  /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff */ \
+	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) )  /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff; This info needs additional verification, as the d8041-535 mcu has not been dumped yet to prove code is the same. */ \
 \
 	ROM_REGION( 0x00060, "proms", 0 )	  /* PROMS */ \
 	ROM_LOAD( "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
