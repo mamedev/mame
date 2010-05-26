@@ -260,7 +260,7 @@ notes:
   crush roller roms.  It is slightly different from a Make Trax board in that the sync inverter chip is missing and
   there are no jumper wires.
 
-- jumpshtp: This board was aquired by Pokemame from a former midway employee.  The hardware is identical to normal boards
+- jumpshotp: This board was aquired by Pokemame from a former midway employee.  The hardware is identical to normal boards
   except the daughterboard is missing the epoxy potting.  Board was labeled engineering sample. Code differences
   include dips, starting position and cheerleader text.
 
@@ -2426,7 +2426,7 @@ static INPUT_PORTS_START( jumpshot )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( jumpshtp )
+static INPUT_PORTS_START( jumpshotp )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -4870,7 +4870,7 @@ ROM_START( jumpshot )
 ROM_END
 
 
-ROM_START( jumpshtp )
+ROM_START( jumpshotp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "js6e.bin",           0x0000, 0x1000, CRC(acc5e15e) SHA1(c9516f2d0862b29a3efe19eb13ab68decd670ca8) )
 	ROM_LOAD( "js6f.bin",           0x1000, 0x1000, CRC(62b48ba4) SHA1(a17d8ca68de6116822cf4eff70eada04a3fbb4c3) )
@@ -5799,7 +5799,7 @@ GAME( 1983, mrtnt,    0,        pacman,   mrtnt,    eyes,     ROT90,  "Techstar 
 GAME( 1983, gorkans,  mrtnt,    pacman,   mrtnt,    0,        ROT90,  "Techstar", "Gorkans", GAME_SUPPORTS_SAVE )
 GAME( 1983, eggor,    0,        pacman,   mrtnt,    eyes,     ROT90,  "Telko", "Eggor", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, jumpshot, ROT90,  "Bally Midway", "Jump Shot", GAME_SUPPORTS_SAVE )
-GAME( 1985, jumpshtp, jumpshot, pacman,   jumpshtp, jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", GAME_SUPPORTS_SAVE )
+GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", GAME_SUPPORTS_SAVE )
 GAME( 1985, shootbul, 0,        pacman,   shootbul, jumpshot, ROT90,  "Bally Midway", "Shoot the Bull", GAME_SUPPORTS_SAVE )
 GAME( 1981, piranha,  puckman,  piranha,  mspacman, eyes,     ROT90,  "GL (US Billiards license)", "Piranha", GAME_SUPPORTS_SAVE )
 GAME( 1981, piranhao, puckman,  piranha,  mspacman, eyes,     ROT90,  "GL (US Billiards license)", "Piranha (older)", GAME_SUPPORTS_SAVE )

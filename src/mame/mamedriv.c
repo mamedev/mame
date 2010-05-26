@@ -77,7 +77,7 @@ const game_driver * const drivers[] =
 	DRIVER( gorkans )	/* (c) 1984 Techstar */
 	DRIVER( eggor )		/* (c) 1983 Telko */
 	DRIVER( jumpshot )	/* (c) 1985 Bally Midway */
-	DRIVER( jumpshtp )	/* (c) 1985 Bally Midway */
+	DRIVER( jumpshotp )	/* (c) 1985 Bally Midway */
 	DRIVER( shootbul )	/* (c) 1985 Bally Midway */
 	DRIVER( piranha )	/* GL */
 	DRIVER( piranhao )	/* GL */
