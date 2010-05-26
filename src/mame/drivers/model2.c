@@ -4606,16 +4606,53 @@ static DRIVER_INIT( daytonam )
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x240000, 0x24ffff, 0, 0, maxx_r );
 }
 
+/* very crude support for let the game set itself into stand-alone mode */
+static int jnet_time_out;
+
+static READ32_HANDLER( jaleco_network_r )
+{
+	if(offset == 0x4000/4)
+	{
+		if(model2_netram[offset] == 0x00000000)
+			jnet_time_out = 0;
+
+		if((model2_netram[offset] & 0xffff) == 0x0001)
+			jnet_time_out++;
+
+		if(jnet_time_out > 0x80)
+			model2_netram[offset]|= 0x00800000;
+
+		return model2_netram[offset];
+	}
+
+	return model2_netram[offset];
+}
+
+static WRITE32_HANDLER( jaleco_network_w )
+{
+	COMBINE_DATA(&model2_netram[offset]);
+}
+
 static DRIVER_INIT( sgt24h )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
+
 	protstate = protpos = 0;
 
 	ROM[0x56578/4] = 0x08000004;
 	ROM[0x5b3e8/4] = 0x08000004;
 }
+
+static DRIVER_INIT( overrev )
+{
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
+
+	//TODO: protection patch / simulation
+}
+
 
 static DRIVER_INIT( doa )
 {
@@ -4682,7 +4719,7 @@ GAME( 1996, skisuprg,        0, model2c, model2, 0, ROT0, "Sega", "Sega Ski Supe
 GAME( 1996, stcc,            0, model2c, model2, 0, ROT0, "Sega", "Sega Touring Car Championship (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, waverunr,        0, model2c, model2, 0, ROT0, "Sega", "Wave Runner (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,            0, model2c, model2, 0, ROT0, "Sega", "House of the Dead", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, overrev,         0, model2c, model2, 0, ROT0, "Jaleco", "Over Rev (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, overrev,         0, model2c, model2, overrev, ROT0, "Jaleco", "Over Rev (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,        0, model2c, model2, 0, ROT0, "Sega", "Sega Water Ski (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,        0, model2c, model2, 0, ROT0, "Sega", "Top Skater (Export, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatru,topskatr, model2c, model2, 0, ROT0, "Sega", "Top Skater (USA)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
