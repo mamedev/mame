@@ -987,8 +987,8 @@ ROM_END
 
 
 GAME( 1984, dynamski, 0,        dynamski, dynamski, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL )
-GAME( 1984, chinhero, 0,        chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero", 0 )
+GAME( 1984, chinhero, 0,        chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero", 0 ) // by Nihon Game?
 GAME( 1984, chinhero2,chinhero, chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero (older)", 0 )
-GAME( 1984, chinherot,chinhero, chinhero, chinhero, chinhero, ROT90, "Taito", "Chinese Heroe (Taito)", 0 )
+GAME( 1984, chinherot,chinhero, chinhero, chinhero, chinhero, ROT90, "Taiyo (Taito license)", "Chinese Heroe (Taito)", 0 )
 GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", GAME_NO_COCKTAIL )
 GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid, ROT0,  "Taiyo (Taito license)", "Hokuha Syourin Hiryu no Ken", GAME_NO_COCKTAIL )
