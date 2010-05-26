@@ -976,8 +976,10 @@ const game_driver * const drivers[] =
 	DRIVER( taiko10 )
 
 	/* Misc Namco games */
-	DRIVER( 20pacgal )	/* (c) 2000 Ver 1.04 */
-	DRIVER( 20pacgala )	/* (c) 2000 Ver 1.01 */
+	DRIVER( 20pacgal )	/* (c) 2000 Ver 1.08 */
+	DRIVER( 20pacgalr4 )	/* (c) 2000 Ver 1.04 */
+	DRIVER( 20pacgalr2 )	/* (c) 2000 Ver 1.02 */
+	DRIVER( 20pacgalr1 )	/* (c) 2000 Ver 1.01 */
 	DRIVER( turrett )	/* (c) 2001 licensed from Dell Electronics */
 
 	/* Universal games */
