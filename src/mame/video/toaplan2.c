@@ -1361,7 +1361,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int bank, sprite_num;
 
 		attrib = source[offs];
-		priority = primap[((attrib & 0x0f00)>>8)]+1;
+		priority = primap[((attrib & 0x0f00)>>8)]+1+controller*0x40;
 
 		if ((attrib & 0x8000))
 		{
