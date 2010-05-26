@@ -250,9 +250,10 @@ VIDEO_UPDATE( zaccaria )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
 	// 3 layers of sprites, each with their own palette and priorities
+	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?
 	draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.spriteram2.u8,2,1);
 	draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.spriteram.u8,1,0);
 	draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.spriteram2.u8+0x20,0,1);
-	
+
 	return 0;
 }
