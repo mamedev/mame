@@ -8103,8 +8103,8 @@ Other Sun games
 	DRIVER( blzntrnd )	/* (c) 1994 Human Amusement */
 	DRIVER( gstrik2 )	/* (c) 1996 Human Amusement */
 	DRIVER( gstrik2j )
-	DRIVER( hyprduel )	/* (c) 1993 Technosoft (World) */
-	DRIVER( hyprdelj )	/* (c) 1993 Technosoft (Japan) */
+	DRIVER( hyprduel )	/* (c) 1993 Technosoft (Japan) */
+	DRIVER( hyprduel2 )	/* (c) 1993 Technosoft (Japan) */
 	DRIVER( magerror )	/* (c) 1994 Technosoft (Japan) (Arcade TV Game List - P.100, Left, 13 from Bottom) */
 	DRIVER( puzzlet )	/* (c) 2000 Yunizu Corporation (Japan) */
 
