@@ -12,16 +12,20 @@
     The Dumping Union
 
     The DECO cassette system consists of three PCBS in a card cage:
+    Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset)
+    One RMS-3 pcb with a 6502 processor, two ay-3-8910s, and one 2716 eprom holding the audio bios. (audio)
+    One DSP-3 pcb with a 6502 processor, two 2716 eproms (main processor and bios, graphics, dipswitches?)
+    One BIO-3 pcb with an 8041 MCU (cassette control)
+    TODO: get more info about this older boardset: D. Widel has some info about it on his page at http://www.widel.com/stuff/decopin.htm
+
+    Later boardset: (1984 onward, schematic is dated 10/83)
     One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
-    Older systems may have a DSP-3 board instead of an RMS-8 board, only difference seems to be the layout of the rom on that board (3 x 2716 instead of 1 x 2716 and 1 x 2732)
-    TODO: verify DSP-3 info.
-
     One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor and graphics)
-
     One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it (cassette control, inputs)
 
 
-    The actual cassettes use a custom player hooked to the BIO-8 board, and are roughly microcassette form factor, but are larger and will not fit in a microcassette player.
+    The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
+    Each cassette has two tracks on it: a clock track and a data track, for a form of synchronous serial. The data is stored in blocks with headers and checksums.
 
 
 
@@ -908,11 +912,11 @@ MACHINE_DRIVER_END
 
 #define DECOCASS_BIOS \
 	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "v0a.7e, older 1-chip bios?" ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "v0a.7e, New boardset bios, revision A" ) \
 	ROM_LOAD_BIOS( 0, "v0a.7e",     0xf000, 0x1000, CRC(3D33AC34) SHA1(909D59E7A993AFFD10224402B4370E82A5F5545C) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A' label (has HDRA01HDR string inside it), bios code */ \
-	ROM_SYSTEM_BIOS( 1, "bios1", "rms8.7e, newer 1-chip bios?" ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "rms8.7e, New boardset bios, revision B" ) \
 	ROM_LOAD_BIOS( 1, "rms8.7e",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/unknown label (probably 'V0B', needs checking; has HDRB01HDR string in it), bios code */ \
-	ROM_SYSTEM_BIOS( 2, "bios2", "dsp3.p0b & dsp3.p1b 2-chip bios?" ) /* from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
+	ROM_SYSTEM_BIOS( 2, "bios2", "dsp3.p0b/p1b, Old boardset bios, revision B?" ) /* from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
 	ROM_LOAD_BIOS( 2, "dsp3.p0b",     0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
 	ROM_LOAD_BIOS( 2, "dsp3.p1b",     0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
 
