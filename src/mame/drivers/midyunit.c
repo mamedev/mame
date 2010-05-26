@@ -26,6 +26,7 @@
     Notes:
         * Super Hi Impact Proto V4.0: You need to at least reset the high score
             table from the UTILITIES menu.  It's best to do a FULL FACTORY RESTORE
+        * Known to exist, but not dumped Terminator 2 LA4 (8/3/92)
 
 
 Super High Impact
