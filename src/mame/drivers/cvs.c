@@ -301,7 +301,7 @@ static READ8_HANDLER( cvs_393hz_clock_r )
 
 static READ8_DEVICE_HANDLER( tms_clock_r )
 {
-	return tms5110_romclk_r(device, 0) ? 0x80 : 0;
+	return tms5110_romclk_hack_r(device, 0) ? 0x80 : 0;
 }
 
 static TIMER_CALLBACK( cvs_393hz_timer_cb )

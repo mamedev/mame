@@ -22,15 +22,30 @@
 typedef struct _tms5110_interface tms5110_interface;
 struct _tms5110_interface
 {
+	/* legacy interface */
 	int (*M0_callback)(running_device *device);	/* function to be called when chip requests another bit */
 	void (*load_address)(running_device *device, int addr);	/* speech ROM load address callback */
+	/* new rom controller interface */
+	devcb_write_line m0_func;		/* the M0 line */
+	devcb_write_line m1_func;		/* the M1 line */
+	devcb_write8 address_func;		/* Write to ADD1,2,4,8 - 4 address bits */
+	devcb_read_line data_func;		/* Read one bit from ADD8/Data - voice data */
+	/* on a real chip rom_clk is running all the time
+	 * Here, we only use it to properly emulate the protocol.
+	 * Do not rely on it to be a timed signal.
+	 */
+	devcb_write_line rom_clk_func;	/* rom_clk - Only used to drive the data lines */
 };
 
 WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
 READ8_DEVICE_HANDLER( tms5110_ctl_r );
 WRITE8_DEVICE_HANDLER( tms5110_pdc_w );
 
-READ8_DEVICE_HANDLER( tms5110_romclk_r );
+/* this is only used by cvs.c
+ * it is not related at all to the speech generation
+ * and conflicts with the new rom controller interface.
+ */
+READ8_DEVICE_HANDLER( tms5110_romclk_hack_r );
 
 /* m58817 status line */
 READ8_DEVICE_HANDLER( m58817_status_r );
