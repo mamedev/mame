@@ -115,8 +115,7 @@ TODO:
 
 - third CPU
 - dip switch reading bug. dorunrun and docastle are VERY timing sensitive, and
-  dip switch reading will fail if the main CPU is running at the nominally correct
-  4MHz speed. This is kludge by slighly lowering the speed to 3.98MHz.
+  dip switch reading will fail if timing is not completely accurate.
 - the dorunrun attract mode sequence is also very timing sensitive. The behaviour
   of the "dorunrun2" set, verified on the real board, with all dips in the OFF
   position (easiest difficulty setting), should be, for the first 12 rounds of
@@ -134,9 +133,9 @@ TODO:
   11) Mr do moves right.
   12) Mr do moves. Kills 'A' monster. Shows winning extra Mr do.
 
-  Small changes to the CPU speed alter the demo timing and can cause the above
-  sequence not to work (e.g. Mr Do might not fill all monsters at once on the
-  first round). The 3.98MHz speed makes the sequence work.
+  Small changes to the CPU speed or refresh rate alter the demo timing and can cause
+  the above sequence (not) to work (e.g. Mr Do might not fill all monsters at once
+  on the first round).
   Note that this only works in the dorunrun2 set. The dorunrun set works slightly
   differently, however it hasn't been compared with the real board so it might be
   right.
@@ -598,23 +597,22 @@ static MACHINE_DRIVER_START( docastle )
 	MDRV_DRIVER_DATA(docastle_state)
 
 	/* basic machine hardware */
-//  MDRV_CPU_ADD("maincpu", Z80, 4000000)  // 4 MHz
-	MDRV_CPU_ADD("maincpu", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunrun2 attract sequence
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(docastle_map)
 	MDRV_CPU_IO_MAP(docastle_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("slave", Z80, 4000000)	// 4 MHz
+	MDRV_CPU_ADD("slave", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(docastle_map2)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 8)
 
-	MDRV_CPU_ADD("cpu3", Z80, 4000000)	// 4 MHz
+	MDRV_CPU_ADD("cpu3", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(docastle_map3)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.60)	// measured on pcb
+	MDRV_SCREEN_REFRESH_RATE(59.60)	// measured on pcb, real refresh rate should be derived from XTAL_9_828MHz, how?
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -633,16 +631,16 @@ static MACHINE_DRIVER_START( docastle )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, 4000000)
+	MDRV_SOUND_ADD("sn1", SN76489A, XTAL_4MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn2", SN76489A, 4000000)
+	MDRV_SOUND_ADD("sn2", SN76489A, XTAL_4MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn3", SN76489A, 4000000)
+	MDRV_SOUND_ADD("sn3", SN76489A, XTAL_4MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn4", SN76489A, 4000000)
+	MDRV_SOUND_ADD("sn4", SN76489A, XTAL_4MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
