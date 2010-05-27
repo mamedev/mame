@@ -393,12 +393,21 @@ static const input_type_desc core_types[] =
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN6,               "Coin 6",                 SEQ_DEF_0 )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN7,               "Coin 7",                 SEQ_DEF_0 )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN8,               "Coin 8",                 SEQ_DEF_0 )
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN9,               "Coin 9",                 SEQ_DEF_0 )
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN10,              "Coin 10",                SEQ_DEF_0 )
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN11,              "Coin 11",                SEQ_DEF_0 )
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN12,              "Coin 12",                SEQ_DEF_0 )	
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   BILL1,               "Bill 1",                 SEQ_DEF_1(KEYCODE_BACKSPACE) )
 
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   SERVICE1,            "Service 1",              SEQ_DEF_1(KEYCODE_9) )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   SERVICE2,            "Service 2",              SEQ_DEF_1(KEYCODE_0) )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   SERVICE3,            "Service 3",              SEQ_DEF_1(KEYCODE_MINUS) )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   SERVICE4,            "Service 4",              SEQ_DEF_1(KEYCODE_EQUALS) )
+
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   TILT1,               "Tilt 1",                 SEQ_DEF_1(KEYCODE_T) )
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   TILT2,               "Tilt 2",                 SEQ_DEF_0 )
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   TILT3,               "Tilt 3",                 SEQ_DEF_0 )
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   TILT4,               "Tilt 4",                 SEQ_DEF_0 )
 
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   SERVICE,             "Service",                SEQ_DEF_1(KEYCODE_F2) )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   TILT,                "Tilt",                   SEQ_DEF_1(KEYCODE_T) )

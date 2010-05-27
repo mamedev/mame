@@ -134,6 +134,10 @@ enum
 	IPT_COIN6,
 	IPT_COIN7,
 	IPT_COIN8,
+	IPT_COIN9,
+	IPT_COIN10,
+	IPT_COIN11,
+	IPT_COIN12,
 	IPT_BILL1,
 
 	/* service coin */
@@ -142,9 +146,15 @@ enum
 	IPT_SERVICE3,
 	IPT_SERVICE4,
 
+	/* tilt inputs */
+	IPT_TILT1,
+	IPT_TILT2,
+	IPT_TILT3,
+	IPT_TILT4,	
+
 	/* misc other digital inputs */
 	IPT_SERVICE,
-	IPT_TILT,
+	IPT_TILT,	
 	IPT_INTERLOCK,
 	IPT_VOLUME_UP,
 	IPT_VOLUME_DOWN,
