@@ -4210,6 +4210,23 @@ void ym2610_reset_chip(void *chip)
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 
+	astring name;
+	running_device* dev = F2610->OPN.ST.device;
+ 
+	/* setup PCM buffers again */
+	name.printf("%s",dev->tag());
+	F2610->pcmbuf   = (const UINT8 *)memory_region(dev->machine,name);
+	F2610->pcm_size = memory_region_length(dev->machine,name);
+	name.printf("%s.deltat",dev->tag());
+	F2610->deltaT.memory = (UINT8 *)memory_region(dev->machine,name);
+	if(F2610->deltaT.memory == NULL)
+	{
+		F2610->deltaT.memory = (UINT8*)F2610->pcmbuf;
+		F2610->deltaT.memory_size = F2610->pcm_size;
+	}
+	else
+		F2610->deltaT.memory_size = memory_region_length(dev->machine,name);
+
 	/* Reset Prescaler */
 	OPNSetPres( OPN, 6*24, 6*24, 4*2); /* OPN 1/6 , SSG 1/4 */
 	/* reset SSG section */
