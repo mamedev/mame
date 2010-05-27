@@ -227,7 +227,11 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 	debug_view_set_visible_position(dv->view, pos);
 	debug_view_set_visible_size(dv->view, vsize);
 
+#ifdef GTK_WIDGET_REALIZED
 	if(GTK_WIDGET_REALIZED(wdv))
+#else
+	if(gtk_widget_get_realized(wdv))
+#endif
 		gdk_window_move_resize(wdv->window,
 							   allocation->x, allocation->y,
 							   allocation->width, allocation->height);
