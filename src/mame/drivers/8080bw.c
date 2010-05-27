@@ -2008,6 +2008,44 @@ static MACHINE_DRIVER_START( darthvdr )
 
 MACHINE_DRIVER_END
 
+/* decrypt function for vortex */
+static DRIVER_INIT( vortex )
+{
+	UINT8 *rom = memory_region(machine, "maincpu");
+	int length = memory_region_length(machine, "maincpu");
+	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
+	UINT32 x;
+	for (x = 0; x < length; x++)
+	{
+		UINT32 addr = x;
+		switch (x&0xE000) // inputs are A13 A14 A15
+		{
+			case 0x0000: case 0x2000: // A0 A3 A9
+				addr ^= 0x0209;
+				break;
+			case 0x4000: // none
+				break;
+			case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000: // A3 and A9
+				addr ^= 0x0208;
+				break;
+		/*
+			case 0x0000: case 0x2000: // A0 A3 A9
+				addr ^= 0x0001;
+				break;
+			case 0x4000:
+				addr ^= 0x0208;
+				break;
+			case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000:
+				break;*/
+		}
+		buf1[addr] = rom[x];
+	}
+
+	memcpy(rom, buf1, length);
+
+	auto_free(machine, buf1);
+}
+
 
 ROM_START( searthin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2950,7 +2988,7 @@ GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Taito (Midway license)", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1980, vortex,   0,        invaders, invadpt2, 0, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080 */
+GAME( 1980, vortex,   0,        invaders, invadpt2, vortex, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080 */
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 GAME( 1979, schasercv,schaser,  schasercv,schasercv,0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
