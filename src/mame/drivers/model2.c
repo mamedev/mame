@@ -29,20 +29,21 @@
     dynamcop
     dynabb
     lastbrnj/lastbrnx
-    pltkids/pltkidsa
     skisuprg
 
     almost OK
     ---------
-    sgt24h: hangs on network test.  You can set it to non-linked in test but it still hangs on the network test.
-    overrev: bad network test like sgt24h.
+	overrev: sound CPU crashes.
     vstriker: shows some attract mode, then hangs
-    manxtt: no escape from "active motion slider" tutorial (needs analog inputs)
-
+    manxtt: no escape from "active motion slider" tutorial (needs analog inputs), bypass it by entering then exiting service mode
+    manxtt: crashes after the title screen, the TGP is the cause
+    pltkids/pltkidsa: crashes after some time of gameplay.
+    rchase2: fails drive bd i/o check
 
     TODO
     ----
     Controls are pretty basic right now
+    Some games (sgt24h, indy500) hangs at random places, presumably due to a regression with the SHARC fifo comms
     Sound doesn't work properly in all games
     System 24 tilemaps need more advanced linescroll support (see fvipers, daytona)
     2C needs DSP still
@@ -256,6 +257,13 @@ static NVRAM_HANDLER( model2 )
 			mame_fread(file, model2_backup1, 0x3fff);
 			if (model2_backup2)
 				mame_fread(file, model2_backup2, 0xff);
+		}
+		else
+		{
+			/* Virtua Striker needs the nvram to be defaulted with 1s or the ranking gets un-inited. */
+			memset(model2_backup1, 0xff, 0x4000);
+			if (model2_backup2)
+				memset(model2_backup2, 0xff, 0x100);
 		}
 	}
 }
@@ -563,10 +571,16 @@ static int iop_write_num = 0;
 static UINT32 iop_data = 0;
 static WRITE32_HANDLER(copro_sharc_iop_w)
 {
+	/* FIXME: clean this up */
 	if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0) ||
+		(strcmp(space->machine->gamedrv->name, "sfight" ) == 0) ||
 		(strcmp(space->machine->gamedrv->name, "fvipers" ) == 0) ||
 		(strcmp(space->machine->gamedrv->name, "vstriker" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "gunblade" ) == 0))
+		(strcmp(space->machine->gamedrv->name, "vstrikero" ) == 0) ||
+		(strcmp(space->machine->gamedrv->name, "gunblade" ) == 0) ||
+		(strcmp(space->machine->gamedrv->name, "von" ) == 0) ||
+		(strcmp(space->machine->gamedrv->name, "vonj" ) == 0) ||
+		(strcmp(space->machine->gamedrv->name, "rchase2" ) == 0))
 	{
 		sharc_external_iop_write(devtag_get_device(space->machine, "dsp"), offset, data);
 	}
@@ -4650,7 +4664,7 @@ static DRIVER_INIT( overrev )
 {
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
 
-	//TODO: protection patch / simulation
+	//TODO: cache patch?
 }
 
 
@@ -4695,15 +4709,15 @@ GAME( 1994, vstriker,        0, model2b, model2, 0,       ROT0, "Sega", "Virtua 
 GAME( 1994, vstrikero,vstriker, model2b, model2, 0,       ROT0, "Sega", "Virtua Striker", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, fvipers,         0, model2b, model2, 0,       ROT0, "Sega", "Fighting Vipers (Revision D)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, gunblade,        0, model2b, model2, 0,       ROT0, "Sega", "Gunblade NY (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500,         0, model2b, model2, 0,       ROT0, "Sega", "INDY 500 Twin (Revision A, Newer)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500d,  indy500, model2b, model2, 0,       ROT0, "Sega", "INDY 500 Deluxe (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500to, indy500, model2b, model2, 0,       ROT0, "Sega", "INDY 500 Twin (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500,         0, model2b, srallyc,0,       ROT0, "Sega", "INDY 500 Twin (Revision A, Newer)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500d,  indy500, model2b, srallyc,0,       ROT0, "Sega", "INDY 500 Deluxe (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500to, indy500, model2b, srallyc,0,       ROT0, "Sega", "INDY 500 Twin (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, schamp,          0, model2b, model2, 0,       ROT0, "Sega", "Sonic Championship", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sfight,     schamp, model2b, model2, 0,       ROT0, "Sega", "Sonic The Fighters", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnx,        0, model2b, model2, 0,       ROT0, "Sega", "Last Bronx (Export, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnxj,lastbrnx, model2b, model2, 0,       ROT0, "Sega", "Last Bronx (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, doa,             0, model2b, model2, doa,     ROT0, "Sega", "Dead or Alive (Model 2B, Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, sgt24h,          0, model2b, model2, sgt24h,  ROT0, "Jaleco", "Super GT 24h", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, sgt24h,          0, model2b, srallyc, sgt24h,  ROT0, "Jaleco", "Super GT 24h", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, von,             0, model2b, model2, 0,       ROT0, "Sega", "Virtual On Cyber Troopers (US, Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, vonj,          von, model2b, model2, 0,       ROT0, "Sega", "Virtual On Cyber Troopers (Japan, Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, dynabb,          0, model2b, model2, 0,       ROT0, "Sega", "Dynamite Baseball '97 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
@@ -4719,7 +4733,7 @@ GAME( 1996, skisuprg,        0, model2c, model2, 0, ROT0, "Sega", "Sega Ski Supe
 GAME( 1996, stcc,            0, model2c, model2, 0, ROT0, "Sega", "Sega Touring Car Championship (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, waverunr,        0, model2c, model2, 0, ROT0, "Sega", "Wave Runner (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,            0, model2c, model2, 0, ROT0, "Sega", "House of the Dead", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, overrev,         0, model2c, model2, overrev, ROT0, "Jaleco", "Over Rev (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, overrev,         0, model2c, srallyc, overrev, ROT0, "Jaleco", "Over Rev (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,        0, model2c, model2, 0, ROT0, "Sega", "Sega Water Ski (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,        0, model2c, model2, 0, ROT0, "Sega", "Top Skater (Export, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatru,topskatr, model2c, model2, 0, ROT0, "Sega", "Top Skater (USA)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
