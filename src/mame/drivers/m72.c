@@ -3652,7 +3652,7 @@ GAME( 1989, loht,        0,        m72,         loht,     loht,        ROT0,   "
 GAME( 1989, lohtj,       loht,     m72,         loht,     loht,        ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
 GAME( 1989, lohtb,       loht,     m72,         loht,     0,           ROT0,   "bootleg", "Legend of Hero Tonma (bootleg, set 1)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
 GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
-GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, 0,           ROT0,   "Irem", "X Multiply (Japan, M81)", GAME_NO_COCKTAIL ) // no jp sub-title at titlescreen (unlike m72 version), is this a World set?
+GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, 0,           ROT0,   "Irem", "X Multiply (World, M81)", GAME_NO_COCKTAIL )
 GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, xmultiplm72, ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreed,      0,        dbreed,      dbreed,   0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreedm72,   dbreed,   dbreedm72,   dbreed,   dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", GAME_NO_COCKTAIL )
