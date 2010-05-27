@@ -31,9 +31,9 @@ struct _tms5110_interface
 	devcb_write8 address_func;		/* Write to ADD1,2,4,8 - 4 address bits */
 	devcb_read_line data_func;		/* Read one bit from ADD8/Data - voice data */
 	/* on a real chip rom_clk is running all the time
-	 * Here, we only use it to properly emulate the protocol.
-	 * Do not rely on it to be a timed signal.
-	 */
+     * Here, we only use it to properly emulate the protocol.
+     * Do not rely on it to be a timed signal.
+     */
 	devcb_write_line rom_clk_func;	/* rom_clk - Only used to drive the data lines */
 };
 

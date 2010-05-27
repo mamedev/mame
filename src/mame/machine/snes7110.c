@@ -121,7 +121,7 @@ static const UINT8 spc7110_mode2_context_table[32][2] =
 typedef struct
 {
 	running_machine *machine;
-	
+
 	UINT32 decomp_mode;
 	UINT32 decomp_offset;
 
@@ -138,7 +138,7 @@ typedef struct
 
 	UINT32 morton16[2][256];
 	UINT32 morton32[4][256];
-	
+
 	UINT32 rom_size;
 } SPC7110Decomp;
 
@@ -867,7 +867,7 @@ typedef struct
 	UINT64 rtc_offset;
 
 	UINT8 rtc_ram[16];	// 0-12 secs, min, hrs, etc.; 13-14-15 control registers
-	
+
 	UINT32 size;
 } _snes_spc7110_t;
 
@@ -929,9 +929,9 @@ static void spc7110_init(running_machine* machine)
 	snes_spc7110.r4840 = 0x00;
 	snes_spc7110.r4841 = 0x00;
 	snes_spc7110.r4842 = 0x00;
-	
-	snes_spc7110.size = state->cart_size;	
-	
+
+	snes_spc7110.size = state->cart_size;
+
 	snes_spc7110.decomp = SPC7110Decomp_ctor(machine, snes_spc7110.size);
 }
 

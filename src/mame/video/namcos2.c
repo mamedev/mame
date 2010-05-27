@@ -133,38 +133,38 @@ DrawRozHelper(
 	if( bitmap->bpp == 16 )
 	{
 		/* On many processors, the simple approach of an outer loop over the
-			rows of the destination bitmap with an inner loop over the columns
-			of the destination bitmap has poor performance due to the order
-			that memory in the source bitmap is referenced when rotation
-			approaches 90 or 270 degrees.  The reason is that the inner loop
-			ends up reading pixels not sequentially in the source bitmap, but
-			instead at rozInfo->incxx increments, which is at its maximum at 90
-			degrees of rotation.  This means that only a few (or as few as
-			one) source pixels are in each cache line at a time.
+            rows of the destination bitmap with an inner loop over the columns
+            of the destination bitmap has poor performance due to the order
+            that memory in the source bitmap is referenced when rotation
+            approaches 90 or 270 degrees.  The reason is that the inner loop
+            ends up reading pixels not sequentially in the source bitmap, but
+            instead at rozInfo->incxx increments, which is at its maximum at 90
+            degrees of rotation.  This means that only a few (or as few as
+            one) source pixels are in each cache line at a time.
 
-			Instead of the above, this code iterates in NxN blocks through the
-			destination bitmap.  This has more overhead when there is little or
-			no rotation, but much better performance when there is closer to 90
-			degrees of rotation (as long as the chunk of the source bitmap that
-			corresponds to an NxN destination block fits in cache!).
+            Instead of the above, this code iterates in NxN blocks through the
+            destination bitmap.  This has more overhead when there is little or
+            no rotation, but much better performance when there is closer to 90
+            degrees of rotation (as long as the chunk of the source bitmap that
+            corresponds to an NxN destination block fits in cache!).
 
-			N is defined by ROZ_BLOCK_SIZE below; the best N is one that is as
-			big as possible but at the same time not too big to prevent all of
-			the source bitmap pixels from fitting into cache at the same time.
-			Keep in mind that the block of source pixels used can be somewhat
-			scattered in memory.  8x8 works well on the few processors that
-			were tested; 16x16 seems to work even better for more modern
-			processors with larger caches, but since 8x8 works well enough and
-			is less likely to result in cache misses on processors with smaller
-			caches, it is used.
-		*/
+            N is defined by ROZ_BLOCK_SIZE below; the best N is one that is as
+            big as possible but at the same time not too big to prevent all of
+            the source bitmap pixels from fitting into cache at the same time.
+            Keep in mind that the block of source pixels used can be somewhat
+            scattered in memory.  8x8 works well on the few processors that
+            were tested; 16x16 seems to work even better for more modern
+            processors with larger caches, but since 8x8 works well enough and
+            is less likely to result in cache misses on processors with smaller
+            caches, it is used.
+        */
 
 #define ROZ_BLOCK_SIZE 8
 
 		UINT32 size_mask = rozInfo->size - 1;
 		bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
 		bitmap_t *flagsbitmap = tilemap_get_flagsmap(tmap);
-		UINT32 srcx = (rozInfo->startx + (clip->min_x * rozInfo->incxx) + 
+		UINT32 srcx = (rozInfo->startx + (clip->min_x * rozInfo->incxx) +
 			(clip->min_y * rozInfo->incyx));
 		UINT32 srcy = (rozInfo->starty + (clip->min_x * rozInfo->incxy) +
 			(clip->min_y * rozInfo->incyy));

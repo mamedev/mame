@@ -5521,8 +5521,8 @@ static void stv_vdp2_dynamic_res_change(running_machine *machine)
 
 		vblank_period = get_vblank_duration(machine);
 		hblank_period = get_hblank_duration(machine);
-//		popmessage("%d",vblank_period);
-//		hblank_period = get_hblank_duration(machine->primary_screen);
+//      popmessage("%d",vblank_period);
+//      hblank_period = get_hblank_duration(machine->primary_screen);
 		video_screen_configure(machine->primary_screen, (horz_res+hblank_period), (vert_res+vblank_period), &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
 
 		old_vres = vert_res;

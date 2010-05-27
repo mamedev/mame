@@ -293,7 +293,7 @@ struct _tms5220_state
 
 	UINT16 previous_energy;	/* needed for lattice filter to match patent */
 
-	//UINT8 interp_period;	/* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
+	//UINT8 interp_period;  /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
 	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24; TODO: rename this variable to PC/merge into PC function */
 	UINT8 inhibit;			/* If 1, interpolation is inhibited until the DIV1 period */
 	//UINT8 spkslow_delay;  /* delay counter for interp count, only used on tms51xx */

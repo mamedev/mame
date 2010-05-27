@@ -556,20 +556,20 @@ ROM_END
 /*
 
 CPUs
-1x 	H8/3048 		ic1 	16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x 	AD-65 		ic24 	4-Channel Mixing ADCPM Voice Synthesis LSI - sound
-1x 	LM358N 		ic27 	Dual Operational Amplifier - sound
-1x 	TDA2003 		ic26 	Audio Amplifier - sound
-1x 	oscillator 	30.000MHz 	osc1
-1x 	blu resonator 	1000J 	x1
-1x 	oscillator 	KDS0D 	x2
+1x  H8/3048         ic1     16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  AD-65       ic24    4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x  LM358N      ic27    Dual Operational Amplifier - sound
+1x  TDA2003         ic26    Audio Amplifier - sound
+1x  oscillator  30.000MHz   osc1
+1x  blu resonator   1000J   x1
+1x  oscillator  KDS0D   x2
 ROMs
-1x 	W27C020 	1 	dumped
-2x 	M27C4001 	2,3 	dumped
+1x  W27C020     1   dumped
+2x  M27C4001    2,3     dumped
 RAMs
-2x 	LST62832I-70LL-10L 	ic13,ic14
+2x  LST62832I-70LL-10L  ic13,ic14
 PLDs
-1x 	ispLSI2064-80LJ 	ic12 	not dumped
+1x  ispLSI2064-80LJ     ic12    not dumped
 
 Others
 1x 28x2 edge connector
@@ -596,19 +596,19 @@ ROM_END
 /*
 
 CPUs
-1x 	H8/3048 		ic1 	16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x 	AD-65 		ic24 	4-Channel Mixing ADCPM Voice Synthesis LSI - sound
-1x 	LM358N 		ic27 	Dual Operational Amplifier - sound
-1x 	TDA2003 		ic26 	Audio Amplifier - sound
-1x 	oscillator 	30.000MHz 	osc1
-1x 	red resonator 	ZTB1000J 	x1
+1x  H8/3048         ic1     16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  AD-65       ic24    4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x  LM358N      ic27    Dual Operational Amplifier - sound
+1x  TDA2003         ic26    Audio Amplifier - sound
+1x  oscillator  30.000MHz   osc1
+1x  red resonator   ZTB1000J    x1
 ROMs
-1x 	W27C020 	1 	dumped
-2x 	M27C4001 	2,3 	dumped
+1x  W27C020     1   dumped
+2x  M27C4001    2,3     dumped
 RAMs
-2x 	MB8464C-10L 	ic13,ic14
+2x  MB8464C-10L     ic13,ic14
 PLDs
-1x 	ispLSI2064-80LJ 	ic12 	not dumped
+1x  ispLSI2064-80LJ     ic12    not dumped
 
 Others
 1x 28x2 edge connector

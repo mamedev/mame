@@ -358,13 +358,13 @@ static READ8_HANDLER( nss_eeprom_r )
 static WRITE8_HANDLER( nss_eeprom_w )
 {
 	/*
-	x--- ---- EEPROM CS bit?
-	---x ---- EEPROM clock bit?
-	---- x--- EEPROM write bit
-	---- ---x EEPROM reset bit? (active low)
-	*/
+    x--- ---- EEPROM CS bit?
+    ---x ---- EEPROM clock bit?
+    ---- x--- EEPROM write bit
+    ---- ---x EEPROM reset bit? (active low)
+    */
 
-//	printf("EEPROM write %02x\n",data);
+//  printf("EEPROM write %02x\n",data);
 }
 
 static UINT8 m50458_rom_bank;
@@ -413,8 +413,8 @@ ADDRESS_MAP_END
 static READ8_HANDLER( port00_r )
 {
 	/*
-	-x-- ---- almost certainly tied to the vblank signal
-	*/
+    -x-- ---- almost certainly tied to the vblank signal
+    */
 
 	static UINT8 vblank_bit;
 
@@ -432,9 +432,9 @@ static READ8_HANDLER( port01_r )
 static READ8_HANDLER( port02_r )
 {
 	/*
-	---- -x-- (makes the BIOS to jump at 0x4258, sets 0x80 bit 1 and then jumps to unmapped area of the BIOS (bankswitch?))
-	---- ---x
-	*/
+    ---- -x-- (makes the BIOS to jump at 0x4258, sets 0x80 bit 1 and then jumps to unmapped area of the BIOS (bankswitch?))
+    ---- ---x
+    */
 
 	return 0xfb;
 }
@@ -442,10 +442,10 @@ static READ8_HANDLER( port02_r )
 static READ8_HANDLER( port03_r )
 {
 	/*
-	x--- ---- EEPROM2 read bit
-	---- ---x tested at 7006, some status bit
+    x--- ---- EEPROM2 read bit
+    ---- ---x tested at 7006, some status bit
 
-	*/
+    */
 
 	return 0xfe;
 }
@@ -453,10 +453,10 @@ static READ8_HANDLER( port03_r )
 static WRITE8_HANDLER( port80_w )
 {
 	/*
-	---- x--- written when 0x9000-0x9fff is read, probably a bankswitch
-	---- --x- see port 0x02 note
-	---- ---x BIOS bankswitch
-	*/
+    ---- x--- written when 0x9000-0x9fff is read, probably a bankswitch
+    ---- --x- see port 0x02 note
+    ---- ---x BIOS bankswitch
+    */
 
 	memory_set_bank(space->machine, "bank1", data & 1);
 	m50458_rom_bank = data & 8;
@@ -465,10 +465,10 @@ static WRITE8_HANDLER( port80_w )
 static WRITE8_HANDLER( port82_w ) // EEPROM2?
 {
 	/*
-	---- x--- EEPROM2 clock bit?
-	---- -x-- EEPROM2 write bit
-	---- --x- EEPROM2 CS bit?
-	*/
+    ---- x--- EEPROM2 clock bit?
+    ---- -x-- EEPROM2 write bit
+    ---- --x- EEPROM2 CS bit?
+    */
 }
 
 static ADDRESS_MAP_START( bios_io_map, ADDRESS_SPACE_IO, 8 )
@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( nss )
 	MDRV_CPU_PROGRAM_MAP(bios_map)
 	MDRV_CPU_IO_MAP(bios_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-//	MDRV_CPU_FLAGS(CPU_DISABLE)
+//  MDRV_CPU_FLAGS(CPU_DISABLE)
 
 	MDRV_MACHINE_START( nss )
 MACHINE_DRIVER_END

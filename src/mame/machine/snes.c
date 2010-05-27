@@ -1726,7 +1726,7 @@ MACHINE_START( snes )
 
 	if (state->cart[0].mode == SNES_MODE_BSX)
 		bsx_init(machine);
-	
+
 	snes_init_timers(machine);
 
 	for (i = 0; i < 6; i++)

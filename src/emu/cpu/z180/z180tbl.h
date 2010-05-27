@@ -289,10 +289,10 @@ static void (*const Z180ops[Z180_PREFIX_COUNT][0x100])(z180_state *cpustate) =
  ***************************************************************/
 
 #define EXEC_PROTOTYPE(prefix) \
-INLINE int exec##_##prefix(z180_state *cpustate, const UINT8 opcode) 	\
+INLINE int exec##_##prefix(z180_state *cpustate, const UINT8 opcode)	\
 {																		\
     (*Z180ops[Z180_PREFIX_##prefix][opcode])(cpustate);                 		            \
-    return cpustate->cc[Z180_TABLE_##prefix][opcode]; 					\
+    return cpustate->cc[Z180_TABLE_##prefix][opcode];					\
 }
 
 EXEC_PROTOTYPE(op)

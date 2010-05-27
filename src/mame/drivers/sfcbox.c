@@ -258,15 +258,15 @@ ROM_START( sfcbox )
 	ROM_LOAD( "grom1-1.bin", 0x0000, 0x8000, CRC(333bf9a7) SHA1(5d0cd9ca29e5580c3eebe9f136839987c879f979) )
 	ROM_LOAD( "grom1-3.bin", 0x8000, 0x8000, CRC(ebec4c1c) SHA1(d638ef1486b4c0b3d4d5b666929ca7947e16efad) )
 
-//	ROM_REGION( 0x80000, "atrom", 0 )
+//  ROM_REGION( 0x80000, "atrom", 0 )
 	ROM_REGION( 0x100000, "user3", 0 )
 	ROM_LOAD( "atrom-4s-0.smc", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
 
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-//	ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
-//	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
+//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pss62 )
@@ -282,8 +282,8 @@ ROM_START( pss62 )
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
-//	ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
-//	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
+//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 GAME( 199?, sfcbox,      0,     sfcbox,      snes,    snes,    ROT0, "Nintendo",                   "Super Famicom Box BIOS", GAME_IS_BIOS_ROOT )

@@ -102,7 +102,7 @@ Notes:
 
   Kaitei (and SOS) is developed by Kazuharu Yoshioka of K.K.Tokki (Universal Tokki).
   Namco acquired license for these games.
-  
+
 - The coin counter doesn't work in kaitei. This might be the expected behaviour.
 
 - sos does a "coffee break" every 2000 points, showing a girl. The first times,

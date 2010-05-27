@@ -785,18 +785,18 @@ ROM_END
 Magic Number
 
 CPUs
-1x 	 H8/3337  	 	 	 32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x 	D7759 			     ADPCM Speech Synthesizer LSIs - sound
-1x 	TDA2003 		     Audio Amplifier - sound
-1x 	oscillator 	14.31818MHz
-1x 	oscillator 	16.000
+1x   H8/3337             32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  D7759                ADPCM Speech Synthesizer LSIs - sound
+1x  TDA2003              Audio Amplifier - sound
+1x  oscillator  14.31818MHz
+1x  oscillator  16.000
 ROMs
-3x 	M27C4001 	1,2,3 	dumped
-1x 	M27C1001 	MSG 	dumped
+3x  M27C4001    1,2,3   dumped
+1x  M27C1001    MSG     dumped
 RAMs
-3x 	CXK581000BM-70LL
+3x  CXK581000BM-70LL
 PLDs
-2x 	ispLSI1032E-70Lj 		not dumped
+2x  ispLSI1032E-70Lj        not dumped
 Others
 
 1x 28x2 edge connector
@@ -825,18 +825,18 @@ ROM_END
 /*
 
 CPUs
-1x 	 H8/3337            32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x 	D7759 			    ADPCM Speech Synthesizer LSIs - sound
-1x 	TDA2003 			Audio Amplifier - sound
-1x 	oscillator 	14.31818MHz
-1x 	oscillator 	16.000
+1x   H8/3337            32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  D7759               ADPCM Speech Synthesizer LSIs - sound
+1x  TDA2003             Audio Amplifier - sound
+1x  oscillator  14.31818MHz
+1x  oscillator  16.000
 ROMs
-3x 	M27C4001 	1,2,3   dumped
-1x 	M27C1001 	SND     dumped
+3x  M27C4001    1,2,3   dumped
+1x  M27C1001    SND     dumped
 RAMs
-3x 	MX66C1024MC-70
+3x  MX66C1024MC-70
 PLDs
-2x 	ispLSI1032E-70Lj    not dumped
+2x  ispLSI1032E-70Lj    not dumped
 Others
 
 1x 28x2 edge connector
@@ -868,18 +868,18 @@ ROM_END
 /*
 
 CPUs
-1x 	H8/3337 			32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x 	D7759 			    ADPCM Speech Synthesizer LSIs - sound
-1x 	TDA2003 			Audio Amplifier - sound
-1x 	oscillator 	14.31818MHz
-1x 	oscillator 	16.000
+1x  H8/3337             32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  D7759               ADPCM Speech Synthesizer LSIs - sound
+1x  TDA2003             Audio Amplifier - sound
+1x  oscillator  14.31818MHz
+1x  oscillator  16.000
 ROMs
-3x 	M27C4001 	1,2,3 	dumped
-1x 	M27C1001 	SND 	dumped
+3x  M27C4001    1,2,3   dumped
+1x  M27C1001    SND     dumped
 RAMs
-3x 	V62C5181024L-35W
+3x  V62C5181024L-35W
 PLDs
-2x 	ispLSI1032E-70Lj    not dumped
+2x  ispLSI1032E-70Lj    not dumped
 Others
 
 1x 28x2 edge connector

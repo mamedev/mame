@@ -373,15 +373,15 @@ static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle
 			y = clock / 288;
 
 			/* code at d616 translates into:
-			 * carryout = lfsr & 1;
-			 * lfsr = lfsr>>1;
-			 * lfsr = (feedback << 15) | lfsr;
-			 * feedback = (((lfsr>>4) & 1) ^ (carryout & 1)) ^ 1;
-			 *
-			 * and needs a Hack:
-			 * 	x = 288 - x;
-			 *
-			 */
+             * carryout = lfsr & 1;
+             * lfsr = lfsr>>1;
+             * lfsr = (feedback << 15) | lfsr;
+             * feedback = (((lfsr>>4) & 1) ^ (carryout & 1)) ^ 1;
+             *
+             * and needs a Hack:
+             *  x = 288 - x;
+             *
+             */
 
 			/* code at d648 */
 			carryout = ((lfsr >> 4) ^ feedback ^ 1) & 1;

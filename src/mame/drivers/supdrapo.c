@@ -534,27 +534,27 @@ ROM_END
 
 /*
 Poker Relance Gamble
-EMU Infos dumper 	f205v
-manufacturer 	Valadon Automation
+EMU Infos dumper    f205v
+manufacturer    Valadon Automation
 
 Technical references
 
 CPUs
-QTY		Type 		clock 		position 	function
-1x		NEC D780C 				2c 			8-bit Microprocessor - main
-1x		AY-3-8910 				2a 			Programmable Sound Generator - sound
-1x		LM380N 					10b 		Audio Amplifier - sound
-1x 		oscillator 	12.000MHz 	5b 	
+QTY     Type        clock       position    function
+1x      NEC D780C               2c          8-bit Microprocessor - main
+1x      AY-3-8910               2a          Programmable Sound Generator - sound
+1x      LM380N                  10b         Audio Amplifier - sound
+1x      oscillator  12.000MHz   5b
 
 ROMs
-QTY 	Type 					position 	status
-9x 		ET2732Q 				0-8 		dumped
-1x		DM74S287N 				9n,9p 		dumped
+QTY     Type                    position    status
+9x      ET2732Q                 0-8         dumped
+1x      DM74S287N               9n,9p       dumped
 
 RAMs
-QTY 	Type 					position
-8x 		MM2114N-3 				1k,1l,1m,1n,2f,3f,3h,3j
-1x 		MWS5101AEL2 			2p
+QTY     Type                    position
+8x      MM2114N-3               1k,1l,1m,1n,2f,3f,3h,3j
+1x      MWS5101AEL2             2p
 
 Others
 
@@ -566,7 +566,7 @@ Others
 Notes
 
 At 2l there is an empty space with "batt." handwritten on the PCB
-At 1p there is an unmarked DIP20 mil.300 chip. 
+At 1p there is an unmarked DIP20 mil.300 chip.
 
 */
 

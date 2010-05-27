@@ -1021,7 +1021,7 @@ static ADDRESS_MAP_START( kengo_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
-//	AM_RANGE(0x8c, 0x8f) AM_WRITENOP	/* ??? */
+//  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
 
@@ -1059,7 +1059,7 @@ static ADDRESS_MAP_START( rtype2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", m72_sample_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(m72_sound_irq_ack_w)
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
-//	AM_RANGE(0x87, 0x87) AM_WRITENOP	/* ??? */
+//  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )

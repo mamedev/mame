@@ -40,7 +40,7 @@
 
     Multi Game (Tung Sheng Electronics): 10 games included, selectable by dip switches.
 
-	Super Game III:
+    Super Game III:
 
 PCB Layout
 ----------
@@ -61,8 +61,8 @@ PCB Layout
 |------------------------------------|
 * - chip surface scratched
 
-	Super Game III features 15 games, updated hardware with several NES mappers allowing newer NES
-	games to run.
+    Super Game III features 15 games, updated hardware with several NES mappers allowing newer NES
+    games to run.
 */
 
 #include "emu.h"
@@ -778,14 +778,14 @@ static void multigam_init_mmc1(running_machine *machine, UINT8 *prg_base, int pr
       76543210
 5001: x         select rom at 0x8000: 0 - control program, 1 - game
        x        mapper for game: 0 - mapper 02, 1 - MMC1/MMC3
-	    x       game rom size: 0 - 256KB, 1 - 128KB
+        x       game rom size: 0 - 256KB, 1 - 128KB
          xxxxx  rom bank, each bank has 0x20000 bytes (128KB)
 
-	  76543210
+      76543210
 5002: x         unknown, always 0
        x        CHR rom size: 0 - 256KB, 1 - 128KB
-	    x       CHR rom flag: 0 - no CHR rom, 1 - CHR rom present
-		 x      mapper for game: 0 - MMC1, 1 - MMC3
+        x       CHR rom flag: 0 - no CHR rom, 1 - CHR rom present
+         x      mapper for game: 0 - MMC1, 1 - MMC3
           xxxx  CHR rom bank, each bank has 0x8000 bytes (32KB)
 */
 
@@ -835,24 +835,24 @@ static void supergm3_set_bank(running_machine *machine)
 	else if ((supergm3_prg_bank & 0x40) == 0)
 	{
 		// mapper 02
-		multigam_init_mapper02(machine, 
-			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000, 
+		multigam_init_mapper02(machine,
+			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000,
 			0x20000);
 	}
 	else if (supergm3_chr_bank & 0x10)
 	{
 		// MMC3
-		multigam_init_mmc3(machine, 
-			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000, 
-			(supergm3_prg_bank & 0x20) ? 0x20000 : 0x40000, 
+		multigam_init_mmc3(machine,
+			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000,
+			(supergm3_prg_bank & 0x20) ? 0x20000 : 0x40000,
 			(supergm3_chr_bank & 0x0f)*0x80);
 	}
 	else
 	{
 		//MMC1
-		multigam_init_mmc1(machine, 
-			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000, 
-			0x20000, 
+		multigam_init_mmc1(machine,
+			memory_region(machine, "user1") + (supergm3_prg_bank & 0x1f)*0x20000,
+			0x20000,
 			(supergm3_chr_bank & 0x0f)*0x80/4 );
 	}
 }

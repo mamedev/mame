@@ -429,17 +429,17 @@ ROM_END
 X Five Jokers
 
 CPUs
-1x 	M30624FGAFP 		u11 	16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x 	MSM6295 		    u28 	4-Channel Mixing ADCPM Voice Synthesis LSI - sound
-1x 	LM358N 		        u33 	Dual Operational Amplifier - sound
-1x 	TDA2003 	     	u32 	Audio Amplifier - sound
-1x 	oscillator 	16.000MHz 	u27
+1x  M30624FGAFP         u11     16-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  MSM6295             u28     4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x  LM358N              u33     Dual Operational Amplifier - sound
+1x  TDA2003             u32     Audio Amplifier - sound
+1x  oscillator  16.000MHz   u27
 ROMs
-4x 	M27C4001 	1,2,3,S 	dumped
+4x  M27C4001    1,2,3,S     dumped
 RAMs
-3x 	D431000AGW-70LL 	u20,u21,u22
+3x  D431000AGW-70LL     u20,u21,u22
 PLDs
-2x 	ispLSI1032E-70LJ 	u12,u13 	not dumped
+2x  ispLSI1032E-70LJ    u12,u13     not dumped
 Others
 
 1x 28x2 edge connector

@@ -186,7 +186,7 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 static WRITE8_HANDLER( popflame_protection_w )
 {
 	/*
-	Alternative protection check is executed at the end of stage 3, it seems some kind of pseudo "EEPROM" device:
+    Alternative protection check is executed at the end of stage 3, it seems some kind of pseudo "EEPROM" device:
 2720: 21 98 B0      ld   hl,$B098
 2723: 36 01         ld   (hl),$01
 2725: 0E 40         ld   c,$40
@@ -226,15 +226,15 @@ static WRITE8_HANDLER( popflame_protection_w )
 0CF8: 36 00         ld   (hl),$00 ; ... reset the game
 0CFA: C9            ret
 
-	For now, we use a kludge to feed what the game needs, there could be many possible combinations of this so a PCB tracing / trojan is needed
-	to determine the behaviour of this.
+    For now, we use a kludge to feed what the game needs, there could be many possible combinations of this so a PCB tracing / trojan is needed
+    to determine the behaviour of this.
 
-	---x ---- enables alternative protection seed
-	---- x--- increments read index buffer
-	---- -x-- reset read index buffer
-	---- --x- puts a bit into the write buffer
-	---- ---x reset write index buffer
-	*/
+    ---x ---- enables alternative protection seed
+    ---- x--- increments read index buffer
+    ---- -x-- reset read index buffer
+    ---- --x- puts a bit into the write buffer
+    ---- ---x reset write index buffer
+    */
 	if(data & 1 && ((popflame_prot_seed & 1) == 0)) //Note: we use the write buffer index
 		r_index = 0;
 	if(data & 8 && ((popflame_prot_seed & 8) == 0))

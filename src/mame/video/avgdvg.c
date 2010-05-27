@@ -835,7 +835,7 @@ static int tempest_strobe2(vgdata *vg)
 	if ((OP2 == 0) && (vg->dvy12 == 0))
 	{
 		/* Contrary to previous documentation in MAME,
-		Tempest does not have the vg->enspkl bit. */
+        Tempest does not have the vg->enspkl bit. */
 		if (vg->dvy & 0x800)
 			vg->color = vg->dvy & 0xf;
 		else

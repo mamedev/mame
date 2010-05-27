@@ -41,15 +41,15 @@ To Do:
 
     Offset:     Bits:         Value:
 
-    0           7654 ----     
+    0           7654 ----
                 ---- 3210     Color
-    1           7--- ----     
+    1           7--- ----
                 -6-- ----     256 Color Sprite
-                --5- ----     
+                --5- ----
                 ---4 ----     ?
-                ---- 3---     
+                ---- 3---
                 ---- -2--     Draw Sprite
-                ---- --10     
+                ---- --10
     2                         Tile Code (High)
     3                         Tile Code (Low)
     4           7654 3---     Number of X Tiles - 1
@@ -60,8 +60,8 @@ To Do:
     7                         Y (Low)
     8                         Zoom Factor (<< 8, High)
     9                         Zoom Factor (<< 8, Low)
-	a
-	b
+    a
+    b
     c           7654 3---
                 ---- -210     Delta X (High)
     d                         Delta X (Low)
@@ -268,7 +268,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_w )
 	eeprom_write_bit(device, data & 0x40);
 
 	// reset line asserted: reset.
-//	if ((c0 ^ data) & 0x20)
+//  if ((c0 ^ data) & 0x20)
 		eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// clock line asserted: write latch or select next bit to read
@@ -302,7 +302,7 @@ static WRITE8_HANDLER( c6_w )
 
 	set_led_status(space->machine, 1,   data  & 0x08);
 	set_led_status(space->machine, 2,   data  & 0x10);
-	set_led_status(space->machine, 3,   data  & 0x20);	// 
+	set_led_status(space->machine, 3,   data  & 0x20);	//
 
 	c6 = data;
 	show_outputs();
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( gegege_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0xc800, 0xc87f ) AM_RAM
 
-//	AM_RANGE( 0xd001, 0xd021 ) AM_RAM
+//  AM_RANGE( 0xd001, 0xd021 ) AM_RAM
 	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")
 
 	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( gegege_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x00, 0x01 ) AM_DEVWRITE( "ymz", ymz280b_w )
 
 	AM_RANGE( 0xa0, 0xa1 ) AM_READWRITE( regs_r,  regs_w )
-//	AM_RANGE( 0xa2, 0xa3 )
+//  AM_RANGE( 0xa2, 0xa3 )
 	AM_RANGE( 0xa4, 0xa5 ) AM_READWRITE( regs2_r, regs2_w )
 
 	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "EEPROM" )

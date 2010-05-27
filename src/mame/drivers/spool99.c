@@ -245,7 +245,7 @@ static READ8_HANDLER( vcarn_io_r )
 
 		}
 	}
-// 	printf("%04x\n",offset+0xa700);
+//  printf("%04x\n",offset+0xa700);
 
 	return ROM[0xa700+offset];
 }
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( vcarn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
-//	AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE(&vcarn_io)
+//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE(&vcarn_io)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,vram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,cram)
 ADDRESS_MAP_END

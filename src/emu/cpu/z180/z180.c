@@ -45,12 +45,12 @@
 
 /*****************************************************************************
 
-	TODO:
-		- HALT processing is not yet perfect. The manual states that
-		  during HALT, all dma and internal i/o incl. timers continue to
-		  work. Currently, only timers are implemented. Ideally, the
-		  burn_cycles routine would go away and halt processing be
-		  implemented in cpu_execute.
+    TODO:
+        - HALT processing is not yet perfect. The manual states that
+          during HALT, all dma and internal i/o incl. timers continue to
+          work. Currently, only timers are implemented. Ideally, the
+          burn_cycles routine would go away and halt processing be
+          implemented in cpu_execute.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -123,7 +123,7 @@ struct _z180_state
 	UINT8	tmdr_latch; 					/* flag latched TMDR0H, TMDR1H values */
 	UINT8	read_tcr_tmdr[2];				/* flag to indicate that TCR or TMDR was read */
 	UINT32	iol;							/* I/O line status bits */
-	UINT8	io[64];				 			/* 64 internal 8 bit registers */
+	UINT8	io[64];							/* 64 internal 8 bit registers */
 	offs_t	mmu[16];						/* MMU address translation */
 	UINT8	tmdrh[2];						/* latched TMDR0H and TMDR1H values */
 	UINT16	tmdr_value[2];					/* TMDR values used byt PRT0 and PRT1 as down counter */
@@ -2477,13 +2477,13 @@ again:
 				handle_io_timers(cpustate, curcycles);
 
 				/* FIXME:
-				 * For simultaneous DREQ0 and DREQ1 requests, channel 0 has priority
-				 * over channel 1. When channel 0 is performing a memory to/from memory
-				 * transfer, channel 1 cannot operate until the channel 0 operation has
-				 * terminated. If channel 1 is operating, channel 0 cannot operate until
-				 * channel 1 releases control of the bus.
-				 *
-				 */
+                 * For simultaneous DREQ0 and DREQ1 requests, channel 0 has priority
+                 * over channel 1. When channel 0 is performing a memory to/from memory
+                 * transfer, channel 1 cannot operate until the channel 0 operation has
+                 * terminated. If channel 1 is operating, channel 0 cannot operate until
+                 * channel 1 releases control of the bus.
+                 *
+                 */
 				curcycles = z180_dma0(cpustate, 6);
 				cpustate->icount -= curcycles;
 				handle_io_timers(cpustate, curcycles);

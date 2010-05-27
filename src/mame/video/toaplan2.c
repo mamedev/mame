@@ -907,14 +907,14 @@ static void toaplan2_scroll_reg_select_w(offs_t offset, UINT16 data, UINT16 mem_
 
 WRITE16_HANDLER( toaplan2_0_scroll_reg_select_w )
 {
-//	printf("toaplan2_scroll_reg_select_w %04x %04x\n",offset,data);
+//  printf("toaplan2_scroll_reg_select_w %04x %04x\n",offset,data);
 
 	toaplan2_scroll_reg_select_w(offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_scroll_reg_select_w )
 {
-//	printf("toaplan2_scroll_1_reg_select_w %04x %04x\n",offset,data);
+//  printf("toaplan2_scroll_1_reg_select_w %04x %04x\n",offset,data);
 
 	toaplan2_scroll_reg_select_w(offset, data, mem_mask, 1);
 }
@@ -1440,20 +1440,20 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				{
 					if (flipx) sx = sx_base - dim_x;
 					else       sx = sx_base + dim_x;
-				
+
 					/*
-					drawgfx_transpen(bitmap,cliprect,gfx,sprite,
-						color,
-						flipx,flipy,
-						sx,sy,0);
-					*/
+                    drawgfx_transpen(bitmap,cliprect,gfx,sprite,
+                        color,
+                        flipx,flipy,
+                        sx,sy,0);
+                    */
 					sprite %= gfx->total_elements;
 					color %= gfx->total_colors;
-				
+
 					{
 						int yy, xx;
 						const pen_t *paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-						const UINT8* srcdata = gfx_element_get_data(gfx, sprite);	
+						const UINT8* srcdata = gfx_element_get_data(gfx, sprite);
 						int count = 0;
 						int ystart, yend, yinc;
 						int xstart, xend, xinc;
@@ -1487,7 +1487,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						for (yy=ystart;yy!=yend;yy+=yinc)
 						{
 							int drawyy = yy+sy;
-							
+
 
 							for (xx=xstart;xx!=xend;xx+=xinc)
 							{
@@ -1498,7 +1498,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 									UINT8 pix = srcdata[count];
 									UINT16* dstptr = BITMAP_ADDR16(bitmap,drawyy,drawxx);
 									UINT8* dstpri = BITMAP_ADDR8(toaplan2_custom_priority_bitmap, drawyy, drawxx);
-									
+
 									if (priority >= dstpri[0])
 									{
 										if (pix&0xf)
@@ -1517,7 +1517,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 
 					}
-					
+
 
 
 					sprite++ ;
@@ -1556,10 +1556,10 @@ void toaplan2_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, ti
 		for (x=0;x<width;x++)
 		{
 			int realx = (x+scrollx)&0x1ff;
-	
+
 			UINT16 pixdat = srcptr[realx];
 			UINT8 pixpri = ((pixdat & 0xf000)>>12);
-			
+
 			if (pri_enable[pixpri])
 			{
 				pixpri = priremap[pixpri]+1; // priority of 0 isn't desireable
@@ -1629,7 +1629,7 @@ VIDEO_UPDATE( batsugun_1 )
 {
 
 	toaplan2_log_vram(screen->machine);
-	
+
 	bitmap_fill(bitmap,cliprect,0);
 	bitmap_fill(toaplan2_custom_priority_bitmap, cliprect, 0);
 
@@ -1693,7 +1693,7 @@ VIDEO_UPDATE( batrider_0 )
 VIDEO_UPDATE( mahoudai_0 )
 {
 	toaplan2_log_vram(screen->machine);
-	
+
 	VIDEO_UPDATE_CALL( toaplan2_0 );
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);

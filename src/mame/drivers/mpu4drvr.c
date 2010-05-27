@@ -166,7 +166,7 @@ IRQ line connected to CPU
 TODO:
       - Correctly implement characteriser protection for each game.
       - Hook up trackball control for The Crystal Maze and The Mating Game - done, but game response is v. slow
-	  - Fix meter sense error when coining up in Team Challenge - different cabinet
+      - Fix meter sense error when coining up in Team Challenge - different cabinet
       - Improve AVDC implementation, adding split-screen interrupts (needed for mid-screen palette changes)
       - Hook up OKIM6376 sound in The Mating Game
       - Get the BwB games running
@@ -1125,12 +1125,12 @@ static READ16_HANDLER( ef9369_r )
 static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 {
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
-	mainboard. As per usual, they've taken the cheap route here, reading and processing the 
-	raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
-	additional hardware to simplify matters. For our purposes, two fake ports give the X and Y positions,
-	which are then worked back into the signal levels.
-	We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
-	clean up the pulses and flip the active phase.*/
+    mainboard. As per usual, they've taken the cheap route here, reading and processing the
+    raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
+    additional hardware to simplify matters. For our purposes, two fake ports give the X and Y positions,
+    which are then worked back into the signal levels.
+    We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
+    clean up the pulses and flip the active phase.*/
 
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",cpuexec_describe_context(device->machine)));
 
@@ -1564,7 +1564,7 @@ static INPUT_PORTS_START( skiltrek )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("C")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("B")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("A")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)	
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
@@ -2493,7 +2493,7 @@ static DRIVER_INIT (crmaze3)
 {
 	mpu4_current_chr_table = crmaze3_data;
 }
-	
+
 static DRIVER_INIT (crmaze3a)
 {
 	mpu4_current_chr_table = crmaze3a_data;

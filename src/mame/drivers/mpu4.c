@@ -1642,7 +1642,7 @@ static WRITE8_HANDLER( characteriser_w )
 
 	if (offset == 0)
 	{
-	//	for (x = prot_col; x < 64; x++)
+	//  for (x = prot_col; x < 64; x++)
 		{
 			if (call == 0)
 			{
