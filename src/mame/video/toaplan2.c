@@ -1361,7 +1361,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int bank, sprite_num;
 
 		attrib = source[offs];
-		priority = primap[((attrib & 0x0f00)>>8)]+1+controller*0x40;
+		priority = primap[((attrib & 0x0f00)>>8)]+1;
 
 		if ((attrib & 0x8000))
 		{
@@ -1635,15 +1635,15 @@ VIDEO_UPDATE( batsugun_1 )
 
 	tile_limit[1] = 0x1fff; // 0x2000-0x3fff seem to be for sprites only? (corruption on level 1 otherwise)
 
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[1], toaplan2_primap1, batsugun_prienable0);
 	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
-	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
-	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[0], toaplan2_primap1, batsugun_prienable0);
-	draw_sprites(screen->machine,bitmap,cliprect,0, toaplan2_sprprimap1);
-
-	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[1], toaplan2_primap1, batsugun_prienable0);
 	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[1], toaplan2_primap1, batsugun_prienable0);
-	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[1], toaplan2_primap1, batsugun_prienable0); // priority 0 of this MUST be below priority 0 of bg_tilemap[0] for lev 3, but above for lev 2?!
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[1], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+
 	draw_sprites(screen->machine,bitmap,cliprect,1, toaplan2_sprprimap1);
+	draw_sprites(screen->machine,bitmap,cliprect,0, toaplan2_sprprimap1);
 
 	return 0;
 }
