@@ -1610,15 +1610,15 @@ VIDEO_UPDATE( dogyuun_1 )
 	bitmap_fill(bitmap,cliprect,0);
 	bitmap_fill(toaplan2_custom_priority_bitmap, cliprect, 0);
 
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[1], toaplan2_primap1, batsugun_prienable0);
 	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
-	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
-	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[0], toaplan2_primap1, batsugun_prienable0);
-	draw_sprites(screen->machine,bitmap,cliprect,0, toaplan2_sprprimap1);
-
-	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[1], toaplan2_primap1, batsugun_prienable0);
 	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[1], toaplan2_primap1, batsugun_prienable0);
-	toaplan2_draw_custom_tilemap( screen->machine, bitmap, bg_tilemap[1], toaplan2_primap1, batsugun_prienable0); // priority 0 of this MUST be below priority 0 of bg_tilemap[0] for lev 3, but above for lev 2?!
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, fg_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[1], toaplan2_primap1, batsugun_prienable0);
+	toaplan2_draw_custom_tilemap( screen->machine, bitmap, top_tilemap[0], toaplan2_primap1, batsugun_prienable0);
+
 	draw_sprites(screen->machine,bitmap,cliprect,1, toaplan2_sprprimap1);
+	draw_sprites(screen->machine,bitmap,cliprect,0, toaplan2_sprprimap1);
 
 
 	return 0;
