@@ -792,10 +792,6 @@ ROM_END
 
 Zoo by Astro
 
-ZOO Z0.02.D at both U25 & U26 are Winbond W27C512 roms and are program code
-5 ZOO is a MX 27C4000 rom and is the sample rom
-29F1610mc at U26 (yes "U26" is present twice on the PCB) are the graphics
-
 ASTRO M1.1 PCB:
  Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
  Astro V102PX-005 T042652846 at U10 (68K core, has direct connection to program roms)
