@@ -826,7 +826,7 @@ ADDRESS_MAP_START( c76_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(M37710_ADC0_H, M37710_ADC7_H) AM_READNOP
 ADDRESS_MAP_END
 
-INTERRUPT_GEN( c76_interrupt )
+static INTERRUPT_GEN( c76_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{

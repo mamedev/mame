@@ -1839,7 +1839,7 @@ static DEVICE_NVRAM( naomibd )
     device get info callback
 -------------------------------------------------*/
 
-DEVICE_GET_RUNTIME_INFO( naomibd )
+static DEVICE_GET_RUNTIME_INFO( naomibd )
 {
 	switch (state)
 	{

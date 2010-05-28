@@ -123,7 +123,7 @@ static void filter_init(running_machine *machine, lp_filter *iir, double fs)
 	iir->history = (float *)auto_alloc_array_clear(machine, float, 2 * 2);
 }
 
-void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
+static void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
 {
 	double wp, pi;
 
@@ -134,7 +134,7 @@ void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
 	*a1 = *a1 / wp;
 }
 
-void bilinear(double a0, double a1, double a2,
+static void bilinear(double a0, double a1, double a2,
 			  double b0, double b1, double b2,
 			  double *k, double fs, float *coef)
 {
@@ -152,7 +152,7 @@ void bilinear(double a0, double a1, double a2,
 	*coef = (4. * a2 * fs * fs - 2. * a1 * fs + a0) / ad;
 }
 
-void recompute_filter(lp_filter *iir, double k, double q, double fc)
+static void recompute_filter(lp_filter *iir, double k, double q, double fc)
 {
 	int nInd;
 	double a0, a1, a2, b0, b1, b2;

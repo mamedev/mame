@@ -265,7 +265,7 @@ static void external_irq_check(am29000_state *am29000)
 	}
 }
 
-UINT32 read_program_word(am29000_state *state, UINT32 address)
+static UINT32 read_program_word(am29000_state *state, UINT32 address)
 {
 	/* TODO: ROM enable? */
 	if (state->cps & CPS_PI || state->cps & CPS_RE)

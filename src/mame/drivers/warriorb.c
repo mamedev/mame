@@ -219,7 +219,7 @@ static WRITE8_HANDLER( warriorb_pancontrol )
 }
 
 
-WRITE16_HANDLER( tc0100scn_dual_screen_w )
+static WRITE16_HANDLER( tc0100scn_dual_screen_w )
 {
 	warriorb_state *state = (warriorb_state *)space->machine->driver_data;
 

@@ -153,13 +153,13 @@ static INPUT_PORTS_START( attckufo )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN( attckufo_raster_interrupt )
+static INTERRUPT_GEN( attckufo_raster_interrupt )
 {
 	attckufo_state *state = (attckufo_state *)device->machine->driver_data;
 	mos6560_raster_interrupt_gen(state->mos6560);
 }
 
-VIDEO_UPDATE( attckufo )
+static VIDEO_UPDATE( attckufo )
 {
 	attckufo_state *state = (attckufo_state *)screen->machine->driver_data;
 	mos6560_video_update(state->mos6560, bitmap, cliprect);

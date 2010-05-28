@@ -283,7 +283,7 @@ static VIDEO_START( subsino )
 
 
 
-WRITE8_HANDLER( subsino_reel1_ram_w )
+static WRITE8_HANDLER( subsino_reel1_ram_w )
 {
 	reel1_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel1_tilemap,offset);
@@ -314,7 +314,7 @@ static TILE_GET_INFO( get_stisub_reel1_tile_info )
 }
 
 
-WRITE8_HANDLER( subsino_reel2_ram_w )
+static WRITE8_HANDLER( subsino_reel2_ram_w )
 {
 	reel2_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel2_tilemap,offset);
@@ -344,7 +344,7 @@ static TILE_GET_INFO( get_stisub_reel2_tile_info )
 			0);
 }
 
-WRITE8_HANDLER( subsino_reel3_ram_w )
+static WRITE8_HANDLER( subsino_reel3_ram_w )
 {
 	reel3_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel3_tilemap,offset);
@@ -918,7 +918,7 @@ static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-WRITE8_HANDLER( subsino_out_c_w )
+static WRITE8_HANDLER( subsino_out_c_w )
 {
 	// not 100% sure on this
 
@@ -975,7 +975,7 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static int colordac_offs;
-UINT8* stisub_colorram;
+static UINT8* stisub_colorram;
 
 static WRITE8_HANDLER(colordac_w)
 {
@@ -1004,9 +1004,9 @@ static WRITE8_HANDLER(colordac_w)
 	}
 }
 
-UINT8 stisub_outc;
+static UINT8 stisub_outc;
 
-WRITE8_HANDLER( stisub_out_c_w )
+static WRITE8_HANDLER( stisub_out_c_w )
 {
 	stisub_outc = data;
 
@@ -1014,7 +1014,7 @@ WRITE8_HANDLER( stisub_out_c_w )
 
 // this stuff is banked..
 // not 100% sure on the bank bits.. other bits are also set
-WRITE8_HANDLER( reel_scrollattr_w )
+static WRITE8_HANDLER( reel_scrollattr_w )
 {
 	if (stisub_outc&0x20)
 	{
@@ -1058,7 +1058,7 @@ WRITE8_HANDLER( reel_scrollattr_w )
 	}
 }
 
-READ8_HANDLER( reel_scrollattr_r )
+static READ8_HANDLER( reel_scrollattr_r )
 {
 	return reel1_attr[offset];
 }
@@ -2953,13 +2953,13 @@ void dump_decrypted(running_machine* machine, UINT8* decrypt)
 }
 #endif
 
-unsigned char victor5_xors[8] =  { 0x99, 0x99, 0x33, 0x44, 0xbb, 0x88, 0x88, 0xbb };
-unsigned char victor21_xors[8] = { 0x44, 0xbb, 0x66, 0x44, 0xaa, 0x55, 0x88, 0x22 };
-unsigned char crsbingo_xors[8] = { 0xbb, 0xcc, 0xcc, 0xdd, 0xaa, 0x11, 0x44, 0xee };
-unsigned char sharkpy_xors[8] =  { 0xcc, 0xaa, 0x66, 0xaa, 0xee, 0x33, 0xff, 0xff };
+static const unsigned char victor5_xors[8] =  { 0x99, 0x99, 0x33, 0x44, 0xbb, 0x88, 0x88, 0xbb };
+static const unsigned char victor21_xors[8] = { 0x44, 0xbb, 0x66, 0x44, 0xaa, 0x55, 0x88, 0x22 };
+static const unsigned char crsbingo_xors[8] = { 0xbb, 0xcc, 0xcc, 0xdd, 0xaa, 0x11, 0x44, 0xee };
+static const unsigned char sharkpy_xors[8] =  { 0xcc, 0xaa, 0x66, 0xaa, 0xee, 0x33, 0xff, 0xff };
 
 
-void victor5_bitswaps(UINT8* decrypt, int i)
+static void victor5_bitswaps(UINT8* decrypt, int i)
 {
 	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
 	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
@@ -2972,7 +2972,7 @@ void victor5_bitswaps(UINT8* decrypt, int i)
 }
 
 
-void victor21_bitswaps(UINT8* decrypt, int i)
+static void victor21_bitswaps(UINT8* decrypt, int i)
 {
 	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
 	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,4,7,2,5,0);
@@ -2984,7 +2984,7 @@ void victor21_bitswaps(UINT8* decrypt, int i)
 	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,4,7,6,5,0);
 }
 
-void crsbingo_bitswaps(UINT8* decrypt, int i)
+static void crsbingo_bitswaps(UINT8* decrypt, int i)
 {
 	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
 	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
@@ -2996,7 +2996,7 @@ void crsbingo_bitswaps(UINT8* decrypt, int i)
 	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
 }
 
-void sharkpy_bitswaps(UINT8* decrypt, int i)
+static void sharkpy_bitswaps(UINT8* decrypt, int i)
 {
 	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
 	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
@@ -3008,7 +3008,7 @@ void sharkpy_bitswaps(UINT8* decrypt, int i)
 	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,4,7,2,5,0);
 }
 
-void subsino_decrypt(running_machine* machine, void (*bitswaps)(UINT8* decrypt, int i), UINT8* xors, int size)
+static void subsino_decrypt(running_machine* machine, void (*bitswaps)(UINT8* decrypt, int i), const UINT8* xors, int size)
 {
 	int i;
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
@@ -3093,7 +3093,7 @@ static DRIVER_INIT( tisuba )
 	rom[0x6498] = 0x00;
 }
 
-DRIVER_INIT( stisub )
+static DRIVER_INIT( stisub )
 {
 	UINT8 *rom = memory_region( machine, "maincpu" );
 	rom[0x1005] = 0x1d; //patch protection check

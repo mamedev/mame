@@ -837,7 +837,7 @@ static void print_game_driver(FILE *out, const game_driver *game, const machine_
     settings for a system
 -------------------------------------------------*/
 
-void print_game_categories(FILE *out, const game_driver *game, const ioport_list &portlist)
+static void print_game_categories(FILE *out, const game_driver *game, const ioport_list &portlist)
 {
 	const input_port_config *port;
 	const input_field_config *field;

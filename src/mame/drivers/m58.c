@@ -431,7 +431,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT( yard85 )
+static DRIVER_INIT( yard85 )
 {
 	// on these sets the content of the sprite color PROM needs reversing
 	//  are the proms on the other sets from bootleg boards, or hand modified?

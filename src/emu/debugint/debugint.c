@@ -964,11 +964,11 @@ static void process_string(DView *dv, const char *str)
 	}
 }
 
-void on_memory_window_activate(DView *dv, const ui_menu_event *event)
+static void on_memory_window_activate(DView *dv, const ui_menu_event *event)
 {
 }
 
-void on_disassembly_window_activate(DView *dv, const ui_menu_event *event)
+static void on_disassembly_window_activate(DView *dv, const ui_menu_event *event)
 {
 	DView *ndv;
 	render_target *target;
@@ -985,7 +985,7 @@ void on_disassembly_window_activate(DView *dv, const ui_menu_event *event)
 
 }
 
-void on_disasm_cpu_activate(DView *dv, const ui_menu_event *event)
+static void on_disasm_cpu_activate(DView *dv, const ui_menu_event *event)
 {
 	const disasm_subview_item *subview;
 	int current = disasm_view_get_subview(dv->view);
@@ -1005,7 +1005,7 @@ void on_disasm_cpu_activate(DView *dv, const ui_menu_event *event)
 	}
 }
 
-void on_log_window_activate(DView *dv, const ui_menu_event *event)
+static void on_log_window_activate(DView *dv, const ui_menu_event *event)
 {
 	DView *ndv;
 	render_target *target;
@@ -1016,14 +1016,14 @@ void on_log_window_activate(DView *dv, const ui_menu_event *event)
 	set_focus_view(ndv);
 }
 
-void on_close_activate(DView *dv, const ui_menu_event *event)
+static void on_close_activate(DView *dv, const ui_menu_event *event)
 {
 	if (focus_view == dv)
 		set_focus_view(dv->next);
 	dview_free(dv);
 }
 
-void on_run_activate(DView *dv, const ui_menu_event *event)
+static void on_run_activate(DView *dv, const ui_menu_event *event)
 {
 	debug_cpu_go(dv->machine, ~0);
 }
@@ -1036,53 +1036,55 @@ void on_run_h_activate(DView *dv, const ui_menu_event *event)
 }
 #endif
 
-void on_run_cpu_activate(DView *dv, const ui_menu_event *event)
+static void on_run_cpu_activate(DView *dv, const ui_menu_event *event)
 {
 	debug_cpu_next_cpu(dv->machine);
 }
 
-void on_run_irq_activate(DView *dv, const ui_menu_event *event)
+static void on_run_irq_activate(DView *dv, const ui_menu_event *event)
 {
 	debug_cpu_go_interrupt(dv->machine, -1);
 }
 
-void on_run_vbl_activate(DView *dv, const ui_menu_event *event)
+static void on_run_vbl_activate(DView *dv, const ui_menu_event *event)
 {
 	debug_cpu_go_vblank(dv->machine);
 }
 
-void on_step_into_activate(DView *dv, const ui_menu_event *event)
+static void on_step_into_activate(DView *dv, const ui_menu_event *event)
 {
 	debug_cpu_single_step(dv->machine, 1);
 }
 
-void on_step_over_activate(DView *dv, const ui_menu_event *event)
+static void on_step_over_activate(DView *dv, const ui_menu_event *event)
 {
 	debug_cpu_single_step_over(dv->machine, 1);
 }
 
-void on_step_out_activate(DView *dv, const ui_menu_event *event)
+#ifdef UNUSED_CODE
+static void on_step_out_activate(DView *dv, const ui_menu_event *event)
 {
 	debug_cpu_single_step_out(dv->machine);
 }
+#endif
 
-void on_hard_reset_activate(DView *dv, const ui_menu_event *event)
+static void on_hard_reset_activate(DView *dv, const ui_menu_event *event)
 {
 	mame_schedule_hard_reset(dv->machine);
 }
 
-void on_soft_reset_activate(DView *dv, const ui_menu_event *event)
+static void on_soft_reset_activate(DView *dv, const ui_menu_event *event)
 {
 	mame_schedule_soft_reset(dv->machine);
 	debug_cpu_go(dv->machine, ~0);
 }
 
-void on_exit_activate(DView *dv, const ui_menu_event *event)
+static void on_exit_activate(DView *dv, const ui_menu_event *event)
 {
 	mame_schedule_exit(dv->machine);
 }
 
-void on_view_opcodes_activate(DView *dv, const ui_menu_event *event)
+static void on_view_opcodes_activate(DView *dv, const ui_menu_event *event)
 {
 	disasm_right_column rc = disasm_view_get_right_column(focus_view->view);
 	disasm_right_column new_rc = DASM_RIGHTCOL_NONE;
@@ -1101,7 +1103,7 @@ void on_view_opcodes_activate(DView *dv, const ui_menu_event *event)
 	}
 }
 
-void on_run_to_cursor_activate(DView *dv, const ui_menu_event *event)
+static void on_run_to_cursor_activate(DView *dv, const ui_menu_event *event)
 {
 	char command[64];
 

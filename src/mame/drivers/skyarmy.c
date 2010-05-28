@@ -44,12 +44,12 @@ public:
 	int nmi;
 };
 
-WRITE8_HANDLER( skyarmy_flip_screen_x_w )
+static WRITE8_HANDLER( skyarmy_flip_screen_x_w )
 {
 	flip_screen_x_set(space->machine, data & 0x01);
 }
 
-WRITE8_HANDLER( skyarmy_flip_screen_y_w )
+static WRITE8_HANDLER( skyarmy_flip_screen_y_w )
 {
 	flip_screen_y_set(space->machine, data & 0x01);
 }

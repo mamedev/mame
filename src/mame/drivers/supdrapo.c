@@ -64,8 +64,6 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-UINT8 wdog;
-
 class supdrapo_state
 {
 public:
@@ -76,6 +74,7 @@ public:
 	UINT8 *char_bank;
 	UINT8 *col_line;
 	UINT8 *videoram;
+	UINT8 wdog;
 };
 
 
@@ -180,12 +179,14 @@ static WRITE8_HANDLER( wdog8000_w )
   Watchdog: 00
 
 */
-	if (wdog == data)
+	supdrapo_state *state = (supdrapo_state *)space->machine->driver_data;
+
+	if (state->wdog == data)
 	{
 		watchdog_reset_w(space, 0, 0);	/* Reset */
 	}
 
-	wdog = data;
+	state->wdog = data;
 //  logerror("Watchdog: %02X\n", data);
 }
 
@@ -226,13 +227,13 @@ static WRITE8_HANDLER( payout_w )
 
 static MACHINE_START( supdrapo )
 {
-	wdog = 1;
 }
 
 
 static MACHINE_RESET( supdrapo )
 {
-	wdog = 1;
+	supdrapo_state *state = (supdrapo_state *)machine->driver_data;
+	state->wdog = 1;
 }
 
 

@@ -816,7 +816,7 @@ struct TILELIST {
 	int hflip;
 };
 
-struct TILELIST oam_tilelist[34];
+static struct TILELIST oam_tilelist[34];
 
 /*********************************************
  * snes_update_obsel()

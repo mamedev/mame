@@ -113,7 +113,7 @@ enum
 };
 
 
-void micro3d_mc68901_int_gen(running_machine *machine, int source)
+static void micro3d_mc68901_int_gen(running_machine *machine, int source)
 {
 	micro3d_state *state = (micro3d_state*)machine->driver_data;
 	UINT8 *ien = source & 8 ? &state->mc68901.ierb : &state->mc68901.iera;

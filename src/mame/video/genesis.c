@@ -11,7 +11,6 @@
 #include "sound/sn76496.h"
 #include "includes/genesis.h"
 
-static running_device *genesis_screen;
 
 
 /******************************************************************************
@@ -69,6 +68,8 @@ static void drawline_sprite(int line, UINT16 *bmap, int priority, UINT8 *spriteb
        UINT8		genesis_vdp_regs[32];		/* VDP registers */
 
 /* LOCAL */
+static running_device *genesis_screen;
+
 static UINT8 *		vdp_vram;					/* VDP video RAM */
 static UINT8 *		vdp_vsram;					/* VDP vertical scroll RAM */
 static UINT8		display_enable;				/* is the display enabled? */

@@ -17,12 +17,12 @@
 static UINT8 *poker72_vram,*poker72_pal;
 static UINT8 tile_bank;
 
-VIDEO_START(poker72)
+static VIDEO_START(poker72)
 {
 
 }
 
-VIDEO_UPDATE(poker72)
+static VIDEO_UPDATE(poker72)
 {
 	int x,y,count;
 

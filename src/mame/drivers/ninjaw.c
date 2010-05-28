@@ -413,7 +413,7 @@ static WRITE8_HANDLER( ninjaw_pancontrol )
 }
 
 
-WRITE16_HANDLER( tc0100scn_triple_screen_w )
+static WRITE16_HANDLER( tc0100scn_triple_screen_w )
 {
 	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
 

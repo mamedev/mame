@@ -329,7 +329,6 @@ static const sega16sp_interface xboard_sega16sp_intf =
 	MDRV_DEVICE_CONFIG(xboard_sega16sp_intf)
 
 
-extern struct palette_info palette;
-extern struct rotate_info rotate[SEGAIC16_MAX_ROTATE];
-extern struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
-extern struct road_info road[SEGAIC16_MAX_ROADS];
+extern struct palette_info segaic16_palette;
+extern struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
+extern struct road_info segaic16_road[SEGAIC16_MAX_ROADS];

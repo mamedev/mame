@@ -22,7 +22,7 @@ const z80_daisy_chain senjyo_daisy_chain[] =
 
 /* z80 pio */
 
-READ8_DEVICE_HANDLER( pio_pa_r )
+static READ8_DEVICE_HANDLER( pio_pa_r )
 {
 	return senjyo_sound_cmd;
 }

@@ -48,12 +48,12 @@ Other bits from DSW2 (but bit 5) don't seem to be read / tested at all ...
 static UINT8 *poo_vram, *poo_scrolly, *poo_sprites;
 static UINT8 vram_colbank;
 
-VIDEO_START(unclepoo)
+static VIDEO_START(unclepoo)
 {
 
 }
 
-VIDEO_UPDATE(unclepoo)
+static VIDEO_UPDATE(unclepoo)
 {
 	int y,x;
 	int count;

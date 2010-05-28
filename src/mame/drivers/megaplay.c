@@ -66,7 +66,7 @@ static UINT16 *genesis_io_ram;
 static UINT8* ic3_ram;
 
 static UINT8* ic37_ram;
-UINT16 *ic36_ram;
+static UINT16 *ic36_ram;
 
 //static UINT8 ic36_ram[0x4000];
 

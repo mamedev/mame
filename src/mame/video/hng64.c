@@ -1724,7 +1724,7 @@ VIDEO_START( hng64 )
 ///////////////
 // 3d Engine //
 ///////////////
-UINT32 hng64_dls[2][0x81];
+static UINT32 hng64_dls[2][0x81];
 
 // 3d State
 static int paletteState3d = 0x00;
@@ -1786,7 +1786,7 @@ static float uToF(UINT16 input);
 // 3d 'Functions' //
 ////////////////////
 
-void printPacket(const UINT16* packet, int hex)
+static void printPacket(const UINT16* packet, int hex)
 {
 	if (hex)
 	{
@@ -1975,7 +1975,7 @@ static void setCameraProjectionMatrix(const UINT16* packet)
 
 // Operation 0100
 // Polygon rasterization.
-void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct polygon* polys, int* numPolys)
+static void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct polygon* polys, int* numPolys)
 {
 	/*//////////////
     // PACKET FORMAT

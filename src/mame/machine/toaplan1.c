@@ -366,7 +366,7 @@ WRITE16_HANDLER( samesame_coin_w )
 }
 
 
-void toaplan1_init_coinage_tables(running_machine *machine)
+static void toaplan1_init_coinage_tables(running_machine *machine)
 {
 	/* Japan */
 	toaplan1_coins_for_credit[TOAPLAN1_REGION_JAPAN][0][0] = 1; toaplan1_credits_for_coin[TOAPLAN1_REGION_JAPAN][0][0] = 1;

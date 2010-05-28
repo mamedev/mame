@@ -5,7 +5,7 @@
 static const UINT8 *sOpROM;	// current opROM pointer
 static UINT32 sBasePC;
 
-UINT8 program_read_byte(offs_t pc)
+static UINT8 program_read_byte(offs_t pc)
 {
 	return sOpROM[pc - sBasePC];
 }
@@ -61,7 +61,7 @@ static const char *i24str(INT32 v)
 }
 
 
-int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
+static int mn102_disassemble(char *buffer, UINT32 pc, const UINT8 *oprom)
 {
 	UINT8 opcode;
 

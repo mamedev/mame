@@ -402,7 +402,7 @@ static void init_systeme_map(running_machine *machine)
 	init_ports_systeme(machine);
 }
 
-DRIVER_INIT( segasyse )
+static DRIVER_INIT( segasyse )
 {
 	init_systeme_map(machine);
 	DRIVER_INIT_CALL(hazemd_segasyse);

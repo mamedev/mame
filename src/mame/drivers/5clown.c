@@ -453,7 +453,7 @@ static UINT8 main_latch_d800;
 static UINT8 snd_latch_0800;
 static UINT8 snd_latch_0a02;
 static UINT8 ay8910_addr;
-running_device *ay8910;
+static running_device *ay8910;
 
 
 /*************************

@@ -35,12 +35,12 @@ static GFXDECODE_START( rgum )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-VIDEO_START(royalgum)
+static VIDEO_START(royalgum)
 {
 
 }
 
-VIDEO_UPDATE(royalgum)
+static VIDEO_UPDATE(royalgum)
 {
 	return 0;
 }

@@ -1204,6 +1204,7 @@ void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
     if present
 -------------------------------------------------*/
 
+#ifdef UNUSED_CODE
 void *_memory_install_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler)
 {
 	address_space *spacerw = (address_space *)space;
@@ -1218,6 +1219,7 @@ void *_memory_install_handler(const address_space *space, offs_t addrstart, offs
 	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, addrstart, addrend);
 }
+#endif
 
 
 /*-------------------------------------------------

@@ -30,8 +30,8 @@ static void snes_dma(const address_space *space, UINT8 channels);
 static void snes_hdma_init(const address_space *space);
 static void snes_hdma(const address_space *space);
 
-READ8_HANDLER(snes_io_dma_r);
-WRITE8_HANDLER(snes_io_dma_w);
+static READ8_HANDLER(snes_io_dma_r);
+static WRITE8_HANDLER(snes_io_dma_w);
 
 struct snes_cart_info snes_cart;
 
@@ -302,7 +302,7 @@ READ8_HANDLER( snes_open_bus_r )
 }
 
 /* read & write to DMA addresses are defined separately, to be called by snessdd1 handlers */
-READ8_HANDLER( snes_io_dma_r )
+static READ8_HANDLER( snes_io_dma_r )
 {
 	snes_state *state = (snes_state *)space->machine->driver_data;
 
@@ -350,7 +350,7 @@ READ8_HANDLER( snes_io_dma_r )
 	return snes_open_bus_r(space, 0);
 }
 
-WRITE8_HANDLER( snes_io_dma_w )
+static WRITE8_HANDLER( snes_io_dma_w )
 {
 	snes_state *state = (snes_state *)space->machine->driver_data;
 

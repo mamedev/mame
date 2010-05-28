@@ -1823,7 +1823,7 @@ static CPU_EXECUTE(mn10200)
 	return cycles - mn102->cycles;
 }
 
-const char *inames[10][4] = {
+static const char *const inames[10][4] = {
   { "timer0", "timer1", "timer2", "timer3" },
   { "timer4", "timer5", "timer6", "timer7" },
   { "timer8", "timer9", "timer12a", "timer12b" },
