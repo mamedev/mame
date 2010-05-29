@@ -110,6 +110,19 @@ VIDEO_START( prehisle )
 	state_save_register_global(machine, invert_controls);
 }
 
+/* sprite layout
+o fedcba9876543210
+
+0 .......xxxxxxxxx y, other bits unused?
+1 .......xxxxxxxxx x, other bits unused?
+
+2 ...xxxxxxxxxxxxx code
+2 ..x............. ?
+2 .x.............. flipx
+2 x............... flipy
+
+3 xxxx............ color+priority, other bits unknown
+*/
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int foreground )
 {
 	UINT16 *spriteram16 = machine->generic.spriteram.u16;
@@ -120,13 +133,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int attr = spriteram16[offs + 2];
 		int code = attr & 0x1fff;
 		int color = spriteram16[offs + 3] >> 12;
-		int priority = (color < 0x4);
+		int priority = (color < 0x4); // correct?
 		int flipx = attr & 0x4000;
 		int flipy = attr & 0x8000;
-		int sx = spriteram16[offs + 1];
-		int sy = spriteram16[offs];
+		int sx = spriteram16[offs + 1]&0x1ff;
+		int sy = spriteram16[offs]&0x1ff;
 
-		if (sx & 0x200) sx = -(0xff - (sx & 0xff));	// wraparound
+		// coordinates are 9-bit signed
+		if (sx&0x100) sx=-0x100+(sx&0xff);
+		if (sy&0x100) sy=-0x100+(sy&0xff);
 
 		if (flip_screen_get(machine))
 		{
