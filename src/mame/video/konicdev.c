@@ -4895,6 +4895,16 @@ static DEVICE_START( k053247 )
 				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 		128*8
 	};
+	static const gfx_layout tasman_16x16_layout =
+	{
+		16,16,
+		RGN_FRAC(1,2),
+		8,
+		{ 0,8,16,24, RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+16,RGN_FRAC(1,2)+24 },
+		{ 0,1,2,3,4,5,6,7, 32,33,34,35,36,37,38,39 },
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		16*64
+	};
 
 	k053247->screen = devtag_get_device(device->machine, intf->screen);
 
@@ -4904,6 +4914,11 @@ static DEVICE_START( k053247 )
 	case NORMAL_PLANE_ORDER:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
 		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
+		break;
+
+	case TASMAN_PLANE_ORDER:
+		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &tasman_16x16_layout, 4);
 		break;
 
 	default:
@@ -7808,6 +7823,16 @@ static DEVICE_START( k056832 )
 		{ 0, 8*4, 8*4*2, 8*4*3, 8*4*4, 8*4*5, 8*4*6, 8*4*7 },
 		8*8*4
 	};
+	static const gfx_layout charlayout8_tasman =
+	{
+		8,8,
+		RGN_FRAC(1,1),
+		8,
+		{ 0,8,16,24,32,40,48,56 },
+		{ 0,1,2,3,4,5,6,7 },	// bit order probably not exact - note ramp in first 16 tiles
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
+		8*64
+	};
 
 
 	/* handle the various graphics formats */
@@ -7840,6 +7865,11 @@ static DEVICE_START( k056832 )
 		case K056832_BPP_8LE:
 			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 8);
 			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8le, 4);
+			break;
+
+		case K056832_BPP_8TASMAN:
+			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 8);
+			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8_tasman, 4);
 			break;
 
 		case K056832_BPP_4dj:

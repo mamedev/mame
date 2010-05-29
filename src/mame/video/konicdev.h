@@ -410,7 +410,7 @@ permutations which may be required).
 #define NORMAL_PLANE_ORDER 0x0123
 #define REVERSE_PLANE_ORDER 0x3210
 #define GRADIUS3_PLANE_ORDER 0x1111
-
+#define TASMAN_PLANE_ORDER 0x1616
 
 /*
 The callback is passed:
@@ -672,6 +672,7 @@ WRITE32_DEVICE_HANDLER( k056832_b_long_w );
 #define K056832_BPP_8	3
 #define K056832_BPP_4dj	4
 #define K056832_BPP_8LE	5
+#define K056832_BPP_8TASMAN	6
 
 /**  Konami 055555  **/
 void k055555_write_reg(running_device *device, UINT8 regnum, UINT8 regdat);
