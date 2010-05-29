@@ -517,10 +517,10 @@ static void cclimber_draw_bigsprite(bitmap_t *bitmap, const rectangle *cliprect)
 	int bigsprite_flip_y = (cclimber_bigsprite_control[1] & 0x20) >> 5;
 
 	if (bigsprite_flip_x)
-		x = 0x7f - x;
+		x = 0x80 - x;
 
 	if (bigsprite_flip_y)
-		y = 0x7f - y;
+		y = 0x80 - y;
 
 	tilemap_mark_all_tiles_dirty(bs_tilemap);
 
