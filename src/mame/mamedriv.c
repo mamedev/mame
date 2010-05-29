@@ -2238,7 +2238,10 @@ const game_driver * const drivers[] =
 	DRIVER( optiger )	/* 1998.09 E63 (c) 1998 Taito */
 
 	/* Taito Type-Zero System */
-	DRIVER( landhigh )	/* E68 (c) 1999 Taito */
+	DRIVER( taitotz )
+	DRIVER( batlgear )	/* E68 (c) 1999 Taito */
+	DRIVER( landhigh )	/* E82 (c) 1999 Taito */
+	DRIVER( batlgr2 )	/* E87 (c) 2000 Taito */
 
 	/* Toaplan games */
 	DRIVER( perfrman )	/* (c) 1985 Data East Corporation (Japan) */
