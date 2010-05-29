@@ -1088,7 +1088,8 @@ ROM_START( ptblank )
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) )
+//	ROM_LOAD( "gn1-spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 27C1024 or was it chopped? Same data as the 4x rom (in the 1st 128K) */
+	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 27C4096 with data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x200000, "c352", 0 )
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
@@ -1118,7 +1119,8 @@ ROM_START( gunbuletw )
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) )
+//	ROM_LOAD( "gn1-spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 27C1024 or was it chopped? Same data as the 4x rom (in the 1st 128K) */
+	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 27C4096 with data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x200000, "c352", 0 )
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
@@ -1148,7 +1150,8 @@ ROM_START( gunbuletj )
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
 	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) )
+//	ROM_LOAD( "gn1-spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 27C1024 or was it chopped? Same data as the 4x rom (in the 1st 128K) */
+	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 27C4096 with data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x200000, "c352", 0 )
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
