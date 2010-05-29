@@ -123,7 +123,7 @@ static STREAM_UPDATE( flower_update_mono )
 							voice->oneshotplaying = 0;
 						}
 
-						if (voice->oneshotplaying)
+						else
 						{
 //                          *mix++ += ((w[offs] - 0x80) * v) / 16;
 							*mix++ += sound_rom2[v*256 + w[offs]] - 0x80;
@@ -211,7 +211,7 @@ DEVICE_GET_INFO( flower_sound )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Flower Custom");				break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
 

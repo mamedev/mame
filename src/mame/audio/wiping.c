@@ -124,7 +124,7 @@ static STREAM_UPDATE( wiping_update_mono )
 							voice->oneshotplaying = 0;
 						}
 
-						if (voice->oneshotplaying)
+						else
 						{
 							/* use full byte, first the high 4 bits, then the low 4 bits */
 							if (offs & 1)
@@ -204,7 +204,7 @@ DEVICE_GET_INFO( wiping_sound )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Wiping Custom");				break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
 
