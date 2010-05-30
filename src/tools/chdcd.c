@@ -1,6 +1,7 @@
 /***************************************************************************
 
-    CDRDAO TOC parser for CHD compression frontend
+    TOC parser for CHD compression frontend
+    Handles CDRDAO .toc, CDRWIN .cue, and Sega GDROM .gdi
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -231,18 +232,43 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 }
 
 /*-------------------------------------------------
+    chdcd_tracksize_helper - fixes up track sizes
+                             for bin/cue images
+-------------------------------------------------*/
+
+static void chdcd_tracksize_helper(int trknum, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+{
+	if (outtoc->tracks[trknum].frames == 0)
+	{
+		UINT64 tlen;
+
+		tlen = get_file_size(outinfo->fname[trknum]) - outinfo->offset[trknum];
+		tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+
+		outtoc->tracks[trknum].frames = tlen;
+	}
+
+//	printf("track %d: %d frames\n", trknum, outtoc->tracks[trknum].frames);
+}
+
+/*-------------------------------------------------
     chdcd_parse_toc - parse a CDRDAO format TOC file
 -------------------------------------------------*/
 
 chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
 {
 	FILE *infile;
-	int i, trknum;
+	int i, trknum, cuemode = 0;
 	static char token[128];
 
 	if (strstr(tocfname,".gdi"))
 	{
 		return chdcd_parse_gdi(tocfname, outtoc, outinfo);
+	}
+
+	if (strstr(tocfname,".cue"))
+	{
+		cuemode = 1;
 	}
 
 	infile = fopen(tocfname, "rt");
@@ -273,6 +299,17 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 			if ((!strcmp(token, "DATAFILE")) || (!strcmp(token, "AUDIOFILE")) || (!strcmp(token, "FILE")))
 			{
 				int f;
+
+				/* for bin/cue, this is where you increment the track # */
+				if (cuemode)
+				{
+					/* make sure we have a size for the current track before moving on */
+					if (trknum > -1)
+					{
+						chdcd_tracksize_helper(trknum, outtoc, outinfo);
+					}
+					trknum++;
+				}
 
 				/* found the data file for a track */
 				TOKENIZE
@@ -341,26 +378,28 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				}
 				else
 				{
-					/* guesstimate the track length */
-					UINT64 tlen;
-					printf("Warning: Estimating length of track %d.  If this is not the final or only track\n on the disc, the estimate may be wrong.\n", trknum+1);
-
-					tlen = get_file_size(outinfo->fname[trknum]) - outinfo->offset[trknum];
-
-					tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
-
-					f = tlen;
+					/* guesstimate the track length? */
+					f = 0;
 				}
 
 				outtoc->tracks[trknum].frames = f;
 			}
 			else if (!strcmp(token, "TRACK"))
 			{
-				/* found a new track */
-				trknum++;
+				/* found a new track if CDRDAO .toc, not if .cue */
+				if (!cuemode)
+				{
+					trknum++;
+				}
 
 				/* next token on the line is the track type */
 				TOKENIZE
+
+				/* for bin/cue skip the track number */
+				if (cuemode)
+				{
+					TOKENIZE
+				}
 
 				outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
 				outtoc->tracks[trknum].datasize = 0;
@@ -376,8 +415,8 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 					outtoc->tracks[trknum].trktype != CD_TRACK_MODE2_RAW &&
 					outtoc->tracks[trknum].trktype != CD_TRACK_AUDIO)
 				{
-					printf("Note: MAME now prefers and can accept RAW format images.\n");
-					printf("At least one track of this CDRDAO rip is not either RAW or AUDIO.\n");
+					printf("Note: MAME prefers and can accept RAW format images.\n");
+					printf("At least one track of this rip is not either RAW or AUDIO.\n");
 				}
 
 				/* next (optional) token on the line is the subcode type */
@@ -385,7 +424,50 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 				cdrom_convert_subtype_string_to_track_info(token, &outtoc->tracks[trknum]);
 			}
+			else if (!strcmp(token, "INDEX"))	/* only in bin/cue files */
+			{
+				int idx, frames;
+
+				/* get index number */
+				TOKENIZE
+				idx = strtoul(token, NULL, 10);
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				if (idx == 1)
+				{
+					outtoc->tracks[trknum].pregap = frames;
+				}
+			}
+			else if ((!strcmp(token, "START")) || (!strcmp(token, "PREGAP")))	/* START for CDRDAO, PREGAP for CDRWIN */
+			{
+				int frames;
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				outtoc->tracks[trknum].pregap = frames;
+			}
+			else if (!strcmp(token, "POSTGAP"))	/* only in CDRWIN files */
+			{
+				int frames;
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				outtoc->tracks[trknum].postgap = frames;
+			}
 		}
+	}
+
+	if (cuemode)
+	{
+		/* make sure we have a size for the last track before moving on */
+		chdcd_tracksize_helper(trknum, outtoc, outinfo);
 	}
 
 	/* close the input TOC */

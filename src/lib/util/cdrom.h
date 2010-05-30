@@ -59,6 +59,7 @@
 #define CD_FRAMES_PER_HUNK		(4)
 
 #define CD_METADATA_WORDS		(1+(CD_MAX_TRACKS * 6))
+
 enum
 {
 	CD_TRACK_MODE1 = 0, 		/* mode 1 2048 bytes/sector */
@@ -99,6 +100,12 @@ struct _cdrom_track_info
 	UINT32 subsize;		/* size of subchannel data in each sector of this track */
 	UINT32 frames;		/* number of frames in this track */
 	UINT32 extraframes;	/* number of "spillage" frames in this track */
+	UINT32 pregap;		/* number of pregap frames */
+	UINT32 postgap;		/* number of postgap frames */
+	UINT32 pgtype;		/* type of sectors in pregap */
+	UINT32 pgsub;		/* type of subchannel data in pregap */
+	UINT32 pgdatasize;	/* size of data in each sector of the pregap */ 
+	UINT32 pgsubsize;	/* size of subchannel data in each sector of the pregap */ 
 
 	/* fields used in MAME only */
 	UINT32 physframeofs;	/* frame number on the real CD this track starts at */
@@ -139,9 +146,11 @@ const cdrom_toc *cdrom_get_toc(cdrom_file *file);
 
 /* extra utilities */
 void cdrom_convert_type_string_to_track_info(const char *typestring, cdrom_track_info *info);
+void cdrom_convert_type_string_to_pregap_info(const char *typestring, cdrom_track_info *info);
 void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_track_info *info);
-const char *cdrom_get_type_string(const cdrom_track_info *info);
-const char *cdrom_get_subtype_string(const cdrom_track_info *info);
+void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_track_info *info);
+const char *cdrom_get_type_string(UINT32 trktype);
+const char *cdrom_get_subtype_string(UINT32 subtype);
 chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
 chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
 
