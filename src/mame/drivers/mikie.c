@@ -252,7 +252,6 @@ static MACHINE_DRIVER_START( mikie )
 	MDRV_VIDEO_UPDATE(mikie)
 
 	/* sound hardware */
-	// on the pcb there are 2x76489AN but SN76489 sounds correct in the locker room level (sound test 24)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("sn1", SN76489A, XTAL/8)
