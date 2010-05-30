@@ -1,8 +1,8 @@
-/***************************************************************************
+/*************************************************************************************************************
 
-                      -= IGS Lord Of Gun =-
+                                                -= IGS Lord Of Gun =-
 
-                    driver by   Luca Elia (l.elia@tin.it)
+                                          driver by   Luca Elia (l.elia@tin.it)
 
 
 Note:   if MAME_DEBUG is defined, pressing Z with:
@@ -12,33 +12,35 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
         Keys can be used together!
 
-
     [ 4 Scrolling Layers ]
 
-                Tiles       Layer size
+        Tiles       Layer size
 
-                8 x 8 x 6   0x800 x 0x200
-                8 x 8 x 6   0x200 x 0x100
-                16x16 x 6   0x800 x 0x200
-                32x32 x 6   0x800 x 0x800
+        8 x 8 x 6   0x800 x 0x200
+        8 x 8 x 6   0x200 x 0x100
+        16x16 x 6   0x800 x 0x200
+        32x32 x 6   0x800 x 0x200
 
     [ 256 Sprites ]
 
-        Plain 16 x 16 x 6 sprites
+        Each sprite is made of N x M tiles (up to 16 x 16 tiles).
+        Tiles are 16 x 16 x 6
 
     [ 2048 colors ]
 
     [ Priorities ]
 
-        RAM based priorities, with probably a per tile priority code
+        RAM based priorities, with a per tile priority code
         (the same sprite goes below some parts, and above others, of the same layer)
 
-***************************************************************************/
+*************************************************************************************************************/
 
 #include "emu.h"
 #include "includes/lordgun.h"
 
 // Variables needed by driver:
+
+UINT16 *lordgun_priority_ram, lordgun_priority;
 
 UINT16 *lordgun_vram_0, *lordgun_scroll_x_0, *lordgun_scroll_y_0;
 UINT16 *lordgun_vram_1, *lordgun_scroll_x_1, *lordgun_scroll_y_1;
@@ -48,6 +50,20 @@ UINT16 *lordgun_scrollram;
 int lordgun_whitescreen;
 
 lordgun_gun_data lordgun_gun[2];
+
+/***************************************************************************
+
+    Palette
+
+***************************************************************************/
+
+// xxxxBBBBGGGGRRRR, but repeat ecah color for each priority code (since we stuff it in the high bits of the pen)
+WRITE16_HANDLER( lordgun_paletteram_w )
+{
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	for (int pri = 0; pri < 8; pri++)
+		palette_set_color_rgb(space->machine, offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+}
 
 
 /***************************************************************************
@@ -62,28 +78,32 @@ static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 attr = lordgun_vram_0[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_0[ tile_index * 2 + 1 ];
-	SET_TILE_INFO( 1, code, (attr & 0x0030) >> 4, TILE_FLIPXY(attr >> 14));
+	UINT16 pri  = (attr & 0x0e00) >> 9;
+	SET_TILE_INFO( 0, code, ((attr & 0x0030) >> 4)+0x500/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 attr = lordgun_vram_1[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_1[ tile_index * 2 + 1 ];
-	SET_TILE_INFO( 2, code, (attr & 0x0070) >> 4, TILE_FLIPXY(attr >> 14));
+	UINT16 pri  = (attr & 0x0e00) >> 9;
+	SET_TILE_INFO( 1, code, ((attr & 0x0070) >> 4)+0x600/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_2 )
 {
 	UINT16 attr = lordgun_vram_2[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_2[ tile_index * 2 + 1 ];
-	SET_TILE_INFO( 3, code, (attr & 0x0300) >> 8, TILE_FLIPXY(attr >> 14));
+	UINT16 pri  = (attr & 0x0e00) >> 9;
+	SET_TILE_INFO( 2, code, ((attr & 0x0030) >> 4)+0x700/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_3 )
 {
 	UINT16 attr = lordgun_vram_3[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_3[ tile_index * 2 + 1 ];
-	SET_TILE_INFO( 4, code, (attr & 0x00f0) >> 4, TILE_FLIPXY(attr >> 14));
+	UINT16 pri  = (attr & 0x0e00) >> 9;
+	SET_TILE_INFO( 3, code, ((attr & 0x00f0) >> 4)+0x400/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 WRITE16_HANDLER( lordgun_vram_0_w )
@@ -116,17 +136,27 @@ WRITE16_HANDLER( lordgun_vram_3_w )
 
 ***************************************************************************/
 
+static bitmap_t *bitmaps[5];
+
 VIDEO_START( lordgun )
 {
+	int i;
+	int w = video_screen_get_width(machine->primary_screen);
+	int h = video_screen_get_height(machine->primary_screen);
+
+	// 0x800 x 200
 	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 8,8, 0x100, 0x40 );
 
+	// 0x800 x 200
 	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16,16, 0x80,0x20 );
 
+	// 0x800 x 200
 	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
-								 32,32, 0x40,0x40 );
+								 32,32, 0x40,0x10 );
 
+	// 0x200 x 100
 	tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
 								 8,8, 0x40,0x20 );
 
@@ -134,6 +164,7 @@ VIDEO_START( lordgun )
 	tilemap_set_scroll_cols(tilemap_0,1);
 	tilemap_set_transparent_pen(tilemap_0,0x3f);
 
+	// Has line scroll
 	tilemap_set_scroll_rows(tilemap_1,0x200);
 	tilemap_set_scroll_cols(tilemap_1,1);
 	tilemap_set_transparent_pen(tilemap_1,0x3f);
@@ -145,6 +176,10 @@ VIDEO_START( lordgun )
 	tilemap_set_scroll_rows(tilemap_3,1);
 	tilemap_set_scroll_cols(tilemap_3,1);
 	tilemap_set_transparent_pen(tilemap_3,0x3f);
+
+	// Buffer bitmaps for 4 tilemaps (0-3) + sprites (4)
+	for (i = 0; i < 5; i++)
+		bitmaps[i] = auto_bitmap_alloc(machine, w, h, BITMAP_FORMAT_INDEXED16);
 }
 
 /***************************************************************************
@@ -183,11 +218,22 @@ static const int lordgun_gun_x_table[] =
 	0x1B3,0x1B4,0x1B5,0x1B6,0x1B7,0x1B8,0x1B9,0x1BA,0x1BB,0x1BC,0x1BD,0x1BE,0x1BF,0x1BF
 };
 
-
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT1_X", "LIGHT0_Y", "LIGHT1_Y" };
+
+float lordgun_crosshair_mapper(const input_field_config *field, float linear_value)
+{
+	int x = linear_value - 0x3c;
+
+	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )
+		x = 0;
+
+	return lordgun_gun_x_table[x] * 1.0f / 0x1BF;
+}
 
 static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 {
+//	popmessage("%03x, %02x", input_port_read(machine, "LIGHT0_X"), input_port_read(machine, "LIGHT0_Y"));
+
 	int x = input_port_read(machine, gunnames[i]) - 0x3c;
 
 	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )
@@ -218,6 +264,24 @@ void lordgun_update_gun(running_machine *machine, int i)
 
     Sprites
 
+
+    Offset:     Bits:                   Value:
+
+    0.w         fedc ---- ---- ----     Number of Y Tiles - 1
+                ---- ba98 7654 3210     Y
+
+    2.w         f--- ---- ---- ----     Flip X
+                -e-- ---- ---- ----     Flip Y
+                --dc ---- ---- ----
+                ---- ba9- ---- ----     Priority
+                ---- ---8 ---- ----     End of Sprite List
+                ---- ---- 7654 ----     Color
+                ---- ---- ---- 3210     Number of X Tiles - 1
+
+    4.w                                 Tile Code
+
+    6.w                                 X
+
 ***************************************************************************/
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -227,27 +291,51 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for ( ; s < end; s += 8/2 )
 	{
-		int attr, code, color, sx, sy, flipx, flipy;
+		int attr, code, color, pri;
+		int sx, nx, x, x0, x1, dx, flipx;
+		int sy, ny, y, y0, y1, dy, flipy;
 
 		sy		=		s[ 0 ];
 		attr	=		s[ 1 ];
 		code	=		s[ 2 ];
 		sx		=		s[ 3 ];
 
-		// Last sprite
-		if (sy & 0x8000) break;
+		// End of sprite list
+		if (attr & 0x0100)
+			break;
 
 		flipx	=	 attr & 0x8000;
 		flipy	=	 attr & 0x4000;
+		pri		=	(attr & 0x0e00) >> 9;
 		color	=	(attr & 0x00f0) >> 4;
+		nx		=	(attr & 0x000f) + 1;
+
+		ny		=	((sy & 0xf000) >> 12) + 1;
+
+		if ( flipx )	{	x0 = nx - 1;	x1 = -1;	dx = -1;	}
+		else			{	x0 = 0;			x1 = nx;	dx = +1;	}
+
+		if ( flipy )	{	y0 = ny - 1;	y1 = -1;	dy = -1;	}
+		else			{	y0 = 0;			y1 = ny;	dy = +1;	}
 
 		// Sign extend the position
 		sx	-=	0x18;
 		sy	=	(sy & 0x7ff) - (sy & 0x800);
 
-		drawgfx_transpen(	bitmap,	cliprect, machine->gfx[0],
-					code,	color,
-					flipx,	flipy,	sx,	sy, 0x3f);
+		for (y = y0; y != y1; y += dy)
+		{
+			for (x = x0; x != x1; x += dx)
+			{
+				drawgfx_transpen(	bitmap,	cliprect, machine->gfx[4],
+									code, color + pri * 0x800/0x40,
+									flipx, flipy,
+									sx + x * 0x10, sy + y * 0x10,
+									0x3f	);
+				code += 0x10;
+			}
+
+			code += 1 - 0x10 * nx;
+		}
 	}
 }
 
@@ -255,32 +343,55 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
     Video Update
 
+    Priorities are similar to those in igs011.c
+
+    There are 4 scrolling layers, plus sprites, with a per tile priority
+    code (0-7).
+
+    Then there are 0x20000 bytes of priority RAM. Each word contains a
+    layer code (3-7), where 3 means sprites, and the rest are the tilemaps.
+    Actually, the layer code is repeated in both nibbles (e.g. 0x0033).
+
+    For each screen position, to determine which pixel to display, the video
+    chip associates a bit to the opacity of that pixel for each layer
+    (1 = transparent) to form an address into priority RAM.
+    So the bottom 5 bits of the priority RAM address depend on the layer opacities.
+
+    The higher order bits come from the priority of the pixels from each layer
+    (not all layers, actually, I guess to save on RAM size).
+
+    The priority RAM value at that address selects the topmost layer, that
+    gets sent to the screen.
+
 ***************************************************************************/
 
 VIDEO_UPDATE( lordgun )
 {
 	int layers_ctrl = -1;
-	int y;
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(screen->machine, KEYCODE_Z))
-{
-	int msk = 0;
+	if (input_code_pressed(screen->machine, KEYCODE_Z))
+	{
+		int msk = 0;
 
-	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine, KEYCODE_E))    msk |= 4;
-	if (input_code_pressed(screen->machine, KEYCODE_R))	msk |= 8;
-	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 16;
-	if (msk != 0) layers_ctrl &= msk;
-}
+		if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
+		if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
+		if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 4;
+		if (input_code_pressed(screen->machine, KEYCODE_R))	msk |= 8;
+		if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 16;
+		if (msk != 0) layers_ctrl &= msk;
+	}
 #endif
 
 	if (lordgun_whitescreen)
 	{
-		bitmap_fill( bitmap, cliprect , get_white_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_white_pen(screen->machine));
 		return 0;
 	}
+
+	// Scrolling
+
+	int x, y;
 
 	tilemap_set_scrollx( tilemap_0, 0, *lordgun_scroll_x_0 );
 	tilemap_set_scrolly( tilemap_0, 0, *lordgun_scroll_y_0 );
@@ -295,13 +406,62 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	tilemap_set_scrollx( tilemap_3, 0, *lordgun_scroll_x_3 );
 	tilemap_set_scrolly( tilemap_3, 0, *lordgun_scroll_y_3 );
 
-	bitmap_fill( bitmap, cliprect , 0);
+	// Rendering:
 
-	if (layers_ctrl & 4)	tilemap_draw(bitmap, cliprect, tilemap_2, 0, 0);
-	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, tilemap_0, 0, 0);
-	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, tilemap_1, 0, 0);
-	if (layers_ctrl & 16)	draw_sprites(screen->machine, bitmap, cliprect);
-	if (layers_ctrl & 8)	tilemap_draw(bitmap, cliprect, tilemap_3, 0, 0);
+	// render each layer (0-3 tilemaps, 4 sprites) into a buffer bitmap.
+	// The priority code of each pixel will be stored into the high 3 bits of the pen
+
+	pen_t trans_pen = 0 * 0x800 + 0x3f;	// pri = 0, pen = 3f (transparent)
+
+	int l;
+	for (l = 0; l < 5; l++)
+		bitmap_fill(bitmaps[l], cliprect, trans_pen);
+
+	if (layers_ctrl & 1)	tilemap_draw(bitmaps[0], cliprect, tilemap_0, 0, 0);
+	if (layers_ctrl & 2)	tilemap_draw(bitmaps[1], cliprect, tilemap_1, 0, 0);
+	if (layers_ctrl & 4)	tilemap_draw(bitmaps[2], cliprect, tilemap_2, 0, 0);
+	if (layers_ctrl & 8)	tilemap_draw(bitmaps[3], cliprect, tilemap_3, 0, 0);
+	if (layers_ctrl & 16)	draw_sprites(screen->machine, bitmaps[4], cliprect);
+
+	// copy to screen bitmap 
+
+	// priority code (3-7) -> layer index (0-3, 4 for sprites)
+	const int pri2layer[8] = {0,0,0,4,3,0,1,2};
+	// layer index (0-3, 4 for sprites) -> priority address bit
+	const int layer2bit[5] = {0,1,2,4,3};
+
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		{
+			UINT16 pens[5];
+
+			int pri_addr = 0;
+
+			// bits 0-4: layer transparency
+			for (l = 0; l < 5; l++)
+			{
+				pens[l] = *BITMAP_ADDR16(bitmaps[l], y, x);
+				if (pens[l] == trans_pen)
+					pri_addr |= 1 << layer2bit[l];
+			}
+
+			// bits 05-07: layer 1 priority
+			pri_addr |= (pens[1]>>11) << 5;
+			// bits 08-10: sprites priority
+			pri_addr |= (pens[4]>>11) << 8;
+			// bits 11-13: layer 0 priority
+			pri_addr |= (pens[0]>>11) << 11;
+			// bit     14: layer 3 priority
+			pri_addr |= (pens[3]>>11) << 14;
+
+			pri_addr &= 0x7fff;
+
+			l	=	pri2layer[lordgun_priority_ram[pri_addr] & 7];
+
+			*BITMAP_ADDR16(bitmap, y, x) = pens[l];
+		}
+	}
 
 	return 0;
 }

@@ -624,7 +624,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 
 		default:
-			logerror("%s: unexpected write at offset %X to ymf278b\n", cpuexec_describe_context(device->machine), offset);
+			logerror("%s: unexpected read at offset %X from ymf278b\n", cpuexec_describe_context(device->machine), offset);
 			break;
 	}
 	return 0xff;

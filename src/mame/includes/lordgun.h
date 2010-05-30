@@ -1,10 +1,12 @@
-/***************************************************************************
+/*************************************************************************
 
                       -= IGS Lord Of Gun =-
 
 *************************************************************************/
 
 /*----------- defined in video/lordgun.c -----------*/
+
+extern UINT16 *lordgun_priority_ram, lordgun_priority;
 
 extern UINT16 *lordgun_vram_0, *lordgun_scroll_x_0, *lordgun_scroll_y_0;
 extern UINT16 *lordgun_vram_1, *lordgun_scroll_x_1, *lordgun_scroll_y_1;
@@ -22,12 +24,13 @@ struct _lordgun_gun_data
 
 extern lordgun_gun_data lordgun_gun[2];
 
-
+WRITE16_HANDLER( lordgun_paletteram_w );
 WRITE16_HANDLER( lordgun_vram_0_w );
 WRITE16_HANDLER( lordgun_vram_1_w );
 WRITE16_HANDLER( lordgun_vram_2_w );
 WRITE16_HANDLER( lordgun_vram_3_w );
 
+float lordgun_crosshair_mapper(const input_field_config *field, float linear_value);
 void lordgun_update_gun(running_machine *machine, int i);
 
 VIDEO_START( lordgun );

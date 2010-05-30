@@ -64,7 +64,7 @@ Notes:
     There are 8 priority codes with RAM associated to each (8 x 256 values).
     For each screen position, to determine which pixel to display, the video
     chip associates a bit to the opacity of that pixel for each layer
-    (1 = trasparent) to form an address into the selected priority RAM.
+    (1 = transparent) to form an address into the selected priority RAM.
     The value at that address (0-7) is the topmost layer.
 
 ***************************************************************************/

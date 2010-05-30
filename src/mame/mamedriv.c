@@ -8370,7 +8370,8 @@ Other Sun games
 
 	/* IGS005 + IGS006 + IGS007 + IGS008 Games */
 	DRIVER( lordgun )	/* (c) 1994 */
-	DRIVER( hfh )		/* (c) 199? */
+	DRIVER( aliencha )	/* (c) 1994 */
+	DRIVER( alienchac )	/* (c) 1994 */
 
 	/* IGS009 Games */
 	DRIVER( jingbell )	/* (c) 1995? */
