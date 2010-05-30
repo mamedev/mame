@@ -1431,7 +1431,7 @@ static DRIVER_INIT( decocrom )
 /* 26 */ GAME( 1983, cbtime,   decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (Cassette)", 0 )
 /* 27 */ GAME( 1982, cburnrub, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 1)", 0 )
 /* 27 */ GAME( 1982, cburnrub2,cburnrub, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 2)", 0 )
-/* 27 */ GAME( 1982, cbnj,     cburnrub, cbnj,     decocass, decocass, ROT270, "Data East Corporation", "Bump N Jump (Cassette)", 0 )
+/* 27 */ GAME( 1982, cbnj,     cburnrub, cbnj,     decocass, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (Cassette)", 0 )
 /* 28 */ GAME( 1983, cgraplop, decocass, cgraplop, cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 1)", 0 )
 /* 28 */ GAME( 1983, cgraplop2,cgraplop, cgraplop2,cgraplop, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 2)", GAME_NOT_WORKING )
 /* 29 */ GAME( 1983, clapapa,  decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
