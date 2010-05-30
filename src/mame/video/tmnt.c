@@ -252,6 +252,8 @@ VIDEO_START( tmnt )
 
 	state->tmnt_priorityflag = 0;
 	state_save_register_global(machine, state->tmnt_priorityflag);
+
+	palette_set_shadow_factor(machine,0.75);
 }
 
 VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
