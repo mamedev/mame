@@ -5754,6 +5754,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kbm )		/* GQ974 (c) 2000 */
 	DRIVER( kbm2nd )	/* GCA01 (c) 2000 */
 	DRIVER( kbm3rd )	/* GCA12 (c) 2001 */
+	DRIVER( popn5 )		/* GCA04 (c) 2000 */
 	DRIVER( popn7 )		/* not sure, doesn't boot yet (c) 2001 */
 
 	/* PowerPC based Konami games */
