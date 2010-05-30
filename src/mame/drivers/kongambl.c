@@ -20,20 +20,24 @@
 
 static VIDEO_START(kongambl)
 {
-	int i;
+	running_device *k056832 = devtag_get_device(machine, "k056832");
 
-	for (i=0;i<256;i++)
-	{
-		palette_set_color(machine,i,MAKE_RGB(i,i,i));
-	}
+	k056832_set_layer_association(k056832, 0);
+	k056832_set_layer_offs(k056832, 0, -2, 0);
+	k056832_set_layer_offs(k056832, 1,  2, 0);
+	k056832_set_layer_offs(k056832, 2,  4, 0);
+	k056832_set_layer_offs(k056832, 3,  6, 0);
 }
 
 static VIDEO_UPDATE(kongambl)
 {
 	running_device *k056832 = devtag_get_device(screen->machine, "k056832");
 
-	k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 0);
-	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);
+	bitmap_fill(bitmap, cliprect, 0);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+
+//	k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 0);
+//	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
 	return 0;
@@ -66,7 +70,8 @@ static ADDRESS_MAP_START( kongambl_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)
 
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM
+	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w) 
+
 	AM_RANGE(0x440000, 0x443fff) AM_RAM
 
 	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram) 
@@ -196,5 +201,5 @@ ROM_START( moneybnk )
 ROM_END
 
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "King Tut (Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money Bank (Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "King Tut (NSW)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money In The Bank (NSW)", GAME_NOT_WORKING | GAME_NO_SOUND )

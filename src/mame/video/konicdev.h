@@ -662,6 +662,8 @@ void k056832_set_tile_bank(running_device *device, int bank);	/* Asterix */
 READ32_DEVICE_HANDLER( k056832_ram_long_r );
 READ32_DEVICE_HANDLER( k056832_rom_long_r );
 WRITE32_DEVICE_HANDLER( k056832_ram_long_w );
+READ32_DEVICE_HANDLER( k056832_unpaged_ram_long_r );
+WRITE32_DEVICE_HANDLER( k056832_unpaged_ram_long_w );
 WRITE32_DEVICE_HANDLER( k056832_long_w );
 WRITE32_DEVICE_HANDLER( k056832_b_long_w );
 

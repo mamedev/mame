@@ -6644,6 +6644,17 @@ READ32_DEVICE_HANDLER( k056832_ram_long_r )
 	return (pMem[0]<<16 | pMem[1]);
 }
 
+READ32_DEVICE_HANDLER( k056832_unpaged_ram_long_r )
+{
+	k056832_state *k056832 = k056832_get_safe_token(device);
+	UINT16 *pMem = &k056832->videoram[offset * 2];
+
+	// reading from tile RAM resets the ROM readback "half" offset
+	k056832->rom_half = 0;
+
+	return (pMem[0]<<16 | pMem[1]);
+}
+
 /* special 8-bit handlers for Lethal Enforcers */
 READ8_DEVICE_HANDLER( k056832_ram_code_lo_r )
 {
@@ -6808,6 +6819,29 @@ WRITE32_DEVICE_HANDLER( k056832_ram_long_w )
 			tilemap_mark_tile_dirty(k056832->tilemap[k056832->selected_page], offset);
 		else
 			k056832_mark_line_dirty(k056832->selected_page, offset);
+	}
+}
+
+WRITE32_DEVICE_HANDLER( k056832_unpaged_ram_long_w )
+{
+	k056832_state *k056832 = k056832_get_safe_token(device);
+	UINT16 *tile_ptr;
+	UINT32 old_mask, old_data;
+
+	tile_ptr = &k056832->videoram[offset * 2];
+	old_mask = ~mem_mask;
+	old_data = (UINT32)tile_ptr[0] << 16 | (UINT32)tile_ptr[1];
+	data = (data & mem_mask) | (old_data & old_mask);
+
+	if (data != old_data)
+	{
+		tile_ptr[0] = data >> 16;
+		tile_ptr[1] = data;
+
+		if (k056832->page_tile_mode[offset/0x800])
+			tilemap_mark_tile_dirty(k056832->tilemap[offset/0x800], offset&0x7ff);
+		else
+			k056832_mark_line_dirty(offset/0x800, (offset&0x7ff));
 	}
 }
 
