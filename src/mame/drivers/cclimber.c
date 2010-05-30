@@ -122,6 +122,7 @@ Changes:
 
 TODO:
         * Verify timings of sound/music on Swimmer.
+        * Add tms5110 support to bagmanf
 
 
 -------------------------------------------------------------------
