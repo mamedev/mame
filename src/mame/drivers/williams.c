@@ -2899,9 +2899,9 @@ GAME( 1980, zero2,      defender, defender,            defender, defndjeu, ROT0,
 GAME( 1980, defcmnd,    defender, defender,            defender, defender, ROT0,   "bootleg", "Defense Command", GAME_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,            defender, defender, ROT0,   "bootleg (Outer Limits)", "Defence Command", GAME_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,            defender, defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mayday,     0,        defender,            mayday,   mayday,   ROT0,   "<unknown>", "Mayday (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, maydaya,    mayday,   defender,            mayday,   mayday,   ROT0,   "<unknown>", "Mayday (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, maydayb,    mayday,   defender,            mayday,   mayday,   ROT0,   "<unknown>", "Mayday (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mayday,     0,        defender,            mayday,   mayday,   ROT0,   "Hoei", "Mayday (set 1)", GAME_SUPPORTS_SAVE ) // original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
+GAME( 1980, maydaya,    mayday,   defender,            mayday,   mayday,   ROT0,   "Hoei", "Mayday (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, maydayb,    mayday,   defender,            mayday,   mayday,   ROT0,   "Hoei", "Mayday (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, colony7,    0,        defender,            colony7,  defender, ROT270, "Taito", "Colony 7 (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, colony7a,   colony7,  defender,            colony7,  defender, ROT270, "Taito", "Colony 7 (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, jin,        0,        jin,                 jin,      defender, ROT90,  "Falcon", "Jin", GAME_SUPPORTS_SAVE )

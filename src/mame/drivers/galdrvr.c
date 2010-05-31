@@ -5974,8 +5974,8 @@ GAME( 198?, thepitm,  thepit,   mooncrst, thepitm,  thepitm,  ROT90,  "bootleg (
 GAME( 1982, skybase,  0,        mooncrst, skybase,  skybase,  ROT90,  "Omori Electric Co., Ltd.", "Sky Base", GAME_SUPPORTS_SAVE )
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
-GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "Sega (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE )
-GAME( 1981, jumpbugb, jumpbug,  jumpbug,  jumpbug,  jumpbug,  ROT90,  "bootleg", "Jump Bug (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?
+GAME( 1981, jumpbugb, jumpbug,  jumpbug,  jumpbug,  jumpbug,  ROT90,  "bootleg (Sega)", "Jump Bug (bootleg)", GAME_SUPPORTS_SAVE ) // bootleg or licensed?
 GAME( 1983, levers,   0,        jumpbug,  levers,   jumpbug,  ROT90,  "Rock-Ola", "Levers", GAME_SUPPORTS_SAVE )
 
 /* 2nd CPU driving AY8910 for sound */
