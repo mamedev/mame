@@ -16,9 +16,9 @@ PALETTE_INIT( battlex )
 		for (i = 0; i < 16; i++)
 		{
 			int data = i | col;
-			int g = pal1bit(data >> 0);
+			int r = pal1bit(data >> 0);
 			int b = pal1bit(data >> 1);
-			int r = pal1bit(data >> 2);
+			int g = pal1bit(data >> 2);
 
 #if 0
 			/* from Tim's shots, bit 3 seems to have no effect (see e.g. Laser Ship on title screen) */
@@ -37,7 +37,7 @@ PALETTE_INIT( battlex )
 
 WRITE8_HANDLER( battlex_palette_w )
 {
-	palette_set_color_rgb(space->machine, 16 * 8 + offset, pal1bit(data >> 2), pal1bit(data >> 0), pal1bit(data >> 1));
+	palette_set_color_rgb(space->machine, 16 * 8 + offset, pal1bit(data >> 0), pal1bit(data >> 2), pal1bit(data >> 1));
 }
 
 WRITE8_HANDLER( battlex_scroll_x_lsb_w )

@@ -24,9 +24,6 @@
     - game speed, its seems to be controlled by the IRQ's, how fast should it
       be? firing seems frustratingly inconsistant
 
-    - colors match Tim's screen shots, but there's no guarantee RGB are in the
-      correct order.
-
 ****************************************************************************
 
     Battle Cross (c)1982 Omori
