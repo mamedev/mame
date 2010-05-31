@@ -6,6 +6,7 @@
 #include "machine/latch8.h"
 
 #include "sound/tms5110.h"
+#include "machine/tms6100.h"
 
 #include "includes/dkong.h"
 
@@ -23,7 +24,7 @@
 #define USE_LS629	(0)		/* set to use new LS624 code */
 
 /* Issue surrounded by this define need to be analyzed and
- * reviewed at a lator time.
+ * reviewed at a later time.
  * Currently, the following issues exist:
  * - although not present on schematics, a 10K resistor is needed
  *   as RF in the mixer stage. Without this resistor, the DAC

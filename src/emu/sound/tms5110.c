@@ -165,32 +165,6 @@ struct _tms5110_state
 	UINT8 romclk_hack_state;
 };
 
-#define TMS6100_READ_PENDING		0x01
-#define TMS6100_NEXT_READ_IS_DUMMY	0x02
-
-typedef struct _tms6100_state tms6100_state;
-struct _tms6100_state
-{
-	/* Rom interface */
-	UINT32 address;
-	UINT32 address_latch;
-	UINT8  loadptr;
-	UINT8  m0;
-	UINT8  m1;
-	UINT8  addr_bits;
-	UINT8  clock;
-	UINT8  data;
-	UINT8  state;
-
-	const UINT8 *rom;
-
-	running_device *device;
-
-#if 0
-	const tms5110_interface *intf;
-#endif
-};
-
 typedef struct _tmsprom_state tmsprom_state;
 struct _tmsprom_state
 {
@@ -235,15 +209,6 @@ INLINE tms5110_state *get_safe_token(running_device *device)
 		   sound_get_type(device) == SOUND_CD2802 ||
 		   sound_get_type(device) == SOUND_M58817);
 	return (tms5110_state *)device->token;
-}
-
-INLINE tms6100_state *get_safe_token_6100(running_device *device)
-{
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TMS6100 ||
-			device->type == M58819);
-	return (tms6100_state *)device->token;
 }
 
 INLINE tmsprom_state *get_safe_token_prom(running_device *device)
@@ -1339,139 +1304,6 @@ void tms5110_set_frequency(running_device *device, int frequency)
 
 /******************************************************************************
 
-     DEVICE_START( tms6100 ) -- allocate buffers and reset the 6100
-
-******************************************************************************/
-
-static void register_for_save_states_6100(tms6100_state *tms)
-{
-	state_save_register_device_item(tms->device, 0, tms->addr_bits);
-	state_save_register_device_item(tms->device, 0, tms->address);
-	state_save_register_device_item(tms->device, 0, tms->address_latch);
-	state_save_register_device_item(tms->device, 0, tms->data);
-	state_save_register_device_item(tms->device, 0, tms->loadptr);
-	state_save_register_device_item(tms->device, 0, tms->m0);
-	state_save_register_device_item(tms->device, 0, tms->m1);
-	state_save_register_device_item(tms->device, 0, tms->state);
-}
-
-static DEVICE_START( tms6100 )
-{
-	//static const tms5110_interface dummy = { 0 };
-	tms6100_state *tms = get_safe_token_6100(device);
-
-	assert_always(tms != NULL, "Error creating TMS6100 chip");
-
-	//tms->intf = device->baseconfig().static_config ? (const tms5110_interface *)device->baseconfig().static_config : &dummy;
-	tms->rom = *device->region;
-
-	tms->device = device;
-
-	register_for_save_states_6100(tms);
-}
-
-static DEVICE_START( m58819 )
-{
-	//tms6100_state *tms = get_safe_token_6100(device);
-	DEVICE_START_CALL( tms6100 );
-	//tms5110_set_variant(tms, TMS5110_IS_5100);
-}
-
-static DEVICE_RESET( tms6100 )
-{
-	tms6100_state *tms = get_safe_token_6100(device);
-
-	/* initialize the chip */
-	tms->addr_bits = 0;
-	tms->address = 0;
-	tms->address_latch = 0;
-	tms->loadptr = 0;
-	tms->m0 = 0;
-	tms->m1 = 0;
-	tms->state = 0;
-	tms->clock = 0;
-	tms->data = 0;
-}
-
-WRITE_LINE_DEVICE_HANDLER( tms6100_m0_w )
-{
-	tms6100_state *tms = get_safe_token_6100(device);
-	if (state != tms->m0)
-		tms->m0 = state;
-}
-
-WRITE_LINE_DEVICE_HANDLER( tms6100_m1_w )
-{
-	tms6100_state *tms = get_safe_token_6100(device);
-	if (state != tms->m1)
-		tms->m1 = state;
-}
-
-WRITE_LINE_DEVICE_HANDLER( tms6100_romclock_w )
-{
-	tms6100_state *tms = get_safe_token_6100(device);
-
-	/* process on falling edge */
-	if (tms->clock && !state)
-	{
-		switch ((tms->m1<<1) | tms->m0)
-		{
-		case 0x00:
-			/* NOP in datasheet, not really ... */
-			if (tms->state & TMS6100_READ_PENDING)
-			{
-				if (tms->state & TMS6100_NEXT_READ_IS_DUMMY)
-				{
-					tms->address = (tms->address_latch << 3);
-					tms->address_latch = 0;
-					tms->loadptr = 0;
-					tms->state &= ~TMS6100_NEXT_READ_IS_DUMMY;
-					printf("loaded address %08x\n", tms->address);
-				}
-				else
-				{
-					/* read bit at address */
-					tms->data = (tms->rom[tms->address >> 3] >> ((tms->address & 0x07) ^ 0x07)) & 1;
-					tms->address++;
-				}
-				tms->state &= ~TMS6100_READ_PENDING;
-			}
-			break;
-		case 0x01:
-			/* READ */
-			tms->state |= TMS6100_READ_PENDING;
-			break;
-		case 0x02:
-			/* LOAD ADDRESS */
-			tms->state |= TMS6100_NEXT_READ_IS_DUMMY;
-			tms->address_latch |= (tms->addr_bits << tms->loadptr);
-			printf("loaded address latch %08x\n", tms->address_latch);
-			tms->loadptr += 4;
-			break;
-		case 0x03:
-			/* READ AND BRANCH */
-			break;
-		}
-	}
-	tms->clock = state;
-}
-
-WRITE8_DEVICE_HANDLER( tms6100_addr_w )
-{
-	tms6100_state *tms = get_safe_token_6100(device);
-	if (data != tms->addr_bits)
-		tms->addr_bits = data;
-}
-
-READ_LINE_DEVICE_HANDLER( tms6100_data_r )
-{
-	tms6100_state *tms = get_safe_token_6100(device);
-
-	return tms->data;
-}
-
-/******************************************************************************
-
      DEVICE_START( tmsprom ) -- allocate buffers initialize
 
 ******************************************************************************/
@@ -1659,25 +1491,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##m58817##s
 #define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
 #define DEVTEMPLATE_DERIVED_NAME		"M58817"
-#include "devtempl.h"
-
-/*-------------------------------------------------
-    TMS 6100 device definition
--------------------------------------------------*/
-
-#undef DEVTEMPLATE_ID
-#undef DEVTEMPLATE_NAME
-#undef DEVTEMPLATE_FEATURES
-
-#define DEVTEMPLATE_ID(p,s)				p##tms6100##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"TMS6100"
-#define DEVTEMPLATE_FAMILY				"TI Speech"
-#include "devtempl.h"
-
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##m58819##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"M58819"
 #include "devtempl.h"
 
 /*-------------------------------------------------
