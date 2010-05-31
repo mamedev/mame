@@ -475,6 +475,93 @@ static CUSTOM_INPUT( _1c0001c_r )
 	return iptval;
 }
 
+/*
+	Rail Chase 2 "Drive I/O BD" documentation
+
+	I'm fairly sure that this is actually controlled by a CPU with undumped program code.
+
+	commands 0x2* are for device status bits (all of them active low)
+
+	command 0x27 (4 port valve rear cylinder)
+	---- --xx Cylinder Position (00 - neutral, 01 - up, 10 - down, 11 - error)
+
+	command 0x29
+	---- -x-- Compressor Motor
+	---- --x- Unloader Valve
+	---- ---x Compression Valve
+
+	command 0x2a (4 port valve left cylinder)
+	---- -x-- Rev Valve
+	---- --x- Down Valve
+	---- ---x Up Valve
+
+	command 0x2b (4 port valve right cylinder)
+	---- -x-- Rev Valve
+	---- --x- Down Valve
+	---- ---x Up Valve
+
+	command 0x2e
+	---- --xx Compression SW (00 - error, 01 - low, 10 - high, 11 - error)
+
+	command 0x2f
+	---- x--- Emergency SW
+	---- ---x Safety Sensor
+
+	These are all used on network check, probably some specific data port R/Ws
+
+	command 0x3b
+	command 0xe0
+	command 0xd0
+	command 0xb0
+	command 0x70
+	command 0x0e
+	command 0x0d
+	command 0x0b
+	command 0x07
+
+	Every other write of this controls devices behaviour:
+
+	command 0x4f (left up valve off)
+	command 0x5b (left down valve off)
+	command 0x5d (compression valve on)
+	command 0x5e (left rev valve on)
+	command 0x5f (left Cylinder reset)
+
+	command 0x6f (right up valve off)
+	command 0x7b (right down valve off)
+	command 0x7d (compression valve on)
+	command 0x7e (right rev valve on)
+	command 0x7f (right Cylinder reset)
+
+	command 0x84 (reset up/down valves of rear cylinder)
+	command 0x85 (rear up valve on)
+	command 0x86 (rear down valve on)
+
+	command 0x8b (compression valve on)
+	command 0x8d (left rev valve is on)
+	command 0x8e (right rev valve is on)
+	command 0x8f (reset 4 port valve left / right cylinders and compression valve)
+
+*/
+
+static UINT16 cmd_data;
+
+static CUSTOM_INPUT( rchase2_devices_r )
+{
+	return 0xffff;
+}
+
+static WRITE32_HANDLER( rchase2_devices_w )
+{
+	/*
+	0x00040000 start 1 lamp
+	0x00080000 start 2 lamp
+	*/
+
+	if(mem_mask == 0x0000ffff)
+		cmd_data = data;
+}
+
 /*****************************************************************************/
 /* COPRO */
 
@@ -1637,6 +1724,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rchase2 )
 	PORT_INCLUDE( model2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // 1p shot
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // 2p shot
+	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(rchase2_devices_r, NULL)
 
 	/* FIXME: don't know yet if min max values are really correct, we'll see ... */
 	PORT_START("ANA0")
@@ -3614,6 +3709,10 @@ ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B */
 	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
 	ROM_LOAD("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
 	ROM_LOAD("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+
+	/* the Drive I/O clearly has a CPU on it (see above) */
+	ROM_REGION( 0x1000, "iocpu", 0 )
+	ROM_LOAD("drive_io.bin", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 
@@ -4696,6 +4795,11 @@ static DRIVER_INIT( doa )
 	ROM[0x808/4] = 0x08000004;
 }
 
+static DRIVER_INIT( rchase2 )
+{
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, rchase2_devices_w);
+}
+
 // Model 2 (TGPs, Model 1 sound board)
 GAME( 1993, daytona,         0, model2o, daytona, 0,        ROT0, "Sega", "Daytona USA (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, daytona93, daytona, model2o, daytona, 0,        ROT0, "Sega", "Daytona USA Deluxe '93", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
@@ -4743,7 +4847,7 @@ GAME( 1997, zerogunj,  zerogun, model2b, model2, zerogun, ROT0, "Psikyo", "Zero 
 GAME( 1998, dynamcopb,dynamcop, model2b, model2, genprot, ROT0, "Sega", "Dynamite Cop (Export, Model 2B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2b,dynamcop, model2b, model2, genprot, ROT0, "Sega", "Dynamite Deka 2 (Japan, Model 2B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkids,         0, model2b, model2, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, rchase2,         0, model2b, rchase2,0,       ROT0, "Sega", "Rail Chase 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, rchase2,         0, model2b, rchase2,rchase2, ROT0, "Sega", "Rail Chase 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,        0, model2c, model2, 0, ROT0, "Sega", "Sega Ski Super G", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
