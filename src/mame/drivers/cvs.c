@@ -433,7 +433,7 @@ static WRITE8_DEVICE_HANDLER( cvs_tms5110_pdc_w )
 {
 	UINT8 out = ((~data) >> 7) & 1;
 	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
-	tms5110_pdc_w(device, 0, out);
+	tms5110_pdc_w(device, out);
 }
 
 

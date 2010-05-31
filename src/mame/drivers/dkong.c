@@ -1824,7 +1824,7 @@ ROM_START( radarscp1 )
     ROM_RELOAD(               0x0800, 0x0800 )
     ROM_FILL(                 0x1000, 0x0800, 0xFF )
 
-    ROM_REGION( 0x0800, "tms", 0 )  /* speech rom */
+    ROM_REGION( 0x0800, "m58819", 0 )  /* speech rom */
     ROM_LOAD( "trs014ha.bin",      0x0000, 0x0800, CRC(d1f1b48c) SHA1(ee5584368d2e9f7bde271f5004585b53f5ff5c3f) ) /* speech rom */
 
     ROM_REGION( 0x1000, "gfx1", 0 )

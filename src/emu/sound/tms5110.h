@@ -28,18 +28,18 @@ struct _tms5110_interface
 	/* new rom controller interface */
 	devcb_write_line m0_func;		/* the M0 line */
 	devcb_write_line m1_func;		/* the M1 line */
-	devcb_write8 address_func;		/* Write to ADD1,2,4,8 - 4 address bits */
+	devcb_write8 addr_func;			/* Write to ADD1,2,4,8 - 4 address bits */
 	devcb_read_line data_func;		/* Read one bit from ADD8/Data - voice data */
 	/* on a real chip rom_clk is running all the time
      * Here, we only use it to properly emulate the protocol.
      * Do not rely on it to be a timed signal.
      */
-	devcb_write_line rom_clk_func;	/* rom_clk - Only used to drive the data lines */
+	devcb_write_line romclk_func;	/* rom clock - Only used to drive the data lines */
 };
 
 WRITE8_DEVICE_HANDLER( tms5110_ctl_w );
 READ8_DEVICE_HANDLER( tms5110_ctl_r );
-WRITE8_DEVICE_HANDLER( tms5110_pdc_w );
+WRITE_LINE_DEVICE_HANDLER( tms5110_pdc_w );
 
 /* this is only used by cvs.c
  * it is not related at all to the speech generation
@@ -70,5 +70,50 @@ DEVICE_GET_INFO( m58817 );
 #define SOUND_CD2802 DEVICE_GET_INFO_NAME( cd2802 )
 #define SOUND_M58817 DEVICE_GET_INFO_NAME( m58817 )
 
+/* TMS 6100 memory controller */
+
+WRITE_LINE_DEVICE_HANDLER( tms6100_m0_w );
+WRITE_LINE_DEVICE_HANDLER( tms6100_m1_w );
+WRITE_LINE_DEVICE_HANDLER( tms6100_romclock_w );
+WRITE8_DEVICE_HANDLER( tms6100_addr_w );
+
+READ_LINE_DEVICE_HANDLER( tms6100_data_r );
+
+DEVICE_GET_INFO( tms6100 );
+DEVICE_GET_INFO( m58819 );
+
+#define TMS6100 DEVICE_GET_INFO_NAME( tms6100 )
+#define M58819 DEVICE_GET_INFO_NAME( m58819 )
+
+/* PROM controlled TMS5110 interface */
+
+typedef struct _tmsprom_interface tmsprom_interface;
+struct _tmsprom_interface
+{
+	const char *prom_region;		/* prom memory region - sound region is automatically assigned */
+	UINT32 rom_size;				/* individual rom_size */
+	UINT8 pdc_bit;					/* bit # of pdc line */
+	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
+	UINT8 ctl1_bit;					/* bit # of ctl1 line */
+	UINT8 ctl2_bit;					/* bit # of ctl2 line */
+	UINT8 ctl4_bit;					/* bit # of ctl4 line */
+	UINT8 ctl8_bit;					/* bit # of ctl8 line */
+	UINT8 reset_bit;				/* bit # of rom reset */
+	UINT8 stop_bit;					/* bit # of stop */
+	devcb_write_line pdc_func;		/* tms pdc func */
+	devcb_write8 ctl_func;			/* tms ctl func */
+};
+
+WRITE_LINE_DEVICE_HANDLER( tmsprom_m0_w );
+READ_LINE_DEVICE_HANDLER( tmsprom_data_r );
+
+/* offset is rom # */
+WRITE8_DEVICE_HANDLER( tmsprom_rom_csq_w );
+WRITE8_DEVICE_HANDLER( tmsprom_bit_w );
+WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w );
+
+DEVICE_GET_INFO( tmsprom );
+
+#define TMSPROM DEVICE_GET_INFO_NAME( tmsprom )
 
 #endif /* __TMS5110_H__ */

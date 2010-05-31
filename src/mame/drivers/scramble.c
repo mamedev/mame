@@ -1940,7 +1940,7 @@ ROM_START( ad2083 )
 	ROM_LOAD( "ad4.5k",       0x0000, 0x2000, CRC(388cdd21) SHA1(52f97d8e4f7c7f45a2875f03eadc622b540693e7) )
 	ROM_LOAD( "ad5.3k",       0x2000, 0x2000, CRC(f53f3449) SHA1(0711f2e47504f256d46eea1e225e35f9bde8b9fb) )
 
-	ROM_REGION( 0x2000, "tms5110", 0 ) /* data for the TMS5110 speech chip */
+	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
 	ROM_LOAD( "ad1v.9a",      0x0000, 0x1000, CRC(4cb93fff) SHA1(2cc686a9a58a85f2bb04fb6ced4626e9952635bb) )
 	ROM_LOAD( "ad2v.10a",     0x1000, 0x1000, CRC(4b530ea7) SHA1(8793b3497b598f33b34bf9524e360c6c62e8001d) )
 

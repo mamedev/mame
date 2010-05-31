@@ -117,6 +117,15 @@ struct _tms5110_state
 	/* external callback */
 	int (*M0_callback)(running_device *);
 	void (*set_load_address)(running_device *, int);
+
+	/* callbacks */
+	devcb_resolved_write_line m0_func;		/* the M0 line */
+	devcb_resolved_write_line m1_func;		/* the M1 line */
+	devcb_resolved_write8 addr_func;		/* Write to ADD1,2,4,8 - 4 address bits */
+	devcb_resolved_read_line data_func;		/* Read one bit from ADD8/Data - voice data */
+	devcb_resolved_write_line romclk_func;	/* rom clock - Only used to drive the data lines */
+
+
 	running_device *device;
 
 	/* these contain data describing the current and previous voice frames */
@@ -156,6 +165,57 @@ struct _tms5110_state
 	UINT8 romclk_hack_state;
 };
 
+#define TMS6100_READ_PENDING		0x01
+#define TMS6100_NEXT_READ_IS_DUMMY	0x02
+
+typedef struct _tms6100_state tms6100_state;
+struct _tms6100_state
+{
+	/* Rom interface */
+	UINT32 address;
+	UINT32 address_latch;
+	UINT8  loadptr;
+	UINT8  m0;
+	UINT8  m1;
+	UINT8  addr_bits;
+	UINT8  clock;
+	UINT8  data;
+	UINT8  state;
+
+	const UINT8 *rom;
+
+	running_device *device;
+
+#if 0
+	const tms5110_interface *intf;
+#endif
+};
+
+typedef struct _tmsprom_state tmsprom_state;
+struct _tmsprom_state
+{
+	/* Rom interface */
+	UINT32 address;
+	/* ctl lines */
+	UINT8  m0;
+	UINT8  enable;
+	UINT32  base_address;
+	UINT8  bit;
+
+	int prom_cnt;
+
+	int    clock;
+	const UINT8 *rom;
+	const UINT8 *prom;
+
+	devcb_resolved_write_line pdc_func;		/* tms pdc func */
+	devcb_resolved_write8 ctl_func;			/* tms ctl func */
+
+	running_device *device;
+	emu_timer *romclk_timer;
+
+	const tmsprom_interface *intf;
+};
 
 /* Pull in the ROM tables */
 #include "tms5110r.c"
@@ -177,6 +237,22 @@ INLINE tms5110_state *get_safe_token(running_device *device)
 	return (tms5110_state *)device->token;
 }
 
+INLINE tms6100_state *get_safe_token_6100(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == TMS6100 ||
+			device->type == M58819);
+	return (tms6100_state *)device->token;
+}
+
+INLINE tmsprom_state *get_safe_token_prom(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == TMSPROM);
+	return (tmsprom_state *)device->token;
+}
 
 /* Static function prototypes */
 static void tms5110_set_variant(tms5110_state *tms, int variant);
@@ -209,6 +285,39 @@ void tms5110_set_variant(tms5110_state *tms, int variant)
 	tms->variant = variant;
 }
 
+static void new_int_write(tms5110_state *tms, UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
+{
+	if (tms->m0_func.write)
+		devcb_call_write_line(&tms->m0_func, m0);
+	if (tms->m1_func.write)
+		devcb_call_write_line(&tms->m1_func, m1);
+	if (tms->addr_func.write)
+		devcb_call_write8(&tms->addr_func, 0, addr);
+	if (tms->romclk_func.write)
+	{
+		//printf("rc %d\n", rc);
+		devcb_call_write_line(&tms->romclk_func, rc);
+	}
+}
+
+static void new_int_write_addr(tms5110_state *tms, UINT8 addr)
+{
+	new_int_write(tms, 1, 0, 1, addr);
+	new_int_write(tms, 0, 0, 1, addr);
+	new_int_write(tms, 1, 0, 0, addr);
+	new_int_write(tms, 0, 0, 0, addr);
+}
+
+static UINT8 new_int_read(tms5110_state *tms)
+{
+	new_int_write(tms, 1, 1, 0, 0);
+	new_int_write(tms, 0, 1, 0, 0);
+	new_int_write(tms, 1, 0, 0, 0);
+	new_int_write(tms, 0, 0, 0, 0);
+	if (tms->data_func.read)
+		return devcb_call_read_line(&tms->data_func);
+	return 0;
+}
 
 static void register_for_save_states(tms5110_state *tms)
 {
@@ -310,7 +419,11 @@ int i;
 			FIFO_data_write(tms, data);
 		}
 		else
-			if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
+		{
+			//if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
+			UINT8 data = new_int_read(tms);
+			FIFO_data_write(tms, data);
+		}
 	}
 }
 
@@ -321,10 +434,16 @@ static void perform_dummy_read(tms5110_state *tms)
 		if (tms->M0_callback)
 		{
 			int data = (*tms->M0_callback)(tms->device);
-				if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
+
+			if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
 		}
-			else
-				if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
+		else
+		{
+			int data = new_int_read(tms);
+
+			if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
+			//if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
+		}
 		tms->schedule_dummy_read = FALSE;
 	}
 }
@@ -685,6 +804,7 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 				tms->schedule_dummy_read = TRUE;
 				if (tms->set_load_address)
 					tms->set_load_address(tms->device, tms->address);
+				new_int_write_addr(tms, tms->CTL_pins & 0x0F);
 			}
 			else
 			{
@@ -918,10 +1038,15 @@ static void speech_rom_set_addr(running_device *device, int addr)
 
 ******************************************************************************/
 
+
 static DEVICE_START( tms5110 )
 {
-	static const tms5110_interface dummy = { 0 };
+	static const tms5110_interface dummy = { NULL, NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL};
 	tms5110_state *tms = get_safe_token(device);
+
+	assert_always(tms != NULL, "Error creating TMS5110 chip");
+
+	assert_always(device->baseconfig().static_config != NULL, "No config");
 
 	tms->intf = device->baseconfig().static_config ? (const tms5110_interface *)device->baseconfig().static_config : &dummy;
 	tms->table = *device->region;
@@ -929,14 +1054,21 @@ static DEVICE_START( tms5110 )
 	tms->device = device;
 	tms5110_set_variant(tms, TMS5110_IS_5110A);
 
-	assert_always(tms != NULL, "Error creating TMS5110 chip");
+	/* resolve lines */
+	devcb_resolve_write_line(&tms->m0_func, &tms->intf->m0_func, device);
+	devcb_resolve_write_line(&tms->m1_func, &tms->intf->m1_func, device);
+	devcb_resolve_write_line(&tms->romclk_func, &tms->intf->romclk_func, device);
+	devcb_resolve_write8(&tms->addr_func, &tms->intf->addr_func, device);
+	devcb_resolve_read_line(&tms->data_func, &tms->intf->data_func, device);
 
 	/* initialize a stream */
 	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5110_update);
 
 	if (tms->table == NULL)
 	{
+#if 0
 		assert_always(tms->intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
+#endif
 	    tms->M0_callback = tms->intf->M0_callback;
 	    tms->set_load_address = tms->intf->load_address;
 	}
@@ -1021,7 +1153,19 @@ static DEVICE_RESET( tms5110 )
 	memset(tms->x, 0, sizeof(tms->x));
 	tms->next_is_address = FALSE;
 	tms->address = 0;
-	tms->schedule_dummy_read = TRUE;
+	if (tms->table != NULL || tms->M0_callback != NULL)
+	{
+		/* legacy interface */
+		tms->schedule_dummy_read = TRUE;
+
+	}
+	else
+	{
+		/* no dummy read! This makes bagman and ad2083 speech fail
+		 * with the new cycle and transition exact interfaces
+		 */
+		tms->schedule_dummy_read = FALSE;
+	}
 	tms->addr_bit = 0;
 }
 
@@ -1050,13 +1194,13 @@ WRITE8_DEVICE_HANDLER( tms5110_ctl_w )
 
 ******************************************************************************/
 
-WRITE8_DEVICE_HANDLER( tms5110_pdc_w )
+WRITE_LINE_DEVICE_HANDLER( tms5110_pdc_w )
 {
 	tms5110_state *tms = get_safe_token(device);
 
     /* bring up to date first */
     stream_update(tms->stream);
-    tms5110_PDC_set(tms, data);
+    tms5110_PDC_set(tms, state);
 }
 
 
@@ -1193,9 +1337,290 @@ void tms5110_set_frequency(running_device *device, int frequency)
 }
 
 
+/******************************************************************************
+
+     DEVICE_START( tms6100 ) -- allocate buffers and reset the 6100
+
+******************************************************************************/
+
+static void register_for_save_states_6100(tms6100_state *tms)
+{
+	state_save_register_device_item(tms->device, 0, tms->addr_bits);
+	state_save_register_device_item(tms->device, 0, tms->address);
+	state_save_register_device_item(tms->device, 0, tms->address_latch);
+	state_save_register_device_item(tms->device, 0, tms->data);
+	state_save_register_device_item(tms->device, 0, tms->loadptr);
+	state_save_register_device_item(tms->device, 0, tms->m0);
+	state_save_register_device_item(tms->device, 0, tms->m1);
+	state_save_register_device_item(tms->device, 0, tms->state);
+}
+
+static DEVICE_START( tms6100 )
+{
+	//static const tms5110_interface dummy = { 0 };
+	tms6100_state *tms = get_safe_token_6100(device);
+
+	assert_always(tms != NULL, "Error creating TMS6100 chip");
+
+	//tms->intf = device->baseconfig().static_config ? (const tms5110_interface *)device->baseconfig().static_config : &dummy;
+	tms->rom = *device->region;
+
+	tms->device = device;
+
+	register_for_save_states_6100(tms);
+}
+
+static DEVICE_START( m58819 )
+{
+	//tms6100_state *tms = get_safe_token_6100(device);
+	DEVICE_START_CALL( tms6100 );
+	//tms5110_set_variant(tms, TMS5110_IS_5100);
+}
+
+static DEVICE_RESET( tms6100 )
+{
+	tms6100_state *tms = get_safe_token_6100(device);
+
+	/* initialize the chip */
+	tms->addr_bits = 0;
+	tms->address = 0;
+	tms->address_latch = 0;
+	tms->loadptr = 0;
+	tms->m0 = 0;
+	tms->m1 = 0;
+	tms->state = 0;
+	tms->clock = 0;
+	tms->data = 0;
+}
+
+WRITE_LINE_DEVICE_HANDLER( tms6100_m0_w )
+{
+	tms6100_state *tms = get_safe_token_6100(device);
+	if (state != tms->m0)
+		tms->m0 = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( tms6100_m1_w )
+{
+	tms6100_state *tms = get_safe_token_6100(device);
+	if (state != tms->m1)
+		tms->m1 = state;
+}
+
+WRITE_LINE_DEVICE_HANDLER( tms6100_romclock_w )
+{
+	tms6100_state *tms = get_safe_token_6100(device);
+
+	/* process on falling edge */
+	if (tms->clock && !state)
+	{
+		switch ((tms->m1<<1) | tms->m0)
+		{
+		case 0x00:
+			/* NOP in datasheet, not really ... */
+			if (tms->state & TMS6100_READ_PENDING)
+			{
+				if (tms->state & TMS6100_NEXT_READ_IS_DUMMY)
+				{
+					tms->address = (tms->address_latch << 3);
+					tms->address_latch = 0;
+					tms->loadptr = 0;
+					tms->state &= ~TMS6100_NEXT_READ_IS_DUMMY;
+					printf("loaded address %08x\n", tms->address);
+				}
+				else
+				{
+					/* read bit at address */
+					tms->data = (tms->rom[tms->address >> 3] >> ((tms->address & 0x07) ^ 0x07)) & 1;
+					tms->address++;
+				}
+				tms->state &= ~TMS6100_READ_PENDING;
+			}
+			break;
+		case 0x01:
+			/* READ */
+			tms->state |= TMS6100_READ_PENDING;
+			break;
+		case 0x02:
+			/* LOAD ADDRESS */
+			tms->state |= TMS6100_NEXT_READ_IS_DUMMY;
+			tms->address_latch |= (tms->addr_bits << tms->loadptr);
+			printf("loaded address latch %08x\n", tms->address_latch);
+			tms->loadptr += 4;
+			break;
+		case 0x03:
+			/* READ AND BRANCH */
+			break;
+		}
+	}
+	tms->clock = state;
+}
+
+WRITE8_DEVICE_HANDLER( tms6100_addr_w )
+{
+	tms6100_state *tms = get_safe_token_6100(device);
+	if (data != tms->addr_bits)
+		tms->addr_bits = data;
+}
+
+READ_LINE_DEVICE_HANDLER( tms6100_data_r )
+{
+	tms6100_state *tms = get_safe_token_6100(device);
+
+	return tms->data;
+}
+
+/******************************************************************************
+
+     DEVICE_START( tmsprom ) -- allocate buffers initialize
+
+******************************************************************************/
+
+static void register_for_save_states_prom(tmsprom_state *tms)
+{
+	state_save_register_device_item(tms->device, 0, tms->address);
+	state_save_register_device_item(tms->device, 0, tms->base_address);
+	state_save_register_device_item(tms->device, 0, tms->bit);
+	state_save_register_device_item(tms->device, 0, tms->enable);
+	state_save_register_device_item(tms->device, 0, tms->prom_cnt);
+	state_save_register_device_item(tms->device, 0, tms->m0);
+}
+
+
+static void update_prom_cnt(tmsprom_state *tms)
+{
+	UINT8 prev_val = tms->prom[tms->prom_cnt] | 0x0200;
+	if (tms->enable && (prev_val & (1<<tms->intf->stop_bit)))
+		tms->prom_cnt |= 0x10;
+	else
+		tms->prom_cnt &= 0x0f;
+}
+
+static TIMER_CALLBACK( tmsprom_step )
+{
+	running_device *device = (running_device *)ptr;
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	/* only 16 bytes needed ... The original dump is bad. This
+     * is what is needed to get speech to work. The prom data has
+     * been updated and marked as BAD_DUMP. The information below
+     * is given for reference once another dump should surface.
+     *
+     * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
+     *              0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
+     */
+	UINT16 ctrl;
+
+	update_prom_cnt(tms);
+	ctrl = (tms->prom[tms->prom_cnt] | 0x200);
+
+	//printf("ctrl %04x, enable %d cnt %d\n", ctrl, tms->enable, tms->prom_cnt);
+	tms->prom_cnt = ((tms->prom_cnt + 1) & 0x0f) | (tms->prom_cnt & 0x10);
+
+	if (ctrl & (1 << tms->intf->reset_bit))
+		tms->address = 0;
+
+	devcb_call_write8(&tms->ctl_func, 0, BITSWAP8(ctrl,0,0,0,0,tms->intf->ctl8_bit,
+			tms->intf->ctl4_bit,tms->intf->ctl2_bit,tms->intf->ctl1_bit));
+
+	devcb_call_write_line(&tms->pdc_func, (ctrl >> tms->intf->pdc_bit) & 0x01);
+}
+
+static DEVICE_START( tmsprom )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	assert_always(tms != NULL, "Error creating TMSPROM chip");
+
+	tms->intf = (const tmsprom_interface *) device->baseconfig().static_config;
+	assert_always(tms->intf != NULL, "Error creating TMSPROM chip: No configuration");
+
+	/* resolve lines */
+	devcb_resolve_write_line(&tms->pdc_func, &tms->intf->pdc_func, device);
+	devcb_resolve_write8(&tms->ctl_func, &tms->intf->ctl_func, device);
+
+	tms->rom = *device->region;
+	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No rom region found");
+	tms->prom = memory_region(device->machine, tms->intf->prom_region);
+	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No prom region found");
+
+	tms->device = device;
+	tms->clock = device->clock;
+
+	tms->romclk_timer = timer_alloc(device->machine, tmsprom_step, device);
+	timer_adjust_periodic(tms->romclk_timer, attotime_zero, 0, ATTOTIME_IN_HZ(tms->clock));
+
+	tms->bit = 0;
+	tms->base_address = 0;
+	tms->address = 0;
+	tms->enable = 0;
+	tms->m0 = 0;
+	tms->prom_cnt = 0;
+	register_for_save_states_prom(tms);
+}
+
+WRITE_LINE_DEVICE_HANDLER( tmsprom_m0_w )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	/* falling edge counts */
+	if (tms->m0 && !state)
+	{
+		tms->address += 1;
+		tms->address &= (tms->intf->rom_size-1);
+	}
+	tms->m0 = state;
+}
+
+READ_LINE_DEVICE_HANDLER( tmsprom_data_r )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	return (tms->rom[tms->base_address + tms->address] >> tms->bit) & 0x01;
+}
+
+
+WRITE8_DEVICE_HANDLER( tmsprom_rom_csq_w )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	if (!data)
+		tms->base_address = offset * tms->intf->rom_size;
+}
+
+WRITE8_DEVICE_HANDLER( tmsprom_bit_w )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	tms->bit = data;
+}
+
+WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	if (state != tms->enable)
+	{
+		tms->enable = state;
+		update_prom_cnt(tms);
+
+		/* the following is needed for ad2084.
+		 * It is difficult to derive the actual connections from
+		 * pcb pictures but the reset pin of the LS393 driving
+		 * the prom address line is connected somewhere.
+		 *
+		 * This does not affect bagman. It just simulates that a
+		 * write to ads3 is always happening when the four lower
+		 * counter bits are 0!
+		 */
+		if (state)
+			tms->prom_cnt &= 0x10;
+	}
+}
+
 
 /*-------------------------------------------------
-    device definition
+    TMS 5110 device definition
 -------------------------------------------------*/
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
@@ -1235,3 +1660,37 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
 #define DEVTEMPLATE_DERIVED_NAME		"M58817"
 #include "devtempl.h"
+
+/*-------------------------------------------------
+    TMS 6100 device definition
+-------------------------------------------------*/
+
+#undef DEVTEMPLATE_ID
+#undef DEVTEMPLATE_NAME
+#undef DEVTEMPLATE_FEATURES
+
+#define DEVTEMPLATE_ID(p,s)				p##tms6100##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME				"TMS6100"
+#define DEVTEMPLATE_FAMILY				"TI Speech"
+#include "devtempl.h"
+
+#define DEVTEMPLATE_DERIVED_ID(p,s)		p##m58819##s
+#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
+#define DEVTEMPLATE_DERIVED_NAME		"M58819"
+#include "devtempl.h"
+
+/*-------------------------------------------------
+    TMS PROM interface definition
+-------------------------------------------------*/
+
+#undef DEVTEMPLATE_ID
+#undef DEVTEMPLATE_NAME
+#undef DEVTEMPLATE_FEATURES
+
+#define DEVTEMPLATE_ID(p,s)				p##tmsprom##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START
+#define DEVTEMPLATE_NAME				"TMSPROM"
+#define DEVTEMPLATE_FAMILY				"TI Speech"
+#include "devtempl.h"
+

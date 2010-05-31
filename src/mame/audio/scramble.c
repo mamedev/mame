@@ -210,6 +210,15 @@ void scramble_sh_init(running_machine *machine)
     Q6      ==> Reset Counters (LS393)
     Q7      ==> Trigger Logic
 
+	 only 16 bytes needed ... The original dump is bad. This
+     is what is needed to get speech to work. The prom data has
+     been updated and marked as BAD_DUMP. The information below
+     is given for reference once another dump should surface.
+
+     static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
+                  0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
+
+
   ***************************************************************************/
 
 /*
@@ -236,90 +245,32 @@ void scramble_sh_init(running_machine *machine)
  *
  */
 
-static UINT32 speech_rom_address;
-static UINT32 speech_rom_address_hi;
-static UINT8 speech_rom_bit;
-static UINT8 speech_cnt;
-
-static TIMER_CALLBACK( ad2083_step )
-{
-	running_device *tms = devtag_get_device(machine, "tms");
-
-	/* only 16 bytes needed ... The original dump is bad. This
-     * is what is needed to get speech to work. The prom data has
-     * been updated and marked as BAD_DUMP. The information below
-     * is given for reference once another dump should surface.
-     *
-     * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
-     *              0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
-     */
-	UINT8 *prom = memory_region(machine, "5110ctrl");
-	UINT8 ctrl;
-
-	if (param == 0)
-	{
-		if (speech_cnt < 0x10)
-		{
-			/* Just reset and exit */
-			speech_cnt = 0;
-			return;
-		}
-		speech_cnt = 0;
-	}
-	ctrl = prom[speech_cnt++];
-
-	if (ctrl & 0x40)
-		speech_rom_address = 0;
-
-	tms5110_ctl_w(tms, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
-	tms5110_pdc_w(tms, 0, ctrl & 0x02 ? 0 : 1);
-
-	if (!(ctrl & 0x80))
-		timer_set(machine, ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);
-}
-
-static int ad2083_speech_rom_read_bit(running_device *device)
-{
-	UINT8 *ROM = memory_region(device->machine, "tms5110");
-	int bit;
-
-	speech_rom_address %= 4096;
-
-	bit = (ROM[speech_rom_address | speech_rom_address_hi] >> speech_rom_bit) & 1;
-	speech_rom_address++;
-
-	return bit;
-}
-
-static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
+static WRITE8_DEVICE_HANDLER( ad2083_tms5110_ctrl_w )
 {
 	static const int tbl[8] = {0,4,2,6,1,5,3,7};
 
-	speech_rom_bit = tbl[data & 0x07];
+	tmsprom_bit_w(device, 0, tbl[data & 0x07]);
 	switch (data>>3)
 	{
-		case 0x00:
-			logerror("Rom 0 select .. \n");
-			break;
 		case 0x01:
-			/* Rom 2 select */
-			speech_rom_address_hi = 0x1000;
-			break;
-		case 0x02:
-			logerror("Rom 1 select\n");
+			tmsprom_rom_csq_w(device, 1, 0);
 			break;
 		case 0x03:
+			tmsprom_rom_csq_w(device, 0, 0);
+			break;
+		case 0x00:
+			/* Rom 2 select */
+			logerror("Rom 2 select\n");
+			break;
+		case 0x02:
+			logerror("Rom 3 select .. \n");
 			/* Rom 3 select */
-			speech_rom_address_hi = 0x0000;
 			break;
 	}
-	timer_set(space->machine, attotime_zero,NULL,0,ad2083_step);
+	/* most likely triggered by write access */
+	tmsprom_enable_w(device, 0);
+	tmsprom_enable_w(device, 1);
 }
-
-static const tms5110_interface ad2083_tms5110_interface =
-{
-	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
-};
 
 
 static const ay8910_interface ad2083_ay8910_interface_1 =
@@ -349,7 +300,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ad2083_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ad2083_tms5110_ctrl_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("tmsprom", ad2083_tms5110_ctrl_w)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
@@ -358,22 +309,47 @@ ADDRESS_MAP_END
 
 static SOUND_START( ad2083 )
 {
-	speech_rom_address = 0;
-	speech_rom_address_hi = 0;
-	speech_rom_bit = 0;
-	speech_cnt = 0x10;
-
-	state_save_register_global(machine, speech_rom_address);
-	state_save_register_global(machine, speech_rom_address_hi);
-	state_save_register_global(machine, speech_rom_bit);
-	state_save_register_global(machine, speech_cnt);
 }
+
+static const tmsprom_interface prom_intf =
+{
+	"5110ctrl",						/* prom memory region - sound region is automatically assigned */
+	0x1000,							/* individual rom_size */
+	1,								/* bit # of pdc line */
+	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
+	8,								/* bit # of ctl1 line */
+	2,								/* bit # of ctl2 line */
+	8,								/* bit # of ctl4 line */
+	2,								/* bit # of ctl8 line */
+	6,								/* bit # of rom reset */
+	7,								/* bit # of stop */
+	DEVCB_DEVICE_LINE("tms", tms5110_pdc_w),		/* tms pdc func */
+	DEVCB_DEVICE_HANDLER("tms", tms5110_ctl_w)		/* tms ctl func */
+};
+
+static const tms5110_interface ad2083_tms5110_interface =
+{
+	/* legacy interface */
+	NULL,											/* function to be called when chip requests another bit */
+	NULL,											/* speech ROM load address callback */
+	/* new rom controller interface */
+	DEVCB_DEVICE_LINE("tmsprom", tmsprom_m0_w),		/* the M0 line */
+	DEVCB_NULL,										/* the M1 line */
+	DEVCB_NULL,										/* Write to ADD1,2,4,8 - 4 address bits */
+	DEVCB_DEVICE_LINE("tmsprom", tmsprom_data_r),	/* Read one bit from ADD8/Data - voice data */
+	DEVCB_NULL										/* rom clock - Only used to drive the data lines */
+};
+
+
 
 MACHINE_DRIVER_START( ad2083_audio )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_sound_map)
 	MDRV_CPU_IO_MAP(ad2083_sound_io_map)
+
+	MDRV_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
+	MDRV_DEVICE_CONFIG(prom_intf)
 
 	MDRV_SOUND_START(ad2083)
 
