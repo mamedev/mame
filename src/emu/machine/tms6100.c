@@ -230,6 +230,17 @@ WRITE_LINE_DEVICE_HANDLER( tms6100_romclock_w )
 			break;
 		case 0x03:
 			/* READ AND BRANCH */
+			if (tms->state & TMS6100_NEXT_READ_IS_DUMMY)
+			{
+				tms->state &= ~TMS6100_NEXT_READ_IS_DUMMY;  // clear - no dummy read according to datasheet
+				LOG(("loaded address latch %08x\n", tms->address_latch));
+				tms->address = tms->rom[tms->address_latch] | (tms->rom[tms->address_latch+1]<<8);
+				tms->address &= 0x3fff; // 14 bits
+				LOG(("loaded indirect address %04x\n", tms->address));
+				tms->address = (tms->address << 3);
+				tms->address_latch = 0;
+				tms->loadptr = 0;
+			}
 			break;
 		}
 	}

@@ -801,6 +801,16 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 					tms->next_is_address = TRUE;
 					break;
 
+				case TMS5110_CMD_READ_BRANCH:
+					new_int_write(tms, 0,1,1,0);
+					new_int_write(tms, 1,1,1,0);
+					new_int_write(tms, 0,1,1,0);
+					new_int_write(tms, 0,0,0,0);
+					new_int_write(tms, 1,0,0,0);
+					new_int_write(tms, 0,0,0,0);
+					tms->schedule_dummy_read = FALSE;
+					break;
+
 				case TMS5110_CMD_TEST_TALK:
 					tms->state = CTL_STATE_NEXT_OUTPUT;
 					break;
