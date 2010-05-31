@@ -8,6 +8,9 @@
 #include "idectrl.h"
 #include "debugger.h"
 
+#ifdef MESS
+#include "devices/harddriv.h"
+#endif
 
 /***************************************************************************
     DEBUGGING
@@ -1904,6 +1907,31 @@ static DEVICE_RESET( ide_controller )
 	ide_state *ide = get_safe_token(device);
 
 	LOG(("IDE controller reset performed\n"));
+
+#ifdef MESS
+	if (!ide->disk)
+	{
+		ide->handle = mess_hd_get_chd_file( device->machine->device( "harddisk" ) );	// should be config->master
+		ide->disk = mess_hd_get_hard_disk_file( device->machine->device( "harddisk" ) );	// should be config->master
+
+		if (ide->disk != NULL)
+		{
+			const hard_disk_info *hdinfo;
+
+			hdinfo = hard_disk_get_info(ide->disk);
+			if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)
+			{
+				ide->num_cylinders = hdinfo->cylinders;
+				ide->num_sectors = hdinfo->sectors;
+				ide->num_heads = hdinfo->heads;
+				if (PRINTF_IDE_COMMANDS) printf("CHS: %d %d %d\n", ide->num_cylinders, ide->num_heads, ide->num_sectors);
+			}
+
+			/* build the features page */
+			ide_build_features(ide);
+		}
+	}
+#endif
 
 	/* reset the drive state */
 	ide->status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
