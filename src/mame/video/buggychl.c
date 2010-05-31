@@ -7,9 +7,9 @@ PALETTE_INIT( buggychl )
 {
 	int i;
 
-	/* arbitrary blue shading for the sky */
+	/* arbitrary blue shading for the sky, estimation */
 	for (i = 0; i < 128; i++)
-		palette_set_color(machine, i + 128, MAKE_RGB(0, i, 2 * i));
+		palette_set_color(machine, i + 128, MAKE_RGB(0, 240-i, 255));
 }
 
 VIDEO_START( buggychl )
@@ -96,6 +96,11 @@ static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle
 	int offs;
 	int scroll[256];
 
+	/* prevent wraparound */
+	rectangle clip = *cliprect;
+	if (flip_screen_x_get(machine)) clip.min_x += 8*8;
+	else clip.max_x -= 8*8;
+
 	for (offs = 0; offs < 0x400; offs++)
 	{
 		int code = state->videoram[0x400 + offs];
@@ -125,7 +130,7 @@ static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle
 	for (offs = 0; offs < 256; offs++)
 		scroll[offs] = -state->scrollh[offs];
 
-	copyscrollbitmap_trans(bitmap, state->tmp_bitmap2, 256, scroll, 0, 0, cliprect, 32);
+	copyscrollbitmap_trans(bitmap, state->tmp_bitmap2, 256, scroll, 0, 0, &clip, 32);
 }
 
 
@@ -140,8 +145,6 @@ static void draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle
 		int sy = offs / 32;
 		int flipx = flip_screen_x_get(machine);
 		int flipy = flip_screen_y_get(machine);
-		/* the following line is most likely wrong */
-		int transpen = (state->bg_on && sx >= 22) ? -1 : 0;
 
 		int code = state->videoram[offs];
 
@@ -155,7 +158,7 @@ static void draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle
 				0,
 				flipx,flipy,
 				8*sx,8*sy,
-				transpen);
+				0);
 	}
 }
 

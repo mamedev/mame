@@ -10,10 +10,6 @@ TODO:
   correct.
 - Tilemap and sprite placement might not be accurate, there aren't many
   references.
-- The way I'm handling opaqueness in the top portion of the screen is definitely
-  wrong (see the high score entry screen). Actually there doesn't seem to be
-  a way to make the fg opaque, but not doing so leaves parts of the bg visible
-  at the top of the screen.
 - The gradient sky is completely wrong - it's more of a placeholder to show
   that it's supposed to be there. It is supposed to skew along with the
   background, and the gradient can move around (the latter doesn't seem to
@@ -478,11 +474,11 @@ static MACHINE_DRIVER_START( buggychl )
 
 	MDRV_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
 	MDRV_SOUND_CONFIG(msm5232_config)
