@@ -22,6 +22,10 @@
           and it listens for incoming characters.
         * CPU is a Z8S18020VSC (20MHz part), OSC is 73.728MHz
 
+    Note: The "correct" size of the roms are 27C020 for the program rom & 27C256 for the
+          pallete rom.  However genuine boards have been found with larger roms containing
+          the same data with the extra rom space banked out.
+
     Known issues/to-do's:
         * Starfield is not 100% accurate
         * Check the ASCI interface, there probably is fully working debug code.
@@ -29,7 +33,7 @@
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
 
-    Versions known to exist but not dumped: v1.03
+    Versions known to exist but not dumped: v1.0 & v1.03
 
 ***************************************************************************/
 
