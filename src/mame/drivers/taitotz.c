@@ -127,6 +127,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( taitotz )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS
 
 	ROM_REGION( 0x10000, "sound_cpu", ROMREGION_ERASE00 ) /* Internal ROM :( */
