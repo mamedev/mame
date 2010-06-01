@@ -3010,11 +3010,11 @@ GAMEL(1978, invadrmr, invaders, invaders, invadrmr, 0, ROT270, "bootleg? (Model 
 GAMEL(1978, spaceatt, invaders, invaders, sicv,     0, ROT270, "bootleg (Video Games GmbH)", "Space Attack", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of super invaders
 GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg (Emag)", "Super Invaders (Emag)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "<unknown>", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninv, invaders, invaders, alieninv, 0, ROT270, "bootleg (Margamatics)", "Alien Invasion", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninvp2,invaders,invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation","Space King", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "bootleg? (Sanritsu)", "Space War (Sanritsu)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders )
 GAME (19??, astropal, 0,        astropal, astropal, 0, ROT0,   "Sidam?", "Astropal", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(1978, spacewr3, invaders, spcewars, sicv,     0, ROT270, "bootleg", "Space War Part 3", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders )
@@ -3028,8 +3028,8 @@ GAMEL(19??, superinv, invaders, invaders, superinv, 0, ROT270, "bootleg", "Super
 GAMEL(19??, invasion, invaders, invaders, invasion, 0, ROT270, "Sidam",   "Invasion (Sidam)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invasiona,invaders, invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 1, normal graphics)", GAME_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX
 GAMEL(19??, invasionb,invaders, invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 2, no copyright)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, invasionrz,invaders,invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 3, R Z SRL BOLOGNA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
-GAMEL(19??, invasionrza,invaders,invaders,invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 4, R Z SRL BOLOGNA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
+GAMEL(19??, invasionrz,invaders,invaders, invasion, 0, ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg, set 3, R Z SRL Bologna)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
+GAMEL(19??, invasionrza,invaders,invaders,invasion, 0, ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg, set 4, R Z SRL Bologna)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
 GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu (Taito license?)", "Moon Base (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - how do you get it to display?
 GAME( 1979, moonbasea,invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )                  // this has the same string replaced with Nichibutsu, no other differences
@@ -3038,7 +3038,7 @@ GAMEL(19??, invrvngea,invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microse
 GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "Taito", "Space Laser", GAME_SUPPORTS_SAVE )
 GAME( 1980, intruder, spclaser, invadpt2, spclaser, 0, ROT270, "Taito (GamePlan license?)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, laser,    spclaser, invaders, spclaser, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser", GAME_SUPPORTS_SAVE )
-GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation (Konami)","Space War (Leijac Corporation)", GAME_SUPPORTS_SAVE )
+GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation","Space War (Leijac Corporation)", GAME_SUPPORTS_SAVE )
 GAME( 1979, rollingc, 0,        rollingc, rollingc, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, ozmawars, 0,        invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, ozmawars2,ozmawars, invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 2)", GAME_SUPPORTS_SAVE ) /* Uses Taito's three board color version of Space Invaders PCB */
