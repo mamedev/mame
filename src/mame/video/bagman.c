@@ -121,27 +121,27 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 
 		sx = spriteram[offs + 3];
-		sy = 240 - spriteram[offs + 2];
+		sy = 255 - spriteram[offs + 2] - 16;
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
 		if (flip_screen_x_get(machine))
 		{
-			sx = 240 - sx +1;	/* compensate misplacement */
+			sx = 256 - sx  - 15;
 			flipx = !flipx;
 		}
 		if (flip_screen_y_get(machine))
 		{
-			sy = 240 - sy;
+			sy = 255 - sy - 8;
 			flipy = !flipy;
 		}
 
 		if (spriteram[offs + 2] && spriteram[offs + 3])
-			drawgfx_transpen(bitmap,/* compensate misplacement */
+			drawgfx_transpen(bitmap,
 					cliprect,machine->gfx[1],
 					(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
 					spriteram[offs + 1] & 0x1f,
 					flipx,flipy,
-					sx,sy+1,0);
+					sx,sy,0);
 	}
 }
 
@@ -151,6 +151,8 @@ VIDEO_UPDATE( bagman )
 	if (*bagman_video_enable == 0)
 		return 0;
 
+	tilemap_set_scrolldx(bg_tilemap, 0, -128);
+	tilemap_set_scrolldy(bg_tilemap, -1, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;

@@ -66,7 +66,6 @@ DIP locations verified for:
 #include "sound/tms5110.h"
 #include "includes/bagman.h"
 
-
 //static int speech_rom_address = 0;
 
 static UINT8 ls259_buf[8] = {0,0,0,0,0,0,0,0};
@@ -88,6 +87,7 @@ static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 			tmsprom_bit_w(device, 0, (ls259_buf[0]<<2) | (ls259_buf[1]<<1) | (ls259_buf[2]<<0));
 			break;
 		case 3:
+			//printf("Speech %d\n", ls259_buf[offset]);
 			tmsprom_enable_w(device, ls259_buf[offset]);
 			break;
 		case 4:
@@ -105,6 +105,14 @@ static WRITE8_HANDLER( bagman_coin_counter_w )
 	coin_counter_w(space->machine, offset,data);
 }
 
+static WRITE8_DEVICE_HANDLER( bagman_interrupt_w )
+{
+	data &= 1;
+	if (!data)
+		cpu_set_input_line(device, 0, CLEAR_LINE);
+	cpu_interrupt_enable(device, data);
+}
+
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
@@ -113,7 +121,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagman_pal16r6_r)
 	//AM_RANGE(0xa800, 0xa805) AM_READ(bagman_ls259_r) /*just for debugging purposes*/
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("maincpu", bagman_interrupt_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE(&bagman_video_enable)
 	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
@@ -123,7 +131,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa805) AM_DEVWRITE("tmsprom", bagman_ls259_w) /* TMS5110 driving state machine */
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READNOP
+	AM_RANGE(0xb800, 0xb800) AM_READNOP								/* looks like watchdog from schematics */
 
 #if 0
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* ???? */
@@ -463,20 +471,17 @@ static const tms5110_interface bagman_tms5110_interface =
 static MACHINE_DRIVER_START( bagman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_M1Q)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(bagman)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_GFXDECODE(bagman)
 	MDRV_PALETTE_LENGTH(64)
 
@@ -490,7 +495,7 @@ static MACHINE_DRIVER_START( bagman )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, BAGMAN_H0 / 2)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -502,7 +507,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pickin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_M1Q)
 	MDRV_CPU_PROGRAM_MAP(pickin_map)
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -511,11 +516,8 @@ static MACHINE_DRIVER_START( pickin )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(pickin)
 	MDRV_PALETTE_LENGTH(64)
 
@@ -557,7 +559,7 @@ z80
 static MACHINE_DRIVER_START( botanic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_M1Q)
 	MDRV_CPU_PROGRAM_MAP(pickin_map)
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -566,11 +568,9 @@ static MACHINE_DRIVER_START( botanic )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+
 	MDRV_GFXDECODE(bagman)
 	MDRV_PALETTE_LENGTH(64)
 
