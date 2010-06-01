@@ -7,10 +7,10 @@
 
  TODO:
  - inputs / port mapping
- - sound
+ - sound (what's the sound chip?)
  - reel scroll / reel enable / reel colours
  - are the colours correct even on the text layer? they look odd in places, and there are unused bits
-
+ - dunno where / how is the service mode bit is connected (I've accessed it once, but dunno how I've did it)
 
 
  Lucky Girl
@@ -83,17 +83,19 @@
 
 static UINT8 *luck_vram1,*luck_vram2,*luck_vram3;
 static UINT8 nmi_enable;
-static tilemap_t *reel1_tilemap, *reel2_tilemap, *reel3_tilemap;
+static tilemap_t *reel1_tilemap, *reel2_tilemap, *reel3_tilemap, *reel4_tilemap;
 static UINT8* reel1_ram;
 static UINT8* reel2_ram;
 static UINT8* reel3_ram;
+static UINT8* reel4_ram;
 static UINT8* reel1_scroll;
 static UINT8* reel2_scroll;
 static UINT8* reel3_scroll;
+static UINT8* reel4_scroll;
 static UINT8* reel1_attr;
 static UINT8* reel2_attr;
 static UINT8* reel3_attr;
-
+static UINT8* reel4_attr;
 
 
 
@@ -188,11 +190,41 @@ static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 			0);
 }
 
+static WRITE8_HANDLER( luckgrln_reel4_ram_w )
+{
+	reel4_ram[offset] = data;
+	tilemap_mark_tile_dirty(reel4_tilemap,offset);
+}
+
+static WRITE8_HANDLER( luckgrln_reel4_attr_w )
+{
+	reel4_attr[offset] = data;
+	tilemap_mark_tile_dirty(reel4_tilemap,offset);
+}
+
+
+static TILE_GET_INFO( get_luckgrln_reel4_tile_info )
+{
+	int code = reel4_ram[tile_index];
+	int attr = reel4_attr[tile_index];
+	int col = (attr & 0x03)<<1;
+	col |= (attr & 0x4)>>2;
+
+	code |= (attr & 0xe0)<<3;
+
+	SET_TILE_INFO(
+			1,
+			code,
+			col,
+			0);
+}
+
 static VIDEO_START(luckgrln)
 {
 	reel1_tilemap = tilemap_create(machine,get_luckgrln_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	reel2_tilemap = tilemap_create(machine,get_luckgrln_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	reel3_tilemap = tilemap_create(machine,get_luckgrln_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	reel4_tilemap = tilemap_create(machine,get_luckgrln_reel4_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 
 	//machine->gfx[0]->color_granularity = 16;
 
@@ -221,6 +253,7 @@ static VIDEO_UPDATE(luckgrln)
 		tilemap_set_scrolly(reel1_tilemap, i, reel1_scroll[i]);
 		tilemap_set_scrolly(reel2_tilemap, i, reel2_scroll[i]);
 		tilemap_set_scrolly(reel3_tilemap, i, reel3_scroll[i]);
+		tilemap_set_scrolly(reel4_tilemap, i, reel4_scroll[i]);
 	}
 
 
@@ -269,10 +302,7 @@ static VIDEO_UPDATE(luckgrln)
 			if (bgenable==0) tilemap_draw(bitmap, &clip, reel1_tilemap, 0, 0);
 			if (bgenable==1) tilemap_draw(bitmap, &clip, reel2_tilemap, 0, 0);
 			if (bgenable==2) tilemap_draw(bitmap, &clip, reel3_tilemap, 0, 0);
-			else
-			{
-				// 3 ..?
-			}
+			if (bgenable==3) tilemap_draw(bitmap, &clip, reel4_tilemap, 0, 0);
 
 			drawgfx_transpen(bitmap,&clip,screen->machine->gfx[region],tile,col,0,0,x*8,y*8, 0);
 
@@ -299,10 +329,9 @@ static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0cc00, 0x0cdff) AM_RAM_WRITE(luckgrln_reel3_attr_w) AM_BASE(&reel3_attr)
 	AM_RANGE(0x0d400, 0x0d43f) AM_RAM AM_BASE(&reel3_scroll) AM_MIRROR(0x000c0)
 
-
-
-//	AM_RANGE(0x0ca00, 0x0cdff) AM_RAM
-
+	AM_RANGE(0x0c600, 0x0c7ff) AM_RAM_WRITE(luckgrln_reel4_ram_w ) AM_BASE(&reel4_ram)
+	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE(luckgrln_reel4_attr_w) AM_BASE(&reel4_attr)
+	AM_RANGE(0x0d600, 0x0d63f) AM_RAM AM_BASE(&reel4_scroll)
 
 //	AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
 
@@ -333,16 +362,6 @@ static WRITE8_HANDLER( output_w )
 //  printf("%02x\n",data);
 }
 #endif
-
-static READ8_HANDLER( test_r )
-{
-	return 0xff;//mame_rand(space->machine);
-}
-
-static READ8_HANDLER( test2_r )
-{
-	return 0xff;//return mame_rand(space->machine);
-}
 
 static int palette_count = 0;
 static UINT8 palette_ram[0x10000];
@@ -381,25 +400,40 @@ static WRITE8_HANDLER( palette_w )
 
 }
 
+// Oki M62X428 is a 4-bit RTC, doesn't seem to be millennium bug proof ...
+static READ8_HANDLER( rtc_r )
+{
+	mame_system_time systime;
+	mame_get_base_datetime(space->machine, &systime);
+
+	switch(offset)
+	{
+		case 0x00: return (systime.local_time.second % 10);
+		case 0x01: return (systime.local_time.second / 10);
+		case 0x02: return (systime.local_time.minute % 10);
+		case 0x03: return (systime.local_time.minute / 10);
+		case 0x04: return (systime.local_time.hour % 10);
+		case 0x05: return (systime.local_time.hour / 10);
+		case 0x06: return (systime.local_time.mday % 10);
+		case 0x07: return (systime.local_time.mday / 10);
+		case 0x08: return ((systime.local_time.month+1) % 10);
+		case 0x09: return ((systime.local_time.month+1) / 10);
+		case 0x0a: return (systime.local_time.year%10);
+		case 0x0b: return ((systime.local_time.year%100)/10);
+
+		case 0x0d: return 0xff; // bit 1: reset switch for the RTC?
+	}
+
+	return 0;
+}
+
 /* are some of these reads / writes mirrored? there seem to be far too many */
 static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // i think
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
 	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
 
-	AM_RANGE(0x0090, 0x0090) AM_READ(test2_r) AM_WRITENOP
-	AM_RANGE(0x0092, 0x0092) AM_READ(test2_r)
-	AM_RANGE(0x0093, 0x0093) AM_READ(test2_r)
-	AM_RANGE(0x0094, 0x0094) AM_READ(test2_r)
-	AM_RANGE(0x0095, 0x0095) AM_READ(test2_r)
-	AM_RANGE(0x0096, 0x0096) AM_READ(test2_r) AM_WRITENOP
-	AM_RANGE(0x0097, 0x0097) AM_READ(test2_r)
-	AM_RANGE(0x0098, 0x0098) AM_READ(test2_r)
-	AM_RANGE(0x0099, 0x0099) AM_READ(test2_r)
-	AM_RANGE(0x009a, 0x009a) AM_READ(test2_r)
-	AM_RANGE(0x009b, 0x009b) AM_READ(test2_r)
-
-	AM_RANGE(0x009d, 0x009d) AM_READ(test2_r) AM_WRITENOP
+	AM_RANGE(0x0090, 0x009f) AM_READ(rtc_r) AM_WRITENOP
 
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(palette_offset_low_w)
 	AM_RANGE(0x00a1, 0x00a1) AM_WRITE(palette_offset_high_w)
@@ -408,11 +442,11 @@ static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_register_w)
 
-	AM_RANGE(0x00b8, 0x00b8) AM_READ(test2_r)
-	AM_RANGE(0x00b9, 0x00b9) AM_READ(test2_r) AM_WRITENOP
-	AM_RANGE(0x00ba, 0x00ba) AM_READ(test2_r)
-	AM_RANGE(0x00bb, 0x00bb) AM_READ(test_r) AM_WRITENOP // returning ff here allows it to boot
-	AM_RANGE(0x00bc, 0x00bc) AM_READ(test2_r)
+	AM_RANGE(0x00b8, 0x00b8) AM_READ_PORT("IN0")
+	AM_RANGE(0x00b9, 0x00b9) AM_READ_PORT("IN1") AM_WRITENOP // coin counters are here
+	AM_RANGE(0x00ba, 0x00ba) AM_READ_PORT("IN2")
+	AM_RANGE(0x00bb, 0x00bb) AM_READ_PORT("IN3") AM_WRITENOP // coin lockouts?
+	AM_RANGE(0x00bc, 0x00bc) AM_READ_PORT("IN4")
 
 	AM_RANGE(0x00c3, 0x00c3) AM_WRITENOP
 	AM_RANGE(0x00c7, 0x00c7) AM_WRITENOP
@@ -424,18 +458,15 @@ static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00db, 0x00db) AM_WRITENOP
 	AM_RANGE(0x00df, 0x00df) AM_WRITENOP
 
-	AM_RANGE(0x00e3, 0x00e3) AM_WRITENOP
-	AM_RANGE(0x00e7, 0x00e7) AM_WRITENOP
-	AM_RANGE(0x00eb, 0x00eb) AM_WRITENOP
-	AM_RANGE(0x00ef, 0x00ef) AM_WRITENOP
+	AM_RANGE(0x00e4, 0x00e7) AM_WRITENOP
 
 	AM_RANGE(0x00f3, 0x00f3) AM_WRITENOP
 	AM_RANGE(0x00f7, 0x00f7) AM_WRITENOP
 
-	AM_RANGE(0x00f8, 0x00f8) AM_READ(test2_r)
-	AM_RANGE(0x00f9, 0x00f9) AM_READ(test2_r)
-	AM_RANGE(0x00fa, 0x00fa) AM_READ(test2_r)
-	AM_RANGE(0x00fb, 0x00fb) AM_READ(test2_r) AM_WRITENOP
+	AM_RANGE(0x00f8, 0x00f8) AM_READ_PORT("DSW0")
+	AM_RANGE(0x00f9, 0x00f9) AM_READ_PORT("DSW1")
+	AM_RANGE(0x00fa, 0x00fa) AM_READ_PORT("DSW2")
+	AM_RANGE(0x00fb, 0x00fb) AM_READ_PORT("DSW3") AM_WRITENOP
 	AM_RANGE(0x00fc, 0x00fc) AM_WRITENOP
 	AM_RANGE(0x00fd, 0x00fd) AM_WRITENOP
 	AM_RANGE(0x00fe, 0x00fe) AM_WRITENOP
@@ -446,6 +477,180 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( luckgrln )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_CODE(KEYCODE_1) PORT_NAME("Start")
+	PORT_DIPNAME( 0x02, 0x02, "IN0" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_DIPNAME( 0x20, 0x20, "IN1" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(1)
+	PORT_DIPNAME( 0x10, 0x10, "IN2" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_DIPNAME( 0x04, 0x04, "IN3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Credit Clear")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Books SW")
+
+	PORT_START("IN4") //DIP SW 1
+	PORT_DIPNAME( 0x01, 0x01, "IN4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) //adult content
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
+
+	PORT_START("DSW0") //DIP SW 2
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
+	PORT_DIPNAME( 0x10, 0x10, "DSW0" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "IN6" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "IN7" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3") //DIP SW 5
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
+	PORT_DIPNAME( 0x04, 0x04, "DSW3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -519,6 +724,9 @@ static MACHINE_DRIVER_START( luckgrln )
 
 	MDRV_VIDEO_START(luckgrln)
 	MDRV_VIDEO_UPDATE(luckgrln)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( luckgrln )
@@ -573,5 +781,5 @@ ROM_START( luckgrln )
 	ROM_LOAD( "falcon.6", 0x40000, 0x20000, CRC(bfb02c87) SHA1(1b5ca562ed76eb3f1b4a52d379a6af07e79b6ee5) )
 ROM_END
 
-GAME( 1991, luckgrln,  0,    luckgrln, luckgrln,  luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1991, luckgrln,  0,    luckgrln, luckgrln,  luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND )
 
