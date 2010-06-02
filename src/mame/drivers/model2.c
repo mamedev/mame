@@ -47,6 +47,43 @@
     Sound doesn't work properly in all games
     System 24 tilemaps need more advanced linescroll support (see fvipers, daytona)
     2C needs DSP still
+
+======================================================================================================================================
+
+    Sega Model 2 Feedback Driver Board
+	----------------------------------
+
+
+	PCB Layout
+	----------
+
+	SJ25-0207-01
+	838-10646 (Daytona)
+	838-11661 (Sega Rally)
+	|---------------------------------------------|
+	|             7-SEG-LED 7-SEG-LED             |
+	|                                             |
+	|   315-5296      315-5296                    |
+	|                 DSW(8)                      |
+	|    M6253                      MB3759        |
+	|                                             |
+	|           GAL.IC23  ROM.IC12                |
+	|                                             |
+	|     Z80                                     |
+	|8MHz   MB3771 MB3771  8464                   |
+	|---------------------------------------------|
+	Notes:
+	      Z80      - clock 4.000MHz [8/2]
+	      8464     - 8k x8 SRAM
+	      ROM.IC12 - EPR-16488A for Daytona
+	                 EPR-17891  for Sega Rally
+	      GAL      - Lattice GAL16V8B stamped 315-5625 common to both Daytona and Sega Rally
+	      DSW(8)   - 8-Position dip switch, all OFF
+	      M6253    - Oki M6253
+	      315-5296 - Sega Custom QFP100
+	      plus several transistors, resistors, a couple of relays and 8 connectors.
+
+
 */
 
 #include "emu.h"
@@ -57,6 +94,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86233/mb86233.h"
+#include "cpu/z80/z80.h"
 #include "sound/scsp.h"
 #include "sound/multipcm.h"
 #include "sound/2612intf.h"
@@ -560,6 +598,23 @@ static WRITE32_HANDLER( rchase2_devices_w )
 
 	if(mem_mask == 0x0000ffff)
 		cmd_data = data;
+}
+
+static UINT8 driveio_comm_data;
+
+static WRITE32_HANDLER( srallyc_devices_w )
+{
+	/*
+	0x00040000 start 1 lamp
+	0x00200000 vr lamp
+	0x00800000 leader lamp
+	*/
+
+	if(mem_mask == 0x000000ff || mem_mask == 0x0000ffff)
+	{
+		driveio_comm_data = data & 0xff;
+		cputag_set_input_line(space->machine, "drivecpu", 0, HOLD_LINE);
+	}
 }
 
 /*****************************************************************************/
@@ -2058,6 +2113,47 @@ static MACHINE_DRIVER_START( model2a )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_DRIVER_END
 
+static READ8_HANDLER( driveio_port_r )
+{
+	return driveio_comm_data;
+}
+
+static WRITE8_HANDLER( driveio_port_w )
+{
+//	TODO: hook up to the main CPU
+//	popmessage("%02x",data);
+}
+
+static READ8_HANDLER( driveio_port_str_r )
+{
+	static const char sega_str[4] = { 'S', 'E', 'G', 'A' };
+
+	return sega_str[offset];
+}
+
+static ADDRESS_MAP_START( drive_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( drive_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
+	AM_RANGE(0x23, 0x23) AM_WRITE(driveio_port_w)
+	AM_RANGE(0x26, 0x27) AM_READ(driveio_port_r)
+	AM_RANGE(0x28, 0x2b) AM_READ(driveio_port_str_r)
+	AM_RANGE(0x40, 0x4f) AM_WRITENOP //Oki M6253
+	AM_RANGE(0x80, 0x83) AM_NOP //r/w it during irq
+ADDRESS_MAP_END
+
+static MACHINE_DRIVER_START( srallyc )
+	MDRV_IMPORT_FROM( model2a )
+
+	MDRV_CPU_ADD("drivecpu", Z80, 16000000/4) //???
+	MDRV_CPU_PROGRAM_MAP(drive_map)
+	MDRV_CPU_IO_MAP(drive_io_map)
+//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+MACHINE_DRIVER_END
 
 static const sharc_config sharc_cfg =
 {
@@ -2525,6 +2621,9 @@ ROM_START( srallyc ) /* Sega Rally Championship, Model 2A */
 	ROM_LOAD32_WORD( "mpr-17754.bin", 0x000000, 0x200000, CRC(81a84f67) SHA1(c0a9b690523a529e4015e9af10dc3fb2a1726f08) )
 	ROM_LOAD32_WORD( "mpr-17755.bin", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) )
 
+	ROM_REGION( 0x010000, "drivecpu", 0 ) // Drive I/O program
+	ROM_LOAD( "epr-17891.ic12", 0x000000, 0x010000, CRC(9a33b437) SHA1(3e8f210aa5159e78f640126cb5ce7f05f22560f2) )
+
 	ROM_REGION( 0x2000000, "user2", 0 ) // Models
 	ROM_LOAD32_WORD( "mpr-17748.bin", 0x000000, 0x200000, CRC(3148a2b2) SHA1(283cc49bfb6c6381a7ead9273fd097dca5b981b6) )
 	ROM_LOAD32_WORD( "mpr-17750.bin", 0x000002, 0x200000, CRC(232aec29) SHA1(4d470e71df61298282c356814e2d151fda323fb6) )
@@ -2534,7 +2633,6 @@ ROM_START( srallyc ) /* Sega Rally Championship, Model 2A */
 	ROM_REGION( 0x1000000, "user3", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-17753.bin", 0x000000, 0x200000, CRC(6db0eb36) SHA1(dd5fd3c9592360d3e95623ac2491e6faabe9dbcb) )
 	ROM_LOAD32_WORD( "mpr-17752.bin", 0x000002, 0x200000, CRC(d6aa86ce) SHA1(1d342f87d1af1e5438d1ae818b1b14268e765897) )
-
 
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
@@ -2547,9 +2645,6 @@ ROM_START( srallyc ) /* Sega Rally Championship, Model 2A */
 	ROM_LOAD( "mpr-17757.32", 0x000000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
 	ROM_LOAD( "mpr-17886.36", 0x000000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) )
 	ROM_LOAD( "mpr-17887.37", 0x000000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) )
-
-	ROM_REGION( 0x010000, "user4", 0 ) // Unknown (on "amp" board)
-	ROM_LOAD( "mpr-17891.bin", 0x000000, 0x010000, CRC(9a33b437) SHA1(3e8f210aa5159e78f640126cb5ce7f05f22560f2) )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -4800,6 +4895,12 @@ static DRIVER_INIT( rchase2 )
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, rchase2_devices_w);
 }
 
+static DRIVER_INIT( srallyc )
+{
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, srallyc_devices_w);
+}
+
+
 // Model 2 (TGPs, Model 1 sound board)
 GAME( 1993, daytona,         0, model2o, daytona, 0,        ROT0, "Sega", "Daytona USA (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, daytona93, daytona, model2o, daytona, 0,        ROT0, "Sega", "Daytona USA Deluxe '93", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
@@ -4812,7 +4913,7 @@ GAME( 1994, vcop,            0, model2o, daytona, 0,        ROT0, "Sega", "Virtu
 // Model 2A-CRX (TGPs, SCSP sound board)
 GAME( 1995, manxtt,          0, model2a, model2, 0,       ROT0, "Sega", "Manx TT Superbike (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, motoraid,        0, model2a, model2, 0,       ROT0, "Sega", "Motoraid", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, srallyc,         0, model2a, srallyc,0,       ROT0, "Sega", "Sega Rally Championship", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, srallyc,         0, srallyc, srallyc,srallyc, ROT0, "Sega", "Sega Rally Championship", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2,             0, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Version 2.1)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2b,          vf2, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vf2a,          vf2, model2a, model2, 0,       ROT0, "Sega", "Virtua Fighter 2 (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
