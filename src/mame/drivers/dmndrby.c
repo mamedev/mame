@@ -11,7 +11,7 @@ TODO:
 -Enters into Service Mode (?) if you let it go in attract mode after some time;
 -Fix remaining graphic issues;
 -Fix colors (check bar test on the first Service Mode menu);
-
+-Implement proper battery support;
 ============================================================================================
 
 G4001
