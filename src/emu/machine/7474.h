@@ -54,15 +54,12 @@ struct _ttl7474_config
 
 
 
-/* must call TTL7474_update() after setting the inputs */
-void ttl7474_update(running_device *device);
-
-void ttl7474_clear_w(running_device *device, int data);
-void ttl7474_preset_w(running_device *device, int data);
-void ttl7474_clock_w(running_device *device, int data);
-void ttl7474_d_w(running_device *device, int data);
-int  ttl7474_output_r(running_device *device);
-int  ttl7474_output_comp_r(running_device *device);	/* NOT strictly the same as !ttl7474_output_r() */
+WRITE_LINE_DEVICE_HANDLER( ttl7474_clear_w );
+WRITE_LINE_DEVICE_HANDLER( ttl7474_preset_w );
+WRITE_LINE_DEVICE_HANDLER( ttl7474_clock_w );
+WRITE_LINE_DEVICE_HANDLER( ttl7474_d_w );
+READ_LINE_DEVICE_HANDLER( ttl7474_output_r );
+READ_LINE_DEVICE_HANDLER( ttl7474_output_comp_r );	/* NOT strictly the same as !ttl7474_output_r() */
 
 /* device get info callback */
 #define TTL7474 DEVICE_GET_INFO_NAME(ttl7474)

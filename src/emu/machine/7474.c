@@ -61,6 +61,8 @@ struct _ttl7474_state
 	UINT8 last_clock;
 	UINT8 last_output;
 	UINT8 last_output_comp;
+
+	running_device *device;
 };
 
 INLINE ttl7474_state *get_safe_token(running_device *device)
@@ -73,10 +75,8 @@ INLINE ttl7474_state *get_safe_token(running_device *device)
 }
 
 
-void ttl7474_update(running_device *device)
+static void ttl7474_update(ttl7474_state *state)
 {
-	ttl7474_state *state = get_safe_token(device);
-
 	if (!state->preset && state->clear)			  /* line 1 in truth table */
 	{
 		state->output	 = 1;
@@ -109,46 +109,50 @@ void ttl7474_update(running_device *device)
 		state->last_output = state->output;
 		state->last_output_comp = state->output_comp;
 
-		state->output_cb(device);
+		state->output_cb(state->device);
 	}
 }
 
 
-void ttl7474_clear_w(running_device *device, int data)
+WRITE_LINE_DEVICE_HANDLER( ttl7474_clear_w )
 {
-	ttl7474_state *state = get_safe_token(device);
-	state->clear = data ? 1 : 0;
+	ttl7474_state *dev_state = get_safe_token(device);
+	dev_state->clear = state & 1;
+	ttl7474_update(dev_state);
 }
 
-void ttl7474_preset_w(running_device *device, int data)
+WRITE_LINE_DEVICE_HANDLER( ttl7474_preset_w )
 {
-	ttl7474_state *state = get_safe_token(device);
-	state->preset = data ? 1 : 0;
+	ttl7474_state *dev_state = get_safe_token(device);
+	dev_state->preset = state & 1;
+	ttl7474_update(dev_state);
 }
 
-void ttl7474_clock_w(running_device *device, int data)
+WRITE_LINE_DEVICE_HANDLER( ttl7474_clock_w )
 {
-	ttl7474_state *state = get_safe_token(device);
-	state->clock = data ? 1 : 0;
+	ttl7474_state *dev_state = get_safe_token(device);
+	dev_state->clock = state & 1;
+	ttl7474_update(dev_state);
 }
 
-void ttl7474_d_w(running_device *device, int data)
+WRITE_LINE_DEVICE_HANDLER( ttl7474_d_w )
 {
-	ttl7474_state *state = get_safe_token(device);
-	state->d = data ? 1 : 0;
+	ttl7474_state *dev_state = get_safe_token(device);
+	dev_state->d = state & 1;
+	ttl7474_update(dev_state);
 }
 
 
-int ttl7474_output_r(running_device *device)
+READ_LINE_DEVICE_HANDLER( ttl7474_output_r )
 {
-	ttl7474_state *state = get_safe_token(device);
-	return state->output;
+	ttl7474_state *dev_state = get_safe_token(device);
+	return dev_state->output;
 }
 
-int ttl7474_output_comp_r(running_device *device)
+READ_LINE_DEVICE_HANDLER( ttl7474_output_comp_r )
 {
-	ttl7474_state *state = get_safe_token(device);
-	return state->output_comp;
+	ttl7474_state *dev_state = get_safe_token(device);
+	return dev_state->output_comp;
 }
 
 
@@ -157,6 +161,8 @@ static DEVICE_START( ttl7474 )
 	ttl7474_config *config = (ttl7474_config *)device->baseconfig().inline_config;
 	ttl7474_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
+
+    state->device = device;
 
     state_save_register_device_item(device, 0, state->clear);
     state_save_register_device_item(device, 0, state->preset);

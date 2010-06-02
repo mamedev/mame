@@ -82,11 +82,10 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 	running_device *target = devtag_get_device(device->machine, "konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
-	ttl7474_clock_w(target, ~data & 0x08);
-	ttl7474_update(target);
+	ttl7474_clock_w(target, (~data & 0x08) >> 3);
 
 	/* bit 4 is sound disable */
-	sound_global_enable(device->machine, ~data & 0x10);
+	sound_global_enable(device->machine, (~data & 0x10) >> 4);
 }
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
@@ -94,8 +93,7 @@ WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 	running_device *target = devtag_get_device(device->machine, "konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
-	ttl7474_clock_w(target, ~data & 0x08);
-	ttl7474_update(target);
+	ttl7474_clock_w(target, (~data & 0x08) >> 3);
 }
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
@@ -106,10 +104,8 @@ static IRQ_CALLBACK(scramble_sh_irq_callback)
        we need to pulse the CLR line because MAME's core never clears this
        line, only asserts it */
 	ttl7474_clear_w(target, 0);
-	ttl7474_update(target);
 
 	ttl7474_clear_w(target, 1);
-	ttl7474_update(target);
 
 	return 0xff;
 }

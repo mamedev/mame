@@ -37,7 +37,6 @@ void galaxold_7474_9m_2_callback(running_device *device)
        Q is VBLANK (not visible to the CPU) */
     running_device *target = devtag_get_device(device->machine, "7474_9m_1");
 	ttl7474_clock_w(target, ttl7474_output_comp_r(device));
-	ttl7474_update(target);
 }
 
 void galaxold_7474_9m_1_callback(running_device *device)
@@ -49,8 +48,7 @@ void galaxold_7474_9m_1_callback(running_device *device)
 WRITE8_HANDLER( galaxold_nmi_enable_w )
 {
     running_device *target = devtag_get_device(space->machine, "7474_9m_1");
-	ttl7474_preset_w(target, data);
-	ttl7474_update(target);
+	ttl7474_preset_w(target, data ? 1 : 0);
 }
 
 
@@ -67,8 +65,6 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 	param = (param + 0x10) & 0xff;
 
 	timer_device_adjust_oneshot(int_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, param, 0), param);
-
-	ttl7474_update(target);
 }
 
 

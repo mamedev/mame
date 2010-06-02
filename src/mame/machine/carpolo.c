@@ -242,16 +242,10 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 	/* check the coins here as well - they drive the clock of the flip-flops */
 	port_value = input_port_read(device->machine, "IN0");
 
-	ttl7474_clock_w(ttl7474_2s_1, port_value & 0x01);
-	ttl7474_clock_w(ttl7474_2s_2, port_value & 0x02);
-	ttl7474_clock_w(ttl7474_2u_1, port_value & 0x04);
-	ttl7474_clock_w(ttl7474_2u_2, port_value & 0x08);
-
-	ttl7474_update(ttl7474_2s_1);
-	ttl7474_update(ttl7474_2s_2);
-	ttl7474_update(ttl7474_2u_1);
-	ttl7474_update(ttl7474_2u_2);
-
+	ttl7474_clock_w(ttl7474_2s_1, (port_value & 0x01) >> 0);
+	ttl7474_clock_w(ttl7474_2s_2, (port_value & 0x02) >> 1);
+	ttl7474_clock_w(ttl7474_2u_1, (port_value & 0x04) >> 2);
+	ttl7474_clock_w(ttl7474_2u_2, (port_value & 0x08) >> 3);
 
 	/* read the steering controls */
 	for (player = 0; player < 4; player++)
@@ -282,9 +276,6 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 		/* as the wheel moves, both flip-flops are clocked */
 		ttl7474_clock_w(movement_flip_flop, port_value & 0x01);
 		ttl7474_clock_w(dir_flip_flop,      port_value & 0x01);
-
-		ttl7474_update(movement_flip_flop);
-		ttl7474_update(dir_flip_flop);
 	}
 
 
@@ -318,29 +309,26 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 	ttl74153_update(ttl74153_1k);
 }
 
+// FIXME: Remove trampolines
 
 static WRITE_LINE_DEVICE_HANDLER( coin1_interrupt_clear_w )
 {
 	ttl7474_clear_w(ttl7474_2s_1, state);
-	ttl7474_update(ttl7474_2s_1);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( coin2_interrupt_clear_w )
 {
 	ttl7474_clear_w(ttl7474_2s_2, state);
-	ttl7474_update(ttl7474_2s_2);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( coin3_interrupt_clear_w )
 {
 	ttl7474_clear_w(ttl7474_2u_1, state);
-	ttl7474_update(ttl7474_2u_1);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( coin4_interrupt_clear_w )
 {
 	ttl7474_clear_w(ttl7474_2u_2, state);
-	ttl7474_update(ttl7474_2u_2);
 }
 
 WRITE8_HANDLER( carpolo_ball_screen_interrupt_clear_w )
@@ -400,15 +388,10 @@ static WRITE8_DEVICE_HANDLER( pia_0_port_a_w )
 	coin_counter_w(device->machine, 0, data & 0x01);
 
 
-	ttl7474_clear_w(ttl7474_1f_1, data & 0x08);
-	ttl7474_clear_w(ttl7474_1d_1, data & 0x08);
-	ttl7474_clear_w(ttl7474_1c_1, data & 0x08);
-	ttl7474_clear_w(ttl7474_1a_1, data & 0x08);
-
-	ttl7474_update(ttl7474_1f_1);
-	ttl7474_update(ttl7474_1d_1);
-	ttl7474_update(ttl7474_1c_1);
-	ttl7474_update(ttl7474_1a_1);
+	ttl7474_clear_w(ttl7474_1f_1, (data & 0x08) >> 3);
+	ttl7474_clear_w(ttl7474_1d_1, (data & 0x08) >> 3);
+	ttl7474_clear_w(ttl7474_1c_1, (data & 0x08) >> 3);
+	ttl7474_clear_w(ttl7474_1a_1, (data & 0x08) >> 3);
 }
 
 
