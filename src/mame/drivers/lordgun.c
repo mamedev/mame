@@ -33,7 +33,8 @@ Notes:
 
 - aliencha: when booting into service mode, keep buttons 1, 2 and 3 pressed to show more options
 - aliencha: original videos at http://www.youtube.com/watch?v=TRHb3WTGuvk, http://www.youtube.com/watch?v=_RaCpHwyS78.
-  The latter shows a 1995 copyright (instead of 1994) in a different font.
+  The latter shows English text and a 1995 copyright (instead of 1994) in a different font.
+- aliencha: routine at A34 - english/chinese text, A38 - english/chinese names, A3C - Alien Challenge/Round House Rumble title
 
 *************************************************************************************************************/
 
