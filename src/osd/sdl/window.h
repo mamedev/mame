@@ -130,7 +130,6 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int window_height);
 void sdlwindow_toggle_full_screen(running_machine *machine, sdl_window_info *window);
 void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window, int dir);
-void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window);
 void sdlwindow_resize(sdl_window_info *window, INT32 width, INT32 height);
 void sdlwindow_clear(sdl_window_info *window);
 

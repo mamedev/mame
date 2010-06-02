@@ -609,9 +609,6 @@ static void check_osd_inputs(running_machine *machine)
 
 	if (ui_input_pressed(machine, IPT_OSD_7))
 		sdlwindow_modify_prescale(machine, window, 1);
-
-	if (ui_input_pressed(machine, IPT_OSD_10))
-		sdlwindow_toggle_draw(machine, window);
 }
 
 //============================================================

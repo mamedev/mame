@@ -587,47 +587,6 @@ void sdlwindow_modify_prescale(running_machine *machine, sdl_window_info *window
 	}
 }
 
-void sdlwindow_toggle_draw(running_machine *machine, sdl_window_info *window)
-{
-#if USE_OPENGL
-	//FIXME: Not yet working in 1.3
-#if (!SDL_VERSION_ATLEAST(1,3,0))
-	worker_param wp;
-
-	// If we are not fullscreen (windowed) remember our windowed size
-	if (!window->fullscreen)
-	{
-		window->windowed_width = window->width;
-		window->windowed_height = window->height;
-	}
-
-	clear_worker_param(&wp);
-
-	wp.window = window;
-	wp.machine = machine;
-	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
-
-	window->scale_mode = VIDEO_SCALE_MODE_NONE;
-
-	if (video_config.mode == VIDEO_MODE_OPENGL)
-	{
-		video_config.mode = VIDEO_MODE_SOFT;
-		drawsdl_init(&draw);
-		ui_popup_time(1, "Using software rendering");
-	}
-	else
-	{
-		video_config.mode = VIDEO_MODE_OPENGL;
-		drawogl_init(&draw);
-		ui_popup_time(1, "Using OpenGL rendering");
-	}
-
-	execute_async_wait(&complete_create_wt, &wp);
-#endif
-#endif
-}
-
-
 //============================================================
 //  sdlwindow_update_cursor_state
 //  (main or window thread)

@@ -1685,12 +1685,6 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F7, SEQCODE_NOT, KEYCODE_LCONTROL, SEQCODE_NOT, KEYCODE_LSHIFT);
 				break;
 
-			// LCTRL-F10 to toggle the renderer (software vs opengl)
-			case IPT_OSD_10:
-				typedesc->token = "TOGGLE_RENDERER";
-				typedesc->name = "Toggle OpenGL/software rendering";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10, KEYCODE_LCONTROL);
-				break;
 			// add a Not lcrtl condition to the throttle key
 			case IPT_UI_THROTTLE:
 				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10, SEQCODE_NOT, KEYCODE_LCONTROL);
