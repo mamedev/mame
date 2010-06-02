@@ -11,7 +11,6 @@ TODO:
 -Enters into Service Mode (?) if you let it go in attract mode after some time;
 -Fix remaining graphic issues;
 -Fix colors (check bar test on the first Service Mode menu);
--Implement proper battery support;
 ============================================================================================
 
 G4001
@@ -59,18 +58,8 @@ static UINT8* dderby_vidchars;
 static UINT8* scroll_ram;
 static UINT8* dderby_vidattribs;
 static UINT8* sprite_ram;
-static UINT8 *nvram;
-static size_t nvram_size;
 static UINT8 *racetrack_tilemap_rom;
 static tilemap_t *racetrack_tilemap;
-
-static NVRAM_HANDLER( dderby )
-{
-	if (read_or_write)
-		mame_fwrite(file,nvram,nvram_size);
-	else if (file)
-		mame_fread(file,nvram,nvram_size);
-}
 
 static WRITE8_HANDLER( dderby_sound_w )
 {
@@ -116,7 +105,7 @@ static WRITE8_HANDLER( output_w )
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xc000, 0xc007) AM_READ(input_r)
 	AM_RANGE(0xc000, 0xc007) AM_WRITE(output_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW1")
@@ -508,7 +497,7 @@ static MACHINE_DRIVER_START( dderby )
 	MDRV_CPU_PROGRAM_MAP(dderby_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
-	MDRV_NVRAM_HANDLER(dderby)
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
