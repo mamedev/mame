@@ -73,7 +73,8 @@ static UINT8 ls259_buf[8] = {0,0,0,0,0,0,0,0};
 
 static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 {
-	bagman_pal16r6_w(NULL /*space*/,offset,data); /*this is just a simulation*/
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
 	if (ls259_buf[offset] != (data&1) )
 	{
@@ -84,10 +85,9 @@ static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 		case 0:
 		case 1:
 		case 2:
-			tmsprom_bit_w(device, 0, (ls259_buf[0]<<2) | (ls259_buf[1]<<1) | (ls259_buf[2]<<0));
+			tmsprom_bit_w(device, 0, 7 - ((ls259_buf[0]<<2) | (ls259_buf[1]<<1) | (ls259_buf[2]<<0)));
 			break;
 		case 3:
-			//printf("Speech %d\n", ls259_buf[offset]);
 			tmsprom_enable_w(device, ls259_buf[offset]);
 			break;
 		case 4:
@@ -471,7 +471,7 @@ static const tms5110_interface bagman_tms5110_interface =
 static MACHINE_DRIVER_START( bagman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_M1Q)
+	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
@@ -507,7 +507,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pickin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_M1Q)
+	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MDRV_CPU_PROGRAM_MAP(pickin_map)
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -559,7 +559,7 @@ z80
 static MACHINE_DRIVER_START( botanic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_M1Q)
+	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MDRV_CPU_PROGRAM_MAP(pickin_map)
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)

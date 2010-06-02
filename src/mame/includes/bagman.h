@@ -5,7 +5,6 @@
 #define BAGMAN_HCLK			(BAGMAN_MAIN_CLOCK / 3)
 #define BAGMAN_H0			(BAGMAN_HCLK / 2)
 #define BAGMAN_H1			(BAGMAN_H0   / 2)
-#define BAGMAN_M1Q			(BAGMAN_H1)			/* inverted H1 */
 #define HTOTAL				((0x100-0x40)*2)
 #define HBEND				(0x00)
 #define HBSTART				(0x100)
