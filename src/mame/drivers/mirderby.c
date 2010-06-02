@@ -62,10 +62,36 @@ static ADDRESS_MAP_START( cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM // videoram
+	AM_RANGE(0x4000, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM
+	//0x7ff0 onward is the blitter
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP //watchdog
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static UINT8 prot_data;
+
+static READ8_HANDLER( mirderby_prot_r )
+{
+	prot_data&=0x7f;
+	return prot_data++;
+}
+
+static WRITE8_HANDLER( mirderby_prot_w )
+{
+	prot_data = data;
+}
+
+
 static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM // videoram
+	AM_RANGE(0x4000, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM
+	AM_RANGE(0x7800, 0x7800) AM_READWRITE(mirderby_prot_r, mirderby_prot_w) // protection check?
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP //watchdog
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -102,14 +128,23 @@ static GFXDECODE_START( mirderby )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0x0000, 0x10 )
 GFXDECODE_END
 
+
+static INTERRUPT_GEN( mirderby_irq )
+{
+	cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+}
+
 static MACHINE_DRIVER_START( mirderby )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu0", Z80, 16000000/4)	/* 4 Mhz */
+	MDRV_CPU_FLAGS(CPU_DISABLE)
 	MDRV_CPU_PROGRAM_MAP(cpu0_map)
 
 	MDRV_CPU_ADD("cpu1", M6809, 16000000/8)	/* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cpu1_map)
+	MDRV_CPU_FLAGS(CPU_DISABLE)
+	MDRV_CPU_VBLANK_INT("screen", mirderby_irq)
 
 	MDRV_CPU_ADD("cpu2", M6809, 16000000/8)	/* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map)
