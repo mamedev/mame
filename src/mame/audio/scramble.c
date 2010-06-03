@@ -110,11 +110,11 @@ static IRQ_CALLBACK(scramble_sh_irq_callback)
 	return 0xff;
 }
 
-void scramble_sh_7474_callback(running_device *device)
+WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback )
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cputag_set_input_line(device->machine, "audiocpu", 0, !ttl7474_output_comp_r(device) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, !state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )

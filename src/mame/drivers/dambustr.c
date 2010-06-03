@@ -238,8 +238,8 @@ static MACHINE_DRIVER_START( dambustr )
 
 	MDRV_MACHINE_RESET(galaxold)
 
-	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
-	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
+	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
 	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 

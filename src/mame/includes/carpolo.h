@@ -15,10 +15,10 @@ extern const pia6821_interface carpolo_pia1_intf;
 
 void carpolo_74148_3s_cb(running_device *device);
 
-void carpolo_7474_2s_1_cb(running_device *device);
-void carpolo_7474_2s_2_cb(running_device *device);
-void carpolo_7474_2u_1_cb(running_device *device);
-void carpolo_7474_2u_2_cb(running_device *device);
+WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_1_q_cb );
+WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_2_q_cb );
+WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_1_q_cb );
+WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_2_q_cb );
 
 MACHINE_START( carpolo );
 MACHINE_RESET( carpolo );

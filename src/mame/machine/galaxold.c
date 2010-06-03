@@ -30,19 +30,18 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
 	return 0x03;
 }
 
-
-void galaxold_7474_9m_2_callback(running_device *device)
+/* FIXME: remove trampoline */
+WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback )
 {
 	/* Q bar clocks the other flip-flop,
        Q is VBLANK (not visible to the CPU) */
-    running_device *target = devtag_get_device(device->machine, "7474_9m_1");
-	ttl7474_clock_w(target, ttl7474_output_comp_r(device));
+	ttl7474_clock_w(device, state);
 }
 
-void galaxold_7474_9m_1_callback(running_device *device)
+WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
 {
 	/* Q goes to the NMI line */
-	cputag_set_input_line(device->machine, "maincpu", irq_line, ttl7474_output_r(device) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", irq_line, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_HANDLER( galaxold_nmi_enable_w )
@@ -57,10 +56,10 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
     running_device *target = devtag_get_device(timer->machine, "7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
-	ttl7474_d_w(target, (param & 0xe0) != 0xe0);
+	ttl7474_d_w(target, ((param & 0xe0) != 0xe0) ? 1 : 0);
 
 	/* 16V clocks the flip-flop */
-	ttl7474_clock_w(target, (param & 0x10) == 0x10);
+	ttl7474_clock_w(target, ((param & 0x10) == 0x10) ? 1 : 0);
 
 	param = (param + 0x10) & 0xff;
 

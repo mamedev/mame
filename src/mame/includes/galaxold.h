@@ -100,8 +100,8 @@ WRITE8_HANDLER( galaxold_flip_screen_y_w );
 
 TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer );
 
-void galaxold_7474_9m_2_callback(running_device *device);
-void galaxold_7474_9m_1_callback(running_device *device);
+WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback );
+WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback );
 
 DRIVER_INIT( 4in1 );
 DRIVER_INIT( ladybugg );
@@ -173,7 +173,7 @@ CUSTOM_INPUT( darkplnt_custom_r );
 /*----------- defined in audio/scramble.c -----------*/
 
 void scramble_sh_init(running_machine *machine);
-void scramble_sh_7474_callback(running_device *device);
+WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback );
 
 WRITE8_HANDLER( scramble_filter_w );
 WRITE8_HANDLER( frogger_filter_w );

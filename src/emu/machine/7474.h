@@ -44,14 +44,15 @@
 typedef struct _ttl7474_config ttl7474_config;
 struct _ttl7474_config
 {
-	void (*output_cb)(running_device *device);
+	devcb_write_line output_cb;
+	devcb_write_line comp_output_cb;
 };
 
 
-#define MDRV_7474_ADD(_tag, _output_cb) \
+#define MDRV_7474_ADD(_tag, _target_tag, _output_cb, _comp_output_cb) \
 	MDRV_DEVICE_ADD(_tag, TTL7474, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ttl7474_config, output_cb, _output_cb)
-
+	MDRV_DEVICE_CONFIG_WRITE_LINE(ttl7474_config, output_cb, _target_tag, _output_cb) \
+	MDRV_DEVICE_CONFIG_WRITE_LINE(ttl7474_config, comp_output_cb, _target_tag, _comp_output_cb)
 
 
 WRITE_LINE_DEVICE_HANDLER( ttl7474_clear_w );

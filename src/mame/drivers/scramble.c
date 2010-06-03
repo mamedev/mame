@@ -1243,9 +1243,10 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_CPU_PROGRAM_MAP(scramble_sound_map)
 	MDRV_CPU_IO_MAP(scramble_sound_io_map)
 
-	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
-	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
-	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
+	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
+
+	MDRV_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
 
 	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
@@ -1478,9 +1479,9 @@ static MACHINE_DRIVER_START( ad2083 )
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_map)
 
-	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
-	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
-	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
+	MDRV_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
+	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
 	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 

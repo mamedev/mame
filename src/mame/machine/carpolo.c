@@ -94,28 +94,28 @@ void carpolo_74148_3s_cb(running_device *device)
 
 
 /* the outputs of the flip-flops are connected to the priority encoder */
-void carpolo_7474_2s_1_cb(running_device *device)
+WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_1_q_cb )
 {
-	ttl74148_input_line_w(ttl74148_3s, COIN1_PRIORITY_LINE, ttl7474_output_comp_r(device));
-	ttl74148_update(ttl74148_3s);
+	ttl74148_input_line_w(device, COIN1_PRIORITY_LINE, state);
+	ttl74148_update(device);
 }
 
-void carpolo_7474_2s_2_cb(running_device *device)
+WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_2_q_cb )
 {
-	ttl74148_input_line_w(ttl74148_3s, COIN2_PRIORITY_LINE, ttl7474_output_comp_r(device));
-	ttl74148_update(ttl74148_3s);
+	ttl74148_input_line_w(device, COIN2_PRIORITY_LINE, state);
+	ttl74148_update(device);
 }
 
-void carpolo_7474_2u_1_cb(running_device *device)
+WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_1_q_cb )
 {
-	ttl74148_input_line_w(ttl74148_3s, COIN3_PRIORITY_LINE, ttl7474_output_comp_r(device));
-	ttl74148_update(ttl74148_3s);
+	ttl74148_input_line_w(device, COIN3_PRIORITY_LINE, state);
+	ttl74148_update(device);
 }
 
-void carpolo_7474_2u_2_cb(running_device *device)
+WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2u_2_q_cb )
 {
-	ttl74148_input_line_w(ttl74148_3s, COIN4_PRIORITY_LINE, ttl7474_output_comp_r(device));
-	ttl74148_update(ttl74148_3s);
+	ttl74148_input_line_w(device, COIN4_PRIORITY_LINE, state);
+	ttl74148_update(device);
 }
 
 

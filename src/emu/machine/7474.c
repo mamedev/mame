@@ -44,8 +44,9 @@
 typedef struct _ttl7474_state ttl7474_state;
 struct _ttl7474_state
 {
-	/* callback */
-	void (*output_cb)(running_device *);
+	/* callbacks */
+	devcb_resolved_write_line output_cb;
+	devcb_resolved_write_line comp_output_cb;
 
 	/* inputs */
 	UINT8 clear;			/* pin 1/13 */
@@ -102,14 +103,18 @@ static void ttl7474_update(ttl7474_state *state)
 
 
 	/* call callback if any of the outputs changed */
-	if (  state->output_cb &&
-	    ((state->output      != state->last_output) ||
-	     (state->output_comp != state->last_output_comp)))
+	if (state->output != state->last_output)
 	{
 		state->last_output = state->output;
+		if (state->output_cb.write != NULL)
+			devcb_call_write_line(&state->output_cb, state->output);
+	}
+	/* call callback if any of the outputs changed */
+	if (state->output_comp != state->last_output_comp)
+	{
 		state->last_output_comp = state->output_comp;
-
-		state->output_cb(state->device);
+		if (state->comp_output_cb.write != NULL)
+			devcb_call_write_line(&state->comp_output_cb, state->output_comp);
 	}
 }
 
@@ -160,7 +165,9 @@ static DEVICE_START( ttl7474 )
 {
 	ttl7474_config *config = (ttl7474_config *)device->baseconfig().inline_config;
 	ttl7474_state *state = get_safe_token(device);
-    state->output_cb = config->output_cb;
+
+	devcb_resolve_write_line(&state->output_cb, &config->output_cb, device);
+	devcb_resolve_write_line(&state->comp_output_cb, &config->comp_output_cb, device);
 
     state->device = device;
 
