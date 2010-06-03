@@ -107,18 +107,18 @@ READ8_DEVICE_HANDLER( at28c16_r )
 	}
 }
 
-void at28c16_a9_12v( running_device *device, int a9_12v )
+WRITE_LINE_DEVICE_HANDLER( at28c16_a9_12v )
 {
 	at28c16_state *c = get_safe_token(device);
 
-	c->a9_12v = a9_12v;
+	c->a9_12v = state & 1;
 }
 
-void at28c16_oe_12v( running_device *device, int oe_12v )
+WRITE_LINE_DEVICE_HANDLER( at28c16_oe_12v )
 {
 	at28c16_state *c = get_safe_token(device);
 
-	c->oe_12v = oe_12v;
+	c->oe_12v = state & 1;
 }
 
 /*-------------------------------------------------
