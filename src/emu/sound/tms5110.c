@@ -1312,6 +1312,44 @@ void tms5110_set_frequency(running_device *device, int frequency)
 }
 
 
+/*
+ *
+ * General Interface design (Bagman)
+ *
+ *                         +------------------------------------------------------------------------+
+ *                         |                                                                        |
+ *       +-------------+   |           +-------------+       +-------------+       +-------------+  |
+ *       | TMS5100     |   |           | Counters    |       | Rom(s)      |       | Decoder     |  |
+ *       |        ADD8 |<--+           | LS393s      |       |             |       |             |  |
+ *       |             |               |             |       |             |       |        Out  |--+
+ *       |          M0 |---+           |     Address |======>| Address     |       | IN1         |
+ *       |             |   |           |             |       |       Data  |======>| ...         |
+ *   M   |             |   +---------->| Clk         |       |             |       | IN8         |
+ *   A-->| CTL1        |               |             |       |             |       |             |
+ *   P-->| CTL2        |          +--->| Reset       |       |             |       |             |
+ *   P-->| CTL3        |          |    |             |       |             |       |    A  B  C  |
+ *   E-->| CTL4        |          |    +-------------+       +-------------+       +-------------+
+ *   D-->| PDC         |          |                                                     ^  ^  ^
+ *       |             |          +-------------------------------------------------+   |  |  |
+ *       |             |                                                            |   Bit Select
+ *       |      ROMCLK |---+           +-------------+       +-------------+        |
+ *       |             |   |           | Counter     |       | PROM        |        |
+ *       +-------------+   |           | LS393       |       |          D1 |   M  --+ Reset Bit
+ *                         |           |          Q0 |------>| A0          |   A
+ *                         +---------->| Clk      Q1 |------>| A1          |   P ==>  CTL1 ... CTL4
+ *                                     |          Q2 |------>| A2          |   P -->  PDC
+ *                                     | Reset    Q3 |------>| A3          |   E  --+ Stop Bit
+ *                                     |             |   +-->| A4       D8 |   D    |
+ *                                     +-------------+   |   +-------------+        |
+ *                                                       |                          |
+ *                                                       |   +---+                  |
+ *                                                       |   |   |<-----------------+
+ *                                                       +---| & |
+ *                                                           |   |<-------- Enable
+ *                                                           +---+
+ *
+ */
+
 /******************************************************************************
 
      DEVICE_START( tmsprom ) -- allocate buffers initialize
@@ -1356,7 +1394,7 @@ static TIMER_CALLBACK( tmsprom_step )
 	update_prom_cnt(tms);
 	ctrl = (tms->prom[tms->prom_cnt] | 0x200);
 
-	//printf("ctrl %04x, enable %d cnt %d\n", ctrl, tms->enable, tms->prom_cnt);
+	//if (tms->enable && tms->prom_cnt < 0x10) printf("ctrl %04x, enable %d cnt %d\n", ctrl, tms->enable, tms->prom_cnt);
 	tms->prom_cnt = ((tms->prom_cnt + 1) & 0x0f) | (tms->prom_cnt & 0x10);
 
 	if (ctrl & (1 << tms->intf->reset_bit))
