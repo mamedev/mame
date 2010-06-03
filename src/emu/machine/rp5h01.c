@@ -49,13 +49,6 @@ INLINE rp5h01_state *get_safe_token(running_device *device)
 	return (rp5h01_state *)device->token;
 }
 
-INLINE const rp5h01_interface *get_interface(running_device *device)
-{
-	assert(device != NULL);
-	assert((device->type == RP5H01));
-	return (const rp5h01_interface *) device->baseconfig().static_config;
-}
-
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -180,9 +173,11 @@ READ8_DEVICE_HANDLER( rp5h01_data_r )
 static DEVICE_START( rp5h01 )
 {
 	rp5h01_state *rp5h01 = get_safe_token(device);
-	const rp5h01_interface *intf = get_interface(device);
 
-	rp5h01->data = &(memory_region(device->machine, intf->region)[intf->offset]);
+	assert(device->baseconfig().static_config == NULL);
+	assert(device->baseconfig().inline_config == NULL);
+
+	rp5h01->data = *device->region;
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, rp5h01->counter);

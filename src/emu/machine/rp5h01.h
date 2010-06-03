@@ -14,21 +14,14 @@
 
 #define RP5H01		DEVICE_GET_INFO_NAME(rp5h01)
 
-#define MDRV_RP5H01_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, RP5H01, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MDRV_RP5H01_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, RP5H01, 0)
 
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _rp5h01_interface rp5h01_interface;
-struct _rp5h01_interface
-{
-	const char *region;		/* memory region where data resides */
-	int offset;		/* memory offset within the above region where data resides */
-};
+/*
+ * Device uses memory region
+ * with the same tag as the one
+ * assigned to device.
+ */
 
 /***************************************************************************
     PROTOTYPES
