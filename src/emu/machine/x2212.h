@@ -8,11 +8,9 @@
 #if !defined( X2212_H )
 #define X2212_H ( 1 )
 
-typedef struct _x2212_config x2212_config;
-struct _x2212_config
-{
-	const char *data;
-};
+/* default nvram contents should be in memory region
+ * with the same tag as device.
+ */
 
 #define X2212 DEVICE_GET_INFO_NAME(x2212)
 DEVICE_GET_INFO(x2212);
@@ -20,10 +18,9 @@ DEVICE_GET_INFO(x2212);
 #define MDRV_X2212_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, X2212, 0)
 
-
-extern void x2212_write( running_device *device, int offset, int data );
-extern int x2212_read( running_device *device, int offset );
-extern void x2212_store( running_device *device, int store );
-extern void x2212_array_recall( running_device *device, int array_recall );
+WRITE8_DEVICE_HANDLER( x2212_write );
+READ8_DEVICE_HANDLER( x2212_read );
+WRITE_LINE_DEVICE_HANDLER( x2212_store );
+WRITE_LINE_DEVICE_HANDLER( x2212_array_recall );
 
 #endif

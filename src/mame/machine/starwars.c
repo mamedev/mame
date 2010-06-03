@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "includes/starwars.h"
+#include "machine/x2212.h"
 #include "video/avgdvg.h"
 
 
@@ -34,7 +35,6 @@
 #define MASTER_CLOCK (12096000)
 
 UINT8 *starwars_mathram;
-UINT8 *starwars_ram_overlay;
 
 /* Local variables */
 static UINT8 control_num = kPitch;
@@ -69,9 +69,9 @@ static TIMER_CALLBACK( math_run_clear )
  *
  *************************************/
 
-WRITE8_HANDLER( starwars_nstore_w )
+WRITE8_DEVICE_HANDLER( starwars_nstore_w )
 {
-	memcpy (space->machine->generic.nvram.v, starwars_ram_overlay, space->machine->generic.nvram_size);
+	x2212_store(device, data & 0x01);
 }
 
 /*************************************
@@ -113,7 +113,7 @@ WRITE8_HANDLER( starwars_out_w )
 			break;
 
 		case 7:		/* NVRAM array recall */
-			memcpy (starwars_ram_overlay, space->machine->generic.nvram.v, space->machine->generic.nvram_size);
+			x2212_array_recall(devtag_get_device(space->machine, "x2212"), data >> 7);
 			break;
 	}
 }

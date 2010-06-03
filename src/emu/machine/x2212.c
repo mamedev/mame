@@ -33,7 +33,7 @@ INLINE x2212_state *get_safe_token(running_device *device)
 	return (x2212_state *)device->token;
 }
 
-void x2212_write( running_device *device, int offset, int data )
+WRITE8_DEVICE_HANDLER( x2212_write )
 {
 	x2212_state *c = get_safe_token(device);
 
@@ -41,35 +41,37 @@ void x2212_write( running_device *device, int offset, int data )
 }
 
 
-int x2212_read( running_device *device, int offset )
+READ8_DEVICE_HANDLER( x2212_read )
 {
 	x2212_state *c = get_safe_token(device);
 
 	return c->sram[ offset ];
 }
 
-void x2212_store( running_device *device, int store )
+WRITE_LINE_DEVICE_HANDLER( x2212_store )
 {
 	x2212_state *c = get_safe_token(device);
 
-	if( !store && c->store )
+	state &= 1;
+	if( !state && c->store )
 	{
 		memcpy( c->e2prom, c->sram, SIZE_DATA );
 	}
 
-	c->store = store;
+	c->store = state;
 }
 
-void x2212_array_recall( running_device *device, int array_recall )
+WRITE_LINE_DEVICE_HANDLER( x2212_array_recall )
 {
 	x2212_state *c = get_safe_token(device);
 
-	if( !array_recall && c->array_recall )
+	state &= 1;
+	if( !state && c->array_recall )
 	{
 		memcpy( c->sram, c->e2prom, SIZE_DATA );
 	}
 
-	c->array_recall = array_recall;
+	c->array_recall = state;
 }
 
 /*-------------------------------------------------
@@ -79,11 +81,10 @@ void x2212_array_recall( running_device *device, int array_recall )
 static DEVICE_START(x2212)
 {
 	x2212_state *c = get_safe_token(device);
-	const x2212_config *config;
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-//  assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config == NULL);
 	assert(device->baseconfig().inline_config == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
@@ -93,11 +94,7 @@ static DEVICE_START(x2212)
 	c->store = 1;
 	c->array_recall = 1;
 
-	config = (const x2212_config *)device->baseconfig().static_config;
-	if( config != NULL && config->data != NULL )
-	{
-		c->default_data = memory_region( device->machine, config->data );
-	}
+	c->default_data = *device->region;
 
 	state_save_register_device_item_pointer( device, 0, c->sram, SIZE_DATA );
 	state_save_register_device_item_pointer( device, 0, c->e2prom, SIZE_DATA );
@@ -144,29 +141,15 @@ static DEVICE_NVRAM(x2212)
 }
 
 /*-------------------------------------------------
-    device get info callback
+    device definition
 -------------------------------------------------*/
 
-DEVICE_GET_INFO(x2212)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(x2212_state); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break; // sizeof(x2212_config)
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(x2212); break;
-		case DEVINFO_FCT_STOP:					/* nothing */ break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(x2212); break;
-		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(x2212); break;
+#define DEVTEMPLATE_ID( p, s )	p##x2212##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_NVRAM
+#define DEVTEMPLATE_NAME		"X2212"
+#define DEVTEMPLATE_FAMILY		"EEPROM"
+#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
+#include "devtempl.h"
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "X2212"); break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "EEPROM"); break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0"); break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__); break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
