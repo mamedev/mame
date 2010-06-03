@@ -2,7 +2,8 @@
 
 Royal Gum
 
-Unknown CPU (either Z80 or Z180)
+Unknown CPU (either Z80 or Z180) - or at least rgum.u47 looks z80 related
+rgum.u5 is for a 6502?
 
 Big Black Box in the middle of the PCB (for encryption, or containing roms?)
 
@@ -10,9 +11,22 @@ Big Black Box in the middle of the PCB (for encryption, or containing roms?)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6502/m6502.h"
+
+static READ8_HANDLER( unk_r )
+{
+	return mame_rand(space->machine);
+}
 
 static ADDRESS_MAP_START( rgum_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+
+	AM_RANGE(0x3000, 0x3000) AM_READ(unk_r)
+
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x5000, 0x57ff) AM_RAM
+
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -48,9 +62,9 @@ static VIDEO_UPDATE(royalgum)
 
 static MACHINE_DRIVER_START( rgum )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", M6502,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(rgum_map)
-//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -71,10 +85,10 @@ MACHINE_DRIVER_END
 
 
 ROM_START( rgum )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "z80cpu", 0 )
 	ROM_LOAD( "rgum.u47", 0x00000, 0x20000, CRC(fe410eb9) SHA1(25180ba336269279f251be5483c210a581d27197) ) // encrypted.. 2nd half empty
 
-	ROM_REGION( 0x10000, "data", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rgum.u5", 0x00000, 0x10000, CRC(9d2d1681) SHA1(1c1da0d970ea2cf58f7961417ab6986cc667da5c) ) // plaintext in here, but firt half is empty
 
 	ROM_REGION( 0x10000, "unk", 0 )

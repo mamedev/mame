@@ -44,7 +44,6 @@ public:
 
 WRITE8_HANDLER( mrokumei_videoram_w );
 WRITE8_HANDLER( reikaids_videoram_w );
-WRITE8_HANDLER( pteacher_videoram_w );
 WRITE8_HANDLER( reikaids_gfx_bank_w );
 WRITE8_HANDLER( pteacher_gfx_bank_w );
 WRITE8_HANDLER( homedata_blitter_param_w );
@@ -58,12 +57,15 @@ WRITE8_HANDLER( pteacher_blitter_start_w );
 PALETTE_INIT( mrokumei );
 PALETTE_INIT( reikaids );
 PALETTE_INIT( pteacher );
+PALETTE_INIT( mirderby );
 
 VIDEO_START( mrokumei );
 VIDEO_START( reikaids );
 VIDEO_START( pteacher );
 VIDEO_START( lemnangl );
+VIDEO_START( mirderby );
 VIDEO_UPDATE( mrokumei );
 VIDEO_UPDATE( reikaids );
 VIDEO_UPDATE( pteacher );
+VIDEO_UPDATE( mirderby );
 VIDEO_EOF( homedata );

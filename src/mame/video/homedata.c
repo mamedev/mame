@@ -289,7 +289,7 @@ static void pteacher_handleblit( const address_space *space, int rom_base )
 				if ((addr & 0x2080) == 0)
 				{
 					addr = ((addr & 0xc000) >> 2) | ((addr & 0x1f00) >> 1) | (addr & 0x7f);
-					pteacher_videoram_w(space, addr, data);
+					 mrokumei_videoram_w(space, addr, data);
 				}
 			}
 
@@ -379,7 +379,20 @@ PALETTE_INIT( pteacher )
 	}
 }
 
+PALETTE_INIT( mirderby )
+{
+	int i;
 
+	for (i = 0; i < 0x100; i++)
+	{
+		int r,g,b;
+		r = color_prom[0x000+i];
+		g = color_prom[0x100+i];
+		b = color_prom[0x200+i];
+
+		palette_set_color_rgb(machine,i,pal4bit(r),pal4bit(g),pal4bit(b));
+	}
+}
 
 /***************************************************************************
 
@@ -577,6 +590,53 @@ static TILE_GET_INFO( lemnangl_get_info1_1 )
 }
 
 
+INLINE void mirderby_info0( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	int addr  = tile_index * 2 + 0x2000 * page;
+	int attr  = state->videoram[addr];
+	int code  = state->videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400;// + (gfxbank << 10);
+	int color = (attr >> 2) + (gfxbank << 6);
+
+	SET_TILE_INFO( 0, code, color, state->flipscreen );
+}
+INLINE void mirderby_info1( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	int addr  = tile_index * 2 + 0x1000 + 0x2000 * page;
+	int attr  = state->videoram[addr];
+	int code  = state->videoram[addr + 1] + ((attr & 0x07) << 8) + 0x400;//(gfxbank << 11);
+	int color = (attr >> 3) + ((gfxbank & 3) << 6);
+
+	SET_TILE_INFO( 1, code, color, state->flipscreen );
+}
+
+static TILE_GET_INFO( mirderby_get_info0_0 )
+{
+//	homedata_state *state = (homedata_state *)machine->driver_data;
+	mirderby_info0( machine, tileinfo, tile_index, 0, 0);// state->blitter_bank & 0x03 );
+}
+
+static TILE_GET_INFO( mirderby_get_info1_0 )
+{
+//	homedata_state *state = (homedata_state *)machine->driver_data;
+	mirderby_info0( machine, tileinfo, tile_index, 1, 0);// state->blitter_bank & 0x03 );
+}
+
+static TILE_GET_INFO( mirderby_get_info0_1 )
+{
+//	homedata_state *state = (homedata_state *)machine->driver_data;
+	mirderby_info1( machine, tileinfo, tile_index, 0, 0);//(state->blitter_bank & 0x38) >> 3 );
+}
+
+static TILE_GET_INFO( mirderby_get_info1_1 )
+{
+//	homedata_state *state = (homedata_state *)machine->driver_data;
+	mirderby_info1( machine, tileinfo, tile_index, 1, 0);//(state->blitter_bank & 0x38) >> 3 );
+}
+
+
+
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -641,7 +701,17 @@ VIDEO_START( lemnangl )
 	tilemap_set_transparent_pen(state->bg_tilemap[1][1], 0x0f);
 }
 
+VIDEO_START( mirderby )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	state->bg_tilemap[0][0] = tilemap_create( machine, mirderby_get_info0_0, tilemap_scan_rows, 8, 8, 64, 32 );
+	state->bg_tilemap[0][1] = tilemap_create( machine, mirderby_get_info0_1, tilemap_scan_rows, 8, 8, 64, 32 );
+	state->bg_tilemap[1][0] = tilemap_create( machine, mirderby_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32 );
+	state->bg_tilemap[1][1] = tilemap_create( machine, mirderby_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32 );
 
+	tilemap_set_transparent_pen(state->bg_tilemap[0][1], 0);
+	tilemap_set_transparent_pen(state->bg_tilemap[1][1], 0);
+}
 
 /***************************************************************************
 
@@ -663,12 +733,6 @@ WRITE8_HANDLER( reikaids_videoram_w )
 	tilemap_mark_tile_dirty(state->bg_tilemap[(offset & 0x2000) >> 13][offset & 3], (offset & 0xffc) >> 2);
 }
 
-WRITE8_HANDLER( pteacher_videoram_w )
-{
-	homedata_state *state = (homedata_state *)space->machine->driver_data;
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1);
-}
 
 WRITE8_HANDLER( reikaids_gfx_bank_w )
 {
@@ -976,6 +1040,11 @@ VIDEO_UPDATE( pteacher )
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap[state->visible_page][0], 0, 0);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap[state->visible_page][1], 0, 0);
+	return 0;
+}
+
+VIDEO_UPDATE( mirderby )
+{
 	return 0;
 }
 

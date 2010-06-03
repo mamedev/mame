@@ -1862,7 +1862,6 @@ src/mame/drivers/miniboy7.c svneol=native#text/plain
 src/mame/drivers/minivadr.c svneol=native#text/plain
 src/mame/drivers/mirage.c svneol=native#text/plain
 src/mame/drivers/mirax.c svneol=native#text/plain
-src/mame/drivers/mirderby.c svneol=native#text/plain
 src/mame/drivers/missb2.c svneol=native#text/plain
 src/mame/drivers/missile.c svneol=native#text/plain
 src/mame/drivers/mitchell.c svneol=native#text/plain
