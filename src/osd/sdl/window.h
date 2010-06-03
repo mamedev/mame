@@ -95,7 +95,7 @@ struct _sdl_window_info
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	// Needs to be here as well so we can identify window
-	SDL_WindowID		window_id;
+	SDL_Window			*sdl_window;
 	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
 	int 				resize_width;
 	int					resize_height;

@@ -117,6 +117,12 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 #define GL_DEPTH_COMPONENT32				0x81A7
 #endif
 
+//#define OLD_CODE	1
+
+#ifndef OLD_CODE
+#define HASH_SIZE		((1<<10)+1)
+#define OVERFLOW_SIZE	(1<<10)
+#endif
 
 // OSD headers
 #include "osdsdl.h"
@@ -163,7 +169,9 @@ typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *t
 /* texture_info holds information about a texture */
 struct _texture_info
 {
+#ifdef OLD_CODE
 	texture_info *		next;				// next texture in the list
+#endif
 	HashT				hash;				// hash value for the texture (must be >= pointer size)
 	UINT32				flags;				// rendering flags
 	render_texinfo		texinfo;			// copy of the texture info
@@ -220,7 +228,11 @@ struct _sdl_info
 
 	int				initialized;		// is everything well initialized, i.e. all GL stuff etc.
 	// 3D info (GL mode only)
+#ifdef OLD_CODE
 	texture_info *	texlist;		// list of active textures
+#else
+	texture_info *	texhash[HASH_SIZE + OVERFLOW_SIZE];
+#endif
 	int				last_blendmode;		// previous blendmode
 	INT32			texture_max_width;  	// texture maximum width
 	INT32			texture_max_height; 	// texture maximum height
@@ -283,10 +295,19 @@ static const line_aa_step line_aa_4step[] =
 //  INLINES
 //============================================================
 
+#ifdef OLD_CODE
 INLINE HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 {
 	return (HashT)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 }
+#else
+INLINE HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
+{
+	HashT h = (HashT)texture ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
+	//printf("hash %d\n", (int) h % HASH_SIZE);
+	return (h >> 8) % HASH_SIZE;
+}
+#endif
 
 INLINE void set_blendmode(sdl_info *sdl, int blendmode)
 {
@@ -545,26 +566,26 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		mode.h = height;
 		if (window->refresh)
 			mode.refresh_rate = window->refresh;
-		SDL_SetWindowDisplayMode(window->window_id, &mode);	// Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window, &mode);	// Try to set mode
 	}
 	else
-		SDL_SetWindowDisplayMode(window->window_id, NULL);	// Use desktop
+		SDL_SetWindowDisplayMode(window->sdl_window, NULL);	// Use desktop
 
-	window->window_id = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 			width, height, sdl->extra_flags);
 
-	if  (!window->window_id )
+	if  (!window->sdl_window )
 	{
 		mame_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
 		return 1;
 	}
 
-	SDL_ShowWindow(window->window_id);
-	//SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
-	SDL_RaiseWindow(window->window_id);
-	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
+	SDL_ShowWindow(window->sdl_window);
+	//SDL_SetWindowFullscreen(window->sdl_window, window->fullscreen);
+	SDL_RaiseWindow(window->sdl_window);
+	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 
-	sdl->gl_context_id = SDL_GL_CreateContext(window->window_id);
+	sdl->gl_context_id = SDL_GL_CreateContext(window->sdl_window);
 	if  (!sdl->gl_context_id)
 	{
 		mame_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
@@ -779,9 +800,9 @@ static void drawogl_window_resize(sdl_window_info *window, int width, int height
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	//SDL_GL_MakeCurrent(window->window_id, sdl->gl_context_id);
-	SDL_SetWindowSize(window->window_id, width, height);
-	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
+	//SDL_GL_MakeCurrent(window->sdl_window, sdl->gl_context_id);
+	SDL_SetWindowSize(window->sdl_window, width, height);
+	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 	sdl->blittimer = 3;
 #else
 	SDL_FreeSurface(sdl->sdlsurf);
@@ -1172,7 +1193,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	}
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	SDL_GL_MakeCurrent(window->window_id, sdl->gl_context_id);
+	SDL_GL_MakeCurrent(window->sdl_window, sdl->gl_context_id);
 #endif
 	if (sdl->init_context)
 	{
@@ -1527,7 +1548,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 	SDL_GL_SwapBuffers();
 #else
-	SDL_GL_SwapWindow(window->window_id);
+	SDL_GL_SwapWindow(window->sdl_window);
 #endif
 	return 0;
 }
@@ -1701,7 +1722,7 @@ static void drawogl_window_destroy(sdl_window_info *window)
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	SDL_GL_DeleteContext(sdl->gl_context_id);
-	SDL_DestroyWindow(window->window_id);
+	SDL_DestroyWindow(window->sdl_window);
 #else
 	if (sdl->sdlsurf)
 	{
@@ -2539,9 +2560,24 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
     }
 
 	// add us to the texture list
+#ifdef OLD_CODE
 	texture->next = sdl->texlist;
 	sdl->texlist = texture;
-
+#else
+	if (sdl->texhash[texture->hash] == NULL)
+		sdl->texhash[texture->hash] = texture;
+	else
+	{
+		int i;
+		for (i = HASH_SIZE; i < HASH_SIZE + OVERFLOW_SIZE; i++)
+			if (sdl->texhash[i] == NULL)
+			{
+				sdl->texhash[i] = texture;
+				break;
+			}
+		assert(i < HASH_SIZE + OVERFLOW_SIZE);
+	}
+#endif
 	if(sdl->usevbo)
 	{
 		// Generate And Bind The Texture Coordinate Buffer
@@ -2668,6 +2704,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 //  texture_find
 //============================================================
 
+#ifdef OLD_CODE
 static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim)
 {
 	HashT texhash = texture_compute_hash(&prim->texture, prim->flags);
@@ -2686,6 +2723,55 @@ static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim)
 	// nothing found
 	return NULL;
 }
+#else
+
+#if 0
+static int compare_texinfo(render_texinfo *t1, render_texinfo *t2)
+{
+	if (t1->base == t2->base &&
+			t1->width == t2->width &&
+			t1->height == t2->height &&
+			t1->rowpixels == t2->rowpixels)
+		return 1;
+	else
+		return 0;
+}
+#endif
+
+static int compare_texture_primitive(const texture_info *texture, const render_primitive *prim)
+{
+	if (texture->texinfo.base == prim->texture.base &&
+		texture->texinfo.width == prim->texture.width &&
+		texture->texinfo.height == prim->texture.height &&
+		texture->texinfo.rowpixels == prim->texture.rowpixels &&
+		((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
+		return 1;
+	else
+		return 0;
+}
+
+static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim)
+{
+	HashT texhash = texture_compute_hash(&prim->texture, prim->flags);
+	texture_info *texture;
+
+	texture = sdl->texhash[texhash];
+	if (texture != NULL)
+	{
+		int i;
+		if (compare_texture_primitive(texture, prim))
+			return texture;
+		for (i=HASH_SIZE; i<HASH_SIZE + OVERFLOW_SIZE; i++)
+		{
+			texture = sdl->texhash[i];
+			if (texture != NULL && compare_texture_primitive(texture, prim))
+				return texture;
+		}
+	}
+	return NULL;
+}
+
+#endif
 
 //============================================================
 //  texture_update
@@ -3027,8 +3113,13 @@ static void texture_all_disable(sdl_info *sdl)
 static void drawogl_destroy_all_textures(sdl_window_info *window)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
-	texture_info *next_texture=NULL, *texture = NULL;
+	texture_info *texture = NULL;
 	int lock=FALSE;
+#ifdef OLD_CODE
+	texture_info *next_texture=NULL;
+#else
+	int i;
+#endif
 
 	if (sdl == NULL)
 		return;
@@ -3037,7 +3128,7 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 		return;
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	SDL_GL_MakeCurrent(window->window_id, sdl->gl_context_id);
+	SDL_GL_MakeCurrent(window->sdl_window, sdl->gl_context_id);
 #endif
 
 	if(window->primlist && window->primlist->lock)
@@ -3046,16 +3137,26 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 		osd_lock_acquire(window->primlist->lock);
 	}
 
-	texture = sdl->texlist;
 	glFinish();
 
 	texture_all_disable(sdl);
 	glFinish();
 	glDisableClientState(GL_VERTEX_ARRAY);
 
+#ifdef OLD_CODE
+	texture = sdl->texlist;
 	while (texture)
 	{
 		next_texture = texture->next;
+#else
+	i=0;
+	while (i<HASH_SIZE+OVERFLOW_SIZE)
+	{
+		texture = sdl->texhash[i];
+		sdl->texhash[i] = NULL;
+		if (texture != NULL)
+		{
+#endif
 
 		if(sdl->usevbo)
 		{
@@ -3094,10 +3195,15 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 			texture->data_own=FALSE;
 		}
 		free(texture);
+#ifdef OLD_CODE
 		texture = next_texture;
 	}
     sdl->texlist = NULL;
-
+#else
+		}
+		i++;
+	}
+#endif
 	if ( sdl->useglsl )
 	{
 		glsl_shader_free(sdl->glsl);

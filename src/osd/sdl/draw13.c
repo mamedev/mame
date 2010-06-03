@@ -603,32 +603,32 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 				mame_printf_warning("Ignoring depth %d\n", window->depth);
 			}
 		}
-		SDL_SetWindowDisplayMode(window->window_id, &mode);	// Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window, &mode);	// Try to set mode
 	}
 	else
-		SDL_SetWindowDisplayMode(window->window_id, NULL);	// Use desktop
+		SDL_SetWindowDisplayMode(window->sdl_window, NULL);	// Use desktop
 
-	window->window_id = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 			width, height, sdl->extra_flags);
 
-	SDL_ShowWindow(window->window_id);
+	SDL_ShowWindow(window->sdl_window);
 	//SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
-	SDL_RaiseWindow(window->window_id);
-	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
+	SDL_RaiseWindow(window->sdl_window);
+	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 
 	// create renderer
 
 	if (video_config.waitvsync)
-		result = SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD | SDL_RENDERER_PRESENTVSYNC);
+		result = SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD | SDL_RENDERER_PRESENTVSYNC);
 	else
-		result = SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD);
+		result = SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD);
 
 	if (result)
 	{
 		fatalerror("Error on creating renderer: %s \n", SDL_GetError());
 	}
 
-    SDL_SelectRenderer(window->window_id);
+    SDL_SelectRenderer(window->sdl_window);
 
 	sdl->blittimer = 3;
 
@@ -649,8 +649,8 @@ static void draw13_window_resize(sdl_window_info *window, int width, int height)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
-	SDL_SetWindowSize(window->window_id, width, height);
-	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
+	SDL_SetWindowSize(window->sdl_window, width, height);
+	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 	sdl->blittimer = 3;
 
 }
@@ -707,7 +707,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		return 0;
 	}
 
-	SDL_SelectRenderer(window->window_id);
+	SDL_SelectRenderer(window->sdl_window);
 
 	if (sdl->blittimer > 0)
 	{
@@ -819,7 +819,7 @@ static void draw13_window_destroy(sdl_window_info *window)
 
 	draw13_destroy_all_textures(window);
 
-	SDL_DestroyWindow(window->window_id);
+	SDL_DestroyWindow(window->sdl_window);
 
 	osd_free(sdl);
 	window->dxdata = NULL;

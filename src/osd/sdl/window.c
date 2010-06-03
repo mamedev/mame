@@ -605,14 +605,14 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 		if (!window->fullscreen && !sdlinput_should_hide_mouse(machine))
 		{
 			SDL_ShowCursor(SDL_ENABLE);
-			if (SDL_GetWindowGrab(window->window_id ))
-				SDL_SetWindowGrab(window->window_id, 0);
+			if (SDL_GetWindowGrab(window->sdl_window ))
+				SDL_SetWindowGrab(window->sdl_window, 0);
 		}
 		else
 		{
 			SDL_ShowCursor(SDL_DISABLE);
-			if (!SDL_GetWindowGrab(window->window_id))
-				SDL_SetWindowGrab(window->window_id, 1);
+			if (!SDL_GetWindowGrab(window->sdl_window))
+				SDL_SetWindowGrab(window->sdl_window, 1);
 		}
 		SDL_SetCursor(NULL); // Force an update in case the underlying driver has changed visibility
 	}

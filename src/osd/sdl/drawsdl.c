@@ -414,31 +414,31 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 		mode.h = height;
 		if (window->refresh)
 			mode.refresh_rate = window->refresh;
-		SDL_SetWindowDisplayMode(window->window_id, &mode);	// Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window, &mode);	// Try to set mode
 	}
 	else
-		SDL_SetWindowDisplayMode(window->window_id, NULL);	// Use desktop
+		SDL_SetWindowDisplayMode(window->sdl_window, NULL);	// Use desktop
 
-	window->window_id = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 			width, height, sdl->extra_flags);
-	SDL_ShowWindow(window->window_id);
+	SDL_ShowWindow(window->sdl_window);
 
-	SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
-	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
-	SDL_RaiseWindow(window->window_id);
+	SDL_SetWindowFullscreen(window->sdl_window, window->fullscreen);
+	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
+	SDL_RaiseWindow(window->sdl_window);
 
 	/* FIXME: Bug in SDL 1.3 */
 	if (window->fullscreen)
-		SDL_SetWindowGrab(window->window_id, 1);
+		SDL_SetWindowGrab(window->sdl_window, 1);
 
 	// create a texture
 
 	if (video_config.waitvsync)
-		SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD | SDL_RENDERER_PRESENTVSYNC);
+		SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD | SDL_RENDERER_PRESENTVSYNC);
 	else
-		SDL_CreateRenderer(window->window_id, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD);
+		SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD);
 
-    SDL_SelectRenderer(window->window_id);
+    SDL_SelectRenderer(window->sdl_window);
 
     {
         struct SDL_RendererInfo render_info;
@@ -502,8 +502,8 @@ static void drawsdl_window_resize(sdl_window_info *window, int width, int height
 {
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	SDL_SetWindowSize(window->window_id, width, height);
-	SDL_GetWindowSize(window->window_id, &window->width, &window->height);
+	SDL_SetWindowSize(window->sdl_window, width, height);
+	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 
 #else
 	sdl_info *sdl = (sdl_info *) window->dxdata;
@@ -543,10 +543,10 @@ static void drawsdl_window_destroy(sdl_window_info *window)
 		return;
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	SDL_SelectRenderer(window->window_id);
+	SDL_SelectRenderer(window->sdl_window);
 	SDL_DestroyTexture(sdl->texture_id);
-	//SDL_DestroyRenderer(window->window_id);
-	SDL_DestroyWindow(window->window_id);
+	//SDL_DestroyRenderer(window->sdl_window);
+	SDL_DestroyWindow(window->sdl_window);
 #else
 	if (sdl->yuvsurf != NULL)
 	{
@@ -694,7 +694,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	else
 		surfptr = (UINT8 *)sdl->sdlsurf->pixels;
 #else
-	SDL_SelectRenderer(window->window_id);
+	SDL_SelectRenderer(window->sdl_window);
 
 	if (window->blitwidth != sdl->old_blitwidth || window->blitheight != sdl->old_blitheight)
 	{

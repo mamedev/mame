@@ -1,3 +1,21 @@
+======================================================================================
+SDLMAME only supports SDL hg revisions up to 4464 
+
+Every revision after 4464 has multi-mice/multi-keyboard ripped out. 
+Revisions >= 4465 will not work with SDLMAME.
+
+To build a version suitable for SDLMAME, use ...
+
+hg clone http://hg.libsdl.org/SDL
+hg update 4464
+sh autogen.sh
+./configure --prefix=/usr/local/sdl13 --enable-maintainer-mode --disable-video-directfb --disable-fusionsound
+
+Know caveats: DirectFB is broken (will not compile)
+
+=======================================================================================
+
+
 Warning
 =======
 
