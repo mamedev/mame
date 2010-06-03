@@ -47,10 +47,10 @@ INLINE const k033906_interface *k033906_get_interface( running_device *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k033906_set_reg( running_device *device, int state )
+WRITE_LINE_DEVICE_HANDLER( k033906_set_reg )
 {
 	k033906_state *k033906 = k033906_get_safe_token(device);
-	k033906->reg_set = state;
+	k033906->reg_set = state & 1;
 }
 
 static UINT32 k033906_reg_r( running_device *device, int reg )
