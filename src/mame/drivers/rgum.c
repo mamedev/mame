@@ -7,6 +7,8 @@ rgum.u5 is for a 6502?
 
 Big Black Box in the middle of the PCB (for encryption, or containing roms?)
 
+The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
+
 */
 
 #include "emu.h"
@@ -54,8 +56,8 @@ static ADDRESS_MAP_START( rgum_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("aysnd", ay8910_data_w)
 	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_address_w)
 
-	AM_RANGE(0x2801, 0x2801) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2803, 0x2803) AM_READ_PORT("DSW2")
+	AM_RANGE(0x2801, 0x2801) AM_READNOP //read but value discarded?
+	AM_RANGE(0x2803, 0x2803) AM_READNOP
 
 	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 
@@ -140,18 +142,7 @@ static INPUT_PORTS_START( rgum )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //communication port with the z80?
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
@@ -273,6 +264,7 @@ static MACHINE_DRIVER_START( rgum )
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 
 	MDRV_MC6845_ADD("crtc", MC6845, 24000000/16, mc6845_intf)	/* unknown clock & type, hand tuned to get ~50 fps (?) */
+
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
 
 	MDRV_GFXDECODE(rgum)
