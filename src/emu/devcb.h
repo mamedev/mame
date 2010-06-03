@@ -87,7 +87,20 @@
 #define READ_LINE_DEVICE_HANDLER(name)		int  name(ATTR_UNUSED running_device *device)
 #define WRITE_LINE_DEVICE_HANDLER(name) 	void name(ATTR_UNUSED running_device *device, ATTR_UNUSED int state)
 
+/* macros for inline device handler initialization */
 
+#define MDRV_DEVICE_CONFIG_DEVCB_GENERIC(_access, _struct, _entry, _tag, _type, _linefunc, _devfunc, _spacefunc) \
+	MDRV_DEVICE_CONFIG_DATA32(_struct, _entry .type, DEVCB_TYPE_DEVICE) \
+	MDRV_DEVICE_CONFIG_DATAPTR(_struct, _entry .tag, _tag) \
+	MDRV_DEVICE_CONFIG_DATAPTR(_struct, _entry . _access ## line, _linefunc) \
+	MDRV_DEVICE_CONFIG_DATAPTR(_struct, _entry . _access ## device, _devfunc) \
+	MDRV_DEVICE_CONFIG_DATAPTR(_struct, _entry .  _access ## space, _spacefunc)
+
+#define MDRV_DEVICE_CONFIG_READ_LINE(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(read, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, _func, NULL, NULL)
+#define MDRV_DEVICE_CONFIG_WRITE_LINE(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(write, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, _func, NULL, NULL)
+
+#define MDRV_DEVICE_CONFIG_READ_HANDLER(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(read, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, NULL, _func, NULL)
+#define MDRV_DEVICE_CONFIG_WRITE_HANDLER(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(write, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, NULL, _func, NULL)
 
 /***************************************************************************
     TYPE DEFINITIONS
