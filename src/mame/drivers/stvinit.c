@@ -405,7 +405,7 @@ DRIVER_INIT(sss)
 	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x6026398);
 	sh2drc_add_pcflush(devtag_get_device(machine, "slave"), 0x6028cd6);
 
-	install_standard_protection(machine);
+	install_sss_protection(machine);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -469,7 +469,7 @@ DRIVER_INIT(twcup98)
 	sh2drc_add_pcflush(devtag_get_device(machine, "slave"), 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
-	install_standard_protection(machine);
+	install_twcup98_protection(machine);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(5);
 }
@@ -521,7 +521,7 @@ DRIVER_INIT(elandore)
 	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x604eac0);
 	sh2drc_add_pcflush(devtag_get_device(machine, "slave"), 0x605340a);
 
-	install_standard_protection(machine);
+	install_elandore_protection(machine);
 
 	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(0);
@@ -533,7 +533,7 @@ DRIVER_INIT(rsgun)
 	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x6034d04);
 	sh2drc_add_pcflush(devtag_get_device(machine, "slave"), 0x6036152);
 
-	install_standard_protection(machine);
+	install_rsgun_protection(machine);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -543,7 +543,7 @@ DRIVER_INIT(rsgun)
 
 DRIVER_INIT(ffreveng)
 {
-	install_standard_protection(machine);
+	install_ffreveng_protection(machine);
 	DRIVER_INIT_CALL(stv);
 }
 

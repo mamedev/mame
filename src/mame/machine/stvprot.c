@@ -105,39 +105,14 @@ static UINT32 a_bus[4];
 static UINT32 ctrl_index;
 static UINT32 internal_counter;
 static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
-/*
-ffreveng protection notes
-Global:
-R2 is the vector read (where to jump to)
-R3 is the vector pointer
 
-Notes:
--0x234 is a dummy vector to get safe in the debugger without doing
-anything and to read the registers.
+/************************
+*
+* Tecmo World Cup '98
+*
+************************/
 
-Right vectors:
-0x0603B158 (but not as first,will garbage the registers)
-
-Wrong vectors (at least not where I tested it):
-0x060016fc (1st)
-0x0603AFE0 (1st) (attempts to read to the sh2 internal register fffffe11)
-0x060427FC (1st) (resets the sh2)
-0x0603B1B2 (1st) (crashes the sh2)
-*/
-static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
-
-#define ELANDORE_CTRL_1_HUMAN   0xff7f0000
-#define ELANDORE_CTRL_2_HUMAN   0xffbf0000
-
-#define ELANDORE_CTRL_1_DRAGON  0xf9ff0000
-#define ELANDORE_CTRL_2_DRAGON  0xfbff0000
-#define ELANDORE_CTRL_3_DRAGON  0xfe7f0000
-#define ELANDORE_CTRL_4_DRAGON  0xfd7f0000
-#define ELANDORE_CTRL_5_DRAGON  0xfeff0000
-#define ELANDORE_CTRL_6_DRAGON  0xf9bf0000
-
-
-static READ32_HANDLER( a_bus_ctrl_r )
+static READ32_HANDLER( twcup98_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
 
@@ -151,79 +126,65 @@ static READ32_HANDLER( a_bus_ctrl_r )
 			#endif
 			switch(a_bus[3])
 			{
-				case 0x01230000://astrass,char data in test mode PC=60118f2
-				/*
-                TODO: the chars that are used are 8x8x4,but we need to convert them to
-                16x16x4 format.
-                [01] NULL
-                [02] NULL
-                [03] NULL
-                [04] NULL
-                [05] NULL
-                [06] NULL
-                [07] NULL
-                [08] NULL
-                [09] data 1
-                [10] data 2
-                [11] data 3
-                [12] data 4
-                [13] data 5
-                [14] data 6
-                [15] data 7
-                [16] data 8
 
-                2b5 = A (up-left)
-                2b6 = A (up-right)
-                2d1 = A (down-left)
-                2d0 = A (down-right)
-                2f2 = S (up-left)
-                2f3 = S (up-right)
-                311 = S (down-left)
-                310 = S (down-right)
-                2f4 = T (up-left)
-                2f5 = T (up-right)
-                2b7 = E (up-left) (not 2bc,maybe because the up-left corner of E is equal of B?)
-                2bd = E (up-right)
-                */
-					internal_counter++;
-					if(char_offset == 0)
-					{
-						if(internal_counter > ((8*0x234)-1))
-						{
-							internal_counter = 0;
-							char_offset = 1;
-						}
+			}
+		}
+		return a_bus[offset];
+	}
+	else
+	{
+		if(a_bus[offset] != 0) return a_bus[offset];
+		else return ROM[(0x02fffff0/4)+offset];
+	}
+}
 
-						return 0;
-					}
-					else
-					{
-						if(internal_counter > 8)
-						{
-							if(internal_counter > 15)
-							{
-								ctrl_index-=8;
-								internal_counter = 0;
-							}
+static WRITE32_HANDLER ( twcup98_prot_w )
+{
+	COMBINE_DATA(&a_bus[offset]);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(space->cpu),offset,data);
+	if(offset == 3)
+	{
+		printf("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
 
-							ctrl_index++;
-							return ROM[ctrl_index];
-						}
-						else
-						{
-							ctrl_index++;
-							return ROM[ctrl_index];
-						}
-					}
-				case 0x10da0000://ffreveng, boot vectors at $6080000,test mode
-					ctrl_index++;
-					if(ctrl_index > 2)
-						return 0x234;
-					else
-						return vector_prot[ctrl_index-1];
-				case 0x10d70000://ffreveng, boot vectors at $6080000,attract mode
-					ctrl_index++;
-					return ROM[ctrl_index];
+		//MAIN : 12120000  DATA : 0ad20069 Tecmo logo
+		if(a_bus[3] == 0x12120000 && a_bus[2] == 0x0ad20069)
+		{
+			// ...
+		}
+		//MAIN : 12120000  DATA : e332006b title screen
+		if(a_bus[3] == 0x12120000 && a_bus[2] == 0xe332006b)
+		{
+			// ...
+		}
+	}
+	//popmessage("%04x %04x",data,offset/4);
+}
+
+void install_twcup98_protection(running_machine *machine)
+{
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, twcup98_prot_r, twcup98_prot_w);
+}
+
+/**************************
+*
+* Steep Slope Sliders
+*
+**************************/
+
+static READ32_HANDLER( sss_prot_r )
+{
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+
+	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	{
+		if(offset == 3)
+		{
+			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(space->cpu),a_bus[3]);
+			#ifdef MAME_DEBUG
+			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(space->cpu),a_bus[3]);
+			#endif
+			switch(a_bus[3])
+			{
 				case 0x2c5b0000://sss
 				case 0x47f10000:
 				case 0xfcda0000:
@@ -233,6 +194,62 @@ static READ32_HANDLER( a_bus_ctrl_r )
 				case 0x8a620000:
 					ctrl_index++;
 					return ROM[ctrl_index];
+			}
+		}
+		return a_bus[offset];
+	}
+	else
+	{
+		if(a_bus[offset] != 0) return a_bus[offset];
+		else return ROM[(0x02fffff0/4)+offset];
+	}
+}
+
+static WRITE32_HANDLER ( sss_prot_w )
+{
+	COMBINE_DATA(&a_bus[offset]);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(space->cpu),offset,data);
+	if(offset == 3)
+	{
+		//printf("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
+		switch(a_bus[3])
+		{
+			case 0x2c5b0000: ctrl_index = (0x145ffac/4)-1; break;
+			case 0x47f10000: ctrl_index = ((0x145ffac+0xbaf0)/4)-1; break;
+			case 0xfcda0000: ctrl_index = ((0x145ffac+0x12fd0)/4)-1; break;
+			case 0xb5e60000: ctrl_index = ((0x145ffac+0x1a4c4)/4)-1; break;
+			case 0x392c0000: ctrl_index = ((0x145ffac+0x219b0)/4)-1; break;
+			case 0x77c30000: ctrl_index = ((0x145ffac+0x28ea0)/4)-1; break;
+			case 0x8a620000: ctrl_index = ((0x145ffac+0x30380)/4)-1; break;
+		}
+	}
+}
+
+void install_sss_protection(running_machine *machine)
+{
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, sss_prot_r, sss_prot_w);
+}
+
+/*************************************
+*
+* Radiant Silvergun
+*
+*************************************/
+
+static READ32_HANDLER( rsgun_prot_r )
+{
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+
+	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	{
+		if(offset == 3)
+		{
+			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(space->cpu),a_bus[3]);
+			#ifdef MAME_DEBUG
+			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(space->cpu),a_bus[3]);
+			#endif
+			switch(a_bus[3])
+			{
 				case 0x77770000: {//rsgun
 					UINT32 val =
 						((ctrl_index & 0xff)<<24) |
@@ -247,7 +264,67 @@ static READ32_HANDLER( a_bus_ctrl_r )
 					ctrl_index += 4;
 					return val;
 				}
-				//elandore
+			}
+		}
+		return a_bus[offset];
+	}
+	else
+	{
+		if(a_bus[offset] != 0) return a_bus[offset];
+		else return ROM[(0x02fffff0/4)+offset];
+	}
+}
+
+static WRITE32_HANDLER ( rsgun_prot_w )
+{
+	COMBINE_DATA(&a_bus[offset]);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(space->cpu),offset,data);
+	if(offset == 3)
+	{
+		//printf("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
+		switch(a_bus[3])
+		{
+			case 0x77770000: ctrl_index = 0; break;
+		}
+	}
+	//popmessage("%04x %04x",data,offset/4);
+}
+
+void install_rsgun_protection(running_machine *machine)
+{
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, rsgun_prot_r, rsgun_prot_w);
+}
+
+/*************************
+*
+* Elandoree
+*
+*************************/
+
+#define ELANDORE_CTRL_1_HUMAN   0xff7f0000
+#define ELANDORE_CTRL_2_HUMAN   0xffbf0000
+
+#define ELANDORE_CTRL_1_DRAGON  0xf9ff0000
+#define ELANDORE_CTRL_2_DRAGON  0xfbff0000
+#define ELANDORE_CTRL_3_DRAGON  0xfe7f0000
+#define ELANDORE_CTRL_4_DRAGON  0xfd7f0000
+#define ELANDORE_CTRL_5_DRAGON  0xfeff0000
+#define ELANDORE_CTRL_6_DRAGON  0xf9bf0000
+
+static READ32_HANDLER( elandore_prot_r )
+{
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+
+	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	{
+		if(offset == 3)
+		{
+			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(space->cpu),a_bus[3]);
+			#ifdef MAME_DEBUG
+			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(space->cpu),a_bus[3]);
+			#endif
+			switch(a_bus[3])
+			{
 				case ELANDORE_CTRL_1_HUMAN:
 				case ELANDORE_CTRL_2_HUMAN:
 				case ELANDORE_CTRL_1_DRAGON:
@@ -269,35 +346,16 @@ static READ32_HANDLER( a_bus_ctrl_r )
 	}
 }
 
-static WRITE32_HANDLER ( a_bus_ctrl_w )
+static WRITE32_HANDLER ( elandore_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(space->cpu),offset,data);
 	if(offset == 3)
 	{
+		/* a bus value 2 seed is used too here. */
 		//printf("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
 		switch(a_bus[3])
 		{
-			/*astrass,I need an original test mode screen to compare...*/
-			case 0x01230000:
-			char_offset = 0;
-			internal_counter = 0;
-			ctrl_index = ((0x400000)/4)-1; break;
-			/*ffreveng*/
-			case 0x10d70000: ctrl_index = 0; break;
-			case 0x10da0000: ctrl_index = 0; break;
-			/*sss,TRUSTED*/
-			case 0x2c5b0000: ctrl_index = (0x145ffac/4)-1; break;
-			/*sss,might be offset...*/
-			case 0x47f10000: ctrl_index = ((0x145ffac+0xbaf0)/4)-1; break;
-			case 0xfcda0000: ctrl_index = ((0x145ffac+0x12fd0)/4)-1; break;
-			case 0xb5e60000: ctrl_index = ((0x145ffac+0x1a4c4)/4)-1; break;
-			case 0x392c0000: ctrl_index = ((0x145ffac+0x219b0)/4)-1; break;
-			case 0x77c30000: ctrl_index = ((0x145ffac+0x28ea0)/4)-1; break;
-			case 0x8a620000: ctrl_index = ((0x145ffac+0x30380)/4)-1; break;
-			/*rsgun*/
-			case 0x77770000: ctrl_index = 0; break;
-			/*elandore*/
 			case ELANDORE_CTRL_1_HUMAN: // (human polygons)
 				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
@@ -327,10 +385,100 @@ static WRITE32_HANDLER ( a_bus_ctrl_w )
 	//popmessage("%04x %04x",data,offset/4);
 }
 
-void install_standard_protection(running_machine *machine)
+void install_elandore_protection(running_machine *machine)
 {
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, a_bus_ctrl_r, a_bus_ctrl_w);
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, elandore_prot_r, elandore_prot_w);
 }
+
+/*************************
+*
+* Final Fight Revenge
+*
+*************************/
+
+/*
+ffreveng protection notes
+Global:
+R2 is the vector read (where to jump to)
+R3 is the vector pointer
+
+Notes:
+-0x234 is a dummy vector to get safe in the debugger without doing
+anything and to read the registers.
+
+Right vectors:
+0x0603B158 (but not as first,will garbage the registers)
+
+Wrong vectors (at least not where I tested it):
+0x060016fc (1st)
+0x0603AFE0 (1st) (attempts to read to the sh2 internal register fffffe11)
+0x060427FC (1st) (resets the sh2)
+0x0603B1B2 (1st) (crashes the sh2)
+*/
+static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
+
+
+static READ32_HANDLER( ffreveng_prot_r )
+{
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+
+	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	{
+		if(offset == 3)
+		{
+			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(space->cpu),a_bus[3]);
+			#ifdef MAME_DEBUG
+			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(space->cpu),a_bus[3]);
+			#endif
+			switch(a_bus[3])
+			{
+				case 0x10da0000://ffreveng, boot vectors at $6080000,test mode
+					ctrl_index++;
+					if(ctrl_index > 2)
+						return 0x234;
+					else
+						return vector_prot[ctrl_index-1];
+				case 0x10d70000://ffreveng, boot vectors at $6080000,attract mode
+					ctrl_index++;
+					return ROM[ctrl_index];
+			}
+		}
+		return a_bus[offset];
+	}
+	else
+	{
+		if(a_bus[offset] != 0) return a_bus[offset];
+		else return ROM[(0x02fffff0/4)+offset];
+	}
+}
+
+static WRITE32_HANDLER ( ffreveng_prot_w )
+{
+	COMBINE_DATA(&a_bus[offset]);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(space->cpu),offset,data);
+	if(offset == 3)
+	{
+		//printf("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
+		switch(a_bus[3])
+		{
+			/*ffreveng*/
+			case 0x10d70000: ctrl_index = 0; break;
+			case 0x10da0000: ctrl_index = 0; break;
+		}
+	}
+	//popmessage("%04x %04x",data,offset/4);
+}
+
+void install_ffreveng_protection(running_machine *machine)
+{
+	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, ffreveng_prot_r, ffreveng_prot_w);
+}
+
+/************************
+*
+* Astra Super Stars
+*
+************************/
 
 static READ32_HANDLER(astrass_prot_r)
 {
@@ -366,6 +514,11 @@ void install_astrass_protection(running_machine *machine)
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4fffff0, 0x4ffffff, 0, 0, astrass_prot_r, astrass_prot_w);
 }
 
+/**************************
+*
+* Decathlete
+*
+**************************/
 
 /* Decathlete seems to be a variation on this ... not understood */
 static UINT32 decathlt_protregs[4];
