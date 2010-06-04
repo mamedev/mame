@@ -2008,6 +2008,52 @@ static MACHINE_DRIVER_START( darthvdr )
 
 MACHINE_DRIVER_END
 
+/*************************************
+ *
+ * Vortex (by Zilec AKA Zenitone-Microsec)
+ * Runs on Space Invaders CV (color)/PV (part 2) board with
+ * some color mods, and an epoxy brick for rom encryption
+ * see below for decryption function (A0, A3, A9 invert)
+ * It uses its own I/O function since A9 is inverted (and A9 mirrors A1 for I/O)
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( vortex_io_map, ADDRESS_SPACE_IO, 8 )
+	// I/O map is same as invaders but with A9 (used as A1 for I/O) inverted
+	ADDRESS_MAP_GLOBAL_MASK(0xFF)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN0")
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ_PORT("IN1")
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN2")
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_shift_result_r)
+
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("mb14241", mb14241_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("discrete", invaders_audio_1_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE("discrete", invaders_audio_2_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
+ADDRESS_MAP_END
+ 
+MACHINE_DRIVER_START( vortex )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(mw8080bw_root)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(vortex_io_map)
+	MDRV_MACHINE_START(extra_8080bw)
+	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+
+	/* video hardware */
+	// TODO: replace with modified invaders color renderer code allowing midscanline color writes
+	MDRV_VIDEO_UPDATE(invaders)
+
+	/* add shifter */
+	MDRV_MB14241_ADD("mb14241")
+
+	/* audio hardware */
+	MDRV_IMPORT_FROM(invaders_audio)
+
+MACHINE_DRIVER_END
+
 /* decrypt function for vortex */
 static DRIVER_INIT( vortex )
 {
@@ -2018,12 +2064,24 @@ static DRIVER_INIT( vortex )
 	for (x = 0; x < length; x++)
 	{
 		UINT32 addr = x;
+		/*
+		A15	A14	A13		A0	A3	A9
+		0	0	0		I	I	I
+		0	0	1		I	I	I
+		0	1	0		N	N	N
+		0	1	1		N	I	I
+		1	0	0		N	I	I
+		1	0	1		N	I	I
+		1	1	0		N	I	I
+		1	1	1		N	I	I
+		*/
 		switch (x&0xE000) // inputs are A13 A14 A15
 		{
 			case 0x0000: case 0x2000: // A0 A3 A9
 				addr ^= 0x0209;
 				break;
-			case 0x4000: // none
+			case 0x4000: // none, but doesn't decode right with none
+				addr ^= 0x0209; // hack: this doesn't match schematic but gets code running. Why does this work? Is there something I'm not undertstanding about how the memory_region maps? or was the zilec/zinitone-microsec epoxy brick simply a bad design which is always stuck on the 0x0000 encryption no matter what?
 				break;
 			case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000: // A3 and A9
 				addr ^= 0x0208;
@@ -2988,7 +3046,7 @@ GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Taito (Midway license)", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1980, vortex,   0,        invaders, invadpt2, vortex, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080 */
+GAME( 1980, vortex,   0,        vortex,   invadpt2, vortex, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080/IO */
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 GAME( 1979, schasercv,schaser,  schasercv,schasercv,0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )

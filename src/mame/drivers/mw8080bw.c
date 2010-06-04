@@ -2692,7 +2692,7 @@ static INPUT_PORTS_START( invaders )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) /* in the software, this is TILI, but not connected on the Midway PCB */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) /* in the software, this is TILI, but not connected on the Midway PCB. Is this correct? */
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "1500" )
