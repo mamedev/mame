@@ -104,7 +104,6 @@ struct _tms5110_state
 	UINT8 PDC;
 	UINT8 CTL_pins;
 	UINT8 speaking_now;
-	UINT8 speak_delay_frames;
 	UINT8 talk_status;
 	UINT8 state;
 
@@ -294,7 +293,6 @@ static void register_for_save_states(tms5110_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->PDC);
 	state_save_register_device_item(tms->device, 0, tms->CTL_pins);
 	state_save_register_device_item(tms->device, 0, tms->speaking_now);
-	state_save_register_device_item(tms->device, 0, tms->speak_delay_frames);
 	state_save_register_device_item(tms->device, 0, tms->talk_status);
 	state_save_register_device_item(tms->device, 0, tms->state);
 
@@ -1111,7 +1109,7 @@ static DEVICE_RESET( tms5110 )
 	tms->fifo_head = tms->fifo_tail = tms->fifo_count = 0;
 
 	/* initialize the chip state */
-	tms->speaking_now = tms->speak_delay_frames = tms->talk_status = 0;
+	tms->speaking_now = tms->talk_status = 0;
 	tms->CTL_pins = 0;
 		tms->RNG = 0x1fff;
 
