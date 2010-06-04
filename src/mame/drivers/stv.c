@@ -249,6 +249,8 @@ attotime minit_boost_timeslice, sinit_boost_timeslice;
 
 //static int scanline;
 
+static emu_timer *stv_rtc_timer;
+
 
 /*A-Bus IRQ checks,where they could be located these?*/
 #define ABUSIRQ(_irq_,_vector_) \
@@ -625,13 +627,13 @@ static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Status Acquire\n");
 				smpc_ram[0x5f]=0x10;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
-				smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-				smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-				smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-				smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-				smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-				smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-				smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+				//smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
+				//smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
+				//smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+				//smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+				//smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+				//smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+				//smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
 
 				smpc_ram[0x31]=0x00;  //?
 
@@ -2359,13 +2361,6 @@ DRIVER_INIT ( stv )
 	memory_install_write32_handler(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
 	memory_install_write32_handler(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
 
-	smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-    smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-    smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-    smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-    smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-    smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-    smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
     smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  smpc_ram[0x33] = input_port_read(machine, "FAKE");
 	smpc_ram[0x5f] = 0x10;
@@ -2521,8 +2516,80 @@ static const scsp_interface scsp_config =
 	scsp_irq
 };
 
+static TIMER_CALLBACK(stv_rtc_increment)
+{
+	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	static int year_num, year_count;
+
+	/*
+		smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
+	    smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
+	    smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+	    smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+	    smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+	    smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+   		smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+	*/
+
+	smpc_ram[0x2f]++;
+
+	/* seconds from 9 -> 10*/
+	if((smpc_ram[0x2f] & 0x0f) >= 0x0a) 			{ smpc_ram[0x2f]+=0x10; smpc_ram[0x2f]&=0xf0; }
+	/* seconds from 59 -> 0 */
+	if((smpc_ram[0x2f] & 0xf0) >= 0x60) 			{ smpc_ram[0x2d]++;     smpc_ram[0x2f] = 0; }
+	/* minutes from 9 -> 10 */
+	if((smpc_ram[0x2d] & 0x0f) >= 0x0a) 			{ smpc_ram[0x2d]+=0x10; smpc_ram[0x2d]&=0xf0; }
+	/* minutes from 59 -> 0 */
+	if((smpc_ram[0x2d] & 0xf0) >= 0x60) 			{ smpc_ram[0x2b]++;     smpc_ram[0x2d] = 0; }
+	/* hours from 9 -> 10 */
+	if((smpc_ram[0x2b] & 0x0f) >= 0x0a) 			{ smpc_ram[0x2b]+=0x10; smpc_ram[0x2b]&=0xf0; }
+	/* hours from 23 -> 0 */
+	if((smpc_ram[0x2b] & 0xff) >= 0x24)				{ smpc_ram[0x29]++; smpc_ram[0x27]+=0x10; smpc_ram[0x2b] = 0; }
+	/* week day name sunday -> monday */
+	if((smpc_ram[0x27] & 0xf0) >= 0x70)				{ smpc_ram[0x27]&=0x0f; }
+	/* day number 9 -> 10 */
+	if((smpc_ram[0x29] & 0x0f) >= 0x0a)				{ smpc_ram[0x29]+=0x10; smpc_ram[0x29]&=0xf0; }
+
+	// year BCD to dec conversion (for the leap year stuff)
+	{
+		year_num = (smpc_ram[0x25] & 0xf);
+
+		for(year_count = 0; year_count < (smpc_ram[0x25] & 0xf0); year_count += 0x10)
+			year_num += 0xa;
+
+		year_num += (smpc_ram[0x23] & 0xf)*0x64;
+
+		for(year_count = 0; year_count < (smpc_ram[0x23] & 0xf0); year_count += 0x10)
+			year_num += 0x3e8;
+	}
+
+	/* month +1 check */
+	/* the RTC have a range of 1980 - 2100, so we don't actually need to support the leap year special conditions */
+	if(((year_num % 4) == 0) && (smpc_ram[0x27] & 0xf) == 2)
+	{
+		if((smpc_ram[0x29] & 0xff) >= dpm[(smpc_ram[0x27] & 0xf)-1]+1+1)
+			{ smpc_ram[0x27]++; smpc_ram[0x29] = 0x01; }
+	}
+	else if((smpc_ram[0x29] & 0xff) >= dpm[(smpc_ram[0x27] & 0xf)-1]+1){ smpc_ram[0x27]++; smpc_ram[0x29] = 0x01; }
+	/* year +1 check */
+	if((smpc_ram[0x27] & 0x0f) > 12)				{ smpc_ram[0x25]++;  smpc_ram[0x27] = (smpc_ram[0x27] & 0xf0) | 0x01; }
+	/* year from 9 -> 10 */
+	if((smpc_ram[0x25] & 0x0f) >= 0x0a)				{ smpc_ram[0x25]+=0x10; smpc_ram[0x25]&=0xf0; }
+	/* year from 99 -> 100 */
+	if((smpc_ram[0x25] & 0xf0) >= 0xa0)				{ smpc_ram[0x23]++; smpc_ram[0x25] = 0; }
+
+	// probably not SO precise, here just for reference ...
+	/* year from 999 -> 1000 */
+	//if((smpc_ram[0x23] & 0x0f) >= 0x0a)				{ smpc_ram[0x23]+=0x10; smpc_ram[0x23]&=0xf0; }
+	/* year from 9999 -> 0 */
+	//if((smpc_ram[0x23] & 0xf0) >= 0xa0)				{ smpc_ram[0x23] = 0; } //roll over
+}
+
 static MACHINE_START( stv )
 {
+	mame_system_time systime;
+	mame_get_base_datetime(machine, &systime);
+
 	scsp_set_ram_base(devtag_get_device(machine, "scsp"), sound_ram);
 
 	// save states
@@ -2550,6 +2617,16 @@ static MACHINE_START( stv )
 	stv_register_protection_savestates(machine); // machine/stvprot.c
 
 	add_exit_callback(machine, stvcd_exit);
+
+	smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
+    smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
+    smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+    smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+    smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+    smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+    smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+
+	stv_rtc_timer = timer_alloc(machine, stv_rtc_increment, 0);
 }
 
 /*
@@ -2763,6 +2840,8 @@ static MACHINE_RESET( stv )
 	vblank_out_timer = devtag_get_device(machine, "vbout_timer");
 	timer_device_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	timer_device_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 224, 352), 0);
+
+	timer_adjust_periodic(stv_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 }
 
 
