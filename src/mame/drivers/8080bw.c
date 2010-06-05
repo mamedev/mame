@@ -259,6 +259,7 @@ static ADDRESS_MAP_START( invadpt2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
+
 static INPUT_PORTS_START( invadpt2 )
 	PORT_INCLUDE( sicv )
 
@@ -2033,6 +2034,40 @@ static ADDRESS_MAP_START( vortex_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
  
+
+static INPUT_PORTS_START( vortex )
+	PORT_INCLUDE( sicv )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")	
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
+INPUT_PORTS_END
+
 MACHINE_DRIVER_START( vortex )
 
 	/* basic machine hardware */
@@ -3046,7 +3081,7 @@ GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Taito (Midway license)", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1980, vortex,   0,        vortex,   invadpt2, vortex, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080/IO */
+GAME( 1980, vortex,   0,        vortex,   vortex, vortex, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080/IO */
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 GAME( 1979, schasercv,schaser,  schasercv,schasercv,0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
