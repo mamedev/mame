@@ -23,6 +23,10 @@
 #include "emu.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
+#include "machine/8237dma.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/8042kbdc.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
@@ -136,3 +140,197 @@ void pc_keyboard(void)
 		}
 	}
 }
+
+/******************
+DMA8237 Controller
+******************/
+
+static int dma_channel;
+static UINT8 dma_offset[2][4];
+static UINT8 at_pages[0x10];
+
+static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
+{
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	i8237_hlda_w( device, state );
+}
+
+
+static READ8_HANDLER( pc_dma_read_byte )
+{
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+		& 0xFF0000;
+
+	return memory_read_byte(space, page_offset + offset);
+}
+
+
+static WRITE8_HANDLER( pc_dma_write_byte )
+{
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+		& 0xFF0000;
+
+	memory_write_byte(space, page_offset + offset, data);
+}
+
+static READ8_HANDLER(dma_page_select_r)
+{
+	UINT8 data = at_pages[offset % 0x10];
+
+	switch(offset % 8)
+	{
+	case 1:
+		data = dma_offset[(offset / 8) & 1][2];
+		break;
+	case 2:
+		data = dma_offset[(offset / 8) & 1][3];
+		break;
+	case 3:
+		data = dma_offset[(offset / 8) & 1][1];
+		break;
+	case 7:
+		data = dma_offset[(offset / 8) & 1][0];
+		break;
+	}
+	return data;
+}
+
+
+static WRITE8_HANDLER(dma_page_select_w)
+{
+	at_pages[offset % 0x10] = data;
+
+	switch(offset % 8)
+	{
+	case 1:
+		dma_offset[(offset / 8) & 1][2] = data;
+		break;
+	case 2:
+		dma_offset[(offset / 8) & 1][3] = data;
+		break;
+	case 3:
+		dma_offset[(offset / 8) & 1][1] = data;
+		break;
+	case 7:
+		dma_offset[(offset / 8) & 1][0] = data;
+		break;
+	}
+}
+
+static void set_dma_channel(running_device *device, int channel, int state)
+{
+	if (!state) dma_channel = channel;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+
+static I8237_INTERFACE( dma8237_1_config )
+{
+	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+};
+
+static I8237_INTERFACE( dma8237_2_config )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+};
+
+
+/******************
+8259 IRQ controller
+******************/
+
+static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+}
+
+static const struct pic8259_interface pic8259_1_config =
+{
+	DEVCB_LINE(pic8259_1_set_int_line)
+};
+
+static const struct pic8259_interface pic8259_2_config =
+{
+	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w)
+};
+
+IRQ_CALLBACK(pcat_irq_callback)
+{
+	int r = 0;
+	r = pic8259_acknowledge(device->machine->device("pic8259_2"));
+	if (r==0)
+	{
+		r = pic8259_acknowledge(device->machine->device("pic8259_1"));
+	}
+	return r;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
+{
+	if ( device->machine->device("pic8259_1") )
+	{
+		pic8259_ir0_w(device->machine->device("pic8259_1"), state);
+	}
+}
+
+
+static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out2_changed )
+{
+	//at_speaker_set_input( state ? 1 : 0 );
+}
+
+
+static const struct pit8253_config at_pit8254_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			DEVCB_NULL,
+			DEVCB_LINE(at_pit8254_out0_changed)
+		}, {
+			4772720/4,				/* dram refresh */
+			DEVCB_NULL,
+			DEVCB_NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			DEVCB_NULL,
+			DEVCB_LINE(at_pit8254_out2_changed)
+		}
+	}
+};
+
+ADDRESS_MAP_START( pcat32_io_common, ADDRESS_SPACE_IO, 32 )
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
+	AM_RANGE(0x0070, 0x007f) AM_RAM//READWRITE(mc146818_port32le_r,     mc146818_port32le_w)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_r, i8237_w, 0xffff)
+ADDRESS_MAP_END
+
+MACHINE_DRIVER_START(pcat_common)
+	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
+	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
+	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
+MACHINE_DRIVER_END

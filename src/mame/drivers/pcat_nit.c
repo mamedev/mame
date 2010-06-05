@@ -83,30 +83,13 @@ Smitdogg
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "memconv.h"
-#include "devconv.h"
-#include "machine/8237dma.h"
 #include "machine/pic8259.h"
-#include "machine/pit8253.h"
 #include "machine/mc146818.h"
 #include "machine/pcshare.h"
-#include "machine/pci.h"
-#include "machine/8042kbdc.h"
-#include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "video/pc_vga.h"
 #include "video/pc_video.h"
-
-static struct {
-	running_device	*pit8253;
-	running_device	*pic8259_1;
-	running_device	*pic8259_2;
-	running_device	*dma8237_1;
-	running_device	*dma8237_2;
-	running_device  *com0;
-} streetg2_devices;
 
 /*************************************
  *
@@ -116,7 +99,7 @@ static struct {
 
 static void pcat_nit_microtouch_tx_callback(running_machine *machine, UINT8 data)
 {
-	ins8250_receive(streetg2_devices.com0, data);
+	ins8250_receive(machine->device("ns16450_0"), data);
 };
 
 static INS8250_TRANSMIT( pcat_nit_com_transmit )
@@ -127,7 +110,7 @@ static INS8250_TRANSMIT( pcat_nit_com_transmit )
 
 static INS8250_INTERRUPT( at_com_interrupt_1 )
 {
-	pic8259_ir4_w(streetg2_devices.pic8259_1, state);
+	pic8259_ir4_w(device->machine->device("pic8259_1"), state);
 }
 
 static const ins8250_interface pcat_nit_com0_interface =
@@ -139,184 +122,13 @@ static const ins8250_interface pcat_nit_com0_interface =
 	NULL
 };
 
-static UINT32 *main_ram;
+/*************************************
+ *
+ *  ROM banking
+ *
+ *************************************/
 
-/******************
-DMA8237 Controller
-******************/
-
-static int dma_channel;
-static UINT8 dma_offset[2][4];
-static UINT8 at_pages[0x10];
-
-static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
-{
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	i8237_hlda_w( device, state );
-}
-
-
-static READ8_HANDLER( pc_dma_read_byte )
-{
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
-		& 0xFF0000;
-
-	return memory_read_byte(space, page_offset + offset);
-}
-
-
-static WRITE8_HANDLER( pc_dma_write_byte )
-{
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
-		& 0xFF0000;
-
-	memory_write_byte(space, page_offset + offset, data);
-}
-
-static READ8_HANDLER(dma_page_select_r)
-{
-	UINT8 data = at_pages[offset % 0x10];
-
-	switch(offset % 8)
-	{
-	case 1:
-		data = dma_offset[(offset / 8) & 1][2];
-		break;
-	case 2:
-		data = dma_offset[(offset / 8) & 1][3];
-		break;
-	case 3:
-		data = dma_offset[(offset / 8) & 1][1];
-		break;
-	case 7:
-		data = dma_offset[(offset / 8) & 1][0];
-		break;
-	}
-	return data;
-}
-
-
-static WRITE8_HANDLER(dma_page_select_w)
-{
-	at_pages[offset % 0x10] = data;
-
-	switch(offset % 8)
-	{
-	case 1:
-		dma_offset[(offset / 8) & 1][2] = data;
-		break;
-	case 2:
-		dma_offset[(offset / 8) & 1][3] = data;
-		break;
-	case 3:
-		dma_offset[(offset / 8) & 1][1] = data;
-		break;
-	case 7:
-		dma_offset[(offset / 8) & 1][0] = data;
-		break;
-	}
-}
-
-static void set_dma_channel(running_device *device, int channel, int state)
-{
-	if (!state) dma_channel = channel;
-}
-
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
-
-static I8237_INTERFACE( dma8237_1_config )
-{
-	DEVCB_LINE(pc_dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
-};
-
-static I8237_INTERFACE( dma8237_2_config )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
-
-/******************
-8259 IRQ controller
-******************/
-
-static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-static const struct pic8259_interface pic8259_1_config =
-{
-	DEVCB_LINE(pic8259_1_set_int_line)
-};
-
-static const struct pic8259_interface pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w)
-};
-
-static IRQ_CALLBACK(irq_callback)
-{
-	int r = 0;
-	r = pic8259_acknowledge(streetg2_devices.pic8259_2);
-	if (r==0)
-	{
-		r = pic8259_acknowledge(streetg2_devices.pic8259_1);
-	}
-	return r;
-}
-
-static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
-{
-	if ( streetg2_devices.pic8259_1 )
-	{
-		pic8259_ir0_w(streetg2_devices.pic8259_1, state);
-	}
-}
-
-
-static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out2_changed )
-{
-	//at_speaker_set_input( state ? 1 : 0 );
-}
-
-
-static const struct pit8253_config at_pit8254_config =
-{
-	{
-		{
-			4772720/4,				/* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_LINE(at_pit8254_out0_changed)
-		}, {
-			4772720/4,				/* dram refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_LINE(at_pit8254_out2_changed)
-		}
-	}
-};
-
-static WRITE8_HANDLER(nit_rombank_w)
+static WRITE8_HANDLER(pcat_nit_rombank_w)
 {
 	logerror( "rom bank #%02x at PC=%08X\n", data, cpu_get_pc(space->cpu) );
 	if ( data & 0x40 )
@@ -353,13 +165,13 @@ static ADDRESS_MAP_START( pcat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0) 
-	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(nit_rombank_w, 0xff)
+	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
 	AM_RANGE(0x000d8000, 0x000dffff) AM_ROMBANK("rombank")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0 )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
-static READ8_HANDLER(pc_nit_io_r)
+static READ8_HANDLER(pcat_nit_io_r)
 {
 	switch(offset)
 	{
@@ -374,16 +186,9 @@ static READ8_HANDLER(pc_nit_io_r)
 	}
 }
 
-static ADDRESS_MAP_START( pcat_io, ADDRESS_SPACE_IO, 32 )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
-	AM_RANGE(0x0070, 0x007f) AM_RAM//READWRITE(mc146818_port32le_r,     mc146818_port32le_w)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_r, i8237_w, 0xffff)
-	AM_RANGE(0x0278, 0x027f) AM_READ8(pc_nit_io_r, 0xffffffff) AM_WRITENOP
+static ADDRESS_MAP_START( pcat_nit_io, ADDRESS_SPACE_IO, 32 )
+	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -400,7 +205,7 @@ INPUT_PORTS_END
 
 static void streetg2_set_keyb_int(running_machine *machine, int state)
 {
-	pic8259_ir1_w(streetg2_devices.pic8259_1, state);
+	pic8259_ir1_w(machine->device("pic8259_1"), state);
 }
 
 static const struct pc_vga_interface vga_interface =
@@ -414,13 +219,7 @@ static const struct pc_vga_interface vga_interface =
 
 static MACHINE_START( streetg2 )
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
-	streetg2_devices.pit8253 = devtag_get_device( machine, "pit8254" );
-	streetg2_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
-	streetg2_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
-	streetg2_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
-	streetg2_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
-	streetg2_devices.com0 = devtag_get_device( machine, "ns16450_0" );
+	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pcat_irq_callback);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, streetg2_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);
@@ -435,7 +234,7 @@ static MACHINE_DRIVER_START( pcat_nit )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
 	MDRV_CPU_PROGRAM_MAP(pcat_map)
-	MDRV_CPU_IO_MAP(pcat_io)
+	MDRV_CPU_IO_MAP(pcat_nit_io)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM( pcvideo_vga )
@@ -448,11 +247,7 @@ static MACHINE_DRIVER_START( pcat_nit )
 	MDRV_NVRAM_HANDLER( mc146818 )
 
 //  MDRV_IMPORT_FROM( at_kbdc8042 )
-	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
-	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
-	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
-	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
-	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
+	MDRV_IMPORT_FROM( pcat_common )
 	MDRV_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface )
 
 MACHINE_DRIVER_END
