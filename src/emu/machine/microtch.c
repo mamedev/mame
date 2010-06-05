@@ -5,12 +5,14 @@
 
     Notes/ToDo:
     - calibration mode (command CX)
-    - only tablet format is supported for returning touch screen state
+    - only tablet format and decimal format are supported for returning touch screen state
 
 */
 
 #include "emu.h"
 #include "microtch.h"
+
+#define LOG 0
 
 static struct
 {
@@ -22,6 +24,7 @@ static struct
 	UINT8		tx_buffer_ptr;
 	int			reset_done;
 	int			format_tablet;
+	int			format_decimal;
 	int			mode_inactive;
 	int			mode_stream;
 	int			last_touch_state;
@@ -60,6 +63,33 @@ static void microtouch_send_format_table_packet(UINT8 flag, int x, int y)
 	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (y >> 7) & 0x7f;
 };
 
+static void microtouch_send_format_decimal_packet(int x, int y)
+{
+	int decx, decy;
+
+	decx = x / 16;
+	if ( decx > 999 )
+		decx = 999;
+	decy = y / 16;
+	if ( decy > 999 )
+		decy = 999;
+
+	// header byte
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x01;
+	// x coordinate in decimal mode
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (decx / 100) + '0';
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = ((decx / 10) % 10) + '0';
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (decx % 10) + '0';
+	// comma (separator)
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = ',';
+	// y coordinate in decimal mode
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (decy / 100) + '0';
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = ((decy / 10) % 10) + '0';
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = (decy % 10) + '0';
+	// terminator
+	microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x0d;
+}
+
 static TIMER_CALLBACK(microtouch_timer_callback)
 {
 	if ( microtouch.tx_buffer_ptr < microtouch.tx_buffer_num )
@@ -73,7 +103,7 @@ static TIMER_CALLBACK(microtouch_timer_callback)
 	}
 
 	if ( (microtouch.reset_done == 0) ||
-		 (microtouch.format_tablet == 0) ||
+		 ((microtouch.format_tablet == 0) && (microtouch.format_decimal == 0)) ||
 		 (microtouch.mode_inactive == 1) ||
 		 (microtouch.mode_stream == 0) )
 	{
@@ -91,7 +121,14 @@ static TIMER_CALLBACK(microtouch_timer_callback)
 		{
 			ty = 0x4000 - ty;
 
-			microtouch_send_format_table_packet(0xc8, tx, ty);
+			if ( microtouch.format_tablet )
+			{
+				microtouch_send_format_table_packet(0xc8, tx, ty);
+			}
+			else if ( microtouch.format_decimal )
+			{
+				microtouch_send_format_decimal_packet(tx, ty);
+			}
 			microtouch.last_touch_state = 1;
 			microtouch.last_x = tx;
 			microtouch.last_y = ty;
@@ -102,7 +139,14 @@ static TIMER_CALLBACK(microtouch_timer_callback)
 		if ( microtouch.last_touch_state == 1 )
 		{
 			microtouch.last_touch_state = 0;
-			microtouch_send_format_table_packet(0x88, microtouch.last_x, microtouch.last_y);
+			if ( microtouch.format_tablet )
+			{
+				microtouch_send_format_table_packet(0x88, microtouch.last_x, microtouch.last_y);
+			}
+			else if ( microtouch.format_decimal )
+			{
+				microtouch_send_format_decimal_packet(microtouch.last_x, microtouch.last_y);
+			}
 		}
 	}
 };
@@ -130,6 +174,7 @@ void microtouch_init(running_machine *machine, microtouch_tx_func tx_cb, microto
 	state_save_register_item_array(machine, "microtouch", NULL, 0, microtouch.tx_buffer);
 	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.tx_buffer_num);
 	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.tx_buffer_ptr);
+	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.format_decimal);
 
 };
 
@@ -146,6 +191,13 @@ void microtouch_rx(int count, UINT8* data)
 
 	if (microtouch.rx_buffer_ptr > 0 && (microtouch.rx_buffer[microtouch.rx_buffer_ptr-1] == 0x0d))
 	{
+		if (LOG)
+		{
+			char command[16];
+			memset(command, 0, sizeof(command));
+			strncpy( command, (const char*)microtouch.rx_buffer + 1, microtouch.rx_buffer_ptr - 2 );
+			logerror("Microtouch: received command %s\n", command);
+		}
 		// check command
 		if ( microtouch_check_command( "MS", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
 		{
@@ -164,6 +216,10 @@ void microtouch_rx(int count, UINT8* data)
 		else if ( microtouch_check_command( "FT", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
 		{
 			microtouch.format_tablet = 1;
+		}
+		else if ( microtouch_check_command( "FD", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		{
+			microtouch.format_decimal = 1;
 		}
 		// send response
 		microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x01;

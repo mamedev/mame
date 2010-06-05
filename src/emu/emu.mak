@@ -143,6 +143,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/i2cmemdev.o \
 	$(EMUMACHINE)/idectrl.o \
 	$(EMUMACHINE)/ins8154.o	\
+	$(EMUMACHINE)/ins8250.o \
 	$(EMUMACHINE)/intelfsh.o \
 	$(EMUMACHINE)/k033906.o \
 	$(EMUMACHINE)/k056230.o \
@@ -190,6 +191,8 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/generic.o \
 	$(EMUVIDEO)/hd63484.o \
 	$(EMUVIDEO)/mc6845.o \
+	$(EMUVIDEO)/pc_vga.o \
+	$(EMUVIDEO)/pc_video.o \
 	$(EMUVIDEO)/poly.o \
 	$(EMUVIDEO)/resnet.o \
 	$(EMUVIDEO)/rgbutil.o \
