@@ -259,6 +259,9 @@ public:
 	/* debugger-related information */
 	UINT32					debug_flags;		/* the current debug flags */
 
+	/* UI-related */
+	int						ui_active;			/* ui active or not (useful for games / systems with keyboard inputs) */
+	
 	/* generic pointers */
 	generic_pointers		generic;			/* generic pointers */
 

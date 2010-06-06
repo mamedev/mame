@@ -122,7 +122,6 @@ static rgb_t messagebox_backcolor;
 static slider_state *slider_list;
 static slider_state *slider_current;
 
-static int ui_active;
 /* natural keyboard info */
 static int ui_use_natural_keyboard;
 static UINT8 non_char_keys_down[(ARRAY_LENGTH(non_char_keys) + 7) / 8];
@@ -255,7 +254,6 @@ int ui_init(running_machine *machine)
 	/* reset globals */
 	single_step = FALSE;
 	ui_set_handler(handler_messagebox, 0);
-	ui_active = 0;
 	/* retrieve options */
 	ui_use_natural_keyboard = options_get_bool(mame_options(), OPTION_NATURAL_KEYBOARD);
 
@@ -1299,7 +1297,7 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 	}
 
 	/* determine if we should disable the rest of the UI */
-	int ui_disabled = (input_machine_has_keyboard(machine) && !ui_active);
+	int ui_disabled = (input_machine_has_keyboard(machine) && !machine->ui_active);
 
 	/* is ScrLk UI toggling applicable here? */
 	if (input_machine_has_keyboard(machine))
@@ -1308,10 +1306,10 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
 		{
 			/* toggle the UI */
-			ui_active = !ui_active;
+			machine->ui_active = !machine->ui_active;
 
 			/* display a popup indicating the new status */
-			if (ui_active)
+			if (machine->ui_active)
 			{
 				ui_popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
 					"Keyboard Emulation Status",

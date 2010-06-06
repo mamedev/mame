@@ -1269,6 +1269,7 @@ running_machine::running_machine(const game_driver *driver)
 	  priority_bitmap(NULL),
 	  sample_rate(0),
 	  debug_flags(0),
+      ui_active(0),
 	  mame_data(NULL),
 	  cpuexec_data(NULL),
 	  timer_data(NULL),
