@@ -31,13 +31,16 @@ static UINT8* vram = NULL;
 static UINT8* vrom[2];
 static UINT8* nt_ram[2];
 static UINT8* nt_page[2][4]; // because mirroring is used.
+static UINT32 vrom_size[2];
+static int vrom_banks;
 
 /* Prototypes for mapping board components to PPU bus */
 static WRITE8_HANDLER( vsnes_nt0_w );
 static WRITE8_HANDLER( vsnes_nt1_w );
 static READ8_HANDLER( vsnes_nt0_r );
 static READ8_HANDLER( vsnes_nt1_r );
-static void v_set_videorom_bank( running_machine* machine, int start, int count, int bank, int bank_size_in_kb );
+
+static const char * const chr_banknames[] = { "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8", "bank9" };
 
 /*************************************
  *
@@ -179,9 +182,27 @@ MACHINE_RESET( vsdual )
  *
  *************************************/
 
+static void v_set_videorom_bank( running_machine* machine, int start, int count, int vrom_start_bank )
+{
+	int i;
+
+	assert(start + count < 8);
+
+	vrom_start_bank &= (vrom_banks - 1);
+	assert(vrom_start_bank + count < vrom_banks);
+
+	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
+	/* count determines the size of the area mapped */
+	for (i = 0; i < count; i++)
+	{
+		memory_set_bank(machine, chr_banknames[i + start], vrom_start_bank + i);
+	}
+}
+
 MACHINE_START( vsnes )
 {
 	const address_space *ppu1_space = cpu_get_address_space(devtag_get_device(machine, "ppu1"), ADDRESS_SPACE_PROGRAM);
+	int i;
 
 	/* establish nametable ram */
 	nt_ram[0] = auto_alloc_array(machine, UINT8, 0x1000);
@@ -194,21 +215,20 @@ MACHINE_START( vsnes )
 	memory_install_readwrite8_handler(ppu1_space, 0x2000, 0x3eff, 0, 0, vsnes_nt0_r, vsnes_nt0_w);
 
 	vrom[0] = memory_region(machine, "gfx1");
+	vrom_size[0] = memory_region_length(machine, "gfx1");
+	vrom_banks = vrom_size[0] / 0x400;
 
 	/* establish chr banks */
 	/* bank 1 is used already! */
 	/* DRIVER_INIT is called first - means we can handle this different for VRAM games! */
 	if (NULL != vrom[0])
 	{
-		memory_install_read_bank(ppu1_space, 0x0000, 0x03ff, 0, 0, "bank2");
-		memory_install_read_bank(ppu1_space, 0x0400, 0x07ff, 0, 0, "bank3");
-		memory_install_read_bank(ppu1_space, 0x0800, 0x0bff, 0, 0, "bank4");
-		memory_install_read_bank(ppu1_space, 0x0c00, 0x0fff, 0, 0, "bank5");
-		memory_install_read_bank(ppu1_space, 0x1000, 0x13ff, 0, 0, "bank6");
-		memory_install_read_bank(ppu1_space, 0x1400, 0x17ff, 0, 0, "bank7");
-		memory_install_read_bank(ppu1_space, 0x1800, 0x1bff, 0, 0, "bank8");
-		memory_install_read_bank(ppu1_space, 0x1c00, 0x1fff, 0, 0, "bank9");
-		v_set_videorom_bank(machine, 0, 8, 0, 8);
+		for (i = 0; i < 8; i++)
+		{
+			memory_install_read_bank(ppu1_space, 0x0400 * i, 0x0400 * i + 0x03ff, 0, 0, chr_banknames[i]);
+			memory_configure_bank(machine, chr_banknames[i], 0, vrom_banks, vrom[0], 0x400);
+		}
+		v_set_videorom_bank(machine, 0, 8, 0);
 	}
 	else
 	{
@@ -216,16 +236,12 @@ MACHINE_START( vsnes )
 	}
 }
 
-/*************************************
- *
- *  Init machine
- *
- *************************************/
-
 MACHINE_START( vsdual )
 {
 	vrom[0] = memory_region(machine, "gfx1");
 	vrom[1] = memory_region(machine, "gfx2");
+	vrom_size[0] = memory_region_length(machine, "gfx1");
+	vrom_size[1] = memory_region_length(machine, "gfx2");
 
 	/* establish nametable ram */
 	nt_ram[0] = auto_alloc_array(machine, UINT8, 0x1000);
@@ -246,8 +262,10 @@ MACHINE_START( vsdual )
 	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank2");
 	// read only!
 	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank3");
-	memory_set_bankptr(machine, "bank2", vrom[0]);
-	memory_set_bankptr(machine, "bank3", vrom[1]);
+	memory_configure_bank(machine, "bank2", 0, vrom_size[0] / 0x2000, vrom[0], 0x2000);
+	memory_configure_bank(machine, "bank3", 0, vrom_size[1] / 0x2000, vrom[1], 0x2000);
+	memory_set_bank(machine, "bank2", 0);
+	memory_set_bank(machine, "bank3", 0);
 }
 
 /*************************************
@@ -313,20 +331,6 @@ static void v_set_mirroring( int ppu, int mirroring )
 
 }
 
-static const char * const banknames[] = { "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8", "bank9" };
-
-static void v_set_videorom_bank( running_machine* machine, int start, int count, int bank, int bank_size_in_kb )
-{
-	int i;
-	int offset = bank * (bank_size_in_kb * 0x400);
-	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
-	/* count determines the size of the area mapped */
-	for (i = 0; i < count; i++, offset += 0x400)
-	{
-		memory_set_bankptr(machine, banknames[i + start], vrom[0] + offset);
-	}
-}
-
 /**********************************************************************************
  *
  *  Game and Board-specific initialization
@@ -339,7 +343,7 @@ static void v_set_videorom_bank( running_machine* machine, int start, int count,
 static WRITE8_HANDLER( vsnormal_vrom_banking )
 {
 	/* switch vrom */
-	v_set_videorom_bank(space->machine, 0, 8, (data & 4) ? 1 : 0, 8);
+	v_set_videorom_bank(space->machine, 0, 8, (data & 4) ? 8 : 0);
 
 	/* bit 1 ( data & 2 ) enables writes to extra ram, we ignore it */
 
@@ -364,7 +368,7 @@ static WRITE8_HANDLER( gun_in0_w )
 	if (vsnes_do_vrom_bank)
 	{
 		/* switch vrom */
-		v_set_videorom_bank(space->machine, 0, 8, (data & 4) ? 1 : 0, 8);
+		v_set_videorom_bank(space->machine, 0, 8, (data & 4) ? 8 : 0);
 	}
 
 	/* here we do things a little different */
@@ -431,11 +435,11 @@ static WRITE8_HANDLER( vskonami_rom_banking )
 		break;
 
 		case 6: /* vrom bank 0 */
-			v_set_videorom_bank(space->machine, 0, 4, data, 4);
+			v_set_videorom_bank(space->machine, 0, 4, data * 4);
 		break;
 
 		case 7: /* vrom bank 1 */
-			v_set_videorom_bank(space->machine, 4, 4, data, 4);
+			v_set_videorom_bank(space->machine, 4, 4, data * 4);
 		break;
 	}
 }
@@ -559,12 +563,12 @@ static WRITE8_HANDLER( drmario_rom_banking )
 
 			case 1:	/* video rom banking - bank 0 - 4k or 8k */
 				if (!vram)
-					v_set_videorom_bank(space->machine, 0, (vrom4k) ? 4 : 8, drmario_shiftreg, (vrom4k) ? 4 : 8);
+					v_set_videorom_bank(space->machine, 0, (vrom4k) ? 4 : 8, drmario_shiftreg * 4);
 			break;
 
 			case 2: /* video rom banking - bank 1 - 4k only */
 				if (vrom4k && !vram)
-					v_set_videorom_bank(space->machine, 4, 4, drmario_shiftreg, 4);
+					v_set_videorom_bank(space->machine, 4, 4, drmario_shiftreg * 4);
 			break;
 
 			case 3:	/* program banking */
@@ -661,14 +665,14 @@ static void mapper4_set_chr( running_machine *machine )
 {
 	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
 
-	v_set_videorom_bank(machine, chr_page ^ 0, 1, MMC3_chr_bank[0] & ~0x01, 1);
-	v_set_videorom_bank(machine, chr_page ^ 1, 1, MMC3_chr_bank[0] |  0x01, 1);
-	v_set_videorom_bank(machine, chr_page ^ 2, 1, MMC3_chr_bank[1] & ~0x01, 1);
-	v_set_videorom_bank(machine, chr_page ^ 3, 1, MMC3_chr_bank[1] |  0x01, 1);
-	v_set_videorom_bank(machine, chr_page ^ 4, 1, MMC3_chr_bank[2], 1);
-	v_set_videorom_bank(machine, chr_page ^ 5, 1, MMC3_chr_bank[3], 1);
-	v_set_videorom_bank(machine, chr_page ^ 6, 1, MMC3_chr_bank[4], 1);
-	v_set_videorom_bank(machine, chr_page ^ 7, 1, MMC3_chr_bank[5], 1);
+	v_set_videorom_bank(machine, chr_page ^ 0, 1, MMC3_chr_bank[0] & ~0x01);
+	v_set_videorom_bank(machine, chr_page ^ 1, 1, MMC3_chr_bank[0] |  0x01);
+	v_set_videorom_bank(machine, chr_page ^ 2, 1, MMC3_chr_bank[1] & ~0x01);
+	v_set_videorom_bank(machine, chr_page ^ 3, 1, MMC3_chr_bank[1] |  0x01);
+	v_set_videorom_bank(machine, chr_page ^ 4, 1, MMC3_chr_bank[2]);
+	v_set_videorom_bank(machine, chr_page ^ 5, 1, MMC3_chr_bank[3]);
+	v_set_videorom_bank(machine, chr_page ^ 6, 1, MMC3_chr_bank[4]);
+	v_set_videorom_bank(machine, chr_page ^ 7, 1, MMC3_chr_bank[5]);
 }
 
 #define BOTTOM_VISIBLE_SCANLINE	239		/* The bottommost visible scanline */
@@ -940,19 +944,19 @@ static WRITE8_HANDLER( mapper68_rom_banking )
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-		v_set_videorom_bank(space->machine, 0, 2, data, 2);
+		v_set_videorom_bank(space->machine, 0, 2, data * 2);
 
 		break;
 		case 0x1000:
-		v_set_videorom_bank(space->machine, 2, 2, data, 2);
+		v_set_videorom_bank(space->machine, 2, 2, data * 2);
 
 		break;
 		case 0x2000:
-		v_set_videorom_bank(space->machine, 4, 2, data, 2);
+		v_set_videorom_bank(space->machine, 4, 2, data * 2);
 
 		break;
 		case 0x3000: /* ok? */
-		v_set_videorom_bank(space->machine, 6, 2, data, 2);
+		v_set_videorom_bank(space->machine, 6, 2, data * 2);
 
 		break;
 
@@ -1018,7 +1022,7 @@ static WRITE8_HANDLER( vsdual_vrom_banking )
 	running_device *other_cpu = (space->cpu == devtag_get_device(space->machine, "maincpu")) ? devtag_get_device(space->machine, "sub") : devtag_get_device(space->machine, "maincpu");
 
 	/* switch vrom */
-	(space->cpu == devtag_get_device(space->machine, "maincpu")) ? memory_set_bankptr(space->machine, "bank2", (data & 4) ? vrom[0] + 0x2000 : vrom[0]) : memory_set_bankptr(space->machine, "bank3", (data & 4) ? vrom[1] + 0x2000 : vrom[1]);
+	(space->cpu == devtag_get_device(space->machine, "maincpu")) ? memory_set_bank(space->machine, "bank2", BIT(data, 2)) : memory_set_bank(space->machine, "bank3", BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	cpu_set_input_line(other_cpu, 0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);

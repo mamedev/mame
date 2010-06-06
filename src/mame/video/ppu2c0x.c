@@ -966,14 +966,14 @@ READ8_DEVICE_HANDLER( ppu2c0x_r )
 
 	if (offset >= PPU_MAX_REG)
 	{
-		logerror("PPU %s(r): Attempting to read past the chip\n", device->tag());
+		logerror("PPU %s: Attempting to read past the chip: offset %x\n", device->tag(), offset);
 		offset &= PPU_MAX_REG - 1;
 	}
 
 	// see which register to read
 	switch (offset & 7)
 	{
-		case PPU_STATUS:
+		case PPU_STATUS: /* 2 */
 			// The top 3 bits of the status register are the only ones that report data. The
 			// remainder contain whatever was last in the PPU data latch, except on the RC2C05 (protection)
 			if (ppu2c0x->security_value)
@@ -989,11 +989,11 @@ READ8_DEVICE_HANDLER( ppu2c0x_r )
 				ppu2c0x->regs[PPU_STATUS] &= 0x60;
 			break;
 
-		case PPU_SPRITE_DATA:
+		case PPU_SPRITE_DATA: /* 4 */
 			ppu2c0x->data_latch = ppu2c0x->spriteram[ppu2c0x->regs[PPU_SPRITE_ADDRESS]];
 			break;
 
-		case PPU_DATA:
+		case PPU_DATA: /* 7 */
 			if (ppu_latch)
 				(*ppu_latch)(device, ppu2c0x->videomem_addr & 0x3fff);
 
@@ -1035,7 +1035,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 
 	if (offset >= PPU_MAX_REG)
 	{
-		logerror("PPU: Attempting to write past the chip\n");
+		logerror("PPU %s: Attempting to write past the chip: offset %x, data %x\n", device->tag(), offset, data);
 		offset &= PPU_MAX_REG - 1;
 	}
 
@@ -1053,7 +1053,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 
 	switch (offset & 7)
 	{
-		case PPU_CONTROL0:
+		case PPU_CONTROL0: /* 0 */
 			ppu2c0x->regs[PPU_CONTROL0] = data;
 
 			/* update the name table number on our refresh latches */
@@ -1068,7 +1068,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 //          logerror("control0 write: %02x (scanline: %d)\n", data, ppu2c0x->scanline);
 			break;
 
-		case PPU_CONTROL1:
+		case PPU_CONTROL1: /* 1 */
 			/* if color intensity has changed, change all the color tables to reflect them */
 			if ((data & PPU_CONTROL1_COLOR_EMPHASIS) != (ppu2c0x->regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS))
 			{
@@ -1085,11 +1085,11 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 			ppu2c0x->regs[PPU_CONTROL1] = data;
 			break;
 
-		case PPU_SPRITE_ADDRESS:
+		case PPU_SPRITE_ADDRESS: /* 3 */
 			ppu2c0x->regs[PPU_SPRITE_ADDRESS] = data;
 			break;
 
-		case PPU_SPRITE_DATA:
+		case PPU_SPRITE_DATA: /* 4 */
 			// If the PPU is currently rendering the screen, 0xff is written instead of the desired data.
 			if (ppu2c0x->scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
 				data = 0xff;
@@ -1097,7 +1097,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 			ppu2c0x->regs[PPU_SPRITE_ADDRESS] = (ppu2c0x->regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
 			break;
 
-		case PPU_SCROLL:
+		case PPU_SCROLL: /* 5 */
 			if (ppu2c0x->toggle)
 			{
 				/* second write */
@@ -1119,7 +1119,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 			ppu2c0x->toggle ^= 1;
 			break;
 
-		case PPU_ADDRESS:
+		case PPU_ADDRESS: /* 6 */
 			if (ppu2c0x->toggle)
 			{
 				/* second write */
@@ -1141,7 +1141,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 			ppu2c0x->toggle ^= 1;
 			break;
 
-		case PPU_DATA:
+		case PPU_DATA: /* 7 */
 			{
 				int tempAddr = ppu2c0x->videomem_addr & 0x3fff;
 
@@ -1172,6 +1172,8 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 			/* ignore other registers writes */
 			break;
 	}
+
+	ppu2c0x->data_latch = data;
 }
 
 /*************************************
