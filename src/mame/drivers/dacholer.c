@@ -5,8 +5,9 @@
 
     Driver by Pierpaolo Prazzoli
 
-    TODO:
-      - Add colors when proms are dumped
+	TODO:
+	  - is the background color pen correct for both games? (Dacholer probably
+	    just use a different color prom data)
 
     Mods by Tomasz Slanina (2008.06.12):
       - fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)
@@ -22,7 +23,7 @@
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
-
+#include "video/resnet.h"
 
 class dacholer_state
 {
@@ -395,9 +396,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( dacholer )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x10, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x10, 1 )
 GFXDECODE_END
 
 
@@ -460,6 +461,46 @@ static MACHINE_RESET( dacholer )
 	state->snd_ack = 0;
 }
 
+/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
+static PALETTE_INIT( dacholer )
+{
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double weights_rg[3], weights_b[2];
+	int i;
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0, 255, -1.0,
+			3, resistances_rg, weights_rg, 0, 0,
+			2, resistances_b,  weights_b,  0, 0,
+			0, 0, 0, 0, 0);
+
+	for (i = 0;i < machine->config->total_colors; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(weights_b, bit0, bit1);
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
 static MACHINE_DRIVER_START( dacholer )
 
 	/* driver data */
@@ -487,7 +528,8 @@ static MACHINE_DRIVER_START( dacholer )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_INIT(dacholer)
 	MDRV_GFXDECODE(dacholer)
 
 	MDRV_VIDEO_START(dacholer)
@@ -537,7 +579,7 @@ ROM_START( dacholer )
 	ROM_LOAD( "dacholer6.rom", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "proms", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "k.13d", 0x0000, 0x0020, BAD_DUMP CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) ) //taken from Kick Boy
 ROM_END
 
 ROM_START( kickboy )
@@ -569,4 +611,4 @@ ROM_START( kickboy )
 ROM_END
 
 GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_SUPPORTS_SAVE )
