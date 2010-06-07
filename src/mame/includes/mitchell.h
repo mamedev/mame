@@ -28,7 +28,6 @@ public:
 	int        sample_select;
 
 	/* misc */
-	UINT8      port5_kludge;
 	int        input_type;
 	int        dial[2], dial_selected;
 	int        dir[2];

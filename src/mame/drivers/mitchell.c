@@ -18,8 +18,6 @@
 
     TODO:
     - understand what bits 0 and 3 of input port 0x05 are
-    - ball speed is erratic in Block Block. It was not like this at one point.
-      This is probably related to interrupts and maybe to the above bits.
 
 
 ******************************************************************************
@@ -120,25 +118,18 @@ static NVRAM_HANDLER( mitchell )
 
 static READ8_HANDLER( pang_port5_r )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
-	int bit;
+	int bit = eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
 
-	bit = eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
-
-	/* bits 0 and (sometimes) 3 are checked in the interrupt handler. */
-	/* Maybe they are vblank related, but I'm not sure. */
-	/* bit 3 is checked before updating the palette so it really seems to be vblank. */
-	/* Many games require two interrupts per frame and for these bits to toggle, */
-	/* otherwise music doesn't work. */
+	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
+		bit 3 is checked before updating the palette so it really seems to be vblank.
+		bit 0 may be vblank (or vblank irq flag) related too, but I'm not sure.
+		Many games require two interrupts per frame and for these bits to toggle,
+		otherwise music doesn't work.
+	*/
 	if (cpu_getiloops(space->cpu) & 1)
 		bit |= 0x01;
-	else
-		bit |= 0x08;
 
-	if (state->port5_kludge)	/* hack... music doesn't work otherwise */
-		bit ^= 0x08;
-
-	return (input_port_read(space->machine, "DSW0") & 0x76) | bit;
+	return (input_port_read(space->machine, "DSW0") & 0x7e) | bit;
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
@@ -442,7 +433,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -559,6 +550,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgakuen )
 	PORT_INCLUDE( mj_common )
+
+	PORT_MODIFY("DSW0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// not IPT_VBLANK
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
@@ -691,7 +685,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -739,7 +733,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM (spang) */
 
@@ -855,7 +849,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -895,7 +889,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -937,7 +931,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -1135,7 +1129,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -1178,7 +1172,7 @@ static MACHINE_DRIVER_START( pang )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57.42)   /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -1318,7 +1312,7 @@ static MACHINE_DRIVER_START( marukin )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -1375,7 +1369,7 @@ static MACHINE_DRIVER_START( pkladiesbl )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.09) /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -2142,10 +2136,7 @@ static void bootleg_decode( running_machine *machine )
 
 static void configure_banks( running_machine *machine )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
-
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
-	state->port5_kludge = 0;
 }
 
 
@@ -2258,7 +2249,6 @@ static DRIVER_INIT( mgakuen2 )
 	nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
-	state->port5_kludge = 1;
 }
 static DRIVER_INIT( pkladies )
 {
