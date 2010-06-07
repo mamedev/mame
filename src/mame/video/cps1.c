@@ -1304,7 +1304,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"mbombrd",  CPS_B_21_QS5, mapper_MB63B },
 	{"mbombrdj", CPS_B_21_QS5, mapper_MB63B },
 	{"sf2hf",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2t",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2hfu",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2tj",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"qad",      CPS_B_21_BT7, mapper_QD22B,  0x36 },	/* TODO: layer enable (port 36 probably leftover input code from another game) */
 	{"qadj",     CPS_B_21_DEF, mapper_qadj,   0x36, 0x38, 0x34 },	/* (ports 36, 38, 34 probably leftover input code from another game) */
