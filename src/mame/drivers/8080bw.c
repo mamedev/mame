@@ -20,6 +20,99 @@
 /*      -lrescue                                                            */
 /*      -invasion                                                           */
 /*                                                                          */
+/*  - The Taito Space invaders hardware comes on at least five board types;
+      The Taito manufactured ones are:
+      * The "L-shaped" PCB set, Upright, B&W only
+      * Three pcbs in a stack, often called the '3 layer pcb set' (most common)
+      * Two pcbs in a stack, with the function of two of the three pcb stack
+        pcbs combined.
+      * In general, discounting revision specific differences, the pcbs are
+        arranged in a stack, connected end-to-end by ribbon cables and folded
+        such that the middle pcb (of 3 pcb stack) or the bottom pcb (of 2 pcb
+        stack) is upside down.
+      * Keep in mind specific differences on the pcbs (especially the TVN pcbs
+        vs the others) sometimes prevent exchanging 'equivalent' pcbs between stacks.
+        * L-shaped pcb set details:
+          * One large, square board with ROM, RAM, CPU, Video circuitry on it.
+          * One smaller pcb with audio/io/shifter circuitry on it, plugged into
+            the main pcb at a right angle (hence the entire pcb set is 'L-shaped')
+          * Does not have the capability of any sort of electronic color overlay.
+        * 3 layer pcb set details:
+          * This pcb set came in 3 versions: TVN, CVN, PVN; see below for differences.
+          * Top pcb: Audio/IO/Shifter pcb
+            - discrete audio and sn76477, and volume knobs
+            - data shifter, using either ~11 74xx chips, AM25S10s, Fujitsu MB14221
+              or Fujitsu MB14241 chips, which all do the same thing.
+            - has the dipswitches
+            - has the main "G" edge connector for the wiring harness
+            - has the gating circuitry for the color overlay
+              (these are not present and/or populated on some TVN pcbs)
+            - despite there being at least six versions of this pcb, the discrete
+              audio section is identical in all of them.
+          * Middle pcb: CPU/RAM/Color overlay pcb
+            - has SRAMS on it
+            - has the 8080 CPU on it
+            - has the two PROMS for color overlay on it (one for each player flip)
+              (these are not populated on TVN pcbs and the related circuitry is not
+              present and/or populated on some TVN pcbs)
+          * Bottom pcb: Power/Video/ROM pcb
+            - has the game roms on it
+            - has the main B&W video generation logic on it
+            - has the larger connection to the PSU, and B&W composite output "T" connector
+        * 2 layer pcb set details:
+          * This pcb set came in one version: PVN, and is entirely exchangable
+            with the 3 layer PVN pcb set.
+          * Top pcb is same as 3 layer pcb set
+          * Bottom pcb combines the function of the Middle and Bottom pcbs
+            of the 3 layer set.
+
+       * The different pcb set versions are noted by a different version code on
+         a paper sticker on the pcb; The code will be of the format mVNnnnnn where
+         m is a letter and nnnnn is a number.
+         Codes:
+         * unknown (L shaped pcb) - B&W only, used on "Space Invaders" Upright
+           with 3-strip overlay.
+           Came from factory with one of the TV romsets ONLY.
+           Capable of running TV, SV or CV romsets.
+         * TVNxxxxx (3 layer pcb) - B&W only, used on "T.T Space Invaders"
+           cocktail with blended single-sheet color gel overlay.
+        TODO: this overlay is not supported in MAME yet.
+           Several revisions (at least 5 rom, 3 cpu, 3 audio) of each pcb exist
+           for this set.
+           Came from factory with one of the SV or TV romsets.
+           Capable of running TV, SV or CV romsets.
+         * CVNxxxxx (3 layer pcb) - Color, used on "T.T Space Invaders Color"
+           cocktail with electronic overlay.
+           Came from factory with one of the CV romsets.
+           Capable of running TV, SV or CV romsets.
+         * PVNxxxxx (2&3 layer pcb) - Color, used on "T.T Space Invaders Part
+           II" cocktail with electronic overlay.
+           Several revisions (at least 3 rom, 1 cpu, 2 audio) of each pcb exist
+           for this set.
+           Came from factory with UV (2708) or PV (2716) romsets.
+           Capable of running TV, SV, CV, UV or PV romsets.
+
+       * The following Romsets are known:
+         TV0H, TV02, TV03, TV04 (w/test mode) - sitv
+         TV01, TV02, TV03, TV04 (w/o test mode) - undumped, tv01 has crc32 of 9F37B146
+         SV0H, SV11, SV12, SV04, SV13, SV14 - undumped? roms called sv0h exist in mame...
+         SV01, SV11, SV12, SV04, SV13, SV14 - sisv2
+         SV01, SV02, SV10, SV04, SV09, SV06 - sisv
+         CV03, CV04, CV05, CV06 w/proms - undumped (but apparently the same as sisv with the roms combined to 2716 size)
+         CV17, CV18, CV19, CV20 w/proms- sicv
+         UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - undumped (probably same as pvxx set just split differently)
+         PV01, PV02, PV03, PV04, PV05 w/proms - invadpt2
+
+      - Midway PCB sets: (cursory descripton)
+         * Midway Space Invaders Deluxe (and Deluxe Cocktail) use a special midway-made PCB set
+           which is significantly different from the taito ones.
+         * Midway Space Invaders II (only produced as a cocktail) is also significantly different hardware from the Taito SI hardware, but additionally has different (head to head) gameplya, as well has having two sound boards instead of one.
+      TODO: this needs to be emulated properly
+         * Both midway space invaders games' sound is different from the taito ones (particularly the shot sound) due to using slightly different components on the discrete section.
+      TODO: this needs to be emulated properly
+
+      - Taito-USA-made 'trimline' PCBS do not match the taito pcbs either.
+*/
 /*  To Do:                                                                  */
 /*  -----                                                                   */
 /*                                                                          */
