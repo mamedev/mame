@@ -8413,7 +8413,7 @@ static MACHINE_DRIVER_START( inttoote )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(inttoote)
-	MDRV_PALETTE_LENGTH(512 * 1)	/* sprites, layer1, layer2 */
+	MDRV_PALETTE_LENGTH(512 * 1)
 
 	MDRV_PALETTE_INIT(inttoote)
 	MDRV_VIDEO_START(seta_1_layer)
@@ -10083,8 +10083,8 @@ GAME( 1993, madshark, 0,        madshark, madshark, 0,        ROT270, "Allumer",
 GAME( 1993, msgundam, 0,        msgundam, msgundam, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
 GAME( 1993, msgundam1,msgundam, msgundam, msgunda1, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam (Japan)", 0 )
 GAME( 1993, oisipuzl, 0,        oisipuzl, oisipuzl, 0,        ROT0,   "Sunsoft / Atlus",        "Oishii Puzzle Ha Irimasenka", 0 )
-GAME( 1993, qzkklgy2, 0,        qzkklgy2, qzkklgy2, 0,        ROT0,   "Tecmo",                  "Quiz Kokology 2", 0 )
 GAME( 1993, triplfun, oisipuzl, triplfun, oisipuzl, 0,        ROT0,   "bootleg",                "Triple Fun", 0 )
+GAME( 1993, qzkklgy2, 0,        qzkklgy2, qzkklgy2, 0,        ROT0,   "Tecmo",                  "Quiz Kokology 2", 0 )
 GAME( 1993, utoukond, 0,        utoukond, utoukond, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
 GAME( 1993, wrofaero, 0,        wrofaero, wrofaero, 0,        ROT270, "Yang Cheng",             "War of Aero - Project MEIOU", 0 )
 GAME( 1994, eightfrc, 0,        eightfrc, eightfrc, eightfrc, ROT90,  "Tecmo",                  "Eight Forces", 0 )

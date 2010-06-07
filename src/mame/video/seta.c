@@ -172,42 +172,55 @@ static const struct x_offset game_offsets[] =
 {
 	/* only sprites */
 	{ "tndrcade", { -1,  0 } },				// correct (wall at beginning of game)
-	{ "tndrcadj", { -1,  0 } },				// correct (wall at beginning of game)
+	{ "tndrcadej",{ -1,  0 } },				// "
 	{ "wits",     {  0,  0 } },				// unknown
 	{ "thunderl", {  0,  0 } },				// unknown
 	{ "wiggie",   {  0,  0 } },				// some problems but they seem y co-ordinate related?
+	{ "superbar", {  0,  0 } },				// "
+	{ "pairlove", {  0,  0 } },				// unknown
 	{ "blockcar", {  0,  0 } },				// unknown
-	{ "umanclub", {  0,  0 } },				// unknown
+	{ "neobattl", {  0,  0 } },				// correct (test grid)
+	{ "umanclub", {  0,  0 } },				// correct (test grid)
 	{ "atehate",  {  0,  0 } },				// correct (test grid)
 	{ "kiwame",   {  0,-16 } },				// correct (test grid)
 	{ "krzybowl", {  0,  0 } },				// correct (test grid)
+	{ "orbs",     {  0,  0 } },				// unknown
+	{ "keroppi",  {  0,  0 } },				// unknown
 
 	/* 1 layer */
 	{ "twineagl", {  0,  0 }, {  0, -3 } },	// unknown
 	{ "downtown", {  1,  0 }, { -1,  0 } },	// sprites correct (test grid), tilemap unknown but at least -1 non-flipped to fix glitches later in the game
+	{ "downtown2",{  1,  0 }, { -1,  0 } },	// "
+	{ "downtownj",{  1,  0 }, { -1,  0 } },	// "
+	{ "downtownp",{  1,  0 }, { -1,  0 } },	// "
 	{ "usclssic", {  1,  2 }, {  0, -1 } },	// correct (test grid and bg)
 	{ "calibr50", { -1,  2 }, { -3, -2 } },	// correct (test grid and roof in animation at beginning of game)
 	{ "arbalest", {  0,  1 }, { -2, -1 } },	// correct (test grid and landing pad at beginning of game)
 	{ "metafox",  {  0,  0 }, { 16,-19 } },	// sprites unknown, tilemap correct (test grid)
+	{ "setaroul", {  0,  0 }, {  0,  0 } },	// unknown
 	{ "drgnunit", {  2,  2 }, { -2, -2 } },	// correct (test grid and I/O test)
+	{ "jockeyc",  {  0,  0 }, { -2,  0 } },	// sprites unknown, tilemap correct (test grid)
+	{ "inttoote", {  0,  0 }, { -2,  0 } },	// "
+	{ "inttootea",{  0,  0 }, { -2,  0 } },	// "
 	{ "stg",      {  0,  0 }, { -2, -2 } },	// sprites correct? (panel), tilemap correct (test grid)
 	{ "qzkklogy", {  1,  1 }, { -1, -1 } },	// correct (timer, test grid)
 	{ "qzkklgy2", {  0,  0 }, { -1, -3 } },	// sprites unknown, tilemaps correct (test grid)
 
 	/* 2 layers */
 	{ "rezon",    {  0,  0 }, { -2, -2 } },	// correct (test grid)
+	{ "rezont",   {  0,  0 }, { -2, -2 } },	// "
 	{ "blandia",  {  0,  8 }, { -2,  6 } },	// correct (test grid, startup bg)
-	{ "blandiap", {  0,  8 }, { -2,  6 } },	// correct (test grid, startup bg)
+	{ "blandiap", {  0,  8 }, { -2,  6 } },	// "
 	{ "zingzip",  {  0,  0 }, { -1, -2 } },	// sprites unknown, tilemaps correct (test grid)
 	{ "eightfrc", {  3,  4 }, {  0,  0 } },	// unknown
 	{ "daioh",    {  1,  1 }, { -1, -1 } },	// correct? (launch window and test grid are right, but planet is wrong)
 	{ "msgundam", {  0,  0 }, { -2, -2 } },	// correct (test grid, banpresto logo)
-	{ "msgunda1", {  0,  0 }, { -2, -2 } },	// correct (test grid, banpresto logo)
+	{ "msgundam1",{  0,  0 }, { -2, -2 } },	// "
 	{ "oisipuzl", {  0,  0 }, { -1, -1 } },	// correct (test mode) flip screen not supported?
-	{ "triplfun", {  0,  0 }, { -1, -1 } },	// correct (test mode) flip screen not supported?
+	{ "triplfun", {  0,  0 }, { -1, -1 } },	// "
 	{ "wrofaero", {  0,  0 }, {  0,  0 } },	// unknown
 	{ "jjsquawk", {  1,  1 }, { -1, -1 } },	// correct (test mode)
-	{ "jjsquawb", {  1,  1 }, { -1, -1 } },	// correct (test mode)
+	{ "jjsquawkb",{  1,  1 }, { -1, -1 } },	// "
 	{ "kamenrid", {  0,  0 }, { -2, -2 } },	// correct (map, banpresto logo)
 	{ "extdwnhl", {  0,  0 }, { -2, -2 } },	// correct (test grid, background images)
 	{ "sokonuke", {  0,  0 }, { -2, -2 } },	// correct (game selection, test grid)
@@ -216,6 +229,7 @@ static const struct x_offset game_offsets[] =
 	{ "madshark", {  0,  0 }, {  0,  0 } },	// unknown (wrong when flipped, but along y)
 	{ "utoukond", {  0,  0 }, { -2,  0 } }, // unknown (wrong when flipped, but along y)
 	{ "crazyfgt", {  0,  0 }, { -2,  0 } }, // wrong (empty background column in title screen, but aligned sprites in screen select)
+
 	{ NULL }
 };
 
