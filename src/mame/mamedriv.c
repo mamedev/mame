@@ -8273,6 +8273,7 @@ Other Sun games
 	DRIVER( quizchql )	/* "73" (c) 1993 Laxan */
 	DRIVER( funkyfig )	/* "74" (c) 1993 Nakanihon + East Technology */
 	DRIVER( animaljr )	/* "75" 1993 Nakanihon/Taito */
+	DRIVER( animaljrj )	/* "75" 1993 Nakanihon/Taito */
 	DRIVER( hginga )	/*      1994 Dynax */
 	DRIVER( mjmyster )	/* "?7" 1994 Dynax */
 	DRIVER( mjmywrld )	/* "?7" 1994 Dynax */

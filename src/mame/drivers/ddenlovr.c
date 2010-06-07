@@ -8580,6 +8580,23 @@ ROM_START( animaljr )
 ROM_END
 
 
+ROM_START( animaljrj )
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* Z80 Code */
+	ROM_LOAD( "nwc_7502.2e",  0x00000, 0x40000, CRC(c526cf56) SHA1(466378125c06de1475de37c2e0b80c7522b82308) )
+	ROM_RELOAD(               0x10000, 0x40000 )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )	/* Z80 Code */
+	ROM_LOAD( "nwc_7503.8e",  0x00000, 0x20000, CRC(9c27e0b6) SHA1(e904725912391a776ef22cc79e25b9c8cf90ebf6) )	// 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "blitter", 0 )	/* blitter data */
+	ROM_LOAD( "nwc_7504.17b", 0x000000, 0x100000, CRC(b62de6a3) SHA1(62abf09b52844d3b3325e8931cb572c15581964f) )
+	ROM_LOAD( "nwc_7505.17d", 0x100000, 0x080000, CRC(729b073f) SHA1(8e41fafc47adbe76452e92ab1459536a5a46784d) )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "nwc_7501.1h",  0x00000, 0x40000, CRC(c821e589) SHA1(45ece97a1cd5114871ff07d2593057635d928959) )
+ROM_END
+
+
 /***************************************************************************
 
 Quiz Channel Question (JPN ver.)
@@ -10175,6 +10192,7 @@ GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, 0,        ROT0, "Nakanihon
 GAME( 1993, quizchq,   0,        quizchq,   quizchq,  0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1993, animaljr,  0,        mmpanic,   animaljr, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr.",                                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr.",                                          GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1994, hginga,    0,        hginga,    hginga,   0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
