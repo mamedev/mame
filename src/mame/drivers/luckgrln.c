@@ -80,6 +80,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "video/mc6845.h"
+#include "luckgrln.lh"
 
 static UINT8 *luck_vram1,*luck_vram2,*luck_vram3;
 static UINT8 nmi_enable;
@@ -427,13 +428,77 @@ static READ8_HANDLER( rtc_r )
 	return 0;
 }
 
+/* Analizing the lamps, the game should has a 12-buttons control layout */
+static WRITE8_HANDLER(lamps_a_w)
+{
+/*  LAMPS A:
+
+    7654 3210
+    ---- ---x  HOLD1
+    ---- --x-  HOLD2
+    ---- -x--  HOLD3
+    ---- x---  HOLD4
+    ---x ----  HOLD5
+    --x- ----  START
+    -x-- ----  BET (PLAY)
+    x--- ----  TAKE
+
+*/
+	output_set_lamp_value(0, (data >> 0) & 1);		/* HOLD1 */
+	output_set_lamp_value(1, (data >> 1) & 1);		/* HOLD2 */
+	output_set_lamp_value(2, (data >> 2) & 1);		/* HOLD3 */
+	output_set_lamp_value(3, (data >> 3) & 1);		/* HOLD4 */
+	output_set_lamp_value(4, (data >> 4) & 1);		/* HOLD5 */
+	output_set_lamp_value(5, (data >> 5) & 1);		/* START */
+	output_set_lamp_value(6, (data >> 6) & 1);		/* BET */
+	output_set_lamp_value(7, (data >> 7) & 1);		/* TAKE */
+}
+
+static WRITE8_HANDLER(lamps_b_w)
+{
+/*  LAMPS B:
+
+    7654 3210
+    ---- ---x  D-UP
+    ---- --x-  HIGH
+    ---- -x--  LOW
+    ---- x---  CANCEL
+    --xx ----  unknown (mostly on)
+    xx-- ----  unused
+
+*/
+	output_set_lamp_value(8, (data >> 0) & 1);		/* D-UP */
+	output_set_lamp_value(9, (data >> 1) & 1);		/* HIGH */
+	output_set_lamp_value(10, (data >> 2) & 1);		/* LOW */
+	output_set_lamp_value(11, (data >> 3) & 1);		/* CANCEL */
+}
+
+static WRITE8_HANDLER(counters_w)
+{
+/*  COUNTERS:
+
+    7654 3210
+    ---- ---x  COIN1
+    ---- --x-  KEYIN
+    ---- -x--  COIN2
+    ---- x---  COIN3
+    xxxx ----  unused
+
+*/
+	coin_counter_w(space->machine, 0, data & 0x01);	/* COIN 1 */
+	coin_counter_w(space->machine, 1, data & 0x04);	/* COIN 2 */
+	coin_counter_w(space->machine, 2, data & 0x08);	/* COIN 3 */
+	coin_counter_w(space->machine, 3, data & 0x02);	/* KEY IN */
+}
+
+
 /* are some of these reads / writes mirrored? there seem to be far too many */
 static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // i think
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
 	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
 
-	AM_RANGE(0x0090, 0x009f) AM_READ(rtc_r) AM_WRITENOP
+	AM_RANGE(0x0090, 0x009f) AM_READ(rtc_r) //AM_WRITENOP
 
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(palette_offset_low_w)
 	AM_RANGE(0x00a1, 0x00a1) AM_WRITE(palette_offset_high_w)
@@ -443,51 +508,56 @@ static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_register_w)
 
 	AM_RANGE(0x00b8, 0x00b8) AM_READ_PORT("IN0")
-	AM_RANGE(0x00b9, 0x00b9) AM_READ_PORT("IN1") AM_WRITENOP // coin counters are here
-	AM_RANGE(0x00ba, 0x00ba) AM_READ_PORT("IN2")
-	AM_RANGE(0x00bb, 0x00bb) AM_READ_PORT("IN3") AM_WRITENOP // coin lockouts?
-	AM_RANGE(0x00bc, 0x00bc) AM_READ_PORT("IN4")
+	AM_RANGE(0x00b9, 0x00b9) AM_READ_PORT("IN1") AM_WRITE(counters_w)
+	AM_RANGE(0x00ba, 0x00ba) AM_READ_PORT("IN2") AM_WRITE(lamps_a_w)
+	AM_RANGE(0x00bb, 0x00bb) AM_READ_PORT("IN3") AM_WRITE(lamps_b_w)
+	AM_RANGE(0x00bc, 0x00bc) AM_READ_PORT("DSW1")
 
-	AM_RANGE(0x00c3, 0x00c3) AM_WRITENOP
-	AM_RANGE(0x00c7, 0x00c7) AM_WRITENOP
-	AM_RANGE(0x00cb, 0x00cb) AM_WRITENOP
-	AM_RANGE(0x00cf, 0x00cf) AM_WRITENOP
+	AM_RANGE(0x00c0, 0x00c3) AM_WRITENOP
+	AM_RANGE(0x00c4, 0x00c7) AM_WRITENOP
+	AM_RANGE(0x00c8, 0x00cb) AM_WRITENOP
+	AM_RANGE(0x00cc, 0x00cf) AM_WRITENOP
 
-	AM_RANGE(0x00d3, 0x00d3) AM_WRITENOP
-	AM_RANGE(0x00d7, 0x00d7) AM_WRITENOP
-	AM_RANGE(0x00db, 0x00db) AM_WRITENOP
-	AM_RANGE(0x00df, 0x00df) AM_WRITENOP
+	AM_RANGE(0x00d0, 0x00d3) AM_WRITENOP
+	AM_RANGE(0x00d4, 0x00d7) AM_WRITENOP
+	AM_RANGE(0x00d8, 0x00db) AM_WRITENOP
+	AM_RANGE(0x00dc, 0x00df) AM_WRITENOP
 
 	AM_RANGE(0x00e4, 0x00e7) AM_WRITENOP
 
 	AM_RANGE(0x00f3, 0x00f3) AM_WRITENOP
 	AM_RANGE(0x00f7, 0x00f7) AM_WRITENOP
 
-	AM_RANGE(0x00f8, 0x00f8) AM_READ_PORT("DSW0")
-	AM_RANGE(0x00f9, 0x00f9) AM_READ_PORT("DSW1")
-	AM_RANGE(0x00fa, 0x00fa) AM_READ_PORT("DSW2")
-	AM_RANGE(0x00fb, 0x00fb) AM_READ_PORT("DSW3") AM_WRITENOP
+	AM_RANGE(0x00f8, 0x00f8) AM_READ_PORT("DSW2")
+	AM_RANGE(0x00f9, 0x00f9) AM_READ_PORT("DSW3")
+	AM_RANGE(0x00fa, 0x00fa) AM_READ_PORT("DSW4")
+	AM_RANGE(0x00fb, 0x00fb) AM_READ_PORT("DSW5") //AM_WRITENOP
 	AM_RANGE(0x00fc, 0x00fc) AM_WRITENOP
 	AM_RANGE(0x00fd, 0x00fd) AM_WRITENOP
 	AM_RANGE(0x00fe, 0x00fe) AM_WRITENOP
 	AM_RANGE(0x00ff, 0x00ff) AM_WRITENOP
 
+/*
+
+  C0-C3 seems to be a 4-bytes port device (maybe sound), where is written --> data, control (or channel), unknown, volume.
+  If in fact it's a sound device, the last parameter (volume) is decreasing once the sound event was triggered.
+  Seems to be more than one, and these devices seems mirrored along the rest of memory.
+
+*/
 
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( luckgrln )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_CODE(KEYCODE_1) PORT_NAME("Start")
-	PORT_DIPNAME( 0x02, 0x02, "IN0" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	PORT_CODE(KEYCODE_1) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )		PORT_NAME("Play")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN0" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -526,25 +596,25 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Reset")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R)	PORT_NAME("Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)	PORT_NAME("Service In")
 	PORT_DIPNAME( 0x04, 0x04, "IN3" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Credit Clear")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W)	PORT_NAME("Credit Clear")
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Books SW")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0)	PORT_NAME("Books SW")
 
-	PORT_START("IN4") //DIP SW 1
-	PORT_DIPNAME( 0x01, 0x01, "IN4" )
+	PORT_START("DSW1") //DIP SW 1
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -564,9 +634,9 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
 
-	PORT_START("DSW0") //DIP SW 2
+	PORT_START("DSW2") //DIP SW 2
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
-	PORT_DIPNAME( 0x10, 0x10, "DSW0" )
+	PORT_DIPNAME( 0x10, 0x10, "DSW2" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
@@ -579,61 +649,66 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "IN6" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x07, 0x04, "Key In" )
+	PORT_DIPSETTING(    0x07, "1 Pulse / 5 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Pulse / 10 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Pulse / 50 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Pulse / 300 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Pulse / 500 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 1000 Credits" )
+	PORT_DIPNAME( 0x38, 0x10, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 50 Credits" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW3-40" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW3-80" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "IN7" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x0f, 0x04, "Coin C" )
+	PORT_DIPSETTING(    0x0f, "10 Coins / 1 Credit" )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0d, "5 Coins / 2 Credits" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x04, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0x70, 0x10, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x70, "10 Coins / 1 Credit" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin / 200 Credits" )
+	PORT_DIPNAME( 0x80, 0x80, "DSW4-80" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3") //DIP SW 5
+	PORT_START("DSW5") //DIP SW 5
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
-	PORT_DIPNAME( 0x04, 0x04, "DSW3" )
+	PORT_DIPNAME( 0x04, 0x04, "DSW5" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
@@ -763,6 +838,7 @@ static DRIVER_INIT( luckgrln )
 //  memory_set_bankptr(machine, "bank1",&rom[0x010000]);
 }
 
+
 ROM_START( luckgrln )
 	ROM_REGION( 0x4000, "maincpu", 0 ) // internal Z180 rom
 	ROM_LOAD( "lucky74.bin",  0x00000, 0x4000, CRC(fa128e05) SHA1(97a9534b8414f984159271db48b153b0724d22f9) )
@@ -781,5 +857,11 @@ ROM_START( luckgrln )
 	ROM_LOAD( "falcon.6", 0x40000, 0x20000, CRC(bfb02c87) SHA1(1b5ca562ed76eb3f1b4a52d379a6af07e79b6ee5) )
 ROM_END
 
-GAME( 1991, luckgrln,  0,    luckgrln, luckgrln,  luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND )
+
+/*********************************************
+*                Game Drivers                *
+**********************************************
+
+       YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY           FULLNAME                                 FLAGS                                  LAYOUT  */
+GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND, layout_luckgrln )
 
