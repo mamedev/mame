@@ -1127,7 +1127,8 @@ void timer_device::device_reset()
 
 void timer_device::periodic_timer_callback(int param)
 {
-	(*m_config.m_callback)(*this, m_ptr, param);
+	if (m_config.m_callback != NULL)
+		(*m_config.m_callback)(*this, m_ptr, param);
 }
 
 
