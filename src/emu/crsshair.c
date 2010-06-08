@@ -155,8 +155,7 @@ static void create_bitmap(running_machine *machine, int player)
 	rgb_t color = crosshair_colors[player];
 
 	/* if we have a bitmap for this player, kill it */
-	if (global.bitmap[player] != NULL)
-		bitmap_free(global.bitmap[player]);
+	global_free(global.bitmap[player]);
 
 	if (global.name[player][0] != 0)
 	{
@@ -268,8 +267,7 @@ static void crosshair_exit(running_machine *machine)
 			render_texture_free(global.texture[player]);
 		global.texture[player] = NULL;
 
-		if (global.bitmap[player] != NULL)
-			bitmap_free(global.bitmap[player]);
+		global_free(global.bitmap[player]);
 		global.bitmap[player] = NULL;
 	}
 }

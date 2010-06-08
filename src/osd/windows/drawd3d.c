@@ -578,8 +578,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 	device_delete(d3d);
 
 	// experimental: free the vector PNG
-	if (d3d->vector_bitmap != NULL)
-		bitmap_free(d3d->vector_bitmap);
+	global_free(d3d->vector_bitmap);
 
 	// free the memory in the window
 	global_free(d3d);

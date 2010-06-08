@@ -1881,7 +1881,7 @@ static bitmap_t *load_component_bitmap(const char *dirname, const char *file, co
 		/* load the alpha bitmap if specified */
 		if (render_load_png(OPTION_ARTPATH, dirname, alphafile, bitmap, hasalpha) == NULL)
 		{
-			bitmap_free(bitmap);
+			global_free(bitmap);
 			bitmap = NULL;
 		}
 

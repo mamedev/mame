@@ -149,8 +149,7 @@ void winvideo_init(running_machine *machine)
 static void winvideo_exit(running_machine *machine)
 {
 	// free the overlay effect
-	if (effect_bitmap != NULL)
-		bitmap_free(effect_bitmap);
+	global_free(effect_bitmap);
 	effect_bitmap = NULL;
 
 	// free all of our monitor information
