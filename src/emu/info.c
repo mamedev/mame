@@ -566,7 +566,7 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 
 static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config_sound_interface *sound;
+	const device_config_sound_interface *sound = NULL;
 
 	for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->devconfig().type() == SOUND_SAMPLES)
@@ -597,7 +597,7 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 
 static void print_game_sample(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config_sound_interface *sound;
+	const device_config_sound_interface *sound = NULL;
 
 	/* iterate over sound chips looking for samples */
 	for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
