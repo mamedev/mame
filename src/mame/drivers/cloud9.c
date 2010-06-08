@@ -127,7 +127,7 @@ INLINE void schedule_next_irq(running_machine *machine, int curscanline)
 	curscanline = (curscanline + 64) & 255;
 
 	/* next one at the start of this scanline */
-	timer_adjust_oneshot(state->irq_timer, video_screen_get_time_until_pos(machine->primary_screen, curscanline, 0), curscanline);
+	timer_adjust_oneshot(state->irq_timer, machine->primary_screen->time_until_pos(curscanline), curscanline);
 }
 
 
@@ -142,7 +142,7 @@ static TIMER_CALLBACK( clock_irq )
 	}
 
 	/* force an update now */
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 
 	/* find the next edge */
 	schedule_next_irq(machine, param);
@@ -152,7 +152,7 @@ static TIMER_CALLBACK( clock_irq )
 static CUSTOM_INPUT( get_vblank )
 {
 	cloud9_state *state = (cloud9_state *)field->port->machine->driver_data;
-	int scanline = video_screen_get_vpos(field->port->machine->primary_screen);
+	int scanline = field->port->machine->primary_screen->vpos();
 	return (~state->syncprom[scanline & 0xff] >> 1) & 1;
 }
 
@@ -193,7 +193,7 @@ static MACHINE_START( cloud9 )
 	visarea.max_x = 255;
 	visarea.min_y = state->vblank_end + 1;
 	visarea.max_y = state->vblank_start;
-	video_screen_configure(machine->primary_screen, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	machine->primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
 	state->irq_timer = timer_alloc(machine, clock_irq, NULL);

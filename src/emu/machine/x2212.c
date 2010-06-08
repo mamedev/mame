@@ -27,10 +27,9 @@ typedef struct
 INLINE x2212_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == X2212);
+	assert(device->type() == X2212);
 
-	return (x2212_state *)device->token;
+	return (x2212_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 WRITE8_DEVICE_HANDLER( x2212_write )
@@ -84,8 +83,8 @@ static DEVICE_START(x2212)
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config == NULL);
-	assert(device->baseconfig().inline_config == NULL);
+	assert(device->baseconfig().static_config() == NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -94,7 +93,7 @@ static DEVICE_START(x2212)
 	c->store = 1;
 	c->array_recall = 1;
 
-	c->default_data = *device->region;
+	c->default_data = *device->region();
 
 	state_save_register_device_item_pointer( device, 0, c->sram, SIZE_DATA );
 	state_save_register_device_item_pointer( device, 0, c->e2prom, SIZE_DATA );

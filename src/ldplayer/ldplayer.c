@@ -236,8 +236,8 @@ static TIMER_CALLBACK( vsync_update )
 		process_commands(laserdisc);
 
 	/* set a timer to go off on the next VBLANK */
-	vblank_scanline = video_screen_get_visible_area(machine->primary_screen)->max_y + 1;
-	target = video_screen_get_time_until_pos(machine->primary_screen, vblank_scanline, 0);
+	vblank_scanline = machine->primary_screen->visible_area().max_y + 1;
+	target = machine->primary_screen->time_until_pos(vblank_scanline);
 	timer_set(machine, target, NULL, 0, vsync_update);
 }
 

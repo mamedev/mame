@@ -918,7 +918,7 @@ static WRITE32_HANDLER( tcram_w )
 	if(offset == 0x02)
 	{
 		static UINT16 min_x,min_y,max_x,max_y;
-		rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
+		rectangle visarea = space->machine->primary_screen->visible_area();
 
 		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
 		min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
@@ -937,7 +937,7 @@ static WRITE32_HANDLER( tcram_w )
 		visarea.max_x = min_x + max_x - 1;
 		visarea.min_y = min_y;
 		visarea.max_y = min_y + max_y - 1;
-		video_screen_configure(space->machine->primary_screen, 0x200, 0x1c0, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds );
+		space->machine->primary_screen->configure(0x200, 0x1c0, visarea, space->machine->primary_screen->frame_period().attoseconds );
 	}
 }
 

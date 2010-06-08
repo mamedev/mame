@@ -4,6 +4,7 @@
 #define FLT_RC_H
 
 #include "machine/rescap.h"
+#include "devlegcy.h"
 
 #define FLT_RC_LOWPASS		0
 #define FLT_RC_HIGHPASS		1
@@ -58,7 +59,6 @@ extern const flt_rc_config flt_rc_ac_default;
 
 void filter_rc_set_RC(running_device *device, int type, double R1, double R2, double R3, double C);
 
-DEVICE_GET_INFO( filter_rc );
-#define SOUND_FILTER_RC DEVICE_GET_INFO_NAME( filter_rc )
+DECLARE_LEGACY_SOUND_DEVICE(FILTER_RC, filter_rc);
 
 #endif /* __FLT_RC_H__ */

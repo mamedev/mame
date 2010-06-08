@@ -2577,12 +2577,15 @@ static void console_set_cpu(running_device *device)
 				break;
 			}
 	if (main_console->view[1].view != NULL)
+	{
+		device_state_interface *stateintf = device_state(device);
 		for (regsubitem = registers_view_get_subview_list(main_console->view[1].view); regsubitem != NULL; regsubitem = regsubitem->next)
-			if (regsubitem->device == device)
+			if (regsubitem->stateintf == stateintf)
 			{
 				registers_view_set_subview(main_console->view[1].view, regsubitem->index);
 				break;
 			}
+	}
 
 	// then update the caption
 	if (regsubitem != NULL)

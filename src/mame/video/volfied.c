@@ -99,8 +99,8 @@ static void refresh_pixel_layer( running_machine *machine, bitmap_t *bitmap )
 
 	volfied_state *state = (volfied_state *)machine->driver_data;
 	UINT16* p = state->video_ram;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	if (state->video_ctrl & 1)
 		p += 0x20000;

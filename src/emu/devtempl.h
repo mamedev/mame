@@ -17,8 +17,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_ID(p,s)             p##devicenameprefix##s
 #define DEVTEMPLATE_FEATURES            DT_HAS_xxx | DT_HAS_yyy | ...
 #define DEVTEMPLATE_NAME                "Device Name String"
-#define DEVTEMPLATE_FAMILY              "Device Family String"
-#define DEVTEMPLATE_CLASS               DEVICE_CLASS_xxxx
 #include "devtempl.h"
 
 // for a derived device....
@@ -41,21 +39,9 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
     DEVTEMPLATE_NAME - required - a string describing the device
 
-    DEVTEMPLATE_FAMILY - required - a string describing the device family
-        name
-
     DEVTEMPLATE_STATE - optional - the name of the device's state
         structure; by default, this is assumed to be
         DEVTEMPLATE_ID(,_state)
-
-    DEVTEMPLATE_CLASS - optional - the device's class (default is
-        DEVICE_CLASS_PERIPHERAL)
-
-    DEVTEMPLATE_VERSION - optional - the device's version string (default
-        is "1.0")
-
-    DEVTEMPLATE_CREDITS - optional - the device's credit string (default
-        is "Copyright Nicola Salmoria and the MAME Team")
 
 ***************************************************************************/
 
@@ -69,7 +55,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DT_HAS_STOP				0x0004
 #define DT_HAS_EXECUTE			0x0008
 #define DT_HAS_NVRAM			0x0010
-#define DT_HAS_VALIDITY_CHECK	0x0020
 #define DT_HAS_CUSTOM_CONFIG	0x0040
 #define DT_HAS_ROM_REGION		0x0080
 #define DT_HAS_MACHINE_CONFIG	0x0100
@@ -96,10 +81,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #error DEVTEMPLATE_NAME must be specified!
 #endif
 
-#ifndef DEVTEMPLATE_FAMILY
-#error DEVTEMPLATE_FAMILY must be specified!
-#endif
-
 #if (((DEVTEMPLATE_FEATURES) & (DT_HAS_PROGRAM_SPACE | DT_HAS_DATA_SPACE | DT_HAS_IO_SPACE)) != 0)
 #ifndef DEVTEMPLATE_ENDIANNESS
 #error DEVTEMPLATE_ENDIANNESS must be specified if an address space is present!
@@ -119,11 +100,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 /* derive standard state name (unless explicitly provided) */
 #ifndef DEVTEMPLATE_STATE
 #define DEVTEMPLATE_STATE		DEVTEMPLATE_ID(,_state)
-#endif
-
-/* default to DEVICE_CLASS_PERIPHERAL */
-#ifndef DEVTEMPLATE_CLASS
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #endif
 
 /* default to version 1.0 */
@@ -150,9 +126,6 @@ static DEVICE_EXECUTE( DEVTEMPLATE_ID(,) );
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_NVRAM)
 static DEVICE_NVRAM( DEVTEMPLATE_ID(,) );
 #endif
-#if ((DEVTEMPLATE_FEATURES) & DT_HAS_VALIDITY_CHECK)
-static DEVICE_VALIDITY_CHECK( DEVTEMPLATE_ID(,) );
-#endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_CUSTOM_CONFIG)
 static DEVICE_CUSTOM_CONFIG( DEVTEMPLATE_ID(,) );
 #endif
@@ -167,7 +140,6 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_INLINE_CONFIG)
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(DEVTEMPLATE_ID(,_config));						break;
 #endif
-		case DEVINFO_INT_CLASS:					info->i = DEVTEMPLATE_CLASS;									break;
 #ifdef DEVTEMPLATE_ENDIANNESS
 		case DEVINFO_INT_ENDIANNESS:			info->i = DEVTEMPLATE_ENDIANNESS;								break;
 #endif
@@ -242,19 +214,9 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_NVRAM)
 		case DEVINFO_FCT_NVRAM:					info->nvram = DEVTEMPLATE_ID1(DEVICE_NVRAM_NAME()); 					break;
 #endif
-#if ((DEVTEMPLATE_FEATURES) & DT_HAS_VALIDITY_CHECK)
-		case DEVINFO_FCT_VALIDITY_CHECK:		info->validity_check = DEVTEMPLATE_ID1(DEVICE_VALIDITY_CHECK_NAME());	break;
-#endif
-#if ((DEVTEMPLATE_FEATURES) & DT_HAS_CUSTOM_CONFIG)
-		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVTEMPLATE_ID1(DEVICE_CUSTOM_CONFIG_NAME());	break;
-#endif
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, DEVTEMPLATE_NAME);								break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, DEVTEMPLATE_FAMILY);							break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, DEVTEMPLATE_VERSION);							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, DEVTEMPLATE_SOURCE);							break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, DEVTEMPLATE_CREDITS);							break;
 	}
 }
 
@@ -277,9 +239,6 @@ static DEVICE_EXECUTE( DEVTEMPLATE_DERIVED_ID(,) );
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_NVRAM)
 static DEVICE_NVRAM( DEVTEMPLATE_DERIVED_ID(,) );
-#endif
-#if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_VALIDITY_CHECK)
-static DEVICE_VALIDITY_CHECK( DEVTEMPLATE_DERIVED_ID(,) );
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_CUSTOM_CONFIG)
 static DEVICE_CUSTOM_CONFIG( DEVTEMPLATE_DERIVED_ID(,) );
@@ -337,12 +296,6 @@ DEVICE_GET_INFO( DEVTEMPLATE_DERIVED_ID(,) )
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_NVRAM)
 		case DEVINFO_FCT_NVRAM:					info->nvram = DEVTEMPLATE_DERIVED_ID1(DEVICE_NVRAM_NAME()); 					break;
 #endif
-#if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_VALIDITY_CHECK)
-		case DEVINFO_FCT_VALIDITY_CHECK:		info->validity_check = DEVTEMPLATE_DERIVED_ID1(DEVICE_VALIDITY_CHECK_NAME()); break;
-#endif
-#if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_CUSTOM_CONFIG)
-		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVTEMPLATE_DERIVED_ID1(DEVICE_CUSTOM_CONFIG_NAME()); 	break;
-#endif
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, DEVTEMPLATE_DERIVED_NAME);								break;
@@ -358,7 +311,6 @@ DEVICE_GET_INFO( DEVTEMPLATE_DERIVED_ID(,) )
 #undef DT_HAS_STOP
 #undef DT_HAS_EXECUTE
 #undef DT_HAS_NVRAM
-#undef DT_HAS_VALIDITY_CHECK
 #undef DT_HAS_CUSTOM_CONFIG
 #undef DT_HAS_ROM_REGION
 #undef DT_HAS_MACHINE_CONFIG

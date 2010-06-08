@@ -109,10 +109,8 @@ struct _c140_state
 INLINE c140_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_C140);
-	return (c140_state *)device->token;
+	assert(device->type() == SOUND_C140);
+	return (c140_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -466,16 +464,16 @@ static STREAM_UPDATE( update_stereo )
 
 static DEVICE_START( c140 )
 {
-	const c140_interface *intf = (const c140_interface *)device->baseconfig().static_config;
+	const c140_interface *intf = (const c140_interface *)device->baseconfig().static_config();
 	c140_state *info = get_safe_token(device);
 
-	info->sample_rate=info->baserate=device->clock;
+	info->sample_rate=info->baserate=device->clock();
 
 	info->banking_type = intf->banking_type;
 
 	info->stream = stream_create(device,0,2,info->sample_rate,info,update_stereo);
 
-	info->pRom=*device->region;
+	info->pRom=*device->region();
 
 	/* make decompress pcm table */		//2000.06.26 CAB
 	{

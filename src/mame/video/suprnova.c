@@ -673,12 +673,12 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 			if (sprite_flip&2)
 			{
 				xflip ^= 1;
-				sx = video_screen_get_visible_area(machine->primary_screen)->max_x+1 - sx;
+				sx = machine->primary_screen->visible_area().max_x+1 - sx;
 			}
 			if (sprite_flip&1)
 			{
 				yflip ^= 1;
-				sy = video_screen_get_visible_area(machine->primary_screen)->max_y+1 - sy;
+				sy = machine->primary_screen->visible_area().max_y+1 - sy;
 			}
 
 			/* Palette linking */

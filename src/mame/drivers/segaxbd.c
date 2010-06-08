@@ -362,7 +362,7 @@ static TIMER_CALLBACK( scanline_callback )
 		update_main_irqs(machine);
 
 	/* come back in 2 scanlines */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, next_scanline, 0), NULL, next_scanline, scanline_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(next_scanline), NULL, next_scanline, scanline_callback);
 }
 
 
@@ -441,7 +441,7 @@ static MACHINE_RESET( xboard )
 	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), xboard_reset);
 
 	/* start timers to track interrupts */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), NULL, 1, scanline_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(1), NULL, 1, scanline_callback);
 }
 
 

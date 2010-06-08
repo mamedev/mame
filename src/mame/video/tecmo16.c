@@ -64,8 +64,8 @@ static TILE_GET_INFO( tx_get_tile_info )
 
 VIDEO_START( fstarfrc )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	/* set up tile layers */
 	tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -89,8 +89,8 @@ VIDEO_START( fstarfrc )
 
 VIDEO_START( ginkun )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	/* set up tile layers */
 	tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -112,8 +112,8 @@ VIDEO_START( ginkun )
 
 VIDEO_START( riot )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	/* set up tile layers */
 	tile_bitmap_bg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);

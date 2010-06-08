@@ -563,6 +563,7 @@ static MACHINE_DRIVER_START( condor )
 	MDRV_IMPORT_FROM(phoenix)
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */
 	MDRV_CPU_REPLACE("maincpu", Z80, 11000000/4)	/* 2.75 MHz??? */
+	MDRV_CPU_PROGRAM_MAP(phoenix_memory_map)
 MACHINE_DRIVER_END
 
 

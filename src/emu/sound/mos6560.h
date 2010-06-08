@@ -7,6 +7,7 @@
 #ifndef __MOS6560_H__
 #define __MOS6560_H__
 
+#include "devlegcy.h"
 #include "devcb.h"
 
 
@@ -87,18 +88,15 @@ struct _mos6560_interface
     INFO PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO( mos6560 );
+DECLARE_LEGACY_SOUND_DEVICE(MOS656X, mos6560);
+#define MOS656X SOUND_MOS656X
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MOS656X DEVICE_GET_INFO_NAME( mos6560 )
-#define SOUND_MOS656X MOS656X
-
 #define MDRV_MOS656X_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, SOUND, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_MOS656X) \
+	MDRV_DEVICE_ADD(_tag, SOUND_MOS656X, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
 
 

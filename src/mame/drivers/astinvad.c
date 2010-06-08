@@ -217,7 +217,7 @@ static TIMER_CALLBACK( kamizake_int_gen )
 	/* interrupts are asserted on every state change of the 128V line */
 	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 	param ^= 128;
-	timer_adjust_oneshot(state->int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
+	timer_adjust_oneshot(state->int_timer, machine->primary_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
 	timer_set(machine, double_to_attotime(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
@@ -234,7 +234,7 @@ static MACHINE_START( kamikaze )
 	state->samples = devtag_get_device(machine, "samples");
 
 	state->int_timer = timer_alloc(machine, kamizake_int_gen, NULL);
-	timer_adjust_oneshot(state->int_timer, video_screen_get_time_until_pos(machine->primary_screen, 128, 0), 128);
+	timer_adjust_oneshot(state->int_timer, machine->primary_screen->time_until_pos(128), 128);
 
 	state_save_register_global(machine, state->screen_flip);
 	state_save_register_global(machine, state->screen_red);

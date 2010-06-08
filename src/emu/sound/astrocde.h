@@ -3,9 +3,10 @@
 #ifndef __ASTROCDE_H__
 #define __ASTROCDE_H__
 
+#include "devlegcy.h"
+
 WRITE8_DEVICE_HANDLER( astrocade_sound_w );
 
-DEVICE_GET_INFO( astrocade );
-#define SOUND_ASTROCADE DEVICE_GET_INFO_NAME( astrocade )
+DECLARE_LEGACY_SOUND_DEVICE(ASTROCADE, astrocade);
 
 #endif /* __ASTROCDE_H__ */

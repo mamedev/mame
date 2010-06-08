@@ -32,14 +32,14 @@ struct _i8008_state
 	UINT8	SF; // Sign flag
 	UINT8	PF; // Parity flag
 	UINT8	HALT;
+	UINT8	flags; // temporary I/O only
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
-	cpu_state_table 	state;
 	int					icount;
 	int 				pc_pos; // PC possition in ADDR
 
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	UINT8			irq_state;
 };
 
@@ -51,52 +51,15 @@ struct _i8008_state
 #define GET_PC					(cpustate->ADDR[cpustate->pc_pos])
 
 /***************************************************************************
-    CPU STATE DESCRIPTION
-***************************************************************************/
-
-#define I8008_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(I8008_##_name, #_name, _format, i8008_state, _member, _datamask, ~0, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	I8008_STATE_ENTRY(PC,   "%04X", PC.w.l, 0x3fff, 0)
-	I8008_STATE_ENTRY(GENPC,"%04X", PC.w.l, 0x3fff, CPUSTATE_NOSHOW)
-	I8008_STATE_ENTRY(A,   "%02X", A, 0xff, 0)
-	I8008_STATE_ENTRY(B,   "%02X", B, 0xff, 0)
-	I8008_STATE_ENTRY(C,   "%02X", C, 0xff, 0)
-	I8008_STATE_ENTRY(D,   "%02X", D, 0xff, 0)
-	I8008_STATE_ENTRY(E,   "%02X", E, 0xff, 0)
-	I8008_STATE_ENTRY(H,   "%02X", H, 0xff, 0)
-	I8008_STATE_ENTRY(L,   "%02X", L, 0xff, 0)
-	I8008_STATE_ENTRY(ADDR1, "%04X", ADDR[0].w.l, 0x0fff, 0)
-	I8008_STATE_ENTRY(ADDR2, "%04X", ADDR[1].w.l, 0x0fff, 0)
-	I8008_STATE_ENTRY(ADDR3, "%04X", ADDR[2].w.l, 0x0fff, 0)
-	I8008_STATE_ENTRY(ADDR4, "%04X", ADDR[3].w.l, 0x0fff, 0)
-	I8008_STATE_ENTRY(ADDR5, "%04X", ADDR[4].w.l, 0x0fff, 0)
-	I8008_STATE_ENTRY(ADDR6, "%04X", ADDR[5].w.l, 0x0fff, 0)
-	I8008_STATE_ENTRY(ADDR7, "%04X", ADDR[6].w.l, 0x0fff, 0)
-	I8008_STATE_ENTRY(ADDR8, "%04X", ADDR[7].w.l, 0x0fff, 0)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
-};
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE i8008_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I8008);
-	return (i8008_state *)device->token;
+	return (i8008_state *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE void PUSH_STACK(i8008_state *cpustate)
@@ -563,14 +526,29 @@ static CPU_INIT( i8008 )
 	i8008_state *cpustate = get_safe_token(device);
 
 	/* set up the state table */
-	cpustate->state = state_table_template;
-	cpustate->state.baseptr = cpustate;
-	cpustate->state.subtypemask = 1;
+	{
+		device_state_interface *state;
+		device->interface(state);
+		state->state_add(I8008_PC,    "PC",    cpustate->PC.w.l).mask(0x3fff);
+		state->state_add(STATE_GENPC, "GENPC", cpustate->PC.w.l).mask(0x3fff).noshow();
+		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
+		state->state_add(I8008_A,     "A",     cpustate->A);
+		state->state_add(I8008_B,     "B",     cpustate->B);
+		state->state_add(I8008_C,     "C",     cpustate->C);
+		state->state_add(I8008_D,     "D",     cpustate->D);
+		state->state_add(I8008_E,     "E",     cpustate->E);
+		state->state_add(I8008_H,     "H",     cpustate->H);
+		state->state_add(I8008_L,     "L",     cpustate->L);
+		
+		astring tempstr;
+		for (int addrnum = 0; addrnum < 8; addrnum++)
+			state->state_add(I8008_ADDR1 + addrnum, tempstr.format("ADDR%d", addrnum + 1), cpustate->ADDR[addrnum].w.l).mask(0xfff);
+	}
 
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	cpustate->irq_callback = irqcallback;
 
@@ -635,10 +613,48 @@ static void set_irq_line(i8008_state *cpustate, int irqline, int state)
 
 static CPU_IMPORT_STATE( i8008 )
 {
+	i8008_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			cpustate->CF = (cpustate->flags >> 3) & 1;
+			cpustate->ZF = (cpustate->flags >> 2) & 1;
+			cpustate->SF = (cpustate->flags >> 1) & 1;
+			cpustate->PF = (cpustate->flags >> 0) & 1;
+			break;
+	}
 }
 
 static CPU_EXPORT_STATE( i8008 )
 {
+	i8008_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			cpustate->flags = (cpustate->CF ? 0x08 : 0x00) |
+							  (cpustate->ZF ? 0x04 : 0x00) |
+							  (cpustate->SF ? 0x02 : 0x00) |
+							  (cpustate->PF ? 0x01 : 0x00);
+			break;
+	}
+}
+
+static CPU_EXPORT_STRING( i8008 )
+{
+	i8008_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c",
+				cpustate->CF ? 'C':'.',
+				cpustate->ZF ? 'Z':'.',
+				cpustate->SF ? 'S':'.',
+				cpustate->PF ? 'P':'.');
+			break;
+	}
 }
 
 /***************************************************************************
@@ -660,7 +676,7 @@ static CPU_SET_INFO( i8008 )
 
 CPU_GET_INFO( i8008 )
 {
-	i8008_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i8008_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -695,10 +711,10 @@ CPU_GET_INFO( i8008 )
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(i8008);		break;
 		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(i8008);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(i8008);		break;
+		case CPUINFO_FCT_EXPORT_STRING:	info->export_string = CPU_EXPORT_STRING_NAME(i8008);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "8008");				break;
@@ -706,13 +722,5 @@ CPU_GET_INFO( i8008 )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c",
-				cpustate->CF ? 'C':'.',
-				cpustate->ZF ? 'Z':'.',
-				cpustate->SF ? 'S':'.',
-				cpustate->PF ? 'P':'.');
-			break;
 	}
 }

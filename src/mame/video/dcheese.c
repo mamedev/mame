@@ -63,9 +63,9 @@ static void update_scanline_irq( running_machine *machine )
 			effscan += state->blitter_vidparam[0x1e/2];
 
 		/* determine the time; if it's in this scanline, bump to the next frame */
-		time = video_screen_get_time_until_pos(machine->primary_screen, effscan, 0);
-		if (attotime_compare(time, video_screen_get_scan_period(machine->primary_screen)) < 0)
-			time = attotime_add(time, video_screen_get_frame_period(machine->primary_screen));
+		time = machine->primary_screen->time_until_pos(effscan);
+		if (attotime_compare(time, machine->primary_screen->scan_period()) < 0)
+			time = attotime_add(time, machine->primary_screen->frame_period());
 		timer_adjust_oneshot(state->blitter_timer, time, 0);
 	}
 }
@@ -95,7 +95,7 @@ VIDEO_START( dcheese )
 	dcheese_state *state = (dcheese_state *)machine->driver_data;
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	state->dstbitmap = auto_bitmap_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, video_screen_get_format(machine->primary_screen));
+	state->dstbitmap = auto_bitmap_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine->primary_screen->format());
 
 	/* create a timer */
 	state->blitter_timer = timer_alloc(machine, blitter_scanline_callback, NULL);
@@ -151,7 +151,7 @@ static void do_clear( running_machine *machine )
 		memset(BITMAP_ADDR16(state->dstbitmap, y % DSTBITMAP_HEIGHT, 0), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 1, dcheese_signal_irq_callback);
+	timer_set(machine, machine->primary_screen->scan_period(), NULL, 1, dcheese_signal_irq_callback);
 }
 
 
@@ -206,7 +206,7 @@ static void do_blit( running_machine *machine )
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(machine, attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(machine->primary_screen)) / 2), NULL, 2, dcheese_signal_irq_callback);
+	timer_set(machine, attotime_make(0, attotime_to_attoseconds(machine->primary_screen->scan_period()) / 2), NULL, 2, dcheese_signal_irq_callback);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (state->blitter_xparam[8] != 0 || state->blitter_xparam[9] != 0 || state->blitter_xparam[10] != 0 || state->blitter_xparam[11] != 0 ||

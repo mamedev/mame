@@ -135,10 +135,8 @@ static const INT16 qtbl[128] =
 INLINE sp0256_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SP0256);
-	return (sp0256_state *)device->token;
+	assert(device->type() == SOUND_SP0256);
+	return (sp0256_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -1180,7 +1178,7 @@ static STREAM_UPDATE( sp0256_update )
 
 static DEVICE_START( sp0256 )
 {
-	const sp0256_interface *intf = (const sp0256_interface *)device->baseconfig().static_config;
+	const sp0256_interface *intf = (const sp0256_interface *)device->baseconfig().static_config();
 	sp0256_state *sp = get_safe_token(device);
 
 	sp->device = device;
@@ -1189,7 +1187,7 @@ static DEVICE_START( sp0256 )
 	devcb_call_write_line(&sp->drq, 1);
 	devcb_call_write_line(&sp->sby, 1);
 
-	sp->stream = stream_create(device, 0, 1, device->clock / CLOCK_DIVIDER, sp, sp0256_update);
+	sp->stream = stream_create(device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0256_update);
 
     /* -------------------------------------------------------------------- */
     /*  Configure our internal variables.                                   */
@@ -1214,7 +1212,7 @@ static DEVICE_START( sp0256 )
     /* -------------------------------------------------------------------- */
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
-	sp->rom = *device->region;
+	sp->rom = *device->region();
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 }
 

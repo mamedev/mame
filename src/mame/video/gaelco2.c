@@ -339,7 +339,7 @@ VIDEO_START( gaelco2_dual )
 
 ***************************************************************************/
 
-static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
+static void draw_sprites(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
 {
 	UINT16 *buffered_spriteram16 = screen->machine->generic.buffered_spriteram.u16;
 	int j, x, y, ex, ey, px, py;
@@ -350,7 +350,7 @@ static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectang
 	int end_offset = start_offset + 0x1000;
 
 	/* sprite offset is based on the visible area */
-	int spr_x_adjust = (video_screen_get_visible_area(screen)->max_x - 320 + 1) - (511 - 320 - 1) - ((gaelco2_vregs[0] >> 4) & 0x01) + xoffs;
+	int spr_x_adjust = (screen->visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((gaelco2_vregs[0] >> 4) & 0x01) + xoffs;
 
 	for (j = start_offset; j < end_offset; j += 8){
 		int data = buffered_spriteram16[(j/2) + 0];

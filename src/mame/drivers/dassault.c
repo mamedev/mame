@@ -522,7 +522,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 	dassault_state *state = (dassault_state *)device->machine->driver_data;
 
 	/* the second OKIM6295 ROM is bank switched */
-	okim6295_set_bank_base(state->oki2, (data & 1) * 0x40000);
+	state->oki2->set_bank_base((data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =
@@ -551,17 +551,6 @@ static const deco16ic_interface dassault_deco16ic_intf =
 	dassault_bank_callback
 };
 
-static MACHINE_START( dassault )
-{
-	dassault_state *state = (dassault_state *)machine->driver_data;
-
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
-	state->oki2 = devtag_get_device(machine, "oki2");
-}
-
 static MACHINE_DRIVER_START( dassault )
 
 	/* driver data */
@@ -580,8 +569,6 @@ static MACHINE_DRIVER_START( dassault )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(8400)) /* 140 CPU slices per frame */
-
-	MDRV_MACHINE_START(dassault)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -612,13 +599,11 @@ static MACHINE_DRIVER_START( dassault )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 2047848)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", 2047848, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_DRIVER_END

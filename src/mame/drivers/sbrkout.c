@@ -97,7 +97,7 @@ static MACHINE_START( sbrkout )
 
 static MACHINE_RESET( sbrkout )
 {
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 
@@ -113,7 +113,7 @@ static TIMER_CALLBACK( scanline_callback )
 	int scanline = param;
 
 	/* force a partial update before anything happens */
-	video_screen_update_partial(machine->primary_screen, scanline);
+	machine->primary_screen->update_partial(scanline);
 
 	/* if this is a rising edge of 16V, assert the CPU interrupt */
 	if (scanline % 32 == 16)
@@ -123,17 +123,17 @@ static TIMER_CALLBACK( scanline_callback )
 	dac_data_w(devtag_get_device(machine, "dac"), (machine->generic.videoram.u8[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
-	if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
+	if (scanline == machine->primary_screen->visible_area().max_y + 1)
 	{
 		UINT8 potvalue = input_port_read(machine, "PADDLE");
-		timer_adjust_oneshot(pot_timer, video_screen_get_time_until_pos(machine->primary_screen, 56 + (potvalue / 2), (potvalue % 2) * 128), 0);
+		timer_adjust_oneshot(pot_timer, machine->primary_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128), 0);
 	}
 
 	/* call us back in 4 scanlines */
 	scanline += 4;
-	if (scanline >= video_screen_get_height(machine->primary_screen))
+	if (scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -258,9 +258,9 @@ static WRITE8_HANDLER( coincount_w )
 
 static READ8_HANDLER( sync_r )
 {
-	int hpos = video_screen_get_hpos(space->machine->primary_screen);
-	sync2_value = (hpos >= 128 && hpos <= video_screen_get_visible_area(space->machine->primary_screen)->max_x);
-	return video_screen_get_vpos(space->machine->primary_screen);
+	int hpos = space->machine->primary_screen->hpos();
+	sync2_value = (hpos >= 128 && hpos <= space->machine->primary_screen->visible_area().max_x);
+	return space->machine->primary_screen->vpos();
 }
 
 

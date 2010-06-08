@@ -165,6 +165,9 @@ void free_file_line(void *memory, const char *file, int line)
 		return;
 	}
 
+	// clear memory to a bogus value
+	memset(memory, 0xfc, entry->m_size);
+
 	// free the entry and the memory
 	if (entry != NULL)
 		memory_entry::release(entry);

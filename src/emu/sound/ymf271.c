@@ -276,10 +276,8 @@ static int env_volume_table[256];
 INLINE YMF271Chip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YMF271);
-	return (YMF271Chip *)device->token;
+	assert(device->type() == SOUND_YMF271);
+	return (YMF271Chip *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -1775,12 +1773,12 @@ static DEVICE_START( ymf271 )
 	YMF271Chip *chip = get_safe_token(device);
 
 	chip->device = device;
-	chip->clock = device->clock;
+	chip->clock = device->clock();
 
-	intf = (device->baseconfig().static_config != NULL) ? (const ymf271_interface *)device->baseconfig().static_config : &defintrf;
+	intf = (device->baseconfig().static_config() != NULL) ? (const ymf271_interface *)device->baseconfig().static_config() : &defintrf;
 
-	ymf271_init(device, chip, *device->region, intf->irq_callback, &intf->ext_read, &intf->ext_write);
-	chip->stream = stream_create(device, 0, 2, device->clock/384, chip, ymf271_update);
+	ymf271_init(device, chip, *device->region(), intf->irq_callback, &intf->ext_read, &intf->ext_write);
+	chip->stream = stream_create(device, 0, 2, device->clock()/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)
 	{

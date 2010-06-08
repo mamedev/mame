@@ -451,7 +451,7 @@ static READ32_HANDLER( skns_hit_r )
 
 static TIMER_DEVICE_CALLBACK( interrupt_callback )
 {
-	cputag_set_input_line(timer->machine, "maincpu", param, HOLD_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", param, HOLD_LINE);
 }
 
 static MACHINE_RESET(skns)

@@ -68,7 +68,7 @@ static MACHINE_RESET( atarigt )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_scanline_timer_reset(machine->primary_screen, atarigt_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine->primary_screen, atarigt_scanline_update, 8);
 }
 
 

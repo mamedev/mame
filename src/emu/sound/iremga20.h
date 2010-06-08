@@ -8,10 +8,11 @@
 #ifndef __IREMGA20_H__
 #define __IREMGA20_H__
 
+#include "devlegcy.h"
+
 WRITE8_DEVICE_HANDLER( irem_ga20_w );
 READ8_DEVICE_HANDLER( irem_ga20_r );
 
-DEVICE_GET_INFO( iremga20 );
-#define SOUND_IREMGA20 DEVICE_GET_INFO_NAME( iremga20 )
+DECLARE_LEGACY_SOUND_DEVICE(IREMGA20, iremga20);
 
 #endif /* __IREMGA20_H__ */

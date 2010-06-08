@@ -63,7 +63,7 @@ static UINT8 nvram_write_enable;
  *
  *************************************/
 
-static void amerdart_scanline(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void amerdart_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -90,7 +90,7 @@ static void amerdart_scanline(running_device *screen, bitmap_t *bitmap, int scan
 }
 
 
-static void coolpool_scanline(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void coolpool_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -169,7 +169,8 @@ static WRITE16_HANDLER( nvram_thrash_w )
 	if (!memcmp(nvram_unlock_seq, nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
 		nvram_write_enable = 1;
-		timer_device_adjust_oneshot(devtag_get_device(space->machine, "nvram_timer"), ATTOTIME_IN_MSEC(1000), 0);
+		timer_device *nvram_timer = space->machine->device<timer_device>("nvram_timer");
+		nvram_timer->adjust(ATTOTIME_IN_MSEC(1000));
 	}
 }
 
@@ -675,7 +676,7 @@ static MACHINE_DRIVER_START( amerdart )
 	MDRV_CPU_PROGRAM_MAP(amerdart_map)
 
 	MDRV_CPU_ADD("dsp", TMS32010, 15000000/2)
-	MDRV_CPU_FLAGS(CPU_DISABLE)
+	MDRV_DEVICE_DISABLE()
 	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map)
 
 	MDRV_MACHINE_RESET(amerdart)

@@ -51,6 +51,7 @@
 // undef WINNT for dinput.h to prevent duplicate definition
 #undef WINNT
 #include <dinput.h>
+#undef interface
 
 // standard C headers
 #include <conio.h>

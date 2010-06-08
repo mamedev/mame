@@ -74,7 +74,7 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline > 262)
 		scanline = 0;
 
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, periodic_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, periodic_callback);
 }
 
 
@@ -914,7 +914,7 @@ static MACHINE_DRIVER_START( superbug )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(firetrk)
-	MDRV_CPU_REPLACE("maincpu", M6800, MASTER_CLOCK/12)
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(superbug_map)
 
 	/* video hardware */
@@ -934,7 +934,7 @@ static MACHINE_DRIVER_START( montecar )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(firetrk)
-	MDRV_CPU_REPLACE("maincpu", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */
+	MDRV_CPU_MODIFY("maincpu")	/* 750Khz during service mode */
 	MDRV_CPU_PROGRAM_MAP(montecar_map)
 
 	/* video hardware */

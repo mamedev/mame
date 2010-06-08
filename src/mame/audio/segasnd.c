@@ -729,7 +729,7 @@ static DEVICE_START( usb_sound )
 }
 
 
-static DEVICE_GET_INFO( usb_sound )
+DEVICE_GET_INFO( usb_sound )
 {
 	switch (state)
 	{
@@ -742,7 +742,7 @@ static DEVICE_GET_INFO( usb_sound )
 	}
 }
 
-#define SOUND_USB DEVICE_GET_INFO_NAME(usb_sound)
+DECLARE_LEGACY_SOUND_DEVICE(USB, usb_sound);
 
 
 

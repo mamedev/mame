@@ -1723,7 +1723,7 @@ static MACHINE_DRIVER_START( samesame )
 
 	MDRV_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)	/* HD647180XOFS6 CPU */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem_map)
-	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped */
+	MDRV_DEVICE_DISABLE()		/* Internal code is not dumped */
 
 	MDRV_MACHINE_RESET(toaplan1)
 
@@ -1801,7 +1801,7 @@ static MACHINE_DRIVER_START( vimana )
 
 	MDRV_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)	/* HD647180XOFS6 CPU */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem_map)
-	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped */
+	MDRV_DEVICE_DISABLE()		/* Internal code is not dumped */
 
 	MDRV_MACHINE_RESET(vimana)
 

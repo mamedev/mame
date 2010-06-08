@@ -950,7 +950,7 @@ static READ32_HANDLER( funcube_debug_r )
 	UINT32 ret = input_port_read(space->machine,"DEBUG");
 
 	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
-	if (!(video_screen_get_frame_number(space->machine->primary_screen) % 3))
+	if (!(space->machine->primary_screen->frame_number() % 3))
 		ret |= 0x3f;
 
 	return ret;
@@ -996,7 +996,7 @@ static READ8_HANDLER( funcube_coins_r )
 	UINT8 coin_bit0 = 1;	// active low
 	UINT8 coin_bit1 = 1;
 
-	UINT8 hopper_bit = (funcube_hopper_motor && !(video_screen_get_frame_number(space->machine->primary_screen)%20)) ? 1 : 0;
+	UINT8 hopper_bit = (funcube_hopper_motor && !(space->machine->primary_screen->frame_number()%20)) ? 1 : 0;
 
 	const UINT64 coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK / (1000/20);
 

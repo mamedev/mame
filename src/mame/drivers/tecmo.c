@@ -718,7 +718,8 @@ static MACHINE_DRIVER_START( gemini )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(rygar)
-	MDRV_CPU_REPLACE("maincpu", Z80, 6000000)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(6000000)
 	MDRV_CPU_PROGRAM_MAP(gemini_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
@@ -730,7 +731,8 @@ static MACHINE_DRIVER_START( silkworm )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gemini)
-	MDRV_CPU_REPLACE("maincpu", Z80, 6000000)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(6000000)
 	MDRV_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_DRIVER_END
 

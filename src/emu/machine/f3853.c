@@ -49,9 +49,8 @@ static TIMER_CALLBACK( f3853_timer_callback );
 INLINE f3853_t *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == DEVICE_GET_INFO_NAME(f3853) );
-	return ( f3853_t * ) device->token;
+	assert( device->type() == F3853 );
+	return ( f3853_t * ) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -75,7 +74,7 @@ static void f3853_timer_start(running_device *device, UINT8 value)
 {
 	f3853_t	*f3853 = get_safe_token( device );
 
-	attotime period = (value != 0xff) ? attotime_mul(ATTOTIME_IN_HZ(device->clock), f3853_value_to_cycle[value]*31) : attotime_never;
+	attotime period = (value != 0xff) ? attotime_mul(ATTOTIME_IN_HZ(device->clock()), f3853_value_to_cycle[value]*31) : attotime_never;
 
 	timer_adjust_oneshot(f3853->timer, period, 0);
 }
@@ -167,7 +166,7 @@ static DEVICE_START( f3853 )
 	UINT8 reg=0xfe;
 	int i;
 
-	f3853->config = (const f3853_config *)device->baseconfig().static_config;
+	f3853->config = (const f3853_config *)device->baseconfig().static_config();
 
 	for (i=254/*known to get 0xfe after 255 cycles*/; i>=0; i--)
 	{
@@ -215,7 +214,6 @@ DEVICE_GET_INFO( f3853 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(f3853_t);						break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;									break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(f3853);			break;

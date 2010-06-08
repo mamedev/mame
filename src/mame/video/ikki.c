@@ -119,7 +119,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 VIDEO_START( ikki )
 {
 	ikki_state *state = (ikki_state *)machine->driver_data;
-	state->sprite_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->sprite_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 	state_save_register_global_bitmap(machine, state->sprite_bitmap);
 }
 

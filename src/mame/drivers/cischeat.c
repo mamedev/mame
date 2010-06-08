@@ -498,8 +498,10 @@ static WRITE16_HANDLER( scudhamm_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki1"), 0x40000 * ((data >> 0) & 0x3) );
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), 0x40000 * ((data >> 4) & 0x3) );
+		okim6295_device *oki1 = space->machine->device<okim6295_device>("oki1");
+		okim6295_device *oki2 = space->machine->device<okim6295_device>("oki2");
+		oki1->set_bank_base(0x40000 * ((data >> 0) & 0x3) );
+		oki2->set_bank_base(0x40000 * ((data >> 4) & 0x3) );
 	}
 }
 
@@ -693,8 +695,10 @@ static WRITE16_HANDLER( bigrun_soundbank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki1"), 0x40000 * ((data >> 0) & 1) );
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), 0x40000 * ((data >> 4) & 1) );
+		okim6295_device *oki1 = space->machine->device<okim6295_device>("oki1");
+		okim6295_device *oki2 = space->machine->device<okim6295_device>("oki2");
+		oki1->set_bank_base(0x40000 * ((data >> 0) & 1) );
+		oki2->set_bank_base(0x40000 * ((data >> 4) & 1) );
 	}
 }
 
@@ -715,7 +719,8 @@ ADDRESS_MAP_END
 
 static WRITE16_DEVICE_HANDLER( cischeat_soundbank_w )
 {
-	if (ACCESSING_BITS_0_7)	okim6295_set_bank_base(device, 0x40000 * (data & 1) );
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	if (ACCESSING_BITS_0_7)	oki->set_bank_base(0x40000 * (data & 1) );
 }
 
 static ADDRESS_MAP_START( cischeat_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1604,12 +1609,10 @@ static MACHINE_DRIVER_START( bigrun )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, STD_OKI_CLOCK)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, STD_OKI_CLOCK)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
@@ -1733,13 +1736,11 @@ static MACHINE_DRIVER_START( scudhamm )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 2112000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END

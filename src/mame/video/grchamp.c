@@ -107,7 +107,7 @@ VIDEO_START( grchamp )
 {
 	grchamp_state *state = (grchamp_state *)machine->driver_data;
 
-	state->work_bitmap = auto_bitmap_alloc(machine,32,32,video_screen_get_format(machine->primary_screen));
+	state->work_bitmap = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
 
 	/* allocate tilemaps for each of the three sections */
 	state->text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8,8, 32,32);
@@ -121,7 +121,7 @@ static int collision_check(running_machine *machine, grchamp_state *state, bitma
 {
 	int bgcolor = machine->pens[0];
 	int sprite_transp = machine->pens[0x24];
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle *visarea = machine->primary_screen->visible_area();
 	int y0 = 240 - state->cpu0_out[3];
 	int x0 = 256 - state->cpu0_out[2];
 	int x,y,sx,sy;

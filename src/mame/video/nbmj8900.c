@@ -187,8 +187,8 @@ void nbmj8900_vramflip(running_machine *machine, int vram)
 	int x, y;
 	unsigned char color1, color2;
 	unsigned char *vidram;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	if (nbmj8900_flipscreen == nbmj8900_flipscreen_old) return;
 
@@ -384,11 +384,11 @@ static void nbmj8900_gfxdraw(running_machine *machine)
 ******************************************************************************/
 VIDEO_START( nbmj8900_2layer )
 {
-	screen_width = video_screen_get_width(machine->primary_screen);
-	screen_height = video_screen_get_height(machine->primary_screen);
+	screen_width = machine->primary_screen->width();
+	screen_height = machine->primary_screen->height();
 
-	nbmj8900_tmpbitmap0 = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj8900_tmpbitmap1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj8900_tmpbitmap0 = machine->primary_screen->alloc_compatible_bitmap();
+	nbmj8900_tmpbitmap1 = machine->primary_screen->alloc_compatible_bitmap();
 	nbmj8900_videoram0 = auto_alloc_array(machine, UINT8, screen_width * screen_height);
 	nbmj8900_videoram1 = auto_alloc_array(machine, UINT8, screen_width * screen_height);
 	nbmj8900_palette = auto_alloc_array(machine, UINT8, 0x200);

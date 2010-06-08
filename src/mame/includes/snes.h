@@ -1,6 +1,7 @@
 #ifndef _SNES_H_
 #define _SNES_H_
 
+#include "devlegcy.h"
 #include "devcb.h"
 #include "streams.h"
 

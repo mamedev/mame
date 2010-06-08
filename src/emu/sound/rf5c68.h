@@ -7,6 +7,8 @@
 #ifndef __RF5C68_H__
 #define __RF5C68_H__
 
+#include "devlegcy.h"
+
 /******************************************/
 WRITE8_DEVICE_HANDLER( rf5c68_w );
 
@@ -19,7 +21,6 @@ struct _rf5c68_interface
 	void (*sample_end_callback)(running_device* device, int channel);
 };
 
-DEVICE_GET_INFO( rf5c68 );
-#define SOUND_RF5C68 DEVICE_GET_INFO_NAME( rf5c68 )
+DECLARE_LEGACY_SOUND_DEVICE(RF5C68, rf5c68);
 
 #endif /* __RF5C68_H__ */

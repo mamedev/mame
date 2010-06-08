@@ -110,16 +110,16 @@ struct _pia6821_state
 INLINE pia6821_state *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == PIA6821) || (device->type == PIA6822));
-	return (pia6821_state *) device->token;
+	assert((device->type() == PIA6821) || (device->type() == PIA6822));
+	return (pia6821_state *) downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE const pia6821_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == PIA6821) || (device->type == PIA6822));
-	return (const pia6821_interface *) device->baseconfig().static_config;
+	assert((device->type() == PIA6821) || (device->type() == PIA6822));
+	return (const pia6821_interface *) device->baseconfig().static_config();
 }
 
 

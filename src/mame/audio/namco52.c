@@ -64,10 +64,9 @@ struct _namco_52xx_state
 INLINE namco_52xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == NAMCO_52XX);
+	assert(device->type() == NAMCO_52XX);
 
-	return (namco_52xx_state *)device->token;
+	return (namco_52xx_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -80,50 +79,50 @@ static TIMER_CALLBACK( namco_52xx_latch_callback )
 
 static READ8_HANDLER( namco_52xx_K_r )
 {
-	namco_52xx_state *state = get_safe_token(space->cpu->owner);
+	namco_52xx_state *state = get_safe_token(space->cpu->owner());
 	return state->latched_cmd & 0x0f;
 }
 
 static READ8_HANDLER( namco_52xx_SI_r )
 {
-	namco_52xx_state *state = get_safe_token(space->cpu->owner);
+	namco_52xx_state *state = get_safe_token(space->cpu->owner());
 	return devcb_call_read8(&state->si, 0) ? 1 : 0;
 }
 
 static READ8_HANDLER( namco_52xx_R0_r )
 {
-	namco_52xx_state *state = get_safe_token(space->cpu->owner);
+	namco_52xx_state *state = get_safe_token(space->cpu->owner());
 	return devcb_call_read8(&state->romread, state->address) & 0x0f;
 }
 
 static READ8_HANDLER( namco_52xx_R1_r )
 {
-	namco_52xx_state *state = get_safe_token(space->cpu->owner);
+	namco_52xx_state *state = get_safe_token(space->cpu->owner());
 	return devcb_call_read8(&state->romread, state->address) >> 4;
 }
 
 
 static WRITE8_HANDLER( namco_52xx_P_w )
 {
-	namco_52xx_state *state = get_safe_token(space->cpu->owner);
+	namco_52xx_state *state = get_safe_token(space->cpu->owner());
 	discrete_sound_w(state->discrete, NAMCO_52XX_P_DATA(state->basenode), data & 0x0f);
 }
 
 static WRITE8_HANDLER( namco_52xx_R2_w )
 {
-	namco_52xx_state *state = get_safe_token(space->cpu->owner);
+	namco_52xx_state *state = get_safe_token(space->cpu->owner());
 	state->address = (state->address & 0xfff0) | ((data & 0xf) << 0);
 }
 
 static WRITE8_HANDLER( namco_52xx_R3_w )
 {
-	namco_52xx_state *state = get_safe_token(space->cpu->owner);
+	namco_52xx_state *state = get_safe_token(space->cpu->owner());
 	state->address = (state->address & 0xff0f) | ((data & 0xf) << 4);
 }
 
 static WRITE8_HANDLER( namco_52xx_O_w )
 {
-	namco_52xx_state *state = get_safe_token(space->cpu->owner);
+	namco_52xx_state *state = get_safe_token(space->cpu->owner());
 	if (data & 0x10)
 		state->address = (state->address & 0x0fff) | ((data & 0xf) << 12);
 	else
@@ -201,7 +200,7 @@ ROM_END
 
 static DEVICE_START( namco_52xx )
 {
-	namco_52xx_interface *intf = (namco_52xx_interface *)device->baseconfig().static_config;
+	namco_52xx_interface *intf = (namco_52xx_interface *)device->baseconfig().static_config();
 	namco_52xx_state *state = get_safe_token(device);
 	astring tempstring;
 

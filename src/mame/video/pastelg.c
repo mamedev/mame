@@ -141,8 +141,8 @@ static void pastelg_vramflip(running_machine *machine)
 	static int pastelg_flipscreen_old = 0;
 	int x, y;
 	UINT8 color1, color2;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	if (pastelg_flipscreen == pastelg_flipscreen_old) return;
 
@@ -168,7 +168,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void pastelg_gfxdraw(running_machine *machine)
 {
 	UINT8 *GFX = memory_region(machine, "gfx1");
-	int width = video_screen_get_width(machine->primary_screen);
+	int width = machine->primary_screen->width();
 
 	int x, y;
 	int dx, dy;
@@ -294,8 +294,8 @@ static void pastelg_gfxdraw(running_machine *machine)
 ******************************************************************************/
 VIDEO_START( pastelg )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	pastelg_videoram = auto_alloc_array_clear(machine, UINT8, width * height);
 	pastelg_clut = auto_alloc_array(machine, UINT8, 0x10);
@@ -310,8 +310,8 @@ VIDEO_UPDATE( pastelg )
 	if (pastelg_dispflag)
 	{
 		int x, y;
-		int width = video_screen_get_width(screen);
-		int height = video_screen_get_height(screen);
+		int width = screen->width();
+		int height = screen->height();
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)

@@ -652,10 +652,10 @@ WRITE8_HANDLER( tdfever_spriteram_w )
 	/*  partial updates avoid flickers in the fsoccer radar. */
 	if (offset < 0x80 && space->machine->generic.spriteram.u8[offset] != data)
 	{
-		int vpos = video_screen_get_vpos(space->machine->primary_screen);
+		int vpos = space->machine->primary_screen->vpos();
 
 		if (vpos > 0)
-			video_screen_update_partial(space->machine->primary_screen, vpos - 1);
+			space->machine->primary_screen->update_partial(vpos - 1);
 	}
 
 	space->machine->generic.spriteram.u8[offset] = data;

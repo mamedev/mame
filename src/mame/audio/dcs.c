@@ -284,7 +284,7 @@ struct _dsio_denver_state
 typedef struct _dcs_state dcs_state;
 struct _dcs_state
 {
-	running_device *cpu;
+	cpu_device *cpu;
 	const address_space *program;
 	const address_space *data;
 	UINT8		rev;
@@ -295,10 +295,10 @@ struct _dcs_state
 	UINT8		channels;
 	UINT16		size;
 	UINT16		incs;
-	running_device *dmadac[6];
-	running_device *reg_timer;
-	running_device *sport_timer;
-	running_device *internal_timer;
+	dmadac_sound_device *dmadac[6];
+	timer_device *reg_timer;
+	timer_device *sport_timer;
+	timer_device *internal_timer;
 	INT32		ireg;
 	UINT16		ireg_base;
 	UINT16		control_regs[32];
@@ -350,7 +350,7 @@ struct _hle_transfer_state
 	INT32		writes_left;
 	UINT16		sum;
 	INT32		fifo_entries;
-	running_device *watchdog;
+	timer_device *watchdog;
 };
 
 
@@ -674,6 +674,7 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( dcs2_audio_2104 )
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
 	MDRV_CPU_REPLACE("dcs2", ADSP2104, XTAL_16MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs2_2104_program_map)
 	MDRV_CPU_DATA_MAP(dcs2_2104_data_map)
 MACHINE_DRIVER_END
@@ -863,11 +864,11 @@ static TIMER_CALLBACK( dcs_reset )
 	/* reset timers */
 	dcs.timer_enable = 0;
 	dcs.timer_scale = 1;
-	timer_device_adjust_oneshot(dcs.internal_timer, attotime_never, 0);
+	dcs.internal_timer->reset();
 
 	/* start the SPORT0 timer */
 	if (dcs.sport_timer != NULL)
-		timer_device_adjust_periodic(dcs.sport_timer, ATTOTIME_IN_HZ(1000), 0, ATTOTIME_IN_HZ(1000));
+		dcs.sport_timer->adjust(ATTOTIME_IN_HZ(1000), 0, ATTOTIME_IN_HZ(1000));
 
 	/* reset the HLE transfer states */
 	transfer.dcs_state = transfer.state = 0;
@@ -940,12 +941,12 @@ void dcs_init(running_machine *machine)
 	dcs_sram = NULL;
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpu = devtag_get_device(machine, "dcs");
+	dcs.cpu = machine->device<cpu_device>("dcs");
 	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
-	dcs.dmadac[0] = devtag_get_device(machine, "dac");
+	dcs.dmadac[0] = machine->device<dmadac_sound_device>("dac");
 
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -956,8 +957,8 @@ void dcs_init(running_machine *machine)
 	memory_configure_bank(machine, "databank", 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
 
 	/* create the timers */
-	dcs.internal_timer = devtag_get_device(machine, "dcs_int_timer");
-	dcs.reg_timer = devtag_get_device(machine, "dcs_reg_timer");
+	dcs.internal_timer = machine->device<timer_device>("dcs_int_timer");
+	dcs.reg_timer = machine->device<timer_device>("dcs_reg_timer");
 
 	/* non-RAM based automatically acks */
 	dcs.auto_ack = TRUE;
@@ -977,26 +978,26 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	memset(&dcs, 0, sizeof(dcs));
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpu = devtag_get_device(machine, "dcs2");
+	dcs.cpu = machine->device<cpu_device>("dcs2");
 	dcs.rev = 2;
 	soundbank_words = 0x1000;
 	if (dcs.cpu == NULL)
 	{
-		dcs.cpu = devtag_get_device(machine, "dsio");
+		dcs.cpu = machine->device<cpu_device>("dsio");
 		dcs.rev = 3;
 		soundbank_words = 0x400;
 	}
 	if (dcs.cpu == NULL)
 	{
-		dcs.cpu = devtag_get_device(machine, "denver");
+		dcs.cpu = machine->device<cpu_device>("denver");
 		dcs.rev = 4;
 		soundbank_words = 0x800;
 	}
 	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.channels = 2;
-	dcs.dmadac[0] = devtag_get_device(machine, "dac1");
-	dcs.dmadac[1] = devtag_get_device(machine, "dac2");
+	dcs.dmadac[0] = machine->device<dmadac_sound_device>("dac1");
+	dcs.dmadac[1] = machine->device<dmadac_sound_device>("dac2");
 
 	/* always boot from the base of "dcs" */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -1021,9 +1022,9 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs_sram = auto_alloc_array(machine, UINT16, 0x8000*4/2);
 
 	/* create the timers */
-	dcs.internal_timer = devtag_get_device(machine, "dcs_int_timer");
-	dcs.reg_timer = devtag_get_device(machine, "dcs_reg_timer");
-	dcs.sport_timer = devtag_get_device(machine, "dcs_sport_timer");
+	dcs.internal_timer = machine->device<timer_device>("dcs_int_timer");
+	dcs.reg_timer = machine->device<timer_device>("dcs_reg_timer");
+	dcs.sport_timer = machine->device<timer_device>("dcs_sport_timer");
 
 	/* we don't do auto-ack by default */
 	dcs.auto_ack = FALSE;
@@ -1036,7 +1037,7 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	/* allocate a watchdog timer for HLE transfers */
 	transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
 	if (transfer.hle_enabled)
-		transfer.watchdog = devtag_get_device(machine, "dcs_hle_timer");
+		transfer.watchdog = machine->device<timer_device>("dcs_hle_timer");
 
 	/* register for save states */
 	dcs_register_state(machine);
@@ -1408,7 +1409,7 @@ static WRITE16_HANDLER( denver_w )
 				{
 					char buffer[10];
 					sprintf(buffer, "dac%d", chan + 1);
-					dcs.dmadac[chan] = devtag_get_device(space->machine, buffer);
+					dcs.dmadac[chan] = space->machine->device<dmadac_sound_device>(buffer);
 				}
 				dmadac_enable(&dcs.dmadac[0], dcs.channels, enable);
 				if (dcs.channels < 6)
@@ -1753,7 +1754,7 @@ static TIMER_DEVICE_CALLBACK( internal_timer_callback )
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		timer_device_adjust_oneshot(timer, cpu_clocks_to_attotime(dcs.cpu, target_cycles), 0);
+		timer.adjust(cpu_clocks_to_attotime(dcs.cpu, target_cycles));
 
 	/* the IRQ line is edge triggered */
 	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, ASSERT_LINE);
@@ -1789,7 +1790,7 @@ static void reset_timer(running_machine *machine)
 
 	/* adjust the timer if not optimized */
 	if (!dcs.timer_ignore)
-		timer_device_adjust_oneshot(dcs.internal_timer, cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_start_count + 1)), 0);
+		dcs.internal_timer->adjust(cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_start_count + 1)));
 }
 
 
@@ -1805,7 +1806,7 @@ static void timer_enable_callback(running_device *device, int enable)
 	else
 	{
 //      mame_printf_debug("Timer disabled\n");
-		timer_device_adjust_oneshot(dcs.internal_timer, attotime_never, 0);
+		dcs.internal_timer->reset();
 	}
 }
 
@@ -1883,7 +1884,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
-				timer_device_adjust_oneshot(dcs.reg_timer, attotime_never, 0);
+				dcs.reg_timer->reset();
 			}
 			break;
 
@@ -1892,7 +1893,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
-				timer_device_adjust_oneshot(dcs.reg_timer, attotime_never, 0);
+				dcs.reg_timer->reset();
 			}
 			break;
 
@@ -2004,7 +2005,7 @@ static void recompute_sample_rate(running_machine *machine)
 	if (dcs.incs)
 	{
 		attotime period = attotime_div(attotime_mul(sample_period, dcs.size), (2 * dcs.channels * dcs.incs));
-		timer_device_adjust_periodic(dcs.reg_timer, period, 0, period);
+		dcs.reg_timer->adjust(period, 0, period);
 	}
 }
 
@@ -2057,7 +2058,7 @@ static void sound_tx_callback(running_device *device, int port, INT32 data)
 	dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
 
 	/* remove timer */
-	timer_device_adjust_oneshot(dcs.reg_timer, attotime_never, 0);
+	dcs.reg_timer->reset();
 }
 
 
@@ -2112,9 +2113,9 @@ static TIMER_DEVICE_CALLBACK( transfer_watchdog_callback )
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(timer->machine, (*dcs.fifo_data_r)(dcs.cpu));
+			preprocess_write(timer.machine, (*dcs.fifo_data_r)(dcs.cpu));
 	}
-	timer_device_adjust_oneshot(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left);
+	transfer.watchdog->adjust(ATTOTIME_IN_MSEC(1), transfer.writes_left);
 }
 
 
@@ -2344,7 +2345,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 			transfer.sum = 0;
 			if (transfer.hle_enabled)
 			{
-				timer_device_adjust_oneshot(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left);
+				transfer.watchdog->adjust(ATTOTIME_IN_MSEC(1), transfer.writes_left);
 				return 1;
 			}
 			break;
@@ -2371,7 +2372,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 				if (transfer.state == 0)
 				{
 					timer_set(machine, ATTOTIME_IN_USEC(1), NULL, transfer.sum, s2_ack_callback);
-					timer_device_adjust_oneshot(transfer.watchdog, attotime_never, 0);
+					transfer.watchdog->reset();
 				}
 				return 1;
 			}

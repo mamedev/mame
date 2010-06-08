@@ -154,10 +154,9 @@ static void update_ethernet_irq(smc91c9x_state *smc);
 INLINE smc91c9x_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SMC91C94 || device->type == SMC91C96);
+	assert(device->type() == SMC91C94 || device->type() == SMC91C96);
 
-	return (smc91c9x_state *)device->token;
+	return (smc91c9x_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -510,13 +509,13 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 
 static DEVICE_START( smc91c9x )
 {
-	const smc91c9x_config *config = (const smc91c9x_config *)device->baseconfig().inline_config;
+	const smc91c9x_config *config = (const smc91c9x_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	smc91c9x_state *smc = get_safe_token(device);
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config == NULL);
-	assert(device->baseconfig().inline_config != NULL);
+	assert(device->baseconfig().static_config() == NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -600,7 +599,6 @@ static DEVICE_GET_INFO( smc91c9x )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(smc91c9x_state);		break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(smc91c9x_config);		break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(smc91c9x); break;

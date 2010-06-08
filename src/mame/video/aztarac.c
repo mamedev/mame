@@ -83,12 +83,12 @@ WRITE16_HANDLER( aztarac_ubr_w )
 
 VIDEO_START( aztarac )
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	int xmin = visarea->min_x;
-	int ymin = visarea->min_y;
-	int xmax = visarea->max_x;
-	int ymax = visarea->max_y;
+	int xmin = visarea.min_x;
+	int ymin = visarea.min_y;
+	int xmax = visarea.max_x;
+	int ymax = visarea.max_y;
 
 	xcenter=((xmax + xmin) / 2) << 16;
 	ycenter=((ymax + ymin) / 2) << 16;

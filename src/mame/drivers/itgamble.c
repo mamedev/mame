@@ -201,8 +201,7 @@ static MACHINE_DRIVER_START( itgamble )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, SND_CLOCK)	/* 1MHz resonator */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", SND_CLOCK, OKIM6295_PIN7_HIGH)	/* 1MHz resonator */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -210,10 +209,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mnumber )
 
 	MDRV_IMPORT_FROM(itgamble)
-	MDRV_CPU_REPLACE("maincpu", H83044, MNUMBER_MAIN_CLOCK/2)	/* probably the wrong CPU */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(MNUMBER_MAIN_CLOCK/2)	/* probably the wrong CPU */
 
-	MDRV_SOUND_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* clock frequency & pin 7 not verified */
+	MDRV_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -222,10 +221,10 @@ static MACHINE_DRIVER_START( ejollyx5 )
 
 	MDRV_IMPORT_FROM(itgamble)
 	/* wrong CPU. we need a Renesas M16/62A 16bit microcomputer core */
-	MDRV_CPU_REPLACE("maincpu", H83044, EJOLLYX5_MAIN_CLOCK/2)	/* up to 10MHz.*/
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(EJOLLYX5_MAIN_CLOCK/2)	/* up to 10MHz.*/
 
-	MDRV_SOUND_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* clock frequency & pin 7 not verified */
+	MDRV_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

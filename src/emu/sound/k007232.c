@@ -58,10 +58,8 @@ typedef struct kdacApcm
 INLINE KDAC_A_PCM *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_K007232);
-	return (KDAC_A_PCM *)device->token;
+	assert(device->type() == SOUND_K007232);
+	return (KDAC_A_PCM *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -307,15 +305,15 @@ static DEVICE_START( k007232 )
 	int i;
 	KDAC_A_PCM *info = get_safe_token(device);
 
-	info->intf = (device->baseconfig().static_config != NULL) ? (const k007232_interface *)device->baseconfig().static_config : &defintrf;
+	info->intf = (device->baseconfig().static_config() != NULL) ? (const k007232_interface *)device->baseconfig().static_config() : &defintrf;
 
 	/* Set up the chips */
 
-	info->pcmbuf[0] = *device->region;
-	info->pcmbuf[1] = *device->region;
-	info->pcmlimit  = device->region->bytes();
+	info->pcmbuf[0] = *device->region();
+	info->pcmbuf[1] = *device->region();
+	info->pcmlimit  = device->region()->bytes();
 
-	info->clock = device->clock;
+	info->clock = device->clock();
 
 	for( i = 0; i < KDAC_A_PCM_MAX; i++ )
 	{
@@ -331,7 +329,7 @@ static DEVICE_START( k007232 )
 
 	for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
 
-	info->stream = stream_create(device,0,2,device->clock/128,info,KDAC_A_update);
+	info->stream = stream_create(device,0,2,device->clock()/128,info,KDAC_A_update);
 
 	KDAC_A_make_fncode(info);
 }

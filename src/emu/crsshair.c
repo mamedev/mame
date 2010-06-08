@@ -39,7 +39,7 @@ struct _crosshair_global
 	UINT8				visible[MAX_PLAYERS];	/* visibility per player */
 	bitmap_t *			bitmap[MAX_PLAYERS];	/* bitmap per player */
 	render_texture *	texture[MAX_PLAYERS];	/* texture per player */
-	running_device *screen[MAX_PLAYERS];	/* the screen on which this player's crosshair is drawn */
+	device_t *screen[MAX_PLAYERS];	/* the screen on which this player's crosshair is drawn */
 	float				x[MAX_PLAYERS];			/* current X position */
 	float				y[MAX_PLAYERS];			/* current Y position */
 	float				last_x[MAX_PLAYERS];	/* last X position */
@@ -135,7 +135,7 @@ static void crosshair_exit(running_machine *machine);
 static void crosshair_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void crosshair_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 
-static void animate(running_device *device, void *param, int vblank_state);
+static void animate(screen_device &device, void *param, bool vblank_state);
 
 
 /***************************************************************************
@@ -179,7 +179,7 @@ static void create_bitmap(running_machine *machine, int player)
 	if (global.bitmap[player] == NULL)
 	{
 		/* allocate a blank bitmap to start with */
-		global.bitmap[player] = bitmap_alloc(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32);
+		global.bitmap[player] = global_alloc(bitmap_t(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32));
 		bitmap_fill(global.bitmap[player], NULL, MAKE_ARGB(0x00,0xff,0xff,0xff));
 
 		/* extract the raw source data to it */
@@ -222,7 +222,7 @@ void crosshair_init(running_machine *machine)
 	global.auto_time = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
 
 	/* determine who needs crosshairs */
-	for (port = machine->portlist.first(); port != NULL; port = port->next)
+	for (port = machine->portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE)
 			{
@@ -248,7 +248,7 @@ void crosshair_init(running_machine *machine)
 
 	/* register the animation callback */
 	if (machine->primary_screen != NULL)
-		video_screen_register_vblank_callback(machine->primary_screen, animate, NULL);
+		machine->primary_screen->register_vblank_callback(animate, NULL);
 }
 
 
@@ -331,7 +331,7 @@ void crosshair_set_user_settings(running_machine *machine, UINT8 player, crossha
     animate - animates the crosshair once a frame
 -------------------------------------------------*/
 
-static void animate(running_device *device, void *param, int vblank_state)
+static void animate(screen_device &device, void *param, bool vblank_state)
 {
 	int player;
 
@@ -352,7 +352,7 @@ static void animate(running_device *device, void *param, int vblank_state)
 	{
 		/* read all the lightgun values */
 		if (global.used[player])
-			input_port_get_crosshair_position(device->machine, player, &global.x[player], &global.y[player]);
+			input_port_get_crosshair_position(device.machine, player, &global.x[player], &global.y[player]);
 
 		/* auto visibility */
 		if (global.mode[player] == CROSSHAIR_VISIBILITY_AUTO)
@@ -388,17 +388,17 @@ static void animate(running_device *device, void *param, int vblank_state)
     for the given screen
 -------------------------------------------------*/
 
-void crosshair_render(running_device *screen)
+void crosshair_render(screen_device &screen)
 {
 	int player;
 
 	for (player = 0; player < MAX_PLAYERS; player++)
 		/* draw if visible and the right screen */
 		if (global.visible[player] &&
-			((global.screen[player] == screen) || (global.screen[player] == CROSSHAIR_SCREEN_ALL)))
+			((global.screen[player] == &screen) || (global.screen[player] == CROSSHAIR_SCREEN_ALL)))
 		{
 			/* add a quad assuming a 4:3 screen (this is not perfect) */
-			render_screen_add_quad(screen,
+			render_screen_add_quad(&screen,
 						global.x[player] - 0.03f, global.y[player] - 0.04f,
 						global.x[player] + 0.03f, global.y[player] + 0.04f,
 						MAKE_ARGB(0xc0, global.fade, global.fade, global.fade),
@@ -412,7 +412,7 @@ void crosshair_render(running_device *screen)
     given player's crosshair
 -------------------------------------------------*/
 
-void crosshair_set_screen(running_machine *machine, int player, running_device *screen)
+void crosshair_set_screen(running_machine *machine, int player, device_t *screen)
 {
 	global.screen[player] = screen;
 }

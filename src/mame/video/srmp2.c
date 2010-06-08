@@ -75,7 +75,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_y = machine->primary_screen->height();
 
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x05 : 0x07;
@@ -158,7 +158,7 @@ static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, c
 
 			int sx		=	  x + xoffs  + (offs & 1) * 16;
 			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(video_screen_get_height(machine->primary_screen) - (video_screen_get_visible_area(machine->primary_screen)->max_y + 1));
+							(machine->primary_screen->height() - (machine->primary_screen->visible_area().max_y + 1));
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -232,7 +232,7 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	int offs;
 	int xoffs, yoffs;
 
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_y = machine->primary_screen->height();
 
 	int ctrl	=	spriteram[ 0x600/2 ];
 	//int ctrl2   =   spriteram[ 0x602/2 ];
@@ -327,7 +327,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 
 			int sx		=	  x + xoffs  + (offs & 1) * 16;
 			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(video_screen_get_height(machine->primary_screen) - (video_screen_get_visible_area(machine->primary_screen)->max_y + 1));
+							(machine->primary_screen->height() - (machine->primary_screen->visible_area().max_y + 1));
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -398,7 +398,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_y = machine->primary_screen->height();
 
 	mjyuugi_draw_sprites_map(machine, bitmap, cliprect);
 
@@ -424,7 +424,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		if (flip)
 		{
 			y = max_y - y
-				+(video_screen_get_height(machine->primary_screen) - (video_screen_get_visible_area(machine->primary_screen)->max_y + 1));
+				+(machine->primary_screen->height() - (machine->primary_screen->visible_area().max_y + 1));
 			flipx = !flipx;
 			flipy = !flipy;
 		}

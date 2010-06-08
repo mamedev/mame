@@ -175,7 +175,7 @@ static READ8_HANDLER( changela_2d_r )
 	int v8 = 0;
 	int gas;
 
-	if ((video_screen_get_vpos(space->machine->primary_screen) & 0xf8) == 0xf8)
+	if ((space->machine->primary_screen->vpos() & 0xf8) == 0xf8)
 		v8 = 1;
 
 	/* Gas pedal is made up of 2 switches, 1 active low, 1 active high */
@@ -423,9 +423,9 @@ static const ay8910_interface ay8910_interface_2 =
 static INTERRUPT_GEN( chl_interrupt )
 {
 	changela_state *state = (changela_state *)device->machine->driver_data;
-	int vector = video_screen_get_vblank(device->machine->primary_screen) ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
+	int vector = device->machine->primary_screen->vblank() ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
 
-//    video_screen_update_partial(device->machine->primary_screen, video_screen_get_vpos(device->machine->primary_screen));
+//    device->machine->primary_screen->update_partial(device->machine->primary_screen->vpos());
 
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
 

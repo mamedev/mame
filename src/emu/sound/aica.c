@@ -213,10 +213,8 @@ static signed short *RBUFDST;	//this points to where the sample will be stored i
 INLINE aica_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_AICA);
-	return (aica_state *)device->token;
+	assert(device->type() == SOUND_AICA);
+	return (aica_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static unsigned char DecodeSCI(aica_state *AICA, unsigned char irq)
@@ -508,11 +506,11 @@ static void AICA_Init(running_device *device, aica_state *AICA, const aica_inter
 	{
 		AICA->Master = intf->master;
 
-		AICA->AICARAM = *device->region;
+		AICA->AICARAM = *device->region();
 		if (AICA->AICARAM)
 		{
 			AICA->AICARAM += intf->roffset;
-			AICA->AICARAM_LENGTH = device->region->bytes();
+			AICA->AICARAM_LENGTH = device->region()->bytes();
 			AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 			AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
 			AICA->DSP.AICARAM = (UINT16 *)AICA->AICARAM;
@@ -1248,7 +1246,7 @@ static DEVICE_START( aica )
 
 	aica_state *AICA = get_safe_token(device);
 
-	intf = (const aica_interface *)device->baseconfig().static_config;
+	intf = (const aica_interface *)device->baseconfig().static_config();
 
 	// init the emulation
 	AICA_Init(device, AICA, intf);

@@ -480,8 +480,8 @@ static VIDEO_START(sliver)
 {
 	sliver_state *state = (sliver_state *)machine->driver_data;
 
-	state->bitmap_bg = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->bitmap_fg = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->bitmap_bg = machine->primary_screen->alloc_compatible_bitmap();
+	state->bitmap_fg = machine->primary_screen->alloc_compatible_bitmap();
 }
 
 static VIDEO_UPDATE(sliver)
@@ -594,8 +594,7 @@ static MACHINE_DRIVER_START( sliver )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 MACHINE_DRIVER_END

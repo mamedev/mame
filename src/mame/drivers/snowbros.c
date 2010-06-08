@@ -336,7 +336,7 @@ static WRITE8_DEVICE_HANDLER( twinadv_oki_bank_w )
 
 	if (data&0xfd) logerror ("Unused bank bits! %02x\n",data);
 
-	okim6295_set_bank_base(device, bank * 0x40000);
+	downcast<okim6295_device *>(device)->set_bank_base(bank * 0x40000);
 }
 
 static ADDRESS_MAP_START( twinadv_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1558,7 +1558,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wintbob )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snowbros)
-	MDRV_CPU_REPLACE("maincpu", M68000, 10000000) /* 10mhz - Confirmed */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(10000000) /* 10mhz - Confirmed */
 	MDRV_CPU_PROGRAM_MAP(wintbob_map)
 
 	MDRV_DEVICE_REMOVE("pandora")
@@ -1574,10 +1575,12 @@ static MACHINE_DRIVER_START( semicom )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snowbros)
-	MDRV_CPU_REPLACE("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(16000000) /* 16mhz or 12mhz ? */
 	MDRV_CPU_PROGRAM_MAP(hyperpac_map)
 
-	MDRV_CPU_REPLACE("soundcpu", Z80, 4000000) /* 4.0 MHz ??? */
+	MDRV_CPU_MODIFY("soundcpu")
+	MDRV_CPU_CLOCK(4000000) /* 4.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(hyperpac_sound_map)
 
 	MDRV_GFXDECODE(hyperpac)
@@ -1588,8 +1591,7 @@ static MACHINE_DRIVER_START( semicom )
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 999900)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1665,8 +1667,7 @@ static MACHINE_DRIVER_START( honeydol )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 999900) /* freq? */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) /* freq? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1699,8 +1700,7 @@ static MACHINE_DRIVER_START( twinadv )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/12) /* freq? */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 12000000/12, OKIM6295_PIN7_HIGH) /* freq? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1726,10 +1726,12 @@ Intel P8752 (mcu)
 static MACHINE_DRIVER_START( finalttr )
 	MDRV_IMPORT_FROM(semicom)
 
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(12000000)
 	MDRV_CPU_PROGRAM_MAP(finalttr_map)
 
-	MDRV_CPU_REPLACE("soundcpu", Z80, 3578545)
+	MDRV_CPU_MODIFY("soundcpu")
+	MDRV_CPU_CLOCK(3578545)
 
 	MDRV_MACHINE_RESET ( finalttr )
 
@@ -1738,8 +1740,7 @@ static MACHINE_DRIVER_START( finalttr )
 	MDRV_SOUND_ROUTE(0, "mono", 0.08)
 	MDRV_SOUND_ROUTE(1, "mono", 0.08)
 
-	MDRV_SOUND_REPLACE("oki", OKIM6295, 999900)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_REPLACE("oki", 999900, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
@@ -1773,8 +1774,7 @@ static MACHINE_DRIVER_START( snowbro3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 999900)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

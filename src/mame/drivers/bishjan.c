@@ -327,7 +327,7 @@ static READ16_HANDLER( bishjan_serial_r )
 		(mame_rand(space->machine) & 0x9800)	|	// bit 7 - serial communication
 		(((bishjan_sel==0x12) ? 0x40:0x00) << 8) |
 //      (mame_rand() & 0xff);
-//      (((video_screen_get_frame_number(space->machine->primary_screen)%60)==0)?0x18:0x00);
+//      (((space->machine->primary_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
 }
 
@@ -348,7 +348,7 @@ static READ16_HANDLER( bishjan_input_r )
 
 	return	(res << 8) |									// high byte
 			input_port_read(space->machine, "SYSTEM") |		// low byte
-			((bishjan_hopper && !(video_screen_get_frame_number(space->machine->primary_screen)%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
+			((bishjan_hopper && !(space->machine->primary_screen->frame_number()%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }
 
@@ -458,12 +458,13 @@ static WRITE8_HANDLER( saklove_outputs_w )
 static WRITE8_DEVICE_HANDLER( saklove_oki_bank_w )
 {
 	// it writes 0x32 or 0x33
-	okim6295_set_bank_base(device, (data & 1) * 0x40000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 1) * 0x40000);
 }
 
 static READ8_HANDLER( saklove_vblank_r )
 {
-	return video_screen_get_vblank(space->machine->primary_screen) ? 0x04 : 0x00;
+	return space->machine->primary_screen->vblank() ? 0x04 : 0x00;
 }
 
 static UINT8 *am188em_regs;
@@ -880,8 +881,7 @@ static MACHINE_DRIVER_START( saklove )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_8_4672MHz / 8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4)	// ? chip and clock unknown

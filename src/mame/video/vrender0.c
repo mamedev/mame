@@ -93,17 +93,16 @@ struct _vr0video_state
 INLINE vr0video_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == VIDEO_VRENDER0);
+	assert(device->type() == VIDEO_VRENDER0);
 
-	return (vr0video_state *)device->token;
+	return (vr0video_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const vr0video_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == VIDEO_VRENDER0);
-	return (const vr0video_interface *) device->baseconfig().static_config;
+	assert(device->type() == VIDEO_VRENDER0);
+	return (const vr0video_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -608,5 +607,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"VRender0"
 #define DEVTEMPLATE_FAMILY		"???"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
 #include "devtempl.h"

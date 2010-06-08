@@ -647,7 +647,7 @@ static READ8_HANDLER( driveout_sound_command_r)
 static void reset_driveout_sound_region( running_machine *machine )
 {
 	taitof2_state *state = (taitof2_state *)machine->driver_data;
-	okim6295_set_bank_base(state->oki, state->oki_bank * 0x40000);
+	state->oki->set_bank_base(state->oki_bank * 0x40000);
 }
 
 static WRITE8_HANDLER( oki_bank_w )
@@ -3381,7 +3381,6 @@ static MACHINE_START( common )
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->audiocpu = devtag_get_device(machine, "audiocpu");;
-	state->oki = devtag_get_device(machine, "oki");;
 	state->tc0100scn = devtag_get_device(machine, "tc0100scn");;
 	state->tc0100scn_1 = devtag_get_device(machine, "tc0100scn_1");;
 	state->tc0100scn_2 = devtag_get_device(machine, "tc0100scn_2");;
@@ -4000,8 +3999,7 @@ static MACHINE_DRIVER_START( cameltrya )
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.60)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 4224000/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", 4224000/4, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitof2_tc0140syt_intf)
@@ -4047,8 +4045,7 @@ static MACHINE_DRIVER_START( driveout )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")   /* does it ? */
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

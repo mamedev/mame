@@ -147,10 +147,9 @@ struct _namco_50xx_state
 INLINE namco_50xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == NAMCO_50XX);
+	assert(device->type() == NAMCO_50XX);
 
-	return (namco_50xx_state *)device->token;
+	return (namco_50xx_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -172,19 +171,19 @@ static TIMER_CALLBACK( namco_50xx_readrequest_callback )
 
 static READ8_HANDLER( namco_50xx_K_r )
 {
-	namco_50xx_state *state = get_safe_token(space->cpu->owner);
+	namco_50xx_state *state = get_safe_token(space->cpu->owner());
 	return state->latched_cmd >> 4;
 }
 
 static READ8_HANDLER( namco_50xx_R0_r )
 {
-	namco_50xx_state *state = get_safe_token(space->cpu->owner);
+	namco_50xx_state *state = get_safe_token(space->cpu->owner());
 	return state->latched_cmd & 0x0f;
 }
 
 static READ8_HANDLER( namco_50xx_R2_r )
 {
-	namco_50xx_state *state = get_safe_token(space->cpu->owner);
+	namco_50xx_state *state = get_safe_token(space->cpu->owner());
 	return state->latched_rw & 1;
 }
 
@@ -192,7 +191,7 @@ static READ8_HANDLER( namco_50xx_R2_r )
 
 static WRITE8_HANDLER( namco_50xx_O_w )
 {
-	namco_50xx_state *state = get_safe_token(space->cpu->owner);
+	namco_50xx_state *state = get_safe_token(space->cpu->owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
 		state->portO = (state->portO & 0x0f) | (out << 4);

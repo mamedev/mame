@@ -56,8 +56,8 @@ public:
 static VIDEO_START( mjsister )
 {
 	mjsister_state *state = (mjsister_state *)machine->driver_data;
-	state->tmpbitmap0 = auto_bitmap_alloc(machine, 256, 256, video_screen_get_format(machine->primary_screen));
-	state->tmpbitmap1 = auto_bitmap_alloc(machine, 256, 256, video_screen_get_format(machine->primary_screen));
+	state->tmpbitmap0 = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
+	state->tmpbitmap1 = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
 	state->videoram0 = auto_alloc_array(machine, UINT8, 0x8000);
 	state->videoram1 = auto_alloc_array(machine, UINT8, 0x8000);
 

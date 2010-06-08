@@ -58,10 +58,10 @@ VIDEO_START( bigevglf )
 {
 	bigevglf_state *state = (bigevglf_state *)machine->driver_data;
 
-	state->tmp_bitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->tmp_bitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->tmp_bitmap[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->tmp_bitmap[3] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmp_bitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmp_bitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmp_bitmap[2] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmp_bitmap[3] = machine->primary_screen->alloc_compatible_bitmap();
 	state_save_register_global_bitmap(machine, state->tmp_bitmap[0]);
 	state_save_register_global_bitmap(machine, state->tmp_bitmap[1]);
 	state_save_register_global_bitmap(machine, state->tmp_bitmap[2]);

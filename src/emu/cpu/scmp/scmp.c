@@ -35,7 +35,6 @@ struct _scmp_state
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
-	cpu_state_table 	state;
 	int					icount;
 
 	devcb_resolved_write8		flag_out_func;
@@ -51,44 +50,15 @@ struct _scmp_state
 ***************************************************************************/
 
 /***************************************************************************
-    CPU STATE DESCRIPTION
-***************************************************************************/
-
-#define SCMP_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(SCMP_##_name, #_name, _format, scmp_state, _member, _datamask, ~0, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	SCMP_STATE_ENTRY(PC,   "%04X", PC.w.l, 0xffff, 0)
-	SCMP_STATE_ENTRY(GENPC,"%04X", PC.w.l, 0xffff, CPUSTATE_NOSHOW)
-	SCMP_STATE_ENTRY(P1,   "%04X", P1.w.l, 0xffff, 0)
-	SCMP_STATE_ENTRY(P2,   "%04X", P2.w.l, 0xffff, 0)
-	SCMP_STATE_ENTRY(P3,   "%04X", P3.w.l, 0xffff, 0)
-	SCMP_STATE_ENTRY(AC,   "%02X", AC, 0xff, 0)
-	SCMP_STATE_ENTRY(ER,   "%02X", ER, 0xff, 0)
-	SCMP_STATE_ENTRY(SR,   "%02X", SR, 0xff, 0)
-
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
-};
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE scmp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SCMP || cpu_get_type(device) == CPU_INS8060);
-	return (scmp_state *)device->token;
+	return (scmp_state *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE UINT16 ADD12(UINT16 addr, INT8 val)
@@ -528,16 +498,27 @@ static CPU_INIT( scmp )
 {
 	scmp_state *cpustate = get_safe_token(device);
 
-	if (device->baseconfig().static_config != NULL)
-		cpustate->config = *(scmp_config *)device->baseconfig().static_config;
+	if (device->baseconfig().static_config() != NULL)
+		cpustate->config = *(scmp_config *)device->baseconfig().static_config();
+
 	/* set up the state table */
-	cpustate->state = state_table_template;
-	cpustate->state.baseptr = cpustate;
-	cpustate->state.subtypemask = 1;
+	{
+		device_state_interface *state;
+		device->interface(state);
+		state->state_add(SCMP_PC,     "PC",    cpustate->PC.w.l);
+		state->state_add(STATE_GENPC, "GENPC", cpustate->PC.w.l).noshow();
+		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->SR).noshow().formatstr("%8s");
+		state->state_add(SCMP_P1,     "P1",    cpustate->P1.w.l);
+		state->state_add(SCMP_P2,     "P2",    cpustate->P2.w.l);
+		state->state_add(SCMP_P3,     "P3",    cpustate->P3.w.l);
+		state->state_add(SCMP_AC,     "AC",    cpustate->AC);
+		state->state_add(SCMP_ER,     "ER",    cpustate->ER);
+		state->state_add(SCMP_SR,     "SR",    cpustate->SR);
+	}
 
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	/* resolve callbacks */
 	devcb_resolve_write8(&cpustate->flag_out_func, &cpustate->config.flag_out_func, device);
@@ -589,6 +570,26 @@ static CPU_EXPORT_STATE( scmp )
 {
 }
 
+static CPU_EXPORT_STRING( scmp )
+{
+	scmp_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c%c%c",
+			  (cpustate->SR & 0x80) ? 'C' : '.',
+			  (cpustate->SR & 0x40) ? 'V' : '.',
+			  (cpustate->SR & 0x20) ? 'B' : '.',
+			  (cpustate->SR & 0x10) ? 'A' : '.',
+			  (cpustate->SR & 0x08) ? 'I' : '.',
+			  (cpustate->SR & 0x04) ? '2' : '.',
+			  (cpustate->SR & 0x02) ? '1' : '.',
+			  (cpustate->SR & 0x01) ? '0' : '.');
+			break;
+	}
+}
+
 /***************************************************************************
     COMMON SET INFO
 ***************************************************************************/
@@ -602,7 +603,7 @@ static CPU_SET_INFO( scmp )
 
 CPU_GET_INFO( scmp )
 {
-	scmp_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	scmp_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -637,10 +638,10 @@ CPU_GET_INFO( scmp )
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(scmp);			break;
 		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(scmp);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(scmp);		break;
+		case CPUINFO_FCT_EXPORT_STRING:	info->export_string = CPU_EXPORT_STRING_NAME(scmp);		break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "INS 8050 SC/MP");				break;
@@ -648,18 +649,6 @@ CPU_GET_INFO( scmp )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-			  (cpustate->SR & 0x80) ? 'C' : '.',
-			  (cpustate->SR & 0x40) ? 'V' : '.',
-			  (cpustate->SR & 0x20) ? 'B' : '.',
-			  (cpustate->SR & 0x10) ? 'A' : '.',
-			  (cpustate->SR & 0x08) ? 'I' : '.',
-			  (cpustate->SR & 0x04) ? '2' : '.',
-			  (cpustate->SR & 0x02) ? '1' : '.',
-			  (cpustate->SR & 0x01) ? '0' : '.');
-			break;
 	}
 }
 

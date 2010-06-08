@@ -243,7 +243,7 @@ static void liberatr_init_planet(running_machine *machine, planet *liberatr_plan
 
 			/* calculate the bitmap's x coordinate for the western horizon
                center of bitmap - (the number of planet pixels) / 4 */
-			*buffer++ = (video_screen_get_width(machine->primary_screen) / 2) - ((line->max_x + 2) / 4);
+			*buffer++ = (machine->primary_screen->width() / 2) - ((line->max_x + 2) / 4);
 
 			for (i = 0; i < segment_count; i++)
 			{

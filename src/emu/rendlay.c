@@ -545,7 +545,7 @@ static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, co
 	curx = bounds->min_x + (bounds->max_x - bounds->min_x - width) / 2;
 
 	/* allocate a temporary bitmap */
-	tempbitmap = bitmap_alloc(dest->width, dest->height, BITMAP_FORMAT_ARGB32);
+	tempbitmap = global_alloc(bitmap_t(dest->width, dest->height, BITMAP_FORMAT_ARGB32));
 
 	/* loop over characters */
 	for (s = string; *s != 0; s++)
@@ -591,7 +591,7 @@ static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, co
 	}
 
 	/* free the temporary bitmap and font */
-	bitmap_free(tempbitmap);
+	global_free(tempbitmap);
 	render_font_free(font);
 }
 
@@ -824,7 +824,7 @@ static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds,
 	skewwidth = 40;
 
 	/* allocate a temporary bitmap for drawing */
-	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32);
+	tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32));
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
 	/* top bar */
@@ -857,7 +857,7 @@ static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds,
 	/* resample to the target size */
 	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
 
-	bitmap_free(tempbitmap);
+	global_free(tempbitmap);
 }
 
 
@@ -880,7 +880,7 @@ static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds
 	skewwidth = 40;
 
 	/* allocate a temporary bitmap for drawing */
-	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32);
+	tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32));
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top bar */
@@ -963,7 +963,7 @@ static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds
 	/* resample to the target size */
 	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
 
-	bitmap_free(tempbitmap);
+	global_free(tempbitmap);
 }
 
 
@@ -986,7 +986,7 @@ static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *boun
 	skewwidth = 40;
 
 	/* allocate a temporary bitmap for drawing, adding some extra space for the tail */
-	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight + segwidth, BITMAP_FORMAT_ARGB32);
+	tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight + segwidth, BITMAP_FORMAT_ARGB32));
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top bar */
@@ -1078,7 +1078,7 @@ static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *boun
 	/* resample to the target size */
 	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
 
-	bitmap_free(tempbitmap);
+	global_free(tempbitmap);
 }
 
 
@@ -1101,7 +1101,7 @@ static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds
 	skewwidth = 40;
 
 	/* allocate a temporary bitmap for drawing */
-	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32);
+	tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32));
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top-left bar */
@@ -1194,7 +1194,7 @@ static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds
 	/* resample to the target size */
 	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
 
-	bitmap_free(tempbitmap);
+	global_free(tempbitmap);
 }
 
 
@@ -1217,7 +1217,7 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
 	skewwidth = 40;
 
 	/* allocate a temporary bitmap for drawing */
-	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight + segwidth, BITMAP_FORMAT_ARGB32);
+	tempbitmap = global_alloc(bitmap_t(bmwidth + skewwidth, bmheight + segwidth, BITMAP_FORMAT_ARGB32));
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top-left bar */
@@ -1319,7 +1319,7 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
 	/* resample to the target size */
 	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
 
-	bitmap_free(tempbitmap);
+	global_free(tempbitmap);
 }
 
 
@@ -1335,22 +1335,21 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
 
 static int get_variable_value(const machine_config *config, const char *string, char **outputptr)
 {
-	const device_config *devconfig;
+	const screen_device_config *devconfig;
 	int num, den;
 	char temp[100];
 
 	/* screen 0 parameters */
-	for (devconfig = video_screen_first(config); devconfig != NULL; devconfig = video_screen_next(devconfig))
+	for (devconfig = screen_first(*config); devconfig != NULL; devconfig = screen_next(devconfig))
 	{
-		int scrnum = config->devicelist.index(VIDEO_SCREEN, devconfig->tag());
-		const screen_config *scrconfig = (const screen_config *)devconfig->inline_config;
+		int scrnum = config->devicelist.index(SCREEN, devconfig->tag());
 
 		/* native X aspect factor */
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			num = scrconfig->visarea.max_x + 1 - scrconfig->visarea.min_x;
-			den = scrconfig->visarea.max_y + 1 - scrconfig->visarea.min_y;
+			num = devconfig->visible_area().max_x + 1 - devconfig->visible_area().min_x;
+			den = devconfig->visible_area().max_y + 1 - devconfig->visible_area().min_y;
 			reduce_fraction(&num, &den);
 			*outputptr += sprintf(*outputptr, "%d", num);
 			return strlen(temp);
@@ -1360,8 +1359,8 @@ static int get_variable_value(const machine_config *config, const char *string, 
 		sprintf(temp, "~scr%dnativeyaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			num = scrconfig->visarea.max_x + 1 - scrconfig->visarea.min_x;
-			den = scrconfig->visarea.max_y + 1 - scrconfig->visarea.min_y;
+			num = devconfig->visible_area().max_x + 1 - devconfig->visible_area().min_x;
+			den = devconfig->visible_area().max_y + 1 - devconfig->visible_area().min_y;
 			reduce_fraction(&num, &den);
 			*outputptr += sprintf(*outputptr, "%d", den);
 			return strlen(temp);
@@ -1371,7 +1370,7 @@ static int get_variable_value(const machine_config *config, const char *string, 
 		sprintf(temp, "~scr%dwidth~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", scrconfig->visarea.max_x + 1 - scrconfig->visarea.min_x);
+			*outputptr += sprintf(*outputptr, "%d", devconfig->visible_area().max_x + 1 - devconfig->visible_area().min_x);
 			return strlen(temp);
 		}
 
@@ -1379,7 +1378,7 @@ static int get_variable_value(const machine_config *config, const char *string, 
 		sprintf(temp, "~scr%dheight~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", scrconfig->visarea.max_y + 1 - scrconfig->visarea.min_y);
+			*outputptr += sprintf(*outputptr, "%d", devconfig->visible_area().max_y + 1 - devconfig->visible_area().min_y);
 			return strlen(temp);
 		}
 	}
@@ -1892,7 +1891,7 @@ static bitmap_t *load_component_bitmap(const char *dirname, const char *file, co
 		int step, line;
 
 		/* draw some stripes in the bitmap */
-		bitmap = bitmap_alloc(100, 100, BITMAP_FORMAT_ARGB32);
+		bitmap = global_alloc(bitmap_t(100, 100, BITMAP_FORMAT_ARGB32));
 		bitmap_fill(bitmap, NULL, 0);
 		for (step = 0; step < 100; step += 25)
 			for (line = 0; line < 100; line++)
@@ -2101,8 +2100,7 @@ static void layout_element_free(layout_element *element)
 			global_free(temp->imagefile);
 		if (temp->alphafile != NULL)
 			global_free(temp->alphafile);
-		if (temp->bitmap != NULL)
-			bitmap_free(temp->bitmap);
+		global_free(temp->bitmap);
 		global_free(temp);
 	}
 

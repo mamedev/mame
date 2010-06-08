@@ -85,10 +85,8 @@ struct _c352_state
 INLINE c352_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_C352);
-	return (c352_state *)device->token;
+	assert(device->type() == SOUND_C352);
+	return (c352_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 // noise generator
@@ -543,10 +541,10 @@ static DEVICE_START( c352 )
 {
 	c352_state *info = get_safe_token(device);
 
-	info->c352_rom_samples = *device->region;
-	info->c352_rom_length = device->region->bytes();
+	info->c352_rom_samples = *device->region();
+	info->c352_rom_length = device->region()->bytes();
 
-	info->sample_rate_base = device->clock / 192;
+	info->sample_rate_base = device->clock() / 192;
 
 	info->stream = stream_create(device, 0, 4, info->sample_rate_base, info, c352_update);
 

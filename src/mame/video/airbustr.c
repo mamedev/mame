@@ -121,7 +121,7 @@ VIDEO_START( airbustr )
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	state->sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->sprites_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
 	tilemap_set_scrolldx(state->bg_tilemap, 0x094, 0x06a);

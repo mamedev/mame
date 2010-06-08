@@ -525,10 +525,8 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 INLINE pokey_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_POKEY);
-	return (pokey_state *)device->token;
+	assert(device->type() == SOUND_POKEY);
+	return (pokey_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -618,13 +616,13 @@ static void register_for_save(pokey_state *chip, running_device *device)
 static DEVICE_START( pokey )
 {
 	pokey_state *chip = get_safe_token(device);
-	int sample_rate = device->clock;
+	int sample_rate = device->clock();
 	int i;
 
-	if (device->baseconfig().static_config)
-		memcpy(&chip->intf, device->baseconfig().static_config, sizeof(pokey_interface));
+	if (device->baseconfig().static_config())
+		memcpy(&chip->intf, device->baseconfig().static_config(), sizeof(pokey_interface));
 	chip->device = device;
-	chip->clock_period = ATTOTIME_IN_HZ(device->clock);
+	chip->clock_period = ATTOTIME_IN_HZ(device->clock());
 
 	/* calculate the A/D times
      * In normal, slow mode (SKCTL bit SK_PADDLE is clear) the conversion
@@ -633,8 +631,8 @@ static DEVICE_START( pokey )
      * In quick mode (SK_PADDLE set) the conversion is done very fast
      * (takes two scanlines) but the result is not as accurate.
      */
-	chip->ad_time_fast = attotime_div(attotime_mul(ATTOTIME_IN_NSEC(64000*2/228), FREQ_17_EXACT), device->clock);
-	chip->ad_time_slow = attotime_div(attotime_mul(ATTOTIME_IN_NSEC(64000      ), FREQ_17_EXACT), device->clock);
+	chip->ad_time_fast = attotime_div(attotime_mul(ATTOTIME_IN_NSEC(64000*2/228), FREQ_17_EXACT), device->clock());
+	chip->ad_time_slow = attotime_div(attotime_mul(ATTOTIME_IN_NSEC(64000      ), FREQ_17_EXACT), device->clock());
 
 	/* initialize the poly counters */
 	poly_init(chip->poly4,   4, 3, 1, 0x00004);
@@ -646,7 +644,7 @@ static DEVICE_START( pokey )
 	rand_init(chip->rand9,   9, 8, 1, 0x00180);
 	rand_init(chip->rand17, 17,16, 1, 0x1c000);
 
-	chip->samplerate_24_8 = (device->clock << 8) / sample_rate;
+	chip->samplerate_24_8 = (device->clock() << 8) / sample_rate;
 	chip->divisor[CHAN1] = 4;
 	chip->divisor[CHAN2] = 4;
 	chip->divisor[CHAN3] = 4;

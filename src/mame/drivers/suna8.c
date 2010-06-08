@@ -923,7 +923,7 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 
 static READ8_HANDLER( sparkman_c0a3_r )
 {
-	return (video_screen_get_frame_number(space->machine->primary_screen) & 1) ? 0x80 : 0;
+	return (space->machine->primary_screen->frame_number() & 1) ? 0x80 : 0;
 }
 
 #if 0

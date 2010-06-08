@@ -262,8 +262,7 @@ static MACHINE_DRIVER_START( pokechmp )
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 4000000/4) // ?? unknown frequency
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 4000000/4, OKIM6295_PIN7_HIGH) // ?? unknown frequency
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	/* sound fx */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

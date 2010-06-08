@@ -362,7 +362,7 @@ static VIDEO_START(rabbit)
     tilemap_map_pen_to_layer(rabbit_tilemap[3], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
     tilemap_map_pen_to_layer(rabbit_tilemap[3], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
-	rabbit_sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,video_screen_get_format(machine->primary_screen));
+	rabbit_sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,machine->primary_screen->format());
 	rabbit_sprite_clip.min_x = 0;
 	rabbit_sprite_clip.max_x = 0x1000-1;
 	rabbit_sprite_clip.min_y = 0;

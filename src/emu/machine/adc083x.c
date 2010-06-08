@@ -74,16 +74,15 @@ struct _adc0831_state
 INLINE adc0831_state *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( ( device->type == ADC0831 ) || ( device->type == ADC0832 ) || ( device->type == ADC0834 ) || ( device->type == ADC0838 ) );
-	return (adc0831_state *) device->token;
+	assert( ( device->type() == ADC0831 ) || ( device->type() == ADC0832 ) || ( device->type() == ADC0834 ) || ( device->type() == ADC0838 ) );
+	return (adc0831_state *) downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const adc083x_interface *get_interface( running_device *device )
 {
 	assert( device != NULL );
-	assert( ( device->type == ADC0831 ) || ( device->type == ADC0832 ) || ( device->type == ADC0834 ) || ( device->type == ADC0838 ) );
-	return (const adc083x_interface *) device->baseconfig().static_config;
+	assert( ( device->type() == ADC0831 ) || ( device->type() == ADC0832 ) || ( device->type() == ADC0834 ) || ( device->type() == ADC0838 ) );
+	return (const adc083x_interface *) device->baseconfig().static_config();
 }
 
 
@@ -97,7 +96,7 @@ INLINE const adc083x_interface *get_interface( running_device *device )
 
 static void adc083x_clear_sars( running_device *device, adc0831_state *adc083x )
 {
-	if( device->type == ADC0834 ||device->type == ADC0838 )
+	if( device->type() == ADC0834 ||device->type() == ADC0838 )
 	{
 		adc083x->sars = 1;
 	}
@@ -129,7 +128,7 @@ WRITE_LINE_DEVICE_HANDLER( adc083x_cs_write )
 
 	if( adc083x->cs != 0 && state == 0 )
 	{
-		if( device->type == ADC0831 )
+		if( device->type() == ADC0831 )
 		{
 			adc083x->state = STATE_MUX_SETTLE;
 		}
@@ -160,12 +159,12 @@ static UINT8 adc083x_conversion( running_device *device )
 	double gnd = adc083x->input_callback_r( device, ADC083X_AGND );
 	double vref = adc083x->input_callback_r( device, ADC083X_VREF );
 
-	if( device->type == ADC0831 )
+	if( device->type() == ADC0831 )
 	{
 		positive_channel = ADC083X_CH0;
 		negative_channel = ADC083X_CH1;
 	}
-	else if( device->type == ADC0832 )
+	else if( device->type() == ADC0832 )
 	{
 		positive_channel = ADC083X_CH0 + adc083x->odd;
 		if( adc083x->sgl == 0 )
@@ -177,7 +176,7 @@ static UINT8 adc083x_conversion( running_device *device )
 			negative_channel = ADC083X_AGND;
 		}
 	}
-	else if( device->type == ADC0834 )
+	else if( device->type() == ADC0834 )
 	{
 		positive_channel = ADC083X_CH0 + adc083x->odd + ( adc083x->sel1 * 2 );
 		if( adc083x->sgl == 0 )
@@ -189,7 +188,7 @@ static UINT8 adc083x_conversion( running_device *device )
 			negative_channel = ADC083X_AGND;
 		}
 	}
-	else if( device->type == ADC0838 )
+	else if( device->type() == ADC0838 )
 	{
 		positive_channel = ADC083X_CH0 + adc083x->odd + ( adc083x->sel0 * 2 ) + ( adc083x->sel1 * 4 );
 		if( adc083x->sgl == 0 )
@@ -308,7 +307,7 @@ WRITE_LINE_DEVICE_HANDLER( adc083x_clk_write )
 
 			case STATE_WAIT_FOR_SE:
 				adc083x->sars = 0;
-				if( device->type == ADC0838 && adc083x->se != 0 )
+				if( device->type() == ADC0838 && adc083x->se != 0 )
 				{
 					verboselog( 1, device->machine, "adc083x %s not se\n", device->tag() );
 				}
@@ -342,7 +341,7 @@ WRITE_LINE_DEVICE_HANDLER( adc083x_clk_write )
 				adc083x->bit--;
 				if( adc083x->bit < 0 )
 				{
-					if( device->type == ADC0831 )
+					if( device->type() == ADC0831 )
 					{
 						adc083x->state = STATE_FINISHED;
 					}
@@ -455,19 +454,19 @@ static DEVICE_START( adc0831 )
 	adc083x->bit = 0;
 	adc083x->output = 0;
 
-	if( device->type == ADC0831 )
+	if( device->type() == ADC0831 )
 	{
 		adc083x->mux_bits = 0;
 	}
-	else if( device->type == ADC0832 )
+	else if( device->type() == ADC0832 )
 	{
 		adc083x->mux_bits = 2;
 	}
-	else if( device->type == ADC0834 )
+	else if( device->type() == ADC0834 )
 	{
 		adc083x->mux_bits = 3;
 	}
-	else if( device->type == ADC0838 )
+	else if( device->type() == ADC0838 )
 	{
 		adc083x->mux_bits = 4;
 	}
@@ -516,7 +515,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"A/D Converters 0831"
 #define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 083x"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID( p, s )	p##adc0832##s

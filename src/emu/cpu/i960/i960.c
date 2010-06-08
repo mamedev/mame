@@ -33,7 +33,7 @@ struct _i960_state_t {
 
 	int immediate_irq, immediate_vector, immediate_pri;
 
-	cpu_irq_callback irq_cb;
+	device_irq_callback irq_cb;
 	running_device *device;
 	const address_space *program;
 
@@ -43,10 +43,9 @@ struct _i960_state_t {
 INLINE i960_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I960);
-	return (i960_state_t *)device->token;
+	return (i960_state_t *)downcast<cpu_device *>(device)->token();
 }
 
 static void do_call(i960_state_t *i960, UINT32 adr, int type, UINT32 stack);
@@ -2071,7 +2070,7 @@ static CPU_INIT( i960 )
 
 	i960->irq_cb = irqcallback;
 	i960->device = device;
-	i960->program = device->space(AS_PROGRAM);
+	i960->program = device_memory(device)->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, i960->PIP);
 	state_save_register_device_item(device, 0, i960->SAT);
@@ -2108,7 +2107,7 @@ static CPU_RESET( i960 )
 
 CPU_GET_INFO( i960 )
 {
-	i960_state_t *i960 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i960_state_t *i960 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	if(state >= CPUINFO_INT_REGISTER+I960_R0 && state <= CPUINFO_INT_REGISTER + I960_G15) {
 		info->i = i960->r[state - (CPUINFO_INT_REGISTER + I960_R0)];

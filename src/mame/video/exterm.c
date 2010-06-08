@@ -67,7 +67,7 @@ void exterm_from_shiftreg_slave(const address_space *space, UINT32 address, UINT
  *
  *************************************/
 
-void exterm_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void exterm_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *bgsrc = &exterm_master_videoram[(params->rowaddr << 8) & 0xff00];
 	UINT16 *fgsrc = NULL;
@@ -78,7 +78,7 @@ void exterm_scanline_update(running_device *screen, bitmap_t *bitmap, int scanli
 	int x;
 
 	/* get parameters for the slave CPU */
-	tms34010_get_display_params(devtag_get_device(screen->machine, "slave"), &fgparams);
+	tms34010_get_display_params(devtag_get_device(screen.machine, "slave"), &fgparams);
 
 	/* compute info about the slave vram */
 	if (fgparams.enabled && scanline >= fgparams.veblnk && scanline < fgparams.vsblnk && fgparams.heblnk < fgparams.hsblnk)

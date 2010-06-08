@@ -170,7 +170,7 @@ static void generate_interrupt(running_machine *machine, int state)
 {
 	itech8_update_interrupts(machine, -1, state, -1);
 
-	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
+	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", machine->primary_screen->vpos());
 }
 
 
@@ -229,8 +229,8 @@ WRITE8_HANDLER( itech8_palette_w )
 
 WRITE8_HANDLER( itech8_page_w )
 {
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
-	logerror("%04x:display_page = %02X (%d)\n", cpu_get_pc(space->cpu), data, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	logerror("%04x:display_page = %02X (%d)\n", cpu_get_pc(space->cpu), data, space->machine->primary_screen->vpos());
 	page_select = data;
 }
 
@@ -328,7 +328,7 @@ static void perform_blit(const address_space *space)
 	/* debugging */
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
-				video_screen_get_vpos(space->machine->primary_screen),
+				space->machine->primary_screen->vpos(),
 				(*itech8_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
@@ -450,7 +450,7 @@ static TIMER_CALLBACK( blitter_done )
 	blit_in_progress = 0;
 	itech8_update_interrupts(machine, -1, -1, 1);
 
-	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
+	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", machine->primary_screen->vpos());
 }
 
 
@@ -585,7 +585,7 @@ WRITE8_HANDLER( grmatch_palette_w )
 WRITE8_HANDLER( grmatch_xscroll_w )
 {
 	/* update the X scroll value */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	grmatch_xscroll = data;
 }
 

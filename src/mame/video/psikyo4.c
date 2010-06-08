@@ -99,7 +99,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 			if ((!scr && flipscreen1) || (scr && flipscreen2))
 			{
-				ypos = video_screen_get_visible_area(machine->primary_screen)->max_y + 1 - ypos - high * 16; /* Screen Height depends on game */
+				ypos = machine->primary_screen->visible_area().max_y + 1 - ypos - high * 16; /* Screen Height depends on game */
 				xpos = 40 * 8 - xpos - wide * 16;
 				flipx = !flipx;
 				flipy = !flipy;

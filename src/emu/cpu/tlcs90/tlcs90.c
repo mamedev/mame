@@ -30,7 +30,7 @@ typedef struct
 	PAIR		af2,bc2,de2,hl2;
 	UINT8		halt, after_EI;
 	UINT16		irq_state, irq_mask;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
@@ -63,13 +63,12 @@ typedef struct
 INLINE t90_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMP90840 ||
 		   cpu_get_type(device) == CPU_TMP90841 ||
 		   cpu_get_type(device) == CPU_TMP91640 ||
 		   cpu_get_type(device) == CPU_TMP91641);
-	return (t90_Regs *)device->token;
+	return (t90_Regs *)downcast<cpu_device *>(device)->token();
 }
 
 enum	{
@@ -2716,8 +2715,8 @@ static CPU_INIT( t90 )
 	memset(cpustate, 0, sizeof(t90_Regs));
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	cpustate->timer_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device)), 8);
 
@@ -2791,7 +2790,7 @@ static CPU_SET_INFO( t90 )
 
 CPU_GET_INFO( tmp90840 )
 {
-	t90_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	t90_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

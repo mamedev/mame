@@ -10,11 +10,13 @@
 #ifndef __TMS9927__
 #define __TMS9927__
 
+#include "devlegcy.h"
 
-#define TMS9927		DEVICE_GET_INFO_NAME(tms9927)
-#define CRT5027		DEVICE_GET_INFO_NAME(crt5027)
-#define CRT5037		DEVICE_GET_INFO_NAME(crt5037)
-#define CRT5057		DEVICE_GET_INFO_NAME(crt5057)
+
+DECLARE_LEGACY_DEVICE(TMS9927, tms9927);
+DECLARE_LEGACY_DEVICE(CRT5027, crt5027);
+DECLARE_LEGACY_DEVICE(CRT5037, crt5037);
+DECLARE_LEGACY_DEVICE(CRT5057, crt5057);
 
 
 #define MDRV_TMS9927_ADD(_tag, _clock, _config) \
@@ -39,12 +41,6 @@ struct _tms9927_interface
 
 extern tms9927_interface tms9927_null_interface;
 
-
-/* device interface */
-DEVICE_GET_INFO( tms9927 );
-DEVICE_GET_INFO( crt5027 );
-DEVICE_GET_INFO( crt5037 );
-DEVICE_GET_INFO( crt5057 );
 
 /* basic read/write handlers */
 WRITE8_DEVICE_HANDLER( tms9927_w );

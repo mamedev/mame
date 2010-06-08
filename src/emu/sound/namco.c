@@ -80,12 +80,10 @@ struct _namco_sound
 INLINE namco_sound *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_NAMCO ||
-		   sound_get_type(device) == SOUND_NAMCO_15XX ||
-		   sound_get_type(device) == SOUND_NAMCO_CUS30);
-	return (namco_sound *)device->token;
+	assert(device->type() == SOUND_NAMCO ||
+		   device->type() == SOUND_NAMCO_15XX ||
+		   device->type() == SOUND_NAMCO_CUS30);
+	return (namco_sound *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* update the decoded waveform data */
@@ -366,7 +364,7 @@ static STREAM_UPDATE( namco_update_stereo )
 static DEVICE_START( namco )
 {
 	sound_channel *voice;
-	const namco_interface *intf = (const namco_interface *)device->baseconfig().static_config;
+	const namco_interface *intf = (const namco_interface *)device->baseconfig().static_config();
 	int clock_multiple;
 	namco_sound *chip = get_safe_token(device);
 
@@ -376,7 +374,7 @@ static DEVICE_START( namco )
 	chip->stereo = intf->stereo;
 
 	/* adjust internal clock */
-	chip->namco_clock = device->clock;
+	chip->namco_clock = device->clock();
 	for (clock_multiple = 0; chip->namco_clock < INTERNAL_RATE; clock_multiple++)
 		chip->namco_clock *= 2;
 
@@ -388,7 +386,7 @@ static DEVICE_START( namco )
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", chip->f_fracbits, chip->namco_clock, chip->sample_rate);
 
 	/* build the waveform table */
-	build_decoded_waveform(device->machine, chip, *device->region);
+	build_decoded_waveform(device->machine, chip, *device->region());
 
 	/* get stream channels */
 	if (intf->stereo)

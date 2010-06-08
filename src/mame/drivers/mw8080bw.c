@@ -2156,7 +2156,7 @@ MACHINE_DRIVER_END
 
 static TIMER_DEVICE_CALLBACK( spcenctr_strobe_timer_callback )
 {
-	mw8080bw_state *state = (mw8080bw_state *)timer->machine->driver_data;
+	mw8080bw_state *state = (mw8080bw_state *)timer.machine->driver_data;
 	output_set_value("STROBE", param && state->spcenctr_strobe_state);
 }
 

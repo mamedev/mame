@@ -102,8 +102,8 @@ static int brt_r,brt_g,brt_b;
 
 VIDEO_START( ms32 )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	ms32_priram_8   = auto_alloc_array_clear(machine, UINT8, 0x2000);
 	ms32_palram_16  = auto_alloc_array_clear(machine, UINT16, 0x20000);
@@ -437,8 +437,8 @@ VIDEO_UPDATE( ms32 )
        than are supported here..  I don't know, it will need hw tests I think */
 	{
 		int xx, yy;
-		int width = video_screen_get_width(screen);
-		int height = video_screen_get_height(screen);
+		int width = screen->width();
+		int height = screen->height();
 		const pen_t *paldata = screen->machine->pens;
 
 		UINT16* srcptr_tile;

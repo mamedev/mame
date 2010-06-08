@@ -307,7 +307,7 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 	mo->romlength     = memory_region_length(machine, desc->region);
 	mo->objectcount   = count_objects(base, mo->romlength);
 
-	mo->cliprect      = *video_screen_get_visible_area(machine->primary_screen);
+	mo->cliprect      = machine->primary_screen->visible_area();
 	if (desc->rightclip)
 	{
 		mo->cliprect.min_x = desc->leftclip;
@@ -336,8 +336,8 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 	mo->spriteram = auto_alloc_array_clear(machine, atarirle_entry, mo->spriteramsize);
 
 	/* allocate bitmaps */
-	width = video_screen_get_width(machine->primary_screen);
-	height = video_screen_get_height(machine->primary_screen);
+	width = machine->primary_screen->width();
+	height = machine->primary_screen->height();
 
 	mo->vram[0][0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	mo->vram[0][1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -380,7 +380,7 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 void atarirle_control_w(running_machine *machine, int map, UINT8 bits)
 {
 	atarirle_data *mo = &atarirle[map];
-	int scanline = video_screen_get_vpos(machine->primary_screen);
+	int scanline = machine->primary_screen->vpos();
 	int oldbits = mo->control_bits;
 
 //logerror("atarirle_control_w(%d)\n", bits);
@@ -390,7 +390,7 @@ void atarirle_control_w(running_machine *machine, int map, UINT8 bits)
 		return;
 
 	/* force a partial update first */
-	video_screen_update_partial(machine->primary_screen, scanline);
+	machine->primary_screen->update_partial(scanline);
 
 	/* if the erase flag was set, erase the front map */
 	if (oldbits & ATARIRLE_CONTROL_ERASE)
@@ -838,7 +838,7 @@ if (hilite)
 
 		do
 		{
-			const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+			const rectangle &visarea = machine->primary_screen->visible_area();
 			int scaled_width = (scale * info->width + 0x7fff) >> 12;
 			int scaled_height = (scale * info->height + 0x7fff) >> 12;
 			int ex, ey, sx = x, sy = y, tx, ty;
@@ -852,27 +852,27 @@ if (hilite)
 			ey = sy + scaled_height - 1;
 
 			/* left edge clip */
-			if (sx < visarea->min_x)
-				sx = visarea->min_x;
-			if (sx > visarea->max_x)
+			if (sx < visarea.min_x)
+				sx = visarea.min_x;
+			if (sx > visarea.max_x)
 				break;
 
 			/* right edge clip */
-			if (ex > visarea->max_x)
-				ex = visarea->max_x;
-			else if (ex < visarea->min_x)
+			if (ex > visarea.max_x)
+				ex = visarea.max_x;
+			else if (ex < visarea.min_x)
 				break;
 
 			/* top edge clip */
-			if (sy < visarea->min_y)
-				sy = visarea->min_y;
-			else if (sy > visarea->max_y)
+			if (sy < visarea.min_y)
+				sy = visarea.min_y;
+			else if (sy > visarea.max_y)
 				break;
 
 			/* bottom edge clip */
-			if (ey > visarea->max_y)
-				ey = visarea->max_y;
-			else if (ey < visarea->min_y)
+			if (ey > visarea.max_y)
+				ey = visarea.max_y;
+			else if (ey < visarea.min_y)
 				break;
 
 			for (ty = sy; ty <= ey; ty++)
@@ -914,7 +914,7 @@ void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hfli
 	if (hflip)
 		scaled_xoffs = ((xscale * info->width) >> 12) - scaled_xoffs;
 
-//if (clip->min_y == video_screen_get_visible_area(Machine->primary_screen)->min_y)
+//if (clip->min_y == Machine->primary_screen->visible_area().min_y)
 //logerror("   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",
 //  code, color, hflip,
 //  x, -scaled_xoffs, (xscale * info->width) >> 12,

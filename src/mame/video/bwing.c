@@ -123,7 +123,7 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 			state->srbank = data >> 6;
 
 			#if BW_DEBUG
-				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", space->cpu->tag, cpu_get_pc(space->cpu), data, 0x1b00 + offset, video_screen_get_frame_number(space->machine->primary_screen));
+				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", space->cpu->tag, cpu_get_pc(space->cpu), data, 0x1b00 + offset, space->machine->primary_screen->frame_number());
 			#endif
 		break;
 	}

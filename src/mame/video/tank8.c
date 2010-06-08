@@ -115,9 +115,9 @@ static TILE_GET_INFO( tank8_get_tile_info )
 
 VIDEO_START( tank8 )
 {
-	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	helper3 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper1 = machine->primary_screen->alloc_compatible_bitmap();
+	helper2 = machine->primary_screen->alloc_compatible_bitmap();
+	helper3 = machine->primary_screen->alloc_compatible_bitmap();
 
 	tank8_tilemap = tilemap_create(machine, tank8_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
@@ -214,17 +214,17 @@ VIDEO_EOF( tank8 )
 {
 	int x;
 	int y;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	tilemap_draw(helper1, visarea, tank8_tilemap, 0, 0);
+	tilemap_draw(helper1, &visarea, tank8_tilemap, 0, 0);
 
-	bitmap_fill(helper2, visarea, 8);
-	bitmap_fill(helper3, visarea, 8);
+	bitmap_fill(helper2, &visarea, 8);
+	bitmap_fill(helper3, &visarea, 8);
 
-	draw_sprites(machine, helper2, visarea);
-	draw_bullets(helper3, visarea);
+	draw_sprites(machine, helper2, &visarea);
+	draw_bullets(helper3, &visarea);
 
-	for (y = visarea->min_y; y <= visarea->max_y; y++)
+	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{
 		int state = 0;
 
@@ -232,10 +232,10 @@ VIDEO_EOF( tank8 )
 		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
 		const UINT16* p3 = BITMAP_ADDR16(helper3, y, 0);
 
-		if (y % 2 != video_screen_get_frame_number(machine->primary_screen) % 2)
+		if (y % 2 != machine->primary_screen->frame_number() % 2)
 			continue; /* video display is interlaced */
 
-		for (x = visarea->min_x; x <= visarea->max_x; x++)
+		for (x = visarea.min_x; x <= visarea.max_x; x++)
 		{
 			UINT8 index;
 
@@ -291,7 +291,7 @@ VIDEO_EOF( tank8 )
 					index |= 0x80; /* collision on right side */
 			}
 
-			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, y, x), NULL, index, tank8_collision_callback);
+			timer_set(machine, machine->primary_screen->time_until_pos(y, x), NULL, index, tank8_collision_callback);
 
 			state = 1;
 		}

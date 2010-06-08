@@ -13,13 +13,13 @@ Atari Drag Race Driver
 
 static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 {
-	dragrace_state *state = (dragrace_state *)timer->machine->driver_data;
+	dragrace_state *state = (dragrace_state *)timer.machine->driver_data;
 	int i;
 	static const char *const portnames[] = { "P1", "P2" };
 
 	for (i = 0; i < 2; i++)
 	{
-		switch (input_port_read(timer->machine, portnames[i]))
+		switch (input_port_read(timer.machine, portnames[i]))
 		{
 		case 0x01: state->gear[i] = 1; break;
 		case 0x02: state->gear[i] = 2; break;
@@ -30,7 +30,7 @@ static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 	}
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(timer->machine, input_port_read(timer->machine, "IN0") & 0x20);
+	watchdog_enable(timer.machine, input_port_read(timer.machine, "IN0") & 0x20);
 }
 
 
@@ -163,7 +163,7 @@ static READ8_HANDLER( dragrace_steering_r )
 
 static READ8_HANDLER( dragrace_scanline_r )
 {
-	return (video_screen_get_vpos(space->machine->primary_screen) ^ 0xf0) | 0x0f;
+	return (space->machine->primary_screen->vpos() ^ 0xf0) | 0x0f;
 }
 
 

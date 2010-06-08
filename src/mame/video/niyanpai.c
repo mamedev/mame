@@ -153,8 +153,8 @@ static void niyanpai_vramflip(running_machine *machine, int vram)
 	static int niyanpai_flipscreen_old[VRAM_MAX] = { 0, 0, 0 };
 	int x, y;
 	UINT16 color1, color2;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	if (niyanpai_flipscreen[vram] == niyanpai_flipscreen_old[vram]) return;
 
@@ -186,7 +186,7 @@ static void niyanpai_vramflip(running_machine *machine, int vram)
 
 static void update_pixel(running_machine *machine, int vram, int x, int y)
 {
-	UINT16 color = niyanpai_videoram[vram][(y * video_screen_get_width(machine->primary_screen)) + x];
+	UINT16 color = niyanpai_videoram[vram][(y * machine->primary_screen->width()) + x];
 	*BITMAP_ADDR16(niyanpai_tmpbitmap[vram], y, x) = color;
 }
 
@@ -198,7 +198,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void niyanpai_gfxdraw(running_machine *machine, int vram)
 {
 	UINT8 *GFX = memory_region(machine, "gfx1");
-	int width = video_screen_get_width(machine->primary_screen);
+	int width = machine->primary_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -376,12 +376,12 @@ WRITE16_HANDLER( niyanpai_clutsel_2_w )	{ niyanpai_clutsel_w(2, data); }
 ******************************************************************************/
 VIDEO_START( niyanpai )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
-	niyanpai_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	niyanpai_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	niyanpai_tmpbitmap[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	niyanpai_tmpbitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
+	niyanpai_tmpbitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
+	niyanpai_tmpbitmap[2] = machine->primary_screen->alloc_compatible_bitmap();
 	niyanpai_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	niyanpai_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
 	niyanpai_videoram[2] = auto_alloc_array_clear(machine, UINT16, width * height);
@@ -407,8 +407,8 @@ VIDEO_UPDATE( niyanpai )
 
 	if (niyanpai_screen_refresh)
 	{
-		int width = video_screen_get_width(screen);
-		int height = video_screen_get_height(screen);
+		int width = screen->width();
+		int height = screen->height();
 
 		niyanpai_screen_refresh = 0;
 

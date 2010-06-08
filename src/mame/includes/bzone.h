@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "devlegcy.h"
+
 #define BZONE_MASTER_CLOCK (XTAL_12_096MHz)
 #define BZONE_CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
@@ -23,5 +25,4 @@ MACHINE_DRIVER_EXTERN( bzone_audio );
 
 WRITE8_HANDLER( redbaron_sounds_w );
 
-DEVICE_GET_INFO( redbaron_sound );
-#define SOUND_REDBARON DEVICE_GET_INFO_NAME(redbaron_sound)
+DECLARE_LEGACY_SOUND_DEVICE(REDBARON, redbaron_sound);

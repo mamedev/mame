@@ -7,6 +7,8 @@
 #ifndef __RIOT6532_H__
 #define __RIOT6532_H__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -54,7 +56,6 @@ UINT8 riot6532_portb_out_get(running_device *device);
 
 /* ----- device interface ----- */
 
-#define RIOT6532 DEVICE_GET_INFO_NAME(riot6532)
-DEVICE_GET_INFO( riot6532 );
+DECLARE_LEGACY_DEVICE(RIOT6532, riot6532);
 
 #endif

@@ -139,7 +139,7 @@ static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
 	{
 		int bank = (data & 0x3000000) >> 24;
 		if(bank < 3)
-			okim6295_set_bank_base(devtag_get_device(device->machine, "oki1"), 0x40000 * (bank));
+			device->machine->device<okim6295_device>("oki1")->set_bank_base(0x40000 * (bank));
 	}
 }
 
@@ -308,13 +308,11 @@ static MACHINE_DRIVER_START( silkroad )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 MACHINE_DRIVER_END

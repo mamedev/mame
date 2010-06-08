@@ -33,10 +33,9 @@ struct _ds2404_state {
 INLINE ds2404_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == DS2404);
+	assert(device->type() == DS2404);
 
-	return (ds2404_state *)device->token;
+	return (ds2404_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -300,7 +299,7 @@ static TIMER_CALLBACK( ds2404_tick )
 
 static DEVICE_START( ds2404 )
 {
-	ds2404_config *config = (ds2404_config *)device->baseconfig().inline_config;
+	ds2404_config *config = (ds2404_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	ds2404_state *state = get_safe_token(device);
 
 	struct tm ref_tm;

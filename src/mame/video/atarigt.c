@@ -116,8 +116,8 @@ VIDEO_START( atarigt )
 	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
 
 	/* allocate temp bitmaps */
-	width = video_screen_get_width(machine->primary_screen);
-	height = video_screen_get_height(machine->primary_screen);
+	width = machine->primary_screen->width();
+	height = machine->primary_screen->height();
 
 	state->pf_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	state->an_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
@@ -186,9 +186,9 @@ UINT16 atarigt_colorram_r(atarigt_state *state, offs_t address)
  *
  *************************************/
 
-void atarigt_scanline_update(running_device *screen, int scanline)
+void atarigt_scanline_update(screen_device &screen, int scanline)
 {
-	atarigt_state *state = (atarigt_state *)screen->machine->driver_data;
+	atarigt_state *state = (atarigt_state *)screen.machine->driver_data;
 	UINT32 *base = &state->atarigen.alpha32[(scanline / 8) * 32 + 24];
 	int i;
 
@@ -208,14 +208,14 @@ void atarigt_scanline_update(running_device *screen, int scanline)
 			if (newscroll != state->playfield_xscroll)
 			{
 				if (scanline + i > 0)
-					video_screen_update_partial(screen, scanline + i - 1);
+					screen.update_partial(scanline + i - 1);
 				tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll);
 				state->playfield_xscroll = newscroll;
 			}
 			if (newbank != state->playfield_color_bank)
 			{
 				if (scanline + i > 0)
-					video_screen_update_partial(screen, scanline + i - 1);
+					screen.update_partial(scanline + i - 1);
 				tilemap_set_palette_offset(state->atarigen.playfield_tilemap, (newbank & 0x1f) << 8);
 				state->playfield_color_bank = newbank;
 			}
@@ -228,14 +228,14 @@ void atarigt_scanline_update(running_device *screen, int scanline)
 			if (newscroll != state->playfield_yscroll)
 			{
 				if (scanline + i > 0)
-					video_screen_update_partial(screen, scanline + i - 1);
+					screen.update_partial(scanline + i - 1);
 				tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll);
 				state->playfield_yscroll = newscroll;
 			}
 			if (newbank != state->playfield_tile_bank)
 			{
 				if (scanline + i > 0)
-					video_screen_update_partial(screen, scanline + i - 1);
+					screen.update_partial(scanline + i - 1);
 				tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 				state->playfield_tile_bank = newbank;
 			}

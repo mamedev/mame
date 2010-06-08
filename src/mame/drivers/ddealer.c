@@ -294,11 +294,11 @@ static VIDEO_UPDATE( ddealer )
 
 static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 {
-	ddealer_state *state = (ddealer_state *)timer->machine->driver_data;
+	ddealer_state *state = (ddealer_state *)timer.machine->driver_data;
 
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
-	state->coin_input = (~(input_port_read(timer->machine, "IN0")));
+	state->coin_input = (~(input_port_read(timer.machine, "IN0")));
 
 	if (state->coin_input & 0x01)//coin 1
 	{
@@ -351,10 +351,10 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 	}
 
 	/*random number generators,controls order of cards*/
-	state->mcu_shared_ram[0x10 / 2] = mame_rand(timer->machine) & 0xffff;
-	state->mcu_shared_ram[0x12 / 2] = mame_rand(timer->machine) & 0xffff;
-	state->mcu_shared_ram[0x14 / 2] = mame_rand(timer->machine) & 0xffff;
-	state->mcu_shared_ram[0x16 / 2] = mame_rand(timer->machine) & 0xffff;
+	state->mcu_shared_ram[0x10 / 2] = mame_rand(timer.machine) & 0xffff;
+	state->mcu_shared_ram[0x12 / 2] = mame_rand(timer.machine) & 0xffff;
+	state->mcu_shared_ram[0x14 / 2] = mame_rand(timer.machine) & 0xffff;
+	state->mcu_shared_ram[0x16 / 2] = mame_rand(timer.machine) & 0xffff;
 }
 
 

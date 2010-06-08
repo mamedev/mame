@@ -138,9 +138,9 @@ WRITE16_HANDLER( vindictr_paletteram_w )
  *
  *************************************/
 
-void vindictr_scanline_update(running_device *screen, int scanline)
+void vindictr_scanline_update(screen_device &screen, int scanline)
 {
-	vindictr_state *state = (vindictr_state *)screen->machine->driver_data;
+	vindictr_state *state = (vindictr_state *)screen.machine->driver_data;
 	UINT16 *base = &state->atarigen.alpha[((scanline - 8) / 8) * 64 + 42];
 	int x;
 
@@ -160,7 +160,7 @@ void vindictr_scanline_update(running_device *screen, int scanline)
 			case 2:		/* /PFB */
 				if (state->playfield_tile_bank != (data & 7))
 				{
-					video_screen_update_partial(screen, scanline - 1);
+					screen.update_partial(scanline - 1);
 					state->playfield_tile_bank = data & 7;
 					tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 				}
@@ -169,7 +169,7 @@ void vindictr_scanline_update(running_device *screen, int scanline)
 			case 3:		/* /PFHSLD */
 				if (state->playfield_xscroll != (data & 0x1ff))
 				{
-					video_screen_update_partial(screen, scanline - 1);
+					screen.update_partial(scanline - 1);
 					tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, data);
 					state->playfield_xscroll = data & 0x1ff;
 				}
@@ -178,7 +178,7 @@ void vindictr_scanline_update(running_device *screen, int scanline)
 			case 4:		/* /MOHS */
 				if (atarimo_get_xscroll(0) != (data & 0x1ff))
 				{
-					video_screen_update_partial(screen, scanline - 1);
+					screen.update_partial(scanline - 1);
 					atarimo_set_xscroll(0, data & 0x1ff);
 				}
 				break;
@@ -187,20 +187,20 @@ void vindictr_scanline_update(running_device *screen, int scanline)
 				break;
 
 			case 6:		/* /VIRQ */
-				atarigen_scanline_int_gen(devtag_get_device(screen->machine, "maincpu"));
+				atarigen_scanline_int_gen(devtag_get_device(screen.machine, "maincpu"));
 				break;
 
 			case 7:		/* /PFVS */
 			{
 				/* a new vscroll latches the offset into a counter; we must adjust for this */
 				int offset = scanline;
-				const rectangle *visible_area = video_screen_get_visible_area(screen);
-				if (offset > visible_area->max_y)
-					offset -= visible_area->max_y + 1;
+				const rectangle &visible_area = screen.visible_area();
+				if (offset > visible_area.max_y)
+					offset -= visible_area.max_y + 1;
 
 				if (state->playfield_yscroll != ((data - offset) & 0x1ff))
 				{
-					video_screen_update_partial(screen, scanline - 1);
+					screen.update_partial(scanline - 1);
 					tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, data - offset);
 					atarimo_set_yscroll(0, (data - offset) & 0x1ff);
 				}

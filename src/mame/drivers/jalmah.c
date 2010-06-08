@@ -841,12 +841,12 @@ static TIMER_DEVICE_CALLBACK( jalmah_mcu_sim )
             #define KAKUMEI2_MCU (0x22)
             #define SUCHIPI_MCU  (0x23)
         */
-			case MJZOOMIN_MCU: mjzoomin_mcu_run(timer->machine); break;
-			case DAIREIKA_MCU: daireika_mcu_run(timer->machine); break;
-			case URASHIMA_MCU: urashima_mcu_run(timer->machine); break;
+			case MJZOOMIN_MCU: mjzoomin_mcu_run(timer.machine); break;
+			case DAIREIKA_MCU: daireika_mcu_run(timer.machine); break;
+			case URASHIMA_MCU: urashima_mcu_run(timer.machine); break;
 			case KAKUMEI_MCU:
 			case KAKUMEI2_MCU:
-			case SUCHIPI_MCU:  second_mcu_run(timer->machine); break;
+			case SUCHIPI_MCU:  second_mcu_run(timer.machine); break;
 	}
 }
 
@@ -1327,8 +1327,7 @@ static MACHINE_DRIVER_START( jalmah )
 	MDRV_TIMER_ADD_PERIODIC("mcusim", jalmah_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, 4000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", 4000000, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 

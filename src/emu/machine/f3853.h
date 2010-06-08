@@ -10,7 +10,9 @@
 #ifndef __F3853_H__
 #define __F3853_H__
 
-#define F3853		DEVICE_GET_INFO_NAME(f3853)
+#include "devlegcy.h"
+
+DECLARE_LEGACY_DEVICE(F3853, f3853);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -31,9 +33,6 @@ struct _f3853_config
 	MDRV_DEVICE_ADD(_tag, F3853, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-
-/* device interface */
-DEVICE_GET_INFO(f3853);
 
 READ8_DEVICE_HANDLER(f3853_r);
 WRITE8_DEVICE_HANDLER(f3853_w);

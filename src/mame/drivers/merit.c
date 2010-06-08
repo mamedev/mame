@@ -164,7 +164,7 @@ static WRITE8_HANDLER( palette_w )
 {
 	int co;
 
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	data &= 0x0f;
 
 	co = ((ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
@@ -243,7 +243,7 @@ static MC6845_UPDATE_ROW( update_row )
 static WRITE_LINE_DEVICE_HANDLER(hsync_changed)
 {
 	/* update any video up to the current scanline */
-	video_screen_update_now(device->machine->primary_screen);
+	device->machine->primary_screen->update_now();
 }
 
 static WRITE_LINE_DEVICE_HANDLER(vsync_changed)

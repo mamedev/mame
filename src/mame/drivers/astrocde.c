@@ -1256,7 +1256,7 @@ static const samples_interface gorf_samples_interface =
  *
  *************************************/
 
-static const z80_daisy_chain tenpin_daisy_chain[] =
+static const z80_daisy_config tenpin_daisy_chain[] =
 {
 	{ "ctc" },
 	{ NULL }

@@ -216,14 +216,14 @@ const pia6821_interface zwackery_pia2_intf =
  *
  *************************************/
 
-const z80_daisy_chain mcr_daisy_chain[] =
+const z80_daisy_config mcr_daisy_chain[] =
 {
 	{ "ctc" },
 	{ NULL }
 };
 
 
-const z80_daisy_chain mcr_ipu_daisy_chain[] =
+const z80_daisy_config mcr_ipu_daisy_chain[] =
 {
 	{ "ipu_ctc" },
 	{ "ipu_pio1" },
@@ -491,7 +491,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 {
 	v493_irq_state = 1;
 	update_mcr68_interrupts(machine);
-	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 0, mcr68_493_off_callback);
+	timer_set(machine, machine->primary_screen->scan_period(), NULL, 0, mcr68_493_off_callback);
 	logerror("--- (INT1) ---\n");
 }
 
@@ -616,7 +616,7 @@ static TIMER_CALLBACK( zwackery_493_callback )
 	running_device *pia = devtag_get_device(machine, "pia0");
 
 	pia6821_ca1_w(pia, 0, 1);
-	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
+	timer_set(machine, machine->primary_screen->scan_period(), NULL, 0, zwackery_493_off_callback);
 }
 
 

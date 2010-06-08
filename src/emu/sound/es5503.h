@@ -3,6 +3,8 @@
 #ifndef __ES5503_H__
 #define __ES5503_H__
 
+#include "devlegcy.h"
+
 typedef struct _es5503_interface es5503_interface;
 struct _es5503_interface
 {
@@ -15,7 +17,6 @@ READ8_DEVICE_HANDLER( es5503_r );
 WRITE8_DEVICE_HANDLER( es5503_w );
 void es5503_set_base(running_device *device, UINT8 *wavemem);
 
-DEVICE_GET_INFO( es5503 );
-#define SOUND_ES5503 DEVICE_GET_INFO_NAME( es5503 )
+DECLARE_LEGACY_SOUND_DEVICE(ES5503, es5503);
 
 #endif /* __ES5503_H__ */

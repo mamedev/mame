@@ -425,10 +425,9 @@ struct _pdp1_state
 INLINE pdp1_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_PDP1);
-	return (pdp1_state *)device->token;
+	return (pdp1_state *)downcast<cpu_device *>(device)->token();
 }
 
 static void execute_instruction(pdp1_state *cpustate);
@@ -539,14 +538,14 @@ static void pdp1_set_irq_line (pdp1_state *cpustate, int irqline, int state)
 
 static CPU_INIT( pdp1 )
 {
-	const pdp1_reset_param_t *param = (const pdp1_reset_param_t *)device->baseconfig().static_config;
+	const pdp1_reset_param_t *param = (const pdp1_reset_param_t *)device->baseconfig().static_config();
 	pdp1_state *cpustate = get_safe_token(device);
 	int i;
 
 	/* clean-up */
 	memset (cpustate, 0, sizeof (*cpustate));
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	/* set up params and callbacks */
 	for (i=0; i<64; i++)
@@ -937,7 +936,7 @@ static CPU_SET_INFO( pdp1 )
 
 CPU_GET_INFO( pdp1 )
 {
-	pdp1_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	pdp1_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

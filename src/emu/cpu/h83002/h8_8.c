@@ -237,8 +237,8 @@ static CPU_INIT(h8bit)
 
 	h8->mode_8bit = 1;
 
-	h8->program = device->space(AS_PROGRAM);
-	h8->io = device->space(AS_IO);
+	h8->program = device_memory(device)->space(AS_PROGRAM);
+	h8->io = device_memory(device)->space(AS_IO);
 
 	h8->timer[0] = timer_alloc(h8->device->machine, h8_timer_0_cb, h8);
 	h8->timer[1] = timer_alloc(h8->device->machine, h8_timer_1_cb, h8);
@@ -515,7 +515,7 @@ static READ8_HANDLER( h8330_itu_r )
 	UINT8 reg;
 	UINT64 frc;
 	static const UINT64 divider[4] = { 2, 8, 32, 1 };
-	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
+	h83xx_state *h8 = get_safe_token(space->cpu);
 
 	reg = (offset + 0x88) & 0xff;
 
@@ -603,7 +603,7 @@ static READ8_HANDLER( h8330_itu_r )
 static WRITE8_HANDLER( h8330_itu_w )
 {
 	UINT8 reg;
-	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
+	h83xx_state *h8 = get_safe_token(space->cpu);
 
 	reg = (offset + 0x88) & 0xff;
 
@@ -751,7 +751,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3334 )
 {
-	h83xx_state *h8 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	h83xx_state *h8 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state) {
 	// Interface functions and variables

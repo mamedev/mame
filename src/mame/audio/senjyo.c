@@ -12,7 +12,7 @@ static int single_rate = 0;
 static int single_volume = 0;
 UINT8 senjyo_sound_cmd;
 
-const z80_daisy_chain senjyo_daisy_chain[] =
+const z80_daisy_config senjyo_daisy_chain[] =
 {
 	{ "z80ctc" },
 	{ "z80pio" },
@@ -51,7 +51,7 @@ Z80CTC_INTERFACE( senjyo_ctc_intf )
 
 WRITE8_HANDLER( senjyo_volume_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	samples_sound_device *samples = space->machine->device<samples_sound_device>("samples");
 	single_volume = data & 0x0f;
 	sample_set_volume(samples,0,single_volume / 15.0);
 }
@@ -62,7 +62,8 @@ static TIMER_CALLBACK( senjyo_sh_update )
 	running_device *samples = devtag_get_device(machine, "samples");
 
 	/* ctc2 timer single tone generator frequency */
-	attotime period = z80ctc_getperiod (devtag_get_device(machine, "z80ctc"), 2);
+	z80ctc_device *ctc = machine->device<z80ctc_device>("z80ctc");
+	attotime period = ctc->period(2);
 	if (attotime_compare(period, attotime_zero) != 0 )
 		single_rate = ATTOSECONDS_TO_HZ(period.attoseconds);
 	else
@@ -88,5 +89,5 @@ SAMPLES_START( senjyo_sh_start )
 	sample_set_volume(device,0,single_volume / 15.0);
 	sample_start_raw(device,0,_single,SINGLE_LENGTH,single_rate,1);
 
-	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, senjyo_sh_update);
+	timer_pulse(machine, machine->primary_screen->frame_period(), NULL, 0, senjyo_sh_update);
 }

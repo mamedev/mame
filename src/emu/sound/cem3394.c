@@ -141,10 +141,8 @@ struct _cem3394_state
 INLINE cem3394_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_CEM3394);
-	return (cem3394_state *)device->token;
+	assert(device->type() == SOUND_CEM3394);
+	return (cem3394_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -327,7 +325,7 @@ static STREAM_UPDATE( cem3394_update )
 
 static DEVICE_START( cem3394 )
 {
-	const cem3394_interface *intf = (const cem3394_interface *)device->baseconfig().static_config;
+	const cem3394_interface *intf = (const cem3394_interface *)device->baseconfig().static_config();
 	cem3394_state *chip = get_safe_token(device);
 
 	chip->device = device;

@@ -71,10 +71,10 @@ static WRITE16_HANDLER( stoneage_sound_w )
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	cninja_state *state = (cninja_state *)timer->machine->driver_data;
+	cninja_state *state = (cninja_state *)timer.machine->driver_data;
 
 	cpu_set_input_line(state->maincpu, (state->irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
-	timer_device_adjust_oneshot(state->raster_irq_timer, attotime_never, 0);
+	state->raster_irq_timer->reset();
 }
 
 static READ16_HANDLER( cninja_irq_r )
@@ -117,9 +117,9 @@ static WRITE16_HANDLER( cninja_irq_w )
 		state->scanline = data & 0xff;
 
 		if (!BIT(state->irq_mask, 1) && state->scanline > 0 && state->scanline < 240)
-			timer_device_adjust_oneshot(state->raster_irq_timer, video_screen_get_time_until_pos(space->machine->primary_screen, state->scanline, 0), state->scanline);
+			state->raster_irq_timer->adjust(space->machine->primary_screen->time_until_pos(state->scanline), state->scanline);
 		else
-			timer_device_adjust_oneshot(state->raster_irq_timer, attotime_never, 0);
+			state->raster_irq_timer->reset();
 		return;
 
 	case 2: /* VBL irq ack */
@@ -153,7 +153,7 @@ static WRITE16_HANDLER( cninja_pf12_control_w )
 {
 	cninja_state *state = (cninja_state *)space->machine->driver_data;
 	deco16ic_pf12_control_w(state->deco16ic, offset, data, mem_mask);
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
 
@@ -161,7 +161,7 @@ static WRITE16_HANDLER( cninja_pf34_control_w )
 {
 	cninja_state *state = (cninja_state *)space->machine->driver_data;
 	deco16ic_pf34_control_w(state->deco16ic, offset, data, mem_mask);
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
 
@@ -736,7 +736,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 	cninja_state *state = (cninja_state *)device->machine->driver_data;
 
 	/* the second OKIM6295 ROM is bank switched */
-	okim6295_set_bank_base(state->oki2, (data & 1) * 0x40000);
+	state->oki2->set_bank_base((data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =
@@ -830,12 +830,6 @@ static MACHINE_START( cninja )
 {
 	cninja_state *state = (cninja_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
-	state->raster_irq_timer = devtag_get_device(machine, "raster_timer");
-	state->oki2 = devtag_get_device(machine, "oki2");
-
 	state_save_register_global(machine, state->scanline);
 	state_save_register_global(machine, state->irq_mask);
 }
@@ -893,12 +887,10 @@ static MACHINE_DRIVER_START( cninja )
 	MDRV_SOUND_ROUTE(0, "mono", 0.45)
 	MDRV_SOUND_ROUTE(1, "mono", 0.45)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -945,12 +937,10 @@ static MACHINE_DRIVER_START( stoneage )
 	MDRV_SOUND_ROUTE(0, "mono", 0.45)
 	MDRV_SOUND_ROUTE(1, "mono", 0.45)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -997,8 +987,7 @@ static MACHINE_DRIVER_START( cninjabl )
 	MDRV_SOUND_ROUTE(0, "mono", 0.45)
 	MDRV_SOUND_ROUTE(1, "mono", 0.45)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -1048,12 +1037,10 @@ static MACHINE_DRIVER_START( edrandy )
 	MDRV_SOUND_ROUTE(0, "mono", 0.45)
 	MDRV_SOUND_ROUTE(1, "mono", 0.45)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -1103,13 +1090,11 @@ static MACHINE_DRIVER_START( robocop2 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_DRIVER_END
@@ -1154,13 +1139,11 @@ static MACHINE_DRIVER_START( mutantf )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_DRIVER_END

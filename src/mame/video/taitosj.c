@@ -192,16 +192,16 @@ VIDEO_START( taitosj )
 {
 	int i;
 
-	sprite_layer_collbitmap1 = auto_bitmap_alloc(machine,16,16,video_screen_get_format(machine->primary_screen));
+	sprite_layer_collbitmap1 = auto_bitmap_alloc(machine,16,16,machine->primary_screen->format());
 
 	for (i = 0; i < 3; i++)
 	{
-		taitosj_layer_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-		sprite_layer_collbitmap2[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+		taitosj_layer_bitmap[i] = machine->primary_screen->alloc_compatible_bitmap();
+		sprite_layer_collbitmap2[i] = machine->primary_screen->alloc_compatible_bitmap();
 	}
 
-	sprite_sprite_collbitmap1 = auto_bitmap_alloc(machine,32,32,video_screen_get_format(machine->primary_screen));
-	sprite_sprite_collbitmap2 = auto_bitmap_alloc(machine,32,32,video_screen_get_format(machine->primary_screen));
+	sprite_sprite_collbitmap1 = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
+	sprite_sprite_collbitmap2 = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
 
 	gfx_element_set_source(machine->gfx[0], taitosj_characterram);
 	gfx_element_set_source(machine->gfx[1], taitosj_characterram);
@@ -412,8 +412,8 @@ static void check_sprite_sprite_collision(running_machine *machine)
 static void calculate_sprite_areas(running_machine *machine, int *sprites_on, rectangle *sprite_areas)
 {
 	int which;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	for (which = 0; which < 0x20; which++)
 	{

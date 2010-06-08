@@ -3,6 +3,8 @@
 #ifndef __NAMCO_H__
 #define __NAMCO_H__
 
+#include "devlegcy.h"
+
 typedef struct _namco_interface namco_interface;
 struct _namco_interface
 {
@@ -30,13 +32,9 @@ extern UINT8 *namco_wavedata;
 #define pacman_soundregs namco_soundregs
 #define polepos_soundregs namco_soundregs
 
-DEVICE_GET_INFO( namco );
-DEVICE_GET_INFO( namco_15xx );
-DEVICE_GET_INFO( namco_cus30 );
-
-#define SOUND_NAMCO DEVICE_GET_INFO_NAME( namco )
-#define SOUND_NAMCO_15XX DEVICE_GET_INFO_NAME( namco_15xx )
-#define SOUND_NAMCO_CUS30 DEVICE_GET_INFO_NAME( namco_cus30 )
+DECLARE_LEGACY_SOUND_DEVICE(NAMCO, namco);
+DECLARE_LEGACY_SOUND_DEVICE(NAMCO_15XX, namco_15xx);
+DECLARE_LEGACY_SOUND_DEVICE(NAMCO_CUS30, namco_cus30);
 
 
 #endif /* __NAMCO_H__ */

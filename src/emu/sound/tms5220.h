@@ -3,6 +3,8 @@
 #ifndef __TMS5220_H__
 #define __TMS5220_H__
 
+#include "devlegcy.h"
+
 
 /* clock rate = 80 * output sample rate,     */
 /* usually 640000 for 8000 Hz sample rate or */
@@ -39,15 +41,10 @@ double tms5220_time_to_ready(running_device *device);
 
 void tms5220_set_frequency(running_device *device, int frequency);
 
-DEVICE_GET_INFO( tms5220c );
-DEVICE_GET_INFO( tms5220 );
-DEVICE_GET_INFO( tmc0285 );
-DEVICE_GET_INFO( tms5200 );
-
-#define SOUND_TMS5220C DEVICE_GET_INFO_NAME( tms5220c )
-#define SOUND_TMS5220 DEVICE_GET_INFO_NAME( tms5220 )
-#define SOUND_TMC0285 DEVICE_GET_INFO_NAME( tmc0285 )
-#define SOUND_TMS5200 DEVICE_GET_INFO_NAME( tms5200 )
+DECLARE_LEGACY_SOUND_DEVICE(TMS5220C, tms5220c);
+DECLARE_LEGACY_SOUND_DEVICE(TMS5220, tms5220);
+DECLARE_LEGACY_SOUND_DEVICE(TMC0285, tmc0285);
+DECLARE_LEGACY_SOUND_DEVICE(TMS5200, tms5200);
 
 
 #endif /* __TMS5220_H__ */

@@ -1490,15 +1490,15 @@ static void register_state (running_machine *machine)
 
 static VIDEO_START( avg_common )
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	vg = &vgd;
 	vg->machine = machine;
 
-	xmin = visarea->min_x;
-	ymin = visarea->min_y;
-	xmax = visarea->max_x;
-	ymax = visarea->max_y;
+	xmin = visarea.min_x;
+	ymin = visarea.min_y;
+	xmax = visarea.max_x;
+	ymax = visarea.max_y;
 
 	xcenter = ((xmax - xmin) / 2) << 16;
 	ycenter = ((ymax - ymin) / 2) << 16;
@@ -1522,14 +1522,14 @@ static VIDEO_START( avg_common )
 
 VIDEO_START( dvg )
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	vgc = &dvg_default;
 	vg = &vgd;
 	vg->machine = machine;
 
-	xmin = visarea->min_x;
-	ymin = visarea->min_y;
+	xmin = visarea.min_x;
+	ymin = visarea.min_y;
 
 	vg_halt_timer = timer_alloc(machine, vg_set_halt_callback, NULL);
 	vg_run_timer = timer_alloc(machine, run_state_machine, NULL);

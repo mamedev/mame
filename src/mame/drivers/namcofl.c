@@ -219,7 +219,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = space->machine->generic.paletteram.u32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(space->machine->primary_screen, triggerscanline, 0), 0);
+		timer_adjust_oneshot(raster_interrupt_timer, space->machine->primary_screen->time_until_pos(triggerscanline), 0);
 	}
 }
 
@@ -538,22 +538,22 @@ GFXDECODE_END
 static TIMER_CALLBACK( network_interrupt_callback )
 {
 	cputag_set_input_line(machine, "maincpu", I960_IRQ0, ASSERT_LINE);
-	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, network_interrupt_callback);
+	timer_set(machine, machine->primary_screen->frame_period(), NULL, 0, network_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cputag_set_input_line(machine, "maincpu", I960_IRQ2, ASSERT_LINE);
-	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
+	timer_set(machine, machine->primary_screen->frame_period(), NULL, 0, vblank_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	cputag_set_input_line(machine, "maincpu", I960_IRQ1, ASSERT_LINE);
-	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(machine->primary_screen), 0);
+	timer_adjust_oneshot(raster_interrupt_timer, machine->primary_screen->frame_period(), 0);
 }
 
 static INTERRUPT_GEN( mcu_interrupt )
@@ -580,8 +580,8 @@ static MACHINE_START( namcofl )
 
 static MACHINE_RESET( namcofl )
 {
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 3, 0), NULL, 0, network_interrupt_callback);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(machine->primary_screen->visible_area().max_y + 3, 0), NULL, 0, network_interrupt_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(machine->primary_screen->visible_area().max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
 
 	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") );
 	memory_set_bankptr(machine,  "bank2", namcofl_workram );

@@ -76,7 +76,7 @@ static WRITE16_HANDLER( interrupt_scan_w )
 	if (oldword != newword)
 	{
 		state->interrupt_scan[offset] = newword;
-		atarigen_scanline_int_set(space->machine->primary_screen, newword & 0x1ff);
+		atarigen_scanline_int_set(*space->machine->primary_screen, newword & 0x1ff);
 	}
 }
 
@@ -92,7 +92,7 @@ static READ16_HANDLER( special_port1_r )
 {
 	toobin_state *state = (toobin_state *)space->machine->driver_data;
 	int result = input_port_read(space->machine, "FF9000");
-	if (atarigen_get_hblank(space->machine->primary_screen)) result ^= 0x8000;
+	if (atarigen_get_hblank(*space->machine->primary_screen)) result ^= 0x8000;
 	if (state->atarigen.cpu_to_sound_ready) result ^= 0x2000;
 	return result;
 }

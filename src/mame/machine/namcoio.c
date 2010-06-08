@@ -142,17 +142,16 @@ struct _namcoio_state
 INLINE namcoio_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == NAMCO56XX || device->type == NAMCO58XX || device->type == NAMCO59XX);
+	assert(device->type() == NAMCO56XX || device->type() == NAMCO58XX || device->type() == NAMCO59XX);
 
-	return (namcoio_state *)device->token;
+	return (namcoio_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const namcoio_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == NAMCO56XX || device->type == NAMCO58XX || device->type == NAMCO59XX);
-	return (const namcoio_interface *) device->baseconfig().static_config;
+	assert(device->type() == NAMCO56XX || device->type() == NAMCO58XX || device->type() == NAMCO59XX);
+	return (const namcoio_interface *) device->baseconfig().static_config();
 }
 
 

@@ -72,7 +72,7 @@ struct _tms7000_state
 	UINT8		irq_state[3];	/* State of the three IRQs */
 	UINT8		rf[0x80];	/* Register file (SJE) */
 	UINT8		pf[0x100];	/* Perpherial file */
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
@@ -88,11 +88,10 @@ struct _tms7000_state
 INLINE tms7000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS7000 ||
 		   cpu_get_type(device) == CPU_TMS7000_EXL);
-	return (tms7000_state *)device->token;
+	return (tms7000_state *)downcast<cpu_device *>(device)->token();
 }
 
 #define pPC		cpustate->pc.w.l
@@ -166,8 +165,8 @@ static CPU_INIT( tms7000 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	memset(cpustate->pf, 0, 0x100);
 	memset(cpustate->rf, 0, 0x80);
@@ -265,7 +264,7 @@ static CPU_SET_INFO( tms7000 )
 
 CPU_GET_INFO( tms7000 )
 {
-	tms7000_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms7000_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch( state )
     {

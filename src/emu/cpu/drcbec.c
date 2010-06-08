@@ -353,7 +353,7 @@ static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, running_
 	/* remember our pointers */
 	drcbe->device = device;
 	for (spacenum = 0; spacenum < ARRAY_LENGTH(drcbe->space); spacenum++)
-		drcbe->space[spacenum] = device->space(spacenum);
+		drcbe->space[spacenum] = device_memory(device)->space(spacenum);
 	drcbe->drcuml = drcuml;
 	drcbe->cache = cache;
 

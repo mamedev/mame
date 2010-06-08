@@ -35,7 +35,7 @@ static void tumblepb_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 		y = spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		x = spriteram[offs + 2];
@@ -101,7 +101,7 @@ static void jumpkids_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 		y = spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		x = spriteram[offs+2];
@@ -168,7 +168,7 @@ static void fncywld_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 		y = spriteram[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		x = spriteram[offs + 2];

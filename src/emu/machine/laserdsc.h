@@ -213,12 +213,10 @@ void laserdisc_set_config(running_device *device, const laserdisc_config *config
 /* ----- device interface ----- */
 
 /* device get info callback */
-#define LASERDISC DEVICE_GET_INFO_NAME(laserdisc)
-DEVICE_GET_INFO( laserdisc );
+DECLARE_LEGACY_DEVICE(LASERDISC, laserdisc);
 
 /* audio get info callback */
-#define SOUND_LASERDISC DEVICE_GET_INFO_NAME(laserdisc_sound)
-DEVICE_GET_INFO( laserdisc_sound );
+DECLARE_LEGACY_SOUND_DEVICE(LASERDISC, laserdisc_sound);
 
 /* type setter */
 int laserdisc_get_type(running_device *device);

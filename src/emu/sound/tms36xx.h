@@ -3,6 +3,8 @@
 #ifndef __TMS36XX_H__
 #define __TMS36XX_H__
 
+#include "devlegcy.h"
+
 /* subtypes */
 #define MM6221AA    21      /* Phoenix (fixed melodies) */
 #define TMS3615 	15		/* Naughty Boy, Pleiads (13 notes, one output) */
@@ -26,7 +28,6 @@ extern void tms36xx_note_w(running_device *device, int octave, int note);
 /* TMS3617 interface functions */
 extern void tms3617_enable_w(running_device *device, int enable);
 
-DEVICE_GET_INFO( tms36xx );
-#define SOUND_TMS36XX DEVICE_GET_INFO_NAME( tms36xx )
+DECLARE_LEGACY_SOUND_DEVICE(TMS36XX, tms36xx);
 
 #endif /* __TMS36XX_H__ */

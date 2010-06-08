@@ -350,7 +350,7 @@ static READ16_HANDLER( unk880000_r )
 	switch( offset )
 	{
 		case 0:
-			if ( video_screen_get_vpos(space->machine->primary_screen) >= 240) return 0;
+			if ( space->machine->primary_screen->vpos() >= 240) return 0;
 			else return 1;
 
 		default:
@@ -914,8 +914,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 16000000/8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 

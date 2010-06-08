@@ -7,6 +7,8 @@
 #ifndef __S2636_H__
 #define __S2636_H__
 
+#include "devlegcy.h"
+
 
 #define S2636_IS_PIXEL_DRAWN(p)     (((p) & 0x08) ? TRUE : FALSE)
 #define S2636_PIXEL_COLOR(p)        ((p) & 0x07)
@@ -28,20 +30,11 @@ struct _s2636_interface
 
 /*************************************
  *
- *  Function prototypes
- *
- *************************************/
-
-DEVICE_GET_INFO( s2636 );
-
-
-/*************************************
- *
  *  Device configuration macros
  *
  *************************************/
 
-#define S2636 DEVICE_GET_INFO_NAME( s2636 )
+DECLARE_LEGACY_DEVICE(S2636, s2636);
 
 #define MDRV_S2636_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, S2636, 0) \

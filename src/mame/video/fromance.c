@@ -266,7 +266,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 	fromance_state *state = (fromance_state *)machine->driver_data;
 	cpu_set_input_line(state->subcpu, 0, HOLD_LINE);
 	if (param != 0)
-		timer_adjust_periodic(state->crtc_timer, attotime_div(video_screen_get_frame_period(machine->primary_screen), param), 0, attotime_div(video_screen_get_frame_period(machine->primary_screen), param));
+		timer_adjust_periodic(state->crtc_timer, attotime_div(machine->primary_screen->frame_period(), param), 0, attotime_div(machine->primary_screen->frame_period(), param));
 }
 
 
@@ -279,7 +279,7 @@ WRITE8_HANDLER( fromance_crtc_data_w )
 	{
 		/* only register we know about.... */
 		case 0x0b:
-			timer_adjust_oneshot(state->crtc_timer, video_screen_get_time_until_vblank_start(space->machine->primary_screen), (data > 0x80) ? 2 : 1);
+			timer_adjust_oneshot(state->crtc_timer, space->machine->primary_screen->time_until_vblank_start(), (data > 0x80) ? 2 : 1);
 			break;
 
 		default:
@@ -303,11 +303,11 @@ WRITE8_HANDLER( fromance_crtc_register_w )
  *
  *************************************/
 
-static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int draw_priority )
+static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect, int draw_priority )
 {
-	fromance_state *state = (fromance_state *)screen->machine->driver_data;
+	fromance_state *state = (fromance_state *)screen.machine->driver_data;
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen.visible_area();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -341,16 +341,16 @@ static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectan
 			yzoom = 16 - zoomtable[yzoom] / 8;
 
 			/* wrap around */
-			if (x > visarea->max_x)
+			if (x > visarea.max_x)
 				x -= 0x200;
-			if (y > visarea->max_y)
+			if (y > visarea.max_y)
 				y -= 0x200;
 
 			/* flip ? */
 			if (state->flipscreen)
 			{
-				y = visarea->max_y - y - 16 * ytiles - 4;
-				x = visarea->max_x - x - 16 * xtiles - 24;
+				y = visarea.max_y - y - 16 * ytiles - 4;
+				x = visarea.max_x - x - 16 * xtiles - 24;
 				xflip=!xflip;
 				yflip=!yflip;
 			}
@@ -361,10 +361,10 @@ static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectan
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 0, 0,
+							drawgfx_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 0, 0,
 									x + xt * 16, y + yt * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 0, 0,
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 0, 0,
 									x + xt * xzoom, y + yt * yzoom,
 									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
@@ -375,10 +375,10 @@ static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectan
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 1, 0,
+							drawgfx_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 1, 0,
 									x + (xtiles - 1 - xt) * 16, y + yt * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 1, 0,
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 1, 0,
 									x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom,
 									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
@@ -389,10 +389,10 @@ static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectan
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 0, 1,
+							drawgfx_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 0, 1,
 									x + xt * 16, y + (ytiles - 1 - yt) * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 0, 1,
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 0, 1,
 									x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom,
 									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
@@ -403,10 +403,10 @@ static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectan
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 1, 1,
+							drawgfx_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 1, 1,
 									x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, 15);
 						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen->machine->gfx[2], code, color, 1, 1,
+							drawgfxzoom_transpen(bitmap, cliprect, screen.machine->gfx[2], code, color, 1, 1,
 									x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom,
 									0x1000 * xzoom, 0x1000 * yzoom, 15);
 			}
@@ -448,7 +448,7 @@ VIDEO_UPDATE( pipedrm )
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
-	draw_sprites(screen, bitmap, cliprect, 0);
-	draw_sprites(screen, bitmap, cliprect, 1);
+	draw_sprites(*screen, bitmap, cliprect, 0);
+	draw_sprites(*screen, bitmap, cliprect, 1);
 	return 0;
 }

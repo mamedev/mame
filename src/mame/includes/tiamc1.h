@@ -1,7 +1,8 @@
+#include "devlegcy.h"
+
 /*----------- defined in audio/tiamc1.c -----------*/
 
-DEVICE_GET_INFO( tiamc1_sound );
-#define SOUND_TIAMC1 DEVICE_GET_INFO_NAME(tiamc1_sound)
+DECLARE_LEGACY_SOUND_DEVICE(TIAMC1, tiamc1_sound);
 
 WRITE8_HANDLER( tiamc1_timer0_w );
 WRITE8_HANDLER( tiamc1_timer1_w );

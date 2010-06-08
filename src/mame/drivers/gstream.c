@@ -131,7 +131,9 @@ class gstream_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gstream_state(machine)); }
 
-	gstream_state(running_machine &machine) { }
+	gstream_state(running_machine &machine)
+		: oki_1(machine.device<okim6295_device>("oki1")),
+		  oki_2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
 	UINT32 *  vram;
@@ -148,8 +150,8 @@ public:
 	int       oki_bank_0, oki_bank_1;
 
 	/* devices */
-	running_device *oki_1;
-	running_device *oki_2;
+	okim6295_device *oki_1;
+	okim6295_device *oki_2;
 };
 
 
@@ -333,8 +335,8 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 		state->oki_bank_1 = 3;		// end sequence music
 	}
 
-	okim6295_set_bank_base(state->oki_1, state->oki_bank_0 * 0x40000);
-	okim6295_set_bank_base(state->oki_2, state->oki_bank_1 * 0x40000);
+	state->oki_1->set_bank_base(state->oki_bank_0 * 0x40000);
+	state->oki_2->set_bank_base(state->oki_bank_1 * 0x40000);
 }
 
 static WRITE32_HANDLER( gstream_oki_4040_w )
@@ -521,9 +523,6 @@ static MACHINE_START( gstream )
 {
 	gstream_state *state = (gstream_state *)machine->driver_data;
 
-	state->oki_1 = devtag_get_device(machine, "oki1");
-	state->oki_2 = devtag_get_device(machine, "oki2");
-
 	state_save_register_global(machine, state->tmap1_scrollx);
 	state_save_register_global(machine, state->tmap2_scrollx);
 	state_save_register_global(machine, state->tmap3_scrollx);
@@ -580,12 +579,10 @@ static MACHINE_DRIVER_START( gstream )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000) /* 1 Mhz? */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000) /* 1 Mhz? */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

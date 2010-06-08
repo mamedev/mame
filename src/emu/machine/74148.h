@@ -41,6 +41,8 @@
 #ifndef TTL74148_H
 #define TTL74148_H
 
+#include "devlegcy.h"
+
 
 typedef struct _ttl74148_config ttl74148_config;
 struct _ttl74148_config
@@ -63,8 +65,6 @@ int  ttl74148_output_r(running_device *device);
 int  ttl74148_output_valid_r(running_device *device);
 int  ttl74148_enable_output_r(running_device *device);
 
-/* device get info callback */
-#define TTL74148 DEVICE_GET_INFO_NAME(ttl74148)
-DEVICE_GET_INFO( ttl74148 );
+DECLARE_LEGACY_DEVICE(TTL74148, ttl74148);
 
 #endif

@@ -27,17 +27,16 @@ struct _k056800_state
 INLINE k056800_state *k056800_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K056800);
+	assert(device->type() == K056800);
 
-	return (k056800_state *)device->token;
+	return (k056800_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k056800_interface *k056800_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K056800));
-	return (const k056800_interface *) device->baseconfig().static_config;
+	assert((device->type() == K056800));
+	return (const k056800_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************

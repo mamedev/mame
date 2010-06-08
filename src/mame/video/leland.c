@@ -66,7 +66,7 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline = (scanline+1) % 256;
 
 	/* come back at the next appropriate scanline */
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -83,7 +83,7 @@ static VIDEO_START( leland )
 
 	/* scanline timer */
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 
 }
 
@@ -107,9 +107,9 @@ static VIDEO_START( ataxx )
 
 WRITE8_HANDLER( leland_scroll_w )
 {
-	int scanline = video_screen_get_vpos(space->machine->primary_screen);
+	int scanline = space->machine->primary_screen->vpos();
 	if (scanline > 0)
-		video_screen_update_partial(space->machine->primary_screen, scanline - 1);
+		space->machine->primary_screen->update_partial(scanline - 1);
 
 	/* adjust the proper scroll value */
 	switch (offset)
@@ -139,7 +139,7 @@ WRITE8_HANDLER( leland_scroll_w )
 
 WRITE8_DEVICE_HANDLER( leland_gfx_port_w )
 {
-	video_screen_update_partial(device->machine->primary_screen, video_screen_get_vpos(device->machine->primary_screen));
+	device->machine->primary_screen->update_partial(device->machine->primary_screen->vpos());
 	gfxbank = data;
 }
 
@@ -225,9 +225,9 @@ static void leland_vram_port_w(const address_space *space, int offset, int data,
 
 	/* don't fully understand why this is needed.  Isn't the
        video RAM just one big RAM? */
-	int scanline = video_screen_get_vpos(space->machine->primary_screen);
+	int scanline = space->machine->primary_screen->vpos();
 	if (scanline > 0)
-		video_screen_update_partial(space->machine->primary_screen, scanline - 1);
+		space->machine->primary_screen->update_partial(scanline - 1);
 
 	if (LOG_COMM && addr >= 0xf000)
 		logerror("%s:%s comm write %04X = %02X\n", cpuexec_describe_context(space->machine), num ? "slave" : "master", addr, data);

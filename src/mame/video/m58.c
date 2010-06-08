@@ -180,14 +180,14 @@ VIDEO_START( yard )
 {
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
-	bitmap_format format = video_screen_get_format(machine->primary_screen);
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
+	bitmap_format format = machine->primary_screen->format();
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	state->bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
-	tilemap_set_scrolldx(state->bg_tilemap, visarea->min_x, width - (visarea->max_x + 1));
-	tilemap_set_scrolldy(state->bg_tilemap, visarea->min_y - 8, height + 16 - (visarea->max_y + 1));
+	tilemap_set_scrolldx(state->bg_tilemap, visarea.min_x, width - (visarea.max_x + 1));
+	tilemap_set_scrolldy(state->bg_tilemap, visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 
 	state->scroll_panel_bitmap = auto_bitmap_alloc(machine, SCROLL_PANEL_WIDTH, height, format);
 }
@@ -223,7 +223,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	int offs;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
@@ -261,8 +261,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sy2 = sy1 + 0x10;
 		}
 
-		DRAW_SPRITE(code1 + 256 * bank, visarea->min_y + sy1)
-		DRAW_SPRITE(code2 + 256 * bank, visarea->min_y + sy2)
+		DRAW_SPRITE(code1 + 256 * bank, visarea.min_y + sy1)
+		DRAW_SPRITE(code2 + 256 * bank, visarea.min_y + sy2)
 	}
 }
 
@@ -291,16 +291,16 @@ static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectan
 			1*8, 31*8-1
 		};
 		rectangle clip = flip_screen_get(machine) ? clippanelflip : clippanel;
-		const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+		const rectangle &visarea = machine->primary_screen->visible_area();
 		int sx = flip_screen_get(machine) ? cliprect->min_x - 8 : cliprect->max_x + 1 - SCROLL_PANEL_WIDTH;
 		int yoffs = flip_screen_get(machine) ? -40 : -16;
 
-		clip.min_y += visarea->min_y + yoffs;
-		clip.max_y += visarea->max_y + yoffs;
+		clip.min_y += visarea.min_y + yoffs;
+		clip.max_y += visarea.max_y + yoffs;
 		sect_rect(&clip, cliprect);
 
 		copybitmap(bitmap, state->scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
-				   sx, visarea->min_y + yoffs, &clip);
+				   sx, visarea.min_y + yoffs, &clip);
 	}
 }
 

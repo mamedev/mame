@@ -78,10 +78,10 @@ VIDEO_START( gaelco3d )
 	poly = poly_alloc(machine, 2000, sizeof(poly_extra_data), 0);
 	add_exit_callback(machine, gaelco3d_exit);
 
-	screenbits = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	screenbits = machine->primary_screen->alloc_compatible_bitmap();
 
-	width = video_screen_get_width(machine->primary_screen);
-	height = video_screen_get_height(machine->primary_screen);
+	width = machine->primary_screen->width();
+	height = machine->primary_screen->height();
 	zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	palette = auto_alloc_array(machine, rgb_t, 32768);
@@ -129,10 +129,10 @@ VIDEO_START( gaelco3d )
     (repeat these two for each additional point in the fan)
 */
 
-static void render_poly(running_device *screen, UINT32 *polydata)
+static void render_poly(screen_device &screen, UINT32 *polydata)
 {
-	float midx = video_screen_get_width(screen) / 2;
-	float midy = video_screen_get_height(screen) / 2;
+	float midx = screen.width() / 2;
+	float midy = screen.height() / 2;
 	float z0 = convert_tms3203x_fp_to_float(polydata[0]);
 	float voz_dy = convert_tms3203x_fp_to_float(polydata[1]) * 256.0f;
 	float voz_dx = convert_tms3203x_fp_to_float(polydata[2]) * 256.0f;
@@ -200,19 +200,19 @@ static void render_poly(running_device *screen, UINT32 *polydata)
 	/* if we have a valid number of verts, render them */
 	if (vertnum >= 3)
 	{
-		const rectangle *visarea = video_screen_get_visible_area(screen);
+		const rectangle &visarea = screen.visible_area();
 
 		/* special case: no Z buffering and no perspective correction */
 		if (color != 0x7f00 && z0 < 0 && ooz_dx == 0 && ooz_dy == 0)
-			poly_render_triangle_fan(poly, screenbits, visarea, render_noz_noperspective, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(poly, screenbits, &visarea, render_noz_noperspective, 0, vertnum, &vert[0]);
 
 		/* general case: non-alpha blended */
 		else if (color != 0x7f00)
-			poly_render_triangle_fan(poly, screenbits, visarea, render_normal, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(poly, screenbits, &visarea, render_normal, 0, vertnum, &vert[0]);
 
 		/* color 0x7f seems to be hard-coded as a 50% alpha blend */
 		else
-			poly_render_triangle_fan(poly, screenbits, visarea, render_alphablend, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(poly, screenbits, &visarea, render_alphablend, 0, vertnum, &vert[0]);
 
 		polygons += vertnum - 2;
 	}
@@ -371,15 +371,15 @@ static void render_alphablend(void *destbase, INT32 scanline, const poly_extent 
  *
  *************************************/
 
-void gaelco3d_render(running_device *screen)
+void gaelco3d_render(screen_device &screen)
 {
 	/* wait for any queued stuff to complete */
 	poly_wait(poly, "Time to render");
 
 #if DISPLAY_STATS
 {
-	int scan = video_screen_get_vpos(screen);
-	popmessage("Polys = %4d  Timeleft = %3d", polygons, (lastscan < scan) ? (scan - lastscan) : (scan + (lastscan - video_screen_get_visible_area(screen)->max_y)));
+	int scan = screen.vpos();
+	popmessage("Polys = %4d  Timeleft = %3d", polygons, (lastscan < scan) ? (scan - lastscan) : (scan + (lastscan - screen.visible_area().max_y)));
 }
 #endif
 
@@ -408,14 +408,14 @@ WRITE32_HANDLER( gaelco3d_render_w )
 	{
 		if (polydata_count >= 18 && (polydata_count % 2) == 1 && IS_POLYEND(polydata_buffer[polydata_count - 2]))
 		{
-			render_poly(space->machine->primary_screen, &polydata_buffer[0]);
+			render_poly(*space->machine->primary_screen, &polydata_buffer[0]);
 			polydata_count = 0;
 		}
 		video_changed = TRUE;
 	}
 
 #if DISPLAY_STATS
-	lastscan = video_screen_get_vpos(space->machine->primary_screen);
+	lastscan = space->machine->primary_screen->vpos();
 #endif
 }
 

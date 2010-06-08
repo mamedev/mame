@@ -76,7 +76,7 @@ VIDEO_START( tunhunt )
     */
 	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
 
-	machine->generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, video_screen_get_format(machine->primary_screen));
+	machine->generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, machine->primary_screen->format());
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 

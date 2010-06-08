@@ -79,10 +79,8 @@ typedef struct
 INLINE ES5503Chip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_ES5503);
-	return (ES5503Chip *)device->token;
+	assert(device->type() == SOUND_ES5503);
+	return (ES5503Chip *)downcast<legacy_device_base *>(device)->token();
 }
 
 static const UINT16 wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
@@ -235,12 +233,12 @@ static DEVICE_START( es5503 )
 	int osc;
 	ES5503Chip *chip = get_safe_token(device);
 
-	intf = (const es5503_interface *)device->baseconfig().static_config;
+	intf = (const es5503_interface *)device->baseconfig().static_config();
 
 	chip->irq_callback = intf->irq_callback;
 	chip->adc_read = intf->adc_read;
 	chip->docram = intf->wave_memory;
-	chip->clock = device->clock;
+	chip->clock = device->clock();
 	chip->device = device;
 
 	chip->rege0 = 0x80;
@@ -268,7 +266,7 @@ static DEVICE_START( es5503 )
 
 	chip->oscsenabled = 1;
 
-	chip->output_rate = (device->clock/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
+	chip->output_rate = (device->clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
 	chip->stream = stream_create(device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
 }
 

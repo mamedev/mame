@@ -183,7 +183,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_UPDATE(kingdrby)
 {
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 	rectangle clip;
 	tilemap_set_scrollx( sc0_tilemap,0, kingdrby_vram[0x342]);
 	tilemap_set_scrolly( sc0_tilemap,0, kingdrby_vram[0x341]);
@@ -192,10 +192,10 @@ static VIDEO_UPDATE(kingdrby)
 	tilemap_set_scrolly( sc0w_tilemap,0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
-	clip.min_x = visarea->min_x;
+	clip.min_x = visarea.min_x;
 	clip.max_x = 256;
 	clip.min_y = 192;
-	clip.max_y = visarea->max_y;
+	clip.max_y = visarea.max_y;
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
 	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
@@ -1033,8 +1033,7 @@ static MACHINE_DRIVER_START( cowrace )
 	MDRV_GFXDECODE(cowrace)
 	MDRV_PALETTE_INIT(kingdrby)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_REPLACE("aysnd", YM2203, 3000000)

@@ -671,8 +671,8 @@ VIDEO_START( f3 )
 	pixel_layer = tilemap_create(machine, get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
 	pf_line_inf = auto_alloc_array(machine, struct f3_playfield_line_inf, 5);
 	sa_line_inf = auto_alloc_array(machine, struct f3_spritealpha_line_inf, 1);
-	width = video_screen_get_width(machine->primary_screen);
-	height = video_screen_get_height(machine->primary_screen);
+	width = machine->primary_screen->width();
+	height = machine->primary_screen->height();
 	pri_alp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8 );
 	tile_opaque_sp = auto_alloc_array(machine, UINT8, machine->gfx[2]->total_elements);
 	for (i=0; i<4; i++)
@@ -2919,9 +2919,9 @@ INLINE void f3_drawgfxzoom(
 
 static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_ptr)
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-	const int min_x=visarea->min_x,max_x=visarea->max_x;
-	const int min_y=visarea->min_y,max_y=visarea->max_y;
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	const int min_x=visarea.min_x,max_x=visarea.max_x;
+	const int min_y=visarea.min_y,max_y=visarea.max_y;
 	int offs,spritecont,flipx,flipy,/*old_x,*/color,x,y;
 	int sprite,global_x=0,global_y=0,subglobal_x=0,subglobal_y=0;
 	int block_x=0, block_y=0;

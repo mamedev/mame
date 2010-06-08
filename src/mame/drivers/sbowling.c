@@ -120,7 +120,7 @@ static VIDEO_START(sbowling)
 {
 	sbowling_state *state = (sbowling_state *)machine->driver_data;
 
-	state->tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,video_screen_get_format(machine->primary_screen));
+	state->tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,machine->primary_screen->format());
 	state->sb_tilemap = tilemap_create(machine, get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
@@ -156,7 +156,7 @@ static READ8_HANDLER( pix_data_r )
 
 static INTERRUPT_GEN( sbw_interrupt )
 {
-	int vector = video_screen_get_vblank(device->machine->primary_screen) ? 0xcf : 0xd7;	/* RST 08h/10h */
+	int vector = device->machine->primary_screen->vblank() ? 0xcf : 0xd7;	/* RST 08h/10h */
 
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
 }

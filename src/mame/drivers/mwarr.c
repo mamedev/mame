@@ -108,7 +108,7 @@ static WRITE16_HANDLER( tx_videoram_w )
 
 static WRITE16_DEVICE_HANDLER( oki1_bank_w )
 {
-	okim6295_set_bank_base(device, 0x40000 * (data & 3));
+	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
 }
 
 static WRITE16_HANDLER( sprites_commands_w )
@@ -563,12 +563,10 @@ static MACHINE_DRIVER_START( mwarr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, SOUND_CLOCK/48 )
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, SOUND_CLOCK/48 )
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

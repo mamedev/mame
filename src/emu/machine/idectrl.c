@@ -198,16 +198,15 @@ static void ide_controller_write(running_device *device, int bank, offs_t offset
 INLINE ide_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == IDE_CONTROLLER);
+	assert(device->type() == IDE_CONTROLLER);
 
-	return (ide_state *)device->token;
+	return (ide_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE void signal_interrupt(ide_state *ide)
 {
-	const ide_config *config = (const ide_config *)ide->device->baseconfig().inline_config;
+	const ide_config *config = (const ide_config *)downcast<const legacy_device_config_base &>(ide->device->baseconfig()).inline_config();
 
 	LOG(("IDE interrupt assert\n"));
 
@@ -221,7 +220,7 @@ INLINE void signal_interrupt(ide_state *ide)
 
 INLINE void clear_interrupt(ide_state *ide)
 {
-	const ide_config *config = (const ide_config *)ide->device->baseconfig().inline_config;
+	const ide_config *config = (const ide_config *)downcast<const legacy_device_config_base &>(ide->device->baseconfig()).inline_config();
 
 	LOG(("IDE interrupt clear\n"));
 
@@ -1794,8 +1793,8 @@ static DEVICE_START( ide_controller )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config == NULL);
-	assert(device->baseconfig().inline_config != NULL);
+	assert(device->baseconfig().static_config() == NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -1803,7 +1802,7 @@ static DEVICE_START( ide_controller )
 	ide->device = device;
 
 	/* set MAME harddisk handle */
-	config = (const ide_config *)device->baseconfig().inline_config;
+	config = (const ide_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	ide->handle = get_disk_handle(device->machine, (config->master != NULL) ? config->master : device->tag());
 	ide->disk = hard_disk_open(ide->handle);
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
@@ -1811,7 +1810,7 @@ static DEVICE_START( ide_controller )
 	/* find the bus master space */
 	if (config->bmcpu != NULL)
 	{
-		ide->dma_space = device->machine->device(config->bmcpu)->space(config->bmspace);
+		ide->dma_space = device_memory(device->machine->device(config->bmcpu))->space(config->bmspace);
 		assert_always(ide->dma_space != NULL, "IDE controller bus master space not found!");
 		ide->dma_address_xor = (ide->dma_space->endianness == ENDIANNESS_LITTLE) ? 0 : 3;
 	}
@@ -1959,7 +1958,6 @@ DEVICE_GET_INFO( ide_controller )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ide_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(ide_config);			break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ide_controller); break;

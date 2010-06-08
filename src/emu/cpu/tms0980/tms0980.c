@@ -449,8 +449,7 @@ static const UINT32 tms1100_default_decode[256] = {
 INLINE tms0980_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS0980 ||
 			cpu_get_type(device) == CPU_TMS1000 ||
 			cpu_get_type(device) == CPU_TMS1070 ||
@@ -458,7 +457,7 @@ INLINE tms0980_state *get_safe_token(running_device *device)
 			cpu_get_type(device) == CPU_TMS1200 ||
 			cpu_get_type(device) == CPU_TMS1270 ||
 			cpu_get_type(device) == CPU_TMS1300 );
-	return (tms0980_state *)device->token;
+	return (tms0980_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -496,7 +495,7 @@ static void cpu_init_tms_common( running_device *device, const UINT32* decode_ta
 {
 	tms0980_state *cpustate = get_safe_token( device );
 
-	cpustate->config = (const tms0980_config *) device->baseconfig().static_config;
+	cpustate->config = (const tms0980_config *) device->baseconfig().static_config();
 
 	assert( cpustate->config != NULL );
 
@@ -506,8 +505,8 @@ static void cpu_init_tms_common( running_device *device, const UINT32* decode_ta
 	cpustate->pc_size = pc_size;
 	cpustate->byte_size = byte_size;
 
-	cpustate->program = device->space( AS_PROGRAM );
-	cpustate->data = device->space( AS_PROGRAM );
+	cpustate->program = device_memory(device)->space( AS_PROGRAM );
+	cpustate->data = device_memory(device)->space( AS_PROGRAM );
 
 	state_save_register_device_item( device, 0, cpustate->prev_pc );
 	state_save_register_device_item( device, 0, cpustate->prev_pa );
@@ -1115,7 +1114,7 @@ static CPU_SET_INFO( tms0980 )
 
 static CPU_GET_INFO( tms_generic )
 {
-	tms0980_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms0980_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{
@@ -1171,7 +1170,7 @@ static CPU_GET_INFO( tms_generic )
 
 CPU_GET_INFO( tms0980 )
 {
-	tms0980_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms0980_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{
@@ -1194,7 +1193,7 @@ CPU_GET_INFO( tms0980 )
 
 CPU_GET_INFO( tms1000 )
 {
-	tms0980_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms0980_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{
@@ -1251,7 +1250,7 @@ CPU_GET_INFO( tms1270 )
 
 CPU_GET_INFO( tms1100 )
 {
-	tms0980_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms0980_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

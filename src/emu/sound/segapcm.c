@@ -21,10 +21,8 @@ struct _segapcm_state
 INLINE segapcm_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SEGAPCM);
-	return (segapcm_state *)device->token;
+	assert(device->type() == SOUND_SEGAPCM);
+	return (segapcm_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static STREAM_UPDATE( SEGAPCM_update )
@@ -90,11 +88,11 @@ static STREAM_UPDATE( SEGAPCM_update )
 
 static DEVICE_START( segapcm )
 {
-	const sega_pcm_interface *intf = (const sega_pcm_interface *)device->baseconfig().static_config;
+	const sega_pcm_interface *intf = (const sega_pcm_interface *)device->baseconfig().static_config();
 	int mask, rom_mask, len;
 	segapcm_state *spcm = get_safe_token(device);
 
-	spcm->rom = *device->region;
+	spcm->rom = *device->region();
 	spcm->ram = auto_alloc_array(device->machine, UINT8, 0x800);
 
 	memset(spcm->ram, 0xff, 0x800);
@@ -104,7 +102,7 @@ static DEVICE_START( segapcm )
 	if(!mask)
 		mask = BANK_MASK7>>16;
 
-	len = device->region->bytes();
+	len = device->region()->bytes();
 	spcm->rgnmask = len - 1;
 
 	for(rom_mask = 1; rom_mask < len; rom_mask *= 2);
@@ -113,7 +111,7 @@ static DEVICE_START( segapcm )
 
 	spcm->bankmask = mask & (rom_mask >> spcm->bankshift);
 
-	spcm->stream = stream_create(device, 0, 2, device->clock / 128, spcm, SEGAPCM_update);
+	spcm->stream = stream_create(device, 0, 2, device->clock() / 128, spcm, SEGAPCM_update);
 
 	state_save_register_device_item_array(device, 0, spcm->low);
 	state_save_register_device_item_pointer(device, 0, spcm->ram, 0x800);

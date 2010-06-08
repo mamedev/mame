@@ -712,10 +712,11 @@ static const char *line_to_symbol(const char *line, FPTR &address)
 	// find a matching start
 	if (strncmp(line, "                0x", 18) == 0)
 		if (sscanf(line, " 0x%p %s", &temp, symbol) == 2)
-		{
-			address = reinterpret_cast<FPTR>(temp);
-			return strstr(line, symbol);
-		}
+			if (symbol[0] != '0' && symbol[1] != 'x')
+			{
+				address = reinterpret_cast<FPTR>(temp);
+				return strstr(line, symbol);
+			}
 #endif
 
 #ifdef _MSC_VER

@@ -47,10 +47,8 @@ struct dss_input_context
 INLINE discrete_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_DISCRETE);
-	return (discrete_info *)device->token;
+	assert(device->type() == SOUND_DISCRETE);
+	return (discrete_info *)downcast<legacy_device_base *>(device)->token();
 }
 
 READ8_DEVICE_HANDLER(discrete_sound_r)

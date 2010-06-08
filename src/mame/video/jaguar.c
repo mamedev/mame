@@ -237,13 +237,13 @@ static void blitter_x1800x01_xxxxxx_xxxxxx(running_machine *machine, UINT32 comm
 
 INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	int width = visarea->max_x + 1 - visarea->min_x;
-	int height = visarea->max_y + 1 - visarea->min_y;
+	int width = visarea.max_x + 1 - visarea.min_x;
+	int height = visarea.max_y + 1 - visarea.min_y;
 	/* only 2 lightguns are connected */
-	*x = visarea->min_x + (((input_port_read(machine, player ? "FAKE2_X" : "FAKE1_X") & 0xff) * width) >> 8);
-	*y = visarea->min_y + (((input_port_read(machine, player ? "FAKE2_Y" : "FAKE1_Y") & 0xff) * height) >> 8);
+	*x = visarea.min_x + (((input_port_read(machine, player ? "FAKE2_X" : "FAKE1_X") & 0xff) * width) >> 8);
+	*y = visarea.min_y + (((input_port_read(machine, player ? "FAKE2_Y" : "FAKE1_Y") & 0xff) * height) >> 8);
 }
 
 
@@ -291,11 +291,11 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 	hdb = hdbpix[vc % 2];
 
 	/* if setting the second one in a line, make sure we will ever actually hit it */
-	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= video_screen_get_width(machine->primary_screen)))
+	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= machine->primary_screen->width()))
 		return FALSE;
 
 	/* adjust the timer */
-	timer_adjust_oneshot(object_timer, video_screen_get_time_until_pos(machine->primary_screen, vc / 2, hdb), vc | (hdb << 16));
+	timer_adjust_oneshot(object_timer, machine->primary_screen->time_until_pos(vc / 2, hdb), vc | (hdb << 16));
 	return TRUE;
 }
 
@@ -655,18 +655,18 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return cpu_irq_state;
 
 		case HC:
-			return video_screen_get_hpos(space->machine->primary_screen) % (video_screen_get_width(space->machine->primary_screen) / 2);
+			return space->machine->primary_screen->hpos() % (space->machine->primary_screen->width() / 2);
 
 		case VC:
 		{
 			UINT8 half_line;
 
-			if(video_screen_get_hpos(space->machine->primary_screen) >= (video_screen_get_width(space->machine->primary_screen) / 2))
+			if(space->machine->primary_screen->hpos() >= (space->machine->primary_screen->width() / 2))
 				half_line = 1;
 			else
 				half_line = 0;
 
-			return video_screen_get_vpos(space->machine->primary_screen) * 2 + half_line;
+			return space->machine->primary_screen->vpos() * 2 + half_line;
 		}
 	}
 
@@ -761,7 +761,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 						visarea.max_x = hbstart / 2 - 1;
 						visarea.min_y = vbend / 2;
 						visarea.max_y = vbstart / 2 - 1;
-						video_screen_configure(space->machine->primary_screen, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
+						space->machine->primary_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
 					}
 				}
 				break;
@@ -832,13 +832,13 @@ static TIMER_CALLBACK( cojag_scanline_update )
 {
 	int vc = param & 0xffff;
 	int hdb = param >> 16;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((gpu_regs[VMODE] & 1) && vc >= (gpu_regs[VDB] & 0x7ff))
 	{
 		UINT32 *dest = BITMAP_ADDR32(screen_bitmap, vc >> 1, 0);
-		int maxx = visarea->max_x;
+		int maxx = visarea.max_x;
 		int hde = effective_hvalue(gpu_regs[HDE]) >> 1;
 		UINT16 x,scanline[760];
 		UINT8 y,pixel_width = ((gpu_regs[VMODE]>>10)&3)+1;
@@ -847,7 +847,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		if (ENABLE_BORDERS && vc % 2 == 0)
 		{
 			rgb_t border = MAKE_RGB(gpu_regs[BORD1] & 0xff, gpu_regs[BORD1] >> 8, gpu_regs[BORD2] & 0xff);
-			for (x = visarea->min_x; x <= visarea->max_x; x++)
+			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				dest[x] = border;
 		}
 
@@ -885,7 +885,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		}
 
 		/* point to the next counter value */
-		if (++vc / 2 >= video_screen_get_height(machine->primary_screen))
+		if (++vc / 2 >= machine->primary_screen->height())
 			vc = 0;
 
 	} while (!adjust_object_timer(machine, vc));

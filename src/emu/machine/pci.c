@@ -99,10 +99,9 @@ struct _pci_bus_state
 INLINE pci_bus_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == PCI_BUS);
+	assert(device->type() == PCI_BUS);
 
-	return (pci_bus_state *)device->token;
+	return (pci_bus_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -205,13 +204,13 @@ static DEVICE_START( pci_bus )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config == NULL);
-	assert(device->baseconfig().inline_config != NULL);
+	assert(device->baseconfig().static_config() == NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
 	/* store a pointer back to the device */
-	pcibus->config = (const pci_bus_config *)device->baseconfig().inline_config;
+	pcibus->config = (const pci_bus_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	pcibus->busdevice = device;
 	pcibus->devicenum = -1;
 
@@ -251,7 +250,6 @@ DEVICE_GET_INFO( pci_bus )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(pci_bus_state);		break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(pci_bus_config);		break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pci_bus); break;

@@ -2911,8 +2911,8 @@ static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitma
 	stv2_current_tilemap.bitmap_palette_number+=stv2_current_tilemap.colour_ram_address_offset;
 	stv2_current_tilemap.bitmap_palette_number&=7;//safety check
 
-	screen_x = video_screen_get_visible_area(machine->primary_screen)->max_x;
-	screen_y = video_screen_get_visible_area(machine->primary_screen)->max_y;
+	screen_x = machine->primary_screen->visible_area().max_x;
+	screen_y = machine->primary_screen->visible_area().max_y;
 
 	switch(stv2_current_tilemap.colour_depth)
 	{
@@ -4880,7 +4880,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bi
 	else
 	{
 		if ( stv_vdp2_roz_bitmap[iRP-1] == NULL )
-			stv_vdp2_roz_bitmap[iRP-1] = bitmap_alloc(4096, 4096, video_screen_get_format(machine->primary_screen));
+			stv_vdp2_roz_bitmap[iRP-1] = auto_alloc(machine, bitmap_t(4096, 4096, machine->primary_screen->format()));
 
 		roz_clip_rect.min_x = roz_clip_rect.min_y = 0;
 		if ( (iRP == 1 && STV_VDP2_RAOVR == 3) ||
@@ -5295,8 +5295,8 @@ static UINT8 get_hblank(running_machine *machine)
 {
 	static int cur_h;
 
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
-	cur_h = video_screen_get_hpos(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	cur_h = machine->primary_screen->hpos();
 
 	if (cur_h > visarea.max_x)
 		return 1;
@@ -5321,8 +5321,8 @@ static int get_hblank_duration(running_machine *machine)
 UINT8 stv_get_vblank(running_machine *machine)
 {
 	static int cur_v;
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
-	cur_v = video_screen_get_vpos(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	cur_v = machine->primary_screen->vpos();
 
 	if (cur_v > visarea.max_y)
 		return 1;
@@ -5356,7 +5356,7 @@ static int get_vblank_duration(running_machine *machine)
 static UINT8 get_odd_bit(running_machine *machine)
 {
 	static int cur_v;
-	cur_v = video_screen_get_vpos(machine->primary_screen);
+	cur_v = machine->primary_screen->vpos();
 
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
 		return 1;
@@ -5389,8 +5389,8 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 		{
 			static UINT16 h_count,v_count;
 			/* TODO: handle various h/v settings. */
-			h_count = video_screen_get_hpos(space->machine->primary_screen) & 0x3ff;
-			v_count = video_screen_get_vpos(space->machine->primary_screen) & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
+			h_count = space->machine->primary_screen->hpos() & 0x3ff;
+			v_count = space->machine->primary_screen->vpos() & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
 			stv_vdp2_regs[offset] = (h_count<<16)|(v_count);
 			if(LOG_VDP2) logerror("CPU %s PC(%08x) = VDP2: H/V counter read : %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),stv_vdp2_regs[offset]);
 			break;
@@ -5424,10 +5424,6 @@ static STATE_POSTLOAD( stv_vdp2_state_save_postload )
 
 static void stv_vdp2_exit (running_machine *machine)
 {
-	if (stv_vdp2_roz_bitmap[0] != NULL)
-		bitmap_free(stv_vdp2_roz_bitmap[0]);
-	if (stv_vdp2_roz_bitmap[1] != NULL)
-		bitmap_free(stv_vdp2_roz_bitmap[1]);
 	stv_vdp2_roz_bitmap[0] =  stv_vdp2_roz_bitmap[1] = NULL;
 }
 
@@ -5475,8 +5471,6 @@ VIDEO_START( stv_vdp2 )
 	gfx_element_set_source(machine->gfx[7], stv_vdp1_gfx_decode);
 }
 
-/*TODO: frame_period should be different for every kind of resolution (needs tests on actual boards)*/
-/*    & height / width not yet understood (docs-wise MUST be bigger than normal visible area)*/
 static void stv_vdp2_dynamic_res_change(running_machine *machine)
 {
 	static UINT8 old_vres = 0,old_hres = 0;
@@ -5513,7 +5507,7 @@ static void stv_vdp2_dynamic_res_change(running_machine *machine)
 	if(old_vres != vert_res || old_hres != horz_res)
 	{
 		int vblank_period,hblank_period;
-		rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+		rectangle visarea = machine->primary_screen->visible_area();
 		visarea.min_x = 0;
 		visarea.max_x = horz_res-1;
 		visarea.min_y = 0;
@@ -5523,12 +5517,12 @@ static void stv_vdp2_dynamic_res_change(running_machine *machine)
 		hblank_period = get_hblank_duration(machine);
 //      popmessage("%d",vblank_period);
 //      hblank_period = get_hblank_duration(machine->primary_screen);
-		video_screen_configure(machine->primary_screen, (horz_res+hblank_period), (vert_res+vblank_period), &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
+		machine->primary_screen->configure((horz_res+hblank_period), (vert_res+vblank_period), visarea, machine->primary_screen->frame_period().attoseconds );
 
 		old_vres = vert_res;
 		old_hres = horz_res;
 	}
-//  video_screen_set_visarea(machine->primary_screen, 0*8, horz_res-1,0*8, vert_res-1);
+//  machine->primary_screen->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
 	//if(LOG_VDP2) popmessage("%04d %04d",horz_res-1,vert-1);
 }
 

@@ -184,7 +184,7 @@ VIDEO_UPDATE( actfancr )
 		x = buffered_spriteram[offs + 4] + (buffered_spriteram[offs + 5] << 8);
 		colour = ((x & 0xf000) >> 12);
 		flash = x & 0x800;
-		if (flash && (video_screen_get_frame_number(screen) & 1))
+		if (flash && (screen->frame_number() & 1))
 			continue;
 
 		fx = y & 0x2000;
@@ -276,7 +276,7 @@ VIDEO_UPDATE( triothep )
 		x = buffered_spriteram[offs + 4] + (buffered_spriteram[offs + 5] << 8);
 		colour = ((x & 0xf000) >> 12);
 		flash = x & 0x800;
-		if (flash && (video_screen_get_frame_number(screen) & 1))
+		if (flash && (screen->frame_number() & 1))
 			continue;
 
 		fx = y & 0x2000;

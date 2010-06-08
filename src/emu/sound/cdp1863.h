@@ -21,16 +21,16 @@
 #ifndef __CDP1863__
 #define __CDP1863__
 
+#include "devlegcy.h"
+
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define CDP1863 DEVICE_GET_INFO_NAME(cdp1863)
-#define SOUND_CDP1863 CDP1863
+DECLARE_LEGACY_SOUND_DEVICE(CDP1863, cdp1863);
 
 #define MDRV_CDP1863_ADD(_tag, _clock1, _clock2) \
 	MDRV_DEVICE_ADD(_tag, SOUND, _clock1) \
-	MDRV_DEVICE_CONFIG_DATAPTR(cdp1863_config, type, SOUND_CDP1863) \
 	MDRV_DEVICE_CONFIG_DATA32(cdp1863_config, clock2, _clock2)
 
 #define CDP1863_INTERFACE(name) \
@@ -43,17 +43,12 @@
 typedef struct _cdp1863_config cdp1863_config;
 struct _cdp1863_config
 {
-	const sound_config *type;
-
 	int clock2;				/* the clock 2 (pin 2) of the chip */
 };
 
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( cdp1863 );
 
 /* load tone latch */
 WRITE8_DEVICE_HANDLER( cdp1863_str_w );

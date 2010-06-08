@@ -283,7 +283,7 @@ static WRITE8_HANDLER( custom_io_w )
 
 static CUSTOM_INPUT( hopper_r )
 {
-	if (hopper) return !(video_screen_get_frame_number(field->port->machine->primary_screen)%10);
+	if (hopper) return !(field->port->machine->primary_screen->frame_number()%10);
 	return input_code_pressed(field->port->machine, KEYCODE_H);
 }
 
@@ -1615,8 +1615,7 @@ static MACHINE_DRIVER_START( number10 )
 	MDRV_VIDEO_START(cpokerpk)
 	MDRV_VIDEO_UPDATE(cpokerpk)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz / 12)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

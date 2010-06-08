@@ -25,7 +25,7 @@ static void line(tms34010_state *tms, UINT16 op)
 
 		tms->st |= STBIT_P;
 		TEMP(tms) = (op & 0x80) ? 1 : 0;  /* boundary value depends on the algorithm */
-		LOGGFX(("%08X(%3d):LINE (%d,%d)-(%d,%d)\n", tms->pc, video_screen_get_vpos(tms->screen), DADDR_X(tms), DADDR_Y(tms), DADDR_X(tms) + DYDX_X(tms), DADDR_Y(tms) + DYDX_Y(tms)));
+		LOGGFX(("%08X(%3d):LINE (%d,%d)-(%d,%d)\n", tms->pc, tms->screen->vpos(), DADDR_X(tms), DADDR_Y(tms), DADDR_X(tms) + DYDX_X(tms), DADDR_Y(tms) + DYDX_Y(tms)));
 	}
 
 	if (COUNT(tms) > 0)
@@ -906,7 +906,7 @@ static void pixblt_b_l(tms34010_state *tms, UINT16 op)
 	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
 	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT B,L (%dx%d) depth=%d\n", tms->pc, video_screen_get_vpos(tms->screen), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
+	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT B,L (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
 	pixel_op = pixel_op_table[rop];
 	pixel_op_timing = pixel_op_timing_table[rop];
 	(*pixblt_b_op_table[ix])(tms, 1);
@@ -918,7 +918,7 @@ static void pixblt_b_xy(tms34010_state *tms, UINT16 op)
 	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
 	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT B,XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, video_screen_get_vpos(tms->screen), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
+	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT B,XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
 	pixel_op = pixel_op_table[rop];
 	pixel_op_timing = pixel_op_timing_table[rop];
 	(*pixblt_b_op_table[ix])(tms, 0);
@@ -931,7 +931,7 @@ static void pixblt_l_l(tms34010_state *tms, UINT16 op)
 	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
 	int pbh = (IOREG(tms, REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT L,L (%dx%d) depth=%d\n", tms->pc, video_screen_get_vpos(tms->screen), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
+	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT L,L (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
 	pixel_op = pixel_op_table[rop];
 	pixel_op_timing = pixel_op_timing_table[rop];
 	if (!pbh)
@@ -947,7 +947,7 @@ static void pixblt_l_xy(tms34010_state *tms, UINT16 op)
 	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
 	int pbh = (IOREG(tms, REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT L,XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, video_screen_get_vpos(tms->screen), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
+	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT L,XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
 	pixel_op = pixel_op_table[rop];
 	pixel_op_timing = pixel_op_timing_table[rop];
 	if (!pbh)
@@ -963,7 +963,7 @@ static void pixblt_xy_l(tms34010_state *tms, UINT16 op)
 	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
 	int pbh = (IOREG(tms, REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT XY,L (%dx%d) depth=%d\n", tms->pc, video_screen_get_vpos(tms->screen), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
+	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT XY,L (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
 	pixel_op = pixel_op_table[rop];
 	pixel_op_timing = pixel_op_timing_table[rop];
 	if (!pbh)
@@ -979,7 +979,7 @@ static void pixblt_xy_xy(tms34010_state *tms, UINT16 op)
 	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
 	int pbh = (IOREG(tms, REG_CONTROL) >> 8) & 1;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT XY,XY (%dx%d) depth=%d\n", tms->pc, video_screen_get_vpos(tms->screen), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
+	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):PIXBLT XY,XY (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
 	pixel_op = pixel_op_table[rop];
 	pixel_op_timing = pixel_op_timing_table[rop];
 	if (!pbh)
@@ -994,7 +994,7 @@ static void fill_l(tms34010_state *tms, UINT16 op)
 	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
 	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):FILL L (%dx%d) depth=%d\n", tms->pc, video_screen_get_vpos(tms->screen), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
+	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):FILL L (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
 	pixel_op = pixel_op_table[rop];
 	pixel_op_timing = pixel_op_timing_table[rop];
 	(*fill_op_table[ix])(tms, 1);
@@ -1006,7 +1006,7 @@ static void fill_xy(tms34010_state *tms, UINT16 op)
 	int trans = (IOREG(tms, REG_CONTROL) & 0x20) >> 5;
 	int rop = (IOREG(tms, REG_CONTROL) >> 10) & 0x1f;
 	int ix = trans | (rop << 1) | (psize << 6);
-	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):FILL XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, video_screen_get_vpos(tms->screen), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
+	if (!P_FLAG(tms)) LOGGFX(("%08X(%3d):FILL XY (%d,%d) (%dx%d) depth=%d\n", tms->pc, tms->screen->vpos(), DADDR_X(tms), DADDR_Y(tms), DYDX_X(tms), DYDX_Y(tms), IOREG(tms, REG_PSIZE) ? IOREG(tms, REG_PSIZE) : 32));
 	pixel_op = pixel_op_table[rop];
 	pixel_op_timing = pixel_op_timing_table[rop];
 	(*fill_op_table[ix])(tms, 0);

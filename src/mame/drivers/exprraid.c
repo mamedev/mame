@@ -540,7 +540,6 @@ static MACHINE_DRIVER_START( exprboot )
 
 	MDRV_CPU_REPLACE("maincpu", M6502, 4000000)        /* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(master_map)
-	MDRV_CPU_IO_MAP(0)
 MACHINE_DRIVER_END
 
 

@@ -312,7 +312,7 @@ static WRITE16_HANDLER( shadfrce_scanline_w )
 
 static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 {
-	shadfrce_state *state = (shadfrce_state *)timer->machine->driver_data;
+	shadfrce_state *state = (shadfrce_state *)timer.machine->driver_data;
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */
@@ -333,8 +333,8 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		{
 			state->raster_scanline = (state->raster_scanline + 1) % 240;
 			if (state->raster_scanline > 0)
-				video_screen_update_partial(timer->machine->primary_screen, state->raster_scanline - 1);
-			cputag_set_input_line(timer->machine, "maincpu", 1, ASSERT_LINE);
+				timer.machine->primary_screen->update_partial(state->raster_scanline - 1);
+			cputag_set_input_line(timer.machine, "maincpu", 1, ASSERT_LINE);
 		}
 	}
 
@@ -344,8 +344,8 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		if (scanline % 16 == 0)
 		{
 			if (scanline > 0)
-				video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-			cputag_set_input_line(timer->machine, "maincpu", 2, ASSERT_LINE);
+				timer.machine->primary_screen->update_partial(scanline - 1);
+			cputag_set_input_line(timer.machine, "maincpu", 2, ASSERT_LINE);
 		}
 	}
 
@@ -354,8 +354,8 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 	{
 		if (scanline == 248)
 		{
-			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-			cputag_set_input_line(timer->machine, "maincpu", 3, ASSERT_LINE);
+			timer.machine->primary_screen->update_partial(scanline - 1);
+			cputag_set_input_line(timer.machine, "maincpu", 3, ASSERT_LINE);
 		}
 	}
 }
@@ -396,7 +396,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 {
-	okim6295_set_bank_base(device, (data & 1) * 0x40000);
+	downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
 
 static ADDRESS_MAP_START( shadfrce_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -586,8 +586,7 @@ static MACHINE_DRIVER_START( shadfrce )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_13_4952MHz/8)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)		/* verified on pcb, pin7 is at 2.4v */
+	MDRV_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, OKIM6295_PIN7_HIGH)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END

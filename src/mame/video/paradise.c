@@ -158,7 +158,7 @@ VIDEO_START( paradise )
 	state->tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 0x20, 0x20);
 
 	/* pixmap */
-	state->tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	tilemap_set_transparent_pen(state->tilemap_0, 0x0f);
 	tilemap_set_transparent_pen(state->tilemap_1, 0xff);

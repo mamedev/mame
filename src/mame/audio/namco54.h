@@ -1,6 +1,7 @@
 #ifndef NAMCO54_H
 #define NAMCO54_H
 
+#include "devlegcy.h"
 #include "sound/discrete.h"
 
 
@@ -21,9 +22,7 @@ struct _namco_54xx_config
 WRITE8_DEVICE_HANDLER( namco_54xx_write );
 
 
-/* device get info callback */
-#define NAMCO_54XX DEVICE_GET_INFO_NAME(namco_54xx)
-DEVICE_GET_INFO( namco_54xx );
+DECLARE_LEGACY_DEVICE(NAMCO_54XX, namco_54xx);
 
 
 /* discrete nodes */

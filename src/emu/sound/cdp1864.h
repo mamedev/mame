@@ -36,6 +36,8 @@
 #ifndef __CDP1864__
 #define __CDP1864__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     PARAMETERS
@@ -73,8 +75,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define CDP1864		DEVICE_GET_INFO_NAME(cdp1864)
-#define SOUND_CDP1864 CDP1864
+DECLARE_LEGACY_SOUND_DEVICE(CDP1864, cdp1864);
 
 #define MDRV_CDP1864_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, SOUND, _clock) \
@@ -129,9 +130,6 @@ struct _cdp1864_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( cdp1864 );
 
 /* display on (0x69) */
 READ8_DEVICE_HANDLER( cdp1864_dispon_r ) ATTR_NONNULL(1);

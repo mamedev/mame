@@ -49,7 +49,7 @@ public:
 static WRITE8_HANDLER( dotrikun_color_w )
 {
 	dotrikun_state *state = (dotrikun_state *)space->machine->driver_data;
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	state->color = data;
 }
 

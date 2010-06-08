@@ -87,10 +87,8 @@ struct psxinfo
 INLINE struct psxinfo *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_PSXSPU);
-	return (struct psxinfo *)device->token;
+	assert(device->type() == SOUND_PSXSPU);
+	return (struct psxinfo *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -279,7 +277,7 @@ static DEVICE_START( psxspu )
 	int n_effect;
 	int n_channel;
 
-	chip->intf = (const psx_spu_interface *)device->baseconfig().static_config;
+	chip->intf = (const psx_spu_interface *)device->baseconfig().static_config();
 	chip->device = device;
 	chip->g_p_n_psxram = *(chip->intf->p_psxram);
 

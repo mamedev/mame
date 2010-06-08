@@ -135,9 +135,8 @@ static void ppi8255_write_port(running_device *device, int port);
 
 INLINE ppi8255_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == DEVICE_GET_INFO_NAME(ppi8255) );
-	return ( ppi8255_t * ) device->token;
+	assert( device->type() == PPI8255 );
+	return ( ppi8255_t * ) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -567,7 +566,7 @@ UINT8 ppi8255_get_port_c( running_device *device ) {
 static DEVICE_START( ppi8255 ) {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 
-	ppi8255->intf = (const ppi8255_interface *)device->baseconfig().static_config;
+	ppi8255->intf = (const ppi8255_interface *)device->baseconfig().static_config();
 
 	devcb_resolve_read8(&ppi8255->port_read[0], &ppi8255->intf->port_a_read, device);
 	devcb_resolve_read8(&ppi8255->port_read[1], &ppi8255->intf->port_b_read, device);
@@ -626,7 +625,6 @@ DEVICE_GET_INFO(ppi8255) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(ppi8255_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ppi8255);	break;

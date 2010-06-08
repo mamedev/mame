@@ -1,7 +1,7 @@
 #ifndef __NAMCOIO_H__
 #define __NAMCOIO_H__
 
-#include "devcb.h"
+#include "devlegcy.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -16,19 +16,13 @@ struct _namcoio_interface
 	running_device *device;
 };
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( namcoio );
+DECLARE_LEGACY_DEVICE(NAMCO56XX, namcoio);
+DECLARE_LEGACY_DEVICE(NAMCO58XX, namcoio);
+DECLARE_LEGACY_DEVICE(NAMCO59XX, namcoio);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define NAMCO56XX DEVICE_GET_INFO_NAME( namcoio )
-#define NAMCO58XX DEVICE_GET_INFO_NAME( namcoio )
-#define NAMCO59XX DEVICE_GET_INFO_NAME( namcoio )
 
 #define MDRV_NAMCO56XX_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, NAMCO56XX, 0) \

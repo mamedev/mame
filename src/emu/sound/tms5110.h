@@ -3,6 +3,8 @@
 #ifndef __TMS5110_H__
 #define __TMS5110_H__
 
+#include "devlegcy.h"
+
 /* TMS5110 commands */
                                      /* CTL8  CTL4  CTL2  CTL1  |   PDC's  */
                                      /* (MSB)             (LSB) | required */
@@ -54,21 +56,14 @@ int tms5110_ready_r(running_device *device);
 
 void tms5110_set_frequency(running_device *device, int frequency);
 
-DEVICE_GET_INFO( tms5110 );
-DEVICE_GET_INFO( tms5100 );
-DEVICE_GET_INFO( tms5110a );
-DEVICE_GET_INFO( cd2801 );
-DEVICE_GET_INFO( tmc0281 );
-DEVICE_GET_INFO( cd2802 );
-DEVICE_GET_INFO( m58817 );
+DECLARE_LEGACY_SOUND_DEVICE(TMS5110, tms5110);
+DECLARE_LEGACY_SOUND_DEVICE(TMS5100, tms5100);
+DECLARE_LEGACY_SOUND_DEVICE(TMS5110A, tms5110a);
+DECLARE_LEGACY_SOUND_DEVICE(CD2801, cd2801);
+DECLARE_LEGACY_SOUND_DEVICE(TMC0281, tmc0281);
+DECLARE_LEGACY_SOUND_DEVICE(CD2802, cd2802);
+DECLARE_LEGACY_SOUND_DEVICE(M58817, m58817);
 
-#define SOUND_TMS5110 DEVICE_GET_INFO_NAME( tms5110 )
-#define SOUND_TMS5100 DEVICE_GET_INFO_NAME( tms5100 )
-#define SOUND_TMS5110A DEVICE_GET_INFO_NAME( tms5110a )
-#define SOUND_CD2801 DEVICE_GET_INFO_NAME( cd2801 )
-#define SOUND_TMC0281 DEVICE_GET_INFO_NAME( tmc0281 )
-#define SOUND_CD2802 DEVICE_GET_INFO_NAME( cd2802 )
-#define SOUND_M58817 DEVICE_GET_INFO_NAME( m58817 )
 
 /* PROM controlled TMS5110 interface */
 
@@ -97,8 +92,6 @@ WRITE8_DEVICE_HANDLER( tmsprom_rom_csq_w );
 WRITE8_DEVICE_HANDLER( tmsprom_bit_w );
 WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w );
 
-DEVICE_GET_INFO( tmsprom );
-
-#define TMSPROM DEVICE_GET_INFO_NAME( tmsprom )
+DECLARE_LEGACY_DEVICE(TMSPROM, tmsprom);
 
 #endif /* __TMS5110_H__ */

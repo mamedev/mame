@@ -37,10 +37,8 @@ struct _ym3526_state
 INLINE ym3526_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YM3526);
-	return (ym3526_state *)device->token;
+	assert(device->type() == SOUND_YM3526);
+	return (ym3526_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -93,13 +91,13 @@ static DEVICE_START( ym3526 )
 {
 	static const ym3526_interface dummy = { 0 };
 	ym3526_state *info = get_safe_token(device);
-	int rate = device->clock/72;
+	int rate = device->clock()/72;
 
-	info->intf = device->baseconfig().static_config ? (const ym3526_interface *)device->baseconfig().static_config : &dummy;
+	info->intf = device->baseconfig().static_config() ? (const ym3526_interface *)device->baseconfig().static_config() : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
-	info->chip = ym3526_init(device,device->clock,rate);
+	info->chip = ym3526_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM3526 chip");
 
 	info->stream = stream_create(device,0,1,rate,info,ym3526_stream_update);

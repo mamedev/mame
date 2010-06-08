@@ -561,7 +561,7 @@ static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
 
 static void common_video_start(running_machine *machine)
 {
-	mjsikaku_tmpbitmap = auto_bitmap_alloc(machine, 512, 256, video_screen_get_format(machine->primary_screen));
+	mjsikaku_tmpbitmap = auto_bitmap_alloc(machine, 512, 256, machine->primary_screen->format());
 	mjsikaku_videoram = auto_alloc_array_clear(machine, UINT16, 512 * 256);
 	nbmj8688_clut = auto_alloc_array(machine, UINT8, 0x20);
 

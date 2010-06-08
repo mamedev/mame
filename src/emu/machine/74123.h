@@ -46,7 +46,9 @@
 #ifndef TTL74123_H
 #define TTL74123_H
 
-#define TTL74123		DEVICE_GET_INFO_NAME(ttl74123)
+#include "devlegcy.h"
+
+DECLARE_LEGACY_DEVICE(TTL74123, ttl74123);
 
 #define MDRV_TTL74123_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, TTL74123, 0) \
@@ -71,9 +73,6 @@ struct _ttl74123_config
 	int clear;				/* initial/constant value of the Clear pin */
 	write8_device_func	output_changed_cb;
 };
-
-/* device interface */
-DEVICE_GET_INFO( ttl74123 );
 
 /* write inputs */
 

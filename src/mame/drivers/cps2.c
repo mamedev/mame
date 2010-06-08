@@ -648,7 +648,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 		state->cps_b_regs[0x10/2] = 0;
 		cpu_set_input_line(device, 4, HOLD_LINE);
 		cps2_set_sprite_priorities(device->machine);
-		video_screen_update_partial(device->machine->primary_screen, 16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		device->machine->primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		state->scancalls++;
 //          popmessage("IRQ4 scancounter = %04i", state->scancount);
 	}
@@ -659,7 +659,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 		state->cps_b_regs[0x12 / 2] = 0;
 		cpu_set_input_line(device, 4, HOLD_LINE);
 		cps2_set_sprite_priorities(device->machine);
-		video_screen_update_partial(device->machine->primary_screen, 16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		device->machine->primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		state->scancalls++;
 //          popmessage("IRQ4 scancounter = %04i",scancount);
 	}
@@ -672,7 +672,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 		if(state->scancalls)
 		{
 			cps2_set_sprite_priorities(device->machine);
-			video_screen_update_partial(device->machine->primary_screen, 256);
+			device->machine->primary_screen->update_partial(256);
 		}
 		cps2_objram_latch(device->machine);
 	}
@@ -1270,8 +1270,7 @@ static MACHINE_DRIVER_START( gigamn2 )
 
 	MDRV_DEVICE_REMOVE("qsound")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_DRIVER_END

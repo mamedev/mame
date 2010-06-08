@@ -389,7 +389,7 @@ static UINT8 *z80_shared_ram;
 
 /* V60 interrupt controller */
 static UINT8 v60_irq_control[0x10];
-static running_device *v60_irq_timer[2];
+static timer_device *v60_irq_timer[2];
 
 /* sound interrupt controller */
 static UINT8 sound_irq_control[4];
@@ -436,8 +436,8 @@ static MACHINE_RESET( system32 )
 	memset(v60_irq_control, 0xff, sizeof(v60_irq_control));
 
 	/* allocate timers */
-	v60_irq_timer[0] = devtag_get_device(machine, "v60_irq0");
-	v60_irq_timer[1] = devtag_get_device(machine, "v60_irq1");
+	v60_irq_timer[0] = machine->device<timer_device>("v60_irq0");
+	v60_irq_timer[1] = machine->device<timer_device>("v60_irq1");
 
 	/* clear IRQ lines */
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
@@ -485,7 +485,7 @@ static void signal_v60_irq(running_machine *machine, int which)
 
 static TIMER_DEVICE_CALLBACK( signal_v60_irq_callback )
 {
-	signal_v60_irq(timer->machine, param);
+	signal_v60_irq(timer.machine, param);
 }
 
 
@@ -525,7 +525,7 @@ static void int_control_w(const address_space *space, int offset, UINT8 data)
 			if (duration)
 			{
 				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_0_CLOCK)) * duration);
-				timer_device_adjust_oneshot(v60_irq_timer[0], period, MAIN_IRQ_TIMER0);
+				v60_irq_timer[0]->adjust(period, MAIN_IRQ_TIMER0);
 			}
 			break;
 
@@ -536,7 +536,7 @@ static void int_control_w(const address_space *space, int offset, UINT8 data)
 			if (duration)
 			{
 				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_1_CLOCK)) * duration);
-				timer_device_adjust_oneshot(v60_irq_timer[1], period, MAIN_IRQ_TIMER1);
+				v60_irq_timer[1]->adjust(period, MAIN_IRQ_TIMER1);
 			}
 			break;
 
@@ -615,7 +615,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
 {
 	signal_v60_irq(device->machine, MAIN_IRQ_VBSTART);
 	system32_set_vblank(device->machine, 1);
-	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
+	timer_set(device->machine, device->machine->primary_screen->time_until_pos(0), NULL, 0, end_of_vblank_int);
 	if (system32_prot_vblank)
 		(*system32_prot_vblank)(device);
 }
@@ -712,7 +712,7 @@ static void common_io_chip_w(const address_space *space, int which, offs_t offse
 
 			if (which == 0)
 			{
-				running_device *device = devtag_get_device(space->machine, "eeprom");
+				eeprom_device *device = space->machine->device<eeprom_device>("eeprom");
 				eeprom_write_bit(device, data & 0x80);
 				eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 				eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -730,7 +730,7 @@ static void common_io_chip_w(const address_space *space, int which, offs_t offse
 			else
 			{
 				/* multi-32 EEPROM access */
-				running_device *device = devtag_get_device(space->machine, "eeprom");
+				eeprom_device *device = space->machine->device<eeprom_device>("eeprom");
 				eeprom_write_bit(device, data & 0x80);
 				eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 				eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -4151,7 +4151,7 @@ static DRIVER_INIT( radr )
 
 static DRIVER_INIT( scross )
 {
-	running_device *multipcm = devtag_get_device(machine, "sega");
+	multipcm_sound_device *multipcm = machine->device<multipcm_sound_device>("sega");
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
 

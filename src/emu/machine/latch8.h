@@ -15,7 +15,9 @@
 #ifndef __LATCH8_H_
 #define __LATCH8_H_
 
-#define LATCH8		DEVICE_GET_INFO_NAME(latch8)
+#include "devlegcy.h"
+
+DECLARE_LEGACY_DEVICE(LATCH8, latch8);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -92,9 +94,6 @@ struct _latch8_config
 
 #define AM_LATCH8_READWRITE(_tag) \
 	AM_DEVREADWRITE(_tag, latch8_r, latch8_w)
-
-/* device interface */
-DEVICE_GET_INFO( latch8 );
 
 /* write & read full byte */
 

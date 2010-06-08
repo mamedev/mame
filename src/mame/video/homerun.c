@@ -7,7 +7,7 @@
 WRITE8_DEVICE_HANDLER(homerun_banking_w)
 {
 	homerun_state *state = (homerun_state *)device->machine->driver_data;
-	if (video_screen_get_vpos(device->machine->primary_screen) > half_screen)
+	if (device->machine->primary_screen->vpos() > half_screen)
 		state->gc_down = data & 3;
 	else
 		state->gc_up = data & 3;

@@ -69,10 +69,8 @@ struct _zsg2_state
 INLINE zsg2_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_ZSG2);
-	return (zsg2_state *)device->token;
+	assert(device->type() == SOUND_ZSG2);
+	return (zsg2_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static STREAM_UPDATE( update_stereo )
@@ -221,10 +219,10 @@ READ16_DEVICE_HANDLER( zsg2_r )
 
 static DEVICE_START( zsg2 )
 {
-	const zsg2_interface *intf = (const zsg2_interface *)device->baseconfig().static_config;
+	const zsg2_interface *intf = (const zsg2_interface *)device->baseconfig().static_config();
 	zsg2_state *info = get_safe_token(device);
 
-	info->sample_rate = device->clock;
+	info->sample_rate = device->clock();
 
 	memset(&info->zc, 0, sizeof(info->zc));
 	memset(&info->act, 0, sizeof(info->act));

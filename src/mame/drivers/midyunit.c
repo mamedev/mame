@@ -140,7 +140,7 @@ Notes:
 static WRITE8_DEVICE_HANDLER( yawdim_oki_bank_w )
 {
 	if (data & 4)
-		okim6295_set_bank_base(device, 0x40000 * (data & 3));
+		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
 }
 
 
@@ -1086,7 +1086,8 @@ static MACHINE_DRIVER_START( yunit_cvsd_4bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("maincpu", TMS34010, FAST_MASTER_CLOCK)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(FAST_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_cvsd_sound)
 
 	/* video hardware */
@@ -1111,7 +1112,8 @@ static MACHINE_DRIVER_START( yunit_adpcm_6bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("maincpu", TMS34010, FAST_MASTER_CLOCK)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(FAST_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_adpcm_sound)
 
 	/* video hardware */
@@ -1124,7 +1126,8 @@ static MACHINE_DRIVER_START( yunit_adpcm_6bit_faster )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("maincpu", TMS34010, FASTER_MASTER_CLOCK)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(FASTER_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_adpcm_sound)
 
 	/* video hardware */
@@ -1148,8 +1151,7 @@ static MACHINE_DRIVER_START( mkyawdim )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

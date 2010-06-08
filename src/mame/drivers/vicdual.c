@@ -98,7 +98,7 @@ static INPUT_CHANGED( coin_changed )
 		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		timer_set(field->port->machine, double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(field->port->machine->primary_screen))), NULL, 0, clear_coin_status);
+		timer_set(field->port->machine, double_to_attotime(4 * attotime_to_double(field->port->machine->primary_screen->frame_period())), NULL, 0, clear_coin_status);
 	}
 }
 
@@ -123,11 +123,11 @@ static INPUT_CHANGED( coin_changed )
 
 static int get_vcounter(running_machine *machine)
 {
-	int vcounter = video_screen_get_vpos(machine->primary_screen);
+	int vcounter = machine->primary_screen->vpos();
 
 	/* the vertical synch counter gets incremented at the end of HSYNC,
        compensate for this */
-	if (video_screen_get_hpos(machine->primary_screen) >= VICDUAL_HSEND)
+	if (machine->primary_screen->hpos() >= VICDUAL_HSEND)
 		vcounter = (vcounter + 1) % VICDUAL_VTOTAL;
 
 	return vcounter;
@@ -148,7 +148,7 @@ static CUSTOM_INPUT( vicdual_get_vblank_comp )
 
 static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 {
-	return (vicdual_get_vblank_comp(field, 0) && !video_screen_get_hblank(field->port->machine->primary_screen));
+	return (vicdual_get_vblank_comp(field, 0) && !field->port->machine->primary_screen->hblank());
 }
 
 
@@ -195,7 +195,7 @@ static UINT8 *vicdual_characterram;
 
 static WRITE8_HANDLER( vicdual_videoram_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	vicdual_videoram[offset] = data;
 }
 
@@ -208,7 +208,7 @@ UINT8 vicdual_videoram_r(offs_t offset)
 
 static WRITE8_HANDLER( vicdual_characterram_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	vicdual_characterram[offset] = data;
 }
 

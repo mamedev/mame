@@ -132,7 +132,7 @@ VIDEO_START( glass )
 	glass_state *state = (glass_state *)machine->driver_data;
 	state->pant[0] = tilemap_create(machine, get_tile_info_glass_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->pant[1] = tilemap_create(machine, get_tile_info_glass_screen1, tilemap_scan_rows, 16, 16, 32, 32);
-	state->screen_bitmap = auto_bitmap_alloc (machine, 320, 200, video_screen_get_format(machine->primary_screen));
+	state->screen_bitmap = auto_bitmap_alloc (machine, 320, 200, machine->primary_screen->format());
 
 	state_save_register_global_bitmap(machine, state->screen_bitmap);
 

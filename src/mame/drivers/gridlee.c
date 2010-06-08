@@ -121,15 +121,15 @@ static TIMER_CALLBACK( irq_timer_tick )
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-        timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
+        timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(64), 64);
 	else
-        timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), param + 64);
+        timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-    timer_adjust_oneshot(irq_off, video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), 0);
+    timer_adjust_oneshot(irq_off, machine->primary_screen->time_until_pos(param, BALSENTE_HBSTART), 0);
 }
 
 
@@ -142,13 +142,13 @@ static TIMER_CALLBACK( firq_off_tick )
 static TIMER_CALLBACK( firq_timer_tick )
 {
 	/* same time next frame */
-    timer_adjust_oneshot(firq_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), 0);
+    timer_adjust_oneshot(firq_timer, machine->primary_screen->time_until_pos(FIRQ_SCANLINE), 0);
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
 	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-    timer_adjust_oneshot(firq_off, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, BALSENTE_HBSTART), 0);
+    timer_adjust_oneshot(firq_off, machine->primary_screen->time_until_pos(FIRQ_SCANLINE, BALSENTE_HBSTART), 0);
 }
 
 static MACHINE_START( gridlee )
@@ -169,8 +169,8 @@ static MACHINE_START( gridlee )
 static MACHINE_RESET( gridlee )
 {
 	/* start timers to generate interrupts */
-    timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
-    timer_adjust_oneshot(firq_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), 0);
+    timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(0), 0);
+    timer_adjust_oneshot(firq_timer, machine->primary_screen->time_until_pos(FIRQ_SCANLINE), 0);
 }
 
 

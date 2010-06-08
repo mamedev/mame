@@ -51,10 +51,8 @@ static int diff_lookup[49*16];
 INLINE es8712_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_ES8712);
-	return (es8712_state *)device->token;
+	assert(device->type() == SOUND_ES8712);
+	return (es8712_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -227,10 +225,10 @@ static DEVICE_START( es8712 )
 	chip->repeat = 0;
 
 	chip->bank_offset = 0;
-	chip->region_base = *device->region;
+	chip->region_base = *device->region();
 
 	/* generate the name and create the stream */
-	chip->stream = stream_create(device, 0, 1, device->clock, chip, es8712_update);
+	chip->stream = stream_create(device, 0, 1, device->clock(), chip, es8712_update);
 
 	/* initialize the rest of the structure */
 	chip->signal = -2;

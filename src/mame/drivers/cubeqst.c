@@ -89,7 +89,7 @@ static PALETTE_INIT( cubeqst )
 
 static WRITE16_HANDLER( palette_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 }
 
@@ -172,7 +172,7 @@ static VIDEO_UPDATE( cubeqst )
 static READ16_HANDLER( line_r )
 {
 	/* I think this is unusued */
-	return video_screen_get_vpos(space->machine->primary_screen);
+	return space->machine->primary_screen->vpos();
 }
 
 static INTERRUPT_GEN( vblank )

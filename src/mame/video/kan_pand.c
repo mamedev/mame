@@ -53,7 +53,7 @@
 typedef struct _kaneko_pandora_state  kaneko_pandora_state;
 struct _kaneko_pandora_state
 {
-	running_device *screen;
+	screen_device *screen;
 	UINT8 *      spriteram;
 	bitmap_t     *sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
 	int          clear_bitmap;
@@ -68,17 +68,16 @@ struct _kaneko_pandora_state
 INLINE kaneko_pandora_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == KANEKO_PANDORA);
+	assert(device->type() == KANEKO_PANDORA);
 
-	return (kaneko_pandora_state *)device->token;
+	return (kaneko_pandora_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const kaneko_pandora_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == KANEKO_PANDORA));
-	return (const kaneko_pandora_interface *) device->baseconfig().static_config;
+	assert((device->type() == KANEKO_PANDORA));
+	return (const kaneko_pandora_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -196,9 +195,9 @@ void pandora_eof( running_device *device )
 
 	// the games can disable the clearing of the sprite bitmap, to leave sprite trails
 	if (pandora->clear_bitmap)
-		bitmap_fill(pandora->sprites_bitmap, video_screen_get_visible_area(pandora->screen), 0);
+		bitmap_fill(pandora->sprites_bitmap, &pandora->screen->visible_area(), 0);
 
-	pandora_draw(device, pandora->sprites_bitmap, video_screen_get_visible_area(pandora->screen));
+	pandora_draw(device, pandora->sprites_bitmap, &pandora->screen->visible_area());
 }
 
 /*****************************************************************************
@@ -295,14 +294,14 @@ static DEVICE_START( kaneko_pandora )
 	kaneko_pandora_state *pandora = get_safe_token(device);
 	const kaneko_pandora_interface *intf = get_interface(device);
 
-	pandora->screen = devtag_get_device(device->machine, intf->screen);
+	pandora->screen = device->machine->device<screen_device>(intf->screen);
 	pandora->region = intf->gfx_region;
 	pandora->xoffset = intf->x;
 	pandora->yoffset = intf->y;
 
 	pandora->spriteram = auto_alloc_array(device->machine, UINT8, 0x1000);
 
-	pandora->sprites_bitmap = video_screen_auto_bitmap_alloc(pandora->screen);
+	pandora->sprites_bitmap = pandora->screen->alloc_compatible_bitmap();
 
 	state_save_register_device_item(device, 0, pandora->clear_bitmap);
 	state_save_register_device_item_pointer(device, 0, pandora->spriteram, 0x1000);
@@ -324,5 +323,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"Kaneko Pandora - PX79C480FP-3"
 #define DEVTEMPLATE_FAMILY		"Kaneko Video Chips"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
 #include "devtempl.h"

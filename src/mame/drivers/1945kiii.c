@@ -52,7 +52,9 @@ class k3_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, k3_state(machine)); }
 
-	k3_state(running_machine &machine) { }
+	k3_state(running_machine &machine)
+		: oki1(machine.device<okim6295_device>("oki1")), 
+		  oki2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
 	UINT16 *  spriteram_1;
@@ -64,8 +66,8 @@ public:
 	tilemap_t  *bg_tilemap;
 
 	/* devices */
-	running_device *oki1;
-	running_device *oki2;
+	okim6295_device *oki1;
+	okim6295_device *oki2;
 };
 
 
@@ -139,8 +141,8 @@ static WRITE16_HANDLER( k3_scrolly_w )
 static WRITE16_HANDLER( k3_soundbanks_w )
 {
 	k3_state *state = (k3_state *)space->machine->driver_data;
-	okim6295_set_bank_base(state->oki1, (data & 4) ? 0x40000 : 0);
-	okim6295_set_bank_base(state->oki2, (data & 2) ? 0x40000 : 0);
+	state->oki1->set_bank_base((data & 4) ? 0x40000 : 0);
+	state->oki2->set_bank_base((data & 2) ? 0x40000 : 0);
 }
 
 static ADDRESS_MAP_START( k3_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -246,10 +248,6 @@ GFXDECODE_END
 
 static MACHINE_START( 1945kiii )
 {
-	k3_state *state = (k3_state *)machine->driver_data;
-
-	state->oki1 = devtag_get_device(machine, "oki1");
-	state->oki2 = devtag_get_device(machine, "oki2");
 }
 
 static MACHINE_DRIVER_START( k3 )
@@ -278,12 +276,10 @@ static MACHINE_DRIVER_START( k3 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, MASTER_CLOCK/16) /* dividers? */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)  /* dividers? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, MASTER_CLOCK/16) /* dividers? */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH) /* dividers? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

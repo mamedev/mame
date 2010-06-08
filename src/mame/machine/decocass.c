@@ -102,7 +102,7 @@ READ8_HANDLER( decocass_sound_command_r )
 
 TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen )
 {
-	decocass_state *state = (decocass_state *)timer->machine->driver_data;
+	decocass_state *state = (decocass_state *)timer.machine->driver_data;
 	int scanline = param;
 	state->audio_nmi_state = scanline & 8;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
@@ -1909,10 +1909,9 @@ struct _tape_state
 INLINE tape_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == DECOCASS_TAPE);
+	assert(device->type() == DECOCASS_TAPE);
 
-	return (tape_state *)device->token;
+	return (tape_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -2105,7 +2104,7 @@ static UINT8 tape_get_status_bits(running_device *device)
 
 		/* data block bytes are data */
 		else if (tape->bytenum >= BYTE_DATA_0 && tape->bytenum <= BYTE_DATA_255)
-			byteval = static_cast<UINT8 *>(*device->region)[blocknum * 256 + (tape->bytenum - BYTE_DATA_0)];
+			byteval = static_cast<UINT8 *>(*device->region())[blocknum * 256 + (tape->bytenum - BYTE_DATA_0)];
 
 		/* CRC MSB */
 		else if (tape->bytenum == BYTE_CRC16_MSB)
@@ -2130,7 +2129,7 @@ static UINT8 tape_get_status_bits(running_device *device)
 
 static UINT8 tape_is_present(running_device *device)
 {
-	return device->region != NULL;
+	return device->region() != NULL;
 }
 
 
@@ -2173,19 +2172,19 @@ static DEVICE_START( decocass_tape )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config == NULL);
-	assert(device->baseconfig().inline_config == NULL);
+	assert(device->baseconfig().static_config() == NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
 	/* fetch the data pointer */
 	tape->timer = timer_alloc(device->machine, tape_clock_callback, (void *)device);
-	if (device->region == NULL)
+	if (device->region() == NULL)
 		return;
-	UINT8 *regionbase = *device->region;
+	UINT8 *regionbase = *device->region();
 
 	/* scan for the first non-empty block in the image */
-	for (offs = device->region->bytes() - 1; offs >= 0; offs--)
+	for (offs = device->region()->bytes() - 1; offs >= 0; offs--)
 		if (regionbase[offs] != 0)
 			break;
 	numblocks = ((offs | 0xff) + 1) / 256;
@@ -2239,7 +2238,6 @@ DEVICE_GET_INFO( decocass_tape )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tape_state);			break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(decocass_tape); break;

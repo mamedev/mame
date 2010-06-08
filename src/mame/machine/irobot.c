@@ -26,7 +26,7 @@
 
 #define IR_CPU_STATE(m) \
 	logerror(\
-			"%s, scanline: %d\n", cpuexec_describe_context(m), video_screen_get_vpos((m)->primary_screen))
+			"%s, scanline: %d\n", cpuexec_describe_context(m), (m)->primary_screen->vpos())
 
 
 UINT8 irobot_vg_clear;
@@ -35,8 +35,8 @@ static UINT8 irvg_running;
 static UINT8 irmb_running;
 
 #if IR_TIMING
-static running_device *irvg_timer;
-static running_device *irmb_timer;
+static timer_device *irvg_timer;
+static timer_device *irmb_timer;
 #endif
 
 static UINT8 *comRAM[2], *mbRAM, *mbROM;
@@ -112,7 +112,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 		else
 			logerror("vg start [busy!] ");
 		IR_CPU_STATE(space->machine);
-		timer_device_adjust_oneshot(irvg_timer, ATTOTIME_IN_MSEC(10), 0);
+		irvg_timer->adjust(ATTOTIME_IN_MSEC(10));
 #endif
 		irvg_running=1;
 	}
@@ -185,7 +185,7 @@ static TIMER_CALLBACK( scanline_callback )
     /* set a callback for the next 32-scanline increment */
     scanline += 32;
     if (scanline >= 256) scanline = 0;
-    timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
+    timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, scanline_callback);
 }
 
 MACHINE_RESET( irobot )
@@ -200,12 +200,12 @@ MACHINE_RESET( irobot )
 
 	irvg_vblank=0;
 	irvg_running = 0;
-	irvg_timer = devtag_get_device(machine, "irvg_timer");
+	irvg_timer = machine->device<timer_device>("irvg_timer");
 	irmb_running = 0;
-	irmb_timer = devtag_get_device(machine, "irmb_timer");
+	irmb_timer = machine->device<timer_device>("irmb_timer");
 
 	/* set an initial timer to go off on scanline 0 */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, scanline_callback);
 
 	irobot_rom_banksel_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
 	irobot_out0_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
@@ -456,7 +456,7 @@ TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback )
 {
     logerror("mb done. ");
 	irmb_running = 0;
-	cputag_set_input_line(timer->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -849,7 +849,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 #if IR_TIMING
 	if (irmb_running == 0)
 	{
-		timer_device_adjust_oneshot(irmb_timer, attotime_mul(ATTOTIME_IN_HZ(12000000), icount), 0);
+		irmb_timer->adjust(attotime_mul(ATTOTIME_IN_HZ(12000000), icount));
 		logerror("mb start ");
 		IR_CPU_STATE(machine);
 	}
@@ -857,7 +857,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 	{
 		logerror("mb start [busy!] ");
 		IR_CPU_STATE(machine);
-		timer_device_adjust_oneshot(irmb_timer, attotime_mul(ATTOTIME_IN_NSEC(200), icount), 0);
+		irmb_timer->adjust(attotime_mul(ATTOTIME_IN_NSEC(200), icount));
 	}
 #else
 	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);

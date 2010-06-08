@@ -47,6 +47,7 @@
 // undef WINNT for dsound.h to prevent duplicate definition
 #undef WINNT
 #include <dsound.h>
+#undef interface
 
 // MAME headers
 #include "emu.h"

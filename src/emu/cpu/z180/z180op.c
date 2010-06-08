@@ -309,8 +309,8 @@ static int take_interrupt(z180_state *cpustate, int irq)
 	if( irq == Z180_INT_IRQ0 )
 	{
 		/* Daisy chain mode? If so, call the requesting device */
-		if (cpustate->daisy)
-			irq_vector = z80daisy_call_ack_device(cpustate->daisy);
+		if (cpustate->daisy.present())
+			irq_vector = cpustate->daisy.call_ack_device();
 
 		/* else call back the cpu interface to retrieve the vector */
 		else

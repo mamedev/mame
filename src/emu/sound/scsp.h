@@ -7,6 +7,8 @@
 #ifndef __SCSP_H__
 #define __SCSP_H__
 
+#include "devlegcy.h"
+
 typedef struct _scsp_interface scsp_interface;
 struct _scsp_interface
 {
@@ -26,7 +28,6 @@ READ16_DEVICE_HANDLER( scsp_midi_out_r );
 
 extern UINT32* stv_scu;
 
-DEVICE_GET_INFO( scsp );
-#define SOUND_SCSP DEVICE_GET_INFO_NAME( scsp )
+DECLARE_LEGACY_SOUND_DEVICE(SCSP, scsp);
 
 #endif /* __SCSP_H__ */

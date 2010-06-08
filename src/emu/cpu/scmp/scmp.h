@@ -9,9 +9,9 @@
 enum
 {
 	SCMP_PC, SCMP_P1, SCMP_P2, SCMP_P3, SCMP_AC, SCMP_ER, SCMP_SR,
-	SCMP_GENPC = REG_GENPC,
-	SCMP_GENSP = REG_GENSP,
-	SCMP_GENPCBASE = REG_GENPCBASE
+	SCMP_GENPC = STATE_GENPC,
+	SCMP_GENSP = STATE_GENSP,
+	SCMP_GENPCBASE = STATE_GENPCBASE
 };
 
 /***************************************************************************

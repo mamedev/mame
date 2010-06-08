@@ -848,7 +848,7 @@ static MACHINE_DRIVER_START( sasuke )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snk6502", snk6502, 0)
+	MDRV_SOUND_ADD("snk6502", SNK6502, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
@@ -922,7 +922,7 @@ static MACHINE_DRIVER_START( vanguard )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snk6502", snk6502, 0)
+	MDRV_SOUND_ADD("snk6502", SNK6502, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)

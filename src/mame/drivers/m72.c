@@ -128,20 +128,20 @@ static MACHINE_RESET( m72 )
 	mcu_sample_addr = 0;
 	mcu_snd_cmd_latch = 0;
 
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 	timer_call_after_resynch(machine,  NULL, 0, synch_callback);
 }
 
 static MACHINE_RESET( xmultipl )
 {
 	m72_irq_base = 0x08;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 static MACHINE_RESET( kengo )
 {
 	m72_irq_base = 0x18;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 static TIMER_CALLBACK( m72_scanline_interrupt )
@@ -151,21 +151,21 @@ static TIMER_CALLBACK( m72_scanline_interrupt )
 	/* raster interrupt - visible area only? */
 	if (scanline < 256 && scanline == m72_raster_irq_position - 128)
 	{
-		video_screen_update_partial(machine->primary_screen, scanline);
+		machine->primary_screen->update_partial(scanline);
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, m72_irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
-		video_screen_update_partial(machine->primary_screen, scanline);
+		machine->primary_screen->update_partial(scanline);
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, m72_irq_base + 0);
 	}
 
 	/* adjust for next scanline */
-	if (++scanline >= video_screen_get_height(machine->primary_screen))
+	if (++scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 /***************************************************************************

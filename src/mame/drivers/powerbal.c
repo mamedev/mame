@@ -70,7 +70,7 @@ static WRITE16_DEVICE_HANDLER( oki_banking )
 		int addr = 0x40000 * ((data & 3) - 1);
 
 		if (addr < memory_region_length(device->machine, "oki"))
-			okim6295_set_bank_base(device, addr);
+			downcast<okim6295_device *>(device)->set_bank_base(addr);
 	}
 }
 
@@ -513,8 +513,7 @@ static MACHINE_DRIVER_START( powerbal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -551,8 +550,7 @@ static MACHINE_DRIVER_START( magicstk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

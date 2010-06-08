@@ -65,7 +65,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*debug_instruction_hook_func)(running_device *device, offs_t curpc);
+typedef int (*debug_instruction_hook_func)(device_t *device, offs_t curpc);
 
 
 typedef struct _debug_cpu_breakpoint debug_cpu_breakpoint;
@@ -98,9 +98,10 @@ struct _debug_hotspot_entry
 
 
 /* In cpuintrf.h: typedef struct _cpu_debug_data cpu_debug_data; */
-struct _cpu_debug_data
+class cpu_debug_data
 {
-	running_device *	device;						/* CPU device object */
+public:
+	cpu_device *	cpudevice;					/* CPU device object */
 	symbol_table *			symtable;					/* symbol table for expression evaluation */
 	UINT32					flags;						/* debugging flags for this CPU */
 	UINT8					opwidth;					/* width of an opcode */
@@ -118,11 +119,6 @@ struct _cpu_debug_data
 	UINT32					pc_history_index;			/* current history index */
 	int						hotspot_count;				/* number of hotspots */
 	int						hotspot_threshhold;			/* threshhold for the number of hits to print */
-	cpu_read_func			read;						/* memory read routine */
-	cpu_write_func			write;						/* memory write routine */
-	cpu_readop_func			readop;						/* opcode read routine */
-	cpu_translate_func		translate;					/* pointer to CPU's translate function */
-	cpu_disassemble_func	disassemble;				/* pointer to CPU's dissasemble function */
 	cpu_disassemble_func	dasm_override;				/* pointer to provided override function */
 	debug_instruction_hook_func instrhook;				/* per-instruction callback hook */
 	debug_cpu_watchpoint *	wplist[ADDRESS_SPACES];		/* watchpoint lists for each address space */
@@ -180,7 +176,7 @@ void debug_cpu_flush_traces(running_machine *machine);
 /* ----- debugging status & information ----- */
 
 /* return the visible CPU device (the one that commands should apply to) */
-running_device *debug_cpu_get_visible_cpu(running_machine *machine);
+device_t *debug_cpu_get_visible_cpu(running_machine *machine);
 
 /* TRUE if the debugger is currently stopped within an instruction hook callback */
 int debug_cpu_within_instruction_hook(running_machine *machine);
@@ -199,7 +195,7 @@ symbol_table *debug_cpu_get_global_symtable(running_machine *machine);
 symbol_table *debug_cpu_get_visible_symtable(running_machine *machine);
 
 /* return a specific CPU's symbol table */
-symbol_table *debug_cpu_get_symtable(running_device *device);
+symbol_table *debug_cpu_get_symtable(device_t *device);
 
 
 
@@ -209,29 +205,29 @@ symbol_table *debug_cpu_get_symtable(running_device *device);
 int debug_cpu_translate(const address_space *space, int intention, offs_t *address);
 
 /* disassemble a line at a given PC on a given CPU */
-offs_t debug_cpu_disassemble(running_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+offs_t debug_cpu_disassemble(device_t *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 /* set an override handler for disassembly */
-void debug_cpu_set_dasm_override(running_device *device, cpu_disassemble_func dasm_override);
+void debug_cpu_set_dasm_override(device_t *device, cpu_disassemble_func dasm_override);
 
 
 
 /* ----- core debugger hooks ----- */
 
 /* the CPU execution system calls this hook before beginning execution for the given CPU */
-void debug_cpu_start_hook(running_device *device, attotime endtime);
+void debug_cpu_start_hook(device_t *device, attotime endtime);
 
 /* the CPU execution system calls this hook when ending execution for the given CPU */
-void debug_cpu_stop_hook(running_device *device);
+void debug_cpu_stop_hook(device_t *device);
 
 /* the CPU execution system calls this hook when an interrupt is acknowledged */
-void debug_cpu_interrupt_hook(running_device *device, int irqline);
+void debug_cpu_interrupt_hook(device_t *device, int irqline);
 
 /* called by the CPU cores when an exception is generated */
-void debug_cpu_exception_hook(running_device *device, int exception);
+void debug_cpu_exception_hook(device_t *device, int exception);
 
 /* called by the CPU cores before executing each instruction */
-void debug_cpu_instruction_hook(running_device *device, offs_t curpc);
+void debug_cpu_instruction_hook(device_t *device, offs_t curpc);
 
 /* the memory system calls this hook when watchpoints are enabled and a memory read happens */
 void debug_cpu_memory_read_hook(const address_space *space, offs_t address, UINT64 mem_mask);
@@ -244,10 +240,10 @@ void debug_cpu_memory_write_hook(const address_space *space, offs_t address, UIN
 /* ----- execution control ----- */
 
 /* halt in the debugger on the next instruction */
-void debug_cpu_halt_on_next_instruction(running_device *device, const char *fmt, ...) ATTR_PRINTF(2,3);
+void debug_cpu_halt_on_next_instruction(device_t *device, const char *fmt, ...) ATTR_PRINTF(2,3);
 
 /* ignore/observe a given CPU */
-void debug_cpu_ignore_cpu(running_device *cpu, int ignore);
+void debug_cpu_ignore_cpu(device_t *cpu, int ignore);
 
 /* single step the visible CPU past the requested number of instructions */
 void debug_cpu_single_step(running_machine *machine, int numsteps);
@@ -281,7 +277,7 @@ void debug_cpu_next_cpu(running_machine *machine);
 /* ----- breakpoints ----- */
 
 /* set a new breakpoint, returning its index */
-int	debug_cpu_breakpoint_set(running_device *device, offs_t address, parsed_expression *condition, const char *action);
+int	debug_cpu_breakpoint_set(device_t *device, offs_t address, parsed_expression *condition, const char *action);
 
 /* clear a breakpoint by index */
 int	debug_cpu_breakpoint_clear(running_machine *machine, int bpnum);
@@ -310,16 +306,16 @@ int	debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 void debug_cpu_source_script(running_machine *machine, const char *file);
 
 /* trace execution of a given CPU */
-void debug_cpu_trace(running_device *device, FILE *file, int trace_over, const char *action);
+void debug_cpu_trace(device_t *device, FILE *file, int trace_over, const char *action);
 
 /* output data into the given CPU's tracefile, if tracing */
-void debug_cpu_trace_printf(running_device *device, const char *fmt, ...) ATTR_PRINTF(2,3);
+void debug_cpu_trace_printf(device_t *device, const char *fmt, ...) ATTR_PRINTF(2,3);
 
 /* set a hook to be called on each instruction for a given CPU */
-void debug_cpu_set_instruction_hook(running_device *device, debug_instruction_hook_func hook);
+void debug_cpu_set_instruction_hook(device_t *device, debug_instruction_hook_func hook);
 
 /* hotspots */
-int	debug_cpu_hotspot_track(running_device *device, int numspots, int threshhold);
+int	debug_cpu_hotspot_track(device_t *device, int numspots, int threshhold);
 
 
 

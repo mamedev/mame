@@ -1,10 +1,14 @@
 
+#include "sound/okim6295.h"
+
 class drgnmst_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drgnmst_state(machine)); }
 
-	drgnmst_state(running_machine &machine) { }
+	drgnmst_state(running_machine &machine)
+		: oki_1(machine.device<okim6295_device>("oki1")),
+		  oki_2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
 	UINT16 *    vidregs;
@@ -30,8 +34,8 @@ public:
 	UINT8       oki1_bank;
 
 	/* devices */
-	running_device *oki_1;
-	running_device *oki_2;
+	okim6295_device *oki_1;
+	okim6295_device *oki_2;
 };
 
 

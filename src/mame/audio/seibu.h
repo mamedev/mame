@@ -23,6 +23,7 @@
 
 ***************************************************************************/
 
+#include "devlegcy.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/2151intf.h"
@@ -60,8 +61,7 @@ void seibu_adpcm_decrypt(running_machine *machine, const char *region);
 WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w );
 WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w );
 
-DEVICE_GET_INFO( seibu_adpcm );
-#define SOUND_SEIBU_ADPCM DEVICE_GET_INFO_NAME(seibu_adpcm)
+DECLARE_LEGACY_SOUND_DEVICE(SEIBU_ADPCM, seibu_adpcm);
 
 extern const ym3812_interface seibu_ym3812_interface;
 extern const ym2151_interface seibu_ym2151_interface;
@@ -102,8 +102,7 @@ extern const ym2203_interface seibu_ym2203_interface;
 	MDRV_SOUND_CONFIG(seibu_ym3812_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
-	MDRV_SOUND_ADD("oki", OKIM6295, freq2)							\
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)					\
+	MDRV_OKIM6295_ADD("oki", freq2, OKIM6295_PIN7_LOW)				\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
 #define SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(freq1,freq2)		\
@@ -113,8 +112,7 @@ extern const ym2203_interface seibu_ym2203_interface;
 	MDRV_SOUND_CONFIG(seibu_ym3812_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
-	MDRV_SOUND_ADD("oki", OKIM6295, freq2)							\
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)					\
+	MDRV_OKIM6295_ADD("oki", freq2, OKIM6295_PIN7_HIGH)				\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 
 #define SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(freq1,freq2)			\
@@ -125,8 +123,7 @@ extern const ym2203_interface seibu_ym2203_interface;
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)								\
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)								\
 																	\
-	MDRV_SOUND_ADD("oki", OKIM6295, freq2)							\
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)					\
+	MDRV_OKIM6295_ADD("oki", freq2, OKIM6295_PIN7_LOW)				\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
 
@@ -138,12 +135,10 @@ extern const ym2203_interface seibu_ym2203_interface;
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)								\
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)								\
 																	\
-	MDRV_SOUND_ADD("oki1", OKIM6295, freq2)							\
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)					\
+	MDRV_OKIM6295_ADD("oki1", freq2, OKIM6295_PIN7_HIGH)			\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 																	\
-	MDRV_SOUND_ADD("oki2", OKIM6295, freq2)							\
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)					\
+	MDRV_OKIM6295_ADD("oki2", freq2, OKIM6295_PIN7_HIGH)			\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
 

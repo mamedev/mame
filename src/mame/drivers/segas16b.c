@@ -1120,7 +1120,7 @@ static MACHINE_RESET( system16b )
 
 static TIMER_DEVICE_CALLBACK( atomicp_sound_irq )
 {
-	segas1x_state *state = (segas1x_state *)timer->machine->driver_data;
+	segas1x_state *state = (segas1x_state *)timer.machine->driver_data;
 
 	if (++state->atomicp_sound_count >= state->atomicp_sound_divisor)
 	{

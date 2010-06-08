@@ -193,7 +193,8 @@ static WRITE16_HANDLER( bestleag_fgram_w )
 
 static WRITE16_DEVICE_HANDLER( oki_bank_w )
 {
-	okim6295_set_bank_base(device, 0x40000 * ((data & 3) - 1));
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base(0x40000 * ((data & 3) - 1));
 }
 
 
@@ -347,8 +348,7 @@ static MACHINE_DRIVER_START( bestleag )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000) /* Hand-tuned */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) /* Hand-tuned */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_DRIVER_END

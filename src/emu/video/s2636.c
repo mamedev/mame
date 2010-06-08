@@ -116,17 +116,16 @@ struct _s2636_state
 INLINE s2636_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == S2636);
+	assert(device->type() == S2636);
 
-	return (s2636_state *)device->token;
+	return (s2636_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const s2636_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == S2636));
-	return (const s2636_interface *) device->baseconfig().static_config;
+	assert((device->type() == S2636));
+	return (const s2636_interface *) device->baseconfig().static_config();
 }
 
 
@@ -342,9 +341,9 @@ static DEVICE_START( s2636 )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	const s2636_interface *intf = get_interface(device);
-	running_device *screen = device->machine->device(intf->screen);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = downcast<screen_device *>(device->machine->device(intf->screen));
+	int width = screen->width();
+	int height = screen->height();
 
 	s2636->work_ram_size = intf->work_ram_size;
 	s2636->x_offset = intf->x_offset;
@@ -367,6 +366,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES		DT_HAS_START
 #define DEVTEMPLATE_NAME		"Signetics 2636"
 #define DEVTEMPLATE_FAMILY		"Signetics Video Chips"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
 #include "devtempl.h"
 

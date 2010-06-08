@@ -62,9 +62,9 @@ static VIDEO_START ( skeetsht )
 {
 }
 
-static void skeetsht_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void skeetsht_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	skeetsht_state *state = (skeetsht_state *)screen->machine->driver_data;
+	skeetsht_state *state = (skeetsht_state *)screen.machine->driver_data;
 	const rgb_t *const pens = tlc34076_get_pens();
 	UINT16 *vram = &state->tms_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);

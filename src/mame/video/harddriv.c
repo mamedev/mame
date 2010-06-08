@@ -165,7 +165,7 @@ void hdgsp_read_from_shiftreg(const address_space *space, UINT32 address, UINT16
 static void update_palette_bank(running_machine *machine, int newbank)
 {
 	harddriv_state *state = (harddriv_state *)machine->driver_data;
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	state->gfx_palettebank = newbank;
 }
 
@@ -231,7 +231,7 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
 
 		case 0x01:
 			data = data & (15 >> state->gsp_multisync);
-			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) - 1);
+			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() - 1);
 			state->gfx_finescroll = data;
 			break;
 
@@ -423,9 +423,9 @@ static void display_speedups(void)
 }
 
 
-void harddriv_scanline_driver(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void harddriv_scanline_driver(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	harddriv_state *state = (harddriv_state *)screen->machine->driver_data;
+	harddriv_state *state = (harddriv_state *)screen.machine->driver_data;
 	UINT8 *vram_base = &state->gsp_vram[(params->rowaddr << 12) & state->vram_mask];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (state->gfx_finescroll & 0x0f);
@@ -434,14 +434,14 @@ void harddriv_scanline_driver(running_device *screen, bitmap_t *bitmap, int scan
 	for (x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = state->gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0xfff)];
 
-	if (scanline == video_screen_get_visible_area(screen)->max_y)
+	if (scanline == screen.visible_area().max_y)
 		display_speedups();
 }
 
 
-void harddriv_scanline_multisync(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void harddriv_scanline_multisync(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	harddriv_state *state = (harddriv_state *)screen->machine->driver_data;
+	harddriv_state *state = (harddriv_state *)screen.machine->driver_data;
 	UINT8 *vram_base = &state->gsp_vram[(params->rowaddr << 11) & state->vram_mask];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (state->gfx_finescroll & 0x07);
@@ -450,6 +450,6 @@ void harddriv_scanline_multisync(running_device *screen, bitmap_t *bitmap, int s
 	for (x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = state->gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0x7ff)];
 
-	if (scanline == video_screen_get_visible_area(screen)->max_y)
+	if (scanline == screen.visible_area().max_y)
 		display_speedups();
 }

@@ -872,7 +872,7 @@ VIDEO_UPDATE( mrokumei )
 			width = 54;
 			break;
 	}
-	video_screen_set_visarea(screen, 0*8, width*8-1, 2*8, 30*8-1);
+	screen->set_visible_area(0*8, width*8-1, 2*8, 30*8-1);
 
 	tilemap_set_scrollx(state->bg_tilemap[state->visible_page][0], 0, state->vreg[0xc] << 1);
 
@@ -1013,24 +1013,24 @@ VIDEO_UPDATE( pteacher )
 		if (state->vreg[0x4] == 0xae || state->vreg[0x4] == 0xb8)
 		{
 			/* kludge for mjkinjas */
-			video_screen_set_visarea(screen, 0*8, 42*8-1, 2*8, 30*8-1);
+			screen->set_visible_area(0*8, 42*8-1, 2*8, 30*8-1);
 			scroll_low = 0;
 		}
 		else
 		{
 			if (state->vreg[0x3] == 0xa6)
-				video_screen_set_visarea(screen, 0*8, 33*8-1, 2*8, 30*8-1);
+				screen->set_visible_area(0*8, 33*8-1, 2*8, 30*8-1);
 			else
-				video_screen_set_visarea(screen, 0*8, 35*8-1, 2*8, 30*8-1);
+				screen->set_visible_area(0*8, 35*8-1, 2*8, 30*8-1);
 			scroll_low = (11 - (state->vreg[0x4] & 0x0f)) * 8 / 12;
 		}
 	}
 	else
 	{
 		if (state->vreg[0x3] == 0xa6)
-			video_screen_set_visarea(screen, 0*8, 51*8-1, 2*8, 30*8-1);
+			screen->set_visible_area(0*8, 51*8-1, 2*8, 30*8-1);
 		else
-			video_screen_set_visarea(screen, 0*8, 54*8-1, 2*8, 30*8-1);
+			screen->set_visible_area(0*8, 54*8-1, 2*8, 30*8-1);
 		scroll_low = 7 - (state->vreg[0x4] & 0x0f);
 	}
 	scroll_high = state->vreg[0xb] >> 2;

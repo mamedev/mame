@@ -435,7 +435,7 @@ struct _tms99xx_state
 	/* interrupt callback */
 	/* note that this callback is used by tms9900_set_irq_line(cpustate) and tms9980a_set_irq_line(cpustate) to
     retreive the value on IC0-IC3 (non-standard behaviour) */
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
@@ -512,10 +512,9 @@ struct _tms99xx_state
 INLINE tms99xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == TMS99XX_GET_INFO);
-	return (tms99xx_state *)device->token;
+	return (tms99xx_state *)downcast<cpu_device *>(device)->token();
 }
 
 #if (TMS99XX_MODEL == TMS9995_ID)
@@ -1288,7 +1287,7 @@ static void register_for_save_state(running_device *device)
 
 static CPU_INIT( tms99xx )
 {
-	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->baseconfig().static_config;
+	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->baseconfig().static_config();
 	tms99xx_state *cpustate = get_safe_token(device);
 
 	register_for_save_state(device);
@@ -1296,8 +1295,8 @@ static CPU_INIT( tms99xx )
 	cpustate->irq_level = 16;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 #if (TMS99XX_MODEL == TMS9995_ID)
 	cpustate->timer = timer_alloc(device->machine, decrementer_callback, cpustate);
@@ -4637,7 +4636,7 @@ static CPU_SET_INFO( tms99xx )
 
 void TMS99XX_GET_INFO(const device_config *devconfig, running_device *device, UINT32 state, cpuinfo *info)
 {
-	tms99xx_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms99xx_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

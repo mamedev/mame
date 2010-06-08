@@ -29,6 +29,7 @@
 
 // standard C++ includes
 #include <exception>
+#include <typeinfo>
 
 // core system includes
 #include "osdcomm.h"
@@ -40,9 +41,9 @@
 
 
 
-/***************************************************************************
-    COMPILER-SPECIFIC NASTINESS
-***************************************************************************/
+//**************************************************************************
+//  COMPILER-SPECIFIC NASTINESS
+//**************************************************************************
 
 // Suppress warnings about redefining the macro 'PPC' on LinuxPPC.
 #undef PPC
@@ -52,9 +53,9 @@
 
 
 
-/***************************************************************************
-    FUNDAMENTAL TYPES
-***************************************************************************/
+//**************************************************************************
+//  FUNDAMENTAL TYPES
+//**************************************************************************
 
 // genf is a generic function pointer; cast function pointers to this instead of void *
 typedef void genf(void);
@@ -77,9 +78,9 @@ class running_machine;
 
 
 
-/***************************************************************************
-    USEFUL COMPOSITE TYPES
-***************************************************************************/
+//**************************************************************************
+//  USEFUL COMPOSITE TYPES
+//**************************************************************************
 
 // generic_ptr is a union of pointers to various sizes
 union generic_ptr
@@ -139,9 +140,9 @@ union PAIR64
 
 
 
-/***************************************************************************
-    COMMON CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  COMMON CONSTANTS
+//**************************************************************************
 
 // constants for expression endianness
 enum endianness_t
@@ -178,9 +179,9 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 
 
 
-/***************************************************************************
-    COMMON MACROS
-***************************************************************************/
+//**************************************************************************
+//  COMMON MACROS
+//**************************************************************************
 
 // macro for defining a copy constructor and assignment operator to prevent copying
 #define DISABLE_COPYING(_Type) \
@@ -269,9 +270,9 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 
 
 
-/***************************************************************************
-    EXCEPTION CLASSES
-***************************************************************************/
+//**************************************************************************
+//  EXCEPTION CLASSES
+//**************************************************************************
 
 // emu_exception is the base class for all emu-related exceptions
 class emu_exception : public std::exception { };
@@ -315,35 +316,78 @@ private:
 
 
 
-/***************************************************************************
-    COMMON TEMPLATES
-***************************************************************************/
+//**************************************************************************
+//  CASTING TEMPLATES
+//**************************************************************************
 
-template<class T> class tagged_list
+// template function for casting from a base class to a derived class that is checked 
+// in debug builds and fast in release builds
+template<class _Dest, class _Source> 
+inline _Dest downcast(_Source *src)
+{
+	assert(dynamic_cast<_Dest>(src) == src);
+	return static_cast<_Dest>(src);
+}
+
+template<class _Dest, class _Source> 
+inline _Dest downcast(_Source &src)
+{
+	assert(&dynamic_cast<_Dest>(src) == &src);
+	return static_cast<_Dest>(src);
+}
+
+
+// template function for cross-casting from one class to another that throws a bad_cast
+// exception instead of returning NULL
+template<class _Dest, class _Source> 
+inline _Dest crosscast(_Source *src)
+{
+	_Dest result = dynamic_cast<_Dest>(src);
+	assert(result != NULL);
+	if (result == NULL)
+		throw std::bad_cast();
+	return result;
+}
+
+
+
+//**************************************************************************
+//  COMMON TEMPLATES
+//**************************************************************************
+
+template<class T> 
+class tagged_list
 {
 	DISABLE_COPYING(tagged_list);
 
-	T *head;
-	T **tailptr;
-	tagmap_t<T *> map;
+	T *m_head;
+	T **m_tailptr;
+	tagmap_t<T *> m_map;
+	resource_pool &m_pool;
 
 public:
-	tagged_list() :
-		head(NULL),
-		tailptr(&head) { }
+	tagged_list(resource_pool &pool = global_resource_pool) :
+		m_head(NULL),
+		m_tailptr(&m_head),
+		m_pool(pool) { }
 
 	virtual ~tagged_list()
 	{
-		while (head != NULL)
-			remove(head);
+		reset();
 	}
 
-	T *first() const { return head; }
+	void reset()
+	{
+		while (m_head != NULL)
+			remove(m_head);
+	}
+
+	T *first() const { return m_head; }
 
 	int count() const
 	{
 		int num = 0;
-		for (T *cur = head; cur != NULL; cur = cur->next)
+		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
 			num++;
 		return num;
 	}
@@ -351,7 +395,7 @@ public:
 	int index(T *object) const
 	{
 		int num = 0;
-		for (T *cur = head; cur != NULL; cur = cur->next)
+		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
 			if (cur == object)
 				return num;
 			else
@@ -365,37 +409,48 @@ public:
 		return (object != NULL) ? index(object) : -1;
 	}
 
-	T *prepend(const char *tag, T *object, bool replace_if_duplicate = false)
+	T *replace(const char *tag, T *object)
 	{
-		if (map.add_unique_hash(tag, object, replace_if_duplicate) != TMERR_NONE)
-			throw emu_fatalerror("Error adding object named '%s'", tag);
-		object->next = head;
-		head = object;
-		if (tailptr == &head)
-			tailptr = &object->next;
+		T *existing = find(tag);
+		if (existing == NULL)
+			return append(tag, object);
+
+		for (T **objectptr = &m_head; *objectptr != NULL; objectptr = &(*objectptr)->m_next)
+			if (*objectptr == existing)
+			{
+				*objectptr = object;
+				object->m_next = existing->m_next;
+				if (m_tailptr == &existing->m_next)
+					m_tailptr = &object->m_next;
+				m_map.remove(existing);
+				pool_free(m_pool, existing);
+				if (m_map.add_unique_hash(tag, object, false) != TMERR_NONE)
+					throw emu_fatalerror("Error replacing object named '%s'", tag);
+				break;
+			}
 		return object;
 	}
 
 	T *append(const char *tag, T *object, bool replace_if_duplicate = false)
 	{
-		if (map.add_unique_hash(tag, object, replace_if_duplicate) != TMERR_NONE)
+		if (m_map.add_unique_hash(tag, object, false) != TMERR_NONE)
 			throw emu_fatalerror("Error adding object named '%s'", tag);
-		*tailptr = object;
-		object->next = NULL;
-		tailptr = &object->next;
+		*m_tailptr = object;
+		object->m_next = NULL;
+		m_tailptr = &object->m_next;
 		return object;
 	}
 
 	void remove(T *object)
 	{
-		for (T **objectptr = &head; *objectptr != NULL; objectptr = &(*objectptr)->next)
+		for (T **objectptr = &m_head; *objectptr != NULL; objectptr = &(*objectptr)->m_next)
 			if (*objectptr == object)
 			{
-				*objectptr = object->next;
-				if (tailptr == &object->next)
-					tailptr = objectptr;
-				map.remove(object);
-				global_free(object);
+				*objectptr = object->m_next;
+				if (m_tailptr == &object->m_next)
+					m_tailptr = objectptr;
+				m_map.remove(object);
+				pool_free(m_pool, object);
 				return;
 			}
 	}
@@ -409,12 +464,12 @@ public:
 
 	T *find(const char *tag) const
 	{
-		return map.find_hash_only(tag);
+		return m_map.find_hash_only(tag);
 	}
 
 	T *find(int index) const
 	{
-		for (T *cur = head; cur != NULL; cur = cur->next)
+		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
 			if (index-- == 0)
 				return cur;
 		return NULL;
@@ -423,9 +478,9 @@ public:
 
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  FUNCTION PROTOTYPES
+//**************************************************************************
 
 DECL_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2) ATTR_NORETURN;
 DECL_NORETURN void fatalerror_exitcode(running_machine *machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4) ATTR_NORETURN;
@@ -448,11 +503,11 @@ inline void fatalerror_exitcode(running_machine *machine, int exitcode, const ch
 
 
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  INLINE FUNCTIONS
+//**************************************************************************
 
-/* population count */
+// population count
 inline int popcount(UINT32 val)
 {
 	int count;
@@ -463,7 +518,7 @@ inline int popcount(UINT32 val)
 }
 
 
-/* convert a series of 32 bits into a float */
+// convert a series of 32 bits into a float
 inline float u2f(UINT32 v)
 {
 	union {
@@ -475,7 +530,7 @@ inline float u2f(UINT32 v)
 }
 
 
-/* convert a float into a series of 32 bits */
+// convert a float into a series of 32 bits
 inline UINT32 f2u(float f)
 {
 	union {
@@ -487,7 +542,7 @@ inline UINT32 f2u(float f)
 }
 
 
-/* convert a series of 64 bits into a double */
+// convert a series of 64 bits into a double
 inline double u2d(UINT64 v)
 {
 	union {
@@ -499,7 +554,7 @@ inline double u2d(UINT64 v)
 }
 
 
-/* convert a double into a series of 64 bits */
+// convert a double into a series of 64 bits
 inline UINT64 d2u(double d)
 {
 	union {

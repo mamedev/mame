@@ -53,7 +53,7 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 {
 	int Checksum=0;
 	int x,y;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
     if((zac2650_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (zac2650_s2636_0_ram[second * 0x10 + 10] < 0xf0))
     {
@@ -75,10 +75,10 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 	    {
 		    for (y = fy; y < fy + machine->gfx[expand]->height; y++)
             {
-			    if ((x < visarea->min_x) ||
-			        (x > visarea->max_x) ||
-			        (y < visarea->min_y) ||
-			        (y > visarea->max_y))
+			    if ((x < visarea.min_x) ||
+			        (x > visarea.max_x) ||
+			        (y < visarea.min_y) ||
+			        (y > visarea.max_y))
 			    {
 				    continue;
 			    }
@@ -101,10 +101,10 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 	    {
 		    for (y = fy; y < fy + machine->gfx[expand]->height; y++)
             {
-			    if ((x < visarea->min_x) ||
-			        (x > visarea->max_x) ||
-			        (y < visarea->min_y) ||
-			        (y > visarea->max_y))
+			    if ((x < visarea.min_x) ||
+			        (x > visarea.max_x) ||
+			        (y < visarea.min_y) ||
+			        (y > visarea.max_y))
 			    {
 				    continue;
 			    }
@@ -137,8 +137,8 @@ VIDEO_START( tinvader )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 24, 24, 32, 32);
 
-	spritebitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	spritebitmap = machine->primary_screen->alloc_compatible_bitmap();
+	machine->generic.tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	gfx_element_set_source(machine->gfx[1], zac2650_s2636_0_ram);
 	gfx_element_set_source(machine->gfx[2], zac2650_s2636_0_ram);
@@ -147,7 +147,7 @@ VIDEO_START( tinvader )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
 	int offs;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
     /* -------------------------------------------------------------- */
     /* There seems to be a strange setup with this board, in that it  */
@@ -163,7 +163,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
     CollisionBackground = 0;	/* Read from 0x1e80 bit 7 */
 
 	// for collision detection checking
-	copybitmap(machine->generic.tmpbitmap,bitmap,0,0,0,0,visarea);
+	copybitmap(machine->generic.tmpbitmap,bitmap,0,0,0,0,&visarea);
 
     for(offs=0;offs<0x50;offs+=0x10)
     {
@@ -186,10 +186,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 	        {
 		        for (y = by; y < by + machine->gfx[expand]->height; y++)
                 {
-			        if ((x < visarea->min_x) ||
-			            (x > visarea->max_x) ||
-			            (y < visarea->min_y) ||
-			            (y > visarea->max_y))
+			        if ((x < visarea.min_x) ||
+			            (x > visarea.max_x) ||
+			            (y < visarea.min_y) ||
+			            (y > visarea.max_y))
 			        {
 				        continue;
 			        }

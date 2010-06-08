@@ -116,9 +116,9 @@ WRITE8_HANDLER( matmania_paletteram_w )
 VIDEO_START( matmania )
 {
 	matmania_state *state = (matmania_state *)machine->driver_data;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
-	bitmap_format format = video_screen_get_format(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
+	bitmap_format format = machine->primary_screen->format();
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
 	state->tmpbitmap  = auto_bitmap_alloc(machine, width, 2 * height, format);

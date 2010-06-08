@@ -14,13 +14,14 @@
 #ifndef __6522VIA_H__
 #define __6522VIA_H__
 
+#include "devlegcy.h"
 
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define VIA6522		DEVICE_GET_INFO_NAME(via6522)
+DECLARE_LEGACY_DEVICE(VIA6522, via6522);
 
 #define MDRV_VIA6522_ADD(_tag, _clock, _intrf) \
 	MDRV_DEVICE_ADD(_tag, VIA6522, _clock) \
@@ -70,8 +71,6 @@ struct _via6522_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(via6522);
 
 READ8_DEVICE_HANDLER(via_r);
 WRITE8_DEVICE_HANDLER(via_w);

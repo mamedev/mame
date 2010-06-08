@@ -30,7 +30,7 @@
 
 typedef void (*atarigen_int_func)(running_machine *machine);
 
-typedef void (*atarigen_scanline_func)(running_device *screen, int scanline);
+typedef void (*atarigen_scanline_func)(screen_device &screen, int scanline);
 
 typedef struct _atarivc_state_desc atarivc_state_desc;
 struct _atarivc_state_desc
@@ -53,7 +53,7 @@ struct _atarivc_state_desc
 typedef struct _atarigen_screen_timer atarigen_screen_timer;
 struct _atarigen_screen_timer
 {
-	running_device *screen;
+	screen_device *screen;
 	emu_timer *			scanline_interrupt_timer;
 	emu_timer *			scanline_timer;
 	emu_timer *			atarivc_eof_update_timer;
@@ -147,7 +147,7 @@ void atarigen_init(running_machine *machine);
 void atarigen_interrupt_reset(atarigen_state *state, atarigen_int_func update_int);
 void atarigen_update_interrupts(running_machine *machine);
 
-void atarigen_scanline_int_set(running_device *screen, int scanline);
+void atarigen_scanline_int_set(screen_device &screen, int scanline);
 INTERRUPT_GEN( atarigen_scanline_int_gen );
 WRITE16_HANDLER( atarigen_scanline_int_ack_w );
 WRITE32_HANDLER( atarigen_scanline_int_ack32_w );
@@ -231,10 +231,10 @@ void atarigen_set_oki6295_vol(running_machine *machine, int volume);
     VIDEO CONTROLLER
 ---------------------------------------------------------------*/
 
-void atarivc_reset(running_device *screen, UINT16 *eof_data, int playfields);
+void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields);
 
-void atarivc_w(running_device *screen, offs_t offset, UINT16 data, UINT16 mem_mask);
-UINT16 atarivc_r(running_device *screen, offs_t offset);
+void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mask);
+UINT16 atarivc_r(screen_device &screen, offs_t offset);
 
 INLINE void atarivc_update_pf_xscrolls(atarigen_state *state)
 {
@@ -267,9 +267,9 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
     VIDEO HELPERS
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(running_device *screen, atarigen_scanline_func update_graphics, int frequency);
-int atarigen_get_hblank(running_device *screen);
-void atarigen_halt_until_hblank_0(running_device *screen);
+void atarigen_scanline_timer_reset(screen_device &screen, atarigen_scanline_func update_graphics, int frequency);
+int atarigen_get_hblank(screen_device &screen);
+void atarigen_halt_until_hblank_0(screen_device &screen);
 WRITE16_HANDLER( atarigen_666_paletteram_w );
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );
 WRITE32_HANDLER( atarigen_666_paletteram32_w );

@@ -149,11 +149,10 @@ INLINE void mn102_change_pc(mn102_info *mn102, UINT32 pc)
 INLINE mn102_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MN10200);
 
-	return (mn102_info *)device->token;
+	return (mn102_info *)downcast<cpu_device *>(device)->token();
 }
 
 static void mn102_take_irq(mn102_info *mn102, int level, int group)
@@ -277,8 +276,8 @@ static CPU_INIT(mn10200)
 	memset(cpustate, 0, sizeof(mn102_info));
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->pc);
 	state_save_register_device_item_array(device, 0, cpustate->d);
@@ -2336,7 +2335,7 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 
 static CPU_SET_INFO(mn10200)
 {
-	mn102_info *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	mn102_info *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -2365,7 +2364,7 @@ static CPU_SET_INFO(mn10200)
 
 CPU_GET_INFO( mn10200 )
 {
-	mn102_info *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	mn102_info *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

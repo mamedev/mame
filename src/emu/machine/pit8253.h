@@ -23,11 +23,9 @@
 #ifndef __PIT8253_H__
 #define __PIT8253_H__
 
+#include "devlegcy.h"
 #include "devcb.h"
 
-
-#define PIT8253		DEVICE_GET_INFO_NAME(pit8253)
-#define PIT8254		DEVICE_GET_INFO_NAME(pit8254)
 
 struct pit8253_config
 {
@@ -38,6 +36,9 @@ struct pit8253_config
 		devcb_write_line	out_out_func;	/* out signal */
 	} timer[3];
 };
+
+DECLARE_LEGACY_DEVICE(PIT8253, pit8253);
+DECLARE_LEGACY_DEVICE(PIT8254, pit8254);
 
 
 /***************************************************************************
@@ -53,10 +54,6 @@ struct pit8253_config
 	MDRV_DEVICE_ADD(_tag, PIT8254, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
-
-/* device interface */
-DEVICE_GET_INFO( pit8253 );
-DEVICE_GET_INFO( pit8254 );
 
 READ8_DEVICE_HANDLER( pit8253_r );
 WRITE8_DEVICE_HANDLER( pit8253_w );

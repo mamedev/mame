@@ -2686,21 +2686,16 @@ static bitmap_t *sys24_bitmap = NULL;
 static void model2_exit(running_machine *machine)
 {
 	poly_free(poly);
-	if ( sys24_bitmap != NULL )
-	{
-		bitmap_free( sys24_bitmap );
-		sys24_bitmap = NULL;
-	}
 }
 
 VIDEO_START(model2)
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-	int	width = visarea->max_x - visarea->min_x;
-	int	height = visarea->max_y - visarea->min_y;
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	int	width = visarea.max_x - visarea.min_x;
+	int	height = visarea.max_y - visarea.min_y;
 
 	sys24_tile_vh_start(machine, 0x3fff);
-	sys24_bitmap = bitmap_alloc(width, height+4, BITMAP_FORMAT_INDEXED16);
+	sys24_bitmap = auto_alloc(machine, bitmap_t(width, height+4, BITMAP_FORMAT_INDEXED16));
 
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 	add_exit_callback(machine, model2_exit);

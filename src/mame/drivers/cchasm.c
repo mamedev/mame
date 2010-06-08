@@ -139,7 +139,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const z80_daisy_chain daisy_chain[] =
+static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
 	{ NULL }

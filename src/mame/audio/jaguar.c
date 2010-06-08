@@ -370,8 +370,8 @@ static WRITE32_HANDLER( dsp_flags_w )
 TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cputag_set_input_line(timer->machine, "audiocpu", 1, ASSERT_LINE);
-	jaguar_dsp_resume(timer->machine);
+	cputag_set_input_line(timer.machine, "audiocpu", 1, ASSERT_LINE);
+	jaguar_dsp_resume(timer.machine);
 
 	/* fix flaky code in interrupt handler which thwarts our speedup */
 	if ((jaguar_dsp_ram[0x3e/4] & 0xffff) == 0xbfbc &&
@@ -389,8 +389,8 @@ TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cputag_set_input_line(timer->machine, "audiocpu", 1, ASSERT_LINE);
-	jaguar_dsp_resume(timer->machine);
+	cputag_set_input_line(timer.machine, "audiocpu", 1, ASSERT_LINE);
+	jaguar_dsp_resume(timer.machine);
 }
 
 #endif
@@ -436,7 +436,8 @@ WRITE32_HANDLER( jaguar_serial_w )
 			if ((data & 0x3f) == 0x15)
 			{
 				attotime rate = attotime_mul(ATTOTIME_IN_HZ(26000000), 32 * 2 * (serial_frequency + 1));
-				timer_device_adjust_periodic(devtag_get_device(space->machine, "serial_timer"), rate, 0, rate);
+				timer_device *serial_timer = space->machine->device<timer_device>("serial_timer");
+				serial_timer->adjust(rate, 0, rate);
 			}
 			break;
 

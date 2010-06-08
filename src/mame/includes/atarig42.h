@@ -42,5 +42,5 @@ VIDEO_UPDATE( atarig42 );
 
 WRITE16_HANDLER( atarig42_mo_control_w );
 
-void atarig42_scanline_update(running_device *screen, int scanline);
+void atarig42_scanline_update(screen_device &screen, int scanline);
 

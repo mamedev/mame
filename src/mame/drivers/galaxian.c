@@ -1220,7 +1220,7 @@ static WRITE8_HANDLER( checkman_sound_command_w )
 
 static TIMER_DEVICE_CALLBACK( checkmaj_irq0_gen )
 {
-	cputag_set_input_line(timer->machine, "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(timer.machine, "audiocpu", 0, HOLD_LINE);
 }
 
 

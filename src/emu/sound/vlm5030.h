@@ -3,6 +3,8 @@
 #ifndef __VLM5030_H__
 #define __VLM5030_H__
 
+#include "devlegcy.h"
+
 typedef struct _vlm5030_interface vlm5030_interface;
 struct _vlm5030_interface
 {
@@ -23,7 +25,6 @@ void vlm5030_vcu(running_device *device, int pin );
 /* set ST pin level  : set table address A0-A7 / start speech */
 void vlm5030_st(running_device *device, int pin );
 
-DEVICE_GET_INFO( vlm5030 );
-#define SOUND_VLM5030 DEVICE_GET_INFO_NAME( vlm5030 )
+DECLARE_LEGACY_SOUND_DEVICE(VLM5030, vlm5030);
 
 #endif /* __VLM5030_H__ */

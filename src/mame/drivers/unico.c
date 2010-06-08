@@ -53,7 +53,7 @@ static WRITE16_DEVICE_HANDLER( burglarx_sound_bank_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		int bank = (data >> 8 ) & 1;
-		okim6295_set_bank_base(device, 0x40000 * bank );
+		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * bank );
 	}
 }
 
@@ -117,7 +117,7 @@ static READ16_HANDLER( unico_gunx_0_msb_r )
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (video_screen_get_frame_number(space->machine->primary_screen)&1))<<8;
+	return ((x&0xff) ^ (space->machine->primary_screen->frame_number()&1))<<8;
 }
 
 static READ16_HANDLER( unico_guny_0_msb_r )
@@ -126,7 +126,7 @@ static READ16_HANDLER( unico_guny_0_msb_r )
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (video_screen_get_frame_number(space->machine->primary_screen)&1))<<8;
+	return ((y&0xff) ^ (space->machine->primary_screen->frame_number()&1))<<8;
 }
 
 static READ16_HANDLER( unico_gunx_1_msb_r )
@@ -137,7 +137,7 @@ static READ16_HANDLER( unico_gunx_1_msb_r )
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (video_screen_get_frame_number(space->machine->primary_screen)&1))<<8;
+	return ((x&0xff) ^ (space->machine->primary_screen->frame_number()&1))<<8;
 }
 
 static READ16_HANDLER( unico_guny_1_msb_r )
@@ -146,7 +146,7 @@ static READ16_HANDLER( unico_guny_1_msb_r )
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (video_screen_get_frame_number(space->machine->primary_screen)&1))<<8;
+	return ((y&0xff) ^ (space->machine->primary_screen->frame_number()&1))<<8;
 }
 
 static ADDRESS_MAP_START( zeropnt_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -631,8 +631,7 @@ static MACHINE_DRIVER_START( burglarx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_DRIVER_END
@@ -678,8 +677,7 @@ static MACHINE_DRIVER_START( zeropnt )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_DRIVER_END
@@ -722,12 +720,10 @@ static MACHINE_DRIVER_START( zeropnt2 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 3960000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", 3960000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_DRIVER_END
 

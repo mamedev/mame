@@ -91,10 +91,8 @@ struct _qsound_state
 INLINE qsound_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_QSOUND);
-	return (qsound_state *)device->token;
+	assert(device->type() == SOUND_QSOUND);
+	return (qsound_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -107,8 +105,8 @@ static DEVICE_START( qsound )
 	qsound_state *chip = get_safe_token(device);
 	int i;
 
-	chip->sample_rom = (QSOUND_SRC_SAMPLE *)*device->region;
-	chip->sample_rom_length = device->region->bytes();
+	chip->sample_rom = (QSOUND_SRC_SAMPLE *)*device->region();
+	chip->sample_rom_length = device->region()->bytes();
 
 	memset(chip->channel, 0, sizeof(chip->channel));
 
@@ -128,7 +126,7 @@ static DEVICE_START( qsound )
 		/* Allocate stream */
 		chip->stream = stream_create(
 			device, 0, 2,
-			device->clock / QSOUND_CLOCKDIV,
+			device->clock() / QSOUND_CLOCKDIV,
 			chip,
 			qsound_update );
 	}

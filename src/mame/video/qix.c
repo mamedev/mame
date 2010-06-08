@@ -126,7 +126,7 @@ static WRITE8_HANDLER( qix_videoram_w )
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( slither_videoram_w )
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -183,7 +183,7 @@ static WRITE8_HANDLER( qix_addresslatch_w )
 	qix_state *state = (qix_state *)space->machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( slither_addresslatch_w )
 	qix_state *state = (qix_state *)space->machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -230,7 +230,7 @@ static WRITE8_HANDLER( qix_paletteram_w )
 	/* trigger an update if a currently visible pen has changed */
 	if (((offset >> 8) == state->palette_bank) &&
 	    (old_data != data))
-		video_screen_update_now(space->machine->primary_screen);
+		space->machine->primary_screen->update_now();
 }
 
 
@@ -241,7 +241,7 @@ WRITE8_HANDLER( qix_palettebank_w )
 	/* set the bank value */
 	if (state->palette_bank != (data & 3))
 	{
-		video_screen_update_now(space->machine->primary_screen);
+		space->machine->primary_screen->update_now();
 		state->palette_bank = data & 3;
 	}
 
@@ -469,6 +469,7 @@ MACHINE_DRIVER_END
 
 
 MACHINE_DRIVER_START( slither_video )
-	MDRV_CPU_REPLACE("videocpu", M6809, SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
+	MDRV_CPU_MODIFY("videocpu")
+	MDRV_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
 	MDRV_CPU_PROGRAM_MAP(slither_video_map)
 MACHINE_DRIVER_END

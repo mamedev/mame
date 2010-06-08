@@ -1316,8 +1316,8 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			}
 			g1bus_regs[SB_GDST] = dat & 1;
 //          printf("ROM board DMA to %x len %x (PC %x)\n", g1bus_regs[SB_GDSTAR], g1bus_regs[SB_GDLEN], cpu_get_pc(space->cpu));
-			ROM = (UINT8 *)space->machine->device("rom_board")->get_runtime_ptr(DEVINFO_PTR_MEMORY);
-			dmaoffset = (UINT32)space->machine->device("rom_board")->get_runtime_int(DEVINFO_INT_DMAOFFSET);
+			ROM = (UINT8 *)naomibd_get_memory(space->machine->device("rom_board"));
+			dmaoffset = naomibd_get_dmaoffset(space->machine->device("rom_board"));
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
 			ddtdata.length=g1bus_regs[SB_GDLEN] >> 5;		// words to transfer
 			/* data in the lower 5 bits makes the length size to round by 32 bytes, this'll be needed by Virtua Tennis to boot (according to Deunan) */

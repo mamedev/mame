@@ -9,6 +9,8 @@
 #ifndef __K053260_H__
 #define __K053260_H__
 
+#include "devlegcy.h"
+
 typedef struct _k053260_interface k053260_interface;
 struct _k053260_interface {
 	const char *rgnoverride;
@@ -19,7 +21,6 @@ struct _k053260_interface {
 WRITE8_DEVICE_HANDLER( k053260_w );
 READ8_DEVICE_HANDLER( k053260_r );
 
-DEVICE_GET_INFO( k053260 );
-#define SOUND_K053260 DEVICE_GET_INFO_NAME( k053260 )
+DECLARE_LEGACY_SOUND_DEVICE(K053260, k053260);
 
 #endif /* __K053260_H__ */

@@ -241,7 +241,7 @@ typedef struct
 	UINT16		ifc;
     UINT8   	irq_state[9];
     UINT8   	irq_latch[9];
-    cpu_irq_callback irq_callback;
+    device_irq_callback irq_callback;
     running_device *device;
 
 	/* other internal states */
@@ -266,7 +266,6 @@ typedef struct
     const address_space *program;
     const address_space *data;
     const address_space *io;
-    cpu_state_table state;
 
 } adsp2100_state;
 
@@ -287,132 +286,6 @@ static UINT32 pcbucket[0x4000];
 
 
 /***************************************************************************
-    CPU STATE DESCRIPTION
-***************************************************************************/
-
-#define ADSP21XX_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(ADSP2100_##_name, #_name, _format, adsp2100_state, _member, _datamask, ~0, _flags)
-
-#define ADSP21XX_STATE_ENTRY_MASK(_name, _format, _member, _datamask, _flags, _validmask) \
-	CPU_STATE_ENTRY(ADSP2100_##_name, #_name, _format, adsp2100_state, _member, _datamask, _validmask, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	ADSP21XX_STATE_ENTRY(PC,  "%04X", pc, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(GENPC, "%04X", pc, 0xffff, CPUSTATE_NOSHOW)
-	ADSP21XX_STATE_ENTRY(GENPCBASE, "%04X", ppc, 0xffff, CPUSTATE_NOSHOW)
-
-	ADSP21XX_STATE_ENTRY(AX0, "%04X", core.ax0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AX1, "%04X", core.ax1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AY0, "%04X", core.ay0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AY1, "%04X", core.ay1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AR,  "%04X", core.ar.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AF,  "%04X", core.af.u, 0xffff, 0)
-
-	ADSP21XX_STATE_ENTRY(MX0, "%04X", core.mx0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MX1, "%04X", core.mx1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MY0, "%04X", core.my0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MY1, "%04X", core.my1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MR0, "%04X", core.mr.mrx.mr0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MR1, "%04X", core.mr.mrx.mr1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MR2, "%02X", core.mr.mrx.mr2.u, 0xff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(MF,  "%04X", core.mf.u, 0xffff, 0)
-
-	ADSP21XX_STATE_ENTRY(SI,  "%04X", core.si.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(SE,  "%02X", core.se.u, 0xff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(SB,  "%02X", core.sb.u, 0x1f, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(SR0, "%04X", core.sr.srx.sr0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(SR1, "%04X", core.sr.srx.sr0.u, 0xffff, 0)
-
-	ADSP21XX_STATE_ENTRY(AX0_SEC, "%04X", alt.ax0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AX1_SEC, "%04X", alt.ax1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AY0_SEC, "%04X", alt.ay0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AY1_SEC, "%04X", alt.ay1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AR_SEC,  "%04X", alt.ar.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(AF_SEC,  "%04X", alt.af.u, 0xffff, 0)
-
-	ADSP21XX_STATE_ENTRY(MX0_SEC, "%04X", alt.mx0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MX1_SEC, "%04X", alt.mx1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MY0_SEC, "%04X", alt.my0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MY1_SEC, "%04X", alt.my1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MR0_SEC, "%04X", alt.mr.mrx.mr0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MR1_SEC, "%04X", alt.mr.mrx.mr1.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(MR2_SEC, "%02X", alt.mr.mrx.mr2.u, 0xff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(MF_SEC,  "%04X", alt.mf.u, 0xffff, 0)
-
-	ADSP21XX_STATE_ENTRY(SI_SEC,  "%04X", alt.si.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(SE_SEC,  "%02X", alt.se.u, 0xff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(SB_SEC,  "%02X", alt.sb.u, 0x1f, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(SR0_SEC, "%04X", alt.sr.srx.sr0.u, 0xffff, 0)
-	ADSP21XX_STATE_ENTRY(SR1_SEC, "%04X", alt.sr.srx.sr0.u, 0xffff, 0)
-
-	ADSP21XX_STATE_ENTRY(I0, "%04X", i[0], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(I1, "%04X", i[1], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(I2, "%04X", i[2], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(I3, "%04X", i[3], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(I4, "%04X", i[4], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(I5, "%04X", i[5], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(I6, "%04X", i[6], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(I7, "%04X", i[7], 0x3fff, CPUSTATE_IMPORT)
-
-	ADSP21XX_STATE_ENTRY(L0, "%04X", l[0], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(L1, "%04X", l[1], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(L2, "%04X", l[2], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(L3, "%04X", l[3], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(L4, "%04X", l[4], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(L5, "%04X", l[5], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(L6, "%04X", l[6], 0x3fff, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(L7, "%04X", l[7], 0x3fff, CPUSTATE_IMPORT)
-
-	ADSP21XX_STATE_ENTRY(M0, "%04X", m[0], 0x3fff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(M1, "%04X", m[1], 0x3fff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(M2, "%04X", m[2], 0x3fff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(M3, "%04X", m[3], 0x3fff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(M4, "%04X", m[4], 0x3fff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(M5, "%04X", m[5], 0x3fff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(M6, "%04X", m[6], 0x3fff, CPUSTATE_IMPORT_SEXT)
-	ADSP21XX_STATE_ENTRY(M7, "%04X", m[7], 0x3fff, CPUSTATE_IMPORT_SEXT)
-
-	ADSP21XX_STATE_ENTRY(PX, "%02X", px, 0xff, 0)
-	ADSP21XX_STATE_ENTRY(CNTR, "%04X", cntr, 0x3fff, 0)
-	ADSP21XX_STATE_ENTRY(ASTAT, "%02X", astat, 0xff, 0)
-	ADSP21XX_STATE_ENTRY(SSTAT, "%02X", sstat, 0xff, 0)
-	ADSP21XX_STATE_ENTRY_MASK(MSTAT, "%01X", mstat, 0x0f, CPUSTATE_IMPORT,  (1 << CHIP_TYPE_ADSP2100))
-	ADSP21XX_STATE_ENTRY_MASK(MSTAT, "%02X", mstat, 0x7f, CPUSTATE_IMPORT, ~(1 << CHIP_TYPE_ADSP2100))
-
-	ADSP21XX_STATE_ENTRY(PCSP,   "%02X", pc_sp, 0xff, 0)
-	ADSP21XX_STATE_ENTRY(GENSP,  "%02X", pc_sp, 0xff, CPUSTATE_NOSHOW)
-	ADSP21XX_STATE_ENTRY(CNTRSP, "%01X", cntr_sp, 0xf, 0)
-	ADSP21XX_STATE_ENTRY(STATSP, "%01X", stat_sp, 0xf, 0)
-	ADSP21XX_STATE_ENTRY(LOOPSP, "%01X", loop_sp, 0xf, 0)
-
-	ADSP21XX_STATE_ENTRY_MASK(IMASK, "%01X", imask, 0x00f, CPUSTATE_IMPORT,  (1 << CHIP_TYPE_ADSP2100))
-	ADSP21XX_STATE_ENTRY_MASK(IMASK, "%02X", imask, 0x03f, CPUSTATE_IMPORT, ~((1 << CHIP_TYPE_ADSP2100) | (1 << CHIP_TYPE_ADSP2181)))
-	ADSP21XX_STATE_ENTRY_MASK(IMASK, "%03X", imask, 0x3ff, CPUSTATE_IMPORT,  (1 << CHIP_TYPE_ADSP2181))
-	ADSP21XX_STATE_ENTRY(ICNTL, "%02X", icntl, 0x1f, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(IRQSTATE0, "%1u", irq_state[0], 0x1, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(IRQSTATE1, "%1u", irq_state[1], 0x1, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY(IRQSTATE2, "%1u", irq_state[2], 0x1, CPUSTATE_IMPORT)
-	ADSP21XX_STATE_ENTRY_MASK(IRQSTATE3, "%1u", irq_state[3], 0x1, CPUSTATE_IMPORT, (1 << CHIP_TYPE_ADSP2100))
-
-	ADSP21XX_STATE_ENTRY(FLAGIN, "%1u", flagin, 0x1, 0)
-	ADSP21XX_STATE_ENTRY(FLAGOUT, "%1u", flagout, 0x1, 0)
-	ADSP21XX_STATE_ENTRY(FL0, "%1u", fl0, 0x1, 0)
-	ADSP21XX_STATE_ENTRY(FL1, "%1u", fl1, 0x1, 0)
-	ADSP21XX_STATE_ENTRY(FL2, "%1u", fl2, 0x1, 0)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
-};
-
-
-
-/***************************************************************************
     PRIVATE FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -428,15 +301,14 @@ static void check_irqs(adsp2100_state *adsp);
 INLINE adsp2100_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ADSP2100 ||
 		   cpu_get_type(device) == CPU_ADSP2101 ||
 		   cpu_get_type(device) == CPU_ADSP2104 ||
 		   cpu_get_type(device) == CPU_ADSP2105 ||
 		   cpu_get_type(device) == CPU_ADSP2115 ||
 		   cpu_get_type(device) == CPU_ADSP2181);
-	return (adsp2100_state *)device->token;
+	return (adsp2100_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -691,9 +563,9 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static adsp2100_state *adsp21xx_init(running_device *device, cpu_irq_callback irqcallback, int chiptype)
+static adsp2100_state *adsp21xx_init(running_device *device, device_irq_callback irqcallback, int chiptype)
 {
-	const adsp21xx_config *config = (const adsp21xx_config *)device->baseconfig().static_config;
+	const adsp21xx_config *config = (const adsp21xx_config *)device->baseconfig().static_config();
 	adsp2100_state *adsp = get_safe_token(device);
 
 	/* create the tables */
@@ -706,9 +578,9 @@ static adsp2100_state *adsp21xx_init(running_device *device, cpu_irq_callback ir
 
 	/* fetch device parameters */
 	adsp->device = device;
-	adsp->program = device->space(AS_PROGRAM);
-	adsp->data = device->space(AS_DATA);
-	adsp->io = device->space(AS_IO);
+	adsp->program = device_memory(device)->space(AS_PROGRAM);
+	adsp->data = device_memory(device)->space(AS_DATA);
+	adsp->io = device_memory(device)->space(AS_IO);
 
 	/* copy function pointers from the config */
 	if (config != NULL)
@@ -717,11 +589,6 @@ static adsp2100_state *adsp21xx_init(running_device *device, cpu_irq_callback ir
 		adsp->sport_tx_callback = config->tx;
 		adsp->timer_fired = config->timer;
 	}
-
-	/* set up the state table */
-	adsp->state = state_table_template;
-	adsp->state.baseptr = adsp;
-	adsp->state.subtypemask = 1 << chiptype;
 
 	/* set up ALU register pointers */
 	adsp->alu_xregs[0] = &adsp->core.ax0;
@@ -842,6 +709,93 @@ static adsp2100_state *adsp21xx_init(running_device *device, cpu_irq_callback ir
 	state_save_register_device_item(device, 0, adsp->ifc);
 	state_save_register_device_item_array(device, 0, adsp->irq_state);
 	state_save_register_device_item_array(device, 0, adsp->irq_latch);
+
+	// eventually this will be built-in
+	device_state_interface *state;
+	device->interface(state);
+	state->state_add(ADSP2100_PC,      "PC",        adsp->pc);
+	state->state_add(STATE_GENPC,      "GENPC",     adsp->pc).noshow();
+	state->state_add(STATE_GENPCBASE,  "GENPCBASE", adsp->ppc).noshow();
+	state->state_add(STATE_GENFLAGS,   "GENFLAGS",  adsp->astat).mask(0xff).noshow().formatstr("%8s");
+
+	state->state_add(ADSP2100_AX0,     "AX0",       adsp->core.ax0.u);
+	state->state_add(ADSP2100_AX1,     "AX1",       adsp->core.ax1.u);
+	state->state_add(ADSP2100_AY0,     "AY0",       adsp->core.ay0.u);
+	state->state_add(ADSP2100_AY1,     "AY1",       adsp->core.ay1.u);
+	state->state_add(ADSP2100_AR,      "AR",        adsp->core.ar.u);
+	state->state_add(ADSP2100_AF,      "AF",        adsp->core.af.u);
+
+	state->state_add(ADSP2100_MX0,     "MX0",       adsp->core.mx0.u);
+	state->state_add(ADSP2100_MX1,     "MX1",       adsp->core.mx1.u);
+	state->state_add(ADSP2100_MY0,     "MY0",       adsp->core.my0.u);
+	state->state_add(ADSP2100_MY1,     "MY1",       adsp->core.my1.u);
+	state->state_add(ADSP2100_MR0,     "MR0",       adsp->core.mr.mrx.mr0.u);
+	state->state_add(ADSP2100_MR1,     "MR1",       adsp->core.mr.mrx.mr1.u);
+	state->state_add(ADSP2100_MR2,     "MR2",       adsp->core.mr.mrx.mr2.u).signed_mask(0xff);
+	state->state_add(ADSP2100_MF,      "MF",        adsp->core.mf.u);
+
+	state->state_add(ADSP2100_SI,      "SI",        adsp->core.si.u);
+	state->state_add(ADSP2100_SE,      "SE",        adsp->core.se.u).signed_mask(0xff);
+	state->state_add(ADSP2100_SB,      "SB",        adsp->core.sb.u).signed_mask(0x1f);
+	state->state_add(ADSP2100_SR0,     "SR0",       adsp->core.sr.srx.sr0.u);
+	state->state_add(ADSP2100_SR1,     "SR1",       adsp->core.sr.srx.sr1.u);
+
+	state->state_add(ADSP2100_AX0_SEC, "AX0_SEC",   adsp->alt.ax0.u);
+	state->state_add(ADSP2100_AX1_SEC, "AX1_SEC",   adsp->alt.ax1.u);
+	state->state_add(ADSP2100_AY0_SEC, "AY0_SEC",   adsp->alt.ay0.u);
+	state->state_add(ADSP2100_AY1_SEC, "AY1_SEC",   adsp->alt.ay1.u);
+	state->state_add(ADSP2100_AR_SEC,  "AR_SEC",    adsp->alt.ar.u);
+	state->state_add(ADSP2100_AF_SEC,  "AF_SEC",    adsp->alt.af.u);
+
+	state->state_add(ADSP2100_MX0_SEC, "MX0_SEC",   adsp->alt.mx0.u);
+	state->state_add(ADSP2100_MX1_SEC, "MX1_SEC",   adsp->alt.mx1.u);
+	state->state_add(ADSP2100_MY0_SEC, "MY0_SEC",   adsp->alt.my0.u);
+	state->state_add(ADSP2100_MY1_SEC, "MY1_SEC",   adsp->alt.my1.u);
+	state->state_add(ADSP2100_MR0_SEC, "MR0_SEC",   adsp->alt.mr.mrx.mr0.u);
+	state->state_add(ADSP2100_MR1_SEC, "MR1_SEC",   adsp->alt.mr.mrx.mr1.u);
+	state->state_add(ADSP2100_MR2_SEC, "MR2_SEC",   adsp->alt.mr.mrx.mr2.u).signed_mask(0xff);
+	state->state_add(ADSP2100_MF_SEC,  "MF_SEC",    adsp->alt.mf.u);
+
+	state->state_add(ADSP2100_SI_SEC,  "SI_SEC",    adsp->alt.si.u);
+	state->state_add(ADSP2100_SE_SEC,  "SE_SEC",    adsp->alt.se.u).signed_mask(0xff);
+	state->state_add(ADSP2100_SB_SEC,  "SB_SEC",    adsp->alt.sb.u).signed_mask(0x1f);
+	state->state_add(ADSP2100_SR0_SEC, "SR0_SEC",   adsp->alt.sr.srx.sr0.u);
+	state->state_add(ADSP2100_SR1_SEC, "SR1_SEC",   adsp->alt.sr.srx.sr1.u);
+
+	astring tempstring;
+	for (int ireg = 0; ireg < 8; ireg++)
+		state->state_add(ADSP2100_I0 + ireg, tempstring.format("I%d", ireg), adsp->i[ireg]).mask(0x3fff).callimport();
+
+	for (int lreg = 0; lreg < 8; lreg++)
+		state->state_add(ADSP2100_L0 + lreg, tempstring.format("L%d", lreg), adsp->l[lreg]).mask(0x3fff).callimport();
+
+	for (int mreg = 0; mreg < 8; mreg++)
+		state->state_add(ADSP2100_M0 + mreg, tempstring.format("M%d", mreg), adsp->m[mreg]).signed_mask(0x3fff);
+
+	state->state_add(ADSP2100_PX,      "PX",        adsp->px);
+	state->state_add(ADSP2100_CNTR,    "CNTR",      adsp->cntr).mask(0x3fff);
+	state->state_add(ADSP2100_ASTAT,   "ASTAT",     adsp->astat).mask(0xff);
+	state->state_add(ADSP2100_SSTAT,   "SSTAT",     adsp->sstat).mask(0xff);
+	state->state_add(ADSP2100_MSTAT,   "MSTAT",     adsp->mstat).mask((chiptype == CHIP_TYPE_ADSP2100) ? 0x0f : 0x7f).callimport();
+
+	state->state_add(ADSP2100_PCSP,    "PCSP",      adsp->pc_sp).mask(0xff);
+	state->state_add(STATE_GENSP,      "GENSP",     adsp->pc_sp).mask(0xff).noshow();
+	state->state_add(ADSP2100_CNTRSP,  "CNTRSP",    adsp->cntr_sp).mask(0xf);
+	state->state_add(ADSP2100_STATSP,  "STATSP",    adsp->stat_sp).mask(0xf);
+	state->state_add(ADSP2100_LOOPSP,  "LOOPSP",    adsp->loop_sp).mask(0xf);
+
+	state->state_add(ADSP2100_IMASK,   "IMASK",     adsp->imask).mask((chiptype == CHIP_TYPE_ADSP2100) ? 0x00f : (chiptype == CHIP_TYPE_ADSP2181) ? 0x3ff : 0x07f).callimport();
+	state->state_add(ADSP2100_ICNTL,   "ICNTL",     adsp->icntl).mask(0x1f).callimport();
+
+	for (int irqnum = 0; irqnum < 4; irqnum++)
+		if (irqnum < 4 || chiptype == CHIP_TYPE_ADSP2100)
+			state->state_add(ADSP2100_IRQSTATE0 + irqnum, tempstring.format("IRQ%d", irqnum), adsp->irq_state[irqnum]).mask(1).callimport();
+
+	state->state_add(ADSP2100_FLAGIN,  "FLAGIN",    adsp->flagin).mask(1);
+	state->state_add(ADSP2100_FLAGOUT, "FLAGOUT",   adsp->flagout).mask(1);
+	state->state_add(ADSP2100_FL0,     "FL0",       adsp->fl0).mask(1);
+	state->state_add(ADSP2100_FL1,     "FL1",       adsp->fl1).mask(1);
+	state->state_add(ADSP2100_FL2,     "FL2",       adsp->fl2).mask(1);
 
 	return adsp;
 }
@@ -1807,7 +1761,7 @@ extern CPU_DISASSEMBLE( adsp21xx );
 static CPU_IMPORT_STATE( adsp21xx )
 {
 	adsp2100_state *adsp = get_safe_token(device);
-	switch (entry->index)
+	switch (entry.index())
 	{
 		case ADSP2100_MSTAT:
 			update_mstat(adsp);
@@ -1830,7 +1784,7 @@ static CPU_IMPORT_STATE( adsp21xx )
 		case ADSP2100_I5:
 		case ADSP2100_I6:
 		case ADSP2100_I7:
-			update_i(adsp, entry->index - ADSP2100_I0);
+			update_i(adsp, entry.index() - ADSP2100_I0);
 			break;
 
 		case ADSP2100_L0:
@@ -1841,7 +1795,7 @@ static CPU_IMPORT_STATE( adsp21xx )
 		case ADSP2100_L5:
 		case ADSP2100_L6:
 		case ADSP2100_L7:
-			update_l(adsp, entry->index - ADSP2100_L0);
+			update_l(adsp, entry.index() - ADSP2100_L0);
 			break;
 
 		default:
@@ -1849,6 +1803,28 @@ static CPU_IMPORT_STATE( adsp21xx )
 			break;
 	}
 }
+
+
+static CPU_EXPORT_STRING( adsp21xx )
+{
+	adsp2100_state *adsp = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c%c%c",
+				adsp->astat & 0x80 ? 'X':'.',
+				adsp->astat & 0x40 ? 'M':'.',
+				adsp->astat & 0x20 ? 'Q':'.',
+				adsp->astat & 0x10 ? 'S':'.',
+				adsp->astat & 0x08 ? 'C':'.',
+				adsp->astat & 0x04 ? 'V':'.',
+				adsp->astat & 0x02 ? 'N':'.',
+				adsp->astat & 0x01 ? 'Z':'.');
+			break;
+	}
+}
+
 
 
 
@@ -1885,7 +1861,7 @@ static CPU_SET_INFO( adsp21xx )
 
 static CPU_GET_INFO( adsp21xx )
 {
-	adsp2100_state *adsp = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	adsp2100_state *adsp = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1928,10 +1904,10 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(adsp21xx);				break;
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(adsp21xx);		break;
 		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(adsp21xx);	break;
+		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(adsp21xx);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &adsp->icount;			break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &adsp->state;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per CPU */						break;
@@ -1939,18 +1915,6 @@ static CPU_GET_INFO( adsp21xx )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				adsp->astat & 0x80 ? 'X':'.',
-				adsp->astat & 0x40 ? 'M':'.',
-				adsp->astat & 0x20 ? 'Q':'.',
-				adsp->astat & 0x10 ? 'S':'.',
-				adsp->astat & 0x08 ? 'C':'.',
-				adsp->astat & 0x04 ? 'V':'.',
-				adsp->astat & 0x02 ? 'N':'.',
-				adsp->astat & 0x01 ? 'Z':'.');
-			break;
 	}
 }
 

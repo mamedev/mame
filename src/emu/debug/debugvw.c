@@ -38,6 +38,12 @@ enum _view_notification
 };
 typedef enum _view_notification view_notification;
 
+#define REG_DIVIDER			-10
+#define REG_CYCLES			-11
+#define REG_BEAMX			-12
+#define REG_BEAMY			-13
+#define REG_FRAME			-14
+
 
 
 /***************************************************************************
@@ -123,18 +129,16 @@ struct _debug_view_register
 {
 	UINT64				lastval;				/* last value */
 	UINT64				currval;				/* current value */
-	UINT32				regnum;					/* index */
-	UINT8				tagstart;				/* starting tag char */
-	UINT8				taglen;					/* number of tag chars */
-	UINT8				valstart;				/* starting value char */
+	int					regnum;					/* index */
 	UINT8				vallen;					/* number of value chars */
+	astring				symbol;					/* symbol */
 };
 
 
 typedef struct _debug_view_registers debug_view_registers;
 struct _debug_view_registers
 {
-	running_device *device;				/* CPU device whose registers we are showing */
+	const registers_subview_item *subview;		/* pointer to our subview */
 	int					divider;				/* dividing column */
 	UINT64				last_update;			/* execution counter at last update */
 	debug_view_register reg[MAX_REGS];			/* register data */
@@ -820,7 +824,7 @@ static void debug_view_expression_set(debug_view_expression *expression, const c
     changed
 -------------------------------------------------*/
 
-static int debug_view_expression_changed_value(debug_view *view, debug_view_expression *expression, running_device *cpu)
+static int debug_view_expression_changed_value(debug_view *view, debug_view_expression *expression, device_t *cpu)
 {
 	int changed = expression->dirty;
 	EXPRERR exprerr;
@@ -1029,15 +1033,17 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	for (running_device *cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	device_state_interface *state;
+	for (bool gotone = machine->devicelist.first(state); gotone; gotone = state->next(state))
 	{
 		registers_subview_item *subview = auto_alloc(machine, registers_subview_item);
 
 		/* populate the subview */
 		subview->next = NULL;
 		subview->index = curindex++;
-		subview->name.printf("CPU '%s' (%s)", cpu->tag(), cpu->name());
-		subview->device = cpu;
+		subview->name.printf("CPU '%s' (%s)", state->device().tag(), state->device().name());
+		subview->stateintf = state;
+		state->device().interface(subview->execintf);
 
 		/* add to the list */
 		*tailptr = subview;
@@ -1063,7 +1069,7 @@ static int registers_view_alloc(debug_view *view)
 	debug_view_registers *regdata = auto_alloc_clear(view->machine, debug_view_registers);
 
 	/* default to the first subview */
-	regdata->device = view->machine->debugvw_data->registers_subviews->device;
+	regdata->subview = view->machine->debugvw_data->registers_subviews;
 
 	/* stash the extra data pointer */
 	view->extra_data = regdata;
@@ -1088,65 +1094,6 @@ static void registers_view_free(debug_view *view)
 
 
 /*-------------------------------------------------
-    registers_view_add_register - adds a register
-    to the registers view
--------------------------------------------------*/
-
-static void registers_view_add_register(debug_view *view, int regnum, const char *str)
-{
-	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
-	int tagstart, taglen, valstart, vallen;
-	const char *colon;
-
-	colon = strchr(str, ':');
-
-	/* if no colon, mark everything as tag */
-	if (colon == NULL)
-	{
-		tagstart = 0;
-		taglen = (int)strlen(str);
-		valstart = 0;
-		vallen = 0;
-	}
-
-	/* otherwise, break the string at the colon */
-	else
-	{
-		tagstart = 0;
-		taglen = colon - str;
-		valstart = (colon + 1) - str;
-		vallen = (int)strlen(colon + 1);
-	}
-
-	/* now trim spaces */
-	while (isspace((UINT8)str[tagstart]) && taglen > 0)
-		tagstart++, taglen--;
-	while (isspace((UINT8)str[tagstart + taglen - 1]) && taglen > 0)
-		taglen--;
-	while (isspace((UINT8)str[valstart]) && vallen > 0)
-		valstart++, vallen--;
-	while (isspace((UINT8)str[valstart + vallen - 1]) && vallen > 0)
-		vallen--;
-	if (str[valstart] == '!')
-		valstart++, vallen--;
-
-	/* note the register number and info */
-	regdata->reg[view->total.y].lastval  =
-	regdata->reg[view->total.y].currval  = cpu_get_reg(regdata->device, regnum);
-	regdata->reg[view->total.y].regnum   = regnum;
-	regdata->reg[view->total.y].tagstart = tagstart;
-	regdata->reg[view->total.y].taglen   = taglen;
-	regdata->reg[view->total.y].valstart = valstart;
-	regdata->reg[view->total.y].vallen   = vallen;
-	view->total.y++;
-
-	/* adjust the divider and total cols, if necessary */
-	regdata->divider = MAX(regdata->divider, 1 + taglen + 1);
-	view->total.x = MAX(view->total.x, 1 + taglen + 2 + vallen + 1);
-}
-
-
-/*-------------------------------------------------
     registers_view_recompute - recompute all info
     for the registers view
 -------------------------------------------------*/
@@ -1154,13 +1101,7 @@ static void registers_view_add_register(debug_view *view, int regnum, const char
 static void registers_view_recompute(debug_view *view)
 {
 	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
-	int regnum, maxtaglen, maxvallen;
-	const cpu_state_table *table;
-
-	/* if no CPU, reset to the first one */
-	if (regdata->device == NULL)
-		regdata->device = view->machine->firstcpu;
-	table = cpu_get_state_table(regdata->device);
+	int maxtaglen, maxvallen;
 
 	/* reset the view parameters */
 	view->topleft.y = 0;
@@ -1170,100 +1111,84 @@ static void registers_view_recompute(debug_view *view)
 	regdata->divider = 0;
 
 	/* add a cycles entry: cycles:99999999 */
-	regdata->reg[view->total.y].lastval  =
-	regdata->reg[view->total.y].currval  = 0;
-	regdata->reg[view->total.y].regnum   = MAX_REGS + 1;
-	regdata->reg[view->total.y].tagstart = 0;
-	regdata->reg[view->total.y].taglen   = 6;
-	regdata->reg[view->total.y].valstart = 7;
-	regdata->reg[view->total.y].vallen   = 8;
-	maxtaglen = regdata->reg[view->total.y].taglen;
-	maxvallen = regdata->reg[view->total.y].vallen;
-	view->total.y++;
+	maxtaglen = 0;
+	maxvallen = 0;
+	if (regdata->subview->execintf != NULL)
+	{
+		regdata->reg[view->total.y].lastval  =
+		regdata->reg[view->total.y].currval  = 0;
+		regdata->reg[view->total.y].regnum   = REG_CYCLES;
+		regdata->reg[view->total.y].symbol.cpy("cycles");
+		regdata->reg[view->total.y].vallen   = 8;
+		maxtaglen = regdata->reg[view->total.y].symbol.len();
+		maxvallen = regdata->reg[view->total.y].vallen;
+		view->total.y++;
+	}
 
 	/* add a beam entry: beamx:123 */
 	regdata->reg[view->total.y].lastval  =
 	regdata->reg[view->total.y].currval  = 0;
-	regdata->reg[view->total.y].regnum   = MAX_REGS + 2;
-	regdata->reg[view->total.y].tagstart = 0;
-	regdata->reg[view->total.y].taglen   = 5;
-	regdata->reg[view->total.y].valstart = 6;
+	regdata->reg[view->total.y].regnum   = REG_BEAMX;
+	regdata->reg[view->total.y].symbol.cpy("beamx");
 	regdata->reg[view->total.y].vallen   = 3;
-	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].taglen);
+	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].symbol.len());
 	maxvallen = MAX(maxvallen, regdata->reg[view->total.y].vallen);
 	view->total.y++;
 
 	/* add a beam entry: beamy:456 */
 	regdata->reg[view->total.y].lastval  =
 	regdata->reg[view->total.y].currval  = 0;
-	regdata->reg[view->total.y].regnum   = MAX_REGS + 3;
-	regdata->reg[view->total.y].tagstart = 0;
-	regdata->reg[view->total.y].taglen   = 5;
-	regdata->reg[view->total.y].valstart = 6;
+	regdata->reg[view->total.y].regnum   = REG_BEAMY;
+	regdata->reg[view->total.y].symbol.cpy("beamy");
 	regdata->reg[view->total.y].vallen   = 3;
-	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].taglen);
+	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].symbol.len());
 	maxvallen = MAX(maxvallen, regdata->reg[view->total.y].vallen);
 	view->total.y++;
 
 	/* add a beam entry: frame:123456 */
 	regdata->reg[view->total.y].lastval  =
 	regdata->reg[view->total.y].currval  = 0;
-	regdata->reg[view->total.y].regnum   = MAX_REGS + 4;
-	regdata->reg[view->total.y].tagstart = 0;
-	regdata->reg[view->total.y].taglen   = 5;
-	regdata->reg[view->total.y].valstart = 6;
+	regdata->reg[view->total.y].regnum   = REG_FRAME;
+	regdata->reg[view->total.y].symbol.cpy("frame");
 	regdata->reg[view->total.y].vallen   = 6;
-	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].taglen);
+	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].symbol.len());
 	maxvallen = MAX(maxvallen, regdata->reg[view->total.y].vallen);
 	view->total.y++;
 
 	/* add a flags entry: flags:xxxxxxxx */
 	regdata->reg[view->total.y].lastval  =
 	regdata->reg[view->total.y].currval  = 0;
-	regdata->reg[view->total.y].regnum   = MAX_REGS + 5;
-	regdata->reg[view->total.y].tagstart = 0;
-	regdata->reg[view->total.y].taglen   = 5;
-	regdata->reg[view->total.y].valstart = 6;
-	regdata->reg[view->total.y].vallen   = (UINT32)strlen(cpu_get_flags_string(regdata->device));
-	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].taglen);
+	regdata->reg[view->total.y].regnum   = STATE_GENFLAGS;
+	regdata->reg[view->total.y].symbol.cpy("flags");
+	regdata->reg[view->total.y].vallen   = regdata->subview->stateintf->state_string_max_length(regdata->reg[view->total.y].regnum);
+	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].symbol.len());
 	maxvallen = MAX(maxvallen, regdata->reg[view->total.y].vallen);
 	view->total.y++;
 
 	/* add a divider entry */
 	regdata->reg[view->total.y].lastval  =
 	regdata->reg[view->total.y].currval  = 0;
-	regdata->reg[view->total.y].regnum   = MAX_REGS;
+	regdata->reg[view->total.y].regnum   = REG_DIVIDER;
 	view->total.y++;
+
+	/* add all registers into it */
+	for (const device_state_entry *entry = regdata->subview->stateintf->state_first(); entry != NULL; entry = entry->next())
+		if (entry->visible())
+		{
+			/* note the register number and info */
+			regdata->reg[view->total.y].lastval  =
+			regdata->reg[view->total.y].currval  = regdata->subview->stateintf->state_value(entry->index());
+			regdata->reg[view->total.y].regnum   = entry->index();
+			regdata->reg[view->total.y].symbol.cpy(entry->symbol());
+			regdata->reg[view->total.y].vallen   = regdata->subview->stateintf->state_string_max_length(entry->index());
+			maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].symbol.len());
+			maxvallen = MAX(maxvallen, regdata->reg[view->total.y].vallen);
+			view->total.y++;
+		}
 
 	/* set the current divider and total cols */
 	regdata->divider = 1 + maxtaglen + 1;
 	view->total.x = 1 + maxtaglen + 2 + maxvallen + 1;
-
-	/* add all registers into it */
-	for (regnum = 0; regnum < MAX_REGS; regnum++)
-	{
-		const char *str = NULL;
-		int regid;
-
-		/* identify the register id */
-		if (table != NULL)
-		{
-			if (regnum >= table->entrycount)
-				break;
-			if ((table->entrylist[regnum].validmask & table->subtypemask) == 0)
-				continue;
-			regid = table->entrylist[regnum].index;
-		}
-		else
-			regid = regnum;
-
-		/* retrieve the string for this register */
-		str = cpu_get_reg_string(regdata->device, regid);
-
-		/* did we get a string? */
-		if (str != NULL && str[0] != 0 && str[0] != '~')
-			registers_view_add_register(view, regid, str);
-	}
 
 	/* no longer need to recompute */
 	view->recompute = FALSE;
@@ -1277,18 +1202,20 @@ static void registers_view_recompute(debug_view *view)
 
 static void registers_view_update(debug_view *view)
 {
-	running_device *screen = view->machine->primary_screen;
+	screen_device *screen = view->machine->primary_screen;
 	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
 	debug_view_char *dest = view->viewdata;
 	UINT64 total_cycles;
 	UINT32 row, i;
 
 	/* if our assumptions changed, revisit them */
-	if (view->recompute || regdata->device == NULL)
+	if (view->recompute)
 		registers_view_recompute(view);
 
 	/* cannot update if no active CPU */
-	total_cycles = cpu_get_total_cycles(regdata->device);
+	total_cycles = 0;
+	if (regdata->subview->execintf != NULL)
+		total_cycles = regdata->subview->execintf->total_cycles();
 
 	/* loop over visible rows */
 	for (row = 0; row < view->visible.y; row++)
@@ -1301,57 +1228,62 @@ static void registers_view_update(debug_view *view)
 		{
 			debug_view_register *reg = &regdata->reg[effrow];
 			UINT32 effcol = view->topleft.x;
-			char temp[256], dummy[100];
 			UINT8 attrib = DCA_NORMAL;
 			UINT32 len = 0;
-			char *data = dummy;
+			astring valstr;
 
 			/* get the effective string */
-			dummy[0] = 0;
-			if (reg->regnum >= MAX_REGS)
+			if (reg->regnum >= REG_FRAME && reg->regnum <= REG_DIVIDER)
 			{
 				reg->lastval = reg->currval;
 				switch (reg->regnum)
 				{
-					case MAX_REGS:
-						reg->tagstart = reg->valstart = reg->vallen = 0;
-						reg->taglen = view->total.x;
+					case REG_DIVIDER:
+						reg->vallen = 0;
+						reg->symbol.reset();
 						for (i = 0; i < view->total.x; i++)
-							dummy[i] = '-';
-						dummy[i] = 0;
+							reg->symbol.cat("-");
 						break;
 
-					case MAX_REGS + 1:
-						sprintf(dummy, "cycles:%-8d", *cpu_get_icount_ptr(regdata->device));
-						reg->currval = *cpu_get_icount_ptr(regdata->device);
+					case REG_CYCLES:
+						if (regdata->subview->execintf != NULL)
+						{
+							reg->currval = regdata->subview->execintf->cycles_remaining();
+							valstr.printf("%-8d", (UINT32)reg->currval);
+						}
 						break;
 
-					case MAX_REGS + 2:
+					case REG_BEAMX:
 						if (screen != NULL)
-							sprintf(dummy, "beamx:%3d", video_screen_get_hpos(screen));
+						{
+							reg->currval = screen->hpos();
+							valstr.printf("%3d", (UINT32)reg->currval);
+						}
 						break;
 
-					case MAX_REGS + 3:
+					case REG_BEAMY:
 						if (screen != NULL)
-							sprintf(dummy, "beamy:%3d", video_screen_get_vpos(screen));
+						{
+							reg->currval = screen->vpos();
+							valstr.printf("%3d", (UINT32)reg->currval);
+						}
 						break;
 
-					case MAX_REGS + 4:
+					case REG_FRAME:
 						if (screen != NULL)
-							sprintf(dummy, "frame:%-6d", (UINT32)video_screen_get_frame_number(screen));
-						break;
-
-					case MAX_REGS + 5:
-						sprintf(dummy, "flags:%s", cpu_get_flags_string(regdata->device));
+						{
+							reg->currval = screen->frame_number();
+							valstr.printf("%3d", (UINT32)reg->currval);
+						}
 						break;
 				}
 			}
 			else
 			{
-				data = (char *)cpu_get_reg_string(regdata->device, reg->regnum);
 				if (regdata->last_update != total_cycles)
 					reg->lastval = reg->currval;
-				reg->currval = cpu_get_reg(regdata->device, reg->regnum);
+				reg->currval = regdata->subview->stateintf->state_value(reg->regnum);
+				regdata->subview->stateintf->state_string(reg->regnum, valstr);
 			}
 
 			/* see if we changed */
@@ -1359,19 +1291,20 @@ static void registers_view_update(debug_view *view)
 				attrib = DCA_CHANGED;
 
 			/* build up a string */
-			if (reg->taglen < regdata->divider - 1)
+			char temp[256];
+			if (reg->symbol.len() < regdata->divider - 1)
 			{
-				memset(&temp[len], ' ', regdata->divider - 1 - reg->taglen);
-				len += regdata->divider - 1 - reg->taglen;
+				memset(&temp[len], ' ', regdata->divider - 1 - reg->symbol.len());
+				len += regdata->divider - 1 - reg->symbol.len();
 			}
 
-			memcpy(&temp[len], &data[reg->tagstart], reg->taglen);
-			len += reg->taglen;
+			memcpy(&temp[len], reg->symbol.cstr(), reg->symbol.len());
+			len += reg->symbol.len();
 
 			temp[len++] = ' ';
 			temp[len++] = ' ';
 
-			memcpy(&temp[len], &data[reg->valstart], reg->vallen);
+			memcpy(&temp[len], valstr.cstr(), reg->vallen);
 			len += reg->vallen;
 
 			temp[len++] = ' ';
@@ -1431,7 +1364,7 @@ int registers_view_get_subview(debug_view *view)
 
 	for (subview = view->machine->debugvw_data->registers_subviews; subview != NULL; subview = subview->next)
 	{
-		if (subview->device == regdata->device)
+		if (regdata->subview == subview)
 			return index;
 		index++;
 	}
@@ -1455,10 +1388,10 @@ void registers_view_set_subview(debug_view *view, int index)
 		return;
 
 	/* handle a change */
-	if (subview->device != regdata->device)
+	if (regdata->subview != subview)
 	{
 		debug_view_begin_update(view);
-		regdata->device = subview->device;
+		regdata->subview = subview;
 		view->recompute = view->update_pending = TRUE;
 		debug_view_end_update(view);
 	}
@@ -1482,23 +1415,20 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	for (running_device *cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	device_execute_interface *exec;
+	for (bool gotone = machine->devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
-		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
-		if (space != NULL)
-		{
-			disasm_subview_item *subview = auto_alloc(machine, disasm_subview_item);
+		disasm_subview_item *subview = auto_alloc(machine, disasm_subview_item);
 
-			/* populate the subview */
-			subview->next = NULL;
-			subview->index = curindex++;
-			subview->name.printf("CPU '%s' (%s)", cpu->tag(), cpu->name());
-			subview->space = space;
+		/* populate the subview */
+		subview->next = NULL;
+		subview->index = curindex++;
+		subview->name.printf("%s '%s'", exec->device().name(), exec->device().tag());
+		subview->space = cpu_get_address_space(*exec, ADDRESS_SPACE_PROGRAM);
 
-			/* add to the list */
-			*tailptr = subview;
-			tailptr = &subview->next;
-		}
+		/* add to the list */
+		*tailptr = subview;
+		tailptr = &subview->next;
 	}
 
 	return head;
@@ -1514,7 +1444,7 @@ static int disasm_view_alloc(debug_view *view)
 {
 	debug_view_disasm *dasmdata;
 	int total_comments = 0;
-	running_device *cpu;
+	device_t *cpu;
 
 	/* fail if no available subviews */
 	if (view->machine->debugvw_data->disasm_subviews == NULL)
@@ -1663,8 +1593,11 @@ static void disasm_view_char(debug_view *view, int chval)
 
 static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t targetpc, int numinstrs)
 {
-	int minlen = memory_byte_to_address(space, cpu_get_min_opcode_bytes(space->cpu));
-	int maxlen = memory_byte_to_address(space, cpu_get_max_opcode_bytes(space->cpu));
+	cpu_device *cpudevice = downcast<cpu_device *>(space->cpu);
+	assert(cpudevice != NULL);
+	
+	int minlen = memory_byte_to_address(space, cpudevice->min_opcode_bytes());
+	int maxlen = memory_byte_to_address(space, cpudevice->max_opcode_bytes());
 	offs_t targetpcbyte = memory_address_to_byte(space, targetpc) & space->logbytemask;
 	offs_t lastgoodpc = targetpc;
 	offs_t fillpcbyte, curpc;
@@ -1778,8 +1711,10 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 	dasmdata->divider2 = dasmdata->divider1 + 1 + dasmdata->dasm_width + 1;
 
 	/* determine how many bytes we might need to display */
-	minbytes = cpu_get_min_opcode_bytes(space->cpu);
-	maxbytes = cpu_get_max_opcode_bytes(space->cpu);
+	cpu_device *cpudevice = downcast<cpu_device *>(space->cpu);
+	assert(cpudevice != NULL);
+	minbytes = cpudevice->min_opcode_bytes();
+	maxbytes = cpudevice->max_opcode_bytes();
 
 	/* ensure that the PC is aligned to the minimum opcode size */
 	pc &= ~memory_byte_to_address_end(space, minbytes - 1);
@@ -2353,10 +2288,11 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	int curindex = 0;
 
 	/* first add all the device's address spaces */
-	for (running_device *device = machine->devicelist.first(); device != NULL; device = device->next)
+	device_memory_interface *memintf;
+	for (bool gotone = machine->devicelist.first(memintf); gotone; gotone = memintf->next(memintf))
 		for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
-			const address_space *space = device->space(spacenum);
+			const address_space *space = memintf->space(spacenum);
 			if (space != NULL)
 			{
 				memory_subview_item *subview = auto_alloc(machine, memory_subview_item);
@@ -2364,10 +2300,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 				/* populate the subview */
 				subview->next = NULL;
 				subview->index = curindex++;
-				if (device->type == CPU)
-					subview->name.printf("CPU '%s' (%s) %s memory", device->tag(), device->name(), space->name);
-				else
-					subview->name.printf("%s '%s' space #%d memory", device->name(), device->tag(), spacenum);
+				subview->name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space->name);
 				subview->space = space;
 				subview->endianness = space->endianness;
 				subview->prefsize = space->dbits / 8;
@@ -2379,7 +2312,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 		}
 
 	/* then add all the memory regions */
-	for (const region_info *region = machine->regionlist.first(); region != NULL; region = region->next)
+	for (const region_info *region = machine->regionlist.first(); region != NULL; region = region->next())
 	{
 		memory_subview_item *subview = auto_alloc(machine, memory_subview_item);
 
@@ -2823,7 +2756,7 @@ static int memory_view_needs_recompute(debug_view *view)
 	int recompute = view->recompute;
 
 	/* handle expression changes */
-	if (debug_view_expression_changed_value(view, &memdata->expression, (space != NULL && space->cpu != NULL && space->cpu->type == CPU) ? space->cpu : NULL))
+	if (debug_view_expression_changed_value(view, &memdata->expression, (space != NULL && space->cpu != NULL && space->cpu->type() == CPU) ? space->cpu : NULL))
 	{
 		offs_t resultbyte;
 

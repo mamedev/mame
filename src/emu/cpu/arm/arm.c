@@ -233,7 +233,7 @@ typedef struct
 	UINT32 coproRegister[16];
 	UINT8 pendingIrq;
 	UINT8 pendingFiq;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 } ARM_REGS;
@@ -253,10 +253,9 @@ static void arm_check_irq_state(ARM_REGS* cpustate);
 INLINE ARM_REGS *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ARM);
-	return (ARM_REGS *)device->token;
+	return (ARM_REGS *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE void cpu_write32( ARM_REGS* cpustate, int addr, UINT32 data )
@@ -312,11 +311,11 @@ static CPU_RESET( arm )
 {
 	ARM_REGS *cpustate = get_safe_token(device);
 
-	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(ARM_REGS));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
@@ -501,7 +500,7 @@ static CPU_INIT( arm )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
 	state_save_register_device_item_array(device, 0, cpustate->coproRegister);
@@ -1436,7 +1435,7 @@ static CPU_SET_INFO( arm )
 
 CPU_GET_INFO( arm )
 {
-	ARM_REGS *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	ARM_REGS *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

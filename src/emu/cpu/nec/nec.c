@@ -160,7 +160,7 @@ struct _nec_state_t
 	UINT32	poll_state;
 	UINT8	no_interrupt;
 
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
@@ -184,14 +184,13 @@ struct _nec_state_t
 INLINE nec_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_V20 ||
 		   cpu_get_type(device) == CPU_V25 ||
 		   cpu_get_type(device) == CPU_V30 ||
 		   cpu_get_type(device) == CPU_V33 ||
 		   cpu_get_type(device) == CPU_V35);
-	return (nec_state_t *)device->token;
+	return (nec_state_t *)downcast<cpu_device *>(device)->token();
 }
 
 /* The interrupt number of a pending external interrupt pending NMI is 2.   */
@@ -1101,9 +1100,9 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
-static void nec_init(running_device *device, cpu_irq_callback irqcallback, int type)
+static void nec_init(running_device *device, device_irq_callback irqcallback, int type)
 {
-	const nec_config *config = device->baseconfig().static_config ? (const nec_config *)device->baseconfig().static_config : &default_config;
+	const nec_config *config = device->baseconfig().static_config() ? (const nec_config *)device->baseconfig().static_config() : &default_config;
 	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_state->config = config;
@@ -1131,8 +1130,8 @@ static void nec_init(running_device *device, cpu_irq_callback irqcallback, int t
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;
-	nec_state->program = device->space(AS_PROGRAM);
-	nec_state->io = device->space(AS_IO);
+	nec_state->program = device_memory(device)->space(AS_PROGRAM);
+	nec_state->io = device_memory(device)->space(AS_IO);
 }
 
 
@@ -1321,7 +1320,7 @@ static CPU_SET_INFO( nec )
 
 static CPU_GET_INFO( nec )
 {
-	nec_state_t *nec_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	nec_state_t *nec_state = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	int flags;
 
 	switch (state)

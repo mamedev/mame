@@ -375,7 +375,7 @@ VIDEO_START( locomotn )
 	state->fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
 
 	/* handle reduced visible area in some games */
-	if (video_screen_get_visible_area(machine->primary_screen)->max_x == 32 * 8 - 1)
+	if (machine->primary_screen->visible_area().max_x == 32 * 8 - 1)
 	{
 		tilemap_set_scrolldx(state->bg_tilemap, 0, 32);
 		tilemap_set_scrolldx(state->fg_tilemap, 0, 32);
@@ -396,7 +396,7 @@ VIDEO_START( commsega )
 	state->fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
 
 	/* handle reduced visible area in some games */
-	if (video_screen_get_visible_area(machine->primary_screen)->max_x == 32 * 8 - 1)
+	if (machine->primary_screen->visible_area().max_x == 32 * 8 - 1)
 	{
 		tilemap_set_scrolldx(state->bg_tilemap, 0, 32);
 		tilemap_set_scrolldx(state->fg_tilemap, 0, 32);
@@ -710,7 +710,7 @@ VIDEO_UPDATE( locomotn )
 	if (flip_screen_get(screen->machine))
 	{
 		/* handle reduced visible area in some games */
-		if (video_screen_get_visible_area(screen)->max_x == 32 * 8 - 1)
+		if (screen->visible_area().max_x == 32 * 8 - 1)
 		{
 			bg_clip.min_x = 4 * 8;
 			fg_clip.max_x = 4 * 8 - 1;

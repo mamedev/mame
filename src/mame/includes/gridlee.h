@@ -6,13 +6,14 @@
 
 ***************************************************************************/
 
+#include "devlegcy.h"
+
 
 /*----------- defined in audio/gridlee.c -----------*/
 
 WRITE8_HANDLER( gridlee_sound_w );
 
-DEVICE_GET_INFO( gridlee_sound );
-#define SOUND_GRIDLEE DEVICE_GET_INFO_NAME(gridlee_sound)
+DECLARE_LEGACY_SOUND_DEVICE(GRIDLEE, gridlee_sound);
 
 
 /*----------- defined in video/gridlee.c -----------*/

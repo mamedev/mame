@@ -675,7 +675,7 @@ static void vga_cpu_interface(running_machine *machine)
 	}
 	else
 	{
-		buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
+		buswidth = downcast<cpu_device *>(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 		switch(buswidth)
 		{
 			case 8:
@@ -1265,8 +1265,8 @@ void pc_vga_init(running_machine *machine, const struct pc_vga_interface *vga_in
 	memset(vga.crtc.data, '\0', vga.svga_intf.crtc_regcount);
 	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
-	buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
-	spacevga =cpu_get_address_space(machine->firstcpu,vga.vga_intf.port_addressspace);
+	buswidth = downcast<cpu_device *>(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	spacevga = cpu_get_address_space(machine->firstcpu,vga.vga_intf.port_addressspace);
 	switch(buswidth)
 	{
 		case 8:

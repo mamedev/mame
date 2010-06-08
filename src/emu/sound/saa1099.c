@@ -171,10 +171,8 @@ static const UINT8 envelope[8][64] = {
 INLINE saa1099_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SAA1099);
-	return (saa1099_state *)device->token;
+	assert(device->type() == SOUND_SAA1099);
+	return (saa1099_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -327,7 +325,7 @@ static DEVICE_START( saa1099 )
 
 	/* copy global parameters */
 	saa->device = device;
-	saa->sample_rate = device->clock / 256;
+	saa->sample_rate = device->clock() / 256;
 
 	/* for each chip allocate one stream */
 	saa->stream = stream_create(device, 0, 2, saa->sample_rate, saa, saa1099_update);

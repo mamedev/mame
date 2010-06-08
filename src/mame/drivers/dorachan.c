@@ -134,7 +134,7 @@ static CUSTOM_INPUT( dorachan_v128_r )
 	dorachan_state *state = (dorachan_state *)field->port->machine->driver_data;
 
 	/* to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped */
-	return ((video_screen_get_vpos(field->port->machine->primary_screen) >> 7) & 0x01) ^ state->flip_screen;
+	return ((field->port->machine->primary_screen->vpos() >> 7) & 0x01) ^ state->flip_screen;
 }
 
 

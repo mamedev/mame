@@ -29,14 +29,14 @@ static double color_weights_rg[3], color_weights_b[2];
 
 WRITE8_HANDLER( spacefb_port_0_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	port_0 = data;
 }
 
 
 WRITE8_HANDLER( spacefb_port_2_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	port_2 = data;
 }
 
@@ -90,8 +90,8 @@ VIDEO_START( spacefb )
 							 2, resistances_b,  color_weights_b,  470, 0,
 							 0, 0, 0, 0, 0);
 
-	width = video_screen_get_width(machine->primary_screen);
-	height = video_screen_get_height(machine->primary_screen);
+	width = machine->primary_screen->width();
+	height = machine->primary_screen->height();
 	object_present_map = auto_alloc_array(machine, UINT8, width * height);
 
 	/* this start value positions the stars to match the flyer screen shot,
@@ -147,7 +147,7 @@ static void get_starfield_pens(pen_t *pens)
 }
 
 
-static void draw_starfield(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_starfield(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y;
 	pen_t pens[NUM_STARFIELD_PENS];
@@ -155,7 +155,7 @@ static void draw_starfield(running_device *screen, bitmap_t *bitmap, const recta
 	get_starfield_pens(pens);
 
 	/* the shift register is always shifting -- do the portion in the top VBLANK */
-	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
+	if (cliprect->min_y == screen.visible_area().min_y)
 	{
 		int i;
 
@@ -190,7 +190,7 @@ static void draw_starfield(running_device *screen, bitmap_t *bitmap, const recta
 	}
 
 	/* do the shifting in the bottom VBLANK */
-	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
+	if (cliprect->max_y == screen.visible_area().max_y)
 	{
 		int i;
 		int clock_count = (SPACEFB_HBSTART - SPACEFB_HBEND) * (SPACEFB_VTOTAL - SPACEFB_VBSTART);
@@ -404,7 +404,7 @@ static void draw_objects(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( spacefb )
 {
 	draw_objects(screen->machine, bitmap, cliprect);
-	draw_starfield(screen, bitmap, cliprect);
+	draw_starfield(*screen, bitmap, cliprect);
 
 	return 0;
 }

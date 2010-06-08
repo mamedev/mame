@@ -64,7 +64,7 @@ static MACHINE_RESET( cyberbal )
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_slapstic_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_scanline_timer_reset(machine->primary_screen, cyberbal_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine->primary_screen, cyberbal_scanline_update, 8);
 	atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
 
 	cyberbal_sound_reset(machine);
@@ -88,7 +88,7 @@ static MACHINE_RESET( cyberbal2p )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, cyberbal2p_update_interrupts);
-	atarigen_scanline_timer_reset(machine->primary_screen, cyberbal_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine->primary_screen, cyberbal_scanline_update, 8);
 	atarijsa_reset();
 }
 

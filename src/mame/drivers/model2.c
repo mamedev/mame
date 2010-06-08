@@ -111,7 +111,7 @@ static UINT16 *model2_soundram = NULL;
 
 static UINT32 model2_timervals[4], model2_timerorig[4];
 static int      model2_timerrun[4];
-static running_device *model2_timers[4];
+static timer_device *model2_timers[4];
 static int model2_ctrlmode;
 static int analog_channel;
 
@@ -315,7 +315,7 @@ static READ32_HANDLER( timers_r )
 	if (model2_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		UINT32 cur = attotime_to_double(attotime_mul(timer_device_timeelapsed(model2_timers[offset]), 25000000));
+		UINT32 cur = attotime_to_double(attotime_mul(model2_timers[offset]->time_elapsed(), 25000000));
 
 		// subtract units from starting value
 		model2_timervals[offset] = model2_timerorig[offset] - cur;
@@ -333,7 +333,7 @@ static WRITE32_HANDLER( timers_w )
 
 	model2_timerorig[offset] = model2_timervals[offset];
 	period = attotime_mul(ATTOTIME_IN_HZ(25000000), model2_timerorig[offset]);
-	timer_device_adjust_oneshot(model2_timers[offset], period, 0);
+	model2_timers[offset]->adjust(period);
 	model2_timerrun[offset] = 1;
 }
 
@@ -342,12 +342,12 @@ static TIMER_DEVICE_CALLBACK( model2_timer_cb )
 	int tnum = (int)(FPTR)ptr;
 	int bit = tnum + 2;
 
-	timer_device_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
+	model2_timers[tnum]->reset();
 
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
 	{
-		cputag_set_input_line(timer->machine, "maincpu", I960_IRQ2, ASSERT_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", I960_IRQ2, ASSERT_LINE);
 	}
 
 	model2_timervals[tnum] = 0;
@@ -374,12 +374,12 @@ static MACHINE_RESET(model2_common)
 
 	model2_timerrun[0] = model2_timerrun[1] = model2_timerrun[2] = model2_timerrun[3] = 0;
 
-	model2_timers[0] = devtag_get_device(machine, "timer0");
-	model2_timers[1] = devtag_get_device(machine, "timer1");
-	model2_timers[2] = devtag_get_device(machine, "timer2");
-	model2_timers[3] = devtag_get_device(machine, "timer3");
+	model2_timers[0] = machine->device<timer_device>("timer0");
+	model2_timers[1] = machine->device<timer_device>("timer1");
+	model2_timers[2] = machine->device<timer_device>("timer2");
+	model2_timers[3] = machine->device<timer_device>("timer3");
 	for (i=0; i<4; i++)
-		timer_device_adjust_oneshot(model2_timers[i], attotime_never, 0);
+		model2_timers[i]->reset();
 }
 
 static MACHINE_RESET(model2o)
@@ -454,7 +454,7 @@ static WRITE32_HANDLER( ctrl0_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		running_device *device = devtag_get_device(space->machine, "eeprom");
+		eeprom_device *device = space->machine->device<eeprom_device>("eeprom");
 		model2_ctrlmode = data & 0x01;
 		eeprom_write_bit(device, data & 0x20);
 		eeprom_set_clock_line(device, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -483,7 +483,7 @@ static READ32_HANDLER( fifoctl_r )
 
 static READ32_HANDLER( videoctl_r )
 {
-	return (video_screen_get_frame_number(space->machine->primary_screen) & 1) << 2;
+	return (space->machine->primary_screen->frame_number() & 1) << 2;
 }
 
 static CUSTOM_INPUT( _1c00000_r )

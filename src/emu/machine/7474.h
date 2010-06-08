@@ -40,6 +40,8 @@
 #ifndef TTL7474_H
 #define TTL7474_H
 
+#include "devlegcy.h"
+
 
 typedef struct _ttl7474_config ttl7474_config;
 struct _ttl7474_config
@@ -62,8 +64,6 @@ WRITE_LINE_DEVICE_HANDLER( ttl7474_d_w );
 READ_LINE_DEVICE_HANDLER( ttl7474_output_r );
 READ_LINE_DEVICE_HANDLER( ttl7474_output_comp_r );	/* NOT strictly the same as !ttl7474_output_r() */
 
-/* device get info callback */
-#define TTL7474 DEVICE_GET_INFO_NAME(ttl7474)
-DEVICE_GET_INFO( ttl7474 );
+DECLARE_LEGACY_DEVICE(TTL7474, ttl7474);
 
 #endif

@@ -492,82 +492,11 @@ const UINT8 m68ki_ea_idx_cycle_table[64] =
 #define MASK_030_OR_LATER			(CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)
 #define MASK_040_OR_LATER			(CPU_TYPE_040 | CPU_TYPE_EC040)
 
-#define M68K_STATE_ENTRY(_name, _format, _member, _datamask, _flags, _mask) \
-	CPU_STATE_ENTRY(M68K_##_name, #_name, _format, m68ki_cpu_core, _member, _datamask, _mask, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	M68K_STATE_ENTRY(PC,  "%06X", pc, 0xffffff, 0, MASK_24BIT_SPACE)
-	M68K_STATE_ENTRY(PC,  "%08X", pc, 0xffffffff, 0, MASK_32BIT_SPACE)
-	M68K_STATE_ENTRY(GENPC, "%06X", pc, 0xffffff, CPUSTATE_NOSHOW, MASK_24BIT_SPACE)
-	M68K_STATE_ENTRY(GENPC, "%08X", pc, 0xffffffff, CPUSTATE_NOSHOW, MASK_32BIT_SPACE)
-	M68K_STATE_ENTRY(GENPCBASE, "%06X", ppc, 0xffffff, CPUSTATE_NOSHOW, MASK_24BIT_SPACE)
-	M68K_STATE_ENTRY(GENPCBASE, "%08X", ppc, 0xffffffff, CPUSTATE_NOSHOW, MASK_32BIT_SPACE)
-
-	M68K_STATE_ENTRY(SP,  "%08X", dar[15], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(GENSP, "%08X", dar[15], 0xffffffff, CPUSTATE_NOSHOW, MASK_ALL)
-
-	M68K_STATE_ENTRY(ISP, "%08X", iotemp, 0xffffffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT, MASK_ALL)
-	M68K_STATE_ENTRY(USP, "%08X", iotemp, 0xffffffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT, MASK_ALL)
-	M68K_STATE_ENTRY(MSP, "%08X", iotemp, 0xffffffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT, MASK_020_OR_LATER)
-	M68K_STATE_ENTRY(SR, "%04X", iotemp, 0xffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT, MASK_ALL)
-
-	M68K_STATE_ENTRY(D0, "%08X", dar[0], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(D1, "%08X", dar[1], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(D2, "%08X", dar[2], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(D3, "%08X", dar[3], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(D4, "%08X", dar[4], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(D5, "%08X", dar[5], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(D6, "%08X", dar[6], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(D7, "%08X", dar[7], 0xffffffff, 0, MASK_ALL)
-
-	M68K_STATE_ENTRY(A0, "%08X", dar[8], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(A1, "%08X", dar[9], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(A2, "%08X", dar[10], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(A3, "%08X", dar[11], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(A4, "%08X", dar[12], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(A5, "%08X", dar[13], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(A6, "%08X", dar[14], 0xffffffff, 0, MASK_ALL)
-	M68K_STATE_ENTRY(A7, "%08X", dar[15], 0xffffffff, 0, MASK_ALL)
-
-	M68K_STATE_ENTRY(PREF_ADDR, "%06X", pref_addr, 0xffffff, 0, MASK_24BIT_SPACE)
-	M68K_STATE_ENTRY(PREF_ADDR, "%08X", pref_addr, 0xffffffff, 0, MASK_32BIT_SPACE)
-	M68K_STATE_ENTRY(PREF_DATA, "%08X", pref_data, 0xffffffff, 0, MASK_ALL)
-
-	M68K_STATE_ENTRY(SFC, "%01X", sfc, 0x7, 0, MASK_010_OR_LATER)
-	M68K_STATE_ENTRY(DFC, "%01X", dfc, 0x7, 0, MASK_010_OR_LATER)
-	M68K_STATE_ENTRY(VBR, "%08X", vbr, 0xffffffff, 0, MASK_010_OR_LATER)
-
-	M68K_STATE_ENTRY(CACR, "%08X", cacr, 0xffffffff, 0, MASK_020_OR_LATER)
-	M68K_STATE_ENTRY(CAAR, "%08X", caar, 0xffffffff, 0, MASK_020_OR_LATER)
-
-	M68K_STATE_ENTRY(FP0, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FP1, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FP2, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FP3, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FP4, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FP5, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FP6, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FP7, "%s", iotemp, 0xffffffff, CPUSTATE_EXPORT, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FPSR, "%08X", fpsr, 0xffffffff, 0, MASK_030_OR_LATER)
-	M68K_STATE_ENTRY(FPCR, "%08X", fpcr, 0xffffffff, 0, MASK_030_OR_LATER)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
-};
-
-
 
 INLINE m68ki_cpu_core *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M68000 ||
 		   cpu_get_type(device) == CPU_M68008 ||
 		   cpu_get_type(device) == CPU_M68010 ||
@@ -579,7 +508,7 @@ INLINE m68ki_cpu_core *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_M68EC040 ||
 		   cpu_get_type(device) == CPU_M68040 ||
 		   cpu_get_type(device) == CPU_SCC68070);
-	return (m68ki_cpu_core *)device->token;
+	return (m68ki_cpu_core *)downcast<cpu_device *>(device)->token();
 }
 
 /* ======================================================================== */
@@ -708,7 +637,7 @@ static CPU_INIT( m68k )
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	m68k->device = device;
-	m68k->program = device->space(AS_PROGRAM);
+	m68k->program = device_memory(device)->space(AS_PROGRAM);
 	m68k->int_ack_callback = irqcallback;
 
 	/* The first call to this function initializes the opcode handler jump table */
@@ -717,10 +646,6 @@ static CPU_INIT( m68k )
 		m68ki_build_opcode_table();
 		emulation_initialized = 1;
 	}
-
-	/* set up the state table */
-	m68k->state = state_table_template;
-	m68k->state.baseptr = m68k;
 
 	/* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
 	state_save_register_device_item_array(device, 0, REG_D);
@@ -802,9 +727,10 @@ static CPU_IMPORT_STATE( m68k )
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
-	switch (entry->index)
+	switch (entry.index())
 	{
 		case M68K_SR:
+		case STATE_GENFLAGS:
 			m68ki_set_sr(m68k, m68k->iotemp);
 			break;
 
@@ -840,9 +766,10 @@ static CPU_EXPORT_STATE( m68k )
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
-	switch (entry->index)
+	switch (entry.index())
 	{
 		case M68K_SR:
+		case STATE_GENFLAGS:
 			m68k->iotemp = m68ki_get_sr(m68k);
 			break;
 
@@ -897,47 +824,68 @@ static CPU_SET_INFO( m68k )
 static CPU_EXPORT_STRING( m68k )
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
+	UINT16 sr;
 
-	switch (entry->index)
+	switch (entry.index())
 	{
 		case M68K_FP0:
-			sprintf(string, "%f", fx80_to_double(REG_FP[0]));
+			string.printf("%f", fx80_to_double(REG_FP[0]));
 			break;
 
 		case M68K_FP1:
-			sprintf(string, "%f", fx80_to_double(REG_FP[1]));
+			string.printf("%f", fx80_to_double(REG_FP[1]));
 			break;
 
 		case M68K_FP2:
-			sprintf(string, "%f", fx80_to_double(REG_FP[2]));
+			string.printf("%f", fx80_to_double(REG_FP[2]));
 			break;
 
 		case M68K_FP3:
-			sprintf(string, "%f", fx80_to_double(REG_FP[3]));
+			string.printf("%f", fx80_to_double(REG_FP[3]));
 			break;
 
 		case M68K_FP4:
-			sprintf(string, "%f", fx80_to_double(REG_FP[4]));
+			string.printf("%f", fx80_to_double(REG_FP[4]));
 			break;
 
 		case M68K_FP5:
-			sprintf(string, "%f", fx80_to_double(REG_FP[5]));
+			string.printf("%f", fx80_to_double(REG_FP[5]));
 			break;
 
 		case M68K_FP6:
-			sprintf(string, "%f", fx80_to_double(REG_FP[6]));
+			string.printf("%f", fx80_to_double(REG_FP[6]));
 			break;
 
 		case M68K_FP7:
-			sprintf(string, "%f", fx80_to_double(REG_FP[7]));
+			string.printf("%f", fx80_to_double(REG_FP[7]));
+			break;
+		
+		case STATE_GENFLAGS:
+			sr = m68ki_get_sr(m68k);
+			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				sr & 0x8000 ? 'T':'.',
+				sr & 0x4000 ? 't':'.',
+				sr & 0x2000 ? 'S':'.',
+				sr & 0x1000 ? 'M':'.',
+				sr & 0x0800 ? '?':'.',
+				sr & 0x0400 ? 'I':'.',
+				sr & 0x0200 ? 'I':'.',
+				sr & 0x0100 ? 'I':'.',
+				sr & 0x0080 ? '?':'.',
+				sr & 0x0040 ? '?':'.',
+				sr & 0x0020 ? '?':'.',
+				sr & 0x0010 ? 'X':'.',
+				sr & 0x0008 ? 'N':'.',
+				sr & 0x0004 ? 'Z':'.',
+				sr & 0x0002 ? 'V':'.',
+				sr & 0x0001 ? 'C':'.');
 			break;
 	}
 }
 
 static CPU_GET_INFO( m68k )
 {
-	m68ki_cpu_core *m68k = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-	int sr;
+	m68ki_cpu_core *m68k = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -979,7 +927,6 @@ static CPU_GET_INFO( m68k )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &m68k->state;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per-core */						break;
@@ -987,27 +934,6 @@ static CPU_GET_INFO( m68k )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.60");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB)"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sr = m68ki_get_sr(m68k);
-			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-				sr & 0x8000 ? 'T':'.',
-				sr & 0x4000 ? '?':'.',
-				sr & 0x2000 ? 'S':'.',
-				sr & 0x1000 ? '?':'.',
-				sr & 0x0800 ? '?':'.',
-				sr & 0x0400 ? 'I':'.',
-				sr & 0x0200 ? 'I':'.',
-				sr & 0x0100 ? 'I':'.',
-				sr & 0x0080 ? '?':'.',
-				sr & 0x0040 ? '?':'.',
-				sr & 0x0020 ? '?':'.',
-				sr & 0x0010 ? 'X':'.',
-				sr & 0x0008 ? 'N':'.',
-				sr & 0x0004 ? 'Z':'.',
-				sr & 0x0002 ? 'V':'.',
-				sr & 0x0001 ? 'C':'.');
-			break;
 	}
 }
 
@@ -1309,6 +1235,61 @@ void m68k_set_tas_callback(running_device *device, m68k_tas_func callback)
 
 
 /****************************************************************************
+ * State definition
+ ****************************************************************************/
+
+static void define_state(running_device *device)
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+	UINT32 addrmask = (m68k->cpu_type & MASK_24BIT_SPACE) ? 0xffffff : 0xffffffff;
+
+	device_state_interface *state;
+	device->interface(state);
+	state->state_add(M68K_PC,         "PC",        m68k->pc).mask(addrmask);
+	state->state_add(STATE_GENPC,     "GENPC",     m68k->pc).mask(addrmask).noshow();
+	state->state_add(STATE_GENPCBASE, "GENPCBASE", m68k->ppc).mask(addrmask).noshow();
+	state->state_add(M68K_SP,         "SP",        m68k->dar[15]);
+	state->state_add(STATE_GENSP,     "GENSP",     m68k->dar[15]).noshow();
+	state->state_add(STATE_GENFLAGS,  "GENFLAGS",  m68k->iotemp).noshow().callimport().callexport().formatstr("%16s");
+	state->state_add(M68K_ISP,        "ISP",       m68k->iotemp).callimport().callexport();
+	state->state_add(M68K_USP,        "USP",       m68k->iotemp).callimport().callexport();
+	if (m68k->cpu_type & MASK_020_OR_LATER)
+		state->state_add(M68K_MSP,    "MSP",       m68k->iotemp).callimport().callexport();
+	state->state_add(M68K_ISP,        "ISP",       m68k->iotemp).callimport().callexport();
+
+	astring tempstr;
+	for (int regnum = 0; regnum < 8; regnum++)
+		state->state_add(M68K_D0 + regnum, tempstr.format("D%d", regnum), m68k->dar[regnum]);
+	for (int regnum = 0; regnum < 8; regnum++)
+		state->state_add(M68K_A0 + regnum, tempstr.format("A%d", regnum), m68k->dar[8 + regnum]);
+
+	state->state_add(M68K_PREF_ADDR,  "PREF_ADDR", m68k->pref_addr).mask(addrmask);
+	state->state_add(M68K_PREF_DATA,  "PREF_DATA", m68k->pref_data);
+
+	if (m68k->cpu_type & MASK_010_OR_LATER)
+	{
+		state->state_add(M68K_SFC,    "SFC",       m68k->sfc).mask(0x7);
+		state->state_add(M68K_DFC,    "DFC",       m68k->dfc).mask(0x7);
+		state->state_add(M68K_VBR,    "VBR",       m68k->vbr);
+	}
+
+	if (m68k->cpu_type & MASK_020_OR_LATER)
+	{
+		state->state_add(M68K_CACR,   "CACR",      m68k->cacr);
+		state->state_add(M68K_CAAR,   "CAAR",      m68k->caar);
+	}
+
+	if (m68k->cpu_type & MASK_030_OR_LATER)
+	{
+		for (int regnum = 0; regnum < 8; regnum++)
+			state->state_add(M68K_FP0 + regnum, tempstr.format("FP%d", regnum), m68k->iotemp).callimport().callexport().formatstr("%10s");
+		state->state_add(M68K_FPSR, "FPSR", m68k->fpsr);
+		state->state_add(M68K_FPCR, "FPCR", m68k->fpcr);
+	}
+}
+
+
+/****************************************************************************
  * 68000 section
  ****************************************************************************/
 
@@ -1319,7 +1300,6 @@ static CPU_INIT( m68000 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_000;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68000;
 	m68k->memory           = interface_d16;
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1335,6 +1315,8 @@ static CPU_INIT( m68000 )
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
 	m68k->has_pmmu	       = 0;
+	
+	define_state(device);
 }
 
 CPU_GET_INFO( m68000 )
@@ -1363,7 +1345,6 @@ static CPU_INIT( m68008 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_008;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68008;
 	m68k->memory           = interface_d8;
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1379,6 +1360,8 @@ static CPU_INIT( m68008 )
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
 	m68k->has_pmmu	       = 0;
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68008 )
@@ -1411,7 +1394,6 @@ static CPU_INIT( m68010 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_010;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68010;
 	m68k->memory           = interface_d16;
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1427,6 +1409,8 @@ static CPU_INIT( m68010 )
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 130;
 	m68k->has_pmmu	       = 0;
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68010 )
@@ -1455,7 +1439,6 @@ static CPU_INIT( m68020 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_020;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68020;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1471,13 +1454,12 @@ static CPU_INIT( m68020 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 0;
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68020 )
 {
-	m68ki_cpu_core *m68k = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-	int sr;
-
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1493,27 +1475,6 @@ CPU_GET_INFO( m68020 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "68020");				break;
-
-		case CPUINFO_STR_FLAGS:
-			sr = m68ki_get_sr(m68k);
-			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-				sr & 0x8000 ? 'T':'.',
-				sr & 0x4000 ? 't':'.',
-				sr & 0x2000 ? 'S':'.',
-				sr & 0x1000 ? 'M':'.',
-				sr & 0x0800 ? '?':'.',
-				sr & 0x0400 ? 'I':'.',
-				sr & 0x0200 ? 'I':'.',
-				sr & 0x0100 ? 'I':'.',
-				sr & 0x0080 ? '?':'.',
-				sr & 0x0040 ? '?':'.',
-				sr & 0x0020 ? '?':'.',
-				sr & 0x0010 ? 'X':'.',
-				sr & 0x0008 ? 'N':'.',
-				sr & 0x0004 ? 'Z':'.',
-				sr & 0x0002 ? 'V':'.',
-				sr & 0x0001 ? 'C':'.');
-			break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -1555,7 +1516,6 @@ static CPU_INIT( m68ec020 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_EC020;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68EC020;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1571,6 +1531,8 @@ static CPU_INIT( m68ec020 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 0;
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68ec020 )
@@ -1601,7 +1563,6 @@ static CPU_INIT( m68030 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_030;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68030;
 	m68k->memory           = interface_d32_mmu;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1617,13 +1578,12 @@ static CPU_INIT( m68030 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 1;
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68030 )
 {
-	m68ki_cpu_core *m68k = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-	int sr;
-
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1639,27 +1599,6 @@ CPU_GET_INFO( m68030 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "68030");				break;
-
-		case CPUINFO_STR_FLAGS:
-			sr = m68ki_get_sr(m68k);
-			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-				sr & 0x8000 ? 'T':'.',
-				sr & 0x4000 ? 't':'.',
-				sr & 0x2000 ? 'S':'.',
-				sr & 0x1000 ? 'M':'.',
-				sr & 0x0800 ? '?':'.',
-				sr & 0x0400 ? 'I':'.',
-				sr & 0x0200 ? 'I':'.',
-				sr & 0x0100 ? 'I':'.',
-				sr & 0x0080 ? '?':'.',
-				sr & 0x0040 ? '?':'.',
-				sr & 0x0020 ? '?':'.',
-				sr & 0x0010 ? 'X':'.',
-				sr & 0x0008 ? 'N':'.',
-				sr & 0x0004 ? 'Z':'.',
-				sr & 0x0002 ? 'V':'.',
-				sr & 0x0001 ? 'C':'.');
-			break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -1677,7 +1616,6 @@ static CPU_INIT( m68ec030 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_EC030;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68EC030;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1693,6 +1631,8 @@ static CPU_INIT( m68ec030 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 0;		/* EC030 lacks the PMMU and is effectively a die-shrink 68020 */
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68ec030 )
@@ -1720,7 +1660,6 @@ static CPU_INIT( m68040 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_040;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68040;
 	m68k->memory           = interface_d32_mmu;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1736,13 +1675,12 @@ static CPU_INIT( m68040 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 1;
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68040 )
 {
-	m68ki_cpu_core *m68k = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-	int sr;
-
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1759,27 +1697,6 @@ CPU_GET_INFO( m68040 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "68040");				break;
 
-		case CPUINFO_STR_FLAGS:
-			sr = m68ki_get_sr(m68k);
-			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-				sr & 0x8000 ? 'T':'.',
-				sr & 0x4000 ? 't':'.',
-				sr & 0x2000 ? 'S':'.',
-				sr & 0x1000 ? 'M':'.',
-				sr & 0x0800 ? '?':'.',
-				sr & 0x0400 ? 'I':'.',
-				sr & 0x0200 ? 'I':'.',
-				sr & 0x0100 ? 'I':'.',
-				sr & 0x0080 ? '?':'.',
-				sr & 0x0040 ? '?':'.',
-				sr & 0x0020 ? '?':'.',
-				sr & 0x0010 ? 'X':'.',
-				sr & 0x0008 ? 'N':'.',
-				sr & 0x0004 ? 'Z':'.',
-				sr & 0x0002 ? 'V':'.',
-				sr & 0x0001 ? 'C':'.');
-			break;
-
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }
@@ -1795,7 +1712,6 @@ static CPU_INIT( m68ec040 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_EC040;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68EC040;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1811,6 +1727,8 @@ static CPU_INIT( m68ec040 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 0;
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68ec040 )
@@ -1838,7 +1756,6 @@ static CPU_INIT( m68lc040 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_LC040;
-	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68LC040;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1854,6 +1771,8 @@ static CPU_INIT( m68lc040 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 1;
+
+	define_state(device);
 }
 
 CPU_GET_INFO( m68lc040 )

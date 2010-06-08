@@ -41,7 +41,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 263)
 		scanline = 16;
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 static MACHINE_START( runaway )
@@ -51,7 +51,7 @@ static MACHINE_START( runaway )
 
 static MACHINE_RESET( runaway )
 {
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 16, 0), 16);
+	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(16), 16);
 }
 
 

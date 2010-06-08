@@ -53,15 +53,15 @@ ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in 
 static UINT8 *bank_base;
 static UINT8 *bank_source_data;
 
-static running_device *jsacpu;
+static cpu_device *jsacpu;
 static const char *test_port;
 static UINT16 test_mask;
 
-static running_device *pokey;
-static running_device *ym2151;
-static running_device *tms5220;
-static running_device *oki6295;
-static running_device *oki6295_l, *oki6295_r;
+static pokey_sound_device *pokey;
+static ym2151_sound_device *ym2151;
+static tms5220_sound_device *tms5220;
+static okim6295_device *oki6295;
+static okim6295_device *oki6295_l, *oki6295_r;
 
 static UINT8 overall_volume;
 static UINT8 pokey_volume;
@@ -127,7 +127,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	UINT8 *rgn;
 
 	/* copy in the parameters */
-	jsacpu = devtag_get_device(machine, "jsa");
+	jsacpu = machine->device<cpu_device>("jsa");
 	assert_always(jsacpu != NULL, "Could not find JSA CPU!");
 	test_port = testport;
 	test_mask = testmask;
@@ -138,12 +138,12 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	bank_source_data = &rgn[0x10000];
 
 	/* determine which sound hardware is installed */
-	tms5220 = devtag_get_device(machine, "tms");
-	ym2151 = devtag_get_device(machine, "ymsnd");
-	pokey = devtag_get_device(machine, "pokey");
-	oki6295 = devtag_get_device(machine, "adpcm");
-	oki6295_l = devtag_get_device(machine, "adpcml");
-	oki6295_r = devtag_get_device(machine, "adpcmr");
+	tms5220 = machine->device<tms5220_sound_device>("tms");
+	ym2151 = machine->device<ym2151_sound_device>("ymsnd");
+	pokey = machine->device<pokey_sound_device>("pokey");
+	oki6295 = machine->device<okim6295_device>("adpcm");
+	oki6295_l = machine->device<okim6295_device>("adpcml");
+	oki6295_r = machine->device<okim6295_device>("adpcmr");
 
 	/* install POKEY memory handlers */
 	if (pokey != NULL)
@@ -430,7 +430,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 
 			/* update the OKI frequency */
 			if (oki6295 != NULL)
-				okim6295_set_pin7(oki6295, data & 8);
+				oki6295->set_pin7(data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -558,7 +558,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			coin_counter_w(space->machine, 0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			if (oki6295 != NULL) okim6295_set_pin7(oki6295, data & 8);
+			if (oki6295 != NULL) oki6295->set_pin7(data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -691,8 +691,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			coin_counter_w(space->machine, 0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			okim6295_set_pin7(oki6295_l, data & 8);
-			okim6295_set_pin7(oki6295_r, data & 8);
+			oki6295_l->set_pin7(data & 8);
+			oki6295_r->set_pin7(data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -884,8 +884,7 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD("adpcm", OKIM6295, JSA_MASTER_CLOCK/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("adpcm", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -930,13 +929,11 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MDRV_SOUND_ADD("adpcml", OKIM6295, JSA_MASTER_CLOCK/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("adpcml", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
 
-	MDRV_SOUND_ADD("adpcmr", OKIM6295, JSA_MASTER_CLOCK/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("adpcmr", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
 MACHINE_DRIVER_END

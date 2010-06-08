@@ -732,8 +732,10 @@ class input_port_config
 public:
 	input_port_config(const char *tag);
 	~input_port_config();
+	
+	input_port_config *next() const { return m_next; }
 
-	input_port_config *			next;			/* pointer to next port */
+	input_port_config *			m_next;			/* pointer to next port */
 	const char *				tag;			/* pointer to this port's tag */
 	const input_field_config *	fieldlist;		/* list of input_field_configs */
 

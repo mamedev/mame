@@ -62,7 +62,7 @@ static MACHINE_START( m107 )
 
 static MACHINE_RESET( m107 )
 {
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 /*****************************************************************************/
@@ -74,21 +74,21 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	/* raster interrupt */
 	if (scanline == m107_raster_irq_position)
 	{
-		video_screen_update_partial(machine->primary_screen, scanline);
+		machine->primary_screen->update_partial(scanline);
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M107_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
-	else if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
+	else if (scanline == machine->primary_screen->visible_area().max_y + 1)
 	{
-		video_screen_update_partial(machine->primary_screen, scanline);
+		machine->primary_screen->update_partial(scanline);
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M107_IRQ_0);
 	}
 
 	/* adjust for next scanline */
-	if (++scanline >= video_screen_get_height(machine->primary_screen))
+	if (++scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -481,7 +481,8 @@ static MACHINE_DRIVER_START( dsoccr94 )
 	MDRV_IMPORT_FROM(firebarr)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", V33, 20000000/2)	/* NEC V33, Could be 28MHz clock? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(20000000/2)	/* NEC V33, Could be 28MHz clock? */
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_CONFIG(dsoccr94_config)

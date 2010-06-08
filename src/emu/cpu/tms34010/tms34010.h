@@ -50,9 +50,9 @@ enum
 	TMS34010_B13,
 	TMS34010_B14,
 
-	TMS34010_GENPC = REG_GENPC,
-	TMS34010_GENSP = REG_GENSP,
-	TMS34010_GENPCBASE = REG_GENPCBASE
+	TMS34010_GENPC = STATE_GENPC,
+	TMS34010_GENSP = STATE_GENSP,
+	TMS34010_GENPCBASE = STATE_GENPCBASE
 };
 
 
@@ -196,7 +196,7 @@ struct _tms34010_config
 	const char *screen_tag;						/* the screen operated on */
 	UINT32	pixclock;							/* the pixel clock (0 means don't adjust screen size) */
 	int		pixperclock;						/* pixels per clock */
-	void	(*scanline_callback)(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+	void	(*scanline_callback)(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
 	void	(*output_int)(running_device *device, int state);			/* output interrupt callback */
 	void	(*to_shiftreg)(const address_space *space, offs_t, UINT16 *);	/* shift register write */
 	void	(*from_shiftreg)(const address_space *space, offs_t, UINT16 *);	/* shift register read */

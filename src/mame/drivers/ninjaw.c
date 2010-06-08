@@ -690,7 +690,7 @@ static DEVICE_GET_INFO( subwoofer )
 	}
 }
 
-#define SOUND_SUBWOOFER DEVICE_GET_INFO_NAME(subwoofer)
+DECLARE_LEGACY_SOUND_DEVICE(SUBWOOFER, subwoofer);
 #endif
 
 

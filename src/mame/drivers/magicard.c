@@ -383,22 +383,22 @@ static VIDEO_UPDATE(magicard)
 
 				color = ((magicram[count]) & 0x000f)>>0;
 
-				if(((x*4)+3)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				if(((x*4)+3)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*4)+3) = screen->machine->pens[color];
 
 				color = ((magicram[count]) & 0x00f0)>>4;
 
-				if(((x*4)+2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				if(((x*4)+2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*4)+2) = screen->machine->pens[color];
 
 				color = ((magicram[count]) & 0x0f00)>>8;
 
-				if(((x*4)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				if(((x*4)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*4)+1) = screen->machine->pens[color];
 
 				color = ((magicram[count]) & 0xf000)>>12;
 
-				if(((x*4)+0)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				if(((x*4)+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*4)+0) = screen->machine->pens[color];
 
 				count++;
@@ -415,12 +415,12 @@ static VIDEO_UPDATE(magicard)
 
 				color = ((magicram[count]) & 0x00ff)>>0;
 
-				if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				if(((x*2)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
 
 				color = ((magicram[count]) & 0xff00)>>8;
 
-				if(((x*2)+0)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				if(((x*2)+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
 
 				count++;

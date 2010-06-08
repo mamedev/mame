@@ -54,9 +54,9 @@ void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_
 
 VIDEO_START( exidy )
 {
-	bitmap_format format = video_screen_get_format(machine->primary_screen);
+	bitmap_format format = machine->primary_screen->format();
 
-	background_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	background_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 	motion_object_1_vid = auto_bitmap_alloc(machine, 16, 16, format);
 	motion_object_2_vid = auto_bitmap_alloc(machine, 16, 16, format);
 	motion_object_2_clip = auto_bitmap_alloc(machine, 16, 16, format);
@@ -361,7 +361,7 @@ static void check_collision(running_machine *machine)
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & collision_mask) && (count++ < 128))
-					timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, org_1_x + sx, org_1_y + sy), NULL, current_collision_mask, collision_irq_callback);
+					timer_set(machine, machine->primary_screen->time_until_pos(org_1_x + sx, org_1_y + sy), NULL, current_collision_mask, collision_irq_callback);
 			}
 
 			if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != 0xff)
@@ -369,7 +369,7 @@ static void check_collision(running_machine *machine)
 				/* check for background collision (M2CHAR) */
 				if (*BITMAP_ADDR16(background_bitmap, org_2_y + sy, org_2_x + sx) != 0)
 					if ((collision_mask & 0x08) && (count++ < 128))
-						timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
+						timer_set(machine, machine->primary_screen->time_until_pos(org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
 			}
 		}
 }

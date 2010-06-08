@@ -28,7 +28,7 @@ static size_t rotaryf_videoram_size;
 
 static INTERRUPT_GEN( rotaryf_interrupt )
 {
-	if (video_screen_get_vblank(device->machine->primary_screen))
+	if (device->machine->primary_screen->vblank())
 		cpu_set_input_line(device, I8085_RST55_LINE, HOLD_LINE);
 	else
 	{

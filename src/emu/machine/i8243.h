@@ -13,6 +13,7 @@
 #ifndef __I8243_H__
 #define __I8243_H__
 
+#include "devlegcy.h"
 #include "cpu/mcs48/mcs48.h"
 
 
@@ -33,7 +34,7 @@ struct _i8243_config
     MACROS
 ***************************************************************************/
 
-#define I8243 DEVICE_GET_INFO_NAME( i8243 )
+DECLARE_LEGACY_DEVICE(I8243, i8243);
 
 
 #define MDRV_I8243_ADD(_tag, _read, _write) \
@@ -46,8 +47,6 @@ struct _i8243_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( i8243 );
 
 READ8_DEVICE_HANDLER( i8243_p2_r );
 WRITE8_DEVICE_HANDLER( i8243_p2_w );

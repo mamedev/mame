@@ -50,10 +50,10 @@ static UINT8 gunx[2];
 
 INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	*x = (((input_port_read(machine, player ? "GUNX2" : "GUNX1") & 0xff) * (visarea->max_x - visarea->min_x)) >> 8) + visarea->min_x;
-	*y = (((input_port_read(machine, player ? "GUNY2" : "GUNY1") & 0xff) * (visarea->max_y - visarea->min_y)) >> 8) + visarea->min_y;
+	*x = (((input_port_read(machine, player ? "GUNX2" : "GUNX1") & 0xff) * (visarea.max_x - visarea.min_x)) >> 8) + visarea.min_x;
+	*y = (((input_port_read(machine, player ? "GUNY2" : "GUNY1") & 0xff) * (visarea.max_y - visarea.min_y)) >> 8) + visarea.min_y;
 }
 
 
@@ -67,7 +67,7 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 static TIMER_CALLBACK( trigger_gun_interrupt )
 {
 	int which = param & 1;
-	int beamx = (video_screen_get_hpos(machine->primary_screen)/2)-58;
+	int beamx = (machine->primary_screen->hpos()/2)-58;
 
 	/* once we're ready to fire, set the X coordinate and assert the line */
 	gunx[which] = beamx;
@@ -89,7 +89,7 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 	int beamx, beamy;
 
 	/* set a timer to do this again next frame */
-	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(setup_gun_timer, machine->primary_screen->time_until_pos(0), 0);
 
 	/* only do work if the palette is flashed */
 	if (tickee_control)
@@ -98,13 +98,13 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(machine, 0, &beamx, &beamy);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + beamyadd,     beamx + beamxadd), NULL, 0, trigger_gun_interrupt);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + beamyadd + 1, beamx + beamxadd), NULL, 0, clear_gun_interrupt);
+	timer_set(machine, machine->primary_screen->time_until_pos(beamy + beamyadd,     beamx + beamxadd), NULL, 0, trigger_gun_interrupt);
+	timer_set(machine, machine->primary_screen->time_until_pos(beamy + beamyadd + 1, beamx + beamxadd), NULL, 0, clear_gun_interrupt);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(machine, 1, &beamx, &beamy);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + beamyadd,     beamx + beamxadd), NULL, 1, trigger_gun_interrupt);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + beamyadd + 1, beamx + beamxadd), NULL, 1, clear_gun_interrupt);
+	timer_set(machine, machine->primary_screen->time_until_pos(beamy + beamyadd,     beamx + beamxadd), NULL, 1, trigger_gun_interrupt);
+	timer_set(machine, machine->primary_screen->time_until_pos(beamy + beamyadd + 1, beamx + beamxadd), NULL, 1, clear_gun_interrupt);
 }
 
 
@@ -119,7 +119,7 @@ static VIDEO_START( tickee )
 {
 	/* start a timer going on the first scanline of every frame */
 	setup_gun_timer = timer_alloc(machine, setup_gun_interrupts, NULL);
-	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(setup_gun_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 
@@ -130,7 +130,7 @@ static VIDEO_START( tickee )
  *
  *************************************/
 
-static void scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -155,7 +155,7 @@ static void scanline_update(running_device *screen, bitmap_t *bitmap, int scanli
 }
 
 
-static void rapidfir_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void rapidfir_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -322,19 +322,19 @@ static WRITE16_DEVICE_HANDLER( sound_bank_w )
 	switch (data & 0xff)
 	{
 		case 0x2c:
-			okim6295_set_bank_base(device, 0x00000);
+			downcast<okim6295_device *>(device)->set_bank_base(0x00000);
 			break;
 
 		case 0x2d:
-			okim6295_set_bank_base(device, 0x40000);
+			downcast<okim6295_device *>(device)->set_bank_base(0x40000);
 			break;
 
 		case 0x1c:
-			okim6295_set_bank_base(device, 0x80000);
+			downcast<okim6295_device *>(device)->set_bank_base(0x80000);
 			break;
 
 		case 0x1d:
-			okim6295_set_bank_base(device, 0xc0000);
+			downcast<okim6295_device *>(device)->set_bank_base(0xc0000);
 			break;
 
 		default:
@@ -790,8 +790,7 @@ static MACHINE_DRIVER_START( rapidfir )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, OKI_CLOCK)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
@@ -822,8 +821,7 @@ static MACHINE_DRIVER_START( mouseatk )
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, OKI_CLOCK)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

@@ -3,6 +3,8 @@
 #ifndef __X1_010_H__
 #define __X1_010_H__
 
+#include "devlegcy.h"
+
 
 typedef struct _x1_010_interface x1_010_interface;
 struct _x1_010_interface
@@ -19,7 +21,6 @@ WRITE16_DEVICE_HANDLER( seta_sound_word_w );
 
 void seta_sound_enable_w(running_device *device, int data);
 
-DEVICE_GET_INFO( x1_010 );
-#define SOUND_X1_010 DEVICE_GET_INFO_NAME( x1_010 )
+DECLARE_LEGACY_SOUND_DEVICE(X1_010, x1_010);
 
 #endif /* __X1_010_H__ */

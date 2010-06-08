@@ -468,8 +468,8 @@ static void toaplan2_vram_alloc(running_machine *machine, int controller)
 
 static void toaplan2_vh_start(running_machine *machine, int controller)
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	toaplan2_vram_alloc(machine, controller);
 
@@ -561,8 +561,8 @@ VIDEO_START( toaplan2_1 )
 
 VIDEO_START( truxton2_0 )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	toaplan2_vram_alloc(machine, 0);
 	truxton2_create_tilemaps_0(machine);
@@ -598,8 +598,8 @@ VIDEO_START( truxton2_0 )
 
 VIDEO_START( bgaregga_0 )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	toaplan2_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
 
@@ -615,8 +615,8 @@ VIDEO_START( bgaregga_0 )
 
 VIDEO_START( batrider_0 )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	toaplan2_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
 
@@ -1038,7 +1038,7 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 						/* HACK! When tilted, sound CPU needs to be reset. */
 						running_device *ym = devtag_get_device(machine, "ymsnd");
 
-						if (ym && (sound_get_type(ym) == SOUND_YM3812))
+						if (ym && ym->type() == SOUND_YM3812)
 						{
 							cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 							devtag_reset(machine, "ymsnd");
@@ -1534,8 +1534,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 void toaplan2_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, tilemap_t* tilemap, UINT8* priremap, UINT8* pri_enable )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 	int y,x;
 	bitmap_t *tmb = tilemap_get_pixmap(tilemap);
 	UINT16* srcptr;
@@ -1659,7 +1659,7 @@ VIDEO_UPDATE( batrider_0 )
 {
 	int line;
 	rectangle clip;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 
 	toaplan2_log_vram(screen->machine);
 
@@ -1674,10 +1674,10 @@ VIDEO_UPDATE( batrider_0 )
 
 	VIDEO_UPDATE_CALL( toaplan2_0 );
 
-	clip.min_x = visarea->min_x;
-	clip.max_x = visarea->max_x;
-	clip.min_y = visarea->min_y;
-	clip.max_y = visarea->max_y;
+	clip.min_x = visarea.min_x;
+	clip.max_x = visarea.max_x;
+	clip.min_y = visarea.min_y;
+	clip.max_y = visarea.max_y;
 
 	/* used for 'for use in' and '8ing' screen on bbakraid, raizing on batrider */
 	for (line = 0; line < 256;line++)

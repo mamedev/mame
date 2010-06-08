@@ -2898,13 +2898,13 @@ static INPUT_PORTS_START( mjegolf )
 INPUT_PORTS_END
 
 
-static const z80_daisy_chain daisy_chain_main[] =
+static const z80_daisy_config daisy_chain_main[] =
 {
 	{ "main_ctc" },
 	{ NULL }
 };
 
-static const z80_daisy_chain daisy_chain_sound[] =
+static const z80_daisy_config daisy_chain_sound[] =
 {
 	{ "audio_ctc" },
 	{ NULL }

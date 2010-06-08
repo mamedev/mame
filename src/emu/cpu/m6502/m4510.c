@@ -142,7 +142,7 @@ struct _m4510_Regs {
 	UINT16  low, high;
 	UINT32	mem[8];
 
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *space;
 	int 	icount;
@@ -159,10 +159,9 @@ struct _m4510_Regs {
 INLINE m4510_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M4510);
-	return (m4510_Regs *)device->token;
+	return (m4510_Regs *)downcast<cpu_device *>(device)->token();
 }
 
 /***************************************************************
@@ -198,7 +197,7 @@ static void default_wrmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m4510 )
 {
 	m4510_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
 
 	cpustate->interrupt_inhibit = 0;
 	cpustate->rdmem_id = default_rdmem_id;
@@ -207,7 +206,7 @@ static CPU_INIT( m4510 )
 	cpustate->port_write = NULL;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->space = device_memory(device)->space(AS_PROGRAM);
 
 	if ( intf )
 	{
@@ -456,7 +455,7 @@ static CPU_SET_INFO( m4510 )
 
 CPU_GET_INFO( m4510 )
 {
-	m4510_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m4510_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -45,28 +45,28 @@ static TIMER_CALLBACK( irq_gen )
 }
 
 
-static void alpha_row_update(running_device *screen, int scanline)
+static void alpha_row_update(screen_device &screen, int scanline)
 {
-	skullxbo_state *state = (skullxbo_state *)screen->machine->driver_data;
+	skullxbo_state *state = (skullxbo_state *)screen.machine->driver_data;
 	UINT16 *check = &state->atarigen.alpha[(scanline / 8) * 64 + 42];
 
 	/* check for interrupts in the alpha ram */
 	/* the interrupt occurs on the HBLANK of the 6th scanline following */
 	if (check < &state->atarigen.alpha[0x7c0] && (*check & 0x8000))
 	{
-		int	width = video_screen_get_width(screen);
-		attotime period = video_screen_get_time_until_pos(screen, video_screen_get_vpos(screen) + 6, width * 0.9);
-		timer_set(screen->machine, period, NULL, 0, irq_gen);
+		int	width = screen.width();
+		attotime period = screen.time_until_pos(screen.vpos() + 6, width * 0.9);
+		timer_set(screen.machine, period, NULL, 0, irq_gen);
 	}
 
 	/* update the playfield and motion objects */
-	skullxbo_scanline_update(screen->machine, scanline);
+	skullxbo_scanline_update(screen.machine, scanline);
 }
 
 
 static WRITE16_HANDLER( skullxbo_halt_until_hblank_0_w )
 {
-	atarigen_halt_until_hblank_0(space->machine->primary_screen);
+	atarigen_halt_until_hblank_0(*space->machine->primary_screen);
 }
 
 
@@ -82,7 +82,7 @@ static MACHINE_RESET( skullxbo )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_scanline_timer_reset(machine->primary_screen, alpha_row_update, 8);
+	atarigen_scanline_timer_reset(*machine->primary_screen, alpha_row_update, 8);
 	atarijsa_reset();
 }
 
@@ -99,7 +99,7 @@ static READ16_HANDLER( special_port1_r )
 	skullxbo_state *state = (skullxbo_state *)space->machine->driver_data;
 	int temp = input_port_read(space->machine, "FF5802");
 	if (state->atarigen.cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(space->machine->primary_screen)) temp ^= 0x0010;
+	if (atarigen_get_hblank(*space->machine->primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 

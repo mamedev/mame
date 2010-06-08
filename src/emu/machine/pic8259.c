@@ -72,9 +72,8 @@ struct pic8259
 
 INLINE pic8259_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == DEVICE_GET_INFO_NAME(pic8259) );
-	return ( pic8259_t *) device->token;
+	assert( device->type() == PIC8259 );
+	return ( pic8259_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -401,7 +400,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 static DEVICE_START( pic8259 )
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
-	const struct pic8259_interface *intf = (const struct pic8259_interface *)device->baseconfig().static_config;
+	const struct pic8259_interface *intf = (const struct pic8259_interface *)device->baseconfig().static_config();
 
 	assert(intf != NULL);
 
@@ -444,7 +443,6 @@ DEVICE_GET_INFO( pic8259 ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(pic8259_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(pic8259);	break;

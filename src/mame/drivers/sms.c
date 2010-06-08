@@ -450,7 +450,7 @@ static WRITE8_HANDLER(video_w)
 
 static VIDEO_START( sms )
 {
-	sms_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	sms_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	state_save_register_global_array(machine, vid_regs);
 	state_save_register_global_bitmap(machine, sms_bitmap);

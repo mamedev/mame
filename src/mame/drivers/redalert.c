@@ -122,7 +122,7 @@ static READ8_HANDLER( redalert_interrupt_clear_r )
 	cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
-	return video_screen_get_vpos(space->machine->primary_screen);
+	return space->machine->primary_screen->vpos();
 }
 
 

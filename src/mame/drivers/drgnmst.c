@@ -157,14 +157,14 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
 		state->oki0_bank = oki_new_bank;
 		if (state->oki0_bank)
 			oki_new_bank--;
-		okim6295_set_bank_base(state->oki_1, (oki_new_bank * 0x40000));
+		state->oki_1->set_bank_base(oki_new_bank * 0x40000);
 	}
 
 	oki_new_bank = ((state->pic16c5x_port0 & 0x3) >> 0) | ((state->oki_control & 0x20) >> 3);
 	if (oki_new_bank != state->oki1_bank)
 	{
 		state->oki1_bank = oki_new_bank;
-		okim6295_set_bank_base(state->oki_2, (oki_new_bank * 0x40000));
+		state->oki_2->set_bank_base(oki_new_bank * 0x40000);
 	}
 
 	switch (state->oki_control & 0x1f)
@@ -381,9 +381,6 @@ static MACHINE_START( drgnmst )
 {
 	drgnmst_state *state = (drgnmst_state *)machine->driver_data;
 
-	state->oki_1 = devtag_get_device(machine, "oki1");
-	state->oki_2 = devtag_get_device(machine, "oki2");
-
 	state_save_register_global(machine, state->snd_flag);
 	state_save_register_global(machine, state->snd_command);
 	state_save_register_global(machine, state->oki_control);
@@ -437,13 +434,11 @@ static MACHINE_DRIVER_START( drgnmst )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32000000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32000000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32000000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32000000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END

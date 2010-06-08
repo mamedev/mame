@@ -1066,8 +1066,7 @@ static MACHINE_DRIVER_START( fclown )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD("oki6295", OKIM6295, MASTER_CLOCK/12)	/* guess, seems ok */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)			/* pin7 guessed, seems ok */
+	MDRV_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, OKIM6295_PIN7_LOW)	/* guess, seems ok; pin7 guessed, seems ok */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
 
 MACHINE_DRIVER_END

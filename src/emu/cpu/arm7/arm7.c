@@ -71,10 +71,9 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 INLINE arm_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ARM7 || cpu_get_type(device) == CPU_ARM9 || cpu_get_type(device) == CPU_PXA255);
-	return (arm_state *)device->token;
+	return (arm_state *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE INT64 saturate_qbit_overflow(arm_state *cpustate, INT64 res)
@@ -191,7 +190,7 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr)
 
 static CPU_TRANSLATE( arm7 )
 {
-	arm_state *cpustate = (device != NULL) ? (arm_state *)device->token : NULL;
+	arm_state *cpustate = (device != NULL) ? (arm_state *)downcast<cpu_device *>(device)->token() : NULL;
 
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if( space == ADDRESS_SPACE_PROGRAM && ( COPRO_CTRL & COPRO_CTRL_MMU_EN ) )
@@ -217,7 +216,7 @@ static CPU_INIT( arm7 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	// setup co-proc callbacks
 	arm7_coproc_do_callback = arm7_do_callback;
@@ -385,7 +384,7 @@ static CPU_SET_INFO( arm7 )
 
 CPU_GET_INFO( arm7 )
 {
-    arm_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+    arm_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch (state)
     {

@@ -64,10 +64,8 @@ struct _k005289_state
 INLINE k005289_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_K005289);
-	return (k005289_state *)device->token;
+	assert(device->type() == SOUND_K005289);
+	return (k005289_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* build a table to divide by the number of voices */
@@ -166,9 +164,9 @@ static DEVICE_START( k005289 )
 	voice = info->channel_list;
 
 	/* get stream channels */
-	info->rate = device->clock/16;
+	info->rate = device->clock()/16;
 	info->stream = stream_create(device, 0, 1, info->rate, info, K005289_update);
-	info->mclock = device->clock;
+	info->mclock = device->clock();
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	info->mixer_buffer = auto_alloc_array(device->machine, short, 2 * info->rate);
@@ -176,7 +174,7 @@ static DEVICE_START( k005289 )
 	/* build the mixer table */
 	make_mixer_table(device->machine, info, 2);
 
-	info->sound_prom = *device->region;
+	info->sound_prom = *device->region();
 
 	/* reset all the voices */
 	voice[0].frequency = 0;

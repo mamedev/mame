@@ -2905,7 +2905,7 @@ TABLE_FUNCTION(uint, get_reg, (m37710i_cpu_struct *cpustate, int regnum))
 		case M37710_D: return REG_D;
 		case M37710_P: return m37710i_get_reg_p(cpustate);
 		case M37710_IRQ_STATE: return LINE_IRQ;
-		case REG_GENPCBASE: return REG_PPC;
+		case STATE_GENPCBASE: return REG_PPC;
 	}
 	return 0;
 }

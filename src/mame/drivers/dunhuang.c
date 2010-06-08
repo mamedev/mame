@@ -431,7 +431,7 @@ static READ8_HANDLER( dunhuang_service_r )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
 	return input_port_read(space->machine, "SERVICE")
-	 | ((state->hopper && !(video_screen_get_frame_number(space->machine->primary_screen) % 10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
+	 | ((state->hopper && !(space->machine->primary_screen->frame_number() % 10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
 	 | 0x80																// bit 7 low -> tiles block transferrer busy
 	;
 }
@@ -853,8 +853,7 @@ static MACHINE_DRIVER_START( dunhuang )
 	MDRV_SOUND_CONFIG(dunhuang_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

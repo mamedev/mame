@@ -822,7 +822,7 @@ static VIDEO_START(cps3)
 
 	// the renderbuffer can be twice the size of the screen, this allows us to handle framebuffer zoom values
 	// between 0x00 and 0x80 (0x40 is normal, 0x80 would be 'view twice as much', 0x20 is 'view half as much')
-	renderbuffer_bitmap = auto_bitmap_alloc(machine,512*2,224*2,video_screen_get_format(machine->primary_screen));
+	renderbuffer_bitmap = auto_bitmap_alloc(machine,512*2,224*2,machine->primary_screen->format());
 
 	renderbuffer_clip.min_x = 0;
 	renderbuffer_clip.max_x = cps3_screenwidth-1;
@@ -920,8 +920,8 @@ static void cps3_draw_tilemapsprite_line(running_machine *machine, int tmnum, in
 static VIDEO_UPDATE(cps3)
 {
 	int y,x, count;
-	attoseconds_t period = video_screen_get_frame_period(screen).attoseconds;
-	rectangle visarea = *video_screen_get_visible_area(screen);
+	attoseconds_t period = screen->frame_period().attoseconds;
+	rectangle visarea = screen->visible_area();
 
 	int bg_drawn[4] = { 0, 0, 0, 0 };
 
@@ -941,7 +941,7 @@ static VIDEO_UPDATE(cps3)
 			cps3_screenwidth = 496;
 			visarea.min_x = 0; visarea.max_x = 496-1;
 			visarea.min_y = 0; visarea.max_y = 224-1;
-			video_screen_configure(screen, 496, 224, &visarea, period);
+			screen->configure(496, 224, visarea, period);
 		}
 	}
 	else
@@ -951,7 +951,7 @@ static VIDEO_UPDATE(cps3)
 			cps3_screenwidth = 384;
 			visarea.min_x = 0; visarea.max_x = 384-1;
 			visarea.min_y = 0; visarea.max_y = 224-1;
-			video_screen_configure(screen, 384, 224, &visarea, period);
+			screen->configure(384, 224, visarea, period);
 		}
 	}
 
@@ -1126,7 +1126,7 @@ static VIDEO_UPDATE(cps3)
 
 								if (current_ypos&0x200) current_ypos-=0x400;
 
-								//if ( (whichbpp) && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+								//if ( (whichbpp) && (machine->primary_screen->frame_number() & 1)) continue;
 
 								/* use the palette value from the main list or the sublists? */
 								if (whichpal)

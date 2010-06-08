@@ -195,9 +195,9 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
 	tms.visarea.max_y = tms.top_border + 24*8 - 1 + MIN(intf->bordery, tms.bottom_border);
 
 	/* configure the screen if we weren't overridden */
-	if (video_screen_get_width(machine->primary_screen) == LEFT_BORDER+32*8+RIGHT_BORDER &&
-	    video_screen_get_height(machine->primary_screen) == TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
-		video_screen_configure(machine->primary_screen, LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, &tms.visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+	if (machine->primary_screen->width() == LEFT_BORDER+32*8+RIGHT_BORDER &&
+	    machine->primary_screen->height() == TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
+		machine->primary_screen->configure(LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, tms.visarea, machine->primary_screen->frame_period().attoseconds);
 
     /* Video RAM */
     tms.vramsize = intf->vram;
@@ -207,7 +207,7 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
     tms.dBackMem = auto_alloc_array(machine, UINT8, IMAGE_SIZE);
 
     /* back bitmap */
-    tms.tmpbmp = auto_bitmap_alloc (machine, 256, 192, video_screen_get_format(machine->primary_screen));
+    tms.tmpbmp = auto_bitmap_alloc (machine, 256, 192, machine->primary_screen->format());
 
     TMS9928A_reset ();
     tms.LimitSprites = 1;

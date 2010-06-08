@@ -140,11 +140,11 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 	int scanline = param;
 
 	/* update the video */
-	video_screen_update_now(timer->machine->primary_screen);
+	timer.machine->primary_screen->update_now();
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
-		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 
 	/* wrap around at 262 */
 	scanline++;
@@ -153,10 +153,10 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 
 	/* set the scanline IRQ */
 	irq_state[2] = 1;
-	update_interrupts(timer->machine);
+	update_interrupts(timer.machine);
 
 	/* set the timer for the next one */
-	timer_device_adjust_oneshot(timer, double_to_attotime(attotime_to_double(video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0)) - hblank_offset), scanline);
+	timer.adjust(double_to_attotime(attotime_to_double(timer.machine->primary_screen->time_until_pos(scanline)) - hblank_offset), scanline);
 }
 
 
@@ -180,8 +180,9 @@ static MACHINE_RESET( beathead )
 	memcpy(ram_base, rom_base, 0x40);
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
-	hblank_offset = attotime_to_double(video_screen_get_scan_period(machine->primary_screen)) * ((455. - 336. - 25.) / 455.);
-	timer_device_adjust_oneshot(devtag_get_device(machine, "scan_timer"), double_to_attotime(attotime_to_double(video_screen_get_time_until_pos(machine->primary_screen, 0, 0)) - hblank_offset), 0);
+	hblank_offset = attotime_to_double(machine->primary_screen->scan_period()) * ((455. - 336. - 25.) / 455.);
+	timer_device *scanline_timer = machine->device<timer_device>("scan_timer");
+	scanline_timer->adjust(double_to_attotime(attotime_to_double(machine->primary_screen->time_until_pos(0)) - hblank_offset));
 
 	/* reset IRQs */
 	irq_line_state = CLEAR_LINE;

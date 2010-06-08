@@ -272,9 +272,9 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 	via_ca1_w(state->via_0, param);
 
 	if (param)
-		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
+		timer_adjust_oneshot(state->via_0_ca1_timer, machine->primary_screen->time_until_pos(VBSTART), 0);
 	else
-		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBEND, 0), 1);
+		timer_adjust_oneshot(state->via_0_ca1_timer, machine->primary_screen->time_until_pos(VBEND), 1);
 }
 
 
@@ -326,7 +326,7 @@ static VIDEO_START( trvquest )
 static VIDEO_RESET( gameplan )
 {
 	gameplan_state *state = (gameplan_state *)machine->driver_data;
-	timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
+	timer_adjust_oneshot(state->via_0_ca1_timer, machine->primary_screen->time_until_pos(VBSTART), 0);
 }
 
 

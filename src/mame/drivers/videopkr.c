@@ -919,7 +919,7 @@ static TIMER_DEVICE_CALLBACK(sound_t1_callback)
 
 		if (dc_40103 == 0)
 		{
-			cputag_set_input_line(timer->machine, "soundcpu", 0, ASSERT_LINE);
+			cputag_set_input_line(timer.machine, "soundcpu", 0, ASSERT_LINE);
 		}
 	}
 }
@@ -1263,7 +1263,8 @@ static MACHINE_DRIVER_START( videodad )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(videopkr)
-	MDRV_CPU_REPLACE("maincpu", I8039, CPU_CLOCK_ALT)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(CPU_CLOCK_ALT)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1279,7 +1280,8 @@ static MACHINE_DRIVER_START( babypkr )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(videopkr)
-	MDRV_CPU_REPLACE("maincpu", I8039, CPU_CLOCK_ALT)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(CPU_CLOCK_ALT)
 	/* most likely romless or eprom */
 	MDRV_CPU_REPLACE("soundcpu", I8031, CPU_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(i8051_sound_mem)
@@ -1303,7 +1305,8 @@ static MACHINE_DRIVER_START( fortune1 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(videopkr)
-	MDRV_CPU_REPLACE("maincpu", I8039, CPU_CLOCK_ALT)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(CPU_CLOCK_ALT)
 
 	MDRV_PALETTE_INIT(fortune1)
 MACHINE_DRIVER_END

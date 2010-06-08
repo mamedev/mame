@@ -55,7 +55,7 @@ static MACHINE_RESET( thunderj )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarivc_reset(machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
+	atarivc_reset(*machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
 	atarijsa_reset();
 }
 
@@ -96,7 +96,7 @@ static WRITE16_HANDLER( latch_w )
 		/* bits 2-5 are the alpha bank */
 		if (state->alpha_tile_bank != ((data >> 2) & 7))
 		{
-			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 			tilemap_mark_all_tiles_dirty(state->atarigen.alpha_tilemap);
 			state->alpha_tile_bank = (data >> 2) & 7;
 		}
@@ -133,13 +133,13 @@ static READ16_HANDLER( thunderj_atarivc_r )
 		mame_printf_debug("You're screwed!");
 #endif
 
-	return atarivc_r(space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( thunderj_atarivc_w )
 {
-	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
 }
 
 

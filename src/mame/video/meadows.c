@@ -63,7 +63,7 @@ WRITE8_HANDLER( meadows_videoram_w )
 
 WRITE8_HANDLER( meadows_spriteram_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	space->machine->generic.spriteram.u8[offset] = data;
 }
 

@@ -12,7 +12,6 @@
 #include "includes/galaxold.h"
 
 static int irq_line;
-static running_device *int_timer;
 
 static UINT8 _4in1_bank;
 
@@ -25,8 +24,8 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
      *
      * Therefore we reset the line without any detour ....
      */
-	//cpu_set_input_line(device->machine->firstcpu, 0, CLEAR_LINE);
-	cpu_set_info(device->machine->firstcpu, CPUINFO_INT_INPUT_STATE + irq_line, CLEAR_LINE);
+	cpu_set_input_line(device->machine->firstcpu, 0, CLEAR_LINE);
+	//cpu_set_info(device->machine->firstcpu, CPUINFO_INT_INPUT_STATE + irq_line, CLEAR_LINE);
 	return 0x03;
 }
 
@@ -53,7 +52,7 @@ WRITE8_HANDLER( galaxold_nmi_enable_w )
 
 TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 {
-    running_device *target = devtag_get_device(timer->machine, "7474_9m_2");
+    running_device *target = devtag_get_device(timer.machine, "7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
 	ttl7474_d_w(target, ((param & 0xe0) != 0xe0) ? 1 : 0);
@@ -63,7 +62,7 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 
 	param = (param + 0x10) & 0xff;
 
-	timer_device_adjust_oneshot(int_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, param, 0), param);
+	timer.adjust(timer.machine->primary_screen->time_until_pos(param), param);
 }
 
 
@@ -82,8 +81,8 @@ static void machine_reset_common(running_machine *machine, int line)
 	ttl7474_preset_w(ttl7474_9m_1, 0);
 
 	/* start a timer to generate interrupts */
-	int_timer = devtag_get_device(machine, "int_timer");
-	timer_device_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_device *int_timer = machine->device<timer_device>("int_timer");
+	int_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 MACHINE_RESET( galaxold )

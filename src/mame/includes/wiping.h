@@ -1,9 +1,10 @@
+#include "devlegcy.h"
+
 /*----------- defined in audio/wiping.c -----------*/
 
 extern UINT8 *wiping_soundregs;
 
-DEVICE_GET_INFO( wiping_sound );
-#define SOUND_WIPING DEVICE_GET_INFO_NAME(wiping_sound)
+DECLARE_LEGACY_SOUND_DEVICE(WIPING, wiping_sound);
 
 WRITE8_HANDLER( wiping_sound_w );
 

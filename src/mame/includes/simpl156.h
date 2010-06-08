@@ -4,12 +4,20 @@
 
 *************************************************************************/
 
+#include "machine/eeprom.h"
+#include "sound/okim6295.h"
+#include "video/deco16ic.h"
+
 class simpl156_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, simpl156_state(machine)); }
 
-	simpl156_state(running_machine &machine) { }
+	simpl156_state(running_machine &machine) 
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
+		  eeprom(machine.device<eeprom_device>("eeprom")),
+		  okimusic(machine.device<okim6295_device>("okimusic")) { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
@@ -18,10 +26,10 @@ public:
 	UINT32 *  systemram;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *deco16ic;
-	running_device *eeprom;
-	running_device *okimusic;
+	cpu_device *maincpu;
+	deco16ic_device *deco16ic;
+	eeprom_device *eeprom;
+	okim6295_device *okimusic;
 };
 
 

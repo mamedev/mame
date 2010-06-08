@@ -11,6 +11,8 @@
 #ifndef __SOUND_PSX_H__
 #define __SOUND_PSX_H__
 
+#include "devlegcy.h"
+
 WRITE32_DEVICE_HANDLER( psx_spu_w );
 READ32_DEVICE_HANDLER( psx_spu_r );
 WRITE32_DEVICE_HANDLER( psx_spu_delay_w );
@@ -27,7 +29,6 @@ struct _psx_spu_interface
 	void (*spu_install_write_handler)(int,spu_handler);
 };
 
-DEVICE_GET_INFO( psxspu );
-#define SOUND_PSXSPU DEVICE_GET_INFO_NAME( psxspu )
+DECLARE_LEGACY_SOUND_DEVICE(PSXSPU, psxspu);
 
 #endif /* __SOUND_PSX_H__ */

@@ -155,8 +155,8 @@ static void nbmj8991_vramflip(running_machine *machine)
 	static int nbmj8991_flipscreen_old = 0;
 	int x, y;
 	UINT8 color1, color2;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	if (nbmj8991_flipscreen == nbmj8991_flipscreen_old) return;
 
@@ -183,7 +183,7 @@ static void nbmj8991_vramflip(running_machine *machine)
 
 static void update_pixel(running_machine *machine, int x, int y)
 {
-	UINT8 color = nbmj8991_videoram[(y * video_screen_get_width(machine->primary_screen)) + x];
+	UINT8 color = nbmj8991_videoram[(y * machine->primary_screen->width()) + x];
 	*BITMAP_ADDR16(nbmj8991_tmpbitmap, y, x) = color;
 }
 
@@ -195,7 +195,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void nbmj8991_gfxdraw(running_machine *machine)
 {
 	UINT8 *GFX = memory_region(machine, "gfx1");
-	int width = video_screen_get_width(machine->primary_screen);
+	int width = machine->primary_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -303,10 +303,10 @@ static void nbmj8991_gfxdraw(running_machine *machine)
 ******************************************************************************/
 VIDEO_START( nbmj8991 )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
-	nbmj8991_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj8991_tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
 	nbmj8991_videoram = auto_alloc_array(machine, UINT8, width * height);
 	nbmj8991_clut = auto_alloc_array(machine, UINT8, 0x800);
 	memset(nbmj8991_videoram, 0x00, (width * height * sizeof(UINT8)));
@@ -318,8 +318,8 @@ VIDEO_UPDATE( nbmj8991_type1 )
 
 	if (nbmj8991_screen_refresh)
 	{
-		int width = video_screen_get_width(screen->machine->primary_screen);
-		int height = video_screen_get_height(screen->machine->primary_screen);
+		int width = screen->machine->primary_screen->width();
+		int height = screen->machine->primary_screen->height();
 
 		nbmj8991_screen_refresh = 0;
 
@@ -357,8 +357,8 @@ VIDEO_UPDATE( nbmj8991_type2 )
 
 	if (nbmj8991_screen_refresh)
 	{
-		int width = video_screen_get_width(screen);
-		int height = video_screen_get_height(screen);
+		int width = screen->width();
+		int height = screen->height();
 
 		nbmj8991_screen_refresh = 0;
 

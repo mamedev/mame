@@ -73,10 +73,8 @@ struct _astrocade_state
 INLINE astrocade_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_ASTROCADE);
-	return (astrocade_state *)device->token;
+	assert(device->type() == SOUND_ASTROCADE);
+	return (astrocade_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -274,7 +272,7 @@ static DEVICE_START( astrocade )
 		chip->bitswap[i] = BITSWAP8(i, 0,1,2,3,4,5,6,7);
 
 	/* allocate a stream for output */
-	chip->stream = stream_create(device, 0, 1, device->clock, chip, astrocade_update);
+	chip->stream = stream_create(device, 0, 1, device->clock(), chip, astrocade_update);
 
 	/* reset state */
 	DEVICE_RESET_CALL(astrocade);

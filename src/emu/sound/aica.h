@@ -6,6 +6,8 @@
 #ifndef __AICA_H__
 #define __AICA_H__
 
+#include "devlegcy.h"
+
 typedef struct _aica_interface aica_interface;
 struct _aica_interface
 {
@@ -24,7 +26,6 @@ WRITE16_DEVICE_HANDLER( aica_w );
 WRITE16_DEVICE_HANDLER( aica_midi_in );
 READ16_DEVICE_HANDLER( aica_midi_out_r );
 
-DEVICE_GET_INFO( aica );
-#define SOUND_AICA DEVICE_GET_INFO_NAME( aica )
+DECLARE_LEGACY_SOUND_DEVICE(AICA, aica);
 
 #endif /* __AICA_H__ */

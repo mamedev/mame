@@ -291,8 +291,8 @@ void tilemap_init(running_machine *machine)
 	if (machine->primary_screen == NULL)
 		return;
 
-	screen_width  = video_screen_get_width(machine->primary_screen);
-	screen_height = video_screen_get_height(machine->primary_screen);
+	screen_width  = machine->primary_screen->width();
+	screen_height = machine->primary_screen->height();
 
 	if (screen_width != 0 && screen_height != 0)
 	{
@@ -322,7 +322,7 @@ tilemap_t *tilemap_create(running_machine *machine, tile_get_info_func tile_get_
     is owned by a device
 -------------------------------------------------*/
 
-tilemap_t *tilemap_create_device(running_device *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
+tilemap_t *tilemap_create_device(device_t *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	return tilemap_create_common(device->machine, (void *)device, (tile_get_info_func)tile_get_info, mapper, tilewidth, tileheight, cols, rows);
 }
@@ -836,8 +836,8 @@ profiler_mark_start(PROFILER_TILEMAP_DRAW);
 		tmap->gfx_used = 0;
 	}
 
-	width  = video_screen_get_width(tmap->machine->primary_screen);
-	height = video_screen_get_height(tmap->machine->primary_screen);
+	width  = tmap->machine->primary_screen->width();
+	height = tmap->machine->primary_screen->height();
 
 	/* XY scrolling playfield */
 	if (tmap->scrollrows == 1 && tmap->scrollcols == 1)

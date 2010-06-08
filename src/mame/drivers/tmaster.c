@@ -133,7 +133,7 @@ static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
 	{
 		// data & 0x0800?
 		okibank = ((data >> 8) & 3);
-		okim6295_set_bank_base(device, okibank * 0x40000);
+		downcast<okim6295_device *>(device)->set_bank_base(okibank * 0x40000);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -279,7 +279,7 @@ static VIDEO_START( tmaster )
 	{
 		for (buffer = 0; buffer < 2; buffer++)
 		{
-			tmaster_bitmap[layer][buffer] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+			tmaster_bitmap[layer][buffer] = machine->primary_screen->alloc_compatible_bitmap();
 			bitmap_fill(tmaster_bitmap[layer][buffer], NULL, 0xff);
 		}
 	}
@@ -896,8 +896,7 @@ static MACHINE_DRIVER_START( tm3k )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki",OKIM6295, XTAL_32MHz / 16) /* 2MHz */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", XTAL_32MHz / 16, OKIM6295_PIN7_HIGH)  /* 2MHz; clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -905,8 +904,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tm )
 	MDRV_IMPORT_FROM(tm3k)
 
-	MDRV_SOUND_REPLACE("oki",OKIM6295, 1122000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_REPLACE("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -969,8 +967,7 @@ static MACHINE_DRIVER_START( galgames )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_24MHz / 8)	// ??
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", XTAL_24MHz / 8, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

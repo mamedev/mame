@@ -49,6 +49,8 @@
 #ifndef __SP0256_H__
 #define __SP0256_H__
 
+#include "devlegcy.h"
+
 
 typedef struct _sp0256_interface sp0256_interface;
 struct _sp0256_interface
@@ -64,7 +66,6 @@ WRITE8_DEVICE_HANDLER( sp0256_ALD_w );
 READ16_DEVICE_HANDLER( spb640_r );
 WRITE16_DEVICE_HANDLER( spb640_w );
 
-DEVICE_GET_INFO( sp0256 );
-#define SOUND_SP0256 DEVICE_GET_INFO_NAME( sp0256 )
+DECLARE_LEGACY_SOUND_DEVICE(SP0256, sp0256);
 
 #endif /* __SP0256_H__ */

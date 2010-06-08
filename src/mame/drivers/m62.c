@@ -992,7 +992,8 @@ static MACHINE_DRIVER_START( kungfum )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(18432000/6)
 	MDRV_CPU_PROGRAM_MAP(kungfum_map)
 	MDRV_CPU_IO_MAP(kungfum_io_map)
 
@@ -1009,7 +1010,8 @@ static MACHINE_DRIVER_START( battroad )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(18432000/6)
 	MDRV_CPU_PROGRAM_MAP(battroad_map)
 	MDRV_CPU_IO_MAP(battroad_io_map)
 
@@ -1137,7 +1139,8 @@ static MACHINE_DRIVER_START( youjyudn )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(18432000/6)
 	MDRV_CPU_PROGRAM_MAP(youjyudn_map)
 	MDRV_CPU_IO_MAP(youjyudn_io_map)
 

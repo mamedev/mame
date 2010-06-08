@@ -6,6 +6,8 @@
 #if !defined( I2CMEMDEV_H )
 #define I2CMEMDEV_H ( 1 )
 
+#include "devlegcy.h"
+
 #define I2CMEM_E0 ( 1 )
 #define I2CMEM_E1 ( 2 )
 #define I2CMEM_E2 ( 3 )
@@ -25,8 +27,7 @@ struct _i2cmem_config
 	const char *data;
 };
 
-#define I2CMEM DEVICE_GET_INFO_NAME(i2cmem)
-DEVICE_GET_INFO(i2cmem);
+DECLARE_LEGACY_NVRAM_DEVICE(I2CMEM, i2cmem);
 
 #define MDRV_I2CMEM_ADD(_tag, _slave_address, _page_size, _data_size, _data) \
 	MDRV_DEVICE_ADD(_tag, I2CMEM, 0) \

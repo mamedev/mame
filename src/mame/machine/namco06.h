@@ -1,7 +1,7 @@
 #ifndef NAMCO06_H
 #define NAMCO06_H
 
-#include "devintrf.h"
+#include "devlegcy.h"
 
 
 typedef struct _namco_06xx_config namco_06xx_config;
@@ -31,8 +31,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w );
 
 
 /* device get info callback */
-#define NAMCO_06XX DEVICE_GET_INFO_NAME(namco_06xx)
-DEVICE_GET_INFO( namco_06xx );
+DECLARE_LEGACY_DEVICE(NAMCO_06XX, namco_06xx);
 
 
 #endif

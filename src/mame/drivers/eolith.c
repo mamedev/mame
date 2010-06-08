@@ -365,12 +365,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( eolith50 )
 	MDRV_IMPORT_FROM(eolith45)
-	MDRV_CPU_REPLACE("maincpu", E132N, 50000000)		 /* 50 MHz */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(50000000)		 /* 50 MHz */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ironfort )
 	MDRV_IMPORT_FROM(eolith45)
-	MDRV_CPU_REPLACE("maincpu", E132N, 44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
 MACHINE_DRIVER_END
 
 

@@ -26,10 +26,8 @@ struct _vr0_state
 INLINE vr0_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_VRENDER0);
-	return (vr0_state *)device->token;
+	assert(device->type() == SOUND_VRENDER0);
+	return (vr0_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r);
@@ -108,7 +106,7 @@ static DEVICE_START( vrender0 )
 	const vr0_interface *intf;
 	vr0_state *VR0 = get_safe_token(device);
 
-	intf = (const vr0_interface *)device->baseconfig().static_config;
+	intf = (const vr0_interface *)device->baseconfig().static_config();
 
 	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));

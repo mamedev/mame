@@ -445,8 +445,8 @@ void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const recta
 	UINT8 *base_gfx = memory_region(machine, "gfx1");
 	UINT8 *gfx_max  = base_gfx + memory_region_length(machine, "gfx1");
 
-	int max_x = video_screen_get_width(machine->primary_screen);
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_x = machine->primary_screen->width();
+	int max_y = machine->primary_screen->height();
 
 	int max_sprites = state->spriteram_size / 8;
 	int sprites     = state->videoregs[0x00/2] % max_sprites;
@@ -726,8 +726,8 @@ VIDEO_UPDATE( metro )
 	int pri, layers_ctrl = -1;
 	UINT16 screenctrl = *state->screenctrl;
 
-	state->sprite_xoffs = state->videoregs[0x06 / 2] - video_screen_get_width(screen)  / 2;
-	state->sprite_yoffs = state->videoregs[0x04 / 2] - video_screen_get_height(screen) / 2;
+	state->sprite_xoffs = state->videoregs[0x06 / 2] - screen->width()  / 2;
+	state->sprite_yoffs = state->videoregs[0x04 / 2] - screen->height() / 2;
 
 	/* The background color is selected by a register */
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);

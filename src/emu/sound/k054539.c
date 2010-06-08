@@ -94,10 +94,8 @@ struct _k054539_state {
 INLINE k054539_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_K054539);
-	return (k054539_state *)device->token;
+	assert(device->type() == SOUND_K054539);
+	return (k054539_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 //*
@@ -454,12 +452,12 @@ static void k054539_init_chip(running_device *device, k054539_state *info)
 	info->k054539_flags |= K054539_UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	// Real size of 0x4000, the addon is to simplify the reverb buffer computations
-	info->ram = auto_alloc_array(device->machine, unsigned char, 0x4000*2+device->clock/50*2);
+	info->ram = auto_alloc_array(device->machine, unsigned char, 0x4000*2+device->clock()/50*2);
 	info->reverb_pos = 0;
 	info->cur_ptr = 0;
-	memset(info->ram, 0, 0x4000*2+device->clock/50*2);
+	memset(info->ram, 0, 0x4000*2+device->clock()/50*2);
 
-	const region_info *region = (info->intf->rgnoverride != NULL) ? device->machine->region(info->intf->rgnoverride) : device->region;
+	const region_info *region = (info->intf->rgnoverride != NULL) ? device->machine->region(info->intf->rgnoverride) : device->region();
 	info->rom = *region;
 	info->rom_size = region->bytes();
 	info->rom_mask = 0xffffffffU;
@@ -475,7 +473,7 @@ static void k054539_init_chip(running_device *device, k054539_state *info)
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
 		timer_pulse(device->machine, ATTOTIME_IN_HZ(480), info, 0, k054539_irq);
 
-	info->stream = stream_create(device, 0, 2, device->clock, info, k054539_update);
+	info->stream = stream_create(device, 0, 2, device->clock(), info, k054539_update);
 
 	state_save_register_device_item_array(device, 0, info->regs);
 	state_save_register_device_item_pointer(device, 0, info->ram,  0x4000);
@@ -651,7 +649,7 @@ static DEVICE_START( k054539 )
 		info->k054539_gain[i] = 1.0;
 	info->k054539_flags = K054539_RESET_FLAGS;
 
-	info->intf = (device->baseconfig().static_config != NULL) ? (const k054539_interface *)device->baseconfig().static_config : &defintrf;
+	info->intf = (device->baseconfig().static_config() != NULL) ? (const k054539_interface *)device->baseconfig().static_config() : &defintrf;
 
 	/*
         I've tried various equations on volume control but none worked consistently.

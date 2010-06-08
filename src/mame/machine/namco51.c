@@ -85,10 +85,9 @@ struct _namco_51xx_state
 INLINE namco_51xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == NAMCO_51XX);
+	assert(device->type() == NAMCO_51XX);
 
-	return (namco_51xx_state *)device->token;
+	return (namco_51xx_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -264,7 +263,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 
 					if (state->mode == 1)
 					{
-						int on = (video_screen_get_frame_number(device->machine->primary_screen) & 0x10) >> 4;
+						int on = (device->machine->primary_screen->frame_number() & 0x10) >> 4;
 
 						if (state->credits >= 2)
 							WRITE_PORT(state,0,0x0c | 3*on);	// lamps
@@ -361,7 +360,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( namco_51xx )
 	MDRV_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
 	MDRV_CPU_IO_MAP(namco_51xx_map_io)
-	MDRV_CPU_FLAGS(CPU_DISABLE)
+	MDRV_DEVICE_DISABLE()
 MACHINE_DRIVER_END
 
 
@@ -377,7 +376,7 @@ ROM_END
 
 static DEVICE_START( namco_51xx )
 {
-	const namco_51xx_interface *config = (const namco_51xx_interface *)device->baseconfig().static_config;
+	const namco_51xx_interface *config = (const namco_51xx_interface *)device->baseconfig().static_config();
 	namco_51xx_state *state = get_safe_token(device);
 	astring tempstring;
 

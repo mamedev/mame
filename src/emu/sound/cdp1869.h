@@ -34,6 +34,8 @@
 #ifndef __CDP1869__
 #define __CDP1869__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -83,12 +85,10 @@
 
 #define	CDP1869_PALETTE_LENGTH	8+64
 
-#define CDP1869 DEVICE_GET_INFO_NAME(cdp1869)
-#define SOUND_CDP1869 CDP1869
+DECLARE_LEGACY_SOUND_DEVICE(CDP1869, cdp1869);
 
 #define MDRV_CDP1869_ADD(_tag, _pixclock, _config) \
-	MDRV_DEVICE_ADD(_tag, SOUND, _pixclock) \
-	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_CDP1869) \
+	MDRV_DEVICE_ADD(_tag, SOUND_CDP1869, _pixclock) \
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_CDP1869_SCREEN_PAL_ADD(_tag, _clock) \
@@ -161,9 +161,6 @@ struct _cdp1869_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( cdp1869 );
 
 /* palette initialization */
 PALETTE_INIT( cdp1869 );

@@ -31,9 +31,9 @@
  *************************************/
 
 #define MDRV_CPU_VBLANK_INT_HACK(_func, _rate) \
-	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt, _func) \
-	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt_screen, NULL) \
-	MDRV_DEVICE_CONFIG_DATA32(cpu_config, vblank_interrupts_per_frame, _rate)
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DIEXEC_VBLANK_INT, 8, _rate, 24), \
+	TOKEN_PTR(cpu_interrupt, _func), \
+	TOKEN_PTR(stringptr, NULL), \
 
 
 
@@ -48,7 +48,7 @@
    handlers to synchronize their operation. If you call this from outside
    an interrupt handler, add 1 to the result, i.e. if it returns 0, it means
    that the interrupt handler will be called once. */
-int cpu_getiloops(running_device *device);
+#define cpu_getiloops(dev) device_execute(dev)->iloops()
 
 
 

@@ -67,10 +67,9 @@ struct _ttl74148_state
 INLINE ttl74148_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TTL74148);
+	assert(device->type() == TTL74148);
 
-	return (ttl74148_state *)device->token;
+	return (ttl74148_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 void ttl74148_update(running_device *device)
@@ -181,7 +180,7 @@ int ttl74148_enable_output_r(running_device *device)
 
 static DEVICE_START( ttl74148 )
 {
-	ttl74148_config *config = (ttl74148_config *)device->baseconfig().inline_config;
+	ttl74148_config *config = (ttl74148_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	ttl74148_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
 

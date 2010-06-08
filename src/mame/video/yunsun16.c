@@ -140,10 +140,10 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 {
 	yunsun16_state *state = (yunsun16_state *)machine->driver_data;
 	int offs;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	int max_x = visarea->max_x + 1;
-	int max_y = visarea->max_y + 1;
+	int max_x = visarea.max_x + 1;
+	int max_y = visarea.max_y + 1;
 
 	int pri = *state->priorityram & 3;
 	int pri_mask;

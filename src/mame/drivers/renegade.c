@@ -129,7 +129,7 @@ static UINT8 bank;
 
 static struct renegade_adpcm_state
 {
-	struct adpcm_state adpcm;
+	adpcm_state adpcm;
 	sound_stream *stream;
 	UINT32 current, end;
 	UINT8 nibble;
@@ -154,7 +154,7 @@ static STREAM_UPDATE( renegade_adpcm_callback )
 				state->playing = 0;
 		}
 
-		*dest++ = clock_adpcm(&state->adpcm, val) << 4;
+		*dest++ = state->adpcm.clock(val) << 4;
 		samples--;
 	}
 	while (samples > 0)
@@ -169,12 +169,12 @@ static DEVICE_START( renegade_adpcm )
 	running_machine *machine = device->machine;
 	struct renegade_adpcm_state *state = &renegade_adpcm;
 	state->playing = 0;
-	state->stream = stream_create(device, 0, 1, device->clock, state, renegade_adpcm_callback);
+	state->stream = stream_create(device, 0, 1, device->clock(), state, renegade_adpcm_callback);
 	state->base = memory_region(machine, "adpcm");
-	reset_adpcm(&state->adpcm);
+	state->adpcm.reset();
 }
 
-static DEVICE_GET_INFO( renegade_adpcm )
+DEVICE_GET_INFO( renegade_adpcm )
 {
 	switch (state)
 	{
@@ -187,7 +187,7 @@ static DEVICE_GET_INFO( renegade_adpcm )
 	}
 }
 
-#define SOUND_RENEGADE_ADPCM DEVICE_GET_INFO_NAME(renegade_adpcm)
+DECLARE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
 
 
 static WRITE8_HANDLER( adpcm_play_w )

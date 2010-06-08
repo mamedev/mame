@@ -192,9 +192,7 @@ struct _sega16sp_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO( sega16sp );
-
-#define SEGA16SP DEVICE_GET_INFO_NAME( sega16sp )
+DECLARE_LEGACY_DEVICE(SEGA16SP, sega16sp);
 
 void segaic16_sprites_hangon_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 void segaic16_sprites_sharrier_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect);

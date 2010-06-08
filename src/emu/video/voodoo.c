@@ -273,10 +273,9 @@ static const raster_info predef_raster_table[] =
 INLINE voodoo_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == VOODOO_GRAPHICS);
+	assert(device->type() == VOODOO_GRAPHICS);
 
-	return (voodoo_state *)device->token;
+	return (voodoo_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -832,10 +831,10 @@ static void swap_buffers(voodoo_state *v)
 {
 	int count;
 
-	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", video_screen_get_vpos(v->screen));
+	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", v->screen->vpos());
 
 	/* force a partial update */
-	video_screen_update_partial(v->screen, video_screen_get_vpos(v->screen));
+	v->screen->update_partial(v->screen->vpos());
 	v->fbi.video_changed = TRUE;
 
 	/* keep a history of swap intervals */
@@ -889,8 +888,8 @@ static void swap_buffers(voodoo_state *v)
 	/* update the statistics (debug) */
 	if (v->stats.display)
 	{
-		const rectangle *visible_area = video_screen_get_visible_area(v->screen);
-		int screen_area = (visible_area->max_x - visible_area->min_x + 1) * (visible_area->max_y - visible_area->min_y + 1);
+		const rectangle &visible_area = v->screen->visible_area();
+		int screen_area = (visible_area.max_x - visible_area.min_x + 1) * (visible_area.max_y - visible_area.min_y + 1);
 		char *statsptr = v->stats.buffer;
 		int pixelcount;
 		int i;
@@ -943,11 +942,11 @@ static void swap_buffers(voodoo_state *v)
 
 static void adjust_vblank_timer(voodoo_state *v)
 {
-	attotime vblank_period = video_screen_get_time_until_pos(v->screen, v->fbi.vsyncscan, 0);
+	attotime vblank_period = v->screen->time_until_pos(v->fbi.vsyncscan);
 
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (attotime_compare(vblank_period, attotime_zero) == 0)
-		vblank_period = video_screen_get_frame_period(v->screen);
+		vblank_period = v->screen->frame_period();
 	timer_adjust_oneshot(v->fbi.vblank_timer, vblank_period, 0);
 }
 
@@ -996,7 +995,7 @@ static TIMER_CALLBACK( vblank_callback )
 		swap_buffers(v);
 
 	/* set a timer for the next off state */
-	timer_set(machine, video_screen_get_time_until_pos(v->screen, 0, 0), v, 0, vblank_off_callback);
+	timer_set(machine, v->screen->time_until_pos(0), v, 0, vblank_off_callback);
 
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
@@ -2455,7 +2454,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					int vvis = (v->reg[videoDimensions].u >> 16) & 0x3ff;
 					int hbp = (v->reg[backPorch].u & 0xff) + 2;
 					int vbp = (v->reg[backPorch].u >> 16) & 0xff;
-					attoseconds_t refresh = video_screen_get_frame_period(v->screen).attoseconds;
+					attoseconds_t refresh = v->screen->frame_period().attoseconds;
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
@@ -2490,17 +2489,17 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					/* configure the screen based on which one matches the closest */
 					if (stddiff < meddiff && stddiff < vgadiff)
 					{
-						video_screen_configure(v->screen, htotal, vtotal, &visarea, stdperiod);
+						v->screen->configure(htotal, vtotal, visarea, stdperiod);
 						mame_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
 					}
 					else if (meddiff < vgadiff)
 					{
-						video_screen_configure(v->screen, htotal, vtotal, &visarea, medperiod);
+						v->screen->configure(htotal, vtotal, visarea, medperiod);
 						mame_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
 					}
 					else
 					{
-						video_screen_configure(v->screen, htotal, vtotal, &visarea, vgaperiod);
+						v->screen->configure(htotal, vtotal, visarea, vgaperiod);
 						mame_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
 					}
 
@@ -3694,7 +3693,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 
 			/* eat some cycles since people like polling here */
 			cpu_eat_cycles(v->cpu, 10);
-			result = video_screen_get_vpos(v->screen);
+			result = v->screen->vpos();
 			break;
 
 		/* reserved area in the TMU read by the Vegas startup sequence */
@@ -4394,7 +4393,7 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 				v->fbi.width = data & 0xfff;
 			if (data & 0xfff000)
 				v->fbi.height = (data >> 12) & 0xfff;
-			video_screen_set_visarea(v->screen, 0, v->fbi.width - 1, 0, v->fbi.height - 1);
+			v->screen->set_visible_area(0, v->fbi.width - 1, 0, v->fbi.height - 1);
 			adjust_vblank_timer(v);
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", cpuexec_describe_context(device->machine), banshee_io_reg_name[offset], data, mem_mask);
@@ -4440,7 +4439,7 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 
 static DEVICE_START( voodoo )
 {
-	const voodoo_config *config = (const voodoo_config *)device->baseconfig().inline_config;
+	const voodoo_config *config = (const voodoo_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	voodoo_state *v = get_safe_token(device);
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
@@ -4448,8 +4447,8 @@ static DEVICE_START( voodoo )
 	int val;
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config == NULL);
-	assert(device->baseconfig().inline_config != NULL);
+	assert(device->baseconfig().static_config() == NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -4464,7 +4463,7 @@ static DEVICE_START( voodoo )
 	v->device = device;
 
 	/* copy config data */
-	v->freq = device->clock;
+	v->freq = device->clock();
 	v->fbi.vblank_client = config->vblank;
 	v->pci.stall_callback = config->stall;
 
@@ -4538,8 +4537,8 @@ static DEVICE_START( voodoo )
 	}
 
 	/* set the type, and initialize the chip mask */
-	v->index = device->machine->devicelist.index(device->type, device->tag());
-	v->screen = device->machine->device(config->screen);
+	v->index = device->machine->devicelist.index(device->type(), device->tag());
+	v->screen = downcast<screen_device *>(device->machine->device(config->screen));
 	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
 	v->cpu = device->machine->device(config->cputag);
 	assert_always(v->cpu != NULL, "Unable to find CPU attached to voodoo");
@@ -4647,7 +4646,7 @@ static DEVICE_RESET( voodoo )
 
 INLINE const char *get_voodoo_name(const device_config *devconfig)
 {
-	const voodoo_config *config = (devconfig != NULL) ? (const voodoo_config *)devconfig->inline_config : NULL;
+	const voodoo_config *config = (devconfig != NULL) ? (const voodoo_config *)downcast<const legacy_device_config_base *>(devconfig)->inline_config() : NULL;
 	switch (config->type)
 	{
 		default:
@@ -4664,7 +4663,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_STOP | DT_HAS_INLINE_CONFIG
 #define DEVTEMPLATE_NAME		get_voodoo_name(device)
 #define DEVTEMPLATE_FAMILY		"3dfx Voodoo Graphics"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
 #include "devtempl.h"
 
 

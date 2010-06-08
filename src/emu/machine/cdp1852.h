@@ -25,6 +25,8 @@
 #ifndef __CDP1852__
 #define __CDP1852__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -32,7 +34,7 @@
 
 #define CDP1852_CLOCK_HIGH	0
 
-#define CDP1852 DEVICE_GET_INFO_NAME(cdp1852)
+DECLARE_LEGACY_DEVICE(CDP1852, cdp1852);
 
 #define MDRV_CDP1852_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, CDP1852, _clock) \
@@ -69,9 +71,6 @@ struct _cdp1852_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( cdp1852 );
 
 /* data access */
 READ8_DEVICE_HANDLER( cdp1852_data_r );

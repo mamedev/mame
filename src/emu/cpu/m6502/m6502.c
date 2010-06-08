@@ -68,7 +68,7 @@ struct _m6502_Regs
 	UINT8	irq_state;
 	UINT8   so_state;
 
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *space;
 	const address_space *io;
@@ -87,8 +87,7 @@ struct _m6502_Regs
 INLINE m6502_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M6502 ||
 		   cpu_get_type(device) == CPU_M6510 ||
 		   cpu_get_type(device) == CPU_M6510T ||
@@ -98,7 +97,7 @@ INLINE m6502_Regs *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_M65C02 ||
 		   cpu_get_type(device) == CPU_M65SC02 ||
 		   cpu_get_type(device) == CPU_DECO16);
-	return (m6502_Regs *)device->token;
+	return (m6502_Regs *)downcast<cpu_device *>(device)->token();
 }
 
 static UINT8 default_rdmem_id(const address_space *space, offs_t offset) { return memory_read_byte_8le(space, offset); }
@@ -129,14 +128,14 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
  *
  *****************************************************************************/
 
-static void m6502_common_init(running_device *device, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+static void m6502_common_init(running_device *device, device_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->space = device_memory(device)->space(AS_PROGRAM);
 	cpustate->subtype = subtype;
 	cpustate->insn = insn;
 	cpustate->rdmem_id = default_rdmem_id;
@@ -529,7 +528,7 @@ static CPU_INIT( deco16 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 	m6502_common_init(device, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
-	cpustate->io = device->space(AS_IO);
+	cpustate->io = device_memory(device)->space(AS_IO);
 }
 
 
@@ -692,7 +691,7 @@ static CPU_SET_INFO( m6502 )
 
 CPU_GET_INFO( m6502 )
 {
-	m6502_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m6502_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -810,7 +809,7 @@ static CPU_SET_INFO( m6510 )
 
 CPU_GET_INFO( m6510 )
 {
-	m6502_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m6502_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

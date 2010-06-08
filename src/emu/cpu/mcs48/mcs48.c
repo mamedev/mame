@@ -149,7 +149,7 @@ struct _mcs48_state
 
 	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
 
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	int			icount;
 
@@ -161,64 +161,12 @@ struct _mcs48_state
 	UINT8		feature_mask;		/* processor feature flags */
 	UINT16		int_rom_size;		/* internal rom size */
 
-	cpu_state_table state;			/* state table */
 	UINT8		rtemp;				/* temporary for import/export */
 };
 
 
 /* opcode table entry */
 typedef int (*mcs48_ophandler)(mcs48_state *state);
-
-
-
-/***************************************************************************
-    CPU STATE DESCRIPTION
-***************************************************************************/
-
-#define MCS48_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(MCS48_##_name, #_name, _format, mcs48_state, _member, _datamask, MCS48_FEATURE | UPI41_FEATURE, _flags)
-
-#define UPI41_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(MCS48_##_name, #_name, _format, mcs48_state, _member, _datamask, UPI41_FEATURE, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	MCS48_STATE_ENTRY(PC, "%03X", pc, 0xfff, 0)
-	MCS48_STATE_ENTRY(GENPC, "%03X", pc, 0xfff, CPUSTATE_NOSHOW)
-	MCS48_STATE_ENTRY(GENPCBASE, "%03X", prevpc, 0xfff, CPUSTATE_NOSHOW)
-
-	MCS48_STATE_ENTRY(GENSP, "%1X", psw, 0x7, CPUSTATE_NOSHOW)
-
-	MCS48_STATE_ENTRY(A, "%02X", a, 0xff, 0)
-	MCS48_STATE_ENTRY(TC, "%02X", timer, 0xff, 0)
-	MCS48_STATE_ENTRY(TPRE, "%02X", prescaler, 0x1f, 0)
-
-	MCS48_STATE_ENTRY(P1, "%02X", p1, 0xff, 0)
-	MCS48_STATE_ENTRY(P2, "%02X", p2, 0xff, 0)
-
-	MCS48_STATE_ENTRY(R0, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	MCS48_STATE_ENTRY(R1, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	MCS48_STATE_ENTRY(R2, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	MCS48_STATE_ENTRY(R3, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	MCS48_STATE_ENTRY(R4, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	MCS48_STATE_ENTRY(R5, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	MCS48_STATE_ENTRY(R6, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	MCS48_STATE_ENTRY(R7, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-
-	MCS48_STATE_ENTRY(EA, "%1u", ea, 0x1, 0)
-
-	UPI41_STATE_ENTRY(STS, "%02X", sts, 0xff, 0)
-	UPI41_STATE_ENTRY(DBBI, "%02X", dbbi, 0xff, 0)
-	UPI41_STATE_ENTRY(DBBO, "%02X", dbbo, 0xff, 0)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
-};
 
 
 
@@ -272,8 +220,7 @@ static int check_irqs(mcs48_state *cpustate);
 INLINE mcs48_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I8035 ||
 		   cpu_get_type(device) == CPU_I8048 ||
 		   cpu_get_type(device) == CPU_I8648 ||
@@ -291,7 +238,7 @@ INLINE mcs48_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_MB8884 ||
 		   cpu_get_type(device) == CPU_N7751 ||
 		   cpu_get_type(device) == CPU_M58715);
-	return (mcs48_state *)device->token;
+	return (mcs48_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -893,7 +840,7 @@ static const mcs48_ophandler opcode_table[256]=
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
 
-static void mcs48_init(running_device *device, cpu_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
+static void mcs48_init(running_device *device, device_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
@@ -910,14 +857,39 @@ static void mcs48_init(running_device *device, cpu_irq_callback irqcallback, UIN
 	cpustate->int_rom_size = romsize;
 	cpustate->feature_mask = feature_mask;
 
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	/* set up the state table */
-	cpustate->state = state_table_template;
-	cpustate->state.baseptr = cpustate;
-	cpustate->state.subtypemask = feature_mask;
+	{
+		device_state_interface *state;
+		device->interface(state);
+		state->state_add(MCS48_PC,        "PC",        cpustate->pc).mask(0xfff);
+		state->state_add(STATE_GENPC,     "GENPC",     cpustate->pc).mask(0xfff).noshow();
+		state->state_add(STATE_GENPCBASE, "GENPCBASE", cpustate->prevpc).mask(0xfff).noshow();
+		state->state_add(STATE_GENSP,     "GENSP",     cpustate->psw).mask(0x7).noshow();
+		state->state_add(STATE_GENFLAGS,  "GENFLAGS",  cpustate->psw).noshow().formatstr("%10s");
+		state->state_add(MCS48_A,         "A",         cpustate->a);
+		state->state_add(MCS48_TC,        "TC",        cpustate->timer);
+		state->state_add(MCS48_TPRE,      "TPRE",      cpustate->prescaler).mask(0x1f);
+		state->state_add(MCS48_P1,        "P1",        cpustate->p1);
+		state->state_add(MCS48_P2,        "P2",        cpustate->p2);
+		
+		astring tempstr;
+		for (int regnum = 0; regnum < 8; regnum++)
+			state->state_add(MCS48_R0 + regnum, tempstr.format("R%d", regnum), cpustate->rtemp).callimport().callexport();
+
+		state->state_add(MCS48_EA,        "EA",        cpustate->ea).mask(0x1);
+
+		if (feature_mask & UPI41_FEATURE)
+		{
+			state->state_add(MCS48_STS,   "STS",       cpustate->sts);
+			state->state_add(MCS48_DBBI,  "DBBI",      cpustate->dbbi);
+			state->state_add(MCS48_DBBO,  "DBBO",      cpustate->dbbo);
+		}
+
+	}
 
 	/* ensure that regptr is valid before get_info gets called */
 	update_regptr(cpustate);
@@ -1292,7 +1264,7 @@ static CPU_IMPORT_STATE( mcs48 )
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
-	switch (entry->index)
+	switch (entry.index())
 	{
 		case MCS48_R0:
 		case MCS48_R1:
@@ -1302,7 +1274,7 @@ static CPU_IMPORT_STATE( mcs48 )
 		case MCS48_R5:
 		case MCS48_R6:
 		case MCS48_R7:
-			cpustate->regptr[entry->index - MCS48_R0] = cpustate->rtemp;
+			cpustate->regptr[entry.index() - MCS48_R0] = cpustate->rtemp;
 			break;
 
 		default:
@@ -1321,7 +1293,7 @@ static CPU_EXPORT_STATE( mcs48 )
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
-	switch (entry->index)
+	switch (entry.index())
 	{
 		case MCS48_R0:
 		case MCS48_R1:
@@ -1331,7 +1303,7 @@ static CPU_EXPORT_STATE( mcs48 )
 		case MCS48_R5:
 		case MCS48_R6:
 		case MCS48_R7:
-			cpustate->rtemp = cpustate->regptr[entry->index - MCS48_R0];
+			cpustate->rtemp = cpustate->regptr[entry.index() - MCS48_R0];
 			break;
 
 		default:
@@ -1340,6 +1312,27 @@ static CPU_EXPORT_STATE( mcs48 )
 	}
 }
 
+static CPU_EXPORT_STRING( mcs48 )
+{
+	mcs48_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case CPUINFO_STR_FLAGS:
+			string.printf("%c%c %c%c%c%c%c%c%c%c",
+				cpustate->irq_state ? 'I':'.',
+				cpustate->a11       ? 'M':'.',
+				cpustate->psw & 0x80 ? 'C':'.',
+				cpustate->psw & 0x40 ? 'A':'.',
+				cpustate->psw & 0x20 ? 'F':'.',
+				cpustate->psw & 0x10 ? 'B':'.',
+				cpustate->psw & 0x08 ? '?':'.',
+				cpustate->psw & 0x04 ? '4':'.',
+				cpustate->psw & 0x02 ? '2':'.',
+				cpustate->psw & 0x01 ? '1':'.');
+			break;
+	}
+}
 
 /*-------------------------------------------------
     mcs48_set_info - set a piece of information
@@ -1366,7 +1359,7 @@ static CPU_SET_INFO( mcs48 )
 
 static CPU_GET_INFO( mcs48 )
 {
-	mcs48_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	mcs48_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1403,10 +1396,10 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(mcs48);		break;
 		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(mcs48);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(mcs48);		break;
+		case CPUINFO_FCT_EXPORT_STRING:	info->export_string = CPU_EXPORT_STRING_NAME(mcs48);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	/* set per-core */						break;
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		/* set per-core */						break;
 
@@ -1416,20 +1409,6 @@ static CPU_GET_INFO( mcs48 )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.2");					break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c %c%c%c%c%c%c%c%c",
-				cpustate->irq_state ? 'I':'.',
-				cpustate->a11       ? 'M':'.',
-				cpustate->psw & 0x80 ? 'C':'.',
-				cpustate->psw & 0x40 ? 'A':'.',
-				cpustate->psw & 0x20 ? 'F':'.',
-				cpustate->psw & 0x10 ? 'B':'.',
-				cpustate->psw & 0x08 ? '?':'.',
-				cpustate->psw & 0x04 ? '4':'.',
-				cpustate->psw & 0x02 ? '2':'.',
-				cpustate->psw & 0x01 ? '1':'.');
-			break;
 	}
 }
 

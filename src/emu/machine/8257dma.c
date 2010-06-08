@@ -85,9 +85,8 @@ static void dma8257_update_status(running_device *device);
 
 INLINE i8257_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == I8257 );
-	return ( i8257_t * ) device->token;
+	assert( device->type() == I8257 );
+	return ( i8257_t * ) downcast<legacy_device_base *>(device)->token();
 }
 
 static int dma8257_do_operation(running_device *device, int channel)
@@ -218,7 +217,7 @@ static void dma8257_update_status(running_device *device)
 
 	if (pending_transfer)
 	{
-		next = ATTOTIME_IN_HZ(device->clock / 4 );
+		next = ATTOTIME_IN_HZ(device->clock() / 4 );
 		timer_adjust_periodic(i8257->timer,
 			attotime_zero,
 			0,
@@ -384,7 +383,7 @@ WRITE_LINE_DEVICE_HANDLER( i8257_drq3_w ) { dma8257_drq_w(device, 3, state); }
 static DEVICE_START( i8257 )
 {
 	i8257_t *i8257 = get_safe_token(device);
-	i8257_interface *intf = (i8257_interface *)device->baseconfig().static_config;
+	i8257_interface *intf = (i8257_interface *)device->baseconfig().static_config();
 	int i;
 
 	/* validate arguments */
@@ -438,7 +437,6 @@ DEVICE_GET_INFO( i8257 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8257_t);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8257);break;

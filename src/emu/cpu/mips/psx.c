@@ -184,7 +184,7 @@ struct _psxcpu_state
 	int multiplier_operation;
 	UINT32 multiplier_operand1;
 	UINT32 multiplier_operand2;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	int bus_attached;
@@ -196,11 +196,10 @@ struct _psxcpu_state
 INLINE psxcpu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_PSXCPU ||
 		   cpu_get_type(device) == CPU_CXD8661R);
-	return (psxcpu_state *)device->token;
+	return (psxcpu_state *)downcast<cpu_device *>(device)->token();
 }
 
 static const UINT32 mips_mtc0_writemask[]=
@@ -1633,11 +1632,11 @@ static void mips_state_register( const char *type, running_device *device )
 static CPU_INIT( psxcpu )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
-//  psxcpu->intf = (psxcpu_interface *) device->baseconfig().static_config;
+//  psxcpu->intf = (psxcpu_interface *) device->baseconfig().static_config();
 
 	psxcpu->irq_callback = irqcallback;
 	psxcpu->device = device;
-	psxcpu->program = device->space(AS_PROGRAM);
+	psxcpu->program = device_memory(device)->space(AS_PROGRAM);
 
 	mips_state_register( "psxcpu", device );
 }
@@ -6111,7 +6110,7 @@ static CPU_SET_INFO( psxcpu )
 
 CPU_GET_INFO( psxcpu )
 {
-	psxcpu_state *psxcpu = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	psxcpu_state *psxcpu = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

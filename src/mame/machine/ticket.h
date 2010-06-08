@@ -4,6 +4,9 @@
 
 ***************************************************************************/
 
+#include "devlegcy.h"
+
+
 #define TICKET_MOTOR_ACTIVE_LOW    0    /* Ticket motor is triggered by D7=0 */
 #define TICKET_MOTOR_ACTIVE_HIGH   1    /* Ticket motor is triggered by D7=1 */
 
@@ -31,6 +34,4 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w );
 
 READ_LINE_DEVICE_HANDLER( ticket_dispenser_line_r );
 
-/* device interface */
-#define TICKET_DISPENSER DEVICE_GET_INFO_NAME(ticket)
-DEVICE_GET_INFO( ticket );
+DECLARE_LEGACY_DEVICE(TICKET_DISPENSER, ticket);

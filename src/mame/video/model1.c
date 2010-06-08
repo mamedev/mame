@@ -1160,7 +1160,7 @@ static int get_list_number(void)
 
 static void end_frame(running_machine *machine)
 {
-	if((listctl[0] & 4) && (video_screen_get_frame_number(machine->primary_screen) & 1))
+	if((listctl[0] & 4) && (machine->primary_screen->frame_number() & 1))
 		listctl[0] ^= 0x40;
 }
 

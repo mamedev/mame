@@ -136,7 +136,7 @@ void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_da
 void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
-	offs_t romsize = chip->cpu->region->length;
+	offs_t romsize = chip->cpu->region()->length;
 	int rgnum;
 
 	/* loop over the regions */
@@ -319,7 +319,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 		/* ROM areas need extra clamping */
 		if (rgn->romoffset != ~0)
 		{
-			offs_t romsize = chip->cpu->region->length;
+			offs_t romsize = chip->cpu->region()->length;
 			if (region_start >= romsize)
 				read = NULL;
 			else if (region_start + rgn->length > romsize)
@@ -355,7 +355,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 						decrypted = (UINT8 *)fd1089_get_decrypted_base();
 				}
 
-				memory_configure_bank(machine, readbank, 0, 1, chip->cpu->region->base.u8 + region_start, 0);
+				memory_configure_bank(machine, readbank, 0, 1, chip->cpu->region()->base.u8 + region_start, 0);
 				if (decrypted)
 					memory_configure_bank_decrypted(machine, readbank, 0, 1, decrypted + region_start, 0);
 
@@ -412,10 +412,9 @@ struct _ic_315_5248_state
 INLINE ic_315_5248_state *_315_5248_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == _315_5248);
+	assert(device->type() == _315_5248);
 
-	return (ic_315_5248_state *)device->token;
+	return (ic_315_5248_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -491,10 +490,9 @@ struct _ic_315_5249_state
 INLINE ic_315_5249_state *_315_5249_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == _315_5249);
+	assert(device->type() == _315_5249);
 
-	return (ic_315_5249_state *)device->token;
+	return (ic_315_5249_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -650,17 +648,16 @@ struct _ic_315_5250_state
 INLINE ic_315_5250_state *_315_5250_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == _315_5250);
+	assert(device->type() == _315_5250);
 
-	return (ic_315_5250_state *)device->token;
+	return (ic_315_5250_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const ic_315_5250_interface *_315_5250_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == _315_5250));
-	return (const ic_315_5250_interface *) device->baseconfig().static_config;
+	assert((device->type() == _315_5250));
+	return (const ic_315_5250_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -809,7 +806,6 @@ DEVICE_GET_INFO( ic_315_5248 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5248_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5248);		break;
@@ -831,7 +827,6 @@ DEVICE_GET_INFO( ic_315_5249 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5249_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5249);		break;
@@ -853,7 +848,6 @@ DEVICE_GET_INFO( ic_315_5250 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ic_315_5250_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ic_315_5250);		break;

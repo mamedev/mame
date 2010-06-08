@@ -53,6 +53,7 @@
 #include <tchar.h>
 #include <mmsystem.h>
 #include <d3d9.h>
+#undef interface
 
 // MAME headers
 #include "emu.h"
@@ -1271,7 +1272,6 @@ static int get_adapter_for_monitor(d3d_info *d3d, win_monitor_info *monitor)
 
 static void pick_best_mode(win_window_info *window)
 {
-	const device_config *primary_screen = video_screen_first(window->machine->config);
 	double target_refresh = 60.0;
 	INT32 target_width, target_height;
 	d3d_info *d3d = (d3d_info *)window->drawdata;
@@ -1281,11 +1281,9 @@ static void pick_best_mode(win_window_info *window)
 	int modenum;
 
 	// determine the refresh rate of the primary screen
+	const screen_device_config *primary_screen = screen_first(*window->machine->config);
 	if (primary_screen != NULL)
-	{
-		const screen_config *config = (const screen_config *)primary_screen->inline_config;
-		target_refresh = ATTOSECONDS_TO_HZ(config->refresh);
-	}
+		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh());
 
 	// determine the minimum width/height for the selected target
 	// note: technically we should not be calling this from an alternate window

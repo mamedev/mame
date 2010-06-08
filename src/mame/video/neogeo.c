@@ -236,7 +236,7 @@ static TIMER_CALLBACK( auto_animation_timer_callback )
 	else
 		state->auto_animation_frame_counter = state->auto_animation_frame_counter - 1;
 
-	timer_adjust_oneshot(state->auto_animation_timer, video_screen_get_time_until_pos(machine->primary_screen, NEOGEO_VSSTART, 0), 0);
+	timer_adjust_oneshot(state->auto_animation_timer, machine->primary_screen->time_until_pos(NEOGEO_VSSTART), 0);
 }
 
 
@@ -250,7 +250,7 @@ static void create_auto_animation_timer( running_machine *machine )
 static void start_auto_animation_timer( running_machine *machine )
 {
 	neogeo_state *state = (neogeo_state *)machine->driver_data;
-	timer_adjust_oneshot(state->auto_animation_timer, video_screen_get_time_until_pos(machine->primary_screen, NEOGEO_VSSTART, 0), 0);
+	timer_adjust_oneshot(state->auto_animation_timer, machine->primary_screen->time_until_pos(NEOGEO_VSSTART), 0);
 }
 
 
@@ -650,14 +650,14 @@ static TIMER_CALLBACK( sprite_line_timer_callback )
 	/* we are at the beginning of a scanline -
        we need to draw the previous scanline and parse the sprites on the current one */
 	if (scanline != 0)
-		video_screen_update_partial(machine->primary_screen, scanline - 1);
+		machine->primary_screen->update_partial(scanline - 1);
 
 	parse_sprites(machine, scanline);
 
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	timer_adjust_oneshot(state->sprite_line_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(state->sprite_line_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -671,7 +671,7 @@ static void create_sprite_line_timer( running_machine *machine )
 static void start_sprite_line_timer( running_machine *machine )
 {
 	neogeo_state *state = (neogeo_state *)machine->driver_data;
-	timer_adjust_oneshot(state->sprite_line_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(state->sprite_line_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 
@@ -768,7 +768,7 @@ static UINT16 get_video_control( running_machine *machine )
     */
 
 	/* the vertical counter chain goes from 0xf8 - 0x1ff */
-	v_counter = video_screen_get_vpos(machine->primary_screen) + 0x100;
+	v_counter = machine->primary_screen->vpos() + 0x100;
 
 	if (v_counter >= 0x200)
 		v_counter = v_counter - NEOGEO_VTOTAL;

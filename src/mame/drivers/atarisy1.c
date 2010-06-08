@@ -219,7 +219,6 @@ static MACHINE_RESET( atarisy1 )
 
 	/* reset the joystick parameters */
 	state->joystick_value = 0;
-	state->joystick_timer = devtag_get_device(machine, "joystick_timer");
 	state->joystick_int = 0;
 	state->joystick_int_enable = 0;
 }
@@ -234,10 +233,10 @@ static MACHINE_RESET( atarisy1 )
 
 static TIMER_DEVICE_CALLBACK( delayed_joystick_int )
 {
-	atarisy1_state *state = (atarisy1_state *)timer->machine->driver_data;
+	atarisy1_state *state = (atarisy1_state *)timer.machine->driver_data;
 	state->joystick_value = param;
 	state->joystick_int = 1;
-	atarigen_update_interrupts(timer->machine);
+	atarigen_update_interrupts(timer.machine);
 }
 
 
@@ -264,7 +263,7 @@ static READ16_HANDLER( joystick_r )
 
 	/* clear any existing interrupt and set a timer for a new one */
 	state->joystick_int = 0;
-	timer_device_adjust_oneshot(state->joystick_timer, ATTOTIME_IN_USEC(50), newval);
+	state->joystick_timer->adjust(ATTOTIME_IN_USEC(50), newval);
 	atarigen_update_interrupts(space->machine);
 
 	return state->joystick_value;

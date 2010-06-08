@@ -644,7 +644,7 @@ static VIDEO_UPDATE( crystal )
 	UINT16 *srcline;
 	int y;
 	UINT16 head, tail;
-	UINT32 width = video_screen_get_width(screen);
+	UINT32 width = screen->width();
 
 	if (GetVidReg(space, 0x8e) & 1)
 	{

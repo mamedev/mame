@@ -124,16 +124,16 @@ WRITE16_HANDLER( atarig1_mo_control_w )
 {
 	atarig1_state *state = (atarig1_state *)space->machine->driver_data;
 
-	logerror("MOCONT = %d (scan = %d)\n", data, video_screen_get_vpos(space->machine->primary_screen));
+	logerror("MOCONT = %d (scan = %d)\n", data, space->machine->primary_screen->vpos());
 
 	/* set the control value */
 	COMBINE_DATA(&state->current_control);
 }
 
 
-void atarig1_scanline_update(running_device *screen, int scanline)
+void atarig1_scanline_update(screen_device &screen, int scanline)
 {
-	atarig1_state *state = (atarig1_state *)screen->machine->driver_data;
+	atarig1_state *state = (atarig1_state *)screen.machine->driver_data;
 	UINT16 *base = &state->atarigen.alpha[(scanline / 8) * 64 + 48];
 	int i;
 
@@ -142,7 +142,7 @@ void atarig1_scanline_update(running_device *screen, int scanline)
 	/* keep in range */
 	if (base >= &state->atarigen.alpha[0x800])
 		return;
-	video_screen_update_partial(screen, MAX(scanline - 1, 0));
+	screen.update_partial(MAX(scanline - 1, 0));
 
 	/* update the playfield scrolls */
 	for (i = 0; i < 8; i++)
@@ -156,7 +156,7 @@ void atarig1_scanline_update(running_device *screen, int scanline)
 			int newscroll = ((word >> 6) + state->pfscroll_xoffset) & 0x1ff;
 			if (newscroll != state->playfield_xscroll)
 			{
-				video_screen_update_partial(screen, MAX(scanline + i - 1, 0));
+				screen.update_partial(MAX(scanline + i - 1, 0));
 				tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll);
 				state->playfield_xscroll = newscroll;
 			}
@@ -170,13 +170,13 @@ void atarig1_scanline_update(running_device *screen, int scanline)
 			int newbank = word & 7;
 			if (newscroll != state->playfield_yscroll)
 			{
-				video_screen_update_partial(screen, MAX(scanline + i - 1, 0));
+				screen.update_partial(MAX(scanline + i - 1, 0));
 				tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll);
 				state->playfield_yscroll = newscroll;
 			}
 			if (newbank != state->playfield_tile_bank)
 			{
-				video_screen_update_partial(screen, MAX(scanline + i - 1, 0));
+				screen.update_partial(MAX(scanline + i - 1, 0));
 				tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 				state->playfield_tile_bank = newbank;
 			}

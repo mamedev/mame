@@ -37,10 +37,8 @@ struct _ym3812_state
 INLINE ym3812_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YM3812);
-	return (ym3812_state *)device->token;
+	assert(device->type() == SOUND_YM3812);
+	return (ym3812_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -93,13 +91,13 @@ static DEVICE_START( ym3812 )
 {
 	static const ym3812_interface dummy = { 0 };
 	ym3812_state *info = get_safe_token(device);
-	int rate = device->clock/72;
+	int rate = device->clock()/72;
 
-	info->intf = device->baseconfig().static_config ? (const ym3812_interface *)device->baseconfig().static_config : &dummy;
+	info->intf = device->baseconfig().static_config() ? (const ym3812_interface *)device->baseconfig().static_config() : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
-	info->chip = ym3812_init(device,device->clock,rate);
+	info->chip = ym3812_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM3812 chip");
 
 	info->stream = stream_create(device,0,1,rate,info,ym3812_stream_update);

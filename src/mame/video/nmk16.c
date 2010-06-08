@@ -138,7 +138,7 @@ VIDEO_START( bioship )
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
 	nmk16_video_init(machine);
-	background_bitmap = auto_bitmap_alloc(machine,8192,512,video_screen_get_format(machine->primary_screen));
+	background_bitmap = auto_bitmap_alloc(machine,8192,512,machine->primary_screen->format());
 	bioship_background_bank=0;
 	redraw_bitmap = 1;
 

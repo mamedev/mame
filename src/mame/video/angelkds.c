@@ -275,7 +275,7 @@ VIDEO_START( angelkds )
 VIDEO_UPDATE( angelkds )
 {
 	angelkds_state *state = (angelkds_state *)screen->machine->driver_data;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 	rectangle clip;
 
 	bitmap_fill(bitmap, cliprect, 0x3f); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
@@ -283,8 +283,8 @@ VIDEO_UPDATE( angelkds )
 	/* draw top of screen */
 	clip.min_x = 8*0;
 	clip.max_x = 8*16-1;
-	clip.min_y = visarea->min_y;
-	clip.max_y = visarea->max_y;
+	clip.min_y = visarea.min_y;
+	clip.max_y = visarea.max_y;
 
 	if ((state->layer_ctrl & 0x80) == 0x00)
 		tilemap_draw(bitmap, &clip, state->bgtop_tilemap, 0, 0);
@@ -297,8 +297,8 @@ VIDEO_UPDATE( angelkds )
 	/* draw bottom of screen */
 	clip.min_x = 8*16;
 	clip.max_x = 8*32-1;
-	clip.min_y = visarea->min_y;
-	clip.max_y = visarea->max_y;
+	clip.min_y = visarea.min_y;
+	clip.max_y = visarea.max_y;
 
 	if ((state->layer_ctrl & 0x40) == 0x00)
 		tilemap_draw(bitmap, &clip, state->bgbot_tilemap, 0, 0);

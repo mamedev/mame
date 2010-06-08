@@ -509,7 +509,7 @@ static void update_gun_irq(running_machine *machine)
 static TIMER_CALLBACK( invasn_gun_callback )
 {
 	int player = param;
-	int beamy = video_screen_get_vpos(machine->primary_screen);
+	int beamy = machine->primary_screen->vpos();
 
 	/* set the appropriate IRQ in the internal gun control and update */
 	gun_irq_state |= 0x01 << player;
@@ -517,8 +517,8 @@ static TIMER_CALLBACK( invasn_gun_callback )
 
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
-	if (beamy <= video_screen_get_visible_area(machine->primary_screen)->max_y && beamy <= gun_y[player] + BEAM_DY)
-		timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(machine->primary_screen, beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
+	if (beamy <= machine->primary_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
+		timer_adjust_oneshot(gun_timer[player], machine->primary_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
 }
 
 
@@ -539,15 +539,15 @@ static WRITE32_HANDLER( invasn_gun_w )
 		UINT8 pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
-			const rectangle *visarea = video_screen_get_visible_area(space->machine->primary_screen);
+			const rectangle &visarea = space->machine->primary_screen->visible_area();
 			static const char *const names[2][2] =
 			{
 				{ "GUNX1", "GUNY1" },
 				{ "GUNX2", "GUNY2" }
 			};
-			gun_x[player] = input_port_read(space->machine, names[player][0]) * (visarea->max_x + 1 - visarea->min_x) / 255 + visarea->min_x + BEAM_XOFFS;
-			gun_y[player] = input_port_read(space->machine, names[player][1]) * (visarea->max_y + 1 - visarea->min_y) / 255 + visarea->min_y;
-			timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(space->machine->primary_screen, MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			gun_x[player] = input_port_read(space->machine, names[player][0]) * (visarea.max_x + 1 - visarea.min_x) / 255 + visarea.min_x + BEAM_XOFFS;
+			gun_y[player] = input_port_read(space->machine, names[player][1]) * (visarea.max_y + 1 - visarea.min_y) / 255 + visarea.min_y;
+			timer_adjust_oneshot(gun_timer[player], space->machine->primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
@@ -555,8 +555,8 @@ static WRITE32_HANDLER( invasn_gun_w )
 
 static READ32_HANDLER( invasn_gun_r )
 {
-	int beamx = video_screen_get_hpos(space->machine->primary_screen);
-	int beamy = video_screen_get_vpos(space->machine->primary_screen);
+	int beamx = space->machine->primary_screen->hpos();
+	int beamy = space->machine->primary_screen->vpos();
 	UINT32 result = 0xffff;
 	int player;
 

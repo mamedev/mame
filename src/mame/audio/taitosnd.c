@@ -45,17 +45,16 @@ struct _tc0140syt_state
 INLINE tc0140syt_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0140SYT);
+	assert(device->type() == TC0140SYT);
 
-	return (tc0140syt_state *)device->token;
+	return (tc0140syt_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0140syt_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0140SYT));
-	return (const tc0140syt_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0140SYT));
+	return (const tc0140syt_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************

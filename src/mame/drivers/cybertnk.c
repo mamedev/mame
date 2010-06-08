@@ -307,12 +307,12 @@ static VIDEO_UPDATE( cybertnk )
 							dot|= col_bank<<4;
 							if(fx)
 							{
-								if(((x+xsize-(xz)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+								if(((x+xsize-(xz)) < screen->visible_area().max_x) && ((y+yi) < screen->visible_area().max_y))
 									*BITMAP_ADDR16(bitmap, y+yz, x+xsize-(xz)) = screen->machine->pens[dot];
 							}
 							else
 							{
-								if(((x+xz) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+								if(((x+xz) < screen->visible_area().max_x) && ((y+yi) < screen->visible_area().max_y))
 									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
 							}
 						}
@@ -341,12 +341,12 @@ static VIDEO_UPDATE( cybertnk )
 							dot|= col_bank<<4;
 							if(fx)
 							{
-								if(((x+xsize-(xz)) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+								if(((x+xsize-(xz)) < screen->visible_area().max_x) && ((y+yi) < screen->visible_area().max_y))
 									*BITMAP_ADDR16(bitmap, y+yz, x+xsize-(xz)) = screen->machine->pens[dot];
 							}
 							else
 							{
-								if(((x+x_dec+xi) < video_screen_get_visible_area(screen)->max_x) && ((y+yi) < video_screen_get_visible_area(screen)->max_y))
+								if(((x+x_dec+xi) < screen->visible_area().max_x) && ((y+yi) < screen->visible_area().max_y))
 									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
 							}
 						}

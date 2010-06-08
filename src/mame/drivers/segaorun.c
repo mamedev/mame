@@ -469,7 +469,7 @@ static TIMER_CALLBACK( scanline_callback )
 		case 65:
 		case 129:
 		case 193:
-			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, video_screen_get_visible_area(machine->primary_screen)->max_x + 1), NULL, 0, irq2_gen);
+			timer_set(machine, machine->primary_screen->time_until_pos(scanline, machine->primary_screen->visible_area().max_x + 1), NULL, 0, irq2_gen);
 			next_scanline = scanline + 1;
 			break;
 
@@ -500,7 +500,7 @@ static TIMER_CALLBACK( scanline_callback )
 	update_main_irqs(machine);
 
 	/* come back at the next targeted scanline */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, next_scanline, 0), NULL, next_scanline, scanline_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(next_scanline), NULL, next_scanline, scanline_callback);
 }
 
 
@@ -533,7 +533,7 @@ static MACHINE_RESET( outrun )
 	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), outrun_reset);
 
 	/* start timers to track interrupts */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(223), NULL, 223, scanline_callback);
 }
 
 

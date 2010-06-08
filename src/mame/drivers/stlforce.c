@@ -86,7 +86,7 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 
 static WRITE16_DEVICE_HANDLER( oki_bank_w )
 {
-	okim6295_set_bank_base(device, 0x40000 * ((data>>8) & 3));
+	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data>>8) & 3));
 }
 
 static ADDRESS_MAP_START( stlforce_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -211,15 +211,15 @@ static MACHINE_DRIVER_START( stlforce )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 937500 )
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 937500 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( twinbrat )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(stlforce)
-	MDRV_CPU_REPLACE("maincpu", M68000, 14745600)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(14745600)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(3*8, 45*8-1, 0*8, 30*8-1)

@@ -25,10 +25,8 @@ struct _cdda_info
 INLINE cdda_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_CDDA);
-	return (cdda_info *)device->token;
+	assert(device->type() == SOUND_CDDA);
+	return (cdda_info *)downcast<legacy_device_base *>(device)->token();
 }
 
 #define MAX_SECTORS ( 4 )
@@ -59,7 +57,7 @@ static DEVICE_START( cdda )
 	/* allocate an audio cache */
 	info->audio_cache = auto_alloc_array( device->machine, UINT8, CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	//intf = (const struct CDDAinterface *)device->baseconfig().static_config;
+	//intf = (const struct CDDAinterface *)device->baseconfig().static_config();
 
 	info->stream = stream_create(device, 0, 2, 44100, info, cdda_update);
 
@@ -93,14 +91,14 @@ void cdda_set_cdrom(running_device *device, void *file)
 
 running_device *cdda_from_cdrom(running_machine *machine, void *file)
 {
-	running_device *device;
+	device_sound_interface *sound;
 
-	for (device = sound_first(machine); device != NULL; device = sound_next(device))
-		if (sound_get_type(device) == SOUND_CDDA)
+	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
+		if (sound->device().type() == SOUND_CDDA)
 		{
-			cdda_info *info = get_safe_token(device);
+			cdda_info *info = get_safe_token(*sound);
 			if (info->disc == file)
-				return device;
+				return *sound;
 		}
 
 	return NULL;

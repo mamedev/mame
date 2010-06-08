@@ -118,14 +118,18 @@ static WRITE8_HANDLER( aerofgt_sh_bankswitch_w )
 
 static WRITE16_DEVICE_HANDLER( pspikesb_oki_banking_w )
 {
-	okim6295_set_bank_base(device, 0x40000 * (data & 3));
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base(0x40000 * (data & 3));
 }
 
 /*TODO: sound banking. */
 static WRITE16_DEVICE_HANDLER( aerfboo2_okim6295_banking_w )
 {
 //  if(ACCESSING_BITS_8_15)
-//      okim6295_set_bank_base(device, 0x40000 * ((data & 0xf00)>>8));
+//	{
+//		okim6295_device *oki = downcast<okim6295_device *>(device);
+//      oki->set_bank_base(0x40000 * ((data & 0xf00)>>8));
+//	}
 }
 
 static WRITE8_HANDLER( aerfboot_okim6295_banking_w )
@@ -1432,8 +1436,7 @@ static MACHINE_DRIVER_START( pspikesb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1466,8 +1469,7 @@ static MACHINE_DRIVER_START( pspikesc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1716,8 +1718,7 @@ static MACHINE_DRIVER_START( aerfboot )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1751,8 +1752,7 @@ static MACHINE_DRIVER_START( aerfboo2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1793,8 +1793,7 @@ static MACHINE_DRIVER_START( wbbc97 )
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

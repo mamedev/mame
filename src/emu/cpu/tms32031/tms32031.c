@@ -118,7 +118,7 @@ struct _tms32031_state
 	tms32031_xf_func	xf0_w;
 	tms32031_xf_func	xf1_w;
 	tms32031_iack_func	iack_w;
-	cpu_irq_callback	irq_callback;
+	device_irq_callback	irq_callback;
 	running_device *device;
 	const address_space *program;
 };
@@ -126,11 +126,10 @@ struct _tms32031_state
 INLINE tms32031_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS32031 ||
 		   cpu_get_type(device) == CPU_TMS32032);
-	return (tms32031_state *)device->token;
+	return (tms32031_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -369,13 +368,13 @@ static void set_irq_line(tms32031_state *tms, int irqline, int state)
 
 static CPU_INIT( tms32031 )
 {
-	const tms32031_config *configdata = (const tms32031_config *)device->baseconfig().static_config;
+	const tms32031_config *configdata = (const tms32031_config *)device->baseconfig().static_config();
 	tms32031_state *tms = get_safe_token(device);
 	int i;
 
 	tms->irq_callback = irqcallback;
 	tms->device = device;
-	tms->program = device->space(AS_PROGRAM);
+	tms->program = device_memory(device)->space(AS_PROGRAM);
 
 	/* copy in the xf write routines */
 	tms->bootoffset = (configdata != NULL) ? configdata->bootoffset : 0;
@@ -689,7 +688,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( tms32031 )
 {
-	tms32031_state *tms = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms32031_state *tms = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	float ftemp;
 
 	switch (state)

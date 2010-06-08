@@ -419,7 +419,7 @@ static void sfkick_vdp_interrupt(running_machine *machine, int i)
 static VIDEO_START( sfkick )
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init (machine, 0, machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, 0x80000, sfkick_vdp_interrupt);
+	v9938_init (machine, 0, *machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, 0x80000, sfkick_vdp_interrupt);
 	v9938_reset(0);
 }
 

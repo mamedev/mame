@@ -53,7 +53,7 @@ INTERRUPT_GEN( esripsys_vblank_irq )
 
 static TIMER_CALLBACK( hblank_start_callback )
 {
-	int v = video_screen_get_vpos(machine->primary_screen);
+	int v = machine->primary_screen->vpos();
 
 	if (video_firq)
 	{
@@ -73,19 +73,19 @@ static TIMER_CALLBACK( hblank_start_callback )
 		v = 0;
 
 	/* Set end of HBLANK timer */
-	timer_adjust_oneshot(hblank_end_timer, video_screen_get_time_until_pos(machine->primary_screen, v, ESRIPSYS_HBLANK_END), v);
+	timer_adjust_oneshot(hblank_end_timer, machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
 	esripsys_hblank = 0;
 }
 
 static TIMER_CALLBACK( hblank_end_callback )
 {
-	int v = video_screen_get_vpos(machine->primary_screen);
+	int v = machine->primary_screen->vpos();
 
 	if (v > 0)
-		video_screen_update_partial(machine->primary_screen, v - 1);
+		machine->primary_screen->update_partial(v - 1);
 
 	esripsys__12sel ^= 1;
-	timer_adjust_oneshot(hblank_start_timer, video_screen_get_time_until_pos(machine->primary_screen, v, ESRIPSYS_HBLANK_START), 0);
+	timer_adjust_oneshot(hblank_start_timer, machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START), 0);
 
 	esripsys_hblank = 1;
 }
@@ -106,7 +106,7 @@ VIDEO_START( esripsys )
 	/* Create and initialise the HBLANK timers */
 	hblank_start_timer = timer_alloc(machine, hblank_start_callback, NULL);
 	hblank_end_timer = timer_alloc(machine, hblank_end_callback, NULL);
-	timer_adjust_oneshot(hblank_start_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, ESRIPSYS_HBLANK_START), 0);
+	timer_adjust_oneshot(hblank_start_timer, machine->primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START), 0);
 
 	/* Create the sprite scaling table */
 	scale_table = auto_alloc_array(machine, UINT8, 64 * 64);

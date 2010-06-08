@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 
+#include "devlegcy.h"
 
 
 /***************************************************************************
@@ -24,6 +25,4 @@ WRITE8_DEVICE_HANDLER( atari_vg_earom_ctrl_w );
 
 /* ----- device interface ----- */
 
-#define ATARIVGEAROM DEVICE_GET_INFO_NAME(atari_vg_earom)
-
-DEVICE_GET_INFO( atari_vg_earom );
+DECLARE_LEGACY_NVRAM_DEVICE(ATARIVGEAROM, atari_vg_earom);

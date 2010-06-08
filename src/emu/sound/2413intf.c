@@ -22,10 +22,8 @@ struct _ym2413_state
 INLINE ym2413_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YM2413);
-	return (ym2413_state *)device->token;
+	assert(device->type() == SOUND_YM2413);
+	return (ym2413_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -58,10 +56,10 @@ static void _stream_update(void *param, int interval)
 static DEVICE_START( ym2413 )
 {
 	ym2413_state *info = get_safe_token(device);
-	int rate = device->clock/72;
+	int rate = device->clock()/72;
 
 	/* emulator create */
-	info->chip = ym2413_init(device, device->clock, rate);
+	info->chip = ym2413_init(device, device->clock(), rate);
 	assert_always(info->chip != NULL, "Error creating YM2413 chip");
 
 	/* stream system initialize */
@@ -86,7 +84,7 @@ static DEVICE_START( ym2413 )
 	{
 		ym2413_reset (i);
 
-		ym2413[i].DAC_stream = stream_create(device, 0, 1, device->clock/72, i, YM2413DAC_update);
+		ym2413[i].DAC_stream = stream_create(device, 0, 1, device->clock()/72, i, YM2413DAC_update);
 
 		if (ym2413[i].DAC_stream == -1)
 			return 1;

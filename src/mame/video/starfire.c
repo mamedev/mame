@@ -79,7 +79,7 @@ WRITE8_HANDLER( starfire_colorram_w )
 		/* don't modify the palette unless the TRANS bit is set */
 		if (starfire_vidctrl1 & 0x40)
 		{
-			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 			starfire_colors[palette_index] = ((((data << 1) & 0x06) | ((offset >> 8) & 0x01)) << 6) |
 											 (((data >> 5) & 0x07) << 3) |

@@ -34,9 +34,8 @@ struct _mb3773_state
 INLINE mb3773_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == MB3773));
-	return (mb3773_state *)device->token;
+	assert((device->type() == MB3773));
+	return (mb3773_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -112,5 +111,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"Fujistu MB3773"
 #define DEVTEMPLATE_FAMILY		"Fujistu Power Supply Monitor"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"

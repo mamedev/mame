@@ -130,10 +130,8 @@ struct _es5506_state
 INLINE es5506_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_ES5505 || sound_get_type(device) == SOUND_ES5506);
-	return (es5506_state *)device->token;
+	assert(device->type() == SOUND_ES5505 || device->type() == SOUND_ES5506);
+	return (es5506_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -826,7 +824,7 @@ static STREAM_UPDATE( es5506_update )
 
 ***********************************************************************************************/
 
-static void es5506_start_common(running_device *device, const void *config, sound_type sndtype)
+static void es5506_start_common(running_device *device, const void *config, device_type sndtype)
 {
 	const es5506_interface *intf = (const es5506_interface *)config;
 	es5506_state *chip = get_safe_token(device);
@@ -838,7 +836,7 @@ static void es5506_start_common(running_device *device, const void *config, soun
 		eslog = fopen("es.log", "w");
 
 	/* create the stream */
-	chip->stream = stream_create(device, 0, 2, device->clock / (16*32), chip, es5506_update);
+	chip->stream = stream_create(device, 0, 2, device->clock() / (16*32), chip, es5506_update);
 
 	/* initialize the regions */
 	chip->region_base[0] = intf->region0 ? (UINT16 *)memory_region(device->machine, intf->region0) : NULL;
@@ -848,7 +846,7 @@ static void es5506_start_common(running_device *device, const void *config, soun
 
 	/* initialize the rest of the structure */
 	chip->device = device;
-	chip->master_clock = device->clock;
+	chip->master_clock = device->clock();
 	chip->irq_callback = intf->irq_callback;
 	chip->irqv = 0x80;
 
@@ -917,7 +915,7 @@ static void es5506_start_common(running_device *device, const void *config, soun
 
 static DEVICE_START( es5506 )
 {
-	es5506_start_common(device, device->baseconfig().static_config, SOUND_ES5506);
+	es5506_start_common(device, device->baseconfig().static_config(), SOUND_ES5506);
 }
 
 
@@ -1482,7 +1480,7 @@ void es5506_voice_bank_w(running_device *device, int voice, int bank)
 
 static DEVICE_START( es5505 )
 {
-	const es5505_interface *intf = (const es5505_interface *)device->baseconfig().static_config;
+	const es5505_interface *intf = (const es5505_interface *)device->baseconfig().static_config();
 	es5506_interface es5506intf;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));

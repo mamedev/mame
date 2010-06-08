@@ -194,7 +194,7 @@ static READ8_HANDLER( borntofi_inputs_r )
 
 	x = input_port_read(space->machine, offset ? "P2 Trackball X" : "P1 Trackball X");
 	y = input_port_read(space->machine, offset ? "P2 Trackball Y" : "P1 Trackball Y");
-	f = video_screen_get_frame_number(space->machine->primary_screen);
+	f = space->machine->primary_screen->frame_number();
 
 	state->input_ret[offset] = (state->input_ret[offset] & 0x14) | (input_port_read(space->machine, offset ? "P2_TRACK" : "P1_TRACK") & 0xc3);
 

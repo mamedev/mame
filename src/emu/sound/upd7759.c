@@ -224,10 +224,8 @@ static const int upd7759_state_table[16] = { -1, -1, 0, 0, 1, 2, 2, 3, -1, -1, 0
 INLINE upd7759_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_UPD7759);
-	return (upd7759_state *)device->token;
+	assert(device->type() == SOUND_UPD7759);
+	return (upd7759_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -638,25 +636,25 @@ static void register_for_save(upd7759_state *chip, running_device *device)
 static DEVICE_START( upd7759 )
 {
 	static const upd7759_interface defintrf = { 0 };
-	const upd7759_interface *intf = (device->baseconfig().static_config != NULL) ? (const upd7759_interface *)device->baseconfig().static_config : &defintrf;
+	const upd7759_interface *intf = (device->baseconfig().static_config() != NULL) ? (const upd7759_interface *)device->baseconfig().static_config() : &defintrf;
 	upd7759_state *chip = get_safe_token(device);
 
 	chip->device = device;
 
 	/* allocate a stream channel */
-	chip->channel = stream_create(device, 0, 1, device->clock/4, chip, upd7759_update);
+	chip->channel = stream_create(device, 0, 1, device->clock()/4, chip, upd7759_update);
 
 	/* compute the stepping rate based on the chip's clock speed */
 	chip->step = 4 * FRAC_ONE;
 
 	/* compute the clock period */
-	chip->clock_period = ATTOTIME_IN_HZ(device->clock);
+	chip->clock_period = ATTOTIME_IN_HZ(device->clock());
 
 	/* set the intial state */
 	chip->state = STATE_IDLE;
 
 	/* compute the ROM base or allocate a timer */
-	chip->rom = chip->rombase = *device->region;
+	chip->rom = chip->rombase = *device->region();
 	if (chip->rom == NULL)
 		chip->timer = timer_alloc(device->machine, upd7759_slave_update, chip);
 

@@ -32,10 +32,8 @@ struct _ym2610_state
 INLINE ym2610_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YM2610 || sound_get_type(device) == SOUND_YM2610B);
-	return (ym2610_state *)device->token;
+	assert(device->type() == SOUND_YM2610 || device->type() == SOUND_YM2610B);
+	return (ym2610_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -145,17 +143,17 @@ static DEVICE_START( ym2610 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ym2610_interface *intf = device->baseconfig().static_config ? (const ym2610_interface *)device->baseconfig().static_config : &generic_2610;
-	int rate = device->clock/72;
+	const ym2610_interface *intf = device->baseconfig().static_config() ? (const ym2610_interface *)device->baseconfig().static_config() : &generic_2610;
+	int rate = device->clock()/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
 	ym2610_state *info = get_safe_token(device);
 	astring name;
-	sound_type type = sound_get_type(device);
+	device_type type = device->type();
 
 	info->intf = intf;
 	info->device = device;
-	info->psg = ay8910_start_ym(NULL, sound_get_type(device), device, device->clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(NULL, device->type(), device, device->clock(), &generic_ay8910);
 	assert_always(info->psg != NULL, "Error creating YM2610/AY8910 chip");
 
 	/* Timer Handler set */
@@ -165,8 +163,8 @@ static DEVICE_START( ym2610 )
 	/* stream system initialize */
 	info->stream = stream_create(device,0,2,rate,info,(type == SOUND_YM2610) ? ym2610_stream_update : ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = *device->region;
-	pcmsizea = device->region->bytes();
+	pcmbufa  = *device->region();
+	pcmsizea = device->region()->bytes();
 	name.printf("%s.deltat", device->tag());
 	pcmbufb  = (void *)(memory_region(device->machine, name));
 	pcmsizeb = memory_region_length(device->machine, name);
@@ -177,7 +175,7 @@ static DEVICE_START( ym2610 )
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,device,device->clock,rate,
+	info->chip = ym2610_init(info,device,device->clock(),rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 	assert_always(info->chip != NULL, "Error creating YM2610 chip");

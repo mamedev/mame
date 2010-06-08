@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( triplhnt )
 {
-	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper = machine->primary_screen->alloc_compatible_bitmap();
 
 	bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 }
@@ -124,7 +124,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, hit_line, 0), NULL, hit_code, triplhnt_hit_callback);
+		timer_set(machine, machine->primary_screen->time_until_pos(hit_line), NULL, hit_code, triplhnt_hit_callback);
 }
 
 

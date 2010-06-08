@@ -92,6 +92,8 @@ struct _cop400_state
     const address_space *program;
     const address_space *data;
     const address_space *io;
+    
+    UINT8 featuremask;
 
 	/* registers */
 	UINT16	pc;				/* 9/10/11-bit ROM address program counter */
@@ -108,6 +110,7 @@ struct _cop400_state
 	int		skl;			/* 1-bit latch for SK output */
 	UINT8	h;				/* 4-bit general purpose I/O port (COP440 only) */
 	UINT8	r;				/* 8-bit general purpose I/O port (COP440 only) */
+	UINT8	flags;			// used for I/O only
 
 	/* counter */
 	UINT8	t;				/* 8-bit timer */
@@ -136,7 +139,6 @@ struct _cop400_state
 	int LBIops[256];
 	int LBIops33[256];
 	int icount;				/* instruction counter */
-	cpu_state_table state_table;	/* state table */
 
 	const cop400_opcode_map *opcode_map;
 
@@ -152,62 +154,6 @@ typedef void (*cop400_opcode_func) (cop400_state *cpustate, UINT8 opcode);
 struct _cop400_opcode_map {
 	unsigned cycles;
 	cop400_opcode_func function;
-};
-
-/***************************************************************************
-    CPU STATE DESCRIPTION
-***************************************************************************/
-
-#define COP400_STATE_ENTRY(_name, _format, _member, _datamask, _featuremask, _flags) \
-	CPU_STATE_ENTRY(COP400_##_name, #_name, _format, cop400_state, _member, _datamask, _featuremask, _flags)
-
-#define COP410_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	COP400_STATE_ENTRY(_name, _format, _member, _datamask, COP410_FEATURE | COP420_FEATURE | COP444_FEATURE | COP440_FEATURE, _flags)
-
-#define COP420_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	COP400_STATE_ENTRY(_name, _format, _member, _datamask, COP420_FEATURE | COP444_FEATURE | COP440_FEATURE, _flags)
-
-#define COP444_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	COP400_STATE_ENTRY(_name, _format, _member, _datamask, COP444_FEATURE | COP440_FEATURE, _flags)
-
-#define COP440_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	COP400_STATE_ENTRY(_name, _format, _member, _datamask, COP440_FEATURE, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	COP410_STATE_ENTRY(GENPC, "%03X", pc, 0xfff, CPUSTATE_NOSHOW)
-	COP410_STATE_ENTRY(GENPCBASE, "%03X", prevpc, 0xfff, CPUSTATE_NOSHOW)
-	COP440_STATE_ENTRY(GENSP, "%01X", n, 0x3, CPUSTATE_NOSHOW)
-
-	COP410_STATE_ENTRY(PC, "%03X", pc, 0xfff, 0)
-
-	COP400_STATE_ENTRY(SA, "%03X", sa, 0xfff, COP410_FEATURE | COP420_FEATURE | COP444_FEATURE, 0)
-	COP400_STATE_ENTRY(SB, "%03X", sb, 0xfff, COP410_FEATURE | COP420_FEATURE | COP444_FEATURE, 0)
-	COP400_STATE_ENTRY(SC, "%03X", sc, 0xfff, COP420_FEATURE | COP444_FEATURE, 0)
-	COP440_STATE_ENTRY(N, "%01X", n, 0x3, 0)
-
-	COP410_STATE_ENTRY(A, "%01X", a, 0xf, 0)
-	COP410_STATE_ENTRY(B, "%02X", b, 0xff, 0)
-	COP410_STATE_ENTRY(C, "%1u", c, 0x1, 0)
-
-	COP410_STATE_ENTRY(EN, "%01X", en, 0xf, 0)
-	COP410_STATE_ENTRY(G, "%01X", g, 0xf, 0)
-	COP440_STATE_ENTRY(H, "%01X", h, 0xf, 0)
-	COP410_STATE_ENTRY(Q, "%02X", q, 0xff, 0)
-	COP440_STATE_ENTRY(R, "%02X", r, 0xff, 0)
-
-	COP410_STATE_ENTRY(SIO, "%01X", sio, 0xf, 0)
-	COP410_STATE_ENTRY(SKL, "%1u", skl, 0x1, 0)
-
-	COP420_STATE_ENTRY(T, "%02X", t, 0xff, 0)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
 };
 
 /***************************************************************************
@@ -256,8 +202,7 @@ static const cpu_state_table state_table_template =
 INLINE cop400_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_COP401 ||
 		   cpu_get_type(device) == CPU_COP410 ||
 		   cpu_get_type(device) == CPU_COP411 ||
@@ -271,12 +216,12 @@ INLINE cop400_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_COP426 ||
 		   cpu_get_type(device) == CPU_COP444 ||
 		   cpu_get_type(device) == CPU_COP445);
-	return (cop400_state *)device->token;
+	return (cop400_state *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE void PUSH(cop400_state *cpustate, UINT16 data)
 {
-	if (cpustate->state_table.subtypemask != COP410_FEATURE)
+	if (cpustate->featuremask != COP410_FEATURE)
 	{
 		SC = SB;
 	}
@@ -290,7 +235,7 @@ INLINE void POP(cop400_state *cpustate)
 	PC = SA;
 	SA = SB;
 
-	if (cpustate->state_table.subtypemask != COP410_FEATURE)
+	if (cpustate->featuremask != COP410_FEATURE)
 	{
 		SB = SC;
 	}
@@ -878,17 +823,59 @@ static TIMER_CALLBACK( microbus_tick )
     INITIALIZATION
 ***************************************************************************/
 
+static void define_state_table(running_device *device)
+{
+	cop400_state *cpustate = get_safe_token(device);
+
+	device_state_interface *state;
+	device->interface(state);
+	state->state_add(STATE_GENPC,     "GENPC",     cpustate->pc).mask(0xfff).noshow();
+	state->state_add(STATE_GENPCBASE, "GENPCBASE", cpustate->prevpc).mask(0xfff).noshow();
+	state->state_add(STATE_GENSP,     "GENSP",     cpustate->n).mask(0x3).noshow();
+	state->state_add(STATE_GENFLAGS,  "GENFLAGS",  cpustate->flags).mask(0x3).callimport().callexport().noshow().formatstr("%2s");
+
+	state->state_add(COP400_PC,       "PC",        cpustate->pc).mask(0xfff);
+
+	if (cpustate->featuremask & (COP410_FEATURE | COP420_FEATURE | COP444_FEATURE))
+	{
+		state->state_add(COP400_SA,   "SA",        cpustate->sa).mask(0xfff);
+		state->state_add(COP400_SB,   "SB",        cpustate->sb).mask(0xfff);
+		if (cpustate->featuremask & (COP420_FEATURE | COP444_FEATURE))
+			state->state_add(COP400_SC, "SC",      cpustate->sc).mask(0xfff);
+	}
+	if (cpustate->featuremask & COP440_FEATURE)
+		state->state_add(COP400_N,    "N",         cpustate->n).mask(0x3);
+
+	state->state_add(COP400_A,        "A",         cpustate->a).mask(0xf);
+	state->state_add(COP400_B,        "B",         cpustate->b);
+	state->state_add(COP400_C,        "C",         cpustate->c).mask(0x1);
+
+	state->state_add(COP400_EN,       "EN",        cpustate->en).mask(0xf);
+	state->state_add(COP400_G,        "G",         cpustate->g).mask(0xf);
+	if (cpustate->featuremask & COP440_FEATURE)
+		state->state_add(COP400_H,    "H",         cpustate->h).mask(0xf);
+	state->state_add(COP400_Q,        "Q",         cpustate->q);
+	if (cpustate->featuremask & COP440_FEATURE)
+		state->state_add(COP400_R,    "R",         cpustate->r);
+
+	state->state_add(COP400_SIO,      "SIO",       cpustate->sio).mask(0xf);
+	state->state_add(COP400_SKL,      "SKL",       cpustate->skl).mask(0x1);
+
+	if (cpustate->featuremask & (COP420_FEATURE | COP444_FEATURE | COP440_FEATURE))
+		state->state_add(COP400_T,    "T",         cpustate->t);
+}
+
 static void cop400_init(running_device *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
 {
 	cop400_state *cpustate = get_safe_token(device);
 
-	cpustate->intf = (cop400_interface *) device->baseconfig().static_config;
+	cpustate->intf = (cop400_interface *) device->baseconfig().static_config();
 
 	/* find address spaces */
 
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	/* set output pin masks */
 
@@ -899,14 +886,14 @@ static void cop400_init(running_device *device, UINT8 g_mask, UINT8 d_mask, UINT
 	/* allocate serial timer */
 
 	cpustate->serial_timer = timer_alloc(device->machine, serial_tick, cpustate);
-	timer_adjust_periodic(cpustate->serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
+	timer_adjust_periodic(cpustate->serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / 16));
 
 	/* allocate counter timer */
 
 	if (has_counter)
 	{
 		cpustate->counter_timer = timer_alloc(device->machine, counter_tick, cpustate);
-		timer_adjust_periodic(cpustate->counter_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16 / 4));
+		timer_adjust_periodic(cpustate->counter_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / 16 / 4));
 	}
 
 	/* allocate IN latch timer */
@@ -914,7 +901,7 @@ static void cop400_init(running_device *device, UINT8 g_mask, UINT8 d_mask, UINT
 	if (has_inil)
 	{
 		cpustate->inil_timer = timer_alloc(device->machine, inil_tick, cpustate);
-		timer_adjust_periodic(cpustate->inil_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
+		timer_adjust_periodic(cpustate->inil_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / 16));
 	}
 
 	/* allocate Microbus timer */
@@ -922,7 +909,7 @@ static void cop400_init(running_device *device, UINT8 g_mask, UINT8 d_mask, UINT
 	if (cpustate->intf->microbus == COP400_MICROBUS_ENABLED)
 	{
 		cpustate->microbus_timer = timer_alloc(device->machine, microbus_tick, cpustate);
-		timer_adjust_periodic(cpustate->microbus_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
+		timer_adjust_periodic(cpustate->microbus_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / 16));
 	}
 
 	/* register for state saving */
@@ -962,9 +949,8 @@ static void cop410_init_opcodes(running_device *device)
 
 	/* set up the state table */
 
-	cpustate->state_table = state_table_template;
-	cpustate->state_table.baseptr = cpustate;
-	cpustate->state_table.subtypemask = COP410_FEATURE;
+	cpustate->featuremask = COP410_FEATURE;
+	define_state_table(device);
 
 	/* initialize instruction length array */
 
@@ -993,9 +979,8 @@ static void cop420_init_opcodes(running_device *device)
 
 	/* set up the state table */
 
-	cpustate->state_table = state_table_template;
-	cpustate->state_table.baseptr = cpustate;
-	cpustate->state_table.subtypemask = COP420_FEATURE;
+	cpustate->featuremask = COP420_FEATURE;
+	define_state_table(device);
 
 	/* initialize instruction length array */
 
@@ -1028,9 +1013,8 @@ static void cop444_init_opcodes(running_device *device)
 
 	/* set up the state table */
 
-	cpustate->state_table = state_table_template;
-	cpustate->state_table.baseptr = cpustate;
-	cpustate->state_table.subtypemask = COP444_FEATURE;
+	cpustate->featuremask = COP444_FEATURE;
+	define_state_table(device);
 
 	/* initialize instruction length array */
 
@@ -1287,6 +1271,7 @@ ADDRESS_MAP_END
     VALIDITY CHECKS
 ***************************************************************************/
 
+#if 0
 static CPU_VALIDITY_CHECK( cop410 )
 {
 	int error = FALSE;
@@ -1342,10 +1327,51 @@ static CPU_VALIDITY_CHECK( cop444 )
 
 	return error;
 }
+#endif
 
 /***************************************************************************
     GENERAL CONTEXT ACCESS
 ***************************************************************************/
+
+static CPU_IMPORT_STATE( cop400 )
+{
+	cop400_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			cpustate->c = (cpustate->flags >> 1) & 1;
+			cpustate->skl = (cpustate->flags >> 0) & 1;
+			break;
+	}
+}
+
+static CPU_EXPORT_STATE( cop400 )
+{
+	cop400_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			cpustate->flags = (cpustate->c ? 0x02 : 0x00) |
+							  (cpustate->skl ? 0x01 : 0x00);
+			break;
+	}
+}
+
+static CPU_EXPORT_STRING( cop400 )
+{
+	cop400_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c",
+						 cpustate->c ? 'C' : '.',
+						 cpustate->skl ? 'S' : '.');
+			break;
+	}
+}
 
 static CPU_SET_INFO( cop400 )
 {
@@ -1354,8 +1380,8 @@ static CPU_SET_INFO( cop400 )
 
 static CPU_GET_INFO( cop400 )
 {
-	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-	cop400_interface *intf = (devconfig->static_config != NULL) ? (cop400_interface *)devconfig->static_config : NULL;
+	cop400_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	cop400_interface *intf = (devconfig->static_config() != NULL) ? (cop400_interface *)devconfig->static_config() : NULL;
 
 	switch (state)
 	{
@@ -1387,11 +1413,13 @@ static CPU_GET_INFO( cop400 )
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cop400);					break;
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop400);				break;
 		case CPUINFO_FCT_DISASSEMBLE:					/* set per-core */										break;
-		case CPUINFO_FCT_VALIDITY_CHECK:				/* set per-core */										break;
+//		case CPUINFO_FCT_VALIDITY_CHECK:				/* set per-core */										break;
+		case CPUINFO_FCT_IMPORT_STATE: 					info->import_state = CPU_IMPORT_STATE_NAME(cop400);		break;
+		case CPUINFO_FCT_EXPORT_STATE: 					info->export_state = CPU_EXPORT_STATE_NAME(cop400);		break;
+		case CPUINFO_FCT_EXPORT_STRING: 				info->export_string = CPU_EXPORT_STRING_NAME(cop400);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;						break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state_table;				break;
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	/* set per-core */										break;
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		/* set per-core */										break;
 
@@ -1410,8 +1438,6 @@ static CPU_GET_INFO( cop400 )
 
 CPU_GET_INFO( cop410 )
 {
-	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1421,7 +1447,7 @@ CPU_GET_INFO( cop410 )
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop410);						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop410);		break;
-		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410);	break;
+//		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_512b);	break;
@@ -1429,11 +1455,6 @@ CPU_GET_INFO( cop410 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP410");								break;
-
-		case CPUINFO_STR_FLAGS: sprintf(info->s,
-									"%c%c",
-									 cpustate->c ? 'C' : '.',
-									 cpustate->skl ? 'S' : '.'); break;
 
 		default:										CPU_GET_INFO_CALL(cop400);								break;
 	}
@@ -1473,7 +1494,7 @@ CPU_GET_INFO( cop401 )
 
 CPU_GET_INFO( cop420 )
 {
-	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	cop400_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1484,7 +1505,7 @@ CPU_GET_INFO( cop420 )
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop420);						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop420);		break;
-		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420);	break;
+//		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;
@@ -1511,7 +1532,7 @@ CPU_GET_INFO( cop421 )
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop421);						break;
-		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
+//		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP421");								break;
@@ -1554,7 +1575,7 @@ CPU_GET_INFO( cop402 )
 
 CPU_GET_INFO( cop444 )
 {
-	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	cop400_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1565,7 +1586,7 @@ CPU_GET_INFO( cop444 )
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop444);						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop444);		break;
-		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop444);	break;
+//		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop444);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;

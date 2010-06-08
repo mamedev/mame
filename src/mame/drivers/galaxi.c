@@ -257,13 +257,13 @@ static WRITE16_HANDLER( galaxi_500004_w )
 static CUSTOM_INPUT( ticket_r )
 {
 	galaxi_state *state = (galaxi_state *)field->port->machine->driver_data;
-	return state->ticket && !(video_screen_get_frame_number(field->port->machine->primary_screen) % 10);
+	return state->ticket && !(field->port->machine->primary_screen->frame_number() % 10);
 }
 
 static CUSTOM_INPUT( hopper_r )
 {
 	galaxi_state *state = (galaxi_state *)field->port->machine->driver_data;
-	return state->hopper && !(video_screen_get_frame_number(field->port->machine->primary_screen) % 10);
+	return state->hopper && !(field->port->machine->primary_screen->frame_number() % 10);
 }
 
 
@@ -422,8 +422,7 @@ static MACHINE_DRIVER_START( galaxi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16)	// ?
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)	// ?
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

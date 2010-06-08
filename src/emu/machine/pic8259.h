@@ -25,9 +25,10 @@
 #ifndef __PIC8259_H__
 #define __PIC8259_H__
 
+#include "devlegcy.h"
 #include "devcb.h"
 
-#define PIC8259	DEVICE_GET_INFO_NAME(pic8259)
+DECLARE_LEGACY_DEVICE(PIC8259, pic8259);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -50,7 +51,6 @@ struct pic8259_interface
 
 
 /* device interface */
-DEVICE_GET_INFO(pic8259);
 READ8_DEVICE_HANDLER( pic8259_r );
 WRITE8_DEVICE_HANDLER( pic8259_w );
 int pic8259_acknowledge(running_device *device);

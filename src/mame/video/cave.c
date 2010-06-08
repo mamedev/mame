@@ -553,8 +553,8 @@ static void get_sprite_info_cave( running_machine *machine )
 	int glob_flipx = state->videoregs[0] & 0x8000;
 	int glob_flipy = state->videoregs[1] & 0x8000;
 
-	int max_x = video_screen_get_width(machine->primary_screen);
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_x = machine->primary_screen->width();
+	int max_y = machine->primary_screen->height();
 
 	source = state->spriteram + ((state->spriteram_size / 2) / 2) * state->spriteram_bank;
 
@@ -683,8 +683,8 @@ static void get_sprite_info_donpachi( running_machine *machine )
 	int glob_flipx = state->videoregs[0] & 0x8000;
 	int glob_flipy = state->videoregs[1] & 0x8000;
 
-	int max_x = video_screen_get_width(machine->primary_screen);
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_x = machine->primary_screen->width();
+	int max_y = machine->primary_screen->height();
 
 	source = state->spriteram + ((state->spriteram_size / 2) / 2) * state->spriteram_bank;
 
@@ -758,8 +758,8 @@ static void get_sprite_info_donpachi( running_machine *machine )
 static void sprite_init_cave( running_machine *machine )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
-	int screen_width = video_screen_get_width(machine->primary_screen);
-	int screen_height = video_screen_get_height(machine->primary_screen);
+	int screen_width = machine->primary_screen->width();
+	int screen_height = machine->primary_screen->height();
 
 	if (state->spritetype[0] == 0 || state->spritetype[0] == 2)	// most of the games
 	{
@@ -797,9 +797,9 @@ static void sprite_init_cave( running_machine *machine )
 	state_save_register_postload(machine, cave_sprite_postload, NULL);
 }
 
-static void cave_sprite_check( running_device *screen, const rectangle *clip )
+static void cave_sprite_check( screen_device &screen, const rectangle *clip )
 {
-	cave_state *state = (cave_state *)screen->machine->driver_data;
+	cave_state *state = (cave_state *)screen.machine->driver_data;
 
 	{	/* set clip */
 		int left = clip->min_x;
@@ -819,7 +819,7 @@ static void cave_sprite_check( running_device *screen, const rectangle *clip )
 		int i[4] = {0,0,0,0};
 		int priority_check = 0;
 		int spritetype = state->spritetype[1];
-		const rectangle *visarea = video_screen_get_visible_area(screen);
+		const rectangle &visarea = screen.visible_area();
 
 		while (sprite < finish)
 		{
@@ -852,19 +852,19 @@ static void cave_sprite_check( running_device *screen, const rectangle *clip )
 
 			case CAVE_SPRITETYPE_ZOOM | CAVE_SPRITETYPE_ZBUF:
 				state->sprite_draw = sprite_draw_cave_zbuf;
-				if (clip->min_y == visarea->min_y)
+				if (clip->min_y == visarea.min_y)
 				{
 					if(!(state->sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						bitmap_fill(state->sprite_zbuf, visarea, 0);
+						bitmap_fill(state->sprite_zbuf, &visarea, 0);
 				}
 				break;
 
 			case CAVE_SPRITETYPE_ZBUF:
 				state->sprite_draw = sprite_draw_donpachi_zbuf;
-				if (clip->min_y == visarea->min_y)
+				if (clip->min_y == visarea.min_y)
 				{
 					if(!(state->sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						bitmap_fill(state->sprite_zbuf,visarea,0);
+						bitmap_fill(state->sprite_zbuf,&visarea,0);
 				}
 				break;
 
@@ -1703,7 +1703,7 @@ VIDEO_UPDATE( cave )
 }
 #endif
 
-	cave_sprite_check(screen, cliprect);
+	cave_sprite_check(*screen, cliprect);
 
 	bitmap_fill(bitmap, cliprect, state->background_color);
 

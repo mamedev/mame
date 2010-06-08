@@ -2181,6 +2181,7 @@ static MACHINE_DRIVER_START( magicrd2 )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_VIDEO_START(magicrd2)
 
@@ -2194,6 +2195,7 @@ static MACHINE_DRIVER_START( royalcd1 )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( royalcd2 )
@@ -2208,6 +2210,7 @@ static MACHINE_DRIVER_START( cuoreuno )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(cuoreuno_map)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( saloon )
@@ -2215,6 +2218,7 @@ static MACHINE_DRIVER_START( saloon )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(saloon_map)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_DRIVER_END
 
 

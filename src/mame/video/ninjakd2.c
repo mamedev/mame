@@ -137,7 +137,7 @@ static void videoram_alloc(running_machine* machine, int const size)
 		robokid_bg2_videoram = auto_alloc_array_clear(machine, UINT8, size);
 	}
 
-	sp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	sp_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 }
 
 static int stencil_ninjakd2( UINT16 pal );

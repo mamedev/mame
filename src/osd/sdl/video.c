@@ -818,7 +818,6 @@ static void extract_video_config(running_machine *machine)
 
 static void load_effect_overlay(running_machine *machine, const char *filename)
 {
-	const device_config *screen;
 	char *tempstr = global_alloc_array(char, strlen(filename) + 5);
 	char *dest;
 
@@ -839,7 +838,7 @@ static void load_effect_overlay(running_machine *machine, const char *filename)
 	}
 
 	// set the overlay on all screens
-	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+	for (screen_device *screen = screen_first(*machine); screen != NULL; screen = screen_next(screen))
 		render_container_set_overlay(render_container_get_screen(screen), effect_bitmap);
 
 	global_free(tempstr);

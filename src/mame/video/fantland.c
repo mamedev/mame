@@ -70,8 +70,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			*ram2		=	indx_ram;			// current sprite pointer in indx_ram
 
 	// wheelrun is the only game with a smaller visible area
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-	int special = (visarea->max_y - visarea->min_y + 1) < 0x100;
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	int special = (visarea.max_y - visarea.min_y + 1) < 0x100;
 
 	for ( ; ram < indx_ram; ram += 8,ram2++)
 	{

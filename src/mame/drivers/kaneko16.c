@@ -398,7 +398,8 @@ ADDRESS_MAP_END
 static WRITE16_DEVICE_HANDLER( bakubrkr_oki_bank_sw )
 {
 	if (ACCESSING_BITS_0_7) {
-		okim6295_set_bank_base(device, 0x40000 * (data & 0x7) );
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(0x40000 * (data & 0x7) );
 		logerror("%s:Selecting OKI bank %02X\n",cpuexec_describe_context(device->machine),data&0xff);
 	}
 }
@@ -469,7 +470,8 @@ static WRITE16_DEVICE_HANDLER( bloodwar_oki_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(device, 0x40000 * (data & 0xf) );
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(0x40000 * (data & 0xf) );
 //      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
@@ -478,7 +480,8 @@ static WRITE16_DEVICE_HANDLER( bloodwar_oki_1_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(device, 0x40000 * data );
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(0x40000 * data );
 //      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
@@ -539,7 +542,8 @@ static WRITE16_DEVICE_HANDLER( bonkadv_oki_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(device, 0x40000 * (data & 0xF));
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(0x40000 * (data & 0xF));
 		logerror("%s: OKI0  bank %08X\n",cpuexec_describe_context(device->machine),data);
 	}
 }
@@ -548,7 +552,8 @@ static WRITE16_DEVICE_HANDLER( bonkadv_oki_1_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(device, 0x40000 * data );
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(0x40000 * data );
 		logerror("%s: OKI1  bank %08X\n",cpuexec_describe_context(device->machine),data);
 	}
 }
@@ -614,7 +619,8 @@ static WRITE16_DEVICE_HANDLER( gtmr_oki_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(device, 0x40000 * (data & 0xF) );
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base( 0x40000 * (data & 0xF) );
 //      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
@@ -623,7 +629,8 @@ static WRITE16_DEVICE_HANDLER( gtmr_oki_1_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(device, 0x40000 * (data & 0x1) );
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base( 0x40000 * (data & 0x1) );
 //      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
@@ -1828,8 +1835,7 @@ static MACHINE_DRIVER_START( berlwall )
 	MDRV_SOUND_ADD("ay2", YM2149, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
@@ -1875,8 +1881,7 @@ static MACHINE_DRIVER_START( bakubrkr )
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/6) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1976,12 +1981,10 @@ static MACHINE_DRIVER_START( gtmr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -2076,8 +2079,7 @@ static MACHINE_DRIVER_START( mgcrystl )
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/6) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -2187,13 +2189,11 @@ static MACHINE_DRIVER_START( shogwarr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_DEVICE_ADDRESS_MAP(0, shogwarr_oki1_map)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_DEVICE_ADDRESS_MAP(0, shogwarr_oki2_map)
 MACHINE_DRIVER_END

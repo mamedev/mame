@@ -108,7 +108,7 @@ struct _m37710i_cpu_struct
 	int ICount;		/* cycle count */
 	uint source;		/* temp register */
 	uint destination;	/* temp register */
-	cpu_irq_callback int_ack;
+	device_irq_callback int_ack;
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
@@ -130,11 +130,10 @@ struct _m37710i_cpu_struct
 INLINE m37710i_cpu_struct *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M37710 ||
 		   cpu_get_type(device) == CPU_M37702);
-	return (m37710i_cpu_struct *)device->token;
+	return (m37710i_cpu_struct *)downcast<cpu_device *>(device)->token();
 }
 
 extern uint m37710i_adc_tbl[];

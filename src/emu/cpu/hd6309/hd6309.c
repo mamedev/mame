@@ -131,7 +131,7 @@ struct _m68_state_t
 	UINT8	irq_state[2];
 
 	int 	extra_cycles; /* cycles used up by interrupts */
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	int		icount;
 	PAIR	ea; 		/* effective address */
@@ -154,10 +154,9 @@ struct _m68_state_t
 INLINE m68_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_HD6309);
-	return (m68_state_t *)device->token;
+	return (m68_state_t *)downcast<cpu_device *>(device)->token();
 }
 
 static void check_irq_lines( m68_state_t *m68_state );
@@ -523,7 +522,7 @@ static CPU_INIT( hd6309 )
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
 
-	m68_state->program = device->space(AS_PROGRAM);
+	m68_state->program = device_memory(device)->space(AS_PROGRAM);
 
 	/* setup regtable */
 
@@ -1259,7 +1258,7 @@ static CPU_SET_INFO( hd6309 )
 
 CPU_GET_INFO( hd6309 )
 {
-	m68_state_t *m68_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m68_state_t *m68_state = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

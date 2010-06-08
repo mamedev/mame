@@ -114,17 +114,16 @@ static const int mb87078_gain_percent[66] = {
 INLINE mb87078_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == MB87078);
+	assert(device->type() == MB87078);
 
-	return (mb87078_state *)device->token;
+	return (mb87078_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const mb87078_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == MB87078));
-	return (const mb87078_interface *) device->baseconfig().static_config;
+	assert((device->type() == MB87078));
+	return (const mb87078_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -273,6 +272,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"Fujitsu MB87078"
 #define DEVTEMPLATE_FAMILY		"Fujitsu Volume Controller MB87078"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"
 

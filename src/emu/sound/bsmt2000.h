@@ -10,9 +10,10 @@
 #ifndef __BSMT2000_H__
 #define __BSMT2000_H__
 
+#include "devlegcy.h"
+
 WRITE16_DEVICE_HANDLER( bsmt2000_data_w );
 
-DEVICE_GET_INFO( bsmt2000 );
-#define SOUND_BSMT2000 DEVICE_GET_INFO_NAME( bsmt2000 )
+DECLARE_LEGACY_SOUND_DEVICE(BSMT2000, bsmt2000);
 
 #endif /* __BSMT2000_H__ */

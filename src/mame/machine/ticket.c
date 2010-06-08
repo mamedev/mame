@@ -34,10 +34,9 @@ struct _ticket_state
 INLINE ticket_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TICKET_DISPENSER);
+	assert(device->type() == TICKET_DISPENSER);
 
-	return (ticket_state *)device->token;
+	return (ticket_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -122,14 +121,14 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 
 static DEVICE_START( ticket )
 {
-	const ticket_config *config = (const ticket_config *)device->baseconfig().inline_config;
+	const ticket_config *config = (const ticket_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	ticket_state *state = get_safe_token(device);
 
 	assert(config != NULL);
 
 	/* initialize the state */
 	state->active_bit			= 0x80;
-	state->time_msec			= device->clock;
+	state->time_msec			= device->clock();
 	state->motoron				= config->motorhigh  ? state->active_bit : 0;
 	state->ticketdispensed		= config->statushigh ? state->active_bit : 0;
 	state->ticketnotdispensed	= state->ticketdispensed ^ state->active_bit;

@@ -5,6 +5,8 @@
 #ifndef __C140_H__
 #define __C140_H__
 
+#include "devlegcy.h"
+
 READ8_DEVICE_HANDLER( c140_r );
 WRITE8_DEVICE_HANDLER( c140_w );
 
@@ -23,7 +25,6 @@ struct _c140_interface {
     int banking_type;
 };
 
-DEVICE_GET_INFO( c140 );
-#define SOUND_C140 DEVICE_GET_INFO_NAME( c140 )
+DECLARE_LEGACY_SOUND_DEVICE(C140, c140);
 
 #endif /* __C140_H__ */

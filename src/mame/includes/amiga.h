@@ -10,6 +10,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 #ifndef __AMIGA_H__
 #define __AMIGA_H__
 
+#include "devlegcy.h"
+
 
 /* A bit of a trick here: some registers are 32-bit. In order to efficiently */
 /* read them on both big-endian and little-endian systems, we store the custom */
@@ -396,8 +398,7 @@ const amiga_machine_interface *amiga_get_interface(void);
 
 /*----------- defined in audio/amiga.c -----------*/
 
-DEVICE_GET_INFO( amiga_sound );
-#define SOUND_AMIGA DEVICE_GET_INFO_NAME(amiga_sound)
+DECLARE_LEGACY_SOUND_DEVICE(AMIGA, amiga_sound);
 
 void amiga_audio_update(void);
 void amiga_audio_data_w(int which, UINT16 data);
@@ -409,7 +410,7 @@ PALETTE_INIT( amiga );
 VIDEO_START( amiga );
 VIDEO_UPDATE( amiga );
 
-UINT32 amiga_gethvpos(running_device *screen);
+UINT32 amiga_gethvpos(screen_device &screen);
 void copper_setpc(UINT32 pc);
 void amiga_set_genlock_color(UINT16 color);
 void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);
@@ -421,7 +422,7 @@ void amiga_sprite_enable_comparitor(int which, int enable);
 VIDEO_START( amiga_aga );
 VIDEO_UPDATE( amiga_aga );
 
-UINT32 amiga_aga_gethvpos(running_device *screen);
+UINT32 amiga_aga_gethvpos(screen_device &screen);
 void aga_copper_setpc(UINT32 pc);
 void amiga_aga_set_genlock_color(UINT16 color);
 void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);

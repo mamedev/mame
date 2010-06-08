@@ -1134,6 +1134,7 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 	static const char *const pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
 	static const char *const bang_size[] = { "?", "b", "h", "?", "", "?", "?", "?", "d" };
 	static const char *const fmods[] = { "trunc", "round", "ceil", "floor", "default" };
+	static const char *const spaces[] = { "program", "data", "io", "3", "4", "5", "6", "7" };
 	static const char *const sizes[] = { "byte", "word", "dword", "qword" };
 	const drcuml_opcode_info *opinfo = opcode_info_table[inst->opcode];
 	char *dest = buffer;
@@ -1179,11 +1180,11 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 
 				/* address space immediate */
 				else if (typemask == PTYPES_SPACE)
-					dest += sprintf(dest, "%s", address_space_names[param->value]);
+					dest += sprintf(dest, "%s", spaces[param->value]);
 
 				/* size + address space immediate */
 				else if (typemask == PTYPES_SPSZ)
-					dest += sprintf(dest, "%s_%s", address_space_names[param->value / 16], sizes[param->value % 16]);
+					dest += sprintf(dest, "%s_%s", spaces[param->value / 16], sizes[param->value % 16]);
 
 				/* size + scale immediate */
 				else if (typemask == PTYPES_SCSZ)

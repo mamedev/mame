@@ -440,7 +440,7 @@ static void debugmain_set_cpu(running_device *cpu)
 
 		dv = get_view(dmain, DVT_REGISTERS);
 		for (regsubitem = registers_view_get_subview_list(dv->view); regsubitem != NULL; regsubitem = regsubitem->next)
-			if (regsubitem->device == cpu)
+			if (regsubitem->cpudevice == cpu)
 			{
 				registers_view_set_subview(dv->view, regsubitem->index);
 				break;

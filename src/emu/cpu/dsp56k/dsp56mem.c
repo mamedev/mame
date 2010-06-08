@@ -31,7 +31,7 @@ static void mem_reset(dsp56k_core* cpustate)
 /* Work */
 static READ16_HANDLER( peripheral_register_r )
 {
-	dsp56k_core* cpustate = (dsp56k_core*)space->cpu->token;
+	dsp56k_core* cpustate = get_safe_token(space->cpu);
 	// (printf) logerror("Peripheral read 0x%04x\n", O2A(offset));
 
 	switch (O2A(offset))
@@ -166,7 +166,7 @@ static READ16_HANDLER( peripheral_register_r )
 
 static WRITE16_HANDLER( peripheral_register_w )
 {
-	dsp56k_core* cpustate = (dsp56k_core*)space->cpu->token;
+	dsp56k_core* cpustate = get_safe_token(space->cpu);
 
 	// Its primary behavior is RAM
 	// COMBINE_DATA(&dsp56k_peripheral_ram[offset]);

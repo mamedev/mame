@@ -446,10 +446,10 @@ static TIMER_DEVICE_CALLBACK( generate_interrupt )
 
 	/* IRQ is clocked on the rising edge of 16V, equal to the previous 32V */
 	if (scanline & 16)
-		cputag_set_input_line(timer->machine, "maincpu", 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* do a partial update now to handle sprite multiplexing (Maze Invaders) */
-	video_screen_update_partial(timer->machine->primary_screen, scanline);
+	timer.machine->primary_screen->update_partial(scanline);
 }
 
 

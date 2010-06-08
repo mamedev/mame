@@ -877,7 +877,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (flip)
 		{
-			y = (0x100 - video_screen_get_height(machine->primary_screen)) + max_y - y;
+			y = (0x100 - machine->primary_screen->height()) + max_y - y;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
@@ -926,8 +926,8 @@ static VIDEO_UPDATE( seta_layers )
 	int order	=	0;
 	int flip	=	(screen->machine->generic.spriteram.u16[ 0x600/2 ] & 0x40) >> 6;
 
-	const rectangle *visarea = video_screen_get_visible_area(screen);
-	int vis_dimy = visarea->max_y - visarea->min_y + 1;
+	const rectangle &visarea = screen->visible_area();
+	int vis_dimy = visarea.max_y - visarea.min_y + 1;
 
 	flip ^= tilemaps_flip;
 

@@ -32,7 +32,7 @@ remove all the code writing the $a0000 area.)
 
 WRITE16_HANDLER( toki_control_w )
 {
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) - 1);
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() - 1);
 	COMBINE_DATA(&toki_scrollram16[offset]);
 }
 

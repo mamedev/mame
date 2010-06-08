@@ -470,7 +470,7 @@ static VIDEO_UPDATE(firebeat)
 {
 	int chip;
 
-	if (screen == screen->machine->devicelist.find(VIDEO_SCREEN, 0))
+	if (screen == screen->machine->devicelist.find(SCREEN, 0))
 		chip = 0;
 	else
 		chip = 1;
@@ -599,11 +599,11 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 			COMBINE_DATA( &gcu[chip].visible_area );
 			if (ACCESSING_BITS_0_15)
 			{
-				running_device *screen = machine->devicelist.find(VIDEO_SCREEN, chip);
+				screen_device *screen = downcast<screen_device *>(machine->devicelist.find(SCREEN, chip));
 
 				if (screen != NULL)
 				{
-					rectangle visarea = *video_screen_get_visible_area(screen);
+					rectangle visarea = screen->visible_area();
 					int width, height;
 
 					width = (gcu[chip].visible_area & 0xffff);
@@ -612,7 +612,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 					visarea.max_x = width-1;
 					visarea.max_y = height-1;
 
-					video_screen_configure(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, video_screen_get_frame_period(screen).attoseconds);
+					screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, screen->frame_period().attoseconds);
 				}
 			}
 			break;

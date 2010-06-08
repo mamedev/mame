@@ -164,8 +164,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	skyfox_state *state = (skyfox_state *)machine->driver_data;
 	int offs;
 
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift =(state->bg_ctrl & 0x80) ? (4 - 1) : 4;

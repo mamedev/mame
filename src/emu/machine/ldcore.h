@@ -121,8 +121,8 @@ struct _ldplayer_state
 typedef struct _laserdisc_state laserdisc_state;
 struct _laserdisc_state
 {
-	running_device *	device;					/* pointer to owning device */
-	running_device *	screen;					/* pointer to the screen device */
+	running_device *		device;					/* pointer to owning device */
+	screen_device *	screen;					/* pointer to the screen device */
 	ldcore_data *			core;					/* private core data */
 	ldplayer_data *			player;					/* private player data */
 

@@ -12,11 +12,12 @@
 #include "emu.h"
 #include <ctype.h>
 
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const device_config *owner, int depth);
+static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const device_config *owner);
 
 
 
@@ -38,7 +39,19 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 	config = global_alloc_clear(machine_config);
 
 	/* parse tokens into the config */
-	machine_config_detokenize(config, tokens, NULL, 0);
+	machine_config_detokenize(config, tokens, NULL);
+
+	/* process any device-specific machine configurations */
+	for (const device_config *device = config->devicelist.first(); device != NULL; device = device->next())
+	{
+		tokens = device->machine_config_tokens();
+		if (tokens != NULL)
+			machine_config_detokenize(config, tokens, device);
+	}
+		
+	// then notify all devices that their configuration is complete
+	for (device_config *device = config->devicelist.first(); device != NULL; device = device->next())
+		device->config_complete();
 
 	return config;
 }
@@ -61,7 +74,7 @@ void machine_config_free(machine_config *config)
     machine config
 -------------------------------------------------*/
 
-static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const device_config *owner, int depth)
+static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const device_config *owner)
 {
 	UINT32 entrytype = MCONFIG_TOKEN_INVALID;
 	device_config *device = NULL;
@@ -70,12 +83,10 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
 	{
-		device_custom_config_func custom;
-		int size, offset, bits;
-		UINT32 data32, clock;
 		device_type devtype;
 		const char *tag;
 		UINT64 data64;
+		UINT32 clock;
 
 		/* unpack the token from the first entry */
 		TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
@@ -87,7 +98,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			/* including */
 			case MCONFIG_TOKEN_INCLUDE:
-				machine_config_detokenize(config, TOKEN_GET_PTR(tokens, tokenptr), owner, depth + 1);
+				machine_config_detokenize(config, TOKEN_GET_PTR(tokens, tokenptr), owner);
 				break;
 
 			/* device management */
@@ -96,7 +107,15 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = owner->subtag(tempstring, TOKEN_GET_STRING(tokens));
-				device = config->devicelist.append(tag, global_alloc(device_config(owner, devtype, tag, clock)));
+				device = config->devicelist.append(tag, (*devtype)(*config, tag, owner, clock));
+				break;
+
+			case MCONFIG_TOKEN_DEVICE_REPLACE:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
+				devtype = TOKEN_GET_PTR(tokens, devtype);
+				tag = owner->subtag(tempstring, TOKEN_GET_STRING(tokens));
+				device = config->devicelist.replace(tag, (*devtype)(*config, tag, owner, clock));
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
@@ -113,22 +132,19 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_CLOCK:
-				assert(device != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, device->clock, 32);
-				break;
-
-			case MCONFIG_TOKEN_DEVICE_MAP:
-				assert(device != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, data32, 8);
-				device->address_map[data32] = TOKEN_GET_PTR(tokens, addrmap);
-				break;
-
 			case MCONFIG_TOKEN_DEVICE_CONFIG:
-				assert(device != NULL);
-				device->static_config = TOKEN_GET_PTR(tokens, voidptr);
-				break;
+			case MCONFIG_TOKEN_DEVICE_INLINE_DATA16:
+			case MCONFIG_TOKEN_DEVICE_INLINE_DATA32:
+			case MCONFIG_TOKEN_DEVICE_INLINE_DATA64:
+
+			case MCONFIG_TOKEN_DIEXEC_DISABLE:
+			case MCONFIG_TOKEN_DIEXEC_VBLANK_INT:
+			case MCONFIG_TOKEN_DIEXEC_PERIODIC_INT:
+
+			case MCONFIG_TOKEN_DIMEMORY_MAP:
+
+			case MCONFIG_TOKEN_DISOUND_ROUTE:
+			case MCONFIG_TOKEN_DISOUND_RESET:
 
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1:
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_2:
@@ -139,50 +155,12 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_7:
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_8:
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_9:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_DATA32:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_DATA64:
+			case MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32:
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE:
 				assert(device != NULL);
-				custom = (device_custom_config_func)device->get_config_fct(DEVINFO_FCT_CUSTOM_CONFIG);
-				assert(custom != NULL);
-				tokens = (*custom)(device, entrytype, tokens);
-				break;
-
-			case MCONFIG_TOKEN_DEVICE_CONFIG_DATA32:
-				assert(device != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 4, offset, 12);
-				data32 = TOKEN_GET_UINT32(tokens);
-				switch (size)
-				{
-					case 1: *(UINT8 *) ((UINT8 *)device->inline_config + offset) = data32; break;
-					case 2: *(UINT16 *)((UINT8 *)device->inline_config + offset) = data32; break;
-					case 4: *(UINT32 *)((UINT8 *)device->inline_config + offset) = data32; break;
-				}
-				break;
-
-			case MCONFIG_TOKEN_DEVICE_CONFIG_DATA64:
-				assert(device != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 4, offset, 12);
-				TOKEN_EXTRACT_UINT64(tokens, data64);
-				switch (size)
-				{
-					case 1: *(UINT8 *) ((UINT8 *)device->inline_config + offset) = data64; break;
-					case 2: *(UINT16 *)((UINT8 *)device->inline_config + offset) = data64; break;
-					case 4: *(UINT32 *)((UINT8 *)device->inline_config + offset) = data64; break;
-					case 8: *(UINT64 *)((UINT8 *)device->inline_config + offset) = data64; break;
-				}
-				break;
-
-			case MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32:
-				assert(device != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, size, 4, bits, 6, offset, 12);
-				data32 = TOKEN_GET_UINT32(tokens);
-				switch (size)
-				{
-					case 4: *(float *)((UINT8 *)device->inline_config + offset) = (float)(INT32)data32 / (float)(1 << bits); break;
-					case 8: *(double *)((UINT8 *)device->inline_config + offset) = (double)(INT32)data32 / (double)(1 << bits); break;
-				}
+				device->process_token(entrytype, tokens);
 				break;
 
 
@@ -281,13 +259,4 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				break;
 		}
 	}
-
-	/* if we are the outermost level, process any device-specific machine configurations */
-	if (depth == 0)
-		for (device = config->devicelist.first(); device != NULL; device = device->next)
-		{
-			tokens = device->machine_config_tokens();
-			if (tokens != NULL)
-				machine_config_detokenize(config, tokens, device, depth + 1);
-		}
 }

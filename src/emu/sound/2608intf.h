@@ -3,6 +3,8 @@
 #ifndef __2608INTF_H__
 #define __2608INTF_H__
 
+#include "devlegcy.h"
+
 #include "fm.h"
 #include "ay8910.h"
 
@@ -27,7 +29,6 @@ WRITE8_DEVICE_HANDLER( ym2608_control_port_b_w );
 WRITE8_DEVICE_HANDLER( ym2608_data_port_a_w );
 WRITE8_DEVICE_HANDLER( ym2608_data_port_b_w );
 
-DEVICE_GET_INFO( ym2608 );
-#define SOUND_YM2608 DEVICE_GET_INFO_NAME( ym2608 )
+DECLARE_LEGACY_SOUND_DEVICE(YM2608, ym2608);
 
 #endif /* __2608INTF_H__ */

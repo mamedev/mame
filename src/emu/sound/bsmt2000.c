@@ -98,10 +98,8 @@ static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8
 INLINE bsmt2000_chip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_BSMT2000);
-	return (bsmt2000_chip *)device->token;
+	assert(device->type() == SOUND_BSMT2000);
+	return (bsmt2000_chip *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -120,12 +118,12 @@ static DEVICE_START( bsmt2000 )
 	int voicenum;
 
 	/* create a stream at a nominal sample rate (real one specified later) */
-	chip->stream = stream_create(device, 0, 2, device->clock / 1000, chip, bsmt2000_update);
-	chip->clock = device->clock;
+	chip->stream = stream_create(device, 0, 2, device->clock() / 1000, chip, bsmt2000_update);
+	chip->clock = device->clock();
 
 	/* initialize the regions */
-	chip->region_base = *device->region;
-	chip->total_banks = device->region->bytes() / 0x10000;
+	chip->region_base = *device->region();
+	chip->total_banks = device->region()->bytes() / 0x10000;
 
 	/* register chip-wide data for save states */
 	state_save_register_device_item(device, 0, chip->last_register);

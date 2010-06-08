@@ -116,7 +116,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		y = spriteram[offs];
 		flash = y & 0x1000;
 		xsize = y & 0x0800;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		x = spriteram[offs + 2];
@@ -772,8 +772,7 @@ static MACHINE_DRIVER_START( dblewing )
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

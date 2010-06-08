@@ -53,10 +53,9 @@ struct _ccpu_state
 INLINE ccpu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CCPU);
-	return (ccpu_state *)device->token;
+	return (ccpu_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -125,16 +124,16 @@ void ccpu_wdt_timer_trigger(running_device *device)
 
 static CPU_INIT( ccpu )
 {
-	const ccpu_config *configdata = (const ccpu_config *)device->baseconfig().static_config;
+	const ccpu_config *configdata = (const ccpu_config *)device->baseconfig().static_config();
 	ccpu_state *cpustate = get_safe_token(device);
 
 	/* copy input params */
 	cpustate->external_input = configdata->external_input ? configdata->external_input : read_jmi;
 	cpustate->vector_callback = configdata->vector_callback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->A);
@@ -731,7 +730,7 @@ static CPU_SET_INFO( ccpu )
 
 CPU_GET_INFO( ccpu )
 {
-	ccpu_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	ccpu_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

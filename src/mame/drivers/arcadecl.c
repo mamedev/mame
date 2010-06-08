@@ -88,11 +88,11 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(running_device *screen, int scanline)
+static void scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(devtag_get_device(screen->machine, "maincpu"));
+		atarigen_scanline_int_gen(devtag_get_device(screen.machine, "maincpu"));
 }
 
 
@@ -115,7 +115,7 @@ static MACHINE_RESET( arcadecl )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
+	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 32);
 }
 
 
@@ -137,7 +137,8 @@ static WRITE16_HANDLER( latch_w )
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x80) ? 0x40000 : 0x00000);
+		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		oki->set_bank_base((data & 0x80) ? 0x40000 : 0x00000);
 		atarigen_set_oki6295_vol(space->machine, (data & 0x001f) * 100 / 0x1f);
 	}
 }
@@ -351,8 +352,7 @@ static MACHINE_DRIVER_START( arcadecl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, MASTER_CLOCK/4/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK/4/3, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

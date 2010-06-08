@@ -32,7 +32,7 @@ TODO:
 typedef struct _mjkjidai_adpcm_state mjkjidai_adpcm_state;
 struct _mjkjidai_adpcm_state
 {
-	struct adpcm_state adpcm;
+	adpcm_state adpcm;
 	sound_stream *stream;
 	UINT32 current, end;
 	UINT8 nibble;
@@ -57,7 +57,7 @@ static STREAM_UPDATE( mjkjidai_adpcm_callback )
 				state->playing = 0;
 		}
 
-		*dest++ = clock_adpcm(&state->adpcm, val) << 4;
+		*dest++ = state->adpcm.clock(val) << 4;
 		samples--;
 	}
 	while (samples > 0)
@@ -70,15 +70,15 @@ static STREAM_UPDATE( mjkjidai_adpcm_callback )
 static DEVICE_START( mjkjidai_adpcm )
 {
 	running_machine *machine = device->machine;
-	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)device->token;
+	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	state->playing = 0;
-	state->stream = stream_create(device, 0, 1, device->clock, state, mjkjidai_adpcm_callback);
+	state->stream = stream_create(device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
 	state->base = memory_region(machine, "adpcm");
-	reset_adpcm(&state->adpcm);
+	state->adpcm.reset();
 }
 
-static DEVICE_GET_INFO( mjkjidai_adpcm )
+DEVICE_GET_INFO( mjkjidai_adpcm )
 {
 	switch (state)
 	{
@@ -93,7 +93,7 @@ static DEVICE_GET_INFO( mjkjidai_adpcm )
 	}
 }
 
-#define SOUND_MJKJIDAI DEVICE_GET_INFO_NAME(mjkjidai_adpcm)
+DECLARE_LEGACY_SOUND_DEVICE(MJKJIDAI, mjkjidai_adpcm);
 
 
 static void mjkjidai_adpcm_play (mjkjidai_adpcm_state *state, int offset, int length)
@@ -106,7 +106,7 @@ static void mjkjidai_adpcm_play (mjkjidai_adpcm_state *state, int offset, int le
 
 static WRITE8_DEVICE_HANDLER( adpcm_w )
 {
-	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)device->token;
+	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 	mjkjidai_adpcm_play (state, (data & 0x07) * 0x1000, 0x1000 * 2);
 }
 /* End of ADPCM custom chip code */

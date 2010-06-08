@@ -257,7 +257,7 @@ VIDEO_UPDATE( blaster )
 		pens[x] = palette_lookup[screen->machine->generic.paletteram.u8[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
-	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y || !(blaster_video_control & 1))
+	if (cliprect->min_y == screen->visible_area().min_y || !(blaster_video_control & 1))
 		blaster_color0 = pens[0];
 
 	/* loop over rows */
@@ -397,13 +397,13 @@ WRITE8_HANDLER( williams2_fg_select_w )
 
 READ8_HANDLER( williams_video_counter_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen) & 0xfc;
+	return space->machine->primary_screen->vpos() & 0xfc;
 }
 
 
 READ8_HANDLER( williams2_video_counter_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen);
+	return space->machine->primary_screen->vpos();
 }
 
 
@@ -581,7 +581,7 @@ WRITE8_HANDLER( williams_blitter_w )
 
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
-			cpu_get_pc(space->cpu), video_screen_get_vpos(space->machine->primary_screen),
+			cpu_get_pc(space->cpu), space->machine->primary_screen->vpos(),
 			blitterram[2], blitterram[3],
 			blitterram[4], blitterram[5],
 			blitterram[6], blitterram[7],

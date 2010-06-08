@@ -843,15 +843,15 @@ static void radarscp_scanline(running_machine *machine, int scanline)
 	int 			x,y,offset;
 	UINT16			*pixel;
 	static int		counter=0;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	y = scanline;
 	radarscp_step(machine, y);
-	if (y <= visarea->min_y || y > visarea->max_y)
+	if (y <= visarea.min_y || y > visarea.max_y)
 		counter = 0;
 	offset = (state->flip ^ state->rflip_sig) ? 0x000 : 0x400;
 	x = 0;
-	while (x < video_screen_get_width(machine->primary_screen))
+	while (x < machine->primary_screen->width())
 	{
 		pixel = BITMAP_ADDR16(state->bg_bits, y, x);
 		if ((counter < table_len) && (x == 4 * (table[counter|offset] & 0x7f)))
@@ -881,11 +881,11 @@ static TIMER_CALLBACK( scanline_callback )
 		radarscp_scanline(machine, scanline);
 
 	/* update any video up to the current scanline */
-	video_screen_update_now(machine->primary_screen);
+	machine->primary_screen->update_now();
 
 	scanline = (scanline+1) % VTOTAL;
 	/* come back at the next appropriate scanline */
-	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 static void check_palette(running_machine *machine)
@@ -945,12 +945,12 @@ VIDEO_START( dkong )
 	VIDEO_START_CALL(dkong_base);
 
 	state->scanline_timer = timer_alloc(machine, scanline_callback, NULL);
-	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 
 	switch (state->hardware_type)
 	{
 		case HARDWARE_TRS02:
-			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
+			state->bg_bits = machine->primary_screen->alloc_compatible_bitmap();
 			state->gfx3 = memory_region(machine, "gfx3");
 			state->gfx3_len = memory_region_length(machine, "gfx3");
 		    /* fall through */
@@ -963,7 +963,7 @@ VIDEO_START( dkong )
 			state->bg_tilemap = tilemap_create(machine, radarscp1_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 			tilemap_set_scrolldx(state->bg_tilemap, 0, 128);
 
-			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
+			state->bg_bits = machine->primary_screen->alloc_compatible_bitmap();
 			state->gfx4 = memory_region(machine, "gfx4");
 			state->gfx3 = memory_region(machine, "gfx3");
 			state->gfx3_len = memory_region_length(machine, "gfx3");

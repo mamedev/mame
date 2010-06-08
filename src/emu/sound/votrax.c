@@ -41,10 +41,8 @@ struct _votrax_state
 INLINE votrax_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_VOTRAX);
-	return (votrax_state *)device->token;
+	assert(device->type() == SOUND_VOTRAX);
+	return (votrax_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 #define FRAC_BITS		24

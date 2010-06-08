@@ -60,7 +60,7 @@ typedef struct
     UINT8 nmi_state;
     UINT8 irq_state[3];
 	UINT8 irq_pending;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	const address_space *io;

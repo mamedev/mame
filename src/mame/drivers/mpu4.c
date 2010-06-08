@@ -1745,7 +1745,7 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
     oscillating signal.*/
 	signal_50hz = signal_50hz?0:1;
 	update_lamps();
-	pia6821_ca1_w(devtag_get_device(timer->machine, "pia_ic4"), 0,  signal_50hz);	/* signal is connected to IC4 CA1 */
+	pia6821_ca1_w(devtag_get_device(timer.machine, "pia_ic4"), 0,  signal_50hz);	/* signal is connected to IC4 CA1 */
 }
 
 

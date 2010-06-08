@@ -96,8 +96,7 @@ struct _pic16c62x_state
 INLINE pic16c62x_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_PIC16C620 ||
 		   cpu_get_type(device) == CPU_PIC16C620A ||
 //         cpu_get_type(device) == CPU_PIC16CR620A ||
@@ -105,7 +104,7 @@ INLINE pic16c62x_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_PIC16C621A ||
 		   cpu_get_type(device) == CPU_PIC16C622 ||
 		   cpu_get_type(device) == CPU_PIC16C622A);
-	return (pic16c62x_state *)device->token;
+	return (pic16c62x_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -838,9 +837,9 @@ static CPU_INIT( pic16c62x )
 	pic16c62x_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	cpustate->CONFIG = 0x3fff;
 
@@ -1115,7 +1114,7 @@ static CPU_SET_INFO( pic16c62x )
 
 static CPU_GET_INFO( pic16c62x )
 {
-	pic16c62x_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	pic16c62x_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

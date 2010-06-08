@@ -69,6 +69,14 @@
 // devices and callbacks
 #include "devintrf.h"
 #include "devcb.h"
+#include "distate.h"
+#include "dimemory.h"
+#include "diexec.h"
+#include "disound.h"
+#include "dinvram.h"
+#include "didisasm.h"
+#include "timer.h"
+#include "schedule.h"
 
 // I/O
 #include "input.h"
@@ -77,9 +85,7 @@
 #include "output.h"
 
 // timers, CPU and scheduling
-#include "timer.h"
-#include "cpuintrf.h"
-#include "cpuexec.h"
+#include "devcpu.h"
 #include "watchdog.h"
 
 // machine and driver configuration
@@ -105,6 +111,7 @@
 #include "video.h"
 
 // sound-related
+#include "streams.h"
 #include "sound.h"
 
 // generic helpers

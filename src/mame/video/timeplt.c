@@ -165,7 +165,7 @@ WRITE8_HANDLER( timeplt_flipscreen_w )
 
 READ8_HANDLER( timeplt_scanline_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen);
+	return space->machine->primary_screen->vpos();
 }
 
 

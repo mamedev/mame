@@ -40,15 +40,14 @@ struct _cdp1852_t
 INLINE cdp1852_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (cdp1852_t *)device->token;
+	return (cdp1852_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const cdp1852_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == CDP1852));
-	return (const cdp1852_interface *) device->baseconfig().static_config;
+	assert((device->type() == CDP1852));
+	return (const cdp1852_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -120,7 +119,7 @@ READ8_DEVICE_HANDLER( cdp1852_data_r )
 {
 	cdp1852_t *cdp1852 = get_safe_token(device);
 
-	if (cdp1852->mode == CDP1852_MODE_INPUT && device->clock == 0)
+	if (cdp1852->mode == CDP1852_MODE_INPUT && device->clock() == 0)
 	{
 		// input data into register
 		cdp1852->data = devcb_call_read8(&cdp1852->in_data_func, 0);
@@ -163,11 +162,11 @@ static DEVICE_START( cdp1852 )
 	/* set initial values */
 	cdp1852->mode = (cdp1852_mode)intf->mode;
 
-	if (device->clock > 0)
+	if (device->clock() > 0)
 	{
 		/* create the scan timer */
 		cdp1852->scan_timer = timer_alloc(device->machine, cdp1852_scan_tick, (void *)device);
-		timer_adjust_periodic(cdp1852->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
+		timer_adjust_periodic(cdp1852->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
 	}
 
 	/* register for state saving */
@@ -215,7 +214,6 @@ DEVICE_GET_INFO( cdp1852 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1852_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1852);	break;

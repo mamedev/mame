@@ -4,12 +4,20 @@
 
 *************************************************************************/
 
+#include "sound/okim6295.h"
+#include "video/deco16ic.h"
+
 class dassault_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dassault_state(machine)); }
 
-	dassault_state(running_machine &machine) { }
+	dassault_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  audiocpu(machine.device<cpu_device>("audiocpu")),
+		  subcpu(machine.device<cpu_device>("sub")),
+		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
+		  oki2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
 	UINT16 *  pf2_rowscroll;
@@ -19,11 +27,11 @@ public:
 	UINT16 *  shared_ram;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *subcpu;
-	running_device *deco16ic;
-	running_device *oki2;
+	cpu_device *maincpu;
+	cpu_device *audiocpu;
+	cpu_device *subcpu;
+	deco16ic_device *deco16ic;
+	okim6295_device *oki2;
 };
 
 

@@ -9,6 +9,8 @@
 #ifndef PCI_H
 #define PCI_H
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -62,9 +64,7 @@ WRITE64_DEVICE_HANDLER( pci_64be_w );
 
 /* ----- device interface ----- */
 
-/* device get info callback */
-#define PCI_BUS DEVICE_GET_INFO_NAME(pci_bus)
-DEVICE_GET_INFO( pci_bus );
+DECLARE_LEGACY_DEVICE(PCI_BUS, pci_bus);
 
 #endif /* PCI_H */
 

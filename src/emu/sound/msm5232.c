@@ -78,10 +78,8 @@ typedef struct {
 INLINE MSM5232 *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_MSM5232);
-	return (MSM5232 *)device->token;
+	assert(device->type() == SOUND_MSM5232);
+	return (MSM5232 *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -785,13 +783,13 @@ static STREAM_UPDATE( MSM5232_update_one )
 
 static DEVICE_START( msm5232 )
 {
-	const msm5232_interface *intf = (const msm5232_interface *)device->baseconfig().static_config;
-	int rate = device->clock/CLOCK_RATE_DIVIDER;
+	const msm5232_interface *intf = (const msm5232_interface *)device->baseconfig().static_config();
+	int rate = device->clock()/CLOCK_RATE_DIVIDER;
 	MSM5232 *chip = get_safe_token(device);
 
 	chip->device = device;
 
-	msm5232_init(chip, intf, device->clock, rate);
+	msm5232_init(chip, intf, device->clock(), rate);
 
 	chip->stream = stream_create(device,0,11,rate,chip,MSM5232_update_one);
 }

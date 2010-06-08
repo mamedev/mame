@@ -53,7 +53,7 @@ struct _cdp1864_t
 	devcb_resolved_write_line		out_dmao_func;
 	devcb_resolved_write_line		out_efx_func;
 
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 	sound_stream *stream;			/* sound output */
 
@@ -84,8 +84,7 @@ struct _cdp1864_t
 INLINE cdp1864_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (cdp1864_t *)device->token;
+	return (cdp1864_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -101,7 +100,7 @@ static TIMER_CALLBACK( cdp1864_int_tick )
 	running_device *device = (running_device *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
-	int scanline = video_screen_get_vpos(cdp1864->screen);
+	int scanline = cdp1864->screen->vpos();
 
 	if (scanline == CDP1864_SCANLINE_INT_START)
 	{
@@ -110,7 +109,7 @@ static TIMER_CALLBACK( cdp1864_int_tick )
 			devcb_call_write_line(&cdp1864->out_int_func, ASSERT_LINE);
 		}
 
-		timer_adjust_oneshot(cdp1864->int_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_INT_END, 0), 0);
+		timer_adjust_oneshot(cdp1864->int_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_INT_END), 0);
 	}
 	else
 	{
@@ -119,7 +118,7 @@ static TIMER_CALLBACK( cdp1864_int_tick )
 			devcb_call_write_line(&cdp1864->out_int_func, CLEAR_LINE);
 		}
 
-		timer_adjust_oneshot(cdp1864->int_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_INT_START, 0), 0);
+		timer_adjust_oneshot(cdp1864->int_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_INT_START), 0);
 	}
 }
 
@@ -132,28 +131,28 @@ static TIMER_CALLBACK( cdp1864_efx_tick )
 	running_device *device = (running_device *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
-	int scanline = video_screen_get_vpos(cdp1864->screen);
+	int scanline = cdp1864->screen->vpos();
 
 	switch (scanline)
 	{
 	case CDP1864_SCANLINE_EFX_TOP_START:
 		devcb_call_write_line(&cdp1864->out_efx_func, ASSERT_LINE);
-		timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_TOP_END, 0), 0);
+		timer_adjust_oneshot(cdp1864->efx_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_END), 0);
 		break;
 
 	case CDP1864_SCANLINE_EFX_TOP_END:
 		devcb_call_write_line(&cdp1864->out_efx_func, CLEAR_LINE);
-		timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_BOTTOM_START, 0), 0);
+		timer_adjust_oneshot(cdp1864->efx_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_EFX_BOTTOM_START), 0);
 		break;
 
 	case CDP1864_SCANLINE_EFX_BOTTOM_START:
 		devcb_call_write_line(&cdp1864->out_efx_func, ASSERT_LINE);
-		timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_BOTTOM_END, 0), 0);
+		timer_adjust_oneshot(cdp1864->efx_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_EFX_BOTTOM_END), 0);
 		break;
 
 	case CDP1864_SCANLINE_EFX_BOTTOM_END:
 		devcb_call_write_line(&cdp1864->out_efx_func, CLEAR_LINE);
-		timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_TOP_START, 0), 0);
+		timer_adjust_oneshot(cdp1864->efx_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_START), 0);
 		break;
 	}
 }
@@ -167,7 +166,7 @@ static TIMER_CALLBACK( cdp1864_dma_tick )
 	running_device *device = (running_device *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
-	int scanline = video_screen_get_vpos(cdp1864->screen);
+	int scanline = cdp1864->screen->vpos();
 
 	if (cdp1864->dmaout)
 	{
@@ -325,8 +324,8 @@ WRITE8_DEVICE_HANDLER( cdp1864_dma_w )
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int rdata = 1, bdata = 1, gdata = 1;
-	int sx = video_screen_get_hpos(cdp1864->screen) + 4;
-	int y = video_screen_get_vpos(cdp1864->screen);
+	int sx = cdp1864->screen->hpos() + 4;
+	int y = cdp1864->screen->vpos();
 	int x;
 
 	if (!cdp1864->con)
@@ -424,7 +423,7 @@ void cdp1864_update(running_device *device, bitmap_t *bitmap, const rectangle *c
 static DEVICE_START( cdp1864 )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
-	const cdp1864_interface *intf = (const cdp1864_interface *) device->baseconfig().static_config;
+	const cdp1864_interface *intf = (const cdp1864_interface *) device->baseconfig().static_config();
 
 	/* resolve callbacks */
 	devcb_resolve_read_line(&cdp1864->in_rdata_func, &intf->in_rdata_func, device);
@@ -438,11 +437,11 @@ static DEVICE_START( cdp1864 )
 	cdp1864->cpu = device->machine->device(intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1864->screen = device->machine->device(intf->screen_tag);
+	cdp1864->screen = downcast<screen_device *>(device->machine->device(intf->screen_tag));
 	assert(cdp1864->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1864->bitmap = auto_bitmap_alloc(device->machine, video_screen_get_width(cdp1864->screen), video_screen_get_height(cdp1864->screen), video_screen_get_format(cdp1864->screen));
+	cdp1864->bitmap = auto_bitmap_alloc(device->machine, cdp1864->screen->width(), cdp1864->screen->height(), cdp1864->screen->format());
 	bitmap_fill(cdp1864->bitmap, 0, CDP1864_BACKGROUND_COLOR_SEQUENCE[cdp1864->bgcolor] + 8);
 
 	/* initialize the palette */
@@ -478,8 +477,8 @@ static DEVICE_RESET( cdp1864 )
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
-	timer_adjust_oneshot(cdp1864->int_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_INT_START, 0), 0);
-	timer_adjust_oneshot(cdp1864->efx_timer, video_screen_get_time_until_pos(cdp1864->screen, CDP1864_SCANLINE_EFX_TOP_START, 0), 0);
+	timer_adjust_oneshot(cdp1864->int_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_INT_START), 0);
+	timer_adjust_oneshot(cdp1864->efx_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_START), 0);
 	timer_adjust_oneshot(cdp1864->dma_timer, cpu_clocks_to_attotime(device->machine->firstcpu, CDP1864_CYCLES_DMA_START), 0);
 
 	cdp1864->disp = 0;
@@ -505,7 +504,6 @@ DEVICE_GET_INFO( cdp1864 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1864_t);						break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;										break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1864);			break;

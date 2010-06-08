@@ -3,6 +3,8 @@
 #ifndef __YMF278B_H__
 #define __YMF278B_H__
 
+#include "devlegcy.h"
+
 #define YMF278B_STD_CLOCK (33868800)			/* standard clock for OPL4 */
 
 
@@ -15,7 +17,6 @@ struct _ymf278b_interface
 READ8_DEVICE_HANDLER( ymf278b_r );
 WRITE8_DEVICE_HANDLER( ymf278b_w );
 
-DEVICE_GET_INFO( ymf278b );
-#define SOUND_YMF278B DEVICE_GET_INFO_NAME( ymf278b )
+DECLARE_LEGACY_SOUND_DEVICE(YMF278B, ymf278b);
 
 #endif /* __YMF278B_H__ */

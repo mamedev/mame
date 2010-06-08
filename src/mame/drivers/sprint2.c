@@ -170,13 +170,13 @@ static READ8_HANDLER( sprint2_sync_r )
 	if (attract != 0)
 		val |= 0x10;
 
-	if (video_screen_get_vpos(space->machine->primary_screen) == 261)
+	if (space->machine->primary_screen->vpos() == 261)
 		val |= 0x20; /* VRESET */
 
-	if (video_screen_get_vpos(space->machine->primary_screen) >= 224)
+	if (space->machine->primary_screen->vpos() >= 224)
 		val |= 0x40; /* VBLANK */
 
-	if (video_screen_get_vpos(space->machine->primary_screen) >= 131)
+	if (space->machine->primary_screen->vpos() >= 131)
 		val |= 0x80; /* 60 Hz? */
 
 	return val;

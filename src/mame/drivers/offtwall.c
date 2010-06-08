@@ -57,7 +57,7 @@ static MACHINE_RESET( offtwall )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarivc_reset(machine->primary_screen, state->atarigen.atarivc_eof_data, 1);
+	atarivc_reset(*machine->primary_screen, state->atarigen.atarivc_eof_data, 1);
 	atarijsa_reset();
 }
 
@@ -71,13 +71,13 @@ static MACHINE_RESET( offtwall )
 
 static READ16_HANDLER( offtwall_atarivc_r )
 {
-	return atarivc_r(space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( offtwall_atarivc_w )
 {
-	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
 }
 
 

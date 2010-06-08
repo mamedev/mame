@@ -35,7 +35,7 @@ static TIMER_DEVICE_CALLBACK( input_callback )
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 val = input_port_read(timer->machine, dialnames[i]) >> 4;
+		UINT8 val = input_port_read(timer.machine, dialnames[i]) >> 4;
 
 		signed char delta = (val - dial[i]) & 15;
 

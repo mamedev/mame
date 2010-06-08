@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "sound/okim6295.h"
+
 class dynax_state
 {
 public:
@@ -121,7 +123,7 @@ public:
 	running_device *soundcpu;
 	running_device *rtc;
 	running_device *ymsnd;
-	running_device *oki;
+	okim6295_device *oki;
 	running_device *top_scr;
 	running_device *bot_scr;
 };

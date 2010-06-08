@@ -39,8 +39,8 @@ static VIDEO_START( taitob_core )
 {
 	taitob_state *state = (taitob_state *)machine->driver_data;
 
-	state->framebuffer[0] = auto_bitmap_alloc(machine, 512, 256, video_screen_get_format(machine->primary_screen));
-	state->framebuffer[1] = auto_bitmap_alloc(machine, 512, 256, video_screen_get_format(machine->primary_screen));
+	state->framebuffer[0] = auto_bitmap_alloc(machine, 512, 256, machine->primary_screen->format());
+	state->framebuffer[1] = auto_bitmap_alloc(machine, 512, 256, machine->primary_screen->format());
 	state->pixel_bitmap = NULL;  /* only hitice needs this */
 
 	state_save_register_global_array(machine, state->pixel_scroll);
@@ -91,7 +91,7 @@ VIDEO_START( hitice )
 
 	state->b_fg_color_base = 0x80;		/* hitice also uses this for the pixel_bitmap */
 
-	state->pixel_bitmap = auto_bitmap_alloc(machine, 1024, 512, video_screen_get_format(machine->primary_screen));
+	state->pixel_bitmap = auto_bitmap_alloc(machine, 1024, 512, machine->primary_screen->format());
 
 	state_save_register_global_bitmap(machine, state->pixel_bitmap);
 }
@@ -398,7 +398,7 @@ VIDEO_EOF( taitob )
 	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->tc0180vcu, 0);
 
 	if (~video_control & 0x01)
-		bitmap_fill(state->framebuffer[framebuffer_page], video_screen_get_visible_area(machine->primary_screen), 0);
+		bitmap_fill(state->framebuffer[framebuffer_page], &machine->primary_screen->visible_area(), 0);
 
 	if (~video_control & 0x80)
 	{
@@ -406,5 +406,5 @@ VIDEO_EOF( taitob )
 		tc0180vcu_set_fb_page(state->tc0180vcu, 0, framebuffer_page);
 	}
 
-	draw_sprites(machine, state->framebuffer[framebuffer_page], video_screen_get_visible_area(machine->primary_screen));
+	draw_sprites(machine, state->framebuffer[framebuffer_page], &machine->primary_screen->visible_area());
 }

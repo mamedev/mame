@@ -15,10 +15,8 @@ struct _filter_rc_state
 INLINE filter_rc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_FILTER_RC);
-	return (filter_rc_state *)device->token;
+	assert(device->type() == SOUND_FILTER_RC);
+	return (filter_rc_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 const flt_rc_config flt_rc_ac_default = {FLT_RC_AC, 10000, 0, 0, CAP_U(1)};
@@ -93,7 +91,7 @@ static void set_RC_info(filter_rc_state *info, int type, double R1, double R2, d
 static DEVICE_START( filter_rc )
 {
 	filter_rc_state *info = get_safe_token(device);
-	const flt_rc_config *conf = (const flt_rc_config *)device->baseconfig().static_config;
+	const flt_rc_config *conf = (const flt_rc_config *)device->baseconfig().static_config();
 
 	info->device = device;
 	info->stream = stream_create(device, 1, 1, device->machine->sample_rate, info, filter_rc_update);

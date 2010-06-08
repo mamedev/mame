@@ -1597,7 +1597,7 @@ static READ64_HANDLER(real3d_status_r)
 	{
 		/* pretty sure this is VBLANK */
 		real3d_status &= ~U64(0x0000000200000000);
-		if (video_screen_get_vblank(space->machine->primary_screen))
+		if (space->machine->primary_screen->vblank())
 			real3d_status |= U64(0x0000000200000000);
 		return real3d_status;
 	}

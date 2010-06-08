@@ -129,16 +129,16 @@ WRITE16_HANDLER( atarigx2_mo_control_w )
 {
 	atarigx2_state *state = (atarigx2_state *)space->machine->driver_data;
 
-	logerror("MOCONT = %d (scan = %d)\n", data, video_screen_get_vpos(space->machine->primary_screen));
+	logerror("MOCONT = %d (scan = %d)\n", data, space->machine->primary_screen->vpos());
 
 	/* set the control value */
 	COMBINE_DATA(&state->current_control);
 }
 
 
-void atarigx2_scanline_update(running_device *screen, int scanline)
+void atarigx2_scanline_update(screen_device &screen, int scanline)
 {
-	atarigx2_state *state = (atarigx2_state *)screen->machine->driver_data;
+	atarigx2_state *state = (atarigx2_state *)screen.machine->driver_data;
 	UINT32 *base = &state->atarigen.alpha32[(scanline / 8) * 32 + 24];
 	int i;
 
@@ -160,14 +160,14 @@ void atarigx2_scanline_update(running_device *screen, int scanline)
 			if (newscroll != state->playfield_xscroll)
 			{
 				if (scanline + i > 0)
-					video_screen_update_partial(screen, scanline + i - 1);
+					screen.update_partial(scanline + i - 1);
 				tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll);
 				state->playfield_xscroll = newscroll;
 			}
 			if (newbank != state->playfield_color_bank)
 			{
 				if (scanline + i > 0)
-					video_screen_update_partial(screen, scanline + i - 1);
+					screen.update_partial(scanline + i - 1);
 				tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 				state->playfield_color_bank = newbank;
 			}
@@ -180,14 +180,14 @@ void atarigx2_scanline_update(running_device *screen, int scanline)
 			if (newscroll != state->playfield_yscroll)
 			{
 				if (scanline + i > 0)
-					video_screen_update_partial(screen, scanline + i - 1);
+					screen.update_partial(scanline + i - 1);
 				tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll);
 				state->playfield_yscroll = newscroll;
 			}
 			if (newbank != state->playfield_tile_bank)
 			{
 				if (scanline + i > 0)
-					video_screen_update_partial(screen, scanline + i - 1);
+					screen.update_partial(scanline + i - 1);
 				tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 				state->playfield_tile_bank = newbank;
 			}

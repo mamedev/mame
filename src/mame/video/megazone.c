@@ -105,7 +105,7 @@ WRITE8_HANDLER( megazone_flipscreen_w )
 VIDEO_START( megazone )
 {
 	megazone_state *state = (megazone_state *)machine->driver_data;
-	state->tmpbitmap = auto_bitmap_alloc(machine, 256, 256, video_screen_get_format(machine->primary_screen));
+	state->tmpbitmap = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
 
 	state_save_register_global_bitmap(machine, state->tmpbitmap);
 }

@@ -35,7 +35,7 @@ struct tms34061_data
 	UINT8 *				shiftreg;
 	emu_timer *			timer;
 	struct tms34061_interface intf;
-	running_device *screen;
+	screen_device *screen;
 };
 
 
@@ -80,7 +80,7 @@ void tms34061_start(running_machine *machine, const struct tms34061_interface *i
 	/* reset the data */
 	memset(&tms34061, 0, sizeof(tms34061));
 	tms34061.intf = *interface;
-	tms34061.screen = machine->device(tms34061.intf.screen_tag);
+	tms34061.screen = downcast<screen_device *>(machine->device(tms34061.intf.screen_tag));
 	tms34061.vrammask = tms34061.intf.vramsize - 1;
 
 	/* allocate memory for VRAM */
@@ -147,7 +147,7 @@ INLINE void update_interrupts(void)
 static TIMER_CALLBACK( tms34061_interrupt )
 {
 	/* set timer for next frame */
-	timer_adjust_oneshot(tms34061.timer, video_screen_get_frame_period(tms34061.screen), 0);
+	timer_adjust_oneshot(tms34061.timer, tms34061.screen->frame_period(), 0);
 
 	/* set the interrupt bit in the status reg */
 	tms34061.regs[TMS34061_STATUS] |= 1;
@@ -172,7 +172,7 @@ static void register_w(const address_space *space, offs_t offset, UINT8 data)
 	/* certain registers affect the display directly */
 	if ((regnum >= TMS34061_HORENDSYNC && regnum <= TMS34061_DISPSTART) ||
 		(regnum == TMS34061_CONTROL2))
-		video_screen_update_partial(tms34061.screen, video_screen_get_vpos(tms34061.screen));
+		tms34061.screen->update_partial(tms34061.screen->vpos());
 
 	/* store the hi/lo half */
 	if (regnum < ARRAY_LENGTH(tms34061.regs))
@@ -196,7 +196,7 @@ static void register_w(const address_space *space, offs_t offset, UINT8 data)
 			if (scanline < 0)
 				scanline += tms34061.regs[TMS34061_VERTOTAL];
 
-			timer_adjust_oneshot(tms34061.timer, video_screen_get_time_until_pos(tms34061.screen, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0);
+			timer_adjust_oneshot(tms34061.timer, tms34061.screen->time_until_pos(scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0);
 			break;
 
 		/* XY offset: set the X and Y masks */
@@ -257,7 +257,7 @@ static UINT8 register_r(const address_space *space, offs_t offset)
 
 		/* vertical count register: return the current scanline */
 		case TMS34061_VERCOUNTER:
-			result = (video_screen_get_vpos(tms34061.screen)+ tms34061.regs[TMS34061_VERENDBLNK]) % tms34061.regs[TMS34061_VERTOTAL];
+			result = (tms34061.screen->vpos()+ tms34061.regs[TMS34061_VERENDBLNK]) % tms34061.regs[TMS34061_VERTOTAL];
 			break;
 	}
 

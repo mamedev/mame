@@ -36,6 +36,8 @@
 #ifndef TTL74153_H
 #define TTL74153_H
 
+#include "devlegcy.h"
+
 
 typedef struct _ttl74153_config ttl74153_config;
 struct _ttl74153_config
@@ -59,8 +61,6 @@ void ttl74153_input_line_w(running_device *device, int section, int input_line, 
 void ttl74153_enable_w(running_device *device, int section, int data);
 int ttl74153_output_r(running_device *device, int section);
 
-/* device get info callback */
-#define TTL74153 DEVICE_GET_INFO_NAME(ttl74153)
-DEVICE_GET_INFO( ttl74153 );
+DECLARE_LEGACY_DEVICE(TTL74153, ttl74153);
 
 #endif

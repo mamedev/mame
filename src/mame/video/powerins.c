@@ -271,8 +271,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	UINT16 *source = machine->generic.spriteram.u16 + 0x8000/2;
 	UINT16 *finish = machine->generic.spriteram.u16 + 0x9000/2;
 
-	int screen_w = video_screen_get_width(machine->primary_screen);
-	int screen_h = video_screen_get_height(machine->primary_screen);
+	int screen_w = machine->primary_screen->width();
+	int screen_h = machine->primary_screen->height();
 
 	for ( ; source < finish; source += 16/2 )
 	{

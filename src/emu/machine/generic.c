@@ -327,30 +327,38 @@ mame_file *nvram_fopen(running_machine *machine, UINT32 openflags)
 
 void nvram_load(running_machine *machine)
 {
-	mame_file *nvram_file = NULL;
-	running_device *device;
+	// only need to do something if we have an NVRAM device or an nvram_handler
+	device_nvram_interface *nvram = NULL;
+	if (!machine->devicelist.first(nvram) && machine->config->nvram_handler == NULL)
+		return;
 
-	/* read data from general NVRAM handler first */
-	if (machine->config->nvram_handler != NULL)
-	{
-		nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
-		(*machine->config->nvram_handler)(machine, nvram_file, 0);
-	}
-
-	/* find all devices with NVRAM handlers, and read from them next */
-	for (device = machine->devicelist.first(); device != NULL; device = device->next)
-	{
-		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
-		if (nvram != NULL)
-		{
-			if (nvram_file == NULL)
-				nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
-			(*nvram)(device, nvram_file, 0);
-		}
-	}
-
+	// open the file; if it exists, call everyone to read from it
+	mame_file *nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
 	if (nvram_file != NULL)
+	{
+		// read data from general NVRAM handler first
+		if (machine->config->nvram_handler != NULL)
+			(*machine->config->nvram_handler)(machine, nvram_file, FALSE);
+
+		// find all devices with NVRAM handlers, and read from them next
+		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
+			nvram->nvram_load(*nvram_file);
+
+		// close the file
 		mame_fclose(nvram_file);
+	}
+	
+	// otherwise, tell everyone to initialize their NVRAM areas
+	else
+	{
+		// initialize via the general NVRAM handler first
+		if (machine->config->nvram_handler != NULL)
+			(*machine->config->nvram_handler)(machine, NULL, FALSE);
+
+		// find all devices with NVRAM handlers, and read from them next
+		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
+			nvram->nvram_reset();
+	}
 }
 
 
@@ -360,30 +368,26 @@ void nvram_load(running_machine *machine)
 
 void nvram_save(running_machine *machine)
 {
-	mame_file *nvram_file = NULL;
-	running_device *device;
+	// only need to do something if we have an NVRAM device or an nvram_handler
+	device_nvram_interface *nvram = NULL;
+	if (!machine->devicelist.first(nvram) && machine->config->nvram_handler == NULL)
+		return;
 
-	/* write data from general NVRAM handler first */
-	if (machine->config->nvram_handler != NULL)
-	{
-		nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		(*machine->config->nvram_handler)(machine, nvram_file, 1);
-	}
-
-	/* find all devices with NVRAM handlers, and write them next */
-	for (device = machine->devicelist.first(); device != NULL; device = device->next)
-	{
-		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
-		if (nvram != NULL)
-		{
-			if (nvram_file == NULL)
-				nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			(*nvram)(device, nvram_file, 1);
-		}
-	}
-
+	// open the file; if it exists, call everyone to read from it
+	mame_file *nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (nvram_file != NULL)
+	{
+		// write data via general NVRAM handler first
+		if (machine->config->nvram_handler != NULL)
+			(*machine->config->nvram_handler)(machine, nvram_file, TRUE);
+
+		// find all devices with NVRAM handlers, and tell them to write next
+		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
+			nvram->nvram_save(*nvram_file);
+
+		// close the file
 		mame_fclose(nvram_file);
+	}
 }
 
 
@@ -633,14 +637,15 @@ static void interrupt_reset(running_machine *machine)
 
 static TIMER_CALLBACK( clear_all_lines )
 {
-	running_device *device = (running_device *)ptr;
-	int inputcount = cpu_get_input_lines(device);
-	int line;
+	cpu_device *cpudevice = reinterpret_cast<cpu_device *>(ptr);
 
-	/* clear NMI and all inputs */
-	cpu_set_input_line(device, INPUT_LINE_NMI, CLEAR_LINE);
-	for (line = 0; line < inputcount; line++)
-		cpu_set_input_line(device, line, CLEAR_LINE);
+	// clear NMI
+	cpudevice->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	// clear all other inputs
+	int inputcount = cpudevice->input_lines();
+	for (int line = 0; line < inputcount; line++)
+		cpudevice->set_input_line(line, CLEAR_LINE);
 }
 
 
@@ -664,11 +669,12 @@ static TIMER_CALLBACK( irq_pulse_clear )
 
 void generic_pulse_irq_line(running_device *device, int irqline)
 {
-	int multiplier = cpu_get_clock_multiplier(device);
-	int clocks = (cpu_get_min_cycles(device) * cpu_get_clock_divider(device) + multiplier - 1) / multiplier;
 	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET);
 	cpu_set_input_line(device, irqline, ASSERT_LINE);
-	timer_set(device->machine, cpu_clocks_to_attotime(device, MAX(clocks, 1)), (void *)device, irqline, irq_pulse_clear);
+
+	cpu_device *cpudevice = downcast<cpu_device *>(device);
+	int clocks = cpudevice->cycles_to_clocks(cpudevice->min_cycles());
+	timer_set(device->machine, cpudevice->clocks_to_attotime(MAX(clocks, 1)), (void *)device, irqline, irq_pulse_clear);
 }
 
 
@@ -693,10 +699,10 @@ void generic_pulse_irq_line_and_vector(running_device *device, int irqline, int 
 
 void cpu_interrupt_enable(running_device *device, int enabled)
 {
+	cpu_device *cpudevice = downcast<cpu_device *>(device);
+
 	generic_machine_private *state = device->machine->generic_machine_data;
 	int cpunum = cpu_get_index(device);
-
-	assert_always(device != NULL, "cpu_interrupt_enable() called for invalid cpu!");
 	assert_always(cpunum < ARRAY_LENGTH(state->interrupt_enable), "cpu_interrupt_enable() called for a CPU > position 7!");
 
 	/* set the new state */
@@ -705,7 +711,7 @@ void cpu_interrupt_enable(running_device *device, int enabled)
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)
-		timer_call_after_resynch(device->machine, (void *)device, 0, clear_all_lines);
+		timer_call_after_resynch(device->machine, (void *)cpudevice, 0, clear_all_lines);
 }
 
 

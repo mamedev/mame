@@ -351,10 +351,9 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 INLINE rsp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_RSP);
-	return *(rsp_state **)device->token;
+	return *(rsp_state **)downcast<cpu_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -685,17 +684,17 @@ static const int vector_elements_2[16][8] =
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },		// 7
 };
 
-static void rspcom_init(rsp_state *rsp, running_device *device, cpu_irq_callback irqcallback)
+static void rspcom_init(rsp_state *rsp, running_device *device, device_irq_callback irqcallback)
 {
 	int regIdx = 0;
     int accumIdx;
 
 	memset(rsp, 0, sizeof(*rsp));
 
-	rsp->config = (const rsp_config *)device->baseconfig().static_config;
+	rsp->config = (const rsp_config *)device->baseconfig().static_config();
 	rsp->irq_callback = irqcallback;
 	rsp->device = device;
-	rsp->program = device->space(AS_PROGRAM);
+	rsp->program = device_memory(device)->space(AS_PROGRAM);
 
 #if 1
     // Inaccurate.  RSP registers power on to a random state...
@@ -748,7 +747,7 @@ static CPU_INIT( rsp )
 	}
 
 	/* allocate the core memory */
-	*(rsp_state **)device->token = rsp = (rsp_state *)drccache_memory_alloc_near(cache, sizeof(*rsp));
+	*(rsp_state **)downcast<cpu_device *>(device)->token() = rsp = (rsp_state *)drccache_memory_alloc_near(cache, sizeof(*rsp));
 	memset(rsp, 0, sizeof(*rsp));
 
 	rspcom_init(rsp, device, irqcallback);
@@ -8595,7 +8594,7 @@ static CPU_SET_INFO( rsp )
 
 CPU_GET_INFO( rsp )
 {
-	rsp_state *rsp = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	rsp_state *rsp = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

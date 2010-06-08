@@ -16,9 +16,9 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 #ifdef USE_SH2DRC
-#define GET_SH2(dev) *(SH2 **)(dev)->token
+#define GET_SH2(dev) *(SH2 **)downcast<cpu_device *>(dev)->token()
 #else
-#define GET_SH2(dev) (SH2 *)(dev)->token
+#define GET_SH2(dev) (SH2 *)downcast<cpu_device *>(dev)->token()
 #endif
 
 
@@ -699,9 +699,9 @@ void sh2_exception(SH2 *sh2, const char *message, int irqline)
 	#endif
 }
 
-void sh2_common_init(SH2 *sh2, running_device *device, cpu_irq_callback irqcallback)
+void sh2_common_init(SH2 *sh2, running_device *device, device_irq_callback irqcallback)
 {
-	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config;
+	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config();
 
 	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);
@@ -727,8 +727,8 @@ void sh2_common_init(SH2 *sh2, running_device *device, cpu_irq_callback irqcallb
 	}
 	sh2->irq_callback = irqcallback;
 	sh2->device = device;
-	sh2->program = device->space(AS_PROGRAM);
-	sh2->internal = device->space(AS_PROGRAM);
+	sh2->program = device_memory(device)->space(AS_PROGRAM);
+	sh2->internal = device_memory(device)->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, sh2->pc);
 	state_save_register_device_item(device, 0, sh2->r[15]);

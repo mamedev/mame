@@ -11,9 +11,7 @@
 #ifndef __SPEAKER_H__
 #define __SPEAKER_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "devlegcy.h"
 
 
 typedef struct _speaker_interface speaker_interface;
@@ -25,12 +23,6 @@ struct _speaker_interface
 
 void speaker_level_w (running_device *device, int new_level);
 
-DEVICE_GET_INFO( speaker );
-#define SOUND_SPEAKER DEVICE_GET_INFO_NAME( speaker )
-
-#ifdef __cplusplus
-}
-#endif
-
+DECLARE_LEGACY_SOUND_DEVICE(SPEAKER, speaker);
 
 #endif /* __SPEAKER_H__ */

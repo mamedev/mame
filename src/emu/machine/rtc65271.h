@@ -2,6 +2,11 @@
     rtc65271.h: include file for rtc65271.c
 */
 
+#ifndef __RTC65271_H__
+#define __RTC65271_H__
+
+#include "devlegcy.h"
+
 typedef struct _rtc65271_config rtc65271_config;
 struct _rtc65271_config
 {
@@ -23,6 +28,6 @@ WRITE8_DEVICE_HANDLER( rtc65271_rtc_w );
 WRITE8_DEVICE_HANDLER( rtc65271_xram_w );
 
 
-/* device get info callback */
-#define RTC65271 DEVICE_GET_INFO_NAME(rtc65271)
-DEVICE_GET_INFO( rtc65271 );
+DECLARE_LEGACY_NVRAM_DEVICE(RTC65271, rtc65271);
+
+#endif

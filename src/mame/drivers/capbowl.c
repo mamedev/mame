@@ -123,10 +123,10 @@ static TIMER_CALLBACK( capbowl_update )
 {
 	int scanline = param;
 
-	video_screen_update_partial(machine->primary_screen, scanline - 1);
+	machine->primary_screen->update_partial(scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, capbowl_update);
+	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, capbowl_update);
 }
 
 
@@ -361,7 +361,7 @@ static MACHINE_RESET( capbowl )
 {
 	capbowl_state *state = (capbowl_state *)machine->driver_data;
 
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, capbowl_update);
+	timer_set(machine, machine->primary_screen->time_until_pos(32), NULL, 32, capbowl_update);
 
 	state->blitter_addr = 0;
 	state->last_trackball_val[0] = 0;

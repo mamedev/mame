@@ -86,7 +86,7 @@ typedef struct
 	uint line_nmi;	/* Status of the NMI line */
 	uint line_rst;	/* Status of the RESET line */
 	uint ir;		/* Instruction Register */
-	cpu_irq_callback int_ack;
+	device_irq_callback int_ack;
 	running_device *device;
 	const address_space *program;
 	uint stopped;	/* stopped status */
@@ -101,10 +101,9 @@ typedef struct
 INLINE spc700i_cpu *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SPC700);
-	return (spc700i_cpu *)device->token;
+	return (spc700i_cpu *)downcast<cpu_device *>(device)->token();
 }
 
 /* ======================================================================== */
@@ -1288,7 +1287,7 @@ static CPU_INIT( spc700 )
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 }
 
 
@@ -1658,7 +1657,7 @@ static CPU_SET_INFO( spc700 )
 
 CPU_GET_INFO( spc700 )
 {
-	spc700i_cpu *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	spc700i_cpu *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	uint p = 0;
 
 	if (cpustate != NULL)

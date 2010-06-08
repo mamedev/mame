@@ -188,8 +188,8 @@ static void esd16_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 	esd16_state *state = (esd16_state *)machine->driver_data;
 	int offs;
 
-	int max_x = video_screen_get_width(machine->primary_screen);
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_x = machine->primary_screen->width();
+	int max_y = machine->primary_screen->height();
 
 	for (offs = state->spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
 	{
@@ -210,7 +210,7 @@ static void esd16_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 
 		int pri_mask;
 
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		if (sx & 0x8000)
@@ -252,8 +252,8 @@ static void hedpanic_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	esd16_state *state = (esd16_state *)machine->driver_data;
 	int offs;
 
-	int max_x = video_screen_get_width(machine->primary_screen);
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_x = machine->primary_screen->width();
+	int max_y = machine->primary_screen->height();
 
 	for (offs = state->spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
 	{
@@ -274,7 +274,7 @@ static void hedpanic_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 		int pri_mask;
 
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		if (sx & 0x8000)

@@ -153,7 +153,8 @@ static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 	if (state->oki_bank != (data & 3))
 	{
 		state->oki_bank = data & 3;
-		okim6295_set_bank_base(device, state->oki_bank * 0x40000);
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(state->oki_bank * 0x40000);
 	}
 
 	/* unknown bit 2 -> (data & 4) */
@@ -320,8 +321,7 @@ static MACHINE_DRIVER_START( drtomy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 26000000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", 26000000/16, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_DRIVER_END
 

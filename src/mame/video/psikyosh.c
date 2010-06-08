@@ -1254,8 +1254,8 @@ static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, 
 VIDEO_START( psikyosh )
 {
 	psikyosh_state *state = (psikyosh_state *)machine->driver_data;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	state->z_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16); /* z-buffer */
 	state->zoom_bitmap = auto_bitmap_alloc(machine, 16*16, 16*16, BITMAP_FORMAT_INDEXED8); /* temp buffer for assembling sprites */

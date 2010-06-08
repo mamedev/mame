@@ -433,7 +433,7 @@ static UINT32 *rombase;
 static galileo_data galileo;
 static widget_data widget;
 
-static running_device *voodoo_device;
+static running_device *voodoo;
 static UINT8 voodoo_stalled;
 static UINT8 cpu_stalled_on_voodoo;
 static UINT32 cpu_stalled_offset;
@@ -485,7 +485,7 @@ static void update_widget_irq(running_machine *machine);
 
 static VIDEO_UPDATE( seattle )
 {
-	return voodoo_update(voodoo_device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return voodoo_update(voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -500,7 +500,7 @@ static MACHINE_START( seattle )
 {
 	int index;
 
-	voodoo_device = devtag_get_device(machine, "voodoo");
+	voodoo = devtag_get_device(machine, "voodoo");
 
 	/* allocate timers for the galileo */
 	galileo.timer[0].timer = timer_alloc(machine, galileo_timer_callback, NULL);
@@ -828,7 +828,7 @@ static void pci_3dfx_w(const address_space *space, UINT8 reg, UINT8 type, UINT32
 			break;
 
 		case 0x10:		/* initEnable register */
-			voodoo_set_init_enable(voodoo_device, data);
+			voodoo_set_init_enable(voodoo, data);
 			break;
 	}
 	if (LOG_PCI)
@@ -1016,7 +1016,7 @@ static void galileo_perform_dma(const address_space *space, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_w(voodoo_device, (dstaddr & 0xffffff) / 4, memory_read_dword(space, srcaddr), 0xffffffff);
+				voodoo_w(voodoo, (dstaddr & 0xffffff) / 4, memory_read_dword(space, srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1298,7 +1298,7 @@ static WRITE32_HANDLER( seattle_voodoo_w )
 	/* if we're not stalled, just write and get out */
 	if (!voodoo_stalled)
 	{
-		voodoo_w(voodoo_device, offset, data, mem_mask);
+		voodoo_w(voodoo, offset, data, mem_mask);
 		return;
 	}
 
@@ -2493,14 +2493,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( phoenixsa )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
+
 	MDRV_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
+	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( seattle150 )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
+
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_DRIVER_END
 
 
@@ -2513,7 +2519,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( seattle200 )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
+
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_DRIVER_END
 
 
@@ -2526,7 +2535,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( flagstaff )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_IMPORT_FROM(cage_seattle)
+
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_PROGRAM_MAP(seattle_map)
 
 	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
 

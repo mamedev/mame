@@ -98,7 +98,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	rectangle clip = *cliprect;
 	const gfx_element *gfx = machine->gfx[1];
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
@@ -115,12 +115,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		code+=(attr&0x0c)<<6;
 
 		if ((control_byte & 0xa))
-			clip.max_y = visarea->max_y;
+			clip.max_y = visarea.max_y;
 		else
 			if (flip_screen_get(machine))
-				clip.min_y = visarea->min_y + 56;
+				clip.min_y = visarea.min_y + 56;
 			else
-				clip.max_y = visarea->max_y - 56;
+				clip.max_y = visarea.max_y - 56;
 
 		if (flip_screen_get(machine))
 		{

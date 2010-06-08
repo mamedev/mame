@@ -347,7 +347,7 @@ WRITE8_HANDLER( segag80r_video_port_w )
 READ8_HANDLER( spaceod_back_port_r )
 {
 	/* force an update to get the current detection value */
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	return 0xfe | spaceod_bg_detect;
 }
 
@@ -400,7 +400,7 @@ WRITE8_HANDLER( spaceod_back_port_w )
 
 		/* port 3: clears the background detection flag */
 		case 3:
-			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 			spaceod_bg_detect = 0;
 			break;
 

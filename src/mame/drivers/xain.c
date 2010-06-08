@@ -194,26 +194,26 @@ INLINE int scanline_to_vcount(int scanline)
 static TIMER_DEVICE_CALLBACK( xain_scanline )
 {
 	int scanline = param;
-	int screen_height = video_screen_get_height(timer->machine->primary_screen);
+	int screen_height = timer.machine->primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
 	if (scanline > 0)
 	{
-		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		timer.machine->primary_screen->update_partial(scanline - 1);
 	}
 
 	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		cputag_set_input_line(timer->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* VBLANK input bit is held high from scanlines 248-255 */

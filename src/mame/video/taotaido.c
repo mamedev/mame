@@ -210,11 +210,11 @@ VIDEO_UPDATE(taotaido)
 	int line;
 	rectangle clip;
 
-	const rectangle *visarea = video_screen_get_visible_area(screen);
-	clip.min_x = visarea->min_x;
-	clip.max_x = visarea->max_x;
-	clip.min_y = visarea->min_y;
-	clip.max_y = visarea->max_y;
+	const rectangle &visarea = screen->visible_area();
+	clip.min_x = visarea.min_x;
+	clip.max_x = visarea.max_x;
+	clip.min_y = visarea.min_y;
+	clip.max_y = visarea.max_y;
 
 	for (line = 0; line < 224;line++)
 	{

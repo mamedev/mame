@@ -131,7 +131,7 @@ Notes (couriersud)
 static WRITE8_DEVICE_HANDLER( ic8j1_output_changed )
 {
 	m10_state *state = (m10_state *)device->machine->driver_data;
-	LOG(("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen)));
+	LOG(("ic8j1: %d %d\n", data, device->machine->primary_screen->vpos()));
 	cpu_set_input_line(state->maincpu, 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -482,7 +482,7 @@ static WRITE8_HANDLER( m15_a100_w )
 static READ8_HANDLER( m10_a700_r )
 {
 	m10_state *state = (m10_state *)space->machine->driver_data;
-	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
+	//LOG(("rd:%d\n",space->machine->primary_screen->vpos()));
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
 	ttl74123_clear_w(state->ic8j1, 0, 1);
@@ -492,7 +492,7 @@ static READ8_HANDLER( m10_a700_r )
 static READ8_HANDLER( m11_a700_r )
 {
 	m10_state *state = (m10_state *)space->machine->driver_data;
-	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
+	//LOG(("rd:%d\n",space->machine->primary_screen->vpos()));
 	//cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
@@ -520,12 +520,12 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (param == 0)
 	{
 		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
-		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART + 16, 0), NULL, 1, interrupt_callback);
+		timer_set(machine, machine->primary_screen->time_until_pos(IREMM10_VBSTART + 16), NULL, 1, interrupt_callback);
 	}
 	if (param == 1)
 	{
 		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
-		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART + 24, 0), NULL, 2, interrupt_callback);
+		timer_set(machine, machine->primary_screen->time_until_pos(IREMM10_VBSTART + 24), NULL, 2, interrupt_callback);
 	}
 	if (param == -1)
 		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
@@ -536,7 +536,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static INTERRUPT_GEN( m11_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	//timer_set(device->machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1, interrupt_callback);
+	//timer_set(device->machine, machine->primary_screen->time_until_pos(IREMM10_VBEND), NULL, -1, interrupt_callback);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
@@ -548,7 +548,7 @@ static INTERRUPT_GEN( m10_interrupt )
 static INTERRUPT_GEN( m15_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, IREMM10_VBSTART + 1, 80), NULL, -1, interrupt_callback);
+	timer_set(device->machine, device->machine->primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), NULL, -1, interrupt_callback);
 }
 
 /*************************************
@@ -878,8 +878,7 @@ static MACHINE_DRIVER_START( m11 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(m10)
-	MDRV_CPU_REPLACE("maincpu", M6502,IREMM10_CPU_CLOCK)
-	//MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(m11_main)
 	//MDRV_CPU_VBLANK_INT("screen", m11_interrupt)
 
@@ -922,7 +921,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( headoni )
 	MDRV_IMPORT_FROM(m15)
-	MDRV_CPU_REPLACE("maincpu", M6502,11730000/16)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(11730000/16)
 MACHINE_DRIVER_END
 
 /*************************************

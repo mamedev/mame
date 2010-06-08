@@ -11,7 +11,11 @@ class atarisy1_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarisy1_state(machine)); }
 
-	atarisy1_state(running_machine &machine) { }
+	atarisy1_state(running_machine &machine)
+		: joystick_timer(machine.device<timer_device>("joystick_timer")),
+		  yscroll_reset_timer(machine.device<timer_device>("yreset_timer")),
+		  scanline_timer(machine.device<timer_device>("scan_timer")),
+		  int3off_timer(machine.device<timer_device>("int3off_timer")) { }
 
 	atarigen_state	atarigen;
 
@@ -20,7 +24,7 @@ public:
 	UINT8			joystick_type;
 	UINT8			trackball_type;
 
-	running_device *joystick_timer;
+	timer_device *	joystick_timer;
 	UINT8			joystick_int;
 	UINT8			joystick_int_enable;
 	UINT8			joystick_value;
@@ -29,12 +33,12 @@ public:
 	UINT16			playfield_lookup[256];
 	UINT8			playfield_tile_bank;
 	UINT16			playfield_priority_pens;
-	running_device *yscroll_reset_timer;
+	timer_device *	yscroll_reset_timer;
 
 	/* INT3 tracking */
 	int 			next_timer_scanline;
-	running_device *scanline_timer;
-	running_device *int3off_timer;
+	timer_device *	scanline_timer;
+	timer_device *	int3off_timer;
 
 	/* graphics bank tracking */
 	UINT8			bank_gfx[3][8];

@@ -69,10 +69,9 @@ struct _superfx_state
 INLINE superfx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SUPERFX);
-	return (superfx_state *)device->token;
+	return (superfx_state *)downcast<cpu_device *>(device)->token();
 }
 
 /*****************************************************************************/
@@ -754,11 +753,11 @@ static CPU_INIT( superfx )
 	superfx_update_speed(cpustate);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
-	if (device->baseconfig().static_config != NULL)
+	if (device->baseconfig().static_config() != NULL)
 	{
-		cpustate->config = *(superfx_config *)device->baseconfig().static_config;
+		cpustate->config = *(superfx_config *)device->baseconfig().static_config();
 	}
 
 	devcb_resolve_write_line(&cpustate->out_irq_func, &cpustate->config.out_irq_func, device);
@@ -1557,7 +1556,7 @@ static CPU_SET_INFO( superfx )
 
 CPU_GET_INFO( superfx )
 {
-	superfx_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	superfx_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

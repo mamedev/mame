@@ -72,8 +72,8 @@ VIDEO_UPDATE( pc_video )
 	{
 		if ((pc_current_width != w) || (pc_current_height != h))
 		{
-			int width = video_screen_get_width(screen);
-			int height = video_screen_get_height(screen);
+			int width = screen->width();
+			int height = screen->height();
 
 			pc_current_width = w;
 			pc_current_height = h;
@@ -85,7 +85,7 @@ VIDEO_UPDATE( pc_video )
 				pc_current_height = height;
 
 			if ((pc_current_width > 100) && (pc_current_height > 100))
-				video_screen_set_visarea(screen, 0, pc_current_width-1, 0, pc_current_height-1);
+				screen->set_visible_area(0, pc_current_width-1, 0, pc_current_height-1);
 
 			bitmap_fill(bitmap, cliprect, 0);
 		}

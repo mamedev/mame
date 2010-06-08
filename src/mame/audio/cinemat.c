@@ -905,14 +905,14 @@ static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bit
         target_pitch = 0x5800 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(machine->primary_screen) > last_frame)
+        if (machine->primary_screen->frame_number() > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 225;
             if (current_pitch < target_pitch)
                 current_pitch += 150;
             sample_set_freq(samples, 4, current_pitch);
-            last_frame = video_screen_get_frame_number(machine->primary_screen);
+            last_frame = machine->primary_screen->frame_number();
         }
 
 		/* remember the previous value */
@@ -1010,7 +1010,7 @@ static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
 			target_volume = 0;
 
 		/* ramp the thrust volume */
-        if (sample_playing(samples, 2) && video_screen_get_frame_number(machine->primary_screen) > last_frame)
+        if (sample_playing(samples, 2) && machine->primary_screen->frame_number() > last_frame)
         {
             if (current_volume > target_volume)
                 current_volume -= 0.078f;
@@ -1020,7 +1020,7 @@ static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
                 sample_set_volume(samples, 2, current_volume);
             else
                 sample_stop(samples, 2);
-            last_frame = video_screen_get_frame_number(machine->primary_screen);
+            last_frame = machine->primary_screen->frame_number();
         }
 
 		/* fire - falling edge */
@@ -1292,14 +1292,14 @@ static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_c
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(machine->primary_screen) > last_frame)
+        if (machine->primary_screen->frame_number() > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(samples, 4, current_pitch);
-            last_frame = video_screen_get_frame_number(machine->primary_screen);
+            last_frame = machine->primary_screen->frame_number();
         }
 
 		/* remember the previous value */
@@ -1406,14 +1406,14 @@ static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(machine->primary_screen) > last_frame)
+        if (machine->primary_screen->frame_number() > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(samples, 4, current_pitch);
-            last_frame = video_screen_get_frame_number(machine->primary_screen);
+            last_frame = machine->primary_screen->frame_number();
         }
 
 		/* remember the previous value */
@@ -1578,7 +1578,7 @@ static ADDRESS_MAP_START( demon_sound_ports, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static const z80_daisy_chain daisy_chain[] =
+static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
 	{ NULL }

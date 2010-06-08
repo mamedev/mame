@@ -48,9 +48,8 @@ struct _upd4701_state
 INLINE upd4701_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == UPD4701));
-	return (upd4701_state *)device->token;
+	assert((device->type() == UPD4701));
+	return (upd4701_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -312,5 +311,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"NEC uPD4701 Encoder"
 #define DEVTEMPLATE_FAMILY		"NEC uPD4701 Encoder"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"

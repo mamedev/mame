@@ -5,6 +5,7 @@
  *
  */
 
+#include "devlegcy.h"
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -25,6 +26,4 @@ READ8_DEVICE_HANDLER( mathbox_lo_r );
 READ8_DEVICE_HANDLER( mathbox_hi_r );
 
 /* ----- device interface ----- */
-
-#define MATHBOX DEVICE_GET_INFO_NAME(mathbox)
-DEVICE_GET_INFO( mathbox );
+DECLARE_LEGACY_DEVICE(MATHBOX, mathbox);

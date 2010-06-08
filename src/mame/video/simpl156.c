@@ -52,7 +52,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 		y = spriteram[offs] & 0xffff;
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		x = spriteram[offs + 2] & 0xffff;

@@ -120,7 +120,7 @@ VIDEO_START( gomoku )
 	int bgdata;
 	int color;
 
-	gomoku_bg_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	gomoku_bg_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32, 32);
 

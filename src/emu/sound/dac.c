@@ -20,10 +20,8 @@ struct _dac_state
 INLINE dac_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_DAC);
-	return (dac_state *)device->token;
+	assert(device->type() == SOUND_DAC);
+	return (dac_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -113,7 +111,7 @@ static DEVICE_START( dac )
 
 	DAC_build_voltable(info);
 
-	info->channel = stream_create(device,0,1,device->clock ? device->clock : DEFAULT_SAMPLE_RATE,info,DAC_update);
+	info->channel = stream_create(device,0,1,device->clock() ? device->clock() : DEFAULT_SAMPLE_RATE,info,DAC_update);
 	info->output = 0;
 
 	state_save_register_device_item(device, 0, info->output);

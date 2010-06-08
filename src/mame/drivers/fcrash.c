@@ -818,8 +818,7 @@ static MACHINE_DRIVER_START( kodb )
 //  MDRV_SOUND_ROUTE(0, "mono", 0.35)
 //  MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
-//  MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-//  MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 can be changed by the game code, see f006 on z80
+//  MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

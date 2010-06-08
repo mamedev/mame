@@ -204,7 +204,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			for (y = 0; y < h; y++)
 			{
 				if ((color & pri_mask) == pri_val &&
-							(!flash || (video_screen_get_frame_number(machine->primary_screen) & 1)))
+							(!flash || (machine->primary_screen->frame_number() & 1)))
 					drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 							code - y * incy + h * x,
 							color,

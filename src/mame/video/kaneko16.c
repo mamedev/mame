@@ -146,13 +146,13 @@ VIDEO_START( kaneko16_1xVIEW2_tilemaps )
 
 	kaneko16_tmap_3 = 0;
 
-	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	sprites_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	{
 		int dx, dy;
 
-		int xdim = video_screen_get_width(machine->primary_screen);
-		int ydim = video_screen_get_height(machine->primary_screen);
+		int xdim = machine->primary_screen->width();
+		int ydim = machine->primary_screen->height();
 
 		switch (xdim)
 		{
@@ -160,7 +160,7 @@ VIDEO_START( kaneko16_1xVIEW2_tilemaps )
 			case 256:	dx = 0x5b;	break;
 			default:	dx = 0;
 		}
-		switch (video_screen_get_visible_area(machine->primary_screen)->max_y - video_screen_get_visible_area(machine->primary_screen)->min_y + 1)
+		switch (machine->primary_screen->visible_area().max_y - machine->primary_screen->visible_area().min_y + 1)
 		{
 			case 240- 8:	dy = +0x08;	break;	/* blazeon */
 			case 240-16:	dy = -0x08;	break;	/* berlwall, bakubrk */
@@ -202,8 +202,8 @@ VIDEO_START( kaneko16_2xVIEW2 )
 	{
 		int dx, dy;
 
-		int xdim = video_screen_get_width(machine->primary_screen);
-		int ydim = video_screen_get_height(machine->primary_screen);
+		int xdim = machine->primary_screen->width();
+		int ydim = machine->primary_screen->height();
 
 		switch (xdim)
 		{
@@ -211,7 +211,7 @@ VIDEO_START( kaneko16_2xVIEW2 )
 			case 256:	dx = 0x5b;	break;
 			default:	dx = 0;
 		}
-		switch (video_screen_get_visible_area(machine->primary_screen)->max_y - video_screen_get_visible_area(machine->primary_screen)->min_y + 1)
+		switch (machine->primary_screen->visible_area().max_y - machine->primary_screen->visible_area().min_y + 1)
 		{
 			case 240- 8:	dy = +0x08;	break;
 			case 240-16:	dy = -0x08;	break;
@@ -314,13 +314,13 @@ VIDEO_START( galsnew )
 
 	kaneko16_tmap_3 = 0;
 
-	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	sprites_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	{
 		int dx = 0x5b, dy = 8;
 
-		int xdim = video_screen_get_width(machine->primary_screen);
-		int ydim = video_screen_get_height(machine->primary_screen);
+		int xdim = machine->primary_screen->width();
+		int ydim = machine->primary_screen->height();
 
 		tilemap_set_scrolldx( kaneko16_tmap_0, -dx,		xdim + dx -1        );
 		tilemap_set_scrolldx( kaneko16_tmap_1, -(dx+2),	xdim + (dx + 2) - 1 );
@@ -425,12 +425,12 @@ static int kaneko16_parse_sprite_type012(running_machine *machine, int i, struct
 if (kaneko16_sprite_flipy)
 {
 	s->yoffs		-=		kaneko16_sprites_regs[0x2/2];
-	s->yoffs		-=		video_screen_get_visible_area(machine->primary_screen)->min_y<<6;
+	s->yoffs		-=		machine->primary_screen->visible_area().min_y<<6;
 }
 else
 {
 	s->yoffs		-=		kaneko16_sprites_regs[0x2/2];
-	s->yoffs		+=		video_screen_get_visible_area(machine->primary_screen)->min_y<<6;
+	s->yoffs		+=		machine->primary_screen->visible_area().min_y<<6;
 }
 
 	return					( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
@@ -550,7 +550,7 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
        in a temp buffer, then draw the buffer's contents from last
        to first. */
 
-	int max	=	(video_screen_get_width(machine->primary_screen) > 0x100) ? (0x200<<6) : (0x100<<6);
+	int max	=	(machine->primary_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
 	struct tempsprite *s = spritelist.first_sprite;

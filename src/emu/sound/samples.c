@@ -33,10 +33,8 @@ struct _samples_info
 INLINE samples_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SAMPLES);
-	return (samples_info *)device->token;
+	assert(device->type() == SOUND_SAMPLES);
+	return (samples_info *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -472,7 +470,7 @@ static STATE_POSTLOAD( samples_postload )
 static DEVICE_START( samples )
 {
 	int i;
-	const samples_interface *intf = (const samples_interface *)device->baseconfig().static_config;
+	const samples_interface *intf = (const samples_interface *)device->baseconfig().static_config();
 	samples_info *info = get_safe_token(device);
 
 	info->device = device;

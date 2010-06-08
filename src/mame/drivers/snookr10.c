@@ -725,8 +725,7 @@ static MACHINE_DRIVER_START( snookr10 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, MASTER_CLOCK/16)	/* 1 MHz (995.5 kHz measured) */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)	/* pin7 checked HIGH on PCB */
+	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)	/* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
 MACHINE_DRIVER_END

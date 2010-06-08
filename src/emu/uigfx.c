@@ -141,8 +141,7 @@ static void ui_gfx_exit(running_machine *machine)
 	ui_gfx.texture = NULL;
 
 	/* free the bitmap */
-	if (ui_gfx.bitmap != NULL)
-		bitmap_free(ui_gfx.bitmap);
+	global_free(ui_gfx.bitmap);
 	ui_gfx.bitmap = NULL;
 }
 
@@ -697,11 +696,10 @@ static void gfxset_update_bitmap(running_machine *machine, ui_gfx_state *state, 
 		/* free the old stuff */
 		if (state->texture != NULL)
 			render_texture_free(state->texture);
-		if (state->bitmap != NULL)
-			bitmap_free(state->bitmap);
+		global_free(state->bitmap);
 
 		/* allocate new stuff */
-		state->bitmap = bitmap_alloc(cellxpix * xcells, cellypix * ycells, BITMAP_FORMAT_ARGB32);
+		state->bitmap = global_alloc(bitmap_t(cellxpix * xcells, cellypix * ycells, BITMAP_FORMAT_ARGB32));
 		state->texture = render_texture_alloc(NULL, NULL);
 		render_texture_set_bitmap(state->texture, state->bitmap, NULL, TEXFORMAT_ARGB32, NULL);
 
@@ -1034,7 +1032,7 @@ static void tilemap_handle_keys(running_machine *machine, ui_gfx_state *state, i
 
 static void tilemap_update_bitmap(running_machine *machine, ui_gfx_state *state, int width, int height)
 {
-	bitmap_format screen_format = video_screen_get_format(machine->primary_screen);
+	bitmap_format screen_format = machine->primary_screen->format();
 	palette_t *palette = NULL;
 	int screen_texformat;
 
@@ -1057,11 +1055,10 @@ static void tilemap_update_bitmap(running_machine *machine, ui_gfx_state *state,
 		/* free the old stuff */
 		if (state->texture != NULL)
 			render_texture_free(state->texture);
-		if (state->bitmap != NULL)
-			bitmap_free(state->bitmap);
+		global_free(state->bitmap);
 
 		/* allocate new stuff */
-		state->bitmap = bitmap_alloc(width, height, screen_format);
+		state->bitmap = global_alloc(bitmap_t(width, height, screen_format));
 		state->texture = render_texture_alloc(NULL, NULL);
 		render_texture_set_bitmap(state->texture, state->bitmap, NULL, screen_texformat, palette);
 

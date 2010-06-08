@@ -126,7 +126,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
-	int vpos = video_screen_get_vpos(machine->primary_screen);
+	int vpos = machine->primary_screen->vpos();
 	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
 	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, vector);
 
@@ -136,7 +136,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	else
 		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(next_vpos), 0);
 }
 
 
@@ -148,7 +148,7 @@ static void create_interrupt_timer(running_machine *machine)
 
 static void start_interrupt_timer(running_machine *machine)
 {
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, SPACEFB_INT_TRIGGER_COUNT_1, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1), 0);
 }
 
 

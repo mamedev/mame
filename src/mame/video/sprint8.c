@@ -125,8 +125,8 @@ WRITE8_HANDLER( sprint8_video_ram_w )
 
 VIDEO_START( sprint8 )
 {
-	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper1 = machine->primary_screen->alloc_compatible_bitmap();
+	helper2 = machine->primary_screen->alloc_compatible_bitmap();
 
 	tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
 	tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
@@ -178,22 +178,22 @@ VIDEO_EOF( sprint8 )
 {
 	int x;
 	int y;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	tilemap_draw(helper2, visarea, tilemap2, 0, 0);
+	tilemap_draw(helper2, &visarea, tilemap2, 0, 0);
 
-	bitmap_fill(helper1, visarea, 0x20);
+	bitmap_fill(helper1, &visarea, 0x20);
 
-	draw_sprites(machine, helper1, visarea);
+	draw_sprites(machine, helper1, &visarea);
 
-	for (y = visarea->min_y; y <= visarea->max_y; y++)
+	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{
 		const UINT16* p1 = BITMAP_ADDR16(helper1, y, 0);
 		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
 
-		for (x = visarea->min_x; x <= visarea->max_x; x++)
+		for (x = visarea.min_x; x <= visarea.max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)
-				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, y + 24, x), NULL,
+				timer_set(machine, machine->primary_screen->time_until_pos(y + 24, x), NULL,
 						  colortable_entry_get_value(machine->colortable, p1[x]),
 						  sprint8_collision_callback);
 	}

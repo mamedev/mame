@@ -6,6 +6,7 @@
 
 **************************************************************************/
 
+#include "devlegcy.h"
 
 /***************************************************************************
     CONSTANTS
@@ -18,12 +19,6 @@ enum
 	DIMM_BOARD,
 	AW_ROM_BOARD,
 	MAX_NAOMIBD_TYPES
-};
-
-enum
-{
-	DEVINFO_INT_DMAOFFSET = DEVINFO_INT_DEVICE_SPECIFIC+0,	/* R/O: value of dma_offset register */
-	DEVINFO_PTR_MEMORY = DEVINFO_PTR_DEVICE_SPECIFIC+0	/* R/O: pointer to memory inside the board containing game data */
 };
 
 
@@ -91,13 +86,12 @@ struct _naomibd_config
 
 int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func callback);
 int naomibd_get_type(running_device *device);
+void *naomibd_get_memory(running_device *device);
+offs_t naomibd_get_dmaoffset(running_device *device);
 
 READ64_DEVICE_HANDLER( naomibd_r );
 WRITE64_DEVICE_HANDLER( naomibd_w );
 
-
 /* ----- device interface ----- */
 
-/* device get info callback */
-#define NAOMI_BOARD DEVICE_GET_INFO_NAME(naomibd)
-DEVICE_GET_INFO( naomibd );
+DECLARE_LEGACY_NVRAM_DEVICE(NAOMI_BOARD, naomibd);

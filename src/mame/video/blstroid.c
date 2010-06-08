@@ -105,9 +105,9 @@ static TIMER_CALLBACK( irq_on )
 }
 
 
-void blstroid_scanline_update(running_device *screen, int scanline)
+void blstroid_scanline_update(screen_device &screen, int scanline)
 {
-	blstroid_state *state = (blstroid_state *)screen->machine->driver_data;
+	blstroid_state *state = (blstroid_state *)screen.machine->driver_data;
 	int offset = (scanline / 8) * 64 + 40;
 
 	/* check for interrupts */
@@ -125,13 +125,13 @@ void blstroid_scanline_update(running_device *screen, int scanline)
 
 			/* set a timer to turn the interrupt on at HBLANK of the 7th scanline */
 			/* and another to turn it off one scanline later */
-			width = video_screen_get_width(screen);
-			vpos  = video_screen_get_vpos(screen);
-			period_on  = video_screen_get_time_until_pos(screen, vpos + 7, width * 0.9);
-			period_off = video_screen_get_time_until_pos(screen, vpos + 8, width * 0.9);
+			width = screen.width();
+			vpos  = screen.vpos();
+			period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
+			period_off = screen.time_until_pos(vpos + 8, width * 0.9);
 
-			timer_set(screen->machine, period_on, NULL,  0, irq_on);
-			timer_set(screen->machine, period_off, NULL, 0, irq_off);
+			timer_set(screen.machine, period_on, NULL,  0, irq_on);
+			timer_set(screen.machine, period_off, NULL, 0, irq_off);
 		}
 }
 

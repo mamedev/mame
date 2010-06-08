@@ -52,7 +52,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int col, row;
 
 		attr = spriteram[offs];
-		if ((attr & 0x0004) && ((attr & 0x0040) == 0 || (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if ((attr & 0x0004) && ((attr & 0x0040) == 0 || (machine->primary_screen->frame_number() & 1))
 //              && ((attr & 0x0030) >> 4) == priority)
 				&& ((attr & 0x0020) >> 5) == priority)
 		{

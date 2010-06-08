@@ -294,7 +294,7 @@ static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 	if(pos_irq_active || !(namconb_cpureg[0x02] & 0xf0))
 		return;
 
-	video_screen_update_partial(machine->primary_screen, param);
+	machine->primary_screen->update_partial(param);
 	pos_irq_active = 1;
 	cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
@@ -348,7 +348,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namconb1_TriggerPOSIRQ );
+		timer_set( device->machine, device->machine->primary_screen->time_until_pos(scanline), NULL, scanline, namconb1_TriggerPOSIRQ );
 	}
 } /* namconb1_interrupt */
 
@@ -370,7 +370,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 
 static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
-	video_screen_update_partial(machine->primary_screen, param);
+	machine->primary_screen->update_partial(param);
 	pos_irq_active = 1;
 	cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02], ASSERT_LINE);
 }
@@ -417,7 +417,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
 		scanline = 0;
 
 	if( scanline < NAMCONB1_VBSTART )
-		timer_set( device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
+		timer_set( device->machine, device->machine->primary_screen->time_until_pos(scanline), NULL, scanline, namconb2_TriggerPOSIRQ );
 } /* namconb2_interrupt */
 
 static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)

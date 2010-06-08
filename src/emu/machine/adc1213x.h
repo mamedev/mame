@@ -10,14 +10,16 @@
 #ifndef __ADC1213X_H__
 #define __ADC1213X_H__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define ADC12130		DEVICE_GET_INFO_NAME(adc12130)
-#define ADC12132		DEVICE_GET_INFO_NAME(adc12132)
-#define ADC12138		DEVICE_GET_INFO_NAME(adc12138)
+DECLARE_LEGACY_DEVICE(ADC12130, adc12130);
+DECLARE_LEGACY_DEVICE(ADC12132, adc12132);
+DECLARE_LEGACY_DEVICE(ADC12138, adc12138);
 
 #define MDRV_ADC12130_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, ADC12130, 0) \
@@ -47,11 +49,6 @@ struct _adc12138_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( adc12130 );
-DEVICE_GET_INFO( adc12132 );
-DEVICE_GET_INFO( adc12138 );
 
 extern WRITE8_DEVICE_HANDLER( adc1213x_di_w );
 extern WRITE8_DEVICE_HANDLER( adc1213x_cs_w );

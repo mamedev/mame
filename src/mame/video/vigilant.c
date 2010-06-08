@@ -40,7 +40,7 @@ static bitmap_t *bg_bitmap;
 
 VIDEO_START( vigilant )
 {
-	bg_bitmap = auto_bitmap_alloc(machine,512*4,256,video_screen_get_format(machine->primary_screen));
+	bg_bitmap = auto_bitmap_alloc(machine,512*4,256,machine->primary_screen->format());
 }
 
 

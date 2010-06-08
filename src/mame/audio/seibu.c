@@ -133,7 +133,7 @@ void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 typedef struct _seibu_adpcm_state seibu_adpcm_state;
 struct _seibu_adpcm_state
 {
-	struct adpcm_state adpcm;
+	adpcm_state adpcm;
 	sound_stream *stream;
 	UINT32 current, end;
 	UINT8 nibble;
@@ -159,7 +159,7 @@ static STREAM_UPDATE( seibu_adpcm_callback )
 				state->playing = 0;
 		}
 
-		*dest++ = clock_adpcm(&state->adpcm, val) << 4;
+		*dest++ = state->adpcm.clock(val) << 4;
 		samples--;
 	}
 	while (samples > 0)
@@ -172,12 +172,12 @@ static STREAM_UPDATE( seibu_adpcm_callback )
 static DEVICE_START( seibu_adpcm )
 {
 	running_machine *machine = device->machine;
-	seibu_adpcm_state *state = (seibu_adpcm_state *)device->token;
+	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	state->playing = 0;
-	state->stream = stream_create(device, 0, 1, device->clock, state, seibu_adpcm_callback);
+	state->stream = stream_create(device, 0, 1, device->clock(), state, seibu_adpcm_callback);
 	state->base = memory_region(machine, "adpcm");
-	reset_adpcm(&state->adpcm);
+	state->adpcm.reset();
 }
 
 DEVICE_GET_INFO( seibu_adpcm )
@@ -215,7 +215,7 @@ void seibu_adpcm_decrypt(running_machine *machine, const char *region)
 
 WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w )
 {
-	seibu_adpcm_state *state = (seibu_adpcm_state *)device->token;
+	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	if (state->stream)
 		stream_update(state->stream);
@@ -232,7 +232,7 @@ WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w )
 
 WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w )
 {
-	seibu_adpcm_state *state = (seibu_adpcm_state *)device->token;
+	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	// sequence is 00 02 01 each time.
 	if (state->stream)

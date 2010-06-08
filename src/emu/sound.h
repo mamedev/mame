@@ -20,28 +20,13 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define MAX_OUTPUTS		4095			/* maximum number of outputs a sound chip can support */
-#define ALL_OUTPUTS 	(MAX_OUTPUTS)	/* special value indicating all outputs for the current chip */
-
-
-
-/***************************************************************************
     MACROS
 ***************************************************************************/
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define sound_count(config)					(config)->devicelist.count(SOUND)
-#define sound_first(config)					(config)->devicelist.first(SOUND)
-#define sound_next(previous)				(previous)->typenext()
-
-/* these functions are macros primarily due to include file ordering */
-/* plus, they are very simple */
-#define speaker_output_count(config)		(config)->devicelist.count(SPEAKER_OUTPUT)
-#define speaker_output_first(config)		(config)->devicelist.first(SPEAKER_OUTPUT)
+#define speaker_output_count(config)		(config)->devicelist.count(SPEAKER)
+#define speaker_output_first(config)		(config)->devicelist.first(SPEAKER)
 #define speaker_output_next(previous)		(previous)->typenext()
 
 
@@ -50,37 +35,97 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* sound type is just a device type */
-typedef device_type sound_type;
+// ======================> speaker_device_config
 
-
-/* Sound route for the machine driver */
-typedef struct _sound_route sound_route;
-struct _sound_route
+class speaker_device_config : public device_config
 {
-	sound_route *		next;					/* pointer to next route */
-	UINT32				output;					/* output index, or ALL_OUTPUTS */
-	const char *		target;					/* target tag */
-	UINT32				input;					/* target input index */
-	float				gain;					/* gain */
+	friend class speaker_device;
+
+	// construction/destruction
+	speaker_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// basic information getters
+	virtual const char *name() const { return "Speaker"; }
+	
+	// indexes to inline data
+	enum
+	{
+		INLINE_X,
+		INLINE_Y,
+		INLINE_Z
+	};
+	
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+
+	// internal state
+	double		m_x;
+	double		m_y;
+	double		m_z;
 };
 
 
-/* Sound configuration for the machine driver */
-typedef struct _sound_config sound_config;
-struct _sound_config
+
+// ======================> speaker_device
+
+class speaker_device : public device_t
 {
-	sound_type			type;					/* type of sound chip */
-	sound_route *		routelist;				/* list of sound routes */
+	friend class speaker_device_config;
+	friend resource_pool_object<speaker_device>::~resource_pool_object();
+	
+	// construction/destruction
+	speaker_device(running_machine &_machine, const speaker_device_config &config);
+	virtual ~speaker_device();
+
+public:
+	// input properties	
+	int inputs() const { return m_inputs; }
+	float input_gain(int index = 0) const { return m_input[index].m_gain; }
+	float input_default_gain(int index = 0) const { return m_input[index].m_default_gain; }
+	const char *input_name(int index = 0) const { return m_input[index].m_name; }
+	void set_input_gain(int index, float gain);
+
+	// internally for use by the sound system
+	void mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_update, bool suppress);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_post_load();
+
+	// internal helpers
+	static STREAM_UPDATE( static_mixer_update ) { downcast<speaker_device *>(device)->mixer_update(inputs, outputs, samples); }
+	void mixer_update(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	// a single input
+	struct speaker_input
+	{
+		float			m_gain;					// current gain
+		float			m_default_gain;			// default gain
+		astring			m_name;					// name of this input
+	};
+
+	// internal state
+	const speaker_device_config &m_config;
+	sound_stream *		m_mixer_stream;			// mixing stream
+	int					m_inputs;				// number of input streams
+	speaker_input *		m_input;				// array of input information
+#ifdef MAME_DEBUG
+	INT32				m_max_sample;			// largest sample value we've seen
+	INT32				m_clipped_samples;		// total number of clipped samples
+	INT32				m_total_samples;		// total number of samples
+#endif
 };
 
 
-/* Speaker configuration for the machine driver */
-typedef struct _speaker_config speaker_config;
-struct _speaker_config
-{
-	float				x, y, z;				/* positioning vector */
-};
+// device type definition
+const device_type SPEAKER = speaker_device_config::static_alloc_device_config;
 
 
 
@@ -88,48 +133,12 @@ struct _speaker_config
     SOUND DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_SOUND_ADD(_tag, _type, _clock) \
-	MDRV_DEVICE_ADD(_tag, SOUND, _clock) \
-	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_##_type)
-
-#define MDRV_SOUND_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag)
-
-#define MDRV_SOUND_TYPE(_type) \
-	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_##_type)
-
-#define MDRV_SOUND_CLOCK(_clock) \
-	MDRV_DEVICE_CLOCK(_clock)
-
-#define MDRV_SOUND_REPLACE(_tag, _type, _clock) \
-	MDRV_DEVICE_MODIFY(_tag) \
-	MDRV_DEVICE_CONFIG_CLEAR() \
-	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_##_type) \
-	MDRV_DEVICE_CLOCK(_clock) \
-	MDRV_SOUND_ROUTES_RESET()
-
-#define MDRV_SOUND_CONFIG(_config) \
-	MDRV_DEVICE_CONFIG(_config)
-
-
-/* sound routine is too complex for standard decoding, so we use a custom config */
-#define MDRV_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	TOKEN_UINT64_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1, 8, _output, 12, _input, 12, ((float)(_gain) * (float)(1 << 24)), 32), \
-	TOKEN_PTR(stringptr, _target),
-
-#define MDRV_SOUND_ROUTE(_output, _target, _gain) \
-	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, 0)
-
-#define MDRV_SOUND_ROUTES_RESET() \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE, 8),
-
-
 /* add/remove speakers */
 #define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
-	MDRV_DEVICE_ADD(_tag, SPEAKER_OUTPUT, 0) \
-	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, x, _x, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, y, _y, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, z, _z, 24)
+	MDRV_DEVICE_ADD(_tag, SPEAKER, 0) \
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_X, (_x) * (double)(1 << 24)) \
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Y, (_y) * (double)(1 << 24)) \
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Z, (_z) * (double)(1 << 24))
 
 #define MDRV_SPEAKER_STANDARD_MONO(_tag) \
 	MDRV_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
@@ -151,12 +160,6 @@ void sound_init(running_machine *machine);
 
 /* ----- sound device interface ----- */
 
-/* device get info callback */
-#define SOUND DEVICE_GET_INFO_NAME(sound)
-DEVICE_GET_INFO( sound );
-
-
-
 /* global sound controls */
 void sound_mute(running_machine *machine, int mute);
 void sound_set_attenuation(running_machine *machine, int attenuation);
@@ -172,35 +175,77 @@ const char *sound_get_user_gain_name(running_machine *machine, int index);
 
 
 /* driver gain controls on chip outputs */
-void sound_set_output_gain(running_device *device, int output, float gain);
-
-
-/* ----- sound speaker device interface ----- */
-
-/* device get info callback */
-#define SPEAKER_OUTPUT DEVICE_GET_INFO_NAME(speaker_output)
-DEVICE_GET_INFO( speaker_output );
+void sound_set_output_gain(device_t *device, int output, float gain);
 
 
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
 
-/*-------------------------------------------------
-    sound_get_type - return the type of the
-    specified sound chip
--------------------------------------------------*/
+//-------------------------------------------------
+//  speaker_count - return the number of speaker
+//  devices in a machine_config
+//-------------------------------------------------
 
-INLINE sound_type sound_get_type(const device_config *devconfig)
+inline int speaker_count(const machine_config &config)
 {
-	const sound_config *config = (const sound_config *)devconfig->inline_config;
-	return config->type;
+	return config.devicelist.count(SPEAKER);
 }
 
-INLINE sound_type sound_get_type(running_device *device)
+
+//-------------------------------------------------
+//  speaker_first - return the first speaker
+//  device config in a machine_config
+//-------------------------------------------------
+
+inline const speaker_device_config *speaker_first(const machine_config &config)
 {
-	return sound_get_type(&device->baseconfig());
+	return downcast<speaker_device_config *>(config.devicelist.first(SPEAKER));
+}
+
+
+//-------------------------------------------------
+//  speaker_next - return the next speaker
+//  device config in a machine_config
+//-------------------------------------------------
+
+inline const speaker_device_config *speaker_next(const speaker_device_config *previous)
+{
+	return downcast<speaker_device_config *>(previous->typenext());
+}
+
+
+//-------------------------------------------------
+//  speaker_count - return the number of speaker
+//  devices in a machine
+//-------------------------------------------------
+
+inline int speaker_count(running_machine &machine)
+{
+	return machine.devicelist.count(SPEAKER);
+}
+
+
+//-------------------------------------------------
+//  speaker_first - return the first speaker
+//  device in a machine
+//-------------------------------------------------
+
+inline speaker_device *speaker_first(running_machine &machine)
+{
+	return downcast<speaker_device *>(machine.devicelist.first(SPEAKER));
+}
+
+
+//-------------------------------------------------
+//  speaker_next - return the next speaker
+//  device in a machine
+//-------------------------------------------------
+
+inline speaker_device *speaker_next(speaker_device *previous)
+{
+	return downcast<speaker_device *>(previous->typenext());
 }
 
 

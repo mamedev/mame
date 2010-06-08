@@ -274,8 +274,8 @@ WRITE32_HANDLER( policetr_video_w )
 READ32_HANDLER( policetr_video_r )
 {
 	int inputval;
-	int width = video_screen_get_width(space->machine->primary_screen);
-	int height = video_screen_get_height(space->machine->primary_screen);
+	int width = space->machine->primary_screen->width();
+	int height = space->machine->primary_screen->height();
 
 	/* the value read is based on the latch */
 	switch (video_latch)

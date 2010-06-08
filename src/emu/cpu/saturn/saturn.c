@@ -81,7 +81,7 @@ struct _saturn_state
 	UINT8   sleeping;       /* low-consumption state */
 	int 	monitor_id;
 	int		monitor_in;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	int icount;
@@ -90,10 +90,9 @@ struct _saturn_state
 INLINE saturn_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SATURN);
-	return (saturn_state *)device->token;
+	return (saturn_state *)downcast<cpu_device *>(device)->token();
 }
 
 /***************************************************************
@@ -113,10 +112,10 @@ static CPU_INIT( saturn )
 {
 	saturn_state *cpustate = get_safe_token(device);
 
-	cpustate->config = (saturn_cpu_core *) device->baseconfig().static_config;
+	cpustate->config = (saturn_cpu_core *) device->baseconfig().static_config();
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0,cpustate->reg[R0]);
 	state_save_register_device_item_array(device, 0,cpustate->reg[R1]);
@@ -305,7 +304,7 @@ static INT64 Reg64Int(Saturn64 r)
 
 CPU_GET_INFO( saturn )
 {
-	saturn_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	saturn_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

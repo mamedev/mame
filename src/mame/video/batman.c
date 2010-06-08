@@ -121,12 +121,12 @@ VIDEO_START( batman )
  *
  *************************************/
 
-void batman_scanline_update(running_device *screen, int scanline)
+void batman_scanline_update(screen_device &screen, int scanline)
 {
-	batman_state *state = (batman_state *)screen->machine->driver_data;
+	batman_state *state = (batman_state *)screen.machine->driver_data;
 
 	/* update the scanline parameters */
-	if (scanline <= video_screen_get_visible_area(screen)->max_y && state->atarigen.atarivc_state.rowscroll_enable)
+	if (scanline <= screen.visible_area().max_y && state->atarigen.atarivc_state.rowscroll_enable)
 	{
 		UINT16 *base = &state->atarigen.alpha[scanline / 8 * 64 + 48];
 		int scan, i;
@@ -139,14 +139,14 @@ void batman_scanline_update(running_device *screen, int scanline)
 				{
 					case 9:
 						if (scanline > 0)
-							video_screen_update_partial(screen, scanline - 1);
+							screen.update_partial(scanline - 1);
 						state->atarigen.atarivc_state.mo_xscroll = (data >> 7) & 0x1ff;
 						atarimo_set_xscroll(0, state->atarigen.atarivc_state.mo_xscroll);
 						break;
 
 					case 10:
 						if (scanline > 0)
-							video_screen_update_partial(screen, scanline - 1);
+							screen.update_partial(scanline - 1);
 						state->atarigen.atarivc_state.pf1_xscroll_raw = (data >> 7) & 0x1ff;
 						atarivc_update_pf_xscrolls(&state->atarigen);
 						tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, state->atarigen.atarivc_state.pf0_xscroll);
@@ -155,7 +155,7 @@ void batman_scanline_update(running_device *screen, int scanline)
 
 					case 11:
 						if (scanline > 0)
-							video_screen_update_partial(screen, scanline - 1);
+							screen.update_partial(scanline - 1);
 						state->atarigen.atarivc_state.pf0_xscroll_raw = (data >> 7) & 0x1ff;
 						atarivc_update_pf_xscrolls(&state->atarigen);
 						tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, state->atarigen.atarivc_state.pf0_xscroll);
@@ -163,21 +163,21 @@ void batman_scanline_update(running_device *screen, int scanline)
 
 					case 13:
 						if (scanline > 0)
-							video_screen_update_partial(screen, scanline - 1);
+							screen.update_partial(scanline - 1);
 						state->atarigen.atarivc_state.mo_yscroll = (data >> 7) & 0x1ff;
 						atarimo_set_yscroll(0, state->atarigen.atarivc_state.mo_yscroll);
 						break;
 
 					case 14:
 						if (scanline > 0)
-							video_screen_update_partial(screen, scanline - 1);
+							screen.update_partial(scanline - 1);
 						state->atarigen.atarivc_state.pf1_yscroll = (data >> 7) & 0x1ff;
 						tilemap_set_scrolly(state->atarigen.playfield2_tilemap, 0, state->atarigen.atarivc_state.pf1_yscroll);
 						break;
 
 					case 15:
 						if (scanline > 0)
-							video_screen_update_partial(screen, scanline - 1);
+							screen.update_partial(scanline - 1);
 						state->atarigen.atarivc_state.pf0_yscroll = (data >> 7) & 0x1ff;
 						tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, state->atarigen.atarivc_state.pf0_yscroll);
 						break;

@@ -9,6 +9,8 @@
 #ifndef __ADC083X_H__
 #define __ADC083X_H__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -30,10 +32,10 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define ADC0831		DEVICE_GET_INFO_NAME(adc0831)
-#define ADC0832		DEVICE_GET_INFO_NAME(adc0832)
-#define ADC0834		DEVICE_GET_INFO_NAME(adc0834)
-#define ADC0838		DEVICE_GET_INFO_NAME(adc0838)
+DECLARE_LEGACY_DEVICE(ADC0831, adc0831);
+DECLARE_LEGACY_DEVICE(ADC0832, adc0832);
+DECLARE_LEGACY_DEVICE(ADC0834, adc0834);
+DECLARE_LEGACY_DEVICE(ADC0838, adc0838);
 
 #define MDRV_ADC0831_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, ADC0831, 0) \
@@ -68,12 +70,6 @@ struct _adc083x_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( adc0831 );
-DEVICE_GET_INFO( adc0832 );
-DEVICE_GET_INFO( adc0834 );
-DEVICE_GET_INFO( adc0838 );
 
 extern WRITE_LINE_DEVICE_HANDLER( adc083x_cs_write );
 extern WRITE_LINE_DEVICE_HANDLER( adc083x_clk_write );

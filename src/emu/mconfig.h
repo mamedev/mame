@@ -60,7 +60,7 @@
 #define VIDEO_EOF_CALL(name)		VIDEO_EOF_NAME(name)(machine)
 
 #define VIDEO_UPDATE_NAME(name)		video_update_##name
-#define VIDEO_UPDATE(name)			UINT32 VIDEO_UPDATE_NAME(name)(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+#define VIDEO_UPDATE(name)			UINT32 VIDEO_UPDATE_NAME(name)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
 #define VIDEO_UPDATE_CALL(name)		VIDEO_UPDATE_NAME(name)(screen, bitmap, cliprect)
 
 
@@ -88,7 +88,7 @@ typedef void   (*video_start_func)(running_machine *machine);
 typedef void   (*video_reset_func)(running_machine *machine);
 typedef void   (*palette_init_func)(running_machine *machine, const UINT8 *color_prom);
 typedef void   (*video_eof_func)(running_machine *machine);
-typedef UINT32 (*video_update_func)(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
+typedef UINT32 (*video_update_func)(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
 typedef void * (*driver_data_alloc_func)(running_machine &machine);
 
 
@@ -108,26 +108,6 @@ enum
 	MCONFIG_TOKEN_INVALID,
 	MCONFIG_TOKEN_END,
 	MCONFIG_TOKEN_INCLUDE,
-
-	MCONFIG_TOKEN_DEVICE_ADD,
-	MCONFIG_TOKEN_DEVICE_REMOVE,
-	MCONFIG_TOKEN_DEVICE_MODIFY,
-	MCONFIG_TOKEN_DEVICE_CLOCK,
-	MCONFIG_TOKEN_DEVICE_MAP,
-	MCONFIG_TOKEN_DEVICE_CONFIG,
-	MCONFIG_TOKEN_DEVICE_CONFIG_DATA32,
-	MCONFIG_TOKEN_DEVICE_CONFIG_DATA64,
-	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_2,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_3,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_4,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_5,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_6,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_7,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_8,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_9,
-	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE,
 
 	MCONFIG_TOKEN_DRIVER_DATA,
 	MCONFIG_TOKEN_QUANTUM_TIME,
@@ -153,6 +133,46 @@ enum
 
 	MCONFIG_TOKEN_SOUND_START,
 	MCONFIG_TOKEN_SOUND_RESET,
+	
+	MCONFIG_TOKEN_DEVICE_ADD,
+	MCONFIG_TOKEN_DEVICE_REPLACE,
+	MCONFIG_TOKEN_DEVICE_REMOVE,
+	MCONFIG_TOKEN_DEVICE_MODIFY,
+
+	// device-specific tokens
+	MCONFIG_TOKEN_DEVICE_CLOCK,
+	MCONFIG_TOKEN_DEVICE_CONFIG,
+	MCONFIG_TOKEN_DEVICE_INLINE_DATA16,
+	MCONFIG_TOKEN_DEVICE_INLINE_DATA32,
+	MCONFIG_TOKEN_DEVICE_INLINE_DATA64,
+	
+	// execute interface-specific tokens
+	MCONFIG_TOKEN_DIEXEC_DISABLE,
+	MCONFIG_TOKEN_DIEXEC_VBLANK_INT,
+	MCONFIG_TOKEN_DIEXEC_PERIODIC_INT,
+
+	// memory interface-specific tokens
+	MCONFIG_TOKEN_DIMEMORY_MAP,
+
+	// sound interface-specific tokens
+	MCONFIG_TOKEN_DISOUND_ROUTE,
+	MCONFIG_TOKEN_DISOUND_RESET,
+
+	// legacy custom tokens
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_2,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_3,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_4,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_5,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_6,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_7,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_8,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_9,
+
+	MCONFIG_TOKEN_DEVICE_CONFIG_DATA32,
+	MCONFIG_TOKEN_DEVICE_CONFIG_DATA64,
+	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE,
 };
 
 
@@ -190,9 +210,9 @@ enum
 struct gfx_decode_entry;
 
 
-typedef struct _machine_config machine_config;
-struct _machine_config
+class machine_config
 {
+public:
 	driver_data_alloc_func	driver_data_alloc;		/* allocator for driver data */
 
 	attotime				minimum_quantum;		/* minimum scheduling quantum */
@@ -248,12 +268,20 @@ union machine_config_token
 	palette_init_func palette_init;
 	video_eof_func video_eof;
 	video_update_func video_update;
+	cpu_type cputype;
+	device_interrupt_func cpu_interrupt;
 	driver_data_alloc_func driver_data_alloc;
 };
 
 
 /* helper macro for returning the size of a field within a struct; similar to offsetof() */
 #define structsizeof(_struct, _field) sizeof(((_struct *)NULL)->_field)
+
+#define DEVCONFIG_OFFSETOF(_class, _member)	\
+	((FPTR)&static_cast<_class *>(reinterpret_cast<device_config *>(1000000))->_member - 1000000)
+
+#define DEVCONFIG_SIZEOF(_class, _member)	\
+	sizeof(reinterpret_cast<_class *>(NULL)->_member)
 
 
 /* start/end tags for the machine driver */
@@ -370,6 +398,11 @@ union machine_config_token
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
+#define MDRV_DEVICE_REPLACE(_tag, _type, _clock) \
+	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_REPLACE, 8, _clock, 32), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
 #define MDRV_DEVICE_REMOVE(_tag) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_REMOVE, 8), \
 	TOKEN_STRING(_tag),
@@ -377,92 +410,6 @@ union machine_config_token
 #define MDRV_DEVICE_MODIFY(_tag)	\
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_MODIFY, 8), \
 	TOKEN_STRING(_tag),
-
-
-/* configure devices */
-#define MDRV_DEVICE_CONFIG(_config) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
-	TOKEN_PTR(voidptr, &(_config)),
-
-#define MDRV_DEVICE_CONFIG_CLEAR() \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
-	TOKEN_PTR(voidptr, NULL),
-
-#define MDRV_DEVICE_CLOCK(_clock) \
-	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_CLOCK, 8, _clock, 32),
-
-#define MDRV_DEVICE_ADDRESS_MAP(_space, _map) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DEVICE_MAP, 8, _space, 8), \
-	TOKEN_PTR(addrmap, (const addrmap_token *)ADDRESS_MAP_NAME(_map)),
-
-#define MDRV_DEVICE_PROGRAM_MAP(_map) \
-	MDRV_DEVICE_ADDRESS_MAP(ADDRESS_SPACE_PROGRAM, _map)
-
-#define MDRV_DEVICE_DATA_MAP(_map) \
-	MDRV_DEVICE_ADDRESS_MAP(ADDRESS_SPACE_DATA, _map)
-
-#define MDRV_DEVICE_IO_MAP(_map) \
-	MDRV_DEVICE_ADDRESS_MAP(ADDRESS_SPACE_IO, _map)
-
-
-
-/* inline device configurations that require 32 bits of storage in the token */
-#define MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_size, _offset, _val) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA32, 8, _size, 4, _offset, 12), \
-	TOKEN_UINT32((UINT32)(_val)),
-
-#define MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
-	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val) \
-	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
-	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
-
-
-/* inline device configurations that require 32 bits of fixed-point storage in the token */
-#define MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(_size, _offset, _val, _fixbits) \
-	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, _size, 4, _fixbits, 6, _offset, 12), \
-	TOKEN_UINT32((INT32)((float)(_val) * (float)(1 << (_fixbits)))),
-
-#define MDRV_DEVICE_CONFIG_DATAFP32(_struct, _field, _val, _fixbits) \
-	MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val, _fixbits)
-
-#define MDRV_DEVICE_CONFIG_DATAFP32_ARRAY(_struct, _field, _index, _val, _fixbits) \
-	MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val, _fixbits)
-
-#define MDRV_DEVICE_CONFIG_DATAFP32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val, _fixbits) \
-	MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val, _fixbits)
-
-
-/* inline device configurations that require 64 bits of storage in the token */
-#define MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_size, _offset, _val) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA64, 8, _size, 4, _offset, 12), \
-	TOKEN_UINT64((UINT64)(_val)),
-
-#define MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val) \
-	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val) \
-	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
-	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
-
-
-/* inline device configurations that require a pointer-sized amount of storage in the token */
-#ifdef PTR64
-#define MDRV_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_struct, _size, _offset)
-#define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val)
-#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val)
-#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
-#else
-#define MDRV_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_struct, _size, _offset)
-#define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val)
-#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val)
-#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
-#endif
 
 
 

@@ -19,10 +19,8 @@ struct _ym2203_state
 INLINE ym2203_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YM2203);
-	return (ym2203_state *)device->token;
+	assert(device->type() == SOUND_YM2203);
+	return (ym2203_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -127,13 +125,13 @@ static DEVICE_START( ym2203 )
 		},
 		NULL
 	};
-	const ym2203_interface *intf = device->baseconfig().static_config ? (const ym2203_interface *)device->baseconfig().static_config : &generic_2203;
+	const ym2203_interface *intf = device->baseconfig().static_config() ? (const ym2203_interface *)device->baseconfig().static_config() : &generic_2203;
 	ym2203_state *info = get_safe_token(device);
-	int rate = device->clock/72; /* ??? */
+	int rate = device->clock()/72; /* ??? */
 
 	info->intf = intf;
 	info->device = device;
-	info->psg = ay8910_start_ym(NULL, SOUND_YM2203, device, device->clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(NULL, SOUND_YM2203, device, device->clock(), &intf->ay8910_intf);
 	assert_always(info->psg != NULL, "Error creating YM2203/AY8910 chip");
 
 	/* Timer Handler set */
@@ -144,7 +142,7 @@ static DEVICE_START( ym2203 )
 	info->stream = stream_create(device,0,1,rate,info,ym2203_stream_update);
 
 	/* Initialize FM emurator */
-	info->chip = ym2203_init(info,device,device->clock,rate,timer_handler,IRQHandler,&psgintf);
+	info->chip = ym2203_init(info,device,device->clock(),rate,timer_handler,IRQHandler,&psgintf);
 	assert_always(info->chip != NULL, "Error creating YM2203 chip");
 
 	state_save_register_postload(device->machine, ym2203_intf_postload, info);

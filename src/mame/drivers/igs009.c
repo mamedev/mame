@@ -242,7 +242,7 @@ static VIDEO_UPDATE(jingbell)
 	{
 		int zz,i;
 		int startclipmin = 0;
-		const rectangle *visarea = video_screen_get_visible_area(screen);
+		const rectangle &visarea = screen->visible_area();
 
 
 		for (i= 0;i < 0x80;i++)
@@ -262,8 +262,8 @@ static VIDEO_UPDATE(jingbell)
 			int rowenable = bg_scroll2[zz];
 
 			/* draw top of screen */
-			clip.min_x = visarea->min_x;
-			clip.max_x = visarea->max_x;
+			clip.min_x = visarea.min_x;
+			clip.max_x = visarea.max_x;
 			clip.min_y = startclipmin;
 			clip.max_y = startclipmin+2;
 
@@ -307,7 +307,7 @@ static int nmi_enable, hopper;
 
 static CUSTOM_INPUT( hopper_r )
 {
-	return hopper && !(video_screen_get_frame_number(field->port->machine->primary_screen)%10);
+	return hopper && !(field->port->machine->primary_screen->frame_number()%10);
 }
 
 static UINT8 out[3];
@@ -660,8 +660,7 @@ static MACHINE_DRIVER_START( jingbell )
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz / 12)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

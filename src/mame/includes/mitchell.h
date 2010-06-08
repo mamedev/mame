@@ -4,12 +4,16 @@
 
 *************************************************************************/
 
+#include "sound/okim6295.h"
+
 class mitchell_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mitchell_state(machine)); }
 
-	mitchell_state(running_machine &machine) { }
+	mitchell_state(running_machine &machine) 
+		: audiocpu(machine.device<cpu_device>("audiocpu")),
+		  oki(machine.device<okim6295_device>("oki")) { }
 
 	/* memory pointers */
 	UINT8 *    videoram;
@@ -34,8 +38,8 @@ public:
 	int        keymatrix;
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *oki;
+	cpu_device *audiocpu;
+	okim6295_device *oki;
 };
 
 

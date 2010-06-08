@@ -4,12 +4,17 @@
 
 *************************************************************************/
 
+#include "sound/okim6295.h"
+#include "machine/eeprom.h"
+
 class kickgoal_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kickgoal_state(machine)); }
 
-	kickgoal_state(running_machine &machine) { }
+	kickgoal_state(running_machine &machine)
+		: adpcm(machine.device<okim6295_device>("oki")),
+		  eeprom(machine.device<eeprom_device>("eeprom")) { }
 
 	/* memory pointers */
 	UINT16 *    fgram;
@@ -30,8 +35,8 @@ public:
 	UINT16      m6295_key_delay;
 
 	/* devices */
-	running_device *adpcm;
-	running_device *eeprom;
+	okim6295_device *adpcm;
+	eeprom_device *eeprom;
 };
 
 

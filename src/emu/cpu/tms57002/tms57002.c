@@ -112,10 +112,9 @@ typedef struct {
 INLINE tms57002_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS57002);
-	return (tms57002_t *)device->token;
+	return (tms57002_t *)downcast<cpu_device *>(device)->token();
 }
 
 static void tms57002_cache_flush(tms57002_t *s);
@@ -1343,8 +1342,8 @@ static CPU_INIT(tms57002)
 	tms57002_t *s = get_safe_token(device);
 	tms57002_cache_flush(s);
 	s->sti = S_IDLE;
-	s->program = device->space(AS_PROGRAM);
-	s->data    = device->space(AS_DATA);
+	s->program = device_memory(device)->space(AS_PROGRAM);
+	s->data    = device_memory(device)->space(AS_DATA);
 }
 
 
@@ -1358,7 +1357,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO(tms57002)
 {
-	tms57002_t *s = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms57002_t *s = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state) {
 	case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(tms57002_t); break;

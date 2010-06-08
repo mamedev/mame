@@ -8,11 +8,13 @@
 #ifndef __RP5H01_H__
 #define __RP5H01_H__
 
+#include "devlegcy.h"
+
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define RP5H01		DEVICE_GET_INFO_NAME(rp5h01)
+DECLARE_LEGACY_DEVICE(RP5H01, rp5h01);
 
 #define MDRV_RP5H01_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, RP5H01, 0)
@@ -26,9 +28,6 @@
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( rp5h01 );
 
 WRITE8_DEVICE_HANDLER( rp5h01_enable_w );	/* /CE */
 WRITE8_DEVICE_HANDLER( rp5h01_reset_w );	/* RESET */

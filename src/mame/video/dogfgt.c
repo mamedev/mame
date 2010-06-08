@@ -73,7 +73,7 @@ VIDEO_START( dogfgt )
 	state->bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
 	state_save_register_global_pointer(machine, state->bitmapram, BITMAPRAM_SIZE);
 
-	state->pixbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->pixbitmap = machine->primary_screen->alloc_compatible_bitmap();
 	state_save_register_global_bitmap(machine, state->pixbitmap);
 }
 

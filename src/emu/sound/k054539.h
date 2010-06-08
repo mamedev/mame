@@ -9,6 +9,8 @@
 #ifndef __K054539_H__
 #define __K054539_H__
 
+#include "devlegcy.h"
+
 typedef struct _k054539_interface k054539_interface;
 struct _k054539_interface
 {
@@ -43,7 +45,6 @@ void k054539_init_flags(running_device *device, int flags);
 */
 void k054539_set_gain(running_device *device, int channel, double gain);
 
-DEVICE_GET_INFO( k054539 );
-#define SOUND_K054539 DEVICE_GET_INFO_NAME( k054539 )
+DECLARE_LEGACY_SOUND_DEVICE(K054539, k054539);
 
 #endif /* __K054539_H__ */

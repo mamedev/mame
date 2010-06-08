@@ -22,7 +22,7 @@ struct _se3208_state_t
 	UINT32 ER;
 	UINT32 PPC;
 
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	UINT8 IRQ;
@@ -61,10 +61,9 @@ static _OP *OpTable=NULL;
 INLINE se3208_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SE3208);
-	return (se3208_state_t *)device->token;
+	return (se3208_state_t *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE UINT32 read_dword_unaligned(const address_space *space, UINT32 address)
@@ -1715,11 +1714,11 @@ static CPU_RESET( se3208 )
 {
 	se3208_state_t *se3208_state = get_safe_token(device);
 
-	cpu_irq_callback save_irqcallback = se3208_state->irq_callback;
+	device_irq_callback save_irqcallback = se3208_state->irq_callback;
 	memset(se3208_state,0,sizeof(se3208_state_t));
 	se3208_state->irq_callback = save_irqcallback;
 	se3208_state->device = device;
-	se3208_state->program = device->space(AS_PROGRAM);
+	se3208_state->program = device_memory(device)->space(AS_PROGRAM);
 	se3208_state->PC=SE3208_Read32(se3208_state, 0);
 	se3208_state->SR=0;
 	se3208_state->IRQ=CLEAR_LINE;
@@ -1792,7 +1791,7 @@ static CPU_INIT( se3208 )
 
 	se3208_state->irq_callback = irqcallback;
 	se3208_state->device = device;
-	se3208_state->program = device->space(AS_PROGRAM);
+	se3208_state->program = device_memory(device)->space(AS_PROGRAM);
 }
 
 static CPU_EXIT( se3208 )
@@ -1843,7 +1842,7 @@ static CPU_SET_INFO( se3208 )
 
 CPU_GET_INFO( se3208 )
 {
-	se3208_state_t *se3208_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	se3208_state_t *se3208_state = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

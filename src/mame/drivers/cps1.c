@@ -289,7 +289,7 @@ static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 
 static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
 {
-	okim6295_set_pin7(device, (data & 1));
+	downcast<okim6295_device *>(device)->set_pin7(data & 1);
 }
 
 static WRITE16_HANDLER( cps1_soundlatch_w )
@@ -3000,8 +3000,7 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 	MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/4/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 can be changed by the game code, see f006 on z80
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/4/4, OKIM6295_PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -3011,7 +3010,8 @@ static MACHINE_DRIVER_START( cps1_12MHz )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_10MHz)
 
-	MDRV_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK( XTAL_12MHz )	/* verified on pcb */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pang3 )
@@ -3064,7 +3064,7 @@ static MACHINE_DRIVER_START( cpspicb )
 	MDRV_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)
-	MDRV_CPU_FLAGS(CPU_DISABLE) /* no valid dumps .. */
+	MDRV_DEVICE_DISABLE() /* no valid dumps .. */
 
 	MDRV_MACHINE_START(common)
 
@@ -3086,8 +3086,7 @@ static MACHINE_DRIVER_START( cpspicb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

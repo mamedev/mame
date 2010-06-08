@@ -372,7 +372,7 @@ MACHINE_START( leland )
 
 MACHINE_RESET( leland )
 {
-	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), 8);
+	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(8), 8);
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
@@ -426,7 +426,7 @@ MACHINE_START( ataxx )
 MACHINE_RESET( ataxx )
 {
 	memset(extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
-	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), 8);
+	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */
 	xrom_length = memory_region_length(machine, "user1");
@@ -478,7 +478,7 @@ static TIMER_CALLBACK( leland_interrupt_callback )
 	scanline += 16;
 	if (scanline > 248)
 		scanline = 8;
-	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -490,7 +490,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 	cputag_set_input_line(machine, "master", 0, HOLD_LINE);
 
 	/* set a timer for the next one */
-	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -1262,7 +1262,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 			break;
 
 		case 0x08:	/*  */
-			timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(space->machine->primary_screen, data + 1, 0), data + 1);
+			timer_adjust_oneshot(master_int_timer, space->machine->primary_screen->time_until_pos(data + 1), data + 1);
 			break;
 
 		default:
@@ -1447,7 +1447,7 @@ WRITE8_HANDLER( ataxx_slave_banksw_w )
 
 READ8_HANDLER( leland_raster_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen);
+	return space->machine->primary_screen->vpos();
 }
 
 

@@ -117,14 +117,14 @@ static UINT8 ad1847_regs[16];
 static UINT32 ad1847_sample_counter = 0;
 static UINT32 ad1847_sample_rate;
 
-static running_device *dmadac[2];
+static dmadac_sound_device *dmadac[2];
 
 static struct {
-	running_device	*pit8254;
-	running_device	*pic8259_1;
-	running_device	*pic8259_2;
-	running_device	*dma8237_1;
-	running_device	*dma8237_2;
+	pit8254_device	*pit8254;
+	pic8259_device	*pic8259_1;
+	pic8259_device	*pic8259_2;
+	i8237_device	*dma8237_1;
+	i8237_device	*dma8237_2;
 } mediagx_devices;
 
 
@@ -231,7 +231,7 @@ static void draw_framebuffer(running_machine *machine, bitmap_t *bitmap, const r
 		visarea.min_x = visarea.min_y = 0;
 		visarea.max_x = width - 1;
 		visarea.max_y = height - 1;
-		video_screen_configure(machine->primary_screen, width, height * 262 / 240, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+		machine->primary_screen->configure(width, height * 262 / 240, visarea, machine->primary_screen->frame_period().attoseconds);
 	}
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
@@ -341,7 +341,7 @@ static READ32_HANDLER( disp_ctrl_r )
 		case DC_TIMING_CFG:
 			r |= 0x40000000;
 
-			if (video_screen_get_vpos(space->machine->primary_screen) >= frame_height)
+			if (space->machine->primary_screen->vpos() >= frame_height)
 				r &= ~0x40000000;
 
 #if SPEEDUP_HACKS
@@ -637,7 +637,7 @@ static void cx5510_pci_w(running_device *busdevice, running_device *device, int 
 static TIMER_DEVICE_CALLBACK( sound_timer_callback )
 {
 	ad1847_sample_counter = 0;
-	timer_device_adjust_oneshot(timer, ATTOTIME_IN_MSEC(10), 0);
+	timer.adjust(ATTOTIME_IN_MSEC(10));
 
 	dmadac_transfer(&dmadac[0], 1, 0, 1, dacl_ptr, dacl);
 	dmadac_transfer(&dmadac[1], 1, 0, 1, dacr_ptr, dacr);
@@ -959,11 +959,11 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(mediagx)
 {
-	mediagx_devices.pit8254 = devtag_get_device( machine, "pit8254" );
-	mediagx_devices.pic8259_1 = devtag_get_device( machine, "pic8259_master" );
-	mediagx_devices.pic8259_2 = devtag_get_device( machine, "pic8259_slave" );
-	mediagx_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
-	mediagx_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
+	mediagx_devices.pit8254 = machine->device<pit8254_device>( "pit8254" );
+	mediagx_devices.pic8259_1 = machine->device<pic8259_device>( "pic8259_master" );
+	mediagx_devices.pic8259_2 = machine->device<pic8259_device>( "pic8259_slave" );
+	mediagx_devices.dma8237_1 = machine->device<i8237_device>( "dma8237_1" );
+	mediagx_devices.dma8237_2 = machine->device<i8237_device>( "dma8237_2" );
 
 	dacl = auto_alloc_array(machine, INT16, 65536);
 	dacr = auto_alloc_array(machine, INT16, 65536);
@@ -978,10 +978,11 @@ static MACHINE_RESET(mediagx)
 	memcpy(bios_ram, rom, 0x40000);
 	machine->device("maincpu")->reset();
 
-	timer_device_adjust_oneshot(devtag_get_device(machine, "sound_timer"), ATTOTIME_IN_MSEC(10), 0);
+	timer_device *sound_timer = machine->device<timer_device>("sound_timer");
+	sound_timer->adjust(ATTOTIME_IN_MSEC(10));
 
-	dmadac[0] = devtag_get_device(machine, "dac1");
-	dmadac[1] = devtag_get_device(machine, "dac2");
+	dmadac[0] = machine->device<dmadac_sound_device>("dac1");
+	dmadac[1] = machine->device<dmadac_sound_device>("dac2");
 	dmadac_enable(&dmadac[0], 2, 1);
 	devtag_reset(machine, "ide");
 }

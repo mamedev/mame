@@ -222,10 +222,8 @@ static const INT16 K5_table[] = {
 INLINE vlm5030_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_VLM5030);
-	return (vlm5030_state *)device->token;
+	assert(device->type() == SOUND_VLM5030);
+	return (vlm5030_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static int get_bits(vlm5030_state *chip, int sbit,int bits)
@@ -654,9 +652,9 @@ static DEVICE_START( vlm5030 )
 	vlm5030_state *chip = get_safe_token(device);
 
 	chip->device = device;
-	chip->intf = (device->baseconfig().static_config != NULL) ? (const vlm5030_interface *)device->baseconfig().static_config : &defintrf;
+	chip->intf = (device->baseconfig().static_config() != NULL) ? (const vlm5030_interface *)device->baseconfig().static_config() : &defintrf;
 
-	emulation_rate = device->clock / 440;
+	emulation_rate = device->clock() / 440;
 
 	/* reset input pins */
 	chip->pin_RST = chip->pin_ST = chip->pin_VCU= 0;
@@ -665,10 +663,10 @@ static DEVICE_START( vlm5030 )
 	vlm5030_reset(chip);
 	chip->phase = PH_IDLE;
 
-	chip->rom = *device->region;
+	chip->rom = *device->region();
 	/* memory size */
 	if( chip->intf->memory_size == 0)
-		chip->address_mask = device->region->bytes()-1;
+		chip->address_mask = device->region()->bytes()-1;
 	else
 		chip->address_mask = chip->intf->memory_size-1;
 

@@ -974,7 +974,7 @@ static INTERRUPT_GEN( namcona1_interrupt )
 				int scanline = namcona1_vreg[0x8a/2]&0xff;
 				if( scanline )
 				{
-					video_screen_update_partial(device->machine->primary_screen, scanline );
+					device->machine->primary_screen->update_partial(scanline );
 				}
 			}
 			cpu_set_input_line(device, level+1, HOLD_LINE);
@@ -1062,7 +1062,7 @@ static MACHINE_DRIVER_START( namcona2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(namcona1)
 
-	MDRV_CPU_REPLACE("maincpu", M68000, 50113000/4)
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(namcona2_main_map)
 MACHINE_DRIVER_END
 

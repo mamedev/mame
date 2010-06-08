@@ -1155,7 +1155,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 		visarea.min_y = 0;
 		visarea.max_y = sms_mode_table[chip->screen_mode].sms2_height-1;
 
-		if (chip->chip_id==3) video_screen_configure(machine->primary_screen, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		if (chip->chip_id==3) machine->primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 	}
 	else /* 160x144 */
@@ -1166,7 +1166,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 		visarea.min_y = (192-144)/2;
 		visarea.max_y = (192-144)/2+144-1;
 
-		video_screen_configure(machine->primary_screen, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		machine->primary_screen->configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 	}
 
 

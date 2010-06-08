@@ -94,7 +94,7 @@ PALETTE_INIT( gyruss )
 WRITE8_HANDLER( gyruss_spriteram_w )
 {
 	gyruss_state *state = (gyruss_state *)space->machine->driver_data;
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	state->spriteram[offset] = data;
 }
 
@@ -125,7 +125,7 @@ VIDEO_START( gyruss )
 READ8_HANDLER( gyruss_scanline_r )
 {
 	/* reads 1V - 128V */
-	return video_screen_get_vpos(space->machine->primary_screen);
+	return space->machine->primary_screen->vpos();
 }
 
 
@@ -154,7 +154,7 @@ VIDEO_UPDATE( gyruss )
 {
 	gyruss_state *state = (gyruss_state *)screen->machine->driver_data;
 
-	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
+	if (cliprect->min_y == screen->visible_area().min_y)
 	{
 		tilemap_mark_all_tiles_dirty_all(screen->machine);
 		tilemap_set_flip_all(screen->machine, (*state->flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);

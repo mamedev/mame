@@ -465,22 +465,22 @@ static VIDEO_UPDATE(bingor)
 
 			color = (blit_ram[count] & 0xf000)>>12;
 
-			if((x+3)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+			if((x+3)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x+3) = screen->machine->pens[color];
 
 			color = (blit_ram[count] & 0x0f00)>>8;
 
-			if((x+2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+			if((x+2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x+2) = screen->machine->pens[color];
 
 			color = (blit_ram[count] & 0x00f0)>>4;
 
-			if((x+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+			if((x+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x+1) = screen->machine->pens[color];
 
 			color = (blit_ram[count] & 0x000f)>>0;
 
-			if((x+0)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+			if((x+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x+0) = screen->machine->pens[color];
 
 			count++;

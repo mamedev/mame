@@ -172,25 +172,37 @@ WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 
 			if (kickgoal_sound >= 0x70) {
 				if (kickgoal_snd_bank != 1)
-					okim6295_set_bank_base(device, (1 * 0x40000));
+				{
+					okim6295_device *oki = downcast<okim6295_device *>(device);
+					oki->set_bank_base((1 * 0x40000));
+				}
 				kickgoal_snd_bank = 1;
 				kickgoal_play(device, 0, data);
 			}
 			else if (kickgoal_sound >= 0x69) {
 				if (kickgoal_snd_bank != 2)
-					okim6295_set_bank_base(device, (2 * 0x40000));
+				{
+					okim6295_device *oki = downcast<okim6295_device *>(device);
+					oki->set_bank_base((2 * 0x40000));
+				}
 				kickgoal_snd_bank = 2;
 				kickgoal_play(device, 4, data);
 			}
 			else if (kickgoal_sound >= 0x65) {
 				if (kickgoal_snd_bank != 1)
-					okim6295_set_bank_base(device, (1 * 0x40000));
+				{
+					okim6295_device *oki = downcast<okim6295_device *>(device);
+					oki->set_bank_base((1 * 0x40000));
+				}
 				kickgoal_snd_bank = 1;
 				kickgoal_play(device, 4, data);
 			}
 			else if (kickgoal_sound >= 0x60) {
 				kickgoal_snd_bank = 0;
-					okim6295_set_bank_base(device, (0 * 0x40000));
+				{
+					okim6295_device *oki = downcast<okim6295_device *>(device);
+					oki->set_bank_base(device, (0 * 0x40000));
+				}
 				kickgoal_snd_bank = 0;
 				kickgoal_play(device, 4, data);
 			}
@@ -210,12 +222,13 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 	if (!ACCESSING_BITS_0_7)
 		data >>= 8;
 
+	okim6295_device *oki = downcast<okim6295_device *>(device);
 	switch (data)
 	{
-		case 0xfc:	okim6295_set_bank_base(device, (0 * 0x40000)); break;
-		case 0xfd:	okim6295_set_bank_base(device, (2 * 0x40000)); break;
-		case 0xfe:	okim6295_set_bank_base(device, (1 * 0x40000)); break;
-		case 0xff:	okim6295_set_bank_base(device, (3 * 0x40000)); break;
+		case 0xfc:	oki->set_bank_base((0 * 0x40000)); break;
+		case 0xfd:	oki->set_bank_base((2 * 0x40000)); break;
+		case 0xfe:	oki->set_bank_base((1 * 0x40000)); break;
+		case 0xff:	oki->set_bank_base((3 * 0x40000)); break;
 		case 0x78:
 				okim6295_w(device, 0, data);
 				state->snd_sam[0] = 00; state->snd_sam[1]= 00; state->snd_sam[2] = 00; state->snd_sam[3] = 00;
@@ -336,7 +349,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			if (state->m6295_bank == 0x03)
 				state->m6295_bank = 0x00;
 			popmessage("Changing Bank to %02x", state->m6295_bank);
-			okim6295_set_bank_base(state->adpcm, ((state->m6295_bank) * 0x40000));
+			state->adpcm->set_bank_base(((state->m6295_bank) * 0x40000));
 
 			if (state->m6295_key_delay == 0xffff)
 				state->m6295_key_delay = 0x00;
@@ -355,7 +368,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			if (state->m6295_bank == 0x03)
 				state->m6295_bank = 0x02;
 			popmessage("Changing Bank to %02x", state->m6295_bank);
-			okim6295_set_bank_base(state->adpcm, ((state->m6295_bank) * 0x40000));
+			state->adpcm->set_bank_base(((state->m6295_bank) * 0x40000));
 
 			if (state->m6295_key_delay == 0xffff)
 				state->m6295_key_delay = 0x00;
@@ -371,11 +384,11 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		{
 			state->m6295_comm += 1;
 			state->m6295_comm &= 0x7f;
-			if (state->m6295_comm == 0x00) { okim6295_set_bank_base(state->adpcm, (0 * 0x40000)); state->m6295_bank = 0; }
-			if (state->m6295_comm == 0x60) { okim6295_set_bank_base(state->adpcm, (0 * 0x40000)); state->m6295_bank = 0; }
-			if (state->m6295_comm == 0x65) { okim6295_set_bank_base(state->adpcm, (1 * 0x40000)); state->m6295_bank = 1; }
-			if (state->m6295_comm == 0x69) { okim6295_set_bank_base(state->adpcm, (2 * 0x40000)); state->m6295_bank = 2; }
-			if (state->m6295_comm == 0x70) { okim6295_set_bank_base(state->adpcm, (1 * 0x40000)); state->m6295_bank = 1; }
+			if (state->m6295_comm == 0x00) { state->adpcm->set_bank_base((0 * 0x40000)); state->m6295_bank = 0; }
+			if (state->m6295_comm == 0x60) { state->adpcm->set_bank_base((0 * 0x40000)); state->m6295_bank = 0; }
+			if (state->m6295_comm == 0x65) { state->adpcm->set_bank_base((1 * 0x40000)); state->m6295_bank = 1; }
+			if (state->m6295_comm == 0x69) { state->adpcm->set_bank_base((2 * 0x40000)); state->m6295_bank = 2; }
+			if (state->m6295_comm == 0x70) { state->adpcm->set_bank_base((1 * 0x40000)); state->m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x", state->m6295_comm, state->m6295_bank);
 
 			if (state->m6295_key_delay == 0xffff)
@@ -392,11 +405,11 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		{
 			state->m6295_comm -= 1;
 			state->m6295_comm &= 0x7f;
-			if (state->m6295_comm == 0x2b) { okim6295_set_bank_base(state->adpcm, (0 * 0x40000)); state->m6295_bank = 0; }
-			if (state->m6295_comm == 0x64) { okim6295_set_bank_base(state->adpcm, (0 * 0x40000)); state->m6295_bank = 0; }
-			if (state->m6295_comm == 0x68) { okim6295_set_bank_base(state->adpcm, (1 * 0x40000)); state->m6295_bank = 1; }
-			if (state->m6295_comm == 0x6c) { okim6295_set_bank_base(state->adpcm, (2 * 0x40000)); state->m6295_bank = 2; }
-			if (state->m6295_comm == 0x76) { okim6295_set_bank_base(state->adpcm, (1 * 0x40000)); state->m6295_bank = 1; }
+			if (state->m6295_comm == 0x2b) { state->adpcm->set_bank_base((0 * 0x40000)); state->m6295_bank = 0; }
+			if (state->m6295_comm == 0x64) { state->adpcm->set_bank_base((0 * 0x40000)); state->m6295_bank = 0; }
+			if (state->m6295_comm == 0x68) { state->adpcm->set_bank_base((1 * 0x40000)); state->m6295_bank = 1; }
+			if (state->m6295_comm == 0x6c) { state->adpcm->set_bank_base((2 * 0x40000)); state->m6295_bank = 2; }
+			if (state->m6295_comm == 0x76) { state->adpcm->set_bank_base((1 * 0x40000)); state->m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x", state->m6295_comm, state->m6295_bank);
 
 			if (state->m6295_key_delay == 0xffff)
@@ -647,9 +660,6 @@ static MACHINE_START( kickgoal )
 {
 	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
 
-	state->adpcm = devtag_get_device(machine, "oki");
-	state->eeprom = devtag_get_device(machine, "eeprom");
-
 	state_save_register_global_array(machine, state->snd_sam);
 	state_save_register_global(machine, state->melody_loop);
 	state_save_register_global(machine, state->snd_new);
@@ -685,7 +695,7 @@ static MACHINE_DRIVER_START( kickgoal )
 	MDRV_CPU_PERIODIC_INT(kickgoal_interrupt, 240)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000/4)	/* 3MHz ? */
-	MDRV_CPU_FLAGS(CPU_DISABLE)	/* Disables since the internal rom isn't dumped */
+	MDRV_DEVICE_DISABLE()	/* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(kickgoal_sound_io_map)
 
@@ -711,8 +721,7 @@ static MACHINE_DRIVER_START( kickgoal )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -727,7 +736,7 @@ static MACHINE_DRIVER_START( actionhw )
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)	/* verified on pcb */
-	MDRV_CPU_FLAGS(CPU_DISABLE) /* Disables since the internal rom isn't dumped */
+	MDRV_DEVICE_DISABLE() /* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(actionhw_io_map)
 
@@ -753,8 +762,7 @@ static MACHINE_DRIVER_START( actionhw )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/12) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

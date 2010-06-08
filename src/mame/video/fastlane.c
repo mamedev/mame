@@ -119,10 +119,10 @@ VIDEO_START( fastlane )
 
 	tilemap_set_scroll_rows(state->layer0, 32);
 
-	state->clip0 = *video_screen_get_visible_area(machine->primary_screen);
+	state->clip0 = machine->primary_screen->visible_area();
 	state->clip0.min_x += 40;
 
-	state->clip1 = *video_screen_get_visible_area(machine->primary_screen);
+	state->clip1 = machine->primary_screen->visible_area();
 	state->clip1.max_x = 39;
 	state->clip1.min_x = 0;
 }

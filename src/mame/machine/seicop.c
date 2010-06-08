@@ -1492,12 +1492,12 @@ static UINT8 xy_check;
 
 #define CRT_MODE(_x_,_y_,_flip_) \
 	{ \
-	rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen); \
+	rectangle visarea; \
 	visarea.min_x = 0; \
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \
 	visarea.max_y = _y_-1; \
-	video_screen_configure(space->machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds ); \
+	space->machine->primary_screen->configure(_x_, _y_, visarea, space->machine->primary_screen->frame_period().attoseconds ); \
 	flip_screen_set(space->machine, _flip_); \
 	} \
 

@@ -78,10 +78,9 @@ struct _i2cmem_state
 INLINE i2cmem_state *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == I2CMEM );
+	assert( device->type() == I2CMEM );
 
-	return (i2cmem_state *)device->token;
+	return (i2cmem_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static int select_device( i2cmem_state *c )
@@ -371,11 +370,11 @@ static DEVICE_START( i2cmem )
 
 	/* validate some basic stuff */
 	assert( device != NULL );
-	assert( device->baseconfig().inline_config != NULL );
+	assert( downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL );
 	assert( device->machine != NULL );
 	assert( device->machine->config != NULL );
 
-	config = (const i2cmem_config *)device->baseconfig().inline_config;
+	config = (const i2cmem_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	c->scl = 0;
 	c->sdaw = 0;
@@ -431,7 +430,7 @@ static DEVICE_RESET( i2cmem )
 
 static DEVICE_NVRAM( i2cmem )
 {
-	const i2cmem_config *config = (const i2cmem_config *)device->baseconfig().inline_config;
+	const i2cmem_config *config = (const i2cmem_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	i2cmem_state *c = get_safe_token( device );
 
 	if( read_or_write )
@@ -460,7 +459,6 @@ DEVICE_GET_INFO( i2cmem )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof( i2cmem_state ); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof( i2cmem_config ); break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( i2cmem ); break;

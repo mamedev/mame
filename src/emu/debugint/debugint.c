@@ -1138,7 +1138,7 @@ static void render_editor(DView_edit *editor)
 	/* compute our bounds */
 	x1 = 0.5f - 0.5f * maxwidth;
 	x2 = x1 + maxwidth;
-	y1 = 0.25;
+	y1 = 0.25f;
 	y2 = 0.45f - UI_BOX_TB_BORDER;
 
 	/* draw a box */
@@ -1389,6 +1389,7 @@ static void handle_menus(running_machine *machine)
 
 static void followers_set_cpu(running_device *device)
 {
+	device_state_interface *stateintf = device_state(device);
 	const registers_subview_item *regsubitem = NULL;
 	const disasm_subview_item *dasmsubitem;
 	char title[256];
@@ -1411,7 +1412,7 @@ static void followers_set_cpu(running_device *device)
 				break;
 			case DVT_REGISTERS:
 				for (regsubitem = registers_view_get_subview_list(dv->view); regsubitem != NULL; regsubitem = regsubitem->next)
-					if (regsubitem->device == device)
+					if (regsubitem->stateintf == stateintf)
 					{
 						registers_view_set_subview(dv->view, regsubitem->index);
 						snprintf(title, ARRAY_LENGTH(title), "%s", regsubitem->name.cstr());

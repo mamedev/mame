@@ -2231,8 +2231,7 @@ static MACHINE_DRIVER_START( victor21 )
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_4_433619MHz / 4)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)	/* Clock frequency & pin 7 not verified */
+	MDRV_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -2304,8 +2303,7 @@ static MACHINE_DRIVER_START( srider )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_4_433619MHz / 4)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)	/* Clock frequency & pin 7 not verified */
+	MDRV_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

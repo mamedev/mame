@@ -196,9 +196,6 @@ VIDEO_START( atarisy1 )
 	/* reset the statics */
 	atarimo_set_yscroll(0, 256);
 	state->next_timer_scanline = -1;
-	state->scanline_timer = devtag_get_device(machine, "scan_timer");
-	state->int3off_timer = devtag_get_device(machine, "int3off_timer");
-	state->yscroll_reset_timer = devtag_get_device(machine, "yreset_timer");
 
 	/* save state */
 	state_save_register_global(machine, state->playfield_tile_bank);
@@ -219,7 +216,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	atarisy1_state *state = (atarisy1_state *)space->machine->driver_data;
 	UINT16 oldselect = *state->bankselect;
 	UINT16 newselect = oldselect, diff;
-	int scanline = video_screen_get_vpos(space->machine->primary_screen);
+	int scanline = space->machine->primary_screen->vpos();
 
 	/* update memory */
 	COMBINE_DATA(&newselect);
@@ -234,7 +231,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 
 	/* if MO or playfield banks change, force a partial update */
 	if (diff & 0x003c)
-		video_screen_update_partial(space->machine->primary_screen, scanline);
+		space->machine->primary_screen->update_partial(scanline);
 
 	/* motion object bank select */
 	atarimo_set_bank(0, (newselect >> 3) & 7);
@@ -268,7 +265,7 @@ WRITE16_HANDLER( atarisy1_priority_w )
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newpens);
 	if (oldpens != newpens)
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	state->playfield_priority_pens = newpens;
 }
 
@@ -289,7 +286,7 @@ WRITE16_HANDLER( atarisy1_xscroll_w )
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
 	if (oldscroll != newscroll)
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* set the new scroll value */
 	tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll);
@@ -308,7 +305,7 @@ WRITE16_HANDLER( atarisy1_xscroll_w )
 
 TIMER_DEVICE_CALLBACK( atarisy1_reset_yscroll_callback )
 {
-	atarisy1_state *state = (atarisy1_state *)timer->machine->driver_data;
+	atarisy1_state *state = (atarisy1_state *)timer.machine->driver_data;
 	tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, param);
 }
 
@@ -318,23 +315,23 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 	atarisy1_state *state = (atarisy1_state *)space->machine->driver_data;
 	UINT16 oldscroll = *state->atarigen.yscroll;
 	UINT16 newscroll = oldscroll;
-	int scanline = video_screen_get_vpos(space->machine->primary_screen);
+	int scanline = space->machine->primary_screen->vpos();
 	int adjusted_scroll;
 
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
-	video_screen_update_partial(space->machine->primary_screen, scanline);
+	space->machine->primary_screen->update_partial(scanline);
 
 	/* because this latches a new value into the scroll base,
        we need to adjust for the scanline */
 	adjusted_scroll = newscroll;
-	if (scanline <= video_screen_get_visible_area(space->machine->primary_screen)->max_y)
+	if (scanline <= space->machine->primary_screen->visible_area().max_y)
 		adjusted_scroll -= (scanline + 1);
 	tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, adjusted_scroll);
 
 	/* but since we've adjusted it, we must reset it to the normal value
        once we hit scanline 0 again */
-	timer_device_adjust_oneshot(state->yscroll_reset_timer, video_screen_get_time_until_pos(space->machine->primary_screen, 0, 0), newscroll);
+	state->yscroll_reset_timer->adjust(space->machine->primary_screen->time_until_pos(0), newscroll);
 
 	/* update the data */
 	*state->atarigen.yscroll = newscroll;
@@ -364,7 +361,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 		{
 			/* if the timer is in the active bank, update the display list */
 			atarimo_0_spriteram_w(space, offset, data, 0xffff);
-			update_timers(space->machine, video_screen_get_vpos(space->machine->primary_screen));
+			update_timers(space->machine, space->machine->primary_screen->vpos());
 		}
 
 		/* if we're about to modify data in the active sprite bank, make sure the video is up-to-date */
@@ -372,7 +369,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 		/* renders the next scanline's sprites to the line buffers, but Road Runner still glitches */
 		/* without the extra +1 */
 		else
-			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) + 2);
+			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() + 2);
 	}
 
 	/* let the MO handler do the basic work */
@@ -389,7 +386,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 
 TIMER_DEVICE_CALLBACK( atarisy1_int3off_callback )
 {
-	const address_space *space = cputag_get_address_space(timer->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(timer.machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* clear the state */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
@@ -398,18 +395,18 @@ TIMER_DEVICE_CALLBACK( atarisy1_int3off_callback )
 
 TIMER_DEVICE_CALLBACK( atarisy1_int3_callback )
 {
-	atarisy1_state *state = (atarisy1_state *)timer->machine->driver_data;
+	atarisy1_state *state = (atarisy1_state *)timer.machine->driver_data;
 	int scanline = param;
 
 	/* update the state */
-	atarigen_scanline_int_gen(devtag_get_device(timer->machine, "maincpu"));
+	atarigen_scanline_int_gen(devtag_get_device(timer.machine, "maincpu"));
 
 	/* set a timer to turn it off */
-	timer_device_adjust_oneshot(state->int3off_timer, video_screen_get_scan_period(timer->machine->primary_screen), 0);
+	state->int3off_timer->adjust(timer.machine->primary_screen->scan_period());
 
 	/* determine the time of the next one */
 	state->next_timer_scanline = -1;
-	update_timers(timer->machine, scanline);
+	update_timers(timer.machine, scanline);
 }
 
 
@@ -486,9 +483,9 @@ static void update_timers(running_machine *machine, int scanline)
 
 		/* set a new one */
 		if (best != -1)
-			timer_device_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, best, 0), best);
+			state->scanline_timer->adjust(machine->primary_screen->time_until_pos(best), best);
 		else
-			timer_device_adjust_oneshot(state->scanline_timer, attotime_never, 0);
+			state->scanline_timer->reset();
 	}
 }
 

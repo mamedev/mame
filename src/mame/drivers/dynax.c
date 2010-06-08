@@ -626,7 +626,7 @@ static WRITE8_HANDLER( hjingi_hopper_w )
 static UINT8 hjingi_hopper_bit( running_machine *machine )
 {
 	dynax_state *state = (dynax_state *)machine->driver_data;
-	return (state->hopper && !(video_screen_get_frame_number(machine->primary_screen) % 10)) ? 0 : (1 << 6);
+	return (state->hopper && !(machine->primary_screen->frame_number() % 10)) ? 0 : (1 << 6);
 }
 
 static READ8_HANDLER( hjingi_keyboard_0_r )
@@ -1203,7 +1203,7 @@ static READ8_HANDLER( htengoku_coin_r )
 	{
 		case 0x00:	return input_port_read(space->machine, "COINS");
 		case 0x01:	return 0xff;	//?
-		case 0x02:	return 0xbf | ((state->hopper && !(video_screen_get_frame_number(space->machine->primary_screen) % 10)) ? 0 : (1 << 6));	// bit 7 = blitter busy, bit 6 = hopper
+		case 0x02:	return 0xbf | ((state->hopper && !(space->machine->primary_screen->frame_number() % 10)) ? 0 : (1 << 6));	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:	return state->coins;
 	}
 	logerror("%04x: coin_r with select = %02x\n", cpu_get_pc(space->cpu), state->input_sel);

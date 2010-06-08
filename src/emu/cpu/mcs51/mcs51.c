@@ -281,7 +281,7 @@ struct _mcs51_state_t
 	UINT8	(*sfr_read)(mcs51_state_t *mcs51_state, size_t offset);
 
 	/* Interrupt Callback */
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 
 	/* Memory spaces */
@@ -651,8 +651,7 @@ INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data);
 INLINE mcs51_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I8031 ||
 		   cpu_get_type(device) == CPU_I8032 ||
 		   cpu_get_type(device) == CPU_I8051 ||
@@ -667,7 +666,7 @@ INLINE mcs51_state_t *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_I87C52 ||
 		   cpu_get_type(device) == CPU_AT89C4051 ||
 		   cpu_get_type(device) == CPU_DS5002FP);
-	return (mcs51_state_t *)device->token;
+	return (mcs51_state_t *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE void clear_current_irq(mcs51_state_t *mcs51_state)
@@ -2080,9 +2079,9 @@ static CPU_INIT( mcs51 )
 	mcs51_state->irq_callback = irqcallback;
 	mcs51_state->device = device;
 
-	mcs51_state->program = device->space(AS_PROGRAM);
-	mcs51_state->data = device->space(AS_DATA);
-	mcs51_state->io = device->space(AS_IO);
+	mcs51_state->program = device_memory(device)->space(AS_PROGRAM);
+	mcs51_state->data = device_memory(device)->space(AS_DATA);
+	mcs51_state->io = device_memory(device)->space(AS_IO);
 
 	mcs51_state->features = FEATURE_NONE;
 	mcs51_state->ram_mask = 0x7F;			/* 128 bytes of ram */
@@ -2389,7 +2388,7 @@ static CPU_INIT( ds5002fp )
 {
 	/* default configuration */
 	static const ds5002fp_config default_config = { 0x00, 0x00, 0x00 };
-	const ds5002fp_config *sconfig = device->baseconfig().static_config ? (const ds5002fp_config *)device->baseconfig().static_config : &default_config;
+	const ds5002fp_config *sconfig = device->baseconfig().static_config() ? (const ds5002fp_config *)device->baseconfig().static_config() : &default_config;
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 
 	CPU_INIT_CALL( mcs51 );
@@ -2476,7 +2475,7 @@ static CPU_SET_INFO( mcs51 )
 
 static CPU_GET_INFO( mcs51 )
 {
-	mcs51_state_t *mcs51_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	mcs51_state_t *mcs51_state = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -73,7 +73,7 @@
 static READ8_HANDLER( fake_VRLE_r )
 {
 	malzak_state *state = (malzak_state *)space->machine->driver_data;
-	return (s2636_work_ram_r(state->s2636_0, 0xcb) & 0x3f) + (video_screen_get_vblank(space->machine->primary_screen) * 0x40);
+	return (s2636_work_ram_r(state->s2636_0, 0xcb) & 0x3f) + (space->machine->primary_screen->vblank() * 0x40);
 }
 
 static READ8_HANDLER( s2636_portA_r )

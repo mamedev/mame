@@ -136,7 +136,7 @@ static WRITE16_HANDLER( ioc_w )
 		// MSM6585 bank, coin LEDs, maybe others?
 		case 0x44:
 			state->msm_bank = data & 0x1000 ? 0x100000 : 0;
-			okim6295_set_bank_base(state->oki, 0x40000 * ((data & 0x800 )>> 11));
+			state->oki->set_bank_base(0x40000 * ((data & 0x800 )>> 11));
 			break;
 
 		case 0x45:
@@ -396,10 +396,6 @@ static MACHINE_START( gcpinbal )
 {
 	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->oki = devtag_get_device(machine, "oki");
-	state->msm = devtag_get_device(machine, "msm");
-
 	state_save_register_global_array(machine, state->scrollx);
 	state_save_register_global_array(machine, state->scrolly);
 	state_save_register_global(machine, state->bg0_gfxset);
@@ -467,8 +463,7 @@ static MACHINE_DRIVER_START( gcpinbal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)

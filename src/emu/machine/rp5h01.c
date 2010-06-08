@@ -44,9 +44,8 @@ struct _rp5h01_state
 INLINE rp5h01_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == RP5H01));
-	return (rp5h01_state *)device->token;
+	assert((device->type() == RP5H01));
+	return (rp5h01_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -174,10 +173,9 @@ static DEVICE_START( rp5h01 )
 {
 	rp5h01_state *rp5h01 = get_safe_token(device);
 
-	assert(device->baseconfig().static_config == NULL);
-	assert(device->baseconfig().inline_config == NULL);
+	assert(device->baseconfig().static_config() == NULL);
 
-	rp5h01->data = *device->region;
+	rp5h01->data = *device->region();
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, rp5h01->counter);
@@ -212,5 +210,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"RP5H01"
 #define DEVTEMPLATE_FAMILY		"RP5H01"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"

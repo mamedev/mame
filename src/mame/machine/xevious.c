@@ -44,18 +44,18 @@ TIMER_DEVICE_CALLBACK( battles_nmi_generate )
 	{
 		if( battles_customio_command_count == 0 )
 		{
-			cputag_set_input_line(timer->machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(timer.machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
 		{
-			cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-			cputag_set_input_line(timer->machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(timer.machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else
 	{
-		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-		cputag_set_input_line(timer->machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer.machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	battles_customio_command_count++;
 }
@@ -89,7 +89,7 @@ READ8_HANDLER( battles_customio3_r )
 
 WRITE8_HANDLER( battles_customio0_w )
 {
-	running_device *timer = devtag_get_device(space->machine, "battles_nmi");
+	timer_device *timer = space->machine->device<timer_device>("battles_nmi");
 
 	logerror("CPU0 %04x: custom I/O Write = %02x\n",cpu_get_pc(space->cpu),data);
 
@@ -99,10 +99,10 @@ WRITE8_HANDLER( battles_customio0_w )
 	switch (data)
 	{
 		case 0x10:
-			timer_device_adjust_oneshot(timer, attotime_never, 0);
+			timer->reset();
 			return; /* nop */
 	}
-	timer_device_adjust_periodic(timer, ATTOTIME_IN_USEC(166), 0, ATTOTIME_IN_USEC(166));
+	timer->adjust(ATTOTIME_IN_USEC(166), 0, ATTOTIME_IN_USEC(166));
 
 }
 
@@ -157,7 +157,7 @@ WRITE8_HANDLER( battles_noise_sound_w )
 {
 	logerror("CPU3 %04x: 50%02x Write = %02x\n",cpu_get_pc(space->cpu),offset,data);
 	if( (battles_sound_played == 0) && (data == 0xFF) ){
-		running_device *samples = devtag_get_device(space->machine, "samples");
+		samples_sound_device *samples = space->machine->device<samples_sound_device>("samples");
 		if( customio[0] == 0x40 ){
 			sample_start (samples, 0, 0, 0);
 		}

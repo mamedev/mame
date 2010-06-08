@@ -87,7 +87,7 @@ enum
 
 /* referenced types from other classes */
 class device_config;
-class running_device;
+class device_t;
 struct game_driver;
 
 
@@ -137,14 +137,14 @@ typedef void	(*write64_space_func)(ATTR_UNUSED const address_space *space, ATTR_
 
 
 /* device read/write handlers */
-typedef UINT8	(*read8_device_func)  (ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset);
-typedef void	(*write8_device_func) (ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
-typedef UINT16	(*read16_device_func) (ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
-typedef void	(*write16_device_func)(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
-typedef UINT32	(*read32_device_func) (ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
-typedef void	(*write32_device_func)(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
-typedef UINT64	(*read64_device_func) (ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
-typedef void	(*write64_device_func)(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+typedef UINT8	(*read8_device_func)  (ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset);
+typedef void	(*write8_device_func) (ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
+typedef UINT16	(*read16_device_func) (ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
+typedef void	(*write16_device_func)(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
+typedef UINT32	(*read32_device_func) (ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
+typedef void	(*write32_device_func)(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT64	(*read64_device_func) (ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
+typedef void	(*write64_device_func)(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
 
 
 /* data_accessors is a struct with accessors of all flavors */
@@ -286,7 +286,7 @@ struct _address_space
 {
 	address_space *			next;				/* next address space in the global list */
 	running_machine *		machine;			/* reference to the owning machine */
-	running_device *		cpu;				/* reference to the owning device */
+	device_t *				cpu;				/* reference to the owning device */
 	const device_config *	devconfig;			/* pointer to the owning device's config */
 	address_map *			map;				/* original memory map */
 	const char *			name;				/* friendly name of the address space */
@@ -341,6 +341,8 @@ union _addrmap8_token
 	write_handler			write;				/* generic write handlers */
 	UINT8 **				memptr;				/* memory pointer */
 	size_t *				sizeptr;			/* size pointer */
+
+	operator const addrmap_token *() const { return reinterpret_cast<const addrmap_token *>(this); }
 };
 
 
@@ -362,6 +364,8 @@ union _addrmap16_token
 	write_handler			write;				/* generic write handlers */
 	UINT16 **				memptr;				/* memory pointer */
 	size_t *				sizeptr;			/* size pointer */
+
+	operator const addrmap_token *() const { return reinterpret_cast<const addrmap_token *>(this); }
 };
 
 
@@ -387,6 +391,8 @@ union _addrmap32_token
 	write_handler			write;				/* generic write handlers */
 	UINT32 **				memptr;				/* memory pointer */
 	size_t *				sizeptr;			/* size pointer */
+
+	operator const addrmap_token *() const { return reinterpret_cast<const addrmap_token *>(this); }
 };
 
 
@@ -416,6 +422,8 @@ union _addrmap64_token
 	write_handler			write;				/* generic write handlers */
 	UINT64 **				memptr;				/* memory pointer */
 	size_t *				sizeptr;			/* size pointer */
+
+	operator const addrmap_token *() const { return reinterpret_cast<const addrmap_token *>(this); }
 };
 
 
@@ -440,14 +448,14 @@ union _addrmap64_token
 
 
 /* device read/write handler function macros */
-#define READ8_DEVICE_HANDLER(name)		UINT8  name(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset)
-#define WRITE8_DEVICE_HANDLER(name) 	void   name(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
-#define READ16_DEVICE_HANDLER(name)		UINT16 name(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
-#define WRITE16_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
-#define READ32_DEVICE_HANDLER(name)		UINT32 name(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
-#define WRITE32_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
-#define READ64_DEVICE_HANDLER(name)		UINT64 name(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
-#define WRITE64_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED running_device *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
+#define READ8_DEVICE_HANDLER(name)		UINT8  name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset)
+#define WRITE8_DEVICE_HANDLER(name) 	void   name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+#define READ16_DEVICE_HANDLER(name)		UINT16 name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
+#define WRITE16_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
+#define READ32_DEVICE_HANDLER(name)		UINT32 name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
+#define WRITE32_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
+#define READ64_DEVICE_HANDLER(name)		UINT64 name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
+#define WRITE64_DEVICE_HANDLER(name)	void   name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
 
 
 /* helper macro for merging data with the memory mask */
@@ -1011,16 +1019,16 @@ UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, 
 UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, const char *rhandler_name, write64_space_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1);
 
 /* install a new 8-bit device memory handler into the given address space, returning a pointer to the memory backing it, if present */
-UINT8 *_memory_install_device_handler8(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rhandler_name, write8_device_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1, 2);
+UINT8 *_memory_install_device_handler8(const address_space *space, device_t *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rhandler_name, write8_device_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1, 2);
 
 /* same as above but explicitly for 16-bit handlers */
-UINT16 *_memory_install_device_handler16(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rhandler_name, write16_device_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1, 2);
+UINT16 *_memory_install_device_handler16(const address_space *space, device_t *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rhandler_name, write16_device_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1, 2);
 
 /* same as above but explicitly for 32-bit handlers */
-UINT32 *_memory_install_device_handler32(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rhandler_name, write32_device_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1, 2);
+UINT32 *_memory_install_device_handler32(const address_space *space, device_t *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rhandler_name, write32_device_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1, 2);
 
 /* same as above but explicitly for 64-bit handlers */
-UINT64 *_memory_install_device_handler64(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rhandler_name, write64_device_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1, 2);
+UINT64 *_memory_install_device_handler64(const address_space *space, device_t *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rhandler_name, write64_device_func whandler, const char *whandler_name, int handlerunitmask) ATTR_NONNULL(1, 2);
 
 /* install a new port into the given address space */
 void _memory_install_port(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);

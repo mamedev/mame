@@ -169,9 +169,9 @@ VIDEO_START( cvs )
 	}
 
 	/* create helper bitmaps */
-	state->background_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->scrolled_collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->background_bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->collision_background = machine->primary_screen->alloc_compatible_bitmap();
+	state->scrolled_collision_background = machine->primary_screen->alloc_compatible_bitmap();
 
 	/* register save */
 	state_save_register_global_bitmap(machine, state->background_bitmap);

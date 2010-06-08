@@ -53,7 +53,7 @@ static TILE_GET_INFO( sprint4_tile_info )
 
 VIDEO_START( sprint4 )
 {
-	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper = machine->primary_screen->alloc_compatible_bitmap();
 
 	playfield = tilemap_create(machine, sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
@@ -114,7 +114,7 @@ VIDEO_EOF( sprint4 )
 		rect.max_x = horz - 15 + machine->gfx[1]->width - 1;
 		rect.max_y = vert - 15 + machine->gfx[1]->height - 1;
 
-		sect_rect(&rect, video_screen_get_visible_area(machine->primary_screen));
+		sect_rect(&rect, &machine->primary_screen->visible_area());
 
 		tilemap_draw(helper, &rect, playfield, 0, 0);
 

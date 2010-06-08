@@ -39,7 +39,7 @@ VIDEO_START(moo)
 {
 	moo_state *state = (moo_state *)machine->driver_data;
 
-	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
+	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
 
 	state->alpha_enabled = 0;
 

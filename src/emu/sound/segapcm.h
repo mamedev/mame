@@ -7,6 +7,8 @@
 #ifndef __SEGAPCM_H__
 #define __SEGAPCM_H__
 
+#include "devlegcy.h"
+
 #define   BANK_256    (11)
 #define   BANK_512    (12)
 #define   BANK_12M    (13)
@@ -23,7 +25,6 @@ struct _sega_pcm_interface
 WRITE8_DEVICE_HANDLER( sega_pcm_w );
 READ8_DEVICE_HANDLER( sega_pcm_r );
 
-DEVICE_GET_INFO( segapcm );
-#define SOUND_SEGAPCM DEVICE_GET_INFO_NAME( segapcm )
+DECLARE_LEGACY_SOUND_DEVICE(SEGAPCM, segapcm);
 
 #endif /* __SEGAPCM_H__ */

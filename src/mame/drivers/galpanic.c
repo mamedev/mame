@@ -909,8 +909,7 @@ static MACHINE_DRIVER_START( galpanic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/6) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -928,7 +927,8 @@ static MACHINE_DRIVER_START( comad )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galpanic)
-	MDRV_CPU_REPLACE("maincpu", M68000, 10000000)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(10000000)
 	MDRV_CPU_PROGRAM_MAP(comad_map)
 
 	MDRV_DEVICE_REMOVE("pandora")
@@ -942,7 +942,8 @@ static MACHINE_DRIVER_START( supmodel )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(supmodel_map)
 	MDRV_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
@@ -951,8 +952,7 @@ static MACHINE_DRIVER_START( supmodel )
 	MDRV_VIDEO_EOF(0)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("oki", OKIM6295, 1584000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_REPLACE("oki", 1584000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -961,7 +961,8 @@ static MACHINE_DRIVER_START( fantsia2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(fantsia2_map)
 
 	/* video hardware */
@@ -973,7 +974,8 @@ static MACHINE_DRIVER_START( galhustl )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(galhustl_map)
 	MDRV_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
@@ -982,8 +984,7 @@ static MACHINE_DRIVER_START( galhustl )
 	MDRV_VIDEO_EOF(0)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -991,7 +992,8 @@ static MACHINE_DRIVER_START( zipzap )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
-	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(zipzap_map)
 	MDRV_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
@@ -999,8 +1001,7 @@ static MACHINE_DRIVER_START( zipzap )
 	MDRV_VIDEO_UPDATE(comad)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

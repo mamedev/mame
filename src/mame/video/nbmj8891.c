@@ -296,8 +296,8 @@ void nbmj8891_vramflip(running_machine *machine, int vram)
 	UINT8 color1, color2;
 	UINT8 *vidram;
 
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	if (nbmj8891_flipscreen == nbmj8891_flipscreen_old) return;
 
@@ -321,13 +321,13 @@ void nbmj8891_vramflip(running_machine *machine, int vram)
 
 static void update_pixel0(running_machine *machine, int x, int y)
 {
-	UINT8 color = nbmj8891_videoram0[(y * video_screen_get_width(machine->primary_screen)) + x];
+	UINT8 color = nbmj8891_videoram0[(y * machine->primary_screen->width()) + x];
 	*BITMAP_ADDR16(nbmj8891_tmpbitmap0, y, x) = color;
 }
 
 static void update_pixel1(running_machine *machine, int x, int y)
 {
-	UINT8 color = nbmj8891_videoram1[(y * video_screen_get_width(machine->primary_screen)) + x];
+	UINT8 color = nbmj8891_videoram1[(y * machine->primary_screen->width()) + x];
 	*BITMAP_ADDR16(nbmj8891_tmpbitmap1, y, x) = (color == 0x7f) ? 0xff : color;
 }
 
@@ -339,7 +339,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void nbmj8891_gfxdraw(running_machine *machine)
 {
 	UINT8 *GFX = memory_region(machine, "gfx1");
-	int width = video_screen_get_width(machine->primary_screen);
+	int width = machine->primary_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy1, dy2;
@@ -497,10 +497,10 @@ VIDEO_START( nbmj8891_1layer )
 {
 	UINT8 *CLUT = memory_region(machine, "protection");
 	int i;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
-	nbmj8891_tmpbitmap0 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj8891_tmpbitmap0 = machine->primary_screen->alloc_compatible_bitmap();
 	nbmj8891_videoram0 = auto_alloc_array(machine, UINT8, width * height);
 	nbmj8891_palette = auto_alloc_array(machine, UINT8, 0x200);
 	nbmj8891_clut = auto_alloc_array(machine, UINT8, 0x800);
@@ -513,11 +513,11 @@ VIDEO_START( nbmj8891_1layer )
 
 VIDEO_START( nbmj8891_2layer )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
-	nbmj8891_tmpbitmap0 = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj8891_tmpbitmap1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj8891_tmpbitmap0 = machine->primary_screen->alloc_compatible_bitmap();
+	nbmj8891_tmpbitmap1 = machine->primary_screen->alloc_compatible_bitmap();
 	nbmj8891_videoram0 = auto_alloc_array(machine, UINT8, width * height);
 	nbmj8891_videoram1 = auto_alloc_array(machine, UINT8, width * height);
 	nbmj8891_palette = auto_alloc_array(machine, UINT8, 0x200);
@@ -537,8 +537,8 @@ VIDEO_UPDATE( nbmj8891 )
 
 	if (nbmj8891_screen_refresh)
 	{
-		int width = video_screen_get_width(screen);
-		int height = video_screen_get_height(screen);
+		int width = screen->width();
+		int height = screen->height();
 
 		nbmj8891_screen_refresh = 0;
 		for (y = 0; y < height; y++)

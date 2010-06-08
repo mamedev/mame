@@ -61,10 +61,8 @@ struct _t6w28_state
 INLINE t6w28_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_T6W28);
-	return (t6w28_state *)device->token;
+	assert(device->type() == SOUND_T6W28);
+	return (t6w28_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -309,7 +307,7 @@ static void t6w28_set_gain(t6w28_state *R,int gain)
 
 static int t6w28_init(running_device *device, t6w28_state *R)
 {
-	int sample_rate = device->clock/16;
+	int sample_rate = device->clock()/16;
 	int i;
 
 	R->Channel = stream_create(device,0,2,sample_rate,R,t6w28_update);

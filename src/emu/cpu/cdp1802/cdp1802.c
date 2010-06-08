@@ -45,6 +45,7 @@ struct _cdp1802_state
 	UINT8 t;				/* temporary register */
 	int ie;					/* interrupt enable */
 	int q;					/* output flip-flop */
+	UINT8 flags;			// used for I/O only
 
 	/* cpu state */
 	cdp1802_cpu_state state;		/* processor state */
@@ -59,70 +60,19 @@ struct _cdp1802_state
 	int ef;					/* external flags */
 
 	/* execution logic */
-	UINT16 fake_pc;			/* fake program counter */
 	int icount;				/* instruction counter */
-
-	cpu_state_table state_table;
 };
 
 /***************************************************************************
     CPU STATE DESCRIPTION
 ***************************************************************************/
 
-#define CDP1802_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(CDP1802_##_name, #_name, _format, cdp1802_state, _member, _datamask, ~0, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	CDP1802_STATE_ENTRY(GENPC, "%04X", fake_pc, 0xffff, CPUSTATE_NOSHOW | CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-
-	CDP1802_STATE_ENTRY(P, "%01X", p, 0xf, 0)
-	CDP1802_STATE_ENTRY(X, "%01X", x, 0xf, 0)
-	CDP1802_STATE_ENTRY(D, "%02X", d, 0xff, 0)
-	CDP1802_STATE_ENTRY(B, "%02X", b, 0xff, 0)
-	CDP1802_STATE_ENTRY(T, "%02X", t, 0xff, 0)
-
-	CDP1802_STATE_ENTRY(I, "%01X", i, 0xf, 0)
-	CDP1802_STATE_ENTRY(N, "%01X", n, 0xf, 0)
-
-	CDP1802_STATE_ENTRY(R0, "%04X", r[0], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R1, "%04X", r[1], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R2, "%04X", r[2], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R3, "%04X", r[3], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R4, "%04X", r[4], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R5, "%04X", r[5], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R6, "%04X", r[6], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R7, "%04X", r[7], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R8, "%04X", r[8], 0xffff, 0)
-	CDP1802_STATE_ENTRY(R9, "%04X", r[9], 0xffff, 0)
-	CDP1802_STATE_ENTRY(Ra, "%04X", r[10], 0xffff, 0)
-	CDP1802_STATE_ENTRY(Rb, "%04X", r[11], 0xffff, 0)
-	CDP1802_STATE_ENTRY(Rc, "%04X", r[12], 0xffff, 0)
-	CDP1802_STATE_ENTRY(Rd, "%04X", r[13], 0xffff, 0)
-	CDP1802_STATE_ENTRY(Re, "%04X", r[14], 0xffff, 0)
-	CDP1802_STATE_ENTRY(Rf, "%04X", r[15], 0xffff, 0)
-
-	CDP1802_STATE_ENTRY(SC, "%1u", state_code, 0x3, CPUSTATE_NOSHOW)
-	CDP1802_STATE_ENTRY(DF, "%1u", df, 0x1, CPUSTATE_NOSHOW)
-	CDP1802_STATE_ENTRY(IE, "%1u", ie, 0x1, CPUSTATE_NOSHOW)
-	CDP1802_STATE_ENTRY(Q, "%1u", q, 0x1, CPUSTATE_NOSHOW)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
-};
-
 INLINE cdp1802_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CDP1802);
-	return (cdp1802_state *)device->token;
+	return (cdp1802_state *)downcast<cpu_device *>(device)->token();
 }
 
 #define OPCODE_R(addr)		memory_decrypted_read_byte(cpustate->program, addr)
@@ -960,12 +910,55 @@ static CPU_RESET( cdp1802 )
 	cpustate->mode = CDP1802_MODE_RESET;
 }
 
+static CPU_IMPORT_STATE( cdp1802 )
+{
+	cdp1802_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			cpustate->df = (cpustate->flags >> 1) & 1;
+			cpustate->ie = (cpustate->flags >> 1) & 1;
+			cpustate->q = (cpustate->flags >> 0) & 1;
+			break;
+	}
+}
+
+static CPU_EXPORT_STATE( cdp1802 )
+{
+	cdp1802_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			cpustate->flags = (cpustate->df ? 0x04 : 0x00) |
+							  (cpustate->ie ? 0x02 : 0x00) |
+							  (cpustate->q ? 0x01 : 0x00);
+			break;
+	}
+}
+
+static CPU_EXPORT_STRING( cdp1802 )
+{
+	cdp1802_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c",
+						 cpustate->df ? 'D' : '.',
+						 cpustate->ie ? 'I' : '.',
+						 cpustate->q ? 'Q' : '.');
+			break;
+	}
+}
+
 static CPU_INIT( cdp1802 )
 {
 	cdp1802_state *cpustate = get_safe_token(device);
 	int i;
 
-	cpustate->intf = (cdp1802_interface *) device->baseconfig().static_config;
+	cpustate->intf = (cdp1802_interface *) device->baseconfig().static_config();
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&cpustate->out_q_func, &cpustate->intf->out_q_func, device);
@@ -973,13 +966,34 @@ static CPU_INIT( cdp1802 )
 	devcb_resolve_write8(&cpustate->out_dma_func, &cpustate->intf->out_dma_func, device);
 
 	/* set up the state table */
-	cpustate->state_table = state_table_template;
-	cpustate->state_table.baseptr = cpustate;
-	cpustate->state_table.subtypemask = 1;
+	{
+		device_state_interface *state;
+		device->interface(state);
+		state->state_add(STATE_GENPC, "GENPC", R[P]).noshow();
+		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->flags).mask(0x7).callimport().callexport().noshow().formatstr("%3s");
+
+		state->state_add(CDP1802_P, "P", cpustate->p).mask(0xf);
+		state->state_add(CDP1802_X, "X", cpustate->x).mask(0xf);
+		state->state_add(CDP1802_D, "D", cpustate->d);
+		state->state_add(CDP1802_B, "B", cpustate->b);
+		state->state_add(CDP1802_T, "T", cpustate->t);
+
+		state->state_add(CDP1802_I, "I", cpustate->i).mask(0xf);
+		state->state_add(CDP1802_N, "N", cpustate->n).mask(0xf);
+
+		astring tempstr;
+		for (int regnum = 0; regnum < 16; regnum++)
+			state->state_add(CDP1802_R0 + regnum, tempstr.format("R%x", regnum), cpustate->r[regnum]);
+
+		state->state_add(CDP1802_SC, "SC", cpustate->state_code).mask(0x3).noshow();
+		state->state_add(CDP1802_DF, "DF", cpustate->df).mask(0x1).noshow();
+		state->state_add(CDP1802_IE, "IE", cpustate->ie).mask(0x1).noshow();
+		state->state_add(CDP1802_Q, "Q", cpustate->q).mask(0x1).noshow();
+	}
 
 	/* find address spaces */
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	/* set initial values */
 	cpustate->p = mame_rand(device->machine) & 0x0f;
@@ -1023,42 +1037,6 @@ static CPU_INIT( cdp1802 )
 }
 
 /**************************************************************************
- * STATE IMPORT/EXPORT
- **************************************************************************/
-
-static CPU_IMPORT_STATE( cdp1802 )
-{
-	cdp1802_state *cpustate = get_safe_token(device);
-
-	switch (entry->index)
-	{
-		case CDP1802_GENPC:
-			R[P] = cpustate->fake_pc;
-			break;
-
-		default:
-			fatalerror("CPU_IMPORT_STATE(cdp1802) called for unexpected value\n");
-			break;
-	}
-}
-
-static CPU_EXPORT_STATE( cdp1802 )
-{
-	cdp1802_state *cpustate = get_safe_token(device);
-
-	switch (entry->index)
-	{
-		case CDP1802_GENPC:
-			cpustate->fake_pc = R[P];
-			break;
-
-		default:
-			fatalerror("CPU_EXPORT_STATE(cdp1802) called for unexpected value\n");
-			break;
-	}
-}
-
-/**************************************************************************
  * Generic set_info
  **************************************************************************/
 
@@ -1080,7 +1058,7 @@ static CPU_SET_INFO( cdp1802 )
 
 CPU_GET_INFO( cdp1802 )
 {
-	cdp1802_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	cdp1802_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1116,12 +1094,12 @@ CPU_GET_INFO( cdp1802 )
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cdp1802);				break;
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cdp1802);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cdp1802);	break;
-		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(cdp1802);break;
-		case CPUINFO_FCT_EXPORT_STATE:					info->export_state = CPU_EXPORT_STATE_NAME(cdp1802);break;
+		case CPUINFO_FCT_IMPORT_STATE: 					info->import_state = CPU_IMPORT_STATE_NAME(cdp1802);	break;
+		case CPUINFO_FCT_EXPORT_STATE: 					info->export_state = CPU_EXPORT_STATE_NAME(cdp1802);	break;
+		case CPUINFO_FCT_EXPORT_STRING: 				info->export_string = CPU_EXPORT_STRING_NAME(cdp1802);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state_table;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "CDP1802");				break;
@@ -1129,11 +1107,5 @@ CPU_GET_INFO( cdp1802 )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-
-		case CPUINFO_STR_FLAGS: sprintf(info->s,
-									"%c%c%c",
-									 cpustate->df ? 'D' : '.',
-									 cpustate->ie ? 'I' : '.',
-									 cpustate->q ? 'Q' : '.'); break;
 	}
 }

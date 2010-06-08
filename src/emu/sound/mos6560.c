@@ -69,7 +69,7 @@ struct _mos6560_state
 {
 	mos6560_type  type;
 
-	running_device *screen;
+	screen_device *screen;
 
 	UINT8 reg[16];
 
@@ -123,20 +123,17 @@ struct _mos6560_state
 INLINE mos6560_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == MOS656X);
+	assert(device->type() == MOS656X);
 
-	return (mos6560_state *)device->token;
+	return (mos6560_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const mos6560_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == MOS656X);
+	assert((device->type() == MOS656X));
 
-	return (const mos6560_interface *) device->baseconfig().static_config;
+	return (const mos6560_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -803,12 +800,12 @@ static void mos6560_sound_start( running_device *device )
 static DEVICE_START( mos6560 )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
-	const mos6560_interface *intf = (mos6560_interface *)device->baseconfig().static_config;
+	const mos6560_interface *intf = (mos6560_interface *)device->baseconfig().static_config();
 	int width, height;
 
-	mos6560->screen = devtag_get_device(device->machine, intf->screen);
-	width = video_screen_get_width(mos6560->screen);
-	height = video_screen_get_height(mos6560->screen);
+	mos6560->screen = downcast<screen_device *>(devtag_get_device(device->machine, intf->screen));
+	width = mos6560->screen->width();
+	height = mos6560->screen->height();
 
 	mos6560->type = intf->type;
 

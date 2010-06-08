@@ -192,7 +192,7 @@ static WRITE8_DEVICE_HANDLER( ay_audio_nmi_enable_w )
 
 static TIMER_DEVICE_CALLBACK( audio_nmi_gen )
 {
-	btime_state *state = (btime_state *)timer->machine->driver_data;
+	btime_state *state = (btime_state *)timer.machine->driver_data;
 	int scanline = param;
 	state->audio_nmi_state = scanline & 8;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
@@ -562,7 +562,7 @@ static READ8_HANDLER( audio_command_r )
 
 static READ8_HANDLER( zoar_dsw1_read )
 {
-	return (!video_screen_get_vblank(space->machine->primary_screen) << 7) | (input_port_read(space->machine, "DSW1") & 0x7f);
+	return (!space->machine->primary_screen->vblank() << 7) | (input_port_read(space->machine, "DSW1") & 0x7f);
 }
 
 static INPUT_PORTS_START( btime )

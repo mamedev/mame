@@ -427,7 +427,7 @@ VIDEO_START( toaplan1 )
 
 READ16_HANDLER( toaplan1_frame_done_r )
 {
-	return video_screen_get_vblank(space->machine->primary_screen);
+	return space->machine->primary_screen->vblank();
 }
 
 WRITE16_HANDLER( toaplan1_tile_offsets_w )
@@ -482,14 +482,14 @@ WRITE16_HANDLER( toaplan1_bcu_flipscreen_w )
 		tilemap_set_flip_all(space->machine, (data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 		if (bcu_flipscreen)
 		{
-			const rectangle *visarea = video_screen_get_visible_area(space->machine->primary_screen);
+			const rectangle &visarea = space->machine->primary_screen->visible_area();
 
 			scrollx_offs1 = 0x151 - 6;
 			scrollx_offs2 = 0x151 - 4;
 			scrollx_offs3 = 0x151 - 2;
 			scrollx_offs4 = 0x151 - 0;
 			scrolly_offs  = 0x1ef;
-			scrolly_offs += ((visarea->max_y + 1) - ((visarea->max_y + 1) - visarea->min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
+			scrolly_offs += ((visarea.max_y + 1) - ((visarea.max_y + 1) - visarea.min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
 		}
 		else
 		{
@@ -1079,11 +1079,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			/****** flip the sprite layer ******/
 			if (fcu_flipscreen)
 			{
-				const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+				const rectangle &visarea = machine->primary_screen->visible_area();
 
-				sx_base = ((visarea->max_x + 1) - visarea->min_x) - (sx_base + 8);	/* visarea.x = 320 */
-				sy_base = ((visarea->max_y + 1) - visarea->min_y) - (sy_base + 8);	/* visarea.y = 240 */
-				sy_base += ((visarea->max_y + 1) - ((visarea->max_y + 1) - visarea->min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
+				sx_base = ((visarea.max_x + 1) - visarea.min_x) - (sx_base + 8);	/* visarea.x = 320 */
+				sy_base = ((visarea.max_y + 1) - visarea.min_y) - (sy_base + 8);	/* visarea.y = 240 */
+				sy_base += ((visarea.max_y + 1) - ((visarea.max_y + 1) - visarea.min_y)) * 2;	/* Horizontal games are offset so adjust by +0x20 */
 			}
 
 			for (dim_y = 0; dim_y < sprite_sizey; dim_y += 8)

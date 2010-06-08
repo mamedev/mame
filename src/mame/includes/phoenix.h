@@ -1,3 +1,4 @@
+#include "devlegcy.h"
 #include "devcb.h"
 #include "sound/discrete.h"
 
@@ -24,8 +25,7 @@ DISCRETE_SOUND_EXTERN( phoenix );
 WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w );
 WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w );
 
-DEVICE_GET_INFO( phoenix_sound );
-#define SOUND_PHOENIX DEVICE_GET_INFO_NAME(phoenix_sound)
+DECLARE_LEGACY_SOUND_DEVICE(PHOENIX, phoenix_sound);
 
 /*----------- defined in audio/pleiads.c -----------*/
 
@@ -33,14 +33,9 @@ WRITE8_HANDLER( pleiads_sound_control_a_w );
 WRITE8_HANDLER( pleiads_sound_control_b_w );
 WRITE8_HANDLER( pleiads_sound_control_c_w );
 
-DEVICE_GET_INFO( pleiads_sound );
-#define SOUND_PLEIADS DEVICE_GET_INFO_NAME(pleiads_sound)
-
-DEVICE_GET_INFO( naughtyb_sound );
-#define SOUND_NAUGHTYB DEVICE_GET_INFO_NAME(naughtyb_sound)
-
-DEVICE_GET_INFO( popflame_sound );
-#define SOUND_POPFLAME DEVICE_GET_INFO_NAME(popflame_sound)
+DECLARE_LEGACY_SOUND_DEVICE(PLEIADS, pleiads_sound);
+DECLARE_LEGACY_SOUND_DEVICE(NAUGHTYB, naughtyb_sound);
+DECLARE_LEGACY_SOUND_DEVICE(POPFLAME, popflame_sound);
 
 /*----------- defined in video/naughtyb.c -----------*/
 

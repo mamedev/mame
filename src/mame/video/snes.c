@@ -1814,8 +1814,8 @@ void snes_latch_counters( running_machine *machine )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
 
-	snes_ppu.beam.current_horz = video_screen_get_hpos(machine->primary_screen) / state->htmult;
-	snes_ppu.beam.latch_vert = video_screen_get_vpos(machine->primary_screen);
+	snes_ppu.beam.current_horz = machine->primary_screen->hpos() / state->htmult;
+	snes_ppu.beam.latch_vert = machine->primary_screen->vpos();
 	snes_ppu.beam.latch_horz = snes_ppu.beam.current_horz;
 	snes_ram[STAT78] |= 0x40;	// indicate we latched
 //  state->read_ophct = state->read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
@@ -1826,7 +1826,7 @@ void snes_latch_counters( running_machine *machine )
 static void snes_dynamic_res_change( running_machine *machine )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	rectangle visarea = machine->primary_screen->visible_area();
 	attoseconds_t refresh;
 
 	visarea.min_x = visarea.min_y = 0;
@@ -1846,9 +1846,9 @@ static void snes_dynamic_res_change( running_machine *machine )
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
 
 	if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
-		video_screen_configure(machine->primary_screen, SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * snes_ppu.interlace, &visarea, refresh);
+		machine->primary_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * snes_ppu.interlace, visarea, refresh);
 	else
-		video_screen_configure(machine->primary_screen, SNES_HTOTAL * 2, SNES_VTOTAL_PAL * snes_ppu.interlace, &visarea, refresh);
+		machine->primary_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * snes_ppu.interlace, visarea, refresh);
 }
 
 /*************************************************
@@ -1891,8 +1891,8 @@ static READ8_HANDLER( snes_vram_read )
 		res = snes_vram[offset];
 	else
 	{
-		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
-		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
+		UINT16 v = space->machine->primary_screen->vpos();
+		UINT16 h = space->machine->primary_screen->hpos();
 		UINT16 ls = (((snes_ram[STAT78] & 0x10) == SNES_NTSC ? 525 : 625) >> 1) - 1;
 
 		if (snes_ppu.interlace == 2)
@@ -1923,8 +1923,8 @@ static WRITE8_HANDLER( snes_vram_write )
 		snes_vram[offset] = data;
 	else
 	{
-		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
-		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
+		UINT16 v = space->machine->primary_screen->vpos();
+		UINT16 h = space->machine->primary_screen->hpos();
 		if (v == 0)
 		{
 			if (h <= 4)
@@ -1986,7 +1986,7 @@ static READ8_HANDLER( snes_oam_read )
 
 	if (!snes_ppu.screen_disabled)
 	{
-		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
+		UINT16 v = space->machine->primary_screen->vpos();
 
 		if (v < snes_ppu.beam.last_visible_line)
 			offset = 0x010c;
@@ -2004,7 +2004,7 @@ static WRITE8_HANDLER( snes_oam_write )
 
 	if (!snes_ppu.screen_disabled)
 	{
-		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
+		UINT16 v = space->machine->primary_screen->vpos();
 
 		if (v < snes_ppu.beam.last_visible_line)
 			offset = 0x010c;
@@ -2045,8 +2045,8 @@ static READ8_HANDLER( snes_cgram_read )
 #if 0
 	if (!snes_ppu.screen_disabled)
 	{
-		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
-		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
+		UINT16 v = space->machine->primary_screen->vpos();
+		UINT16 h = space->machine->primary_screen->hpos();
 
 		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;
@@ -2073,8 +2073,8 @@ static WRITE8_HANDLER( snes_cgram_write )
 	// writes to the cgram address
 	if (!snes_ppu.screen_disabled)
 	{
-		UINT16 v = video_screen_get_vpos(space->machine->primary_screen);
-		UINT16 h = video_screen_get_hpos(space->machine->primary_screen);
+		UINT16 v = space->machine->primary_screen->vpos();
+		UINT16 h = space->machine->primary_screen->hpos();
 
 		if (v < snes_ppu.beam.last_visible_line && h >= 128 && h < 1096)
 			offset = 0x1ff;

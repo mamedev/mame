@@ -59,7 +59,7 @@ static VIDEO_UPDATE( tgtpanic )
 
 static WRITE8_HANDLER( color_w )
 {
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	color = data;
 }
 

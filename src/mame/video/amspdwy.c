@@ -108,8 +108,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
 	UINT8 *spriteram = state->spriteram;
 	int i;
-	int max_x = video_screen_get_width(machine->primary_screen)  - 1;
-	int max_y = video_screen_get_height(machine->primary_screen) - 1;
+	int max_x = machine->primary_screen->width()  - 1;
+	int max_y = machine->primary_screen->height() - 1;
 
 	for (i = 0; i < state->spriteram_size ; i += 4)
 	{

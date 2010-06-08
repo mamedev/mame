@@ -445,7 +445,7 @@ static INTERRUPT_GEN( generate_int1 )
 {
 	/* signal the NMI */
 	itech32_update_interrupts(device->machine, 1, -1, -1);
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(device->machine->primary_screen));
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", device->machine->primary_screen->vpos());
 }
 
 
@@ -524,7 +524,7 @@ static READ32_HANDLER( trackball32_4bit_r )
 	static attotime lasttime;
 	attotime curtime = timer_get_time(space->machine);
 
-	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(space->machine->primary_screen)) > 0)
+	if (attotime_compare(attotime_sub(curtime, lasttime), space->machine->primary_screen->scan_period()) > 0)
 	{
 		int upper, lower;
 		int dx, dy;
@@ -563,7 +563,7 @@ static READ32_HANDLER( trackball32_4bit_p2_r )
 	static attotime lasttime;
 	attotime curtime = timer_get_time(space->machine);
 
-	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(space->machine->primary_screen)) > 0)
+	if (attotime_compare(attotime_sub(curtime, lasttime), space->machine->primary_screen->scan_period()) > 0)
 	{
 		int upper, lower;
 		int dx, dy;
@@ -1786,7 +1786,6 @@ static MACHINE_DRIVER_START( drivedge )
 
 	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_map)
-	MDRV_CPU_VBLANK_INT_HACK(NULL,0)
 
 	MDRV_CPU_ADD("dsp1", TMS32031, TMS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_tms1_map)
@@ -1808,6 +1807,7 @@ static MACHINE_DRIVER_START( sftm )
 
 	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(itech020_map)
+	MDRV_CPU_VBLANK_INT("screen", generate_int1)
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(sound_020_map)

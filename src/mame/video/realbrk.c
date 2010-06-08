@@ -162,8 +162,8 @@ VIDEO_START(realbrk)
 	tilemap_set_transparent_pen(tilemap_1,0);
 	tilemap_set_transparent_pen(tilemap_2,0);
 
-	tmpbitmap0 = auto_bitmap_alloc(machine,32,32, video_screen_get_format(machine->primary_screen));
-	tmpbitmap1 = auto_bitmap_alloc(machine,32,32, video_screen_get_format(machine->primary_screen));
+	tmpbitmap0 = auto_bitmap_alloc(machine,32,32, machine->primary_screen->format());
+	tmpbitmap1 = auto_bitmap_alloc(machine,32,32, machine->primary_screen->format());
 }
 
 /***************************************************************************
@@ -216,8 +216,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
-	int max_x = video_screen_get_width(machine->primary_screen);
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_x = machine->primary_screen->width();
+	int max_y = machine->primary_screen->height();
 
 	rectangle spritetile_clip;
 	spritetile_clip.min_x = 0;
@@ -382,8 +382,8 @@ static void dai2kaku_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
-	int max_x = video_screen_get_width(machine->primary_screen);
-	int max_y = video_screen_get_height(machine->primary_screen);
+	int max_x = machine->primary_screen->width();
+	int max_y = machine->primary_screen->height();
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{

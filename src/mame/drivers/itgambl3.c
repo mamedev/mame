@@ -102,7 +102,7 @@ static VIDEO_UPDATE( itgambl3 )
 
 			color = (blit_ram[count] & 0xff)>>0;
 
-			if((x)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+			if((x)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x) = screen->machine->pens[color];
 
 			count++;
@@ -259,8 +259,7 @@ static MACHINE_DRIVER_START( itgambl3 )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, MAIN_CLOCK/16)	/* 1MHz */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", MAIN_CLOCK/16, OKIM6295_PIN7_HIGH)	/* 1MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

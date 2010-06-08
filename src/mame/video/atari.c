@@ -755,7 +755,7 @@ VIDEO_START( atari )
 	LOG(("atari prio_init\n"));
     prio_init();
 
-	for( i = 0; i < video_screen_get_height(machine->primary_screen); i++ )
+	for( i = 0; i < machine->primary_screen->height(); i++ )
     {
 		antic.video[i] = auto_alloc_clear(machine, VIDEO);
     }
@@ -946,7 +946,7 @@ static void antic_linerefresh(running_machine *machine)
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
 
 	/* increment the scanline */
-    if( ++antic.scanline == video_screen_get_height(machine->primary_screen) )
+    if( ++antic.scanline == machine->primary_screen->height() )
     {
         /* and return to the top if the frame was complete */
         antic.scanline = 0;
@@ -1048,12 +1048,12 @@ static void antic_linerefresh(running_machine *machine)
 
 static int cycle(running_machine *machine)
 {
-	return video_screen_get_hpos(machine->primary_screen) * CYCLES_PER_LINE / video_screen_get_width(machine->primary_screen);
+	return machine->primary_screen->hpos() * CYCLES_PER_LINE / machine->primary_screen->width();
 }
 
 static void after(running_machine *machine, int cycles, timer_fired_func function, const char *funcname)
 {
-    attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(machine->primary_screen)) * cycles / CYCLES_PER_LINE);
+    attotime duration = attotime_make(0, attotime_to_attoseconds(machine->primary_screen->scan_period()) * cycles / CYCLES_PER_LINE);
     (void)funcname;
 	LOG(("           after %3d (%5.1f us) %s\n", cycles, attotime_to_double(duration) * 1.0e6, funcname));
 	timer_set(machine, duration, NULL, 0, function);
@@ -1354,7 +1354,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
                         /* produce empty scanlines until vblank start */
 						antic.modelines = VBL_START + 1 - antic.scanline;
 						if( antic.modelines < 0 )
-							antic.modelines = video_screen_get_height(machine->primary_screen) - antic.scanline;
+							antic.modelines = machine->primary_screen->height() - antic.scanline;
 						LOG(("           JVB $%04x\n", antic.dpage|antic.doffs));
 					}
 					else
@@ -1521,7 +1521,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 		handle_keyboard(machine);
 
 		/* do nothing new for the rest of the frame */
-		antic.modelines = video_screen_get_height(machine->primary_screen) - VBL_START;
+		antic.modelines = machine->primary_screen->height() - VBL_START;
 		antic.renderer = antic_mode_0_xx;
 
 		/* if the CPU want's to be interrupted at vertical blank... */

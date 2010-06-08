@@ -69,10 +69,9 @@ struct _ttl7474_state
 INLINE ttl7474_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TTL7474);
+	assert(device->type() == TTL7474);
 
-	return (ttl7474_state *)device->token;
+	return (ttl7474_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -163,7 +162,7 @@ READ_LINE_DEVICE_HANDLER( ttl7474_output_comp_r )
 
 static DEVICE_START( ttl7474 )
 {
-	ttl7474_config *config = (ttl7474_config *)device->baseconfig().inline_config;
+	ttl7474_config *config = (ttl7474_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	ttl7474_state *state = get_safe_token(device);
 
 	devcb_resolve_write_line(&state->output_cb, &config->output_cb, device);

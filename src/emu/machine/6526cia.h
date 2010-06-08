@@ -39,9 +39,9 @@
     MACROS
 ***************************************************************************/
 
-#define MOS6526R1		DEVICE_GET_INFO_NAME(cia6526r1)
-#define MOS6526R2		DEVICE_GET_INFO_NAME(cia6526r2)
-#define MOS8520			DEVICE_GET_INFO_NAME(cia8520)
+DECLARE_LEGACY_DEVICE(MOS6526R1, cia6526r1);
+DECLARE_LEGACY_DEVICE(MOS6526R2, cia6526r2);
+DECLARE_LEGACY_DEVICE(MOS8520, cia8520);
 
 #define MDRV_MOS6526R1_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, MOS6526R1, _clock) \
@@ -85,10 +85,6 @@ struct _mos6526_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(cia6526r1);
-DEVICE_GET_INFO(cia6526r2);
-DEVICE_GET_INFO(cia8520);
 
 /* register access */
 READ8_DEVICE_HANDLER( mos6526_r );

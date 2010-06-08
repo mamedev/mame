@@ -9,6 +9,8 @@
 #ifndef __SMC91C9X__
 #define __SMC91C9X__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -49,10 +51,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w );
 
 /* ----- device interface ----- */
 
-/* device get info callbacks */
-#define SMC91C94 DEVICE_GET_INFO_NAME(smc91c94)
-#define SMC91C96 DEVICE_GET_INFO_NAME(smc91c96)
-DEVICE_GET_INFO( smc91c94 );
-DEVICE_GET_INFO( smc91c96 );
+DECLARE_LEGACY_DEVICE(SMC91C94, smc91c94);
+DECLARE_LEGACY_DEVICE(SMC91C96, smc91c96);
 
 #endif

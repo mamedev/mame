@@ -114,7 +114,7 @@ static VIDEO_UPDATE( itgambl2 )
 
 			color = (blit_ram[count] & 0xff)>>0;
 
-			if((x)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+			if((x)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x) = screen->machine->pens[color];
 
 			count++;

@@ -136,14 +136,14 @@ VIDEO_UPDATE( flkatck )
 {
 	flkatck_state *state = (flkatck_state *)screen->machine->driver_data;
 	rectangle clip[2];
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 
 	if (state->flipscreen)
 	{
-		clip[0] = *visarea;
+		clip[0] = visarea;
 		clip[0].max_x -= 40;
 
-		clip[1] = *visarea;
+		clip[1] = visarea;
 		clip[1].min_x = clip[1].max_x - 40;
 
 		tilemap_set_scrollx(state->k007121_tilemap[0], 0, k007121_ctrlram_r(state->k007121, 0) - 56 );
@@ -152,10 +152,10 @@ VIDEO_UPDATE( flkatck )
 	}
 	else
 	{
-		clip[0] = *visarea;
+		clip[0] = visarea;
 		clip[0].min_x += 40;
 
-		clip[1] = *visarea;
+		clip[1] = visarea;
 		clip[1].max_x = 39;
 		clip[1].min_x = 0;
 

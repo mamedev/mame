@@ -57,7 +57,7 @@ struct _i80286_state
 		UINT16 limit;
 		UINT8 rights;
 	} ldtr, tr;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
@@ -84,10 +84,9 @@ struct _i80286_state
 INLINE i80286_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I80286);
-	return (i80286_state *)device->token;
+	return (i80286_state *)downcast<cpu_device *>(device)->token();
 }
 
 #define INT_IRQ 0x01
@@ -294,12 +293,12 @@ static CPU_INIT( i80286 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	/* If a reset parameter is given, take it as pointer to an address mask */
-	if( device->baseconfig().static_config )
-		cpustate->amask = *(unsigned*)device->baseconfig().static_config;
+	if( device->baseconfig().static_config() )
+		cpustate->amask = *(unsigned*)device->baseconfig().static_config();
 	else
 		cpustate->amask = 0x00ffff;
 
@@ -389,7 +388,7 @@ static CPU_SET_INFO( i80286 )
 
 CPU_GET_INFO( i80286 )
 {
-	i80286_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i80286_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

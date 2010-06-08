@@ -8,6 +8,8 @@
 #ifndef __MB87078_H__
 #define __MB87078_H__
 
+#include "devlegcy.h"
+
 
 
 /***************************************************************************
@@ -22,17 +24,11 @@ struct _mb87078_interface
 	mb87078_gain_changed_cb   gain_changed_cb;
 };
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( mb87078 );
+DECLARE_LEGACY_DEVICE(MB87078, mb87078);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define MB87078 DEVICE_GET_INFO_NAME( mb87078 )
 
 #define MDRV_MB87078_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, MB87078, 0) \

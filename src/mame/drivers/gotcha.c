@@ -89,7 +89,8 @@ static WRITE16_DEVICE_HANDLER( gotcha_oki_bank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		okim6295_set_bank_base(device,(((~data & 0x0100) >> 8) * 0x40000));
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base((((~data & 0x0100) >> 8) * 0x40000));
 	}
 }
 
@@ -311,8 +312,7 @@ static MACHINE_DRIVER_START( gotcha )
 	MDRV_SOUND_ROUTE(0, "mono", 0.80)
 	MDRV_SOUND_ROUTE(1, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

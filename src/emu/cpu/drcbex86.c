@@ -631,7 +631,7 @@ static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, runnin
 
 	/* get address spaces */
 	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-		drcbe->space[spacenum] = device->space(spacenum);
+		drcbe->space[spacenum] = device_memory(device)->space(spacenum);
 
 	/* allocate hash tables */
 	drcbe->hash = drchash_alloc(cache, modes, addrbits, ignorebits);

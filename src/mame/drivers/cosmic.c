@@ -391,7 +391,7 @@ static READ8_HANDLER( cosmica_pixel_clock_r )
 static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (input_port_read(space->machine, "IN0") & 0xf0) | ((video_screen_get_vpos(space->machine->primary_screen) & 0xf0) >> 4);
+	return (input_port_read(space->machine, "IN0") & 0xf0) | ((space->machine->primary_screen->vpos() & 0xf0) >> 4);
 }
 
 static READ8_HANDLER( magspot_coinage_dip_r )

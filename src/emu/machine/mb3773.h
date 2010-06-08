@@ -9,12 +9,14 @@
 #ifndef __MB3773_H__
 #define __MB3773_H__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MB3773		DEVICE_GET_INFO_NAME(mb3773)
+DECLARE_LEGACY_DEVICE(MB3773, mb3773);
 
 #define MDRV_MB3773_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, MB3773, 0)
@@ -23,9 +25,6 @@
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( mb3773 );
 
 extern WRITE8_DEVICE_HANDLER( mb3773_set_ck );
 

@@ -120,7 +120,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	snes_state *state = (snes_state *)machine->driver_data;
 
 	/* Increase current line - we want to latch on this line during it, not after it */
-	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
+	snes_ppu.beam.current_vert = machine->primary_screen->vpos();
 
 	// not in hblank
 	snes_ram[HVBJOY] &= ~0x40;
@@ -160,7 +160,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			}
 			else
 			{
-				timer_adjust_oneshot(state->hirq_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, pixel * state->htmult), 0);
+				timer_adjust_oneshot(state->hirq_timer, machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, pixel * state->htmult), 0);
 			}
 		}
 	}
@@ -168,7 +168,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Start of VBlank */
 	if (snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line)
 	{
-		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, 10), NULL, 0, snes_reset_oam_address);
+		timer_set(machine, machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, 10), NULL, 0, snes_reset_oam_address);
 
 		snes_ram[HVBJOY] |= 0x81;		/* Set vblank bit to on & indicate controllers being read */
 		snes_ram[RDNMI] |= 0x80;		/* Set NMI occured bit */
@@ -180,7 +180,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		}
 
 		/* three lines after start of vblank we update the controllers (value from snes9x) */
-		timer_adjust_oneshot(state->io_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert + 2, state->hblank_offset * state->htmult), 0);
+		timer_adjust_oneshot(state->io_timer, machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert + 2, state->hblank_offset * state->htmult), 0);
 	}
 
 	// hdma reset happens at scanline 0, H=~6
@@ -201,7 +201,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	}
 
 	timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
-	timer_adjust_oneshot(state->hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, state->hblank_offset * state->htmult), 0);
+	timer_adjust_oneshot(state->hblank_timer, machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, state->hblank_offset * state->htmult), 0);
 
 //  printf("%02x %d\n",snes_ram[HVBJOY],snes_ppu.beam.current_vert);
 }
@@ -213,7 +213,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	int nextscan;
 
-	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
+	snes_ppu.beam.current_vert = machine->primary_screen->vpos();
 
 	/* make sure we halt */
 	timer_adjust_oneshot(state->hblank_timer, attotime_never, 0);
@@ -221,13 +221,13 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	/* draw a scanline */
 	if (snes_ppu.beam.current_vert <= snes_ppu.beam.last_visible_line)
 	{
-		if (video_screen_get_vpos(machine->primary_screen) > 0)
+		if (machine->primary_screen->vpos() > 0)
 		{
 			/* Do HDMA */
 			if (snes_ram[HDMAEN])
 				snes_hdma(cpu0space);
 
-			video_screen_update_partial(machine->primary_screen, (snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert * snes_ppu.interlace) : snes_ppu.beam.current_vert - 1);
+			machine->primary_screen->update_partial((snes_ppu.interlace == 2) ? (snes_ppu.beam.current_vert * snes_ppu.interlace) : snes_ppu.beam.current_vert - 1);
 		}
 	}
 
@@ -241,7 +241,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		nextscan = 0;
 	}
 
-	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, nextscan, 0), 0);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(nextscan), 0);
 }
 
 /* FIXME: multiplication should take 8 CPU cycles & division 16 CPU cycles, but
@@ -504,7 +504,7 @@ READ8_HANDLER( snes_r_io )
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
-//          if (video_screen_get_hpos(space->machine->primary_screen) >= 363) snes_ram[offset] |= 0x40;
+//          if (space->machine->primary_screen->hpos() >= 363) snes_ram[offset] |= 0x40;
 //              else snes_ram[offset] &= ~0x40;
 			return (snes_ram[offset] & 0xc1) | (snes_open_bus_r(space, 0) & 0x3e);
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */
@@ -722,7 +722,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case HDMAEN:	/* HDMA channel designation */
 			if (data) //if a HDMA is enabled, data is inited at the next scanline
-				timer_set(space->machine, video_screen_get_time_until_pos(space->machine->primary_screen, snes_ppu.beam.current_vert + 1, 0), NULL, 0, snes_reset_hdma);
+				timer_set(space->machine, space->machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), NULL, 0, snes_reset_hdma);
 			break;
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
@@ -1598,7 +1598,7 @@ static void snes_init_timers( running_machine *machine )
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
 	state->hblank_offset = 268;
-	timer_adjust_oneshot(state->hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, state->hblank_offset), 0);
+	timer_adjust_oneshot(state->hblank_timer, machine->primary_screen->time_until_pos(((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, state->hblank_offset), 0);
 }
 
 static void snes_init_ram( running_machine *machine )
@@ -1670,7 +1670,7 @@ static void snes_init_ram( running_machine *machine )
 	}
 
 	// init frame counter so first line is 0
-	if (ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds) >= 59)
+	if (ATTOSECONDS_TO_HZ(machine->primary_screen->frame_period().attoseconds) >= 59)
 		snes_ppu.beam.current_vert = SNES_VTOTAL_NTSC;
 	else
 		snes_ppu.beam.current_vert = SNES_VTOTAL_PAL;
@@ -1816,9 +1816,9 @@ MACHINE_RESET( snes )
 	}
 
 	/* Set STAT78 to NTSC or PAL */
-	if (ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds) >= 59.0f)
+	if (ATTOSECONDS_TO_HZ(machine->primary_screen->frame_period().attoseconds) >= 59.0f)
 		snes_ram[STAT78] = SNES_NTSC;
-	else /* if (ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds) == 50.0f) */
+	else /* if (ATTOSECONDS_TO_HZ(machine->primary_screen->frame_period().attoseconds) == 50.0f) */
 		snes_ram[STAT78] = SNES_PAL;
 
 	// reset does this to these registers

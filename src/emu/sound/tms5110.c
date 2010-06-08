@@ -198,24 +198,21 @@ struct _tmsprom_state
 INLINE tms5110_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_TMS5110 ||
-		   sound_get_type(device) == SOUND_TMS5100 ||
-		   sound_get_type(device) == SOUND_TMS5110A ||
-		   sound_get_type(device) == SOUND_CD2801 ||
-		   sound_get_type(device) == SOUND_TMC0281 ||
-		   sound_get_type(device) == SOUND_CD2802 ||
-		   sound_get_type(device) == SOUND_M58817);
-	return (tms5110_state *)device->token;
+	assert(device->type() == SOUND_TMS5110 ||
+		   device->type() == SOUND_TMS5100 ||
+		   device->type() == SOUND_TMS5110A ||
+		   device->type() == SOUND_CD2801 ||
+		   device->type() == SOUND_TMC0281 ||
+		   device->type() == SOUND_CD2802 ||
+		   device->type() == SOUND_M58817);
+	return (tms5110_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE tmsprom_state *get_safe_token_prom(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TMSPROM);
-	return (tmsprom_state *)device->token;
+	assert(device->type() == TMSPROM);
+	return (tmsprom_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* Static function prototypes */
@@ -1019,10 +1016,10 @@ static DEVICE_START( tms5110 )
 
 	assert_always(tms != NULL, "Error creating TMS5110 chip");
 
-	assert_always(device->baseconfig().static_config != NULL, "No config");
+	assert_always(device->baseconfig().static_config() != NULL, "No config");
 
-	tms->intf = device->baseconfig().static_config ? (const tms5110_interface *)device->baseconfig().static_config : &dummy;
-	tms->table = *device->region;
+	tms->intf = device->baseconfig().static_config() ? (const tms5110_interface *)device->baseconfig().static_config() : &dummy;
+	tms->table = *device->region();
 
 	tms->device = device;
 	tms5110_set_variant(tms, TMS5110_IS_5110A);
@@ -1035,7 +1032,7 @@ static DEVICE_START( tms5110 )
 	devcb_resolve_read_line(&tms->data_func, &tms->intf->data_func, device);
 
 	/* initialize a stream */
-	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5110_update);
+	tms->stream = stream_create(device, 0, 1, device->clock() / 80, tms, tms5110_update);
 
 	if (tms->table == NULL)
 	{
@@ -1243,7 +1240,7 @@ READ8_DEVICE_HANDLER( tms5110_romclk_hack_r )
     if (!tms->romclk_hack_timer_started)
     {
     	tms->romclk_hack_timer_started = TRUE;
-		timer_adjust_periodic(tms->romclk_hack_timer, ATTOTIME_IN_HZ(device->clock / 40), 0, ATTOTIME_IN_HZ(device->clock / 40));
+		timer_adjust_periodic(tms->romclk_hack_timer, ATTOTIME_IN_HZ(device->clock() / 40), 0, ATTOTIME_IN_HZ(device->clock() / 40));
 	}
     return tms->romclk_hack_state;
 }
@@ -1410,20 +1407,20 @@ static DEVICE_START( tmsprom )
 
 	assert_always(tms != NULL, "Error creating TMSPROM chip");
 
-	tms->intf = (const tmsprom_interface *) device->baseconfig().static_config;
+	tms->intf = (const tmsprom_interface *) device->baseconfig().static_config();
 	assert_always(tms->intf != NULL, "Error creating TMSPROM chip: No configuration");
 
 	/* resolve lines */
 	devcb_resolve_write_line(&tms->pdc_func, &tms->intf->pdc_func, device);
 	devcb_resolve_write8(&tms->ctl_func, &tms->intf->ctl_func, device);
 
-	tms->rom = *device->region;
+	tms->rom = *device->region();
 	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No rom region found");
 	tms->prom = memory_region(device->machine, tms->intf->prom_region);
 	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No prom region found");
 
 	tms->device = device;
-	tms->clock = device->clock;
+	tms->clock = device->clock();
 
 	tms->romclk_timer = timer_alloc(device->machine, tmsprom_step, device);
 	timer_adjust_periodic(tms->romclk_timer, attotime_zero, 0, ATTOTIME_IN_HZ(tms->clock));

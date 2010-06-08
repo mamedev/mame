@@ -18,16 +18,10 @@
 
 **********************************************************************/
 
-#ifndef __6821NEW_H__
-#define __6821NEW_H__
+#ifndef __6821PIA_H__
+#define __6821PIA_H__
 
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define PIA6821		DEVICE_GET_INFO_NAME(pia6821)
-#define PIA6822		DEVICE_GET_INFO_NAME(pia6822)
+#include "devlegcy.h"
 
 
 /***************************************************************************
@@ -53,13 +47,14 @@ struct _pia6821_interface
 	devcb_write_line irq_b_func;
 };
 
+DECLARE_LEGACY_DEVICE(PIA6821, pia6821);
+DECLARE_LEGACY_DEVICE(PIA6822, pia6822);
+
+
 
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( pia6821 );
-DEVICE_GET_INFO( pia6822 );
 
 READ8_DEVICE_HANDLER( pia6821_r );
 WRITE8_DEVICE_HANDLER( pia6821_w );

@@ -316,16 +316,16 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	}
 
 
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 
 	//debug
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(machine->primary_screen));
+	logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,machine->primary_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
 		scanline = 0;
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -357,7 +357,7 @@ static MACHINE_START( tubep )
 
 static MACHINE_RESET( tubep )
 {
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 
@@ -497,15 +497,15 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	}
 
 
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 
-	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, video_screen_get_vpos(machine->primary_screen));
+	logerror("scanline=%3i scrgetvpos(0)=%3i\n", scanline, machine->primary_screen->vpos());
 
 	scanline++;
 	if (scanline >= 264)
 		scanline = 0;
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -519,7 +519,7 @@ static MACHINE_START( rjammer )
 
 static MACHINE_RESET( rjammer )
 {
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 

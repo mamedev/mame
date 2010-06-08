@@ -393,7 +393,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( rst1_tick )
 {
-	n8080_state *n8080 = (n8080_state *)timer->machine->driver_data;
+	n8080_state *n8080 = (n8080_state *)timer.machine->driver_data;
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
@@ -402,7 +402,7 @@ static TIMER_DEVICE_CALLBACK( rst1_tick )
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
 {
-	n8080_state *n8080 = (n8080_state *)timer->machine->driver_data;
+	n8080_state *n8080 = (n8080_state *)timer.machine->driver_data;
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */

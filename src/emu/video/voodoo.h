@@ -6,6 +6,13 @@
 
 **************************************************************************/
 
+#ifndef __VOODOO_H__
+#define __VOODOO_H__
+
+#pragma once
+
+#include "devlegcy.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -113,6 +120,6 @@ READ32_DEVICE_HANDLER( banshee_rom_r );
 
 /* ----- device interface ----- */
 
-/* device get info callback */
-#define VOODOO_GRAPHICS DEVICE_GET_INFO_NAME(voodoo)
-DEVICE_GET_INFO( voodoo );
+DECLARE_LEGACY_DEVICE(VOODOO_GRAPHICS, voodoo);
+
+#endif

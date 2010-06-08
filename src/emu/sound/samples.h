@@ -3,6 +3,8 @@
 #ifndef __SAMPLES_H__
 #define __SAMPLES_H__
 
+#include "devlegcy.h"
+
 typedef struct _loaded_sample loaded_sample;
 struct _loaded_sample
 {
@@ -42,7 +44,6 @@ int sample_playing(running_device *device,int channel);
 /* drivers as well (e.g. a sound chip emulator needing drum samples) */
 loaded_samples *readsamples(running_machine *machine, const char *const *samplenames, const char *name);
 
-DEVICE_GET_INFO( samples );
-#define SOUND_SAMPLES DEVICE_GET_INFO_NAME( samples )
+DECLARE_LEGACY_SOUND_DEVICE(SAMPLES, samples);
 
 #endif /* __SAMPLES_H__ */

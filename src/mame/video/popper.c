@@ -201,7 +201,7 @@ VIDEO_START( popper )
 	tilemap_set_transmask(state->ol_p0_tilemap,   0, 0x0f, 0x0e);
 	tilemap_set_transmask(state->ol_p0_tilemap,   1, 0x0e, 0x0f);
 
-	state->tilemap_clip = *video_screen_get_visible_area(machine->primary_screen);
+	state->tilemap_clip = machine->primary_screen->visible_area();
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )

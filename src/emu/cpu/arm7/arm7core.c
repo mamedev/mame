@@ -547,12 +547,12 @@ static void arm7_core_reset(running_device *device)
 {
     arm_state *cpustate = get_safe_token(device);
 
-    cpu_irq_callback save_irqcallback = cpustate->irq_callback;
+    device_irq_callback save_irqcallback = cpustate->irq_callback;
 
     memset(cpustate, 0, sizeof(arm_state));
     cpustate->irq_callback = save_irqcallback;
     cpustate->device = device;
-    cpustate->program = device->space(AS_PROGRAM);
+    cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
     /* start up in SVC mode with interrupts disabled. */
     SwitchMode(cpustate, eARM7_MODE_SVC);

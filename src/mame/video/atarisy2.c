@@ -136,7 +136,7 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll >> 6);
@@ -169,13 +169,13 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(space->machine->primary_screen));
+		tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, (newscroll >> 6) - space->machine->primary_screen->vpos());
 	else
-		timer_adjust_oneshot(state->yscroll_reset_timer, video_screen_get_time_until_pos(space->machine->primary_screen, 0, 0), newscroll >> 6);
+		timer_adjust_oneshot(state->yscroll_reset_timer, space->machine->primary_screen->time_until_pos(0), newscroll >> 6);
 
 	/* update the playfield banking */
 	if (state->playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
@@ -285,7 +285,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	{
 		/* force an update if the link of object 0 is about to change */
 		if (offs == 0x0c03)
-			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 		atarimo_0_spriteram_w(space, offs - 0x0c00, data, mem_mask);
 	}
 

@@ -183,28 +183,28 @@ static TIMER_CALLBACK( via_t2_timeout );
 INLINE via6522_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == VIA6522));
-	return (via6522_t *) device->token;
+	assert((device->type() == VIA6522));
+	return (via6522_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE const via6522_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == VIA6522));
-	return (const via6522_interface *) device->baseconfig().static_config;
+	assert((device->type() == VIA6522));
+	return (const via6522_interface *) device->baseconfig().static_config();
 }
 
 
 INLINE attotime v_cycles_to_time(running_device *device, int c)
 {
-	return attotime_mul(ATTOTIME_IN_HZ(device->clock), c);
+	return attotime_mul(ATTOTIME_IN_HZ(device->clock()), c);
 }
 
 
 INLINE UINT32 v_time_to_cycles(running_device *device, attotime t)
 {
-	return attotime_to_double(attotime_mul(t, device->clock));
+	return attotime_to_double(attotime_mul(t, device->clock()));
 }
 
 
@@ -261,8 +261,8 @@ static DEVICE_START( via6522 )
 	v->shift_timer = timer_alloc(device->machine, via_shift_callback, (void *) device);
 
 	/* Default clock is from CPU1 */
-	if (device->clock == 0)
-		device->set_clock(device->machine->firstcpu->clock);
+	if (device->clock() == 0)
+		device->set_unscaled_clock(device->machine->firstcpu->clock());
 
 	/* save state register */
 	state_save_register_device_item(device, 0, v->in_a);
@@ -1167,7 +1167,6 @@ DEVICE_GET_INFO(via6522)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(via6522_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(via6522);	break;

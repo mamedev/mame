@@ -242,7 +242,7 @@ static WRITE16_HANDLER( wwfsstar_irqack_w )
 
 static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 {
-	wwfsstar_state *state = (wwfsstar_state *)timer->machine->driver_data;
+	wwfsstar_state *state = (wwfsstar_state *)timer.machine->driver_data;
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */
@@ -260,15 +260,15 @@ static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cputag_set_input_line(timer->machine, "maincpu", 5, ASSERT_LINE);
+			timer.machine->primary_screen->update_partial(scanline - 1);
+		cputag_set_input_line(timer.machine, "maincpu", 5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 240 */
 	if (scanline == 240)
 	{
-		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cputag_set_input_line(timer->machine, "maincpu", 6, ASSERT_LINE);
+		timer.machine->primary_screen->update_partial(scanline - 1);
+		cputag_set_input_line(timer.machine, "maincpu", 6, ASSERT_LINE);
 	}
 }
 
@@ -458,8 +458,7 @@ static MACHINE_DRIVER_START( wwfsstar )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_DRIVER_END

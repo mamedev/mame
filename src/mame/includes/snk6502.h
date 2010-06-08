@@ -4,6 +4,7 @@
 
 *************************************************************************/
 
+#include "devlegcy.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
@@ -29,8 +30,7 @@ extern WRITE8_HANDLER( vanguard_speech_w );
 extern WRITE8_HANDLER( fantasy_sound_w );
 extern WRITE8_HANDLER( fantasy_speech_w );
 
-DEVICE_GET_INFO( snk6502_sound );
-#define SOUND_snk6502 DEVICE_GET_INFO_NAME(snk6502_sound)
+DECLARE_LEGACY_SOUND_DEVICE(SNK6502, snk6502_sound);
 
 void snk6502_set_music_clock(double clock_time);
 void snk6502_set_music_freq(int freq);

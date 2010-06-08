@@ -32,8 +32,8 @@ WRITE8_HANDLER( fgoal_xpos_w )
 VIDEO_START( fgoal )
 {
 	fgoal_state *state = (fgoal_state *)machine->driver_data;
-	state->fgbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->bgbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->fgbitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->bgbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	state_save_register_global_bitmap(machine, state->fgbitmap);
 	state_save_register_global_bitmap(machine, state->bgbitmap);

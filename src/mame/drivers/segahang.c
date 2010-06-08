@@ -949,11 +949,13 @@ static MACHINE_DRIVER_START( sharrier_base )
 	MDRV_IMPORT_FROM(hangon_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", M68000, MASTER_CLOCK_10MHz)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(MASTER_CLOCK_10MHz)
 	MDRV_CPU_PROGRAM_MAP(sharrier_map)
 	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
-	MDRV_CPU_REPLACE("sub", M68000, MASTER_CLOCK_10MHz)
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_CLOCK(MASTER_CLOCK_10MHz)
 
 	/* video hardware */
 	MDRV_VIDEO_START(sharrier)
@@ -1068,8 +1070,10 @@ static MACHINE_DRIVER_START( shangupb )
 	MDRV_IMPORT_FROM(sound_board_2151)
 
 	/* not sure about these speeds, but at 6MHz, the road is not updated fast enough */
-	MDRV_CPU_REPLACE("maincpu", M68000, 10000000)
-	MDRV_CPU_REPLACE("sub", M68000, 10000000)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(10000000)
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_CLOCK(10000000)
 
 	MDRV_SEGA16SP_ADD_HANGON("segaspr1")
 MACHINE_DRIVER_END

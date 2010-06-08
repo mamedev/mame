@@ -274,8 +274,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	UINT8 *TILES = memory_region(machine, "spritelut");	// Sprites LUT
 	int TILES_LEN = memory_region_length(machine, "spritelut");
 
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	/* Exit if sprites are disabled */
 	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)	return;
@@ -396,8 +396,8 @@ static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, co
 	UINT8 *TILES = memory_region(machine, "spritelut");	// Sprites LUT
 	int TILES_LEN = memory_region_length(machine, "spritelut");
 
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	/* Exit if sprites are disabled */
 	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)

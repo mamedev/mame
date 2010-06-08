@@ -96,7 +96,7 @@ VIDEO_START( toobin )
 	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
 
 	/* allocate a playfield bitmap for rendering */
-	state->pfbitmap = auto_bitmap_alloc(machine, video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
+	state->pfbitmap = auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
 
 	state_save_register_global(machine, state->brightness);
 }
@@ -167,7 +167,7 @@ WRITE16_HANDLER( toobin_xscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll >> 6);
@@ -187,7 +187,7 @@ WRITE16_HANDLER( toobin_yscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll >> 6);
@@ -213,7 +213,7 @@ WRITE16_HANDLER( toobin_slip_w )
 
 	/* if the SLIP is changing, force a partial update first */
 	if (oldslip != newslip)
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* update the data */
 	atarimo_0_slipram_w(space, offset, data, mem_mask);

@@ -288,10 +288,8 @@ static const int pitch_vals[32] = {
 INLINE digitalker *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_DIGITALKER);
-	return (digitalker *)device->token;
+	assert(device->type() == SOUND_DIGITALKER);
+	return (digitalker *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -652,7 +650,7 @@ static DEVICE_START(digitalker)
 	digitalker *dg = get_safe_token(device);
 	dg->device = device;
 	dg->rom = memory_region(device->machine, device->tag());
-	dg->stream = stream_create(device, 0, 1, device->clock/4, dg, digitalker_update);
+	dg->stream = stream_create(device, 0, 1, device->clock()/4, dg, digitalker_update);
 	dg->dac_index = 128;
 	dg->data = 0xff;
 	dg->cs = dg->cms = dg->wr = 1;

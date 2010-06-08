@@ -83,7 +83,7 @@ typedef struct {
 	UINT8	YI;
 	UINT8	halted;
 	UINT8	interrupt_pending;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	int icount;
@@ -96,11 +96,10 @@ typedef struct {
 INLINE minx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MINX);
 
-	return (minx_state *)device->token;
+	return (minx_state *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE UINT16 rd16( minx_state *minx, UINT32 offset )
@@ -121,8 +120,8 @@ static CPU_INIT( minx )
 	minx_state *minx = get_safe_token(device);
 	minx->irq_callback = irqcallback;
 	minx->device = device;
-	minx->program = device->space(AS_PROGRAM);
-	if ( device->baseconfig().static_config != NULL )
+	minx->program = device_memory(device)->space(AS_PROGRAM);
+	if ( device->baseconfig().static_config() != NULL )
 	{
 	}
 	else
@@ -226,9 +225,9 @@ static unsigned minx_get_reg( minx_state *minx, int regnum )
 {
 	switch( regnum )
 	{
-	case REG_GENPC:	return GET_MINX_PC;
+	case STATE_GENPC:	return GET_MINX_PC;
 	case MINX_PC:	return minx->PC;
-	case REG_GENSP:
+	case STATE_GENSP:
 	case MINX_SP:	return minx->SP;
 	case MINX_BA:	return minx->BA;
 	case MINX_HL:	return minx->HL;
@@ -251,9 +250,9 @@ static void minx_set_reg( minx_state *minx, int regnum, unsigned val )
 {
 	switch( regnum )
 	{
-	case REG_GENPC:	break;
+	case STATE_GENPC:	break;
 	case MINX_PC:	minx->PC = val; break;
-	case REG_GENSP:
+	case STATE_GENSP:
 	case MINX_SP:	minx->SP = val; break;
 	case MINX_BA:	minx->BA = val; break;
 	case MINX_HL:	minx->HL = val; break;
@@ -313,7 +312,7 @@ static CPU_SET_INFO( minx )
 
 CPU_GET_INFO( minx )
 {
-	minx_state *minx = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	minx_state *minx = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch( state )
 	{
 	case CPUINFO_INT_CONTEXT_SIZE:								info->i = sizeof(minx_state); break;
@@ -336,8 +335,8 @@ CPU_GET_INFO( minx )
 	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 0; break;
 	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:			info->i = 0; break;
 	case CPUINFO_INT_INPUT_STATE + 0:							info->i = 0; break;
-	case CPUINFO_INT_REGISTER + REG_GENPC:							info->i = GET_MINX_PC; break;
-	case CPUINFO_INT_REGISTER + REG_GENSP:
+	case CPUINFO_INT_REGISTER + STATE_GENPC:							info->i = GET_MINX_PC; break;
+	case CPUINFO_INT_REGISTER + STATE_GENSP:
 	case CPUINFO_INT_REGISTER + MINX_PC:
 	case CPUINFO_INT_REGISTER + MINX_SP:
 	case CPUINFO_INT_REGISTER + MINX_BA:

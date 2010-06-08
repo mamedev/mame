@@ -1293,7 +1293,7 @@ static READ16_HANDLER(s23_c417_r)
            1:  1st c435 busy (inverted)
            0:  xcpreq
          */
-	case 0: return 0x8e | (video_screen_get_vblank(space->machine->primary_screen) ? 0x0000 : 0x8000);
+	case 0: return 0x8e | (space->machine->primary_screen->vblank() ? 0x0000 : 0x8000);
 	case 1: return c417_adr;
 	case 4:
 		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -1531,7 +1531,7 @@ static WRITE16_HANDLER(s23_c361_w)
 		}
 		else
 		{
-			timer_adjust_oneshot(c361_timer, video_screen_get_time_until_pos(space->machine->primary_screen, c361_scanline, 0), 0);
+			timer_adjust_oneshot(c361_timer, space->machine->primary_screen->time_until_pos(c361_scanline), 0);
 		}
 		break;
 
@@ -1543,8 +1543,8 @@ static WRITE16_HANDLER(s23_c361_w)
 static READ16_HANDLER(s23_c361_r)
 {
 	switch(offset) {
-	case 5: return video_screen_get_vpos(space->machine->primary_screen)*2 | (video_screen_get_vblank(space->machine->primary_screen) ? 1 : 0);
-	case 6: return video_screen_get_vblank(space->machine->primary_screen);
+	case 5: return space->machine->primary_screen->vpos()*2 | (space->machine->primary_screen->vblank() ? 1 : 0);
+	case 6: return space->machine->primary_screen->vblank();
 	}
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 	return 0xffff;

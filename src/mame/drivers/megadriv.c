@@ -95,8 +95,8 @@ static int megadrive_irq6_pending = 0;
 static int megadrive_irq4_pending = 0;
 
 /* 32x! */
-static running_device *_32x_master_cpu;
-static running_device *_32x_slave_cpu;
+static cpu_device *_32x_master_cpu;
+static cpu_device *_32x_slave_cpu;
 static int _32x_is_connected;
 
 static int sh2_are_running;
@@ -129,12 +129,12 @@ static UINT16 *_32x_display_dram, *_32x_access_dram;
 static UINT16* _32x_palette;
 static UINT16* _32x_palette_lookup;
 /* SegaCD! */
-static running_device *_segacd_68k_cpu;
+static cpu_device *_segacd_68k_cpu;
 /* SVP (virtua racing) */
-static running_device *_svp_cpu;
+static cpu_device *_svp_cpu;
 
 
-static running_device *_genesis_snd_z80_cpu;
+static cpu_device *_genesis_snd_z80_cpu;
 
 int segac2_bg_pal_lookup[4];
 int segac2_sp_pal_lookup[4];
@@ -163,10 +163,10 @@ static int megadrive_region_pal;
 static int megadrive_max_hposition;
 
 
-static running_device* frame_timer;
-static running_device* scanline_timer;
-static running_device* irq6_on_timer;
-static running_device* irq4_on_timer;
+static timer_device* frame_timer;
+static timer_device* scanline_timer;
+static timer_device* irq6_on_timer;
+static timer_device* irq4_on_timer;
 static bitmap_t* render_bitmap;
 //emu_timer* vblankirq_off_timer;
 
@@ -3907,7 +3907,7 @@ VIDEO_START(megadriv)
 {
 	int x;
 
-	render_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	render_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	megadrive_vdp_vram  = auto_alloc_array(machine, UINT16, 0x10000/2);
 	megadrive_vdp_cram  = auto_alloc_array(machine, UINT16, 0x80/2);
@@ -3963,7 +3963,7 @@ VIDEO_UPDATE(megadriv)
 //  int xxx;
 	/* reference */
 
-//  time_elapsed_since_crap = timer_device_timeelapsed(frame_timer);
+//  time_elapsed_since_crap = frame_timer->time_elapsed();
 //  xxx = cputag_attotime_to_clocks(screen->machine, "maincpu", time_elapsed_since_crap);
 //  mame_printf_debug("update cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 
@@ -5508,7 +5508,7 @@ INLINE UINT16 get_hposition(void)
 	attotime time_elapsed_since_scanline_timer;
 	UINT16 value4;
 
-	time_elapsed_since_scanline_timer = timer_device_timeelapsed(scanline_timer);
+	time_elapsed_since_scanline_timer = scanline_timer->time_elapsed();
 
 	if (time_elapsed_since_scanline_timer.attoseconds<(ATTOSECONDS_PER_SECOND/megadriv_framerate /megadrive_total_scanlines))
 	{
@@ -5796,13 +5796,13 @@ INLINE UINT16 get_hposition(void)
 
 static int irq4counter;
 
-static running_device* render_timer;
+static timer_device* render_timer;
 
 static TIMER_DEVICE_CALLBACK( render_timer_callback )
 {
 	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
 	{
-		genesis_render_scanline(timer->machine, genesis_scanline_counter);
+		genesis_render_scanline(timer.machine, genesis_scanline_counter);
 	}
 }
 
@@ -5813,7 +5813,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
        VIDEO_EOF) */
 
-	timer_call_after_resynch(timer->machine, NULL, 0, 0);
+	timer_call_after_resynch(timer.machine, NULL, 0, 0);
 	/* Compensate for some rounding errors
 
        When the counter reaches 261 we should have reached the end of the frame, however due
@@ -5825,13 +5825,13 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	{
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
-		timer_device_adjust_oneshot(scanline_timer, attotime_div(ATTOTIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0);
-		timer_device_adjust_oneshot(render_timer, ATTOTIME_IN_USEC(1), 0);
+		scanline_timer->adjust(attotime_div(ATTOTIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines));
+		render_timer->adjust(ATTOTIME_IN_USEC(1));
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )
 		{
 		//  mame_printf_debug("x %d",genesis_scanline_counter);
-			timer_device_adjust_oneshot(irq6_on_timer,  ATTOTIME_IN_USEC(6), 0);
+			irq6_on_timer->adjust(ATTOTIME_IN_USEC(6));
 			megadrive_irq6_pending = 1;
 			megadrive_vblank_flag = 1;
 
@@ -5868,7 +5868,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					timer_device_adjust_oneshot(irq4_on_timer,  ATTOTIME_IN_USEC(1), 0);
+					irq4_on_timer->adjust(ATTOTIME_IN_USEC(1));
 					//mame_printf_debug("irq4 on scanline %d reload %d\n",genesis_scanline_counter,MEGADRIVE_REG0A_HINT_VALUE);
 				}
 			}
@@ -5879,21 +5879,21 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			else irq4counter=MEGADRIVE_REG0A_HINT_VALUE;
 		}
 
-		//if (genesis_scanline_counter==0) timer_device_adjust_oneshot(irq4_on_timer,  ATTOTIME_IN_USEC(2), 0);
+		//if (genesis_scanline_counter==0) irq4_on_timer->adjust(ATTOTIME_IN_USEC(2));
 
 
 
 
-		if (devtag_get_device(timer->machine, "genesis_snd_z80") != NULL)
+		if (devtag_get_device(timer.machine, "genesis_snd_z80") != NULL)
 		{
 			if (genesis_scanline_counter == megadrive_z80irq_scanline)
 			{
 				if ((genz80.z80_has_bus == 1) && (genz80.z80_is_reset == 0))
-					cputag_set_input_line(timer->machine, "genesis_snd_z80", 0, HOLD_LINE);
+					cputag_set_input_line(timer.machine, "genesis_snd_z80", 0, HOLD_LINE);
 			}
 			if (genesis_scanline_counter == megadrive_z80irq_scanline + 1)
 			{
-				cputag_set_input_line(timer->machine, "genesis_snd_z80", 0, CLEAR_LINE);
+				cputag_set_input_line(timer.machine, "genesis_snd_z80", 0, CLEAR_LINE);
 			}
 		}
 
@@ -5912,14 +5912,14 @@ static TIMER_DEVICE_CALLBACK( irq6_on_callback )
 	{
 //      megadrive_irq6_pending = 1;
 		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6)
-			cputag_set_input_line(timer->machine, "maincpu", 6, HOLD_LINE);
+			cputag_set_input_line(timer.machine, "maincpu", 6, HOLD_LINE);
 	}
 }
 
 static TIMER_DEVICE_CALLBACK( irq4_on_callback )
 {
 	//mame_printf_debug("irq4 active on %d\n",genesis_scanline_counter);
-	cputag_set_input_line(timer->machine, "maincpu", 4, HOLD_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", 4, HOLD_LINE);
 }
 
 /*****************************************************************************************/
@@ -5985,15 +5985,15 @@ MACHINE_RESET( megadriv )
 
 	megadrive_reset_io(machine);
 
-	frame_timer = devtag_get_device(machine, "frame_timer");
-	scanline_timer = devtag_get_device(machine, "scanline_timer");
-	render_timer = devtag_get_device(machine, "render_timer");
+	frame_timer = machine->device<timer_device>("frame_timer");
+	scanline_timer = machine->device<timer_device>("scanline_timer");
+	render_timer = machine->device<timer_device>("render_timer");
 
-	irq6_on_timer = devtag_get_device(machine, "irq6_timer");
-	irq4_on_timer = devtag_get_device(machine, "irq4_timer");
+	irq6_on_timer = machine->device<timer_device>("irq6_timer");
+	irq4_on_timer = machine->device<timer_device>("irq4_timer");
 
-	timer_device_adjust_oneshot(frame_timer, attotime_zero, 0);
-	timer_device_adjust_oneshot(scanline_timer, attotime_zero, 0);
+	frame_timer->reset();
+	scanline_timer->reset();
 
 	if (genesis_other_hacks)
 	{
@@ -6032,7 +6032,7 @@ MACHINE_RESET( megadriv )
 
 void megadriv_stop_scanline_timer(void)
 {
-	timer_device_adjust_oneshot(scanline_timer,  attotime_never, 0);
+	scanline_timer->reset();
 }
 
 /*
@@ -6134,7 +6134,7 @@ int megadrive_z80irq_hpos = 320;
 	visarea.min_y = 0;
 	visarea.max_y = megadrive_visible_scanlines-1;
 
-	video_screen_configure(machine->primary_screen, scr_width, megadrive_visible_scanlines, &visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
+	machine->primary_screen->configure(scr_width, megadrive_visible_scanlines, visarea, HZ_TO_ATTOSECONDS(megadriv_framerate));
 
 	if (0)
 	{
@@ -6144,14 +6144,14 @@ int megadrive_z80irq_hpos = 320;
 	//  /* reference */
 		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
-		//time_elapsed_since_crap = timer_device_timeelapsed(frame_timer);
+		//time_elapsed_since_crap = frame_timer->time_elapsed();
 		//xxx = cputag_attotime_to_clocks(machine, "maincpu",time_elapsed_since_crap);
 		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
-		timer_device_adjust_oneshot(frame_timer,  attotime_zero, 0);
+		frame_timer->reset();
 	}
 
-	timer_device_adjust_oneshot(scanline_timer,  attotime_zero, 0);
+	scanline_timer->reset();
 
 }
 
@@ -6365,7 +6365,7 @@ static void megadriv_init_common(running_machine *machine)
 	const input_port_token *ipt = machine->gamedrv->ipt;
 
 	/* Look to see if this system has the standard Sound Z80 */
-	_genesis_snd_z80_cpu = devtag_get_device(machine, "genesis_snd_z80");
+	_genesis_snd_z80_cpu = machine->device<cpu_device>("genesis_snd_z80");
 	if (_genesis_snd_z80_cpu != NULL)
 	{
 		//printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
@@ -6375,14 +6375,14 @@ static void megadriv_init_common(running_machine *machine)
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
-	_32x_master_cpu = devtag_get_device(machine, "32x_master_sh2");
+	_32x_master_cpu = machine->device<cpu_device>("32x_master_sh2");
 	if (_32x_master_cpu != NULL)
 	{
 		printf("32x MASTER SH2 cpu found %d\n", cpu_get_index(_32x_master_cpu) );
 	}
 
 	/* Look to see if this system has the 32x Slave SH2 */
-	_32x_slave_cpu = devtag_get_device(machine, "32x_slave_sh2");
+	_32x_slave_cpu = machine->device<cpu_device>("32x_slave_sh2");
 	if (_32x_slave_cpu != NULL)
 	{
 		printf("32x SLAVE SH2 cpu found %d\n", cpu_get_index(_32x_slave_cpu) );
@@ -6397,13 +6397,13 @@ static void megadriv_init_common(running_machine *machine)
 		_32x_is_connected = 0;
 	}
 
-	_segacd_68k_cpu = devtag_get_device(machine, "segacd_68k");
+	_segacd_68k_cpu = machine->device<cpu_device>("segacd_68k");
 	if (_segacd_68k_cpu != NULL)
 	{
 		printf("Sega CD secondary 68k cpu found %d\n", cpu_get_index(_segacd_68k_cpu) );
 	}
 
-	_svp_cpu = devtag_get_device(machine, "svp");
+	_svp_cpu = machine->device<cpu_device>("svp");
 	if (_svp_cpu != NULL)
 	{
 		printf("SVP (cpu) found %d\n", cpu_get_index(_svp_cpu) );

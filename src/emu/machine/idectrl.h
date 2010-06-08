@@ -14,6 +14,8 @@
 #ifndef __IDECTRL_H__
 #define __IDECTRL_H__
 
+#include "devlegcy.h"
+
 #include "harddisk.h"
 
 
@@ -81,9 +83,7 @@ WRITE16_DEVICE_HANDLER( ide_controller16_w );
 
 /* ----- device interface ----- */
 
-/* device get info callback */
-#define IDE_CONTROLLER DEVICE_GET_INFO_NAME(ide_controller)
-DEVICE_GET_INFO( ide_controller );
+DECLARE_LEGACY_DEVICE(IDE_CONTROLLER, ide_controller);
 
 
 #endif	/* __IDECTRL_H__ */

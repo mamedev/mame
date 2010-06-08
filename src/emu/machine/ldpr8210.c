@@ -373,17 +373,17 @@ static void pr8210_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int field
 	if (LOG_VBLANK_VBI)
 	{
 		if ((vbi->line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
-			printf("%3d:VSYNC(%d,%05d)\n", video_screen_get_vpos(ld->screen), fieldnum, VBI_CAV_PICTURE(vbi->line1718));
+			printf("%3d:VSYNC(%d,%05d)\n", ld->screen->vpos(), fieldnum, VBI_CAV_PICTURE(vbi->line1718));
 		else
-			printf("%3d:VSYNC(%d)\n", video_screen_get_vpos(ld->screen), fieldnum);
+			printf("%3d:VSYNC(%d)\n", ld->screen->vpos(), fieldnum);
 	}
 
 	/* signal VSYNC and set a timer to turn it off */
 	player->vsync = TRUE;
-	timer_set(ld->device->machine, attotime_mul(video_screen_get_scan_period(ld->screen), 4), ld, 0, vsync_off);
+	timer_set(ld->device->machine, attotime_mul(ld->screen->scan_period(), 4), ld, 0, vsync_off);
 
 	/* also set a timer to fetch the VBI data when it is ready */
-	timer_set(ld->device->machine, video_screen_get_time_until_pos(ld->screen, 19*2, 0), ld, 0, vbi_data_fetch);
+	timer_set(ld->device->machine, ld->screen->time_until_pos(19*2), ld, 0, vbi_data_fetch);
 }
 
 
@@ -399,7 +399,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 
 	/* logging */
 	if (LOG_VBLANK_VBI)
-		printf("%3d:Update(%d)\n", video_screen_get_vpos(ld->screen), fieldnum);
+		printf("%3d:Update(%d)\n", ld->screen->vpos(), fieldnum);
 
 	/* if the spindle is on, we advance by 1 track after completing field #1 */
 	return (spdl_on) ? fieldnum : 0;
@@ -544,9 +544,9 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	if (LOG_VBLANK_VBI)
 	{
 		if ((line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
-			printf("%3d:VBI(%05d)\n", video_screen_get_vpos(ld->screen), VBI_CAV_PICTURE(line1718));
+			printf("%3d:VBI(%05d)\n", ld->screen->vpos(), VBI_CAV_PICTURE(line1718));
 		else
-			printf("%3d:VBI()\n", video_screen_get_vpos(ld->screen));
+			printf("%3d:VBI()\n", ld->screen->vpos());
 	}
 
 	/* update PIA registers based on vbi code */
@@ -587,7 +587,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 
 static READ8_HANDLER( pr8210_pia_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0xff;
 
@@ -612,14 +612,14 @@ static READ8_HANDLER( pr8210_pia_r )
 		/* (C0) VBI decoding state 1 */
 		case 0xc0:
 			if (LOG_VBLANK_VBI)
-				printf("%3d:PIA(C0)\n", video_screen_get_vpos(ld->screen));
+				printf("%3d:PIA(C0)\n", ld->screen->vpos());
 			result = player->pia.vbi1;
 			break;
 
 		/* (E0) VBI decoding state 2 */
 		case 0xe0:
 			if (LOG_VBLANK_VBI)
-				printf("%3d:PIA(E0)\n", video_screen_get_vpos(ld->screen));
+				printf("%3d:PIA(E0)\n", ld->screen->vpos());
 			result = player->pia.vbi2;
 			break;
 
@@ -638,7 +638,7 @@ static READ8_HANDLER( pr8210_pia_r )
 
 static WRITE8_HANDLER( pr8210_pia_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	ldplayer_data *player = ld->player;
 	UINT8 value;
 
@@ -722,7 +722,7 @@ static READ8_HANDLER( pr8210_bus_r )
        $02 = (in) FG via op-amp (spindle motor stop detector)
        $01 = (in) SLOW TIMER OUT
     */
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	ldplayer_data *player = ld->player;
 	slider_position sliderpos = ldcore_get_slider_position(ld);
 	UINT8 focus_on = !(player->port1 & 0x08);
@@ -770,7 +770,7 @@ static WRITE8_HANDLER( pr8210_port1_w )
        $02 = (out) SCAN A (/SCAN)
        $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
     */
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->port1;
 	int direction;
@@ -788,11 +788,11 @@ static WRITE8_HANDLER( pr8210_port1_w )
 		if (player->simutrek.cpu == NULL || !player->simutrek.controlthis)
 		{
 			if (LOG_SIMUTREK)
-				printf("%3d:JUMP TRG\n", video_screen_get_vpos(ld->screen));
+				printf("%3d:JUMP TRG\n", ld->screen->vpos());
 			ldcore_advance_slider(ld, direction);
 		}
 		else if (LOG_SIMUTREK)
-			printf("%3d:Skipped JUMP TRG\n", video_screen_get_vpos(ld->screen));
+			printf("%3d:Skipped JUMP TRG\n", ld->screen->vpos());
 	}
 
 	/* bit 1 low enables scanning */
@@ -832,7 +832,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
        $02 = (out) ???
        $01 = (out) LASER ON
     */
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->port2;
 
@@ -860,7 +860,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 static READ8_HANDLER( pr8210_t0_r )
 {
 	/* returns VSYNC state */
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	return !ld->player->vsync;
 }
 
@@ -1098,7 +1098,7 @@ static TIMER_CALLBACK( irq_off )
 	ldplayer_data *player = ld->player;
 	cpu_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
 	if (LOG_SIMUTREK)
-		printf("%3d:**** Simutrek IRQ clear\n", video_screen_get_vpos(ld->screen));
+		printf("%3d:**** Simutrek IRQ clear\n", ld->screen->vpos());
 }
 
 static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
@@ -1112,15 +1112,15 @@ static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 	}
 
 	if (LOG_SIMUTREK)
-		printf("%3d:VSYNC(%d)\n", video_screen_get_vpos(ld->screen), fieldnum);
+		printf("%3d:VSYNC(%d)\n", ld->screen->vpos(), fieldnum);
 	pr8210_vsync(ld, vbi, fieldnum, curtime);
 
 	if (player->simutrek.data_ready)
 	{
 		if (LOG_SIMUTREK)
-			printf("%3d:VSYNC IRQ\n", video_screen_get_vpos(ld->screen));
+			printf("%3d:VSYNC IRQ\n", ld->screen->vpos());
 		cpu_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
-		timer_set(ld->device->machine, video_screen_get_scan_period(ld->screen), ld, 0, irq_off);
+		timer_set(ld->device->machine, ld->screen->scan_period(), ld, 0, irq_off);
 	}
 }
 
@@ -1167,7 +1167,7 @@ static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 {
 	timer_call_after_resynch(ld->device->machine, ld, data, simutrek_latched_data_w);
 	if (LOG_SIMUTREK)
-		printf("%03d:**** Simutrek Command = %02X\n", video_screen_get_vpos(ld->screen), data);
+		printf("%03d:**** Simutrek Command = %02X\n", ld->screen->vpos(), data);
 }
 
 
@@ -1194,7 +1194,7 @@ static TIMER_CALLBACK( simutrek_latched_data_w )
 
 static READ8_HANDLER( simutrek_port2_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	ldplayer_data *player = ld->player;
 
 	/* bit $80 is the pr8210 video squelch */
@@ -1209,7 +1209,7 @@ static READ8_HANDLER( simutrek_port2_r )
 
 static WRITE8_HANDLER( simutrek_port2_w )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->simutrek.port2;
 
@@ -1226,13 +1226,13 @@ static WRITE8_HANDLER( simutrek_port2_w )
 	{
 		int direction = (data & 0x08) ? 1 : -1;
 		if (LOG_SIMUTREK)
-			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), cpu_get_pc(space->cpu));
+			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", ld->screen->vpos(), cpu_get_pc(space->cpu));
 		ldcore_advance_slider(ld, direction);
 	}
 
 	/* bit $04 controls who owns the JUMP TRG command */
 	if (LOG_SIMUTREK && ((data ^ prev) & 0x04))
-		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), (data >> 2) & 1, cpu_get_pc(space->cpu));
+		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", ld->screen->vpos(), (data >> 2) & 1, cpu_get_pc(space->cpu));
 	player->simutrek.controlnext = (~data >> 2) & 1;
 
 	/* bits $03 control something (status?) */
@@ -1248,7 +1248,7 @@ static WRITE8_HANDLER( simutrek_port2_w )
 
 static READ8_HANDLER( simutrek_data_r )
 {
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	ldplayer_data *player = ld->player;
 
 	/* acknowledge the read and clear the data ready flag */
@@ -1265,6 +1265,6 @@ static READ8_HANDLER( simutrek_data_r )
 static READ8_HANDLER( simutrek_t0_r )
 {
 	/* return 1 if data is waiting from main CPU */
-	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner());
 	return ld->player->simutrek.data_ready;
 }

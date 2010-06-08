@@ -1427,7 +1427,8 @@ static MACHINE_DRIVER_START( mjkinjas )
 
 	MDRV_IMPORT_FROM(pteacher)
 
-	MDRV_CPU_REPLACE("audiocpu", UPD7807, 11000000)	/* 11MHz ? */
+	MDRV_CPU_MODIFY("audiocpu")
+	MDRV_CPU_CLOCK(11000000)	/* 11MHz ? */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lemnangl )
@@ -1557,12 +1558,12 @@ static MACHINE_DRIVER_START( mirderby )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu0", Z80, 16000000/4)	/* 4 Mhz */
-	MDRV_CPU_FLAGS(CPU_DISABLE)
+	MDRV_DEVICE_DISABLE()
 	MDRV_CPU_PROGRAM_MAP(cpu0_map)
 
 	MDRV_CPU_ADD("cpu1", M6809, 16000000/8)	/* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cpu1_map)
-	MDRV_CPU_FLAGS(CPU_DISABLE)
+	MDRV_DEVICE_DISABLE()
 	//MDRV_CPU_VBLANK_INT("screen", mirderby_irq)
 
 

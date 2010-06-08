@@ -1,7 +1,9 @@
 #pragma once
 
 #ifndef __CDDA_H__
-#define _CDDA_H_
+#define __CDDA_H__
+
+#include "devlegcy.h"
 
 void cdda_set_cdrom(running_device *device, void *file);
 running_device *cdda_from_cdrom(running_machine *machine, void *file);
@@ -15,7 +17,6 @@ int cdda_audio_active(running_device *device);
 int cdda_audio_paused(running_device *device);
 int cdda_audio_ended(running_device *device);
 
-DEVICE_GET_INFO( cdda );
-#define SOUND_CDDA DEVICE_GET_INFO_NAME( cdda )
+DECLARE_LEGACY_SOUND_DEVICE(CDDA, cdda);
 
 #endif /* __CDDA_H__ */

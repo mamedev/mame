@@ -1,6 +1,8 @@
 #ifndef _68681_H
 #define _68681_H
 
+#include "devlegcy.h"
+
 typedef struct _duart68681_config duart68681_config;
 struct _duart68681_config
 {
@@ -13,8 +15,7 @@ struct _duart68681_config
 	INT32 ip3clk, ip4clk, ip5clk, ip6clk;
 };
 
-#define DUART68681 DEVICE_GET_INFO_NAME(duart68681)
-DEVICE_GET_INFO(duart68681);
+DECLARE_LEGACY_DEVICE(DUART68681, duart68681);
 
 #define MDRV_DUART68681_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, DUART68681, _clock) \

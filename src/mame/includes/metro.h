@@ -4,12 +4,21 @@
 
 *************************************************************************/
 
+#include "sound/okim6295.h"
+#include "sound/2151intf.h"
+#include "video/konicdev.h"
+
 class metro_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, metro_state(machine)); }
 
-	metro_state(running_machine &machine) { }
+	metro_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  audiocpu(machine.device<cpu_device>("audiocpu")),
+		  oki(machine.device<okim6295_device>("oki")),
+		  ymsnd(machine.device<ym2151_sound_device>("ymsnd")),
+		  k053936(machine.device<k053936_device>("k053936")) { }
 
 	/* memory pointers */
 	UINT16 *    vram_0;
@@ -72,11 +81,11 @@ public:
 	tilemap_t *vmetal_mid2tilemap;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *oki;
-	running_device *ymsnd;
-	running_device *k053936;
+	cpu_device *maincpu;
+	cpu_device *audiocpu;
+	okim6295_device *oki;
+	ym2151_sound_device *ymsnd;
+	k053936_device *k053936;
 };
 
 

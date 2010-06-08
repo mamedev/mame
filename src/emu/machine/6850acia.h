@@ -9,12 +9,14 @@
 #ifndef __ACIA6850_H__
 #define __ACIA6850_H__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-#define ACIA6850		DEVICE_GET_INFO_NAME(acia6850)
+DECLARE_LEGACY_DEVICE(ACIA6850, acia6850);
 
 #define ACIA6850_STATUS_RDRF	0x01
 #define ACIA6850_STATUS_TDRE	0x02
@@ -57,8 +59,6 @@ struct _acia6850_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( acia6850 );
 
 void acia6850_tx_clock_in(running_device *device) ATTR_NONNULL(1);
 void acia6850_rx_clock_in(running_device *device) ATTR_NONNULL(1);

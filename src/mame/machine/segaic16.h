@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "devlegcy.h"
+
 /* open bus read helpers */
 READ16_HANDLER( segaic16_open_bus_r );
 
@@ -53,28 +55,18 @@ struct _ic_315_5250_interface
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( ic_315_5248 );
-DEVICE_GET_INFO( ic_315_5249 );
-DEVICE_GET_INFO( ic_315_5250 );
-
-/***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define _315_5248 DEVICE_GET_INFO_NAME( ic_315_5248 )
+DECLARE_LEGACY_DEVICE(_315_5248, ic_315_5248);
+DECLARE_LEGACY_DEVICE(_315_5249, ic_315_5249);
+DECLARE_LEGACY_DEVICE(_315_5250, ic_315_5250);
 
 #define MDRV_315_5248_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, _315_5248, 0)
 
-#define _315_5249 DEVICE_GET_INFO_NAME( ic_315_5249 )
-
 #define MDRV_315_5249_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, _315_5249, 0)
-
-#define _315_5250 DEVICE_GET_INFO_NAME( ic_315_5250 )
 
 #define MDRV_315_5250_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, _315_5250, 0) \

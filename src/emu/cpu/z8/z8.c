@@ -182,54 +182,9 @@ struct _z8_state
 	int clock;				/* clock */
 	int icount;				/* instruction counter */
 
-	cpu_state_table state_table;
-
 	/* timers */
 	emu_timer *t0_timer;
 	emu_timer *t1_timer;
-};
-
-/***************************************************************************
-    CPU STATE DESCRIPTION
-***************************************************************************/
-
-#define Z8_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(Z8_##_name, #_name, _format, z8_state, _member, _datamask, ~0, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	Z8_STATE_ENTRY(PC,  "%04X", pc, 0xffff, 0)
-	Z8_STATE_ENTRY(GENPC, "%04X", pc, 0xffff, CPUSTATE_NOSHOW)
-	Z8_STATE_ENTRY(SP, "%04X", fake_sp, 0xffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(GENSP, "%04X", fake_sp, 0xffff, CPUSTATE_NOSHOW | CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(RP, "%02X", r[Z8_REGISTER_RP], 0xff, 0)
-	Z8_STATE_ENTRY(T0, "%02X", t0, 0xff, 0)
-	Z8_STATE_ENTRY(T1, "%02X", t1, 0xff, 0)
-
-	Z8_STATE_ENTRY(R0, "%02X", fake_r[0], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R1, "%02X", fake_r[1], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R2, "%02X", fake_r[2], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R3, "%02X", fake_r[3], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R4, "%02X", fake_r[4], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R5, "%02X", fake_r[5], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R6, "%02X", fake_r[6], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R7, "%02X", fake_r[7], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R8, "%02X", fake_r[8], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R9, "%02X", fake_r[9], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R10, "%02X", fake_r[10], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R11, "%02X", fake_r[11], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R12, "%02X", fake_r[12], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R13, "%02X", fake_r[13], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R14, "%02X", fake_r[14], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	Z8_STATE_ENTRY(R15, "%02X", fake_r[15], 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
 };
 
 /***************************************************************************
@@ -239,12 +194,11 @@ static const cpu_state_table state_table_template =
 INLINE z8_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert((cpu_get_type(device) == CPU_Z8601) ||
 		(cpu_get_type(device) == CPU_UB8830D) ||
 		(cpu_get_type(device) == CPU_Z8611));
-	return (z8_state *)device->token;
+	return (z8_state *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE UINT8 fetch(z8_state *cpustate)
@@ -689,16 +643,29 @@ static CPU_INIT( z8 )
 	z8_state *cpustate = get_safe_token(device);
 
 	/* set up the state table */
-	cpustate->state_table = state_table_template;
-	cpustate->state_table.baseptr = cpustate;
-	cpustate->state_table.subtypemask = 1;
+	{
+		device_state_interface *state;
+		device->interface(state);
+		state->state_add(Z8_PC,         "PC",        cpustate->pc);
+		state->state_add(STATE_GENPC,   "GENPC",     cpustate->pc).noshow();
+		state->state_add(Z8_SP,         "SP",        cpustate->fake_sp).callimport().callexport();
+		state->state_add(STATE_GENSP,   "GENSP",     cpustate->fake_sp).callimport().callexport().noshow();
+		state->state_add(Z8_RP,         "RP",        cpustate->r[Z8_REGISTER_RP]);
+		state->state_add(Z8_T0,         "T0",        cpustate->t0);
+		state->state_add(Z8_T1,         "T1",        cpustate->t1);
+		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->r[Z8_REGISTER_FLAGS]).noshow().formatstr("%6s");
+		
+		astring tempstr;
+		for (int regnum = 0; regnum < 16; regnum++)
+			state->state_add(Z8_R0 + regnum, tempstr.format("R%d", regnum), cpustate->fake_r[regnum]).callimport().callexport();
+	}
 
-	cpustate->clock = device->clock;
+	cpustate->clock = device->clock();
 
 	/* find address spaces */
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	/* allocate timers */
 	cpustate->t0_timer = timer_alloc(device->machine, t0_tick, cpustate);
@@ -786,7 +753,7 @@ static CPU_IMPORT_STATE( z8 )
 {
 	z8_state *cpustate = get_safe_token(device);
 
-	switch (entry->index)
+	switch (entry.index())
 	{
 		case Z8_SP:
 		case Z8_GENSP:
@@ -795,7 +762,7 @@ static CPU_IMPORT_STATE( z8 )
 			break;
 
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
-			cpustate->r[cpustate->r[Z8_REGISTER_RP] + (entry->index - Z8_R0)] = cpustate->fake_r[entry->index - Z8_R0];
+			cpustate->r[cpustate->r[Z8_REGISTER_RP] + (entry.index() - Z8_R0)] = cpustate->fake_r[entry.index() - Z8_R0];
 			break;
 
 		default:
@@ -808,7 +775,7 @@ static CPU_EXPORT_STATE( z8 )
 {
 	z8_state *cpustate = get_safe_token(device);
 
-	switch (entry->index)
+	switch (entry.index())
 	{
 		case Z8_SP:
 		case Z8_GENSP:
@@ -816,12 +783,28 @@ static CPU_EXPORT_STATE( z8 )
 			break;
 
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
-			cpustate->fake_r[entry->index - Z8_R0] = cpustate->r[cpustate->r[Z8_REGISTER_RP] + (entry->index - Z8_R0)];
+			cpustate->fake_r[entry.index() - Z8_R0] = cpustate->r[cpustate->r[Z8_REGISTER_RP] + (entry.index() - Z8_R0)];
 			break;
 
 		default:
 			fatalerror("CPU_EXPORT_STATE(z8) called for unexpected value\n");
 			break;
+	}
+}
+
+static CPU_EXPORT_STRING( z8 )
+{
+	z8_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS: string.printf("%c%c%c%c%c%c",
+									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_C ? 'C' : '.',
+									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_Z ? 'Z' : '.',
+									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_S ? 'S' : '.',
+									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_V ? 'V' : '.',
+									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_D ? 'D' : '.',
+									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_H ? 'H' : '.');	break;
 	}
 }
 
@@ -844,7 +827,7 @@ static CPU_SET_INFO( z8 )
 
 static CPU_GET_INFO( z8 )
 {
-	z8_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	z8_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -878,10 +861,10 @@ static CPU_GET_INFO( z8 )
 		case CPUINFO_FCT_DISASSEMBLE:			info->disassemble = CPU_DISASSEMBLE_NAME(z8);	break;
 		case CPUINFO_FCT_IMPORT_STATE:			info->import_state = CPU_IMPORT_STATE_NAME(z8);	break;
 		case CPUINFO_FCT_EXPORT_STATE:			info->export_state = CPU_EXPORT_STATE_NAME(z8);	break;
+		case CPUINFO_FCT_EXPORT_STRING:			info->export_string = CPU_EXPORT_STRING_NAME(z8);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &cpustate->icount;				break;
-		case CPUINFO_PTR_STATE_TABLE:			info->state_table = &cpustate->state_table;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8");					break;
@@ -889,15 +872,6 @@ static CPU_GET_INFO( z8 )
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team"); break;
-
-		case CPUINFO_STR_FLAGS: sprintf(info->s,
-									"%c%c%c%c%c%c",
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_C ? 'C' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_Z ? 'Z' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_S ? 'S' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_V ? 'V' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_D ? 'D' : '.',
-									 cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_H ? 'H' : '.');	break;
 	}
 }
 

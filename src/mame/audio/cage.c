@@ -33,7 +33,7 @@
  *
  *************************************/
 
-static running_device *cage_cpu;
+static cpu_device *cage_cpu;
 static attotime cage_cpu_h1_clock_period;
 
 static UINT8 cpu_to_cage_ready;
@@ -45,10 +45,10 @@ static attotime serial_period_per_word;
 
 static UINT8 dma_enabled;
 static UINT8 dma_timer_enabled;
-static running_device *dma_timer;
+static timer_device *dma_timer;
 
 static UINT8 cage_timer_enabled[2];
-static running_device *timer[2];
+static timer_device *timer[2];
 
 static UINT32 *tms32031_io_regs;
 
@@ -57,7 +57,7 @@ static UINT16 cage_control;
 
 static UINT32 *speedup_ram;
 
-static running_device *dmadac[DAC_BUFFER_CHANNELS];
+static dmadac_sound_device *dmadac[DAC_BUFFER_CHANNELS];
 
 
 
@@ -163,13 +163,13 @@ void cage_init(running_machine *machine, offs_t speedup)
 	memory_set_bankptr(machine, "bank10", memory_region(machine, "cageboot"));
 	memory_set_bankptr(machine, "bank11", memory_region(machine, "cage"));
 
-	cage_cpu = devtag_get_device(machine, "cage");
-	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(cage_cpu));
+	cage_cpu = machine->device<cpu_device>("cage");
+	cage_cpu_clock_period = ATTOTIME_IN_HZ(cage_cpu->clock());
 	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
 
-	dma_timer = devtag_get_device(machine, "cage_dma_timer");
-	timer[0] = devtag_get_device(machine, "cage_timer0");
-	timer[1] = devtag_get_device(machine, "cage_timer1");
+	dma_timer = machine->device<timer_device>("cage_dma_timer");
+	timer[0] = machine->device<timer_device>("cage_timer0");
+	timer[1] = machine->device<timer_device>("cage_timer1");
 
 	if (speedup)
 		speedup_ram = memory_install_write32_handler(cpu_get_address_space(cage_cpu, ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
@@ -178,7 +178,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	{
 		char buffer[10];
 		sprintf(buffer, "dac%d", chan + 1);
-		dmadac[chan] = devtag_get_device(machine, buffer);
+		dmadac[chan] = machine->device<dmadac_sound_device>(buffer);
 	}
 
 	state_save_register_global(machine, cpu_to_cage_ready);
@@ -221,7 +221,7 @@ static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 	{
 		if (dma_timer_enabled)
 		{
-			timer_device_adjust_oneshot(timer, attotime_never, 0);
+			timer.adjust(attotime_never);
 			dma_timer_enabled = 0;
 		}
 		return;
@@ -272,7 +272,7 @@ static void update_dma_state(const address_space *space)
 		if (!dma_timer_enabled)
 		{
 			attotime period = attotime_mul(serial_period_per_word, tms32031_io_regs[DMA_TRANSFER_COUNT]);
-			timer_device_adjust_periodic(dma_timer, period, addr, period);
+			dma_timer->adjust(period, addr, period);
 			dma_timer_enabled = 1;
 		}
 	}
@@ -280,7 +280,7 @@ static void update_dma_state(const address_space *space)
 	/* see if we turned off */
 	else if (!enabled && dma_enabled)
 	{
-		timer_device_adjust_oneshot(dma_timer, attotime_never, 0);
+		dma_timer->reset();
 		dma_timer_enabled = 0;
 	}
 
@@ -322,13 +322,13 @@ static void update_timer(int which)
 		if (tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
 			logerror("CAGE TIMER%d: unexpected timer config %08X!\n", which, tms32031_io_regs[base + TIMER0_GLOBAL_CTL]);
 
-		timer_device_adjust_oneshot(timer[which], period, which);
+		timer[which]->adjust(period, which);
 	}
 
 	/* see if we turned off */
 	else if (!enabled && cage_timer_enabled[which])
 	{
-		timer_device_adjust_oneshot(timer[which], attotime_never, which);
+		timer[which]->adjust(attotime_never, which);
 	}
 
 	/* set the new state */
@@ -569,12 +569,12 @@ void cage_control_w(running_machine *machine, UINT16 data)
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
-		timer_device_adjust_oneshot(dma_timer, attotime_never, 0);
+		dma_timer->reset();
 
 		cage_timer_enabled[0] = 0;
 		cage_timer_enabled[1] = 0;
-		timer_device_adjust_oneshot(timer[0], attotime_never, 0);
-		timer_device_adjust_oneshot(timer[1], attotime_never, 0);
+		timer[0]->reset();
+		timer[1]->reset();
 
 		memset(tms32031_io_regs, 0, 0x60 * 4);
 

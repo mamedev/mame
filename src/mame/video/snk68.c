@@ -57,8 +57,8 @@ static void common_video_start(running_machine *machine)
 {
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
-	tilemap_set_scrolldx(fg_tilemap, 0, video_screen_get_width(machine->primary_screen) - 256);
-	tilemap_set_scrolldy(fg_tilemap, 0, video_screen_get_height(machine->primary_screen) - 256);
+	tilemap_set_scrolldx(fg_tilemap, 0, machine->primary_screen->width() - 256);
+	tilemap_set_scrolldy(fg_tilemap, 0, machine->primary_screen->height() - 256);
 }
 
 VIDEO_START( pow )
@@ -104,10 +104,10 @@ WRITE16_HANDLER( pow_spriteram_w )
 
 	if (spriteram16[offset] != newword)
 	{
-		int vpos = video_screen_get_vpos(space->machine->primary_screen);
+		int vpos = space->machine->primary_screen->vpos();
 
 		if (vpos > 0)
-			video_screen_update_partial(space->machine->primary_screen, vpos - 1);
+			space->machine->primary_screen->update_partial(vpos - 1);
 
 		spriteram16[offset] = newword;
 	}

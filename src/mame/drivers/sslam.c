@@ -219,7 +219,7 @@ static TIMER_CALLBACK( music_playback )
 {
 	sslam_state *state = (sslam_state *)machine->driver_data;
 	int pattern = 0;
-	running_device *device = devtag_get_device(machine, "oki");
+	okim6295_device *device = machine->device<okim6295_device>("oki");
 
 	if ((okim6295_r(device,0) & 0x08) == 0)
 	{
@@ -330,13 +330,13 @@ static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 			else if (state->sound >= 0x70) {
 				/* These vocals are in bank 1, but a bug in the actual MCU doesn't set the bank */
 //              if (state->snd_bank != 1)
-//                  okim6295_set_bank_base(device, (1 * 0x40000));
+//                  downcast<okim6295_device *>(device)->set_bank_base((1 * 0x40000));
 //              sslam_snd_bank = 1;
 				sslam_play(device, 0, state->sound);
 			}
 			else if (state->sound >= 0x69) {
 				if (state->snd_bank != 2)
-					okim6295_set_bank_base(device, (2 * 0x40000));
+					downcast<okim6295_device *>(device)->set_bank_base(2 * 0x40000);
 				state->snd_bank = 2;
 				switch (state->sound)
 				{
@@ -349,14 +349,14 @@ static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 			}
 			else if (state->sound >= 0x65) {
 				if (state->snd_bank != 1)
-					okim6295_set_bank_base(device, (1 * 0x40000));
+					downcast<okim6295_device *>(device)->set_bank_base(1 * 0x40000);
 				state->snd_bank = 1;
 				state->melody = 4;
 				sslam_play(device, state->melody, state->sound);
 			}
 			else if (state->sound >= 0x60) {
 				if (state->snd_bank != 0)
-					okim6295_set_bank_base(device, (0 * 0x40000));
+					downcast<okim6295_device *>(device)->set_bank_base(0 * 0x40000);
 				state->snd_bank = 0;
 				switch (state->sound)
 				{
@@ -465,7 +465,7 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 		if (state->oki_bank != ((data & 3) - 1))
 		{
 			state->oki_bank = (data & 3) - 1;
-			okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * state->oki_bank);
+			space->machine->device<okim6295_device>("oki")->set_bank_base(0x40000 * state->oki_bank);
 		}
 	}
 
@@ -720,7 +720,7 @@ static MACHINE_DRIVER_START( sslam )
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", I8051, 12000000)
-	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped - 2 boards were protected */
+	MDRV_DEVICE_DISABLE()		/* Internal code is not dumped - 2 boards were protected */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -739,8 +739,7 @@ static MACHINE_DRIVER_START( sslam )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -773,8 +772,7 @@ static MACHINE_DRIVER_START( powerbls )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)	/* verified on original PCB */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)	/* verified on original PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

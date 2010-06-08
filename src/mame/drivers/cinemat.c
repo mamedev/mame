@@ -269,8 +269,8 @@ static READ8_HANDLER( boxingb_dial_r )
 
 static READ8_HANDLER( qb3_frame_r )
 {
-	attotime next_update = video_screen_get_time_until_update(space->machine->primary_screen);
-	attotime frame_period = video_screen_get_frame_period(space->machine->primary_screen);
+	attotime next_update = space->machine->primary_screen->time_until_update();
+	attotime frame_period = space->machine->primary_screen->frame_period();
 	int percent = next_update.attoseconds / (frame_period.attoseconds / 100);
 
 	/* note this is just an approximation... */

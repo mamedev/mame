@@ -10,6 +10,8 @@
 #ifndef __PPU_2C03B_H__
 #define __PPU_2C03B_H__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -72,16 +74,6 @@ enum
 	// are non-rendering and non-vblank.
 };
 
-#define PPU_2C02	DEVICE_GET_INFO_NAME(ppu2c02)		// NTSC NES, Famicom
-#define PPU_2C03B	DEVICE_GET_INFO_NAME(ppu2c03b)		// Vs. Unisystem, Playchoice 10
-#define PPU_2C04	DEVICE_GET_INFO_NAME(ppu2c04)		// Vs. Unisystem (four versions with different colors)
-/* The PPU_2C05 variants have different protection value, set at DEVICE_START, but otherwise are all the same... */
-#define PPU_2C05_01	DEVICE_GET_INFO_NAME(ppu2c05_01)	// Vs. Unisystem (Ninja Jajamaru Kun)
-#define PPU_2C05_02	DEVICE_GET_INFO_NAME(ppu2c05_02)	// Vs. Unisystem (Mighty Bomb Jack)
-#define PPU_2C05_03	DEVICE_GET_INFO_NAME(ppu2c05_03)	// Vs. Unisystem (Gumshoe)
-#define PPU_2C05_04	DEVICE_GET_INFO_NAME(ppu2c05_04)	// Vs. Unisystem (Top Gun)
-#define PPU_2C07	DEVICE_GET_INFO_NAME(ppu2c07)		// PAL NES
-
 /* callback datatypes */
 typedef void (*ppu2c0x_scanline_cb)( running_device *device, int scanline, int vblank, int blanked );
 typedef void (*ppu2c0x_hblank_cb)( running_device *device, int scanline, int vblank, int blanked );
@@ -102,14 +94,15 @@ struct _ppu2c0x_interface
     PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO(ppu2c02);
-DEVICE_GET_INFO(ppu2c03b);
-DEVICE_GET_INFO(ppu2c04);
-DEVICE_GET_INFO(ppu2c05_01);
-DEVICE_GET_INFO(ppu2c05_02);
-DEVICE_GET_INFO(ppu2c05_03);
-DEVICE_GET_INFO(ppu2c05_04);
-DEVICE_GET_INFO(ppu2c07);
+DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C02, ppu2c02);		// NTSC NES
+DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C03B, ppu2c03b);		// Playchoice 10
+DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C04, ppu2c04);		// Vs. Unisystem
+// The PPU_2C05 variants have different protection value, set at DEVICE_START, but otherwise are all the same...
+DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C05_01, ppu2c05_01);	// Vs. Unisystem (Ninja Jajamaru Kun)
+DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C05_02, ppu2c05_02);	// Vs. Unisystem (Mighty Bomb Jack)
+DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C05_03, ppu2c05_03);	// Vs. Unisystem (Gumshoe)
+DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C05_04, ppu2c05_04);	// Vs. Unisystem (Top Gun)
+DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C07, ppu2c07);		// PAL NES
 
 /* routines */
 void ppu2c0x_init_palette(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
@@ -130,6 +123,8 @@ extern void (*ppu_latch)( running_device *device, offs_t offset );
 
 WRITE8_DEVICE_HANDLER( ppu2c0x_w );
 READ8_DEVICE_HANDLER( ppu2c0x_r );
+
+int ppu2c0x_get_scanlines_per_frame( running_device *device );
 
 
 /***************************************************************************

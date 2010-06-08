@@ -92,7 +92,6 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* typedef struct _render_texture render_texture; -- defined in render.h */
 /* typedef struct _render_container render_container; -- defined in render.h */
 typedef struct _object_transform object_transform;
 typedef struct _scaled_texture scaled_texture;
@@ -127,7 +126,7 @@ struct _scaled_texture
 
 
 /* a render_texture is used to track transformations when building an object list */
-struct _render_texture
+struct render_texture
 {
 	render_texture *	next;				/* next texture (for free list) */
 	render_texture *	base;				/* pointer to base of texture group */
@@ -191,7 +190,7 @@ struct _render_container
 	render_container *	next;				/* the next container in the list */
 	container_item *	itemlist;			/* head of the item list */
 	container_item **	nextitem;			/* pointer to the next item to add */
-	const device_config *screen;			/* the screen device */
+	screen_device *screen;			/* the screen device */
 	int					orientation;		/* orientation of the container */
 	float				brightness;			/* brightness of the container */
 	float				contrast;			/* contrast of the container */
@@ -543,7 +542,6 @@ INLINE render_container *get_screen_container_by_index(int index)
 
 void render_init(running_machine *machine)
 {
-	const device_config *screen;
 	render_container **current_container_ptr = &screen_container_list;
 
 	/* make sure we clean up after ourselves */
@@ -563,7 +561,7 @@ void render_init(running_machine *machine)
 	ui_container = render_container_alloc(machine);
 
 	/* create a container for each screen and determine its orientation */
-	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+	for (screen_device *screendev = screen_first(*machine); screendev != NULL; screendev = screen_next(screendev))
 	{
 		render_container *screen_container = render_container_alloc(machine);
 		render_container **temp = &screen_container->next;
@@ -577,7 +575,7 @@ void render_init(running_machine *machine)
 		settings.gamma = options_get_float(mame_options(), OPTION_GAMMA);
 		render_container_set_user_settings(screen_container, &settings);
 
-		screen_container->screen = screen;
+		screen_container->screen = screendev;
 
 		/* link it up */
 		*current_container_ptr = screen_container;
@@ -626,8 +624,7 @@ static void render_exit(running_machine *machine)
 
 	/* free the screen overlay; similarly, do this before any of the following
        calls to avoid double-frees */
-	if (screen_overlay != NULL)
-		bitmap_free(screen_overlay);
+	global_free(screen_overlay);
 	screen_overlay = NULL;
 
 	/* free the texture groups */
@@ -957,7 +954,7 @@ static void render_save(running_machine *machine, int config_type, xml_data_node
     is 'live'
 -------------------------------------------------*/
 
-int render_is_live_screen(running_device *screen)
+int render_is_live_screen(device_t *screen)
 {
 	render_target *target;
 	int screen_index;
@@ -967,7 +964,7 @@ int render_is_live_screen(running_device *screen)
 	assert(screen->machine != NULL);
 	assert(screen->machine->config != NULL);
 
-	screen_index = screen->machine->devicelist.index(VIDEO_SCREEN, screen->tag());
+	screen_index = screen->machine->devicelist.index(SCREEN, screen->tag());
 
 	assert(screen_index != -1);
 
@@ -1470,9 +1467,8 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 		for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
 			if (item->element == NULL)
 			{
-				const device_config *screen = target->machine->config->devicelist.find(VIDEO_SCREEN, item->index);
-				const screen_config *scrconfig = (const screen_config *)screen->inline_config;
-				running_device *screendev = target->machine->device(screen->tag());
+				const screen_device_config *scrconfig = downcast<const screen_device_config *>(target->machine->config->devicelist.find(SCREEN, item->index));
+				screen_device *screendev = downcast<screen_device *>(target->machine->devicelist.find(scrconfig->tag()));
 				const rectangle vectorvis = { 0, 639, 0, 479 };
 				const rectangle *visarea = NULL;
 				render_container *container = get_screen_container_by_index(item->index);
@@ -1480,12 +1476,12 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 				float xscale, yscale;
 
 				/* we may be called very early, before machine->visible_area is initialized; handle that case */
-				if (scrconfig->type == SCREEN_TYPE_VECTOR)
+				if (scrconfig->screen_type() == SCREEN_TYPE_VECTOR)
 					visarea = &vectorvis;
-				else if (screendev != NULL && screendev->started)
-					visarea = video_screen_get_visible_area(screendev);
+				else if (screendev != NULL && screendev->started())
+					visarea = &screendev->visible_area();
 				else
-					visarea = &scrconfig->visarea;
+					visarea = &scrconfig->visible_area();
 
 				/* apply target orientation to the bounds */
 				bounds = item->bounds;
@@ -1854,7 +1850,7 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 	}
 
 	/* now do the built-in layouts for single-screen games */
-	if (video_screen_count(config) == 1)
+	if (screen_count(*config) == 1)
 	{
 		if (gamedrv->flags & ORIENTATION_SWAP_XY)
 			*nextfile = layout_file_load(config, NULL, layout_vertical);
@@ -2502,7 +2498,7 @@ void render_texture_free(render_texture *texture)
 		if (texture->scaled[scalenum].bitmap != NULL)
 		{
 			invalidate_all_render_ref(texture->scaled[scalenum].bitmap);
-			bitmap_free(texture->scaled[scalenum].bitmap);
+			global_free(texture->scaled[scalenum].bitmap);
 		}
 
 	/* invalidate references to the original bitmap as well */
@@ -2567,7 +2563,7 @@ void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const 
 		if (texture->scaled[scalenum].bitmap != NULL)
 		{
 			invalidate_all_render_ref(texture->scaled[scalenum].bitmap);
-			bitmap_free(texture->scaled[scalenum].bitmap);
+			global_free(texture->scaled[scalenum].bitmap);
 		}
 		texture->scaled[scalenum].bitmap = NULL;
 		texture->scaled[scalenum].seqid = 0;
@@ -2636,11 +2632,11 @@ static int texture_get_scaled(render_texture *texture, UINT32 dwidth, UINT32 dhe
 		if (scaled->bitmap != NULL)
 		{
 			invalidate_all_render_ref(scaled->bitmap);
-			bitmap_free(scaled->bitmap);
+			global_free(scaled->bitmap);
 		}
 
 		/* allocate a new bitmap */
-		scaled->bitmap = bitmap_alloc(dwidth, dheight, BITMAP_FORMAT_ARGB32);
+		scaled->bitmap = global_alloc(bitmap_t(dwidth, dheight, BITMAP_FORMAT_ARGB32));
 		scaled->seqid = ++texture->curseq;
 
 		/* let the scaler do the work */
@@ -2961,7 +2957,7 @@ render_container *render_container_get_ui(void)
     to the screen container for this device
 -------------------------------------------------*/
 
-render_container *render_container_get_screen(const device_config *screen)
+render_container *render_container_get_screen(screen_device *screen)
 {
 	render_container *container;
 
@@ -2975,12 +2971,6 @@ render_container *render_container_get_screen(const device_config *screen)
 	assert(container != NULL);
 
 	return container;
-}
-
-
-render_container *render_container_get_screen(running_device *screen)
-{
-	return render_container_get_screen(&screen->baseconfig());
 }
 
 

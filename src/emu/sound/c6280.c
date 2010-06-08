@@ -86,10 +86,8 @@ typedef struct {
 INLINE c6280_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_C6280);
-	return (c6280_t *)device->token;
+	assert(device->type() == SOUND_C6280);
+	return (c6280_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -99,7 +97,7 @@ INLINE c6280_t *get_safe_token(running_device *device)
 
 static void c6280_init(running_device *device, c6280_t *p, double clk, double rate)
 {
-	const c6280_interface *intf = (const c6280_interface *)device->baseconfig().static_config;
+	const c6280_interface *intf = (const c6280_interface *)device->baseconfig().static_config();
     int i;
     double step;
 
@@ -324,11 +322,11 @@ static STREAM_UPDATE( c6280_update )
 
 static DEVICE_START( c6280 )
 {
-    int rate = device->clock/16;
+    int rate = device->clock()/16;
     c6280_t *info = get_safe_token(device);
 
     /* Initialize PSG emulator */
-    c6280_init(device, info, device->clock, rate);
+    c6280_init(device, info, device->clock(), rate);
 
     /* Create stereo stream */
     info->stream = stream_create(device, 0, 2, rate, info, c6280_update);

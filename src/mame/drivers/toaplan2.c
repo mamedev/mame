@@ -531,7 +531,7 @@ static DRIVER_INIT( bbakradu )
 
 static READ16_HANDLER( toaplan2_inputport_0_word_r )
 {
-	return ((video_screen_get_vpos(space->machine->primary_screen) + 15) % 262) >= 245;
+	return ((space->machine->primary_screen->vpos() + 15) % 262) >= 245;
 }
 
 
@@ -543,7 +543,7 @@ static TIMER_CALLBACK( toaplan2_raise_irq )
 static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
 {
 	/* the IRQ appears to fire at line 0xe6 */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0xe6, 0), NULL, irq_line, toaplan2_raise_irq);
+	timer_set(machine, machine->primary_screen->time_until_pos(0xe6), NULL, irq_line, toaplan2_raise_irq);
 }
 
 static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(device->machine, 1); }
@@ -558,8 +558,8 @@ static READ16_HANDLER( video_count_r )
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	int hpos = video_screen_get_hpos(space->machine->primary_screen);
-	int vpos = video_screen_get_vpos(space->machine->primary_screen);
+	int hpos = space->machine->primary_screen->hpos();
+	int vpos = space->machine->primary_screen->vpos();
 	video_status = 0xff00;						/* Set signals inactive */
 
 	vpos = (vpos + 15) % 262;
@@ -575,7 +575,7 @@ static READ16_HANDLER( video_count_r )
 	else
 		video_status |= 0xff;
 
-//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(space->machine->primary_screen));
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,space->machine->primary_screen->vblank());
 
 	return video_status;
 }
@@ -658,7 +658,7 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan2_coin_w(space, offset, data & 0xff);
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (((data & 0x10) >> 4) * 0x40000));
+		space->machine->device<okim6295_device>("oki")->set_bank_base(((data & 0x10) >> 4) * 0x40000);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -1000,7 +1000,7 @@ static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(device, (data & 1) * 0x40000);
+		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 	}
 }
 
@@ -1084,7 +1084,7 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 {
-	running_device *nmk112 = devtag_get_device(space->machine, "nmk112");
+	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
 
 	nmk112_okibank_w(nmk112, 0,  data		& 0x0f);	// chip 0 bank 0
 	nmk112_okibank_w(nmk112, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
@@ -1092,7 +1092,7 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 {
-	running_device *nmk112 = devtag_get_device(space->machine, "nmk112");
+	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
 
 	nmk112_okibank_w(nmk112, 2,  data		& 0x0f);	// chip 0 bank 2
 	nmk112_okibank_w(nmk112, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
@@ -1100,7 +1100,7 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 {
-	running_device *nmk112 = devtag_get_device(space->machine, "nmk112");
+	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
 
 	nmk112_okibank_w(nmk112, 4,  data		& 0x0f);	// chip 1 bank 0
 	nmk112_okibank_w(nmk112, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
@@ -1108,7 +1108,7 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 {
-	running_device *nmk112 = devtag_get_device(space->machine, "nmk112");
+	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
 
 	nmk112_okibank_w(nmk112, 6,  data		& 0x0f);	// chip 1 bank 2
 	nmk112_okibank_w(nmk112, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
@@ -1267,7 +1267,7 @@ static const eeprom_interface bbakraid_93C66_intf =
 
 static READ16_HANDLER( bbakraid_nvram_r )
 {
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	eeprom_device *eeprom = space->machine->device<eeprom_device>("eeprom");
 
 	/* Bit 1 returns the status of BUSAK from the Z80.
        BUSRQ is activated via bit 0x10 on the NVRAM write port.
@@ -3541,8 +3541,7 @@ static MACHINE_DRIVER_START( dogyuun )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_25MHz/24) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3631,8 +3630,7 @@ static MACHINE_DRIVER_START( kbash )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3664,12 +3662,10 @@ static MACHINE_DRIVER_START( kbash2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3705,8 +3701,7 @@ static MACHINE_DRIVER_START( truxton2 )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3893,8 +3888,7 @@ static MACHINE_DRIVER_START( fixeight )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3926,8 +3920,7 @@ static MACHINE_DRIVER_START( fixeighb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_14MHz/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", XTAL_14MHz/16, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4089,8 +4082,7 @@ static MACHINE_DRIVER_START( batsugun )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_CONFIG(batsugun_ym2151_interface)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4126,8 +4118,7 @@ static MACHINE_DRIVER_START( snowbro2 )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_27MHz/10)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_27MHz/10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4168,8 +4159,7 @@ static MACHINE_DRIVER_START( mahoudai )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4210,8 +4200,7 @@ static MACHINE_DRIVER_START( shippumd )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono",1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4252,8 +4241,7 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_32MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NMK112_ADD("nmk112", bgaregga_nmk112_intf)
@@ -4296,12 +4284,10 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_32MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_32MHz/10)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", XTAL_32MHz/10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_32MHz/10)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki2", XTAL_32MHz/10, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NMK112_ADD("nmk112", batrider_nmk112_intf)

@@ -50,7 +50,7 @@ struct _sm8500_state
 	UINT8 CheckInterrupts;
 	int halted;
 	int icount;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	UINT8 internal_ram[0x500];
@@ -59,10 +59,9 @@ struct _sm8500_state
 INLINE sm8500_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SM8500);
-	return (sm8500_state *)device->token;
+	return (sm8500_state *)downcast<cpu_device *>(device)->token();
 }
 
 static const UINT8 sm8500_b2w[8] = {
@@ -100,10 +99,10 @@ static CPU_INIT( sm8500 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	if ( device->baseconfig().static_config != NULL ) {
-		cpustate->config.handle_dma = ((SM8500_CONFIG *)device->baseconfig().static_config)->handle_dma;
-		cpustate->config.handle_timers = ((SM8500_CONFIG *)device->baseconfig().static_config)->handle_timers;
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	if ( device->baseconfig().static_config() != NULL ) {
+		cpustate->config.handle_dma = ((SM8500_CONFIG *)device->baseconfig().static_config())->handle_dma;
+		cpustate->config.handle_timers = ((SM8500_CONFIG *)device->baseconfig().static_config())->handle_timers;
 	} else {
 		cpustate->config.handle_dma = NULL;
 		cpustate->config.handle_timers = NULL;
@@ -281,9 +280,9 @@ static unsigned sm8500_get_reg( sm8500_state *cpustate, int regnum )
 {
 	switch( regnum )
 	{
-	case REG_GENPC:
+	case STATE_GENPC:
 	case SM8500_PC:		return cpustate->PC;
-	case REG_GENSP:
+	case STATE_GENSP:
 	case SM8500_SP:		return ( cpustate->SYS & 0x40 ) ? cpustate->SP : cpustate->SP & 0xFF ;
 	case SM8500_PS:		return ( cpustate->PS0 << 8 ) | cpustate->PS1;
 	case SM8500_SYS16:	return cpustate->SYS;
@@ -321,9 +320,9 @@ static void sm8500_set_reg( sm8500_state *cpustate, int regnum, unsigned val )
 {
 	switch( regnum )
 	{
-	case REG_GENPC:
+	case STATE_GENPC:
 	case SM8500_PC:		cpustate->PC = val; break;
-	case REG_GENSP:
+	case STATE_GENSP:
 	case SM8500_SP:		cpustate->SP = val; break;
 	case SM8500_PS:		sm8500_set_reg( cpustate, SM8500_PS0, ( val >> 8 ) & 0xFF ); sm8500_set_reg( cpustate, SM8500_PS1, val & 0xFF ); break;
 	case SM8500_SYS16:	cpustate->SYS = val; break;
@@ -445,7 +444,7 @@ static CPU_SET_INFO( sm8500 )
 
 CPU_GET_INFO( sm8500 )
 {
-	sm8500_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	sm8500_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{
@@ -507,8 +506,8 @@ CPU_GET_INFO( sm8500 )
 	case CPUINFO_INT_REGISTER + SM8500_P2C:
 	case CPUINFO_INT_REGISTER + SM8500_P3C:
 								info->i = sm8500_get_reg( cpustate, state - CPUINFO_INT_REGISTER ); break;
-	case CPUINFO_INT_REGISTER + REG_GENPC:			info->i = sm8500_get_reg( cpustate, SM8500_PC ); break;
-	case CPUINFO_INT_REGISTER + REG_GENSP:			info->i = sm8500_get_reg( cpustate, SM8500_SP ); break;
+	case CPUINFO_INT_REGISTER + STATE_GENPC:			info->i = sm8500_get_reg( cpustate, SM8500_PC ); break;
+	case CPUINFO_INT_REGISTER + STATE_GENSP:			info->i = sm8500_get_reg( cpustate, SM8500_SP ); break;
 	case CPUINFO_INT_PREVIOUSPC:				info->i = 0x0000; break;
 
 

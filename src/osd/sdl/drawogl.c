@@ -1208,12 +1208,11 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 	// figure out if we're vector
 	scrnum = is_vector = 0;
-	for (screen = video_screen_first(window->machine->config); screen != NULL; screen = video_screen_next(screen))
+	for (screen = screen_first(*window->machine->config); screen != NULL; screen = screen_next(screen))
 	{
 		if (scrnum == window->index)
 		{
-			scrconfig = (const screen_config *) screen->inline_config;
-			is_vector = (scrconfig->type == SCREEN_TYPE_VECTOR) ? 1 : 0;
+			is_vector = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
 			break;
 		}
 		else
@@ -2938,13 +2937,12 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 		int uniform_location, scrnum;
 		render_container *container;
 		GLfloat vid_attributes[4]; // gamma, contrast, brightness, effect
-		const device_config *screen;
 
 		assert ( sdl->glsl_vid_attributes && texture->format!=SDL_TEXFORMAT_PALETTE16 );
 
 		scrnum = 0;
 		container = (render_container *)NULL;
-		for (screen = video_screen_first(window->machine->config); screen != NULL; screen = video_screen_next(screen))
+		for (screen_device *screen = screen_first(*window->machine); screen != NULL; screen = screen_next(screen))
 		{
 			if (scrnum == window->start_viewscreen)
 			{

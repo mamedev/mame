@@ -137,7 +137,7 @@ struct _r3000_state
 	int			icount;
 	int			interrupt_cycles;
 	int			hasfpu;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 
@@ -165,13 +165,12 @@ struct _r3000_state
 INLINE r3000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_R3000BE ||
 		   cpu_get_type(device) == CPU_R3000LE ||
 		   cpu_get_type(device) == CPU_R3041BE ||
 		   cpu_get_type(device) == CPU_R3041LE);
-	return (r3000_state *)device->token;
+	return (r3000_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -300,7 +299,7 @@ static void set_irq_line(r3000_state *r3000, int irqline, int state)
 
 static CPU_INIT( r3000 )
 {
-	const r3000_cpu_core *configdata = (const r3000_cpu_core *)device->baseconfig().static_config;
+	const r3000_cpu_core *configdata = (const r3000_cpu_core *)device->baseconfig().static_config();
 	r3000_state *r3000 = get_safe_token(device);
 
 	/* allocate memory */
@@ -313,7 +312,7 @@ static CPU_INIT( r3000 )
 
 	r3000->irq_callback = irqcallback;
 	r3000->device = device;
-	r3000->program = device->space(AS_PROGRAM);
+	r3000->program = device_memory(device)->space(AS_PROGRAM);
 }
 
 
@@ -1164,7 +1163,7 @@ static CPU_SET_INFO( r3000 )
 
 static CPU_GET_INFO( r3000 )
 {
-	r3000_state *r3000 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	r3000_state *r3000 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

@@ -38,6 +38,7 @@
 #ifndef __SN76477_H__
 #define __SN76477_H__
 
+#include "devlegcy.h"
 #include "machine/rescap.h"
 
 
@@ -124,7 +125,6 @@ void sn76477_attack_decay_cap_voltage_w(running_device *device, double data);
 void sn76477_vco_voltage_w(running_device *device, double data);
 void sn76477_pitch_voltage_w(running_device *device, double data);
 
-DEVICE_GET_INFO( sn76477 );
-#define SOUND_SN76477 DEVICE_GET_INFO_NAME( sn76477 )
+DECLARE_LEGACY_SOUND_DEVICE(SN76477, sn76477);
 
 #endif/* __SN76477_H__ */

@@ -202,7 +202,7 @@ VIDEO_START( pacland )
 {
 	int color;
 
-	fg_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	fg_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 	bitmap_fill(fg_bitmap, NULL, 0xffff);
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);

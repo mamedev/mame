@@ -309,7 +309,7 @@ static MACHINE_RESET( gottlieb )
 {
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
 	if (laserdisc != NULL)
-		timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, 17, 0), 17);
+		timer_adjust_oneshot(laserdisc_philips_timer, machine->primary_screen->time_until_pos(17), 17);
 }
 
 
@@ -468,7 +468,7 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
-	timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, param * 2, 0), param);
+	timer_adjust_oneshot(laserdisc_philips_timer, machine->primary_screen->time_until_pos(param * 2), param);
 }
 
 
@@ -689,7 +689,7 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
+	timer_set(device->machine, device->machine->primary_screen->time_until_pos(0), NULL, 0, nmi_clear);
 
 	/* if we have a laserdisc, update it */
 	if (laserdisc != NULL)

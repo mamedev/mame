@@ -282,7 +282,8 @@ static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
 
 static WRITE8_DEVICE_HANDLER( galpani2_oki2_bank_w )
 {
-		okim6295_set_bank_base(device, 0x40000 * (data & 0xf) );
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(0x40000 * (data & 0xf) );
 		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag(),data);
 }
 
@@ -606,12 +607,10 @@ static MACHINE_DRIVER_START( galpani2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 

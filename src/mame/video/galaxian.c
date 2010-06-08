@@ -544,7 +544,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 WRITE8_HANDLER( galaxian_videoram_w )
 {
 	/* update any video up to the current scanline */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 
 	/* store the data and mark the corresponding tile dirty */
 	space->machine->generic.videoram.u8[offset] = data;
@@ -555,7 +555,7 @@ WRITE8_HANDLER( galaxian_videoram_w )
 WRITE8_HANDLER( galaxian_objram_w )
 {
 	/* update any video up to the current scanline */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 
 	/* store the data */
 	space->machine->generic.spriteram.u8[offset] = data;
@@ -704,7 +704,7 @@ WRITE8_HANDLER( galaxian_flip_screen_x_w )
 {
 	if (flipscreen_x != (data & 0x01))
 	{
-		video_screen_update_now(space->machine->primary_screen);
+		space->machine->primary_screen->update_now();
 
 		/* when the direction changes, we count a different number of clocks */
 		/* per frame, so we need to reset the origin of the stars to the current */
@@ -720,7 +720,7 @@ WRITE8_HANDLER( galaxian_flip_screen_y_w )
 {
 	if (flipscreen_y != (data & 0x01))
 	{
-		video_screen_update_now(space->machine->primary_screen);
+		space->machine->primary_screen->update_now();
 		flipscreen_y = data & 0x01;
 		tilemap_set_flip(bg_tilemap, (flipscreen_x ? TILEMAP_FLIPX : 0) | (flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
@@ -743,14 +743,14 @@ WRITE8_HANDLER( galaxian_flip_screen_xy_w )
 WRITE8_HANDLER( galaxian_stars_enable_w )
 {
 	if ((stars_enabled ^ data) & 0x01)
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	if (!stars_enabled && (data & 0x01))
 	{
 		/* on the rising edge of this, the CLR on the shift registers is released */
 		/* this resets the "origin" of this frame to 0 minus the number of clocks */
 		/* we have counted so far */
-		star_rng_origin = STAR_RNG_PERIOD - (video_screen_get_vpos(space->machine->primary_screen) * 512 + video_screen_get_hpos(space->machine->primary_screen));
-		star_rng_origin_frame = video_screen_get_frame_number(space->machine->primary_screen);
+		star_rng_origin = STAR_RNG_PERIOD - (space->machine->primary_screen->vpos() * 512 + space->machine->primary_screen->hpos());
+		star_rng_origin_frame = space->machine->primary_screen->frame_number();
 	}
 	stars_enabled = data & 0x01;
 }
@@ -758,28 +758,28 @@ WRITE8_HANDLER( galaxian_stars_enable_w )
 
 WRITE8_HANDLER( scramble_background_enable_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	background_enable = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_red_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	background_red = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_green_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	background_green = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_blue_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	background_blue = data & 0x01;
 }
 
@@ -795,7 +795,7 @@ WRITE8_HANDLER( galaxian_gfxbank_w )
 {
 	if (gfxbank[offset] != data)
 	{
-		video_screen_update_now(space->machine->primary_screen);
+		space->machine->primary_screen->update_now();
 		gfxbank[offset] = data;
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
@@ -847,7 +847,7 @@ static void stars_init(running_machine *machine)
 
 static void stars_update_origin(running_machine *machine)
 {
-	int curframe = video_screen_get_frame_number(machine->primary_screen);
+	int curframe = machine->primary_screen->frame_number();
 
 	/* only update on a different frame */
 	if (curframe != star_rng_origin_frame)

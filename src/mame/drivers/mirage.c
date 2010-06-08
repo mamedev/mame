@@ -44,7 +44,11 @@ class mirage_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mirage_state(machine)); }
 
-	mirage_state(running_machine &machine) { }
+	mirage_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
+		  oki_sfx(machine.device<okim6295_device>("oki_sfx")),
+		  oki_bgm(machine.device<okim6295_device>("oki_bgm")) { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
@@ -57,11 +61,10 @@ public:
 	UINT32 mux_data;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *deco16ic;
-	running_device *oki_sfx;
-	running_device *oki_bgm;
+	cpu_device *maincpu;
+	deco16ic_device *deco16ic;
+	okim6295_device *oki_sfx;
+	okim6295_device *oki_bgm;
 };
 
 
@@ -82,7 +85,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		y = spriteram[offs];
 		flash = y & 0x1000;
 
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		if (pri != ((y & 0x8000) >> 15))
@@ -181,7 +184,7 @@ static READ16_HANDLER( mirage_input_r )
 static WRITE16_HANDLER( okim1_rombank_w )
 {
 	mirage_state *state = (mirage_state *)space->machine->driver_data;
-	okim6295_set_bank_base(state->oki_sfx, 0x40000 * (data & 0x3));
+	state->oki_sfx->set_bank_base(0x40000 * (data & 0x3));
 }
 
 static WRITE16_HANDLER( okim0_rombank_w )
@@ -189,7 +192,7 @@ static WRITE16_HANDLER( okim0_rombank_w )
 	mirage_state *state = (mirage_state *)space->machine->driver_data;
 
 	/*bits 4-6 used on POST? */
-	okim6295_set_bank_base(state->oki_bgm, 0x40000 * (data & 0x7));
+	state->oki_bgm->set_bank_base(0x40000 * (data & 0x7));
 }
 
 static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -362,11 +365,6 @@ static MACHINE_START( mirage )
 {
 	mirage_state *state = (mirage_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
-	state->oki_sfx = devtag_get_device(machine, "oki_sfx");
-	state->oki_bgm = devtag_get_device(machine, "oki_bgm");
-
 	state_save_register_global(machine, state->mux_data);
 }
 
@@ -408,12 +406,10 @@ static MACHINE_DRIVER_START( mirage )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki_bgm", OKIM6295, 2000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki_bgm", 2000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("oki_sfx", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki_sfx", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 

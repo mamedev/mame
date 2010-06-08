@@ -4,13 +4,13 @@
 
 *************************************************************************/
 
+#include "devlegcy.h"
 #include "sound/discrete.h"
 
 
 /*----------- defined in audio/polepos.c -----------*/
 
-DEVICE_GET_INFO( polepos_sound );
-#define SOUND_POLEPOS DEVICE_GET_INFO_NAME(polepos_sound)
+DECLARE_LEGACY_SOUND_DEVICE(POLEPOS, polepos_sound);
 
 WRITE8_HANDLER( polepos_engine_sound_lsb_w );
 WRITE8_HANDLER( polepos_engine_sound_msb_w );

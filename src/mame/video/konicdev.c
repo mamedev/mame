@@ -1347,10 +1347,9 @@ struct _k007121_state
 INLINE k007121_state *k007121_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K007121);
+	assert(device->type() == K007121);
 
-	return (k007121_state *)device->token;
+	return (k007121_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -1621,17 +1620,16 @@ struct _k007342_state
 INLINE k007342_state *k007342_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K007342);
+	assert(device->type() == K007342);
 
-	return (k007342_state *)device->token;
+	return (k007342_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k007342_interface *k007342_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K007342));
-	return (const k007342_interface *) device->baseconfig().static_config;
+	assert((device->type() == K007342));
+	return (const k007342_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -1912,17 +1910,16 @@ struct _k007420_state
 INLINE k007420_state *k007420_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K007420);
+	assert(device->type() == K007420);
 
-	return (k007420_state *)device->token;
+	return (k007420_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k007420_interface *k007420_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K007420));
-	return (const k007420_interface *) device->baseconfig().static_config;
+	assert((device->type() == K007420));
+	return (const k007420_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -2190,17 +2187,16 @@ struct _k052109_state
 INLINE k052109_state *k052109_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K052109);
+	assert(device->type() == K052109);
 
-	return (k052109_state *)device->token;
+	return (k052109_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k052109_interface *k052109_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K052109));
-	return (const k052109_interface *) device->baseconfig().static_config;
+	assert((device->type() == K052109));
+	return (const k052109_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -2826,17 +2822,16 @@ struct _k051960_state
 INLINE k051960_state *k051960_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K051960);
+	assert(device->type() == K051960);
 
-	return (k051960_state *)device->token;
+	return (k051960_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k051960_interface *k051960_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K051960));
-	return (const k051960_interface *) device->baseconfig().static_config;
+	assert((device->type() == K051960));
+	return (const k051960_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -3369,17 +3364,16 @@ struct _k05324x_state
 INLINE k05324x_state *k05324x_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == K053244 || device->type == K053245));
+	assert((device->type() == K053244 || device->type() == K053245));
 
-	return (k05324x_state *)device->token;
+	return (k05324x_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k05324x_interface *k05324x_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K053244 || device->type == K053245));
-	return (const k05324x_interface *) device->baseconfig().static_config;
+	assert((device->type() == K053244 || device->type() == K053245));
+	return (const k05324x_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -4148,7 +4142,7 @@ struct _k053247_state
 	k05324x_callback callback;
 
 	const char *memory_region;
-	running_device *screen;
+	screen_device *screen;
 };
 
 
@@ -4160,17 +4154,16 @@ struct _k053247_state
 INLINE k053247_state *k053247_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == K053246 || device->type == K053247 || device->type == K055673));
+	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
 
-	return (k053247_state *)device->token;
+	return (k053247_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k053247_interface *k053247_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K053246 || device->type == K053247 || device->type == K055673));
-	return (const k053247_interface *) device->baseconfig().static_config;
+	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
+	return (const k053247_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -4503,7 +4496,7 @@ void k053247_sprites_draw( running_device *device, bitmap_t *bitmap, const recta
 	int offx = (short)((k053246->kx46_regs[0] << 8) | k053246->kx46_regs[1]);
 	int offy = (short)((k053246->kx46_regs[2] << 8) | k053246->kx46_regs[3]);
 
-	int screen_width = video_screen_get_width(k053246->screen);
+	int screen_width = k053246->screen->width();
 	UINT8 drawmode_table[256];
 	UINT8 shadowmode_table[256];
 	UINT8 *whichtable;
@@ -4906,7 +4899,7 @@ static DEVICE_START( k053247 )
 		16*64
 	};
 
-	k053247->screen = devtag_get_device(device->machine, intf->screen);
+	k053247->screen = machine->device<screen_device>(intf->screen);
 
 	/* decode the graphics */
 	switch (intf->plane_order)
@@ -4927,7 +4920,7 @@ static DEVICE_START( k053247 )
 
 	if (VERBOSE)
 	{
-		if (video_screen_get_format(k053247->screen) == BITMAP_FORMAT_RGB32)
+		if (k053247->screen->format() == BITMAP_FORMAT_RGB32)
 		{
 			if ((machine->config->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
@@ -5014,7 +5007,7 @@ static DEVICE_START( k055673 )
 		16*16*6
 	};
 
-	k053247->screen = devtag_get_device(device->machine, intf->screen);
+	k053247->screen = machine->device<screen_device>(intf->screen);
 
 	K055673_rom = (UINT16 *)memory_region(machine, intf->gfx_memory_region);
 
@@ -5152,17 +5145,16 @@ struct _k051316_state
 INLINE k051316_state *k051316_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K051316);
+	assert(device->type() == K051316);
 
-	return (k051316_state *)device->token;
+	return (k051316_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k051316_interface *k051316_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == K051316);
-	return (const k051316_interface *) device->baseconfig().static_config;
+	assert(device->type() == K051316);
+	return (const k051316_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -5441,17 +5433,16 @@ struct _k053936_state
 INLINE k053936_state *k053936_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K053936);
+	assert(device->type() == K053936);
 
-	return (k053936_state *)device->token;
+	return (k053936_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k053936_interface *k053936_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == K053936);
-	return (const k053936_interface *) device->baseconfig().static_config;
+	assert(device->type() == K053936);
+	return (const k053936_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -5667,10 +5658,9 @@ struct _k053251_state
 INLINE k053251_state *k053251_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K053251);
+	assert(device->type() == K053251);
 
-	return (k053251_state *)device->token;
+	return (k053251_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -5821,10 +5811,9 @@ struct _k054000_state
 INLINE k054000_state *k054000_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K054000);
+	assert(device->type() == K054000);
 
-	return (k054000_state *)device->token;
+	return (k054000_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -5933,10 +5922,9 @@ struct _k051733_state
 INLINE k051733_state *k051733_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K051733);
+	assert(device->type() == K051733);
 
-	return (k051733_state *)device->token;
+	return (k051733_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -6138,17 +6126,16 @@ struct _k056832_state
 INLINE k056832_state *k056832_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K056832);
+	assert(device->type() == K056832);
 
-	return (k056832_state *)device->token;
+	return (k056832_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k056832_interface *k056832_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == K056832);
-	return (const k056832_interface *) device->baseconfig().static_config;
+	assert(device->type() == K056832);
+	return (const k056832_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -8058,10 +8045,9 @@ struct _k055555_state
 INLINE k055555_state *k055555_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K055555);
+	assert(device->type() == K055555);
 
-	return (k055555_state *)device->token;
+	return (k055555_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -8175,7 +8161,7 @@ struct _k054338_state
 	int       shd_rgb[9];
 	int       alphainverted;
 
-	running_device *screen;
+	screen_device *screen;
 	running_device *k055555;	/* used to fill BG color */
 };
 
@@ -8186,17 +8172,16 @@ struct _k054338_state
 INLINE k054338_state *k054338_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K054338);
+	assert(device->type() == K054338);
 
-	return (k054338_state *)device->token;
+	return (k054338_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k054338_interface *k054338_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == K054338);
-	return (const k054338_interface *) device->baseconfig().static_config;
+	assert(device->type() == K054338);
+	return (const k054338_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -8280,12 +8265,12 @@ void k054338_fill_backcolor( running_device *device, bitmap_t *bitmap, int mode 
 	int BGC_CBLK, BGC_SET;
 	UINT32 *dst_ptr, *pal_ptr;
 	int bgcolor;
-	const rectangle *visarea = video_screen_get_visible_area(k054338->screen);
+	const rectangle &visarea = k054338->screen->visible_area();
 
-	clipx = visarea->min_x & ~3;
-	clipy = visarea->min_y;
-	clipw = (visarea->max_x - clipx + 4) & ~3;
-	cliph = visarea->max_y - clipy + 1;
+	clipx = visarea.min_x & ~3;
+	clipy = visarea.min_y;
+	clipw = (visarea.max_x - clipx + 4) & ~3;
+	cliph = visarea.max_y - clipy + 1;
 
 	dst_ptr = BITMAP_ADDR32(bitmap, clipy, 0);
 	dst_pitch = bitmap->rowpixels;
@@ -8445,7 +8430,7 @@ static DEVICE_START( k054338 )
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	const k054338_interface *intf = k054338_get_interface(device);
 
-	k054338->screen = devtag_get_device(device->machine, intf->screen);
+	k054338->screen = device->machine->device<screen_device>(intf->screen);
 	k054338->k055555 = devtag_get_device(device->machine, intf->k055555);
 
 	k054338->alphainverted = intf->alpha_inv;
@@ -8480,7 +8465,7 @@ struct _k053250_state
 	int         page;
 	int         frame, offsx, offsy;
 
-	running_device *screen;
+	screen_device *screen;
 };
 
 /*****************************************************************************
@@ -8490,17 +8475,16 @@ struct _k053250_state
 INLINE k053250_state *k053250_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K053250);
+	assert(device->type() == K053250);
 
-	return (k053250_state *)device->token;
+	return (k053250_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k053250_interface *k053250_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K053250));
-	return (const k053250_interface *) device->baseconfig().static_config;
+	assert((device->type() == K053250));
+	return (const k053250_interface *) device->baseconfig().static_config();
 }
 
 
@@ -8515,7 +8499,7 @@ void k053250_dma( running_device *device, int limiter )
 	k053250_state *k053250 = k053250_get_safe_token(device);
 	int last_frame, current_frame;
 
-	current_frame = video_screen_get_frame_number(k053250->screen);
+	current_frame = k053250->screen->frame_number();
 	last_frame = k053250->frame;
 
 	if (limiter && current_frame == last_frame)
@@ -8981,7 +8965,7 @@ static DEVICE_START( k053250 )
 	k053250->base = memory_region(device->machine, intf->gfx_memory_region);
 	k053250->rommask = memory_region_length(device->machine, intf->gfx_memory_region);
 
-	k053250->screen = devtag_get_device(device->machine, intf->screen);
+	k053250->screen = device->machine->device<screen_device>(intf->screen);
 
 	k053250->ram = auto_alloc_array(device->machine, UINT16, 0x6000 / 2);
 
@@ -9034,10 +9018,9 @@ struct _k053252_state
 INLINE k053252_state *k053252_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K053252);
+	assert(device->type() == K053252);
 
-	return (k053252_state *)device->token;
+	return (k053252_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -9102,7 +9085,7 @@ static DEVICE_RESET( k053252 )
 typedef struct _k001006_state k001006_state;
 struct _k001006_state
 {
-	running_device *screen;
+	screen_device *screen;
 
 	UINT16 *     pal_ram;
 	UINT16 *     unknown_ram;
@@ -9121,17 +9104,16 @@ struct _k001006_state
 INLINE k001006_state *k001006_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K001006);
+	assert(device->type() == K001006);
 
-	return (k001006_state *)device->token;
+	return (k001006_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k001006_interface *k001006_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K001006));
-	return (const k001006_interface *) device->baseconfig().static_config;
+	assert((device->type() == K001006));
+	return (const k001006_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -9287,7 +9269,7 @@ struct _poly_extra_data
 typedef struct _k001005_state k001005_state;
 struct _k001005_state
 {
-	running_device *screen;
+	screen_device *screen;
 	running_device *cpu;
 	running_device *dsp;
 	running_device *k001006_1;
@@ -9332,17 +9314,16 @@ static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96
 INLINE k001005_state *k001005_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K001005);
+	assert(device->type() == K001005);
 
-	return (k001005_state *)device->token;
+	return (k001005_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k001005_interface *k001005_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K001005));
-	return (const k001005_interface *) device->baseconfig().static_config;
+	assert((device->type() == K001005));
+	return (const k001005_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -9680,7 +9661,7 @@ static void k001005_render_polygons( running_device *device )
 	k001005_state *k001005 = k001005_get_safe_token(device);
 	int i, j;
 #if POLY_DEVICE
-	const rectangle *visarea = video_screen_get_visible_area(k001005->screen);
+	const rectangle &visarea = k001005->screen->visible_area();
 #endif
 
 //  mame_printf_debug("k001005->fifo_ptr = %08X\n", k001005->_3d_fifo_ptr);
@@ -9723,9 +9704,9 @@ static void k001005_render_polygons( running_device *device )
 
 			extra->color = color;
 #if POLY_DEVICE
-			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
-			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
-//          poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page],  visarea, draw_scanline, 1, 4, v);
+			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
+//          poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page],  &visarea, draw_scanline, 1, 4, v);
 #endif
 			i = index - 1;
 		}
@@ -9831,13 +9812,13 @@ static void k001005_render_polygons( running_device *device )
 			if (num_verts < 3)
 			{
 #if POLY_DEVICE
-				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &v[0], &v[1]);
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &v[0], &v[1]);
 				if (k001005->prev_poly_type)
-					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &k001005->prev_v[3], &v[0]);
+					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &k001005->prev_v[3], &v[0]);
 //              if (k001005->prev_poly_type)
-//                  poly_render_quad(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &k001005->prev_v[3], &v[0], &v[1]);
+//                  poly_render_quad(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &k001005->prev_v[3], &v[0], &v[1]);
 //              else
-//                  poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &v[0], &v[1]);
+//                  poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, &k001005->prev_v[2], &v[0], &v[1]);
 #endif
 				memcpy(&k001005->prev_v[0], &k001005->prev_v[2], sizeof(poly_vertex));
 				memcpy(&k001005->prev_v[1], &k001005->prev_v[3], sizeof(poly_vertex));
@@ -9847,10 +9828,10 @@ static void k001005_render_polygons( running_device *device )
 			else
 			{
 #if POLY_DEVICE
-				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
 				if (num_verts > 3)
-					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
-//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, num_verts, v);
+					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
+//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, num_verts, v);
 #endif
 				memcpy(k001005->prev_v, v, sizeof(poly_vertex) * 4);
 			}
@@ -9935,10 +9916,10 @@ static void k001005_render_polygons( running_device *device )
 				extra->color = color;
 
 #if POLY_DEVICE
-				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, &v[0], &v[1], &v[2]);
 				if (new_verts > 1)
-					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
-//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline_tex, 4, new_verts + 2, v);
+					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, &v[2], &v[3], &v[0]);
+//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline_tex, 4, new_verts + 2, v);
 #endif
 				memcpy(k001005->prev_v, v, sizeof(poly_vertex) * 4);
 			};
@@ -9995,10 +9976,10 @@ static void k001005_render_polygons( running_device *device )
 			extra->color = color;
 
 #if POLY_DEVICE
-			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+			poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
 			if (num_verts > 3)
-				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[2], &v[3], &v[0]);
-//          poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, num_verts, v);
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline, 1, &v[2], &v[3], &v[0]);
+//          poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline, 1, num_verts, v);
 #endif
 			memcpy(k001005->prev_v, v, sizeof(poly_vertex) * 4);
 
@@ -10055,10 +10036,10 @@ static void k001005_render_polygons( running_device *device )
 				extra->color = color;
 
 #if POLY_DEVICE
-				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
+				poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[1], &v[2]);
 				if (new_verts > 1)
-					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
-//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], visarea, draw_scanline, 1, new_verts + 2, v);
+					poly_render_triangle(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline, 1, &v[0], &v[2], &v[3]);
+//              poly_render_polygon(k001005->poly, k001005->bitmap[k001005->bitmap_page], &visarea, draw_scanline, 1, new_verts + 2, v);
 #endif
 				memcpy(k001005->prev_v, v, sizeof(poly_vertex) * 4);
 			};
@@ -10120,15 +10101,15 @@ static DEVICE_START( k001005 )
 	k001005->k001006_1 = devtag_get_device(device->machine, intf->k001006_1);
 	k001005->k001006_2 = devtag_get_device(device->machine, intf->k001006_2);
 
-	k001005->screen = devtag_get_device(device->machine, intf->screen);
-	width = video_screen_get_width(k001005->screen);
-	height = video_screen_get_height(k001005->screen);
+	k001005->screen = device->machine->device<screen_device>(intf->screen);
+	width = k001005->screen->width();
+	height = k001005->screen->height();
 	k001005->zbuffer = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	k001005->gfxrom = memory_region(device->machine, intf->gfx_memory_region);
 
-	k001005->bitmap[0] = video_screen_auto_bitmap_alloc(k001005->screen);
-	k001005->bitmap[1] = video_screen_auto_bitmap_alloc(k001005->screen);
+	k001005->bitmap[0] = k001005->screen->alloc_compatible_bitmap();
+	k001005->bitmap[1] = k001005->screen->alloc_compatible_bitmap();
 
 	k001005->texture = auto_alloc_array(device->machine, UINT8, 0x800000);
 
@@ -10201,7 +10182,7 @@ static DEVICE_STOP( k001005 )
 typedef struct _k001604_state k001604_state;
 struct _k001604_state
 {
-	running_device *screen;
+	screen_device *screen;
 	tilemap_t        *layer_8x8[2];
 	tilemap_t        *layer_roz[2];
 	int            gfx_index[2];
@@ -10225,17 +10206,16 @@ struct _k001604_state
 INLINE k001604_state *k001604_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K001604);
+	assert(device->type() == K001604);
 
-	return (k001604_state *)device->token;
+	return (k001604_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k001604_interface *k001604_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K001604));
-	return (const k001604_interface *) device->baseconfig().static_config;
+	assert((device->type() == K001604));
+	return (const k001604_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -10620,7 +10600,7 @@ static DEVICE_RESET( k001604 )
 typedef struct _k037122_state k037122_state;
 struct _k037122_state
 {
-	running_device *screen;
+	screen_device *screen;
 	tilemap_t        *layer[2];
 	int            gfx_index;
 
@@ -10639,17 +10619,16 @@ struct _k037122_state
 INLINE k037122_state *k037122_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K037122);
+	assert(device->type() == K037122);
 
-	return (k037122_state *)device->token;
+	return (k037122_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k037122_interface *k037122_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K037122));
-	return (const k037122_interface *) device->baseconfig().static_config;
+	assert((device->type() == K037122));
+	return (const k037122_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -10703,18 +10682,18 @@ static TILE_GET_INFO_DEVICE( k037122_tile_info_layer1 )
 void k037122_tile_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	k037122_state *k037122 = k037122_get_safe_token(device);
-	const rectangle *visarea = video_screen_get_visible_area(k037122->screen);
+	const rectangle &visarea = k037122->screen->visible_area();
 
 	if (k037122->reg[0xc] & 0x10000)
 	{
-		tilemap_set_scrolldx(k037122->layer[1], visarea->min_x, visarea->min_x);
-		tilemap_set_scrolldy(k037122->layer[1], visarea->min_y, visarea->min_y);
+		tilemap_set_scrolldx(k037122->layer[1], visarea.min_x, visarea.min_x);
+		tilemap_set_scrolldy(k037122->layer[1], visarea.min_y, visarea.min_y);
 		tilemap_draw(bitmap, cliprect, k037122->layer[1], 0, 0);
 	}
 	else
 	{
-		tilemap_set_scrolldx(k037122->layer[0], visarea->min_x, visarea->min_x);
-		tilemap_set_scrolldy(k037122->layer[0], visarea->min_y, visarea->min_y);
+		tilemap_set_scrolldx(k037122->layer[0], visarea.min_x, visarea.min_x);
+		tilemap_set_scrolldy(k037122->layer[0], visarea.min_y, visarea.min_y);
 		tilemap_draw(bitmap, cliprect, k037122->layer[0], 0, 0);
 	}
 }
@@ -10821,7 +10800,7 @@ static DEVICE_START( k037122 )
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	const k037122_interface *intf = k037122_get_interface(device);
 
-	k037122->screen = devtag_get_device(device->machine, intf->screen);
+	k037122->screen = device->machine->device<screen_device>(intf->screen);
 	k037122->gfx_index = intf->gfx_index;
 
 	k037122->char_ram = auto_alloc_array(device->machine, UINT32, 0x200000 / 4);
@@ -10944,7 +10923,6 @@ DEVICE_GET_INFO( k007121 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k007121_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k007121);		break;
@@ -10967,7 +10945,6 @@ DEVICE_GET_INFO( k007342 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k007342_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k007342);		break;
@@ -10990,7 +10967,6 @@ DEVICE_GET_INFO( k007420 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k007420_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k007420);		break;
@@ -11013,7 +10989,6 @@ DEVICE_GET_INFO( k052109 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k052109_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k052109);		break;
@@ -11035,7 +11010,6 @@ DEVICE_GET_INFO( k051960 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k051960_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k051960);		break;
@@ -11057,7 +11031,6 @@ DEVICE_GET_INFO( k05324x )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k05324x_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k05324x);		break;
@@ -11079,7 +11052,6 @@ DEVICE_GET_INFO( k053247 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k053247_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k053247);		break;
@@ -11101,7 +11073,6 @@ DEVICE_GET_INFO( k055673 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k053247_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k055673);		break;
@@ -11123,7 +11094,6 @@ DEVICE_GET_INFO( k051316 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k051316_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k051316);		break;
@@ -11145,7 +11115,6 @@ DEVICE_GET_INFO( k053936 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k053936_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k053936);		break;
@@ -11167,7 +11136,6 @@ DEVICE_GET_INFO( k053251 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k053251_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k053251);		break;
@@ -11189,7 +11157,6 @@ DEVICE_GET_INFO( k054000 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k054000_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k054000);		break;
@@ -11211,7 +11178,6 @@ DEVICE_GET_INFO( k051733 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k051733_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k051733);		break;
@@ -11233,7 +11199,6 @@ DEVICE_GET_INFO( k056832 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k056832_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k056832);		break;
@@ -11255,7 +11220,6 @@ DEVICE_GET_INFO( k055555 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k055555_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k055555);		break;
@@ -11277,7 +11241,6 @@ DEVICE_GET_INFO( k054338 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k054338_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k054338);		break;
@@ -11299,7 +11262,6 @@ DEVICE_GET_INFO( k053250 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k053250_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k053250);		break;
@@ -11321,7 +11283,6 @@ DEVICE_GET_INFO( k053252 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k053252_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k053252);		break;
@@ -11343,7 +11304,6 @@ DEVICE_GET_INFO( k001006 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k001006_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k001006);		break;
@@ -11366,7 +11326,6 @@ DEVICE_GET_INFO( k001005 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k001005_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k001005);		break;
@@ -11389,7 +11348,6 @@ DEVICE_GET_INFO( k001604 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k001604_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k001604);		break;
@@ -11412,7 +11370,6 @@ DEVICE_GET_INFO( k037122 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k037122_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k037122);		break;

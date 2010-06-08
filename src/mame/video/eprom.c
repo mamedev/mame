@@ -210,9 +210,9 @@ VIDEO_START( guts )
  *
  *************************************/
 
-void eprom_scanline_update(running_device *screen, int scanline)
+void eprom_scanline_update(screen_device &screen, int scanline)
 {
-	eprom_state *state = (eprom_state *)screen->machine->driver_data;
+	eprom_state *state = (eprom_state *)screen.machine->driver_data;
 
 	/* update the playfield */
 	if (scanline == 0)

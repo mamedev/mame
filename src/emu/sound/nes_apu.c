@@ -75,10 +75,8 @@ struct _nesapu_state
 INLINE nesapu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_NES);
-	return (nesapu_state *)device->token;
+	assert(device->type() == SOUND_NES);
+	return (nesapu_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* INTERNAL FUNCTIONS */
@@ -687,16 +685,16 @@ static STREAM_UPDATE( nes_psg_update_sound )
 /* INITIALIZE APU SYSTEM */
 static DEVICE_START( nesapu )
 {
-	const nes_interface *intf = (const nes_interface *)device->baseconfig().static_config;
+	const nes_interface *intf = (const nes_interface *)device->baseconfig().static_config();
 	nesapu_state *info = get_safe_token(device);
-	int rate = device->clock / 4;
+	int rate = device->clock() / 4;
 	int i;
 
 	/* Initialize global variables */
-	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
+	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(device->machine->primary_screen->frame_period().attoseconds);
 	info->buffer_size = info->samps_per_sync;
-	info->real_rate = info->samps_per_sync * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
-	info->apu_incsize = (float) (device->clock / (float) info->real_rate);
+	info->real_rate = info->samps_per_sync * ATTOSECONDS_TO_HZ(device->machine->primary_screen->frame_period().attoseconds);
+	info->apu_incsize = (float) (device->clock() / (float) info->real_rate);
 
 	/* Use initializer calls */
 	create_noise(info->noise_lut, 13, NOISE_LONG);

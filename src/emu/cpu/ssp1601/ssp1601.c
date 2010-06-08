@@ -60,10 +60,9 @@ struct _ssp1601_state_t
 INLINE ssp1601_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SSP1601);
-	return (ssp1601_state_t *)device->token;
+	return (ssp1601_state_t *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -530,8 +529,8 @@ static CPU_INIT( ssp1601 )
 	memset(ssp1601_state, 0, sizeof(ssp1601_state_t));
 	ssp1601_state->gr[0].w.h = 0xffff; // constant reg
 	ssp1601_state->device = device;
-	ssp1601_state->program = device->space(AS_PROGRAM);
-	ssp1601_state->io = device->space(AS_IO);
+	ssp1601_state->program = device_memory(device)->space(AS_PROGRAM);
+	ssp1601_state->io = device_memory(device)->space(AS_IO);
 
 }
 
@@ -809,7 +808,7 @@ static CPU_SET_INFO( ssp1601 )
 
 CPU_GET_INFO( ssp1601 )
 {
-	ssp1601_state_t *ssp1601_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	ssp1601_state_t *ssp1601_state = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

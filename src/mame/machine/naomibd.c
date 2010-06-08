@@ -306,10 +306,9 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
 INLINE naomibd_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == NAOMI_BOARD);
+	assert(device->type() == NAOMI_BOARD);
 
-	return (naomibd_state *)device->token;
+	return (naomibd_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -322,7 +321,7 @@ INLINE naomibd_state *get_safe_token(running_device *device)
 
 int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func callback)
 {
-	naomibd_config *config = (naomibd_config *)device->baseconfig().inline_config;
+	naomibd_config *config = (naomibd_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	//naomibd_state *v = get_safe_token(device);
 
 	config->interrupt = callback;
@@ -335,6 +334,55 @@ int naomibd_get_type(running_device *device)
 	return v->type;
 }
 
+
+void *naomibd_get_memory(running_device *device)
+{
+	return get_safe_token(device)->memory;
+}
+
+
+offs_t naomibd_get_dmaoffset(running_device *device)
+{
+	offs_t result = 0;
+	
+	#if NAOMIBD_PRINTF_PROTECTION
+        printf("DMA source %08x, flags %x\n", get_safe_token(device)->dma_offset, get_safe_token(device)->dma_offset_flags);
+	#endif
+
+	// if the flag is cleared that lets the protection chip go,
+	// we need to handle this specially.  but not on DIMM boards.
+	if (!(get_safe_token(device)->dma_offset_flags & NAOMIBD_FLAG_ADDRESS_SHUFFLE) && (get_safe_token(device)->type == ROM_BOARD))
+	{
+		if (!strcmp(device->machine->gamedrv->name, "qmegamis"))
+		{
+			result = 0x9000000;
+			return result;
+		}
+		else if (!strcmp(device->machine->gamedrv->name, "mvsc2"))
+		{
+			switch (get_safe_token(device)->dma_offset)
+			{
+				case 0x08000000: result = 0x8800000;	break;
+				case 0x08026440: result = 0x8830000;	break;
+				case 0x0803bda0: result = 0x8850000;	break;
+				case 0x0805a560: result = 0x8870000;	break;
+				case 0x0805b720: result = 0x8880000;	break;
+				case 0x0808b7e0: result = 0x88a0000;	break;
+				default:
+					result = get_safe_token(device)->dma_offset;
+					break;
+			}
+
+			return result;
+		}
+		else
+		{
+			logerror("Protected DMA not handled for this game (dma_offset %x)\n", get_safe_token(device)->dma_offset);
+		}
+	}
+
+	return result;
+}
 
 
 /*************************************
@@ -1697,13 +1745,13 @@ static void stream_decrypt(UINT32 game_key, UINT32 sequence_key, UINT16 seed, UI
 
 static DEVICE_START( naomibd )
 {
-	const naomibd_config *config = (const naomibd_config *)device->baseconfig().inline_config;
+	const naomibd_config *config = (const naomibd_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	naomibd_state *v = get_safe_token(device);
 	int i;
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config == NULL);
-	assert(device->baseconfig().inline_config != NULL);
+	assert(device->baseconfig().static_config() == NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -1755,7 +1803,7 @@ static DEVICE_START( naomibd )
 	}
 
 	/* set the type */
-	v->index = device->machine->devicelist.index(device->type, device->tag());
+	v->index = device->machine->devicelist.index(device->type(), device->tag());
 	v->type = config->type;
 
 	/* initialize some registers */
@@ -1839,68 +1887,14 @@ static DEVICE_NVRAM( naomibd )
     device get info callback
 -------------------------------------------------*/
 
-static DEVICE_GET_RUNTIME_INFO( naomibd )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_DMAOFFSET:
-			#if NAOMIBD_PRINTF_PROTECTION
-		        printf("DMA source %08x, flags %x\n", get_safe_token(device)->dma_offset, get_safe_token(device)->dma_offset_flags);
-			#endif
-
-			// if the flag is cleared that lets the protection chip go,
-			// we need to handle this specially.  but not on DIMM boards.
-			if (!(get_safe_token(device)->dma_offset_flags & NAOMIBD_FLAG_ADDRESS_SHUFFLE) && (get_safe_token(device)->type == ROM_BOARD))
-			{
-				if (!strcmp(device->machine->gamedrv->name, "qmegamis"))
-				{
-					info->i = 0x9000000;
-					break;
-				}
-				else if (!strcmp(device->machine->gamedrv->name, "mvsc2"))
-				{
-					switch (get_safe_token(device)->dma_offset)
-					{
-						case 0x08000000: info->i = 0x8800000;	break;
-						case 0x08026440: info->i = 0x8830000;	break;
-						case 0x0803bda0: info->i = 0x8850000;	break;
-						case 0x0805a560: info->i = 0x8870000;	break;
-						case 0x0805b720: info->i = 0x8880000;	break;
-						case 0x0808b7e0: info->i = 0x88a0000;	break;
-						default:
-							info->i = get_safe_token(device)->dma_offset;
-							break;
-					}
-
-					return;
-				}
-				else
-				{
-					logerror("Protected DMA not handled for this game (dma_offset %x)\n", get_safe_token(device)->dma_offset);
-				}
-			}
-
-			info->i = get_safe_token(device)->dma_offset;
-			break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MEMORY:				info->p = get_safe_token(device)->memory;		break;
-
-		/* default to the standard info */
-		default:								DEVICE_GET_INFO_NAME(naomibd)(&device->baseconfig(), state, info);	break;
-	}
-}
-
 DEVICE_GET_INFO( naomibd )
 {
-	const naomibd_config *config = (device != NULL) ? (const naomibd_config *)device->inline_config : NULL;
+	const naomibd_config *config = (device != NULL) ? (const naomibd_config *)downcast<const legacy_device_config_base *>(device)->inline_config() : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(naomibd_state);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(naomibd_config);				break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = NULL;							break;
@@ -1911,7 +1905,6 @@ DEVICE_GET_INFO( naomibd )
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(naomibd);			break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(naomibd);		break;
 		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(naomibd);		break;
-		case DEVINFO_FCT_GET_RUNTIME_INFO:		info->get_runtime_info = DEVICE_GET_RUNTIME_INFO_NAME(naomibd);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:

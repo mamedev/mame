@@ -81,7 +81,7 @@ static TIMER_CALLBACK( periodic_callback )
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
-				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, i, 0), NULL, mask[i], pot_interrupt);
+				timer_set(machine, machine->primary_screen->time_until_pos(i), NULL, mask[i], pot_interrupt);
 
 		state->pot_state = 0;
 	}
@@ -91,7 +91,7 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline >= 262)
 		scanline = 0;
 
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, periodic_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, periodic_callback);
 }
 
 
@@ -196,7 +196,7 @@ static READ8_HANDLER( boxer_input_r )
 {
 	UINT8 val = input_port_read(space->machine, "IN0");
 
-	if (input_port_read(space->machine, "IN3") < video_screen_get_vpos(space->machine->primary_screen))
+	if (input_port_read(space->machine, "IN3") < space->machine->primary_screen->vpos())
 		val |= 0x02;
 
 	return (val << ((offset & 7) ^ 7)) & 0x80;
@@ -215,7 +215,7 @@ static READ8_HANDLER( boxer_misc_r )
 		break;
 
 	case 1:
-		val = video_screen_get_vpos(space->machine->primary_screen);
+		val = space->machine->primary_screen->vpos();
 		break;
 
 	case 2:
@@ -429,7 +429,7 @@ static MACHINE_START( boxer )
 static MACHINE_RESET( boxer )
 {
 	boxer_state *state = (boxer_state *)machine->driver_data;
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, periodic_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, periodic_callback);
 
 	state->pot_state = 0;
 	state->pot_latch = 0;

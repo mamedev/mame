@@ -25,7 +25,6 @@ static UINT16* pkscramble_mdtilemap_ram;
 static UINT16* pkscramble_bgtilemap_ram;
 
 static tilemap_t *fg_tilemap, *md_tilemap, *bg_tilemap;
-static running_device *scanline_timer;
 
 static WRITE16_HANDLER( pkscramble_fgtilemap_w )
 {
@@ -196,15 +195,15 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 	if (param == interrupt_scanline)
 	{
     	if (out & 0x2000)
-    		cputag_set_input_line(timer->machine, "maincpu", 1, ASSERT_LINE);
-		timer_device_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, param + 1, 0), param+1);
+    		cputag_set_input_line(timer.machine, "maincpu", 1, ASSERT_LINE);
+		timer.adjust(timer.machine->primary_screen->time_until_pos(param + 1), param+1);
 		interrupt_line_active = 1;
 	}
 	else
 	{
 		if (interrupt_line_active)
-	    	cputag_set_input_line(timer->machine, "maincpu", 1, CLEAR_LINE);
-		timer_device_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
+	    	cputag_set_input_line(timer.machine, "maincpu", 1, CLEAR_LINE);
+		timer.adjust(timer.machine->primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 		interrupt_line_active = 0;
 	}
 }
@@ -269,8 +268,8 @@ static MACHINE_RESET( pkscramble)
 {
 	out = 0;
 	interrupt_line_active=0;
-	scanline_timer = devtag_get_device(machine, "scan_timer");
-	timer_device_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
+	timer_device *scanline_timer = machine->device<timer_device>("scan_timer");
+	scanline_timer->adjust(machine->primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
 static MACHINE_DRIVER_START( pkscramble )

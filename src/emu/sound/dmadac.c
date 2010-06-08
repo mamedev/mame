@@ -59,10 +59,8 @@ struct _dmadac_state
 INLINE dmadac_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_DMADAC);
-	return (dmadac_state *)device->token;
+	assert(device->type() == SOUND_DMADAC);
+	return (dmadac_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -134,7 +132,7 @@ static DEVICE_START( dmadac )
  *
  *************************************/
 
-void dmadac_transfer(running_device **devlist, UINT8 num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data)
+void dmadac_transfer(dmadac_sound_device **devlist, UINT8 num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data)
 {
 	int i, j;
 
@@ -181,7 +179,7 @@ void dmadac_transfer(running_device **devlist, UINT8 num_channels, offs_t channe
  *
  *************************************/
 
-void dmadac_enable(running_device **devlist, UINT8 num_channels, UINT8 enable)
+void dmadac_enable(dmadac_sound_device **devlist, UINT8 num_channels, UINT8 enable)
 {
 	int i;
 
@@ -204,7 +202,7 @@ void dmadac_enable(running_device **devlist, UINT8 num_channels, UINT8 enable)
  *
  *************************************/
 
-void dmadac_set_frequency(running_device **devlist, UINT8 num_channels, double frequency)
+void dmadac_set_frequency(dmadac_sound_device **devlist, UINT8 num_channels, double frequency)
 {
 	int i;
 
@@ -224,7 +222,7 @@ void dmadac_set_frequency(running_device **devlist, UINT8 num_channels, double f
  *
  *************************************/
 
-void dmadac_set_volume(running_device **devlist, UINT8 num_channels, UINT16 volume)
+void dmadac_set_volume(dmadac_sound_device **devlist, UINT8 num_channels, UINT16 volume)
 {
 	int i;
 

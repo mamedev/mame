@@ -111,26 +111,26 @@ INLINE int scanline_to_vcount(int scanline)
 static TIMER_DEVICE_CALLBACK( vball_scanline )
 {
 	int scanline = param;
-	int screen_height = video_screen_get_height(timer->machine->primary_screen);
+	int screen_height = timer.machine->primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* Update to the current point */
 	if (scanline > 0)
 	{
-		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		timer.machine->primary_screen->update_partial(scanline - 1);
 	}
 
 	/* IRQ fires every on every 8th scanline */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		cputag_set_input_line(timer->machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(timer.machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* Save the scroll x register value */
@@ -445,8 +445,7 @@ static MACHINE_DRIVER_START( vball )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END

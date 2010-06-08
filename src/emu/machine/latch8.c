@@ -26,9 +26,8 @@ struct _latch8_t
 
 INLINE latch8_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == LATCH8 );
-	return ( latch8_t * ) device->token;
+	assert( device->type() == LATCH8 );
+	return ( latch8_t * ) downcast<legacy_device_base *>(device)->token();
 }
 
 static void update(running_device *device, UINT8 new_val, UINT8 mask)
@@ -188,7 +187,7 @@ static DEVICE_START( latch8 )
 	int i;
 
 	/* validate arguments */
-	latch8->intf = (latch8_config *)device->baseconfig().inline_config;
+	latch8->intf = (latch8_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	latch8->value = 0x0;
 
@@ -241,7 +240,6 @@ DEVICE_GET_INFO( latch8 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(latch8_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(latch8_config);							break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(latch8);break;

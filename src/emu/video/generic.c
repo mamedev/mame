@@ -251,7 +251,7 @@ void generic_video_init(running_machine *machine)
 VIDEO_START( generic_bitmapped )
 {
 	/* allocate the temporary bitmap */
-	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	/* ensure the contents of the bitmap are saved */
 	state_save_register_global_bitmap(machine, machine->generic.tmpbitmap);
@@ -389,10 +389,10 @@ void buffer_spriteram_2(running_machine *machine, UINT8 *ptr, int length)
 static void updateflip(running_machine *machine)
 {
 	generic_video_private *state = machine->generic_video_data;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
-	attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
+	attoseconds_t period = machine->primary_screen->frame_period().attoseconds;
+	rectangle visarea = machine->primary_screen->visible_area();
 
 	tilemap_set_flip_all(machine,(TILEMAP_FLIPX & state->flip_screen_x) | (TILEMAP_FLIPY & state->flip_screen_y));
 
@@ -413,7 +413,7 @@ static void updateflip(running_machine *machine)
 		visarea.max_y = temp;
 	}
 
-	video_screen_configure(machine->primary_screen, width, height, &visarea, period);
+	machine->primary_screen->configure(width, height, visarea, period);
 }
 
 

@@ -344,10 +344,8 @@ static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 INLINE tms_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_TMS36XX);
-	return (tms_state *)device->token;
+	assert(device->type() == SOUND_TMS36XX);
+	return (tms_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -501,11 +499,11 @@ static DEVICE_START( tms36xx )
 	tms_state *tms = get_safe_token(device);
 	int enable;
 
-	tms->intf = (const tms36xx_interface *)device->baseconfig().static_config;
+	tms->intf = (const tms36xx_interface *)device->baseconfig().static_config();
 
-   tms->channel = stream_create(device, 0, 1, device->clock * 64, tms, tms36xx_sound_update);
-	tms->samplerate = device->clock * 64;
-	tms->basefreq = device->clock;
+   tms->channel = stream_create(device, 0, 1, device->clock() * 64, tms, tms36xx_sound_update);
+	tms->samplerate = device->clock() * 64;
+	tms->basefreq = device->clock();
 	enable = 0;
    for (j = 0; j < 6; j++)
 	{

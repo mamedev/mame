@@ -129,10 +129,8 @@ static const int val2chan[] =
 INLINE MultiPCM *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_MULTIPCM);
-	return (MultiPCM *)device->token;
+	assert(device->type() == SOUND_MULTIPCM);
+	return (MultiPCM *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -502,8 +500,8 @@ static DEVICE_START( multipcm )
 	MultiPCM *ptChip = get_safe_token(device);
 	int i;
 
-	ptChip->ROM=*device->region;
-	ptChip->Rate=(float) device->clock / MULTIPCM_CLOCKDIV;
+	ptChip->ROM=*device->region();
+	ptChip->Rate=(float) device->clock() / MULTIPCM_CLOCKDIV;
 
 	ptChip->stream = stream_create(device, 0, 2, ptChip->Rate, ptChip, MultiPCM_update);
 

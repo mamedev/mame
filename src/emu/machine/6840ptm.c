@@ -113,16 +113,15 @@ struct _ptm6840_state
 INLINE ptm6840_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == PTM6840));
-	return (ptm6840_state *)device->token;
+	assert((device->type() == PTM6840));
+	return (ptm6840_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const ptm6840_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == PTM6840));
-	return (const ptm6840_interface *) device->baseconfig().static_config;
+	assert((device->type() == PTM6840));
+	return (const ptm6840_interface *) device->baseconfig().static_config();
 }
 
 
@@ -843,6 +842,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_ID(p,s)		p##ptm6840##s
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"6840 PTM"
-#define DEVTEMPLATE_FAMILY		"Motorola Programmable Timer Modules"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"

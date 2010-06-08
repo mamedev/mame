@@ -61,11 +61,11 @@ struct _tms34010_state
 	UINT8				hblank_stable;
 	UINT8				external_host_access;
 	UINT8				executing;
-	cpu_irq_callback	irq_callback;
+	device_irq_callback	irq_callback;
 	running_device *device;
 	const address_space *program;
 	const tms34010_config *config;
-	running_device *screen;
+	screen_device *screen;
 	emu_timer *			scantimer;
 	int					icount;
 
@@ -78,18 +78,15 @@ struct _tms34010_state
 	} regs[31];
 
 	UINT16 IOregs[64];
-
-	cpu_state_table		state;
 };
 
 INLINE tms34010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS34010 ||
 		   cpu_get_type(device) == CPU_TMS34020);
-	return (tms34010_state *)device->token;
+	return (tms34010_state *)downcast<cpu_device *>(device)->token();
 }
 
 #include "34010ops.h"
@@ -198,66 +195,6 @@ static STATE_POSTLOAD( tms34010_state_postload );
 
 /* I/O registers */
 #define WINDOW_CHECKING(T)	((IOREG(T, REG_CONTROL) >> 6) & 0x03)
-
-
-
-/***************************************************************************
-    CPU STATE DESCRIPTION
-***************************************************************************/
-
-#define TMS340X0_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(TMS34010_##_name, #_name, _format, tms34010_state, _member, _datamask, ~0, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	TMS340X0_STATE_ENTRY(PC,  "%08X", pc, 0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(GENPC, "%08X", pc, 0xffffffff, CPUSTATE_NOSHOW)
-	TMS340X0_STATE_ENTRY(GENPCBASE, "%08X", ppc, 0xffffffff, CPUSTATE_NOSHOW)
-
-	TMS340X0_STATE_ENTRY(SP,  "%08X", regs[15].reg, 0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(GENSP, "%08X", regs[15].reg, 0xffffffff, CPUSTATE_NOSHOW)
-
-	TMS340X0_STATE_ENTRY(ST,  "%08X", st, 0xffffffff, 0)
-
-	TMS340X0_STATE_ENTRY(A0,  "%08X", regs[0].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A1,  "%08X", regs[1].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A2,  "%08X", regs[2].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A3,  "%08X", regs[3].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A4,  "%08X", regs[4].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A5,  "%08X", regs[5].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A6,  "%08X", regs[6].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A7,  "%08X", regs[7].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A8,  "%08X", regs[8].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A9,  "%08X", regs[9].reg,     0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A10, "%08X", regs[10].reg,    0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A11, "%08X", regs[11].reg,    0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A12, "%08X", regs[12].reg,    0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A13, "%08X", regs[13].reg,    0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(A14, "%08X", regs[14].reg,    0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B0,  "%08X", regs[30-0].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B1,  "%08X", regs[30-1].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B2,  "%08X", regs[30-2].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B3,  "%08X", regs[30-3].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B4,  "%08X", regs[30-4].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B5,  "%08X", regs[30-5].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B6,  "%08X", regs[30-6].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B7,  "%08X", regs[30-7].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B8,  "%08X", regs[30-8].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B9,  "%08X", regs[30-9].reg,  0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B10, "%08X", regs[30-10].reg, 0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B11, "%08X", regs[30-11].reg, 0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B12, "%08X", regs[30-12].reg, 0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B13, "%08X", regs[30-13].reg, 0xffffffff, 0)
-	TMS340X0_STATE_ENTRY(B14, "%08X", regs[30-14].reg, 0xffffffff, 0)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
-};
 
 
 
@@ -683,7 +620,7 @@ static void check_interrupt(tms34010_state *tms)
 
 static CPU_INIT( tms34010 )
 {
-	const tms34010_config *configdata = device->baseconfig().static_config ? (const tms34010_config *)device->baseconfig().static_config : &default_config;
+	const tms34010_config *configdata = device->baseconfig().static_config() ? (const tms34010_config *)device->baseconfig().static_config() : &default_config;
 	tms34010_state *tms = get_safe_token(device);
 
 	tms->external_host_access = FALSE;
@@ -691,13 +628,27 @@ static CPU_INIT( tms34010 )
 	tms->config = configdata;
 	tms->irq_callback = irqcallback;
 	tms->device = device;
-	tms->program = device->space(AS_PROGRAM);
-	tms->screen = device->machine->device(configdata->screen_tag);
+	tms->program = device_memory(device)->space(AS_PROGRAM);
+	tms->screen = downcast<screen_device *>(device->machine->device(configdata->screen_tag));
 
 	/* set up the state table */
-	tms->state = state_table_template;
-	tms->state.baseptr = tms;
-	tms->state.subtypemask = 1;
+	{
+		device_state_interface *state;
+		device->interface(state);
+		state->state_add(TMS34010_PC,     "PC",        tms->pc);
+		state->state_add(STATE_GENPC,     "GENPC",     tms->pc).noshow();
+		state->state_add(STATE_GENPCBASE, "GENPCBASE", tms->ppc).noshow();
+		state->state_add(TMS34010_SP,     "SP",        tms->regs[15].reg);
+		state->state_add(STATE_GENSP,     "GENSP",     tms->regs[15].reg).noshow();
+		state->state_add(TMS34010_ST,     "ST",        tms->st);
+		state->state_add(STATE_GENFLAGS,  "GENFLAGS",  tms->st).noshow().formatstr("%18s");
+
+		astring tempstr;
+		for (int regnum = 0; regnum < 15; regnum++)
+			state->state_add(TMS34010_A0 + regnum, tempstr.format("A%d", regnum), tms->regs[regnum].reg);
+		for (int regnum = 0; regnum < 15; regnum++)
+			state->state_add(TMS34010_B0 + regnum, tempstr.format("B%d", regnum), tms->regs[30 - regnum].reg);
+	}
 
 	/* allocate a scanline timer and set it to go off at the start */
 	tms->scantimer = timer_alloc(device->machine, scanline_callback, tms);
@@ -725,11 +676,10 @@ static CPU_RESET( tms34010 )
 	/* zap the state and copy in the config pointer */
 	tms34010_state *tms = get_safe_token(device);
 	const tms34010_config *config = tms->config;
-	running_device *screen = tms->screen;
+	screen_device *screen = tms->screen;
 	UINT16 *shiftreg = tms->shiftreg;
-	cpu_irq_callback save_irqcallback = tms->irq_callback;
+	device_irq_callback save_irqcallback = tms->irq_callback;
 	emu_timer *save_scantimer = tms->scantimer;
-	cpu_state_table savetable = tms->state;
 
 	memset(tms, 0, sizeof(*tms));
 
@@ -739,8 +689,7 @@ static CPU_RESET( tms34010 )
 	tms->irq_callback = save_irqcallback;
 	tms->scantimer = save_scantimer;
 	tms->device = device;
-	tms->program = device->space(AS_PROGRAM);
-	tms->state = savetable;
+	tms->program = device_memory(device)->space(AS_PROGRAM);
 
 	/* fetch the initial PC and reset the state */
 	tms->pc = RLONG(tms, 0xffffffe0) & 0xfffffff0;
@@ -750,7 +699,7 @@ static CPU_RESET( tms34010 )
 	/* the first time we are run */
 	tms->reset_deferred = tms->config->halt_on_reset;
 	if (tms->config->halt_on_reset)
-		tms34010_io_register_w(device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
+		tms34010_io_register_w(device_memory(device)->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
 }
 
 
@@ -959,14 +908,13 @@ static void set_raster_op(tms34010_state *tms)
 static TIMER_CALLBACK( scanline_callback )
 {
 	tms34010_state *tms = (tms34010_state *)ptr;
-	const rectangle *current_visarea;
 	int vsblnk, veblnk, vtotal;
 	int vcount = param;
 	int enabled;
 	int master;
 
 	/* fetch the core timing parameters */
-	current_visarea = video_screen_get_visible_area(tms->screen);
+	const rectangle &current_visarea = tms->screen->visible_area();
 	enabled = SMART_IOREG(tms, DPYCTL) & 0x8000;
 	master = (tms->is_34020 || (SMART_IOREG(tms, DPYCTL) & 0x2000));
 	vsblnk = SMART_IOREG(tms, VSBLNK);
@@ -974,8 +922,8 @@ static TIMER_CALLBACK( scanline_callback )
 	vtotal = SMART_IOREG(tms, VTOTAL);
 	if (!master)
 	{
-		vtotal = MIN(video_screen_get_height(tms->screen) - 1, vtotal);
-		vcount = video_screen_get_vpos(tms->screen);
+		vtotal = MIN(tms->screen->height() - 1, vtotal);
+		vcount = tms->screen->vpos();
 	}
 
 	/* update the VCOUNT */
@@ -1033,13 +981,13 @@ static TIMER_CALLBACK( scanline_callback )
 					/* because many games play with the HEBLNK/HSBLNK for effects, we don't change
                        if they are the only thing that has changed, unless they are stable for a couple
                        of frames */
-					int current_width  = video_screen_get_width(tms->screen);
-					int current_height = video_screen_get_height(tms->screen);
+					int current_width  = tms->screen->width();
+					int current_height = tms->screen->height();
 
-					if (width != current_width || height != current_height || visarea.min_y != current_visarea->min_y || visarea.max_y != current_visarea->max_y ||
-						(tms->hblank_stable > 2 && (visarea.min_x != current_visarea->min_x || visarea.max_x != current_visarea->max_x)))
+					if (width != current_width || height != current_height || visarea.min_y != current_visarea.min_y || visarea.max_y != current_visarea.max_y ||
+						(tms->hblank_stable > 2 && (visarea.min_x != current_visarea.min_x || visarea.max_x != current_visarea.max_x)))
 					{
-						video_screen_configure(tms->screen, width, height, &visarea, refresh);
+						tms->screen->configure(width, height, visarea, refresh);
 					}
 					tms->hblank_stable++;
 				}
@@ -1055,8 +1003,8 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 
 	/* force a partial update within the visible area */
-	if (vcount >= current_visarea->min_y && vcount <= current_visarea->max_y && tms->config->scanline_callback != NULL)
-		video_screen_update_partial(tms->screen, vcount);
+	if (vcount >= current_visarea.min_y && vcount <= current_visarea.max_y && tms->config->scanline_callback != NULL)
+		tms->screen->update_partial(vcount);
 
 	/* if we are in the visible area, increment DPYADR by DUDATE */
 	if (vcount >= veblnk && vcount < vsblnk)
@@ -1092,7 +1040,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	timer_adjust_oneshot(tms->scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(tms->screen, vcount, 0), !master), vcount);
+	timer_adjust_oneshot(tms->scantimer, attotime_add_attoseconds(tms->screen->time_until_pos(vcount), !master), vcount);
 }
 
 
@@ -1161,7 +1109,7 @@ VIDEO_UPDATE( tms340x0 )
 	{
 		/* call through to the callback */
 		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect->min_y, params.rowaddr, params.coladdr));
-		(*tms->config->scanline_callback)(screen, bitmap, cliprect->min_y, &params);
+		(*tms->config->scanline_callback)(*screen, bitmap, cliprect->min_y, &params);
 	}
 
 	/* otherwise, just blank the current scanline */
@@ -1322,7 +1270,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 	}
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: %s = %04X (%d)\n", cpuexec_describe_context(tms->device->machine), ioreg_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
+//      logerror("%s: %s = %04X (%d)\n", cpuexec_describe_context(tms->device->machine), ioreg_name[offset], IOREG(tms, offset), tms->screen->vpos());
 }
 
 
@@ -1359,7 +1307,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(tms, offset) = data;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: %s = %04X (%d)\n", cpuexec_describe_context(device->machine), ioreg020_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
+//      logerror("%s: %s = %04X (%d)\n", cpuexec_describe_context(device->machine), ioreg020_name[offset], IOREG(tms, offset), tms->screen->vpos());
 
 	switch (offset)
 	{
@@ -1524,9 +1472,9 @@ READ16_HANDLER( tms34010_io_register_r )
 	{
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = video_screen_get_hpos(tms->screen);
+			result = tms->screen->hpos();
 			total = IOREG(tms, REG_HTOTAL) + 1;
-			result = result * total / video_screen_get_width(tms->screen);
+			result = result * total / tms->screen->width();
 
 			/* offset by the HBLANK end */
 			result += IOREG(tms, REG_HEBLNK);
@@ -1567,9 +1515,9 @@ READ16_HANDLER( tms34020_io_register_r )
 	{
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = video_screen_get_hpos(tms->screen);
+			result = tms->screen->hpos();
 			total = IOREG(tms, REG020_HTOTAL) + 1;
-			result = result * total / video_screen_get_width(tms->screen);
+			result = result * total / tms->screen->width();
 
 			/* offset by the HBLANK end */
 			result += IOREG(tms, REG020_HEBLNK);
@@ -1646,7 +1594,7 @@ void tms34010_host_w(running_device *cpu, int reg, int data)
 		/* control register */
 		case TMS34010_HOST_CONTROL:
 			tms->external_host_access = TRUE;
-			space = tms->device->space(AS_PROGRAM);
+			space = device_memory(tms->device)->space(AS_PROGRAM);
 			tms34010_io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
 			tms34010_io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
 			tms->external_host_access = FALSE;
@@ -1740,9 +1688,39 @@ static CPU_SET_INFO( tms34010 )
  * Generic get_info
  **************************************************************************/
 
+CPU_EXPORT_STRING( tms34010 )
+{
+	tms34010_state *tms = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				tms->st & 0x80000000 ? 'N':'.',
+				tms->st & 0x40000000 ? 'C':'.',
+				tms->st & 0x20000000 ? 'Z':'.',
+				tms->st & 0x10000000 ? 'V':'.',
+				tms->st & 0x02000000 ? 'P':'.',
+				tms->st & 0x00200000 ? 'I':'.',
+				tms->st & 0x00000800 ? 'E':'.',
+				tms->st & 0x00000400 ? 'F':'.',
+				tms->st & 0x00000200 ? 'F':'.',
+				tms->st & 0x00000100 ? 'F':'.',
+				tms->st & 0x00000080 ? 'F':'.',
+				tms->st & 0x00000040 ? 'F':'.',
+				tms->st & 0x00000020 ? 'E':'.',
+				tms->st & 0x00000010 ? 'F':'.',
+				tms->st & 0x00000008 ? 'F':'.',
+				tms->st & 0x00000004 ? 'F':'.',
+				tms->st & 0x00000002 ? 'F':'.',
+				tms->st & 0x00000001 ? 'F':'.');
+			break;
+	}
+}
+
 CPU_GET_INFO( tms34010 )
 {
-	tms34010_state *tms = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms34010_state *tms = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1773,10 +1751,10 @@ CPU_GET_INFO( tms34010 )
 		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(tms34010);			break;
 		case CPUINFO_FCT_BURN:			info->burn = NULL;									break;
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms34010);	break;
+		case CPUINFO_FCT_EXPORT_STRING:	info->export_string = CPU_EXPORT_STRING_NAME(tms34010);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms->icount;		break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &tms->state;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS34010");		break;
@@ -1784,28 +1762,6 @@ CPU_GET_INFO( tms34010 )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);			break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Alex Pasadyn/Zsolt Vasvari\nParts based on code by Aaron Giles"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-				tms->st & 0x80000000 ? 'N':'.',
-				tms->st & 0x40000000 ? 'C':'.',
-				tms->st & 0x20000000 ? 'Z':'.',
-				tms->st & 0x10000000 ? 'V':'.',
-				tms->st & 0x02000000 ? 'P':'.',
-				tms->st & 0x00200000 ? 'I':'.',
-				tms->st & 0x00000800 ? 'E':'.',
-				tms->st & 0x00000400 ? 'F':'.',
-				tms->st & 0x00000200 ? 'F':'.',
-				tms->st & 0x00000100 ? 'F':'.',
-				tms->st & 0x00000080 ? 'F':'.',
-				tms->st & 0x00000040 ? 'F':'.',
-				tms->st & 0x00000020 ? 'E':'.',
-				tms->st & 0x00000010 ? 'F':'.',
-				tms->st & 0x00000008 ? 'F':'.',
-				tms->st & 0x00000004 ? 'F':'.',
-				tms->st & 0x00000002 ? 'F':'.',
-				tms->st & 0x00000001 ? 'F':'.');
-			break;
 	}
 }
 

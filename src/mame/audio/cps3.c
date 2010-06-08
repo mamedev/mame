@@ -104,7 +104,7 @@ static STREAM_UPDATE( cps3_stream_update )
 static DEVICE_START( cps3_sound )
 {
 	/* Allocate the stream */
-	cps3_stream = stream_create(device, 0, 2, device->clock / 384, NULL, cps3_stream_update);
+	cps3_stream = stream_create(device, 0, 2, device->clock() / 384, NULL, cps3_stream_update);
 
 	memset(&chip, 0, sizeof(chip));
 }

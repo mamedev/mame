@@ -31,6 +31,7 @@
 #ifndef __INS8154_H__
 #define __INS8154_H__
 
+#include "devlegcy.h"
 #include "devcb.h"
 
 
@@ -48,12 +49,12 @@ struct _ins8154_interface
 	devcb_write_line	out_irq_func;
 };
 
+DECLARE_LEGACY_DEVICE(INS8154, ins8154);
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( ins8154 );
 
 READ8_DEVICE_HANDLER( ins8154_r );
 WRITE8_DEVICE_HANDLER( ins8154_w );
@@ -65,8 +66,6 @@ WRITE8_DEVICE_HANDLER( ins8154_portb_w );
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define INS8154  DEVICE_GET_INFO_NAME(ins8154)
 
 #define MDRV_INS8154_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, INS8154, 0) \

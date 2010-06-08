@@ -267,7 +267,7 @@ static DEVICE_START( amiga_sound )
 	int i;
 
 	/* allocate a new audio state */
-	audio_state = (amiga_audio *)device->token;
+	audio_state = (amiga_audio *)downcast<legacy_device_base *>(device)->token();
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
@@ -275,7 +275,7 @@ static DEVICE_START( amiga_sound )
 	}
 
 	/* create the stream */
-	audio_state->stream = stream_create(device, 0, 4, device->clock / CLOCK_DIVIDER, audio_state, amiga_stream_update);
+	audio_state->stream = stream_create(device, 0, 4, device->clock() / CLOCK_DIVIDER, audio_state, amiga_stream_update);
 }
 
 

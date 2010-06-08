@@ -150,7 +150,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( laserbas_interrupt )
 {
-	if(video_screen_get_vblank(device->machine->primary_screen))
+	if(device->machine->primary_screen->vblank())
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);

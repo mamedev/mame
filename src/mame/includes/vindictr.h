@@ -28,4 +28,4 @@ WRITE16_HANDLER( vindictr_paletteram_w );
 VIDEO_START( vindictr );
 VIDEO_UPDATE( vindictr );
 
-void vindictr_scanline_update(running_device *screen, int scanline);
+void vindictr_scanline_update(screen_device &screen, int scanline);

@@ -31,7 +31,7 @@ static UINT8 portA_in,portA_out,ddrA;
 static UINT8 portB_in,portB_out,ddrB;
 static UINT8 portC_in,portC_out,ddrC;
 static UINT8 tdr,tcr;
-static running_device *mcu_timer;
+static timer_device *mcu_timer;
 
 /* Port A:
     0   (in)  DSW
@@ -154,7 +154,7 @@ static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 		if ( (tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(devtag_get_device(timer->machine, "mcu"), M68705_INT_TIMER);
+			generic_pulse_irq_line(devtag_get_device(timer.machine, "mcu"), M68705_INT_TIMER);
 		}
 	}
 }
@@ -202,7 +202,7 @@ static WRITE8_HANDLER( mcu_tcr_w )
 		}
 
 		period = attotime_mul(ATTOTIME_IN_HZ(3579545), divider);
-		timer_device_adjust_periodic( mcu_timer, period, 0, period);
+		mcu_timer->adjust(period, 0, period);
 	}
 }
 
@@ -212,7 +212,7 @@ static MACHINE_RESET(supervisor_board)
 	portB_in = portB_out = ddrB	= 0;
 	portC_in = portC_out = ddrC	= 0;
 	tdr = tcr = 0;
-	mcu_timer = devtag_get_device(machine, "mcu_timer");
+	mcu_timer = machine->device<timer_device>("mcu_timer");
 
 	output_set_lamp_value(0, 0);
 	output_set_lamp_value(1, 0);

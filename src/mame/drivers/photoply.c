@@ -31,12 +31,12 @@ static UINT8 vga_regs[0x19];
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen); \
+	rectangle visarea; \
 	visarea.min_x = 0; \
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \
 	visarea.max_y = _y_-1; \
-	video_screen_configure(machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds ); \
+	machine->primary_screen->configure(_x_, _y_, visarea, machine->primary_screen->frame_period().attoseconds ); \
 	} \
 
 #define RES_320x200 0

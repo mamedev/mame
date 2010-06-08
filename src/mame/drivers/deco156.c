@@ -27,16 +27,17 @@ class deco156_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, deco156_state(machine)); }
 
-	deco156_state(running_machine &machine) { }
+	deco156_state(running_machine &machine)
+		: oki2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *deco16ic;
-	running_device *oki2;
+	cpu_device *maincpu;
+	deco16ic_device *deco16ic;
+	okim6295_device *oki2;
 };
 
 
@@ -70,7 +71,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		y = spriteram[offs] & 0xffff;
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		x = spriteram[offs + 2] & 0xffff;
@@ -157,14 +158,15 @@ static WRITE32_HANDLER(hvysmsh_eeprom_w)
 	deco156_state *state = (deco156_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(state->oki2, 0x40000 * (data & 0x7));
+		state->oki2->set_bank_base(0x40000 * (data & 0x7));
 		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 }
 
 static WRITE32_DEVICE_HANDLER( hvysmsh_oki_0_bank_w )
 {
-	okim6295_set_bank_base(device, (data & 1) * 0x40000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 1) * 0x40000);
 }
 
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
@@ -402,9 +404,8 @@ static MACHINE_START( deco156 )
 {
 	deco156_state *state = (deco156_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
-	state->oki2 = devtag_get_device(machine, "oki2");
+	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->deco16ic = machine->device<deco16ic_device>("deco_custom");
 }
 
 static MACHINE_DRIVER_START( hvysmsh )
@@ -442,13 +443,11 @@ static MACHINE_DRIVER_START( hvysmsh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 28000000/28)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 28000000/28, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 28000000/14)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 28000000/14, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_DRIVER_END

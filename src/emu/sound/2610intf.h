@@ -3,6 +3,7 @@
 #ifndef __2610INTF_H__
 #define __2610INTF_H__
 
+#include "devlegcy.h"
 #include "fm.h"
 
 
@@ -27,10 +28,7 @@ WRITE8_DEVICE_HANDLER( ym2610_data_port_a_w );
 WRITE8_DEVICE_HANDLER( ym2610_data_port_b_w );
 
 
-DEVICE_GET_INFO( ym2610 );
-DEVICE_GET_INFO( ym2610b );
-
-#define SOUND_YM2610 DEVICE_GET_INFO_NAME( ym2610 )
-#define SOUND_YM2610B DEVICE_GET_INFO_NAME( ym2610b )
+DECLARE_LEGACY_SOUND_DEVICE(YM2610, ym2610);
+DECLARE_LEGACY_SOUND_DEVICE(YM2610B, ym2610b);
 
 #endif /* __2610INTF_H__ */

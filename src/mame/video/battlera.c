@@ -33,8 +33,8 @@ VIDEO_START( battlera )
 	memset(HuC6270_vram,0,0x20000);
 	memset(vram_dirty,1,0x1000);
 
-	tile_bitmap=auto_bitmap_alloc(machine,512,512,video_screen_get_format(machine->primary_screen));
-	front_bitmap=auto_bitmap_alloc(machine,512,512,video_screen_get_format(machine->primary_screen));
+	tile_bitmap=auto_bitmap_alloc(machine,512,512,machine->primary_screen->format());
+	front_bitmap=auto_bitmap_alloc(machine,512,512,machine->primary_screen->format());
 
 	vram_ptr=0;
 	inc_value=1;
@@ -377,14 +377,14 @@ INTERRUPT_GEN( battlera_interrupt )
 
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
 	if (rcr_enable && (current_scanline+56)==HuC6270_registers[6]) {
-		video_screen_update_partial(device->machine->primary_screen, current_scanline);
+		device->machine->primary_screen->update_partial(current_scanline);
 		cpu_set_input_line(device, 0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
 	else if (current_scanline==240) {
 		bldwolf_vblank=1;
-		video_screen_update_partial(device->machine->primary_screen, 240);
+		device->machine->primary_screen->update_partial(240);
 		if (irq_enable)
 			cpu_set_input_line(device, 0, HOLD_LINE); /* VBL */
 	}

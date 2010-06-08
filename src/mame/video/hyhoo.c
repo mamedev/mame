@@ -234,7 +234,7 @@ static void hyhoo_gfxdraw(running_machine *machine)
 
 VIDEO_START( hyhoo )
 {
-	hyhoo_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	hyhoo_tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
 }
 
 

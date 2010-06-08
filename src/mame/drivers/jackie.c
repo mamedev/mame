@@ -146,7 +146,7 @@ static VIDEO_UPDATE(jackie)
 {
 	int i,j;
 	int startclipmin = 0;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -163,8 +163,8 @@ static VIDEO_UPDATE(jackie)
 		int rowenable = bg_scroll2[j];
 
 		/* draw top of screen */
-		clip.min_x = visarea->min_x;
-		clip.max_x = visarea->max_x;
+		clip.min_x = visarea.min_x;
+		clip.max_x = visarea.max_x;
 		clip.min_y = startclipmin;
 		clip.max_y = startclipmin+1;
 
@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( hopper_r )
 {
-	if (hopper) return !(video_screen_get_frame_number(field->port->machine->primary_screen)%10);
+	if (hopper) return !(field->port->machine->primary_screen->frame_number()%10);
 	return input_code_pressed(field->port->machine, KEYCODE_H);
 }
 

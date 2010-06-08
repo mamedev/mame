@@ -36,10 +36,8 @@ struct _snkwave_state
 INLINE snkwave_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SNKWAVE);
-	return (snkwave_state *)device->token;
+	assert(device->type() == SOUND_SNKWAVE);
+	return (snkwave_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -113,10 +111,10 @@ static DEVICE_START( snkwave )
 {
 	snkwave_state *chip = get_safe_token(device);
 
-	assert(device->baseconfig().static_config == 0);
+	assert(device->baseconfig().static_config() == 0);
 
 	/* adjust internal clock */
-	chip->external_clock = device->clock;
+	chip->external_clock = device->clock();
 
 	/* adjust output clock */
 	chip->sample_rate = chip->external_clock >> CLOCK_SHIFT;

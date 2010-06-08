@@ -890,7 +890,7 @@ static READ32_HANDLER( spi_unknown_r )
 
 static WRITE32_DEVICE_HANDLER( eeprom_w )
 {
-	running_device *oki2 = devtag_get_device(device->machine, "oki2");
+	okim6295_device *oki2 = device->machine->device<okim6295_device>("oki2");
 
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
@@ -902,7 +902,7 @@ static WRITE32_DEVICE_HANDLER( eeprom_w )
 
 	// oki banking
 	if (oki2 != NULL)
-		okim6295_set_bank_base(oki2, (data & 0x4000000) ? 0x40000 : 0);
+		oki2->set_bank_base((data & 0x4000000) ? 0x40000 : 0);
 }
 
 static WRITE32_HANDLER( z80_prg_fifo_w )
@@ -1943,9 +1943,11 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 
 	MDRV_IMPORT_FROM(spi)
 
-	MDRV_CPU_REPLACE("maincpu", I386, 28636360) /* AMD AM386DX/DX-40, 28.63636MHz */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(28636360) /* AMD AM386DX/DX-40, 28.63636MHz */
 
-	MDRV_CPU_REPLACE("soundcpu", Z80, 4915200) /* 4.9152MHz */
+	MDRV_CPU_MODIFY("soundcpu")
+	MDRV_CPU_CLOCK(4915200) /* 4.9152MHz */
 
 	MDRV_SOUND_REPLACE("ymf", YMF271, 16384000) /* 16.3840MHz */
 	MDRV_SOUND_CONFIG(ymf271_config)
@@ -2223,12 +2225,10 @@ static MACHINE_DRIVER_START( seibu386 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1431815)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 1431815, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 1431815)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 1431815, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

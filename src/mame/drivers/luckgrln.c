@@ -235,17 +235,17 @@ static VIDEO_UPDATE(luckgrln)
 {
 	int y,x;
 	int count = 0;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 	int i;
 
 	rectangle clip;
 
 	bitmap_fill(bitmap, cliprect, 0x3f); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
 
-	clip.min_x = visarea->min_x;
-	clip.max_x = visarea->max_x;
-	clip.min_y = visarea->min_y;
-	clip.max_y = visarea->max_y;
+	clip.min_x = visarea.min_x;
+	clip.max_x = visarea.max_x;
+	clip.min_y = visarea.min_y;
+	clip.max_y = visarea.max_y;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -263,8 +263,8 @@ static VIDEO_UPDATE(luckgrln)
 		clip.min_y = y*8;
 		clip.max_y = y*8+8;
 
-		if (clip.min_y<visarea->min_y) clip.min_y = visarea->min_y;
-		if (clip.max_y>visarea->max_y) clip.max_y = visarea->max_y;
+		if (clip.min_y<visarea.min_y) clip.min_y = visarea.min_y;
+		if (clip.max_y>visarea.max_y) clip.max_y = visarea.max_y;
 
 		for (x=0;x<64;x++)
 		{
@@ -278,8 +278,8 @@ static VIDEO_UPDATE(luckgrln)
 			clip.min_x = x*8;
 			clip.max_x = x*8+8;
 
-			if (clip.min_x<visarea->min_x) clip.min_x = visarea->min_x;
-			if (clip.max_x>visarea->max_x) clip.max_x = visarea->max_x;
+			if (clip.min_x<visarea.min_x) clip.min_x = visarea.min_x;
+			if (clip.max_x>visarea.max_x) clip.max_x = visarea.max_x;
 
 			/*
 			  luck_vram1  tttt tttt   (t = low tile bits)

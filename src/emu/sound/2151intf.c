@@ -27,10 +27,8 @@ struct _ym2151_state
 INLINE ym2151_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YM2151);
-	return (ym2151_state *)device->token;
+	assert(device->type() == SOUND_YM2151);
+	return (ym2151_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -54,14 +52,14 @@ static DEVICE_START( ym2151 )
 	ym2151_state *info = get_safe_token(device);
 	int rate;
 
-	info->intf = device->baseconfig().static_config ? (const ym2151_interface *)device->baseconfig().static_config : &dummy;
+	info->intf = device->baseconfig().static_config() ? (const ym2151_interface *)device->baseconfig().static_config() : &dummy;
 
-	rate = device->clock/64;
+	rate = device->clock()/64;
 
 	/* stream setup */
 	info->stream = stream_create(device,0,2,rate,info,ym2151_update);
 
-	info->chip = ym2151_init(device,device->clock,rate);
+	info->chip = ym2151_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM2151 chip");
 
 	state_save_register_postload(device->machine, ym2151intf_postload, info);

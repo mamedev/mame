@@ -38,10 +38,9 @@ static TIMER_CALLBACK( write_finished )
 INLINE at28c16_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == AT28C16);
+	assert(device->type() == AT28C16);
 
-	return (at28c16_state *)device->token;
+	return (at28c16_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 WRITE8_DEVICE_HANDLER( at28c16_w )
@@ -132,7 +131,7 @@ static DEVICE_START(at28c16)
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-//  assert(device->baseconfig().static_config != NULL);
+//  assert(device->baseconfig().static_config() != NULL);
 //  assert(device->baseconfig().inline_config == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
@@ -143,9 +142,9 @@ static DEVICE_START(at28c16)
 	c->oe_12v = 0;
 	c->last_write = -1;
 	c->write_timer = timer_alloc(device->machine,  write_finished, c );
-	c->default_data = *device->region;
+	c->default_data = *device->region();
 
-	config = (const at28c16_config *)device->baseconfig().inline_config;
+	config = (const at28c16_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	if (config->id != NULL)
 		c->default_id = memory_region( device->machine, config->id );
 
@@ -215,7 +214,6 @@ DEVICE_GET_INFO(at28c16)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(at28c16_state); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(at28c16_config); break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(at28c16); break;

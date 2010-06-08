@@ -179,7 +179,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 		x = buffered_spriteram16[offs+2];
 
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		if (flash && (machine->primary_screen->frame_number() & 1)) continue;
 
 		colour = (x >> 9) &0x1f;
 

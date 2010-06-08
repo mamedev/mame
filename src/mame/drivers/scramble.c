@@ -1469,7 +1469,8 @@ static MACHINE_DRIVER_START( hncholms )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hunchbks)
-	MDRV_CPU_REPLACE("maincpu", S2650, 18432000/6/2/2)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(18432000/6/2/2)
 
 	MDRV_VIDEO_START(scorpion)
 MACHINE_DRIVER_END

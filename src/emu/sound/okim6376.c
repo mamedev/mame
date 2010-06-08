@@ -66,10 +66,8 @@ static int tables_computed = 0;
 INLINE okim6376_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_OKIM6376);
-	return (okim6376_state *)device->token;
+	assert(device->type() == SOUND_OKIM6376);
+	return (okim6376_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -305,11 +303,11 @@ static DEVICE_START( okim6376 )
 	compute_tables();
 
 	info->command = -1;
-	info->region_base = *device->region;
-	info->master_clock = device->clock;
+	info->region_base = *device->region();
+	info->master_clock = device->clock();
 
 	/* generate the name and create the stream */
-	info->stream = stream_create(device, 0, 1, device->clock/divisor, info, okim6376_update);
+	info->stream = stream_create(device, 0, 1, device->clock()/divisor, info, okim6376_update);
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6376_VOICES; voice++)

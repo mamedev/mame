@@ -110,15 +110,15 @@ INLINE int scanline_to_vcount( int scanline )
 
 static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 {
-	ddragon_state *state = (ddragon_state *)timer->machine->driver_data;
+	ddragon_state *state = (ddragon_state *)timer.machine->driver_data;
 	int scanline = param;
-	int screen_height = video_screen_get_height(timer->machine->primary_screen);
+	int screen_height = timer.machine->primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
 	if (scanline > 0)
-		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		timer.machine->primary_screen->update_partial(scanline - 1);
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
@@ -608,8 +608,7 @@ static MACHINE_DRIVER_START( chinagat )
 	MDRV_SOUND_ROUTE(0, "mono", 0.80)
 	MDRV_SOUND_ROUTE(1, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1065000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 not verified, clock frequency estimated with recording
+	MDRV_OKIM6295_ADD("oki", 1065000, OKIM6295_PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

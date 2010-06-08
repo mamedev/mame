@@ -132,7 +132,7 @@ static void nbmj9195_blitter_w(running_machine *machine, int vram, int offset, i
 					break;
 		case 0x01:	nbmj9195_scrollx[vram] = (nbmj9195_scrollx[vram] & 0x0100) | data; break;
 		case 0x02:	nbmj9195_scrollx[vram] = (nbmj9195_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
-					new_line = video_screen_get_vpos(machine->primary_screen);
+					new_line = machine->primary_screen->vpos();
 					if (nbmj9195_flipscreen[vram])
 					{
 						for ( ; nbmj9195_scanline[vram] < new_line; nbmj9195_scanline[vram]++)
@@ -185,8 +185,8 @@ static void nbmj9195_vramflip(running_machine *machine, int vram)
 	static int nbmj9195_flipscreen_old[VRAM_MAX] = { 0, 0 };
 	int x, y;
 	UINT16 color1, color2;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	if (nbmj9195_flipscreen[vram] == nbmj9195_flipscreen_old[vram]) return;
 
@@ -221,7 +221,7 @@ static void nbmj9195_vramflip(running_machine *machine, int vram)
 
 static void update_pixel(running_machine *machine, int vram, int x, int y)
 {
-	UINT16 color = nbmj9195_videoram[vram][(y * video_screen_get_width(machine->primary_screen)) + x];
+	UINT16 color = nbmj9195_videoram[vram][(y * machine->primary_screen->width()) + x];
 	*BITMAP_ADDR16(nbmj9195_tmpbitmap[vram], y, x) = color;
 }
 
@@ -233,7 +233,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 {
 	UINT8 *GFX = memory_region(machine, "gfx1");
-	int width = video_screen_get_width(machine->primary_screen);
+	int width = machine->primary_screen->width();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -409,10 +409,10 @@ WRITE8_HANDLER( nbmj9195_clut_1_w )		{ nbmj9195_clut_w(1, offset, data); }
 ******************************************************************************/
 VIDEO_START( nbmj9195_1layer )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
-	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj9195_tmpbitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
 	nbmj9195_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	nbmj9195_palette = auto_alloc_array(machine, UINT8, 0x200);
 	nbmj9195_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
@@ -423,11 +423,11 @@ VIDEO_START( nbmj9195_1layer )
 
 VIDEO_START( nbmj9195_2layer )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
-	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj9195_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj9195_tmpbitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
+	nbmj9195_tmpbitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
 	nbmj9195_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	nbmj9195_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
 	nbmj9195_palette = auto_alloc_array(machine, UINT8, 0x200);
@@ -440,11 +440,11 @@ VIDEO_START( nbmj9195_2layer )
 
 VIDEO_START( nbmj9195_nb22090 )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
-	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj9195_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj9195_tmpbitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
+	nbmj9195_tmpbitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
 	nbmj9195_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
 	nbmj9195_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
 	nbmj9195_videoworkram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
@@ -469,8 +469,8 @@ VIDEO_UPDATE( nbmj9195 )
 
 	if (nbmj9195_screen_refresh)
 	{
-		int width = video_screen_get_width(screen);
-		int height = video_screen_get_height(screen);
+		int width = screen->width();
+		int height = screen->height();
 
 		nbmj9195_screen_refresh = 0;
 

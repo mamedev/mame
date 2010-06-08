@@ -1288,7 +1288,8 @@ static WRITE16_HANDLER( sdmg2_magic_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x80) ? 0x40000 : 0);
+				okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+				oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
 			}
 			break;
 
@@ -1303,7 +1304,7 @@ static READ16_HANDLER( sdmg2_magic_r )
 	{
 		case 0x00:
 		{
-			UINT16 hopper_bit = (hopper && ((video_screen_get_frame_number(space->machine->primary_screen)/10)&1)) ? 0x0000 : 0x0001;
+			UINT16 hopper_bit = (hopper && ((space->machine->primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
 			return input_port_read(space->machine, "COINS") | hopper_bit;
 		}
 
@@ -1388,7 +1389,8 @@ static WRITE16_HANDLER( mgdh_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				// bit 7?
-				okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x40) ? 0x40000 : 0);
+				okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+				oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
 			}
 			break;
 
@@ -1412,7 +1414,7 @@ static READ16_HANDLER( mgdh_magic_r )
 
 		case 0x03:
 		{
-			UINT16 hopper_bit = (hopper && ((video_screen_get_frame_number(space->machine->primary_screen)/10)&1)) ? 0x0000 : 0x0001;
+			UINT16 hopper_bit = (hopper && ((space->machine->primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
 			return input_port_read(space->machine, "COINS") | hopper_bit;
 		}
 
@@ -2055,8 +2057,7 @@ static MACHINE_DRIVER_START( iqblocka )
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz / 16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -2124,8 +2125,7 @@ static MACHINE_DRIVER_START( mgcs )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_8MHz / 8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -2170,8 +2170,7 @@ static MACHINE_DRIVER_START( sdmg2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_22MHz / 22)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -2229,8 +2228,7 @@ static MACHINE_DRIVER_START( mgdh )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_22MHz / 22)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 

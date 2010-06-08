@@ -345,7 +345,7 @@ static READ32_HANDLER( boardconfig_r )
     111----- rev=5
     */
 
-	if( video_screen_get_height(space->machine->primary_screen) == 1024 )
+	if( space->machine->primary_screen->height() == 1024 )
 	{
 		return 64|32|8;
 	}

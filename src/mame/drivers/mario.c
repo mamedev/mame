@@ -356,10 +356,9 @@ static MACHINE_DRIVER_START( masao )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mario_base )
 
-	MDRV_CPU_REPLACE("maincpu", Z80, 4000000)        /* 4.000 MHz (?) */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(4000000)        /* 4.000 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(masao_map)
-	MDRV_CPU_IO_MAP(mario_io_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(masao_audio)

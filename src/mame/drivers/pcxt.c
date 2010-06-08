@@ -72,12 +72,12 @@ the main program is 9th October 1990.
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen); \
+	rectangle visarea; \
 	visarea.min_x = 0; \
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \
 	visarea.max_y = _y_-1; \
-	video_screen_configure(machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds ); \
+	machine->primary_screen->configure(_x_, _y_, visarea, machine->primary_screen->frame_period().attoseconds ); \
 	} \
 
 
@@ -116,15 +116,15 @@ static READ8_HANDLER( vga_hvretrace_r )
 	static UINT8 res;
 	static int h,w;
 	res = 0;
-	h = video_screen_get_height(space->machine->primary_screen);
-	w = video_screen_get_width(space->machine->primary_screen);
+	h = space->machine->primary_screen->height();
+	w = space->machine->primary_screen->width();
 
 //  popmessage("%d %d",h,w);
 
-	if (video_screen_get_hpos(space->machine->primary_screen) > h)
+	if (space->machine->primary_screen->hpos() > h)
 		res|= 1;
 
-	if (video_screen_get_vpos(space->machine->primary_screen) > w)
+	if (space->machine->primary_screen->vpos() > w)
 		res|= 8;
 
 	return res;

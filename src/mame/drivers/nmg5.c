@@ -315,7 +315,7 @@ static WRITE16_HANDLER( priority_reg_w )
 
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
-	okim6295_set_bank_base(device, (data & 1) ? 0x40000 : 0);
+	downcast<okim6295_device *>(device)->set_bank_base((data & 1) ? 0x40000 : 0);
 }
 
 /*******************************************************************
@@ -1069,8 +1069,7 @@ static MACHINE_DRIVER_START( nmg5 )
 	MDRV_SOUND_CONFIG(ym3812_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000 )
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

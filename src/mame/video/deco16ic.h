@@ -6,6 +6,10 @@
 
 **************************************************************************/
 
+#pragma once
+#ifndef __DECO16IC_H__
+#define __DECO16IC_H__
+
 #include "devcb.h"
 
 
@@ -30,18 +34,12 @@ struct _deco16ic_interface
 	deco16_bank_cb     bank_cb0, bank_cb1, bank_cb2, bank_cb3;
 };
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( deco16ic );
+DECLARE_LEGACY_DEVICE(DECO16IC, deco16ic);
 
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define DECO16IC DEVICE_GET_INFO_NAME( deco16ic )
 
 #define MDRV_DECO16IC_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, DECO16IC, 0) \
@@ -122,3 +120,5 @@ void deco16ic_pf34_set_gfxbank(running_device *device, int small, int big);
 
 /* used by stoneage */
 void deco16ic_set_scrolldx(running_device *device, int tmap, int size, int dx, int dx_if_flipped);
+
+#endif

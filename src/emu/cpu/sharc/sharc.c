@@ -124,7 +124,7 @@ struct _SHARC_REGS
 	UINT16 *internal_ram;
 	UINT16 *internal_ram_block0, *internal_ram_block1;
 
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *program;
 	const address_space *data;
@@ -187,10 +187,9 @@ static void (* sharc_op[512])(SHARC_REGS *cpustate);
 INLINE SHARC_REGS *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ADSP21062);
-	return (SHARC_REGS *)device->token;
+	return (SHARC_REGS *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE void CHANGE_PC(SHARC_REGS *cpustate, UINT32 newpc)
@@ -420,15 +419,15 @@ void sharc_external_dma_write(running_device *device, UINT32 address, UINT64 dat
 static CPU_INIT( sharc )
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
-	const sharc_config *cfg = (const sharc_config *)device->baseconfig().static_config;
+	const sharc_config *cfg = (const sharc_config *)device->baseconfig().static_config();
 	int saveindex;
 
 	cpustate->boot_mode = cfg->boot_mode;
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
 
 	build_opcode_table();
 
@@ -1059,7 +1058,7 @@ ADDRESS_MAP_END
 
 static CPU_GET_INFO( sharc )
 {
-	SHARC_REGS *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	SHARC_REGS *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

@@ -24,13 +24,13 @@ VIDEO_START( changela )
 	state->memory_devices = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
 	state->tree_ram = auto_alloc_array(machine, UINT8, 2 * 0x20);
 
-	state->obj0_bitmap  = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->river_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->tree0_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->tree1_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->obj0_bitmap  = machine->primary_screen->alloc_compatible_bitmap();
+	state->river_bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->tree0_bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->tree1_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	state->scanline_timer = timer_alloc(machine, changela_scanline_callback, NULL);
-	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 30, 0), 30);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(30), 30);
 
 	state_save_register_global_pointer(machine, state->memory_devices, 4 * 0x800);
 	state_save_register_global_pointer(machine, state->tree_ram, 2 * 0x20);
@@ -719,7 +719,7 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 	sy++;
 	if (sy > 256) sy = 30;
-	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, sy, 0), sy);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(sy), sy);
 }
 
 VIDEO_UPDATE( changela )

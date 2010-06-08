@@ -438,8 +438,7 @@ static const UINT8 fcmp_cr_table_source[32] =
 INLINE powerpc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_PPC403GA ||
 		   cpu_get_type(device) == CPU_PPC403GCX ||
 		   cpu_get_type(device) == CPU_PPC601 ||
@@ -449,7 +448,7 @@ INLINE powerpc_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_PPC603R ||
 		   cpu_get_type(device) == CPU_PPC604 ||
 		   cpu_get_type(device) == CPU_MPC8240);
-	return *(powerpc_state **)device->token;
+	return *(powerpc_state **)downcast<cpu_device *>(device)->token();
 }
 
 /*-------------------------------------------------
@@ -548,7 +547,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, running_device *device, cpu_irq_callback irqcallback)
+static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, running_device *device, device_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -569,7 +568,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, runnin
 		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*ppc)));
 
 	/* allocate the core from the near cache */
-	*(powerpc_state **)device->token = ppc = (powerpc_state *)drccache_memory_alloc_near(cache, sizeof(*ppc));
+	*(powerpc_state **)downcast<cpu_device *>(device)->token() = ppc = (powerpc_state *)drccache_memory_alloc_near(cache, sizeof(*ppc));
 	memset(ppc, 0, sizeof(*ppc));
 
 	/* initialize the core */
@@ -794,7 +793,7 @@ static CPU_SET_INFO( ppcdrc )
 
 static CPU_GET_INFO( ppcdrc )
 {
-	powerpc_state *ppc = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	powerpc_state *ppc = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1479,7 +1478,7 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
 	drcuml_state *drcuml = ppc->impstate->drcuml;
-	int fastxor = BYTE8_XOR_BE(0) >> (int)(ppc->device->databus_width(AS_PROGRAM) < 64);
+	int fastxor = BYTE8_XOR_BE(0) >> (int)(device_memory(ppc->device)->space_config(AS_PROGRAM)->m_databus_width < 64);
 	drcuml_block *block;
 	jmp_buf errorbuf;
 	int translate_type;
@@ -4291,7 +4290,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 
 static CPU_GET_INFO( ppcdrc4xx )
 {
-	powerpc_state *ppc = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	powerpc_state *ppc = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	CPU_GET_INFO_CALL(ppcdrc);
 	ppc4xx_get_info(ppc, state, info);
 }

@@ -60,10 +60,8 @@ struct _ga20_state
 INLINE ga20_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_IREMGA20);
-	return (ga20_state *)device->token;
+	assert(device->type() == SOUND_IREMGA20);
+	return (ga20_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -242,15 +240,15 @@ static DEVICE_START( iremga20 )
 	int i;
 
 	/* Initialize our chip structure */
-	chip->rom = *device->region;
-	chip->rom_size = device->region->bytes();
+	chip->rom = *device->region();
+	chip->rom_size = device->region()->bytes();
 
 	iremga20_reset(chip);
 
 	for ( i = 0; i < 0x40; i++ )
 		chip->regs[i] = 0;
 
-	chip->stream = stream_create( device, 0, 2, device->clock/4, chip, IremGA20_update );
+	chip->stream = stream_create( device, 0, 2, device->clock()/4, chip, IremGA20_update );
 
 	state_save_register_device_item_array(device, 0, chip->regs);
 	for (i = 0; i < 4; i++)

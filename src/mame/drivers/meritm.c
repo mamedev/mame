@@ -333,12 +333,12 @@ static VIDEO_START( meritm )
 {
 	layer0_enabled = layer1_enabled = 1;
 
-	vdp0_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	v9938_init (machine, 0, machine->primary_screen, vdp0_bitmap, MODEL_V9938, 0x20000, meritm_vdp0_interrupt);
+	vdp0_bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	v9938_init (machine, 0, *machine->primary_screen, vdp0_bitmap, MODEL_V9938, 0x20000, meritm_vdp0_interrupt);
 	v9938_reset(0);
 
-	vdp1_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	v9938_init (machine, 1, machine->primary_screen, vdp1_bitmap, MODEL_V9938, 0x20000, meritm_vdp1_interrupt);
+	vdp1_bitmap = machine->primary_screen->alloc_compatible_bitmap();
+	v9938_init (machine, 1, *machine->primary_screen, vdp1_bitmap, MODEL_V9938, 0x20000, meritm_vdp1_interrupt);
 	v9938_reset(1);
 
 	state_save_register_global(machine, meritm_vint);
@@ -954,7 +954,7 @@ static Z80PIO_INTERFACE( meritm_io_pio_intf )
 	DEVCB_NULL
 };
 
-static const z80_daisy_chain meritm_daisy_chain[] =
+static const z80_daisy_config meritm_daisy_chain[] =
 {
 	{ "z80pio_0" },
 	{ "z80pio_1" },

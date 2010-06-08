@@ -201,8 +201,8 @@ static TIMER_CALLBACK( timekeeper_tick )
 	{
 		carry = inc_bcd( &c->century, MASK_CENTURY, 0x00, 0x99 );
 
-		if( c->device->type == M48T35 ||
-			c->device->type == M48T58 )
+		if( c->device->type() == M48T35 ||
+			c->device->type() == M48T58 )
 		{
 			if( ( c->day & DAY_CEB ) != 0 )
 			{
@@ -225,13 +225,12 @@ static TIMER_CALLBACK( timekeeper_tick )
 INLINE timekeeper_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == M48T02) ||
-		   (device->type == M48T35) ||
-		   (device->type == M48T58) ||
-		   (device->type == MK48T08));
+	assert((device->type() == M48T02) ||
+		   (device->type() == M48T35) ||
+		   (device->type() == M48T58) ||
+		   (device->type() == MK48T08));
 
-	return (timekeeper_state *)device->token;
+	return (timekeeper_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* memory handlers */
@@ -251,17 +250,17 @@ WRITE8_DEVICE_HANDLER( timekeeper_w )
 	}
 	else if( offset == c->offset_day )
 	{
-		if( c->device->type == M48T35 ||
-			c->device->type == M48T58 )
+		if( c->device->type() == M48T35 ||
+			c->device->type() == M48T58 )
 		{
 			c->day = ( c->day & ~DAY_CEB ) | ( data & DAY_CEB );
 		}
 	}
-	else if( offset == c->offset_date && c->device->type == M48T58 )
+	else if( offset == c->offset_date && c->device->type() == M48T58 )
 	{
 		data &= ~DATE_BL;
 	}
-	else if( offset == c->offset_flags && c->device->type == MK48T08 )
+	else if( offset == c->offset_flags && c->device->type() == MK48T08 )
 	{
 		data &= ~FLAGS_BL;
 	}
@@ -291,8 +290,8 @@ static DEVICE_START(timekeeper)
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-//  assert(device->baseconfig().static_config != NULL);
-	assert(device->baseconfig().inline_config == NULL);
+//  assert(device->baseconfig().static_config() != NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
@@ -310,8 +309,8 @@ static DEVICE_START(timekeeper)
 	c->century = make_bcd( systime.local_time.year / 100 );
 	c->data = auto_alloc_array( device->machine, UINT8, c->size );
 
-	c->default_data = *device->region;
-	assert( device->region->bytes() == c->size );
+	c->default_data = *device->region();
+	assert( device->region()->bytes() == c->size );
 
 	state_save_register_device_item( device, 0, c->control );
 	state_save_register_device_item( device, 0, c->seconds );
@@ -454,7 +453,6 @@ static DEVICE_GET_INFO(timekeeper)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(timekeeper_state); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break; // sizeof(timekeeper_config)
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(timekeeper); break;

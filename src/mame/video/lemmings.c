@@ -30,7 +30,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		y = spritedata[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (flash && (machine->primary_screen->frame_number() & 1))
 			continue;
 
 		x = spritedata[offs + 2];
@@ -87,7 +87,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( lemmings )
 {
 	lemmings_state *state = (lemmings_state *)machine->driver_data;
-	state->bitmap0 = auto_bitmap_alloc(machine, 2048, 256, video_screen_get_format(machine->primary_screen));
+	state->bitmap0 = auto_bitmap_alloc(machine, 2048, 256, machine->primary_screen->format());
 	state->vram_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 
 	state->vram_buffer = auto_alloc_array(machine, UINT8, 2048 * 64); /* 64 bytes per VRAM character */

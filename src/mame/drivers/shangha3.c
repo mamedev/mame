@@ -91,7 +91,7 @@ static WRITE16_HANDLER( heberpop_coinctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"),(data & 0x08) ? 0x40000 : 0x00000);
+		space->machine->device<okim6295_device>("oki")->set_bank_base((data & 0x08) ? 0x40000 : 0x00000);
 
 		coin_lockout_w(space->machine, 0,~data & 0x04);
 		coin_lockout_w(space->machine, 1,~data & 0x04);
@@ -105,7 +105,7 @@ static WRITE16_HANDLER( blocken_coinctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), ((data >> 4) & 3) * 0x40000);
+		space->machine->device<okim6295_device>("oki")->set_bank_base(((data >> 4) & 3) * 0x40000);
 
 		coin_lockout_w(space->machine, 0,~data & 0x04);
 		coin_lockout_w(space->machine, 1,~data & 0x04);
@@ -506,8 +506,7 @@ static MACHINE_DRIVER_START( shangha3 )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -547,8 +546,7 @@ static MACHINE_DRIVER_START( heberpop )
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -588,8 +586,7 @@ static MACHINE_DRIVER_START( blocken )
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

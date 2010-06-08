@@ -105,10 +105,9 @@ struct _tms6100_state
 INLINE tms6100_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TMS6100 ||
-			device->type == M58819);
-	return (tms6100_state *)device->token;
+	assert(device->type() == TMS6100 ||
+			device->type() == M58819);
+	return (tms6100_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /**********************************************************************************************
@@ -143,7 +142,7 @@ static DEVICE_START( tms6100 )
 	assert_always(tms != NULL, "Error creating TMS6100 chip");
 
 	//tms->intf = device->baseconfig().static_config ? (const tms5110_interface *)device->baseconfig().static_config : &dummy;
-	tms->rom = *device->region;
+	tms->rom = *device->region();
 
 	tms->device = device;
 

@@ -32,7 +32,7 @@ VIDEO_START( ccastles )
 			3,	resistances, state->bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	state->spritebitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->spritebitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	/* register for savestates */
 	state_save_register_global_array(machine, state->video_control);
@@ -52,7 +52,7 @@ VIDEO_START( ccastles )
 WRITE8_HANDLER( ccastles_hscroll_w )
 {
 	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	state->hscroll = data;
 }
 

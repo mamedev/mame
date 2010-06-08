@@ -78,7 +78,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
 	if (param != 0)
-		timer_adjust_periodic(crtc_timer, attotime_div(video_screen_get_frame_period(machine->primary_screen), param), 0, attotime_div(video_screen_get_frame_period(machine->primary_screen), param));
+		timer_adjust_periodic(crtc_timer, attotime_div(machine->primary_screen->frame_period(), param), 0, attotime_div(machine->primary_screen->frame_period(), param));
 }
 
 
@@ -164,7 +164,7 @@ WRITE16_HANDLER( rpunch_crtc_data_w )
 		{
 			/* only register we know about.... */
 			case 0x0b:
-				timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_vblank_start(space->machine->primary_screen), (data == 0xc0) ? 2 : 1);
+				timer_adjust_oneshot(crtc_timer, space->machine->primary_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
 				break;
 
 			default:

@@ -90,7 +90,7 @@ static READ8_HANDLER( irq_clear_r )
 
 static TIMER_DEVICE_CALLBACK( irq_callback )
 {
-	astrof_state *state = (astrof_state *)timer->machine->driver_data;
+	astrof_state *state = (astrof_state *)timer.machine->driver_data;
 	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
@@ -310,7 +310,7 @@ static WRITE8_HANDLER( video_control_1_w )
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
 
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
 
@@ -333,7 +333,7 @@ static void astrof_set_video_control_2( running_machine *machine, UINT8 data )
 static WRITE8_HANDLER( astrof_video_control_2_w )
 {
 	astrof_set_video_control_2(space->machine, data);
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
 
@@ -353,7 +353,7 @@ static void spfghmk2_set_video_control_2( running_machine *machine, UINT8 data )
 static WRITE8_HANDLER( spfghmk2_video_control_2_w )
 {
 	spfghmk2_set_video_control_2(space->machine, data);
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
 
@@ -372,7 +372,7 @@ static void tomahawk_set_video_control_2( running_machine *machine, UINT8 data )
 static WRITE8_HANDLER( tomahawk_video_control_2_w )
 {
 	tomahawk_set_video_control_2(space->machine, data);
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
 

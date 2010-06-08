@@ -102,10 +102,9 @@ typedef struct
 INLINE duart68681_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == DUART68681);
+	assert(device->type() == DUART68681);
 
-	return (duart68681_state *)device->token;
+	return (duart68681_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static void duart68681_update_interrupts(duart68681_state *duart68681)
@@ -541,13 +540,13 @@ READ8_DEVICE_HANDLER(duart68681_r)
 				/* TODO: implement modes 0,1,2,4,5 */
 				case 0x03: /* Counter, CLK/16 */
 					{
-						attotime rate = ATTOTIME_IN_HZ(2*device->clock/(2*16*16*duart68681->CTR.w.l));
+						attotime rate = ATTOTIME_IN_HZ(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
 						timer_adjust_periodic(duart68681->duart_timer, rate, 0, rate);
 					}
 					break;
 				case 0x06: /* Timer, CLK/1 */
 					{
-						attotime rate = ATTOTIME_IN_HZ(2*device->clock/(2*16*duart68681->CTR.w.l));
+						attotime rate = ATTOTIME_IN_HZ(2*device->clock()/(2*16*duart68681->CTR.w.l));
 						timer_adjust_periodic(duart68681->duart_timer, rate, 0, rate);
 					}
 					break;
@@ -555,7 +554,7 @@ READ8_DEVICE_HANDLER(duart68681_r)
 					{
 						//double hz;
 						//attotime rate = attotime_mul(ATTOTIME_IN_HZ(duart68681->clock), 16*duart68681->CTR.w.l);
-						attotime rate = ATTOTIME_IN_HZ(2*device->clock/(2*16*16*duart68681->CTR.w.l));
+						attotime rate = ATTOTIME_IN_HZ(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
 						//hz = ATTOSECONDS_TO_HZ(rate.attoseconds);
 						timer_adjust_periodic(duart68681->duart_timer, rate, 0, rate);
 					}
@@ -690,7 +689,7 @@ static DEVICE_START(duart68681)
 	/* validate arguments */
 	assert(device != NULL);
 
-	duart68681->duart_config = (const duart68681_config *)device->baseconfig().static_config;
+	duart68681->duart_config = (const duart68681_config *)device->baseconfig().static_config();
 	duart68681->device = device;
 
 	duart68681->channel[0].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
@@ -781,7 +780,6 @@ DEVICE_GET_INFO(duart68681)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(duart68681_state);	break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(duart68681_config);	break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(duart68681); break;

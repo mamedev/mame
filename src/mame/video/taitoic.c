@@ -570,17 +570,16 @@ struct _pc080sn_state
 INLINE pc080sn_state *pc080sn_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == PC080SN);
+	assert(device->type() == PC080SN);
 
-	return (pc080sn_state *)device->token;
+	return (pc080sn_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const pc080sn_interface *pc080sn_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == PC080SN));
-	return (const pc080sn_interface *) device->baseconfig().static_config;
+	assert((device->type() == PC080SN));
+	return (const pc080sn_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -1064,17 +1063,16 @@ struct _pc090oj_state
 INLINE pc090oj_state *pc090oj_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == PC090OJ);
+	assert(device->type() == PC090OJ);
 
-	return (pc090oj_state *)device->token;
+	return (pc090oj_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const pc090oj_interface *pc090oj_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == PC090OJ));
-	return (const pc090oj_interface *) device->baseconfig().static_config;
+	assert((device->type() == PC090OJ));
+	return (const pc090oj_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -1273,17 +1271,16 @@ struct _tc0080vco_state
 INLINE tc0080vco_state *tc0080vco_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0080VCO);
+	assert(device->type() == TC0080VCO);
 
-	return (tc0080vco_state *)device->token;
+	return (tc0080vco_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0080vco_interface *tc0080vco_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0080VCO));
-	return (const tc0080vco_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0080VCO));
+	return (const tc0080vco_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -1945,7 +1942,7 @@ struct _tc0100scn_state
 	INT32        bg0_colbank, bg1_colbank, tx_colbank;
 	int          dblwidth;
 
-	running_device *screen;
+	screen_device *screen;
 };
 
 #define TC0100SCN_RAM_SIZE        0x14000	/* enough for double-width tilemaps */
@@ -1958,17 +1955,16 @@ struct _tc0100scn_state
 INLINE tc0100scn_state *tc0100scn_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0100SCN);
+	assert(device->type() == TC0100SCN);
 
-	return (tc0100scn_state *)device->token;
+	return (tc0100scn_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0100scn_interface *tc0100scn_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0100SCN));
-	return (const tc0100scn_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0100SCN));
+	return (const tc0100scn_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -2429,14 +2425,14 @@ static DEVICE_START( tc0100scn )
 	const tc0100scn_interface *intf = tc0100scn_get_interface(device);
 	int xd, yd;
 
-	tc0100scn->screen = devtag_get_device(device->machine, intf->screen);
+	tc0100scn->screen = device->machine->device<screen_device>(intf->screen);
 
 	/* Set up clipping for multi-TC0100SCN games. We assume
        this code won't ever affect single screen games:
        Thundfox is the only one of those with two chips, and
        we're safe as it uses single width tilemaps. */
 
-	tc0100scn->cliprect = *video_screen_get_visible_area(tc0100scn->screen);
+	tc0100scn->cliprect = tc0100scn->screen->visible_area();
 
 	/* use the given gfx sets for bg/tx tiles*/
 	tc0100scn->bg_gfx = intf->gfxnum;	/* 2nd/3rd chips will use the same gfx set */
@@ -2565,17 +2561,16 @@ struct _tc0280grd_state
 INLINE tc0280grd_state *tc0280grd_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == TC0280GRD) || (device->type == TC0430GRW));
+	assert((device->type() == TC0280GRD) || (device->type() == TC0430GRW));
 
-	return (tc0280grd_state *)device->token;
+	return (tc0280grd_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0280grd_interface *tc0280grd_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0280GRD) || (device->type == TC0430GRW));
-	return (const tc0280grd_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0280GRD) || (device->type() == TC0430GRW));
+	return (const tc0280grd_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -2736,10 +2731,9 @@ struct _tc0360pri_state
 INLINE tc0360pri_state *tc0360pri_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0360PRI);
+	assert(device->type() == TC0360PRI);
 
-	return (tc0360pri_state *)device->token;
+	return (tc0360pri_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -2829,17 +2823,16 @@ struct _tc0480scp_state
 INLINE tc0480scp_state *tc0480scp_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0480SCP);
+	assert(device->type() == TC0480SCP);
 
-	return (tc0480scp_state *)device->token;
+	return (tc0480scp_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0480scp_interface *tc0480scp_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0480SCP));
-	return (const tc0480scp_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0480SCP));
+	return (const tc0480scp_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -3772,17 +3765,16 @@ struct _tc0150rod_state
 INLINE tc0150rod_state *tc0150rod_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0150ROD);
+	assert(device->type() == TC0150ROD);
 
-	return (tc0150rod_state *)device->token;
+	return (tc0150rod_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0150rod_interface *tc0150rod_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0150ROD));
-	return (const tc0150rod_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0150ROD));
+	return (const tc0150rod_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -4583,17 +4575,16 @@ struct _tc0110pcr_state
 INLINE tc0110pcr_state *tc0110pcr_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0110PCR);
+	assert(device->type() == TC0110PCR);
 
-	return (tc0110pcr_state *)device->token;
+	return (tc0110pcr_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0110pcr_interface *tc0110pcr_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0110PCR));
-	return (const tc0110pcr_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0110PCR));
+	return (const tc0110pcr_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -4814,17 +4805,16 @@ struct _tc0180vcu_state
 INLINE tc0180vcu_state *tc0180vcu_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0180VCU);
+	assert(device->type() == TC0180VCU);
 
-	return (tc0180vcu_state *)device->token;
+	return (tc0180vcu_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0180vcu_interface *tc0180vcu_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0180VCU));
-	return (const tc0180vcu_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0180VCU));
+	return (const tc0180vcu_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -5147,7 +5137,6 @@ DEVICE_GET_INFO( pc080sn )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(pc080sn_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pc080sn);		break;
@@ -5169,7 +5158,6 @@ DEVICE_GET_INFO( pc090oj )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(pc090oj_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pc090oj);		break;
@@ -5191,7 +5179,6 @@ DEVICE_GET_INFO( tc0080vco )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0080vco_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0080vco);		break;
@@ -5213,7 +5200,6 @@ DEVICE_GET_INFO( tc0110pcr )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0110pcr_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0110pcr);		break;
@@ -5235,7 +5221,6 @@ DEVICE_GET_INFO( tc0100scn )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0100scn_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0100scn);		break;
@@ -5257,7 +5242,6 @@ DEVICE_GET_INFO( tc0280grd )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0280grd_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0280grd);		break;
@@ -5279,7 +5263,6 @@ DEVICE_GET_INFO( tc0360pri )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0360pri_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0360pri);		break;
@@ -5301,7 +5284,6 @@ DEVICE_GET_INFO( tc0480scp )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0480scp_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0480scp);		break;
@@ -5323,7 +5305,6 @@ DEVICE_GET_INFO( tc0150rod )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0150rod_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0150rod);		break;
@@ -5345,7 +5326,6 @@ DEVICE_GET_INFO( tc0180vcu )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0180vcu_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0180vcu);		break;

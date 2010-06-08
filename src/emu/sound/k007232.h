@@ -7,6 +7,8 @@
 #ifndef __K007232_H__
 #define __K007232_H__
 
+#include "devlegcy.h"
+
 typedef struct _k007232_interface k007232_interface;
 struct _k007232_interface
 {
@@ -28,7 +30,6 @@ void k007232_set_bank( running_device *device, int chABank, int chBBank );
 */
 void k007232_set_volume(running_device *device,int channel,int volumeA,int volumeB);
 
-DEVICE_GET_INFO( k007232 );
-#define SOUND_K007232 DEVICE_GET_INFO_NAME( k007232 )
+DECLARE_LEGACY_SOUND_DEVICE(K007232, k007232);
 
 #endif /* __K007232_H__ */

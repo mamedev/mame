@@ -320,7 +320,7 @@ VIDEO_UPDATE( midzeus )
 	if (!input_code_pressed(screen->machine, KEYCODE_W))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0xcc]);
-		int xoffs = video_screen_get_visible_area(screen)->min_x;
+		int xoffs = screen->visible_area().min_x;
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
 			UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
@@ -373,18 +373,18 @@ READ32_HANDLER( zeus_r )
 	switch (offset & ~1)
 	{
 		case 0xf0:
-			result = video_screen_get_hpos(space->machine->primary_screen);
+			result = space->machine->primary_screen->hpos();
 			logit = 0;
 			break;
 
 		case 0xf2:
-			result = video_screen_get_vpos(space->machine->primary_screen);
+			result = space->machine->primary_screen->vpos();
 			logit = 0;
 			break;
 
 		case 0xf4:
 			result = 6;
-			if (video_screen_get_vblank(space->machine->primary_screen))
+			if (space->machine->primary_screen->vblank())
 				result |= 0x800;
 			logit = 0;
 			break;
@@ -526,7 +526,7 @@ static void zeus_register16_w(running_machine *machine, offs_t offset, UINT16 da
 {
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		machine->primary_screen->update_partial(machine->primary_screen->vpos());
 
 	/* write to high part on odd addresses */
 	if (offset & 1)
@@ -550,7 +550,7 @@ static void zeus_register32_w(running_machine *machine, offs_t offset, UINT32 da
 {
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		machine->primary_screen->update_partial(machine->primary_screen->vpos());
 
 	/* always write to low word? */
 	zeusbase[offset & ~1] = data;
@@ -717,7 +717,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
 		case 0xc6:
 		case 0xc8:
 		case 0xca:
-			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+			machine->primary_screen->update_partial(machine->primary_screen->vpos());
 			{
 				int vtotal = zeusbase[0xca] >> 16;
 				int htotal = zeusbase[0xc6] >> 16;
@@ -729,7 +729,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
 				visarea.max_y = zeusbase[0xc8] & 0xffff;
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
-					video_screen_configure(machine->primary_screen, htotal, vtotal, &visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
+					machine->primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
 					zeus_cliprect = visarea;
 					zeus_cliprect.max_x -= zeus_cliprect.min_x;
 					zeus_cliprect.min_x = 0;
@@ -738,7 +738,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
 			break;
 
 		case 0xcc:
-			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+			machine->primary_screen->update_partial(machine->primary_screen->vpos());
 			log_fifo = input_code_pressed(machine, KEYCODE_L);
 			break;
 

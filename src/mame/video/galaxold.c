@@ -954,7 +954,7 @@ VIDEO_START( dambustr )
 	draw_bullets = dambustr_draw_bullets;
 
 	/* allocate the temporary bitmap for the background priority */
-	dambustr_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	dambustr_tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	/* make a copy of the tilemap to emulate background priority */
 	dambustr_videoram2 = auto_alloc_array(machine, UINT8, 0x0400);
@@ -1754,7 +1754,7 @@ static TIMER_CALLBACK( stars_scroll_callback )
 
 static void start_stars_scroll_timer(running_machine *machine)
 {
-	timer_adjust_periodic(stars_scroll_timer, video_screen_get_frame_period(machine->primary_screen), 0, video_screen_get_frame_period(machine->primary_screen));
+	timer_adjust_periodic(stars_scroll_timer, machine->primary_screen->frame_period(), 0, machine->primary_screen->frame_period());
 }
 
 

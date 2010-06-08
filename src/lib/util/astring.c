@@ -137,6 +137,8 @@ INLINE void normalize_substr(int *start, int *count, int length)
 
 #ifdef __cplusplus
 
+#include <new>
+
 /*-------------------------------------------------
     init - constructor helper
 -------------------------------------------------*/
@@ -167,7 +169,12 @@ astring::~astring()
 
 astring *astring_alloc(void)
 {
-	return new astring;
+	// we do our own malloc and use placement new here to
+	// make our memory tracking happy
+	void *ptr = malloc(sizeof(astring));
+	if (ptr == NULL)
+		return NULL;
+	return new(ptr) astring;
 }
 
 
@@ -177,7 +184,10 @@ astring *astring_alloc(void)
 
 void astring_free(astring *str)
 {
-	delete str;
+	// since we malloc'ed the memory ourselves, we directly
+	// call the destructor and free the memory ourselves
+	str->~astring();
+	free(str);
 }
 
 #else

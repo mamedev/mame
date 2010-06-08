@@ -108,10 +108,9 @@ struct _namco_06xx_state
 INLINE namco_06xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == NAMCO_06XX);
+	assert(device->type() == NAMCO_06XX);
 
-	return (namco_06xx_state *)device->token;
+	return (namco_06xx_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -221,7 +220,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 
 static DEVICE_START( namco_06xx )
 {
-	const namco_06xx_config *config = (const namco_06xx_config *)device->baseconfig().inline_config;
+	const namco_06xx_config *config = (const namco_06xx_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
@@ -245,7 +244,7 @@ static DEVICE_START( namco_06xx )
 	for (devnum = 0; devnum < 4; devnum++)
 		if (state->device[devnum] != NULL)
 		{
-			device_type type = state->device[devnum]->type;
+			device_type type = state->device[devnum]->type();
 
 			if (type == NAMCO_50XX)
 			{

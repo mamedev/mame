@@ -1537,13 +1537,17 @@ static WRITE16_HANDLER( ddenlovr16_transparency_mask_w )
 
 static WRITE8_DEVICE_HANDLER( quizchq_oki_bank_w )
 {
-	okim6295_set_bank_base(device, (data & 1) * 0x40000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 1) * 0x40000);
 }
 
 static WRITE16_DEVICE_HANDLER( ddenlovr_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		okim6295_set_bank_base(device, (data & 7) * 0x40000);
+	{
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base((data & 7) * 0x40000);
+	}
 }
 
 
@@ -1555,7 +1559,8 @@ static WRITE16_DEVICE_HANDLER( quiz365_oki_bank1_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		state->okibank = (state->okibank & 2) | (data & 1);
-		okim6295_set_bank_base(device, state->okibank * 0x40000);
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(state->okibank * 0x40000);
 	}
 }
 
@@ -1566,7 +1571,8 @@ static WRITE16_DEVICE_HANDLER( quiz365_oki_bank2_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		state->okibank = (state->okibank & 1) | ((data & 1) << 1);
-		okim6295_set_bank_base(device, state->okibank * 0x40000);
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(state->okibank * 0x40000);
 	}
 }
 
@@ -1835,7 +1841,7 @@ static WRITE16_HANDLER( ddenlovrk_protection2_w )
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
 
 	COMBINE_DATA(state->protection2);
-	okim6295_set_bank_base(state->oki, ((*state->protection2) & 0x7) * 0x40000);
+	state->oki->set_bank_base(((*state->protection2) & 0x7) * 0x40000);
 }
 
 static ADDRESS_MAP_START( ddenlovrk_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1960,7 +1966,10 @@ static WRITE16_HANDLER( nettoqc_coincounter_w )
 static WRITE16_DEVICE_HANDLER( nettoqc_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		okim6295_set_bank_base(device, (data & 3) * 0x40000);
+	{
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base((data & 3) * 0x40000);
+	}
 }
 
 static ADDRESS_MAP_START( nettoqc_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2521,7 +2530,8 @@ static WRITE8_HANDLER( hanakanz_palette_w )
 
 static WRITE8_DEVICE_HANDLER( hanakanz_oki_bank_w )
 {
-	okim6295_set_bank_base(device, (data & 0x40) ? 0x40000 : 0);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
 }
 
 static READ8_HANDLER( hanakanz_rand_r )
@@ -2707,7 +2717,8 @@ static WRITE8_HANDLER( mjchuuka_coincounter_w )
 static WRITE8_DEVICE_HANDLER( mjchuuka_oki_bank_w )
 {
 	// data & 0x08 ?
-	okim6295_set_bank_base(device, (data & 0x01) ? 0x40000 : 0);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
 
 #ifdef MAME_DEBUG
 //    popmessage("1e = %02x",data);
@@ -3052,7 +3063,7 @@ ADDRESS_MAP_END
 static UINT8 hgokou_player_r( const address_space *space, int player )
 {
 	dynax_state *state = (dynax_state *)space->machine->driver_data;
-	UINT8 hopper_bit = ((state->hopper && !(video_screen_get_frame_number(space->machine->primary_screen) % 10)) ? 0 : (1 << 6));
+	UINT8 hopper_bit = ((state->hopper && !(space->machine->primary_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
 	if (!BIT(state->input_sel, 0))   return input_port_read(space->machine, player ? "KEY5" : "KEY0") | hopper_bit;
 	if (!BIT(state->input_sel, 1))   return input_port_read(space->machine, player ? "KEY6" : "KEY1") | hopper_bit;
@@ -3321,7 +3332,7 @@ static WRITE16_HANDLER( akamaru_protection1_w )
 	COMBINE_DATA(&state->prot_16);
 	// BCD number?
 	bank = (((state->prot_16 >> 4) & 0x0f) % 10) * 10 + ((state->prot_16 & 0x0f) % 10);
-	okim6295_set_bank_base(state->oki, bank * 0x40000);
+	state->oki->set_bank_base(bank * 0x40000);
 
 //  popmessage("bank $%0x (%d)", state->prot_16, bank);
 }
@@ -3409,7 +3420,8 @@ static WRITE8_HANDLER( mjflove_rombank_w )
 
 static WRITE8_DEVICE_HANDLER( mjflove_okibank_w )
 {
-	okim6295_set_bank_base(device, (data & 0x07) * 0x40000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 0x07) * 0x40000);
 	//popmessage("SOUND = %02x", data);
 }
 
@@ -3495,7 +3507,8 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( jongtei_okibank_w )
 {
-	okim6295_set_bank_base(device, ((data >> 4) & 0x07) * 0x40000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base(((data >> 4) & 0x07) * 0x40000);
 }
 
 static WRITE8_HANDLER( jongtei_dsw_keyb_w )
@@ -3674,7 +3687,8 @@ static READ8_HANDLER( daimyojn_protection_r )
 
 static WRITE8_DEVICE_HANDLER( daimyojn_okibank_w )
 {
-	okim6295_set_bank_base(device, ((data >> 4) & 0x01) * 0x40000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base(((data >> 4) & 0x01) * 0x40000);
 }
 
 static WRITE8_HANDLER( daimyojn_palette_sel_w )
@@ -7564,7 +7578,7 @@ static MACHINE_START( ddenlovr )
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->oki = devtag_get_device(machine, "oki");
+	state->oki = machine->device<okim6295_device>("oki");
 
 	state_save_register_global(machine, state->input_sel);
 	state_save_register_global(machine, state->dsw_sel);
@@ -7732,8 +7746,7 @@ static MACHINE_DRIVER_START( ddenlovr )
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 16)	// or /8 ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -7811,7 +7824,7 @@ static INTERRUPT_GEN( quizchq_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise quizchq would lock up. */
-	if (device->get_runtime_int(CPUINFO_INT_INPUT_STATE + 0))
+	if (downcast<cpu_device *>(device)->input_state(0))
 		return;
 
 	if ((++state->irq_count % 60) == 0)
@@ -7861,8 +7874,7 @@ static MACHINE_DRIVER_START( quizchq )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1022720)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -7897,7 +7909,7 @@ static INTERRUPT_GEN( mmpanic_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise the game would lock up. */
-	if (device->get_runtime_int(CPUINFO_INT_INPUT_STATE + 0))
+	if (downcast<cpu_device *>(device)->input_state(0))
 		return;
 
 	if ((++state->irq_count % 60) == 0)
@@ -7948,8 +7960,7 @@ static MACHINE_DRIVER_START( mmpanic )
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1022720)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -7975,7 +7986,7 @@ static INTERRUPT_GEN( hanakanz_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise quizchq would lock up. */
-	if (device->get_runtime_int(CPUINFO_INT_INPUT_STATE + 0))
+	if (downcast<cpu_device *>(device)->input_state(0))
 		return;
 
 	if ((++state->irq_count % 60) == 0)
@@ -8018,8 +8029,7 @@ static MACHINE_DRIVER_START( hanakanz )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1022720)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -8057,7 +8067,7 @@ static INTERRUPT_GEN( mjchuuka_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise quizchq would lock up. */
-	if (device->get_runtime_int(CPUINFO_INT_INPUT_STATE + 0))
+	if (downcast<cpu_device *>(device)->input_state(0))
 		return;
 
 	if ((++state->irq_count % 60) == 0)
@@ -8117,7 +8127,7 @@ static INTERRUPT_GEN( mjmyster_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise quizchq would lock up. */
-	if (device->get_runtime_int(CPUINFO_INT_INPUT_STATE + 0))
+	if (downcast<cpu_device *>(device)->input_state(0))
 		return;
 
 	switch (cpu_getiloops(device))
@@ -8175,7 +8185,7 @@ static INTERRUPT_GEN( hginga_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise hginga would lock up. */
-	if (device->get_runtime_int(CPUINFO_INT_INPUT_STATE + 0))
+	if (downcast<cpu_device *>(device)->input_state(0))
 		return;
 
 	if ((++state->irq_count % 60) == 0)
@@ -8349,8 +8359,7 @@ static MACHINE_DRIVER_START( jongtei )
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -8398,8 +8407,7 @@ static MACHINE_DRIVER_START( sryudens )
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)	// ?
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -8444,8 +8452,7 @@ static MACHINE_DRIVER_START( daimyojn )
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */

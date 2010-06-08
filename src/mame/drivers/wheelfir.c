@@ -153,8 +153,8 @@ static bitmap_t* render_bitmap;
 static WRITE16_HANDLER(wheelfir_blit_w)
 {
 	//wheelfir_blitdata[offset]=data;
-	int width = video_screen_get_width(space->machine->primary_screen);
-	int height = video_screen_get_height(space->machine->primary_screen);
+	int width = space->machine->primary_screen->width();
+	int height = space->machine->primary_screen->height();
 	int vpage=0;
 	COMBINE_DATA(&wheelfir_blitdata[offset]);
 
@@ -275,11 +275,11 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 static VIDEO_START(wheelfir)
 {
 
-	wheelfir_tmp_bitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	wheelfir_tmp_bitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	wheelfir_tmp_bitmap[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	wheelfir_tmp_bitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
+	wheelfir_tmp_bitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
+	wheelfir_tmp_bitmap[2] = machine->primary_screen->alloc_compatible_bitmap();
 
-	render_bitmap =          video_screen_auto_bitmap_alloc(machine->primary_screen);
+	render_bitmap =          machine->primary_screen->alloc_compatible_bitmap();
 
 }
 
@@ -304,7 +304,7 @@ static VIDEO_UPDATE(wheelfir)
     copybitmap(bitmap, wheelfir_tmp_bitmap[2], 0, 0, 0, 0, cliprect);
     //copybitmap_trans(bitmap, wheelfir_tmp_bitmap[1], 0, 0, 0, 0, cliprect, 0);
     copybitmap_trans(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, 0);
-    bitmap_fill(wheelfir_tmp_bitmap[0], video_screen_get_visible_area(screen),0);
+    bitmap_fill(wheelfir_tmp_bitmap[0], screen->visible_area(),0);
 
     if ( input_code_pressed(screen->machine, KEYCODE_R) )
     {
@@ -540,8 +540,8 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static running_device* frame_timer;
-static running_device* scanline_timer;
+static timer_device* frame_timer;
+static timer_device* scanline_timer;
 
 static TIMER_DEVICE_CALLBACK( frame_timer_callback )
 {
@@ -572,13 +572,13 @@ static void render_background_to_render_buffer(int scanline)
 
 static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
-	timer_call_after_resynch(timer->machine, NULL, 0, 0);
+	timer_call_after_resynch(timer.machine, NULL, 0, 0);
 
 	if (scanline_counter != (total_scanlines - 1))
 	{
 		scanline_counter++;
-		cputag_set_input_line(timer->machine, "maincpu", 5, HOLD_LINE); // raster IRQ, changes scroll values for road
-		timer_device_adjust_oneshot(timer, attotime_div(ATTOTIME_IN_HZ(60), total_scanlines), 0);
+		cputag_set_input_line(timer.machine, "maincpu", 5, HOLD_LINE); // raster IRQ, changes scroll values for road
+		timer.adjust(attotime_div(ATTOTIME_IN_HZ(60), total_scanlines));
 
 		if (scanline_counter < 256)
 		{
@@ -587,7 +587,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 		if (scanline_counter == 256)
 		{
-			cputag_set_input_line(timer->machine, "maincpu", 3, HOLD_LINE); // vblank IRQ?
+			cputag_set_input_line(timer.machine, "maincpu", 3, HOLD_LINE); // vblank IRQ?
 			toggle_bit = 0x8000; // must toggle..
 		}
 
@@ -607,18 +607,18 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 static VIDEO_EOF( wheelfir )
 {
 	scanline_counter = -1;
-	bitmap_fill(wheelfir_tmp_bitmap[0], video_screen_get_visible_area(machine->primary_screen),0);
+	bitmap_fill(wheelfir_tmp_bitmap[0], &machine->primary_screen->visible_area(),0);
 
-	timer_device_adjust_oneshot(frame_timer,  attotime_zero, 0);
-	timer_device_adjust_oneshot(scanline_timer,  attotime_zero, 0);
+	frame_timer->reset();
+	scanline_timer->reset();
 }
 
 static MACHINE_RESET(wheelfir)
 {
-	frame_timer = devtag_get_device(machine, "frame_timer");
-	scanline_timer = devtag_get_device(machine, "scan_timer");
-	timer_device_adjust_oneshot(frame_timer, attotime_zero, 0);
-	timer_device_adjust_oneshot(scanline_timer,  attotime_zero, 0);
+	frame_timer = machine->device<timer_device>("frame_timer");
+	scanline_timer = machine->device<timer_device>("scan_timer");
+	frame_timer->reset();
+	scanline_timer->reset();
 	scanline_counter = -1;
 }
 

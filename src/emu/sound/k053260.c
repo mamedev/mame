@@ -46,10 +46,8 @@ struct _k053260_state {
 INLINE k053260_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_K053260);
-	return (k053260_state *)device->token;
+	assert(device->type() == SOUND_K053260);
+	return (k053260_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -210,16 +208,16 @@ static DEVICE_START( k053260 )
 {
 	static const k053260_interface defintrf = { 0 };
 	k053260_state *ic = get_safe_token(device);
-	int rate = device->clock / 32;
+	int rate = device->clock() / 32;
 	int i;
 
 	/* Initialize our chip structure */
 	ic->device = device;
-	ic->intf = (device->baseconfig().static_config != NULL) ? (const k053260_interface *)device->baseconfig().static_config : &defintrf;
+	ic->intf = (device->baseconfig().static_config() != NULL) ? (const k053260_interface *)device->baseconfig().static_config() : &defintrf;
 
 	ic->mode = 0;
 
-	const region_info *region = (ic->intf->rgnoverride != NULL) ? device->machine->region(ic->intf->rgnoverride) : device->region;
+	const region_info *region = (ic->intf->rgnoverride != NULL) ? device->machine->region(ic->intf->rgnoverride) : device->region();
 
 	ic->rom = *region;
 	ic->rom_size = region->bytes();
@@ -233,11 +231,11 @@ static DEVICE_START( k053260 )
 
 	ic->channel = stream_create( device, 0, 2, rate, ic, k053260_update );
 
-	InitDeltaTable( ic, rate, device->clock );
+	InitDeltaTable( ic, rate, device->clock() );
 
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )
-		timer_pulse( device->machine, attotime_mul(ATTOTIME_IN_HZ(device->clock), 32), NULL, 0, ic->intf->irq );
+		timer_pulse( device->machine, attotime_mul(ATTOTIME_IN_HZ(device->clock()), 32), NULL, 0, ic->intf->irq );
 }
 
 INLINE void check_bounds( k053260_state *ic, int channel ) {

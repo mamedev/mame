@@ -498,7 +498,7 @@ static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
 
 	if(offset == 0x75)
 	{
-		running_device *device = devtag_get_device(space->machine, "eeprom");
+		eeprom_device *device = space->machine->device<eeprom_device>("eeprom");
 		eeprom_set_clock_line(device, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(device, data & 0x10);
 		eeprom_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
@@ -2654,9 +2654,9 @@ SCU register[40] is for IRQ masking.
    It's not tested much either, but I'm aware that timer 1 doesn't work with this for whatever reason ... */
 static TIMER_CALLBACK( stv_irq_callback )
 {
-	int hpos = video_screen_get_hpos(machine->primary_screen);
-	int vpos = video_screen_get_vpos(machine->primary_screen);
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	int hpos = machine->primary_screen->hpos();
+	int vpos = machine->primary_screen->vpos();
+	rectangle visarea = *machine->primary_screen->visible_area();
 
 	h_sync = visarea.max_x+1;//horz
 	v_sync = visarea.max_y+1;//vert
@@ -2664,12 +2664,12 @@ static TIMER_CALLBACK( stv_irq_callback )
 	if(vpos == v_sync && hpos == 0)
 		VBLANK_IN_IRQ;
 	if(hpos == 0 && vpos == 0)
-		VBLANK_OUT_IRQ;
+		VBLANK_OUT_IRQ(timer->machine);
 	if(hpos == h_sync)
-		TIMER_0_IRQ;
+		TIMER_0_IRQ(timer->machine);
 	if(hpos == h_sync && (vpos != 0 && vpos != v_sync))
 	{
-		HBLANK_IN_IRQ;
+		HBLANK_IN_IRQ(timer->machine);
 		timer_0++;
 	}
 
@@ -2679,28 +2679,28 @@ static TIMER_CALLBACK( stv_irq_callback )
 		VDP1_IRQ;
 
 	if(hpos == timer_1)
-		TIMER_1_IRQ;
+		TIMER_1_IRQ(timer->machine);
 
 	if(hpos <= h_sync)
-		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, hpos+1), 0);
+		scan_timer->adjust(machine->primary_screen->time_until_pos(vpos, hpos+1));
 	else if(vpos <= v_sync)
-		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos+1, 0), 0);
+		scan_timer->adjust(machine->primary_screen->time_until_pos(vpos+1));
 	else
-		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+		scan_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 #endif
 
 
-static running_device *vblank_out_timer,*scan_timer,*t1_timer;
+static timer_device *vblank_out_timer,*scan_timer,*t1_timer;
 static int h_sync,v_sync;
 static int cur_scan;
 
-#define VBLANK_OUT_IRQ	\
+#define VBLANK_OUT_IRQ(m)	\
 timer_0 = 0; \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
-	cputag_set_input_line_and_vector(timer->machine, "maincpu", 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
+	cputag_set_input_line_and_vector(m, "maincpu", 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
 } \
 
 #define VBLANK_IN_IRQ \
@@ -2709,34 +2709,34 @@ timer_0 = 0; \
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
 } \
 
-#define HBLANK_IN_IRQ \
+#define HBLANK_IN_IRQ(m) \
 timer_1 = stv_scu[37] & 0x1ff; \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);*/ \
-	cputag_set_input_line_and_vector(timer->machine, "maincpu", 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
+	cputag_set_input_line_and_vector(m, "maincpu", 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
 } \
 
-#define TIMER_0_IRQ \
+#define TIMER_0_IRQ(m) \
 if(timer_0 == (stv_scu[36] & 0x3ff)) \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);*/ \
-	cputag_set_input_line_and_vector(timer->machine, "maincpu", 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
+	cputag_set_input_line_and_vector(m, "maincpu", 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
 } \
 
-#define TIMER_1_IRQ	\
+#define TIMER_1_IRQ(m)	\
 if((stv_scu[38] & 1)) \
 { \
 	if(!(stv_scu[38] & 0x80)) \
 	{ \
 		/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-		cputag_set_input_line_and_vector(timer->machine, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+		cputag_set_input_line_and_vector(m, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
 	} \
 	else \
 	{ \
 		if((timer_0) == (stv_scu[36] & 0x3ff)) \
 		{ \
 			/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-			cputag_set_input_line_and_vector(timer->machine, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+			cputag_set_input_line_and_vector(m, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
 		} \
 	} \
 } \
@@ -2750,20 +2750,20 @@ static TIMER_DEVICE_CALLBACK( hblank_in_irq )
 {
 	int scanline = param;
 
-//  h = video_screen_get_height(timer->machine->primary_screen);
-//  w = video_screen_get_width(timer->machine->primary_screen);
+//  h = timer.machine->primary_screen->height();
+//  w = timer.machine->primary_screen->width();
 
-	HBLANK_IN_IRQ;
-	TIMER_0_IRQ;
+	HBLANK_IN_IRQ(timer.machine);
+	TIMER_0_IRQ(timer.machine);
 
 	if(scanline+1 < v_sync)
 	{
 		if(stv_irq.hblank_in || stv_irq.timer_0)
-			timer_device_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline+1, h_sync), scanline+1);
+			scan_timer->adjust(timer.machine->primary_screen->time_until_pos(scanline+1, h_sync), scanline+1);
 		/*set the first Timer-1 event*/
 		cur_scan = scanline+1;
 		if(stv_irq.timer_1)
-			timer_device_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline+1, timer_1), scanline+1);
+			t1_timer->adjust(timer.machine->primary_screen->time_until_pos(scanline+1, timer_1), scanline+1);
 	}
 
 	timer_0++;
@@ -2773,10 +2773,10 @@ static TIMER_DEVICE_CALLBACK( timer1_irq )
 {
 	int scanline = param;
 
-	TIMER_1_IRQ;
+	TIMER_1_IRQ(timer.machine);
 
 	if(stv_irq.timer_1)
-		timer_device_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline+1, timer_1), scanline+1);
+		t1_timer->adjust(timer.machine->primary_screen->time_until_pos(scanline+1, timer_1), scanline+1);
 }
 
 static TIMER_CALLBACK( vdp1_irq )
@@ -2786,14 +2786,14 @@ static TIMER_CALLBACK( vdp1_irq )
 
 static TIMER_DEVICE_CALLBACK( vblank_out_irq )
 {
-	VBLANK_OUT_IRQ;
+	VBLANK_OUT_IRQ(timer.machine);
 }
 
 /*V-Blank-IN event*/
 static INTERRUPT_GEN( stv_interrupt )
 {
 //  scanline = 0;
-	rectangle visarea = *video_screen_get_visible_area(device->machine->primary_screen);
+	rectangle visarea = device->machine->primary_screen->visible_area();
 
 	h_sync = visarea.max_x+1;//horz
 	v_sync = visarea.max_y+1;//vert
@@ -2802,14 +2802,14 @@ static INTERRUPT_GEN( stv_interrupt )
 
 	/*Next V-Blank-OUT event*/
 	if(stv_irq.vblank_out)
-		timer_device_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
+		vblank_out_timer->adjust(device->machine->primary_screen->time_until_pos(0));
 	/*Set the first Hblank-IN event*/
 	if(stv_irq.hblank_in || stv_irq.timer_0 || stv_irq.timer_1)
-		timer_device_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 0, h_sync), 0);
+		scan_timer->adjust(device->machine->primary_screen->time_until_pos(0, h_sync));
 
 	/*TODO: timing of this one (related to the VDP1 speed)*/
 	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
-	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
+	timer_set(device->machine, device->machine->primary_screen->time_until_pos(0), NULL, 0, vdp1_irq);
 }
 
 static MACHINE_RESET( stv )
@@ -2835,11 +2835,11 @@ static MACHINE_RESET( stv )
 	stvcd_reset(machine);
 
 	/* set the first scanline 0 timer to go off */
-	scan_timer = devtag_get_device(machine, "scan_timer");
-	t1_timer = devtag_get_device(machine, "t1_timer");
-	vblank_out_timer = devtag_get_device(machine, "vbout_timer");
-	timer_device_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
-	timer_device_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 224, 352), 0);
+	scan_timer = machine->device<timer_device>("scan_timer");
+	t1_timer = machine->device<timer_device>("t1_timer");
+	vblank_out_timer = machine->device<timer_device>("vbout_timer");
+	vblank_out_timer->adjust(machine->primary_screen->time_until_pos(0));
+	scan_timer->adjust(machine->primary_screen->time_until_pos(224, 352));
 
 	timer_adjust_periodic(stv_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 }

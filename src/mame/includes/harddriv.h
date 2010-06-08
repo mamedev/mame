@@ -12,18 +12,27 @@ class harddriv_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, harddriv_state(machine)); }
 
-	harddriv_state(running_machine &machine) { }
+	harddriv_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  gsp(machine.device<cpu_device>("gsp")),
+		  msp(machine.device<cpu_device>("msp")),
+		  adsp(machine.device<cpu_device>("adsp")),
+		  soundcpu(machine.device<cpu_device>("soundcpu")),
+		  sounddsp(machine.device<cpu_device>("sounddsp")),
+		  jsacpu(machine.device<cpu_device>("jsa")),
+		  dsp32(machine.device<cpu_device>("dsp32")),
+		  duart_timer(machine.device<timer_device>("duart_timer")) { }
 
 	atarigen_state			atarigen;
 
-	running_device *	maincpu;
-	running_device *	gsp;
-	running_device *	msp;
-	running_device *	adsp;
-	running_device *	soundcpu;
-	running_device *	sounddsp;
-	running_device *	jsacpu;
-	running_device *	dsp32;
+	cpu_device *			maincpu;
+	cpu_device *			gsp;
+	cpu_device *			msp;
+	cpu_device *			adsp;
+	cpu_device *			soundcpu;
+	cpu_device *			sounddsp;
+	cpu_device *			jsacpu;
+	cpu_device *			dsp32;
 
 	UINT8					hd34010_host_access;
 	UINT8					dsk_pio_access;
@@ -81,7 +90,7 @@ public:
 	UINT8					duart_read_data[16];
 	UINT8					duart_write_data[16];
 	UINT8					duart_output_port;
-	running_device *	duart_timer;
+	timer_device *			duart_timer;
 
 	UINT8					last_gsp_shiftreg;
 
@@ -347,5 +356,5 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w );
 READ16_HANDLER( hdgsp_paletteram_hi_r );
 WRITE16_HANDLER( hdgsp_paletteram_hi_w );
 
-void harddriv_scanline_driver(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
-void harddriv_scanline_multisync(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void harddriv_scanline_driver(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void harddriv_scanline_multisync(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);

@@ -298,7 +298,7 @@ VIDEO_START( ojankoc )
 {
 	ojankohs_state *state = (ojankohs_state *)machine->driver_data;
 
-	state->tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
 	state->videoram = auto_alloc_array(machine, UINT8, 0x8000);
 	state->paletteram = auto_alloc_array(machine, UINT8, 0x20);
 

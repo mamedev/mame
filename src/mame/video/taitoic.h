@@ -6,7 +6,7 @@
 
 **************************************************************************/
 
-#include "devcb.h"
+#include "devlegcy.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -106,52 +106,37 @@ struct _tc0180vcu_interface
 	int            tx_color_base;
 };
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( pc080sn );
-DEVICE_GET_INFO( pc090oj );
-DEVICE_GET_INFO( tc0080vco );
-DEVICE_GET_INFO( tc0100scn );
-DEVICE_GET_INFO( tc0280grd );
-DEVICE_GET_INFO( tc0360pri );
-DEVICE_GET_INFO( tc0480scp );
-DEVICE_GET_INFO( tc0150rod );
-DEVICE_GET_INFO( tc0110pcr );
-DEVICE_GET_INFO( tc0180vcu );
+DECLARE_LEGACY_DEVICE(PC080SN, pc080sn);
+DECLARE_LEGACY_DEVICE(PC090OJ, pc090oj);
+DECLARE_LEGACY_DEVICE(TC0080VCO, tc0080vco);
+DECLARE_LEGACY_DEVICE(TC0100SCN, tc0100scn);
+DECLARE_LEGACY_DEVICE(TC0280GRD, tc0280grd);
+DECLARE_LEGACY_DEVICE(TC0430GRW, tc0280grd);
+DECLARE_LEGACY_DEVICE(TC0360PRI, tc0360pri);
+DECLARE_LEGACY_DEVICE(TC0480SCP, tc0480scp);
+DECLARE_LEGACY_DEVICE(TC0150ROD, tc0150rod);
+DECLARE_LEGACY_DEVICE(TC0110PCR, tc0110pcr);
+DECLARE_LEGACY_DEVICE(TC0180VCU, tc0180vcu);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define PC080SN DEVICE_GET_INFO_NAME( pc080sn )
-
 #define MDRV_PC080SN_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, PC080SN, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
-
-#define PC090OJ DEVICE_GET_INFO_NAME( pc090oj )
 
 #define MDRV_PC090OJ_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, PC090OJ, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
 
-#define TC0080VCO DEVICE_GET_INFO_NAME( tc0080vco )
-
 #define MDRV_TC0080VCO_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, TC0080VCO, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
 
-#define TC0100SCN DEVICE_GET_INFO_NAME( tc0100scn )
-
 #define MDRV_TC0100SCN_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, TC0100SCN, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
-
-#define TC0280GRD DEVICE_GET_INFO_NAME( tc0280grd )
-#define TC0430GRW DEVICE_GET_INFO_NAME( tc0280grd )
 
 #define MDRV_TC0280GRD_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, TC0280GRD, 0) \
@@ -161,30 +146,20 @@ DEVICE_GET_INFO( tc0180vcu );
 	MDRV_DEVICE_ADD(_tag, TC0430GRW, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
 
-#define TC0360PRI DEVICE_GET_INFO_NAME( tc0360pri )
-
 #define MDRV_TC0360PRI_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, TC0360PRI, 0)
-
-#define TC0150ROD DEVICE_GET_INFO_NAME( tc0150rod )
 
 #define MDRV_TC0150ROD_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, TC0150ROD, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
 
-#define TC0480SCP DEVICE_GET_INFO_NAME( tc0480scp )
-
 #define MDRV_TC0480SCP_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, TC0480SCP, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
 
-#define TC0110PCR DEVICE_GET_INFO_NAME( tc0110pcr )
-
 #define MDRV_TC0110PCR_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, TC0110PCR, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
-
-#define TC0180VCU DEVICE_GET_INFO_NAME( tc0180vcu )
 
 #define MDRV_TC0180VCU_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, TC0180VCU, 0) \

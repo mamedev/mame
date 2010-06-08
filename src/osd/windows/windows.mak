@@ -147,8 +147,8 @@ CPPONLYFLAGS += /EHsc
 # disable function pointer warnings in C++ which are evil to work around
 CPPONLYFLAGS += /wd4191 /wd4060 /wd4065 /wd4640
 
-# disable warning about exception specifications
-CPPONLYFLAGS += /wd4290
+# disable warning about exception specifications and using this in constructors
+CPPONLYFLAGS += /wd4290 /wd4355
 
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup

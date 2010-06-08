@@ -3,6 +3,8 @@
 #ifndef __AY8910_H__
 #define __AY8910_H__
 
+#include "devlegcy.h"
+
 /*
 AY-3-8910A: 2 I/O ports
 AY-3-8912A: 1 I/O port
@@ -88,7 +90,7 @@ WRITE8_DEVICE_HANDLER( ay8910_address_data_w );
 
 /*********** An interface for SSG of YM2203 ***********/
 
-void *ay8910_start_ym(void *infoptr, sound_type chip_type, running_device *device, int clock, const ay8910_interface *intf);
+void *ay8910_start_ym(void *infoptr, device_type chip_type, running_device *device, int clock, const ay8910_interface *intf);
 
 void ay8910_stop_ym(void *chip);
 void ay8910_reset_ym(void *chip);
@@ -96,22 +98,13 @@ void ay8910_set_clock_ym(void *chip, int clock);
 void ay8910_write_ym(void *chip, int addr, int data);
 int ay8910_read_ym(void *chip);
 
-DEVICE_GET_INFO( ay8910 );
-DEVICE_GET_INFO( ay8912 );
-DEVICE_GET_INFO( ay8913 );
-DEVICE_GET_INFO( ay8930 );
-DEVICE_GET_INFO( ym2149 );
-DEVICE_GET_INFO( ym3439 );
-DEVICE_GET_INFO( ymz284 );
-DEVICE_GET_INFO( ymz294 );
-
-#define SOUND_AY8910 DEVICE_GET_INFO_NAME( ay8910 )
-#define SOUND_AY8912 DEVICE_GET_INFO_NAME( ay8912 )
-#define SOUND_AY8913 DEVICE_GET_INFO_NAME( ay8913 )
-#define SOUND_AY8930 DEVICE_GET_INFO_NAME( ay8930 )
-#define SOUND_YM2149 DEVICE_GET_INFO_NAME( ym2149 )
-#define SOUND_YM3439 DEVICE_GET_INFO_NAME( ym3439 )
-#define SOUND_YMZ284 DEVICE_GET_INFO_NAME( ymz284 )
-#define SOUND_YMZ294 DEVICE_GET_INFO_NAME( ymz294 )
+DECLARE_LEGACY_SOUND_DEVICE(AY8910, ay8910);
+DECLARE_LEGACY_SOUND_DEVICE(AY8912, ay8912);
+DECLARE_LEGACY_SOUND_DEVICE(AY8913, ay8913);
+DECLARE_LEGACY_SOUND_DEVICE(AY8930, ay8930);
+DECLARE_LEGACY_SOUND_DEVICE(YM2149, ym2149);
+DECLARE_LEGACY_SOUND_DEVICE(YM3439, ym3439);
+DECLARE_LEGACY_SOUND_DEVICE(YMZ284, ymz284);
+DECLARE_LEGACY_SOUND_DEVICE(YMZ294, ymz294);
 
 #endif /* __AY8910_H__ */

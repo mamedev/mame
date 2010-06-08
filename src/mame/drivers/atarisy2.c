@@ -188,15 +188,15 @@ static void update_interrupts(running_machine *machine)
  *
  *************************************/
 
-static void scanline_update(running_device *screen, int scanline)
+static void scanline_update(screen_device &screen, int scanline)
 {
-	atarisy2_state *state = (atarisy2_state *)screen->machine->driver_data;
-	if (scanline <= video_screen_get_height(screen))
+	atarisy2_state *state = (atarisy2_state *)screen.machine->driver_data;
+	if (scanline <= screen.height())
 	{
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (state->interrupt_enable & 4)
-				atarigen_scanline_int_gen(devtag_get_device(screen->machine, "maincpu"));
+				atarigen_scanline_int_gen(devtag_get_device(screen.machine, "maincpu"));
 	}
 }
 
@@ -244,7 +244,7 @@ static MACHINE_RESET( atarisy2 )
 	slapstic_reset();
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_sound_io_reset(devtag_get_device(machine, "soundcpu"));
-	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 64);
+	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 64);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
 
 	state->p2portwr_state = 0;

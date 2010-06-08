@@ -65,7 +65,7 @@
  *
  *************************************/
 
-static running_device *laserdisc;
+static laserdisc_device *laserdisc;
 static UINT8 last_misc;
 
 static UINT8 laserdisc_type;
@@ -125,7 +125,7 @@ static const z80sio_interface sio_intf =
 };
 
 
-static const z80_daisy_chain dleuro_daisy_chain[] =
+static const z80_daisy_config dleuro_daisy_chain[] =
 {
 	{ "sio" },
 	{ "ctc" },
@@ -184,7 +184,7 @@ static VIDEO_UPDATE( dleuro )
 
 static MACHINE_START( dlair )
 {
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	laserdisc = machine->device<laserdisc_device>("laserdisc");
 }
 
 
@@ -209,12 +209,12 @@ static MACHINE_RESET( dlair )
 static INTERRUPT_GEN( vblank_callback )
 {
 	/* also update the speaker on the European version */
-	running_device *beep = devtag_get_device(device->machine, "beep");
+	beep_sound_device *beep = device->machine->device<beep_sound_device>("beep");
 	if (beep != NULL)
 	{
-		running_device *ctc = devtag_get_device(device->machine, "ctc");
+		z80ctc_device *ctc = device->machine->device<z80ctc_device>("ctc");
 		beep_set_state(beep, 1);
-		beep_set_frequency(beep, ATTOSECONDS_TO_HZ(z80ctc_getperiod(ctc, 0).attoseconds));
+		beep_set_frequency(beep, ATTOSECONDS_TO_HZ(ctc->period(0).attoseconds));
 	}
 }
 

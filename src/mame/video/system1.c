@@ -194,19 +194,19 @@ if (data & 0x6e) logerror("videomode = %02x\n",data);
 
 READ8_HANDLER( system1_mixer_collision_r )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	return mix_collide[offset & 0x3f] | 0x7e | (mix_collide_summary << 7);
 }
 
 WRITE8_HANDLER( system1_mixer_collision_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	mix_collide[offset & 0x3f] = 0;
 }
 
 WRITE8_HANDLER( system1_mixer_collision_reset_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	mix_collide_summary = 0;
 }
 
@@ -220,19 +220,19 @@ WRITE8_HANDLER( system1_mixer_collision_reset_w )
 
 READ8_HANDLER( system1_sprite_collision_r )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	return sprite_collide[offset & 0x3ff] | 0x7e | (sprite_collide_summary << 7);
 }
 
 WRITE8_HANDLER( system1_sprite_collision_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	sprite_collide[offset & 0x3ff] = 0;
 }
 
 WRITE8_HANDLER( system1_sprite_collision_reset_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	sprite_collide_summary = 0;
 }
 
@@ -276,7 +276,7 @@ WRITE8_HANDLER( system1_videoram_w )
 
 	/* force a partial update if the page is changing */
 	if (tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
-		video_screen_update_now(space->machine->primary_screen);
+		space->machine->primary_screen->update_now();
 }
 
 WRITE8_DEVICE_HANDLER( system1_videoram_bank_w )

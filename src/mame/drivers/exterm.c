@@ -212,7 +212,7 @@ static TIMER_DEVICE_CALLBACK( master_sound_nmi_callback )
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (sound_control & 0x01)
-		cputag_set_input_line(timer->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer.machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -229,7 +229,8 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
 	attotime nmi_rate = attotime_mul(ATTOTIME_IN_HZ(4000000), 4096 * (256 - data));
-	timer_device_adjust_periodic(devtag_get_device(space->machine, "snd_nmi_timer"), nmi_rate, 0, nmi_rate);
+	timer_device *nmi_timer = space->machine->device<timer_device>("snd_nmi_timer");
+	nmi_timer->adjust(nmi_rate, 0, nmi_rate);
 }
 
 

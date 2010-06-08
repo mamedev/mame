@@ -9,9 +9,10 @@
 #ifndef __8255PPI_H_
 #define __8255PPI_H_
 
+#include "devlegcy.h"
 
 
-#define PPI8255		DEVICE_GET_INFO_NAME(ppi8255)
+DECLARE_LEGACY_DEVICE(PPI8255, ppi8255);
 
 
 /***************************************************************************
@@ -43,9 +44,6 @@ struct _ppi8255_interface
 	MDRV_DEVICE_CONFIG(_intrf)
 
 
-
-/* device interface */
-DEVICE_GET_INFO(ppi8255);
 
 READ8_DEVICE_HANDLER( ppi8255_r );
 WRITE8_DEVICE_HANDLER( ppi8255_w );

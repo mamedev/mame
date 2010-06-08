@@ -185,8 +185,7 @@ void render_font_free(render_font *font)
 				render_font_char *ch = &font->chars[tablenum][charnum];
 				if (ch->texture != NULL)
 					render_texture_free(ch->texture);
-				if (ch->bitmap != NULL)
-					bitmap_free(ch->bitmap);
+				global_free(ch->bitmap);
 			}
 
 			/* free the subtable itself */
@@ -216,7 +215,7 @@ static void render_font_char_expand(render_font *font, render_font_char *ch)
 		return;
 
 	/* allocate a new bitmap of the size we need */
-	ch->bitmap = bitmap_alloc(ch->bmwidth, font->height, BITMAP_FORMAT_ARGB32);
+	ch->bitmap = global_alloc(bitmap_t(ch->bmwidth, font->height, BITMAP_FORMAT_ARGB32));
 	bitmap_fill(ch->bitmap, NULL, 0);
 
 	/* extract the data */
@@ -816,7 +815,7 @@ static int render_font_save_cached(render_font *font, const char *filename, UINT
 				if (ch->texture != NULL)
 					render_texture_free(ch->texture);
 				ch->texture = NULL;
-				bitmap_free(ch->bitmap);
+				global_free(ch->bitmap);
 				ch->bitmap = NULL;
 			}
 

@@ -49,10 +49,8 @@ struct _msm5205_state
 INLINE msm5205_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_MSM5205);
-	return (msm5205_state *)device->token;
+	assert(device->type() == SOUND_MSM5205);
+	return (msm5205_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -182,15 +180,15 @@ static DEVICE_START( msm5205 )
 	msm5205_state *voice = get_safe_token(device);
 
 	/* save a global pointer to our interface */
-	voice->intf = (const msm5205_interface *)device->baseconfig().static_config;
+	voice->intf = (const msm5205_interface *)device->baseconfig().static_config();
 	voice->device = device;
-	voice->clock = device->clock;
+	voice->clock = device->clock();
 
 	/* compute the difference tables */
 	ComputeTables (voice);
 
 	/* stream system initialize */
-	voice->stream = stream_create(device,0,1,device->clock,voice,MSM5205_update);
+	voice->stream = stream_create(device,0,1,device->clock(),voice,MSM5205_update);
 	voice->timer = timer_alloc(device->machine, MSM5205_vclk_callback, voice);
 
 	/* initialize */

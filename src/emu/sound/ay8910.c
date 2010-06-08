@@ -200,17 +200,15 @@ struct _ay8910_context
 INLINE ay8910_context *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_AY8910 ||
-		   sound_get_type(device) == SOUND_AY8912 ||
-		   sound_get_type(device) == SOUND_AY8913 ||
-		   sound_get_type(device) == SOUND_AY8930 ||
-		   sound_get_type(device) == SOUND_YM2149 ||
-		   sound_get_type(device) == SOUND_YM3439 ||
-		   sound_get_type(device) == SOUND_YMZ284 ||
-		   sound_get_type(device) == SOUND_YMZ294);
-	return (ay8910_context *)device->token;
+	assert(device->type() == SOUND_AY8910 ||
+		   device->type() == SOUND_AY8912 ||
+		   device->type() == SOUND_AY8913 ||
+		   device->type() == SOUND_AY8930 ||
+		   device->type() == SOUND_YM2149 ||
+		   device->type() == SOUND_YM3439 ||
+		   device->type() == SOUND_YMZ284 ||
+		   device->type() == SOUND_YMZ294);
+	return (ay8910_context *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -736,7 +734,7 @@ static void ay8910_statesave(ay8910_context *psg, running_device *device)
  *
  *************************************/
 
-void *ay8910_start_ym(void *infoptr, sound_type chip_type, running_device *device, int clock, const ay8910_interface *intf)
+void *ay8910_start_ym(void *infoptr, device_type chip_type, running_device *device, int clock, const ay8910_interface *intf)
 {
 	ay8910_context *info = (ay8910_context *)infoptr;
 
@@ -778,9 +776,9 @@ void *ay8910_start_ym(void *infoptr, sound_type chip_type, running_device *devic
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
-	info->channel = stream_create(device, 0, info->streams, device->clock / 8, info, ay8910_update);
+	info->channel = stream_create(device, 0, info->streams, device->clock() / 8, info, ay8910_update);
 
-	ay8910_set_clock_ym(info,device->clock);
+	ay8910_set_clock_ym(info,device->clock());
 	ay8910_statesave(info, device);
 
 	return info;
@@ -917,8 +915,8 @@ static DEVICE_START( ay8910 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->baseconfig().static_config ? (const ay8910_interface *)device->baseconfig().static_config : &generic_ay8910);
-	ay8910_start_ym(get_safe_token(device), SOUND_AY8910, device, device->clock, intf);
+	const ay8910_interface *intf = (device->baseconfig().static_config() ? (const ay8910_interface *)device->baseconfig().static_config() : &generic_ay8910);
+	ay8910_start_ym(get_safe_token(device), SOUND_AY8910, device, device->clock(), intf);
 }
 
 static DEVICE_START( ym2149 )
@@ -929,8 +927,8 @@ static DEVICE_START( ym2149 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->baseconfig().static_config ? (const ay8910_interface *)device->baseconfig().static_config : &generic_ay8910);
-	ay8910_start_ym(get_safe_token(device), SOUND_YM2149, device, device->clock, intf);
+	const ay8910_interface *intf = (device->baseconfig().static_config() ? (const ay8910_interface *)device->baseconfig().static_config() : &generic_ay8910);
+	ay8910_start_ym(get_safe_token(device), SOUND_YM2149, device, device->clock(), intf);
 }
 
 static DEVICE_STOP( ay8910 )

@@ -137,12 +137,12 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
-			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline + i, 0), NULL, potsense[i], flyball_joystick_callback);
+			timer_set(machine, machine->primary_screen->time_until_pos(scanline + i), NULL, potsense[i], flyball_joystick_callback);
 
 	scanline += 0x40;
 	scanline &= 0xff;
 
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, flyball_quarter_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, flyball_quarter_callback);
 
 	state->potsense = 0;
 	state->potmask = 0;
@@ -163,7 +163,7 @@ static READ8_HANDLER( flyball_input_r )
 
 static READ8_HANDLER( flyball_scanline_r )
 {
-	return video_screen_get_vpos(space->machine->primary_screen) & 0x3f;
+	return space->machine->primary_screen->vpos() & 0x3f;
 }
 
 static READ8_HANDLER( flyball_potsense_r )
@@ -388,7 +388,7 @@ static MACHINE_RESET( flyball )
 
 	machine->device("maincpu")->reset();
 
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, flyball_quarter_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, flyball_quarter_callback);
 
 	state->pitcher_vert = 0;
 	state->pitcher_horz = 0;

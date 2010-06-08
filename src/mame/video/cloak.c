@@ -103,7 +103,7 @@ static void set_current_bitmap_videoram_pointer(void)
 
 WRITE8_HANDLER( cloak_clearbmp_w )
 {
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	bitmap_videoram_selected = data & 0x01;
 	set_current_bitmap_videoram_pointer();
 

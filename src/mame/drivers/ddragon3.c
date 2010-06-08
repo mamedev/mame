@@ -156,7 +156,8 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 
 static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 {
-	okim6295_set_bank_base(device, (data & 1) * 0x40000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 1) * 0x40000);
 }
 
 static WRITE16_HANDLER( ddragon3_io_w )
@@ -532,21 +533,21 @@ static const ym2151_interface ym2151_config =
 
 static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 {
-	ddragon3_state *state = (ddragon3_state *)timer->machine->driver_data;
+	ddragon3_state *state = (ddragon3_state *)timer.machine->driver_data;
 	int scanline = param;
 
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+			timer.machine->primary_screen->update_partial(scanline - 1);
 		cpu_set_input_line(state->maincpu, 5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
-		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		timer.machine->primary_screen->update_partial(scanline - 1);
 		cpu_set_input_line(state->maincpu, 6, ASSERT_LINE);
 	}
 }
@@ -624,8 +625,7 @@ static MACHINE_DRIVER_START( ddragon3 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_DRIVER_END

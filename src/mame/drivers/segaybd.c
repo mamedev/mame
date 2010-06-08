@@ -137,7 +137,7 @@ static void update_main_irqs(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
-	segas1x_state *state = (segas1x_state *)timer->machine->driver_data;
+	segas1x_state *state = (segas1x_state *)timer.machine->driver_data;
 	int scanline = param;
 
 	/* on scanline 'irq2_scanline' generate an IRQ2 */
@@ -169,10 +169,10 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 	}
 
 	/* update IRQs on the main CPU */
-	update_main_irqs(timer->machine);
+	update_main_irqs(timer.machine);
 
 	/* come back at the next appropriate scanline */
-	timer_device_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0), scanline);
+	timer.adjust(timer.machine->primary_screen->time_until_pos(scanline), scanline);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -214,8 +214,7 @@ static MACHINE_RESET( yboard )
 
 	state->irq2_scanline = 170;
 
-	state->interrupt_timer = devtag_get_device(machine, "int_timer");
-	timer_device_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), 223);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(223), 223);
 }
 
 

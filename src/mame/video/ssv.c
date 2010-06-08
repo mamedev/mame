@@ -371,7 +371,7 @@ UINT16 *eaglshot_gfxram, *gdfs_tmapram, *gdfs_tmapscroll;
 
 READ16_HANDLER( ssv_vblank_r )
 {
-	if (video_screen_get_vblank(space->machine->primary_screen))
+	if (space->machine->primary_screen->vblank())
 		return 0x2000 | 0x1000;
 	else
 		return 0x0000;
@@ -721,7 +721,7 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int  nr)
 {
 	int sy;
-	for ( sy = 0; sy <= video_screen_get_visible_area(machine->primary_screen)->max_y; sy += 0x40 )
+	for ( sy = 0; sy <= machine->primary_screen->visible_area().max_y; sy += 0x40 )
 		draw_row(machine, bitmap, cliprect, 0, sy, nr);
 }
 

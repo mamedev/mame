@@ -31,10 +31,8 @@ struct _ym2612_state
 INLINE ym2612_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YM2612 || sound_get_type(device) == SOUND_YM3438);
-	return (ym2612_state *)device->token;
+	assert(device->type() == SOUND_YM2612 || device->type() == SOUND_YM3438);
+	return (ym2612_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -104,9 +102,9 @@ static DEVICE_START( ym2612 )
 {
 	static const ym2612_interface dummy = { 0 };
 	ym2612_state *info = get_safe_token(device);
-	int rate = device->clock/72;
+	int rate = device->clock()/72;
 
-	info->intf = device->baseconfig().static_config ? (const ym2612_interface *)device->baseconfig().static_config : &dummy;
+	info->intf = device->baseconfig().static_config() ? (const ym2612_interface *)device->baseconfig().static_config() : &dummy;
 	info->device = device;
 
 	/* FM init */
@@ -118,7 +116,7 @@ static DEVICE_START( ym2612 )
 	info->stream = stream_create(device,0,2,rate,info,ym2612_stream_update);
 
 	/**** initialize YM2612 ****/
-	info->chip = ym2612_init(info,device,device->clock,rate,timer_handler,IRQHandler);
+	info->chip = ym2612_init(info,device,device->clock(),rate,timer_handler,IRQHandler);
 	assert_always(info->chip != NULL, "Error creating YM2612 chip");
 
 	state_save_register_postload(device->machine, ym2612_intf_postload, info);

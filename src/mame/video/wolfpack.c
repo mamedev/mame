@@ -125,7 +125,7 @@ VIDEO_START( wolfpack )
 
 	LFSR = auto_alloc_array(machine, UINT8, 0x8000);
 
-	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper = machine->primary_screen->alloc_compatible_bitmap();
 
 	for (i = 0; i < 0x8000; i++)
 	{

@@ -205,10 +205,9 @@ static CPU_RESET( dsp32c );
 INLINE dsp32_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_DSP32C);
-	return (dsp32_state *)device->token;
+	return (dsp32_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -352,7 +351,7 @@ static void dsp32_register_save( running_device *device )
 
 static CPU_INIT( dsp32c )
 {
-	const dsp32_config *configdata = (const dsp32_config *)device->baseconfig().static_config;
+	const dsp32_config *configdata = (const dsp32_config *)device->baseconfig().static_config();
 	dsp32_state *cpustate = get_safe_token(device);
 
 	/* copy in config data */
@@ -360,7 +359,7 @@ static CPU_INIT( dsp32c )
 		cpustate->output_pins_changed = configdata->output_pins_changed;
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	dsp32_register_save(device);
 }
@@ -766,7 +765,7 @@ static CPU_SET_INFO( dsp32c )
 
 CPU_GET_INFO( dsp32c )
 {
-	dsp32_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	dsp32_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

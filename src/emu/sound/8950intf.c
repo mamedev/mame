@@ -37,10 +37,8 @@ struct _y8950_state
 INLINE y8950_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_Y8950);
-	return (y8950_state *)device->token;
+	assert(device->type() == SOUND_Y8950);
+	return (y8950_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -120,17 +118,17 @@ static DEVICE_START( y8950 )
 {
 	static const y8950_interface dummy = { 0 };
 	y8950_state *info = get_safe_token(device);
-	int rate = device->clock/72;
+	int rate = device->clock()/72;
 
-	info->intf = device->baseconfig().static_config ? (const y8950_interface *)device->baseconfig().static_config : &dummy;
+	info->intf = device->baseconfig().static_config() ? (const y8950_interface *)device->baseconfig().static_config() : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
-	info->chip = y8950_init(device,device->clock,rate);
+	info->chip = y8950_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating Y8950 chip");
 
 	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(info->chip, *device->region, device->region->bytes());
+	y8950_set_delta_t_memory(info->chip, *device->region(), device->region()->bytes());
 
 	info->stream = stream_create(device,0,1,rate,info,y8950_stream_update);
 

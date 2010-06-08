@@ -186,7 +186,7 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 	if (~data & 8)
 	{
 		running_device *device = devtag_get_device(machine, data & 4 ? "noise_2" : "noise_1");
-		noise_state *nstate = (noise_state *)device->token;
+		noise_state *nstate = (noise_state *)downcast<legacy_device_base *>(device)->token();
 
 		if (state->dac_data != nstate->dac[data & 3])
 		{
@@ -213,11 +213,9 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 INLINE noise_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_MICRO3D);
+	assert(device->type() == SOUND_MICRO3D);
 
-	return (noise_state *)device->token;
+	return (noise_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static STREAM_UPDATE( micro3d_stream_update )

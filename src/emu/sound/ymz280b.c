@@ -133,10 +133,8 @@ static const timer_fired_func update_irq_state_cb[] =
 INLINE ymz280b_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YMZ280B);
-	return (ymz280b_state *)device->token;
+	assert(device->type() == SOUND_YMZ280B);
+	return (ymz280b_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -638,7 +636,7 @@ static STREAM_UPDATE( ymz280b_update )
 static DEVICE_START( ymz280b )
 {
 	static const ymz280b_interface defintrf = { 0 };
-	const ymz280b_interface *intf = (device->baseconfig().static_config != NULL) ? (const ymz280b_interface *)device->baseconfig().static_config : &defintrf;
+	const ymz280b_interface *intf = (device->baseconfig().static_config() != NULL) ? (const ymz280b_interface *)device->baseconfig().static_config() : &defintrf;
 	ymz280b_state *chip = get_safe_token(device);
 
 	chip->device = device;
@@ -649,8 +647,8 @@ static DEVICE_START( ymz280b )
 	compute_tables();
 
 	/* initialize the rest of the structure */
-	chip->master_clock = (double)device->clock / 384.0;
-	chip->region_base = *device->region;
+	chip->master_clock = (double)device->clock() / 384.0;
+	chip->region_base = *device->region();
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */

@@ -264,10 +264,8 @@ struct _sn76477_state
 INLINE sn76477_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SN76477);
-	return (sn76477_state *)device->token;
+	assert(device->type() == SOUND_SN76477);
+	return (sn76477_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -2401,7 +2399,7 @@ static DEVICE_START( sn76477 )
 
 
 #if TEST_MODE == 0
-	intf = (sn76477_interface *)device->baseconfig().static_config;
+	intf = (sn76477_interface *)device->baseconfig().static_config();
 #else
 	intf = &test_interface;
 #endif
@@ -2411,9 +2409,9 @@ static DEVICE_START( sn76477 )
 
 	sn->channel = stream_create(device, 0, 1, device->machine->sample_rate, sn, SN76477_update);
 
-	if (device->clock > 0)
+	if (device->clock() > 0)
 	{
-		sn->sample_rate = device->clock;
+		sn->sample_rate = device->clock();
 	}
 	else
 	{

@@ -247,7 +247,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( skyskipr )
 {
 	popeye_bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
-	tmpbitmap2 = auto_bitmap_alloc(machine,1024,1024,video_screen_get_format(machine->primary_screen));	/* actually 1024x512 but not rolling over vertically? */
+	tmpbitmap2 = auto_bitmap_alloc(machine,1024,1024,machine->primary_screen->format());	/* actually 1024x512 but not rolling over vertically? */
 
 	bitmap_type = TYPE_SKYSKIPR;
 
@@ -264,7 +264,7 @@ VIDEO_START( skyskipr )
 VIDEO_START( popeye )
 {
 	popeye_bitmapram = auto_alloc_array(machine, UINT8, popeye_bitmapram_size);
-	tmpbitmap2 = auto_bitmap_alloc(machine,512,512,video_screen_get_format(machine->primary_screen));
+	tmpbitmap2 = auto_bitmap_alloc(machine,512,512,machine->primary_screen->format());
 
 	bitmap_type = TYPE_POPEYE;
 

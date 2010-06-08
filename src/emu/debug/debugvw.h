@@ -113,12 +113,14 @@ public:
 	registers_subview_item()
 		: next(NULL),
 		  index(0),
-		  device(NULL) { }
+		  stateintf(NULL),
+		  execintf(NULL) { }
 
 	registers_subview_item *next;				/* link to next item */
 	int					index;					/* index of this item */
 	astring				name;					/* name of the subview item */
-	running_device *	device;					/* device to display */
+	device_state_interface *stateintf;			/* state interface */
+	device_execute_interface *execintf;				/* execution interface */
 };
 
 

@@ -34,7 +34,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 	welltris_state *state = (welltris_state *)machine->driver_data;
 	int offs;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	/* draw the sprites */
 	for (offs = 0; offs < 0x200 - 4; offs += 4) {
@@ -62,8 +62,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		yzoom = 16 - zoomtable[yzoom] / 8;
 
 		/* wrap around */
-		if (x > visarea->max_x) x -= 0x200;
-		if (y > visarea->max_y) y -= 0x200;
+		if (x > visarea.max_x) x -= 0x200;
+		if (y > visarea.max_y) y -= 0x200;
 
 		/* normal case */
 		if (!xflip && !yflip) {

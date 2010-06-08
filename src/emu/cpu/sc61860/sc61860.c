@@ -63,10 +63,9 @@ struct _sc61860_state
 INLINE sc61860_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SC61860);
-	return (sc61860_state *)device->token;
+	return (sc61860_state *)downcast<cpu_device *>(device)->token();
 }
 
 UINT8 *sc61860_internal_ram(running_device *device)
@@ -104,10 +103,10 @@ static CPU_RESET( sc61860 )
 static CPU_INIT( sc61860 )
 {
 	sc61860_state *cpustate = get_safe_token(device);
-	cpustate->config = (sc61860_cpu_core *) device->baseconfig().static_config;
+	cpustate->config = (sc61860_cpu_core *) device->baseconfig().static_config();
 	timer_pulse(device->machine, ATTOTIME_IN_HZ(500), cpustate, 0, sc61860_2ms_tick);
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 }
 
 static CPU_EXECUTE( sc61860 )
@@ -174,7 +173,7 @@ static CPU_SET_INFO( sc61860 )
 
 CPU_GET_INFO( sc61860 )
 {
-	sc61860_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	sc61860_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

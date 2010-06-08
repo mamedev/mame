@@ -96,7 +96,7 @@ VIDEO_START( quasar )
 	state->effectram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* create helper bitmap */
-	state->collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->collision_background = machine->primary_screen->alloc_compatible_bitmap();
 
 	/* register save */
 	state_save_register_global_bitmap(machine, state->collision_background);

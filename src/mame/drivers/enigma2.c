@@ -113,7 +113,7 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
-	int vpos = video_screen_get_vpos(machine->primary_screen);
+	int vpos = machine->primary_screen->vpos();
 	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
 	cpu_set_input_line_and_vector(state->maincpu, 0, ASSERT_LINE, vector);
@@ -125,8 +125,8 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 		next_counter = INT_TRIGGER_COUNT_1;
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
-	timer_adjust_oneshot(state->interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), 0);
-	timer_adjust_oneshot(state->interrupt_clear_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos + 1, 0), 0);
+	timer_adjust_oneshot(state->interrupt_assert_timer, machine->primary_screen->time_until_pos(next_vpos), 0);
+	timer_adjust_oneshot(state->interrupt_clear_timer, machine->primary_screen->time_until_pos(vpos + 1), 0);
 }
 
 
@@ -142,7 +142,7 @@ static void start_interrupt_timers( running_machine *machine )
 {
 	enigma2_state *state = (enigma2_state *)machine->driver_data;
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
-	timer_adjust_oneshot(state->interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
+	timer_adjust_oneshot(state->interrupt_assert_timer, machine->primary_screen->time_until_pos(vpos), 0);
 }
 
 
@@ -201,13 +201,13 @@ static VIDEO_UPDATE( enigma2 )
 	enigma2_state *state = (enigma2_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 	UINT8 *prom = memory_region(screen->machine, "proms");
 	UINT8 *color_map_base = state->flip_screen ? &prom[0x0400] : &prom[0x0000];
 	UINT8 *star_map_base = (state->blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
 	UINT8 x = 0;
-	UINT16 bitmap_y = visarea->min_y;
+	UINT16 bitmap_y = visarea.min_y;
 	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
 	UINT8 video_data = 0;
 	UINT8 fore_color = 0;
@@ -269,7 +269,7 @@ static VIDEO_UPDATE( enigma2 )
 		if (x == 0)
 		{
 			/* end of screen? */
-			if (bitmap_y == visarea->max_y)
+			if (bitmap_y == visarea.max_y)
 				break;
 
 			/* next row */
@@ -288,8 +288,8 @@ static VIDEO_UPDATE( enigma2a )
 {
 	enigma2_state *state = (enigma2_state *)screen->machine->driver_data;
 	UINT8 x = 0;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
-	UINT16 bitmap_y = visarea->min_y;
+	const rectangle &visarea = screen->visible_area();
+	UINT16 bitmap_y = visarea.min_y;
 	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
 	UINT8 video_data = 0;
 
@@ -332,7 +332,7 @@ static VIDEO_UPDATE( enigma2a )
 		if (x == 0)
 		{
 			/* end of screen? */
-			if (bitmap_y == visarea->max_y)
+			if (bitmap_y == visarea.max_y)
 				break;
 
 			/* next row */

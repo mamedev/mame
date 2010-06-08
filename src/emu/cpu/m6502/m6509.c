@@ -77,7 +77,7 @@ struct _m6509_Regs {
 	UINT8	nmi_state;
 	UINT8	irq_state;
 	UINT8	so_state;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *space;
 
@@ -90,10 +90,9 @@ struct _m6509_Regs {
 INLINE m6509_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M6509);
-	return (m6509_Regs *)device->token;
+	return (m6509_Regs *)downcast<cpu_device *>(device)->token();
 }
 
 /***************************************************************
@@ -104,21 +103,21 @@ INLINE m6509_Regs *get_safe_token(running_device *device)
 
 static READ8_HANDLER( m6509_read_00000 )
 {
-	m6509_Regs *cpustate = (m6509_Regs *)space->cpu->token;
+	m6509_Regs *cpustate = get_safe_token(space->cpu);
 
 	return cpustate->pc_bank.b.h2;
 }
 
 static READ8_HANDLER( m6509_read_00001 )
 {
-	m6509_Regs *cpustate = (m6509_Regs *)space->cpu->token;
+	m6509_Regs *cpustate = get_safe_token(space->cpu);
 
 	return cpustate->ind_bank.b.h2;
 }
 
 static WRITE8_HANDLER( m6509_write_00000 )
 {
-	m6509_Regs *cpustate = (m6509_Regs *)space->cpu->token;
+	m6509_Regs *cpustate = get_safe_token(space->cpu);
 
 	cpustate->pc_bank.b.h2=data&0xf;
 	cpustate->pc.w.h=cpustate->pc_bank.w.h;
@@ -126,7 +125,7 @@ static WRITE8_HANDLER( m6509_write_00000 )
 
 static WRITE8_HANDLER( m6509_write_00001 )
 {
-	m6509_Regs *cpustate = (m6509_Regs *)space->cpu->token;
+	m6509_Regs *cpustate = get_safe_token(space->cpu);
 
 	cpustate->ind_bank.b.h2=data&0xf;
 }
@@ -142,13 +141,13 @@ static void default_wdmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m6509 )
 {
 	m6509_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
 
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wdmem_id;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->space = device_memory(device)->space(AS_PROGRAM);
 
 	if ( intf )
 	{
@@ -331,7 +330,7 @@ static CPU_SET_INFO( m6509 )
 
 CPU_GET_INFO( m6509 )
 {
-	m6509_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m6509_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -111,9 +111,8 @@ struct _i8237_t
 
 INLINE i8237_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == I8237 );
-	return ( i8237_t *) device->token;
+	assert( device->type() == I8237 );
+	return ( i8237_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -610,7 +609,7 @@ WRITE_LINE_DEVICE_HANDLER( i8237_eop_w )
 
 static DEVICE_START( i8237 ) {
 	i8237_t	*i8237 = get_safe_token(device);
-	i8237_interface *intf = (i8237_interface *)device->baseconfig().static_config;
+	i8237_interface *intf = (i8237_interface *)device->baseconfig().static_config();
 	int i;
 
 	/* resolve callbacks */
@@ -648,9 +647,9 @@ static DEVICE_RESET( i8237 ) {
 	i8237->chan[3].mode = 0;
 
 	timer_adjust_periodic(i8237->timer,
-		ATTOTIME_IN_HZ(device->clock),
+		ATTOTIME_IN_HZ(device->clock()),
 		0,
-		ATTOTIME_IN_HZ(device->clock));
+		ATTOTIME_IN_HZ(device->clock()));
 }
 
 
@@ -659,7 +658,6 @@ DEVICE_GET_INFO( i8237 ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(i8237_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(i8237);	break;

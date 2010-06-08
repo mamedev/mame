@@ -63,10 +63,9 @@ struct _namco_54xx_state
 INLINE namco_54xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == NAMCO_54XX);
+	assert(device->type() == NAMCO_54XX);
 
-	return (namco_54xx_state *)device->token;
+	return (namco_54xx_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -79,20 +78,20 @@ static TIMER_CALLBACK( namco_54xx_latch_callback )
 
 static READ8_HANDLER( namco_54xx_K_r )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner);
+	namco_54xx_state *state = get_safe_token(space->cpu->owner());
 	return state->latched_cmd >> 4;
 }
 
 static READ8_HANDLER( namco_54xx_R0_r )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner);
+	namco_54xx_state *state = get_safe_token(space->cpu->owner());
 	return state->latched_cmd & 0x0f;
 }
 
 
 static WRITE8_HANDLER( namco_54xx_O_w )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner);
+	namco_54xx_state *state = get_safe_token(space->cpu->owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
 		discrete_sound_w(state->discrete, NAMCO_54XX_1_DATA(state->basenode), out);
@@ -102,7 +101,7 @@ static WRITE8_HANDLER( namco_54xx_O_w )
 
 static WRITE8_HANDLER( namco_54xx_R1_w )
 {
-	namco_54xx_state *state = get_safe_token(space->cpu->owner);
+	namco_54xx_state *state = get_safe_token(space->cpu->owner());
 	UINT8 out = (data & 0x0f);
 
 	discrete_sound_w(state->discrete, NAMCO_54XX_2_DATA(state->basenode), out);
@@ -165,7 +164,7 @@ ROM_END
 
 static DEVICE_START( namco_54xx )
 {
-	namco_54xx_config *config = (namco_54xx_config *)device->baseconfig().inline_config;
+	namco_54xx_config *config = (namco_54xx_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	namco_54xx_state *state = get_safe_token(device);
 	astring tempstring;
 

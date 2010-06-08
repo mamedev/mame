@@ -142,14 +142,13 @@ typedef struct {
 INLINE ins8250_t *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( ( device->type == DEVICE_GET_INFO_NAME(ins8250) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(ins8250a) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(ns16450) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(ns16550) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(ns16550a) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(pc16550d) ) );
-	return ( ins8250_t *) device->token;
+	assert( ( device->type() == INS8250 ) ||
+			( device->type() == INS8250A ) ||
+			( device->type() == NS16450 ) ||
+			( device->type() == NS16550 ) ||
+			( device->type() == NS16550A ) ||
+			( device->type() == PC16550D ) );
+	return (ins8250_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -545,7 +544,7 @@ static void common_start( running_device *device, int device_type )
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
-	ins8250->interface = (const ins8250_interface*)device->baseconfig().static_config;
+	ins8250->interface = (const ins8250_interface*)device->baseconfig().static_config();
 	ins8250->device_type = device_type;
 }
 
@@ -611,7 +610,6 @@ DEVICE_GET_INFO( ins8250 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(ins8250_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ins8250);	break;

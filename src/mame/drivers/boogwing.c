@@ -283,8 +283,8 @@ static void sound_irq(running_device *device, int state)
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	boogwing_state *state = (boogwing_state *)device->machine->driver_data;
-	okim6295_set_bank_base(state->oki2, ((data & 2) >> 1) * 0x40000);
-	okim6295_set_bank_base(state->oki1, (data & 1) * 0x40000);
+	state->oki2->set_bank_base(((data & 2) >> 1) * 0x40000);
+	state->oki1->set_bank_base((data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =
@@ -322,17 +322,6 @@ static const deco16ic_interface boogwing_deco16ic_intf =
 };
 
 
-static MACHINE_START( boogwing )
-{
-	boogwing_state *state = (boogwing_state *)machine->driver_data;
-
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
-	state->oki1 = devtag_get_device(machine, "oki1");
-	state->oki2 = devtag_get_device(machine, "oki2");
-}
-
 static MACHINE_DRIVER_START( boogwing )
 
 	/* driver data */
@@ -345,8 +334,6 @@ static MACHINE_DRIVER_START( boogwing )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4)
 	MDRV_CPU_PROGRAM_MAP(audio_map)
-
-	MDRV_MACHINE_START(boogwing)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -373,13 +360,11 @@ static MACHINE_DRIVER_START( boogwing )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.40)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_DRIVER_END

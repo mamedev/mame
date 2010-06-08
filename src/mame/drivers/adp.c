@@ -419,15 +419,15 @@ static READ8_DEVICE_HANDLER(t2_r)
 	static UINT8 res;
 	static int h,w;
 	res = 0;
-	h = video_screen_get_height(device->machine->primary_screen);
-	w = video_screen_get_width(device->machine->primary_screen);
+	h = device->machine->primary_screen->height();
+	w = device->machine->primary_screen->width();
 
 //  popmessage("%d %d",h,w);
 
-	if (video_screen_get_hpos(device->machine->primary_screen) > h)
+	if (device->machine->primary_screen->hpos() > h)
 		res|= 0x20; //hblank
 
-	if (video_screen_get_vpos(device->machine->primary_screen) > w)
+	if (device->machine->primary_screen->vpos() > w)
 		res|= 0x40; //vblank
 
 	return res;

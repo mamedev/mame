@@ -57,16 +57,15 @@ struct _adc12138_state
 INLINE adc12138_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == ADC12130) || (device->type == ADC12132) || (device->type == ADC12138));
-	return (adc12138_state *)device->token;
+	assert((device->type() == ADC12130) || (device->type() == ADC12132) || (device->type() == ADC12138));
+	return (adc12138_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const adc12138_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == ADC12130) || (device->type == ADC12132) || (device->type == ADC12138));
-	return (const adc12138_interface *) device->baseconfig().static_config;
+	assert((device->type() == ADC12130) || (device->type() == ADC12132) || (device->type() == ADC12138));
+	return (const adc12138_interface *) device->baseconfig().static_config();
 }
 
 
@@ -360,7 +359,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"A/D Converter 12138"
 #define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 1213x"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"
 
 #define DEVTEMPLATE_DERIVED_ID(p,s)		p##adc12130##s

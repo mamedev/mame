@@ -295,7 +295,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_NULL					// ZC/TO2 callback
 };
 
-static const z80_daisy_chain daisy_chain_sound[] =
+static const z80_daisy_config daisy_chain_sound[] =
 {
 	{ "ctc" },
 	{ NULL }

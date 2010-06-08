@@ -144,19 +144,18 @@ typedef struct _am29000_state
 INLINE am29000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_AM29000);
-	return (am29000_state *)device->token;
+	return (am29000_state *)downcast<cpu_device *>(device)->token();
 }
 
 static CPU_INIT( am29000 )
 {
 	am29000_state *am29000 = get_safe_token(device);
 
-	am29000->program = device->space(AS_PROGRAM);
-	am29000->data = device->space(AS_DATA);
-	am29000->io = device->space(AS_IO);
+	am29000->program = device_memory(device)->space(AS_PROGRAM);
+	am29000->data = device_memory(device)->space(AS_DATA);
+	am29000->io = device_memory(device)->space(AS_IO);
 	am29000->cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
 	/* Register state for saving */
@@ -713,7 +712,7 @@ static CPU_SET_INFO( am29000 )
 
 CPU_GET_INFO( am29000 )
 {
-	am29000_state *am29000 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	am29000_state *am29000 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

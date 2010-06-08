@@ -1,7 +1,7 @@
 #ifndef NAMCO51_H
 #define NAMCO51_H
 
-#include "devcb.h"
+#include "devlegcy.h"
 
 
 typedef struct _namco_51xx_interface namco_51xx_interface;
@@ -21,9 +21,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read );
 WRITE8_DEVICE_HANDLER( namco_51xx_write );
 
 
-/* device get info callback */
-#define NAMCO_51XX DEVICE_GET_INFO_NAME(namco_51xx)
-DEVICE_GET_INFO( namco_51xx );
+DECLARE_LEGACY_DEVICE(NAMCO_51XX, namco_51xx);
 
 
 #endif	/* NAMCO51_H */

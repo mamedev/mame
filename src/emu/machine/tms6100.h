@@ -3,6 +3,7 @@
 #ifndef __TMS6100_H__
 #define __TMS6100_H__
 
+#include "devlegcy.h"
 
 /* TMS 6100 memory controller */
 
@@ -13,10 +14,7 @@ WRITE8_DEVICE_HANDLER( tms6100_addr_w );
 
 READ_LINE_DEVICE_HANDLER( tms6100_data_r );
 
-DEVICE_GET_INFO( tms6100 );
-DEVICE_GET_INFO( m58819 );
-
-#define TMS6100 DEVICE_GET_INFO_NAME( tms6100 )
-#define M58819 DEVICE_GET_INFO_NAME( m58819 )
+DECLARE_LEGACY_DEVICE(TMS6100, tms6100);
+DECLARE_LEGACY_DEVICE(M58819, m58819);
 
 #endif /* __TMS6100_H__ */

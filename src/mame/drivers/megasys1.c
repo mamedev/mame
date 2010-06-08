@@ -1492,13 +1492,11 @@ static MACHINE_DRIVER_START( system_A )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_DRIVER_END
@@ -1513,8 +1511,8 @@ static MACHINE_DRIVER_START( system_B )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system_A)
 
-	MDRV_CPU_REPLACE("maincpu", M68000, SYS_B_CPU_CLOCK) /* 8MHz */
 	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(megasys1B_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
 
@@ -1552,8 +1550,7 @@ static MACHINE_DRIVER_START( system_Bbl )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* just the one OKI, used for sound and music */
-	MDRV_SOUND_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_DRIVER_END
@@ -1563,13 +1560,11 @@ static MACHINE_DRIVER_START( system_B_hayaosi1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system_B)
 
-	MDRV_SOUND_REPLACE("oki1",OKIM6295, 2000000) /* correct speed, but unknown OSC + divider combo */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_REPLACE("oki1", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MDRV_SOUND_REPLACE("oki2",OKIM6295, 2000000) /* correct speed, but unknown OSC + divider combo */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_REPLACE("oki2", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_DRIVER_END
@@ -1579,8 +1574,8 @@ static MACHINE_DRIVER_START( system_C )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system_A)
-	MDRV_CPU_REPLACE("maincpu", M68000, SYS_C_CPU_CLOCK) /* 12MHz */
 	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(megasys1C_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_C,INTERRUPT_NUM_C)
 
@@ -1628,8 +1623,7 @@ static MACHINE_DRIVER_START( system_D )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1",OKIM6295, SYS_D_CPU_CLOCK/4)	/* 2MHz (8MHz / 4) */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, OKIM6295_PIN7_HIGH)	/* 2MHz (8MHz / 4) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

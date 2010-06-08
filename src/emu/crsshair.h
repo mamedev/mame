@@ -19,8 +19,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define CROSSHAIR_SCREEN_NONE	((running_device *) 0)
-#define CROSSHAIR_SCREEN_ALL	((running_device *) ~0)
+#define CROSSHAIR_SCREEN_NONE	((device_t *) 0)
+#define CROSSHAIR_SCREEN_ALL	((device_t *) ~0)
 
 /* user settings for visibility mode */
 #define CROSSHAIR_VISIBILITY_OFF				0
@@ -62,10 +62,10 @@ struct _crosshair_user_settings
 void crosshair_init(running_machine *machine);
 
 /* draws crosshair(s) in a given screen, if neccessary */
-void crosshair_render(running_device *screen);
+void crosshair_render(screen_device &screen);
 
 /* sets the screen(s) for a given player's crosshair */
-void crosshair_set_screen(running_machine *machine, int player, running_device *screen);
+void crosshair_set_screen(running_machine *machine, int player, device_t *screen);
 
 /* return TRUE if any crosshairs are used */
 int crosshair_get_usage(running_machine *machine);

@@ -44,6 +44,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 #include <ddraw.h>
+#undef interface
 
 // MAME headers
 #include "emu.h"
@@ -1316,7 +1317,6 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 
 static void pick_best_mode(win_window_info *window)
 {
-	const device_config *primary_screen = video_screen_first(window->machine->config);
 	dd_info *dd = (dd_info *)window->drawdata;
 	mode_enum_info einfo;
 	HRESULT result;
@@ -1333,11 +1333,9 @@ static void pick_best_mode(win_window_info *window)
 
 	// determine the refresh rate of the primary screen
 	einfo.target_refresh = 60.0;
+	const screen_device_config *primary_screen = screen_first(*window->machine->config);
 	if (primary_screen != NULL)
-	{
-		const screen_config *config = (const screen_config *)primary_screen->inline_config;
-		einfo.target_refresh = ATTOSECONDS_TO_HZ(config->refresh);
-	}
+		einfo.target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh());
 	printf("Target refresh = %f\n", einfo.target_refresh);
 
 	// if we're not stretching, allow some slop on the minimum since we can handle it

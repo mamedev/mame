@@ -344,7 +344,7 @@ VIDEO_START( valtric )
 
 	tilemap_set_transparent_pen(tx_tilemap,  15);
 
-	mosaicbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	mosaicbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
 }
@@ -913,7 +913,7 @@ static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 }
 
 #if 1
-static void valtric_draw_mosaic(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	static int mosaic=0;
 
@@ -933,8 +933,8 @@ static void valtric_draw_mosaic(running_device *screen, bitmap_t *bitmap, const 
 			int step=mosaic;
 			UINT32 *dest;
 			int x,y,xx,yy;
-			int width = video_screen_get_width(screen);
-			int height = video_screen_get_height(screen);
+			int width = screen.width();
+			int height = screen.height();
 
 			if (mosaic<0)step*=-1;
 
@@ -964,7 +964,7 @@ static void valtric_draw_mosaic(running_device *screen, bitmap_t *bitmap, const 
 	}
 }
 #else
-static void valtric_draw_mosaic(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int step = 0x10 - (valtric_mosaic & 0x0f);
 
@@ -976,8 +976,8 @@ static void valtric_draw_mosaic(running_device *screen, bitmap_t *bitmap, const 
 		{
 			UINT32 *dest;
 			int x,y,xx,yy;
-			int width = video_screen_get_width(screen);
-			int height = video_screen_get_height(screen);
+			int width = screen.width();
+			int height = screen.height();
 
 			for (y = 0; y < width+step; y += step)
 				for (x = 0; x < height+step; x += step)
@@ -1229,7 +1229,7 @@ VIDEO_UPDATE( valtric )
 	bg_setting(screen->machine);
 
 	if (argus_bg_status & 1)	/* Backgound enable */
-		valtric_draw_mosaic(screen, bitmap, cliprect);
+		valtric_draw_mosaic(*screen, bitmap, cliprect);
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	valtric_draw_sprites(screen->machine, bitmap, cliprect);

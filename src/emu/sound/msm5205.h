@@ -3,6 +3,8 @@
 #ifndef __MSM5205_H__
 #define __MSM5205_H__
 
+#include "devlegcy.h"
+
 /* an interface for the MSM5205 and similar chips */
 
 /* prescaler selector defines   */
@@ -36,7 +38,6 @@ void msm5205_playmode_w(running_device *device, int _select);
 
 void msm5205_set_volume(running_device *device,int volume);
 
-DEVICE_GET_INFO( msm5205 );
-#define SOUND_MSM5205 DEVICE_GET_INFO_NAME( msm5205 )
+DECLARE_LEGACY_SOUND_DEVICE(MSM5205, msm5205);
 
 #endif /* __MSM5205_H__ */

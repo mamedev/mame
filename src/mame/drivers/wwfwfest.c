@@ -160,7 +160,7 @@ static WRITE16_HANDLER( wwfwfest_scroll_write )
 
 static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 {
-	okim6295_set_bank_base(device, (data & 1) * 0x40000);
+	downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
 
 static WRITE16_HANDLER ( wwfwfest_soundwrite )
@@ -351,15 +351,15 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
 	if (scanline % 16 == 0)
 	{
 		if (scanline > 0)
-			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cputag_set_input_line(timer->machine, "maincpu", 2, ASSERT_LINE);
+			timer.machine->primary_screen->update_partial(scanline - 1);
+		cputag_set_input_line(timer.machine, "maincpu", 2, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
-		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cputag_set_input_line(timer->machine, "maincpu", 3, ASSERT_LINE);
+		timer.machine->primary_screen->update_partial(scanline - 1);
+		cputag_set_input_line(timer.machine, "maincpu", 3, ASSERT_LINE);
 	}
 }
 
@@ -422,8 +422,7 @@ static MACHINE_DRIVER_START( wwfwfest )
 	MDRV_SOUND_ROUTE(0, "mono", 0.45)
 	MDRV_SOUND_ROUTE(1, "mono", 0.45)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1024188)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* Verified - Pin 7 tied to +5VDC */
+	MDRV_OKIM6295_ADD("oki", 1024188, OKIM6295_PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 

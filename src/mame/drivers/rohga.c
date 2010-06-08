@@ -112,7 +112,6 @@
 #include "includes/rohga.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "video/deco16ic.h"
 
 
 static READ16_HANDLER( rohga_irq_ack_r )
@@ -730,8 +729,8 @@ static void sound_irq(running_device *device, int state)
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	rohga_state *state = (rohga_state *)device->machine->driver_data;
-	okim6295_set_bank_base(state->oki1, BIT(data, 0) * 0x40000);
-	okim6295_set_bank_base(state->oki2, BIT(data, 1) * 0x40000);
+	state->oki1->set_bank_base(BIT(data, 0) * 0x40000);
+	state->oki2->set_bank_base(BIT(data, 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =
@@ -773,17 +772,6 @@ static const deco16ic_interface nitrobal_deco16ic_intf =
 	rohga_bank_callback
 };
 
-static MACHINE_START( rohga )
-{
-	rohga_state *state = (rohga_state *)machine->driver_data;
-
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
-	state->oki1 = devtag_get_device(machine, "oki1");
-	state->oki2 = devtag_get_device(machine, "oki2");
-}
-
 static MACHINE_DRIVER_START( rohga )
 
 	/* driver data */
@@ -796,8 +784,6 @@ static MACHINE_DRIVER_START( rohga )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
-
-	MDRV_MACHINE_START(rohga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -825,13 +811,11 @@ static MACHINE_DRIVER_START( rohga )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.78)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.78)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
@@ -848,8 +832,6 @@ static MACHINE_DRIVER_START( wizdfire )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
-
-	MDRV_MACHINE_START(rohga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -876,13 +858,11 @@ static MACHINE_DRIVER_START( wizdfire )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
@@ -899,8 +879,6 @@ static MACHINE_DRIVER_START( nitrobal )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
-
-	MDRV_MACHINE_START(rohga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -927,13 +905,11 @@ static MACHINE_DRIVER_START( nitrobal )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
@@ -950,8 +926,6 @@ static MACHINE_DRIVER_START( schmeisr )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
-
-	MDRV_MACHINE_START(rohga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -979,13 +953,11 @@ static MACHINE_DRIVER_START( schmeisr )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END

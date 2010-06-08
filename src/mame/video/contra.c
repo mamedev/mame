@@ -175,12 +175,12 @@ VIDEO_START( contra )
 	state->spriteram = auto_alloc_array(machine, UINT8, 0x800);
 	state->spriteram_2 = auto_alloc_array(machine, UINT8, 0x800);
 
-	state->bg_clip = *video_screen_get_visible_area(machine->primary_screen);
+	state->bg_clip = machine->primary_screen->visible_area();
 	state->bg_clip.min_x += 40;
 
 	state->fg_clip = state->bg_clip;
 
-	state->tx_clip = *video_screen_get_visible_area(machine->primary_screen);
+	state->tx_clip = machine->primary_screen->visible_area();
 	state->tx_clip.max_x = 39;
 	state->tx_clip.min_x = 0;
 

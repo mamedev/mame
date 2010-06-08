@@ -51,9 +51,6 @@ Registers per channel:
 
 UINT16 *gaelco_sndregs;
 
-/* fix me -- asumes that only one type can be active at a time */
-static sound_type chip_type;
-
 /* this structure defines a channel */
 typedef struct _gaelco_sound_channel gaelco_sound_channel;
 struct _gaelco_sound_channel
@@ -81,10 +78,8 @@ static wav_file *	wavraw;					/* raw waveform */
 INLINE gaelco_sound_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_GAELCO_GAE1 || sound_get_type(device) == SOUND_GAELCO_CG1V);
-	return (gaelco_sound_state *)device->token;
+	assert(device->type() == SOUND_GAELCO_GAE1 || device->type() == SOUND_GAELCO_CG1V);
+	return (gaelco_sound_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*============================================================================
@@ -255,11 +250,9 @@ WRITE16_DEVICE_HANDLER( gaelcosnd_w )
 static DEVICE_START( gaelco )
 {
 	int j, vol;
-	const gaelcosnd_interface *intf = (const gaelcosnd_interface *)device->baseconfig().static_config;
+	const gaelcosnd_interface *intf = (const gaelcosnd_interface *)device->baseconfig().static_config();
 
 	gaelco_sound_state *info = get_safe_token(device);
-
-	chip_type = sound_get_type(device);
 
 	/* copy rom banks */
 	for (j = 0; j < 4; j++){
@@ -268,7 +261,7 @@ static DEVICE_START( gaelco )
 	info->stream = stream_create(device, 0, 2, 8000, info, gaelco_update);
 	info->snd_data = (UINT8 *)memory_region(device->machine, intf->gfxregion);
 	if (info->snd_data == NULL)
-		info->snd_data = *device->region;
+		info->snd_data = *device->region();
 
 	/* init volume table */
 	for (vol = 0; vol < VOLUME_LEVELS; vol++){

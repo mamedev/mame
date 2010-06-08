@@ -37,7 +37,7 @@ struct _cp1610_state
 	UINT8	flags;	/* flags */
 	int 	intr_enabled;
 	//int       (*reset_callback)(cp1610_state *cpustate);
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	UINT16	intr_vector;
 	int 	reset_state;
 	int		intr_state;
@@ -54,10 +54,9 @@ struct _cp1610_state
 INLINE cp1610_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CP1610);
-	return (cp1610_state *)device->token;
+	return (cp1610_state *)downcast<cpu_device *>(device)->token();
 }
 
 #define cp1610_readop(A) memory_read_word_16be(cpustate->program, (A)<<1)
@@ -3395,7 +3394,7 @@ static CPU_INIT( cp1610 )
 	cpustate->intrm_pending = 0;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0, cpustate->r);
 	state_save_register_device_item(device, 0, cpustate->flags);
@@ -3460,7 +3459,7 @@ static CPU_SET_INFO( cp1610 )
 
 CPU_GET_INFO( cp1610 )
 {
-	cp1610_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	cp1610_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */

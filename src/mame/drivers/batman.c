@@ -54,8 +54,8 @@ static MACHINE_RESET( batman )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarivc_reset(machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
-	atarigen_scanline_timer_reset(machine->primary_screen, batman_scanline_update, 8);
+	atarivc_reset(*machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
+	atarigen_scanline_timer_reset(*machine->primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -69,13 +69,13 @@ static MACHINE_RESET( batman )
 
 static READ16_HANDLER( batman_atarivc_r )
 {
-	return atarivc_r(space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( batman_atarivc_w )
 {
-	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
 }
 
 
@@ -111,7 +111,7 @@ static WRITE16_HANDLER( latch_w )
 	/* alpha bank is selected by the upper 4 bits */
 	if ((oldword ^ state->latch_data) & 0x7000)
 	{
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 		tilemap_mark_all_tiles_dirty(state->atarigen.alpha_tilemap);
 		state->alpha_tile_bank = (state->latch_data >> 12) & 7;
 	}

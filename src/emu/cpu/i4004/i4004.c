@@ -31,12 +31,12 @@ struct _i4004_state
 	UINT8	C; // Carry flag
 	UINT8	TEST; // Test PIN status
 	PAIR	PC; // It is in fact one of ADDR regs
+	UINT8	flags; // used for I/O only
 
 	running_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
-	cpu_state_table 	state;
 	int					icount;
 	int 				pc_pos; // PC possition in ADDR
 	int					addr_mask;
@@ -48,51 +48,15 @@ struct _i4004_state
 #define GET_PC					(cpustate->ADDR[cpustate->pc_pos])
 
 /***************************************************************************
-    CPU STATE DESCRIPTION
-***************************************************************************/
-
-#define I4004_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
-	CPU_STATE_ENTRY(I4004_##_name, #_name, _format, i4004_state, _member, _datamask, ~0, _flags)
-
-static const cpu_state_entry state_array[] =
-{
-	I4004_STATE_ENTRY(PC,   "%03X", PC.w.l, 0x0fff, 0)
-	I4004_STATE_ENTRY(GENPC,"%03X", PC.w.l, 0x0fff, CPUSTATE_NOSHOW)
-	I4004_STATE_ENTRY(A,   "%01X", A, 0x0f, 0)
-	I4004_STATE_ENTRY(R01, "%02X", R[0], 0xff, 0)
-	I4004_STATE_ENTRY(R23, "%02X", R[1], 0xff, 0)
-	I4004_STATE_ENTRY(R45, "%02X", R[2], 0xff, 0)
-	I4004_STATE_ENTRY(R67, "%02X", R[3], 0xff, 0)
-	I4004_STATE_ENTRY(R89, "%02X", R[4], 0xff, 0)
-	I4004_STATE_ENTRY(RAB, "%02X", R[5], 0xff, 0)
-	I4004_STATE_ENTRY(RCD, "%02X", R[6], 0xff, 0)
-	I4004_STATE_ENTRY(REF, "%02X", R[7], 0xff, 0)
-	I4004_STATE_ENTRY(ADDR1, "%03X", ADDR[0].w.l, 0x0fff, 0)
-	I4004_STATE_ENTRY(ADDR2, "%03X", ADDR[1].w.l, 0x0fff, 0)
-	I4004_STATE_ENTRY(ADDR3, "%03X", ADDR[2].w.l, 0x0fff, 0)
-	I4004_STATE_ENTRY(ADDR4, "%03X", ADDR[3].w.l, 0x0fff, 0)
-	I4004_STATE_ENTRY(RAM, "%03X", RAM.w.l, 0x0fff, 0)
-};
-
-static const cpu_state_table state_table_template =
-{
-	NULL,						/* pointer to the base of state (offsets are relative to this) */
-	0,							/* subtype this table refers to */
-	ARRAY_LENGTH(state_array),	/* number of entries */
-	state_array					/* array of entries */
-};
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE i4004_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I4004);
-	return (i4004_state *)device->token;
+	return (i4004_state *)downcast<cpu_device *>(device)->token();
 }
 
 INLINE UINT8 ROP(i4004_state *cpustate)
@@ -484,15 +448,29 @@ static CPU_INIT( i4004 )
 	i4004_state *cpustate = get_safe_token(device);
 
 	/* set up the state table */
-	cpustate->state = state_table_template;
-	cpustate->state.baseptr = cpustate;
-	cpustate->state.subtypemask = 1;
+	{
+		device_state_interface *state;
+		device->interface(state);
+		state->state_add(I4004_PC,    "PC",    cpustate->PC.w.l).mask(0x0fff);
+		state->state_add(STATE_GENPC, "GENPC", cpustate->PC.w.l).mask(0x0fff).noshow();
+		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
+		state->state_add(I4004_A,     "A",     cpustate->A).mask(0x0f);
+		
+		astring tempstr;
+		for (int regnum = 0; regnum < 8; regnum++)
+			state->state_add(I4004_R01 + regnum, tempstr.format("R%X%X", regnum*2, regnum*2+1), cpustate->R[regnum]);
+
+		for (int addrnum = 0; addrnum < 4; addrnum++)
+			state->state_add(I4004_ADDR1 + addrnum, tempstr.format("ADDR%d", addrnum + 1), cpustate->ADDR[addrnum].w.l).mask(0xfff);
+
+		state->state_add(I4004_RAM,   "RAM",   cpustate->RAM.w.l).mask(0x0fff);
+	}
 
 	cpustate->device = device;
 
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->A);
@@ -543,10 +521,44 @@ static CPU_RESET( i4004 )
 
 static CPU_IMPORT_STATE( i4004 )
 {
+	i4004_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			cpustate->C = (cpustate->flags >> 1) & 1;
+			cpustate->TEST = (cpustate->flags >> 0) & 1;
+			break;
+	}
 }
 
 static CPU_EXPORT_STATE( i4004 )
 {
+	i4004_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			cpustate->flags = ((cpustate->A == 0) ? 0x04 : 0x00) |
+							  (cpustate->C ? 0x02 : 0x00) |
+							  (cpustate->TEST ? 0x01 : 0x00);
+			break;
+	}
+}
+
+static CPU_EXPORT_STRING( i4004 )
+{
+	i4004_state *cpustate = get_safe_token(device);
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf(".%c%c%c",
+				(cpustate->A==0) ? 'Z':'.',
+				cpustate->C      ? 'C':'.',
+				cpustate->TEST   ? 'T':'.');
+			break;
+	}
 }
 
 /***************************************************************************
@@ -562,7 +574,7 @@ static CPU_SET_INFO( i4004 )
 
 CPU_GET_INFO( i4004 )
 {
-	i4004_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i4004_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -597,10 +609,10 @@ CPU_GET_INFO( i4004 )
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(i4004);		break;
 		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(i4004);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(i4004);		break;
+		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(i4004);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "4004");				break;
@@ -608,12 +620,5 @@ CPU_GET_INFO( i4004 )
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, ".%c%c%c",
-				(cpustate->A==0) ? 'Z':'.',
-				cpustate->C      ? 'C':'.',
-				cpustate->TEST   ? 'T':'.');
-			break;
 	}
 }

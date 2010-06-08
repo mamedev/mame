@@ -322,7 +322,7 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		sx = spritedata[offs+1];
 
-		if ((sy&0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		if ((sy&0x2000) && (machine->primary_screen->frame_number() & 1)) continue;
 
 		colour = (spritedata[offs+2] >>0) & 0x1f;
 
@@ -389,7 +389,7 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		y = spritedata[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		if (flash && (machine->primary_screen->frame_number() & 1)) continue;
 
 		x = spritedata[offs+2];
 		colour = (x >>9) & colourmask;
@@ -503,7 +503,7 @@ static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		y = spritedata[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		if (flash && (machine->primary_screen->frame_number() & 1)) continue;
 
 		//trans=TRANSPARENCY_PEN;
 		x = spritedata[offs+2];
@@ -1071,8 +1071,8 @@ VIDEO_START( fghthist )
 	dirty_palette = auto_alloc_array(machine, UINT8, 4096);
 
 	/* Allow sprite bitmap */
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 	sprite_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
@@ -1139,8 +1139,8 @@ VIDEO_START( nslasher )
 	pf1a_tilemap =0;
 	dirty_palette = auto_alloc_array(machine, UINT8, 4096);
 
-	width = video_screen_get_width(machine->primary_screen);
-	height = video_screen_get_height(machine->primary_screen);
+	width = machine->primary_screen->width();
+	height = machine->primary_screen->height();
 	sprite0_mix_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
 	sprite1_mix_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
 	tilemap_alpha_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );

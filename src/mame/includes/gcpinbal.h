@@ -1,10 +1,16 @@
 
+#include "sound/okim6295.h"
+#include "sound/msm5205.h"
+
 class gcpinbal_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gcpinbal_state(machine)); }
 
-	gcpinbal_state(running_machine &machine) { }
+	gcpinbal_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  oki(machine.device<okim6295_device>("oki")),
+		  msm(machine.device<msm5205_sound_device>("msm")) { }
 
 	/* memory pointers */
 	UINT16 *    tilemapram;
@@ -27,9 +33,9 @@ public:
 	UINT8       adpcm_trigger, adpcm_data;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *oki;
-	running_device *msm;
+	cpu_device *maincpu;
+	okim6295_device *oki;
+	msm5205_sound_device *msm;
 };
 
 

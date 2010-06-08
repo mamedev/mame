@@ -179,10 +179,9 @@ typedef struct {
 INLINE i860_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I860);
-	return (i860_state_t *)device->token;
+	return (i860_state_t *)downcast<cpu_device *>(device)->token();
 }
 
 

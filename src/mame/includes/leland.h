@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "devlegcy.h"
+
 #define LELAND_BATTERY_RAM_SIZE 0x4000
 #define ATAXX_EXTRA_TRAM_SIZE 0x800
 
@@ -98,14 +100,9 @@ void leland_rotate_memory(running_machine *machine, const char *cpuname);
 
 /*----------- defined in audio/leland.c -----------*/
 
-DEVICE_GET_INFO( leland_sound );
-#define SOUND_LELAND DEVICE_GET_INFO_NAME(leland_sound)
-
-DEVICE_GET_INFO( leland_80186_sound );
-#define SOUND_LELAND_80186 DEVICE_GET_INFO_NAME(leland_80186_sound)
-
-DEVICE_GET_INFO( redline_80186_sound );
-#define SOUND_REDLINE_80186 DEVICE_GET_INFO_NAME(redline_80186_sound)
+DECLARE_LEGACY_SOUND_DEVICE(LELAND, leland_sound);
+DECLARE_LEGACY_SOUND_DEVICE(LELAND_80186, leland_80186_sound);
+DECLARE_LEGACY_SOUND_DEVICE(REDLINE_80186, redline_80186_sound);
 
 void leland_dac_update(int dacnum, UINT8 sample);
 

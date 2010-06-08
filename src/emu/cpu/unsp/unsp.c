@@ -13,10 +13,9 @@
 INLINE unsp_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->token != NULL);
-    assert(device->type == CPU);
+    assert(device->type() == CPU);
     assert(cpu_get_type(device) == CPU_UNSP);
-    return (unsp_state *)device->token;
+    return (unsp_state *)downcast<cpu_device *>(device)->token();
 }
 
 static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
@@ -116,7 +115,7 @@ static CPU_INIT( unsp )
     memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
 
     unsp->device = device;
-    unsp->program = device->space(AS_PROGRAM);
+    unsp->program = device_memory(device)->space(AS_PROGRAM);
     unsp->irq = 0;
     unsp->fiq = 0;
 }
@@ -857,7 +856,7 @@ static CPU_SET_INFO( unsp )
 
 CPU_GET_INFO( unsp )
 {
-    unsp_state *unsp = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+    unsp_state *unsp = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch(state)
     {

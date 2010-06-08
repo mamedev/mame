@@ -28,4 +28,4 @@ VIDEO_UPDATE( eprom );
 VIDEO_START( guts );
 VIDEO_UPDATE( guts );
 
-void eprom_scanline_update(running_device *screen, int scanline);
+void eprom_scanline_update(screen_device &screen, int scanline);

@@ -4,12 +4,20 @@
 
 *************************************************************************/
 
+#include "sound/okim6295.h"
+#include "video/deco16ic.h"
+
 class cninja_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cninja_state(machine)); }
 
-	cninja_state(running_machine &machine) { }
+	cninja_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  audiocpu(machine.device<cpu_device>("audiocpu")),
+		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
+		  raster_irq_timer(machine.device<timer_device>("raster_timer")),
+		  oki2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
 	UINT16 *   ram;
@@ -22,11 +30,11 @@ public:
 	int        scanline, irq_mask;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *deco16ic;
-	running_device *raster_irq_timer;
-	running_device *oki2;
+	cpu_device *maincpu;
+	cpu_device *audiocpu;
+	deco16ic_device *deco16ic;
+	timer_device *raster_irq_timer;
+	okim6295_device *oki2;
 };
 
 /*----------- defined in video/cninja.c -----------*/

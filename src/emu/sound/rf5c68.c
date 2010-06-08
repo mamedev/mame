@@ -40,10 +40,8 @@ struct _rf5c68_state
 INLINE rf5c68_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_RF5C68);
-	return (rf5c68_state *)device->token;
+	assert(device->type() == SOUND_RF5C68);
+	return (rf5c68_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -142,13 +140,13 @@ static STREAM_UPDATE( rf5c68_update )
 
 static DEVICE_START( rf5c68 )
 {
-	const rf5c68_interface* intf = (const rf5c68_interface*)device->baseconfig().static_config;
+	const rf5c68_interface* intf = (const rf5c68_interface*)device->baseconfig().static_config();
 
 	/* allocate memory for the chip */
 	rf5c68_state *chip = get_safe_token(device);
 
 	/* allocate the stream */
-	chip->stream = stream_create(device, 0, 2, device->clock / 384, chip, rf5c68_update);
+	chip->stream = stream_create(device, 0, 2, device->clock() / 384, chip, rf5c68_update);
 
 	chip->device = device;
 

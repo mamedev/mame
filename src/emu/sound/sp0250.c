@@ -60,10 +60,8 @@ struct _sp0250_state
 INLINE sp0250_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SP0250);
-	return (sp0250_state *)device->token;
+	assert(device->type() == SOUND_SP0250);
+	return (sp0250_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -202,7 +200,7 @@ static STREAM_UPDATE( sp0250_update )
 
 static DEVICE_START( sp0250 )
 {
-	const struct sp0250_interface *intf = (const struct sp0250_interface *)device->baseconfig().static_config;
+	const struct sp0250_interface *intf = (const struct sp0250_interface *)device->baseconfig().static_config();
 	sp0250_state *sp = get_safe_token(device);
 
 	sp->device = device;
@@ -211,10 +209,10 @@ static DEVICE_START( sp0250 )
 	if (sp->drq != NULL)
 	{
 		sp->drq(sp->device, ASSERT_LINE);
-		timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(device->clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
+		timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(device->clock()), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
 	}
 
-	sp->stream = stream_create(device, 0, 1, device->clock / CLOCK_DIVIDER, sp, sp0250_update);
+	sp->stream = stream_create(device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0250_update);
 }
 
 

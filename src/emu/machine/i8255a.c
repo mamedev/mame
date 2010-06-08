@@ -80,16 +80,15 @@ struct _i8255a_t
 INLINE i8255a_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (i8255a_t *)device->token;
+	return (i8255a_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const i8255a_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == I8255A));
-	return (const i8255a_interface *) device->baseconfig().static_config;
+	assert((device->type() == I8255A));
+	return (const i8255a_interface *) device->baseconfig().static_config();
 }
 
 INLINE int group_mode(i8255a_t *i8255a, int group)
@@ -891,7 +890,6 @@ DEVICE_GET_INFO( i8255a )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8255a_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8255a);	break;

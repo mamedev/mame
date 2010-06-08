@@ -169,7 +169,7 @@ UINT8 *deco16icvdp_get_vram( const device_config *device )
 typedef struct _deco16ic_state deco16ic_state;
 struct _deco16ic_state
 {
-	running_device *screen;
+	screen_device *screen;
 
 	UINT16 *pf1_data, *pf2_data;
 	UINT16 *pf3_data, *pf4_data;
@@ -208,17 +208,16 @@ struct _deco16ic_state
 INLINE deco16ic_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == DECO16IC);
+	assert(device->type() == DECO16IC);
 
-	return (deco16ic_state *)device->token;
+	return (deco16ic_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const deco16ic_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == DECO16IC));
-	return (const deco16ic_interface *) device->baseconfig().static_config;
+	assert((device->type() == DECO16IC));
+	return (const deco16ic_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -805,8 +804,8 @@ WRITE32_DEVICE_HANDLER( deco16ic_pf4_data_dword_w )
 void deco_allocate_sprite_bitmap(running_machine *machine)
 {
 	/* Allow sprite bitmap to be used by Deco32 games as well */
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 	sprite_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
 }
 
@@ -1237,9 +1236,9 @@ static DEVICE_START( deco16ic )
 	const deco16ic_interface *intf = get_interface(device);
 	int width, height;
 
-	deco16ic->screen = devtag_get_device(device->machine, intf->screen);
-	width = video_screen_get_width(deco16ic->screen);
-	height = video_screen_get_height(deco16ic->screen);
+	deco16ic->screen = device->machine->device<screen_device>(intf->screen);
+	width = deco16ic->screen->width();
+	height = deco16ic->screen->height();
 
 	deco16ic->sprite_priority_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED8);
 
@@ -1366,7 +1365,6 @@ DEVICE_GET_INFO( deco16ic )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(deco16ic_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(deco16ic);		break;

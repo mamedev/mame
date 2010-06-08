@@ -610,7 +610,7 @@ bitmap_t *render_load_png(const char *path, const char *dirname, const char *fil
 	/* non-alpha case */
 	if (alphadest == NULL)
 	{
-		bitmap = bitmap_alloc(png.width, png.height, BITMAP_FORMAT_ARGB32);
+		bitmap = global_alloc(bitmap_t(png.width, png.height, BITMAP_FORMAT_ARGB32));
 		if (bitmap != NULL)
 			copy_png_to_bitmap(bitmap, &png, hasalpha);
 	}

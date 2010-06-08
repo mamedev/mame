@@ -994,19 +994,19 @@ READ64_HANDLER( pvr_ta_r )
 		{
 			UINT8 fieldnum,vsync,hsync,blank;
 
-			fieldnum = (video_screen_get_frame_number(space->machine->primary_screen) & 1) ? 1 : 0;
+			fieldnum = (space->machine->primary_screen->frame_number() & 1) ? 1 : 0;
 
-			vsync = video_screen_get_vblank(space->machine->primary_screen) ? 1 : 0;
+			vsync = space->machine->primary_screen->vblank() ? 1 : 0;
 			if(spg_vsync_pol) { vsync^=1; }
 
-			hsync = video_screen_get_hblank(space->machine->primary_screen) ? 1 : 0;
+			hsync = space->machine->primary_screen->hblank() ? 1 : 0;
 			if(spg_hsync_pol) { hsync^=1; }
 
 			/* FIXME: following is just a wild guess */
-			blank = (video_screen_get_vblank(space->machine->primary_screen) | video_screen_get_hblank(space->machine->primary_screen)) ? 0 : 1;
+			blank = (space->machine->primary_screen->vblank() | space->machine->primary_screen->hblank()) ? 0 : 1;
 			if(spg_blank_pol) { blank^=1; }
 
-			pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (video_screen_get_vpos(space->machine->primary_screen) & 0x3ff);
+			pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (space->machine->primary_screen->vpos() & 0x3ff);
 			break;
 		}
 	case SPG_TRIGGER_POS:
@@ -1258,8 +1258,8 @@ WRITE64_HANDLER( pvr_ta_w )
 		timer_adjust_oneshot(vbin_timer, attotime_never, 0);
 		timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 
-		timer_adjust_oneshot(vbin_timer, video_screen_get_time_until_pos(space->machine->primary_screen, spg_vblank_in_irq_line_num, 0), 0);
-		timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(space->machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
+		timer_adjust_oneshot(vbin_timer, space->machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num), 0);
+		timer_adjust_oneshot(vbout_timer, space->machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num), 0);
 		break;
 	/* TODO: timer adjust for SPG_HBLANK_INT too */
 	case TA_LIST_CONT:
@@ -1278,7 +1278,7 @@ WRITE64_HANDLER( pvr_ta_w )
 	case VO_STARTX:
 	case VO_STARTY:
 		{
-			rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
+			rectangle visarea = space->machine->primary_screen->visible_area();
 			/* FIXME: right visible area calculations aren't known yet*/
 			visarea.min_x = 0;
 			visarea.max_x = ((spg_hbstart - spg_hbend - vo_horz_start_pos) <= 0x180 ? 320 : 640) - 1;
@@ -1286,7 +1286,7 @@ WRITE64_HANDLER( pvr_ta_w )
 			visarea.max_y = ((spg_vbstart - spg_vbend - vo_vert_start_pos_f1) <= 0x100 ? 240 : 480) - 1;
 
 
-			video_screen_configure(space->machine->primary_screen, spg_hbstart, spg_vbstart, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds );
+			space->machine->primary_screen->configure(spg_hbstart, spg_vbstart, visarea, space->machine->primary_screen->frame_period().attoseconds );
 		}
 		break;
 	}
@@ -2465,7 +2465,7 @@ static TIMER_CALLBACK(vbin)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(vbin_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_in_irq_line_num, 0), 0);
+	timer_adjust_oneshot(vbin_timer, machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num), 0);
 }
 
 static TIMER_CALLBACK(vbout)
@@ -2473,7 +2473,7 @@ static TIMER_CALLBACK(vbout)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
+	timer_adjust_oneshot(vbout_timer, machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num), 0);
 }
 
 static TIMER_CALLBACK(hbin)
@@ -2503,7 +2503,7 @@ static TIMER_CALLBACK(hbin)
 		next_y = spg_line_comp_val;
 	}
 
-	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, spg_hblank_in_irq-1), 0);
+	timer_adjust_oneshot(hbin_timer, machine->primary_screen->time_until_pos(scanline, spg_hblank_in_irq-1), 0);
 }
 
 
@@ -2566,13 +2566,13 @@ VIDEO_START(dc)
 	computedilated();
 
 	vbout_timer = timer_alloc(machine, vbout, 0);
-	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_out_irq_line_num, 0), 0);
+	timer_adjust_oneshot(vbout_timer, machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num), 0);
 
 	vbin_timer = timer_alloc(machine, vbin, 0);
-	timer_adjust_oneshot(vbin_timer, video_screen_get_time_until_pos(machine->primary_screen, spg_vblank_in_irq_line_num, 0), 0);
+	timer_adjust_oneshot(vbin_timer, machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num), 0);
 
 	hbin_timer = timer_alloc(machine, hbin, 0);
-	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, spg_hblank_in_irq-1), 0);
+	timer_adjust_oneshot(hbin_timer, machine->primary_screen->time_until_pos(0, spg_hblank_in_irq-1), 0);
 
 	scanline = 0;
 	next_y = 0;
@@ -2605,7 +2605,7 @@ VIDEO_UPDATE(dc)
     ******************/
 
 //  static int useframebuffer=1;
-//  const rectangle *visarea = video_screen_get_visible_area(screen);
+//  const rectangle &visarea = screen->visible_area();
 //  int y,x;
 	//printf("videoupdate\n");
 

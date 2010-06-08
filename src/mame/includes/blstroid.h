@@ -24,4 +24,4 @@ public:
 VIDEO_START( blstroid );
 VIDEO_UPDATE( blstroid );
 
-void blstroid_scanline_update(running_device *screen, int scanline);
+void blstroid_scanline_update(screen_device &screen, int scanline);

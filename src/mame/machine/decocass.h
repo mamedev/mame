@@ -1,3 +1,5 @@
+#include "devlegcy.h"
+
 #ifdef MAME_DEBUG
 #define LOGLEVEL  5
 #else
@@ -6,8 +8,7 @@
 #define LOG(n,x)  do { if (LOGLEVEL >= n) logerror x; } while (0)
 
 
-#define DECOCASS_TAPE DEVICE_GET_INFO_NAME(decocass_tape)
-DEVICE_GET_INFO( decocass_tape );
+DECLARE_LEGACY_DEVICE(DECOCASS_TAPE, decocass_tape);
 
 #define MDRV_DECOCASS_TAPE_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, DECOCASS_TAPE, 0)

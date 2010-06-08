@@ -59,10 +59,9 @@ struct _ttl74153_state
 INLINE ttl74153_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TTL74153);
+	assert(device->type() == TTL74153);
 
-	return (ttl74153_state *)device->token;
+	return (ttl74153_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -137,7 +136,7 @@ int ttl74153_output_r(running_device *device, int section)
 
 static DEVICE_START( ttl74153 )
 {
-	ttl74153_config *config = (ttl74153_config *)device->baseconfig().inline_config;
+	ttl74153_config *config = (ttl74153_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	ttl74153_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
 

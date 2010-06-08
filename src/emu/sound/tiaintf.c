@@ -13,10 +13,8 @@ struct _tia_state
 INLINE tia_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_TIA);
-	return (tia_state *)device->token;
+	assert(device->type() == SOUND_TIA);
+	return (tia_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -31,9 +29,9 @@ static DEVICE_START( tia )
 {
 	tia_state *info = get_safe_token(device);
 
-	info->channel = stream_create(device, 0, 1, device->clock, info, tia_update);
+	info->channel = stream_create(device, 0, 1, device->clock(), info, tia_update);
 
-	info->chip = tia_sound_init(device->clock, device->clock, 16);
+	info->chip = tia_sound_init(device->clock(), device->clock(), 16);
 	assert_always(info->chip != NULL, "Error creating TIA chip");
 }
 

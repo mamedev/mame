@@ -36,9 +36,9 @@ static UINT8 blank_palette;
 INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
 	static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-	int width = visarea->max_x + 1 - visarea->min_x;
-	int height = visarea->max_y + 1 - visarea->min_y;
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	int width = visarea.max_x + 1 - visarea.min_x;
+	int height = visarea.max_y + 1 - visarea.min_y;
 
 	*x = ((input_port_read_safe(machine, gunnames[player * 2], 0x00) & 0xff) * width) / 255;
 	*y = ((input_port_read_safe(machine, gunnames[1 + player * 2], 0x00) & 0xff) * height) / 255;
@@ -181,7 +181,7 @@ WRITE16_HANDLER( lethalj_blitter_w )
  *
  *************************************/
 
-void lethalj_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void lethalj_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &screenram[(vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -193,7 +193,7 @@ void lethalj_scanline_update(running_device *screen, bitmap_t *bitmap, int scanl
 	{
 		for (x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = 0x7fff;
-		if (scanline == video_screen_get_visible_area(screen)->max_y)
+		if (scanline == screen.visible_area().max_y)
 			blank_palette = 0;
 		return;
 	}

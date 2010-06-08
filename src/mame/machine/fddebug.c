@@ -1038,7 +1038,7 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
 		newpc = cpu_get_pc(cpu);
 
 	/* set the new PC */
-	cpu_set_reg(cpu, REG_GENPC, newpc);
+	cpu_set_reg(cpu, STATE_GENPC, newpc);
 
 	/* recompute around that */
 	instruction_hook(cpu, newpc);
@@ -1091,7 +1091,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 			}
 
 			/* set this as our current PC and run the instruction hook */
-			cpu_set_reg(space->cpu, REG_GENPC, pc);
+			cpu_set_reg(space->cpu, STATE_GENPC, pc);
 			if (instruction_hook(space->cpu, pc))
 				break;
 		}

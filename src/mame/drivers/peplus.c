@@ -336,13 +336,13 @@ static void handle_lightpen( running_device *device )
 {
     int x_val = input_port_read_safe(device->machine, "TOUCH_X",0x00);
     int y_val = input_port_read_safe(device->machine, "TOUCH_Y",0x00);
-    const rectangle *vis_area = video_screen_get_visible_area(device->machine->primary_screen);
+    const rectangle &vis_area = device->machine->primary_screen->visible_area();
     int xt, yt;
 
-    xt = x_val * (vis_area->max_x - vis_area->min_x) / 1024 + vis_area->min_x;
-    yt = y_val * (vis_area->max_y - vis_area->min_y) / 1024 + vis_area->min_y;
+    xt = x_val * (vis_area.max_x - vis_area.min_x) / 1024 + vis_area.min_x;
+    yt = y_val * (vis_area.max_y - vis_area.min_y) / 1024 + vis_area.min_y;
 
-     timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, yt, xt), (void *) device, 0, assert_lp_cb);
+     timer_set(device->machine, device->machine->primary_screen->time_until_pos(yt, xt), (void *) device, 0, assert_lp_cb);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)

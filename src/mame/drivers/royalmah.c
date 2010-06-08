@@ -3127,7 +3127,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( janoh )
 
 	MDRV_IMPORT_FROM(royalmah)
-	MDRV_CPU_REPLACE("maincpu", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(janho_map)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
@@ -3153,25 +3154,29 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dondenmj )
 	MDRV_IMPORT_FROM(royalmah)
-	MDRV_CPU_REPLACE("maincpu", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(dondenmj_iomap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( makaijan )
 	MDRV_IMPORT_FROM(royalmah)
-	MDRV_CPU_REPLACE("maincpu", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(makaijan_iomap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( daisyari )
 	MDRV_IMPORT_FROM(royalmah)
-	MDRV_CPU_REPLACE("maincpu", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(daisyari_iomap)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjclub )
 	MDRV_IMPORT_FROM(royalmah)
-	MDRV_CPU_REPLACE("maincpu", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(mjclub_iomap)
 MACHINE_DRIVER_END
 

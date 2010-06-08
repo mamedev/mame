@@ -36,17 +36,16 @@ struct _adc1038_state
 INLINE adc1038_state *adc1038_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == ADC1038);
+	assert(device->type() == ADC1038);
 
-	return (adc1038_state *)device->token;
+	return (adc1038_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const adc1038_interface *adc1038_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == ADC1038));
-	return (const adc1038_interface *) device->baseconfig().static_config;
+	assert((device->type() == ADC1038));
+	return (const adc1038_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -172,5 +171,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"A/D Converters 1038"
 #define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 1038"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"

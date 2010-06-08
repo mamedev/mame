@@ -105,10 +105,9 @@ struct _pit8253_t
 INLINE pit8253_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == PIT8253) || (device->type == PIT8254));
+	assert((device->type() == PIT8253) || (device->type() == PIT8254));
 
-	return (pit8253_t *) device->token;
+	return (pit8253_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -1072,7 +1071,7 @@ static void common_start( running_device *device, int device_type ) {
 	pit8253_t	*pit8253 = get_safe_token(device);
 	int			timerno;
 
-	pit8253->config = (const struct pit8253_config *)device->baseconfig().static_config;
+	pit8253->config = (const struct pit8253_config *)device->baseconfig().static_config();
 	pit8253->device_type = device_type;
 
 	/* register for state saving */
@@ -1162,7 +1161,6 @@ DEVICE_GET_INFO( pit8253 ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(pit8253_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(pit8253);	break;

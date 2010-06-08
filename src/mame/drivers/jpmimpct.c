@@ -241,7 +241,7 @@ static TIMER_DEVICE_CALLBACK( duart_1_timer_event )
 	duart_1.ISR |= 0x08;
 
 	duart_1_irq = 1;
-	update_irqs(timer->machine);
+	update_irqs(timer.machine);
 }
 
 static READ16_HANDLER( duart_1_r )
@@ -292,7 +292,8 @@ static READ16_HANDLER( duart_1_r )
 		case 0xe:
 		{
 			attotime rate = attotime_mul(ATTOTIME_IN_HZ(MC68681_1_CLOCK), 16 * duart_1.CT);
-			timer_device_adjust_periodic(devtag_get_device(space->machine, "duart_1_timer"), rate, 0, rate);
+			timer_device *duart_timer = space->machine->device<timer_device>("duart_1_timer");
+			duart_timer->adjust(rate, 0, rate);
 			break;
 		}
 		case 0xf:

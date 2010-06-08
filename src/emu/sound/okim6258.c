@@ -52,10 +52,8 @@ static int tables_computed = 0;
 INLINE okim6258_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_OKIM6258);
-	return (okim6258_state *)device->token;
+	assert(device->type() == SOUND_OKIM6258);
+	return (okim6258_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /**********************************************************************************************
@@ -192,19 +190,19 @@ static void okim6258_state_save_register(okim6258_state *info, running_device *d
 
 static DEVICE_START( okim6258 )
 {
-	const okim6258_interface *intf = (const okim6258_interface *)device->baseconfig().static_config;
+	const okim6258_interface *intf = (const okim6258_interface *)device->baseconfig().static_config();
 	okim6258_state *info = get_safe_token(device);
 
 	compute_tables();
 
-	info->master_clock = device->clock;
+	info->master_clock = device->clock();
 	info->adpcm_type = intf->adpcm_type;
 
 	/* D/A precision is 10-bits but 12-bit data can be output serially to an external DAC */
 	info->output_bits = intf->output_12bits ? 12 : 10;
 	info->divider = dividers[intf->divider];
 
-	info->stream = stream_create(device, 0, 1, device->clock/info->divider, info, okim6258_update);
+	info->stream = stream_create(device, 0, 1, device->clock()/info->divider, info, okim6258_update);
 
 	info->signal = -2;
 	info->step = 0;

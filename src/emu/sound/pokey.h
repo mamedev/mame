@@ -19,6 +19,8 @@
 #ifndef __POKEY_H__
 #define __POKEY_H__
 
+#include "devlegcy.h"
+
 /* CONSTANT DEFINITIONS */
 
 /* POKEY WRITE LOGICALS */
@@ -88,7 +90,6 @@ void pokey_serin_ready (running_device *device, int after);
 void pokey_break_w (running_device *device, int shift);
 void pokey_kbcode_w (running_device *device, int kbcode, int make);
 
-DEVICE_GET_INFO( pokey );
-#define SOUND_POKEY DEVICE_GET_INFO_NAME( pokey )
+DECLARE_LEGACY_SOUND_DEVICE(POKEY, pokey);
 
 #endif	/* __POKEY_H__ */

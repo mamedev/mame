@@ -1670,7 +1670,7 @@ struct _voodoo_state
 {
 	UINT8				index;					/* index of board */
 	running_device *device;				/* pointer to our containing device */
-	running_device *screen;				/* the screen we are acting on */
+	screen_device *screen;				/* the screen we are acting on */
 	running_device *cpu;					/* the CPU we interact with */
 	UINT8				type;					/* type of system */
 	UINT8				chipmask;				/* mask for which chips are available */

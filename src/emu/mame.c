@@ -41,7 +41,6 @@
                 - calls input_port_init() [inptport.c] to set up the input ports
                 - calls rom_init() [romload.c] to load the game's ROMs
                 - calls memory_init() [memory.c] to process the game's memory maps
-                - calls cpuexec_init() [cpuexec.c] to initialize the CPUs
                 - calls watchdog_init() [watchdog.c] to initialize the watchdog system
                 - calls the driver's DRIVER_INIT callback
                 - calls device_list_start() [devintrf.c] to start any devices
@@ -62,7 +61,7 @@
 
                 -------------------( at this point, we're up and running )----------------------
 
-            - calls cpuexec_timeslice() [cpuexec.c] over and over until we exit
+            - calls scheduler->timeslice() [schedule.c] over and over until we exit
             - ends resource tracking (level 2), freeing all auto_mallocs and timers
             - calls the nvram_save() [machine/generic.c] to save NVRAM
             - calls config_save_settings() [config.c] to save the game's configuration
@@ -201,26 +200,6 @@ static void logfile_callback(running_machine *machine, const char *buffer);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    eat_all_cpu_cycles - eat a ton of cycles on
-    all CPUs to force a quick exit
--------------------------------------------------*/
-
-INLINE void eat_all_cpu_cycles(running_machine *machine)
-{
-	running_device *cpu;
-
-    if(machine->cpuexec_data)
-		for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
-			cpu_eat_cycles(cpu, 1000000000);
-}
-
-
-
-/***************************************************************************
-    CORE IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
     mame_execute - run the core emulation
 -------------------------------------------------*/
 
@@ -258,6 +237,7 @@ int mame_execute(core_options *options)
 		/* otherwise, perform validity checks before anything else */
 		else if (mame_validitychecks(driver) != 0)
 			return MAMERR_FAILED_VALIDITY;
+
 		firstgame = FALSE;
 
 		/* parse any INI files as the first thing */
@@ -300,7 +280,7 @@ int mame_execute(core_options *options)
 			/* load the configuration settings and NVRAM */
 			settingsloaded = config_load_settings(machine);
 			nvram_load(machine);
-			sound_mute(machine, FALSE);
+ 			sound_mute(machine, FALSE);
 
 			/* display the startup screens */
 			ui_display_startup_screens(machine, firstrun, !settingsloaded);
@@ -317,7 +297,7 @@ int mame_execute(core_options *options)
 
 				/* execute CPUs if not paused */
 				if (!mame->paused)
-					cpuexec_timeslice(machine);
+					machine->scheduler.timeslice();
 
 				/* otherwise, just pump video updates through */
 				else
@@ -551,7 +531,7 @@ void mame_schedule_exit(running_machine *machine)
 		mame->exit_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	eat_all_cpu_cycles(machine);
+	machine->scheduler.eat_all_cycles();
 
 	/* if we're autosaving on exit, schedule a save as well */
 	if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
@@ -570,7 +550,7 @@ void mame_schedule_hard_reset(running_machine *machine)
 	mame->hard_reset_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	eat_all_cpu_cycles(machine);
+	machine->scheduler.eat_all_cycles();
 }
 
 
@@ -589,7 +569,7 @@ void mame_schedule_soft_reset(running_machine *machine)
 	mame_pause(machine, FALSE);
 
 	/* if we're executing, abort out immediately */
-	eat_all_cpu_cycles(machine);
+	machine->scheduler.eat_all_cycles();
 }
 
 
@@ -605,7 +585,7 @@ void mame_schedule_new_driver(running_machine *machine, const game_driver *drive
 	mame->new_driver_pending = driver;
 
 	/* if we're executing, abort out immediately */
-	eat_all_cpu_cycles(machine);
+	machine->scheduler.eat_all_cycles();
 }
 
 
@@ -744,7 +724,7 @@ int mame_is_paused(running_machine *machine)
 
 region_info::region_info(running_machine *_machine, const char *_name, UINT32 _length, UINT32 _flags)
 	: machine(_machine),
-	  next(NULL),
+	  m_next(NULL),
 	  name(_name),
 	  length(_length),
 	  flags(_flags)
@@ -837,7 +817,7 @@ const char *memory_region_next(running_machine *machine, const char *name)
 	if (name == NULL)
 		return (machine->regionlist.first() != NULL) ? machine->regionlist.first()->name.cstr() : NULL;
 	const region_info *region = machine->region(name);
-	return (region != NULL && region->next != NULL) ? region->next->name.cstr() : NULL;
+	return (region != NULL && region->next() != NULL) ? region->next()->name.cstr() : NULL;
 }
 
 
@@ -1182,7 +1162,6 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 #ifndef MESS
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
-		const device_config *device;
 		machine_config *config;
 
 		/* parse "vertical.ini" or "horizont.ini" */
@@ -1193,15 +1172,12 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 
 		/* parse "vector.ini" for vector games */
 		config = machine_config_alloc(driver->machine_config);
-		for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
-		{
-			const screen_config *scrconfig = (const screen_config *)device->inline_config;
-			if (scrconfig->type == SCREEN_TYPE_VECTOR)
+		for (const screen_device_config *devconfig = screen_first(*config); devconfig != NULL; devconfig = screen_next(devconfig))
+			if (devconfig->screen_type() == SCREEN_TYPE_VECTOR)
 			{
 				parse_ini_file(options, "vector", OPTION_PRIORITY_VECTOR_INI);
 				break;
 			}
-		}
 		machine_config_free(config);
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
@@ -1257,7 +1233,9 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 -------------------------------------------------*/
 
 running_machine::running_machine(const game_driver *driver)
-	: config(NULL),
+	: devicelist(respool),
+	  scheduler(*this),
+	  config(NULL),
 	  firstcpu(NULL),
 	  gamedrv(driver),
 	  basename(NULL),
@@ -1269,9 +1247,8 @@ running_machine::running_machine(const game_driver *driver)
 	  priority_bitmap(NULL),
 	  sample_rate(0),
 	  debug_flags(0),
-      ui_active(0),
+      ui_active(false),
 	  mame_data(NULL),
-	  cpuexec_data(NULL),
 	  timer_data(NULL),
 	  state_data(NULL),
 	  memory_data(NULL),
@@ -1316,7 +1293,7 @@ running_machine::running_machine(const game_driver *driver)
 
 		/* find devices */
 		firstcpu = cpu_first(this);
-		primary_screen = video_screen_first(this);
+		primary_screen = screen_first(*this);
 
 		/* fetch core options */
 		sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
@@ -1354,6 +1331,31 @@ running_machine::~running_machine()
 
 	global_machine = NULL;
 }
+
+
+//-------------------------------------------------
+//  describe_context - return a string describing
+//  which device is currently executing and its 
+//  PC
+//-------------------------------------------------
+
+const char *running_machine::describe_context()
+{
+	device_execute_interface *executing = scheduler.currently_executing();
+	if (executing != NULL)
+	{
+		cpu_device *cpu = downcast<cpu_device *>(&executing->device());
+		if (cpu != NULL)
+			m_context.printf("'%s' (%s)", cpu->tag(), core_i64_hex_format(cpu_get_pc(cpu), cpu->space(AS_PROGRAM)->logaddrchars));
+		else
+			m_context.printf("'%s'", cpu->tag());
+	}
+	else
+		m_context.cpy("(no context)");
+
+	return m_context;
+}
+
 
 
 /*-------------------------------------------------
@@ -1408,7 +1410,6 @@ static void init_machine(running_machine *machine)
 	/* these operations must proceed in this order */
 	rom_init(machine);
 	memory_init(machine);
-	cpuexec_init(machine);
 	watchdog_init(machine);
 
 	/* allocate the gfx elements prior to device initialization */

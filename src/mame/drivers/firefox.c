@@ -157,14 +157,14 @@ static VIDEO_START( firefox )
 {
 	bgtiles = tilemap_create(machine, bgtile_get_info, tilemap_scan_rows, 8,8, 64,64);
 	tilemap_set_transparent_pen(bgtiles, 0);
-	tilemap_set_scrolldy(bgtiles, video_screen_get_visible_area(machine->primary_screen)->min_y, 0);
+	tilemap_set_scrolldy(bgtiles, machine->primary_screen->visible_area().min_y, 0);
 }
 
 
 static VIDEO_UPDATE( firefox )
 {
 	int sprite;
-	int gfxtop = video_screen_get_visible_area(screen)->min_y;
+	int gfxtop = screen->visible_area().min_y;
 
 	bitmap_fill( bitmap, cliprect, palette_get_color(screen->machine, 256) );
 
@@ -198,9 +198,9 @@ static VIDEO_UPDATE( firefox )
 
 static TIMER_DEVICE_CALLBACK( video_timer_callback )
 {
-	video_screen_update_now(timer->machine->primary_screen);
+	timer.machine->primary_screen->update_now();
 
-	cputag_set_input_line( timer->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE );
+	cputag_set_input_line( timer.machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE );
 }
 
 static void set_rgba( running_machine *machine, int start, int index, unsigned char *palette_ram )

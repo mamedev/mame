@@ -118,15 +118,15 @@ static TIMER_CALLBACK( cia_clock_tod_callback );
 INLINE cia_state *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == MOS6526R1) || (device->type == MOS6526R2) || (device->type == MOS8520));
-	return (cia_state *) device->token;
+	assert((device->type() == MOS6526R1) || (device->type() == MOS6526R2) || (device->type() == MOS8520));
+	return (cia_state *) downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const mos6526_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == MOS6526R1) || (device->type == MOS6526R2) || (device->type == MOS8520));
-	return (mos6526_interface *) device->baseconfig().static_config;
+	assert((device->type() == MOS6526R1) || (device->type() == MOS6526R2) || (device->type() == MOS8520));
+	return (mos6526_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -194,11 +194,12 @@ static DEVICE_RESET( cia )
     DEVICE_VALIDITY_CHECK( cia )
 -------------------------------------------------*/
 
+#if 0
 static DEVICE_VALIDITY_CHECK( cia )
 {
 	int error = FALSE;
 
-	if (device->clock <= 0)
+	if (device->clock() <= 0)
 	{
 		mame_printf_error("%s: %s has a cia with an invalid clock\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -206,6 +207,7 @@ static DEVICE_VALIDITY_CHECK( cia )
 
 	return error;
 }
+#endif
 
 /*-------------------------------------------------
     cia_update_pc - pulse /pc output
@@ -269,7 +271,7 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	/* update the timer count, if necessary */
 	if ((new_count == -1) && is_timer_active(timer->timer))
 	{
-		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), timer->cia->device->clock));
+		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), timer->cia->device->clock()));
 		timer->count = timer->count - MIN(timer->count, current_count);
 	}
 
@@ -281,7 +283,7 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	if ((timer->mode & 0x01) && ((timer->mode & (which ? 0x60 : 0x20)) == 0x00))
 	{
 		/* timer is on and is connected to clock */
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(timer->cia->device->clock), (timer->count ? timer->count : 0x10000));
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(timer->cia->device->clock()), (timer->count ? timer->count : 0x10000));
 		timer_adjust_oneshot(timer->timer, period, 0);
 	}
 	else
@@ -302,7 +304,7 @@ static UINT16 cia_get_timer(cia_timer *timer)
 
 	if (is_timer_active(timer->timer))
 	{
-		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), timer->cia->device->clock));
+		UINT16 current_count = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), timer->cia->device->clock()));
 		count = timer->count - MIN(timer->count, current_count);
 	}
 	else
@@ -489,13 +491,13 @@ static void cia_clock_tod(running_device *device)
 
 	if (cia->tod_running)
 	{
-		if ((device->type == MOS6526R1) || (device->type == MOS6526R2))
+		if ((device->type() == MOS6526R1) || (device->type() == MOS6526R2))
 		{
 			/* The 6526 split the value into hours, minutes, seconds and
              * subseconds */
 			cia6526_increment(cia);
 		}
-		else if (device->type == MOS8520)
+		else if (device->type() == MOS8520)
 		{
 			/* the 8520 has a straight 24-bit counter */
 			cia->tod++;
@@ -695,7 +697,7 @@ READ8_DEVICE_HANDLER( mos6526_r )
 		case CIA_TOD1:
 		case CIA_TOD2:
 		case CIA_TOD3:
-			if (device->type == MOS8520)
+			if (device->type() == MOS8520)
 			{
 				if (offset == CIA_TOD2)
 				{
@@ -821,7 +823,7 @@ WRITE8_DEVICE_HANDLER( mos6526_w )
 			else
 				cia->tod = (cia->tod & ~(0xff << shift)) | (data << shift);
 
-			if (device->type == MOS8520)
+			if (device->type() == MOS8520)
 			{
 				if (offset == CIA_TOD2)
 					cia->tod_running = FALSE;
@@ -956,13 +958,12 @@ DEVICE_GET_INFO(cia6526r1)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cia_state);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cia);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cia);		break;
-		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(cia); break;
+//		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(cia); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "MOS6526 rev1");			break;

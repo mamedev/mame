@@ -68,10 +68,8 @@ struct _ics2115_state
 INLINE ics2115_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_ICS2115);
-	return (ics2115_state *)device->token;
+	assert(device->type() == SOUND_ICS2115);
+	return (ics2115_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static void recalc_irq(ics2115_state *chip)
@@ -476,8 +474,8 @@ static DEVICE_START( ics2115 )
 	int i, vv;
 
 	chip->device = device;
-	chip->intf = (const ics2115_interface *)device->baseconfig().static_config;
-	chip->rom = *device->region;
+	chip->intf = (const ics2115_interface *)device->baseconfig().static_config();
+	chip->rom = *device->region();
 	chip->timer[0].timer = timer_alloc(device->machine, timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc(device->machine, timer_cb_1, chip);
 	chip->ulaw = auto_alloc_array(device->machine, INT16, 256);

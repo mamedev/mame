@@ -1137,11 +1137,11 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 		INT32 ytopleft,ymiddle;
 		int xinc,yinc;
 
-		const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-		clip.min_x = visarea->min_x;
-		clip.max_x = visarea->max_x;
-		clip.min_y = visarea->min_y;
-		clip.max_y = visarea->max_y;
+		const rectangle &visarea = machine->primary_screen->visible_area();
+		clip.min_x = visarea.min_x;
+		clip.max_x = visarea.max_x;
+		clip.min_y = visarea.min_y;
+		clip.max_y = visarea.max_y;
 
 		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
 		{
@@ -1677,7 +1677,7 @@ VIDEO_UPDATE( hng64 )
 
 VIDEO_START( hng64 )
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	hng64_tilemap0_8x8       = tilemap_create(machine, get_hng64_tile0_8x8_info,   tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
 	hng64_tilemap0_16x16     = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
@@ -1716,8 +1716,8 @@ VIDEO_START( hng64 )
 	additive_tilemap_debug = 0;
 
 	// 3d Buffer Allocation
-	depthBuffer3d = auto_alloc_array(machine, float,  (visarea->max_x)*(visarea->max_y));
-	colorBuffer3d = auto_alloc_array(machine, UINT32, (visarea->max_x)*(visarea->max_y));
+	depthBuffer3d = auto_alloc_array(machine, float,  (visarea.max_x)*(visarea.max_y));
+	colorBuffer3d = auto_alloc_array(machine, UINT32, (visarea.max_x)*(visarea.max_y));
 }
 
 
@@ -2024,7 +2024,7 @@ static void recoverPolygonBlock(running_machine* machine, const UINT16* packet, 
 	setIdentity(objectMatrix);
 
 	struct polygon lastPoly = { 0 };
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	/////////////////
 	// HEADER INFO //
@@ -2515,11 +2515,11 @@ static void recoverPolygonBlock(running_machine* machine, const UINT16* packet, 
 						ndCoords[3] = polys[*numPolys].vert[m].clipCoords[3];
 
 						// Final pixel values are garnered here :
-						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea->max_x) / 2.0f) + 0.0f;
-						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea->max_y) / 2.0f) + 0.0f;
+						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea.max_x) / 2.0f) + 0.0f;
+						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea.max_y) / 2.0f) + 0.0f;
 						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
 
-						windowCoords[1] = (float)visarea->max_y - windowCoords[1];		// Flip Y
+						windowCoords[1] = (float)visarea.max_y - windowCoords[1];		// Flip Y
 
 						// Store the points in a list for later use...
 						polys[*numPolys].vert[m].clipCoords[0] = windowCoords[0];
@@ -2635,7 +2635,7 @@ static void clear3d(running_machine *machine)
 {
 	int i;
 
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	// Clear each of the display list buffers after drawing - todo: kill!
 	for (i = 0; i < 0x81; i++)
@@ -2645,7 +2645,7 @@ static void clear3d(running_machine *machine)
 	}
 
 	// Reset the buffers...
-	for (i = 0; i < (visarea->max_x)*(visarea->max_y); i++)
+	for (i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
 	{
 		depthBuffer3d[i] = 100.0f;
 		colorBuffer3d[i] = MAKE_ARGB(0,0,0,0);
@@ -2912,7 +2912,7 @@ static void performFrustumClip(struct polygon *p)
 #ifdef UNUSED_FUNCTION
 static void plot(running_machine *machine, INT32 x, INT32 y, UINT32 color)
 {
-	UINT32* cb = &(colorBuffer3d[(y * video_screen_get_visible_area(machine->primary_screen)->max_x) + x]);
+	UINT32* cb = &(colorBuffer3d[(y * machine->primary_screen->visible_area().max_x) + x]);
 	*cb = color;
 }
 
@@ -3028,8 +3028,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 										  float g_start, float g_delta, float b_start, float b_delta,
 										  float s_start, float s_delta, float t_start, float t_delta)
 {
-	float*  db = &(depthBuffer3d[(y * video_screen_get_visible_area(machine->primary_screen)->max_x) + x_start]);
-	UINT32* cb = &(colorBuffer3d[(y * video_screen_get_visible_area(machine->primary_screen)->max_x) + x_start]);
+	float*  db = &(depthBuffer3d[(y * machine->primary_screen->visible_area().max_x) + x_start]);
+	UINT32* cb = &(colorBuffer3d[(y * machine->primary_screen->visible_area().max_x) + x_start]);
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;

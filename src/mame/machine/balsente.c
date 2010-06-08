@@ -37,23 +37,23 @@ static TIMER_CALLBACK( irq_off )
 
 TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
 {
-	balsente_state *state = (balsente_state *)timer->machine->driver_data;
+	balsente_state *state = (balsente_state *)timer.machine->driver_data;
 
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		timer_device_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, 64, 0), 64);
+		state->scanline_timer->adjust(timer.machine->primary_screen->time_until_pos(64), 64);
 	else
-		timer_device_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, param + 64, 0), param + 64);
+		state->scanline_timer->adjust(timer.machine->primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cputag_set_input_line(timer->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(timer->machine, video_screen_get_time_until_pos(timer->machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
+	timer_set(timer.machine, timer.machine->primary_screen->time_until_pos(param, BALSENTE_HBSTART), NULL, 0, irq_off);
 
 	/* if this is Grudge Match, update the steering */
 	if (state->grudge_steering_result & 0x80)
-		update_grudge_steering(timer->machine);
+		update_grudge_steering(timer.machine);
 
 	/* if we're a shooter, we do a little more work */
 	if (state->shooter)
@@ -63,8 +63,8 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
 		/* we latch the beam values on the first interrupt after VBLANK */
 		if (param == 64)
 		{
-			state->shooter_x = input_port_read(timer->machine, "FAKEX");
-			state->shooter_y = input_port_read(timer->machine, "FAKEY");
+			state->shooter_x = input_port_read(timer.machine, "FAKEX");
+			state->shooter_y = input_port_read(timer.machine, "FAKEY");
 		}
 
 		/* which bits get returned depends on which scanline we're at */
@@ -134,16 +134,15 @@ MACHINE_RESET( balsente )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	balsente_state *state = (balsente_state *)machine->driver_data;
-	int numbanks, i;
+	int numbanks;
 
 	/* reset counters; counter 2's gate is tied high */
 	memset(state->counter, 0, sizeof(state->counter));
-	state->counter[1].timer = devtag_get_device(machine, "8253_1_timer");
-	state->counter[2].timer = devtag_get_device(machine, "8253_2_timer");
+	state->counter[1].timer = machine->device<timer_device>("8253_1_timer");
+	state->counter[2].timer = machine->device<timer_device>("8253_2_timer");
 	state->counter[2].gate = 1;
 
 	/* reset the manual counter 0 clock */
-	state->counter_0_timer = devtag_get_device(machine, "8253_0_timer");
 	state->counter_control = 0x00;
 	state->counter_0_ff = 0;
 	state->counter_0_timer_active = 0;
@@ -166,15 +165,6 @@ MACHINE_RESET( balsente )
 	/* reset the noise generator */
 	memset(state->noise_position, 0, sizeof(state->noise_position));
 
-	/* find the CEM devices */
-	for (i = 0; i < ARRAY_LENGTH(state->cem_device); i++)
-	{
-		char name[10];
-		sprintf(name, "cem%d", i+1);
-		state->cem_device[i] = devtag_get_device(machine, name);
-		assert(state->cem_device[i] != NULL);
-	}
-
 	/* point the banks to bank 0 */
 	numbanks = (memory_region_length(machine, "maincpu") > 0x40000) ? 16 : 8;
 	memory_configure_bank(machine, "bank1", 0, numbanks, &memory_region(machine, "maincpu")[0x10000], 0x6000);
@@ -184,8 +174,7 @@ MACHINE_RESET( balsente )
 	machine->device("maincpu")->reset();
 
 	/* start a timer to generate interrupts */
-	state->scanline_timer = devtag_get_device(machine, "scan_timer");
-	timer_device_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 
@@ -230,15 +219,8 @@ void balsente_noise_gen(running_device *device, int count, short *buffer)
 
 	/* find the chip we are referring to */
 	for (chip = 0; chip < ARRAY_LENGTH(state->cem_device); chip++)
-	{
 		if (device == state->cem_device[chip])
 			break;
-		else if (state->cem_device[chip] == NULL)
-		{
-			state->cem_device[chip] = device;
-			break;
-		}
-	}
 	assert(chip < ARRAY_LENGTH(state->cem_device));
 
 	/* noise generator runs at 100kHz */
@@ -661,7 +643,7 @@ INLINE void counter_start(balsente_state *state, int which)
 		if (state->counter[which].gate && !state->counter[which].timer_active)
 		{
 			state->counter[which].timer_active = 1;
-			timer_device_adjust_oneshot(state->counter[which].timer, attotime_mul(ATTOTIME_IN_HZ(2000000), state->counter[which].count), which);
+			state->counter[which].timer->adjust(attotime_mul(ATTOTIME_IN_HZ(2000000), state->counter[which].count), which);
 		}
 	}
 }
@@ -671,7 +653,7 @@ INLINE void counter_stop(balsente_state *state, int which)
 {
 	/* only stop the timer if it exists */
 	if (state->counter[which].timer_active)
-		timer_device_adjust_oneshot(state->counter[which].timer, attotime_never, 0);
+		state->counter[which].timer->reset();
 	state->counter[which].timer_active = 0;
 }
 
@@ -682,7 +664,7 @@ INLINE void counter_update_count(balsente_state *state, int which)
 	if (state->counter[which].timer_active)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = attotime_to_double(attotime_mul(timer_device_timeleft(state->counter[which].timer), 2000000));
+		int count = attotime_to_double(attotime_mul(state->counter[which].timer->time_left(), 2000000));
 		state->counter[which].count = (count < 0) ? 0 : count;
 	}
 }
@@ -750,7 +732,7 @@ static void counter_set_out(running_machine *machine, int which, int out)
 
 TIMER_DEVICE_CALLBACK( balsente_counter_callback )
 {
-	balsente_state *state = (balsente_state *)timer->machine->driver_data;
+	balsente_state *state = (balsente_state *)timer.machine->driver_data;
 
 	/* reset the counter and the count */
 	state->counter[param].timer_active = 0;
@@ -759,7 +741,7 @@ TIMER_DEVICE_CALLBACK( balsente_counter_callback )
 	/* set the state of the OUT line */
 	/* mode 0 and 1: when firing, transition OUT to high */
 	if (state->counter[param].mode == 0 || state->counter[param].mode == 1)
-		counter_set_out(timer->machine, param, 1);
+		counter_set_out(timer.machine, param, 1);
 
 	/* no other modes handled currently */
 }
@@ -884,9 +866,9 @@ WRITE8_HANDLER( balsente_counter_8253_w )
  *
  *************************************/
 
-static void set_counter_0_ff(running_device *timer, int newstate)
+static void set_counter_0_ff(timer_device &timer, int newstate)
 {
-	balsente_state *state = (balsente_state *)timer->machine->driver_data;
+	balsente_state *state = (balsente_state *)timer.machine->driver_data;
 
 	/* the flip/flop output is inverted, so if we went high to low, that's a clock */
 	if (state->counter_0_ff && !newstate)
@@ -907,7 +889,7 @@ static void set_counter_0_ff(running_device *timer, int newstate)
 
 TIMER_DEVICE_CALLBACK( balsente_clock_counter_0_ff )
 {
-	balsente_state *state = (balsente_state *)timer->machine->driver_data;
+	balsente_state *state = (balsente_state *)timer.machine->driver_data;
 
 	/* clock the D value through the flip-flop */
 	set_counter_0_ff(timer, (state->counter_control >> 3) & 1);
@@ -921,7 +903,7 @@ static void update_counter_0_timer(balsente_state *state)
 
 	/* if there's already a timer, remove it */
 	if (state->counter_0_timer_active)
-		timer_device_adjust_oneshot(state->counter_0_timer, attotime_never, 0);
+		state->counter_0_timer->reset();
 	state->counter_0_timer_active = 0;
 
 	/* find the counter with the maximum frequency */
@@ -946,7 +928,7 @@ static void update_counter_0_timer(balsente_state *state)
 	if (maxfreq > 0.0)
 	{
 		state->counter_0_timer_active = 1;
-		timer_device_adjust_periodic(state->counter_0_timer, ATTOTIME_IN_HZ(maxfreq), 0, ATTOTIME_IN_HZ(maxfreq));
+		state->counter_0_timer->adjust(ATTOTIME_IN_HZ(maxfreq), 0, ATTOTIME_IN_HZ(maxfreq));
 	}
 }
 
@@ -998,7 +980,7 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	/* if we gate off, remove the timer */
 	else if (state->counter[0].gate && !(data & 0x02) && state->counter_0_timer_active)
 	{
-		timer_device_adjust_oneshot(state->counter_0_timer, attotime_never, 0);
+		state->counter_0_timer->reset();
 		state->counter_0_timer_active = 0;
 	}
 
@@ -1006,8 +988,8 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	counter_set_gate(space->machine, 0, (data >> 1) & 1);
 
 	/* bits D2 and D4 control the clear/reset flags on the flip-flop that feeds counter 0 */
-	if (!(data & 0x04)) set_counter_0_ff(state->counter_0_timer, 1);
-	if (!(data & 0x10)) set_counter_0_ff(state->counter_0_timer, 0);
+	if (!(data & 0x04)) set_counter_0_ff(*state->counter_0_timer, 1);
+	if (!(data & 0x10)) set_counter_0_ff(*state->counter_0_timer, 0);
 
 	/* bit 5 clears the NMI interrupt; recompute the I/O state now */
 	m6850_update_io(space->machine);
@@ -1209,7 +1191,7 @@ static void update_grudge_steering(running_machine *machine)
 READ8_HANDLER( grudge_steering_r )
 {
 	balsente_state *state = (balsente_state *)space->machine->driver_data;
-	logerror("%04X:grudge_steering_r(@%d)\n", cpu_get_pc(space->cpu), video_screen_get_vpos(space->machine->primary_screen));
+	logerror("%04X:grudge_steering_r(@%d)\n", cpu_get_pc(space->cpu), space->machine->primary_screen->vpos());
 	state->grudge_steering_result |= 0x80;
 	return state->grudge_steering_result;
 }

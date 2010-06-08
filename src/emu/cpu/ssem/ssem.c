@@ -29,10 +29,9 @@ struct _ssem_state
 INLINE ssem_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->token != NULL);
-    assert(device->type == CPU);
+    assert(device->type() == CPU);
     assert(cpu_get_type(device) == CPU_SSEM);
-    return (ssem_state *)device->token;
+    return (ssem_state *)downcast<cpu_device *>(device)->token();
 }
 
 #define INSTR       ((op >> 13) & 7)
@@ -152,7 +151,7 @@ static CPU_INIT( ssem )
     cpustate->halt = 0;
 
     cpustate->device = device;
-    cpustate->program = device->space(AS_PROGRAM);
+    cpustate->program = device_memory(device)->space(AS_PROGRAM);
 }
 
 static CPU_EXIT( ssem )
@@ -256,7 +255,7 @@ static CPU_SET_INFO( ssem )
 
 CPU_GET_INFO( ssem )
 {
-    ssem_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+    ssem_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch(state)
     {

@@ -42,11 +42,18 @@ EMUOBJS = \
 	$(EMUOBJ)/cheat.o \
 	$(EMUOBJ)/clifront.o \
 	$(EMUOBJ)/config.o \
-	$(EMUOBJ)/cpuexec.o \
 	$(EMUOBJ)/crsshair.o \
 	$(EMUOBJ)/debugger.o \
 	$(EMUOBJ)/devcb.o \
+	$(EMUOBJ)/devcpu.o \
+	$(EMUOBJ)/devlegcy.o \
 	$(EMUOBJ)/devintrf.o \
+	$(EMUOBJ)/didisasm.o \
+	$(EMUOBJ)/diexec.o \
+	$(EMUOBJ)/dimemory.o \
+	$(EMUOBJ)/dinvram.o \
+	$(EMUOBJ)/disound.o \
+	$(EMUOBJ)/distate.o \
 	$(EMUOBJ)/drawgfx.o \
 	$(EMUOBJ)/driver.o \
 	$(EMUOBJ)/emualloc.o \
@@ -68,6 +75,7 @@ EMUOBJS = \
 	$(EMUOBJ)/rendlay.o \
 	$(EMUOBJ)/rendutil.o \
 	$(EMUOBJ)/romload.o \
+	$(EMUOBJ)/schedule.o \
 	$(EMUOBJ)/sound.o \
 	$(EMUOBJ)/state.o \
 	$(EMUOBJ)/streams.o \

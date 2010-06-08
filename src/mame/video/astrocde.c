@@ -223,7 +223,7 @@ VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(1), 1);
 
 	/* register for save states */
 	init_savestate(machine);
@@ -238,7 +238,7 @@ VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(1), 1);
 
 	/* allocate videoram */
 	profpac_videoram = auto_alloc_array(machine, UINT16, 0x4000 * 4);
@@ -308,11 +308,11 @@ VIDEO_UPDATE( astrocde )
 	int y;
 
 	/* compute the starting point of sparkle for the current frame */
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	int width = screen->width();
+	int height = screen->height();
 
 	if (astrocade_video_config & AC_STARS)
-		sparklebase = (video_screen_get_frame_number(screen) * (UINT64)(width * height)) % RNG_PERIOD;
+		sparklebase = (screen->frame_number() * (UINT64)(width * height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -441,7 +441,7 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		if ((interrupt_enable & 0x01) == 0)
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector & 0xf0);
-			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
+			timer_set(machine, machine->primary_screen->time_until_vblank_end(), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
@@ -472,7 +472,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* force an update against the current scanline */
 	if (scanline > 0)
-		video_screen_update_partial(machine->primary_screen, scanline - 1);
+		machine->primary_screen->update_partial(scanline - 1);
 
 	/* generate a scanline interrupt if it's time */
 	if (astrocade_scanline == interrupt_scanline && (interrupt_enable & 0x08) != 0)
@@ -481,7 +481,7 @@ static TIMER_CALLBACK( scanline_callback )
 		if ((interrupt_enable & 0x04) == 0)
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector);
-			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
+			timer_set(machine, machine->primary_screen->time_until_vblank_end(), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
@@ -498,9 +498,9 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* advance to the next scanline */
 	scanline++;
-	if (scanline >= video_screen_get_height(machine->primary_screen))
+	if (scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 

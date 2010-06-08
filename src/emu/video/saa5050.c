@@ -59,17 +59,16 @@ struct _saa5050_state
 INLINE saa5050_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SAA5050);
+	assert(device->type() == SAA5050);
 
-	return (saa5050_state *)device->token;
+	return (saa5050_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const saa5050_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == SAA5050));
-	return (const saa5050_interface *) device->baseconfig().static_config;
+	assert((device->type() == SAA5050));
+	return (const saa5050_interface *) device->baseconfig().static_config();
 }
 
 /*************************************
@@ -385,6 +384,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"SAA5050"
 #define DEVTEMPLATE_FAMILY		"SAA5050 Teletext Character Generator"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
 #include "devtempl.h"
 

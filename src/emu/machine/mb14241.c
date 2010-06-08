@@ -21,10 +21,9 @@ struct _mb14241_state
 INLINE mb14241_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == MB14241);
+	assert(device->type() == MB14241);
 
-	return (mb14241_state *)device->token;
+	return (mb14241_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -75,5 +74,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"MB14241"
 #define DEVTEMPLATE_FAMILY		"MB14241 Shifter IC"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
 #include "devtempl.h"

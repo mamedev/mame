@@ -1,4 +1,6 @@
 
+#include "sound/okim6295.h"
+
 struct f2_tempsprite
 {
 	int code, color;
@@ -13,7 +15,8 @@ class taitof2_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitof2_state(machine)); }
 
-	taitof2_state(running_machine &machine) { }
+	taitof2_state(running_machine &machine) 
+		: oki(machine.device<okim6295_device>("oki")) { }
 
 	/* memory pointers */
 	UINT16 *        sprite_extension;
@@ -66,7 +69,7 @@ public:
 	/* devices */
 	running_device *maincpu;
 	running_device *audiocpu;
-	running_device *oki;
+	okim6295_device *oki;
 	running_device *tc0100scn;
 	running_device *tc0100scn_1;
 	running_device *tc0100scn_2;

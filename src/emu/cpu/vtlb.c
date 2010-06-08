@@ -30,7 +30,7 @@
 /* VTLB state */
 struct _vtlb_state
 {
-	running_device *device;			/* CPU device */
+	cpu_device *		cpudevice;			/* CPU device */
 	int					space;				/* address space */
 	int 				dynamic;			/* number of dynamic entries */
 	int					fixed;				/* number of fixed entries */
@@ -41,7 +41,6 @@ struct _vtlb_state
 	int *				fixedpages;			/* number of pages each fixed entry covers */
 	vtlb_entry *		table;				/* table of entries by address */
 	vtlb_entry *		save;				/* cache of live table entries for saving */
-	cpu_translate_func	translate;			/* translate function */
 };
 
 
@@ -63,17 +62,17 @@ vtlb_state *vtlb_alloc(running_device *cpu, int space, int fixed_entries, int dy
 	vtlb = auto_alloc_clear(cpu->machine, vtlb_state);
 
 	/* fill in CPU information */
-	vtlb->device = cpu;
+	vtlb->cpudevice = downcast<cpu_device *>(cpu);
 	vtlb->space = space;
 	vtlb->dynamic = dynamic_entries;
 	vtlb->fixed = fixed_entries;
-	vtlb->pageshift = cpu_get_page_shift(cpu, space);
-	vtlb->addrwidth = cpu_get_logaddr_width(cpu, space);
-	vtlb->translate = (cpu_translate_func)cpu->get_config_fct(CPUINFO_FCT_TRANSLATE);
+	const address_space_config *spaceconfig = devconfig_get_space_config(cpu->baseconfig(), space);
+	assert(spaceconfig != NULL);
+	vtlb->pageshift = spaceconfig->m_page_shift;
+	vtlb->addrwidth = spaceconfig->m_logaddr_width;
 
 	/* validate CPU information */
 	assert((1 << vtlb->pageshift) > VTLB_FLAGS_MASK);
-	assert(vtlb->translate != NULL);
 	assert(vtlb->addrwidth > vtlb->pageshift);
 
 	/* allocate the entry array */
@@ -102,16 +101,16 @@ void vtlb_free(vtlb_state *vtlb)
 {
 	/* free the fixed pages if allocated */
 	if (vtlb->fixedpages != NULL)
-		auto_free(vtlb->device->machine, vtlb->fixedpages);
+		auto_free(vtlb->cpudevice->machine, vtlb->fixedpages);
 
 	/* free the table and array if they exist */
 	if (vtlb->live != NULL)
-		auto_free(vtlb->device->machine, vtlb->live);
+		auto_free(vtlb->cpudevice->machine, vtlb->live);
 	if (vtlb->table != NULL)
-		auto_free(vtlb->device->machine, vtlb->table);
+		auto_free(vtlb->cpudevice->machine, vtlb->table);
 
 	/* and then the VTLB object itself */
-	auto_free(vtlb->device->machine, vtlb);
+	auto_free(vtlb->cpudevice->machine, vtlb);
 }
 
 
@@ -147,7 +146,7 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention)
 
 	/* ask the CPU core to translate for us */
 	taddress = address;
-	if (!(*vtlb->translate)(vtlb->device, vtlb->space, intention, &taddress))
+	if (!vtlb->cpudevice->translate(vtlb->space, intention, taddress))
 	{
 		if (PRINTF_TLB)
 			printf("failed: no translation\n");

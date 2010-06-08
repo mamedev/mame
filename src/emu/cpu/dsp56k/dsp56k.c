@@ -232,11 +232,11 @@ static CPU_INIT( dsp56k )
 	state_save_register_device_item(device, 0, cpustate->HI.trxl);
 	state_save_register_device_item(device, 0, cpustate->HI.bootstrap_offset);
 
-	//cpustate->config = device->baseconfig().static_config;
+	//cpustate->config = device->baseconfig().static_config();
 	//cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
 
 	/* Setup the direct memory handler for this CPU */
 	/* NOTE: Be sure to grab this guy and call him if you ever install another direct_update_hander in a driver! */
@@ -436,7 +436,7 @@ static CPU_SET_INFO( dsp56k )
 
 CPU_GET_INFO( dsp56k )
 {
-	dsp56k_core* cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	dsp56k_core* cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

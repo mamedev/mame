@@ -371,10 +371,9 @@ struct _apexc_state
 INLINE apexc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_APEXC);
-	return (apexc_state *)device->token;
+	return (apexc_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -803,8 +802,8 @@ static CPU_INIT( apexc )
 	apexc_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->a);
 	state_save_register_device_item(device, 0, cpustate->r);
@@ -890,7 +889,7 @@ static CPU_SET_INFO( apexc )
 
 CPU_GET_INFO( apexc )
 {
-	apexc_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	apexc_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

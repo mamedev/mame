@@ -52,7 +52,7 @@ void _profiler_mark_start(int type)
 	int index;
 
 	/* track context switches */
-	if (type >= PROFILER_CPU_FIRST && type <= PROFILER_CPU_MAX)
+	if (type >= PROFILER_DEVICE_FIRST && type <= PROFILER_DEVICE_MAX)
 		data->context_switches++;
 
 	/* we're starting a new bucket, begin now */
@@ -185,8 +185,8 @@ astring &_profiler_get_text(running_machine *machine, astring &string)
 				string.catprintf("%02d%% ", (int)((computed * 100 + normalize/2) / normalize));
 
 			/* and then the text */
-			if (curtype >= PROFILER_CPU_FIRST && curtype <= PROFILER_CPU_MAX)
-				string.catprintf("CPU '%s'", machine->devicelist.find(CPU, curtype - PROFILER_CPU_FIRST)->tag());
+			if (curtype >= PROFILER_DEVICE_FIRST && curtype <= PROFILER_DEVICE_MAX)
+				string.catprintf("'%s'", machine->devicelist.find(curtype - PROFILER_DEVICE_FIRST)->tag());
 			else
 				for (nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
 					if (names[nameindex].type == curtype)

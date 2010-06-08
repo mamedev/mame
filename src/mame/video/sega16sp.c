@@ -15,17 +15,16 @@ UINT16 *segaic16_spriteram_1;
 INLINE sega16sp_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SEGA16SP);
+	assert(device->type() == SEGA16SP);
 
-	return (sega16sp_state *)device->token;
+	return (sega16sp_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const sega16sp_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == SEGA16SP));
-	return (const sega16sp_interface *) device->baseconfig().static_config;
+	assert((device->type() == SEGA16SP));
+	return (const sega16sp_interface *) device->baseconfig().static_config();
 }
 
 /*******************************************************************************************
@@ -1503,8 +1502,8 @@ void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum,
 
 	if (sega16sp->bank[banknum] != offset)
 	{
-		running_device *screen = machine->primary_screen;
-		video_screen_update_partial(screen, video_screen_get_vpos(screen));
+		screen_device *screen = machine->primary_screen;
+		screen->update_partial(screen->vpos());
 		sega16sp->bank[banknum] = offset;
 	}
 }
@@ -1534,8 +1533,8 @@ void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 	flip = (flip != 0);
 	if (sega16sp->flip != flip)
 	{
-		running_device *screen = machine->primary_screen;
-		video_screen_update_partial(screen, video_screen_get_vpos(screen));
+		screen_device *screen = machine->primary_screen;
+		screen->update_partial(screen->vpos());
 		sega16sp->flip = flip;
 	}
 }
@@ -1565,8 +1564,8 @@ void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow
 	shadow = (shadow != 0);
 	if (sega16sp->shadow != shadow)
 	{
-		running_device *screen = machine->primary_screen;
-		video_screen_update_partial(screen, video_screen_get_vpos(screen));
+		screen_device *screen = machine->primary_screen;
+		screen->update_partial(screen->vpos());
 		sega16sp->shadow = shadow;
 	}
 }
@@ -1683,7 +1682,6 @@ DEVICE_GET_INFO( sega16sp )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(sega16sp_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(sega16sp);		break;

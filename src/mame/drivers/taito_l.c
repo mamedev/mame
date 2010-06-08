@@ -2328,8 +2328,8 @@ static MACHINE_DRIVER_START( lagirl )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(XTAL_27_2109MHz/4)
 	MDRV_CPU_PROGRAM_MAP(cachat_map)
-	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_27_2109MHz/4)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ymsnd", YM2203, XTAL_27_2109MHz/8)

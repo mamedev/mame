@@ -165,10 +165,10 @@ VIDEO_START( amiga )
  *
  *************************************/
 
-UINT32 amiga_gethvpos(running_device *screen)
+UINT32 amiga_gethvpos(screen_device &screen)
 {
-	UINT32 hvpos = (last_scanline << 8) | (video_screen_get_hpos(screen) >> 2);
-	UINT32 latchedpos = input_port_read_safe(screen->machine, "HVPOS", 0);
+	UINT32 hvpos = (last_scanline << 8) | (screen.hpos() >> 2);
+	UINT32 latchedpos = input_port_read_safe(screen.machine, "HVPOS", 0);
 
 	/* if there's no latched position, or if we are in the active display area */
 	/* but before the latching point, return the live HV position */
@@ -921,7 +921,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 	}
 
 #if 0
-	if ( video_screen_get_frame_number(machine->primary_screen) % 64 == 0 && scanline == 100 )
+	if ( machine->primary_screen->frame_number() % 64 == 0 && scanline == 100 )
 	{
 		const char *m_lores = "LORES";
 		const char *m_hires = "HIRES";
@@ -958,7 +958,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 	CUSTOM_REG(REG_COLOR00) = save_color0;
 
 #if GUESS_COPPER_OFFSET
-	if (video_screen_get_frame_number(machine->primary_screen) % 64 == 0 && scanline == 0)
+	if (machine->primary_screen->frame_number() % 64 == 0 && scanline == 0)
 	{
 		if (input_code_pressed(machine, KEYCODE_Q))
 			popmessage("%d", wait_offset -= 1);

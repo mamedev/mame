@@ -74,7 +74,7 @@ struct	_m65ce02_Regs {
 	UINT8	nmi_state;
 	UINT8	irq_state;
 	int		icount;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	running_device *device;
 	const address_space *space;
 	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
@@ -84,10 +84,9 @@ struct	_m65ce02_Regs {
 INLINE m65ce02_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M65CE02);
-	return (m65ce02_Regs *)device->token;
+	return (m65ce02_Regs *)downcast<cpu_device *>(device)->token();
 }
 
 /***************************************************************
@@ -102,13 +101,13 @@ static void default_wdmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m65ce02 )
 {
 	m65ce02_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
 
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wdmem_id;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->space = device_memory(device)->space(AS_PROGRAM);
 
 	if ( intf )
 	{
@@ -276,7 +275,7 @@ static CPU_SET_INFO( m65ce02 )
 
 CPU_GET_INFO( m65ce02 )
 {
-	m65ce02_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m65ce02_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch( state )
 	{

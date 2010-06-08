@@ -59,7 +59,7 @@ struct _hc11_state
 	UINT8 adctl;
 	int ad_channel;
 
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	UINT8 irq_state[2];
 	running_device *device;
 	const address_space *program;
@@ -81,10 +81,9 @@ struct _hc11_state
 INLINE hc11_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MC68HC11);
-	return (hc11_state *)device->token;
+	return (hc11_state *)downcast<cpu_device *>(device)->token();
 }
 
 #define HC11OP(XX)		hc11_##XX
@@ -370,7 +369,7 @@ static CPU_INIT( hc11 )
 	hc11_state *cpustate = get_safe_token(device);
 	int i;
 
-	const hc11_config *conf = (const hc11_config *)device->baseconfig().static_config;
+	const hc11_config *conf = (const hc11_config *)device->baseconfig().static_config();
 
 	/* clear the opcode tables */
 	for(i=0; i < 256; i++) {
@@ -417,8 +416,8 @@ static CPU_INIT( hc11 )
 	cpustate->ram_position = 0x100;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 }
 
 static CPU_RESET( hc11 )
@@ -538,7 +537,7 @@ static CPU_SET_INFO( mc68hc11 )
 
 CPU_GET_INFO( mc68hc11 )
 {
-	hc11_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	hc11_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

@@ -149,15 +149,15 @@ VIDEO_START( fuuki32 )
 
 ***************************************************************************/
 
-static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	fuuki32_state *state = (fuuki32_state *)screen->machine->driver_data;
+	fuuki32_state *state = (fuuki32_state *)screen.machine->driver_data;
 	int offs;
-	const gfx_element *gfx = screen->machine->gfx[0];
-	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
-	int max_x =	visarea->max_x + 1;
-	int max_y =	visarea->max_y + 1;
+	const gfx_element *gfx = screen.machine->gfx[0];
+	bitmap_t *priority_bitmap = screen.machine->priority_bitmap;
+	const rectangle &visarea = screen.visible_area();
+	int max_x =	visarea.max_x + 1;
+	int max_y =	visarea.max_y + 1;
 
 	UINT32 *src = state->buf_spriteram2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
 
@@ -204,7 +204,7 @@ static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectan
 		sx = (sx & 0x1ff) - (sx & 0x200);
 		sy = (sy & 0x1ff) - (sy & 0x200);
 
-		if (flip_screen_get(screen->machine))
+		if (flip_screen_get(screen.machine))
 		{
 			flipx = !flipx;		sx = max_x - sx - xnum * 16;
 			flipy = !flipy;		sy = max_y - sy - ynum * 16;
@@ -217,10 +217,10 @@ static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectan
 		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
 
 #if 0
-		if(!( (input_code_pressed(screen->machine, KEYCODE_V) && (((attr >> 6)&3) == 0))
-		   || (input_code_pressed(screen->machine, KEYCODE_B) && (((attr >> 6)&3) == 1))
-		   || (input_code_pressed(screen->machine, KEYCODE_N) && (((attr >> 6)&3) == 2))
-		   || (input_code_pressed(screen->machine, KEYCODE_M) && (((attr >> 6)&3) == 3))
+		if(!( (input_code_pressed(screen.machine, KEYCODE_V) && (((attr >> 6)&3) == 0))
+		   || (input_code_pressed(screen.machine, KEYCODE_B) && (((attr >> 6)&3) == 1))
+		   || (input_code_pressed(screen.machine, KEYCODE_N) && (((attr >> 6)&3) == 2))
+		   || (input_code_pressed(screen.machine, KEYCODE_M) && (((attr >> 6)&3) == 3))
 		   ))
 #endif
 
@@ -249,7 +249,7 @@ static void draw_sprites( running_device *screen, bitmap_t *bitmap, const rectan
 
 #ifdef MAME_DEBUG
 #if 0
-if (input_code_pressed(screen->machine, KEYCODE_X))
+if (input_code_pressed(screen.machine, KEYCODE_X))
 {	/* Display some info on each sprite */
 	char buf[40];
 	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);
@@ -369,7 +369,7 @@ VIDEO_UPDATE( fuuki32 )
 	fuuki32_draw_layer(screen->machine, bitmap, cliprect, tm_middle, 0, 2);
 	fuuki32_draw_layer(screen->machine, bitmap, cliprect, tm_front,  0, 4);
 
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(*screen, bitmap, cliprect);
 	return 0;
 }
 

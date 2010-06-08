@@ -68,10 +68,9 @@ struct _mb86233_state
 INLINE mb86233_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MB86233);
-	return (mb86233_state *)device->token;
+	return (mb86233_state *)downcast<cpu_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -108,12 +107,12 @@ INLINE mb86233_state *get_safe_token(running_device *device)
 static CPU_INIT( mb86233 )
 {
 	mb86233_state *cpustate = get_safe_token(device);
-	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->baseconfig().static_config;
+	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->baseconfig().static_config();
 	(void)irqcallback;
 
 	memset(cpustate, 0, sizeof( *cpustate ) );
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	if ( _config )
 	{
@@ -1607,7 +1606,7 @@ static CPU_SET_INFO( mb86233 )
 
 CPU_GET_INFO( mb86233 )
 {
-	mb86233_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	mb86233_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -4,8 +4,36 @@
 
     Device interface functions.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -13,34 +41,34 @@
 
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
 #define TEMP_STRING_POOL_ENTRIES		16
 #define MAX_STRING_LENGTH				256
 
 
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
 static char temp_string_pool[TEMP_STRING_POOL_ENTRIES][MAX_STRING_LENGTH];
 static int temp_string_pool_index;
 
 
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  INLINE FUNCTIONS
+//**************************************************************************
 
-/*-------------------------------------------------
-    get_temp_string_buffer - return a pointer to
-    a temporary string buffer
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_temp_string_buffer - return a pointer to
+//  a temporary string buffer
+//-------------------------------------------------
 
-static char *get_temp_string_buffer(void)
+char *get_temp_string_buffer(void)
 {
 	char *string = &temp_string_pool[temp_string_pool_index++ % TEMP_STRING_POOL_ENTRIES][0];
 	string[0] = 0;
@@ -48,59 +76,71 @@ static char *get_temp_string_buffer(void)
 }
 
 
+resource_pool &machine_get_pool(running_machine &machine)
+{
+	// temporary to get around include dependencies, until CPUs
+	// get a proper device class
+	return machine.respool;
+}
 
 
-/***************************************************************************
-    LIVE DEVICE MANAGEMENT
-***************************************************************************/
 
-/*-------------------------------------------------
-    device_list - device list constructor
--------------------------------------------------*/
+//**************************************************************************
+//  DEVICE LIST MANAGEMENT
+//**************************************************************************
 
-device_list::device_list()
-	: machine(NULL)
+//-------------------------------------------------
+//  device_list - device list constructor
+//-------------------------------------------------
+
+device_list::device_list(resource_pool &pool)
+	: tagged_device_list<device_t>(pool),
+	  m_machine(NULL)
 {
 }
 
 
-/*-------------------------------------------------
-    import_config_list - import a list of device
-    configs and allocate new devices
--------------------------------------------------*/
+//-------------------------------------------------
+//  import_config_list - import a list of device
+//  configs and allocate new devices
+//-------------------------------------------------
 
-void device_list::import_config_list(const device_config_list &list, running_machine &_machine)
+void device_list::import_config_list(const device_config_list &list, running_machine &machine)
 {
 	// remember the machine for later use
-	machine = &_machine;
-
+	m_machine = &machine;
+	
 	// append each device from the configuration list
-	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next)
-		append(devconfig->tag(), new running_device(_machine, *devconfig));
+	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next())
+		append(devconfig->tag(), devconfig->alloc_device(*m_machine));
 }
 
 
-/*-------------------------------------------------
-    start_all - start all the devices in the
-    list
--------------------------------------------------*/
+//-------------------------------------------------
+//  start_all - start all the devices in the
+//  list
+//-------------------------------------------------
 
 void device_list::start_all()
 {
 	// add exit and reset callbacks
-	assert(machine != NULL);
-	add_reset_callback(machine, static_reset);
-	add_exit_callback(machine, static_stop);
+	assert(m_machine != NULL);
+	add_reset_callback(m_machine, static_reset);
+	add_exit_callback(m_machine, static_exit);
+
+	// add pre-save and post-load callbacks
+	state_save_register_presave(m_machine, static_pre_save, this);
+	state_save_register_postload(m_machine, static_post_load, this);
 
 	// iterate until we've started everything
 	int devcount = count();
 	int numstarted = 0;
 	while (numstarted < devcount)
 	{
-		// iterate over devices and start them
+		// iterate over devices and start them 
 		int prevstarted = numstarted;
-		for (running_device *device = first(); device != NULL; device = device->next)
-			if (!device->started)
+		for (device_t *device = first(); device != NULL; device = device->next())
+			if (!device->started())
 			{
 				// attempt to start the device, catching any expected exceptions
 				try
@@ -120,32 +160,27 @@ void device_list::start_all()
 }
 
 
-/*-------------------------------------------------
-    stop_all - stop all devices in the list
--------------------------------------------------*/
+//-------------------------------------------------
+//  debug_setup_all - tell all the devices to set
+//  up any debugging they need
+//-------------------------------------------------
 
-void device_list::stop_all()
+void device_list::debug_setup_all()
 {
 	// iterate over devices and stop them
-	for (running_device *device = first(); device != NULL; device = device->next)
-		device->stop();
+	for (device_t *device = first(); device != NULL; device = device->next())
+		device->debug_setup();
 }
 
 
-void device_list::static_stop(running_machine *machine)
-{
-	machine->devicelist.stop_all();
-}
-
-
-/*-------------------------------------------------
-    reset_all - reset all devices in the list
--------------------------------------------------*/
+//-------------------------------------------------
+//  reset_all - reset all devices in the list
+//-------------------------------------------------
 
 void device_list::reset_all()
 {
-	/* iterate over devices and stop them */
-	for (running_device *device = first(); device != NULL; device = device->next)
+	// iterate over devices and stop them
+	for (device_t *device = first(); device != NULL; device = device->next())
 		device->reset();
 }
 
@@ -156,227 +191,525 @@ void device_list::static_reset(running_machine *machine)
 }
 
 
+//-------------------------------------------------
+//  static_exit - tear down all the devices
+//-------------------------------------------------
 
-/***************************************************************************
-    DEVICE CONFIGURATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    device_config - constructor for a new
-    device configuration
--------------------------------------------------*/
-
-device_config::device_config(const device_config *_owner, device_type _type, const char *_tag, UINT32 _clock)
-	: next(NULL),
-	  owner(const_cast<device_config *>(_owner)),
-	  type(_type),
-	  devclass(DEVICE_CLASS_GENERAL),
-	  clock(_clock),
-	  static_config(NULL),
-	  inline_config(NULL),
-	  m_tag(_tag)
+void device_list::static_exit(running_machine *machine)
 {
-	// initialize remaining members
-	memset(address_map, 0, sizeof(address_map));
-	devclass = (device_class)get_config_int(DEVINFO_INT_CLASS);
-
-	// derive the clock from our owner if requested
-	if ((clock & 0xff000000) == 0xff000000)
-	{
-		assert(owner != NULL);
-		clock = owner->clock * ((clock >> 12) & 0xfff) / ((clock >> 0) & 0xfff);
-	}
-
-	// allocate a buffer for the inline configuration
-	UINT32 configlen = (UINT32)get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES);
-	inline_config = (configlen == 0) ? NULL : global_alloc_array_clear(UINT8, configlen);
+	machine->devicelist.reset();
 }
 
 
-/*-------------------------------------------------
-    ~device_config - destructor
--------------------------------------------------*/
+//-------------------------------------------------
+//  static_pre_save - tell all the devices we are
+//  about to save
+//-------------------------------------------------
+
+void device_list::static_pre_save(running_machine *machine, void *param)
+{
+	device_list *list = reinterpret_cast<device_list *>(param);
+	for (device_t *device = list->first(); device != NULL; device = device->next())
+		device->pre_save();
+}
+
+
+//-------------------------------------------------
+//  static_post_load - tell all the devices we just
+//  completed a load
+//-------------------------------------------------
+
+void device_list::static_post_load(running_machine *machine, void *param)
+{
+	device_list *list = reinterpret_cast<device_list *>(param);
+	for (device_t *device = list->first(); device != NULL; device = device->next())
+		device->post_load();
+}
+
+
+
+//**************************************************************************
+//  DEVICE INTERFACE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_config_interface - constructor
+//-------------------------------------------------
+
+device_config_interface::device_config_interface(const machine_config &mconfig, device_config &devconfig)
+	: m_device_config(devconfig),
+	  m_machine_config(mconfig),
+	  m_interface_next(NULL)
+{
+	device_config_interface **tailptr;
+	for (tailptr = &devconfig.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;
+	*tailptr = this;
+}
+
+
+//-------------------------------------------------
+//  ~device_config_interface - destructor
+//-------------------------------------------------
+
+device_config_interface::~device_config_interface()
+{
+}
+
+
+//-------------------------------------------------
+//  interface_config_complete - perform any 
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void device_config_interface::interface_config_complete()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_process_token - default token
+//  processing for a given interface
+//-------------------------------------------------
+
+bool device_config_interface::interface_process_token(UINT32 entrytype, const machine_config_token *&tokens)
+{
+	return false;
+}
+
+
+//-------------------------------------------------
+//  interface_validity_check - default validation
+//  for a device after the configuration has been 
+//  constructed
+//-------------------------------------------------
+
+bool device_config_interface::interface_validity_check(const game_driver &driver) const
+{
+	return false;
+}
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_config - constructor for a new
+//  device configuration
+//-------------------------------------------------
+
+device_config::device_config(const machine_config &mconfig, device_type type, const char *_tag, const device_config *owner, UINT32 clock)
+	: m_next(NULL),
+	  m_owner(const_cast<device_config *>(owner)),
+	  m_interface_list(NULL),
+	  m_type(type),
+	  m_clock(clock),
+	  m_machine_config(mconfig),
+	  m_static_config(NULL),
+	  m_tag(_tag)
+{
+	memset(m_inline_data, 0, sizeof(m_inline_data));
+
+	// derive the clock from our owner if requested
+	if ((m_clock & 0xff000000) == 0xff000000)
+	{
+		assert(m_owner != NULL);
+		m_clock = m_owner->m_clock * ((m_clock >> 12) & 0xfff) / ((m_clock >> 0) & 0xfff);
+	}
+}
+
+
+//-------------------------------------------------
+//  ~device_config - destructor
+//-------------------------------------------------
 
 device_config::~device_config()
 {
-	// call the custom config free function first
-	device_custom_config_func custom = reinterpret_cast<device_custom_config_func>(get_config_fct(DEVINFO_FCT_CUSTOM_CONFIG));
-	if (custom != NULL)
-		(*custom)(this, MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE, NULL);
-
-	// free the inline config
-	global_free(inline_config);
 }
 
 
-/*-------------------------------------------------
-    device_get_config_int - return an integer state
-    value from an allocated device
--------------------------------------------------*/
+//-------------------------------------------------
+//  config_complete - called when the 
+//  configuration of a device is complete
+//-------------------------------------------------
 
-INT64 device_config::get_config_int(UINT32 state) const
+void device_config::config_complete()
 {
-	assert(this != NULL);
-	assert(type != NULL);
-	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
-
-	// retrieve the value
-	deviceinfo info;
-	info.i = 0;
-	(*type)(this, state, &info);
-	return info.i;
+	// first notify the interfaces
+	for (device_config_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_config_complete();
+	
+	// then notify the device itself
+	device_config_complete();
 }
 
 
-/*-------------------------------------------------
-    device_get_config_ptr - return a pointer state
-    value from an allocated device
--------------------------------------------------*/
+//-------------------------------------------------
+//  process_token - process tokens
+//-------------------------------------------------
 
-void *device_config::get_config_ptr(UINT32 state) const
+void device_config::process_token(UINT32 entrytype, const machine_config_token *&tokens)
 {
-	assert(this != NULL);
-	assert(type != NULL);
-	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
+	int size, offset, bits, index;
+	UINT32 data32;
+	UINT64 data64;
+	bool processed = false;
 
-	// retrieve the value
-	deviceinfo info;
-	info.p = NULL;
-	(*type)(this, state, &info);
-	return info.p;
-}
-
-
-/*-------------------------------------------------
-    device_get_config_fct - return a function
-    pointer state value from an allocated device
--------------------------------------------------*/
-
-genf *device_config::get_config_fct(UINT32 state) const
-{
-	assert(this != NULL);
-	assert(type != NULL);
-	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
-
-	// retrieve the value
-	deviceinfo info;
-	info.f = 0;
-	(*type)(this, state, &info);
-	return info.f;
-}
-
-
-/*-------------------------------------------------
-    device_get_config_string - return a string value
-    from an allocated device
--------------------------------------------------*/
-
-const char *device_config::get_config_string(UINT32 state) const
-{
-	assert(this != NULL);
-	assert(type != NULL);
-	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
-
-	// retrieve the value
-	deviceinfo info;
-	info.s = get_temp_string_buffer();
-	(*type)(this, state, &info);
-	if (info.s[0] == 0)
+	// first process stuff we know about
+	switch (entrytype)
 	{
-		switch (state)
-		{
-			case DEVINFO_STR_NAME:			strcpy(info.s, "Custom");						break;
-			case DEVINFO_STR_FAMILY:		strcpy(info.s, "Custom");						break;
-			case DEVINFO_STR_VERSION:		strcpy(info.s, "1.0");							break;
-			case DEVINFO_STR_SOURCE_FILE:	strcpy(info.s, __FILE__);						break;
-			case DEVINFO_STR_CREDITS:		strcpy(info.s, "Copyright Nicola Salmoria and the MAME Team"); break;
-		}
+		// specify device clock
+		case MCONFIG_TOKEN_DEVICE_CLOCK:
+			TOKEN_UNGET_UINT32(tokens);
+			TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, m_clock, 32);
+			processed = true;
+			break;
+
+		// specify pointer to static device configuration
+		case MCONFIG_TOKEN_DEVICE_CONFIG:
+			m_static_config = TOKEN_GET_PTR(tokens, voidptr);
+			processed = true;
+			break;
+		
+		// provide inline device data packed into a 16-bit space
+		case MCONFIG_TOKEN_DEVICE_INLINE_DATA16:
+			TOKEN_UNGET_UINT32(tokens);
+			TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, index, 8, data32, 16);
+			assert(index >= 0 && index < ARRAY_LENGTH(m_inline_data));
+			m_inline_data[index] = data32;
+			processed = true;
+			break;
+
+		// provide inline device data packed into a 32-bit space
+		case MCONFIG_TOKEN_DEVICE_INLINE_DATA32:
+			TOKEN_UNGET_UINT32(tokens);
+			TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, index, 8);
+			assert(index >= 0 && index < ARRAY_LENGTH(m_inline_data));
+			m_inline_data[index] = TOKEN_GET_UINT32(tokens);
+			processed = true;
+			break;
+
+		// provide inline device data packed into a 64-bit space
+		case MCONFIG_TOKEN_DEVICE_INLINE_DATA64:
+			TOKEN_UNGET_UINT32(tokens);
+			TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, index, 8);
+			assert(index >= 0 && index < ARRAY_LENGTH(m_inline_data));
+			TOKEN_EXTRACT_UINT64(tokens, m_inline_data[index]);
+			processed = true;
+			break;
+
+		// provide inline device data packed into a 32-bit word
+		case MCONFIG_TOKEN_DEVICE_CONFIG_DATA32:
+			TOKEN_UNGET_UINT32(tokens);
+			TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 4, offset, 12);
+			data32 = TOKEN_GET_UINT32(tokens);
+			switch (size)
+			{
+				case 1: *(UINT8 *) ((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data32; break;
+				case 2: *(UINT16 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data32; break;
+				case 4: *(UINT32 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data32; break;
+			}
+			processed = true;
+			break;
+
+		// provide inline device data packed into a 64-bit word
+		case MCONFIG_TOKEN_DEVICE_CONFIG_DATA64:
+			TOKEN_UNGET_UINT32(tokens);
+			TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 4, offset, 12);
+			TOKEN_EXTRACT_UINT64(tokens, data64);
+			switch (size)
+			{
+				case 1: *(UINT8 *) ((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data64; break;
+				case 2: *(UINT16 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data64; break;
+				case 4: *(UINT32 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data64; break;
+				case 8: *(UINT64 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data64; break;
+			}
+			processed = true;
+			break;
+
+		// provide inline floating-point device data packed into a fixed-point 32-bit word
+		case MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32:
+			TOKEN_UNGET_UINT32(tokens);
+			TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, size, 4, bits, 6, offset, 12);
+			data32 = TOKEN_GET_UINT32(tokens);
+			switch (size)
+			{
+				case 4: *(float *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = (float)(INT32)data32 / (float)(1 << bits); break;
+				case 8: *(double *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = (double)(INT32)data32 / (double)(1 << bits); break;
+			}
+			processed = true;
+			break;
 	}
-	return info.s;
+
+	// anything else might be handled by one of our interfaces
+	for (device_config_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		if (intf->interface_process_token(entrytype, tokens))
+		{
+			assert(!processed);
+			processed = true;
+		}
+	
+	// or it might be processed by the device itself
+	if (device_process_token(entrytype, tokens))
+	{
+		assert(!processed);
+		processed = true;
+	}
+	
+	// regardless, *somebody* must handle it
+	if (!processed)
+		throw emu_fatalerror("Unhandled token %d for device '%s'", entrytype, tag());
 }
 
 
-/*-------------------------------------------------
-    subtag - create a tag for an object that is
-    owned by this device
--------------------------------------------------*/
+//-------------------------------------------------
+//  validity_check - validate a device after the
+//  configuration has been constructed
+//-------------------------------------------------
 
-astring &device_config::subtag(astring &dest, const char *_tag) const
+bool device_config::validity_check(const game_driver &driver) const
 {
-	return (this != NULL) ? dest.cpy(m_tag).cat(":").cat(_tag) : dest.cpy(_tag);
+	bool error = false;
+
+	// validate via the interfaces
+	for (device_config_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		if (intf->interface_validity_check(driver))
+			error = true;
+	
+	// let the device itself validate
+	if (device_validity_check(driver))
+		error = true;
+	
+	return error;
 }
 
 
-/*-------------------------------------------------
-    siblingtag - create a tag for an object that
-    a sibling to this device
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_config_complete - perform any 
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-astring &device_config::siblingtag(astring &dest, const char *_tag) const
+void device_config::device_config_complete()
 {
-	return (this != NULL && owner != NULL) ? owner->subtag(dest, _tag) : dest.cpy(_tag);
+	// do nothing by default
 }
 
 
+//-------------------------------------------------
+//  device_process_token - process basic device
+//  tokens
+//-------------------------------------------------
 
-/***************************************************************************
-    LIVE DEVICE MANAGEMENT
-***************************************************************************/
-
-/*-------------------------------------------------
-    running_device - constructor for a new
-    running device; initial state is derived
-    from the provided config
--------------------------------------------------*/
-
-running_device::running_device(running_machine &_machine, const device_config &_config)
-	: m_baseconfig(_config),
-	  machine(&_machine),
-	  next(NULL),
-	  owner((_config.owner != NULL) ? _machine.devicelist.find(_config.owner->tag()) : NULL),
-	  type(_config.type),
-	  devclass(_config.devclass),
-	  clock(_config.clock),
-	  started(false),
-	  token(NULL),
-	  tokenbytes(_config.get_config_int(DEVINFO_INT_TOKEN_BYTES)),
-	  region(NULL),
-	  execute(NULL),
-	  get_runtime_info(NULL),
-	  m_tag(_config.tag())
+bool device_config::device_process_token(UINT32 entrytype, const machine_config_token *&tokens)
 {
-	memset(addrspace, 0, sizeof(addrspace));
-
-	if (tokenbytes == 0)
-		throw emu_fatalerror("Device %s specifies a 0 token length!\n", tag());
-
-	// allocate memory for the token
-	token = auto_alloc_array_clear(machine, UINT8, tokenbytes);
-
-	// get function pointers
-	execute = (device_execute_func)get_config_fct(DEVINFO_FCT_EXECUTE);
-	get_runtime_info = (device_get_runtime_info_func)get_config_fct(DEVINFO_FCT_GET_RUNTIME_INFO);
+	// handle nothing by default
+	return false;
 }
 
 
-/*-------------------------------------------------
-    ~running_device - destructor for a
-    running_device
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_validity_check - validate a device after 
+//  the configuration has been constructed
+//-------------------------------------------------
 
-running_device::~running_device()
+bool device_config::device_validity_check(const game_driver &driver) const
 {
-	// release token memory
-	auto_free(machine, token);
+	// indicate no error by default
+	return false;
 }
 
 
-/*-------------------------------------------------
-    subregion - return a pointer to the region
-    info for a given region
--------------------------------------------------*/
+//-------------------------------------------------
+//  rom_region - return a pointer to the implicit
+//  rom region description for this device
+//-------------------------------------------------
 
-const region_info *running_device::subregion(const char *_tag) const
+const rom_entry *device_config::rom_region() const
+{
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  machine_config_tokens - return a pointer to
+//  a set of machine configuration tokens 
+//  describing sub-devices for this device
+//-------------------------------------------------
+
+const machine_config_token *device_config::machine_config_tokens() const
+{
+	return NULL;
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE INTERFACES
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_interface - constructor
+//-------------------------------------------------
+
+device_interface::device_interface(running_machine &machine, const device_config &config, device_t &device)
+	: m_interface_next(NULL),
+	  m_device(device)
+{
+	device_interface **tailptr;
+	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;
+	*tailptr = this;
+}
+
+
+//-------------------------------------------------
+//  ~device_interface - destructor
+//-------------------------------------------------
+
+device_interface::~device_interface()
+{
+}
+
+
+//-------------------------------------------------
+//  interface_pre_start - called before the
+//  device's own start function
+//-------------------------------------------------
+
+void device_interface::interface_pre_start()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_post_start - called after the
+//  device's own start function
+//-------------------------------------------------
+
+void device_interface::interface_post_start()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_pre_reset - called before the
+//  device's own reset function
+//-------------------------------------------------
+
+void device_interface::interface_pre_reset()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_post_reset - called after the
+//  device's own reset function
+//-------------------------------------------------
+
+void device_interface::interface_post_reset()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_pre_save - called prior to saving the
+//  state, so that registered variables can be
+//  properly normalized
+//-------------------------------------------------
+
+void device_interface::interface_pre_save()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_post_load - called after the loading a
+//  saved state, so that registered variables can
+//  be expaneded as necessary
+//-------------------------------------------------
+
+void device_interface::interface_post_load()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_clock_changed - called when the
+//  device clock is altered in any way; designed
+//  to be overridden by the actual device
+//  implementation
+//-------------------------------------------------
+
+void device_interface::interface_clock_changed()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_debug_setup - called to allow
+//  interfaces to set up any debugging for this
+//  device
+//-------------------------------------------------
+
+void device_interface::interface_debug_setup()
+{
+	// do nothing by default
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE MANAGEMENT
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_t - constructor for a new
+//  running device; initial state is derived
+//  from the provided config
+//-------------------------------------------------
+
+device_t::device_t(running_machine &_machine, const device_config &config)
+	: machine(&_machine),
+	  m_machine(_machine),
+	  m_next(NULL),
+	  m_owner((config.m_owner != NULL) ? _machine.devicelist.find(config.m_owner->tag()) : NULL),
+	  m_interface_list(NULL),
+	  m_started(false),
+	  m_clock(config.m_clock),
+	  m_region(NULL),
+	  m_baseconfig(config),
+	  m_unscaled_clock(config.m_clock),
+	  m_clock_scale(1.0),
+	  m_attoseconds_per_clock((config.m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(config.m_clock))
+{
+}
+
+
+//-------------------------------------------------
+//  ~device_t - destructor for a device_t
+//-------------------------------------------------
+
+device_t::~device_t()
+{
+}
+
+
+//-------------------------------------------------
+//  subregion - return a pointer to the region
+//  info for a given region
+//-------------------------------------------------
+
+const region_info *device_t::subregion(const char *_tag) const
 {
 	// safety first
 	if (this == NULL)
@@ -384,16 +717,16 @@ const region_info *running_device::subregion(const char *_tag) const
 
 	// build a fully-qualified name
 	astring tempstring;
-	return machine->region(subtag(tempstring, _tag));
+	return m_machine.region(subtag(tempstring, _tag));
 }
 
 
-/*-------------------------------------------------
-    subdevice - return a pointer to the given
-    device that is owned by us
--------------------------------------------------*/
+//-------------------------------------------------
+//  subdevice - return a pointer to the given
+//  device that is owned by us
+//-------------------------------------------------
 
-running_device *running_device::subdevice(const char *_tag) const
+device_t *device_t::subdevice(const char *_tag) const
 {
 	// safety first
 	if (this == NULL)
@@ -401,135 +734,267 @@ running_device *running_device::subdevice(const char *_tag) const
 
 	// build a fully-qualified name
 	astring tempstring;
-	return machine->device(subtag(tempstring, _tag));
+	return m_machine.device(subtag(tempstring, _tag));
 }
 
 
-/*-------------------------------------------------
-    set_address_space - connect an address space
-    to a device
--------------------------------------------------*/
+//-------------------------------------------------
+//  siblingdevice - return a pointer to the given
+//  device that is owned by our same owner
+//-------------------------------------------------
 
-void running_device::set_address_space(int spacenum, const address_space *space)
+device_t *device_t::siblingdevice(const char *_tag) const
 {
-	addrspace[spacenum] = space;
+	// safety first
+	if (this == NULL)
+		return NULL;
+
+	// build a fully-qualified name
+	astring tempstring;
+	return m_machine.device(siblingtag(tempstring, _tag));
 }
 
 
-/*-------------------------------------------------
-    set_clock - set a device's clock
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_clock - sets the given device's raw clock
+//-------------------------------------------------
 
-void running_device::set_clock(UINT32 _clock)
+void device_t::set_unscaled_clock(UINT32 clock)
 {
-	clock = _clock;
+	m_unscaled_clock = clock;
+	m_clock = m_unscaled_clock * m_clock_scale;
+	m_attoseconds_per_clock = HZ_TO_ATTOSECONDS(m_clock);
+	notify_clock_changed();
 }
 
 
-/*-------------------------------------------------
-    start - start a device
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_clockscale - sets a scale factor for the
+//  device's clock
+//-------------------------------------------------
 
-void running_device::start()
+void device_t::set_clock_scale(double clockscale)
 {
-	// find our region
-	region = machine->regionlist.find(baseconfig().tag());
-
-	// start functions are required
-	device_start_func start = (device_start_func)get_config_fct(DEVINFO_FCT_START);
-	assert(start != NULL);
-	(*start)(this);
-
-	// if we didn't get any exceptions then we started ok
-	started = true;
+	m_clock_scale = clockscale;
+	m_clock = m_unscaled_clock * m_clock_scale;
+	m_attoseconds_per_clock = HZ_TO_ATTOSECONDS(m_clock);
+	notify_clock_changed();
 }
 
 
-/*-------------------------------------------------
-    stop - stop a device
--------------------------------------------------*/
+//-------------------------------------------------
+//  clocks_to_attotime - converts a number of
+//  clock ticks to an attotime
+//-------------------------------------------------
 
-void running_device::stop()
+attotime device_t::clocks_to_attotime(UINT64 numclocks) const
 {
-	assert(token != NULL);
-	assert(type != NULL);
-
-	// if we have a stop function, call it
-	device_stop_func stop = (device_stop_func)get_config_fct(DEVINFO_FCT_STOP);
-	if (stop != NULL)
-		(*stop)(this);
+	if (numclocks < m_clock)
+		return attotime_make(0, numclocks * m_attoseconds_per_clock);
+	else
+	{
+		UINT32 remainder;
+		UINT32 quotient = divu_64x32_rem(numclocks, m_clock, &remainder);
+		return attotime_make(quotient, (UINT64)remainder * (UINT64)m_attoseconds_per_clock);
+	}
 }
 
 
-/*-------------------------------------------------
-    reset - reset a device
--------------------------------------------------*/
+//-------------------------------------------------
+//  attotime_to_clocks - converts a duration as
+//  attotime to CPU clock ticks
+//-------------------------------------------------
 
-void running_device::reset()
+UINT64 device_t::attotime_to_clocks(attotime duration) const
 {
-	assert(this != NULL);
-	assert(this->token != NULL);
-	assert(this->type != NULL);
-
-	// if we have a reset function, call it
-	device_reset_func reset = (device_reset_func)get_config_fct(DEVINFO_FCT_RESET);
-	if (reset != NULL)
-		(*reset)(this);
+	return mulu_32x32(duration.seconds, m_clock) + (UINT64)duration.attoseconds / (UINT64)m_attoseconds_per_clock;
 }
 
 
-/*-------------------------------------------------
-    get_runtime_int - return an integer state
-    value from an allocated device
--------------------------------------------------*/
+//-------------------------------------------------
+//  start - start a device
+//-------------------------------------------------
 
-INT64 running_device::get_runtime_int(UINT32 state)
+void device_t::start()
 {
-	assert(this != NULL);
-	assert(get_runtime_info != NULL);
-	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+	// populate the region field
+	m_region = m_machine.region(tag());
+	
+	// let the interfaces do their pre-work
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_pre_start();
+	
+	// remember the number of state registrations
+	int state_registrations = state_save_get_reg_count(machine);
+	
+	// start the device
+	device_start();
+	
+	// complain if nothing was registered by the device
+	state_registrations = state_save_get_reg_count(machine) - state_registrations;
+	device_execute_interface *exec;
+	device_sound_interface *sound;
+	if (state_registrations == 0 && (interface(exec) || interface(sound)))
+	{
+		logerror("Device '%s' did not register any state to save!\n", tag());
+		if ((m_machine.gamedrv->flags & GAME_SUPPORTS_SAVE) != 0)
+			fatalerror("Device '%s' did not register any state to save!", tag());
+	}
 
-	// retrieve the value
-	deviceinfo info;
-	info.i = 0;
-	(*get_runtime_info)(this, state, &info);
-	return info.i;
+	// let the interfaces do their post-work
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_post_start();
+	
+	// force an update of the clock
+	notify_clock_changed();
+
+	// register our save states	
+	state_save_register_device_item(this, 0, m_clock);
+	state_save_register_device_item(this, 0, m_unscaled_clock);
+	state_save_register_device_item(this, 0, m_clock_scale);
+
+	// we're now officially started
+	m_started = true;
 }
 
 
-/*-------------------------------------------------
-    get_runtime_ptr - return a pointer state
-    value from an allocated device
--------------------------------------------------*/
+//-------------------------------------------------
+//  debug_setup - set up for debugging
+//-------------------------------------------------
 
-void *running_device::get_runtime_ptr(UINT32 state)
+void device_t::debug_setup()
 {
-	assert(this != NULL);
-	assert(get_runtime_info != NULL);
-	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
-
-	// retrieve the value
-	deviceinfo info;
-	info.p = NULL;
-	(*get_runtime_info)(this, state, &info);
-	return info.p;
+	// notify the interface
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_debug_setup();
+	
+	// notify the device
+	device_debug_setup();
 }
 
 
-/*-------------------------------------------------
-    get_runtime_string - return a string value
-    from an allocated device
--------------------------------------------------*/
+//-------------------------------------------------
+//  reset - reset a device
+//-------------------------------------------------
 
-const char *running_device::get_runtime_string(UINT32 state)
+void device_t::reset()
 {
-	assert(this != NULL);
-	assert(get_runtime_info != NULL);
-	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
+	// let the interfaces do their pre-work
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_pre_reset();
+	
+	// reset the device
+	device_reset();
 
-	// retrieve the value
-	deviceinfo info;
-	info.s = get_temp_string_buffer();
-	(*get_runtime_info)(this, state, &info);
-	return info.s;
+	// let the interfaces do their post-work
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_post_reset();
+}
+
+
+//-------------------------------------------------
+//  pre_save - tell the device and its interfaces
+//  that we are about to save
+//-------------------------------------------------
+
+void device_t::pre_save()
+{
+	// notify the interface
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_pre_save();
+	
+	// notify the device
+	device_pre_save();
+}
+
+
+//-------------------------------------------------
+//  post_load - tell the device and its interfaces
+//  that we just completed a load
+//-------------------------------------------------
+
+void device_t::post_load()
+{
+	// notify the interface
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_post_load();
+	
+	// notify the device
+	device_post_load();
+}
+
+
+//-------------------------------------------------
+//  device_reset - actually handle resetting of
+//  a device; designed to be overriden by the
+//  actual device implementation
+//-------------------------------------------------
+
+void device_t::device_reset()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_pre_save - called prior to saving the
+//  state, so that registered variables can be
+//  properly normalized
+//-------------------------------------------------
+
+void device_t::device_pre_save()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_post_load - called after the loading a
+//  saved state, so that registered variables can
+//  be expaneded as necessary
+//-------------------------------------------------
+
+void device_t::device_post_load()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed - called when the
+//  device clock is altered in any way; designed
+//  to be overridden by the actual device
+//  implementation
+//-------------------------------------------------
+
+void device_t::device_clock_changed()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_debug_setup - called when the debugger
+//  is active to allow for device-specific setup
+//-------------------------------------------------
+
+void device_t::device_debug_setup()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  notify_clock_changed - notify all interfaces
+//  that the clock has changed
+//-------------------------------------------------
+
+void device_t::notify_clock_changed()
+{
+	// first notify interfaces
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_clock_changed();
+
+	// then notify the device
+	device_clock_changed();
 }

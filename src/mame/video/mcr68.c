@@ -209,7 +209,7 @@ WRITE16_HANDLER( zwackery_spriteram_w )
 
 static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
-	rectangle sprite_clip = *video_screen_get_visible_area(machine->primary_screen);
+	rectangle sprite_clip = machine->primary_screen->visible_area();
 	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 

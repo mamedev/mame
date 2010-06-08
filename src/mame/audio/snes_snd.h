@@ -13,17 +13,12 @@
 
 
 /***************************************************************************
-    INFO PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( snes_sound );
-
-/***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define SNES_SPC DEVICE_GET_INFO_NAME( snes_sound )
-#define SOUND_SNES SNES_SPC
+DECLARE_LEGACY_SOUND_DEVICE(SNES, snes_sound);
+#define SNES_SPC SOUND_SNES
+
 
 /***************************************************************************
     I/O PROTOTYPES

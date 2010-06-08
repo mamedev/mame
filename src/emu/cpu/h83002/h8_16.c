@@ -220,8 +220,8 @@ static CPU_INIT(h8)
 
 	h8->mode_8bit = 0;
 
-	h8->program = device->space(AS_PROGRAM);
-	h8->io = device->space(AS_IO);
+	h8->program = device_memory(device)->space(AS_PROGRAM);
+	h8->io = device_memory(device)->space(AS_IO);
 
 	state_save_register_device_item(device, 0, h8->h8err);
 	state_save_register_device_item_array(device, 0, h8->regs);
@@ -429,7 +429,7 @@ static CPU_SET_INFO( h8 )
 
 static READ16_HANDLER( h8_itu_r )
 {
-	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
+	h83xx_state *h8 = get_safe_token(space->cpu);
 
 	if (mem_mask == 0xffff)
 	{
@@ -450,7 +450,7 @@ static READ16_HANDLER( h8_itu_r )
 
 static WRITE16_HANDLER( h8_itu_w )
 {
-	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
+	h83xx_state *h8 = get_safe_token(space->cpu);
 
 	if (mem_mask == 0xffff)
 	{
@@ -470,7 +470,7 @@ static WRITE16_HANDLER( h8_itu_w )
 
 static READ16_HANDLER( h8_3007_itu_r )
 {
-	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
+	h83xx_state *h8 = get_safe_token(space->cpu);
 
 	if (mem_mask == 0xffff)
 	{
@@ -490,7 +490,7 @@ static READ16_HANDLER( h8_3007_itu_r )
 }
 static WRITE16_HANDLER( h8_3007_itu_w )
 {
-	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
+	h83xx_state *h8 = get_safe_token(space->cpu);
 
 	if (mem_mask == 0xffff)
 	{
@@ -510,7 +510,7 @@ static WRITE16_HANDLER( h8_3007_itu_w )
 
 static READ16_HANDLER( h8_3007_itu1_r )
 {
-	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
+	h83xx_state *h8 = get_safe_token(space->cpu);
 
 	if (mem_mask == 0xffff)
 	{
@@ -530,7 +530,7 @@ static READ16_HANDLER( h8_3007_itu1_r )
 }
 static WRITE16_HANDLER( h8_3007_itu1_w )
 {
-	h83xx_state *h8 = (h83xx_state *)space->cpu->token;
+	h83xx_state *h8 = get_safe_token(space->cpu);
 
 	if (mem_mask == 0xffff)
 	{
@@ -570,7 +570,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3002 )
 {
-	h83xx_state *h8 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	h83xx_state *h8 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state) {
 	// Interface functions and variables

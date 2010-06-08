@@ -289,7 +289,7 @@ static READ8_HANDLER( ray_r )
 {
 	// the games read the raster beam position as part of the hardware checks..
 	// with a 6mhz clock and 640x480 resolution this seems to give the right results.
-	return video_screen_get_vpos(space->machine->primary_screen);
+	return space->machine->primary_screen->vpos();
 }
 
 static UINT8 multfish_hopper_motor = 0;

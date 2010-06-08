@@ -43,18 +43,18 @@ static TIMER_CALLBACK( response_timer );
  *
  *************************************/
 
-static int get_lightgun_pos(running_device *screen, int player, int *x, int *y)
+static int get_lightgun_pos(screen_device &screen, int player, int *x, int *y)
 {
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen.visible_area();
 
-	int xpos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1X" : "GUN2X", 0xffffffff);
-	int ypos = input_port_read_safe(screen->machine, (player == 0) ? "GUN1Y" : "GUN2Y", 0xffffffff);
+	int xpos = input_port_read_safe(screen.machine, (player == 0) ? "GUN1X" : "GUN2X", 0xffffffff);
+	int ypos = input_port_read_safe(screen.machine, (player == 0) ? "GUN1Y" : "GUN2Y", 0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
 
-	*x = visarea->min_x + xpos * (visarea->max_x - visarea->min_x + 1) / 255;
-	*y = visarea->min_y + ypos * (visarea->max_y - visarea->min_y + 1) / 255;
+	*x = visarea.min_x + xpos * (visarea.max_x - visarea.min_x + 1) / 255;
+	*y = visarea.min_y + ypos * (visarea.max_y - visarea.min_y + 1) / 255;
 	return TRUE;
 }
 
@@ -170,7 +170,7 @@ static CUSTOM_INPUT( lightgun_pos_r )
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(field->port->machine->primary_screen, input_select, &x, &y);
+	get_lightgun_pos(*field->port->machine->primary_screen, input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 

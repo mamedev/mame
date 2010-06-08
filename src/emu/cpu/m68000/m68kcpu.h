@@ -620,7 +620,7 @@ struct _m68ki_cpu_core
 	const UINT8* cyc_exception;
 
 	/* Callbacks to host */
-	cpu_irq_callback int_ack_callback;			  /* Interrupt Acknowledge */
+	device_irq_callback int_ack_callback;			  /* Interrupt Acknowledge */
 	m68k_bkpt_ack_func bkpt_ack_callback;         /* Breakpoint Acknowledge */
 	m68k_reset_func reset_instr_callback;         /* Called when a RESET instruction is encountered */
 	m68k_cmpild_func cmpild_instr_callback;       /* Called when a CMPI.L #v, Dn instruction is encountered */
@@ -633,7 +633,6 @@ struct _m68ki_cpu_core
 	offs_t encrypted_start;
 	offs_t encrypted_end;
 
-	cpu_state_table state;
 	UINT32		iotemp;
 
 	/* save state data */

@@ -101,10 +101,8 @@ struct _x1_010_state
 INLINE x1_010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_X1_010);
-	return (x1_010_state *)device->token;
+	assert(device->type() == SOUND_X1_010);
+	return (x1_010_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -203,12 +201,12 @@ static STREAM_UPDATE( seta_update )
 static DEVICE_START( x1_010 )
 {
 	int i;
-	const x1_010_interface *intf = (const x1_010_interface *)device->baseconfig().static_config;
+	const x1_010_interface *intf = (const x1_010_interface *)device->baseconfig().static_config();
 	x1_010_state *info = get_safe_token(device);
 
-	info->region		= *device->region;
-	info->base_clock	= device->clock;
-	info->rate			= device->clock / 1024;
+	info->region		= *device->region();
+	info->base_clock	= device->clock();
+	info->rate			= device->clock() / 1024;
 	info->address		= intf->adr;
 
 	for( i = 0; i < SETA_NUM_CHANNELS; i++ ) {
@@ -216,7 +214,7 @@ static DEVICE_START( x1_010 )
 		info->env_offset[i] = 0;
 	}
 	/* Print some more debug info */
-	LOG_SOUND(("masterclock = %d rate = %d\n", device->clock, info->rate ));
+	LOG_SOUND(("masterclock = %d rate = %d\n", device->clock(), info->rate ));
 
 	/* get stream channels */
 	info->stream = stream_create(device,0,2,info->rate,info,seta_update);

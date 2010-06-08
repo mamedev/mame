@@ -41,46 +41,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _sound_output sound_output;
-struct _sound_output
-{
-	sound_stream *	stream;					/* associated stream */
-	int				output;					/* output number */
-};
-
-
-typedef struct _sound_class_data sound_class_data;
-struct _sound_class_data
-{
-	int				outputs;				/* number of outputs from this instance */
-	sound_output	output[MAX_OUTPUTS];	/* array of output information */
-};
-
-
-typedef struct _speaker_input speaker_input;
-struct _speaker_input
-{
-	float			gain;					/* current gain */
-	float			default_gain;			/* default gain */
-	char *			name;					/* name of this input */
-};
-
-
-typedef struct _speaker_info speaker_info;
-struct _speaker_info
-{
-	const speaker_config *speaker;			/* pointer to the speaker info */
-	const char *	tag;					/* speaker tag */
-	sound_stream *	mixer_stream;			/* mixing stream */
-	int				inputs;					/* number of input streams */
-	speaker_input *	input;					/* array of input information */
-#ifdef MAME_DEBUG
-	INT32			max_sample;				/* largest sample value we've seen */
-	INT32			clipped_samples;		/* total number of clipped samples */
-	INT32			total_samples;			/* total number of samples */
-#endif
-};
-
 struct _sound_private
 {
 	emu_timer *update_timer;
@@ -113,8 +73,6 @@ static void sound_load(running_machine *machine, int config_type, xml_data_node 
 static void sound_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 static TIMER_CALLBACK( sound_update );
 static void route_sound(running_machine *machine);
-static STREAM_UPDATE( mixer_update );
-static STATE_POSTLOAD( mixer_postload );
 
 
 
@@ -122,59 +80,25 @@ static STATE_POSTLOAD( mixer_postload );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    get_class_data - return a pointer to the
-    class data
--------------------------------------------------*/
+//-------------------------------------------------
+//  index_to_input - map an absolute index to
+//  a particular input
+//-------------------------------------------------
 
-INLINE sound_class_data *get_class_data(running_device *device)
+INLINE speaker_device *index_to_input(running_machine *machine, int index, int &input)
 {
-	assert(device != NULL);
-	assert(device->type == SOUND);
-	assert(device->devclass == DEVICE_CLASS_SOUND_CHIP);
-	assert(device->token != NULL);
-	return (sound_class_data *)((UINT8 *)device->token + device->tokenbytes) - 1;
-}
-
-
-/*-------------------------------------------------
-    get_safe_token - makes sure that the passed
-    in device is, in fact, a timer
--------------------------------------------------*/
-
-INLINE speaker_info *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SPEAKER_OUTPUT);
-
-	return (speaker_info *)device->token;
-}
-
-
-/*-------------------------------------------------
-    index_to_input - map an absolute index to
-    a particular input
--------------------------------------------------*/
-
-INLINE speaker_info *index_to_input(running_machine *machine, int index, int *input)
-{
-	running_device *curspeak;
-	int count = 0;
-
-	/* scan through the speakers until we find the indexed input */
-	for (curspeak = speaker_output_first(machine); curspeak != NULL; curspeak = speaker_output_next(curspeak))
+	// scan through the speakers until we find the indexed input
+	for (speaker_device *speaker = speaker_first(*machine); speaker != NULL; speaker = speaker_next(speaker))
 	{
-		speaker_info *info = (speaker_info *)curspeak->token;
-		if (index < count + info->inputs)
+		if (index < speaker->inputs())
 		{
-			*input = index - count;
-			return info;
+			input = index;
+			return speaker;
 		}
-		count += info->inputs;
+		index -= speaker->inputs();
 	}
 
-	/* index out of range */
+	// index out of range
 	return NULL;
 }
 
@@ -254,163 +178,6 @@ static void sound_exit(running_machine *machine)
 
 
 /***************************************************************************
-    SOUND DEVICE INTERFACE
-***************************************************************************/
-
-/*-------------------------------------------------
-    device_start_sound - device start callback
--------------------------------------------------*/
-
-static DEVICE_START( sound )
-{
-	sound_class_data *classdata;
-	const sound_config *config;
-	deviceinfo devinfo;
-	int num_regs, outputnum;
-
-	/* validate some basic stuff */
-	assert(device != NULL);
-	assert(device->baseconfig().inline_config != NULL);
-	assert(device->machine != NULL);
-	assert(device->machine->config != NULL);
-
-	/* get pointers to our data */
-	config = (const sound_config *)device->baseconfig().inline_config;
-	classdata = get_class_data(device);
-
-	/* get the chip's start function */
-	devinfo.start = NULL;
-	(*config->type)(&device->baseconfig(), DEVINFO_FCT_START, &devinfo);
-	assert(devinfo.start != NULL);
-
-	/* initialize this sound chip */
-	num_regs = state_save_get_reg_count(device->machine);
-	(*devinfo.start)(device);
-	num_regs = state_save_get_reg_count(device->machine) - num_regs;
-
-	/* now count the outputs */
-	VPRINTF(("Counting outputs\n"));
-	for (outputnum = 0; outputnum < MAX_OUTPUTS; outputnum++)
-	{
-		sound_stream *stream = stream_find_by_device(device, outputnum);
-		int curoutput, numoutputs;
-
-		/* stop when we run out of streams */
-		if (stream == NULL)
-			break;
-
-		/* accumulate the number of outputs from this stream */
-		numoutputs = stream_get_outputs(stream);
-		assert(classdata->outputs < MAX_OUTPUTS);
-
-		/* fill in the array */
-		for (curoutput = 0; curoutput < numoutputs; curoutput++)
-		{
-			sound_output *output = &classdata->output[classdata->outputs++];
-			output->stream = stream;
-			output->output = curoutput;
-		}
-	}
-
-	/* if no state registered for saving, we can't save */
-	if (num_regs == 0)
-	{
-		logerror("Sound chip '%s' did not register any state to save!\n", device->tag());
-		if (device->machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("Sound chip '%s' did not register any state to save!", device->tag());
-	}
-}
-
-
-/*-------------------------------------------------
-    device_custom_config_sound - custom inline
-    config callback for populating sound routes
--------------------------------------------------*/
-
-static DEVICE_CUSTOM_CONFIG( sound )
-{
-	sound_config *config = (sound_config *)device->inline_config;
-
-	switch (entrytype)
-	{
-		/* custom config 1 is a new route */
-		case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1:
-		{
-			sound_route **routeptr;
-			int output, input;
-			UINT32 gain;
-
-			/* put back the token that was originally fetched so we can grab a packed 64-bit token */
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT64_UNPACK4(tokens, entrytype, 8, output, 12, input, 12, gain, 32);
-
-			/* allocate a new route */
-			for (routeptr = &config->routelist; *routeptr != NULL; routeptr = &(*routeptr)->next) ;
-			*routeptr = global_alloc(sound_route);
-			(*routeptr)->next = NULL;
-			(*routeptr)->output = output;
-			(*routeptr)->input = input;
-			(*routeptr)->gain = (float)gain * (1.0f / (float)(1 << 24));
-			(*routeptr)->target = TOKEN_GET_STRING(tokens);
-			break;
-		}
-
-		/* custom config free is also used as a reset of sound routes */
-		case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE:
-			while (config->routelist != NULL)
-			{
-				sound_route *temp = config->routelist;
-				config->routelist = temp->next;
-				global_free(temp);
-			}
-			break;
-	}
-
-	return tokens;
-}
-
-
-/*-------------------------------------------------
-    device_get_info_sound - device get info
-    callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( sound )
-{
-	const sound_config *config = (device != NULL) ? (const sound_config *)device->inline_config : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:
-			(*config->type)(device, DEVINFO_INT_TOKEN_BYTES, info);
-			info->i += sizeof(sound_class_data);
-			break;
-
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(sound_config);				break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_SOUND_CHIP;			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(sound); 	break;
-		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVICE_CUSTOM_CONFIG_NAME(sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:
-			if (config != NULL)
-				(*config->type)(device, state, info);
-			else
-				strcpy(info->s, "sound");
-			break;
-
-		default:
-			(*config->type)(device, state, info);
-			break;
-	}
-}
-
-
-
-/***************************************************************************
     INITIALIZATION HELPERS
 ***************************************************************************/
 
@@ -421,97 +188,31 @@ DEVICE_GET_INFO( sound )
 
 static void route_sound(running_machine *machine)
 {
-	running_device *curspeak;
-	running_device *sound;
-	astring tempstring;
-	int outputnum;
-
-	/* first count up the inputs for each speaker */
-	for (sound = sound_first(machine); sound != NULL; sound = sound_next(sound))
-	{
-		const sound_config *config = (const sound_config *)sound->baseconfig().inline_config;
-		int numoutputs = stream_get_device_outputs(sound);
-		const sound_route *route;
-
-		/* iterate over all routes */
-		for (route = config->routelist; route != NULL; route = route->next)
-		{
-			running_device *target_device = machine->device(route->target);
-
-			/* if neither found, it's fatal */
-			if (target_device == NULL)
-				fatalerror("Sound route \"%s\" not found!\n", route->target);
-
-			/* if we got a speaker, bump its input count */
-			if (target_device->type == SPEAKER_OUTPUT)
-				get_safe_token(target_device)->inputs += (route->output == ALL_OUTPUTS) ? numoutputs : 1;
-		}
-	}
-
-	/* now allocate the mixers and input data */
-	for (curspeak = speaker_output_first(machine); curspeak != NULL; curspeak = speaker_output_next(curspeak))
-	{
-		speaker_info *info = get_safe_token(curspeak);
-		if (info->inputs != 0)
-		{
-			info->mixer_stream = stream_create(curspeak, info->inputs, 1, machine->sample_rate, info, mixer_update);
-			state_save_register_postload(machine, mixer_postload, info->mixer_stream);
-			info->input = auto_alloc_array(machine, speaker_input, info->inputs);
-			info->inputs = 0;
-		}
-		else
-			logerror("Warning: speaker \"%s\" has no inputs\n", info->tag);
-	}
-
 	/* iterate again over all the sound chips */
-	for (sound = sound_first(machine); sound != NULL; sound = sound_next(sound))
+	device_sound_interface *sound;
+	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
-		const sound_config *config = (const sound_config *)sound->baseconfig().inline_config;
-		int numoutputs = stream_get_device_outputs(sound);
-		const sound_route *route;
+		int numoutputs = stream_get_device_outputs(*sound);
 
 		/* iterate over all routes */
-		for (route = config->routelist; route != NULL; route = route->next)
+		for (const device_config_sound_interface::sound_route *route = sound->sound_config().m_route_list; route != NULL; route = route->m_next)
 		{
-			running_device *target_device = machine->device(route->target);
-			int inputnum = route->input;
-			sound_stream *stream;
-			int streamoutput;
+			device_t *target_device = machine->device(route->m_target);
+			if (target_device->type() == SPEAKER)
+				continue;
+				
+			int inputnum = route->m_input;
 
 			/* iterate over all outputs, matching any that apply */
-			for (outputnum = 0; outputnum < numoutputs; outputnum++)
-				if (route->output == outputnum || route->output == ALL_OUTPUTS)
+			for (int outputnum = 0; outputnum < numoutputs; outputnum++)
+				if (route->m_output == outputnum || route->m_output == ALL_OUTPUTS)
 				{
-					/* if it's a speaker, set the input */
-					if (target_device->type == SPEAKER_OUTPUT)
-					{
-						speaker_info *speakerinfo = get_safe_token(target_device);
+					sound_stream *inputstream, *stream;
+					int streaminput, streamoutput;
 
-						/* generate text for the UI */
-						tempstring.printf("Speaker '%s': %s '%s'", target_device->tag(), sound->name(), sound->tag());
-						if (numoutputs > 1)
-							tempstring.catprintf(" Ch.%d", outputnum);
-
-						/* fill in the input data on this speaker */
-						speakerinfo->input[speakerinfo->inputs].gain = route->gain;
-						speakerinfo->input[speakerinfo->inputs].default_gain = route->gain;
-						speakerinfo->input[speakerinfo->inputs].name = auto_strdup(machine, tempstring);
-
-						/* connect the output to the input */
-						if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
-							stream_set_input(speakerinfo->mixer_stream, speakerinfo->inputs++, stream, streamoutput, route->gain);
-					}
-
-					/* otherwise, it's a sound chip */
-					else
-					{
-						sound_stream *inputstream;
-						int streaminput;
-
-						if (stream_device_input_to_stream_input(target_device, inputnum++, &inputstream, &streaminput))
-							if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
-								stream_set_input(inputstream, streaminput, stream, streamoutput, route->gain);
-					}
+					if (stream_device_input_to_stream_input(target_device, inputnum++, &inputstream, &streaminput))
+						if (stream_device_output_to_stream_output(*sound, outputnum, &stream, &streamoutput))
+							stream_set_input(inputstream, streaminput, stream, streamoutput, route->m_gain);
 				}
 		}
 	}
@@ -529,11 +230,11 @@ static void route_sound(running_machine *machine)
 
 static void sound_reset(running_machine *machine)
 {
-	running_device *sound;
+	device_sound_interface *sound;
 
 	/* reset all the sound chips */
-	for (sound = sound_first(machine); sound != NULL; sound = sound_next(sound))
-		sound->reset();
+	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
+		sound->device().reset();
 }
 
 
@@ -690,7 +391,6 @@ static void sound_save(running_machine *machine, int config_type, xml_data_node 
 static TIMER_CALLBACK( sound_update )
 {
 	UINT32 finalmix_step, finalmix_offset;
-	running_device *curspeak;
 	int samples_this_update = 0;
 	int sample;
 	sound_private *global = machine->sound_data;
@@ -706,67 +406,8 @@ static TIMER_CALLBACK( sound_update )
 	finalmix = global->finalmix;
 
 	/* force all the speaker streams to generate the proper number of samples */
-	for (curspeak = speaker_output_first(machine); curspeak != NULL; curspeak = speaker_output_next(curspeak))
-	{
-		speaker_info *spk = (speaker_info *)curspeak->token;
-		const stream_sample_t *stream_buf;
-
-		/* get the output buffer */
-		if (spk->mixer_stream != NULL)
-		{
-			int numsamples;
-
-			/* update the stream, getting the start/end pointers around the operation */
-			stream_buf = stream_get_output_since_last_update(spk->mixer_stream, 0, &numsamples);
-
-			/* set or assert that all streams have the same count */
-			if (samples_this_update == 0)
-			{
-				samples_this_update = numsamples;
-
-				/* reset the mixing streams */
-				memset(leftmix, 0, samples_this_update * sizeof(*leftmix));
-				memset(rightmix, 0, samples_this_update * sizeof(*rightmix));
-			}
-			assert(samples_this_update == numsamples);
-
-#ifdef MAME_DEBUG
-			/* debug version: keep track of the maximum sample */
-			for (sample = 0; sample < samples_this_update; sample++)
-			{
-				if (stream_buf[sample] > spk->max_sample)
-					spk->max_sample = stream_buf[sample];
-				else if (-stream_buf[sample] > spk->max_sample)
-					spk->max_sample = -stream_buf[sample];
-				if (stream_buf[sample] > 32767 || stream_buf[sample] < -32768)
-					spk->clipped_samples++;
-				spk->total_samples++;
-			}
-#endif
-
-			/* mix if sound is enabled */
-			if (global->enabled && !global->nosound_mode)
-			{
-				/* if the speaker is centered, send to both left and right */
-				if (spk->speaker->x == 0)
-					for (sample = 0; sample < samples_this_update; sample++)
-					{
-						leftmix[sample] += stream_buf[sample];
-						rightmix[sample] += stream_buf[sample];
-					}
-
-				/* if the speaker is to the left, send only to the left */
-				else if (spk->speaker->x < 0)
-					for (sample = 0; sample < samples_this_update; sample++)
-						leftmix[sample] += stream_buf[sample];
-
-				/* if the speaker is to the right, send only to the right */
-				else
-					for (sample = 0; sample < samples_this_update; sample++)
-						rightmix[sample] += stream_buf[sample];
-			}
-		}
-	}
+	for (speaker_device *speaker = speaker_first(*machine); speaker != NULL; speaker = speaker_next(speaker))
+		speaker->mix(leftmix, rightmix, samples_this_update, !global->enabled || global->nosound_mode);
 
 	/* now downmix the final result */
 	finalmix_step = video_get_speed_factor();
@@ -810,107 +451,280 @@ static TIMER_CALLBACK( sound_update )
 }
 
 
-/*-------------------------------------------------
-    mixer_update - mix all inputs to one output
--------------------------------------------------*/
 
-static STREAM_UPDATE( mixer_update )
+//**************************************************************************
+//  SPEAKER DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  speaker_device_config - constructor
+//-------------------------------------------------
+
+speaker_device_config::speaker_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	  m_x(0.0),
+	  m_y(0.0),
+	  m_z(0.0)
 {
-	speaker_info *speaker = (speaker_info *)param;
-	int numinputs = speaker->inputs;
-	int pos;
+}
 
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *speaker_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(speaker_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *speaker_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, speaker_device(machine, *this));
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any 
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void speaker_device_config::device_config_complete()
+{
+	// move inline data into its final home
+	m_x = static_cast<double>(static_cast<INT32>(m_inline_data[INLINE_X])) / (double)(1 << 24);
+	m_y = static_cast<double>(static_cast<INT32>(m_inline_data[INLINE_Y])) / (double)(1 << 24);
+	m_z = static_cast<double>(static_cast<INT32>(m_inline_data[INLINE_Z])) / (double)(1 << 24);
+}
+
+
+
+//**************************************************************************
+//  LIVE SPEAKER DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  speaker_device - constructor
+//-------------------------------------------------
+
+speaker_device::speaker_device(running_machine &_machine, const speaker_device_config &config)
+	: device_t(_machine, config),
+	  m_config(config),
+	  m_mixer_stream(NULL),
+	  m_inputs(0),
+	  m_input(NULL)
+#ifdef MAME_DEBUG
+	,
+	  m_max_sample(0),
+	  m_clipped_samples(0),
+	  m_total_samples(0)
+#endif
+{
+}
+
+
+//-------------------------------------------------
+//  ~speaker_device - destructor
+//-------------------------------------------------
+
+speaker_device::~speaker_device()
+{
+#ifdef MAME_DEBUG
+	// log the maximum sample values for all speakers
+	if (m_max_sample > 0)
+		mame_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
+#endif /* MAME_DEBUG */
+}
+
+
+//-------------------------------------------------
+//  device_start - perform device-specific
+//  startup
+//-------------------------------------------------
+
+void speaker_device::device_start()
+{
+	// scan all the sound devices and count our inputs
+	int inputs = 0;
+	device_sound_interface *sound;
+	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
+	{
+		// scan each route on the device
+		for (const device_config_sound_interface::sound_route *route = sound->sound_config().m_route_list; route != NULL; route = route->m_next)
+		{
+			// if we are the target of this route, accumulate inputs
+			device_t *target_device = machine->device(route->m_target);
+			if (target_device == this)
+			{
+				// if the sound device is not yet started, bail however -- we need the its stream
+				if (!sound->device().started())
+					throw device_missing_dependencies();
+				
+				// accumulate inputs
+				inputs += (route->m_output == ALL_OUTPUTS) ? stream_get_device_outputs(*sound) : 1;
+			}
+		}
+	}
+	
+	// no inputs? that's weird
+	if (inputs == 0)
+	{
+		logerror("Warning: speaker \"%s\" has no inputs\n", tag());
+		return;
+	}
+	
+	// now we know how many inputs; allocate the mixers and input data
+	m_mixer_stream = stream_create(this, inputs, 1, machine->sample_rate, NULL, static_mixer_update);
+	m_input = auto_alloc_array(machine, speaker_input, inputs);
+	m_inputs = 0;
+
+	// iterate again over all the sound devices
+	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
+	{
+		// scan each route on the device
+		for (const device_config_sound_interface::sound_route *route = sound->sound_config().m_route_list; route != NULL; route = route->m_next)
+		{
+			// if we are the target of this route, hook it up
+			device_t *target_device = machine->device(route->m_target);
+			if (target_device == this)
+			{
+				// iterate over all outputs, matching any that apply
+				int numoutputs = stream_get_device_outputs(*sound);
+				for (int outputnum = 0; outputnum < numoutputs; outputnum++)
+					if (route->m_output == outputnum || route->m_output == ALL_OUTPUTS)
+					{
+						// fill in the input data on this speaker
+						m_input[m_inputs].m_gain = route->m_gain;
+						m_input[m_inputs].m_default_gain = route->m_gain;
+						m_input[m_inputs].m_name.printf("Speaker '%s': %s '%s'", tag(), sound->device().name(), sound->device().tag());
+						if (numoutputs > 1)
+							m_input[m_inputs].m_name.catprintf(" Ch.%d", outputnum);
+
+						// connect the output to the input
+						sound_stream *stream;
+						int streamoutput;
+						if (stream_device_output_to_stream_output(*sound, outputnum, &stream, &streamoutput))
+							stream_set_input(m_mixer_stream, m_inputs++, stream, streamoutput, route->m_gain);
+					}
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  device_post_load - after we load a save state
+//  be sure to update the mixer stream's output
+//  sample rate
+//-------------------------------------------------
+
+void speaker_device::device_post_load()
+{
+	stream_set_sample_rate(m_mixer_stream, machine->sample_rate);
+}
+
+
+//-------------------------------------------------
+//  mixer_update - mix all inputs to one output
+//-------------------------------------------------
+
+void speaker_device::mixer_update(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 	VPRINTF(("Mixer_update(%d)\n", samples));
 
-	/* loop over samples */
-	for (pos = 0; pos < samples; pos++)
+	// loop over samples
+	for (int pos = 0; pos < samples; pos++)
 	{
 		INT32 sample = inputs[0][pos];
 		int inp;
 
-		/* add up all the inputs */
-		for (inp = 1; inp < numinputs; inp++)
+		// add up all the inputs
+		for (inp = 1; inp < m_inputs; inp++)
 			sample += inputs[inp][pos];
 		outputs[0][pos] = sample;
 	}
 }
 
 
-/*-------------------------------------------------
-    mixer_postload - postload function to reset
-    the mixer stream to the proper sample rate
--------------------------------------------------*/
+//-------------------------------------------------
+//  mix - mix in samples from the speaker's stream
+//-------------------------------------------------
 
-static STATE_POSTLOAD( mixer_postload )
+void speaker_device::mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_update, bool suppress)
 {
-	sound_stream *stream = (sound_stream *)param;
-	stream_set_sample_rate(stream, machine->sample_rate);
-}
+	// skip if no stream
+	if (m_mixer_stream == NULL)
+		return;
 
+	// update the stream, getting the start/end pointers around the operation
+	int numsamples;
+	const stream_sample_t *stream_buf = stream_get_output_since_last_update(m_mixer_stream, 0, &numsamples);
 
-
-/***************************************************************************
-    SPEAKER OUTPUT DEVICE INTERFACE
-***************************************************************************/
-
-/*-------------------------------------------------
-    speaker_output_start - device start callback
-    for a speaker
--------------------------------------------------*/
-
-static DEVICE_START( speaker_output )
-{
-	speaker_info *info = (speaker_info *)device->token;
-
-	/* copy in all the relevant info */
-	info->speaker = (const speaker_config *)device->baseconfig().inline_config;
-	info->tag = device->tag();
-}
-
-
-/*-------------------------------------------------
-    speaker_output_stop - device stop callback
-    for a speaker
--------------------------------------------------*/
-
-static DEVICE_STOP( speaker_output )
-{
-#ifdef MAME_DEBUG
-	speaker_info *info = (speaker_info *)device->token;
-
-	/* log the maximum sample values for all speakers */
-	if (info->max_sample > 0)
-		mame_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", info->tag, info->max_sample, 32767.0 / (info->max_sample ? info->max_sample : 1), (int)((double)info->clipped_samples * 100.0 / info->total_samples));
-#endif /* MAME_DEBUG */
-}
-
-
-/*-------------------------------------------------
-    speaker_output_get_info - device get info
-    callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( speaker_output )
-{
-	switch (state)
+	// set or assert that all streams have the same count
+	if (samples_this_update == 0)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(speaker_info);			break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(speaker_config);		break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_AUDIO;			break;
+		samples_this_update = numsamples;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(speaker_output); break;
-		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME(speaker_output); break;
-		case DEVINFO_FCT_RESET:							/* Nothing */							break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Speaker");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Sound");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		/* reset the mixing streams */
+		memset(leftmix, 0, samples_this_update * sizeof(*leftmix));
+		memset(rightmix, 0, samples_this_update * sizeof(*rightmix));
 	}
+	assert(samples_this_update == numsamples);
+
+#ifdef MAME_DEBUG
+	// debug version: keep track of the maximum sample
+	for (int sample = 0; sample < samples_this_update; sample++)
+	{
+		if (stream_buf[sample] > m_max_sample)
+			m_max_sample = stream_buf[sample];
+		else if (-stream_buf[sample] > m_max_sample)
+			m_max_sample = -stream_buf[sample];
+		if (stream_buf[sample] > 32767 || stream_buf[sample] < -32768)
+			m_clipped_samples++;
+		m_total_samples++;
+	}
+#endif
+
+	// mix if sound is enabled
+	if (!suppress)
+	{
+		// if the speaker is centered, send to both left and right
+		if (m_config.m_x == 0)
+			for (int sample = 0; sample < samples_this_update; sample++)
+			{
+				leftmix[sample] += stream_buf[sample];
+				rightmix[sample] += stream_buf[sample];
+			}
+
+		// if the speaker is to the left, send only to the left
+		else if (m_config.m_x < 0)
+			for (int sample = 0; sample < samples_this_update; sample++)
+				leftmix[sample] += stream_buf[sample];
+
+		// if the speaker is to the right, send only to the right
+		else
+			for (int sample = 0; sample < samples_this_update; sample++)
+				rightmix[sample] += stream_buf[sample];
+	}
+}
+
+
+//-------------------------------------------------
+//  set_input_gain - set the gain on a given
+//  input
+//-------------------------------------------------
+
+void speaker_device::set_input_gain(int inputnum, float gain)
+{
+	m_input[inputnum].m_gain = gain;
+	stream_set_input_gain(m_mixer_stream, inputnum, gain);
 }
 
 
@@ -924,7 +738,7 @@ DEVICE_GET_INFO( speaker_output )
     particular output
 -------------------------------------------------*/
 
-void sound_set_output_gain(running_device *device, int output, float gain)
+void sound_set_output_gain(device_t *device, int output, float gain)
 {
 	sound_stream *stream;
 	int outputnum;
@@ -946,15 +760,11 @@ void sound_set_output_gain(running_device *device, int output, float gain)
 
 int sound_get_user_gain_count(running_machine *machine)
 {
-	running_device *curspeak;
+	// count up the number of speaker inputs
 	int count = 0;
+	for (speaker_device *speaker = speaker_first(*machine); speaker != NULL; speaker = speaker_next(speaker))
+		count += speaker->inputs();
 
-	/* count up the number of speaker inputs */
-	for (curspeak = speaker_output_first(machine); curspeak != NULL; curspeak = speaker_output_next(curspeak))
-	{
-		speaker_info *info = (speaker_info *)curspeak->token;
-		count += info->inputs;
-	}
 	return count;
 }
 
@@ -967,13 +777,10 @@ int sound_get_user_gain_count(running_machine *machine)
 void sound_set_user_gain(running_machine *machine, int index, float gain)
 {
 	int inputnum;
-	speaker_info *spk = index_to_input(machine, index, &inputnum);
+	speaker_device *speaker = index_to_input(machine, index, inputnum);
 
-	if (spk != NULL)
-	{
-		spk->input[inputnum].gain = gain;
-		stream_set_input_gain(spk->mixer_stream, inputnum, gain);
-	}
+	if (speaker != NULL)
+		speaker->set_input_gain(inputnum, gain);
 }
 
 
@@ -985,8 +792,8 @@ void sound_set_user_gain(running_machine *machine, int index, float gain)
 float sound_get_user_gain(running_machine *machine, int index)
 {
 	int inputnum;
-	speaker_info *spk = index_to_input(machine, index, &inputnum);
-	return (spk != NULL) ? spk->input[inputnum].gain : 0;
+	speaker_device *speaker = index_to_input(machine, index, inputnum);
+	return (speaker != NULL) ? speaker->input_gain(inputnum) : 0;
 }
 
 
@@ -998,8 +805,8 @@ float sound_get_user_gain(running_machine *machine, int index)
 float sound_get_default_gain(running_machine *machine, int index)
 {
 	int inputnum;
-	speaker_info *spk = index_to_input(machine, index, &inputnum);
-	return (spk != NULL) ? spk->input[inputnum].default_gain : 0;
+	speaker_device *speaker = index_to_input(machine, index, inputnum);
+	return (speaker != NULL) ? speaker->input_default_gain(inputnum) : 0;
 }
 
 
@@ -1011,6 +818,6 @@ float sound_get_default_gain(running_machine *machine, int index)
 const char *sound_get_user_gain_name(running_machine *machine, int index)
 {
 	int inputnum;
-	speaker_info *spk = index_to_input(machine, index, &inputnum);
-	return (spk != NULL) ? spk->input[inputnum].name : NULL;
+	speaker_device *speaker = index_to_input(machine, index, inputnum);
+	return (speaker != NULL) ? speaker->input_name(inputnum) : 0;
 }

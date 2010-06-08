@@ -69,7 +69,7 @@ static TIMER_CALLBACK( cursor_callback )
 	if (state->main_inten)
 		cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
 
-	timer_adjust_oneshot(state->cursor_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
+	timer_adjust_oneshot(state->cursor_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
 }
 
 /*************************************
@@ -922,7 +922,7 @@ VIDEO_START( lockon )
 
 	/* Timer for the CRTC cursor pulse */
 	state->cursor_timer = timer_alloc(machine, cursor_callback, NULL);
-	timer_adjust_oneshot(state->cursor_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
+	timer_adjust_oneshot(state->cursor_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
 
 	state_save_register_global_bitmap(machine, state->back_buffer);
 	state_save_register_global_bitmap(machine, state->front_buffer);

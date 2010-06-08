@@ -47,8 +47,8 @@ public:
 	PXA255_GPIO_Regs gpio_regs;
 	PXA255_LCD_Regs lcd_regs;
 
-	running_device *dmadac[2];
-	running_device *eeprom;
+	dmadac_sound_device *dmadac[2];
+	eeprom_device *eeprom;
 	UINT32 pxa255_lcd_palette[0x100];
 	UINT8 pxa255_lcd_framebuffer[0x100000];
 
@@ -1451,9 +1451,9 @@ static DRIVER_INIT( 39in1 )
 {
 	_39in1_state *state = (_39in1_state *)machine->driver_data;
 
-	state->dmadac[0] = devtag_get_device(machine, "dac1");
-	state->dmadac[1] = devtag_get_device(machine, "dac2");
-	state->eeprom = devtag_get_device(machine, "eeprom");
+	state->dmadac[0] = machine->device<dmadac_sound_device>("dac1");
+	state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");
+	state->eeprom = machine->device<eeprom_device>("eeprom");
 
 	memory_install_read32_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa0151648, 0xa015164b, 0, 0, prot_cheater_r);
 }
@@ -1532,7 +1532,7 @@ static void pxa255_start(running_machine* machine)
 
 	//pxa255_t* pxa255 = pxa255_get_safe_token( device );
 
-	//pxa255->iface = device->base_config().static_config;
+	//pxa255->iface = device->base_config().static_config();
 
 	for(index = 0; index < 16; index++)
 	{

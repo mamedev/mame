@@ -61,10 +61,9 @@ struct _ins8154_state
 INLINE ins8154_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == INS8154);
+	assert(device->type() == INS8154);
 
-	return (ins8154_state *)device->token;
+	return (ins8154_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -219,7 +218,7 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 static DEVICE_START( ins8154 )
 {
 	ins8154_state *ins8154 = get_safe_token(device);
-	const ins8154_interface *intf = (const ins8154_interface *)device->baseconfig().static_config;
+	const ins8154_interface *intf = (const ins8154_interface *)device->baseconfig().static_config();
 
 	/* validate some basic stuff */
 	assert(intf != NULL);

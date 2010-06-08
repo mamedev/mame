@@ -54,10 +54,9 @@ struct _drcfe_state
 	void *				param;						/* parameter for the callback */
 
 	/* CPU parameters */
-	running_device *device;					/* CPU device object */
+	cpu_device *		cpudevice;					/* CPU device object */
 	const address_space *program;					/* program address space for this CPU */
 	offs_t				pageshift;					/* shift to convert address to a page index */
-	cpu_translate_func	translate;					/* pointer to translation function */
 
 	/* opcode descriptor arrays */
 	opcode_desc *		desc_live_list;				/* head of list of live descriptions */
@@ -95,7 +94,7 @@ INLINE opcode_desc *desc_alloc(drcfe_state *drcfe)
 	if (desc != NULL)
 		drcfe->desc_free_list = desc->next;
 	else
-		desc = auto_alloc(drcfe->device->machine, opcode_desc);
+		desc = auto_alloc(drcfe->cpudevice->machine, opcode_desc);
 	return desc;
 }
 
@@ -139,10 +138,9 @@ drcfe_state *drcfe_init(running_device *cpu, const drcfe_config *config, void *p
 	drcfe->param = param;
 
 	/* initialize the state */
-	drcfe->device = cpu;
-	drcfe->program = cpu->space(AS_PROGRAM);
-	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
-	drcfe->translate = (cpu_translate_func)cpu->get_config_fct(CPUINFO_FCT_TRANSLATE);
+	drcfe->cpudevice = downcast<cpu_device *>(cpu);
+	drcfe->program = device_memory(cpu)->space(AS_PROGRAM);
+	drcfe->pageshift = device_memory(cpu)->space_config(AS_PROGRAM)->m_page_shift;
 
 	return drcfe;
 }
@@ -162,14 +160,14 @@ void drcfe_exit(drcfe_state *drcfe)
 	{
 		opcode_desc *freeme = drcfe->desc_free_list;
 		drcfe->desc_free_list = drcfe->desc_free_list->next;
-		auto_free(drcfe->device->machine, freeme);
+		auto_free(drcfe->cpudevice->machine, freeme);
 	}
 
 	/* free the description array */
-	auto_free(drcfe->device->machine, drcfe->desc_array);
+	auto_free(drcfe->cpudevice->machine, drcfe->desc_array);
 
 	/* free the object itself */
-	auto_free(drcfe->device->machine, drcfe);
+	auto_free(drcfe->cpudevice->machine, drcfe);
 }
 
 

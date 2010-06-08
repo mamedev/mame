@@ -227,11 +227,10 @@ typedef struct {
 INLINE alpha8201_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ALPHA8201 ||
 		   cpu_get_type(device) == CPU_ALPHA8301);
-	return (alpha8201_state *)device->token;
+	return (alpha8201_state *)downcast<cpu_device *>(device)->token();
 }
 
 /* Get next opcode argument and increment program counter */
@@ -670,7 +669,7 @@ static CPU_INIT( alpha8201 )
 	alpha8201_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0, cpustate->RAM);
 	state_save_register_device_item(device, 0, cpustate->PREVPC);
@@ -879,7 +878,7 @@ static CPU_SET_INFO( alpha8201 )
 /* 8201 and 8301 */
 static CPU_GET_INFO( alpha8xxx )
 {
-	alpha8201_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	alpha8201_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

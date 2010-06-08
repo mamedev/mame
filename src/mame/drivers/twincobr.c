@@ -610,7 +610,7 @@ static MACHINE_DRIVER_START( fsharkbt )
 	MDRV_CPU_ADD("mcu", I8741, XTAL_28MHz/16)
 	/* Program Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(fsharkbt_i8741_io_map)
-	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal program code is not dumped */
+	MDRV_DEVICE_DISABLE()		/* Internal program code is not dumped */
 
 	MDRV_MACHINE_RESET(fsharkbt)	/* Reset fshark bootleg 8741 MCU data */
 MACHINE_DRIVER_END

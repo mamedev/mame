@@ -437,8 +437,8 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 
 static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 {
-	running_device *sn = devtag_get_device(timer->machine, "snsnd");
-	n8080_state *state = (n8080_state *)timer->machine->driver_data;
+	running_device *sn = devtag_get_device(timer.machine, "snsnd");
+	n8080_state *state = (n8080_state *)timer.machine->driver_data;
 	double voltage = 0;
 
 	if (state->mono_flop[2])
@@ -452,8 +452,8 @@ static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 
 static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
 {
-	n8080_state *state = (n8080_state *)timer->machine->driver_data;
-	double t = state->helifire_dac_timing - attotime_to_double(timer_get_time(timer->machine));
+	n8080_state *state = (n8080_state *)timer.machine->driver_data;
+	double t = state->helifire_dac_timing - attotime_to_double(timer_get_time(timer.machine));
 
 	if (state->helifire_dac_phase)
 	{

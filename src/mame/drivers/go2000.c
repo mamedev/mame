@@ -204,8 +204,8 @@ static VIDEO_UPDATE(go2000)
 	{
 	int offs;
 
-	int max_x = video_screen_get_width(screen->machine->primary_screen) - 8;
-	int max_y = video_screen_get_height(screen->machine->primary_screen) - 8;
+	int max_x = screen->machine->primary_screen->width() - 8;
+	int max_y = screen->machine->primary_screen->height() - 8;
 
 	for (offs = 0xf800 / 2; offs < 0x10000 / 2 ; offs += 4/2)
 	{

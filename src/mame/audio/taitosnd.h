@@ -1,6 +1,7 @@
 #ifndef __TAITOSND_H__
 #define __TAITOSND_H__
 
+#include "devlegcy.h"
 #include "devcb.h"
 
 /***************************************************************************
@@ -14,17 +15,11 @@ struct _tc0140syt_interface
 	const char         *slave;
 };
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( tc0140syt );
+DECLARE_LEGACY_DEVICE(TC0140SYT, tc0140syt);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define TC0140SYT DEVICE_GET_INFO_NAME( tc0140syt )
 
 #define MDRV_TC0140SYT_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, TC0140SYT, 0) \

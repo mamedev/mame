@@ -55,17 +55,16 @@ struct _hd63484_state
 INLINE hd63484_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == HD63484);
+	assert(device->type() == HD63484);
 
-	return (hd63484_state *)device->token;
+	return (hd63484_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const hd63484_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == HD63484);
-	return (const hd63484_interface *) device->baseconfig().static_config;
+	assert(device->type() == HD63484);
+	return (const hd63484_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -1509,7 +1508,7 @@ READ16_DEVICE_HANDLER( hd63484_data_r )
 	int res;
 
 	if (hd63484->regno == 0x80)
-		res = video_screen_get_vpos(device->machine->primary_screen);
+		res = device->machine->primary_screen->vpos();
 	else if (hd63484->regno == 0)
 	{
 #if LOG_COMMANDS
@@ -1583,6 +1582,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
 #define DEVTEMPLATE_NAME		"HD63484"
 #define DEVTEMPLATE_FAMILY		"HD63484 Video Controller"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
 #include "devtempl.h"
 

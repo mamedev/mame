@@ -1,3 +1,5 @@
+#include "devlegcy.h"
+
 /*----------- defined in audio/flower.c -----------*/
 
 extern UINT8 *flower_soundregs1,*flower_soundregs2;
@@ -5,8 +7,7 @@ extern UINT8 *flower_soundregs1,*flower_soundregs2;
 WRITE8_HANDLER( flower_sound1_w );
 WRITE8_HANDLER( flower_sound2_w );
 
-DEVICE_GET_INFO( flower_sound );
-#define SOUND_FLOWER DEVICE_GET_INFO_NAME(flower_sound)
+DECLARE_LEGACY_SOUND_DEVICE(FLOWER, flower_sound);
 
 
 /*----------- defined in video/flower.c -----------*/

@@ -77,7 +77,7 @@ VIDEO_START( shangha3 )
 {
 	int i;
 
-	rawbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	rawbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	for (i = 0;i < 14;i++)
 		drawmode_table[i] = DRAWMODE_SOURCE;

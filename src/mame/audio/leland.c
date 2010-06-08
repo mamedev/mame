@@ -514,7 +514,7 @@ static TIMER_CALLBACK( dma_timer_callback );
 static DEVICE_START( common_sh_start )
 {
 	running_machine *machine = device->machine;
-	const address_space *dmaspace = machine->device("audiocpu")->space(AS_PROGRAM);
+	const address_space *dmaspace = cputag_get_address_space(machine, "audiocpu", AS_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */
@@ -651,7 +651,7 @@ static IRQ_CALLBACK( int_callback )
 	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time(device->machine)), i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	cpu_set_info(device, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
+	cpu_set_input_line(device, 0, CLEAR_LINE);
 	i80186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */

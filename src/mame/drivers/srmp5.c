@@ -94,7 +94,7 @@ static VIDEO_UPDATE( srmp5 )
 	UINT16 *sprite_list=state->sprram;
 	UINT16 *sprite_list_end=&state->sprram[0x4000]; //guess
 	UINT8 *pixels=(UINT8 *)state->tileram;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
 //Currently the tiles are OFF.
@@ -170,7 +170,7 @@ static VIDEO_UPDATE( srmp5 )
 								xs2 = (sprite_sublist[SPRITE_PALETTE] & 0x8000) ? (sizex - xs) : xs;
 								if(pen)
 								{
-									if(xb+xs2<=visarea->max_x && xb+xs2>=visarea->min_x && yb+ys2<=visarea->max_y && yb+ys2>=visarea->min_y )
+									if(xb+xs2<=visarea.max_x && xb+xs2>=visarea.min_x && yb+ys2<=visarea.max_y && yb+ys2>=visarea.min_y )
 									{
 										UINT16 pixdata=state->palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
 										*BITMAP_ADDR32(bitmap, yb+ys2, xb+xs2) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);

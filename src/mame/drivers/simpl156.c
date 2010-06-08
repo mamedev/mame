@@ -174,7 +174,7 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 	//okibank = data & 0x07;
 
-	okim6295_set_bank_base(state->okimusic, 0x40000 * (data & 0x7));
+	state->okimusic->set_bank_base(0x40000 * (data & 0x7));
 
 	eeprom_set_clock_line(state->eeprom, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 	eeprom_write_bit(state->eeprom, BIT(data, 4));
@@ -415,16 +415,6 @@ static const deco16ic_interface simpl156_deco16ic_intf =
 	NULL
 };
 
-static MACHINE_START( simpl156 )
-{
-	simpl156_state *state = (simpl156_state *)machine->driver_data;
-
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
-	state->eeprom = devtag_get_device(machine, "eeprom");
-	state->okimusic = devtag_get_device(machine, "okimusic");
-}
-
 static MACHINE_DRIVER_START( chainrec )
 
 	/* driver data */
@@ -436,8 +426,6 @@ static MACHINE_DRIVER_START( chainrec )
 	MDRV_CPU_VBLANK_INT("screen", simpl156_vbl_interrupt)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")  // 93C45
-
-	MDRV_MACHINE_START(simpl156)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -456,13 +444,11 @@ static MACHINE_DRIVER_START( chainrec )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("okisfx", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("okisfx", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MDRV_SOUND_ADD("okimusic", OKIM6295, 32220000/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("okimusic", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_DRIVER_END
@@ -494,8 +480,7 @@ static MACHINE_DRIVER_START( mitchell156 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mitchell156_map)
 
-	MDRV_SOUND_REPLACE("okimusic", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_REPLACE("okimusic", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_DRIVER_END

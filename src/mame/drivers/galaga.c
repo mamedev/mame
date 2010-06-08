@@ -873,7 +873,7 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 		scanline = 64;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(cpu3_interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -900,7 +900,7 @@ static MACHINE_RESET( galaga )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
+	timer_adjust_oneshot(cpu3_interrupt_timer, machine->primary_screen->time_until_pos(64), 64);
 }
 
 static MACHINE_RESET( battles )

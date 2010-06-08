@@ -106,8 +106,8 @@ VIDEO_START( fortyl )
 	state->pixram1 = auto_alloc_array_clear(machine, UINT8, 0x4000);
 	state->pixram2 = auto_alloc_array_clear(machine, UINT8, 0x4000);
 
-	state->tmp_bitmap1 = auto_bitmap_alloc(machine, 256, 256, video_screen_get_format(machine->primary_screen));
-	state->tmp_bitmap2 = auto_bitmap_alloc(machine, 256, 256, video_screen_get_format(machine->primary_screen));
+	state->tmp_bitmap1 = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
+	state->tmp_bitmap2 = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 

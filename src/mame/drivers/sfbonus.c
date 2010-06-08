@@ -722,12 +722,12 @@ static VIDEO_START(sfbonus)
 
 }
 
-static void sfbonus_draw_reel_layer(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
+static void sfbonus_draw_reel_layer(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int catagory)
 {
 	int zz;
 	int i;
 	int startclipmin;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 	UINT8* selectbase = &sfbonus_videoram[0x600];
 	UINT8* bg_scroll = &sfbonus_videoram[0x000];
 	UINT8* reels_rowscroll = &sfbonus_videoram[0x400];
@@ -770,7 +770,7 @@ static void sfbonus_draw_reel_layer(running_device *screen, bitmap_t *bitmap, co
 		//printf("%04x %04x %d\n",zz, xxxscroll, line/8);
 
 		/* draw top of screen */
-		clip.min_x = visarea->min_x;
+		clip.min_x = visarea.min_x;
 		clip.max_x = 511;
 		clip.min_y = startclipmin;
 		clip.max_y = startclipmin;
@@ -1230,8 +1230,7 @@ static MACHINE_DRIVER_START( sfbonus )
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

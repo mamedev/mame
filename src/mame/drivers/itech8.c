@@ -636,7 +636,7 @@ static INTERRUPT_GEN( generate_nmi )
 	itech8_update_interrupts(device->machine, 1, -1, -1);
 	timer_set(device->machine, ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(device->machine->primary_screen));
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", device->machine->primary_screen->vpos());
 }
 
 
@@ -666,7 +666,7 @@ static TIMER_CALLBACK( behind_the_beam_update );
 static MACHINE_START( sstrike )
 {
 	/* we need to update behind the beam as well */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 32, behind_the_beam_update);
+	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 32, behind_the_beam_update);
 }
 
 static MACHINE_RESET( itech8 )
@@ -686,7 +686,7 @@ static MACHINE_RESET( itech8 )
 	/* set the visible area */
 	if (visarea)
 	{
-		video_screen_set_visarea(machine->primary_screen, visarea->min_x, visarea->max_x, visarea->min_y, visarea->max_y);
+		machine->primary_screen->set_visible_area(visarea->min_x, visarea->max_x, visarea->min_y, visarea->max_y);
 		visarea = NULL;
 	}
 }
@@ -705,14 +705,14 @@ static TIMER_CALLBACK( behind_the_beam_update )
 	int interval = param & 0xff;
 
 	/* force a partial update to the current scanline */
-	video_screen_update_partial(machine->primary_screen, scanline);
+	machine->primary_screen->update_partial(scanline);
 
 	/* advance by the interval, and wrap to 0 */
 	scanline += interval;
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, (scanline << 8) + interval, behind_the_beam_update);
+	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, (scanline << 8) + interval, behind_the_beam_update);
 }
 
 
@@ -1769,8 +1769,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym2203 )
 	MDRV_SOUND_ROUTE(2, "mono", 0.07)
 	MDRV_SOUND_ROUTE(3, "mono", 0.75)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, CLOCK_8MHz/8) // was /128??
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // was /128, not /132, so unsure so pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -1801,8 +1800,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812 )
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, CLOCK_8MHz/8) // was /128??
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // was /128, not /132, so unsure so pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -1818,8 +1816,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812_external )
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, CLOCK_8MHz/8) // was /128??
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // was /128, not /132, so unsure so pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -1972,6 +1969,8 @@ static MACHINE_DRIVER_START( rimrockn )
 	MDRV_IMPORT_FROM(itech8_sound_ym3812_external)
 
 	MDRV_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
+	MDRV_CPU_PROGRAM_MAP(tmshi_map)
+	MDRV_CPU_VBLANK_INT("screen", generate_nmi)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1988,6 +1987,7 @@ static MACHINE_DRIVER_START( ninclown )
 
 	MDRV_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MDRV_CPU_PROGRAM_MAP(ninclown_map)
+	MDRV_CPU_VBLANK_INT("screen", generate_nmi)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

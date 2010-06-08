@@ -66,7 +66,7 @@ VIDEO_START( blockout )
 	blockout_state *state = (blockout_state *)machine->driver_data;
 
 	/* Allocate temporary bitmaps */
-	state->tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
 	state_save_register_global_bitmap(machine, state->tmpbitmap);
 }
 
@@ -75,9 +75,9 @@ static void update_pixels( running_machine *machine, int x, int y )
 	blockout_state *state = (blockout_state *)machine->driver_data;
 	UINT16 front, back;
 	int color;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	if (x < visarea->min_x || x > visarea->max_x || y < visarea->min_y || y > visarea->max_y)
+	if (x < visarea.min_x || x > visarea.max_x || y < visarea.min_y || y > visarea.max_y)
 		return;
 
 	front = state->videoram[y * 256 + x / 2];

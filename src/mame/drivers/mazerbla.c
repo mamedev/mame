@@ -131,10 +131,10 @@ static PALETTE_INIT( mazerbla )
 static VIDEO_START( mazerbla )
 {
 	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
-	state->tmpbitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->tmpbitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->tmpbitmaps[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	state->tmpbitmaps[3] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmpbitmaps[0] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmaps[1] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmaps[2] = machine->primary_screen->alloc_compatible_bitmap();
+	state->tmpbitmaps[3] = machine->primary_screen->alloc_compatible_bitmap();
 
 	state_save_register_global_bitmap(machine, state->tmpbitmaps[0]);
 	state_save_register_global_bitmap(machine, state->tmpbitmaps[1]);

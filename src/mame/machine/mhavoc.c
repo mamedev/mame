@@ -44,7 +44,7 @@ TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock )
 		alpha_irq_clock++;
 		if ((alpha_irq_clock & 0x0c) == 0x0c)
 		{
-			cputag_set_input_line(timer->machine, "alpha", 0, ASSERT_LINE);
+			cputag_set_input_line(timer.machine, "alpha", 0, ASSERT_LINE);
 			alpha_irq_clock_enable = 0;
 		}
 	}
@@ -53,7 +53,7 @@ TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock )
 	if (has_gamma_cpu)
 	{
 		gamma_irq_clock++;
-		cputag_set_input_line(timer->machine, "gamma", 0, (gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(timer.machine, "gamma", 0, (gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

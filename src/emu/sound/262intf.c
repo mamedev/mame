@@ -25,10 +25,8 @@ struct _ymf262_state
 INLINE ymf262_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YMF262);
-	return (ymf262_state *)device->token;
+	assert(device->type() == SOUND_YMF262);
+	return (ymf262_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -82,13 +80,13 @@ static DEVICE_START( ymf262 )
 {
 	static const ymf262_interface dummy = { 0 };
 	ymf262_state *info = get_safe_token(device);
-	int rate = device->clock/288;
+	int rate = device->clock()/288;
 
-	info->intf = device->baseconfig().static_config ? (const ymf262_interface *)device->baseconfig().static_config : &dummy;
+	info->intf = device->baseconfig().static_config() ? (const ymf262_interface *)device->baseconfig().static_config() : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
-	info->chip = ymf262_init(device,device->clock,rate);
+	info->chip = ymf262_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YMF262 chip");
 
 	info->stream = stream_create(device,0,4,rate,info,ymf262_stream_update);

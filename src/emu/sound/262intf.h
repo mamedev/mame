@@ -3,6 +3,8 @@
 #ifndef __262INTF_H__
 #define __262INTF_H__
 
+#include "devlegcy.h"
+
 
 typedef struct _ymf262_interface ymf262_interface;
 struct _ymf262_interface
@@ -21,7 +23,6 @@ WRITE8_DEVICE_HANDLER( ymf262_data_a_w );
 WRITE8_DEVICE_HANDLER( ymf262_data_b_w );
 
 
-DEVICE_GET_INFO( ymf262 );
-#define SOUND_YMF262 DEVICE_GET_INFO_NAME( ymf262 )
+DECLARE_LEGACY_SOUND_DEVICE(YMF262, ymf262);
 
 #endif /* __262INTF_H__ */

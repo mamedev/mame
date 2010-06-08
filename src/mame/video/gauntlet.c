@@ -127,7 +127,7 @@ WRITE16_HANDLER( gauntlet_xscroll_w )
 	/* if something changed, force a partial update */
 	if (*state->atarigen.xscroll != oldxscroll)
 	{
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 		/* adjust the scrolls */
 		tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, *state->atarigen.xscroll);
@@ -152,7 +152,7 @@ WRITE16_HANDLER( gauntlet_yscroll_w )
 	/* if something changed, force a partial update */
 	if (*state->atarigen.yscroll != oldyscroll)
 	{
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 		/* if the bank changed, mark all tiles dirty */
 		if (state->playfield_tile_bank != (*state->atarigen.yscroll & 3))

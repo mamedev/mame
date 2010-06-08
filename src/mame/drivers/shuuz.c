@@ -46,13 +46,13 @@ static void update_interrupts(running_machine *machine)
 
 static READ16_HANDLER( shuuz_atarivc_r )
 {
-	return atarivc_r(space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( shuuz_atarivc_w )
 {
-	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
 }
 
 
@@ -75,7 +75,7 @@ static MACHINE_RESET( shuuz )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarivc_reset(machine->primary_screen, state->atarigen.atarivc_eof_data, 1);
+	atarivc_reset(*machine->primary_screen, state->atarigen.atarivc_eof_data, 1);
 }
 
 
@@ -123,7 +123,7 @@ static READ16_HANDLER( special_port0_r )
 {
 	int result = input_port_read(space->machine, "SYSTEM");
 
-	if ((result & 0x0800) && atarigen_get_hblank(space->machine->primary_screen))
+	if ((result & 0x0800) && atarigen_get_hblank(*space->machine->primary_screen))
 		result &= ~0x0800;
 
 	return result;
@@ -286,8 +286,7 @@ static MACHINE_DRIVER_START( shuuz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

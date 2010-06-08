@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "sound/cem3394.h"
 
 #define BALSENTE_MASTER_CLOCK	(20000000)
 #define BALSENTE_CPU_CLOCK		(BALSENTE_MASTER_CLOCK / 16)
@@ -30,7 +31,17 @@ class balsente_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, balsente_state(machine)); }
 
-	balsente_state(running_machine &machine) { }
+	balsente_state(running_machine &machine)
+		: scanline_timer(machine.device<timer_device>("scan_timer")),
+		  counter_0_timer(machine.device<timer_device>("8253_0_timer"))
+	{
+		astring temp;
+		for (int i = 0; i < ARRAY_LENGTH(cem_device); i++)
+		{
+			cem_device[i] = machine.device<cem3394_sound_device>(temp.format("cem%d", i+1));
+			assert(cem_device[i] != NULL);
+		}
+	}
 
 	/* global data */
 	UINT8 shooter;
@@ -43,7 +54,7 @@ public:
 	/* 8253 counter state */
 	struct
 	{
-		running_device *timer;
+		timer_device *timer;
 		UINT8 timer_active;
 		INT32 initial;
 		INT32 count;
@@ -54,12 +65,12 @@ public:
 		UINT8 writebyte;
 	} counter[3];
 
-	running_device *scanline_timer;
+	timer_device *scanline_timer;
 
 	/* manually clocked counter 0 states */
 	UINT8 counter_control;
 	UINT8 counter_0_ff;
-	running_device *counter_0_timer;
+	timer_device *counter_0_timer;
 	UINT8 counter_0_timer_active;
 
 	/* random number generator states */
@@ -90,7 +101,7 @@ public:
 
 	/* noise generator states */
 	UINT32 noise_position[6];
-	running_device *cem_device[6];
+	cem3394_sound_device *cem_device[6];
 
 	/* game-specific states */
 	UINT8 nstocker_bits;

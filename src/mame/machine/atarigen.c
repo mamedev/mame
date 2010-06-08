@@ -44,11 +44,11 @@ static TIMER_CALLBACK( delayed_sound_reset );
 static TIMER_CALLBACK( delayed_sound_w );
 static TIMER_CALLBACK( delayed_6502_sound_w );
 
-static void atarigen_set_vol(running_machine *machine, int volume, sound_type type);
+static void atarigen_set_vol(running_machine *machine, int volume, device_type type);
 
 static TIMER_CALLBACK( scanline_timer_callback );
 
-static void atarivc_common_w(running_device *screen, offs_t offset, UINT16 newword);
+static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword);
 
 static TIMER_CALLBACK( unhalt_cpu );
 
@@ -60,17 +60,17 @@ static TIMER_CALLBACK( atarivc_eof_update );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE const atarigen_screen_timer *get_screen_timer(running_device *screen)
+INLINE const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 {
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
+	atarigen_state *state = (atarigen_state *)screen.machine->driver_data;
 	int i;
 
 	/* find the index of the timer that matches the screen */
 	for (i = 0; i < ARRAY_LENGTH(state->screen_timer); i++)
-		if (state->screen_timer[i].screen == screen)
+		if (state->screen_timer[i].screen == &screen)
 			return &state->screen_timer[i];
 
-	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen->tag());
+	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen.tag());
 	return NULL;
 }
 
@@ -83,12 +83,12 @@ INLINE const atarigen_screen_timer *get_screen_timer(running_device *screen)
 void atarigen_init(running_machine *machine)
 {
 	atarigen_state *state = (atarigen_state *)machine->driver_data;
-	running_device *screen;
+	screen_device *screen;
 	int i;
 
 	/* allocate timers for all screens */
-	assert(video_screen_count(machine->config) <= ARRAY_LENGTH(state->screen_timer));
-	for (i = 0, screen = video_screen_first(machine); screen != NULL; i++, screen = video_screen_next(screen))
+	assert(screen_count(*machine) <= ARRAY_LENGTH(state->screen_timer));
+	for (i = 0, screen = screen_first(*machine); screen != NULL; i++, screen = screen_next(screen))
 	{
 		state->screen_timer[i].screen = screen;
 		state->screen_timer[i].scanline_interrupt_timer = timer_alloc(machine, scanline_interrupt_callback, (void *)screen);
@@ -179,10 +179,10 @@ void atarigen_update_interrupts(running_machine *machine)
     scanline interrupt should be generated.
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_int_set(running_device *screen, int scanline)
+void atarigen_scanline_int_set(screen_device &screen, int scanline)
 {
 	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
-	timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, scanline, 0), 0);
+	timer_adjust_oneshot(timer, screen.time_until_pos(scanline), 0);
 }
 
 
@@ -291,14 +291,14 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w )
 
 static TIMER_CALLBACK( scanline_interrupt_callback )
 {
-	running_device *screen = (running_device *)ptr;
+	screen_device &screen = *reinterpret_cast<screen_device *>(ptr);
 	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
 
 	/* generate the interrupt */
 	atarigen_scanline_int_gen(devtag_get_device(machine, "maincpu"));
 
 	/* set a new timer to go off at the same scan line next frame */
-	timer_adjust_oneshot(timer, video_screen_get_frame_period(screen), 0);
+	timer_adjust_oneshot(timer, screen.frame_period(), 0);
 }
 
 
@@ -873,11 +873,12 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
     changes the volume on all channels associated with it.
 ---------------------------------------------------------------*/
 
-void atarigen_set_vol(running_machine *machine, int volume, sound_type type)
+void atarigen_set_vol(running_machine *machine, int volume, device_type type)
 {
-	for (running_device *device = sound_first(machine); device != NULL; device = sound_next(device))
-		if (sound_get_type(device) == type)
-			sound_set_output_gain(device, ALL_OUTPUTS, volume / 100.0);
+	device_sound_interface *sound;
+	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
+		if (sound->device().type() == type)
+			sound_set_output_gain(*sound, ALL_OUTPUTS, volume / 100.0);
 }
 
 
@@ -921,9 +922,9 @@ void atarigen_set_oki6295_vol(running_machine *machine, int volume)
     atarigen_scanline_timer_reset: Sets up the scanline timer.
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(running_device *screen, atarigen_scanline_func update_graphics, int frequency)
+void atarigen_scanline_timer_reset(screen_device &screen, atarigen_scanline_func update_graphics, int frequency)
 {
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
+	atarigen_state *state = (atarigen_state *)screen.machine->driver_data;
 
 	/* set the scanline callback */
 	state->scanline_callback = update_graphics;
@@ -933,7 +934,7 @@ void atarigen_scanline_timer_reset(running_device *screen, atarigen_scanline_fun
 	if (state->scanline_callback != NULL)
 	{
 		emu_timer *timer = get_screen_timer(screen)->scanline_timer;
-		timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
+		timer_adjust_oneshot(timer, screen.time_until_pos(0), 0);
 	}
 }
 
@@ -946,7 +947,7 @@ void atarigen_scanline_timer_reset(running_device *screen, atarigen_scanline_fun
 static TIMER_CALLBACK( scanline_timer_callback )
 {
 	atarigen_state *state = (atarigen_state *)machine->driver_data;
-	running_device *screen = (running_device *)ptr;
+	screen_device &screen = *reinterpret_cast<screen_device *>(ptr);
 	int scanline = param;
 
 	/* callback */
@@ -956,9 +957,9 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 		/* generate another */
 		scanline += state->scanlines_per_callback;
-		if (scanline >= video_screen_get_height(screen))
+		if (scanline >= screen.height())
 			scanline = 0;
-		timer_adjust_oneshot(get_screen_timer(screen)->scanline_timer, video_screen_get_time_until_pos(screen, scanline, 0), scanline);
+		timer_adjust_oneshot(get_screen_timer(screen)->scanline_timer, screen.time_until_pos(scanline), scanline);
 	}
 }
 
@@ -976,7 +977,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 static TIMER_CALLBACK( atarivc_eof_update )
 {
 	atarigen_state *state = (atarigen_state *)machine->driver_data;
-	running_device *screen = (running_device *)ptr;
+	screen_device &screen = *reinterpret_cast<screen_device *>(ptr);
 	emu_timer *timer = get_screen_timer(screen)->atarivc_eof_update_timer;
 	int i;
 
@@ -997,7 +998,7 @@ static TIMER_CALLBACK( atarivc_eof_update )
 		tilemap_set_scrollx(state->playfield2_tilemap, 0, state->atarivc_state.pf1_xscroll);
 		tilemap_set_scrolly(state->playfield2_tilemap, 0, state->atarivc_state.pf1_yscroll);
 	}
-	timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
+	timer_adjust_oneshot(timer, screen.time_until_pos(0), 0);
 
 	/* use this for debugging the video controller values */
 #if 0
@@ -1020,9 +1021,9 @@ static TIMER_CALLBACK( atarivc_eof_update )
     atarivc_reset: Initializes the video controller.
 ---------------------------------------------------------------*/
 
-void atarivc_reset(running_device *screen, UINT16 *eof_data, int playfields)
+void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields)
 {
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
+	atarigen_state *state = (atarigen_state *)screen.machine->driver_data;
 
 	/* this allows us to manually reset eof_data to NULL if it's not used */
 	state->atarivc_eof_data = eof_data;
@@ -1040,7 +1041,7 @@ void atarivc_reset(running_device *screen, UINT16 *eof_data, int playfields)
 	if (state->atarivc_eof_data)
 	{
 		emu_timer *timer = get_screen_timer(screen)->atarivc_eof_update_timer;
-		timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
+		timer_adjust_oneshot(timer, screen.time_until_pos(0), 0);
 	}
 }
 
@@ -1050,9 +1051,9 @@ void atarivc_reset(running_device *screen, UINT16 *eof_data, int playfields)
     atarivc_w: Handles an I/O write to the video controller.
 ---------------------------------------------------------------*/
 
-void atarivc_w(running_device *screen, offs_t offset, UINT16 data, UINT16 mem_mask)
+void atarivc_w(screen_device &screen, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
+	atarigen_state *state = (atarigen_state *)screen.machine->driver_data;
 	int oldword = state->atarivc_data[offset];
 	int newword = oldword;
 
@@ -1067,9 +1068,9 @@ void atarivc_w(running_device *screen, offs_t offset, UINT16 data, UINT16 mem_ma
     write.
 ---------------------------------------------------------------*/
 
-static void atarivc_common_w(running_device *screen, offs_t offset, UINT16 newword)
+static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newword)
 {
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
+	atarigen_state *state = (atarigen_state *)screen.machine->driver_data;
 	int oldword = state->atarivc_data[offset];
 	state->atarivc_data[offset] = newword;
 
@@ -1102,7 +1103,7 @@ static void atarivc_common_w(running_device *screen, offs_t offset, UINT16 newwo
 			/* check for palette banking */
 			if (state->atarivc_state.palette_bank != (((newword & 0x0400) >> 10) ^ 1))
 			{
-				video_screen_update_partial(screen, video_screen_get_vpos(screen));
+				screen.update_partial(screen.vpos());
 				state->atarivc_state.palette_bank = ((newword & 0x0400) >> 10) ^ 1;
 			}
 			break;
@@ -1160,7 +1161,7 @@ static void atarivc_common_w(running_device *screen, offs_t offset, UINT16 newwo
 		/* scanline IRQ ack here */
 		case 0x1e:
 			/* hack: this should be a device */
-			atarigen_scanline_int_ack_w(cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
+			atarigen_scanline_int_ack_w(cputag_get_address_space(screen.machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
 			break;
 
 		/* log anything else */
@@ -1177,9 +1178,9 @@ static void atarivc_common_w(running_device *screen, offs_t offset, UINT16 newwo
     atarivc_r: Handles an I/O read from the video controller.
 ---------------------------------------------------------------*/
 
-UINT16 atarivc_r(running_device *screen, offs_t offset)
+UINT16 atarivc_r(screen_device &screen, offs_t offset)
 {
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
+	atarigen_state *state = (atarigen_state *)screen.machine->driver_data;
 
 	logerror("vc_r(%02X)\n", offset);
 
@@ -1187,11 +1188,11 @@ UINT16 atarivc_r(running_device *screen, offs_t offset)
 	/* also sets bit 0x4000 if we're in VBLANK */
 	if (offset == 0)
 	{
-		int result = video_screen_get_vpos(screen);
+		int result = screen.vpos();
 
 		if (result > 255)
 			result = 255;
-		if (result > video_screen_get_visible_area(screen)->max_y)
+		if (result > screen.visible_area().max_y)
 			result |= 0x4000;
 
 		return result;
@@ -1394,9 +1395,9 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
     10% of the scanline period.
 ---------------------------------------------------------------*/
 
-int atarigen_get_hblank(running_device *screen)
+int atarigen_get_hblank(screen_device &screen)
 {
-	return (video_screen_get_hpos(screen) > (video_screen_get_width(screen) * 9 / 10));
+	return (screen.hpos() > (screen.width() * 9 / 10));
 }
 
 
@@ -1405,13 +1406,13 @@ int atarigen_get_hblank(running_device *screen)
     next HBLANK.
 ---------------------------------------------------------------*/
 
-void atarigen_halt_until_hblank_0(running_device *screen)
+void atarigen_halt_until_hblank_0(screen_device &screen)
 {
-	running_device *cpu = devtag_get_device(screen->machine, "maincpu");
+	running_device *cpu = devtag_get_device(screen.machine, "maincpu");
 
 	/* halt the CPU until the next HBLANK */
-	int hpos = video_screen_get_hpos(screen);
-	int width = video_screen_get_width(screen);
+	int hpos = screen.hpos();
+	int width = screen.width();
 	int hblank = width * 9 / 10;
 	double fraction;
 
@@ -1421,7 +1422,7 @@ void atarigen_halt_until_hblank_0(running_device *screen)
 
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)width;
-	timer_set(screen->machine, double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), (void *)cpu, 0, unhalt_cpu);
+	timer_set(screen.machine, double_to_attotime(attotime_to_double(screen.scan_period()) * fraction), (void *)cpu, 0, unhalt_cpu);
 	cpu_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 

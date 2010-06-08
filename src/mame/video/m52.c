@@ -306,7 +306,7 @@ WRITE8_HANDLER( alpha1v_flipscreen_w )
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	if (flip_screen_get(machine))
 	{
@@ -335,8 +335,8 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		xpos - 256,
 		ypos, 0);
 
-	rect.min_x = visarea->min_x;
-	rect.max_x = visarea->max_x;
+	rect.min_x = visarea.min_x;
+	rect.max_x = visarea.max_x;
 
 	if (flip_screen_get(machine))
 	{

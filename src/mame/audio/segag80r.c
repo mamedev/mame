@@ -28,8 +28,9 @@
 #define SEGA005_555_TIMER_FREQ		(1.44 / ((15000 + 2 * 4700) * 1.5e-6))
 #define SEGA005_COUNTER_FREQ		(100000)	/* unknown, just a guess */
 
-static DEVICE_GET_INFO( sega005_sound );
-#define SOUND_005 DEVICE_GET_INFO_NAME(sega005_sound)
+DEVICE_GET_INFO( sega005_sound );
+
+DECLARE_LEGACY_SOUND_DEVICE(005, sega005_sound);
 
 
 
@@ -589,7 +590,7 @@ static DEVICE_START( sega005_sound )
 }
 
 
-static DEVICE_GET_INFO( sega005_sound )
+DEVICE_GET_INFO( sega005_sound )
 {
 	switch (state)
 	{

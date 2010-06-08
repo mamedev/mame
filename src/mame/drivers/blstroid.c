@@ -42,7 +42,7 @@ static void update_interrupts(running_machine *machine)
 
 static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
 {
-	atarigen_halt_until_hblank_0(space->machine->primary_screen);
+	atarigen_halt_until_hblank_0(*space->machine->primary_screen);
 }
 
 
@@ -58,7 +58,7 @@ static MACHINE_RESET( blstroid )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_scanline_timer_reset(machine->primary_screen, blstroid_scanline_update, 8);
+	atarigen_scanline_timer_reset(*machine->primary_screen, blstroid_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -77,7 +77,7 @@ static READ16_HANDLER( inputs_r )
 	int temp = input_port_read(space->machine, iptnames[offset & 1]);
 
 	if (state->atarigen.cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(space->machine->primary_screen)) temp ^= 0x0010;
+	if (atarigen_get_hblank(*space->machine->primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 

@@ -73,7 +73,7 @@ struct _mb88_state
 
     /* IRQ handling */
     UINT8 pending_interrupt;
-    cpu_irq_callback irqcallback;
+    device_irq_callback irqcallback;
     running_device *device;
     const address_space *program;
     const address_space *data;
@@ -84,14 +84,13 @@ struct _mb88_state
 INLINE mb88_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MB88 ||
 		   cpu_get_type(device) == CPU_MB8841 ||
 		   cpu_get_type(device) == CPU_MB8842 ||
 		   cpu_get_type(device) == CPU_MB8843 ||
 		   cpu_get_type(device) == CPU_MB8844);
-	return (mb88_state *)device->token;
+	return (mb88_state *)downcast<cpu_device *>(device)->token();
 }
 
 static TIMER_CALLBACK( serial_timer );
@@ -137,17 +136,17 @@ static CPU_INIT( mb88 )
 {
 	mb88_state *cpustate = get_safe_token(device);
 
-	if ( device->baseconfig().static_config )
+	if ( device->baseconfig().static_config() )
 	{
-		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->baseconfig().static_config;
+		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->baseconfig().static_config();
 		cpustate->PLA = _config->PLA_config;
 	}
 
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->data = device->space(AS_DATA);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	cpustate->serial = timer_alloc(device->machine, serial_timer, (void *)device);
 
@@ -263,7 +262,7 @@ static void update_pio_enable( mb88_state *cpustate, UINT8 newpio )
 		if ((newpio & 0x30) == 0)
 			timer_adjust_oneshot(cpustate->serial, attotime_never, 0);
 		else if ((newpio & 0x30) == 0x20)
-			timer_adjust_periodic(cpustate->serial, ATTOTIME_IN_HZ(cpustate->device->clock / SERIAL_PRESCALE), 0, ATTOTIME_IN_HZ(cpustate->device->clock / SERIAL_PRESCALE));
+			timer_adjust_periodic(cpustate->serial, ATTOTIME_IN_HZ(cpustate->device->clock() / SERIAL_PRESCALE), 0, ATTOTIME_IN_HZ(cpustate->device->clock() / SERIAL_PRESCALE));
 		else
 			fatalerror("mb88xx: update_pio_enable set serial enable to unsupported value %02X\n", newpio & 0x30);
 	}
@@ -615,7 +614,7 @@ static CPU_EXECUTE( mb88 )
 				{
 					/* re-enable the timer if we disabled it previously */
 					if (cpustate->SBcount >= SERIAL_DISABLE_THRESH)
-						timer_adjust_periodic(cpustate->serial, ATTOTIME_IN_HZ(cpustate->device->clock / SERIAL_PRESCALE), 0, ATTOTIME_IN_HZ(cpustate->device->clock / SERIAL_PRESCALE));
+						timer_adjust_periodic(cpustate->serial, ATTOTIME_IN_HZ(cpustate->device->clock() / SERIAL_PRESCALE), 0, ATTOTIME_IN_HZ(cpustate->device->clock() / SERIAL_PRESCALE));
 					cpustate->SBcount = 0;
 				}
 				cpustate->sf = 0;
@@ -927,7 +926,7 @@ static CPU_SET_INFO( mb88 )
 
 CPU_GET_INFO( mb88 )
 {
-	mb88_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	mb88_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

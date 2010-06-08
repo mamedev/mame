@@ -167,7 +167,7 @@ static void skimaxx_from_shiftreg(const address_space *space, UINT32 address, UI
  *
  *************************************/
 
-static void skimaxx_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void skimaxx_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	// TODO: This isn't correct. I just hacked it together quickly so I could see something!
 
@@ -538,20 +538,16 @@ static MACHINE_DRIVER_START( skimaxx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_4MHz)		// ?
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)	// ?
+	MDRV_OKIM6295_ADD("oki1", XTAL_4MHz, OKIM6295_PIN7_LOW)		// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_4MHz/2)	// ?
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)	// ?
+	MDRV_OKIM6295_ADD("oki2", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki3", OKIM6295, XTAL_4MHz)		// ?
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)	// ?
+	MDRV_OKIM6295_ADD("oki3", XTAL_4MHz, OKIM6295_PIN7_LOW)		// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki4", OKIM6295, XTAL_4MHz/2)	// ?
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)	// ?
+	MDRV_OKIM6295_ADD("oki4", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 

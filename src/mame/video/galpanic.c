@@ -8,8 +8,8 @@ static bitmap_t *sprites_bitmap;
 
 VIDEO_START( galpanic )
 {
-	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
+	sprites_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 }
 
 PALETTE_INIT( galpanic )

@@ -141,8 +141,8 @@ static bitmap_t *bitmaps[5];
 VIDEO_START( lordgun )
 {
 	int i;
-	int w = video_screen_get_width(machine->primary_screen);
-	int h = video_screen_get_height(machine->primary_screen);
+	int w = machine->primary_screen->width();
+	int h = machine->primary_screen->height();
 
 	// 0x800 x 200
 	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
@@ -245,17 +245,17 @@ static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 
 void lordgun_update_gun(running_machine *machine, int i)
 {
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	lordgun_gun[i].hw_x = input_port_read(machine, gunnames[i]);
 	lordgun_gun[i].hw_y = input_port_read(machine, gunnames[i+2]);
 
 	lorddgun_calc_gun_scr(machine, i);
 
-	if (	(lordgun_gun[i].scr_x < visarea->min_x)	||
-			(lordgun_gun[i].scr_x > visarea->max_x)	||
-			(lordgun_gun[i].scr_y < visarea->min_y)	||
-			(lordgun_gun[i].scr_y > visarea->max_y)	)
+	if (	(lordgun_gun[i].scr_x < visarea.min_x)	||
+			(lordgun_gun[i].scr_x > visarea.max_x)	||
+			(lordgun_gun[i].scr_y < visarea.min_y)	||
+			(lordgun_gun[i].scr_y > visarea.max_y)	)
 		lordgun_gun[i].hw_x = lordgun_gun[i].hw_y = 0;
 }
 

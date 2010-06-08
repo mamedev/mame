@@ -4,6 +4,7 @@
 
 *************************************************************************/
 
+#include "devlegcy.h"
 #include "cpu/tms34010/tms34010.h"
 
 
@@ -173,8 +174,8 @@ READ8_HANDLER( micro3d_sound_io_r );
 WRITE8_HANDLER( micro3d_sound_io_w );
 
 void micro3d_noise_sh_w(running_machine *machine, UINT8 data);
-DEVICE_GET_INFO( micro3d_sound );
-#define SOUND_MICRO3D DEVICE_GET_INFO_NAME(micro3d_sound)
+
+DECLARE_LEGACY_SOUND_DEVICE(MICRO3D, micro3d_sound);
 
 /*----------- defined in video/micro3d.c -----------*/
 VIDEO_START( micro3d );
@@ -182,7 +183,7 @@ VIDEO_UPDATE( micro3d );
 VIDEO_RESET( micro3d );
 
 void micro3d_tms_interrupt(running_device *device, int state);
-void micro3d_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void micro3d_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
 
 WRITE16_HANDLER( micro3d_clut_w );
 WRITE16_HANDLER( micro3d_creg_w );

@@ -3794,7 +3794,7 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 
 	if (VERBOSE)
 	{
-	if (video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32)
+	if (machine->primary_screen->format() == BITMAP_FORMAT_RGB32)
 	{
 		if ((machine->config->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 			popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
@@ -4207,7 +4207,7 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 	int offx = (short)((K053246_regs[0] << 8) | K053246_regs[1]);
 	int offy = (short)((K053246_regs[2] << 8) | K053246_regs[3]);
 
-	int screen_width = video_screen_get_width(machine->primary_screen);
+	int screen_width = machine->primary_screen->width();
 	UINT8 drawmode_table[256];
 	UINT8 shadowmode_table[256];
 	UINT8 *whichtable;
@@ -7367,12 +7367,12 @@ void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode
 	int BGC_CBLK, BGC_SET;
 	UINT32 *dst_ptr, *pal_ptr;
 	int bgcolor;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	clipx = visarea->min_x & ~3;
-	clipy = visarea->min_y;
-	clipw = (visarea->max_x - clipx + 4) & ~3;
-	cliph = visarea->max_y - clipy + 1;
+	clipx = visarea.min_x & ~3;
+	clipy = visarea.min_y;
+	clipw = (visarea.max_x - clipx + 4) & ~3;
+	cliph = visarea.max_y - clipy + 1;
 
 	dst_ptr = BITMAP_ADDR32(bitmap, clipy, 0);
 	dst_pitch = bitmap->rowpixels;
@@ -7537,7 +7537,7 @@ void K053250_dma(running_machine *machine, int chip, int limiter)
 
 	chip_ptr = &K053250_info.chip[chip];
 
-	current_frame = video_screen_get_frame_number(machine->primary_screen);
+	current_frame = machine->primary_screen->frame_number();
 	last_frame = chip_ptr->frame;
 
 	if (limiter && current_frame == last_frame) return; // make sure we only do DMA transfer once per frame
@@ -7840,7 +7840,7 @@ void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 	static int pmode[2] = {-1,-1};
 	static int kc=-1, kk=0, kxx=-105, kyy=0;
 
-	const rectangle area = *video_screen_get_visible_area(machine->primary_screen);
+	const rectangle area = *machine->primary_screen->visible_area();
 	UINT16 *line;
 	int delta, dim1, dim1_max, dim2_max;
 	UINT32 mask1, mask2;

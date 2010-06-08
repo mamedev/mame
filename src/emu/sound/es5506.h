@@ -10,6 +10,8 @@
 #ifndef __ES5506_H__
 #define __ES5506_H__
 
+#include "devlegcy.h"
+
 typedef struct _es5505_interface es5505_interface;
 struct _es5505_interface
 {
@@ -23,8 +25,7 @@ READ16_DEVICE_HANDLER( es5505_r );
 WRITE16_DEVICE_HANDLER( es5505_w );
 void es5505_voice_bank_w(running_device *device, int voice, int bank);
 
-DEVICE_GET_INFO( es5505 );
-#define SOUND_ES5505 DEVICE_GET_INFO_NAME( es5505 )
+DECLARE_LEGACY_SOUND_DEVICE(ES5505, es5505);
 
 
 typedef struct _es5506_interface es5506_interface;
@@ -42,7 +43,6 @@ READ8_DEVICE_HANDLER( es5506_r );
 WRITE8_DEVICE_HANDLER( es5506_w );
 void es5506_voice_bank_w(running_device *device, int voice, int bank);
 
-DEVICE_GET_INFO( es5506 );
-#define SOUND_ES5506 DEVICE_GET_INFO_NAME( es5506 )
+DECLARE_LEGACY_SOUND_DEVICE(ES5506, es5506);
 
 #endif /* __ES5506_H__ */

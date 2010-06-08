@@ -14,17 +14,10 @@ struct _vr0video_interface
 };
 
 /***************************************************************************
- FUNCTION PROTOTYPES
- ***************************************************************************/
-
-DEVICE_GET_INFO( vr0video );
-
-
-/***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
-#define VIDEO_VRENDER0 DEVICE_GET_INFO_NAME( vr0video )
+DECLARE_LEGACY_DEVICE(VIDEO_VRENDER0, vr0video);
 
 #define MDRV_VIDEO_VRENDER0_ADD(_tag, _interface) \
 MDRV_DEVICE_ADD(_tag, VIDEO_VRENDER0, 0) \

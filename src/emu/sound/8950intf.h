@@ -3,6 +3,8 @@
 #ifndef __8950INTF_H__
 #define __8950INTF_H__
 
+#include "devlegcy.h"
+
 typedef struct _y8950_interface y8950_interface;
 struct _y8950_interface
 {
@@ -22,7 +24,6 @@ READ8_DEVICE_HANDLER( y8950_read_port_r );
 WRITE8_DEVICE_HANDLER( y8950_control_port_w );
 WRITE8_DEVICE_HANDLER( y8950_write_port_w );
 
-DEVICE_GET_INFO( y8950 );
-#define SOUND_Y8950 DEVICE_GET_INFO_NAME( y8950 )
+DECLARE_LEGACY_SOUND_DEVICE(Y8950, y8950);
 
 #endif /* __8950INTF_H__ */

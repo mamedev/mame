@@ -318,12 +318,12 @@ static TIMER_CALLBACK( force_update )
 	int scanline = param;
 
 	if (scanline > 0)
-		video_screen_update_partial(machine->primary_screen, scanline - 1);
+		machine->primary_screen->update_partial(scanline - 1);
 
 	scanline += 64;
-	if (scanline >= video_screen_get_visible_area(machine->primary_screen)->max_y)
+	if (scanline >= machine->primary_screen->visible_area().max_y)
 		scanline = 0;
-	timer_adjust_oneshot(force_update_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_adjust_oneshot(force_update_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 /*---------------------------------------------------------------
@@ -404,7 +404,7 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	mo->slipram       = (map == 0) ? &atarimo_0_slipram : &atarimo_1_slipram;
 
 	/* allocate the temp bitmap */
-	mo->bitmap        = auto_bitmap_alloc(machine, video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
+	mo->bitmap        = auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(mo->bitmap, NULL, desc->transpen);
 
 	/* allocate the spriteram */
@@ -425,8 +425,8 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 		mo->colorlookup[i] = i;
 
 	/* allocate dirty grid */
-	mo->dirtywidth = (video_screen_get_width(machine->primary_screen) >> mo->tilexshift) + 2;
-	mo->dirtyheight = (video_screen_get_height(machine->primary_screen) >> mo->tileyshift) + 2;
+	mo->dirtywidth = (machine->primary_screen->width() >> mo->tilexshift) + 2;
+	mo->dirtyheight = (machine->primary_screen->height() >> mo->tileyshift) + 2;
 	mo->dirtygrid = auto_alloc_array(machine, UINT8, mo->dirtywidth * mo->dirtyheight);
 
 	/* allocate the gfx lookup */
@@ -441,7 +441,7 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 
 	/* start a timer to update a few times during refresh */
 	force_update_timer = timer_alloc(machine, force_update, NULL);
-	timer_adjust_oneshot(force_update_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(force_update_timer,machine->primary_screen->time_until_pos(0), 0);
 
 	init_savestate(machine, map, mo);
 
@@ -689,7 +689,7 @@ bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *
 
 			/* compute minimum Y and wrap around if necessary */
 			bandclip.min_y = ((band << mo->slipshift) - mo->yscroll + mo->slipoffset) & mo->bitmapymask;
-			if (bandclip.min_y > video_screen_get_visible_area(mo->machine->primary_screen)->max_y)
+			if (bandclip.min_y > mo->machine->primary_screen->visible_area().max_y)
 				bandclip.min_y -= mo->bitmapheight;
 
 			/* maximum Y is based on the minimum */
@@ -807,8 +807,8 @@ if ((temp & 0xff00) == 0xc800)
 	/* adjust the final coordinates */
 	xpos &= mo->bitmapxmask;
 	ypos &= mo->bitmapymask;
-	if (xpos > video_screen_get_visible_area(mo->machine->primary_screen)->max_x) xpos -= mo->bitmapwidth;
-	if (ypos > video_screen_get_visible_area(mo->machine->primary_screen)->max_y) ypos -= mo->bitmapheight;
+	if (xpos > mo->machine->primary_screen->visible_area().max_x) xpos -= mo->bitmapwidth;
+	if (ypos > mo->machine->primary_screen->visible_area().max_y) ypos -= mo->bitmapheight;
 
 	/* is this one special? */
 	if (mo->specialmask.mask != 0 && EXTRACT_DATA(entry, mo->specialmask) == mo->specialvalue)

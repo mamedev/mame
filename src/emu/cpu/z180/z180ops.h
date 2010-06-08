@@ -246,8 +246,7 @@ INLINE UINT32 ARG16(z180_state *cpustate)
 	POP(cpustate, PC);													\
 /* according to http://www.msxnet.org/tech/Z80/z80undoc.txt */	\
 /*  cpustate->IFF1 = cpustate->IFF2;  */											\
-	if (cpustate->daisy)												\
-		z80daisy_call_reti_device(cpustate->daisy);					\
+	cpustate->daisy.call_reti_device();					\
 }
 
 /***************************************************************

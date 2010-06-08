@@ -1,3 +1,5 @@
+#include "devlegcy.h"
+
 /*----------- defined in video/warpwarp.c -----------*/
 
 extern UINT8 *geebee_videoram,*warpwarp_videoram;
@@ -23,8 +25,8 @@ WRITE8_HANDLER( geebee_videoram_w );
 /*----------- defined in audio/geebee.c -----------*/
 
 WRITE8_HANDLER( geebee_sound_w );
-DEVICE_GET_INFO( geebee_sound );
-#define SOUND_GEEBEE DEVICE_GET_INFO_NAME(geebee_sound)
+
+DECLARE_LEGACY_SOUND_DEVICE(GEEBEE, geebee_sound);
 
 
 /*----------- defined in audio/warpwarp.c -----------*/
@@ -32,5 +34,5 @@ DEVICE_GET_INFO( geebee_sound );
 WRITE8_HANDLER( warpwarp_sound_w );
 WRITE8_HANDLER( warpwarp_music1_w );
 WRITE8_HANDLER( warpwarp_music2_w );
-DEVICE_GET_INFO( warpwarp_sound );
-#define SOUND_WARPWARP DEVICE_GET_INFO_NAME(warpwarp_sound)
+
+DECLARE_LEGACY_SOUND_DEVICE(WARPWARP, warpwarp_sound);

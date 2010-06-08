@@ -228,7 +228,7 @@ VIDEO_START( karnov )
 	karnov_state *state = (karnov_state *)machine->driver_data;
 
 	/* Allocate bitmap & tilemap */
-	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, video_screen_get_format(machine->primary_screen));
+	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	state_save_register_global_bitmap(machine, state->bitmap_f);
@@ -241,7 +241,7 @@ VIDEO_START( wndrplnt )
 	karnov_state *state = (karnov_state *)machine->driver_data;
 
 	/* Allocate bitmap & tilemap */
-	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, video_screen_get_format(machine->primary_screen));
+	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
 	state_save_register_global_bitmap(machine, state->bitmap_f);

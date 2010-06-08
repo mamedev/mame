@@ -764,7 +764,7 @@ static INTERRUPT_GEN( niyanpai_interrupt )
 	cpu_set_input_line(device, 1, HOLD_LINE);
 }
 
-static const z80_daisy_chain daisy_chain_sound[] =
+static const z80_daisy_config daisy_chain_sound[] =
 {
 	{ "ctc" },
 	{ NULL }

@@ -146,7 +146,7 @@ static void gtia_state(running_machine *machine)
 
 static int is_ntsc(running_machine *machine)
 {
-	return ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds) > 55;
+	return ATTOSECONDS_TO_HZ(machine->primary_screen->frame_period().attoseconds) > 55;
 }
 
 

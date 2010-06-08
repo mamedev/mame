@@ -58,10 +58,8 @@ struct _k051649_state
 INLINE k051649_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_K051649);
-	return (k051649_state *)device->token;
+	assert(device->type() == SOUND_K051649);
+	return (k051649_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* build a table to divide by the number of voices */
@@ -140,9 +138,9 @@ static DEVICE_START( k051649 )
 	k051649_state *info = get_safe_token(device);
 
 	/* get stream channels */
-	info->rate = device->clock/16;
+	info->rate = device->clock()/16;
 	info->stream = stream_create(device, 0, 1, info->rate, info, k051649_update);
-	info->mclock = device->clock;
+	info->mclock = device->clock();
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
 	info->mixer_buffer = auto_alloc_array(device->machine, short, 2 * info->rate);

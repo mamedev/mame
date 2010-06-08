@@ -499,10 +499,10 @@ VIDEO_START( decocass )
 	tilemap_set_transparent_pen(state->bg_tilemap_r, 0);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	state->bg_tilemap_l_clip = *video_screen_get_visible_area(machine->primary_screen);
+	state->bg_tilemap_l_clip = machine->primary_screen->visible_area();
 	state->bg_tilemap_l_clip.max_y = 256 / 2 - 1;
 
-	state->bg_tilemap_r_clip = *video_screen_get_visible_area(machine->primary_screen);
+	state->bg_tilemap_r_clip = machine->primary_screen->visible_area();
 	state->bg_tilemap_r_clip.min_y = 256 / 2;
 
 	/* background videroam bits D0-D3 are shared with the tileram */

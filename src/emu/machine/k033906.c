@@ -30,17 +30,16 @@ struct _k033906_state
 INLINE k033906_state *k033906_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K033906);
+	assert(device->type() == K033906);
 
-	return (k033906_state *)device->token;
+	return (k033906_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k033906_interface *k033906_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K033906));
-	return (const k033906_interface *) device->baseconfig().static_config;
+	assert((device->type() == K033906));
+	return (const k033906_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -167,5 +166,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	      DT_HAS_START
 #define DEVTEMPLATE_NAME		"Konami 033906"
 #define DEVTEMPLATE_FAMILY		"Konami PCI Bridge 033906"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"

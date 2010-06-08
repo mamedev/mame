@@ -131,7 +131,7 @@ static READ8_HANDLER( uart_r )
 static READ8_HANDLER( g_status_r )
 {
 	int bank4 = BIT(get_rip_status(devtag_get_device(space->machine, "video_cpu")), 2);
-	int vblank = video_screen_get_vblank(space->machine->primary_screen);
+	int vblank = space->machine->primary_screen->vblank();
 
 	return (!vblank << 7) | (bank4 << 6) | (f_status & 0x2f);
 }
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( g_status_w )
 
 static READ8_HANDLER( f_status_r )
 {
-	int vblank = video_screen_get_vblank(space->machine->primary_screen);
+	int vblank = space->machine->primary_screen->vblank();
 	UINT8 rip_status = get_rip_status(devtag_get_device(space->machine, "video_cpu"));
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
@@ -272,9 +272,9 @@ static WRITE16_DEVICE_HANDLER( fdt_rip_w )
 
 static UINT8 rip_status_in(running_machine *machine)
 {
-	int vpos =  video_screen_get_vpos(machine->primary_screen);
+	int vpos =  machine->primary_screen->vpos();
 	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
-//  UINT8 _hblank = !video_screen_get_hblank(machine->primary_screen);
+//  UINT8 _hblank = !machine->primary_screen->hblank();
 
 	return	_vblank
 			| (esripsys_hblank << 1)

@@ -24,8 +24,8 @@ WRITE8_DEVICE_HANDLER( mcr_ipu_sio_transmit );
 
 extern attotime mcr68_timing_factor;
 
-extern const z80_daisy_chain mcr_daisy_chain[];
-extern const z80_daisy_chain mcr_ipu_daisy_chain[];
+extern const z80_daisy_config mcr_daisy_chain[];
+extern const z80_daisy_config mcr_ipu_daisy_chain[];
 extern const z80ctc_interface mcr_ctc_intf;
 extern const z80ctc_interface nflfoot_ctc_intf;
 extern const z80pio_interface nflfoot_pio_intf;

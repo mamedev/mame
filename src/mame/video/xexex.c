@@ -35,7 +35,7 @@ VIDEO_START( xexex )
 {
 	xexex_state *state = (xexex_state *)machine->driver_data;
 
-	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
+	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
 
 	state->cur_alpha = 0;
 

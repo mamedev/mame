@@ -42,13 +42,13 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline >= 262)
 		scanline = 0;
 
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, periodic_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, periodic_callback);
 }
 
 
 static MACHINE_RESET( wolfpack )
 {
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, periodic_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, periodic_callback);
 }
 
 
@@ -79,7 +79,7 @@ static READ8_HANDLER( wolfpack_misc_r )
 	if (!wolfpack_collision)
 		val |= 0x10;
 
-	if (video_screen_get_vpos(space->machine->primary_screen) >= 240)
+	if (space->machine->primary_screen->vpos() >= 240)
 		val |= 0x80;
 
 	return val;

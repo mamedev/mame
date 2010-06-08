@@ -27,17 +27,16 @@ struct _k056230_state
 INLINE k056230_state *k056230_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K056230);
+	assert(device->type() == K056230);
 
-	return (k056230_state *)device->token;
+	return (k056230_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k056230_interface *k056230_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K056230));
-	return (const k056230_interface *) device->baseconfig().static_config;
+	assert((device->type() == K056230));
+	return (const k056230_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -141,5 +140,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	      DT_HAS_START
 #define DEVTEMPLATE_NAME		"Konami 056230"
 #define DEVTEMPLATE_FAMILY		"Konami Network Board 056230"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"

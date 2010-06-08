@@ -52,14 +52,13 @@ struct _cdp1863_t
 INLINE cdp1863_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (cdp1863_t *)device->token;
+	return (cdp1863_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE cdp1863_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	return (cdp1863_config *)device->baseconfig().inline_config;
+	return (cdp1863_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -179,7 +178,7 @@ static DEVICE_START( cdp1863 )
 
 	/* set initial values */
 	cdp1863->stream = stream_create(device, 0, 1, device->machine->sample_rate, cdp1863, cdp1863_stream_update);
-	cdp1863->clock1 = device->clock;
+	cdp1863->clock1 = device->clock();
 	cdp1863->clock2 = config->clock2;
 	cdp1863->oe = 1;
 

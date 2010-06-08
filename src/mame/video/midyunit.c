@@ -561,7 +561,7 @@ static TIMER_CALLBACK( autoerase_line )
 }
 
 
-void midyunit_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void midyunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &local_videoram[(params->rowaddr << 9) & 0x3fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -573,10 +573,10 @@ void midyunit_scanline_update(running_device *screen, bitmap_t *bitmap, int scan
 		dest[x] = pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(screen->machine, NULL, params->rowaddr - 1);
+	autoerase_line(screen.machine, NULL, params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
-	if (scanline == video_screen_get_visible_area(screen)->max_y)
-		timer_set(screen->machine, video_screen_get_time_until_pos(screen, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
+	if (scanline == screen.visible_area().max_y)
+		timer_set(screen.machine, screen.time_until_pos(scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
 }

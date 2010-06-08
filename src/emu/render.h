@@ -162,8 +162,9 @@ enum
 ***************************************************************************/
 
 // forward definitions
-class running_device;
+class device_t;
 class device_config;
+class screen_device;
 
 
 /*-------------------------------------------------
@@ -181,7 +182,7 @@ typedef void (*texture_scaler_func)(bitmap_t *dest, const bitmap_t *source, cons
 
 typedef struct _render_container render_container;
 class render_target;
-typedef struct _render_texture render_texture;
+struct render_texture;
 typedef struct _render_font render_font;
 typedef struct _render_ref render_ref;
 
@@ -327,7 +328,7 @@ struct _render_container_user_settings
 void render_init(running_machine *machine);
 
 /* return a boolean indicating if the screen is live */
-int render_is_live_screen(running_device *screen);
+int render_is_live_screen(device_t *screen);
 
 /* return the smallest maximum update rate across all targets */
 float render_get_max_update_rate(void);
@@ -448,8 +449,7 @@ void render_container_set_overlay(render_container *container, bitmap_t *bitmap)
 render_container *render_container_get_ui(void);
 
 /* return a pointer to the container for the given screen */
-render_container *render_container_get_screen(const device_config *screen);
-render_container *render_container_get_screen(running_device *screen);
+render_container *render_container_get_screen(screen_device *screen);
 
 /* add a line item to the specified container */
 void render_container_add_line(render_container *container, float x0, float y0, float x1, float y1, float width, rgb_t argb, UINT32 flags);

@@ -142,13 +142,13 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(running_device *screen, int scanline)
+static void scanline_update(screen_device &screen, int scanline)
 {
-	const address_space *space = cputag_get_address_space(screen->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(screen.machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(devtag_get_device(screen->machine, "audiocpu"));
+		atarigen_6502_irq_gen(devtag_get_device(screen.machine, "audiocpu"));
 	else
 		atarigen_6502_irq_ack_r(space, 0);
 }
@@ -172,7 +172,7 @@ static MACHINE_RESET( gauntlet )
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_slapstic_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
+	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 32);
 	atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
 }
 

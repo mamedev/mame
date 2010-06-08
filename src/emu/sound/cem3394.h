@@ -3,6 +3,8 @@
 #ifndef __CEM3394_H__
 #define __CEM3394_H__
 
+#include "devlegcy.h"
+
 
 #define CEM3394_SAMPLE_RATE		(44100*4)
 
@@ -43,7 +45,6 @@ void cem3394_set_voltage(running_device *device, int input, double voltage);
     CEM3394_FINAL_GAIN:         gain, in dB */
 double cem3394_get_parameter(running_device *device, int input);
 
-DEVICE_GET_INFO( cem3394 );
-#define SOUND_CEM3394 DEVICE_GET_INFO_NAME( cem3394 )
+DECLARE_LEGACY_SOUND_DEVICE(CEM3394, cem3394);
 
 #endif /* __CEM3394_H__ */

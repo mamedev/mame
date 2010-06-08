@@ -1,6 +1,8 @@
 #ifndef DS2404_H
 #define DS2404_H
 
+#include "devlegcy.h"
+
 typedef struct _ds2404_config ds2404_config;
 struct _ds2404_config
 {
@@ -28,7 +30,6 @@ WRITE8_DEVICE_HANDLER( ds2404_data_w );
 WRITE8_DEVICE_HANDLER( ds2404_clk_w );
 
 /* device get info callback */
-#define DS2404 DEVICE_GET_INFO_NAME(ds2404)
-DEVICE_GET_INFO( ds2404 );
+DECLARE_LEGACY_NVRAM_DEVICE(DS2404, ds2404);
 
 #endif

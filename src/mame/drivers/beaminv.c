@@ -104,7 +104,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
 	next_vpos = interrupt_lines[next_interrupt_number];
 
-	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_interrupt_number);
+	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(next_vpos), next_interrupt_number);
 }
 
 
@@ -119,7 +119,7 @@ static void start_interrupt_timer( running_machine *machine )
 {
 	beaminv_state *state = (beaminv_state *)machine->driver_data;
 	int vpos = interrupt_lines[0];
-	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
+	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(vpos), 0);
 }
 
 
@@ -194,7 +194,7 @@ static VIDEO_UPDATE( beaminv )
 
 static READ8_HANDLER( v128_r )
 {
-	return (video_screen_get_vpos(space->machine->primary_screen) >> 7) & 0x01;
+	return (space->machine->primary_screen->vpos() >> 7) & 0x01;
 }
 
 

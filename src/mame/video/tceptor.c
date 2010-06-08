@@ -403,7 +403,7 @@ VIDEO_START( tceptor )
 	decode_sprite32(machine, "gfx4");
 
 	/* allocate temp bitmaps */
-	temp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	temp_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	namco_road_init(machine, gfx_index);
 
@@ -540,7 +540,7 @@ VIDEO_UPDATE( tceptor )
 
 	if (screen != _2d_screen)
 	{
-		int frame = video_screen_get_frame_number(screen);
+		int frame = screen->frame_number();
 
 		if ((frame & 1) == 1 && screen == _3d_left_screen)
 			return UPDATE_HAS_NOT_CHANGED;

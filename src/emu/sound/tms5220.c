@@ -348,13 +348,11 @@ struct _tms5220_state
 INLINE tms5220_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_TMS5220 ||
-		   sound_get_type(device) == SOUND_TMS5220C ||
-		   sound_get_type(device) == SOUND_TMC0285 ||
-		   sound_get_type(device) == SOUND_TMS5200);
-	return (tms5220_state *)device->token;
+	assert(device->type() == SOUND_TMS5220 ||
+		   device->type() == SOUND_TMS5220C ||
+		   device->type() == SOUND_TMC0285 ||
+		   device->type() == SOUND_TMS5200);
+	return (tms5220_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* Static function prototypes */
@@ -1414,12 +1412,12 @@ static DEVICE_START( tms5220 )
 	static const tms5220_interface dummy = { DEVCB_NULL };
 	tms5220_state *tms = get_safe_token(device);
 
-	tms->intf = device->baseconfig().static_config ? (const tms5220_interface *)device->baseconfig().static_config : &dummy;
-	//tms->table = *device->region;
+	tms->intf = device->baseconfig().static_config() ? (const tms5220_interface *)device->baseconfig().static_config() : &dummy;
+	//tms->table = *device->region();
 
 	tms->device = device;
 	tms5220_set_variant(tms, TMS5220_IS_5220);
-	tms->clock = device->clock;
+	tms->clock = device->clock();
 
 	assert_always(tms != NULL, "Error creating TMS5220 chip");
 
@@ -1428,7 +1426,7 @@ static DEVICE_START( tms5220 )
 	devcb_resolve_write_line(&tms->readyq_func, &tms->intf->readyq_func, device);
 
 	/* initialize a stream */
-	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5220_update);
+	tms->stream = stream_create(device, 0, 1, device->clock() / 80, tms, tms5220_update);
 
 	/*if (tms->table == NULL)
     {
@@ -1601,7 +1599,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 			tms->io_ready = 0;
 			update_ready_state(tms);
 			/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
 		}
 	}
 }
@@ -1664,7 +1662,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 			SET RATE (5220C only): ? cycles (probably ~16)
 			*/
 			// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 		}
 	}
 }

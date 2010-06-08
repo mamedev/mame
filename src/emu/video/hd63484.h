@@ -14,6 +14,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+DECLARE_LEGACY_DEVICE(HD63484, hd63484);
+
 #define HD63484_RAM_SIZE 0x100000
 
 typedef struct _hd63484_interface hd63484_interface;
@@ -23,17 +25,8 @@ struct _hd63484_interface
 };
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( hd63484 );
-
-
-/***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define HD63484 DEVICE_GET_INFO_NAME( hd63484 )
 
 #define MDRV_HD63484_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, HD63484, 0) \

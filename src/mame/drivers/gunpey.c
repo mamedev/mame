@@ -76,7 +76,7 @@ static VIDEO_UPDATE( gunpey )
 			g = (color & 0x03e0) >> 2;
 			r = (color & 0x7c00) >> 7;
 
-			if(x<video_screen_get_visible_area(screen)->max_x && y<video_screen_get_visible_area(screen)->max_y)
+			if(x<screen->visible_area().max_x && y<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x) = b | (g<<8) | (r<<16);
 
 
@@ -337,8 +337,7 @@ static MACHINE_DRIVER_START( gunpey )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16_9344MHz / 8 / 165)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_16_9344MHz / 8 / 165, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
 

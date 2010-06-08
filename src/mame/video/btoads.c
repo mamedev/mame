@@ -86,9 +86,9 @@ WRITE16_HANDLER( btoads_display_control_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		/* allow multiple changes during display */
-		int scanline = video_screen_get_vpos(space->machine->primary_screen);
+		int scanline = space->machine->primary_screen->vpos();
 		if (scanline > 0)
-			video_screen_update_partial(space->machine->primary_screen, scanline - 1);
+			space->machine->primary_screen->update_partial(scanline - 1);
 
 		/* bit 15 controls which page is rendered and which page is displayed */
 		if (data & 0x8000)
@@ -118,7 +118,7 @@ WRITE16_HANDLER( btoads_display_control_w )
 WRITE16_HANDLER( btoads_scroll0_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)
@@ -131,7 +131,7 @@ WRITE16_HANDLER( btoads_scroll0_w )
 WRITE16_HANDLER( btoads_scroll1_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)
@@ -343,7 +343,7 @@ void btoads_from_shiftreg(const address_space *space, UINT32 address, UINT16 *sh
  *
  *************************************/
 
-void btoads_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void btoads_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
 	UINT16 *bg0_base = &btoads_vram_bg0[(fulladdr + (yscroll0 << 10)) & 0x3fc00];
@@ -524,14 +524,14 @@ void btoads_scanline_update(running_device *screen, bitmap_t *bitmap, int scanli
 #if BT_DEBUG
 	popmessage("screen_control = %02X", screen_control & 0x7f);
 
-	if (input_code_pressed(screen->machine, KEYCODE_X))
+	if (input_code_pressed(screen.machine, KEYCODE_X))
 	{
 		static int count = 0;
 		char name[10];
 		FILE *f;
 		int i;
 
-		while (input_code_pressed(screen->machine, KEYCODE_X)) ;
+		while (input_code_pressed(screen.machine, KEYCODE_X)) ;
 
 		sprintf(name, "disp%d.log", count++);
 		f = fopen(name, "w");

@@ -134,7 +134,7 @@ static VIDEO_UPDATE(calchase)
 
 				color = (vga_vram[count])>>(32-i) & 0x1;
 
-				if((x+i)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				if((x+i)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine->pens[color];
 
 			}

@@ -256,7 +256,7 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 
 TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 {
-	nitedrvr_state *state = (nitedrvr_state *)timer->machine->driver_data;
+	nitedrvr_state *state = (nitedrvr_state *)timer.machine->driver_data;
 
 	if (state->crash_en && state->crash_data_en)
 	{
@@ -268,14 +268,14 @@ TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 		if (state->crash_data & 0x01)
 		{
 			/* Invert video */
-			palette_set_color(timer->machine, 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-			palette_set_color(timer->machine, 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+			palette_set_color(timer.machine, 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(timer.machine, 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 		}
 		else
 		{
 			/* Normal video */
-			palette_set_color(timer->machine, 0, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-			palette_set_color(timer->machine, 1, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+			palette_set_color(timer.machine, 0, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(timer.machine, 1, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 		}
 	}
 }

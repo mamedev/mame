@@ -3,6 +3,8 @@
 #ifndef __WAVE_H__
 #define __WAVE_H__
 
+#include "devlegcy.h"
+
 /*****************************************************************************
  *  CassetteWave interface
  *****************************************************************************/
@@ -11,8 +13,7 @@
 #include "messdrv.h"
 #endif
 
-DEVICE_GET_INFO( wave );
-#define SOUND_WAVE DEVICE_GET_INFO_NAME( wave )
+DECLARE_LEGACY_SOUND_DEVICE(WAVE, wave);
 
 
 #define MDRV_SOUND_WAVE_ADD(_tag, _cass_tag) \

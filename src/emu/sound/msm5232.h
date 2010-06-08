@@ -3,6 +3,8 @@
 #ifndef __MSM5232_H__
 #define __MSM5232_H__
 
+#include "devlegcy.h"
+
 typedef struct _msm5232_interface msm5232_interface;
 struct _msm5232_interface
 {
@@ -14,7 +16,6 @@ WRITE8_DEVICE_HANDLER( msm5232_w );
 
 void msm5232_set_clock(running_device *device, int clock);
 
-DEVICE_GET_INFO( msm5232 );
-#define SOUND_MSM5232 DEVICE_GET_INFO_NAME( msm5232 )
+DECLARE_LEGACY_SOUND_DEVICE(MSM5232, msm5232);
 
 #endif /* __MSM5232_H__ */

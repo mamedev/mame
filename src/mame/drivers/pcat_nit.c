@@ -91,12 +91,6 @@ Smitdogg
 #include "video/pc_vga.h"
 #include "video/pc_video.h"
 
-/*************************************
- *
- *  Microtouch <-> ins8250 interface
- *
- *************************************/
-
 static void pcat_nit_microtouch_tx_callback(running_machine *machine, UINT8 data)
 {
 	ins8250_receive(machine->device("ns16450_0"), data);

@@ -9,7 +9,7 @@
 #ifndef __KAN_PAND_H__
 #define __KAN_PAND_H__
 
-#include "devcb.h"
+#include "devlegcy.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -24,18 +24,11 @@ struct _kaneko_pandora_interface
 	int        y;
 };
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( kaneko_pandora );
-
+DECLARE_LEGACY_DEVICE(KANEKO_PANDORA, kaneko_pandora);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define KANEKO_PANDORA DEVICE_GET_INFO_NAME( kaneko_pandora )
 
 #define MDRV_KANEKO_PANDORA_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, KANEKO_PANDORA, 0) \

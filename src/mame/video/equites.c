@@ -130,7 +130,7 @@ VIDEO_START( equites )
 VIDEO_START( splndrbt )
 {
 	equites_state *state = (equites_state *)machine->driver_data;
-	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_INDEXED16);
+	assert(machine->primary_screen->format() == BITMAP_FORMAT_INDEXED16);
 
 	state->fg_videoram = auto_alloc_array(machine, UINT8, 0x800);
 	state_save_register_global_pointer(machine, state->fg_videoram, 0x800);

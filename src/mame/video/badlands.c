@@ -96,7 +96,7 @@ WRITE16_HANDLER( badlands_pf_bank_w )
 	if (ACCESSING_BITS_0_7)
 		if (state->playfield_tile_bank != (data & 1))
 		{
-			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 			state->playfield_tile_bank = data & 1;
 			tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 		}

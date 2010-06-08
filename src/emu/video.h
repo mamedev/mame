@@ -4,8 +4,36 @@
 
     Core MAME video routines.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -19,16 +47,16 @@
 #define __VIDEO_H__
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-/* number of levels of frameskipping supported */
-#define FRAMESKIP_LEVELS			12
-#define MAX_FRAMESKIP				(FRAMESKIP_LEVELS - 2)
+// number of levels of frameskipping supported
+const int FRAMESKIP_LEVELS = 12;
+const int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 
-/* screen types */
-enum
+// screen types
+enum screen_type_enum
 {
 	SCREEN_TYPE_INVALID = 0,
 	SCREEN_TYPE_RASTER,
@@ -38,185 +66,276 @@ enum
 
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-/* these functions are macros primarily due to include file ordering */
-/* plus, they are very simple */
-#define video_screen_count(config)		(config)->devicelist.count(VIDEO_SCREEN)
-#define video_screen_first(config)		(config)->devicelist.first(VIDEO_SCREEN)
-#define video_screen_next(previous)		(previous)->typenext()
-
-#define video_screen_get_format(screen)	(((screen_config *)(screen)->baseconfig().inline_config)->format)
-
-/* allocates a bitmap that has the same dimensions and format as the passed in screen */
-#define video_screen_auto_bitmap_alloc(screen)	auto_bitmap_alloc(screen->machine, video_screen_get_width(screen), video_screen_get_height(screen), video_screen_get_format(screen))
-
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 // forward references
 class render_target;
+struct render_texture;
+class screen_device;
 
 
-/*-------------------------------------------------
-    screen_config - configuration of a single
-    screen
--------------------------------------------------*/
+// callback that is called to notify of a change in the VBLANK state
+typedef void (*vblank_state_changed_func)(screen_device &device, void *param, bool vblank_state);
 
-typedef struct _screen_config screen_config;
-struct _screen_config
+
+// ======================> screen_device_config
+
+class screen_device_config : public device_config
 {
-	int				type;						/* type of screen */
-	int				width, height;				/* default total width/height (HTOTAL, VTOTAL) */
-	rectangle		visarea;					/* default visible area (HBLANK end/start, VBLANK end/start) */
-	UINT8			oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
-	attoseconds_t	refresh;					/* default refresh period */
-	attoseconds_t	vblank;						/* duration of a VBLANK */
-	bitmap_format	format;						/* bitmap format */
-	float			xoffset, yoffset;			/* default X/Y offsets */
-	float			xscale, yscale;				/* default X/Y scale factor */
+	friend class screen_device;
+	
+	// construction/destruction
+	screen_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators	
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// basic information getters
+	virtual const char *name() const { return "Video Screen"; }
+
+	// configuration readers	
+	screen_type_enum screen_type() const { return m_type; }
+	int width() const { return m_width; }
+	int height() const { return m_height; }
+	const rectangle &visible_area() const { return m_visarea; }
+	bool oldstyle_vblank_supplied() const { return m_oldstyle_vblank_supplied; }
+	attoseconds_t refresh() const { return m_refresh; }
+	attoseconds_t vblank() const { return m_vblank; }
+	bitmap_format format() const { return m_format; }
+	float xoffset() const { return m_xoffset; }
+	float yoffset() const { return m_yoffset; }
+	float xscale() const { return m_xscale; }
+	float yscale() const { return m_yscale; }
+
+	// indexes to inline data
+	enum
+	{
+		INLINE_TYPE,
+		INLINE_FORMAT,
+		INLINE_REFRESH,
+		INLINE_VBLANK,
+		INLINE_WIDTH,
+		INLINE_HEIGHT,
+		INLINE_VIS_MINX,
+		INLINE_VIS_MAXX,
+		INLINE_VIS_MINY,
+		INLINE_VIS_MAXY,
+		INLINE_XOFFSET,
+		INLINE_XSCALE,
+		INLINE_YOFFSET,
+		INLINE_YSCALE,
+		INLINE_OLDVBLANK
+	};
+
+private:
+	// device_config overrides
+	virtual void device_config_complete();
+	virtual bool device_validity_check(const game_driver &driver) const;
+
+	// configuration data
+	screen_type_enum 	m_type;						// type of screen
+	int					m_width, m_height;			// default total width/height (HTOTAL, VTOTAL)
+	rectangle			m_visarea;					// default visible area (HBLANK end/start, VBLANK end/start)
+	bool				m_oldstyle_vblank_supplied;	// MDRV_SCREEN_VBLANK_TIME macro used
+	attoseconds_t		m_refresh;					// default refresh period
+	attoseconds_t		m_vblank;					// duration of a VBLANK
+	bitmap_format		m_format;					// bitmap format
+	float				m_xoffset, m_yoffset;		// default X/Y offsets
+	float				m_xscale, m_yscale;			// default X/Y scale factor
 };
 
 
-/*-------------------------------------------------
-    vblank_state_changed_func -
-    callback that is called to notify of a change
-    in the VBLANK state
--------------------------------------------------*/
 
-typedef void (*vblank_state_changed_func)(running_device *device, void *param, int vblank_state);
+// ======================> screen_device
+
+class screen_device : public device_t
+{
+	friend class screen_device_config;
+	friend resource_pool_object<screen_device>::~resource_pool_object();
+
+	// construction/destruction
+	screen_device(running_machine &_machine, const screen_device_config &config);
+	virtual ~screen_device();
+
+public:
+	// information getters
+	const screen_device_config &config() const { return m_config; }
+	screen_type_enum screen_type() const { return m_config.m_type; }
+	int width() const { return m_width; }
+	int height() const { return m_height; }
+	const rectangle &visible_area() const { return m_visarea; }
+	bitmap_format format() const { return m_config.m_format; }
+	
+	// dynamic configuration
+	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
+	void set_visible_area(int min_x, int max_x, int min_y, int max_y);
+
+	// beam positioning and state
+	int vpos() const;
+	int hpos() const;
+	bool vblank() const { return attotime_compare(timer_get_time(machine), m_vblank_end_time) < 0; }
+	bool hblank() const { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x); }
+
+	// timing
+	attotime time_until_pos(int vpos, int hpos = 0) const;
+	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.max_y + 1); }
+	attotime time_until_vblank_end() const;
+	attotime time_until_update() const { return (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
+	attotime scan_period() const { return attotime_make(0, m_scantime); }
+	attotime frame_period() const { return (this == NULL || !started()) ? k_default_frame_period : attotime_make(0, m_frame_period); };
+	UINT64 frame_number() const { return m_frame_number; }
+
+	// updating
+	bool update_partial(int scanline);
+	void update_now();
+
+	// additional helpers
+	void save_snapshot(mame_file *fp);
+	void register_vblank_callback(vblank_state_changed_func vblank_callback, void *param);
+	bitmap_t *alloc_compatible_bitmap(int width = 0, int height = 0) { return auto_bitmap_alloc(machine, (width == 0) ? m_width : width, (height == 0) ? m_height : height, m_config.m_format); }
+	
+	// internal to the video system
+	bool update_quads();
+	void update_burnin();
+
+	// globally accessible constants
+	static const int k_default_frame_rate = 60;
+	static const attotime k_default_frame_period;
+
+private:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_post_load();
+
+	// internal helpers
+	void realloc_screen_bitmaps();
+
+	static TIMER_CALLBACK( static_vblank_begin_callback ) { reinterpret_cast<screen_device *>(ptr)->vblank_begin_callback(); }
+	void vblank_begin_callback();
+
+	static TIMER_CALLBACK( static_vblank_end_callback ) { reinterpret_cast<screen_device *>(ptr)->vblank_end_callback(); }
+	void vblank_end_callback();
+
+	static TIMER_CALLBACK( static_scanline0_callback ) { reinterpret_cast<screen_device *>(ptr)->scanline0_callback(); }
+public:	// temporary
+	void scanline0_callback();
+private:
+
+	static TIMER_CALLBACK( static_scanline_update_callback ) { reinterpret_cast<screen_device *>(ptr)->scanline_update_callback(param); }
+	void scanline_update_callback(int scanline);
+
+	void finalize_burnin();
+
+	// internal state
+	const screen_device_config &m_config;
+
+	// dimensions
+	int						m_width;				// current width (HTOTAL)
+	int						m_height;				// current height (VTOTAL)
+	rectangle				m_visarea;				// current visible area (HBLANK end/start, VBLANK end/start)
+
+	// textures and bitmaps
+	render_texture *		m_texture[2];			// 2x textures for the screen bitmap
+	bitmap_t *				m_bitmap[2];			// 2x bitmaps for rendering
+	bitmap_t *				m_burnin;				// burn-in bitmap
+	UINT8					m_curbitmap;			// current bitmap index
+	UINT8					m_curtexture;			// current texture index
+	INT32					m_texture_format;		// texture format of bitmap for this screen
+	bool					m_changed;				// has this bitmap changed?
+	INT32					m_last_partial_scan;	// scanline of last partial update
+
+	// screen timing
+	attoseconds_t			m_frame_period;			// attoseconds per frame
+	attoseconds_t			m_scantime;				// attoseconds per scanline
+	attoseconds_t			m_pixeltime;			// attoseconds per pixel
+	attoseconds_t			m_vblank_period;		// attoseconds per VBLANK period
+	attotime				m_vblank_start_time;	// time of last VBLANK start
+	attotime				m_vblank_end_time;		// time of last VBLANK end
+	emu_timer *				m_vblank_begin_timer;	// timer to signal VBLANK start
+	emu_timer *				m_vblank_end_timer;		// timer to signal VBLANK end
+	emu_timer *				m_scanline0_timer;		// scanline 0 timer
+	emu_timer *				m_scanline_timer;		// scanline timer
+	UINT64					m_frame_number;			// the current frame number
+
+	struct callback_item
+	{
+		callback_item *				m_next;
+		vblank_state_changed_func 	m_callback;
+		void *						m_param;
+	};
+	callback_item *			m_callback_list;		// list of VBLANK callbacks
+};
+
+
+// device type definition
+const device_type SCREEN = screen_device_config::static_alloc_device_config;
 
 
 
-/***************************************************************************
-    SCREEN DEVICE CONFIGURATION MACROS
-***************************************************************************/
+//**************************************************************************
+//  SCREEN DEVICE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MDRV_SCREEN_ADD(_tag, _type) \
-	MDRV_DEVICE_ADD(_tag, VIDEO_SCREEN, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
+	MDRV_DEVICE_ADD(_tag, SCREEN, 0) \
+	MDRV_SCREEN_TYPE(_type)
 
 #define MDRV_SCREEN_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag)
 
 #define MDRV_SCREEN_FORMAT(_format) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, format, _format)
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_FORMAT, _format)
 
 #define MDRV_SCREEN_TYPE(_type) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_TYPE, SCREEN_TYPE_##_type)
 
 #define MDRV_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, refresh, HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, vblank, ((HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) / (_vtotal)) * ((_vtotal) - ((_vbstart) - (_vbend)))) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, width, _htotal)	\
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, height, _vtotal)	\
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_x, _hbend) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_x, (_hbstart) - 1) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_y, _vbend) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_y, (_vbstart) - 1)
+	MDRV_DEVICE_INLINE_DATA64(screen_device_config::INLINE_REFRESH, HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) \
+	MDRV_DEVICE_INLINE_DATA64(screen_device_config::INLINE_VBLANK, ((HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) / (_vtotal)) * ((_vtotal) - ((_vbstart) - (_vbend)))) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_WIDTH, _htotal)	\
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_HEIGHT, _vtotal)	\
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MINX, _hbend) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MAXX, (_hbstart) - 1) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MINY, _vbend) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MAXY, (_vbstart) - 1)
 
 #define MDRV_SCREEN_REFRESH_RATE(_rate) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, refresh, HZ_TO_ATTOSECONDS(_rate))
+	MDRV_DEVICE_INLINE_DATA64(screen_device_config::INLINE_REFRESH, HZ_TO_ATTOSECONDS(_rate))
 
 #define MDRV_SCREEN_VBLANK_TIME(_time) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, vblank, _time) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, oldstyle_vblank_supplied, TRUE)
+	MDRV_DEVICE_INLINE_DATA64(screen_device_config::INLINE_VBLANK, _time) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_OLDVBLANK, true)
 
 #define MDRV_SCREEN_SIZE(_width, _height) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, width, _width) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, height, _height)
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_WIDTH, _width) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_HEIGHT, _height)
 
 #define MDRV_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_x, _minx) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_x, _maxx) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_y, _miny) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_y, _maxy)
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MINX, _minx) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MAXX, _maxx) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MINY, _miny) \
+	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MAXY, _maxy)
 
 #define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
-	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, xoffset, _xoffs, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, xscale, _xscale, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, yoffset, _yoffs, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, yscale, _yscale, 24)
+	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_XOFFSET, (_xoffs) * (double)(1 << 24)) \
+	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_XSCALE, (_xscale) * (double)(1 << 24)) \
+	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_YOFFSET, (_yoffs) * (double)(1 << 24)) \
+	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_YSCALE, (_yscale) * (double)(1 << 24))
 
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  FUNCTION PROTOTYPES
+//**************************************************************************
 
 /* ----- core implementation ----- */
 
 /* core initialization */
 void video_init(running_machine *machine);
-
-
-/* ----- screen management ----- */
-
-/* set the resolution of a screen */
-void video_screen_configure(running_device *screen, int width, int height, const rectangle *visarea, attoseconds_t refresh);
-
-/* set the visible area of a screen; this is a subset of video_screen_configure */
-void video_screen_set_visarea(running_device *screen, int min_x, int max_x, int min_y, int max_y);
-
-/* force a partial update of the screen up to and including the requested scanline */
-int video_screen_update_partial(running_device *screen, int scanline);
-
-/* force an update from the last beam position up to the current beam position */
-void video_screen_update_now(running_device *screen);
-
-/* return the current vertical or horizontal position of the beam for a screen */
-int video_screen_get_vpos(running_device *screen);
-int video_screen_get_hpos(running_device *screen);
-
-/* return the current vertical or horizontal blanking state for a screen */
-int video_screen_get_vblank(running_device *screen);
-int video_screen_get_hblank(running_device *screen);
-
-/* return the current width for a screen */
-int video_screen_get_width(running_device *screen);
-
-/* return the current height for a screen */
-int video_screen_get_height(running_device *screen);
-
-/* return the current visible area for a screen */
-const rectangle *video_screen_get_visible_area(running_device *screen);
-
-/* return the time when the beam will reach a particular H,V position */
-attotime video_screen_get_time_until_pos(running_device *screen, int vpos, int hpos);
-
-/* return the time when the beam will reach the start of VBLANK */
-attotime video_screen_get_time_until_vblank_start(running_device *screen);
-
-/* return the time when the beam will reach the end of VBLANK */
-attotime video_screen_get_time_until_vblank_end(running_device *screen);
-
-/* return the time when the VIDEO_UPDATE function will be called */
-attotime video_screen_get_time_until_update(running_device *screen);
-
-/* return the amount of time the beam takes to draw one scan line */
-attotime video_screen_get_scan_period(running_device *screen);
-
-/* return the amount of time the beam takes to draw one complete frame */
-attotime video_screen_get_frame_period(running_device *screen);
-
-/* return the current frame number -- this is always increasing */
-UINT64 video_screen_get_frame_number(running_device *screen);
-
-/* registers a VBLANK callback for the given screen */
-void video_screen_register_vblank_callback(running_device *screen, vblank_state_changed_func vblank_callback, void *param);
-
-
-/* ----- video screen device interface ----- */
-
-/* device get info callback */
-#define VIDEO_SCREEN DEVICE_GET_INFO_NAME(video_screen)
-DEVICE_GET_INFO( video_screen );
 
 
 /* ----- global rendering ----- */
@@ -256,7 +375,7 @@ void video_set_fastforward(int fastforward);
 /* ----- snapshots ----- */
 
 /* save a snapshot of a given screen */
-void video_screen_save_snapshot(running_machine *machine, running_device *screen, mame_file *fp);
+void screen_save_snapshot(running_machine *machine, device_t *screen, mame_file *fp);
 
 /* save a snapshot of all the active screens */
 void video_save_active_screen_snapshots(running_machine *machine);
@@ -283,6 +402,77 @@ int video_get_view_for_target(running_machine *machine, render_target *target, c
 
 /* assert if any pixels in the given bitmap contain an invalid palette index */
 void video_assert_out_of_range_pixels(running_machine *machine, bitmap_t *bitmap);
+
+
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  screen_count - return the number of
+//  video screen devices in a machine_config
+//-------------------------------------------------
+
+inline int screen_count(const machine_config &config)
+{
+	return config.devicelist.count(SCREEN);
+}
+
+
+//-------------------------------------------------
+//  screen_first - return the first
+//  video screen device config in a machine_config
+//-------------------------------------------------
+
+inline const screen_device_config *screen_first(const machine_config &config)
+{
+	return downcast<screen_device_config *>(config.devicelist.first(SCREEN));
+}
+
+
+//-------------------------------------------------
+//  screen_next - return the next
+//  video screen device config in a machine_config
+//-------------------------------------------------
+
+inline const screen_device_config *screen_next(const screen_device_config *previous)
+{
+	return downcast<screen_device_config *>(previous->typenext());
+}
+
+
+//-------------------------------------------------
+//  screen_count - return the number of
+//  video screen devices in a machine
+//-------------------------------------------------
+
+inline int screen_count(running_machine &machine)
+{
+	return machine.devicelist.count(SCREEN);
+}
+
+
+//-------------------------------------------------
+//  screen_first - return the first
+//  video screen device in a machine
+//-------------------------------------------------
+
+inline screen_device *screen_first(running_machine &machine)
+{
+	return downcast<screen_device *>(machine.devicelist.first(SCREEN));
+}
+
+
+//-------------------------------------------------
+//  screen_next - return the next
+//  video screen device in a machine
+//-------------------------------------------------
+
+inline screen_device *screen_next(screen_device *previous)
+{
+	return downcast<screen_device *>(previous->typenext());
+}
 
 
 #endif	/* __VIDEO_H__ */

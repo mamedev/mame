@@ -62,13 +62,17 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE8_DEVICE_HANDLER( deniam16b_oki_rom_bank_w )
 {
-	okim6295_set_bank_base(device, (data & 0x40) ? 0x40000 : 0x00000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
 }
 
 static WRITE16_DEVICE_HANDLER( deniam16c_oki_rom_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		okim6295_set_bank_base(device, (data & 0x01) ? 0x40000 : 0x00000);
+	{
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base((data & 0x01) ? 0x40000 : 0x00000);
+	}
 }
 
 static WRITE16_HANDLER( deniam_irq_ack_w )
@@ -262,7 +266,7 @@ static MACHINE_START( deniam )
 static MACHINE_RESET( deniam )
 {
 	/* logicpr2 does not reset the bank base on startup */
-	okim6295_set_bank_base(devtag_get_device(machine, "oki"), 0x00000);
+	machine->device<okim6295_device>("oki")->set_bank_base(0x00000);
 }
 
 static MACHINE_DRIVER_START( deniam16b )
@@ -304,8 +308,7 @@ static MACHINE_DRIVER_START( deniam16b )
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_25MHz/24) /* 1.041620 measured, = 1.0416666Mhz verified */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 verified high
+	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -344,8 +347,7 @@ static MACHINE_DRIVER_START( deniam16c )
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_25MHz/24) /* 1.041620 measured, = 1.0416666Mhz verified */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 verified high
+	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

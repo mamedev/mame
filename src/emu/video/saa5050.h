@@ -9,6 +9,7 @@
 #ifndef __SAA5050_H__
 #define __SAA5050_H__
 
+#include "devlegcy.h"
 
 #define SAA5050_VBLANK 2500
 
@@ -25,18 +26,11 @@ struct _saa5050_interface
 	int rev;
 };
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( saa5050 );
-
+DECLARE_LEGACY_DEVICE(SAA5050, saa5050);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define SAA5050 DEVICE_GET_INFO_NAME( saa5050 )
 
 #define MDRV_SAA5050_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, SAA5050, 0) \

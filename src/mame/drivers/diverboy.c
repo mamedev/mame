@@ -96,7 +96,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 		bank = (source[1] & 0x0002) >> 1;
 
-		if (!flash || (video_screen_get_frame_number(machine->primary_screen) & 1))
+		if (!flash || (machine->primary_screen->frame_number() & 1))
 		{
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[bank],
 					number,
@@ -134,7 +134,8 @@ static WRITE8_DEVICE_HANDLER( okibank_w )
 	/* bit 2 might be reset */
 //  popmessage("%02x",data);
 
-	okim6295_set_bank_base(device, (data & 3) * 0x40000);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	oki->set_bank_base((data & 3) * 0x40000);
 }
 
 
@@ -277,8 +278,7 @@ static MACHINE_DRIVER_START( diverboy )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1320000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

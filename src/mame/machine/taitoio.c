@@ -72,17 +72,16 @@ struct _tc0220ioc_state
 INLINE tc0220ioc_state *tc0220ioc_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0220IOC);
+	assert(device->type() == TC0220IOC);
 
-	return (tc0220ioc_state *)device->token;
+	return (tc0220ioc_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0220ioc_interface *tc0220ioc_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0220IOC));
-	return (const tc0220ioc_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0220IOC));
+	return (const tc0220ioc_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -230,17 +229,16 @@ struct _tc0510nio_state
 INLINE tc0510nio_state *tc0510nio_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0510NIO);
+	assert(device->type() == TC0510NIO);
 
-	return (tc0510nio_state *)device->token;
+	return (tc0510nio_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0510nio_interface *tc0510nio_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0510NIO));
-	return (const tc0510nio_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0510NIO));
+	return (const tc0510nio_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -382,17 +380,16 @@ struct _tc0640fio_state
 INLINE tc0640fio_state *tc0640fio_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TC0640FIO);
+	assert(device->type() == TC0640FIO);
 
-	return (tc0640fio_state *)device->token;
+	return (tc0640fio_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const tc0640fio_interface *tc0640fio_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TC0640FIO));
-	return (const tc0640fio_interface *) device->baseconfig().static_config;
+	assert((device->type() == TC0640FIO));
+	return (const tc0640fio_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -519,7 +516,6 @@ DEVICE_GET_INFO( tc0220ioc )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0220ioc_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0220ioc);		break;
@@ -541,7 +537,6 @@ DEVICE_GET_INFO( tc0510nio )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0510nio_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0510nio);		break;
@@ -563,7 +558,6 @@ DEVICE_GET_INFO( tc0640fio )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tc0640fio_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(tc0640fio);		break;

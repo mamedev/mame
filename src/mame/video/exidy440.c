@@ -169,7 +169,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
      * caused by collision or beam, ORed together with CHRCLK,
      * which probably goes off once per scanline; for now, we just
      * always return the current scanline */
-	result = video_screen_get_vpos(space->machine->primary_screen);
+	result = space->machine->primary_screen->vpos();
 	return (result < 255) ? result : 255;
 }
 
@@ -183,7 +183,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
 
 WRITE8_HANDLER( exidy440_spriteram_w )
 {
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	space->machine->generic.spriteram.u8[offset] = data;
 }
 
@@ -306,7 +306,7 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect,
+static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect,
 						 int scroll_offset, int check_collision)
 {
 	int i;
@@ -316,7 +316,7 @@ static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectang
 	int count = 0;
 
 	/* draw the sprite images, checking for collisions along the way */
-	UINT8 *sprite = screen->machine->generic.spriteram.u8 + (SPRITE_COUNT - 1) * 4;
+	UINT8 *sprite = screen.machine->generic.spriteram.u8 + (SPRITE_COUNT - 1) * 4;
 
 	for (i = 0; i < SPRITE_COUNT; i++, sprite -= 4)
 	{
@@ -374,7 +374,7 @@ static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectang
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							timer_set(screen->machine, video_screen_get_time_until_pos(screen, yoffs, currx), NULL, currx, collide_firq_callback);
+							timer_set(screen.machine, screen.time_until_pos(yoffs, currx), NULL, currx, collide_firq_callback);
 					}
 					currx++;
 
@@ -387,7 +387,7 @@ static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectang
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							timer_set(screen->machine, video_screen_get_time_until_pos(screen, yoffs, currx), NULL, currx, collide_firq_callback);
+							timer_set(screen.machine, screen.time_until_pos(yoffs, currx), NULL, currx, collide_firq_callback);
 					}
 					currx++;
 				}
@@ -406,7 +406,7 @@ static void draw_sprites(running_device *screen, bitmap_t *bitmap, const rectang
  *
  *************************************/
 
-static void update_screen(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect,
+static void update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect,
 						  int scroll_offset, int check_collision)
 {
 	int y, sy;
@@ -438,10 +438,10 @@ static void update_screen(running_device *screen, bitmap_t *bitmap, const rectan
 static VIDEO_UPDATE( exidy440 )
 {
 	/* redraw the screen */
-	update_screen(screen, bitmap, cliprect, 0, TRUE);
+	update_screen(*screen, bitmap, cliprect, 0, TRUE);
 
 	/* generate an interrupt once/frame for the beam */
-	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
+	if (cliprect->max_y == screen->visible_area().max_y)
 	{
 		int i;
 
@@ -454,8 +454,8 @@ static VIDEO_UPDATE( exidy440 )
             From this, it appears that they are expecting to get beams over
             a 12 scanline period, and trying to pick roughly the middle one.
             This is how it is implemented. */
-		attoseconds_t increment = attotime_to_attoseconds(video_screen_get_scan_period(screen));
-		attotime time = attotime_sub(video_screen_get_time_until_pos(screen, beamy, beamx), attotime_make(0, increment * 6));
+		attoseconds_t increment = attotime_to_attoseconds(screen->scan_period());
+		attotime time = attotime_sub(screen->time_until_pos(beamy, beamx), attotime_make(0, increment * 6));
 		for (i = 0; i <= 12; i++)
 		{
 			timer_set(screen->machine, time, NULL, beamx, beam_firq_callback);
@@ -470,7 +470,7 @@ static VIDEO_UPDATE( exidy440 )
 static VIDEO_UPDATE( topsecex )
 {
 	/* redraw the screen */
-	update_screen(screen, bitmap, cliprect, *topsecex_yscroll, FALSE);
+	update_screen(*screen, bitmap, cliprect, *topsecex_yscroll, FALSE);
 
 	return 0;
 }

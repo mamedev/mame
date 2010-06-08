@@ -164,7 +164,7 @@ const rom_source *rom_first_source(const game_driver *drv, const machine_config 
 
 	/* otherwise, look through devices */
 	if (config != NULL)
-		for (devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next)
+		for (devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next())
 		{
 			const rom_entry *devromp = devconfig->rom_region();
 			if (devromp != NULL)
@@ -187,10 +187,10 @@ const rom_source *rom_next_source(const game_driver *drv, const machine_config *
 	if (rom_source_is_gamedrv(drv, previous))
 		devconfig = (config != NULL) ? config->devicelist.first() : NULL;
 	else
-		devconfig = ((const device_config *)previous)->next;
+		devconfig = ((const device_config *)previous)->next();
 
 	/* look for further devices with ROM definitions */
-	for ( ; devconfig != NULL; devconfig = devconfig->next)
+	for ( ; devconfig != NULL; devconfig = devconfig->next())
 	{
 		const rom_entry *devromp = devconfig->rom_region();
 		if (devromp != NULL)
@@ -1231,29 +1231,34 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startflags, const char *rgntag)
 {
-	running_device *device = machine->device(rgntag);
-	if (device != NULL && device->databus_width(0) != 0)
+	device_t *device = machine->device(rgntag);
+	device_memory_interface *memory;
+	if (device->interface(memory))
 	{
-		int buswidth;
+		const address_space_config *spaceconfig = memory->space_config();
+		if (device != NULL && spaceconfig != NULL)
+		{
+			int buswidth;
 
-		/* set the endianness */
-		startflags &= ~ROMREGION_ENDIANMASK;
-		if (device->endianness() == ENDIANNESS_LITTLE)
-			startflags |= ROMREGION_LE;
-		else
-			startflags |= ROMREGION_BE;
+			/* set the endianness */
+			startflags &= ~ROMREGION_ENDIANMASK;
+			if (spaceconfig->m_endianness == ENDIANNESS_LITTLE)
+				startflags |= ROMREGION_LE;
+			else
+				startflags |= ROMREGION_BE;
 
-		/* set the width */
-		startflags &= ~ROMREGION_WIDTHMASK;
-		buswidth = device->databus_width(0);
-		if (buswidth <= 8)
-			startflags |= ROMREGION_8BIT;
-		else if (buswidth <= 16)
-			startflags |= ROMREGION_16BIT;
-		else if (buswidth <= 32)
-			startflags |= ROMREGION_32BIT;
-		else
-			startflags |= ROMREGION_64BIT;
+			/* set the width */
+			startflags &= ~ROMREGION_WIDTHMASK;
+			buswidth = spaceconfig->m_databus_width;
+			if (buswidth <= 8)
+				startflags |= ROMREGION_8BIT;
+			else if (buswidth <= 16)
+				startflags |= ROMREGION_16BIT;
+			else if (buswidth <= 32)
+				startflags |= ROMREGION_32BIT;
+			else
+				startflags |= ROMREGION_64BIT;
+		}
 	}
 	return startflags;
 }

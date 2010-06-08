@@ -29,7 +29,7 @@ VIDEO_START( bishi )
 {
 	bishi_state *state = (bishi_state *)machine->driver_data;
 
-	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
+	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
 
 	k056832_set_layer_association(state->k056832, 0);
 

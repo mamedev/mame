@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "devlegcy.h"
+
 #define TX1_PIXEL_CLOCK		(XTAL_18MHz / 3)
 #define TX1_HBSTART			256
 #define TX1_HBEND			0
@@ -56,13 +58,13 @@ WRITE8_HANDLER( tx1_pit8253_w );
 WRITE8_DEVICE_HANDLER( bb_ym1_a_w );
 WRITE8_DEVICE_HANDLER( bb_ym2_a_w );
 WRITE8_DEVICE_HANDLER( bb_ym2_b_w );
-DEVICE_GET_INFO( buggyboy_sound );
-#define SOUND_BUGGYBOY DEVICE_GET_INFO_NAME(buggyboy_sound)
+
+DECLARE_LEGACY_SOUND_DEVICE(BUGGYBOY, buggyboy_sound);
 
 WRITE8_DEVICE_HANDLER( tx1_ay8910_a_w );
 WRITE8_DEVICE_HANDLER( tx1_ay8910_b_w );
-DEVICE_GET_INFO( tx1_sound );
-#define SOUND_TX1 DEVICE_GET_INFO_NAME(tx1_sound)
+
+DECLARE_LEGACY_SOUND_DEVICE(TX1, tx1_sound);
 
 
 /*----------- defined in video/tx1.c -----------*/

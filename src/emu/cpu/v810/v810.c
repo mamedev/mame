@@ -29,7 +29,7 @@ struct _v810_state
 	UINT32 reg[65];
 	UINT8 irq_line;
 	UINT8 nmi_line;
-	cpu_irq_callback irq_cb;
+	device_irq_callback irq_cb;
 	running_device *device;
 	const address_space *program;
 	const address_space *io;
@@ -40,10 +40,9 @@ struct _v810_state
 INLINE v810_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_V810);
-	return (v810_state *)device->token;
+	return (v810_state *)downcast<cpu_device *>(device)->token();
 }
 
 #define R0 reg[0]
@@ -1003,8 +1002,8 @@ static CPU_INIT( v810 )
 	cpustate->nmi_line = CLEAR_LINE;
 	cpustate->irq_cb = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device->space(AS_PROGRAM);
-	cpustate->io = device->space(AS_IO);
+	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->io = device_memory(device)->space(AS_IO);
 
 	state_save_register_device_item_array(device, 0, cpustate->reg);
 	state_save_register_device_item(device, 0, cpustate->irq_line);
@@ -1135,7 +1134,7 @@ static CPU_SET_INFO( v810 )
 
 CPU_GET_INFO( v810 )
 {
-	v810_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	v810_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

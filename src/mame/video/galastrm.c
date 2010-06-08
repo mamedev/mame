@@ -45,8 +45,8 @@ VIDEO_START( galastrm )
 {
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
-	tmpbitmaps = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	polybitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmaps = machine->primary_screen->alloc_compatible_bitmap();
+	polybitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	poly = poly_alloc(machine, 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, galastrm_exit);
@@ -460,8 +460,8 @@ VIDEO_UPDATE( galastrm )
 
 	clip.min_x = 0;
 	clip.min_y = 0;
-	clip.max_x = video_screen_get_width(screen) -1;
-	clip.max_y = video_screen_get_height(screen) -1;
+	clip.max_x = screen->width() -1;
+	clip.max_y = screen->height() -1;
 
 	tc0100scn_tilemap_update(tc0100scn);
 	tc0480scp_tilemap_update(tc0480scp);

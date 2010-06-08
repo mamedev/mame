@@ -240,7 +240,7 @@ INTERRUPT_GEN( bfm_dm01_vbl )
 
 VIDEO_START( bfm_dm01 )
 {
-	dm_bitmap = auto_bitmap_alloc(machine, DM_BYTESPERROW*8, DM_MAXLINES,video_screen_get_format(machine->primary_screen));
+	dm_bitmap = auto_bitmap_alloc(machine, DM_BYTESPERROW*8, DM_MAXLINES,machine->primary_screen->format());
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -249,9 +249,9 @@ VIDEO_START( bfm_dm01 )
 
 VIDEO_UPDATE( bfm_dm01 )
 {
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 
-	copybitmap(bitmap, dm_bitmap, 0,0,0,0, visarea);
+	copybitmap(bitmap, dm_bitmap, 0,0,0,0, &visarea);
 
 	LOG(("Busy=%X",data_avail));
 	LOG(("%X",Scorpion2_GetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA)));

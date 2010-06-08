@@ -271,18 +271,18 @@ PALETTE_INIT( tia_PAL )
 
 VIDEO_START( tia )
 {
-	int cx = video_screen_get_width(machine->primary_screen);
+	int cx = machine->primary_screen->width();
 
-	screen_height = video_screen_get_height(machine->primary_screen);
-	helper[0] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
-	helper[1] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
-	helper[2] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
+	screen_height = machine->primary_screen->height();
+	helper[0] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, machine->primary_screen->format());
+	helper[1] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, machine->primary_screen->format());
+	helper[2] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, machine->primary_screen->format());
 }
 
 
 VIDEO_UPDATE( tia )
 {
-	screen_height = video_screen_get_height(screen);
+	screen_height = screen->height();
 	copybitmap(bitmap, helper[2], 0, 0, 0, 0, cliprect);
 	return 0;
 }
@@ -872,8 +872,8 @@ static WRITE8_HANDLER( VSYNC_w )
 
 			if ( curr_y > 5 )
 				update_bitmap(
-					video_screen_get_width(space->machine->primary_screen),
-					video_screen_get_height(space->machine->primary_screen));
+					space->machine->primary_screen->width(),
+					space->machine->primary_screen->height());
 
 			if ( tia_vsync_callback ) {
 				tia_vsync_callback( space, 0, curr_y, 0xFFFF );

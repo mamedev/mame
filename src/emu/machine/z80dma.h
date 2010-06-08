@@ -33,11 +33,12 @@
 #ifndef __Z80DMA__
 #define __Z80DMA__
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
+#include "cpu/z80/z80daisy.h"
 
-#define Z80DMA DEVICE_GET_INFO_NAME(z80dma)
+
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MDRV_Z80DMA_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, Z80DMA, _clock) \
@@ -46,43 +47,163 @@
 #define Z80DMA_INTERFACE(_name) \
 	const z80dma_interface (_name) =
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _z80dma_interface z80dma_interface;
-struct _z80dma_interface
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+
+// ======================> z80dma_interface
+
+struct z80dma_interface
 {
-	devcb_write_line	out_busreq_func;
-	devcb_write_line	out_int_func;
-	devcb_write_line	out_bao_func;
+	devcb_write_line	m_out_busreq_func;
+	devcb_write_line	m_out_int_func;
+	devcb_write_line	m_out_bao_func;
 
-	/* memory accessors */
-	devcb_read8			in_mreq_func;
-	devcb_write8		out_mreq_func;
+	// memory accessors
+	devcb_read8			m_in_mreq_func;
+	devcb_write8		m_out_mreq_func;
 
-	/* I/O accessors */
-	devcb_read8			in_iorq_func;
-	devcb_write8		out_iorq_func;
+	// I/O accessors
+	devcb_read8			m_in_iorq_func;
+	devcb_write8		m_out_iorq_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
-DEVICE_GET_INFO( z80dma );
 
-/* register access */
+// ======================> z80dma_device_config
+
+class z80dma_device_config : 	public device_config, 
+								public device_config_z80daisy_interface,
+								public z80dma_interface
+{
+	friend class z80dma_device;
+
+	// construction/destruction
+	z80dma_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// basic information getters
+	virtual const char *name() const { return "Z8410"; }
+
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+};
+
+
+
+// ======================> z80dma_device
+
+class z80dma_device : 	public device_t, 
+						public device_z80daisy_interface
+{
+	friend class z80dma_device_config;
+
+	// construction/destruction
+	z80dma_device(running_machine &_machine, const z80dma_device_config &_config);
+	
+public:
+	UINT8 read();
+	void write(UINT8 data);
+	
+	void rdy_w(int state);
+	void wait_w(int state);
+	void bai_w(int state);
+
+private:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_z80daisy_interface overrides
+	virtual int z80daisy_irq_state();
+	virtual int z80daisy_irq_ack();
+	virtual void z80daisy_irq_reti();
+
+	// internal helpers
+	int is_ready();
+	void interrupt_check();
+	void trigger_interrupt(int level);
+	void do_read();
+	int do_write();
+
+	static TIMER_CALLBACK( static_timerproc ) { reinterpret_cast<z80dma_device *>(ptr)->timerproc(); }
+	void timerproc();
+
+	void update_status();
+	
+	static TIMER_CALLBACK( static_rdy_write_callback ) { reinterpret_cast<z80dma_device *>(ptr)->rdy_write_callback(param); }
+	void rdy_write_callback(int state);
+
+	// internal state
+	const z80dma_device_config &m_config;
+
+	devcb_resolved_write_line	m_out_busreq_func;
+	devcb_resolved_write_line	m_out_int_func;
+	devcb_resolved_write_line	m_out_bao_func;
+	devcb_resolved_read8		m_in_mreq_func;
+	devcb_resolved_write8		m_out_mreq_func;
+	devcb_resolved_read8		m_in_iorq_func;
+	devcb_resolved_write8		m_out_iorq_func;
+
+	emu_timer *m_timer;
+
+	UINT16	m_regs[(6<<3)+1+1];
+	UINT8	m_num_follow;
+	UINT8	m_cur_follow;
+	UINT8	m_regs_follow[4];
+	UINT8	m_read_num_follow;
+	UINT8	m_read_cur_follow;
+	UINT8	m_read_regs_follow[7];
+	UINT8	m_status;
+	UINT8	m_dma_enabled;
+	
+	UINT16 m_addressA;
+	UINT16 m_addressB;
+	UINT16 m_count;
+
+	int m_rdy;
+	int m_force_ready;
+	UINT8 m_reset_pointer;
+
+	bool m_is_read;
+	UINT8 m_cur_cycle;
+	UINT8 m_latch;
+
+	// interrupts
+	int m_ip;					// interrupt pending
+	int m_ius;					// interrupt under service
+	UINT8 m_vector;				// interrupt vector
+};
+
+
+// device type definition
+const device_type Z80DMA = z80dma_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  FUNCTION PROTOTYPES
+//**************************************************************************
+
+// register access
 READ8_DEVICE_HANDLER( z80dma_r );
 WRITE8_DEVICE_HANDLER( z80dma_w );
 
-/* ready */
+// ready
 WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w );
 
-/* wait */
+// wait
 WRITE_LINE_DEVICE_HANDLER( z80dma_wait_w );
 
-/* bus acknowledge in */
+// bus acknowledge in
 WRITE_LINE_DEVICE_HANDLER( z80dma_bai_w );
 
 #endif

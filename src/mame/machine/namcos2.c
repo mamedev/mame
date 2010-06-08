@@ -675,14 +675,14 @@ static TIMER_CALLBACK( namcos2_posirq_tick )
 {
 	if (IsSystem21()) {
 		if (namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
-			video_screen_update_partial(machine->primary_screen, param);
+			machine->primary_screen->update_partial(param);
 			cputag_set_input_line(machine, "gpu", namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 		}
 		return;
 	}
 
 	if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]|namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) {
-		video_screen_update_partial(machine->primary_screen, param);
+		machine->primary_screen->update_partial(param);
 		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) cputag_set_input_line(machine, "maincpu", namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 		if (namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) cputag_set_input_line(machine, "slave", namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 	}
@@ -690,7 +690,7 @@ static TIMER_CALLBACK( namcos2_posirq_tick )
 
 void namcos2_adjust_posirq_timer( running_machine *machine, int scanline )
 {
-	timer_adjust_oneshot(namcos2_posirq_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 80), scanline);
+	timer_adjust_oneshot(namcos2_posirq_timer, machine->primary_screen->time_until_pos(scanline, 80), scanline);
 }
 
 INTERRUPT_GEN( namcos2_68k_master_vblank )

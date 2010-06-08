@@ -125,7 +125,7 @@ static void xexex_objdma( running_machine *machine, int limiter )
 	UINT16 *src, *dst;
 
 	counter = state->frame;
-	state->frame = video_screen_get_frame_number(machine->primary_screen);
+	state->frame = machine->primary_screen->frame_number();
 	if (limiter && counter == state->frame)
 		return; // make sure we only do DMA transfer once per frame
 

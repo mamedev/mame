@@ -1186,8 +1186,7 @@ static MACHINE_DRIVER_START( s1945bl ) /* Bootleg hardware based on the unprotec
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) // ?? clock
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // ?? pin 7
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // ?? clock
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
 MACHINE_DRIVER_END

@@ -35,7 +35,7 @@ struct _tms9927_state
 {
 	/* driver-controlled state */
 	const tms9927_interface *intf;
-	running_device *screen;
+	screen_device *screen;
 	const UINT8 *selfload;
 
 	/* live state */
@@ -63,9 +63,8 @@ tms9927_interface tms9927_null_interface = { 0 };
 INLINE tms9927_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TMS9927);
-	return (tms9927_state *)device->token;
+	assert(device->type() == TMS9927);
+	return (tms9927_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -103,21 +102,21 @@ static void generic_access(running_device *device, offs_t offset)
 		case 0x0a:	/* Reset */
 			if (!tms->reset)
 			{
-				video_screen_update_now(tms->screen);
+				tms->screen->update_now();
 				tms->reset = TRUE;
 			}
 			break;
 
 		case 0x0b:	/* Up scroll */
 mame_printf_debug("Up scroll\n");
-			video_screen_update_now(tms->screen);
+			tms->screen->update_now();
 			tms->start_datarow = (tms->start_datarow + 1) % DATA_ROWS_PER_FRAME(tms);
 			break;
 
 		case 0x0e:	/* Start timing chain */
 			if (tms->reset)
 			{
-				video_screen_update_now(tms->screen);
+				tms->screen->update_now();
 				tms->reset = FALSE;
 				recompute_parameters(tms, FALSE);
 			}
@@ -248,7 +247,7 @@ static void recompute_parameters(tms9927_state *tms, int postload)
 
 	refresh = HZ_TO_ATTOSECONDS(tms->clock) * tms->total_hpix * tms->total_vpix;
 
-	video_screen_configure(tms->screen, tms->total_hpix, tms->total_vpix, &visarea, refresh);
+	tms->screen->configure(tms->total_hpix, tms->total_vpix, visarea, refresh);
 }
 
 
@@ -260,19 +259,19 @@ static DEVICE_START( tms9927 )
 	/* validate arguments */
 	assert(device != NULL);
 
-	tms->intf = (const tms9927_interface *)device->baseconfig().static_config;
+	tms->intf = (const tms9927_interface *)device->baseconfig().static_config();
 
 	if (tms->intf != NULL)
 	{
-		assert(device->clock > 0);
+		assert(device->clock() > 0);
 		assert(tms->intf->hpixels_per_column > 0);
 
 		/* copy the initial parameters */
-		tms->clock = device->clock;
+		tms->clock = device->clock();
 		tms->hpixels_per_column = tms->intf->hpixels_per_column;
 
 		/* get the screen device */
-		tms->screen = device->machine->device(tms->intf->screen_tag);
+		tms->screen = downcast<screen_device *>(device->machine->device(tms->intf->screen_tag));
 		assert(tms->screen != NULL);
 
 		/* get the self-load PROM */
@@ -319,7 +318,6 @@ DEVICE_GET_INFO( tms9927 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms9927_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tms9927);	break;

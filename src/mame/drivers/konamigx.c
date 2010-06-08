@@ -670,7 +670,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 
 	// maybe this interupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
 	// the real hardware should output the display for each screen on alternate frames
-//  if(video_screen_get_frame_number(device->machine->primary_screen) & 1)
+//  if(device->machine->primary_screen->frame_number() & 1)
 	if (1) // gx_syncen & 0x20)
 	{
 		gx_syncen &= ~0x20;
@@ -1840,7 +1840,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragoonj )
 	MDRV_IMPORT_FROM(konamigx)
-	MDRV_CPU_REPLACE("maincpu", M68EC020, 26400000) // needs higher clock to stop sprite flickerings
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(26400000) // needs higher clock to stop sprite flickerings
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MDRV_VIDEO_START(dragoonj)

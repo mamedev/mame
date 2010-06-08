@@ -156,13 +156,13 @@ static DEVICE_START( exidy440_sound )
 	state_save_register_global(machine, m6844_interrupt);
 	state_save_register_global(machine, m6844_chain);
 
-	channel_frequency[0] = device->clock;   /* channels 0 and 1 are run by FCLK */
-	channel_frequency[1] = device->clock;
-	channel_frequency[2] = device->clock/2; /* channels 2 and 3 are run by SCLK */
-	channel_frequency[3] = device->clock/2;
+	channel_frequency[0] = device->clock();   /* channels 0 and 1 are run by FCLK */
+	channel_frequency[1] = device->clock();
+	channel_frequency[2] = device->clock()/2; /* channels 2 and 3 are run by SCLK */
+	channel_frequency[3] = device->clock()/2;
 
 	/* get stream channels */
-	stream = stream_create(device, 0, 2, device->clock, NULL, channel_update);
+	stream = stream_create(device, 0, 2, device->clock(), NULL, channel_update);
 
 	/* allocate the sample cache */
 	length = memory_region_length(machine, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
@@ -173,8 +173,8 @@ static DEVICE_START( exidy440_sound )
 	reset_sound_cache();
 
 	/* allocate the mixer buffer */
-	mixer_buffer_left = auto_alloc_array(machine, INT32, 2 * device->clock);
-	mixer_buffer_right = mixer_buffer_left + device->clock;
+	mixer_buffer_left = auto_alloc_array(machine, INT32, 2 * device->clock());
+	mixer_buffer_right = mixer_buffer_left + device->clock();
 
 	if (SOUND_LOG)
 		debuglog = fopen("sound.log", "w");
@@ -913,7 +913,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static DEVICE_GET_INFO( exidy440_sound )
+DEVICE_GET_INFO( exidy440_sound )
 {
 	switch (state)
 	{
@@ -928,7 +928,7 @@ static DEVICE_GET_INFO( exidy440_sound )
 }
 
 
-#define SOUND_EXIDY440 DEVICE_GET_INFO_NAME( exidy440_sound )
+DECLARE_LEGACY_SOUND_DEVICE(EXIDY440, exidy440_sound);
 
 
 

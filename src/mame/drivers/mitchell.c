@@ -390,7 +390,7 @@ ADDRESS_MAP_END
 /**** Monsters World ****/
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
-	okim6295_set_bank_base(device, 0x40000 * (data & 3));
+	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
 }
 
 static ADDRESS_MAP_START( mstworld_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1084,9 +1084,6 @@ static MACHINE_START( mitchell )
 {
 	mitchell_state *state = (mitchell_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->oki = devtag_get_device(machine, "oki");
-
 	state_save_register_global(machine, state->sample_buffer);
 	state_save_register_global(machine, state->sample_select);
 	state_save_register_global(machine, state->dial_selected);
@@ -1143,8 +1140,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* probably same clock as the other mitchell hardware games */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* probably same clock as the other mitchell hardware games */
@@ -1186,8 +1182,7 @@ static MACHINE_DRIVER_START( pang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 verified
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ymsnd",YM2413, XTAL_16MHz/4) /* verified on pcb */
@@ -1289,8 +1284,7 @@ static MACHINE_DRIVER_START( mstworld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 990000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 990000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1326,8 +1320,7 @@ static MACHINE_DRIVER_START( marukin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* verified on pcb */
@@ -1383,8 +1376,7 @@ static MACHINE_DRIVER_START( pkladiesbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* It should be a OKIM5205 with a 384khz resonator */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */

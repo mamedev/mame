@@ -116,7 +116,7 @@ PALETTE_INIT( tp84 )
 WRITE8_HANDLER( tp84_spriteram_w )
 {
 	/* the game multiplexes the sprites, so update now */
-	video_screen_update_now(space->machine->primary_screen);
+	space->machine->primary_screen->update_now();
 	tp84_spriteram[offset] = data;
 }
 
@@ -124,7 +124,7 @@ WRITE8_HANDLER( tp84_spriteram_w )
 READ8_HANDLER( tp84_scanline_r )
 {
 	/* reads 1V - 128V */
-	return video_screen_get_vpos(space->machine->primary_screen);
+	return space->machine->primary_screen->vpos();
 }
 
 
@@ -183,9 +183,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( tp84 )
 {
 	rectangle clip = *cliprect;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 
-	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
+	if (cliprect->min_y == screen->visible_area().min_y)
 	{
 		tilemap_mark_all_tiles_dirty_all(screen->machine);
 
@@ -200,13 +200,13 @@ VIDEO_UPDATE( tp84 )
 	draw_sprites(screen->machine, bitmap, cliprect);
 
 	/* draw top status region */
-	clip.min_x = visarea->min_x;
-	clip.max_x = visarea->min_x + 15;
+	clip.min_x = visarea.min_x;
+	clip.max_x = visarea.min_x + 15;
 	tilemap_draw(bitmap, &clip, fg_tilemap, 0, 0);
 
 	/* draw bottom status region */
-	clip.min_x = visarea->max_x - 15;
-	clip.max_x = visarea->max_x;
+	clip.min_x = visarea.max_x - 15;
+	clip.max_x = visarea.max_x;
 	tilemap_draw(bitmap, &clip, fg_tilemap, 0, 0);
 
 	return 0;

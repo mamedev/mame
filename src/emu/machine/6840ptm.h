@@ -9,12 +9,14 @@
 #ifndef __6840PTM_H__
 #define __6840PTM_H__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define PTM6840		DEVICE_GET_INFO_NAME(ptm6840)
+DECLARE_LEGACY_DEVICE(PTM6840, ptm6840);
 
 #define MDRV_PTM6840_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, PTM6840, 0) \
@@ -40,9 +42,6 @@ struct _ptm6840_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( ptm6840 );
 
 int ptm6840_get_status( running_device *device, int clock );	// get whether timer is enabled
 int ptm6840_get_irq( running_device *device );					// get IRQ state

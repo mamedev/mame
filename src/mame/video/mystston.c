@@ -57,7 +57,7 @@ static TIMER_CALLBACK( interrupt_callback )
 		scanline = FIRST_INT_VPOS;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline - 1, INT_HPOS), scanline);
+	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(scanline - 1, INT_HPOS), scanline);
 }
 
 
@@ -243,7 +243,7 @@ static VIDEO_RESET( mystston )
 {
 	mystston_state *state = (mystston_state *)machine->driver_data;
 
-	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
+	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
 
 

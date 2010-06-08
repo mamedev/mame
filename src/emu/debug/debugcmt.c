@@ -93,7 +93,7 @@ static void debug_comment_exit(running_machine *machine);
 
 int debug_comment_init(running_machine *machine)
 {
-	running_device *cpu;
+	device_t *cpu;
 
 	/* allocate memory for the comments */
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
@@ -115,7 +115,7 @@ int debug_comment_init(running_machine *machine)
                         the proper crc32
 -------------------------------------------------------------------------*/
 
-int debug_comment_add(running_device *device, offs_t addr, const char *comment, rgb_t color, UINT32 c_crc)
+int debug_comment_add(device_t *device, offs_t addr, const char *comment, rgb_t color, UINT32 c_crc)
 {
 	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	int insert_point = comments->comment_count;
@@ -182,7 +182,7 @@ int debug_comment_add(running_device *device, offs_t addr, const char *comment, 
                         the proper crc32
 -------------------------------------------------------------------------*/
 
-int debug_comment_remove(running_device *device, offs_t addr, UINT32 c_crc)
+int debug_comment_remove(device_t *device, offs_t addr, UINT32 c_crc)
 {
 	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	int remove_index = -1;
@@ -219,7 +219,7 @@ int debug_comment_remove(running_device *device, offs_t addr, UINT32 c_crc)
                         the proper crc32
 -------------------------------------------------------------------------*/
 
-const char *debug_comment_get_text(running_device *device, offs_t addr, UINT32 c_crc)
+const char *debug_comment_get_text(device_t *device, offs_t addr, UINT32 c_crc)
 {
 	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	int i;
@@ -242,7 +242,7 @@ const char *debug_comment_get_text(running_device *device, offs_t addr, UINT32 c
     for a given cpu number
 -------------------------------------------------------------------------*/
 
-int debug_comment_get_count(running_device *device)
+int debug_comment_get_count(device_t *device)
 {
 	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	return comments->comment_count;
@@ -254,7 +254,7 @@ int debug_comment_get_count(running_device *device)
     for a given cpu number
 -------------------------------------------------------------------------*/
 
-UINT32 debug_comment_get_change_count(running_device *device)
+UINT32 debug_comment_get_change_count(device_t *device)
 {
 	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	return comments->change_count;
@@ -267,7 +267,7 @@ UINT32 debug_comment_get_change_count(running_device *device)
 
 UINT32 debug_comment_all_change_count(running_machine *machine)
 {
-	running_device *cpu;
+	device_t *cpu;
 	UINT32 retVal = 0;
 
 	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
@@ -285,7 +285,7 @@ UINT32 debug_comment_all_change_count(running_machine *machine)
                         for the opcode at the requested address.
 -------------------------------------------------------------------------*/
 
-UINT32 debug_comment_get_opcode_crc32(running_device *device, offs_t address)
+UINT32 debug_comment_get_opcode_crc32(device_t *device, offs_t address)
 {
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int i;
@@ -293,7 +293,8 @@ UINT32 debug_comment_get_opcode_crc32(running_device *device, offs_t address)
 	UINT8 opbuf[64], argbuf[64];
 	char buff[256];
 	offs_t numbytes;
-	int maxbytes = cpu_get_max_opcode_bytes(device);
+	cpu_device *cpudevice = downcast<cpu_device *>(device);
+	int maxbytes = cpudevice->max_opcode_bytes();
 	UINT32 addrmask = space->logaddrmask;
 
 	memset(opbuf, 0x00, sizeof(opbuf));
@@ -319,7 +320,7 @@ UINT32 debug_comment_get_opcode_crc32(running_device *device, offs_t address)
     debug_comment_dump - debugging function to dump junk to the command line
 -------------------------------------------------------------------------*/
 
-void debug_comment_dump(running_device *device, offs_t addr)
+void debug_comment_dump(device_t *device, offs_t addr)
 {
 	debug_cpu_comment_group *comments = cpu_get_debug_data(device)->comments;
 	int i;
@@ -367,7 +368,7 @@ int debug_comment_save(running_machine *machine)
 	xml_data_node *root = xml_file_create();
 	xml_data_node *commentnode, *systemnode;
 	int total_comments = 0;
-	running_device *cpu;
+	device_t *cpu;
 
 	/* if we don't have a root, bail */
 	if (root == NULL)
@@ -483,7 +484,7 @@ static int debug_comment_load_xml(running_machine *machine, mame_file *fp)
 
 	for (cpunode = xml_get_sibling(systemnode->child, "cpu"); cpunode; cpunode = xml_get_sibling(cpunode->next, "cpu"))
 	{
-		running_device *cpu = machine->device(xml_get_attribute_string(cpunode, "tag", ""));
+		device_t *cpu = machine->device(xml_get_attribute_string(cpunode, "tag", ""));
 		if (cpu != NULL)
 		{
 			debug_cpu_comment_group *comments = cpu_get_debug_data(cpu)->comments;

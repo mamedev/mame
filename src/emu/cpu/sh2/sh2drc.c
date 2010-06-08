@@ -140,11 +140,10 @@ static void cfunc_DIV1(void *param);
 INLINE SH2 *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SH1 ||
 		   cpu_get_type(device) == CPU_SH2);
-	return *(SH2 **)device->token;
+	return *(SH2 **)downcast<cpu_device *>(device)->token();
 }
 
 INLINE UINT16 RW(SH2 *sh2, offs_t A)
@@ -694,7 +693,7 @@ static CPU_INIT( sh2 )
 		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(SH2)));
 
 	/* allocate the core memory */
-	*(SH2 **)device->token = sh2 = (SH2 *)drccache_memory_alloc_near(cache, sizeof(SH2));
+	*(SH2 **)downcast<cpu_device *>(device)->token() = sh2 = (SH2 *)drccache_memory_alloc_near(cache, sizeof(SH2));
 	memset(sh2, 0, sizeof(SH2));
 
 	/* initialize the common core parts */
@@ -797,7 +796,7 @@ static CPU_RESET( sh2 )
 	UINT32 *m;
 
 	void (*f)(UINT32 data);
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 
 	m = sh2->m;
 	tsave = sh2->timer;
@@ -3263,7 +3262,7 @@ static CPU_SET_INFO( sh2 )
 
 CPU_GET_INFO( sh2 )
 {
-	SH2 *sh2 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	SH2 *sh2 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

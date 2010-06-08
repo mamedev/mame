@@ -621,13 +621,13 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
-			const device_config *devconfig;
+			const device_config_sound_interface *sound;
 
 			/* find samples interfaces */
-			for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
-				if (sound_get_type(devconfig) == SOUND_SAMPLES)
+			for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
+				if (sound->devconfig().type() == SOUND_SAMPLES)
 				{
-					const char *const *samplenames = ((const samples_interface *)devconfig->static_config)->samplenames;
+					const char *const *samplenames = ((const samples_interface *)sound->devconfig().static_config())->samplenames;
 					int sampnum;
 
 					/* if the list is legit, walk it and print the sample info */
@@ -667,26 +667,19 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 			printf("Driver %s (%s):\n", drivers[drvindex]->name, drivers[drvindex]->description);
 
 			/* iterate through devices */
-			for (devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next)
+			for (devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next())
 			{
-				switch (devconfig->devclass)
-				{
-					case DEVICE_CLASS_AUDIO:            printf("  Audio: ");	break;
-					case DEVICE_CLASS_VIDEO:            printf("  Video: ");	break;
-					case DEVICE_CLASS_CPU_CHIP:         printf("  CPU:   ");	break;
-					case DEVICE_CLASS_SOUND_CHIP:       printf("  Sound: ");	break;
-					case DEVICE_CLASS_TIMER:            printf("  Timer: ");	break;
-					default:                            printf("  Other: ");	break;
-				}
-				printf("%s ('%s')", devconfig->name(), devconfig->tag());
-				if (devconfig->clock >= 1000000000)
-					printf(" @ %d.%02d GHz\n", devconfig->clock / 1000000000, (devconfig->clock / 10000000) % 100);
-				else if (devconfig->clock >= 1000000)
-					printf(" @ %d.%02d MHz\n", devconfig->clock / 1000000, (devconfig->clock / 10000) % 100);
-				else if (devconfig->clock >= 1000)
-					printf(" @ %d.%02d kHz\n", devconfig->clock / 1000, (devconfig->clock / 10) % 100);
-				else if (devconfig->clock > 0)
-					printf(" @ %d Hz\n", devconfig->clock);
+				printf("   %s ('%s')", devconfig->name(), devconfig->tag());
+				
+				UINT32 clock = devconfig->clock();
+				if (clock >= 1000000000)
+					printf(" @ %d.%02d GHz\n", clock / 1000000000, (clock / 10000000) % 100);
+				else if (clock >= 1000000)
+					printf(" @ %d.%02d MHz\n", clock / 1000000, (clock / 10000) % 100);
+				else if (clock >= 1000)
+					printf(" @ %d.%02d kHz\n", clock / 1000, (clock / 10) % 100);
+				else if (clock > 0)
+					printf(" @ %d Hz\n", clock);
 				else
 					printf("\n");
 			}

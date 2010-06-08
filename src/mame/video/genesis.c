@@ -68,7 +68,7 @@ static void drawline_sprite(int line, UINT16 *bmap, int priority, UINT8 *spriteb
        UINT8		genesis_vdp_regs[32];		/* VDP registers */
 
 /* LOCAL */
-static running_device *genesis_screen;
+static screen_device *genesis_screen;
 
 static UINT8 *		vdp_vram;					/* VDP video RAM */
 static UINT8 *		vdp_vsram;					/* VDP vertical scroll RAM */
@@ -119,7 +119,7 @@ static UINT8		window_width;				/* window width */
 ******************************************************************************/
 
 
-static void start_genesis_vdp(running_device *screen)
+static void start_genesis_vdp(screen_device *screen)
 {
 	static const UINT8 vdp_init[24] =
 	{
@@ -273,8 +273,8 @@ READ16_HANDLER( genesis_vdp_r )
 		case 0x06:
 		case 0x07:
 		{
-			int xpos = video_screen_get_hpos(genesis_screen);
-			int ypos = video_screen_get_vpos(genesis_screen);
+			int xpos = genesis_screen->hpos();
+			int ypos = genesis_screen->vpos();
 
 			/* adjust for the weird counting rules */
 			if (xpos > 0xe9) xpos -= (342 - 0x100);
@@ -398,7 +398,7 @@ static void vdp_data_w(running_machine *machine, int data)
 			/* if the hscroll RAM is changing, force an update */
 			if (vdp_address >= vdp_hscrollbase &&
 				vdp_address < vdp_hscrollbase + vdp_hscrollsize)
-				video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+				machine->primary_screen->update_partial(machine->primary_screen->vpos());
 
 			/* write to VRAM */
 			if (vdp_address & 1)
@@ -417,7 +417,7 @@ static void vdp_data_w(running_machine *machine, int data)
 		case 0x05:		/* VSRAM write */
 
 			/* vscroll RAM is changing, force an update */
-			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+			machine->primary_screen->update_partial(machine->primary_screen->vpos());
 
 			/* write to VSRAM */
 			if (vdp_address & 1)
@@ -479,11 +479,11 @@ static int vdp_control_r(running_machine *machine)
 	vdp_cmdpart = 0;
 
 	/* set the VBLANK bit */
-	if (video_screen_get_vblank(machine->primary_screen))
+	if (machine->primary_screen->vblank())
 		status |= 0x0008;
 
 	/* set the HBLANK bit */
-	if (video_screen_get_hblank(machine->primary_screen))
+	if (machine->primary_screen->hblank())
 		status |= 0x0004;
 
 	return (status);
@@ -497,7 +497,7 @@ static void vdp_control_w(const address_space *space, int data)
 	{
 		/* if 10xxxxxx xxxxxxxx this is a register setting command */
 		if ((data & 0xc000) == 0x8000)
-			vdp_register_w(space->machine, data, video_screen_get_vblank(space->machine->primary_screen));
+			vdp_register_w(space->machine, data, space->machine->primary_screen->vblank());
 
 		/* otherwise this is the First part of a mode setting command */
 		else
@@ -531,7 +531,7 @@ static void vdp_register_w(running_machine *machine, int data, int vblank)
 
 	/* these are mostly important writes; force an update if they written */
 	if (is_important[regnum])
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		machine->primary_screen->update_partial(machine->primary_screen->vpos());
 
 	/* For quite a few of the registers its a good idea to set a couple of variable based
        upon the writes here */
@@ -594,13 +594,13 @@ static void vdp_register_w(running_machine *machine, int data, int vblank)
 				break;
 			}
 			{
-				int height = video_screen_get_height(genesis_screen);
-				rectangle visarea = *video_screen_get_visible_area(genesis_screen);
-				attoseconds_t refresh = video_screen_get_frame_period(genesis_screen).attoseconds;
+				int height = genesis_screen->height();
+				rectangle visarea = genesis_screen->visible_area();
+				attoseconds_t refresh = genesis_screen->frame_period().attoseconds;
 
 				/* this gets called from the init! */
 				visarea.max_x = scrwidth*8-1;
-				video_screen_configure(genesis_screen, scrwidth*8, height, &visarea, refresh);
+				genesis_screen->configure(scrwidth*8, height, visarea, refresh);
 			}
 			break;
 

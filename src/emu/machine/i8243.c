@@ -35,16 +35,16 @@ struct _i8243_state
 INLINE i8243_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == I8243);
-	return (i8243_state *)device->token;
+	assert(device->type() == I8243);
+	return (i8243_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE i8243_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == I8243);
-	return (i8243_config *)device->baseconfig().inline_config;
+	assert(device->type() == I8243);
+	return (i8243_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 
@@ -171,7 +171,6 @@ DEVICE_GET_INFO( i8243 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8243_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(i8243_config);			break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:			info->start = DEVICE_START_NAME(i8243);					break;

@@ -33,12 +33,14 @@
 #ifndef __I8237__
 #define __I8237__
 
+#include "devlegcy.h"
+
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define I8237 DEVICE_GET_INFO_NAME(i8237)
+DECLARE_LEGACY_DEVICE(I8237, i8237);
 
 #define MDRV_I8237_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, I8237, _clock) \
@@ -89,7 +91,5 @@ WRITE_LINE_DEVICE_HANDLER( i8237_dreq3_w );
 
 /* end of process */
 WRITE_LINE_DEVICE_HANDLER( i8237_eop_w );
-
-DEVICE_GET_INFO( i8237 );
 
 #endif

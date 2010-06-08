@@ -55,7 +55,7 @@ struct _cdp1869_t
 
 	running_device *device;
 	const cdp1869_interface *intf;	/* interface */
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 	running_device *cpu;		/* CPU */
 	sound_stream *stream;			/* sound output */
 	int color_clock;
@@ -97,8 +97,7 @@ struct _cdp1869_t
 INLINE cdp1869_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (cdp1869_t *)device->token;
+	return (cdp1869_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -119,7 +118,7 @@ static void update_prd_changed_timer(cdp1869_t *cdp1869)
 	{
 		attotime duration;
 		int start, end, level;
-		int scanline = video_screen_get_vpos(cdp1869->screen);
+		int scanline = cdp1869->screen->vpos();
 		int next_scanline;
 
 		if (CDP1869_IS_NTSC)
@@ -154,7 +153,7 @@ static void update_prd_changed_timer(cdp1869_t *cdp1869)
 			level = 1;
 		}
 
-		duration = video_screen_get_time_until_pos(cdp1869->screen, next_scanline, 0);
+		duration = cdp1869->screen->time_until_pos(next_scanline);
 		timer_adjust_oneshot(cdp1869->prd_changed_timer, duration, level);
 	}
 }
@@ -805,7 +804,7 @@ static STREAM_UPDATE( cdp1869_stream_update )
 
 	if (!cdp1869->toneoff && cdp1869->toneamp)
 	{
-		double frequency = (cdp1869->device->clock / 2) / (512 >> cdp1869->tonefreq) / (cdp1869->tonediv + 1);
+		double frequency = (cdp1869->device->clock() / 2) / (512 >> cdp1869->tonefreq) / (cdp1869->tonediv + 1);
 //      double amplitude = cdp1869->toneamp * ((0.78*5) / 15);
 
 		int rate = cdp1869->device->machine->sample_rate / 2;
@@ -861,7 +860,7 @@ static DEVICE_START( cdp1869 )
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
 	/* validate arguments */
-	cdp1869->intf = (const cdp1869_interface *)device->baseconfig().static_config;
+	cdp1869->intf = (const cdp1869_interface *)device->baseconfig().static_config();
 
 	assert(cdp1869->intf->pcb_r != NULL);
 	assert(cdp1869->intf->char_ram_r != NULL);
@@ -881,7 +880,7 @@ static DEVICE_START( cdp1869 )
 	cdp1869->wnoff = 1;
 
 	/* get the screen device */
-	cdp1869->screen = device->machine->device(cdp1869->intf->screen_tag);
+	cdp1869->screen = downcast<screen_device *>(device->machine->device(cdp1869->intf->screen_tag));
 	assert(cdp1869->screen != NULL);
 
 	/* get the CPU device */

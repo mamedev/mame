@@ -318,7 +318,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 {
-	okim6295_set_bank_base(device, (data & 2) ? 0x40000 : 0);
+	downcast<okim6295_device *>(device)->set_bank_base((data & 2) ? 0x40000 : 0);
 	if (data & ~3)	logerror("%s: unknown okibank bits %02x\n", cpuexec_describe_context(device->machine), data);
 //  popmessage("OKI %x", data);
 }
@@ -684,8 +684,7 @@ static MACHINE_DRIVER_START( lordgun )
 	MDRV_SOUND_CONFIG(lordgun_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz / 20)	// ? 5MHz can't be right
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right!
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -729,12 +728,10 @@ static MACHINE_DRIVER_START( aliencha )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz / 20)	// ? 5MHz can't be right
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_20MHz / 20)	// ? 5MHz can't be right
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki2", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

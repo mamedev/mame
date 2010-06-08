@@ -56,10 +56,9 @@ struct _rtc65271_state
 INLINE rtc65271_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == RTC65271);
+	assert(device->type() == RTC65271);
 
-	return (rtc65271_state *)device->token;
+	return (rtc65271_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -686,7 +685,7 @@ static TIMER_CALLBACK( rtc_end_update_callback )
 
 static DEVICE_START( rtc65271 )
 {
-	rtc65271_config *config = (rtc65271_config *)device->baseconfig().inline_config;
+	rtc65271_config *config = (rtc65271_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	rtc65271_state *state = get_safe_token(device);
 
 	state->update_timer = timer_alloc(device->machine, rtc_begin_update_callback, (void *)device);

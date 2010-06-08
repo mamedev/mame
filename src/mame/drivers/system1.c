@@ -520,7 +520,7 @@ static WRITE8_HANDLER( soundport_w )
 static TIMER_DEVICE_CALLBACK( soundirq_gen )
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
-	cputag_set_input_line(timer->machine, "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(timer.machine, "soundcpu", 0, HOLD_LINE);
 }
 
 
@@ -607,7 +607,7 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
        enough, the MCU will fail; on shtngmst this happens after 3
        VBLANKs without a tick */
 
-	running_device *mcu = devtag_get_device(timer->machine, "mcu");
+	running_device *mcu = devtag_get_device(timer.machine, "mcu");
 	cpu_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
 	cpu_set_input_line(mcu, MCS51_T0_LINE, CLEAR_LINE);
 }

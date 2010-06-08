@@ -129,17 +129,15 @@ static double get_filtered_volume(speaker_state *sp);
 INLINE speaker_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SPEAKER);
-	return (speaker_state *)device->token;
+	assert(device->type() == SOUND_SPEAKER);
+	return (speaker_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
 static DEVICE_START( speaker )
 {
 	speaker_state *sp = get_safe_token(device);
-	const speaker_interface *intf = (const speaker_interface *) device->baseconfig().static_config;
+	const speaker_interface *intf = (const speaker_interface *) device->baseconfig().static_config();
 	int i;
 	double x;
 

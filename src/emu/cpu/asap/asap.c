@@ -85,7 +85,7 @@ struct _asap_state
 	UINT32		nextpc;
 	UINT8		irq_state;
 	int			icount;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	const address_space *program;
 	running_device *device;
 
@@ -271,10 +271,9 @@ static void (*const conditiontable[16])(asap_state *) =
 INLINE asap_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ASAP);
-	return (asap_state *)device->token;
+	return (asap_state *)downcast<cpu_device *>(device)->token();
 }
 
 
@@ -447,7 +446,7 @@ static CPU_INIT( asap )
 		asap->src2val[i] = i;
 	asap->irq_callback = irqcallback;
 	asap->device = device;
-	asap->program = device->space(AS_PROGRAM);
+	asap->program = device_memory(device)->space(AS_PROGRAM);
 
 
 	state_save_register_device_item(device, 0, asap->pc);
@@ -1728,7 +1727,7 @@ static CPU_SET_INFO( asap )
 
 CPU_GET_INFO( asap )
 {
-	asap_state *asap = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	asap_state *asap = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

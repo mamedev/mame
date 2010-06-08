@@ -475,7 +475,7 @@ static UINT8 cmos_unlocked;
 static UINT32 *timekeeper_nvram;
 static size_t timekeeper_nvram_size;
 
-static running_device *voodoo_device;
+static running_device *voodoo;
 static UINT8 dcs_idma_cs;
 
 static int dynamic_count;
@@ -516,7 +516,7 @@ static void remap_dynamic_addresses(running_machine *machine);
 
 static VIDEO_UPDATE( vegas )
 {
-	return voodoo_update(voodoo_device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return voodoo_update(voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -528,7 +528,7 @@ static VIDEO_UPDATE( vegas )
 
 static MACHINE_START( vegas )
 {
-	voodoo_device = devtag_get_device(machine, "voodoo");
+	voodoo = devtag_get_device(machine, "voodoo");
 
 	/* allocate timers for the NILE */
 	timer[0] = timer_alloc(machine, NULL, NULL);
@@ -784,7 +784,7 @@ static WRITE32_HANDLER( pci_ide_w )
 
 static READ32_HANDLER( pci_3dfx_r )
 {
-	int voodoo_type = voodoo_get_type(voodoo_device);
+	int voodoo_type = voodoo_get_type(voodoo);
 	UINT32 result = pci_3dfx_regs[offset];
 
 	switch (offset)
@@ -817,7 +817,7 @@ static READ32_HANDLER( pci_3dfx_r )
 
 static WRITE32_HANDLER( pci_3dfx_w )
 {
-	int voodoo_type = voodoo_get_type(voodoo_device);
+	int voodoo_type = voodoo_get_type(voodoo);
 
 	pci_3dfx_regs[offset] = data;
 
@@ -856,7 +856,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			break;
 
 		case 0x10:		/* initEnable register */
-			voodoo_set_init_enable(voodoo_device, data);
+			voodoo_set_init_enable(voodoo, data);
 			break;
 
 	}
@@ -1553,7 +1553,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 {
 	running_device *ethernet = devtag_get_device(machine, "ethernet");
 	running_device *ide = devtag_get_device(machine, "ide");
-	int voodoo_type = voodoo_get_type(voodoo_device);
+	int voodoo_type = voodoo_get_type(voodoo);
 	offs_t base;
 	int addr;
 
@@ -1652,24 +1652,24 @@ static void remap_dynamic_addresses(running_machine *machine)
 		if (base >= ramsize && base < 0x20000000)
 		{
 			if (voodoo_type == VOODOO_2)
-				add_dynamic_device_address(voodoo_device, base + 0x000000, base + 0xffffff, voodoo_r, voodoo_w);
+				add_dynamic_device_address(voodoo, base + 0x000000, base + 0xffffff, voodoo_r, voodoo_w);
 			else
-				add_dynamic_device_address(voodoo_device, base + 0x000000, base + 0x1ffffff, banshee_r, banshee_w);
+				add_dynamic_device_address(voodoo, base + 0x000000, base + 0x1ffffff, banshee_r, banshee_w);
 		}
 
 		if (voodoo_type >= VOODOO_BANSHEE)
 		{
 			base = pci_3dfx_regs[0x05] & 0xfffffff0;
             if (base >= ramsize && base < 0x20000000)
-				add_dynamic_device_address(voodoo_device, base + 0x0000000, base + 0x1ffffff, banshee_fb_r, banshee_fb_w);
+				add_dynamic_device_address(voodoo, base + 0x0000000, base + 0x1ffffff, banshee_fb_r, banshee_fb_w);
 
 			base = pci_3dfx_regs[0x06] & 0xfffffff0;
             if (base >= ramsize && base < 0x20000000)
-				add_dynamic_device_address(voodoo_device, base + 0x0000000, base + 0x00000ff, banshee_io_r, banshee_io_w);
+				add_dynamic_device_address(voodoo, base + 0x0000000, base + 0x00000ff, banshee_io_r, banshee_io_w);
 
 			base = pci_3dfx_regs[0x0c] & 0xffff0000;
             if (base >= ramsize && base < 0x20000000)
-				add_dynamic_device_address(voodoo_device, base + 0x0000000, base + 0x000ffff, banshee_rom_r, NULL);
+				add_dynamic_device_address(voodoo, base + 0x0000000, base + 0x000ffff, banshee_rom_r, NULL);
 		}
 	}
 
@@ -2258,7 +2258,8 @@ static MACHINE_DRIVER_START( vegas250 )
 	MDRV_IMPORT_FROM(vegascore)
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
 
-	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*2.5)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(SYSTEM_CLOCK*2.5)
 MACHINE_DRIVER_END
 
 
@@ -2288,6 +2289,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vegasv3 )
 	MDRV_IMPORT_FROM(vegas32m)
 	MDRV_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
+	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb)
 
 	MDRV_DEVICE_REMOVE("voodoo")
 	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
@@ -2301,6 +2304,7 @@ static MACHINE_DRIVER_START( denver )
 	MDRV_IMPORT_FROM(dcs2_audio_denver)
 
 	MDRV_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
+	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MDRV_DEVICE_REMOVE("voodoo")

@@ -97,10 +97,8 @@ enum {
 INLINE rf5c400_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_RF5C400);
-	return (rf5c400_state *)device->token;
+	assert(device->type() == SOUND_RF5C400);
+	return (rf5c400_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -244,8 +242,8 @@ static void rf5c400_init_chip(running_device *device, rf5c400_state *info)
 {
 	int i;
 
-	info->rom = *device->region;
-	info->rom_length = device->region->bytes() / 2;
+	info->rom = *device->region();
+	info->rom_length = device->region()->bytes() / 2;
 
 	// init volume table
 	{
@@ -348,7 +346,7 @@ static void rf5c400_init_chip(running_device *device, rf5c400_state *info)
 		state_save_register_device_item(device, i, info->channels[i].env_scale);
 	}
 
-	info->stream = stream_create(device, 0, 2, device->clock/384, info, rf5c400_update);
+	info->stream = stream_create(device, 0, 2, device->clock()/384, info, rf5c400_update);
 }
 
 

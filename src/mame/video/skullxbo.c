@@ -114,7 +114,7 @@ WRITE16_HANDLER( skullxbo_xscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* adjust the actual scrolls */
 	tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, 2 * (newscroll >> 7));
@@ -130,7 +130,7 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 	skullxbo_state *state = (skullxbo_state *)space->machine->driver_data;
 
 	/* combine data */
-	int scanline = video_screen_get_vpos(space->machine->primary_screen);
+	int scanline = space->machine->primary_screen->vpos();
 	UINT16 oldscroll = *state->atarigen.yscroll;
 	UINT16 newscroll = oldscroll;
 	UINT16 effscroll;
@@ -138,10 +138,10 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		video_screen_update_partial(space->machine->primary_screen, scanline);
+		space->machine->primary_screen->update_partial(scanline);
 
 	/* adjust the effective scroll for the current scanline */
-	if (scanline > video_screen_get_visible_area(space->machine->primary_screen)->max_y)
+	if (scanline > space->machine->primary_screen->visible_area().max_y)
 		scanline = 0;
 	effscroll = (newscroll >> 7) - scanline;
 
@@ -163,7 +163,7 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 
 WRITE16_HANDLER( skullxbo_mobmsb_w )
 {
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	atarimo_set_bank(0, (offset >> 9) & 1);
 }
 
@@ -221,7 +221,7 @@ void skullxbo_scanline_update(running_machine *machine, int scanline)
 
 			/* force a partial update with the previous scroll */
 			if (scanline > 0)
-				video_screen_update_partial(machine->primary_screen, scanline - 1);
+				machine->primary_screen->update_partial(scanline - 1);
 
 			/* update the new scroll */
 			tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll);

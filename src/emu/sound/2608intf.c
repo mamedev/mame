@@ -32,10 +32,8 @@ struct _ym2608_state
 INLINE ym2608_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YM2608);
-	return (ym2608_state *)device->token;
+	assert(device->type() == SOUND_YM2608);
+	return (ym2608_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -140,8 +138,8 @@ static DEVICE_START( ym2608 )
 		},
 		NULL
 	};
-	const ym2608_interface *intf = device->baseconfig().static_config ? (const ym2608_interface *)device->baseconfig().static_config : &generic_2608;
-	int rate = device->clock/72;
+	const ym2608_interface *intf = device->baseconfig().static_config() ? (const ym2608_interface *)device->baseconfig().static_config() : &generic_2608;
+	int rate = device->clock()/72;
 	void *pcmbufa;
 	int  pcmsizea;
 
@@ -151,7 +149,7 @@ static DEVICE_START( ym2608 )
 	info->device = device;
 
 	/* FIXME: Force to use simgle output */
-	info->psg = ay8910_start_ym(NULL, SOUND_YM2608, device, device->clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(NULL, SOUND_YM2608, device, device->clock(), &intf->ay8910_intf);
 	assert_always(info->psg != NULL, "Error creating YM2608/AY8910 chip");
 
 	/* Timer Handler set */
@@ -161,11 +159,11 @@ static DEVICE_START( ym2608 )
 	/* stream system initialize */
 	info->stream = stream_create(device,0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = *device->region;
-	pcmsizea = device->region->bytes();
+	pcmbufa  = *device->region();
+	pcmsizea = device->region()->bytes();
 
 	/* initialize YM2608 */
-	info->chip = ym2608_init(info,device,device->clock,rate,
+	info->chip = ym2608_init(info,device,device->clock(),rate,
 		           pcmbufa,pcmsizea,
 		           timer_handler,IRQHandler,&psgintf);
 	assert_always(info->chip != NULL, "Error creating YM2608 chip");

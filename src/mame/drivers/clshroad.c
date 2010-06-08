@@ -19,6 +19,7 @@ XTAL        :   18.432 MHz
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "includes/wiping.h"
 
 /* Variables & functions defined in video: */
 
@@ -38,7 +39,6 @@ VIDEO_UPDATE( clshroad );
 extern UINT8 *wiping_soundregs;
 
 DEVICE_GET_INFO( wiping_sound );
-#define SOUND_WIPING DEVICE_GET_INFO_NAME(wiping_sound)
 
 WRITE8_HANDLER( wiping_sound_w );
 

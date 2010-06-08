@@ -47,13 +47,13 @@ static void update_interrupts(running_machine *machine)
 
 static READ16_HANDLER( relief_atarivc_r )
 {
-	return atarivc_r(space->machine->primary_screen, offset);
+	return atarivc_r(*space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( relief_atarivc_w )
 {
-	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(*space->machine->primary_screen, offset, data, mem_mask);
 }
 
 
@@ -76,9 +76,9 @@ static MACHINE_RESET( relief )
 
 	atarigen_eeprom_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarivc_reset(machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
+	atarivc_reset(*machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
 
-	okim6295_set_bank_base(devtag_get_device(machine, "oki"), 0);
+	machine->device<okim6295_device>("oki")->set_bank_base(0);
 	state->ym2413_volume = 15;
 	state->overall_volume = 127;
 	state->adpcm_bank_base = 0;
@@ -97,7 +97,7 @@ static READ16_HANDLER( special_port2_r )
 	relief_state *state = (relief_state *)space->machine->driver_data;
 	int result = input_port_read(space->machine, "260010");
 	if (state->atarigen.cpu_to_sound_ready) result ^= 0x0020;
-	if (!(result & 0x0080) || atarigen_get_hblank(space->machine->primary_screen)) result ^= 0x0001;
+	if (!(result & 0x0080) || atarigen_get_hblank(*space->machine->primary_screen)) result ^= 0x0001;
 	return result;
 }
 
@@ -121,7 +121,8 @@ static WRITE16_HANDLER( audio_control_w )
 	if (ACCESSING_BITS_8_15)
 		state->adpcm_bank_base = (0x100000 * ((data >> 8) & 1)) | (state->adpcm_bank_base & 0x0c0000);
 
-	okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), state->adpcm_bank_base);
+	okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+	oki->set_bank_base(state->adpcm_bank_base);
 }
 
 
@@ -320,8 +321,7 @@ static MACHINE_DRIVER_START( relief )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/4/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, ATARI_CLOCK_14MHz/4)

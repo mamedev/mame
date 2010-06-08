@@ -327,7 +327,7 @@ MACHINE_RESET( amiga )
 		(*amiga_intf->reset_callback)(machine);
 
 	/* start the scanline timer */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
+	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, scanline_callback);
 }
 
 
@@ -362,7 +362,7 @@ static TIMER_CALLBACK( scanline_callback )
 	mos6526_tod_w(cia_1, 1);
 
 	/* render up to this scanline */
-	if (!video_screen_update_partial(machine->primary_screen, scanline))
+	if (!machine->primary_screen->update_partial(scanline))
 	{
 		if (IS_AGA(amiga_intf))
 			amiga_aga_render_scanline(machine, NULL, scanline);
@@ -374,8 +374,8 @@ static TIMER_CALLBACK( scanline_callback )
 	amiga_audio_update();
 
 	/* set timer for next line */
-	scanline = (scanline + 1) % video_screen_get_height(machine->primary_screen);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
+	scanline = (scanline + 1) % machine->primary_screen->height();
+	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, scanline_callback);
 }
 
 
@@ -1183,16 +1183,16 @@ READ16_HANDLER( amiga_custom_r )
 		case REG_VPOSR:
 			CUSTOM_REG(REG_VPOSR) &= 0xff00;
 			if (IS_AGA(amiga_intf))
-				CUSTOM_REG(REG_VPOSR) |= amiga_aga_gethvpos(space->machine->primary_screen) >> 16;
+				CUSTOM_REG(REG_VPOSR) |= amiga_aga_gethvpos(*space->machine->primary_screen) >> 16;
 			else
-				CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(space->machine->primary_screen) >> 16;
+				CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(*space->machine->primary_screen) >> 16;
 			return CUSTOM_REG(REG_VPOSR);
 
 		case REG_VHPOSR:
 			if (IS_AGA(amiga_intf))
-				return amiga_aga_gethvpos(space->machine->primary_screen) & 0xffff;
+				return amiga_aga_gethvpos(*space->machine->primary_screen) & 0xffff;
 			else
-				return amiga_gethvpos(space->machine->primary_screen) & 0xffff;
+				return amiga_gethvpos(*space->machine->primary_screen) & 0xffff;
 
 		case REG_SERDATR:
 			CUSTOM_REG(REG_SERDATR) &= ~0x4000;

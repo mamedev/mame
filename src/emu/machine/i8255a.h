@@ -33,12 +33,13 @@
 #ifndef __I8255A__
 #define __I8255A__
 
+#include "devlegcy.h"
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define I8255A		DEVICE_GET_INFO_NAME(i8255a)
+DECLARE_LEGACY_DEVICE(I8255A, i8255a);
 
 #define MDRV_I8255A_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, I8255A, 0) \
@@ -66,9 +67,6 @@ struct _i8255a_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( i8255a );
 
 /* register access */
 READ8_DEVICE_HANDLER( i8255a_r );

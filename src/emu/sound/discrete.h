@@ -3,6 +3,7 @@
 #ifndef __DISCRETE_H__
 #define __DISCRETE_H__
 
+#include "devlegcy.h"
 #include "machine/rescap.h"
 
 /***********************************************************************
@@ -4563,7 +4564,6 @@ enum
 WRITE8_DEVICE_HANDLER( discrete_sound_w );
 READ8_DEVICE_HANDLER( discrete_sound_r );
 
-DEVICE_GET_INFO( discrete );
-#define SOUND_DISCRETE DEVICE_GET_INFO_NAME( discrete )
+DECLARE_LEGACY_SOUND_DEVICE(DISCRETE, discrete);
 
 #endif /* __DISCRETE_H__ */

@@ -129,7 +129,7 @@ VIDEO_START( bnj )
 	/* the background area is twice as wide as the screen */
 	int width = 256;
 	int height = 256;
-	bitmap_format format = video_screen_get_format(machine->primary_screen);
+	bitmap_format format = machine->primary_screen->format();
 	state->background_bitmap = auto_bitmap_alloc(machine, 2 * width, height, format);
 
 	state_save_register_global_bitmap(machine, state->background_bitmap);

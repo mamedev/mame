@@ -121,7 +121,7 @@ static TIMER_DEVICE_CALLBACK( scanline_update )
        mystery yet */
 
 	/* INT 1 is on 32V */
-	atarigen_scanline_int_gen(devtag_get_device(timer->machine, "maincpu"));
+	atarigen_scanline_int_gen(devtag_get_device(timer.machine, "maincpu"));
 
 	/* advance to the next interrupt */
 	scanline += 64;
@@ -129,7 +129,7 @@ static TIMER_DEVICE_CALLBACK( scanline_update )
 		scanline = 0;
 
 	/* set a timer for it */
-	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0), scanline);
+	timer.adjust(timer.machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -145,7 +145,8 @@ static MACHINE_RESET( foodf )
 {
 	foodf_state *state = (foodf_state *)machine->driver_data;
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	timer_device_adjust_oneshot(devtag_get_device(machine, "scan_timer"), video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_device *scan_timer = machine->device<timer_device>("scan_timer");
+	scan_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 

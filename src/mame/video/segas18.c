@@ -45,8 +45,8 @@ VIDEO_START( system18 )
 	system18_vdp_start(machine);
 
 	/* create a temp bitmap to draw the VDP data into */
-	width = video_screen_get_width(machine->primary_screen);
-	height = video_screen_get_height(machine->primary_screen);
+	width = machine->primary_screen->width();
+	height = machine->primary_screen->height();
 	state->tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 
@@ -71,7 +71,7 @@ void system18_set_grayscale(running_machine *machine, int enable)
 	enable = (enable != 0);
 	if (enable != state->grayscale_enable)
 	{
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		machine->primary_screen->update_partial(machine->primary_screen->vpos());
 		state->grayscale_enable = enable;
 //      mame_printf_debug("Grayscale = %02X\n", enable);
 	}
@@ -85,7 +85,7 @@ void system18_set_vdp_enable(running_machine *machine, int enable)
 	enable = (enable != 0);
 	if (enable != state->vdp_enable)
 	{
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		machine->primary_screen->update_partial(machine->primary_screen->vpos());
 		state->vdp_enable = enable;
 #if DEBUG_VDP
 		mame_printf_debug("VDP enable = %02X\n", enable);
@@ -100,7 +100,7 @@ void system18_set_vdp_mixing(running_machine *machine, int mixing)
 
 	if (mixing != state->vdp_mixing)
 	{
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		machine->primary_screen->update_partial(machine->primary_screen->vpos());
 		state->vdp_mixing = mixing;
 #if DEBUG_VDP
 		mame_printf_debug("VDP mixing = %02X\n", mixing);

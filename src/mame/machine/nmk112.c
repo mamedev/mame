@@ -33,17 +33,16 @@ struct _nmk112_state
 INLINE nmk112_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == NMK112);
+	assert(device->type() == NMK112);
 
-	return (nmk112_state *)device->token;
+	return (nmk112_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const nmk112_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == NMK112));
-	return (const nmk112_interface *) device->baseconfig().static_config;
+	assert((device->type() == NMK112));
+	return (const nmk112_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************

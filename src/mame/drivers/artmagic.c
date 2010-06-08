@@ -129,7 +129,10 @@ static WRITE16_HANDLER( control_w )
 
 	/* OKI banking here */
 	if (offset == 0)
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (((data >> 4) & 1) * 0x40000) % memory_region_length(space->machine, "oki"));
+	{
+		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		oki->set_bank_base((((data >> 4) & 1) * 0x40000) % oki->region()->bytes());
+	}
 
 	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(space->cpu), offset, data);
 }
@@ -729,8 +732,7 @@ static MACHINE_DRIVER_START( artmagic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, MASTER_CLOCK_40MHz/3/10)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 MACHINE_DRIVER_END
 

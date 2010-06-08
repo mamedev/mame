@@ -284,8 +284,8 @@ static struct
 
 static void DebugMeshInit( running_machine *machine )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	m_debug.b_mesh = 0;
 	m_debug.b_texture = 0;
@@ -302,8 +302,8 @@ static void DebugMesh( int n_coordx, int n_coordy )
 	running_machine *machine = m_debug.machine;
 	int n_coord;
 	int n_colour;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	if( m_debug.b_clear )
 	{
@@ -428,12 +428,12 @@ static void DebugCheckKeys( running_machine *machine )
 
 	if( m_debug.b_mesh || m_debug.b_texture )
 	{
-		int width = video_screen_get_width(machine->primary_screen);
-		int height = video_screen_get_height(machine->primary_screen);
-		video_screen_set_visarea(machine->primary_screen, 0, width - 1, 0, height - 1 );
+		int width = machine->primary_screen->width();
+		int height = machine->primary_screen->height();
+		machine->primary_screen->set_visible_area( 0, width - 1, 0, height - 1 );
 	}
 	else
-		video_screen_set_visarea(machine->primary_screen, 0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
+		machine->primary_screen->set_visible_area( 0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
 
 	if( input_code_pressed_once( machine, KEYCODE_I ) )
 	{
@@ -510,8 +510,8 @@ static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 
 	if( m_debug.b_texture )
 	{
-		int width = video_screen_get_width(machine->primary_screen);
-		int height = video_screen_get_height(machine->primary_screen);
+		int width = machine->primary_screen->width();
+		int height = machine->primary_screen->height();
 
 		for( n_y = 0; n_y < height; n_y++ )
 		{
@@ -614,7 +614,7 @@ static STATE_POSTLOAD( updatevisiblearea )
 	visarea.min_x = visarea.min_y = 0;
 	visarea.max_x = m_n_screenwidth - 1;
 	visarea.max_y = m_n_screenheight - 1;
-	video_screen_configure(machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
+	machine->primary_screen->configure(m_n_screenwidth, m_n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 static void psx_gpu_init( running_machine *machine )
@@ -624,8 +624,8 @@ static void psx_gpu_init( running_machine *machine )
 	int n_level2;
 	int n_shade;
 	int n_shaded;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = machine->primary_screen->width();
+	int height = machine->primary_screen->height();
 
 	need_sianniv_vblank_hack = !strcmp(machine->gamedrv->name, "sianniv");
 
