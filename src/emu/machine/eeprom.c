@@ -128,7 +128,7 @@ void eeprom_device_config::device_config_complete()
 	if (m_data_bits == 8)
 		m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME(eeprom_map8));
 	else
-		m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 16, m_address_bits, 0, *ADDRESS_MAP_NAME(eeprom_map16));
+		m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 16, m_address_bits * 2, 0, *ADDRESS_MAP_NAME(eeprom_map16));
 }
 
 
