@@ -1683,7 +1683,6 @@ static void memory_init_spaces(running_machine *machine)
 {
 	memory_private *memdata = machine->memory_data;
 	address_space **nextptr = (address_space **)&memdata->spacelist;
-	device_t *device;
 	int spacenum;
 
 	/* create a global watchpoint-filled table */
@@ -1691,105 +1690,102 @@ static void memory_init_spaces(running_machine *machine)
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over devices */
-	for (device = machine->devicelist.first(); device != NULL; device = device->next())
-	{
-		device_memory_interface *memory;
-		if (device->interface(memory))
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+	device_memory_interface *memory;
+	for (bool gotone = machine->devicelist.first(memory); gotone; gotone = memory->next(memory))
+		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		{
+			const address_space_config *spaceconfig = memory->space_config(spacenum);
+			if (spaceconfig != NULL)
 			{
-				const address_space_config *spaceconfig = memory->space_config(spacenum);
-				if (spaceconfig != NULL)
+				address_space *space = auto_alloc_clear(machine, address_space);
+				int ashift = spaceconfig->m_addrbus_shift;
+				int abits = spaceconfig->m_addrbus_width;
+				int dbits = spaceconfig->m_databus_width;
+				int logbits = spaceconfig->m_logaddr_width;
+				endianness_t endianness = spaceconfig->m_endianness;
+				int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
+				int entrynum;
+
+				/* if logbits is 0, revert to abits */
+				if (logbits == 0)
+					logbits = abits;
+
+				/* determine the address and data bits */
+				space->machine = machine;
+				space->cpu = &memory->device();
+				space->name = spaceconfig->m_name;
+				space->accessors = memory_accessors[accessorindex][(endianness == ENDIANNESS_LITTLE) ? 0 : 1];
+				space->addrmask = 0xffffffffUL >> (32 - abits);
+				space->bytemask = (ashift < 0) ? ((space->addrmask << -ashift) | ((1 << -ashift) - 1)) : (space->addrmask >> ashift);
+				space->logaddrmask = 0xffffffffUL >> (32 - logbits);
+				space->logbytemask = (ashift < 0) ? ((space->logaddrmask << -ashift) | ((1 << -ashift) - 1)) : (space->logaddrmask >> ashift);
+				space->spacenum = spacenum;
+				space->endianness = endianness;
+				space->ashift = ashift;
+				space->abits = abits;
+				space->dbits = dbits;
+				space->addrchars = (abits + 3) / 4;
+				space->logaddrchars = (logbits + 3) / 4;
+				space->log_unmap = TRUE;
+
+				/* allocate subtable information; we malloc this manually because it will be realloc'ed */
+				space->read.subtable = auto_alloc_array_clear(machine, subtable_data, SUBTABLE_COUNT);
+				space->write.subtable = auto_alloc_array_clear(machine, subtable_data, SUBTABLE_COUNT);
+
+				/* allocate the handler table */
+				space->read.handlers[0] = auto_alloc_array_clear(machine, handler_data, ARRAY_LENGTH(space->read.handlers));
+				space->write.handlers[0] = auto_alloc_array_clear(machine, handler_data, ARRAY_LENGTH(space->write.handlers));
+				for (entrynum = 1; entrynum < ARRAY_LENGTH(space->read.handlers); entrynum++)
 				{
-					address_space *space = auto_alloc_clear(machine, address_space);
-					int ashift = spaceconfig->m_addrbus_shift;
-					int abits = spaceconfig->m_addrbus_width;
-					int dbits = spaceconfig->m_databus_width;
-					int logbits = spaceconfig->m_logaddr_width;
-					endianness_t endianness = spaceconfig->m_endianness;
-					int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
-					int entrynum;
-
-					/* if logbits is 0, revert to abits */
-					if (logbits == 0)
-						logbits = abits;
-
-					/* determine the address and data bits */
-					space->machine = machine;
-					space->cpu = device;
-					space->name = spaceconfig->m_name;
-					space->accessors = memory_accessors[accessorindex][(endianness == ENDIANNESS_LITTLE) ? 0 : 1];
-					space->addrmask = 0xffffffffUL >> (32 - abits);
-					space->bytemask = (ashift < 0) ? ((space->addrmask << -ashift) | ((1 << -ashift) - 1)) : (space->addrmask >> ashift);
-					space->logaddrmask = 0xffffffffUL >> (32 - logbits);
-					space->logbytemask = (ashift < 0) ? ((space->logaddrmask << -ashift) | ((1 << -ashift) - 1)) : (space->logaddrmask >> ashift);
-					space->spacenum = spacenum;
-					space->endianness = endianness;
-					space->ashift = ashift;
-					space->abits = abits;
-					space->dbits = dbits;
-					space->addrchars = (abits + 3) / 4;
-					space->logaddrchars = (logbits + 3) / 4;
-					space->log_unmap = TRUE;
-
-					/* allocate subtable information; we malloc this manually because it will be realloc'ed */
-					space->read.subtable = auto_alloc_array_clear(machine, subtable_data, SUBTABLE_COUNT);
-					space->write.subtable = auto_alloc_array_clear(machine, subtable_data, SUBTABLE_COUNT);
-
-					/* allocate the handler table */
-					space->read.handlers[0] = auto_alloc_array_clear(machine, handler_data, ARRAY_LENGTH(space->read.handlers));
-					space->write.handlers[0] = auto_alloc_array_clear(machine, handler_data, ARRAY_LENGTH(space->write.handlers));
-					for (entrynum = 1; entrynum < ARRAY_LENGTH(space->read.handlers); entrynum++)
-					{
-						space->read.handlers[entrynum] = space->read.handlers[0] + entrynum;
-						space->write.handlers[entrynum] = space->write.handlers[0] + entrynum;
-					}
-
-					/* init the static handlers */
-					for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
-					{
-						space->read.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 0, entrynum);
-						space->read.handlers[entrynum]->object = space;
-						space->write.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 1, entrynum);
-						space->write.handlers[entrynum]->object = space;
-					}
-
-					/* make sure we fix up the mask for the unmap and watchpoint handlers */
-					space->read.handlers[STATIC_UNMAP]->bytemask = ~0;
-					space->write.handlers[STATIC_UNMAP]->bytemask = ~0;
-					space->read.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
-					space->write.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
-
-					/* allocate memory */
-					space->read.machine = machine;
-					space->read.table = auto_alloc_array(machine, UINT8, 1 << LEVEL1_BITS);
-					space->write.machine = machine;
-					space->write.table = auto_alloc_array(machine, UINT8, 1 << LEVEL1_BITS);
-
-					/* initialize everything to unmapped */
-					memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
-					memset(space->write.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
-
-					/* initialize the lookups */
-					space->readlookup = space->read.table;
-					space->writelookup = space->write.table;
-
-					/* set the direct access information base */
-					space->direct.raw = space->direct.decrypted = NULL;
-					space->direct.bytemask = space->bytemask;
-					space->direct.bytestart = 1;
-					space->direct.byteend = 0;
-					space->direct.entry = STATIC_UNMAP;
-					space->directupdate = NULL;
-
-					/* link us in */
-					*nextptr = space;
-					nextptr = (address_space **)&space->next;
-
-					/* notify the device */
-					memory->set_address_space(spacenum, space);
+					space->read.handlers[entrynum] = space->read.handlers[0] + entrynum;
+					space->write.handlers[entrynum] = space->write.handlers[0] + entrynum;
 				}
+
+				/* init the static handlers */
+				for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
+				{
+					space->read.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 0, entrynum);
+					space->read.handlers[entrynum]->object = space;
+					space->write.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 1, entrynum);
+					space->write.handlers[entrynum]->object = space;
+				}
+
+				/* make sure we fix up the mask for the unmap and watchpoint handlers */
+				space->read.handlers[STATIC_UNMAP]->bytemask = ~0;
+				space->write.handlers[STATIC_UNMAP]->bytemask = ~0;
+				space->read.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
+				space->write.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
+
+				/* allocate memory */
+				space->read.machine = machine;
+				space->read.table = auto_alloc_array(machine, UINT8, 1 << LEVEL1_BITS);
+				space->write.machine = machine;
+				space->write.table = auto_alloc_array(machine, UINT8, 1 << LEVEL1_BITS);
+
+				/* initialize everything to unmapped */
+				memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
+				memset(space->write.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
+
+				/* initialize the lookups */
+				space->readlookup = space->read.table;
+				space->writelookup = space->write.table;
+
+				/* set the direct access information base */
+				space->direct.raw = space->direct.decrypted = NULL;
+				space->direct.bytemask = space->bytemask;
+				space->direct.bytestart = 1;
+				space->direct.byteend = 0;
+				space->direct.entry = STATIC_UNMAP;
+				space->directupdate = NULL;
+
+				/* link us in */
+				*nextptr = space;
+				nextptr = (address_space **)&space->next;
+
+				/* notify the device */
+				memory->set_address_space(spacenum, space);
 			}
-	}
+		}
 }
 
 
