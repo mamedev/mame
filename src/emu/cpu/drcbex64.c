@@ -714,7 +714,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, runnin
 	/* get address spaces and accessors */
 	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 	{
-		drcbe->space[spacenum] = device->space(spacenum);
+		drcbe->space[spacenum] = downcast<cpu_device *>(device)->space(spacenum);
 		if (drcbe->space[spacenum] != NULL)
 			drcbe->accessors[spacenum] = drcbe->space[spacenum]->accessors;
 	}
