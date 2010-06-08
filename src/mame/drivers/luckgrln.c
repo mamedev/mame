@@ -118,8 +118,7 @@ static TILE_GET_INFO( get_luckgrln_reel1_tile_info )
 {
 	int code = reel1_ram[tile_index];
 	int attr = reel1_attr[tile_index];
-	int col = (attr & 0x03)<<1;
-	col |= (attr & 0x4)>>2;
+	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
 
@@ -149,8 +148,7 @@ static TILE_GET_INFO( get_luckgrln_reel2_tile_info )
 {
 	int code = reel2_ram[tile_index];
 	int attr = reel2_attr[tile_index];
-	int col = (attr & 0x03)<<1;
-	col |= (attr & 0x4)>>2;
+	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
 
@@ -179,8 +177,7 @@ static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 {
 	int code = reel3_ram[tile_index];
 	int attr = reel3_attr[tile_index];
-	int col = (attr & 0x03)<<1;
-	col |= (attr & 0x4)>>2;
+	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
 
@@ -208,8 +205,7 @@ static TILE_GET_INFO( get_luckgrln_reel4_tile_info )
 {
 	int code = reel4_ram[tile_index];
 	int attr = reel4_attr[tile_index];
-	int col = (attr & 0x03)<<1;
-	col |= (attr & 0x4)>>2;
+	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
 
@@ -227,8 +223,15 @@ static VIDEO_START(luckgrln)
 	reel3_tilemap = tilemap_create(machine,get_luckgrln_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 	reel4_tilemap = tilemap_create(machine,get_luckgrln_reel4_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 
-	//machine->gfx[0]->color_granularity = 16;
+	tilemap_set_scroll_cols(reel1_tilemap, 64);
+	tilemap_set_scroll_cols(reel2_tilemap, 64);
+	tilemap_set_scroll_cols(reel3_tilemap, 64);
+	tilemap_set_scroll_cols(reel4_tilemap, 64);
 
+	tilemap_set_transparent_pen( reel1_tilemap, 0 );
+	tilemap_set_transparent_pen( reel2_tilemap, 0 );
+	tilemap_set_transparent_pen( reel3_tilemap, 0 );
+	tilemap_set_transparent_pen( reel4_tilemap, 0 );
 }
 
 static VIDEO_UPDATE(luckgrln)
@@ -239,8 +242,6 @@ static VIDEO_UPDATE(luckgrln)
 	int i;
 
 	rectangle clip;
-
-	bitmap_fill(bitmap, cliprect, 0x3f); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
 
 	clip.min_x = visarea.min_x;
 	clip.max_x = visarea.max_x;
@@ -284,7 +285,6 @@ static VIDEO_UPDATE(luckgrln)
 			/*
 			  luck_vram1  tttt tttt   (t = low tile bits)
 			  luck_vram2  tttt ppp?   (t = high tile bits) (p = pal select)?
-              luck_vram3  --ee --t-   (t = tile bank) (e = select which of the reel tiles to display here too?)
 
 
 			 */
@@ -293,19 +293,41 @@ static VIDEO_UPDATE(luckgrln)
 			if (tileattr & 0x02) tile |= 0x1000;
 
 			// ?? low bit is used too
-			col = (tile_high>>1)&0x7;
-			col += 8;
+			col = tile_high&0xf;
 
-			// other bits are used.. do they affect palette of reels, or..?
+			// --ss fbt-   luck_vram3
+			// - = unused?
+			// s = reel layer select for this 8x8 region
+			// f = fg enabled for this 8x8 region (or priority?)
+			// b = reel enabled for this 8x8 region (not set on startup screens)
+			// t = tile bank
+
 			bgenable = (tileattr &0x30)>>4;
 
+#if 0 // treat bit as fg enable
+			if (tileattr&0x04)
+			{
+				if (bgenable==0) tilemap_draw(bitmap, &clip, reel1_tilemap, 0, 0);
+				if (bgenable==1) tilemap_draw(bitmap, &clip, reel2_tilemap, 0, 0);
+				if (bgenable==2) tilemap_draw(bitmap, &clip, reel3_tilemap, 0, 0);
+				if (bgenable==3) tilemap_draw(bitmap, &clip, reel4_tilemap, 0, 0);
+			}
 
-			if (bgenable==0) tilemap_draw(bitmap, &clip, reel1_tilemap, 0, 0);
-			if (bgenable==1) tilemap_draw(bitmap, &clip, reel2_tilemap, 0, 0);
-			if (bgenable==2) tilemap_draw(bitmap, &clip, reel3_tilemap, 0, 0);
-			if (bgenable==3) tilemap_draw(bitmap, &clip, reel4_tilemap, 0, 0);
+			if (tileattr&0x08) drawgfx_transpen(bitmap,&clip,screen->machine->gfx[region],tile,col,0,0,x*8,y*8, 0);
 
-			drawgfx_transpen(bitmap,&clip,screen->machine->gfx[region],tile,col,0,0,x*8,y*8, 0);
+#else // treat it as priority flag instead (looks better in non-adult title screen - needs verifying)
+			if (!(tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen->machine->gfx[region],tile,col,0,0,x*8,y*8, 0);
+
+			if (tileattr&0x04)
+			{
+				if (bgenable==0) tilemap_draw(bitmap, &clip, reel1_tilemap, 0, 0);
+				if (bgenable==1) tilemap_draw(bitmap, &clip, reel2_tilemap, 0, 0);
+				if (bgenable==2) tilemap_draw(bitmap, &clip, reel3_tilemap, 0, 0);
+				if (bgenable==3) tilemap_draw(bitmap, &clip, reel4_tilemap, 0, 0);
+			}
+
+			if ((tileattr&0x08)) drawgfx_transpen(bitmap,&clip,screen->machine->gfx[region],tile,col,0,0,x*8,y*8, 0);
+#endif
 
 			count++;
 		}
@@ -348,7 +370,7 @@ static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-#if 1
+
 static WRITE8_HANDLER( output_w )
 {
 	/* correct? */
@@ -358,22 +380,19 @@ static WRITE8_HANDLER( output_w )
 		nmi_enable = 1;
 	else
 		printf("output_w unk data %02x\n",data);
-
-	// other values unknown
-//  printf("%02x\n",data);
 }
-#endif
+
 
 static int palette_count = 0;
 static UINT8 palette_ram[0x10000];
 
 static WRITE8_HANDLER( palette_offset_low_w )
 {
-	palette_count = data;
+	palette_count = data<<1;
 }
 static WRITE8_HANDLER( palette_offset_high_w )
 {
-	palette_count = palette_count | data<<8;
+	palette_count = palette_count | data<<9;
 }
 
 
@@ -632,10 +651,26 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPNAME( 0x20, 0x20, "Minimum Bet" )
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
+	PORT_DIPNAME( 0x40, 0x40, "DSW1-40 (Do Not Use)" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW1-80 (Do Not Use)" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2") //DIP SW 2
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
+	PORT_DIPNAME( 0x01, 0x01, "DSW2-01 (Do Not Use)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DSW2-02 (Do Not Use)" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DSW2-04 (Do Not Use)" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DSW2-08 (Do Not Use)" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "DSW2-10" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -707,7 +742,12 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5") //DIP SW 5
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED ) //causes POST errors otherwise
+	PORT_DIPNAME( 0x01, 0x01, "DSW5-01 (Do Not Use)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DSW5-02 (Do Not Use)" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "DSW5-04" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -751,7 +791,7 @@ static const gfx_layout tiles8x32_layout =
 };
 
 static GFXDECODE_START( luckgrln )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x100, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x400, 64 )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 64 )
 GFXDECODE_END
 
@@ -771,11 +811,8 @@ static const mc6845_interface mc6845_intf =
 
 static INTERRUPT_GEN( luckgrln_irq )
 {
-	#if 1
-	//nmi_enable = 1;
 	if(nmi_enable)
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-	#endif
 }
 
 static MACHINE_DRIVER_START( luckgrln )
@@ -862,5 +899,5 @@ ROM_END
 **********************************************
 
        YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY           FULLNAME                                 FLAGS                                  LAYOUT  */
-GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND, layout_luckgrln )
+GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_NO_SOUND, layout_luckgrln )
 

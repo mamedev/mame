@@ -13,6 +13,10 @@ RAM: 411A (x48)
 
 XTal: 20.0
 
+todo:
+ how are the games checking the battery
+ state?
+
 **********************************/
 
 #include "emu.h"
@@ -160,7 +164,7 @@ static WRITE8_DEVICE_HANDLER( wldarrow_dac_4_w )
  *************************************/
 
 static ADDRESS_MAP_START( wldarrow_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&wldarrow_videoram_0) AM_SIZE(&wldarrow_videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&wldarrow_videoram_1)
@@ -451,6 +455,17 @@ ROM_START( mdrawpkra )
 	ROM_LOAD( "meyco.k3", 0x2800, 0x0800, CRC(72aee07f) SHA1(a6d6086f3a6181d5111d05ae779c3f7b363c7f14) )
 ROM_END
 
+ROM_START( unkmeyco )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "k8", 0x0000, 0x0800, CRC(c6d8a2f7) SHA1(1fcd3ad72a29f832ffaf37edcb74e84e21909496) )
+	ROM_LOAD( "k7", 0x0800, 0x0800, CRC(6e30e5ae) SHA1(980096adefce4d4d97607b22f56f3acf246986ed) )
+	ROM_LOAD( "k6", 0x1000, 0x0800, CRC(7e2cb0e1) SHA1(3ea8f3c051ba730a39404b718d93bcdd762834c3) )
+	ROM_LOAD( "k5", 0x1800, 0x0800, CRC(536c83f9) SHA1(0dc9171c14f96bde68dc3b175abe31fa25753b48) )
+	ROM_LOAD( "k4", 0x2000, 0x0800, CRC(178b0f95) SHA1(cea5922f5294958c59cacd42e30399fc329426d9) )
+	ROM_LOAD( "k3", 0x2800, 0x0800, CRC(9cd6b843) SHA1(fb9c5c5ba96ebb75dc42e7c891d6da2a8a1ea6c1) )
+	ROM_LOAD( "k2", 0x3000, 0x0800, CRC(5f82eafa) SHA1(4f5a4dc773ceae9a69ec532166047867db4ddadf) )
+ROM_END
+ 
 
 /*************************************
  *
@@ -463,7 +478,7 @@ static DRIVER_INIT( wldarrow )
 	offs_t i;
 	UINT8 *rom = memory_region(machine, "maincpu");
 
-	for (i = 0; i < 0x3000; i++)
+	for (i = 0; i < 0x3800; i++)
 		rom[i] ^= 0xff;
 }
 
@@ -471,3 +486,4 @@ static DRIVER_INIT( wldarrow )
 GAME( 1982, wldarrow,  0,        wldarrow, wldarrow, wldarrow, ROT0, "Meyco Games", "Wild Arrow (Standard V4.8)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 198?, mdrawpkr,  0,        wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Draw Poker Joker's Wild (Standard)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 198?, mdrawpkra, mdrawpkr, wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Draw Poker Joker's Wild (02-11)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 198?, unkmeyco,  0,        wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Unknown Meyco Game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

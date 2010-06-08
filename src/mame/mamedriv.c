@@ -7347,6 +7347,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( toki )		/* (c) 1989 Tad (World) */
 	DRIVER( tokia )		/* (c) 1989 Tad (World) */
 	DRIVER( tokiu )		/* (c) 1989 Tad + Fabtek license (US) */
+	DRIVER( tokiua )	/* (c) 1989 Tad + Fabtek license (US) */
 	DRIVER( tokib )		/* bootleg */
 	DRIVER( juju )		/* (c) 1989 Tad (Japan) */
 	DRIVER( jujub )		/* (c) 1989 Tad (Japan) */
@@ -9013,6 +9014,7 @@ Other Sun games
 	DRIVER( portraita )	/* (c) 1983 Olympia */
 	DRIVER( enigma2 )	/* (c) 1981 Game Plan (Zilec Electronics license) */
 	DRIVER( enigma2a )	/* (c) 1984 Zilec Electronics (bootleg?) */
+	DRIVER( enigma2b )	/* (c) 1981 Zilec Electronics */
 	DRIVER( ltcasino )	/* (c) 1982 Digital Controls Inc */
 	DRIVER( mv4in1 )	/* (c) 1983 Entertainment Enterprises */
 	DRIVER( ltcasinn )	/* (c) 1984 Digital Controls Inc */
@@ -9170,6 +9172,7 @@ Other Sun games
 	DRIVER( gunpey )	/* (c) 2000 Banpresto */
 	DRIVER( spaceg )	/* (c) 19?? */
 	DRIVER( wldarrow )	/* (c) 1982 */
+	DRIVER( unkmeyco )	/* (c) 198? */
 	DRIVER( mdrawpkr )	/* (c) 19?? */
 	DRIVER( mdrawpkra )	/* (c) 19?? */
 	DRIVER( laserbas )	/* (c) 1981 Amstar/HOEI */

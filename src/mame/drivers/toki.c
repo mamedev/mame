@@ -563,6 +563,36 @@ ROM_START( tokia )
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
+ROM_START( tokiua )
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "tokijp.006",   0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
+	ROM_LOAD16_BYTE( "4u.k10",       0x00001, 0x20000, CRC(ca2f50d9) SHA1(e2660a9627850fa39469804a3ff563caedd0782b) )
+	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
+	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 code, banked data */
+	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )	/* encrypted */
+	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )	/* banked stuff */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
+	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
+	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
+
+	ROM_REGION( 0x080000, "gfx4", 0 )
+	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+ROM_END
+
+
 ROM_START( tokiu )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "6b.10m",       0x00000, 0x20000, CRC(3674d9fe) SHA1(7c610bee23b0f7e6a9e3d5d72d6084e025eb89ec) )
@@ -836,10 +866,15 @@ static DRIVER_INIT(jujub)
 }
 
 
-GAME( 1989, toki,  0,    toki,  toki,  toki,  ROT0, "TAD Corporation", "Toki (World set 1)", 0 )
-GAME( 1989, tokia, toki, toki,  toki,  toki,  ROT0, "TAD Corporation", "Toki (World set 2)", 0 )
-GAME( 1989, tokiu, toki, toki,  toki,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US)", 0 )
+// these 2 are both unique revisions
+GAME( 1989, toki,  0,    toki,  toki,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", 0 )
+GAME( 1989, tokiu, toki, toki,  toki,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", 0 )
+
+// these 3 are all the same revision, only the region byte differs
+GAME( 1989, tokia, toki, toki,  toki,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", 0 )
+GAME( 1989, tokiua,toki, toki,  toki,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", 0 )
 GAME( 1989, juju,  toki, toki,  toki,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", 0 )
-GAME( 1990, tokib, toki, tokib, tokib, tokib, ROT0, "bootleg", "Toki (Datsu bootleg)", 0 )
+
+GAME( 1990, tokib, toki, tokib, tokib, tokib, ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", 0 )
 /* Sound hardware seems to have been slightly modified, the coins are handled ok, but there is no music and bad sfx.  Program roms have a slight bitswap, Flipscreen also seems to be ignored */
-GAME( 1989, jujub, toki, toki,  toki,  jujub, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND ) // bootleg of tokia/tokij revison
+GAME( 1989, jujub, toki, toki,  toki,  jujub, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND ) // bootleg of tokia/juju revison
