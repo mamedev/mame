@@ -302,7 +302,7 @@ void cpu_device::device_start()
 		state_add(STATE_GENPCBASE, "curpcbase", m_state_io).callimport().callexport().formatstr("%8s").noshow();
 		
 		const char *string = get_legacy_runtime_string(CPUINFO_STR_FLAGS);
-		if (string != NULL)
+		if (string != NULL && string[0] != 0)
 		{
 			astring flagstr;
 			flagstr.printf("%%%ds", strlen(string));

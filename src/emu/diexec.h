@@ -257,7 +257,7 @@ public:
 
 protected:
 	// optional operation overrides
-	virtual INT32 execute_run(INT32 clocks) = 0;
+	virtual INT32 execute_run(INT32 cycles) = 0;
 	virtual void execute_burn(INT32 cycles);
 	virtual void execute_set_input(int linenum, int state);
 
