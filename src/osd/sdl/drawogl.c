@@ -1184,8 +1184,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	texture_info *texture=NULL;
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE, scrnum, is_vector;
-	const device_config *screen;
-	const screen_config *scrconfig;
+	const screen_device_config *screen;
 
 	if (video_config.novideo)
 	{
