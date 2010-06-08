@@ -6,9 +6,6 @@
     earlier version, without RAM banking, not encrypted (standard Z80)
     and without EEPROM.
 
-    Other games that might run on this hardware:
-    "Chi-toitsu"(YUGA 1988)-Another version of"Mahjong Gakuen"
-
     Notes:
     - Super Pang has a protection which involves copying code stored in the
       EEPROM to RAM and execute it from there. The first time the game is run,
@@ -129,7 +126,7 @@ static READ8_HANDLER( pang_port5_r )
 	if (cpu_getiloops(space->cpu) & 1)
 		bit |= 0x01;
 
-	return (input_port_read(space->machine, "DSW0") & 0x7e) | bit;
+	return (input_port_read(space->machine, "SYS0") & 0x7e) | bit;
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
@@ -413,10 +410,10 @@ static ADDRESS_MAP_START( mstworld_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(mstworld_sound_w)	/* write to sound cpu */
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")	/* dips? */
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW0")	/* special? */
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW3")	/* dips? */
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(mstworld_sound_w)	/* write to sound cpu */
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	/* dips? */
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")	/* special? */
+	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")	/* dips? */
 	AM_RANGE(0x06, 0x06) AM_WRITENOP		/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)	/* Video RAM bank register */
 ADDRESS_MAP_END
@@ -429,7 +426,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( mj_common )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -551,10 +548,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mgakuen )
 	PORT_INCLUDE( mj_common )
 
-	PORT_MODIFY("DSW0")
+	PORT_MODIFY("SYS0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// not IPT_VBLANK
 
-	PORT_START("DSW1")
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -578,7 +575,7 @@ static INPUT_PORTS_START( mgakuen )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Player 1 Skill" )
 	PORT_DIPSETTING(    0x03, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -606,7 +603,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( marukin )
 	PORT_INCLUDE( mj_common )
 
-	PORT_MODIFY("DSW0")
+	PORT_MODIFY("SYS0")
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -681,7 +678,7 @@ static INPUT_PORTS_START( pkladies )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pang )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -729,7 +726,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mstworld )
 	/* this port may not have the same role */
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -767,7 +764,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START("DSW1")		/* coinage seems to be in here.. */
+	PORT_START("DSW0")		/* coinage seems to be in here.. */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, "A 1Coin 4Credits / B 1Coin 4Credits" )
 	PORT_DIPSETTING(    0x02, "A 1Coin 3Credits / B 1Coin 3Credits" )
@@ -790,6 +787,32 @@ static INPUT_PORTS_START( mstworld )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "ds1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "ds2" )
@@ -816,36 +839,10 @@ static INPUT_PORTS_START( mstworld )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, "ds3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qtono1 )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -885,7 +882,7 @@ static INPUT_PORTS_START( qtono1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( block )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -927,7 +924,7 @@ static INPUT_PORTS_START( block )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( blockjoy )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -2231,8 +2228,8 @@ static DRIVER_INIT( mgakuen )
 	mitchell_state *state = (mitchell_state *)machine->driver_data;
 	state->input_type = 1;
 	configure_banks(machine);
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW1");
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSW2");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW0");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSW1");
 }
 static DRIVER_INIT( mgakuen2 )
 {
