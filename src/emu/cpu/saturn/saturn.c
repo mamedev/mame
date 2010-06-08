@@ -82,7 +82,7 @@ struct _saturn_state
 	int 	monitor_id;
 	int		monitor_in;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -115,7 +115,7 @@ static CPU_INIT( saturn )
 	cpustate->config = (saturn_cpu_core *) device->baseconfig().static_config();
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0,cpustate->reg[R0]);
 	state_save_register_device_item_array(device, 0,cpustate->reg[R1]);
@@ -304,7 +304,7 @@ static INT64 Reg64Int(Saturn64 r)
 
 CPU_GET_INFO( saturn )
 {
-	saturn_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	saturn_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

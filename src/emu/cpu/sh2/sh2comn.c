@@ -699,7 +699,7 @@ void sh2_exception(SH2 *sh2, const char *message, int irqline)
 	#endif
 }
 
-void sh2_common_init(SH2 *sh2, running_device *device, device_irq_callback irqcallback)
+void sh2_common_init(SH2 *sh2, cpu_device *device, device_irq_callback irqcallback)
 {
 	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config();
 
@@ -727,8 +727,8 @@ void sh2_common_init(SH2 *sh2, running_device *device, device_irq_callback irqca
 	}
 	sh2->irq_callback = irqcallback;
 	sh2->device = device;
-	sh2->program = device_memory(device)->space(AS_PROGRAM);
-	sh2->internal = device_memory(device)->space(AS_PROGRAM);
+	sh2->program = device->space(AS_PROGRAM);
+	sh2->internal = device->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, sh2->pc);
 	state_save_register_device_item(device, 0, sh2->r[15]);

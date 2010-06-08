@@ -62,7 +62,7 @@ struct _tms34010_state
 	UINT8				external_host_access;
 	UINT8				executing;
 	device_irq_callback	irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const tms34010_config *config;
 	screen_device *screen;
@@ -628,7 +628,7 @@ static CPU_INIT( tms34010 )
 	tms->config = configdata;
 	tms->irq_callback = irqcallback;
 	tms->device = device;
-	tms->program = device_memory(device)->space(AS_PROGRAM);
+	tms->program = device->space(AS_PROGRAM);
 	tms->screen = downcast<screen_device *>(device->machine->device(configdata->screen_tag));
 
 	/* set up the state table */
@@ -689,7 +689,7 @@ static CPU_RESET( tms34010 )
 	tms->irq_callback = save_irqcallback;
 	tms->scantimer = save_scantimer;
 	tms->device = device;
-	tms->program = device_memory(device)->space(AS_PROGRAM);
+	tms->program = device->space(AS_PROGRAM);
 
 	/* fetch the initial PC and reset the state */
 	tms->pc = RLONG(tms, 0xffffffe0) & 0xfffffff0;
@@ -699,7 +699,7 @@ static CPU_RESET( tms34010 )
 	/* the first time we are run */
 	tms->reset_deferred = tms->config->halt_on_reset;
 	if (tms->config->halt_on_reset)
-		tms34010_io_register_w(device_memory(device)->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
+		tms34010_io_register_w(device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
 }
 
 
@@ -1594,7 +1594,7 @@ void tms34010_host_w(running_device *cpu, int reg, int data)
 		/* control register */
 		case TMS34010_HOST_CONTROL:
 			tms->external_host_access = TRUE;
-			space = device_memory(tms->device)->space(AS_PROGRAM);
+			space = tms->device->space(AS_PROGRAM);
 			tms34010_io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
 			tms34010_io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
 			tms->external_host_access = FALSE;
@@ -1720,7 +1720,7 @@ CPU_EXPORT_STRING( tms34010 )
 
 CPU_GET_INFO( tms34010 )
 {
-	tms34010_state *tms = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	tms34010_state *tms = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -463,7 +463,7 @@ static void I386OP(decode_two_byte)(i386_state *cpustate)
 
 static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	running_device *device = (running_device *)ref;
+	cpu_device *device = (cpu_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
 	UINT32 result;
 	I386_SREG seg;
@@ -484,7 +484,7 @@ static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, cons
 
 static UINT64 i386_debug_seglimit(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	running_device *device = (running_device *)ref;
+	cpu_device *device = (cpu_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
 	UINT32 result = 0;
 	I386_SREG seg;
@@ -509,7 +509,7 @@ static CPU_DEBUG_INIT( i386 )
 
 static STATE_POSTLOAD( i386_postload )
 {
-	running_device *device = (running_device *)param;
+	cpu_device *device = (cpu_device *)param;
 	i386_state *cpustate = get_safe_token(device);
 	int i;
 	for (i = 0; i < 6; i++)
@@ -548,8 +548,8 @@ static CPU_INIT( i386 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item_array(device, 0,	cpustate->reg.d);
 	state_save_register_device_item(device, 0, cpustate->sreg[ES].selector);
@@ -647,8 +647,8 @@ static CPU_RESET( i386 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -870,7 +870,7 @@ static CPU_SET_INFO( i386 )
 
 CPU_GET_INFO( i386 )
 {
-	i386_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	i386_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1103,8 +1103,8 @@ static CPU_RESET( i486 )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -1165,7 +1165,7 @@ static CPU_SET_INFO( i486 )
 
 CPU_GET_INFO( i486 )
 {
-	i386_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	i386_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(i486);break;
@@ -1219,8 +1219,8 @@ static CPU_RESET( pentium )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -1296,7 +1296,7 @@ static CPU_SET_INFO( pentium )
 
 CPU_GET_INFO( pentium )
 {
-	i386_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	i386_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(pentium);	break;
@@ -1350,8 +1350,8 @@ static CPU_RESET( mediagx )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
 	cpustate->sreg[CS].base		= 0xffff0000;
@@ -1422,7 +1422,7 @@ static CPU_SET_INFO( mediagx )
 
 CPU_GET_INFO( mediagx )
 {
-	i386_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	i386_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(mediagx);	break;

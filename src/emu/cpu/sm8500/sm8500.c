@@ -51,7 +51,7 @@ struct _sm8500_state
 	int halted;
 	int icount;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	UINT8 internal_ram[0x500];
 };
@@ -99,7 +99,7 @@ static CPU_INIT( sm8500 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 	if ( device->baseconfig().static_config() != NULL ) {
 		cpustate->config.handle_dma = ((SM8500_CONFIG *)device->baseconfig().static_config())->handle_dma;
 		cpustate->config.handle_timers = ((SM8500_CONFIG *)device->baseconfig().static_config())->handle_timers;
@@ -444,7 +444,7 @@ static CPU_SET_INFO( sm8500 )
 
 CPU_GET_INFO( sm8500 )
 {
-	sm8500_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	sm8500_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

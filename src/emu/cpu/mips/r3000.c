@@ -138,7 +138,7 @@ struct _r3000_state
 	int			interrupt_cycles;
 	int			hasfpu;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 
 	/* endian-dependent load/store */
@@ -312,7 +312,7 @@ static CPU_INIT( r3000 )
 
 	r3000->irq_callback = irqcallback;
 	r3000->device = device;
-	r3000->program = device_memory(device)->space(AS_PROGRAM);
+	r3000->program = device->space(AS_PROGRAM);
 }
 
 
@@ -1163,7 +1163,7 @@ static CPU_SET_INFO( r3000 )
 
 static CPU_GET_INFO( r3000 )
 {
-	r3000_state *r3000 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	r3000_state *r3000 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

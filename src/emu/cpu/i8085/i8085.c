@@ -183,7 +183,7 @@ struct _i8085_state
 	UINT8				ietemp;			/* import/export temp space */
 
 	device_irq_callback	irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int					icount;
@@ -971,7 +971,7 @@ static void init_tables (int type)
 }
 
 
-static void init_808x_common(running_device *device, device_irq_callback irqcallback, int type)
+static void init_808x_common(cpu_device *device, device_irq_callback irqcallback, int type)
 {
 	i8085_state *cpustate = get_safe_token(device);
 
@@ -1010,8 +1010,8 @@ static void init_808x_common(running_device *device, device_irq_callback irqcall
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* resolve callbacks */
 	devcb_resolve_write8(&cpustate->out_status_func, &cpustate->config.out_status_func, device);
@@ -1202,7 +1202,7 @@ static CPU_SET_INFO( i808x )
 
 CPU_GET_INFO( i8085 )
 {
-	i8085_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	i8085_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

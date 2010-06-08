@@ -50,7 +50,7 @@ struct _mb86233_state
 	UINT32			gpr[16];
 	UINT32			extport[0x30];
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 
@@ -112,7 +112,7 @@ static CPU_INIT( mb86233 )
 
 	memset(cpustate, 0, sizeof( *cpustate ) );
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	if ( _config )
 	{
@@ -1606,7 +1606,7 @@ static CPU_SET_INFO( mb86233 )
 
 CPU_GET_INFO( mb86233 )
 {
-	mb86233_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	mb86233_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

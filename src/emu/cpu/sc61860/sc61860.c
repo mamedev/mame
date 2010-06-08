@@ -55,7 +55,7 @@ struct _sc61860_state
 
     struct { int t2ms, t512ms; int count;} timer;
 
-    running_device *device;
+    cpu_device *device;
     const address_space *program;
     int icount;
 };
@@ -106,7 +106,7 @@ static CPU_INIT( sc61860 )
 	cpustate->config = (sc61860_cpu_core *) device->baseconfig().static_config();
 	timer_pulse(device->machine, ATTOTIME_IN_HZ(500), cpustate, 0, sc61860_2ms_tick);
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_EXECUTE( sc61860 )
@@ -173,7 +173,7 @@ static CPU_SET_INFO( sc61860 )
 
 CPU_GET_INFO( sc61860 )
 {
-	sc61860_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	sc61860_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

@@ -87,7 +87,7 @@ struct _asap_state
 	int			icount;
 	device_irq_callback irq_callback;
 	const address_space *program;
-	running_device *device;
+	cpu_device *device;
 
 	/* src2val table, registers are at the end */
 	UINT32		src2val[65536];
@@ -446,7 +446,7 @@ static CPU_INIT( asap )
 		asap->src2val[i] = i;
 	asap->irq_callback = irqcallback;
 	asap->device = device;
-	asap->program = device_memory(device)->space(AS_PROGRAM);
+	asap->program = device->space(AS_PROGRAM);
 
 
 	state_save_register_device_item(device, 0, asap->pc);
@@ -1727,7 +1727,7 @@ static CPU_SET_INFO( asap )
 
 CPU_GET_INFO( asap )
 {
-	asap_state *asap = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	asap_state *asap = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

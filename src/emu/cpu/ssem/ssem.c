@@ -21,7 +21,7 @@ struct _ssem_state
     UINT32 a;
     UINT32 halt;
 
-    running_device *device;
+    cpu_device *device;
     const address_space *program;
     int icount;
 };
@@ -151,7 +151,7 @@ static CPU_INIT( ssem )
     cpustate->halt = 0;
 
     cpustate->device = device;
-    cpustate->program = device_memory(device)->space(AS_PROGRAM);
+    cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_EXIT( ssem )
@@ -255,7 +255,7 @@ static CPU_SET_INFO( ssem )
 
 CPU_GET_INFO( ssem )
 {
-    ssem_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+    ssem_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch(state)
     {

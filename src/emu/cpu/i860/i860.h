@@ -169,7 +169,7 @@ typedef struct {
 	/*
      * MAME-specific stuff.
      */
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	UINT32 ppc;
 	int icount;

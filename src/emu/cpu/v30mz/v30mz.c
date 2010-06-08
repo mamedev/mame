@@ -84,7 +84,7 @@ struct _v30mz_state
 	UINT8	no_interrupt;
 
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -139,8 +139,8 @@ static CPU_RESET( nec )
 	memset( cpustate, 0, sizeof(*cpustate) );
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sregs[CS] = 0xffff;
 
@@ -932,7 +932,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, cpustate->config);
 }
 
-static void nec_init(running_device *device, device_irq_callback irqcallback, int type)
+static void nec_init(cpu_device *device, device_irq_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = get_safe_token(device);
 
@@ -960,8 +960,8 @@ static void nec_init(running_device *device, device_irq_callback irqcallback, in
 	cpustate->config = config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_INIT( v30mz ) { nec_init(device, irqcallback, 3); }
@@ -1055,7 +1055,7 @@ static CPU_SET_INFO( nec )
 
 CPU_GET_INFO( v30mz )
 {
-	v30mz_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	v30mz_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	int flags;
 
 	switch (state)

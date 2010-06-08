@@ -91,7 +91,7 @@ struct _tms32010_state
 	UINT16	memaccess;
 	int		addr_mask;
 
-	running_device *device;
+	cpu_device *device;
 	const	address_space *program;
 	const	address_space *data;
 	const	address_space *io;
@@ -800,9 +800,9 @@ static CPU_INIT( tms32010 )
 	state_save_register_device_item(device, 0, cpustate->addr_mask);
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 }
 
 
@@ -943,7 +943,7 @@ static CPU_SET_INFO( tms32010 )
 
 CPU_GET_INFO( tms32010 )
 {
-	tms32010_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	tms32010_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

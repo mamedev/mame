@@ -64,7 +64,7 @@ struct _tx0_state
 
 	int icount;
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 };
 
@@ -126,7 +126,7 @@ static void tx0_write(tx0_state *cpustate, offs_t address, int data)
 		;
 }
 
-static void tx0_init_common(running_device *device, device_irq_callback irqcallback, int is_64kw)
+static void tx0_init_common(cpu_device *device, device_irq_callback irqcallback, int is_64kw)
 {
 	tx0_state *cpustate = get_safe_token(device);
 
@@ -137,7 +137,7 @@ static void tx0_init_common(running_device *device, device_irq_callback irqcallb
 	cpustate->ir_mask = is_64kw ? 03 : 037;
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_INIT( tx0_64kw )
@@ -434,7 +434,7 @@ static CPU_SET_INFO( tx0 )
 
 CPU_GET_INFO( tx0_64kw )
 {
-	tx0_state *cpustate = ( device != NULL && downcast<cpu_device *>(device)->token() != NULL ) ? get_safe_token(device) : NULL;
+	tx0_state *cpustate = ( device != NULL && device->token() != NULL ) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -560,7 +560,7 @@ CPU_GET_INFO( tx0_64kw )
 
 CPU_GET_INFO( tx0_8kw )
 {
-	tx0_state *cpustate = ( device != NULL && downcast<cpu_device *>(device)->token() != NULL ) ? get_safe_token(device) : NULL;
+	tx0_state *cpustate = ( device != NULL && device->token() != NULL ) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

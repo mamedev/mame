@@ -234,7 +234,7 @@ typedef struct
 	UINT8 pendingIrq;
 	UINT8 pendingFiq;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 } ARM_REGS;
 
@@ -315,7 +315,7 @@ static CPU_RESET( arm )
 	memset(cpustate, 0, sizeof(ARM_REGS));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
@@ -500,7 +500,7 @@ static CPU_INIT( arm )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
 	state_save_register_device_item_array(device, 0, cpustate->coproRegister);
@@ -1435,7 +1435,7 @@ static CPU_SET_INFO( arm )
 
 CPU_GET_INFO( arm )
 {
-	ARM_REGS *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	ARM_REGS *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

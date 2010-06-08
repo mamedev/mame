@@ -59,7 +59,7 @@ struct _i8086_state
 
 	memory_interface	mem;
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -167,8 +167,8 @@ static CPU_INIT( i8086 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* set up the state table */
 	{
@@ -224,8 +224,8 @@ static CPU_RESET( i8086 )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->mem = save_mem;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->sregs[CS] = 0xf000;
 	cpustate->base[CS] = SegBase(CS);
@@ -523,7 +523,7 @@ static CPU_SET_INFO( i8086 )
 
 CPU_GET_INFO( i8086 )
 {
-	i8086_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	i8086_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

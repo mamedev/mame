@@ -227,7 +227,7 @@ struct _i386_state
 
 	UINT8 irq_state;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32 a20_mask;

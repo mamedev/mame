@@ -75,7 +75,7 @@ struct	_m65ce02_Regs {
 	UINT8	irq_state;
 	int		icount;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *space;
 	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
@@ -107,7 +107,7 @@ static CPU_INIT( m65ce02 )
 	cpustate->wrmem_id = default_wdmem_id;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device_memory(device)->space(AS_PROGRAM);
+	cpustate->space = device->space(AS_PROGRAM);
 
 	if ( intf )
 	{
@@ -275,7 +275,7 @@ static CPU_SET_INFO( m65ce02 )
 
 CPU_GET_INFO( m65ce02 )
 {
-	m65ce02_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	m65ce02_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch( state )
 	{

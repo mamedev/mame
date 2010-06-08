@@ -115,7 +115,7 @@ static CPU_INIT( unsp )
     memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
 
     unsp->device = device;
-    unsp->program = device_memory(device)->space(AS_PROGRAM);
+    unsp->program = device->space(AS_PROGRAM);
     unsp->irq = 0;
     unsp->fiq = 0;
 }
@@ -856,7 +856,7 @@ static CPU_SET_INFO( unsp )
 
 CPU_GET_INFO( unsp )
 {
-    unsp_state *unsp = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+    unsp_state *unsp = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch(state)
     {

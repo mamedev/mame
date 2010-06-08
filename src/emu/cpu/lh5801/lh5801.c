@@ -50,7 +50,7 @@ typedef struct _lh5810_state lh5801_state;
 struct _lh5810_state
 {
 	const lh5801_cpu_core *config;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 
 	PAIR s, p, u, x, y;
@@ -106,7 +106,7 @@ static CPU_INIT( lh5801 )
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->config = (const lh5801_cpu_core *) device->baseconfig().static_config();
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_RESET( lh5801 )
@@ -183,7 +183,7 @@ static CPU_SET_INFO( lh5801 )
 
 CPU_GET_INFO( lh5801 )
 {
-	lh5801_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	lh5801_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

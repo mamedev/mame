@@ -46,7 +46,7 @@ struct _cp1610_state
 	int		intr_pending;
 	int		intrm_pending;
 	int		mask_interrupts;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -3394,7 +3394,7 @@ static CPU_INIT( cp1610 )
 	cpustate->intrm_pending = 0;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0, cpustate->r);
 	state_save_register_device_item(device, 0, cpustate->flags);
@@ -3459,7 +3459,7 @@ static CPU_SET_INFO( cp1610 )
 
 CPU_GET_INFO( cp1610 )
 {
-	cp1610_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	cp1610_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */

@@ -143,7 +143,7 @@ struct _m4510_Regs {
 	UINT32	mem[8];
 
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *space;
 	int 	icount;
 
@@ -206,7 +206,7 @@ static CPU_INIT( m4510 )
 	cpustate->port_write = NULL;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device_memory(device)->space(AS_PROGRAM);
+	cpustate->space = device->space(AS_PROGRAM);
 
 	if ( intf )
 	{
@@ -455,7 +455,7 @@ static CPU_SET_INFO( m4510 )
 
 CPU_GET_INFO( m4510 )
 {
-	m4510_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	m4510_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

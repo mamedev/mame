@@ -109,7 +109,7 @@ struct _m37710i_cpu_struct
 	uint source;		/* temp register */
 	uint destination;	/* temp register */
 	device_irq_callback int_ack;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	uint stopped;		/* Sets how the CPU is stopped */

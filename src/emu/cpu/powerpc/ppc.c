@@ -306,7 +306,7 @@ typedef struct {
 	UINT64 tb;			/* 56-bit timebase register */
 
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 
 	// STUFF added for the 6xx series
@@ -963,7 +963,7 @@ static CPU_INIT( ppc403 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device_memory(device)->space(AS_PROGRAM);
+	ppc.program = device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 }
@@ -1088,7 +1088,7 @@ static CPU_INIT( ppc603 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device_memory(device)->space(AS_PROGRAM);
+	ppc.program = device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1236,7 +1236,7 @@ static CPU_INIT( ppc602 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device_memory(device)->space(AS_PROGRAM);
+	ppc.program = device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1377,7 +1377,7 @@ static CPU_INIT( mpc8240 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device_memory(device)->space(AS_PROGRAM);
+	ppc.program = device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1503,7 +1503,7 @@ static CPU_INIT( ppc601 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device_memory(device)->space(AS_PROGRAM);
+	ppc.program = device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1633,7 +1633,7 @@ static CPU_INIT( ppc604 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
-	ppc.program = device_memory(device)->space(AS_PROGRAM);
+	ppc.program = device->space(AS_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 

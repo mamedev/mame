@@ -30,7 +30,7 @@ static CPU_INIT( i860 )
 {
 	i860_state_t *cpustate = get_safe_token(device);
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 	reset_i860(cpustate);
 	i860_set_pin(device, DEC_PIN_BUS_HOLD, 0);
 	i860_set_pin(device, DEC_PIN_RESET, 0);
@@ -176,7 +176,7 @@ static CPU_SET_INFO( i860 )
 
 CPU_GET_INFO( i860 )
 {
-	i860_state_t *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	i860_state_t *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -64,7 +64,7 @@ struct _mn102_info
 
 	int cycles;
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -276,8 +276,8 @@ static CPU_INIT(mn10200)
 	memset(cpustate, 0, sizeof(mn102_info));
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->pc);
 	state_save_register_device_item_array(device, 0, cpustate->d);
@@ -2335,7 +2335,7 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 
 static CPU_SET_INFO(mn10200)
 {
-	mn102_info *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	mn102_info *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -2364,7 +2364,7 @@ static CPU_SET_INFO(mn10200)
 
 CPU_GET_INFO( mn10200 )
 {
-	mn102_info *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	mn102_info *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

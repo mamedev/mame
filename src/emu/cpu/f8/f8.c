@@ -53,7 +53,7 @@ struct _f8_Regs
 	UINT16	io; 	/* last I/O address */
 	UINT16  irq_vector;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *iospace;
 	int icount;
@@ -1551,8 +1551,8 @@ static CPU_RESET( f8 )
 	memset(cpustate, 0, sizeof(f8_Regs));
 	cpustate->irq_callback = save_callback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->iospace = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->iospace = device->space(AS_IO);
 	cpustate->w&=~I;
 
 	/* save PC0 to PC1 and reset PC0 */
@@ -1901,8 +1901,8 @@ static CPU_INIT( f8 )
 	f8_Regs *cpustate = get_safe_token(device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->iospace = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->iospace = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->pc0);
 	state_save_register_device_item(device, 0, cpustate->pc1);
@@ -2019,7 +2019,7 @@ static CPU_SET_INFO( f8 )
 
 CPU_GET_INFO( f8 )
 {
-	f8_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	f8_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

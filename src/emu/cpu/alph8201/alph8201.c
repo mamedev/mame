@@ -197,7 +197,7 @@ struct _alpha8201_state
 	UINT8 halt;     /* halt input line                        */
 #endif
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 	int inst_cycles;
@@ -669,7 +669,7 @@ static CPU_INIT( alpha8201 )
 	alpha8201_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item_array(device, 0, cpustate->RAM);
 	state_save_register_device_item(device, 0, cpustate->PREVPC);
@@ -878,7 +878,7 @@ static CPU_SET_INFO( alpha8201 )
 /* 8201 and 8301 */
 static CPU_GET_INFO( alpha8xxx )
 {
-	alpha8201_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	alpha8201_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

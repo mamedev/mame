@@ -72,7 +72,7 @@ struct _tlcs900_state
 	int icount;
 	int regbank;
 	device_irq_callback irqcallback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 };
 
@@ -221,7 +221,7 @@ static CPU_INIT( tlcs900 )
 	cpustate->intf = (const tlcs900_interface *)device->baseconfig().static_config();
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space( AS_PROGRAM );
+	cpustate->program = device->space( AS_PROGRAM );
 
 	devcb_resolve_write8( &cpustate->to1, &cpustate->intf->to1, device );
 	devcb_resolve_write8( &cpustate->to3, &cpustate->intf->to3, device );
@@ -1125,7 +1125,7 @@ static CPU_SET_INFO( tlcs900 )
 
 CPU_GET_INFO( tlcs900h )
 {
-	tlcs900_state *cpustate = ( device != NULL && downcast<cpu_device *>(device)->token() != NULL ) ? get_safe_token(device) : NULL;
+	tlcs900_state *cpustate = ( device != NULL && device->token() != NULL ) ? get_safe_token(device) : NULL;
 
 	switch( state )
 	{

@@ -282,7 +282,7 @@ struct _mcs51_state_t
 
 	/* Interrupt Callback */
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 
 	/* Memory spaces */
     const address_space *program;
@@ -2079,9 +2079,9 @@ static CPU_INIT( mcs51 )
 	mcs51_state->irq_callback = irqcallback;
 	mcs51_state->device = device;
 
-	mcs51_state->program = device_memory(device)->space(AS_PROGRAM);
-	mcs51_state->data = device_memory(device)->space(AS_DATA);
-	mcs51_state->io = device_memory(device)->space(AS_IO);
+	mcs51_state->program = device->space(AS_PROGRAM);
+	mcs51_state->data = device->space(AS_DATA);
+	mcs51_state->io = device->space(AS_IO);
 
 	mcs51_state->features = FEATURE_NONE;
 	mcs51_state->ram_mask = 0x7F;			/* 128 bytes of ram */
@@ -2475,7 +2475,7 @@ static CPU_SET_INFO( mcs51 )
 
 static CPU_GET_INFO( mcs51 )
 {
-	mcs51_state_t *mcs51_state = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	mcs51_state_t *mcs51_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

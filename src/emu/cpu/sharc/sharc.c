@@ -125,7 +125,7 @@ struct _SHARC_REGS
 	UINT16 *internal_ram_block0, *internal_ram_block1;
 
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	void (*opcode_handler)(SHARC_REGS *cpustate);
@@ -426,8 +426,8 @@ static CPU_INIT( sharc )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
 
 	build_opcode_table();
 
@@ -1058,7 +1058,7 @@ ADDRESS_MAP_END
 
 static CPU_GET_INFO( sharc )
 {
-	SHARC_REGS *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	SHARC_REGS *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

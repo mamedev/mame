@@ -69,7 +69,7 @@ struct _m6502_Regs
 	UINT8   so_state;
 
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *space;
 	const address_space *io;
 	int		int_occured;
@@ -128,14 +128,14 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
  *
  *****************************************************************************/
 
-static void m6502_common_init(running_device *device, device_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+static void m6502_common_init(cpu_device *device, device_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->space = device_memory(device)->space(AS_PROGRAM);
+	cpustate->space = device->space(AS_PROGRAM);
 	cpustate->subtype = subtype;
 	cpustate->insn = insn;
 	cpustate->rdmem_id = default_rdmem_id;
@@ -528,7 +528,7 @@ static CPU_INIT( deco16 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 	m6502_common_init(device, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->io = device->space(AS_IO);
 }
 
 
@@ -691,7 +691,7 @@ static CPU_SET_INFO( m6502 )
 
 CPU_GET_INFO( m6502 )
 {
-	m6502_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	m6502_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -809,7 +809,7 @@ static CPU_SET_INFO( m6510 )
 
 CPU_GET_INFO( m6510 )
 {
-	m6502_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	m6502_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

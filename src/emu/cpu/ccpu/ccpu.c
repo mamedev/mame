@@ -43,7 +43,7 @@ struct _ccpu_state
 
 	int					icount;
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -131,9 +131,9 @@ static CPU_INIT( ccpu )
 	cpustate->external_input = configdata->external_input ? configdata->external_input : read_jmi;
 	cpustate->vector_callback = configdata->vector_callback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->A);
@@ -730,7 +730,7 @@ static CPU_SET_INFO( ccpu )
 
 CPU_GET_INFO( ccpu )
 {
-	ccpu_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	ccpu_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

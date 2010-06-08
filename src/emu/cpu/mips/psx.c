@@ -185,7 +185,7 @@ struct _psxcpu_state
 	UINT32 multiplier_operand1;
 	UINT32 multiplier_operand2;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int bus_attached;
 	UINT32 bad_byte_address_mask;
@@ -1605,7 +1605,7 @@ static STATE_POSTLOAD( mips_postload )
 	mips_update_scratchpad( psxcpu->program );
 }
 
-static void mips_state_register( const char *type, running_device *device )
+static void mips_state_register( const char *type, cpu_device *device )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
 
@@ -1636,7 +1636,7 @@ static CPU_INIT( psxcpu )
 
 	psxcpu->irq_callback = irqcallback;
 	psxcpu->device = device;
-	psxcpu->program = device_memory(device)->space(AS_PROGRAM);
+	psxcpu->program = device->space(AS_PROGRAM);
 
 	mips_state_register( "psxcpu", device );
 }
@@ -6110,7 +6110,7 @@ static CPU_SET_INFO( psxcpu )
 
 CPU_GET_INFO( psxcpu )
 {
-	psxcpu_state *psxcpu = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	psxcpu_state *psxcpu = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

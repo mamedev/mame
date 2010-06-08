@@ -865,7 +865,7 @@ static void define_state_table(running_device *device)
 		state->state_add(COP400_T,    "T",         cpustate->t);
 }
 
-static void cop400_init(running_device *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
+static void cop400_init(cpu_device *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
 {
 	cop400_state *cpustate = get_safe_token(device);
 
@@ -873,9 +873,9 @@ static void cop400_init(running_device *device, UINT8 g_mask, UINT8 d_mask, UINT
 
 	/* find address spaces */
 
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	/* set output pin masks */
 
@@ -1380,7 +1380,7 @@ static CPU_SET_INFO( cop400 )
 
 static CPU_GET_INFO( cop400 )
 {
-	cop400_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	cop400_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	cop400_interface *intf = (devconfig->static_config() != NULL) ? (cop400_interface *)devconfig->static_config() : NULL;
 
 	switch (state)
@@ -1494,7 +1494,7 @@ CPU_GET_INFO( cop401 )
 
 CPU_GET_INFO( cop420 )
 {
-	cop400_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	cop400_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1575,7 +1575,7 @@ CPU_GET_INFO( cop402 )
 
 CPU_GET_INFO( cop444 )
 {
-	cop400_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	cop400_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

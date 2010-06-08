@@ -30,7 +30,7 @@ struct _v810_state
 	UINT8 irq_line;
 	UINT8 nmi_line;
 	device_irq_callback irq_cb;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32 PPC;
@@ -1002,8 +1002,8 @@ static CPU_INIT( v810 )
 	cpustate->nmi_line = CLEAR_LINE;
 	cpustate->irq_cb = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item_array(device, 0, cpustate->reg);
 	state_save_register_device_item(device, 0, cpustate->irq_line);
@@ -1134,7 +1134,7 @@ static CPU_SET_INFO( v810 )
 
 CPU_GET_INFO( v810 )
 {
-	v810_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	v810_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

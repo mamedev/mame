@@ -52,7 +52,7 @@ struct _ssp1601_state_t
 
 	int g_cycles;
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -529,8 +529,8 @@ static CPU_INIT( ssp1601 )
 	memset(ssp1601_state, 0, sizeof(ssp1601_state_t));
 	ssp1601_state->gr[0].w.h = 0xffff; // constant reg
 	ssp1601_state->device = device;
-	ssp1601_state->program = device_memory(device)->space(AS_PROGRAM);
-	ssp1601_state->io = device_memory(device)->space(AS_IO);
+	ssp1601_state->program = device->space(AS_PROGRAM);
+	ssp1601_state->io = device->space(AS_IO);
 
 }
 
@@ -808,7 +808,7 @@ static CPU_SET_INFO( ssp1601 )
 
 CPU_GET_INFO( ssp1601 )
 {
-	ssp1601_state_t *ssp1601_state = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	ssp1601_state_t *ssp1601_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

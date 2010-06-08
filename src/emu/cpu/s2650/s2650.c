@@ -42,7 +42,7 @@ struct _s2650_regs {
 
 	int		icount;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -796,8 +796,8 @@ static CPU_INIT( s2650 )
 
 	s2650c->irq_callback = irqcallback;
 	s2650c->device = device;
-	s2650c->program = device_memory(device)->space(AS_PROGRAM);
-	s2650c->io = device_memory(device)->space(AS_IO);
+	s2650c->program = device->space(AS_PROGRAM);
+	s2650c->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, s2650c->ppc);
 	state_save_register_device_item(device, 0, s2650c->page);
@@ -828,8 +828,8 @@ static CPU_RESET( s2650 )
 	memset(s2650c->ras, 0, sizeof(s2650c->ras));
 
 	s2650c->device = device;
-	s2650c->program = device_memory(device)->space(AS_PROGRAM);
-	s2650c->io = device_memory(device)->space(AS_IO);
+	s2650c->program = device->space(AS_PROGRAM);
+	s2650c->io = device->space(AS_IO);
 	s2650c->psl = COM | WC;
 	/* force write */
 	s2650c->psu = 0xff;
@@ -1545,7 +1545,7 @@ static CPU_SET_INFO( s2650 )
 
 CPU_GET_INFO( s2650 )
 {
-	s2650_regs *s2650c = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	s2650_regs *s2650c = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

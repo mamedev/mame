@@ -337,7 +337,7 @@ static CPU_INIT( g65816 )
 
 	g65816_set_irq_callback(cpustate, irqcallback);
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->cpu_type = CPU_TYPE_G65816;
 
 	state_save_register_device_item(device, 0, cpustate->a);
@@ -418,7 +418,7 @@ void g65816_set_read_vector_callback(running_device *device, read8_space_func re
 
 CPU_GET_INFO( g65816 )
 {
-	g65816i_cpu_struct *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	g65816i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

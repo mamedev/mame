@@ -896,8 +896,8 @@ static CPU_INIT( m37710 )
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->ICount = 0;
 
@@ -1014,7 +1014,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( m37710 )
 {
-	m37710i_cpu_struct *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	m37710i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

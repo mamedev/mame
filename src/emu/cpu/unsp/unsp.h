@@ -23,7 +23,7 @@ struct _unsp_state
 	UINT8 sb;
 	UINT8 saved_sb;
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 

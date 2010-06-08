@@ -26,7 +26,7 @@ struct _h83xx_state
 	UINT8  incheckirqs;
 
 	device_irq_callback irq_cb;
-	running_device *device;
+	cpu_device *device;
 
 	const address_space *program;
 	const address_space *io;

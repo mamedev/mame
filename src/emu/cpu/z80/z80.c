@@ -149,7 +149,7 @@ struct _z80_state
 	UINT8			after_ei;			/* are we in the EI shadow? */
 	UINT32			ea;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int				icount;
@@ -3470,8 +3470,8 @@ static CPU_INIT( z80 )
 		z80->daisy.init(device, (const z80_daisy_config *)device->baseconfig().static_config());
 	z80->irq_callback = irqcallback;
 	z80->device = device;
-	z80->program = device_memory(device)->space(AS_PROGRAM);
-	z80->io = device_memory(device)->space(AS_IO);
+	z80->program = device->space(AS_PROGRAM);
+	z80->io = device->space(AS_IO);
 	z80->IX = z80->IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	z80->F = ZF;			/* Zero flag is set */
 
@@ -3825,7 +3825,7 @@ void z80_set_cycle_tables(running_device *device, const UINT8 *op, const UINT8 *
 
 CPU_GET_INFO( z80 )
 {
-	z80_state *z80 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	z80_state *z80 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -3875,7 +3875,7 @@ CPU_GET_INFO( z80 )
 
 CPU_GET_INFO( nsc800 )
 {
-	z80_state *z80 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	z80_state *z80 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_INT_INPUT_LINES:					info->i = 4;									break;

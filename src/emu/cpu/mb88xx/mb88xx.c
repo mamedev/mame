@@ -74,7 +74,7 @@ struct _mb88_state
     /* IRQ handling */
     UINT8 pending_interrupt;
     device_irq_callback irqcallback;
-    running_device *device;
+    cpu_device *device;
     const address_space *program;
     const address_space *data;
     const address_space *io;
@@ -144,9 +144,9 @@ static CPU_INIT( mb88 )
 
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->serial = timer_alloc(device->machine, serial_timer, (void *)device);
 
@@ -209,7 +209,7 @@ static CPU_RESET( mb88 )
 
 static TIMER_CALLBACK( serial_timer )
 {
-	mb88_state *cpustate = get_safe_token((running_device *)ptr);
+	mb88_state *cpustate = get_safe_token((cpu_device *)ptr);
 
 	cpustate->SBcount++;
 
@@ -926,7 +926,7 @@ static CPU_SET_INFO( mb88 )
 
 CPU_GET_INFO( mb88 )
 {
-	mb88_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	mb88_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

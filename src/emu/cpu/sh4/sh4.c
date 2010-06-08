@@ -3281,9 +3281,9 @@ static CPU_RESET( sh4 )
 	sh4->ftcsr_read_callback = f;
 	sh4->irq_callback = save_irqcallback;
 	sh4->device = device;
-	sh4->internal = device_memory(device)->space(AS_PROGRAM);
-	sh4->program = device_memory(device)->space(AS_PROGRAM);
-	sh4->io = device_memory(device)->space(AS_IO);
+	sh4->internal = device->space(AS_PROGRAM);
+	sh4->program = device->space(AS_PROGRAM);
+	sh4->io = device->space(AS_IO);
 
 	sh4->dma_timer[0] = tsaved[0];
 	sh4->dma_timer[1] = tsaved[1];
@@ -3392,9 +3392,9 @@ static CPU_INIT( sh4 )
 
 	sh4->irq_callback = irqcallback;
 	sh4->device = device;
-	sh4->internal = device_memory(device)->space(AS_PROGRAM);
-	sh4->program = device_memory(device)->space(AS_PROGRAM);
-	sh4->io = device_memory(device)->space(AS_IO);
+	sh4->internal = device->space(AS_PROGRAM);
+	sh4->program = device->space(AS_PROGRAM);
+	sh4->io = device->space(AS_IO);
 	sh4_default_exception_priorities(sh4);
 	sh4->irln = 15;
 	sh4->test_irq = 0;
@@ -3674,7 +3674,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( sh4 )
 {
-	SH4 *sh4 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	SH4 *sh4 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -33,7 +33,7 @@ struct _t11_state
     UINT8				irq_state;
     int					icount;
 	device_irq_callback	irq_callback;
-	running_device *device;
+	cpu_device *		device;
 	const address_space *program;
 };
 
@@ -264,7 +264,7 @@ static CPU_INIT( t11 )
 	cpustate->initial_pc = initial_pc[setup->mode >> 13];
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, cpustate->ppc.w.l);
 	state_save_register_device_item(device, 0, cpustate->reg[0].w.l);
@@ -412,7 +412,7 @@ static CPU_SET_INFO( t11 )
 
 CPU_GET_INFO( t11 )
 {
-	t11_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	t11_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

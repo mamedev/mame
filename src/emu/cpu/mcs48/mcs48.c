@@ -150,7 +150,7 @@ struct _mcs48_state
 	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
 
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	int			icount;
 
 	/* Memory spaces */
@@ -840,7 +840,7 @@ static const mcs48_ophandler opcode_table[256]=
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
 
-static void mcs48_init(running_device *device, device_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
+static void mcs48_init(cpu_device *device, device_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
@@ -857,9 +857,9 @@ static void mcs48_init(running_device *device, device_irq_callback irqcallback, 
 	cpustate->int_rom_size = romsize;
 	cpustate->feature_mask = feature_mask;
 
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	/* set up the state table */
 	{
@@ -1190,7 +1190,7 @@ UINT8 upi41_master_r(running_device *device, UINT8 a0)
 
 static TIMER_CALLBACK( master_callback )
 {
-	running_device *device = (running_device *)ptr;
+	cpu_device *device = (cpu_device *)ptr;
 	mcs48_state *cpustate = get_safe_token(device);
 	UINT8 a0 = (param >> 8) & 1;
 	UINT8 data = param;
@@ -1213,8 +1213,9 @@ static TIMER_CALLBACK( master_callback )
 		cpustate->sts |= STS_F1;
 }
 
-void upi41_master_w(running_device *device, UINT8 a0, UINT8 data)
+void upi41_master_w(running_device *_device, UINT8 a0, UINT8 data)
 {
+	cpu_device *device = downcast<cpu_device *>(_device);
 	timer_call_after_resynch(device->machine, (void *)device, (a0 << 8) | data, master_callback);
 }
 
@@ -1359,7 +1360,7 @@ static CPU_SET_INFO( mcs48 )
 
 static CPU_GET_INFO( mcs48 )
 {
-	mcs48_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	mcs48_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1418,7 +1419,7 @@ static CPU_GET_INFO( mcs48 )
     CPU-SPECIFIC CONTEXT ACCESS
 ***************************************************************************/
 
-static void mcs48_generic_get_info(const device_config *devconfig, running_device *device, UINT32 state, cpuinfo *info, UINT8 features, int romsize, int ramsize, const char *name)
+static void mcs48_generic_get_info(const device_config *devconfig, cpu_device *device, UINT32 state, cpuinfo *info, UINT8 features, int romsize, int ramsize, const char *name)
 {
 	switch (state)
 	{

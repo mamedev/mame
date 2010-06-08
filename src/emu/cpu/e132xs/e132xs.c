@@ -319,7 +319,7 @@ struct _hyperstone_state
 	struct _delay delay;
 
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32 opcodexor;
@@ -637,7 +637,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 
 static TIMER_CALLBACK( e132xs_timer_callback )
 {
-	running_device *device = (running_device *)ptr;
+	cpu_device *device = (cpu_device *)ptr;
 	hyperstone_state *cpustate = get_safe_token(device);
 	int update = param;
 
@@ -1527,7 +1527,7 @@ static void set_irq_line(hyperstone_state *cpustate, int irqline, int state)
 		ISR &= ~(1 << irqline);
 }
 
-static void hyperstone_init(running_device *device, device_irq_callback irqcallback, int scale_mask)
+static void hyperstone_init(cpu_device *device, device_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 
@@ -1543,13 +1543,13 @@ static void hyperstone_init(running_device *device, device_irq_callback irqcallb
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 	cpustate->timer = timer_alloc(device->machine, e132xs_timer_callback, (void *)device);
 	cpustate->clock_scale_mask = scale_mask;
 }
 
-static void e116_init(running_device *device, device_irq_callback irqcallback, int scale_mask)
+static void e116_init(cpu_device *device, device_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
@@ -1586,7 +1586,7 @@ static CPU_INIT( gms30c2216 )
 	e116_init(device, irqcallback, 0);
 }
 
-static void e132_init(running_device *device, device_irq_callback irqcallback, int scale_mask)
+static void e132_init(cpu_device *device, device_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
@@ -1650,8 +1650,8 @@ static CPU_RESET( hyperstone )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->opcodexor = save_opcodexor;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 	cpustate->timer = save_timer;
 
 	cpustate->tr_clocks_per_tick = 2;
@@ -4843,7 +4843,7 @@ static CPU_SET_INFO( hyperstone )
 
 static CPU_GET_INFO( hyperstone )
 {
-	hyperstone_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	hyperstone_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

@@ -143,7 +143,7 @@ struct _tms32051_state
 	} shadow;
 
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	int icount;
@@ -224,8 +224,8 @@ static CPU_INIT( tms )
 	tms32051_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
 }
 
 static CPU_RESET( tms )
@@ -575,7 +575,7 @@ static CPU_READ( tms )
 
 static CPU_GET_INFO( tms )
 {
-	tms32051_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	tms32051_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

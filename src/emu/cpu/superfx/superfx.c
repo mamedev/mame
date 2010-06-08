@@ -61,7 +61,7 @@ struct _superfx_state
 	cache_t cache;
 	pixelcache_t pixelcache[2];
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -669,7 +669,7 @@ void superfx_add_clocks(running_device *cpu, INT32 clocks)
 
 /*****************************************************************************/
 
-static void superfx_register_save( running_device *device )
+static void superfx_register_save( cpu_device *device )
 {
 	superfx_state *cpustate = get_safe_token(device);
 	int i;
@@ -753,7 +753,7 @@ static CPU_INIT( superfx )
 	superfx_update_speed(cpustate);
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	if (device->baseconfig().static_config() != NULL)
 	{
@@ -1556,7 +1556,7 @@ static CPU_SET_INFO( superfx )
 
 CPU_GET_INFO( superfx )
 {
-	superfx_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	superfx_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

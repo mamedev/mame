@@ -33,7 +33,7 @@ struct _i8008_state
 	UINT8	PF; // Parity flag
 	UINT8	HALT;
 	UINT8	flags; // temporary I/O only
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int					icount;
@@ -547,8 +547,8 @@ static CPU_INIT( i8008 )
 
 	cpustate->device = device;
 
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	cpustate->irq_callback = irqcallback;
 
@@ -676,7 +676,7 @@ static CPU_SET_INFO( i8008 )
 
 CPU_GET_INFO( i8008 )
 {
-	i8008_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	i8008_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

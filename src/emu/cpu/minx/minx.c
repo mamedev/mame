@@ -84,7 +84,7 @@ typedef struct {
 	UINT8	halted;
 	UINT8	interrupt_pending;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 } minx_state;
@@ -120,7 +120,7 @@ static CPU_INIT( minx )
 	minx_state *minx = get_safe_token(device);
 	minx->irq_callback = irqcallback;
 	minx->device = device;
-	minx->program = device_memory(device)->space(AS_PROGRAM);
+	minx->program = device->space(AS_PROGRAM);
 	if ( device->baseconfig().static_config() != NULL )
 	{
 	}
@@ -312,7 +312,7 @@ static CPU_SET_INFO( minx )
 
 CPU_GET_INFO( minx )
 {
-	minx_state *minx = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	minx_state *minx = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch( state )
 	{
 	case CPUINFO_INT_CONTEXT_SIZE:								info->i = sizeof(minx_state); break;

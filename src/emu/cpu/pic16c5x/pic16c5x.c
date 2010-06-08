@@ -97,7 +97,7 @@ struct _pic16c5x_state
 	int		inst_cycles;
 
 
-	running_device *device;
+	cpu_device *device;
 	const	address_space *program;
 	const	address_space *data;
 	const	address_space *io;
@@ -729,9 +729,9 @@ static CPU_INIT( pic16c5x )
 	pic16c5x_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	/* ensure the internal ram pointers are set before get_info is called */
 	update_internalram_ptr(cpustate);
@@ -996,7 +996,7 @@ static CPU_SET_INFO( pic16c5x )
 
 static CPU_GET_INFO( pic16c5x )
 {
-	pic16c5x_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	pic16c5x_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

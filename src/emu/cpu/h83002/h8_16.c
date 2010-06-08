@@ -220,8 +220,8 @@ static CPU_INIT(h8)
 
 	h8->mode_8bit = 0;
 
-	h8->program = device_memory(device)->space(AS_PROGRAM);
-	h8->io = device_memory(device)->space(AS_IO);
+	h8->program = device->space(AS_PROGRAM);
+	h8->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, h8->h8err);
 	state_save_register_device_item_array(device, 0, h8->regs);
@@ -570,7 +570,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3002 )
 {
-	h83xx_state *h8 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	h83xx_state *h8 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state) {
 	// Interface functions and variables

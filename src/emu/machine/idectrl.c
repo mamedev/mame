@@ -1810,8 +1810,15 @@ static DEVICE_START( ide_controller )
 	/* find the bus master space */
 	if (config->bmcpu != NULL)
 	{
-		ide->dma_space = device_memory(device->machine->device(config->bmcpu))->space(config->bmspace);
-		assert_always(ide->dma_space != NULL, "IDE controller bus master space not found!");
+		device_t *bmtarget = device->machine->device(config->bmcpu);
+		if (bmtarget == NULL)
+			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", device->tag(), config->bmcpu);
+		device_memory_interface *memory;
+		if (!bmtarget->interface(memory))
+			throw emu_fatalerror("IDE controller '%s' bus master target '%s' has no memory!", device->tag(), config->bmcpu);
+		ide->dma_space = memory->space(config->bmspace);
+		if (ide->dma_space == NULL)
+			throw emu_fatalerror("IDE controller '%s' bus master target '%s' does not have specified space %d!", device->tag(), config->bmcpu, config->bmspace);
 		ide->dma_address_xor = (ide->dma_space->endianness == ENDIANNESS_LITTLE) ? 0 : 3;
 	}
 

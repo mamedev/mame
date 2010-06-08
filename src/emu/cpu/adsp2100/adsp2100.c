@@ -242,7 +242,7 @@ typedef struct
     UINT8   	irq_state[9];
     UINT8   	irq_latch[9];
     device_irq_callback irq_callback;
-    running_device *device;
+    cpu_device *device;
 
 	/* other internal states */
     int			icount;
@@ -563,7 +563,7 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static adsp2100_state *adsp21xx_init(running_device *device, device_irq_callback irqcallback, int chiptype)
+static adsp2100_state *adsp21xx_init(cpu_device *device, device_irq_callback irqcallback, int chiptype)
 {
 	const adsp21xx_config *config = (const adsp21xx_config *)device->baseconfig().static_config();
 	adsp2100_state *adsp = get_safe_token(device);
@@ -578,9 +578,9 @@ static adsp2100_state *adsp21xx_init(running_device *device, device_irq_callback
 
 	/* fetch device parameters */
 	adsp->device = device;
-	adsp->program = device_memory(device)->space(AS_PROGRAM);
-	adsp->data = device_memory(device)->space(AS_DATA);
-	adsp->io = device_memory(device)->space(AS_IO);
+	adsp->program = device->space(AS_PROGRAM);
+	adsp->data = device->space(AS_DATA);
+	adsp->io = device->space(AS_IO);
 
 	/* copy function pointers from the config */
 	if (config != NULL)
@@ -1861,7 +1861,7 @@ static CPU_SET_INFO( adsp21xx )
 
 static CPU_GET_INFO( adsp21xx )
 {
-	adsp2100_state *adsp = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	adsp2100_state *adsp = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

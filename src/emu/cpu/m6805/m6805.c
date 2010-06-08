@@ -61,7 +61,7 @@ typedef struct
 
 	UINT16	pending_interrupts; /* MB */
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
@@ -441,7 +441,7 @@ static void Interrupt( m6805_Regs *cpustate )
 	}
 }
 
-static void state_register(m6805_Regs *cpustate, const char *type, running_device *device)
+static void state_register(m6805_Regs *cpustate, const char *type, cpu_device *device)
 {
 	state_save_register_device_item(device, 0, A);
 	state_save_register_device_item(device, 0, PC);
@@ -459,7 +459,7 @@ static CPU_INIT( m6805 )
 	state_register(cpustate, "m6805", device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_RESET( m6805 )
@@ -472,7 +472,7 @@ static CPU_RESET( m6805 )
 	cpustate->iCount=50000;		/* Used to be global */
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* Force CPU sub-type and relevant masks */
 	cpustate->subtype = SUBTYPE_M6805;
@@ -907,7 +907,7 @@ static CPU_SET_INFO( m6805 )
 
 CPU_GET_INFO( m6805 )
 {
-	m6805_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1001,7 +1001,7 @@ static CPU_SET_INFO( m68705 )
 
 CPU_GET_INFO( m68705 )
 {
-	m6805_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1048,7 +1048,7 @@ static CPU_SET_INFO( hd63705 )
 
 CPU_GET_INFO( hd63705 )
 {
-	m6805_Regs *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -87,7 +87,7 @@ typedef struct
 	uint line_rst;	/* Status of the RESET line */
 	uint ir;		/* Instruction Register */
 	device_irq_callback int_ack;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	uint stopped;	/* stopped status */
 	int ICount;
@@ -1246,7 +1246,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 /* ================================= API ================================== */
 /* ======================================================================== */
 
-static void state_register( running_device *device )
+static void state_register( cpu_device *device )
 {
 	spc700i_cpu *cpustate = get_safe_token(device);
 
@@ -1287,7 +1287,7 @@ static CPU_INIT( spc700 )
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 
@@ -1657,7 +1657,7 @@ static CPU_SET_INFO( spc700 )
 
 CPU_GET_INFO( spc700 )
 {
-	spc700i_cpu *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	spc700i_cpu *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	uint p = 0;
 
 	if (cpustate != NULL)

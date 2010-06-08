@@ -436,7 +436,7 @@ struct _tms99xx_state
 	/* note that this callback is used by tms9900_set_irq_line(cpustate) and tms9980a_set_irq_line(cpustate) to
     retreive the value on IC0-IC3 (non-standard behaviour) */
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -1295,8 +1295,8 @@ static CPU_INIT( tms99xx )
 	cpustate->irq_level = 16;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 #if (TMS99XX_MODEL == TMS9995_ID)
 	cpustate->timer = timer_alloc(device->machine, decrementer_callback, cpustate);
@@ -4634,9 +4634,9 @@ static CPU_SET_INFO( tms99xx )
  * Generic get_info
  **************************************************************************/
 
-void TMS99XX_GET_INFO(const device_config *devconfig, running_device *device, UINT32 state, cpuinfo *info)
+void TMS99XX_GET_INFO(const device_config *devconfig, cpu_device *device, UINT32 state, cpuinfo *info)
 {
-	tms99xx_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	tms99xx_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

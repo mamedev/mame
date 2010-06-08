@@ -32,7 +32,7 @@ struct _scmp_state
 	UINT8	ER;
 	UINT8	SR;
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int					icount;
@@ -518,7 +518,7 @@ static CPU_INIT( scmp )
 
 	cpustate->device = device;
 
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* resolve callbacks */
 	devcb_resolve_write8(&cpustate->flag_out_func, &cpustate->config.flag_out_func, device);
@@ -603,7 +603,7 @@ static CPU_SET_INFO( scmp )
 
 CPU_GET_INFO( scmp )
 {
-	scmp_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	scmp_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

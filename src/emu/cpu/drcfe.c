@@ -139,8 +139,8 @@ drcfe_state *drcfe_init(running_device *cpu, const drcfe_config *config, void *p
 
 	/* initialize the state */
 	drcfe->cpudevice = downcast<cpu_device *>(cpu);
-	drcfe->program = device_memory(cpu)->space(AS_PROGRAM);
-	drcfe->pageshift = device_memory(cpu)->space_config(AS_PROGRAM)->m_page_shift;
+	drcfe->program = drcfe->cpudevice->space(AS_PROGRAM);
+	drcfe->pageshift = drcfe->cpudevice->space_config(AS_PROGRAM)->m_page_shift;
 
 	return drcfe;
 }

@@ -139,7 +139,7 @@ struct _z180_state
 	UINT8	dma1_cnt;						/* dma1 counter / divide by 20 */
 	z80_daisy_chain daisy;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	const address_space *iospace;
 	UINT8	rtemp;
@@ -2212,8 +2212,8 @@ static CPU_RESET( z180 )
 	cpustate->irq_state[2] = CLEAR_LINE;
 	cpustate->after_EI = 0;
 	cpustate->ea = 0;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->iospace = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->iospace = device->space(AS_IO);
 	cpustate->device = device;
 
 	memcpy(cpustate->cc, (UINT8 *)cc_default, sizeof(cpustate->cc));
@@ -2678,7 +2678,7 @@ static CPU_SET_INFO( z180 )
 
 CPU_GET_INFO( z180 )
 {
-	z180_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	z180_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

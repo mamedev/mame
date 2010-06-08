@@ -78,7 +78,7 @@ struct _v60_state
 	UINT8				irq_line;
 	UINT8				nmi_line;
 	device_irq_callback	irq_cb;
-	running_device *device;
+	cpu_device *		device;
 	const address_space *program;
 	const address_space *io;
 	UINT32				PPC;
@@ -311,7 +311,7 @@ static UINT32 opUNHANDLED(v60_state *cpustate)
 // Opcode jump table
 #include "optable.c"
 
-static void base_init(running_device *device, device_irq_callback irqcallback)
+static void base_init(cpu_device *device, device_irq_callback irqcallback)
 {
 	v60_state *cpustate = get_safe_token(device);
 
@@ -341,8 +341,8 @@ static CPU_INIT( v60 )
 	cpustate->PIR = 0x00006000;
 	cpustate->info = v60_i;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_INIT( v70 )
@@ -355,8 +355,8 @@ static CPU_INIT( v70 )
 	cpustate->PIR = 0x00007000;
 	cpustate->info = v70_i;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_RESET( v60 )
@@ -551,7 +551,7 @@ static CPU_SET_INFO( v60 )
 
 CPU_GET_INFO( v60 )
 {
-	v60_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	v60_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

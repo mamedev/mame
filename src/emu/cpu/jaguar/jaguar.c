@@ -100,7 +100,7 @@ struct _jaguar_state
 	void		(*const *table)(jaguar_state *jaguar, UINT16 op);
 	device_irq_callback irq_callback;
 	jaguar_int_func cpu_interrupt;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 };
 
@@ -401,7 +401,7 @@ static void init_tables(void)
 
 static STATE_POSTLOAD( jaguar_postload )
 {
-	running_device *device = (running_device *)param;
+	cpu_device *device = (cpu_device *)param;
 	jaguar_state *jaguar = get_safe_token(device);
 
 	update_register_banks(jaguar);
@@ -409,7 +409,7 @@ static STATE_POSTLOAD( jaguar_postload )
 }
 
 
-static void init_common(int isdsp, running_device *device, device_irq_callback irqcallback)
+static void init_common(int isdsp, cpu_device *device, device_irq_callback irqcallback)
 {
 	const jaguar_cpu_config *configdata = (const jaguar_cpu_config *)device->baseconfig().static_config();
 	jaguar_state *jaguar = get_safe_token(device);
@@ -421,7 +421,7 @@ static void init_common(int isdsp, running_device *device, device_irq_callback i
 
 	jaguar->irq_callback = irqcallback;
 	jaguar->device = device;
-	jaguar->program = device_memory(device)->space(AS_PROGRAM);
+	jaguar->program = device->space(AS_PROGRAM);
 	if (configdata != NULL)
 		jaguar->cpu_interrupt = configdata->cpu_int_callback;
 
@@ -1495,7 +1495,7 @@ static CPU_SET_INFO( jaguargpu )
 
 CPU_GET_INFO( jaguargpu )
 {
-	jaguar_state *jaguar = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	jaguar_state *jaguar = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1648,7 +1648,7 @@ static CPU_SET_INFO( jaguardsp )
 
 CPU_GET_INFO( jaguardsp )
 {
-	jaguar_state *jaguar = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	jaguar_state *jaguar = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

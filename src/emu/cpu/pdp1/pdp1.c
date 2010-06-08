@@ -417,7 +417,7 @@ struct _pdp1_state
 	/* 1 for 16-line sequence break system, 0 for default break system */
 	int type_20_sbs;
 
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -545,7 +545,7 @@ static CPU_INIT( pdp1 )
 	/* clean-up */
 	memset (cpustate, 0, sizeof (*cpustate));
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* set up params and callbacks */
 	for (i=0; i<64; i++)
@@ -936,7 +936,7 @@ static CPU_SET_INFO( pdp1 )
 
 CPU_GET_INFO( pdp1 )
 {
-	pdp1_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	pdp1_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

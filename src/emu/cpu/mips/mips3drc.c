@@ -359,7 +359,7 @@ INLINE void save_fast_iregs(mips3_state *mips3, drcuml_block *block)
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_flavor flavor, int bigendian, running_device *device, device_irq_callback irqcallback)
+static void mips3_init(mips3_flavor flavor, int bigendian, cpu_device *device, device_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -380,7 +380,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, running_device *devic
 		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*mips3)));
 
 	/* allocate the core memory */
-	*(mips3_state **)downcast<cpu_device *>(device)->token() = mips3 = (mips3_state *)drccache_memory_alloc_near(cache, sizeof(*mips3));
+	*(mips3_state **)device->token() = mips3 = (mips3_state *)drccache_memory_alloc_near(cache, sizeof(*mips3));
 	memset(mips3, 0, sizeof(*mips3));
 
 	/* initialize the core */
@@ -601,7 +601,7 @@ static CPU_SET_INFO( mips3 )
 
 static CPU_GET_INFO( mips3 )
 {
-	mips3_state *mips3 = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	mips3_state *mips3 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

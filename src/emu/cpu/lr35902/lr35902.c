@@ -65,7 +65,7 @@ typedef struct {
 	int	irq_state;
 	int	ei_delay;
 	device_irq_callback irq_callback;
-	running_device *device;
+	cpu_device *device;
 	const address_space *program;
 	int icount;
 	/* Timer stuff */
@@ -193,7 +193,7 @@ static CPU_INIT( lr35902 )
 	cpustate->w.config = (const lr35902_cpu_core *) device->baseconfig().static_config();
 	cpustate->w.irq_callback = irqcallback;
 	cpustate->w.device = device;
-	cpustate->w.program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->w.program = device->space(AS_PROGRAM);
 }
 
 /*** Reset lr353902 registers: ******************************/
@@ -410,7 +410,7 @@ static CPU_SET_INFO( lr35902 )
 
 CPU_GET_INFO( lr35902 )
 {
-	lr35902_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	lr35902_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

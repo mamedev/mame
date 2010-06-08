@@ -663,9 +663,9 @@ static CPU_INIT( z8 )
 	cpustate->clock = device->clock();
 
 	/* find address spaces */
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->data = device_memory(device)->space(AS_DATA);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
 
 	/* allocate timers */
 	cpustate->t0_timer = timer_alloc(device->machine, t0_tick, cpustate);
@@ -827,7 +827,7 @@ static CPU_SET_INFO( z8 )
 
 static CPU_GET_INFO( z8 )
 {
-	z8_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	z8_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

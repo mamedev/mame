@@ -109,7 +109,7 @@ typedef struct
 	UINT16	*ipt_ram;
 	UINT8	*lbrm;
 
-	running_device *device;
+	cpu_device *device;
 	const	address_space *program;
 	int		icount;
 
@@ -264,7 +264,7 @@ static CPU_INIT( esrip )
 	cpustate->ipt_ram = auto_alloc_array(device->machine, UINT16, IPT_RAM_SIZE/2);
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* Create the instruction decode lookup table */
 	cpustate->optable = auto_alloc_array(device->machine, UINT8, 65536);
@@ -1890,7 +1890,7 @@ static CPU_SET_INFO( esrip )
 
 CPU_GET_INFO( esrip )
 {
-	esrip_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	esrip_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

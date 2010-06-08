@@ -184,7 +184,7 @@ struct _dsp32_state
 	UINT8			lastpins;
 	UINT32			ppc;
 	void			(*output_pins_changed)(running_device *device, UINT32 pins);
-	running_device *device;
+	cpu_device *	device;
 	const address_space *program;
 };
 
@@ -359,7 +359,7 @@ static CPU_INIT( dsp32c )
 		cpustate->output_pins_changed = configdata->output_pins_changed;
 
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	dsp32_register_save(device);
 }
@@ -765,7 +765,7 @@ static CPU_SET_INFO( dsp32c )
 
 CPU_GET_INFO( dsp32c )
 {
-	dsp32_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	dsp32_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

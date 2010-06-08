@@ -992,8 +992,8 @@ static CPU_INIT( cdp1802 )
 	}
 
 	/* find address spaces */
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* set initial values */
 	cpustate->p = mame_rand(device->machine) & 0x0f;
@@ -1058,7 +1058,7 @@ static CPU_SET_INFO( cdp1802 )
 
 CPU_GET_INFO( cdp1802 )
 {
-	cdp1802_state *cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	cdp1802_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

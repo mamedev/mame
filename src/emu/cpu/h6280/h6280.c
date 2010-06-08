@@ -162,8 +162,8 @@ static CPU_INIT( h6280 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 }
 
 static CPU_RESET( h6280 )
@@ -178,8 +178,8 @@ static CPU_RESET( h6280 )
 	memset(cpustate, 0, sizeof(h6280_Regs));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = device_memory(device)->space(AS_PROGRAM);
-	cpustate->io = device_memory(device)->space(AS_IO);
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->io = device->space(AS_IO);
 
 	/* set I and B flags */
 	P = _fI | _fB;
@@ -425,7 +425,7 @@ static CPU_SET_INFO( h6280 )
 
 CPU_GET_INFO( h6280 )
 {
-	h6280_Regs* cpustate = (device != NULL && downcast<cpu_device *>(device)->token() != NULL) ? get_safe_token(device) : NULL;
+	h6280_Regs* cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
