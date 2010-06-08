@@ -415,39 +415,41 @@ static void disasmview_update_checks(win_i *info)
 //  debugmain_set_cpu
 //============================================================
 
-static void debugmain_set_cpu(running_device *cpu)
+static void debugmain_set_cpu(running_device *device)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
 	DView *dv;
 
-	if (cpu != dmain->cpu)
+	if (device != dmain->cpu)
 	{
 		char title[256];
 		const registers_subview_item *regsubitem;
 		const disasm_subview_item *dasmsubitem;
 
-		dmain->cpu = cpu;
+		dmain->cpu = device;
 
 		// first set all the views to the new cpu
 		// FIXME: Iterate over all views !
 		dv = get_view(dmain, DVT_DISASSEMBLY);
 		for (dasmsubitem = disasm_view_get_subview_list(dv->view); dasmsubitem != NULL; dasmsubitem = dasmsubitem->next)
-			if (dasmsubitem->space->cpu == cpu)
+			if (dasmsubitem->space->cpu == device)
 			{
 				disasm_view_set_subview(dv->view, dasmsubitem->index);
 				break;
 			}
 
 		dv = get_view(dmain, DVT_REGISTERS);
+		device_state_interface *stateintf = device_state(device);
+
 		for (regsubitem = registers_view_get_subview_list(dv->view); regsubitem != NULL; regsubitem = regsubitem->next)
-			if (regsubitem->cpudevice == cpu)
+			if (regsubitem->stateintf == stateintf)
 			{
 				registers_view_set_subview(dv->view, regsubitem->index);
 				break;
 			}
 
 		// then update the caption
-		snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", cpu->machine->gamedrv->name, regsubitem->name.cstr());
+		snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", device->machine->gamedrv->name, regsubitem->name.cstr());
 		gtk_window_set_title(GTK_WINDOW(dmain->win), title);
 		disasmview_update_checks(dmain);
 	}
