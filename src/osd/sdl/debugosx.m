@@ -1299,8 +1299,9 @@ void console_create_window(running_machine *machine)
 - (void)selectSubviewForCPU:(running_device *)device {
 	const int						selected = registers_view_get_subview(view);
 	const registers_subview_item	*subitem;
+	device_state_interface			*stateintf = device_state(device);
 	for (subitem = registers_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
-		if (subitem->device == device) {
+		if (subitem->stateintf == stateintf) {
 			if (selected != subitem->index) {
 				registers_view_set_subview(view, subitem->index);
 				if ([[self window] firstResponder] != self)
