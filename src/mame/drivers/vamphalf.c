@@ -768,9 +768,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mrdig )
 	MDRV_IMPORT_FROM(common)
+
 	MDRV_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
+	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mrdig_io)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
