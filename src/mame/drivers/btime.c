@@ -1597,7 +1597,8 @@ static MACHINE_DRIVER_START( sdtennis )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
-	MDRV_CPU_REPLACE("maincpu", M6502, HCLK4)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(HCLK4)
 	MDRV_CPU_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
@@ -1649,7 +1650,8 @@ static MACHINE_DRIVER_START( disco )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
-	MDRV_CPU_REPLACE("maincpu", M6502, HCLK4)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(HCLK4)
 	MDRV_CPU_PROGRAM_MAP(disco_map)
 
 	MDRV_CPU_MODIFY("audiocpu")

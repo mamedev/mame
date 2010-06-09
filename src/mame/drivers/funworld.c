@@ -2157,6 +2157,8 @@ static MACHINE_DRIVER_START( fw2ndpal )
 	MDRV_IMPORT_FROM(fw1stpal)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_PROGRAM_MAP(funworld_map)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_GFXDECODE(fw2ndpal)
 MACHINE_DRIVER_END
@@ -2169,6 +2171,7 @@ static MACHINE_DRIVER_START( funquiz )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funquiz_map)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(funquiz_ay8910_intf)
@@ -2203,6 +2206,7 @@ static MACHINE_DRIVER_START( royalcd2 )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cuoreuno )
