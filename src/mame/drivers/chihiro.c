@@ -38,6 +38,18 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "cpu/i386/i386.h"
 #include "includes/naomibd.h"
 
+static VIDEO_START(chihiro)
+{
+
+}
+
+static VIDEO_UPDATE(chihiro)
+{
+
+	return 0;
+}
+
+
 /*
 St.     Instr.       Comment
 0x02    PEEK         ACC := MEM[OP1]
@@ -61,21 +73,12 @@ static READ32_HANDLER( chihiro_jamtable )
 
 static ADDRESS_MAP_START( xbox_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x004fffff) AM_RAM
+	AM_RANGE(0x07fd0000, 0x07feffff) AM_RAM // a table of some sort?
+
 	AM_RANGE(0xff000080, 0xff000083) AM_READ( chihiro_jamtable )
 	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_SHARE("biosflash")
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_SHARE("biosflash")
 ADDRESS_MAP_END
-
-
-static VIDEO_START(chihiro)
-{
-
-}
-
-static VIDEO_UPDATE(chihiro)
-{
-	return 0;
-}
 
 static INPUT_PORTS_START( chihiro )
 INPUT_PORTS_END
