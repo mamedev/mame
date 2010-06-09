@@ -529,6 +529,7 @@ protected:
 	cpu_state_io_func		m_state_import;				//
 	cpu_state_io_func		m_state_export;				//
 	cpu_string_io_func		m_string_export;			//
+	cpu_exit_func			m_exit;						//
 
 	UINT64					m_state_io;					// temporary buffer for state I/O
 	bool					m_using_legacy_state;		// true if we are using the old-style state access

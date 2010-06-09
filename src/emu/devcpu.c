@@ -222,24 +222,21 @@ cpu_device::cpu_device(running_machine &machine, const cpu_device_config &config
 	  m_debug(NULL),
 	  m_cpu_config(config),
 	  m_token(NULL),
-	  m_set_info(NULL),
-	  m_execute(NULL),
+	  m_set_info(reinterpret_cast<cpu_set_info_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_SET_INFO))),
+	  m_execute(reinterpret_cast<cpu_execute_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXECUTE))),
+	  m_burn(reinterpret_cast<cpu_burn_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_BURN))),
+	  m_translate(reinterpret_cast<cpu_translate_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_TRANSLATE))),
+	  m_read(reinterpret_cast<cpu_read_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_READ))),
+	  m_write(reinterpret_cast<cpu_write_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_WRITE))),
+	  m_readop(reinterpret_cast<cpu_readop_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_READOP))),
+	  m_disassemble(reinterpret_cast<cpu_disassemble_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_DISASSEMBLE))),
+	  m_state_import(reinterpret_cast<cpu_state_io_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_IMPORT_STATE))),
+	  m_state_export(reinterpret_cast<cpu_state_io_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXPORT_STATE))),
+	  m_string_export(reinterpret_cast<cpu_string_io_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXPORT_STRING))),
+	  m_exit(reinterpret_cast<cpu_exit_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXIT))),
 	  m_using_legacy_state(false)
 {
 	memset(&m_partial_frame_period, 0, sizeof(m_partial_frame_period));
-
-	// pre-fetch function pointers for frequently-called functions
-	m_set_info = reinterpret_cast<cpu_set_info_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_SET_INFO));
-	m_execute = reinterpret_cast<cpu_execute_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXECUTE));
-	m_burn = reinterpret_cast<cpu_burn_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_BURN));
-	m_translate = reinterpret_cast<cpu_translate_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_TRANSLATE));
-	m_read = reinterpret_cast<cpu_read_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_READ));
-	m_write = reinterpret_cast<cpu_write_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_WRITE));
-	m_readop = reinterpret_cast<cpu_readop_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_READOP));
-	m_disassemble = reinterpret_cast<cpu_disassemble_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_DISASSEMBLE));
-	m_state_import = reinterpret_cast<cpu_state_io_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_IMPORT_STATE));
-	m_state_export = reinterpret_cast<cpu_state_io_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXPORT_STATE));
-	m_string_export = reinterpret_cast<cpu_string_io_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXPORT_STRING));
 
 	int tokenbytes = m_cpu_config.get_legacy_config_int(CPUINFO_INT_CONTEXT_SIZE);
 	if (tokenbytes == 0)
@@ -257,9 +254,8 @@ cpu_device::cpu_device(running_machine &machine, const cpu_device_config &config
 cpu_device::~cpu_device()
 {
 	// call the CPU's exit function if present
-	cpu_exit_func exit = reinterpret_cast<cpu_exit_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXIT));
-	if (exit != NULL)
-		(*exit)(this);
+	if (m_exit != NULL)
+		(*m_exit)(this);
 }
 
 
