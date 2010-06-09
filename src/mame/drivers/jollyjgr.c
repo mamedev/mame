@@ -120,7 +120,7 @@ public:
 	tilemap_t  *bg_tilemap;
 
 	/* misc */
-	UINT8      nmi_enable, flip_x, flip_y, bitmap_disable, tilemap_bank;
+	UINT8      nmi_enable, flip_x, flip_y, bitmap_disable, tilemap_bank, pri;
 };
 
 
@@ -168,6 +168,8 @@ static WRITE8_HANDLER( jollyjgr_misc_w )
 	// same for these two (used by Frog & Spiders)
 	state->bitmap_disable = data & 0x40;
 	state->tilemap_bank = data & 0x20;
+
+	state->pri = data & 4;
 
 	tilemap_set_flip(state->bg_tilemap, (state->flip_x ? TILEMAP_FLIPX : 0) | (state->flip_y ? TILEMAP_FLIPY : 0));
 
@@ -484,10 +486,20 @@ static VIDEO_UPDATE( jollyjgr )
 
 	bitmap_fill(bitmap, cliprect, 32);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	if(state->pri) //used in Frog & Spiders level 3
+	{
+		if(!(state->bitmap_disable))
+			draw_bitmap(screen->machine, bitmap);
 
-	if(!(state->bitmap_disable))
-		draw_bitmap(screen->machine, bitmap);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	}
+	else
+	{
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+
+		if(!(state->bitmap_disable))
+			draw_bitmap(screen->machine, bitmap);
+	}
 
 	/* Sprites are the same as in Galaxian */
 	for (offs = 0; offs < 0x40; offs += 4)
