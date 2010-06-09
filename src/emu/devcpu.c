@@ -312,6 +312,8 @@ void cpu_device::device_start()
 
 	// get our icount pointer
 	m_icount = reinterpret_cast<int *>(get_legacy_runtime_ptr(CPUINFO_PTR_INSTRUCTION_COUNTER));
+	assert(m_icount != 0);
+	*m_icount = 0;
 }
 
 

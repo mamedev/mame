@@ -890,7 +890,8 @@ static CPU_EXECUTE( s2650 )
 	s2650c->icount = cycles;
 
 	/* check for external irqs */
-	s2650c->icount -= check_irq_line(s2650c);
+	int irqcycles = check_irq_line(s2650c);
+	s2650c->icount -= irqcycles;
 
 	do
 	{

@@ -476,6 +476,7 @@ attotime device_execute_interface::local_time() const
 	attotime result = m_localtime;
 	if (is_executing())
 	{
+		assert(m_cycles_running >= *m_icount);
 		int cycles = m_cycles_running - *m_icount;
 		result = attotime_add(result, m_device.clocks_to_attotime(cycles));
 	}
@@ -491,7 +492,10 @@ attotime device_execute_interface::local_time() const
 UINT64 device_execute_interface::total_cycles() const
 {
 	if (is_executing())
+	{
+		assert(m_cycles_running >= *m_icount);
 		return m_totalcycles + m_cycles_running - *m_icount;
+	}
 	else
 		return m_totalcycles;
 }
