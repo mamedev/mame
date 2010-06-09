@@ -188,6 +188,44 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* up marukin - you can see partially built up screens during attract mode. */
 }
 
+WRITE8_HANDLER( pangbl_gfxctrl_w )
+{
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+
+logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
+{
+#if 0
+	char baf[40];
+	sprintf(baf,"%02x",data);
+	popmessage(baf);
+#endif
+}
+
+	/* bit 0 is unknown (used, maybe back color enable?) */
+
+	/* bit 1 is coin counter */
+	coin_counter_w(space->machine, 0, data & 2);
+
+	/* bit 2 is flip screen */
+	if (state->flipscreen != (data & 0x04))
+	{
+		state->flipscreen = data & 0x04;
+		tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	}
+
+	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
+
+	/* bit 4 selects OKI M6295 bank, nop'ed here */
+
+	/* bit 5 is palette RAM bank selector (doesn't apply to mgakuen) */
+	state->paletteram_bank = data & 0x20;
+
+	/* bits 6 and 7 are unknown, used in several places. At first I thought */
+	/* they were bg and sprites enable, but this screws up spang (screen flickers */
+	/* every time you pop a bubble). However, not using them as enable bits screws */
+	/* up marukin - you can see partially built up screens during attract mode. */
+}
+
 WRITE8_HANDLER( mstworld_gfxctrl_w )
 {
 	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
