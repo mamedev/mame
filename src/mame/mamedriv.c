@@ -8950,6 +8950,7 @@ Other Sun games
 	DRIVER( maddonnb )	/* (c) 1995 Tuning */
 	DRIVER( tugboat )	/* (c) 1982 ETM */
 	DRIVER( noahsark )	/* (c) 1983 Enter-Tech */
+	DRIVER( berenstn )	/* (c) 1984 Enter-Tech */
 	DRIVER( gotcha )	/* (c) 1997 Dongsung + "presented by Para" */
 	DRIVER( ppchamp )	/* (c) 1997 Dongsung + "presented by Para" */
 	DRIVER( amerdart )	/* (c) 1989 Ameri Corporation */

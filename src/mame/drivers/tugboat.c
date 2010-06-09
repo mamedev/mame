@@ -10,6 +10,7 @@ TODO:
   supposed to access videoram scanning it by columns (like btime_mirrorvideoram_w),
   but the current implementation is a big kludge, and it still looks wrong.
 - colors might not be entirely accurate
+  Suspect berenstn is using the wrong color PROM.
 
 the problem which caused the controls not to work
 ---
@@ -407,5 +408,39 @@ ROM_START( noahsark )
 ROM_END
 
 
+ROM_START( berenstn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u6.bin", 0x4000, 0x1000, CRC(e45275a2) SHA1(d788bc5a69b3cdb2596a3b354371ff88d39f6d46) )
+	ROM_LOAD( "u7.bin", 0x5000, 0x1000, CRC(1984d787) SHA1(c13959c9be075400e9d1668b5404bc73f6db5fe4) )
+	ROM_LOAD( "u8.bin", 0x6000, 0x1000, CRC(0c4d53b7) SHA1(45bd847fdb7bbfbe53d750003024ef3454faa6e6) )
+	ROM_LOAD( "u9.bin", 0x7000, 0x1000, CRC(7e058e57) SHA1(e9506fa4ec693abf0dc4e4cbfd4b93bdbcfc9ba4) )
+	ROM_RELOAD(         0xf000, 0x1000 )	/* for the vectors */
+
+	ROM_REGION( 0x1800, "gfx1", ROMREGION_INVERT  )
+	ROM_LOAD( "u67.bin",  0x0000, 0x0800, CRC(1a77605b) SHA1(8c25750f94895f5820ad4f1fa4ae1ea70ee0aee2) )
+	ROM_FILL(             0x0800, 0x0800, 0xff )
+	ROM_FILL(             0x1000, 0x0800, 0xff )
+
+	ROM_REGION( 0x3000, "gfx2", ROMREGION_INVERT  )
+	ROM_LOAD( "u68.bin", 0x0000, 0x1000, CRC(21bf375f) SHA1(52bc81a4f289a96edfab034445bcf639b1524ada) )
+	ROM_LOAD( "u69.bin", 0x1000, 0x1000, CRC(9dc770f6) SHA1(5dc16fac72d68b521dbb415935f5e7f682c26d7f) )
+	ROM_LOAD( "u70.bin", 0x2000, 0x1000, CRC(a810bd45) SHA1(8be531529174c5d4b4f164bd2397116b9d5350db) )
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_LOAD( "u167.bin", 0x0000, 0x0800, CRC(7fc7280f) SHA1(93bf46e421b580edf81177db85cb220073761c57) )
+	ROM_RELOAD(         0x0800, 0x0800 )
+	ROM_RELOAD(         0x1000, 0x0800 )
+
+	ROM_REGION( 0x3000, "gfx4", 0 )
+	ROM_LOAD( "u168.bin", 0x0000, 0x0800, CRC(af532ba3) SHA1(b196e294eaf4c25549278fd040b1dad2799e18d5) )
+	ROM_LOAD( "u169.bin", 0x1000, 0x0800, CRC(07b6e660) SHA1(c755f63cc7c566e200fc11199bfac06a7e8f89e4) )
+	ROM_LOAD( "u170.bin", 0x2000, 0x0800, CRC(73261eff) SHA1(19edd6957fceb3df12fd29cd5e156a5eb1c70710) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) /* Same as Tugboat but is this actually correct? */
+	ROM_LOAD( "n.t.2-031j.24s10", 0x0000, 0x0100, CRC(236672bf) SHA1(57482d0a23223ef7b211045ad28d3e41e90f961e) )
+ROM_END
+
+
 GAME( 1982, tugboat,  0, tugboat, tugboat,  0, ROT90, "ETM", "Tugboat",    GAME_IMPERFECT_GRAPHICS )
 GAME( 1983, noahsark, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech", "Noah's Ark", GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, berenstn, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech", "The Berenstain Bears in Big Paw's Cave", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
