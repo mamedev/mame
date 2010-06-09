@@ -70,9 +70,10 @@
          a paper sticker on the pcb; The code will be of the format mVNnnnnn where
          m is a letter and nnnnn is a number.
          Codes:
-         * unknown (L shaped pcb) - B&W only, used on "Space Invaders" Upright
+         * SVNxxxxx? (L shaped pcbset) - B&W only, used on "Space Invaders" Upright
            with 3-strip overlay.
-           Came from factory with one of the TV romsets ONLY.
+           Audio PCB daughterboard has part number SVN00001 or SVN00003.
+           Came from factory with one of the TV romsets ONLY?
            Capable of running TV, SV or CV romsets.
          * TVNxxxxx (3 layer pcb) - B&W only, used on "T.T Space Invaders"
            cocktail with blended single-sheet color gel overlay.
@@ -104,12 +105,11 @@
          PV01, PV02, PV03, PV04, PV05 w/proms - invadpt2
 
       - Midway PCB sets: (cursory descripton)
-         * Midway Space Invaders Deluxe (and Deluxe Cocktail) use a special midway-made PCB set
-           which is significantly different from the taito ones.
-         * Midway Space Invaders II (only produced as a cocktail) is also significantly different hardware from the Taito SI hardware, but additionally has different (head to head) gameplya, as well has having two sound boards instead of one.
-      TODO: this needs to be emulated properly
-         * Both midway space invaders games' sound is different from the taito ones (particularly the shot sound) due to using slightly different components on the discrete section.
-      TODO: this needs to be emulated properly
+         NOTE: The discrete components, particularly for the shot sound, differ between Taito and Midway audio daughterboards.
+         TODO: figure out the difference between the Taito and Midway discrete boards and emulate them both properly. Figure out what the current discrete setup is trying to emulate.
+         * All Midway Space Invaders games ([Space Invader Upright], [Space Invader Cocktail], [Deluxe Space Invaders Upright], [Deluxe Space Invaders Cocktail], and [Space Invaders II]) use the same 8080 mainboard, with no emulation-relevant differences between revisions.
+         * [Space Invaders II] from Midway (only produced as a cocktail) uses an extra sound board for the simultaneous 2 player head-to-head sounds.
+         TODO: remove Space Invader 'invaders' set from mw8080bw.c, it does not belong there at all
 
       - Taito-USA-made 'trimline' PCBS do not match the taito pcbs either.
 */
