@@ -186,7 +186,7 @@ static void v_set_videorom_bank( running_machine* machine, int start, int count,
 {
 	int i;
 
-	assert(start + count < 8);
+	assert(start + count <= 8);
 
 	vrom_start_bank &= (vrom_banks - 1);
 	assert(vrom_start_bank + count < vrom_banks);
