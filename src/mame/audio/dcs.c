@@ -2115,7 +2115,8 @@ static TIMER_DEVICE_CALLBACK( transfer_watchdog_callback )
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
 			preprocess_write(timer.machine, (*dcs.fifo_data_r)(dcs.cpu));
 	}
-	transfer.watchdog->adjust(ATTOTIME_IN_MSEC(1), transfer.writes_left);
+	if (transfer.watchdog != NULL)
+		transfer.watchdog->adjust(ATTOTIME_IN_MSEC(1), transfer.writes_left);
 }
 
 
