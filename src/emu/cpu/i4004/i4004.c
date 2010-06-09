@@ -426,17 +426,12 @@ static CPU_EXECUTE( i4004 )
 {
 	i4004_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
-
 	do
 	{
 		debugger_instruction_hook(device, GET_PC.d);
 		execute_one(cpustate, ROP(cpustate));
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 /***************************************************************************

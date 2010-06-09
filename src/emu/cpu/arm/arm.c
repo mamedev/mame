@@ -332,7 +332,6 @@ static CPU_EXECUTE( arm )
 	UINT32 insn;
 	ARM_REGS *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
 	do
 	{
 		debugger_instruction_hook(device, R15 & ADDRESS_MASK);
@@ -436,8 +435,6 @@ static CPU_EXECUTE( arm )
 		arm_check_irq_state(cpustate);
 
 	} while( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 } /* arm_execute */
 
 

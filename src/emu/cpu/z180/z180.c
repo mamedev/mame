@@ -2398,8 +2398,6 @@ static CPU_EXECUTE( z180 )
 	z180_state *cpustate = get_safe_token(device);
 	int curcycles;
 
-	cpustate->icount = cycles;
-
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
 	/* to just check here */
@@ -2517,7 +2515,6 @@ again:
 	}
 
     //cpustate->old_icount -= cpustate->icount;
-	return cycles - cpustate->icount;
 }
 
 /****************************************************************************

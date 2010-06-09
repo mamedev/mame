@@ -226,8 +226,6 @@ static CPU_EXECUTE( m6502 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 op;
@@ -271,8 +269,6 @@ static CPU_EXECUTE( m6502 )
 		}
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
@@ -447,8 +443,6 @@ static CPU_EXECUTE( m65c02 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 op;
@@ -484,8 +478,6 @@ static CPU_EXECUTE( m65c02 )
 			m65c02_take_irq(cpustate);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static void m65c02_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
@@ -613,8 +605,6 @@ static CPU_EXECUTE( deco16 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 op;
@@ -650,8 +640,6 @@ static CPU_EXECUTE( deco16 )
 			deco16_take_irq(cpustate);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

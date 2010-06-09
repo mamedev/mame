@@ -553,8 +553,6 @@ static CPU_EXECUTE( ssp1601 )
 {
 	ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
-	ssp1601_state->g_cycles = cycles;
-
 	while (ssp1601_state->g_cycles > 0)
 	{
 		int op;
@@ -757,7 +755,6 @@ static CPU_EXECUTE( ssp1601 )
 	}
 
 	update_P(ssp1601_state);
-	return cycles - ssp1601_state->g_cycles;
 }
 
 

@@ -1122,8 +1122,6 @@ static CPU_EXECUTE( mcs48 )
 
 	update_regptr(cpustate);
 
-	cpustate->icount = cycles;
-
 	/* external interrupts may have been set since we last checked */
 	curcycles = check_irqs(cpustate);
 	cpustate->icount -= curcycles;
@@ -1149,8 +1147,6 @@ static CPU_EXECUTE( mcs48 )
 			burn_cycles(cpustate, curcycles);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

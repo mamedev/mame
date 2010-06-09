@@ -2188,10 +2188,11 @@ static CPU_RESET( sh1 )
 /* Execute cycles - returns number of cycles actually run */
 static CPU_EXECUTE( sh2 )
 {
-	sh2_icount = cycles;
-
 	if (sh2->cpu_off)
-		return 0;
+	{
+		sh2->icount = 0;
+		return;
+	}
 
 	do
 	{
@@ -2238,8 +2239,6 @@ static CPU_EXECUTE( sh2 )
 		}
 		sh2_icount--;
 	} while( sh2_icount > 0 );
-
-	return cycles - sh2_icount;
 }
 
 static CPU_INIT( sh2 )

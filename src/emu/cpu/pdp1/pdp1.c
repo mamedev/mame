@@ -622,8 +622,6 @@ static CPU_EXECUTE( pdp1 )
 {
 	pdp1_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		debugger_instruction_hook(device, PC);
@@ -861,8 +859,6 @@ static CPU_EXECUTE( pdp1 )
 		}
 	}
 	while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

@@ -496,8 +496,6 @@ static CPU_EXECUTE( hc11 )
 {
 	hc11_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	while(cpustate->icount > 0)
 	{
 		UINT8 op;
@@ -510,8 +508,6 @@ static CPU_EXECUTE( hc11 )
 		op = FETCH(cpustate);
 		hc11_optable[op](cpustate);
 	}
-
-	return cycles-cpustate->icount;
 }
 
 /*****************************************************************************/

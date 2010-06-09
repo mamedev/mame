@@ -122,8 +122,6 @@ static CPU_EXECUTE( lh5801 )
 {
 	lh5801_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	if (cpustate->idle) {
 		cpustate->icount=0;
 	} else {
@@ -136,8 +134,6 @@ static CPU_EXECUTE( lh5801 )
 
 		} while (cpustate->icount > 0);
 	}
-
-	return cycles - cpustate->icount;
 }
 
 static void set_irq_line(lh5801_state *cpustate, int irqline, int state)

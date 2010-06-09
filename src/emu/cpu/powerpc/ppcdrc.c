@@ -712,7 +712,6 @@ static CPU_EXECUTE( ppcdrc )
 	ppc->impstate->cache_dirty = FALSE;
 
 	/* execute */
-	ppc->icount = cycles;
 	do
 	{
 		/* run as much as we can */
@@ -727,9 +726,6 @@ static CPU_EXECUTE( ppcdrc )
 			code_flush_cache(ppc);
 
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
-
-	/* return the number of cycles executed */
-	return cycles - ppc->icount;
 }
 
 

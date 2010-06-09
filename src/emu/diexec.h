@@ -253,11 +253,11 @@ public:
 	UINT32 default_irq_vector() const { return m_execute_config.default_irq_vector(); }
 
 	// required operation overrides
-	INT32 run(INT32 clocks) { return execute_run(clocks); }
+	void run() { execute_run(); }
 
 protected:
 	// optional operation overrides
-	virtual INT32 execute_run(INT32 cycles) = 0;
+	virtual void execute_run() = 0;
 	virtual void execute_burn(INT32 cycles);
 	virtual void execute_set_input(int linenum, int state);
 

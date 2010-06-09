@@ -1848,8 +1848,6 @@ static CPU_EXECUTE( psxcpu )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
 
-	psxcpu->icount = cycles;
-
 	do
 	{
 		if (LOG_BIOSCALL) log_bioscall( psxcpu );
@@ -2841,8 +2839,6 @@ static CPU_EXECUTE( psxcpu )
 		}
 		psxcpu->icount--;
 	} while( psxcpu->icount > 0 );
-
-	return cycles - psxcpu->icount;
 }
 
 static void set_irq_line( psxcpu_state *psxcpu, int irqline, int state )

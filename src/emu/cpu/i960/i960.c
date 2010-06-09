@@ -1958,7 +1958,6 @@ static CPU_EXECUTE( i960 )
 	i960_state_t *i960 = get_safe_token(device);
 	UINT32 opcode;
 
-	i960->icount = cycles;
 	check_irqs(i960);
 	while(i960->icount > 0) {
 		i960->PIP = i960->IP;
@@ -1971,7 +1970,6 @@ static CPU_EXECUTE( i960 )
 
 		execute_op(i960, opcode);
 	}
-	return cycles - i960->icount;
 }
 
 static void set_irq_line(i960_state_t *i960, int irqline, int state)

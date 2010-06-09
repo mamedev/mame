@@ -514,7 +514,6 @@ static CPU_EXECUTE( m6805 )
 	m6805_Regs *cpustate = get_safe_token(device);
 
 	S = SP_ADJUST( S );		/* Taken from CPU_SET_CONTEXT when pointer'afying */
-	cpustate->iCount = cycles;
 
 	do
 	{
@@ -799,8 +798,6 @@ static CPU_EXECUTE( m6805 )
 		}
 		cpustate->iCount -= cycles1[ireg];
 	} while( cpustate->iCount > 0 );
-
-	return cycles - cpustate->iCount;
 }
 
 /****************************************************************************

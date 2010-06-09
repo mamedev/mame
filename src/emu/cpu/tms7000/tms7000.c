@@ -445,8 +445,7 @@ static CPU_EXECUTE( tms7000 )
 	tms7000_state *cpustate = get_safe_token(device);
 	int op;
 
-	cpustate->icount = cycles;
-	cpustate->div_by_16_trigger += cycles;
+	cpustate->div_by_16_trigger += cpustate->icount;
 
     tms7000_check_IRQ_lines(cpustate);
 
@@ -479,7 +478,6 @@ static CPU_EXECUTE( tms7000 )
 	} while( cpustate->icount > 0 );
 
 	cpustate->div_by_16_trigger -= cpustate->icount;
-	return cycles - cpustate->icount;
 }
 
 static CPU_EXECUTE( tms7000_exl )
@@ -487,8 +485,7 @@ static CPU_EXECUTE( tms7000_exl )
 	tms7000_state *cpustate = get_safe_token(device);
 	int op;
 
-	cpustate->icount = cycles;
-	cpustate->div_by_16_trigger += cycles;
+	cpustate->div_by_16_trigger += cpustate->icount;
 
     tms7000_check_IRQ_lines(cpustate);
 
@@ -522,7 +519,6 @@ static CPU_EXECUTE( tms7000_exl )
 	} while( cpustate->icount > 0 );
 
 	cpustate->div_by_16_trigger -= cpustate->icount;
-	return cycles - cpustate->icount;
 }
 
 /****************************************************************************

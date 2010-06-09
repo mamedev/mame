@@ -1009,9 +1009,6 @@ static CPU_EXECUTE( adsp21xx )
 
 	check_irqs(adsp);
 
-	/* count cycles and interrupt cycles */
-	adsp->icount = cycles;
-
 	do
 	{
 		UINT32 temp;
@@ -1740,8 +1737,6 @@ static CPU_EXECUTE( adsp21xx )
 
 		adsp->icount--;
 	} while (adsp->icount > 0);
-
-	return cycles - adsp->icount;
 }
 
 

@@ -887,11 +887,8 @@ static CPU_EXECUTE( s2650 )
 {
 	s2650_regs *s2650c = get_safe_token(device);
 
-	s2650c->icount = cycles;
-
 	/* check for external irqs */
-	int irqcycles = check_irq_line(s2650c);
-	s2650c->icount -= irqcycles;
+	s2650c->icount -= check_irq_line(s2650c);
 
 	do
 	{
@@ -1498,8 +1495,6 @@ static CPU_EXECUTE( s2650 )
 				break;
 		}
 	} while( s2650c->icount > 0 );
-
-	return cycles - s2650c->icount;
 }
 
 

@@ -484,8 +484,6 @@ static CPU_EXECUTE( i8008 )
 {
 	i8008_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		if (cpustate->irq_state != CLEAR_LINE) {
@@ -495,8 +493,6 @@ static CPU_EXECUTE( i8008 )
 		execute_one(cpustate, ROP(cpustate));
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 /***************************************************************************

@@ -890,7 +890,6 @@ static CPU_EXECUTE( sh2 )
 		code_flush_cache(sh2);
 
 	/* execute */
-	sh2->icount = cycles;
 	do
 	{
 		/* run as much as we can */
@@ -910,9 +909,6 @@ static CPU_EXECUTE( sh2 )
 			code_flush_cache(sh2);
 		}
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
-
-	/* return the number of cycles executed */
-	return cycles - sh2->icount;
 }
 
 /*-------------------------------------------------

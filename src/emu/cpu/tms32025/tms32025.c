@@ -1967,7 +1967,6 @@ again:
 static CPU_EXECUTE( tms32025 )
 {
 	tms32025_state *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 
 	/**** Respond to external hold signal */
@@ -2099,8 +2098,6 @@ static CPU_EXECUTE( tms32025 )
 			}
 		}
 	}
-
-	return (cycles - cpustate->icount);
 }
 
 

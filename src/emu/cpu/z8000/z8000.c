@@ -431,8 +431,6 @@ static CPU_EXECUTE( z8000 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
-    cpustate->icount = cycles;
-
     do
     {
         /* any interrupt request pending? */
@@ -460,8 +458,6 @@ static CPU_EXECUTE( z8000 )
             (*exec->opcode)(cpustate);
         }
     } while (cpustate->icount > 0);
-
-    return cycles - cpustate->icount;
 
 }
 

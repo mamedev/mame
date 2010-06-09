@@ -334,9 +334,9 @@ void cpu_device::device_reset()
 //  cycles
 //-------------------------------------------------
 
-INT32 cpu_device::execute_run(INT32 cycles)
+void cpu_device::execute_run()
 {
-	return (*m_execute)(this, cycles);
+	(*m_execute)(this);
 }
 
 

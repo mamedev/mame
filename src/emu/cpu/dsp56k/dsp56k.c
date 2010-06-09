@@ -319,13 +319,18 @@ static CPU_EXECUTE( dsp56k )
 
 	/* If reset line is asserted, do nothing */
 	if (cpustate->reset_state)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	/* HACK - if you're in bootstrap mode, simply pretend you ate up all your cycles waiting for data. */
 	if (cpustate->bootstrap_mode != BOOTSTRAP_OFF)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
-	cpustate->icount = cycles;
 	cpustate->icount -= cpustate->interrupt_cycles;
 	cpustate->interrupt_cycles = 0;
 
@@ -337,8 +342,6 @@ static CPU_EXECUTE( dsp56k )
 
 	cpustate->icount -= cpustate->interrupt_cycles;
 	cpustate->interrupt_cycles = 0;
-
-	return cycles - cpustate->icount;
 }
 
 

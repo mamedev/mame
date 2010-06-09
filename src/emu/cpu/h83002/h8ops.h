@@ -110,8 +110,6 @@ static CPU_EXECUTE(h8)
 	h83xx_state *h8 = get_safe_token(device);
 	UINT16 opcode=0;
 
-	h8->cyccnt = cycles;
-
 	h8_check_irqs(h8);
 
 	while ((h8->cyccnt > 0) && (!h8->h8err))
@@ -224,8 +222,6 @@ static CPU_EXECUTE(h8)
 	{
 		fatalerror("H8/3xx: Unknown opcode (PC=%x) %x", h8->ppc, opcode);
 	}
-
-	return cycles - h8->cyccnt;
 }
 
 static void h8_group0(h83xx_state *h8, UINT16 opcode)

@@ -1276,10 +1276,9 @@ static int tms57002_decode_get_pc(tms57002_t *s)
 static CPU_EXECUTE(tms57002)
 {
 	tms57002_t *s = get_safe_token(device);
-	int initial_cycles = cycles;
 	int ipc = -1;
 
-	while(cycles > 0 && !(s->sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
+	while(s->icount > 0 && !(s->sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
 		int iipc;
 
 		debugger_instruction_hook(device, s->pc);
@@ -1315,7 +1314,7 @@ static CPU_EXECUTE(tms57002)
 			}
 		}
 	inst:
-		cycles--;
+		s->icount--;
 
 		if(s->rptc) {
 			s->rptc--;
@@ -1332,9 +1331,8 @@ static CPU_EXECUTE(tms57002)
 		}
 	}
 
-	if(cycles > 0)
-		cycles = 0;
-	return initial_cycles - cycles;
+	if(s->icount > 0)
+		s->icount = 0;
 }
 
 static CPU_INIT(tms57002)

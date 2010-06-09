@@ -717,14 +717,15 @@ static CPU_EXECUTE( i386 )
 {
 	i386_state *cpustate = get_safe_token(device);
 
-	cpustate->cycles = cycles;
+	int cycles = cpustate->cycles;
 	cpustate->base_cycles = cycles;
 	CHANGE_PC(cpustate,cpustate->eip);
 
 	if (cpustate->halted)
 	{
 		cpustate->tsc += cycles;
-		return cycles;
+		cpustate->cycles = 0;
+		return;
 	}
 
 	while( cpustate->cycles > 0 )
@@ -741,8 +742,6 @@ static CPU_EXECUTE( i386 )
 		I386OP(decode_opcode)(cpustate);
 	}
 	cpustate->tsc += (cycles - cpustate->cycles);
-
-	return cycles - cpustate->cycles;
 }
 
 /*************************************************************************/

@@ -339,8 +339,6 @@ static CPU_EXECUTE( mb88 )
 {
 	mb88_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	while (cpustate->icount > 0)
 	{
 		UINT8 opcode, arg, oc;
@@ -857,8 +855,6 @@ static CPU_EXECUTE( mb88 )
 		/* update interrupts, serial and timer flags */
 		update_pio(cpustate, oc);
 	}
-
-	return cycles - cpustate->icount;
 }
 
 /***************************************************************************

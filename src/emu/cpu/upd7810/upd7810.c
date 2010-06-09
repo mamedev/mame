@@ -1885,7 +1885,6 @@ static CPU_EXIT( upd7810 )
 static CPU_EXECUTE( upd7810 )
 {
 	upd7810_state *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 	do
 	{
@@ -1961,8 +1960,6 @@ static CPU_EXECUTE( upd7810 )
 		upd7810_take_irq(cpustate);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static void set_irq_line(upd7810_state *cpustate, int irqline, int state)

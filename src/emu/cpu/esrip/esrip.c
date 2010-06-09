@@ -1666,8 +1666,6 @@ static CPU_EXECUTE( esrip )
 	int calldebugger = (device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0;
 	UINT8 status;
 
-	cpustate->icount = cycles;
-
 	/* I think we can get away with placing this outside of the loop */
 	status = cpustate->status_in(device->machine);
 
@@ -1860,8 +1858,6 @@ static CPU_EXECUTE( esrip )
 
 		cpustate->icount--;
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

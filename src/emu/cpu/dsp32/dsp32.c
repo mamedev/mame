@@ -415,10 +415,10 @@ static CPU_EXECUTE( dsp32c )
 
 	/* skip if halted */
 	if ((cpustate->pcr & PCR_RESET) == 0)
-		return cycles;
-
-	/* count cycles and interrupt cycles */
-	cpustate->icount = cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	/* update buffered accumulator values */
 	cpustate->abufcycle[0] += cpustate->icount;
@@ -437,8 +437,6 @@ static CPU_EXECUTE( dsp32c )
 	cpustate->abufcycle[1] -= cpustate->icount;
 	cpustate->abufcycle[2] -= cpustate->icount;
 	cpustate->abufcycle[3] -= cpustate->icount;
-
-	return cycles - cpustate->icount;
 }
 
 

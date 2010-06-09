@@ -687,8 +687,6 @@ static CPU_EXECUTE( z8 )
 {
 	z8_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 opcode;
@@ -709,8 +707,6 @@ static CPU_EXECUTE( z8 )
 		cpustate->icount -= cycles;
 	}
 	while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 /***************************************************************************

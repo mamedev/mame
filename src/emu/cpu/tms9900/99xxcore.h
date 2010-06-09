@@ -1404,7 +1404,6 @@ INLINE UINT16 fetch(tms99xx_state *cpustate)
 static CPU_EXECUTE( tms99xx )
 {
 	tms99xx_state *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 	cpustate->lds_flag = 0;
 	cpustate->ldd_flag = 0;
@@ -1541,8 +1540,6 @@ static CPU_EXECUTE( tms99xx )
 		}
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 #if (TMS99XX_MODEL == TI990_10_ID)

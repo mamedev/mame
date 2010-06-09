@@ -502,8 +502,6 @@ static CPU_EXECUTE( cquestsnd )
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
 	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
-	cpustate->icount = cycles;
-
 	/* Core execution loop */
 	do
 	{
@@ -697,8 +695,6 @@ static CPU_EXECUTE( cquestsnd )
 
 		cpustate->icount--;
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -766,8 +762,6 @@ static CPU_EXECUTE( cquestrot )
 	cquestrot_state *cpustate = get_safe_token_rot(device);
 	cquestlin_state *lincpustate = get_safe_token_lin(cpustate->lindevice);
 	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
-
-	cpustate->icount = cycles;
 
 	/* Core execution loop */
 	do
@@ -1081,8 +1075,6 @@ static CPU_EXECUTE( cquestrot )
 		cpustate->clkcnt++;
 		cpustate->icount--;
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -1197,8 +1189,6 @@ static CPU_EXECUTE( cquestlin )
 		stack_ram = cpustate->e_stack;
 		ptr_ram = &cpustate->ptr_ram[0x100];
 	}
-
-	cpustate->icount = cycles;
 
 	/* Core execution loop */
 	do
@@ -1550,8 +1540,6 @@ static CPU_EXECUTE( cquestlin )
 		cpustate->icount--;
 		cpustate->clkcnt++;
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

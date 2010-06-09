@@ -834,8 +834,6 @@ static CPU_EXECUTE( apexc )
 {
 	apexc_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		debugger_instruction_hook(device, cpustate->pc);
@@ -847,8 +845,6 @@ static CPU_EXECUTE( apexc )
 			DELAY(cpustate->icount);	/* burn cycles once for all */
 		}
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static CPU_SET_INFO( apexc )

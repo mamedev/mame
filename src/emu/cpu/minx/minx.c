@@ -174,8 +174,6 @@ static CPU_EXECUTE( minx )
 	UINT8	op;
 	minx_state *minx = get_safe_token(device);
 
-	minx->icount = cycles;
-
 	do
 	{
 		debugger_instruction_hook(device, GET_MINX_PC);
@@ -210,7 +208,6 @@ static CPU_EXECUTE( minx )
 			minx->icount -= insnminx_cycles[op];
 		}
 	} while ( minx->icount > 0 );
-	return cycles - minx->icount;
 }
 
 

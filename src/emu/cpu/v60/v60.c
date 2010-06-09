@@ -441,7 +441,6 @@ static CPU_EXECUTE( v60 )
 {
 	v60_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
 	if (cpustate->irq_line != CLEAR_LINE)
 		v60_try_irq(cpustate);
 
@@ -456,8 +455,6 @@ static CPU_EXECUTE( v60 )
 		if (cpustate->irq_line != CLEAR_LINE)
 			v60_try_irq(cpustate);
 	}
-
-	return cycles - cpustate->icount;
 }
 
 

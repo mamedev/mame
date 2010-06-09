@@ -670,14 +670,13 @@ static void check_interrupts(SHARC_REGS *cpustate)
 static CPU_EXECUTE( sharc )
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 	if (cpustate->idle && cpustate->irq_active == 0)
 	{
 		// handle pending DMA transfers
 		if (cpustate->dmaop_cycles > 0)
 		{
-			cpustate->dmaop_cycles -= cycles;
+			cpustate->dmaop_cycles -= cpustate->icount;
 			if (cpustate->dmaop_cycles <= 0)
 			{
 				cpustate->dmaop_cycles = 0;
@@ -691,8 +690,6 @@ static CPU_EXECUTE( sharc )
 
 		cpustate->icount = 0;
 		debugger_instruction_hook(device, cpustate->daddr);
-
-		return cycles;
 	}
 	if (cpustate->irq_active != 0)
 	{
@@ -838,8 +835,6 @@ static CPU_EXECUTE( sharc )
 
 		--cpustate->icount;
 	};
-
-	return cycles - cpustate->icount;
 }
 
 /**************************************************************************

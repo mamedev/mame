@@ -45,7 +45,6 @@
     UINT32 insn;
     arm_state *cpustate = get_safe_token(device);
 
-    ARM7_ICOUNT = cycles;
     do
     {
         debugger_instruction_hook(cpustate->device, R15);
@@ -1603,6 +1602,4 @@
         /* All instructions remove 3 cycles.. Others taking less / more will have adjusted this # prior to here */
         ARM7_ICOUNT -= 3;
     } while (ARM7_ICOUNT > 0);
-
-    return cycles - ARM7_ICOUNT;
 }

@@ -638,7 +638,7 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 {
 	m68_state_t *m68_state = get_safe_token(device);
 
-	m68_state->icount = cycles - m68_state->extra_cycles;
+	m68_state->icount -= m68_state->extra_cycles;
 	m68_state->extra_cycles = 0;
 
 	check_irq_lines(m68_state);
@@ -929,8 +929,6 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 		m68_state->icount -= m68_state->extra_cycles;
 		m68_state->extra_cycles = 0;
 	}
-
-	return cycles - m68_state->icount;	 /* NS 970908 */
 }
 
 INLINE void fetch_effective_address( m68_state_t *m68_state )

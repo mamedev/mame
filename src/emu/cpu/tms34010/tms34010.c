@@ -782,7 +782,10 @@ static CPU_EXECUTE( tms34010 )
 
 	/* Get out if CPU is halted. Absolutely no interrupts must be taken!!! */
 	if (IOREG(tms, REG_HSTCTLH) & 0x8000)
-		return cycles;
+	{
+		tms->icount = 0;
+		return;
+	}
 
 	/* if the CPU's reset was deferred, do it now */
 	if (tms->reset_deferred)
@@ -790,9 +793,6 @@ static CPU_EXECUTE( tms34010 )
 		tms->reset_deferred = 0;
 		tms->pc = RLONG(tms, 0xffffffe0);
 	}
-
-	/* execute starting now */
-	tms->icount = cycles;
 
 	/* check interrupts first */
 	tms->executing = TRUE;
@@ -819,8 +819,6 @@ static CPU_EXECUTE( tms34010 )
 		} while (tms->icount > 0);
 	}
 	tms->executing = FALSE;
-
-	return cycles - tms->icount;
 }
 
 

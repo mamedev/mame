@@ -170,8 +170,6 @@ static CPU_EXECUTE( saturn )
 {
 	saturn_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		cpustate->oldpc = cpustate->pc;
@@ -194,8 +192,6 @@ static CPU_EXECUTE( saturn )
 		}
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

@@ -941,8 +941,6 @@ static CPU_EXECUTE( mb86233 )
 {
 	mb86233_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	while( cpustate->icount > 0 )
 	{
 		UINT32		val;
@@ -1555,8 +1553,6 @@ static CPU_EXECUTE( mb86233 )
 			cpustate->icount = 0;
 		}
 	}
-
-	return cycles - cpustate->icount;
 }
 
 /***************************************************************************

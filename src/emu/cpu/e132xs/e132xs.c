@@ -4659,8 +4659,6 @@ static CPU_EXECUTE( hyperstone )
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	if (cpustate->intblock < 0)
 		cpustate->intblock = 0;
 	check_interrupts(cpustate);
@@ -4695,8 +4693,6 @@ static CPU_EXECUTE( hyperstone )
 			check_interrupts(cpustate);
 
 	} while( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 }
 
 

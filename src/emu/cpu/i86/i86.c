@@ -283,14 +283,16 @@ static CPU_EXECUTE( i8086 )
 
 
 	if (cpustate->halted)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 8086)
 		timing = i8086_cycles;
 
 	/* adjust for any interrupts that came in */
-	cpustate->icount = cycles;
 	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
 
@@ -310,8 +312,6 @@ static CPU_EXECUTE( i8086 )
 	/* adjust for any interrupts that came in */
 	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -345,7 +345,6 @@ static CPU_EXECUTE( i80186 )
 		timing = i80186_cycles;
 
 	/* adjust for any interrupts that came in */
-	cpustate->icount = cycles;
 	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
 
@@ -364,8 +363,6 @@ static CPU_EXECUTE( i80186 )
 	/* adjust for any interrupts that came in */
 	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
-
-	return cycles - cpustate->icount;
 }
 
 

@@ -473,7 +473,6 @@ static CPU_EXECUTE( konami )
 {
 	konami_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
 	check_irq_lines(cpustate);
 
 	if( cpustate->int_state & (KONAMI_CWAI | KONAMI_SYNC) )
@@ -499,8 +498,6 @@ static CPU_EXECUTE( konami )
 
         } while( cpustate->icount > 0 );
     }
-
-	return cycles - cpustate->icount;
 }
 
 

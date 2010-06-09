@@ -1639,7 +1639,6 @@ INLINE void handle_cop2(UINT32 op)
 CPU_EXECUTE( mips3 )
 {
 	/* count cycles and interrupt cycles */
-	mips3.core.icount = cycles;
 	mips3.core.icount -= mips3.interrupt_cycles;
 	mips3.interrupt_cycles = 0;
 
@@ -1929,7 +1928,6 @@ CPU_EXECUTE( mips3 )
 
 	mips3.core.icount -= mips3.interrupt_cycles;
 	mips3.interrupt_cycles = 0;
-	return cycles - mips3.core.icount;
 }
 
 

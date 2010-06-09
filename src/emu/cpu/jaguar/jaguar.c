@@ -482,7 +482,8 @@ static CPU_EXECUTE( jaguargpu )
 	if (!(jaguar->ctrl[G_CTRL] & 1))
 	{
 		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
-		return cycles;
+		jaguar->icount = 0;
+		return;
 	}
 
 	/* check for IRQs */
@@ -490,7 +491,6 @@ static CPU_EXECUTE( jaguargpu )
 
 	/* count cycles and interrupt cycles */
 	jaguar->bankswitch_icount = -1000;
-	jaguar->icount = cycles;
 
 	/* core execution loop */
 	do
@@ -511,8 +511,6 @@ static CPU_EXECUTE( jaguargpu )
 		jaguar->icount--;
 
 	} while (jaguar->icount > 0 || jaguar->icount == jaguar->bankswitch_icount);
-
-	return cycles - jaguar->icount;
 }
 
 static CPU_EXECUTE( jaguardsp )
@@ -523,7 +521,8 @@ static CPU_EXECUTE( jaguardsp )
 	if (!(jaguar->ctrl[G_CTRL] & 1))
 	{
 		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
-		return cycles;
+		jaguar->icount = 0;
+		return;
 	}
 
 	/* check for IRQs */
@@ -531,7 +530,6 @@ static CPU_EXECUTE( jaguardsp )
 
 	/* count cycles and interrupt cycles */
 	jaguar->bankswitch_icount = -1000;
-	jaguar->icount = cycles;
 
 	/* core execution loop */
 	do
@@ -552,8 +550,6 @@ static CPU_EXECUTE( jaguardsp )
 		jaguar->icount--;
 
 	} while (jaguar->icount > 0 || jaguar->icount == jaguar->bankswitch_icount);
-
-	return cycles - jaguar->icount;
 }
 
 

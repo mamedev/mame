@@ -475,8 +475,6 @@ static CPU_EXECUTE( scmp )
 {
 	scmp_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		if ((cpustate->SR & 0x08) && (devcb_call_read_line(&cpustate->sensea_func))) {
@@ -486,8 +484,6 @@ static CPU_EXECUTE( scmp )
 		execute_one(cpustate, ROP(cpustate));
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 /***************************************************************************

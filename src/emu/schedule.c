@@ -177,15 +177,17 @@ void device_scheduler::timeslice()
 						m_executing_device = exec;
 						*exec->m_icount = exec->m_cycles_running;
 						if (!call_debugger)
-							ran = exec->execute_run(exec->m_cycles_running);
+							exec->execute_run();
 						else
 						{
 							debugger_start_cpu_hook(&exec->device(), target);
-							ran = exec->execute_run(exec->m_cycles_running);
+							exec->execute_run();
 							debugger_stop_cpu_hook(&exec->device());
 						}
 
 						// adjust for any cycles we took back
+						assert(ran >= *exec->m_icount);
+						ran -= *exec->m_icount;
 						assert(ran >= exec->m_cycles_stolen);
 						ran -= exec->m_cycles_stolen;
 						profiler_mark_end();

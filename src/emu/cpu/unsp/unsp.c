@@ -176,8 +176,6 @@ static CPU_EXECUTE( unsp )
     UINT16 r0, r1;
 	lres = 0;
 
-    unsp->icount = cycles;
-
     while (unsp->icount > 0)
     {
         debugger_instruction_hook(device, UNSP_LPC<<1);
@@ -748,8 +746,6 @@ static CPU_EXECUTE( unsp )
 		unsp->icount -= 5;
 		unsp->icount = MAX(unsp->icount, 0);
     }
-
-    return cycles - unsp->icount;
 }
 
 

@@ -3328,10 +3328,12 @@ static CPU_RESET( sh4 )
 static CPU_EXECUTE( sh4 )
 {
 	SH4 *sh4 = get_safe_token(device);
-	sh4->sh4_icount = cycles;
 
 	if (sh4->cpu_off)
-		return 0;
+	{
+		sh4->sh4_icount = 0;
+		return;
+	}
 
 	do
 	{
@@ -3377,8 +3379,6 @@ static CPU_EXECUTE( sh4 )
 		}
 		sh4->sh4_icount--;
 	} while( sh4->sh4_icount > 0 );
-
-	return cycles - sh4->sh4_icount;
 }
 
 static CPU_INIT( sh4 )

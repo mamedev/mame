@@ -172,8 +172,6 @@ static CPU_EXECUTE( ssem )
     ssem_state *cpustate = get_safe_token(device);
     UINT32 op;
 
-    cpustate->icount = cycles;
-
     cpustate->pc &= 0x1f;
 
     while (cpustate->icount > 0)
@@ -232,8 +230,6 @@ static CPU_EXECUTE( ssem )
 
         --cpustate->icount;
     }
-
-    return cycles - cpustate->icount;
 }
 
 

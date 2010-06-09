@@ -1757,7 +1757,6 @@ static CPU_EXECUTE( se3208 )
 {
 	se3208_state_t *se3208_state = get_safe_token(device);
 
-	se3208_state->icount=cycles;
 	do
 	{
 		UINT16 Opcode=memory_decrypted_read_word(se3208_state->program, WORD_XOR_LE(se3208_state->PC));
@@ -1779,8 +1778,6 @@ static CPU_EXECUTE( se3208 )
 		}
 		--(se3208_state->icount);
 	} while(se3208_state->icount>0);
-
-	return cycles-se3208_state->icount;
 }
 
 static CPU_INIT( se3208 )

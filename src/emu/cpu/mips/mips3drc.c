@@ -520,7 +520,6 @@ static CPU_EXECUTE( mips3 )
 	mips3->impstate->cache_dirty = FALSE;
 
 	/* execute */
-	mips3->icount = cycles;
 	do
 	{
 		/* run as much as we can */
@@ -535,9 +534,6 @@ static CPU_EXECUTE( mips3 )
 			code_flush_cache(mips3);
 
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
-
-	/* return the number of cycles executed */
-	return cycles - mips3->icount;
 }
 
 

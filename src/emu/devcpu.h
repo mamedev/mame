@@ -207,7 +207,7 @@ enum
 #define CPU_EXIT_CALL(name)				CPU_EXIT_NAME(name)(device)
 
 #define CPU_EXECUTE_NAME(name)			cpu_execute_##name
-#define CPU_EXECUTE(name)				int CPU_EXECUTE_NAME(name)(cpu_device *device, int cycles)
+#define CPU_EXECUTE(name)				void CPU_EXECUTE_NAME(name)(cpu_device *device)
 #define CPU_EXECUTE_CALL(name)			CPU_EXECUTE_NAME(name)(device, cycles)
 
 #define CPU_BURN_NAME(name)				cpu_burn_##name
@@ -333,7 +333,7 @@ typedef void (*cpu_set_info_func)(cpu_device *device, UINT32 state, cpuinfo *inf
 typedef void (*cpu_init_func)(cpu_device *device, device_irq_callback irqcallback);
 typedef void (*cpu_reset_func)(cpu_device *device);
 typedef void (*cpu_exit_func)(cpu_device *device);
-typedef int	(*cpu_execute_func)(cpu_device *device, int cycles);
+typedef void (*cpu_execute_func)(cpu_device *device);
 typedef void (*cpu_burn_func)(cpu_device *device, int cycles);
 typedef int	(*cpu_translate_func)(cpu_device *device, int space, int intention, offs_t *address);
 typedef int	(*cpu_read_func)(cpu_device *device, int space, UINT32 offset, int size, UINT64 *value);
@@ -486,7 +486,7 @@ protected:
 	virtual void device_debug_setup();
 	
 	// device_execute_interface overrides
-	virtual INT32 execute_run(INT32 cycles);
+	virtual void execute_run();
 	virtual void execute_burn(INT32 cycles);
 	virtual void execute_set_input(int inputnum, int state) { set_legacy_runtime_int(CPUINFO_INT_INPUT_STATE + inputnum, state); }
 	

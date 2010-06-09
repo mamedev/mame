@@ -150,7 +150,6 @@ static CPU_RESET( ppc403 )
 static CPU_EXECUTE( ppc403 )
 {
 	UINT32 fit_trigger_cycle;
-	ppc_icount = cycles;
 	ppc_tb_base_icount = cycles;
 
 	fit_trigger_cycle = 0x7fffffff;
@@ -244,8 +243,6 @@ static CPU_EXECUTE( ppc403 )
 
 	// update timebase
 	ppc.tb += (ppc_tb_base_icount - ppc_icount);
-
-	return cycles - ppc_icount;
 }
 
 void ppc403_exception(int exception)

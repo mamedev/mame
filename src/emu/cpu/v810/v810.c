@@ -1026,7 +1026,6 @@ static CPU_EXECUTE( v810 )
 {
 	v810_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
 	while(cpustate->icount>0)
 	{
 		UINT32 op;
@@ -1037,7 +1036,6 @@ static CPU_EXECUTE( v810 )
 		cpustate->PC+=2;
 		cpustate->icount-= OpCodeTable[op>>10](cpustate,op);
 	}
-	return cycles-cpustate->icount;
 }
 
 

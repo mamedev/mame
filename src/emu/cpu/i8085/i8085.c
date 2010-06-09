@@ -914,8 +914,6 @@ static CPU_EXECUTE( i808x )
 {
 	i8085_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	/* check for TRAPs before diving in (can't do others because of after_ei) */
 	if (cpustate->trap_pending || cpustate->after_ei == 0)
 		check_for_interrupts(cpustate);
@@ -933,8 +931,6 @@ static CPU_EXECUTE( i808x )
 		execute_one(cpustate, ROP(cpustate));
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

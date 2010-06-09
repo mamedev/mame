@@ -812,8 +812,6 @@ static CPU_EXECUTE( superfx )
 	superfx_state *cpustate = get_safe_token(device);
 	UINT8 op;
 
-	cpustate->icount = cycles;
-
 	if(!(cpustate->sfr & SUPERFX_SFR_G))
 	{
 		superfx_add_clocks_internal(cpustate, 6);
@@ -1485,8 +1483,6 @@ static CPU_EXECUTE( superfx )
 
 		--cpustate->icount;
 	}
-
-	return cycles - cpustate->icount;
 }
 
 /*****************************************************************************/

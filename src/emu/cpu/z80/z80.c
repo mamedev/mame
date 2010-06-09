@@ -3570,8 +3570,6 @@ static CPU_EXECUTE( z80 )
 {
 	z80_state *z80 = get_safe_token(device);
 
-	z80->icount = cycles;
-
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
 	/* to just check here */
@@ -3601,15 +3599,11 @@ static CPU_EXECUTE( z80 )
 		z80->r++;
 		EXEC_INLINE(z80,op,ROP(z80));
 	} while (z80->icount > 0);
-
-	return cycles - z80->icount;
 }
 
  static CPU_EXECUTE( nsc800 )
 {
 	z80_state *z80 = get_safe_token(device);
-
-	z80->icount = cycles;
 
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
@@ -3647,8 +3641,6 @@ static CPU_EXECUTE( z80 )
 		z80->r++;
 		EXEC_INLINE(z80,op,ROP(z80));
 	} while (z80->icount > 0);
-
-	return cycles - z80->icount;
 }
 
 /****************************************************************************

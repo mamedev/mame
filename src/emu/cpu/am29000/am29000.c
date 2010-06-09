@@ -386,7 +386,6 @@ static CPU_EXECUTE( am29000 )
 {
 	am29000_state *am29000 = get_safe_token(device);
 	UINT32 call_debugger = (device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0;
-	am29000->icount = cycles;
 
 	external_irq_check(am29000);
 
@@ -448,8 +447,6 @@ static CPU_EXECUTE( am29000 )
 		am29000->exec_pc = am29000->pc;
 		am29000->pc = am29000->next_pc;
 	} while (--am29000->icount > 0);
-
-	return cycles - am29000->icount;
 }
 
 static void set_irq_line(am29000_state *am29000, int line, int state)

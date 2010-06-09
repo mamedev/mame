@@ -855,7 +855,6 @@ static int Ext_IRQ(tms32010_state *cpustate)
 static CPU_EXECUTE( tms32010 )
 {
 	tms32010_state *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 	do
 	{
@@ -881,8 +880,6 @@ static CPU_EXECUTE( tms32010 )
 			(*opcode_7F[(cpustate->opcode.b.l & 0x1f)].function)(cpustate);
 		}
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

@@ -2543,8 +2543,6 @@ static CPU_EXECUTE( rsp )
 	rsp_state *rsp = get_safe_token(device);
 	UINT32 op;
 
-	rsp->icount = cycles;
-
 	rsp->pc = 0x4001000 | (rsp->pc & 0xfff);
 
 	if( rsp->sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
@@ -2806,8 +2804,6 @@ static CPU_EXECUTE( rsp )
 		}
 
 	}
-
-	return cycles - rsp->icount;
 }
 
 

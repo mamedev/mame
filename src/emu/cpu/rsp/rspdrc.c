@@ -7120,7 +7120,6 @@ static CPU_EXECUTE( rsp )
 	rsp->impstate->cache_dirty = FALSE;
 
 	/* execute */
-	rsp->icount = cycles;
 	do
 	{
 		if( rsp->sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
@@ -7146,9 +7145,6 @@ static CPU_EXECUTE( rsp )
 			code_flush_cache(rsp);
 		}
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
-
-	/* return the number of cycles executed */
-	return cycles - rsp->icount;
 }
 
 /***************************************************************************

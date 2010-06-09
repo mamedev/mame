@@ -465,12 +465,14 @@ static CPU_EXECUTE( tms32031 )
 	tms32031_state *tms = get_safe_token(device);
 
 	/* check IRQs up front */
-	tms->icount = cycles;
 	check_irqs(tms);
 
 	/* if we're idling, just eat the cycles */
 	if (tms->is_idling)
-		return tms->icount;
+	{
+		tms->icount = 0;
+		return;
+	}
 
 	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
@@ -529,8 +531,6 @@ static CPU_EXECUTE( tms32031 )
 			execute_one(tms);
 		}
 	}
-
-	return cycles - tms->icount;
 }
 
 

@@ -1255,7 +1255,6 @@ static CPU_EXECUTE( m6800 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
-	cpustate->icount = cycles;
 
 	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 
@@ -1277,8 +1276,6 @@ static CPU_EXECUTE( m6800 )
 			increment_counter(cpustate, cycles_6800[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	return cycles - cpustate->icount;
 }
 
 /****************************************************************************
@@ -1620,7 +1617,6 @@ static CPU_EXECUTE( m6803 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
-	cpustate->icount = cycles;
 
 	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 
@@ -1642,8 +1638,6 @@ static CPU_EXECUTE( m6803 )
 			increment_counter(cpustate, cycles_6803[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -1974,7 +1968,6 @@ static CPU_EXECUTE( hd63701 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
-	cpustate->icount = cycles;
 
 	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 
@@ -1996,8 +1989,6 @@ static CPU_EXECUTE( hd63701 )
 			increment_counter(cpustate, cycles_63701[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	return cycles - cpustate->icount;
 }
 
 /*
@@ -2320,7 +2311,6 @@ static CPU_EXECUTE( nsc8105 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
-	cpustate->icount = cycles;
 
 	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 
@@ -2342,8 +2332,6 @@ static CPU_EXECUTE( nsc8105 )
 			increment_counter(cpustate, cycles_nsc8105[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	return cycles - cpustate->icount;
 }
 
 

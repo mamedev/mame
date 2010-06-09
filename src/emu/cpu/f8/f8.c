@@ -1586,7 +1586,6 @@ static CPU_RESET( f8 )
 static CPU_EXECUTE( f8 )
 {
     f8_Regs *cpustate = get_safe_token(device);
-    cpustate->icount = cycles;
 
     do
     {
@@ -1890,8 +1889,6 @@ static CPU_EXECUTE( f8 )
 	}
 
     } while( cpustate->icount > 0 );
-
-    return cycles - cpustate->icount;
 }
 
 CPU_DISASSEMBLE( f8 );

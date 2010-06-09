@@ -338,8 +338,6 @@ static CPU_EXECUTE( tms )
 {
 	tms32051_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	while(cpustate->icount > 0)
 	{
 		UINT16 ppc;
@@ -396,7 +394,6 @@ static CPU_EXECUTE( tms )
 			}
 		}
 	}
-	return cycles - cpustate->icount;
 }
 
 

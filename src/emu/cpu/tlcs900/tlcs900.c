@@ -858,8 +858,6 @@ static CPU_EXECUTE( tlcs900 )
 {
 	tlcs900_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		const tlcs900inst *inst;
@@ -897,8 +895,6 @@ static CPU_EXECUTE( tlcs900 )
 
 		cpustate->icount -= cpustate->cycles;
 	} while ( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 }
 
 

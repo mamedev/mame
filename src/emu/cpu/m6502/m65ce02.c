@@ -169,8 +169,6 @@ static CPU_EXECUTE( m65ce02 )
 {
 	m65ce02_Regs *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 op;
@@ -205,8 +203,6 @@ static CPU_EXECUTE( m65ce02 )
 			m65ce02_take_irq(cpustate);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static void m65ce02_set_irq_line(m65ce02_Regs *cpustate, int irqline, int state)

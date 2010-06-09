@@ -196,9 +196,10 @@ static CPU_EXECUTE( ccpu )
 	ccpu_state *cpustate = get_safe_token(device);
 
 	if (cpustate->waiting)
-		return cycles;
-
-	cpustate->icount = cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	do
 	{
@@ -683,8 +684,6 @@ static CPU_EXECUTE( ccpu )
 				break;
 		}
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

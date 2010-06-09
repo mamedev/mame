@@ -693,7 +693,6 @@ static CPU_EXECUTE( r3000 )
 	r3000_state *r3000 = get_safe_token(device);
 
 	/* count cycles and interrupt cycles */
-	r3000->icount = cycles;
 	r3000->icount -= r3000->interrupt_cycles;
 	r3000->interrupt_cycles = 0;
 
@@ -881,7 +880,6 @@ static CPU_EXECUTE( r3000 )
 
 	r3000->icount -= r3000->interrupt_cycles;
 	r3000->interrupt_cycles = 0;
-	return cycles - r3000->icount;
 }
 
 

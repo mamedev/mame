@@ -513,8 +513,6 @@ static CPU_EXECUTE(mn10200)
 {
 	mn102_info *mn102 = get_safe_token(device);
 
-	mn102->cycles = cycles;
-
 	while(mn102->cycles > 0)
 	{
 		UINT8 opcode;
@@ -1818,8 +1816,6 @@ static CPU_EXECUTE(mn10200)
 			break;
 		}
 	}
-
-	return cycles - mn102->cycles;
 }
 
 static const char *const inames[10][4] = {

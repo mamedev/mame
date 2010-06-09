@@ -1008,8 +1008,6 @@ static CPU_EXECUTE( pic16c62x )
 
 	update_internalram_ptr(cpustate);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		if (PD == 0)						/* Sleep Mode */
@@ -1064,8 +1062,6 @@ static CPU_EXECUTE( pic16c62x )
 		cpustate->icount -= cpustate->inst_cycles;
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

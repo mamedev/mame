@@ -222,8 +222,6 @@ static CPU_EXECUTE( avr8 )
     //UINT16 pr = 0;
     avr8_state *cpustate = get_safe_token(device);
 
-    cpustate->icount = cycles;
-
     while (cpustate->icount > 0)
     {
         cpustate->pc &= 0x0fff;
@@ -991,8 +989,6 @@ static CPU_EXECUTE( avr8 )
 
         cpustate->icount -= opcycles;
     }
-
-    return cycles - cpustate->icount;
 }
 
 /*****************************************************************************/

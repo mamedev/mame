@@ -829,8 +829,6 @@ static CPU_EXECUTE( cdp1802 )
 {
 	cdp1802_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	cpustate->prevmode = cpustate->mode;
 	cpustate->mode = cpustate->intf->mode_r(device);
 
@@ -899,8 +897,6 @@ static CPU_EXECUTE( cdp1802 )
 		cdp1802_output_state_code(device);
 	}
 	while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static CPU_RESET( cdp1802 )

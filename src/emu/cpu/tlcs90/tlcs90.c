@@ -1351,7 +1351,7 @@ static CPU_EXECUTE( t90 )
 	unsigned a32;
 	PAIR tmp;
 
-	cpustate->icount = cycles - cpustate->extra_cycles;
+	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
 
 	do
@@ -1981,8 +1981,6 @@ static CPU_EXECUTE( t90 )
 
 	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
-
-	return cycles - cpustate->icount;
 }
 
 static CPU_RESET( t90 )

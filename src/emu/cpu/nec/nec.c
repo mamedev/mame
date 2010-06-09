@@ -1191,8 +1191,6 @@ static CPU_EXECUTE( necv )
 	nec_state_t *nec_state = get_safe_token(device);
 	int prev_ICount;
 
-	nec_state->icount=cycles;
-
 	while(nec_state->icount>0) {
 		/* Dispatch IRQ */
 		if (nec_state->pending_irq && nec_state->no_interrupt==0)
@@ -1212,7 +1210,6 @@ static CPU_EXECUTE( necv )
 		nec_instruction[fetchop(nec_state)](nec_state);
 		do_prefetch(nec_state, prev_ICount);
     }
-	return cycles - nec_state->icount;
 }
 
 /* Wrappers for the different CPU types */

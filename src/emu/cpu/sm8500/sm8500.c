@@ -231,8 +231,6 @@ static CPU_EXECUTE( sm8500 )
 	UINT16 oldpc;
 	int	mycycles;
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8	r1,r2;
@@ -261,8 +259,6 @@ static CPU_EXECUTE( sm8500 )
 		}
 		cpustate->icount -= mycycles;
 	} while ( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 }
 
 static CPU_BURN( sm8500 )

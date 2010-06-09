@@ -520,7 +520,6 @@ static CPU_EXECUTE( asap )
 	asap_state *asap = get_safe_token(device);
 
 	/* check for IRQs */
-	asap->icount = cycles;
 	check_irqs(asap);
 
 	/* core execution loop */
@@ -572,7 +571,6 @@ static CPU_EXECUTE( asap )
 
 		} while (asap->icount > 0);
 	}
-	return cycles - asap->icount;
 }
 
 

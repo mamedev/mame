@@ -729,17 +729,18 @@ static CPU_EXIT( alpha8201 )
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
 
-static int alpha8xxx_execute(running_device *device,const s_opcode *op_map,int cycles)
+static void alpha8xxx_execute(running_device *device,const s_opcode *op_map)
 {
 	alpha8201_state *cpustate = get_safe_token(device);
 	unsigned opcode;
 	UINT8 pcptr;
 
-	cpustate->icount = cycles;
-
 #if HANDLE_HALT_LINE
 	if(cpustate->halt)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 #endif
 
 	/* setup address bank & fall safe */
@@ -806,13 +807,11 @@ mame_printf_debug("alpha8201:  cpustate->PC = %03x,  opcode = %02x\n", cpustate-
 		(*(op_map[opcode].function))(cpustate);
 		cpustate->icount -= cpustate->inst_cycles;
 	} while (cpustate->icount>0);
-
-	return cycles - cpustate->icount;
 }
 
-static CPU_EXECUTE( alpha8201 ) { return alpha8xxx_execute(device,opcode_8201,cycles); }
+static CPU_EXECUTE( alpha8201 ) { alpha8xxx_execute(device,opcode_8201); }
 
-static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(device,opcode_8301,cycles); }
+static CPU_EXECUTE( ALPHA8301 ) { alpha8xxx_execute(device,opcode_8301); }
 
 /****************************************************************************
  * Set IRQ line state

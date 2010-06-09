@@ -165,8 +165,6 @@ static CPU_EXECUTE( tx0_64kw )
 {
 	tx0_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		debugger_instruction_hook(device, PC);
@@ -266,16 +264,12 @@ static CPU_EXECUTE( tx0_64kw )
 		}
 	}
 	while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( tx0_8kw )
 {
 	tx0_state *cpustate = get_safe_token(device);
-
-	cpustate->icount = cycles;
 
 	do
 	{
@@ -376,8 +370,6 @@ static CPU_EXECUTE( tx0_8kw )
 		}
 	}
 	while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 

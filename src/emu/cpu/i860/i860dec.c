@@ -4448,11 +4448,13 @@ static CPU_EXECUTE( i860 )
 	if (cpustate->pin_reset)
 		reset_i860 (cpustate);
 	if (cpustate->pin_bus_hold)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	cpustate->exiting_readmem = 0;
 	cpustate->exiting_ifetch = 0;
-	cpustate->icount = cycles;
 
 	/* Decode and execute loop.  */
 	while (cpustate->icount > 0)
@@ -4522,8 +4524,6 @@ static CPU_EXECUTE( i860 )
 		/*if (cpustate->single_stepping)
             debugger (cpustate); */
 	}
-
-	return cycles - cpustate->icount;
 }
 /*=================================================================*/
 

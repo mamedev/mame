@@ -1928,8 +1928,6 @@ static CPU_EXECUTE( mcs51 )
 
 	update_ptrs(mcs51_state);
 
-	mcs51_state->icount = cycles;
-
 	/* external interrupts may have been set since we last checked */
 	mcs51_state->inst_cycles = 0;
 	check_irqs(mcs51_state);
@@ -1938,7 +1936,7 @@ static CPU_EXECUTE( mcs51 )
 	if ((mcs51_state->features & FEATURE_CMOS) && GET_PD)
 	{
 		mcs51_state->icount = 0;
-		return cycles;
+		return;
 	}
 
 	mcs51_state->icount -= mcs51_state->inst_cycles;
@@ -1952,7 +1950,7 @@ static CPU_EXECUTE( mcs51 )
 			mcs51_state->icount--;
 			burn_cycles(mcs51_state, 1);
 		} while( mcs51_state->icount > 0 );
-		return cycles - mcs51_state->icount;
+		return;
 	}
 
 	do
@@ -1971,7 +1969,7 @@ static CPU_EXECUTE( mcs51 )
 
 		/* if in powerdown, just return */
 		if ((mcs51_state->features & FEATURE_CMOS) && GET_PD)
-			return cycles - mcs51_state->icount;
+			return;
 
 		burn_cycles(mcs51_state, mcs51_state->inst_cycles);
 
@@ -1981,11 +1979,9 @@ static CPU_EXECUTE( mcs51 )
 
 		/* If the chip entered in idle mode, end the loop */
 		if ((mcs51_state->features & FEATURE_CMOS) && GET_IDL)
-			return cycles - mcs51_state->icount;
+			return;
 
 	} while( mcs51_state->icount > 0 );
-
-	return cycles - mcs51_state->icount;
 }
 
 

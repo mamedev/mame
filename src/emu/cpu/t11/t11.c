@@ -345,7 +345,6 @@ static CPU_EXECUTE( t11 )
 {
 	t11_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
 	t11_check_irqs(cpustate);
 
 	if (cpustate->wait_state)
@@ -368,8 +367,7 @@ static CPU_EXECUTE( t11 )
 	} while (cpustate->icount > 0);
 
 getout:
-
-	return cycles - cpustate->icount;
+	;
 }
 
 

@@ -2176,8 +2176,6 @@ static CPU_EXECUTE( cp1610 )
 	cp1610_state *cpustate = get_safe_token(device);
 	UINT16 opcode;
 
-	cpustate->icount = cycles;
-
     do
     {
         debugger_instruction_hook(device, cpustate->r[7]);
@@ -3381,8 +3379,6 @@ static CPU_EXECUTE( cp1610 )
 		}
 
 	} while( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 }
 
 static CPU_INIT( cp1610 )

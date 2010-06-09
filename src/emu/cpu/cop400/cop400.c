@@ -1128,8 +1128,6 @@ static CPU_EXECUTE( cop400 )
 
 	UINT8 opcode;
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		cpustate->prevpc = PC;
@@ -1231,8 +1229,6 @@ static CPU_EXECUTE( cop400 )
 			}
 		}
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 /***************************************************************************

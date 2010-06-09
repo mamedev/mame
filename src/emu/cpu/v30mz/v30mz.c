@@ -969,8 +969,6 @@ static CPU_EXECUTE( v30mz )
 {
 	v30mz_state *cpustate = get_safe_token(device);
 
-	cpustate->icount=cycles;
-
 	while(cpustate->icount>0) {
 		/* Dispatch IRQ */
 		if (cpustate->pending_irq && cpustate->no_interrupt==0)
@@ -988,8 +986,6 @@ static CPU_EXECUTE( v30mz )
 		debugger_instruction_hook(device, (cpustate->sregs[CS]<<4) + cpustate->ip);
 		nec_instruction[FETCHOP](cpustate);
 	}
-
-	return cycles - cpustate->icount;
 }
 
 

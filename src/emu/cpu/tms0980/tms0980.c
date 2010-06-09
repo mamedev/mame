@@ -805,8 +805,6 @@ static CPU_EXECUTE( tms0980 )
 {
 	tms0980_state *cpustate = get_safe_token( device );
 
-	cpustate->icount = cycles;
-
 	do
 	{
 //      debugger_instruction_hook( device, ( ( cpustate->pa << cpustate->pc_size ) | cpustate->pc ) << 1 );
@@ -1088,8 +1086,6 @@ static CPU_EXECUTE( tms0980 )
 		}
 		cpustate->subcycle = ( cpustate->subcycle + 1 ) % 6;
 	} while( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 }
 
 

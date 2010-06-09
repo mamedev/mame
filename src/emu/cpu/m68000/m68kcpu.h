@@ -276,7 +276,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 		{ \
 			if (m68k->remaining_cycles > 0) \
 				m68k->remaining_cycles = 0; \
-			return m68k->initial_cycles; \
+			return; \
 		} \
 	}
 
@@ -297,7 +297,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 		{ \
 			if (m68k->remaining_cycles > 0) \
 				m68k->remaining_cycles = 0; \
-			return m68k->initial_cycles; \
+			return; \
 		} \
 	}
 

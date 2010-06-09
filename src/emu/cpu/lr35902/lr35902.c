@@ -306,8 +306,6 @@ static CPU_EXECUTE( lr35902 )
 {
 	lr35902_state *cpustate = get_safe_token(device);
 
-	cpustate->w.icount = cycles;
-
 	do
 	{
 		if ( cpustate->w.execution_state ) {
@@ -334,8 +332,6 @@ static CPU_EXECUTE( lr35902 )
 		}
 		cpustate->w.execution_state ^= 1;
 	} while (cpustate->w.icount > 0);
-
-	return cycles - cpustate->w.icount;
 }
 
 static CPU_BURN( lr35902 )

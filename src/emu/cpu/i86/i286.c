@@ -214,14 +214,16 @@ static CPU_EXECUTE( i80286 )
 	i80286_state *cpustate = get_safe_token(device);
 
 	if (cpustate->halted)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 80286)
 		timing = i80286_cycles;
 
 	/* adjust for any interrupts that came in */
-	cpustate->icount = cycles;
 	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
 
@@ -240,8 +242,6 @@ static CPU_EXECUTE( i80286 )
 	/* adjust for any interrupts that came in */
 	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
-
-	return cycles - cpustate->icount;
 }
 
 extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode);

@@ -817,7 +817,7 @@ static CPU_EXECUTE( m37710 )
 
 	m37710i_update_irqs(m37710);
 
-	return m37710->execute(m37710, cycles);
+	m37710->ICount = m37710->execute(m37710, m37710->ICount);
 }
 
 

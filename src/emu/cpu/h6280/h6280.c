@@ -216,8 +216,6 @@ static CPU_EXECUTE( h6280 )
 	int in;
 	h6280_Regs* cpustate = get_safe_token(device);
 
-	cpustate->ICount = cycles;
-
 	if ( cpustate->irq_pending == 2 ) {
 		cpustate->irq_pending--;
 	}
@@ -258,8 +256,6 @@ static CPU_EXECUTE( h6280 )
 			}
 		}
 	} while (cpustate->ICount > 0);
-
-	return cycles - cpustate->ICount;
 }
 
 /*****************************************************************************/

@@ -1353,7 +1353,11 @@ static CPU_EXECUTE( spc700 )
 {
 	spc700i_cpu *cpustate = get_safe_token(device);
 
-	CLOCKS = CPU_STOPPED ? 0 : cycles;
+	if (CPU_STOPPED)
+	{
+		CLOCKS = 0;
+		return;
+	}
 	while(CLOCKS > 0)
 	{
 		REG_PPC = REG_PC;
@@ -1620,7 +1624,6 @@ static CPU_EXECUTE( spc700 )
 			case 0xff: OP_STOP  ( 3               ); break; /* STOP          */
 		}
 	}
-	return cycles - CLOCKS;
 }
 
 
