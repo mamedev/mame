@@ -784,7 +784,7 @@ static MACHINE_DRIVER_START( lwings )
 	MDRV_CPU_PROGRAM_MAP(lwings_map)
 	MDRV_CPU_VBLANK_INT("screen", lwings_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, XTAL_12MHz/3)	/* verified on PCB */
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4)	/* verified on PCB */
 	MDRV_CPU_PROGRAM_MAP(lwings_sound_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* ??? */
 
@@ -828,10 +828,12 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_IMPORT_FROM( lwings )
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_12MHz/4)	/* verified on PCB */
+	MDRV_CPU_CLOCK(XTAL_12MHz/4)			/* verified on PCB */
+
 	MDRV_CPU_PROGRAM_MAP(trojan_map)
 
-	MDRV_CPU_REPLACE("soundcpu", Z80, XTAL_12MHz/4)	/* verified on PCB */
+	MDRV_CPU_MODIFY("soundcpu")
+	MDRV_CPU_CLOCK(XTAL_12MHz/4)			/* verified on PCB */
 
 	MDRV_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)	/* verified on PCB */
 	MDRV_CPU_PROGRAM_MAP(trojan_adpcm_map)
