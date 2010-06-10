@@ -614,7 +614,8 @@ static MACHINE_DRIVER_START( funcsino )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-    MDRV_CPU_REPLACE("maincpu", 8085A, MASTER_CLOCK/2)	/* 3 MHz?? seems accurate */
+    MDRV_CPU_MODIFY("maincpu")
+    MDRV_CPU_CLOCK(MASTER_CLOCK/2)	/* 3 MHz?? seems accurate */
 MACHINE_DRIVER_END
 
 
