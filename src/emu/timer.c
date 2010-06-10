@@ -34,6 +34,7 @@
 #define DEFAULT_MINIMUM_QUANTUM	ATTOSECONDS_IN_MSEC(100)
 
 
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -1096,15 +1097,17 @@ void timer_device::device_reset()
 			// convert the period into attotime
 			attotime period = attotime_never;
 			if (m_config.m_period > 0)
+			{
 				period = UINT64_ATTOTIME_TO_ATTOTIME(m_config.m_period);
 
-			// convert the start_delay into attotime
-			attotime start_delay = attotime_zero;
-			if (m_config.m_start_delay > 0)
-				start_delay = UINT64_ATTOTIME_TO_ATTOTIME(m_config.m_start_delay);
+				// convert the start_delay into attotime
+				attotime start_delay = attotime_zero;
+				if (m_config.m_start_delay > 0)
+					start_delay = UINT64_ATTOTIME_TO_ATTOTIME(m_config.m_start_delay);
 
-			// allocate and start the backing timer
-			timer_adjust_periodic(m_timer, start_delay, m_config.m_param, period);
+				// allocate and start the backing timer
+				timer_adjust_periodic(m_timer, start_delay, m_config.m_param, period);
+			}
 			break;
 		}
 

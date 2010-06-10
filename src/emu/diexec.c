@@ -427,7 +427,7 @@ void device_execute_interface::spin_until_time(attotime duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	timer_set(&m_machine, duration, this, timetrig, static_timed_trigger_callback);
+	timer_set(&m_machine, duration, this, TRIGGER_SUSPENDTIME + timetrig, static_timed_trigger_callback);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -867,6 +867,8 @@ void device_execute_interface::device_input::reset()
 void device_execute_interface::device_input::set_state_synced(int state, int vector)
 {
 	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_device->tag(), m_linenum, state, vector));
+
+	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE || state == PULSE_LINE);
 
 	// treat PULSE_LINE as ASSERT+CLEAR
 	if (state == PULSE_LINE)

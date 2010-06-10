@@ -288,8 +288,9 @@ void device_scheduler::trigger(int trigid, attotime after)
 		timer_set(&m_machine, after, (void *)this, trigid, static_timed_trigger);
 	
 	// send the trigger to everyone who cares
-	for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
-		exec->trigger(trigid);
+	else
+		for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
+			exec->trigger(trigid);
 }
 
 
