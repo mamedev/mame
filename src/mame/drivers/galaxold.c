@@ -2333,8 +2333,7 @@ static MACHINE_DRIVER_START( hunchbkg )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxold_base)
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(PIXEL_CLOCK/4)
+	MDRV_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
 
 	MDRV_CPU_PROGRAM_MAP(hunchbkg)
 	MDRV_CPU_IO_MAP(hunchbkg_io)
