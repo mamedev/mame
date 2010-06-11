@@ -180,9 +180,6 @@ endif
 # uncomment next line to include the internal profiler
 # PROFILER = 1
 
-# uncomment next line to include gprof profiler support
-# GPROF = 1
-
 # uncomment the force the universal DRC to always use the C backend
 # you may need to do this if your target architecture does not have
 # a native backend
@@ -213,6 +210,10 @@ BUILD_ZLIB = 1
 
 # uncomment next line to include the symbols
 # SYMBOLS = 1
+
+# specify symbols level or leave commented to use the default
+# (default is SYMLEVEL = 2 normally; use 1 if you only need backtrace)
+# SYMLEVEL = 2
 
 # uncomment next line to include profiling information from the compiler
 # PROFILE = 1
@@ -254,10 +255,20 @@ endif
 endif
 
 # allow gprof profiling as well, which overrides the internal PROFILER
-ifdef GPROF
-CCOMFLAGS += -pg
+# also enable symbols as it is useless without them
+ifdef PROFILE
 PROFILER =
-# LIBS += -lc_p
+SYMBOLS = 1
+ifndef SYMLEVEL
+SYMLEVEL = 1
+endif
+endif
+
+# set the symbols level
+ifdef SYMBOLS
+ifndef SYMLEVEL
+SYMLEVEL = 2
+endif
 endif
 
 
@@ -296,7 +307,7 @@ RM = @rm -f
 PREFIXSDL =
 SUFFIX64 =
 SUFFIXDEBUG =
-SUFFIXGPROF =
+SUFFIXPROFILE =
 
 # Windows SDL builds get an SDL prefix
 ifeq ($(OSD),sdl)
@@ -316,8 +327,8 @@ SUFFIXDEBUG = d
 endif
 
 # gprof builds get an addition 'p' suffix
-ifdef GPROF
-SUFFIXGPROF = p
+ifdef PROFILE
+SUFFIXPROFILE = p
 endif
 
 # the name is just 'target' if no subtarget; otherwise it is
@@ -329,7 +340,7 @@ NAME = $(TARGET)$(SUBTARGET)
 endif
 
 # fullname is prefix+name+suffix+suffix64+suffixdebug
-FULLNAME = $(PREFIX)$(PREFIXSDL)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXGPROF)
+FULLNAME = $(PREFIX)$(PREFIXSDL)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 
 # add an EXE suffix to get the final emulator name
 EMULATOR = $(FULLNAME)$(EXE)
@@ -418,7 +429,7 @@ CCOMFLAGS += -pipe
 
 # add -g if we need symbols, and ensure we have frame pointers
 ifdef SYMBOLS
-CCOMFLAGS += -g -fno-omit-frame-pointer
+CCOMFLAGS += -g$(SYMLEVEL) -fno-omit-frame-pointer
 endif
 
 # add -v if we need verbose build information
@@ -466,6 +477,7 @@ CONLYFLAGS += \
 # warnings only applicable to OBJ-C compiles
 COBJFLAGS += \
 	-Wpointer-arith 
+
 
 
 #-------------------------------------------------
@@ -521,10 +533,8 @@ endif
 
 # strip symbols and other metadata in non-symbols and non profiling builds
 ifndef SYMBOLS
-ifndef PROFILE
 ifneq ($(TARGETOS),macosx)
 LDFLAGS += -s
-endif
 endif
 endif
 
@@ -589,6 +599,8 @@ endif
 
 # add SoftFloat floating point emulation library
 SOFTFLOAT = $(OBJ)/libsoftfloat.a
+
+
 
 #-------------------------------------------------
 # 'default' target needs to go here, before the 
