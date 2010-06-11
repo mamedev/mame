@@ -78,8 +78,7 @@
 DECLARE_LEGACY_SOUND_DEVICE(CDP1864, cdp1864);
 
 #define MDRV_CDP1864_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, SOUND, _clock) \
-	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_CDP1864) \
+	MDRV_SOUND_ADD(_tag, CDP1864, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_CDP1864_SCREEN_ADD(_tag, _clock) \
