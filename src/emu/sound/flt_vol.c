@@ -72,3 +72,5 @@ DEVICE_GET_INFO( filter_volume )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(FILTER_VOLUME, filter_volume);

@@ -399,3 +399,5 @@ DEVICE_GET_INFO( qsound )
 }
 
 /**************** end of file ****************/
+
+DEFINE_LEGACY_SOUND_DEVICE(QSOUND, qsound);

@@ -518,3 +518,6 @@ DEVICE_GET_INFO( cdp1864 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(CDP1864, cdp1864);

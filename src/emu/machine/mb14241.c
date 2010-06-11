@@ -75,3 +75,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"MB14241"
 #define DEVTEMPLATE_FAMILY		"MB14241 Shifter IC"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(MB14241, mb14241);

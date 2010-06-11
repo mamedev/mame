@@ -943,3 +943,6 @@ DEVICE_GET_INFO( cdp1869 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(CDP1869, cdp1869);

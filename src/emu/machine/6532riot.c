@@ -512,3 +512,6 @@ DEVICE_GET_INFO( riot6532 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(RIOT6532, riot6532);

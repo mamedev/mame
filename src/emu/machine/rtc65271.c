@@ -717,3 +717,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"RTC65271"
 #define DEVTEMPLATE_FAMILY		"RTC"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_NVRAM_DEVICE(RTC65271, rtc65271);

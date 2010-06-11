@@ -225,3 +225,4 @@ DEVICE_GET_INFO( redbaron_sound )
 }
 
 
+DEFINE_LEGACY_SOUND_DEVICE(REDBARON, redbaron_sound);

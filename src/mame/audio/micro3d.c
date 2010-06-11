@@ -423,3 +423,6 @@ WRITE8_DEVICE_HANDLER( micro3d_upd7759_w )
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(MICRO3D, micro3d_sound);

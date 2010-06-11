@@ -324,3 +324,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"Kaneko Pandora - PX79C480FP-3"
 #define DEVTEMPLATE_FAMILY		"Kaneko Video Chips"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(KANEKO_PANDORA, kaneko_pandora);

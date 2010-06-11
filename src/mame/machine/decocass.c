@@ -2251,3 +2251,6 @@ DEVICE_GET_INFO( decocass_tape )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(DECOCASS_TAPE, decocass_tape);

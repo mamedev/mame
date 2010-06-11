@@ -694,3 +694,8 @@ DEVICE_GET_INFO( popflame_sound )
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(PLEIADS, pleiads_sound);
+DEFINE_LEGACY_SOUND_DEVICE(NAUGHTYB, naughtyb_sound);
+DEFINE_LEGACY_SOUND_DEVICE(POPFLAME, popflame_sound);

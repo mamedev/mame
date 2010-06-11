@@ -141,3 +141,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"Konami 056230"
 #define DEVTEMPLATE_FAMILY		"Konami Network Board 056230"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(K056230, k056230);

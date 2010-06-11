@@ -211,3 +211,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"RP5H01"
 #define DEVTEMPLATE_FAMILY		"RP5H01"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(RP5H01, rp5h01);

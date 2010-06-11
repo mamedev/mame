@@ -1584,3 +1584,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY		"HD63484 Video Controller"
 #include "devtempl.h"
 
+
+DEFINE_LEGACY_DEVICE(HD63484, hd63484);

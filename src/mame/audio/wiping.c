@@ -257,3 +257,6 @@ WRITE8_HANDLER( wiping_sound_w )
 		}
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(WIPING, wiping_sound);

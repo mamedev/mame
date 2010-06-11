@@ -1662,3 +1662,7 @@ DEVICE_GET_INFO( laserdisc )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(LASERDISC, laserdisc);
+DEFINE_LEGACY_SOUND_DEVICE(LASERDISC, laserdisc_sound);

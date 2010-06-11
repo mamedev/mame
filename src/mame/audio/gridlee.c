@@ -184,3 +184,6 @@ fclose(f);
 }
 #endif
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(GRIDLEE, gridlee_sound);

@@ -653,3 +653,5 @@ DEVICE_GET_INFO( s14001a )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Jonathan Gevaryahu"); break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(S14001A, s14001a);

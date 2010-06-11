@@ -451,3 +451,6 @@ DEVICE_GET_INFO( i8257 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(I8257, i8257);

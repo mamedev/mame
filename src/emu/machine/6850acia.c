@@ -837,3 +837,5 @@ DEVICE_GET_INFO( acia6850 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */									break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(ACIA6850, acia6850);

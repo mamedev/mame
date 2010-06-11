@@ -317,3 +317,5 @@ DEVICE_GET_INFO( cdda )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(CDDA, cdda);

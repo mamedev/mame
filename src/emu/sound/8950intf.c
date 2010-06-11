@@ -200,3 +200,6 @@ DEVICE_GET_INFO( y8950 )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(Y8950, y8950);

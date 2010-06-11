@@ -743,6 +743,7 @@ DEVICE_GET_INFO( usb_sound )
 }
 
 DECLARE_LEGACY_SOUND_DEVICE(USB, usb_sound);
+DEFINE_LEGACY_SOUND_DEVICE(USB, usb_sound);
 
 
 

@@ -188,3 +188,6 @@ DEVICE_GET_INFO( beep )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright The MESS Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(BEEP, beep);

@@ -326,3 +326,5 @@ DEVICE_GET_INFO( tiamc1_sound )
 }
 
 
+
+DEFINE_LEGACY_SOUND_DEVICE(TIAMC1, tiamc1_sound);

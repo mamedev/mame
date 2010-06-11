@@ -273,3 +273,5 @@ DEVICE_GET_INFO( rf5c68 )
 }
 
 /**************** end of file ****************/
+
+DEFINE_LEGACY_SOUND_DEVICE(RF5C68, rf5c68);

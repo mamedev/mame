@@ -112,3 +112,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"Fujistu MB3773"
 #define DEVTEMPLATE_FAMILY		"Fujistu Power Supply Monitor"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(MB3773, mb3773);

@@ -386,3 +386,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY		"SAA5050 Teletext Character Generator"
 #include "devtempl.h"
 
+
+DEFINE_LEGACY_DEVICE(SAA5050, saa5050);

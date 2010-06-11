@@ -267,3 +267,5 @@ DEVICE_GET_INFO( vrender0 )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(VRENDER0, vrender0);

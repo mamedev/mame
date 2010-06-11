@@ -199,3 +199,6 @@ WRITE16_HANDLER( msm6242_lsb_w )
 		msm6242_w(space, offset, data);
 }
 #endif
+
+
+DEFINE_LEGACY_DEVICE(MSM6242, msm6242);

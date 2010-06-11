@@ -328,3 +328,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY		"Taito Audio Custom IC"
 #include "devtempl.h"
 
+
+DEFINE_LEGACY_DEVICE(TC0140SYT, tc0140syt);

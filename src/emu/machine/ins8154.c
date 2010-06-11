@@ -267,3 +267,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_VERSION				"1.1"
 #define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(INS8154, ins8154);

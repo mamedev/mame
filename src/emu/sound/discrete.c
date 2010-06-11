@@ -1087,3 +1087,5 @@ DEVICE_GET_INFO( discrete )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(DISCRETE, discrete);

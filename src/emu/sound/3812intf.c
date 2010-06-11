@@ -166,3 +166,6 @@ DEVICE_GET_INFO( ym3812 )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(YM3812, ym3812);

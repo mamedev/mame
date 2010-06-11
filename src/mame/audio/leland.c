@@ -586,6 +586,11 @@ DEVICE_GET_INFO( redline_80186_sound )
 }
 
 
+DEFINE_LEGACY_SOUND_DEVICE(LELAND, leland_sound);
+DEFINE_LEGACY_SOUND_DEVICE(LELAND_80186, leland_80186_sound);
+DEFINE_LEGACY_SOUND_DEVICE(REDLINE_80186, redline_80186_sound);
+
+
 static void leland_80186_reset(void)
 {
 	struct i80186_state oldstate = i80186;

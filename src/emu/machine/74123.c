@@ -237,3 +237,5 @@ DEVICE_GET_INFO( ttl74123 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(TTL74123, ttl74123);

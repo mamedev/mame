@@ -17,8 +17,8 @@ struct _namcoio_interface
 };
 
 DECLARE_LEGACY_DEVICE(NAMCO56XX, namcoio);
-DECLARE_LEGACY_DEVICE(NAMCO58XX, namcoio);
-DECLARE_LEGACY_DEVICE(NAMCO59XX, namcoio);
+#define NAMCO58XX NAMCO56XX
+#define NAMCO59XX NAMCO56XX
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

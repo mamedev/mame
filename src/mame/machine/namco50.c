@@ -303,3 +303,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"Namco 50xx"
 #define DEVTEMPLATE_FAMILY		"Namco I/O"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(NAMCO_50XX, namco_50xx);

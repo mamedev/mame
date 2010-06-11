@@ -259,3 +259,5 @@ DEVICE_GET_INFO( nile )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(NILE, nile);

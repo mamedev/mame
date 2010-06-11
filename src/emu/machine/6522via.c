@@ -1181,3 +1181,6 @@ DEVICE_GET_INFO(via6522)
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(VIA6522, via6522);

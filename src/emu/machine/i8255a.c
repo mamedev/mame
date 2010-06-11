@@ -904,3 +904,6 @@ DEVICE_GET_INFO( i8255a )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(I8255A, i8255a);

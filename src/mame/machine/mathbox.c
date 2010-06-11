@@ -359,3 +359,6 @@ DEVICE_GET_INFO( mathbox )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(MATHBOX, mathbox);

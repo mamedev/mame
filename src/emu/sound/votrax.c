@@ -184,3 +184,5 @@ DEVICE_GET_INFO( votrax )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(VOTRAX, votrax);

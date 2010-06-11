@@ -2109,3 +2109,6 @@ READ16_HANDLER( segaic16_rotate_control_0_r )
 
 	return 0xffff;
 }
+
+
+DEFINE_LEGACY_DEVICE(SEGA16SP, sega16sp);

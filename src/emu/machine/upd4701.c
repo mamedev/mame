@@ -312,3 +312,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"NEC uPD4701 Encoder"
 #define DEVTEMPLATE_FAMILY		"NEC uPD4701 Encoder"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(UPD4701, upd4701);

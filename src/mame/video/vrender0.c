@@ -608,3 +608,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"VRender0"
 #define DEVTEMPLATE_FAMILY		"???"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(VIDEO_VRENDER0, vr0video);

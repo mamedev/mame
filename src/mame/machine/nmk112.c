@@ -161,3 +161,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"NMK 112"
 #define DEVTEMPLATE_FAMILY				"NMK 112 Bankswitch IC"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(NMK112, nmk112);

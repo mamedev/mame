@@ -368,3 +368,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY		"Signetics Video Chips"
 #include "devtempl.h"
 
+
+DEFINE_LEGACY_DEVICE(S2636, s2636);

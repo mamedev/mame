@@ -575,3 +575,5 @@ DEVICE_GET_INFO( buggyboy_sound )
 }
 
 
+DEFINE_LEGACY_SOUND_DEVICE(BUGGYBOY, buggyboy_sound);
+DEFINE_LEGACY_SOUND_DEVICE(TX1, tx1_sound);

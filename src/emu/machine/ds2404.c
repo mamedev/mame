@@ -353,3 +353,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"DS2404"
 #define DEVTEMPLATE_FAMILY		"NVRAM"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_NVRAM_DEVICE(DS2404, ds2404);

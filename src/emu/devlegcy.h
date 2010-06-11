@@ -139,6 +139,66 @@ enum
 //  MACROS
 //**************************************************************************
 
+// macro for declaring the configuration and device classes of a legacy device
+#define _DECLARE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass) 		\
+																				\
+DEVICE_GET_INFO( basename ); 													\
+																				\
+class configclass;																\
+																				\
+class deviceclass : public basedeviceclass										\
+{																				\
+	friend class configclass;													\
+	deviceclass(running_machine &_machine, const configclass &config); 			\
+};																				\
+																				\
+class configclass : public baseconfigclass										\
+{																				\
+	configclass(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock); \
+																				\
+public:																			\
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock); \
+	virtual device_t *alloc_device(running_machine &machine) const; 			\
+};																				\
+																				\
+const device_type name = configclass::static_alloc_device_config
+
+// macro for defining the implementation needed for configuration and device classes
+#define _DEFINE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass) 		\
+																				\
+deviceclass::deviceclass(running_machine &_machine, const configclass &config) 	\
+		: basedeviceclass(_machine, config)										\
+	{																			\
+	}																			\
+																				\
+configclass::configclass(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock) \
+	: baseconfigclass(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(basename)) \
+{																				\
+}																				\
+																				\
+device_config *configclass::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
+{																				\
+	return global_alloc(configclass(mconfig, static_alloc_device_config, tag, owner, clock)); \
+}																				\
+																				\
+device_t *configclass::alloc_device(running_machine &machine) const 			\
+{																				\
+	return pool_alloc(machine_get_pool(machine), deviceclass(machine, *this)); 	\
+}
+
+// reduced macros that are easier to use, and map to the above two macros
+#define DECLARE_LEGACY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_device_config_base, legacy_device_base)
+#define DECLARE_LEGACY_SOUND_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(SOUND_##name, basename, basename##_sound_device_config, basename##_sound_device, legacy_sound_device_config_base, legacy_sound_device_base)
+#define DECLARE_LEGACY_NVRAM_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_memory_device_config_base, legacy_memory_device_base)
+#define DECLARE_LEGACY_MEMORY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_nvram_device_config_base, legacy_nvram_device_base)
+
+#define DEFINE_LEGACY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_device_config_base, legacy_device_base)
+#define DEFINE_LEGACY_SOUND_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(SOUND_##name, basename, basename##_sound_device_config, basename##_sound_device, legacy_sound_device_config_base, legacy_sound_device_base)
+#define DEFINE_LEGACY_NVRAM_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_memory_device_config_base, legacy_memory_device_base)
+#define DEFINE_LEGACY_MEMORY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_nvram_device_config_base, legacy_nvram_device_base)
+
+
+// macros to wrap legacy device functions
 #define DEVICE_GET_INFO_NAME(name)	device_get_config_##name
 #define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(const device_config *device, UINT32 state, deviceinfo *info)
 #define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
@@ -166,66 +226,6 @@ enum
 #define DEVICE_NVRAM_NAME(name)		device_nvram_##name
 #define DEVICE_NVRAM(name)			void DEVICE_NVRAM_NAME(name)(device_t *device, mame_file *file, int read_or_write)
 #define DEVICE_NVRAM_CALL(name)		DEVICE_NVRAM_NAME(name)(device, file, read_or_write)
-
-
-// defined types and such for a standard legacy device
-#define DECLARE_LEGACY_DEVICE(name, basename)			 		\
-	DEVICE_GET_INFO( basename ); 								\
-	typedef legacy_device<										\
-				DEVICE_GET_INFO_NAME(basename),					\
-				legacy_device_base								\
-			> basename##_device;								\
-	typedef legacy_device_config<								\
-				DEVICE_GET_INFO_NAME(basename),					\
-				legacy_device_config_base,						\
-				basename##_device								\
-			> basename##_device_config; 						\
-	const device_type name = basename##_device_config::static_alloc_device_config
-
-
-// defined types and such for a sound legacy device
-#define DECLARE_LEGACY_SOUND_DEVICE(name, basename) 			\
-	DEVICE_GET_INFO( basename ); 								\
-	typedef legacy_device<										\
-				DEVICE_GET_INFO_NAME(basename),					\
-				legacy_sound_device_base						\
-			> basename##_sound_device;							\
-	typedef legacy_device_config<								\
-				DEVICE_GET_INFO_NAME(basename),					\
-				legacy_sound_device_config_base,				\
-				basename##_sound_device							\
-			> basename##_sound_device_config;					\
-	const device_type SOUND_##name = basename##_sound_device_config::static_alloc_device_config
-
-
-// defined types and such for a memory legacy device
-#define DECLARE_LEGACY_MEMORY_DEVICE(name, basename)			\
-	DEVICE_GET_INFO( basename ); 								\
-	typedef legacy_device<										\
-				DEVICE_GET_INFO_NAME(basename),					\
-				legacy_memory_device_base						\
-			> basename##_device;								\
-	typedef legacy_device_config<								\
-				DEVICE_GET_INFO_NAME(basename),					\
-				legacy_memory_device_config_base,				\
-				basename##_device								\
-			> basename##_device_config; 						\
-	const device_type name = basename##_device_config::static_alloc_device_config
-
-
-// defined types and such for a memory legacy device
-#define DECLARE_LEGACY_NVRAM_DEVICE(name, basename)				\
-	DEVICE_GET_INFO( basename ); 								\
-	typedef legacy_device<										\
-				DEVICE_GET_INFO_NAME(basename),					\
-				legacy_nvram_device_base						\
-			> basename##_device;								\
-	typedef legacy_device_config<								\
-				DEVICE_GET_INFO_NAME(basename),					\
-				legacy_nvram_device_config_base,				\
-				basename##_device								\
-			> basename##_device_config; 						\
-	const device_type name = basename##_device_config::static_alloc_device_config
 
 
 
@@ -529,64 +529,6 @@ protected:
 	virtual void nvram_read(mame_file &file);
 	virtual void nvram_write(mame_file &file);
 };
-
-
-// ======================> legacy_device_config
-
-// legacy_device_config template describes a new device_config derivative that implements
-// the old device callbacks
-template<
-	device_get_config_func _get_config,
-	class _config_base,
-	class _running_class
->
-class legacy_device_config : public _config_base
-{
-	// construction/destruction
-	legacy_device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock)
-		: _config_base(mconfig, type, tag, owner, clock, _get_config)
-	{
-	}
-	
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	{
-		return global_alloc(legacy_device_config(mconfig, static_alloc_device_config, tag, owner, clock));
-	}
-	
-	virtual device_t *alloc_device(running_machine &machine) const
-	{
-		return pool_alloc(machine_get_pool(machine), _running_class(machine, *this));
-//		return auto_alloc(&machine, device_t(machine, *this));
-	}
-};
-
-
-
-// ======================> legacy_device
-
-// legacy_device template describes a new device_t derivative that implements
-// the old device callbacks
-template<
-	device_get_config_func _get_config,
-	class _device_base
->
-class legacy_device : public _device_base
-{
-	template<
-		device_get_config_func __get_config,
-		class __config_base,
-		class __running_class
-	>
-	friend class legacy_device_config;
-	
-	legacy_device(running_machine &_machine, const legacy_device_config_base &config)
-		: _device_base(_machine, config)
-	{
-	}
-};
-
 
 
 #endif	/* __DEVLEGCY_H__ */

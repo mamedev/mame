@@ -583,3 +583,5 @@ DEVICE_GET_INFO( rf5c400 )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team & hoot development team"); break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(RF5C400, rf5c400);

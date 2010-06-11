@@ -275,3 +275,6 @@ WRITE8_HANDLER( gomoku_sound2_w )
 			voice->oneshotplaying = 0;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(GOMOKU, gomoku_sound);

@@ -99,3 +99,6 @@ DEVICE_GET_INFO( wave )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright The MESS Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(WAVE, wave);

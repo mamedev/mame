@@ -532,3 +532,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"NEC uPD4990A"
 #define DEVTEMPLATE_FAMILY		"NEC uPD4990A Calendar & Clock"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(UPD4990A, upd4990a);

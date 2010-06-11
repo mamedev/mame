@@ -188,6 +188,7 @@ DEVICE_GET_INFO( renegade_adpcm )
 }
 
 DECLARE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
+DEFINE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
 
 
 static WRITE8_HANDLER( adpcm_play_w )

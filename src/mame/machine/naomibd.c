@@ -1922,3 +1922,6 @@ DEVICE_GET_INFO( naomibd )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_NVRAM_DEVICE(NAOMI_BOARD, naomibd);

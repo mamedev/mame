@@ -172,3 +172,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"Konami 056800 MIRAC"
 #define DEVTEMPLATE_FAMILY		"Konami custom"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(K056800, k056800);

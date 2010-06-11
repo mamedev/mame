@@ -262,3 +262,5 @@ DEVICE_GET_INFO( dmadac )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(DMADAC, dmadac);

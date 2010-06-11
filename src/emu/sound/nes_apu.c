@@ -792,3 +792,5 @@ DEVICE_GET_INFO( nesapu )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(NES, nesapu);

@@ -148,3 +148,6 @@ DEVICE_GET_INFO( atari_vg_earom )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_NVRAM_DEVICE(ATARIVGEAROM, atari_vg_earom);

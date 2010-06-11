@@ -141,3 +141,4 @@ DEVICE_GET_INFO( geebee_sound )
 }
 
 
+DEFINE_LEGACY_SOUND_DEVICE(GEEBEE, geebee_sound);

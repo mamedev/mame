@@ -1361,3 +1361,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"SNES Custom DSP (SPC700)"
 #define DEVTEMPLATE_FAMILY				"SNES Custom"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_SOUND_DEVICE(SNES, snes_sound);

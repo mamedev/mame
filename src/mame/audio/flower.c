@@ -308,3 +308,6 @@ popmessage("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%
 		voice->oneshotplaying = 0;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(FLOWER, flower_sound);

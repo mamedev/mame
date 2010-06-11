@@ -163,3 +163,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"Ticket Dispenser"
 #define DEVTEMPLATE_FAMILY		"Generic"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(TICKET_DISPENSER, ticket);

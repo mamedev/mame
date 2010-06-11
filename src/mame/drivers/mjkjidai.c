@@ -94,6 +94,7 @@ DEVICE_GET_INFO( mjkjidai_adpcm )
 }
 
 DECLARE_LEGACY_SOUND_DEVICE(MJKJIDAI, mjkjidai_adpcm);
+DEFINE_LEGACY_SOUND_DEVICE(MJKJIDAI, mjkjidai_adpcm);
 
 
 static void mjkjidai_adpcm_play (mjkjidai_adpcm_state *state, int offset, int length)

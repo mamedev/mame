@@ -167,3 +167,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"Konami 033906"
 #define DEVTEMPLATE_FAMILY		"Konami PCI Bridge 033906"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(K033906, k033906);

@@ -5294,6 +5294,7 @@ static void dump_rasterizer_stats(voodoo_state *v)
 	}
 }
 
+DEFINE_LEGACY_DEVICE(VOODOO_GRAPHICS, voodoo);
 
 
 /***************************************************************************

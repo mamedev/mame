@@ -172,3 +172,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"A/D Converters 1038"
 #define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 1038"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(ADC1038, adc1038);

@@ -171,3 +171,6 @@ READ32_HANDLER( cps3_sound_r )
 		return 0;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(CPS3, cps3_sound);

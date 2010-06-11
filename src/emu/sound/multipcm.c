@@ -700,3 +700,4 @@ DEVICE_GET_INFO( multipcm )
 }
 
 
+DEFINE_LEGACY_SOUND_DEVICE(MULTIPCM, multipcm);

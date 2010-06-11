@@ -225,3 +225,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"Dallas DS1302 RTC"
 #define DEVTEMPLATE_FAMILY		"Dallas DS1302 RTC"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(DS1302, ds1302);

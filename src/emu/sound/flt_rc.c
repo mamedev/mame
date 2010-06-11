@@ -137,3 +137,5 @@ DEVICE_GET_INFO( filter_rc )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(FILTER_RC, filter_rc);

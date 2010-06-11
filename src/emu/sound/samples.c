@@ -536,3 +536,5 @@ DEVICE_GET_INFO( samples )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(SAMPLES, samples);

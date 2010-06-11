@@ -563,3 +563,6 @@ ADDRESS_MAP_START( seibu3_adpcm_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_ctl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
+
+
+DEFINE_LEGACY_SOUND_DEVICE(SEIBU_ADPCM, seibu_adpcm);

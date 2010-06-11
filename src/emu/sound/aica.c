@@ -1334,3 +1334,6 @@ DEVICE_GET_INFO( aica )
 	}
 }
 
+
+
+DEFINE_LEGACY_SOUND_DEVICE(AICA, aica);

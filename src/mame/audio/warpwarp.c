@@ -233,3 +233,4 @@ DEVICE_GET_INFO( warpwarp_sound )
 }
 
 
+DEFINE_LEGACY_SOUND_DEVICE(WARPWARP, warpwarp_sound);

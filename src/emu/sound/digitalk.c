@@ -704,3 +704,6 @@ WRITE8_DEVICE_HANDLER( digitalker_data_w )
 	digitalker *dg = get_safe_token(device);
 	dg->data = data;
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(DIGITALKER, digitalker);

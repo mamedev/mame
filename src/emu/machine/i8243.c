@@ -184,3 +184,6 @@ DEVICE_GET_INFO( i8243 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */							break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(I8243, i8243);

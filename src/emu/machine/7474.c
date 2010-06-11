@@ -205,3 +205,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME		"7474"
 #define DEVTEMPLATE_FAMILY		"TTL"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(TTL7474, ttl7474);

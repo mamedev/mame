@@ -296,3 +296,4 @@ DEVICE_GET_INFO( amiga_sound )
 }
 
 
+DEFINE_LEGACY_SOUND_DEVICE(AMIGA, amiga_sound);

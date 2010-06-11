@@ -1979,3 +1979,6 @@ DEVICE_GET_INFO( ide_controller )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(IDE_CONTROLLER, ide_controller);

@@ -263,3 +263,6 @@ DEVICE_GET_INFO( pci_bus )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(PCI_BUS, pci_bus);

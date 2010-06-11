@@ -728,3 +728,5 @@ DEVICE_GET_INFO( psxspu )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(PSXSPU, psxspu);

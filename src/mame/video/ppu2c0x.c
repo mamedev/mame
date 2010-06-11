@@ -1475,3 +1475,14 @@ DEVICE_GET_INFO(ppu2c07)
 		default:										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
 }
+
+
+DEFINE_LEGACY_MEMORY_DEVICE(PPU_2C02, ppu2c02);		// NTSC NES
+DEFINE_LEGACY_MEMORY_DEVICE(PPU_2C03B, ppu2c03b);		// Playchoice 10
+DEFINE_LEGACY_MEMORY_DEVICE(PPU_2C04, ppu2c04);		// Vs. Unisystem
+// The PPU_2C05 variants have different protection value, set at DEVICE_START, but otherwise are all the same...
+DEFINE_LEGACY_MEMORY_DEVICE(PPU_2C05_01, ppu2c05_01);	// Vs. Unisystem (Ninja Jajamaru Kun)
+DEFINE_LEGACY_MEMORY_DEVICE(PPU_2C05_02, ppu2c05_02);	// Vs. Unisystem (Mighty Bomb Jack)
+DEFINE_LEGACY_MEMORY_DEVICE(PPU_2C05_03, ppu2c05_03);	// Vs. Unisystem (Gumshoe)
+DEFINE_LEGACY_MEMORY_DEVICE(PPU_2C05_04, ppu2c05_04);	// Vs. Unisystem (Top Gun)
+DEFINE_LEGACY_MEMORY_DEVICE(PPU_2C07, ppu2c07);		// PAL NES

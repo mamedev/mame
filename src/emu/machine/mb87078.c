@@ -274,3 +274,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY		"Fujitsu Volume Controller MB87078"
 #include "devtempl.h"
 
+
+DEFINE_LEGACY_DEVICE(MB87078, mb87078);

@@ -1210,3 +1210,6 @@ WRITE8_HANDLER( fantasy_speech_w )
 
 	snk6502_speech_w(space->machine, data, fantasy_table, 0);
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(SNK6502, snk6502_sound);

@@ -691,6 +691,7 @@ static DEVICE_GET_INFO( subwoofer )
 }
 
 DECLARE_LEGACY_SOUND_DEVICE(SUBWOOFER, subwoofer);
+DEFINE_LEGACY_SOUND_DEVICE(SUBWOOFER, subwoofer);
 #endif
 
 

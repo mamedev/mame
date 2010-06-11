@@ -76,3 +76,5 @@ DEVICE_GET_INFO( tia )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(TIA, tia);

@@ -1379,3 +1379,6 @@ DEVICE_GET_INFO( deco16ic )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(DECO16IC, deco16ic);

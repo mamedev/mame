@@ -952,3 +952,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"MOS 6560 / 6561 VIC"
 #define DEVTEMPLATE_FAMILY				"MOS Video Interface Chip"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_SOUND_DEVICE(MOS656X, mos6560);

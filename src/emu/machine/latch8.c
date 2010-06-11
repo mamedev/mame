@@ -254,3 +254,6 @@ DEVICE_GET_INFO( latch8 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_DEVICE(LATCH8, latch8);
