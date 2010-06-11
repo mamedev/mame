@@ -124,6 +124,20 @@ const char *legacy_device_config_base::get_legacy_config_string(UINT32 state) co
 }
 
 
+//-------------------------------------------------
+//  device_validity_check - perform validity
+//  checks on a device configuration
+//-------------------------------------------------
+
+bool legacy_device_config_base::device_validity_check(const game_driver &driver) const
+{
+	device_validity_check_func validity_func = reinterpret_cast<device_validity_check_func>(get_legacy_config_fct(DEVINFO_FCT_VALIDITY_CHECK));
+	if (validity_func != NULL)
+		return (*validity_func)(&driver, this);
+	return false;
+}
+
+
 
 //**************************************************************************
 //  LIVE LEGACY DEVICE

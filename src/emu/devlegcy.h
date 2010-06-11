@@ -113,6 +113,7 @@ enum
 		DEVINFO_FCT_RESET,								// R/O: device_reset_func 
 		DEVINFO_FCT_EXECUTE,							// R/O: device_execute_func 
 		DEVINFO_FCT_NVRAM,								// R/O: device_nvram_func 
+		DEVINFO_FCT_VALIDITY_CHECK,						// R/O: device_validity_check_func
 
 	DEVINFO_FCT_CLASS_SPECIFIC = 0x24000,				// R/W: device-specific values start here 
 	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				// R/W: device-specific values start here 
@@ -141,6 +142,10 @@ enum
 #define DEVICE_GET_INFO_NAME(name)	device_get_config_##name
 #define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(const device_config *device, UINT32 state, deviceinfo *info)
 #define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
+
+#define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
+#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device)
+#define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK_NAME(name)(driver, device)
 
 #define DEVICE_START_NAME(name)		device_start_##name
 #define DEVICE_START(name)			void DEVICE_START_NAME(name)(device_t *device)
@@ -333,6 +338,7 @@ resource_pool &machine_get_pool(running_machine &machine);
 
 // device interface function types
 typedef void (*device_get_config_func)(const device_config *device, UINT32 state, deviceinfo *info);
+typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device);
 
 typedef void (*device_start_func)(device_t *device);
 typedef void (*device_stop_func)(device_t *device);
@@ -392,6 +398,9 @@ public:
 	void *inline_config() const { return m_inline_config; }
 
 protected:
+	// overrides
+	virtual bool device_validity_check(const game_driver &driver) const;
+
 	// access to legacy configuration info
 	INT64 get_legacy_config_int(UINT32 state) const;
 	void *get_legacy_config_ptr(UINT32 state) const;
