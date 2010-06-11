@@ -16,6 +16,8 @@
 #define FLASH_INTEL_E28F400 ( 6 )
 #define FLASH_SHARP_UNK128MBIT ( 7 )
 #define FLASH_MACRONIX_29L001MC ( 8 )
+#define FLASH_PANASONIC_MN63F805MNP ( 9 )
+#define FLASH_SANYO_LE26FV10N1TS ( 10 )
 
 extern void intelflash_init( running_machine *machine, int chip, int type, void *data );
 extern UINT32 intelflash_read( int chip, UINT32 address );
