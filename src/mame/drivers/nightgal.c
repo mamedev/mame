@@ -5,13 +5,16 @@ Night Gal (c) 1984 Nichibutsu
 a.k.a. same Jangou blitter but with NCS CPU for displaying graphics as protection.
 
 preliminary driver by David Haywood & Angelo Salese
+many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
--Get Night Gal Summer and Royal Queen to boot;
+-Get Night Gal Summer to boot;
 -Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi
  wrong firing);
 -Proper Z80<->MCU comms,many video problems because of that;
 -Abstract the video chip to a proper video file and get the name of that chip;
+-Minor graphic glitches in Royal Queen (cross hatch test, some little glitches during gameplay),
+ presumably due of the unemulated wait states on the comms.
 
 *******************************************************************************************/
 
@@ -43,6 +46,8 @@ public:
 	/* misc */
 	UINT8 nsc_latch, z80_latch;
 	UINT8 mux_data;
+
+	UINT8 *comms_ram;
 
 	/* devices */
 	running_device *maincpu;
@@ -333,6 +338,52 @@ static READ8_HANDLER( nsc_blit_r )
 	return state->blit_raw_data[offset];
 }
 
+/* TODO: simplify this (error in the document) */
+
+static WRITE8_HANDLER( royalqn_blitter_0_w )
+{
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	state->blit_raw_data[0] = data;
+}
+
+static WRITE8_HANDLER( royalqn_blitter_1_w )
+{
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	state->blit_raw_data[1] = data;
+}
+
+static WRITE8_HANDLER( royalqn_blitter_2_w )
+{
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+	state->blit_raw_data[2] = data;
+	cpu_set_input_line(state->subcpu, 0, ASSERT_LINE );
+}
+
+static READ8_HANDLER( royalqn_nsc_blit_r )
+{
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+
+	if(offset == 2)
+		cpu_set_input_line(state->subcpu, 0, CLEAR_LINE );
+
+	return state->blit_raw_data[offset];
+}
+
+static READ8_HANDLER( royalqn_comm_r )
+{
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+
+	return (state->comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
+}
+
+static WRITE8_HANDLER( royalqn_comm_w )
+{
+	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
+
+	state->comms_ram[offset] = data & 0x80;
+}
+
+
 static WRITE8_HANDLER( blit_vregs_w )
 {
 	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
@@ -424,7 +475,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nightgal_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r) //ay read port
+	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 //  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
@@ -484,6 +535,46 @@ static ADDRESS_MAP_START( sexygal_nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x1000, 0x103f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_WRITENOP
+ADDRESS_MAP_END
+
+/********************************
+* Royal Queen
+********************************/
+
+static ADDRESS_MAP_START( royalqn_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_NOP
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_BASE_MEMBER(nightgal_state,comms_ram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( royalqn_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x01,0x01) AM_MIRROR(0xec) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_MIRROR(0xec) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITENOP //AM_WRITE(output_w)
+	AM_RANGE(0x11,0x11) AM_MIRROR(0xe8) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
+	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
+	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
+	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
+	AM_RANGE(0x15,0x15) AM_MIRROR(0xe8) AM_NOP
+	AM_RANGE(0x16,0x16) AM_MIRROR(0xe8) AM_NOP
+	AM_RANGE(0x17,0x17) AM_MIRROR(0xe8) AM_NOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( royalqn_nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
+	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
+	AM_RANGE(0x0080, 0x0086) AM_WRITE(nsc_true_blitter_w)
+
+	AM_RANGE(0x00a0, 0x00af) AM_WRITE(blit_true_vregs_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
+
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
+	AM_RANGE(0x4000, 0x4000) AM_NOP
+	AM_RANGE(0x8000, 0x8000) AM_NOP //open bus or protection check
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM
 ADDRESS_MAP_END
 
 /********************************************
@@ -826,6 +917,47 @@ static MACHINE_DRIVER_START( sexygal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( royalqn )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(nightgal_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)		 /* ? MHz */
+	MDRV_CPU_PROGRAM_MAP(royalqn_map)
+	MDRV_CPU_IO_MAP(royalqn_io)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_CPU_ADD("sub", NSC8105, MASTER_CLOCK / 8)
+	MDRV_CPU_PROGRAM_MAP(royalqn_nsc_map)
+
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+
+	MDRV_MACHINE_START(nightgal)
+	MDRV_MACHINE_RESET(nightgal)
+
+	/* video hardware */
+	/* TODO: blitter clock is MASTER_CLOCK / 4, 320 x 264 pixels, 256 x 224 of visible area */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MDRV_PALETTE_INIT(nightgal)
+
+	MDRV_PALETTE_LENGTH(0x10)
+
+	MDRV_VIDEO_START(nightgal)
+	MDRV_VIDEO_UPDATE(nightgal)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+MACHINE_DRIVER_END
 
 /*
 Night Gal
@@ -1112,7 +1244,7 @@ ROM_START( royalqn )
 	ROM_LOAD( "a12.3v", 0x04000, 0x02000, CRC(4e8efda4) SHA1(1959491fd899a4d85fd067d7674592ec25188a75) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "rq9.3p",  0x0e000, 0x02000, CRC(34b4cf82) SHA1(01f49ca11a695d41c181e92217e228bc1656ee57) )
+	ROM_LOAD( "rq9.3p",  0x0c000, 0x02000, CRC(34b4cf82) SHA1(01f49ca11a695d41c181e92217e228bc1656ee57) )
 
 	ROM_REGION( 0xc000, "samples", ROMREGION_ERASE00 )
 
@@ -1130,13 +1262,23 @@ ROM_START( royalqn )
 	ROM_LOAD( "ng.6s", 0x00, 0x20, CRC(19255a7d) SHA1(4ac6316f7d8b575f28d33564b422b68993a4e484) )
 ROM_END
 
-/* Type 1 HW*/
-GAME( 1984, nightgal, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1984, ngtbunny, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1984, royalngt, ngtbunny, nightgal, sexygal,  0, ROT0, "Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-/* Type 2 HW*/
-GAME( 1985, sexygal,  0,        sexygal,  sexygal,  0, ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sexygal,  sexygal,  0, ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-/* Type 3 HW*/
-GAME( 1985, ngalsumr, 0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1985, royalqn,  0,        nightgal, sexygal,  0, ROT0, "Nichibutsu",   "Royal Queen", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+static DRIVER_INIT( royalqn )
+{
+	UINT8 *ROM = memory_region(machine, "sub");
+
+	/* patch open bus / protection */
+	ROM[0xc27e] = 0x02;
+	ROM[0xc27f] = 0x02;
+}
+
+/* Type 1 HW */
+GAME( 1984, nightgal, 0,        nightgal, sexygal,  0,       ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1984, ngtbunny, 0,        nightgal, sexygal,  0,       ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1984, royalngt, ngtbunny, nightgal, sexygal,  0,       ROT0, "Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+/* Type 2 HW */
+GAME( 1984, royalqn,  0,        royalqn,  sexygal,  royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+/* Type 3 HW */
+GAME( 1985, sexygal,  0,        sexygal,  sexygal,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sexygal,  sexygal,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+/* Type 4 HW */
+GAME( 1985, ngalsumr, 0,        nightgal, sexygal,  0,       ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
