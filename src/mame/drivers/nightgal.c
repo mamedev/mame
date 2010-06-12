@@ -994,7 +994,7 @@ ROM_START( nightgal )
 	ROM_LOAD( "ngal_12.bin", 0x04000, 0x02000, CRC(515e69a7) SHA1(234247c829c2b082360d7d44c1488fc5fcf45cd2) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "ngal_09.bin", 0x0e000, 0x02000, CRC(da3dcc08) SHA1(6f5319c1777dabf7041286698ac8f25eca1545a1) )
+	ROM_LOAD( "ngal_09.bin", 0x0c000, 0x02000, CRC(da3dcc08) SHA1(6f5319c1777dabf7041286698ac8f25eca1545a1) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "ngal_01.bin",  0x00000, 0x02000, CRC(8e4c92ad) SHA1(13cebe765ebabe6be79c9c9ac3f778550e450380) )
@@ -1045,7 +1045,7 @@ ROM_START( ngtbunny )
 	ROM_LOAD( "8.3s", 0x04000, 0x02000, CRC(9bf96168) SHA1(f0e9302bc9577fe779b56cb72035672368c94481) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "5.3m",  0x0e000, 0x02000, CRC(b8a82966) SHA1(9f86b3208fb48f9735cfc4f8e62680f0cb4a92f0) )
+	ROM_LOAD( "5.3m",  0x0c000, 0x02000, CRC(b8a82966) SHA1(9f86b3208fb48f9735cfc4f8e62680f0cb4a92f0) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "1.3a",  0x00000, 0x02000, CRC(16776c5f) SHA1(a2925eaed938ae3985ea796658b62d6fafb6412b) )
@@ -1064,7 +1064,7 @@ ROM_START( royalngt )
 	ROM_LOAD( "rn8.3s", 0x04000, 0x02000, CRC(1371a83a) SHA1(c7107b62534837dd51bb4a93ba9a690f91393930) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "rn5.3l",  0x0e000, 0x02000, CRC(b8a82966) SHA1(9f86b3208fb48f9735cfc4f8e62680f0cb4a92f0) )
+	ROM_LOAD( "rn5.3l",  0x0c000, 0x02000, CRC(b8a82966) SHA1(9f86b3208fb48f9735cfc4f8e62680f0cb4a92f0) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "rn1.3a",  0x00000, 0x02000, CRC(16776c5f) SHA1(a2925eaed938ae3985ea796658b62d6fafb6412b) )
@@ -1272,13 +1272,12 @@ static DRIVER_INIT( royalqn )
 }
 
 /* Type 1 HW */
-GAME( 1984, nightgal, 0,        nightgal, sexygal,  0,       ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1984, ngtbunny, 0,        nightgal, sexygal,  0,       ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1984, royalngt, ngtbunny, nightgal, sexygal,  0,       ROT0, "Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1984, nightgal, 0,        royalqn, sexygal,  0,       ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, ngtbunny, 0,        royalqn, sexygal,  0,       ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, royalngt, ngtbunny, royalqn, sexygal,  0,       ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, royalqn,  0,        royalqn, sexygal,  royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 /* Type 2 HW */
-GAME( 1984, royalqn,  0,        royalqn,  sexygal,  royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1985, sexygal,  0,        sexygal, sexygal,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sexygal, sexygal,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, sexygal,  0,        sexygal,  sexygal,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sexygal,  sexygal,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-/* Type 4 HW */
-GAME( 1985, ngalsumr, 0,        nightgal, sexygal,  0,       ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, ngalsumr, 0,        nightgal,sexygal,  0,       ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
