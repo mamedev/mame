@@ -189,7 +189,7 @@ static void v_set_videorom_bank( running_machine* machine, int start, int count,
 	assert(start + count <= 8);
 
 	vrom_start_bank &= (vrom_banks - 1);
-	assert(vrom_start_bank + count < vrom_banks);
+	assert(vrom_start_bank + count <= vrom_banks);
 
 	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
 	/* count determines the size of the area mapped */
