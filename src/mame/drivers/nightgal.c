@@ -8,7 +8,7 @@ preliminary driver by David Haywood & Angelo Salese
 many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
--Get Night Gal Summer to boot;
+-Night Gal Summer trips illegal opcodes on the NCS side, presumably a CPU bug;
 -Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi
  wrong firing);
 -Proper Z80<->MCU comms,many video problems because of that;
@@ -507,9 +507,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x807f) AM_RAM AM_SHARE("share2")
-//  AM_RANGE(0xa000, 0xa000) AM_WRITE(nsc_latch_w) //???
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8000, 0xbfff) AM_RAM //???
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_BASE_MEMBER(nightgal_state,comms_ram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -518,22 +517,22 @@ static ADDRESS_MAP_START( sexygal_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 //  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
-	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA")
-	AM_RANGE(0x12,0x12) AM_READ_PORT("DSWA")
-	AM_RANGE(0x13,0x13) AM_READ_PORT("DSWB")
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x14) AM_WRITE(blitter_w) //data for the nsc to be processed
+	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
+	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
+	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
+	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
-	AM_RANGE(0x0081, 0x0083) AM_READ(nsc_blit_r)
+	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
 	AM_RANGE(0x0080, 0x0086) AM_WRITE(sexygal_nsc_true_blitter_w)
 
 	AM_RANGE(0x00a0, 0x00af) AM_WRITE(blit_true_vregs_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
 
-	AM_RANGE(0x1000, 0x103f) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_BASE_MEMBER(nightgal_state,comms_ram)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -857,66 +856,6 @@ static MACHINE_RESET( nightgal )
 	memset(state->pen_raw_data, 0, ARRAY_LENGTH(state->pen_raw_data));
 }
 
-static MACHINE_DRIVER_START( nightgal )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(nightgal_state)
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 4)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(nightgal_map)
-	MDRV_CPU_IO_MAP(nightgal_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-
-	MDRV_CPU_ADD("sub", NSC8105, MASTER_CLOCK / 4)
-	MDRV_CPU_PROGRAM_MAP(nsc_map)
-
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
-
-	MDRV_MACHINE_START(nightgal)
-	MDRV_MACHINE_RESET(nightgal)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MDRV_PALETTE_INIT(nightgal)
-
-	MDRV_PALETTE_LENGTH(0x10)
-
-	MDRV_VIDEO_START(nightgal)
-	MDRV_VIDEO_UPDATE(nightgal)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( sexygal )
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( nightgal )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sexygal_map)
-	MDRV_CPU_IO_MAP(sexygal_io)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
-
-	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(sexygal_nsc_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-
-	MDRV_DEVICE_REMOVE("aysnd")
-
-	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
-
 static MACHINE_DRIVER_START( royalqn )
 
 	/* driver data */
@@ -957,6 +896,33 @@ static MACHINE_DRIVER_START( royalqn )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( sexygal )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM( royalqn )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(sexygal_map)
+	MDRV_CPU_IO_MAP(sexygal_io)
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
+
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_PROGRAM_MAP(sexygal_nsc_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_DEVICE_REMOVE("aysnd")
+
+	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( ngalsumr )
+	MDRV_IMPORT_FROM( royalqn )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(royalqn_map)
+	MDRV_CPU_IO_MAP(royalqn_io)
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
 MACHINE_DRIVER_END
 
 /*
@@ -1076,6 +1042,31 @@ ROM_START( royalngt )
 	ROM_LOAD( "f5.6s", 0x00, 0x20, CRC(006b42d6) SHA1(ced119a299a9a7694d2fa0ef178b69d76abd0d6f) )
 ROM_END
 
+ROM_START( royalqn )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "b10.3s", 0x00000, 0x02000, CRC(67a4abfe) SHA1(1f408f7540185ce136507a8aca8d3beb234979d5) )
+	ROM_LOAD( "a11.3t", 0x02000, 0x02000, CRC(e7c5395b) SHA1(5131ab9b0fbf1b7b4d410aa2a57eceaf47f8ec3a) )
+	ROM_LOAD( "a12.3v", 0x04000, 0x02000, CRC(4e8efda4) SHA1(1959491fd899a4d85fd067d7674592ec25188a75) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "rq9.3p",  0x0c000, 0x02000, CRC(34b4cf82) SHA1(01f49ca11a695d41c181e92217e228bc1656ee57) )
+
+	ROM_REGION( 0xc000, "samples", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "rq1.3a",  0x00000, 0x02000, CRC(066449dc) SHA1(34838f5e3569b313306ce465e481b934e938c837) )
+	ROM_LOAD( "rq2.3c",  0x02000, 0x02000, CRC(c467adb5) SHA1(755ebde6229bbf0c7d9293e0becb7506d9aa9d49) )
+	ROM_LOAD( "rq3.3d",  0x04000, 0x02000, CRC(7e5a7a2d) SHA1(5770cd832de59ff4f61ac40eca8c2238ff7b582d) )
+	ROM_LOAD( "rq4.3f",  0x06000, 0x02000, CRC(afb3e333) SHA1(a3ddf800925df748db4f71a9dcb05ff0e838d767) )
+	ROM_LOAD( "rq5.3j",  0x08000, 0x02000, CRC(1e81d0f6) SHA1(f38fbaf1f2cfabb5ba0e4a06964f9a2862b7569d) )
+	ROM_LOAD( "rq6.3k",  0x0a000, 0x02000, CRC(45b2bb9c) SHA1(935e72d45585576b8f8c140ef2fdedfe6578d1c8) )
+	ROM_LOAD( "rq7.3l",  0x0c000, 0x02000, CRC(c43ee2dd) SHA1(235e15d0a5e3ccbdf47960241faf747eaa2524f6) )
+	ROM_LOAD( "rq8.3n",  0x0e000, 0x02000, CRC(3a79b3cc) SHA1(0b7b13cd1ee35ec3475d33c734c6d8f757dddd96) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "ng.6s", 0x00, 0x20, CRC(19255a7d) SHA1(4ac6316f7d8b575f28d33564b422b68993a4e484) )
+ROM_END
+
 /*
 
 Sexy Gal
@@ -1121,12 +1112,12 @@ ROM_START( sexygal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10.3n",  0x00000, 0x04000, CRC(53425b74) SHA1(1239c0527d00d693313366b7e3da669565f99ffd) )
 	ROM_LOAD( "11.3pr", 0x04000, 0x04000, CRC(a3138b42) SHA1(1bf7f6e2c4020251379cc72fa731c17795f35e2e) )
+	ROM_LOAD( "12.s8b", 0x08000, 0x04000, CRC(7ac4a984) SHA1(7b41c522387938fe7625c9a6c62a385d6635cc5e) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "1.3a",   0x0c000, 0x04000, CRC(f814cf27) SHA1(ceba1f14a202d926380039d7cb4669eb8be58539) ) // has a big (16 byte wide) ASCII 'Y.M' art, written in YMs (!)
 
 	ROM_REGION( 0xc000, "samples", 0 )
-	ROM_LOAD( "12.s8b",  0x00000, 0x04000, CRC(7ac4a984) SHA1(7b41c522387938fe7625c9a6c62a385d6635cc5e) )
 	ROM_LOAD( "13.s7b",  0x04000, 0x04000, CRC(5eb75f56) SHA1(b7d81d786d1ac8d65a6a122140954eb89d76e8b4) )
 	ROM_LOAD( "14.s6b",  0x08000, 0x04000, CRC(b4a2497b) SHA1(7231f57b4548899c886625e883b9972c0f30e9f2) )
 
@@ -1217,7 +1208,7 @@ ROM_START( ngalsumr )
 	ROM_LOAD( "10.3v", 0x04000, 0x02000, CRC(31211088) SHA1(960b781c420602be3de66565a030cf5ebdcc2ffb) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "7.3p",  0x0e000, 0x02000, CRC(20c55a25) SHA1(9dc88cb6c016b594264f7272d4fd5f30567e7c5d) )
+	ROM_LOAD( "7.3p",  0x0c000, 0x02000, CRC(20c55a25) SHA1(9dc88cb6c016b594264f7272d4fd5f30567e7c5d) )
 
 	ROM_REGION( 0xc000, "samples", 0 )
 	ROM_LOAD( "1s.ic7", 0x00000, 0x04000, CRC(47ad8a0f) SHA1(e3b1e13f0a5c613bd205338683bef8d005b54830) )
@@ -1236,32 +1227,6 @@ ROM_START( ngalsumr )
 	ROM_LOAD( "ng2.6u", 0x00, 0x20, CRC(0162a24a) SHA1(f7e1623c5bca3725f2e59ae2096b9bc42e0363bf) )
 ROM_END
 
-
-ROM_START( royalqn )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "b10.3s", 0x00000, 0x02000, CRC(67a4abfe) SHA1(1f408f7540185ce136507a8aca8d3beb234979d5) )
-	ROM_LOAD( "a11.3t", 0x02000, 0x02000, CRC(e7c5395b) SHA1(5131ab9b0fbf1b7b4d410aa2a57eceaf47f8ec3a) )
-	ROM_LOAD( "a12.3v", 0x04000, 0x02000, CRC(4e8efda4) SHA1(1959491fd899a4d85fd067d7674592ec25188a75) )
-
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "rq9.3p",  0x0c000, 0x02000, CRC(34b4cf82) SHA1(01f49ca11a695d41c181e92217e228bc1656ee57) )
-
-	ROM_REGION( 0xc000, "samples", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "rq1.3a",  0x00000, 0x02000, CRC(066449dc) SHA1(34838f5e3569b313306ce465e481b934e938c837) )
-	ROM_LOAD( "rq2.3c",  0x02000, 0x02000, CRC(c467adb5) SHA1(755ebde6229bbf0c7d9293e0becb7506d9aa9d49) )
-	ROM_LOAD( "rq3.3d",  0x04000, 0x02000, CRC(7e5a7a2d) SHA1(5770cd832de59ff4f61ac40eca8c2238ff7b582d) )
-	ROM_LOAD( "rq4.3f",  0x06000, 0x02000, CRC(afb3e333) SHA1(a3ddf800925df748db4f71a9dcb05ff0e838d767) )
-	ROM_LOAD( "rq5.3j",  0x08000, 0x02000, CRC(1e81d0f6) SHA1(f38fbaf1f2cfabb5ba0e4a06964f9a2862b7569d) )
-	ROM_LOAD( "rq6.3k",  0x0a000, 0x02000, CRC(45b2bb9c) SHA1(935e72d45585576b8f8c140ef2fdedfe6578d1c8) )
-	ROM_LOAD( "rq7.3l",  0x0c000, 0x02000, CRC(c43ee2dd) SHA1(235e15d0a5e3ccbdf47960241faf747eaa2524f6) )
-	ROM_LOAD( "rq8.3n",  0x0e000, 0x02000, CRC(3a79b3cc) SHA1(0b7b13cd1ee35ec3475d33c734c6d8f757dddd96) )
-
-	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "ng.6s", 0x00, 0x20, CRC(19255a7d) SHA1(4ac6316f7d8b575f28d33564b422b68993a4e484) )
-ROM_END
-
 static DRIVER_INIT( royalqn )
 {
 	UINT8 *ROM = memory_region(machine, "sub");
@@ -1269,6 +1234,15 @@ static DRIVER_INIT( royalqn )
 	/* patch open bus / protection */
 	ROM[0xc27e] = 0x02;
 	ROM[0xc27f] = 0x02;
+}
+
+static DRIVER_INIT( ngalsumr )
+{
+	UINT8 *ROM = memory_region(machine, "sub");
+
+	/* patch protection */
+	ROM[0xd6ce] = 0x02;
+	ROM[0xd6cf] = 0x02;
 }
 
 /* Type 1 HW */
@@ -1280,4 +1254,4 @@ GAME( 1984, royalqn,  0,        royalqn, sexygal,  royalqn, ROT0, "Royal Denshi"
 GAME( 1985, sexygal,  0,        sexygal, sexygal,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1985, sweetgal, sexygal,  sexygal, sexygal,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        nightgal,sexygal,  0,       ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal,  ngalsumr,ROT0, "Nichibutsu",   "Night Gal Summer", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
