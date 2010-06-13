@@ -7722,6 +7722,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( brapboys )	/* (c) 1992 Kaneko */
 	DRIVER( brapboysj )	/* (c) 1992 Kaneko */
 	DRIVER( bloodwar )	/* (c) 1994 Kaneko */
+	DRIVER( oedfight )	/* (c) 1994 Kaneko */
 	DRIVER( bonkadv )	/* (c) 1994 Kaneko */
 	DRIVER( gtmr )		/* (c) 1994 Kaneko */
 	DRIVER( gtmra )		/* (c) 1994 Kaneko */
