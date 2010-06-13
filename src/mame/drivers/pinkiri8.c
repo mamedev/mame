@@ -30,14 +30,14 @@ static VIDEO_UPDATE( pinkiri8 )
 
 		for(i=0x00000;i<0x4000;i+=4)
 		{
-			spr_offs = ((vram[i+0+0x30000] & 0xff) | (vram[i+1+0x30000]<<16)) & 0x0fff;
-			x = vram[i+3+0x30000];
-			y = vram[i+2+0x30000];
+			spr_offs = ((vram[i+0+0x10000] & 0xff) | (vram[i+1+0x10000]<<16)) & 0x0fff;
+			y = vram[i+2+0x10000];
+			x = vram[i+3+0x10000];
 
-			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,  0,0,0,x+0,y,0);
-			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+1,0,0,0,x+8,y,0);
-			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+2,0,0,0,x+16,y,0);
-			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+3,0,0,0,x+24,y,0);
+			drawgfx_transpen(bitmap,cliprect,gfx,0,  0,0,0,x+0,y,0);
+//			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+1,0,0,0,x+8,y,0);
+//			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+2,0,0,0,x+16,y,0);
+//			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+3,0,0,0,x+24,y,0);
 
 		}
 	}
@@ -53,7 +53,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( unk_r )
 {
-	return 0xff;//mame_rand(space->machine);
+	return mame_rand(space->machine);
+}
+
+static READ8_HANDLER( unk2_r )
+{
+	return (mame_rand(space->machine) & 0xfe)| 1;
 }
 
 static WRITE8_HANDLER( output_regs_w )
@@ -72,15 +77,14 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 		case 0: vram_addr = (data & 0xff) | (vram_addr & 0xff00); break;
 		case 1: vram_addr = (data << 8) | (vram_addr & 0x00ff); break;
 		case 2:
-			vram_bank = (data ^ 0x07) & 0x07; //unknown purpose
+			vram_bank = ((data ^ 0x06) & 0x06)>>1; //unknown purpose
 			//printf("%02x\n",vram_bank);
 			break;
 		case 3:
 			vram_addr++;
 			vram_addr&=0xffff;
-			if(vram_bank < 3)
-				vram[vram_addr] = data;
-			if(vram_addr <= 0x3fff)
+			vram[(vram_addr) | (vram_bank << 16)] = data;
+			if(vram_addr <= 0xffff)
 			{
 				static UINT16 datax,pal_offs;
 				static UINT8 r,g,b;
@@ -106,7 +110,7 @@ static ADDRESS_MAP_START( pinkiri8_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x83) AM_WRITE(pinkiri8_vram_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITENOP //mux
 	AM_RANGE(0xb0, 0xb1) AM_READ(unk_r) // mux inputs
-	AM_RANGE(0xb2, 0xb2) AM_READ(unk_r) //bit 0 causes a reset inside the NMI routine
+	AM_RANGE(0xb2, 0xb2) AM_READ(unk2_r) //bit 0 causes a reset inside the NMI routine
 	AM_RANGE(0xf8, 0xf8) AM_READ(unk_r) //test bit 0
 	AM_RANGE(0xf9, 0xf9) AM_READ(unk_r)
 	AM_RANGE(0xfa, 0xfa) AM_READ(unk_r) //test bit 7
