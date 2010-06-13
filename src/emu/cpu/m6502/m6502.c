@@ -355,7 +355,7 @@ static CPU_RESET( m6510 )
 	cpustate->ddr = 0x00;
 }
 
-int m6510_get_port(cpu_device *device)
+UINT8 m6510_get_port(cpu_device *device)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 	return (cpustate->port & cpustate->ddr) | (cpustate->ddr ^ 0xff);

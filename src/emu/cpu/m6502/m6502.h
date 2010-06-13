@@ -65,12 +65,6 @@ struct _m6502_interface
 	m6510_port_write_func	port_write_func;
 };
 
-
-enum
-{
-	CPUINFO_INT_M6510_PORT = CPUINFO_INT_CPU_SPECIFIC
-};
-
 extern CPU_GET_INFO( m6502 );
 #define CPU_M6502 CPU_GET_INFO_NAME( m6502 )
 
@@ -97,7 +91,7 @@ extern CPU_GET_INFO( m6510 );
 
 extern CPU_DISASSEMBLE( m6510 );
 
-int m6510_get_port(cpu_device *device);
+UINT8 m6510_get_port(cpu_device *device);
 
 #define M6510T_A						M6502_A
 #define M6510T_X						M6502_X

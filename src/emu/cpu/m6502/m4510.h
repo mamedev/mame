@@ -45,4 +45,6 @@ CPU_GET_INFO( m4510 );
 
 extern CPU_DISASSEMBLE( m4510 );
 
+UINT8 m4510_get_port(cpu_device *device);
+
 #endif /* __M4510_H__ */

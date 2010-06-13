@@ -349,11 +349,11 @@ static void m4510_set_irq_line(m4510_Regs *cpustate, int irqline, int state)
 	}
 }
 
-static UINT8 m4510_get_port(m4510_Regs *cpustate)
+UINT8 m4510_get_port(cpu_device *device)
 {
+	m4510_Regs *cpustate = get_safe_token(device);
 	return (cpustate->port & cpustate->ddr) | (cpustate->ddr ^ 0xff);
 }
-
 static READ8_HANDLER( m4510_read_0000 )
 {
 	UINT8 result = 0x00;
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( m4510_write_0000 )
 	}
 
 	if (cpustate->port_write)
-		cpustate->port_write(cpustate->device, 0, m4510_get_port(cpustate));
+		cpustate->port_write(cpustate->device, 0, m4510_get_port(downcast<cpu_device *>(space->cpu)));
 }
 
 static ADDRESS_MAP_START(m4510_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -506,7 +506,6 @@ CPU_GET_INFO( m4510 )
 		case CPUINFO_INT_REGISTER + M4510_MEM5:			info->i = cpustate->mem[5];					break;
 		case CPUINFO_INT_REGISTER + M4510_MEM6:			info->i = cpustate->mem[6];					break;
 		case CPUINFO_INT_REGISTER + M4510_MEM7:			info->i = cpustate->mem[7];					break;
-		case CPUINFO_INT_M6510_PORT:					info->i = m4510_get_port(cpustate);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m4510);			break;
