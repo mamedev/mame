@@ -18,14 +18,14 @@ HNZVC
 //OP_HANDLER( illegal )
 OP_HANDLER( illegal )
 {
-	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC,(int) M_RDOP_ARG(PC)&0xFF);
+	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
 }
 
 /* HD63701 only */
 //OP_HANDLER( trap )
 OP_HANDLER( trap )
 {
-	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC,(int) M_RDOP_ARG(PC)&0xFF);
+	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
 	TAKE_TRAP;
 }
 
