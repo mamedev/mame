@@ -52,17 +52,19 @@ static VIDEO_UPDATE( pinkiri8 )
 		UINT8 x,y;
 		UINT16 spr_offs,i;
 
-		for(i=0x00000;i<0x4000;i+=4)
+		for(i=0x00000;i<0x1000;i+=4)
 		{
-			spr_offs = ((vram[i+0+0x10000] & 0xff) | (vram[i+1+0x10000]<<16)) & 0x0fff;
-			y = vram[i+2+0x10000];
-			x = vram[i+3+0x10000];
+			spr_offs = ((vram[i+0+0x12000] & 0xff) | (vram[i+1+0x12000]<<8)) & 0xffff;
+			y = ((i & 0x0fc0) >> 7)* 8;//vram[i+2+0x12000];
+			x = vram[i+3+0x12000] & 0xf8;
 
-			drawgfx_transpen(bitmap,cliprect,gfx,0,  0,0,0,x+0,y,0);
-//			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+1,0,0,0,x+8,y,0);
-//			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+2,0,0,0,x+16,y,0);
-//			drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+3,0,0,0,x+24,y,0);
-
+			if(spr_offs != 0xf00)
+			{
+				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+0,0,0,0,x+0,y,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+1,0,0,0,x+8,y,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+2,0,0,0,x+16,y,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+3,0,0,0,x+24,y,0);
+			}
 		}
 	}
 
@@ -72,17 +74,18 @@ static VIDEO_UPDATE( pinkiri8 )
 static ADDRESS_MAP_START( pinkiri8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0bfff) AM_ROM
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM
+	AM_RANGE(0x0e000, 0x0ffff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM
 ADDRESS_MAP_END
 
 static READ8_HANDLER( unk_r )
 {
-	return mame_rand(space->machine);
+	return 0xff;//mame_rand(space->machine);
 }
 
 static READ8_HANDLER( unk2_r )
 {
-	return (mame_rand(space->machine) & 0xfe)| 1;
+	return 0xff;//(mame_rand(space->machine) & 0xfe)| 1;
 }
 
 static WRITE8_HANDLER( output_regs_w )
