@@ -24,12 +24,6 @@ typedef struct {
 
 enum
 {
-	CPUINFO_PTR_SM8500_INTERNAL_RAM = CPUINFO_PTR_CPU_SPECIFIC
-};
-
-
-enum
-{
 	/* "main" 16 bit register */
         SM8500_PC=1, SM8500_SP, SM8500_PS, SM8500_SYS16, SM8500_RR0, SM8500_RR2, SM8500_RR4, SM8500_RR6, SM8500_RR8, SM8500_RR10,
 	SM8500_RR12, SM8500_RR14,
@@ -42,5 +36,7 @@ extern CPU_GET_INFO( sm8500 );
 #define CPU_SM8500 CPU_GET_INFO_NAME( sm8500 )
 
 extern CPU_DISASSEMBLE( sm8500 );
+
+UINT8 *sm8500_get_internal_ram(cpu_device *device);
 
 #endif /* __SM8500_H__ */

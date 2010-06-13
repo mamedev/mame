@@ -384,6 +384,12 @@ static void sm8500_set_irq_line( sm8500_state *cpustate, int irqline, int state 
 	}
 }
 
+UINT8 *sm8500_get_internal_ram(cpu_device *device)
+{
+	sm8500_state *cpustate = get_safe_token(device);
+	return cpustate->internal_ram; 
+}
+
 static CPU_SET_INFO( sm8500 )
 {
 	sm8500_state *cpustate = get_safe_token(device);
@@ -514,8 +520,7 @@ CPU_GET_INFO( sm8500 )
 	case CPUINFO_FCT_EXECUTE:				info->execute = CPU_EXECUTE_NAME(sm8500); break;
 	case CPUINFO_FCT_BURN:					info->burn = CPU_BURN_NAME(sm8500); break;
 	case CPUINFO_FCT_DISASSEMBLE:			info->disassemble = CPU_DISASSEMBLE_NAME(sm8500); break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount; break;
-	case CPUINFO_PTR_SM8500_INTERNAL_RAM:	info->p = cpustate->internal_ram; break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount; break;	
 
 	case DEVINFO_STR_NAME:					strcpy( info->s, "sm8500" ); break;
 	case DEVINFO_STR_FAMILY:				strcpy( info->s, "Sharp SM8500" ); break;

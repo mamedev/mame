@@ -355,8 +355,9 @@ static CPU_RESET( m6510 )
 	cpustate->ddr = 0x00;
 }
 
-static UINT8 m6510_get_port(m6502_Regs *cpustate)
+int m6510_get_port(cpu_device *device)
 {
+	m6502_Regs *cpustate = get_safe_token(device);
 	return (cpustate->port & cpustate->ddr) | (cpustate->ddr ^ 0xff);
 }
 
@@ -797,8 +798,6 @@ static CPU_SET_INFO( m6510 )
 
 CPU_GET_INFO( m6510 )
 {
-	m6502_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -810,9 +809,6 @@ CPU_GET_INFO( m6510 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "M6510");				break;
-
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_M6510_PORT:					info->i = m6510_get_port(cpustate);				break;
 
 		default:										CPU_GET_INFO_CALL(m6502);			break;
 	}

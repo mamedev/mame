@@ -1264,6 +1264,88 @@ static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startf
 }
 
 
+#ifdef MESS
+/*-------------------------------------------------
+    load_software_part_region - load a software part
+
+    This is used by MESS when loading a piece of
+    software. The code should be merged with
+    process_region_list or updated to use a slight
+    more general process_region_list.
+-------------------------------------------------*/
+
+void load_software_part_region(running_device *device, char *swlist, char *swname, rom_entry *start_region)
+{
+	astring *regiontag = astring_alloc();
+	astring *locationtag = astring_alloc();
+	const rom_entry *region;
+	rom_load_data *romdata = device->machine->romload_data;
+
+	/* Make sure we are passed a device */
+	assert(device!=NULL);
+
+	astring_assemble_3( locationtag, swlist, PATH_SEPARATOR, swname );
+
+	romdata->errorstring.reset();
+
+	/* loop until we hit the end */
+	for (region = start_region; region != NULL; region = rom_next_region(region))
+	{
+		UINT32 regionlength = ROMREGION_GETLENGTH(region);
+		UINT32 regionflags = ROMREGION_GETFLAGS(region);
+
+		astring_assemble_3( regiontag, device->tag(), ":", ROMREGION_GETTAG(region) );
+		LOG(("Processing region \"%s\" (length=%X)\n", astring_c(regiontag), regionlength));
+
+		/* the first entry must be a region */
+		assert(ROMENTRY_ISREGION(region));
+
+		/* if this is a device region, override with the device width and endianness */
+		if (devtag_get_device(romdata->machine, astring_c(regiontag)) != NULL)
+			regionflags = normalize_flags_for_device(romdata->machine, regionflags, astring_c(regiontag));
+
+		/* clear old region (todo: should be moved to an image unload function) */
+		if (memory_region(romdata->machine, astring_c(regiontag)) != NULL)
+			memory_region_free(romdata->machine, astring_c(regiontag));
+
+		/* remember the base and length */
+		romdata->region = memory_region_alloc(romdata->machine, astring_c(regiontag), regionlength, regionflags);
+		LOG(("Allocated %X bytes @ %p\n", romdata->region->length, romdata->region->base.v));
+
+		/* clear the region if it's requested */
+		if (ROMREGION_ISERASE(region))
+			memset(romdata->region->base.v, ROMREGION_GETERASEVAL(region), romdata->region->length);
+
+		/* or if it's sufficiently small (<= 4MB) */
+		else if (romdata->region->length <= 0x400000)
+			memset(romdata->region->base.v, 0, romdata->region->length);
+
+#ifdef MAME_DEBUG
+		/* if we're debugging, fill region with random data to catch errors */
+		else
+			fill_random(romdata->machine, romdata->region->base.u8, romdata->region->length);
+#endif
+
+		/* now process the entries in the region */
+		if (ROMREGION_ISROMDATA(region))
+			process_rom_entries(romdata, astring_c(locationtag), region + 1);
+		else if (ROMREGION_ISDISKDATA(region))
+			process_disk_entries(romdata, astring_c(locationtag), region + 1);
+	}
+
+	/* now go back and post-process all the regions */
+	for (region = start_region; region != NULL; region = rom_next_region(region))
+		region_post_process(romdata, ROMREGION_GETTAG(region));
+
+	astring_free(regiontag);
+	astring_free(locationtag);
+
+	/* display the results and exit */
+	display_rom_load_results(romdata);
+}
+#endif
+
+
 /*-------------------------------------------------
     process_region_list - process a region list
 -------------------------------------------------*/
