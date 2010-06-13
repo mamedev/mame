@@ -4,6 +4,30 @@ Pinkiri 8 skeleton driver
 
 - current blocker is the video emulation i/o ports, it looks somewhat exotic.
 
+============================================================================
+Janshi
+(c)1992 Eagle
+
+CPU: HD647180X0P6 (16K EPROM internal rom)
+Sound: AY-3-8910, M6295
+Others: Battery
+OSC: 32MHz, 21MHz & 12.2880MHz
+
+ROMs:
+1.1A         [92b140a5]
+2.1B         [6de7e086]
+3.1D         [4e94d8f2]
+4.1F         [a5f6e3ef]
+5.1H         [ff2cc769]
+6.1K         [8197034d]
+11.1L        [a7692ddf]
+
+
+
+--- Team Japump!!! ---
+Dumped by Chackn
+04/May/2007
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -180,4 +204,26 @@ ROM_START( pinkiri8 )
 	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
 ROM_END
 
-GAME( 2005?, pinkiri8,  0,   pinkiri8,  pinkiri8,  0, ROT0, "<unknown>", "Pinkiri 8", GAME_NOT_WORKING| GAME_NO_SOUND )
+
+ROM_START( janshi )
+	ROM_REGION( 0x24000, "maincpu", 0 )
+	ROM_LOAD( "11.1l",    0x00000, 0x20000, CRC(a7692ddf) SHA1(5e7f43d8337583977baf22a28bbcd9b2182c0cde) )
+//	ROM_LOAD( "9009 1996.08 ron jan.bin", 0x00000, 0x4000, CRC(4eb74322) SHA1(84f864c0da3fb69948f6eb7ffecf0e722a882efc) ) //this is from an undumped ROMset
+	ROM_LOAD( "[3] 9009 1992.1 new jansh.bin", 0x0000, 0x4000, CRC(63cd3f12) SHA1(aebac739bffaf043e6acffa978e935f73ee1385f) ) //overlapped internal ROM
+
+	ROM_REGION( 0x140000, "gfx1", 0 )
+	ROM_LOAD( "1.1a", 0x000000, 0x40000, CRC(92b140a5) SHA1(f3b38563f74650604ed0faaf84460e0b04b386b7) )
+	ROM_LOAD( "2.1b", 0x040000, 0x40000, CRC(6de7e086) SHA1(e87426264f0181c17383ffe0f7ec7ff5fce3d809) )
+	ROM_LOAD( "3.1d", 0x080000, 0x40000, CRC(4e94d8f2) SHA1(a25f542943d74915fc82910baafb9ff9db1ffd70) )
+	ROM_LOAD( "4.1f", 0x0c0000, 0x40000, CRC(a5f6e3ef) SHA1(f1f3d28b27eea682aa71855a311fb3abdf9af2cd) )
+	ROM_LOAD( "5.1h", 0x100000, 0x40000, CRC(ff2cc769) SHA1(ba4cf2923cf3d4d815a9327595f8e1801c3c8a2b) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "6.1k", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
+
+	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
+
+ROM_END
+
+GAME( 2005?, pinkiri8,  0,   pinkiri8, pinkiri8,  0, ROT0, "<unknown>", "Pinkiri 8", GAME_NOT_WORKING| GAME_NO_SOUND )
+GAME( 1992,  janshi,    0,   pinkiri8, pinkiri8,  0, ROT0, "Eagle", "Janshi", GAME_NOT_WORKING | GAME_NO_SOUND )
