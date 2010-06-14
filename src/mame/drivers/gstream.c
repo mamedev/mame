@@ -132,7 +132,8 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gstream_state(machine)); }
 
 	gstream_state(running_machine &machine)
-		: oki_1(machine.device<okim6295_device>("oki1")),
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  oki_1(machine.device<okim6295_device>("oki1")),
 		  oki_2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
@@ -150,6 +151,7 @@ public:
 	int       oki_bank_0, oki_bank_1;
 
 	/* devices */
+	cpu_device *maincpu;
 	okim6295_device *oki_1;
 	okim6295_device *oki_2;
 };
@@ -624,9 +626,9 @@ ROM_END
 static READ32_HANDLER( gstream_speedup_r )
 {
 	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	if (cpu_get_pc(space->cpu) == 0xc0001592)
+	if (state->maincpu->state_value(STATE_GENPC) == 0xc0001592)
 	{
-		cpu_eat_cycles(space->cpu, 50);
+		state->maincpu->eat_cycles(50);
 	}
 
 	return state->workram[0xd1ee0 / 4];
