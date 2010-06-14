@@ -50,6 +50,8 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
+#define TEMPLOG	0
+
 
 
 //**************************************************************************
@@ -390,6 +392,7 @@ void device_execute_interface::set_irq_callback(device_irq_callback callback)
 
 void device_execute_interface::suspend(UINT32 reason, bool eatcycles)
 {
+if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 	// set the suspend reason and eat cycles flag
 	m_nextsuspend |= reason;
 	m_nexteatcycles = eatcycles;
@@ -406,6 +409,7 @@ void device_execute_interface::suspend(UINT32 reason, bool eatcycles)
 
 void device_execute_interface::resume(UINT32 reason)
 {
+if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
 	// clear the suspend reason and eat cycles flag
 	m_nextsuspend &= ~reason;
 
@@ -868,6 +872,7 @@ void device_execute_interface::device_input::set_state_synced(int state, int vec
 {
 	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_device->tag(), m_linenum, state, vector));
 
+if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_device->tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE || state == PULSE_LINE);
 
 	// treat PULSE_LINE as ASSERT+CLEAR
@@ -917,6 +922,7 @@ TIMER_CALLBACK( device_execute_interface::device_input::static_empty_event_queue
 
 void device_execute_interface::device_input::empty_event_queue()
 {
+if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_device->tag(), m_linenum, m_qindex);
 	// loop over all events
 	for (int curevent = 0; curevent < m_qindex; curevent++)
 	{
@@ -925,6 +931,7 @@ void device_execute_interface::device_input::empty_event_queue()
 		// set the input line state and vector
 		m_curstate = input_event & 0xff;
 		m_curvector = input_event >> 8;
+if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 
 		assert(m_curstate == ASSERT_LINE || m_curstate == HOLD_LINE || m_curstate == CLEAR_LINE);
 

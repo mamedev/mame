@@ -59,7 +59,7 @@ static UINT16 test_mask;
 
 static pokey_sound_device *pokey;
 static ym2151_sound_device *ym2151;
-static tms5220_sound_device *tms5220;
+static device_t *tms5220;
 static okim6295_device *oki6295;
 static okim6295_device *oki6295_l, *oki6295_r;
 
@@ -138,7 +138,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	bank_source_data = &rgn[0x10000];
 
 	/* determine which sound hardware is installed */
-	tms5220 = machine->device<tms5220_sound_device>("tms");
+	tms5220 = machine->device("tms");
 	ym2151 = machine->device<ym2151_sound_device>("ymsnd");
 	pokey = machine->device<pokey_sound_device>("pokey");
 	oki6295 = machine->device<okim6295_device>("adpcm");

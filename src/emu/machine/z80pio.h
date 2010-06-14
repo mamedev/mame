@@ -108,9 +108,16 @@ class z80pio_device : 	public device_t,
 	z80pio_device(running_machine &_machine, const z80pio_device_config &config);
 
 public:
+	enum
+	{
+		PORT_A = 0,
+		PORT_B,
+		PORT_COUNT
+	};
+
 	// I/O line access	
 	int rdy(int which) { return m_port[which].rdy(); }
-	void strobe(int which, int state) { m_port[which].strobe(state); }
+	void strobe(int which, bool state) { m_port[which].strobe(state); }
 
 	// control register I/O
 	UINT8 control_read();
@@ -152,9 +159,9 @@ private:
 		void trigger_interrupt();
 
 		int rdy() const { return m_rdy; }
-		void set_rdy(int state);
+		void set_rdy(bool state);
 		void set_mode(int mode);
-		void strobe(int state);
+		void strobe(bool state);
 		
 		UINT8 read();
 		void write(UINT8 data);
@@ -179,17 +186,17 @@ private:
 		UINT8 m_input;				// input latch
 		UINT8 m_output;				// output latch
 		UINT8 m_ior;				// input/output register
-		int m_rdy;					// ready
-		int m_stb;					// strobe
+		bool m_rdy;					// ready
+		bool m_stb;					// strobe
 
 		// interrupts
-		int m_ie;					// interrupt enabled
-		int m_ip;					// interrupt pending
-		int m_ius;					// interrupt under service
+		bool m_ie;					// interrupt enabled
+		bool m_ip;					// interrupt pending
+		bool m_ius;					// interrupt under service
 		UINT8 m_icw;				// interrupt control word
 		UINT8 m_vector;				// interrupt vector
 		UINT8 m_mask;				// interrupt mask
-		int m_match;				// logic equation match
+		bool m_match;				// logic equation match
 	};
 
 	// internal state

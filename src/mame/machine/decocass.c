@@ -222,7 +222,7 @@ WRITE8_HANDLER( decocass_reset_w )
 	}
 
 	/* 8041 active low reset */
-	cpu_set_input_line(state->mcu, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(state->mcu, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

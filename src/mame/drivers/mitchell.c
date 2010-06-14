@@ -387,7 +387,8 @@ ADDRESS_MAP_END
 /**** Monsters World ****/
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
-	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
+	mitchell_state *state = (mitchell_state *)device->machine->driver_data;
+	state->oki->set_bank_base(0x40000 * (data & 3));
 }
 
 static ADDRESS_MAP_START( mstworld_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1239,7 +1240,8 @@ static MACHINE_DRIVER_START( spangbl )
 
 	MDRV_GFXDECODE(spangbl)
 
-	MDRV_SOUND_REPLACE("oki", MSM5205, 384000)
+	MDRV_DEVICE_REMOVE("oki")
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

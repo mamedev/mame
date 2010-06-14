@@ -817,7 +817,8 @@ static CPU_EXECUTE( m37710 )
 
 	m37710i_update_irqs(m37710);
 
-	m37710->ICount = m37710->execute(m37710, m37710->ICount);
+	int clocks = m37710->ICount;
+	m37710->ICount = clocks - m37710->execute(m37710, m37710->ICount);
 }
 
 

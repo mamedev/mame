@@ -494,7 +494,8 @@ static WRITE32_HANDLER( tattass_control_w )
 	static int pendingCommand=0; /* 1 = read, 2 = write */
 	static int readBitCount=0;
 	static int byteAddr=0;
-	const address_space *eeprom_space = cputag_get_address_space(space->machine, "eeprom", ADDRESS_SPACE_0);
+	eeprom_device *eeprom = space->machine->device<eeprom_device>("eeprom");
+	const address_space *eeprom_space = eeprom->space();
 
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */

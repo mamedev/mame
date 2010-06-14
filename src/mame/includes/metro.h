@@ -17,7 +17,7 @@ public:
 		: maincpu(machine.device<cpu_device>("maincpu")),
 		  audiocpu(machine.device<cpu_device>("audiocpu")),
 		  oki(machine.device<okim6295_device>("oki")),
-		  ymsnd(machine.device<ym2151_sound_device>("ymsnd")),
+		  ymsnd(machine.device("ymsnd")),
 		  k053936(machine.device<k053936_device>("k053936")) { }
 
 	/* memory pointers */
@@ -84,7 +84,7 @@ public:
 	cpu_device *maincpu;
 	cpu_device *audiocpu;
 	okim6295_device *oki;
-	ym2151_sound_device *ymsnd;
+	device_t *ymsnd;
 	k053936_device *k053936;
 };
 

@@ -50,6 +50,8 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
+#define TEMPLOG	0
+
 
 
 //**************************************************************************
@@ -111,6 +113,7 @@ void device_scheduler::timeslice()
 {
 	bool call_debugger = ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	timer_execution_state *timerexec = timer_get_execution_state(&m_machine);
+if (TEMPLOG) printf("Timeslice start\n");
 
 	// build the execution list if we don't have one yet
 	if (m_execute_list == NULL)
@@ -119,6 +122,14 @@ void device_scheduler::timeslice()
 	// loop until we hit the next timer
 	while (ATTOTIME_LT(timerexec->basetime, timerexec->nextfire))
 	{
+if (TEMPLOG)
+{
+	void timer_print_first_timer(running_machine *machine);
+	printf("Timeslice loop: basetime=%15.6f\n", attotime_to_double(timerexec->basetime));
+	timer_print_first_timer(&m_machine);
+}
+		
+		
 		// by default, assume our target is the end of the next quantum
 		attotime target;
 		target.seconds = timerexec->basetime.seconds;
@@ -174,6 +185,7 @@ void device_scheduler::timeslice()
 						// note that this global variable cycles_stolen can be modified
 						// via the call to cpu_execute
 						exec->m_cycles_stolen = 0;
+if (TEMPLOG) printf("Executing %s for %d cycles\n", exec->device().tag(), ran);
 						m_executing_device = exec;
 						*exec->m_icount = exec->m_cycles_running;
 						if (!call_debugger)
@@ -192,6 +204,8 @@ void device_scheduler::timeslice()
 						ran -= exec->m_cycles_stolen;
 						profiler_mark_end();
 					}
+else
+if (TEMPLOG) printf("Skipping %s for %d cycles\n", exec->device().tag(), ran);
 
 					// account for these cycles
 					exec->m_totalcycles += ran;
@@ -224,6 +238,7 @@ void device_scheduler::timeslice()
 		// update the base time
 		timerexec->basetime = target;
 	}
+if (TEMPLOG) printf("Timeslice end\n");
 
 	// execute timers
 	timer_execute_timers(&m_machine);
@@ -382,6 +397,7 @@ void device_scheduler::rebuild_execute_list()
 		// inform the timer system of our decision
 		assert(min_quantum.seconds == 0);
 		timer_add_scheduling_quantum(&m_machine, min_quantum.attoseconds, attotime_never);
+if (TEMPLOG) printf("Setting quantum: %08X%08X\n", (UINT32)(min_quantum.attoseconds >> 32), (UINT32)min_quantum.attoseconds);
 		m_quantum_set = true;
 	}
 
@@ -413,4 +429,11 @@ void device_scheduler::rebuild_execute_list()
 	
 	// append the suspend list to the end of the active list
 	*active_tailptr = suspend_list;
+if (TEMPLOG)
+{
+	printf("Execute list:");
+	for (exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
+		printf(" %s", exec->device().tag());
+	printf("\n");
+}
 }

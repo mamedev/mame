@@ -921,6 +921,14 @@ static void timer_logtimers(running_machine *machine)
 }
 
 
+void timer_print_first_timer(running_machine *machine)
+{
+	timer_private *global = machine->timer_data;
+	emu_timer *t = global->activelist;
+	printf("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s)\n",
+		attotime_to_double(t->start), attotime_to_double(t->expire), attotime_to_double(t->period), t->enabled, t->temporary, t->func);
+}
+
 
 //**************************************************************************
 //  TIMER DEVICE CONFIGURATION

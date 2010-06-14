@@ -249,7 +249,8 @@ static CPU_EXECUTE( g65816 )
 {
 	g65816i_cpu_struct *cpustate = get_safe_token(device);
 
-	cpustate->ICount = FTABLE_EXECUTE(cpustate, cpustate->ICount);
+	int clocks = cpustate->ICount;
+	cpustate->ICount = clocks - FTABLE_EXECUTE(cpustate, cpustate->ICount);
 }
 
 
