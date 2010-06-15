@@ -246,6 +246,49 @@ ROM_START( ronjan )
 
 ROM_END
 
+static UINT8 prot_read_index;
+
+static READ8_HANDLER( ronjan_prot_r )
+{
+	static const char wing_str[6] = { 'W', 'I', 'N', 'G', '8', '9' };
+
+	prot_read_index++;
+
+	if(prot_read_index & 1)
+		return 0xff; //value is discarded
+
+	return wing_str[(prot_read_index >> 1)-1];
+}
+
+static WRITE8_HANDLER( ronjan_prot_w )
+{
+	static UINT8 prot_char[6],prot_index;
+
+	if(data == 0)
+	{
+		prot_index = 0;
+	}
+	else
+	{
+		prot_char[prot_index] = data;
+		prot_index++;
+
+		if(prot_char[0] == 'E' && prot_char[1] == 'R' && prot_char[2] == 'R' && prot_char[3] == 'O' && prot_char[4] == 'R')
+			prot_read_index = 0;
+	}
+}
+
+static READ8_HANDLER( ronjan_prot_status_r )
+{
+	return 0; //bit 0 seems a protection status bit
+}
+
+static DRIVER_INIT( ronjan )
+{
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x90, 0x90, 0, 0, ronjan_prot_r, ronjan_prot_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x66, 0x66, 0, 0, ronjan_prot_status_r);
+}
+
 GAME( 2005?, pinkiri8,  0,   pinkiri8, pinkiri8,  0, ROT0, "Wing Co., Ltd", "Pinkiri 8", GAME_NOT_WORKING| GAME_NO_SOUND )
 GAME( 1992,  janshi,    0,   pinkiri8, pinkiri8,  0, ROT0, "Eagle", "Janshi", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1996,  ronjan,    0,   pinkiri8, pinkiri8,  0, ROT0, "Eagle", "Ron Jan", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1996,  ronjan,    0,   pinkiri8, pinkiri8,  ronjan, ROT0, "Eagle", "Ron Jan", GAME_NOT_WORKING | GAME_NO_SOUND )
