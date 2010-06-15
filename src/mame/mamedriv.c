@@ -9693,6 +9693,7 @@ Other Sun games
 
 	/* Eagle */
 	DRIVER( janshi )
+	DRIVER( ronjan )
 	DRIVER( pinkiri8 )
 
 	/* Wing */

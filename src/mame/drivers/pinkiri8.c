@@ -211,7 +211,6 @@ ROM_END
 ROM_START( janshi )
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "11.1l",    0x00000, 0x20000, CRC(a7692ddf) SHA1(5e7f43d8337583977baf22a28bbcd9b2182c0cde) )
-//	ROM_LOAD( "9009 1996.08 ron jan.bin", 0x00000, 0x4000, CRC(4eb74322) SHA1(84f864c0da3fb69948f6eb7ffecf0e722a882efc) ) //this is from an undumped ROMset
 	ROM_LOAD( "[3] 9009 1992.1 new jansh.bin", 0x0000, 0x4000, CRC(63cd3f12) SHA1(aebac739bffaf043e6acffa978e935f73ee1385f) ) //overlapped internal ROM
 
 	ROM_REGION( 0x140000, "gfx1", 0 )
@@ -228,5 +227,25 @@ ROM_START( janshi )
 
 ROM_END
 
-GAME( 2005?, pinkiri8,  0,   pinkiri8, pinkiri8,  0, ROT0, "<unknown>", "Pinkiri 8", GAME_NOT_WORKING| GAME_NO_SOUND )
+ROM_START( ronjan )
+	ROM_REGION( 0x24000, "maincpu", 0 )
+	ROM_LOAD( "ver201.bin",    0x00000, 0x20000, CRC(caa98c79) SHA1(e18f52fc910e3a77142ad2a3167805cfd664f0f4) )
+	ROM_LOAD( "9009 1996.08 ron jan.bin", 0x00000, 0x4000, CRC(4eb74322) SHA1(84f864c0da3fb69948f6eb7ffecf0e722a882efc) ) //overlapped internal ROM
+
+	ROM_REGION( 0x140000, "gfx1", 0 )
+	ROM_LOAD( "eagle.1", 0x000000, 0x40000, CRC(11cef2c4) SHA1(fcd46bfa123cd91053f8d49892778e02a275ffdd) )
+	ROM_LOAD( "eagle.2", 0x040000, 0x40000, CRC(177c444c) SHA1(5af0f6040ba121c90b3480ce636885cce535d3ea) )
+	ROM_LOAD( "eagle.3", 0x080000, 0x40000, CRC(5b15b99f) SHA1(b99e2fa4cde7c8661d1a81ce5045f5df4f1de9f2) )
+	ROM_LOAD( "eagle.4", 0x0c0000, 0x40000, CRC(d6797340) SHA1(0394ba570f2008f5a16e7c0a4dc67b1182be8899) )
+	ROM_LOAD( "eagle.5", 0x100000, 0x40000, CRC(1aa42eaf) SHA1(edae2d1b58429e09ecfcaa5bcf4a9bfd5fb7cbea) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "eagle.6", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
+
+	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
+
+ROM_END
+
+GAME( 2005?, pinkiri8,  0,   pinkiri8, pinkiri8,  0, ROT0, "Wing Co., Ltd", "Pinkiri 8", GAME_NOT_WORKING| GAME_NO_SOUND )
 GAME( 1992,  janshi,    0,   pinkiri8, pinkiri8,  0, ROT0, "Eagle", "Janshi", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1996,  ronjan,    0,   pinkiri8, pinkiri8,  0, ROT0, "Eagle", "Ron Jan", GAME_NOT_WORKING | GAME_NO_SOUND )
