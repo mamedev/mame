@@ -868,6 +868,60 @@ static void print_game_categories(FILE *out, const game_driver *game, const iopo
 }
 
 /*-------------------------------------------------
+    print_game_images - prints out all info on
+    image devices
+-------------------------------------------------*/
+
+static void print_game_images(FILE *out, const game_driver *game, const machine_config *config)
+{
+	const device_config_image_interface *dev;
+	const char *name;
+	const char *shortname;
+	const char *ext;
+
+	for (bool gotone = config->devicelist.first(dev); gotone; gotone = dev->next(dev))
+	{
+		const legacy_image_device_config_base *info = downcast<const legacy_image_device_config_base *>(dev);
+
+		/* print out device type */
+		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(info->image_type_name()));
+
+		/* does this device have a tag? */
+		if (info->tag())
+			fprintf(out, " tag=\"%s\"", xml_normalize_string(info->tag()));
+
+		/* is this device mandatory? */
+		if (info->must_be_loaded())
+			fprintf(out, " mandatory=\"1\"");
+
+		if (info->image_interface()[0] )
+			fprintf(out, " interface=\"%s\"", xml_normalize_string(info->image_interface()));
+
+		/* close the XML tag */
+		fprintf(out, ">\n");
+
+		name = info->instance_name();
+		shortname = info->brief_instance_name();
+
+		fprintf(out, "\t\t\t<instance");
+		fprintf(out, " name=\"%s\"", xml_normalize_string(name));
+		fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
+		fprintf(out, "/>\n");
+
+		ext = info->file_extensions();
+		while (*ext)
+		{
+			fprintf(out, "\t\t\t<extension");
+			fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
+			fprintf(out, "/>\n");
+			ext += strlen(ext) + 1;
+		}
+
+		fprintf(out, "\t\t</device>\n");
+	}
+}
+
+/*-------------------------------------------------
     print_game_info - print the XML information
     for one particular game driver
 -------------------------------------------------*/
@@ -941,6 +995,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_categories(out, game, portlist);
 	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
+	print_game_images( out, game, config );
 #ifdef MESS
 	print_mess_game_xml(out, game, config);
 #endif /* MESS */
@@ -971,7 +1026,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 #ifdef MESS
 		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*, softwarelist*)>\n"
 #else
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*)>\n"
 #endif
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
@@ -1078,7 +1133,6 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST driver protection (good|imperfect|preliminary) #IMPLIED>\n"
 		"\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST driver palettesize CDATA #REQUIRED>\n"
-#ifdef MESS
 		"\t\t<!ELEMENT device (instance*, extension*)>\n"
 		"\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
@@ -1089,6 +1143,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
 		"\t\t\t<!ELEMENT extension EMPTY>\n"
 		"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
+#ifdef MESS
 		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
 		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
 		"\t\t<!ELEMENT softwarelist EMPTY>\n"

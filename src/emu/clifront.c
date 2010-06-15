@@ -55,6 +55,7 @@ static void display_help(void);
 static int info_verifyroms(core_options *options, const char *gamename);
 static int info_verifysamples(core_options *options, const char *gamename);
 static int info_romident(core_options *options, const char *gamename);
+static int info_listmedia(core_options *opts, const char *gamename);
 
 /* utilities */
 static void romident(core_options *options, const char *filename, romident_status *status);
@@ -95,8 +96,8 @@ static const options_entry cli_options[] =
 	{ "verifysamples",            "0",        OPTION_COMMAND,    "report samplesets that have problems" },
 	{ "romident",                 "0",        OPTION_COMMAND,    "compare files with known MAME roms" },
 	{ "listdevices;ld",           "0",        OPTION_COMMAND,    "list available devices" },
-#ifdef MESS
 	{ "listmedia;lm",             "0",        OPTION_COMMAND,    "list available media for the system" },
+#ifdef MESS
 	{ "listsoftware",             "0",        OPTION_COMMAND,    "list known software for the system" },
 #endif
 
@@ -273,8 +274,8 @@ static int execute_commands(core_options *options, const char *exename, const ga
 		{ CLIOPTION_LISTSAMPLES,	cli_info_listsamples },
 		{ CLIOPTION_VERIFYROMS,		info_verifyroms },
 		{ CLIOPTION_VERIFYSAMPLES,	info_verifysamples },
-#ifdef MESS
 		{ CLIOPTION_LISTMEDIA,		info_listmedia },
+#ifdef MESS
 		{ CLIOPTION_LISTSOFTWARE,	info_listsoftware },
 #endif
 		{ CLIOPTION_ROMIDENT,		info_romident }
@@ -773,6 +774,71 @@ static int info_verifyroms(core_options *options, const char *gamename)
 		mame_printf_info("%d romsets found, %d were OK.\n", correct + incorrect, correct);
 		return (incorrect > 0) ? MAMERR_MISSING_FILES : MAMERR_NONE;
 	}
+}
+
+
+/*-------------------------------------------------
+    info_listmedia - output the list of image
+    devices referenced by a given game or set of
+    games
+-------------------------------------------------*/
+
+static int info_listmedia(core_options *options, const char *gamename)
+{
+	int count = 0, devcount;
+	int drvindex;
+	machine_config *config;
+	const device_config_image_interface *dev;	
+	const char *src;
+	const char *driver_name;
+	const char *name;
+	const char *shortname;
+	char paren_shortname[16];
+
+	printf(" SYSTEM      DEVICE NAME (brief)   IMAGE FILE EXTENSIONS SUPPORTED    \n");
+	printf("----------  --------------------  ------------------------------------\n");
+
+	/* iterate over drivers */
+	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
+		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
+		{
+			/* allocate the machine config */
+			config = machine_config_alloc(drivers[drvindex]->machine_config);
+
+			driver_name = drivers[drvindex]->name;
+
+			devcount = 0;
+
+			for (bool gotone = config->devicelist.first(dev); gotone; gotone = dev->next(dev))
+			{
+				src = downcast<const legacy_image_device_config_base *>(dev)->file_extensions();
+				name = downcast<const legacy_image_device_config_base *>(dev)->instance_name();
+				shortname = downcast<const legacy_image_device_config_base *>(dev)->brief_instance_name();					
+				
+				sprintf(paren_shortname, "(%s)", shortname);
+
+				printf("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
+				driver_name = " ";
+
+				while (src && *src)
+				{
+					printf(".%-5s", src);
+					src += strlen(src) + 1;
+					devcount++;
+				}
+				printf("\n");
+			}
+			if (!devcount)			
+				printf("%-13s(none)\n",driver_name);
+
+			count++;
+			machine_config_free(config);
+		}
+
+	if (!count)
+		printf("There are no Computers or Consoles named %s\n", gamename);
+
+	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
 
 

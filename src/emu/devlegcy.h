@@ -48,6 +48,8 @@
 //  CONSTANTS
 //**************************************************************************
 
+#define DEVINFO_IMAGE_CREATE_OPTMAX   32
+
 // state constants passed to the device_get_config_func
 enum
 {
@@ -130,9 +132,68 @@ enum
 
 	DEVINFO_STR_CLASS_SPECIFIC = 0x34000,				// R/W: device-specific values start here 
 	DEVINFO_STR_DEVICE_SPECIFIC = 0x38000,				// R/W: device-specific values start here 
-	DEVINFO_STR_LAST = 0x3ffff
+	DEVINFO_STR_LAST = 0x3ffff,
+	
+    /* --- image device related --- */
+	/* --- the following bits of info are returned as integers --- */
+    DEVINFO_INT_IMAGE_FIRST = DEVINFO_INT_FIRST + 0x7000,
+    DEVINFO_INT_IMAGE_TYPE,
+    DEVINFO_INT_IMAGE_READABLE,
+    DEVINFO_INT_IMAGE_WRITEABLE,
+    DEVINFO_INT_IMAGE_CREATABLE,
+    DEVINFO_INT_IMAGE_MUST_BE_LOADED,
+    DEVINFO_INT_IMAGE_RESET_ON_LOAD,
+    DEVINFO_INT_IMAGE_CREATE_OPTCOUNT,
+    DEVINFO_INT_IMAGE_LAST = DEVINFO_INT_IMAGE_FIRST + 0x0fff,
+
+    /* --- the following bits of info are returned as pointers --- */
+    DEVINFO_PTR_IMAGE_FIRST = DEVINFO_PTR_FIRST + 0x7000,
+    DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE,
+    DEVINFO_PTR_IMAGE_CREATE_OPTSPEC,
+
+    /* --- the following bits of info are returned as pointers to functions --- */
+    DEVINFO_FCT_IMAGE_FIRST = DEVINFO_FCT_FIRST + 0x7000,
+    DEVINFO_FCT_IMAGE_LOAD,                                     /* R/O: device_image_load_func */
+    DEVINFO_FCT_IMAGE_CREATE,                                   /* R/O: device_image_create_func */
+    DEVINFO_FCT_IMAGE_UNLOAD,                                   /* R/O: device_image_unload_func */
+    DEVINFO_FCT_IMAGE_DISPLAY,                                  /* R/O: device_image_display_func */
+    DEVINFO_FCT_IMAGE_PARTIAL_HASH,                             /* R/O: device_image_partialhash_func */
+    DEVINFO_FCT_IMAGE_GET_DEVICES,                              /* R/O: device_image_get_devices_func */
+    DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff,
+
+    /* --- the following bits of info are returned as NULL-terminated strings --- */
+    DEVINFO_STR_IMAGE_FIRST = DEVINFO_STR_FIRST + 0x7000,
+    DEVINFO_STR_IMAGE_FILE_EXTENSIONS,
+    DEVINFO_STR_IMAGE_INSTANCE_NAME,
+    DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME,
+    DEVINFO_STR_IMAGE_CREATE_OPTNAME,
+    DEVINFO_STR_IMAGE_CREATE_OPTDESC = DEVINFO_STR_IMAGE_CREATE_OPTNAME + DEVINFO_IMAGE_CREATE_OPTMAX,
+    DEVINFO_STR_IMAGE_CREATE_OPTEXTS = DEVINFO_STR_IMAGE_CREATE_OPTDESC + DEVINFO_IMAGE_CREATE_OPTMAX,
+	DEVINFO_STR_IMAGE_INTERFACE,
+    DEVINFO_STR_IMAGE_LAST = DEVINFO_STR_IMAGE_FIRST + 0x0fff
 };
 
+typedef enum
+{
+    /* List of all supported devices.  Refer to the device by these names only */
+    IO_UNKNOWN,
+    IO_CARTSLOT,    /*  1 - Cartridge Port, as found on most console and on some computers */
+    IO_FLOPPY,      /*  2 - Floppy Disk unit */
+    IO_HARDDISK,    /*  3 - Hard Disk unit */
+    IO_CYLINDER,    /*  4 - Magnetically-Coated Cylinder */
+    IO_CASSETTE,    /*  5 - Cassette Recorder (common on early home computers) */
+    IO_PUNCHCARD,   /*  6 - Card Puncher/Reader */
+    IO_PUNCHTAPE,   /*  7 - Tape Puncher/Reader (reels instead of punchcards) */
+    IO_PRINTER,     /*  8 - Printer device */
+    IO_SERIAL,      /*  9 - Generic Serial Port */
+    IO_PARALLEL,    /* 10 - Generic Parallel Port */
+    IO_SNAPSHOT,    /* 11 - Complete 'snapshot' of the state of the computer */
+    IO_QUICKLOAD,   /* 12 - Allow to load program/data into memory, without matching any actual device */
+    IO_MEMCARD,     /* 13 - Memory card */
+    IO_CDROM,       /* 14 - optical CD-ROM disc */
+	IO_MAGTAPE,     /* 15 - Magentic tape */
+    IO_COUNT        /* 16 - Total Number of IO_devices for searching */
+} iodevice_t;
 
 
 //**************************************************************************
@@ -191,11 +252,13 @@ device_t *configclass::alloc_device(running_machine &machine) const 			\
 #define DECLARE_LEGACY_SOUND_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(SOUND_##name, basename, basename##_sound_device_config, basename##_sound_device, legacy_sound_device_config_base, legacy_sound_device_base)
 #define DECLARE_LEGACY_MEMORY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_memory_device_config_base, legacy_memory_device_base)
 #define DECLARE_LEGACY_NVRAM_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_nvram_device_config_base, legacy_nvram_device_base)
+#define DECLARE_LEGACY_IMAGE_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_image_device_config_base, legacy_image_device_base)
 
 #define DEFINE_LEGACY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_device_config_base, legacy_device_base)
 #define DEFINE_LEGACY_SOUND_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(SOUND_##name, basename, basename##_sound_device_config, basename##_sound_device, legacy_sound_device_config_base, legacy_sound_device_base)
 #define DEFINE_LEGACY_MEMORY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_memory_device_config_base, legacy_memory_device_base)
 #define DEFINE_LEGACY_NVRAM_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_nvram_device_config_base, legacy_nvram_device_base)
+#define DEFINE_LEGACY_IMAGE_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_image_device_config_base, legacy_image_device_base)
 
 
 // macros to wrap legacy device functions
@@ -346,6 +409,13 @@ typedef INT32 (*device_execute_func)(device_t *device, INT32 clocks);
 typedef void (*device_reset_func)(device_t *device);
 typedef void (*device_nvram_func)(device_t *device, mame_file *file, int read_or_write);
 
+// device image interface function types
+typedef int (*device_image_load_func)(running_device *image);
+typedef int (*device_image_create_func)(running_device *image, int format_type, option_resolution *format_options);
+typedef void (*device_image_unload_func)(running_device *image);
+typedef void (*device_image_display_func)(running_device *image);
+typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
+typedef void (*device_image_get_devices_func)(running_device *device);
 
 // the actual deviceinfo union 
 union deviceinfo
@@ -529,6 +599,90 @@ protected:
 	virtual void nvram_read(mame_file &file);
 	virtual void nvram_write(mame_file &file);
 };
+
+// ======================> legacy_image_device_config
+typedef struct _image_device_format image_device_format;
+struct _image_device_format
+{
+    image_device_format *next;
+    int index;
+    const char *name;
+    const char *description;
+    const char *extensions;
+    const char *optspec;
+};
+
+struct image_config
+{
+    iodevice_t   m_type;
+	bool m_readable;
+	bool m_writeable;
+	bool m_creatable;
+	bool m_must_be_loaded;
+    bool m_reset_on_load;
+    bool m_has_partial_hash;
+    const char *m_file_extensions;
+    const char *m_instance_name;
+    const char *m_brief_instance_name;
+	const char *m_interface_name;
+
+	device_image_load_func			load;
+	device_image_create_func		create;
+	device_image_unload_func		unload;
+	device_image_display_func		display;
+	device_image_partialhash_func	partialhash;
+	device_image_get_devices_func	get_devices;
+	
+    /* creation info */
+    const option_guide *m_create_option_guide;
+    image_device_format *m_formatlist;	
+};
+// legacy_image_device_config is a device_config with a image interface
+class legacy_image_device_config_base : 	public legacy_device_config_base, 
+											public device_config_image_interface
+{
+public:	
+	virtual iodevice_t image_type()  const { return m_config.m_type; }
+	virtual const char *image_type_name()  const;
+	virtual iodevice_t image_type_direct() const { return static_cast<iodevice_t>(get_legacy_config_int(DEVINFO_INT_IMAGE_TYPE)); }	
+	virtual bool is_readable()  const { return m_config.m_readable; }
+	virtual bool is_writeable() const { return m_config.m_writeable; }
+	virtual bool is_creatable() const { return m_config.m_creatable; }
+	virtual bool must_be_loaded() const { return m_config.m_must_be_loaded; }
+	virtual bool is_reset_on_load() const { return m_config.m_reset_on_load; }
+	virtual bool has_partiah_hash() const { return m_config.m_has_partial_hash; }
+	virtual const char *image_interface() const { return m_config.m_interface_name; }
+	virtual const char *file_extensions() const { return m_config.m_file_extensions; }
+	virtual const char *file_extensions_list() const { return core_strdup(get_legacy_config_string(DEVINFO_STR_IMAGE_FILE_EXTENSIONS)); }
+	virtual const char *instance_name() const { return m_config.m_instance_name; }
+	virtual const char *brief_instance_name() const { return m_config.m_brief_instance_name; }	
+protected:
+	// construction/destruction
+	legacy_image_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
+	virtual ~legacy_image_device_config_base();
+	
+	// device_config overrides
+	virtual void device_config_complete();
+		
+	image_config m_config;
+	const machine_config *m_mconfig;	
+};
+
+
+// ======================> legacy_image_device
+
+// legacy_image_device is a legacy_device_base with a image interface
+class legacy_image_device_base : 	public legacy_device_base, 
+									public device_image_interface
+{
+protected:
+	// construction/destruction
+	legacy_image_device_base(running_machine &machine, const device_config &config);
+
+	// device_image_interface overrides
+};
+
+
 
 
 #endif	/* __DEVLEGCY_H__ */

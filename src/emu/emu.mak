@@ -50,6 +50,7 @@ EMUOBJS = \
 	$(EMUOBJ)/devintrf.o \
 	$(EMUOBJ)/didisasm.o \
 	$(EMUOBJ)/diexec.o \
+	$(EMUOBJ)/diimage.o \
 	$(EMUOBJ)/dimemory.o \
 	$(EMUOBJ)/dinvram.o \
 	$(EMUOBJ)/disound.o \
@@ -70,6 +71,7 @@ EMUOBJS = \
 	$(EMUOBJ)/mconfig.o \
 	$(EMUOBJ)/memory.o \
 	$(EMUOBJ)/output.o \
+	$(EMUOBJ)/opresolv.o \
 	$(EMUOBJ)/render.o \
 	$(EMUOBJ)/rendfont.o \
 	$(EMUOBJ)/rendlay.o \

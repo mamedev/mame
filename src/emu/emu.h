@@ -72,6 +72,8 @@
 #include "distate.h"
 #include "dimemory.h"
 #include "diexec.h"
+#include "opresolv.h"
+#include "diimage.h"
 #include "disound.h"
 #include "dinvram.h"
 #include "didisasm.h"
