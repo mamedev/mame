@@ -810,5 +810,5 @@ ROM_END
 
 
 
-GAME( 1986, firetrap,   0,        firetrap,   firetrap,   0, ROT90, "Data East USA", "Fire Trap (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, firetrap,   0,        firetrap,   firetrap,   0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US)", GAME_SUPPORTS_SAVE )
 GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, 0, ROT90, "bootleg", "Fire Trap (Japan bootleg)", GAME_SUPPORTS_SAVE )
