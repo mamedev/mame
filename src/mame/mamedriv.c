@@ -3135,7 +3135,10 @@ V-V                           TP-027
 	DRIVER( bldyror2u )	/* Bloody Roar 2 (USA) */
 	DRIVER( bldyror2a )	/* Bloody Roar 2 (ASIA) */
 	DRIVER( bldyror2j )	/* Bloody Roar 2 (JAPAN) */
-	DRIVER( brvblade )	/* Brave Blade (JAPAN) */
+	DRIVER( brvblade )	/* Brave Blade (WORLD) */
+	DRIVER( brvbladeu )	/* Brave Blade (USA) */
+	DRIVER( brvbladea )	/* Brave Blade (ASIA) */
+	DRIVER( brvbladej )	/* Brave Blade (JAPAN) */
 	DRIVER( bam2 )		/* Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00) */
 
 	/* Atari PSX */
