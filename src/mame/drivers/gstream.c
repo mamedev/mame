@@ -2,8 +2,6 @@
 
     G-Stream (c)2002 Oriental Soft Japan
 
-    Is 'Oriental Soft Japan' actually a Korean company?
-
     Hyperstone based hardware
 
     Simple Sprites (16x16x8bpp tiles)
@@ -470,7 +468,7 @@ static VIDEO_START(gstream)
 
 static VIDEO_UPDATE(gstream)
 {
-	/* The tilemaps and sprite sre interleaved together.
+	/* The tilemaps and sprite are interleaved together.
        Even Words are tilemap tiles
        Odd Words are sprite data
 
@@ -621,6 +619,9 @@ ROM_START( gstream )
 
 	ROM_REGION( 0x200000, "oki2", 0 )
 	ROM_COPY( "oki1", 0, 0, 0x200000 )
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "gstream.nv", 0x000000, 0x2000, CRC(895d724b) SHA1(97941102f94923220d9beb270939f0ad9a40fe0e) )
 ROM_END
 
 static READ32_HANDLER( gstream_speedup_r )
