@@ -32,6 +32,8 @@ Dumped by Chackn
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "sound/okim6295.h"
+
 
 static UINT32 vram_addr;
 static UINT8 vram_bank;
@@ -49,16 +51,18 @@ static VIDEO_UPDATE( pinkiri8 )
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	{
-		UINT8 x,y;
+		int x,y,hw;
 		UINT16 spr_offs,i;
 
 		for(i=0x00000;i<0x1000;i+=4)
 		{
 			spr_offs = ((vram[i+0+0x12000] & 0xff) | (vram[i+1+0x12000]<<8)) & 0xffff;
 			y = ((i & 0x0fc0) >> 7)* 8;//vram[i+2+0x12000];
-			x = vram[i+3+0x12000] & 0xf8;
+			x = (vram[i+3+0x12000] & 0xfc)*2;
+			hw = vram[i+2+0x12000];
 
-			if(spr_offs != 0xf00)
+//			if(spr_offs != 0xf00)
+			if(hw != 0x00)
 			{
 				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+0,0,0,0,x+0,y,0);
 				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+1,0,0,0,x+8,y,0);
@@ -80,12 +84,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( unk_r )
 {
-	return 0xff;//mame_rand(space->machine);
+	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER( unk2_r )
 {
-	return 0xff;//(mame_rand(space->machine) & 0xfe)| 1;
+	return (mame_rand(space->machine) & 0xfe)| 1;
 }
 
 static WRITE8_HANDLER( output_regs_w )
@@ -135,6 +139,8 @@ static ADDRESS_MAP_START( pinkiri8_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x3f) AM_RAM //Z180 internal I/O
 	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)
 	AM_RANGE(0x80, 0x83) AM_WRITE(pinkiri8_vram_w)
+
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w ) //correct?
 	AM_RANGE(0xb0, 0xb0) AM_WRITENOP //mux
 	AM_RANGE(0xb0, 0xb1) AM_READ(unk_r) // mux inputs
 	AM_RANGE(0xb2, 0xb2) AM_READ(unk2_r) //bit 0 causes a reset inside the NMI routine
@@ -142,6 +148,26 @@ static ADDRESS_MAP_START( pinkiri8_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf9, 0xf9) AM_READ(unk_r)
 	AM_RANGE(0xfa, 0xfa) AM_READ(unk_r) //test bit 7
 	AM_RANGE(0xfb, 0xfb) AM_READ(unk_r)
+
+	/* Wing custom sound chip, same as Lucky Girl Z180 */
+	AM_RANGE(0xc3, 0xc3) AM_WRITENOP
+	AM_RANGE(0xc7, 0xc7) AM_WRITENOP
+	AM_RANGE(0xcb, 0xcb) AM_WRITENOP
+	AM_RANGE(0xcf, 0xcf) AM_WRITENOP
+
+	AM_RANGE(0xd3, 0xd3) AM_WRITENOP
+	AM_RANGE(0xd7, 0xd7) AM_WRITENOP
+	AM_RANGE(0xdb, 0xdb) AM_WRITENOP
+	AM_RANGE(0xdf, 0xdf) AM_WRITENOP
+
+	AM_RANGE(0xe3, 0xe3) AM_WRITENOP
+	AM_RANGE(0xe7, 0xe7) AM_WRITENOP
+	AM_RANGE(0xeb, 0xeb) AM_WRITENOP
+	AM_RANGE(0xef, 0xef) AM_WRITENOP
+
+	AM_RANGE(0xf3, 0xf3) AM_WRITENOP
+	AM_RANGE(0xf7, 0xf7) AM_WRITENOP
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pinkiri8 )
@@ -172,8 +198,8 @@ static MACHINE_DRIVER_START( pinkiri8 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(pinkiri8)
 	MDRV_PALETTE_LENGTH(0x2000)
 
@@ -182,8 +208,8 @@ static MACHINE_DRIVER_START( pinkiri8 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-//  MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MDRV_OKIM6295_ADD("oki", 12288000/8, OKIM6295_PIN7_LOW) // pin 7 and frequency not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -205,6 +231,8 @@ ROM_START( pinkiri8 )
 	ROM_LOAD( "pinkiri8-chr-05.h1",  0x80000, 0x20000, CRC(036ca165) SHA1(c4a2d6e394bbabcae1413d8a2916a19c90687edf) )
 
 	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
 ROM_END
 
 
@@ -283,10 +311,16 @@ static READ8_HANDLER( ronjan_prot_status_r )
 	return 0; //bit 0 seems a protection status bit
 }
 
+static READ8_HANDLER( ronjan_patched_prot_r )
+{
+	return 0; //value is read then discarded
+}
+
 static DRIVER_INIT( ronjan )
 {
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x90, 0x90, 0, 0, ronjan_prot_r, ronjan_prot_w);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x66, 0x66, 0, 0, ronjan_prot_status_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x9f, 0x9f, 0, 0, ronjan_patched_prot_r);
 }
 
 GAME( 2005?, pinkiri8,  0,   pinkiri8, pinkiri8,  0, ROT0, "Wing Co., Ltd", "Pinkiri 8", GAME_NOT_WORKING| GAME_NO_SOUND )
