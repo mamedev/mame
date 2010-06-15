@@ -45,29 +45,80 @@ static VIDEO_START( pinkiri8 )
 
 static VIDEO_UPDATE( pinkiri8 )
 {
-	static UINT8 *vram = memory_region(screen->machine, "vram");
+	static UINT8 *vram1 = memory_region(screen->machine, "vram")+0x12000;
+	static UINT8 *vram2 = memory_region(screen->machine, "vram")+0x13800;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	{
-		int x,y,hw;
-		UINT16 spr_offs,i;
+		int x,y,unk2;
+		int col = 0;
 
-		for(i=0x00000;i<0x1000;i+=4)
+		int spr_offs,i;
+
+		for(i=(0x1800/4)-4;i>=0;i--)
 		{
-			spr_offs = ((vram[i+0+0x12000] & 0xff) | (vram[i+1+0x12000]<<8)) & 0xffff;
-			y = ((i & 0x0fc0) >> 7)* 8;//vram[i+2+0x12000];
-			x = (vram[i+3+0x12000] & 0xfc)*2;
-			hw = vram[i+2+0x12000];
+
+		/* vram 1
+
+		  tttt tttt | tttt tttt | ???? ?000 | xxxx xxxx |
+
+		  vram 2
+
+		  yyyy yyyy | ???? ???? |
+
+		  */
+
+			spr_offs = ((vram1[(i*4)+0] & 0xff) | (vram1[(i*4)+1]<<8)) & 0xffff;
+			col = (vram1[(i*4)+2] & 0xf8) >> 3;
+			x =   vram1[(i*4)+3];
+
+			x &= 0xff;
+			x *= 2;
+
+			unk2 = vram2[(i*2)+1];
+			y = (vram2[(i*2)+0]);
+			y = 0xff-y;
+
+			// FIXME: ron jan and janshi both needs col bit 5 tied to somewhere on the title screen ...
+
+			//if (vram1[(i*4)+3] & 0x01)
+		//	if (unk & 0x80)
+		 //		col = mame_rand(screen->machine)&0xf;
 
 //			if(spr_offs != 0xf00)
-			if(hw != 0x00)
+	//		if(hw != 0x00)
+
 			{
-				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+0,0,0,0,x+0,y,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+1,0,0,0,x+8,y,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+2,0,0,0,x+16,y,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+3,0,0,0,x+24,y,0);
+
+
+				{
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+0,col,0,0,x+0,y,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+1,col,0,0,x+8,y,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+2,col,0,0,x+16,y,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+3,col,0,0,x+24,y,0);
+
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+4,col,0,0,x+0,y+8,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+5,col,0,0,x+8,y+8,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+6,col,0,0,x+16,y+8,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+7,col,0,0,x+24,y+8,0);
+
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+8,col,0,0,x+0,y+16,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+9,col,0,0,x+8,y+16,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+10,col,0,0,x+16,y+16,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+11,col,0,0,x+24,y+16,0);
+
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+12,col,0,0,x+0,y+24,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+13,col,0,0,x+8,y+24,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+14,col,0,0,x+16,y+24,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+15,col,0,0,x+24,y+24,0);
+
+
+				}
+
+
+
 			}
 		}
 	}
@@ -84,12 +135,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( unk_r )
 {
-	return mame_rand(space->machine);
+	return 0xff;//mame_rand(space->machine);
 }
 
 static READ8_HANDLER( unk2_r )
 {
-	return (mame_rand(space->machine) & 0xfe)| 1;
+	return 0xff;// 1;
 }
 
 static WRITE8_HANDLER( output_regs_w )
@@ -99,19 +150,41 @@ static WRITE8_HANDLER( output_regs_w )
 	//data & 0x80 is probably NMI mask
 }
 
+static int prev_writes = 0;
+
+#define LOG_VRAM 0
+
 static WRITE8_HANDLER( pinkiri8_vram_w )
 {
 	static UINT8 *vram = memory_region(space->machine, "vram");
 
+
+
 	switch(offset)
 	{
-		case 0: vram_addr = (data & 0xff) | (vram_addr & 0xff00); break;
-		case 1: vram_addr = (data << 8) | (vram_addr & 0x00ff); break;
+		case 0:
+			vram_addr = (data & 0xff);
+			if (LOG_VRAM) printf("\n prev writes was %04x\n\naddress set to %04x -\n", prev_writes, vram_addr );
+			prev_writes = 0;
+			break;
+
+		case 1:
+			vram_addr = (data << 8) | (vram_addr & 0x00ff);
+			if (LOG_VRAM)printf("\naddress set to %04x\n", vram_addr);
+			break;
+
 		case 2:
 			vram_bank = ((data ^ 0x06) & 0x06)>>1; //unknown purpose
+			if (LOG_VRAM)printf("\nunk set to %02x\n", data);
+
+			if ((data!= 0xfb) && (data!=0xfc) && (data!=0xff) && (data!=0xfe)  && (data!=0x0c))
+				if (LOG_VRAM) fatalerror("unknown unknown\n");
 			//printf("%02x\n",vram_bank);
 			break;
+
 		case 3:
+			if (LOG_VRAM) printf("%02x ", data);
+			prev_writes++;
 			vram_addr++;
 			vram_addr&=0xffff;
 			vram[(vram_addr) | (vram_bank << 16)] = data;
@@ -198,8 +271,8 @@ static MACHINE_DRIVER_START( pinkiri8 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_SIZE(64*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 	MDRV_GFXDECODE(pinkiri8)
 	MDRV_PALETTE_LENGTH(0x2000)
 
