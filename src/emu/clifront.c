@@ -1034,22 +1034,82 @@ static void identify_file(core_options *options, const char *name, romident_stat
 	osd_file *file;
 	UINT64 length;
 
-	/* open for read and process if it opens and has a valid length */
-	filerr = osd_open(name, OPEN_FLAG_READ, &file, &length);
-	if (filerr == FILERR_NONE && length > 0 && (UINT32)length == length)
+	if (core_filename_ends_with(name, ".chd"))
 	{
-		UINT8 *data = global_alloc_array(UINT8, length);
-		if (data != NULL)
-		{
-			UINT32 bytes;
+		chd_file *chd;
+		chd_error err;
+		astring basename;
+		int found = 0;
 
-			/* read file data into RAM and identify it */
-			filerr = osd_read(file, data, 0, length, &bytes);
-			if (filerr == FILERR_NONE)
-				identify_data(options, name, data, bytes, status);
-			global_free(data);
+		core_filename_extract_base(&basename, name, FALSE);
+		mame_printf_info("%-20s", basename.cstr());
+
+		status->total++;
+
+		err = chd_open(name, CHD_OPEN_READ, NULL, &chd);
+		if (err != CHDERR_NONE)
+		{
+			mame_printf_info("NOT A CHD\n");
+			status->nonroms++;
 		}
-		osd_close(file);
+		else
+		{
+			chd_header header;
+
+			header = *chd_get_header(chd);
+			if (header.flags & CHDFLAGS_IS_WRITEABLE)
+			{
+				mame_printf_info("is a writable CHD\n");
+			}
+			else
+			{
+				static const UINT8 nullhash[HASH_BUF_SIZE] = { 0 };
+				char			hash[HASH_BUF_SIZE];	/* actual hash information */
+
+				hash_data_clear(hash);
+
+				/* if there's an MD5 or SHA1 hash, add them to the output hash */
+				if (memcmp(nullhash, header.md5, sizeof(header.md5)) != 0)
+					hash_data_insert_binary_checksum(hash, HASH_MD5, header.md5);
+				if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
+					hash_data_insert_binary_checksum(hash, HASH_SHA1, header.sha1);
+
+				length = header.logicalbytes;
+
+				match_roms(options, hash, length, &found);
+
+				if (found == 0)
+				{
+					mame_printf_info("NO MATCH\n");
+				}
+
+				/* if we did find it, count it as a match */
+				else
+					status->matches++;
+			}
+
+			chd_close(chd);
+		}
+	}
+	else
+	{
+		/* open for read and process if it opens and has a valid length */
+		filerr = osd_open(name, OPEN_FLAG_READ, &file, &length);
+		if (filerr == FILERR_NONE && length > 0 && (UINT32)length == length)
+		{
+			UINT8 *data = global_alloc_array(UINT8, length);
+			if (data != NULL)
+			{
+				UINT32 bytes;
+
+				/* read file data into RAM and identify it */
+				filerr = osd_read(file, data, 0, length, &bytes);
+				if (filerr == FILERR_NONE)
+					identify_data(options, name, data, bytes, status);
+				global_free(data);
+			}
+			osd_close(file);
+		}
 	}
 }
 
