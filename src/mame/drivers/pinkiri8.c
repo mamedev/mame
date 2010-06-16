@@ -359,8 +359,6 @@ static WRITE8_HANDLER( output_regs_w )
 	if(data & 0x40)
 		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	//data & 0x80 is probably NMI mask
-
-	popmessage("%02x",data);
 }
 
 static int prev_writes = 0;
