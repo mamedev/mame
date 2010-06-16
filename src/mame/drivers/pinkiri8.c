@@ -33,6 +33,117 @@ Dumped by Chackn
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/okim6295.h"
+#include "video/generic.h"
+
+static UINT8* janshi_vram1;
+static UINT8* janshi_vram2;
+static UINT8* janshi_back_vram;
+static UINT8* janshi_crtc_regs;
+
+
+static ADDRESS_MAP_START( janshi_vdp_map8, 0, 8 )
+	AM_RANGE(0x00000, 0x007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	
+	AM_RANGE(0x06000, 0x0601f) AM_RAM AM_BASE(&janshi_crtc_regs)
+	
+	AM_RANGE(0x12000, 0x12fff) AM_RAM AM_BASE(&janshi_vram1)
+	
+	AM_RANGE(0x13700, 0x137ff) AM_RAM //??
+	
+	AM_RANGE(0x13800, 0x13fff) AM_RAM AM_BASE(&janshi_vram2)
+	
+	AM_RANGE(0x20000, 0x21fff) AM_RAM AM_BASE(&janshi_back_vram)
+ADDRESS_MAP_END
+
+ 
+ 
+/* VDP device to give us our own memory map */
+
+class janshi_vdp_device_config : public device_config, 
+								 public device_config_memory_interface
+{
+	friend class janshi_vdp_device;
+	janshi_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+public:
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+	virtual const char *name() const { return "JANSHIVDP"; }
+protected:
+	virtual void device_config_complete();
+	virtual bool device_validity_check(const game_driver &driver) const;
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+	address_space_config  		m_space_config;
+};
+
+class janshi_vdp_device : public device_t, 
+						  public device_memory_interface
+{
+	friend class janshi_vdp_device_config;
+	janshi_vdp_device(running_machine &_machine, const janshi_vdp_device_config &config);
+public:
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+	const janshi_vdp_device_config &m_config;
+};
+
+const device_type JANSHIVDP = janshi_vdp_device_config::static_alloc_device_config;
+
+janshi_vdp_device_config::janshi_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
+{
+}
+
+device_config *janshi_vdp_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(janshi_vdp_device_config(mconfig, tag, owner, clock));
+}
+
+device_t *janshi_vdp_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, janshi_vdp_device(machine, *this));
+}
+
+void janshi_vdp_device_config::device_config_complete()
+{
+//	int address_bits = 24;
+	
+//	m_space_config = address_space_config("janshi_vdp", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME(janshi_vdp_map8));
+}
+
+bool janshi_vdp_device_config::device_validity_check(const game_driver &driver) const
+{
+	bool error = false;
+	return error;
+}
+
+const address_space_config *janshi_vdp_device_config::memory_space_config(int spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
+
+
+janshi_vdp_device::janshi_vdp_device(running_machine &_machine, const janshi_vdp_device_config &config)
+	: device_t(_machine, config),
+	  device_memory_interface(_machine, config, *this),
+	  m_config(config)
+{
+}
+
+void janshi_vdp_device::device_start()
+{
+}
+
+void janshi_vdp_device::device_reset()
+{
+}
+
+/* end VDP device to give us our own memory map */
+
+
 
 
 static UINT32 vram_addr;
@@ -45,10 +156,6 @@ static VIDEO_START( pinkiri8 )
 
 static VIDEO_UPDATE( pinkiri8 )
 {
-	static UINT8 *vram1 = memory_region(screen->machine, "vram")+0x12000;
-	static UINT8 *vram2 = memory_region(screen->machine, "vram")+0x13800;
-	static UINT8 *back_vram = memory_region(screen->machine, "vram")+0x20000;
-	static UINT8 *crtc_regs = memory_region(screen->machine, "vram")+0x6000;
 	static int col_bank;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
@@ -56,12 +163,12 @@ static VIDEO_UPDATE( pinkiri8 )
 
 	if (!strcmp(screen->machine->gamedrv->name,"janshi")) game_type_hack = 1;
 
-	//popmessage("%02x",crtc_regs[0x0a]);
-	col_bank = (crtc_regs[0x0a] & 0x40) >> 6;
+	//popmessage("%02x",janshi_crtc_regs[0x0a]);
+	col_bank = (janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	/* FIXME: color for the back layer is a bit of a mystery */
+	/* FIXME: color is a bit of a mystery */
 	{
 		int x,y,col,tile,count,attr;
 
@@ -71,8 +178,8 @@ static VIDEO_UPDATE( pinkiri8 )
 		{
 			for(x=0;x<64;x++)
 			{
-				tile = back_vram[count+1]<<8 | back_vram[count+0];
-				attr = back_vram[count+2];
+				tile = janshi_back_vram[count+1]<<8 | janshi_back_vram[count+0];
+				attr = janshi_back_vram[count+2];
 				col = 0x20;
 
 				if(!(attr & 0x10))
@@ -92,8 +199,8 @@ static VIDEO_UPDATE( pinkiri8 )
 		{
 			for(x=0;x<64;x++)
 			{
-				tile = back_vram[count+1]<<8 | back_vram[count+0];
-				attr = back_vram[count+2];
+				tile = janshi_back_vram[count+1]<<8 | janshi_back_vram[count+0];
+				attr = janshi_back_vram[count+2];
 				col = 0x20;
 
 				if(attr & 0x10)
@@ -133,21 +240,22 @@ static VIDEO_UPDATE( pinkiri8 )
 
 		  */
 
-			spr_offs = ((vram1[(i*4)+0] & 0xff) | (vram1[(i*4)+1]<<8)) & 0xffff;
-			col = (vram1[(i*4)+2] & 0xf8) >> 3;
-			x =   vram1[(i*4)+3];
+			spr_offs = ((janshi_vram1[(i*4)+0] & 0xff) | (janshi_vram1[(i*4)+1]<<8)) & 0xffff;
+			col = (janshi_vram1[(i*4)+2] & 0xf8) >> 3;
+			x =   janshi_vram1[(i*4)+3];
 
 			x &= 0xff;
 			x *= 2;
 
-			unk2 = vram2[(i*2)+1];
-			y = (vram2[(i*2)+0]);
+			unk2 = janshi_vram2[(i*2)+1];
+			y = (janshi_vram2[(i*2)+0]);
 
 			y = 0x100-y;
 
 			col|= col_bank<<5;
 
 		//	width = 0; height = 0;
+
 
 			// hacks!
 			if (game_type_hack==1) // janshi
@@ -259,7 +367,7 @@ static int prev_writes = 0;
 
 static WRITE8_HANDLER( pinkiri8_vram_w )
 {
-	static UINT8 *vram = memory_region(space->machine, "vram");
+//	static UINT8 *vram = memory_region(space->machine, "vram");
 
 
 
@@ -286,11 +394,23 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 			break;
 
 		case 3:
+		
+			const address_space *vdp_space = space->machine->device<janshi_vdp_device>("janshivdp")->space();
+		
+
+		
 			if (LOG_VRAM) printf("%02x ", data);
 			prev_writes++;
 			vram_addr++;
 			vram_addr&=0xffff;
+
+			memory_write_byte_8le(vdp_space, (vram_addr) | (vram_bank << 16), data);
+
+			
+			/*
 			vram[(vram_addr) | (vram_bank << 16)] = data;
+			
+		
 			if(vram_addr <= 0xffff)
 			{
 				static UINT16 datax,pal_offs;
@@ -306,6 +426,8 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 
 				palette_set_color_rgb(space->machine, pal_offs & 0x1fff, pal5bit(r), pal5bit(g), pal5bit(b));
 			}
+			*/
+
 			break;
 	}
 }
@@ -638,79 +760,6 @@ static INPUT_PORTS_START( pinkiri8 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( janshi )
-	PORT_INCLUDE( pinkiri8 )
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x04, "1 Coin/10 Credits")
-	PORT_DIPNAME( 0x08, 0x08, "Round Up Bonus" ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "500" )
-	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x30, 0x00, "Base Score" ) PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x00, "5000 / 8000" )
-	PORT_DIPSETTING(    0x10, "4000 / 8000" )
-	PORT_DIPSETTING(    0x20, "3000 / 8000" )
-	PORT_DIPSETTING(    0x30, "2000 / 8000" )
-	PORT_DIPNAME( 0xc0, 0x80, "Win Rate" ) PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Very_Easy ) )
-
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x01, "Play Time" ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x00, "12 Seconds" )
-	PORT_DIPSETTING(    0x01, "10 Seconds" )
-	PORT_DIPSETTING(    0x02, "8 Seconds" )
-	PORT_DIPSETTING(    0x03, "6 Seconds" )
-	PORT_DIPNAME( 0x04, 0x04, "Yakuman Bonus" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, "BGM" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Voice" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Nudity" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Cocktail ) )
-
-	PORT_MODIFY("DSW3")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW3:1" )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW3:5" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW3:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
-
-	PORT_MODIFY("DSW4")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW4:1" )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW4:2" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW4:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW4:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW4:5" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW4:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW4:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
-INPUT_PORTS_END
-
 static const gfx_layout charlayout =
 {
 	16,8,
@@ -743,6 +792,8 @@ static MACHINE_DRIVER_START( pinkiri8 )
 
 	MDRV_VIDEO_START(pinkiri8)
 	MDRV_VIDEO_UPDATE(pinkiri8)
+
+	MDRV_DEVICE_ADD("janshivdp", JANSHIVDP, 0) \
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -862,6 +913,6 @@ static DRIVER_INIT( ronjan )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x9f, 0x9f, 0, 0, ronjan_patched_prot_r);
 }
 
-GAME( 1992,  janshi,    0,   pinkiri8, janshi,    0, ROT0, "Eagle", "Janshi", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1996,  ronjan,    0,   pinkiri8, pinkiri8,  ronjan, ROT0, "Eagle", "Ron Jan", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 2005?, pinkiri8,  0,   pinkiri8, pinkiri8,  0, ROT0, "Wing Co., Ltd", "Pinkiri 8", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1992,  janshi,    0,   pinkiri8, pinkiri8,  0, ROT0, "Eagle", "Janshi", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1996,  ronjan,    0,   pinkiri8, pinkiri8,  ronjan, ROT0, "Eagle", "Ron Jan", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
