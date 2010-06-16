@@ -274,10 +274,6 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 }
 
 //============================================================
-//  MESS specific code below
-//============================================================
-
-//============================================================
 //  get_clipboard_text_by_format
 //============================================================
 
@@ -357,8 +353,6 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
-
-#ifdef MESS
 
 //============================================================
 //  astring_from_utf8
@@ -552,5 +546,3 @@ done:
 		osd_free(t_path);
 	return err;
 }
-
-#endif

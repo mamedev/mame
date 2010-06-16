@@ -71,7 +71,6 @@ EMUOBJS = \
 	$(EMUOBJ)/mconfig.o \
 	$(EMUOBJ)/memory.o \
 	$(EMUOBJ)/output.o \
-	$(EMUOBJ)/opresolv.o \
 	$(EMUOBJ)/render.o \
 	$(EMUOBJ)/rendfont.o \
 	$(EMUOBJ)/rendlay.o \

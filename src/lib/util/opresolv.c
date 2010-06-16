@@ -12,8 +12,8 @@
 #include <string.h>
 
 #include "pool.h"
+#include "corestr.h"
 #include "opresolv.h"
-#include "emu.h"
 
 enum resolution_entry_state
 {
@@ -40,18 +40,6 @@ struct _option_resolution
 	struct option_resolution_entry *entries;
 };
 
-
-
-/* syntax errors are generally indicative of some sort of internal error */
-static void syntaxerror(const char *str)
-{
-#ifdef MAME_DEBUG
-	logerror("Option resolution syntax error! str='%s'\n", str);
-#endif
-}
-
-
-
 static optreserr_t resolve_single_param(const char *specification, int *param_value,
 	struct OptionRange *range, size_t range_count)
 {
@@ -72,7 +60,6 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 			/* range specifier */
 			if (flags & (FLAG_IN_RANGE|FLAG_IN_DEFAULT))
 			{
-				syntaxerror(NULL);
 				return OPTIONRESOLUTION_ERROR_SYNTAX;
 			}
 			flags |= FLAG_IN_RANGE;
@@ -93,7 +80,6 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 			/* begin default value */
 			if (flags & (FLAG_IN_DEFAULT|FLAG_DEFAULT_SPECIFIED))
 			{
-				syntaxerror(NULL);
 				return OPTIONRESOLUTION_ERROR_SYNTAX;
 			}
 			flags |= FLAG_IN_DEFAULT;
@@ -104,7 +90,6 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 			/* end default value */
 			if ((flags & FLAG_IN_DEFAULT) == 0)
 			{
-				syntaxerror(NULL);
 				return OPTIONRESOLUTION_ERROR_SYNTAX;
 			}
 			flags &= ~FLAG_IN_DEFAULT;
@@ -119,7 +104,6 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 			/* value separator */
 			if (flags & (FLAG_IN_DEFAULT|FLAG_IN_RANGE))
 			{
-				syntaxerror(NULL);
 				return OPTIONRESOLUTION_ERROR_SYNTAX;
 			}
 			s++;
@@ -174,7 +158,6 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 		}
 		else
 		{
-			syntaxerror(NULL);
 			return OPTIONRESOLUTION_ERROR_SYNTAX;
 		}
 	}
@@ -182,7 +165,6 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 	/* we can't have zero length guidelines strings */
 	if (s == specification)
 	{
-		syntaxerror(NULL);
 		return OPTIONRESOLUTION_ERROR_SYNTAX;
 	}
 
@@ -308,7 +290,7 @@ optreserr_t option_resolution_add_param(option_resolution *resolution, const cha
 	case OPTIONTYPE_ENUM_BEGIN:
 		for (i = 1; entry->guide_entry[i].option_type == OPTIONTYPE_ENUM_VALUE; i++)
 		{
-			if (!mame_stricmp(value, entry->guide_entry[i].identifier))
+			if (!core_stricmp(value, entry->guide_entry[i].identifier))
 			{
 				entry->u.int_value = entry->guide_entry[i].parameter;
 				entry->state = RESOLUTION_ENTRY_STATE_SPECIFIED;
@@ -508,7 +490,6 @@ optreserr_t option_resolution_listranges(const char *specification, int option_c
 	specification = strchr(specification, option_char);
 	if (!specification)
 	{
-		syntaxerror(NULL);
 		return OPTIONRESOLUTION_ERROR_SYNTAX;
 	}
 
@@ -527,7 +508,6 @@ optreserr_t option_resolution_getdefault(const char *specification, int option_c
 	specification = strchr(specification, option_char);
 	if (!specification)
 	{
-		syntaxerror(NULL);
 		return OPTIONRESOLUTION_ERROR_SYNTAX;
 	}
 

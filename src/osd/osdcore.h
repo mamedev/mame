@@ -828,7 +828,6 @@ void osd_break_into_debugger(const char *message);
 char *osd_get_clipboard_text(void);
 
 
-#ifdef MESS
 /***************************************************************************
     DIRECTORY INTERFACES
 ***************************************************************************/
@@ -885,7 +884,6 @@ file_error osd_get_full_path(char **dst, const char *path);
 
 -----------------------------------------------------------------------------*/
 const char *osd_get_volume_name(int idx);
-#endif
 
 #ifdef __cplusplus
 }
