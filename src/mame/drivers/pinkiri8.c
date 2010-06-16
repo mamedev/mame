@@ -174,40 +174,15 @@ static VIDEO_UPDATE( pinkiri8 )
 
 		count = 0;
 
-		for(y=0;y<32;y++)
+		for(y=0;y<64;y++)
 		{
-			for(x=0;x<64;x++)
+			for(x=0;x<32;x++)
 			{
 				tile = janshi_back_vram[count+1]<<8 | janshi_back_vram[count+0];
-				attr = janshi_back_vram[count+2];
-				col = 0x20;
+				attr = janshi_back_vram[count+2] ^ 0xf0;
+				col = (attr >> 4) | 0x10;
 
-				if(!(attr & 0x10))
-					drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,y*8,0);
-
-				count+=4;
-			}
-		}
-	}
-
-	{
-		int x,y,col,tile,count,attr;
-
-		count = 0;
-
-		for(y=0;y<32;y++)
-		{
-			for(x=0;x<64;x++)
-			{
-				tile = janshi_back_vram[count+1]<<8 | janshi_back_vram[count+0];
-				attr = janshi_back_vram[count+2];
-				col = 0x20;
-
-				if(attr & 0x10)
-				{
-					drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,(y*2+0)*8,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,(y*2+1)*8,0);
-				}
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*16,y*8,0);
 
 				count+=4;
 			}
