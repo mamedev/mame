@@ -4318,7 +4318,7 @@ ROM_START( bldyror2 )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
-	ROM_LOAD( "at28c16_world",      0x0000000, 0x000800, BAD_DUMP CRC(01b42397) SHA1(853553a38e81e64a17c040173b29c7bfd6f79f31) ) /* preprogrammed mainboard flash for region */
+	ROM_LOAD( "at28c16_world",      0x0000000, 0x000800, CRC(01b42397) SHA1(853553a38e81e64a17c040173b29c7bfd6f79f31) ) /* preprogrammed mainboard flash for region */
 ROM_END
 
 ROM_START( bldyror2u )
@@ -4342,7 +4342,7 @@ ROM_START( bldyror2u )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
-	ROM_LOAD( "at28c16_usa",      0x0000000, 0x000800, BAD_DUMP CRC(b78d6fc3) SHA1(49d8b6f44c31d74f36cba981af7f4c7e23dd9007) ) /* preprogrammed mainboard flash for region */
+	ROM_LOAD( "at28c16_usa",      0x0000000, 0x000800, CRC(b78d6fc3) SHA1(49d8b6f44c31d74f36cba981af7f4c7e23dd9007) ) /* preprogrammed mainboard flash for region */
 ROM_END
 
 ROM_START( bldyror2j )
@@ -4366,7 +4366,7 @@ ROM_START( bldyror2j )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
-	ROM_LOAD( "at28c16_japan",      0x0000000, 0x000800, BAD_DUMP CRC(6cb55630) SHA1(b840bc0339485dd82f7c9aa669faf90ae371218f) ) /* preprogrammed mainboard flash for region */
+	ROM_LOAD( "at28c16_japan",      0x0000000, 0x000800, CRC(6cb55630) SHA1(b840bc0339485dd82f7c9aa669faf90ae371218f) ) /* preprogrammed mainboard flash for region */
 ROM_END
 
 ROM_START( bldyror2a )
@@ -4390,7 +4390,7 @@ ROM_START( bldyror2a )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x800, "at28c16", 0 ) /* at28c16 */
-	ROM_LOAD( "at28c16_asia",      0x0000000, 0x000800, BAD_DUMP CRC(da8c1a64) SHA1(14cbb751f498c96d9d8fce3eea3781ebc45f6291) ) /* preprogrammed mainboard flash for region */
+	ROM_LOAD( "at28c16_asia",      0x0000000, 0x000800, CRC(da8c1a64) SHA1(14cbb751f498c96d9d8fce3eea3781ebc45f6291) ) /* preprogrammed mainboard flash for region */
 ROM_END
 
 ROM_START( bam2 )
