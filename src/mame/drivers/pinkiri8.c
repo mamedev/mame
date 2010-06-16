@@ -47,13 +47,13 @@ static VIDEO_UPDATE( pinkiri8 )
 {
 	static UINT8 *vram1 = memory_region(screen->machine, "vram")+0x12000;
 	static UINT8 *vram2 = memory_region(screen->machine, "vram")+0x13800;
+	static UINT8 *back_vram = memory_region(screen->machine, "vram")+0x20000;
 	static UINT8 *crtc_regs = memory_region(screen->machine, "vram")+0x6000;
 	static int col_bank;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
 	static int game_type_hack = 0;
-	
-	
+
 	if (!strcmp(screen->machine->gamedrv->name,"janshi")) game_type_hack = 1;
 
 	//popmessage("%02x",crtc_regs[0x0a]);
@@ -61,6 +61,51 @@ static VIDEO_UPDATE( pinkiri8 )
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
+	/* FIXME: color is a bit of a mystery */
+	{
+		int x,y,col,tile,count,attr;
+
+		count = 0;
+
+		for(y=0;y<32;y++)
+		{
+			for(x=0;x<64;x++)
+			{
+				tile = back_vram[count+1]<<8 | back_vram[count+0];
+				attr = back_vram[count+2];
+				col = 0x20;
+
+				if(!(attr & 0x10))
+					drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,y*8,0);
+
+				count+=4;
+			}
+		}
+	}
+
+	{
+		int x,y,col,tile,count,attr;
+
+		count = 0;
+
+		for(y=0;y<32;y++)
+		{
+			for(x=0;x<64;x++)
+			{
+				tile = back_vram[count+1]<<8 | back_vram[count+0];
+				attr = back_vram[count+2];
+				col = 0x20;
+
+				if(attr & 0x10)
+				{
+					drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,(y*2+0)*8,0);
+					drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,(y*2+1)*8,0);
+				}
+
+				count+=4;
+			}
+		}
+	}
 
 	{
 		int x,y,unk2;
@@ -69,9 +114,9 @@ static VIDEO_UPDATE( pinkiri8 )
 		int spr_offs,i;
 
 		int width, height;
-		
-	
-		
+
+
+
 		for(i=(0x1000/4)-4;i>=0;i--)
 		{
 
@@ -147,39 +192,39 @@ static VIDEO_UPDATE( pinkiri8 )
 				{
 					width = 2;
 					height = 4;
-				}	
+				}
 				else if (spr_offs<0x19c0)
 				{
 					width = 2;
 					height = 1;
-				}			
+				}
 				else
 				{
 					width = 2;
 					height = 4;
-				}					
-					
-				
+				}
+
+
 				if (height==1)
 					y+=16;
-			
-				
-				// hmm... 
+
+
+				// hmm...
 				if (height==2)
 					y+=16;
-					
+
 			}
 			else // other games
 			{
 					width = 2;
 					height = 2;
 			}
-				
-	
+
+
 			{
 				int count = 0;
-				
-				
+
+
 				for (int yy=0;yy<height;yy++)
 				{
 					for (int xx=0;xx<width;xx++)
