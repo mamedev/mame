@@ -47,7 +47,12 @@ static VIDEO_UPDATE( pinkiri8 )
 {
 	static UINT8 *vram1 = memory_region(screen->machine, "vram")+0x12000;
 	static UINT8 *vram2 = memory_region(screen->machine, "vram")+0x13800;
+	static UINT8 *crtc_regs = memory_region(screen->machine, "vram")+0x6000;
+	static int col_bank;
 	const gfx_element *gfx = screen->machine->gfx[0];
+
+	//popmessage("%02x",crtc_regs[0x0a]);
+	col_bank = (crtc_regs[0x0a] & 0x40) >> 6;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -81,7 +86,7 @@ static VIDEO_UPDATE( pinkiri8 )
 			y = (vram2[(i*2)+0]);
 			y = 0xff-y;
 
-			// FIXME: ron jan and janshi both needs col bit 5 tied to somewhere on the title screen ...
+			col|= col_bank<<5;
 
 			//if (vram1[(i*4)+3] & 0x01)
 		//	if (unk & 0x80)
