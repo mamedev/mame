@@ -877,45 +877,42 @@ static void print_game_images(FILE *out, const game_driver *game, const machine_
 	const device_config_image_interface *dev;
 	const char *name;
 	const char *shortname;
-	const char *ext;
 
 	for (bool gotone = config->devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
-		const legacy_image_device_config_base *info = downcast<const legacy_image_device_config_base *>(dev);
-
 		/* print out device type */
-		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(info->image_type_name()));
+		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(dev->image_type_name()));
 
 		/* does this device have a tag? */
-		if (info->tag())
-			fprintf(out, " tag=\"%s\"", xml_normalize_string(info->tag()));
+		if (dev->devconfig().tag())
+			fprintf(out, " tag=\"%s\"", xml_normalize_string(dev->devconfig().tag()));
 
 		/* is this device mandatory? */
-		if (info->must_be_loaded())
+		if (dev->must_be_loaded())
 			fprintf(out, " mandatory=\"1\"");
 
-		if (info->image_interface()[0] )
-			fprintf(out, " interface=\"%s\"", xml_normalize_string(info->image_interface()));
+		if (dev->image_interface()[0] )
+			fprintf(out, " interface=\"%s\"", xml_normalize_string(dev->image_interface()));
 
 		/* close the XML tag */
 		fprintf(out, ">\n");
 
-		name = info->instance_name();
-		shortname = info->brief_instance_name();
+		name = dev->instance_name();
+		shortname = dev->brief_instance_name();
 
 		fprintf(out, "\t\t\t<instance");
 		fprintf(out, " name=\"%s\"", xml_normalize_string(name));
 		fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
 		fprintf(out, "/>\n");
-
-		ext = info->file_extensions();
-		while (*ext)
+		
+		char *ext = strtok((char*)dev->file_extensions(),",");
+		while (ext != NULL)
 		{
 			fprintf(out, "\t\t\t<extension");
 			fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
 			fprintf(out, "/>\n");
-			ext += strlen(ext) + 1;
-		}
+			ext = strtok (NULL, ",");
+		}		
 
 		fprintf(out, "\t\t</device>\n");
 	}

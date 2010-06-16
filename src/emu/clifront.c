@@ -820,10 +820,11 @@ static int info_listmedia(core_options *options, const char *gamename)
 				printf("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
 				driver_name = " ";
 
-				while (src && *src)
+				char *ext = strtok((char*)src,",");
+				while (ext != NULL)
 				{
-					printf(".%-5s", src);
-					src += strlen(src) + 1;
+					printf(".%-5s",ext);
+					ext = strtok (NULL, ",");
 					devcount++;
 				}
 				printf("\n");

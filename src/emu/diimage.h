@@ -51,6 +51,28 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+enum iodevice_t
+{
+    /* List of all supported devices.  Refer to the device by these names only */
+    IO_UNKNOWN,
+    IO_CARTSLOT,    /*  1 - Cartridge Port, as found on most console and on some computers */
+    IO_FLOPPY,      /*  2 - Floppy Disk unit */
+    IO_HARDDISK,    /*  3 - Hard Disk unit */
+    IO_CYLINDER,    /*  4 - Magnetically-Coated Cylinder */
+    IO_CASSETTE,    /*  5 - Cassette Recorder (common on early home computers) */
+    IO_PUNCHCARD,   /*  6 - Card Puncher/Reader */
+    IO_PUNCHTAPE,   /*  7 - Tape Puncher/Reader (reels instead of punchcards) */
+    IO_PRINTER,     /*  8 - Printer device */
+    IO_SERIAL,      /*  9 - Generic Serial Port */
+    IO_PARALLEL,    /* 10 - Generic Parallel Port */
+    IO_SNAPSHOT,    /* 11 - Complete 'snapshot' of the state of the computer */
+    IO_QUICKLOAD,   /* 12 - Allow to load program/data into memory, without matching any actual device */
+    IO_MEMCARD,     /* 13 - Memory card */
+    IO_CDROM,       /* 14 - optical CD-ROM disc */
+	IO_MAGTAPE,     /* 15 - Magentic tape */
+    IO_COUNT        /* 16 - Total Number of IO_devices for searching */
+};
+
 
 // ======================> device_config_image_interface
 
@@ -61,6 +83,22 @@ public:
 	// construction/destruction
 	device_config_image_interface(const machine_config &mconfig, device_config &device);
 	virtual ~device_config_image_interface();
+
+	// public accessors... for now
+	virtual iodevice_t image_type()  const = 0;
+	virtual const char *image_type_name()  const = 0;
+	virtual iodevice_t image_type_direct() const = 0;
+	virtual bool is_readable()  const = 0;
+	virtual bool is_writeable() const = 0;
+	virtual bool is_creatable() const = 0;
+	virtual bool must_be_loaded() const = 0;
+	virtual bool is_reset_on_load() const = 0;
+	virtual bool has_partial_hash() const = 0;
+	virtual const char *image_interface() const = 0;
+	virtual const char *file_extensions() const = 0;
+	virtual const char *instance_name() const = 0;
+	virtual const char *brief_instance_name() const = 0;
+	virtual bool uses_file_extension(const char *file_extension) const = 0;
 };
 
 
@@ -77,8 +115,6 @@ public:
 
 	// configuration access	
 	const device_config_image_interface &image_config() const { return m_image_config; }
-
-	// public accessors... for now
 
 protected:
 	// derived class overrides
