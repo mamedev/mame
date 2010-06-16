@@ -51,27 +51,40 @@ static VIDEO_UPDATE( pinkiri8 )
 	static int col_bank;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
+	static int game_type_hack = 0;
+	
+	
+	if (!strcmp(screen->machine->gamedrv->name,"janshi")) game_type_hack = 1;
+
 	//popmessage("%02x",crtc_regs[0x0a]);
 	col_bank = (crtc_regs[0x0a] & 0x40) >> 6;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
+
 	{
 		int x,y,unk2;
-		int col = 0;
+		int col;
 
 		int spr_offs,i;
 
-		for(i=(0x1800/4)-4;i>=0;i--)
+		int width, height;
+		
+	
+		
+		for(i=(0x1000/4)-4;i>=0;i--)
 		{
 
-		/* vram 1
+		/* vram 1 (12000 - 12fff)
 
-		  tttt tttt | tttt tttt | ???? ?000 | xxxx xxxx |
+		  tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
 
-		  vram 2
+		  vram 2 (13800 - 13fff)
 
 		  yyyy yyyy | ???? ???? |
+
+		there is also some data at 13000 - 137ff
+		and a table at 20000..
 
 		  */
 
@@ -84,44 +97,97 @@ static VIDEO_UPDATE( pinkiri8 )
 
 			unk2 = vram2[(i*2)+1];
 			y = (vram2[(i*2)+0]);
-			y = 0xff-y;
+
+			y = 0x100-y;
 
 			col|= col_bank<<5;
 
-			//if (vram1[(i*4)+3] & 0x01)
-		//	if (unk & 0x80)
-		 //		col = mame_rand(screen->machine)&0xf;
+		//	width = 0; height = 0;
 
-//			if(spr_offs != 0xf00)
-	//		if(hw != 0x00)
 
+			// hacks!
+			if (game_type_hack==1) // janshi
 			{
-
-
+				if (spr_offs<0x400)
 				{
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+0,col,0,0,x+0,y,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+1,col,0,0,x+8,y,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+2,col,0,0,x+16,y,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+3,col,0,0,x+24,y,0);
-
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+4,col,0,0,x+0,y+8,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+5,col,0,0,x+8,y+8,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+6,col,0,0,x+16,y+8,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+7,col,0,0,x+24,y+8,0);
-
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+8,col,0,0,x+0,y+16,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+9,col,0,0,x+8,y+16,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+10,col,0,0,x+16,y+16,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+11,col,0,0,x+24,y+16,0);
-
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+12,col,0,0,x+0,y+24,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+13,col,0,0,x+8,y+24,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+14,col,0,0,x+16,y+24,0);
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs*2+15,col,0,0,x+24,y+24,0);
+					width = 2;
+					height = 4;
 				}
-
-
-
+				else if (spr_offs<0x580)
+				{
+					width = 1;
+					height = 2;
+				}
+				else if (spr_offs<0x880)
+				{
+					width = 2;
+					height = 4;
+				}
+				else if (spr_offs<0x1000)
+				{
+					width = 2;
+					height = 2;
+				}
+				else if (spr_offs<0x1080)
+				{
+					width = 1;
+					height = 2;
+				}
+				else if (spr_offs<0x1700)
+				{
+					width = 2;
+					height = 4;
+				}
+				else if (spr_offs<0x1730)
+				{
+					width = 2;
+					height = 2;
+				}
+				else if (spr_offs<0x1930)
+				{
+					width = 2;
+					height = 4;
+				}	
+				else if (spr_offs<0x19c0)
+				{
+					width = 2;
+					height = 1;
+				}			
+				else
+				{
+					width = 2;
+					height = 4;
+				}					
+					
+				
+				if (height==1)
+					y+=16;
+			
+				
+				// hmm... 
+				if (height==2)
+					y+=16;
+					
+			}
+			else // other games
+			{
+					width = 2;
+					height = 2;
+			}
+				
+	
+			{
+				int count = 0;
+				
+				
+				for (int yy=0;yy<height;yy++)
+				{
+					for (int xx=0;xx<width;xx++)
+					{
+						drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+count,col,0,0,x+xx*16,y+yy*8,0);
+						count++;
+					}
+				}
 			}
 		}
 	}
@@ -530,13 +596,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,
+	16,8,
 	RGN_FRAC(1,5),
 	5,
 	{ RGN_FRAC(4,5),RGN_FRAC(3,5),RGN_FRAC(2,5),RGN_FRAC(1,5),RGN_FRAC(0,5) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	8*16
 };
 
 static GFXDECODE_START( pinkiri8 )
