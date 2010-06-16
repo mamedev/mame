@@ -42,7 +42,8 @@
  different set of registers for the frame / call this time. (or if another
  Hyperstone bug is trashing some of the code in RAM)
 
-
+ Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB
+ that Semicom also used for Date Quiz Go Go Episode 2 game.
 
 
 *********************************************************************/
@@ -1474,7 +1475,7 @@ ROM_END
 
 Mr. Kicker (c) SemiCom
 
-SEMICOM-003b
+SEMICOM-003b 
 
 +---------------------------------------------+
 |                     +------+                |
