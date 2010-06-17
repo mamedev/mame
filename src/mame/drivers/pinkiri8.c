@@ -39,7 +39,7 @@ static UINT8* janshi_vram1;
 static UINT8* janshi_vram2;
 static UINT8* janshi_back_vram;
 static UINT8* janshi_crtc_regs;
-
+static UINT8* janshi_unk;
 
 static ADDRESS_MAP_START( janshi_vdp_map8, 0, 8 )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
@@ -49,7 +49,7 @@ static ADDRESS_MAP_START( janshi_vdp_map8, 0, 8 )
 
 	AM_RANGE(0x12000, 0x12fff) AM_RAM AM_BASE(&janshi_vram1)
 
-	AM_RANGE(0x13700, 0x137ff) AM_RAM //??
+	AM_RANGE(0x13700, 0x137ff) AM_RAM AM_BASE(&janshi_unk)
 
 	AM_RANGE(0x13800, 0x13fff) AM_RAM AM_BASE(&janshi_vram2)
 
@@ -154,6 +154,39 @@ static VIDEO_START( pinkiri8 )
 
 }
 
+/*
+
+ronjan
+00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 0c, 00, 4e, 00, 10, 00, 12, 00, 14, 00, 16, 00, 18, 00, 1a, 00, 1c,
+00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 4c, 00, 4e, 00, 50, 00, 52, 00, 54, 00, 56, 00, 58, 00, 5a, 00, 5c,
+00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 4c, 00, 4e, 00, 50, 00, 52, 00, 54, 00, 56, 00, 58, 00, 5a, 00, 5c,
+
+00, 1e, 00, 20, 00, 22, 00, 24, 00, 26, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 38, 00, 3a, 00, c0,
+00, 5e, 00, 60, 00, 62, 00, 64, 00, 66, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 78, 00, 7a, 00, c0,
+00, 5e, 00, 60, 00, 62, 00, 64, 00, 66, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 78, 00, 7a, 00, c0,
+
+
+00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
+00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
+00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
+
+00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
+00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
+00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
+
+00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 01, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
+00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
+00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
+
+
+00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 01, 00, 00, 00, 00,
+00, 01, 00, 01, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 00, 00, 00,
+
+
+
+*/
+
 static VIDEO_UPDATE( pinkiri8 )
 {
 	static int col_bank;
@@ -163,6 +196,33 @@ static VIDEO_UPDATE( pinkiri8 )
 
 	if (!strcmp(screen->machine->gamedrv->name,"janshi")) game_type_hack = 1;
 
+	if ( input_code_pressed_once(screen->machine, KEYCODE_W) )
+	{
+		int i;
+		int count2;
+		printf("-------------------------------\n");
+		count2=0;
+		for (i=0x80;i<0xc0;i+=2)
+		{
+		
+			printf("%02x, ", janshi_unk[i+1]);
+			
+			count2++;
+			
+			if (count2==0x10)
+			{
+				printf("\n");
+				count2 = 0;
+			}
+			
+			
+		}
+
+
+	}
+	
+	
+	
 	//popmessage("%02x",janshi_crtc_regs[0x0a]);
 	col_bank = (janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
@@ -231,76 +291,84 @@ static VIDEO_UPDATE( pinkiri8 )
 
 		//  width = 0; height = 0;
 
+			width = 2;
+			height = 2;
 
+
+			// these bits seem to somehow determine the sprite height / widths for the sprite ram region?
+			int bit = janshi_unk[0x80 + (i/0x20)*2 + 1];
+
+			if (bit)
+			{
+				//col = mame_rand(screen->machine);
+				width = 2;
+			}
+			else
+			{
+				width = 1;
+				height = 2;	
+			}
+			
 			// hacks!
 			if (game_type_hack==1) // janshi
 			{
 				if (spr_offs<0x400)
 				{
-					width = 2;
 					height = 4;
 				}
 				else if (spr_offs<0x580)
 				{
-					width = 1;
-					height = 2;
+				//	height = 2;
 				}
 				else if (spr_offs<0x880)
 				{
-					width = 2;
 					height = 4;
 				}
 				else if (spr_offs<0x1000)
 				{
-					width = 2;
-					height = 2;
+				//	height = 2;
 				}
 				else if (spr_offs<0x1080)
 				{
-					width = 1;
-					height = 2;
+				//	height = 2;
 				}
 				else if (spr_offs<0x1700)
 				{
-					width = 2;
 					height = 4;
 				}
 				else if (spr_offs<0x1730)
 				{
-					width = 2;
-					height = 2;
+				//	height = 2;
 				}
 				else if (spr_offs<0x1930)
 				{
-					width = 2;
 					height = 4;
 				}
 				else if (spr_offs<0x19c0)
 				{
-					width = 2;
 					height = 1;
 				}
 				else
 				{
-					width = 2;
 					height = 4;
 				}
 
 
-				if (height==1)
-					y+=16;
-
-
-				// hmm...
-				if (height==2)
-					y+=16;
-
 			}
-			else // other games
-			{
-					width = 2;
-					height = 2;
-			}
+
+
+
+
+			
+
+			if (height==1)
+				y+=16;
+
+
+			// hmm...
+			if (height==2)
+				y+=16;
+
 
 
 			{
@@ -342,7 +410,7 @@ static int prev_writes = 0;
 
 static WRITE8_HANDLER( pinkiri8_vram_w )
 {
-//  static UINT8 *vram = memory_region(space->machine, "vram");
+  static UINT8 *vram = memory_region(space->machine, "vram");
 
 
 
@@ -381,7 +449,7 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 
 			memory_write_byte_8le(vdp_space, (vram_addr) | (vram_bank << 16), data);
 
-
+			vram[(vram_addr) | (vram_bank << 16)] = data;
 
 			//vram[(vram_addr) | (vram_bank << 16)] = data;
 			/*
