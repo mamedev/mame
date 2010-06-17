@@ -654,7 +654,7 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 	}
 
 	/* iterate over sound chips */
-	const device_config_sound_interface *sound;
+	const device_config_sound_interface *sound = NULL;
 	for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		fprintf(out, "\t\t<chip");
@@ -762,7 +762,7 @@ static void print_game_sound(FILE *out, const game_driver *game, const machine_c
 	int speakers = speaker_output_count(config);
 
 	/* if we have no sound, zero out the speaker count */
-	const device_config_sound_interface *sound;
+	const device_config_sound_interface *sound = NULL;
 	if (!config->devicelist.first(sound))
 		speakers = 0;
 
