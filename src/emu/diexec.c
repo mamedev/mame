@@ -482,7 +482,7 @@ attotime device_execute_interface::local_time() const
 	{
 		assert(m_cycles_running >= *m_icount);
 		int cycles = m_cycles_running - *m_icount;
-		result = attotime_add(result, m_device.clocks_to_attotime(cycles));
+		result = attotime_add(result, m_device.clocks_to_attotime(cycles_to_clocks(cycles)));
 	}
 	return result;
 }
