@@ -410,7 +410,7 @@ if (TEMPLOG) printf("Setting quantum: %08X%08X\n", (UINT32)(min_quantum.attoseco
 	device_execute_interface **suspend_tailptr = &suspend_list;
 
 	// iterate over all devices
-	device_execute_interface *exec;
+	device_execute_interface *exec = NULL;
 	for (bool gotone = m_machine.devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
 		// append to the appropriate list
