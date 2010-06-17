@@ -2599,7 +2599,7 @@ static MACHINE_DRIVER_START( glfgreat )
 	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(glfgreat_main_map)
 	MDRV_CPU_VBLANK_INT("screen", lgtnfght_interrupt)
 
@@ -2666,7 +2666,7 @@ static MACHINE_DRIVER_START( prmrsocr )
 	MDRV_DRIVER_DATA(tmnt_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(prmrsocr_main_map)
 	MDRV_CPU_VBLANK_INT("screen", lgtnfght_interrupt)
 
