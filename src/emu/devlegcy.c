@@ -386,7 +386,7 @@ legacy_image_device_config_base::legacy_image_device_config_base(const machine_c
 
 void legacy_image_device_config_base::device_config_complete()
 {
-	const device_config_image_interface *image;
+	const device_config_image_interface *image = NULL;
 	int count = 0;
 	int index = -1;
     image_device_format **formatptr;
