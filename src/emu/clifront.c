@@ -788,7 +788,7 @@ static int info_listmedia(core_options *options, const char *gamename)
 	int count = 0, devcount;
 	int drvindex;
 	machine_config *config;
-	const device_config_image_interface *dev;	
+	const device_config_image_interface *dev = NULL;
 	const char *src;
 	const char *driver_name;
 	const char *name;
