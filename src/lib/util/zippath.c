@@ -359,7 +359,7 @@ done:
 	if (temp2 != NULL)
 		astring_free(temp2);
 	if (alloc_fullpath != NULL)
-		free(alloc_fullpath);
+		osd_free(alloc_fullpath);
 	return filerr;
 }
 
