@@ -5992,8 +5992,8 @@ MACHINE_RESET( megadriv )
 	irq6_on_timer = machine->device<timer_device>("irq6_timer");
 	irq4_on_timer = machine->device<timer_device>("irq4_timer");
 
-	frame_timer->reset();
-	scanline_timer->reset();
+	frame_timer->adjust(attotime_zero);
+	scanline_timer->adjust(attotime_zero);
 
 	if (genesis_other_hacks)
 	{
@@ -6148,10 +6148,10 @@ int megadrive_z80irq_hpos = 320;
 		//xxx = cputag_attotime_to_clocks(machine, "maincpu",time_elapsed_since_crap);
 		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
-		frame_timer->reset();
+		frame_timer->adjust(attotime_zero);
 	}
 
-	scanline_timer->reset();
+	scanline_timer->adjust(attotime_zero);
 
 }
 
