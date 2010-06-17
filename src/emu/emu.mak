@@ -63,6 +63,7 @@ EMUOBJS = \
 	$(EMUOBJ)/emupal.o \
 	$(EMUOBJ)/fileio.o \
 	$(EMUOBJ)/hash.o \
+	$(EMUOBJ)/hashfile.o \
 	$(EMUOBJ)/info.o \
 	$(EMUOBJ)/input.o \
 	$(EMUOBJ)/inputseq.o \
