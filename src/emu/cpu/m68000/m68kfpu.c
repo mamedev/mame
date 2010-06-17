@@ -12,7 +12,7 @@
 extern flag floatx80_is_nan( floatx80 a );
 
 // masks for packed dwords, positive k-factor
-static UINT32 pkmask2[18] =
+static const UINT32 pkmask2[18] =
 {
 	0xffffffff, 0, 0xf0000000, 0xff000000, 0xfff00000, 0xffff0000,
 	0xfffff000, 0xffffff00, 0xfffffff0, 0xffffffff,
@@ -20,7 +20,7 @@ static UINT32 pkmask2[18] =
 	0xffffffff, 0xffffffff, 0xffffffff
 };
 
-static UINT32 pkmask3[18] =
+static const UINT32 pkmask3[18] =
 {
 	0xffffffff, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0xf0000000, 0xff000000, 0xfff00000, 0xffff0000,

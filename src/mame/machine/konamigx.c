@@ -17,6 +17,8 @@
 // K055550/K053990 protection chips, perform simple memset() and other game logic operations
 static UINT16 prot_data[0x20];
 
+static WRITE32_HANDLER(fantjour_dma_w);
+
 READ16_HANDLER( K055550_word_r )
 {
 	return(prot_data[offset]);
@@ -444,7 +446,7 @@ void fantjour_dma_install(running_machine *machine)
 	memset(fantjour_dma, 0, sizeof(fantjour_dma));
 }
 
-WRITE32_HANDLER(fantjour_dma_w)
+static WRITE32_HANDLER(fantjour_dma_w)
 {
 	COMBINE_DATA(fantjour_dma + offset);
 	if(!offset && ACCESSING_BITS_24_31) {

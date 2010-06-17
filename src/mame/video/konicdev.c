@@ -1356,17 +1356,6 @@ INLINE k007121_state *k007121_get_safe_token( running_device *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-/* FIXME: this is probably unused... check! */
-WRITE8_DEVICE_HANDLER( k007121_ctrlram_w )
-{
-	k007121_state *k007121 = k007121_get_safe_token(device);
-
-	assert(offset < 8);
-
-	k007121->ctrlram[offset] = data;
-}
-
-
 READ8_DEVICE_HANDLER( k007121_ctrlram_r )
 {
 	k007121_state *k007121 = k007121_get_safe_token(device);
@@ -1757,12 +1746,6 @@ void k007342_tilemap_update( running_device *device )
 			current_layer);
 	}
 #endif
-}
-
-void k007342_tilemap_set_enable( running_device *device, int tmap, int enable )
-{
-	k007342_state *k007342 = k007342_get_safe_token(device);
-	tilemap_set_enable(k007342->tilemap[tmap], enable);
 }
 
 void k007342_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int num, int flags, UINT32 priority )

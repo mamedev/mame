@@ -148,7 +148,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE(sigmab98)
+static VIDEO_UPDATE(sigmab98)
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -253,7 +253,7 @@ static READ8_HANDLER( regs2_r )
 
 // Outputs
 
-UINT8 c0,c4,c6,c8;
+static UINT8 c0,c4,c6,c8;
 static void show_outputs()
 {
 #ifdef MAME_DEBUG

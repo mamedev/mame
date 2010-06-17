@@ -322,7 +322,6 @@ void konami_sortlayers5(int *layer, int *pri);
 ***************************************************************************/
 
 /**  Konami 007121  **/
-WRITE8_DEVICE_HANDLER( k007121_ctrlram_w );	// FIXME: this is probably unused: writes to ctrlram should use ctrl_w below!
 READ8_DEVICE_HANDLER( k007121_ctrlram_r );
 WRITE8_DEVICE_HANDLER( k007121_ctrl_w );
 
@@ -340,7 +339,6 @@ WRITE8_DEVICE_HANDLER( k007342_scroll_w );
 WRITE8_DEVICE_HANDLER( k007342_vreg_w );
 
 void k007342_tilemap_update(running_device *device);
-void k007342_tilemap_set_enable(running_device *device, int layer, int enable);
 void k007342_tilemap_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int num, int flags, UINT32 priority);
 int k007342_is_int_enabled(running_device *device);
 

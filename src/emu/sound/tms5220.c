@@ -225,7 +225,7 @@ device), PES Speech adapter (serial port connection)
 
 #define TMS5220_IS_TMC0285	TMS5220_IS_5200
 
-static UINT8 reload_table[4] = { 0, 50, 100, 150 }; //is the sample count reload for 5220c only; 5200 and 5220 always reload with 0
+static const UINT8 reload_table[4] = { 0, 50, 100, 150 }; //is the sample count reload for 5220c only; 5200 and 5220 always reload with 0
 
 typedef struct _tms5220_state tms5220_state;
 struct _tms5220_state

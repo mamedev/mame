@@ -1343,7 +1343,7 @@ static void toaplan2_log_vram(running_machine *machine)
     Sprite Handlers
 ***************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int controller, UINT8* primap )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int controller, const UINT8* primap )
 {
 	const gfx_element *gfx = machine->gfx[ ((controller*2)+1) ];
 
@@ -1532,7 +1532,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
     Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
-void toaplan2_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, tilemap_t* tilemap, UINT8* priremap, UINT8* pri_enable )
+static void toaplan2_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
 {
 	int width = machine->primary_screen->width();
 	int height = machine->primary_screen->height();
@@ -1579,11 +1579,11 @@ void toaplan2_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, ti
 }
 
 
-UINT8 toaplan2_primap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
+static const UINT8 toaplan2_primap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
 //UINT8 toaplan2_sprprimap1[16] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-UINT8 toaplan2_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
+static const UINT8 toaplan2_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
 
-UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
+static const UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
 
 
 VIDEO_UPDATE( toaplan2_0 )

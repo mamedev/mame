@@ -1,13 +1,10 @@
 /*----------- defined in video/konamigx.c -----------*/
 
 // 2nd-Tier GX/MW Hardware Functions
-void K053247GP_set_SpriteOffset(int offsx, int offsy);
 
 void K053936GP_set_offset(int chip, int xoffs, int yoffs);
 void K053936GP_clip_enable(int chip, int status);
 void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy);
-void K053936GP_0_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int tilebpp, int blend, int alpha);
-void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int tilebpp, int blend, int alpha);
 
 
 
@@ -15,10 +12,6 @@ void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rec
 extern UINT8  konamigx_wrport1_0, konamigx_wrport1_1;
 extern UINT16 konamigx_wrport2;
 
-
-// Tile and Sprite Mixcode Decoders
-int K055555GX_decode_vmixcolor(int layer, int *color);
-int K055555GX_decode_osmixcolor(int layer, int *color);
 
 
 // Sprite Callbacks
@@ -37,11 +30,6 @@ int K055555GX_decode_osmixcolor(int layer, int *color);
 #define K055555_SKIPSHADOW	0x40000000
 #define K055555_FULLSHADOW	0x80000000
 
-void konamigx_type2_sprite_callback(int *code, int *color, int *priority);
-
-void konamigx_dragoonj_sprite_callback(int *code, int *color, int *priority);
-void konamigx_salmndr2_sprite_callback(int *code, int *color, int *priority);
-void konamigx_le2_sprite_callback(int *code, int *color, int *priority);
 
 
 // Centralized Sprites and Layer Blitter
@@ -95,9 +83,11 @@ VIDEO_START(racinfrc);
 VIDEO_UPDATE(konamigx);
 
 WRITE32_HANDLER( konamigx_palette_w );
+#ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( konamigx_palette2_w );
 WRITE32_HANDLER( konamigx_555_palette_w );
 WRITE32_HANDLER( konamigx_555_palette2_w );
+#endif
 WRITE32_HANDLER( konamigx_tilebank_w );
 WRITE32_HANDLER( konamigx_t1_psacmap_w );
 WRITE32_HANDLER( konamigx_t4_psacmap_w );
@@ -116,7 +106,6 @@ WRITE16_HANDLER( K053990_martchmp_word_w );
 void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 
 void fantjour_dma_install(running_machine *machine);
-WRITE32_HANDLER(fantjour_dma_w);
 
 
 

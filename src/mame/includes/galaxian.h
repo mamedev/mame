@@ -72,7 +72,7 @@ extern galaxian_draw_background_func galaxian_draw_background_ptr;
 /* special purpose background rendering */
 void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+//void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 void turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 void jumpbug_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);

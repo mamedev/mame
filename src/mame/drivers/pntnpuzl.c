@@ -172,11 +172,11 @@ static VIDEO_UPDATE( pntnpuzl )
 {
 	int x,y;
 	int count;
+#if 0
 	static int xxx=0x18f;
 	static int yyy=512;
 	static int sss=0xa8;
 
-#if 0
 	if ( input_code_pressed_once(screen->machine, KEYCODE_Q) )
 	{
 		xxx--;
@@ -212,6 +212,10 @@ static VIDEO_UPDATE( pntnpuzl )
 		sss++;
 		mame_printf_debug("sss %04x\n",sss);
 	}
+#else
+	const int xxx=0x18f;
+	const int yyy=512;
+	const int sss=0xa8;
 #endif
 
 

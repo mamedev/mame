@@ -419,7 +419,7 @@ const cdrom_toc *cdrom_get_toc(cdrom_file *file)
     and track data size
 -------------------------------------------------*/
 
-void cdrom_get_info_from_type_string(const char *typestring, UINT32 *trktype, UINT32 *datasize)
+static void cdrom_get_info_from_type_string(const char *typestring, UINT32 *trktype, UINT32 *datasize)
 {
 	if (!strcmp(typestring, "MODE1"))
 	{

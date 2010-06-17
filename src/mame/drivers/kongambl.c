@@ -99,11 +99,11 @@ static ADDRESS_MAP_START( kongamaud_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x2000ff) AM_RAM	// unknown (YMZ280b?  Shared with 68020?)
 ADDRESS_MAP_END
 
-void kongambl_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
+static void kongambl_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
 }
 
-void kongambl_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
+static void kongambl_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
 {
 }
 

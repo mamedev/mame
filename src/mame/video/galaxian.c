@@ -950,6 +950,7 @@ static void stars_draw_row(bitmap_t *bitmap, int maxx, int y, UINT32 star_offs, 
  *
  *************************************/
 
+#ifdef UNUSED_FUNCTION
 static int flip_and_clip(rectangle *draw, int xstart, int xend, const rectangle *cliprect)
 {
 	*draw = *cliprect;
@@ -966,6 +967,7 @@ static int flip_and_clip(rectangle *draw, int xstart, int xend, const rectangle 
 	sect_rect(draw, cliprect);
 	return (draw->min_x <= draw->max_x);
 }
+#endif
 
 
 void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -1027,6 +1029,7 @@ void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const r
 }
 
 
+#ifdef UNUSED_FUNCTION
 void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *prom = memory_region(machine, "user1");
@@ -1056,6 +1059,7 @@ void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const re
 			bitmap_fill(bitmap, &draw, MAKE_RGB(red, green, blue));
 		}
 }
+#endif
 
 
 void turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

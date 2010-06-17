@@ -13,8 +13,8 @@
 #define OP(A)   oprom[(A) - PC]
 #define ARG(A)  opram[(A) - PC]
 
-static char reg[] = { 'a', 'b', 'c', 'd', 'e', 'h', 'l', 'm' };
-static char flag_names[] = { 'c', 'z', 's', 'p' };
+static const char reg[] = { 'a', 'b', 'c', 'd', 'e', 'h', 'l', 'm' };
+static const char flag_names[] = { 'c', 'z', 's', 'p' };
 
 CPU_DISASSEMBLE( i8008 )
 {

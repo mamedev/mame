@@ -1,3 +1,4 @@
+#ifdef UNUSED_FUNCTION
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
 void konami_rom_deinterleave_2(running_machine *machine, const char *mem_region);
 void konami_rom_deinterleave_2_half(running_machine *machine, const char *mem_region);
@@ -33,6 +34,7 @@ READ8_HANDLER( K007420_r );
 WRITE8_HANDLER( K007420_w );
 void K007420_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect);
 void K007420_set_banklimit(int limit);
+#endif
 
 
 /*
@@ -49,6 +51,7 @@ permutations which may be required).
 #define GRADIUS3_PLANE_ORDER 0x1111
 #define TASMAN_PLANE_ORDER 0x1616
 
+#ifdef UNUSED_FUNCTION
 /*
 The callback is passed:
 - layer number (0 = FIX, 1 = A, 2 = B)
@@ -133,6 +136,7 @@ void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,c
 void K053245_sprites_draw_lethal(running_machine *machine, int chip, bitmap_t *bitmap,const rectangle *cliprect); /* for lethal enforcers */
 void K053245_clear_buffer(int chip);
 void K053245_set_SpriteOffset(int chip,int offsx, int offsy);
+#endif
 
 #define K055673_LAYOUT_GX  0
 #define K055673_LAYOUT_RNG 1
@@ -154,28 +158,38 @@ Callback procedures for non-standard shadows:
 #define K053247_CUSTOMSHADOW	0x20000000
 #define K053247_SHDSHIFT		20
 
+#ifdef UNUSED_FUNCTION
 void K053247_vh_start(running_machine *machine, const char *gfx_memory_region,int dx,int dy,int plane_order,
 		void (*callback)(int *code,int *color,int *priority_mask));
 READ8_HANDLER( K053247_r );
 WRITE8_HANDLER( K053247_w );
+#endif
 READ16_HANDLER( K053247_word_r );
 WRITE16_HANDLER( K053247_word_w );
 READ32_HANDLER( K053247_long_r );
 WRITE32_HANDLER( K053247_long_w );
 WRITE16_HANDLER( K053247_reg_word_w ); // "OBJSET2" registers
 WRITE32_HANDLER( K053247_reg_long_w );
+#ifdef UNUSED_FUNCTION
 void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect);
+#endif
 int K053247_read_register(int regnum);
 void K053247_set_SpriteOffset(int offsx, int offsy);
+#ifdef UNUSED_FUNCTION
 void K053247_wraparound_enable(int status);
 void K05324x_set_z_rejection(int zcode); // common to K053245/6/7
+#endif
 void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(int *, int *, int *), int *dx, int *dy);
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( K053246_r );
 WRITE8_HANDLER( K053246_w );
 READ16_HANDLER( K053246_word_r );
+#endif
 WRITE16_HANDLER( K053246_word_w );
+#ifdef UNUSED_FUNCTION
 READ32_HANDLER( K053246_long_r );
+#endif
 WRITE32_HANDLER( K053246_long_w );
 void K053246_set_OBJCHA_line(int state);
 int K053246_is_IRQ_enabled(void);
@@ -193,6 +207,7 @@ The callback must put:
 - if necessary, put flags for the TileMap code in the tile_info
   structure (e.g. TILE_FLIPX)
 */
+#ifdef UNUSED_FUNCTION
 void K051316_vh_start_0(running_machine *machine,const char *gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags));
@@ -219,12 +234,15 @@ void K051316_zoom_draw_1(bitmap_t *bitmap,const rectangle *cliprect,int flags,UI
 void K051316_zoom_draw_2(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
 void K051316_wraparound_enable(int chip, int status);
 void K051316_set_offset(int chip, int xoffs, int yoffs);
+#endif
 
 
 extern UINT16 *K053936_0_ctrl,*K053936_0_linectrl;
 extern UINT16 *K053936_1_ctrl,*K053936_1_linectrl;
 void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack);
+#ifdef UNUSED_FUNCTION
 void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack);
+#endif
 void K053936_wraparound_enable(int chip, int status);
 void K053936_set_offset(int chip, int xoffs, int yoffs);
 
@@ -244,15 +262,19 @@ void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t
 void K053251_vh_start(running_machine *machine);
 
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( K054000_w );
 READ8_HANDLER( K054000_r );
+#endif
 WRITE16_HANDLER( K054000_lsb_w );
 READ16_HANDLER( K054000_lsb_r );
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( K051733_w );
 READ8_HANDLER( K051733_r );
 
 void K056832_SetExtLinescroll(void);	/* Lethal Enforcers */
+#endif
 
 #define K056382_DRAW_FLAG_FORCE_XYSCROLL		0x00800000
 
@@ -262,18 +284,25 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 			int djmain_hack);
 READ16_HANDLER( K056832_ram_word_r );
 WRITE16_HANDLER( K056832_ram_word_w );
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( K056832_ram_half_word_r );
 WRITE16_HANDLER( K056832_ram_half_word_w );
 READ16_HANDLER( K056832_5bpp_rom_word_r );
+#endif
 READ32_HANDLER( K056832_5bpp_rom_long_r );
 READ32_HANDLER( K056832_6bpp_rom_long_r );
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( K056832_rom_word_r );
+#endif
 READ16_HANDLER( K056832_mw_rom_word_r );
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( K056832_bishi_rom_word_r );
 READ16_HANDLER( K056832_old_rom_word_r );
 READ16_HANDLER( K056832_rom_word_8000_r );
+#endif
 WRITE16_HANDLER( K056832_word_w ); // "VRAM" registers
 WRITE16_HANDLER( K056832_b_word_w );
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( K056832_ram_code_lo_r );
 READ8_HANDLER( K056832_ram_code_hi_r );
 READ8_HANDLER( K056832_ram_attr_lo_r );
@@ -284,15 +313,21 @@ WRITE8_HANDLER( K056832_ram_attr_lo_w );
 WRITE8_HANDLER( K056832_ram_attr_hi_w );
 WRITE8_HANDLER( K056832_w );
 WRITE8_HANDLER( K056832_b_w );
+#endif
 void K056832_mark_plane_dirty(int num);
 void K056832_MarkAllTilemapsDirty(void);
 void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int num, UINT32 flags, UINT32 priority);
+#ifdef UNUSED_FUNCTION
 void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority);
 void K056832_set_LayerAssociation(int status);
+#endif
 int  K056832_get_LayerAssociation(void);
 void K056832_set_LayerOffset(int layer, int offsx, int offsy);
+#ifdef UNUSED_FUNCTION
 void K056832_set_LSRAMPage(int logical_page, int physical_page, int physical_offset);
+#endif
 void K056832_set_UpdateMode(int mode);
+#ifdef UNUSED_FUNCTION
 void K056832_linemap_enable(int enable);
 int  K056832_is_IRQ_enabled(int irqline);
 void K056832_read_AVAC(int *mode, int *data);
@@ -300,9 +335,12 @@ int  K056832_read_register(int regnum);
 int K056832_get_current_rambank(void);
 int K056832_get_lookup(int bits);	/* Asterix */
 void K056832_set_tile_bank(int bank);	/* Asterix */
+#endif
 
 READ32_HANDLER( K056832_ram_long_r );
+#ifdef UNUSED_FUNCTION
 READ32_HANDLER( K056832_rom_long_r );
+#endif
 WRITE32_HANDLER( K056832_ram_long_w );
 WRITE32_HANDLER( K056832_long_w );
 WRITE32_HANDLER( K056832_b_long_w );
@@ -420,11 +458,13 @@ READ16_HANDLER( K053250_0_r );
 WRITE16_HANDLER( K053250_0_ram_w );
 READ16_HANDLER( K053250_0_ram_r );
 READ16_HANDLER( K053250_0_rom_r );
+#ifdef UNUSED_FUNCTION
 WRITE16_HANDLER( K053250_1_w );
 READ16_HANDLER( K053250_1_r );
 WRITE16_HANDLER( K053250_1_ram_w );
 READ16_HANDLER( K053250_1_ram_r );
 READ16_HANDLER( K053250_1_rom_r );
+#endif
 
 // K053250_draw() control flags
 #define K053250_WRAP500		0x01
@@ -433,16 +473,23 @@ READ16_HANDLER( K053250_1_rom_r );
 void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
 void K053250_set_LayerOffset(int chip, int offsx, int offsy);
 void K053250_unpack_pixels(running_machine *machine, const char *region);
+#ifdef UNUSED_FUNCTION
 void K053250_dma(running_machine *machine, int chip, int limiter);
+#endif
 
 
 // K053252 CRT and interrupt control unit
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( K053252_word_r );	// CCU registers
+#endif
 WRITE16_HANDLER( K053252_word_w );
+#ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( K053252_long_w );
+#endif
 
 
 // debug handlers
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( K056832_word_r );		// VACSET
 READ16_HANDLER( K056832_b_word_r );		// VSCCS  (board dependent)
 READ16_HANDLER( K053246_reg_word_r );	// OBJSET1
@@ -457,3 +504,4 @@ READ32_HANDLER( K053247_reg_long_r );	// OBJSET2
 READ32_HANDLER( K055555_long_r );		// PCU2
 
 READ16_HANDLER( K053244_reg_word_r );	// OBJSET0
+#endif
