@@ -388,7 +388,7 @@ static WRITE8_HANDLER( m4510_write_0000 )
 	}
 
 	if (cpustate->port_write)
-		cpustate->port_write(cpustate->device, 0, m4510_get_port(downcast<cpu_device *>(space->cpu)));
+		cpustate->port_write(cpustate->device, 0, m4510_get_port(downcast<legacy_cpu_device *>(space->cpu)));
 }
 
 static ADDRESS_MAP_START(m4510_mem, ADDRESS_SPACE_PROGRAM, 8)
