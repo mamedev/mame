@@ -698,7 +698,7 @@ void device_execute_interface::static_on_vblank(screen_device &screen, void *par
 	// VBLANK starting
 	if (vblank_state)
 	{
-		device_execute_interface *exec;
+		device_execute_interface *exec = NULL;
 		for (bool gotone = screen.machine->devicelist.first(exec); gotone; gotone = exec->next(exec))
 			exec->on_vblank_start(screen);
 	}
