@@ -1033,7 +1033,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	device_state_interface *state;
+	device_state_interface *state = NULL;
 	for (bool gotone = machine->devicelist.first(state); gotone; gotone = state->next(state))
 	{
 		registers_subview_item *subview = auto_alloc(machine, registers_subview_item);
@@ -1415,7 +1415,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 	int curindex = 0;
 
 	/* iterate over CPUs with program address spaces */
-	device_execute_interface *exec;
+	device_execute_interface *exec = NULL;
 	for (bool gotone = machine->devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
 		disasm_subview_item *subview = auto_alloc(machine, disasm_subview_item);
@@ -2288,7 +2288,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	int curindex = 0;
 
 	/* first add all the device's address spaces */
-	device_memory_interface *memintf;
+	device_memory_interface *memintf = NULL;
 	for (bool gotone = machine->devicelist.first(memintf); gotone; gotone = memintf->next(memintf))
 		for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
