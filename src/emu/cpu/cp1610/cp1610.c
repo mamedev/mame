@@ -46,7 +46,7 @@ struct _cp1610_state
 	int		intr_pending;
 	int		intrm_pending;
 	int		mask_interrupts;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -56,7 +56,7 @@ INLINE cp1610_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CP1610);
-	return (cp1610_state *)downcast<cpu_device *>(device)->token();
+	return (cp1610_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define cp1610_readop(A) memory_read_word_16be(cpustate->program, (A)<<1)

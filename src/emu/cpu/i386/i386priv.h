@@ -227,7 +227,7 @@ struct _i386_state
 
 	UINT8 irq_state;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32 a20_mask;
@@ -265,7 +265,7 @@ INLINE i386_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_I486 ||
 		   cpu_get_type(device) == CPU_PENTIUM ||
 		   cpu_get_type(device) == CPU_MEDIAGX);
-	return (i386_state *)downcast<cpu_device *>(device)->token();
+	return (i386_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 extern int i386_parity_table[256];

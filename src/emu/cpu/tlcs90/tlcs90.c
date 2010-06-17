@@ -31,7 +31,7 @@ typedef struct
 	UINT8		halt, after_EI;
 	UINT16		irq_state, irq_mask;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int		icount;
@@ -68,7 +68,7 @@ INLINE t90_Regs *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_TMP90841 ||
 		   cpu_get_type(device) == CPU_TMP91640 ||
 		   cpu_get_type(device) == CPU_TMP91641);
-	return (t90_Regs *)downcast<cpu_device *>(device)->token();
+	return (t90_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 enum	{
@@ -2633,7 +2633,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 	cpustate->internal_registers[offset] = data;
 }
 
-static void state_register( cpu_device *device )
+static void state_register( legacy_cpu_device *device )
 {
 	t90_Regs *cpustate = get_safe_token(device);
 

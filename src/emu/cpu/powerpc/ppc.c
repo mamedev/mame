@@ -306,7 +306,7 @@ typedef struct {
 	UINT64 tb;			/* 56-bit timebase register */
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 
 	// STUFF added for the 6xx series

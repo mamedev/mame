@@ -282,7 +282,7 @@ struct _mcs51_state_t
 
 	/* Interrupt Callback */
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 
 	/* Memory spaces */
     const address_space *program;
@@ -666,7 +666,7 @@ INLINE mcs51_state_t *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_I87C52 ||
 		   cpu_get_type(device) == CPU_AT89C4051 ||
 		   cpu_get_type(device) == CPU_DS5002FP);
-	return (mcs51_state_t *)downcast<cpu_device *>(device)->token();
+	return (mcs51_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void clear_current_irq(mcs51_state_t *mcs51_state)

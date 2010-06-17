@@ -32,7 +32,7 @@ struct _scmp_state
 	UINT8	ER;
 	UINT8	SR;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int					icount;
@@ -58,7 +58,7 @@ INLINE scmp_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SCMP || cpu_get_type(device) == CPU_INS8060);
-	return (scmp_state *)downcast<cpu_device *>(device)->token();
+	return (scmp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE UINT16 ADD12(UINT16 addr, INT8 val)

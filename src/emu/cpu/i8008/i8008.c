@@ -33,7 +33,7 @@ struct _i8008_state
 	UINT8	PF; // Parity flag
 	UINT8	HALT;
 	UINT8	flags; // temporary I/O only
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int					icount;
@@ -59,7 +59,7 @@ INLINE i8008_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I8008);
-	return (i8008_state *)downcast<cpu_device *>(device)->token();
+	return (i8008_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void PUSH_STACK(i8008_state *cpustate)

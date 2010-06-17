@@ -15,7 +15,7 @@ INLINE unsp_state *get_safe_token(running_device *device)
     assert(device != NULL);
     assert(device->type() == CPU);
     assert(cpu_get_type(device) == CPU_UNSP);
-    return (unsp_state *)downcast<cpu_device *>(device)->token();
+    return (unsp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);

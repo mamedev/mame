@@ -138,7 +138,7 @@ struct _r3000_state
 	int			interrupt_cycles;
 	int			hasfpu;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 
 	/* endian-dependent load/store */
@@ -170,7 +170,7 @@ INLINE r3000_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_R3000LE ||
 		   cpu_get_type(device) == CPU_R3041BE ||
 		   cpu_get_type(device) == CPU_R3041LE);
-	return (r3000_state *)downcast<cpu_device *>(device)->token();
+	return (r3000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 

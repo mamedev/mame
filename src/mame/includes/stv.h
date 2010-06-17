@@ -8,6 +8,10 @@ extern int stv_enable_slave_sh2;
 extern int minit_boost,sinit_boost;
 extern attotime minit_boost_timeslice, sinit_boost_timeslice;
 
+extern cpu_device *stv_maincpu;
+extern cpu_device *stv_slave;
+extern cpu_device *stv_audiocpu;
+
 DRIVER_INIT ( stv );
 
 

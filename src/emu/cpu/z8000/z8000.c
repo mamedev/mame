@@ -82,7 +82,7 @@ struct _z8000_state
 	int nmi_state;		/* NMI line state */
 	int irq_state[2];	/* IRQ line states (NVI, VI) */
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -95,7 +95,7 @@ INLINE z8000_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_Z8001 || cpu_get_type(device) == CPU_Z8002);
-	return (z8000_state *)downcast<cpu_device *>(device)->token();
+	return (z8000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* opcode execution table */

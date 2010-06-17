@@ -197,7 +197,7 @@ struct _alpha8201_state
 	UINT8 halt;     /* halt input line                        */
 #endif
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 	int inst_cycles;
@@ -230,7 +230,7 @@ INLINE alpha8201_state *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ALPHA8201 ||
 		   cpu_get_type(device) == CPU_ALPHA8301);
-	return (alpha8201_state *)downcast<cpu_device *>(device)->token();
+	return (alpha8201_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* Get next opcode argument and increment program counter */

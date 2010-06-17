@@ -232,7 +232,7 @@ typedef struct
 	UINT32			op;
 	int				interrupt_cycles;
 	void			(*output_pins_changed)(UINT32 pins);
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 } dsp56k_core;

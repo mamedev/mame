@@ -198,7 +198,7 @@ INLINE z8_state *get_safe_token(running_device *device)
 	assert((cpu_get_type(device) == CPU_Z8601) ||
 		(cpu_get_type(device) == CPU_UB8830D) ||
 		(cpu_get_type(device) == CPU_Z8611));
-	return (z8_state *)downcast<cpu_device *>(device)->token();
+	return (z8_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE UINT8 fetch(z8_state *cpustate)

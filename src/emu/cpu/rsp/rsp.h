@@ -209,7 +209,7 @@ struct _rsp_state
 	UINT32 nextpc;
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 

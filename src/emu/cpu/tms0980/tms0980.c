@@ -457,7 +457,7 @@ INLINE tms0980_state *get_safe_token(running_device *device)
 			cpu_get_type(device) == CPU_TMS1200 ||
 			cpu_get_type(device) == CPU_TMS1270 ||
 			cpu_get_type(device) == CPU_TMS1300 );
-	return (tms0980_state *)downcast<cpu_device *>(device)->token();
+	return (tms0980_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -491,7 +491,7 @@ static ADDRESS_MAP_START(data_7bit, ADDRESS_SPACE_DATA, 8)
 ADDRESS_MAP_END
 
 
-static void cpu_init_tms_common( cpu_device *device, const UINT32* decode_table, UINT16 o_mask, UINT16 r_mask, UINT8 pc_size, UINT8 byte_size )
+static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode_table, UINT16 o_mask, UINT16 r_mask, UINT8 pc_size, UINT8 byte_size )
 {
 	tms0980_state *cpustate = get_safe_token( device );
 

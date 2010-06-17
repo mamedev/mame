@@ -358,7 +358,7 @@ struct _apexc_state
 				/* running: flag implied by the existence of the stop instruction */
 	UINT32 pc;	/* address of next instruction for the disassembler */
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -373,7 +373,7 @@ INLINE apexc_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_APEXC);
-	return (apexc_state *)downcast<cpu_device *>(device)->token();
+	return (apexc_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 

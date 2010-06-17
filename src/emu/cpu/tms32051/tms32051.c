@@ -143,7 +143,7 @@ struct _tms32051_state
 	} shadow;
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	int icount;
@@ -154,7 +154,7 @@ INLINE tms32051_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS32051);
-	return (tms32051_state *)downcast<cpu_device *>(device)->token();
+	return (tms32051_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void delay_slot(tms32051_state *cpustate, UINT16 startpc);

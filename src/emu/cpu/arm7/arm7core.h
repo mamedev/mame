@@ -161,7 +161,7 @@ enum
     UINT8 pendingSwi;                   \
     INT32 iCount;			\
     device_irq_callback irq_callback;		\
-    cpu_device *device;		\
+    legacy_cpu_device *device;		\
     const address_space *program;
 
 

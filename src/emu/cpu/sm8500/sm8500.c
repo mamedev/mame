@@ -51,7 +51,7 @@ struct _sm8500_state
 	int halted;
 	int icount;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	UINT8 internal_ram[0x500];
 };
@@ -61,7 +61,7 @@ INLINE sm8500_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SM8500);
-	return (sm8500_state *)downcast<cpu_device *>(device)->token();
+	return (sm8500_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static const UINT8 sm8500_b2w[8] = {
@@ -384,7 +384,7 @@ static void sm8500_set_irq_line( sm8500_state *cpustate, int irqline, int state 
 	}
 }
 
-UINT8 *sm8500_get_internal_ram(cpu_device *device)
+UINT8 *sm8500_get_internal_ram(legacy_cpu_device *device)
 {
 	sm8500_state *cpustate = get_safe_token(device);
 	return cpustate->internal_ram; 

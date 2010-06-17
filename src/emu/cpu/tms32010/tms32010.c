@@ -91,7 +91,7 @@ struct _tms32010_state
 	UINT16	memaccess;
 	int		addr_mask;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const	address_space *program;
 	const	address_space *data;
 	const	address_space *io;
@@ -102,7 +102,7 @@ INLINE tms32010_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS32010);
-	return (tms32010_state *)downcast<cpu_device *>(device)->token();
+	return (tms32010_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* opcode table entry */

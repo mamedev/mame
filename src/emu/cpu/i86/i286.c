@@ -58,7 +58,7 @@ struct _i80286_state
 		UINT8 rights;
 	} ldtr, tr;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	INT32	AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
@@ -86,7 +86,7 @@ INLINE i80286_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I80286);
-	return (i80286_state *)downcast<cpu_device *>(device)->token();
+	return (i80286_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define INT_IRQ 0x01

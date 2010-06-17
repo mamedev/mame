@@ -146,7 +146,7 @@ INLINE am29000_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_AM29000);
-	return (am29000_state *)downcast<cpu_device *>(device)->token();
+	return (am29000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static CPU_INIT( am29000 )

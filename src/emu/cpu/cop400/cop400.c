@@ -216,7 +216,7 @@ INLINE cop400_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_COP426 ||
 		   cpu_get_type(device) == CPU_COP444 ||
 		   cpu_get_type(device) == CPU_COP445);
-	return (cop400_state *)downcast<cpu_device *>(device)->token();
+	return (cop400_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void PUSH(cop400_state *cpustate, UINT16 data)
@@ -865,7 +865,7 @@ static void define_state_table(running_device *device)
 		state->state_add(COP400_T,    "T",         cpustate->t);
 }
 
-static void cop400_init(cpu_device *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
+static void cop400_init(legacy_cpu_device *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
 {
 	cop400_state *cpustate = get_safe_token(device);
 

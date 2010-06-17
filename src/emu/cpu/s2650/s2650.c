@@ -42,7 +42,7 @@ struct _s2650_regs {
 
 	int		icount;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -52,7 +52,7 @@ INLINE s2650_regs *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_S2650);
-	return (s2650_regs *)downcast<cpu_device *>(device)->token();
+	return (s2650_regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* condition code changes for a byte */
@@ -888,7 +888,8 @@ static CPU_EXECUTE( s2650 )
 	s2650_regs *s2650c = get_safe_token(device);
 
 	/* check for external irqs */
-	s2650c->icount -= check_irq_line(s2650c);
+	int cycles = check_irq_line(s2650c);
+	s2650c->icount -= cycles;
 
 	do
 	{

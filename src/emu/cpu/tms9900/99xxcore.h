@@ -436,7 +436,7 @@ struct _tms99xx_state
 	/* note that this callback is used by tms9900_set_irq_line(cpustate) and tms9980a_set_irq_line(cpustate) to
     retreive the value on IC0-IC3 (non-standard behaviour) */
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -514,7 +514,7 @@ INLINE tms99xx_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == TMS99XX_GET_INFO);
-	return (tms99xx_state *)downcast<cpu_device *>(device)->token();
+	return (tms99xx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #if (TMS99XX_MODEL == TMS9995_ID)
@@ -4631,7 +4631,7 @@ static CPU_SET_INFO( tms99xx )
  * Generic get_info
  **************************************************************************/
 
-void TMS99XX_GET_INFO(const device_config *devconfig, cpu_device *device, UINT32 state, cpuinfo *info)
+void TMS99XX_GET_INFO(const device_config *devconfig, legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 {
 	tms99xx_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)

@@ -417,5 +417,5 @@ INLINE dsp56k_core *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_DSP56156);
-	return (dsp56k_core *)downcast<cpu_device *>(device)->token();
+	return (dsp56k_core *)downcast<legacy_cpu_device *>(device)->token();
 }

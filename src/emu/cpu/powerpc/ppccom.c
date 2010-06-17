@@ -286,7 +286,7 @@ INLINE int sign_double(double x)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, cpu_device *device, device_irq_callback irqcallback)
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	const powerpc_config *config = (const powerpc_config *)device->baseconfig().static_config();
 
@@ -1980,7 +1980,7 @@ updateirq:
 
 static READ8_HANDLER( ppc4xx_spu_r )
 {
-	powerpc_state *ppc = *(powerpc_state **)downcast<cpu_device *>(space->cpu)->token();
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(space->cpu)->token();
 	UINT8 result = 0xff;
 
 	switch (offset)
@@ -2007,7 +2007,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 
 static WRITE8_HANDLER( ppc4xx_spu_w )
 {
-	powerpc_state *ppc = *(powerpc_state **)downcast<cpu_device *>(space->cpu)->token();
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(space->cpu)->token();
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)
@@ -2084,7 +2084,7 @@ ADDRESS_MAP_END
 
 void ppc4xx_spu_set_tx_handler(running_device *device, ppc4xx_spu_tx_handler handler)
 {
-	powerpc_state *ppc = *(powerpc_state **)downcast<cpu_device *>(device)->token();
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc->spu.tx_handler = handler;
 }
 
@@ -2096,7 +2096,7 @@ void ppc4xx_spu_set_tx_handler(running_device *device, ppc4xx_spu_tx_handler han
 
 void ppc4xx_spu_receive_byte(running_device *device, UINT8 byteval)
 {
-	powerpc_state *ppc = *(powerpc_state **)downcast<cpu_device *>(device)->token();
+	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc4xx_spu_rx_data(ppc, byteval);
 }
 

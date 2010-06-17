@@ -417,7 +417,7 @@ struct _pdp1_state
 	/* 1 for 16-line sequence break system, 0 for default break system */
 	int type_20_sbs;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -427,7 +427,7 @@ INLINE pdp1_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_PDP1);
-	return (pdp1_state *)downcast<cpu_device *>(device)->token();
+	return (pdp1_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void execute_instruction(pdp1_state *cpustate);

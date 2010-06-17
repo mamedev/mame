@@ -35,7 +35,7 @@ INLINE SH4 *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SH4);
-	return (SH4 *)downcast<cpu_device *>(device)->token();
+	return (SH4 *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 void sh4_change_register_bank(SH4 *sh4, int to)

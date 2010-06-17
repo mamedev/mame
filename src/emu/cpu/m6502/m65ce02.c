@@ -75,7 +75,7 @@ struct	_m65ce02_Regs {
 	UINT8	irq_state;
 	int		icount;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *space;
 	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
@@ -86,7 +86,7 @@ INLINE m65ce02_Regs *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M65CE02);
-	return (m65ce02_Regs *)downcast<cpu_device *>(device)->token();
+	return (m65ce02_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************

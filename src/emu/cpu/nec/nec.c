@@ -161,7 +161,7 @@ struct _nec_state_t
 	UINT8	no_interrupt;
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int		icount;
@@ -190,7 +190,7 @@ INLINE nec_state_t *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_V30 ||
 		   cpu_get_type(device) == CPU_V33 ||
 		   cpu_get_type(device) == CPU_V35);
-	return (nec_state_t *)downcast<cpu_device *>(device)->token();
+	return (nec_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* The interrupt number of a pending external interrupt pending NMI is 2.   */
@@ -1100,7 +1100,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
-static void nec_init(cpu_device *device, device_irq_callback irqcallback, int type)
+static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
 {
 	const nec_config *config = device->baseconfig().static_config() ? (const nec_config *)device->baseconfig().static_config() : &default_config;
 	nec_state_t *nec_state = get_safe_token(device);

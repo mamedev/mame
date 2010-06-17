@@ -53,7 +53,7 @@ struct _f8_Regs
 	UINT16	io; 	/* last I/O address */
 	UINT16  irq_vector;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *iospace;
 	int icount;
@@ -66,7 +66,7 @@ INLINE f8_Regs *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_F8);
-	return (f8_Regs *)downcast<cpu_device *>(device)->token();
+	return (f8_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* timer shifter polynome values (will be used for timer interrupts) */

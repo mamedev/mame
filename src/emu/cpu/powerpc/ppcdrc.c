@@ -448,7 +448,7 @@ INLINE powerpc_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_PPC603R ||
 		   cpu_get_type(device) == CPU_PPC604 ||
 		   cpu_get_type(device) == CPU_MPC8240);
-	return *(powerpc_state **)downcast<cpu_device *>(device)->token();
+	return *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /*-------------------------------------------------
@@ -547,7 +547,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, cpu_device *device, device_irq_callback irqcallback)
+static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{

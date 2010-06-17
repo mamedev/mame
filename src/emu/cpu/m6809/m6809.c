@@ -99,7 +99,7 @@ struct _m68_state_t
 
 	int 	extra_cycles; /* cycles used up by interrupts */
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const m6809_config *config;
 	int		icount;
 	PAIR	ea;			/* effective address */
@@ -117,7 +117,7 @@ INLINE m68_state_t *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M6809 ||
 		   cpu_get_type(device) == CPU_M6809E);
-	return (m68_state_t *)downcast<cpu_device *>(device)->token();
+	return (m68_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void check_irq_lines( m68_state_t *m68_state );

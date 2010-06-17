@@ -26,7 +26,7 @@ struct _h83xx_state
 	UINT8  incheckirqs;
 
 	device_irq_callback irq_cb;
-	cpu_device *device;
+	legacy_cpu_device *device;
 
 	const address_space *program;
 	const address_space *io;
@@ -55,7 +55,7 @@ INLINE h83xx_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_H83007 ||
 		   cpu_get_type(device) == CPU_H83044 ||
 		   cpu_get_type(device) == CPU_H83334);
-	return (h83xx_state *)downcast<cpu_device *>(device)->token();
+	return (h83xx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 UINT8 h8_register_read8(h83xx_state *h8, UINT32 address);

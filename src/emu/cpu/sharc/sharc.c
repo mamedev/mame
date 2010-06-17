@@ -125,7 +125,7 @@ struct _SHARC_REGS
 	UINT16 *internal_ram_block0, *internal_ram_block1;
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	void (*opcode_handler)(SHARC_REGS *cpustate);
@@ -189,7 +189,7 @@ INLINE SHARC_REGS *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ADSP21062);
-	return (SHARC_REGS *)downcast<cpu_device *>(device)->token();
+	return (SHARC_REGS *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void CHANGE_PC(SHARC_REGS *cpustate, UINT32 newpc)

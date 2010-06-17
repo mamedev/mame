@@ -61,7 +61,7 @@ struct _hc11_state
 
 	device_irq_callback irq_callback;
 	UINT8 irq_state[2];
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -83,7 +83,7 @@ INLINE hc11_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MC68HC11);
-	return (hc11_state *)downcast<cpu_device *>(device)->token();
+	return (hc11_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define HC11OP(XX)		hc11_##XX

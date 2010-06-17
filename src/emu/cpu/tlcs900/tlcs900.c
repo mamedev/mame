@@ -72,7 +72,7 @@ struct _tlcs900_state
 	int icount;
 	int regbank;
 	device_irq_callback irqcallback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 };
 
@@ -210,7 +210,7 @@ INLINE tlcs900_state *get_safe_token( running_device *device )
 	assert( device->type() == CPU );
 	assert( cpu_get_type(device) == CPU_TLCS900H );
 
-	return (tlcs900_state *) downcast<cpu_device *>(device)->token();
+	return (tlcs900_state *) downcast<legacy_cpu_device *>(device)->token();
 }
 
 

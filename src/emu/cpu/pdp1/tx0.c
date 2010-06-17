@@ -64,7 +64,7 @@ struct _tx0_state
 
 	int icount;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 };
 
@@ -74,7 +74,7 @@ INLINE tx0_state *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TX0_64KW ||
 		   cpu_get_type(device) == CPU_TX0_8KW);
-	return (tx0_state *)downcast<cpu_device *>(device)->token();
+	return (tx0_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define READ_TX0_18BIT(A) ((signed)memory_read_dword_32be(cpustate->program, (A)<<2))
@@ -126,7 +126,7 @@ static void tx0_write(tx0_state *cpustate, offs_t address, int data)
 		;
 }
 
-static void tx0_init_common(cpu_device *device, device_irq_callback irqcallback, int is_64kw)
+static void tx0_init_common(legacy_cpu_device *device, device_irq_callback irqcallback, int is_64kw)
 {
 	tx0_state *cpustate = get_safe_token(device);
 

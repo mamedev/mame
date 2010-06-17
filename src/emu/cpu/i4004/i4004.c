@@ -33,7 +33,7 @@ struct _i4004_state
 	PAIR	PC; // It is in fact one of ADDR regs
 	UINT8	flags; // used for I/O only
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -56,7 +56,7 @@ INLINE i4004_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I4004);
-	return (i4004_state *)downcast<cpu_device *>(device)->token();
+	return (i4004_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE UINT8 ROP(i4004_state *cpustate)

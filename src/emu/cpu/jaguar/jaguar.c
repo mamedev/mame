@@ -100,7 +100,7 @@ struct _jaguar_state
 	void		(*const *table)(jaguar_state *jaguar, UINT16 op);
 	device_irq_callback irq_callback;
 	jaguar_int_func cpu_interrupt;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 };
 
@@ -254,7 +254,7 @@ INLINE jaguar_state *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_JAGUARGPU ||
 		   cpu_get_type(device) == CPU_JAGUARDSP);
-	return (jaguar_state *)downcast<cpu_device *>(device)->token();
+	return (jaguar_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void update_register_banks(jaguar_state *jaguar)
@@ -401,7 +401,7 @@ static void init_tables(void)
 
 static STATE_POSTLOAD( jaguar_postload )
 {
-	cpu_device *device = (cpu_device *)param;
+	legacy_cpu_device *device = (legacy_cpu_device *)param;
 	jaguar_state *jaguar = get_safe_token(device);
 
 	update_register_banks(jaguar);
@@ -409,7 +409,7 @@ static STATE_POSTLOAD( jaguar_postload )
 }
 
 
-static void init_common(int isdsp, cpu_device *device, device_irq_callback irqcallback)
+static void init_common(int isdsp, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	const jaguar_cpu_config *configdata = (const jaguar_cpu_config *)device->baseconfig().static_config();
 	jaguar_state *jaguar = get_safe_token(device);

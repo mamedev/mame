@@ -69,7 +69,7 @@ INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
     structure based on the configured type
 -------------------------------------------------*/
 
-void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, cpu_device *device, device_irq_callback irqcallback)
+void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	const mips3_config *config = (const mips3_config *)device->baseconfig().static_config();
 	int tlbindex;
@@ -751,7 +751,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 
 static TIMER_CALLBACK( compare_int_callback )
 {
-	cpu_device *device = (cpu_device *)ptr;
+	legacy_cpu_device *device = (legacy_cpu_device *)ptr;
 	cpu_set_input_line(device, MIPS3_IRQ5, ASSERT_LINE);
 }
 

@@ -359,7 +359,7 @@ offs_t debug_cpu_disassemble(device_t *device, char *buffer, offs_t pc, const UI
 
 	/* check for disassembler override */
 	if (cpudebug->dasm_override != NULL)
-		result = (*cpudebug->dasm_override)(cpudebug->cpudevice, buffer, pc, oprom, opram, 0);
+		result = (*cpudebug->dasm_override)(downcast<legacy_cpu_device *>(cpudebug->cpudevice), buffer, pc, oprom, opram, 0);
 
 	/* if we have a disassembler, run it */
 	if (result == 0)

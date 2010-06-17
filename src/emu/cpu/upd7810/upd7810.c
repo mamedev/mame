@@ -499,7 +499,7 @@ struct _upd7810_state
 	void (*handle_timers)(upd7810_state *cpustate, int cycles);
 	UPD7810_CONFIG config;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -514,7 +514,7 @@ INLINE upd7810_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_UPD7801 ||
 		   cpu_get_type(device) == CPU_UPD78C05 ||
 		   cpu_get_type(device) == CPU_UPD78C06);
-	return (upd7810_state *)downcast<cpu_device *>(device)->token();
+	return (upd7810_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define CY	0x01

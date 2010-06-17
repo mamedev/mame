@@ -61,7 +61,7 @@ struct _konami_state
 	UINT8	nmi_state;
 	UINT8	nmi_pending;
 	int		icount;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	konami_set_lines_func setlines_callback;
 };
@@ -71,7 +71,7 @@ INLINE konami_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_KONAMI);
-	return (konami_state *)downcast<cpu_device *>(device)->token();
+	return (konami_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* flag bits in the cc register */

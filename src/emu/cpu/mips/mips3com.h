@@ -195,7 +195,7 @@ struct _mips3_state
 	/* internal stuff */
 	mips3_flavor	flavor;
 	device_irq_callback irq_callback;
-	cpu_device *	device;
+	legacy_cpu_device *	device;
 	const address_space *program;
 	UINT32			system_clock;
 	UINT32			cpu_clock;
@@ -229,7 +229,7 @@ struct _mips3_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, cpu_device *device, device_irq_callback irqcallback);
+void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, legacy_cpu_device *device, device_irq_callback irqcallback);
 void mips3com_exit(mips3_state *mips);
 
 void mips3com_reset(mips3_state *mips);

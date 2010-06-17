@@ -139,7 +139,7 @@ struct _z180_state
 	UINT8	dma1_cnt;						/* dma1 counter / divide by 20 */
 	z80_daisy_chain daisy;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *iospace;
 	UINT8	rtemp;
@@ -154,7 +154,7 @@ INLINE z180_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_Z180);
-	return (z180_state *)downcast<cpu_device *>(device)->token();
+	return (z180_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void set_irq_line(z180_state *cpustate, int irqline, int state);

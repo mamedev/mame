@@ -353,7 +353,7 @@ INLINE rsp_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_RSP);
-	return *(rsp_state **)downcast<cpu_device *>(device)->token();
+	return *(rsp_state **)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -684,7 +684,7 @@ static const int vector_elements_2[16][8] =
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },		// 7
 };
 
-static void rspcom_init(rsp_state *rsp, cpu_device *device, device_irq_callback irqcallback)
+static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	int regIdx = 0;
     int accumIdx;

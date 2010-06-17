@@ -61,7 +61,7 @@ struct _superfx_state
 	cache_t cache;
 	pixelcache_t pixelcache[2];
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -71,7 +71,7 @@ INLINE superfx_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SUPERFX);
-	return (superfx_state *)downcast<cpu_device *>(device)->token();
+	return (superfx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /*****************************************************************************/
@@ -669,7 +669,7 @@ void superfx_add_clocks(running_device *cpu, INT32 clocks)
 
 /*****************************************************************************/
 
-static void superfx_register_save( cpu_device *device )
+static void superfx_register_save( legacy_cpu_device *device )
 {
 	superfx_state *cpustate = get_safe_token(device);
 	int i;

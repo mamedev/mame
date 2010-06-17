@@ -61,7 +61,7 @@ typedef struct
 
 	UINT16	pending_interrupts; /* MB */
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
@@ -74,7 +74,7 @@ INLINE m6805_Regs *get_safe_token(running_device *device)
 	assert(cpu_get_type(device) == CPU_M6805 ||
 		   cpu_get_type(device) == CPU_M68705 ||
 		   cpu_get_type(device) == CPU_HD63705);
-	return (m6805_Regs *)downcast<cpu_device *>(device)->token();
+	return (m6805_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /****************************************************************************/
@@ -441,7 +441,7 @@ static void Interrupt( m6805_Regs *cpustate )
 	}
 }
 
-static void state_register(m6805_Regs *cpustate, const char *type, cpu_device *device)
+static void state_register(m6805_Regs *cpustate, const char *type, legacy_cpu_device *device)
 {
 	state_save_register_device_item(device, 0, A);
 	state_save_register_device_item(device, 0, PC);

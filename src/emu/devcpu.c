@@ -54,7 +54,17 @@ cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type 
 	  device_config_execute_interface(mconfig, *this),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_state_interface(mconfig, *this),
-	  device_config_disasm_interface(mconfig, *this),
+	  device_config_disasm_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  legacy_cpu_device_config - constructor
+//-------------------------------------------------
+
+legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig, device_type _type, const char *_tag, const device_config *_owner, UINT32 _clock)
+	: cpu_device_config(mconfig, _type, _tag, _owner, _clock),
 	  m_cputype(NULL)
 {
 	memset(m_space_config, 0, sizeof(m_space_config));
@@ -65,9 +75,9 @@ cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type 
 //  static_alloc_device_config - static allocator
 //-------------------------------------------------
 
-device_config *cpu_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+device_config *legacy_cpu_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	return global_alloc(cpu_device_config(mconfig, static_alloc_device_config, tag, owner, clock));
+	return global_alloc(legacy_cpu_device_config(mconfig, static_alloc_device_config, tag, owner, clock));
 }
 
 
@@ -76,9 +86,9 @@ device_config *cpu_device_config::static_alloc_device_config(const machine_confi
 //  provided configuration
 //-------------------------------------------------
 
-device_t *cpu_device_config::alloc_device(running_machine &machine) const
+device_t *legacy_cpu_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(&machine, cpu_device(machine, *this));
+	return auto_alloc(&machine, legacy_cpu_device(machine, *this));
 }
 
 
@@ -87,7 +97,7 @@ device_t *cpu_device_config::alloc_device(running_machine &machine) const
 //  config callback for populating class data
 //-------------------------------------------------
 
-bool cpu_device_config::device_process_token(UINT32 entrytype, const machine_config_token *&tokens)
+bool legacy_cpu_device_config::device_process_token(UINT32 entrytype, const machine_config_token *&tokens)
 {
 	switch (entrytype)
 	{
@@ -122,7 +132,7 @@ bool cpu_device_config::device_process_token(UINT32 entrytype, const machine_con
 //  clock into cycles per second
 //-------------------------------------------------
 
-UINT32 cpu_device_config::execute_clocks_to_cycles(UINT32 clocks) const
+UINT32 legacy_cpu_device_config::execute_clocks_to_cycles(UINT32 clocks) const
 {
 	UINT32 multiplier = get_legacy_config_int(CPUINFO_INT_CLOCK_MULTIPLIER);
 	UINT32 divider = get_legacy_config_int(CPUINFO_INT_CLOCK_DIVIDER);
@@ -139,7 +149,7 @@ UINT32 cpu_device_config::execute_clocks_to_cycles(UINT32 clocks) const
 //  count back to raw clocks
 //-------------------------------------------------
 
-UINT32 cpu_device_config::execute_cycles_to_clocks(UINT32 cycles) const
+UINT32 legacy_cpu_device_config::execute_cycles_to_clocks(UINT32 cycles) const
 {
 	UINT32 multiplier = get_legacy_config_int(CPUINFO_INT_CLOCK_MULTIPLIER);
 	UINT32 divider = get_legacy_config_int(CPUINFO_INT_CLOCK_DIVIDER);
@@ -156,7 +166,7 @@ UINT32 cpu_device_config::execute_cycles_to_clocks(UINT32 cycles) const
 //  integer value
 //-------------------------------------------------
 
-INT64 cpu_device_config::get_legacy_config_int(UINT32 state) const
+INT64 legacy_cpu_device_config::get_legacy_config_int(UINT32 state) const
 {
 	cpuinfo info = { 0 };
 	(*m_cputype)(this, NULL, state, &info);
@@ -169,7 +179,7 @@ INT64 cpu_device_config::get_legacy_config_int(UINT32 state) const
 //  pointer value
 //-------------------------------------------------
 
-void *cpu_device_config::get_legacy_config_ptr(UINT32 state) const
+void *legacy_cpu_device_config::get_legacy_config_ptr(UINT32 state) const
 {
 	cpuinfo info = { 0 };
 	(*m_cputype)(this, NULL, state, &info);
@@ -182,7 +192,7 @@ void *cpu_device_config::get_legacy_config_ptr(UINT32 state) const
 //  function value
 //-------------------------------------------------
 
-genf *cpu_device_config::get_legacy_config_fct(UINT32 state) const
+genf *legacy_cpu_device_config::get_legacy_config_fct(UINT32 state) const
 {
 	cpuinfo info = { 0 };
 	(*m_cputype)(this, NULL, state, &info);
@@ -195,7 +205,7 @@ genf *cpu_device_config::get_legacy_config_fct(UINT32 state) const
 //  string value
 //-------------------------------------------------
 
-const char *cpu_device_config::get_legacy_config_string(UINT32 state) const
+const char *legacy_cpu_device_config::get_legacy_config_string(UINT32 state) const
 {
 	cpuinfo info;
 	info.s = get_temp_string_buffer();
@@ -219,7 +229,26 @@ cpu_device::cpu_device(running_machine &machine, const cpu_device_config &config
 	  device_memory_interface(machine, config, *this),
 	  device_state_interface(machine, config, *this),
 	  device_disasm_interface(machine, config, *this),
-	  m_debug(NULL),
+	  m_debug(NULL)
+{
+}
+
+
+//-------------------------------------------------
+//  cpu_device - destructor
+//-------------------------------------------------
+
+cpu_device::~cpu_device()
+{
+}
+
+
+//-------------------------------------------------
+//  legacy_cpu_device - constructor
+//-------------------------------------------------
+
+legacy_cpu_device::legacy_cpu_device(running_machine &machine, const legacy_cpu_device_config &config)
+	: cpu_device(machine, config),
 	  m_cpu_config(config),
 	  m_token(NULL),
 	  m_set_info(reinterpret_cast<cpu_set_info_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_SET_INFO))),
@@ -248,10 +277,10 @@ cpu_device::cpu_device(running_machine &machine, const cpu_device_config &config
 
 
 //-------------------------------------------------
-//  cpu_device - destructor
+//  legacy_cpu_device - destructor
 //-------------------------------------------------
 
-cpu_device::~cpu_device()
+legacy_cpu_device::~legacy_cpu_device()
 {
 	// call the CPU's exit function if present
 	if (m_exit != NULL)
@@ -263,7 +292,7 @@ cpu_device::~cpu_device()
 //  device_start - start up the device
 //-------------------------------------------------
 
-void cpu_device::device_start()
+void legacy_cpu_device::device_start()
 {
 	// standard init
 	cpu_init_func init = reinterpret_cast<cpu_init_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_INIT));
@@ -317,7 +346,7 @@ void cpu_device::device_start()
 //  device_reset - reset up the device
 //-------------------------------------------------
 
-void cpu_device::device_reset()
+void legacy_cpu_device::device_reset()
 {
 	cpu_reset_func reset = reinterpret_cast<cpu_reset_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_RESET));
 	if (reset != NULL)
@@ -330,7 +359,7 @@ void cpu_device::device_reset()
 //  cycles
 //-------------------------------------------------
 
-void cpu_device::execute_run()
+void legacy_cpu_device::execute_run()
 {
 	(*m_execute)(this);
 }
@@ -340,7 +369,7 @@ void cpu_device::execute_run()
 //  execute_burn - burn the requested number of cycles
 //-------------------------------------------------
 
-void cpu_device::execute_burn(INT32 cycles)
+void legacy_cpu_device::execute_burn(INT32 cycles)
 {
 	if (m_burn != NULL)
 		(*m_burn)(this, cycles);
@@ -352,7 +381,7 @@ void cpu_device::execute_burn(INT32 cycles)
 //  on the provided address
 //-------------------------------------------------
 
-bool cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool legacy_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if (m_translate != NULL)
 		return (*m_translate)(this, spacenum, intention, &address) ? true : false;
@@ -365,7 +394,7 @@ bool cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
 //  device specific overrides
 //-------------------------------------------------
 
-bool cpu_device::memory_read(int spacenum, offs_t offset, int size, UINT64 &value)
+bool legacy_cpu_device::memory_read(int spacenum, offs_t offset, int size, UINT64 &value)
 {
 	if (m_read != NULL)
 		return (*m_read)(this, spacenum, offset, size, &value) ? true : false;
@@ -378,7 +407,7 @@ bool cpu_device::memory_read(int spacenum, offs_t offset, int size, UINT64 &valu
 //  for device specific overrides
 //-------------------------------------------------
 
-bool cpu_device::memory_write(int spacenum, offs_t offset, int size, UINT64 value)
+bool legacy_cpu_device::memory_write(int spacenum, offs_t offset, int size, UINT64 value)
 {
 	if (m_write != NULL)
 		return (*m_write)(this, spacenum, offset, size, value) ? true : false;
@@ -391,7 +420,7 @@ bool cpu_device::memory_write(int spacenum, offs_t offset, int size, UINT64 valu
 //  allowing for device specific overrides
 //-------------------------------------------------
 
-bool cpu_device::memory_readop(offs_t offset, int size, UINT64 &value)
+bool legacy_cpu_device::memory_readop(offs_t offset, int size, UINT64 &value)
 {
 	if (m_readop != NULL)
 		return (*m_readop)(this, offset, size, &value) ? true : false;
@@ -404,7 +433,7 @@ bool cpu_device::memory_readop(offs_t offset, int size, UINT64 &value)
 //  debugging commands or state
 //-------------------------------------------------
 
-void cpu_device::device_debug_setup()
+void legacy_cpu_device::device_debug_setup()
 {
 	cpu_debug_init_func init = reinterpret_cast<cpu_debug_init_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_DEBUG_INIT));
 	if (init != NULL)
@@ -417,7 +446,7 @@ void cpu_device::device_debug_setup()
 //  data to a buffer
 //-------------------------------------------------
 
-offs_t cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t legacy_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	// if we have a callback, just use that
 	if (m_disassemble != NULL)
@@ -453,7 +482,7 @@ offs_t cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 //  function to retrieve an integer value
 //-------------------------------------------------
 
-INT64 cpu_device::get_legacy_runtime_int(UINT32 state)
+INT64 legacy_cpu_device::get_legacy_runtime_int(UINT32 state)
 {
 	cpuinfo info = { 0 };
 	(*m_cpu_config.m_cputype)(&m_cpu_config, this, state, &info);
@@ -466,7 +495,7 @@ INT64 cpu_device::get_legacy_runtime_int(UINT32 state)
 //  function to retrieve a pointer value
 //-------------------------------------------------
 
-void *cpu_device::get_legacy_runtime_ptr(UINT32 state)
+void *legacy_cpu_device::get_legacy_runtime_ptr(UINT32 state)
 {
 	cpuinfo info = { 0 };
 	(*m_cpu_config.m_cputype)(&m_cpu_config, this, state, &info);
@@ -479,7 +508,7 @@ void *cpu_device::get_legacy_runtime_ptr(UINT32 state)
 //  function to retrieve a string value
 //-------------------------------------------------
 
-const char *cpu_device::get_legacy_runtime_string(UINT32 state)
+const char *legacy_cpu_device::get_legacy_runtime_string(UINT32 state)
 {
 	cpuinfo info;
 	info.s = get_temp_string_buffer();
@@ -493,7 +522,7 @@ const char *cpu_device::get_legacy_runtime_string(UINT32 state)
 //  function to set an integer value
 //-------------------------------------------------
 
-void cpu_device::set_legacy_runtime_int(UINT32 state, INT64 value)
+void legacy_cpu_device::set_legacy_runtime_int(UINT32 state, INT64 value)
 {
 	cpuinfo info = { 0 };
 	info.i = value;
@@ -502,7 +531,7 @@ void cpu_device::set_legacy_runtime_int(UINT32 state, INT64 value)
 
 
 
-void cpu_device::state_import(const device_state_entry &entry)
+void legacy_cpu_device::state_import(const device_state_entry &entry)
 {
 	if (m_using_legacy_state)
 	{
@@ -516,7 +545,7 @@ void cpu_device::state_import(const device_state_entry &entry)
 }
 
 
-void cpu_device::state_export(const device_state_entry &entry)
+void legacy_cpu_device::state_export(const device_state_entry &entry)
 {
 	if (m_using_legacy_state)
 	{
@@ -535,7 +564,7 @@ void cpu_device::state_export(const device_state_entry &entry)
 }
 
 
-void cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void legacy_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
 	if (m_using_legacy_state)
 	{

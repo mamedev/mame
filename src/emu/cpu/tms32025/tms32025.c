@@ -173,7 +173,7 @@ struct _tms32025_state
 	int		mHackIgnoreARP;			 /* special handling for lst, lst1 instructions */
 	int		waiting_for_serial_frame;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -188,7 +188,7 @@ INLINE tms32025_state *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS32025 ||
 		   cpu_get_type(device) == CPU_TMS32026);
-	return (tms32025_state *)downcast<cpu_device *>(device)->token();
+	return (tms32025_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* opcode table entry */

@@ -87,7 +87,7 @@ typedef struct
 	uint line_rst;	/* Status of the RESET line */
 	uint ir;		/* Instruction Register */
 	device_irq_callback int_ack;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	uint stopped;	/* stopped status */
 	int ICount;
@@ -103,7 +103,7 @@ INLINE spc700i_cpu *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SPC700);
-	return (spc700i_cpu *)downcast<cpu_device *>(device)->token();
+	return (spc700i_cpu *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* ======================================================================== */
@@ -1246,7 +1246,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 /* ================================= API ================================== */
 /* ======================================================================== */
 
-static void state_register( cpu_device *device )
+static void state_register( legacy_cpu_device *device )
 {
 	spc700i_cpu *cpustate = get_safe_token(device);
 

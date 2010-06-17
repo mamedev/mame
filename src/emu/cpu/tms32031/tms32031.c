@@ -119,7 +119,7 @@ struct _tms32031_state
 	tms32031_xf_func	xf1_w;
 	tms32031_iack_func	iack_w;
 	device_irq_callback	irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 };
 
@@ -129,7 +129,7 @@ INLINE tms32031_state *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS32031 ||
 		   cpu_get_type(device) == CPU_TMS32032);
-	return (tms32031_state *)downcast<cpu_device *>(device)->token();
+	return (tms32031_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 

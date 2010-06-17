@@ -50,7 +50,7 @@ struct _mb86233_state
 	UINT32			gpr[16];
 	UINT32			extport[0x30];
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 
@@ -70,7 +70,7 @@ INLINE mb86233_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MB86233);
-	return (mb86233_state *)downcast<cpu_device *>(device)->token();
+	return (mb86233_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************************

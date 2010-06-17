@@ -543,7 +543,7 @@ static void arm7_core_init(running_device *device, const char *cpuname)
 }
 
 // CPU RESET
-static void arm7_core_reset(cpu_device *device)
+static void arm7_core_reset(legacy_cpu_device *device)
 {
     arm_state *cpustate = get_safe_token(device);
 

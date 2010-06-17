@@ -26,7 +26,7 @@ struct _avr8_state
 {
     UINT32 pc;
 
-    cpu_device *device;
+    legacy_cpu_device *device;
     const address_space *program;
     const address_space *io;
     int icount;
@@ -80,7 +80,7 @@ INLINE avr8_state *get_safe_token(running_device *device)
     assert(device != NULL);
     assert(device->type() == CPU);
     assert(cpu_get_type(device) == CPU_AVR8);
-    return (avr8_state *)downcast<cpu_device *>(device)->token();
+    return (avr8_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /*****************************************************************************/

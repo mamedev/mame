@@ -37,6 +37,6 @@ extern CPU_GET_INFO( sm8500 );
 
 extern CPU_DISASSEMBLE( sm8500 );
 
-UINT8 *sm8500_get_internal_ram(cpu_device *device);
+UINT8 *sm8500_get_internal_ram(legacy_cpu_device *device);
 
 #endif /* __SM8500_H__ */

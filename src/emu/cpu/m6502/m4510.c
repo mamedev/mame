@@ -143,7 +143,7 @@ struct _m4510_Regs {
 	UINT32	mem[8];
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *space;
 	int 	icount;
 
@@ -161,7 +161,7 @@ INLINE m4510_Regs *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M4510);
-	return (m4510_Regs *)downcast<cpu_device *>(device)->token();
+	return (m4510_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************
@@ -349,7 +349,7 @@ static void m4510_set_irq_line(m4510_Regs *cpustate, int irqline, int state)
 	}
 }
 
-UINT8 m4510_get_port(cpu_device *device)
+UINT8 m4510_get_port(legacy_cpu_device *device)
 {
 	m4510_Regs *cpustate = get_safe_token(device);
 	return (cpustate->port & cpustate->ddr) | (cpustate->ddr ^ 0xff);

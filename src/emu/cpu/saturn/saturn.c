@@ -82,7 +82,7 @@ struct _saturn_state
 	int 	monitor_id;
 	int		monitor_in;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -92,7 +92,7 @@ INLINE saturn_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SATURN);
-	return (saturn_state *)downcast<cpu_device *>(device)->token();
+	return (saturn_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************

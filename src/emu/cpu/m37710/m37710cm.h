@@ -109,7 +109,7 @@ struct _m37710i_cpu_struct
 	uint source;		/* temp register */
 	uint destination;	/* temp register */
 	device_irq_callback int_ack;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	uint stopped;		/* Sets how the CPU is stopped */
@@ -133,7 +133,7 @@ INLINE m37710i_cpu_struct *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M37710 ||
 		   cpu_get_type(device) == CPU_M37702);
-	return (m37710i_cpu_struct *)downcast<cpu_device *>(device)->token();
+	return (m37710i_cpu_struct *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 extern uint m37710i_adc_tbl[];

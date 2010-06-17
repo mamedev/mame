@@ -73,7 +73,7 @@ INLINE arm_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ARM7 || cpu_get_type(device) == CPU_ARM9 || cpu_get_type(device) == CPU_PXA255);
-	return (arm_state *)downcast<cpu_device *>(device)->token();
+	return (arm_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE INT64 saturate_qbit_overflow(arm_state *cpustate, INT64 res)

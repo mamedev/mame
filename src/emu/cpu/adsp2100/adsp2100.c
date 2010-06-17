@@ -242,7 +242,7 @@ typedef struct
     UINT8   	irq_state[9];
     UINT8   	irq_latch[9];
     device_irq_callback irq_callback;
-    cpu_device *device;
+    legacy_cpu_device *device;
 
 	/* other internal states */
     int			icount;
@@ -308,7 +308,7 @@ INLINE adsp2100_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_ADSP2105 ||
 		   cpu_get_type(device) == CPU_ADSP2115 ||
 		   cpu_get_type(device) == CPU_ADSP2181);
-	return (adsp2100_state *)downcast<cpu_device *>(device)->token();
+	return (adsp2100_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -563,7 +563,7 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static adsp2100_state *adsp21xx_init(cpu_device *device, device_irq_callback irqcallback, int chiptype)
+static adsp2100_state *adsp21xx_init(legacy_cpu_device *device, device_irq_callback irqcallback, int chiptype)
 {
 	const adsp21xx_config *config = (const adsp21xx_config *)device->baseconfig().static_config();
 	adsp2100_state *adsp = get_safe_token(device);

@@ -463,7 +463,7 @@ static void I386OP(decode_two_byte)(i386_state *cpustate)
 
 static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	cpu_device *device = (cpu_device *)ref;
+	legacy_cpu_device *device = (legacy_cpu_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
 	UINT32 result;
 	I386_SREG seg;
@@ -484,7 +484,7 @@ static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, cons
 
 static UINT64 i386_debug_seglimit(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	cpu_device *device = (cpu_device *)ref;
+	legacy_cpu_device *device = (legacy_cpu_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
 	UINT32 result = 0;
 	I386_SREG seg;
@@ -509,7 +509,7 @@ static CPU_DEBUG_INIT( i386 )
 
 static STATE_POSTLOAD( i386_postload )
 {
-	cpu_device *device = (cpu_device *)param;
+	legacy_cpu_device *device = (legacy_cpu_device *)param;
 	i386_state *cpustate = get_safe_token(device);
 	int i;
 	for (i = 0; i < 6; i++)

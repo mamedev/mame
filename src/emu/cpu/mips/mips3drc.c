@@ -293,7 +293,7 @@ INLINE mips3_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_QED5271LE ||
 		   cpu_get_type(device) == CPU_RM7000BE ||
 		   cpu_get_type(device) == CPU_RM7000LE);
-	return *(mips3_state **)downcast<cpu_device *>(device)->token();
+	return *(mips3_state **)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -359,7 +359,7 @@ INLINE void save_fast_iregs(mips3_state *mips3, drcuml_block *block)
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_flavor flavor, int bigendian, cpu_device *device, device_irq_callback irqcallback)
+static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{

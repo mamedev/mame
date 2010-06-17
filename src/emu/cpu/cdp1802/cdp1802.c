@@ -72,7 +72,7 @@ INLINE cdp1802_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CDP1802);
-	return (cdp1802_state *)downcast<cpu_device *>(device)->token();
+	return (cdp1802_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define OPCODE_R(addr)		memory_decrypted_read_byte(cpustate->program, addr)

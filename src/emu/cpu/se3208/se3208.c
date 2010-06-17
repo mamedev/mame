@@ -23,7 +23,7 @@ struct _se3208_state_t
 	UINT32 PPC;
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	UINT8 IRQ;
 	UINT8 NMI;
@@ -63,7 +63,7 @@ INLINE se3208_state_t *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SE3208);
-	return (se3208_state_t *)downcast<cpu_device *>(device)->token();
+	return (se3208_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE UINT32 read_dword_unaligned(const address_space *space, UINT32 address)

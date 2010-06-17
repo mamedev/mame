@@ -69,7 +69,7 @@ struct _m6502_Regs
 	UINT8   so_state;
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *space;
 	const address_space *io;
 	int		int_occured;
@@ -97,7 +97,7 @@ INLINE m6502_Regs *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_M65C02 ||
 		   cpu_get_type(device) == CPU_M65SC02 ||
 		   cpu_get_type(device) == CPU_DECO16);
-	return (m6502_Regs *)downcast<cpu_device *>(device)->token();
+	return (m6502_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static UINT8 default_rdmem_id(const address_space *space, offs_t offset) { return memory_read_byte_8le(space, offset); }
@@ -128,7 +128,7 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
  *
  *****************************************************************************/
 
-static void m6502_common_init(cpu_device *device, device_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+static void m6502_common_init(legacy_cpu_device *device, device_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
@@ -355,7 +355,7 @@ static CPU_RESET( m6510 )
 	cpustate->ddr = 0x00;
 }
 
-UINT8 m6510_get_port(cpu_device *device)
+UINT8 m6510_get_port(legacy_cpu_device *device)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 	return (cpustate->port & cpustate->ddr) | (cpustate->ddr ^ 0xff);

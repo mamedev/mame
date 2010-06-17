@@ -55,7 +55,7 @@ struct _sc61860_state
 
     struct { int t2ms, t512ms; int count;} timer;
 
-    cpu_device *device;
+    legacy_cpu_device *device;
     const address_space *program;
     int icount;
 };
@@ -65,7 +65,7 @@ INLINE sc61860_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SC61860);
-	return (sc61860_state *)downcast<cpu_device *>(device)->token();
+	return (sc61860_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 UINT8 *sc61860_internal_ram(running_device *device)

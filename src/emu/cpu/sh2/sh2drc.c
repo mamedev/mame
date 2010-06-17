@@ -143,7 +143,7 @@ INLINE SH2 *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SH1 ||
 		   cpu_get_type(device) == CPU_SH2);
-	return *(SH2 **)downcast<cpu_device *>(device)->token();
+	return *(SH2 **)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE UINT16 RW(SH2 *sh2, offs_t A)

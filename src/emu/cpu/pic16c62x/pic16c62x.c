@@ -87,7 +87,7 @@ struct _pic16c62x_state
 	int		inst_cycles;
 
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const	address_space *program;
 	const	address_space *data;
 	const	address_space *io;
@@ -104,7 +104,7 @@ INLINE pic16c62x_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_PIC16C621A ||
 		   cpu_get_type(device) == CPU_PIC16C622 ||
 		   cpu_get_type(device) == CPU_PIC16C622A);
-	return (pic16c62x_state *)downcast<cpu_device *>(device)->token();
+	return (pic16c62x_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 

@@ -52,7 +52,7 @@ struct _ssp1601_state_t
 
 	int g_cycles;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -62,7 +62,7 @@ INLINE ssp1601_state_t *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SSP1601);
-	return (ssp1601_state_t *)downcast<cpu_device *>(device)->token();
+	return (ssp1601_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 

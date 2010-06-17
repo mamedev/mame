@@ -34,7 +34,7 @@ struct _i960_state_t {
 	int immediate_irq, immediate_vector, immediate_pri;
 
 	device_irq_callback irq_cb;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 
 	int icount;
@@ -45,7 +45,7 @@ INLINE i960_state_t *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I960);
-	return (i960_state_t *)downcast<cpu_device *>(device)->token();
+	return (i960_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void do_call(i960_state_t *i960, UINT32 adr, int type, UINT32 stack);

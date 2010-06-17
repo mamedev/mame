@@ -59,7 +59,7 @@ struct _i8086_state
 
 	memory_interface	mem;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -78,7 +78,7 @@ INLINE i8086_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_I8088 ||
 		   cpu_get_type(device) == CPU_I80186 ||
 		   cpu_get_type(device) == CPU_I80188);
-	return (i8086_state *)downcast<cpu_device *>(device)->token();
+	return (i8086_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 

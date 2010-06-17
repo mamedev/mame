@@ -111,22 +111,22 @@ enum
 	CPUINFO_FCT_FIRST = DEVINFO_FCT_FIRST,
 
 		// CPU-specific additions
-		CPUINFO_FCT_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	// R/O: void (*set_info)(cpu_device *device, UINT32 state, INT64 data, void *ptr)
-		CPUINFO_FCT_INIT,									// R/O: void (*init)(cpu_device *device, int index, int clock, int (*irqcallback)(cpu_device *device, int))
-		CPUINFO_FCT_RESET,									// R/O: void (*reset)(cpu_device *device)
-		CPUINFO_FCT_EXIT,									// R/O: void (*exit)(cpu_device *device)
-		CPUINFO_FCT_EXECUTE,								// R/O: int (*execute)(cpu_device *device, int cycles)
-		CPUINFO_FCT_BURN,									// R/O: void (*burn)(cpu_device *device, int cycles)
-		CPUINFO_FCT_DISASSEMBLE,							// R/O: offs_t (*disassemble)(cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
-		CPUINFO_FCT_TRANSLATE,								// R/O: int (*translate)(cpu_device *device, int space, int intention, offs_t *address)
-		CPUINFO_FCT_READ,									// R/O: int (*read)(cpu_device *device, int space, UINT32 offset, int size, UINT64 *value)
-		CPUINFO_FCT_WRITE,									// R/O: int (*write)(cpu_device *device, int space, UINT32 offset, int size, UINT64 value)
-		CPUINFO_FCT_READOP,									// R/O: int (*readop)(cpu_device *device, UINT32 offset, int size, UINT64 *value)
-		CPUINFO_FCT_DEBUG_INIT,								// R/O: void (*debug_init)(cpu_device *device)
-		CPUINFO_FCT_IMPORT_STATE,							// R/O: void (*import_state)(cpu_device *device, void *baseptr, const cpu_state_entry *entry)
-		CPUINFO_FCT_EXPORT_STATE,							// R/O: void (*export_state)(cpu_device *device, void *baseptr, const cpu_state_entry *entry)
-		CPUINFO_FCT_IMPORT_STRING,							// R/O: void (*import_string)(cpu_device *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string)
-		CPUINFO_FCT_EXPORT_STRING,							// R/O: void (*export_string)(cpu_device *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string)
+		CPUINFO_FCT_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	// R/O: void (*set_info)(legacy_cpu_device *device, UINT32 state, INT64 data, void *ptr)
+		CPUINFO_FCT_INIT,									// R/O: void (*init)(legacy_cpu_device *device, int index, int clock, int (*irqcallback)(legacy_cpu_device *device, int))
+		CPUINFO_FCT_RESET,									// R/O: void (*reset)(legacy_cpu_device *device)
+		CPUINFO_FCT_EXIT,									// R/O: void (*exit)(legacy_cpu_device *device)
+		CPUINFO_FCT_EXECUTE,								// R/O: int (*execute)(legacy_cpu_device *device, int cycles)
+		CPUINFO_FCT_BURN,									// R/O: void (*burn)(legacy_cpu_device *device, int cycles)
+		CPUINFO_FCT_DISASSEMBLE,							// R/O: offs_t (*disassemble)(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+		CPUINFO_FCT_TRANSLATE,								// R/O: int (*translate)(legacy_cpu_device *device, int space, int intention, offs_t *address)
+		CPUINFO_FCT_READ,									// R/O: int (*read)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 *value)
+		CPUINFO_FCT_WRITE,									// R/O: int (*write)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 value)
+		CPUINFO_FCT_READOP,									// R/O: int (*readop)(legacy_cpu_device *device, UINT32 offset, int size, UINT64 *value)
+		CPUINFO_FCT_DEBUG_INIT,								// R/O: void (*debug_init)(legacy_cpu_device *device)
+		CPUINFO_FCT_IMPORT_STATE,							// R/O: void (*import_state)(legacy_cpu_device *device, void *baseptr, const cpu_state_entry *entry)
+		CPUINFO_FCT_EXPORT_STATE,							// R/O: void (*export_state)(legacy_cpu_device *device, void *baseptr, const cpu_state_entry *entry)
+		CPUINFO_FCT_IMPORT_STRING,							// R/O: void (*import_string)(legacy_cpu_device *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string)
+		CPUINFO_FCT_EXPORT_STRING,							// R/O: void (*export_string)(legacy_cpu_device *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string)
 
 	CPUINFO_FCT_CPU_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC,	// R/W: CPU-specific values start here
 
@@ -187,67 +187,67 @@ enum
 
 // CPU interface functions
 #define CPU_GET_INFO_NAME(name)			cpu_get_info_##name
-#define CPU_GET_INFO(name)				void CPU_GET_INFO_NAME(name)(const device_config *devconfig, cpu_device *device, UINT32 state, cpuinfo *info)
+#define CPU_GET_INFO(name)				void CPU_GET_INFO_NAME(name)(const device_config *devconfig, legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 #define CPU_GET_INFO_CALL(name)			CPU_GET_INFO_NAME(name)(devconfig, device, state, info)
 
 #define CPU_SET_INFO_NAME(name)			cpu_set_info_##name
-#define CPU_SET_INFO(name)				void CPU_SET_INFO_NAME(name)(cpu_device *device, UINT32 state, cpuinfo *info)
+#define CPU_SET_INFO(name)				void CPU_SET_INFO_NAME(name)(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 #define CPU_SET_INFO_CALL(name)			CPU_SET_INFO_NAME(name)(device, state, info)
 
 #define CPU_INIT_NAME(name)				cpu_init_##name
-#define CPU_INIT(name)					void CPU_INIT_NAME(name)(cpu_device *device, device_irq_callback irqcallback)
+#define CPU_INIT(name)					void CPU_INIT_NAME(name)(legacy_cpu_device *device, device_irq_callback irqcallback)
 #define CPU_INIT_CALL(name)				CPU_INIT_NAME(name)(device, irqcallback)
 
 #define CPU_RESET_NAME(name)			cpu_reset_##name
-#define CPU_RESET(name)					void CPU_RESET_NAME(name)(cpu_device *device)
+#define CPU_RESET(name)					void CPU_RESET_NAME(name)(legacy_cpu_device *device)
 #define CPU_RESET_CALL(name)			CPU_RESET_NAME(name)(device)
 
 #define CPU_EXIT_NAME(name)				cpu_exit_##name
-#define CPU_EXIT(name)					void CPU_EXIT_NAME(name)(cpu_device *device)
+#define CPU_EXIT(name)					void CPU_EXIT_NAME(name)(legacy_cpu_device *device)
 #define CPU_EXIT_CALL(name)				CPU_EXIT_NAME(name)(device)
 
 #define CPU_EXECUTE_NAME(name)			cpu_execute_##name
-#define CPU_EXECUTE(name)				void CPU_EXECUTE_NAME(name)(cpu_device *device)
+#define CPU_EXECUTE(name)				void CPU_EXECUTE_NAME(name)(legacy_cpu_device *device)
 #define CPU_EXECUTE_CALL(name)			CPU_EXECUTE_NAME(name)(device, cycles)
 
 #define CPU_BURN_NAME(name)				cpu_burn_##name
-#define CPU_BURN(name)					void CPU_BURN_NAME(name)(cpu_device *device, int cycles)
+#define CPU_BURN(name)					void CPU_BURN_NAME(name)(legacy_cpu_device *device, int cycles)
 #define CPU_BURN_CALL(name)				CPU_BURN_NAME(name)(device, cycles)
 
 #define CPU_TRANSLATE_NAME(name)		cpu_translate_##name
-#define CPU_TRANSLATE(name)				int CPU_TRANSLATE_NAME(name)(cpu_device *device, int space, int intention, offs_t *address)
+#define CPU_TRANSLATE(name)				int CPU_TRANSLATE_NAME(name)(legacy_cpu_device *device, int space, int intention, offs_t *address)
 #define CPU_TRANSLATE_CALL(name)		CPU_TRANSLATE_NAME(name)(device, space, intention, address)
 
 #define CPU_READ_NAME(name)				cpu_read_##name
-#define CPU_READ(name)					int CPU_READ_NAME(name)(cpu_device *device, int space, UINT32 offset, int size, UINT64 *value)
+#define CPU_READ(name)					int CPU_READ_NAME(name)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 *value)
 #define CPU_READ_CALL(name)				CPU_READ_NAME(name)(device, space, offset, size, value)
 
 #define CPU_WRITE_NAME(name)			cpu_write_##name
-#define CPU_WRITE(name)					int CPU_WRITE_NAME(name)(cpu_device *device, int space, UINT32 offset, int size, UINT64 value)
+#define CPU_WRITE(name)					int CPU_WRITE_NAME(name)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 value)
 #define CPU_WRITE_CALL(name)			CPU_WRITE_NAME(name)(device, space, offset, size, value)
 
 #define CPU_READOP_NAME(name)			cpu_readop_##name
-#define CPU_READOP(name)				int CPU_READOP_NAME(name)(cpu_device *device, UINT32 offset, int size, UINT64 *value)
+#define CPU_READOP(name)				int CPU_READOP_NAME(name)(legacy_cpu_device *device, UINT32 offset, int size, UINT64 *value)
 #define CPU_READOP_CALL(name)			CPU_READOP_NAME(name)(device, offset, size, value)
 
 #define CPU_DEBUG_INIT_NAME(name)		cpu_debug_init_##name
-#define CPU_DEBUG_INIT(name)			void CPU_DEBUG_INIT_NAME(name)(cpu_device *device)
+#define CPU_DEBUG_INIT(name)			void CPU_DEBUG_INIT_NAME(name)(legacy_cpu_device *device)
 #define CPU_DEBUG_INIT_CALL(name)		CPU_DEBUG_INIT_NAME(name)(device)
 
 #define CPU_DISASSEMBLE_NAME(name)		cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)			offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+#define CPU_DISASSEMBLE(name)			offs_t CPU_DISASSEMBLE_NAME(name)(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 #define CPU_DISASSEMBLE_CALL(name)		CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram, options)
 
 #define CPU_IMPORT_STATE_NAME(name)		cpu_state_import_##name
-#define CPU_IMPORT_STATE(name)			void CPU_IMPORT_STATE_NAME(name)(cpu_device *device, const device_state_entry &entry)
+#define CPU_IMPORT_STATE(name)			void CPU_IMPORT_STATE_NAME(name)(legacy_cpu_device *device, const device_state_entry &entry)
 #define CPU_IMPORT_STATE_CALL(name)		CPU_IMPORT_STATE_NAME(name)(device, entry)
 
 #define CPU_EXPORT_STATE_NAME(name)		cpu_state_export_##name
-#define CPU_EXPORT_STATE(name)			void CPU_EXPORT_STATE_NAME(name)(cpu_device *device, const device_state_entry &entry)
+#define CPU_EXPORT_STATE(name)			void CPU_EXPORT_STATE_NAME(name)(legacy_cpu_device *device, const device_state_entry &entry)
 #define CPU_EXPORT_STATE_CALL(name)		CPU_EXPORT_STATE_NAME(name)(device, entry)
 
 #define CPU_EXPORT_STRING_NAME(name)	cpu_string_export_##name
-#define CPU_EXPORT_STRING(name)			void CPU_EXPORT_STRING_NAME(name)(cpu_device *device, const device_state_entry &entry, astring &string)
+#define CPU_EXPORT_STRING(name)			void CPU_EXPORT_STRING_NAME(name)(legacy_cpu_device *device, const device_state_entry &entry, astring &string)
 #define CPU_EXPORT_STRING_CALL(name)	CPU_EXPORT_STRING_NAME(name)(device, entry, string)
 
 
@@ -323,26 +323,27 @@ enum
 // forward declaration of types
 union cpuinfo;
 class cpu_device;
+class legacy_cpu_device;
 struct cpu_state_entry;
 class cpu_debug_data;
 
 
 // CPU interface functions
-typedef void (*cpu_get_info_func)(const device_config *devconfig, cpu_device *device, UINT32 state, cpuinfo *info);
-typedef void (*cpu_set_info_func)(cpu_device *device, UINT32 state, cpuinfo *info);
-typedef void (*cpu_init_func)(cpu_device *device, device_irq_callback irqcallback);
-typedef void (*cpu_reset_func)(cpu_device *device);
-typedef void (*cpu_exit_func)(cpu_device *device);
-typedef void (*cpu_execute_func)(cpu_device *device);
-typedef void (*cpu_burn_func)(cpu_device *device, int cycles);
-typedef int	(*cpu_translate_func)(cpu_device *device, int space, int intention, offs_t *address);
-typedef int	(*cpu_read_func)(cpu_device *device, int space, UINT32 offset, int size, UINT64 *value);
-typedef int	(*cpu_write_func)(cpu_device *device, int space, UINT32 offset, int size, UINT64 value);
-typedef int	(*cpu_readop_func)(cpu_device *device, UINT32 offset, int size, UINT64 *value);
-typedef void (*cpu_debug_init_func)(cpu_device *device);
-typedef offs_t (*cpu_disassemble_func)(cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
-typedef void (*cpu_state_io_func)(cpu_device *device, const device_state_entry &entry);
-typedef void (*cpu_string_io_func)(cpu_device *device, const device_state_entry &entry, astring &string);
+typedef void (*cpu_get_info_func)(const device_config *devconfig, legacy_cpu_device *device, UINT32 state, cpuinfo *info);
+typedef void (*cpu_set_info_func)(legacy_cpu_device *device, UINT32 state, cpuinfo *info);
+typedef void (*cpu_init_func)(legacy_cpu_device *device, device_irq_callback irqcallback);
+typedef void (*cpu_reset_func)(legacy_cpu_device *device);
+typedef void (*cpu_exit_func)(legacy_cpu_device *device);
+typedef void (*cpu_execute_func)(legacy_cpu_device *device);
+typedef void (*cpu_burn_func)(legacy_cpu_device *device, int cycles);
+typedef int	(*cpu_translate_func)(legacy_cpu_device *device, int space, int intention, offs_t *address);
+typedef int	(*cpu_read_func)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 *value);
+typedef int	(*cpu_write_func)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 value);
+typedef int	(*cpu_readop_func)(legacy_cpu_device *device, UINT32 offset, int size, UINT64 *value);
+typedef void (*cpu_debug_init_func)(legacy_cpu_device *device);
+typedef offs_t (*cpu_disassemble_func)(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+typedef void (*cpu_state_io_func)(legacy_cpu_device *device, const device_state_entry &entry);
+typedef void (*cpu_string_io_func)(legacy_cpu_device *device, const device_state_entry &entry, astring &string);
 
 
 // a cpu_type is just a pointer to the CPU's get_info function
@@ -410,8 +411,21 @@ class cpu_device_config : 	public device_config,
 {
 	friend class cpu_device;
 
+protected:
 	// construction/destruction
 	cpu_device_config(const machine_config &mconfig, device_type _type, const char *_tag, const device_config *_owner, UINT32 _clock);
+};
+
+
+
+// ======================> legacy_cpu_device_config
+
+class legacy_cpu_device_config : public cpu_device_config
+{
+	friend class legacy_cpu_device;
+
+	// construction/destruction
+	legacy_cpu_device_config(const machine_config &mconfig, device_type _type, const char *_tag, const device_config *_owner, UINT32 _clock);
 
 public:
 	// allocators
@@ -453,7 +467,7 @@ protected:
 	address_space_config m_space_config[3];				// array of address space configs
 };
 
-const device_type CPU = cpu_device_config::static_alloc_device_config;
+const device_type CPU = legacy_cpu_device_config::static_alloc_device_config;
 
 
 
@@ -465,13 +479,30 @@ class cpu_device : 	public device_t,
 					public device_state_interface,
 					public device_disasm_interface
 {
-
 	friend class cpu_device_config;
 	friend resource_pool_object<cpu_device>::~resource_pool_object();
 
+protected:
 	// construction/destruction
 	cpu_device(running_machine &machine, const cpu_device_config &config);
 	virtual ~cpu_device();
+
+public:
+	cpu_debug_data *		m_debug;					// debugging data
+};
+
+
+
+// ======================> legacy_cpu_device
+
+class legacy_cpu_device : public cpu_device
+{
+	friend class legacy_cpu_device_config;
+	friend resource_pool_object<legacy_cpu_device>::~resource_pool_object();
+
+	// construction/destruction
+	legacy_cpu_device(running_machine &machine, const legacy_cpu_device_config &config);
+	virtual ~legacy_cpu_device();
 
 public:
 	// additional CPU-specific configuration properties ... pass through to underlying config
@@ -510,12 +541,9 @@ protected:
 	const char *get_legacy_runtime_string(UINT32 state);
 	void set_legacy_runtime_int(UINT32 state, INT64 value);
 
-public:
-	cpu_debug_data *		m_debug;					// debugging data
-
 protected:
 	// internal state
-	const cpu_device_config &m_cpu_config;				// reference to the config
+	const legacy_cpu_device_config &m_cpu_config;		// reference to the config
 	void *					m_token;					// pointer to our state
 	
 	cpu_set_info_func		m_set_info;					// extracted legacy function pointers
@@ -546,7 +574,7 @@ protected:
 // return the type of the specified CPU
 inline cpu_type cpu_get_type(device_t *device)
 {
-	return downcast<cpu_device *>(device)->cputype();
+	return downcast<legacy_cpu_device *>(device)->cputype();
 }
 
 // return a pointer to the given CPU's debugger data

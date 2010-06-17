@@ -185,7 +185,7 @@ struct _psxcpu_state
 	UINT32 multiplier_operand1;
 	UINT32 multiplier_operand2;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int bus_attached;
 	UINT32 bad_byte_address_mask;
@@ -199,7 +199,7 @@ INLINE psxcpu_state *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_PSXCPU ||
 		   cpu_get_type(device) == CPU_CXD8661R);
-	return (psxcpu_state *)downcast<cpu_device *>(device)->token();
+	return (psxcpu_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static const UINT32 mips_mtc0_writemask[]=
@@ -1605,7 +1605,7 @@ static STATE_POSTLOAD( mips_postload )
 	mips_update_scratchpad( psxcpu->program );
 }
 
-static void mips_state_register( const char *type, cpu_device *device )
+static void mips_state_register( const char *type, legacy_cpu_device *device )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
 

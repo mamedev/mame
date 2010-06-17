@@ -74,7 +74,7 @@ struct _mb88_state
     /* IRQ handling */
     UINT8 pending_interrupt;
     device_irq_callback irqcallback;
-    cpu_device *device;
+    legacy_cpu_device *device;
     const address_space *program;
     const address_space *data;
     const address_space *io;
@@ -90,7 +90,7 @@ INLINE mb88_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_MB8842 ||
 		   cpu_get_type(device) == CPU_MB8843 ||
 		   cpu_get_type(device) == CPU_MB8844);
-	return (mb88_state *)downcast<cpu_device *>(device)->token();
+	return (mb88_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static TIMER_CALLBACK( serial_timer );

@@ -78,7 +78,7 @@ struct _m6509_Regs {
 	UINT8	irq_state;
 	UINT8	so_state;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *space;
 
 	int 	icount;
@@ -92,7 +92,7 @@ INLINE m6509_Regs *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M6509);
-	return (m6509_Regs *)downcast<cpu_device *>(device)->token();
+	return (m6509_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************

@@ -87,7 +87,7 @@ struct _asap_state
 	int			icount;
 	device_irq_callback irq_callback;
 	const address_space *program;
-	cpu_device *device;
+	legacy_cpu_device *device;
 
 	/* src2val table, registers are at the end */
 	UINT32		src2val[65536];
@@ -273,7 +273,7 @@ INLINE asap_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ASAP);
-	return (asap_state *)downcast<cpu_device *>(device)->token();
+	return (asap_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 

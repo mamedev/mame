@@ -188,6 +188,9 @@ static UINT8 *smpc_ram;
 
 UINT32* stv_workram_l;
 UINT32* stv_workram_h;
+cpu_device *stv_maincpu;
+cpu_device *stv_slave;
+cpu_device *stv_audiocpu;
 static UINT32* stv_backupram;
 static UINT32* ioga;
 static UINT16* scsp_regs;
@@ -2589,6 +2592,10 @@ static MACHINE_START( stv )
 {
 	mame_system_time systime;
 	mame_get_base_datetime(machine, &systime);
+
+	stv_maincpu = machine->device<cpu_device>("maincpu");
+	stv_slave = machine->device<cpu_device>("slave");
+	stv_audiocpu = machine->device<cpu_device>("audiocpu");
 
 	scsp_set_ram_base(devtag_get_device(machine, "scsp"), sound_ram);
 

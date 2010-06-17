@@ -122,7 +122,7 @@ INLINE h6280_Regs *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_H6280);
-	return (h6280_Regs *)downcast<cpu_device *>(device)->token();
+	return (h6280_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* include the opcode macros, functions and function pointer tables */

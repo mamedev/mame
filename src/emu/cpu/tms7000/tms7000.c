@@ -73,7 +73,7 @@ struct _tms7000_state
 	UINT8		rf[0x80];	/* Register file (SJE) */
 	UINT8		pf[0x100];	/* Perpherial file */
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int			icount;
@@ -91,7 +91,7 @@ INLINE tms7000_state *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS7000 ||
 		   cpu_get_type(device) == CPU_TMS7000_EXL);
-	return (tms7000_state *)downcast<cpu_device *>(device)->token();
+	return (tms7000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define pPC		cpustate->pc.w.l

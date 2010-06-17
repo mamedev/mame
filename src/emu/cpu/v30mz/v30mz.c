@@ -84,7 +84,7 @@ struct _v30mz_state
 	UINT8	no_interrupt;
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -106,7 +106,7 @@ INLINE v30mz_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_V30MZ);
-	return (v30mz_state *)downcast<cpu_device *>(device)->token();
+	return (v30mz_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************************/
@@ -932,7 +932,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, cpustate->config);
 }
 
-static void nec_init(cpu_device *device, device_irq_callback irqcallback, int type)
+static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = get_safe_token(device);
 

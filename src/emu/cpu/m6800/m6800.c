@@ -113,7 +113,7 @@ struct _m6800_state
 	UINT8	ic_eddge;		/* InputCapture eddge , b.0=fall,b.1=raise */
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 
 	/* Memory spaces */
     const address_space *program;
@@ -164,7 +164,7 @@ INLINE m6800_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_M6808 ||
 		   cpu_get_type(device) == CPU_HD63701 ||
 		   cpu_get_type(device) == CPU_NSC8105);
-	return (m6800_state *)downcast<cpu_device *>(device)->token();
+	return (m6800_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #if 0

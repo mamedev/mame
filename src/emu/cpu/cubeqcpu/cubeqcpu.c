@@ -97,7 +97,7 @@ typedef struct
 	cubeqst_dac_w_func dac_w;
 	UINT16 *sound_data;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 } cquestsnd_state;
@@ -137,8 +137,8 @@ typedef struct
 	UINT8 rc;
 	UINT8 clkcnt;
 
-	cpu_device *device;
-	cpu_device *lindevice;
+	legacy_cpu_device *device;
+	legacy_cpu_device *lindevice;
 	const address_space *program;
 	int icount;
 } cquestrot_state;
@@ -183,8 +183,8 @@ typedef struct
 	UINT32	*e_stack;
 	UINT32	*o_stack;
 
-	cpu_device *device;
-	cpu_device *rotdevice;
+	legacy_cpu_device *device;
+	legacy_cpu_device *rotdevice;
 	const address_space *program;
 	int icount;
 } cquestlin_state;
@@ -198,7 +198,7 @@ INLINE cquestsnd_state *get_safe_token_snd(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CQUESTSND);
-	return (cquestsnd_state *)downcast<cpu_device *>(device)->token();
+	return (cquestsnd_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE cquestrot_state *get_safe_token_rot(running_device *device)
@@ -206,7 +206,7 @@ INLINE cquestrot_state *get_safe_token_rot(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CQUESTROT);
-	return (cquestrot_state *)downcast<cpu_device *>(device)->token();
+	return (cquestrot_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE cquestlin_state *get_safe_token_lin(running_device *device)
@@ -214,7 +214,7 @@ INLINE cquestlin_state *get_safe_token_lin(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CQUESTLIN);
-	return (cquestlin_state *)downcast<cpu_device *>(device)->token();
+	return (cquestlin_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -362,7 +362,7 @@ static CPU_INIT( cquestrot )
 	cpustate->sram = auto_alloc_array(device->machine, UINT16, 2048);   /* Private */
 
 	cpustate->device = device;
-	cpustate->lindevice = device->machine->device<cpu_device>(rotconfig->lin_cpu_tag);
+	cpustate->lindevice = device->machine->device<legacy_cpu_device>(rotconfig->lin_cpu_tag);
 	cpustate->program = device->space(AS_PROGRAM);
 
 	cquestrot_state_register(device);
@@ -447,7 +447,7 @@ static CPU_INIT( cquestlin )
 	cpustate->o_stack = auto_alloc_array(device->machine, UINT32, 32768);  /* Stack DRAM: 32kx20 */
 
 	cpustate->device = device;
-	cpustate->rotdevice = device->machine->device<cpu_device>(linconfig->rot_cpu_tag);
+	cpustate->rotdevice = device->machine->device<legacy_cpu_device>(linconfig->rot_cpu_tag);
 	cpustate->program = device->space(AS_PROGRAM);
 
 	cquestlin_state_register(device);

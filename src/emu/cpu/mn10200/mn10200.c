@@ -64,7 +64,7 @@ struct _mn102_info
 
 	int cycles;
 
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -152,7 +152,7 @@ INLINE mn102_info *get_safe_token(running_device *device)
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MN10200);
 
-	return (mn102_info *)downcast<cpu_device *>(device)->token();
+	return (mn102_info *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void mn102_take_irq(mn102_info *mn102, int level, int group)

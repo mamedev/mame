@@ -100,7 +100,7 @@ INLINE g65816i_cpu_struct *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_G65816 || cpu_get_type(device) == CPU_5A22);
-	return (g65816i_cpu_struct *)downcast<cpu_device *>(device)->token();
+	return (g65816i_cpu_struct *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* Temporary Variables */

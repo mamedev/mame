@@ -149,7 +149,7 @@ struct _z80_state
 	UINT8			after_ei;			/* are we in the EI shadow? */
 	UINT32			ea;
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int				icount;
@@ -168,7 +168,7 @@ INLINE z80_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_Z80 || cpu_get_type(device) == CPU_NSC800);
-	return (z80_state *)downcast<cpu_device *>(device)->token();
+	return (z80_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define CF		0x01

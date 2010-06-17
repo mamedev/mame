@@ -50,7 +50,7 @@ typedef struct _lh5810_state lh5801_state;
 struct _lh5810_state
 {
 	const lh5801_cpu_core *config;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 
 	PAIR s, p, u, x, y;
@@ -73,7 +73,7 @@ INLINE lh5801_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_LH5801);
-	return (lh5801_state *)downcast<cpu_device *>(device)->token();
+	return (lh5801_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define P cpustate->p.w.l

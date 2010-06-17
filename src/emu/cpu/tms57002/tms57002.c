@@ -114,7 +114,7 @@ INLINE tms57002_t *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS57002);
-	return (tms57002_t *)downcast<cpu_device *>(device)->token();
+	return (tms57002_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void tms57002_cache_flush(tms57002_t *s);

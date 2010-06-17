@@ -150,7 +150,7 @@ struct _mcs48_state
 	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
 
 	device_irq_callback irq_callback;
-	cpu_device *device;
+	legacy_cpu_device *device;
 	int			icount;
 
 	/* Memory spaces */
@@ -238,7 +238,7 @@ INLINE mcs48_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_MB8884 ||
 		   cpu_get_type(device) == CPU_N7751 ||
 		   cpu_get_type(device) == CPU_M58715);
-	return (mcs48_state *)downcast<cpu_device *>(device)->token();
+	return (mcs48_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -840,7 +840,7 @@ static const mcs48_ophandler opcode_table[256]=
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
 
-static void mcs48_init(cpu_device *device, device_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
+static void mcs48_init(legacy_cpu_device *device, device_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
@@ -1186,7 +1186,7 @@ UINT8 upi41_master_r(running_device *device, UINT8 a0)
 
 static TIMER_CALLBACK( master_callback )
 {
-	cpu_device *device = (cpu_device *)ptr;
+	legacy_cpu_device *device = (legacy_cpu_device *)ptr;
 	mcs48_state *cpustate = get_safe_token(device);
 	UINT8 a0 = (param >> 8) & 1;
 	UINT8 data = param;
@@ -1211,7 +1211,7 @@ static TIMER_CALLBACK( master_callback )
 
 void upi41_master_w(running_device *_device, UINT8 a0, UINT8 data)
 {
-	cpu_device *device = downcast<cpu_device *>(_device);
+	legacy_cpu_device *device = downcast<legacy_cpu_device *>(_device);
 	timer_call_after_resynch(device->machine, (void *)device, (a0 << 8) | data, master_callback);
 }
 
@@ -1415,7 +1415,7 @@ static CPU_GET_INFO( mcs48 )
     CPU-SPECIFIC CONTEXT ACCESS
 ***************************************************************************/
 
-static void mcs48_generic_get_info(const device_config *devconfig, cpu_device *device, UINT32 state, cpuinfo *info, UINT8 features, int romsize, int ramsize, const char *name)
+static void mcs48_generic_get_info(const device_config *devconfig, legacy_cpu_device *device, UINT32 state, cpuinfo *info, UINT8 features, int romsize, int ramsize, const char *name)
 {
 	switch (state)
 	{

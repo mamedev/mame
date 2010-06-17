@@ -508,7 +508,7 @@ INLINE m68ki_cpu_core *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_M68EC040 ||
 		   cpu_get_type(device) == CPU_M68040 ||
 		   cpu_get_type(device) == CPU_SCC68070);
-	return (m68ki_cpu_core *)downcast<cpu_device *>(device)->token();
+	return (m68ki_cpu_core *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* ======================================================================== */
