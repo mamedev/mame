@@ -622,7 +622,7 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
-			const device_config_sound_interface *sound;
+			const device_config_sound_interface *sound = NULL;
 
 			/* find samples interfaces */
 			for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))

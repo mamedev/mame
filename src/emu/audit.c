@@ -152,7 +152,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 	int sampnum;
 
 	/* count the number of sample records attached to this driver */
-	const device_config_sound_interface *sound;
+	const device_config_sound_interface *sound = NULL;
 	for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->devconfig().type() == SOUND_SAMPLES)
 		{
