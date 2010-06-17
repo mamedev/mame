@@ -34,9 +34,9 @@
    system headers may assume the cdecl convention.
 */
 #ifndef XMLCALL
-#if defined(XML_USE_MSC_EXTENSIONS)
+#if defined(_MSC_VER)
 #define XMLCALL __cdecl
-#elif defined(__GNUC__) && defined(__i386)
+#elif defined(__GNUC__) && defined(__i386) && !defined(__INTEL_COMPILER)
 #define XMLCALL __attribute__((cdecl))
 #else
 /* For any platform which uses this definition and supports more than
@@ -97,7 +97,7 @@ typedef char XML_LChar;
 
 #ifdef XML_LARGE_SIZE  /* Use large integers for file/stream positions. */
 #if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
-typedef __int64 XML_Index;
+typedef __int64 XML_Index; 
 typedef unsigned __int64 XML_Size;
 #else
 typedef long long XML_Index;
