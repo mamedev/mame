@@ -1039,7 +1039,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 	}
 
 	/* loop over all sound chips */
-	device_sound_interface *sound;
+	device_sound_interface *sound = NULL;
 	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		/* append the Sound: string */
