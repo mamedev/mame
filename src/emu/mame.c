@@ -52,6 +52,7 @@
                 - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
                 - calls saveload_init() [mame.c] to set up for save/load
                 - calls cheat_init() [cheat.c] to initialize the cheat system
+				- calls image_init() [image.c] to initialize the image system
 
             - calls config_load_settings() [config.c] to load the configuration file
             - calls nvram_load [machine/generic.c] to load NVRAM
@@ -77,6 +78,7 @@
 #include "osdepend.h"
 #include "config.h"
 #include "debugger.h"
+#include "image.h"
 #include "profiler.h"
 #include "render.h"
 #include "cheat.h"
@@ -1267,9 +1269,6 @@ running_machine::running_machine(const game_driver *driver)
 	  generic_machine_data(NULL),
 	  generic_video_data(NULL),
 	  generic_audio_data(NULL),
-#ifdef MESS
-	  images_data(NULL),
-#endif /* MESS */
 	  driver_data(NULL)
 {
 	try
@@ -1418,10 +1417,8 @@ static void init_machine(running_machine *machine)
 	/* initialize natural keyboard support */
 	inputx_init(machine);
 
-#ifdef MESS
-	/* first MESS initialization */
-	mess_predevice_init(machine);
-#endif /* MESS */
+	/* initialize image devices */
+	image_init(machine);
 
 	/* start up the devices */
 	machine->devicelist.start_all();
@@ -1432,11 +1429,6 @@ static void init_machine(running_machine *machine)
 	ui_set_startup_text(machine, "Initializing...", TRUE);
 	if (machine->gamedrv->driver_init != NULL)
 		(*machine->gamedrv->driver_init)(machine);
-
-#ifdef MESS
-	/* second MESS initialization */
-	mess_postdevice_init(machine);
-#endif /* MESS */
 
 	/* start the video and audio hardware */
 	video_init(machine);

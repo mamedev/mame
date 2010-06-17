@@ -1,0 +1,478 @@
+/***************************************************************************
+
+    devimage.c
+
+    Legacy image device helpers.
+
+****************************************************************************
+
+    Copyright Miodrag Milanovic
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+***************************************************************************/
+
+
+#include "emu.h"
+#include "devlegcy.h"
+#include "hashfile.h"
+#include "zippath.h"
+
+
+//**************************************************************************
+//  LEGACY IMAGE DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  legacy_image_device_config_base - constructor
+//-------------------------------------------------
+
+legacy_image_device_config_base::legacy_image_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config)
+	: legacy_device_config_base(mconfig, type, tag, owner, clock, get_config),
+	  device_config_image_interface(mconfig, *this),
+	  m_create_option_guide(NULL),
+	  m_formatlist(NULL)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - update configuration
+//  based on completed device setup
+//-------------------------------------------------
+
+void legacy_image_device_config_base::device_config_complete()
+{
+	const device_config_image_interface *image = NULL;
+	int count = 0;
+	int index = -1;
+    image_device_format **formatptr;
+    image_device_format *format;
+    formatptr = &m_formatlist;
+    int cnt = 0;
+
+	m_type = static_cast<iodevice_t>(get_legacy_config_int(DEVINFO_INT_IMAGE_TYPE));
+	m_readable = get_legacy_config_int(DEVINFO_INT_IMAGE_READABLE)!=0;
+	m_writeable = get_legacy_config_int(DEVINFO_INT_IMAGE_WRITEABLE)!=0;
+	m_creatable = get_legacy_config_int(DEVINFO_INT_IMAGE_CREATABLE)!=0;
+	m_must_be_loaded = get_legacy_config_int(DEVINFO_INT_IMAGE_MUST_BE_LOADED)!=0;
+	m_reset_on_load = get_legacy_config_int(DEVINFO_INT_IMAGE_RESET_ON_LOAD)!=0;
+	m_has_partial_hash = get_legacy_config_int(DEVINFO_FCT_IMAGE_PARTIAL_HASH)!=0;
+
+	m_interface_name = get_legacy_config_string(DEVINFO_STR_IMAGE_INTERFACE);
+
+	m_file_extensions = get_legacy_config_string(DEVINFO_STR_IMAGE_FILE_EXTENSIONS);
+
+	load		 = reinterpret_cast<device_image_load_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_LOAD));
+	create		 = reinterpret_cast<device_image_create_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_CREATE));
+	unload		 = reinterpret_cast<device_image_unload_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_UNLOAD));
+	display	 = reinterpret_cast<device_image_display_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_DISPLAY));
+	partialhash = reinterpret_cast<device_image_partialhash_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
+	get_devices = reinterpret_cast<device_image_get_devices_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_GET_DEVICES));
+
+	m_create_option_guide = reinterpret_cast<const option_guide *>(get_legacy_config_ptr(DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE));
+
+    int format_count = get_legacy_config_int(DEVINFO_INT_IMAGE_CREATE_OPTCOUNT);
+
+	for (int i = 0; i < format_count; i++)
+	{
+		// only add if creatable
+		if (get_legacy_config_string(DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i)) {
+			// allocate a new format
+			format = global_alloc_clear(image_device_format);
+
+			// populate it
+			format->m_index       = cnt;
+			format->m_name        = get_legacy_config_string(DEVINFO_STR_IMAGE_CREATE_OPTNAME + i);
+			format->m_description = get_legacy_config_string(DEVINFO_STR_IMAGE_CREATE_OPTDESC + i);
+			format->m_extensions  = get_legacy_config_string(DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i);
+			format->m_optspec     = get_legacy_config_string(DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
+
+			// and append it to the list
+			*formatptr = format;
+			formatptr = &format->m_next;
+			cnt++;
+		}
+	}
+
+	for (bool gotone = device_config_interface::m_machine_config.devicelist.first(image); gotone; gotone = image->next(image))
+	{
+		if (this == image)
+			index = count;
+		if (image->image_type_direct() == m_type)
+			count++;
+	}
+	if (count > 1) {
+		m_instance_name.printf("%s%d", device_typename(m_type), index + 1);
+		m_brief_instance_name.printf("%s%d", device_brieftypename(m_type), index + 1);
+	}
+	else
+	{
+		m_instance_name = device_typename(m_type);
+		m_brief_instance_name = device_brieftypename(m_type);
+	}
+	// Override in case of hardcoded values
+	if (strlen(get_legacy_config_string(DEVINFO_STR_IMAGE_INSTANCE_NAME))>0) {
+		m_instance_name = get_legacy_config_string(DEVINFO_STR_IMAGE_INSTANCE_NAME);
+	}
+	if (strlen(get_legacy_config_string(DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME))>0) {
+		m_brief_instance_name = get_legacy_config_string(DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME);
+	}
+}
+
+//-------------------------------------------------
+//  uses_file_extension - update configuration
+//  based on completed device setup
+//-------------------------------------------------
+
+bool legacy_image_device_config_base::uses_file_extension(const char *file_extension) const
+{
+    bool result = FALSE;
+
+	if (file_extension[0] == '.')
+        file_extension++;
+
+	/* find the extensions */
+	char *ext = strtok((char*)m_file_extensions.cstr(),",");
+	while (ext != NULL)
+	{
+		if (!mame_stricmp(ext, file_extension))
+        {
+            result = TRUE;
+            break;
+        }
+		ext = strtok (NULL, ",");
+	}
+    return result;
+}
+
+//-------------------------------------------------
+//  ~legacy_device_config_base - destructor
+//-------------------------------------------------
+
+legacy_image_device_config_base::~legacy_image_device_config_base()
+{
+    image_device_format **formatptr = &m_formatlist;
+
+	/* free all entries */
+	while (*formatptr != NULL)
+	{
+		image_device_format *entry = *formatptr;
+		*formatptr = entry->m_next;
+		global_free(entry);
+	}
+}
+
+
+//**************************************************************************
+//  LIVE LEGACY IMAGE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  legacy_image_device_base - constructor
+//-------------------------------------------------
+
+legacy_image_device_base::legacy_image_device_base(running_machine &machine, const device_config &config)
+	: legacy_device_base(machine, config),
+	  device_image_interface(machine, config, *this),
+	  m_file(NULL)
+{
+}
+
+
+/****************************************************************************
+    IMAGE LOADING
+****************************************************************************/
+
+/*-------------------------------------------------
+    set_image_filename - specifies the filename of
+    an image
+-------------------------------------------------*/
+
+image_error_t legacy_image_device_base::set_image_filename(const char *filename)
+{
+    m_name = filename;
+    zippath_parent(&m_working_directory, filename);
+    return IMAGE_ERROR_SUCCESS;
+}
+
+
+/*-------------------------------------------------
+    load_image_by_path - loads an image with a
+    specific path
+-------------------------------------------------*/
+
+image_error_t legacy_image_device_base::load_image_by_path(UINT32 open_flags, const char *path)
+{
+    file_error filerr = FILERR_NOT_FOUND;
+    image_error_t err = IMAGE_ERROR_FILENOTFOUND;	
+    astring revised_path;
+
+    /* attempt to read the file */
+    filerr = zippath_fopen(path, open_flags, &m_file, &revised_path);
+
+    /* did the open succeed? */
+    switch(filerr)
+    {
+        case FILERR_NONE:
+            /* success! */
+            m_writeable = (open_flags & OPEN_FLAG_WRITE) ? 1 : 0;
+            m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
+            err = IMAGE_ERROR_SUCCESS;
+            break;
+
+        case FILERR_NOT_FOUND:
+        case FILERR_ACCESS_DENIED:
+            /* file not found (or otherwise cannot open); continue */
+            err = IMAGE_ERROR_FILENOTFOUND;
+            break;
+
+        case FILERR_OUT_OF_MEMORY:
+            /* out of memory */
+            err = IMAGE_ERROR_OUTOFMEMORY;
+            break;
+
+        case FILERR_ALREADY_OPEN:
+            /* this shouldn't happen */
+            err = IMAGE_ERROR_ALREADYOPEN;
+            break;
+
+        case FILERR_FAILURE:
+        case FILERR_TOO_MANY_FILES:
+        case FILERR_INVALID_DATA:
+        default:
+            /* other errors */
+            err = IMAGE_ERROR_INTERNAL;
+            break;
+    }
+
+    /* if successful, set the file name */
+    if (filerr == FILERR_NONE)
+        set_image_filename(revised_path);
+
+    return err;
+}
+  
+/*-------------------------------------------------
+    determine_open_plan - determines which open
+    flags to use, and in what order
+-------------------------------------------------*/
+
+void legacy_image_device_base::determine_open_plan(int is_create, UINT32 *open_plan)
+{
+    int i = 0;
+
+    /* emit flags */
+    if (!is_create && m_image_config.is_readable() && m_image_config.is_writeable())
+        open_plan[i++] = OPEN_FLAG_READ | OPEN_FLAG_WRITE;
+    if (!is_create && !m_image_config.is_readable() && m_image_config.is_writeable())
+        open_plan[i++] = OPEN_FLAG_WRITE;
+    if (!is_create && m_image_config.is_readable())
+        open_plan[i++] = OPEN_FLAG_READ;
+    if (m_image_config.is_writeable() && m_image_config.is_creatable())
+        open_plan[i++] = OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE;
+    open_plan[i] = 0;
+}
+
+/*-------------------------------------------------
+    load_internal - core image loading
+-------------------------------------------------*/
+
+bool legacy_image_device_base::load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args)
+{
+    image_error_t err;
+    UINT32 open_plan[4];
+    int i;
+
+    /* first unload the image */
+    unload();
+
+    /* clear any possible error messages */
+
+    /* we are now loading */
+
+    /* record the filename */
+    err = set_image_filename(path);
+    if (err)
+        goto done;
+
+	/* Check if there's a software list defined for this device and use that if we're not creating an image */
+		/* determine open plan */
+		determine_open_plan(is_create, open_plan);
+
+		/* attempt to open the file in various ways */
+		for (i = 0; !m_file && open_plan[i]; i++)
+		{
+			/* open the file */
+			err = load_image_by_path(open_plan[i], path);
+			if (err && (err != IMAGE_ERROR_FILENOTFOUND))
+				goto done;
+		}
+    /* success! */
+
+done:
+    if (err) {
+		clear();
+	}
+	else {
+		/* do we need to reset the CPU? only schedule it if load/create is successful */
+		if ((attotime_compare(timer_get_time(device().machine), attotime_zero) > 0) && m_image_config.is_reset_on_load())
+			mame_schedule_hard_reset(device().machine);
+	}
+	return err ? FALSE : TRUE;
+}
+
+
+
+/*-------------------------------------------------
+    load - load an image into MESS
+-------------------------------------------------*/
+
+bool legacy_image_device_base::load(const char *path)
+{
+    return load_internal(path, FALSE, 0, NULL);
+}
+
+/*-------------------------------------------------
+    clear - clear all internal data pertaining
+    to an image
+-------------------------------------------------*/
+
+void legacy_image_device_base::clear()
+{
+	if (m_file)
+    {
+        core_fclose(m_file);		
+        m_file = NULL;
+    }
+
+    m_name.reset();
+    m_writeable = FALSE;
+    m_created = FALSE;
+}
+
+
+/*-------------------------------------------------
+    unload_internal - internal call to unload
+    images
+-------------------------------------------------*/
+
+void legacy_image_device_base::unload_internal()
+{
+    clear();
+}
+
+
+
+/*-------------------------------------------------
+    unload - main call to unload an image
+-------------------------------------------------*/
+
+void legacy_image_device_base::unload()
+{
+    unload_internal();
+}
+
+
+/***************************************************************************
+    WORKING DIRECTORIES
+***************************************************************************/
+
+/*-------------------------------------------------
+    try_change_working_directory - tries to change
+    the working directory, but only if the directory
+    actually exists
+-------------------------------------------------*/
+bool legacy_image_device_base::try_change_working_directory(const char *subdir)
+{
+    osd_directory *directory;
+    const osd_directory_entry *entry;
+    bool success = FALSE;
+    bool done = FALSE;
+
+    directory = osd_opendir(m_working_directory.cstr());
+    if (directory != NULL)
+    {
+        while(!done && (entry = osd_readdir(directory)) != NULL)
+        {
+            if (!mame_stricmp(subdir, entry->name))
+            {
+                done = TRUE;
+                success = entry->type == ENTTYPE_DIR;
+            }
+        }
+
+        osd_closedir(directory);
+    }
+
+    /* did we successfully identify the directory? */
+    if (success)
+        zippath_combine(&m_working_directory, m_working_directory, subdir);
+
+    return success;
+}
+/*-------------------------------------------------
+    setup_working_directory - sets up the working
+    directory according to a few defaults
+-------------------------------------------------*/
+
+void legacy_image_device_base::setup_working_directory()
+{
+    const game_driver *gamedrv;
+	char *dst = NULL;
+
+	osd_get_full_path(&dst,".");
+    /* first set up the working directory to be the starting directory */
+    m_working_directory = dst;
+
+    /* now try browsing down to "software" */
+    if (try_change_working_directory("software"))
+    {
+        /* now down to a directory for this computer */
+        gamedrv = device().machine->gamedrv;
+        while(gamedrv && !try_change_working_directory(gamedrv->name))
+        {
+            gamedrv = driver_get_compatible(gamedrv);
+        }
+    }
+	osd_free(dst);
+}
+
+//-------------------------------------------------
+//  working_directory - returns the working
+//  directory to use for this image; this is
+//  valid even if not mounted
+//-------------------------------------------------
+
+const char * legacy_image_device_base::working_directory() 
+{
+   /* check to see if we've never initialized the working directory */
+    if (m_working_directory.len() == 0)
+        setup_working_directory();
+
+    return m_working_directory;
+}

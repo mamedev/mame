@@ -46,6 +46,7 @@ EMUOBJS = \
 	$(EMUOBJ)/debugger.o \
 	$(EMUOBJ)/devcb.o \
 	$(EMUOBJ)/devcpu.o \
+	$(EMUOBJ)/devimage.o \
 	$(EMUOBJ)/devlegcy.o \
 	$(EMUOBJ)/devintrf.o \
 	$(EMUOBJ)/didisasm.o \
@@ -64,6 +65,7 @@ EMUOBJS = \
 	$(EMUOBJ)/fileio.o \
 	$(EMUOBJ)/hash.o \
 	$(EMUOBJ)/hashfile.o \
+	$(EMUOBJ)/image.o \
 	$(EMUOBJ)/info.o \
 	$(EMUOBJ)/input.o \
 	$(EMUOBJ)/inputseq.o \

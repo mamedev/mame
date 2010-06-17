@@ -73,18 +73,77 @@ enum iodevice_t
     IO_COUNT        /* 16 - Total Number of IO_devices for searching */
 };
 
+enum image_error_t
+{
+    IMAGE_ERROR_SUCCESS,
+    IMAGE_ERROR_INTERNAL,
+    IMAGE_ERROR_UNSUPPORTED,
+    IMAGE_ERROR_OUTOFMEMORY,
+    IMAGE_ERROR_FILENOTFOUND,
+    IMAGE_ERROR_INVALIDIMAGE,
+    IMAGE_ERROR_ALREADYOPEN,
+    IMAGE_ERROR_UNSPECIFIED
+};
+
+struct image_device_type_info
+{
+	iodevice_t m_type;
+	const char *m_name;
+	const char *m_shortname;
+};
+
+struct image_device_format
+{
+    image_device_format *m_next;
+    int m_index;
+    astring m_name;
+    astring m_description;
+    astring m_extensions;
+    astring m_optspec;
+};
+
+// device image interface function types
+typedef int (*device_image_load_func)(device_t *image);
+typedef int (*device_image_create_func)(device_t *image, int format_type, option_resolution *format_options);
+typedef void (*device_image_unload_func)(device_t *image);
+typedef void (*device_image_display_func)(device_t *image);
+typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
+typedef void (*device_image_get_devices_func)(device_t *device);
+
+
+//**************************************************************************
+//  MACROS
+//**************************************************************************
+
+#define DEVICE_IMAGE_LOAD_NAME(name)        device_load_##name
+#define DEVICE_IMAGE_LOAD(name)             int DEVICE_IMAGE_LOAD_NAME(name)(device_t *image)
+
+#define DEVICE_IMAGE_CREATE_NAME(name)      device_create_##name
+#define DEVICE_IMAGE_CREATE(name)           int DEVICE_IMAGE_CREATE_NAME(name)(device_t *image, int create_format, option_resolution *create_args)
+
+#define DEVICE_IMAGE_UNLOAD_NAME(name)      device_unload_##name
+#define DEVICE_IMAGE_UNLOAD(name)           void DEVICE_IMAGE_UNLOAD_NAME(name)(device_t *image)
+
+#define DEVICE_IMAGE_DISPLAY_NAME(name)     device_image_display_func##name
+#define DEVICE_IMAGE_DISPLAY(name)          void DEVICE_IMAGE_DISPLAY_NAME(name)(device_t *image)
+
+#define DEVICE_IMAGE_GET_DEVICES_NAME(name) device_image_get_devices_##name
+#define DEVICE_IMAGE_GET_DEVICES(name)      void DEVICE_IMAGE_GET_DEVICES_NAME(name)(device_t *device)
+
 
 // ======================> device_config_image_interface
 
 // class representing interface-specific configuration image
 class device_config_image_interface : public device_config_interface
 {
+	friend class device_image_interface;
 public:
 	// construction/destruction
 	device_config_image_interface(const machine_config &mconfig, device_config &device);
 	virtual ~device_config_image_interface();
 
 	// public accessors... for now
+	virtual const char *name() const = 0;	
 	virtual iodevice_t image_type()  const = 0;
 	virtual const char *image_type_name()  const = 0;
 	virtual iodevice_t image_type_direct() const = 0;
@@ -99,6 +158,12 @@ public:
 	virtual const char *instance_name() const = 0;
 	virtual const char *brief_instance_name() const = 0;
 	virtual bool uses_file_extension(const char *file_extension) const = 0;
+	
+	static const char *device_typename(iodevice_t type);
+	static const char *device_brieftypename(iodevice_t type);	
+protected:
+	static const image_device_type_info *find_device_type(iodevice_t type);
+	static const image_device_type_info m_device_info_array[];
 };
 
 
@@ -108,19 +173,24 @@ public:
 // class representing interface-specific live image
 class device_image_interface : public device_interface
 {
+	friend class device_config_image_interface;
 public:
 	// construction/destruction
 	device_image_interface(running_machine &machine, const device_config &config, device_t &device);
 	virtual ~device_image_interface();
 
+	virtual void set_working_directory(const char *working_directory) = 0;
+	virtual const char * working_directory() = 0;
+	virtual bool load(const char *path) = 0;
+	virtual void unload() = 0;
+	
 	// configuration access
 	const device_config_image_interface &image_config() const { return m_image_config; }
-
 protected:
 	// derived class overrides
 
 	// configuration
-	const device_config_image_interface &m_image_config;	// reference to our device_config_execute_interface
+	const device_config_image_interface &m_image_config;	// reference to our device_config_execute_interface	
 };
 
 

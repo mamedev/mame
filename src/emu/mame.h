@@ -291,9 +291,6 @@ public:
 	generic_machine_private *generic_machine_data; /* internal data from machine/generic.c */
 	generic_video_private *	generic_video_data;	/* internal data from video/generic.c */
 	generic_audio_private *	generic_audio_data;	/* internal data from audio/generic.c */
-#ifdef MESS
-	images_private *		images_data;		/* internal data from image.c */
-#endif /* MESS */
 
 	/* driver-specific information */
 	void *					driver_data;		/* drivers can hang data off of here instead of using globals */

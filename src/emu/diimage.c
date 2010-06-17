@@ -44,9 +44,27 @@
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
 //**************************************************************************
+const image_device_type_info device_config_image_interface::m_device_info_array[] =
+	{
+		{ IO_CARTSLOT,	"cartridge",	"cart" }, /*  0 */
+		{ IO_FLOPPY,	"floppydisk",	"flop" }, /*  1 */
+		{ IO_HARDDISK,	"harddisk",		"hard" }, /*  2 */
+		{ IO_CYLINDER,	"cylinder",		"cyln" }, /*  3 */
+		{ IO_CASSETTE,	"cassette",		"cass" }, /*  4 */
+		{ IO_PUNCHCARD,	"punchcard",	"pcrd" }, /*  5 */
+		{ IO_PUNCHTAPE,	"punchtape",	"ptap" }, /*  6 */
+		{ IO_PRINTER,	"printer",		"prin" }, /*  7 */
+		{ IO_SERIAL,	"serial",		"serl" }, /*  8 */
+		{ IO_PARALLEL,	"parallel",		"parl" }, /*  9 */
+		{ IO_SNAPSHOT,	"snapshot",		"dump" }, /* 10 */
+		{ IO_QUICKLOAD,	"quickload",	"quik" }, /* 11 */
+		{ IO_MEMCARD,	"memcard",		"memc" }, /* 12 */
+		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
+		{ IO_MAGTAPE,	"magtape",		"magt" }, /* 14 */
+	};
 
 //-------------------------------------------------
-//  device_config_nvram_interface - constructor
+//  device_config_image_interface - constructor
 //-------------------------------------------------
 
 device_config_image_interface::device_config_image_interface(const machine_config &mconfig, device_config &devconfig)
@@ -64,6 +82,42 @@ device_config_image_interface::~device_config_image_interface()
 }
 
 
+//-------------------------------------------------
+//  find_device_type - search trough list of
+//  device types to extact data
+//-------------------------------------------------
+
+const image_device_type_info *device_config_image_interface::find_device_type(iodevice_t type)
+{
+	int i;
+	for (i = 0; i < ARRAY_LENGTH(device_config_image_interface::m_device_info_array); i++)
+	{
+		if (m_device_info_array[i].m_type == type)
+			return &m_device_info_array[i];
+	}
+	return NULL;
+}
+
+//-------------------------------------------------
+//  device_typename - retrieves device type name
+//-------------------------------------------------
+
+const char *device_config_image_interface::device_typename(iodevice_t type)
+{
+	const image_device_type_info *info = find_device_type(type);
+	return (info != NULL) ? info->m_name : NULL;
+}
+
+//-------------------------------------------------
+//  device_brieftypename - retrieves device
+//  brief type name
+//-------------------------------------------------
+
+const char *device_config_image_interface::device_brieftypename(iodevice_t type)
+{
+	const image_device_type_info *info = find_device_type(type);
+	return (info != NULL) ? info->m_shortname : NULL;
+}
 
 //**************************************************************************
 //  DEVICE image INTERFACE

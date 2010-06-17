@@ -98,10 +98,12 @@
 #include "romload.h"
 #include "state.h"
 
+// image-related
+#include "image.h"
+
 // the running machine
 #ifdef MESS
 #include "mess.h"
-#include "image.h"
 #include "messdrv.h"
 #endif /* MESS */
 #include "mame.h"

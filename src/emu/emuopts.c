@@ -207,14 +207,14 @@ static void mame_puts_error(const char *s)
     option
 -------------------------------------------------*/
 
-const char *image_get_device_option(device_t *image)
+const char *image_get_device_option(device_image_interface *image)
 {
 	const char *result = NULL;
 
 	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
 	{
 		/* access the option */
-		result = options_get_string(mame_options(),  downcast<const legacy_image_device_config_base *>(&image->baseconfig())->instance_name());
+		result = options_get_string(mame_options(),  image->image_config().instance_name());
 	}
 	return result;
 }
