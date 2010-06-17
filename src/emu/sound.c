@@ -189,7 +189,7 @@ static void sound_exit(running_machine *machine)
 static void route_sound(running_machine *machine)
 {
 	/* iterate again over all the sound chips */
-	device_sound_interface *sound;
+	device_sound_interface *sound = NULL;
 	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		int numoutputs = stream_get_device_outputs(*sound);
@@ -230,7 +230,7 @@ static void route_sound(running_machine *machine)
 
 static void sound_reset(running_machine *machine)
 {
-	device_sound_interface *sound;
+	device_sound_interface *sound = NULL;
 
 	/* reset all the sound chips */
 	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
@@ -553,7 +553,7 @@ void speaker_device::device_start()
 {
 	// scan all the sound devices and count our inputs
 	int inputs = 0;
-	device_sound_interface *sound;
+	device_sound_interface *sound = NULL;
 	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		// scan each route on the device
