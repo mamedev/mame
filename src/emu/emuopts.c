@@ -228,7 +228,7 @@ void image_add_device_options(core_options *opts, const game_driver *driver)
 {
 	int index = 0;
 	machine_config *config;
-	const device_config_image_interface *image;
+	const device_config_image_interface *image = NULL;
 
 	/* create the configuration */
 	config = machine_config_alloc(driver->machine_config);
