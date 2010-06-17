@@ -1690,7 +1690,7 @@ static void memory_init_spaces(running_machine *machine)
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over devices */
-	device_memory_interface *memory;
+	device_memory_interface *memory = NULL;
 	for (bool gotone = machine->devicelist.first(memory); gotone; gotone = memory->next(memory))
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
