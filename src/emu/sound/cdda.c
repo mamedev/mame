@@ -91,7 +91,7 @@ void cdda_set_cdrom(running_device *device, void *file)
 
 running_device *cdda_from_cdrom(running_machine *machine, void *file)
 {
-	device_sound_interface *sound;
+	device_sound_interface *sound = NULL;
 
 	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->device().type() == SOUND_CDDA)
