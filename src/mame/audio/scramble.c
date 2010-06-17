@@ -206,7 +206,7 @@ void scramble_sh_init(running_machine *machine)
     Q6      ==> Reset Counters (LS393)
     Q7      ==> Trigger Logic
 
-	 only 16 bytes needed ... The original dump is bad. This
+     only 16 bytes needed ... The original dump is bad. This
      is what is needed to get speech to work. The prom data has
      been updated and marked as BAD_DUMP. The information below
      is given for reference once another dump should surface.

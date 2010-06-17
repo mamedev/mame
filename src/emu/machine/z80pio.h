@@ -73,7 +73,7 @@ struct z80pio_interface
 
 // ======================> z80pio_device_config
 
-class z80pio_device_config : 	public device_config, 
+class z80pio_device_config :	public device_config,
 								public device_config_z80daisy_interface,
 								public z80pio_interface
 {
@@ -99,7 +99,7 @@ protected:
 
 // ======================> z80pio_device
 
-class z80pio_device : 	public device_t, 
+class z80pio_device :	public device_t,
 						public device_z80daisy_interface
 {
 	friend class z80pio_device_config;
@@ -115,7 +115,7 @@ public:
 		PORT_COUNT
 	};
 
-	// I/O line access	
+	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }
 	void strobe(int which, bool state) { m_port[which].strobe(state); }
 
@@ -140,7 +140,7 @@ private:
 	virtual int z80daisy_irq_state();
 	virtual int z80daisy_irq_ack();
 	virtual void z80daisy_irq_reti();
-	
+
 	// internal helpers
 	void check_interrupts();
 
@@ -148,10 +148,10 @@ private:
 	class pio_port
 	{
 		friend class z80pio_device;
-		
+
 	public:
 		pio_port();
-		
+
 		void start(z80pio_device *device, int index, const devcb_read8 &infunc, const devcb_write8 &outfunc, const devcb_write_line &rdyfunc);
 		void reset();
 
@@ -162,21 +162,21 @@ private:
 		void set_rdy(bool state);
 		void set_mode(int mode);
 		void strobe(bool state);
-		
+
 		UINT8 read();
 		void write(UINT8 data);
-		
+
 		void control_write(UINT8 data);
-		
+
 		UINT8 data_read();
 		void data_write(UINT8 data);
 
-	private:		
+	private:
 		void check_interrupts() { m_device->check_interrupts(); }
 
 		z80pio_device *				m_device;
 		int							m_index;
-		
+
 		devcb_resolved_read8		m_in_p_func;
 		devcb_resolved_write8		m_out_p_func;
 		devcb_resolved_write_line	m_out_rdy_func;
@@ -201,7 +201,7 @@ private:
 
 	// internal state
 	const z80pio_device_config &m_config;
-	pio_port 					m_port[2];
+	pio_port					m_port[2];
 	devcb_resolved_write_line	m_out_int_func;
 };
 

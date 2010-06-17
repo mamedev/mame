@@ -73,7 +73,7 @@ enum
 class device_state_entry
 {
 	friend class device_state_interface;
-	
+
 private:
 	// construction/destruction
 	device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size);
@@ -86,7 +86,7 @@ public:
 	device_state_entry &callimport() { m_flags |= DSF_IMPORT; return *this; }
 	device_state_entry &callexport() { m_flags |= DSF_EXPORT; return *this; }
 	device_state_entry &noshow() { m_flags |= DSF_NOSHOW; return *this; }
-	
+
 	// iteration helpers
 	const device_state_entry *next() const { return m_next; }
 
@@ -118,7 +118,7 @@ protected:
 	void set_value(UINT64 value) const;
 	void set_value(const char *string) const;
 
-	// statics	
+	// statics
 	static const UINT64 k_decimal_divisor[20];		// divisors for outputting decimal values
 
 	// public state description
@@ -159,7 +159,7 @@ public:
 	device_state_interface(running_machine &machine, const device_config &config, device_t &device);
 	virtual ~device_state_interface();
 
-	// configuration access	
+	// configuration access
 	const device_config_state_interface &state_config() const { return m_state_config; }
 	const device_state_entry *state_first() const { return m_state_list; }
 
@@ -190,8 +190,8 @@ protected:
 
 	// internal operation overrides
 	virtual void interface_post_start();
-	
-	// find the entry for a given index	
+
+	// find the entry for a given index
 	const device_state_entry *state_find_entry(int index);
 
 	// constants
@@ -202,7 +202,7 @@ protected:
 	running_machine &						m_machine;				// reference to owning machine
 	const device_config_state_interface &	m_state_config;			// reference to configuration data
 	device_state_entry *					m_state_list;			// head of state list
-	device_state_entry *					m_fast_state[k_fast_state_max  + 1 - k_fast_state_min];	
+	device_state_entry *					m_fast_state[k_fast_state_max  + 1 - k_fast_state_min];
 																	// fast access to common entries
 };
 

@@ -47,18 +47,18 @@ const int NOTIMER_3 = (1<<3);
 
 struct z80ctc_interface
 {
-	UINT8 				m_notimer;	// timer disabler mask
-	devcb_write_line 	m_intr;		// callback when change interrupt status
-	devcb_write_line 	m_zc0;		// ZC/TO0 callback
-	devcb_write_line 	m_zc1;		// ZC/TO1 callback
-	devcb_write_line 	m_zc2;		// ZC/TO2 callback
+	UINT8				m_notimer;	// timer disabler mask
+	devcb_write_line	m_intr;		// callback when change interrupt status
+	devcb_write_line	m_zc0;		// ZC/TO0 callback
+	devcb_write_line	m_zc1;		// ZC/TO1 callback
+	devcb_write_line	m_zc2;		// ZC/TO2 callback
 };
 
 
 
 // ======================> z80ctc_device_config
 
-class z80ctc_device_config : 	public device_config, 
+class z80ctc_device_config :	public device_config,
 								public device_config_z80daisy_interface,
 								public z80ctc_interface
 {
@@ -84,7 +84,7 @@ protected:
 
 // ======================> z80ctc_device
 
-class z80ctc_device : 	public device_t, 
+class z80ctc_device :	public device_t,
 						public device_z80daisy_interface
 {
 	friend class z80ctc_device_config;

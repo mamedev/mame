@@ -52,10 +52,10 @@
 //  MACROS
 //**************************************************************************
 
-// macro for specifying a clock derived from an owning device 
+// macro for specifying a clock derived from an owning device
 #define DERIVED_CLOCK(num, den)		(0xff000000 | ((num) << 12) | ((den) << 0))
 
-// shorthand for accessing devices by machine/type/tag 
+// shorthand for accessing devices by machine/type/tag
 #define devtag_get_device(mach,tag)							(mach)->device(tag)
 #define devtag_reset(mach,tag)								(mach)->device(tag)->reset()
 
@@ -123,11 +123,11 @@ typedef device_config *(*device_type)(const machine_config &mconfig, const char 
 // ======================> tagged_device_list
 
 // tagged_device_list is a tagged_list with additional searching based on type
-template<class T> 
+template<class T>
 class tagged_device_list : public tagged_list<T>
 {
 	typedef tagged_list<T> super;
-	
+
 public:
 	tagged_device_list(resource_pool &pool = global_resource_pool)
 		: tagged_list<T>(pool) { }
@@ -137,7 +137,7 @@ public:
 	using super::count;
 	using super::index;
 	using super::find;
-	
+
 	// provide type-specific overrides
 	T *first(device_type type) const
 	{
@@ -145,14 +145,14 @@ public:
 		for (cur = super::first(); cur != NULL && cur->type() != type; cur = cur->next()) ;
 		return cur;
 	}
-	
+
 	int count(device_type type) const
 	{
 		int num = 0;
 		for (const T *curdev = first(type); curdev != NULL; curdev = curdev->typenext()) num++;
 		return num;
 	}
-	
+
 	int index(device_type type, T *object) const
 	{
 		int num = 0;
@@ -160,13 +160,13 @@ public:
 			if (cur == object) return num;
 		return -1;
 	}
-	
+
 	int index(device_type type, const char *tag) const
 	{
 		T *object = find(tag);
 		return (object != NULL && object->type() == type) ? index(type, object) : -1;
 	}
-	
+
 	T *find(device_type type, int index) const
 	{
 		for (T *cur = first(type); cur != NULL; cur = cur->typenext())
@@ -200,12 +200,12 @@ typedef tagged_device_list<device_config> device_config_list;
 class device_list : public tagged_device_list<device_t>
 {
 	running_machine *m_machine;
-	
+
 	static void static_reset(running_machine *machine);
 	static void static_exit(running_machine *machine);
 	static void static_pre_save(running_machine *machine, void *param);
 	static void static_post_load(running_machine *machine, void *param);
-	
+
 public:
 	device_list(resource_pool &pool = global_resource_pool);
 	void import_config_list(const device_config_list &list, running_machine &machine);
@@ -223,11 +223,11 @@ public:
 class device_config
 {
 	DISABLE_COPYING(device_config);
-	
+
 	friend class device_t;
 	friend class device_config_interface;
 	template<class T> friend class tagged_list;
-	
+
 protected:
 	// construction/destruction
 	device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock);
@@ -263,7 +263,7 @@ public:
 	void process_token(UINT32 entrytype, const machine_config_token *&tokens);
 	void config_complete();
 	bool validity_check(const game_driver &driver) const;
-	
+
 	//------------------- begin derived class overrides
 
 	// required operation overrides
@@ -278,24 +278,24 @@ protected:
 	// required information overrides
 public:
 	virtual const char *name() const = 0;
-	
+
 	// optional information overrides
 	virtual const rom_entry *rom_region() const;
 	virtual const machine_config_token *machine_config_tokens() const;
-	
+
 	//------------------- end derived class overrides
 
 protected:
 	// device relationships
-	device_config *			m_next;					// next device (of any type/class) 
+	device_config *			m_next;					// next device (of any type/class)
 	device_config *			m_owner;				// device that owns us, or NULL if nobody
 	device_config_interface *m_interface_list;		// head of interface list
 
-	const device_type		m_type;					// device type 
-	UINT32					m_clock;				// device clock 
+	const device_type		m_type;					// device type
+	UINT32					m_clock;				// device clock
 
 	const machine_config &	m_machine_config;		// reference to the machine's configuration
-	const void *			m_static_config;		// static device configuration 
+	const void *			m_static_config;		// static device configuration
 	UINT64					m_inline_data[16];		// array of inline configuration values
 
 private:
@@ -322,7 +322,7 @@ public:
 	operator const device_config &() const { return m_device_config; }
 	operator const device_config *() const { return &m_device_config; }
 
-	// iteration helpers	
+	// iteration helpers
 	device_config_interface *interface_next() const { return m_interface_next; }
 	template<class T> bool next(T *&intf) const { return m_device_config.next(intf); }
 
@@ -360,7 +360,7 @@ public:
 	device_t *next() const { return m_next; }
 	device_t *typenext() const;
 	device_t *owner() const { return m_owner; }
-	
+
 	// interface helpers
 	template<class T> bool interface(T *&intf) { intf = dynamic_cast<T *>(this); return (intf != NULL); }
 	template<class T> bool next(T *&intf) const
@@ -426,15 +426,15 @@ protected:
 	virtual void device_debug_setup();
 
 	//------------------- end derived class overrides
-	
+
 	running_machine &		m_machine;
-	
-	// device relationships 
-	device_t *				m_next;					// next device (of any type/class) 
-	device_t *				m_owner;				// device that owns us, or NULL if nobody 
+
+	// device relationships
+	device_t *				m_next;					// next device (of any type/class)
+	device_t *				m_owner;				// device that owns us, or NULL if nobody
 	device_interface *		m_interface_list;		// head of interface list
 
-	bool					m_started;				// true if the start function has succeeded 
+	bool					m_started;				// true if the start function has succeeded
 	UINT32					m_clock;				// device clock
 	const region_info *		m_region;				// our device-local region
 
@@ -461,13 +461,13 @@ protected:
 	// construction/destruction
 	device_interface(running_machine &machine, const device_config &config, device_t &device);
 	virtual ~device_interface();
-	
+
 public:
 	// casting helpers
 	device_t &device() { return m_device; }
 	operator device_t &() { return m_device; }
 	operator device_t *() { return &m_device; }
-	
+
 	// iteration helpers
 	device_interface *interface_next() const { return m_interface_next; }
 	template<class T> bool next(T *&intf) const { return m_device.next(intf); }
@@ -481,7 +481,7 @@ public:
 	virtual void interface_post_load();
 	virtual void interface_clock_changed();
 	virtual void interface_debug_setup();
-	
+
 protected:
 	device_interface *		m_interface_next;
 	device_t &				m_device;

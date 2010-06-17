@@ -1595,7 +1595,7 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 {
 	cpu_device *cpudevice = downcast<cpu_device *>(space->cpu);
 	assert(cpudevice != NULL);
-	
+
 	int minlen = memory_byte_to_address(space, cpudevice->min_opcode_bytes());
 	int maxlen = memory_byte_to_address(space, cpudevice->max_opcode_bytes());
 	offs_t targetpcbyte = memory_address_to_byte(space, targetpc) & space->logbytemask;

@@ -59,7 +59,7 @@
 //**************************************************************************
 
 const int TRIGGER_INT			= -2000;
-const int TRIGGER_SUSPENDTIME 	= -4000;
+const int TRIGGER_SUSPENDTIME	= -4000;
 
 
 
@@ -93,7 +93,7 @@ device_config_execute_interface::~device_config_execute_interface()
 
 
 //-------------------------------------------------
-//  execute_clocks_to_cycles - convert the number 
+//  execute_clocks_to_cycles - convert the number
 //  of clocks to cycles, rounding down if necessary
 //-------------------------------------------------
 
@@ -104,19 +104,19 @@ UINT32 device_config_execute_interface::execute_clocks_to_cycles(UINT32 clocks) 
 
 
 //-------------------------------------------------
-//  execute_cycles_to_clocks - convert the number 
+//  execute_cycles_to_clocks - convert the number
 //  of cycles to clocks, rounding down if necessary
 //-------------------------------------------------
 
-UINT32 device_config_execute_interface::execute_cycles_to_clocks(UINT32 cycles) const 
+UINT32 device_config_execute_interface::execute_cycles_to_clocks(UINT32 cycles) const
 {
 	return cycles;
 }
 
 
 //-------------------------------------------------
-//  execute_min_cycles - return the smallest number 
-//  of cycles that a single instruction or 
+//  execute_min_cycles - return the smallest number
+//  of cycles that a single instruction or
 //  operation can take
 //-------------------------------------------------
 
@@ -127,8 +127,8 @@ UINT32 device_config_execute_interface::execute_min_cycles() const
 
 
 //-------------------------------------------------
-//  execute_max_cycles - return the maximum number 
-//  of cycles that a single instruction or 
+//  execute_max_cycles - return the maximum number
+//  of cycles that a single instruction or
 //  operation can take
 //-------------------------------------------------
 
@@ -139,7 +139,7 @@ UINT32 device_config_execute_interface::execute_max_cycles() const
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the total number 
+//  execute_input_lines - return the total number
 //  of input lines for the device
 //-------------------------------------------------
 
@@ -150,7 +150,7 @@ UINT32 device_config_execute_interface::execute_input_lines() const
 
 
 //-------------------------------------------------
-//  execute_default_irq_vector - return the default 
+//  execute_default_irq_vector - return the default
 //  IRQ vector when an acknowledge is processed
 //-------------------------------------------------
 
@@ -173,7 +173,7 @@ bool device_config_execute_interface::interface_process_token(UINT32 entrytype, 
 		case MCONFIG_TOKEN_DIEXEC_DISABLE:
 			m_disabled = true;
 			return true;
-		
+
 		// VBLANK interrupt
 		case MCONFIG_TOKEN_DIEXEC_VBLANK_INT:
 			TOKEN_UNGET_UINT32(tokens);
@@ -188,14 +188,14 @@ bool device_config_execute_interface::interface_process_token(UINT32 entrytype, 
 			TOKEN_EXTRACT_UINT64(tokens, m_timed_interrupt_period);
 			return true;
 	}
-	
+
 	return false;
 }
 
 
 //-------------------------------------------------
 //  interface_validity_check - validation for a
-//  device after the configuration has been 
+//  device after the configuration has been
 //  constructed
 //-------------------------------------------------
 
@@ -319,7 +319,7 @@ INT32 device_execute_interface::cycles_remaining() const
 
 
 //-------------------------------------------------
-//  eat_cycles - safely eats cycles so we don't 
+//  eat_cycles - safely eats cycles so we don't
 //  cross a timeslice boundary
 //-------------------------------------------------
 
@@ -403,7 +403,7 @@ if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 
 
 //-------------------------------------------------
-//  resume - clear a suspend reason for this 
+//  resume - clear a suspend reason for this
 //  device
 //-------------------------------------------------
 
@@ -419,7 +419,7 @@ if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
 
 
 //-------------------------------------------------
-//  spinuntil_time - burn cycles for a specific 
+//  spinuntil_time - burn cycles for a specific
 //  period of time
 //-------------------------------------------------
 
@@ -489,7 +489,7 @@ attotime device_execute_interface::local_time() const
 
 
 //-------------------------------------------------
-//  total_cycles - return the total number of 
+//  total_cycles - return the total number of
 //  cycles executed on this device
 //-------------------------------------------------
 
@@ -506,8 +506,8 @@ UINT64 device_execute_interface::total_cycles() const
 
 
 //-------------------------------------------------
-//  execute_burn - called after we consume a bunch 
-//  of cycles for artifical reasons (such as 
+//  execute_burn - called after we consume a bunch
+//  of cycles for artifical reasons (such as
 //  spinning devices for performance optimization)
 //-------------------------------------------------
 
@@ -585,7 +585,7 @@ void device_execute_interface::interface_pre_reset()
 {
 	// reset the total number of cycles
 	m_totalcycles = 0;
-	
+
 	// enable all devices (except for disabled devices)
 	if (!m_execute_config.disabled())
 		resume(SUSPEND_ANY_REASON);
@@ -703,7 +703,7 @@ void device_execute_interface::static_on_vblank(screen_device &screen, void *par
 			exec->on_vblank_start(screen);
 	}
 }
-	
+
 void device_execute_interface::on_vblank_start(screen_device &screen)
 {
 	// start the interrupt counter
@@ -738,7 +738,7 @@ void device_execute_interface::on_vblank_start(screen_device &screen)
 
 
 //-------------------------------------------------
-//  static_trigger_partial_frame_interrupt - 
+//  static_trigger_partial_frame_interrupt -
 //  called to trigger a partial frame interrupt
 //-------------------------------------------------
 
@@ -767,7 +767,7 @@ void device_execute_interface::trigger_partial_frame_interrupt()
 
 
 //-------------------------------------------------
-//  static_trigger_periodic_interrupt - timer 
+//  static_trigger_periodic_interrupt - timer
 //  callback for timed interrupts
 //-------------------------------------------------
 
@@ -843,7 +843,7 @@ void device_execute_interface::device_input::start(device_execute_interface *exe
 	m_execute = execute;
 	m_device = &m_execute->m_device;
 	m_linenum = linenum;
-	
+
 	reset();
 
 	state_save_register_device_item(m_device, m_linenum, m_stored_vector);
@@ -994,14 +994,14 @@ if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 
 
 //-------------------------------------------------
-//  default_irq_callback - the default IRQ 
+//  default_irq_callback - the default IRQ
 //  callback for this input line
 //-------------------------------------------------
 
 int device_execute_interface::device_input::default_irq_callback()
 {
 	int vector = m_curvector;
-	
+
 	// if the IRQ state is HOLD_LINE, clear it
 	if (m_curstate == HOLD_LINE)
 	{

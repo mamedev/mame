@@ -92,7 +92,7 @@ struct z80sti_interface
 
 // ======================> z80sti_device_config
 
-class z80sti_device_config : 	public device_config, 
+class z80sti_device_config :	public device_config,
 								public device_config_z80daisy_interface,
 								public z80sti_interface
 {
@@ -105,7 +105,7 @@ public:
 	// allocators
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
-	
+
 	// basic information getters
 	virtual const char *name() const { return "Mostek MK3801"; }
 
@@ -118,24 +118,24 @@ protected:
 
 // ======================> z80sti_device
 
-class z80sti_device : 	public device_t, 
+class z80sti_device :	public device_t,
 						public device_z80daisy_interface
 {
 	friend class z80sti_device_config;
 
 	// construction/destruction
 	z80sti_device(running_machine &_machine, const z80sti_device_config &config);
-	
+
 public:
 	// I/O accessors
 	UINT8 read(offs_t offset);
 	void write(offs_t offset, UINT8 data);
-	
+
 	// communication I/O
 	void serial_receive();
 	void serial_transmit();
 	void gpip_input(int bit, int state);
-	
+
 private:
 	// device-level overrides
 	virtual void device_start();
@@ -159,7 +159,7 @@ private:
 
 	// internal state
 	const z80sti_device_config &m_config;
-	
+
 	// device callbacks
 	devcb_resolved_read8				m_in_gpio_func;
 	devcb_resolved_write8				m_out_gpio_func;

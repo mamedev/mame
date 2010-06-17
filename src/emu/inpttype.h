@@ -396,7 +396,7 @@ static const input_type_desc core_types[] =
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN9,               "Coin 9",                 SEQ_DEF_0 )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN10,              "Coin 10",                SEQ_DEF_0 )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN11,              "Coin 11",                SEQ_DEF_0 )
-	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN12,              "Coin 12",                SEQ_DEF_0 )	
+	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   COIN12,              "Coin 12",                SEQ_DEF_0 )
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   BILL1,               "Bill 1",                 SEQ_DEF_1(KEYCODE_BACKSPACE) )
 
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   SERVICE1,            "Service 1",              SEQ_DEF_1(KEYCODE_9) )

@@ -200,7 +200,7 @@ static void route_sound(running_machine *machine)
 			device_t *target_device = machine->device(route->m_target);
 			if (target_device->type() == SPEAKER)
 				continue;
-				
+
 			int inputnum = route->m_input;
 
 			/* iterate over all outputs, matching any that apply */
@@ -491,7 +491,7 @@ device_t *speaker_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -566,20 +566,20 @@ void speaker_device::device_start()
 				// if the sound device is not yet started, bail however -- we need the its stream
 				if (!sound->device().started())
 					throw device_missing_dependencies();
-				
+
 				// accumulate inputs
 				inputs += (route->m_output == ALL_OUTPUTS) ? stream_get_device_outputs(*sound) : 1;
 			}
 		}
 	}
-	
+
 	// no inputs? that's weird
 	if (inputs == 0)
 	{
 		logerror("Warning: speaker \"%s\" has no inputs\n", tag());
 		return;
 	}
-	
+
 	// now we know how many inputs; allocate the mixers and input data
 	m_mixer_stream = stream_create(this, inputs, 1, machine->sample_rate, NULL, static_mixer_update);
 	m_input = auto_alloc_array(machine, speaker_input, inputs);

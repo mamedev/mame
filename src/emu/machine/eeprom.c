@@ -107,7 +107,7 @@ device_t *eeprom_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -119,11 +119,11 @@ void eeprom_device_config::device_config_complete()
 	m_default_data = reinterpret_cast<const UINT8 *>(m_inline_data[INLINE_DATAPTR]);
 	m_default_data_size = m_inline_data[INLINE_DATASIZE];
 	m_default_value = m_inline_data[INLINE_DEFVALUE];
-	
+
 	// inherit a copy of the static data
 	if (intf != NULL)
 		*static_cast<eeprom_interface *>(this) = *intf;
-	
+
 	// now describe our address space
 	if (m_data_bits == 8)
 		m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME(eeprom_map8));
@@ -133,7 +133,7 @@ void eeprom_device_config::device_config_complete()
 
 
 //-------------------------------------------------
-//  device_validity_check - perform validity checks 
+//  device_validity_check - perform validity checks
 //  on this device
 //-------------------------------------------------
 
@@ -157,7 +157,7 @@ bool eeprom_device_config::device_validity_check(const game_driver &driver) cons
 
 
 //-------------------------------------------------
-//  memory_space_config - return a description of 
+//  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
 

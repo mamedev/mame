@@ -796,7 +796,7 @@ static void set_irq_line(z180_state *cpustate, int irqline, int state);
 
 /***************************************************************************
     CPU PREFIXES
- 
+
     order is important here - see z180tbl.h
 ***************************************************************************/
 
@@ -1981,9 +1981,9 @@ static CPU_INIT( z180 )
 		state->state_add(Z180_IFF1,       "IFF1",      cpustate->IFF1).mask(0x1);
 		state->state_add(Z180_IFF2,       "IFF2",      cpustate->IFF2).mask(0x1);
 		state->state_add(Z180_HALT,       "HALT",      cpustate->HALT).mask(0x1);
-		
+
 		state->state_add(Z180_IOLINES,    "IOLINES",   cpustate->ioltemp).mask(0xffffff).callimport();
-		
+
 		state->state_add(Z180_CNTLA0,     "CNTLA0",    cpustate->IO_CNTLA0);
 		state->state_add(Z180_CNTLA1,     "CNTLA1",    cpustate->IO_CNTLA1);
 		state->state_add(Z180_CNTLB0,     "CNTLB0",    cpustate->IO_CNTLB0);

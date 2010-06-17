@@ -88,7 +88,7 @@ void z80_daisy_chain::init(device_t *cpudevice, const z80_daisy_config *daisy)
 		device_t *target = cpudevice->siblingdevice(daisy->devname);
 		if (target == NULL)
 			fatalerror("Unable to locate device '%s'", daisy->devname);
-	
+
 		// make sure it has an interface
 		device_z80daisy_interface *intf;
 		if (!target->interface(intf))

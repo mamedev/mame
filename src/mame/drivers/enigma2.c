@@ -706,7 +706,7 @@ ROM_START( enigma2b )
 	ROM_LOAD( "ic33.bin",   0x1800, 0x0800, CRC(ac6c2410) SHA1(d35565a5ffe795d0c36970bd9c2f948bf79e0ed8) )
 	ROM_LOAD( "ic32.bin",   0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
 	ROM_LOAD( "ic42.bin",   0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
-	
+
 	/* this rom was completely broken on this pcb.. */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )

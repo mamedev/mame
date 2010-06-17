@@ -5,9 +5,9 @@
 
     Driver by Pierpaolo Prazzoli
 
-	TODO:
-	  - is the background color pen correct for both games? (Dacholer probably
-	    just use a different color prom data)
+    TODO:
+      - is the background color pen correct for both games? (Dacholer probably
+        just use a different color prom data)
 
     Mods by Tomasz Slanina (2008.06.12):
       - fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)

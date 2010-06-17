@@ -75,7 +75,7 @@ struct z80dma_interface
 
 // ======================> z80dma_device_config
 
-class z80dma_device_config : 	public device_config, 
+class z80dma_device_config :	public device_config,
 								public device_config_z80daisy_interface,
 								public z80dma_interface
 {
@@ -83,7 +83,7 @@ class z80dma_device_config : 	public device_config,
 
 	// construction/destruction
 	z80dma_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	
+
 public:
 	// allocators
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
@@ -101,18 +101,18 @@ protected:
 
 // ======================> z80dma_device
 
-class z80dma_device : 	public device_t, 
+class z80dma_device :	public device_t,
 						public device_z80daisy_interface
 {
 	friend class z80dma_device_config;
 
 	// construction/destruction
 	z80dma_device(running_machine &_machine, const z80dma_device_config &_config);
-	
+
 public:
 	UINT8 read();
 	void write(UINT8 data);
-	
+
 	void rdy_w(int state);
 	void wait_w(int state);
 	void bai_w(int state);
@@ -138,7 +138,7 @@ private:
 	void timerproc();
 
 	void update_status();
-	
+
 	static TIMER_CALLBACK( static_rdy_write_callback ) { reinterpret_cast<z80dma_device *>(ptr)->rdy_write_callback(param); }
 	void rdy_write_callback(int state);
 
@@ -164,7 +164,7 @@ private:
 	UINT8	m_read_regs_follow[7];
 	UINT8	m_status;
 	UINT8	m_dma_enabled;
-	
+
 	UINT16 m_addressA;
 	UINT16 m_addressB;
 	UINT16 m_count;

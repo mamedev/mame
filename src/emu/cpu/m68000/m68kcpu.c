@@ -853,7 +853,7 @@ static CPU_EXPORT_STRING( m68k )
 		case M68K_FP7:
 			string.printf("%f", fx80_to_double(REG_FP[7]));
 			break;
-		
+
 		case STATE_GENFLAGS:
 			sr = m68ki_get_sr(m68k);
 			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
@@ -1309,7 +1309,7 @@ static CPU_INIT( m68000 )
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
 	m68k->has_pmmu	       = 0;
-	
+
 	define_state(device);
 }
 

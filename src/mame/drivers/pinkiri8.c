@@ -73,7 +73,7 @@ protected:
 	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
 	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
-	address_space_config  		m_space_config;
+	address_space_config		m_space_config;
 };
 
 class janshi_vdp_device : public device_t,
@@ -109,9 +109,9 @@ device_t *janshi_vdp_device_config::alloc_device(running_machine &machine) const
 
 void janshi_vdp_device_config::device_config_complete()
 {
-//	int address_bits = 24;
+//  int address_bits = 24;
 
-//	m_space_config = address_space_config("janshi_vdp", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME(janshi_vdp_map8));
+//  m_space_config = address_space_config("janshi_vdp", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME(janshi_vdp_map8));
 }
 
 bool janshi_vdp_device_config::device_validity_check(const game_driver &driver) const
@@ -204,16 +204,16 @@ static VIDEO_UPDATE( pinkiri8 )
 
 		/* vram 1 (12000 - 12fff)
 
-		  tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
+          tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
 
-		  vram 2 (13800 - 13fff)
+          vram 2 (13800 - 13fff)
 
-		  yyyy yyyy | ???? ???? |
+          yyyy yyyy | ???? ???? |
 
-		there is also some data at 13000 - 137ff
-		and a table at 20000..
+        there is also some data at 13000 - 137ff
+        and a table at 20000..
 
-		  */
+          */
 
 			spr_offs = ((janshi_vram1[(i*4)+0] & 0xff) | (janshi_vram1[(i*4)+1]<<8)) & 0xffff;
 			col = (janshi_vram1[(i*4)+2] & 0xf8) >> 3;
@@ -229,7 +229,7 @@ static VIDEO_UPDATE( pinkiri8 )
 
 			col|= col_bank<<5;
 
-		//	width = 0; height = 0;
+		//  width = 0; height = 0;
 
 
 			// hacks!
@@ -342,7 +342,7 @@ static int prev_writes = 0;
 
 static WRITE8_HANDLER( pinkiri8_vram_w )
 {
-//	static UINT8 *vram = memory_region(space->machine, "vram");
+//  static UINT8 *vram = memory_region(space->machine, "vram");
 
 
 
@@ -386,22 +386,22 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 			//vram[(vram_addr) | (vram_bank << 16)] = data;
 			/*
 
-			if(vram_addr <= 0xffff)
-			{
-				static UINT16 datax,pal_offs;
-				static UINT8 r,g,b;
+            if(vram_addr <= 0xffff)
+            {
+                static UINT16 datax,pal_offs;
+                static UINT8 r,g,b;
 
-				pal_offs = vram_addr;
+                pal_offs = vram_addr;
 
-				datax = (vram[pal_offs & 0x1fff]) + (vram[(pal_offs & 0x1fff) | (0x2000)]<<8);
+                datax = (vram[pal_offs & 0x1fff]) + (vram[(pal_offs & 0x1fff) | (0x2000)]<<8);
 
-				r = ((datax)&0x001f)>>0;
-				g = ((datax)&0x03e0)>>5;
-				b = ((datax)&0x7c00)>>10;
+                r = ((datax)&0x001f)>>0;
+                g = ((datax)&0x03e0)>>5;
+                b = ((datax)&0x7c00)>>10;
 
-				palette_set_color_rgb(space->machine, pal_offs & 0x1fff, pal5bit(r), pal5bit(g), pal5bit(b));
-			}
-			*/
+                palette_set_color_rgb(space->machine, pal_offs & 0x1fff, pal5bit(r), pal5bit(g), pal5bit(b));
+            }
+            */
 
 			break;
 	}

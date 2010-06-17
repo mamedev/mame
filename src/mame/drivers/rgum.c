@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( rgum )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02,24000000/16)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(rgum_map)
-//	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+//  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

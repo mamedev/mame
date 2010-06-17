@@ -36,8 +36,8 @@ static VIDEO_UPDATE(kongambl)
 	bitmap_fill(bitmap, cliprect, 0);
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-//	k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 0);
-//	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);
+//  k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 0);
+//  k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
 	return 0;
@@ -70,11 +70,11 @@ static ADDRESS_MAP_START( kongambl_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)
 
-	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w) 
+	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram) 
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_long_w)
 

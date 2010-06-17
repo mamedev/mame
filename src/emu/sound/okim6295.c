@@ -6,32 +6,32 @@
 
 ****************************************************************************
 
-	Library to transcode from an ADPCM source to raw PCM.
-	Written by Buffoni Mirko in 08/06/97
-	References: various sources and documents.
+    Library to transcode from an ADPCM source to raw PCM.
+    Written by Buffoni Mirko in 08/06/97
+    References: various sources and documents.
 
-	R. Belmont 31/10/2003
-	Updated to allow a driver to use both MSM6295s and "raw" ADPCM voices 
-	(gcpinbal). Also added some error trapping for MAME_DEBUG builds
+    R. Belmont 31/10/2003
+    Updated to allow a driver to use both MSM6295s and "raw" ADPCM voices
+    (gcpinbal). Also added some error trapping for MAME_DEBUG builds
 
 ****************************************************************************
 
-	OKIM 6295 ADPCM chip:
+    OKIM 6295 ADPCM chip:
 
-	Command bytes are sent:
+    Command bytes are sent:
 
-	    1xxx xxxx = start of 2-byte command sequence, xxxxxxx is the sample 
-	                number to trigger
-	    abcd vvvv = second half of command; one of the abcd bits is set to 
-	                indicate which voice the v bits seem to be volumed
+        1xxx xxxx = start of 2-byte command sequence, xxxxxxx is the sample
+                    number to trigger
+        abcd vvvv = second half of command; one of the abcd bits is set to
+                    indicate which voice the v bits seem to be volumed
 
-	    0abc d000 = stop playing; one or more of the abcd bits is set to 
-	                indicate which voice(s)
+        0abc d000 = stop playing; one or more of the abcd bits is set to
+                    indicate which voice(s)
 
-	Status is read:
+    Status is read:
 
-	    ???? abcd = one bit per voice, set to 0 if nothing is playing, or 
-	                1 if it is active
+        ???? abcd = one bit per voice, set to 0 if nothing is playing, or
+                    1 if it is active
 
 ***************************************************************************/
 
@@ -118,7 +118,7 @@ device_t *okim6295_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -131,7 +131,7 @@ void okim6295_device_config::device_config_complete()
 
 
 //-------------------------------------------------
-//  memory_space_config - return a description of 
+//  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
 
@@ -364,7 +364,7 @@ void okim6295_device::data_write(UINT8 data)
 					else
 						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",tag(),m_command);
 				}
-				
+
 				// invalid samples go here
 				else
 				{

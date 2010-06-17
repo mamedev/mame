@@ -97,7 +97,7 @@ struct z80dart_interface
 
 // ======================> z80dart_device_config
 
-class z80dart_device_config : 	public device_config, 
+class z80dart_device_config :	public device_config,
 								public device_config_z80daisy_interface,
 								public z80dart_interface
 {
@@ -123,7 +123,7 @@ protected:
 
 // ======================> z80dart_device
 
-class z80dart_device : 	public device_t, 
+class z80dart_device :	public device_t,
 						public device_z80daisy_interface
 {
 	friend class z80dart_device_config;
@@ -140,10 +140,10 @@ public:
 	// data register access
 	UINT8 data_read(int which) { return m_channel[which].data_read(); }
 	void data_write(int which, UINT8 data) { return m_channel[which].data_write(data); }
-	
+
 	// put data on the input lines
 	void receive_data(int which, UINT8 data) { m_channel[which].receive_data(data); }
-	
+
 	// control line access
 	void cts_w(int which, int state) { m_channel[which].cts_w(state); }
 	void dcd_w(int which, int state) { m_channel[which].dcd_w(state); }
@@ -164,26 +164,26 @@ private:
 	// internal interrupt management
 	void check_interrupts();
 	void take_interrupt(int priority);
-	
+
 	// a single channel on the DART
 	class dart_channel
 	{
 		friend class z80dart_device;
-		
+
 	public:
 		dart_channel();
-		
+
 		void start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy);
 		void reset();
-	
+
 		UINT8 control_read();
 		void control_write(UINT8 data);
 
 		UINT8 data_read();
 		void data_write(UINT8 data);
-		
+
 		void receive_data(UINT8 data);
-		
+
 		void cts_w(int state);
 		void dcd_w(int state);
 		void ri_w(int state);
@@ -207,10 +207,10 @@ private:
 		static TIMER_CALLBACK( static_rxca_tick ) { reinterpret_cast<dart_channel *>(ptr)->rx_w(1); }
 		static TIMER_CALLBACK( static_txca_tick ) { reinterpret_cast<dart_channel *>(ptr)->tx_w(1); }
 		static TIMER_CALLBACK( static_rxtxcb_tick ) { reinterpret_cast<dart_channel *>(ptr)->rx_w(1); reinterpret_cast<dart_channel *>(ptr)->tx_w(1); }
-		
+
 		z80dart_device *m_device;
 		int	m_index;
-		
+
 		devcb_resolved_read_line	m_in_rxd_func;
 		devcb_resolved_write_line	m_out_txd_func;
 		devcb_resolved_write_line	m_out_dtr_func;
@@ -256,7 +256,7 @@ private:
 	// internal state
 	const z80dart_device_config &	m_config;
 	devcb_resolved_write_line		m_out_int_func;
-	dart_channel 					m_channel[2];		// channels
+	dart_channel					m_channel[2];		// channels
 	int 							m_int_state[8];		// interrupt state
 
 	// timers

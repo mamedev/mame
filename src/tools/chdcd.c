@@ -248,7 +248,7 @@ static void chdcd_tracksize_helper(int trknum, cdrom_toc *outtoc, chdcd_track_in
 		outtoc->tracks[trknum].frames = tlen;
 	}
 
-//	printf("track %d: %d frames\n", trknum, outtoc->tracks[trknum].frames);
+//  printf("track %d: %d frames\n", trknum, outtoc->tracks[trknum].frames);
 }
 
 /*-------------------------------------------------

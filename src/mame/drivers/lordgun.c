@@ -91,10 +91,10 @@ static DRIVER_INIT( aliencha )
 	rom[0x0AC92/2]	=	0x6012;		// 0AC92  beq.s   $ACA6
 	rom[0x124CC/2]	=	0x6012;		// 124CC  beq.s   $124E0
 	rom[0x12850/2]	=	0x6012;		// 12850  beq.s   $12864
-	rom[0x12C06/2]	=	0x6012;		// 12C06  beq.s   $12C1A 
+	rom[0x12C06/2]	=	0x6012;		// 12C06  beq.s   $12C1A
 	rom[0x1862A/2]	=	0x6012;		// 1862A  beq.s   $1863E
 	rom[0x189AE/2]	=	0x6012;		// 189AE  beq.s   $189C2
-	rom[0x18D64/2]	=	0x6012;		// 18D64  beq.s   $18D78 
+	rom[0x18D64/2]	=	0x6012;		// 18D64  beq.s   $18D78
 	rom[0x230FC/2]	=	0x6012;		// 230FC  beq.s   $23110
 	rom[0x23480/2]	=	0x6012;		// 23480  beq.s   $23494
 	rom[0x23836/2]	=	0x6012;		// 23836  beq.s   $2384A
@@ -115,10 +115,10 @@ static DRIVER_INIT( alienchac )
 	rom[0x0AC8A/2]	=	0x6012;		// 0AC8A  beq.s   $AC9E
 	rom[0x124B8/2]	=	0x6012;		// 124B8  beq.s   $124CC
 	rom[0x1283C/2]	=	0x6012;		// 1283C  beq.s   $12850
-	rom[0x12BF2/2]	=	0x6012;		// 12BF2  beq.s   $12C06 
+	rom[0x12BF2/2]	=	0x6012;		// 12BF2  beq.s   $12C06
 	rom[0x18616/2]	=	0x6012;		// 18616  beq.s   $1862A
 	rom[0x1899A/2]	=	0x6012;		// 1899A  beq.s   $189AE
-	rom[0x18D50/2]	=	0x6012;		// 18D50  beq.s   $18D64 
+	rom[0x18D50/2]	=	0x6012;		// 18D50  beq.s   $18D64
 	rom[0x230E8/2]	=	0x6012;		// 230E8  beq.s   $230FC
 	rom[0x2346C/2]	=	0x6012;		// 2346C  beq.s   $23480
 	rom[0x23822/2]	=	0x6012;		// 23822  beq.s   $23822
@@ -531,7 +531,7 @@ static INPUT_PORTS_START( aliencha )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "6" )
-//	PORT_DIPSETTING(    0x00, "6" )
+//  PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPNAME( 0x04, 0x04, "Vs. Rounds" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
@@ -582,8 +582,8 @@ static INPUT_PORTS_START( aliencha )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1          )	
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2          )  
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1          )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2          )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5        ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6        ) PORT_PLAYER(1)

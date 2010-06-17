@@ -975,7 +975,7 @@ device_t *timer_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -1046,7 +1046,7 @@ bool timer_device_config::device_validity_check(const game_driver &driver) const
 			error = true;
 			break;
 	}
-	
+
 	return error;
 }
 
@@ -1122,7 +1122,7 @@ void timer_device::device_reset()
 		case timer_device_config::TIMER_TYPE_SCANLINE:
 			if (m_screen == NULL)
 				fatalerror("timer '%s': unable to find screen '%s'\n", tag(), m_config.m_screen);
-		
+
 			// set the timer to to fire immediately
 			m_first_time = true;
 			timer_adjust_oneshot(m_timer, attotime_zero, m_config.m_param);

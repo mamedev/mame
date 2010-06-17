@@ -2126,7 +2126,7 @@ static ADDRESS_MAP_START( vortex_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE("discrete", invaders_audio_2_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
- 
+
 
 static INPUT_PORTS_START( vortex )
 	PORT_INCLUDE( sicv )
@@ -2153,7 +2153,7 @@ static INPUT_PORTS_START( vortex )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")	
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
@@ -2193,16 +2193,16 @@ static DRIVER_INIT( vortex )
 	{
 		UINT32 addr = x;
 		/*
-		A15	A14	A13		A0	A3	A9
-		0	0	0		I	I	I
-		0	0	1		I	I	I
-		0	1	0		N	N	N
-		0	1	1		N	I	I
-		1	0	0		N	I	I
-		1	0	1		N	I	I
-		1	1	0		N	I	I
-		1	1	1		N	I	I
-		*/
+        A15 A14 A13     A0  A3  A9
+        0   0   0       I   I   I
+        0   0   1       I   I   I
+        0   1   0       N   N   N
+        0   1   1       N   I   I
+        1   0   0       N   I   I
+        1   0   1       N   I   I
+        1   1   0       N   I   I
+        1   1   1       N   I   I
+        */
 		switch (x&0xE000) // inputs are A13 A14 A15
 		{
 			case 0x0000: case 0x2000: // A0 A3 A9
@@ -2215,14 +2215,14 @@ static DRIVER_INIT( vortex )
 				addr ^= 0x0208;
 				break;
 		/*
-			case 0x0000: case 0x2000: // A0 A3 A9
-				addr ^= 0x0001;
-				break;
-			case 0x4000:
-				addr ^= 0x0208;
-				break;
-			case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000:
-				break;*/
+            case 0x0000: case 0x2000: // A0 A3 A9
+                addr ^= 0x0001;
+                break;
+            case 0x4000:
+                addr ^= 0x0208;
+                break;
+            case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000:
+                break;*/
 		}
 		buf1[addr] = rom[x];
 	}

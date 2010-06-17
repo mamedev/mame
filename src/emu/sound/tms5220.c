@@ -1652,15 +1652,15 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 			tms->io_ready = 0;
 			update_ready_state(tms);
 			/* Now comes the complicated part: long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
-			Speak external mode: ~16 cycles
-			Command Mode:
-			SPK: ? cycles
-			SPKEXT: ? cycles 
-			RDBY: between 60 and 140 cycles
-			RB: ? cycles (80?)
-			RST: between 60 and 140 cycles
-			SET RATE (5220C only): ? cycles (probably ~16)
-			*/
+            Speak external mode: ~16 cycles
+            Command Mode:
+            SPK: ? cycles
+            SPKEXT: ? cycles
+            RDBY: between 60 and 140 cycles
+            RB: ? cycles (80?)
+            RST: between 60 and 140 cycles
+            SET RATE (5220C only): ? cycles (probably ~16)
+            */
 			// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
 			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 		}

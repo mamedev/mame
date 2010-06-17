@@ -172,7 +172,7 @@ device_t *z80sti_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -183,7 +183,7 @@ void z80sti_device_config::device_config_complete()
 	const z80sti_interface *intf = reinterpret_cast<const z80sti_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<z80sti_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

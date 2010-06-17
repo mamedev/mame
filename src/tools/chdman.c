@@ -1626,7 +1626,7 @@ static int do_extractcd(int argc, char *argv[], int param)
 			char modestr[16];
 
 			fprintf(outfile, "FILE \"%s\" BINARY\n", trackoutname);
-			
+
 			switch (toc->tracks[track].trktype)
 			{
 				case CD_TRACK_MODE1:

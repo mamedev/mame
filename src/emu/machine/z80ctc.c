@@ -105,7 +105,7 @@ device_t *z80ctc_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -116,7 +116,7 @@ void z80ctc_device_config::device_config_complete()
 	const z80ctc_interface *intf = reinterpret_cast<const z80ctc_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<z80ctc_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -154,7 +154,7 @@ void z80ctc_device::device_start()
 {
 	m_period16 = attotime_mul(ATTOTIME_IN_HZ(m_clock), 16);
 	m_period256 = attotime_mul(ATTOTIME_IN_HZ(m_clock), 256);
-	
+
 	// resolve callbacks
 	devcb_resolve_write_line(&m_intr, &m_config.m_intr, this);
 
@@ -250,7 +250,7 @@ int z80ctc_device::z80daisy_irq_ack()
 
 
 //-------------------------------------------------
-//  z80daisy_irq_reti - clear the interrupt 
+//  z80daisy_irq_reti - clear the interrupt
 //  pending state to allow other interrupts through
 //-------------------------------------------------
 

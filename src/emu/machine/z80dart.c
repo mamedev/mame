@@ -178,7 +178,7 @@ device_t *z80dart_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -189,7 +189,7 @@ void z80dart_device_config::device_config_complete()
 	const z80dart_interface *intf = reinterpret_cast<const z80dart_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<z80dart_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -234,7 +234,7 @@ void z80dart_device::device_start()
 {
 	// resolve callbacks
 	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
-	
+
 	m_channel[Z80DART_CH_A].start(this, Z80DART_CH_A, m_config.m_in_rxda_func, m_config.m_out_txda_func, m_config.m_out_dtra_func, m_config.m_out_rtsa_func, m_config.m_out_wrdya_func);
 	m_channel[Z80DART_CH_B].start(this, Z80DART_CH_B, m_config.m_in_rxdb_func, m_config.m_out_txdb_func, m_config.m_out_dtrb_func, m_config.m_out_rtsb_func, m_config.m_out_wrdyb_func);
 
@@ -457,7 +457,7 @@ z80dart_device::dart_channel::dart_channel()
 void z80dart_device::dart_channel::start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy)
 {
 	m_index = index;
-	
+
 	devcb_resolve_read_line(&m_in_rxd_func, &in_rxd, m_device);
 	devcb_resolve_write_line(&m_out_txd_func, &out_txd, m_device);
 	devcb_resolve_write_line(&m_out_dtr_func, &out_dtr, m_device);

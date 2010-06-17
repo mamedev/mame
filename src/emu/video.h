@@ -85,19 +85,19 @@ typedef void (*vblank_state_changed_func)(screen_device &device, void *param, bo
 class screen_device_config : public device_config
 {
 	friend class screen_device;
-	
+
 	// construction/destruction
 	screen_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
 public:
-	// allocators	
+	// allocators
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
 
 	// basic information getters
 	virtual const char *name() const { return "Video Screen"; }
 
-	// configuration readers	
+	// configuration readers
 	screen_type_enum screen_type() const { return m_type; }
 	int width() const { return m_width; }
 	int height() const { return m_height; }
@@ -137,7 +137,7 @@ private:
 	virtual bool device_validity_check(const game_driver &driver) const;
 
 	// configuration data
-	screen_type_enum 	m_type;						// type of screen
+	screen_type_enum	m_type;						// type of screen
 	int					m_width, m_height;			// default total width/height (HTOTAL, VTOTAL)
 	rectangle			m_visarea;					// default visible area (HBLANK end/start, VBLANK end/start)
 	bool				m_oldstyle_vblank_supplied;	// MDRV_SCREEN_VBLANK_TIME macro used
@@ -169,7 +169,7 @@ public:
 	int height() const { return m_height; }
 	const rectangle &visible_area() const { return m_visarea; }
 	bitmap_format format() const { return m_config.m_format; }
-	
+
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
 	void set_visible_area(int min_x, int max_x, int min_y, int max_y);
@@ -197,7 +197,7 @@ public:
 	void save_snapshot(mame_file *fp);
 	void register_vblank_callback(vblank_state_changed_func vblank_callback, void *param);
 	bitmap_t *alloc_compatible_bitmap(int width = 0, int height = 0) { return auto_bitmap_alloc(machine, (width == 0) ? m_width : width, (height == 0) ? m_height : height, m_config.m_format); }
-	
+
 	// internal to the video system
 	bool update_quads();
 	void update_burnin();
@@ -264,7 +264,7 @@ private:
 	struct callback_item
 	{
 		callback_item *				m_next;
-		vblank_state_changed_func 	m_callback;
+		vblank_state_changed_func	m_callback;
 		void *						m_param;
 	};
 	callback_item *			m_callback_list;		// list of VBLANK callbacks

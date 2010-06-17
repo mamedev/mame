@@ -52,12 +52,12 @@
 //**************************************************************************
 
 // suspension reasons for executing devices
-const UINT32 SUSPEND_REASON_HALT 		= 0x0001;	// HALT line set (or equivalent)
-const UINT32 SUSPEND_REASON_RESET 		= 0x0002;	// RESET line set (or equivalent)
-const UINT32 SUSPEND_REASON_SPIN 		= 0x0004;	// currently spinning
+const UINT32 SUSPEND_REASON_HALT		= 0x0001;	// HALT line set (or equivalent)
+const UINT32 SUSPEND_REASON_RESET		= 0x0002;	// RESET line set (or equivalent)
+const UINT32 SUSPEND_REASON_SPIN		= 0x0004;	// currently spinning
 const UINT32 SUSPEND_REASON_TRIGGER 	= 0x0008;	// waiting for a trigger
 const UINT32 SUSPEND_REASON_DISABLE 	= 0x0010;	// disabled (due to disable flag)
-const UINT32 SUSPEND_REASON_TIMESLICE 	= 0x0020;	// waiting for the next timeslice
+const UINT32 SUSPEND_REASON_TIMESLICE	= 0x0020;	// waiting for the next timeslice
 const UINT32 SUSPEND_ANY_REASON 		= ~0;		// all of the above
 
 
@@ -194,7 +194,7 @@ protected:
 class device_execute_interface : public device_interface
 {
 	friend class device_scheduler;
-	
+
 public:
 	// construction/destruction
 	device_execute_interface(running_machine &machine, const device_config &config, device_t &device);
@@ -247,7 +247,7 @@ public:
 	UINT32 cycles_to_clocks(UINT32 cycles) const { return m_execute_config.cycles_to_clocks(cycles); }
 	UINT32 min_cycles() const { return m_execute_config.min_cycles(); }
 	UINT32 max_cycles() const { return m_execute_config.max_cycles(); }
-	
+
 	// input line information getters
 	UINT32 input_lines() const { return m_execute_config.input_lines(); }
 	UINT32 default_irq_vector() const { return m_execute_config.default_irq_vector(); }
@@ -276,13 +276,13 @@ protected:
 	class device_input
 	{
 		static const int USE_STORED_VECTOR = 0xff000000;
-		
+
 	public:
 		device_input();
-		
+
 		void start(device_execute_interface *execute, int linenum);
 		void reset();
-		
+
 		void set_state_synced(int state, int vector = USE_STORED_VECTOR);
 		void set_vector(int vector) { m_stored_vector = vector; }
 		int default_irq_callback();
@@ -290,11 +290,11 @@ protected:
 		device_execute_interface *m_execute;// pointer to the execute interface
 		device_t *		m_device;			// pointer to our device
 		int				m_linenum;			// which input line we are
-		
+
 		INT32			m_stored_vector;	// most recently written vector
 		INT32			m_curvector;		// most recently processed vector
 		UINT8			m_curstate;			// most recently processed state
-		INT32			m_queue[32]; 		// queue of pending events
+		INT32			m_queue[32];		// queue of pending events
 		int				m_qindex;			// index within the queue
 
 	private:
@@ -311,11 +311,11 @@ protected:
 
 	// input states and IRQ callbacks
 	device_irq_callback		m_driver_irq;				// driver-specific IRQ callback
-	device_input			m_input[MAX_INPUT_LINES]; 	// data about inputs
+	device_input			m_input[MAX_INPUT_LINES];	// data about inputs
 	emu_timer *				m_timedint_timer;			// reference to this device's periodic interrupt timer
 
 	// these below are hacks to support multiple interrupts per frame
-	INT32					m_iloops; 					// number of interrupts remaining this frame
+	INT32					m_iloops;					// number of interrupts remaining this frame
 	emu_timer *				m_partial_frame_timer;		// the timer that triggers partial frame interrupts
 	attotime				m_partial_frame_period;		// the length of one partial frame for interrupt purposes
 
@@ -340,7 +340,7 @@ protected:
 	UINT8					m_divshift;					// right shift amount to fit the divisor into 32 bits
 	UINT32					m_cycles_per_second;		// cycles per second, adjusted for multipliers
 	attoseconds_t			m_attoseconds_per_cycle;	// attoseconds per adjusted clock cycle
-	
+
 private:
 	// callbacks
 	static void static_timed_trigger_callback(running_machine *machine, void *ptr, int param);

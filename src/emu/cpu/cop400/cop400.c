@@ -92,7 +92,7 @@ struct _cop400_state
     const address_space *program;
     const address_space *data;
     const address_space *io;
-    
+
     UINT8 featuremask;
 
 	/* registers */
@@ -1409,9 +1409,9 @@ static CPU_GET_INFO( cop400 )
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cop400);					break;
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop400);				break;
 		case CPUINFO_FCT_DISASSEMBLE:					/* set per-core */										break;
-//		case CPUINFO_FCT_VALIDITY_CHECK:				/* set per-core */										break;
-		case CPUINFO_FCT_IMPORT_STATE: 					info->import_state = CPU_IMPORT_STATE_NAME(cop400);		break;
-		case CPUINFO_FCT_EXPORT_STATE: 					info->export_state = CPU_EXPORT_STATE_NAME(cop400);		break;
+//      case CPUINFO_FCT_VALIDITY_CHECK:                /* set per-core */                                      break;
+		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(cop400);		break;
+		case CPUINFO_FCT_EXPORT_STATE:					info->export_state = CPU_EXPORT_STATE_NAME(cop400);		break;
 		case CPUINFO_FCT_EXPORT_STRING: 				info->export_string = CPU_EXPORT_STRING_NAME(cop400);	break;
 
 		/* --- the following bits of info are returned as pointers --- */
@@ -1443,7 +1443,7 @@ CPU_GET_INFO( cop410 )
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop410);						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop410);		break;
-//		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410);	break;
+//      case CPUINFO_FCT_VALIDITY_CHECK:                info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410); break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_512b);	break;
@@ -1501,7 +1501,7 @@ CPU_GET_INFO( cop420 )
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop420);						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop420);		break;
-//		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420);	break;
+//      case CPUINFO_FCT_VALIDITY_CHECK:                info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420); break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;
@@ -1528,7 +1528,7 @@ CPU_GET_INFO( cop421 )
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop421);						break;
-//		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
+//      case CPUINFO_FCT_VALIDITY_CHECK:                info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "COP421");								break;
@@ -1582,7 +1582,7 @@ CPU_GET_INFO( cop444 )
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop444);						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop444);		break;
-//		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop444);	break;
+//      case CPUINFO_FCT_VALIDITY_CHECK:                info->validity_check = CPU_VALIDITY_CHECK_NAME(cop444); break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;

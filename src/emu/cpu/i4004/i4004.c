@@ -450,7 +450,7 @@ static CPU_INIT( i4004 )
 		state->state_add(STATE_GENPC, "GENPC", cpustate->PC.w.l).mask(0x0fff).noshow();
 		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
 		state->state_add(I4004_A,     "A",     cpustate->A).mask(0x0f);
-		
+
 		astring tempstr;
 		for (int regnum = 0; regnum < 8; regnum++)
 			state->state_add(I4004_R01 + regnum, tempstr.format("R%X%X", regnum*2, regnum*2+1), cpustate->R[regnum]);

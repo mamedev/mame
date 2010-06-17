@@ -104,8 +104,8 @@ struct _cdrom_track_info
 	UINT32 postgap;		/* number of postgap frames */
 	UINT32 pgtype;		/* type of sectors in pregap */
 	UINT32 pgsub;		/* type of subchannel data in pregap */
-	UINT32 pgdatasize;	/* size of data in each sector of the pregap */ 
-	UINT32 pgsubsize;	/* size of subchannel data in each sector of the pregap */ 
+	UINT32 pgdatasize;	/* size of data in each sector of the pregap */
+	UINT32 pgsubsize;	/* size of subchannel data in each sector of the pregap */
 
 	/* fields used in MAME only */
 	UINT32 physframeofs;	/* frame number on the real CD this track starts at */

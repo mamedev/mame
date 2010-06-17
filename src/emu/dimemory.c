@@ -83,7 +83,7 @@ device_config_memory_interface::~device_config_memory_interface()
 
 
 //-------------------------------------------------
-//  memory_space_config - return configuration for 
+//  memory_space_config - return configuration for
 //  the given space by index, or NULL if the space
 //  does not exist
 //-------------------------------------------------
@@ -102,7 +102,7 @@ const address_space_config *device_config_memory_interface::memory_space_config(
 bool device_config_memory_interface::interface_process_token(UINT32 entrytype, const machine_config_token *&tokens)
 {
 	UINT32 data32;
-	
+
 	switch (entrytype)
 	{
 		// specify device address map
@@ -113,13 +113,13 @@ bool device_config_memory_interface::interface_process_token(UINT32 entrytype, c
 			m_address_map[data32] = TOKEN_GET_PTR(tokens, addrmap);
 			return true;
 	}
-	
+
 	return false;
 }
 
 
 //-------------------------------------------------
-//  interface_validity_check - perform validity 
+//  interface_validity_check - perform validity
 //  checks on the memory configuration
 //-------------------------------------------------
 
@@ -128,7 +128,7 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 	const device_config *devconfig = crosscast<const device_config *>(this);
 	bool detected_overlap = DETECT_OVERLAPPING_MEMORY ? false : true;
 	bool error = false;
-	
+
 	// loop over all address spaces
 	for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 	{
@@ -246,12 +246,12 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 				}
 
 				// make sure ports exist
-//				if ((entry->read.type == AMH_PORT && entry->read.tag != NULL && portlist.find(entry->read.tag) == NULL) ||
-//					(entry->write.type == AMH_PORT && entry->write.tag != NULL && portlist.find(entry->write.tag) == NULL))
-//				{
-//					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->read.tag);
-//					error = true;
-//				}
+//              if ((entry->read.type == AMH_PORT && entry->read.tag != NULL && portlist.find(entry->read.tag) == NULL) ||
+//                  (entry->write.type == AMH_PORT && entry->write.tag != NULL && portlist.find(entry->write.tag) == NULL))
+//              {
+//                  mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->read.tag);
+//                  error = true;
+//              }
 
 				// validate bank and share tags
 				if (entry->read.type == AMH_BANK && !validate_tag(&driver, "bank", entry->read.tag))
@@ -309,9 +309,9 @@ void device_memory_interface::set_address_space(int spacenum, const address_spac
 
 
 //-------------------------------------------------
-//  memory_translate - translate from logical to 
-//  phyiscal addresses; designed to be overridden 
-//  by the actual device implementation if address 
+//  memory_translate - translate from logical to
+//  phyiscal addresses; designed to be overridden
+//  by the actual device implementation if address
 //  translation is supported
 //-------------------------------------------------
 
@@ -323,10 +323,10 @@ bool device_memory_interface::memory_translate(int spacenum, int intention, offs
 
 
 //-------------------------------------------------
-//  memory_read - perform internal memory 
-//  operations that bypass the memory system; 
-//  designed to be overridden by the actual device 
-//  implementation if internal read operations are 
+//  memory_read - perform internal memory
+//  operations that bypass the memory system;
+//  designed to be overridden by the actual device
+//  implementation if internal read operations are
 //  handled by bypassing the memory system
 //-------------------------------------------------
 
@@ -338,10 +338,10 @@ bool device_memory_interface::memory_read(int spacenum, offs_t offset, int size,
 
 
 //-------------------------------------------------
-//  memory_write - perform internal memory 
-//  operations that bypass the memory system; 
-//  designed to be overridden by the actual device 
-//  implementation if internal write operations are 
+//  memory_write - perform internal memory
+//  operations that bypass the memory system;
+//  designed to be overridden by the actual device
+//  implementation if internal write operations are
 //  handled by bypassing the memory system
 //-------------------------------------------------
 
@@ -353,11 +353,11 @@ bool device_memory_interface::memory_write(int spacenum, offs_t offset, int size
 
 
 //-------------------------------------------------
-//  memory_readop - perform internal memory 
-//  operations that bypass the memory system; 
-//  designed to be overridden by the actual device 
-//  implementation if internal opcode fetching 
-//  operations are handled by bypassing the memory 
+//  memory_readop - perform internal memory
+//  operations that bypass the memory system;
+//  designed to be overridden by the actual device
+//  implementation if internal opcode fetching
+//  operations are handled by bypassing the memory
 //  system
 //-------------------------------------------------
 

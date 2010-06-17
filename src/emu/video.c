@@ -1726,7 +1726,7 @@ device_t *screen_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -1754,13 +1754,13 @@ void screen_device_config::device_config_complete()
 
 //-------------------------------------------------
 //  device_validity_check - verify device
-//	configuration
+//  configuration
 //-------------------------------------------------
 
 bool screen_device_config::device_validity_check(const game_driver &driver) const
 {
 	bool error = false;
-	
+
 	// sanity check dimensions
 	if (m_width <= 0 || m_height <= 0)
 	{
@@ -2212,7 +2212,7 @@ int screen_device::hpos() const
 
 //-------------------------------------------------
 //  time_until_pos - returns the amount of time
-//  remaining until the beam is at the given 
+//  remaining until the beam is at the given
 //  hpos,vpos
 //-------------------------------------------------
 
@@ -2273,7 +2273,7 @@ void screen_device::register_vblank_callback(vblank_state_changed_func vblank_ca
 	for (itemptr = &m_callback_list; *itemptr != NULL; itemptr = &(*itemptr)->m_next)
 		if ((*itemptr)->m_callback == vblank_callback)
 			break;
-	
+
 	// if not found, register
 	if (*itemptr == NULL)
 	{
@@ -2387,7 +2387,7 @@ bool screen_device::update_quads()
 				rectangle fixedvis = m_visarea;
 				fixedvis.max_x++;
 				fixedvis.max_y++;
-				
+
 				palette_t *palette = (m_texture_format == TEXFORMAT_PALETTE16) ? machine->palette : NULL;
 				render_texture_set_bitmap(m_texture[m_curbitmap], m_bitmap[m_curbitmap], &fixedvis, m_texture_format, palette);
 

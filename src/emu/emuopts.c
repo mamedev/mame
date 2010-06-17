@@ -160,7 +160,7 @@ const options_entry mame_core_options[] =
 	{ "skip_gameinfo",               "0",         OPTION_BOOLEAN,    "skip displaying the information screen at startup" },
 
 	/* image device options */
-	{ OPTION_ADDED_DEVICE_OPTIONS,	 "0",		  OPTION_BOOLEAN | OPTION_INTERNAL,	"image device-specific options have been added" },	
+	{ OPTION_ADDED_DEVICE_OPTIONS,	 "0",		  OPTION_BOOLEAN | OPTION_INTERNAL,	"image device-specific options have been added" },
 	{ NULL }
 };
 
@@ -201,7 +201,7 @@ static void mame_puts_error(const char *s)
 {
 	mame_printf_error("%s", s);
 }
-	
+
 /*-------------------------------------------------
     image_get_device_option - accesses a device
     option
@@ -249,14 +249,14 @@ void image_add_device_options(core_options *opts, const game_driver *driver)
 			options_add_entries(opts, entry);
 		}
 
-		/* retrieve info about the device instance */	
+		/* retrieve info about the device instance */
 		dev_full_name.printf("%s;%s", image->instance_name(), image->brief_instance_name());
 
 		/* add the option */
 		memset(entry, 0, sizeof(entry));
 		entry[0].name = dev_full_name;
 		options_add_entries(opts, entry);
-		
+
 		index++;
 	}
 
@@ -309,7 +309,7 @@ core_options *mame_options_init(const options_entry *entries)
 
 	/* we need to dynamically add options when the device name is parsed */
 	options_set_option_callback(opts, OPTION_GAMENAME, image_driver_name_callback);
-	
+
 #ifdef MESS
 	mess_options_init(opts);
 #endif /* MESS */

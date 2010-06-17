@@ -75,7 +75,7 @@ public:
 	device_nvram_interface(running_machine &machine, const device_config &config, device_t &device);
 	virtual ~device_nvram_interface();
 
-	// configuration access	
+	// configuration access
 	const device_config_nvram_interface &nvram_config() const { return m_nvram_config; }
 
 	// public accessors... for now

@@ -671,7 +671,7 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 			for (devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next())
 			{
 				printf("   %s ('%s')", devconfig->name(), devconfig->tag());
-				
+
 				UINT32 clock = devconfig->clock();
 				if (clock >= 1000000000)
 					printf(" @ %d.%02d GHz\n", clock / 1000000000, (clock / 10000000) % 100);
@@ -813,8 +813,8 @@ static int info_listmedia(core_options *options, const char *gamename)
 			{
 				src = downcast<const legacy_image_device_config_base *>(dev)->file_extensions();
 				name = downcast<const legacy_image_device_config_base *>(dev)->instance_name();
-				shortname = downcast<const legacy_image_device_config_base *>(dev)->brief_instance_name();					
-				
+				shortname = downcast<const legacy_image_device_config_base *>(dev)->brief_instance_name();
+
 				sprintf(paren_shortname, "(%s)", shortname);
 
 				printf("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
@@ -829,7 +829,7 @@ static int info_listmedia(core_options *options, const char *gamename)
 				}
 				printf("\n");
 			}
-			if (!devcount)			
+			if (!devcount)
 				printf("%-13s(none)\n",driver_name);
 
 			count++;

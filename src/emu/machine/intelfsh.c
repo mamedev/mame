@@ -266,7 +266,7 @@ UINT32 intelflash_read(int chip, UINT32 address)
 		break;
 	}
 
-//	logerror( "intelflash_read( %d, %08x ) %08x\n", chip, address, data );
+//  logerror( "intelflash_read( %d, %08x ) %08x\n", chip, address, data );
 
 	return data;
 }
@@ -281,7 +281,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 	}
 	c = &chips[ chip ];
 
-//	logerror( "intelflash_write( %d, %08x, %08x )\n", chip, address, data );
+//  logerror( "intelflash_write( %d, %08x, %08x )\n", chip, address, data );
 
 	switch( c->flash_mode )
 	{
@@ -443,13 +443,13 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 					UINT16 *flash_memory = (UINT16 *)c->flash_memory;
 					if (c->sector_is_4k)
 					{
-				 		memset( &flash_memory[ address & ~0x7ff ], 0xff, 4 * 1024 );
+						memset( &flash_memory[ address & ~0x7ff ], 0xff, 4 * 1024 );
 						c->erase_sector = address & ~0x7ff;
 						timer_adjust_oneshot( c->timer, ATTOTIME_IN_MSEC( 125 ), 0 );
 					}
 					else
 					{
-				 		memset( &flash_memory[ address & ~0x7fff ], 0xff, 64 * 1024 );
+						memset( &flash_memory[ address & ~0x7fff ], 0xff, 64 * 1024 );
 						c->erase_sector = address & ~0x7fff;
 						timer_adjust_oneshot( c->timer, ATTOTIME_IN_SEC( 1 ), 0 );
 					}

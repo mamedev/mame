@@ -11,8 +11,8 @@
 #define VTOTAL				((0x100-0x7c)*2)
 
 /* the following VBEND/VBSTART are used for compsync
- * #define VBEND				(0x08)
- * #define VBSTART				(0x100)
+ * #define VBEND                (0x08)
+ * #define VBSTART              (0x100)
  *
  * However VBSYQ (and INTQ) is generated using the following values:
  */

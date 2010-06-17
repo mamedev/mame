@@ -280,7 +280,7 @@ int mame_execute(core_options *options)
 			/* load the configuration settings and NVRAM */
 			settingsloaded = config_load_settings(machine);
 			nvram_load(machine);
- 			sound_mute(machine, FALSE);
+			sound_mute(machine, FALSE);
 
 			/* display the startup screens */
 			ui_display_startup_screens(machine, firstrun, !settingsloaded);
@@ -1335,7 +1335,7 @@ running_machine::~running_machine()
 
 //-------------------------------------------------
 //  describe_context - return a string describing
-//  which device is currently executing and its 
+//  which device is currently executing and its
 //  PC
 //-------------------------------------------------
 

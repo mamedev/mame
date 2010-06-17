@@ -48,7 +48,7 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 		if (tokens != NULL)
 			machine_config_detokenize(config, tokens, device);
 	}
-		
+
 	// then notify all devices that their configuration is complete
 	for (device_config *device = config->devicelist.first(); device != NULL; device = device->next())
 		device->config_complete();

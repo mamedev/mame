@@ -904,7 +904,7 @@ static void print_game_images(FILE *out, const game_driver *game, const machine_
 		fprintf(out, " name=\"%s\"", xml_normalize_string(name));
 		fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
 		fprintf(out, "/>\n");
-		
+
 		char *ext = strtok((char*)dev->file_extensions(),",");
 		while (ext != NULL)
 		{
@@ -912,7 +912,7 @@ static void print_game_images(FILE *out, const game_driver *game, const machine_
 			fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
 			fprintf(out, "/>\n");
 			ext = strtok (NULL, ",");
-		}		
+		}
 
 		fprintf(out, "\t\t</device>\n");
 	}

@@ -1132,8 +1132,8 @@ static DEVICE_RESET( tms5110 )
 	else
 	{
 		/* no dummy read! This makes bagman and ad2083 speech fail
-		 * with the new cycle and transition exact interfaces
-		 */
+         * with the new cycle and transition exact interfaces
+         */
 		tms->schedule_dummy_read = FALSE;
 	}
 	tms->addr_bit = 0;
@@ -1480,14 +1480,14 @@ WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w )
 		update_prom_cnt(tms);
 
 		/* the following is needed for ad2084.
-		 * It is difficult to derive the actual connections from
-		 * pcb pictures but the reset pin of the LS393 driving
-		 * the prom address line is connected somewhere.
-		 *
-		 * This does not affect bagman. It just simulates that a
-		 * write to ads3 is always happening when the four lower
-		 * counter bits are 0!
-		 */
+         * It is difficult to derive the actual connections from
+         * pcb pictures but the reset pin of the LS393 driving
+         * the prom address line is connected somewhere.
+         *
+         * This does not affect bagman. It just simulates that a
+         * write to ads3 is always happening when the four lower
+         * counter bits are 0!
+         */
 		if (state)
 			tms->prom_cnt &= 0x10;
 	}

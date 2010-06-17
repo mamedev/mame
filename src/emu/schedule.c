@@ -128,8 +128,8 @@ if (TEMPLOG)
 	printf("Timeslice loop: basetime=%15.6f\n", attotime_to_double(timerexec->basetime));
 	timer_print_first_timer(&m_machine);
 }
-		
-		
+
+
 		// by default, assume our target is the end of the next quantum
 		attotime target;
 		target.seconds = timerexec->basetime.seconds;
@@ -297,11 +297,11 @@ void device_scheduler::trigger(int trigid, attotime after)
 	// ensure we have a list of executing devices
 	if (m_execute_list == NULL)
 		rebuild_execute_list();
-	
+
 	// if we have a non-zero time, schedule a timer
 	if (after.attoseconds != 0 || after.seconds != 0)
 		timer_set(&m_machine, after, (void *)this, trigid, static_timed_trigger);
-	
+
 	// send the trigger to everyone who cares
 	else
 		for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
@@ -310,7 +310,7 @@ void device_scheduler::trigger(int trigid, attotime after)
 
 
 //-------------------------------------------------
-//  static_timed_trigger - generate a trigger 
+//  static_timed_trigger - generate a trigger
 //  after a given amount of time
 //-------------------------------------------------
 
@@ -331,7 +331,7 @@ void device_scheduler::compute_perfect_interleave()
 	if (m_execute_list == NULL)
 		rebuild_execute_list();
 
-	// start with the first one	
+	// start with the first one
 	device_execute_interface *first = m_execute_list;
 	if (first != NULL)
 	{
@@ -374,7 +374,7 @@ void device_scheduler::rebuild_execute_list()
 	{
 		// set the core scheduling quantum
 		attotime min_quantum = m_machine.config->minimum_quantum;
-	
+
 		// if none specified default to 60Hz
 		if (attotime_compare(min_quantum, attotime_zero) == 0)
 			min_quantum = ATTOTIME_IN_HZ(60);
@@ -385,7 +385,7 @@ void device_scheduler::rebuild_execute_list()
 			device_t *device = m_machine.device(m_machine.config->perfect_cpu_quantum);
 			if (device == NULL)
 				fatalerror("Device '%s' specified for perfect interleave is not present!", m_machine.config->perfect_cpu_quantum);
-			
+
 			device_execute_interface *exec;
 			if (!device->interface(exec))
 				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", m_machine.config->perfect_cpu_quantum);
@@ -393,7 +393,7 @@ void device_scheduler::rebuild_execute_list()
 			attotime cpu_quantum = attotime_make(0, exec->minimum_quantum());
 			min_quantum = attotime_min(cpu_quantum, min_quantum);
 		}
-		
+
 		// inform the timer system of our decision
 		assert(min_quantum.seconds == 0);
 		timer_add_scheduling_quantum(&m_machine, min_quantum.attoseconds, attotime_never);
@@ -404,7 +404,7 @@ if (TEMPLOG) printf("Setting quantum: %08X%08X\n", (UINT32)(min_quantum.attoseco
 	// start with an empty list
 	device_execute_interface **active_tailptr = &m_execute_list;
 	*active_tailptr = NULL;
-	
+
 	// also make an empty list of suspended devices
 	device_execute_interface *suspend_list = NULL;
 	device_execute_interface **suspend_tailptr = &suspend_list;
@@ -426,7 +426,7 @@ if (TEMPLOG) printf("Setting quantum: %08X%08X\n", (UINT32)(min_quantum.attoseco
 			suspend_tailptr = &exec->m_nextexec;
 		}
 	}
-	
+
 	// append the suspend list to the end of the active list
 	*active_tailptr = suspend_list;
 if (TEMPLOG)

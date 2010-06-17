@@ -654,7 +654,7 @@ static CPU_INIT( z8 )
 		state->state_add(Z8_T0,         "T0",        cpustate->t0);
 		state->state_add(Z8_T1,         "T1",        cpustate->t1);
 		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->r[Z8_REGISTER_FLAGS]).noshow().formatstr("%6s");
-		
+
 		astring tempstr;
 		for (int regnum = 0; regnum < 16; regnum++)
 			state->state_add(Z8_R0 + regnum, tempstr.format("R%d", regnum), cpustate->fake_r[regnum]).callimport().callexport();

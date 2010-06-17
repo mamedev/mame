@@ -51,7 +51,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-// the configuration for a general device 
+// the configuration for a general device
 enum device_space
 {
 	AS_PROGRAM = 0,
@@ -126,7 +126,7 @@ public:
 		  m_page_shift(0),
 		  m_internal_map(internal),
 		  m_default_map(defmap) { }
- 
+
 	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, const addrmap_token *internal = NULL, const addrmap_token *defmap = NULL)
 		: m_name(name),
 		  m_endianness(endian),
@@ -142,29 +142,29 @@ public:
 	{
 		return (m_addrbus_shift < 0) ? (address << -m_addrbus_shift) : (address >> m_addrbus_shift);
 	}
-	
+
 	inline offs_t addr2byte_end(offs_t address) const
 	{
 		return (m_addrbus_shift < 0) ? ((address << -m_addrbus_shift) | ((1 << -m_addrbus_shift) - 1)) : (address >> m_addrbus_shift);
 	}
- 
+
 	inline offs_t byte2addr(offs_t address) const
 	{
 		return (m_addrbus_shift > 0) ? (address << m_addrbus_shift) : (address >> -m_addrbus_shift);
 	}
-	
+
 	inline offs_t byte2addr_end(offs_t address) const
 	{
 		return (m_addrbus_shift > 0) ? ((address << m_addrbus_shift) | ((1 << -m_addrbus_shift) - 1)) : (address >> -m_addrbus_shift);
 	}
- 
- 	const char *		m_name;
-	endianness_t 		m_endianness;
-	UINT8 				m_databus_width;
-	UINT8 				m_addrbus_width;
-	INT8 				m_addrbus_shift;
-	UINT8 				m_logaddr_width;
-	UINT8 				m_page_shift;
+
+	const char *		m_name;
+	endianness_t		m_endianness;
+	UINT8				m_databus_width;
+	UINT8				m_addrbus_width;
+	INT8				m_addrbus_shift;
+	UINT8				m_logaddr_width;
+	UINT8				m_page_shift;
 	const addrmap_token *m_internal_map;
 	const addrmap_token *m_default_map;
 };
@@ -195,7 +195,7 @@ protected:
 	virtual bool interface_process_token(UINT32 entrytype, const machine_config_token *&tokens);
 	virtual bool interface_validity_check(const game_driver &driver) const;
 
-	const addrmap_token *	m_address_map[ADDRESS_SPACES]; // address maps for each address space 
+	const addrmap_token *	m_address_map[ADDRESS_SPACES]; // address maps for each address space
 };
 
 
@@ -205,7 +205,7 @@ protected:
 class device_memory_interface : public device_interface
 {
 	friend class device_scheduler;
-	
+
 public:
 	// construction/destruction
 	device_memory_interface(running_machine &machine, const device_config &config, device_t &device);
@@ -241,7 +241,7 @@ protected:
 
 	// configuration
 	const device_config_memory_interface &m_memory_config;	// reference to our device_config_execute_interface
-	const address_space *	m_addrspace[ADDRESS_SPACES]; // reported address spaces 
+	const address_space *	m_addrspace[ADDRESS_SPACES]; // reported address spaces
 };
 
 
@@ -265,7 +265,7 @@ inline device_memory_interface *device_memory(device_t *device)
 
 
 //-------------------------------------------------
-//  device_get_space - return a pointer to the 
+//  device_get_space - return a pointer to the
 //  given address space on this device
 //-------------------------------------------------
 
@@ -276,7 +276,7 @@ inline const address_space *device_get_space(device_t *device, int spacenum = 0)
 
 
 //-------------------------------------------------
-//  devconfig_get_space_config - return a pointer 
+//  devconfig_get_space_config - return a pointer
 //  to sthe given address space's configuration
 //-------------------------------------------------
 

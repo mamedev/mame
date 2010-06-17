@@ -875,7 +875,7 @@ static void mcs48_init(legacy_cpu_device *device, device_irq_callback irqcallbac
 		state->state_add(MCS48_TPRE,      "TPRE",      cpustate->prescaler).mask(0x1f);
 		state->state_add(MCS48_P1,        "P1",        cpustate->p1);
 		state->state_add(MCS48_P2,        "P2",        cpustate->p2);
-		
+
 		astring tempstr;
 		for (int regnum = 0; regnum < 8; regnum++)
 			state->state_add(MCS48_R0 + regnum, tempstr.format("R%d", regnum), cpustate->rtemp).callimport().callexport();

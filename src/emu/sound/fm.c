@@ -4212,7 +4212,7 @@ void ym2610_reset_chip(void *chip)
 
 	astring name;
 	running_device* dev = F2610->OPN.ST.device;
- 
+
 	/* setup PCM buffers again */
 	name.printf("%s",dev->tag());
 	F2610->pcmbuf   = (const UINT8 *)memory_region(dev->machine,name);

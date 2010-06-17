@@ -67,8 +67,8 @@ const int TM_SEARCH_TRANSFER	= 0x03;
 
 #define LOG 0
 
-#define REGNUM(_m, _s) 			(((_m)<<3) + (_s))
-#define GET_REGNUM(_r)	 		(&(_r) - &(WR0))
+#define REGNUM(_m, _s)			(((_m)<<3) + (_s))
+#define GET_REGNUM(_r)			(&(_r) - &(WR0))
 #define REG(_m, _s) 			m_regs[REGNUM(_m,_s)]
 #define WR0						REG(0, 0)
 #define WR1						REG(1, 0)
@@ -123,7 +123,7 @@ const int TM_SEARCH_TRANSFER	= 0x03;
 #define EOB_F_SET				(m_status &= ~0x20)
 #define EOB_F_CLEAR				(m_status |= 0x20)
 
-#define READY_ACTIVE_HIGH	 	((WR5>>3) & 0x01)
+#define READY_ACTIVE_HIGH		((WR5>>3) & 0x01)
 
 #define INTERRUPT_ENABLE		(WR3 & 0x20)
 #define INT_ON_MATCH			(INTERRUPT_CTRL & 0x01)
@@ -170,7 +170,7 @@ device_t *z80dma_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -317,14 +317,14 @@ int z80dma_device::z80daisy_irq_ack()
 	if (m_ip)
 	{
 	    if (LOG) logerror("Z80DMA '%s' Interrupt Acknowledge\n", tag());
-		
+
 		// clear interrupt pending flag
 		m_ip = 0;
 	    interrupt_check();
 
 		// set interrupt under service flag
 		m_ius = 1;
-		
+
 		// disable DMA
 		m_dma_enabled = 0;
 
@@ -338,7 +338,7 @@ int z80dma_device::z80daisy_irq_ack()
 
 
 //-------------------------------------------------
-//  z80daisy_irq_reti - clear the interrupt 
+//  z80daisy_irq_reti - clear the interrupt
 //  pending state to allow other interrupts through
 //-------------------------------------------------
 
@@ -563,14 +563,14 @@ void z80dma_device::timerproc()
 	{
 		m_dma_enabled = 0; //FIXME: Correct?
         m_status = 0x19;
-        
+
 		m_status |= !is_ready() << 1; // ready line status
-		
+
 		if(TRANSFER_MODE == TM_TRANSFER)     m_status |= 0x10;   // no match found
 
 		update_status();
 		if (LOG) logerror("Z80DMA '%s' End of Block\n", tag());
-        
+
 		if (INT_ON_END_OF_BLOCK)
         {
 			trigger_interrupt(INT_END_OF_BLOCK);
@@ -698,7 +698,7 @@ void z80dma_device::write(UINT8 data)
 			m_dma_enabled = 0;
 
 			WR6 = data;
-			
+
 
 			switch (data)
 			{

@@ -113,7 +113,7 @@ public:
 	device_image_interface(running_machine &machine, const device_config &config, device_t &device);
 	virtual ~device_image_interface();
 
-	// configuration access	
+	// configuration access
 	const device_config_image_interface &image_config() const { return m_image_config; }
 
 protected:

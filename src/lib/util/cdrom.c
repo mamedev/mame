@@ -569,7 +569,7 @@ const char *cdrom_get_type_string(UINT32 trktype)
 {
 	switch (trktype)
 	{
-	  	case CD_TRACK_MODE1:			return "MODE1";
+		case CD_TRACK_MODE1:			return "MODE1";
 		case CD_TRACK_MODE1_RAW:		return "MODE1_RAW";
 		case CD_TRACK_MODE2:			return "MODE2";
 		case CD_TRACK_MODE2_FORM1:		return "MODE2_FORM1";
@@ -668,7 +668,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 		}
 		else
 		{
-			err = chd_get_metadata(chd, CDROM_TRACK_METADATA2_TAG, toc->numtrks, metadata, sizeof(metadata), NULL, NULL, NULL); 
+			err = chd_get_metadata(chd, CDROM_TRACK_METADATA2_TAG, toc->numtrks, metadata, sizeof(metadata), NULL, NULL, NULL);
 			if (err != CHDERR_NONE)
 				break;
 			/* parse the metadata */

@@ -150,11 +150,11 @@ enum
 	IPT_TILT1,
 	IPT_TILT2,
 	IPT_TILT3,
-	IPT_TILT4,	
+	IPT_TILT4,
 
 	/* misc other digital inputs */
 	IPT_SERVICE,
-	IPT_TILT,	
+	IPT_TILT,
 	IPT_INTERLOCK,
 	IPT_VOLUME_UP,
 	IPT_VOLUME_DOWN,
@@ -732,7 +732,7 @@ class input_port_config
 public:
 	input_port_config(const char *tag);
 	~input_port_config();
-	
+
 	input_port_config *next() const { return m_next; }
 
 	input_port_config *			m_next;			/* pointer to next port */

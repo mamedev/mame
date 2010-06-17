@@ -109,7 +109,7 @@ void device_list::import_config_list(const device_config_list &list, running_mac
 {
 	// remember the machine for later use
 	m_machine = &machine;
-	
+
 	// append each device from the configuration list
 	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next())
 		append(devconfig->tag(), devconfig->alloc_device(*m_machine));
@@ -137,7 +137,7 @@ void device_list::start_all()
 	int numstarted = 0;
 	while (numstarted < devcount)
 	{
-		// iterate over devices and start them 
+		// iterate over devices and start them
 		int prevstarted = numstarted;
 		for (device_t *device = first(); device != NULL; device = device->next())
 			if (!device->started())
@@ -257,7 +257,7 @@ device_config_interface::~device_config_interface()
 
 
 //-------------------------------------------------
-//  interface_config_complete - perform any 
+//  interface_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -281,7 +281,7 @@ bool device_config_interface::interface_process_token(UINT32 entrytype, const ma
 
 //-------------------------------------------------
 //  interface_validity_check - default validation
-//  for a device after the configuration has been 
+//  for a device after the configuration has been
 //  constructed
 //-------------------------------------------------
 
@@ -332,7 +332,7 @@ device_config::~device_config()
 
 
 //-------------------------------------------------
-//  config_complete - called when the 
+//  config_complete - called when the
 //  configuration of a device is complete
 //-------------------------------------------------
 
@@ -341,7 +341,7 @@ void device_config::config_complete()
 	// first notify the interfaces
 	for (device_config_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
 		intf->interface_config_complete();
-	
+
 	// then notify the device itself
 	device_config_complete();
 }
@@ -373,7 +373,7 @@ void device_config::process_token(UINT32 entrytype, const machine_config_token *
 			m_static_config = TOKEN_GET_PTR(tokens, voidptr);
 			processed = true;
 			break;
-		
+
 		// provide inline device data packed into a 16-bit space
 		case MCONFIG_TOKEN_DEVICE_INLINE_DATA16:
 			TOKEN_UNGET_UINT32(tokens);
@@ -451,14 +451,14 @@ void device_config::process_token(UINT32 entrytype, const machine_config_token *
 			assert(!processed);
 			processed = true;
 		}
-	
+
 	// or it might be processed by the device itself
 	if (device_process_token(entrytype, tokens))
 	{
 		assert(!processed);
 		processed = true;
 	}
-	
+
 	// regardless, *somebody* must handle it
 	if (!processed)
 		throw emu_fatalerror("Unhandled token %d for device '%s'", entrytype, tag());
@@ -478,17 +478,17 @@ bool device_config::validity_check(const game_driver &driver) const
 	for (device_config_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
 		if (intf->interface_validity_check(driver))
 			error = true;
-	
+
 	// let the device itself validate
 	if (device_validity_check(driver))
 		error = true;
-	
+
 	return error;
 }
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -512,7 +512,7 @@ bool device_config::device_process_token(UINT32 entrytype, const machine_config_
 
 
 //-------------------------------------------------
-//  device_validity_check - validate a device after 
+//  device_validity_check - validate a device after
 //  the configuration has been constructed
 //-------------------------------------------------
 
@@ -536,7 +536,7 @@ const rom_entry *device_config::rom_region() const
 
 //-------------------------------------------------
 //  machine_config_tokens - return a pointer to
-//  a set of machine configuration tokens 
+//  a set of machine configuration tokens
 //  describing sub-devices for this device
 //-------------------------------------------------
 
@@ -819,17 +819,17 @@ void device_t::start()
 {
 	// populate the region field
 	m_region = m_machine.region(tag());
-	
+
 	// let the interfaces do their pre-work
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
 		intf->interface_pre_start();
-	
+
 	// remember the number of state registrations
 	int state_registrations = state_save_get_reg_count(machine);
-	
+
 	// start the device
 	device_start();
-	
+
 	// complain if nothing was registered by the device
 	state_registrations = state_save_get_reg_count(machine) - state_registrations;
 	device_execute_interface *exec;
@@ -844,11 +844,11 @@ void device_t::start()
 	// let the interfaces do their post-work
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
 		intf->interface_post_start();
-	
+
 	// force an update of the clock
 	notify_clock_changed();
 
-	// register our save states	
+	// register our save states
 	state_save_register_device_item(this, 0, m_clock);
 	state_save_register_device_item(this, 0, m_unscaled_clock);
 	state_save_register_device_item(this, 0, m_clock_scale);
@@ -867,7 +867,7 @@ void device_t::debug_setup()
 	// notify the interface
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
 		intf->interface_debug_setup();
-	
+
 	// notify the device
 	device_debug_setup();
 }
@@ -882,7 +882,7 @@ void device_t::reset()
 	// let the interfaces do their pre-work
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
 		intf->interface_pre_reset();
-	
+
 	// reset the device
 	device_reset();
 
@@ -902,7 +902,7 @@ void device_t::pre_save()
 	// notify the interface
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
 		intf->interface_pre_save();
-	
+
 	// notify the device
 	device_pre_save();
 }
@@ -918,7 +918,7 @@ void device_t::post_load()
 	// notify the interface
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
 		intf->interface_post_load();
-	
+
 	// notify the device
 	device_post_load();
 }

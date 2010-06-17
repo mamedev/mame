@@ -52,7 +52,7 @@
 //**************************************************************************
 
 const int MAX_OUTPUTS		= 4095;			// maximum number of outputs a sound chip can support
-const int ALL_OUTPUTS 		= MAX_OUTPUTS;	// special value indicating all outputs for the current chip
+const int ALL_OUTPUTS		= MAX_OUTPUTS;	// special value indicating all outputs for the current chip
 
 
 
@@ -108,7 +108,7 @@ public:
 	{
 	public:
 		sound_route(int output, int input, float gain, const char *target);
-	
+
 		sound_route *		m_next;				// pointer to next route
 		UINT32				m_output;			// output index, or ALL_OUTPUTS
 		UINT32				m_input;			// target input index
@@ -137,7 +137,7 @@ public:
 	device_sound_interface(running_machine &machine, const device_config &config, device_t &device);
 	virtual ~device_sound_interface();
 
-	// configuration access	
+	// configuration access
 	const device_config_sound_interface &sound_config() const { return m_sound_config; }
 
 protected:
@@ -152,7 +152,7 @@ protected:
 
 	int				m_outputs;					// number of outputs from this instance
 	sound_output	m_output[MAX_OUTPUTS];		// array of output information
-	
+
 	const device_config_sound_interface &m_sound_config;
 };
 

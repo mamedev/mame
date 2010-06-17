@@ -118,11 +118,11 @@ static READ8_HANDLER( pang_port5_r )
 	int bit = eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
-		bit 3 is checked before updating the palette so it really seems to be vblank.
-		bit 0 may be vblank (or vblank irq flag) related too, but I'm not sure.
-		Many games require two interrupts per frame and for these bits to toggle,
-		otherwise music doesn't work.
-	*/
+        bit 3 is checked before updating the palette so it really seems to be vblank.
+        bit 0 may be vblank (or vblank irq flag) related too, but I'm not sure.
+        Many games require two interrupts per frame and for these bits to toggle,
+        otherwise music doesn't work.
+    */
 	if (cpu_getiloops(space->cpu) & 1)
 		bit |= 0x01;
 

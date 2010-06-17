@@ -224,7 +224,7 @@ attotime timer_firetime(emu_timer *which);
 class timer_device_config : public device_config
 {
 	friend class timer_device;
-	
+
 	// construction/destruction
 	timer_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
@@ -235,7 +235,7 @@ public:
 
 	// basic information getters
 	virtual const char *name() const { return "Timer"; }
-	
+
 	// indexes to inline data
 	enum
 	{
@@ -264,7 +264,7 @@ private:
 	virtual bool device_validity_check(const game_driver &driver) const;
 
 	// configuration data
-	timer_type 				m_type;				// type of timer
+	timer_type				m_type;				// type of timer
 	timer_device_fired_func	m_callback;			// the timer's callback function
 	void *					m_ptr;				// the pointer parameter passed to the timer callback
 
@@ -286,7 +286,7 @@ private:
 class timer_device : public device_t
 {
 	friend class timer_device_config;
-	
+
 	// construction/destruction
 	timer_device(running_machine &_machine, const timer_device_config &config);
 
@@ -297,7 +297,7 @@ public:
 	bool enabled() const { return (timer_enabled(m_timer) != 0); }
 
 	// property setters
-	void set_param(int param) { assert(m_config.m_type == timer_device_config::TIMER_TYPE_GENERIC); timer_set_param(m_timer, param); }	
+	void set_param(int param) { assert(m_config.m_type == timer_device_config::TIMER_TYPE_GENERIC); timer_set_param(m_timer, param); }
 	void set_ptr(void *ptr) { m_ptr = ptr; }
 	void enable(bool enable = true) { timer_enable(m_timer, enable); }
 
@@ -323,7 +323,7 @@ private:
 	static TIMER_CALLBACK( static_scanline_timer_callback ) { reinterpret_cast<timer_device *>(ptr)->scanline_timer_callback(param); }
 	void scanline_timer_callback(int scanline);
 
-	// internal state	
+	// internal state
 	const timer_device_config &m_config;
 	emu_timer *		m_timer;			// the backing timer
 	void *			m_ptr;				// the pointer parameter passed to the timer callback

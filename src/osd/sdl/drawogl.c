@@ -117,7 +117,7 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 #define GL_DEPTH_COMPONENT32				0x81A7
 #endif
 
-//#define OLD_CODE	1
+//#define OLD_CODE  1
 
 #ifndef OLD_CODE
 #define HASH_SIZE		((1<<10)+1)

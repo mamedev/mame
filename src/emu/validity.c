@@ -596,7 +596,7 @@ static bool validate_display(int drivnum, const machine_config *config)
 	const game_driver *driver = drivers[drivnum];
 	bool palette_modes = false;
 	bool error = false;
-	
+
 	for (const screen_device_config *scrconfig = screen_first(*config); scrconfig != NULL; scrconfig = screen_next(scrconfig))
 		if (scrconfig->format() == BITMAP_FORMAT_INDEXED16)
 			palette_modes = true;

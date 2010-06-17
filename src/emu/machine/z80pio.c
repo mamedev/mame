@@ -82,7 +82,7 @@ device_t *z80pio_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -93,7 +93,7 @@ void z80pio_device_config::device_config_complete()
 	const z80pio_interface *intf = reinterpret_cast<const z80pio_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<z80pio_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -164,7 +164,7 @@ void z80pio_device::device_reset()
 int z80pio_device::z80daisy_irq_state()
 {
 	int state = 0;
-	
+
 	for (int index = PORT_A; index < PORT_COUNT; index++)
 	{
 		pio_port &port = m_port[index];
@@ -219,7 +219,7 @@ int z80pio_device::z80daisy_irq_ack()
 
 
 //-------------------------------------------------
-//  z80daisy_irq_reti - clear the interrupt 
+//  z80daisy_irq_reti - clear the interrupt
 //  pending state to allow other interrupts through
 //-------------------------------------------------
 
@@ -268,7 +268,7 @@ UINT8 z80pio_device::control_read()
 void z80pio_device::check_interrupts()
 {
 	int state = CLEAR_LINE;
-	
+
 	for (int index = PORT_A; index < PORT_COUNT; index++)
 		if (m_port[index].interrupt_signalled())
 			state = ASSERT_LINE;
@@ -318,7 +318,7 @@ void z80pio_device::pio_port::start(z80pio_device *device, int index, const devc
 {
 	m_device = device;
 	m_index = index;
-	
+
 	// resolve callbacks
 	devcb_resolve_read8(&m_in_p_func, &infunc, m_device);
 	devcb_resolve_write8(&m_out_p_func, &outfunc, m_device);
@@ -693,7 +693,7 @@ void z80pio_device::pio_port::control_write(UINT8 data)
 	case MASK: // interrupt mask
 		m_mask = data;
 		if (LOG) logerror("Z80PIO '%s' Port %c Mask: %02x\n", m_device->tag(), 'A' + m_index, data);
-		
+
 		// set interrupt enable
 		m_ie = BIT(m_icw, 7) ? true : false;
 		check_interrupts();

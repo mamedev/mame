@@ -344,7 +344,7 @@ void *naomibd_get_memory(running_device *device)
 offs_t naomibd_get_dmaoffset(running_device *device)
 {
 	offs_t result = 0;
-	
+
 	#if NAOMIBD_PRINTF_PROTECTION
         printf("DMA source %08x, flags %x\n", get_safe_token(device)->dma_offset, get_safe_token(device)->dma_offset_flags);
 	#endif

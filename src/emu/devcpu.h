@@ -281,12 +281,12 @@ enum
 #define cpu_adjust_icount					device_adjust_icount
 #define cpu_abort_timeslice					device_abort_timeslice
 
-#define cpu_triggerint 						device_triggerint
-#define cpu_set_input_line 					device_set_input_line
-#define cpu_set_input_line_vector 			device_set_input_line_vector
-#define cpu_set_input_line_and_vector 		device_set_input_line_and_vector
-#define cpu_set_irq_callback 				device_set_irq_callback
-#define cpu_spin_until_int 					device_spin_until_int
+#define cpu_triggerint						device_triggerint
+#define cpu_set_input_line					device_set_input_line
+#define cpu_set_input_line_vector			device_set_input_line_vector
+#define cpu_set_input_line_and_vector		device_set_input_line_and_vector
+#define cpu_set_irq_callback				device_set_irq_callback
+#define cpu_spin_until_int					device_spin_until_int
 
 #define cpu_get_address_space				device_get_space
 
@@ -403,9 +403,9 @@ union cpuinfo
 
 // ======================> cpu_device_config
 
-class cpu_device_config : 	public device_config, 
-							public device_config_execute_interface, 
-							public device_config_memory_interface, 
+class cpu_device_config :	public device_config,
+							public device_config_execute_interface,
+							public device_config_memory_interface,
 							public device_config_state_interface,
 							public device_config_disasm_interface
 {
@@ -431,7 +431,7 @@ public:
 	// allocators
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
-	
+
 	// basic information getters
 	virtual const char *name() const { return get_legacy_config_string(DEVINFO_STR_NAME); }
 	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
@@ -473,9 +473,9 @@ const device_type CPU = legacy_cpu_device_config::static_alloc_device_config;
 
 // ======================> cpu_device
 
-class cpu_device : 	public device_t, 
-					public device_execute_interface, 
-					public device_memory_interface, 
+class cpu_device :	public device_t,
+					public device_execute_interface,
+					public device_memory_interface,
 					public device_state_interface,
 					public device_disasm_interface
 {
@@ -509,29 +509,29 @@ public:
 	cpu_type cputype() const { return m_cpu_config.m_cputype; }
 
 	void *token() const { return m_token; }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_debug_setup();
-	
+
 	// device_execute_interface overrides
 	virtual void execute_run();
 	virtual void execute_burn(INT32 cycles);
 	virtual void execute_set_input(int inputnum, int state) { set_legacy_runtime_int(CPUINFO_INT_INPUT_STATE + inputnum, state); }
-	
+
 	// device_memory_interface overrides
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address);
 	virtual bool memory_read(int spacenum, offs_t offset, int size, UINT64 &value);
 	virtual bool memory_write(int spacenum, offs_t offset, int size, UINT64 value);
 	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
-	
+
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
-	
+
 	// device_disasm_interface overrides
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
@@ -545,9 +545,9 @@ protected:
 	// internal state
 	const legacy_cpu_device_config &m_cpu_config;		// reference to the config
 	void *					m_token;					// pointer to our state
-	
+
 	cpu_set_info_func		m_set_info;					// extracted legacy function pointers
-	cpu_execute_func		m_execute;					// 
+	cpu_execute_func		m_execute;					//
 	cpu_burn_func			m_burn;						//
 	cpu_translate_func		m_translate;				//
 	cpu_read_func			m_read;						//

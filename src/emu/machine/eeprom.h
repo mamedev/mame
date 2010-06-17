@@ -45,14 +45,14 @@
 
 struct eeprom_interface
 {
-	UINT8 		m_address_bits;			// EEPROM has 2^address_bits cells
-	UINT8 		m_data_bits;			// every cell has this many bits (8 or 16)
+	UINT8		m_address_bits;			// EEPROM has 2^address_bits cells
+	UINT8		m_data_bits;			// every cell has this many bits (8 or 16)
 	const char *m_cmd_read;				//   read command string, e.g. "0110"
 	const char *m_cmd_write;			//  write command string, e.g. "0111"
 	const char *m_cmd_erase;			//  erase command string, or 0 if n/a
 	const char *m_cmd_lock;				//   lock command string, or 0 if n/a
 	const char *m_cmd_unlock;			// unlock command string, or 0 if n/a
-	bool 		m_enable_multi_read;	// set to 1 to enable multiple values to be read from one read command
+	bool		m_enable_multi_read;	// set to 1 to enable multiple values to be read from one read command
 	int			m_reset_delay;			// number of times eeprom_read_bit() should return 0 after a reset,
 										// before starting to return 1.
 };
@@ -61,13 +61,13 @@ struct eeprom_interface
 
 // ======================> eeprom_device_config
 
-class eeprom_device_config : 	public device_config, 
-								public device_config_memory_interface, 
-								public device_config_nvram_interface, 
+class eeprom_device_config :	public device_config,
+								public device_config_memory_interface,
+								public device_config_nvram_interface,
 								public eeprom_interface
 {
 	friend class eeprom_device;
-	
+
 	// construction/destruction
 	eeprom_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
@@ -92,21 +92,21 @@ protected:
 	// device_config overrides
 	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
-	
+
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
 
 	// device-specific configuration
 	const UINT8 *				m_default_data;
 	int 						m_default_data_size;
-	UINT32 						m_default_value;
-	address_space_config  		m_space_config;
+	UINT32						m_default_value;
+	address_space_config		m_space_config;
 };
 
 
 // ======================> eeprom_device
 
-class eeprom_device : 	public device_t, 
+class eeprom_device :	public device_t,
 						public device_memory_interface,
 						public device_nvram_interface
 {
@@ -114,7 +114,7 @@ class eeprom_device : 	public device_t,
 
 	// construction/destruction
 	eeprom_device(running_machine &_machine, const eeprom_device_config &config);
-	
+
 public:
 	// I/O operations
 	void write_bit(int state);
@@ -126,7 +126,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// device_nvram_interface overrides
 	virtual void nvram_default();
 	virtual void nvram_read(mame_file &file);
@@ -142,7 +142,7 @@ protected:
 	const eeprom_device_config &m_config;
 
 	int 		m_serial_count;
-	UINT8 		m_serial_buffer[SERIAL_BUFFER_LENGTH];
+	UINT8		m_serial_buffer[SERIAL_BUFFER_LENGTH];
 	int 		m_data_bits;
 	int 		m_read_address;
 	int 		m_clock_count;

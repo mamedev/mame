@@ -535,7 +535,7 @@ static CPU_INIT( i8008 )
 		state->state_add(I8008_E,     "E",     cpustate->E);
 		state->state_add(I8008_H,     "H",     cpustate->H);
 		state->state_add(I8008_L,     "L",     cpustate->L);
-		
+
 		astring tempstr;
 		for (int addrnum = 0; addrnum < 8; addrnum++)
 			state->state_add(I8008_ADDR1 + addrnum, tempstr.format("ADDR%d", addrnum + 1), cpustate->ADDR[addrnum].w.l).mask(0xfff);

@@ -347,7 +347,7 @@ void nvram_load(running_machine *machine)
 		// close the file
 		mame_fclose(nvram_file);
 	}
-	
+
 	// otherwise, tell everyone to initialize their NVRAM areas
 	else
 	{

@@ -57,7 +57,7 @@ const UINT32 DASMFLAG_STEP_OUT		= 0x40000000;	// this instruction should be the 
 const UINT32 DASMFLAG_STEP_OVER		= 0x20000000;	// this instruction should be stepped over by setting a breakpoint afterwards
 const UINT32 DASMFLAG_OVERINSTMASK	= 0x18000000;	// number of extra instructions to skip when stepping over
 const UINT32 DASMFLAG_OVERINSTSHIFT	= 27;			// bits to shift after masking to get the value
-const UINT32 DASMFLAG_LENGTHMASK 	= 0x0000ffff;	// the low 16-bits contain the actual length
+const UINT32 DASMFLAG_LENGTHMASK	= 0x0000ffff;	// the low 16-bits contain the actual length
 
 
 
@@ -106,7 +106,7 @@ public:
 	device_disasm_interface(running_machine &machine, const device_config &config, device_t &device);
 	virtual ~device_disasm_interface();
 
-	// configuration access	
+	// configuration access
 	const device_config_disasm_interface &disasm_config() const { return m_disasm_config; }
 	UINT32 min_opcode_bytes() const { return m_disasm_config.min_opcode_bytes(); }
 	UINT32 max_opcode_bytes() const { return m_disasm_config.max_opcode_bytes(); }

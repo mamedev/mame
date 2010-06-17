@@ -283,11 +283,11 @@ static VIDEO_UPDATE(luckgrln)
 			if (clip.max_x>visarea.max_x) clip.max_x = visarea.max_x;
 
 			/*
-			  luck_vram1  tttt tttt   (t = low tile bits)
-			  luck_vram2  tttt ppp?   (t = high tile bits) (p = pal select)?
+              luck_vram1  tttt tttt   (t = low tile bits)
+              luck_vram2  tttt ppp?   (t = high tile bits) (p = pal select)?
 
 
-			 */
+             */
 
 			tile |= (tile_high & 0xf0) << 4;
 			if (tileattr & 0x02) tile |= 0x1000;
@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE(luckgrln_reel4_attr_w) AM_BASE(&reel4_attr)
 	AM_RANGE(0x0d600, 0x0d63f) AM_RAM AM_BASE(&reel4_scroll)
 
-//	AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
+//  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
 
 
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM // nvram

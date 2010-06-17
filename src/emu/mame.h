@@ -164,7 +164,7 @@ typedef void (*output_callback_func)(void *param, const char *format, va_list ar
 class region_info
 {
 	DISABLE_COPYING(region_info);
-	
+
 	running_machine *		machine;
 
 public:
@@ -267,7 +267,7 @@ public:
 
 	/* UI-related */
 	bool					ui_active;			/* ui active or not (useful for games / systems with keyboard inputs) */
-	
+
 	/* generic pointers */
 	generic_pointers		generic;			/* generic pointers */
 

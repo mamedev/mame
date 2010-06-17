@@ -13,7 +13,7 @@ class simpl156_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, simpl156_state(machine)); }
 
-	simpl156_state(running_machine &machine) 
+	simpl156_state(running_machine &machine)
 		: maincpu(machine.device<cpu_device>("maincpu")),
 		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
 		  eeprom(machine.device<eeprom_device>("eeprom")),

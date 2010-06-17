@@ -1032,7 +1032,7 @@ DEVICE_GET_INFO( mc6845 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc6845);	break;
-//		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(mc6845); break;
+//      case DEVINFO_FCT_VALIDITY_CHECK:                info->validity_check = DEVICE_VALIDITY_CHECK_NAME(mc6845); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Motorola 6845");			break;

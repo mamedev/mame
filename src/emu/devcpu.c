@@ -121,14 +121,14 @@ bool legacy_cpu_device_config::device_process_token(UINT32 entrytype, const mach
 			}
 			return true;
 	}
-		
+
 	// everything else goes to our parent
 	return device_config::device_process_token(entrytype, tokens);
 }
 
 
 //-------------------------------------------------
-//  execute_clocks_to_cycles - convert the raw 
+//  execute_clocks_to_cycles - convert the raw
 //  clock into cycles per second
 //-------------------------------------------------
 
@@ -136,16 +136,16 @@ UINT32 legacy_cpu_device_config::execute_clocks_to_cycles(UINT32 clocks) const
 {
 	UINT32 multiplier = get_legacy_config_int(CPUINFO_INT_CLOCK_MULTIPLIER);
 	UINT32 divider = get_legacy_config_int(CPUINFO_INT_CLOCK_DIVIDER);
-	
+
 	if (multiplier == 0) multiplier = 1;
 	if (divider == 0) divider = 1;
-	
+
 	return (clocks * multiplier + divider - 1) / divider;
 }
 
 
 //-------------------------------------------------
-//  execute_cycles_to_clocks - convert a cycle 
+//  execute_cycles_to_clocks - convert a cycle
 //  count back to raw clocks
 //-------------------------------------------------
 
@@ -153,10 +153,10 @@ UINT32 legacy_cpu_device_config::execute_cycles_to_clocks(UINT32 cycles) const
 {
 	UINT32 multiplier = get_legacy_config_int(CPUINFO_INT_CLOCK_MULTIPLIER);
 	UINT32 divider = get_legacy_config_int(CPUINFO_INT_CLOCK_DIVIDER);
-	
+
 	if (multiplier == 0) multiplier = 1;
 	if (divider == 0) divider = 1;
-	
+
 	return (cycles * divider + multiplier - 1) / multiplier;
 }
 
@@ -315,7 +315,7 @@ void legacy_cpu_device::device_start()
 				int colon = tempstr.chr(0, ':');
 				int length = tempstr.len() - colon - 1;
 				tempstr.substr(0, colon);
-				
+
 				astring formatstr;
 				formatstr.printf("%%%ds", length);
 				device_state_entry &entry = state_add(index, tempstr, m_state_io).callimport().callexport().formatstr(formatstr);
@@ -325,7 +325,7 @@ void legacy_cpu_device::device_start()
 		}
 		state_add(STATE_GENPC, "curpc", m_state_io).callimport().callexport().formatstr("%8s").noshow();
 		state_add(STATE_GENPCBASE, "curpcbase", m_state_io).callimport().callexport().formatstr("%8s").noshow();
-		
+
 		const char *string = get_legacy_runtime_string(CPUINFO_STR_FLAGS);
 		if (string != NULL && string[0] != 0)
 		{
@@ -377,7 +377,7 @@ void legacy_cpu_device::execute_burn(INT32 cycles)
 
 
 //-------------------------------------------------
-//  memory_translate - perform address translation 
+//  memory_translate - perform address translation
 //  on the provided address
 //-------------------------------------------------
 
@@ -390,7 +390,7 @@ bool legacy_cpu_device::memory_translate(int spacenum, int intention, offs_t &ad
 
 
 //-------------------------------------------------
-//  memory_read - read device memory, allowing for 
+//  memory_read - read device memory, allowing for
 //  device specific overrides
 //-------------------------------------------------
 
@@ -403,7 +403,7 @@ bool legacy_cpu_device::memory_read(int spacenum, offs_t offset, int size, UINT6
 
 
 //-------------------------------------------------
-//  memory_write - write device memory, allowing 
+//  memory_write - write device memory, allowing
 //  for device specific overrides
 //-------------------------------------------------
 
@@ -416,7 +416,7 @@ bool legacy_cpu_device::memory_write(int spacenum, offs_t offset, int size, UINT
 
 
 //-------------------------------------------------
-//  memory_read - read device opcode memory, 
+//  memory_read - read device opcode memory,
 //  allowing for device specific overrides
 //-------------------------------------------------
 
@@ -429,7 +429,7 @@ bool legacy_cpu_device::memory_readop(offs_t offset, int size, UINT64 &value)
 
 
 //-------------------------------------------------
-//  debug_setup - set up any device-specific 
+//  debug_setup - set up any device-specific
 //  debugging commands or state
 //-------------------------------------------------
 

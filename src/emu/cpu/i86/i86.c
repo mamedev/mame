@@ -466,7 +466,7 @@ static CPU_EXPORT_STRING( i8086 )
 		case I8086_GENSP:
 			string.printf("%04X:%04X", cpustate->sregs[SS] & 0xffff, cpustate->regs.w[SP] & 0xffff);
 			break;
-		
+
 		case STATE_GENFLAGS:
 			cpustate->flags = CompressFlags();
 			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",

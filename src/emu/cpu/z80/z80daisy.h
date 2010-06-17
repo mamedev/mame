@@ -90,7 +90,7 @@ protected:
 	{
 	public:
 		daisy_entry(device_t *device);
-		
+
 		daisy_entry *				m_next;			// next device
 		device_t *					m_device;		// associated device
 		device_z80daisy_interface *	m_interface;	// associated device's daisy interface

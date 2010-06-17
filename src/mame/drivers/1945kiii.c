@@ -53,7 +53,7 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, k3_state(machine)); }
 
 	k3_state(running_machine &machine)
-		: oki1(machine.device<okim6295_device>("oki1")), 
+		: oki1(machine.device<okim6295_device>("oki1")),
 		  oki2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */

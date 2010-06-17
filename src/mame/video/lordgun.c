@@ -232,7 +232,7 @@ float lordgun_crosshair_mapper(const input_field_config *field, float linear_val
 
 static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 {
-//	popmessage("%03x, %02x", input_port_read(machine, "LIGHT0_X"), input_port_read(machine, "LIGHT0_Y"));
+//  popmessage("%03x, %02x", input_port_read(machine, "LIGHT0_X"), input_port_read(machine, "LIGHT0_Y"));
 
 	int x = input_port_read(machine, gunnames[i]) - 0x3c;
 
@@ -423,7 +423,7 @@ VIDEO_UPDATE( lordgun )
 	if (layers_ctrl & 8)	tilemap_draw(bitmaps[3], cliprect, tilemap_3, 0, 0);
 	if (layers_ctrl & 16)	draw_sprites(screen->machine, bitmaps[4], cliprect);
 
-	// copy to screen bitmap 
+	// copy to screen bitmap
 
 	// priority code (3-7) -> layer index (0-3, 4 for sprites)
 	const int pri2layer[8] = {0,0,0,4,3,0,1,2};

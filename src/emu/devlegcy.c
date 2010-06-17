@@ -73,7 +73,7 @@ legacy_device_config_base::~legacy_device_config_base()
 
 //-------------------------------------------------
 //  get_legacy_config_int - return a legacy
-//	configuration parameter as an integer
+//  configuration parameter as an integer
 //-------------------------------------------------
 
 INT64 legacy_device_config_base::get_legacy_config_int(UINT32 state) const
@@ -86,7 +86,7 @@ INT64 legacy_device_config_base::get_legacy_config_int(UINT32 state) const
 
 //-------------------------------------------------
 //  get_legacy_config_ptr - return a legacy
-//	configuration parameter as a pointer
+//  configuration parameter as a pointer
 //-------------------------------------------------
 
 void *legacy_device_config_base::get_legacy_config_ptr(UINT32 state) const
@@ -99,7 +99,7 @@ void *legacy_device_config_base::get_legacy_config_ptr(UINT32 state) const
 
 //-------------------------------------------------
 //  get_legacy_config_fct - return a legacy
-//	configuration parameter as a function pointer
+//  configuration parameter as a function pointer
 //-------------------------------------------------
 
 genf *legacy_device_config_base::get_legacy_config_fct(UINT32 state) const
@@ -112,7 +112,7 @@ genf *legacy_device_config_base::get_legacy_config_fct(UINT32 state) const
 
 //-------------------------------------------------
 //  get_legacy_config_string - return a legacy
-//	configuration parameter as a string pointer
+//  configuration parameter as a string pointer
 //-------------------------------------------------
 
 const char *legacy_device_config_base::get_legacy_config_string(UINT32 state) const
@@ -248,7 +248,7 @@ legacy_memory_device_config_base::legacy_memory_device_config_base(const machine
 
 //-------------------------------------------------
 //  device_config_complete - update configuration
-//	based on completed device setup
+//  based on completed device setup
 //-------------------------------------------------
 
 void legacy_memory_device_config_base::device_config_complete()
@@ -365,8 +365,8 @@ const image_device_type_info legacy_image_device_config_base::m_device_info_arra
 		{ IO_MEMCARD,	"memcard",		"memc" }, /* 12 */
 		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
 		{ IO_MAGTAPE,	"magtape",		"magt" }, /* 14 */
-	};	
-	
+	};
+
 //-------------------------------------------------
 //  legacy_image_device_config_base - constructor
 //-------------------------------------------------
@@ -381,7 +381,7 @@ legacy_image_device_config_base::legacy_image_device_config_base(const machine_c
 
 //-------------------------------------------------
 //  device_config_complete - update configuration
-//	based on completed device setup
+//  based on completed device setup
 //-------------------------------------------------
 
 void legacy_image_device_config_base::device_config_complete()
@@ -390,10 +390,10 @@ void legacy_image_device_config_base::device_config_complete()
 	int count = 0;
 	int index = -1;
     image_device_format **formatptr;
-    image_device_format *format;	
+    image_device_format *format;
     formatptr = &m_formatlist;
     int cnt = 0;
-	
+
 	m_type = static_cast<iodevice_t>(get_legacy_config_int(DEVINFO_INT_IMAGE_TYPE));
 	m_readable = get_legacy_config_int(DEVINFO_INT_IMAGE_READABLE)!=0;
 	m_writeable = get_legacy_config_int(DEVINFO_INT_IMAGE_WRITEABLE)!=0;
@@ -401,37 +401,37 @@ void legacy_image_device_config_base::device_config_complete()
 	m_must_be_loaded = get_legacy_config_int(DEVINFO_INT_IMAGE_MUST_BE_LOADED)!=0;
 	m_reset_on_load = get_legacy_config_int(DEVINFO_INT_IMAGE_RESET_ON_LOAD)!=0;
 	m_has_partial_hash = get_legacy_config_int(DEVINFO_FCT_IMAGE_PARTIAL_HASH)!=0;
-		
+
 	m_interface_name = get_legacy_config_string(DEVINFO_STR_IMAGE_INTERFACE);
-	
-	m_file_extensions = get_legacy_config_string(DEVINFO_STR_IMAGE_FILE_EXTENSIONS);	
-	
+
+	m_file_extensions = get_legacy_config_string(DEVINFO_STR_IMAGE_FILE_EXTENSIONS);
+
 	load		 = reinterpret_cast<device_image_load_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_LOAD));
 	create		 = reinterpret_cast<device_image_create_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_CREATE));
 	unload		 = reinterpret_cast<device_image_unload_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_UNLOAD));
 	display	 = reinterpret_cast<device_image_display_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_DISPLAY));
 	partialhash = reinterpret_cast<device_image_partialhash_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
 	get_devices = reinterpret_cast<device_image_get_devices_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_GET_DEVICES));
-	
+
 	m_create_option_guide = reinterpret_cast<const option_guide *>(get_legacy_config_ptr(DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE));
-	
+
     int format_count = get_legacy_config_int(DEVINFO_INT_IMAGE_CREATE_OPTCOUNT);
-	
+
 	for (int i = 0; i < format_count; i++)
 	{
 		// only add if creatable
 		if (get_legacy_config_string(DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i)) {
-			// allocate a new format 
+			// allocate a new format
 			format = global_alloc_clear(image_device_format);
 
-			// populate it 
+			// populate it
 			format->m_index       = cnt;
 			format->m_name        = get_legacy_config_string(DEVINFO_STR_IMAGE_CREATE_OPTNAME + i);
 			format->m_description = get_legacy_config_string(DEVINFO_STR_IMAGE_CREATE_OPTDESC + i);
 			format->m_extensions  = get_legacy_config_string(DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i);
 			format->m_optspec     = get_legacy_config_string(DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
 
-			// and append it to the list 
+			// and append it to the list
 			*formatptr = format;
 			formatptr = &format->m_next;
 			cnt++;
@@ -442,14 +442,14 @@ void legacy_image_device_config_base::device_config_complete()
 	{
 		if (this == image)
 			index = count;
-		if (image->image_type_direct() == m_type)						
+		if (image->image_type_direct() == m_type)
 			count++;
-	}		
+	}
 	if (count > 1) {
 		m_instance_name.printf("%s%d", device_typename(m_type), index + 1);
 		m_brief_instance_name.printf("%s%d", device_brieftypename(m_type), index + 1);
 	}
-	else 
+	else
 	{
 		m_instance_name = device_typename(m_type);
 		m_brief_instance_name = device_brieftypename(m_type);
@@ -465,7 +465,7 @@ void legacy_image_device_config_base::device_config_complete()
 
 //-------------------------------------------------
 //  find_device_type - search trough list of
-//	device types to extact data
+//  device types to extact data
 //-------------------------------------------------
 
 const image_device_type_info *legacy_image_device_config_base::find_device_type(iodevice_t type)
@@ -474,7 +474,7 @@ const image_device_type_info *legacy_image_device_config_base::find_device_type(
 	for (i = 0; i < ARRAY_LENGTH(legacy_image_device_config_base::m_device_info_array); i++)
 	{
 		if (m_device_info_array[i].m_type == type)
-			return &m_device_info_array[i];			
+			return &m_device_info_array[i];
 	}
 	return NULL;
 }
@@ -491,7 +491,7 @@ const char *legacy_image_device_config_base::device_typename(iodevice_t type)
 
 //-------------------------------------------------
 //  device_brieftypename - retrieves device
-//	brief type name
+//  brief type name
 //-------------------------------------------------
 
 const char *legacy_image_device_config_base::device_brieftypename(iodevice_t type)
@@ -502,17 +502,17 @@ const char *legacy_image_device_config_base::device_brieftypename(iodevice_t typ
 
 //-------------------------------------------------
 //  uses_file_extension - update configuration
-//	based on completed device setup
+//  based on completed device setup
 //-------------------------------------------------
 
 bool legacy_image_device_config_base::uses_file_extension(const char *file_extension) const
 {
     bool result = FALSE;
-	
+
 	if (file_extension[0] == '.')
         file_extension++;
 
-	/* find the extensions */	
+	/* find the extensions */
 	char *ext = strtok((char*)m_file_extensions.cstr(),",");
 	while (ext != NULL)
 	{
@@ -522,7 +522,7 @@ bool legacy_image_device_config_base::uses_file_extension(const char *file_exten
             break;
         }
 		ext = strtok (NULL, ",");
-	}	
+	}
     return result;
 }
 
@@ -532,18 +532,18 @@ bool legacy_image_device_config_base::uses_file_extension(const char *file_exten
 
 legacy_image_device_config_base::~legacy_image_device_config_base()
 {
-    image_device_format **formatptr = &m_formatlist;	
-	
+    image_device_format **formatptr = &m_formatlist;
+
 	/* free all entries */
 	while (*formatptr != NULL)
 	{
 		image_device_format *entry = *formatptr;
 		*formatptr = entry->m_next;
-		global_free(entry);	
+		global_free(entry);
 	}
 }
 
-	
+
 //**************************************************************************
 //  LIVE LEGACY IMAGE DEVICE
 //**************************************************************************

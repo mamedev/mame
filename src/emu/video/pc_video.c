@@ -38,7 +38,7 @@ static STATE_POSTLOAD( pc_video_postload )
 
 
 
-void pc_video_start(running_machine *machine, 
+void pc_video_start(running_machine *machine,
 	pc_video_update_proc (*choosevideomode)(running_machine *machine, int *width, int *height),
 	size_t vramsize)
 {

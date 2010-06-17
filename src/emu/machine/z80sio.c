@@ -98,7 +98,7 @@ const int SIO_WR4_CLOCK_MODE_x64			=	0xc0;	//  11 = x64 clock mode
 const int SIO_WR4_SYNC_MODE_MASK			= 0x30;		// D5-D4 = Sync mode
 const int SIO_WR4_SYNC_MODE_8BIT			=	0x00;	//  00 = 8 bit sync character
 const int SIO_WR4_SYNC_MODE_16BIT			=	0x10;	//  01 = 16 bit sync character
-const int SIO_WR4_SYNC_MODE_SDLC			=	0x20;	//  10 = SDLC mode (01111110 flag) 
+const int SIO_WR4_SYNC_MODE_SDLC			=	0x20;	//  10 = SDLC mode (01111110 flag)
 const int SIO_WR4_SYNC_MODE_EXTERNAL		=	0x30;	//  11 = External sync mode
 const int SIO_WR4_STOPBITS_MASK				= 0x0c;		// D3-D2 = Stop bits
 const int SIO_WR4_STOPBITS_SYNC				=	0x00;	//  00 = Sync modes enable
@@ -121,7 +121,7 @@ const int SIO_WR5_CRC16_SDLC				= 0x04;		// D2 = CRC-16/SDLC
 const int SIO_WR5_RTS						= 0x02;		// D1 = RTS
 const int SIO_WR5_TX_CRC_ENABLE				= 0x01;		// D0 = Tx CRC enable
 
-// SIO write register 6 
+// SIO write register 6
 const int SIO_WR6_SYNC_7_0_MASK				= 0xff;		// D7-D0 = Sync bits 7-0
 
 // SIO write register 7
@@ -260,8 +260,8 @@ inline void z80sio_device::sio_channel::set_interrupt(int type)
 
 
 //-------------------------------------------------
-//  clear_interrupt - clear the given interrupt 
-//  state on this channel and update the overall 
+//  clear_interrupt - clear the given interrupt
+//  state on this channel and update the overall
 //  device state
 //-------------------------------------------------
 
@@ -323,7 +323,7 @@ device_t *z80sio_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any 
+//  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
@@ -334,7 +334,7 @@ void z80sio_device_config::device_config_complete()
 	const z80sio_interface *intf = reinterpret_cast<const z80sio_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<z80sio_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -454,7 +454,7 @@ int z80sio_device::z80daisy_irq_ack()
 
 
 //-------------------------------------------------
-//  z80daisy_irq_reti - clear the interrupt 
+//  z80daisy_irq_reti - clear the interrupt
 //  pending state to allow other interrupts through
 //-------------------------------------------------
 

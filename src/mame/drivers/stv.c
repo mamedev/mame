@@ -2525,14 +2525,14 @@ static TIMER_CALLBACK(stv_rtc_increment)
 	static int year_num, year_count;
 
 	/*
-		smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-	    smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-	    smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	    smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-	    smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-	    smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-   		smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
-	*/
+        smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
+        smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
+        smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+        smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+        smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+        smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+        smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+    */
 
 	smpc_ram[0x2f]++;
 
@@ -2583,9 +2583,9 @@ static TIMER_CALLBACK(stv_rtc_increment)
 
 	// probably not SO precise, here just for reference ...
 	/* year from 999 -> 1000 */
-	//if((smpc_ram[0x23] & 0x0f) >= 0x0a)				{ smpc_ram[0x23]+=0x10; smpc_ram[0x23]&=0xf0; }
+	//if((smpc_ram[0x23] & 0x0f) >= 0x0a)               { smpc_ram[0x23]+=0x10; smpc_ram[0x23]&=0xf0; }
 	/* year from 9999 -> 0 */
-	//if((smpc_ram[0x23] & 0xf0) >= 0xa0)				{ smpc_ram[0x23] = 0; } //roll over
+	//if((smpc_ram[0x23] & 0xf0) >= 0xa0)               { smpc_ram[0x23] = 0; } //roll over
 }
 
 static MACHINE_START( stv )

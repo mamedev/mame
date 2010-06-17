@@ -963,7 +963,7 @@ DEVICE_GET_INFO(cia6526r1)
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cia);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cia);		break;
-//		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(cia); break;
+//      case DEVINFO_FCT_VALIDITY_CHECK:                info->validity_check = DEVICE_VALIDITY_CHECK_NAME(cia); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "MOS6526 rev1");			break;

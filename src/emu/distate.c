@@ -44,26 +44,26 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const UINT64 device_state_entry::k_decimal_divisor[] = 
+const UINT64 device_state_entry::k_decimal_divisor[] =
 {
-	1, 
-	10, 
-	100, 
-	1000, 
-	10000, 
-	100000, 
-	1000000, 
-	10000000, 
-	100000000, 
+	1,
+	10,
+	100,
+	1000,
+	10000,
+	100000,
+	1000000,
+	10000000,
+	100000000,
 	1000000000,
-	U64(10000000000),			
-	U64(100000000000),			
+	U64(10000000000),
+	U64(100000000000),
 	U64(1000000000000),
-	U64(10000000000000),		
-	U64(100000000000000),		
+	U64(10000000000000),
+	U64(100000000000000),
 	U64(1000000000000000),
-	U64(10000000000000000), 	
-	U64(100000000000000000),	
+	U64(10000000000000000),
+	U64(100000000000000000),
 	U64(1000000000000000000),
 	U64(10000000000000000000)
 };
@@ -88,7 +88,7 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 	  m_default_format(true),
 	  m_sizemask(0)
 {
-	// set the data pointer	
+	// set the data pointer
 	m_dataptr.v = dataptr;
 
 	// convert the size to a mask
@@ -101,11 +101,11 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 		m_sizemask = 0xffffffff;
 	else
 		m_sizemask = ~U64(0);
-	
+
 	// default the data mask to the same
 	m_datamask = m_sizemask;
 	format_from_mask();
-	
+
 	// override well-known symbols
 	if (index == STATE_GENPC)
 		m_symbol.cpy("CURPC");
@@ -158,13 +158,13 @@ UINT64 device_state_entry::value() const
 
 //-------------------------------------------------
 //  format - return the value of the given
-//	pieces of indexed state as a string
+//  pieces of indexed state as a string
 //-------------------------------------------------
 
 astring &device_state_entry::format(astring &dest, const char *string, bool maxout) const
 {
 	UINT64 result = value();
-	
+
 	// parse the format
 	bool leadzero = false;
 	bool percent = false;
@@ -356,7 +356,7 @@ void device_state_entry::set_value(const char *string) const
 
 
 //-------------------------------------------------
-//  format_from_mask - make a format based on 
+//  format_from_mask - make a format based on
 //  the data mask
 //-------------------------------------------------
 
@@ -372,7 +372,7 @@ void device_state_entry::format_from_mask()
 		width++;
 	m_format.printf("%%0%dX", width);
 }
-	
+
 
 
 //**************************************************************************
@@ -428,7 +428,7 @@ device_state_interface::~device_state_interface()
 
 //-------------------------------------------------
 //  state_value - return the value of the given
-//	pieces of indexed state as a UINT64
+//  pieces of indexed state as a UINT64
 //-------------------------------------------------
 
 UINT64 device_state_interface::state_value(int index)
@@ -437,7 +437,7 @@ UINT64 device_state_interface::state_value(int index)
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == NULL)
 		return 0;
-	
+
 	// call the exporter before we do anything
 	if (entry->needs_export())
 		state_export(*entry);
@@ -449,7 +449,7 @@ UINT64 device_state_interface::state_value(int index)
 
 //-------------------------------------------------
 //  state_string - return the value of the given
-//	pieces of indexed state as a string
+//  pieces of indexed state as a string
 //-------------------------------------------------
 
 astring &device_state_interface::state_string(int index, astring &dest)
@@ -458,7 +458,7 @@ astring &device_state_interface::state_string(int index, astring &dest)
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == NULL)
 		return dest.cpy("???");
-	
+
 	// get the custom string if needed
 	astring custom;
 	if (entry->needs_custom_string())
@@ -489,7 +489,7 @@ int device_state_interface::state_string_max_length(int index)
 
 //-------------------------------------------------
 //  state_set_value - set the value of the given
-//	pieces of indexed state from a UINT64
+//  pieces of indexed state from a UINT64
 //-------------------------------------------------
 
 void device_state_interface::state_set_value(int index, UINT64 value)
@@ -498,7 +498,7 @@ void device_state_interface::state_set_value(int index, UINT64 value)
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == NULL)
 		return;
-	
+
 	// set the value
 	entry->set_value(value);
 
@@ -510,7 +510,7 @@ void device_state_interface::state_set_value(int index, UINT64 value)
 
 //-------------------------------------------------
 //  state_set_value - set the value of the given
-//	pieces of indexed state from a string
+//  pieces of indexed state from a string
 //-------------------------------------------------
 
 void device_state_interface::state_set_value(int index, const char *string)
@@ -519,7 +519,7 @@ void device_state_interface::state_set_value(int index, const char *string)
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == NULL)
 		return;
-	
+
 	// set the value
 	entry->set_value(string);
 
@@ -571,7 +571,7 @@ void device_state_interface::state_string_export(const device_state_entry &entry
 
 //-------------------------------------------------
 //  state_add - return the value of the given
-//	pieces of indexed state as a UINT64
+//  pieces of indexed state as a UINT64
 //-------------------------------------------------
 
 device_state_entry &device_state_interface::state_add(int index, const char *symbol, void *data, UINT8 size)
@@ -579,7 +579,7 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 	// assert validity of incoming parameters
 	assert(size == 1 || size == 2 || size == 4 || size == 8);
 	assert(symbol != NULL);
-	
+
 	// allocate new entry
 	device_state_entry *entry = auto_alloc(&m_machine, device_state_entry(index, symbol, data, size));
 
@@ -587,11 +587,11 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 	device_state_entry **tailptr;
 	for (tailptr = &m_state_list; *tailptr != NULL; tailptr = &(*tailptr)->m_next) ;
 	*tailptr = entry;
-	
+
 	// set the fast entry if applicable
 	if (index >= k_fast_state_min && index <= k_fast_state_max)
 		m_fast_state[index - k_fast_state_min] = entry;
-	
+
 	return *entry;
 }
 
@@ -606,12 +606,12 @@ const device_state_entry *device_state_interface::state_find_entry(int index)
 	// use fast lookup if possible
 	if (index >= k_fast_state_min && index <= k_fast_state_max)
 		return m_fast_state[index - k_fast_state_min];
-	
+
 	// otherwise, scan the first
 	for (const device_state_entry *entry = m_state_list; entry != NULL; entry = entry->m_next)
 		if (entry->m_index == index)
 			return entry;
-	
+
 	// handle failure by returning NULL
 	return NULL;
 }

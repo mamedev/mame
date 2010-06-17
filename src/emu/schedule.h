@@ -68,15 +68,15 @@
 class device_scheduler
 {
 	friend class device_execute_interface;
-	
+
 public:
 	device_scheduler(running_machine &machine);
 	~device_scheduler();
-	
+
 	void timeslice();
-	
+
 	void trigger(int trigid, attotime after = attotime_zero);
-	
+
 	void boost_interleave(attotime timeslice_time, attotime boost_duration);
 	void abort_timeslice();
 
@@ -84,7 +84,7 @@ public:
 
 	// for timer system only!
 	attotime override_local_time(attotime default_time);
-	
+
 	// for emergencies only!
 	void eat_all_cycles();
 

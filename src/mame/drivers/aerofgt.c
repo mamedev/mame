@@ -126,10 +126,10 @@ static WRITE16_DEVICE_HANDLER( pspikesb_oki_banking_w )
 static WRITE16_DEVICE_HANDLER( aerfboo2_okim6295_banking_w )
 {
 //  if(ACCESSING_BITS_8_15)
-//	{
-//		okim6295_device *oki = downcast<okim6295_device *>(device);
+//  {
+//      okim6295_device *oki = downcast<okim6295_device *>(device);
 //      oki->set_bank_base(0x40000 * ((data & 0xf00)>>8));
-//	}
+//  }
 }
 
 static WRITE8_HANDLER( aerfboot_okim6295_banking_w )

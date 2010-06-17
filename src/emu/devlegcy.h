@@ -53,87 +53,87 @@
 // state constants passed to the device_get_config_func
 enum
 {
-	// --- the following bits of info are returned as 64-bit signed integers --- 
+	// --- the following bits of info are returned as 64-bit signed integers ---
 	DEVINFO_INT_FIRST = 0x00000,
 
-		DEVINFO_INT_TOKEN_BYTES = DEVINFO_INT_FIRST,	// R/O: bytes to allocate for the token 
-		DEVINFO_INT_INLINE_CONFIG_BYTES,				// R/O: bytes to allocate for the inline configuration 
+		DEVINFO_INT_TOKEN_BYTES = DEVINFO_INT_FIRST,	// R/O: bytes to allocate for the token
+		DEVINFO_INT_INLINE_CONFIG_BYTES,				// R/O: bytes to allocate for the inline configuration
 
-		DEVINFO_INT_ENDIANNESS,							// R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE 
-		DEVINFO_INT_DATABUS_WIDTH,						// R/O: data bus size for each address space (8,16,32,64) 
+		DEVINFO_INT_ENDIANNESS,							// R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE
+		DEVINFO_INT_DATABUS_WIDTH,						// R/O: data bus size for each address space (8,16,32,64)
 		DEVINFO_INT_DATABUS_WIDTH_0 = DEVINFO_INT_DATABUS_WIDTH + 0,
 		DEVINFO_INT_DATABUS_WIDTH_1 = DEVINFO_INT_DATABUS_WIDTH + 1,
 		DEVINFO_INT_DATABUS_WIDTH_2 = DEVINFO_INT_DATABUS_WIDTH + 2,
 		DEVINFO_INT_DATABUS_WIDTH_3 = DEVINFO_INT_DATABUS_WIDTH + 3,
 		DEVINFO_INT_DATABUS_WIDTH_LAST = DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
-		DEVINFO_INT_ADDRBUS_WIDTH,						// R/O: address bus size for each address space (12-32) 
+		DEVINFO_INT_ADDRBUS_WIDTH,						// R/O: address bus size for each address space (12-32)
 		DEVINFO_INT_ADDRBUS_WIDTH_0 = DEVINFO_INT_ADDRBUS_WIDTH + 0,
 		DEVINFO_INT_ADDRBUS_WIDTH_1 = DEVINFO_INT_ADDRBUS_WIDTH + 1,
 		DEVINFO_INT_ADDRBUS_WIDTH_2 = DEVINFO_INT_ADDRBUS_WIDTH + 2,
 		DEVINFO_INT_ADDRBUS_WIDTH_3 = DEVINFO_INT_ADDRBUS_WIDTH + 3,
 		DEVINFO_INT_ADDRBUS_WIDTH_LAST = DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
-		DEVINFO_INT_ADDRBUS_SHIFT,						// R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) 
+		DEVINFO_INT_ADDRBUS_SHIFT,						// R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1)
 		DEVINFO_INT_ADDRBUS_SHIFT_0 = DEVINFO_INT_ADDRBUS_SHIFT + 0,
 		DEVINFO_INT_ADDRBUS_SHIFT_1 = DEVINFO_INT_ADDRBUS_SHIFT + 1,
 		DEVINFO_INT_ADDRBUS_SHIFT_2 = DEVINFO_INT_ADDRBUS_SHIFT + 2,
 		DEVINFO_INT_ADDRBUS_SHIFT_3 = DEVINFO_INT_ADDRBUS_SHIFT + 3,
 		DEVINFO_INT_ADDRBUS_SHIFT_LAST = DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
 
-	DEVINFO_INT_CLASS_SPECIFIC = 0x04000,				// R/W: device-specific values start here 
-	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				// R/W: device-specific values start here 
+	DEVINFO_INT_CLASS_SPECIFIC = 0x04000,				// R/W: device-specific values start here
+	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				// R/W: device-specific values start here
 	DEVINFO_INT_LAST = 0x0ffff,
 
-	// --- the following bits of info are returned as pointers --- 
+	// --- the following bits of info are returned as pointers ---
 	DEVINFO_PTR_FIRST = 0x10000,
 
-		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		// R/O: pointer to device-specific ROM region 
-		DEVINFO_PTR_MACHINE_CONFIG,						// R/O: pointer to device-specific machine config 
+		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		// R/O: pointer to device-specific ROM region
+		DEVINFO_PTR_MACHINE_CONFIG,						// R/O: pointer to device-specific machine config
 
-		DEVINFO_PTR_INTERNAL_MEMORY_MAP,				// R/O: const addrmap_token *map 
+		DEVINFO_PTR_INTERNAL_MEMORY_MAP,				// R/O: const addrmap_token *map
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_0 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 0,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_1 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 1,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_2 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 2,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_3 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 3,
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_LAST = DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
 
-		DEVINFO_PTR_DEFAULT_MEMORY_MAP,					// R/O: const addrmap_token *map 
+		DEVINFO_PTR_DEFAULT_MEMORY_MAP,					// R/O: const addrmap_token *map
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_0 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 0,
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_1 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 1,
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_2 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 2,
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_3 = DEVINFO_PTR_DEFAULT_MEMORY_MAP + 3,
 		DEVINFO_PTR_DEFAULT_MEMORY_MAP_LAST = DEVINFO_PTR_DEFAULT_MEMORY_MAP + ADDRESS_SPACES - 1,
 
-	DEVINFO_PTR_CLASS_SPECIFIC = 0x14000,				// R/W: device-specific values start here 
-	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				// R/W: device-specific values start here 
+	DEVINFO_PTR_CLASS_SPECIFIC = 0x14000,				// R/W: device-specific values start here
+	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				// R/W: device-specific values start here
 	DEVINFO_PTR_LAST = 0x1ffff,
 
-	// --- the following bits of info are returned as pointers to functions --- 
+	// --- the following bits of info are returned as pointers to functions ---
 	DEVINFO_FCT_FIRST = 0x20000,
 
-		DEVINFO_FCT_START = DEVINFO_FCT_FIRST,			// R/O: device_start_func 
-		DEVINFO_FCT_STOP,								// R/O: device_stop_func 
-		DEVINFO_FCT_RESET,								// R/O: device_reset_func 
-		DEVINFO_FCT_EXECUTE,							// R/O: device_execute_func 
-		DEVINFO_FCT_NVRAM,								// R/O: device_nvram_func 
+		DEVINFO_FCT_START = DEVINFO_FCT_FIRST,			// R/O: device_start_func
+		DEVINFO_FCT_STOP,								// R/O: device_stop_func
+		DEVINFO_FCT_RESET,								// R/O: device_reset_func
+		DEVINFO_FCT_EXECUTE,							// R/O: device_execute_func
+		DEVINFO_FCT_NVRAM,								// R/O: device_nvram_func
 		DEVINFO_FCT_VALIDITY_CHECK,						// R/O: device_validity_check_func
 
-	DEVINFO_FCT_CLASS_SPECIFIC = 0x24000,				// R/W: device-specific values start here 
-	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				// R/W: device-specific values start here 
+	DEVINFO_FCT_CLASS_SPECIFIC = 0x24000,				// R/W: device-specific values start here
+	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				// R/W: device-specific values start here
 	DEVINFO_FCT_LAST = 0x2ffff,
 
-	// --- the following bits of info are returned as NULL-terminated strings --- 
+	// --- the following bits of info are returned as NULL-terminated strings ---
 	DEVINFO_STR_FIRST = 0x30000,
 
-		DEVINFO_STR_NAME = DEVINFO_STR_FIRST,			// R/O: name of the device 
-		DEVINFO_STR_FAMILY,								// R/O: family of the device 
-		DEVINFO_STR_VERSION,							// R/O: version of the device 
-		DEVINFO_STR_SOURCE_FILE,						// R/O: file containing the device implementation 
-		DEVINFO_STR_CREDITS,							// R/O: credits for the device implementation 
+		DEVINFO_STR_NAME = DEVINFO_STR_FIRST,			// R/O: name of the device
+		DEVINFO_STR_FAMILY,								// R/O: family of the device
+		DEVINFO_STR_VERSION,							// R/O: version of the device
+		DEVINFO_STR_SOURCE_FILE,						// R/O: file containing the device implementation
+		DEVINFO_STR_CREDITS,							// R/O: credits for the device implementation
 
-	DEVINFO_STR_CLASS_SPECIFIC = 0x34000,				// R/W: device-specific values start here 
-	DEVINFO_STR_DEVICE_SPECIFIC = 0x38000,				// R/W: device-specific values start here 
+	DEVINFO_STR_CLASS_SPECIFIC = 0x34000,				// R/W: device-specific values start here
+	DEVINFO_STR_DEVICE_SPECIFIC = 0x38000,				// R/W: device-specific values start here
 	DEVINFO_STR_LAST = 0x3ffff,
-	
+
     /* --- image device related --- */
 	/* --- the following bits of info are returned as integers --- */
     DEVINFO_INT_IMAGE_FIRST = DEVINFO_INT_FIRST + 0x7000,
@@ -178,16 +178,16 @@ enum
 //**************************************************************************
 
 // macro for declaring the configuration and device classes of a legacy device
-#define _DECLARE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass) 		\
+#define _DECLARE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass)		\
 																				\
-DEVICE_GET_INFO( basename ); 													\
+DEVICE_GET_INFO( basename );													\
 																				\
 class configclass;																\
 																				\
 class deviceclass : public basedeviceclass										\
 {																				\
 	friend class configclass;													\
-	deviceclass(running_machine &_machine, const configclass &config); 			\
+	deviceclass(running_machine &_machine, const configclass &config);			\
 };																				\
 																				\
 class configclass : public baseconfigclass										\
@@ -202,9 +202,9 @@ public:																			\
 const device_type name = configclass::static_alloc_device_config
 
 // macro for defining the implementation needed for configuration and device classes
-#define _DEFINE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass) 		\
+#define _DEFINE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass)		\
 																				\
-deviceclass::deviceclass(running_machine &_machine, const configclass &config) 	\
+deviceclass::deviceclass(running_machine &_machine, const configclass &config)	\
 		: basedeviceclass(_machine, config)										\
 	{																			\
 	}																			\
@@ -221,7 +221,7 @@ device_config *configclass::static_alloc_device_config(const machine_config &mco
 																				\
 device_t *configclass::alloc_device(running_machine &machine) const 			\
 {																				\
-	return pool_alloc(machine_get_pool(machine), deviceclass(machine, *this)); 	\
+	return pool_alloc(machine_get_pool(machine), deviceclass(machine, *this));	\
 }
 
 // reduced macros that are easier to use, and map to the above two macros
@@ -394,29 +394,29 @@ typedef void (*device_image_display_func)(device_t *image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
 typedef void (*device_image_get_devices_func)(device_t *device);
 
-// the actual deviceinfo union 
+// the actual deviceinfo union
 union deviceinfo
 {
-	INT64					i;							// generic integers 
-	void *					p;							// generic pointers 
-	genf *  				f;							// generic function pointers 
-	char *					s;							// generic strings 
+	INT64					i;							// generic integers
+	void *					p;							// generic pointers
+	genf *  				f;							// generic function pointers
+	char *					s;							// generic strings
 
-	device_start_func		start;						// DEVINFO_FCT_START 
-	device_stop_func		stop;						// DEVINFO_FCT_STOP 
-	device_reset_func		reset;						// DEVINFO_FCT_RESET 
-	device_execute_func 	execute;					// DEVINFO_FCT_EXECUTE 
-	device_nvram_func		nvram;						// DEVINFO_FCT_NVRAM 
-	const rom_entry *		romregion;					// DEVINFO_PTR_ROM_REGION 
-	const machine_config_token *machine_config;			// DEVINFO_PTR_MACHINE_CONFIG 
-	const addrmap8_token *	internal_map8;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP 
-	const addrmap16_token *	internal_map16;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP 
-	const addrmap32_token *	internal_map32;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP 
-	const addrmap64_token *	internal_map64;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP 
-	const addrmap8_token *	default_map8;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP 
-	const addrmap16_token *	default_map16;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP 
-	const addrmap32_token *	default_map32;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP 
-	const addrmap64_token *	default_map64;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP 
+	device_start_func		start;						// DEVINFO_FCT_START
+	device_stop_func		stop;						// DEVINFO_FCT_STOP
+	device_reset_func		reset;						// DEVINFO_FCT_RESET
+	device_execute_func 	execute;					// DEVINFO_FCT_EXECUTE
+	device_nvram_func		nvram;						// DEVINFO_FCT_NVRAM
+	const rom_entry *		romregion;					// DEVINFO_PTR_ROM_REGION
+	const machine_config_token *machine_config;			// DEVINFO_PTR_MACHINE_CONFIG
+	const addrmap8_token *	internal_map8;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
+	const addrmap16_token *	internal_map16;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
+	const addrmap32_token *	internal_map32;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
+	const addrmap64_token *	internal_map64;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
+	const addrmap8_token *	default_map8;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
+	const addrmap16_token *	default_map16;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
+	const addrmap32_token *	default_map32;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
+	const addrmap64_token *	default_map64;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
 };
 
 
@@ -479,7 +479,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// internal state
 	const legacy_device_config_base &	m_config;
 	void *								m_token;
@@ -490,7 +490,7 @@ protected:
 // ======================> legacy_sound_device_config_base
 
 // legacy_sound_device_config is a device_config with a sound interface
-class legacy_sound_device_config_base :	public legacy_device_config_base, 
+class legacy_sound_device_config_base :	public legacy_device_config_base,
 										public device_config_sound_interface
 {
 protected:
@@ -503,7 +503,7 @@ protected:
 // ======================> legacy_sound_device_base
 
 // legacy_sound_device is a legacy_device_base with a sound interface
-class legacy_sound_device_base :	public legacy_device_base, 
+class legacy_sound_device_base :	public legacy_device_base,
 									public device_sound_interface
 {
 protected:
@@ -516,7 +516,7 @@ protected:
 // ======================> legacy_memory_device_config_base
 
 // legacy_memory_device_config is a device_config with a memory interface
-class legacy_memory_device_config_base : public legacy_device_config_base, 
+class legacy_memory_device_config_base : public legacy_device_config_base,
 										 public device_config_memory_interface
 {
 protected:
@@ -538,7 +538,7 @@ protected:
 // ======================> legacy_memory_device_base
 
 // legacy_memory_device is a legacy_device_base with a memory interface
-class legacy_memory_device_base : 	public legacy_device_base, 
+class legacy_memory_device_base :	public legacy_device_base,
 									public device_memory_interface
 {
 protected:
@@ -551,7 +551,7 @@ protected:
 // ======================> legacy_nvram_device_config
 
 // legacy_nvram_device_config is a device_config with a nvram interface
-class legacy_nvram_device_config_base : 	public legacy_device_config_base, 
+class legacy_nvram_device_config_base : 	public legacy_device_config_base,
 											public device_config_nvram_interface
 {
 protected:
@@ -564,7 +564,7 @@ protected:
 // ======================> legacy_nvram_device
 
 // legacy_nvram_device is a legacy_device_base with a nvram interface
-class legacy_nvram_device_base : 	public legacy_device_base, 
+class legacy_nvram_device_base :	public legacy_device_base,
 									public device_nvram_interface
 {
 protected:
@@ -596,13 +596,13 @@ struct image_device_type_info
 };
 
 // legacy_image_device_config is a device_config with a image interface
-class legacy_image_device_config_base : 	public legacy_device_config_base, 
+class legacy_image_device_config_base : 	public legacy_device_config_base,
 											public device_config_image_interface
 {
-public:	
+public:
 	virtual iodevice_t image_type()  const { return m_type; }
 	virtual const char *image_type_name()  const { return device_typename(m_type); }
-	virtual iodevice_t image_type_direct() const { return static_cast<iodevice_t>(get_legacy_config_int(DEVINFO_INT_IMAGE_TYPE)); }	
+	virtual iodevice_t image_type_direct() const { return static_cast<iodevice_t>(get_legacy_config_int(DEVINFO_INT_IMAGE_TYPE)); }
 	virtual bool is_readable()  const { return m_readable; }
 	virtual bool is_writeable() const { return m_writeable; }
 	virtual bool is_creatable() const { return m_creatable; }
@@ -612,22 +612,22 @@ public:
 	virtual const char *image_interface() const { return m_interface_name; }
 	virtual const char *file_extensions() const { return m_file_extensions; }
 	virtual const char *instance_name() const { return m_instance_name; }
-	virtual const char *brief_instance_name() const { return m_brief_instance_name; }	
+	virtual const char *brief_instance_name() const { return m_brief_instance_name; }
 	virtual bool uses_file_extension(const char *file_extension) const;
 	static const char *device_typename(iodevice_t type);
 	static const char *device_brieftypename(iodevice_t type);
 protected:
 	// construction/destruction
 	legacy_image_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
-	virtual ~legacy_image_device_config_base();	
-	
+	virtual ~legacy_image_device_config_base();
+
 	// device_config overrides
 	virtual void device_config_complete();
-	
+
 	static const image_device_type_info *find_device_type(iodevice_t type);
-		
-	static const image_device_type_info m_device_info_array[];		
-	
+
+	static const image_device_type_info m_device_info_array[];
+
     iodevice_t   m_type;
 	bool m_readable;
 	bool m_writeable;
@@ -646,17 +646,17 @@ protected:
 	device_image_display_func		display;
 	device_image_partialhash_func	partialhash;
 	device_image_get_devices_func	get_devices;
-	
+
     /* creation info */
     const option_guide *m_create_option_guide;
-    image_device_format *m_formatlist;		
+    image_device_format *m_formatlist;
 };
 
 
 // ======================> legacy_image_device
 
 // legacy_image_device is a legacy_device_base with a image interface
-class legacy_image_device_base : 	public legacy_device_base, 
+class legacy_image_device_base :	public legacy_device_base,
 									public device_image_interface
 {
 protected:

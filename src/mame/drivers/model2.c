@@ -33,7 +33,7 @@
 
     almost OK
     ---------
-	overrev: sound CPU crashes.
+    overrev: sound CPU crashes.
     vstriker: shows some attract mode, then hangs
     manxtt: no escape from "active motion slider" tutorial (needs analog inputs), bypass it by entering then exiting service mode
     manxtt: crashes after the title screen, the TGP is the cause
@@ -51,37 +51,37 @@
 ======================================================================================================================================
 
     Sega Model 2 Feedback Driver Board
-	----------------------------------
+    ----------------------------------
 
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	SJ25-0207-01
-	838-10646 (Daytona)
-	838-11661 (Sega Rally)
-	|---------------------------------------------|
-	|             7-SEG-LED 7-SEG-LED             |
-	|                                             |
-	|   315-5296      315-5296                    |
-	|                 DSW(8)                      |
-	|    M6253                      MB3759        |
-	|                                             |
-	|           GAL.IC23  ROM.IC12                |
-	|                                             |
-	|     Z80                                     |
-	|8MHz   MB3771 MB3771  8464                   |
-	|---------------------------------------------|
-	Notes:
-	      Z80      - clock 4.000MHz [8/2]
-	      8464     - 8k x8 SRAM
-	      ROM.IC12 - EPR-16488A for Daytona
-	                 EPR-17891  for Sega Rally
-	      GAL      - Lattice GAL16V8B stamped 315-5625 common to both Daytona and Sega Rally
-	      DSW(8)   - 8-Position dip switch, all OFF
-	      M6253    - Oki M6253
-	      315-5296 - Sega Custom QFP100
-	      plus several transistors, resistors, a couple of relays and 8 connectors.
+    SJ25-0207-01
+    838-10646 (Daytona)
+    838-11661 (Sega Rally)
+    |---------------------------------------------|
+    |             7-SEG-LED 7-SEG-LED             |
+    |                                             |
+    |   315-5296      315-5296                    |
+    |                 DSW(8)                      |
+    |    M6253                      MB3759        |
+    |                                             |
+    |           GAL.IC23  ROM.IC12                |
+    |                                             |
+    |     Z80                                     |
+    |8MHz   MB3771 MB3771  8464                   |
+    |---------------------------------------------|
+    Notes:
+          Z80      - clock 4.000MHz [8/2]
+          8464     - 8k x8 SRAM
+          ROM.IC12 - EPR-16488A for Daytona
+                     EPR-17891  for Sega Rally
+          GAL      - Lattice GAL16V8B stamped 315-5625 common to both Daytona and Sega Rally
+          DSW(8)   - 8-Position dip switch, all OFF
+          M6253    - Oki M6253
+          315-5296 - Sega Custom QFP100
+          plus several transistors, resistors, a couple of relays and 8 connectors.
 
 
 */
@@ -514,71 +514,71 @@ static CUSTOM_INPUT( _1c0001c_r )
 }
 
 /*
-	Rail Chase 2 "Drive I/O BD" documentation
+    Rail Chase 2 "Drive I/O BD" documentation
 
-	I'm fairly sure that this is actually controlled by a CPU with undumped program code.
+    I'm fairly sure that this is actually controlled by a CPU with undumped program code.
 
-	commands 0x2* are for device status bits (all of them active low)
+    commands 0x2* are for device status bits (all of them active low)
 
-	command 0x27 (4 port valve rear cylinder)
-	---- --xx Cylinder Position (00 - neutral, 01 - up, 10 - down, 11 - error)
+    command 0x27 (4 port valve rear cylinder)
+    ---- --xx Cylinder Position (00 - neutral, 01 - up, 10 - down, 11 - error)
 
-	command 0x29
-	---- -x-- Compressor Motor
-	---- --x- Unloader Valve
-	---- ---x Compression Valve
+    command 0x29
+    ---- -x-- Compressor Motor
+    ---- --x- Unloader Valve
+    ---- ---x Compression Valve
 
-	command 0x2a (4 port valve left cylinder)
-	---- -x-- Rev Valve
-	---- --x- Down Valve
-	---- ---x Up Valve
+    command 0x2a (4 port valve left cylinder)
+    ---- -x-- Rev Valve
+    ---- --x- Down Valve
+    ---- ---x Up Valve
 
-	command 0x2b (4 port valve right cylinder)
-	---- -x-- Rev Valve
-	---- --x- Down Valve
-	---- ---x Up Valve
+    command 0x2b (4 port valve right cylinder)
+    ---- -x-- Rev Valve
+    ---- --x- Down Valve
+    ---- ---x Up Valve
 
-	command 0x2e
-	---- --xx Compression SW (00 - error, 01 - low, 10 - high, 11 - error)
+    command 0x2e
+    ---- --xx Compression SW (00 - error, 01 - low, 10 - high, 11 - error)
 
-	command 0x2f
-	---- x--- Emergency SW
-	---- ---x Safety Sensor
+    command 0x2f
+    ---- x--- Emergency SW
+    ---- ---x Safety Sensor
 
-	These are all used on network check, probably some specific data port R/Ws
+    These are all used on network check, probably some specific data port R/Ws
 
-	command 0x3b
-	command 0xe0
-	command 0xd0
-	command 0xb0
-	command 0x70
-	command 0x0e
-	command 0x0d
-	command 0x0b
-	command 0x07
+    command 0x3b
+    command 0xe0
+    command 0xd0
+    command 0xb0
+    command 0x70
+    command 0x0e
+    command 0x0d
+    command 0x0b
+    command 0x07
 
-	Every other write of this controls devices behaviour:
+    Every other write of this controls devices behaviour:
 
-	command 0x4f (left up valve off)
-	command 0x5b (left down valve off)
-	command 0x5d (compression valve on)
-	command 0x5e (left rev valve on)
-	command 0x5f (left Cylinder reset)
+    command 0x4f (left up valve off)
+    command 0x5b (left down valve off)
+    command 0x5d (compression valve on)
+    command 0x5e (left rev valve on)
+    command 0x5f (left Cylinder reset)
 
-	command 0x6f (right up valve off)
-	command 0x7b (right down valve off)
-	command 0x7d (compression valve on)
-	command 0x7e (right rev valve on)
-	command 0x7f (right Cylinder reset)
+    command 0x6f (right up valve off)
+    command 0x7b (right down valve off)
+    command 0x7d (compression valve on)
+    command 0x7e (right rev valve on)
+    command 0x7f (right Cylinder reset)
 
-	command 0x84 (reset up/down valves of rear cylinder)
-	command 0x85 (rear up valve on)
-	command 0x86 (rear down valve on)
+    command 0x84 (reset up/down valves of rear cylinder)
+    command 0x85 (rear up valve on)
+    command 0x86 (rear down valve on)
 
-	command 0x8b (compression valve on)
-	command 0x8d (left rev valve is on)
-	command 0x8e (right rev valve is on)
-	command 0x8f (reset 4 port valve left / right cylinders and compression valve)
+    command 0x8b (compression valve on)
+    command 0x8d (left rev valve is on)
+    command 0x8e (right rev valve is on)
+    command 0x8f (reset 4 port valve left / right cylinders and compression valve)
 
 */
 
@@ -592,9 +592,9 @@ static CUSTOM_INPUT( rchase2_devices_r )
 static WRITE32_HANDLER( rchase2_devices_w )
 {
 	/*
-	0x00040000 start 1 lamp
-	0x00080000 start 2 lamp
-	*/
+    0x00040000 start 1 lamp
+    0x00080000 start 2 lamp
+    */
 
 	if(mem_mask == 0x0000ffff)
 		cmd_data = data;
@@ -605,10 +605,10 @@ static UINT8 driveio_comm_data;
 static WRITE32_HANDLER( srallyc_devices_w )
 {
 	/*
-	0x00040000 start 1 lamp
-	0x00200000 vr lamp
-	0x00800000 leader lamp
-	*/
+    0x00040000 start 1 lamp
+    0x00200000 vr lamp
+    0x00800000 leader lamp
+    */
 
 	if(mem_mask == 0x000000ff || mem_mask == 0x0000ffff)
 	{
@@ -2120,8 +2120,8 @@ static READ8_HANDLER( driveio_port_r )
 
 static WRITE8_HANDLER( driveio_port_w )
 {
-//	TODO: hook up to the main CPU
-//	popmessage("%02x",data);
+//  TODO: hook up to the main CPU
+//  popmessage("%02x",data);
 }
 
 static READ8_HANDLER( driveio_port_str_r )
@@ -2152,7 +2152,7 @@ static MACHINE_DRIVER_START( srallyc )
 	MDRV_CPU_ADD("drivecpu", Z80, 16000000/4) //???
 	MDRV_CPU_PROGRAM_MAP(drive_map)
 	MDRV_CPU_IO_MAP(drive_io_map)
-//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
 
 static const sharc_config sharc_cfg =

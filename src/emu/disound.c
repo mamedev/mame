@@ -101,21 +101,21 @@ bool device_config_sound_interface::interface_process_token(UINT32 entrytype, co
 			reset_routes();
 			return true;
 	}
-	
+
 	return false;
 }
 
 
 //-------------------------------------------------
 //  interface_validity_check - validation for a
-//  device after the configuration has been 
+//  device after the configuration has been
 //  constructed
 //-------------------------------------------------
 
 bool device_config_sound_interface::interface_validity_check(const game_driver &driver) const
 {
 	bool error = false;
-	
+
 	// loop over all the routes
 	for (const sound_route *route = m_route_list; route != NULL; route = route->m_next)
 	{
@@ -126,7 +126,7 @@ bool device_config_sound_interface::interface_validity_check(const game_driver &
 			mame_printf_error("%s: %s attempting to route sound to non-existant device '%s'\n", driver.source_file, driver.name, route->m_target);
 			error = true;
 		}
-		
+
 		// if it's not a speaker or a sound device, error
 		const device_config_sound_interface *sound;
 		if (target->type() != SPEAKER && !target->interface(sound))
@@ -194,7 +194,7 @@ device_sound_interface::device_sound_interface(running_machine &machine, const d
 device_sound_interface::~device_sound_interface()
 {
 }
-	
+
 
 //-------------------------------------------------
 //  interface_post_start - verify that state was

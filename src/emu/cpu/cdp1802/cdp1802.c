@@ -1090,8 +1090,8 @@ CPU_GET_INFO( cdp1802 )
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cdp1802);				break;
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cdp1802);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cdp1802);	break;
-		case CPUINFO_FCT_IMPORT_STATE: 					info->import_state = CPU_IMPORT_STATE_NAME(cdp1802);	break;
-		case CPUINFO_FCT_EXPORT_STATE: 					info->export_state = CPU_EXPORT_STATE_NAME(cdp1802);	break;
+		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(cdp1802);	break;
+		case CPUINFO_FCT_EXPORT_STATE:					info->export_state = CPU_EXPORT_STATE_NAME(cdp1802);	break;
 		case CPUINFO_FCT_EXPORT_STRING: 				info->export_string = CPU_EXPORT_STRING_NAME(cdp1802);	break;
 
 		/* --- the following bits of info are returned as pointers --- */

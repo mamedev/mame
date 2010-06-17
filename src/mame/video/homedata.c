@@ -613,25 +613,25 @@ INLINE void mirderby_info1( running_machine *machine, tile_data *tileinfo, int t
 
 static TILE_GET_INFO( mirderby_get_info0_0 )
 {
-//	homedata_state *state = (homedata_state *)machine->driver_data;
+//  homedata_state *state = (homedata_state *)machine->driver_data;
 	mirderby_info0( machine, tileinfo, tile_index, 0, 0);// state->blitter_bank & 0x03 );
 }
 
 static TILE_GET_INFO( mirderby_get_info1_0 )
 {
-//	homedata_state *state = (homedata_state *)machine->driver_data;
+//  homedata_state *state = (homedata_state *)machine->driver_data;
 	mirderby_info0( machine, tileinfo, tile_index, 1, 0);// state->blitter_bank & 0x03 );
 }
 
 static TILE_GET_INFO( mirderby_get_info0_1 )
 {
-//	homedata_state *state = (homedata_state *)machine->driver_data;
+//  homedata_state *state = (homedata_state *)machine->driver_data;
 	mirderby_info1( machine, tileinfo, tile_index, 0, 0);//(state->blitter_bank & 0x38) >> 3 );
 }
 
 static TILE_GET_INFO( mirderby_get_info1_1 )
 {
-//	homedata_state *state = (homedata_state *)machine->driver_data;
+//  homedata_state *state = (homedata_state *)machine->driver_data;
 	mirderby_info1( machine, tileinfo, tile_index, 1, 0);//(state->blitter_bank & 0x38) >> 3 );
 }
 

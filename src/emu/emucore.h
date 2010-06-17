@@ -320,16 +320,16 @@ private:
 //  CASTING TEMPLATES
 //**************************************************************************
 
-// template function for casting from a base class to a derived class that is checked 
+// template function for casting from a base class to a derived class that is checked
 // in debug builds and fast in release builds
-template<class _Dest, class _Source> 
+template<class _Dest, class _Source>
 inline _Dest downcast(_Source *src)
 {
 	assert(dynamic_cast<_Dest>(src) == src);
 	return static_cast<_Dest>(src);
 }
 
-template<class _Dest, class _Source> 
+template<class _Dest, class _Source>
 inline _Dest downcast(_Source &src)
 {
 	assert(&dynamic_cast<_Dest>(src) == &src);
@@ -339,7 +339,7 @@ inline _Dest downcast(_Source &src)
 
 // template function for cross-casting from one class to another that throws a bad_cast
 // exception instead of returning NULL
-template<class _Dest, class _Source> 
+template<class _Dest, class _Source>
 inline _Dest crosscast(_Source *src)
 {
 	_Dest result = dynamic_cast<_Dest>(src);
@@ -355,7 +355,7 @@ inline _Dest crosscast(_Source *src)
 //  COMMON TEMPLATES
 //**************************************************************************
 
-template<class T> 
+template<class T>
 class tagged_list
 {
 	DISABLE_COPYING(tagged_list);

@@ -51,7 +51,7 @@ public:
 
 	// basic information getters
 	virtual const char *name() const { return "Speaker"; }
-	
+
 	// indexes to inline data
 	enum
 	{
@@ -59,7 +59,7 @@ public:
 		INLINE_Y,
 		INLINE_Z
 	};
-	
+
 protected:
 	// device_config overrides
 	virtual void device_config_complete();
@@ -78,13 +78,13 @@ class speaker_device : public device_t
 {
 	friend class speaker_device_config;
 	friend resource_pool_object<speaker_device>::~resource_pool_object();
-	
+
 	// construction/destruction
 	speaker_device(running_machine &_machine, const speaker_device_config &config);
 	virtual ~speaker_device();
 
 public:
-	// input properties	
+	// input properties
 	int inputs() const { return m_inputs; }
 	float input_gain(int index = 0) const { return m_input[index].m_gain; }
 	float input_default_gain(int index = 0) const { return m_input[index].m_default_gain; }
