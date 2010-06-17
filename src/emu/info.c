@@ -874,7 +874,7 @@ static void print_game_categories(FILE *out, const game_driver *game, const iopo
 
 static void print_game_images(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config_image_interface *dev;
+	const device_config_image_interface *dev = NULL;
 	const char *name;
 	const char *shortname;
 
