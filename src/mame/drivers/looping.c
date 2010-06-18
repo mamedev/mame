@@ -727,7 +727,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-ROM_START( looping )
+ROM_START( loopingv )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
 	ROM_LOAD( "vli3.5a",		0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
 	ROM_LOAD( "vli1.2a",		0x2000, 0x2000, CRC(97755fd4) SHA1(4a6ef02b0128cd516ff95083a7caaad8f3756f09) )
@@ -763,7 +763,7 @@ ROM_START( looping )
 	ROM_LOAD( "18s030.11b",		0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-ROM_START( loopinga )
+ROM_START( loopingva )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
 	ROM_LOAD( "vli3.5a",		0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
 	ROM_LOAD( "vli-4-3",		0x2000, 0x1000, CRC(f32cae2b) SHA1(2c6ef82af438e588b56fd58b95cf969c97bb9a66) )
@@ -798,6 +798,40 @@ ROM_START( loopinga )
 
 	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
 	ROM_LOAD( "18s030.11b",		0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+ROM_START( looping )
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
+	ROM_LOAD( "loop551.bin",		0x0000, 0x1000, CRC(d6bb6db6) SHA1(074eb3bc101096bfe67c3107f306df829ae38548) )
+	ROM_LOAD( "loop552.bin",		0x1000, 0x1000, CRC(bc32956d) SHA1(6ef8d76df1d5b1ed52a4057eae2bf4eb394e4c54) )
+	ROM_LOAD( "loop553.bin",		0x2000, 0x1000, CRC(5f8b9aed) SHA1(32be61788e3d54b23d1663025365b1ab6b96dc91) )
+	ROM_LOAD( "loop554b.bin",		0x3000, 0x1000, CRC(381a9625) SHA1(07d775125be1f761dad568f8ccce600414a9d15f) )
+	ROM_LOAD( "loop555.bin",		0x4000, 0x1000, CRC(0ef4c922) SHA1(df6db0897a51aa10e106865a643588d866ef8c4e) )
+	ROM_LOAD( "loop556.bin",		0x5000, 0x1000, CRC(3419a5d5) SHA1(2b0249c54985ab5e12de17c0e3d62caa0c7575e3) )
+	ROM_LOAD( "loop557.bin",		0x6000, 0x1000, CRC(d430e287) SHA1(b0edd25ef4d2468cc1f8c10ac49c545a89d398d7) )
+	
+	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
+	ROM_LOAD( "loopc13.bin",		0x0000, 0x1000, CRC(ff9ac4ec) SHA1(9f8df94cd79d86fe4c384df1d5d729b58a7ca7a8) )
+	ROM_LOAD( "loopa13.bin",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
+	ROM_LOAD( "loopa11.bin",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
+
+	ROM_REGION( 0x1000, "mcu", 0 ) /* COP420 microcontroller code */
+	/* taken from the other sets */
+	ROM_LOAD( "cop.bin",		0x00c2, 0x033e, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times and shifted
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+	ROM_CONTINUE(			0x00c2, 0x033e)
+	ROM_CONTINUE(			0x0000, 0x00c2)
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "loopaa8.bin",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
+	ROM_LOAD( "loopaa6.bin",	0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) /* color prom */
+	ROM_LOAD( "loopvp1.bin",		0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( skybump )
@@ -868,6 +902,7 @@ static DRIVER_INIT( looping )
  *
  *************************************/
 
-GAME( 1982, looping,  0,        looping, looping, looping, ROT90, "Venture Line", "Looping (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, loopinga, looping,  looping, looping, looping, ROT90, "Venture Line", "Looping (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, skybump,  0,        looping, skybump, looping, ROT90, "Venture Line", "Sky Bumper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, looping,   0,        looping, looping, looping, ROT90, "Video Games GMBH", "Looping", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, loopingv,  looping,  looping, looping, looping, ROT90, "Video Games GMBH (Venture Line license)", "Looping (Venture Line license, set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, loopingva, looping,  looping, looping, looping, ROT90, "Video Games GMBH (Venture Line license)", "Looping (Venture Line license, set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, skybump,   0,        looping, skybump, looping, ROT90, "Venture Line", "Sky Bumper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
