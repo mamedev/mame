@@ -217,7 +217,7 @@ public:
 	void make_readonly() { m_writeable = 0; }
 	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return core_fread(m_file, buffer, length); }
 	UINT32 fwrite(const void *buffer, UINT32 length) { check_for_file(); return core_fwrite(m_file, buffer, length); }
-	int fseek(running_device *image, INT64 offset, int whence) { check_for_file(); return core_fseek(m_file, offset, whence); }
+	int fseek(INT64 offset, int whence) { check_for_file(); return core_fseek(m_file, offset, whence); }
 	UINT64 ftell() { check_for_file(); return core_ftell(m_file); }
 	int fgetc() { char ch; if (fread(&ch, 1) != 1) ch = '\0'; return ch; }
 	char *fgets(char *buffer, UINT32 length) { check_for_file(); return core_fgets(buffer, length, m_file); }
