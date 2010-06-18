@@ -3567,15 +3567,6 @@ ROM_END
     Altered Beast, Sega System 16B
     CPU: 68000 + i8751 (317-0078)
     ROM Board: 171-5521
-
-    Game Board 834-6661-10 - Use a MCU Intel 8751 for protection (317-0078)
-
-    Program roms
-
-    EPR11906.bin
-    EPR11907.bin
-
-    Other ROMS are identical with altbeast.zip set.
 */
 ROM_START( altbeast )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
@@ -4470,7 +4461,6 @@ Dynamite Dux (8751 version) - Sega System16B System - Sega 1988
 Game Number 837-6768-09
 Rom Number  834-6767-09
 
-
 Rom Board Type 171-5704
 
 */
@@ -5001,7 +4991,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Heavyweight Champ, Sega System 16B
-    CPU: 68000 (version uses custom 317-0046 known to be exist)
+    CPU: 68000
     ROM Board: 171-5521
 */
 ROM_START( hwchamp )
@@ -5030,7 +5020,7 @@ ROM_START( hwchamp )
 	ROM_CONTINUE(                    0x0a0001, 0x010000 )
 	ROM_LOAD16_BYTE( "epr-11211.b7", 0x080000, 0x010000, CRC(d6c7917b) SHA1(8b313a5634c14f4c90bfa9f9616d600283f72768) )
 	ROM_CONTINUE(                    0x0a0000, 0x010000 )
-	ROM_LOAD16_BYTE( "obj3-o.b4",    0x0c0001, 0x010000, CRC(52fa3a49) SHA1(c2331af630d86a111cdaf21556d9df23d1471f53) ) /* dump miss ? */
+	ROM_LOAD16_BYTE( "epr-11208.b4", 0x0c0001, 0x010000, CRC(35c9e44b) SHA1(2de32cb684c46d1169d8afcb0d3058d08e452a49) )
 	ROM_CONTINUE(                    0x0e0001, 0x010000 )
 	ROM_LOAD16_BYTE( "epr-11212.b8", 0x0c0000, 0x010000, CRC(57e8f9d2) SHA1(1804677820d05a421120660f91e3a5f1df1e6a8d) )
 	ROM_CONTINUE(                    0x0e0000, 0x010000 )
