@@ -28,6 +28,11 @@ const options_entry mame_core_options[] =
 	/* config options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE CONFIGURATION OPTIONS" },
 	{ "readconfig;rc",               "1",         OPTION_BOOLEAN,    "enable loading of configuration files" },
+#ifdef MESS
+	{ "writeconfig;wc",				 "1",		  OPTION_BOOLEAN,	 "writes configuration to (driver).ini on exit" },
+#else
+	{ "writeconfig;wc",				 "0",		  OPTION_BOOLEAN,	 "writes configuration to (driver).ini on exit" },
+#endif /* MESS */
 
 	/* seach path options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },

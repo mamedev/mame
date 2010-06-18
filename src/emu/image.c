@@ -84,6 +84,65 @@ static void image_dirs_save(running_machine *machine, int config_type, xml_data_
 }
 
 /*-------------------------------------------------
+    write_config - emit current option statuses as
+    INI files
+-------------------------------------------------*/
+
+static int write_config(const char *filename, const game_driver *gamedrv)
+{
+	file_error filerr;
+	mame_file *f;
+	char buffer[128];
+	int retval = 1;
+
+	if (gamedrv != NULL)
+	{
+		sprintf(buffer, "%s.ini", gamedrv->name);
+		filename = buffer;
+	}
+
+	filerr = mame_fopen(SEARCHPATH_INI, buffer, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &f);
+	if (filerr != FILERR_NONE)
+		goto done;
+
+	options_output_ini_file(mame_options(), mame_core_file(f));
+	retval = 0;
+
+done:
+	if (f != NULL)
+		mame_fclose(f);
+	return retval;
+}
+
+/*-------------------------------------------------
+    image_options_extract - extract device options
+    out of core into the options
+-------------------------------------------------*/
+
+static void image_options_extract(running_machine *machine)
+{
+	/* only extract the device options if we've added them */
+	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS)) {
+		int index = 0;		
+		device_image_interface *image = NULL;
+
+		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+		{		
+			const char *filename = image->filename();
+
+			/* and set the option */
+			options_set_string(mame_options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);				
+			
+			index++;
+		}
+	}
+
+	/* write the config, if appropriate */
+	if (options_get_bool(mame_options(), OPTION_WRITECONFIG))
+		write_config(NULL, machine->gamedrv);
+}
+
+/*-------------------------------------------------
     image_unload_all - unload all images and
     extract options
 -------------------------------------------------*/
@@ -93,7 +152,7 @@ void image_unload_all(running_machine *machine)
     device_image_interface *image = NULL;
 
 	// extract the options 
-	//mess_options_extract(machine);
+	image_options_extract(machine);
 
 	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
 	{
