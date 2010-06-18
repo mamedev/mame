@@ -19,5 +19,6 @@
 #define __IMAGE_H__
 
 void image_init(running_machine *machine);
+void image_postdevice_init(running_machine *machine);
 
 #endif /* __IMAGE_H__ */

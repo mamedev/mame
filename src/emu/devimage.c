@@ -199,7 +199,7 @@ legacy_image_device_config_base::~legacy_image_device_config_base()
 legacy_image_device_base::legacy_image_device_base(running_machine &machine, const device_config &config)
 	: legacy_device_base(machine, config),
 	  device_image_interface(machine, config, *this),
-	  m_file(NULL)
+	  m_is_loading(FALSE)
 {
 }
 
@@ -220,6 +220,15 @@ image_error_t legacy_image_device_base::set_image_filename(const char *filename)
     return IMAGE_ERROR_SUCCESS;
 }
 
+/*-------------------------------------------------
+    is_loaded - quick check to determine whether an
+    image is loaded
+-------------------------------------------------*/
+
+bool legacy_image_device_base::is_loaded()
+{
+    return (m_file != NULL); // (image->software_info_ptr != NULL);
+}
 
 /*-------------------------------------------------
     load_image_by_path - loads an image with a
@@ -312,9 +321,11 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
     unload();
 
     /* clear any possible error messages */
+    clear_error();
 
     /* we are now loading */
-
+    m_is_loading = TRUE;
+	
     /* record the filename */
     err = set_image_filename(path);
     if (err)
@@ -332,16 +343,50 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 			if (err && (err != IMAGE_ERROR_FILENOTFOUND))
 				goto done;
 		}
+		
+	/* did we fail to find the file? */
+	if (!is_loaded())
+	{
+		err = IMAGE_ERROR_FILENOTFOUND;
+		goto done;
+	}
+		
+	/* call device load or create */
+	m_create_format = create_format;
+	m_create_args = create_args;
+
+	if (m_init_phase==FALSE) {
+		err = (image_error_t)finish_load();
+		if (err)
+			goto done;
+	}
     /* success! */
 
 done:
-    if (err) {
+    if (m_err) {
+		if (!m_init_phase)
+		{
+			if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
+				popmessage("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
+			else
+				mame_printf_error("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
+		}
 		clear();
 	}
 	else {
 		/* do we need to reset the CPU? only schedule it if load/create is successful */
 		if ((attotime_compare(timer_get_time(device().machine), attotime_zero) > 0) && m_image_config.is_reset_on_load())
 			mame_schedule_hard_reset(device().machine);
+		else
+		{
+			if (!m_init_phase)
+			{
+				if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
+					popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
+				else
+					mame_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");
+			}
+		}
 	}
 	return err ? FALSE : TRUE;
 }
@@ -356,6 +401,57 @@ bool legacy_image_device_base::load(const char *path)
 {
     return load_internal(path, FALSE, 0, NULL);
 }
+
+
+/*-------------------------------------------------
+    image_finish_load - special call - only use
+    from core
+-------------------------------------------------*/
+
+bool legacy_image_device_base::finish_load()
+{
+    bool err = FALSE;
+
+    if (m_is_loading)
+    {
+        if (has_been_created() && ((*m_image_config.create_func()) != NULL))
+        {
+            err = (*m_image_config.create_func())(this, m_create_format, m_create_args);
+            if (err)
+            {
+                if (!m_err)
+                    m_err = IMAGE_ERROR_UNSPECIFIED;
+            }
+        }
+        else if ((*m_image_config.load_func()) != NULL)
+        {
+            /* using device load */
+            err = (*m_image_config.load_func())(this);
+            if (err)
+            {
+                if (!m_err)
+                    m_err = IMAGE_ERROR_UNSPECIFIED;
+            }
+        }
+    }
+
+    m_is_loading = FALSE;
+    m_create_format = 0;
+    m_create_args = NULL;
+	m_init_phase = FALSE;
+    return err;
+}
+
+/*-------------------------------------------------
+    create - create a image
+-------------------------------------------------*/
+
+bool legacy_image_device_base::create(const char *path, const image_device_format *create_format, option_resolution *create_args)
+{
+    int format_index = (create_format != NULL) ? create_format->m_index : 0;
+    return load_internal(path, TRUE, format_index, create_args);
+}
+
 
 /*-------------------------------------------------
     clear - clear all internal data pertaining
@@ -375,26 +471,13 @@ void legacy_image_device_base::clear()
     m_created = FALSE;
 }
 
-
-/*-------------------------------------------------
-    unload_internal - internal call to unload
-    images
--------------------------------------------------*/
-
-void legacy_image_device_base::unload_internal()
-{
-    clear();
-}
-
-
-
 /*-------------------------------------------------
     unload - main call to unload an image
 -------------------------------------------------*/
 
 void legacy_image_device_base::unload()
 {
-    unload_internal();
+    clear();
 }
 
 

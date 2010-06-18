@@ -38,7 +38,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-
+#include "ui.h"
 
 
 //**************************************************************************
@@ -129,7 +129,8 @@ const char *device_config_image_interface::device_brieftypename(iodevice_t type)
 
 device_image_interface::device_image_interface(running_machine &machine, const device_config &config, device_t &device)
 	: device_interface(machine, config, device),
-	  m_image_config(dynamic_cast<const device_config_image_interface &>(config))
+	  m_image_config(dynamic_cast<const device_config_image_interface &>(config)),	  
+	  m_file(NULL)
 {
 }
 
@@ -140,4 +141,193 @@ device_image_interface::device_image_interface(running_machine &machine, const d
 
 device_image_interface::~device_image_interface()
 {
+}
+
+/****************************************************************************
+    CREATION FORMATS
+****************************************************************************/
+
+/*-------------------------------------------------
+    device_get_indexed_creatable_format -
+    accesses a specific image format available for
+    image creation by index
+-------------------------------------------------*/
+
+const image_device_format *device_image_interface::device_get_indexed_creatable_format(int index)
+{
+    const image_device_format *format = device_get_creatable_formats();
+    while(index-- && (format != NULL))
+        format = format->m_next;
+    return format;
+}
+
+
+
+/*-------------------------------------------------
+    device_get_named_creatable_format -
+    accesses a specific image format available for
+    image creation by name
+-------------------------------------------------*/
+
+const image_device_format *device_image_interface::device_get_named_creatable_format(const char *format_name)
+{
+    const image_device_format *format = device_get_creatable_formats();
+    while((format != NULL) && strcmp(format->m_name, format_name))
+        format = format->m_next;
+    return format;
+}
+
+/****************************************************************************
+    ERROR HANDLING
+****************************************************************************/
+
+/*-------------------------------------------------
+    image_clear_error - clear out any specified
+    error
+-------------------------------------------------*/
+
+void device_image_interface::clear_error()
+{
+    m_err = IMAGE_ERROR_SUCCESS;
+    if (m_err_message.len()==0)
+    {
+        //image_freeptr(image->dev, image->err_message);
+        m_err_message.reset();
+    }
+}
+
+
+
+/*-------------------------------------------------
+    error - returns the error text for an image
+    error
+-------------------------------------------------*/
+
+const char *device_image_interface::error()
+{
+    static const char *const messages[] =
+    {
+        NULL,
+        "Internal error",
+        "Unsupported operation",
+        "Out of memory",
+        "File not found",
+        "Invalid image",
+        "File already open",
+        "Unspecified error"
+    };
+
+    return m_err_message.len()==0 ? m_err_message : astring(messages[m_err]);
+}
+
+
+
+/*-------------------------------------------------
+    seterror - specifies an error on an image
+-------------------------------------------------*/
+
+void device_image_interface::seterror(image_error_t err, const char *message)
+{
+    clear_error();
+    m_err = err;
+    if (message != NULL)
+    {
+        m_err_message = message;
+    }
+}
+
+
+
+/*-------------------------------------------------
+    message - used to display a message while
+    loading
+-------------------------------------------------*/
+
+void device_image_interface::message(const char *format, ...)
+{
+    va_list args;
+    char buffer[256];	
+
+    /* format the message */
+    va_start(args, format);
+    vsnprintf(buffer, ARRAY_LENGTH(buffer), format, args);
+    va_end(args);
+
+    /* display the popup for a standard amount of time */
+    ui_popup_time(5, "%s: %s",
+        basename(),
+        buffer);
+}
+
+
+/****************************************************************************
+  Accessor functions
+
+  These provide information about the device; and about the mounted image
+****************************************************************************/
+
+/*-------------------------------------------------
+    filename
+-------------------------------------------------*/
+
+const char *device_image_interface::filename()
+{
+    const char *name = m_name;
+    return (name[0] != '\0') ? name : NULL;
+}
+
+/*-------------------------------------------------
+    basename
+-------------------------------------------------*/
+
+const char *device_image_interface::basename()
+{
+    char *fname = (char*)filename();
+	const char *c;
+
+	// NULL begets NULL
+	if (!fname)
+		return NULL;
+
+	// start at the end and return when we hit a slash or colon
+	for (c = fname + strlen(fname) - 1; c >= fname; c--)
+		if (*c == '\\' || *c == '/' || *c == ':')
+			return c + 1;
+
+	// otherwise, return the whole thing
+	return fname;
+}
+
+
+/*-------------------------------------------------
+    basename_noext
+-------------------------------------------------*/
+
+const char *device_image_interface::basename_noext()
+{
+    const char *s;
+    char *ext;
+
+    s = basename();
+	if (s)
+	{
+		ext = strrchr(s, '.');
+		if (ext)
+			*ext = '\0';
+	}
+    return s;
+}
+
+
+
+/*-------------------------------------------------
+    filetype
+-------------------------------------------------*/
+
+const char *device_image_interface::filetype()
+{
+    const char *s = filename();
+    if (s != NULL)
+        s = strrchr(s, '.');
+    return s ? s+1 : NULL;
 }

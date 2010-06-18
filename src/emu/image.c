@@ -19,26 +19,6 @@
 /***************************************************************************
     INITIALIZATION HELPERS
 ***************************************************************************/
-//============================================================
-//  filename_basename
-//============================================================
-
-static const char *filename_basename(const char *filename)
-{
-	const char *c;
-
-	// NULL begets NULL
-	if (!filename)
-		return NULL;
-
-	// start at the end and return when we hit a slash or colon
-	for (c = filename + strlen(filename) - 1; c >= filename; c--)
-		if (*c == '\\' || *c == '/' || *c == ':')
-			return c + 1;
-
-	// otherwise, return the whole thing
-	return filename;
-}
 
 /*-------------------------------------------------
     image_dirs_load - loads image device directory
@@ -103,7 +83,24 @@ static void image_dirs_save(running_machine *machine, int config_type, xml_data_
 	}
 }
 
+/*-------------------------------------------------
+    image_unload_all - unload all images and
+    extract options
+-------------------------------------------------*/
 
+void image_unload_all(running_machine *machine)
+{
+    device_image_interface *image = NULL;
+
+	// extract the options 
+	//mess_options_extract(machine);
+
+	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+	{
+		// unload this image
+		image->unload();
+	}
+}
 /*-------------------------------------------------
     image_device_init - initialize devices for a specific
     running_machine
@@ -124,6 +121,9 @@ void image_device_init(running_machine *machine)
 		{
 			bool result = FALSE;
 
+			/* mark init state */
+			image->set_init_phase();
+			
 			/* try to load this image */
 			result = image->load(image_name);
 
@@ -131,15 +131,15 @@ void image_device_init(running_machine *machine)
 			if (!result)
 			{
 				/* retrieve image error message */
-				const char *image_err = "error";// image_error(image);
-				char *image_basename = auto_strdup(machine, filename_basename(image_name));
+				const char *image_err = image->error();
+				const char *image_basename_str = image->basename();
 
 				/* unload all images */
-				//image_unload_all(machine);
+				image_unload_all(machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
 					image->image_config().name(),
-					image_basename,
+					image_basename_str,
 					image_err);
 			}
 		}
@@ -152,6 +152,40 @@ void image_device_init(running_machine *machine)
 			}
 		}
 	}
+}
+
+/*-------------------------------------------------
+    image_postdevice_init - initialize devices for a specific
+    running_machine
+-------------------------------------------------*/
+
+void image_postdevice_init(running_machine *machine)
+{
+	device_image_interface *image = NULL;
+
+	/* make sure that any required devices have been allocated */
+    for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+    {
+			int result = image->finish_load();
+			/* did the image load fail? */
+			if (result)
+			{
+				/* retrieve image error message */
+				const char *image_err = image->error();
+				const char *image_basename_str = image->basename();
+
+				/* unload all images */
+				image_unload_all(machine);
+
+				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
+					image->image_config().name(),
+					image_basename_str,
+					image_err);
+			}
+	}
+
+	/* add a callback for when we shut down */
+	add_exit_callback(machine, image_unload_all);
 }
 /***************************************************************************
     INITIALIZATION

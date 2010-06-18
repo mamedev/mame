@@ -102,13 +102,15 @@ struct image_device_format
     astring m_optspec;
 };
 
+class device_image_interface;
+
 // device image interface function types
-typedef int (*device_image_load_func)(device_t *image);
-typedef int (*device_image_create_func)(device_t *image, int format_type, option_resolution *format_options);
-typedef void (*device_image_unload_func)(device_t *image);
-typedef void (*device_image_display_func)(device_t *image);
+typedef int (*device_image_load_func)(device_image_interface *image);
+typedef int (*device_image_create_func)(device_image_interface *image, int format_type, option_resolution *format_options);
+typedef void (*device_image_unload_func)(device_image_interface *image);
+typedef void (*device_image_display_func)(device_image_interface *image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
-typedef void (*device_image_get_devices_func)(device_t *device);
+typedef void (*device_image_get_devices_func)(device_image_interface *device);
 
 
 //**************************************************************************
@@ -116,19 +118,19 @@ typedef void (*device_image_get_devices_func)(device_t *device);
 //**************************************************************************
 
 #define DEVICE_IMAGE_LOAD_NAME(name)        device_load_##name
-#define DEVICE_IMAGE_LOAD(name)             int DEVICE_IMAGE_LOAD_NAME(name)(device_t *image)
+#define DEVICE_IMAGE_LOAD(name)             int DEVICE_IMAGE_LOAD_NAME(name)(device_image_interface *image)
 
 #define DEVICE_IMAGE_CREATE_NAME(name)      device_create_##name
-#define DEVICE_IMAGE_CREATE(name)           int DEVICE_IMAGE_CREATE_NAME(name)(device_t *image, int create_format, option_resolution *create_args)
+#define DEVICE_IMAGE_CREATE(name)           int DEVICE_IMAGE_CREATE_NAME(name)(device_image_interface *image, int create_format, option_resolution *create_args)
 
 #define DEVICE_IMAGE_UNLOAD_NAME(name)      device_unload_##name
-#define DEVICE_IMAGE_UNLOAD(name)           void DEVICE_IMAGE_UNLOAD_NAME(name)(device_t *image)
+#define DEVICE_IMAGE_UNLOAD(name)           void DEVICE_IMAGE_UNLOAD_NAME(name)(device_image_interface *image)
 
 #define DEVICE_IMAGE_DISPLAY_NAME(name)     device_image_display_func##name
-#define DEVICE_IMAGE_DISPLAY(name)          void DEVICE_IMAGE_DISPLAY_NAME(name)(device_t *image)
+#define DEVICE_IMAGE_DISPLAY(name)          void DEVICE_IMAGE_DISPLAY_NAME(name)(device_image_interface *image)
 
 #define DEVICE_IMAGE_GET_DEVICES_NAME(name) device_image_get_devices_##name
-#define DEVICE_IMAGE_GET_DEVICES(name)      void DEVICE_IMAGE_GET_DEVICES_NAME(name)(device_t *device)
+#define DEVICE_IMAGE_GET_DEVICES(name)      void DEVICE_IMAGE_GET_DEVICES_NAME(name)(device_image_interface *device)
 
 
 // ======================> device_config_image_interface
@@ -158,9 +160,16 @@ public:
 	virtual const char *instance_name() const = 0;
 	virtual const char *brief_instance_name() const = 0;
 	virtual bool uses_file_extension(const char *file_extension) const = 0;
+	virtual const option_guide *create_option_guide() const = 0;
+    virtual image_device_format *formatlist() const = 0;
 	
 	static const char *device_typename(iodevice_t type);
 	static const char *device_brieftypename(iodevice_t type);	
+	
+	virtual device_image_load_func		load_func() const  = 0;
+	virtual device_image_create_func	create_func() const = 0;
+	virtual device_image_unload_func	unload_func() const = 0;
+	
 protected:
 	static const image_device_type_info *find_device_type(iodevice_t type);
 	static const image_device_type_info m_device_info_array[];
@@ -182,15 +191,66 @@ public:
 	virtual void set_working_directory(const char *working_directory) = 0;
 	virtual const char * working_directory() = 0;
 	virtual bool load(const char *path) = 0;
+	virtual bool finish_load() = 0;
 	virtual void unload() = 0;
 	
+	virtual const image_device_format *device_get_indexed_creatable_format(int index);
+	virtual const image_device_format *device_get_named_creatable_format(const char *format_name);
+	const option_guide *image_device_get_creation_option_guide() { return m_image_config.create_option_guide(); }
+	const image_device_format *device_get_creatable_formats() { return m_image_config.formatlist(); }	
+
+	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args) = 0;
+	
+	const char *error();
+	void seterror(image_error_t err, const char *message);
+	void message(const char *format, ...);
+
+	bool exists() { return m_name.len() != 0; }
+	const char *filename();
+	const char *basename();
+	const char *basename_noext();
+	const char *filetype();
+	core_file *image_core_file() { return m_file; }
+	UINT64 length() { check_for_file(); return core_fsize(m_file); }
+	bool is_writable() { return m_writeable; }
+	bool has_been_created() { return m_created; }
+	void make_readonly() { m_writeable = 0; }
+	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return core_fread(m_file, buffer, length); }
+	UINT32 fwrite(const void *buffer, UINT32 length) { check_for_file(); return core_fwrite(m_file, buffer, length); }
+	int fseek(running_device *image, INT64 offset, int whence) { check_for_file(); return core_fseek(m_file, offset, whence); }
+	UINT64 ftell() { check_for_file(); return core_ftell(m_file); }
+	int fgetc() { char ch; if (fread(&ch, 1) != 1) ch = '\0'; return ch; }
+	char *fgets(char *buffer, UINT32 length) { check_for_file(); return core_fgets(buffer, length, m_file); }
+	int feof() { check_for_file(); return core_feof(m_file); }	
+	void *ptr() {check_for_file(); return (void *) core_fbuffer(m_file); }	
 	// configuration access
 	const device_config_image_interface &image_config() const { return m_image_config; }
+	
+	void set_init_phase() { m_init_phase = TRUE; }
 protected:
+	void clear_error();
+	
+	void check_for_file() { assert_always(m_file != NULL, "Illegal operation on unmounted image"); }
 	// derived class overrides
 
 	// configuration
 	const device_config_image_interface &m_image_config;	// reference to our device_config_execute_interface	
+
+    /* error related info */
+    image_error_t m_err;
+    astring m_err_message;	
+	
+    /* variables that are only non-zero when an image is mounted */
+	core_file *m_file;	
+	astring m_name;	
+    /* flags */
+    bool m_writeable;
+    bool m_created;	
+	bool m_init_phase;
+	
+    /* special - used when creating */
+    int m_create_format;
+    option_resolution *m_create_args;
 };
 
 

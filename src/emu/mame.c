@@ -1422,6 +1422,9 @@ static void init_machine(running_machine *machine)
 
 	/* start up the devices */
 	machine->devicelist.start_all();
+	
+	/* finish image devices init process*/
+	image_postdevice_init(machine);
 
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */

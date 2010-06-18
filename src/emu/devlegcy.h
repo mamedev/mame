@@ -592,7 +592,11 @@ public:
 	virtual const char *instance_name() const { return m_instance_name; }
 	virtual const char *brief_instance_name() const { return m_brief_instance_name; }
 	virtual bool uses_file_extension(const char *file_extension) const;
-	
+	virtual const option_guide *create_option_guide() const { return m_create_option_guide; }
+    virtual image_device_format *formatlist() const { return m_formatlist; }
+	virtual device_image_load_func		load_func() const { return load; }
+	virtual device_image_create_func	create_func() const { return create; }	
+	virtual device_image_unload_func	unload_func() const { return unload; }
 protected:
 	// construction/destruction
 	legacy_image_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
@@ -637,7 +641,9 @@ public:
 	virtual void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	virtual const char * working_directory();
 	virtual bool load(const char *path);
+	virtual bool finish_load();
 	virtual void unload();
+	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);	
 protected:
 	// construction/destruction
 	legacy_image_device_base(running_machine &machine, const device_config &config);
@@ -645,16 +651,7 @@ protected:
 	
 	/* working directory; persists across mounts */
 	astring m_working_directory;
-	
-    /* variables that are only non-zero when an image is mounted */
-	core_file *m_file;	
-	astring m_name;
-	
-    /* error related info */
-    image_error_t err;
-    astring err_message;
-	
-	
+		
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
 	
@@ -662,12 +659,10 @@ protected:
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t set_image_filename(const char *filename);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
-	void clear();
-	void unload_internal();
+	void clear();	
+	bool is_loaded();
 	
-    /* flags */
-    bool m_writeable;
-    bool m_created;	
+	bool m_is_loading;
 };
 
 
