@@ -39,6 +39,7 @@
 
 /* core configuration options */
 #define OPTION_READCONFIG			"readconfig"
+#define OPTION_WRITECONFIG			"writeconfig"
 
 /* core search path options */
 #define OPTION_ROMPATH				"rompath"
