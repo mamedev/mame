@@ -416,7 +416,7 @@ bool legacy_image_device_base::finish_load()
     {
         if (has_been_created() && ((*m_image_config.create_func()) != NULL))
         {
-            err = (*m_image_config.create_func())(this, m_create_format, m_create_args);
+            err = (*m_image_config.create_func())(*this, m_create_format, m_create_args);
             if (err)
             {
                 if (!m_err)
@@ -426,7 +426,7 @@ bool legacy_image_device_base::finish_load()
         else if ((*m_image_config.load_func()) != NULL)
         {
             /* using device load */
-            err = (*m_image_config.load_func())(this);
+            err = (*m_image_config.load_func())(*this);
             if (err)
             {
                 if (!m_err)

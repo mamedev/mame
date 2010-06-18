@@ -105,12 +105,12 @@ struct image_device_format
 class device_image_interface;
 
 // device image interface function types
-typedef int (*device_image_load_func)(device_image_interface *image);
-typedef int (*device_image_create_func)(device_image_interface *image, int format_type, option_resolution *format_options);
-typedef void (*device_image_unload_func)(device_image_interface *image);
-typedef void (*device_image_display_func)(device_image_interface *image);
+typedef int (*device_image_load_func)(device_image_interface &image);
+typedef int (*device_image_create_func)(device_image_interface &image, int format_type, option_resolution *format_options);
+typedef void (*device_image_unload_func)(device_image_interface &image);
+typedef void (*device_image_display_func)(device_image_interface &image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
-typedef void (*device_image_get_devices_func)(device_image_interface *device);
+typedef void (*device_image_get_devices_func)(device_image_interface &device);
 
 
 //**************************************************************************
@@ -118,19 +118,19 @@ typedef void (*device_image_get_devices_func)(device_image_interface *device);
 //**************************************************************************
 
 #define DEVICE_IMAGE_LOAD_NAME(name)        device_load_##name
-#define DEVICE_IMAGE_LOAD(name)             int DEVICE_IMAGE_LOAD_NAME(name)(device_image_interface *image)
+#define DEVICE_IMAGE_LOAD(name)             int DEVICE_IMAGE_LOAD_NAME(name)(device_image_interface &image)
 
 #define DEVICE_IMAGE_CREATE_NAME(name)      device_create_##name
-#define DEVICE_IMAGE_CREATE(name)           int DEVICE_IMAGE_CREATE_NAME(name)(device_image_interface *image, int create_format, option_resolution *create_args)
+#define DEVICE_IMAGE_CREATE(name)           int DEVICE_IMAGE_CREATE_NAME(name)(device_image_interface &image, int create_format, option_resolution *create_args)
 
 #define DEVICE_IMAGE_UNLOAD_NAME(name)      device_unload_##name
-#define DEVICE_IMAGE_UNLOAD(name)           void DEVICE_IMAGE_UNLOAD_NAME(name)(device_image_interface *image)
+#define DEVICE_IMAGE_UNLOAD(name)           void DEVICE_IMAGE_UNLOAD_NAME(name)(device_image_interface &image)
 
 #define DEVICE_IMAGE_DISPLAY_NAME(name)     device_image_display_func##name
-#define DEVICE_IMAGE_DISPLAY(name)          void DEVICE_IMAGE_DISPLAY_NAME(name)(device_image_interface *image)
+#define DEVICE_IMAGE_DISPLAY(name)          void DEVICE_IMAGE_DISPLAY_NAME(name)(device_image_interface &image)
 
 #define DEVICE_IMAGE_GET_DEVICES_NAME(name) device_image_get_devices_##name
-#define DEVICE_IMAGE_GET_DEVICES(name)      void DEVICE_IMAGE_GET_DEVICES_NAME(name)(device_image_interface *device)
+#define DEVICE_IMAGE_GET_DEVICES(name)      void DEVICE_IMAGE_GET_DEVICES_NAME(name)(device_image_interface &image)
 
 
 // ======================> device_config_image_interface
