@@ -157,7 +157,7 @@ bool legacy_image_device_config_base::uses_file_extension(const char *file_exten
         file_extension++;
 
 	/* find the extensions */
-	char *ext = strtok((char*)m_file_extensions.cstr(),",");
+	char *ext = strtok((char*)astring(m_file_extensions).cstr(),",");
 	while (ext != NULL)
 	{
 		if (!mame_stricmp(ext, file_extension))

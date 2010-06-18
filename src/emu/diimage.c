@@ -282,7 +282,7 @@ const char *device_image_interface::filename()
 
 const char *device_image_interface::basename()
 {
-    char *fname = (char*)filename();
+    char *fname = (char*)astring(filename()).cstr();
 	const char *c;
 
 	// NULL begets NULL
@@ -308,7 +308,7 @@ const char *device_image_interface::basename_noext()
     const char *s;
     char *ext;
 
-    s = basename();
+    s = astring(basename());
 	if (s)
 	{
 		ext = strrchr(s, '.');
