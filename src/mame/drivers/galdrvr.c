@@ -3237,6 +3237,24 @@ ROM_START( exodus )
 	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( redufoa )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "redufo.1",  0x0000, 0x0800, CRC(6a3b873c) SHA1(82f07921d8f1da3ed8b4f99b8052bd7e2cefcb6a) )
+	ROM_LOAD( "redufo.2",  0x0800, 0x0800, CRC(202eda3b) SHA1(5ca7b50fc510950cd6cce6f27573b5c491171bf0) )
+	ROM_LOAD( "redufo.3",  0x1000, 0x0800, CRC(bf7030e8) SHA1(59b0624dd91527a916ee6a27d61def82c3c14f49) )
+	ROM_LOAD( "redufo.4",  0x1800, 0x0800, CRC(8c1c2ef9) SHA1(3beec82c67d8e26ecd988be77efb8599a4741d4d) )
+	ROM_LOAD( "redufo.5",  0x2000, 0x0800, CRC(ef965b24) SHA1(2e2e0ef2b2940660092c27f46ae76c9320136f17) )
+	ROM_LOAD( "redufo.6",  0x2800, 0x0800, CRC(58b3e39b) SHA1(9b081154c90f22c17315c8bc2a47993468367768) )
+	ROM_LOAD( "redufo.7",  0x3000, 0x0800, CRC(fd07d811) SHA1(6b968a7ce452f76a8d26fe694aa4ea6b16e8b6fa) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "redufo.8",  0x0000, 0x0800, CRC(b34c7cb4) SHA1(146ed4a02d7540378f4a27a6643055216ad403f7) )
+	ROM_LOAD( "redufo.9",  0x0800, 0x0800, CRC(50a2d447) SHA1(1f97d1096ad2a3a43a480cb1f040f4534fada3c3) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "tbp18s030n.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( tdpgal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",  0x0000, 0x0800, CRC(7be819fe) SHA1(ab5a332914546692f9976e243daf3040f0d9952e) )
@@ -5889,6 +5907,7 @@ GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia",
 GAME( 1981, warofbugg,warofbug, galaxian, warofbug, nolock,   ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1981, redufo,   0,        galaxian, redufo,   nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE )
 GAME( 19??, exodus,   redufo,   galaxian, exodus,   nolock,   ROT90,  "bootleg? (Subelectro)", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 19??, redufoa,  redufo,   galaxian, exodus,   nolock,   ROT270, "Artic", "Defend the Terra Attack on the Red UFO (Artic)", GAME_SUPPORTS_SAVE ) // is this the original?
 GAME( 1983, tdpgal,   0,        galaxian, tdpgal,   nolock,   ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", GAME_SUPPORTS_SAVE )
 GAME( 1979, kamakazi3,galaxian, galaxian, superg,   nolock,	  ROT90,  "hack", "Kamakazi III (superg hack)", GAME_SUPPORTS_SAVE )
 

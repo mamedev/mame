@@ -39,21 +39,25 @@ static UINT8* janshi_vram1;
 static UINT8* janshi_vram2;
 static UINT8* janshi_back_vram;
 static UINT8* janshi_crtc_regs;
-static UINT8* janshi_unk;
+static UINT8* janshi_unk1;
+static UINT8* janshi_widthflags;
+static UINT8* janshi_unk2;
 
 static ADDRESS_MAP_START( janshi_vdp_map8, 0, 8 )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 
-	AM_RANGE(0x06000, 0x0601f) AM_RAM AM_BASE(&janshi_crtc_regs)
+	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE(&janshi_back_vram) // bg tilemap?
+	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE(&janshi_vram1) // xpos, colour, tile number etc.
+	
+	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_BASE(&janshi_unk1) // ?? height related?
+	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_BASE(&janshi_widthflags)
+	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_BASE(&janshi_unk2) // 2x increasing tables 00 10 20 30 etc.
+	
+	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_BASE(&janshi_vram2) // y pos + unknown
 
-	AM_RANGE(0x12000, 0x12fff) AM_RAM AM_BASE(&janshi_vram1)
+	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 
-	AM_RANGE(0x13700, 0x137ff) AM_RAM AM_BASE(&janshi_unk)
-
-	AM_RANGE(0x13800, 0x13fff) AM_RAM AM_BASE(&janshi_vram2)
-
-	AM_RANGE(0x20000, 0x21fff) AM_RAM AM_BASE(&janshi_back_vram)
+	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_BASE(&janshi_crtc_regs)
 ADDRESS_MAP_END
 
 
@@ -147,7 +151,6 @@ void janshi_vdp_device::device_reset()
 
 
 static UINT32 vram_addr;
-static UINT8 vram_bank;
 
 static VIDEO_START( pinkiri8 )
 {
@@ -202,10 +205,10 @@ static VIDEO_UPDATE( pinkiri8 )
 		int count2;
 		printf("-------------------------------\n");
 		count2=0;
-		for (i=0x80;i<0xc0;i+=2)
+		for (i=0x00;i<0x40;i+=2)
 		{
 
-			printf("%02x, ", janshi_unk[i+1]);
+			printf("%02x, ", janshi_widthflags[i+1]);
 
 			count2++;
 
@@ -262,11 +265,11 @@ static VIDEO_UPDATE( pinkiri8 )
 		for(i=(0x1000/4)-4;i>=0;i--)
 		{
 
-		/* vram 1 (12000 - 12fff)
+		/* vram 1 (video map 0xfc2000)
 
           tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
 
-          vram 2 (13800 - 13fff)
+          vram 2 (video map 0xfc3800)
 
           yyyy yyyy | ???? ???? |
 
@@ -296,7 +299,7 @@ static VIDEO_UPDATE( pinkiri8 )
 
 
 			// these bits seem to somehow determine the sprite height / widths for the sprite ram region?
-			int bit = janshi_unk[0x80 + (i/0x20)*2 + 1];
+			int bit = janshi_widthflags[(i/0x20)*2 + 1];
 
 			if (bit)
 			{
@@ -410,67 +413,33 @@ static int prev_writes = 0;
 
 static WRITE8_HANDLER( pinkiri8_vram_w )
 {
-  static UINT8 *vram = memory_region(space->machine, "vram");
-
-
-
 	switch(offset)
 	{
 		case 0:
-			vram_addr = (data & 0xff);
+			vram_addr = (data << 0)  | (vram_addr&0xffff00);
 			if (LOG_VRAM) printf("\n prev writes was %04x\n\naddress set to %04x -\n", prev_writes, vram_addr );
 			prev_writes = 0;
 			break;
 
 		case 1:
-			vram_addr = (data << 8) | (vram_addr & 0x00ff);
+			vram_addr = (data << 8)  | (vram_addr & 0xff00ff);
 			if (LOG_VRAM)printf("\naddress set to %04x\n", vram_addr);
 			break;
 
 		case 2:
-			vram_bank = ((data ^ 0x06) & 0x06)>>1; //unknown purpose
-			if (LOG_VRAM)printf("\nunk set to %02x\n", data);
-
-			if ((data!= 0xfb) && (data!=0xfc) && (data!=0xff) && (data!=0xfe)  && (data!=0x0c))
-				if (LOG_VRAM) fatalerror("unknown unknown\n");
-			//printf("%02x\n",vram_bank);
+			vram_addr = (data << 16) | (vram_addr & 0x00ffff);
+			if (LOG_VRAM)printf("\naddress set to %04x\n", vram_addr);
 			break;
 
 		case 3:
 
 			const address_space *vdp_space = space->machine->device<janshi_vdp_device>("janshivdp")->space();
 
-
-
 			if (LOG_VRAM) printf("%02x ", data);
 			prev_writes++;
 			vram_addr++;
-			vram_addr&=0xffff;
 
-			memory_write_byte_8le(vdp_space, (vram_addr) | (vram_bank << 16), data);
-
-			vram[(vram_addr) | (vram_bank << 16)] = data;
-
-			//vram[(vram_addr) | (vram_bank << 16)] = data;
-			/*
-
-            if(vram_addr <= 0xffff)
-            {
-                static UINT16 datax,pal_offs;
-                static UINT8 r,g,b;
-
-                pal_offs = vram_addr;
-
-                datax = (vram[pal_offs & 0x1fff]) + (vram[(pal_offs & 0x1fff) | (0x2000)]<<8);
-
-                r = ((datax)&0x001f)>>0;
-                g = ((datax)&0x03e0)>>5;
-                b = ((datax)&0x7c00)>>10;
-
-                palette_set_color_rgb(space->machine, pal_offs & 0x1fff, pal5bit(r), pal5bit(g), pal5bit(b));
-            }
-            */
-
+			memory_write_byte_8le(vdp_space, vram_addr, data);
 			break;
 	}
 }
@@ -1157,7 +1126,7 @@ static MACHINE_DRIVER_START( pinkiri8 )
 	MDRV_VIDEO_START(pinkiri8)
 	MDRV_VIDEO_UPDATE(pinkiri8)
 
-	MDRV_DEVICE_ADD("janshivdp", JANSHIVDP, 0) \
+	MDRV_DEVICE_ADD("janshivdp", JANSHIVDP, 0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1184,8 +1153,6 @@ ROM_START( pinkiri8 )
 	ROM_LOAD( "pinkiri8-chr-04.ef1", 0x60000, 0x20000, CRC(4d0e5005) SHA1(4b90119c359c4de576131fd0e28d2fe1482ce74f) )
 	ROM_LOAD( "pinkiri8-chr-05.h1",  0x80000, 0x20000, CRC(036ca165) SHA1(c4a2d6e394bbabcae1413d8a2916a19c90687edf) )
 
-	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
-
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
 ROM_END
 
@@ -1204,9 +1171,6 @@ ROM_START( janshi )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "6.1k", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
-
-	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
-
 ROM_END
 
 ROM_START( ronjan )
@@ -1223,9 +1187,6 @@ ROM_START( ronjan )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "eagle.6", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
-
-	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
-
 ROM_END
 
 static UINT8 prot_read_index;
