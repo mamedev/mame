@@ -1502,6 +1502,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
 	$(DRIVERS)/cb2001.o \
+	$(DRIVERS)/cdi.o \
 	$(DRIVERS)/chsuper.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
@@ -1703,6 +1704,8 @@ $(DRIVERS)/buggychl.o:	$(LAYOUT)/buggychl.lh
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
 
 $(DRIVERS)/cardline.o:	$(LAYOUT)/cardline.lh
+
+$(DRIVERS)/cdi.o:	$(LAYOUT)/cdi.lh
 
 $(DRIVERS)/changela.o:	$(LAYOUT)/changela.lh
 
