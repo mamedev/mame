@@ -311,7 +311,7 @@ const char *device_image_interface::basename_noext()
     s = astring(basename());
 	if (s)
 	{
-		ext = strrchr(s, '.');
+		ext = (char *)strrchr(s, '.');
 		if (ext)
 			*ext = '\0';
 	}
