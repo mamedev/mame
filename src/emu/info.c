@@ -919,6 +919,30 @@ static void print_game_images(FILE *out, const game_driver *game, const machine_
 }
 
 /*-------------------------------------------------
+    print_game_software_list - print the information
+    for all known software lists for this system
+-------------------------------------------------*/
+
+static void print_game_software_list(FILE *out, const game_driver *game, const machine_config *config)
+{
+	for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next())
+	{
+		if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
+		{
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+
+			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+			{
+				if ( swlist->list_name[i] )
+				{
+					fprintf(out, "\t\t<softwarelist name=\"%s\" />\n", swlist->list_name[i] );
+				}
+			}
+		}
+	}
+}
+
+/*-------------------------------------------------
     print_game_info - print the XML information
     for one particular game driver
 -------------------------------------------------*/
@@ -993,6 +1017,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
 	print_game_images( out, game, config );
+	print_game_software_list( out, game, config );
 #ifdef MESS
 	print_mess_game_xml(out, game, config);
 #endif /* MESS */
@@ -1023,7 +1048,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 #ifdef MESS
 		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*, softwarelist*)>\n"
 #else
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, softwarelist*)>\n"
 #endif
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
@@ -1140,11 +1165,11 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
 		"\t\t\t<!ELEMENT extension EMPTY>\n"
 		"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
+		"\t\t<!ELEMENT softwarelist EMPTY>\n"
+		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 #ifdef MESS
 		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
 		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
-		"\t\t<!ELEMENT softwarelist EMPTY>\n"
-		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 #endif
 		"]>\n\n"
 		"<" XML_ROOT " build=\"%s\" debug=\""
