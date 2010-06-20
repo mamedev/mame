@@ -103,6 +103,9 @@ struct image_device_format
 };
 
 class device_image_interface;
+struct feature_list;
+struct software_part;
+struct software_info;
 
 // device image interface function types
 typedef int (*device_image_load_func)(device_image_interface &image);
@@ -188,11 +191,11 @@ public:
 	device_image_interface(running_machine &machine, const device_config &config, device_t &device);
 	virtual ~device_image_interface();
 
-	virtual void set_working_directory(const char *working_directory) = 0;
-	virtual const char * working_directory() = 0;
 	virtual bool load(const char *path) = 0;
 	virtual bool finish_load() = 0;
 	virtual void unload() = 0;
+	
+	virtual void display();
 	
 	virtual const image_device_format *device_get_indexed_creatable_format(int index);
 	virtual const image_device_format *device_get_named_creatable_format(const char *format_name);
@@ -206,10 +209,10 @@ public:
 	void message(const char *format, ...);
 
 	bool exists() { return m_name.len() != 0; }
-	const char *filename();
-	const char *basename();
-	const char *basename_noext();
-	const char *filetype();
+	const char *filename() { if (m_name.len()==0) return NULL; else return m_name; }
+	const char *basename() { if (m_basename.len()==0) return NULL; else return m_basename; }
+	const char *basename_noext()  { if (m_basename_noext.len()==0) return NULL; else return m_basename_noext; }
+	const char *filetype()  { if (m_filetype.len()==0) return NULL; else return m_filetype; }
 	core_file *image_core_file() { return m_file; }
 	UINT64 length() { check_for_file(); return core_fsize(m_file); }
 	bool is_writable() { return m_writeable; }
@@ -227,10 +230,33 @@ public:
 	const device_config_image_interface &image_config() const { return m_image_config; }
 	
 	void set_init_phase() { m_init_phase = TRUE; }
+	
+	const char* longname() { return m_longname; }
+	const char* manufacturer() { return m_manufacturer; }
+	const char* year() { return m_year; }
+	const char* playable() { return m_playable; }
+	const char* pcb() { return m_pcb; }
+	const char* extrainfo() { return m_extrainfo; }
+	
+	const software_info *software_entry() { return m_software_info_ptr; }
+	
+	virtual void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
+	virtual const char * working_directory();	
+	
+	UINT8 *get_software_region(const char *tag);
+	UINT32 get_software_region_length(const char *tag);
+	const char *get_feature(const char *feature_name);
+
 protected:
+	image_error_t set_image_filename(const char *filename);
+
 	void clear_error();
 	
 	void check_for_file() { assert_always(m_file != NULL, "Illegal operation on unmounted image"); }
+	
+	void setup_working_directory();
+	bool try_change_working_directory(const char *subdir);
+
 	// derived class overrides
 
 	// configuration
@@ -243,6 +269,26 @@ protected:
     /* variables that are only non-zero when an image is mounted */
 	core_file *m_file;	
 	astring m_name;	
+	astring m_basename;
+	astring m_basename_noext;
+	astring m_filetype;
+
+	/* working directory; persists across mounts */
+	astring m_working_directory;
+	
+	/* Software information */
+	char *m_full_software_name;
+	software_info *m_software_info_ptr;
+	software_part *m_software_part_ptr;
+
+    /* info read from the hash file/software list */
+	astring m_longname;
+	astring m_manufacturer;
+	astring m_year;
+	astring m_playable;
+    astring m_pcb;
+    astring m_extrainfo;
+
     /* flags */
     bool m_writeable;
     bool m_created;	

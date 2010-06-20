@@ -99,6 +99,7 @@
 #include "state.h"
 
 // image-related
+#include "softlist.h"
 #include "image.h"
 
 // the running machine

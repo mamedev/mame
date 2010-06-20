@@ -638,8 +638,6 @@ class legacy_image_device_base :	public legacy_device_base,
 {
 	friend class legacy_image_device_config_base;
 public:
-	virtual void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
-	virtual const char * working_directory();
 	virtual bool load(const char *path);
 	virtual bool finish_load();
 	virtual void unload();
@@ -648,16 +646,8 @@ protected:
 	// construction/destruction
 	legacy_image_device_base(running_machine &machine, const device_config &config);
 	// device_image_interface overrides
-	
-	/* working directory; persists across mounts */
-	astring m_working_directory;
-		
-	void setup_working_directory();
-	bool try_change_working_directory(const char *subdir);
-	
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
-	image_error_t set_image_filename(const char *filename);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
 	void clear();	
 	bool is_loaded();

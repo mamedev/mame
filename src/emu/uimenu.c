@@ -14,6 +14,7 @@
 #include "ui.h"
 #include "rendutil.h"
 #include "cheat.h"
+#include "uiimage.h"
 #include "uiinput.h"
 #include "uimenu.h"
 #include "audit.h"
@@ -1530,11 +1531,23 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 	/* add game info menu */
 	ui_menu_item_append(menu, CAPSTARTGAMENOUN " Information", NULL, 0, (void *)menu_game_info);
 
-#ifdef MESS
-	/* add MESS-specific menus */
-	ui_mess_main_menu_populate(machine, menu);
-#endif /* MESS */
+	device_image_interface *image = NULL;
+	if (machine->devicelist.first(image)) 
+	{
+		/* add image info menu */
+		ui_menu_item_append(menu, "Image Information", NULL, 0, (void*)ui_image_menu_image_info);
 
+		/* add file manager menu */
+		ui_menu_item_append(menu, "File Manager", NULL, 0, (void*)ui_image_menu_file_manager);
+
+		/* add software menu */
+		ui_menu_item_append(menu, "Software", NULL, 0, (void*)ui_image_menu_software);
+		
+	#ifdef MESS
+		/* add MESS-specific menus */
+		ui_mess_main_menu_populate(machine, menu);
+	#endif /* MESS */
+	}
 	/* add keyboard mode menu */
 	if (input_machine_has_keyboard(machine) && inputx_can_post(machine))
 		ui_menu_item_append(menu, "Keyboard Mode", NULL, 0, (void *)ui_menu_keyboard_mode);

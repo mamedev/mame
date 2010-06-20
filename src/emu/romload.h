@@ -324,9 +324,6 @@ chd_file *get_disk_handle(running_machine *machine, const char *region);
 /* set a pointer to the CHD file associated with the given region */
 void set_disk_handle(running_machine *machine, const char *region, mame_file *file, chd_file *chd);
 
-
-#ifdef MESS
 void load_software_part_region(running_device *device, char *swlist, char *swname, rom_entry *start_region);
-#endif
 
 #endif	/* __ROMLOAD_H__ */

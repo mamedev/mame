@@ -21,11 +21,6 @@
 #include "uiinput.h"
 #include "uimenu.h"
 #include "uigfx.h"
-
-#ifdef MESS
-#include "uimess.h"
-#endif /* MESS */
-
 #include <ctype.h>
 
 
@@ -1266,6 +1261,26 @@ void ui_paste(running_machine *machine)
 }
 
 /*-------------------------------------------------
+    ui_image_handler_ingame - execute display 
+	callback function for each image device
+-------------------------------------------------*/
+
+void ui_image_handler_ingame(running_machine *machine)
+{
+	device_image_interface *image = NULL;
+
+	/* run display routine for devices */
+	if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
+	{
+		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+		{
+			image->display();
+		}
+	}
+
+}
+
+/*-------------------------------------------------
     handler_ingame - in-game handler takes care
     of the standard keypresses
 -------------------------------------------------*/
@@ -1345,9 +1360,7 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 			ui_paste(machine);
 	}
 
-#ifdef MESS
-	ui_mess_handler_ingame(machine);
-#endif /* MESS */
+	ui_image_handler_ingame(machine);
 
 	if (ui_disabled) return ui_disabled;
 

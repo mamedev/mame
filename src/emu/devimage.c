@@ -209,25 +209,13 @@ legacy_image_device_base::legacy_image_device_base(running_machine &machine, con
 ****************************************************************************/
 
 /*-------------------------------------------------
-    set_image_filename - specifies the filename of
-    an image
--------------------------------------------------*/
-
-image_error_t legacy_image_device_base::set_image_filename(const char *filename)
-{
-    m_name = filename;
-    zippath_parent(&m_working_directory, filename);
-    return IMAGE_ERROR_SUCCESS;
-}
-
-/*-------------------------------------------------
     is_loaded - quick check to determine whether an
     image is loaded
 -------------------------------------------------*/
 
 bool legacy_image_device_base::is_loaded()
 {
-    return (m_file != NULL); // (image->software_info_ptr != NULL);
+    return (m_file != NULL) || (m_software_info_ptr != NULL);
 }
 
 /*-------------------------------------------------
@@ -332,6 +320,8 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
         goto done;
 
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
+	if (is_create || !load_software_part( this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name ) )
+	{
 		/* determine open plan */
 		determine_open_plan(is_create, open_plan);
 
@@ -343,7 +333,17 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 			if (err && (err != IMAGE_ERROR_FILENOTFOUND))
 				goto done;
 		}
-		
+	}
+
+	/* Copy some image information when we have been loaded through a software list */
+	if ( m_software_info_ptr )
+	{
+		m_longname = m_software_info_ptr->longname;
+		m_manufacturer = m_software_info_ptr->publisher;
+		m_year = m_software_info_ptr->year;
+		//m_playable = m_software_info_ptr->supported;
+	}
+	
 	/* did we fail to find the file? */
 	if (!is_loaded())
 	{
@@ -469,6 +469,18 @@ void legacy_image_device_base::clear()
     m_name.reset();
     m_writeable = FALSE;
     m_created = FALSE;
+	
+    m_longname.reset();
+    m_manufacturer.reset();
+    m_year.reset();
+    m_playable.reset();
+    m_extrainfo.reset();
+    m_basename_noext.reset();
+	m_filetype.reset();
+
+	m_full_software_name = NULL;
+	m_software_info_ptr = NULL;
+	m_software_part_ptr = NULL;	
 }
 
 /*-------------------------------------------------
@@ -480,82 +492,3 @@ void legacy_image_device_base::unload()
     clear();
 }
 
-
-/***************************************************************************
-    WORKING DIRECTORIES
-***************************************************************************/
-
-/*-------------------------------------------------
-    try_change_working_directory - tries to change
-    the working directory, but only if the directory
-    actually exists
--------------------------------------------------*/
-bool legacy_image_device_base::try_change_working_directory(const char *subdir)
-{
-    osd_directory *directory;
-    const osd_directory_entry *entry;
-    bool success = FALSE;
-    bool done = FALSE;
-
-    directory = osd_opendir(m_working_directory.cstr());
-    if (directory != NULL)
-    {
-        while(!done && (entry = osd_readdir(directory)) != NULL)
-        {
-            if (!mame_stricmp(subdir, entry->name))
-            {
-                done = TRUE;
-                success = entry->type == ENTTYPE_DIR;
-            }
-        }
-
-        osd_closedir(directory);
-    }
-
-    /* did we successfully identify the directory? */
-    if (success)
-        zippath_combine(&m_working_directory, m_working_directory, subdir);
-
-    return success;
-}
-/*-------------------------------------------------
-    setup_working_directory - sets up the working
-    directory according to a few defaults
--------------------------------------------------*/
-
-void legacy_image_device_base::setup_working_directory()
-{
-    const game_driver *gamedrv;
-	char *dst = NULL;
-
-	osd_get_full_path(&dst,".");
-    /* first set up the working directory to be the starting directory */
-    m_working_directory = dst;
-
-    /* now try browsing down to "software" */
-    if (try_change_working_directory("software"))
-    {
-        /* now down to a directory for this computer */
-        gamedrv = device().machine->gamedrv;
-        while(gamedrv && !try_change_working_directory(gamedrv->name))
-        {
-            gamedrv = driver_get_compatible(gamedrv);
-        }
-    }
-	osd_free(dst);
-}
-
-//-------------------------------------------------
-//  working_directory - returns the working
-//  directory to use for this image; this is
-//  valid even if not mounted
-//-------------------------------------------------
-
-const char * legacy_image_device_base::working_directory() 
-{
-   /* check to see if we've never initialized the working directory */
-    if (m_working_directory.len() == 0)
-        setup_working_directory();
-
-    return m_working_directory;
-}

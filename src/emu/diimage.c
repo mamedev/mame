@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "ui.h"
+#include "zippath.h"
 
 
 //**************************************************************************
@@ -130,7 +131,10 @@ const char *device_config_image_interface::device_brieftypename(iodevice_t type)
 device_image_interface::device_image_interface(running_machine &machine, const device_config &config, device_t &device)
 	: device_interface(machine, config, device),
 	  m_image_config(dynamic_cast<const device_config_image_interface &>(config)),	  
-	  m_file(NULL)
+	  m_file(NULL),
+	  m_full_software_name(NULL),
+	  m_software_info_ptr(NULL),
+	  m_software_part_ptr(NULL)
 {
 }
 
@@ -141,6 +145,45 @@ device_image_interface::device_image_interface(running_machine &machine, const d
 
 device_image_interface::~device_image_interface()
 {
+}
+
+/*-------------------------------------------------
+    display - call image display callback function
+-------------------------------------------------*/
+
+void device_image_interface::display() 
+{
+}
+
+
+/*-------------------------------------------------
+    set_image_filename - specifies the filename of
+    an image
+-------------------------------------------------*/
+
+image_error_t device_image_interface::set_image_filename(const char *filename)
+{
+    m_name = filename;
+    zippath_parent(&m_working_directory, filename);
+	m_basename = m_name.cpy(m_name);
+	
+	int loc1 = m_name.rchr(0,'\\');
+	int loc2 = m_name.rchr(0,'/');
+	int loc3 = m_name.rchr(0,':');
+	int loc = MAX(loc1,MAX(loc2,loc3));
+	if (loc!=-1) {
+		m_basename = m_basename.substr(loc + 1,m_basename.len()-loc);
+	}
+	m_basename_noext = m_basename.cpy(m_basename);
+	m_filetype = "";
+	loc = m_basename_noext.rchr(0,'.');
+	if (loc!=-1) {
+		m_basename_noext = m_basename_noext.substr(0,loc);
+		m_filetype = m_basename.cpy(m_basename);
+		m_filetype = m_filetype.substr(loc + 1,m_filetype.len()-loc);
+	}
+
+    return IMAGE_ERROR_SUCCESS;
 }
 
 /****************************************************************************
@@ -260,74 +303,132 @@ void device_image_interface::message(const char *format, ...)
 }
 
 
-/****************************************************************************
-  Accessor functions
-
-  These provide information about the device; and about the mounted image
-****************************************************************************/
+/***************************************************************************
+    WORKING DIRECTORIES
+***************************************************************************/
 
 /*-------------------------------------------------
-    filename
+    try_change_working_directory - tries to change
+    the working directory, but only if the directory
+    actually exists
+-------------------------------------------------*/
+bool device_image_interface::try_change_working_directory(const char *subdir)
+{
+    osd_directory *directory;
+    const osd_directory_entry *entry;
+    bool success = FALSE;
+    bool done = FALSE;
+
+    directory = osd_opendir(m_working_directory.cstr());
+    if (directory != NULL)
+    {
+        while(!done && (entry = osd_readdir(directory)) != NULL)
+        {
+            if (!mame_stricmp(subdir, entry->name))
+            {
+                done = TRUE;
+                success = entry->type == ENTTYPE_DIR;
+            }
+        }
+
+        osd_closedir(directory);
+    }
+
+    /* did we successfully identify the directory? */
+    if (success)
+        zippath_combine(&m_working_directory, m_working_directory, subdir);
+
+    return success;
+}
+/*-------------------------------------------------
+    setup_working_directory - sets up the working
+    directory according to a few defaults
 -------------------------------------------------*/
 
-const char *device_image_interface::filename()
+void device_image_interface::setup_working_directory()
 {
-    const char *name = m_name;
-    return (name[0] != '\0') ? name : NULL;
+    const game_driver *gamedrv;
+	char *dst = NULL;
+
+	osd_get_full_path(&dst,".");
+    /* first set up the working directory to be the starting directory */
+    m_working_directory = dst;
+
+    /* now try browsing down to "software" */
+    if (try_change_working_directory("software"))
+    {
+        /* now down to a directory for this computer */
+        gamedrv = device().machine->gamedrv;
+        while(gamedrv && !try_change_working_directory(gamedrv->name))
+        {
+            gamedrv = driver_get_compatible(gamedrv);
+        }
+    }
+	osd_free(dst);
 }
 
+//-------------------------------------------------
+//  working_directory - returns the working
+//  directory to use for this image; this is
+//  valid even if not mounted
+//-------------------------------------------------
+
+const char * device_image_interface::working_directory() 
+{
+   /* check to see if we've never initialized the working directory */
+    if (m_working_directory.len() == 0)
+        setup_working_directory();
+
+    return m_working_directory;
+}
+
+
 /*-------------------------------------------------
-    basename
+    get_software_region
 -------------------------------------------------*/
 
-const char *device_image_interface::basename()
+UINT8 *device_image_interface::get_software_region(const char *tag)
 {
-    char *fname = (char*)astring(filename()).cstr();
-	const char *c;
+	char full_tag[256];
 
-	// NULL begets NULL
-	if (!fname)
+	if ( m_software_info_ptr == NULL || m_software_part_ptr == NULL )
 		return NULL;
 
-	// start at the end and return when we hit a slash or colon
-	for (c = fname + strlen(fname) - 1; c >= fname; c--)
-		if (*c == '\\' || *c == '/' || *c == ':')
-			return c + 1;
-
-	// otherwise, return the whole thing
-	return fname;
+	sprintf( full_tag, "%s:%s", device().tag(), tag );
+	return memory_region( device().machine, full_tag );
 }
 
 
 /*-------------------------------------------------
-    basename_noext
+    image_get_software_region_length
 -------------------------------------------------*/
 
-const char *device_image_interface::basename_noext()
+UINT32 device_image_interface::get_software_region_length(const char *tag)
 {
-    const char *s;
-    char *ext;
+    char full_tag[256];
 
-    s = astring(basename());
-	if (s)
+    sprintf( full_tag, "%s:%s", device().tag(), tag );
+    return memory_region_length( device().machine, full_tag );
+}
+
+
+/*-------------------------------------------------
+ image_get_feature
+ -------------------------------------------------*/
+
+const char *device_image_interface::get_feature(const char *feature_name)
+{
+	feature_list *feature;
+
+	if ( ! m_software_part_ptr->featurelist )
+		return NULL;
+
+	for ( feature = m_software_part_ptr->featurelist; feature; feature = feature->next )
 	{
-		ext = (char *)strrchr(s, '.');
-		if (ext)
-			*ext = '\0';
+		if ( ! strcmp( feature->name, feature_name ) )
+			return feature->value;
 	}
-    return s;
+
+	return NULL;
 }
 
-
-
-/*-------------------------------------------------
-    filetype
--------------------------------------------------*/
-
-const char *device_image_interface::filetype()
-{
-    const char *s = filename();
-    if (s != NULL)
-        s = strrchr(s, '.');
-    return s ? s+1 : NULL;
-}

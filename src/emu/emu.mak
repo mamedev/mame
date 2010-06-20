@@ -80,6 +80,7 @@ EMUOBJS = \
 	$(EMUOBJ)/rendutil.o \
 	$(EMUOBJ)/romload.o \
 	$(EMUOBJ)/schedule.o \
+	$(EMUOBJ)/softlist.o \
 	$(EMUOBJ)/sound.o \
 	$(EMUOBJ)/state.o \
 	$(EMUOBJ)/streams.o \
@@ -87,6 +88,7 @@ EMUOBJS = \
 	$(EMUOBJ)/timer.o \
 	$(EMUOBJ)/ui.o \
 	$(EMUOBJ)/uigfx.o \
+	$(EMUOBJ)/uiimage.o \
 	$(EMUOBJ)/uiinput.o \
 	$(EMUOBJ)/uimenu.o \
 	$(EMUOBJ)/validity.o \
