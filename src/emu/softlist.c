@@ -1016,7 +1016,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 		if ( swlists )
 		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&image->device().baseconfig())->inline_config();
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
 
 			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 			{
