@@ -66,67 +66,162 @@ static UINT16 littlerb_vdp_address_high;
 static UINT16 littlerb_vdp_writemode;
 static UINT32 littlerb_write_address;
 
+
+static UINT16* littlerb_region4;
+
+static UINT8 paldac[3][0x80];
+
+static int paldac_select = 0;
+static int paldac_offset = 0;
+
+
+
+WRITE16_HANDLER( region4_w )
+{	
+	COMBINE_DATA(&littlerb_region4[offset]);
+}
+
+WRITE16_HANDLER(palette_offset_w)
+{
+	//printf("palette offset set to %04x\n",data);
+	paldac_offset = data;
+	paldac_select = 0;
+	paldac_offset&=0x7f;
+
+}
+
+WRITE16_HANDLER( palette_data_w )
+{
+	//printf("palette write %04x\n",data);
+	
+	paldac[paldac_select][paldac_offset] = data;
+	paldac_select++;
+	if (paldac_select==3)
+	{
+		int r,g,b;
+		
+		r = paldac[0][paldac_offset];
+		g = paldac[1][paldac_offset];
+		b = paldac[2][paldac_offset];
+		
+		palette_set_color(space->machine,paldac_offset,MAKE_RGB(r,g,b));
+	
+		paldac_select = 0;
+		paldac_offset++;
+		paldac_offset&=0x7f;
+	}
+}
+
+WRITE16_HANDLER( palette_reset_w )
+{
+//	printf("palette reset write %04x\n",data);
+	
+	paldac_select = 0;
+	paldac_offset = 0;
+	
+}
+
+/* this map is wrong because our VDP access is wrong! */
+static ADDRESS_MAP_START( littlerb_vdp_map8, 0, 16 )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM_WRITE(region4_w)
+	
+	/* these are definitely written by a non-incrementing access to the VDP */
+	AM_RANGE(0x00800000, 0x00800001) AM_WRITE(palette_offset_w)
+	AM_RANGE(0x00800002 ,0x00800003) AM_WRITE(palette_data_w)
+	AM_RANGE(0x00800004 ,0x00800005) AM_WRITE(palette_reset_w)
+	
+
+
+	AM_RANGE(0x0ff80000, 0x0fffffff) AM_RAM_WRITE(region4_w)
+	
+	
+	AM_RANGE(0x1ff80000, 0x1fffffff)  AM_RAM_WRITE(region4_w) AM_BASE(&littlerb_region4)
+ADDRESS_MAP_END
+
+
+
+/* VDP device to give us our own memory map */
+class littlerb_vdp_device;
+class littlerb_vdp_device_config;
+
+
+class littlerb_vdp_device : public device_t,
+						  public device_memory_interface
+{
+	friend class littlerb_vdp_device_config;
+	littlerb_vdp_device(running_machine &_machine, const littlerb_vdp_device_config &config);
+public:
+protected:
+	virtual void device_start() { }
+	const littlerb_vdp_device_config &m_config;
+};
+
+class littlerb_vdp_device_config : public device_config,
+								 public device_config_memory_interface
+{
+	friend class littlerb_vdp_device;
+	littlerb_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+public:
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	{
+		return global_alloc(littlerb_vdp_device_config(mconfig, tag, owner, clock));
+	}
+	
+	virtual device_t *alloc_device(running_machine &machine) const
+	{
+		return auto_alloc(&machine, littlerb_vdp_device(machine, *this));
+	}
+
+	virtual const char *name() const { return "LITTLERBVDP"; }
+protected:
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const
+	{
+		return (spacenum == 0) ? &m_space_config : NULL;
+	}
+	
+	address_space_config		m_space_config;
+};
+
+littlerb_vdp_device::littlerb_vdp_device(running_machine &_machine, const littlerb_vdp_device_config &config)
+	: device_t(_machine, config),
+	  device_memory_interface(_machine, config, *this),
+	  m_config(config)
+{
+}
+
+littlerb_vdp_device_config::littlerb_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("littlerb_vdp", ENDIANNESS_LITTLE, 16,32, 0, NULL, *ADDRESS_MAP_NAME(littlerb_vdp_map8))
+{
+}
+
+const device_type LITTLERBVDP = littlerb_vdp_device_config::static_alloc_device_config;
+
+
+/* end VDP device to give us our own memory map */
+
+
 static void littlerb_recalc_regs(void)
 {
 	littlerb_vdp_address_low = littlerb_write_address&0xffff;
 	littlerb_vdp_address_high = (littlerb_write_address>>16)&0xffff;
 }
 
-static UINT16* littlerb_region1;
-static UINT16* littlerb_region2;
-static UINT16* littlerb_region3;
-static UINT16* littlerb_region4;
 
 
-static void littlerb_data_write(running_machine *machine, UINT16 data)
+
+static void littlerb_data_write(running_machine *machine, UINT16 data, UINT16 mem_mask)
 {
 	UINT32 addr = littlerb_write_address>>4; // is this right? should we shift?
-
-	if (addr>=0x00000000 && addr<=0x0003ffff)
-	{
-		addr &= 0x0003ffff;
-
-	//  littlerb_region1[addr] = data;
-		littlerb_region4[addr] = data; // it writes the 'slime' gfx you cover the enemy in with here
-		                               // it might be a mirror, or just another area of ram it can
-		                               // access but isn't because of the sprite drawing..
-	}
-	else if (addr>=0x00400000 && addr<=0x004007ff)
-	{
-		int x;
-		addr &= 0x7ff;
-		littlerb_region2[addr] = data;
-
-		for (x=0;x<0x100;x+=3)
-		{
-			int r,g,b;
-
-			b = littlerb_region2[x];
-			r = littlerb_region2[x+1];
-			g = littlerb_region2[x+2];
-
-			palette_set_color(machine,x/3,MAKE_RGB(r,g,b));
-		}
+	const address_space *vdp_space = machine->device<littlerb_vdp_device>("littlerbvdp")->space();
 
 
-	}
-	else if (addr>=0x0c000000 && addr<=0x0c00001f)
-	{
-		addr &= 0x1f;
-		littlerb_region3[addr] = data;
-	}
-	else if (addr>=0x0ffc0000 && addr<=0x0fffffff)
-	{
-		addr &=0x3ffff;
-		littlerb_region4[addr] = data;
+	memory_write_word_masked(vdp_space, addr*2, data, mem_mask);
 
-	}
-	else
-	{
-		mame_printf_debug("write data %04x to %08x\n",data,addr);
-	}
 
-	littlerb_write_address+=0x10;
+	// e000 / 2000 are used for palette writes, which should go to a RAMDAC, so probably mean no auto inc.
+	if ((littlerb_vdp_writemode!=0xe000) && (littlerb_vdp_writemode!=0x2000)) littlerb_write_address+=0x10;
 	littlerb_recalc_regs();
 
 }
@@ -161,6 +256,7 @@ static READ16_HANDLER( littlerb_vdp_r )
 	return -1;
 }
 
+#define LOG_VDP 0
 static int type2_writes = 0;
 static UINT32 lasttype2pc = 0;
 static WRITE16_HANDLER( littlerb_vdp_w )
@@ -172,14 +268,14 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 		{
 			if (type2_writes>2)
 			{
-				logerror("******************************* BIG WRITE OCCURRED BEFORE THIS!!! ****************************\n");
+				if (LOG_VDP) logerror("******************************* BIG WRITE OCCURRED BEFORE THIS!!! ****************************\n");
 			}
 
-			logerror("~%06x previously wrote %08x data bytes\n", lasttype2pc, type2_writes*2);
+			if (LOG_VDP) logerror("~%06x previously wrote %08x data bytes\n", lasttype2pc, type2_writes*2);
 			type2_writes = 0;
 		}
 
-		logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+		if (LOG_VDP) logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 	}
 	else
 	{
@@ -187,7 +283,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 		{
 			if (type2_writes==0)
 			{
-				logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+				if (LOG_VDP) logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 			}
 
 			type2_writes++;
@@ -195,7 +291,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 		}
 		else
 		{
-			logerror("xxx %06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
+			if (LOG_VDP) logerror("xxx %06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 		}
 	}
 
@@ -214,10 +310,11 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 
 
 		case 2:
-		littlerb_data_write(space->machine, data);
+		littlerb_data_write(space->machine, data, mem_mask);
 		break;
 
 		case 3:
+		logerror("WRITE MODE CHANGED TO %04x\n",data);
 		littlerb_vdp_writemode = data;
 		break;
 
@@ -237,16 +334,6 @@ static ADDRESS_MAP_START( littlerb_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
 	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
 	AM_RANGE(0x780000, 0x780001) AM_WRITENOP
-
-	/* below are fake.. just to see the data */
-	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_BASE(&littlerb_region1)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE(&littlerb_region2)
-	AM_RANGE(0xe00000, 0xe0003f) AM_RAM AM_BASE(&littlerb_region3)
-	AM_RANGE(0xf00000, 0xf7ffff) AM_RAM AM_BASE(&littlerb_region4)
-
-
-
-
 ADDRESS_MAP_END
 
 
@@ -332,20 +419,13 @@ static INPUT_PORTS_START( littlerb )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-#if 0
-PALETTE_INIT( littlerb )
-{
-	int i;
-	for(i = 0; i < 256; i++)
-		palette_set_color(machine,i,MAKE_RGB(i,i,i));
-}
-#endif
 
-static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos )
+static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
 {
 	UINT16* spritegfx = littlerb_region4;
 	int x,y;
-
+	//int pal = 1;
+	
 	for (y=0;y<ysize;y++)
 	{
 		for (x=0;x<xsize;x++)
@@ -355,6 +435,10 @@ static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int x
 			UINT8 pix2 = (spritegfx[offset]>>8)&0x0f;
 			drawxpos = xpos+x*2;
 			drawypos = ypos+y;
+			
+			pix1+=pal*0x10;
+			pix2+=pal*0x10;
+
 
 			if ((drawxpos < 320) && (drawypos < 256) && (drawxpos >= 0) && (drawypos >=0))
 			{
@@ -373,26 +457,33 @@ static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int x
 	}
 }
 
+/* sprite format / offset could be completely wrong, this is just based on our (currently incorrect) vram access */
 static VIDEO_UPDATE(littlerb)
 {
 	int x,y,offs, code;
 	int xsize,ysize;
+	int pal;
 	UINT16* spriteregion = &littlerb_region4[0x400];
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-
+	//printf("frame\n");
 	/* the spriteram format is something like this .. */
 	for (offs=0x26/2;offs<0xc00;offs+=6) // start at 00x26?
 	{
 		x = spriteregion[offs+2] & 0x01ff;
 		ysize = (spriteregion[offs+5] & 0x007f);
 		y = (spriteregion[offs+3] & 0x01ff); // 1?
-		xsize = (spriteregion[offs+4] & 0x007f)/2;
+		xsize = (spriteregion[offs+4] & 0x00ff)/2;
 
 		// the code seems to be the same address as the blitter writes
 		// e.g  ffc010000
 		code =  (spriteregion[offs+0] & 0xfff0)>>4;
 		code |=  (spriteregion[offs+1] & 0x003f)<<12;
-		draw_sprite(bitmap,xsize,ysize,code,x-8,y-16);
+		
+		pal = 0;//(spriteregion[offs+4] & 0xf000)>>13; // where is the colour bit?!
+		
+		//if (code!=0) printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
+		
+		draw_sprite(bitmap,xsize,ysize,code,x-8,y-16, pal);
 	}
 
 	return 0;
@@ -419,6 +510,8 @@ static MACHINE_DRIVER_START( littlerb )
 
 	MDRV_PALETTE_LENGTH(256)
 
+	MDRV_DEVICE_ADD("littlerbvdp", LITTLERBVDP, 0)
+
 //  MDRV_PALETTE_INIT(littlerb)
 	MDRV_VIDEO_UPDATE(littlerb)
 MACHINE_DRIVER_END
@@ -428,7 +521,7 @@ ROM_START( littlerb )
 	ROM_LOAD16_BYTE( "roma.u53", 0x00001, 0x80000, CRC(172fbc13) SHA1(cd165ca0d0546e2634cf182dc98004cbfb02cf9f) )
 	ROM_LOAD16_BYTE( "romb.u29", 0x00000, 0x80000, CRC(b2fb1d61) SHA1(9a9d7176c241928d07af651e5f7f21d4f019701d) )
 
-		ROM_REGION( 0x80000, "samples", 0 ) /* sound samples */
+	ROM_REGION( 0x80000, "samples", 0 ) /* sound samples */
 	ROM_LOAD16_BYTE( "romc.u26", 0x00001, 0x40000, CRC(f193c5b6) SHA1(95548a40e2b5064c558b36cabbf507d23678b1b2) )
 	ROM_LOAD16_BYTE( "romd.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
 ROM_END
