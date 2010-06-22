@@ -558,6 +558,46 @@ static void cclimber_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, c
        order, to have the correct priorities. */
 	for (offs = 0x1c; offs >= 0; offs -= 4)
 	{
+		int x = cclimber_spriteram[offs + 3] + 1;
+		/* x + 1 is evident in cclimber and ckong. It looks worse,
+		but it has been confirmed on several PCBs. */
+
+		int y = 240 - cclimber_spriteram[offs + 2];
+
+		int code = ((cclimber_spriteram[offs + 1] & 0x10) << 3) |
+				   ((cclimber_spriteram[offs + 1] & 0x20) << 1) |
+				   ( cclimber_spriteram[offs + 0] & 0x3f);
+
+		int color = cclimber_spriteram[offs + 1] & 0x0f;
+
+		int flipx = cclimber_spriteram[offs + 0] & 0x40;
+		int flipy = cclimber_spriteram[offs + 0] & 0x80;
+
+		if (CCLIMBER_FLIP_X)
+		{
+			x = 242 - x;
+			flipx = !flipx;
+		}
+
+		if (CCLIMBER_FLIP_Y)
+		{
+			y = 240 - y;
+			flipy = !flipy;
+		}
+
+		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 0);
+	}
+}
+
+
+static void toprollr_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx)
+{
+	int offs;
+
+	/* draw the sprites -- note that it is important to draw them exactly in this
+       order, to have the correct priorities. */
+	for (offs = 0x1c; offs >= 0; offs -= 4)
+	{
 		int x = cclimber_spriteram[offs + 3];
 		int y = 240 - cclimber_spriteram[offs + 2];
 
@@ -667,13 +707,13 @@ VIDEO_UPDATE( yamato )
 	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(bitmap, cliprect);
-		cclimber_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
+		toprollr_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		cclimber_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
+		toprollr_draw_sprites(bitmap, cliprect, screen->machine->gfx[1]);
 		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
@@ -750,7 +790,7 @@ VIDEO_UPDATE( toprollr )
 	/* draw the "big sprite" over the regular sprites */
 	if ((cclimber_bigsprite_control[1] & 0x20))
 	{
-		cclimber_draw_sprites(bitmap, &scroll_area_clip, screen->machine->gfx[1]);
+		toprollr_draw_sprites(bitmap, &scroll_area_clip, screen->machine->gfx[1]);
 		toprollr_draw_bigsprite(bitmap, &scroll_area_clip);
 	}
 
@@ -758,7 +798,7 @@ VIDEO_UPDATE( toprollr )
 	else
 	{
 		toprollr_draw_bigsprite(bitmap, &scroll_area_clip);
-		cclimber_draw_sprites(bitmap, &scroll_area_clip, screen->machine->gfx[1]);
+		toprollr_draw_sprites(bitmap, &scroll_area_clip, screen->machine->gfx[1]);
 	}
 
 	tilemap_mark_all_tiles_dirty(pf_tilemap);
