@@ -1560,7 +1560,9 @@ ROM_START( ddragon6809 )
 	ROM_LOAD( "21.bin",      0x08000, 0x08000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
 
 	/* all the gfx roms are scrambled on this set */
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "gfx1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x08000, "chars", 0 )
 	ROM_LOAD( "13.bin",        0x00000, 0x08000, CRC(b5a54537) SHA1(a6157cde4f9738565008d11a4a6d8576ae3abfef) )	/* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
@@ -1637,7 +1639,9 @@ ROM_START( ddragon6809a )
 	ROM_LOAD( "16.7n",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
 
 	/* all the gfx roms are scrambled on this set */
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "gfx1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x08000, "chars", 0 )
 	ROM_LOAD( "13.5f",   0x00000, 0x08000, CRC(b5a54537) SHA1(a6157cde4f9738565008d11a4a6d8576ae3abfef) )	/* chars */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
@@ -2078,7 +2082,22 @@ static DRIVER_INIT( toffy )
 static DRIVER_INIT( ddragon6809 )
 {
 	ddragon_state *state = (ddragon_state *)machine->driver_data;
-	/* Descramble GFX here */
+	int i;
+	UINT8 *dst,*src;
+
+	src = memory_region(machine, "chars");
+	dst = memory_region(machine, "gfx1");
+
+	for (i = 0; i < 0x8000; i++)
+	{
+		switch(i & 0x18)
+		{
+			case 0x00: dst[i] = src[(i & ~0x18) | 0x18]; break;
+			case 0x08: dst[i] = src[(i & ~0x18) | 0x00]; break;
+			case 0x10: dst[i] = src[(i & ~0x18) | 0x08]; break;
+			case 0x18: dst[i] = src[(i & ~0x18) | 0x10]; break;
+		}
+	}
 
 	state->sprite_irq = INPUT_LINE_NMI;
 	state->sound_irq = M6809_IRQ_LINE;
