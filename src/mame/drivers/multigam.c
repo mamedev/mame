@@ -499,6 +499,10 @@ static void multigam_init_mmc3(running_machine *machine, UINT8 *prg_base, int pr
 {
 	UINT8* dst = memory_region(machine, "maincpu");
 
+	// Tom & Jerry in Super Game III enables 6000 ram, but does not read/write it
+	// however, it expects ROM from 6000 there (code jumps to $6xxx)
+	memcpy(multigmc_mmc3_6000_ram, dst + 0x6000, 0x2000);
+
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x4000), 0x4000);
 	memcpy(&dst[0xc000], prg_base + (prg_size - 0x4000), 0x4000);
 
