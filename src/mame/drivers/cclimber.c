@@ -1258,7 +1258,9 @@ ROM_START( ccboot2 )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
-ROM_START( ckong )
+/* Sets below are Crazy Kong Part II and have an extra screen in attract mode, showing a caged Kong and copyright */
+
+ROM_START( ckongpt2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d05-07.bin",   0x0000, 0x1000, CRC(b27df032) SHA1(57f9be139c610405e3c2fddd7093dfb1277e450e) )
 	ROM_LOAD( "f05-08.bin",   0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
@@ -1287,7 +1289,7 @@ ROM_START( ckong )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
-ROM_START( ckonga )
+ROM_START( ckongpt2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d05-07.bin",   0x0000, 0x1000, CRC(b27df032) SHA1(57f9be139c610405e3c2fddd7093dfb1277e450e) )
 	ROM_LOAD( "f05-08.bin",   0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
@@ -1316,7 +1318,7 @@ ROM_START( ckonga )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
-ROM_START( ckong2j )
+ROM_START( ckongpt2j )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d05-07.bin",   0x0000, 0x1000, CRC(b27df032) SHA1(57f9be139c610405e3c2fddd7093dfb1277e450e) )
 	ROM_LOAD( "f05-08.bin",   0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
@@ -1345,7 +1347,7 @@ ROM_START( ckong2j )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
-ROM_START( ckongjeu )
+ROM_START( ckongpt2jeu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d05-07.bin",   0x0000, 0x1000, CRC(b27df032) SHA1(57f9be139c610405e3c2fddd7093dfb1277e450e) )
 	ROM_LOAD( "f05-08.bin",   0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
@@ -1374,6 +1376,68 @@ ROM_START( ckongjeu )
 	ROM_LOAD( "cc12j.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
+
+ROM_START( ckongpt2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d05-7.rom",    0x0000, 0x1000, CRC(5d96ee9a) SHA1(f531d251fd3469edd3b5b5e7c26ff9cef7006ce8) )
+	ROM_LOAD( "f05-8.rom",    0x1000, 0x1000, CRC(74a8435b) SHA1(465ad96009d3ba939eee13ba0d5fd6d9dec118bc) )
+	ROM_LOAD( "h05-9.rom",    0x2000, 0x1000, CRC(e06ca575) SHA1(cd5a32fac614902e136e522ac188616c72d65571) )
+	ROM_LOAD( "k05-10.rom",   0x3000, 0x1000, CRC(46d83a11) SHA1(de840994104bfc633a3640610966f087fbc3d749) )
+	ROM_LOAD( "l05-11.rom",   0x4000, 0x1000, CRC(07c30f3d) SHA1(9b72f8a76c64ab22f8b8c1bd8e457c10b86d95a1) )
+	ROM_LOAD( "n05-12.rom",   0x5000, 0x1000, CRC(151de90a) SHA1(5d063c4fe6767727d051815120d692818a30ee81) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "n11-6.bin",    0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
+	ROM_LOAD( "l11-5.bin",    0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "k11-4.bin",    0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
+	ROM_LOAD( "h11-3.bin",    0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "c11-2.bin",    0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
+	ROM_LOAD( "a11-1.bin",    0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "prom.v6",      0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
+	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
+
+	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_LOAD( "s05-14.bin",   0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
+	ROM_LOAD( "r05-13.bin",   0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+ROM_END
+
+/* Sets below are 'Crazy Kong' without the extra Falcon screen or Pt. 2 subtitle, they also have worse colours */
+
+ROM_START( ckong )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "falcon7",      0x0000, 0x1000, CRC(2171cac3) SHA1(7b18bfe44c32fb64b675bbbe2136344522c79b09) )
+	ROM_LOAD( "falcon8",      0x1000, 0x1000, CRC(88b83ff7) SHA1(4afc494cc264aaa4614da6aed02ce062d9c20850) )
+	ROM_LOAD( "falcon9",      0x2000, 0x1000, CRC(cff2af47) SHA1(1757428cefad13855a623162101ec01c04006c94) )
+	ROM_LOAD( "falcon10",     0x3000, 0x1000, CRC(6b2ecf23) SHA1(75098de72f9b2966534b5c3d4bfaf4893c22150a) ) // differs from ckongalc
+	ROM_LOAD( "falcon11",     0x4000, 0x1000, CRC(327dcadf) SHA1(17b2d3b9e2a82b5278a01cc972cb49705d113127) )
+	/* no ROM at 5000 */
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "falcon6",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
+	ROM_LOAD( "falcon5",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
+	ROM_LOAD( "falcon4",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
+	ROM_LOAD( "falcon3",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "falcon2",  0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
+	ROM_LOAD( "falcon1",  0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "ck6v.bin",     0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
+	ROM_LOAD( "ck6u.bin",     0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
+	ROM_LOAD( "ck6t.bin",     0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) )
+
+	ROM_REGION( 0x2000, "samples", 0 )	/* samples */
+	ROM_LOAD( "falcon13",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
+	ROM_LOAD( "falcon12",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) ) // differs from ckongalc
+ROM_END
+
+
 ROM_START( ckongo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "o55a-1",       0x0000, 0x1000, CRC(8bfb4623) SHA1(1b8e12d1f337756bbfa9c3d736db7513d571c1b3) )
@@ -1384,7 +1448,7 @@ ROM_START( ckongo )
 	/* no ROM at 5000 */
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	/* same as ckong but with halves switched */
+	/* same as ckongpt2 but with halves switched */
 	ROM_LOAD( "o50b-1",       0x0000, 0x0800, CRC(cae9e2bf) SHA1(bc62d98840b8b5b296de0f1379baabb1b4d25df0) )
 	ROM_CONTINUE(             0x1000, 0x0800 )
 	ROM_LOAD( "o50b-2",       0x0800, 0x0800, CRC(fba82114) SHA1(36b7c124edf73b01681f5d63867fafa38a31abbf) )
@@ -1495,34 +1559,6 @@ ROM_START( monkeyd )
 	ROM_LOAD( "ck12.bin",     0x1000, 0x1000, CRC(2eb23b60) SHA1(c9e7dc584562aceb374193655fbacb7df6c9c731) )
 ROM_END
 
-ROM_START( ckongb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d05-7.rom",    0x0000, 0x1000, CRC(5d96ee9a) SHA1(f531d251fd3469edd3b5b5e7c26ff9cef7006ce8) )
-	ROM_LOAD( "f05-8.rom",    0x1000, 0x1000, CRC(74a8435b) SHA1(465ad96009d3ba939eee13ba0d5fd6d9dec118bc) )
-	ROM_LOAD( "h05-9.rom",    0x2000, 0x1000, CRC(e06ca575) SHA1(cd5a32fac614902e136e522ac188616c72d65571) )
-	ROM_LOAD( "k05-10.rom",   0x3000, 0x1000, CRC(46d83a11) SHA1(de840994104bfc633a3640610966f087fbc3d749) )
-	ROM_LOAD( "l05-11.rom",   0x4000, 0x1000, CRC(07c30f3d) SHA1(9b72f8a76c64ab22f8b8c1bd8e457c10b86d95a1) )
-	ROM_LOAD( "n05-12.rom",   0x5000, 0x1000, CRC(151de90a) SHA1(5d063c4fe6767727d051815120d692818a30ee81) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "n11-6.bin",    0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
-	ROM_LOAD( "l11-5.bin",    0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
-	ROM_LOAD( "k11-4.bin",    0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
-	ROM_LOAD( "h11-3.bin",    0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
-
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "c11-2.bin",    0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
-	ROM_LOAD( "a11-1.bin",    0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
-
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "prom.v6",      0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
-	ROM_LOAD( "prom.u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
-	ROM_LOAD( "prom.t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
-
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
-	ROM_LOAD( "s05-14.bin",   0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
-	ROM_LOAD( "r05-13.bin",   0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
-ROM_END
 
 /* This set came from a 'Silver Land' board with Silver Land GFX roms, however, the program roms are nearly
    the same as River Patrol but appear to have an original ORCA copyright
@@ -2041,30 +2077,51 @@ static DRIVER_INIT( toprollr )
 }
 
 
-GAME( 1980, cclimber, 0,        cclimber, cclimber, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", 0 )
-GAME( 1980, cclimberj,cclimber, cclimber, cclimberj,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", 0 )
-GAME( 1980, ccboot,   cclimber, cclimber, cclimber, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", 0 )
-GAME( 1980, ccboot2,  cclimber, cclimber, cclimber, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", 0 )
-GAME( 1981, ckong,    0,        cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", 0 )
-GAME( 1981, ckonga,   ckong,    cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", 0 )
-GAME( 1981, ckong2j,  ckong,    cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", 0 )
-GAME( 1981, ckongjeu, ckong,    cclimber, ckong,    0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", 0 )
-GAME( 1981, ckongo,   ckong,    cclimber, ckong,    0,        ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", 0 )
-GAME( 1981, ckongalc, ckong,    cclimber, ckong,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", 0 )
-GAME( 1981, bigkong,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
-GAME( 1981, monkeyd,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
-GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", 0 )
-GAME( 1981, bagmanf,  bagman,   cclimber, ckong,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", GAME_NOT_WORKING )
-GAME( 1981, rpatrol,  0,        cclimber, rpatrol,  0,        ROT0,   "Orca", "River Patrol (Orca)", 0 )
-GAME( 1981, rpatrolb, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
-GAME( 1981, silvland, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "Falcon", "Silver Land", 0 )
-GAME( 1985, cannonb,  cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , GAME_IMPERFECT_GRAPHICS ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb2, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", 0 ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb3, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", 0 ) // the bonus game is patched out, thus avoiding the protection issue
-GAME( 1982, swimmer,  0,        swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", 0 )
-GAME( 1982, swimmera, swimmer,  swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", 0 )
-GAME( 1982, swimmerb, swimmer,  swimmer,  swimmerb, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", 0 )
-GAME( 1983, guzzler,  0,        swimmer,  guzzler,  0,        ROT90,  "Tehkan", "Guzzler", 0 )
-GAME( 1983, yamato,   0,        yamato,   yamato,   yamato,   ROT90,  "Sega", "Yamato (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, yamato2,  yamato,   yamato,   yamato,   yamato,   ROT90,  "Sega", "Yamato (World?)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, toprollr, 0,        toprollr, toprollr, toprollr, ROT90,  "Jaleco", "Top Roller", GAME_IMPERFECT_COLORS )
+GAME( 1980, cclimber,    0,        cclimber, cclimber, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", 0 )
+GAME( 1980, cclimberj,   cclimber, cclimber, cclimberj,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", 0 )
+GAME( 1980, ccboot,      cclimber, cclimber, cclimber, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", 0 )
+GAME( 1980, ccboot2,     cclimber, cclimber, cclimber, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", 0 )
+
+/* these sets have ugly colours, no extra attract screen, and no graphics for the extra attract screen in the BG roms
+  - there is a Falcon logo in the text roms which is unused
+  - does the code to display the extra screen still exist in the roms?  */
+GAME( 1981, ckong,       0,        cclimber, ckong,    0,        ROT270, "Falcon?", "Crazy Kong", 0 ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
+GAME( 1981, ckongalc,    ckong,    cclimber, ckong,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", 0 )
+GAME( 1981, monkeyd,     ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
+
+/* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
+ - the Falcon logo in the text roms is still unused
+ - does the code to display the extra screen still exist in the roms?  */
+GAME( 1981, ckongo,      ckong,    cclimber, ckong,    0,        ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", 0 )
+GAME( 1981, bigkong,     ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
+
+/* these sets have correct colours, and the extra attract screen, they also make use of the Falcon logo, some sets hack out the Falcon
+   text on the extra screen */
+GAME( 1981, ckongpt2,    0,        cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", 0 )
+GAME( 1981, ckongpt2a,   ckongpt2, cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", 0 )
+GAME( 1981, ckongpt2j,   ckongpt2, cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", 0 )
+GAME( 1981, ckongpt2jeu, ckongpt2, cclimber, ckong,    0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", 0 )
+GAME( 1981, ckongpt2b,   ckongpt2, cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", 0 )
+
+// see bagman.c for parent
+GAME( 1981, bagmanf,     bagman,   cclimber, ckong,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", GAME_NOT_WORKING )
+
+GAME( 1981, rpatrol,     0,        cclimber, rpatrol,  0,        ROT0,   "Orca", "River Patrol (Orca)", 0 )
+GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
+GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol,  0,        ROT0,   "Falcon", "Silver Land", 0 )
+
+// see pacman.c for parent
+GAME( 1985, cannonb,     cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , GAME_IMPERFECT_GRAPHICS ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb2,    cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", 0 ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb3,    cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", 0 ) // the bonus game is patched out, thus avoiding the protection issue
+
+GAME( 1982, swimmer,     0,        swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", 0 )
+GAME( 1982, swimmera,    swimmer,  swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", 0 )
+GAME( 1982, swimmerb,    swimmer,  swimmer,  swimmerb, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", 0 )
+
+GAME( 1983, guzzler,     0,        swimmer,  guzzler,  0,        ROT90,  "Tehkan", "Guzzler", 0 )
+
+GAME( 1983, yamato,      0,        yamato,   yamato,   yamato,   ROT90,  "Sega", "Yamato (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, yamato2,     yamato,   yamato,   yamato,   yamato,   ROT90,  "Sega", "Yamato (World?)", GAME_IMPERFECT_GRAPHICS )
+
+GAME( 1983, toprollr,    0,        toprollr, toprollr, toprollr, ROT90,  "Jaleco", "Top Roller", GAME_IMPERFECT_COLORS )

@@ -352,33 +352,37 @@ const game_driver * const drivers[] =
 	DRIVER( turpins )	/* (c) 1981 bootleg */
 
 	/* "Crazy Climber hardware" games */
-	DRIVER( cclimber )	/* (c) 1980 Nichibutsu */
-	DRIVER( cclimberj )	/* (c) 1980 Nichibutsu */
-	DRIVER( ccboot )	/* bootleg */
-	DRIVER( ccboot2 )	/* bootleg */
-	DRIVER( ckong )		/* (c) 1981 Falcon */
-	DRIVER( ckonga )	/* (c) 1981 Falcon */
-	DRIVER( ckong2j )	/* (c) 1981 Falcon */
-	DRIVER( ckongjeu )	/* bootleg */
-	DRIVER( ckongo )	/* bootleg */
-	DRIVER( ckongalc )	/* bootleg */
-	DRIVER( bigkong )	/* bootleg */
-	DRIVER( monkeyd )	/* bootleg */
-	DRIVER( rpatrol )	/* Orca, from a suspicious set */
-	DRIVER( rpatrolb )	/* bootleg */
-	DRIVER( silvland )	/* Falcon */
-	DRIVER( yamato )	/* (c) 1983 Sega */
-	DRIVER( yamato2 )	/* (c) 1983 Sega */
-	DRIVER( toprollr )	/* (c) 1983 Jaleco */
-	DRIVER( swimmer )	/* (c) 1982 Tehkan */
-	DRIVER( swimmera )	/* (c) 1982 Tehkan */
-	DRIVER( swimmerb )	/* (c) 1982 Tehkan */
-	DRIVER( guzzler )	/* (c) 1983 Tehkan */
-	DRIVER( cannonb )	/* (c) 1985 Soft */
-	DRIVER( cannonb2 )	/* (c) 1985 TV Game Gruenberg */
-	DRIVER( cannonb3 )	/* (c) 1985 Soft */
-	DRIVER( ckongb )	/* bootleg */
-	DRIVER( bagmanf )	/* bootleg on Falcon FCK-00 (Falcon Crazy Kong) PCB */
+	DRIVER( cclimber )    /* (c) 1980 Nichibutsu */
+	DRIVER( cclimberj )    /* (c) 1980 Nichibutsu */
+	DRIVER( ccboot )    /* bootleg */
+	DRIVER( ccboot2 )    /* bootleg */
+
+	DRIVER( ckong )        /* (c) 1981 (Falcon?) */
+	DRIVER( ckongo )    /* bootleg (Orca) */
+	DRIVER( ckongalc )    /* bootleg (Alca) */
+	DRIVER( bigkong )    /* bootleg */
+	DRIVER( monkeyd )    /* bootleg */
+
+	DRIVER( ckongpt2 )    /* (c) 1981 Falcon */
+	DRIVER( ckongpt2a ) /* (c) 1981 Falcon */
+	DRIVER( ckongpt2j ) /* (c) 1981 Falcon */
+	DRIVER( ckongpt2jeu )/* bootleg (Jeutel) */
+	DRIVER( ckongpt2b )    /* bootleg */
+
+	DRIVER( rpatrol )    /* Orca, from a suspicious set */
+	DRIVER( rpatrolb )    /* bootleg */
+	DRIVER( silvland )    /* Falcon */
+	DRIVER( yamato )    /* (c) 1983 Sega */
+	DRIVER( yamato2 )    /* (c) 1983 Sega */
+	DRIVER( toprollr )    /* (c) 1983 Jaleco */
+	DRIVER( swimmer )    /* (c) 1982 Tehkan */
+	DRIVER( swimmera )    /* (c) 1982 Tehkan */
+	DRIVER( swimmerb )    /* (c) 1982 Tehkan */
+	DRIVER( guzzler )    /* (c) 1983 Tehkan */
+	DRIVER( cannonb )    /* (c) 1985 Soft */
+	DRIVER( cannonb2 )    /* (c) 1985 TV Game Gruenberg */
+	DRIVER( cannonb3 )    /* (c) 1985 Soft */
+	DRIVER( bagmanf )    /* bootleg on Falcon FCK-00 (Falcon Crazy Kong) PCB */
 
 	/* Nichibutsu games */
 	DRIVER( gomoku )	/* (c) 1981 */
