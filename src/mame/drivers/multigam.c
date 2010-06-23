@@ -631,11 +631,27 @@ static int mmc1_rom_mask;
 static UINT8* multigam_mmc1_prg_base;
 static int multigam_mmc1_prg_size;
 static int multigam_mmc1_chr_bank_base;
+static int multigam_mmc1_reg_write_enable;
+
+static TIMER_CALLBACK( mmc1_resync_callback )
+{
+	multigam_mmc1_reg_write_enable = 1;
+}
 
 static WRITE8_HANDLER( mmc1_rom_switch_w )
 {
 	/* basically, a MMC1 mapper from the nes */
 	static int size16k, switchlow, vrom4k;
+
+	if ( multigam_mmc1_reg_write_enable == 0 )
+	{
+		return;
+	}
+	else
+	{
+		multigam_mmc1_reg_write_enable = 0;
+		timer_call_after_resynch(space->machine, NULL, 0, mmc1_resync_callback);
+	}
 
 	int reg = (offset >> 13);
 
@@ -758,6 +774,7 @@ static void multigam_init_mmc1(running_machine *machine, UINT8 *prg_base, int pr
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
+	multigam_mmc1_reg_write_enable = 1;
 	mmc1_rom_mask = (prg_size / 0x4000) - 1;
 	multigam_mmc1_prg_base = prg_base;
 	multigam_mmc1_prg_size = prg_size;
