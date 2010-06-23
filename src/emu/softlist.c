@@ -1016,11 +1016,13 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 		if ( swlists )
 		{
+			
 			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
+			UINT32 i = DEVINFO_STR_SWLIST_0;
 
-			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+			while ( ! software_part_ptr && i <= DEVINFO_STR_SWLIST_MAX )
 			{
-				swlist_name = swlist->list_name[i];
+				swlist_name = swlist->list_name[i-DEVINFO_STR_SWLIST_0];
 
 				if ( swlist_name && *swlist_name )
 				{
@@ -1041,6 +1043,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 						}
 					}
 				}
+				i++;
 			}
 		}
 

@@ -87,13 +87,6 @@ void legacy_image_device_config_base::device_config_complete()
 
 	m_file_extensions = get_legacy_config_string(DEVINFO_STR_IMAGE_FILE_EXTENSIONS);
 
-	load		 = reinterpret_cast<device_image_load_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_LOAD));
-	create		 = reinterpret_cast<device_image_create_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_CREATE));
-	unload		 = reinterpret_cast<device_image_unload_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_UNLOAD));
-	display	 = reinterpret_cast<device_image_display_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_DISPLAY));
-	partialhash = reinterpret_cast<device_image_partialhash_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
-	get_devices = reinterpret_cast<device_image_get_devices_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_GET_DEVICES));
-
 	m_create_option_guide = reinterpret_cast<const option_guide *>(get_legacy_config_ptr(DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE));
 
     int format_count = get_legacy_config_int(DEVINFO_INT_IMAGE_CREATE_OPTCOUNT);
@@ -414,19 +407,19 @@ bool legacy_image_device_base::finish_load()
 
     if (m_is_loading)
     {
-        if (has_been_created() && ((*m_image_config.create_func()) != NULL))
+        if (has_been_created())
         {
-            err = (*m_image_config.create_func())(*this, m_create_format, m_create_args);
+            err = call_create(m_create_format, m_create_args);
             if (err)
             {
                 if (!m_err)
                     m_err = IMAGE_ERROR_UNSPECIFIED;
             }
         }
-        else if ((*m_image_config.load_func()) != NULL)
+        else
         {
             /* using device load */
-            err = (*m_image_config.load_func())(*this);
+            err = call_load();
             if (err)
             {
                 if (!m_err)
@@ -492,3 +485,51 @@ void legacy_image_device_base::unload()
     clear();
 }
 
+int legacy_image_device_base::call_load()
+{
+	device_image_load_func func = reinterpret_cast<device_image_load_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_LOAD));
+	if (func) {
+		return (*func)(*this);
+	} else {
+		return FALSE;
+	}
+}
+
+int legacy_image_device_base::call_create(int format_type, option_resolution *format_options)
+{
+	device_image_create_func func = reinterpret_cast<device_image_create_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_CREATE));
+	if (func) {
+		return (*func)(*this,format_type,format_options);
+	} else {
+		return FALSE;
+	}
+}
+
+void legacy_image_device_base::call_unload()
+{
+	device_image_unload_func func = reinterpret_cast<device_image_unload_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_UNLOAD));
+	if (func) (*func)(*this);
+}
+
+void legacy_image_device_base::call_display()
+{
+	device_image_display_func func = reinterpret_cast<device_image_display_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_DISPLAY));
+	if (func) (*func)(*this);
+}
+
+void legacy_image_device_base::call_partial_hash(char *dest, const unsigned char *data, unsigned long length, unsigned int functions)
+{
+	device_image_partialhash_func func = reinterpret_cast<device_image_partialhash_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
+	if (func) (*func)(dest,data,length,functions);
+}
+
+void legacy_image_device_base::call_get_devices()
+{
+	device_image_get_devices_func func = reinterpret_cast<device_image_get_devices_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_GET_DEVICES));
+	if (func) (*func)(*this);
+}
+	
+void *legacy_image_device_base::get_device_specific_call()
+{
+	return (void*) m_config.get_legacy_config_fct(DEVINFO_FCT_DEVICE_SPECIFIC);
+}

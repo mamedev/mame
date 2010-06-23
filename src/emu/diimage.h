@@ -46,6 +46,7 @@
 #ifndef __DIIMAGE_H__
 #define __DIIMAGE_H__
 
+#include "pool.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -168,11 +169,6 @@ public:
 	
 	static const char *device_typename(iodevice_t type);
 	static const char *device_brieftypename(iodevice_t type);	
-	
-	virtual device_image_load_func		load_func() const  = 0;
-	virtual device_image_create_func	create_func() const = 0;
-	virtual device_image_unload_func	unload_func() const = 0;
-	
 protected:
 	static const image_device_type_info *find_device_type(iodevice_t type);
 	static const image_device_type_info m_device_info_array[];
@@ -195,11 +191,17 @@ public:
 	virtual bool finish_load() = 0;
 	virtual void unload() = 0;
 	
-	virtual void display();
-	
+	virtual int call_load() = 0;
+	virtual int call_create(int format_type, option_resolution *format_options) = 0;
+	virtual void call_unload() = 0;
+	virtual void call_display() = 0;
+	virtual void call_partial_hash(char *, const unsigned char *, unsigned long, unsigned int) = 0;
+	virtual void call_get_devices() = 0;
+	virtual void *get_device_specific_call() = 0;
+		
 	virtual const image_device_format *device_get_indexed_creatable_format(int index);
 	virtual const image_device_format *device_get_named_creatable_format(const char *format_name);
-	const option_guide *image_device_get_creation_option_guide() { return m_image_config.create_option_guide(); }
+	const option_guide *device_get_creation_option_guide() { return m_image_config.create_option_guide(); }
 	const image_device_format *device_get_creatable_formats() { return m_image_config.formatlist(); }	
 
 	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args) = 0;
@@ -246,6 +248,16 @@ public:
 	UINT8 *get_software_region(const char *tag);
 	UINT32 get_software_region_length(const char *tag);
 	const char *get_feature(const char *feature_name);
+	
+	void *image_malloc(size_t size);
+	char *image_strdup(const char *src);
+	void *image_realloc(void *ptr, size_t size);
+	void image_freeptr(void *ptr);
+	
+	UINT32 crc() { return 0; }
+
+	void battery_load(void *buffer, int length, int fill) { }
+	void battery_save(const void *buffer, int length) { }
 
 protected:
 	image_error_t set_image_filename(const char *filename);
@@ -297,6 +309,8 @@ protected:
     /* special - used when creating */
     int m_create_format;
     option_resolution *m_create_args;
+	
+	object_pool *m_mempool;
 };
 
 

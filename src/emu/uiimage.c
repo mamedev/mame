@@ -115,63 +115,6 @@ struct _confirm_save_as_menu_state
 	int *yes;
 };
 
-char *stripspace(const char *src)
-{
-	static char buff[512];
-	if( src )
-	{
-		char *dst;
-		while( *src && isspace(*src) )
-			src++;
-		strcpy(buff, src);
-		dst = buff + strlen(buff);
-		while( dst >= buff && isspace(*--dst) )
-			*dst = '\0';
-		return buff;
-	}
-	return NULL;
-}
-
-//============================================================
-//  strip_extension
-//============================================================
-
-char *strip_extension(const char *filename)
-{
-	char *newname;
-	char *c;
-
-	// NULL begets NULL
-	if (!filename)
-		return NULL;
-
-	// allocate space for it
-	newname = (char *) malloc(strlen(filename) + 1);
-	if (!newname)
-		return NULL;
-
-	// copy in the name
-	strcpy(newname, filename);
-
-	// search backward for a period, failing if we hit a slash or a colon
-	for (c = newname + strlen(newname) - 1; c >= newname; c--)
-	{
-		// if we hit a period, NULL terminate and break
-		if (*c == '.')
-		{
-			*c = 0;
-			break;
-		}
-
-		// if we hit a slash or colon just stop
-		if (*c == '\\' || *c == '/' || *c == ':')
-			break;
-	}
-
-	return newname;
-}
-
-
 /***************************************************************************
     MENU HELPERS
 ***************************************************************************/
@@ -1041,74 +984,6 @@ void ui_image_menu_file_manager(running_machine *machine, ui_menu *menu, void *p
 		}
 	}
 }
-
-/*-------------------------------------------------
-    image_info_astring - populate an allocated
-    string with the image info text
--------------------------------------------------*/
-
-static astring *image_info_astring(running_machine *machine, astring *string)
-{
-	device_image_interface *image = NULL;
-
-	astring_printf(string, "%s\n\n", machine->gamedrv->description);
-
-#if 0
-	if (mess_ram_size > 0)
-	{
-		char buf2[RAM_STRING_BUFLEN];
-		astring_catprintf(string, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
-	}
-#endif
-
-	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
-	{
-		const char *name = image->filename();
-		if (name != NULL)
-		{
-			const char *base_filename;
-			const char *info;
-			char *base_filename_noextension;
-
-			base_filename = image->basename();
-			base_filename_noextension = strip_extension(base_filename);
-
-			/* display device type and filename */
-			astring_catprintf(string, "%s: %s\n", image->image_config().name(), base_filename);
-
-			/* display long filename, if present and doesn't correspond to name */
-			info = image->longname();
-			if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
-				astring_catprintf(string, "%s\n", info);
-
-			/* display manufacturer, if available */
-			info = image->manufacturer();
-			if (info != NULL)
-			{
-				astring_catprintf(string, "%s", info);
-				info = stripspace(image->year());
-				if (info && *info)
-					astring_catprintf(string, ", %s", info);
-				astring_catprintf(string,"\n");
-			}
-
-			/* display playable information, if available */
-			info = image->playable();
-			if (info != NULL)
-				astring_catprintf(string, "%s\n", info);
-
-			if (base_filename_noextension != NULL)
-				free(base_filename_noextension);
-		}
-		else
-		{
-			astring_catprintf(string, "%s: ---\n", image->image_config().name());
-		}		
-	}
-	return string;
-}
-
-
 
 /*-------------------------------------------------
     ui_image_menu_image_info - menu that shows info

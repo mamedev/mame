@@ -1274,7 +1274,7 @@ void ui_image_handler_ingame(running_machine *machine)
 	{
 		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
 		{
-			image->display();
+			image->call_display();
 		}
 	}
 

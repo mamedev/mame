@@ -18,7 +18,17 @@
 #ifndef __IMAGE_H__
 #define __IMAGE_H__
 
+#include "ioprocs.h"
+
 void image_init(running_machine *machine);
 void image_postdevice_init(running_machine *machine);
 
+extern struct io_procs image_ioprocs;
+
+void image_battery_load_by_name(const char *filename, void *buffer, int length, int fill);
+void image_battery_save_by_name(const char *filename, const void *buffer, int length);
+
+astring *image_info_astring(running_machine *machine, astring *string);
+
+device_image_interface *image_from_absolute_index(running_machine *machine, int absolute_index);
 #endif /* __IMAGE_H__ */

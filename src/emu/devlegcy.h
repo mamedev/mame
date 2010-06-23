@@ -419,6 +419,7 @@ class legacy_device_config_base : public device_config
 {
 	friend class legacy_device_base;
 	friend class legacy_nvram_device_base;
+	friend class legacy_image_device_base;
 
 protected:
 	// construction/destruction
@@ -575,7 +576,6 @@ protected:
 class legacy_image_device_config_base : 	public legacy_device_config_base,
 											public device_config_image_interface
 {
-	friend class legacy_image_device_base;
 public:
 	virtual const char *name() const { return get_legacy_config_string(DEVINFO_STR_NAME); }
 	virtual iodevice_t image_type()  const { return m_type; }
@@ -594,9 +594,6 @@ public:
 	virtual bool uses_file_extension(const char *file_extension) const;
 	virtual const option_guide *create_option_guide() const { return m_create_option_guide; }
     virtual image_device_format *formatlist() const { return m_formatlist; }
-	virtual device_image_load_func		load_func() const { return load; }
-	virtual device_image_create_func	create_func() const { return create; }	
-	virtual device_image_unload_func	unload_func() const { return unload; }
 protected:
 	// construction/destruction
 	legacy_image_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
@@ -616,14 +613,7 @@ protected:
     astring m_instance_name;
     astring m_brief_instance_name;
 	astring m_interface_name;
-
-	device_image_load_func			load;
-	device_image_create_func		create;
-	device_image_unload_func		unload;
-	device_image_display_func		display;
-	device_image_partialhash_func	partialhash;
-	device_image_get_devices_func	get_devices;
-
+	
     /* creation info */
     const option_guide *m_create_option_guide;
     image_device_format *m_formatlist;
@@ -636,12 +626,20 @@ protected:
 class legacy_image_device_base :	public legacy_device_base,
 									public device_image_interface
 {
-	friend class legacy_image_device_config_base;
 public:
 	virtual bool load(const char *path);
 	virtual bool finish_load();
 	virtual void unload();
 	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);	
+	
+	virtual int call_load();
+	virtual int call_create(int format_type, option_resolution *format_options);
+	virtual void call_unload();
+	virtual void call_display();
+	virtual void call_partial_hash(char *, const unsigned char *, unsigned long, unsigned int);
+	virtual void call_get_devices();
+	virtual void *get_device_specific_call();
+	
 protected:
 	// construction/destruction
 	legacy_image_device_base(running_machine &machine, const device_config &config);

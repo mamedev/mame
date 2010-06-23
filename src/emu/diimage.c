@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "ui.h"
+#include "pool.h"
 #include "zippath.h"
 
 
@@ -124,6 +125,16 @@ const char *device_config_image_interface::device_brieftypename(iodevice_t type)
 //  DEVICE image INTERFACE
 //**************************************************************************
 
+/*-------------------------------------------------
+    memory_error - report a memory error
+-------------------------------------------------*/
+
+static void memory_error(const char *message)
+{
+    fatalerror("%s", message);
+}
+
+
 //-------------------------------------------------
 //  device_image_interface - constructor
 //-------------------------------------------------
@@ -136,6 +147,7 @@ device_image_interface::device_image_interface(running_machine &machine, const d
 	  m_software_info_ptr(NULL),
 	  m_software_part_ptr(NULL)
 {
+	m_mempool = pool_alloc_lib(memory_error);
 }
 
 
@@ -145,16 +157,8 @@ device_image_interface::device_image_interface(running_machine &machine, const d
 
 device_image_interface::~device_image_interface()
 {
+    pool_free_lib(m_mempool);    
 }
-
-/*-------------------------------------------------
-    display - call image display callback function
--------------------------------------------------*/
-
-void device_image_interface::display() 
-{
-}
-
 
 /*-------------------------------------------------
     set_image_filename - specifies the filename of
@@ -432,3 +436,30 @@ const char *device_image_interface::get_feature(const char *feature_name)
 	return NULL;
 }
 
+/****************************************************************************
+  Memory allocators
+
+  These allow memory to be allocated for the lifetime of a mounted image.
+  If these (and the above accessors) are used well enough, they should be
+  able to eliminate the need for a unload function.
+****************************************************************************/
+
+void *device_image_interface::image_malloc(size_t size)
+{
+    return image_realloc(NULL, size);
+}
+
+char *device_image_interface::image_strdup(const char *src)
+{
+	return pool_strdup_lib(m_mempool, src);
+}
+
+void *device_image_interface::image_realloc(void *ptr, size_t size)
+{
+    return pool_realloc_lib(m_mempool, ptr, size);
+}
+
+void device_image_interface::image_freeptr(void *ptr)
+{
+	pool_object_remove(m_mempool, ptr, 0);
+}

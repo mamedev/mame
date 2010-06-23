@@ -8,6 +8,7 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
+#include <ctype.h>
 
 #include "emu.h"
 #include "emuopts.h"
@@ -15,6 +16,42 @@
 #include "config.h"
 #include "xmlfile.h"
 
+/* ----------------------------------------------------------------------- */
+
+static int image_fseek_thunk(void *file, INT64 offset, int whence)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fseek(offset, whence);
+}
+
+static size_t image_fread_thunk(void *file, void *buffer, size_t length)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fread(buffer, length);
+}
+
+static size_t image_fwrite_thunk(void *file, const void *buffer, size_t length)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fwrite(buffer, length);
+}
+
+static UINT64 image_fsize_thunk(void *file)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->length();
+}
+
+/* ----------------------------------------------------------------------- */
+
+struct io_procs image_ioprocs =
+{
+	NULL,
+	image_fseek_thunk,
+	image_fread_thunk,
+	image_fwrite_thunk,
+	image_fsize_thunk
+};
 
 /***************************************************************************
     INITIALIZATION HELPERS
@@ -259,3 +296,205 @@ void image_init(running_machine *machine)
 	image_device_init(machine);
 	config_register(machine, "image_directories", image_dirs_load, image_dirs_save);
 }
+
+
+/****************************************************************************
+  Battery functions
+
+  These functions provide transparent access to battery-backed RAM on an
+  image; typically for cartridges.
+****************************************************************************/
+
+/*-------------------------------------------------
+    open_battery_file_by_name - opens the battery backed
+    NVRAM file for an image
+-------------------------------------------------*/
+
+static file_error open_battery_file_by_name(const char *filename, UINT32 openflags, mame_file **file)
+{
+    file_error filerr;
+    filerr = mame_fopen(SEARCHPATH_NVRAM, filename, openflags, file);
+    return filerr;
+}
+
+static char *stripspace(const char *src)
+{
+	static char buff[512];
+	if( src )
+	{
+		char *dst;
+		while( *src && isspace(*src) )
+			src++;
+		strcpy(buff, src);
+		dst = buff + strlen(buff);
+		while( dst >= buff && isspace(*--dst) )
+			*dst = '\0';
+		return buff;
+	}
+	return NULL;
+}
+
+//============================================================
+//  strip_extension
+//============================================================
+
+static char *strip_extension(const char *filename)
+{
+	char *newname;
+	char *c;
+
+	// NULL begets NULL
+	if (!filename)
+		return NULL;
+
+	// allocate space for it
+	newname = (char *) malloc(strlen(filename) + 1);
+	if (!newname)
+		return NULL;
+
+	// copy in the name
+	strcpy(newname, filename);
+
+	// search backward for a period, failing if we hit a slash or a colon
+	for (c = newname + strlen(newname) - 1; c >= newname; c--)
+	{
+		// if we hit a period, NULL terminate and break
+		if (*c == '.')
+		{
+			*c = 0;
+			break;
+		}
+
+		// if we hit a slash or colon just stop
+		if (*c == '\\' || *c == '/' || *c == ':')
+			break;
+	}
+
+	return newname;
+}
+
+/*-------------------------------------------------
+    image_info_astring - populate an allocated
+    string with the image info text
+-------------------------------------------------*/
+
+astring *image_info_astring(running_machine *machine, astring *string)
+{
+	device_image_interface *image = NULL;
+
+	astring_printf(string, "%s\n\n", machine->gamedrv->description);
+
+#if 0
+	if (mess_ram_size > 0)
+	{
+		char buf2[RAM_STRING_BUFLEN];
+		astring_catprintf(string, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
+	}
+#endif
+
+	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+	{
+		const char *name = image->filename();
+		if (name != NULL)
+		{
+			const char *base_filename;
+			const char *info;
+			char *base_filename_noextension;
+
+			base_filename = image->basename();
+			base_filename_noextension = strip_extension(base_filename);
+
+			/* display device type and filename */
+			astring_catprintf(string, "%s: %s\n", image->image_config().name(), base_filename);
+
+			/* display long filename, if present and doesn't correspond to name */
+			info = image->longname();
+			if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
+				astring_catprintf(string, "%s\n", info);
+
+			/* display manufacturer, if available */
+			info = image->manufacturer();
+			if (info != NULL)
+			{
+				astring_catprintf(string, "%s", info);
+				info = stripspace(image->year());
+				if (info && *info)
+					astring_catprintf(string, ", %s", info);
+				astring_catprintf(string,"\n");
+			}
+
+			/* display playable information, if available */
+			info = image->playable();
+			if (info != NULL)
+				astring_catprintf(string, "%s\n", info);
+
+			if (base_filename_noextension != NULL)
+				free(base_filename_noextension);
+		}
+		else
+		{
+			astring_catprintf(string, "%s: ---\n", image->image_config().name());
+		}		
+	}
+	return string;
+}
+
+
+/*-------------------------------------------------
+    image_battery_load_by_name - retrieves the battery
+    backed RAM for an image. A filename may be supplied
+    to the function.
+-------------------------------------------------*/
+
+void image_battery_load_by_name(const char *filename, void *buffer, int length, int fill)
+{
+    file_error filerr;
+    mame_file *file;
+    int bytes_read = 0;
+
+    assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+    /* try to open the battery file and read it in, if possible */
+    filerr = open_battery_file_by_name(filename, OPEN_FLAG_READ, &file);
+    if (filerr == FILERR_NONE)
+    {
+        bytes_read = mame_fread(file, buffer, length);
+        mame_fclose(file);
+    }
+
+    /* fill remaining bytes (if necessary) */
+    memset(((char *) buffer) + bytes_read, fill, length - bytes_read);
+}
+
+/*-------------------------------------------------
+    image_battery_save_by_name - stores the battery
+    backed RAM for an image. A filename may be supplied
+    to the function.
+-------------------------------------------------*/
+void image_battery_save_by_name(const char *filename, const void *buffer, int length)
+{
+    file_error filerr;
+    mame_file *file;
+
+    assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+    /* try to open the battery file and write it out, if possible */
+    filerr = open_battery_file_by_name(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+    if (filerr == FILERR_NONE)
+    {
+        mame_fwrite(file, buffer, length);
+        mame_fclose(file);
+    }
+}
+
+device_image_interface *image_from_absolute_index(running_machine *machine, int absolute_index)
+{
+	device_image_interface *image = NULL;
+	int cnt = 0;
+	/* make sure that any required devices have been allocated */
+    for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+	{
+		if (cnt==absolute_index) return image;
+		cnt++;
+	}
+} 
