@@ -109,7 +109,7 @@
     TODO:
 
     - is bitmap drawing in service mode correct?
-    - real cpu speeds
+    - real cpu speeds (pokey speeds verified with comparison to recording)
     - custom write
 
 */
@@ -362,11 +362,11 @@ static MACHINE_DRIVER_START( cloak )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey1", POKEY, 1500000)
+	MDRV_SOUND_ADD("pokey1", POKEY, XTAL_10MHz/8)		/* Accurate to recording */
 	MDRV_SOUND_CONFIG(pokey_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("pokey2", POKEY, 1500000)
+	MDRV_SOUND_ADD("pokey2", POKEY, XTAL_10MHz/8)		/* Accurate to recording */
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
