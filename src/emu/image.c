@@ -497,4 +497,5 @@ device_image_interface *image_from_absolute_index(running_machine *machine, int 
 		if (cnt==absolute_index) return image;
 		cnt++;
 	}
+	return NULL;
 } 
