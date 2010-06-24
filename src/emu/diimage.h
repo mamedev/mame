@@ -169,6 +169,9 @@ public:
 	
 	static const char *device_typename(iodevice_t type);
 	static const char *device_brieftypename(iodevice_t type);	
+
+	virtual device_image_partialhash_func get_partial_hash() const = 0;
+	virtual void device_compute_hash(char *dest, const void *data, size_t length, unsigned int functions) const;	
 protected:
 	static const image_device_type_info *find_device_type(iodevice_t type);
 	static const image_device_type_info m_device_info_array[];
@@ -195,7 +198,7 @@ public:
 	virtual int call_create(int format_type, option_resolution *format_options) = 0;
 	virtual void call_unload() = 0;
 	virtual void call_display() = 0;
-	virtual void call_partial_hash(char *, const unsigned char *, unsigned long, unsigned int) = 0;
+	virtual device_image_partialhash_func get_partial_hash() = 0;
 	virtual void call_get_devices() = 0;
 	virtual void *get_device_specific_call() = 0;
 		
@@ -254,11 +257,10 @@ public:
 	void *image_realloc(void *ptr, size_t size);
 	void image_freeptr(void *ptr);
 	
-	UINT32 crc() { return 0; }
+	UINT32 crc();
 
-	void battery_load(void *buffer, int length, int fill) { }
-	void battery_save(const void *buffer, int length) { }
-
+	void battery_load(void *buffer, int length, int fill);
+	void battery_save(const void *buffer, int length);
 protected:
 	image_error_t set_image_filename(const char *filename);
 
@@ -269,6 +271,9 @@ protected:
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
 
+	int read_hash_config(const char *sysname);
+	void run_hash(void (*partialhash)(char *, const unsigned char *, unsigned long, unsigned int), char *dest, unsigned int hash_functions);
+	void image_checkhash();
 	// derived class overrides
 
 	// configuration
@@ -311,6 +316,8 @@ protected:
     option_resolution *m_create_args;
 	
 	object_pool *m_mempool;
+	
+	char *m_hash;
 };
 
 

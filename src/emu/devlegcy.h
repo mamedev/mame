@@ -594,6 +594,7 @@ public:
 	virtual bool uses_file_extension(const char *file_extension) const;
 	virtual const option_guide *create_option_guide() const { return m_create_option_guide; }
     virtual image_device_format *formatlist() const { return m_formatlist; }
+	virtual device_image_partialhash_func get_partial_hash() const;
 protected:
 	// construction/destruction
 	legacy_image_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
@@ -636,10 +637,9 @@ public:
 	virtual int call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display();
-	virtual void call_partial_hash(char *, const unsigned char *, unsigned long, unsigned int);
+	virtual device_image_partialhash_func get_partial_hash();
 	virtual void call_get_devices();
 	virtual void *get_device_specific_call();
-	
 protected:
 	// construction/destruction
 	legacy_image_device_base(running_machine &machine, const device_config &config);

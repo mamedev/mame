@@ -150,7 +150,8 @@ bool legacy_image_device_config_base::uses_file_extension(const char *file_exten
         file_extension++;
 
 	/* find the extensions */
-	char *ext = strtok((char*)astring(m_file_extensions).cstr(),",");
+	astring extensions(m_file_extensions);
+	char *ext = strtok((char*)extensions.cstr(),",");
 	while (ext != NULL)
 	{
 		if (!mame_stricmp(ext, file_extension))
@@ -178,6 +179,11 @@ legacy_image_device_config_base::~legacy_image_device_config_base()
 		*formatptr = entry->m_next;
 		global_free(entry);
 	}
+}
+
+device_image_partialhash_func legacy_image_device_config_base::get_partial_hash() const
+{
+	return reinterpret_cast<device_image_partialhash_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));	
 }
 
 
@@ -407,6 +413,8 @@ bool legacy_image_device_base::finish_load()
 
     if (m_is_loading)
     {
+		image_checkhash();
+
         if (has_been_created())
         {
             err = call_create(m_create_format, m_create_args);
@@ -427,7 +435,6 @@ bool legacy_image_device_base::finish_load()
             }
         }
     }
-
     m_is_loading = FALSE;
     m_create_format = 0;
     m_create_args = NULL;
@@ -517,10 +524,9 @@ void legacy_image_device_base::call_display()
 	if (func) (*func)(*this);
 }
 
-void legacy_image_device_base::call_partial_hash(char *dest, const unsigned char *data, unsigned long length, unsigned int functions)
+device_image_partialhash_func legacy_image_device_base::get_partial_hash()
 {
-	device_image_partialhash_func func = reinterpret_cast<device_image_partialhash_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
-	if (func) (*func)(dest,data,length,functions);
+	return reinterpret_cast<device_image_partialhash_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));	
 }
 
 void legacy_image_device_base::call_get_devices()

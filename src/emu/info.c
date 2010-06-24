@@ -905,7 +905,9 @@ static void print_game_images(FILE *out, const game_driver *game, const machine_
 		fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
 		fprintf(out, "/>\n");
 
-		char *ext = strtok((char*)dev->file_extensions(),",");
+		astring extensions(dev->file_extensions());
+
+		char *ext = strtok((char*)extensions.cstr(),",");
 		while (ext != NULL)
 		{
 			fprintf(out, "\t\t\t<extension");
