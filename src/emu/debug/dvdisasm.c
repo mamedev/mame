@@ -476,28 +476,25 @@ void debug_view_disasm::view_update()
 		m_recompute = true;
 
 	// if we're tracking a value, make sure it is visible
-	if (m_expression.dirty())
+	UINT64 previous = m_expression.last_value();
+	UINT64 result = m_expression.value();
+	if (result != previous)
 	{
-		UINT64 previous = m_expression.last_value();
-		UINT64 result = m_expression.value();
-		if (result != previous)
-		{
-			offs_t resultbyte = memory_address_to_byte(source.m_space, result) & source.m_space->logbytemask;
+		offs_t resultbyte = memory_address_to_byte(source.m_space, result) & source.m_space->logbytemask;
 
-			// see if the new result is an address we already have
-			UINT32 row;
-			for (row = 0; row < m_allocated.y; row++)
-				if (m_byteaddress[row] == resultbyte)
-					break;
+		// see if the new result is an address we already have
+		UINT32 row;
+		for (row = 0; row < m_allocated.y; row++)
+			if (m_byteaddress[row] == resultbyte)
+				break;
 
-			// if we didn't find it, or if it's really close to the bottom, recompute
-			if (row == m_allocated.y || row >= m_total.y - m_visible.y)
-				m_recompute = true;
+		// if we didn't find it, or if it's really close to the bottom, recompute
+		if (row == m_allocated.y || row >= m_total.y - m_visible.y)
+			m_recompute = true;
 
-			// otherwise, if it's not visible, adjust the view so it is
-			else if (row < m_topleft.y || row >= m_topleft.y + m_visible.y - 2)
-				m_topleft.y = (row > 3) ? row - 3 : 0;
-		}
+		// otherwise, if it's not visible, adjust the view so it is
+		else if (row < m_topleft.y || row >= m_topleft.y + m_visible.y - 2)
+			m_topleft.y = (row > 3) ? row - 3 : 0;
 	}
 
 	// if the opcode base has changed, rework things
