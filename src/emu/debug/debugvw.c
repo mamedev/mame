@@ -633,7 +633,7 @@ bool debug_view_expression::recompute()
 		UINT64 oldresult = m_result;
 
 		// recompute the value of the expression
-		EXPRERR exprerr = expression_execute(m_parsed, &m_result);
+		expression_execute(m_parsed, &m_result);
 		if (m_result != oldresult)
 			changed = true;
 	}
