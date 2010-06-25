@@ -303,7 +303,7 @@ public:
 	// getters
 	bool dirty() const { return m_dirty; }
 	UINT64 last_value() const { return m_result; }
-	UINT64 value() { if (m_dirty) recompute(); return m_result; }
+	UINT64 value() { recompute(); return m_result; }
 	const char *string() const { return m_string; }
 	symbol_table *context() const { return m_context; }
 
