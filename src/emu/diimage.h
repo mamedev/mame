@@ -149,7 +149,6 @@ public:
 	virtual ~device_config_image_interface();
 
 	// public accessors... for now
-	virtual const char *name() const = 0;	
 	virtual iodevice_t image_type()  const = 0;
 	virtual const char *image_type_name()  const = 0;
 	virtual iodevice_t image_type_direct() const = 0;

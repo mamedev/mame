@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 okim6295_device_config::okim6295_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "OKI6295", tag, owner, clock),
 	  device_config_sound_interface(mconfig, *this),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(okim6295))

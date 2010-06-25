@@ -1778,7 +1778,7 @@ static void memory_create_window(running_machine *machine)
 	for (const debug_view_source *source = info->view[0].view->source_list().head(); source != NULL; source = source->next())
 	{
 		TCHAR *t_name = tstring_from_utf8(source->name());
-		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
+		SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
 		osd_free(t_name);
 	}
 	const debug_view_source *source = info->view[0].view->source_list().match_device(curcpu);
@@ -2085,7 +2085,7 @@ static void disasm_create_window(running_machine *machine)
 	for (const debug_view_source *source = info->view[0].view->source_list().head(); source != NULL; source = source->next())
 	{
 		TCHAR *t_name = tstring_from_utf8(source->name());
-		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
+		SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
 		osd_free(t_name);
 	}
 	const debug_view_source *source = info->view[0].view->source_list().match_device(curcpu);

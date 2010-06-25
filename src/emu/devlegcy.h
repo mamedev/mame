@@ -430,7 +430,6 @@ protected:
 
 	// basic information getters
 public:
-	virtual const char *name() const { return get_legacy_config_string(DEVINFO_STR_NAME); }
 	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
 	virtual const machine_config_token *machine_config_tokens() const { return reinterpret_cast<const machine_config_token *>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
 
@@ -577,7 +576,6 @@ class legacy_image_device_config_base : 	public legacy_device_config_base,
 											public device_config_image_interface
 {
 public:
-	virtual const char *name() const { return get_legacy_config_string(DEVINFO_STR_NAME); }
 	virtual iodevice_t image_type()  const { return m_type; }
 	virtual const char *image_type_name()  const { return device_typename(m_type); }
 	virtual iodevice_t image_type_direct() const { return static_cast<iodevice_t>(get_legacy_config_int(DEVINFO_INT_IMAGE_TYPE)); }

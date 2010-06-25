@@ -50,7 +50,7 @@
 //-------------------------------------------------
 
 legacy_device_config_base::legacy_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config)
-	: device_config(mconfig, type, tag, owner, clock),
+	: device_config(mconfig, type, "Legacy Device", tag, owner, clock),
 	  m_get_config_func(get_config),
 	  m_inline_config(NULL)
 {
@@ -58,6 +58,9 @@ legacy_device_config_base::legacy_device_config_base(const machine_config &mconf
 	UINT32 configlen = (UINT32)get_legacy_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES);
 	if (configlen != 0)
 		m_inline_config = global_alloc_array_clear(UINT8, configlen);
+	
+	// set the proper name
+	m_name = get_legacy_config_string(DEVINFO_STR_NAME);
 }
 
 

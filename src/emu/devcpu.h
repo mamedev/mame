@@ -413,7 +413,7 @@ class cpu_device_config :	public device_config,
 
 protected:
 	// construction/destruction
-	cpu_device_config(const machine_config &mconfig, device_type _type, const char *_tag, const device_config *_owner, UINT32 _clock);
+	cpu_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock);
 };
 
 
@@ -433,7 +433,6 @@ public:
 	virtual device_t *alloc_device(running_machine &machine) const;
 
 	// basic information getters
-	virtual const char *name() const { return get_legacy_config_string(DEVINFO_STR_NAME); }
 	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
 	virtual const machine_config_token *machine_config_tokens() const { return reinterpret_cast<const machine_config_token *>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
 

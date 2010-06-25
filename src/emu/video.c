@@ -1688,7 +1688,7 @@ const attotime screen_device::k_default_frame_period = STATIC_ATTOTIME_IN_HZ(k_d
 //-------------------------------------------------
 
 screen_device_config::screen_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Video Screen", tag, owner, clock),
 	  m_type(SCREEN_TYPE_RASTER),
 	  m_width(0),
 	  m_height(0),

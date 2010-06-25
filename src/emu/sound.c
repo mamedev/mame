@@ -461,7 +461,7 @@ static TIMER_CALLBACK( sound_update )
 //-------------------------------------------------
 
 speaker_device_config::speaker_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Speaker", tag, owner, clock),
 	  m_x(0.0),
 	  m_y(0.0),
 	  m_z(0.0)

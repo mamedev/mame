@@ -142,7 +142,7 @@ const int TM_SEARCH_TRANSFER	= 0x03;
 //-------------------------------------------------
 
 z80dma_device_config::z80dma_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Z8410", tag, owner, clock),
 	  device_config_z80daisy_interface(mconfig, *this)
 {
 }

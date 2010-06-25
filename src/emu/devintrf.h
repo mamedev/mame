@@ -230,7 +230,7 @@ class device_config
 
 protected:
 	// construction/destruction
-	device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock);
+	device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock);
 	virtual ~device_config();
 
 public:
@@ -256,6 +256,7 @@ public:
 	// basic information getters
 	device_type type() const { return m_type; }
 	UINT32 clock() const { return m_clock; }
+	const char *name() const { return m_name; }
 	const char *tag() const { return m_tag; }
 	const void *static_config() const { return m_static_config; }
 
@@ -275,10 +276,7 @@ protected:
 	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
 
-	// required information overrides
 public:
-	virtual const char *name() const = 0;
-
 	// optional information overrides
 	virtual const rom_entry *rom_region() const;
 	virtual const machine_config_token *machine_config_tokens() const;
@@ -297,6 +295,8 @@ protected:
 	const machine_config &	m_machine_config;		// reference to the machine's configuration
 	const void *			m_static_config;		// static device configuration
 	UINT64					m_inline_data[16];		// array of inline configuration values
+
+	astring					m_name;					// name of the device
 
 private:
 	astring 				m_tag;					// tag for this instance

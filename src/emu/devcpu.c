@@ -49,8 +49,8 @@
 //  cpu_device_config - constructor
 //-------------------------------------------------
 
-cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type _type, const char *_tag, const device_config *_owner, UINT32 _clock)
-	: device_config(mconfig, _type, _tag, _owner, _clock),
+cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, type, name, tag, owner, clock),
 	  device_config_execute_interface(mconfig, *this),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_state_interface(mconfig, *this),
@@ -63,8 +63,8 @@ cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type 
 //  legacy_cpu_device_config - constructor
 //-------------------------------------------------
 
-legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig, device_type _type, const char *_tag, const device_config *_owner, UINT32 _clock)
-	: cpu_device_config(mconfig, _type, _tag, _owner, _clock),
+legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock)
+	: cpu_device_config(mconfig, type, "CPU", tag, owner, clock),
 	  m_cputype(NULL)
 {
 	memset(m_space_config, 0, sizeof(m_space_config));
@@ -119,6 +119,7 @@ bool legacy_cpu_device_config::device_process_token(UINT32 entrytype, const mach
 				m_space_config[spacenum].m_internal_map = reinterpret_cast<const addrmap_token *>(get_legacy_config_ptr(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum));
 				m_space_config[spacenum].m_default_map = reinterpret_cast<const addrmap_token *>(get_legacy_config_ptr(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum));
 			}
+			m_name = get_legacy_config_string(DEVINFO_STR_NAME);
 			return true;
 	}
 

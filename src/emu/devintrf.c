@@ -301,7 +301,7 @@ bool device_config_interface::interface_validity_check(const game_driver &driver
 //  device configuration
 //-------------------------------------------------
 
-device_config::device_config(const machine_config &mconfig, device_type type, const char *_tag, const device_config *owner, UINT32 clock)
+device_config::device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock)
 	: m_next(NULL),
 	  m_owner(const_cast<device_config *>(owner)),
 	  m_interface_list(NULL),
@@ -309,7 +309,8 @@ device_config::device_config(const machine_config &mconfig, device_type type, co
 	  m_clock(clock),
 	  m_machine_config(mconfig),
 	  m_static_config(NULL),
-	  m_tag(_tag)
+	  m_name(name),
+	  m_tag(tag)
 {
 	memset(m_inline_data, 0, sizeof(m_inline_data));
 

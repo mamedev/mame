@@ -72,7 +72,6 @@ class janshi_vdp_device_config : public device_config,
 public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
-	virtual const char *name() const { return "JANSHIVDP"; }
 protected:
 	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
@@ -95,7 +94,7 @@ protected:
 const device_type JANSHIVDP = janshi_vdp_device_config::static_alloc_device_config;
 
 janshi_vdp_device_config::janshi_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "JANSHIVDP", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
 {

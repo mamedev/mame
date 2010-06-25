@@ -898,7 +898,7 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 		/* get the image type/id */
 		snprintf(buffer, ARRAY_LENGTH(buffer),
 			"%s",
-			image->image_config().name());
+			image->image_config().devconfig().name());
 
 		/* get the base name */
 		entry_basename = image->basename();

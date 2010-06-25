@@ -939,7 +939,7 @@ void timer_print_first_timer(running_machine *machine)
 //-------------------------------------------------
 
 timer_device_config::timer_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Timer", tag, owner, clock),
 	  m_type(TIMER_TYPE_GENERIC),
 	  m_callback(NULL),
 	  m_ptr(NULL),

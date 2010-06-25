@@ -94,9 +94,6 @@ public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
 
-	// basic information getters
-	virtual const char *name() const { return "Video Screen"; }
-
 	// configuration readers
 	screen_type_enum screen_type() const { return m_type; }
 	int width() const { return m_width; }

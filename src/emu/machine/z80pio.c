@@ -54,7 +54,7 @@ const int ICW_MASK_FOLLOWS	= 0x10;
 //-------------------------------------------------
 
 z80pio_device_config::z80pio_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Z8420", tag, owner, clock),
 	  device_config_z80daisy_interface(mconfig, *this)
 {
 }

@@ -234,7 +234,7 @@ void image_device_init(running_machine *machine)
 				image_unload_all(machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
-					image->image_config().name(),
+					image->image_config().devconfig().name(),
 					image_basename_str,
 					image_err);
 			}
@@ -274,7 +274,7 @@ void image_postdevice_init(running_machine *machine)
 				image_unload_all(machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
-					image->image_config().name(),
+					image->image_config().devconfig().name(),
 					image_basename_str,
 					image_err);
 			}
@@ -405,7 +405,7 @@ astring *image_info_astring(running_machine *machine, astring *string)
 			base_filename_noextension = strip_extension(base_filename);
 
 			/* display device type and filename */
-			astring_catprintf(string, "%s: %s\n", image->image_config().name(), base_filename);
+			astring_catprintf(string, "%s: %s\n", image->image_config().devconfig().name(), base_filename);
 
 			/* display long filename, if present and doesn't correspond to name */
 			info = image->longname();
@@ -433,7 +433,7 @@ astring *image_info_astring(running_machine *machine, astring *string)
 		}
 		else
 		{
-			astring_catprintf(string, "%s: ---\n", image->image_config().name());
+			astring_catprintf(string, "%s: ---\n", image->image_config().devconfig().name());
 		}		
 	}
 	return string;

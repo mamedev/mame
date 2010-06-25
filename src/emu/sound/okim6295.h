@@ -89,9 +89,6 @@ public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
 
-	// basic information getters
-	virtual const char *name() const { return "OKI6295"; }
-
 	// inline configuration indexes
 	enum
 	{
