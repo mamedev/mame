@@ -51,7 +51,9 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+#include "sound/2151intf.h"
 #include "machine/eeprom.h"
 
 static UINT16 *gms_vidram;
@@ -110,6 +112,52 @@ static ADDRESS_MAP_START( rbmk_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xC28000, 0xC28001) AM_WRITE(gms_write3)
 ADDRESS_MAP_END
 
+static UINT8 mux_data;
+
+static ADDRESS_MAP_START( rbmk_mcu_mem, ADDRESS_SPACE_PROGRAM, 8 )
+//	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static READ8_HANDLER( rbmk_mcu_io_r )
+{
+	if(mux_data & 8)
+	{
+		return ym2151_r(devtag_get_device(space->machine, "ymsnd"), offset & 1);
+	}
+	else if(mux_data & 4)
+	{
+		//printf("%02x R\n",offset);
+		// ...
+		return 0xff;
+	}
+	else
+		printf("Warning: mux data R = %02x",mux_data);
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( rbmk_mcu_io_w )
+{
+	if(mux_data & 8) { ym2151_w(devtag_get_device(space->machine, "ymsnd"), offset & 1, data); }
+	else if(mux_data & 4)
+	{
+		//printf("%02x %02x W\n",offset,data);
+		// ...
+	}
+	else
+		printf("Warning: mux data W = %02x",mux_data);
+}
+
+static WRITE8_HANDLER( mcu_io_mux_w )
+{
+	mux_data = ~data;
+}
+
+static ADDRESS_MAP_START( rbmk_mcu_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE( rbmk_mcu_io_r, rbmk_mcu_io_w )
+
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE( mcu_io_mux_w )
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rbmk )
 	PORT_START("IN0")
@@ -459,12 +507,20 @@ static VIDEO_UPDATE(rbmk)
 	return 0;
 }
 
-
+static INTERRUPT_GEN( mcu_irq )
+{
+	cputag_set_input_line(device->machine, "mcu", INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_DRIVER_START( rbmk )
 	MDRV_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MDRV_CPU_PROGRAM_MAP(rbmk_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+
+	MDRV_CPU_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
+	MDRV_CPU_PROGRAM_MAP(rbmk_mcu_mem)
+	MDRV_CPU_IO_MAP(rbmk_mcu_io)
+	MDRV_CPU_VBLANK_INT("screen", mcu_irq)
 
 	MDRV_GFXDECODE(rbmk)
 
@@ -489,14 +545,19 @@ static MACHINE_DRIVER_START( rbmk )
 	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
+
+	MDRV_SOUND_ADD("ymsnd", YM2151, 22000000 / 8)
+//	MDRV_SOUND_CONFIG(ym2151_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_DRIVER_END
 
 ROM_START( rbmk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "p1.u64", 0x00000, 0x80000, CRC(83b3c505) SHA1(b943d7312dacdf46d4a55f9dc3cf92e291c40ce7) )
 
-	ROM_REGION( 0x2, "cpu1", 0 ) /* protected MCU? */
-	ROM_LOAD( "89c51.mcu", 0x0, 0x2, NO_DUMP ) // unless it has external rom only?
+	ROM_REGION( 0x1000, "mcu", 0 ) /* protected MCU? */
+	ROM_LOAD( "89c51.bin", 0x0, 0x1000, CRC(c6d58031) SHA1(5c61ce4eef1ef29bd870d0678bdba24e5aa43eae) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* ??? mcu data / code */
 	ROM_LOAD( "b1.u72", 0x00000, 0x20000,  CRC(1a4991ac) SHA1(523b58caa21b4a073c664c076d2d7bb07a4253cd) )
