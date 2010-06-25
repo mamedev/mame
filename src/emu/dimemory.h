@@ -105,38 +105,9 @@ const int TRANSLATE_FETCH_DEBUG		= (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 class address_space_config
 {
 public:
-	address_space_config()
-		: m_name("unknown"),
-		  m_endianness(ENDIANNESS_NATIVE),
-		  m_databus_width(0),
-		  m_addrbus_width(0),
-		  m_addrbus_shift(0),
-		  m_logaddr_width(0),
-		  m_page_shift(0),
-		  m_internal_map(NULL),
-		  m_default_map(NULL) { }
-
-	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift = 0, const addrmap_token *internal = NULL, const addrmap_token *defmap = NULL)
-		: m_name(name),
-		  m_endianness(endian),
-		  m_databus_width(datawidth),
-		  m_addrbus_width(addrwidth),
-		  m_addrbus_shift(addrshift),
-		  m_logaddr_width(datawidth),
-		  m_page_shift(0),
-		  m_internal_map(internal),
-		  m_default_map(defmap) { }
-
-	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, const addrmap_token *internal = NULL, const addrmap_token *defmap = NULL)
-		: m_name(name),
-		  m_endianness(endian),
-		  m_databus_width(datawidth),
-		  m_addrbus_width(addrwidth),
-		  m_addrbus_shift(addrshift),
-		  m_logaddr_width(datawidth),
-		  m_page_shift(pageshift),
-		  m_internal_map(internal),
-		  m_default_map(defmap) { }
+	address_space_config();
+	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift = 0, const addrmap_token *internal = NULL, const addrmap_token *defmap = NULL);
+	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, const addrmap_token *internal = NULL, const addrmap_token *defmap = NULL);
 
 	inline offs_t addr2byte(offs_t address) const
 	{

@@ -4,173 +4,113 @@
 
     Debugger view engine.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
 
-*********************************************************************/
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+***************************************************************************/
 
 #ifndef __DEBUGVIEW_H__
 #define __DEBUGVIEW_H__
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-/* types passed to debug_view_alloc */
-#define DVT_CONSOLE							(1)
-#define DVT_REGISTERS						(2)
-#define DVT_DISASSEMBLY						(3)
-#define DVT_MEMORY							(4)
-#define DVT_LOG								(5)
-#define DVT_TIMERS							(6)
-#define DVT_ALLOCS							(7)
-
-enum _disasm_right_column
+// types passed to debug_view_manager::alloc_view()
+enum debug_view_type
 {
-	DASM_RIGHTCOL_NONE,
-	DASM_RIGHTCOL_RAW,
-	DASM_RIGHTCOL_ENCRYPTED,
-	DASM_RIGHTCOL_COMMENTS
+	DVT_NONE,
+	DVT_CONSOLE,
+	DVT_STATE,
+	DVT_DISASSEMBLY,
+	DVT_MEMORY,
+	DVT_LOG,
+	DVT_TIMERS,
+	DVT_ALLOCS
 };
-typedef enum _disasm_right_column disasm_right_column;
 
-/* properties available for disassembly views */
-#define DVP_DASM_EXPRESSION					(101)	/* r/w - const char * */
-#define DVP_DASM_TRACK_LIVE					(102)	/* r/w - UINT32 */
-#define DVP_DASM_RIGHT_COLUMN				(103)	/* r/w - UINT32 */
-#define DVP_DASM_BACKWARD_STEPS				(104)	/* r/w - UINT32 */
-#define DVP_DASM_WIDTH						(105)	/* r/w - UINT32 */
-#define DVP_DASM_ACTIVE_ADDRESS				(112)	/* r/w - UINT32 */
 
-/* properties available for memory views */
-#define DVP_MEM_SPACE						(100)	/* r/w - address space * */
-#define DVP_MEM_EXPRESSION					(101)	/* r/w - const char * */
-#define DVP_MEM_TRACK_LIVE					(102)	/* r/w - UINT32 */
-#define DVP_MEM_SPACENUM					(103)	/* r/w - UINT32 */
-#define DVP_MEM_BYTES_PER_CHUNK				(104)	/* r/w - UINT32 */
-#define DVP_MEM_REVERSE_VIEW				(105)	/* r/w - UINT32 */
-#define DVP_MEM_ASCII_VIEW					(106)	/* r/w - UINT32 */
-#define DVP_MEM_RAW_BASE					(107)	/* r/w - void * */
-#define DVP_MEM_RAW_LENGTH					(108)	/* r/w - UINT32 */
-#define DVP_MEM_RAW_OFFSET_XOR				(109)	/* r/w - UINT32 */
-#define DVP_MEM_RAW_LITTLE_ENDIAN			(110)	/* r/w - UINT32 */
-#define DVP_MEM_WIDTH						(111)	/* r/w - UINT32 */
-#define DVP_MEM_NO_TRANSLATION				(113)	/* r/w - UINT32 */
+// notifications passed to view_notify()
+enum debug_view_notification
+{
+	VIEW_NOTIFY_NONE,
+	VIEW_NOTIFY_VISIBLE_CHANGED,
+	VIEW_NOTIFY_CURSOR_CHANGED,
+	VIEW_NOTIFY_SOURCE_CHANGED
+};
 
-/* attribute bits for debug_view_char.attrib */
-#define DCA_NORMAL							(0x00)	/* in Windows: black on white */
-#define DCA_CHANGED							(0x01)	/* in Windows: red foreground */
-#define DCA_SELECTED						(0x02)	/* in Windows: light red background */
-#define DCA_INVALID							(0x04)	/* in Windows: dark blue foreground */
-#define DCA_DISABLED						(0x08)	/* in Windows: darker foreground */
-#define DCA_ANCILLARY						(0x10)	/* in Windows: grey background */
-#define DCA_CURRENT							(0x20)	/* in Windows: yellow background */
-#define DCA_COMMENT							(0x40)	/* in Windows: green foreground */
 
-/* special characters that can be passed as a DVP_CHARACTER */
-#define DCH_UP								(1)		/* up arrow */
-#define DCH_DOWN							(2)		/* down arrow */
-#define DCH_LEFT							(3)		/* left arrow */
-#define DCH_RIGHT							(4)		/* right arrow */
-#define DCH_PUP								(5)		/* page up */
-#define DCH_PDOWN							(6)		/* page down */
-#define DCH_HOME							(7)		/* home */
-#define DCH_CTRLHOME						(8)		/* ctrl+home */
-#define DCH_END								(9)		/* end */
-#define DCH_CTRLEND							(10)	/* ctrl+end */
-#define DCH_CTRLRIGHT						(11)	/* ctrl+right */
-#define DCH_CTRLLEFT						(12)	/* ctrl+left */
+// attribute bits for debug_view_char.attrib
+const UINT8 DCA_NORMAL		= 0x00;		// in Windows: black on white
+const UINT8 DCA_CHANGED		= 0x01;		// in Windows: red foreground
+const UINT8 DCA_SELECTED	= 0x02;		// in Windows: light red background
+const UINT8 DCA_INVALID		= 0x04;		// in Windows: dark blue foreground
+const UINT8 DCA_DISABLED	= 0x08;		// in Windows: darker foreground
+const UINT8 DCA_ANCILLARY	= 0x10;		// in Windows: grey background
+const UINT8 DCA_CURRENT		= 0x20;		// in Windows: yellow background
+const UINT8 DCA_COMMENT		= 0x40;		// in Windows: green foreground
+
+
+// special characters that can be passed to process_char()
+const int DCH_UP			= 1;		// up arrow
+const int DCH_DOWN			= 2;		// down arrow
+const int DCH_LEFT			= 3;		// left arrow
+const int DCH_RIGHT			= 4;		// right arrow
+const int DCH_PUP			= 5;		// page up
+const int DCH_PDOWN			= 6;		// page down
+const int DCH_HOME			= 7;		// home
+const int DCH_CTRLHOME		= 8;		// ctrl+home
+const int DCH_END			= 9;		// end
+const int DCH_CTRLEND		= 10;		// ctrl+end
+const int DCH_CTRLRIGHT		= 11;		// ctrl+right
+const int DCH_CTRLLEFT		= 12;		// ctrl+left
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/* opaque structure representing a debug view */
+// forward references
 class debug_view;
+typedef struct _symbol_table symbol_table;
+typedef struct _parsed_expression parsed_expression;
 
 
-/* OSD callback function for a view */
-typedef void (*debug_view_osd_update_func)(debug_view *view, void *osdprivate);
+// OSD callback function for a view
+typedef void (*debug_view_osd_update_func)(debug_view &view, void *osdprivate);
 
 
-/* pair of X,Y coordinates for sizing */
-struct debug_view_xy
-{
-	INT32				x;
-	INT32				y;
-};
-
-
-/* a registers subview item */
-class registers_subview_item
-{
-	DISABLE_COPYING(registers_subview_item);
-
-public:
-	registers_subview_item()
-		: next(NULL),
-		  index(0),
-		  stateintf(NULL),
-		  execintf(NULL) { }
-
-	registers_subview_item *next;				/* link to next item */
-	int					index;					/* index of this item */
-	astring				name;					/* name of the subview item */
-	device_state_interface *stateintf;			/* state interface */
-	device_execute_interface *execintf;				/* execution interface */
-};
-
-
-/* a disassembly subview item */
-class disasm_subview_item
-{
-	DISABLE_COPYING(disasm_subview_item);
-
-public:
-	disasm_subview_item()
-		: next(NULL),
-		  index(0),
-		  space(NULL) { }
-
-	disasm_subview_item *next;					/* link to next item */
-	int					index;					/* index of this item */
-	astring				name;					/* name of the subview item */
-	const address_space *space;					/* address space to display */
-};
-
-
-/* a memory subview item */
-class memory_subview_item
-{
-	DISABLE_COPYING(memory_subview_item);
-
-public:
-	memory_subview_item()
-		: next(NULL),
-		  index(0),
-		  space(NULL),
-		  base(NULL),
-		  length(0),
-		  offsetxor(0),
-		  endianness(ENDIANNESS_NATIVE),
-		  prefsize(1) { }
-
-	memory_subview_item *next;					/* link to next item */
-	int					index;					/* index of this item */
-	astring				name;					/* name of the subview item */
-	const address_space *space;					/* address space we reference (if any) */
-	void *				base;					/* pointer to memory base */
-	offs_t				length;					/* length of memory */
-	offs_t				offsetxor;				/* XOR to apply to offsets */
-	UINT8				endianness;				/* endianness of memory */
-	UINT8				prefsize;				/* preferred bytes per chunk */
-};
-
-
-/* a single "character" in the debug view has an ASCII value and an attribute byte */
+// a single "character" in the debug view has an ASCII value and an attribute byte
 struct debug_view_char
 {
 	UINT8				byte;
@@ -178,281 +118,212 @@ struct debug_view_char
 };
 
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-/* ----- initialization and cleanup ----- */
-
-/* initializes the view system */
-void debug_view_init(running_machine *machine);
-
-
-
-/* ----- view creation/deletion ----- */
-
-/* allocate a new debug view */
-debug_view *debug_view_alloc(running_machine *machine, int type, debug_view_osd_update_func osdupdate, void *osdprivate);
-
-/* free a debug view */
-void debug_view_free(debug_view *view);
-
-
-
-/* ----- update management ----- */
-
-/* begin a sequence of changes so that only one update occurs */
-void debug_view_begin_update(debug_view *view);
-
-/* complete a sequence of changes so that only one update occurs */
-void debug_view_end_update(debug_view *view);
-
-/* flush any pending updates to the OSD layer */
-void debug_view_flush_updates(running_machine *machine);
-
-/* force all views to refresh */
-void debug_view_update_all(running_machine *machine);
-
-/* force all views of a given type to refresh */
-void debug_view_update_type(running_machine *machine, int type);
-
-
-
-/* ----- standard view properties ----- */
-
-/* return a pointer to a 2-dimentional array of characters that represent the visible area of the view */
-const debug_view_char *debug_view_get_chars(debug_view *view);
-
-/* type a character into a view */
-void debug_view_type_character(debug_view *view, int character);
-
-
-
-/* ----- standard view sizing ----- */
-
-/* return the total view size in rows and columns */
-debug_view_xy debug_view_get_total_size(debug_view *view);
-
-/* return the visible size in rows and columns */
-debug_view_xy debug_view_get_visible_size(debug_view *view);
-
-/* return the top left position of the visible area in rows and columns */
-debug_view_xy debug_view_get_visible_position(debug_view *view);
-
-/* set the visible size in rows and columns */
-void debug_view_set_visible_size(debug_view *view, debug_view_xy size);
-
-/* set the top left position of the visible area in rows and columns */
-void debug_view_set_visible_position(debug_view *view, debug_view_xy pos);
-
-
-
-/* ----- standard view cursor management ----- */
-
-/* return the current cursor position as a row and column */
-debug_view_xy debug_view_get_cursor_position(debug_view *view);
-
-/* return TRUE if a cursor is supported for this view type */
-int debug_view_get_cursor_supported(debug_view *view);
-
-/* return TRUE if a cursor is currently visible */
-int debug_view_get_cursor_visible(debug_view *view);
-
-/* set the current cursor position as a row and column */
-void debug_view_set_cursor_position(debug_view *view, debug_view_xy pos);
-
-/* set the visible state of the cursor */
-void debug_view_set_cursor_visible(debug_view *view, int visible);
-
-
-
-/* ----- registers view-specific properties ----- */
-
-/* return a linked list of subviews */
-const registers_subview_item *registers_view_get_subview_list(debug_view *view);
-
-/* return the current subview index */
-int registers_view_get_subview(debug_view *view);
-
-/* select a new subview by index */
-void registers_view_set_subview(debug_view *view, int index);
-
-
-
-/* ----- disassembly view-specific properties ----- */
-
-/* return a linked list of subviews */
-const disasm_subview_item *disasm_view_get_subview_list(debug_view *view);
-
-/* return the current subview index */
-int disasm_view_get_subview(debug_view *view);
-
-/* return the expression string describing the home address */
-const char *disasm_view_get_expression(debug_view *view);
-
-/* return the contents of the right column */
-disasm_right_column disasm_view_get_right_column(debug_view *view);
-
-/* return the number of instructions displayed before the home address */
-UINT32 disasm_view_get_backward_steps(debug_view *view);
-
-/* return the width in characters of the main disassembly section */
-UINT32 disasm_view_get_disasm_width(debug_view *view);
-
-/* return the PC of the currently selected address in the view */
-offs_t disasm_view_get_selected_address(debug_view *view);
-
-/* select a new subview by index */
-void disasm_view_set_subview(debug_view *view, int index);
-
-/* set the expression string describing the home address */
-void disasm_view_set_expression(debug_view *view, const char *expression);
-
-/* set the contents of the right column */
-void disasm_view_set_right_column(debug_view *view, disasm_right_column contents);
-
-/* set the number of instructions displayed before the home address */
-void disasm_view_set_backward_steps(debug_view *view, UINT32 steps);
-
-/* set the width in characters of the main disassembly section */
-void disasm_view_set_disasm_width(debug_view *view, UINT32 width);
-
-/* set the PC of the currently selected address in the view */
-void disasm_view_set_selected_address(debug_view *view, offs_t address);
-
-
-
-/* ----- memory view-specific properties ----- */
-
-/* return a linked list of subviews */
-const memory_subview_item *memory_view_get_subview_list(debug_view *view);
-
-/* return the current subview index */
-int memory_view_get_subview(debug_view *view);
-
-/* return the expression string describing the home address */
-const char *memory_view_get_expression(debug_view *view);
-
-/* return the currently displayed bytes per chunk */
-UINT8 memory_view_get_bytes_per_chunk(debug_view *view);
-
-/* return the number of chunks displayed across a row */
-UINT32 memory_view_get_chunks_per_row(debug_view *view);
-
-/* return TRUE if the memory view is displayed reverse */
-UINT8 memory_view_get_reverse(debug_view *view);
-
-/* return TRUE if the memory view is displaying an ASCII representation */
-UINT8 memory_view_get_ascii(debug_view *view);
-
-/* return TRUE if the memory view is displaying physical addresses versus logical addresses */
-UINT8 memory_view_get_physical(debug_view *view);
-
-/* select a new subview by index */
-void memory_view_set_subview(debug_view *view, int index);
-
-/* set the expression string describing the home address */
-void memory_view_set_expression(debug_view *view, const char *expression);
-
-/* specify the number of bytes displayed per chunk */
-void memory_view_set_bytes_per_chunk(debug_view *view, UINT8 chunkbytes);
-
-/* specify the number of chunks displayed across a row */
-void memory_view_set_chunks_per_row(debug_view *view, UINT32 rowchunks);
-
-/* specify TRUE if the memory view is displayed reverse */
-void memory_view_set_reverse(debug_view *view, UINT8 reverse);
-
-/* specify TRUE if the memory view should display an ASCII representation */
-void memory_view_set_ascii(debug_view *view, UINT8 ascii);
-
-/* specify TRUE if the memory view should display physical addresses versus logical addresses */
-void memory_view_set_physical(debug_view *view, UINT8 physical);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    registers_view_get_subview_by_index - return a
-    pointer to a registers subview by index
--------------------------------------------------*/
-
-INLINE const registers_subview_item *registers_view_get_subview_by_index(const registers_subview_item *itemlist, int index)
+// pair of X,Y coordinates for sizing
+class debug_view_xy
 {
-	for ( ; itemlist != NULL; itemlist = itemlist->next)
-		if (itemlist->index == index)
-			return itemlist;
-	return NULL;
-}
+public:
+	debug_view_xy(int _x = 0, int _y = 0) : x(_x), y(_y) { }
+
+	INT32					x;
+	INT32					y;
+};
 
 
-/*-------------------------------------------------
-    registers_view_get_current_subview - return a
-    pointer to the current subview of a
-    registers view
--------------------------------------------------*/
-
-INLINE const registers_subview_item *registers_view_get_current_subview(debug_view *view)
+// debug_view_sources select from multiple sources available within a view
+class debug_view_source
 {
-	return registers_view_get_subview_by_index(registers_view_get_subview_list(view), registers_view_get_subview(view));
-}
+	DISABLE_COPYING(debug_view_source);
+	
+	friend class debug_view_source_list;
+
+public:
+	// construction/destruction
+	debug_view_source(const char *name, device_t *device = NULL);
+	virtual ~debug_view_source();
+	
+	// getters
+	const char *name() const { return m_name; }
+	debug_view_source *next() const { return m_next; }
+	device_t *device() const { return m_device; }
+	
+private:
+	// internal state
+	debug_view_source *		m_next;					// link to next item
+	astring					m_name;					// name of the source item
+	device_t *				m_device;				// associated device (if applicable)
+};
 
 
-/*-------------------------------------------------
-    disasm_view_get_subview_by_index - return a
-    pointer to a disasm subview by index
--------------------------------------------------*/
-
-INLINE const disasm_subview_item *disasm_view_get_subview_by_index(const disasm_subview_item *itemlist, int index)
+// a debug_view_source_list contains a list of debug_view_sources
+class debug_view_source_list
 {
-	for ( ; itemlist != NULL; itemlist = itemlist->next)
-		if (itemlist->index == index)
-			return itemlist;
-	return NULL;
-}
+	DISABLE_COPYING(debug_view_source_list);
+
+public:
+	// construction/destruction
+	debug_view_source_list(running_machine &machine);
+	~debug_view_source_list();
+	
+	// getters
+	const debug_view_source *head() const { return m_head; }
+	int count() const { return m_count; }
+	int index(const debug_view_source &source) const;
+	const debug_view_source *by_index(int index) const;
+	
+	// operations
+	void reset();
+	void append(debug_view_source &view_source);
+	const debug_view_source *match_device(device_t *device) const;
+	int match_device_index(device_t *device) const { return index(*match_device(device)); }
+	
+private:
+	// internal state
+	running_machine &		m_machine;				// reference to our machine
+	debug_view_source *		m_head;					// head of the list
+	debug_view_source *		m_tail;					// end of the tail
+	UINT32					m_count;				// number of items in the list
+};
 
 
-/*-------------------------------------------------
-    disasm_view_get_current_subview - return a
-    pointer to the current subview of a
-    disassembly view
--------------------------------------------------*/
-
-INLINE const disasm_subview_item *disasm_view_get_current_subview(debug_view *view)
+// debug_view describes a single text-based view
+class debug_view
 {
-	return disasm_view_get_subview_by_index(disasm_view_get_subview_list(view), disasm_view_get_subview(view));
-}
+	friend class debug_view_manager;
+	
+protected:
+	// construction/destruction
+	debug_view(running_machine &machine, debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate);
+	virtual ~debug_view();
+
+public:
+	// getters
+	running_machine &machine() const { return m_machine; }
+	debug_view *next() const { return m_next; }
+	debug_view_type type() const { return m_type; }
+	const debug_view_char *viewdata() const { return m_viewdata; }
+	debug_view_xy total_size() { flush_updates(); return m_total; }
+	debug_view_xy visible_size() { flush_updates(); return m_visible; }
+	debug_view_xy visible_position() { flush_updates(); return m_topleft; }
+	debug_view_xy cursor_position() { flush_updates(); return m_cursor; }
+	bool cursor_supported() { flush_updates(); return m_supports_cursor; }
+	bool cursor_visible() { flush_updates(); return m_cursor_visible; }
+	const debug_view_source *source() const { return m_source; }
+	const debug_view_source_list &source_list() const { return m_source_list; }
+
+	// setters
+	void set_size(int width, int height);
+	void set_visible_size(debug_view_xy size);
+	void set_visible_position(debug_view_xy pos);
+	void set_cursor_position(debug_view_xy pos);
+	void set_cursor_visible(bool visible = true);
+	void set_source(const debug_view_source &source);
+	void process_char(int character) { view_char(character); }
+
+protected:
+	// internal updating helpers
+	void begin_update() { m_update_level++; }
+	void end_update();
+	void force_update() { begin_update(); m_update_pending = true; end_update(); }
+	void flush_updates() { begin_update(); end_update(); }
+	void flush_osd_updates();
+
+	// cursor management helpers
+	void adjust_visible_x_for_cursor();
+	void adjust_visible_y_for_cursor();
+
+	// overridables
+	virtual void view_update() = 0;
+	virtual void view_notify(debug_view_notification type);
+	virtual void view_char(int chval);
+
+protected:
+	// core view data
+	debug_view *			m_next;				// link to the next view
+	running_machine &		m_machine;			// machine associated with this view
+	debug_view_type			m_type;				// type of view
+	const debug_view_source *m_source;			// currently selected data source
+	debug_view_source_list 	m_source_list;		// list of available data sources
+
+	// OSD data
+	debug_view_osd_update_func m_osdupdate;		// callback for the update
+	void *					m_osdprivate;		// OSD-managed private data
+
+	// visibility info
+	debug_view_xy			m_visible;			// visible size (in rows and columns)
+	debug_view_xy			m_total;			// total size (in rows and columns)
+	debug_view_xy			m_topleft;			// top-left visible position (in rows and columns)
+	debug_view_xy			m_cursor;			// cursor position
+	bool					m_supports_cursor;	// does this view support a cursor?
+	bool					m_cursor_visible;	// is the cursor visible?
+
+	// update info
+	bool					m_recompute;		// does this view require a recomputation?
+	UINT8					m_update_level;		// update level; updates when this hits 0
+	bool					m_update_pending;	// true if there is a pending update
+	bool					m_osd_update_pending; // true if there is a pending update
+	debug_view_char *		m_viewdata;			// current array of view data
+	int						m_viewdata_size;	// number of elements of the viewdata array
+};
 
 
-/*-------------------------------------------------
-    memory_view_get_subview_by_index - return a
-    pointer to a memory subview by index
--------------------------------------------------*/
-
-INLINE const memory_subview_item *memory_view_get_subview_by_index(const memory_subview_item *itemlist, int index)
+// debug_view_manager manages all the views
+class debug_view_manager
 {
-	for ( ; itemlist != NULL; itemlist = itemlist->next)
-		if (itemlist->index == index)
-			return itemlist;
-	return NULL;
-}
+public:
+	// construction/destruction
+	debug_view_manager(running_machine &machine);
+	~debug_view_manager();
+
+	// view allocation	
+	debug_view *alloc_view(debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate);
+	void free_view(debug_view &view);
+
+	// update helpers
+	void update_all(debug_view_type type = DVT_NONE);
+	void flush_osd_updates();
+
+private:
+	// private helpers
+	debug_view *append(debug_view *view);
+
+	// internal state
+	running_machine &	m_machine;				// reference to our machine
+	debug_view *		m_viewlist;				// list of views
+};
 
 
-/*-------------------------------------------------
-    memory_view_get_current_subview - return a
-    pointer to the current subview of a
-    memory view
--------------------------------------------------*/
-
-INLINE const memory_subview_item *memory_view_get_current_subview(debug_view *view)
+// debug_view_expression is a helper for handling embedded expressions
+class debug_view_expression
 {
-	return memory_view_get_subview_by_index(memory_view_get_subview_list(view), memory_view_get_subview(view));
-}
+public:
+	// construction/destruction
+	debug_view_expression(running_machine &machine);
+	~debug_view_expression();
+	
+	// getters
+	bool dirty() const { return m_dirty; }
+	UINT64 last_value() const { return m_result; }
+	UINT64 value() { if (m_dirty) recompute(); return m_result; }
+	const char *string() const { return m_string; }
+	symbol_table *context() const { return m_context; }
+
+	// setters	
+	void mark_dirty() { m_dirty = true; }
+	void set_string(const char *string);
+	void set_context(symbol_table *context);
+
+private:
+	// internal helpers
+	bool recompute();
+
+	// internal state
+	running_machine &	m_machine;				// reference to the machine
+	bool				m_dirty;				// true if the expression needs to be re-evaluated
+	UINT64				m_result;				// last result from the expression
+	parsed_expression *	m_parsed;				// parsed expression data
+	astring				m_string;				// copy of the expression string
+	symbol_table *		m_context;				// context we are using
+};
 
 
 #endif

@@ -165,6 +165,7 @@ private:
 	osd_lock *				m_listlock;
 	resource_pool_item *	m_hash[k_hash_prime];
 	resource_pool_item *	m_ordered_head;
+	resource_pool_item *	m_ordered_tail;
 };
 
 

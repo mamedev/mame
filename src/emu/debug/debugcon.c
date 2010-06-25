@@ -382,7 +382,7 @@ CMDERR debug_console_execute_command(running_machine *machine, const char *comma
 	/* update all views */
 	if (echo)
 	{
-		debug_view_update_all(machine);
+		machine->m_debug_view->update_all();
 		debugger_refresh_display(machine);
 	}
 	return result;
@@ -481,7 +481,7 @@ void CLIB_DECL debug_console_printf(running_machine *machine, const char *format
 	text_buffer_print(console_textbuf, buffer);
 
 	/* force an update of any console views */
-	debug_view_update_type(machine, DVT_CONSOLE);
+	machine->m_debug_view->update_all(DVT_CONSOLE);
 }
 
 
@@ -499,7 +499,7 @@ void CLIB_DECL debug_console_vprintf(running_machine *machine, const char *forma
 	text_buffer_print(console_textbuf, buffer);
 
 	/* force an update of any console views */
-	debug_view_update_type(machine, DVT_CONSOLE);
+	machine->m_debug_view->update_all(DVT_CONSOLE);
 }
 
 
@@ -521,7 +521,7 @@ void CLIB_DECL debug_console_printf_wrap(running_machine *machine, int wrapcol, 
 	text_buffer_print_wrap(console_textbuf, buffer, wrapcol);
 
 	/* force an update of any console views */
-	debug_view_update_type(machine, DVT_CONSOLE);
+	machine->m_debug_view->update_all(DVT_CONSOLE);
 }
 
 
@@ -547,7 +547,7 @@ void debug_errorlog_write_line(running_machine *machine, const char *line)
 		text_buffer_print(errorlog_textbuf, line);
 
 	/* force an update of any log views */
-	debug_view_update_type(machine, DVT_LOG);
+	machine->m_debug_view->update_all(DVT_LOG);
 }
 
 

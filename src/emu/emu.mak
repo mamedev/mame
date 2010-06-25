@@ -101,6 +101,10 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/debugcpu.o \
 	$(EMUOBJ)/debug/debughlp.o \
 	$(EMUOBJ)/debug/debugvw.o \
+	$(EMUOBJ)/debug/dvdisasm.o \
+	$(EMUOBJ)/debug/dvmemory.o \
+	$(EMUOBJ)/debug/dvstate.o \
+	$(EMUOBJ)/debug/dvtext.o \
 	$(EMUOBJ)/debug/express.o \
 	$(EMUOBJ)/debug/textbuf.o \
 	$(EMUOBJ)/debugint/debugint.o

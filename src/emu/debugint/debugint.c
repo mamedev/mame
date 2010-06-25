@@ -18,6 +18,9 @@
 #include "osdepend.h"
 
 #include "debug/debugvw.h"
+#include "debug/dvdisasm.h"
+#include "debug/dvmemory.h"
+#include "debug/dvstate.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
@@ -139,7 +142,7 @@ public:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void dview_update(debug_view *dw, void *osdprivate);
+static void dview_update(debug_view &dw, void *osdprivate);
 static int map_point(DView *dv, INT32 target_x, INT32 target_y, INT32 *mapped_x, INT32 *mapped_y);
 
 class DView
@@ -147,7 +150,7 @@ class DView
 	DISABLE_COPYING(DView);
 
 public:
-	DView(render_target *target, running_machine *machine, int type, int flags)
+	DView(render_target *target, running_machine *machine, debug_view_type type, int flags)
 		: next(NULL),
 		  type(0),
 		  state(0),
@@ -157,7 +160,7 @@ public:
 		this->target = target;
 		//dv->container = render_target_get_component_container(target, name, &pos);
 		this->container = render_debug_alloc(target);
-		this->view = debug_view_alloc(machine, type, dview_update, this);
+		this->view = machine->m_debug_view->alloc_view(type, dview_update, this);
 		this->type = type;
 		this->machine = machine;
 		this->state = flags | VIEW_STATE_NEEDS_UPDATE;
@@ -173,17 +176,17 @@ public:
 		{
 		case DVT_DISASSEMBLY:
 			/* set up disasm view */
-			debug_view_begin_update(this->view);
-			disasm_view_set_expression(this->view, "curpc");
+			downcast<debug_view_disasm *>(this->view)->set_expression("curpc");
 			//debug_view_  property_UINT32(dv->view, DVP_DASM_TRACK_LIVE, 1);
-			debug_view_end_update(this->view);
+			break;
+		default:
 			break;
 		}
 	  }
 	~DView()
 	{
 		render_debug_free(this->target, this->container);
-		debug_view_free(this->view);
+		machine->m_debug_view->free_view(*this->view);
 	}
 
 	DView *				next;
@@ -296,7 +299,7 @@ static void set_focus_view(DView *dv)
 	}
 }
 
-static DView *dview_alloc(render_target *target, running_machine *machine, int type, int flags)
+static DView *dview_alloc(render_target *target, running_machine *machine, debug_view_type type, int flags)
 {
 	DView *dv;
 
@@ -576,12 +579,12 @@ static int dview_on_mouse(DView *dv, int mx, int my, int button)
 				sb->value = sb->upper;
 		}
 
-		pos = debug_view_get_visible_position(dv->view);
+		pos = dv->view->visible_position();
 
 		if (sb->value != pos.x)
 		{
 			pos.x = sb->value;
-			debug_view_set_visible_position(dv->view, pos);
+			dv->view->set_visible_position(pos);
 			dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
 		}
 	}
@@ -615,12 +618,12 @@ static int dview_on_mouse(DView *dv, int mx, int my, int button)
 				sb->value = sb->upper;
 		}
 
-		pos = debug_view_get_visible_position(dv->view);
+		pos = dv->view->visible_position();
 
 		if (sb->value != pos.y)
 		{
 			pos.y = sb->value;
-			debug_view_set_visible_position(dv->view, pos);
+			dv->view->set_visible_position(pos);
 			dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
 		}
 	}
@@ -638,14 +641,14 @@ static int dview_on_mouse(DView *dv, int mx, int my, int button)
 	else if (dview_xy_in_rect(dv, RECT_DVIEW_CLIENT, x, y))
 	{
 		y -= TITLE_HEIGHT;
-		if (debug_view_get_cursor_supported(dv->view) && clicked && y >= 0)
+		if (dv->view->cursor_supported() && clicked && y >= 0)
 		{
-			debug_view_xy topleft = debug_view_get_visible_position(dv->view);
+			debug_view_xy topleft = dv->view->visible_position();
 			debug_view_xy newpos;
 			newpos.x = topleft.x + x / debug_font_width;
 			newpos.y = topleft.y + y / debug_font_height;
-			debug_view_set_cursor_position(dv->view, newpos);
-			debug_view_set_cursor_visible(dv->view, TRUE);
+			dv->view->set_cursor_position(newpos);
+			dv->view->set_cursor_visible(true);
 		}
 		if (clicked)
 			set_focus_view(dv);
@@ -698,7 +701,7 @@ static void dview_draw(DView *dv)
 	rgb_t bg_base, bg, fg;
 	rectangle r;
 
-	vsize = debug_view_get_visible_size(dv->view);
+	vsize = dv->view->visible_size();
 
 	bg_base = MAKE_ARGB(0xff,0xff,0xff,0xff);
 
@@ -714,7 +717,7 @@ static void dview_draw(DView *dv)
 			rect_get_height(&r) /*- (dv->hsb.visible ? HSB_HEIGHT : 0)*/, bg_base);
 
 	/* background first */
-	viewdata = debug_view_get_chars(dv->view);
+	viewdata = dv->view->viewdata();
 
 	yy = BORDER_YTHICKNESS;
 	for(j=0; j<vsize.y; j++)
@@ -734,7 +737,7 @@ static void dview_draw(DView *dv)
 	}
 
 	/* now the text */
-	viewdata = debug_view_get_chars(dv->view);
+	viewdata = dv->view->viewdata();
 
 	yy = BORDER_YTHICKNESS;
 	for(j=0; j<vsize.y; j++)
@@ -785,8 +788,8 @@ static void dview_size_allocate(DView *dv)
 	render_container_set_user_settings(dv->container, &rcus);
 	//printf("%d %d %d %d\n", wpos.min_x, wpos.max_x, wpos.min_y, wpos.max_y);
 
-	pos = debug_view_get_visible_position(dv->view);
-	size = debug_view_get_total_size(dv->view);
+	pos = dv->view->visible_position();
+	size = dv->view->total_size();
 
 	dv->hsb.visible = 0;
 	dv->vsb.visible = 0;
@@ -822,8 +825,8 @@ static void dview_size_allocate(DView *dv)
 		vsize.x = size.x-pos.x;
 	}
 
-	debug_view_set_visible_position(dv->view, pos);
-	debug_view_set_visible_size(dv->view, vsize);
+	dv->view->set_visible_position(pos);
+	dv->view->set_visible_size(vsize);
 
 	if(dv->hsb.visible) {
 		int span = (rect_get_width(&r) - 2 * BORDER_XTHICKNESS) / debug_font_width;
@@ -839,7 +842,7 @@ static void dview_size_allocate(DView *dv)
 		dv->hsb.page_increment = span;
 		dv->hsb.page_size = span;
 
-		debug_view_set_visible_position(dv->view, pos);
+		dv->view->set_visible_position(pos);
 	}
 
 	if(dv->vsb.visible) {
@@ -856,18 +859,18 @@ static void dview_size_allocate(DView *dv)
 		dv->vsb.page_increment = span;
 		dv->vsb.page_size = span;
 
-		debug_view_set_visible_position(dv->view, pos);
+		dv->view->set_visible_position(pos);
 	}
 }
 
-static void dview_update(debug_view *dw, void *osdprivate)
+static void dview_update(debug_view &dw, void *osdprivate)
 {
 	DView *dv = (DView *) osdprivate;
 
 	dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
 
 #if 0
-	debug_view_xy size = debug_view_get_total_size(dw);
+	debug_view_xy size = dw.total_size();
 
 	if((dv->tr != size.y) || (dv->tc != size.x))
 		gtk_widget_queue_resize(GTK_WIDGET(dv));
@@ -950,7 +953,7 @@ static void process_string(DView *dv, const char *str)
 	switch (dv->type)
 	{
 	case DVT_DISASSEMBLY:
-		disasm_view_set_expression(dv->view, str);
+		downcast<debug_view_disasm *>(dv->view)->set_expression(str);
 		break;
 	case DVT_CONSOLE:
 		if(!dv->editor.str[0])
@@ -959,7 +962,7 @@ static void process_string(DView *dv, const char *str)
 			debug_console_execute_command(dv->machine, str, 1);
 		break;
 	case DVT_MEMORY:
-		memory_view_set_expression(dv->view, str);
+		downcast<debug_view_memory *>(dv->view)->set_expression(str);
 		break;
 	}
 }
@@ -972,36 +975,33 @@ static void on_disassembly_window_activate(DView *dv, const ui_menu_event *event
 {
 	DView *ndv;
 	render_target *target;
-	const disasm_subview_item *dasmsubitem;
+	const debug_view_source *source;
 
 	target = render_get_ui_target();
 
 	ndv = dview_alloc(target, dv->machine, DVT_DISASSEMBLY, 0);
 	ndv->editor.active = TRUE;
 	ndv->editor.container = render_container_get_ui();
-	dasmsubitem = disasm_view_get_current_subview(ndv->view);
-	dview_set_title(ndv, dasmsubitem->name);
+	source = ndv->view->source();
+	dview_set_title(ndv, source->name());
 	set_focus_view(ndv);
 
 }
 
 static void on_disasm_cpu_activate(DView *dv, const ui_menu_event *event)
 {
-	const disasm_subview_item *subview;
-	int current = disasm_view_get_subview(dv->view);
+	const debug_view_source *current = dv->view->source();
 
 	if (event->iptkey == IPT_UI_RIGHT)
 	{
-		current++;
-		subview = disasm_view_get_subview_by_index(disasm_view_get_subview_list(dv->view), current);
-		if (subview == NULL)
+		current = current->next();
+		if (current == NULL)
 		{
-			current = 0;
-			subview = disasm_view_get_subview_by_index(disasm_view_get_subview_list(dv->view), current);
+			current = dv->view->source_list().head();
 		}
-		disasm_view_set_subview(dv->view, current);
+		dv->view->set_source(*current);
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
-		dview_set_title(dv, subview->name);
+		dview_set_title(dv, current->name());
 	}
 }
 
@@ -1086,7 +1086,8 @@ static void on_exit_activate(DView *dv, const ui_menu_event *event)
 
 static void on_view_opcodes_activate(DView *dv, const ui_menu_event *event)
 {
-	disasm_right_column rc = disasm_view_get_right_column(focus_view->view);
+	debug_view_disasm *dasmview = downcast<debug_view_disasm *>(focus_view->view);
+	disasm_right_column rc = dasmview->right_column();
 	disasm_right_column new_rc = DASM_RIGHTCOL_NONE;
 
 	if (event->iptkey == IPT_UI_RIGHT)
@@ -1098,7 +1099,7 @@ static void on_view_opcodes_activate(DView *dv, const ui_menu_event *event)
 		case DASM_RIGHTCOL_COMMENTS:	new_rc = DASM_RIGHTCOL_RAW; break;
 		default:						break;
 		}
-		disasm_view_set_right_column(dv->view, new_rc);
+		dasmview->set_right_column(new_rc);
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
 	}
 }
@@ -1107,15 +1108,11 @@ static void on_run_to_cursor_activate(DView *dv, const ui_menu_event *event)
 {
 	char command[64];
 
-	if (debug_view_get_cursor_visible(dv->view))
+	if (dv->view->cursor_visible() && debug_cpu_get_visible_cpu(dv->machine) == dv->view->source()->device())
 	{
-		const address_space *space = disasm_view_get_current_subview(dv->view)->space;
-		if (debug_cpu_get_visible_cpu(dv->machine) == space->cpu)
-		{
-			offs_t address = disasm_view_get_selected_address(dv->view);
-			sprintf(command, "go %X", address);
-			debug_console_execute_command(dv->machine, command, 1);
-		}
+		offs_t address = downcast<debug_view_disasm *>(dv->view)->selected_address();
+		sprintf(command, "go %X", address);
+		debug_console_execute_command(dv->machine, command, 1);
 	}
 }
 
@@ -1184,8 +1181,8 @@ static void CreateMainMenu(running_machine *machine)
 	case DVT_MEMORY:
 		title = "Memory:";
 		break;
-	case DVT_REGISTERS:
-		title = "Registers:";
+	case DVT_STATE:
+		title = "State:";
 		break;
 	}
 
@@ -1195,7 +1192,8 @@ static void CreateMainMenu(running_machine *machine)
 	switch (focus_view->type)
 	{
 	case DVT_DISASSEMBLY:
-		rc = disasm_view_get_right_column(focus_view->view);
+	{
+		rc = downcast<debug_view_disasm *>(focus_view->view)->right_column();
 		switch(rc)
 		{
 		case DASM_RIGHTCOL_RAW:			subtext = "Raw Opcodes"; break;
@@ -1207,12 +1205,11 @@ static void CreateMainMenu(running_machine *machine)
 
 		if (!dview_is_state(focus_view, VIEW_STATE_FOLLOW_CPU))
 		{
-			const disasm_subview_item *		dsi;
-			dsi = disasm_view_get_current_subview(focus_view->view);
-			ui_menu_item_append(menu, "CPU", dsi->name, MENU_FLAG_RIGHT_ARROW, (void *)on_disasm_cpu_activate);
+			ui_menu_item_append(menu, "CPU", focus_view->view->source()->name(), MENU_FLAG_RIGHT_ARROW, (void *)on_disasm_cpu_activate);
 		}
 		ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 		break;
+	}
 	}
 
 	/* add input menu items */
@@ -1389,36 +1386,20 @@ static void handle_menus(running_machine *machine)
 
 static void followers_set_cpu(running_device *device)
 {
-	device_state_interface *stateintf = device_state(device);
-	const registers_subview_item *regsubitem = NULL;
-	const disasm_subview_item *dasmsubitem;
-	char title[256];
+	astring title;
 
 	for (DView *dv = list; dv != NULL; dv = dv->next)
 	{
 		if (dview_is_state(dv, VIEW_STATE_FOLLOW_CPU))
 		{
+			const debug_view_source *source = dv->view->source_list().match_device(device);
 			switch (dv->type)
 			{
 			case DVT_DISASSEMBLY:
-				for (dasmsubitem = disasm_view_get_subview_list(dv->view); dasmsubitem != NULL; dasmsubitem = dasmsubitem->next)
-					if (dasmsubitem->space->cpu == device)
-					{
-						disasm_view_set_subview(dv->view, dasmsubitem->index);
-						snprintf(title, ARRAY_LENGTH(title), "%s", dasmsubitem->name.cstr());
-						dview_set_title(dv, title);
-						break;
-					}
-				break;
-			case DVT_REGISTERS:
-				for (regsubitem = registers_view_get_subview_list(dv->view); regsubitem != NULL; regsubitem = regsubitem->next)
-					if (regsubitem->stateintf == stateintf)
-					{
-						registers_view_set_subview(dv->view, regsubitem->index);
-						snprintf(title, ARRAY_LENGTH(title), "%s", regsubitem->name.cstr());
-						dview_set_title(dv, title);
-						break;
-					}
+			case DVT_STATE:
+				dv->view->set_source(*source);
+				title.printf("%s", source->name());
+				dview_set_title(dv, title);
 				break;
 			}
 		}
@@ -1472,7 +1453,7 @@ void debugint_wait_for_debugger(running_device *device, int firststop)
 		dv = dview_alloc(target, device->machine, DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
 		dv->editor.active = TRUE;
 		dv->editor.container = render_container_get_ui();
-		dv = dview_alloc(target, device->machine, DVT_REGISTERS, VIEW_STATE_FOLLOW_CPU);
+		dv = dview_alloc(target, device->machine, DVT_STATE, VIEW_STATE_FOLLOW_CPU);
 		dv = dview_alloc(target, device->machine, DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
 		dview_set_title(dv, "Console");
 		dv->editor.active = TRUE;

@@ -129,6 +129,7 @@ typedef enum _output_channel output_channel;
 // forward declarations
 class gfx_element;
 class colortable_t;
+class debug_view_manager;
 
 typedef struct _mame_private mame_private;
 typedef struct _cpuexec_private cpuexec_private;
@@ -287,10 +288,11 @@ public:
 	ui_input_private *		ui_input_data;		/* internal data from uiinput.c */
 	cheat_private *			cheat_data;			/* internal data from cheat.c */
 	debugcpu_private *		debugcpu_data;		/* internal data from debugcpu.c */
-	debugvw_private *		debugvw_data;		/* internal data from debugvw.c */
 	generic_machine_private *generic_machine_data; /* internal data from machine/generic.c */
 	generic_video_private *	generic_video_data;	/* internal data from video/generic.c */
 	generic_audio_private *	generic_audio_data;	/* internal data from audio/generic.c */
+
+	debug_view_manager *	m_debug_view;		/* internal data from debugvw.c */
 
 	/* driver-specific information */
 	void *					driver_data;		/* drivers can hang data off of here instead of using globals */

@@ -15,7 +15,7 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 	UINT32 i, j, xx, yy;
 	GdkColor bg, fg;
 
-	vsize = debug_view_get_visible_size(dv->view);
+	vsize = dv->view->visible_size();
 
 	bg.red = bg.green = bg.blue = 0xffff;
 	gdk_gc_set_rgb_fg_color(dv->gc, &bg);
@@ -28,7 +28,7 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 						   dv->vsz, dv->hsz);
 	}
 
-	viewdata = debug_view_get_chars(dv->view);
+	viewdata = dv->view->viewdata();
 
 	yy = wdv->style->ythickness;
 	for(j=0; j<vsize.y; j++) {
@@ -106,12 +106,12 @@ static void dview_hadj_changed(GtkAdjustment *adj, DView *dv)
 	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
 
-	pos = debug_view_get_visible_position(dv->view);
+	pos = dv->view->visible_position();
 
 	if (v != pos.x)
 	{
 		pos.x = v;
-		debug_view_set_visible_position(dv->view, pos);
+		dv->view->set_visible_position(pos);
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
@@ -121,12 +121,12 @@ static void dview_vadj_changed(GtkAdjustment *adj, DView *dv)
 	debug_view_xy pos;
 	UINT32 v = (UINT32)(adj->value);
 
-	pos = debug_view_get_visible_position(dv->view);
+	pos = dv->view->visible_position();
 
 	if (v != pos.y)
 	{
 		pos.y = v;
-		debug_view_set_visible_position(dv->view, pos);
+		dv->view->set_visible_position(pos);
 		gtk_widget_queue_draw(GTK_WIDGET(dv));
 	}
 }
@@ -170,8 +170,8 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 	int ovs = dv->vs;
 	debug_view_xy size, pos, col, vsize;
 
-	pos = debug_view_get_visible_position(dv->view);
-	size = debug_view_get_total_size(dv->view);
+	pos = dv->view->visible_position();
+	size = dv->view->total_size();
 
 	dv->tr = size.y;
 	dv->tc = size.x;
@@ -224,8 +224,8 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 			gdk_window_set_geometry_hints( wdv->window,&x, GDK_HINT_MAX_SIZE  );
 		}
 	}
-	debug_view_set_visible_position(dv->view, pos);
-	debug_view_set_visible_size(dv->view, vsize);
+	dv->view->set_visible_position(pos);
+	dv->view->set_visible_size(vsize);
 
 #ifdef GTK_WIDGET_REALIZED
 	if(GTK_WIDGET_REALIZED(wdv))
@@ -258,7 +258,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->hadj->page_increment = span;
 		dv->hadj->page_size = span;
 		gtk_adjustment_changed(dv->hadj);
-		debug_view_set_visible_position(dv->view, pos);
+		dv->view->set_visible_position(pos);
 	} else {
 		if(ohs)
 			gtk_widget_hide(dv->hscrollbar);
@@ -286,7 +286,7 @@ static void dview_size_allocate(GtkWidget *wdv, GtkAllocation *allocation)
 		dv->vadj->page_increment = span;
 		dv->vadj->page_size = span;
 		gtk_adjustment_changed(dv->vadj);
-		debug_view_set_visible_position(dv->view, pos);
+		dv->view->set_visible_position(pos);
 	} else {
 		if(ovs)
 			gtk_widget_hide(dv->vscrollbar);
@@ -301,7 +301,7 @@ static void dview_size_request(GtkWidget *wdv, GtkRequisition *req)
 	int vs = 0, hs = 0;
 	debug_view_xy size;
 
-	size = debug_view_get_total_size(dv->view);
+	size = dv->view->total_size();
 
 	if(size.x > 50) {
 		size.x = 50;
@@ -402,10 +402,10 @@ static void dview_init(DView *dv)
 	g_signal_connect(dv->vadj, "value-changed", G_CALLBACK(dview_vadj_changed), dv);
 }
 
-static void dview_update(debug_view *dw, void *osdprivate)
+static void dview_update(debug_view &dw, void *osdprivate)
 {
 	DView *dv = (DView *) osdprivate;
-	debug_view_xy size = debug_view_get_total_size(dw);
+	debug_view_xy size = dw.total_size();
 
 	if((dv->tr != size.y) || (dv->tc != size.x))
 		gtk_widget_queue_resize(GTK_WIDGET(dv));
@@ -421,8 +421,8 @@ GtkWidget *dview_new(const gchar *widget_name, const gchar *string1, const gchar
 	return wdv;
 }
 
-void dview_set_debug_view(DView *dv, running_machine *machine, int type)
+void dview_set_debug_view(DView *dv, running_machine *machine, debug_view_type type)
 {
-	dv->view = debug_view_alloc(machine, type, dview_update, dv);
+	dv->view = machine->m_debug_view->alloc_view(type, dview_update, dv);
 	dv->dv_type = type;
 }

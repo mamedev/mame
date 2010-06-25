@@ -1265,10 +1265,10 @@ running_machine::running_machine(const game_driver *driver)
 	  ui_input_data(NULL),
 	  cheat_data(NULL),
 	  debugcpu_data(NULL),
-	  debugvw_data(NULL),
 	  generic_machine_data(NULL),
 	  generic_video_data(NULL),
 	  generic_audio_data(NULL),
+	  m_debug_view(NULL),
 	  driver_data(NULL)
 {
 	try

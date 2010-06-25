@@ -321,7 +321,8 @@ symbol_table *debug_cpu_get_visible_symtable(running_machine *machine)
 
 symbol_table *debug_cpu_get_symtable(device_t *device)
 {
-	return cpu_get_debug_data(device)->symtable;
+	cpu_device *cpu = dynamic_cast<cpu_device *>(device);
+	return (cpu != NULL) ? cpu_get_debug_data(device)->symtable : NULL;
 }
 
 
@@ -425,8 +426,8 @@ void debug_cpu_start_hook(device_t *device, attotime endtime)
 		/* check for periodic updates */
 		if (device == global->visiblecpu && osd_ticks() > global->last_periodic_update_time + osd_ticks_per_second()/4)
 		{
-			debug_view_update_all(device->machine);
-			debug_view_flush_updates(device->machine);
+			device->machine->m_debug_view->update_all();
+			device->machine->m_debug_view->flush_osd_updates();
 			global->last_periodic_update_time = osd_ticks();
 		}
 
@@ -566,8 +567,8 @@ void debug_cpu_instruction_hook(device_t *device, offs_t curpc)
 			/* update every 100 steps until we are within 200 of the end */
 			else if ((cpudebug->flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (cpudebug->stepsleft < 200 || cpudebug->stepsleft % 100 == 0))
 			{
-				debug_view_update_all(device->machine);
-				debug_view_flush_updates(device->machine);
+				device->machine->m_debug_view->update_all();
+				device->machine->m_debug_view->flush_osd_updates();
 				debugger_refresh_display(device->machine);
 			}
 		}
@@ -608,7 +609,7 @@ void debug_cpu_instruction_hook(device_t *device, offs_t curpc)
 		global->visiblecpu = device;
 
 		/* update all views */
-		debug_view_update_all(device->machine);
+		device->machine->m_debug_view->update_all();
 		debugger_refresh_display(device->machine);
 
 		/* wait for the debugger; during this time, disable sound output */
@@ -616,7 +617,7 @@ void debug_cpu_instruction_hook(device_t *device, offs_t curpc)
 		while (global->execution_state == EXECUTION_STATE_STOPPED)
 		{
 			/* flush any pending updates before waiting again */
-			debug_view_flush_updates(device->machine);
+			device->machine->m_debug_view->flush_osd_updates();
 
 			/* clear the memory modified flag and wait */
 			global->memory_modified = FALSE;
@@ -629,7 +630,7 @@ void debug_cpu_instruction_hook(device_t *device, offs_t curpc)
 			/* if something modified memory, update the screen */
 			if (global->memory_modified)
 			{
-				debug_view_update_type(device->machine, DVT_DISASSEMBLY);
+				device->machine->m_debug_view->update_all(DVT_DISASSEMBLY);
 				debugger_refresh_display(device->machine);
 			}
 

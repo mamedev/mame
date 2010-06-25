@@ -155,7 +155,7 @@ int debug_comment_add(device_t *device, offs_t addr, const char *comment, rgb_t 
 		comments->change_count++;
 
 		/* force an update of disassembly views */
-		debug_view_update_type(device->machine, DVT_DISASSEMBLY);
+		device->machine->m_debug_view->update_all(DVT_DISASSEMBLY);
 		return 1;
 	}
 
@@ -170,7 +170,7 @@ int debug_comment_add(device_t *device, offs_t addr, const char *comment, rgb_t 
 	comments->change_count++;
 
 	/* force an update of disassembly views */
-	debug_view_update_type(device->machine, DVT_DISASSEMBLY);
+	device->machine->m_debug_view->update_all(DVT_DISASSEMBLY);
 
 	return 1;
 }
@@ -207,7 +207,7 @@ int debug_comment_remove(device_t *device, offs_t addr, UINT32 c_crc)
 	comments->change_count++;
 
 	/* force an update of disassembly views */
-	debug_view_update_type(device->machine, DVT_DISASSEMBLY);
+	device->machine->m_debug_view->update_all(DVT_DISASSEMBLY);
 
 	return 1;
 }

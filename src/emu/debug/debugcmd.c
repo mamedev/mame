@@ -1128,7 +1128,7 @@ static void execute_comment(running_machine *machine, int ref, int params, const
 
 	/* Now try adding the comment */
 	debug_comment_add(cpu, address, param[1], 0x00ff0000, debug_comment_get_opcode_crc32(cpu, address));
-	debug_view_update_type(cpu->machine, DVT_DISASSEMBLY);
+	cpu->machine->m_debug_view->update_all(DVT_DISASSEMBLY);
 }
 
 
@@ -1152,7 +1152,7 @@ static void execute_comment_del(running_machine *machine, int ref, int params, c
 	/* If it's a number, it must be an address */
 	/* The bankoff and cbn will be pulled from what's currently active */
 	debug_comment_remove(cpu, address, debug_comment_get_opcode_crc32(cpu, address));
-	debug_view_update_type(cpu->machine, DVT_DISASSEMBLY);
+	cpu->machine->m_debug_view->update_all(DVT_DISASSEMBLY);
 }
 
 

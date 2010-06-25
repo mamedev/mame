@@ -301,7 +301,7 @@ struct _address_space
 	offs_t					logaddrmask;		/* logical address mask */
 	offs_t					logbytemask;		/* byte-converted logical address mask */
 	UINT8					spacenum;			/* address space index */
-	UINT8					endianness;			/* endianness of this space */
+	endianness_t			endianness;			/* endianness of this space */
 	INT8					ashift;				/* address shift */
 	UINT8					abits;				/* address bits */
 	UINT8					dbits;				/* data bits */
