@@ -2794,9 +2794,9 @@ ROM_START( loht )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tom_c-h0.rom", 0x00001, 0x20000, CRC(a63204b6) SHA1(d217bc70650a1a1bbe0cf536ec3bb678f670718d) )
 	ROM_LOAD16_BYTE( "tom_c-l0.rom", 0x00000, 0x20000, CRC(e788002f) SHA1(35f509976b342fd47e645453381faa3d86645876) )
-	ROM_LOAD16_BYTE( "tom_c-h3.rom", 0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
+	ROM_LOAD16_BYTE( "tom_c-h3-",    0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "tom_c-l3.rom", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
+	ROM_LOAD16_BYTE( "tom_c-l3-",    0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )
@@ -2866,7 +2866,7 @@ R230
 
 082 - Samples
 
-TOM_C-PR- (i8751H, read protected, not dumped)
+TOM_C-PR- (i8751H, read protected, not dumped) <-- Since decapped, deprotected and read
 TOM_C-3F- (PAL, read protected, not dumped)
 
 
@@ -2893,8 +2893,8 @@ ROM_START( lohtj )
 	ROM_LOAD16_BYTE( "tom_c-l3-", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                   0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "lohtj_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "tom_c-pr.bin",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "r200",     0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )	/* sprites */
@@ -3649,7 +3649,7 @@ GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit,  m72_8751,    ROT0,   "
 GAME( 1988, imgfight,    0,        m72,         imgfight, imgfight,    ROT270, "Irem", "Image Fight (Japan, revision A)", 0 )
 GAME( 1988, imgfighto,   imgfight, m72,         imgfight, imgfight,    ROT270, "Irem", "Image Fight (Japan)", 0 )
 GAME( 1989, loht,        0,        m72,         loht,     loht,        ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )
-GAME( 1989, lohtj,       loht,     m72,         loht,     loht,        ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
+GAME( 1989, lohtj,       loht,     m72_8751,    loht,     m72_8751,    ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
 GAME( 1989, lohtb,       loht,     m72,         loht,     0,           ROT0,   "bootleg", "Legend of Hero Tonma (bootleg, set 1)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
 GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
 GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, 0,           ROT0,   "Irem", "X Multiply (World, M81)", GAME_NO_COCKTAIL )
