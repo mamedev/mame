@@ -5,8 +5,6 @@ Land Sea Air Squad / Storming Party  (c) 1986 Taito
 driver by Nicola Salmoria
 
 TODO:
-- I think storming is supposed to be a bootleg without mcu, so I should verify
-  if it works with the mcu not hooked up.
 - Wrong sprite/tilemap priority. Sprites can appear above and below the middle
   layer, it's not clear how this is selected since there are no free attribute
   bits.
@@ -212,6 +210,27 @@ static ADDRESS_MAP_START( lsasquad_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( storming_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
+	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, videoram, videoram_size)	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, scrollram)	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, spriteram, spriteram_size)	/* OBJECT RAM */
+	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
+	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
+	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
+	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("COINS")
+	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
+	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
+	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
+	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
+	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
+	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
+ADDRESS_MAP_END
+
+
 static INPUT_PORTS_START( lsasquad )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
@@ -284,7 +303,7 @@ static INPUT_PORTS_START( lsasquad )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("MCU?")
+	PORT_START("MCU")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 68705 ready to receive cmd */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 0 = 68705 has sent result */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -334,6 +353,23 @@ static INPUT_PORTS_START( lsasquad )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( storming )
+	PORT_INCLUDE( lsasquad ) // no MCU
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
 
 /* DAIKAIJU */
 
@@ -631,6 +667,15 @@ static MACHINE_DRIVER_START( lsasquad )
 	MDRV_SOUND_ROUTE(3, "mono", 0.63)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( storming )
+	MDRV_IMPORT_FROM( lsasquad )
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(storming_map)
+
+	MDRV_DEVICE_REMOVE("mcu")
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( daikaiju )
 
 	/* driver data */
@@ -735,9 +780,6 @@ ROM_START( storming )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "a64-04.44",    0x0000, 0x8000, CRC(c238406a) SHA1(bb8f9d952c4568edb375328a1f9f6681a1bb5907) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "a64-05.35",    0x0000, 0x0800, CRC(572677b9) SHA1(e098d5d842bcc81221ba56652a7019505d8be082) )
-
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a64-10.27",    0x00000, 0x8000, CRC(bb4f1b37) SHA1(ce8dc962a3d04a624e36b57dc678e7ca7726ba1d) )
 	ROM_LOAD( "stpartyj.009", 0x08000, 0x8000, CRC(8ee2443b) SHA1(855d8189efcfc796daa6b36f86d2872cc48adfde) )
@@ -793,20 +835,6 @@ ROM_START( daikaiju )
 ROM_END
 
 
-/* coin inputs are inverted in storming */
-static DRIVER_INIT( lsasquad )
-{
-	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
-	state->invertcoin = 0x00;
-}
-
-static DRIVER_INIT( storming )
-{
-	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
-	state->invertcoin = 0x0c;
-}
-
-
-GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1986, storming, lsasquad, lsasquad, lsasquad, storming, ROT270, "Taito", "Storming Party / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, 0,        ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, 0, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, storming, lsasquad, storming, storming, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, 0, ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

@@ -14,7 +14,6 @@ public:
 	size_t       videoram_size;
 
 	/* misc */
-	int invertcoin;
 	int sound_pending;
 	int sound_nmi_enable, pending_nmi, sound_cmd, sound_result;
 

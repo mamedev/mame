@@ -199,7 +199,7 @@ READ8_HANDLER( lsasquad_mcu_r )
 READ8_HANDLER( lsasquad_mcu_status_r )
 {
 	lsasquad_state *state = (lsasquad_state *)space->machine->driver_data;
-	int res = input_port_read(space->machine, "MCU?");
+	int res = input_port_read(space->machine, "MCU");
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
@@ -209,13 +209,13 @@ READ8_HANDLER( lsasquad_mcu_status_r )
 	if (!state->mcu_sent)
 		res |= 0x02;
 
-	return res ^ state->invertcoin;
+	return res;
 }
 
 READ8_HANDLER( daikaiju_mcu_status_r )
 {
 	lsasquad_state *state = (lsasquad_state *)space->machine->driver_data;
-	int res = input_port_read(space->machine, "MCU?");
+	int res = input_port_read(space->machine, "MCU");
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
