@@ -28,9 +28,6 @@ Added  'Daikaijuu no Gyakushuu'
 - more sprite ram
 - a bit different sound hardware (diff. communciation with sub cpu, no NMI)
 - same video board as  LSA Squad, but different features are used
-- 68705P5 MCU internal ROM dump is missing. Protection is simulated.
-  (more details -> /machine/daikaiju.c)
-
 
 
 Difficulty level    Damage from..
@@ -152,6 +149,10 @@ Notes:
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "includes/lsasquad.h"
+
+
+#define MASTER_CLOCK	XTAL_24MHz
+
 
 static WRITE8_HANDLER( lsasquad_bankswitch_w )
 {
@@ -353,7 +354,7 @@ static ADDRESS_MAP_START( daikaiju_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_READWRITE(daikaiju_mcu_r, daikaiju_mcu_w)
+	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r, lsasquad_mcu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daikaiju_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -554,15 +555,6 @@ static MACHINE_START( lsasquad )
 	state_save_register_global(machine, state->pending_nmi);
 	state_save_register_global(machine, state->sound_cmd);
 	state_save_register_global(machine, state->sound_result);
-
-	state_save_register_global(machine, state->daikaiju_xor);
-	state_save_register_global(machine, state->daikaiju_command);
-	state_save_register_global(machine, state->daikaiju_length);
-	state_save_register_global(machine, state->daikaiju_prev);
-	state_save_register_global(machine, state->daikaiju_cnt);
-	state_save_register_global(machine, state->daikaiju_cntr);
-
-	state_save_register_global_array(machine, state->daikaiju_buffer);
 }
 
 static MACHINE_RESET( lsasquad )
@@ -585,32 +577,23 @@ static MACHINE_RESET( lsasquad )
 	state->main_sent = 0;
 	state->from_main = 0;
 	state->from_mcu = 0;
-
-	/* daikaiju */
-	state->daikaiju_xor = -1;
-	state->daikaiju_command = 0;
-	state->daikaiju_length = 0;
-	state->daikaiju_prev = 0;
-	state->daikaiju_cnt = 0;
-	state->daikaiju_cntr = 0;
-
-	memset(state->daikaiju_buffer, 0, ARRAY_LENGTH(state->daikaiju_buffer));
 }
 
+/* Note: lsasquad clock values are not verified */
 static MACHINE_DRIVER_START( lsasquad )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(lsasquad_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
 	MDRV_CPU_PROGRAM_MAP(lsasquad_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz? */
+	MDRV_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(lsasquad_sound_map)
 								/* IRQs are triggered by the YM2203 */
-	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ? */
+	MDRV_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
@@ -637,10 +620,10 @@ static MACHINE_DRIVER_START( lsasquad )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 3000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.12)
 	MDRV_SOUND_ROUTE(1, "mono", 0.12)
@@ -654,13 +637,16 @@ static MACHINE_DRIVER_START( daikaiju )
 	MDRV_DRIVER_DATA(lsasquad_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 6000000)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
 	MDRV_CPU_PROGRAM_MAP(daikaiju_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
+	MDRV_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(daikaiju_sound_map)
 	/* IRQs are triggered by the YM2203 */
+
+	MDRV_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
+	MDRV_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -686,10 +672,10 @@ static MACHINE_DRIVER_START( daikaiju )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 3000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.12)
 	MDRV_SOUND_ROUTE(1, "mono", 0.12)
@@ -784,8 +770,8 @@ ROM_START( daikaiju )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "a74_04.ic44",    0x0000, 0x8000, CRC(98a6a703) SHA1(0c169a7a5f8b26606f67ee7f14bd487951536ac5) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )
-	ROM_LOAD( "a74_05.ic35",    0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "a74_05.ic35",    0x0000, 0x0800, CRC(d66df06f) SHA1(6a61eb15aef7f3b7a66ec9d87c0bdd731d6cb079) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a74_10.ic27",    0x00000, 0x8000, CRC(3123158e) SHA1(cdebf63c283c5c042596b0a13361fd01245e9c42) )
@@ -807,7 +793,6 @@ ROM_START( daikaiju )
 ROM_END
 
 
-
 /* coin inputs are inverted in storming */
 static DRIVER_INIT( lsasquad )
 {
@@ -824,4 +809,4 @@ static DRIVER_INIT( storming )
 
 GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1986, storming, lsasquad, lsasquad, lsasquad, storming, ROT270, "Taito", "Storming Party / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1986, daikaiju, 0,	daikaiju, daikaiju, 0, ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, 0,        ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

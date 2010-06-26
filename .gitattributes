@@ -3114,7 +3114,6 @@ src/mame/machine/cx4data.c svneol=native#text/plain
 src/mame/machine/cx4fn.c svneol=native#text/plain
 src/mame/machine/cx4oam.c svneol=native#text/plain
 src/mame/machine/cx4ops.c svneol=native#text/plain
-src/mame/machine/daikaiju.c svneol=native#text/plain
 src/mame/machine/dc.c svneol=native#text/plain
 src/mame/machine/dec0.c svneol=native#text/plain
 src/mame/machine/deco102.c svneol=native#text/plain
