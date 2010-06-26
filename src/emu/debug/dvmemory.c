@@ -188,7 +188,9 @@ void debug_view_memory::enumerate_sources()
 			m_source_list.append(*auto_alloc(&m_machine, debug_view_memory_source(name, base, valsize, valcount)));
 		}
 	}
-	m_source = m_source_list.head();
+
+	// reset the source to a known good entry
+	set_source(*m_source_list.head());
 }
 
 

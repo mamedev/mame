@@ -142,7 +142,7 @@ void debug_view_disasm::enumerate_sources()
 	}
 
 	// reset the source to a known good entry
-	m_source = m_source_list.head();
+	set_source(*m_source_list.head());
 }
 
 
