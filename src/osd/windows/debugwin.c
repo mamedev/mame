@@ -2038,7 +2038,6 @@ static void disasm_create_window(running_machine *machine)
 	running_device *curcpu = debug_cpu_get_visible_cpu(machine);
 	debugwin_info *info;
 	HMENU optionsmenu;
-	int cursel = 0;
 
 	// create the window
 	info = debugwin_window_create(machine, "Disassembly", NULL);
