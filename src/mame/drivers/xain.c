@@ -135,10 +135,6 @@ Updates by Bryan McPhail, 12/12/2004:
     exactly synchronised in practice.  This is currently hacked in MAME
     by raising the VBLANK bit a scanline early.
 
-
-TODO:
-    - 68705 microcontroller not dumped, patched out.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -149,7 +145,7 @@ TODO:
 #define MASTER_CLOCK		XTAL_12MHz
 #define CPU_CLOCK			MASTER_CLOCK / 8
 #define MCU_CLOCK			MASTER_CLOCK / 4
-#define PIXEL_CLOCK		MASTER_CLOCK / 2
+#define PIXEL_CLOCK			MASTER_CLOCK / 2
 
 static int vblank;
 
@@ -166,6 +162,14 @@ WRITE8_HANDLER( xain_flipscreen_w );
 
 extern UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 
+/* MCU */
+static int from_main;
+static int from_mcu;
+static UINT8 ddr_a, ddr_b, ddr_c;
+static UINT8 port_a_out, port_b_out, port_c_out;
+static UINT8 port_a_in, port_b_in, port_c_in;
+static int _mcu_ready;
+static int _mcu_accept;
 
 /*
     Based on the Solar Warrior schematics, vertical timing counts as follows:
@@ -275,18 +279,129 @@ static WRITE8_HANDLER( xain_irqB_clear_w )
 
 static READ8_HANDLER( xain_68705_r )
 {
-//  logerror("read 68705\n");
-	return 0x4d;	/* fake P5 checksum test pass */
+	_mcu_ready = 1;
+	return from_mcu;
 }
 
 static WRITE8_HANDLER( xain_68705_w )
 {
-//  logerror("write %02x to 68705\n",data);
+	from_main = data;
+	_mcu_accept = 0;
+
+	if (devtag_get_device(space->machine, "mcu") != NULL)
+		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 }
 
 static CUSTOM_INPUT( xain_vblank_r )
 {
 	return vblank;
+}
+
+
+/***************************************************************************
+
+    MC68705P5 I/O
+
+***************************************************************************/
+
+READ8_HANDLER( xain_68705_port_a_r )
+{
+	return (port_a_out & ddr_a) | (port_a_in & ~ddr_a);
+}
+
+WRITE8_HANDLER( xain_68705_port_a_w )
+{
+	port_a_out = data;
+}
+
+WRITE8_HANDLER( xain_68705_ddr_a_w )
+{
+	ddr_a = data;
+}
+
+READ8_HANDLER( xain_68705_port_b_r )
+{
+	return (port_b_out & ddr_b) | (port_b_in & ~ddr_b);
+}
+
+WRITE8_HANDLER( xain_68705_port_b_w )
+{
+	if ((ddr_b & 0x02) && (~data & 0x02))
+	{
+		port_a_in = from_main;
+	}
+	/* Rising edge of PB1 */
+	else if ((ddr_b & 0x02) && (~port_b_out & 0x02) && (data & 0x02))
+	{
+		_mcu_accept = 1;
+		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+	}
+
+	/* Rising edge of PB2 */
+	if ((ddr_b & 0x04) && (~port_b_out & 0x04) && (data & 0x04))
+	{
+		_mcu_ready = 0;
+		from_mcu = port_a_out;
+	}
+
+	port_b_out = data;
+}
+
+WRITE8_HANDLER( xain_68705_ddr_b_w )
+{
+	ddr_b = data;
+}
+
+READ8_HANDLER( xain_68705_port_c_r )
+{
+	port_c_in = 0;
+
+	if (!_mcu_accept)
+		port_c_in |= 0x01;
+	if (_mcu_ready)
+		port_c_in |= 0x02;
+
+	return (port_c_out & ddr_c) | (port_c_in & ~ddr_c);
+}
+
+WRITE8_HANDLER( xain_68705_port_c_w )
+{
+	port_c_out = data;
+}
+
+WRITE8_HANDLER( xain_68705_ddr_c_w )
+{
+	ddr_c = data;
+}
+
+static CUSTOM_INPUT( mcu_status_r )
+{
+	UINT8 res = 0;
+
+	if (devtag_get_device(field->port->machine, "mcu") != NULL)
+	{
+		if (_mcu_ready == 1)
+			res |= 0x01;
+		if (_mcu_accept == 1)
+			res |= 0x02;
+	}
+	else
+	{
+		return 3;
+	}
+
+	return res;	
+}
+
+READ8_HANDLER( mcu_comm_reset_r )
+{
+	_mcu_ready = 1;
+	_mcu_accept = 1;
+
+	if (devtag_get_device(space->machine, "mcu") != NULL)
+		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+
+	return 0xff;
 }
 
 
@@ -302,15 +417,15 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a02, 0x3a02) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3a02, 0x3a03) AM_WRITE(xain_scrollyP1_w)
 	AM_RANGE(0x3a03, 0x3a03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)	/* from the 68705 */
+	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(xain_scrollxP0_w)
 	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
-//  AM_RANGE(0x3a06, 0x3a06) AM_READNOP  /* ?? read (and discarded) on startup. Maybe reset the 68705 */
+    AM_RANGE(0x3a06, 0x3a06) AM_READ(mcu_comm_reset_r)
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(xain_scrollyP0_w)
 	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(xain_sound_command_w)
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(xain_main_irq_w)
 	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(xain_flipscreen_w)
-	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(xain_68705_w)	/* to 68705 */
+	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(xain_68705_w)
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
@@ -327,12 +442,19 @@ static ADDRESS_MAP_START( cpu_map_B, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-#if 0
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(xain_68705_port_a_r, xain_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(xain_68705_port_b_r, xain_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(xain_68705_port_c_r, xain_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(xain_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(xain_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(xain_68705_ddr_c_w)
+//	AM_RANGE(0x0008, 0x0008) AM_READWRITE(m68705_tdr_r, m68705_tdr_w)
+//	AM_RANGE(0x0009, 0x0009) AM_READWRITE(m68705_tcr_r, m68705_tcr_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
-#endif
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
@@ -413,8 +535,7 @@ static INPUT_PORTS_START( xsleena )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* when 0, 68705 is ready to send data */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )	/* when 1, 68705 is ready to receive data */
+	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(mcu_status_r, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xain_vblank_r, NULL)	/* VBLANK */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
@@ -477,18 +598,18 @@ static MACHINE_START( xsleena )
 static MACHINE_DRIVER_START( xsleena )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("maincpu", M6809, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", xain_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("sub", M6809, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cpu_map_B)
 
-	MDRV_CPU_ADD("audiocpu", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("audiocpu", M6809, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-//  MDRV_CPU_ADD("mcu", M68705, MCU_CLOCK)    /* Confirmed 3MHz */
-//  MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MDRV_CPU_ADD("mcu", M68705, MCU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_MACHINE_START(xsleena)
 
@@ -508,18 +629,24 @@ static MACHINE_DRIVER_START( xsleena )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
+	MDRV_SOUND_ADD("ym1", YM2203, MCU_CLOCK)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 3000000)
+	MDRV_SOUND_ADD("ym2", YM2203, MCU_CLOCK)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( xsleenab )
+	MDRV_IMPORT_FROM(xsleena)
+	MDRV_DEVICE_REMOVE("mcu")
 MACHINE_DRIVER_END
 
 
@@ -543,8 +670,8 @@ ROM_START( xsleena )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s-3.4s",       0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
-//  ROM_REGION( 0x800, "cpu3", 0 )
-//  ROM_LOAD( "pz-0.113",       0x000, 0x800, CRC(0) SHA1(0) )
+    ROM_REGION( 0x800, "mcu", 0 )
+    ROM_LOAD( "p1-0.113",     0x000, 0x800, CRC(a432a907) SHA1(4708a40e3a82dec2c5a64bc5da884a37d503cb6b) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "s-12.8b",      0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
@@ -648,8 +775,8 @@ ROM_START( solarwar )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s-3.4s",       0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
-//  ROM_REGION( 0x800, "cpu3", 0 )
-//  ROM_LOAD( "pz-0.113",       0x000, 0x800, CRC(0) SHA1(0) )
+    ROM_REGION( 0x800, "mcu", 0 )
+    ROM_LOAD( "p1-0.113",     0x000, 0x800, CRC(a432a907) SHA1(4708a40e3a82dec2c5a64bc5da884a37d503cb6b) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "s-12.8b",      0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
@@ -689,33 +816,6 @@ ROM_START( solarwar )
 ROM_END
 
 
-static DRIVER_INIT( xsleena )
-{
-	UINT8 *RAM = memory_region(machine, "maincpu");
-
-	/* do the same patch as the bootleg xsleena */
-	RAM[0xd488] = 0x12;
-	RAM[0xd489] = 0x12;
-	RAM[0xd48a] = 0x12;
-	RAM[0xd48b] = 0x12;
-	RAM[0xd48c] = 0x12;
-	RAM[0xd48d] = 0x12;
-}
-
-static DRIVER_INIT( solarwar )
-{
-	UINT8 *RAM = memory_region(machine, "maincpu");
-
-	/* do the same patch as the bootleg xsleena */
-	RAM[0xd47e] = 0x12;
-	RAM[0xd47f] = 0x12;
-	RAM[0xd480] = 0x12;
-	RAM[0xd481] = 0x12;
-	RAM[0xd482] = 0x12;
-	RAM[0xd483] = 0x12;
-}
-
-
-GAME( 1986, xsleena,  0,       xsleena, xsleena, xsleena,  ROT0, "Technos Japan", "Xain'd Sleena", 0 )
-GAME( 1986, xsleenab, xsleena, xsleena, xsleena, 0,        ROT0, "bootleg", "Xain'd Sleena (bootleg)", 0 )
-GAME( 1986, solarwar, xsleena, xsleena, xsleena, solarwar, ROT0, "Technos Japan / Taito (Memetron license)", "Solar-Warrior", 0 )
+GAME( 1986, xsleena,  0,       xsleena,  xsleena, 0, ROT0, "Technos Japan", "Xain'd Sleena", 0 )
+GAME( 1986, xsleenab, xsleena, xsleenab, xsleena, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg)", 0 )
+GAME( 1986, solarwar, xsleena, xsleena,  xsleena, 0, ROT0, "Technos Japan / Taito (Memetron license)", "Solar-Warrior", 0 )
