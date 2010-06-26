@@ -5810,7 +5810,7 @@ ROM_START( puzzlet )
 	ROM_REGION( 0x200000, "maincpu", 0 )	/* H8/3007 Code */
 	ROM_LOAD16_WORD_SWAP( "prg1_ver2.u9", 0x000000, 0x200000, CRC(592760da) SHA1(08f7493d2e50831438f53bbf0ae211ec40057da7) )
 
-	ROM_REGION( 0x200, "z86e02", 0 )	/* Zilog Z8 family 8-bit MCU - Requires new CPU core to be written */
+	ROM_REGION( 0x200, "z86e02", 0 )	/* Zilog Z8 family 8-bit MCU */
 	ROM_LOAD( "z86e02.mcu", 0x000000, 0x200, CRC(399fa417) SHA1(f6c57020ea394c858742759050bf4f4b2f1e1fc5) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
