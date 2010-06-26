@@ -5784,7 +5784,7 @@ VG2200-(B)
 |TD62307     HM6216255|14300    |            |
 |TD62064              |         | CY7C199    |
 |                     |         |            |
-|  DIP18              |---------| CY7C199    |
+|  Z86E02             |---------| CY7C199    |
 |        JAMMA              26.666MHz        |
 |--------------------------------------------|
 Notes:
@@ -5793,7 +5793,7 @@ Notes:
       14300     - Imagetek 14300 Graphics Generator IC
       VSync     - 58Hz
       HSync     - 15.26kHz
-      DIP18     - unknown chip with scratched surface. Probably a PIC.
+      Z86E02    - DIP18 surface scratched, decapping reveals Zilog Z8 MCU
       HM6216255 - Hitachi 4M high speed SRAM (256-kword x16-bit)
       CY7C199   - 32k x8 SRAM
       YM2413B   - Clock 4MHz [20/5]
@@ -5809,6 +5809,9 @@ Notes:
 ROM_START( puzzlet )
 	ROM_REGION( 0x200000, "maincpu", 0 )	/* H8/3007 Code */
 	ROM_LOAD16_WORD_SWAP( "prg1_ver2.u9", 0x000000, 0x200000, CRC(592760da) SHA1(08f7493d2e50831438f53bbf0ae211ec40057da7) )
+
+	ROM_REGION( 0x200, "z86e02", 0 )	/* Zilog Z8 family 8-bit MCU - Requires new CPU core to be written */
+	ROM_LOAD( "z86e02.mcu", 0x000000, 0x200, CRC(399fa417) SHA1(f6c57020ea394c858742759050bf4f4b2f1e1fc5) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "cg2.u2", 0x000000, 0x200000, CRC(7720f2d8) SHA1(8e0ccd1e8efe00df909327aefdb1e23e50487524), ROM_GROUPWORD | ROM_SKIP(2))
