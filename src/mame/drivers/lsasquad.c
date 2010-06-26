@@ -455,7 +455,7 @@ static INPUT_PORTS_START( daikaiju )
 	//unused
 
 
-	PORT_START("MCU?")
+	PORT_START("MCU")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 68705 ready to receive cmd */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* 0 = 68705 has sent result */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
