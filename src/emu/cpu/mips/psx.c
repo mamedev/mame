@@ -6290,7 +6290,7 @@ CPU_GET_INFO( psxcpu )
 
 		case CPUINFO_STR_REGISTER + PSXCPU_PC:			sprintf( info->s, "pc      :%08x", psxcpu->pc ); break;
 		case CPUINFO_STR_REGISTER + PSXCPU_DELAYV:		sprintf( info->s, "delayv  :%08x", psxcpu->delayv ); break;
-		case CPUINFO_STR_REGISTER + PSXCPU_DELAYR:		sprintf( info->s, "delayr  :%02x %s", psxcpu->delayr, delayn[ psxcpu->delayr ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_DELAYR:		sprintf( info->s, "delayr  :%02x %-3s", psxcpu->delayr, delayn[ psxcpu->delayr ] ); break;
 		case CPUINFO_STR_REGISTER + PSXCPU_HI:			sprintf( info->s, "hi      :%08x", psxcpu->hi ); break;
 		case CPUINFO_STR_REGISTER + PSXCPU_LO:			sprintf( info->s, "lo      :%08x", psxcpu->lo ); break;
 		case CPUINFO_STR_REGISTER + PSXCPU_BIU:			sprintf( info->s, "biu     :%08x", psxcpu->biu ); break;
