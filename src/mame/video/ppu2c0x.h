@@ -113,6 +113,7 @@ void ppu2c0x_render( running_device *device, bitmap_t *bitmap, int flipx, int fl
 int ppu2c0x_get_pixel( running_device *device, int x, int y ) ATTR_NONNULL(1);
 int ppu2c0x_get_colorbase( running_device *device ) ATTR_NONNULL(1);
 int ppu2c0x_get_current_scanline( running_device *device ) ATTR_NONNULL(1);
+int ppu2c0x_is_sprite_8x16( running_device *device ) ATTR_NONNULL(1);
 void ppu2c0x_set_scanline_callback( running_device *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
 void ppu2c0x_set_hblank_callback( running_device *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
 void ppu2c0x_set_vidaccess_callback( running_device *device, ppu2c0x_vidaccess_cb cb ) ATTR_NONNULL(1);

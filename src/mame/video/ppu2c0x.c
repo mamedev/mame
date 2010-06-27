@@ -1237,6 +1237,13 @@ int ppu2c0x_get_current_scanline( running_device *device )
 	return ppu2c0x->scanline;
 }
 
+// MMC5 has to be able to check this
+int ppu2c0x_is_sprite_8x16( running_device *device )
+{
+	ppu2c0x_state *ppu2c0x = get_token(device);
+	return BIT(ppu2c0x->regs[0], 5);
+}
+
 void ppu2c0x_set_scanline_callback( running_device *device, ppu2c0x_scanline_cb cb )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
