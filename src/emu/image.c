@@ -215,16 +215,14 @@ void image_device_init(running_machine *machine)
 
 		if ((image_name != NULL) && (image_name[0] != '\0'))
 		{
-			bool result = FALSE;
-
 			/* mark init state */
 			image->set_init_phase();
 			
 			/* try to load this image */
-			result = image->load(image_name);
+			bool result = image->load(image_name);
 
 			/* did the image load fail? */
-			if (!result)
+			if (result)
 			{
 				/* retrieve image error message */
 				const char *image_err = image->error();

@@ -24,9 +24,6 @@
 #include <new>
 #include <ctype.h>
 
-#ifdef MESS
-#include "climess.h"
-#endif /* MESS */
 
 
 

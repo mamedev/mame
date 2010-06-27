@@ -121,6 +121,11 @@ typedef void (*device_image_get_devices_func)(device_image_interface &device);
 //  MACROS
 //**************************************************************************
 
+#define IMAGE_INIT_PASS		FALSE
+#define IMAGE_INIT_FAIL		TRUE
+#define IMAGE_VERIFY_PASS	FALSE
+#define IMAGE_VERIFY_FAIL	TRUE
+
 #define DEVICE_IMAGE_LOAD_NAME(name)        device_load_##name
 #define DEVICE_IMAGE_LOAD(name)             int DEVICE_IMAGE_LOAD_NAME(name)(device_image_interface &image)
 

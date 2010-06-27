@@ -18,10 +18,6 @@
 
 #include <ctype.h>
 
-#ifdef MESS
-#include "infomess.h"
-#endif /* MESS */
-
 /* MESS/MAME configuration */
 #ifdef MESS
 #define XML_ROOT "mess"

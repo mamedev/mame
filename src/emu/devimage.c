@@ -387,7 +387,7 @@ done:
 			}
 		}
 	}
-	return err ? FALSE : TRUE;
+	return err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
 }
 
 
@@ -409,7 +409,7 @@ bool legacy_image_device_base::load(const char *path)
 
 bool legacy_image_device_base::finish_load()
 {
-    bool err = FALSE;
+    bool err = IMAGE_INIT_PASS;
 
     if (m_is_loading)
     {
