@@ -1963,7 +1963,7 @@ ADDRESS_MAP_END
 
   Others are encrypted
 */
-#ifdef USE_ENCRYPTED_V25S
+
 /*
     AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, batsugun_snd_cpu_w)   ;V25+ Command/Status port
     AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
@@ -1987,12 +1987,390 @@ static READ8_HANDLER( v25s_internal_io_r )
 	return 0xff;
 }
 
+#define INVALID_WRITE logerror("write: invalid\n");
+
 static WRITE8_HANDLER( v25s_internal_io_w )
 {
-	printf("(PC=%05x) V25S internal I/O write %02x at [%04x]\n",cpu_get_pc(space->cpu),data,offset+0xf00);
+	logerror("(PC=%05x) V25S internal I/O write %02x at [%04x]\n",cpu_get_pc(space->cpu),data,offset+0xf00);
+	
+	switch (offset)
+	{
+		/* 0x00 - 0x3f - Ports */
+	
+		case 0x00:
+			logerror("write: Port 0 (P0)\n");
+			break;
+		case 0x01:
+			logerror("write: Port 0 Mode Register (PM0)\n");
+			break;
+		case 0x02:
+			logerror("write: Port 0 Mode Control Register (PMC0)\n");
+			break;
+		
+		case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: INVALID_WRITE break;
+			
+		case 0x08:
+			logerror("write: Port 1 (P1)\n");
+			break;
+		case 0x09:
+			logerror("write: Port 1 Mode Register (PM1)\n");
+			break;
+		case 0x0A:
+			logerror("write: Port 1 Mode Control Register (PMC1)\n");
+			break;		
+			
+		case 0x0B: case 0x0C: case 0x0D: case 0x0E: case 0x0F: INVALID_WRITE break;
+
+		case 0x10:
+			logerror("write: Port 2 (P2)\n");
+			break;
+		case 0x11:
+			logerror("write: Port 2 Mode Register (PM2)\n");
+			break;
+		case 0x12:
+			logerror("write: Port 2 Mode Control Register (PMC2)\n");
+			break;
+			
+		case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C:
+		case 0x1D: case 0x1E: case 0x1F: case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26:
+		case 0x27: case 0x28: case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: case 0x30:
+		case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: INVALID_WRITE break;
+		
+		case 0x38:	
+			logerror("write: invalid (R/O) Port T (PT)\n");	
+			break;
+		
+		case 0x39: case 0x3a: INVALID_WRITE break;	
+	
+		case 0x3b:	
+			logerror("write: Port T Mode Register(PMT)\n");	
+			break;
+		
+		case 0x3c: case 0x3d: case 0x3e: case 0x3f: INVALID_WRITE break;
+			
+		/* 0x40 - 0x4f - Interrupts */
+			
+		case 0x40:	
+			logerror("write: External Interrupt Mode Register (INTM)\n");	
+			break;
+		
+		case 0x41: case 0x42: case 0x43: INVALID_WRITE break;	
+
+		case 0x44:	
+			logerror("write: External Interrupt Macro Service Control Register 0 (EMS0)\n");	
+			break;		
+		case 0x45:	
+			logerror("write: External Interrupt Macro Service Control Register 1 (EMS1)\n");	
+			break;	
+		case 0x46:	
+			logerror("write: External Interrupt Macro Service Control Register 2 (EMS2)\n");	
+			break;			
+		
+		case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b: INVALID_WRITE break;	
+		
+		case 0x4c:	
+			logerror("write: External Interrupt Request Control Register 0 (EXIC0)\n");	
+			break;
+		case 0x4d:	
+			logerror("write: External Interrupt Request Control Register 1 (EXIC1)\n");	
+			break;
+		case 0x4e:	
+			logerror("write: External Interrupt Request Control Register 2 (EXIC2)\n");
+			break;
+			
+		case 0x4f: case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: case 0x58:
+		case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f: INVALID_WRITE break;
+	
+		/* 0x60 - 0x6f - Serial Port 0 */
+		
+		case 0x60:	
+			logerror("write: invalid (R/O) Recieve Buffer Register 0 (RxB0)\n");
+			break;
+		
+		case 0x61: INVALID_WRITE break;	
+		
+		case 0x62:	
+			logerror("write: Transmit Buffer Register 0 (TxB0)\n");
+			break;
+		
+		case 0x63: case 0x64: INVALID_WRITE break;
+		
+		case 0x65:	
+			logerror("write: Serial Reception Macro Service Control Register 0 (SRMS0)\n");
+			break;		
+		case 0x66:	
+			logerror("write: Serial Transmission Macro Service Control Register 0 (STMS0)\n");
+			break;	
+		
+		case 0x67: INVALID_WRITE break;
+					
+		case 0x68:	
+			logerror("write: Serial Mode Register 0 (SCM0)\n");
+			break;	
+		case 0x69:	
+			logerror("write: Serial Control Register 0 (SCC0)\n");
+			break;	
+		case 0x6a:	
+			logerror("write: Baud Rate Generator Register 0 (BRG0)\n");
+			break;		
+		case 0x6b:	
+			logerror("write: invalid (R/O) Serial Status Register 0 (SCS0)\n");
+			break;	
+		case 0x6c:	
+			logerror("write: Serial Error Interrupt Request Control Register 0 (SEIC0)\n");
+			break;		
+		case 0x6d:	
+			logerror("write: Serial Reception Interrupt Request Control Register 0 (SRIC0)\n");
+			break;	
+		case 0x6e:	
+			logerror("write: Serial Transmission Interrupt Request Control Register 0 (STIC0)\n");
+			break;
+		
+		case 0x6f: INVALID_WRITE break;	
+
+		/* 0x70 - 0x7f - Serial Port 1 */
+		case 0x70:	
+			logerror("write: invalid (R/O) Recieve Buffer Register 0 (RxB1)\n");
+			break;
+		
+		case 0x71: INVALID_WRITE break;	
+		
+		case 0x72:	
+			logerror("write: Transmit Buffer Register 0 (TxB1)\n");
+			break;
+			
+		case 0x73: case 0x74: INVALID_WRITE break;
+				
+		case 0x75:	
+			logerror("write: Serial Reception Macro Service Control Register 0 (SRMS1)\n");
+			break;		
+		case 0x76:	
+			logerror("write: Serial Transmission Macro Service Control Register 0 (STMS1)\n");
+			break;	
+		
+		case 0x77: INVALID_WRITE break;
+					
+		case 0x78:	
+			logerror("write: Serial Mode Register 0 (SCM1)\n");
+			break;	
+		case 0x79:	
+			logerror("write: Serial Control Register 0 (SCC1)\n");
+			break;	
+		case 0x7a:	
+			logerror("write: Baud Rate Generator Register 0 (BRG1)\n");
+			break;		
+		case 0x7b:	
+			logerror("write: invalid (R/O) Serial Status Register 0 (SCS1)\n");
+			break;	
+		case 0x7c:	
+			logerror("write: Serial Error Interrupt Request Control Register 0 (SEIC1)\n");
+			break;		
+		case 0x7d:	
+			logerror("write: Serial Reception Interrupt Request Control Register 0 (SRIC1)\n");
+			break;	
+		case 0x7e:	
+			logerror("write: Serial Transmission Interrupt Request Control Register 0 (STIC1)\n");
+			break;
+		
+		case 0x7f: INVALID_WRITE break;		
+
+		/* 0x80 - 0x9f - Timers */
+		
+		case 0x80:
+		case 0x81:	
+			logerror("write: Timer Register 0 (16-bit) (TM0)\n");
+			break;
+		case 0x82:
+		case 0x83:	
+			logerror("write: Modulo/Timer Register 0 (16-bit) (MD0)\n");
+			break;
+		
+		case 0x84: case 0x85: case 0x86: case 0x87: INVALID_WRITE break;		
+
+		case 0x88:
+		case 0x89:	
+			logerror("write: Timer Register 1 (16-bit) (TM1)\n");
+			break;
+		case 0x8a:
+		case 0x8b:	
+			logerror("write: Modulo/Timer Register 1 (16-bit) (MD1)\n");
+			break;
+
+		case 0x8c: case 0x8d: case 0x8e: case 0x8f:	INVALID_WRITE break;	
+	
+		case 0x90:	
+			logerror("write: Timer Control Register 0 (TMC0)\n");
+			break;
+		case 0x91:	
+			logerror("write: Timer Control Register 1 (TMC1)\n");
+			break;			
+		
+		case 0x92: case 0x93: INVALID_WRITE break;
+	
+		case 0x94:	
+			logerror("write: Timer Unit Macro Service Control Register 0 (TMMS0)\n");
+			break;	
+		case 0x95:	
+			logerror("write: Timer Unit Macro Service Control Register 1 (TMMS1)\n");
+			break;	
+		case 0x96:	
+			logerror("write: Timer Unit Macro Service Control Register 2 (TMMS2)\n");
+			break;				
+		
+		case 0x97: case 0x98: case 0x99: case 0x9a: case 0x9b: INVALID_WRITE break;		
+	
+		case 0x9c:	
+			logerror("write: Timer Interrupt Request Control Register 0 (TMIC0)\n");
+			break;	
+		case 0x9d:	
+			logerror("write: Timer Interrupt Request Control Register 1 (TMIC1)\n");
+			break;	
+		case 0x9e:	
+			logerror("write: Timer Interrupt Request Control Register 2 (TMIC2)\n");
+			break;				
+		
+		case 0x9f: INVALID_WRITE break;			
+		
+		/* 0xa0 - 0xdf - DMA Regs */
+		
+		case 0xa0:	
+			logerror("write: DMA Control Register 0 (DMAC0)\n");
+			break;	
+		case 0xa1:	
+			logerror("write: DMA Mode Register 0 (DMAM0)\n");
+			break;	
+		case 0xa2:	
+			logerror("write: DMA Control Register 1 (DMAC1)\n");
+			break;	
+		case 0xa3:	
+			logerror("write: DMA Mode Register 1 (DMAM1)\n");
+			break;	
+		
+		case 0xa4:	case 0xa5: case 0xa6: case 0xa7: case 0xa8: case 0xa9: case 0xaa: case 0xab: INVALID_WRITE break;
+		
+		case 0xac:	
+			logerror("write: DMA Interrupt Request Control Register 0 (DIC0)\n");
+			break;		
+		case 0xad:	
+			logerror("write: DMA Interrupt Request Control Register 1 (DIC1)\n");
+			break;	
+		
+		case 0xae: case 0xaf: case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf: INVALID_WRITE break;
+	
+		case 0xc0:	
+			logerror("write: Source Address Pointer 0 (Low) (SAR0L)\n");
+			break;	
+		case 0xc1:	
+			logerror("write: Source Address Pointer 0 (Middle) (SAR0M)\n");
+			break;	
+		case 0xc2:	
+			logerror("write: Source Address Pointer 0 (High) (SAR0H)\n");
+			break;		
+		
+		case 0xc3: INVALID_WRITE break;
+	
+		case 0xc4:	
+			logerror("write: Destination Address Pointer 0 (Low) (DAR0L)\n");
+			break;	
+		case 0xc5:	
+			logerror("write: Destination Address Pointer 0 (Middle) (DAR0M)\n");
+			break;	
+		case 0xc6:	
+			logerror("write: Destination Address Pointer 0 (High) (DAR0H)\n");
+			break;	
+		
+		case 0xc7: INVALID_WRITE break;
+		
+		case 0xc8:	
+			logerror("write: Terminal Counter 0 (Low) (TC0L)\n");
+			break;	
+		case 0xc9:	
+			logerror("write: Terminal Counter 0 (High) (TC0H)\n");
+			break;	
+		
+		case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: INVALID_WRITE break;
+			
+		case 0xd0:	
+			logerror("write: Source Address Pointer 1 (Low) (SAR1L)\n");
+			break;	
+		case 0xd1:	
+			logerror("write: Source Address Pointer 1 (Middle) (SAR1M)\n");
+			break;	
+		case 0xd2:	
+			logerror("write: Source Address Pointer 1 (High) (SAR1H)\n");
+			break;		
+		
+		case 0xd3: INVALID_WRITE break;
+	
+		case 0xd4:	
+			logerror("write: Destination Address Pointer 1 (Low) (DAR1L)\n");
+			break;	
+		case 0xd5:	
+			logerror("write: Destination Address Pointer 1 (Middle) (DAR1M)\n");
+			break;
+		case 0xd6:	
+			logerror("write: Destination Address Pointer 1 (High) (DAR1H)\n");
+			break;	
+		
+		case 0xd7: INVALID_WRITE break;
+		
+		case 0xd8:	
+			logerror("write: Terminal Counter 1 (Low) (TC1L)\n");
+			break;	
+		case 0xd9:	
+			logerror("write: Terminal Counter 1 (High) (TC1H)\n");
+			break;	
+		
+		case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: INVALID_WRITE break;	
+	
+		/* 0xe0 - 0xff misc */
+
+		case 0xe0:	
+			logerror("write: Standby Control Register (STBC)\n");
+			break;	
+		case 0xe1:	
+			logerror("write: Refresh Mode Register (RFM)\n");
+			break;	
+		
+		case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: INVALID_WRITE break;
+
+		case 0xe8:	
+		case 0xe9:	
+			logerror("write: Wait Control Register (16-bit) (WTC)\n");
+			break;
+		case 0xea:	
+			logerror("write: User Flag Register (FLAG)\n");
+			break;		
+		case 0xeb:	
+			logerror("write: Processor Control Register (PRC)\n");
+			break;		
+		case 0xec:	
+			logerror("write: Time Base Interrupt Request Control Register (TBIC)\n");
+			break;		
+		
+		case 0xed: case 0xee: INVALID_WRITE break;
+	
+		case 0xef:	
+			logerror("write: invalid (R/O) Interrupt Source Register (IRQS)\n");
+			break;
+		
+		case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: case 0xf8: case 0xf9: case 0xfa: case 0xfb: INVALID_WRITE break;
+
+		case 0xfc:	
+			logerror("write: invalid (R/O) Interrupt Priority Register (ISPR)\n");
+			break;
+
+		case 0xfd: case 0xfe: INVALID_WRITE break;
+			
+		case 0xff:	
+			logerror("write: internal data area base register (IDB)\n");
+			break;						
+	}
 }
 
-/* FIXME: needs an irq to remove this, I've seen two irq routines that have encrypted opcodes... -AS */
+#ifdef USE_ENCRYPTED_V25S
+/* FIXME: needs an irq to remove this */
 static READ8_HANDLER( kludge_r )
 {
 	return 0xff;
@@ -2005,8 +2383,8 @@ static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 
 //  AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE("share7")
 	AM_RANGE(0x40e00, 0x40eff) AM_RAM //internal V25 RAM
-	#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x40f00, 0x40fff) AM_READWRITE(v25s_internal_io_r,v25s_internal_io_w)
+	#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x87ff9, 0x87ff9) AM_READ(kludge_r)
 	#endif
 
