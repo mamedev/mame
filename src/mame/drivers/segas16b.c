@@ -1094,6 +1094,12 @@ static TIMER_CALLBACK( suspend_i8751 )
  *
  *************************************/
 
+static TIMER_CALLBACK( boost_interleave )
+{
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_MSEC(10));
+}
+
+
 static MACHINE_RESET( system16b )
 {
 	segas1x_state *state = (segas1x_state *)machine->driver_data;
@@ -1108,9 +1114,11 @@ static MACHINE_RESET( system16b )
 
 	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
 
-	/* if we have a fake i8751 handler, disable the actual 8751 */
+	/* if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave */
 	if (state->i8751_vblank_hook != NULL)
 		timer_call_after_resynch(machine, NULL, 0, suspend_i8751);
+	else
+		timer_call_after_resynch(machine, NULL, 0, boost_interleave);
 
 	/* configure sprite banks */
 	for (i = 0; i < 16; i++)
@@ -1559,28 +1567,6 @@ static void wb3_i8751_sim(running_machine *machine)
 }
 
 
-static void wrestwar_i8751_sim(running_machine *machine)
-{
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
-	UINT16 temp;
-
-	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
-
-	/* process any new sound data */
-	temp = workram[0x208e/2];
-	if ((temp & 0xff00) != 0x0000)
-	{
-		segaic16_memory_mapper_w(space, 0x03, temp);
-		workram[0x208e/2] = temp & 0x00ff;
-	}
-
-	/* read inputs */
-	workram[0x2082/2] = input_port_read(machine, "SERVICE");
-}
-
-
 
 /*************************************
  *
@@ -1850,6 +1836,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(segaic16_memory_mapper_r, segaic16_memory_mapper_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SERVICE")
 ADDRESS_MAP_END
 
 
@@ -3593,7 +3580,7 @@ ROM_START( altbeast )
 	ROM_LOAD( "opr-11672.a11", 0x10000, 0x20000, CRC(bbd7f460) SHA1(bbc5c2219cb3a827d84062b19affd9780da2a3cf) )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
 	ROM_LOAD( "317-0078.mcu", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -3636,7 +3623,7 @@ ROM_START( altbeastj )
 	ROM_LOAD( "opr-11672.a11", 0x10000, 0x20000, CRC(bbd7f460) SHA1(bbc5c2219cb3a827d84062b19affd9780da2a3cf) )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
 	ROM_LOAD( "317-0077.mcu", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -3679,7 +3666,7 @@ ROM_START( altbeast5 )
 	ROM_LOAD( "opr-11672.a11", 0x10000, 0x20000, CRC(bbd7f460) SHA1(bbc5c2219cb3a827d84062b19affd9780da2a3cf) )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel i8751 protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* Intel i8751 protection MCU */
 	ROM_LOAD( "317-0076.mcu", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -4487,7 +4474,7 @@ ROM_START( ddux1 )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-11916.a10", 0x0000, 0x8000, CRC(7ab541cf) SHA1(feb88022ca1796d020e53e95ad345159bd415530) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
 	ROM_LOAD( "317-0095.bin", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -4785,7 +4772,7 @@ ROM_START( goldnaxe )
 	ROM_LOAD( "epr-12390.ic8", 0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "mpr-12384.ic6", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
 	ROM_LOAD( "317-0123a.bin", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -4945,7 +4932,7 @@ ROM_START( goldnaxe2 )
 	ROM_LOAD( "epr-12390.a10", 0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "mpr-12384.a11", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
 	ROM_LOAD( "317-0112.bin", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -5931,7 +5918,7 @@ ROM_START( tturf )
 	ROM_LOAD( "12329.a11", 0x10000, 0x10000, CRC(ed9a686d) SHA1(da433033d501ee871429ee676b3972b14179df9f) )		// speech
 	ROM_LOAD( "12330.a12", 0x20000, 0x10000, CRC(fb762bca) SHA1(ff9191c5ec38c711ebb7c2ad043f62b6d7e2203c) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
 	ROM_LOAD( "317-0104.bin", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -5969,8 +5956,8 @@ ROM_START( tturfu )
 	ROM_LOAD( "epr-12274.a10", 0x30000, 0x8000, CRC(8207f0c4) SHA1(169914861a52fa731a305e1ee2d230aa0d0d97fe) )
 	ROM_LOAD( "epr-12275.a11", 0x40000, 0x8000, CRC(182f3c3d) SHA1(1482fe08a05a721e315b1a3aa5bef4dddc72e26e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
-	ROM_LOAD( "317-0099.bin", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
+	ROM_LOAD( "317-0099.bin", 0x00000, 0x1000, CRC(f676e3e4) SHA1(b71bad46c8b5f7328fd8d48f18624a620f0d34ce) )
 ROM_END
 
 
@@ -6004,7 +5991,7 @@ ROM_START( wb3 )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-12127.a10", 0x0000, 0x8000, CRC(0bb901bb) SHA1(c81b198df8e3b0ec568032c76addf0d1a1711194) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
 	ROM_LOAD( "317-0098.bin", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
@@ -6179,8 +6166,8 @@ ROM_START( wrestwar )
 	ROM_LOAD( "mpr-12148.a11", 0x10000, 0x20000, CRC(fb9a7f29) SHA1(7ba79c18ab4e586be2deccd78e4479d55eb75a7e) )
 	ROM_LOAD( "mpr-12149.a12", 0x30000, 0x20000, CRC(d6617b19) SHA1(aa36d257eaa52c8c871a39aaa2f29c203525dbaf) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )	/* protection MCU */
-	ROM_LOAD( "317-0103.bin", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection MCU */
+	ROM_LOAD( "317-0103.bin", 0x00000, 0x1000, CRC(aa0710f5) SHA1(61ba8d23d045806b0a7b75184766be00f872cc72) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -6474,20 +6461,12 @@ static DRIVER_INIT( passshtj_5358 )
 	state->custom_io_r = passshtj_custom_io_r;
 }
 
+
 static DRIVER_INIT( tturf_5704 )
 {
 	segas1x_state *state = (segas1x_state *)machine->driver_data;
 
 	DRIVER_INIT_CALL(generic_5704);
-	state->i8751_vblank_hook = tturf_i8751_sim;
-}
-
-
-static DRIVER_INIT( tturf_5358 )
-{
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
-
-	DRIVER_INIT_CALL(generic_5358);
 	state->i8751_vblank_hook = tturf_i8751_sim;
 }
 
@@ -6498,15 +6477,6 @@ static DRIVER_INIT( wb3_5704 )
 
 	DRIVER_INIT_CALL(generic_5704);
 	state->i8751_vblank_hook = wb3_i8751_sim;
-}
-
-
-static DRIVER_INIT( wrestwar_8751 )
-{
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
-
-	DRIVER_INIT_CALL(generic_5704);
-	state->i8751_vblank_hook = wrestwar_i8751_sim;
 }
 
 
@@ -6627,14 +6597,14 @@ GAME( 1987, timescan,   0,        timescan,       timescan, generic_5358,       
 GAME( 1994, toryumon,   0,        system16b_5248, toryumon, generic_5797,       ROT0,   "Sega",           "Toryumon", 0 )
 
 GAME( 1989, tturf,      0,        system16b_8751, tturf,    tturf_5704,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", GAME_NO_SOUND /* due to missing ROM only */)
-GAME( 1989, tturfu,     tturf,    system16b_8751, tturf,    tturf_5358,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US, 8751 317-0099)", 0)
+GAME( 1989, tturfu,     tturf,    system16b_8751, tturf,    generic_5358,       ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US, 8751 317-0099)", 0)
 
 GAME( 1988, wb3,        0,        system16b_8751, wb3,      wb3_5704,           ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, World, System 16B, 8751 317-0098)", 0 )
 GAME( 1988, wb34,       wb3,      system16b,      wb3,      generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B, FD1094 317-0087)", 0 )
 GAME( 1988, wb33,       wb3,      system16b,      wb3,      generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B, FD1094 317-0089)", 0 )
 GAME( 1988, wb32,       wb3,      system16b,      wb3,      generic_5358,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B, FD1094 317-0085)", 0 )
 
-GAME( 1989, wrestwar,   0,        system16b_8751, wrestwar, wrestwar_8751,      ROT270, "Sega",           "Wrestle War (set 3, World, 8751 317-0103)", 0 )
+GAME( 1989, wrestwar,   0,        system16b_8751, wrestwar, generic_5704,       ROT270, "Sega",           "Wrestle War (set 3, World, 8751 317-0103)", 0 )
 GAME( 1989, wrestwar2,  wrestwar, system16b,      wrestwar, generic_5704,       ROT270, "Sega",           "Wrestle War (set 2, World, FD1094 317-0102)", 0 )
 GAME( 1989, wrestwar1,  wrestwar, system16b,      wrestwar, generic_5704,       ROT270, "Sega",           "Wrestle War (set 1, Japan, FD1094 317-0090)", 0 )
 
