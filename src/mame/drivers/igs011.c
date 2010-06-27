@@ -8,28 +8,42 @@
 
 CPU     :   68000
 Sound   :   M6295 + Optional FM or ICS2115
-Custom  :   IGS011 (blitter), IGS003 (8255), IGS012 (optional, near CPU)
+Custom  :   IGS011 (blitter, protection)
+            IGS012 (protection, optional)
+            IGS003 (8255, protection)
 NVRAM   :   Battery for main RAM
 
 ---------------------------------------------------------------------------
-Year + Game            PCB        Sound         Chips
+Year + Game                PCB        Sound         Chips
 ---------------------------------------------------------------------------
-95 Da Ban Cheng        NO-T0084-1 M6295         IGS011 8255
-95 Long Hu Bang        NO-T0093   M6295         IGS011 8255
-95 Mahjong Ryukobou    NO-T0094   M6295         IGS011 8255
-95 Dragon World        NO-0105-1  M6295 YM3812  IGS011 IGS003  IGS012
-96 Virtua Bowling      NO-0101-1  ICS2115       IGS011 IGS003e IGS012
-96 Long Hu Bang II     NO-0115    M6295 YM2413  IGS011 8255
-96 Wan Li Chang Cheng  ?
-96 Xing Yen Man Guan   ?
-98 Mj Nenrikishu SP    NO-0115-5  M6295 YM2413  IGS011 8255
+95 Da Ban Cheng            NO-T0084-1 M6295         IGS011 8255
+95 Long Hu Bang V033C      NO-T0093   M6295         IGS011 8255
+95 Long Hu Bang V035C      ?
+95 Mj Ryukobou             NO-T0094   M6295         IGS011 8255
+95 Dragon World V010C      NO-0105-4  M6295 YM3812  IGS011 IGS003
+95 Dragon World V011H      ?
+95 Dragon World V020J      ?          M6295 YM3812  IGS011 IGS003  IGS012
+95 Dragon World V021J      ?
+95 Dragon World V021O      NO-0105-1  M6295 YM3812  IGS011 IGS003  IGS012
+95 Dragon World V030O      NO-0105-1  M6295 YM3812  IGS011 IGS003
+97 Dragon World V040O      NO-0105-5  M6295 YM3812  IGS011 IGS003c
+96 Virtua Bowling V101XCM  NO-0101-1  ICS2115       IGS011 IGS003e IGS012
+96 Virtua Bowling V100JCM  NO-0101-?  ICS2115       IGS011 IGS003e IGS012
+96 Long Hu Bang II V185H   NO-0115    M6295 YM2413  IGS011 8255
+96 Wan Li Chang Cheng      ?
+96 Xing Yen Man Guan       ?
+98 Mj Nenrikishu SP        NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
 To do:
 
-- Protection emulation instead of patching the roms
+- Implement the I/O part of IGS003 as an 8255
+- IGS003 parametric bitswap protection in lhb2, vbowl (instead of patching the roms)
+- Interrupt controller at 838000 or a38000 (there's a preliminary implementation for lhb)
 - A few graphical bugs
-- vbowl, vbowlj: trackball support, sound is slow and low volume
+
+- vbowl, vbowlj: trackball support, sound is slow and low volume.
+  Wrong colors in "Game Over" screen.
 
 - lhb: in the copyright screen the '5' in '1995' is drawn by the cpu on layer 5,
   but with wrong colors (since the top nibble of the affected pixels is left to 0xf)
@@ -53,6 +67,8 @@ Notes:
 #include "sound/2413intf.h"
 #include "sound/3812intf.h"
 #include "sound/ics2115.h"
+
+#define LOG_BLITTER 0
 
 /***************************************************************************
 
@@ -270,8 +286,10 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 
 	COMBINE_DATA(&blitter.flags);
 
+#if LOG_BLITTER
 	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", cpu_get_pc(space->cpu),
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
+#endif
 
 	dest	=	layer[	   blitter.flags & 0x0007	];
 	opaque	=			 !(blitter.flags & 0x0008);
@@ -763,20 +781,549 @@ static void drgnwrld_gfx_decrypt(running_machine *machine)
 
 /***************************************************************************
 
-    Protection & I/O
+    IGS011 Protection
+
+    Protection 1 ("ASIC11 CHECK PORT ERROR")
+
+    The chip holds an internal value, a buffered value and an address base register.
+    The address base register determines where the protection device is mapped in memory
+    (0x00000-0xffff0), has itself a fixed address, and writes to it reset the state.
+    The internal and buffered value are manipulated by issuing commands, where
+    each command is assigned a specific offset, and is triggered by writing a specific
+    byte value to that offset:
+
+    Offs.   R/W     Result
+    0         W     COPY: copy buffer to value
+    2         W     INC:  increment value
+    4         W     DEC:  decrement value
+    6         W     SWAP: write bitswap1(value) to buffer
+    8       R       READ: read bitswap2(value). Only 2 bits are checked (bitmask 0x24).
+
+    Protection 2 ("CHECK PORT ERROR")
+
+    This is probably not part of the IGS011 nor the IGS012, but a game specific protection
+    similar to the above.
+
+    The chip holds an internal value. It is manipulated by issuing commands,
+    where each command is assigned a specific address range (fixed per game), and is
+    triggered by writing a specific byte value to that range. Possible commands:
+
+    - INC:   increment value
+    - DEC:   decrement value
+    - SWAP:  value = bitswap1(value). Bitswap1 is game specific.
+    - RESET: value = 0
+
+    The protection value is read from an additional address range:
+    - READ:  read bitswap2(value). Only 1 bit is checked. Bitswap2 is game specific.
 
 ***************************************************************************/
 
-static UINT16 igs_magic[2];
+static UINT8 igs011_prot1, igs011_prot1_swap;
+static UINT32 igs011_prot1_addr;
 
-static WRITE16_HANDLER( lhb2_magic_w )
+static UINT8 igs011_prot2;
+
+static WRITE16_HANDLER( igs011_prot1_w )
 {
-	COMBINE_DATA(&igs_magic[offset]);
+	offset *= 2;
+
+	switch (offset)
+	{
+		case 0:	// COPY
+			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300)
+			{
+				igs011_prot1 = igs011_prot1_swap;
+				return;
+			}
+			break;
+
+		case 2:	// INC
+			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0xff00)
+			{
+				igs011_prot1++;
+				return;
+			}
+			break;
+
+		case 4:	// DEC
+			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0xaa00)
+			{
+				igs011_prot1--;
+				return;
+			}
+			break;
+
+		case 6:	// SWAP
+			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500)
+			{
+				// b1 . (b2|b3) . b2 . (b0&b3)
+				UINT8 x = igs011_prot1;
+				igs011_prot1_swap = (BIT(x,1)<<3) | ((BIT(x,2)|BIT(x,3))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,3));
+				return;
+			}
+			break;
+	}
+
+	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+}
+static READ16_HANDLER( igs011_prot1_r )
+{
+	// !(b1&b2) . 0 . 0 . (b0^b3) . 0 . 0
+	UINT8 x = igs011_prot1;
+	return (((BIT(x,1)&BIT(x,2))^1)<<5) | ((BIT(x,0)^BIT(x,3))<<2);
+}
+
+
+static WRITE16_HANDLER( igs011_prot_addr_w )
+{
+	igs011_prot1 = 0x00;
+	igs011_prot1_swap = 0x00;
+
+//  igs011_prot2 = 0x00;
+
+	const address_space *sp = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(space->machine, "maincpu");
+
+	// Plug previous address range with ROM access
+	memory_install_rom(sp, igs011_prot1_addr + 0, igs011_prot1_addr + 9, 0, 0, rom + igs011_prot1_addr);
+
+	igs011_prot1_addr = (data << 4) ^ 0x8340;
+
+	// Add protection memory range
+	memory_install_write16_handler(sp, igs011_prot1_addr + 0, igs011_prot1_addr + 7, 0, 0, igs011_prot1_w);
+	memory_install_read16_handler (sp, igs011_prot1_addr + 8, igs011_prot1_addr + 9, 0, 0, igs011_prot1_r);
+}
+/*
+static READ16_HANDLER( igs011_prot_fake_r )
+{
+    switch (offset)
+    {
+        case 0: return igs011_prot1;
+        case 1: return igs011_prot1_swap;
+        case 2: return igs011_prot2;
+    }
+    return 0;
+}
+*/
+
+
+
+
+
+
+// Prot2
+
+// drgnwrld (33)
+static WRITE16_HANDLER( igs011_prot2_reset_w )
+{
+	igs011_prot2 = 0x00;
+}
+
+// wlcc
+static READ16_HANDLER( igs011_prot2_reset_r )
+{
+	igs011_prot2 = 0x00;
+	return 0;
+}
+
+
+
+// lhb2 (55), lhb/dbc/ryukobou (33)
+static WRITE16_HANDLER( igs011_prot2_inc_w )
+{
+//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0055)) )
+	{
+		igs011_prot2++;
+	}
+//  else
+//      logerror("%s: warning, unknown igs011_prot2_inc_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+}
+
+// vbowl (33)
+static WRITE16_HANDLER( igs011_prot2_dec_w )
+{
+//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+	{
+		igs011_prot2--;
+	}
+//  else
+//      logerror("%s: warning, unknown igs011_prot2_dec_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+}
+
+
+
+static WRITE16_HANDLER( drgnwrld_igs011_prot2_swap_w )
+{
+	offset *= 2;
+
+//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+	{
+		// (b3&b0) . b2 . (b0|b1) . (b2^!b4) . (!b1^b3)
+		UINT8 x = igs011_prot2;
+		igs011_prot2 = ((BIT(x,3)&BIT(x,0))<<4) | (BIT(x,2)<<3) | ((BIT(x,0)|BIT(x,1))<<2) | ((BIT(x,2)^BIT(x,4)^1)<<1) | (BIT(x,1)^1^BIT(x,3));
+	}
+//  else
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+}
+
+// lhb, xymg, lhb2
+static WRITE16_HANDLER( lhb_igs011_prot2_swap_w )
+{
+	offset *= 2;
+
+//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+	{
+		// (!b0|b1) . b2 . (b0&b1)
+		UINT8 x = igs011_prot2;
+		igs011_prot2 = (((BIT(x,0)^1)|BIT(x,1))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,1));
+	}
+//  else
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+}
+
+// wlcc
+static WRITE16_HANDLER( wlcc_igs011_prot2_swap_w )
+{
+	offset *= 2;
+
+//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+	{
+		// (b3 ^ b2) . (b2 ^ b1) . (b1 ^ b0) . !(b4 ^ b0) . !(b4 ^ b3)
+		UINT8 x = igs011_prot2;
+		igs011_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0)^1)<<1) | (BIT(x,4)^BIT(x,3)^1);
+	}
+//  else
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+}
+
+// vbowl
+static WRITE16_HANDLER( vbowl_igs011_prot2_swap_w )
+{
+	offset *= 2;
+
+//  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
+	{
+		// (b3 ^ b2) . (b2 ^ b1) . (b1 ^ b0) . (b4 ^ b0) . (b4 ^ b3)
+		UINT8 x = igs011_prot2;
+		igs011_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0))<<1) | (BIT(x,4)^BIT(x,3));
+	}
+//  else
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+}
+
+
+
+// drgnwrld
+static READ16_HANDLER( drgnwrldv21_igs011_prot2_r )
+{
+	// b9 = (!b4) | (!b0 & b2) | (!(b3 ^ b1) & !(!(b4 & b0) | b2))
+	UINT8 x = igs011_prot2;
+	UINT8 b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ( (BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
+	return (b9 << 9);
+}
+static READ16_HANDLER( drgnwrldv20j_igs011_prot2_r )
+{
+	// b9 = (!b4 | !b0) | !(b3 | b1) | !(b2 & b0)
+	UINT8 x = igs011_prot2;
+	UINT8 b9 = ((BIT(x,4)^1) | (BIT(x,0)^1)) | ((BIT(x,3) | BIT(x,1))^1) | ((BIT(x,2) & BIT(x,0))^1);
+	return (b9 << 9);
+}
+
+// lhb, xymg
+static READ16_HANDLER( lhb_igs011_prot2_r )
+{
+	// b9 = !b2 | (b1 & b0)
+	UINT8 x = igs011_prot2;
+	UINT8 b9 = (BIT(x,2)^1) | (BIT(x,1) & BIT(x,0));
+	return (b9 << 9);
+}
+
+// dbc
+static READ16_HANDLER( dbc_igs011_prot2_r )
+{
+	// b9 = !b1 | (!b0 & b2)
+	UINT8 x = igs011_prot2;
+	UINT8 b9 = (BIT(x,1)^1) | ((BIT(x,0)^1) & BIT(x,2));
+	return (b9 << 9);
+}
+
+// ryukobou
+static READ16_HANDLER( ryukobou_igs011_prot2_r )
+{
+	// b9 = (!b1 | b2) & b0
+	UINT8 x = igs011_prot2;
+	UINT8 b9 = ((BIT(x,1)^1) | BIT(x,2)) & BIT(x,0);
+	return (b9 << 9);
+}
+
+// lhb2
+static READ16_HANDLER( lhb2_igs011_prot2_r )
+{
+	// b3 = !b2 | !b1 | b0
+	UINT8 x = igs011_prot2;
+	UINT8 b3 = (BIT(x,2)^1) | (BIT(x,1)^1) | BIT(x,0);
+	return (b3 << 3);
+}
+
+// vbowl
+static READ16_HANDLER( vbowl_igs011_prot2_r )
+{
+	UINT8 x = igs011_prot2;
+	UINT8 b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | ((BIT(x,2) & BIT(x,1))^1) | ((BIT(x,4) | BIT(x,0))^1);
+	return (b9 << 9);
+}
+
+/***************************************************************************
+
+    IGS012 Protection ("ASIC12 CHECK PORT ERROR")
+
+    The chip holds an internal value, a buffered value and a mode.
+    These are manipulated by issuing commands, where each command is assigned
+    a specific address range, and is triggered by writing a specific byte value
+    to that range. Possible commands:
+
+    - INC:   increment value
+    - DEC:   decrement value
+    - SWAP:  write bitswap1(value) to buffer
+    - COPY:  copy buffer to value
+    - MODE:  toggle mode (toggles address ranges to write/read and byte values to write)
+    - RESET: value = 0, mode = 0
+
+    The protection value is read from an additional address range:
+    - READ: read bitswap2(value). Only 2 bits are checked.
+
+***************************************************************************/
+
+static UINT8 igs012_prot, igs012_prot_swap;
+static UINT8 igs012_prot_mode;
+
+static WRITE16_HANDLER( igs012_prot_reset_w )
+{
+	igs012_prot = 0x00;
+	igs012_prot_swap = 0x00;
+
+	igs012_prot_mode = 0;
+}
+/*
+static READ16_HANDLER( igs012_prot_fake_r )
+{
+    switch (offset)
+    {
+        case 0: return igs012_prot;
+        case 1: return igs012_prot_swap;
+        case 2: return igs012_prot_mode;
+    }
+    return 0;
+}
+*/
+
+// Macro that checks whether the current mode and data byte written match the arguments
+#define MODE_AND_DATA(_MODE,_DATA)	(igs012_prot_mode == (_MODE) && ( (ACCESSING_BITS_8_15 && (data & 0xff00) == ((_DATA)<<8)) || (ACCESSING_BITS_0_7 && ((data & 0x00ff) == (_DATA))) ) )
+
+static WRITE16_HANDLER( igs012_prot_mode_w )
+{
+	if ( MODE_AND_DATA(0, 0xcc) || MODE_AND_DATA(1, 0xdd) )
+	{
+		igs012_prot_mode = igs012_prot_mode ^ 1;
+	}
+	else
+		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+}
+
+static WRITE16_HANDLER( igs012_prot_inc_w )
+{
+	if ( MODE_AND_DATA(0, 0xff) )
+	{
+		igs012_prot = (igs012_prot + 1) & 0x1f;
+	}
+	else
+		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+}
+
+static WRITE16_HANDLER( igs012_prot_dec_inc_w )
+{
+	if ( MODE_AND_DATA(0, 0xaa) )
+	{
+		igs012_prot = (igs012_prot - 1) & 0x1f;
+	}
+	else if ( MODE_AND_DATA(1, 0xfa) )
+	{
+		igs012_prot = (igs012_prot + 1) & 0x1f;
+	}
+	else
+		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+}
+
+static WRITE16_HANDLER( igs012_prot_dec_copy_w )
+{
+	if ( MODE_AND_DATA(0, 0x33) )
+	{
+		igs012_prot = igs012_prot_swap;
+	}
+	else if ( MODE_AND_DATA(1, 0x5a) )
+	{
+		igs012_prot = (igs012_prot - 1) & 0x1f;
+	}
+	else
+		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+}
+
+static WRITE16_HANDLER( igs012_prot_copy_w )
+{
+	if ( MODE_AND_DATA(1, 0x22) )
+	{
+		igs012_prot = igs012_prot_swap;
+	}
+	else
+		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+}
+
+static WRITE16_HANDLER( igs012_prot_swap_w )
+{
+	if ( MODE_AND_DATA(0, 0x55) || MODE_AND_DATA(1, 0xa5) )
+	{
+		// !(3 | 1)..(2 & 1)..(3 ^ 0)..(!2)
+		UINT8 x = igs012_prot;
+		igs012_prot_swap = (((BIT(x,3)|BIT(x,1))^1)<<3) | ((BIT(x,2)&BIT(x,1))<<2) | ((BIT(x,3)^BIT(x,0))<<1) | (BIT(x,2)^1);
+	}
+	else
+		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+}
+
+static READ16_HANDLER( igs012_prot_r )
+{
+	// FIXME: mode 0 and mode 1 are mapped to different memory ranges
+	UINT8 x = igs012_prot;
+
+	UINT8 b1 = (BIT(x,3) | BIT(x,1))^1;
+	UINT8 b0 = BIT(x,3) ^ BIT(x,0);
+
+	return (b1 << 1) | (b0 << 0);
+}
+
+/***************************************************************************
+
+    IGS003 (8255 I/O + Protection)
+
+***************************************************************************/
+
+static UINT16 igs003_reg[2];
+
+static WRITE16_HANDLER( drgnwrld_igs003_w )
+{
+	COMBINE_DATA(&igs003_reg[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(igs_magic[0])
+	switch(igs003_reg[0])
+	{
+
+		case 0x00:
+			if (ACCESSING_BITS_0_7)
+				coin_counter_w(space->machine, 0,data & 2);
+
+			if (data & ~0x2)
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
+
+			break;
+
+//      case 0x01:
+		// 0,1,4 written
+
+//      case 0x03:
+//      case 0x04:
+//      case 0x05:
+
+		default:
+//          popmessage("igs003 %x <- %04x",igs003_reg[0],data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0], data);
+	}
+}
+static READ16_HANDLER( drgnwrld_igs003_r )
+{
+	switch(igs003_reg[0])
+	{
+		case 0x00:	return input_port_read(space->machine, "IN0");
+		case 0x01:	return input_port_read(space->machine, "IN1");
+		case 0x02:	return input_port_read(space->machine, "IN2");
+
+		case 0x20:	return 0x49;
+		case 0x21:	return 0x47;
+		case 0x22:	return 0x53;
+
+		case 0x24:	return 0x41;
+		case 0x25:	return 0x41;
+		case 0x26:	return 0x7f;
+		case 0x27:	return 0x41;
+		case 0x28:	return 0x41;
+
+		case 0x2a:	return 0x3e;
+		case 0x2b:	return 0x41;
+		case 0x2c:	return 0x49;
+		case 0x2d:	return 0xf9;
+		case 0x2e:	return 0x0a;
+
+		case 0x30:	return 0x26;
+		case 0x31:	return 0x49;
+		case 0x32:	return 0x49;
+		case 0x33:	return 0x49;
+		case 0x34:	return 0x32;
+
+		default:
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0]);
+	}
+
+	return 0;
+}
+
+
+
+static WRITE16_HANDLER( lhb_inputs_w )
+{
+	COMBINE_DATA(&igs_input_sel);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		coin_counter_w(space->machine, 0,	data & 0x20	);
+		//  coin out        data & 0x40
+		igs_hopper		=	data & 0x80;
+	}
+
+	if ( igs_input_sel & (~0xff) )
+		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(space->cpu), igs_input_sel);
+
+//  popmessage("sel2 %02x",igs_input_sel&~0x1f);
+}
+static READ16_HANDLER( lhb_inputs_r )
+{
+	switch(offset)
+	{
+		case 0:		return igs_input_sel;
+
+		case 1:
+			if (~igs_input_sel & 0x01)	return input_port_read(space->machine, "KEY0");
+			if (~igs_input_sel & 0x02)	return input_port_read(space->machine, "KEY1");
+			if (~igs_input_sel & 0x04)	return input_port_read(space->machine, "KEY2");
+			if (~igs_input_sel & 0x08)	return input_port_read(space->machine, "KEY3");
+			if (~igs_input_sel & 0x10)	return input_port_read(space->machine, "KEY4");
+
+			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(space->cpu), igs_input_sel);
+			break;
+	}
+	return 0;
+}
+
+
+
+static WRITE16_HANDLER( lhb2_igs003_w )
+{
+	COMBINE_DATA(&igs003_reg[offset]);
+
+	if (offset == 0)
+		return;
+
+	switch(igs003_reg[0])
 	{
 		case 0x00:
 			COMBINE_DATA(&igs_input_sel);
@@ -810,13 +1357,12 @@ static WRITE16_HANDLER( lhb2_magic_w )
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0], data);
 	}
 }
-
-static READ16_HANDLER( lhb2_magic_r )
+static READ16_HANDLER( lhb2_igs003_r )
 {
-	switch(igs_magic[0])
+	switch(igs003_reg[0])
 	{
 		case 0x01:
 			if (~igs_input_sel & 0x01)	return input_port_read(space->machine, "KEY0");
@@ -826,10 +1372,11 @@ static READ16_HANDLER( lhb2_magic_r )
 			if (~igs_input_sel & 0x10)	return input_port_read(space->machine, "KEY4");
 			/* fall through */
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0]);
 			break;
 
-		case 0x03:	return 0xff;	// ?
+//      case 0x03:
+//          return 0xff;    // parametric bitswaps?
 
 		// Protection:
 		// 0544FE: 20 21 22 24 25 26 27 28 2A 2B 2C 2D 2E 30 31 32 33 34
@@ -863,78 +1410,14 @@ static READ16_HANDLER( lhb2_magic_r )
 
 
 
-static WRITE16_HANDLER( drgnwrld_magic_w )
+static WRITE16_HANDLER( wlcc_igs003_w )
 {
-	COMBINE_DATA(&igs_magic[offset]);
+	COMBINE_DATA(&igs003_reg[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(igs_magic[0])
-	{
-
-		case 0x00:
-			if (ACCESSING_BITS_0_7)
-				coin_counter_w(space->machine, 0,data & 2);
-
-			if (data & ~0x2)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
-
-			break;
-
-		default:
-//          popmessage("magic %x <- %04x",igs_magic[0],data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
-	}
-}
-
-static READ16_HANDLER( drgnwrld_magic_r )
-{
-	switch(igs_magic[0])
-	{
-		case 0x00:	return input_port_read(space->machine, "IN0");
-		case 0x01:	return input_port_read(space->machine, "IN1");
-		case 0x02:	return input_port_read(space->machine, "IN2");
-
-		case 0x20:	return 0x49;
-		case 0x21:	return 0x47;
-		case 0x22:	return 0x53;
-
-		case 0x24:	return 0x41;
-		case 0x25:	return 0x41;
-		case 0x26:	return 0x7f;
-		case 0x27:	return 0x41;
-		case 0x28:	return 0x41;
-
-		case 0x2a:	return 0x3e;
-		case 0x2b:	return 0x41;
-		case 0x2c:	return 0x49;
-		case 0x2d:	return 0xf9;
-		case 0x2e:	return 0x0a;
-
-		case 0x30:	return 0x26;
-		case 0x31:	return 0x49;
-		case 0x32:	return 0x49;
-		case 0x33:	return 0x49;
-		case 0x34:	return 0x32;
-
-		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
-	}
-
-	return 0;
-}
-
-
-
-static WRITE16_HANDLER( wlcc_magic_w )
-{
-	COMBINE_DATA(&igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(igs_magic[0])
+	switch(igs003_reg[0])
 	{
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
@@ -954,13 +1437,12 @@ static WRITE16_HANDLER( wlcc_magic_w )
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0], data);
 	}
 }
-
-static READ16_HANDLER( wlcc_magic_r )
+static READ16_HANDLER( wlcc_igs003_r )
 {
-	switch(igs_magic[0])
+	switch(igs003_reg[0])
 	{
 		case 0x00:	return input_port_read(space->machine, "IN0");
 
@@ -987,7 +1469,7 @@ static READ16_HANDLER( wlcc_magic_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0]);
 	}
 
 	return 0;
@@ -995,131 +1477,14 @@ static READ16_HANDLER( wlcc_magic_r )
 
 
 
-static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
+static WRITE16_HANDLER( xymg_igs003_w )
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base((data & 0x200) ? 0x40000 : 0);
-	}
-
-	if ( data & (~0x200) )
-		logerror("%s: warning, unknown bits written in oki bank = %02x\n", cpuexec_describe_context(device->machine), data);
-
-//  popmessage("oki %04x",data);
-}
-
-static WRITE16_HANDLER( lhb_inputs_w )
-{
-	COMBINE_DATA(&igs_input_sel);
-
-	if (ACCESSING_BITS_0_7)
-	{
-		coin_counter_w(space->machine, 0,	data & 0x20	);
-		//  coin out        data & 0x40
-		igs_hopper		=	data & 0x80;
-	}
-
-	if ( igs_input_sel & (~0xff) )
-		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(space->cpu), igs_input_sel);
-
-//  popmessage("sel2 %02x",igs_input_sel&~0x1f);
-}
-
-static READ16_HANDLER( lhb_inputs_r )
-{
-	switch(offset)
-	{
-		case 0:		return igs_input_sel;
-
-		case 1:
-			if (~igs_input_sel & 0x01)	return input_port_read(space->machine, "KEY0");
-			if (~igs_input_sel & 0x02)	return input_port_read(space->machine, "KEY1");
-			if (~igs_input_sel & 0x04)	return input_port_read(space->machine, "KEY2");
-			if (~igs_input_sel & 0x08)	return input_port_read(space->machine, "KEY3");
-			if (~igs_input_sel & 0x10)	return input_port_read(space->machine, "KEY4");
-
-			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(space->cpu), igs_input_sel);
-			break;
-	}
-	return 0;
-}
-
-
-
-static WRITE16_HANDLER( vbowl_magic_w )
-{
-	COMBINE_DATA(&igs_magic[offset]);
+	COMBINE_DATA(&igs003_reg[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(igs_magic[0])
-	{
-		case 0x02:
-			if (ACCESSING_BITS_0_7)
-			{
-				coin_counter_w(space->machine, 0,data & 1);
-				coin_counter_w(space->machine, 1,data & 2);
-			}
-
-			if (data & ~0x3)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
-
-			break;
-
-		default:
-//          popmessage("magic %x <- %04x",igs_magic[0],data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
-	}
-}
-
-static READ16_HANDLER( vbowl_magic_r )
-{
-	switch(igs_magic[0])
-	{
-		case 0x00:	return input_port_read(space->machine, "IN0");
-		case 0x01:	return input_port_read(space->machine, "IN1");
-
-		case 0x20:	return 0x49;
-		case 0x21:	return 0x47;
-		case 0x22:	return 0x53;
-
-		case 0x24:	return 0x41;
-		case 0x25:	return 0x41;
-		case 0x26:	return 0x7f;
-		case 0x27:	return 0x41;
-		case 0x28:	return 0x41;
-
-		case 0x2a:	return 0x3e;
-		case 0x2b:	return 0x41;
-		case 0x2c:	return 0x49;
-		case 0x2d:	return 0xf9;
-		case 0x2e:	return 0x0a;
-
-		case 0x30:	return 0x26;
-		case 0x31:	return 0x49;
-		case 0x32:	return 0x49;
-		case 0x33:	return 0x49;
-		case 0x34:	return 0x32;
-
-		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
-	}
-
-	return 0;
-}
-
-
-
-static WRITE16_HANDLER( xymg_magic_w )
-{
-	COMBINE_DATA(&igs_magic[offset]);
-
-	if (offset == 0)
-		return;
-
-	switch(igs_magic[0])
+	switch(igs003_reg[0])
 	{
 		case 0x01:
 			COMBINE_DATA(&igs_input_sel);
@@ -1128,22 +1493,22 @@ static WRITE16_HANDLER( xymg_magic_w )
 			{
 				coin_counter_w(space->machine, 0,	data & 0x20);
 				//  coin out        data & 0x40
+				igs_hopper		=	data & 0x80;
 			}
 
-			if ( igs_input_sel & ~0x3f )
+			if ( igs_input_sel & 0x40 )
 				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(space->cpu), igs_input_sel);
 
 //          popmessage("sel2 %02x",igs_input_sel&~0x1f);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0], data);
 	}
 }
-
-static READ16_HANDLER( xymg_magic_r )
+static READ16_HANDLER( xymg_igs003_r )
 {
-	switch(igs_magic[0])
+	switch(igs003_reg[0])
 	{
 		case 0x00:	return input_port_read(space->machine, "COIN");
 
@@ -1178,8 +1543,75 @@ static READ16_HANDLER( xymg_magic_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0]);
 			break;
+	}
+
+	return 0;
+}
+
+
+
+static WRITE16_HANDLER( vbowl_igs003_w )
+{
+	COMBINE_DATA(&igs003_reg[offset]);
+
+	if (offset == 0)
+		return;
+
+	switch(igs003_reg[0])
+	{
+		case 0x02:
+			if (ACCESSING_BITS_0_7)
+			{
+				coin_counter_w(space->machine, 0, data & 1);
+				coin_counter_w(space->machine, 1, data & 2);
+			}
+
+			if (data & ~0x3)
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
+
+			break;
+
+		default:
+//          popmessage("igs003 %x <- %04x",igs003_reg[0],data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0], data);
+	}
+}
+static READ16_HANDLER( vbowl_igs003_r )
+{
+	switch(igs003_reg[0])
+	{
+		case 0x00:	return input_port_read(space->machine, "IN0");
+		case 0x01:	return input_port_read(space->machine, "IN1");
+
+//      case 0x03:
+//          return 0xff;    // parametric bitswaps?
+
+		case 0x20:	return 0x49;
+		case 0x21:	return 0x47;
+		case 0x22:	return 0x53;
+
+		case 0x24:	return 0x41;
+		case 0x25:	return 0x41;
+		case 0x26:	return 0x7f;
+		case 0x27:	return 0x41;
+		case 0x28:	return 0x41;
+
+		case 0x2a:	return 0x3e;
+		case 0x2b:	return 0x41;
+		case 0x2c:	return 0x49;
+		case 0x2d:	return 0xf9;
+		case 0x2e:	return 0x0a;
+
+		case 0x30:	return 0x26;
+		case 0x31:	return 0x49;
+		case 0x32:	return 0x49;
+		case 0x33:	return 0x49;
+		case 0x34:	return 0x32;
+
+		default:
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(space->cpu), igs003_reg[0]);
 	}
 
 	return 0;
@@ -1189,11 +1621,391 @@ static READ16_HANDLER( xymg_magic_r )
 
 /***************************************************************************
 
+    Driver Inits (Decryption, Protection Patches)
+
+***************************************************************************/
+
+// V0400O
+static DRIVER_INIT( drgnwrld )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	drgnwrld_type1_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
+/*
+    // PROTECTION CHECKS
+    rom[0x032ee/2]  =   0x606c;     // 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
+    rom[0x23d5e/2]  =   0x606c;     // 023D5E: 676C        beq 23dcc    (CHECK PORT ERROR 1)
+    rom[0x23fd0/2]  =   0x606c;     // 023FD0: 676C        beq 2403e    (CHECK PORT ERROR 2)
+    rom[0x24170/2]  =   0x606c;     // 024170: 676C        beq 241de    (CHECK PORT ERROR 3)
+    rom[0x24348/2]  =   0x606c;     // 024348: 676C        beq 243b6    (ASIC11 CHECK PORT ERROR 4)
+    rom[0x2454e/2]  =   0x606c;     // 02454E: 676C        beq 245bc    (ASIC11 CHECK PORT ERROR 3)
+    rom[0x246cc/2]  =   0x606c;     // 0246CC: 676C        beq 2473a    (ASIC11 CHECK PORT ERROR 2)
+    rom[0x24922/2]  =   0x606c;     // 024922: 676C        beq 24990    (ASIC11 CHECK PORT ERROR 1)
+
+    rom[0x24b66/2]  =   0x606c;     // 024B66: 676C        beq 24bd4    (ASIC12 CHECK PORT ERROR 4)
+    rom[0x24de2/2]  =   0x606c;     // 024DE2: 676C        beq 24e50    (ASIC12 CHECK PORT ERROR 3)
+    rom[0x2502a/2]  =   0x606c;     // 02502A: 676C        beq 25098    (ASIC12 CHECK PORT ERROR 2)
+    rom[0x25556/2]  =   0x6000;     // 025556: 6700 E584   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
+
+    rom[0x2a16c/2]  =   0x606c;     // 02A16C: 676C        beq 2a1da    (ASIC11 CHECK PORT ERROR 2)
+*/
+}
+
+static DRIVER_INIT( drgnwrldv30 )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	drgnwrld_type1_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
+/*
+    // PROTECTION CHECKS
+    rom[0x032ee/2]  =   0x606c;     // 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
+    rom[0x23d5e/2]  =   0x606c;     // 023D5E: 676C        beq 23dcc    (CHECK PORT ERROR 1)
+    rom[0x23fd0/2]  =   0x606c;     // 023FD0: 676C        beq 2403e    (CHECK PORT ERROR 2)
+    rom[0x24170/2]  =   0x606c;     // 024170: 676C        beq 241de    (CHECK PORT ERROR 3)
+    rom[0x24348/2]  =   0x606c;     // 024348: 676C        beq 243b6    (ASIC11 CHECK PORT ERROR 4)
+    rom[0x2454e/2]  =   0x606c;     // 02454E: 676C        beq 245bc    (ASIC11 CHECK PORT ERROR 3)
+    rom[0x246cc/2]  =   0x606c;     // 0246CC: 676C        beq 2473a    (ASIC11 CHECK PORT ERROR 2)
+    rom[0x24922/2]  =   0x606c;     // 024922: 676C        beq 24990    (ASIC11 CHECK PORT ERROR 1)
+    rom[0x24b66/2]  =   0x606c;     // 024B66: 676C        beq 24bd4    (ASIC12 CHECK PORT ERROR 4)
+    rom[0x24de2/2]  =   0x606c;     // 024DE2: 676C        beq 24e50    (ASIC12 CHECK PORT ERROR 3)
+    rom[0x2502a/2]  =   0x606c;     // 02502A: 676C        beq 25098    (ASIC12 CHECK PORT ERROR 2)
+    rom[0x25556/2]  =   0x6000;     // 025556: 6700 E584   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
+    // different from drgnwrld:
+    rom[0x2a162/2]  =   0x606c;     // 02A162: 676C        beq 2a1d0    (ASIC11 CHECK PORT ERROR 2)
+*/
+}
+
+static DRIVER_INIT( drgnwrldv21 )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	drgnwrld_type2_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
+
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd4c0, 0xd4ff, 0, 0, drgnwrldv21_igs011_prot2_r);
+/*
+    // PROTECTION CHECKS
+    // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
+    rom[0x032ee/2]  =   0x606c;     // 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
+    rom[0x11ca8/2]  =   0x606c;     // 011CA8: 676C        beq 11d16    (CHECK PORT ERROR 1)
+    rom[0x23d5e/2]  =   0x606c;     // 023D5E: 676C        beq 23dcc    (CHECK PORT ERROR 1)
+    rom[0x23fd0/2]  =   0x606c;     // 023FD0: 676C        beq 2403e    (CHECK PORT ERROR 2)
+    rom[0x24170/2]  =   0x606c;     // 024170: 676C        beq 241de    (CHECK PORT ERROR 3)
+    rom[0x24348/2]  =   0x606c;     // 024348: 676C        beq 243b6    (ASIC11 CHECK PORT ERROR 4)
+    rom[0x2454e/2]  =   0x606c;     // 02454E: 676C        beq 245bc    (ASIC11 CHECK PORT ERROR 3)
+    rom[0x246cc/2]  =   0x606c;     // 0246CC: 676C        beq 2473a    (ASIC11 CHECK PORT ERROR 2)
+    rom[0x24922/2]  =   0x606c;     // 024922: 676C        beq 24990    (ASIC11 CHECK PORT ERROR 1)
+    rom[0x24b66/2]  =   0x606c;     // 024B66: 676C        beq 24bd4    (ASIC12 CHECK PORT ERROR 4)
+    rom[0x24de2/2]  =   0x606c;     // 024DE2: 676C        beq 24e50    (ASIC12 CHECK PORT ERROR 3)
+    rom[0x2502a/2]  =   0x606c;     // 02502A: 676C        beq 25098    (ASIC12 CHECK PORT ERROR 2)
+    rom[0x25556/2]  =   0x6000;     // 025556: 6700 E584   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
+    rom[0x269de/2]  =   0x606c;     // 0269DE: 676C        beq 26a4c    (ASIC12 CHECK PORT ERROR 1)
+    rom[0x2766a/2]  =   0x606c;     // 02766A: 676C        beq 276d8    (CHECK PORT ERROR 3)
+    rom[0x2a830/2]  =   0x606c;     // 02A830: 676C        beq 2a89e    (ASIC11 CHECK PORT ERROR 2)
+*/
+}
+
+static DRIVER_INIT( drgnwrldv21j )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	drgnwrld_type3_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
+/*
+    // PROTECTION CHECKS
+    rom[0x033d2/2]  =   0x606c;     // 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
+    rom[0x11c74/2]  =   0x606c;     // 011C74: 676C        beq 11ce2    (CHECK PORT ERROR 1)
+    rom[0x23d2a/2]  =   0x606c;     // 023D2A: 676C        beq 23d98
+    rom[0x23f68/2]  =   0x606c;     // 023F68: 676C        beq 23fd6
+    rom[0x240d4/2]  =   0x606c;     // 0240D4: 676C        beq 24142    (CHECK PORT ERROR 3)
+    rom[0x242ac/2]  =   0x606c;     // 0242AC: 676C        beq 2431a
+    rom[0x244b2/2]  =   0x606c;     // 0244B2: 676C        beq 24520
+    rom[0x24630/2]  =   0x606c;     // 024630: 676C        beq 2469e
+    rom[0x24886/2]  =   0x606c;     // 024886: 676C        beq 248f4
+    rom[0x24aca/2]  =   0x606c;     // 024ACA: 676C        beq 24b38
+    rom[0x24d46/2]  =   0x606c;     // 024D46: 676C        beq 24db4
+    rom[0x24f8e/2]  =   0x606c;     // 024F8E: 676C        beq 24ffc
+    rom[0x254ba/2]  =   0x6000;     // 0254BA: 6700 E620   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
+    rom[0x26a52/2]  =   0x606c;     // 026A52: 676C        beq 26ac0    (ASIC12 CHECK PORT ERROR 1)
+    rom[0x276aa/2]  =   0x606c;     // 0276AA: 676C        beq 27718    (CHECK PORT ERROR 3)
+    rom[0x2a870/2]  =   0x606c;     // 02A870: 676C        beq 2a8de    (ASIC11 CHECK PORT ERROR 2)
+*/
+}
+
+static DRIVER_INIT( drgnwrldv20j )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	drgnwrld_type3_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
+/*
+    // PROTECTION CHECKS
+    // bp 33d2; bp 11c74; bp 23d2a; bp 23f68; bp 240d4; bp 242ac; bp 244b2; bp 24630; bp 24886; bp 24aca; bp 24d46; bp 24f8e; bp 254ba; bp 26a52; bp 276a0; bp 2a86e
+    rom[0x033d2/2]  =   0x606c;     // 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
+    rom[0x11c74/2]  =   0x606c;     // 011C74: 676C        beq 11ce2    (CHECK PORT ERROR 1)
+    rom[0x23d2a/2]  =   0x606c;     // 023D2A: 676C        beq 23d98
+    rom[0x23f68/2]  =   0x606c;     // 023F68: 676C        beq 23fd6
+    rom[0x240d4/2]  =   0x606c;     // 0240D4: 676C        beq 24142    (CHECK PORT ERROR 3)
+    rom[0x242ac/2]  =   0x606c;     // 0242AC: 676C        beq 2431a
+    rom[0x244b2/2]  =   0x606c;     // 0244B2: 676C        beq 24520
+    rom[0x24630/2]  =   0x606c;     // 024630: 676C        beq 2469e
+    rom[0x24886/2]  =   0x606c;     // 024886: 676C        beq 248f4
+    rom[0x24aca/2]  =   0x606c;     // 024ACA: 676C        beq 24b38
+    rom[0x24d46/2]  =   0x606c;     // 024D46: 676C        beq 24db4
+    rom[0x24f8e/2]  =   0x606c;     // 024F8E: 676C        beq 24ffc
+    rom[0x254ba/2]  =   0x6000;     // 0254BA: 6700 E620   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
+    rom[0x26a52/2]  =   0x606c;     // 026A52: 676C        beq 26ac0    (ASIC12 CHECK PORT ERROR 1)
+    // different from drgnwrldv21j:
+    rom[0x276a0/2]  =   0x606c;     // 0276A0: 676C        beq 2770e    (CHECK PORT ERROR 3)
+    rom[0x2a86e/2]  =   0x606c;     // 02A86E: 676C        beq 2a8dc    (ASIC11 CHECK PORT ERROR 2)
+*/
+}
+
+static DRIVER_INIT( drgnwrldv11h )
+{
+	drgnwrld_type1_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
+
+	// PROTECTION CHECKS
+	// the protection checks are already patched out like we do!
+}
+
+static DRIVER_INIT( drgnwrldv10c )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	drgnwrld_type1_decrypt(machine);
+	drgnwrld_gfx_decrypt(machine);
+/*
+    // PROTECTION CHECKS
+    // bp 33d2; bp 23d0e; bp 23f58; bp 240d0; bp 242a8; bp 244ae; bp 2462c; bp 24882; bp 24ac6; bp 24d42; bp 24f8a; bp 254b6; bp 2a23a
+    rom[0x033d2/2]  =   0x606c;     // 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
+    rom[0x23d0e/2]  =   0x606c;     // 023D0E: 676C        beq 23d7c    (CHECK PORT ERROR 1)
+    rom[0x23f58/2]  =   0x606c;     // 023F58: 676C        beq 23fc6    (CHECK PORT ERROR 2)
+    rom[0x240d0/2]  =   0x606c;     // 0240D0: 676C        beq 2413e    (CHECK PORT ERROR 3)
+    rom[0x242a8/2]  =   0x606c;     // 0242A8: 676C        beq 24316    (ASIC11 CHECK PORT ERROR 4)
+    rom[0x244ae/2]  =   0x606c;     // 0244AE: 676C        beq 2451c    (ASIC11 CHECK PORT ERROR 3)
+    rom[0x2462c/2]  =   0x606c;     // 02462C: 676C        beq 2469a    (ASIC11 CHECK PORT ERROR 2)
+    rom[0x24882/2]  =   0x606c;     // 024882: 676C        beq 248f0    (ASIC11 CHECK PORT ERROR 1)
+    rom[0x24ac6/2]  =   0x606c;     // 024AC6: 676C        beq 24b34    (ASIC12 CHECK PORT ERROR 4)
+    rom[0x24d42/2]  =   0x606c;     // 024D42: 676C        beq 24db0    (ASIC12 CHECK PORT ERROR 3)
+    rom[0x24f8a/2]  =   0x606c;     // 024F8A: 676C        beq 24ff8    (ASIC12 CHECK PORT ERROR 2)
+    rom[0x254b6/2]  =   0x6000;     // 0254B6: 6700 E5FC   beq 23ab4    (ASIC12 CHECK PORT ERROR 1)
+    rom[0x2a23a/2]  =   0x606c;     // 02A23A: 676C        beq 2a2a8    (ASIC11 CHECK PORT ERROR 2)
+*/
+}
+
+
+static DRIVER_INIT( lhb )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	lhb_decrypt(machine);
+
+	// PROTECTION CHECKS
+//  rom[0x2eef6/2]  =   0x4e75;     // 02EEF6: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
+}
+
+static DRIVER_INIT( lhbv33c )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	lhb_decrypt(machine);
+
+	// PROTECTION CHECKS
+//  rom[0x2e988/2]  =   0x4e75;     // 02E988: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
+}
+
+static DRIVER_INIT( dbc )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	dbc_decrypt(machine);
+
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10600, 0x107ff, 0, 0, dbc_igs011_prot2_r);
+/*
+    // PROTECTION CHECKS
+    rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
+    rom[0x08694/2]  =   0x6008;     // 008694: 6408         bcc 869e  (fills screen with characters otherwise)
+    rom[0x0a05e/2]  =   0x4e71;     // 00A05E: 6408         bcc a068  (fills screen with characters otherwise)
+    rom[0x0bec2/2]  =   0x6008;     // 00BEC2: 6408         bcc becc  (fills screen with characters otherwise)
+    rom[0x0c0d4/2]  =   0x600a;     // 00C0D4: 640A         bcc c0e0  (wrong game state otherwise)
+    rom[0x0c0f0/2]  =   0x4e71;     // 00C0F0: 6408         bcc c0fa  (wrong palette otherwise)
+    rom[0x0e292/2]  =   0x6008;     // 00E292: 6408         bcc e29c  (fills screen with characters otherwise)
+    rom[0x11b42/2]  =   0x6008;     // 011B42: 6408         bcc 11b4c (wrong game state otherwise)
+    rom[0x11b5c/2]  =   0x4e71;     // 011B5C: 6408         bcc 11b66 (wrong palette otherwise)
+    rom[0x170ae/2]  =   0x4e71;     // 0170AE: 6408         bcc 170b8 (fills screen with characters otherwise)
+    rom[0x1842a/2]  =   0x6024;     // 01842A: 6724         beq 18450 (ASIC11 ERROR otherwise)
+    rom[0x18538/2]  =   0x6008;     // 018538: 6408         bcc 18542 (wrong game state otherwise)
+    rom[0x18552/2]  =   0x4e71;     // 018552: 6408         bcc 1855c (wrong palette otherwise)
+    rom[0x18c0e/2]  =   0x6006;     // 018C0E: 6406         bcc 18c16 (fills screen with characters otherwise)
+    rom[0x1923e/2]  =   0x4e71;     // 01923E: 6408         bcc 19248 (fills screen with characters otherwise)
+*/
+	// Fix for the palette fade on title screen
+//  rom[0x19E90/2]  =   0x00ff;
+}
+
+static DRIVER_INIT( ryukobou )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	ryukobou_decrypt(machine);
+
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10600, 0x107ff, 0, 0, ryukobou_igs011_prot2_r);
+
+	// PROTECTION CHECKS
+//  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
+}
+
+
+static DRIVER_INIT( xymg )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	lhb_decrypt(machine);
+/*
+    // PROTECTION CHECKS
+    rom[0x00502/2]  =   0x6006;     // 000502: 6050         bra 554
+    rom[0x0fc1c/2]  =   0x6036;     // 00FC1C: 6736         beq fc54  (fills palette with red otherwise)
+    rom[0x1232a/2]  =   0x6036;     // 01232A: 6736         beq 12362 (fills palette with red otherwise)
+    rom[0x18244/2]  =   0x6036;     // 018244: 6736         beq 1827c (fills palette with red otherwise)
+    rom[0x1e15e/2]  =   0x6036;     // 01E15E: 6736         beq 1e196 (fills palette with red otherwise)
+    rom[0x22286/2]  =   0x6000;     // 022286: 6700 02D2    beq 2255a (fills palette with green otherwise)
+    rom[0x298ce/2]  =   0x6036;     // 0298CE: 6736         beq 29906 (fills palette with red otherwise)
+    rom[0x2e07c/2]  =   0x6036;     // 02E07C: 6736         beq 2e0b4 (fills palette with red otherwise)
+    rom[0x38f1c/2]  =   0x6000;     // 038F1C: 6700 071C    beq 3963a (ASIC11 ERROR 1)
+    rom[0x390e8/2]  =   0x6000;     // 0390E8: 6700 0550    beq 3963a (ASIC11 ERROR 2)
+    rom[0x3933a/2]  =   0x6000;     // 03933A: 6700 02FE    beq 3963a (ASIC11 ERROR 3)
+    rom[0x3955c/2]  =   0x6000;     // 03955C: 6700 00DC    beq 3963a (ASIC11 ERROR 4)
+    rom[0x397f4/2]  =   0x6000;     // 0397F4: 6700 02C0    beq 39ab6 (fills palette with green otherwise)
+    rom[0x39976/2]  =   0x6000;     // 039976: 6700 013E    beq 39ab6 (fills palette with green otherwise)
+    rom[0x39a7e/2]  =   0x6036;     // 039A7E: 6736         beq 39ab6 (fills palette with green otherwise)
+    rom[0x4342c/2]  =   0x4e75;     // 04342C: 4E56 0000    link A6, #$0
+    rom[0x49966/2]  =   0x6036;     // 049966: 6736         beq 4999e (fills palette with blue otherwise)
+    rom[0x58140/2]  =   0x6036;     // 058140: 6736         beq 58178 (fills palette with red otherwise)
+    rom[0x5e05a/2]  =   0x6036;     // 05E05A: 6736         beq 5e092 (fills palette with red otherwise)
+    rom[0x5ebf0/2]  =   0x6000;     // 05EBF0: 6700 0208    beq 5edfa (fills palette with red otherwise)
+    rom[0x5edc2/2]  =   0x6036;     // 05EDC2: 6736         beq 5edfa (fills palette with green otherwise)
+    rom[0x5f71c/2]  =   0x6000;     // 05F71C: 6700 01F2    beq 5f910 (fills palette with green otherwise)
+    rom[0x5f8d8/2]  =   0x6036;     // 05F8D8: 6736         beq 5f910 (fills palette with red otherwise)
+    rom[0x64836/2]  =   0x6036;     // 064836: 6736         beq 6486e (fills palette with red otherwise)
+*/
+}
+
+static DRIVER_INIT( wlcc )
+{
+//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	wlcc_decrypt(machine);
+/*
+    // PROTECTION CHECKS
+    rom[0x16b96/2]  =   0x6000;     // 016B96: 6700 02FE    beq 16e96  (fills palette with red otherwise)
+    rom[0x16e5e/2]  =   0x6036;     // 016E5E: 6736         beq 16e96  (fills palette with green otherwise)
+    rom[0x17852/2]  =   0x6000;     // 017852: 6700 01F2    beq 17a46  (fills palette with green otherwise)
+    rom[0x17a0e/2]  =   0x6036;     // 017A0E: 6736         beq 17a46  (fills palette with red otherwise)
+    rom[0x23636/2]  =   0x6036;     // 023636: 6736         beq 2366e  (fills palette with red otherwise)
+    rom[0x2b1e6/2]  =   0x6000;     // 02B1E6: 6700 0218    beq 2b400  (fills palette with green otherwise)
+    rom[0x2f9f2/2]  =   0x6000;     // 02F9F2: 6700 04CA    beq 2febe  (fills palette with green otherwise)
+    rom[0x2fb2e/2]  =   0x6000;     // 02FB2E: 6700 038E    beq 2febe  (fills palette with red otherwise)
+    rom[0x2fcf2/2]  =   0x6000;     // 02FCF2: 6700 01CA    beq 2febe  (fills palette with red otherwise)
+    rom[0x2fe86/2]  =   0x6036;     // 02FE86: 6736         beq 2febe  (fills palette with red otherwise)
+    rom[0x3016e/2]  =   0x6000;     // 03016E: 6700 03F6    beq 30566  (fills palette with green otherwise)
+    rom[0x303c8/2]  =   0x6000;     // 0303C8: 6700 019C    beq 30566  (fills palette with green otherwise)
+    rom[0x3052e/2]  =   0x6036;     // 03052E: 6736         beq 30566  (fills palette with green otherwise)
+*/
+}
+
+
+static DRIVER_INIT( lhb2 )
+{
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	lhb2_decrypt(machine);
+	lhb2_decrypt_gfx(machine);
+
+	// PROTECTION CHECKS
+	rom[0x034f4/2]	=	0x4e71;		// 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
+	rom[0x03502/2]	=	0x6032;		// 003502: 6732    beq 3536   (rom test, fills palette with white otherwise)
+	rom[0x1afea/2]	=	0x6034;		// 01AFEA: 6734    beq 1b020  (fills palette with black otherwise)
+//  rom[0x24b8a/2]  =   0x6036;     // 024B8A: 6736    beq 24bc2  (fills palette with green otherwise)
+//  rom[0x29ef8/2]  =   0x6036;     // 029EF8: 6736    beq 29f30  (fills palette with red otherwise)
+//  rom[0x2e69c/2]  =   0x6036;     // 02E69C: 6736    beq 2e6d4  (fills palette with green otherwise)
+//  rom[0x2fe96/2]  =   0x6036;     // 02FE96: 6736    beq 2fece  (fills palette with red otherwise)
+//  rom[0x325da/2]  =   0x6036;     // 0325DA: 6736    beq 32612  (fills palette with green otherwise)
+	rom[0x3d80a/2]	=	0x6034;		// 03D80A: 6734    beq 3d840  (fills palette with black otherwise)
+//  rom[0x3ed80/2]  =   0x6036;     // 03ED80: 6736    beq 3edb8  (fills palette with red otherwise)
+	rom[0x41d72/2]	=	0x6034;		// 041D72: 6734    beq 41da8  (fills palette with black otherwise)
+	rom[0x44834/2]	=	0x6034;		// 044834: 6734    beq 4486a  (fills palette with black otherwise)
+}
+
+static DRIVER_INIT( vbowl )
+{
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+	UINT8  *gfx = (UINT8 *)  memory_region(machine, "blitter");
+	int i;
+
+	vbowlj_decrypt(machine);
+
+	for (i = 0x400000-1; i >= 0; i--)
+	{
+		gfx[i * 2 + 1] = (gfx[i] & 0xf0) >> 4;
+		gfx[i * 2 + 0] = (gfx[i] & 0x0f) >> 0;
+	}
+
+	// Patch the bad dump so that it doesn't reboot at the end of a game (the patched value is from vbowlj)
+	rom[0x080e0/2] = 0xe549;	// 0080E0: 0449 dc.w $0449; ILLEGAL
+
+	// PROTECTION CHECKS
+//  rom[0x03764/2] = 0x4e75;    // 003764: 4E56 0000 link    A6, #$0
+	rom[0x173ee/2] = 0x600c;	// 0173EE: 670C      beq     $173fc
+	rom[0x1e6e6/2] = 0x600c;	// 01E6E6: 670C      beq     $1e6f4
+	rom[0x1f7ce/2] = 0x600c;	// 01F7CE: 670C      beq     $1f7dc
+}
+
+
+static DRIVER_INIT( vbowlj )
+{
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+	UINT8  *gfx = (UINT8 *)  memory_region(machine, "blitter");
+	int i;
+
+	vbowlj_decrypt(machine);
+
+	for (i = 0x400000-1; i >= 0; i--)
+	{
+		gfx[i * 2 + 1] = (gfx[i] & 0xf0) >> 4;
+		gfx[i * 2 + 0] = (gfx[i] & 0x0f) >> 0;
+	}
+
+	// PROTECTION CHECKS
+//  rom[0x37b4/2] = 0x4e75;     // 0037B4: 4E56 0000 link    A6, #$0
+	rom[0x17720/2] = 0x600c;	// 017720: 670C      beq     1772e
+	rom[0x1e6e6/2] = 0x600c;	// 01E6E6: 670C      beq     $1e6f4
+	rom[0x1f7c8/2] = 0x600c;	// 01F7C8: 670C      beq     1f7d6
+}
+
+
+static DRIVER_INIT( nkishusp )
+{
+	nkishusp_decrypt(machine);
+
+	// PROTECTION CHECKS (similar to lhb2?)
+}
+
+
+/***************************************************************************
+
     Memory Maps
 
 ***************************************************************************/
 
 static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
+//  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
+//  AM_RANGE( 0x01dd70, 0x01dd77 ) AM_WRITE( igs011_prot1_w )
+//  AM_RANGE( 0x01dd78, 0x01dd79 ) AM_READ ( igs011_prot1_r )
+
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
@@ -1201,10 +2013,16 @@ static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_DEVWRITE8( "ymsnd", ym3812_w, 0x00ff )
-	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( drgnwrld_magic_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( drgnwrld_magic_r )
+
+	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( drgnwrld_igs003_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( drgnwrld_igs003_r )
+
 	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
+
+	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE( igs011_prot_addr_w )
+//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ( igs011_prot_fake_r )
+
 	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
 	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
 	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
@@ -1217,34 +2035,140 @@ static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_3_dips_r )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( drgnwrld_igs012, ADDRESS_SPACE_PROGRAM, 16 )
+	// IGS012
+	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE( igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
+	AM_RANGE( 0x001610, 0x00161f ) AM_READ ( igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
+	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE( igs012_prot_dec_inc_w	)	AM_MIRROR(0x01c000)	// dec  (aa), inc  (fa)
+	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE( igs012_prot_inc_w		)	AM_MIRROR(0x01c000)	// inc  (ff)
+	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE( igs012_prot_copy_w		)	AM_MIRROR(0x01c000)	// copy (22)
+	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE( igs012_prot_dec_copy_w	)	AM_MIRROR(0x01c000)	// dec  (5a), copy (33)
+	AM_RANGE( 0x001660, 0x00166f ) AM_READ ( igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 1)
+	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE( igs012_prot_mode_w		)	AM_MIRROR(0x01c000)	// mode (cc / dd)
 
-static ADDRESS_MAP_START( lhb2, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE( igs011_prot2_dec_w				)	// dec   (33)
+	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE( drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE( igs011_prot2_reset_w			)	// reset (33)
+	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ ( drgnwrldv20j_igs011_prot2_r	)	// read
+
+	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE( igs012_prot_reset_w	)	// reset?
+//  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE( igs012_prot_fake_r )
+
+	AM_IMPORT_FROM(drgnwrld)
+ADDRESS_MAP_END
+
+
+
+// Only values 0 and 7 are written (1 bit per irq source?)
+static UINT16 lhb_irq_enable;
+static WRITE16_HANDLER( lhb_irq_enable_w )
+{
+	COMBINE_DATA( &lhb_irq_enable );
+}
+
+static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base((data & 0x200) ? 0x40000 : 0);
+	}
+
+	if ( data & (~0x200) )
+		logerror("%s: warning, unknown bits written in oki bank = %02x\n", cpuexec_describe_context(device->machine), data);
+
+//  popmessage("oki %04x",data);
+}
+
+static ADDRESS_MAP_START( lhb, ADDRESS_SPACE_PROGRAM, 16 )
+//  lhb: IGS011 protection dynamically mapped at 834x
+//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
+//  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
+
+	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE( "oki", lhb_okibank_w )
+
+	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE( igs011_prot2_inc_w			)
+	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE( lhb_igs011_prot2_swap_w	)
+	AM_RANGE( 0x010600, 0x0107ff ) AM_READ ( lhb_igs011_prot2_r			)
+	// no reset
+
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
-	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
-	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8( "ymsnd", ym2413_w, 0x00ff )
-	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE( lhb2_magic_w )
-	AM_RANGE( 0x208002, 0x208003 ) AM_READ ( lhb2_magic_r )
-	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_BASE(&igs011_priority_ram)
-	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x214000, 0x214001 ) AM_READ_PORT( "COIN" )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
-	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs011_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs011_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs011_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs011_blit_depth_w )
-	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_3_dips_r )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT( "COIN" )
+	AM_RANGE( 0x700002, 0x700005 ) AM_READ ( lhb_inputs_r )
+	AM_RANGE( 0x700002, 0x700003 ) AM_WRITE( lhb_inputs_w )
+	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs011_priority_w )
+	AM_RANGE( 0x838000, 0x838001 ) AM_WRITE( lhb_irq_enable_w )
+	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE( igs_dips_w )
+
+	AM_RANGE( 0x850000, 0x850001 ) AM_WRITE( igs011_prot_addr_w )
+//  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE( igs011_prot_fake_r )
+
+	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs011_blit_depth_w )
+	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_5_dips_r )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
+//  xymg: IGS011 protection dynamically mapped at 834x
+//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
+//  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
+
+	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE( "oki", lhb_okibank_w )
+
+	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE( igs011_prot2_inc_w			)	// inc  (33)
+	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE( lhb_igs011_prot2_swap_w	)	// swap (33)
+	AM_RANGE( 0x010600, 0x0107ff ) AM_READ ( lhb_igs011_prot2_r			)	// read
+	// no reset
+
+	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM
+	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram ) // extra ram
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x700000, 0x700003 ) AM_WRITE( xymg_igs003_w )
+	AM_RANGE( 0x700002, 0x700003 ) AM_READ ( xymg_igs003_r )
+	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs011_priority_w )
+	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE( igs_dips_w )
+
+	AM_RANGE( 0x850000, 0x850001 ) AM_WRITE( igs011_prot_addr_w )
+//  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE( igs011_prot_fake_r )
+
+	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs011_blit_depth_w )
+	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_3_dips_r )
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wlcc, ADDRESS_SPACE_PROGRAM, 16 )
+//  wlcc: IGS011 protection dynamically mapped at 834x
+//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
+//  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
+
+	AM_RANGE( 0x518000, 0x5181ff ) AM_WRITE( igs011_prot2_inc_w			)	// inc   (33)
+	AM_RANGE( 0x518200, 0x5183ff ) AM_WRITE( wlcc_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x518800, 0x5189ff ) AM_READ ( igs011_prot2_reset_r		)	// reset
+	AM_RANGE( 0x519000, 0x5195ff ) AM_READ ( lhb_igs011_prot2_r			)	// read
+
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
@@ -1252,10 +2176,14 @@ static ADDRESS_MAP_START( wlcc, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
-	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( wlcc_magic_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( wlcc_magic_r )
+	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( wlcc_igs003_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( wlcc_igs003_r )
 	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
+
+	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE( igs011_prot_addr_w )
+//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ( igs011_prot_fake_r )
+
 	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
 	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
 	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
@@ -1269,39 +2197,44 @@ static ADDRESS_MAP_START( wlcc, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-// Only values 0 and 7 are written (1 bit per irq source?)
-static UINT16 lhb_irq_enable;
-static WRITE16_HANDLER( lhb_irq_enable_w )
-{
-	COMBINE_DATA( &lhb_irq_enable );
-}
 
-static ADDRESS_MAP_START( lhb, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE( "oki", lhb_okibank_w )
+static ADDRESS_MAP_START( lhb2, ADDRESS_SPACE_PROGRAM, 16 )
+//  lhb2: IGS011 protection dynamically mapped at 1ff8x
+//  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE( igs011_prot1_w )
+//  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
+
+	AM_RANGE( 0x020000, 0x0201ff ) AM_WRITE( igs011_prot2_inc_w			)	// inc   (55)
+	AM_RANGE( 0x020200, 0x0203ff ) AM_WRITE( lhb_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x020400, 0x0205ff ) AM_READ ( lhb2_igs011_prot2_r		)	// read
+	AM_RANGE( 0x020600, 0x0207ff ) AM_WRITE( igs011_prot2_reset_w		)	// reset (55)
+
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
+	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8( "ymsnd", ym2413_w, 0x00ff )
+	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE( lhb2_igs003_w )
+	AM_RANGE( 0x208002, 0x208003 ) AM_READ ( lhb2_igs003_r )
+	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_BASE(&igs011_priority_ram)
+	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x214000, 0x214001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
-	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x700002, 0x700005 ) AM_READ ( lhb_inputs_r )
-	AM_RANGE( 0x700002, 0x700003 ) AM_WRITE( lhb_inputs_w )
-	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs011_priority_w )
-	AM_RANGE( 0x838000, 0x838001 ) AM_WRITE( lhb_irq_enable_w )
-	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE( igs011_blit_x_w )
-	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE( igs011_blit_y_w )
-	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE( igs011_blit_w_w )
-	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE( igs011_blit_h_w )
-	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
-	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
-	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE( igs011_blit_flags_w )
-	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs011_blit_pen_w )
-	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs011_blit_depth_w )
-	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_5_dips_r )
-ADDRESS_MAP_END
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
+	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
 
+	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE( igs011_prot_addr_w )
+//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ( igs011_prot_fake_r )
+
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs011_blit_depth_w )
+	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_3_dips_r )
+ADDRESS_MAP_END
 
 
 
@@ -1359,6 +2292,33 @@ static WRITE16_HANDLER( vbowl_link_2_w )	{ }
 static WRITE16_HANDLER( vbowl_link_3_w )	{ }
 
 static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
+//  vbowl: IGS011 protection dynamically mapped at 834x
+//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
+//  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
+
+	// IGS012
+	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE( igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
+	AM_RANGE( 0x001610, 0x00161f ) AM_READ ( igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
+	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE( igs012_prot_dec_inc_w	)	AM_MIRROR(0x01c000)	// dec  (aa), inc  (fa)
+	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE( igs012_prot_inc_w		)	AM_MIRROR(0x01c000)	// inc  (ff)
+	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE( igs012_prot_copy_w		)	AM_MIRROR(0x01c000)	// copy (22)
+	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE( igs012_prot_dec_copy_w	)	AM_MIRROR(0x01c000)	// dec  (5a), copy (33)
+	AM_RANGE( 0x001660, 0x00166f ) AM_READ ( igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 1)
+	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE( igs012_prot_mode_w		)	AM_MIRROR(0x01c000)	// mode (cc / dd)
+
+	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE( igs011_prot2_dec_w				)	// dec   (33)
+	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE( drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE( igs011_prot2_reset_w			)	// reset (33)
+	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ ( drgnwrldv20j_igs011_prot2_r	)	// read
+
+	AM_RANGE( 0x50f000, 0x50f1ff ) AM_WRITE( igs011_prot2_dec_w			)	// dec   (33)
+	AM_RANGE( 0x50f200, 0x50f3ff ) AM_WRITE( vbowl_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x50f400, 0x50f5ff ) AM_WRITE( igs011_prot2_reset_w		)	// reset (33)
+	AM_RANGE( 0x50f600, 0x50f7ff ) AM_READ ( vbowl_igs011_prot2_r		)	// read
+
+	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE( igs012_prot_reset_w	)	// reset?
+//  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE( igs012_prot_fake_r )
+
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
@@ -1368,8 +2328,8 @@ static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x600000, 0x600007 ) AM_DEVREADWRITE( "ics", ics2115_word_r, ics2115_word_w )
 	AM_RANGE( 0x700000, 0x700003 ) AM_RAM AM_BASE( &vbowl_trackball )
 	AM_RANGE( 0x700004, 0x700005 ) AM_WRITE( vbowl_pen_hi_w )
-	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( vbowl_magic_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_READ( vbowl_magic_r )
+	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( vbowl_igs003_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_READ( vbowl_igs003_r )
 
 	AM_RANGE( 0xa00000, 0xa00001 ) AM_WRITE( vbowl_link_0_w )
 	AM_RANGE( 0xa08000, 0xa08001 ) AM_WRITE( vbowl_link_1_w )
@@ -1378,6 +2338,10 @@ static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
+
+	AM_RANGE( 0xa48000, 0xa48001 ) AM_WRITE( igs011_prot_addr_w )
+//  AM_RANGE( 0xa48000, 0xa48005 ) AM_WRITE( igs011_prot_fake_r )
+
 	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
 	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
 	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
@@ -1392,33 +2356,6 @@ static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_4_dips_r )
 	AM_RANGE( 0xa90000, 0xa90001 ) AM_READ( vbowl_unk_r )
 	AM_RANGE( 0xa98000, 0xa98001 ) AM_READ( vbowl_unk_r )
-ADDRESS_MAP_END
-
-
-
-static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE( "oki", lhb_okibank_w )
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
-	AM_RANGE( 0x700000, 0x700003 ) AM_WRITE( xymg_magic_w )
-	AM_RANGE( 0x700002, 0x700003 ) AM_READ ( xymg_magic_r )
-	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs011_priority_w )
-	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE( igs011_blit_x_w )
-	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE( igs011_blit_y_w )
-	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE( igs011_blit_w_w )
-	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE( igs011_blit_h_w )
-	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
-	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
-	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE( igs011_blit_flags_w )
-	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs011_blit_pen_w )
-	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs011_blit_depth_w )
-	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_3_dips_r )
-	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram ) // extra ram
 ADDRESS_MAP_END
 
 
@@ -1450,12 +2387,12 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Open Girl?" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Nudity" )		// "Open Girl" in test mode
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, "Background" )
 	PORT_DIPSETTING(    0x02, "Girl" )
-	PORT_DIPSETTING(    0x00, "Landscape" )
+	PORT_DIPSETTING(    0x00, "Landscape" )		// broken backgrounds with Nudity on (PCB does the same)
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
@@ -1544,15 +2481,15 @@ static INPUT_PORTS_START( drgnwrldc )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Open Girl?" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Sex Question?" )	// "background" in test mode
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Nudity" )		// "Open Girl" in test mode
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Sex Question" )	// "background" in test mode
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "Background" )	// "sex question" in test mode
 	PORT_DIPSETTING(    0x04, "Girl" )
-	PORT_DIPSETTING(    0x00, "Landscape" )
+	PORT_DIPSETTING(    0x00, "Landscape" )		// broken backgrounds with Nudity on (PCB does the same)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -2095,7 +3032,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// shown in test mode
+PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2)	// shown in test mode
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2369,7 +3306,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(igs_hopper_r, (void *)0)	// hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )	// stats
@@ -2492,13 +3429,13 @@ static const gfx_layout layout_16x16x1 =
 	16*16*1
 };
 
-static GFXDECODE_START( igs011_blit )
+static GFXDECODE_START( igs011 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
 GFXDECODE_END
-static GFXDECODE_START( lhb2 )
+static GFXDECODE_START( igs011_hi )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
@@ -2521,7 +3458,7 @@ static MACHINE_DRIVER_START( igs011_base )
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 
 	MDRV_PALETTE_LENGTH(0x800)
-//  MDRV_GFXDECODE(igs011_blit)
+//  MDRV_GFXDECODE(igs011)
 
 	MDRV_VIDEO_START( igs011 )
 	MDRV_VIDEO_UPDATE( igs011 )
@@ -2532,8 +3469,7 @@ static MACHINE_DRIVER_START( igs011_base )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-
-static INTERRUPT_GEN( lhb2_interrupt )
+static INTERRUPT_GEN( drgnwrld_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
@@ -2543,44 +3479,20 @@ static INTERRUPT_GEN( lhb2_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( lhb2 )
-	MDRV_IMPORT_FROM(igs011_base)
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lhb2)
-	MDRV_CPU_VBLANK_INT_HACK(lhb2_interrupt,1+4)	// lev5 frequency drives the music tempo
-
-//  MDRV_GFXDECODE(lhb2)
-
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
-
-
 static MACHINE_DRIVER_START( drgnwrld )
 	MDRV_IMPORT_FROM(igs011_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drgnwrld)
-	MDRV_CPU_VBLANK_INT_HACK(lhb2_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MDRV_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
-
-static INTERRUPT_GEN( wlcc_interrupt )
-{
-	switch (cpu_getiloops(device))
-	{
-		case 0:	cpu_set_input_line(device, 3, HOLD_LINE);	break;
-		case 1:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
-	}
-}
-
-static MACHINE_DRIVER_START( wlcc )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_DRIVER_START( drgnwrld_igs012 )
+	MDRV_IMPORT_FROM(drgnwrld)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wlcc)
-	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
+	MDRV_CPU_PROGRAM_MAP(drgnwrld_igs012)
 MACHINE_DRIVER_END
 
 
@@ -2605,6 +3517,47 @@ static MACHINE_DRIVER_START( lhb )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lhb)
 	MDRV_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
+MACHINE_DRIVER_END
+
+
+
+static INTERRUPT_GEN( wlcc_interrupt )
+{
+	switch (cpu_getiloops(device))
+	{
+		case 0:	cpu_set_input_line(device, 3, HOLD_LINE);	break;
+		case 1:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
+	}
+}
+
+static MACHINE_DRIVER_START( wlcc )
+	MDRV_IMPORT_FROM(igs011_base)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(wlcc)
+	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
+MACHINE_DRIVER_END
+
+
+
+static MACHINE_DRIVER_START( xymg )
+	MDRV_IMPORT_FROM(igs011_base)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(xymg)
+	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
+MACHINE_DRIVER_END
+
+
+
+static MACHINE_DRIVER_START( lhb2 )
+	MDRV_IMPORT_FROM(igs011_base)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(lhb2)
+	MDRV_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
+
+//  MDRV_GFXDECODE(igs011_hi)
+
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
 
@@ -2637,7 +3590,7 @@ static MACHINE_DRIVER_START( vbowl )
 	MDRV_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
 
 	MDRV_VIDEO_EOF(vbowl)	// trackball
-//  MDRV_GFXDECODE(lhb2)
+//  MDRV_GFXDECODE(igs011_hi)
 
 	MDRV_DEVICE_REMOVE("oki")
 	MDRV_SOUND_ADD("ics", ICS2115, 0)
@@ -2645,355 +3598,6 @@ static MACHINE_DRIVER_START( vbowl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_DRIVER_END
 
-
-
-static MACHINE_DRIVER_START( xymg )
-	MDRV_IMPORT_FROM(igs011_base)
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(xymg)
-	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
-MACHINE_DRIVER_END
-
-
-
-static DRIVER_INIT( lhb2 )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	lhb2_decrypt(machine);
-	lhb2_decrypt_gfx(machine);
-
-	// PROTECTION CHECKS
-	rom[0x034f4/2]	=	0x4e71;		// 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
-	rom[0x03502/2]	=	0x6032;		// 003502: 6732    beq 3536   (rom test, fills palette with white otherwise)
-	rom[0x1afea/2]	=	0x6034;		// 01AFEA: 6734    beq 1b020  (fills palette with black otherwise)
-	rom[0x24b8a/2]	=	0x6036;		// 024B8A: 6736    beq 24bc2  (fills palette with green otherwise)
-	rom[0x29ef8/2]	=	0x6036;		// 029EF8: 6736    beq 29f30  (fills palette with red otherwise)
-	rom[0x2e69c/2]	=	0x6036;		// 02E69C: 6736    beq 2e6d4  (fills palette with green otherwise)
-	rom[0x2fe96/2]	=	0x6036;		// 02FE96: 6736    beq 2fece  (fills palette with red otherwise)
-	rom[0x325da/2]	=	0x6036;		// 0325DA: 6736    beq 32612  (fills palette with green otherwise)
-	rom[0x3d80a/2]	=	0x6034;		// 03D80A: 6734    beq 3d840  (fills palette with black otherwise)
-	rom[0x3ed80/2]	=	0x6036;		// 03ED80: 6736    beq 3edb8  (fills palette with red otherwise)
-	rom[0x41d72/2]	=	0x6034;		// 041D72: 6734    beq 41da8  (fills palette with black otherwise)
-	rom[0x44834/2]	=	0x6034;		// 044834: 6734    beq 4486a  (fills palette with black otherwise)
-}
-
-static DRIVER_INIT( nkishusp )
-{
-	nkishusp_decrypt(machine);
-
-	// PROTECTION CHECKS (similar to lhb2?)
-}
-
-static DRIVER_INIT( drgnwrld )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	drgnwrld_type1_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x032ee/2]	=	0x606c;		// 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
-	rom[0x23d5e/2]	=	0x606c;		// 023D5E: 676C        beq 23dcc    (CHECK PORT ERROR 1)
-	rom[0x23fd0/2]	=	0x606c;		// 023FD0: 676C        beq 2403e    (CHECK PORT ERROR 2)
-	rom[0x24170/2]	=	0x606c;		// 024170: 676C        beq 241de    (CHECK PORT ERROR 3)
-	rom[0x24348/2]	=	0x606c;		// 024348: 676C        beq 243b6    (ASIC11 CHECK PORT ERROR 4)
-	rom[0x2454e/2]	=	0x606c;		// 02454E: 676C        beq 245bc    (ASIC11 CHECK PORT ERROR 3)
-	rom[0x246cc/2]	=	0x606c;		// 0246CC: 676C        beq 2473a    (ASIC11 CHECK PORT ERROR 2)
-	rom[0x24922/2]	=	0x606c;		// 024922: 676C        beq 24990    (ASIC11 CHECK PORT ERROR 1)
-	rom[0x24b66/2]	=	0x606c;		// 024B66: 676C        beq 24bd4    (ASIC12 CHECK PORT ERROR 4)
-	rom[0x24de2/2]	=	0x606c;		// 024DE2: 676C        beq 24e50    (ASIC12 CHECK PORT ERROR 3)
-	rom[0x2502a/2]	=	0x606c;		// 02502A: 676C        beq 25098    (ASIC12 CHECK PORT ERROR 2)
-	rom[0x25556/2]	=	0x6000;		// 025556: 6700 E584   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
-	rom[0x2a16c/2]	=	0x606c;		// 02A16C: 676C        beq 2a1da    (ASIC11 CHECK PORT ERROR 2)
-}
-
-static DRIVER_INIT( drgnwrldv30 )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	drgnwrld_type1_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x032ee/2]	=	0x606c;		// 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
-	rom[0x23d5e/2]	=	0x606c;		// 023D5E: 676C        beq 23dcc    (CHECK PORT ERROR 1)
-	rom[0x23fd0/2]	=	0x606c;		// 023FD0: 676C        beq 2403e    (CHECK PORT ERROR 2)
-	rom[0x24170/2]	=	0x606c;		// 024170: 676C        beq 241de    (CHECK PORT ERROR 3)
-	rom[0x24348/2]	=	0x606c;		// 024348: 676C        beq 243b6    (ASIC11 CHECK PORT ERROR 4)
-	rom[0x2454e/2]	=	0x606c;		// 02454E: 676C        beq 245bc    (ASIC11 CHECK PORT ERROR 3)
-	rom[0x246cc/2]	=	0x606c;		// 0246CC: 676C        beq 2473a    (ASIC11 CHECK PORT ERROR 2)
-	rom[0x24922/2]	=	0x606c;		// 024922: 676C        beq 24990    (ASIC11 CHECK PORT ERROR 1)
-	rom[0x24b66/2]	=	0x606c;		// 024B66: 676C        beq 24bd4    (ASIC12 CHECK PORT ERROR 4)
-	rom[0x24de2/2]	=	0x606c;		// 024DE2: 676C        beq 24e50    (ASIC12 CHECK PORT ERROR 3)
-	rom[0x2502a/2]	=	0x606c;		// 02502A: 676C        beq 25098    (ASIC12 CHECK PORT ERROR 2)
-	rom[0x25556/2]	=	0x6000;		// 025556: 6700 E584   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
-	// different from drgnwrld:
-	rom[0x2a162/2]	=	0x606c;		// 02A162: 676C        beq 2a1d0    (ASIC11 CHECK PORT ERROR 2)
-}
-
-static DRIVER_INIT( drgnwrldv21 )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	drgnwrld_type2_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x032ee/2]	=	0x606c;		// 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
-	rom[0x11ca8/2]	=	0x606c;		// ??
-	rom[0x23d5e/2]	=	0x606c;		// 023D5E: 676C        beq 23dcc    (CHECK PORT ERROR 1)
-	rom[0x23fd0/2]	=	0x606c;		// 023FD0: 676C        beq 2403e    (CHECK PORT ERROR 2)
-	rom[0x24170/2]	=	0x606c;		// 024170: 676C        beq 241de    (CHECK PORT ERROR 3)
-	rom[0x24348/2]	=	0x606c;		// 024348: 676C        beq 243b6    (ASIC11 CHECK PORT ERROR 4)
-	rom[0x2454e/2]	=	0x606c;		// 02454E: 676C        beq 245bc    (ASIC11 CHECK PORT ERROR 3)
-	rom[0x246cc/2]	=	0x606c;		// 0246CC: 676C        beq 2473a    (ASIC11 CHECK PORT ERROR 2)
-	rom[0x24922/2]	=	0x606c;		// 024922: 676C        beq 24990    (ASIC11 CHECK PORT ERROR 1)
-	rom[0x24b66/2]	=	0x606c;		// 024B66: 676C        beq 24bd4    (ASIC12 CHECK PORT ERROR 4)
-	rom[0x24de2/2]	=	0x606c;		// 024DE2: 676C        beq 24e50    (ASIC12 CHECK PORT ERROR 3)
-	rom[0x2502a/2]	=	0x606c;		// 02502A: 676C        beq 25098    (ASIC12 CHECK PORT ERROR 2)
-	rom[0x25556/2]	=	0x6000;		// 025556: 6700 E584   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
-	rom[0x269de/2]	=	0x606c;		// ??
-	rom[0x2766a/2]	=	0x606c;		// ??
-	rom[0x2a830/2]	=	0x606c;		// ??
-}
-
-static DRIVER_INIT( drgnwrldv10c )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	drgnwrld_type1_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x033d2/2]	=	0x606c;		// 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
-	rom[0x23d0e/2]	=	0x606c;		// 023D0E: 676C        beq 23d7c    (CHECK PORT ERROR 1)
-	rom[0x23f58/2]	=	0x606c;		// 023F58: 676C        beq 23fc6    (CHECK PORT ERROR 2)
-	rom[0x240d0/2]	=	0x606c;		// 0240D0: 676C        beq 2413e    (CHECK PORT ERROR 3)
-	rom[0x242a8/2]	=	0x606c;		// 0242A8: 676C        beq 24316    (ASIC11 CHECK PORT ERROR 4)
-	rom[0x244ae/2]	=	0x606c;		// 0244AE: 676C        beq 2451c    (ASIC11 CHECK PORT ERROR 3)
-	rom[0x2462c/2]	=	0x606c;		// 02462C: 676C        beq 2469a    (ASIC11 CHECK PORT ERROR 2)
-	rom[0x24882/2]	=	0x606c;		// 024882: 676C        beq 248f0    (ASIC11 CHECK PORT ERROR 1)
-	rom[0x24ac6/2]	=	0x606c;		// 024AC6: 676C        beq 24b34    (ASIC12 CHECK PORT ERROR 4)
-	rom[0x24d42/2]	=	0x606c;		// 024D42: 676C        beq 24db0    (ASIC12 CHECK PORT ERROR 3)
-	rom[0x24f8a/2]	=	0x606c;		// 024F8A: 676C        beq 24ff8    (ASIC12 CHECK PORT ERROR 2)
-	rom[0x254b6/2]	=	0x6000;		// 0254B6: 6700 E5FC   beq 23ab4    (ASIC12 CHECK PORT ERROR 1)
-	rom[0x2a23a/2]	=	0x606c;		// 02A23A: 676C        beq 2a2a8    (ASIC11 CHECK PORT ERROR 2)
-
-}
-
-static DRIVER_INIT( drgnwrldv11h )
-{
-	drgnwrld_type1_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
-
-	// PROTECTION CHECKS
-	// the protection checks are already pathed out like we do!
-}
-
-static DRIVER_INIT( drgnwrldv21j )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	drgnwrld_type3_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x033d2/2]	=	0x606c;		// 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
-	rom[0x11c74/2]	=	0x606c;		// 011C74: 676C        beq 11ce2    (CHECK PORT ERROR 1)
-	rom[0x23d2a/2]	=	0x606c;		// 023D2A: 676C        beq 23d98
-	rom[0x23f68/2]	=	0x606c;		// 023F68: 676C        beq 23fd6
-	rom[0x240d4/2]	=	0x606c;		// 0240D4: 676C        beq 24142    (CHECK PORT ERROR 3)
-	rom[0x242ac/2]	=	0x606c;		// 0242AC: 676C        beq 2431a
-	rom[0x244b2/2]	=	0x606c;		// 0244B2: 676C        beq 24520
-	rom[0x24630/2]	=	0x606c;		// 024630: 676C        beq 2469e
-	rom[0x24886/2]	=	0x606c;		// 024886: 676C        beq 248f4
-	rom[0x24aca/2]	=	0x606c;		// 024ACA: 676C        beq 24b38
-	rom[0x24d46/2]	=	0x606c;		// 024D46: 676C        beq 24db4
-	rom[0x24f8e/2]	=	0x606c;		// 024F8E: 676C        beq 24ffc
-	rom[0x254ba/2]	=	0x6000;		// 0254BA: 6700 E620   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
-	rom[0x26a52/2]	=	0x606c;		// 026A52: 676C        beq 26ac0    (ASIC12 CHECK PORT ERROR 1)
-	rom[0x276aa/2]	=	0x606c;		// 0276AA: 676C        beq 27718    (CHECK PORT ERROR 3)
-	rom[0x2a870/2]	=	0x606c;		// 02A870: 676C        beq 2a8de    (ASIC11 CHECK PORT ERROR 2)
-}
-
-static DRIVER_INIT( drgnwrldv20j )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	drgnwrld_type3_decrypt(machine);
-	drgnwrld_gfx_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x033d2/2]	=	0x606c;		// 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
-	rom[0x11c74/2]	=	0x606c;		// 011C74: 676C        beq 11ce2    (CHECK PORT ERROR 1)
-	rom[0x23d2a/2]	=	0x606c;		// 023D2A: 676C        beq 23d98
-	rom[0x23f68/2]	=	0x606c;		// 023F68: 676C        beq 23fd6
-	rom[0x240d4/2]	=	0x606c;		// 0240D4: 676C        beq 24142    (CHECK PORT ERROR 3)
-	rom[0x242ac/2]	=	0x606c;		// 0242AC: 676C        beq 2431a
-	rom[0x244b2/2]	=	0x606c;		// 0244B2: 676C        beq 24520
-	rom[0x24630/2]	=	0x606c;		// 024630: 676C        beq 2469e
-	rom[0x24886/2]	=	0x606c;		// 024886: 676C        beq 248f4
-	rom[0x24aca/2]	=	0x606c;		// 024ACA: 676C        beq 24b38
-	rom[0x24d46/2]	=	0x606c;		// 024D46: 676C        beq 24db4
-	rom[0x24f8e/2]	=	0x606c;		// 024F8E: 676C        beq 24ffc
-	rom[0x254ba/2]	=	0x6000;		// 0254BA: 6700 E620   beq 23adc    (ASIC12 CHECK PORT ERROR 1)
-	rom[0x26a52/2]	=	0x606c;		// 026A52: 676C        beq 26ac0    (ASIC12 CHECK PORT ERROR 1)
-	// different from drgnwrldv21j:
-	rom[0x276a0/2]	=	0x606c;		// 0276A0: 676C        beq 2770e    (CHECK PORT ERROR 3)
-	rom[0x2a86e/2]	=	0x606c;		// 02A86E: 676C        beq 2a8dc    (ASIC11 CHECK PORT ERROR 2)
-}
-
-static DRIVER_INIT( wlcc )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	wlcc_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x16b96/2]	=	0x6000;		// 016B96: 6700 02FE    beq 16e96  (fills palette with red otherwise)
-	rom[0x16e5e/2]	=	0x6036;		// 016E5E: 6736         beq 16e96  (fills palette with green otherwise)
-	rom[0x17852/2]	=	0x6000;		// 017852: 6700 01F2    beq 17a46  (fills palette with green otherwise)
-	rom[0x17a0e/2]	=	0x6036;		// 017A0E: 6736         beq 17a46  (fills palette with red otherwise)
-	rom[0x23636/2]	=	0x6036;		// 023636: 6736         beq 2366e  (fills palette with red otherwise)
-	rom[0x2b1e6/2]	=	0x6000;		// 02B1E6: 6700 0218    beq 2b400  (fills palette with green otherwise)
-	rom[0x2f9f2/2]	=	0x6000;		// 02F9F2: 6700 04CA    beq 2febe  (fills palette with green otherwise)
-	rom[0x2fb2e/2]	=	0x6000;		// 02FB2E: 6700 038E    beq 2febe  (fills palette with red otherwise)
-	rom[0x2fcf2/2]	=	0x6000;		// 02FCF2: 6700 01CA    beq 2febe  (fills palette with red otherwise)
-	rom[0x2fe86/2]	=	0x6036;		// 02FE86: 6736         beq 2febe  (fills palette with red otherwise)
-	rom[0x3016e/2]	=	0x6000;		// 03016E: 6700 03F6    beq 30566  (fills palette with green otherwise)
-	rom[0x303c8/2]	=	0x6000;		// 0303C8: 6700 019C    beq 30566  (fills palette with green otherwise)
-	rom[0x3052e/2]	=	0x6036;		// 03052E: 6736         beq 30566  (fills palette with green otherwise)
-}
-
-static DRIVER_INIT( lhb )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	lhb_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x2eef6/2]	=	0x4e75;		// 02EEF6: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
-}
-
-static DRIVER_INIT( lhba )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	lhb_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x2e988/2]	=	0x4e75;		// 02E988: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
-}
-
-static DRIVER_INIT( vbowl )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-	UINT8  *gfx = (UINT8 *)  memory_region(machine, "blitter");
-	int i;
-
-	vbowlj_decrypt(machine);
-
-	for (i = 0x400000-1; i >= 0; i--)
-	{
-		gfx[i * 2 + 1] = (gfx[i] & 0xf0) >> 4;
-		gfx[i * 2 + 0] = (gfx[i] & 0x0f) >> 0;
-	}
-
-	// Patch the bad dump so that it doesn't reboot at the end of a game (the patched value is from vbowlj)
-	rom[0x080e0/2] = 0xe549;	// 0080E0: 0449 dc.w $0449; ILLEGAL
-
-	// PROTECTION CHECKS
-	rom[0x3764/2] = 0x4e75;	// 003764: 4E56 0000 link    A6, #$0
-}
-
-static DRIVER_INIT( vbowlj )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-	UINT8  *gfx = (UINT8 *)  memory_region(machine, "blitter");
-	int i;
-
-	vbowlj_decrypt(machine);
-
-	for (i = 0x400000-1; i >= 0; i--)
-	{
-		gfx[i * 2 + 1] = (gfx[i] & 0xf0) >> 4;
-		gfx[i * 2 + 0] = (gfx[i] & 0x0f) >> 0;
-	}
-
-	// PROTECTION CHECKS
-	rom[0x37b4/2] = 0x4e75;	// 0037B4: 4E56 0000 link    A6, #$0
-}
-
-static DRIVER_INIT( xymg )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	lhb_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x00502/2]	=	0x6006;		// 000502: 6050         bra 554
-	rom[0x0fc1c/2]	=	0x6036;		// 00FC1C: 6736         beq fc54  (fills palette with red otherwise)
-	rom[0x1232a/2]	=	0x6036;		// 01232A: 6736         beq 12362 (fills palette with red otherwise)
-	rom[0x18244/2]	=	0x6036;		// 018244: 6736         beq 1827c (fills palette with red otherwise)
-	rom[0x1e15e/2]	=	0x6036;		// 01E15E: 6736         beq 1e196 (fills palette with red otherwise)
-	rom[0x22286/2]	=	0x6000;		// 022286: 6700 02D2    beq 2255a (fills palette with green otherwise)
-	rom[0x298ce/2]	=	0x6036;		// 0298CE: 6736         beq 29906 (fills palette with red otherwise)
-	rom[0x2e07c/2]	=	0x6036;		// 02E07C: 6736         beq 2e0b4 (fills palette with red otherwise)
-	rom[0x38f1c/2]	=	0x6000;		// 038F1C: 6700 071C    beq 3963a (ASIC11 ERROR 1)
-	rom[0x390e8/2]	=	0x6000;		// 0390E8: 6700 0550    beq 3963a (ASIC11 ERROR 2)
-	rom[0x3933a/2]	=	0x6000;		// 03933A: 6700 02FE    beq 3963a (ASIC11 ERROR 3)
-	rom[0x3955c/2]	=	0x6000;		// 03955C: 6700 00DC    beq 3963a (ASIC11 ERROR 4)
-	rom[0x397f4/2]	=	0x6000;		// 0397F4: 6700 02C0    beq 39ab6 (fills palette with green otherwise)
-	rom[0x39976/2]	=	0x6000;		// 039976: 6700 013E    beq 39ab6 (fills palette with green otherwise)
-	rom[0x39a7e/2]	=	0x6036;		// 039A7E: 6736         beq 39ab6 (fills palette with green otherwise)
-	rom[0x4342c/2]	=	0x4e75;		// 04342C: 4E56 0000    link A6, #$0
-	rom[0x49966/2]	=	0x6036;		// 049966: 6736         beq 4999e (fills palette with blue otherwise)
-	rom[0x58140/2]	=	0x6036;		// 058140: 6736         beq 58178 (fills palette with red otherwise)
-	rom[0x5e05a/2]	=	0x6036;		// 05E05A: 6736         beq 5e092 (fills palette with red otherwise)
-	rom[0x5ebf0/2]	=	0x6000;		// 05EBF0: 6700 0208    beq 5edfa (fills palette with red otherwise)
-	rom[0x5edc2/2]	=	0x6036;		// 05EDC2: 6736         beq 5edfa (fills palette with green otherwise)
-	rom[0x5f71c/2]	=	0x6000;		// 05F71C: 6700 01F2    beq 5f910 (fills palette with green otherwise)
-	rom[0x5f8d8/2]	=	0x6036;		// 05F8D8: 6736         beq 5f910 (fills palette with red otherwise)
-	rom[0x64836/2]	=	0x6036;		// 064836: 6736         beq 6486e (fills palette with red otherwise)
-}
-
-static DRIVER_INIT( dbc )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	dbc_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x04c42/2]	=	0x602e;		// 004C42: 6604         bne 4c48  (rom test error otherwise)
-	rom[0x08694/2]	=	0x6008;		// 008694: 6408         bcc 869e  (fills screen with characters otherwise)
-	rom[0x0a05e/2]	=	0x4e71;		// 00A05E: 6408         bcc a068  (fills screen with characters otherwise)
-	rom[0x0bec2/2]	=	0x6008;		// 00BEC2: 6408         bcc becc  (fills screen with characters otherwise)
-	rom[0x0c0d4/2]	=	0x600a;		// 00C0D4: 640A         bcc c0e0  (wrong game state otherwise)
-	rom[0x0c0f0/2]	=	0x4e71;		// 00C0F0: 6408         bcc c0fa  (wrong palette otherwise)
-	rom[0x0e292/2]	=	0x6008;		// 00E292: 6408         bcc e29c  (fills screen with characters otherwise)
-	rom[0x11b42/2]	=	0x6008;		// 011B42: 6408         bcc 11b4c (wrong game state otherwise)
-	rom[0x11b5c/2]	=	0x4e71;		// 011B5C: 6408         bcc 11b66 (wrong palette otherwise)
-	rom[0x170ae/2]	=	0x4e71;		// 0170AE: 6408         bcc 170b8 (fills screen with characters otherwise)
-	rom[0x1842a/2]	=	0x6024;		// 01842A: 6724         beq 18450 (ASIC11 ERROR otherwise)
-	rom[0x18538/2]	=	0x6008;		// 018538: 6408         bcc 18542 (wrong game state otherwise)
-	rom[0x18552/2]	=	0x4e71;		// 018552: 6408         bcc 1855c (wrong palette otherwise)
-	rom[0x18c0e/2]	=	0x6006;		// 018C0E: 6406         bcc 18c16 (fills screen with characters otherwise)
-	rom[0x1923e/2]	=	0x4e71;		// 01923E: 6408         bcc 19248 (fills screen with characters otherwise)
-
-	// Fix for the palette fade on title screen
-//  rom[0x19E90/2]  =   0x00ff;
-}
-
-static DRIVER_INIT( ryukobou )
-{
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-
-	ryukobou_decrypt(machine);
-
-	// PROTECTION CHECKS
-	rom[0x2df68/2]	=	0x4e75;		// 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
-}
 
 
 /***************************************************************************
@@ -3004,7 +3608,7 @@ static DRIVER_INIT( ryukobou )
 
 /***************************************************************************
 
-Dragon World (World, V0400)
+Dragon World (World, V040O)
 (C) 1997 IGS / ALTA
 
 Chips:
@@ -3042,15 +3646,23 @@ ROM_END
 
 /***************************************************************************
 
-Dragon World (World, V0300)
+Dragon World (World, V030O)
 (C) 1995 IGS
 
 Chips:
-  1x MC68HC000P10 (main)
-  1x CUSTOM IGS011
+  1x MC68HC000P10           U2 (main)
+  1x CUSTOM IGS011          U24
+  1x oscillator 22.000MHz   U25
+  1x oscillator 3.579545MHz X1
 
 ROMs:
-  1x MX27C4096 (main)
+  1x MX27C4096              U3 (main)
+
+Notes:
+  1x JAMMA edge connector
+  1x trimmer (volume)
+  3x 8 switches dips
+  PCB serial number is: 0105-1
 
 ***************************************************************************/
 
@@ -3065,6 +3677,40 @@ ROM_START( drgnwrldv30 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
 
+/***************************************************************************
+
+Dragon World (World, V021O)
+(C) 1995 IGS
+
+Chips:
+    1x MC68HC000P10             u2      16/32-bit Microprocessor - main
+    1x AR17961-AP0642           u41     4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+    1x 6564L                    u40     FM Operator Type-L II (OPL II) - sound
+    1x LS138S                   u42     sound
+    1x LM7805CV                 u38     sound
+    1x UPC1242H                 u46     sound
+    1x IGS003                   u10     Programmable Peripheral Interface
+    1x oscillator   22.0000MHz  u25
+    1x oscillator   3.579545MHz x1
+
+ROMs:
+    1x  M27C4096                u3      (main) dumped
+    1x  custom IGSD0301         u39     not dumped yet
+    x   NEC D27C2001D           u43     (sound) dumped
+
+RAMs:
+    2x  UM6264                  u4,u5
+    2x  CXK5863AP               u31,u32
+
+PLDs:
+    1x  custom IGS011 (FPGA?)   u24     not dumped
+    1x  custom IGS012 (FPGA?)   u1      not dumped
+    2x  PAL16L8A                u17,u18 read protected
+    2x  ATF22V10B               u15,u45 read protected
+    1x  ATV750                  u16     read protected
+
+***************************************************************************/
+
 ROM_START( drgnwrldv21 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "china-dr-v-0210.u3", 0x00000, 0x80000, CRC(60c2b018) SHA1(58563e3ccb51bd9d8362aa17c23743bb5a593c3b) )
@@ -3074,60 +3720,6 @@ ROM_START( drgnwrldv21 )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "china-dr-sp.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
-ROM_END
-
-/***************************************************************************
-
-Zhong Guo Long (China, V0303)
-(C) 1995 IGS
-
-Chips:
-  CPU 1x MC68HC000P10 (main)
-  1x AR17961-AP0642 (equivalent to OKI M6295)(sound)
-  1x 6564L (equivalent to YM3812)(sound)
-  1x LS138S (sound)
-  1x LM7805CV (sound)
-  1x UPC1242H (sound)
-  1x custom IGS003 (marked on PCB as 8255)
-  1x oscillator 22.0000MHz (main)
-  1x oscillator 3.579545MHz (sound)
-  1x custom IGS011 (FPGA?)
-
-ROMs:
-  1x maskrom 256x16 IGSD0303 (u3)(main)
-  1x maskrom 2Mx16 UM23V32000 (IGSD0301)(u39)(gfx)
-  1x empty socket for 27C040 (u44)
-  1x maskrom NEC D27C2001D (IGSS0302)(u43)(sound)
-  2x PAL16L8ACN (u17,u18)(read protected)
-  2x PALATF22V10B (u15,u45)
-  1x empty space for additional PALATV750 (u16)
-
-Notes:
-  1x JAMMA edge connector
-  1x trimmer (volume)
-  3x 8x2 switches DIP
-
-The PCB is perfectly working, empty spaces and empty sockets are clearly intended to be empty.
-25/07/2007 f205v Corrado Tomaselli Gnoppi
-
-***************************************************************************/
-
-ROM_START( drgnwrldv10c )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "igs-d0303.u3", 0x00000, 0x80000, CRC(3b3c29bb) SHA1(77b7e58104314303985c283cce3aec40bd7b9334) )
-
-	ROM_REGION( 0x400000, "blitter", 0 )
-	//ROM_LOAD( "igs-0301.u39", 0x000000, 0x400000, CRC(655ab941) SHA1(4bbefb27e8971446998508969661042c5111bc72) ) // bad dump
-	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
-
-	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
-
-	ROM_REGION( 0x40000, "user1", 0 )
-	ROM_LOAD( "ccdu15.u15", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
-	//ROM_LOAD( "ccdu17.u17.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	//ROM_LOAD( "ccdu18.u18.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "ccdu45.u45", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
 ROM_END
 
 /***************************************************************************
@@ -3191,6 +3783,60 @@ ROM_START( drgnwrldv11h )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+ROM_END
+
+/***************************************************************************
+
+Zhong Guo Long (China, V010C)
+(C) 1995 IGS
+
+Chips:
+  CPU 1x MC68HC000P10 (main)
+  1x AR17961-AP0642 (equivalent to OKI M6295)(sound)
+  1x 6564L (equivalent to YM3812)(sound)
+  1x LS138S (sound)
+  1x LM7805CV (sound)
+  1x UPC1242H (sound)
+  1x custom IGS003 (marked on PCB as 8255)
+  1x oscillator 22.0000MHz (main)
+  1x oscillator 3.579545MHz (sound)
+  1x custom IGS011 (FPGA?)
+
+ROMs:
+  1x maskrom 256x16 IGSD0303 (u3)(main)
+  1x maskrom 2Mx16 UM23V32000 (IGSD0301)(u39)(gfx)
+  1x empty socket for 27C040 (u44)
+  1x maskrom NEC D27C2001D (IGSS0302)(u43)(sound)
+  2x PAL16L8ACN (u17,u18)(read protected)
+  2x PALATF22V10B (u15,u45)
+  1x empty space for additional PALATV750 (u16)
+
+Notes:
+  1x JAMMA edge connector
+  1x trimmer (volume)
+  3x 8x2 switches DIP
+
+The PCB is perfectly working, empty spaces and empty sockets are clearly intended to be empty.
+25/07/2007 f205v Corrado Tomaselli Gnoppi
+
+***************************************************************************/
+
+ROM_START( drgnwrldv10c )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "igs-d0303.u3", 0x00000, 0x80000, CRC(3b3c29bb) SHA1(77b7e58104314303985c283cce3aec40bd7b9334) )
+
+	ROM_REGION( 0x400000, "blitter", 0 )
+	//ROM_LOAD( "igs-0301.u39", 0x000000, 0x400000, CRC(655ab941) SHA1(4bbefb27e8971446998508969661042c5111bc72) ) // bad dump
+	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+
+	ROM_REGION( 0x40000, "plds", 0 )
+	ROM_LOAD( "ccdu15.u15", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
+	//ROM_LOAD( "ccdu17.u17.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	//ROM_LOAD( "ccdu18.u18.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "ccdu45.u45", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
 ROM_END
 
 /***************************************************************************
@@ -3296,7 +3942,7 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( lhba )
+ROM_START( lhbv33c )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "maj_v-033c.u30", 0x00000, 0x80000, CRC(02a0b716) SHA1(cd0ee32ea69f66768196b0e9b4df0fae3af84ed3) )
 
@@ -3534,7 +4180,7 @@ ASIC chip used
 
 SMD - custom chip IGS 011      F5XD  174
 SMD - custom --near sound section - unknown -- i.d. rubbed off
-SMD - custom  -- near inputs and 68000  IGS 012    9441EK001
+SMD - custom  -- near inputs and 68000  IGS012    9441EK001
 
 XTL near sound 33.868mhz
 XTL near 68000  22.0000mhz
@@ -3614,21 +4260,20 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, lhb,          0,        lhb,      lhb,       lhb,          ROT0, "IGS",        "Long Hu Bang (China, V035C)",          0 )
-GAME( 1995, lhba,         lhb,      lhb,      lhb,       lhba,         ROT0, "IGS",        "Long Hu Bang (China, V033C)",          0 )
-GAME( 1995, dbc,          lhb,      lhb,      lhb,       dbc,          ROT0, "IGS",        "Da Ban Cheng (Hong Kong, V027H)",      0 )
-GAME( 1995, ryukobou,     lhb,      lhb,      lhb,       ryukobou,     ROT0, "IGS / Alta", "Mahjong Ryukobou (Japan, V030J)",      0 )
-GAME( 1996, lhb2,         0,        lhb2,     lhb2,      lhb2,         ROT0, "IGS",        "Long Hu Bang II (Hong Kong, V185H)",   0 )
-GAME( 1996, xymg,         0,        xymg,     xymg,      xymg,         ROT0, "IGS",        "Xing Yun Man Guan (China, V651C)",     0 )
-GAME( 1996, wlcc,         xymg,     wlcc,     wlcc,      wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    0 )
-GAME( 1996, vbowl,        0,        vbowl,    vbowl,     vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,       vbowl,    vbowl,    vbowlj,    vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     lhb2,     lhb2,     lhb2,      nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP",                GAME_NOT_WORKING )
-
-GAME( 1997, drgnwrld,     0,        drgnwrld, drgnwrld,  drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          0 )
-GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld, drgnwrld,  drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          0 )
-GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld, drgnwrld,  drgnwrldv21,  ROT0, "IGS",        "Dragon World (World, V021O)",          0 )
-GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld, drgnwrldj, drgnwrldv21j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V021J)",        0 )
-GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld, drgnwrldj, drgnwrldv20j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        0 )
-GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld, drgnwrldc, drgnwrldv10c, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        0 )
-GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld, drgnwrldc, drgnwrldv11h, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", 0 )
+GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          0 )
+GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          0 )
+GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  drgnwrldv21,  ROT0, "IGS",        "Dragon World (World, V021O)",          0 )
+GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, drgnwrldv21j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V021J)",        0 )
+GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, drgnwrldv20j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        0 )
+GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, drgnwrldv10c, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        0 )
+GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, drgnwrldv11h, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", 0 )
+GAME( 1995, lhb,          0,        lhb,             lhb,       lhb,          ROT0, "IGS",        "Long Hu Bang (China, V035C)",          0 )
+GAME( 1995, lhbv33c,      lhb,      lhb,             lhb,       lhbv33c,      ROT0, "IGS",        "Long Hu Bang (China, V033C)",          0 )
+GAME( 1995, dbc,          lhb,      lhb,             lhb,       dbc,          ROT0, "IGS",        "Da Ban Cheng (Hong Kong, V027H)",      0 )
+GAME( 1995, ryukobou,     lhb,      lhb,             lhb,       ryukobou,     ROT0, "IGS / Alta", "Mahjong Ryukobou (Japan, V030J)",      0 )
+GAME( 1996, lhb2,         0,        lhb2,            lhb2,      lhb2,         ROT0, "IGS",        "Long Hu Bang II (Hong Kong, V185H)",   0 )
+GAME( 1996, xymg,         0,        xymg,            xymg,      xymg,         ROT0, "IGS",        "Xing Yun Man Guan (China, V651C)",     0 )
+GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    0 )
+GAME( 1996, vbowl,        0,        vbowl,           vbowl,     vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
+GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
+GAME( 1998, nkishusp,     lhb2,     lhb2,            lhb2,      nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP",                GAME_NOT_WORKING )

@@ -8395,7 +8395,7 @@ Other Sun games
 
 	/* IGS011 Games */
 	DRIVER( lhb )		/* (c) 1995 */
-	DRIVER( lhba )		/* (c) 1995 */
+	DRIVER( lhbv33c )	/* (c) 1995 */
 	DRIVER( ryukobou )	/* (c) 1995 */
 	DRIVER( dbc )		/* (c) 199? */
 	DRIVER( lhb2 )		/* (c) 1996 */
