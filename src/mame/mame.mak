@@ -1671,6 +1671,8 @@ $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 $(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 						$(LAYOUT)/sigmapkr.lh \
 
+$(DRIVERS)/aristmk4.o:	$(LAYOUT)/aristmk4.lh \
+
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
 						$(LAYOUT)/tenpindx.lh
 
