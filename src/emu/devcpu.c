@@ -317,10 +317,7 @@ void legacy_cpu_device::device_start()
 				int colon = tempstr.chr(0, ':');
 				int length = tempstr.len() - colon - 1;
 
-				while (colon>0 && isspace(tempstr[colon-1]))
-					colon--;
-
-				tempstr.substr(0, colon);
+				tempstr.substr(0, colon).trimspace();
 
 				astring formatstr;
 				formatstr.printf("%%%ds", length);
