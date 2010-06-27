@@ -29,6 +29,13 @@ static UINT8 gs_a, gs_d, gs_e;
 static UINT8 tigerhb_cmd;
 
 
+static UINT8 from_main, from_mcu;
+static int mcu_sent = 0, main_sent = 0;
+static UINT8 portA_in, portA_out, ddrA;
+static UINT8 portB_in, portB_out, ddrB;
+static UINT8 portC_in, portC_out, ddrC;
+
+
 /* Perform basic machine initialisation */
 MACHINE_RESET( slapfight )
 {
@@ -106,6 +113,111 @@ READ8_HANDLER( slapfight_port_00_r )
 	return slapfight_status;
 }
 
+READ8_HANDLER( slapfight_68705_portA_r )
+{
+	return (portA_out & ddrA) | (portA_in & ~ddrA);
+}
+
+WRITE8_HANDLER( slapfight_68705_portA_w )
+{
+	portA_out = data;
+}
+
+WRITE8_HANDLER( slapfight_68705_ddrA_w )
+{
+	ddrA = data;
+}
+
+READ8_HANDLER( slapfight_68705_portB_r )
+{
+	return (portB_out & ddrB) | (portB_in & ~ddrB);
+}
+
+WRITE8_HANDLER( slapfight_68705_portB_w )
+{
+	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
+	{
+		portA_in = from_main;
+
+		if (main_sent)
+			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+
+		main_sent = 0;
+	}
+	if ((ddrB & 0x04) && (data & 0x04) && (~portB_out & 0x04))
+	{
+		from_mcu = portA_out;
+		mcu_sent = 1;
+	}
+	if ((ddrB & 0x08) && (~data & 0x08) && (portB_out & 0x08))
+	{
+		*slapfight_scrollx_lo = portA_out;
+	}
+	if ((ddrB & 0x10) && (~data & 0x10) && (portB_out & 0x10))
+	{
+		*slapfight_scrollx_hi = portA_out;
+	}
+
+	portB_out = data;
+}
+
+WRITE8_HANDLER( slapfight_68705_ddrB_w )
+{
+	ddrB = data;
+}
+
+READ8_HANDLER( slapfight_68705_portC_r )
+{
+	portC_in = 0;
+
+	if (main_sent)
+		portC_in |= 0x01;
+	if (!mcu_sent)
+		portC_in |= 0x02;
+
+	return (portC_out & ddrC) | (portC_in & ~ddrC);
+}
+
+WRITE8_HANDLER( slapfight_68705_portC_w )
+{
+	portC_out = data;
+}
+
+WRITE8_HANDLER( slapfight_68705_ddrC_w )
+{
+	ddrC = data;
+}
+
+WRITE8_HANDLER( slapfight_mcu_w )
+{
+	from_main = data;
+	main_sent = 1;
+	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
+}
+
+READ8_HANDLER( slapfight_mcu_r )
+{
+	mcu_sent = 0;
+	return from_mcu;
+}
+
+READ8_HANDLER( slapfight_mcu_status_r )
+{
+	int res = 0;
+
+	if (!main_sent)
+		res |= 0x02;
+	if (!mcu_sent)
+		res |= 0x04;
+
+	return res;
+}
+
+/***************************************************************************
+
+    Get Star MCU simulation
+
+***************************************************************************/
 
 READ8_HANDLER( getstar_e803_r )
 {
@@ -686,13 +798,11 @@ WRITE8_HANDLER( getstar_port_04_w )
 #endif
 
 
-/* Tiger Heli MCU */
+/***************************************************************************
 
-static UINT8 from_main,from_mcu;
-static int mcu_sent = 0,main_sent = 0;
-static UINT8 portA_in,portA_out,ddrA;
-static UINT8 portB_in,portB_out,ddrB;
-static UINT8 portC_in,portC_out,ddrC;
+    Tiger Heli MCU
+
+***************************************************************************/
 
 READ8_HANDLER( tigerh_68705_portA_r )
 {

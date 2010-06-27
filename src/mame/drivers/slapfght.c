@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( slapfght_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE(&slapfight_scrollx_lo)
 	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE(&slapfight_scrollx_hi)
 	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE(&slapfight_scrolly)
-//  AM_RANGE(0xe803, 0xe803) AM_READ(mcu_r) // MCU lives here
+//  AM_RANGE(0xe803, 0xe803) AM_READWRITE(slapfight_mcu_r, slapfight_mcu_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE(&slapfight_fixvideoram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE(&slapfight_fixcolorram)
 ADDRESS_MAP_END
@@ -462,7 +462,6 @@ static ADDRESS_MAP_START( slapbtuk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE(&slapfight_scrollx_hi)
 	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE(&slapfight_scrolly)
 	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_BASE(&slapfight_scrollx_lo)
-//  AM_RANGE(0xe803, 0xe803) AM_READ(getstar_e803_r)
 	AM_RANGE(0xec00, 0xefff) AM_ROM // it reads a copy of the logo from here!
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE(&slapfight_fixvideoram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE(&slapfight_fixcolorram)
@@ -470,7 +469,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfght_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x00, 0x00) AM_WRITE(slapfight_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
 //  AM_RANGE(0x04, 0x04) AM_WRITE(getstar_port_04_w)
@@ -481,9 +480,21 @@ static ADDRESS_MAP_START( slapfght_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( slapfight_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(slapfight_68705_portA_r, slapfight_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(slapfight_68705_portB_r, slapfight_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(slapfight_68705_portC_r, slapfight_68705_portC_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(slapfight_68705_ddrA_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(slapfight_68705_ddrB_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(slapfight_68705_ddrC_w)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
+ADDRESS_MAP_END
+
 static READ8_HANDLER(tigerh_status_r)
 {
-	return (slapfight_port_00_r(space,0)&0xf9)| ((tigerh_mcu_status_r(space,0)));
+	return (slapfight_port_00_r(space, 0) & 0xf9)| ((tigerh_mcu_status_r(space, 0)));
 }
 
 static ADDRESS_MAP_START( tigerh_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1025,6 +1036,9 @@ static MACHINE_DRIVER_START( slapfigh )
 	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt, 3)
 
+	MDRV_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
+	MDRV_CPU_PROGRAM_MAP(slapfight_m68705_map)
+
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MDRV_MACHINE_RESET(slapfight)
@@ -1059,13 +1073,24 @@ static MACHINE_DRIVER_START( slapfigh )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( slapfgtb )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(slapfigh)
+
+	MDRV_DEVICE_REMOVE("mcu")
+MACHINE_DRIVER_END
+
 /* identical to slapfigh_ but the scroll registers are located elsewhere in memory */
 static MACHINE_DRIVER_START( slapbtuk )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(slapfigh)
+
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(slapbtuk_map)
+
+	MDRV_DEVICE_REMOVE("mcu")
 MACHINE_DRIVER_END
 
 
@@ -1394,8 +1419,8 @@ ROM_START( slapfigh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sf_r05.bin",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "68705.bin",    0x0000,  0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_LOAD( "a77_13.bin",    0x0000,  0x0800, CRC(a70c81d9) SHA1(f155ffd25a946b0459216a8f80ded16e6e2f9258) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "sf_r11.bin",   0x00000, 0x2000, CRC(2ac7b943) SHA1(d0c3560bb1f0c2647aeff807cb4b09450237b955) )  /* Chars */
@@ -1429,8 +1454,8 @@ ROM_START( slapfigha )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a76-03.bin",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "68705.bin",    0x0000,  0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "a76_14.bin",    0x0000,  0x0800, NO_DUMP )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "a76-05.bin",   0x00000, 0x2000, CRC(be9a1bc5) SHA1(2fabfd42cd49db67654eac824c9852ed368a6e50) )  /* Chars */
@@ -1462,8 +1487,8 @@ ROM_START( alcon )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sf_r05.bin",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "68705.bin",    0x0000,  0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "a77_13.bin",    0x0000,  0x0800, CRC(a70c81d9) SHA1(f155ffd25a946b0459216a8f80ded16e6e2f9258) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "04",           0x00000, 0x2000, CRC(31003483) SHA1(7014ceb6313ac5a3d2dcb735643dfd8bfabaa185) )  /* Chars */
@@ -1590,8 +1615,8 @@ ROM_START( getstar )
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Region 3 - sound cpu code */
 	ROM_LOAD( "a68-03",       0x0000,  0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "68705.bin",    0x0000,  0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_LOAD( "a68_14",    0x0000,  0x0800, NO_DUMP )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )	/* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_05-1",     0x00000, 0x2000, CRC(06f60107) SHA1(c5dcf0c7a5863ea960ee747d2d7ec7ac8bb7d3af) )  /* Chars */
@@ -1624,7 +1649,7 @@ ROM_START( getstarj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Region 3 - sound cpu code */
 	ROM_LOAD( "a68-03",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
 	ROM_LOAD( "68705.bin",    0x0000,  0x0800, NO_DUMP )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )	/* Region 1 - temporary for gfx */
@@ -1784,7 +1809,8 @@ static READ8_HANDLER( gtstarb1_port_0_read )
 
 static void getstar_init( running_machine *machine )
 {
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_e803_r, getstar_e803_w  );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_e803_r, getstar_e803_w );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, slapfight_port_00_r );
 }
 
 static DRIVER_INIT( getstar )
@@ -1821,54 +1847,48 @@ static DRIVER_INIT( gtstarb2 )
 	getstar_init(machine);
 }
 
-
-static int slapfigh_prot_pos;
-
-static READ8_HANDLER( slapfigh_mcu_r )
-{
-	/* pass initial checks */
-	static const int protvalues[] = { 0xc7, 0x55, -1 };
-
-	if ((cpu_get_pc(space->cpu)==0x1369) || // slapfigh
-		(cpu_get_pc(space->cpu)==0x136d)) // slapfiga
-	{
-		int retdat = protvalues[slapfigh_prot_pos];
-		if (retdat == -1)
-		{
-			slapfigh_prot_pos = 0;
-			retdat = protvalues[slapfigh_prot_pos];
-		}
-
-		slapfigh_prot_pos++;
-		return retdat;
-	}
-	logerror("MCU Read PC=%04x\n",cpu_get_pc(space->cpu));
-	return 0;
-}
-
 static DRIVER_INIT( slapfigh )
 {
-	slapfigh_prot_pos = 0;
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, slapfigh_mcu_r );
-//  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, slapfight_mcu_r, slapfight_mcu_w );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, slapfight_mcu_status_r );
 }
 
 
-/*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR  COMPANY    FULLNAME     FLAGS ) */
+/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */
 GAME( 1985, perfrman, 0,        perfrman, perfrman, 0,        ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
 GAME( 1985, perfrmanu,perfrman, perfrman, perfrman, 0,        ROT270, "Toaplan / Data East USA",         "Performan (US)", 0 )
+
 GAME( 1985, tigerh,   0,        tigerh,   tigerh,   tigerh,   ROT270, "Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
 GAME( 1985, tigerhj,  tigerh,   tigerh,   tigerh,   tigerh,   ROT270, "Taito",   "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
 GAME( 1985, tigerhb1, tigerh,   tigerhb,  tigerh,   tigerhb,  ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb2, tigerh,	tigerhb,  tigerh,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb3, tigerh,	tigerhb,  tigerh,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfigh, 0,        slapfigh, slapfigh, slapfigh, ROT270, "Taito",   "Slap Fight (set 1)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb2, tigerh,   tigerhb,  tigerh,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb3, tigerh,   tigerhb,  tigerh,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
+
+GAME( 1986, slapfigh, 0,        slapfigh, slapfigh, slapfigh, ROT270, "Taito",   "Slap Fight (set 1)", GAME_NO_COCKTAIL )
 GAME( 1986, slapfigha,slapfigh, slapfigh, slapfigh, slapfigh, ROT270, "Taito",   "Slap Fight (set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1986, alcon,    slapfigh, slapfigh, slapfigh, slapfigh, ROT270, "Taito America Corp.", "Alcon", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1986, slapbtjp, slapfigh, slapfigh, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (Japan bootleg)", GAME_NO_COCKTAIL )
+GAME( 1986, alcon,    slapfigh, slapfigh, slapfigh, slapfigh, ROT270, "Taito America Corp.", "Alcon",  GAME_NO_COCKTAIL )
+GAME( 1986, slapbtjp, slapfigh, slapfgtb, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (Japan bootleg)", GAME_NO_COCKTAIL )
 GAME( 1986, slapbtuk, slapfigh, slapbtuk, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (English bootleg)", GAME_NO_COCKTAIL )
 GAME( 1986, slapfgtr, slapfigh, slapbtuk, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (bootleg)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
+
 GAME( 1986, getstar,  0,        slapfigh, getstar,  getstar,  ROT0,   "Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
 GAME( 1986, getstarj, getstar,  slapfigh, getstarj, getstarj, ROT0,   "Taito",   "Get Star (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, gtstarb1, getstar,  slapfigh, getstarj, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, gtstarb2, getstar,  slapfigh, gtstarb2, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1986, gtstarb1, getstar,  slapfgtb, getstarj, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, gtstarb2, getstar,  slapfgtb, gtstarb2, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -42,6 +42,19 @@ WRITE8_HANDLER( slapfight_port_07_w );
 WRITE8_HANDLER( slapfight_port_08_w );
 WRITE8_HANDLER( slapfight_port_09_w );
 
+READ8_HANDLER ( slapfight_68705_portA_r );
+WRITE8_HANDLER( slapfight_68705_portA_w );
+READ8_HANDLER ( slapfight_68705_portB_r );
+WRITE8_HANDLER( slapfight_68705_portB_w );
+READ8_HANDLER ( slapfight_68705_portC_r );
+WRITE8_HANDLER( slapfight_68705_portC_w );
+WRITE8_HANDLER( slapfight_68705_ddrA_w );
+WRITE8_HANDLER( slapfight_68705_ddrB_w );
+WRITE8_HANDLER( slapfight_68705_ddrC_w );
+WRITE8_HANDLER( slapfight_mcu_w );
+READ8_HANDLER ( slapfight_mcu_r );
+READ8_HANDLER ( slapfight_mcu_status_r );
+
 
 READ8_HANDLER( getstar_e803_r );
 WRITE8_HANDLER( getstar_e803_w );
