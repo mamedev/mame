@@ -457,7 +457,8 @@ z80dart_device::dart_channel::dart_channel()
 void z80dart_device::dart_channel::start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy)
 {
 	m_index = index;
-
+	m_device = device;
+	
 	devcb_resolve_read_line(&m_in_rxd_func, &in_rxd, m_device);
 	devcb_resolve_write_line(&m_out_txd_func, &out_txd, m_device);
 	devcb_resolve_write_line(&m_out_dtr_func, &out_dtr, m_device);
