@@ -1037,6 +1037,7 @@ const game_driver * const drivers[] =
 	DRIVER( kickridr )	/* ???? (c) 1984 */
 	DRIVER( idsoccer )	/* ???? (c) 1985 */
 	DRIVER( idsoccera )	/* ???? (c) 1985 */
+	DRIVER( asoccer )   /* 8461 (c) 1987 */
 	DRIVER( superdq )	/* ???? (c) 1984 */
 	DRIVER( superdqs )	/* ???? (c) 1984 */
 	DRIVER( superdqa )	/* ???? (c) 1984 */
