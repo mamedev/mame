@@ -26,6 +26,7 @@ public:
 	/* misc */
 	int        psg_latch;
 	int        last_write;
+	int        colbank;
 };
 
 

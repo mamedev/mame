@@ -92,7 +92,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int gfxbank = tile / 0x200;
 	int code = tile & 0x1ff;
 
-	SET_TILE_INFO(gfxbank, code, 0, 0);
+	SET_TILE_INFO(gfxbank, code, state->colbank, 0);
 }
 
 VIDEO_START( bogeyman )
