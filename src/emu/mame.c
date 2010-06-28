@@ -1420,15 +1420,15 @@ void running_machine::start()
 	// start up the devices
 	m_devicelist.start_all();
 	
-	// finish image devices init process
-	image_postdevice_init(this);
-
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
 	ui_set_startup_text(this, "Initializing...", true);
 	if (m_game.driver_init != NULL)
 		(*m_game.driver_init)(this);
+
+	// finish image devices init process
+	image_postdevice_init(this);
 
 	// start the video and audio hardware
 	video_init(this);
