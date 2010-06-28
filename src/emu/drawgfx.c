@@ -81,7 +81,7 @@ INLINE INT32 normalize_yscroll(bitmap_t *bitmap, INT32 yscroll)
 
 void gfx_init(running_machine *machine)
 {
-	const gfx_decode_entry *gfxdecodeinfo = machine->config->gfxdecodeinfo;
+	const gfx_decode_entry *gfxdecodeinfo = machine->config->m_gfxdecodeinfo;
 	int curgfx;
 
 	/* skip if nothing to do */
@@ -368,7 +368,7 @@ void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UIN
 	gfx->color_base = color_base;
 	gfx->color_depth = color_granularity;
 	gfx->color_granularity = color_granularity;
-	gfx->total_colors = (machine->config->total_colors - color_base) / color_granularity;
+	gfx->total_colors = (machine->total_colors() - color_base) / color_granularity;
 
 	gfx->pen_usage = NULL;
 

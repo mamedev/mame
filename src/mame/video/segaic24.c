@@ -39,7 +39,7 @@ static void set_color(running_machine *machine, int color, UINT8 r, UINT8 g, UIN
 		g = 0.6*g;
 		b = 0.6*b;
 	}
-	palette_set_color(machine,color+machine->config->total_colors/2, MAKE_RGB(r, g, b));
+	palette_set_color(machine,color+machine->total_colors()/2, MAKE_RGB(r, g, b));
 }
 
 // 315-5242
@@ -150,7 +150,7 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 	memset(sys24_char_ram, 0, 0x80000);
 	memset(sys24_tile_ram, 0, 0x10000);
 
-	machine->gfx[sys24_char_gfx_index] = gfx_element_alloc(machine, &sys24_char_layout, (UINT8 *)sys24_char_ram, machine->config->total_colors / 16, 0);
+	machine->gfx[sys24_char_gfx_index] = gfx_element_alloc(machine, &sys24_char_layout, (UINT8 *)sys24_char_ram, machine->total_colors() / 16, 0);
 
 	state_save_register_global_pointer(machine, sys24_tile_ram, 0x10000/2);
 	state_save_register_global_pointer(machine, sys24_char_ram, 0x80000/2);

@@ -366,7 +366,7 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
 	/* ask all the devices if they would like to register functions or symbols */
-	machine->devicelist.debug_setup_all();
+	machine->m_devicelist.debug_setup_all();
 
 	add_exit_callback(machine, debug_command_exit);
 
@@ -536,7 +536,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, dev
 	}
 
 	/* if we got a valid one, return */
-	*result = machine->devicelist.find(CPU, cpunum);
+	*result = machine->m_devicelist.find(CPU, cpunum);
 	if (*result != NULL)
 		return TRUE;
 
@@ -2499,7 +2499,7 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 		const char *filename = param[0];
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;
 
-		device_t *screen = machine->devicelist.find(SCREEN, scrnum);
+		device_t *screen = machine->m_devicelist.find(SCREEN, scrnum);
 
 		if ((screen == NULL) || !render_is_live_screen(screen))
 		{

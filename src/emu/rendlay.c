@@ -1342,7 +1342,7 @@ static int get_variable_value(const machine_config *config, const char *string, 
 	/* screen 0 parameters */
 	for (devconfig = screen_first(*config); devconfig != NULL; devconfig = screen_next(devconfig))
 	{
-		int scrnum = config->devicelist.index(SCREEN, devconfig->tag());
+		int scrnum = config->m_devicelist.index(SCREEN, devconfig->tag());
 
 		/* native X aspect factor */
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);

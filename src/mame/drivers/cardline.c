@@ -170,7 +170,7 @@ static PALETTE_INIT(cardline)
 {
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		data=color_prom[i];
 

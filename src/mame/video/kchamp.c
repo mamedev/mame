@@ -14,11 +14,11 @@ PALETTE_INIT( kchamp )
 {
 	int i, red, green, blue;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		red = color_prom[i];
-		green = color_prom[machine->config->total_colors + i];
-		blue = color_prom[2 * machine->config->total_colors + i];
+		green = color_prom[machine->total_colors() + i];
+		blue = color_prom[2 * machine->total_colors() + i];
 
 		palette_set_color_rgb(machine, i, pal4bit(red), pal4bit(green), pal4bit(blue));
 	}

@@ -253,7 +253,7 @@ WRITE16_DEVICE_HANDLER( deco16ic_buffered_palette_w )
 WRITE16_DEVICE_HANDLER( deco16ic_palette_dma_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
-	const int m = device->machine->config->total_colors;
+	const int m = device->machine->total_colors();
 	int r, g, b, i;
 
 	for (i = 0; i < m; i++)

@@ -1373,7 +1373,7 @@ void ui_mess_menu_software_list(running_machine *machine, ui_menu *menu, void *p
 		software_entry_state *entry = (software_entry_state *) event->itemref;
 
 		/* search for a device with the right interface */
-		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+		for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 		{		
 			const char *interface = image->image_config().image_interface();
 
@@ -1397,7 +1397,7 @@ void ui_mess_menu_software_list(running_machine *machine, ui_menu *menu, void *p
 /* list of available software lists - i.e. cartridges, floppies */
 static void ui_mess_menu_populate_software_list(running_machine *machine, ui_menu *menu)
 {
-	for (const device_config *dev = machine->config->devicelist.first(); dev != NULL; dev = dev->next())
+	for (const device_config *dev = machine->config->m_devicelist.first(); dev != NULL; dev = dev->next())
 	{
 		if (!strcmp(dev->tag(), __SOFTWARE_LIST_TAG))
 		{

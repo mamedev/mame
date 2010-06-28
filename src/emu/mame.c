@@ -186,7 +186,6 @@ static char giant_string_buffer[65536] = { 0 };
 
 static int parse_ini_file(core_options *options, const char *name, int priority);
 
-static void init_machine(running_machine *machine);
 static TIMER_CALLBACK( soft_reset );
 
 static void saveload_init(running_machine *machine);
@@ -248,9 +247,12 @@ int mame_execute(core_options *options)
 			options_revert(mame_options(), OPTION_PRIORITY_INI);
 			mame_parse_ini_files(mame_options(), driver);
 		}
+		
+		// create the machine configuration
+		const machine_config *config = global_alloc(machine_config(driver->machine_config));
 
 		/* create the machine structure and driver */
-		machine = global_alloc(running_machine(driver));
+		machine = global_alloc(running_machine(*driver, *config));
 		mame = machine->mame_data;
 
 		/* start in the "pre-init phase" */
@@ -277,7 +279,7 @@ int mame_execute(core_options *options)
 			}
 
 			/* then finish setting up our local machine */
-			init_machine(machine);
+			machine->start();
 
 			/* load the configuration settings and NVRAM */
 			settingsloaded = config_load_settings(machine);
@@ -354,8 +356,9 @@ int mame_execute(core_options *options)
 		}
 		exit_pending = mame->exit_pending;
 
-		/* destroy the machine */
+		/* destroy the machine and the config */
 		global_free(machine);
+		global_free(config);
 
 		/* reset the options */
 		mame_opts = NULL;
@@ -1173,14 +1176,14 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 			parse_ini_file(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI);
 
 		/* parse "vector.ini" for vector games */
-		config = machine_config_alloc(driver->machine_config);
+		config = global_alloc(machine_config(driver->machine_config));
 		for (const screen_device_config *devconfig = screen_first(*config); devconfig != NULL; devconfig = screen_next(devconfig))
 			if (devconfig->screen_type() == SCREEN_TYPE_VECTOR)
 			{
 				parse_ini_file(options, "vector", OPTION_PRIORITY_VECTOR_INI);
 				break;
 			}
-		machine_config_free(config);
+		global_free(config);
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
 		astring sourcename;
@@ -1234,12 +1237,14 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
     object and initialize it based on options
 -------------------------------------------------*/
 
-running_machine::running_machine(const game_driver *driver)
-	: devicelist(respool),
+running_machine::running_machine(const game_driver &driver, const machine_config &_config)
+	: m_devicelist(respool),
 	  scheduler(*this),
-	  config(NULL),
+	  config(&_config),
+	  m_config(_config),
 	  firstcpu(NULL),
-	  gamedrv(driver),
+	  gamedrv(&driver),
+	  m_game(driver),
 	  basename(NULL),
 	  primary_screen(NULL),
 	  palette(NULL),
@@ -1280,15 +1285,14 @@ running_machine::running_machine(const game_driver *driver)
 		mame_data = auto_alloc_clear(this, mame_private);
 
 		/* initialize the driver-related variables in the machine */
-		basename = mame_strdup(driver->name);
-		config = machine_config_alloc(driver->machine_config);
+		basename = mame_strdup(driver.name);
 
 		/* attach this machine to all the devices in the configuration */
-		devicelist.import_config_list(config->devicelist, *this);
+		m_devicelist.import_config_list(m_config.m_devicelist, *this);
 
 		/* allocate the driver data (after devices) */
-		if (config->driver_data_alloc != NULL)
-			driver_data = (*config->driver_data_alloc)(*this);
+		if (m_config.m_driver_data_alloc != NULL)
+			driver_data = (*m_config.m_driver_data_alloc)(*this);
 
 		/* find devices */
 		firstcpu = cpu_first(this);
@@ -1305,8 +1309,6 @@ running_machine::running_machine(const game_driver *driver)
 	{
 		if (driver_data != NULL)
 			auto_free(this, driver_data);
-		if (config != NULL)
-			machine_config_free((machine_config *)config);
 		if (basename != NULL)
 			osd_free(basename);
 		if (mame_data != NULL)
@@ -1323,8 +1325,6 @@ running_machine::~running_machine()
 {
 	assert(this == global_machine);
 
-	if (config != NULL)
-		machine_config_free((machine_config *)config);
 	if (basename != NULL)
 		osd_free(basename);
 
@@ -1357,108 +1357,105 @@ const char *running_machine::describe_context()
 
 
 
-/*-------------------------------------------------
-    init_machine - initialize the emulated machine
--------------------------------------------------*/
+//-------------------------------------------------
+//  start - initialize the emulated machine
+//-------------------------------------------------
 
-static void init_machine(running_machine *machine)
+void running_machine::start()
 {
-	mame_private *mame = machine->mame_data;
-	time_t newbase;
+	// initialize basic can't-fail systems here
+	fileio_init(this);
+	config_init(this);
+	input_init(this);
+	output_init(this);
+	state_init(this);
+	state_save_allow_registration(this, true);
+	palette_init(this);
+	render_init(this);
+	ui_init(this);
+	generic_machine_init(this);
+	generic_video_init(this);
+	generic_sound_init(this);
+	mame_data->rand_seed = 0x9d14abd7;
 
-	/* initialize basic can't-fail systems here */
-	fileio_init(machine);
-	config_init(machine);
-	input_init(machine);
-	output_init(machine);
-	state_init(machine);
-	state_save_allow_registration(machine, TRUE);
-	palette_init(machine);
-	render_init(machine);
-	ui_init(machine);
-	generic_machine_init(machine);
-	generic_video_init(machine);
-	generic_sound_init(machine);
-	mame->rand_seed = 0x9d14abd7;
+	// initialize the timers and allocate a soft_reset timer
+	// this must be done before cpu_init so that CPU's can allocate timers
+	timer_init(this);
+	mame_data->soft_reset_timer = timer_alloc(this, soft_reset, NULL);
 
-	/* initialize the timers and allocate a soft_reset timer */
-	/* this must be done before cpu_init so that CPU's can allocate timers */
-	timer_init(machine);
-	mame->soft_reset_timer = timer_alloc(machine, soft_reset, NULL);
+	// init the osd layer
+	osd_init(this);
 
-	/* init the osd layer */
-	osd_init(machine);
+	// initialize the base time (needed for doing record/playback)
+	time(&mame_data->base_time);
 
-	/* initialize the base time (needed for doing record/playback) */
-	time(&mame->base_time);
-
-	/* initialize the input system and input ports for the game */
-	/* this must be done before memory_init in order to allow specifying */
-	/* callbacks based on input port tags */
-	newbase = input_port_init(machine, machine->gamedrv->ipt);
+	// initialize the input system and input ports for the game
+	// this must be done before memory_init in order to allow specifying
+	// callbacks based on input port tags
+	time_t newbase = input_port_init(this, m_game.ipt);
 	if (newbase != 0)
-		mame->base_time = newbase;
+		mame_data->base_time = newbase;
 
-	/* intialize UI input */
-	ui_input_init(machine);
+	// intialize UI input
+	ui_input_init(this);
 
-	/* initialize the streams engine before the sound devices start */
-	streams_init(machine);
+	// initialize the streams engine before the sound devices start
+	streams_init(this);
 
-	/* first load ROMs, then populate memory, and finally initialize CPUs */
-	/* these operations must proceed in this order */
-	rom_init(machine);
-	memory_init(machine);
-	watchdog_init(machine);
+	// first load ROMs, then populate memory, and finally initialize CPUs
+	// these operations must proceed in this order
+	rom_init(this);
+	memory_init(this);
+	watchdog_init(this);
 
-	/* allocate the gfx elements prior to device initialization */
-	gfx_init(machine);
+	// allocate the gfx elements prior to device initialization
+	gfx_init(this);
 
-	/* initialize natural keyboard support */
-	inputx_init(machine);
+	// initialize natural keyboard support
+	inputx_init(this);
 
-	/* initialize image devices */
-	image_init(machine);
+	// initialize image devices
+	image_init(this);
 
-	/* start up the devices */
-	machine->devicelist.start_all();
+	// start up the devices
+	m_devicelist.start_all();
 	
-	/* finish image devices init process*/
-	image_postdevice_init(machine);
+	// finish image devices init process
+	image_postdevice_init(this);
 
-	/* call the game driver's init function */
-	/* this is where decryption is done and memory maps are altered */
-	/* so this location in the init order is important */
-	ui_set_startup_text(machine, "Initializing...", TRUE);
-	if (machine->gamedrv->driver_init != NULL)
-		(*machine->gamedrv->driver_init)(machine);
+	// call the game driver's init function
+	// this is where decryption is done and memory maps are altered
+	// so this location in the init order is important
+	ui_set_startup_text(this, "Initializing...", true);
+	if (m_game.driver_init != NULL)
+		(*m_game.driver_init)(this);
 
-	/* start the video and audio hardware */
-	video_init(machine);
-	tilemap_init(machine);
-	crosshair_init(machine);
+	// start the video and audio hardware
+	video_init(this);
+	tilemap_init(this);
+	crosshair_init(this);
 
-	sound_init(machine);
+	sound_init(this);
 
-	/* initialize the debugger */
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debugger_init(machine);
+	// initialize the debugger
+	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debugger_init(this);
 
-	/* call the driver's _START callbacks */
-	if (machine->config->machine_start != NULL)
-		(*machine->config->machine_start)(machine);
-	if (machine->config->sound_start != NULL)
-		(*machine->config->sound_start)(machine);
-	if (machine->config->video_start != NULL)
-		(*machine->config->video_start)(machine);
+	// call the driver's _START callbacks
+	if (m_config.m_machine_start != NULL)
+		(*m_config.m_machine_start)(this);
+	if (m_config.m_sound_start != NULL)
+		(*m_config.m_sound_start)(this);
+	if (m_config.m_video_start != NULL)
+		(*m_config.m_video_start)(this);
 
-	/* initialize miscellaneous systems */
-	saveload_init(machine);
+	// initialize miscellaneous systems
+	saveload_init(this);
 	if (options_get_bool(mame_options(), OPTION_CHEAT))
-		cheat_init(machine);
+		cheat_init(this);
 
-	/* disallow save state registrations starting here */
-	state_save_allow_registration(machine, FALSE);
+	// disallow save state registrations starting here
+	state_save_allow_registration(this, false);
 }
 
 
@@ -1482,12 +1479,12 @@ static TIMER_CALLBACK( soft_reset )
 		(*cb->func.reset)(machine);
 
 	/* run the driver's reset callbacks */
-	if (machine->config->machine_reset != NULL)
-		(*machine->config->machine_reset)(machine);
-	if (machine->config->sound_reset != NULL)
-		(*machine->config->sound_reset)(machine);
-	if (machine->config->video_reset != NULL)
-		(*machine->config->video_reset)(machine);
+	if (machine->config->m_machine_reset != NULL)
+		(*machine->config->m_machine_reset)(machine);
+	if (machine->config->m_sound_reset != NULL)
+		(*machine->config->m_sound_reset)(machine);
+	if (machine->config->m_video_reset != NULL)
+		(*machine->config->m_video_reset)(machine);
 
 	/* now we're running */
 	mame->current_phase = MAME_PHASE_RUNNING;

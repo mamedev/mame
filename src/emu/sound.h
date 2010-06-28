@@ -25,8 +25,8 @@
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define speaker_output_count(config)		(config)->devicelist.count(SPEAKER)
-#define speaker_output_first(config)		(config)->devicelist.first(SPEAKER)
+#define speaker_output_count(config)		(config)->m_devicelist.count(SPEAKER)
+#define speaker_output_first(config)		(config)->m_devicelist.first(SPEAKER)
 #define speaker_output_next(previous)		(previous)->typenext()
 
 
@@ -187,7 +187,7 @@ void sound_set_output_gain(device_t *device, int output, float gain);
 
 inline int speaker_count(const machine_config &config)
 {
-	return config.devicelist.count(SPEAKER);
+	return config.m_devicelist.count(SPEAKER);
 }
 
 
@@ -198,7 +198,7 @@ inline int speaker_count(const machine_config &config)
 
 inline const speaker_device_config *speaker_first(const machine_config &config)
 {
-	return downcast<speaker_device_config *>(config.devicelist.first(SPEAKER));
+	return downcast<speaker_device_config *>(config.m_devicelist.first(SPEAKER));
 }
 
 
@@ -220,7 +220,7 @@ inline const speaker_device_config *speaker_next(const speaker_device_config *pr
 
 inline int speaker_count(running_machine &machine)
 {
-	return machine.devicelist.count(SPEAKER);
+	return machine.m_devicelist.count(SPEAKER);
 }
 
 
@@ -231,7 +231,7 @@ inline int speaker_count(running_machine &machine)
 
 inline speaker_device *speaker_first(running_machine &machine)
 {
-	return downcast<speaker_device *>(machine.devicelist.first(SPEAKER));
+	return downcast<speaker_device *>(machine.m_devicelist.first(SPEAKER));
 }
 
 

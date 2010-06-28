@@ -112,7 +112,7 @@ void legacy_image_device_config_base::device_config_complete()
 		}
 	}
 
-	for (bool gotone = device_config_interface::m_machine_config.devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = device_config::m_machine_config.m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		if (this == image)
 			index = count;

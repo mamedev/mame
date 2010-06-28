@@ -1691,7 +1691,7 @@ static void memory_init_spaces(running_machine *machine)
 
 	/* loop over devices */
 	device_memory_interface *memory = NULL;
-	for (bool gotone = machine->devicelist.first(memory); gotone; gotone = memory->next(memory))
+	for (bool gotone = machine->m_devicelist.first(memory); gotone; gotone = memory->next(memory))
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			const address_space_config *spaceconfig = memory->space_config(spacenum);

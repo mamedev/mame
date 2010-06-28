@@ -893,7 +893,7 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 	const char *entry_basename;
 
 	/* cycle through all devices for this system */
-	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		/* get the image type/id */
 		snprintf(buffer, ARRAY_LENGTH(buffer),

@@ -12,7 +12,7 @@ PALETTE_INIT( truco )
 {
 	int i;
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		int	r = ( i & 0x8 ) ? 0xff : 0x00;
 		int g = ( i & 0x4 ) ? 0xff : 0x00;

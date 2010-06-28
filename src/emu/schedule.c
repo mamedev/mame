@@ -373,22 +373,22 @@ void device_scheduler::rebuild_execute_list()
 	if (!m_quantum_set)
 	{
 		// set the core scheduling quantum
-		attotime min_quantum = m_machine.config->minimum_quantum;
+		attotime min_quantum = m_machine.config->m_minimum_quantum;
 
 		// if none specified default to 60Hz
 		if (attotime_compare(min_quantum, attotime_zero) == 0)
 			min_quantum = ATTOTIME_IN_HZ(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
-		if (m_machine.config->perfect_cpu_quantum != NULL)
+		if (m_machine.config->m_perfect_cpu_quantum != NULL)
 		{
-			device_t *device = m_machine.device(m_machine.config->perfect_cpu_quantum);
+			device_t *device = m_machine.device(m_machine.config->m_perfect_cpu_quantum);
 			if (device == NULL)
-				fatalerror("Device '%s' specified for perfect interleave is not present!", m_machine.config->perfect_cpu_quantum);
+				fatalerror("Device '%s' specified for perfect interleave is not present!", m_machine.config->m_perfect_cpu_quantum);
 
 			device_execute_interface *exec;
 			if (!device->interface(exec))
-				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", m_machine.config->perfect_cpu_quantum);
+				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", m_machine.config->m_perfect_cpu_quantum);
 
 			attotime cpu_quantum = attotime_make(0, exec->minimum_quantum());
 			min_quantum = attotime_min(cpu_quantum, min_quantum);
@@ -411,7 +411,7 @@ if (TEMPLOG) printf("Setting quantum: %08X%08X\n", (UINT32)(min_quantum.attoseco
 
 	// iterate over all devices
 	device_execute_interface *exec = NULL;
-	for (bool gotone = m_machine.devicelist.first(exec); gotone; gotone = exec->next(exec))
+	for (bool gotone = m_machine.m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
 		// append to the appropriate list
 		exec->m_nextexec = NULL;

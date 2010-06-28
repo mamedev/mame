@@ -29,7 +29,7 @@ PALETTE_INIT( zaxxon )
 			2,	&resistances[1], bweights, 470, 0);
 
 	/* initialize the palette with these colors */
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;

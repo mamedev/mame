@@ -155,7 +155,7 @@ UINT32 ui_gfx_ui_handler(running_machine *machine, render_container *container, 
 	ui_gfx_state *state = &ui_gfx;
 
 	/* if we have nothing, implicitly cancel */
-	if (machine->config->total_colors == 0 && machine->colortable == NULL && machine->gfx[0] == NULL && tilemap_count(machine) == 0)
+	if (machine->total_colors() == 0 && machine->colortable == NULL && machine->gfx[0] == NULL && tilemap_count(machine) == 0)
 		goto cancel;
 
 	/* if we're not paused, mark the bitmap dirty */
@@ -168,7 +168,7 @@ again:
 	{
 		case 0:
 			/* if we have a palette, display it */
-			if (machine->config->total_colors > 0)
+			if (machine->total_colors() > 0)
 			{
 				palette_handler(machine, container, state);
 				break;
@@ -235,7 +235,7 @@ cancel:
 
 static void palette_handler(running_machine *machine, render_container *container, ui_gfx_state *state)
 {
-	int total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->config->total_colors;
+	int total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->total_colors();
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
 	const rgb_t *raw_color = palette_entry_list_raw(machine->palette);
 	render_font *ui_font = ui_get_font();
@@ -383,7 +383,7 @@ static void palette_handle_keys(running_machine *machine, ui_gfx_state *state)
 		state->palette.which = (int)(machine->colortable != NULL);
 
 	/* cache some info in locals */
-	total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->config->total_colors;
+	total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->total_colors();
 
 	/* determine number of entries per row and total */
 	rowcount = state->palette.count;
@@ -769,7 +769,7 @@ static void gfxset_draw_item(running_machine *machine, const gfx_element *gfx, i
 	};
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height : gfx->width;
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width : gfx->height;
-	const rgb_t *palette = (machine->config->total_colors != 0) ? palette_entry_list_raw(machine->palette) : NULL;
+	const rgb_t *palette = (machine->total_colors() != 0) ? palette_entry_list_raw(machine->palette) : NULL;
 	UINT32 rowpixels = bitmap->rowpixels;
 	UINT32 palette_mask = ~0;
 	int x, y;

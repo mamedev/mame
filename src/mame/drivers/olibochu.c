@@ -85,7 +85,7 @@ static PALETTE_INIT( olibochu )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		UINT8 pen;
 		int bit0, bit1, bit2, r, g, b;

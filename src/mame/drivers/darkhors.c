@@ -661,7 +661,7 @@ static VIDEO_START(jclub2)
 	assert(jclub2_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, (UINT8 *)jclub2_tileram, machine->config->total_colors / 16, 0);
+	machine->gfx[jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, (UINT8 *)jclub2_tileram, machine->total_colors() / 16, 0);
 
 
 }

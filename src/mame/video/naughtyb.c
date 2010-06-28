@@ -98,7 +98,7 @@ PALETTE_INIT( naughtyb )
 			2, resistances, weights, 0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine->config->total_colors; i++)
+	for (i = 0;i < machine->total_colors(); i++)
 	{
 		int bit0, bit1;
 		int r, g, b;

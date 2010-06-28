@@ -14,11 +14,11 @@ PALETTE_INIT( srmp2 )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + machine->config->total_colors];
+		col = (color_prom[i] << 8) + color_prom[i + machine->total_colors()];
 		palette_set_color_rgb(machine,i ^ 0x0f,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
@@ -28,11 +28,11 @@ PALETTE_INIT( srmp3 )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + machine->config->total_colors];
+		col = (color_prom[i] << 8) + color_prom[i + machine->total_colors()];
 		palette_set_color_rgb(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
@@ -285,7 +285,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine->config->gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->config->m_gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];

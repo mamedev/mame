@@ -418,7 +418,7 @@ static bool validate_driver(int drivnum, const machine_config *config, game_driv
 
 	/* make sure sound-less drivers are flagged */
 	const device_config_sound_interface *sound;
-	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && !config->devicelist.first(sound) && (driver->flags & GAME_NO_SOUND) == 0 && (driver->flags & GAME_NO_SOUND_HW) == 0)
+	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && !config->m_devicelist.first(sound) && (driver->flags & GAME_NO_SOUND) == 0 && (driver->flags & GAME_NO_SOUND_HW) == 0)
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver->source_file, driver->name);
 		error = true;
@@ -602,7 +602,7 @@ static bool validate_display(int drivnum, const machine_config *config)
 			palette_modes = true;
 
 	/* check for empty palette */
-	if (palette_modes && config->total_colors == 0)
+	if (palette_modes && config->m_total_colors == 0)
 	{
 		mame_printf_error("%s: %s has zero palette entries\n", driver->source_file, driver->name);
 		error = true;
@@ -624,16 +624,16 @@ static bool validate_gfx(int drivnum, const machine_config *config, region_array
 	int gfxnum;
 
 	/* bail if no gfx */
-	if (!config->gfxdecodeinfo)
+	if (!config->m_gfxdecodeinfo)
 		return false;
 
 	/* iterate over graphics decoding entries */
-	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && config->gfxdecodeinfo[gfxnum].gfxlayout != NULL; gfxnum++)
+	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && config->m_gfxdecodeinfo[gfxnum].gfxlayout != NULL; gfxnum++)
 	{
-		const gfx_decode_entry *gfx = &config->gfxdecodeinfo[gfxnum];
+		const gfx_decode_entry *gfx = &config->m_gfxdecodeinfo[gfxnum];
 		const char *region = gfx->memory_region;
-		int xscale = (config->gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : config->gfxdecodeinfo[gfxnum].xscale;
-		int yscale = (config->gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : config->gfxdecodeinfo[gfxnum].yscale;
+		int xscale = (config->m_gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : config->m_gfxdecodeinfo[gfxnum].xscale;
+		int yscale = (config->m_gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : config->m_gfxdecodeinfo[gfxnum].yscale;
 		const gfx_layout *gl = gfx->gfxlayout;
 		int israw = (gl->planeoffset[0] == GFX_RAW);
 		int planes = gl->planes;
@@ -1094,14 +1094,14 @@ static bool validate_devices(int drivnum, const machine_config *config, const io
 	bool error = false;
 	const game_driver *driver = drivers[drivnum];
 
-	for (const device_config *devconfig = config->devicelist.first(); devconfig != NULL; devconfig = devconfig->next())
+	for (const device_config *devconfig = config->m_devicelist.first(); devconfig != NULL; devconfig = devconfig->next())
 	{
 		/* validate the device tag */
 		if (!validate_tag(driver, devconfig->name(), devconfig->tag()))
 			error = true;
 
 		/* look for duplicates */
-		for (const device_config *scanconfig = config->devicelist.first(); scanconfig != devconfig; scanconfig = scanconfig->next())
+		for (const device_config *scanconfig = config->m_devicelist.first(); scanconfig != devconfig; scanconfig = scanconfig->next())
 			if (strcmp(scanconfig->tag(), devconfig->tag()) == 0)
 			{
 				mame_printf_warning("%s: %s has multiple devices with the tag '%s'\n", driver->source_file, driver->name, devconfig->tag());
@@ -1197,7 +1197,7 @@ bool mame_validitychecks(const game_driver *curdriver)
 
 		/* expand the machine driver */
 		expansion -= get_profile_ticks();
-		config = machine_config_alloc(driver->machine_config);
+		config = global_alloc(machine_config(driver->machine_config));
 		expansion += get_profile_ticks();
 
 		/* validate the driver entry */
@@ -1230,7 +1230,7 @@ bool mame_validitychecks(const game_driver *curdriver)
 		error = validate_devices(drivnum, config, portlist, &rgninfo) || error;
 		device_checks += get_profile_ticks();
 
-		machine_config_free(config);
+		global_free(config);
 	}
 
 #if (REPORT_TIMES)

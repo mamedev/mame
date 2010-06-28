@@ -4537,7 +4537,7 @@ static DEVICE_START( voodoo )
 	}
 
 	/* set the type, and initialize the chip mask */
-	v->index = device->machine->devicelist.index(device->type(), device->tag());
+	v->index = device->machine->m_devicelist.index(device->type(), device->tag());
 	v->screen = downcast<screen_device *>(device->machine->device(config->screen));
 	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
 	v->cpu = device->machine->device(config->cputag);

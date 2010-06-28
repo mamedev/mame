@@ -12,7 +12,7 @@ PALETTE_INIT( carjmbre )
 {
 	int i, bit0, bit1, bit2, r, g, b;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;

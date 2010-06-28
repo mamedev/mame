@@ -337,7 +337,7 @@ VIDEO_UPDATE( dday )
 				UINT16 src_pixel = *BITMAP_ADDR16(state->main_bitmap, y, x);
 
 				if (*BITMAP_ADDR16(sl_bitmap, y, x) == 0xff)
-					src_pixel += screen->machine->config->total_colors;
+					src_pixel += screen->machine->total_colors();
 
 				*BITMAP_ADDR16(bitmap, y, x) = src_pixel;
 			}

@@ -133,7 +133,7 @@ static PALETTE_INIT( shougi )
 			3,	resistances_rg,	weights_g,	1000, 0,
 			2,	resistances_b,	weights_b,	1000, 0);
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

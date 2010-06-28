@@ -42,7 +42,7 @@ static PALETTE_INIT( tugboat )
 	int i;
 
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		int r,g,b,brt;
 

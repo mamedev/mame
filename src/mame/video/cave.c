@@ -80,9 +80,9 @@ PALETTE_INIT( cave )
 	int pen;
 
 	/* create a 1:1 palette map covering everything */
-	state->palette_map = auto_alloc_array(machine, UINT16, machine->config->total_colors);
+	state->palette_map = auto_alloc_array(machine, UINT16, machine->total_colors());
 
-	for (pen = 0; pen < machine->config->total_colors; pen++)
+	for (pen = 0; pen < machine->total_colors(); pen++)
 		state->palette_map[pen] = pen % maxpen;
 }
 
@@ -191,7 +191,7 @@ static void set_pens( running_machine *machine )
 	cave_state *state = (cave_state *)machine->driver_data;
 	int pen;
 
-	for (pen = 0; pen < machine->config->total_colors; pen++)
+	for (pen = 0; pen < machine->total_colors(); pen++)
 	{
 		UINT16 data = state->paletteram[state->palette_map[pen]];
 
@@ -468,8 +468,8 @@ static void cave_vh_start( running_machine *machine, int num )
 	state->row_effect_offs_n = -1;
 	state->row_effect_offs_f = 1;
 
-	state->background_color = machine->config->gfxdecodeinfo[0].color_codes_start +
-					(machine->config->gfxdecodeinfo[0].total_color_codes - 1) *
+	state->background_color = machine->config->m_gfxdecodeinfo[0].color_codes_start +
+					(machine->config->m_gfxdecodeinfo[0].total_color_codes - 1) *
 						machine->gfx[0]->color_granularity;
 
 	switch (state->kludge)

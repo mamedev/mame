@@ -244,7 +244,7 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
 			break;
 
 		case 0x04:
-			if (space->machine->config->total_colors >= 256 * 8)
+			if (space->machine->total_colors() >= 256 * 8)
 				update_palette_bank(space->machine, (state->gfx_palettebank & ~4) | (val << 2));
 			break;
 

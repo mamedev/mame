@@ -64,7 +64,7 @@ public:
 static PALETTE_INIT( zerotrgt )
 {
 	int i;
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 

@@ -275,7 +275,7 @@ static void zdrawgfxzoom(
 	{
 		if( gfx )
 		{
-			int shadow_offset = (gfx->machine->config->video_attributes&VIDEO_HAS_SHADOWS)?gfx->machine->config->total_colors:0;
+			int shadow_offset = (gfx->machine->config->m_video_attributes&VIDEO_HAS_SHADOWS)?gfx->machine->total_colors():0;
 			const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;

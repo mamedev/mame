@@ -45,10 +45,10 @@ VIDEO_START( pang )
 	state->objram = auto_alloc_array_clear(machine, UINT8, state->videoram_size);
 
 	/* Palette RAM */
-	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 2 * machine->config->total_colors);
+	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 2 * machine->total_colors());
 
 	state_save_register_global_pointer(machine, state->objram, state->videoram_size);
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 2 * machine->config->total_colors);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 2 * machine->total_colors());
 }
 
 

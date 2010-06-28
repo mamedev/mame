@@ -179,10 +179,10 @@ enum
 //**************************************************************************
 
 // device iteration helpers
-#define cpu_count(config)				(config)->devicelist.count(CPU)
-#define cpu_first(config)				(config)->devicelist.first(CPU)
+#define cpu_count(config)				(config)->m_devicelist.count(CPU)
+#define cpu_first(config)				(config)->m_devicelist.first(CPU)
 #define cpu_next(previous)				(previous)->typenext()
-#define cpu_get_index(cpu)				(cpu)->machine->devicelist.index(CPU, (cpu)->tag())
+#define cpu_get_index(cpu)				(cpu)->machine->m_devicelist.index(CPU, (cpu)->tag())
 
 
 // CPU interface functions

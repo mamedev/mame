@@ -125,7 +125,7 @@ int sdlvideo_init(running_machine *machine)
 	if (sdlwindow_init(machine))
 		goto error;
 
-	tc = machine->config->total_colors;
+	tc = machine->total_colors();
 
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)

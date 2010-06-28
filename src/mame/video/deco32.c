@@ -245,7 +245,7 @@ WRITE32_HANDLER( deco32_buffered_palette_w )
 
 WRITE32_HANDLER( deco32_palette_dma_w )
 {
-	const int m=space->machine->config->total_colors;
+	const int m=space->machine->total_colors();
 	int r,g,b,i;
 
 	for (i=0; i<m; i++) {

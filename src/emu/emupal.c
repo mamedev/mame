@@ -120,7 +120,7 @@ void palette_init(running_machine *machine)
 
 		case BITMAP_FORMAT_INVALID:
 			/* invalid format means no palette - or at least it should */
-			assert(machine->config->total_colors == 0);
+			assert(machine->total_colors() == 0);
 			return;
 
 		default:
@@ -129,7 +129,7 @@ void palette_init(running_machine *machine)
 	}
 
 	/* allocate all the data structures */
-	if (machine->config->total_colors > 0)
+	if (machine->total_colors() > 0)
 	{
 		int numcolors;
 
@@ -327,7 +327,7 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 
 	/* fill in the basics */
 	ctable->machine = machine;
-	ctable->entries = machine->config->total_colors;
+	ctable->entries = machine->total_colors();
 	ctable->palentries = palettesize;
 
 	/* allocate the raw colortable */
@@ -583,14 +583,14 @@ static void allocate_palette(running_machine *machine, palette_private *palette)
 
 	/* determine the number of groups we need */
 	numgroups = 1;
-	if (machine->config->video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config->m_video_attributes & VIDEO_HAS_SHADOWS)
 		palette->shadow_group = numgroups++;
-	if (machine->config->video_attributes & VIDEO_HAS_HIGHLIGHTS)
+	if (machine->config->m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
 		palette->hilight_group = numgroups++;
-	assert_always(machine->config->total_colors * numgroups <= 65536, "Error: palette has more than 65536 colors.");
+	assert_always(machine->total_colors() * numgroups <= 65536, "Error: palette has more than 65536 colors.");
 
 	/* allocate a palette object containing all the colors and groups */
-	machine->palette = palette_alloc(machine->config->total_colors, numgroups);
+	machine->palette = palette_alloc(machine->total_colors(), numgroups);
 	assert_always(machine->palette != NULL, "Failed to allocate system palette");
 
 	/* configure the groups */
@@ -600,7 +600,7 @@ static void allocate_palette(running_machine *machine, palette_private *palette)
 		palette_group_set_contrast(machine->palette, palette->hilight_group, (float)PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
 
 	/* set the initial colors to a standard rainbow */
-	for (index = 0; index < machine->config->total_colors; index++)
+	for (index = 0; index < machine->total_colors(); index++)
 		palette_entry_set_color(machine->palette, index, MAKE_RGB(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
 
 	/* switch off the color mode */
@@ -680,7 +680,7 @@ static void allocate_color_tables(running_machine *machine, palette_private *pal
 static void allocate_shadow_tables(running_machine *machine, palette_private *palette)
 {
 	/* if we have shadows, allocate shadow tables */
-	if (machine->config->video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config->m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
 		pen_t *table = auto_alloc_array(machine, pen_t, 65536);
 		int i;
@@ -690,7 +690,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 		{
 			palette->shadow_table[0].base = palette->shadow_table[2].base = table;
 			for (i = 0; i < 65536; i++)
-				table[i] = (i < machine->config->total_colors) ? (i + machine->config->total_colors) : i;
+				table[i] = (i < machine->total_colors()) ? (i + machine->total_colors()) : i;
 		}
 
 		/* RGB mode gets two 32k tables in slots 0 and 2 */
@@ -703,7 +703,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 	}
 
 	/* if we have hilights, allocate shadow tables */
-	if (machine->config->video_attributes & VIDEO_HAS_HIGHLIGHTS)
+	if (machine->config->m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
 	{
 		pen_t *table = auto_alloc_array(machine, pen_t, 65536);
 		int i;
@@ -713,7 +713,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 		{
 			palette->shadow_table[1].base = palette->shadow_table[3].base = table;
 			for (i = 0; i < 65536; i++)
-				table[i] = (i < machine->config->total_colors) ? (i + 2 * machine->config->total_colors) : i;
+				table[i] = (i < machine->total_colors()) ? (i + 2 * machine->total_colors()) : i;
 		}
 
 		/* RGB mode gets two 32k tables in slots 1 and 3 */

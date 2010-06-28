@@ -91,7 +91,7 @@ static PALETTE_INIT( wallc )
 			2,	resistances_rg,	weights_g,	330,	0,
 			3,	resistances_b,	weights_b,	330,	655+220);
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		int bit0,bit1,bit7,r,g,b;
 

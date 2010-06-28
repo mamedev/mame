@@ -187,7 +187,7 @@ void device_list::reset_all()
 
 void device_list::static_reset(running_machine *machine)
 {
-	machine->devicelist.reset_all();
+	machine->m_devicelist.reset_all();
 }
 
 
@@ -197,7 +197,7 @@ void device_list::static_reset(running_machine *machine)
 
 void device_list::static_exit(running_machine *machine)
 {
-	machine->devicelist.reset();
+	machine->m_devicelist.reset();
 }
 
 
@@ -310,7 +310,8 @@ device_config::device_config(const machine_config &mconfig, device_type type, co
 	  m_machine_config(mconfig),
 	  m_static_config(NULL),
 	  m_name(name),
-	  m_tag(tag)
+	  m_tag(tag),
+	  m_config_complete(false)
 {
 	memset(m_inline_data, 0, sizeof(m_inline_data));
 
@@ -683,7 +684,7 @@ device_t::device_t(running_machine &_machine, const device_config &config)
 	: machine(&_machine),
 	  m_machine(_machine),
 	  m_next(NULL),
-	  m_owner((config.m_owner != NULL) ? _machine.devicelist.find(config.m_owner->tag()) : NULL),
+	  m_owner((config.m_owner != NULL) ? _machine.m_devicelist.find(config.m_owner->tag()) : NULL),
 	  m_interface_list(NULL),
 	  m_started(false),
 	  m_clock(config.m_clock),

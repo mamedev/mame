@@ -1216,7 +1216,7 @@ static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UIN
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine->config->total_colors >> bpp, 0);
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine->total_colors() >> bpp, 0);
 }
 
 
@@ -2535,7 +2535,7 @@ void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int
 		fatalerror("Unknown plane_order");
 	}
 
-	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	K051960_dx = K051960_dy = 0;
@@ -3035,7 +3035,7 @@ void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_
 		fatalerror("Unsupported plane_order");
 	}
 
-	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 
@@ -3809,12 +3809,12 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	{
 	if (machine->primary_screen->format() == BITMAP_FORMAT_RGB32)
 	{
-		if ((machine->config->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+		if ((machine->config->m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 			popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 	}
 	else
 	{
-		if (!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
+		if (!(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
 			popmessage("driver should use VIDEO_HAS_SHADOWS");
 	}
 	}
@@ -3946,7 +3946,7 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		fatalerror("Unsupported layout");
 	}
 
-	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	K053247_dx = dx;
@@ -4245,9 +4245,9 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 
         VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
     */
-	if (machine->config->video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config->m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp == 32 && (machine->config->video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap->bpp == 32 && (machine->config->m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -8412,7 +8412,7 @@ void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 	linedata_offs += line_start * linedata_adv;		// pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = machine->pens + (colorbase << 4) % machine->config->total_colors;
+	pal_base = machine->pens + (colorbase << 4) % machine->total_colors();
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos<=line_end; linedata_offs+=linedata_adv, line_pos++)

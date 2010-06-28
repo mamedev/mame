@@ -1125,7 +1125,7 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
 		return;
 
 	/* iterate over disc devices */
-	for (device = machine->devicelist.first(LASERDISC); device != NULL; device = device->typenext())
+	for (device = machine->m_devicelist.first(LASERDISC); device != NULL; device = device->typenext())
 	{
 		laserdisc_config *origconfig = (laserdisc_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 		laserdisc_state *ld = get_safe_token(device);
@@ -1215,7 +1215,7 @@ void laserdisc_overlay_enable(running_device *device, int enable)
 
 VIDEO_UPDATE( laserdisc )
 {
-	running_device *laserdisc = screen->machine->devicelist.first(LASERDISC);
+	running_device *laserdisc = screen->machine->m_devicelist.first(LASERDISC);
 	if (laserdisc != NULL)
 	{
 		const rectangle &visarea = screen->visible_area();

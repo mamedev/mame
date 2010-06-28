@@ -37,7 +37,7 @@ PALETTE_INIT( btime )
 	/* This function is also used by Eggs. */
 	if (color_prom == 0) return;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -82,7 +82,7 @@ PALETTE_INIT( lnc )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 

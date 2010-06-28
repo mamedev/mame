@@ -30,7 +30,7 @@ PALETTE_INIT( sprtmtch )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
 		/* The bits are in reverse order! */

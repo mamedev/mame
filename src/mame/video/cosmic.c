@@ -166,7 +166,7 @@ PALETTE_INIT( cosmicg )
 	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int r = (i > 8) ? 0xff : 0xaa * ((i >> 0) & 1);
 		int g = 0xaa * ((i >> 1) & 1);

@@ -1014,10 +1014,10 @@ static VIDEO_START( mpu4_vid )
 	assert(mpu4_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[mpu4_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)mpu4_vid_vidram, machine->config->total_colors / 16, 0);
-	machine->gfx[mpu4_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)mpu4_vid_vidram, machine->config->total_colors / 16, 0);
-	machine->gfx[mpu4_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)mpu4_vid_vidram, machine->config->total_colors / 16, 0);
-	machine->gfx[mpu4_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)mpu4_vid_vidram, machine->config->total_colors / 16, 0);
+	machine->gfx[mpu4_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)mpu4_vid_vidram, machine->total_colors() / 16, 0);
+	machine->gfx[mpu4_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)mpu4_vid_vidram, machine->total_colors() / 16, 0);
+	machine->gfx[mpu4_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)mpu4_vid_vidram, machine->total_colors() / 16, 0);
+	machine->gfx[mpu4_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)mpu4_vid_vidram, machine->total_colors() / 16, 0);
 
 	scn2675_IR_pointer = 0;
 }

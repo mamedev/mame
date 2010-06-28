@@ -287,8 +287,8 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 				}
 
 				// make sure all devices exist
-				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && m_machine_config.devicelist.find(entry->read.tag) == NULL) ||
-					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && m_machine_config.devicelist.find(entry->write.tag) == NULL))
+				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && m_machine_config.m_devicelist.find(entry->read.tag) == NULL) ||
+					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && m_machine_config.m_devicelist.find(entry->write.tag) == NULL))
 				{
 					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->write.tag);
 					error = true;

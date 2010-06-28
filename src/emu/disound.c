@@ -120,7 +120,7 @@ bool device_config_sound_interface::interface_validity_check(const game_driver &
 	for (const sound_route *route = m_route_list; route != NULL; route = route->m_next)
 	{
 		// find a device with the requested tag
-		const device_config *target = m_machine_config.devicelist.find(route->m_target);
+		const device_config *target = m_machine_config.m_devicelist.find(route->m_target);
 		if (target == NULL)
 		{
 			mame_printf_error("%s: %s attempting to route sound to non-existant device '%s'\n", driver.source_file, driver.name, route->m_target);

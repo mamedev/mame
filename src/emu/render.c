@@ -964,7 +964,7 @@ int render_is_live_screen(device_t *screen)
 	assert(screen->machine != NULL);
 	assert(screen->machine->config != NULL);
 
-	screen_index = screen->machine->devicelist.index(SCREEN, screen->tag());
+	screen_index = screen->machine->m_devicelist.index(SCREEN, screen->tag());
 
 	assert(screen_index != -1);
 
@@ -1467,8 +1467,8 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 		for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
 			if (item->element == NULL)
 			{
-				const screen_device_config *scrconfig = downcast<const screen_device_config *>(target->machine->config->devicelist.find(SCREEN, item->index));
-				screen_device *screendev = downcast<screen_device *>(target->machine->devicelist.find(scrconfig->tag()));
+				const screen_device_config *scrconfig = downcast<const screen_device_config *>(target->machine->config->m_devicelist.find(SCREEN, item->index));
+				screen_device *screendev = downcast<screen_device *>(target->machine->m_devicelist.find(scrconfig->tag()));
 				const rectangle vectorvis = { 0, 639, 0, 479 };
 				const rectangle *visarea = NULL;
 				render_container *container = get_screen_container_by_index(item->index);
@@ -1831,9 +1831,9 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
-	if (config->default_layout != NULL)
+	if (config->m_default_layout != NULL)
 	{
-		*nextfile = layout_file_load(config, NULL, config->default_layout);
+		*nextfile = layout_file_load(config, NULL, config->m_default_layout);
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}

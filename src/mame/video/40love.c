@@ -14,7 +14,7 @@ PALETTE_INIT( fortyl )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -26,17 +26,17 @@ PALETTE_INIT( fortyl )
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* green component */
-		bit0 = (color_prom[machine->config->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->config->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->config->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->config->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[machine->total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine->total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine->total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine->total_colors()] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* blue component */
-		bit0 = (color_prom[2*machine->config->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->config->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->config->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->config->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[2*machine->total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine->total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine->total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine->total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine, i, MAKE_RGB(r,g,b));

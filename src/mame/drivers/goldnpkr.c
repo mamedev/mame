@@ -690,7 +690,7 @@ static PALETTE_INIT( goldnpkr )
 	/* 0000IBGR */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
 
@@ -741,7 +741,7 @@ static PALETTE_INIT( witchcrd )
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 

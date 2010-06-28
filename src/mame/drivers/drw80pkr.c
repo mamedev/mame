@@ -334,7 +334,7 @@ static PALETTE_INIT( drw80pkr )
 {
 	int j;
 
-	for (j = 0; j < machine->config->total_colors; j++)
+	for (j = 0; j < machine->total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i;
 

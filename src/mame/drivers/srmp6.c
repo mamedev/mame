@@ -149,7 +149,7 @@ static VIDEO_START(srmp6)
 	state->sprram_old = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = gfx_element_alloc(machine, &tiles8x8_layout, (UINT8*)state->tileram, machine->config->total_colors / 256, 0);
+	machine->gfx[0] = gfx_element_alloc(machine, &tiles8x8_layout, (UINT8*)state->tileram, machine->total_colors() / 256, 0);
 	machine->gfx[0]->color_granularity=256;
 
 	state->brightness = 0x60;

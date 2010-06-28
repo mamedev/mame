@@ -2390,7 +2390,7 @@ static device_t *expression_get_device(running_machine *machine, const char *tag
 {
 	device_t *device;
 
-	for (device = machine->devicelist.first(); device != NULL; device = device->next())
+	for (device = machine->m_devicelist.first(); device != NULL; device = device->next())
 		if (mame_stricmp(device->tag(), tag) == 0)
 			return device;
 

@@ -432,7 +432,7 @@ static DEVICE_START( riot6532 )
 	/* set static values */
 	riot->device = device;
 	riot->intf = (riot6532_interface *)device->baseconfig().static_config();
-	riot->index = device->machine->devicelist.index(RIOT6532, device->tag());
+	riot->index = device->machine->m_devicelist.index(RIOT6532, device->tag());
 
 	/* configure the ports */
 	devcb_resolve_read8(&riot->port[0].in_func, &riot->intf->in_a_func, device);

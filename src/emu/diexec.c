@@ -217,7 +217,7 @@ bool device_config_execute_interface::interface_validity_check(const game_driver
 			mame_printf_error("%s: %s device '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver.source_file, driver.name, devconfig->tag());
 			error = true;
 		}
-		else if (m_vblank_interrupt_screen != NULL && m_machine_config.devicelist.find(m_vblank_interrupt_screen) == NULL)
+		else if (m_vblank_interrupt_screen != NULL && m_machine_config.m_devicelist.find(m_vblank_interrupt_screen) == NULL)
 		{
 			mame_printf_error("%s: %s device '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver.source_file, driver.name, devconfig->tag(), m_vblank_interrupt_screen);
 			error = true;
@@ -536,7 +536,7 @@ void device_execute_interface::execute_set_input(int linenum, int state)
 void device_execute_interface::interface_pre_start()
 {
 	// fill in the initial states
-	int index = m_machine.devicelist.index(&m_device);
+	int index = m_machine.m_devicelist.index(&m_device);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = index + PROFILER_DEVICE_FIRST;
 	m_inttrigger = index + TRIGGER_INT;
@@ -699,7 +699,7 @@ void device_execute_interface::static_on_vblank(screen_device &screen, void *par
 	if (vblank_state)
 	{
 		device_execute_interface *exec = NULL;
-		for (bool gotone = screen.machine->devicelist.first(exec); gotone; gotone = exec->next(exec))
+		for (bool gotone = screen.machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 			exec->on_vblank_start(screen);
 	}
 }

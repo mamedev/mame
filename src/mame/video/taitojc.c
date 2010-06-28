@@ -194,7 +194,7 @@ VIDEO_START( taitojc )
 	state->tile_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[state->gfx_index] = gfx_element_alloc(machine, &taitojc_char_layout, (UINT8 *)state->char_ram, machine->config->total_colors / 16, 0);
+	machine->gfx[state->gfx_index] = gfx_element_alloc(machine, &taitojc_char_layout, (UINT8 *)state->char_ram, machine->total_colors() / 16, 0);
 
 	state->texture = auto_alloc_array(machine, UINT8, 0x400000);
 

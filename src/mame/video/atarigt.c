@@ -124,7 +124,7 @@ VIDEO_START( atarigt )
 
 	/* map pens 1:1 */
 	substitute_pens = auto_alloc_array(machine, pen_t, 65536);
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 		substitute_pens[i] = i;
 	machine->pens = substitute_pens;
 

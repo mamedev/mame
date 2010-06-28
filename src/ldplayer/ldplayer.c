@@ -227,7 +227,7 @@ static void process_commands(running_device *laserdisc)
 
 static TIMER_CALLBACK( vsync_update )
 {
-	running_device *laserdisc = machine->devicelist.first(LASERDISC);
+	running_device *laserdisc = machine->m_devicelist.first(LASERDISC);
 	int vblank_scanline;
 	attotime target;
 
@@ -250,7 +250,7 @@ static MACHINE_START( ldplayer )
 
 static TIMER_CALLBACK( autoplay )
 {
-	running_device *laserdisc = machine->devicelist.first(LASERDISC);
+	running_device *laserdisc = machine->m_devicelist.first(LASERDISC);
 
 	/* start playing */
 	(*execute_command)(laserdisc, CMD_PLAY);
@@ -323,7 +323,7 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 
 static MACHINE_START( pr8210 )
 {
-	running_device *laserdisc = machine->devicelist.first(LASERDISC);
+	running_device *laserdisc = machine->m_devicelist.first(LASERDISC);
 	MACHINE_START_CALL(ldplayer);
 	pr8210_bit_timer = timer_alloc(machine, pr8210_bit_callback, (void *)laserdisc);
 }

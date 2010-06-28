@@ -363,7 +363,7 @@ static PALETTE_INIT( videopkr )
 {
 	int j;
 
-	for (j = 0; j < machine->config->total_colors; j++)
+	for (j = 0; j < machine->total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i;
 
@@ -389,7 +389,7 @@ static PALETTE_INIT( babypkr )
 {
 	int j;
 
-	for (j = 0; j < machine->config->total_colors; j++)
+	for (j = 0; j < machine->total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i, top;
 
@@ -419,7 +419,7 @@ static PALETTE_INIT( fortune1 )
 {
 	int j;
 
-	for (j = 0; j < machine->config->total_colors; j++)
+	for (j = 0; j < machine->total_colors(); j++)
 	{
 		int r, g, b, tr, tg, tb, i, c;
 

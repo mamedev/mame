@@ -77,7 +77,7 @@ static void image_dirs_load(running_machine *machine, int config_type, xml_data_
 
 			if ((dev_instance != NULL) && (dev_instance[0] != '\0'))
 			{
-				for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+				for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 				{
 					if (!strcmp(dev_instance, image->image_config().instance_name())) {
 						working_directory = xml_get_attribute_string(node, "directory", NULL);
@@ -106,7 +106,7 @@ static void image_dirs_save(running_machine *machine, int config_type, xml_data_
 	/* only care about game-specific data */
 	if (config_type == CONFIG_TYPE_GAME)
 	{
-		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+		for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 		{
 			dev_instance = image->image_config().instance_name();
 
@@ -163,7 +163,7 @@ static void image_options_extract(running_machine *machine)
 		int index = 0;		
 		device_image_interface *image = NULL;
 
-		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+		for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 		{		
 			const char *filename = image->filename();
 
@@ -191,7 +191,7 @@ void image_unload_all(running_machine *machine)
 	// extract the options 
 	image_options_extract(machine);
 
-	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		// unload this image
 		image->unload();
@@ -208,7 +208,7 @@ void image_device_init(running_machine *machine)
 	device_image_interface *image = NULL;
 
 	/* make sure that any required devices have been allocated */
-    for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+    for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		/* is an image specified for this image */
 		image_name = image_get_device_option(image);
@@ -258,7 +258,7 @@ void image_postdevice_init(running_machine *machine)
 	device_image_interface *image = NULL;
 
 	/* make sure that any required devices have been allocated */
-    for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+    for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
     {
 			int result = image->finish_load();
 			/* did the image load fail? */
@@ -390,7 +390,7 @@ astring *image_info_astring(running_machine *machine, astring *string)
 	}
 #endif
 
-	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		const char *name = image->filename();
 		if (name != NULL)
@@ -490,7 +490,7 @@ device_image_interface *image_from_absolute_index(running_machine *machine, int 
 	device_image_interface *image = NULL;
 	int cnt = 0;
 	/* make sure that any required devices have been allocated */
-    for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+    for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		if (cnt==absolute_index) return image;
 		cnt++;

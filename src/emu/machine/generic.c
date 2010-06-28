@@ -109,7 +109,7 @@ void generic_machine_init(running_machine *machine)
 	config_register(machine, "counters", counters_load, counters_save);
 
 	/* for memory cards, request save state and an exit callback */
-	if (machine->config->memcard_handler != NULL)
+	if (machine->config->m_memcard_handler != NULL)
 	{
 		state_save_register_global(machine, state->memcard_inserted);
 		add_exit_callback(machine, memcard_eject);
@@ -329,7 +329,7 @@ void nvram_load(running_machine *machine)
 {
 	// only need to do something if we have an NVRAM device or an nvram_handler
 	device_nvram_interface *nvram = NULL;
-	if (!machine->devicelist.first(nvram) && machine->config->nvram_handler == NULL)
+	if (!machine->m_devicelist.first(nvram) && machine->config->m_nvram_handler == NULL)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
@@ -337,8 +337,8 @@ void nvram_load(running_machine *machine)
 	if (nvram_file != NULL)
 	{
 		// read data from general NVRAM handler first
-		if (machine->config->nvram_handler != NULL)
-			(*machine->config->nvram_handler)(machine, nvram_file, FALSE);
+		if (machine->config->m_nvram_handler != NULL)
+			(*machine->config->m_nvram_handler)(machine, nvram_file, FALSE);
 
 		// find all devices with NVRAM handlers, and read from them next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -352,8 +352,8 @@ void nvram_load(running_machine *machine)
 	else
 	{
 		// initialize via the general NVRAM handler first
-		if (machine->config->nvram_handler != NULL)
-			(*machine->config->nvram_handler)(machine, NULL, FALSE);
+		if (machine->config->m_nvram_handler != NULL)
+			(*machine->config->m_nvram_handler)(machine, NULL, FALSE);
 
 		// find all devices with NVRAM handlers, and read from them next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -370,7 +370,7 @@ void nvram_save(running_machine *machine)
 {
 	// only need to do something if we have an NVRAM device or an nvram_handler
 	device_nvram_interface *nvram = NULL;
-	if (!machine->devicelist.first(nvram) && machine->config->nvram_handler == NULL)
+	if (!machine->m_devicelist.first(nvram) && machine->config->m_nvram_handler == NULL)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
@@ -378,8 +378,8 @@ void nvram_save(running_machine *machine)
 	if (nvram_file != NULL)
 	{
 		// write data via general NVRAM handler first
-		if (machine->config->nvram_handler != NULL)
-			(*machine->config->nvram_handler)(machine, nvram_file, TRUE);
+		if (machine->config->m_nvram_handler != NULL)
+			(*machine->config->m_nvram_handler)(machine, nvram_file, TRUE);
 
 		// find all devices with NVRAM handlers, and tell them to write next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -498,8 +498,8 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 		return 1;
 
 	/* initialize and then save the card */
-	if (machine->config->memcard_handler)
-		(*machine->config->memcard_handler)(machine, file, MEMCARD_CREATE);
+	if (machine->config->m_memcard_handler)
+		(*machine->config->m_memcard_handler)(machine, file, MEMCARD_CREATE);
 
 	/* close the file */
 	mame_fclose(file);
@@ -534,8 +534,8 @@ int memcard_insert(running_machine *machine, int index)
 		return 1;
 
 	/* initialize and then load the card */
-	if (machine->config->memcard_handler)
-		(*machine->config->memcard_handler)(machine, file, MEMCARD_INSERT);
+	if (machine->config->m_memcard_handler)
+		(*machine->config->m_memcard_handler)(machine, file, MEMCARD_INSERT);
 
 	/* close the file */
 	mame_fclose(file);
@@ -573,8 +573,8 @@ void memcard_eject(running_machine *machine)
 	}
 
 	/* initialize and then load the card */
-	if (machine->config->memcard_handler)
-		(*machine->config->memcard_handler)(machine, file, MEMCARD_EJECT);
+	if (machine->config->m_memcard_handler)
+		(*machine->config->m_memcard_handler)(machine, file, MEMCARD_EJECT);
 
 	/* close the file */
 	mame_fclose(file);

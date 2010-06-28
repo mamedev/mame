@@ -24,7 +24,7 @@ static tilemap_t *fg_tilemap;
 static rgb_t palette[64];
 
 #define TOTAL_COLORS(m,gfxn) ((m)->gfx[gfxn]->total_colors * (m)->gfx[gfxn]->color_granularity)
-#define COLOR(m,gfxn,offs) ((m)->config->gfxdecodeinfo[gfxn].color_codes_start + offs)
+#define COLOR(m,gfxn,offs) ((m)->config->m_gfxdecodeinfo[gfxn].color_codes_start + offs)
 
 
 
@@ -39,7 +39,7 @@ PALETTE_INIT( snk6502 )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -200,7 +200,7 @@ PALETTE_INIT( satansat )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 

@@ -470,7 +470,7 @@ static VIDEO_UPDATE(firebeat)
 {
 	int chip;
 
-	if (screen == screen->machine->devicelist.find(SCREEN, 0))
+	if (screen == screen->machine->m_devicelist.find(SCREEN, 0))
 		chip = 0;
 	else
 		chip = 1;
@@ -599,7 +599,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 			COMBINE_DATA( &gcu[chip].visible_area );
 			if (ACCESSING_BITS_0_15)
 			{
-				screen_device *screen = downcast<screen_device *>(machine->devicelist.find(SCREEN, chip));
+				screen_device *screen = downcast<screen_device *>(machine->m_devicelist.find(SCREEN, chip));
 
 				if (screen != NULL)
 				{

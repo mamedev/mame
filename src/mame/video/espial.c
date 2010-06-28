@@ -33,7 +33,7 @@ PALETTE_INIT( espial )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -44,13 +44,13 @@ PALETTE_INIT( espial )
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i + machine->config->total_colors] >> 0) & 0x01;
-		bit2 = (color_prom[i + machine->config->total_colors] >> 1) & 0x01;
+		bit1 = (color_prom[i + machine->total_colors()] >> 0) & 0x01;
+		bit2 = (color_prom[i + machine->total_colors()] >> 1) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = (color_prom[i + machine->config->total_colors] >> 2) & 0x01;
-		bit2 = (color_prom[i + machine->config->total_colors] >> 3) & 0x01;
+		bit1 = (color_prom[i + machine->total_colors()] >> 2) & 0x01;
+		bit2 = (color_prom[i + machine->total_colors()] >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine, i, MAKE_RGB(r,g,b));

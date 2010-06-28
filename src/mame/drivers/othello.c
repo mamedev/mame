@@ -102,7 +102,7 @@ static MC6845_UPDATE_ROW( update_row )
 static PALETTE_INIT( othello )
 {
 	int i;
-	for (i = 0; i < machine->config->total_colors; i++)
+	for (i = 0; i < machine->total_colors(); i++)
 	{
 		palette_set_color(machine, i, MAKE_RGB(0xff, 0x00, 0xff));
 	}

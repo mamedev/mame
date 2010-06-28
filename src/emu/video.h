@@ -181,7 +181,7 @@ public:
 	attotime time_until_pos(int vpos, int hpos = 0) const;
 	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.max_y + 1); }
 	attotime time_until_vblank_end() const;
-	attotime time_until_update() const { return (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
+	attotime time_until_update() const { return (machine->config->m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime_make(0, m_scantime); }
 	attotime frame_period() const { return (this == NULL || !started()) ? k_default_frame_period : attotime_make(0, m_frame_period); };
 	UINT64 frame_number() const { return m_frame_number; }
@@ -413,7 +413,7 @@ void video_assert_out_of_range_pixels(running_machine *machine, bitmap_t *bitmap
 
 inline int screen_count(const machine_config &config)
 {
-	return config.devicelist.count(SCREEN);
+	return config.m_devicelist.count(SCREEN);
 }
 
 
@@ -424,7 +424,7 @@ inline int screen_count(const machine_config &config)
 
 inline const screen_device_config *screen_first(const machine_config &config)
 {
-	return downcast<screen_device_config *>(config.devicelist.first(SCREEN));
+	return downcast<screen_device_config *>(config.m_devicelist.first(SCREEN));
 }
 
 
@@ -446,7 +446,7 @@ inline const screen_device_config *screen_next(const screen_device_config *previ
 
 inline int screen_count(running_machine &machine)
 {
-	return machine.devicelist.count(SCREEN);
+	return machine.m_devicelist.count(SCREEN);
 }
 
 
@@ -457,7 +457,7 @@ inline int screen_count(running_machine &machine)
 
 inline screen_device *screen_first(running_machine &machine)
 {
-	return downcast<screen_device *>(machine.devicelist.first(SCREEN));
+	return downcast<screen_device *>(machine.m_devicelist.first(SCREEN));
 }
 
 

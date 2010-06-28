@@ -155,7 +155,7 @@ WRITE16_HANDLER( sys16_paletteram_w )
 
 		palette_set_color(space->machine, offset, MAKE_RGB(r, g, b) );
 
-		palette_set_color(space->machine, offset + space->machine->config->total_colors/2, MAKE_RGB(rs,gs,bs));
+		palette_set_color(space->machine, offset + space->machine->total_colors()/2, MAKE_RGB(rs,gs,bs));
 	}
 }
 #endif

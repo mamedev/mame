@@ -527,7 +527,7 @@ static PALETTE_INIT( fclown )
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 

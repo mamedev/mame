@@ -293,12 +293,12 @@ void video_init(running_machine *machine)
 	global.seconds_to_run = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
 
 	/* create spriteram buffers if necessary */
-	if (machine->config->video_attributes & VIDEO_BUFFERS_SPRITERAM)
+	if (machine->config->m_video_attributes & VIDEO_BUFFERS_SPRITERAM)
 		init_buffered_spriteram(machine);
 
 	/* call the PALETTE_INIT function */
-	if (machine->config->init_palette != NULL)
-		(*machine->config->init_palette)(machine, memory_region(machine, "proms"));
+	if (machine->config->m_init_palette != NULL)
+		(*machine->config->m_init_palette)(machine, memory_region(machine, "proms"));
 
 	/* create a render target for snapshots */
 	viewname = options_get_string(mame_options(), OPTION_SNAPVIEW);
@@ -489,10 +489,10 @@ void video_frame_update(running_machine *machine, int debug)
 			machine->primary_screen->scanline0_callback();
 
 		/* otherwise, call the video EOF callback */
-		else if (machine->config->video_eof != NULL)
+		else if (machine->config->m_video_eof != NULL)
 		{
 			profiler_mark_start(PROFILER_VIDEO);
-			(*machine->config->video_eof)(machine);
+			(*machine->config->m_video_eof)(machine);
 			profiler_mark_end();
 		}
 	}
@@ -1131,7 +1131,7 @@ void screen_save_snapshot(running_machine *machine, device_t *screen, mame_file 
 
 	/* now do the actual work */
 	palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
-	error = png_write_bitmap(mame_core_file(fp), &pnginfo, global.snap_bitmap, machine->config->total_colors, palette);
+	error = png_write_bitmap(mame_core_file(fp), &pnginfo, global.snap_bitmap, machine->total_colors(), palette);
 
 	/* free any data allocated */
 	png_free(&pnginfo);
@@ -1195,7 +1195,7 @@ static void create_snapshot_bitmap(device_t *screen)
 	/* select the appropriate view in our dummy target */
 	if (global.snap_native && screen != NULL)
 	{
-		view_index = screen->machine->devicelist.index(SCREEN, screen->tag());
+		view_index = screen->machine->m_devicelist.index(SCREEN, screen->tag());
 		assert(view_index != -1);
 		render_target_set_view(global.snap_target, view_index);
 	}
@@ -1397,7 +1397,7 @@ static void video_mng_record_frame(running_machine *machine)
 
 			/* write the next frame */
 			palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
-			error = mng_capture_frame(mame_core_file(global.mngfile), &pnginfo, global.snap_bitmap, machine->config->total_colors, palette);
+			error = mng_capture_frame(mame_core_file(global.mngfile), &pnginfo, global.snap_bitmap, machine->total_colors(), palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
 			{
@@ -1881,7 +1881,7 @@ void screen_device::device_start()
 	m_scanline0_timer = timer_alloc(machine, static_scanline0_callback, (void *)this);
 
 	// allocate a timer to generate per-scanline updates
-	if ((machine->config->video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((machine->config->m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		m_scanline_timer = timer_alloc(machine, static_scanline_update_callback, (void *)this);
 
 	// configure the screen with the default parameters
@@ -1892,7 +1892,7 @@ void screen_device::device_start()
 	m_vblank_end_time = attotime_make(0, m_vblank_period);
 
 	// start the timer to generate per-scanline updates
-	if ((machine->config->video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((machine->config->m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		timer_adjust_oneshot(m_scanline_timer, time_until_pos(0), 0);
 
 	// create burn-in bitmap
@@ -2085,7 +2085,7 @@ bool screen_device::update_partial(int scanline)
 	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag(), scanline));
 
 	// these two checks only apply if we're allowed to skip frames
-	if (!(machine->config->video_attributes & VIDEO_ALWAYS_UPDATE))
+	if (!(machine->config->m_video_attributes & VIDEO_ALWAYS_UPDATE))
 	{
 		// if skipping this frame, bail
 		if (global.skipping_this_frame)
@@ -2125,8 +2125,8 @@ bool screen_device::update_partial(int scanline)
 		profiler_mark_start(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
-		if (machine->config->video_update != NULL)
-			flags = (*machine->config->video_update)(this, m_bitmap[m_curbitmap], &clip);
+		if (machine->config->m_video_update != NULL)
+			flags = (*machine->config->m_video_update)(this, m_bitmap[m_curbitmap], &clip);
 		global.partial_updates_this_frame++;
 		profiler_mark_end();
 
@@ -2301,7 +2301,7 @@ void screen_device::vblank_begin_callback()
 		(*item->m_callback)(*this, item->m_param, true);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine->primary_screen && !(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (this == machine->primary_screen && !(machine->config->m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		video_frame_update(machine, FALSE);
 
 	// reset the VBLANK start timer for the next frame
@@ -2327,7 +2327,7 @@ void screen_device::vblank_end_callback()
 		(*item->m_callback)(*this, item->m_param, false);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine->primary_screen && (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (this == machine->primary_screen && (machine->config->m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		video_frame_update(machine, FALSE);
 
 	// increment the frame number counter
@@ -2379,7 +2379,7 @@ bool screen_device::update_quads()
 	if (render_is_live_screen(this))
 	{
 		// only update if empty and not a vector game; otherwise assume the driver did it directly
-		if (m_config.m_type != SCREEN_TYPE_VECTOR && (machine->config->video_attributes & VIDEO_SELF_RENDER) == 0)
+		if (m_config.m_type != SCREEN_TYPE_VECTOR && (machine->config->m_video_attributes & VIDEO_SELF_RENDER) == 0)
 		{
 			// if we're not skipping the frame and if the screen actually changed, then update the texture
 			if (!global.skipping_this_frame && m_changed)

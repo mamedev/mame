@@ -1035,7 +1035,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 
 	/* loop over all sound chips */
 	device_sound_interface *sound = NULL;
-	for (bool gotone = machine->devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		/* append the Sound: string */
 		if (!found_sound)
@@ -1272,7 +1272,7 @@ void ui_image_handler_ingame(running_machine *machine)
 	/* run display routine for devices */
 	if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
 	{
-		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+		for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 		{
 			image->call_display();
 		}
@@ -1695,7 +1695,7 @@ static slider_state *slider_init(running_machine *machine)
 		tailptr = &(*tailptr)->next;
 	}
 
-	for (device = machine->devicelist.first(LASERDISC); device != NULL; device = device->typenext())
+	for (device = machine->m_devicelist.first(LASERDISC); device != NULL; device = device->typenext())
 	{
 		const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 		if (config->overupdate != NULL)
@@ -2149,7 +2149,7 @@ static char *slider_get_screen_desc(screen_device &screen)
 
 static char *slider_get_laserdisc_desc(device_t *laserdisc)
 {
-	int ldcount = laserdisc->machine->devicelist.count(LASERDISC);
+	int ldcount = laserdisc->machine->m_devicelist.count(LASERDISC);
 	static char descbuf[256];
 
 	if (ldcount > 1)

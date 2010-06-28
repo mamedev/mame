@@ -224,6 +224,7 @@ class device_config
 {
 	DISABLE_COPYING(device_config);
 
+	friend class machine_config;
 	friend class device_t;
 	friend class device_config_interface;
 	template<class T> friend class tagged_list;
@@ -300,6 +301,7 @@ protected:
 
 private:
 	astring 				m_tag;					// tag for this instance
+	bool					m_config_complete;		// have we completed our configuration?
 };
 
 

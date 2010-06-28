@@ -1239,7 +1239,7 @@ static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UIN
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine->config->total_colors >> bpp, 0);
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine->total_colors() >> bpp, 0);
 }
 
 
@@ -3266,7 +3266,7 @@ static DEVICE_START( k051960 )
 		fatalerror("Unknown plane_order");
 	}
 
-	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
@@ -4067,7 +4067,7 @@ static DEVICE_START( k05324x )
 		fatalerror("Unsupported plane_order");
 	}
 
-	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
@@ -4494,9 +4494,9 @@ void k053247_sprites_draw( running_device *device, bitmap_t *bitmap, const recta
 
         VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
     */
-	if (machine->config->video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config->m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp == 32 && (machine->config->video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap->bpp == 32 && (machine->config->m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -4905,12 +4905,12 @@ static DEVICE_START( k053247 )
 	{
 		if (k053247->screen->format() == BITMAP_FORMAT_RGB32)
 		{
-			if ((machine->config->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+			if ((machine->config->m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 		}
 		else
 		{
-			if (!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
+			if (!(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
 				popmessage("driver should use VIDEO_HAS_SHADOWS");
 		}
 	}
@@ -5038,7 +5038,7 @@ static DEVICE_START( k055673 )
 		fatalerror("Unsupported layout");
 	}
 
-	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	k053247->dx = intf->dx;
@@ -8869,7 +8869,7 @@ void k053250_draw( running_device *device, bitmap_t *bitmap, const rectangle *cl
 	linedata_offs += line_start * linedata_adv;		// pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = device->machine->pens + (colorbase << 4) % device->machine->config->total_colors;
+	pal_base = device->machine->pens + (colorbase << 4) % device->machine->total_colors();
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos <= line_end; linedata_offs += linedata_adv, line_pos++)
@@ -10554,8 +10554,8 @@ static DEVICE_START( k001604 )
 	tilemap_set_transparent_pen(k001604->layer_8x8[0], 0);
 	tilemap_set_transparent_pen(k001604->layer_8x8[1], 0);
 
-	device->machine->gfx[k001604->gfx_index[0]] = gfx_element_alloc(device->machine, &k001604_char_layout_layer_8x8, (UINT8*)&k001604->char_ram[0], device->machine->config->total_colors / 16, 0);
-	device->machine->gfx[k001604->gfx_index[1]] = gfx_element_alloc(device->machine, &k001604_char_layout_layer_16x16, (UINT8*)&k001604->char_ram[0], device->machine->config->total_colors / 16, 0);
+	device->machine->gfx[k001604->gfx_index[0]] = gfx_element_alloc(device->machine, &k001604_char_layout_layer_8x8, (UINT8*)&k001604->char_ram[0], device->machine->total_colors() / 16, 0);
+	device->machine->gfx[k001604->gfx_index[1]] = gfx_element_alloc(device->machine, &k001604_char_layout_layer_16x16, (UINT8*)&k001604->char_ram[0], device->machine->total_colors() / 16, 0);
 
 	state_save_register_device_item_pointer(device, 0, k001604->reg, 0x400 / 4);
 	state_save_register_device_item_pointer(device, 0, k001604->char_ram, 0x200000 / 4);
@@ -10796,7 +10796,7 @@ static DEVICE_START( k037122 )
 	tilemap_set_transparent_pen(k037122->layer[0], 0);
 	tilemap_set_transparent_pen(k037122->layer[1], 0);
 
-	device->machine->gfx[k037122->gfx_index] = gfx_element_alloc(device->machine, &k037122_char_layout, (UINT8*)k037122->char_ram, device->machine->config->total_colors / 16, 0);
+	device->machine->gfx[k037122->gfx_index] = gfx_element_alloc(device->machine, &k037122_char_layout, (UINT8*)k037122->char_ram, device->machine->total_colors() / 16, 0);
 
 	state_save_register_device_item_pointer(device, 0, k037122->reg, 0x400 / 4);
 	state_save_register_device_item_pointer(device, 0, k037122->char_ram, 0x200000 / 4);

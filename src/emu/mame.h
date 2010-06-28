@@ -198,8 +198,7 @@ public:
 
 
 /* this structure holds generic pointers that are commonly used */
-typedef struct _generic_pointers generic_pointers;
-struct _generic_pointers
+struct generic_pointers
 {
 	generic_ptr				nvram;				/* generic NVRAM */
 	UINT32					nvram_size;
@@ -223,23 +222,29 @@ class running_machine
 	DISABLE_COPYING(running_machine);
 
 public:
-	running_machine(const game_driver *driver);
+	running_machine(const game_driver &driver, const machine_config &config);
 	~running_machine();
+	
+	void start();
 
 	inline device_t *device(const char *tag);
 	template<class T> inline T *device(const char *tag) { return downcast<T *>(device(tag)); }
 	inline const input_port_config *port(const char *tag);
 	inline const region_info *region(const char *tag);
+	
+	// configuration helpers
+	UINT32 total_colors() const { return m_config.m_total_colors; }
 
 	const char *describe_context();
 
 	resource_pool			respool;			// pool of resources for this machine
 	region_list				regionlist;			// list of memory regions
-	device_list				devicelist;			// list of running devices
+	device_list				m_devicelist;		// list of running devices
 	device_scheduler		scheduler;			// scheduler object
 
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
+	const machine_config &	m_config;			/* points to the constructed machine_config */
 	ioport_list				portlist;			/* points to a list of input port configurations */
 
 	/* CPU information */
@@ -247,11 +252,12 @@ public:
 
 	/* game-related information */
 	const game_driver *		gamedrv;			/* points to the definition of the game machine */
+	const game_driver &		m_game;				/* points to the definition of the game machine */
 	char *					basename;			/* basename used for game-related paths */
 
 	/* video-related information */
 	gfx_element *			gfx[MAX_GFX_ELEMENTS];/* array of pointers to graphic sets (chars, sprites) */
-	screen_device *	primary_screen;		/* the primary screen device, or NULL if screenless */
+	screen_device *			primary_screen;		/* the primary screen device, or NULL if screenless */
 	palette_t *				palette;			/* global palette object */
 
 	/* palette-related information */
@@ -298,7 +304,7 @@ public:
 	void *					driver_data;		/* drivers can hang data off of here instead of using globals */
 
 private:
-	astring						m_context;				// context string
+	astring					m_context;				// context string
 };
 
 
@@ -482,7 +488,7 @@ void mame_get_current_datetime(running_machine *machine, mame_system_time *systi
 
 inline device_t *running_machine::device(const char *tag)
 {
-	return devicelist.find(tag);
+	return m_devicelist.find(tag);
 }
 
 inline const input_port_config *running_machine::port(const char *tag)
