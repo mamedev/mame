@@ -466,7 +466,7 @@ protected:
 	address_space_config m_space_config[3];				// array of address space configs
 };
 
-const device_type CPU = legacy_cpu_device_config::static_alloc_device_config;
+extern const device_type CPU;
 
 
 

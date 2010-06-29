@@ -559,3 +559,5 @@ WRITE_LINE_DEVICE_HANDLER( z80ctc_trg0_w ) { downcast<z80ctc_device *>(device)->
 WRITE_LINE_DEVICE_HANDLER( z80ctc_trg1_w ) { downcast<z80ctc_device *>(device)->trigger(1, state); }
 WRITE_LINE_DEVICE_HANDLER( z80ctc_trg2_w ) { downcast<z80ctc_device *>(device)->trigger(2, state); }
 WRITE_LINE_DEVICE_HANDLER( z80ctc_trg3_w ) { downcast<z80ctc_device *>(device)->trigger(3, state); }
+
+const device_type Z80CTC = z80ctc_device_config::static_alloc_device_config;

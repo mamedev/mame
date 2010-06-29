@@ -821,3 +821,5 @@ const char *sound_get_user_gain_name(running_machine *machine, int index)
 	speaker_device *speaker = index_to_input(machine, index, inputnum);
 	return (speaker != NULL) ? speaker->input_name(inputnum) : 0;
 }
+
+const device_type SPEAKER = speaker_device_config::static_alloc_device_config;

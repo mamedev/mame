@@ -153,7 +153,7 @@ protected:
 
 
 // device type definition
-const device_type EEPROM = eeprom_device_config::static_alloc_device_config;
+extern const device_type EEPROM;
 
 
 

@@ -161,7 +161,7 @@ private:
 
 
 // device type definition
-const device_type Z80SIO = z80sio_device_config::static_alloc_device_config;
+extern const device_type Z80SIO;
 
 
 

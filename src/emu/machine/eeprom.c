@@ -572,3 +572,4 @@ bool eeprom_device::command_match(const char *buf, const char *cmd, int len)
 	return (*cmd==0);
 }
 
+const device_type EEPROM = eeprom_device_config::static_alloc_device_config;

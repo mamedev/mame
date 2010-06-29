@@ -896,3 +896,5 @@ WRITE8_DEVICE_HANDLER( z80sio_ba_cd_w )
 		case 3: z80sio_c_w(device, 1, data); break;
 	}
 }
+
+const device_type Z80SIO = z80sio_device_config::static_alloc_device_config;

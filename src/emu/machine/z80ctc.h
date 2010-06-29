@@ -155,7 +155,7 @@ private:
 
 
 // device type definition
-const device_type Z80CTC = z80ctc_device_config::static_alloc_device_config;
+extern const device_type Z80CTC;
 
 
 

@@ -878,3 +878,5 @@ WRITE8_DEVICE_HANDLER( z80pio_ba_cd_w )
 
 	BIT(offset, 0) ? z80pio_c_w(device, index, data) : z80pio_d_w(device, index, data);
 }
+
+const device_type Z80PIO = z80pio_device_config::static_alloc_device_config;

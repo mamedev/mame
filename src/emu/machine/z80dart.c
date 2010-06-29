@@ -1405,3 +1405,5 @@ WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
 	else
 		z80dart_d_w(device, channel, data);
 }
+
+const device_type Z80DART = z80dart_device_config::static_alloc_device_config;

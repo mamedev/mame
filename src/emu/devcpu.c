@@ -579,3 +579,5 @@ void legacy_cpu_device::state_string_export(const device_state_entry &entry, ast
 	else if (m_string_export != NULL)
 		(*m_string_export)(this, entry, string);
 }
+
+const device_type CPU = legacy_cpu_device_config::static_alloc_device_config;

@@ -898,3 +898,5 @@ WRITE8_DEVICE_HANDLER( z80dma_w ) { downcast<z80dma_device *>(device)->write(dat
 WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w ) { downcast<z80dma_device *>(device)->rdy_w(state); }
 WRITE_LINE_DEVICE_HANDLER( z80dma_wait_w ) { downcast<z80dma_device *>(device)->wait_w(state); }
 WRITE_LINE_DEVICE_HANDLER( z80dma_bai_w ) { downcast<z80dma_device *>(device)->bai_w(state); }
+
+const device_type Z80DMA = z80dma_device_config::static_alloc_device_config;
