@@ -1555,7 +1555,7 @@ ROM_START( autmoon )
 	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
 	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(bddabc7e) SHA1(f49f3b64e0eab0da22018c940a9916e1210a84e6)) // game code
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(30ca1eed) SHA1(540635a8b94c14aefa1d8404226d9e1046776111)) // game code
 	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(8153a60b) SHA1(54b8a0467645161d827bf8cb9fbceb0d00f9639f)) // game code
 
 	/* SHAPE EPROMS */
