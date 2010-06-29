@@ -122,6 +122,21 @@ const char *device_config_image_interface::device_brieftypename(iodevice_t type)
 	return (info != NULL) ? info->m_shortname : NULL;
 }
 
+//-------------------------------------------------
+//  device_typeid - retrieves device type id
+//-------------------------------------------------
+
+iodevice_t device_config_image_interface::device_typeid(const char *name)
+{
+	int i;
+	for (i = 0; i < ARRAY_LENGTH(device_config_image_interface::m_device_info_array); i++)
+	{
+		if (!mame_stricmp(name, m_device_info_array[i].m_name) || !mame_stricmp(name, m_device_info_array[i].m_shortname))
+			return m_device_info_array[i].m_type;
+	}
+	return (iodevice_t)-1;
+}
+
 /*-------------------------------------------------
     device_compute_hash - compute a hash,
     using this device's partial hash if appropriate

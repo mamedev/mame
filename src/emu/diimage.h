@@ -169,10 +169,11 @@ public:
 	virtual const char *brief_instance_name() const = 0;
 	virtual bool uses_file_extension(const char *file_extension) const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
-    virtual image_device_format *formatlist() const = 0;
+	virtual image_device_format *formatlist() const = 0;
 	
 	static const char *device_typename(iodevice_t type);
 	static const char *device_brieftypename(iodevice_t type);	
+	static iodevice_t device_typeid(const char *name);
 
 	virtual device_image_partialhash_func get_partial_hash() const = 0;
 	virtual void device_compute_hash(char *dest, const void *data, size_t length, unsigned int functions) const;	
