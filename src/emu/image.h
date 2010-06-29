@@ -32,8 +32,4 @@ astring *image_info_astring(running_machine *machine, astring *string);
 
 device_image_interface *image_from_absolute_index(running_machine *machine, int absolute_index);
 
-/* extension list handling */
-int image_find_extension(const char *extensions, const char *ext);
-void image_specify_extension(char *buffer, size_t buffer_len, const char *extension);
-
 #endif /* __IMAGE_H__ */
