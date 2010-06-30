@@ -278,6 +278,11 @@ static MACHINE_START( renegade )
 	state_save_register_postload(machine, renegade_postload, NULL);
 }
 
+static DRIVER_INIT( renegade )
+{
+	mcu_sim = FALSE;
+}
+
 static DRIVER_INIT( kuniokun )
 {
 	mcu_sim = TRUE;
@@ -288,9 +293,13 @@ static DRIVER_INIT( kuniokun )
 	cputag_suspend(machine, "mcu", SUSPEND_REASON_DISABLE, 1);
 }
 
-static DRIVER_INIT( renegade )
+static DRIVER_INIT( kuniokunb )
 {
-	mcu_sim = FALSE;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	/* Remove the MCU handlers */
+	memory_unmap_readwrite(space, 0x3804, 0x3804, 0, 0);
+	memory_unmap_read(space, 0x3805, 0x3805, 0, 0);
 }
 
 
@@ -384,7 +393,7 @@ static READ8_HANDLER( mcu_reset_r )
 	}
 	else
 	{
-		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, PULSE_LINE);			
+		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 	return 0;
 }
@@ -414,7 +423,7 @@ static WRITE8_HANDLER( mcu_w )
 	{
 		from_main = data;
 		main_sent = 1;
-		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);			
+		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 	}
 }
 
@@ -1094,6 +1103,6 @@ ROM_END
 
 
 
-GAME( 1986, renegade,  0,        renegade,  renegade, renegade, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", 0 )
-GAME( 1986, kuniokun,  renegade, renegade,  renegade, kuniokun, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", 0 )
-GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, 0,        ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade,  ROT0, "Technos Japan (Taito America license)", "Renegade (US)", 0 )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, kuniokun,  ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", 0 )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, kuniokunb, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 )
