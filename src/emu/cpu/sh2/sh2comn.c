@@ -61,7 +61,7 @@ INLINE void WL(SH2 *sh2, offs_t A, UINT32 V)
 static void sh2_timer_resync(SH2 *sh2)
 {
 	int divider = div_tab[(sh2->m[5] >> 8) & 3];
-	UINT64 cur_time = cpu_get_total_cycles(sh2->device);
+	UINT64 cur_time = sh2->device->total_cycles();
 
 	if(divider)
 		sh2->frc += (cur_time - sh2->frc_base) >> divider;
@@ -98,7 +98,7 @@ static void sh2_timer_activate(SH2 *sh2)
 		int divider = div_tab[(sh2->m[5] >> 8) & 3];
 		if(divider) {
 			max_delta <<= divider;
-			sh2->frc_base = cpu_get_total_cycles(sh2->device);
+			sh2->frc_base = sh2->device->total_cycles();
 			timer_adjust_oneshot(sh2->timer, cpu_clocks_to_attotime(sh2->device, max_delta), 0);
 		} else {
 			logerror("SH2.%s: Timer event in %d cycles of external clock", sh2->device->tag(), max_delta);

@@ -576,7 +576,7 @@ static void hyperstone_set_trap_entry(hyperstone_state *cpustate, int which)
 
 static UINT32 compute_tr(hyperstone_state *cpustate)
 {
-	UINT64 cycles_since_base = cpu_get_total_cycles(cpustate->device) - cpustate->tr_base_cycles;
+	UINT64 cycles_since_base = cpustate->device->total_cycles() - cpustate->tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> cpustate->clock_scale;
 	return cpustate->tr_base_value + (clocks_since_base / cpustate->tr_clocks_per_tick);
 }
@@ -592,12 +592,12 @@ static void update_timer_prescale(hyperstone_state *cpustate)
 	cpustate->clock_cycles_6 = 6 << cpustate->clock_scale;
 	cpustate->tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
 	cpustate->tr_base_value = prevtr;
-	cpustate->tr_base_cycles = cpu_get_total_cycles(cpustate->device);
+	cpustate->tr_base_cycles = cpustate->device->total_cycles();
 }
 
 static void adjust_timer_interrupt(hyperstone_state *cpustate)
 {
-	UINT64 cycles_since_base = cpu_get_total_cycles(cpustate->device) - cpustate->tr_base_cycles;
+	UINT64 cycles_since_base = cpustate->device->total_cycles() - cpustate->tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> cpustate->clock_scale;
 	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << cpustate->clock_scale);
 
@@ -767,7 +767,7 @@ INLINE void set_global_register(hyperstone_state *cpustate, UINT8 code, UINT32 v
 */
 			case TR_REGISTER:
 				cpustate->tr_base_value = val;
-				cpustate->tr_base_cycles = cpu_get_total_cycles(cpustate->device);
+				cpustate->tr_base_cycles = cpustate->device->total_cycles();
 				adjust_timer_interrupt(cpustate);
 				break;
 

@@ -39,7 +39,8 @@
 
 static READ8_HANDLER( mikie_sh_timer_r )
 {
-	int clock = cpu_get_total_cycles(space->cpu) / MIKIE_TIMER_RATE;
+	mikie_state *state = (mikie_state *)space->machine->driver_data;
+	int clock = state->audiocpu->total_cycles() / MIKIE_TIMER_RATE;
 
 	return clock;
 }
@@ -205,8 +206,8 @@ static MACHINE_START( mikie )
 {
 	mikie_state *state = (mikie_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
 
 	state_save_register_global(machine, state->palettebank);
 	state_save_register_global(machine, state->last_irq);

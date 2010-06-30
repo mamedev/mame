@@ -23,7 +23,8 @@ public:
 	UINT8    buffer0[9], buffer1[9];
 
 	/* devices */
-	running_device *slave;
+	cpu_device *maincpu;
+	cpu_device *slave;
 };
 
 

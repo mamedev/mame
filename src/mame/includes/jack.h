@@ -30,7 +30,7 @@ public:
 
 
 	/* devices */
-	running_device *audiocpu;
+	cpu_device *audiocpu;
 };
 
 

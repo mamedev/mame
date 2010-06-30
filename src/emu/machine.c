@@ -205,7 +205,7 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 		driver_data = (*m_config.m_driver_data_alloc)(*this);
 
 	// find devices
-	firstcpu = cpu_first(this);
+	firstcpu = downcast<cpu_device *>(cpu_first(this));
 	primary_screen = screen_first(*this);
 
 	// fetch core options

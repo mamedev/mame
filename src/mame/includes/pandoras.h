@@ -25,10 +25,10 @@ public:
 	int i8039_status;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *subcpu;
-	running_device *audiocpu;
-	running_device *mcu;
+	cpu_device *maincpu;
+	cpu_device *subcpu;
+	cpu_device *audiocpu;
+	cpu_device *mcu;
 };
 
 

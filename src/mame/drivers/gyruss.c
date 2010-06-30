@@ -90,7 +90,7 @@ static const int gyruss_timer[10] =
 static READ8_DEVICE_HANDLER( gyruss_portA_r )
 {
 	gyruss_state *state = (gyruss_state *)device->machine->driver_data;
-	return gyruss_timer[(cpu_get_total_cycles(state->audiocpu) / 1024) % 10];
+	return gyruss_timer[(state->audiocpu->total_cycles() / 1024) % 10];
 }
 
 
@@ -501,8 +501,8 @@ static MACHINE_START( gyruss )
 {
 	gyruss_state *state = (gyruss_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->audiocpu_2 = devtag_get_device(machine, "audio2");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
+	state->audiocpu_2 = machine->device<cpu_device>("audio2");
 }
 
 static MACHINE_DRIVER_START( gyruss )

@@ -357,7 +357,7 @@ static MACHINE_START( common )
 {
 	timeplt_state *state = (timeplt_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
 }
 
 static MACHINE_START( timeplt )

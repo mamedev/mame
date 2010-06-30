@@ -89,6 +89,7 @@
 
 
 /* local variables */
+static cpu_device *maincpu;
 static UINT8 last_analog_input[2];
 static UINT8 last_analog_output[2];
 
@@ -153,6 +154,8 @@ static TIMER_CALLBACK( firq_timer_tick )
 
 static MACHINE_START( gridlee )
 {
+	maincpu = machine->device<cpu_device>("maincpu");
+
     /* create the polynomial tables */
     poly17_init(machine);
 
@@ -267,7 +270,7 @@ static READ8_HANDLER( random_num_r )
 	UINT32 cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
-	cc = cpu_get_total_cycles(space->cpu);
+	cc = maincpu->total_cycles();
 
 	/* 12.5 = 8 + 4 + 0.5 */
 	cc = (cc << 3) + (cc << 2) + (cc >> 1);

@@ -485,7 +485,7 @@ static UINT64 m_p_n_root_start[ 3 ];
 static UINT64 psxcpu_gettotalcycles( running_machine *machine )
 {
 	/* TODO: should return the start of the current tick. */
-	return cpu_get_total_cycles(devtag_get_device(machine, "maincpu")) * 2;
+	return machine->firstcpu->total_cycles() * 2;
 }
 
 static int root_divider( int n_counter )

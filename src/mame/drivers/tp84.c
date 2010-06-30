@@ -89,6 +89,13 @@ PALETTE_INIT( tp84 );
 VIDEO_START( tp84 );
 VIDEO_UPDATE( tp84 );
 
+static cpu_device *audiocpu;
+
+
+static MACHINE_START( tp84 )
+{
+	audiocpu = machine->device<cpu_device>("audiocpu");
+}
 
 
 static READ8_HANDLER( tp84_sh_timer_r )
@@ -97,7 +104,7 @@ static READ8_HANDLER( tp84_sh_timer_r )
 	/* divided by 2048 to get this timer */
 	/* (divide by (2048/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	return (cpu_get_total_cycles(space->cpu) / (2048/2)) & 0x0f;
+	return (audiocpu->total_cycles() / (2048/2)) & 0x0f;
 }
 
 
@@ -300,6 +307,9 @@ static MACHINE_DRIVER_START( tp84 )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+							
+	MDRV_MACHINE_START(tp84)
+	
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

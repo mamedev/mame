@@ -79,7 +79,7 @@ static READ8_HANDLER( cop01_sound_command_r )
 	int res = (soundlatch_r(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
-	if ((cpu_get_total_cycles(space->cpu) / TIMER_RATE) & 1)
+	if ((state->audiocpu->total_cycles() / TIMER_RATE) & 1)
 	{
 		if (state->pulse == 0)
 			res |= 1;
@@ -416,7 +416,7 @@ static MACHINE_START( cop01 )
 {
 	cop01_state *state = (cop01_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
 
 	state_save_register_global(machine, state->pulse);
 	state_save_register_global(machine, state->timer);

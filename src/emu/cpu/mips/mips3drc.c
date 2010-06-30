@@ -845,7 +845,7 @@ static void code_compile_block(mips3_state *mips3, UINT8 mode, offs_t pc)
 static void cfunc_get_cycles(void *param)
 {
 	mips3_state *mips3 = (mips3_state *)param;
-	mips3->impstate->numcycles = cpu_get_total_cycles(mips3->device);
+	mips3->impstate->numcycles = mips3->device->total_cycles();
 }
 
 

@@ -31,7 +31,7 @@ static READ8_DEVICE_HANDLER( megazone_port_a_r )
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
 
-	clock = cpu_get_total_cycles(state->audiocpu) * 7159/12288;	/* = (14318/8)/(18432/6) */
+	clock = state->audiocpu->total_cycles() * 7159/12288;	/* = (14318/8)/(18432/6) */
 	timer = (clock / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
@@ -228,9 +228,9 @@ static MACHINE_START( megazone )
 {
 	megazone_state *state = (megazone_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->daccpu = devtag_get_device(machine, "daccpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
+	state->daccpu = machine->device<cpu_device>("daccpu");
 
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->i8039_status);

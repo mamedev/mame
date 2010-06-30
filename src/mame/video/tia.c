@@ -508,13 +508,13 @@ static int collision_check(UINT8* p1, UINT8* p2, int x1, int x2)
 
 INLINE int current_x(const address_space *space)
 {
-	return 3 * ((cpu_get_total_cycles(space->cpu) - frame_cycles) % 76) - 68;
+	return 3 * ((space->machine->firstcpu->total_cycles() - frame_cycles) % 76) - 68;
 }
 
 
 INLINE int current_y(const address_space *space)
 {
-	return (cpu_get_total_cycles(space->cpu) - frame_cycles) / 76;
+	return (space->machine->firstcpu->total_cycles() - frame_cycles) / 76;
 }
 
 
@@ -853,7 +853,7 @@ static void update_bitmap(int next_x, int next_y)
 
 static WRITE8_HANDLER( WSYNC_w )
 {
-	int cycles = cpu_get_total_cycles(space->cpu) - frame_cycles;
+	int cycles = space->machine->firstcpu->total_cycles() - frame_cycles;
 
 	if (cycles % 76)
 	{
@@ -894,7 +894,7 @@ static WRITE8_HANDLER( VBLANK_w )
 {
 	if (data & 0x80)
 	{
-		paddle_cycles = cpu_get_total_cycles(space->cpu);
+		paddle_cycles = space->machine->firstcpu->total_cycles();
 	}
 	if ( ! ( VBLANK & 0x40 ) ) {
 		INPT4 = 0x80;
@@ -1647,7 +1647,7 @@ static WRITE8_HANDLER( GRP1_w )
 
 static READ8_HANDLER( INPT_r )
 {
-	UINT64 elapsed = cpu_get_total_cycles(space->cpu) - paddle_cycles;
+	UINT64 elapsed = space->machine->firstcpu->total_cycles() - paddle_cycles;
 	int input = TIA_INPUT_PORT_ALWAYS_ON;
 	if ( tia_read_input_port )
 	{

@@ -1724,7 +1724,7 @@ static void update_timer_count(running_machine *machine)
 		return;
 
 	/* count cycles */
-	elapsed_cycles = cpu_get_total_cycles(dcs.cpu) - dcs.timer_start_cycles;
+	elapsed_cycles = dcs.cpu->total_cycles() - dcs.timer_start_cycles;
 	elapsed_clocks = elapsed_cycles / dcs.timer_scale;
 
 	/* if we haven't counted past the initial count yet, just do that */
@@ -1750,7 +1750,7 @@ static TIMER_DEVICE_CALLBACK( internal_timer_callback )
 	/* we do this to avoid drifting */
 	dcs.timers_fired++;
 	target_cycles = dcs.timer_start_cycles + dcs.timer_scale * (dcs.timer_start_count + 1 + dcs.timers_fired * (dcs.timer_period + 1));
-	target_cycles -= cpu_get_total_cycles(dcs.cpu);
+	target_cycles -= dcs.cpu->total_cycles();
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
@@ -1769,7 +1769,7 @@ static void reset_timer(running_machine *machine)
 		return;
 
 	/* compute the time until the first firing */
-	dcs.timer_start_cycles = cpu_get_total_cycles(dcs.cpu);
+	dcs.timer_start_cycles = dcs.cpu->total_cycles();
 	dcs.timers_fired = 0;
 
 	/* if this is the first timer, check the IRQ routine for the DRAM refresh stub */
@@ -1981,7 +1981,7 @@ static TIMER_DEVICE_CALLBACK( sport0_irq )
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
-	if ((cpu_get_total_cycles(dcs.cpu) - dcs.output_control_cycles) > 5)
+	if ((dcs.cpu->total_cycles() - dcs.output_control_cycles) > 5)
 	{
 		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, ASSERT_LINE);
 		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, CLEAR_LINE);

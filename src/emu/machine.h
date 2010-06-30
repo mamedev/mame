@@ -333,7 +333,7 @@ public:
 	ioport_list				m_portlist;			// points to a list of input port configurations
 
 	// CPU information
-	device_t *				firstcpu;			// first CPU (allows for quick iteration via typenext)
+	cpu_device *			firstcpu;			// first CPU (allows for quick iteration via typenext)
 
 	// game-related information
 	const game_driver *		gamedrv;			// points to the definition of the game machine

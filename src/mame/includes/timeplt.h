@@ -59,8 +59,8 @@ public:
 	struct jungler_star stars[JUNGLER_MAX_STARS];	// jungler
 
 	/* devices */
-	running_device *maincpu;
-	running_device *soundcpu;
+	cpu_device *maincpu;
+	cpu_device *soundcpu;
 	running_device *i8039;		// junofrst
 	running_device *samples;		// rallyx
 	running_device *filter_0_0;

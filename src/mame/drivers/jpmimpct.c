@@ -560,7 +560,7 @@ static READ16_HANDLER( jpmio_r )
 
 static WRITE16_HANDLER( jpmio_w )
 {
-	UINT64 cycles = cpu_get_total_cycles(space->cpu);
+	UINT64 cycles = space->machine->firstcpu->total_cycles();
 	switch (offset)
 	{
 		case 0x02:
@@ -1205,7 +1205,7 @@ static READ16_HANDLER( optos_r )
 static WRITE16_HANDLER( jpmioawp_w )
 {
 	int i;
-	UINT64 cycles  = cpu_get_total_cycles(space->cpu);
+	UINT64 cycles  = space->machine->firstcpu->total_cycles();
 	switch (offset)
 	{
 		case 0x00:

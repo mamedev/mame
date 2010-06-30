@@ -288,7 +288,7 @@ WRITE16_HANDLER( hdsnd68k_320com_w )
 READ16_HANDLER( hdsnddsp_get_bio )
 {
 	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
-	UINT64 cycles_since_last_bio = cpu_get_total_cycles(space->cpu) - state->last_bio_cycles;
+	UINT64 cycles_since_last_bio = state->sounddsp->total_cycles() - state->last_bio_cycles;
 	INT32 cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;
 
 	/* if we're not at the next BIO yet, advance us there */
@@ -298,7 +298,7 @@ READ16_HANDLER( hdsnddsp_get_bio )
 		state->last_bio_cycles += CYCLES_PER_BIO;
 	}
 	else
-		state->last_bio_cycles = cpu_get_total_cycles(space->cpu);
+		state->last_bio_cycles = state->sounddsp->total_cycles();
 	return ASSERT_LINE;
 }
 

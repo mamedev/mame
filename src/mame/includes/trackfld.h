@@ -45,7 +45,7 @@ public:
 	int      yiear_nmi_enable;		// yiear
 
 	/* devices */
-	running_device *audiocpu;
+	cpu_device *audiocpu;
 	running_device *vlm;
 };
 

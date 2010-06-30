@@ -31,9 +31,9 @@ public:
 	int           i8039_status;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *daccpu;
+	cpu_device *maincpu;
+	cpu_device *audiocpu;
+	cpu_device *daccpu;
 };
 
 

@@ -302,10 +302,10 @@ static MACHINE_START( pandoras )
 {
 	pandoras_state *state = (pandoras_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->subcpu = machine->device<cpu_device>("sub");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
+	state->mcu = machine->device<cpu_device>("mcu");
 
 	state_save_register_global(machine, state->firq_old_data_a);
 	state_save_register_global(machine, state->firq_old_data_b);
@@ -336,7 +336,7 @@ static READ8_DEVICE_HANDLER( pandoras_portA_r )
 static READ8_DEVICE_HANDLER( pandoras_portB_r )
 {
 	pandoras_state *state = (pandoras_state *)device->machine->driver_data;
-	return (cpu_get_total_cycles(state->audiocpu) / 512) & 0x0f;
+	return (state->audiocpu->total_cycles() / 512) & 0x0f;
 }
 
 static const ay8910_interface ay8910_config =

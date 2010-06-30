@@ -525,11 +525,11 @@ static READ8_HANDLER( h8330_itu_r )
 		val = memory_read_byte(h8->io, H8_SERIAL_1);
 		break;
 	case 0x92:  		// FRC H
-		frc = cpu_get_total_cycles(h8->device) / divider[h8->per_regs[0x96]];
+		frc = h8->device->total_cycles() / divider[h8->per_regs[0x96]];
 		frc %= 65536;
 		return frc>>8;
 	case 0x93:		// FRC L
-		frc = cpu_get_total_cycles(h8->device) / divider[h8->per_regs[0x96]];
+		frc = h8->device->total_cycles() / divider[h8->per_regs[0x96]];
 		frc %= 65536;
 		return frc&0xff;
 	case 0xb2:  		// port 1 data

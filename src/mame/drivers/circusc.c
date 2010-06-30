@@ -61,7 +61,7 @@ static MACHINE_START( circusc )
 {
 	circusc_state *state = (circusc_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->sn1 = devtag_get_device(machine, "sn1");
 	state->sn2 = devtag_get_device(machine, "sn2");
 	state->dac = devtag_get_device(machine, "dac");
@@ -84,14 +84,15 @@ static READ8_HANDLER( circusc_sh_timer_r )
      * to D1-D4.
      *
      * The following:
-     * clock = cpu_get_total_cycles(space->cpu) >> 10;
+     * clock = state->audiocpu->total_cycles() >> 10;
      * return (clock & 0x0f) << 1;
      * Can be shortened to:
      */
 
+	circusc_state *state = (circusc_state *)space->machine->driver_data;
 	int clock;
 
-	clock = cpu_get_total_cycles(space->cpu) >> 9;
+	clock = state->audiocpu->total_cycles() >> 9;
 
 	return clock & 0x1e;
 }

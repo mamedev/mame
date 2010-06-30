@@ -545,13 +545,13 @@ static void tms7000_service_timer1( running_device *device )
         {
             cpustate->t1_decrementer = cpustate->pf[2]; /* Reload decrementer (8 bit) */
 			cpu_set_input_line(device, TMS7000_IRQ2_LINE, HOLD_LINE);
-            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", cpu_get_total_cycles(device), cpu_get_total_cycles(device) - tick, cpustate->cycles_per_INT2-(cpu_get_total_cycles(device) - tick) );
-			//tick = cpu_get_total_cycles(device) );
+            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", cpustate->device->total_cycles(), cpustate->device->total_cycles() - tick, cpustate->cycles_per_INT2-(cpustate->device->total_cycles() - tick) );
+			//tick = cpustate->device->total_cycles() );
             /* Also, cascade out to timer 2 - timer 2 unimplemented */
         }
     }
-//  LOG( ( "tms7000: service timer1. 0x%2.2x 0x%2.2x (cycles %d)\t%d\t\n", cpustate->t1_prescaler, cpustate->t1_decrementer, cpu_get_total_cycles(device), cpu_get_total_cycles(device) - tick2 ) );
-//  tick2 = cpu_get_total_cycles(device);
+//  LOG( ( "tms7000: service timer1. 0x%2.2x 0x%2.2x (cycles %d)\t%d\t\n", cpustate->t1_prescaler, cpustate->t1_decrementer, cpustate->device->total_cycles(), cpustate->device->total_cycles() - tick2 ) );
+//  tick2 = cpustate->device->total_cycles();
 }
 
 static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */

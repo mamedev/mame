@@ -27,7 +27,7 @@ public:
 	UINT8          sn_latch;
 
 	/* devices */
-	running_device *audiocpu;
+	cpu_device *audiocpu;
 	running_device *sn1;
 	running_device *sn2;
 	running_device *dac;

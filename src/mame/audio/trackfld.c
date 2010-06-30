@@ -20,7 +20,8 @@
 
 READ8_HANDLER( trackfld_sh_timer_r )
 {
-	UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	UINT32 clock = state->audiocpu->total_cycles() / TIMER_RATE;
 
 	return clock & 0xF;
 }
@@ -53,7 +54,7 @@ WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 READ8_HANDLER( hyperspt_sh_timer_r )
 {
 	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
-	UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
+	UINT32 clock = state->audiocpu->total_cycles() / TIMER_RATE;
 
 	if (state->vlm != NULL)
 		return (clock & 0x3) | (vlm5030_bsy(state->vlm) ? 0x04 : 0);

@@ -278,7 +278,7 @@ static READ8_DEVICE_HANDLER( nemesis_portA_r )
    bit 7:     unused by this software version. Bubble Memory version uses this bit.
 */
 	nemesis_state *state = (nemesis_state *)device->machine->driver_data;
-	int res = (cpu_get_total_cycles(state->audiocpu) / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
+	int res = (state->audiocpu->total_cycles() / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
 
@@ -1648,8 +1648,8 @@ static MACHINE_START( nemesis )
 {
 	nemesis_state *state = (nemesis_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->vlm = devtag_get_device(machine, "vlm");
 
 	state_save_register_global(machine, state->irq_on);

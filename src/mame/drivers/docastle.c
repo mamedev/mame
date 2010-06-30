@@ -581,7 +581,8 @@ static MACHINE_START( docastle )
 {
 	docastle_state *state = (docastle_state *)machine->driver_data;
 
-	state->slave = devtag_get_device(machine, "slave");
+	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->slave = machine->device<cpu_device>("slave");
 
 	state_save_register_global(machine, state->adpcm_pos);
 	state_save_register_global(machine, state->adpcm_data);

@@ -153,7 +153,7 @@ void mips3com_reset(mips3_state *mips)
 	mips->cpr[0][COP0_Count] = 0;
 	mips->cpr[0][COP0_Config] = compute_config_register(mips);
 	mips->cpr[0][COP0_PRId] = compute_prid_register(mips);
-	mips->count_zero_time = cpu_get_total_cycles(mips->device);
+	mips->count_zero_time = mips->device->total_cycles();
 
 	/* initialize the TLB state */
 	for (tlbindex = 0; tlbindex < mips->tlbentries; tlbindex++)
@@ -200,7 +200,7 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 	/* modify the timer to go off */
 	if (mips->compare_armed && (mips->cpr[0][COP0_Status] & SR_IMEX5))
 	{
-		UINT32 count = (cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2;
+		UINT32 count = (mips->device->total_cycles() - mips->count_zero_time) / 2;
 		UINT32 compare = mips->cpr[0][COP0_Compare];
 		UINT32 delta = compare - count;
 		attotime newtime = cpu_clocks_to_attotime(mips->device, (UINT64)delta * 2);
@@ -297,7 +297,7 @@ void mips3com_tlbwr(mips3_state *mips)
 
 	/* "random" is based off of the current cycle counting through the non-wired pages */
 	if (unwired > 0)
-		tlbindex = ((cpu_get_total_cycles(mips->device) - mips->count_zero_time) % unwired + wired) & 0x3f;
+		tlbindex = ((mips->device->total_cycles() - mips->count_zero_time) % unwired + wired) & 0x3f;
 
 	/* use the common handler to write to this tlbindex */
 	tlb_write_common(mips, tlbindex);
@@ -487,7 +487,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MIPS3_SR:			info->i = mips->cpr[0][COP0_Status];	break;
 		case CPUINFO_INT_REGISTER + MIPS3_EPC:			info->i = mips->cpr[0][COP0_EPC];		break;
 		case CPUINFO_INT_REGISTER + MIPS3_CAUSE:		info->i = mips->cpr[0][COP0_Cause];		break;
-		case CPUINFO_INT_REGISTER + MIPS3_COUNT:		info->i = ((cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2); break;
+		case CPUINFO_INT_REGISTER + MIPS3_COUNT:		info->i = ((mips->device->total_cycles() - mips->count_zero_time) / 2); break;
 		case CPUINFO_INT_REGISTER + MIPS3_COMPARE:		info->i = mips->cpr[0][COP0_Compare];	break;
 		case CPUINFO_INT_REGISTER + MIPS3_INDEX:		info->i = mips->cpr[0][COP0_Index];		break;
 		case CPUINFO_INT_REGISTER + MIPS3_RANDOM:		info->i = mips->cpr[0][COP0_Random];	break;
@@ -557,7 +557,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + MIPS3_SR:			sprintf(info->s, "SR: %08X", (UINT32)mips->cpr[0][COP0_Status]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_EPC:			sprintf(info->s, "EPC:%08X", (UINT32)mips->cpr[0][COP0_EPC]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_CAUSE:		sprintf(info->s, "Cause:%08X", (UINT32)mips->cpr[0][COP0_Cause]); break;
-		case CPUINFO_STR_REGISTER + MIPS3_COUNT:		sprintf(info->s, "Count:%08X", (UINT32)((cpu_get_total_cycles(mips->device) - mips->count_zero_time) / 2)); break;
+		case CPUINFO_STR_REGISTER + MIPS3_COUNT:		sprintf(info->s, "Count:%08X", (UINT32)((mips->device->total_cycles() - mips->count_zero_time) / 2)); break;
 		case CPUINFO_STR_REGISTER + MIPS3_COMPARE:		sprintf(info->s, "Compare:%08X", (UINT32)mips->cpr[0][COP0_Compare]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_INDEX:		sprintf(info->s, "Index:%08X", (UINT32)mips->cpr[0][COP0_Index]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_RANDOM:		sprintf(info->s, "Random:%08X", (UINT32)mips->cpr[0][COP0_Random]); break;

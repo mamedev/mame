@@ -200,7 +200,7 @@ static MACHINE_START( tutankhm )
 
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
 
 	state_save_register_global(machine, state->irq_toggle);
 	state_save_register_global(machine, state->irq_enable);

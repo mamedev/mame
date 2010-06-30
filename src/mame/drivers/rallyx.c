@@ -876,7 +876,7 @@ static MACHINE_START( rallyx )
 {
 	timeplt_state *state = (timeplt_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->samples = devtag_get_device(machine, "samples");
 
 	state_save_register_global(machine, state->last_bang);

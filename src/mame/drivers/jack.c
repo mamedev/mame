@@ -60,7 +60,7 @@ static READ8_DEVICE_HANDLER( timer_r )
 
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
-	return cpu_get_total_cycles(state->audiocpu) / state->timer_rate;
+	return state->audiocpu->total_cycles() / state->timer_rate;
 }
 
 
@@ -796,7 +796,7 @@ static MACHINE_START( jack )
 {
 	jack_state *state = (jack_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
 
 	state_save_register_global(machine, state->joinem_snd_bit);
 	state_save_register_global(machine, state->question_address);

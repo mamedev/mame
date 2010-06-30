@@ -462,7 +462,7 @@ INLINE UINT64 get_cop0_reg(int idx)
 			mips3.core.icount -= MIPS3_COUNT_READ_CYCLES;
 		else
 			mips3.core.icount = 0;
-		return (UINT32)((cpu_get_total_cycles(mips3.core.device) - mips3.core.count_zero_time) / 2);
+		return (UINT32)((mips3.core.device->total_cycles() - mips3.core.count_zero_time) / 2);
 	}
 	else if (idx == COP0_Cause)
 	{
@@ -478,7 +478,7 @@ INLINE UINT64 get_cop0_reg(int idx)
 		int wired = mips3.core.cpr[0][COP0_Wired] & 0x3f;
 		int range = 48 - wired;
 		if (range > 0)
-			return ((cpu_get_total_cycles(mips3.core.device) - mips3.core.count_zero_time) % range + wired) & 0x3f;
+			return ((mips3.core.device->total_cycles() - mips3.core.count_zero_time) % range + wired) & 0x3f;
 		else
 			return 47;
 	}
@@ -518,7 +518,7 @@ INLINE void set_cop0_reg(int idx, UINT64 val)
 
 		case COP0_Count:
 			mips3.core.cpr[0][idx] = val;
-			mips3.core.count_zero_time = cpu_get_total_cycles(mips3.core.device) - ((UINT64)(UINT32)val * 2);
+			mips3.core.count_zero_time = mips3.core.device->total_cycles() - ((UINT64)(UINT32)val * 2);
 			mips3com_update_cycle_counting(&mips3.core);
 			break;
 

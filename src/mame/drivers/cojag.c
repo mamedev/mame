@@ -324,6 +324,8 @@ UINT8 cojag_is_r3000;
  *
  *************************************/
 
+static cpu_device *main_cpu;
+
 static UINT32 misc_control_data;
 static UINT8 eeprom_enable;
 
@@ -635,7 +637,7 @@ static UINT64 main_speedup_max_cycles;
 
 static READ32_HANDLER( cojagr3k_main_speedup_r )
 {
-	UINT64 curcycles = cpu_get_total_cycles(space->cpu);
+	UINT64 curcycles = main_cpu->total_cycles();
 
 	/* if it's been less than main_speedup_max_cycles cycles since the last time */
 	if (curcycles - main_speedup_last_cycles < main_speedup_max_cycles)
@@ -710,7 +712,7 @@ static READ32_HANDLER( main_gpu_wait_r )
 
 static WRITE32_HANDLER( area51_main_speedup_w )
 {
-	UINT64 curcycles = cpu_get_total_cycles(space->cpu);
+	UINT64 curcycles = main_cpu->total_cycles();
 
 	/* store the data */
 	COMBINE_DATA(main_speedup);
@@ -744,7 +746,7 @@ static WRITE32_HANDLER( area51_main_speedup_w )
 
 static WRITE32_HANDLER( area51mx_main_speedup_w )
 {
-	UINT64 curcycles = cpu_get_total_cycles(space->cpu);
+	UINT64 curcycles = main_cpu->total_cycles();
 
 	/* store the data */
 	COMBINE_DATA(&main_speedup[offset]);
@@ -1504,7 +1506,8 @@ ROM_END
 static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UINT16 spin_pc)
 {
 	/* copy over the ROM */
-	cojag_is_r3000 = (cpu_get_type(devtag_get_device(machine, "maincpu")) == CPU_R3041BE);
+	main_cpu = machine->device<cpu_device>("maincpu");
+	cojag_is_r3000 = (cpu_get_type(main_cpu) == CPU_R3041BE);
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)

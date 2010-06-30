@@ -1483,7 +1483,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			return result;
 
 		case REG_REFCNT:
-			return (cpu_get_total_cycles(space->cpu) / 16) & 0xfffc;
+			return (tms->device->total_cycles() / 16) & 0xfffc;
 
 		case REG_INTPEND:
 			result = IOREG(tms, offset);
@@ -1529,7 +1529,7 @@ READ16_HANDLER( tms34020_io_register_r )
 		{
 			int refreshrate = (IOREG(tms, REG020_CONFIG) >> 8) & 7;
 			if (refreshrate < 6)
-				return (cpu_get_total_cycles(space->cpu) / refreshrate) & 0xffff;
+				return (tms->device->total_cycles() / refreshrate) & 0xffff;
 			break;
 		}
 	}

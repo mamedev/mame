@@ -104,7 +104,7 @@ static READ8_DEVICE_HANDLER( junofrst_portA_r )
 	/* divided by 1024 to get this timer */
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	timer = (cpu_get_total_cycles(state->soundcpu) / (1024 / 2)) & 0x0f;
+	timer = (state->soundcpu->total_cycles() / (1024 / 2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
 
@@ -282,9 +282,9 @@ static MACHINE_START( junofrst )
 {
 	timeplt_state *state = (timeplt_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->i8039 = devtag_get_device(machine, "mcu");
-	state->soundcpu = devtag_get_device(machine, "audiocpu");
+	state->soundcpu = machine->device<cpu_device>("audiocpu");
 	state->filter_0_0 = devtag_get_device(machine, "filter.0.0");
 	state->filter_0_1 = devtag_get_device(machine, "filter.0.1");
 	state->filter_0_2 = devtag_get_device(machine, "filter.0.2");

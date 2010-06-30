@@ -40,8 +40,8 @@ public:
 	UINT8     frame_counter;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	cpu_device *maincpu;
+	cpu_device *audiocpu;
 	running_device *vlm;
 };
 

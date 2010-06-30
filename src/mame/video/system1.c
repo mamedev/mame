@@ -244,7 +244,7 @@ WRITE8_HANDLER( system1_sprite_collision_reset_w )
  *
  *************************************/
 
-INLINE void videoram_wait_states(running_device *cpu)
+INLINE void videoram_wait_states(cpu_device *cpu)
 {
 	/* The main Z80's CPU clock is halted whenever an access to VRAM happens,
        and is only restarted by the FIXST signal, which occurs once every
@@ -254,21 +254,21 @@ INLINE void videoram_wait_states(running_device *cpu)
        and is based on a dump of 315-5137 */
 	const UINT32 cpu_cycles_per_fixst = 4 * 4;
 	const UINT32 fixst_offset = 2 * 4;
-	UINT32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((cpu_get_total_cycles(cpu) - fixst_offset) % cpu_cycles_per_fixst);
+	UINT32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((cpu->total_cycles() - fixst_offset) % cpu_cycles_per_fixst);
 
 	cpu_adjust_icount(cpu, -cycles_until_next_fixst);
 }
 
 READ8_HANDLER( system1_videoram_r )
 {
-	videoram_wait_states(space->cpu);
+	videoram_wait_states(space->machine->firstcpu);
 	offset |= 0x1000 * ((videoram_bank >> 1) % (tilemap_pages / 2));
 	return space->machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( system1_videoram_w )
 {
-	videoram_wait_states(space->cpu);
+	videoram_wait_states(space->machine->firstcpu);
 	offset |= 0x1000 * ((videoram_bank >> 1) % (tilemap_pages / 2));
 	space->machine->generic.videoram.u8[offset] = data;
 

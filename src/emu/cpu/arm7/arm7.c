@@ -616,7 +616,7 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
 			switch( cReg )
 			{
 				case 1:	// clock counter
-					data = (UINT32)cpu_get_total_cycles(device);
+					data = (UINT32)cpustate->device->total_cycles();
 					break;
 
 				default:

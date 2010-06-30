@@ -209,7 +209,7 @@ static MACHINE_START( pooyan )
 {
 	timeplt_state *state = (timeplt_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
 
 	state_save_register_global(machine, state->irq_enable);
 }
