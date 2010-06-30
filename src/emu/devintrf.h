@@ -467,6 +467,7 @@ protected:
 public:
 	// casting helpers
 	device_t &device() { return m_device; }
+	const device_t &device() const { return m_device; }
 	operator device_t &() { return m_device; }
 	operator device_t *() { return &m_device; }
 

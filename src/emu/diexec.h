@@ -247,6 +247,8 @@ public:
 	UINT32 cycles_to_clocks(UINT32 cycles) const { return m_execute_config.cycles_to_clocks(cycles); }
 	UINT32 min_cycles() const { return m_execute_config.min_cycles(); }
 	UINT32 max_cycles() const { return m_execute_config.max_cycles(); }
+	attotime cycles_to_attotime(UINT32 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
+	UINT64 attotime_to_cycles(attotime duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 
 	// input line information getters
 	UINT32 input_lines() const { return m_execute_config.input_lines(); }

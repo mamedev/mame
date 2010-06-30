@@ -132,7 +132,7 @@ INLINE void set_xer(powerpc_state *ppc, UINT32 value)
 
 INLINE UINT64 get_timebase(powerpc_state *ppc)
 {
-	return (cpu_get_total_cycles(ppc->device) - ppc->tb_zero_cycles) / ppc->tb_divisor;
+	return (ppc->device->total_cycles() - ppc->tb_zero_cycles) / ppc->tb_divisor;
 }
 
 
@@ -142,7 +142,7 @@ INLINE UINT64 get_timebase(powerpc_state *ppc)
 
 INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 {
-	ppc->tb_zero_cycles = cpu_get_total_cycles(ppc->device) - newtb * ppc->tb_divisor;
+	ppc->tb_zero_cycles = ppc->device->total_cycles() - newtb * ppc->tb_divisor;
 }
 
 
@@ -153,7 +153,7 @@ INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 
 INLINE UINT32 get_decrementer(powerpc_state *ppc)
 {
-	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpu_get_total_cycles(ppc->device);
+	INT64 cycles_until_zero = ppc->dec_zero_cycles - ppc->device->total_cycles();
 	cycles_until_zero = MAX(cycles_until_zero, 0);
 	return cycles_until_zero / ppc->tb_divisor;
 }
@@ -170,14 +170,14 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 
 	if (PRINTF_DECREMENTER)
 	{
-		UINT64 total = cpu_get_total_cycles(ppc->device);
+		UINT64 total = ppc->device->total_cycles();
 		mame_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
 				curdec, newdec, ppc->tb_divisor,
 				(UINT32)(total >> 32), (UINT32)total, (UINT32)(cycles_until_done >> 32), (UINT32)cycles_until_done);
 	}
 
-	ppc->dec_zero_cycles = cpu_get_total_cycles(ppc->device) + cycles_until_done;
-	timer_adjust_oneshot(ppc->decrementer_int_timer, cpu_clocks_to_attotime(ppc->device, cycles_until_done), 0);
+	ppc->dec_zero_cycles = ppc->device->total_cycles() + cycles_until_done;
+	timer_adjust_oneshot(ppc->decrementer_int_timer, ppc->device->cycles_to_attotime(cycles_until_done), 0);
 
 	if ((INT32)curdec >= 0 && (INT32)newdec < 0)
 		ppc->irq_pending |= 0x02;
@@ -383,7 +383,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->msr = MSROEA_IP;
 
 		/* reset the decrementer */
-		ppc->dec_zero_cycles = cpu_get_total_cycles(ppc->device);
+		ppc->dec_zero_cycles = ppc->device->total_cycles();
 		decrementer_int_callback(ppc->device->machine, ppc, 0);
 	}
 
@@ -404,7 +404,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->spr[SPR603_HID0] = 1;
 
 	/* time base starts here */
-	ppc->tb_zero_cycles = cpu_get_total_cycles(ppc->device);
+	ppc->tb_zero_cycles = ppc->device->total_cycles();
 
 	/* clear interrupts */
 	ppc->irq_pending = 0;
@@ -1517,8 +1517,8 @@ static TIMER_CALLBACK( decrementer_int_callback )
 
 	/* advance by another full rev */
 	ppc->dec_zero_cycles += (UINT64)ppc->tb_divisor << 32;
-	cycles_until_next = ppc->dec_zero_cycles - cpu_get_total_cycles(ppc->device);
-	timer_adjust_oneshot(ppc->decrementer_int_timer, cpu_clocks_to_attotime(ppc->device, cycles_until_next), 0);
+	cycles_until_next = ppc->dec_zero_cycles - ppc->device->total_cycles();
+	timer_adjust_oneshot(ppc->decrementer_int_timer, ppc->device->cycles_to_attotime(cycles_until_next), 0);
 }
 
 
@@ -1784,7 +1784,7 @@ static TIMER_CALLBACK( ppc4xx_fit_callback )
 		UINT32 timebase = get_timebase(ppc);
 		UINT32 interval = 0x200 << (4 * ((ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_FP_MASK) >> 24));
 		UINT32 target = (timebase + interval) & ~(interval - 1);
-		timer_adjust_oneshot(ppc->fit_timer, cpu_clocks_to_attotime(ppc->device, (target + 1 - timebase) / ppc->tb_divisor), TRUE);
+		timer_adjust_oneshot(ppc->fit_timer, ppc->device->cycles_to_attotime((target + 1 - timebase) / ppc->tb_divisor), TRUE);
 	}
 
 	/* otherwise, turn ourself off */
@@ -1815,7 +1815,7 @@ static TIMER_CALLBACK( ppc4xx_pit_callback )
 		UINT32 timebase = get_timebase(ppc);
 		UINT32 interval = ppc->pit_reload;
 		UINT32 target = timebase + interval;
-		timer_adjust_oneshot(ppc->pit_timer, cpu_clocks_to_attotime(ppc->device, (target + 1 - timebase) / ppc->tb_divisor), TRUE);
+		timer_adjust_oneshot(ppc->pit_timer, ppc->device->cycles_to_attotime((target + 1 - timebase) / ppc->tb_divisor), TRUE);
 	}
 
 	/* otherwise, turn ourself off */
