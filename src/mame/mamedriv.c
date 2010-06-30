@@ -2974,6 +2974,7 @@ V-V                           TP-027
 	DRIVER( mvsc )		/* 23/01/1998 (c) 1998 (Euro) */
 	DRIVER( mvscr1 )	/* 12/01/1998 (c) 1998 (Euro) */
 	DRIVER( mvscu )		/* 23/01/1998 (c) 1998 (US) */
+	DRIVER( mvscur1 )	/* 23/01/1998 (c) 1998 (US) */
 	DRIVER( mvscj )		/* 23/01/1998 (c) 1998 (Japan) */
 	DRIVER( mvscjr1 )	/* 12/01/1998 (c) 1998 (Japan) */
 	DRIVER( mvsca )		/* 23/01/1998 (c) 1998 (Asia) */
