@@ -71,19 +71,58 @@
 #include "winutil.h"
 #include "debugger.h"
 
-#define ENABLE_PROFILER		0
 #define DEBUG_SLOW_LOCKS	0
 
 
-//============================================================
-//  TYPE DEFINITIONS
-//============================================================
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
 #ifdef UNICODE
 #define UNICODE_POSTFIX "W"
 #else
 #define UNICODE_POSTFIX "A"
 #endif
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class sampling_profiler
+{
+public:
+	sampling_profiler(UINT32 max_seconds, UINT8 stack_depth);
+	~sampling_profiler();
+	
+	void start();
+	void stop();
+
+//	void reset();
+	void print_results();
+
+private:
+	static DWORD WINAPI thread_entry(LPVOID lpParameter);
+	void thread_run();
+
+	static int CLIB_DECL compare_address(const void *item1, const void *item2);
+	static int CLIB_DECL compare_frequency(const void *item1, const void *item2);
+	
+	HANDLE			m_target_thread;
+
+	HANDLE			m_thread;
+	DWORD			m_thread_id;
+	volatile bool	m_thread_exit;
+
+	UINT8			m_stack_depth;
+	UINT8			m_entry_stride;
+	UINT32			m_max_seconds;
+	FPTR *			m_buffer;
+	FPTR *			m_buffer_ptr;
+	FPTR *			m_buffer_end;
+};
+
 
 typedef BOOL (WINAPI *try_enter_critical_section_ptr)(LPCRITICAL_SECTION lpCriticalSection);
 
@@ -105,17 +144,18 @@ typedef BOOL (WINAPI *get_module_information_ptr)(HANDLE hProcess, HMODULE hModu
 
 
 
-//============================================================
+//**************************************************************************
 //  GLOBAL VARIABLES
-//============================================================
+//**************************************************************************
 
 // this line prevents globbing on the command line
 int _CRT_glob = 0;
 
 
-//============================================================
+
+//**************************************************************************
 //  LOCAL VARIABLES
-//============================================================
+//**************************************************************************
 
 static try_enter_critical_section_ptr try_enter_critical_section;
 
@@ -153,11 +193,13 @@ static int timeresult;
 //static MMRESULT result;
 static TIMECAPS caps;
 
+static sampling_profiler *profiler = NULL;
 
 
-//============================================================
-//  PROTOTYPES
-//============================================================
+
+//**************************************************************************
+//  FUNCTION PROTOTYPES
+//**************************************************************************
 
 static void osd_exit(running_machine &machine);
 
@@ -165,16 +207,14 @@ static void soft_link_functions(void);
 static int is_double_click_start(int argc);
 static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter);
 static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info);
-static const char *lookup_symbol(FPTR address);
-
-static void start_profiler(void);
-static void stop_profiler(void);
+static const char *lookup_symbol(FPTR address, FPTR *symbase = NULL, bool cache = false);
+static void winui_output_error(void *param, const char *format, va_list argptr);
 
 
 
-//============================================================
+//**************************************************************************
 //  OPTIONS
-//============================================================
+//**************************************************************************
 
 // struct definitions
 const options_entry mame_win_options[] =
@@ -191,6 +231,7 @@ const options_entry mame_win_options[] =
 	{ "priority(-15-1)",          "0",        0,                 "thread priority for the main game thread; range from -15 to 1" },
 	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
 	{ "numprocessors;np",         "auto",     0,				 "number of processors; this overrides the number the system reports" },
+	{ "profile",                  "0",        0,                 "enable profiling, specifying the stack depth to track" },
 
 	// video options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
@@ -260,22 +301,50 @@ const options_entry mame_win_options[] =
 };
 
 
-//============================================================
-//  winui_output_error
-//============================================================
 
-static void winui_output_error(void *param, const char *format, va_list argptr)
+//**************************************************************************
+//  INLINE FUNCTIONS
+//**************************************************************************
+
+#ifdef PTR64
+#define IMAGE_FILE_MACHINE_NATIVE IMAGE_FILE_MACHINE_AMD64
+inline FPTR ip_from_context(CONTEXT &context)
 {
-	char buffer[1024];
-
-	// if we are in fullscreen mode, go to windowed mode
-	if ((video_config.windowed == 0) && (win_window_list != NULL))
-		winwindow_toggle_full_screen();
-
-	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, argptr);
-	win_message_box_utf8(win_window_list ? win_window_list->hwnd : NULL, buffer, APPNAME, MB_OK);
+	return context.Rip;
 }
+inline void init_stack_frame(STACKFRAME64 &frame, CONTEXT &context)
+{
+	memset(&frame, 0, sizeof(frame));
+	frame.AddrPC.Offset = context.Rip;
+	frame.AddrPC.Mode = AddrModeFlat;
+	frame.AddrFrame.Offset = context.Rsp;
+	frame.AddrFrame.Mode = AddrModeFlat;
+	frame.AddrStack.Offset = context.Rsp;
+	frame.AddrStack.Mode = AddrModeFlat;
+}
+#else
+#define IMAGE_FILE_MACHINE_NATIVE IMAGE_FILE_MACHINE_I386
+inline FPTR ip_from_context(CONTEXT &context)
+{
+	return context.Eip;
+}
+inline void init_stack_frame(STACKFRAME64 &frame, CONTEXT &context)
+{
+	memset(&frame, 0, sizeof(frame));
+	frame.AddrPC.Offset = context.Eip;
+	frame.AddrPC.Mode = AddrModeFlat;
+	frame.AddrFrame.Offset = context.Esp;
+	frame.AddrFrame.Mode = AddrModeFlat;
+	frame.AddrStack.Offset = context.Esp;
+	frame.AddrStack.Mode = AddrModeFlat;
+}
+#endif
 
+
+
+//**************************************************************************
+//  MAIN ENTRY POINT
+//**************************************************************************
 
 
 //============================================================
@@ -320,6 +389,24 @@ int main(int argc, char *argv[])
 
 
 //============================================================
+//  winui_output_error
+//============================================================
+
+static void winui_output_error(void *param, const char *format, va_list argptr)
+{
+	char buffer[1024];
+
+	// if we are in fullscreen mode, go to windowed mode
+	if ((video_config.windowed == 0) && (win_window_list != NULL))
+		winwindow_toggle_full_screen();
+
+	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, argptr);
+	win_message_box_utf8(win_window_list ? win_window_list->hwnd : NULL, buffer, APPNAME, MB_OK);
+}
+
+
+
+//============================================================
 //  output_oslog
 //============================================================
 
@@ -335,8 +422,16 @@ static void output_oslog(running_machine &machine, const char *buffer)
 
 void osd_init(running_machine *machine)
 {
-	int watchdog = options_get_int(machine->options(), WINOPTION_WATCHDOG);
 	const char *stemp;
+
+	// determine if we are profiling, and adjust options appropriately
+	int profile = options_get_int(machine->options(), WINOPTION_PROFILE);
+	if (profile > 0)
+	{
+		options_set_bool(machine->options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(machine->options(), WINOPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(machine->options(), WINOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
+	}
 
 	// thread priority
 	if (!(machine->debug_flags & DEBUG_FLAG_OSD_ENABLED))
@@ -380,9 +475,8 @@ void osd_init(running_machine *machine)
 //      if (av_set_mm_thread_characteristics != NULL)
 //          mm_task = (*av_set_mm_thread_characteristics)(TEXT("Playback"), &task_index);
 
-	start_profiler();
-
 	// if a watchdog thread is requested, create one
+	int watchdog = options_get_int(machine->options(), WINOPTION_WATCHDOG);
 	if (watchdog != 0)
 	{
 		watchdog_reset_event = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -391,6 +485,13 @@ void osd_init(running_machine *machine)
 		assert_always(watchdog_exit_event != NULL, "Failed to create watchdog exit event");
 		watchdog_thread = CreateThread(NULL, 0, watchdog_thread_entry, (LPVOID)(FPTR)watchdog, 0, NULL);
 		assert_always(watchdog_thread != NULL, "Failed to create watchdog thread");
+	}
+
+	// create and start the profiler
+	if (profile > 0)
+	{
+		profiler = global_alloc(sampling_profiler(1000, profile - 1));
+		profiler->start();
 	}
 }
 
@@ -414,7 +515,13 @@ static void osd_exit(running_machine &machine)
 		watchdog_thread = NULL;
 	}
 
-	stop_profiler();
+	// stop the profiler
+	if (profiler != NULL)
+	{
+		profiler->stop();
+		profiler->print_results();
+		global_free(profiler);
+	}
 
 	// turn off our multimedia tasks
 //      if (av_revert_mm_thread_characteristics != NULL)
@@ -654,37 +761,10 @@ static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info)
 		fprintf(stderr, "-----------------------------------------------------\n");
 		fprintf(stderr, "Stack crawl:\n");
 
-		memset(&stackframe, 0, sizeof(stackframe));
-#ifdef PTR64
-		stackframe.AddrPC.Offset = context.Rip;
-		stackframe.AddrFrame.Offset = context.Rsp;
-		stackframe.AddrStack.Offset = context.Rsp;
-#else
-		stackframe.AddrPC.Offset = context.Eip;
-		stackframe.AddrFrame.Offset = context.Ebp;
-		stackframe.AddrStack.Offset = context.Esp;
-#endif
-		stackframe.AddrPC.Mode = AddrModeFlat;
-		stackframe.AddrFrame.Mode = AddrModeFlat;
-		stackframe.AddrStack.Mode = AddrModeFlat;
-
-		while (stack_walk_64(
-#ifdef PTR64
-				IMAGE_FILE_MACHINE_AMD64,
-#else
-				IMAGE_FILE_MACHINE_I386,
-#endif
-				GetCurrentProcess(),
-				GetCurrentThread(),
-				&stackframe,
-				&context,
-				NULL,
-				sym_function_table_access_64,
-				sym_get_module_base_64,
-				NULL))
-		{
+		// walk the stack
+		init_stack_frame(stackframe, context);
+		while (stack_walk_64(IMAGE_FILE_MACHINE_NATIVE, GetCurrentProcess(), GetCurrentThread(), &stackframe, &context, NULL, sym_function_table_access_64, sym_get_module_base_64, NULL))
 			fprintf(stderr, "  %p: %p%s\n", (void *)stackframe.AddrFrame.Offset, (void *)stackframe.AddrPC.Offset, lookup_symbol((FPTR)stackframe.AddrPC.Offset));
-		}
 	}
 
 	// exit
@@ -749,8 +829,15 @@ static const char *line_to_symbol(const char *line, FPTR &address)
 //  lookup_symbol
 //============================================================
 
-static const char *lookup_symbol(FPTR address)
+static const char *lookup_symbol(FPTR address, FPTR *symbase, bool cache)
 {
+	struct symbol_entry
+	{
+		symbol_entry *next;
+		FPTR address;
+		char name[1];
+	};
+	static symbol_entry *symbol_cache;
 	static char buffer[1024];
 
 	// first try to do it formally
@@ -769,294 +856,347 @@ static const char *lookup_symbol(FPTR address)
 
 		// try to get source info as well; again we are returned an ANSI string
 		if (sym_get_line_from_addr_64 != NULL && sym_get_line_from_addr_64(GetCurrentProcess(), address, &linedisp, &lineinfo))
-			sprintf(buffer, " (%s+0x%04x, %s:%d)", info.Name, (UINT32)displacement, lineinfo.FileName, (int)lineinfo.LineNumber);
+		{
+			if (displacement != 0)
+				sprintf(buffer, " (%s+0x%04x, %s:%d)", info.Name, (UINT32)displacement, lineinfo.FileName, (int)lineinfo.LineNumber);
+			else
+				sprintf(buffer, " (%s, %s:%d)", info.Name, lineinfo.FileName, (int)lineinfo.LineNumber);
+		}
 		else
-			sprintf(buffer, " (%s+0x%04x)", info.Name, (UINT32)displacement);
+		{
+			if (displacement != 0)
+				sprintf(buffer, " (%s+0x%04x)", info.Name, (UINT32)displacement);
+			else
+				sprintf(buffer, " (%s)", info.Name);
+		}
+		
+		// set the symbase
+		if (symbase != NULL)
+			*symbase = address - displacement;
 		return buffer;
 	}
-
-	// see if we have a map file
-	FILE *map = fopen(mapfile_name, "r");
-	if (map == NULL)
-		return " (no map)";
-
+	
 	// reset the bests
 	astring best_symbol;
 	FPTR best_addr = 0;
 
-	// parse the file, looking for map entries
-	char line[1024];
-	while (fgets(line, sizeof(line) - 1, map))
+	// if we have a cache, look it up there
+	if (symbol_cache != NULL)
 	{
-		FPTR addr;
-		const char *symbol = line_to_symbol(line, addr);
-		if (symbol != NULL && addr <= address && addr > best_addr)
-		{
-			best_addr = addr;
-			best_symbol.cpy(symbol);
-		}
+		// scan the cache looking for the best match
+		for (symbol_entry *cursym = symbol_cache; cursym != NULL; cursym = cursym->next)
+			if (cursym->address <= address && cursym->address > best_addr)
+			{
+				best_addr = cursym->address;
+				best_symbol.cpy(cursym->name);
+			}
 	}
-	fclose(map);
+	
+	// otherwise, walk the map file, generating a cache if we are allowed to
+	else
+	{
+		symbol_entry **tailptr = &symbol_cache;
+		
+		// see if we have a map file
+		FILE *map = fopen(mapfile_name, "r");
+		if (map == NULL)
+			return " (no map)";
 
-	// create the final result
+		// parse the file, looking for map entries
+		char line[1024];
+		while (fgets(line, sizeof(line) - 1, map))
+		{
+			FPTR addr;
+			const char *symbol = line_to_symbol(line, addr);
+			
+			// if we got one, see if this is the best
+			if (symbol != NULL)
+			{
+				if (addr <= address && addr > best_addr)
+				{
+					best_addr = addr;
+					best_symbol.cpy(symbol);
+				}
+				
+				// also create a cache entry if we can
+				if (cache)
+				{
+					symbol_entry *entry = reinterpret_cast<symbol_entry *>(osd_malloc(sizeof(symbol_entry) + strlen(symbol)));
+					entry->next = NULL;
+					entry->address = addr;
+					strcpy(entry->name, symbol);
+					*tailptr = entry;
+					tailptr = &entry->next;
+				}
+			}
+		}
+		fclose(map);
+	}
+		
+	// generate the string
 	if (address - best_addr > 0x10000)
-		return " (unknown)";
-	sprintf(buffer, " (%s+0x%04x)", best_symbol.trimspace().cstr(), (UINT32)(address - best_addr));
+		strcpy(buffer, " (unknown)");\
+	else if (address != best_addr)
+		sprintf(buffer, " (%s+0x%04x)", best_symbol.trimspace().cstr(), (UINT32)(address - best_addr));
+	else
+		sprintf(buffer, " (%s)", best_symbol.trimspace().cstr());
+
+	// set the symbase
+	if (symbase != NULL)
+		*symbase = best_addr;
 	return buffer;
 }
 
 
 
-#if ENABLE_PROFILER
+//**************************************************************************
+//  SAMPLING PROFILER
+//**************************************************************************
 
-//============================================================
-//
-//  profiler.c - Sampling profiler
-//
-//============================================================
+//-------------------------------------------------
+//  sampling_profiler - constructor
+//-------------------------------------------------
 
-//============================================================
-//  TYPE DEFINITIONS
-//============================================================
-
-#define MAX_SYMBOLS		65536
-
-typedef struct _map_entry map_entry;
-
-struct _map_entry
+sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
+	: m_thread(NULL),
+	  m_thread_id(0),
+	  m_thread_exit(false),
+	  m_stack_depth(stack_depth),
+	  m_entry_stride(stack_depth + 3),
+	  m_max_seconds(max_seconds),
+	  m_buffer(global_alloc(FPTR[max_seconds * 1000 * m_entry_stride])),
+	  m_buffer_ptr(m_buffer),
+	  m_buffer_end(m_buffer + max_seconds * 1000 * m_entry_stride)
 {
-	FPTR start;
-	FPTR end;
-	UINT64 hits;
-	char *name;
-};
-
-
-
-//============================================================
-//  LOCAL VARIABLES
-//============================================================
-
-static map_entry symbol_map[MAX_SYMBOLS];
-static int map_entries;
-
-static HANDLE profiler_thread;
-static DWORD profiler_thread_id;
-static volatile UINT8 profiler_thread_exit;
-
-
-
-//============================================================
-//  compare_base
-//  compare_hits -- qsort callbacks to sort on
-//============================================================
-
-static int CLIB_DECL compare_start(const void *item1, const void *item2)
-{
-	return ((const map_entry *)item1)->start - ((const map_entry *)item2)->start;
-}
-
-static int CLIB_DECL compare_hits(const void *item1, const void *item2)
-{
-	return ((const map_entry *)item2)->hits - ((const map_entry *)item1)->hits;
 }
 
 
-//============================================================
-//  add_symbol_map_entry
-//  parse_map_file
-//============================================================
+//-------------------------------------------------
+//  sampling_profiler - destructor
+//-------------------------------------------------
 
-static void add_symbol_map_entry(UINT32 start, const char *name)
+sampling_profiler::~sampling_profiler()
 {
-	if (map_entries == MAX_SYMBOLS)
-		fatalerror("Symbol table full");
-	symbol_map[map_entries].start = start;
-	symbol_map[map_entries].name = core_strdup(name);
-	if (symbol_map[map_entries].name == NULL)
-		fatalerror("Out of memory");
-	map_entries++;
+	global_free(m_buffer);
 }
 
-static void parse_map_file(void)
+
+//-------------------------------------------------
+//  start - begin gathering profiling information
+//-------------------------------------------------
+
+void sampling_profiler::start()
 {
-	int got_text = 0;
-	char line[1024];
-	FILE *map;
-	int i;
-
-	// open the map file
-	map = fopen(mapfile_name, "r");
-	if (!map)
-		return;
-
-	// parse out the various symbols into map entries
-	map_entries = 0;
-	while (fgets(line, sizeof(line) - 1, map))
+	// fail if we don't have everything we need
+	if (m_stack_depth > 0 &&
+		(stack_walk_64 == NULL ||
+		 sym_initialize == NULL ||
+		 sym_function_table_access_64 == NULL ||
+		 sym_get_module_base_64 == NULL ||
+		 sym_from_addr == NULL ||
+		 get_module_information == NULL))
 	{
-		/* look for the code boundaries */
-		if (!got_text && !strncmp(line, ".text           0x", 18))
+		mame_printf_warning("Unable to start profiler because not all needed APIs are available\n");
+		m_stack_depth = 0;
+		m_entry_stride = 3;
+	}
+		
+	// do the dance to get a handle to ourself
+	BOOL result = DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &m_target_thread,
+			THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
+	assert_always(result, "Failed to get thread handle for main thread");
+
+	// reset the exit flag
+	m_thread_exit = false;
+
+	// start the thread
+	m_thread = CreateThread(NULL, 0, thread_entry, (LPVOID)this, 0, &m_thread_id);
+	assert_always(m_thread != NULL, "Failed to create profiler thread\n");
+
+	// max out the priority
+	SetThreadPriority(m_thread, THREAD_PRIORITY_TIME_CRITICAL);
+}
+
+
+//-------------------------------------------------
+//  stop - stop gathering profiling information
+//-------------------------------------------------
+
+void sampling_profiler::stop()
+{
+	// set the flag and wait a couple of seconds (max)
+	m_thread_exit = true;
+	WaitForSingleObject(m_thread, 2000);
+	
+	// regardless, close the handle
+	CloseHandle(m_thread);
+}
+
+
+//-------------------------------------------------
+//  compare_address - compare two entries by their
+//  bucket address
+//-------------------------------------------------
+
+int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *item2)
+{
+	const FPTR *entry1 = reinterpret_cast<const FPTR *>(item1);
+	const FPTR *entry2 = reinterpret_cast<const FPTR *>(item2);
+	int mincount = MIN(entry1[0], entry2[0]);
+
+	// sort in order of: bucket, EIP, caller, caller's caller, etc.	
+	for (int index = 1; index <= mincount; index++)
+		if (entry1[index] != entry2[index])
+			return entry1[index] - entry2[index];
+	
+	// if we match to the end, sort by the depth of the stack
+	return entry1[0] - entry2[0];
+}
+
+
+//-------------------------------------------------
+//  compare_frequency - compare two entries by 
+//  their frequency of occurrence
+//-------------------------------------------------
+
+int CLIB_DECL sampling_profiler::compare_frequency(const void *item1, const void *item2)
+{
+	const FPTR *entry1 = reinterpret_cast<const FPTR *>(item1);
+	const FPTR *entry2 = reinterpret_cast<const FPTR *>(item2);
+
+	// sort by frequency, then by address
+	if (entry1[0] != entry2[0])
+		return entry2[0] - entry1[0];
+	return entry1[1] - entry2[1];
+}
+
+
+//-------------------------------------------------
+//  print_results - output the results
+//-------------------------------------------------
+
+void sampling_profiler::print_results()
+{
+	// step 1: find the base of each entry
+	for (FPTR *current = m_buffer; current < m_buffer_ptr; current += m_entry_stride)
+	{
+		assert(current[0] >= 2 && current[0] < m_entry_stride);
+		assert(current[1] == 0);
+		
+		// entry[1] has the PC address; use lookup_symbol to get the base of the function
+		// and use that as our bucket
+		lookup_symbol(current[2], &current[1], true);
+	}
+	
+	// step 2: sort the results
+	qsort(m_buffer, (m_buffer_ptr - m_buffer) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_address);
+	
+	// step 3: count and collapse unique entries
+	UINT32 total_count = 0;
+	for (FPTR *current = m_buffer; current < m_buffer_ptr; )
+	{
+		int count = 1;
+		FPTR *scan;
+		for (scan = current + m_entry_stride; scan < m_buffer_ptr; scan += m_entry_stride)
 		{
-			UINT32 base, size;
-			if (sscanf(line, ".text           0x%08x 0x%x", &base, &size) == 2)
-			{
-				add_symbol_map_entry(base, "Code start");
-				add_symbol_map_entry(base+size, "Other");
-				got_text = 1;
-			}
+			if (compare_address(current, scan) != 0)
+				break;
+			scan[0] = 0;
+			count++;
 		}
-
-		/* look for symbols */
-		FPTR addr;
-		const char *symbol = line_to_symbol(line, addr);
-		if (symbol != NULL)
-			add_symbol_map_entry(addr, symbol);
+		current[0] = count;
+		total_count += count;
+		current = scan;
 	}
 
-	/* add a symbol for end-of-memory */
-	add_symbol_map_entry(~0, "<end>");
-	map_entries--;
-
-	/* close the file */
-	fclose(map);
-
-	/* sort by address */
-	qsort(symbol_map, map_entries, sizeof(symbol_map[0]), compare_start);
-
-	/* fill in the end of each bucket */
-	for (i = 0; i < map_entries; i++)
-		symbol_map[i].end = symbol_map[i+1].start ? (symbol_map[i+1].start - 1) : 0;
-}
-
-
-//============================================================
-//  free_symbol_map
-//============================================================
-
-static void free_symbol_map(void)
-{
-	int i;
-
-	for (i = 0; i <= map_entries; i++)
+	// step 4: sort the results again, this time by frequency
+	qsort(m_buffer, (m_buffer_ptr - m_buffer) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_frequency);
+	
+	// step 5: print the results
+	UINT32 num_printed = 0;
+	for (FPTR *current = m_buffer; current < m_buffer_ptr && num_printed < 30; current += m_entry_stride)
 	{
-		free(symbol_map[i].name);
-		symbol_map[i].name = NULL;
-	}
-}
-
-
-//============================================================
-//  output_symbol_list
-//============================================================
-
-static void output_symbol_list(FILE *f)
-{
-	map_entry *entry;
-	int i;
-
-	/* sort by hits */
-	qsort(symbol_map, map_entries, sizeof(symbol_map[0]), compare_hits);
-
-	for (i = 0, entry = symbol_map; i < map_entries; i++, entry++)
-		if (entry->hits > 0)
-			fprintf(f, "%10d  %08X-%08X  %s\n", entry->hits, entry->start, entry->end, entry->name);
-}
-
-
-
-//============================================================
-//  increment_bucket
-//============================================================
-
-static void increment_bucket(UINT32 addr)
-{
-	int i;
-
-	for (i = 0; i < map_entries; i++)
-		if (addr <= symbol_map[i].end)
+		// once we hit 0 frequency, we're done
+		if (current[0] == 0)
+			break;
+		
+		// output the result
+		printf("%4.1f%% - %6d : %p%s\n", (double)current[0] * 100.0 / (double)total_count, (UINT32)current[0], reinterpret_cast<void *>(current[1]), lookup_symbol(current[1]));
+		for (int index = 3; index < m_entry_stride; index++)
 		{
-			symbol_map[i].hits++;
-			return;
+			if (current[index] == 0)
+				break;
+			printf("                 %p%s\n", reinterpret_cast<void *>(current[index]), lookup_symbol(current[index]));
 		}
+		printf("\n");
+		num_printed++;
+	}
 }
 
 
+//-------------------------------------------------
+//  thread_entry - thread entry stub
+//-------------------------------------------------
 
-//============================================================
-//  profiler_thread
-//============================================================
-
-static DWORD WINAPI profiler_thread_entry(LPVOID lpParameter)
+DWORD WINAPI sampling_profiler::thread_entry(LPVOID lpParameter)
 {
-	HANDLE mainThread = (HANDLE)lpParameter;
-	CONTEXT context;
-
-	/* loop until done */
-	memset(&context, 0, sizeof(context));
-	while (!profiler_thread_exit)
-	{
-		/* pause the main thread and get its context */
-		SuspendThread(mainThread);
-		context.ContextFlags = CONTEXT_FULL;
-		GetThreadContext(mainThread, &context);
-		ResumeThread(mainThread);
-
-		/* add to the bucket */
-		increment_bucket(context.Eip);
-
-		/* sleep */
-		Sleep(1);
-	}
-
+	reinterpret_cast<sampling_profiler *>(lpParameter)->thread_run();
 	return 0;
 }
 
 
+//-------------------------------------------------
+//  thread_run - sampling thread
+//-------------------------------------------------
 
-//============================================================
-//  start_profiler
-//============================================================
-
-static void start_profiler(void)
+void sampling_profiler::thread_run()
 {
-	HANDLE currentThread;
-	BOOL result;
+	CONTEXT context;
+	memset(&context, 0, sizeof(context));
 
-	// parse the map file, if present
-	parse_map_file();
+	// initialize the symbol lookup
+	HANDLE process = GetCurrentProcess();
+	sym_initialize(process, NULL, TRUE);
 
-	// do the dance to get a handle to ourself
-	result = DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &currentThread,
-			THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
-	assert_always(result, "Failed to get thread handle for main thread");
+	// loop until done
+	while (!m_thread_exit && m_buffer_ptr < m_buffer_end)
+	{
+		// pause the main thread and get its context
+		SuspendThread(m_target_thread);
+		context.ContextFlags = CONTEXT_FULL;
+		GetThreadContext(m_target_thread, &context);
+		
+		// store an initial entry count plus a NULL (used later) and the EIP
+		FPTR *count = m_buffer_ptr;
+		*m_buffer_ptr++ = 2;
+		*m_buffer_ptr++ = 0;
+		*m_buffer_ptr++ = ip_from_context(context);
+		
+		// now unwind the requested number of frames
+		if (m_stack_depth > 0)
+		{
+			STACKFRAME64 stackframe;
+			init_stack_frame(stackframe, context);
+		
+			// iterate over the frames until we hit an error
+			int frame;
+			for (frame = 0; frame < m_stack_depth; frame++)
+			{
+				if (!stack_walk_64(IMAGE_FILE_MACHINE_NATIVE, process, m_target_thread, &stackframe, &context, NULL, sym_function_table_access_64, sym_get_module_base_64, NULL))
+					break;
+				*m_buffer_ptr++ = stackframe.AddrPC.Offset;
+				*count += 1;
+			}
+			
+			// fill in any missing parts with NULLs
+			for (; frame < m_stack_depth; frame++)
+				*m_buffer_ptr++ = 0;
+		}
+			
+		// resume the thread
+		ResumeThread(m_target_thread);
 
-	profiler_thread_exit = 0;
-
-	// start the thread
-	profiler_thread = CreateThread(NULL, 0, profiler_thread_entry, (LPVOID)currentThread, 0, &profiler_thread_id);
-	assert_always(profiler_thread, "Failed to create profiler thread\n");
-
-	// max out the priority
-	SetThreadPriority(profiler_thread, THREAD_PRIORITY_TIME_CRITICAL);
+		// sleep for 1ms
+		Sleep(1);
+	}
 }
-
-
-
-//============================================================
-//  stop_profiler
-//============================================================
-
-static void stop_profiler(void)
-{
-	profiler_thread_exit = 1;
-	WaitForSingleObject(profiler_thread, 2000);
-	output_symbol_list(stderr);
-	free_symbol_map();
-}
-
-#else
-
-static void start_profiler(void) {}
-static void stop_profiler(void) {}
-
-#endif

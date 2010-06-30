@@ -56,6 +56,7 @@
 #define WINOPTION_PRIORITY				"priority"
 #define WINOPTION_MULTITHREADING		"multithreading"
 #define WINOPTION_NUMPROCESSORS			"numprocessors"
+#define WINOPTION_PROFILE				"profile"
 
 // video options
 #define WINOPTION_VIDEO					"video"
