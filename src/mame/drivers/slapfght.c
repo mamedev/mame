@@ -2,7 +2,7 @@
 
 Driver by K.Wilkins Jan 1998
 
-Games Support:
+Games supported:
   Alcon / Slap Fight
   Guardian / Get Star
   Performan
@@ -1855,10 +1855,14 @@ static DRIVER_INIT( slapfigh )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, slapfight_mcu_status_r );
 }
 
+static DRIVER_INIT( perfrman )
+{
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, perfrman_port_00_r );
+}
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */
-GAME( 1985, perfrman,   0,        perfrman,   perfrman, 0,        ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
-GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman, 0,        ROT270, "Toaplan / Data East USA",         "Performan (US)", 0 )
+GAME( 1985, perfrman,   0,        perfrman,   perfrman, perfrman, ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
+GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman, perfrman, ROT270, "Toaplan / Data East USA",         "Performan (US)", 0 )
 
 GAME( 1985, tigerh,     0,        tigerh,     tigerh,   tigerh,   ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
 GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,   tigerh,   ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )

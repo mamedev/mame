@@ -55,10 +55,10 @@ WRITE8_HANDLER( slapfight_mcu_w );
 READ8_HANDLER ( slapfight_mcu_r );
 READ8_HANDLER ( slapfight_mcu_status_r );
 
-
 READ8_HANDLER( getstar_e803_r );
 WRITE8_HANDLER( getstar_e803_w );
 
+READ8_HANDLER( perfrman_port_00_r );
 
 READ8_HANDLER ( tigerh_68705_portA_r );
 WRITE8_HANDLER( tigerh_68705_portA_w );
