@@ -150,6 +150,9 @@ CPPONLYFLAGS += /wd4191 /wd4060 /wd4065 /wd4640
 # disable warning about exception specifications and using this in constructors
 CPPONLYFLAGS += /wd4290 /wd4355
 
+# disable performance warnings about casting ints to bools
+CPPONLYFLAGS += /wd4800
+
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 
