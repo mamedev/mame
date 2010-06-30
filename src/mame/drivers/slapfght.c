@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( slapfght_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE(&slapfight_fixcolorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapbtuk_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfighb2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -935,7 +935,7 @@ static MACHINE_DRIVER_START( slapfigh )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( slapfgtb )
+static MACHINE_DRIVER_START( slapfighb1 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(slapfigh)
@@ -944,13 +944,13 @@ static MACHINE_DRIVER_START( slapfgtb )
 MACHINE_DRIVER_END
 
 /* identical to slapfigh_ but the scroll registers are located elsewhere in memory */
-static MACHINE_DRIVER_START( slapbtuk )
+static MACHINE_DRIVER_START( slapfighb2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(slapfigh)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(slapbtuk_map)
+	MDRV_CPU_PROGRAM_MAP(slapfighb2_map)
 
 	MDRV_DEVICE_REMOVE("mcu")
 MACHINE_DRIVER_END
@@ -1475,7 +1475,7 @@ ROM_START( slapfigha )
 ROM_END
 
 /*
-PCB Details from slpboota boardset:
+PCB Details from slapfighb1 boardset:
 
 Upper PCB (Sound board)
 ---------
@@ -1514,7 +1514,7 @@ sf_s19 (NEC S27128 16KB EPROM)               CPU Code $0000-$3fff
 sf_s20 (Mitsubishi M5L27128K 16KB EPROM)     CPU Code $4000-$7fff
 */
 
-ROM_START( slapbtjp )
+ROM_START( slapfighb1 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "sf_r19jb.bin", 0x00000, 0x8000, CRC(9a7ac8b3) SHA1(01fbad9b4fc80f2406eff18db20e196e212d0c17) )
 	ROM_LOAD( "sf_rh.bin",    0x10000, 0x8000, CRC(3c42e4a7) SHA1(8e4da1e6e73603e484ba4f5609ac9ea92999a526) )	/* banked at 8000 */
@@ -1544,7 +1544,7 @@ ROM_START( slapbtjp )
 	ROM_LOAD( "sf_col19.bin", 0x0200,  0x0100, CRC(5cbf9fbf) SHA1(abfa58fa4e44ebc56f2e0fac9bcc36164c845fa3) )
 ROM_END
 
-ROM_START( slapbtuk )
+ROM_START( slapfighb2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "sf_r19eb.bin", 0x00000, 0x4000, CRC(2efe47af) SHA1(69ce3e83a0d8fa5ee4737c741d31cf32db6b9919) )
 	ROM_LOAD( "sf_r20eb.bin", 0x04000, 0x4000, CRC(f42c7951) SHA1(d76e7a72f6ced67b550ba68cd42987f7111f5468) )
@@ -1575,8 +1575,8 @@ ROM_START( slapbtuk )
 	ROM_LOAD( "sf_col19.bin", 0x0200,  0x0100, CRC(5cbf9fbf) SHA1(abfa58fa4e44ebc56f2e0fac9bcc36164c845fa3) )
 ROM_END
 
-/* very similar to slapbtuk, is slapbtuk missing the logo rom? */
-ROM_START( slapfgtr )
+/* very similar to slapfighb2, is slapfighb2 missing the logo rom? */
+ROM_START( slapfighb3 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "k1-10.u90",    0x00000, 0x4000, CRC(2efe47af) SHA1(69ce3e83a0d8fa5ee4737c741d31cf32db6b9919) )
 	ROM_LOAD( "k1-09.u89",    0x04000, 0x4000, CRC(17c187c5) SHA1(6e1fd651f56036d1c6c830de8479df25fc182c10) )
@@ -1856,25 +1856,25 @@ static DRIVER_INIT( slapfigh )
 }
 
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */
-GAME( 1985, perfrman, 0,        perfrman, perfrman, 0,        ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
-GAME( 1985, perfrmanu,perfrman, perfrman, perfrman, 0,        ROT270, "Toaplan / Data East USA",         "Performan (US)", 0 )
+/*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */
+GAME( 1985, perfrman,   0,        perfrman,   perfrman, 0,        ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
+GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman, 0,        ROT270, "Toaplan / Data East USA",         "Performan (US)", 0 )
 
-GAME( 1985, tigerh,   0,        tigerh,   tigerh,   tigerh,   ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhj,  tigerh,   tigerh,   tigerh,   tigerh,   ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb1, tigerh,   tigerhb,  tigerh,   tigerhb,  ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb2, tigerh,   tigerhb,  tigerh,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb3, tigerh,   tigerhb,  tigerh,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerh,     0,        tigerh,     tigerh,   tigerh,   ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,   tigerh,   ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb1,   tigerh,   tigerhb,    tigerh,   tigerhb,  ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb,    tigerh,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb,    tigerh,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
 
-GAME( 1986, alcon,    0,        slapfigh, slapfigh, slapfigh, ROT270, "Toaplan / Taito America Corp.", "Alcon",  GAME_NO_COCKTAIL )
-GAME( 1986, slapfigh, alcon,    slapfigh, slapfigh, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfigha,alcon,    slapfigh, slapfigh, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ) /* MCU code not dumped */
-GAME( 1986, slapbtjp, alcon,    slapfgtb, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (Japan bootleg)", GAME_NO_COCKTAIL )
-GAME( 1986, slapbtuk, alcon,    slapbtuk, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (English bootleg)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfgtr, alcon,    slapbtuk, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (bootleg)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
+GAME( 1986, alcon,      0,        slapfigh,   slapfigh, slapfigh, ROT270, "Toaplan / Taito America Corp.", "Alcon (US)",  GAME_NO_COCKTAIL )
+GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ) /* MCU code not dumped */
+GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
+GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
 
-GAME( 1986, getstar,  0,        slapfigh, getstar,  getstar,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
-GAME( 1986, getstarj, getstar,  slapfigh, getstarj, getstarj, ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, gtstarb1, getstar,  slapfgtb, getstarj, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, gtstarb2, getstar,  slapfgtb, gtstarb2, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1986, getstar,    0,        slapfigh,   getstar,  getstar,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
+GAME( 1986, getstarj,   getstar,  slapfigh,   getstarj, getstarj, ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
+GAME( 1986, gtstarb1,   getstar,  slapfighb1, getstarj, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, gtstarb2,   getstar,  slapfighb1, gtstarb2, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
 

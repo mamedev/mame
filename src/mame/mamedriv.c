@@ -2257,12 +2257,12 @@ const game_driver * const drivers[] =
 	DRIVER( tigerhb1 )	/* bootleg but (c) 1985 Taito Corporation */
 	DRIVER( tigerhb2 )	/* bootleg but (c) 1985 Taito Corporation */
 	DRIVER( tigerhb3 )	/* bootleg but (c) 1985 Taito Corporation */
+	DRIVER( alcon )		/* A76 / TP-??? */
 	DRIVER( slapfigh )	/* A76 / TP-??? */
 	DRIVER( slapfigha )	/* A76 / TP-??? */
-	DRIVER( slapbtjp )	/* bootleg but (c) 1986 Taito Corporation */
-	DRIVER( slapbtuk )	/* bootleg but (c) 1986 Taito Corporation */
-	DRIVER( slapfgtr )	/* bootleg */
-	DRIVER( alcon )		/* A76 / TP-??? */
+	DRIVER( slapfighb1 )	/* bootleg but (c) 1986 Taito Corporation */
+	DRIVER( slapfighb2 )	/* bootleg but (c) 1986 Taito Corporation */
+	DRIVER( slapfighb3 )	/* bootleg but (c) 1986 Taito Corporation */
 	DRIVER( getstar )	/* A68 (c) 1986 Taito Corporation */
 	DRIVER( getstarj )	/* A68 (c) 1986 Taito Corporation */
 	DRIVER( gtstarb1 )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
