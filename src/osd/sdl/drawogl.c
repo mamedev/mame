@@ -1241,7 +1241,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		// we're doing nothing 3d, so the Z-buffer is currently not interesting
 		glDisable(GL_DEPTH_TEST);
 
-		if (options_get_bool(mame_options(), OPTION_ANTIALIAS))
+		if (options_get_bool(window->machine->options(), OPTION_ANTIALIAS))
 		{
 			// enable antialiasing for lines
 			glEnable(GL_LINE_SMOOTH);
@@ -2957,9 +2957,9 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 			render_container_get_user_settings(container, &settings);
 			//FIXME: Intended behaviour
 #if 1
-			vid_attributes[0] = options_get_float(mame_options(), OPTION_GAMMA);
-			vid_attributes[1] = options_get_float(mame_options(), OPTION_CONTRAST);
-			vid_attributes[2] = options_get_float(mame_options(), OPTION_BRIGHTNESS);
+			vid_attributes[0] = options_get_float(window->machine->options(), OPTION_GAMMA);
+			vid_attributes[1] = options_get_float(window->machine->options(), OPTION_CONTRAST);
+			vid_attributes[2] = options_get_float(window->machine->options(), OPTION_BRIGHTNESS);
 #else
 			vid_attributes[0] = settings.gamma;
 			vid_attributes[1] = settings.contrast;

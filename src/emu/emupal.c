@@ -77,7 +77,7 @@ public:
 
 static void palette_presave(running_machine *machine, void *param);
 static void palette_postload(running_machine *machine, void *param);
-static void palette_exit(running_machine *machine);
+static void palette_exit(running_machine &machine);
 static void allocate_palette(running_machine *machine, palette_private *palette);
 static void allocate_color_tables(running_machine *machine, palette_private *palette);
 static void allocate_shadow_tables(running_machine *machine, palette_private *palette);
@@ -104,7 +104,7 @@ void palette_init(running_machine *machine)
 
 	/* request cleanup */
 	machine->palette_data = palette;
-	add_exit_callback(machine, palette_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, palette_exit);
 
 	/* reset all our data */
 	palette->format = format;
@@ -564,11 +564,11 @@ static void palette_postload(running_machine *machine, void *param)
     palette_exit - free any allocated memory
 -------------------------------------------------*/
 
-static void palette_exit(running_machine *machine)
+static void palette_exit(running_machine &machine)
 {
 	/* dereference the palette */
-	if (machine->palette != NULL)
-		palette_deref(machine->palette);
+	if (machine.palette != NULL)
+		palette_deref(machine.palette);
 }
 
 

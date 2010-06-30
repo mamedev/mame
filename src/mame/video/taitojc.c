@@ -165,9 +165,9 @@ static void draw_object(running_machine *machine, bitmap_t *bitmap, const rectan
 	}
 }
 
-static void taitojc_exit(running_machine *machine)
+static void taitojc_exit(running_machine &machine)
 {
-	taitojc_state *state = (taitojc_state *)machine->driver_data;
+	taitojc_state *state = (taitojc_state *)machine.driver_data;
 	poly_free(state->poly);
 }
 
@@ -177,7 +177,7 @@ VIDEO_START( taitojc )
 	int width, height;
 
 	state->poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	add_exit_callback(machine, taitojc_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, taitojc_exit);
 
 	/* find first empty slot to decode gfx */
 	for (state->gfx_index = 0; state->gfx_index < MAX_GFX_ELEMENTS; state->gfx_index++)

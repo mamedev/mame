@@ -74,7 +74,7 @@ struct _romload_private
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void rom_exit(running_machine *machine);
+static void rom_exit(running_machine &machine);
 
 
 
@@ -334,7 +334,7 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
 
 static void determine_bios_rom(rom_load_data *romdata)
 {
-	const char *specbios = options_get_string(mame_options(), OPTION_BIOS);
+	const char *specbios = options_get_string(romdata->machine->options(), OPTION_BIOS);
 	const char *defaultname = NULL;
 	const rom_entry *rom;
 	int default_no = 1;
@@ -582,15 +582,6 @@ static void display_rom_load_results(rom_load_data *romdata)
 	/* if we had errors, they are fatal */
 	if (romdata->errors != 0)
 	{
-		const char *rgntag, *nextrgntag;
-
-		/* clean up any regions */
-		for (rgntag = memory_region_next(romdata->machine, NULL); rgntag != NULL; rgntag = nextrgntag)
-		{
-			nextrgntag = memory_region_next(romdata->machine, rgntag);
-			memory_region_free(romdata->machine, rgntag);
-		}
-
 		/* create the error message and exit fatally */
 		mame_printf_error("%s", romdata->errorstring.cstr());
 		fatalerror_exitcode(romdata->machine, MAMERR_MISSING_FILES, "ERROR: required files are missing, the "GAMENOUN" cannot be run.");
@@ -612,29 +603,30 @@ static void display_rom_load_results(rom_load_data *romdata)
 
 static void region_post_process(rom_load_data *romdata, const char *rgntag)
 {
-	UINT32 regionlength = memory_region_length(romdata->machine, rgntag);
-	UINT32 regionflags = memory_region_flags(romdata->machine, rgntag);
-	UINT8 *regionbase = memory_region(romdata->machine, rgntag);
-	int endianness = ((regionflags & ROMREGION_ENDIANMASK) == ROMREGION_LE) ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
-	int datawidth = 1 << ((regionflags & ROMREGION_WIDTHMASK) >> 8);
+	const region_info *region = romdata->machine->region(rgntag);
 	UINT8 *base;
 	int i, j;
 
-	LOG(("+ datawidth=%d little=%d\n", datawidth, endianness == ENDIANNESS_LITTLE));
+	// do nothing if no region
+	if (region == NULL)
+		return;
+
+	LOG(("+ datawidth=%d little=%d\n", region->width(), region->endianness() == ENDIANNESS_LITTLE));
 
 	/* if the region is inverted, do that now */
-	if (regionflags & ROMREGION_INVERTMASK)
+	if (region->invert())
 	{
 		LOG(("+ Inverting region\n"));
-		for (i = 0, base = regionbase; i < regionlength; i++)
+		for (i = 0, base = region->base(); i < region->bytes(); i++)
 			*base++ ^= 0xff;
 	}
 
 	/* swap the endianness if we need to */
-	if (datawidth > 1 && endianness != ENDIANNESS_NATIVE)
+	if (region->width() > 1 && region->endianness() != ENDIANNESS_NATIVE)
 	{
 		LOG(("+ Byte swapping region\n"));
-		for (i = 0, base = regionbase; i < regionlength; i += datawidth)
+		int datawidth = region->width();
+		for (i = 0, base = region->base(); i < region->bytes(); i += datawidth)
 		{
 			UINT8 temp[8];
 			memcpy(temp, base, datawidth);
@@ -732,7 +724,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 	int skip = ROM_GETSKIPCOUNT(romp);
 	int reversed = ROM_ISREVERSED(romp);
 	int numgroups = (numbytes + groupsize - 1) / groupsize;
-	UINT8 *base = romdata->region->base.u8 + ROM_GETOFFSET(romp);
+	UINT8 *base = romdata->region->base() + ROM_GETOFFSET(romp);
 	UINT32 tempbufsize;
 	UINT8 *tempbuf;
 	int i;
@@ -744,7 +736,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		fatalerror("Error in RomModule definition: %s length not an even multiple of group size\n", ROM_GETNAME(romp));
 
 	/* make sure we only fill within the region space */
-	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > romdata->region->length)
+	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > romdata->region->bytes())
 		fatalerror("Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
 
 	/* make sure the length was valid */
@@ -846,10 +838,10 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 static void fill_rom_data(rom_load_data *romdata, const rom_entry *romp)
 {
 	UINT32 numbytes = ROM_GETLENGTH(romp);
-	UINT8 *base = romdata->region->base.u8 + ROM_GETOFFSET(romp);
+	UINT8 *base = romdata->region->base() + ROM_GETOFFSET(romp);
 
 	/* make sure we fill within the region space */
-	if (ROM_GETOFFSET(romp) + numbytes > romdata->region->length)
+	if (ROM_GETOFFSET(romp) + numbytes > romdata->region->bytes())
 		fatalerror("Error in RomModule definition: FILL out of memory region space\n");
 
 	/* make sure the length was valid */
@@ -867,14 +859,13 @@ static void fill_rom_data(rom_load_data *romdata, const rom_entry *romp)
 
 static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 {
-	UINT8 *base = romdata->region->base.u8 + ROM_GETOFFSET(romp);
+	UINT8 *base = romdata->region->base() + ROM_GETOFFSET(romp);
 	const char *srcrgntag = ROM_GETNAME(romp);
 	UINT32 numbytes = ROM_GETLENGTH(romp);
 	UINT32 srcoffs = (FPTR)ROM_GETHASHDATA(romp);  /* srcoffset in place of hashdata */
-	UINT8 *srcbase;
 
 	/* make sure we copy within the region space */
-	if (ROM_GETOFFSET(romp) + numbytes > romdata->region->length)
+	if (ROM_GETOFFSET(romp) + numbytes > romdata->region->bytes())
 		fatalerror("Error in RomModule definition: COPY out of target memory region space\n");
 
 	/* make sure the length was valid */
@@ -882,16 +873,16 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
-	srcbase = memory_region(romdata->machine, srcrgntag);
-	if (srcbase == NULL)
+	const region_info *region = romdata->machine->region(srcrgntag);
+	if (region == NULL)
 		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
-	if (srcoffs + numbytes > memory_region_length(romdata->machine, srcrgntag))
+	if (srcoffs + numbytes > region->bytes())
 		fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
 
 	/* fill the data */
-	memcpy(base, srcbase + srcoffs, numbytes);
+	memcpy(base, region->base() + srcoffs, numbytes);
 }
 
 
@@ -1275,15 +1266,13 @@ static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startf
 
 void load_software_part_region(running_device *device, char *swlist, char *swname, rom_entry *start_region)
 {
-	astring *regiontag = astring_alloc();
-	astring *locationtag = astring_alloc();
-	const rom_entry *region;
+	astring locationtag(swlist, PATH_SEPARATOR, swname);
 	rom_load_data *romdata = device->machine->romload_data;
+	const rom_entry *region;
+	astring regiontag;
 
 	/* Make sure we are passed a device */
 	assert(device!=NULL);
-
-	astring_assemble_3( locationtag, swlist, PATH_SEPARATOR, swname );
 
 	romdata->errorstring.reset();
 
@@ -1293,51 +1282,50 @@ void load_software_part_region(running_device *device, char *swlist, char *swnam
 		UINT32 regionlength = ROMREGION_GETLENGTH(region);
 		UINT32 regionflags = ROMREGION_GETFLAGS(region);
 
-		astring_assemble_3( regiontag, device->tag(), ":", ROMREGION_GETTAG(region) );
-		LOG(("Processing region \"%s\" (length=%X)\n", astring_c(regiontag), regionlength));
+		device->subtag(regiontag, ROMREGION_GETTAG(region));
+		LOG(("Processing region \"%s\" (length=%X)\n", regiontag.cstr(), regionlength));
 
 		/* the first entry must be a region */
 		assert(ROMENTRY_ISREGION(region));
 
 		/* if this is a device region, override with the device width and endianness */
-		if (devtag_get_device(romdata->machine, astring_c(regiontag)) != NULL)
-			regionflags = normalize_flags_for_device(romdata->machine, regionflags, astring_c(regiontag));
+		const region_info *memregion = romdata->machine->region(regiontag);
+		if (memregion != NULL)
+		{
+			regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
 
-		/* clear old region (todo: should be moved to an image unload function) */
-		if (memory_region(romdata->machine, astring_c(regiontag)) != NULL)
-			memory_region_free(romdata->machine, astring_c(regiontag));
+			/* clear old region (todo: should be moved to an image unload function) */
+			romdata->machine->region_free(memregion->name());
+		}
 
 		/* remember the base and length */
-		romdata->region = memory_region_alloc(romdata->machine, astring_c(regiontag), regionlength, regionflags);
-		LOG(("Allocated %X bytes @ %p\n", romdata->region->length, romdata->region->base.v));
+		romdata->region = romdata->machine->region_alloc(regiontag, regionlength, regionflags);
+		LOG(("Allocated %X bytes @ %p\n", romdata->region->bytes(), romdata->region->base()));
 
 		/* clear the region if it's requested */
 		if (ROMREGION_ISERASE(region))
-			memset(romdata->region->base.v, ROMREGION_GETERASEVAL(region), romdata->region->length);
+			memset(romdata->region->base(), ROMREGION_GETERASEVAL(region), romdata->region->bytes());
 
 		/* or if it's sufficiently small (<= 4MB) */
-		else if (romdata->region->length <= 0x400000)
-			memset(romdata->region->base.v, 0, romdata->region->length);
+		else if (romdata->region->bytes() <= 0x400000)
+			memset(romdata->region->base(), 0, romdata->region->bytes());
 
 #ifdef MAME_DEBUG
 		/* if we're debugging, fill region with random data to catch errors */
 		else
-			fill_random(romdata->machine, romdata->region->base.u8, romdata->region->length);
+			fill_random(romdata->machine, romdata->region->base(), romdata->region->bytes());
 #endif
 
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
-			process_rom_entries(romdata, astring_c(locationtag), region + 1);
+			process_rom_entries(romdata, locationtag, region + 1);
 		else if (ROMREGION_ISDISKDATA(region))
-			process_disk_entries(romdata, astring_c(locationtag), region + 1);
+			process_disk_entries(romdata, locationtag, region + 1);
 	}
 
 	/* now go back and post-process all the regions */
 	for (region = start_region; region != NULL; region = rom_next_region(region))
 		region_post_process(romdata, ROMREGION_GETTAG(region));
-
-	astring_free(regiontag);
-	astring_free(locationtag);
 
 	/* display the results and exit */
 	display_rom_load_results(romdata);
@@ -1374,21 +1362,21 @@ static void process_region_list(rom_load_data *romdata)
 					regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
 
 				/* remember the base and length */
-				romdata->region = memory_region_alloc(romdata->machine, regiontag, regionlength, regionflags);
-				LOG(("Allocated %X bytes @ %p\n", romdata->region->length, romdata->region->base.v));
+				romdata->region = romdata->machine->region_alloc(regiontag, regionlength, regionflags);
+				LOG(("Allocated %X bytes @ %p\n", romdata->region->bytes(), romdata->region->base()));
 
 				/* clear the region if it's requested */
 				if (ROMREGION_ISERASE(region))
-					memset(romdata->region->base.v, ROMREGION_GETERASEVAL(region), romdata->region->length);
+					memset(romdata->region->base(), ROMREGION_GETERASEVAL(region), romdata->region->bytes());
 
 				/* or if it's sufficiently small (<= 4MB) */
-				else if (romdata->region->length <= 0x400000)
-					memset(romdata->region->base.v, 0, romdata->region->length);
+				else if (romdata->region->bytes() <= 0x400000)
+					memset(romdata->region->base(), 0, romdata->region->bytes());
 
 #ifdef MAME_DEBUG
 				/* if we're debugging, fill region with random data to catch errors */
 				else
-					fill_random(romdata->machine, romdata->region->base.u8, romdata->region->length);
+					fill_random(romdata->machine, romdata->region->base(), romdata->region->bytes());
 #endif
 
 				/* now process the entries in the region */
@@ -1418,7 +1406,7 @@ void rom_init(running_machine *machine)
 	machine->romload_data = romdata = auto_alloc_clear(machine, romload_private);
 
 	/* make sure we get called back on the way out */
-	add_exit_callback(machine, rom_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, rom_exit);
 
 	/* reset the romdata struct */
 	romdata->machine = machine;
@@ -1445,20 +1433,12 @@ void rom_init(running_machine *machine)
     rom_exit - clean up after ourselves
 -------------------------------------------------*/
 
-static void rom_exit(running_machine *machine)
+static void rom_exit(running_machine &machine)
 {
-	const char *rgntag, *nextrgntag;
 	open_chd *curchd;
 
-	/* free the memory allocated for various regions */
-	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = nextrgntag)
-	{
-		nextrgntag = memory_region_next(machine, rgntag);
-		memory_region_free(machine, rgntag);
-	}
-
 	/* close all hard drives */
-	for (curchd = machine->romload_data->chd_list; curchd != NULL; curchd = curchd->next)
+	for (curchd = machine.romload_data->chd_list; curchd != NULL; curchd = curchd->next)
 	{
 		if (curchd->diffchd != NULL)
 			chd_close(curchd->diffchd);

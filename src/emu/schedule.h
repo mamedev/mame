@@ -53,9 +53,9 @@
 
 // these must be macros because we are included before the running_machine
 #define cpuexec_describe_context(mach)				(mach)->describe_context()
-#define cpuexec_boost_interleave(mach, slice, dur)	(mach)->scheduler.boost_interleave(slice, dur)
-#define cpuexec_trigger(mach, trigid)				(mach)->scheduler.trigger(trigid)
-#define cpuexec_triggertime(mach, trigid, dur)		(mach)->scheduler.trigger(trigid, dur)
+#define cpuexec_boost_interleave(mach, slice, dur)	(mach)->scheduler().boost_interleave(slice, dur)
+#define cpuexec_trigger(mach, trigid)				(mach)->scheduler().trigger(trigid)
+#define cpuexec_triggertime(mach, trigid, dur)		(mach)->scheduler().trigger(trigid, dur)
 
 
 

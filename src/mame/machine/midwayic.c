@@ -383,8 +383,8 @@ void midway_serial_pic2_w(const address_space *space, UINT8 data)
 				/* if we haven't written a new time recently, use the real live time */
 				if (!pic.time_just_written)
 				{
-					mame_system_time systime;
-					mame_get_base_datetime(machine, &systime);
+					system_time systime;
+					machine->base_datetime(systime);
 
 					pic.buffer[pic.total++] = make_bcd(systime.local_time.second);
 					pic.buffer[pic.total++] = make_bcd(systime.local_time.minute);

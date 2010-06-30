@@ -68,7 +68,7 @@ static debug_command *commandlist;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void debug_console_exit(running_machine *machine);
+static void debug_console_exit(running_machine &machine);
 
 
 
@@ -99,7 +99,7 @@ void debug_console_init(running_machine *machine)
 	debug_console_printf(machine, "Currently targeting %s (%s)\n", machine->gamedrv->name, machine->gamedrv->description);
 
 	/* request callback upon exiting */
-	add_exit_callback(machine, debug_console_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_console_exit);
 }
 
 
@@ -108,7 +108,7 @@ void debug_console_init(running_machine *machine)
     system
 -------------------------------------------------*/
 
-static void debug_console_exit(running_machine *machine)
+static void debug_console_exit(running_machine &machine)
 {
 	/* free allocated memory */
 	if (console_textbuf)
@@ -409,7 +409,7 @@ void debug_console_register_command(running_machine *machine, const char *comman
 {
 	debug_command *cmd;
 
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call debug_console_register_command() at init time!");
+	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call debug_console_register_command() at init time!");
 	assert_always((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call debug_console_register_command() when debugger is not running");
 
 	cmd = auto_alloc_clear(machine, debug_command);
@@ -541,13 +541,13 @@ text_buffer *debug_console_get_textbuf(void)
     the errorlog ring buffer
 -------------------------------------------------*/
 
-void debug_errorlog_write_line(running_machine *machine, const char *line)
+void debug_errorlog_write_line(running_machine &machine, const char *line)
 {
 	if (errorlog_textbuf)
 		text_buffer_print(errorlog_textbuf, line);
 
 	/* force an update of any log views */
-	machine->m_debug_view->update_all(DVT_LOG);
+	machine.m_debug_view->update_all(DVT_LOG);
 }
 
 

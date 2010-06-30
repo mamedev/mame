@@ -80,7 +80,7 @@ resource_pool &machine_get_pool(running_machine &machine)
 {
 	// temporary to get around include dependencies, until CPUs
 	// get a proper device class
-	return machine.respool;
+	return machine.m_respool;
 }
 
 
@@ -125,8 +125,8 @@ void device_list::start_all()
 {
 	// add exit and reset callbacks
 	assert(m_machine != NULL);
-	add_reset_callback(m_machine, static_reset);
-	add_exit_callback(m_machine, static_exit);
+	m_machine->add_notifier(MACHINE_NOTIFY_RESET, static_reset);
+	m_machine->add_notifier(MACHINE_NOTIFY_EXIT, static_exit);
 
 	// add pre-save and post-load callbacks
 	state_save_register_presave(m_machine, static_pre_save, this);
@@ -185,9 +185,9 @@ void device_list::reset_all()
 }
 
 
-void device_list::static_reset(running_machine *machine)
+void device_list::static_reset(running_machine &machine)
 {
-	machine->m_devicelist.reset_all();
+	machine.m_devicelist.reset_all();
 }
 
 
@@ -195,9 +195,9 @@ void device_list::static_reset(running_machine *machine)
 //  static_exit - tear down all the devices
 //-------------------------------------------------
 
-void device_list::static_exit(running_machine *machine)
+void device_list::static_exit(running_machine &machine)
 {
-	machine->m_devicelist.reset();
+	machine.m_devicelist.reset();
 }
 
 

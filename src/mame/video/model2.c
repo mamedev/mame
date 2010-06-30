@@ -2683,7 +2683,7 @@ static void geo_parse( void )
 
 static bitmap_t *sys24_bitmap = NULL;
 
-static void model2_exit(running_machine *machine)
+static void model2_exit(running_machine &machine)
 {
 	poly_free(poly);
 }
@@ -2698,7 +2698,7 @@ VIDEO_START(model2)
 	sys24_bitmap = auto_alloc(machine, bitmap_t(width, height+4, BITMAP_FORMAT_INDEXED16));
 
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-	add_exit_callback(machine, model2_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, model2_exit);
 
 	/* initialize the geometry engine */
 	geo_init( machine, (UINT32*)memory_region(machine, "user2") );

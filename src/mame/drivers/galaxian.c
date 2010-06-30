@@ -2658,7 +2658,7 @@ static DRIVER_INIT( gmgalax )
 	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	gmgalax_game_changed(machine->portlist.first()->fieldlist, NULL, 0, 0);
+	gmgalax_game_changed(machine->m_portlist.first()->fieldlist, NULL, 0, 0);
 	state_save_register_global(machine, gmgalax_selected_game);
 }
 

@@ -113,7 +113,7 @@ class device_t;
 
         Note that there is no corresponding osd_exit(). Rather, like most
         systems in MAME, you can register an exit callback via the
-        add_exit_callback() function in mame.c.
+        add_notifier() function in mame.c.
 
         Also note that there is no return value. If you need to report a
         fatal error, use the fatalerror() function with a friendly message

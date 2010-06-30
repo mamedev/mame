@@ -963,13 +963,13 @@ static WRITE32_HANDLER( atapi_w )
 	}
 }
 
-static void atapi_exit(running_machine* machine)
+static void atapi_exit(running_machine& machine)
 {
 	int i;
 
 	for( i = 0; i < 2; i++ )
 	{
-		if( get_disk_handle( machine, diskregions[i] ) != NULL )
+		if( get_disk_handle( &machine, diskregions[i] ) != NULL )
 		{
 			SCSIDeleteInstance( available_cdroms[ i ] );
 		}
@@ -1006,7 +1006,7 @@ static void atapi_init(running_machine *machine)
 			available_cdroms[ i ] = NULL;
 		}
 	}
-	add_exit_callback(machine, atapi_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, atapi_exit);
 
 	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
 

@@ -266,7 +266,7 @@ void okim6295_device::set_bank_base(offs_t base)
 	if (m_bank_installed)
 	{
 		m_bank_offs = base;
-		memory_set_bankptr(&m_machine, tag(), m_region->base.u8 + base);
+		memory_set_bankptr(&m_machine, tag(), m_region->base() + base);
 	}
 }
 

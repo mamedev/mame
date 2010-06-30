@@ -110,7 +110,7 @@ struct _worker_param {
 //  PROTOTYPES
 //============================================================
 
-static void sdlwindow_exit(running_machine *machine);
+static void sdlwindow_exit(running_machine &machine);
 static void sdlwindow_video_window_destroy(running_machine *machine, sdl_window_info *window);
 static OSDWORK_CALLBACK( draw_video_contents_wt );
 static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
@@ -206,13 +206,13 @@ int sdlwindow_init(running_machine *machine)
 {
 	mame_printf_verbose("Enter sdlwindow_init\n");
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool(mame_options(), SDLOPTION_MULTITHREADING);
+	multithreading_enabled = options_get_bool(machine->options(), SDLOPTION_MULTITHREADING);
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();
 
 	// ensure we get called on the way out
-	add_exit_callback(machine, sdlwindow_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, sdlwindow_exit);
 
 	// if multithreading, create a thread to run the windows
 	if (multithreading_enabled)
@@ -292,7 +292,7 @@ static OSDWORK_CALLBACK( sdlwindow_exit_wt )
 }
 
 
-static void sdlwindow_exit(running_machine *machine)
+static void sdlwindow_exit(running_machine &machine)
 {
 	ASSERT_MAIN_THREAD();
 
@@ -303,7 +303,7 @@ static void sdlwindow_exit(running_machine *machine)
 	{
 		sdl_window_info *temp = sdl_window_list;
 		sdl_window_list = temp->next;
-		sdlwindow_video_window_destroy(machine, temp);
+		sdlwindow_video_window_destroy(&machine, temp);
 	}
 
 	// if we're multithreaded, clean up the window thread
@@ -676,7 +676,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 
 	// set the initial maximized state
 	// FIXME: Does not belong here
-	window->startmaximized = options_get_bool(mame_options(), SDLOPTION_MAXIMIZE);
+	window->startmaximized = options_get_bool(machine->options(), SDLOPTION_MAXIMIZE);
 
 	if (!window->fullscreen)
 	{
@@ -704,7 +704,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 
 	// set the specific view
 	sprintf(option, SDLOPTION_VIEW("%d"), index);
-	set_starting_view(machine, index, window, options_get_string(mame_options(), option));
+	set_starting_view(machine, index, window, options_get_string(machine->options(), option));
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -1013,7 +1013,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 
 static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view)
 {
-	const char *defview = options_get_string(mame_options(), SDLOPTION_VIEW( ));
+	const char *defview = options_get_string(machine->options(), SDLOPTION_VIEW( ));
 	int viewindex;
 
 	ASSERT_MAIN_THREAD();

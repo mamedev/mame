@@ -2269,7 +2269,7 @@ static const struct WD33C93interface scsi_intf =
 	NULL			/* command completion IRQ */
 };
 
-static void cps3_exit(running_machine *machine)
+static void cps3_exit(running_machine &machine)
 {
 	wd33c93_exit(&scsi_intf);
 }
@@ -2277,7 +2277,7 @@ static void cps3_exit(running_machine *machine)
 static MACHINE_START( cps3 )
 {
 	wd33c93_init(machine, &scsi_intf);
-	add_exit_callback(machine, cps3_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, cps3_exit);
 }
 
 static MACHINE_RESET( cps3 )

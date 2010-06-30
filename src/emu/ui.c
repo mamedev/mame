@@ -126,7 +126,7 @@ static UINT8 non_char_keys_down[(ARRAY_LENGTH(non_char_keys) + 7) / 8];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void ui_exit(running_machine *machine);
+static void ui_exit(running_machine &machine);
 
 /* text generators */
 static astring &disclaimer_string(running_machine *machine, astring &buffer);
@@ -237,7 +237,7 @@ INLINE int is_breakable_char(unicode_char ch)
 int ui_init(running_machine *machine)
 {
 	/* make sure we clean up after ourselves */
-	add_exit_callback(machine, ui_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, ui_exit);
 
 	/* allocate the font and messagebox string */
 	ui_font = render_font_alloc("ui.bdf");
@@ -250,7 +250,7 @@ int ui_init(running_machine *machine)
 	single_step = FALSE;
 	ui_set_handler(handler_messagebox, 0);
 	/* retrieve options */
-	ui_use_natural_keyboard = options_get_bool(mame_options(), OPTION_NATURAL_KEYBOARD);
+	ui_use_natural_keyboard = options_get_bool(machine->options(), OPTION_NATURAL_KEYBOARD);
 
 	return 0;
 }
@@ -260,7 +260,7 @@ int ui_init(running_machine *machine)
     ui_exit - clean up ourselves on exit
 -------------------------------------------------*/
 
-static void ui_exit(running_machine *machine)
+static void ui_exit(running_machine &machine)
 {
 	/* free the font */
 	if (ui_font != NULL)
@@ -277,8 +277,8 @@ static void ui_exit(running_machine *machine)
 int ui_display_startup_screens(running_machine *machine, int first_time, int show_disclaimer)
 {
 	const int maxstate = 3;
-	int str = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
-	int show_gameinfo = !options_get_bool(mame_options(), OPTION_SKIP_GAMEINFO);
+	int str = options_get_int(machine->options(), OPTION_SECONDS_TO_RUN);
+	int show_gameinfo = !options_get_bool(machine->options(), OPTION_SKIP_GAMEINFO);
 	int show_warnings = TRUE;
 	int state;
 
@@ -292,7 +292,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 
 	/* loop over states */
 	ui_set_handler(handler_ingame, 0);
-	for (state = 0; state < maxstate && !mame_is_scheduled_event_pending(machine) && !ui_menu_is_force_game_select(); state++)
+	for (state = 0; state < maxstate && !machine->scheduled_event_pending() && !ui_menu_is_force_game_select(); state++)
 	{
 		/* default to standard colors */
 		messagebox_backcolor = UI_BACKGROUND_COLOR;
@@ -327,7 +327,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 		while (input_code_poll_switches(machine, FALSE) != INPUT_CODE_INVALID) ;
 
 		/* loop while we have a handler */
-		while (ui_handler_callback != handler_ingame && !mame_is_scheduled_event_pending(machine) && !ui_menu_is_force_game_select())
+		while (ui_handler_callback != handler_ingame && !machine->scheduled_event_pending() && !ui_menu_is_force_game_select())
 			video_frame_update(machine, FALSE);
 
 		/* clear the handler and force an update */
@@ -377,9 +377,9 @@ void ui_update_and_render(running_machine *machine, render_container *container)
 	render_container_empty(container);
 
 	/* if we're paused, dim the whole screen */
-	if (mame_get_phase(machine) >= MAME_PHASE_RESET && (single_step || mame_is_paused(machine)))
+	if (machine->phase() >= MACHINE_PHASE_RESET && (single_step || machine->paused()))
 	{
-		int alpha = (1.0f - options_get_float(mame_options(), OPTION_PAUSE_BRIGHTNESS)) * 255.0f;
+		int alpha = (1.0f - options_get_float(machine->options(), OPTION_PAUSE_BRIGHTNESS)) * 255.0f;
 		if (ui_menu_is_force_game_select())
 			alpha = 255;
 		if (alpha > 255)
@@ -1139,7 +1139,7 @@ static UINT32 handler_messagebox_ok(running_machine *machine, render_container *
 	/* if the user cancels, exit out completely */
 	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
-		mame_schedule_exit(machine);
+		machine->schedule_exit();
 		state = UI_HANDLER_CANCEL;
 	}
 
@@ -1161,7 +1161,7 @@ static UINT32 handler_messagebox_anykey(running_machine *machine, render_contain
 	/* if the user cancels, exit out completely */
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
-		mame_schedule_exit(machine);
+		machine->schedule_exit();
 		state = UI_HANDLER_CANCEL;
 	}
 
@@ -1270,7 +1270,7 @@ void ui_image_handler_ingame(running_machine *machine)
 	device_image_interface *image = NULL;
 
 	/* run display routine for devices */
-	if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
+	if (machine->phase() == MACHINE_PHASE_RUNNING)
 	{
 		for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 		{
@@ -1287,7 +1287,7 @@ void ui_image_handler_ingame(running_machine *machine)
 
 static UINT32 handler_ingame(running_machine *machine, render_container *container, UINT32 state)
 {
-	int is_paused = mame_is_paused(machine);
+	bool is_paused = machine->paused();
 
 	/* first draw the FPS counter */
 	if (showfps || osd_ticks() < showfps_end)
@@ -1309,7 +1309,7 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 	/* if we're single-stepping, pause now */
 	if (single_step)
 	{
-		mame_pause(machine, TRUE);
+		machine->pause();
 		single_step = FALSE;
 	}
 
@@ -1350,7 +1350,7 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 	}
 
 	/* is the natural keyboard enabled? */
-	if (ui_get_use_natural_keyboard(machine) && (mame_get_phase(machine) == MAME_PHASE_RUNNING))
+	if (ui_get_use_natural_keyboard(machine) && (machine->phase() == MACHINE_PHASE_RUNNING))
 		process_natural_keyboard(machine);
 
 	if (!ui_disabled)
@@ -1366,7 +1366,7 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 
 	/* if the user pressed ESC, stop the emulation (except in MESS with newui, where ESC toggles the menubar) */
 	if (ui_input_pressed(machine, IPT_UI_CANCEL) && !ui_use_newui())
-		mame_schedule_exit(machine);
+		machine->schedule_exit();
 
 	/* turn on menus if requested */
 	if (ui_input_pressed(machine, IPT_UI_CONFIGURE) && !ui_use_newui())
@@ -1378,29 +1378,29 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 
 	/* handle a reset request */
 	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))
-		mame_schedule_hard_reset(machine);
+		machine->schedule_hard_reset();
 	if (ui_input_pressed(machine, IPT_UI_SOFT_RESET))
-		mame_schedule_soft_reset(machine);
+		machine->schedule_soft_reset();
 
 	/* handle a request to display graphics/palette */
 	if (ui_input_pressed(machine, IPT_UI_SHOW_GFX))
 	{
 		if (!is_paused)
-			mame_pause(machine, TRUE);
+			machine->pause();
 		return ui_set_handler(ui_gfx_ui_handler, is_paused);
 	}
 
 	/* handle a save state request */
 	if (ui_input_pressed(machine, IPT_UI_SAVE_STATE))
 	{
-		mame_pause(machine, TRUE);
+		machine->pause();
 		return ui_set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
 	/* handle a load state request */
 	if (ui_input_pressed(machine, IPT_UI_LOAD_STATE))
 	{
-		mame_pause(machine, TRUE);
+		machine->pause();
 		return ui_set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
@@ -1415,10 +1415,12 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 		if (is_paused && (input_code_pressed(machine, KEYCODE_LSHIFT) || input_code_pressed(machine, KEYCODE_RSHIFT)))
 		{
 			single_step = TRUE;
-			mame_pause(machine, FALSE);
+			machine->resume();
 		}
+		else if (machine->paused())
+			machine->resume();
 		else
-			mame_pause(machine, !mame_is_paused(machine));
+			machine->pause();
 	}
 
 	/* handle a toggle cheats request */
@@ -1522,7 +1524,7 @@ static UINT32 handler_load_save(running_machine *machine, render_container *cont
 			popmessage("Load cancelled");
 
 		/* reset the state */
-		mame_pause(machine, FALSE);
+		machine->resume();
 		return UI_HANDLER_CANCEL;
 	}
 
@@ -1546,16 +1548,16 @@ static UINT32 handler_load_save(running_machine *machine, render_container *cont
 	if (state == LOADSAVE_SAVE)
 	{
 		popmessage("Save to position %c", file);
-		mame_schedule_save(machine, filename);
+		machine->schedule_save(filename);
 	}
 	else
 	{
 		popmessage("Load from position %c", file);
-		mame_schedule_load(machine, filename);
+		machine->schedule_load(filename);
 	}
 
 	/* remove the pause and reset the state */
-	mame_pause(machine, FALSE);
+	machine->resume();
 	return UI_HANDLER_CANCEL;
 }
 
@@ -1631,7 +1633,7 @@ static slider_state *slider_init(running_machine *machine)
 	}
 
 	/* add analog adjusters */
-	for (port = machine->portlist.first(); port != NULL; port = port->next())
+	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_ADJUSTER)
 			{
@@ -1641,7 +1643,7 @@ static slider_state *slider_init(running_machine *machine)
 			}
 
 	/* add CPU overclocking (cheat only) */
-	if (options_get_bool(mame_options(), OPTION_CHEAT))
+	if (options_get_bool(machine->options(), OPTION_CHEAT))
 	{
 		for (device = machine->firstcpu; device != NULL; device = cpu_next(device))
 		{
@@ -1662,7 +1664,7 @@ static slider_state *slider_init(running_machine *machine)
 		void *param = (void *)screen;
 
 		/* add refresh rate tweaker */
-		if (options_get_bool(mame_options(), OPTION_CHEAT))
+		if (options_get_bool(machine->options(), OPTION_CHEAT))
 		{
 			string.printf("%s Refresh Rate", slider_get_screen_desc(*screen));
 			*tailptr = slider_alloc(machine, string, -10000, 0, 10000, 1000, slider_refresh, param);
@@ -1735,7 +1737,7 @@ static slider_state *slider_init(running_machine *machine)
 
 #ifdef MAME_DEBUG
 	/* add crosshair adjusters */
-	for (port = machine->portlist.first(); port != NULL; port = port->next())
+	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
 			{
@@ -2219,6 +2221,6 @@ int ui_get_use_natural_keyboard(running_machine *machine)
 void ui_set_use_natural_keyboard(running_machine *machine, int use_natural_keyboard)
 {
 	ui_use_natural_keyboard = use_natural_keyboard;
-	options_set_bool(mame_options(), OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(machine->options(), OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE);
 }
 

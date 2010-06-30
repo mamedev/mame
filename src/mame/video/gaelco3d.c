@@ -65,7 +65,7 @@ static void render_alphablend(void *dest, INT32 scanline, const poly_extent *ext
  *
  *************************************/
 
-static void gaelco3d_exit(running_machine *machine)
+static void gaelco3d_exit(running_machine &machine)
 {
 	poly_free(poly);
 }
@@ -76,7 +76,7 @@ VIDEO_START( gaelco3d )
 	int width, height;
 
 	poly = poly_alloc(machine, 2000, sizeof(poly_extra_data), 0);
-	add_exit_callback(machine, gaelco3d_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, gaelco3d_exit);
 
 	screenbits = machine->primary_screen->alloc_compatible_bitmap();
 

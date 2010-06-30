@@ -2211,7 +2211,7 @@ static void recoverPolygonBlock(running_machine* machine, const UINT16* packet, 
                       So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
 			if (hng64_3dregs[0x00/4] & 0x2000)
 			{
-				if (strcmp(machine->basename, "roadedge"))
+				if (strcmp(machine->basename(), "roadedge"))
 					polys[*numPolys].palOffset += 0x800;
 			}
 

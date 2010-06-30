@@ -22,7 +22,7 @@
 
 static void a600xl_mmu(running_machine *machine, UINT8 new_mmu);
 
-static void pokey_reset(running_machine *machine);
+static void pokey_reset(running_machine &machine);
 
 void atari_interrupt_cb(running_device *device, int mask)
 {
@@ -306,9 +306,9 @@ void a5200_handle_keypads(running_machine *machine)
  *************************************/
 
 
-static void pokey_reset(running_machine *machine)
+static void pokey_reset(running_machine &machine)
 {
-	running_device *pokey = devtag_get_device(machine, "pokey");
+	running_device *pokey = machine.device("pokey");
 	pokey_w(pokey,15,0);
 	atari_last = 0xff;
 }
@@ -330,7 +330,7 @@ static void console_write(const address_space *space, UINT8 data)
 }
 
 
-static void _antic_reset(running_machine *machine)
+static void _antic_reset(running_machine &machine)
 {
 	antic_reset();
 }
@@ -349,10 +349,10 @@ void atari_machine_start(running_machine *machine)
 	gtia_init(machine, &gtia_intf);
 
 	/* pokey */
-	add_reset_callback(machine, pokey_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, pokey_reset);
 
 	/* ANTIC */
-	add_reset_callback(machine, _antic_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, _antic_reset);
 
 	/* save states */
 	state_save_register_global_pointer(machine, ((UINT8 *) &antic.r), sizeof(antic.r));

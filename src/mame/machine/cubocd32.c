@@ -68,7 +68,7 @@ static struct akiko_def
 static TIMER_CALLBACK(akiko_dma_proc);
 static TIMER_CALLBACK(akiko_frame_proc);
 
-static void amiga_akiko_exit(running_machine* machine)
+static void amiga_akiko_exit(running_machine& machine)
 {
 	if( akiko.cdrom ) {
 		cdrom_close(akiko.cdrom);
@@ -107,7 +107,7 @@ void amiga_akiko_init(running_machine* machine)
 	akiko.dma_timer = timer_alloc(machine, akiko_dma_proc, NULL);
 	akiko.frame_timer = timer_alloc(machine, akiko_frame_proc, NULL);
 
-	add_exit_callback(machine, amiga_akiko_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, amiga_akiko_exit);
 
 	/* create the TOC table */
 	if ( akiko.cdrom != NULL && cdrom_get_last_track(akiko.cdrom) )

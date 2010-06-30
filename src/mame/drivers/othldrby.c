@@ -55,9 +55,9 @@ static WRITE16_HANDLER( calendar_w )
 
 static READ16_HANDLER( calendar_r )
 {
-	mame_system_time systime;
+	system_time systime;
 
-	mame_get_base_datetime(space->machine, &systime);
+	space->machine->base_datetime(systime);
 
 	switch (offset)
 	{

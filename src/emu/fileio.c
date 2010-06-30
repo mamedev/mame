@@ -77,7 +77,7 @@ struct _mame_path
 ***************************************************************************/
 
 /* core functions */
-static void fileio_exit(running_machine *machine);
+static void fileio_exit(running_machine &machine);
 
 /* file open/close */
 static file_error fopen_internal(core_options *opts, path_iterator *iterator, const char *filename, UINT32 crc, UINT32 flags, mame_file **file);
@@ -106,7 +106,7 @@ static int zip_header_is_path(const zip_file_header *header);
 
 void fileio_init(running_machine *machine)
 {
-	add_exit_callback(machine, fileio_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, fileio_exit);
 }
 
 
@@ -114,7 +114,7 @@ void fileio_init(running_machine *machine)
     fileio_exit - clean up behind ourselves
 -------------------------------------------------*/
 
-static void fileio_exit(running_machine *machine)
+static void fileio_exit(running_machine &machine)
 {
 	zip_file_cache_clear();
 }

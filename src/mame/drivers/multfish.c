@@ -320,9 +320,9 @@ INLINE UINT8 make_bcd(UINT8 data)
 
 static READ8_HANDLER(multfish_rtc_r)
 {
-	mame_system_time systime;
+	system_time systime;
 
-	mame_get_current_datetime(space->machine, &systime);
+	space->machine->current_datetime(systime);
 	switch (offset)
 	{
 		case 0:

@@ -1538,11 +1538,11 @@ static void make_dir_current(running_machine *machine, UINT32 fad)
 	}
 }
 
-void stvcd_exit(running_machine* machine)
+void stvcd_exit(running_machine& machine)
 {
 	if (curdir != (direntryT *)NULL)
 	{
-		auto_free(machine, curdir);
+		auto_free(&machine, curdir);
 		curdir = (direntryT *)NULL;
 	}
 

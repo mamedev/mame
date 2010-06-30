@@ -1031,7 +1031,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 						software_list_close( software_list_ptr );
 					}
 
-					software_list_ptr = software_list_open( mame_options(), swlist_name, FALSE, NULL );
+					software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
 
 					if ( software_list_ptr )
 					{
@@ -1057,7 +1057,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 				software_list_close( software_list_ptr );
 			}
 
-			software_list_ptr = software_list_open( mame_options(), swlist_name, FALSE, NULL );
+			software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
 
 			if ( software_list_ptr )
 			{
@@ -1083,7 +1083,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 				software_list_close( software_list_ptr );
 			}
 
-			software_list_ptr = software_list_open( mame_options(), swlist_name, FALSE, NULL );
+			software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
 
 			if ( software_list_ptr )
 			{
@@ -1336,7 +1336,7 @@ struct _software_entry_state
 /* populate a specific list */
 static void ui_mess_menu_populate_software_entries(running_machine *machine, ui_menu *menu, char *list_name)
 {
-	software_list *list = software_list_open(mame_options(), list_name, FALSE, NULL);
+	software_list *list = software_list_open(machine->options(), list_name, FALSE, NULL);
 
 	if (list)
 	{
@@ -1407,7 +1407,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 			{
 				if (swlist->list_name[i])
 				{
-					software_list *list = software_list_open(mame_options(), swlist->list_name[i], FALSE, NULL);
+					software_list *list = software_list_open(machine->options(), swlist->list_name[i], FALSE, NULL);
 
 					if (list)
 					{

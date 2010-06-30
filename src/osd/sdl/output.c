@@ -75,7 +75,7 @@ void sdloutput_init(running_machine *machine)
 {
 	int fildes;
 
-	add_exit_callback(machine, sdloutput_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, sdloutput_exit);
 
 	fildes = open(SDLMAME_OUTPUT, O_RDWR | O_NONBLOCK);
 
@@ -101,11 +101,11 @@ void sdloutput_init(running_machine *machine)
 //  winoutput_exit
 //============================================================
 
-static void sdloutput_exit(running_machine *machine)
+static void sdloutput_exit(running_machine &machine)
 {
 	if (output != NULL)
 	{
-		fprintf(output, "MAME " PID_FMT " STOP %s\n", osd_getpid(), machine->gamedrv->name);
+		fprintf(output, "MAME " PID_FMT " STOP %s\n", osd_getpid(), machine.m_game.name);
 		fflush(output);
 		fclose(output);
 		output = NULL;

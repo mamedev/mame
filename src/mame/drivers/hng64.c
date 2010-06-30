@@ -552,8 +552,8 @@ static WRITE32_HANDLER( hng64_pal_w )
 
 static READ32_HANDLER( hng64_sysregs_r )
 {
-	mame_system_time systime;
-	mame_get_base_datetime(space->machine, &systime);
+	system_time systime;
+	space->machine->base_datetime(systime);
 
 //  if((offset*4) != 0x1084)
 //      printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);

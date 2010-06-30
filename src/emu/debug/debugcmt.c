@@ -78,7 +78,7 @@ struct _debug_cpu_comment_group
 ***************************************************************************/
 
 static int debug_comment_load_xml(running_machine *machine, mame_file *file);
-static void debug_comment_exit(running_machine *machine);
+static void debug_comment_exit(running_machine &machine);
 
 
 
@@ -104,7 +104,7 @@ int debug_comment_init(running_machine *machine)
 
 	/* automatically load em up */
 	debug_comment_load(machine);
-	add_exit_callback(machine, debug_comment_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_comment_exit);
 	return 1;
 }
 
@@ -415,7 +415,7 @@ int debug_comment_save(running_machine *machine)
 		file_error filerr;
 		mame_file *fp;
 
-		astring fname(machine->basename, ".cmt");
+		astring fname(machine->basename(), ".cmt");
 		filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
 
 		if (filerr == FILERR_NONE)
@@ -444,7 +444,7 @@ int debug_comment_load(running_machine *machine)
 	file_error filerr;
 	mame_file *fp;
 
-	astring fname(machine->basename, ".cmt");
+	astring fname(machine->basename(), ".cmt");
 	filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_READ, &fp);
 
 	if (filerr != FILERR_NONE) return 0;
@@ -524,7 +524,7 @@ error:
     debug_comment_exit - saves the comments and frees memory
 -------------------------------------------------------------------------*/
 
-static void debug_comment_exit(running_machine *machine)
+static void debug_comment_exit(running_machine &machine)
 {
-	debug_comment_save(machine);
+	debug_comment_save(&machine);
 }

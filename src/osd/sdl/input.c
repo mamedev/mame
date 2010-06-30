@@ -173,8 +173,9 @@ static int sixaxis_mode;
 //  PROTOTYPES
 //============================================================
 
-static void sdlinput_pause(running_machine *machine, int paused);
-static void sdlinput_exit(running_machine *machine);
+static void sdlinput_pause(running_machine &machine);
+static void sdlinput_resume(running_machine &machine);
+static void sdlinput_exit(running_machine &machine);
 
 // deivce list management
 static void device_list_reset_devices(device_info *devlist_head);
@@ -637,7 +638,7 @@ static void devmap_init(running_machine *machine, device_map_t *devmap, const ch
 		const char *dev_name;
 		sprintf(defname, "%s%d", opt, dev + 1);
 
-		dev_name = options_get_string(mame_options(), defname);
+		dev_name = options_get_string(machine->options(), defname);
 		if (dev_name && *dev_name && strcmp(dev_name,SDLOPTVAL_AUTO))
 		{
 			devmap->map[dev].name = remove_spaces(machine, dev_name);
@@ -794,7 +795,7 @@ static void sdlinput_register_mice(running_machine *machine)
 {
 	int index, physical_mouse;
 
-	mouse_enabled = options_get_bool(mame_options(), OPTION_MOUSE);
+	mouse_enabled = options_get_bool(machine->options(), OPTION_MOUSE);
 
 	devmap_init(machine, &mouse_map, SDLOPTION_MOUSEINDEX, 8, "Mouse mapping");
 
@@ -854,7 +855,7 @@ static void sdlinput_register_mice(running_machine *machine)
 	devinfo = generic_device_alloc(&mouse_list, "System mouse");
 	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
 
-	mouse_enabled = options_get_bool(mame_options(), OPTION_MOUSE);
+	mouse_enabled = options_get_bool(machine->options(), OPTION_MOUSE);
 
 	// add the axes
 	input_device_item_add(devinfo->device, "X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
@@ -941,10 +942,10 @@ static kt_table * sdlinput_read_keymap(running_machine *machine)
 	char sks[21];
 	char kns[21];
 
-	if (!options_get_bool(mame_options(), SDLOPTION_KEYMAP))
+	if (!options_get_bool(machine->options(), SDLOPTION_KEYMAP))
 		return sdl_key_trans_table;
 
-	keymap_filename = (char *)options_get_string(mame_options(), SDLOPTION_KEYMAP_FILE);
+	keymap_filename = (char *)options_get_string(machine->options(), SDLOPTION_KEYMAP_FILE);
 	mame_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
 	keymap_file = fopen(keymap_filename, "r");
@@ -1103,8 +1104,9 @@ void sdlinput_init(running_machine *machine)
 	app_has_mouse_focus = 1;
 
 	// we need pause and exit callbacks
-	add_pause_callback(machine, sdlinput_pause);
-	add_exit_callback(machine, sdlinput_exit);
+	machine->add_notifier(MACHINE_NOTIFY_PAUSE, sdlinput_pause);
+	machine->add_notifier(MACHINE_NOTIFY_RESUME, sdlinput_resume);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, sdlinput_exit);
 
 	// allocate a lock for input synchronizations
 	input_lock = osd_lock_alloc();
@@ -1123,7 +1125,7 @@ void sdlinput_init(running_machine *machine)
 	}
 
 	// get Sixaxis special mode info
-	sixaxis_mode = options_get_bool(mame_options(), SDLOPTION_SIXAXIS);
+	sixaxis_mode = options_get_bool(machine->options(), SDLOPTION_SIXAXIS);
 
 	// register the joysticks
 	sdlinput_register_joysticks(machine);
@@ -1140,10 +1142,16 @@ void sdlinput_init(running_machine *machine)
 //  sdlinput_pause
 //============================================================
 
-static void sdlinput_pause(running_machine *machine, int paused)
+static void sdlinput_pause(running_machine &machine)
 {
 	// keep track of the paused state
-	input_paused = paused;
+	input_paused = true;
+}
+
+static void sdlinput_resume(running_machine &machine)
+{
+	// keep track of the paused state
+	input_paused = false;
 }
 
 
@@ -1151,14 +1159,14 @@ static void sdlinput_pause(running_machine *machine, int paused)
 //  sdlinput_exit
 //============================================================
 
-static void sdlinput_exit(running_machine *machine)
+static void sdlinput_exit(running_machine &machine)
 {
 	// free the lock
 	osd_lock_free(input_lock);
 
 	// deregister
 
-	sdlinput_deregister_joysticks(machine);
+	sdlinput_deregister_joysticks(&machine);
 
 	// free all devices
 	device_list_free_devices(&keyboard_list);
@@ -1457,7 +1465,7 @@ void sdlinput_poll(running_machine *machine)
 			}
 			break;
 		case SDL_QUIT:
-			mame_schedule_exit(machine);
+			machine->schedule_exit();
 			break;
 		case SDL_VIDEORESIZE:
 			sdlwindow_resize(sdl_window_list, event.resize.w, event.resize.h);
@@ -1485,7 +1493,7 @@ void sdlinput_poll(running_machine *machine)
 			switch (event.window.event)
 			{
 			case SDL_WINDOWEVENT_CLOSE:
-				mame_schedule_exit(machine);
+				machine->schedule_exit();
 				break;
 			case  SDL_WINDOWEVENT_LEAVE:
 				ui_input_push_mouse_leave_event(machine, window->target);

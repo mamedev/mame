@@ -151,7 +151,7 @@ static WRITE8_HANDLER( mux_select_w )
 
 static UINT8 joystick_read(running_device *device)
 {
-	if (mame_get_phase(device->machine) != MAME_PHASE_RUNNING)
+	if (device->machine->phase() != MACHINE_PHASE_RUNNING)
 		return 0;
 	else
 	{

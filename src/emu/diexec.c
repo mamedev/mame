@@ -303,7 +303,7 @@ device_execute_interface::~device_execute_interface()
 
 bool device_execute_interface::is_executing() const
 {
-	return (this == m_machine.scheduler.currently_executing());
+	return (this == m_machine.scheduler().currently_executing());
 }
 
 
@@ -361,7 +361,7 @@ void device_execute_interface::adjust_icount(int delta)
 void device_execute_interface::abort_timeslice()
 {
 	// ignore if not the executing device
-	if (this != m_machine.scheduler.currently_executing())
+	if (this != m_machine.scheduler().currently_executing())
 		return;
 
 	// swallow the remaining cycles
@@ -655,7 +655,7 @@ void device_execute_interface::interface_clock_changed()
 	m_divisor = attos;
 
 	// re-compute the perfect interleave factor
-	m_machine.scheduler.compute_perfect_interleave();
+	m_machine.scheduler().compute_perfect_interleave();
 }
 
 

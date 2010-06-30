@@ -101,7 +101,7 @@ static VIDEO_EOF( champbas )
 	state->watchdog_count++;
 
 	if (state->watchdog_count == 0x10)
-		mame_schedule_soft_reset(machine);
+		machine->schedule_soft_reset();
 }
 
 

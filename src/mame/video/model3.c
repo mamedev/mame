@@ -153,10 +153,10 @@ static UINT32 matrix_base_address;
 #define BYTE_REVERSE16(x)		(((x >> 8) & 0xff) | ((x << 8) & 0xff00))
 
 
-static void model3_exit(running_machine *machine)
+static void model3_exit(running_machine &machine)
 {
-	invalidate_texture(machine, 0, 0, 0, 6, 5);
-	invalidate_texture(machine, 1, 0, 0, 6, 5);
+	invalidate_texture(&machine, 0, 0, 0, 6, 5);
+	invalidate_texture(&machine, 1, 0, 0, 6, 5);
 	poly_free(poly);
 }
 
@@ -165,7 +165,7 @@ VIDEO_START( model3 )
 	int width, height;
 
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-	add_exit_callback(machine, model3_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, model3_exit);
 
 	width = machine->primary_screen->width();
 	height = machine->primary_screen->height();

@@ -76,7 +76,7 @@ static ui_gfx_state ui_gfx;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void ui_gfx_exit(running_machine *machine);
+static void ui_gfx_exit(running_machine &machine);
 
 /* palette handling */
 static void palette_handle_keys(running_machine *machine, ui_gfx_state *state);
@@ -109,7 +109,7 @@ void ui_gfx_init(running_machine *machine)
 	int gfx;
 
 	/* make sure we clean up after ourselves */
-	add_exit_callback(machine, ui_gfx_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, ui_gfx_exit);
 
 	/* initialize our global state */
 	memset(state, 0, sizeof(*state));
@@ -133,7 +133,7 @@ void ui_gfx_init(running_machine *machine)
     ui_gfx_exit - clean up after ourselves
 -------------------------------------------------*/
 
-static void ui_gfx_exit(running_machine *machine)
+static void ui_gfx_exit(running_machine &machine)
 {
 	/* free the texture */
 	if (ui_gfx.texture != NULL)
@@ -159,7 +159,7 @@ UINT32 ui_gfx_ui_handler(running_machine *machine, render_container *container, 
 		goto cancel;
 
 	/* if we're not paused, mark the bitmap dirty */
-	if (!mame_is_paused(machine))
+	if (!machine->paused())
 		state->bitmap_dirty = TRUE;
 
 	/* switch off the state to display something */
@@ -208,7 +208,12 @@ again:
 	}
 
 	if (ui_input_pressed(machine, IPT_UI_PAUSE))
-		mame_pause(machine, !mame_is_paused(machine));
+	{
+		if (machine->paused())
+			machine->resume();
+		else
+			machine->pause();
+	}
 
 	if (ui_input_pressed(machine, IPT_UI_CANCEL) || ui_input_pressed(machine, IPT_UI_SHOW_GFX))
 		goto cancel;
@@ -217,7 +222,7 @@ again:
 
 cancel:
 	if (!uistate)
-		mame_pause(machine, FALSE);
+		machine->resume();
 	state->bitmap_dirty = TRUE;
 	return UI_HANDLER_CANCEL;
 }

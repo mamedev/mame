@@ -864,7 +864,7 @@ static void atapi_clear_irq(running_machine *machine)
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
-static void atapi_exit(running_machine* machine)
+static void atapi_exit(running_machine& machine)
 {
 	SCSIDeleteInstance(atapi_device_data[1]);
 	SCSIDeleteInstance(atapi_device_data[0]);
@@ -886,7 +886,7 @@ static void atapi_init(running_machine *machine)
 	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &atapi_device_data[0], "scsi0" );
 	// TODO: the slave drive can be either CD-ROM, DVD-ROM or HDD
 	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &atapi_device_data[1], "scsi1" );
-	add_exit_callback(machine, atapi_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, atapi_exit);
 }
 
 static void atapi_reset(void)

@@ -48,7 +48,7 @@ static int atexit_registered;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void debugger_exit(running_machine *machine);
+static void debugger_exit(running_machine &machine);
 
 
 
@@ -78,7 +78,7 @@ void debugger_init(running_machine *machine)
 		debugint_init(machine);
 
 		/* allocate a new entry for our global list */
-		add_exit_callback(machine, debugger_exit);
+		machine->add_notifier(MACHINE_NOTIFY_EXIT, debugger_exit);
 		entry = global_alloc(machine_entry);
 		entry->next = machine_list;
 		entry->machine = machine;
@@ -90,7 +90,7 @@ void debugger_init(running_machine *machine)
 		atexit_registered = TRUE;
 
 		/* listen in on the errorlog */
-		add_logerror_callback(machine, debug_errorlog_write_line);
+		machine->add_logerror_callback(debug_errorlog_write_line);
 	}
 }
 
@@ -111,13 +111,13 @@ void debugger_refresh_display(running_machine *machine)
     global list of active machines for cleanup
 -------------------------------------------------*/
 
-static void debugger_exit(running_machine *machine)
+static void debugger_exit(running_machine &machine)
 {
 	machine_entry **entryptr;
 
 	/* remove this machine from the list; it came down cleanly */
 	for (entryptr = &machine_list; *entryptr != NULL; entryptr = &(*entryptr)->next)
-		if ((*entryptr)->machine == machine)
+		if ((*entryptr)->machine == &machine)
 		{
 			machine_entry *deleteme = *entryptr;
 			*entryptr = deleteme->next;

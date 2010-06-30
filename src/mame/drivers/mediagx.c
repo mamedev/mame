@@ -1171,7 +1171,7 @@ static const read32_space_func speedup_handlers[] =
 };
 
 #ifdef MAME_DEBUG
-static void report_speedups(running_machine *machine)
+static void report_speedups(running_machine &machine)
 {
 	int i;
 
@@ -1193,7 +1193,7 @@ static void install_speedups(running_machine *machine, const speedup_entry *entr
 		memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
 
 #ifdef MAME_DEBUG
-	add_exit_callback(machine, report_speedups);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, report_speedups);
 #endif
 }
 

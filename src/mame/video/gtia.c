@@ -27,7 +27,7 @@ gtia_struct gtia;
 #define CHECK_GRACTL	0
 #define VERBOSE			0
 
-static void gtia_reset(running_machine *machine);
+static void gtia_reset(running_machine &machine);
 static void gtia_state(running_machine *machine);
 static STATE_POSTLOAD( gtia_state_postload );
 
@@ -68,7 +68,7 @@ void gtia_init(running_machine *machine, const gtia_interface *intf)
 	memset(&gtia, 0, sizeof(gtia));
 	gtia.intf = *intf;
 
-	add_reset_callback(machine, gtia_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, gtia_reset);
 
 	/* state saves */
 	gtia_state(machine);
@@ -151,16 +151,16 @@ static int is_ntsc(running_machine *machine)
 
 
 
-static void gtia_reset(running_machine *machine)
+static void gtia_reset(running_machine &machine)
 {
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(&machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* reset the GTIA read/write/helper registers */
 	for (i = 0; i < 32; i++)
 		atari_gtia_w(space,i,0);
     memset(&gtia.r, 0, sizeof(gtia.r));
-	if (is_ntsc(machine))
+	if (is_ntsc(&machine))
 		gtia.r.pal = 0xff;
 	else
 		gtia.r.pal = 0xf1;

@@ -251,18 +251,18 @@ void eeprom_device::nvram_default()
 	/* populate from a memory region if present */
 	if (m_region != NULL)
 	{
-		if (m_region->length != eeprom_bytes)
+		if (m_region->bytes() != eeprom_bytes)
 			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", tag(), eeprom_bytes);
-		if (m_config.m_data_bits == 8 && (m_region->flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
+		if (m_config.m_data_bits == 8 && m_region->width() != 1)
 			fatalerror("eeprom region '%s' needs to be an 8-bit region", tag());
-		if (m_config.m_data_bits == 16 && ((m_region->flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (m_region->flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
-			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", tag(), m_region->flags);
+		if (m_config.m_data_bits == 16 && (m_region->width() != 2 || m_region->endianness() != ENDIANNESS_BIG))
+			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", tag(), m_region->flags());
 
 		for (offs_t offs = 0; offs < eeprom_length; offs++)
 			if (m_config.m_data_bits == 8)
-				memory_write_byte(m_addrspace[0], offs, m_region->base.u8[offs]);
+				memory_write_byte(m_addrspace[0], offs, m_region->u8(offs));
 			else
-				memory_write_word(m_addrspace[0], offs * 2, m_region->base.u16[offs]);
+				memory_write_word(m_addrspace[0], offs * 2, m_region->u16(offs));
 	}
 }
 

@@ -162,7 +162,7 @@ static const UINT8 skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 ***************************************************************************/
 
 /* core implementation */
-static void video_exit(running_machine *machine);
+static void video_exit(running_machine &machine);
 static void init_buffered_spriteram(running_machine *machine);
 
 /* global rendering */
@@ -202,7 +202,7 @@ static void rgb888_draw_primitives(const render_primitive *primlist, void *dstda
 INLINE int effective_autoframeskip(running_machine *machine)
 {
 	/* if we're fast forwarding or paused, autoframeskip is disabled */
-	if (global.fastforward || mame_is_paused(machine))
+	if (global.fastforward || machine->paused())
 		return FALSE;
 
 	/* otherwise, it's up to the user */
@@ -236,7 +236,7 @@ INLINE int effective_frameskip(void)
 INLINE int effective_throttle(running_machine *machine)
 {
 	/* if we're paused, or if the UI is active, we always throttle */
-	if (mame_is_paused(machine) || ui_is_menu_active())
+	if (machine->paused() || ui_is_menu_active())
 		return TRUE;
 
 	/* if we're fast forwarding, we don't throttle */
@@ -278,7 +278,7 @@ void video_init(running_machine *machine)
 	assert(machine->config != NULL);
 
 	/* request a callback upon exiting */
-	add_exit_callback(machine, video_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, video_exit);
 
 	/* reset our global state */
 	memset(&global, 0, sizeof(global));
@@ -287,10 +287,10 @@ void video_init(running_machine *machine)
 	/* extract initial execution state from global configuration settings */
 	global.speed = original_speed_setting();
 	update_refresh_speed(machine);
-	global.throttle = options_get_bool(mame_options(), OPTION_THROTTLE);
-	global.auto_frameskip = options_get_bool(mame_options(), OPTION_AUTOFRAMESKIP);
-	global.frameskip_level = options_get_int(mame_options(), OPTION_FRAMESKIP);
-	global.seconds_to_run = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
+	global.throttle = options_get_bool(machine->options(), OPTION_THROTTLE);
+	global.auto_frameskip = options_get_bool(machine->options(), OPTION_AUTOFRAMESKIP);
+	global.frameskip_level = options_get_int(machine->options(), OPTION_FRAMESKIP);
+	global.seconds_to_run = options_get_int(machine->options(), OPTION_SECONDS_TO_RUN);
 
 	/* create spriteram buffers if necessary */
 	if (machine->config->m_video_attributes & VIDEO_BUFFERS_SPRITERAM)
@@ -301,7 +301,7 @@ void video_init(running_machine *machine)
 		(*machine->config->m_init_palette)(machine, memory_region(machine, "proms"));
 
 	/* create a render target for snapshots */
-	viewname = options_get_string(mame_options(), OPTION_SNAPVIEW);
+	viewname = options_get_string(machine->options(), OPTION_SNAPVIEW);
 	global.snap_native = (machine->primary_screen != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
 
 	/* the native target is hard-coded to our internal layout and has all options disabled */
@@ -322,15 +322,15 @@ void video_init(running_machine *machine)
 	}
 
 	/* extract snap resolution if present */
-	if (sscanf(options_get_string(mame_options(), OPTION_SNAPSIZE), "%dx%d", &global.snap_width, &global.snap_height) != 2)
+	if (sscanf(options_get_string(machine->options(), OPTION_SNAPSIZE), "%dx%d", &global.snap_width, &global.snap_height) != 2)
 		global.snap_width = global.snap_height = 0;
 
 	/* start recording movie if specified */
-	filename = options_get_string(mame_options(), OPTION_MNGWRITE);
+	filename = options_get_string(machine->options(), OPTION_MNGWRITE);
 	if (filename[0] != 0)
 		video_mng_begin_recording(machine, filename);
 
-	filename = options_get_string(mame_options(), OPTION_AVIWRITE);
+	filename = options_get_string(machine->options(), OPTION_AVIWRITE);
 	if (filename[0] != 0)
 		video_avi_begin_recording(machine, filename);
 
@@ -347,21 +347,17 @@ void video_init(running_machine *machine)
     video_exit - close down the video system
 -------------------------------------------------*/
 
-static void video_exit(running_machine *machine)
+static void video_exit(running_machine &machine)
 {
 	int i;
 
-	/* validate */
-	assert(machine != NULL);
-	assert(machine->config != NULL);
-
 	/* stop recording any movie */
-	video_mng_end_recording(machine);
-	video_avi_end_recording(machine);
+	video_mng_end_recording(&machine);
+	video_avi_end_recording(&machine);
 
 	/* free all the graphics elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		gfx_element_free(machine->gfx[i]);
+		gfx_element_free(machine.gfx[i]);
 
 	/* free the snapshot target */
 	if (global.snap_target != NULL)
@@ -434,14 +430,14 @@ void video_frame_update(running_machine *machine, int debug)
 {
 	attotime current_time = timer_get_time(machine);
 	int skipped_it = global.skipping_this_frame;
-	int phase = mame_get_phase(machine);
+	int phase = machine->phase();
 
 	/* validate */
 	assert(machine != NULL);
 	assert(machine->config != NULL);
 
 	/* only render sound and video if we're in the running phase */
-	if (phase == MAME_PHASE_RUNNING && (!mame_is_paused(machine) || options_get_bool(mame_options(), OPTION_UPDATEINPAUSE)))
+	if (phase == MACHINE_PHASE_RUNNING && (!machine->paused() || options_get_bool(machine->options(), OPTION_UPDATEINPAUSE)))
 	{
 		int anything_changed = finish_screen_updates(machine);
 
@@ -471,7 +467,7 @@ void video_frame_update(running_machine *machine, int debug)
 
 	/* perform tasks for this frame */
 	if (!debug)
-		mame_frame_update(machine);
+		machine->call_notifiers(MACHINE_NOTIFY_FRAME);
 
 	/* update frameskipping */
 	if (!debug)
@@ -482,10 +478,10 @@ void video_frame_update(running_machine *machine, int debug)
 		recompute_speed(machine, current_time);
 
 	/* call the end-of-frame callback */
-	if (phase == MAME_PHASE_RUNNING)
+	if (phase == MACHINE_PHASE_RUNNING)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
-		if (machine->primary_screen != NULL && (mame_is_paused(machine) || debug || debugger_within_instruction_hook(machine)))
+		if (machine->primary_screen != NULL && (machine->paused() || debug || debugger_within_instruction_hook(machine)))
 			machine->primary_screen->scanline0_callback();
 
 		/* otherwise, call the video EOF callback */
@@ -518,7 +514,7 @@ static int finish_screen_updates(running_machine *machine)
 			anything_changed = true;
 
 	/* update our movie recording and burn-in state */
-	if (!mame_is_paused(machine))
+	if (!machine->paused())
 	{
 		video_mng_record_frame(machine);
 		video_avi_record_frame(machine);
@@ -581,7 +577,7 @@ void video_set_speed_factor(int speed)
 
 const char *video_get_speed_text(running_machine *machine)
 {
-	int paused = mame_is_paused(machine);
+	bool paused = machine->paused();
 	static char buffer[1024];
 	char *dest = buffer;
 
@@ -787,7 +783,7 @@ static void update_throttle(running_machine *machine, attotime emutime)
        and explicitly reset our tracked real and emulated timers to that value ...
        this means we pretend that the last update was exactly 1/60th of a second
        ago, and was in sync in both real and emulated time */
-	if (mame_is_paused(machine))
+	if (machine->paused())
 	{
 		global.throttle_emutime = attotime_sub_attoseconds(emutime, ATTOSECONDS_PER_SECOND / PAUSED_REFRESH_RATE);
 		global.throttle_realtime = global.throttle_emutime;
@@ -880,9 +876,9 @@ static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t ta
 
 	/* we're allowed to sleep via the OSD code only if we're configured to do so
        and we're not frameskipping due to autoframeskip, or if we're paused */
-    if (options_get_bool(mame_options(), OPTION_SLEEP) && (!effective_autoframeskip(machine) || effective_frameskip() == 0))
+    if (options_get_bool(machine->options(), OPTION_SLEEP) && (!effective_autoframeskip(machine) || effective_frameskip() == 0))
     	allowed_to_sleep = TRUE;
-    if (mame_is_paused(machine))
+    if (machine->paused())
     	allowed_to_sleep = TRUE;
 
 	/* loop until we reach our target */
@@ -989,7 +985,7 @@ static void update_frameskip(running_machine *machine)
 static void update_refresh_speed(running_machine *machine)
 {
 	/* only do this if the refreshspeed option is used */
-	if (options_get_bool(mame_options(), OPTION_REFRESHSPEED))
+	if (options_get_bool(machine->options(), OPTION_REFRESHSPEED))
 	{
 		float minrefresh = render_get_max_update_rate();
 		if (minrefresh != 0)
@@ -1035,7 +1031,7 @@ static void recompute_speed(running_machine *machine, attotime emutime)
 	attoseconds_t delta_emutime;
 
 	/* if we don't have a starting time yet, or if we're paused, reset our starting point */
-	if (global.speed_last_realtime == 0 || mame_is_paused(machine))
+	if (global.speed_last_realtime == 0 || machine->paused())
 	{
 		global.speed_last_realtime = osd_ticks();
 		global.speed_last_emutime = emutime;
@@ -1080,7 +1076,7 @@ static void recompute_speed(running_machine *machine, attotime emutime)
 	{
 		if (machine->primary_screen != NULL)
 		{
-			astring fname(machine->basename, PATH_SEPARATOR "final.png");
+			astring fname(machine->basename(), PATH_SEPARATOR "final.png");
 			file_error filerr;
 			mame_file *file;
 
@@ -1094,7 +1090,7 @@ static void recompute_speed(running_machine *machine, attotime emutime)
 		}
 
 		/* schedule our demise */
-		mame_schedule_exit(machine);
+		machine->schedule_exit();
 	}
 }
 
@@ -1232,7 +1228,7 @@ static void create_snapshot_bitmap(device_t *screen)
 
 static file_error mame_fopen_next(running_machine *machine, const char *pathoption, const char *extension, mame_file **file)
 {
-	const char *snapname = options_get_string(mame_options(), OPTION_SNAPNAME);
+	const char *snapname = options_get_string(machine->options(), OPTION_SNAPNAME);
 	file_error filerr;
 	astring snapstr;
 	astring fname;
@@ -1251,7 +1247,7 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
 
 	/* substitute path and gamename up front */
 	snapstr.replace(0, "/", PATH_SEPARATOR);
-	snapstr.replace(0, "%g", machine->basename);
+	snapstr.replace(0, "%g", machine->basename());
 
 	/* determine if the template has an index; if not, we always use the same name */
 	if (snapstr.find(0, "%i") == -1)
@@ -1896,10 +1892,10 @@ void screen_device::device_start()
 		timer_adjust_oneshot(m_scanline_timer, time_until_pos(0), 0);
 
 	// create burn-in bitmap
-	if (options_get_int(mame_options(), OPTION_BURNIN) > 0)
+	if (options_get_int(machine->options(), OPTION_BURNIN) > 0)
 	{
 		int width, height;
-		if (sscanf(options_get_string(mame_options(), OPTION_SNAPSIZE), "%dx%d", &width, &height) != 2 || width == 0 || height == 0)
+		if (sscanf(options_get_string(machine->options(), OPTION_SNAPSIZE), "%dx%d", &width, &height) != 2 || width == 0 || height == 0)
 			width = height = 300;
 		m_burnin = auto_alloc(machine, bitmap_t(width, height, BITMAP_FORMAT_INDEXED64));
 		if (m_burnin == NULL)
@@ -2523,7 +2519,7 @@ void screen_device::finalize_burnin()
 
 	// compute the name and create the file
 	astring fname;
-	fname.printf("%s" PATH_SEPARATOR "burnin-%s.png", machine->basename, tag());
+	fname.printf("%s" PATH_SEPARATOR "burnin-%s.png", machine->basename(), tag());
 	mame_file *file;
 	file_error filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	if (filerr == FILERR_NONE)

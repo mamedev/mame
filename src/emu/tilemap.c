@@ -136,7 +136,7 @@ struct _tilemap_private
 
 /* system management helpers */
 static tilemap_t *tilemap_create_common(running_machine *machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
-static void tilemap_exit(running_machine *machine);
+static void tilemap_exit(running_machine &machine);
 static STATE_POSTLOAD( tilemap_postload );
 static void tilemap_dispose(tilemap_t *tmap);
 
@@ -297,7 +297,7 @@ void tilemap_init(running_machine *machine)
 	if (screen_width != 0 && screen_height != 0)
 	{
 		machine->priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
-		add_exit_callback(machine, tilemap_exit);
+		machine->add_notifier(MACHINE_NOTIFY_EXIT, tilemap_exit);
 	}
 }
 
@@ -1119,9 +1119,9 @@ TILEMAP_MAPPER( tilemap_scan_cols_flip_xy )
     tilemap system
 -------------------------------------------------*/
 
-static void tilemap_exit(running_machine *machine)
+static void tilemap_exit(running_machine &machine)
 {
-	tilemap_private *tilemap_data = machine->tilemap_data;
+	tilemap_private *tilemap_data = machine.tilemap_data;
 
 	/* free all the tilemaps in the list */
 	if (tilemap_data != NULL)

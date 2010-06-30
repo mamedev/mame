@@ -201,8 +201,8 @@ class device_list : public tagged_device_list<device_t>
 {
 	running_machine *m_machine;
 
-	static void static_reset(running_machine *machine);
-	static void static_exit(running_machine *machine);
+	static void static_reset(running_machine &machine);
+	static void static_exit(running_machine &machine);
 	static void static_pre_save(running_machine *machine, void *param);
 	static void static_post_load(running_machine *machine, void *param);
 

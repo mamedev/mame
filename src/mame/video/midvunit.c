@@ -68,7 +68,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 }
 
 
-static void midvunit_exit(running_machine *machine)
+static void midvunit_exit(running_machine &machine)
 {
 	poly_free(poly);
 }
@@ -78,7 +78,7 @@ VIDEO_START( midvunit )
 {
 	scanline_timer = timer_alloc(machine, scanline_timer_cb, NULL);
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	add_exit_callback(machine, midvunit_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, midvunit_exit);
 
 	state_save_register_global_array(machine, video_regs);
 	state_save_register_global_array(machine, dma_data);

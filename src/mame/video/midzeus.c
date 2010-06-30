@@ -82,7 +82,7 @@ static int texel_width;
  *
  *************************************/
 
-static void exit_handler(running_machine *machine);
+static void exit_handler(running_machine &machine);
 
 static void zeus_pointer_w(UINT32 which, UINT32 data, int logit);
 static void zeus_register16_w(running_machine *machine, offs_t offset, UINT16 data, int logit);
@@ -259,7 +259,7 @@ VIDEO_START( midzeus )
 	poly = poly_alloc(machine, 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
-	add_exit_callback(machine, exit_handler);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, exit_handler);
 
 	yoffs = 0;
 	texel_width = 256;
@@ -282,7 +282,7 @@ VIDEO_START( midzeus )
 }
 
 
-static void exit_handler(running_machine *machine)
+static void exit_handler(running_machine &machine)
 {
 #if DUMP_WAVE_RAM
 	FILE *f = fopen("waveram.dmp", "w");

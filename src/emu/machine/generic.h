@@ -102,7 +102,7 @@ int memcard_create(running_machine *machine, int index, int overwrite);
 int memcard_insert(running_machine *machine, int index);
 
 /* "eject" a memory card and save its data */
-void memcard_eject(running_machine *machine);
+void memcard_eject(running_machine &machine);
 
 /* returns the index of the current memory card, or -1 if none */
 int memcard_present(running_machine *machine);

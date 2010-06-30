@@ -506,7 +506,7 @@ static void debugmain_destroy(GtkObject *obj, gpointer user_data)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
 
-	mame_schedule_exit(dmain->machine);
+	dmain->machine->schedule_exit();
 }
 
 
@@ -891,18 +891,18 @@ void on_step_out_activate(GtkWidget *win)
 
 void on_hard_reset_activate(GtkWidget *win)
 {
-	mame_schedule_hard_reset(get_running_machine(win));
+	get_running_machine(win)->schedule_hard_reset();
 }
 
 void on_soft_reset_activate(GtkWidget *win)
 {
-	mame_schedule_soft_reset(get_running_machine(win));
+	get_running_machine(win)->schedule_soft_reset();
 	debug_cpu_go(get_running_machine(win), ~0);
 }
 
 void on_exit_activate(GtkWidget *win)
 {
-	mame_schedule_exit(get_running_machine(win));
+	get_running_machine(win)->schedule_exit();
 }
 
 void on_chunks_1_activate(GtkWidget *win)

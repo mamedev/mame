@@ -169,7 +169,7 @@ static INTERRUPT_GEN( timer_irq )
 		watchdog_cnt++;
 		if ( watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
 		{  // reset board
-			mame_schedule_soft_reset(device->machine);// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
+			device->machine->schedule_soft_reset();// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
 			return;
 		}
 	}

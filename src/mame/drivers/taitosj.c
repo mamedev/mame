@@ -2672,7 +2672,7 @@ ROM_START( kikstart )
 	ROM_LOAD( "pal16l8.28",   0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-static void reset_common(running_machine *machine)
+static void reset_common(running_machine &machine)
 {
 	sndnmi_disable = 1;
 	input_port_4_f0 = 0;
@@ -2691,7 +2691,7 @@ static void init_common(running_machine *machine)
 	state_save_register_global(machine, dac_out);
 	state_save_register_global(machine, dac_vol);
 
-	add_reset_callback(machine, reset_common);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, reset_common);
 }
 
 static DRIVER_INIT( taitosj )

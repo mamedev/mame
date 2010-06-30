@@ -83,7 +83,7 @@ struct _debugcpu_private
 ***************************************************************************/
 
 /* internal helpers */
-static void debug_cpu_exit(running_machine *machine);
+static void debug_cpu_exit(running_machine &machine);
 static void on_vblank(screen_device &device, void *param, bool vblank_state);
 static void reset_transient_flags(running_machine *machine);
 static void compute_debug_flags(device_t *device);
@@ -222,7 +222,7 @@ void debug_cpu_init(running_machine *machine)
 	if (machine->primary_screen != NULL)
 		machine->primary_screen->register_vblank_callback(on_vblank, NULL);
 
-	add_exit_callback(machine, debug_cpu_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_cpu_exit);
 }
 
 
@@ -638,7 +638,7 @@ void debug_cpu_instruction_hook(device_t *device, offs_t curpc)
 			process_source_file(device->machine);
 
 			/* if an event got scheduled, resume */
-			if (mame_is_scheduled_event_pending(device->machine))
+			if (device->machine->scheduled_event_pending())
 				global->execution_state = EXECUTION_STATE_RUNNING;
 		}
 		sound_mute(device->machine, FALSE);
@@ -1157,7 +1157,7 @@ void debug_cpu_source_script(running_machine *machine, const char *file)
 		global->source_file = fopen(file, "r");
 		if (!global->source_file)
 		{
-			if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
+			if (machine->phase() == MACHINE_PHASE_RUNNING)
 				debug_console_printf(machine, "Cannot open command file '%s'\n", file);
 			else
 				fatalerror("Cannot open command file '%s'", file);
@@ -1868,14 +1868,14 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
     debug_cpu_exit - free all memory
 -------------------------------------------------*/
 
-static void debug_cpu_exit(running_machine *machine)
+static void debug_cpu_exit(running_machine &machine)
 {
-	debugcpu_private *global = machine->debugcpu_data;
+	debugcpu_private *global = machine.debugcpu_data;
 	device_t *cpu;
 	int spacenum;
 
 	/* loop over all watchpoints and breakpoints to free their memory */
-	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	for (cpu = machine.firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
 		cpu_debug_data *cpudebug = cpu_get_debug_data(cpu);
 
@@ -1883,7 +1883,7 @@ static void debug_cpu_exit(running_machine *machine)
 		if (cpudebug->trace.file != NULL)
 			fclose(cpudebug->trace.file);
 		if (cpudebug->trace.action != NULL)
-			auto_free(machine, cpudebug->trace.action);
+			auto_free(&machine, cpudebug->trace.action);
 
 		/* free the symbol table */
 		if (cpudebug->symtable != NULL)
@@ -1891,14 +1891,14 @@ static void debug_cpu_exit(running_machine *machine)
 
 		/* free all breakpoints */
 		while (cpudebug->bplist != NULL)
-			debug_cpu_breakpoint_clear(machine, cpudebug->bplist->index);
+			debug_cpu_breakpoint_clear(&machine, cpudebug->bplist->index);
 
 		/* loop over all address spaces */
 		for (spacenum = 0; spacenum < ARRAY_LENGTH(cpudebug->wplist); spacenum++)
 		{
 			/* free all watchpoints */
 			while (cpudebug->wplist[spacenum] != NULL)
-				debug_cpu_watchpoint_clear(machine, cpudebug->wplist[spacenum]->index);
+				debug_cpu_watchpoint_clear(&machine, cpudebug->wplist[spacenum]->index);
 		}
 	}
 
@@ -1951,7 +1951,7 @@ static void compute_debug_flags(device_t *device)
 	machine->debug_flags |= DEBUG_FLAG_ENABLED;
 
 	/* if we are ignoring this CPU, or if events are pending, we're done */
-	if ((cpudebug->flags & DEBUG_FLAG_OBSERVING) == 0 || mame_is_scheduled_event_pending(machine) || mame_is_save_or_load_pending(machine))
+	if ((cpudebug->flags & DEBUG_FLAG_OBSERVING) == 0 || machine->scheduled_event_pending() || machine->save_or_load_pending())
 		return;
 
 	/* many of our states require us to be called on each instruction */
@@ -2525,15 +2525,12 @@ static UINT64 expression_read_program_direct(const address_space *space, int opc
 
 static UINT64 expression_read_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size)
 {
-	UINT8 *base = memory_region(machine, rgntag);
+	const region_info *region = machine->region(rgntag);
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 
 	/* make sure we get a valid base before proceeding */
-	if (base != NULL)
+	if (region != NULL)
 	{
-		UINT32 length = memory_region_length(machine, rgntag);
-		UINT32 flags = memory_region_flags(machine, rgntag);
-
 		/* call ourself recursively until we are byte-sized */
 		if (size > 1)
 		{
@@ -2545,21 +2542,21 @@ static UINT64 expression_read_memory_region(running_machine *machine, const char
 			r1 = expression_read_memory_region(machine, rgntag, address + halfsize, halfsize);
 
 			/* assemble based on the target endianness */
-			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+			if (region->endianness() == ENDIANNESS_LITTLE)
 				result = r0 | (r1 << (8 * halfsize));
 			else
 				result = r1 | (r0 << (8 * halfsize));
 		}
 
 		/* only process if we're within range */
-		else if (address < length)
+		else if (address < region->bytes())
 		{
 			/* lowmask specified which address bits are within the databus width */
-			UINT32 lowmask = (1 << ((flags & ROMREGION_WIDTHMASK) >> 8)) - 1;
-			base += address & ~lowmask;
+			UINT32 lowmask = region->width() - 1;
+			UINT8 *base = region->base() + (address & ~lowmask);
 
 			/* if we have a valid base, return the appropriate byte */
-			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+			if (region->endianness() == ENDIANNESS_LITTLE)
 				result = base[BYTE8_XOR_LE(address) & lowmask];
 			else
 				result = base[BYTE8_XOR_BE(address) & lowmask];
@@ -2701,14 +2698,11 @@ static void expression_write_program_direct(const address_space *space, int opco
 static void expression_write_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size, UINT64 data)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	UINT8 *base = memory_region(machine, rgntag);
+	const region_info *region = machine->region(rgntag);
 
 	/* make sure we get a valid base before proceeding */
-	if (base != NULL)
+	if (region != NULL)
 	{
-		UINT32 length = memory_region_length(machine, rgntag);
-		UINT32 flags = memory_region_flags(machine, rgntag);
-
 		/* call ourself recursively until we are byte-sized */
 		if (size > 1)
 		{
@@ -2717,7 +2711,7 @@ static void expression_write_memory_region(running_machine *machine, const char 
 
 			/* break apart based on the target endianness */
 			halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
-			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+			if (region->endianness() == ENDIANNESS_LITTLE)
 			{
 				r0 = data & halfmask;
 				r1 = (data >> (8 * halfsize)) & halfmask;
@@ -2734,14 +2728,14 @@ static void expression_write_memory_region(running_machine *machine, const char 
 		}
 
 		/* only process if we're within range */
-		else if (address < length)
+		else if (address < region->bytes())
 		{
 			/* lowmask specified which address bits are within the databus width */
-			UINT32 lowmask = (1 << ((flags & ROMREGION_WIDTHMASK) >> 8)) - 1;
-			base += address & ~lowmask;
+			UINT32 lowmask = region->width() - 1;
+			UINT8 *base = region->base() + (address & ~lowmask);
 
 			/* if we have a valid base, set the appropriate byte */
-			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+			if (region->endianness() == ENDIANNESS_LITTLE)
 				base[BYTE8_XOR_LE(address) & lowmask] = data;
 			else
 				base[BYTE8_XOR_BE(address) & lowmask] = data;

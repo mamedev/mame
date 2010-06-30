@@ -48,7 +48,7 @@ INLINE mb3773_state *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( watchdog_timeout )
 {
-	mame_schedule_soft_reset(machine);
+	machine->schedule_soft_reset();
 }
 
 /*-------------------------------------------------

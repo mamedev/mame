@@ -233,10 +233,10 @@ static int rtc65271_file_load(running_device *device, mame_file *file)
 	/*state->dirty = FALSE;*/
 
 	{
-		mame_system_time systime;
+		system_time systime;
 
 		/* get the current date/time from the core */
-		mame_get_current_datetime(device->machine, &systime);
+		device->machine->current_datetime(systime);
 
 		/* set clock registers */
 		state->regs[reg_second] = systime.local_time.second;

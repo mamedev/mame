@@ -155,7 +155,7 @@ static HANDLE window_thread_ready_event;
 //  PROTOTYPES
 //============================================================
 
-static void winwindow_exit(running_machine *machine);
+static void winwindow_exit(running_machine &machine);
 static void winwindow_video_window_destroy(win_window_info *window);
 static void draw_video_contents(win_window_info *window, HDC dc, int update);
 
@@ -228,13 +228,13 @@ void winwindow_init(running_machine *machine)
 	size_t temp;
 
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool(mame_options(), WINOPTION_MULTITHREADING);
+	multithreading_enabled = options_get_bool(machine->options(), WINOPTION_MULTITHREADING);
 
 	// get the main thread ID before anything else
 	main_threadid = GetCurrentThreadId();
 
 	// ensure we get called on the way out
-	add_exit_callback(machine, winwindow_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, winwindow_exit);
 
 	// set up window class and register it
 	create_window_class();
@@ -296,12 +296,12 @@ void winwindow_init(running_machine *machine)
 //  (main thread)
 //============================================================
 
-static void winwindow_exit(running_machine *machine)
+static void winwindow_exit(running_machine &machine)
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// possibly kill the debug window
-	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		debugwin_destroy_windows();
 
 	// free all the windows
@@ -475,7 +475,7 @@ void winwindow_dispatch_message(running_machine *machine, MSG *message)
 	{
 		// special case for quit
 		case WM_QUIT:
-			mame_schedule_exit(machine);
+			machine->schedule_exit();
 			break;
 
 		// temporary pause from the window thread
@@ -565,7 +565,7 @@ void winwindow_update_cursor_state(running_machine *machine)
 	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
-	if (winwindow_has_focus() && ((!video_config.windowed && !win_has_menu(win_window_list)) || (!mame_is_paused(machine) && wininput_should_hide_mouse())))
+	if (winwindow_has_focus() && ((!video_config.windowed && !win_has_menu(win_window_list)) || (!machine->paused() && wininput_should_hide_mouse())))
 	{
 		win_window_info *window = win_window_list;
 		RECT bounds;
@@ -642,7 +642,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 
 	// set the specific view
 	sprintf(option, "view%d", index);
-	set_starting_view(index, window, options_get_string(mame_options(), option));
+	set_starting_view(index, window, options_get_string(machine->options(), option));
 
 	// remember the current values in case they change
 	window->targetview = render_target_get_view(window->target);
@@ -656,7 +656,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->gamedrv->description, machine->gamedrv->name, index);
 
 	// set the initial maximized state
-	window->startmaximized = options_get_bool(mame_options(), WINOPTION_MAXIMIZE);
+	window->startmaximized = options_get_bool(machine->options(), WINOPTION_MAXIMIZE);
 
 	// finish the window creation on the window thread
 	if (multithreading_enabled)
@@ -896,9 +896,9 @@ void winwindow_ui_pause_from_main_thread(running_machine *machine, int pause)
 		if (ui_temp_pause++ == 0)
 		{
 			// only call mame_pause if we weren't already paused due to some external reason
-			ui_temp_was_paused = mame_is_paused(machine);
+			ui_temp_was_paused = machine->paused();
 			if (!ui_temp_was_paused)
-				mame_pause(machine, TRUE);
+				machine->pause();
 
 			SetEvent(ui_pause_event);
 		}
@@ -912,7 +912,7 @@ void winwindow_ui_pause_from_main_thread(running_machine *machine, int pause)
 		{
 			// but only do it if we were the ones who initiated it
 			if (!ui_temp_was_paused)
-				mame_pause(machine, FALSE);
+				machine->resume();
 
 			ResetEvent(ui_pause_event);
 		}
@@ -980,7 +980,7 @@ void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param)
 
 int winwindow_ui_is_paused(running_machine *machine)
 {
-	return mame_is_paused(machine) && ui_temp_was_paused;
+	return machine->paused() && ui_temp_was_paused;
 }
 
 
@@ -1346,7 +1346,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 			if (multithreading_enabled)
 				PostThreadMessage(main_threadid, WM_QUIT, 0, 0);
 			else
-				mame_schedule_exit(window->machine);
+				window->machine->schedule_exit();
 			break;
 
 		// destroy: clean up all attached rendering bits and NULL out our hwnd

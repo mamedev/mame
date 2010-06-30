@@ -185,7 +185,7 @@ loaded_samples *readsamples(running_machine *machine, const char *const *samplen
 	int i;
 
 	/* if the user doesn't want to use samples, bail */
-	if (!options_get_bool(mame_options(), OPTION_SAMPLES))
+	if (!options_get_bool(machine->options(), OPTION_SAMPLES))
 		return NULL;
 	if (samplenames == 0 || samplenames[0] == 0)
 		return NULL;

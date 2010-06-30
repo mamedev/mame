@@ -109,7 +109,7 @@ static const struct prot_data tkdensha_data =
 };
 
 
-static void tecmosys_prot_reset(running_machine *machine)
+static void tecmosys_prot_reset(running_machine &machine)
 {
 	device_read_ptr = 0;
 	device_status = DS_IDLE;
@@ -125,7 +125,7 @@ void tecmosys_prot_init(running_machine *machine, int which)
 	case 2: device_data = &tkdensha_data; break;
 	}
 
-	add_reset_callback(machine, tecmosys_prot_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, tecmosys_prot_reset);
 }
 
 READ16_HANDLER(tecmosys_prot_status_r)

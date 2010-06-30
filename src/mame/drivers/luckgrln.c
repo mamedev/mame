@@ -423,8 +423,8 @@ static WRITE8_HANDLER( palette_w )
 // Oki M62X428 is a 4-bit RTC, doesn't seem to be millennium bug proof ...
 static READ8_HANDLER( rtc_r )
 {
-	mame_system_time systime;
-	mame_get_base_datetime(space->machine, &systime);
+	system_time systime;
+	space->machine->base_datetime(systime);
 
 	switch(offset)
 	{

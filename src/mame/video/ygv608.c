@@ -495,7 +495,7 @@ static void ygv608_register_state_save(running_machine *machine)
 	state_save_register_postload(machine, ygv608_postload, NULL);
 }
 
-static void ygv608_exit(running_machine *machine)
+static void ygv608_exit(running_machine &machine)
 {
 	work_bitmap = NULL;
 }
@@ -531,7 +531,7 @@ VIDEO_START( ygv608 )
 	tilemap_B = NULL;
 
 	ygv608_register_state_save(machine);
-	add_exit_callback(machine, ygv608_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, ygv608_exit);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

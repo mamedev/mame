@@ -170,7 +170,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 
 	// after 5 seconds, exit
 	if (attotime_compare(timer_get_time(machine), attotime_make(5, 0)) > 0)
-		mame_schedule_exit(machine);
+		machine->schedule_exit();
 }
 
 

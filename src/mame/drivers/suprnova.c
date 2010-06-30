@@ -705,10 +705,10 @@ static WRITE32_HANDLER( skns_io_w )
 
 static READ32_HANDLER( skns_msm6242_r )
 {
-	mame_system_time systime;
+	system_time systime;
 	long value;
 
-	mame_get_base_datetime(space->machine, &systime);
+	space->machine->base_datetime(systime);
 	// The clock is not y2k-compatible, wrap back 10 years, screw the leap years
 	//  tm->tm_year -= 10;
 

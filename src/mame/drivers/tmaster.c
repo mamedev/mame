@@ -184,9 +184,9 @@ static UINT8 binary_to_BCD(UINT8 data)
 
 static READ16_HANDLER(rtc_r)
 {
-	mame_system_time systime;
+	system_time systime;
 
-	mame_get_current_datetime(space->machine, &systime);
+	space->machine->current_datetime(systime);
 	rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
 	rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
 	rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);

@@ -216,10 +216,10 @@ const char *image_get_device_option(device_image_interface *image)
 {
 	const char *result = NULL;
 
-	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
+	if (options_get_bool(image->device().machine->options(), OPTION_ADDED_DEVICE_OPTIONS))
 	{
 		/* access the option */
-		result = options_get_string(mame_options(),  image->image_config().instance_name());
+		result = options_get_string(image->device().machine->options(),  image->image_config().instance_name());
 	}
 	return result;
 }

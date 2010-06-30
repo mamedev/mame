@@ -879,7 +879,7 @@ static void dview_update(debug_view &dw, void *osdprivate)
 #endif
 }
 
-static void debugint_exit(running_machine *machine)
+static void debugint_exit(running_machine &machine)
 {
 	for (DView *ndv = list; ndv != NULL; )
 	{
@@ -919,7 +919,7 @@ void debugint_init(running_machine *machine)
 	debug_font_width++;
 	/* FIXME: above does not really work */
 	debug_font_width = 10;
-	add_exit_callback(machine, debugint_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, debugint_exit);
 }
 
 #if 0
@@ -1070,18 +1070,18 @@ static void on_step_out_activate(DView *dv, const ui_menu_event *event)
 
 static void on_hard_reset_activate(DView *dv, const ui_menu_event *event)
 {
-	mame_schedule_hard_reset(dv->machine);
+	dv->machine->schedule_hard_reset();
 }
 
 static void on_soft_reset_activate(DView *dv, const ui_menu_event *event)
 {
-	mame_schedule_soft_reset(dv->machine);
+	dv->machine->schedule_soft_reset();
 	debug_cpu_go(dv->machine, ~0);
 }
 
 static void on_exit_activate(DView *dv, const ui_menu_event *event)
 {
-	mame_schedule_exit(dv->machine);
+	dv->machine->schedule_exit();
 }
 
 static void on_view_opcodes_activate(DView *dv, const ui_menu_event *event)
@@ -1349,7 +1349,7 @@ static void handle_menus(running_machine *machine)
 	const ui_menu_event *event;
 
 	render_container_empty(render_container_get_ui());
-	ui_input_frame_update(machine);
+	ui_input_frame_update(*machine);
 	if (menu != NULL)
 	{
 		/* process the menu */
@@ -1474,7 +1474,7 @@ void debugint_wait_for_debugger(running_device *device, int firststop)
 
 void debugint_update_during_game(running_machine *machine)
 {
-	if (!debug_cpu_is_stopped(machine) && mame_get_phase(machine) == MAME_PHASE_RUNNING)
+	if (!debug_cpu_is_stopped(machine) && machine->phase() == MACHINE_PHASE_RUNNING)
 	{
 		update_views();
 	}

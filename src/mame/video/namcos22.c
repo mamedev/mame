@@ -2190,13 +2190,13 @@ WRITE32_HANDLER( namcos22_paletteram_w )
 	dirtypal[offset&(0x7fff/4)] = 1;
 }
 
-static void namcos22_reset(running_machine *machine)
+static void namcos22_reset(running_machine &machine)
 {
 	memset(&mSceneRoot, 0, sizeof(mSceneRoot));
 	mpFreeSceneNode = NULL;
 }
 
-static void namcos22_exit(running_machine *machine)
+static void namcos22_exit(running_machine &machine)
 {
 	poly_free(poly);
 }
@@ -2225,8 +2225,8 @@ static VIDEO_START( common )
 #else
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 #endif
-	add_reset_callback(machine, namcos22_reset);
-	add_exit_callback(machine, namcos22_exit);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, namcos22_reset);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, namcos22_exit);
 
 	gfx_element_set_source(machine->gfx[GFX_CHAR], (UINT8 *)namcos22_cgram);
 }

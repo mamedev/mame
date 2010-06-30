@@ -73,7 +73,7 @@ static int			sdl_init(running_machine *machine);
 static void			sdl_kill(running_machine *machine);
 static int			sdl_create_buffers(void);
 static void			sdl_destroy_buffers(void);
-static void			sdl_cleanup_audio(running_machine *machine);
+static void			sdl_cleanup_audio(running_machine &machine);
 static void			sdl_callback(void *userdata, Uint8 *stream, int len);
 
 
@@ -93,7 +93,7 @@ void sdlaudio_init(running_machine *machine)
 		if (sdl_init(machine))
 			return;
 
-		add_exit_callback(machine, sdl_cleanup_audio);
+		machine->add_notifier(MACHINE_NOTIFY_EXIT, sdl_cleanup_audio);
 		// set the startup volume
 		osd_set_mastervolume(attenuation);
 	}
@@ -106,14 +106,14 @@ void sdlaudio_init(running_machine *machine)
 //  osd_stop_audio_stream
 //============================================================
 
-static void sdl_cleanup_audio(running_machine *machine)
+static void sdl_cleanup_audio(running_machine &machine)
 {
 	// if nothing to do, don't do it
-	if (machine->sample_rate == 0)
+	if (machine.sample_rate == 0)
 		return;
 
 	// kill the buffers and dsound
-	sdl_kill(machine);
+	sdl_kill(&machine);
 	sdl_destroy_buffers();
 
 	// print out over/underflow stats
@@ -428,7 +428,7 @@ static int sdl_init(running_machine *machine)
 
 	if (initialized_audio)
 	{
-		sdl_cleanup_audio(machine);
+		sdl_cleanup_audio(*machine);
 	}
 
 	mame_printf_verbose("Audio: Start initialization\n");
@@ -464,7 +464,7 @@ static int sdl_init(running_machine *machine)
 
 	sdl_xfer_samples = obtained.samples;
 
-	audio_latency = options_get_int(mame_options(), SDLOPTION_AUDIO_LATENCY);
+	audio_latency = options_get_int(machine->options(), SDLOPTION_AUDIO_LATENCY);
 
 	// pin audio latency
 	if (audio_latency > MAX_AUDIO_LATENCY)

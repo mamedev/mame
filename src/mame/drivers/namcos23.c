@@ -2396,10 +2396,10 @@ INLINE UINT8 make_bcd(UINT8 data)
 static READ8_HANDLER( s23_mcu_rtc_r )
 {
 	UINT8 ret = 0;
-	mame_system_time systime;
+	system_time systime;
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
-	mame_get_current_datetime(space->machine, &systime);
+	space->machine->current_datetime(systime);
 
 	switch (s23_rtcstate)
 	{

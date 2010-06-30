@@ -1578,8 +1578,8 @@ static void rtc_initial_setup(running_machine *machine)
 	static UINT32 current_time;
 	static int year_count,cur_year,i;
 	static const int month_to_day_conversion[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-	mame_system_time systime;
-	mame_get_base_datetime(machine, &systime);
+	system_time systime;
+	machine->base_datetime(systime);
 
 	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
 

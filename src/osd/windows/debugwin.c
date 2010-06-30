@@ -506,7 +506,7 @@ void debugwin_show(int type)
 void debugwin_update_during_game(running_machine *machine)
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine) && mame_get_phase(machine) == MAME_PHASE_RUNNING)
+	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine) && machine->phase() == MACHINE_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
 		if (debugwin_seq_pressed(machine))
@@ -2666,18 +2666,18 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				return 1;
 
 			case ID_HARD_RESET:
-				mame_schedule_hard_reset(info->machine);
+				info->machine->schedule_hard_reset();
 				return 1;
 
 			case ID_SOFT_RESET:
-				mame_schedule_soft_reset(info->machine);
+				info->machine->schedule_soft_reset();
 				debug_cpu_go(info->machine, ~0);
 				return 1;
 
 			case ID_EXIT:
 				if (info->focuswnd != NULL)
 					SetFocus(info->focuswnd);
-				mame_schedule_exit(info->machine);
+				info->machine->schedule_exit();
 				return 1;
 		}
 

@@ -189,7 +189,7 @@ static UINT8 *gfxrom;
 
 void K001005_swap_buffers(running_machine *machine);
 
-static void K001005_exit(running_machine *machine)
+static void K001005_exit(running_machine &machine)
 {
 	poly_free(poly);
 }
@@ -217,7 +217,7 @@ void K001005_init(running_machine *machine)
 	K001005_3d_fifo = auto_alloc_array(machine, UINT32, 0x10000);
 
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	add_exit_callback(machine, K001005_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, K001005_exit);
 
 	for (i=0; i < 128; i++)
 	{

@@ -238,9 +238,9 @@ static int dec_2_local(int a)
 
 static void mc146818_set_base_datetime(running_machine *machine)
 {
-	mame_system_time systime;
+	system_time systime;
 
-	mame_get_base_datetime(machine, &systime);
+	machine->base_datetime(systime);
 
 	if (HOURS_24 || (systime.local_time.hour < 12))
 		mc146818->data[4] = dec_2_local(systime.local_time.hour);

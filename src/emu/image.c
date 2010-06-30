@@ -159,7 +159,7 @@ done:
 static void image_options_extract(running_machine *machine)
 {
 	/* only extract the device options if we've added them */
-	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS)) {
+	if (options_get_bool(machine->options(), OPTION_ADDED_DEVICE_OPTIONS)) {
 		int index = 0;		
 		device_image_interface *image = NULL;
 
@@ -168,14 +168,14 @@ static void image_options_extract(running_machine *machine)
 			const char *filename = image->filename();
 
 			/* and set the option */
-			options_set_string(mame_options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);				
+			options_set_string(machine->options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);				
 			
 			index++;
 		}
 	}
 
 	/* write the config, if appropriate */
-	if (options_get_bool(mame_options(), OPTION_WRITECONFIG))
+	if (options_get_bool(machine->options(), OPTION_WRITECONFIG))
 		write_config(NULL, machine->gamedrv);
 }
 
@@ -184,14 +184,14 @@ static void image_options_extract(running_machine *machine)
     extract options
 -------------------------------------------------*/
 
-void image_unload_all(running_machine *machine)
+void image_unload_all(running_machine &machine)
 {
     device_image_interface *image = NULL;
 
 	// extract the options 
-	image_options_extract(machine);
+	image_options_extract(&machine);
 
-	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine.m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		// unload this image
 		image->unload();
@@ -229,7 +229,7 @@ void image_device_init(running_machine *machine)
 				const char *image_basename_str = image->basename();
 
 				/* unload all images */
-				image_unload_all(machine);
+				image_unload_all(*machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
 					image->image_config().devconfig().name(),
@@ -271,7 +271,7 @@ void image_postdevice_init(running_machine *machine)
 				const char *image_basename_str = image->basename();
 
 				/* unload all images */
-				image_unload_all(machine);
+				image_unload_all(*machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
 					image->image_config().devconfig().name(),
@@ -281,7 +281,7 @@ void image_postdevice_init(running_machine *machine)
 	}
 
 	/* add a callback for when we shut down */
-	add_exit_callback(machine, image_unload_all);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, image_unload_all);
 }
 /***************************************************************************
     INITIALIZATION

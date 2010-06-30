@@ -492,9 +492,9 @@ static UINT8 stv_SMPC_r8 (const address_space *space, int offset)
 
 static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
 {
-	mame_system_time systime;
+	system_time systime;
 
-	mame_get_base_datetime(space->machine, &systime);
+	space->machine->base_datetime(systime);
 
 //  if(LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
 	smpc_ram[offset] = data;
@@ -2336,9 +2336,9 @@ static void print_game_info(void);
 
 DRIVER_INIT ( stv )
 {
-	mame_system_time systime;
+	system_time systime;
 
-	mame_get_base_datetime(machine, &systime);
+	machine->base_datetime(systime);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	minit_boost = 400;
@@ -2590,8 +2590,8 @@ static TIMER_CALLBACK(stv_rtc_increment)
 
 static MACHINE_START( stv )
 {
-	mame_system_time systime;
-	mame_get_base_datetime(machine, &systime);
+	system_time systime;
+	machine->base_datetime(systime);
 
 	stv_maincpu = machine->device<cpu_device>("maincpu");
 	stv_slave = machine->device<cpu_device>("slave");
@@ -2623,7 +2623,7 @@ static MACHINE_START( stv )
 
 	stv_register_protection_savestates(machine); // machine/stvprot.c
 
-	add_exit_callback(machine, stvcd_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, stvcd_exit);
 
 	smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
     smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);

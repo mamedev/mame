@@ -96,7 +96,7 @@ static bitmap_t *effect_bitmap;
 //  PROTOTYPES
 //============================================================
 
-static void winvideo_exit(running_machine *machine);
+static void winvideo_exit(running_machine &machine);
 static void init_monitors(void);
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 static win_monitor_info *pick_monitor(int index);
@@ -119,7 +119,7 @@ void winvideo_init(running_machine *machine)
 	int index;
 
 	// ensure we get called on the way out
-	add_exit_callback(machine, winvideo_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, winvideo_exit);
 
 	// extract data from the options
 	extract_video_config(machine);
@@ -146,7 +146,7 @@ void winvideo_init(running_machine *machine)
 //  winvideo_exit
 //============================================================
 
-static void winvideo_exit(running_machine *machine)
+static void winvideo_exit(running_machine &machine)
 {
 	// free the overlay effect
 	global_free(effect_bitmap);
@@ -399,15 +399,15 @@ static void extract_video_config(running_machine *machine)
 	const char *stemp;
 
 	// global options: extract the data
-	video_config.windowed      = options_get_bool(mame_options(), WINOPTION_WINDOW);
-	video_config.prescale      = options_get_int(mame_options(), WINOPTION_PRESCALE);
-	video_config.keepaspect    = options_get_bool(mame_options(), WINOPTION_KEEPASPECT);
-	video_config.numscreens    = options_get_int(mame_options(), WINOPTION_NUMSCREENS);
+	video_config.windowed      = options_get_bool(machine->options(), WINOPTION_WINDOW);
+	video_config.prescale      = options_get_int(machine->options(), WINOPTION_PRESCALE);
+	video_config.keepaspect    = options_get_bool(machine->options(), WINOPTION_KEEPASPECT);
+	video_config.numscreens    = options_get_int(machine->options(), WINOPTION_NUMSCREENS);
 
 	// if we are in debug mode, never go full screen
 	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
-	stemp                      = options_get_string(mame_options(), WINOPTION_EFFECT);
+	stemp                      = options_get_string(machine->options(), WINOPTION_EFFECT);
 	if (strcmp(stemp, "none") != 0)
 		load_effect_overlay(machine, stemp);
 
@@ -418,7 +418,7 @@ static void extract_video_config(running_machine *machine)
 	get_resolution(WINOPTION_RESOLUTION3, &video_config.window[3], TRUE);
 
 	// video options: extract the data
-	stemp = options_get_string(mame_options(), WINOPTION_VIDEO);
+	stemp = options_get_string(machine->options(), WINOPTION_VIDEO);
 	if (strcmp(stemp, "d3d") == 0)
 		video_config.mode = VIDEO_MODE_D3D;
 	else if (strcmp(stemp, "ddraw") == 0)
@@ -428,7 +428,7 @@ static void extract_video_config(running_machine *machine)
 	else if (strcmp(stemp, "none") == 0)
 	{
 		video_config.mode = VIDEO_MODE_NONE;
-		if (options_get_int(mame_options(), OPTION_SECONDS_TO_RUN) == 0)
+		if (options_get_int(machine->options(), OPTION_SECONDS_TO_RUN) == 0)
 			mame_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else
@@ -436,16 +436,16 @@ static void extract_video_config(running_machine *machine)
 		mame_printf_warning("Invalid video value %s; reverting to gdi\n", stemp);
 		video_config.mode = VIDEO_MODE_GDI;
 	}
-	video_config.waitvsync     = options_get_bool(mame_options(), WINOPTION_WAITVSYNC);
-	video_config.syncrefresh   = options_get_bool(mame_options(), WINOPTION_SYNCREFRESH);
-	video_config.triplebuf     = options_get_bool(mame_options(), WINOPTION_TRIPLEBUFFER);
-	video_config.switchres     = options_get_bool(mame_options(), WINOPTION_SWITCHRES);
+	video_config.waitvsync     = options_get_bool(machine->options(), WINOPTION_WAITVSYNC);
+	video_config.syncrefresh   = options_get_bool(machine->options(), WINOPTION_SYNCREFRESH);
+	video_config.triplebuf     = options_get_bool(machine->options(), WINOPTION_TRIPLEBUFFER);
+	video_config.switchres     = options_get_bool(machine->options(), WINOPTION_SWITCHRES);
 
 	// ddraw options: extract the data
-	video_config.hwstretch     = options_get_bool(mame_options(), WINOPTION_HWSTRETCH);
+	video_config.hwstretch     = options_get_bool(machine->options(), WINOPTION_HWSTRETCH);
 
 	// d3d options: extract the data
-	video_config.filter        = options_get_bool(mame_options(), WINOPTION_FILTER);
+	video_config.filter        = options_get_bool(machine->options(), WINOPTION_FILTER);
 	if (video_config.prescale == 0)
 		video_config.prescale = 1;
 
@@ -454,11 +454,11 @@ static void extract_video_config(running_machine *machine)
 	// per-window options: sanity check values
 
 	// d3d options: sanity check values
-	options_get_int(mame_options(), WINOPTION_D3DVERSION);
+	options_get_int(machine->options(), WINOPTION_D3DVERSION);
 
-	options_get_float(mame_options(), WINOPTION_FULLSCREENBRIGHTNESS);
-	options_get_float(mame_options(), WINOPTION_FULLLSCREENCONTRAST);
-	options_get_float(mame_options(), WINOPTION_FULLSCREENGAMMA);
+	options_get_float(machine->options(), WINOPTION_FULLSCREENBRIGHTNESS);
+	options_get_float(machine->options(), WINOPTION_FULLLSCREENCONTRAST);
+	options_get_float(machine->options(), WINOPTION_FULLSCREENGAMMA);
 }
 
 

@@ -5422,14 +5422,14 @@ static STATE_POSTLOAD( stv_vdp2_state_save_postload )
 	refresh_palette_data(machine);
 }
 
-static void stv_vdp2_exit (running_machine *machine)
+static void stv_vdp2_exit (running_machine &machine)
 {
 	stv_vdp2_roz_bitmap[0] =  stv_vdp2_roz_bitmap[1] = NULL;
 }
 
 static int stv_vdp2_start (running_machine *machine)
 {
-	add_exit_callback(machine, stv_vdp2_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, stv_vdp2_exit);
 
 	stv_vdp2_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
 	stv_vdp2_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 ); // actually we only need half of it since we don't emulate extra 4mbit ram cart.

@@ -333,7 +333,7 @@ static DRIVER_INIT( konamigq )
 	m_p_n_pcmram = memory_region( machine, "shared" ) + 0x80000;
 }
 
-static void konamigq_exit(running_machine *machine)
+static void konamigq_exit(running_machine &machine)
 {
 	am53cf96_exit(&scsi_intf);
 }
@@ -342,7 +342,7 @@ static MACHINE_START( konamigq )
 {
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(machine, &scsi_intf);
-	add_exit_callback(machine, konamigq_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, konamigq_exit);
 	psx_dma_install_read_handler(5, scsi_dma_read);
 	psx_dma_install_write_handler(5, scsi_dma_write);
 

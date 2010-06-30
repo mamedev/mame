@@ -163,6 +163,6 @@ WRITE8_HANDLER( soundlatch4_clear_w ) { latch_clear(space, 3); }
 void soundlatch_setclearedvalue(running_machine *machine, int value)
 {
 	generic_audio_private *state = machine->generic_audio_data;
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call soundlatch_setclearedvalue at init time!");
+	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call soundlatch_setclearedvalue at init time!");
 	state->latch_clear_value = value;
 }

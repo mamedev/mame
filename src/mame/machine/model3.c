@@ -289,9 +289,9 @@ void model3_machine_init(int step)
 
 static UINT8 rtc_get_reg(running_machine *machine, int reg)
 {
-	mame_system_time systime;
+	system_time systime;
 
-	mame_get_current_datetime(machine, &systime);
+	machine->current_datetime(systime);
 
 	switch(reg)
 	{

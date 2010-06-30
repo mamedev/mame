@@ -501,7 +501,7 @@ static WRITE16_HANDLER( pgm_calendar_w )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	mame_get_base_datetime(space->machine, &state->systime);
+	space->machine->base_datetime(state->systime);
 
 	state->cal_com <<= 1;
 	state->cal_com |= data & 1;
@@ -552,7 +552,7 @@ static WRITE16_HANDLER( pgm_calendar_w )
 				break;
 
 			case 0xf:  //Load Date
-				mame_get_base_datetime(space->machine, &state->systime);
+				space->machine->base_datetime(state->systime);
 				break;
 		}
 	}
@@ -1342,7 +1342,7 @@ static MACHINE_START( pgm )
 {
 	pgm_state *state = (pgm_state *)machine->driver_data;
 
-	mame_get_base_datetime(machine, &state->systime);
+	machine->base_datetime(state->systime);
 
 	state->soundcpu = devtag_get_device(machine, "soundcpu");
 	state->prot = devtag_get_device(machine, "prot");

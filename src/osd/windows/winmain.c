@@ -159,7 +159,7 @@ static TIMECAPS caps;
 //  PROTOTYPES
 //============================================================
 
-static void osd_exit(running_machine *machine);
+static void osd_exit(running_machine &machine);
 
 static void soft_link_functions(void);
 static int is_double_click_start(int argc);
@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
 //  output_oslog
 //============================================================
 
-static void output_oslog(running_machine *machine, const char *buffer)
+static void output_oslog(running_machine &machine, const char *buffer)
 {
 	win_output_debug_string_utf8(buffer);
 }
@@ -335,18 +335,18 @@ static void output_oslog(running_machine *machine, const char *buffer)
 
 void osd_init(running_machine *machine)
 {
-	int watchdog = options_get_int(mame_options(), WINOPTION_WATCHDOG);
+	int watchdog = options_get_int(machine->options(), WINOPTION_WATCHDOG);
 	const char *stemp;
 
 	// thread priority
 	if (!(machine->debug_flags & DEBUG_FLAG_OSD_ENABLED))
-		SetThreadPriority(GetCurrentThread(), options_get_int(mame_options(), WINOPTION_PRIORITY));
+		SetThreadPriority(GetCurrentThread(), options_get_int(machine->options(), WINOPTION_PRIORITY));
 
 	// ensure we get called on the way out
-	add_exit_callback(machine, osd_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, osd_exit);
 
 	// get number of processors
-	stemp = options_get_string(mame_options(), WINOPTION_NUMPROCESSORS);
+	stemp = options_get_string(machine->options(), WINOPTION_NUMPROCESSORS);
 
 	osd_num_processors = 0;
 
@@ -367,8 +367,8 @@ void osd_init(running_machine *machine)
 	winoutput_init(machine);
 
 	// hook up the debugger log
-	if (options_get_bool(mame_options(), WINOPTION_OSLOG))
-		add_logerror_callback(machine, output_oslog);
+	if (options_get_bool(machine->options(), WINOPTION_OSLOG))
+		machine->add_logerror_callback(output_oslog);
 
 	// crank up the multimedia timer resolution to its max
 	// this gives the system much finer timeslices
@@ -399,7 +399,7 @@ void osd_init(running_machine *machine)
 //  osd_exit
 //============================================================
 
-static void osd_exit(running_machine *machine)
+static void osd_exit(running_machine &machine)
 {
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
@@ -425,7 +425,7 @@ static void osd_exit(running_machine *machine)
 		timeEndPeriod(caps.wPeriodMin);
 
 	// one last pass at events
-	winwindow_process_events(machine, 0);
+	winwindow_process_events(&machine, 0);
 }
 
 

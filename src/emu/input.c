@@ -420,7 +420,7 @@ const char			joystick_map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void input_frame(running_machine *machine);
+static void input_frame(running_machine &machine);
 static input_device_item *input_code_item(running_machine *machine, input_code code);
 static INT32 convert_absolute_value(running_machine *machine, input_code code, input_device_item *item);
 static INT32 convert_relative_value(input_code code, input_device_item *item);
@@ -587,28 +587,28 @@ void input_init(running_machine *machine)
 	code_pressed_memory_reset(machine);
 
 	/* request a per-frame callback for bookkeeping */
-	add_frame_callback(machine, input_frame);
+	machine->add_notifier(MACHINE_NOTIFY_FRAME, input_frame);
 
 	/* read input enable options */
 	device_list[DEVICE_CLASS_KEYBOARD].enabled = TRUE;
-	device_list[DEVICE_CLASS_MOUSE].enabled = options_get_bool(mame_options(), OPTION_MOUSE);
-	device_list[DEVICE_CLASS_LIGHTGUN].enabled = options_get_bool(mame_options(), OPTION_LIGHTGUN);
-	device_list[DEVICE_CLASS_JOYSTICK].enabled = options_get_bool(mame_options(), OPTION_JOYSTICK);
+	device_list[DEVICE_CLASS_MOUSE].enabled = options_get_bool(machine->options(), OPTION_MOUSE);
+	device_list[DEVICE_CLASS_LIGHTGUN].enabled = options_get_bool(machine->options(), OPTION_LIGHTGUN);
+	device_list[DEVICE_CLASS_JOYSTICK].enabled = options_get_bool(machine->options(), OPTION_JOYSTICK);
 
 	/* read input device multi options */
-	device_list[DEVICE_CLASS_KEYBOARD].multi = options_get_bool(mame_options(), OPTION_MULTIKEYBOARD);
-	device_list[DEVICE_CLASS_MOUSE].multi = options_get_bool(mame_options(), OPTION_MULTIMOUSE);
+	device_list[DEVICE_CLASS_KEYBOARD].multi = options_get_bool(machine->options(), OPTION_MULTIKEYBOARD);
+	device_list[DEVICE_CLASS_MOUSE].multi = options_get_bool(machine->options(), OPTION_MULTIMOUSE);
 	device_list[DEVICE_CLASS_LIGHTGUN].multi = TRUE;
 	device_list[DEVICE_CLASS_JOYSTICK].multi = TRUE;
 
 	/* read other input options */
-	state->steadykey_enabled = options_get_bool(mame_options(), OPTION_STEADYKEY);
-	state->lightgun_reload_button = options_get_bool(mame_options(), OPTION_OFFSCREEN_RELOAD);
-	state->joystick_deadzone = (INT32)(options_get_float(mame_options(), OPTION_JOYSTICK_DEADZONE) * INPUT_ABSOLUTE_MAX);
-	state->joystick_saturation = (INT32)(options_get_float(mame_options(), OPTION_JOYSTICK_SATURATION) * INPUT_ABSOLUTE_MAX);
+	state->steadykey_enabled = options_get_bool(machine->options(), OPTION_STEADYKEY);
+	state->lightgun_reload_button = options_get_bool(machine->options(), OPTION_OFFSCREEN_RELOAD);
+	state->joystick_deadzone = (INT32)(options_get_float(machine->options(), OPTION_JOYSTICK_DEADZONE) * INPUT_ABSOLUTE_MAX);
+	state->joystick_saturation = (INT32)(options_get_float(machine->options(), OPTION_JOYSTICK_SATURATION) * INPUT_ABSOLUTE_MAX);
 
 	/* get the default joystick map */
-	state->joystick_map_default = options_get_string(mame_options(), OPTION_JOYSTICK_MAP);
+	state->joystick_map_default = options_get_string(machine->options(), OPTION_JOYSTICK_MAP);
 	if (state->joystick_map_default[0] == 0 || strcmp(state->joystick_map_default, "auto") == 0)
 		state->joystick_map_default = joystick_map_8way;
 	if (!joystick_map_parse(state->joystick_map_default, &map))
@@ -687,9 +687,9 @@ int input_device_set_joystick_map(running_machine *machine, int devindex, const 
     bookkeeping
 -------------------------------------------------*/
 
-static void input_frame(running_machine *machine)
+static void input_frame(running_machine &machine)
 {
-	input_private *state = machine->input_data;
+	input_private *state = machine.input_data;
 
 	/* if steadykey is enabled, do processing here */
 	if (state->steadykey_enabled)
@@ -710,7 +710,7 @@ static void input_frame(running_machine *machine)
 				input_device_item *item = device->item[itemid];
 				if (item != NULL && item->itemclass == ITEM_CLASS_SWITCH)
 				{
-					input_item_update_value(machine, item);
+					input_item_update_value(&machine, item);
 					if ((item->current ^ item->oldkey) & 1)
 					{
 						changed = TRUE;
@@ -752,7 +752,7 @@ input_device *input_device_add(running_machine *machine, input_device_class devc
 	input_private *state = machine->input_data;
 	input_device_list *devlist = &state->device_list[devclass];
 
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call input_device_add at init time!");
+	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call input_device_add at init time!");
 	assert(name != NULL);
 	assert(devclass != DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 
@@ -794,7 +794,7 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	input_device_item *item;
 	input_item_id itemid_std = itemid;
 
-	assert_always(mame_get_phase(device->machine) == MAME_PHASE_INIT, "Can only call input_device_item_add at init time!");
+	assert_always(device->machine->phase() == MACHINE_PHASE_INIT, "Can only call input_device_item_add at init time!");
 	assert(name != NULL);
 	assert(itemid > ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
 	assert(getstate != NULL);

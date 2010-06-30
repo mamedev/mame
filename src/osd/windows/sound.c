@@ -100,7 +100,7 @@ static int					buffer_overflows;
 //  PROTOTYPES
 //============================================================
 
-static void 		sound_exit(running_machine *machine);
+static void 		sound_exit(running_machine &machine);
 static HRESULT		dsound_init(running_machine *machine);
 static void			dsound_kill(void);
 static HRESULT		dsound_create_buffers(void);
@@ -115,11 +115,11 @@ static void			dsound_destroy_buffers(void);
 void winsound_init(running_machine *machine)
 {
 	// if no sound, don't create anything
-	if (!options_get_bool(mame_options(), OPTION_SOUND))
+	if (!options_get_bool(machine->options(), OPTION_SOUND))
 		return;
 
 	// ensure we get called on the way out
-	add_exit_callback(machine, sound_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, sound_exit);
 
 	// attempt to initialize directsound
 	// don't make it fatal if we can't -- we'll just run without sound
@@ -131,7 +131,7 @@ void winsound_init(running_machine *machine)
 //  sound_exit
 //============================================================
 
-static void sound_exit(running_machine *machine)
+static void sound_exit(running_machine &machine)
 {
 	// kill the buffers and dsound
 	dsound_destroy_buffers();
@@ -305,7 +305,7 @@ static HRESULT dsound_init(running_machine *machine)
 	stream_format.nAvgBytesPerSec	= stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
 	// compute the buffer size based on the output sample rate
-	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * options_get_int(mame_options(), WINOPTION_AUDIO_LATENCY) / 10;
+	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * options_get_int(machine->options(), WINOPTION_AUDIO_LATENCY) / 10;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;

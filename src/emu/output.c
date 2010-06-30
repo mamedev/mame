@@ -62,8 +62,9 @@ static UINT32 uniqueid = 12345;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void output_pause(running_machine *machine, int pause);
-static void output_exit(running_machine *machine);
+static void output_pause(running_machine &machine);
+static void output_resume(running_machine &machine);
+static void output_exit(running_machine &machine);
 
 
 
@@ -146,10 +147,11 @@ INLINE output_item *create_new_item(const char *outname, INT32 value)
 void output_init(running_machine *machine)
 {
 	/* add pause callback */
-	add_pause_callback(machine, output_pause);
+	machine->add_notifier(MACHINE_NOTIFY_PAUSE, output_pause);
+	machine->add_notifier(MACHINE_NOTIFY_RESUME, output_resume);
 
 	/* get a callback when done */
-	add_exit_callback(machine, output_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, output_exit);
 
 	/* reset the lists */
 	memset(itemtable, 0, sizeof(itemtable));
@@ -161,9 +163,14 @@ void output_init(running_machine *machine)
     output_pause - send pause message
 -------------------------------------------------*/
 
-static void output_pause(running_machine *machine, int pause)
+static void output_pause(running_machine &machine)
 {
-	output_set_value("pause", pause & 1);
+	output_set_value("pause", 1);
+}
+
+static void output_resume(running_machine &machine)
+{
+	output_set_value("pause", 0);
 }
 
 
@@ -171,7 +178,7 @@ static void output_pause(running_machine *machine, int pause)
     output_exit - cleanup on exit
 -------------------------------------------------*/
 
-static void output_exit(running_machine *machine)
+static void output_exit(running_machine &machine)
 {
 	output_notify *notify;
 	output_item *item;

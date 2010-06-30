@@ -1195,7 +1195,7 @@ static const struct LSI53C810interface scsi_intf =
 	&scsi_fetch,
 };
 
-static void model3_exit(running_machine *machine)
+static void model3_exit(running_machine &machine)
 {
 	lsi53c810_exit(&scsi_intf);
 }
@@ -1212,13 +1212,13 @@ static void configure_fast_ram(running_machine *machine)
 static MACHINE_START(model3_10)
 {
 	lsi53c810_init(machine, &scsi_intf);
-	add_exit_callback(machine, model3_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, model3_exit);
 	configure_fast_ram(machine);
 }
 static MACHINE_START(model3_15)
 {
 	lsi53c810_init(machine, &scsi_intf);
-	add_exit_callback(machine, model3_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, model3_exit);
 	configure_fast_ram(machine);
 }
 static MACHINE_START(model3_20)

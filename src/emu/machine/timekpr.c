@@ -286,7 +286,7 @@ static DEVICE_START(timekeeper)
 	timekeeper_state *c = get_safe_token(device);
 	emu_timer *timer;
 	attotime duration;
-	mame_system_time systime;
+	system_time systime;
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -295,7 +295,7 @@ static DEVICE_START(timekeeper)
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
-	mame_get_base_datetime(device->machine, &systime);
+	device->machine->base_datetime(systime);
 
 	c->device = device;
 	c->control = 0;

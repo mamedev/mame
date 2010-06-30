@@ -521,13 +521,13 @@ static UINT8 binary_to_BCD(UINT8 data)
 
 static READ8_HANDLER(meritm_ds1644_r)
 {
-	mame_system_time systime;
+	system_time systime;
 	int rambank = (meritm_psd_a15 >> 2) & 0x3;
 	if (rambank == 3)
 	{
 		//logerror( "Reading RTC, reg = %x\n", offset);
 
-		mame_get_current_datetime(space->machine, &systime);
+		space->machine->current_datetime(systime);
 		meritm_ram[0x7ff9] = binary_to_BCD(systime.local_time.second);
 		meritm_ram[0x7ffa] = binary_to_BCD(systime.local_time.minute);
 		meritm_ram[0x7ffb] = binary_to_BCD(systime.local_time.hour);

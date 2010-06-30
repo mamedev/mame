@@ -250,8 +250,9 @@ static const TCHAR *const default_axis_name[] =
 //  PROTOTYPES
 //============================================================
 
-static void wininput_pause(running_machine *machine, int paused);
-static void wininput_exit(running_machine *machine);
+static void wininput_pause(running_machine &machine);
+static void wininput_resume(running_machine &machine);
+static void wininput_exit(running_machine &machine);
 
 // device list management
 static void device_list_poll_devices(device_info *devlist_head);
@@ -267,13 +268,13 @@ static INT32 generic_axis_get_state(void *device_internal, void *item_internal);
 
 // Win32-specific input code
 static void win32_init(running_machine *machine);
-static void win32_exit(running_machine *machine);
+static void win32_exit(running_machine &machine);
 static void win32_keyboard_poll(device_info *devinfo);
 static void win32_lightgun_poll(device_info *devinfo);
 
 // DirectInput-specific code
 static void dinput_init(running_machine *machine);
-static void dinput_exit(running_machine *machine);
+static void dinput_exit(running_machine &machine);
 static HRESULT dinput_set_dword_property(LPDIRECTINPUTDEVICE device, REFGUID property_guid, DWORD object, DWORD how, DWORD value);
 static device_info *dinput_device_create(running_machine *machine, device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level);
 static void dinput_device_release(device_info *devinfo);
@@ -289,7 +290,7 @@ static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_int
 
 // RawInput-specific code
 static void rawinput_init(running_machine *machine);
-static void rawinput_exit(running_machine *machine);
+static void rawinput_exit(running_machine &machine);
 static device_info *rawinput_device_create(running_machine *machine, device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device);
 static void rawinput_device_release(device_info *info);
 static TCHAR *rawinput_device_improve_name(TCHAR *name);
@@ -504,15 +505,16 @@ INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 void wininput_init(running_machine *machine)
 {
 	// we need pause and exit callbacks
-	add_pause_callback(machine, wininput_pause);
-	add_exit_callback(machine, wininput_exit);
+	machine->add_notifier(MACHINE_NOTIFY_PAUSE, wininput_pause);
+	machine->add_notifier(MACHINE_NOTIFY_RESUME, wininput_resume);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, wininput_exit);
 
 	// allocate a lock for input synchronizations, since messages sometimes come from another thread
 	input_lock = osd_lock_alloc();
 	assert_always(input_lock != NULL, "Failed to allocate input_lock");
 
 	// decode the options
-	lightgun_shared_axis_mode = options_get_bool(mame_options(), WINOPTION_DUAL_LIGHTGUN);
+	lightgun_shared_axis_mode = options_get_bool(machine->options(), WINOPTION_DUAL_LIGHTGUN);
 
 	// initialize RawInput and DirectInput (RawInput first so we can fall back)
 	rawinput_init(machine);
@@ -529,10 +531,16 @@ void wininput_init(running_machine *machine)
 //  wininput_pause
 //============================================================
 
-static void wininput_pause(running_machine *machine, int paused)
+static void wininput_pause(running_machine &machine)
 {
 	// keep track of the paused state
-	input_paused = paused;
+	input_paused = true;
+}
+
+static void wininput_resume(running_machine &machine)
+{
+	// keep track of the paused state
+	input_paused = false;
 }
 
 
@@ -540,7 +548,7 @@ static void wininput_pause(running_machine *machine, int paused)
 //  wininput_exit
 //============================================================
 
-static void wininput_exit(running_machine *machine)
+static void wininput_exit(running_machine &machine)
 {
 	// acquire the lock and turn off input (this ensures everyone is done)
 	osd_lock_acquire(input_lock);
@@ -958,7 +966,7 @@ static void win32_init(running_machine *machine)
 		return;
 
 	// we need an exit callback
-	add_exit_callback(machine, win32_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, win32_exit);
 
 	// allocate two lightgun devices
 	for (gunnum = 0; gunnum < 2; gunnum++)
@@ -998,7 +1006,7 @@ static void win32_init(running_machine *machine)
 //  win32_exit
 //============================================================
 
-static void win32_exit(running_machine *machine)
+static void win32_exit(running_machine &machine)
 {
 	// skip if we're in shared axis mode
 	if (!lightgun_shared_axis_mode)
@@ -1126,7 +1134,7 @@ static void dinput_init(running_machine *machine)
 	mame_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
 
 	// we need an exit callback
-	add_exit_callback(machine, dinput_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, dinput_exit);
 
 	// initialize keyboard devices, but only if we don't have any yet
 	if (keyboard_list == NULL)
@@ -1157,7 +1165,7 @@ static void dinput_init(running_machine *machine)
 //  dinput_exit
 //============================================================
 
-static void dinput_exit(running_machine *machine)
+static void dinput_exit(running_machine &machine)
 {
 	// release all our devices
 	while (joystick_list != NULL && joystick_list->dinput.device != NULL)
@@ -1663,7 +1671,7 @@ static void rawinput_init(running_machine *machine)
 	HMODULE user32;
 
 	// we need pause and exit callbacks
-	add_exit_callback(machine, rawinput_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, rawinput_exit);
 
 	// look in user32 for the raw input APIs
 	user32 = LoadLibrary(TEXT("user32.dll"));
@@ -1739,7 +1747,7 @@ error:
 //  rawinput_exit
 //============================================================
 
-static void rawinput_exit(running_machine *machine)
+static void rawinput_exit(running_machine &machine)
 {
 	// release all our devices
 	while (lightgun_list != NULL && lightgun_list->rawinput.device != NULL)

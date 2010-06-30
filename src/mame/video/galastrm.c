@@ -36,7 +36,7 @@ struct _polygon
 
 /******************************************************************/
 
-static void galastrm_exit(running_machine *machine)
+static void galastrm_exit(running_machine &machine)
 {
 	poly_free(poly);
 }
@@ -49,7 +49,7 @@ VIDEO_START( galastrm )
 	polybitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	poly = poly_alloc(machine, 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	add_exit_callback(machine, galastrm_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, galastrm_exit);
 }
 
 /************************************************************

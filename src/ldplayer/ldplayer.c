@@ -82,7 +82,7 @@ static void (*execute_command)(running_device *laserdisc, int command);
  *
  *************************************/
 
-static void free_string(running_machine *machine)
+static void free_string(running_machine &machine)
 {
 }
 
@@ -94,7 +94,7 @@ static chd_file *get_disc(running_device *device)
 	mame_path *path;
 
 	/* open a path to the ROMs and find the first CHD file */
-	path = mame_openpath(mame_options(), OPTION_ROMPATH);
+	path = mame_openpath(device->machine->options(), OPTION_ROMPATH);
 	if (path != NULL)
 	{
 		const osd_directory_entry *dir;
@@ -124,7 +124,7 @@ static chd_file *get_disc(running_device *device)
 					{
 						set_disk_handle(device->machine, "laserdisc", image_file, image_chd);
 						filename.cpy(dir->name);
-						add_exit_callback(device->machine, free_string);
+						device->machine->add_notifier(MACHINE_NOTIFY_EXIT, free_string);
 						break;
 					}
 

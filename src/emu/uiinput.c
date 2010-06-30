@@ -80,7 +80,7 @@ void ui_input_init(running_machine *machine)
 	machine->ui_input_data->current_mouse_y = -1;
 
 	/* add a frame callback to poll inputs */
-	add_frame_callback(machine, ui_input_frame_update);
+	machine->add_notifier(MACHINE_NOTIFY_FRAME, ui_input_frame_update);
 }
 
 
@@ -95,15 +95,15 @@ void ui_input_init(running_machine *machine)
     corresponding IPT_UI_* events
 -------------------------------------------------*/
 
-void ui_input_frame_update(running_machine *machine)
+void ui_input_frame_update(running_machine &machine)
 {
-	ui_input_private *uidata = machine->ui_input_data;
+	ui_input_private *uidata = machine.ui_input_data;
 	int code;
 
 	/* update the state of all the UI keys */
 	for (code = __ipt_ui_start; code <= __ipt_ui_end; code++)
 	{
-		int pressed = input_seq_pressed(machine, input_type_seq(machine, code, 0, SEQ_TYPE_STANDARD));
+		int pressed = input_seq_pressed(&machine, input_type_seq(&machine, code, 0, SEQ_TYPE_STANDARD));
 		if (!pressed || uidata->seqpressed[code] != SEQ_PRESSED_RESET)
 			uidata->seqpressed[code] = pressed;
 	}

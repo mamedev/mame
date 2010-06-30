@@ -554,8 +554,8 @@ VIDEO_UPDATE( atarisy1 )
 static void decode_gfx(running_machine *machine, UINT16 *pflookup, UINT16 *molookup)
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
-	UINT8 *prom1 = &machine->region("proms")->base.u8[0x000];
-	UINT8 *prom2 = &machine->region("proms")->base.u8[0x200];
+	UINT8 *prom1 = &machine->region("proms")->u8(0x000);
+	UINT8 *prom2 = &machine->region("proms")->u8(0x200);
 	int obj, i;
 
 	/* reset the globals */
@@ -647,7 +647,7 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 
 	/* if the bank is out of range, call it 0 */
 	const region_info *tiles = machine->region("tiles");
-	if (0x80000 * (bank_index - 1) >= tiles->length)
+	if (0x80000 * (bank_index - 1) >= tiles->bytes())
 		return 0;
 
 	/* don't have one? let's make it ... first find any empty slot */
@@ -657,7 +657,7 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the graphics */
-	srcdata = &tiles->base.u8[0x80000 * (bank_index - 1)];
+	srcdata = &tiles->u8(0x80000 * (bank_index - 1));
 	switch (bpp)
 	{
 	case 4:

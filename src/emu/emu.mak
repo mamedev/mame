@@ -72,6 +72,7 @@ EMUOBJS = \
 	$(EMUOBJ)/inptport.o \
 	$(EMUOBJ)/ioprocs.o \
 	$(EMUOBJ)/mame.o \
+	$(EMUOBJ)/machine.o \
 	$(EMUOBJ)/mconfig.o \
 	$(EMUOBJ)/memory.o \
 	$(EMUOBJ)/output.o \

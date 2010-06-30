@@ -165,9 +165,9 @@ void debug_view_memory::enumerate_sources()
 		}
 
 	// then add all the memory regions
-	for (const region_info *region = m_machine.regionlist.first(); region != NULL; region = region->next())
+	for (const region_info *region = m_machine.m_regionlist.first(); region != NULL; region = region->next())
 	{
-		name.printf("Region '%s'", region->name.cstr());
+		name.printf("Region '%s'", region->name());
 		m_source_list.append(*auto_alloc(&m_machine, debug_view_memory_source(name, *region)));
 	}
 

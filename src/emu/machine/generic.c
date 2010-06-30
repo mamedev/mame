@@ -21,7 +21,7 @@
 
 static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode);
-static void interrupt_reset(running_machine *machine);
+static void interrupt_reset(running_machine &machine);
 
 
 
@@ -102,7 +102,7 @@ void generic_machine_init(running_machine *machine)
 	state->memcard_inserted = -1;
 
 	/* register a reset callback and save state for interrupt enable */
-	add_reset_callback(machine, interrupt_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, interrupt_reset);
 	state_save_register_item_array(machine, "cpu", NULL, 0, state->interrupt_enable);
 
 	/* register for configuration */
@@ -112,7 +112,7 @@ void generic_machine_init(running_machine *machine)
 	if (machine->config->m_memcard_handler != NULL)
 	{
 		state_save_register_global(machine, state->memcard_inserted);
-		add_exit_callback(machine, memcard_eject);
+		machine->add_notifier(MACHINE_NOTIFY_EXIT, memcard_eject);
 	}
 }
 
@@ -314,7 +314,7 @@ mame_file *nvram_fopen(running_machine *machine, UINT32 openflags)
 	file_error filerr;
 	mame_file *file;
 
-	astring fname(machine->basename, ".nv");
+	astring fname(machine->basename(), ".nv");
 	filerr = mame_fopen(SEARCHPATH_NVRAM, fname, openflags, &file);
 
 	return (filerr == FILERR_NONE) ? file : NULL;
@@ -398,12 +398,13 @@ void nvram_save(running_machine *machine)
 
 NVRAM_HANDLER( generic_0fill )
 {
+	const region_info *region = machine->region("nvram");
 	if (read_or_write)
 		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
 		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
+	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
 	else
 		memset(machine->generic.nvram.v, 0, machine->generic.nvram_size);
 }
@@ -416,12 +417,13 @@ NVRAM_HANDLER( generic_0fill )
 
 NVRAM_HANDLER( generic_1fill )
 {
+	const region_info *region = machine->region("nvram");
 	if (read_or_write)
 		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
 		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
+	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
 	else
 		memset(machine->generic.nvram.v, 0xff, machine->generic.nvram_size);
 }
@@ -434,12 +436,13 @@ NVRAM_HANDLER( generic_1fill )
 
 NVRAM_HANDLER( generic_randfill )
 {
+	const region_info *region = machine->region("nvram");
 	if (read_or_write)
 		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
 		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
+	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
 	else
 	{
 		UINT8 *nvram = (UINT8 *)machine->generic.nvram.v;
@@ -481,7 +484,7 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 	memcard_name(index, name);
 
 	/* if we can't overwrite, fail if the file already exists */
-	astring fname(machine->basename, PATH_SEPARATOR, name);
+	astring fname(machine->basename(), PATH_SEPARATOR, name);
 	if (!overwrite)
 	{
 		filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_READ, &file);
@@ -521,12 +524,12 @@ int memcard_insert(running_machine *machine, int index)
 
 	/* if a card is already inserted, eject it first */
 	if (state->memcard_inserted != -1)
-		memcard_eject(machine);
+		memcard_eject(*machine);
 	assert(state->memcard_inserted == -1);
 
 	/* create a name */
 	memcard_name(index, name);
-	astring fname(machine->basename, PATH_SEPARATOR, name);
+	astring fname(machine->basename(), PATH_SEPARATOR, name);
 
 	/* open the file; if we can't, it's an error */
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_READ, &file);
@@ -549,9 +552,9 @@ int memcard_insert(running_machine *machine, int index)
     its contents along the way
 -------------------------------------------------*/
 
-void memcard_eject(running_machine *machine)
+void memcard_eject(running_machine &machine)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	file_error filerr;
 	mame_file *file;
 	char name[16];
@@ -562,7 +565,7 @@ void memcard_eject(running_machine *machine)
 
 	/* create a name */
 	memcard_name(state->memcard_inserted, name);
-	astring fname(machine->basename, PATH_SEPARATOR, name);
+	astring fname(machine.basename(), PATH_SEPARATOR, name);
 
 	/* open the file; if we can't, it's an error */
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
@@ -573,8 +576,8 @@ void memcard_eject(running_machine *machine)
 	}
 
 	/* initialize and then load the card */
-	if (machine->config->m_memcard_handler)
-		(*machine->config->m_memcard_handler)(machine, file, MEMCARD_EJECT);
+	if (machine.m_config.m_memcard_handler)
+		(*machine.m_config.m_memcard_handler)(&machine, file, MEMCARD_EJECT);
 
 	/* close the file */
 	mame_fclose(file);
@@ -619,9 +622,9 @@ void set_led_status(running_machine *machine, int num, int on)
     states on a reset
 -------------------------------------------------*/
 
-static void interrupt_reset(running_machine *machine)
+static void interrupt_reset(running_machine &machine)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	int cpunum;
 
 	/* on a reset, enable all interrupts */

@@ -256,7 +256,7 @@ static const int layer_order_alternate[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCR
 ***************************************************************************/
 
 /* core system */
-static void render_exit(running_machine *machine);
+static void render_exit(running_machine &machine);
 static void render_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void render_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 
@@ -545,7 +545,7 @@ void render_init(running_machine *machine)
 	render_container **current_container_ptr = &screen_container_list;
 
 	/* make sure we clean up after ourselves */
-	add_exit_callback(machine, render_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, render_exit);
 
 	/* set up the list of render targets */
 	targetlist = NULL;
@@ -570,9 +570,9 @@ void render_init(running_machine *machine)
 		/* set the initial orientation and brightness/contrast/gamma */
 		render_container_get_user_settings(screen_container, &settings);
 		settings.orientation = machine->gamedrv->flags & ORIENTATION_MASK;
-		settings.brightness = options_get_float(mame_options(), OPTION_BRIGHTNESS);
-		settings.contrast = options_get_float(mame_options(), OPTION_CONTRAST);
-		settings.gamma = options_get_float(mame_options(), OPTION_GAMMA);
+		settings.brightness = options_get_float(machine->options(), OPTION_BRIGHTNESS);
+		settings.contrast = options_get_float(machine->options(), OPTION_CONTRAST);
+		settings.gamma = options_get_float(machine->options(), OPTION_GAMMA);
 		render_container_set_user_settings(screen_container, &settings);
 
 		screen_container->screen = screendev;
@@ -594,7 +594,7 @@ void render_init(running_machine *machine)
     render_exit - free all rendering data
 -------------------------------------------------*/
 
-static void render_exit(running_machine *machine)
+static void render_exit(running_machine &machine)
 {
 	render_texture **texture_ptr;
 	render_container *container;
@@ -898,19 +898,19 @@ static void render_save(running_machine *machine, int config_type, xml_data_node
 			xml_set_attribute_int(screennode, "index", scrnum);
 
 			/* output the color controls */
-			if (container->brightness != options_get_float(mame_options(), OPTION_BRIGHTNESS))
+			if (container->brightness != options_get_float(machine->options(), OPTION_BRIGHTNESS))
 			{
 				xml_set_attribute_float(screennode, "brightness", container->brightness);
 				changed = TRUE;
 			}
 
-			if (container->contrast != options_get_float(mame_options(), OPTION_CONTRAST))
+			if (container->contrast != options_get_float(machine->options(), OPTION_CONTRAST))
 			{
 				xml_set_attribute_float(screennode, "contrast", container->contrast);
 				changed = TRUE;
 			}
 
-			if (container->gamma != options_get_float(mame_options(), OPTION_GAMMA))
+			if (container->gamma != options_get_float(machine->options(), OPTION_GAMMA))
 			{
 				xml_set_attribute_float(screennode, "gamma", container->gamma);
 				changed = TRUE;
@@ -1093,26 +1093,26 @@ render_target *render_target_alloc(running_machine *machine, const char *layoutf
 
 	/* determine the base layer configuration based on options */
 	target->base_layerconfig = LAYER_CONFIG_DEFAULT;
-	if (!options_get_bool(mame_options(), OPTION_USE_BACKDROPS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BACKDROP;
-	if (!options_get_bool(mame_options(), OPTION_USE_OVERLAYS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_OVERLAY;
-	if (!options_get_bool(mame_options(), OPTION_USE_BEZELS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BEZEL;
-	if (options_get_bool(mame_options(), OPTION_ARTWORK_CROP)) target->base_layerconfig |= LAYER_CONFIG_ZOOM_TO_SCREEN;
+	if (!options_get_bool(machine->options(), OPTION_USE_BACKDROPS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BACKDROP;
+	if (!options_get_bool(machine->options(), OPTION_USE_OVERLAYS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_OVERLAY;
+	if (!options_get_bool(machine->options(), OPTION_USE_BEZELS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BEZEL;
+	if (options_get_bool(machine->options(), OPTION_ARTWORK_CROP)) target->base_layerconfig |= LAYER_CONFIG_ZOOM_TO_SCREEN;
 
 	/* determine the base orientation based on options */
 	target->orientation = ROT0;
-	if (!options_get_bool(mame_options(), OPTION_ROTATE))
+	if (!options_get_bool(machine->options(), OPTION_ROTATE))
 		target->base_orientation = orientation_reverse(machine->gamedrv->flags & ORIENTATION_MASK);
 
 	/* rotate left/right */
-	if (options_get_bool(mame_options(), OPTION_ROR) || (options_get_bool(mame_options(), OPTION_AUTOROR) && (machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (options_get_bool(machine->options(), OPTION_ROR) || (options_get_bool(machine->options(), OPTION_AUTOROR) && (machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
 		target->base_orientation = orientation_add(ROT90, target->base_orientation);
-	if (options_get_bool(mame_options(), OPTION_ROL) || (options_get_bool(mame_options(), OPTION_AUTOROL) && (machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (options_get_bool(machine->options(), OPTION_ROL) || (options_get_bool(machine->options(), OPTION_AUTOROL) && (machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
 		target->base_orientation = orientation_add(ROT270, target->base_orientation);
 
 	/* flip X/Y */
-	if (options_get_bool(mame_options(), OPTION_FLIPX))
+	if (options_get_bool(machine->options(), OPTION_FLIPX))
 		target->base_orientation ^= ORIENTATION_FLIP_X;
-	if (options_get_bool(mame_options(), OPTION_FLIPY))
+	if (options_get_bool(machine->options(), OPTION_FLIPY))
 		target->base_orientation ^= ORIENTATION_FLIP_Y;
 
 	/* set the orientation and layerconfig equal to the base */
@@ -1559,7 +1559,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
     root_xform.no_center = FALSE;
 
 	/* iterate over layers back-to-front, but only if we're running */
-	if (mame_get_phase(target->machine) >= MAME_PHASE_RESET)
+	if (target->machine->phase() >= MACHINE_PHASE_RESET)
 		for (layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
 		{
 			int blendmode;
@@ -1601,7 +1601,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 							state = output_get_value(item->output_name);
 						else if (item->input_tag[0] != 0)
 						{
-							const input_field_config *field = input_field_by_tag_and_mask(target->machine->portlist, item->input_tag, item->input_mask);
+							const input_field_config *field = input_field_by_tag_and_mask(target->machine->m_portlist, item->input_tag, item->input_mask);
 							if (field != NULL)
 								state = ((input_port_read_safe(target->machine, item->input_tag, 0) ^ field->defvalue) & item->input_mask) ? 1 : 0;
 						}
@@ -1801,7 +1801,7 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 	running_machine *machine = target->machine;
 	const game_driver *gamedrv = machine->gamedrv;
 	const machine_config *config = machine->config;
-	const char *basename = machine->basename;
+	const char *basename = machine->basename();
 	layout_file **nextfile = &target->filelist;
 	const game_driver *cloneof;
 

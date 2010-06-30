@@ -1924,7 +1924,7 @@ WRITE8_HANDLER( tia_w )
 }
 
 
-static void tia_reset(running_machine *machine)
+static void tia_reset(running_machine &machine)
 {
 	int i;
 
@@ -1981,7 +1981,7 @@ static void tia_reset(running_machine *machine)
 
 void tia_init(running_machine *machine, const struct tia_interface* ti)
 {
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
+	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call tia_init at init time!");
 
 	if ( ti ) {
 		tia_read_input_port = ti->read_input_port;
@@ -1993,8 +1993,8 @@ void tia_init(running_machine *machine, const struct tia_interface* ti)
 		tia_vsync_callback = NULL;
 	}
 
-	tia_reset( machine );
+	tia_reset( *machine );
 
-	add_reset_callback(machine, tia_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, tia_reset);
 }
 

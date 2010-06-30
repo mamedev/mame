@@ -91,7 +91,7 @@ static cheat_system cheat;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void debug_command_exit(running_machine *machine);
+static void debug_command_exit(running_machine &machine);
 
 static UINT64 execute_min(void *globalref, void *ref, UINT32 params, const UINT64 *param);
 static UINT64 execute_max(void *globalref, void *ref, UINT32 params, const UINT64 *param);
@@ -368,10 +368,10 @@ void debug_command_init(running_machine *machine)
 	/* ask all the devices if they would like to register functions or symbols */
 	machine->m_devicelist.debug_setup_all();
 
-	add_exit_callback(machine, debug_command_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_command_exit);
 
 	/* set up the initial debugscript if specified */
-	name = options_get_string(mame_options(), OPTION_DEBUGSCRIPT);
+	name = options_get_string(machine->options(), OPTION_DEBUGSCRIPT);
 	if (name[0] != 0)
 		debug_cpu_source_script(machine, name);
 }
@@ -381,16 +381,16 @@ void debug_command_init(running_machine *machine)
     debug_command_exit - exit-time cleanup
 -------------------------------------------------*/
 
-static void debug_command_exit(running_machine *machine)
+static void debug_command_exit(running_machine &machine)
 {
 	device_t *cpu;
 
 	/* turn off all traces */
-	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	for (cpu = machine.firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 		debug_cpu_trace(cpu, NULL, 0, NULL);
 
 	if (cheat.length)
-		auto_free(machine, cheat.cheatmap);
+		auto_free(&machine, cheat.cheatmap);
 }
 
 
@@ -834,7 +834,7 @@ static void execute_tracelog(running_machine *machine, int ref, int params, cons
 static void execute_quit(running_machine *machine, int ref, int params, const char *param[])
 {
 	mame_printf_error("Exited via the debugger\n");
-	mame_schedule_exit(machine);
+	machine->schedule_exit();
 }
 
 
@@ -2670,7 +2670,7 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 
 static void execute_softreset(running_machine *machine, int ref, int params, const char **param)
 {
-	mame_schedule_soft_reset(machine);
+	machine->schedule_soft_reset();
 }
 
 
@@ -2680,5 +2680,5 @@ static void execute_softreset(running_machine *machine, int ref, int params, con
 
 static void execute_hardreset(running_machine *machine, int ref, int params, const char **param)
 {
-	mame_schedule_hard_reset(machine);
+	machine->schedule_hard_reset();
 }

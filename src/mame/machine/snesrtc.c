@@ -41,8 +41,8 @@ static const UINT8 srtc_months[12] =
 
 static void srtc_update_time( running_machine *machine )
 {
-	mame_system_time curtime, *systime = &curtime;
-	mame_get_current_datetime(machine, &curtime);
+	system_time curtime, *systime = &curtime;
+	machine->current_datetime(curtime);
 	rtc_state.ram[0] = systime->local_time.second % 10;
 	rtc_state.ram[1] = systime->local_time.second / 10;
 	rtc_state.ram[2] = systime->local_time.minute % 10;

@@ -992,8 +992,8 @@ static void spc7110_set_data_adjust(UINT32 addr)
 // (and indeed current code fails to pass Tengai Makyou Zero tests)
 static void spc7110_update_time(running_machine *machine, UINT8 offset)
 {
-	mame_system_time curtime, *systime = &curtime;
-	mame_get_current_datetime(machine, &curtime);
+	system_time curtime, *systime = &curtime;
+	machine->current_datetime(curtime);
 	int update = 1;
 
 	snes_spc7110.rtc_offset += offset;

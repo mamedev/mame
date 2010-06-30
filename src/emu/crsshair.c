@@ -131,7 +131,7 @@ static const rgb_t crosshair_colors[] =
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void crosshair_exit(running_machine *machine);
+static void crosshair_exit(running_machine &machine);
 static void crosshair_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void crosshair_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 
@@ -212,7 +212,7 @@ void crosshair_init(running_machine *machine)
 	const input_field_config *field;
 
 	/* request a callback upon exiting */
-	add_exit_callback(machine, crosshair_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, crosshair_exit);
 
 	/* clear all the globals */
 	memset(&global, 0, sizeof(global));
@@ -221,7 +221,7 @@ void crosshair_init(running_machine *machine)
 	global.auto_time = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
 
 	/* determine who needs crosshairs */
-	for (port = machine->portlist.first(); port != NULL; port = port->next())
+	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE)
 			{
@@ -256,7 +256,7 @@ void crosshair_init(running_machine *machine)
     the crosshairs
 -------------------------------------------------*/
 
-static void crosshair_exit(running_machine *machine)
+static void crosshair_exit(running_machine &machine)
 {
 	int player;
 

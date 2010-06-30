@@ -636,8 +636,8 @@ static READ32_HANDLER( timekeeper_r )
 	if ((offset*4) >= 0x7ff0)
 	{
 		/* get the time */
-		mame_system_time systime;
-		mame_get_base_datetime(space->machine, &systime);
+		system_time systime;
+		space->machine->base_datetime(systime);
 
 		/* return portions thereof */
 		switch (offset*4)

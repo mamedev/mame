@@ -448,8 +448,8 @@ static DEVICE_START( upd4990a )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 
-	mame_system_time curtime, *systime = &curtime;
-	mame_get_current_datetime(device->machine, &curtime);
+	system_time curtime, *systime = &curtime;
+	device->machine->current_datetime(curtime);
 
 #if 0
 	upd4990a->seconds = 0x00;

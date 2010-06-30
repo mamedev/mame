@@ -91,8 +91,8 @@ WRITE8_DEVICE_HANDLER( ds1302_clk_w )
 			ds1302->icount++;
 			if(ds1302->icount == 8)	//Command start
 			{
-				mame_system_time systime;
-				mame_get_base_datetime(device->machine, &systime);
+				system_time systime;
+				device->machine->base_datetime(systime);
 
 				switch(ds1302->shift_in)
 				{
