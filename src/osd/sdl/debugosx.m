@@ -30,6 +30,9 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debugger.h"
+#include "debug/dvdisasm.h"
+#include "debug/dvmemory.h"
+#include "debug/dvstate.h"
 
 // MAMEOS headers
 #include "debugosx.h"
@@ -54,7 +57,7 @@ static NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification
 //  PROTOTYPES
 //============================================================
 
-static void debugwin_view_update(debug_view *view, void *osdprivate);
+static void debugwin_view_update(debug_view &view, void *osdprivate);
 
 static void console_create_window(running_machine *machine);
 
@@ -108,7 +111,7 @@ void debugwin_update_during_game(running_machine *machine)
 //  debugwin_view_update
 //============================================================
 
-static void debugwin_view_update(debug_view *view, void *osdprivate)
+static void debugwin_view_update(debug_view &view, void *osdprivate)
 {
 	[(MAMEDebugView *)osdprivate update];
 }
@@ -299,19 +302,19 @@ void console_create_window(running_machine *machine)
 		size.x = totalSize.x;
 
 		// tell them what we think
-		debug_view_set_visible_size(view, size);
-		debug_view_set_visible_position(view, origin);
+		view->set_visible_size(size);
+		view->set_visible_position(origin);
 		topLeft = origin;
 	}
 }
 
 
 - (void)typeCharacterAndScrollToCursor:(char)ch {
-	if (debug_view_get_cursor_supported(view)) {
-		debug_view_xy oldPos = debug_view_get_cursor_position(view);
-		debug_view_type_character(view, ch);
+	if (view->cursor_supported()) {
+		debug_view_xy oldPos = view->cursor_position();
+		view->process_char(ch);
 		{
-			debug_view_xy newPos = debug_view_get_cursor_position(view);
+			debug_view_xy newPos = view->cursor_position();
 			if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y)) {
 				[self scrollRectToVisible:NSMakeRect(newPos.x * fontWidth,
 													 newPos.y * fontHeight,
@@ -320,7 +323,7 @@ void console_create_window(running_machine *machine)
 			}
 		}
 	} else {
-		debug_view_type_character(view, ch);
+		view->process_char(ch);
 	}
 }
 
@@ -331,12 +334,12 @@ void console_create_window(running_machine *machine)
 }
 
 
-- (id)initWithFrame:(NSRect)f type:(int)t machine:(running_machine *)m {
+- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine *)m {
 	if (!(self = [super initWithFrame:f]))
 		return nil;
 	type = t;
 	machine = m;
-	view = debug_view_alloc(machine, type, debugwin_view_update, self);
+	view = machine->m_debug_view->alloc_view((debug_view_type)type, debugwin_view_update, self);
 	if (view == nil) {
 		[self release];
 		return nil;
@@ -350,8 +353,6 @@ void console_create_window(running_machine *machine)
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	if (view != NULL)
-		debug_view_free(view);
 	if (font != nil)
 		[font release];
 	[super dealloc];
@@ -362,14 +363,14 @@ void console_create_window(running_machine *machine)
 	debug_view_xy	newSize, newOrigin;
 
 	// resize our frame if the total size has changed
-	newSize = debug_view_get_total_size(view);
+	newSize = view->total_size();
 	if ((newSize.x != totalSize.x) || (newSize.y != totalSize.y)) {
 		[self setFrameSize:NSMakeSize(fontWidth * newSize.x, fontHeight * newSize.y)];
 		totalSize = newSize;
 	}
 
 	// scroll the view if we're being told to
-	newOrigin = debug_view_get_visible_position(view);
+	newOrigin = view->visible_position();
 	if (newOrigin.y != topLeft.y) {
 		[self scrollPoint:NSMakePoint([self visibleRect].origin.x, newOrigin.y * fontHeight)];
 		topLeft.y = newOrigin.y;
@@ -382,7 +383,7 @@ void console_create_window(running_machine *machine)
 
 
 - (NSSize)maximumFrameSize {
-	debug_view_xy max = debug_view_get_total_size(view);
+	debug_view_xy max = view->total_size();
 	return NSMakeSize(max.x * fontWidth, max.y * fontHeight);
 }
 
@@ -406,28 +407,28 @@ void console_create_window(running_machine *machine)
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
 	NSWindow *win = [notification object];
-	if ((win == [self window]) && ([win firstResponder] == self) && debug_view_get_cursor_supported(view))
+	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
 		[self setNeedsDisplay:YES];
 }
 
 
 - (void)windowDidResignKey:(NSNotification *)notification {
 	NSWindow *win = [notification object];
-	if ((win == [self window]) && ([win firstResponder] == self) && debug_view_get_cursor_supported(view))
+	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
 		[self setNeedsDisplay:YES];
 }
 
 
 - (BOOL)acceptsFirstResponder {
-	return debug_view_get_cursor_supported(view);
+	return view->cursor_supported();
 }
 
 
 - (BOOL)becomeFirstResponder {
-	if (debug_view_get_cursor_supported(view)) {
+	if (view->cursor_supported()) {
 		debug_view_xy pos;
-		debug_view_set_cursor_visible(view, TRUE);
-		pos = debug_view_get_cursor_position(view);
+		view->set_cursor_visible(true);
+		pos = view->cursor_position();
 		[self scrollRectToVisible:NSMakeRect(pos.x * fontWidth, pos.y * fontHeight, fontWidth, fontHeight)];
 		[self setNeedsDisplay:YES];
 		return [super becomeFirstResponder];
@@ -438,7 +439,7 @@ void console_create_window(running_machine *machine)
 
 
 - (BOOL)resignFirstResponder {
-	if (debug_view_get_cursor_supported(view))
+	if (view->cursor_supported())
 		[self setNeedsDisplay:YES];
 	return [super resignFirstResponder];
 }
@@ -482,12 +483,12 @@ void console_create_window(running_machine *machine)
 
 	// work out how much we need to draw
 	[self recomputeVisible];
-	origin = debug_view_get_visible_position(view);
-	size = debug_view_get_visible_size(view);
+	origin = view->visible_position();
+	size = view->visible_size();
 	[self convertBounds:dirtyRect toPosition:&position size:&clip];
 
 	// this gets the text for the whole visible area
-	base = debug_view_get_chars(view);
+	base = view->viewdata();
 	if (!base)
 		return;
 
@@ -545,9 +546,9 @@ void console_create_window(running_machine *machine)
 
 - (void)mouseDown:(NSEvent *)event {
 	NSPoint	location = [self convertPoint:[event locationInWindow] fromView:nil];
-	if (debug_view_get_cursor_supported(view)) {
-		debug_view_set_cursor_position(view, [self convertLocation:location]);
-		debug_view_set_cursor_visible(view, TRUE);
+	if (view->cursor_supported()) {
+		view->set_cursor_position([self convertLocation:location]);
+		view->set_cursor_visible(true);
 		[self setNeedsDisplay:YES];
 	}
 }
@@ -555,9 +556,9 @@ void console_create_window(running_machine *machine)
 
 - (void)mouseDragged:(NSEvent *)event {
 	NSPoint	location = [self convertPoint:[event locationInWindow] fromView:nil];
-	if (debug_view_get_cursor_supported(view)) {
+	if (view->cursor_supported()) {
 		[self autoscroll:event];
-		debug_view_set_cursor_position(view, [self convertLocation:location]);
+		view->set_cursor_position([self convertLocation:location]);
 		[self setNeedsDisplay:YES];
 	}
 }
@@ -565,9 +566,9 @@ void console_create_window(running_machine *machine)
 
 - (void)rightMouseDown:(NSEvent *)event {
 	NSPoint	location = [self convertPoint:[event locationInWindow] fromView:nil];
-	if (debug_view_get_cursor_supported(view)) {
-		debug_view_set_cursor_position(view, [self convertLocation:location]);
-		debug_view_set_cursor_visible(view, TRUE);
+	if (view->cursor_supported()) {
+		view->set_cursor_position([self convertLocation:location]);
+		view->set_cursor_visible(true);
 		[self setNeedsDisplay:YES];
 	}
 	[super rightMouseDown:event];
@@ -583,15 +584,15 @@ void console_create_window(running_machine *machine)
 			switch ([str characterAtIndex:0]) {
 				case NSUpArrowFunctionKey:
 					if (modifiers & NSCommandKeyMask)
-						debug_view_type_character(view, DCH_CTRLHOME);
+						view->process_char(DCH_CTRLHOME);
 					else
-						debug_view_type_character(view, DCH_UP);
+						view->process_char(DCH_UP);
 					return;
 				case NSDownArrowFunctionKey:
 					if (modifiers & NSCommandKeyMask)
-						debug_view_type_character(view, DCH_CTRLEND);
+						view->process_char(DCH_CTRLEND);
 					else
-						debug_view_type_character(view, DCH_DOWN);
+						view->process_char(DCH_DOWN);
 					return;
 				case NSLeftArrowFunctionKey:
 					if (modifiers & NSCommandKeyMask)
@@ -617,12 +618,12 @@ void console_create_window(running_machine *machine)
 			switch ([str characterAtIndex:0]) {
 				case NSPageUpFunctionKey:
 					if (modifiers & NSAlternateKeyMask) {
-						debug_view_type_character(view, DCH_PUP);
+						view->process_char(DCH_PUP);
 						return;
 					}
 				case NSPageDownFunctionKey:
 					if (modifiers & NSAlternateKeyMask) {
-						debug_view_type_character(view, DCH_PDOWN);
+						view->process_char(DCH_PDOWN);
 						return;
 					}
 				default:
@@ -702,111 +703,108 @@ void console_create_window(running_machine *machine)
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
 	SEL			action = [item action];
 	NSInteger	tag = [item tag];
+	debug_view_memory *memview = downcast<debug_view_memory *>(view);
 
 	if (action == @selector(showChunkSize:)) {
-		[item setState:((tag == memory_view_get_bytes_per_chunk(view)) ? NSOnState : NSOffState)];
+		[item setState:((tag == memview->bytes_per_chunk()) ? NSOnState : NSOffState)];
 	} else if (action == @selector(showPhysicalAddresses:)) {
-		[item setState:((tag == memory_view_get_physical(view)) ? NSOnState : NSOffState)];
+		[item setState:((tag == memview->physical()) ? NSOnState : NSOffState)];
 	} else if (action == @selector(showReverseView:)) {
-		[item setState:((tag == memory_view_get_reverse(view)) ? NSOnState : NSOffState)];
+		[item setState:((tag == memview->reverse()) ? NSOnState : NSOffState)];
 	} else if (action == @selector(showReverseViewToggle:)) {
-		[item setState:(memory_view_get_reverse(view) ? NSOnState : NSOffState)];
+		[item setState:(memview->reverse() ? NSOnState : NSOffState)];
 	}
 	return YES;
 }
 
 
 - (NSSize)maximumFrameSize {
-	const int					selected = memory_view_get_subview(view);
-	const memory_subview_item	*subitem;
 	debug_view_xy				max;
+	running_device				*curcpu = debug_cpu_get_visible_cpu(machine);
+	const debug_view_source		*source = view->source_list().match_device(curcpu);
 
 	max.x = max.y = 0;
-	for (subitem = memory_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
+	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	{
 		debug_view_xy	current;
-		memory_view_set_subview(view, subitem->index);
-		current = debug_view_get_total_size(view);
+		view->set_source(*source);
+		current = view->total_size();
 		if (current.x > max.x)
 			max.x = current.x;
 		if (current.y > max.y)
 			max.y = current.y;
 	}
-	memory_view_set_subview(view, selected);
+	view->set_source(*source);
 	return NSMakeSize(max.x * fontWidth, max.y * fontHeight);
 }
 
 
 - (NSString *)selectedSubviewName {
-	const memory_subview_item *subitem = memory_view_get_current_subview(view);
-	if (subitem != NULL)
-		return [NSString stringWithUTF8String:subitem->name];
+	const debug_view_source *source = view->source();
+	if (source != NULL)
+		return [NSString stringWithUTF8String:source->name()];
 	else
 		return @"";
 }
 
 
 - (int)selectedSubviewIndex {
-	const memory_subview_item *subitem = memory_view_get_current_subview(view);
-	if (subitem != NULL)
-		return subitem->index;
+	const debug_view_source *source = view->source();
+	if (source != NULL)
+		return view->source_list().index(*source);
 	else
 		return -1;
 }
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int	selected = memory_view_get_subview(view);
+	const int	selected = view->source_list().index(*view->source());
 	if (selected != index) {
-		memory_view_set_subview(view, index);
+		view->set_source(*view->source_list().by_index(index));
 		if ([[self window] firstResponder] != self)
-			debug_view_set_cursor_visible(view, FALSE);
+			view->set_cursor_visible(false);
 	}
 }
 
 
 - (void)selectSubviewForCPU:(running_device *)device {
-	const int					selected = memory_view_get_subview(view);
-	const memory_subview_item	*subitem;
-	for (subitem = memory_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
-		if (subitem->space->cpu == device) {
-			if (selected != subitem->index) {
-				memory_view_set_subview(view, subitem->index);
-				if ([[self window] firstResponder] != self)
-					debug_view_set_cursor_visible(view, FALSE);
-			}
-			break;
-		}
+	const debug_view_source		*selected = view->source();
+	const debug_view_source		*source = view->source_list().match_device(device);
+	if ( selected != source ) {
+		view->set_source(*source);
+		if ([[self window] firstResponder] != self)
+			view->set_cursor_visible(false);
 	}
 }
 
 
 - (NSString *)expression {
-	return [NSString stringWithUTF8String:memory_view_get_expression(view)];
+	return [NSString stringWithUTF8String:downcast<debug_view_memory *>(view)->expression()];
 }
 
 
 - (void)setExpression:(NSString *)exp {
-	memory_view_set_expression(view, [exp UTF8String]);
+	downcast<debug_view_memory *>(view)->set_expression([exp UTF8String]);
 }
 
 
 - (IBAction)showChunkSize:(id)sender {
-	memory_view_set_bytes_per_chunk(view, [sender tag]);
+	downcast<debug_view_memory *>(view)->set_bytes_per_chunk([sender tag]);
 }
 
 
 - (IBAction)showPhysicalAddresses:(id)sender {
-	memory_view_set_physical(view, [sender tag]);
+	downcast<debug_view_memory *>(view)->set_physical([sender tag]);
 }
 
 
 - (IBAction)showReverseView:(id)sender {
-	memory_view_set_reverse(view, [sender tag]);
+	downcast<debug_view_memory *>(view)->set_reverse([sender tag]);
 }
 
 
 - (IBAction)showReverseViewToggle:(id)sender {
-	memory_view_set_reverse(view, !memory_view_get_reverse(view));
+	downcast<debug_view_memory *>(view)->set_reverse(!downcast<debug_view_memory *>(view)->reverse());
 }
 
 
@@ -854,12 +852,12 @@ void console_create_window(running_machine *machine)
 
 
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	const memory_subview_item *subitem;
-	for (subitem = memory_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
-		[[menu insertItemWithTitle:[NSString stringWithUTF8String:subitem->name]
+	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	{
+		[[menu insertItemWithTitle:[NSString stringWithUTF8String:source->name()]
 							action:NULL
 					 keyEquivalent:@""
-						   atIndex:index++] setTag:subitem->index];
+						   atIndex:index++] setTag:view->source_list().index(*source)];
 	}
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
@@ -950,13 +948,14 @@ void console_create_window(running_machine *machine)
 	BOOL					haveCursor = NO, isCurrent = NO;
 	debug_cpu_breakpoint	*breakpoint = NULL;
 
-	if (debug_view_get_cursor_visible(view)) {
-		const address_space *space = disasm_view_get_current_subview(view)->space;
-		isCurrent = (debug_cpu_get_visible_cpu(machine) == space->cpu);
-		if (!useConsole || isCurrent) {
-			offs_t address = memory_byte_to_address(space, disasm_view_get_selected_address(view));
-			haveCursor = YES;
-			breakpoint = [self findBreakpointAtAddress:address inAddressSpace:space];
+	if (view->cursor_visible()) {
+		if (debug_cpu_get_visible_cpu(machine) == view->source()->device()) {
+			isCurrent = YES;
+			if (!useConsole || isCurrent) {
+				offs_t address = downcast<debug_view_disasm *>(view)->selected_address();
+				haveCursor = YES;
+				breakpoint = [self findBreakpointAtAddress:address inAddressSpace:downcast<const debug_view_disasm_source *>(view->source())->space()];
+			}
 		}
 	}
 
@@ -996,7 +995,7 @@ void console_create_window(running_machine *machine)
 	} else if (action == @selector(debugRunToCursor:)) {
 		return isCurrent;
 	} else if (action == @selector(showRightColumn:)) {
-		[item setState:((disasm_view_get_right_column(view) == [item tag]) ? NSOnState : NSOffState)];
+		[item setState:((downcast<debug_view_disasm *>(view)->right_column() == [item tag]) ? NSOnState : NSOffState)];
 		return YES;
 	} else {
 		return YES;
@@ -1005,84 +1004,80 @@ void console_create_window(running_machine *machine)
 
 
 - (NSSize)maximumFrameSize {
-	const int					selected = disasm_view_get_subview(view);
-	const disasm_subview_item	*subitem;
 	debug_view_xy				max;
+	running_device				*curcpu = debug_cpu_get_visible_cpu(machine);
+	const debug_view_source		*source = view->source_list().match_device(curcpu);
 
 	max.x = max.y = 0;
-	for (subitem = disasm_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
-		debug_view_xy	current;
-		disasm_view_set_subview(view, subitem->index);
-		current = debug_view_get_total_size(view);
+	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	{
+		debug_view_xy   current;
+		view->set_source(*source);
+		current = view->total_size();
 		if (current.x > max.x)
 			max.x = current.x;
 		if (current.y > max.y)
 			max.y = current.y;
 	}
-	disasm_view_set_subview(view, selected);
+	view->set_source(*source);
 	return NSMakeSize(max.x * fontWidth, max.y * fontHeight);
 }
 
 
 - (NSString *)selectedSubviewName {
-	const disasm_subview_item *subitem = disasm_view_get_current_subview(view);
-	if (subitem != NULL)
-		return [NSString stringWithUTF8String:subitem->name];
+	const debug_view_source *source = view->source();
+	if (source != NULL)
+		return [NSString stringWithUTF8String:source->name()];
 	else
 		return @"";
 }
 
 
 - (int)selectedSubviewIndex {
-	const disasm_subview_item *subitem = disasm_view_get_current_subview(view);
-	if (subitem != NULL)
-		return subitem->index;
+	const debug_view_source *source = view->source();
+	if (source != NULL)
+		return view->source_list().index(*source);
 	else
 		return -1;
 }
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int	selected = disasm_view_get_subview(view);
+	const int	selected = view->source_list().index(*view->source());
 	if (selected != index) {
-		disasm_view_set_subview(view, index);
+		view->set_source(*view->source_list().by_index(index));
 		if ([[self window] firstResponder] != self)
-			debug_view_set_cursor_visible(view, FALSE);
+			view->set_cursor_visible(false);
 	}
 }
 
 
 - (void)selectSubviewForCPU:(running_device *)device {
-	const int					selected = disasm_view_get_subview(view);
-	const disasm_subview_item	*subitem;
-	for (subitem = disasm_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
-		if (subitem->space->cpu == device) {
-			if (selected != subitem->index) {
-				disasm_view_set_subview(view, subitem->index);
-				if ([[self window] firstResponder] != self)
-					debug_view_set_cursor_visible(view, FALSE);
-			}
-			break;
-		}
+	const debug_view_source     *selected = view->source();
+	const debug_view_source     *source = view->source_list().match_device(device);
+	if ( selected != source ) {
+		view->set_source(*source);
+		if ([[self window] firstResponder] != self)
+			view->set_cursor_visible(false);
 	}
 }
 
 
 - (NSString *)expression {
-	return [NSString stringWithUTF8String:disasm_view_get_expression(view)];
+	return [NSString stringWithUTF8String:downcast<debug_view_disasm *>(view)->expression()];
 }
 
 
 - (void)setExpression:(NSString *)exp {
-	disasm_view_set_expression(view, [exp UTF8String]);
+	downcast<debug_view_disasm *>(view)->set_expression([exp UTF8String]);
 }
 
 
 - (IBAction)debugToggleBreakpoint:(id)sender {
-	if (debug_view_get_cursor_visible(view)) {
-		const address_space *space = disasm_view_get_current_subview(view)->space;
+	if (view->cursor_visible()) {
+		const address_space *space = downcast<const debug_view_disasm_source *>(view->source())->space();
 		if (!useConsole || (debug_cpu_get_visible_cpu(machine) == space->cpu)) {
-			offs_t				address = memory_byte_to_address(space, disasm_view_get_selected_address(view));
+			offs_t				address = downcast<debug_view_disasm *>(view)->selected_address();
 			debug_cpu_breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
 
 			// if it doesn't exist, add a new one
@@ -1098,7 +1093,6 @@ void console_create_window(running_machine *machine)
 					debug_cpu_breakpoint_set(space->cpu, address, NULL, NULL);
 				else
 					debug_cpu_breakpoint_clear(machine, bp->index);
-				debug_view_update_type(machine, DVT_DISASSEMBLY);
 			}
 		}
 	}
@@ -1106,10 +1100,10 @@ void console_create_window(running_machine *machine)
 
 
 - (IBAction)debugToggleBreakpointEnable:(id)sender {
-	if (debug_view_get_cursor_visible(view)) {
-		const address_space *space = disasm_view_get_current_subview(view)->space;
+	if (view->cursor_visible()) {
+		const address_space *space = downcast<const debug_view_disasm_source *>(view->source())->space();
 		if (!useConsole || (debug_cpu_get_visible_cpu(machine) == space->cpu)) {
-			offs_t				address = memory_byte_to_address(space, disasm_view_get_selected_address(view));
+			offs_t				address = downcast<debug_view_disasm *>(view)->selected_address();
 			debug_cpu_breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
 
 			if (bp != NULL) {
@@ -1122,7 +1116,6 @@ void console_create_window(running_machine *machine)
 					debug_console_execute_command(machine, [command UTF8String], 1);
 				} else {
 					debug_cpu_breakpoint_enable(machine, bp->index, !bp->enabled);
-					debug_view_update_type(machine, DVT_DISASSEMBLY);
 				}
 			}
 		}
@@ -1131,10 +1124,10 @@ void console_create_window(running_machine *machine)
 
 
 - (IBAction)debugRunToCursor:(id)sender {
-	if (debug_view_get_cursor_visible(view)) {
-		const address_space *space = disasm_view_get_current_subview(view)->space;
+	if (view->cursor_visible()) {
+		const address_space *space = downcast<const debug_view_disasm_source *>(view->source())->space();
 		if (debug_cpu_get_visible_cpu(machine) == space->cpu) {
-			offs_t address = memory_byte_to_address(space, disasm_view_get_selected_address(view));
+			offs_t address = downcast<debug_view_disasm *>(view)->selected_address();
 			if (useConsole) {
 				NSString *command = [NSString stringWithFormat:@"go %lX", (unsigned long)address];
 				debug_console_execute_command(machine, [command UTF8String], 1);
@@ -1147,7 +1140,7 @@ void console_create_window(running_machine *machine)
 
 
 - (IBAction)showRightColumn:(id)sender {
-	disasm_view_set_right_column(view, (disasm_right_column) [sender tag]);
+	downcast<debug_view_disasm *>(view)->set_right_column((disasm_right_column) [sender tag]);
 }
 
 
@@ -1216,12 +1209,12 @@ void console_create_window(running_machine *machine)
 
 
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	const disasm_subview_item *subitem;
-	for (subitem = disasm_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
-		[[menu insertItemWithTitle:[NSString stringWithUTF8String:subitem->name]
+	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	{
+		[[menu insertItemWithTitle:[NSString stringWithUTF8String:source->name()]
 							action:NULL
 					 keyEquivalent:@""
-						   atIndex:index++] setTag:subitem->index];
+						   atIndex:index++] setTag:view->source_list().index(*source)];
 	}
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
@@ -1237,7 +1230,7 @@ void console_create_window(running_machine *machine)
 @implementation MAMERegistersView
 
 - (id)initWithFrame:(NSRect)f machine:(running_machine *)m {
-	if (!(self = [super initWithFrame:f type:DVT_REGISTERS machine:m]))
+	if (!(self = [super initWithFrame:f type:DVT_STATE machine:m]))
 		return nil;
 	return self;
 }
@@ -1249,67 +1242,44 @@ void console_create_window(running_machine *machine)
 
 
 - (NSSize)maximumFrameSize {
-	const int						selected = registers_view_get_subview(view);
-	const registers_subview_item	*subitem;
-	debug_view_xy					max;
+	debug_view_xy				max;
+	running_device				*curcpu = debug_cpu_get_visible_cpu(machine);
+	const debug_view_source		*source = view->source_list().match_device(curcpu);
+
 
 	max.x = max.y = 0;
-	for (subitem = registers_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
-		debug_view_xy	current;
-		registers_view_set_subview(view, subitem->index);
-		current = debug_view_get_total_size(view);
+	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	{
+		debug_view_xy   current;
+		view->set_source(*source);
+		current = view->total_size();
 		if (current.x > max.x)
 			max.x = current.x;
 		if (current.y > max.y)
 			max.y = current.y;
 	}
-	registers_view_set_subview(view, selected);
+	view->set_source(*source);
 	return NSMakeSize(max.x * fontWidth, max.y * fontHeight);
 }
 
 
 - (NSString *)selectedSubviewName {
-	const registers_subview_item *subitem = registers_view_get_current_subview(view);
-	if (subitem != NULL)
-		return [NSString stringWithUTF8String:subitem->name];
-	else
-		return @"";
+	return @"";
 }
 
 
 - (int)selectedSubviewIndex {
-	const registers_subview_item *subitem = registers_view_get_current_subview(view);
-	if (subitem != NULL)
-		return subitem->index;
-	else
-		return -1;
+	return -1;
 }
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int	selected = registers_view_get_subview(view);
-	if (selected != index) {
-		registers_view_set_subview(view, index);
-		if ([[self window] firstResponder] != self)
-			debug_view_set_cursor_visible(view, FALSE);
-	}
 }
 
 
 - (void)selectSubviewForCPU:(running_device *)device {
-	const int						selected = registers_view_get_subview(view);
-	const registers_subview_item	*subitem;
-	device_state_interface			*stateintf = device_state(device);
-	for (subitem = registers_view_get_subview_list(view); subitem != NULL; subitem = subitem->next) {
-		if (subitem->stateintf == stateintf) {
-			if (selected != subitem->index) {
-				registers_view_set_subview(view, subitem->index);
-				if ([[self window] firstResponder] != self)
-					debug_view_set_cursor_visible(view, FALSE);
-			}
-			break;
-		}
-	}
+	//dv = get_view(dmain, DVT_STATE);
+	view->set_source(*view->source_list().match_device(device));
 }
 
 @end
@@ -1541,17 +1511,18 @@ void console_create_window(running_machine *machine)
 
 
 - (IBAction)debugSoftReset:(id)sender {
-	mame_schedule_soft_reset(machine);
+	machine->schedule_soft_reset();
+	debug_cpu_go(machine, ~0);
 }
 
 
 - (IBAction)debugHardReset:(id)sender {
-	mame_schedule_hard_reset(machine);
+	machine->schedule_hard_reset();
 }
 
 
 - (IBAction)debugExit:(id)sender {
-	mame_schedule_exit(machine);
+	machine->schedule_exit();
 }
 
 
@@ -1759,9 +1730,10 @@ void console_create_window(running_machine *machine)
 - (void)setCPU:(running_device *)device {
 	[regView selectSubviewForCPU:device];
 	[dasmView selectSubviewForCPU:device];
-	[window setTitle:[NSString stringWithFormat:@"Debug: %s - %@",
+	[window setTitle:[NSString stringWithFormat:@"Debug: %s - %s '%s'",
 												device->machine->gamedrv->name,
-												[regView selectedSubviewName]]];
+												device->name(),
+												device->tag()]];
 }
 
 

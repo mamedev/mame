@@ -117,7 +117,7 @@ typedef float CGFloat;
 
 + (NSFont *)defaultFont;
 
-- (id)initWithFrame:(NSRect)f type:(int)t machine:(running_machine *)m;
+- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine *)m;
 
 - (void)update;
 
