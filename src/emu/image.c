@@ -487,6 +487,10 @@ void image_battery_save_by_name(const char *filename, const void *buffer, int le
     }
 }
 
+/*-------------------------------------------------
+    image_from_absolute_index - retreives index number
+	of image in device list
+-------------------------------------------------*/
 device_image_interface *image_from_absolute_index(running_machine *machine, int absolute_index)
 {
 	device_image_interface *image = NULL;
@@ -499,3 +503,32 @@ device_image_interface *image_from_absolute_index(running_machine *machine, int 
 	}
 	return NULL;
 }
+
+/*-------------------------------------------------
+    image_add_device_with_subdevices - adds
+	device with parameters sent, and all subdevices
+	from it's machine config devices list
+-------------------------------------------------*/
+void image_add_device_with_subdevices(device_t *owner, device_type type, const char *tag, UINT32 clock)
+{
+	astring tempstring;
+	device_list *device_list = &owner->machine->m_devicelist;	
+	machine_config *config = (machine_config *)owner->machine->config;
+	
+	device_config *devconfig = type(*config, owner->subtag(tempstring,tag), &owner->baseconfig(), clock);
+	running_device *device = device_list->append(devconfig->tag(), devconfig->alloc_device(*owner->machine));
+	
+	const machine_config_token *tokens = device->machine_config_tokens();
+	if (tokens != NULL) 
+    {		
+		config->detokenize(tokens,devconfig);
+        for (const device_config *config_dev = config->m_devicelist.first(); config_dev != NULL; config_dev = config_dev->next())
+        {
+			if (config_dev->owner()==devconfig) {
+				device_list->append(config_dev->tag(), config_dev->alloc_device(*owner->machine));
+			}
+        }
+    }
+	config->m_devicelist.append(devconfig->tag(), devconfig);
+}
+

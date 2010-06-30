@@ -32,4 +32,6 @@ astring *image_info_astring(running_machine *machine, astring *string);
 
 device_image_interface *image_from_absolute_index(running_machine *machine, int absolute_index);
 
+void image_add_device_with_subdevices(device_t *owner, device_type type, const char *tag, UINT32 clock);
+
 #endif /* __IMAGE_H__ */
