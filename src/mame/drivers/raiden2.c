@@ -2399,7 +2399,7 @@ GAME( 1993, raiden2,  0,       raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaih
 GAME( 1993, raiden2a, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden II (set 2, Metrotainment)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raiden2b, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (set 3, Japan)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raiden2c, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (set 4, Japan)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, raiden2d, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1993, raiden2d, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (set 5, Italy)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raiden2e, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (set 6, Easy Version)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raiden2f, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1994, raidndx,  0,       raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (UK)", GAME_NOT_WORKING|GAME_NO_SOUND)
