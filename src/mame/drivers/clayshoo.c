@@ -104,7 +104,7 @@ static attotime compute_duration( running_device *device, int analog_pos )
 {
 	/* the 58 comes from the length of the loop used to
        read the analog position */
-	return cpu_clocks_to_attotime(device, 58 * analog_pos);
+	return downcast<cpu_device *>(device)->cycles_to_attotime(58 * analog_pos);
 }
 
 

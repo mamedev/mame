@@ -335,7 +335,7 @@ static CUSTOM_INPUT( tempest_buttons_r )
 static CUSTOM_INPUT( clock_r )
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
-	return (cputag_get_total_cycles(field->port->machine, "maincpu") & 0x100) ? 1 : 0;
+	return (field->port->machine->device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 

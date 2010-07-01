@@ -477,7 +477,7 @@ static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 
 static INTERRUPT_GEN( wgp_cpub_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, wgp_cpub_interrupt6);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(200000-500), NULL, 0, wgp_cpub_interrupt6);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -601,7 +601,7 @@ static WRITE16_HANDLER( wgp_adinput_w )
        hardware has got the next a/d conversion ready. We set a token
        delay of 10000 cycles although our inputs are always ready. */
 
-	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,10000), NULL, 0, wgp_interrupt6);
+	timer_set(space->machine, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), NULL, 0, wgp_interrupt6);
 }
 
 

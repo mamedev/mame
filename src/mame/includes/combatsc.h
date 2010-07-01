@@ -37,7 +37,7 @@ public:
 
 
 	/* devices */
-	running_device *audiocpu;
+	cpu_device *audiocpu;
 	running_device *k007121_1;
 	running_device *k007121_2;
 };

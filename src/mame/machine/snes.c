@@ -176,7 +176,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		if (snes_ram[NMITIMEN] & 0x80)	/* NMI only signaled if this bit set */
 		{
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
-			timer_adjust_oneshot(state->nmi_timer, cpu_clocks_to_attotime(state->maincpu, 12), 0);
+			timer_adjust_oneshot(state->nmi_timer, state->maincpu->cycles_to_attotime(12), 0);
 		}
 
 		/* three lines after start of vblank we update the controllers (value from snes9x) */
@@ -667,7 +667,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case WRMPYB:	/* Multiplier B */
 			snes_ram[WRMPYB] = data;
-//          timer_adjust_oneshot(state->mult_timer, cpu_clocks_to_attotime(state->maincpu, 8), 0);
+//          timer_adjust_oneshot(state->mult_timer, state->maincpu->cycles_to_attotime(8), 0);
 			{
 				UINT32 c = snes_ram[WRMPYA] * snes_ram[WRMPYB];
 				snes_ram[RDMPYL] = c & 0xff;
@@ -679,7 +679,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case WRDVDD:	/* Divisor */
 			snes_ram[WRDVDD] = data;
-//          timer_adjust_oneshot(state->div_timer, cpu_clocks_to_attotime(state->maincpu, 16), 0);
+//          timer_adjust_oneshot(state->div_timer, state->maincpu->cycles_to_attotime(16), 0);
 			{
 				UINT16 value, dividend, remainder;
 				dividend = remainder = 0;
@@ -1697,10 +1697,10 @@ MACHINE_START( snes )
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), snes_direct);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), spc_direct);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->spc700 = devtag_get_device(machine, "spc700");
-	state->superfx = devtag_get_device(machine, "superfx");
+	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->soundcpu = machine->device<cpu_device>("soundcpu");
+	state->spc700 = machine->device<cpu_device>("spc700");
+	state->superfx = machine->device<cpu_device>("superfx");
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;

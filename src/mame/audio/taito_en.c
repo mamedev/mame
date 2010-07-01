@@ -121,7 +121,7 @@ static WRITE16_HANDLER(f3_68681_w)
 					logerror("Counter:  X1/Clk - divided by 16, counter is %04x, so interrupt every %d cycles\n",counter,(M68000_CLOCK/M68681_CLOCK)*counter*16);
 					timer_mode=TIMER_SINGLESHOT;
 					timer = space->machine->device<timer_device>("timer_68681");
-					timer->adjust(cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter*16));
+					timer->adjust(downcast<cpu_device *>(space->cpu)->cycles_to_attotime((M68000_CLOCK/M68681_CLOCK)*counter*16));
 					break;
 				case 4:
 					logerror("Timer:  Unimplemented external IP2\n");
@@ -133,7 +133,7 @@ static WRITE16_HANDLER(f3_68681_w)
 					logerror("Timer:  X1/Clk, counter is %04x, so interrupt every %d cycles\n",counter,(M68000_CLOCK/M68681_CLOCK)*counter);
 					timer_mode=TIMER_PULSE;
 					timer = space->machine->device<timer_device>("timer_68681");
-					timer->adjust(cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter), 0, cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter));
+					timer->adjust(downcast<cpu_device *>(space->cpu)->cycles_to_attotime((M68000_CLOCK/M68681_CLOCK)*counter), 0, downcast<cpu_device *>(space->cpu)->cycles_to_attotime((M68000_CLOCK/M68681_CLOCK)*counter));
 					break;
 				case 7:
 					logerror("Timer:  Unimplemented X1/Clk - divided by 16\n");

@@ -352,7 +352,7 @@ static READ8_DEVICE_HANDLER ( combatsc_ym2203_r )
 		if (state->boost)
 		{
 			state->boost = 0;
-			timer_adjust_periodic(state->interleave_timer, attotime_zero, 0, cpu_clocks_to_attotime(state->audiocpu, 80));
+			timer_adjust_periodic(state->interleave_timer, attotime_zero, 0, state->audiocpu->cycles_to_attotime(80));
 		}
 		else if (status & 2)
 		{
@@ -677,7 +677,7 @@ static MACHINE_START( combatsc )
 
 	state->interleave_timer = timer_alloc(machine, NULL, NULL);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->k007121_1 = devtag_get_device(machine, "k007121_1");
 	state->k007121_2 = devtag_get_device(machine, "k007121_2");
 

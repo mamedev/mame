@@ -955,7 +955,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 static WRITE8_DEVICE_HANDLER( pia_ic7_portb_w )
 {
 	int meter;
-	UINT64 cycles = cputag_get_total_cycles(device->machine, "maincpu");
+	UINT64 cycles = device->machine->device<cpu_device>("maincpu")->total_cycles();
 
 /* The meters are connected to a voltage drop sensor, where current
 flowing through them also passes through pin B7, meaning that when
@@ -996,7 +996,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic7_cb2_w )
 {
 /* The eighth meter is connected here, because the voltage sensor
 is on PB7. */
-	UINT64 cycles = cputag_get_total_cycles(device->machine, "maincpu");
+	UINT64 cycles = device->machine->device<cpu_device>("maincpu")->total_cycles();
 	if (state)
 	{
 		pia6821_portb_w(device, 0, mmtr_data|0x80);

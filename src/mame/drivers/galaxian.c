@@ -590,7 +590,7 @@ static READ8_DEVICE_HANDLER( konami_sound_timer_r )
         current counter index, we use the sound cpu clock times 8 mod
         16*16*2*8*5*2.
     */
-	UINT32 cycles = (cputag_get_total_cycles(device->machine, "audiocpu") * 8) % (UINT64)(16*16*2*8*5*2);
+	UINT32 cycles = (device->machine->device<cpu_device>("audiocpu")->total_cycles() * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
 
 	/* separate the high bit from the others */

@@ -45,7 +45,7 @@ static const int scramble_timer[10] =
 
 READ8_DEVICE_HANDLER( scramble_portB_r )
 {
-	return scramble_timer[(cputag_get_total_cycles(device->machine, "audiocpu")/512) % 10];
+	return scramble_timer[(device->machine->device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
 }
 
 
@@ -74,7 +74,7 @@ static const int frogger_timer[10] =
 
 READ8_DEVICE_HANDLER( frogger_portB_r )
 {
-	return frogger_timer[(cputag_get_total_cycles(device->machine, "audiocpu")/512) % 10];
+	return frogger_timer[(device->machine->device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
 }
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )

@@ -296,7 +296,7 @@ static PALETTE_INIT( unclepoo )
 
  static READ8_HANDLER( timer_r )
 {
-	return cpu_get_total_cycles(space->cpu) / 16;
+	return downcast<cpu_device *>(space->cpu)->total_cycles() / 16;
 }
 
 

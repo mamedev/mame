@@ -271,12 +271,9 @@ enum
 #define cpu_set_clock						device_set_clock
 #define cpu_get_clockscale					device_get_clock_scale
 #define cpu_set_clockscale					device_set_clock_scale
-#define cpu_clocks_to_attotime				device_clocks_to_attotime
-#define cpu_attotime_to_clocks				device_attotime_to_clocks
 
 // CPU timing
 #define cpu_get_local_time					device_get_local_time
-#define cpu_get_total_cycles				device_get_total_cycles
 #define cpu_eat_cycles						device_eat_cycles
 #define cpu_adjust_icount					device_adjust_icount
 #define cpu_abort_timeslice					device_abort_timeslice
@@ -309,7 +306,6 @@ enum
 #define cputag_suspend(mach, tag, reason, eat)							device_suspend((mach)->device(tag), reason, eat)
 #define cputag_resume(mach, tag, reason)								device_resume((mach)->device(tag), reason)
 #define cputag_is_suspended(mach, tag, reason)							device_is_suspended((mach)->device(tag), reason)
-#define cputag_get_total_cycles(mach, tag)								device_get_total_cycles((mach)->device(tag))
 
 #define cputag_set_input_line(mach, tag, line, state)					downcast<cpu_device *>((mach)->device(tag))->set_input_line(line, state)
 #define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	downcast<cpu_device *>((mach)->device(tag))->set_input_line_and_vector(line, state, vec)

@@ -444,12 +444,6 @@ inline attotime device_get_local_time(device_t *device)
 	return device_execute(device)->local_time();
 }
 
-// returns the total number of executed cycles for a given device
-inline UINT64 device_get_total_cycles(device_t *device)
-{
-	return device_execute(device)->total_cycles();
-}
-
 // safely eats cycles so we don't cross a timeslice boundary
 inline void device_eat_cycles(device_t *device, int cycles)
 {

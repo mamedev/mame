@@ -965,7 +965,7 @@ static INTERRUPT_GEN( sci_interrupt )
 	state->sci_int6 = !state->sci_int6;
 
 	if (state->sci_int6)
-		timer_set(device->machine, cpu_clocks_to_attotime(device, 200000 - 500), NULL, 0, taitoz_interrupt6);
+		timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), NULL, 0, taitoz_interrupt6);
 
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
@@ -983,7 +983,7 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 	state->dblaxle_int6 = !state->dblaxle_int6;
 
 	if (state->dblaxle_int6)
-		timer_set(device->machine, cpu_clocks_to_attotime(device, 200000 - 500), NULL, 0, taitoz_interrupt6);
+		timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), NULL, 0, taitoz_interrupt6);
 
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
@@ -991,7 +991,7 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 static INTERRUPT_GEN( dblaxle_cpub_interrupt )
 {
 	// Unsure how many int6's per frame
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 200000 - 500), NULL,  0, taitoz_interrupt6);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), NULL,  0, taitoz_interrupt6);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -1208,7 +1208,7 @@ static WRITE16_HANDLER( bshark_stick_w )
        but we don't want CPUA to have an int6 before int4 is over (?)
     */
 
-	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu, 10000), NULL, 0, taitoz_interrupt6);
+	timer_set(space->machine, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), NULL, 0, taitoz_interrupt6);
 }
 
 
@@ -1293,7 +1293,7 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
        Four lightgun interrupts happen before the collected coords
        are moved to shared ram where CPUA can use them. */
 
-	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu, 10000), NULL, 0, taitoz_cpub_interrupt5);
+	timer_set(space->machine, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), NULL, 0, taitoz_cpub_interrupt5);
 }
 
 static WRITE16_HANDLER( spacegun_gun_output_w )

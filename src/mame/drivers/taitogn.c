@@ -720,7 +720,7 @@ static WRITE32_HANDLER( znsecsel_w )
 			psx_sio_install_handler( 0, sio_dip_handler );
 			psx_sio_input( space->machine, 0, PSX_SIO_IN_DSR, 0 );
 
-			timer_adjust_oneshot( dip_timer, cpu_clocks_to_attotime( space->cpu, 100 ), 1 );
+			timer_adjust_oneshot( dip_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( 100 ), 1 );
         }
 }
 

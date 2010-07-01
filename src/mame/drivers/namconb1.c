@@ -907,7 +907,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->cpu, 300));	// was 300
+		cpu_spinuntil_time(space->cpu, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(300));	// was 300
 	}
 }
 

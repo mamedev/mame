@@ -40,8 +40,8 @@ public:
 	UINT8        c588, c589, c58a; // These variables derived from the bootleg
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	cpu_device *maincpu;
+	cpu_device *audiocpu;
 	running_device *pc080sn;
 	running_device *pc090oj;
 	running_device *msm1;

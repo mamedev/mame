@@ -1695,7 +1695,7 @@ static WRITE16_HANDLER( output_control_w )
 
 static READ16_HANDLER( output_control_r )
 {
-	dcs.output_control_cycles = cpu_get_total_cycles(space->cpu);
+	dcs.output_control_cycles = dcs.cpu->total_cycles();
 	return dcs.output_control;
 }
 
@@ -1754,7 +1754,7 @@ static TIMER_DEVICE_CALLBACK( internal_timer_callback )
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		timer.adjust(cpu_clocks_to_attotime(dcs.cpu, target_cycles));
+		timer.adjust(dcs.cpu->cycles_to_attotime(target_cycles));
 
 	/* the IRQ line is edge triggered */
 	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, ASSERT_LINE);
@@ -1790,7 +1790,7 @@ static void reset_timer(running_machine *machine)
 
 	/* adjust the timer if not optimized */
 	if (!dcs.timer_ignore)
-		dcs.internal_timer->adjust(cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_start_count + 1)));
+		dcs.internal_timer->adjust(dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_start_count + 1)));
 }
 
 
@@ -1800,7 +1800,7 @@ static void timer_enable_callback(running_device *device, int enable)
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
-//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_period + 1)));
+//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_period + 1)));
 		reset_timer(device->machine);
 	}
 	else

@@ -238,7 +238,7 @@ static TIMER_CALLBACK( cadash_interrupt5 )
 
 static INTERRUPT_GEN( cadash_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 500), NULL, 0, cadash_interrupt5);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(500), NULL, 0, cadash_interrupt5);
 	cpu_set_input_line(device, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 

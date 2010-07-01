@@ -182,7 +182,7 @@ static TIMER_CALLBACK( clear_irq_cb )
 static INTERRUPT_GEN( assert_irq )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 14288), NULL, 0, clear_irq_cb);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(14288), NULL, 0, clear_irq_cb);
        /* Timing here is an educated GUESS, Z80 /INT must stay high so the irq
           fires no less than TWICE per frame, else game doesn't work right.
       6000000 / 56.747 = 105732.4616 cycles per frame, we'll call it A

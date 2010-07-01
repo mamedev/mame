@@ -559,17 +559,5 @@ inline void device_set_clock_scale(device_t *device, double clockscale)
 	device->set_clock_scale(clockscale);
 }
 
-// converts a number of clock ticks to an attotime
-inline attotime device_clocks_to_attotime(device_t *device, UINT64 clocks)
-{
-	return device->clocks_to_attotime(clocks);
-}
-
-// converts a duration as attotime to device clock ticks
-inline UINT64 device_attotime_to_clocks(device_t *device, attotime duration)
-{
-	return device->attotime_to_clocks(duration);
-}
-
 
 #endif	/* __DEVINTRF_H__ */

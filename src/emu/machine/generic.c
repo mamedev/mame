@@ -676,8 +676,7 @@ void generic_pulse_irq_line(running_device *device, int irqline)
 	cpu_set_input_line(device, irqline, ASSERT_LINE);
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
-	int clocks = cpudevice->cycles_to_clocks(cpudevice->min_cycles());
-	attotime target_time = attotime_add(cpudevice->local_time(), cpudevice->clocks_to_attotime(MAX(clocks, 1)));
+	attotime target_time = attotime_add(cpudevice->local_time(), cpudevice->cycles_to_attotime(cpudevice->min_cycles()));
 	timer_set(device->machine, attotime_sub(target_time, timer_get_time(device->machine)), (void *)device, irqline, irq_pulse_clear);
 }
 
@@ -694,8 +693,7 @@ void generic_pulse_irq_line_and_vector(running_device *device, int irqline, int 
 	cpu_set_input_line_and_vector(device, irqline, ASSERT_LINE, vector);
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
-	int clocks = cpudevice->cycles_to_clocks(cpudevice->min_cycles());
-	attotime target_time = attotime_add(cpudevice->local_time(), cpudevice->clocks_to_attotime(MAX(clocks, 1)));
+	attotime target_time = attotime_add(cpudevice->local_time(), cpudevice->cycles_to_attotime(cpudevice->min_cycles()));
 	timer_set(device->machine, attotime_sub(target_time, timer_get_time(device->machine)), (void *)device, irqline, irq_pulse_clear);
 }
 

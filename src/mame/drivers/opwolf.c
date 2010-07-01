@@ -433,8 +433,8 @@ static MACHINE_START( opwolf )
 {
 	opwolf_state *state = (opwolf_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device<cpu_device>("maincpu");
+	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->pc080sn = devtag_get_device(machine, "pc080sn");
 	state->pc090oj = devtag_get_device(machine, "pc090oj");
 	state->msm1 = devtag_get_device(machine, "msm1");

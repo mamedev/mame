@@ -178,7 +178,7 @@ static TIMER_CALLBACK( cdp1864_dma_tick )
 			}
 		}
 
-		timer_adjust_oneshot(cdp1864->dma_timer, cpu_clocks_to_attotime(machine->firstcpu, CDP1864_CYCLES_DMA_WAIT), 0);
+		timer_adjust_oneshot(cdp1864->dma_timer, machine->firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_WAIT), 0);
 
 		cdp1864->dmaout = 0;
 	}
@@ -192,7 +192,7 @@ static TIMER_CALLBACK( cdp1864_dma_tick )
 			}
 		}
 
-		timer_adjust_oneshot(cdp1864->dma_timer, cpu_clocks_to_attotime(machine->firstcpu, CDP1864_CYCLES_DMA_ACTIVE), 0);
+		timer_adjust_oneshot(cdp1864->dma_timer, machine->firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_ACTIVE), 0);
 
 		cdp1864->dmaout = 1;
 	}
@@ -479,7 +479,7 @@ static DEVICE_RESET( cdp1864 )
 
 	timer_adjust_oneshot(cdp1864->int_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_INT_START), 0);
 	timer_adjust_oneshot(cdp1864->efx_timer, cdp1864->screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_START), 0);
-	timer_adjust_oneshot(cdp1864->dma_timer, cpu_clocks_to_attotime(device->machine->firstcpu, CDP1864_CYCLES_DMA_START), 0);
+	timer_adjust_oneshot(cdp1864->dma_timer, device->machine->firstcpu->cycles_to_attotime(CDP1864_CYCLES_DMA_START), 0);
 
 	cdp1864->disp = 0;
 	cdp1864->dmaout = 0;

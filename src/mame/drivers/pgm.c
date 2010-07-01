@@ -377,7 +377,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 
 	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(state->prot, 200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	cpu_spinuntil_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static READ16_HANDLER( arm7_ram_r )
@@ -938,7 +938,7 @@ static WRITE16_HANDLER( svg_68k_nmi_w )
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(state->prot, 200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	cpu_spinuntil_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static WRITE16_HANDLER( svg_latch_68k_w )
@@ -1344,8 +1344,8 @@ static MACHINE_START( pgm )
 
 	machine->base_datetime(state->systime);
 
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->prot = devtag_get_device(machine, "prot");
+	state->soundcpu = machine->device<cpu_device>("soundcpu");
+	state->prot = machine->device<cpu_device>("prot");
 	state->ics = devtag_get_device(machine, "ics");
 
 	state_save_register_global(machine, state->cal_val);

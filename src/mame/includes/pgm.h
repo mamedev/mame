@@ -66,8 +66,8 @@ public:
 	system_time  systime;
 
 	/* devices */
-	running_device *soundcpu;
-	running_device *prot;
+	cpu_device *soundcpu;
+	cpu_device *prot;
 	running_device *ics;
 };
 

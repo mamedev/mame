@@ -457,10 +457,10 @@ public:
 	snes_cart_info cart[2];	// the second one is used by MESS for Sufami Turbo and, eventually, BS-X
 
 	/* devices */
-	running_device *maincpu;
-	running_device *soundcpu;
-	running_device *spc700;
-	running_device *superfx;
+	cpu_device *maincpu;
+	cpu_device *soundcpu;
+	cpu_device *spc700;
+	cpu_device *superfx;
 };
 
 /* Special chips, checked at init and used in memory handlers */

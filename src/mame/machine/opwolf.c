@@ -695,7 +695,7 @@ static TIMER_CALLBACK( cchip_timer )
 	{
 		// Simulate time for command to execute (exact timing unknown, this is close)
 		state->current_cmd = 0xf5;
-		timer_set(machine, cpu_clocks_to_attotime(state->maincpu, 80000), NULL, 0, opwolf_timer_callback);
+		timer_set(machine, state->maincpu->cycles_to_attotime(80000), NULL, 0, opwolf_timer_callback);
 	}
 	state->cchip_last_7a = state->cchip_ram[0x7a];
 

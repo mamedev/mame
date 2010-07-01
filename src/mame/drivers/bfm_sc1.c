@@ -268,7 +268,7 @@ static WRITE8_HANDLER( mmtr_w )
 	else
 	{
 		int  changed = mmtr_latch ^ data;
-		UINT64 cycles  = cpu_get_total_cycles(space->cpu);
+		UINT64 cycles  = downcast<cpu_device *>(space->cpu)->total_cycles();
 
 		mmtr_latch = data;
 

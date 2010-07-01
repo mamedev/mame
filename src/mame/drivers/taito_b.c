@@ -194,7 +194,7 @@ static TIMER_CALLBACK( rsaga2_interrupt2  )
 
 static INTERRUPT_GEN( rastansaga2_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, rsaga2_interrupt2);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, rsaga2_interrupt2);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -207,7 +207,7 @@ static TIMER_CALLBACK( crimec_interrupt3 )
 
 static INTERRUPT_GEN( crimec_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, crimec_interrupt3);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, crimec_interrupt3);
 	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
@@ -220,7 +220,7 @@ static TIMER_CALLBACK( hitice_interrupt6 )
 
 static INTERRUPT_GEN( hitice_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, hitice_interrupt6);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, hitice_interrupt6);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -233,7 +233,7 @@ static TIMER_CALLBACK( rambo3_interrupt1 )
 
 static INTERRUPT_GEN( rambo3_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, rambo3_interrupt1);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, rambo3_interrupt1);
 	cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
@@ -246,7 +246,7 @@ static TIMER_CALLBACK( pbobble_interrupt5 )
 
 static INTERRUPT_GEN( pbobble_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, pbobble_interrupt5);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, pbobble_interrupt5);
 	cpu_set_input_line(device, 3, HOLD_LINE);
 }
 
@@ -258,7 +258,7 @@ static TIMER_CALLBACK( viofight_interrupt1 )
 
 static INTERRUPT_GEN( viofight_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, viofight_interrupt1);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, viofight_interrupt1);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -270,7 +270,7 @@ static TIMER_CALLBACK( masterw_interrupt4 )
 
 static INTERRUPT_GEN( masterw_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, masterw_interrupt4);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, masterw_interrupt4);
 	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
@@ -282,7 +282,7 @@ static TIMER_CALLBACK( silentd_interrupt4 )
 
 static INTERRUPT_GEN( silentd_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, silentd_interrupt4);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, silentd_interrupt4);
 	cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
@@ -294,7 +294,7 @@ static TIMER_CALLBACK( selfeena_interrupt4 )
 
 static INTERRUPT_GEN( selfeena_interrupt )
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 5000), NULL, 0, selfeena_interrupt4);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(5000), NULL, 0, selfeena_interrupt4);
 	cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
@@ -306,7 +306,7 @@ static TIMER_CALLBACK( sbm_interrupt5 )//4
 
 static INTERRUPT_GEN( sbm_interrupt )//5
 {
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 10000), NULL, 0, sbm_interrupt5);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(10000), NULL, 0, sbm_interrupt5);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 

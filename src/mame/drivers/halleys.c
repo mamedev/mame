@@ -1014,7 +1014,7 @@ static WRITE8_HANDLER( blitter_w )
 		else
 		{
 			blitter_busy = 1;
-			timer_adjust_oneshot(blitter_reset_timer, cpu_clocks_to_attotime(space->cpu, 100), 0); // free blitter if no updates in 100 cycles
+			timer_adjust_oneshot(blitter_reset_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100), 0); // free blitter if no updates in 100 cycles
 		}
 	}
 }
