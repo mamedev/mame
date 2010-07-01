@@ -1175,6 +1175,8 @@ static UINT32 mSys22PortBits;
 
 static int mFrameCount;
 
+static UINT8 stick_input, prev_stick_state;
+
 /**
  * helper function used to read a byte from a chunk of 32 bit memory
  */
@@ -5283,8 +5285,33 @@ INPUT_PORTS_END /* Time Crisis */
 
 /*****************************************************************************************************/
 
+static CUSTOM_INPUT( acedrvr_shift_read )
+{
+	int shift = input_port_read(field->port->machine, "SHIFT");
+	
+	if (shift > 0 && shift != prev_stick_state)
+	{
+		prev_stick_state = shift;
+		
+		switch (shift)
+		{
+			case 0x01:
+				stick_input = 0x01;
+				break;
+			case 0x02:
+				stick_input = 0x03;
+				break;
+			case 0x04:
+				stick_input = 0x02;
+				break;
+		}
+	}
+	
+	return stick_input;
+}
+
 static INPUT_PORTS_START( acedrvr )
-	PORT_START("DSW0")	/* 0: DIP2 and DIP3 */
+	PORT_START("DSW0")	/* DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -5334,11 +5361,8 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START("INPUTS")	/* 1 */
-	PORT_DIPNAME( 0x0003, 0x0003, "Shift" )
-	PORT_DIPSETTING(    0x0001, "Up" )
-	PORT_DIPSETTING(    0x0003, "Center" )
-	PORT_DIPSETTING(    0x0002, "Down" )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(acedrvr_shift_read, NULL)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5354,11 +5378,16 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("SHIFT")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shift Up") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shift Center") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Shift Down") PORT_PLAYER(1)
+
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Ace Driver */
 
 static INPUT_PORTS_START( victlap )
-	PORT_START("DSW0")	/* 0: DIP2 and DIP3 */
+	PORT_START("DSW0")	/* DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -5408,11 +5437,8 @@ static INPUT_PORTS_START( victlap )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START("INPUTS")	/* 1 */
-	PORT_DIPNAME( 0x0003, 0x0003, "Shift" )
-	PORT_DIPSETTING(    0x0001, "Up" )
-	PORT_DIPSETTING(    0x0003, "Center" )
-	PORT_DIPSETTING(    0x0002, "Down" )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(acedrvr_shift_read, NULL)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5430,11 +5456,51 @@ static INPUT_PORTS_START( victlap )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
+	PORT_START("SHIFT")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shift Up") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shift Center") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Shift Down") PORT_PLAYER(1)
+
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Victory Lap */
 
+
+static CUSTOM_INPUT( ridger_gear_read )
+{
+	int gear = input_port_read(field->port->machine, "GEARS");
+
+	if (gear > 0 && gear != prev_stick_state)
+	{
+		prev_stick_state = gear;
+
+		switch (gear)
+		{
+		case 0x01:
+			stick_input = 0x0a;
+			break;
+		case 0x02:
+			stick_input = 0x09;
+			break;
+		case 0x04:
+			stick_input = 0x0e;
+			break;
+		case 0x08:
+			stick_input = 0x0d;
+			break;
+		case 0x10:
+			stick_input = 0x06;
+			break;
+		case 0x20:
+			stick_input = 0x05;
+			break;
+		}
+	}
+
+	return stick_input;
+}
+
 static INPUT_PORTS_START( ridgera )
-	PORT_START("DSW0")	/* 0: DIP2 and DIP3 */
+	PORT_START("DSW0")	/* DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1 (test mode?)" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -5484,14 +5550,8 @@ static INPUT_PORTS_START( ridgera )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START("INPUTS")	/* 1 */
-	PORT_DIPNAME( 0x000f, 0x000a, "Stick Shift" )
-	PORT_DIPSETTING( 0xa, "1" )
-	PORT_DIPSETTING( 0x9, "2" )
-	PORT_DIPSETTING( 0xe, "3" )
-	PORT_DIPSETTING( 0xd, "4" )
-	PORT_DIPSETTING( 0x6, "5" )
-	PORT_DIPSETTING( 0x5, "6" )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ridger_gear_read, NULL)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* CLUTCH */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5505,12 +5565,20 @@ static INPUT_PORTS_START( ridgera )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* MOTION STOP? */
 
+	PORT_START("GEARS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_PLAYER(1)	/* 1st gear */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear") PORT_PLAYER(1)	/* 2nd gear */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear") PORT_PLAYER(1)	/* 3rd gear */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear") PORT_PLAYER(1)	/* 4th gear */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("5th Gear") PORT_PLAYER(1)	/* 5th gear */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("6th Gear") PORT_PLAYER(1)	/* 6th gear */
+
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Ridge Racer */
 
 
 static INPUT_PORTS_START( rrf )
-	PORT_START("DSW0")	/* 0: DIP2 and DIP3 */
+	PORT_START("DSW0")	/* DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0000, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -5560,14 +5628,8 @@ static INPUT_PORTS_START( rrf )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START("INPUTS")	/* 1 */
-	PORT_DIPNAME( 0x000f, 0x000a, "Stick Shift" )
-	PORT_DIPSETTING( 0xa, "1" )
-	PORT_DIPSETTING( 0x9, "2" )
-	PORT_DIPSETTING( 0xe, "3" )
-	PORT_DIPSETTING( 0xd, "4" )
-	PORT_DIPSETTING( 0x6, "5" )
-	PORT_DIPSETTING( 0x5, "6" )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ridger_gear_read, NULL)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* CLUTCH */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5580,6 +5642,14 @@ static INPUT_PORTS_START( rrf )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* MOTION STOP? */
+
+	PORT_START("GEARS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_PLAYER(1)	/* 1st gear */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear") PORT_PLAYER(1)	/* 2nd gear */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear") PORT_PLAYER(1)	/* 3rd gear */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear") PORT_PLAYER(1)	/* 4th gear */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("5th Gear") PORT_PLAYER(1)	/* 5th gear */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("6th Gear") PORT_PLAYER(1)	/* 6th gear */
 
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Ridge Racer */
@@ -5636,14 +5706,8 @@ static INPUT_PORTS_START( raveracw )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START("INPUTS")	/* 1 */
-	PORT_DIPNAME( 0x000f, 0x000a, "Stick Shift" )
-	PORT_DIPSETTING( 0xa, "1" )
-	PORT_DIPSETTING( 0x9, "2" )
-	PORT_DIPSETTING( 0xe, "3" )
-	PORT_DIPSETTING( 0xd, "4" )
-	PORT_DIPSETTING( 0x6, "5" )
-	PORT_DIPSETTING( 0x5, "6" )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ridger_gear_read, NULL)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* CLUTCH */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* VIEW */
@@ -5656,6 +5720,14 @@ static INPUT_PORTS_START( raveracw )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* MOTION STOP? */
+
+	PORT_START("GEARS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_PLAYER(1)	/* 1st gear */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear") PORT_PLAYER(1)	/* 2nd gear */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear") PORT_PLAYER(1)	/* 3rd gear */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear") PORT_PLAYER(1)	/* 4th gear */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("5th Gear") PORT_PLAYER(1)	/* 5th gear */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("6th Gear") PORT_PLAYER(1)	/* 6th gear */
 
 	DRIVING_ANALOG_PORTS
 INPUT_PORTS_END /* Rave Racer */
@@ -5800,6 +5872,7 @@ static DRIVER_INIT( ridgeraj )
 
 	old_coin_state = 0;
 	credits1 = credits2 = 0;
+	stick_input = 0xa;
 }
 
 static DRIVER_INIT( ridger2j )
@@ -5810,6 +5883,7 @@ static DRIVER_INIT( ridger2j )
 
 	old_coin_state = 0;
 	credits1 = credits2 = 0;
+	stick_input = 0xa;
 }
 
 static DRIVER_INIT( acedrvr )
@@ -5820,6 +5894,7 @@ static DRIVER_INIT( acedrvr )
 
 	old_coin_state = 0;
 	credits1 = credits2 = 0;
+	stick_input = 0x3;
 }
 
 static DRIVER_INIT( victlap )
@@ -5830,6 +5905,7 @@ static DRIVER_INIT( victlap )
 
 	old_coin_state = 0;
 	credits1 = credits2 = 0;
+	stick_input = 0x3;
 }
 
 static DRIVER_INIT( raveracw )
@@ -5840,6 +5916,7 @@ static DRIVER_INIT( raveracw )
 
 	old_coin_state = 0;
 	credits1 = credits2 = 0;
+	stick_input = 0xa;
 }
 
 static DRIVER_INIT( cybrcomm )
