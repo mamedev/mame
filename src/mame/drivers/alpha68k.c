@@ -807,8 +807,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kyros_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_w)
-	AM_RANGE(0x90, 0x91) AM_DEVWRITE("ym3", ym2203_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ym2", ym2203_write_port_w)
+	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ym2", ym2203_control_port_w)
+	AM_RANGE(0x90, 0x90) AM_DEVWRITE("ym3", ym2203_write_port_w)
+	AM_RANGE(0x91, 0x91) AM_DEVWRITE("ym3", ym2203_control_port_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jongbou_sound_portmap, ADDRESS_SPACE_IO, 8 )
