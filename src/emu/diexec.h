@@ -155,8 +155,8 @@ public:
 	bool disabled() const { return m_disabled; }
 
 	// clock and cycle information getters
-	UINT32 clocks_to_cycles(UINT32 clocks) const { return execute_clocks_to_cycles(clocks); }
-	UINT32 cycles_to_clocks(UINT32 cycles) const { return execute_cycles_to_clocks(cycles); }
+	UINT64 clocks_to_cycles(UINT64 clocks) const { return execute_clocks_to_cycles(clocks); }
+	UINT64 cycles_to_clocks(UINT64 cycles) const { return execute_cycles_to_clocks(cycles); }
 	UINT32 min_cycles() const { return execute_min_cycles(); }
 	UINT32 max_cycles() const { return execute_max_cycles(); }
 
@@ -166,8 +166,8 @@ public:
 
 protected:
 	// clock and cycle information getters
-	virtual UINT32 execute_clocks_to_cycles(UINT32 clocks) const;
-	virtual UINT32 execute_cycles_to_clocks(UINT32 cycles) const;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
 	virtual UINT32 execute_min_cycles() const;
 	virtual UINT32 execute_max_cycles() const;
 
@@ -243,11 +243,11 @@ public:
 	UINT64 total_cycles() const;
 
 	// clock and cycle information getters ... pass through to underlying config
-	UINT32 clocks_to_cycles(UINT32 clocks) const { return m_execute_config.clocks_to_cycles(clocks); }
-	UINT32 cycles_to_clocks(UINT32 cycles) const { return m_execute_config.cycles_to_clocks(cycles); }
+	UINT64 clocks_to_cycles(UINT64 clocks) const { return m_execute_config.clocks_to_cycles(clocks); }
+	UINT64 cycles_to_clocks(UINT64 cycles) const { return m_execute_config.cycles_to_clocks(cycles); }
 	UINT32 min_cycles() const { return m_execute_config.min_cycles(); }
 	UINT32 max_cycles() const { return m_execute_config.max_cycles(); }
-	attotime cycles_to_attotime(UINT32 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
+	attotime cycles_to_attotime(UINT64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
 	UINT64 attotime_to_cycles(attotime duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 
 	// input line information getters

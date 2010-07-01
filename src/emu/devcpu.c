@@ -134,7 +134,7 @@ bool legacy_cpu_device_config::device_process_token(UINT32 entrytype, const mach
 //  clock into cycles per second
 //-------------------------------------------------
 
-UINT32 legacy_cpu_device_config::execute_clocks_to_cycles(UINT32 clocks) const
+UINT64 legacy_cpu_device_config::execute_clocks_to_cycles(UINT64 clocks) const
 {
 	UINT32 multiplier = get_legacy_config_int(CPUINFO_INT_CLOCK_MULTIPLIER);
 	UINT32 divider = get_legacy_config_int(CPUINFO_INT_CLOCK_DIVIDER);
@@ -151,7 +151,7 @@ UINT32 legacy_cpu_device_config::execute_clocks_to_cycles(UINT32 clocks) const
 //  count back to raw clocks
 //-------------------------------------------------
 
-UINT32 legacy_cpu_device_config::execute_cycles_to_clocks(UINT32 cycles) const
+UINT64 legacy_cpu_device_config::execute_cycles_to_clocks(UINT64 cycles) const
 {
 	UINT32 multiplier = get_legacy_config_int(CPUINFO_INT_CLOCK_MULTIPLIER);
 	UINT32 divider = get_legacy_config_int(CPUINFO_INT_CLOCK_DIVIDER);

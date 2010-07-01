@@ -437,8 +437,8 @@ protected:
 	virtual bool device_process_token(UINT32 entrytype, const machine_config_token *&tokens);
 
 	// device_config_execute_interface overrides
-	virtual UINT32 execute_clocks_to_cycles(UINT32 clocks) const;
-	virtual UINT32 execute_cycles_to_clocks(UINT32 cycles) const;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
 	virtual UINT32 execute_min_cycles() const { return get_legacy_config_int(CPUINFO_INT_MIN_CYCLES); }
 	virtual UINT32 execute_max_cycles() const { return get_legacy_config_int(CPUINFO_INT_MAX_CYCLES); }
 	virtual UINT32 execute_input_lines() const { return get_legacy_config_int(CPUINFO_INT_INPUT_LINES); }

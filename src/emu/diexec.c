@@ -97,7 +97,7 @@ device_config_execute_interface::~device_config_execute_interface()
 //  of clocks to cycles, rounding down if necessary
 //-------------------------------------------------
 
-UINT32 device_config_execute_interface::execute_clocks_to_cycles(UINT32 clocks) const
+UINT64 device_config_execute_interface::execute_clocks_to_cycles(UINT64 clocks) const
 {
 	return clocks;
 }
@@ -108,7 +108,7 @@ UINT32 device_config_execute_interface::execute_clocks_to_cycles(UINT32 clocks) 
 //  of cycles to clocks, rounding down if necessary
 //-------------------------------------------------
 
-UINT32 device_config_execute_interface::execute_cycles_to_clocks(UINT32 cycles) const
+UINT64 device_config_execute_interface::execute_cycles_to_clocks(UINT64 cycles) const
 {
 	return cycles;
 }
