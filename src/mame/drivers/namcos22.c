@@ -2430,7 +2430,7 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 	}
 #else
 	int i;
-	unsigned sptr = cpu_get_sp(space->cpu);
+	unsigned sptr = downcast<cpu_device *>(space->cpu)->sp();
 	mAlpineSurferProtData = 0;
 	for(i=0;i<4;i++)
 	{

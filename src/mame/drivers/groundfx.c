@@ -443,13 +443,15 @@ ROM_END
 
 static READ32_HANDLER( irq_speedup_r_groundfx )
 {
+	cpu_device *cpu = downcast<cpu_device *>(space->cpu);
 	int ptr;
-	if ((cpu_get_sp(space->cpu)&2)==0) ptr=groundfx_ram[(cpu_get_sp(space->cpu)&0x1ffff)/4];
-	else ptr=(((groundfx_ram[(cpu_get_sp(space->cpu)&0x1ffff)/4])&0x1ffff)<<16) |
-	(groundfx_ram[((cpu_get_sp(space->cpu)&0x1ffff)/4)+1]>>16);
+	offs_t sp = cpu->sp();
+	if ((sp&2)==0) ptr=groundfx_ram[(sp&0x1ffff)/4];
+	else ptr=(((groundfx_ram[(sp&0x1ffff)/4])&0x1ffff)<<16) |
+	(groundfx_ram[((sp&0x1ffff)/4)+1]>>16);
 
-	if (cpu_get_pc(space->cpu)==0x1ece && ptr==0x1b9a)
-		cpu_spinuntil_int(space->cpu);
+	if (cpu->pc()==0x1ece && ptr==0x1b9a)
+		cpu->spin_until_interrupt();
 
 	return groundfx_ram[0xb574/4];
 }

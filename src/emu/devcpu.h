@@ -290,7 +290,6 @@ enum
 #define cpu_get_reg(cpu, _reg)				device_state(cpu)->state_value(_reg)
 #define	cpu_get_previouspc(cpu)				((offs_t)device_state(cpu)->state_value(STATE_GENPCBASE))
 #define	cpu_get_pc(cpu)						((offs_t)device_state(cpu)->state_value(STATE_GENPC))
-#define	cpu_get_sp(cpu)						((offs_t)device_state(cpu)->state_value(STATE_GENSP))
 
 #define cpu_set_reg(cpu, _reg, val)			device_state(cpu)->state_set_value(_reg, val)
 
