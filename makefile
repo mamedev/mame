@@ -215,6 +215,9 @@ BUILD_ZLIB = 1
 # (default is SYMLEVEL = 2 normally; use 1 if you only need backtrace)
 # SYMLEVEL = 2
 
+# uncomment next line to dump the symbols to a .sym file
+# DUMPSYM = 1
+
 # uncomment next line to include profiling information from the compiler
 # PROFILE = 1
 
@@ -296,6 +299,7 @@ CC = @gcc
 LD = @g++
 MD = -mkdir$(EXE)
 RM = @rm -f
+OBJDUMP = @objdump
 
 
 
@@ -695,6 +699,11 @@ $(VERSIONOBJ): $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) $(LIBUTIL) $
 $(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(ZLIB) $(LIBOCORE) $(RESFILE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
+ifeq ($(TARGETOS),win32)
+ifdef SYMBOLS
+	$(OBJDUMP) --section=.text --line-numbers --syms --demangle $@ >$(FULLNAME).sym
+endif
+endif
 
 endif
 

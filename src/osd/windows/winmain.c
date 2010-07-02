@@ -90,6 +90,108 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+template<typename func_ptr>
+class dynamic_bind
+{
+public:
+	// constructor which looks up the function
+	dynamic_bind(const TCHAR *dll, const char *symbol)
+		: m_function(NULL)
+	{
+		HMODULE module = LoadLibrary(dll);
+		if (module != NULL)
+			m_function = reinterpret_cast<func_ptr>(GetProcAddress(module, symbol));
+	}
+
+	// bool to test if the function is NULL or not
+	operator bool() const { return (m_function != NULL); }
+	
+	// dereference to get the underlying pointer
+	func_ptr operator *() const { return m_function; }
+
+private:
+	func_ptr 	m_function;
+};
+
+
+class stack_walker
+{
+public:
+	stack_walker();
+	
+	FPTR ip() const { return m_stackframe.AddrPC.Offset; }
+	FPTR sp() const { return m_stackframe.AddrStack.Offset; }
+	FPTR frame() const { return m_stackframe.AddrFrame.Offset; }
+	
+	void reset(CONTEXT &context, HANDLE thread);
+	bool unwind();
+	
+private:
+	HANDLE			m_process;
+	HANDLE			m_thread;
+	STACKFRAME64	m_stackframe;
+	CONTEXT			m_context;
+	bool			m_first;
+
+	dynamic_bind<BOOL (WINAPI *)(DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64)>
+			m_stack_walk_64;
+	dynamic_bind<BOOL (WINAPI *)(HANDLE, LPCTSTR, BOOL)> m_sym_initialize;
+	dynamic_bind<PVOID (WINAPI *)(HANDLE, DWORD64)> m_sym_function_table_access_64;
+	dynamic_bind<DWORD64 (WINAPI *)(HANDLE, DWORD64)> m_sym_get_module_base_64;
+	
+	static bool		s_initialized;
+};
+
+
+class symbol_manager
+{
+public:
+	// construction/destruction
+	symbol_manager(const char *argv0);
+	~symbol_manager();
+	
+	// getters
+	FPTR last_base() const { return m_last_base; }
+	
+	// core symbol lookup
+	const char *symbol_for_address(FPTR address);
+	const char *symbol_for_address(PVOID address) { return symbol_for_address(reinterpret_cast<FPTR>(address)); }
+
+	// force symbols to be cached
+	void cache_symbols() { scan_file_for_address(0, true); }
+
+private:
+	// internal helpers
+	bool query_system_for_address(FPTR address);
+	void scan_file_for_address(FPTR address, bool create_cache);
+	bool parse_sym_line(const char *line, FPTR &address, astring &symbol);
+	bool parse_map_line(const char *line, FPTR &address, astring &symbol);
+	void scan_cache_for_address(FPTR address);
+	void format_symbol(const char *name, UINT32 displacement, const char *filename = NULL, int linenumber = 0);
+
+	static FPTR get_text_section_base();
+
+	struct cache_entry
+	{
+		cache_entry(FPTR address, const char *symbol) : m_next(NULL), m_address(address), m_name(symbol) { }
+		cache_entry *	m_next;
+		FPTR			m_address;
+		astring			m_name;
+	};
+	cache_entry *	m_cache;
+
+	astring			m_mapfile;
+	astring			m_symfile;
+	astring			m_buffer;
+	HANDLE			m_process;
+	FPTR			m_last_base;
+	FPTR			m_text_base;
+
+	dynamic_bind<BOOL (WINAPI *)(HANDLE, DWORD64, PDWORD64, PSYMBOL_INFO)> m_sym_from_addr;
+	dynamic_bind<BOOL (WINAPI *)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64)> m_sym_get_line_from_addr_64;
+};
+
+
 class sampling_profiler
 {
 public:
@@ -100,7 +202,7 @@ public:
 	void stop();
 
 //	void reset();
-	void print_results();
+	void print_results(symbol_manager &symbols);
 
 private:
 	static DWORD WINAPI thread_entry(LPVOID lpParameter);
@@ -124,24 +226,6 @@ private:
 };
 
 
-typedef BOOL (WINAPI *try_enter_critical_section_ptr)(LPCRITICAL_SECTION lpCriticalSection);
-
-typedef HANDLE (WINAPI *av_set_mm_thread_characteristics_ptr)(LPCTSTR TaskName, LPDWORD TaskIndex);
-typedef HANDLE (WINAPI *av_set_mm_max_thread_characteristics_ptr)(LPCTSTR FirstTask, LPCTSTR SecondTask, LPDWORD TaskIndex);
-typedef BOOL (WINAPI *av_revert_mm_thread_characteristics_ptr)(HANDLE AvrtHandle);
-
-// from dbghelp.dll
-typedef PIMAGE_NT_HEADERS (WINAPI *image_nt_header_ptr)(PVOID ImageBase);
-typedef BOOL (WINAPI *stack_walk_64_ptr)(DWORD MachineType, HANDLE hProcess, HANDLE hThread, LPSTACKFRAME64 StackFrame, PVOID ContextRecord, PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine, PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine, PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine, PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress);
-typedef BOOL (WINAPI *sym_initialize_ptr)(HANDLE hProcess, LPCTSTR UserSearchPath, BOOL fInvadeProcess);
-typedef PVOID (WINAPI *sym_function_table_access_64_ptr)(HANDLE hProcess, DWORD64 AddrBase);
-typedef DWORD64 (WINAPI *sym_get_module_base_64_ptr)(HANDLE hProcess, DWORD64 dwAddr);
-typedef BOOL (WINAPI *sym_from_addr_ptr)(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol);
-typedef BOOL (WINAPI *sym_get_line_from_addr_64_ptr)(HANDLE hProcess, DWORD64 dwAddr, PDWORD pdwDisplacement, PIMAGEHLP_LINE64 Line);
-
-// from psapi.dll
-typedef BOOL (WINAPI *get_module_information_ptr)(HANDLE hProcess, HMODULE hModule, LPMODULEINFO lpmodinfo, DWORD cb);
-
 
 
 //**************************************************************************
@@ -157,23 +241,11 @@ int _CRT_glob = 0;
 //  LOCAL VARIABLES
 //**************************************************************************
 
-static try_enter_critical_section_ptr try_enter_critical_section;
+//static dynamic_bind<HANDLE (WINAPI *)(LPCTSTR, LPDWORD)> av_set_mm_thread_characteristics(TEXT("avrt.dll"), "AvSetMmThreadCharacteristics" UNICODE_POSTFIX);
+//static dynamic_bind<HANDLE (WINAPI *)(LPCTSTR, LPCTSTR, LPDWORD)> av_set_mm_max_thread_characteristics(TEXT("avrt.dll"), "AvSetMmMaxThreadCharacteristics" UNICODE_POSTFIX);
+//static dynamic_bind<BOOL (WINAPI *)(HANDLE)> av_revert_mm_thread_characteristics(TEXT("avrt.dll"), "AvRevertMmThreadCharacteristics");
 
-static av_set_mm_thread_characteristics_ptr av_set_mm_thread_characteristics;
-static av_set_mm_max_thread_characteristics_ptr av_set_mm_max_thread_characteristics;
-static av_revert_mm_thread_characteristics_ptr av_revert_mm_thread_characteristics;
 
-static image_nt_header_ptr image_nt_header;
-static stack_walk_64_ptr stack_walk_64;
-static sym_initialize_ptr sym_initialize;
-static sym_function_table_access_64_ptr sym_function_table_access_64;
-static sym_get_module_base_64_ptr sym_get_module_base_64;
-static sym_from_addr_ptr sym_from_addr;
-static sym_get_line_from_addr_64_ptr sym_get_line_from_addr_64;
-
-static get_module_information_ptr get_module_information;
-
-static char mapfile_name[MAX_PATH];
 static LPTOP_LEVEL_EXCEPTION_FILTER pass_thru_filter;
 
 static HANDLE watchdog_reset_event;
@@ -194,7 +266,9 @@ static int timeresult;
 static TIMECAPS caps;
 
 static sampling_profiler *profiler = NULL;
+static symbol_manager *symbols = NULL;
 
+bool stack_walker::s_initialized = false;
 
 
 //**************************************************************************
@@ -203,11 +277,9 @@ static sampling_profiler *profiler = NULL;
 
 static void osd_exit(running_machine &machine);
 
-static void soft_link_functions(void);
 static int is_double_click_start(int argc);
 static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter);
 static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info);
-static const char *lookup_symbol(FPTR address, FPTR *symbase = NULL, bool cache = false);
 static void winui_output_error(void *param, const char *format, va_list argptr);
 
 
@@ -312,31 +384,11 @@ inline FPTR ip_from_context(CONTEXT &context)
 {
 	return context.Rip;
 }
-inline void init_stack_frame(STACKFRAME64 &frame, CONTEXT &context)
-{
-	memset(&frame, 0, sizeof(frame));
-	frame.AddrPC.Offset = context.Rip;
-	frame.AddrPC.Mode = AddrModeFlat;
-	frame.AddrFrame.Offset = context.Rsp;
-	frame.AddrFrame.Mode = AddrModeFlat;
-	frame.AddrStack.Offset = context.Rsp;
-	frame.AddrStack.Mode = AddrModeFlat;
-}
 #else
 #define IMAGE_FILE_MACHINE_NATIVE IMAGE_FILE_MACHINE_I386
 inline FPTR ip_from_context(CONTEXT &context)
 {
 	return context.Eip;
-}
-inline void init_stack_frame(STACKFRAME64 &frame, CONTEXT &context)
-{
-	memset(&frame, 0, sizeof(frame));
-	frame.AddrPC.Offset = context.Eip;
-	frame.AddrPC.Mode = AddrModeFlat;
-	frame.AddrFrame.Offset = context.Esp;
-	frame.AddrFrame.Mode = AddrModeFlat;
-	frame.AddrStack.Offset = context.Esp;
-	frame.AddrStack.Mode = AddrModeFlat;
 }
 #endif
 
@@ -353,10 +405,11 @@ inline void init_stack_frame(STACKFRAME64 &frame, CONTEXT &context)
 
 int main(int argc, char *argv[])
 {
-	char *ext;
-
 	// initialize common controls
 	InitCommonControls();
+
+	// allocate symbols
+	symbols = global_alloc(symbol_manager(argv[0]));
 
 	// set up exception handling
 	pass_thru_filter = SetUnhandledExceptionFilter(exception_filter);
@@ -372,19 +425,12 @@ int main(int argc, char *argv[])
 		FreeConsole();
 	}
 
-	// soft-link optional functions
-	soft_link_functions();
-
-	// compute the name of the mapfile
-	strcpy(mapfile_name, argv[0]);
-	ext = strchr(mapfile_name, '.');
-	if (ext != NULL)
-		strcpy(ext, ".map");
-	else
-		strcat(mapfile_name, ".map");
-
 	// parse config and cmdline options
-	return cli_execute(argc, argv, mame_win_options);
+	DWORD result = cli_execute(argc, argv, mame_win_options);
+
+	// free symbols
+	global_free(symbols);
+	return result;
 }
 
 
@@ -519,12 +565,12 @@ static void osd_exit(running_machine &machine)
 	if (profiler != NULL)
 	{
 		profiler->stop();
-		profiler->print_results();
+		profiler->print_results(*symbols);
 		global_free(profiler);
 	}
-
+	
 	// turn off our multimedia tasks
-//      if (av_revert_mm_thread_characteristics != NULL)
+//      if (av_revert_mm_thread_characteristics)
 //          (*av_revert_mm_thread_characteristics)(mm_task);
 
 	// restore the timer resolution
@@ -533,49 +579,6 @@ static void osd_exit(running_machine &machine)
 
 	// one last pass at events
 	winwindow_process_events(&machine, 0);
-}
-
-
-
-//============================================================
-//  soft_link_functions
-//============================================================
-
-static void soft_link_functions(void)
-{
-	HMODULE library;
-
-	// see if we can use TryEnterCriticalSection
-	library = LoadLibrary(TEXT("kernel32.dll"));
-	if (library != NULL)
-		try_enter_critical_section = (try_enter_critical_section_ptr)GetProcAddress(library, "TryEnterCriticalSection");
-
-	// see if we can use the multimedia scheduling functions in Vista
-	library = LoadLibrary(TEXT("avrt.dll"));
-	if (library != NULL)
-	{
-		av_set_mm_thread_characteristics = (av_set_mm_thread_characteristics_ptr)GetProcAddress(library, "AvSetMmThreadCharacteristics" UNICODE_POSTFIX);
-		av_set_mm_max_thread_characteristics = (av_set_mm_max_thread_characteristics_ptr)GetProcAddress(library, "AvSetMmMaxThreadCharacteristics" UNICODE_POSTFIX);
-		av_revert_mm_thread_characteristics = (av_revert_mm_thread_characteristics_ptr)GetProcAddress(library, "AvRevertMmThreadCharacteristics");
-	}
-
-	// psapi helpers (not available in win9x)
-	library = LoadLibrary(TEXT("psapi.dll"));
-	if (library != NULL)
-		get_module_information = (get_module_information_ptr)GetProcAddress(library, "GetModuleInformation");
-
-	// dbghelp helpers
-	library = LoadLibrary(TEXT("dbghelp.dll"));
-	if (library != NULL)
-	{
-		image_nt_header = (image_nt_header_ptr)GetProcAddress(library, "ImageNtHeader");
-		stack_walk_64 = (stack_walk_64_ptr)GetProcAddress(library, "StackWalk64");
-		sym_initialize = (sym_initialize_ptr)GetProcAddress(library, "SymInitialize");
-		sym_function_table_access_64 = (sym_function_table_access_64_ptr)GetProcAddress(library, "SymFunctionTableAccess64");
-		sym_get_module_base_64 = (sym_get_module_base_64_ptr)GetProcAddress(library, "SymGetModuleBase64");
-		sym_from_addr = (sym_from_addr_ptr)GetProcAddress(library, "SymFromAddr");
-		sym_get_line_from_addr_64 = (sym_get_line_from_addr_64_ptr)GetProcAddress(library, "SymGetLineFromAddr64");
-	}
 }
 
 
@@ -699,7 +702,7 @@ static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info)
 	// print the exception type and address
 	fprintf(stderr, "\n-----------------------------------------------------\n");
 	fprintf(stderr, "Exception at EIP=%p%s: %s\n", info->ExceptionRecord->ExceptionAddress,
-			lookup_symbol((FPTR)info->ExceptionRecord->ExceptionAddress), exception_table[i].string);
+			symbols->symbol_for_address((FPTR)info->ExceptionRecord->ExceptionAddress), exception_table[i].string);
 
 	// for access violations, print more info
 	if (info->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
@@ -743,40 +746,378 @@ static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info)
 			(void *)info->ContextRecord->Esp);
 #endif
 
-	if (image_nt_header != NULL &&
-		stack_walk_64 != NULL &&
-		sym_initialize != NULL &&
-		sym_function_table_access_64 != NULL &&
-		sym_get_module_base_64 != NULL &&
-		sym_from_addr != NULL &&
-		get_module_information != NULL)
-	{
-		CONTEXT context = *info->ContextRecord;
-		STACKFRAME64 stackframe;
+	stack_walker walker;
+	walker.reset(*info->ContextRecord, GetCurrentThread());
 
-		// initialize the symbol lookup
-		sym_initialize(GetCurrentProcess(), NULL, TRUE);
+	// reprint the actual exception address
+	fprintf(stderr, "-----------------------------------------------------\n");
+	fprintf(stderr, "Stack crawl:\n");
 
-		// reprint the actual exception address
-		fprintf(stderr, "-----------------------------------------------------\n");
-		fprintf(stderr, "Stack crawl:\n");
-
-		// walk the stack
-		init_stack_frame(stackframe, context);
-		while (stack_walk_64(IMAGE_FILE_MACHINE_NATIVE, GetCurrentProcess(), GetCurrentThread(), &stackframe, &context, NULL, sym_function_table_access_64, sym_get_module_base_64, NULL))
-			fprintf(stderr, "  %p: %p%s\n", (void *)stackframe.AddrFrame.Offset, (void *)stackframe.AddrPC.Offset, lookup_symbol((FPTR)stackframe.AddrPC.Offset));
-	}
+	// walk the stack
+	while (walker.unwind())
+		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), symbols->symbol_for_address(walker.ip()));
 
 	// exit
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 
-//============================================================
-//  line_to_symbol
-//============================================================
 
-static const char *line_to_symbol(const char *line, FPTR &address)
+//**************************************************************************
+//  STACK WALKER
+//**************************************************************************
+
+//-------------------------------------------------
+//  stack_walker - constructor
+//-------------------------------------------------
+
+stack_walker::stack_walker()
+	: m_process(GetCurrentProcess()),
+	  m_thread(GetCurrentThread()),
+	  m_first(true),
+	  m_stack_walk_64(TEXT("dbghelp.dll"), "StackWalk64"),
+	  m_sym_initialize(TEXT("dbghelp.dll"), "SymInitialize"),
+	  m_sym_function_table_access_64(TEXT("dbghelp.dll"), "SymFunctionTableAccess64"),
+	  m_sym_get_module_base_64(TEXT("dbghelp.dll"), "SymGetModuleBase64")
+{
+	// zap the structs
+	memset(&m_stackframe, 0, sizeof(m_stackframe));
+	memset(&m_context, 0, sizeof(m_context));
+
+	// initialize the symbols
+	if (!s_initialized && m_sym_initialize && m_stack_walk_64 && m_sym_function_table_access_64 && m_sym_get_module_base_64)
+	{
+		(*m_sym_initialize)(m_process, NULL, TRUE);
+		s_initialized = true;
+	}
+}
+
+
+//-------------------------------------------------
+//  reset - set up a new context
+//-------------------------------------------------
+
+void stack_walker::reset(CONTEXT &initial, HANDLE thread)
+{
+	// set up the initial state
+	m_context = initial;
+	m_thread = thread;
+	m_first = true;
+
+	// initialize the stackframe
+	memset(&m_stackframe, 0, sizeof(m_stackframe));
+	m_stackframe.AddrPC.Mode = AddrModeFlat;
+	m_stackframe.AddrFrame.Mode = AddrModeFlat;
+	m_stackframe.AddrStack.Mode = AddrModeFlat;
+	
+	// pull architecture-specific fields from the context
+#ifdef PTR64
+	m_stackframe.AddrPC.Offset = m_context.Rip;
+	m_stackframe.AddrFrame.Offset = m_context.Rsp;
+	m_stackframe.AddrStack.Offset = m_context.Rsp;
+#else
+	m_stackframe.AddrPC.Offset = m_context.Eip;
+	m_stackframe.AddrFrame.Offset = m_context.Ebp;
+	m_stackframe.AddrStack.Offset = m_context.Esp;
+#endif
+}
+
+
+//-------------------------------------------------
+//  unwind - unwind a single level
+//-------------------------------------------------
+
+bool stack_walker::unwind()
+{
+	// if we were able to initialize, then we have everything we need
+	if (s_initialized)
+		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_NATIVE, m_process, m_thread, &m_stackframe, &m_context, NULL, *m_sym_function_table_access_64, *m_sym_get_module_base_64, NULL);
+
+	// otherwise, fake the first unwind, which will just return info from the context
+	else
+	{
+		bool result = m_first;
+		m_first = false;
+		return result;
+	}
+}
+
+
+
+//**************************************************************************
+//  SYMBOL MANAGER
+//**************************************************************************
+
+//-------------------------------------------------
+//  symbol_manager - constructor
+//-------------------------------------------------
+
+symbol_manager::symbol_manager(const char *argv0)
+	: m_cache(NULL),
+	  m_mapfile(argv0),
+	  m_symfile(argv0),
+	  m_process(GetCurrentProcess()),
+	  m_last_base(0),
+	  m_text_base(0),
+	  m_sym_from_addr(TEXT("dbghelp.dll"), "SymFromAddr"),
+	  m_sym_get_line_from_addr_64(TEXT("dbghelp.dll"), "SymGetLineFromAddr64")
+{
+#ifdef __GNUC__
+	// compute the name of the mapfile
+	int extoffs = m_mapfile.rchr(0, '.');
+	if (extoffs != -1)
+		m_mapfile.substr(0, extoffs);
+	m_mapfile.cat(".map");
+	
+	// and the name of the symfile
+	extoffs = m_symfile.rchr(0, '.');
+	if (extoffs != -1)
+		m_symfile.substr(0, extoffs);
+	m_symfile.cat(".sym");
+
+	// figure out the base of the .text section
+	m_text_base = get_text_section_base();
+#endif
+
+	// expand the buffer to be decently large up front
+	m_buffer.printf("%500s", "");
+}
+
+
+//-------------------------------------------------
+//  ~symbol_manager - destructor
+//-------------------------------------------------
+
+symbol_manager::~symbol_manager()
+{
+	// clean up the cache
+	while (m_cache != NULL)
+	{
+		cache_entry *entry = m_cache;
+		m_cache = entry->m_next;
+		global_free(entry);
+	}
+}
+
+
+//-------------------------------------------------
+//  symbol_for_address - return a symbol by looking
+//  it up either in the cache or by scanning the
+//  file
+//-------------------------------------------------
+
+const char *symbol_manager::symbol_for_address(FPTR address)
+{
+	// default the buffer
+	m_buffer.cpy(" (not found)");
+	m_last_base = 0;
+
+	// first try to do it using system APIs
+	if (!query_system_for_address(address))
+	{
+		// if that fails, scan the cache if we have one
+		if (m_cache != NULL)
+			scan_cache_for_address(address);
+			
+		// or else try to open a sym/map file and find it there
+		else
+			scan_file_for_address(address, false);
+	}
+	return m_buffer;
+}
+
+
+//-------------------------------------------------
+//  query_system_for_address - ask the system to
+//  look up our address
+//-------------------------------------------------
+
+bool symbol_manager::query_system_for_address(FPTR address)
+{
+	// need at least the sym_from_addr API
+	if (m_sym_from_addr == NULL)
+		return false;
+
+	BYTE info_buffer[sizeof(SYMBOL_INFO) + 256] = { 0 };
+	SYMBOL_INFO &info = *reinterpret_cast<SYMBOL_INFO *>(&info_buffer[0]);
+	DWORD64 displacement;
+
+	// even through the struct says TCHAR, we actually get back an ANSI string here
+	info.SizeOfStruct = sizeof(info);
+	info.MaxNameLen = sizeof(info_buffer) - sizeof(info);
+	if ((*m_sym_from_addr)(m_process, address, &displacement, &info))
+	{
+		// try to get source info as well; again we are returned an ANSI string
+		IMAGEHLP_LINE64 lineinfo = { sizeof(lineinfo) };
+		DWORD linedisp;
+		if (m_sym_get_line_from_addr_64 != NULL && (*m_sym_get_line_from_addr_64)(m_process, address, &linedisp, &lineinfo))
+			format_symbol(info.Name, displacement, lineinfo.FileName, lineinfo.LineNumber);
+		else
+			format_symbol(info.Name, displacement);
+
+		// set the last base
+		m_last_base = address - displacement;
+		return true;
+	}
+	return false;
+}
+
+
+//-------------------------------------------------
+//  scan_file_for_address - walk either the map
+//  or symbol files and find the best match for
+//  the given address, optionally creating a cache
+//  along the way
+//-------------------------------------------------
+
+void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
+{
+	bool is_symfile = false;
+	FILE *srcfile = NULL;
+	
+#ifdef __GNUC__
+	// see if we have a symbol file (gcc only)
+	srcfile = fopen(m_symfile, "r");
+	is_symfile = (srcfile != NULL);
+#endif
+	
+	// if not, see if we have a map file
+	if (srcfile == NULL)
+		srcfile = fopen(m_mapfile, "r");
+
+	// if not, fail
+	if (srcfile == NULL)
+		return;
+
+	// reset the best info
+	astring best_symbol;
+	FPTR best_addr = 0;
+
+	// parse the file, looking for valid entries
+	cache_entry **tailptr = &m_cache;
+	astring symbol;
+	char line[1024];
+	while (fgets(line, sizeof(line) - 1, srcfile))
+	{
+		// parse the line looking for an interesting symbol
+		FPTR addr;
+		bool valid = is_symfile ? parse_sym_line(line, addr, symbol) : parse_map_line(line, addr, symbol);
+
+		// if we got one, see if this is the best
+		if (valid)
+		{
+			// if this is the best one so far, remember it
+			if (addr <= address && addr > best_addr)
+			{
+				best_addr = addr;
+				best_symbol = symbol;
+			}
+			
+			// also create a cache entry if we can
+			if (create_cache)
+			{
+				*tailptr = global_alloc(cache_entry(addr, symbol));
+				tailptr = &(*tailptr)->m_next;
+			}
+		}
+	}
+	
+	// close the file
+	fclose(srcfile);
+	
+	// format the symbol and remember the last base
+	format_symbol(best_symbol, address - best_addr);
+	m_last_base = best_addr;
+}
+
+
+//-------------------------------------------------
+//  scan_cache_for_address - walk the cache to
+//  find the best match for the given address
+//-------------------------------------------------
+
+void symbol_manager::scan_cache_for_address(FPTR address)
+{
+	// reset the best info
+	astring best_symbol;
+	FPTR best_addr = 0;
+	
+	// walk the cache, looking for valid entries
+	for (cache_entry *entry = m_cache; entry != NULL; entry = entry->m_next)
+	
+		// if this is the best one so far, remember it
+		if (entry->m_address <= address && entry->m_address > best_addr)
+		{
+			best_addr = entry->m_address;
+			best_symbol = entry->m_name;
+		}
+	
+	// format the symbol and remember the last base
+	format_symbol(best_symbol, address - best_addr);
+	m_last_base = best_addr;
+}
+
+
+//-------------------------------------------------
+//  parse_sym_line - parse a line from a sym file
+//  which is just the output of objdump
+//-------------------------------------------------
+
+bool symbol_manager::parse_sym_line(const char *line, FPTR &address, astring &symbol)
+{
+#ifdef __GNUC__
+/*
+	32-bit gcc symbol line:
+[271778](sec  1)(fl 0x00)(ty  20)(scl   3) (nx 0) 0x007df675 line_to_symbol(char const*, unsigned int&, bool)
+
+	64-bit gcc symbol line:
+[271775](sec  1)(fl 0x00)(ty  20)(scl   3) (nx 0) 0x00000000008dd1e9 line_to_symbol(char const*, unsigned long long&, bool)
+*/
+	
+	// first look for a (ty) entry
+	const char *type = strstr(line, "(ty  20)");
+	if (type == NULL)
+		return false;
+
+	// scan forward in the line to find the address
+	bool in_parens = false;
+	for (const char *chptr = type; *chptr != 0; chptr++)
+	{
+		// track open/close parentheses
+		if (*chptr == '(')
+			in_parens = true;
+		else if (*chptr == ')')
+			in_parens = false;
+		
+		// otherwise, look for an 0x address
+		else if (!in_parens && *chptr == '0' && chptr[1] == 'x')
+		{
+			// make sure we can get an address
+			void *temp;
+			if (sscanf(chptr, "0x%p", &temp) != 1)
+				return false;
+			address = m_text_base + reinterpret_cast<FPTR>(temp);
+			
+			// skip forward until we're past the space
+			while (*chptr != 0 && !isspace(*chptr))
+				chptr++;
+			
+			// extract the symbol name
+			symbol.cpy(chptr).trimspace();
+			return (symbol.len() > 0);
+		}
+	}
+#endif
+	return false;
+}
+
+
+//-------------------------------------------------
+//  parse_map_line - parse a line from a linker-
+//  generated map file
+//-------------------------------------------------
+
+bool symbol_manager::parse_map_line(const char *line, FPTR &address, astring &symbol)
 {
 #ifdef __GNUC__
 /*
@@ -786,165 +1127,79 @@ static const char *line_to_symbol(const char *line, FPTR &address)
     64-bit gcc map line:
                 0x0000000000961afc                nbmj9195_palette_r(_address_space const*, unsigned int)
 */
-	char symbol[1024];
-	void *temp;
 
 	// find a matching start
 	if (strncmp(line, "                0x", 18) == 0)
-		if (sscanf(line, " 0x%p %s", &temp, symbol) == 2)
-			if (symbol[0] != '0' && symbol[1] != 'x')
-			{
-				address = reinterpret_cast<FPTR>(temp);
-				return strstr(line, symbol);
-			}
+	{
+		// make sure we can get an address
+		void *temp;
+		if (sscanf(&line[16], "0x%p", &temp) != 1)
+			return false;
+		address = reinterpret_cast<FPTR>(temp);
+		
+		// skip forward until we're past the space
+		const char *chptr = &line[16];
+		while (*chptr != 0 && !isspace(*chptr))
+			chptr++;
+		
+		// extract the symbol name
+		symbol.cpy(chptr).trimspace();
+		return (symbol.len() > 0);
+	}
 #endif
-
-#ifdef _MSC_VER
-/*
-    32-bit MSVC map line:
- 0001:00387890       ?nbmj9195_palette_r@@YAEPBU_address_space@@I@Z 00788890 f   nichibut:nbmj9195.o
-
-    64-bit MSVC map line:
- 0001:004d7510       ?nbmj9195_palette_r@@YAEPEBU_address_space@@I@Z 00000001404d8510 f   nichibut:nbmj9195.o
-*/
-	static char symbol[1024];
-	int dummy1, dummy2;
-	void *temp;
-
-	symbol[0] = 0;
-	if (line[0] == ' ' && line[5] == ':')
-		if (sscanf(line, " %04x:%08x %s %p", &dummy1, &dummy2, symbol, &temp) == 4)
-		{
-			address = reinterpret_cast<FPTR>(temp);
-			return symbol;
-		}
-#endif
-
-	// nope, not a symbol line
-	return NULL;
+	return false;
 }
 
 
-//============================================================
-//  lookup_symbol
-//============================================================
+//-------------------------------------------------
+//  format_symbol - common symbol formatting
+//-------------------------------------------------
 
-static const char *lookup_symbol(FPTR address, FPTR *symbase, bool cache)
+void symbol_manager::format_symbol(const char *name, UINT32 displacement, const char *filename, int linenumber)
+{		
+	// start with the address and offset
+	m_buffer.printf(" (%s", name);
+	if (displacement != 0)
+		m_buffer.catprintf("+0x%04x", (UINT32)displacement);
+
+	// append file/line if present
+	if (filename != NULL)
+		m_buffer.catprintf(", %s:%d", filename, linenumber);
+
+	// close up the string
+	m_buffer.cat(")");
+}
+		
+
+//-------------------------------------------------
+//  get_text_section_base - figure out the base
+//  of the .text section
+//-------------------------------------------------
+
+FPTR symbol_manager::get_text_section_base()
 {
-	struct symbol_entry
+	dynamic_bind<PIMAGE_SECTION_HEADER (WINAPI *)(PIMAGE_NT_HEADERS, PVOID, ULONG)> image_rva_to_section(TEXT("dbghelp.dll"), "ImageRvaToSection");
+	dynamic_bind<PIMAGE_NT_HEADERS (WINAPI *)(PVOID)> image_nt_header(TEXT("dbghelp.dll"), "ImageNtHeader");
+
+	// start with the image base
+	PVOID base = reinterpret_cast<PVOID>(GetModuleHandle(NULL));
+	assert(base != NULL);
+	
+	// make sure we have the functions we need
+	if (image_nt_header != NULL && image_rva_to_section != NULL)
 	{
-		symbol_entry *next;
-		FPTR address;
-		char name[1];
-	};
-	static symbol_entry *symbol_cache;
-	static char buffer[1024];
-
-	// first try to do it formally
-	BYTE info_buffer[sizeof(SYMBOL_INFO) + 256];
-	SYMBOL_INFO &info = *reinterpret_cast<SYMBOL_INFO *>(&info_buffer[0]);
-	DWORD64 displacement;
-
-	// even through the struct says TCHAR, we actually get back an ANSI string here
-	memset(info_buffer, 0, sizeof(info_buffer));
-	info.SizeOfStruct = sizeof(info);
-	info.MaxNameLen = sizeof(info_buffer) - sizeof(info);
-	if (sym_from_addr(GetCurrentProcess(), address, &displacement, &info))
-	{
-		IMAGEHLP_LINE64 lineinfo = { sizeof(lineinfo) };
-		DWORD linedisp;
-
-		// try to get source info as well; again we are returned an ANSI string
-		if (sym_get_line_from_addr_64 != NULL && sym_get_line_from_addr_64(GetCurrentProcess(), address, &linedisp, &lineinfo))
-		{
-			if (displacement != 0)
-				sprintf(buffer, " (%s+0x%04x, %s:%d)", info.Name, (UINT32)displacement, lineinfo.FileName, (int)lineinfo.LineNumber);
-			else
-				sprintf(buffer, " (%s, %s:%d)", info.Name, lineinfo.FileName, (int)lineinfo.LineNumber);
-		}
-		else
-		{
-			if (displacement != 0)
-				sprintf(buffer, " (%s+0x%04x)", info.Name, (UINT32)displacement);
-			else
-				sprintf(buffer, " (%s)", info.Name);
-		}
+		// get the NT header
+		PIMAGE_NT_HEADERS headers = (*image_nt_header)(base);
+		assert(headers != NULL);
 		
-		// set the symbase
-		if (symbase != NULL)
-			*symbase = address - displacement;
-		return buffer;
+		// look ourself up (assuming we are in the .text section)
+		PIMAGE_SECTION_HEADER section = (*image_rva_to_section)(headers, base, reinterpret_cast<FPTR>(get_text_section_base) - reinterpret_cast<FPTR>(base));
+		if (section != NULL)
+			return reinterpret_cast<FPTR>(base) + section->VirtualAddress;
 	}
 	
-	// reset the bests
-	astring best_symbol;
-	FPTR best_addr = 0;
-
-	// if we have a cache, look it up there
-	if (symbol_cache != NULL)
-	{
-		// scan the cache looking for the best match
-		for (symbol_entry *cursym = symbol_cache; cursym != NULL; cursym = cursym->next)
-			if (cursym->address <= address && cursym->address > best_addr)
-			{
-				best_addr = cursym->address;
-				best_symbol.cpy(cursym->name);
-			}
-	}
-	
-	// otherwise, walk the map file, generating a cache if we are allowed to
-	else
-	{
-		symbol_entry **tailptr = &symbol_cache;
-		
-		// see if we have a map file
-		FILE *map = fopen(mapfile_name, "r");
-		if (map == NULL)
-			return " (no map)";
-
-		// parse the file, looking for map entries
-		char line[1024];
-		while (fgets(line, sizeof(line) - 1, map))
-		{
-			FPTR addr;
-			const char *symbol = line_to_symbol(line, addr);
-			
-			// if we got one, see if this is the best
-			if (symbol != NULL)
-			{
-				if (addr <= address && addr > best_addr)
-				{
-					best_addr = addr;
-					best_symbol.cpy(symbol);
-				}
-				
-				// also create a cache entry if we can
-				if (cache)
-				{
-					symbol_entry *entry = reinterpret_cast<symbol_entry *>(osd_malloc(sizeof(symbol_entry) + strlen(symbol)));
-					entry->next = NULL;
-					entry->address = addr;
-					strcpy(entry->name, symbol);
-					*tailptr = entry;
-					tailptr = &entry->next;
-				}
-			}
-		}
-		fclose(map);
-	}
-		
-	// generate the string
-	if (address - best_addr > 0x10000)
-		strcpy(buffer, " (unknown)");\
-	else if (address != best_addr)
-		sprintf(buffer, " (%s+0x%04x)", best_symbol.trimspace().cstr(), (UINT32)(address - best_addr));
-	else
-		sprintf(buffer, " (%s)", best_symbol.trimspace().cstr());
-
-	// set the symbase
-	if (symbase != NULL)
-		*symbase = best_addr;
-	return buffer;
+	// fallback to returning the image base (wrong)
+	return reinterpret_cast<FPTR>(base);
 }
 
 
@@ -962,7 +1217,7 @@ sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
 	  m_thread_id(0),
 	  m_thread_exit(false),
 	  m_stack_depth(stack_depth),
-	  m_entry_stride(stack_depth + 3),
+	  m_entry_stride(stack_depth + 2),
 	  m_max_seconds(max_seconds),
 	  m_buffer(global_alloc(FPTR[max_seconds * 1000 * m_entry_stride])),
 	  m_buffer_ptr(m_buffer),
@@ -987,20 +1242,6 @@ sampling_profiler::~sampling_profiler()
 
 void sampling_profiler::start()
 {
-	// fail if we don't have everything we need
-	if (m_stack_depth > 0 &&
-		(stack_walk_64 == NULL ||
-		 sym_initialize == NULL ||
-		 sym_function_table_access_64 == NULL ||
-		 sym_get_module_base_64 == NULL ||
-		 sym_from_addr == NULL ||
-		 get_module_information == NULL))
-	{
-		mame_printf_warning("Unable to start profiler because not all needed APIs are available\n");
-		m_stack_depth = 0;
-		m_entry_stride = 3;
-	}
-		
 	// do the dance to get a handle to ourself
 	BOOL result = DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &m_target_thread,
 			THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
@@ -1044,7 +1285,7 @@ int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *
 	const FPTR *entry2 = reinterpret_cast<const FPTR *>(item2);
 	int mincount = MIN(entry1[0], entry2[0]);
 
-	// sort in order of: bucket, EIP, caller, caller's caller, etc.	
+	// sort in order of: bucket, caller, caller's caller, etc.	
 	for (int index = 1; index <= mincount; index++)
 		if (entry1[index] != entry2[index])
 			return entry1[index] - entry2[index];
@@ -1075,17 +1316,19 @@ int CLIB_DECL sampling_profiler::compare_frequency(const void *item1, const void
 //  print_results - output the results
 //-------------------------------------------------
 
-void sampling_profiler::print_results()
+void sampling_profiler::print_results(symbol_manager &symbols)
 {
+	// cache the symbols
+	symbols.cache_symbols();
+
 	// step 1: find the base of each entry
 	for (FPTR *current = m_buffer; current < m_buffer_ptr; current += m_entry_stride)
 	{
-		assert(current[0] >= 2 && current[0] < m_entry_stride);
-		assert(current[1] == 0);
+		assert(current[0] >= 1 && current[0] < m_entry_stride);
 		
-		// entry[1] has the PC address; use lookup_symbol to get the base of the function
-		// and use that as our bucket
-		lookup_symbol(current[2], &current[1], true);
+		// convert the sampled PC to its function base as a bucket
+		symbols.symbol_for_address(current[1]);
+		current[1] = symbols.last_base();
 	}
 	
 	// step 2: sort the results
@@ -1121,12 +1364,12 @@ void sampling_profiler::print_results()
 			break;
 		
 		// output the result
-		printf("%4.1f%% - %6d : %p%s\n", (double)current[0] * 100.0 / (double)total_count, (UINT32)current[0], reinterpret_cast<void *>(current[1]), lookup_symbol(current[1]));
-		for (int index = 3; index < m_entry_stride; index++)
+		printf("%4.1f%% - %6d : %p%s\n", (double)current[0] * 100.0 / (double)total_count, (UINT32)current[0], reinterpret_cast<void *>(current[1]), symbols.symbol_for_address(current[1]));
+		for (int index = 2; index < m_entry_stride; index++)
 		{
 			if (current[index] == 0)
 				break;
-			printf("                 %p%s\n", reinterpret_cast<void *>(current[index]), lookup_symbol(current[index]));
+			printf("                 %p%s\n", reinterpret_cast<void *>(current[index]), symbols.symbol_for_address(current[index]));
 		}
 		printf("\n");
 		num_printed++;
@@ -1154,11 +1397,8 @@ void sampling_profiler::thread_run()
 	CONTEXT context;
 	memset(&context, 0, sizeof(context));
 
-	// initialize the symbol lookup
-	HANDLE process = GetCurrentProcess();
-	sym_initialize(process, NULL, TRUE);
-
 	// loop until done
+	stack_walker walker;
 	while (!m_thread_exit && m_buffer_ptr < m_buffer_end)
 	{
 		// pause the main thread and get its context
@@ -1166,32 +1406,22 @@ void sampling_profiler::thread_run()
 		context.ContextFlags = CONTEXT_FULL;
 		GetThreadContext(m_target_thread, &context);
 		
-		// store an initial entry count plus a NULL (used later) and the EIP
-		FPTR *count = m_buffer_ptr;
-		*m_buffer_ptr++ = 2;
-		*m_buffer_ptr++ = 0;
-		*m_buffer_ptr++ = ip_from_context(context);
-		
-		// now unwind the requested number of frames
-		if (m_stack_depth > 0)
+		// first entry is a count
+		FPTR *count = m_buffer_ptr++;
+		*count = 0;
+	
+		// iterate over the frames until we run out or hit an error
+		walker.reset(context, m_target_thread);
+		int frame;
+		for (frame = 0; frame <= m_stack_depth && walker.unwind(); frame++)
 		{
-			STACKFRAME64 stackframe;
-			init_stack_frame(stackframe, context);
-		
-			// iterate over the frames until we hit an error
-			int frame;
-			for (frame = 0; frame < m_stack_depth; frame++)
-			{
-				if (!stack_walk_64(IMAGE_FILE_MACHINE_NATIVE, process, m_target_thread, &stackframe, &context, NULL, sym_function_table_access_64, sym_get_module_base_64, NULL))
-					break;
-				*m_buffer_ptr++ = stackframe.AddrPC.Offset;
-				*count += 1;
-			}
-			
-			// fill in any missing parts with NULLs
-			for (; frame < m_stack_depth; frame++)
-				*m_buffer_ptr++ = 0;
+			*m_buffer_ptr++ = walker.ip();
+			*count += 1;
 		}
+		
+		// fill in any missing parts with NULLs
+		for (; frame <= m_stack_depth; frame++)
+			*m_buffer_ptr++ = 0;
 			
 		// resume the thread
 		ResumeThread(m_target_thread);
