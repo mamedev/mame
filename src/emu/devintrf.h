@@ -106,6 +106,8 @@ class device_config;
 class device_config_interface;
 class device_t;
 class device_interface;
+class device_execute_interface;
+class device_state_interface;
 struct rom_entry;
 union machine_config_token;
 class machine_config;
@@ -365,13 +367,17 @@ public:
 
 	// interface helpers
 	template<class T> bool interface(T *&intf) { intf = dynamic_cast<T *>(this); return (intf != NULL); }
-	template<class T> bool next(T *&intf) const
+	template<class T> bool next(T *&intf)
 	{
 		for (device_t *cur = m_next; cur != NULL; cur = cur->m_next)
 			if (cur->interface(intf))
 				return true;
 		return false;
 	}
+	
+	// specialized helpers
+	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != NULL); }
+	bool interface(device_state_interface *&intf) { intf = m_state; return (intf != NULL); }
 
 	// owned object helpers
 	astring &subtag(astring &dest, const char *tag) const { return m_baseconfig.subtag(dest, tag); }
@@ -430,6 +436,10 @@ protected:
 	//------------------- end derived class overrides
 
 	running_machine &		m_machine;
+	
+	// for speed
+	device_execute_interface *m_execute;
+	device_state_interface *m_state;
 
 	// device relationships
 	device_t *				m_next;					// next device (of any type/class)

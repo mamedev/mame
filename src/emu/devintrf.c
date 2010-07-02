@@ -683,6 +683,8 @@ void device_interface::interface_debug_setup()
 device_t::device_t(running_machine &_machine, const device_config &config)
 	: machine(&_machine),
 	  m_machine(_machine),
+	  m_execute(NULL),
+	  m_state(NULL),
 	  m_next(NULL),
 	  m_owner((config.m_owner != NULL) ? _machine.m_devicelist.find(config.m_owner->tag()) : NULL),
 	  m_interface_list(NULL),
@@ -819,6 +821,10 @@ UINT64 device_t::attotime_to_clocks(attotime duration) const
 
 void device_t::start()
 {
+	// look up the common interfaces
+	m_execute = dynamic_cast<device_execute_interface *>(this);
+	m_state = dynamic_cast<device_state_interface *>(this);
+
 	// populate the region field
 	m_region = m_machine.region(tag());
 
