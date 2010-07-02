@@ -123,10 +123,10 @@ enum
 		CPUINFO_FCT_WRITE,									// R/O: int (*write)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 value)
 		CPUINFO_FCT_READOP,									// R/O: int (*readop)(legacy_cpu_device *device, UINT32 offset, int size, UINT64 *value)
 		CPUINFO_FCT_DEBUG_INIT,								// R/O: void (*debug_init)(legacy_cpu_device *device)
-		CPUINFO_FCT_IMPORT_STATE,							// R/O: void (*import_state)(legacy_cpu_device *device, void *baseptr, const cpu_state_entry *entry)
-		CPUINFO_FCT_EXPORT_STATE,							// R/O: void (*export_state)(legacy_cpu_device *device, void *baseptr, const cpu_state_entry *entry)
-		CPUINFO_FCT_IMPORT_STRING,							// R/O: void (*import_string)(legacy_cpu_device *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string)
-		CPUINFO_FCT_EXPORT_STRING,							// R/O: void (*export_string)(legacy_cpu_device *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string)
+		CPUINFO_FCT_IMPORT_STATE,							// R/O: void (*import_state)(legacy_cpu_device *device, const device_state_entry &entry)
+		CPUINFO_FCT_EXPORT_STATE,							// R/O: void (*export_state)(legacy_cpu_device *device, const device_state_entry &entry)
+		CPUINFO_FCT_IMPORT_STRING,							// R/O: void (*import_string)(legacy_cpu_device *device, const device_state_entry &entry, astring &string)
+		CPUINFO_FCT_EXPORT_STRING,							// R/O: void (*export_string)(legacy_cpu_device *device, const device_state_entry &entry, astring &string)
 
 	CPUINFO_FCT_CPU_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC,	// R/W: CPU-specific values start here
 
@@ -319,7 +319,6 @@ enum
 union cpuinfo;
 class cpu_device;
 class legacy_cpu_device;
-struct cpu_state_entry;
 class cpu_debug_data;
 
 
@@ -343,20 +342,6 @@ typedef void (*cpu_string_io_func)(legacy_cpu_device *device, const device_state
 
 // a cpu_type is just a pointer to the CPU's get_info function
 typedef cpu_get_info_func cpu_type;
-
-
-// structure describing a single item of exposed CPU state
-struct cpu_state_entry
-{
-	UINT32					index;						// state index this entry applies to
-	UINT32					validmask;					// mask for which CPU subtypes this entry is valid
-	FPTR					dataoffs;					// offset to the data, relative to the baseptr
-	UINT64					mask;						// mask applied to the data
-	UINT8					datasize;					// size of the data item in memory
-	UINT8					flags;						// flags
-	const char *			symbol;						// symbol for display; all lower-case version for expressions
-	const char *			format;						// supported formats
-};
 
 
 // cpuinfo union used to pass data to/from the get_info/set_info functions
