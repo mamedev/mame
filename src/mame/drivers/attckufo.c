@@ -51,14 +51,16 @@ class attckufo_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, attckufo_state(machine)); }
 
-	attckufo_state(running_machine &machine) { }
+	attckufo_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  mos6560(machine.device("mos6560")) { }
 
 	/* memory pointers */
 	UINT8 *      mainram;
 	UINT8 *      tileram;
 
 	/* devices */
-	running_device *maincpu;
+	cpu_device *maincpu;
 	running_device *mos6560;
 };
 
@@ -169,15 +171,13 @@ static VIDEO_UPDATE( attckufo )
 static int attckufo_dma_read( running_machine *machine, int offset )
 {
 	attckufo_state *state = (attckufo_state *)machine->driver_data;
-	const address_space *program = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
-	return memory_read_byte(program, offset);
+	return memory_read_byte(state->maincpu->space(AS_PROGRAM), offset);
 }
 
 static int attckufo_dma_read_color( running_machine *machine, int offset )
 {
 	attckufo_state *state = (attckufo_state *)machine->driver_data;
-	const address_space *program = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
-	return memory_read_byte(program, offset + 0x400);
+	return memory_read_byte(state->maincpu->space(AS_PROGRAM), offset + 0x400);
 }
 
 static const mos6560_interface attckufo_6560_intf =
@@ -190,14 +190,6 @@ static const mos6560_interface attckufo_6560_intf =
 };
 
 
-static MACHINE_START( attckufo )
-{
-	attckufo_state *state = (attckufo_state *)machine->driver_data;
-
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->mos6560 = devtag_get_device(machine, "mos6560");
-}
-
 static MACHINE_DRIVER_START( attckufo )
 
 	/* driver data */
@@ -207,8 +199,6 @@ static MACHINE_DRIVER_START( attckufo )
 	MDRV_CPU_ADD("maincpu", M6502, 14318181/14)
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_PERIODIC_INT(attckufo_raster_interrupt, MOS656X_HRETRACERATE)
-
-	MDRV_MACHINE_START(attckufo)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
