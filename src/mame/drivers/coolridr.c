@@ -1129,7 +1129,8 @@ ROM_END
 #if 0
 static READ32_HANDLER( coolridr_hack1_r )
 {
-	if(cpu_get_pc(space->cpu) == 0x6012374 || cpu_get_pc(space->cpu) == 0x6012392)
+	offs_t pc = downcast<cpu_device *>(space->cpu)->pc();
+	if(pc == 0x6012374 || pc == 0x6012392)
 		return 0;
 
 	return sysh1_workram_h[0xd88a4/4];
@@ -1138,7 +1139,8 @@ static READ32_HANDLER( coolridr_hack1_r )
 
 static READ32_HANDLER( coolridr_hack2_r )
 {
-	if(cpu_get_pc(space->cpu) == 0x6002cba || cpu_get_pc(space->cpu) == 0x6002d42)
+	offs_t pc = downcast<cpu_device *>(space->cpu)->pc();
+	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
 
 	return sysh1_workram_h[0xd8894/4];
