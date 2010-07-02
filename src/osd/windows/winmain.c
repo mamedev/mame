@@ -375,26 +375,6 @@ const options_entry mame_win_options[] =
 
 
 //**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-#ifdef PTR64
-#define IMAGE_FILE_MACHINE_NATIVE IMAGE_FILE_MACHINE_AMD64
-inline FPTR ip_from_context(CONTEXT &context)
-{
-	return context.Rip;
-}
-#else
-#define IMAGE_FILE_MACHINE_NATIVE IMAGE_FILE_MACHINE_I386
-inline FPTR ip_from_context(CONTEXT &context)
-{
-	return context.Eip;
-}
-#endif
-
-
-
-//**************************************************************************
 //  MAIN ENTRY POINT
 //**************************************************************************
 
@@ -831,7 +811,13 @@ bool stack_walker::unwind()
 {
 	// if we were able to initialize, then we have everything we need
 	if (s_initialized)
-		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_NATIVE, m_process, m_thread, &m_stackframe, &m_context, NULL, *m_sym_function_table_access_64, *m_sym_get_module_base_64, NULL);
+	{
+#ifdef PTR64
+		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_AMD64, m_process, m_thread, &m_stackframe, &m_context, NULL, *m_sym_function_table_access_64, *m_sym_get_module_base_64, NULL);
+#else
+		return (*m_stack_walk_64)(IMAGE_FILE_MACHINE_I386, m_process, m_thread, &m_stackframe, &m_context, NULL, *m_sym_function_table_access_64, *m_sym_get_module_base_64, NULL);
+#endif
+	}
 
 	// otherwise, fake the first unwind, which will just return info from the context
 	else
