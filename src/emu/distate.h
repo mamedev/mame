@@ -165,9 +165,9 @@ public:
 
 	// state getters
 	UINT64 state_value(int index);
-	UINT64 pc() { return state_value(STATE_GENPC); }
-	UINT64 pcbase() { return state_value(STATE_GENPCBASE); }
-	UINT64 sp() { return state_value(STATE_GENSP); }
+	offs_t pc() { return state_value(STATE_GENPC); }
+	offs_t pcbase() { return state_value(STATE_GENPCBASE); }
+	offs_t sp() { return state_value(STATE_GENSP); }
 	UINT64 flags() { return state_value(STATE_GENFLAGS); }
 	astring &state_string(int index, astring &dest);
 	int state_string_max_length(int index);

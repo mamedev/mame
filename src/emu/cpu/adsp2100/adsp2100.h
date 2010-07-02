@@ -17,12 +17,11 @@
 ***************************************************************************/
 
 /* transmit and receive data callbacks types */
-typedef INT32 (*adsp21xx_rx_func)(running_device *device, int port);
-typedef void  (*adsp21xx_tx_func)(running_device *device, int port, INT32 data);
-typedef void  (*adsp21xx_timer_func)(running_device *device, int enable);
+typedef INT32 (*adsp21xx_rx_func)(cpu_device &device, int port);
+typedef void  (*adsp21xx_tx_func)(cpu_device &device, int port, INT32 data);
+typedef void  (*adsp21xx_timer_func)(cpu_device &device, int enable);
 
-typedef struct _adsp21xx_config adsp21xx_config;
-struct _adsp21xx_config
+struct adsp21xx_config
 {
 	adsp21xx_rx_func		rx;				/* callback for serial receive */
 	adsp21xx_tx_func		tx;				/* callback for serial transmit */

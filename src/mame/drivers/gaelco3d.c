@@ -171,7 +171,7 @@ static UINT8 adsp_ireg;
 static offs_t adsp_ireg_base, adsp_incs, adsp_size;
 static dmadac_sound_device *dmadac[SOUND_CHANNELS];
 
-static void adsp_tx_callback(running_device *device, int port, INT32 data);
+static void adsp_tx_callback(cpu_device &device, int port, INT32 data);
 
 
 /*************************************
@@ -571,8 +571,10 @@ static WRITE16_HANDLER( adsp_rombank_w )
 
 static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 {
+	cpu_device *adsp = timer.machine->device<cpu_device>("adsp");
+	
 	/* get the index register */
-	int reg = cpu_get_reg(devtag_get_device(timer.machine, "adsp"), ADSP2100_I0 + adsp_ireg);
+	int reg = adsp->state_value(ADSP2100_I0 + adsp_ireg);
 
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", adsp_ireg, reg, adsp_incs, adsp_size);
@@ -589,15 +591,15 @@ static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 		reg = adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(devtag_get_device(timer.machine, "adsp"), ADSP2105_IRQ1);
+		generic_pulse_irq_line(adsp, ADSP2105_IRQ1);
 	}
 
 	/* store it */
-	cpu_set_reg(devtag_get_device(timer.machine, "adsp"), ADSP2100_I0 + adsp_ireg, reg);
+	adsp->state_set_value(ADSP2100_I0 + adsp_ireg, reg);
 }
 
 
-static void adsp_tx_callback(running_device *device, int port, INT32 data)
+static void adsp_tx_callback(cpu_device &device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)
@@ -621,15 +623,15 @@ static void adsp_tx_callback(running_device *device, int port, INT32 data)
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = cpu_get_reg(device, ADSP2100_I0 + adsp_ireg);
-			adsp_incs = cpu_get_reg(device, ADSP2100_M0 + mreg);
-			adsp_size = cpu_get_reg(device, ADSP2100_L0 + lreg);
+			source = device.state_value(ADSP2100_I0 + adsp_ireg);
+			adsp_incs = device.state_value(ADSP2100_M0 + mreg);
+			adsp_size = device.state_value(ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= adsp_incs;
 
 			/* make it go back one so we dont lose the first sample */
-			cpu_set_reg(device, ADSP2100_I0 + adsp_ireg, source);
+			device.state_set_value(ADSP2100_I0 + adsp_ireg, source);
 
 			/* save it as it is now */
 			adsp_ireg_base = source;
@@ -637,7 +639,7 @@ static void adsp_tx_callback(running_device *device, int port, INT32 data)
 			/* calculate how long until we generate an interrupt */
 
 			/* period per each bit sent */
-			sample_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device)), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			sample_period = attotime_mul(ATTOTIME_IN_HZ(device.clock()), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period = attotime_mul(sample_period, 16 * SOUND_CHANNELS);

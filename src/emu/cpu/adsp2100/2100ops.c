@@ -91,7 +91,7 @@ INLINE void update_mstat(adsp2100_state *adsp)
 	}
 	if ((adsp->mstat ^ adsp->mstat_prev) & MSTAT_TIMER)
 		if (adsp->timer_fired != NULL)
-			(*adsp->timer_fired)(adsp->device, (adsp->mstat & MSTAT_TIMER) != 0);
+			(*adsp->timer_fired)(*adsp->device, (adsp->mstat & MSTAT_TIMER) != 0);
 	if (adsp->mstat & MSTAT_STICKYV)
 		adsp->astat_clear = ~(CFLAG | NFLAG | ZFLAG);
 	else
@@ -421,8 +421,8 @@ static void wr_ifc(adsp2100_state *adsp, INT32 val)
 	}
 	check_irqs(adsp);
 }
-static void wr_tx0(adsp2100_state *adsp, INT32 val)	{ if (adsp->sport_tx_callback) (*adsp->sport_tx_callback)(adsp->device, 0, val); }
-static void wr_tx1(adsp2100_state *adsp, INT32 val)	{ if (adsp->sport_tx_callback) (*adsp->sport_tx_callback)(adsp->device, 1, val); }
+static void wr_tx0(adsp2100_state *adsp, INT32 val)	{ if (adsp->sport_tx_callback) (*adsp->sport_tx_callback)(*adsp->device, 0, val); }
+static void wr_tx1(adsp2100_state *adsp, INT32 val)	{ if (adsp->sport_tx_callback) (*adsp->sport_tx_callback)(*adsp->device, 1, val); }
 static void wr_owrctr(adsp2100_state *adsp, INT32 val) { adsp->cntr = val & 0x3fff; }
 static void wr_topstack(adsp2100_state *adsp, INT32 val) { pc_stack_push_val(adsp, val & 0x3fff); }
 
@@ -503,8 +503,8 @@ static INT32 rd_icntl(adsp2100_state *adsp) { return adsp->icntl; }
 static INT32 rd_cntr(adsp2100_state *adsp)  { return adsp->cntr; }
 static INT32 rd_sb(adsp2100_state *adsp)    { return adsp->core.sb.s; }
 static INT32 rd_px(adsp2100_state *adsp)    { return adsp->px; }
-static INT32 rd_rx0(adsp2100_state *adsp)	{ if (adsp->sport_rx_callback) return (*adsp->sport_rx_callback)(adsp->device, 0); else return 0; }
-static INT32 rd_rx1(adsp2100_state *adsp)	{ if (adsp->sport_rx_callback) return (*adsp->sport_rx_callback)(adsp->device, 1); else return 0; }
+static INT32 rd_rx0(adsp2100_state *adsp)	{ if (adsp->sport_rx_callback) return (*adsp->sport_rx_callback)(*adsp->device, 0); else return 0; }
+static INT32 rd_rx1(adsp2100_state *adsp)	{ if (adsp->sport_rx_callback) return (*adsp->sport_rx_callback)(*adsp->device, 1); else return 0; }
 static INT32 rd_stacktop(adsp2100_state *adsp)	{ return pc_stack_pop_val(adsp); }
 
 #define READ_REG(adsp,grp,reg) ((*rd_reg[grp][reg])(adsp))

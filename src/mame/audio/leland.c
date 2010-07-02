@@ -1781,9 +1781,10 @@ static READ16_HANDLER( main_to_sound_comm_r )
 
 static TIMER_CALLBACK( delayed_response_r )
 {
+	cpu_device *master = machine->device<cpu_device>("master");
 	int checkpc = param;
-	int pc = cpu_get_reg(devtag_get_device(machine, "master"), Z80_PC);
-	int oldaf = cpu_get_reg(devtag_get_device(machine, "master"), Z80_AF);
+	int pc = master->pc();
+	int oldaf = master->state_value(Z80_AF);
 
 	/* This is pretty cheesy, but necessary. Since the CPUs run in round-robin order,
        synchronizing on the write to this register from the slave side does nothing.
@@ -1796,7 +1797,7 @@ static TIMER_CALLBACK( delayed_response_r )
 		if (LOG_COMM) logerror("(Updated sound response latch to %02X)\n", sound_response);
 
 		oldaf = (oldaf & 0x00ff) | (sound_response << 8);
-		cpu_set_reg(devtag_get_device(machine, "master"), Z80_AF, oldaf);
+		master->state_set_value(Z80_AF, oldaf);
 	}
 	else
 		logerror("ERROR: delayed_response_r - current PC = %04X, checkPC = %04X\n", pc, checkpc);

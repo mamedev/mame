@@ -1150,17 +1150,17 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	logerror("%06X:hd68k_ds3_gdata_r(%04X)\n", cpu_get_previouspc(space->cpu), state->ds3_gdata);
 
 	/* attempt to optimize the transfer if conditions are right */
-	if (space->cpu == devtag_get_device(space->machine, "maincpu") && pc == state->ds3_transfer_pc &&
+	if (space->cpu == state->maincpu && pc == state->ds3_transfer_pc &&
 		!(!state->ds3_g68flag && state->ds3_g68irqs) && !(state->ds3_gflag && state->ds3_gfirqs))
 	{
-		UINT32 destaddr = cpu_get_reg(space->cpu, M68K_A1);
-		UINT16 count68k = cpu_get_reg(space->cpu, M68K_D1);
-		UINT16 mstat = cpu_get_reg(state->adsp, ADSP2100_MSTAT);
-		UINT16 i6 = cpu_get_reg(state->adsp, (mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC);
-		UINT16 l6 = cpu_get_reg(state->adsp, ADSP2100_L6) - 1;
-		UINT16 m7 = cpu_get_reg(state->adsp, ADSP2100_M7);
+		UINT32 destaddr = state->maincpu->state_value(M68K_A1);
+		UINT16 count68k = state->maincpu->state_value(M68K_D1);
+		UINT16 mstat = state->adsp->state_value(ADSP2100_MSTAT);
+		UINT16 i6 = state->adsp->state_value((mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC);
+		UINT16 l6 = state->adsp->state_value(ADSP2100_L6) - 1;
+		UINT16 m7 = state->adsp->state_value(ADSP2100_M7);
 
-		logerror("%06X:optimizing 68k transfer, %d words\n", cpu_get_previouspc(space->cpu), count68k);
+		logerror("%06X:optimizing 68k transfer, %d words\n", state->maincpu->pcbase(), count68k);
 
 		while (count68k > 0 && state->adsp_data_memory[0x16e6] > 0)
 		{
@@ -1172,8 +1172,8 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 			}
 			count68k--;
 		}
-		cpu_set_reg(space->cpu, M68K_D1, count68k);
-		cpu_set_reg(state->adsp, (mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC, i6);
+		state->maincpu->state_set_value(M68K_D1, count68k);
+		state->adsp->state_set_value((mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC, i6);
 		state->adsp_speedup_count[1]++;
 	}
 

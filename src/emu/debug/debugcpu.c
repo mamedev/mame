@@ -2980,5 +2980,5 @@ static UINT64 get_cpu_reg(void *globalref, void *ref)
 static void set_cpu_reg(void *globalref, void *ref, UINT64 value)
 {
 	cpu_device *device = (cpu_device *)globalref;
-	cpu_set_reg(device, (FPTR)ref, value);
+	device->state_set_value((FPTR)ref, value);
 }
