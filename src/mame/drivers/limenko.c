@@ -967,9 +967,9 @@ ROM_END
 
 static READ32_HANDLER( dynabomb_speedup_r )
 {
-	if(cpu_get_pc(space->cpu) == 0xc25b8)
+	if(space->machine->firstcpu->pc() == 0xc25b8)
 	{
-		cpu_eat_cycles(space->cpu, 50);
+		space->machine->firstcpu->eat_cycles(50);
 	}
 
 	return mainram[0xe2784/4];
@@ -977,9 +977,9 @@ static READ32_HANDLER( dynabomb_speedup_r )
 
 static READ32_HANDLER( legendoh_speedup_r )
 {
-	if(cpu_get_pc(space->cpu) == 0x23e32)
+	if(space->machine->firstcpu->pc() == 0x23e32)
 	{
-		cpu_eat_cycles(space->cpu, 50);
+		space->machine->firstcpu->eat_cycles(50);
 	}
 
 	return mainram[0x32ab0/4];
@@ -987,9 +987,9 @@ static READ32_HANDLER( legendoh_speedup_r )
 
 static READ32_HANDLER( sb2003_speedup_r )
 {
-	if(cpu_get_pc(space->cpu) == 0x26da4)
+	if(space->machine->firstcpu->pc() == 0x26da4)
 	{
-		cpu_eat_cycles(space->cpu, 50);
+		space->machine->firstcpu->eat_cycles(50);
 	}
 
 	return mainram[0x135800/4];
@@ -997,9 +997,9 @@ static READ32_HANDLER( sb2003_speedup_r )
 
 static READ32_HANDLER( spotty_speedup_r )
 {
-	if(cpu_get_pc(space->cpu) == 0x8560)
+	if(space->machine->firstcpu->pc() == 0x8560)
 	{
-		cpu_eat_cycles(space->cpu, 50);
+		space->machine->firstcpu->eat_cycles(50);
 	}
 
 	return mainram[0x6626c/4];

@@ -22,9 +22,11 @@ class mosaicf2_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mosaicf2_state(machine)); }
 
-	mosaicf2_state(running_machine &machine) { }
+	mosaicf2_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")) { }
 
 	/* memory pointers */
+	cpu_device *	maincpu;
 	UINT32 *  videoram;
 };
 
@@ -61,9 +63,11 @@ ADDRESS_MAP_END
 static READ32_HANDLER( f32_input_port_1_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	if ((cpu_get_pc(space->cpu) == 0x000379de) || (cpu_get_pc(space->cpu) == 0x000379cc) )
-		cpu_eat_cycles(space->cpu, 100);
-	//else printf("PC %08x\n", cpu_get_pc(space->cpu) );
+	mosaicf2_state *state = (mosaicf2_state *)space->machine->driver_data;
+	offs_t pc = state->maincpu->pc();
+	if ((pc == 0x000379de) || (pc == 0x000379cc) )
+		state->maincpu->eat_cycles(100);
+	//else printf("PC %08x\n", pc );
 	return input_port_read(space->machine, "SYSTEM_P2");
 }
 
