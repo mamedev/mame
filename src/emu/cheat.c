@@ -84,9 +84,6 @@
 
 #include <ctype.h>
 
-#ifdef MESS
-#include "cheatms.h"
-#endif
 
 
 
@@ -412,16 +409,24 @@ void cheat_reload(running_machine *machine)
 
 	/* load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
        and MAME will load gamename.xml */
-	#ifdef MESS
+	device_image_interface *image = NULL;	
+	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
-		char mess_cheat_filename[9];
-		cheat_mess_init(machine);
-		sprintf(mess_cheat_filename, "%08X", this_game_crc);
-		cheatinfo->cheatlist = cheat_list_load(machine, mess_cheat_filename);
+		if (image->exists())
+		{
+			char mess_cheat_filename[9];
+			UINT32	crc = image->crc();
+			sprintf(mess_cheat_filename, "%08X", crc);
+			if (crc!=0) {
+				cheatinfo->cheatlist = cheat_list_load(machine, mess_cheat_filename);
+				break;
+			}
+		}
 	}
-	#else
-	cheatinfo->cheatlist = cheat_list_load(machine, machine->basename());
-	#endif
+	if (cheatinfo->cheatlist == NULL) 
+	{
+		cheatinfo->cheatlist = cheat_list_load(machine, machine->basename());
+	}
 
 	/* temporary: save the file back out as output.xml for comparison */
 	if (cheatinfo->cheatlist != NULL)
