@@ -114,17 +114,27 @@ static READ8_HANDLER( gondo_player_2_r )
 *
 ***************************************************/
 
-static WRITE8_HANDLER( meikyuh_i8751_w )
+static TIMER_CALLBACK( dec8_i8751_timer_callback )
+{
+	// The schematics show a clocked LS194 shift register (3A) is used to automatically
+	// clear the IRQ request.  The MCU does not clear it itself.
+	dec8_state *state = (dec8_state *)machine->driver_data;
+	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
+}
+
+static WRITE8_HANDLER( dec8_i8751_w )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
-	case 0: /* High byte */
+	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
+		cpu_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
+		timer_set(space->machine, cpu_clocks_to_attotime(state->mcu, 64), NULL, 0, dec8_i8751_timer_callback); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
-		cpu_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -134,28 +144,6 @@ static WRITE8_HANDLER( meikyuh_i8751_w )
 * MCU simulations
 *
 ********************************/
-
-static WRITE8_HANDLER( ghostb_i8751_w )
-{
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
-	state->i8751_return = 0;
-
-	switch (offset)
-	{
-	case 0: /* High byte */
-		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		break;
-	case 1: /* Low byte */
-		state->i8751_value = (state->i8751_value & 0xff00) | data;
-		break;
-	}
-
-	if (state->i8751_value == 0x00aa) state->i8751_return = 0x655;
-	if (state->i8751_value == 0x021a) state->i8751_return = 0x6e5; /* Ghostbusters ID */
-	if (state->i8751_value == 0x021b) state->i8751_return = 0x6e4; /* Meikyuu Hunter G ID */
-}
-
-
 
 static WRITE8_HANDLER( srdarwin_i8751_w )
 {
@@ -178,7 +166,7 @@ static WRITE8_HANDLER( srdarwin_i8751_w )
 	if ((state->i8751_value & 0xff00) == 0x4000) state->i8751_return = state->i8751_value;	/* Coinage settings */
 	if (state->i8751_value == 0x5000) state->i8751_return = ((state->coin1 / 10) << 4) | (state->coin1 % 10);	/* Coin request */
 	if (state->i8751_value == 0x6000) {state->i8751_value = -1; state->coin1--; }	/* Coin clear */
-	/* Nb:  Command 0x4000 for setting coinage options is not supported */
+	/* Nb:  Command 0x4000 for setting coinage options is not sup3ed */
 	if ((input_port_read(space->machine, "FAKE") & 1) == 1) state->latch = 1;
 	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && state->latch) {state->coin1++; state->latch = 0;}
 
@@ -231,40 +219,6 @@ bb63           = Square things again
 	if (state->i8751_value == 0x800a) state->i8751_return = 0xf580 + 42; /* End Game(bad address?) */
 }
 
-static WRITE8_HANDLER( gondo_i8751_w )
-{
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
-	state->i8751_return = 0;
-
-	switch (offset)
-	{
-	case 0: /* High byte */
-		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		if (state->int_enable)
-			cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
-		break;
-	case 1: /* Low byte */
-		state->i8751_value = (state->i8751_value & 0xff00) | data;
-		break;
-	}
-
-	/* Coins are controlled by the i8751 */
-	if ((input_port_read(space->machine, "I8751") & 3) == 3) state->latch = 1;
-	if ((input_port_read(space->machine, "I8751") & 1) != 1 && state->latch) {state->coin1++; state->snd = 1; state->latch = 0;}
-	if ((input_port_read(space->machine, "I8751") & 2) != 2 && state->latch) {state->coin2++; state->snd = 1; state->latch = 0;}
-
-	/* Work out return values */
-	if (state->i8751_value == 0x0000) {state->i8751_return = 0; state->coin1 = state->coin2 = state->snd = 0;}
-	if (state->i8751_value == 0x038a)  state->i8751_return = 0x375; /* Makyou Senshi ID */
-	if (state->i8751_value == 0x038b)  state->i8751_return = 0x374; /* Gondomania ID */
-	if ((state->i8751_value >> 8) == 0x04)  state->i8751_return = 0x40f; /* Coinage settings (Not supported) */
-	if ((state->i8751_value >> 8) == 0x05) {state->i8751_return = 0x500 | ((state->coin1 / 10) << 4) | (state->coin1 % 10);  } /* Coin 1 */
-	if ((state->i8751_value >> 8) == 0x06 && state->coin1 && !offset) {state->i8751_return = 0x600; state->coin1--; } /* Coin 1 clear */
-	if ((state->i8751_value >> 8) == 0x07) {state->i8751_return = 0x700 | ((state->coin2 / 10) << 4) | (state->coin2 % 10);  } /* Coin 2 */
-	if ((state->i8751_value >> 8) == 0x08 && state->coin2 && !offset) {state->i8751_return = 0x800; state->coin2--; } /* Coin 2 clear */
-	/* Commands 0x9xx do nothing */
-	if ((state->i8751_value >> 8) == 0x0a) {state->i8751_return = 0xa00 | state->snd; if (state->snd) state->snd = 0; }
-}
 
 static WRITE8_HANDLER( shackled_i8751_w )
 {
@@ -397,16 +351,16 @@ static WRITE8_HANDLER( ghostb_bank_w )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
 
-	/* Bit 0: Interrupt enable/disable (I think..)
+	/* Bit 0: SECCLR - acknowledge interrupt from I8751
        Bit 1: NMI enable/disable
-       Bit 2: ??
+       Bit 2: Not connected according to schematics
        Bit 3: Screen flip
        Bits 4-7: Bank switch
     */
 
 	memory_set_bank(space->machine, "bank1", data >> 4);
 
-	if (data & 1) state->int_enable =1; else state->int_enable = 0;
+	if ((data&1)==0) cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 	if (data & 2) state->nmi_enable =1; else state->nmi_enable = 0;
 	flip_screen_set(space->machine, data & 0x08);
 }
@@ -556,30 +510,6 @@ static ADDRESS_MAP_START( cobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ghostb_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM
-	AM_RANGE(0x2c00, 0x2dff) AM_RAM AM_BASE_MEMBER(dec8_state, row)
-	AM_RANGE(0x2e00, 0x2fff) AM_RAM /* Unused */
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")	/* Player 3 */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")	/* Start buttons + VBL */
-	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")	/* Dip */
-	AM_RANGE(0x3820, 0x383f) AM_WRITE(dec8_bac06_0_w)
-	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
-	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
-	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
-	AM_RANGE(0x3860, 0x3861) AM_WRITE(ghostb_i8751_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( meikyuh_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
@@ -599,7 +529,7 @@ static ADDRESS_MAP_START( meikyuh_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
 	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
 	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
-	AM_RANGE(0x3860, 0x3861) AM_WRITE(meikyuh_i8751_w)
+	AM_RANGE(0x3860, 0x3861) AM_WRITE(dec8_i8751_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -645,7 +575,7 @@ static ADDRESS_MAP_START( gondo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
 	AM_RANGE(0x3838, 0x3838) AM_READ(i8751_h_r)
 	AM_RANGE(0x3839, 0x3839) AM_READ(i8751_l_r)
-	AM_RANGE(0x383a, 0x383b) AM_WRITE(gondo_i8751_w)
+	AM_RANGE(0x383a, 0x383b) AM_WRITE(dec8_i8751_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -883,39 +813,62 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
+/*
+	Gondomania schematics show the following:
+	
+	Port P0 - attached to 2 * LS374 at location 4C & 1C
+	Port P1 - attached to 2 * LS374 at location 3C & 2C
+	Port P2.2 -> SECIRQ (IRQ to main CPU)
+	Port P2.3 -> 'COUNT' (Enable coin counter - also wired directly to coinage) [not emulated]
+	Port P2.4-7 -> Enable latches 4C, 1C, 3C, 2C
+	Port P3.4-7 -> Directly attached to coinage connector (3 coins & service)
+
+*/
+
 static READ8_HANDLER( dec8_mcu_from_main_r )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0:
-			return ((state->i8751_value & 0xff00) >> 8);
+			return state->i8751_port0;
 		case 1:
-			cpu_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
-			return state->i8751_value & 0xff;
+			return state->i8751_port1;
+		case 2:
+			return 0xff;
+		case 3:
+			return input_port_read(space->machine, "I8751");
 	}
 
-	return 0; //compile safe.
+	return 0xff; //compile safe.
 }
 
 static WRITE8_HANDLER( dec8_mcu_to_main_w )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
-	switch (offset)
-	{
-		case 0: /* High byte */
-			state->i8751_return = (state->i8751_return & 0xff) | (data << 8);
-			break;
-		case 1: /* Low byte */
-			state->i8751_return = (state->i8751_return & 0xff00) | data;
-			break;
-	}
+	
+	// Outputs P0 and P1 are latched
+	if (offset==0) state->i8751_port0=data;
+	else if (offset==1) state->i8751_port1=data;
+	
+	// P2 - controls latches for main CPU communication
+	if (offset==2 && (data&0x10)==0)
+		state->i8751_port0 = state->i8751_value>>8;
+	if (offset==2 && (data&0x20)==0)
+		state->i8751_port1 = state->i8751_value&0xff;
+	if (offset==2 && (data&0x40)==0)
+		state->i8751_return = (state->i8751_return & 0xff) | (state->i8751_port0 << 8);
+	if (offset==2 && (data&0x80)==0)
+		state->i8751_return = (state->i8751_return & 0xff00) | state->i8751_port1;
+	
+	// P2 - IRQ to main CPU
+	if (offset==2 && (data&4)==0)
+		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( dec8_mcu_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P1) AM_READWRITE(dec8_mcu_from_main_r, dec8_mcu_to_main_w)
-	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2) AM_WRITENOP
-	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_READ_PORT("I8751") AM_WRITENOP
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE(dec8_mcu_from_main_r, dec8_mcu_to_main_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1049,11 +1002,12 @@ static INPUT_PORTS_START( ghostb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("I8751")	/* Dummy input for i8751 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_START("I8751")	
+	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
@@ -1092,24 +1046,6 @@ static INPUT_PORTS_START( ghostb3 )
 
 	PORT_MODIFY("DSW0")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
-INPUT_PORTS_END
-
-/* same but with coin latches hooked up with the irqs since we have a MCU dump. */
-static INPUT_CHANGED( coin_inserted )
-{
-	dec8_state *state = (dec8_state *)field->port->machine->driver_data;
-	if (newval)
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
-}
-
-static INPUT_PORTS_START( meikyuh )
-	PORT_INCLUDE(ghostb)
-
-	PORT_MODIFY("I8751")	/* hooked up on the i8751 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( srdarwin )
@@ -1214,9 +1150,12 @@ static INPUT_PORTS_START( gondo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START("I8751") /* Fake port for the i8751 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_START("I8751")	/* hooked up on the i8751 */
+	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("AN0")	/* player 1 12-way rotary control */
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -1954,25 +1893,6 @@ static const msm5205_interface msm5205_config =
 
 /******************************************************************************/
 
-static INTERRUPT_GEN( ghostb_interrupt )
-{
-	dec8_state *state = (dec8_state *)device->machine->driver_data;
-	int i8751_out = input_port_read(device->machine, "I8751");
-
-	/* Ghostbusters coins are controlled by the i8751 */
-	if ((i8751_out & 0x8) == 0x8) state->latch |= 1;
-	if ((i8751_out & 0x4) == 0x4) state->latch |= 2;
-	if ((i8751_out & 0x2) == 0x2) state->latch |= 4;
-	if ((i8751_out & 0x1) == 0x1) state->latch |= 8;
-
-	if (((i8751_out & 0x8) != 0x8) && (state->latch & 1) != 0) {state->latch &= ~1; cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE); state->i8751_return = 0x8001; } /* Player 1 coin */
-	if (((i8751_out & 0x4) != 0x4) && (state->latch & 2) != 0) {state->latch &= ~2; cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE); state->i8751_return = 0x4001; } /* Player 2 coin */
-	if (((i8751_out & 0x2) != 0x2) && (state->latch & 4) != 0) {state->latch &= ~4; cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE); state->i8751_return = 0x2001; } /* Player 3 coin */
-	if (((i8751_out & 0x1) != 0x1) && (state->latch & 8) != 0) {state->latch &= ~8; cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE); state->i8751_return = 0x1001; } /* Service */
-
-	if (state->nmi_enable) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
-}
-
 static INTERRUPT_GEN( gondo_interrupt )
 {
 	dec8_state *state = (dec8_state *)device->machine->driver_data;
@@ -2006,7 +1926,8 @@ static MACHINE_START( dec8 )
 
 	state_save_register_global(machine, state->latch);
 	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->int_enable);
+	state_save_register_global(machine, state->i8751_port0);
+	state_save_register_global(machine, state->i8751_port1);
 	state_save_register_global(machine, state->i8751_return);
 	state_save_register_global(machine, state->i8751_value);
 	state_save_register_global(machine, state->coin1);
@@ -2025,7 +1946,7 @@ static MACHINE_RESET( dec8 )
 	dec8_state *state = (dec8_state *)machine->driver_data;
 	int i;
 
-	state->nmi_enable = state->int_enable = 0;
+	state->nmi_enable = state->i8751_port0 = state->i8751_port1 = 0;
 	state->i8751_return = state->i8751_value = 0;
 	state->coin1 = state->coin2 = state->snd = 0;
 	state->msm5205next = 0;
@@ -2094,12 +2015,15 @@ static MACHINE_DRIVER_START( ghostb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)
-	MDRV_CPU_PROGRAM_MAP(ghostb_map)
-	MDRV_CPU_VBLANK_INT("screen", ghostb_interrupt)
+	MDRV_CPU_PROGRAM_MAP(meikyuh_map)
+	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
+
+	MDRV_CPU_ADD("mcu", I8751, 3000000*4)
+	MDRV_CPU_IO_MAP(dec8_mcu_io_map)
 
 	MDRV_MACHINE_START(dec8)
 	MDRV_MACHINE_RESET(dec8)
@@ -2134,17 +2058,6 @@ static MACHINE_DRIVER_START( ghostb )
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
-
-/* these two will be unified one day... */
-static MACHINE_DRIVER_START( meikyuh )
-	MDRV_IMPORT_FROM( ghostb )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(meikyuh_map)
-	MDRV_CPU_VBLANK_INT("screen", gondo_interrupt)
-
-	MDRV_CPU_ADD("mcu", I8751, 3000000*4)
-	MDRV_CPU_IO_MAP(dec8_mcu_io_map)
 MACHINE_DRIVER_END
 
 
@@ -2208,6 +2121,9 @@ static MACHINE_DRIVER_START( gondo )
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
+
+	MDRV_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MDRV_CPU_IO_MAP(dec8_mcu_io_map)
 
 	MDRV_MACHINE_START(dec8)
 	MDRV_MACHINE_RESET(dec8)
@@ -2573,7 +2489,7 @@ ROM_START( ghostb )
 	ROM_LOAD( "dz-06.rom", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "dz.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dz-00.rom", 0x00000, 0x08000, CRC(992b4f31) SHA1(a9f255286193ccc261a9b6983aabf3c76ebe5ce5) )
@@ -2611,7 +2527,7 @@ ROM_START( ghostb3 )
 	ROM_LOAD( "dz-06.rom", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "dz.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dz-00.rom", 0x00000, 0x08000, CRC(992b4f31) SHA1(a9f255286193ccc261a9b6983aabf3c76ebe5ce5) )
@@ -2940,7 +2856,7 @@ ROM_START( gondo )
 	ROM_LOAD( "dt-05.256", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "dt-a.1b", 0x0000, 0x1000, CRC(03abceeb) SHA1(a16b779d7cea1c1437f85fa6b6e08894a46a5674) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dt-14.256", 0x00000, 0x08000, CRC(4bef16e1) SHA1(b8157a7a1b8f36cea1fd353267a4e03d920cb4aa) )
@@ -2984,7 +2900,7 @@ ROM_START( makyosen )
 	ROM_LOAD( "ds05",      0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "ds-a.1b", 0x0000, 0x1000, BAD_DUMP CRC(8bb25edc) SHA1(7073b06747e55e4ac5b60b68a64ffbc7e18cb593) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ds14",      0x00000, 0x08000, CRC(00cbe9c8) SHA1(de7b640de8fd54ee79194945c96d5768d09f483b) )
@@ -3624,8 +3540,8 @@ GAME( 1988, cobracom, 0,        cobracom, cobracom, cobracom,    ROT0,   "Data E
 GAME( 1988, cobracomj,cobracom, cobracom, cobracom, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ghostb,   0,        ghostb,   ghostb,   ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3,  ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1987, meikyuh,  ghostb,   meikyuh,  meikyuh,  meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, meikyuha, ghostb,   meikyuh,  meikyuh,  meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, meikyuh,  ghostb,   ghostb,   ghostb,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, meikyuha, ghostb,   ghostb,   ghostb,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (World)", GAME_SUPPORTS_SAVE )
 GAME( 1987, srdarwinj,srdarwin, srdarwin, srdarwin, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, gondo,    0,        gondo,    gondo,    gondo,       ROT270, "Data East USA", "Gondomania (US)", GAME_SUPPORTS_SAVE )
@@ -3636,7 +3552,7 @@ GAME( 1987, oscarj1,  oscar,    oscar,    oscaru,   oscar,       ROT0,   "Data E
 GAME( 1987, oscarj2,  oscar,    oscar,    oscaru,   oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, lastmisn, 0,        lastmisn, lastmisn, lastmisn,    ROT270, "Data East USA", "Last Mission (US revision 6)", GAME_SUPPORTS_SAVE )
 GAME( 1986, lastmisno,lastmisn, lastmisn, lastmisn, lastmisn,    ROT270, "Data East USA", "Last Mission (US revision 5)", GAME_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,lastmisn, lastmisn, lastmisnj, lastmisn,    ROT270, "Data East Corporation", "Last Mission (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,lastmisn, lastmisn, lastmisnj, lastmisn,   ROT270, "Data East Corporation", "Last Mission (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, shackled, 0,        shackled, shackled, shackled,    ROT0,   "Data East USA", "Shackled (US)", GAME_SUPPORTS_SAVE )
 GAME( 1986, breywood, shackled, shackled, shackled, shackled,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, csilver,  0,        csilver,  csilver,  csilver,     ROT0,   "Data East Corporation", "Captain Silver (World)", GAME_SUPPORTS_SAVE )

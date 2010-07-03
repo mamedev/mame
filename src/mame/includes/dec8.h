@@ -24,7 +24,8 @@ public:
 	int      gfx_mask, game_uses_priority;
 
 	/* misc */
-	int      nmi_enable, int_enable;
+	int      i8751_port0, i8751_port1;
+	int      nmi_enable;
 	int      i8751_return, i8751_value;
 	int      coin1, coin2, latch, snd;
 	int      msm5205next;
