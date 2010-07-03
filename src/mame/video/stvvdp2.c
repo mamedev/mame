@@ -2164,7 +2164,7 @@ static struct _stv_rbg_cache_data
 
 static void stv_vdp2_fill_rotation_parameter_table( running_machine *machine, UINT8 rot_parameter )
 {
-	UINT32 address;
+	UINT32 address = 0;
 
 	address = (((STV_VDP2_RPTAU << 16) | STV_VDP2_RPTAL) << 1);
 	if ( rot_parameter == 1 )
