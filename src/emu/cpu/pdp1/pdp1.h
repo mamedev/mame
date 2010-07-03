@@ -48,8 +48,7 @@ struct _pdp1_reset_param_t
 #define IOT_NO_COMPLETION_PULSE -1
 
 /* PUBLIC FUNCTIONS */
-CPU_GET_INFO( pdp1 );
-#define CPU_PDP1 CPU_GET_INFO_NAME( pdp1 )
+DECLARE_LEGACY_CPU_DEVICE(PDP1, pdp1);
 
 #define AND 001
 #define IOR 002

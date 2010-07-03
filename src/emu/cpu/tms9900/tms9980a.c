@@ -9,3 +9,5 @@
 #define TMS99XX_MODEL TMS9980_ID
 
 #include "99xxcore.h"
+
+DEFINE_LEGACY_CPU_DEVICE(TMS9980, tms9980a);

@@ -16,6 +16,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+DECLARE_LEGACY_CPU_DEVICE(ADSP2100, adsp2100);
+DECLARE_LEGACY_CPU_DEVICE(ADSP2101, adsp2101);
+DECLARE_LEGACY_CPU_DEVICE(ADSP2104, adsp2104);
+DECLARE_LEGACY_CPU_DEVICE(ADSP2105, adsp2105);
+DECLARE_LEGACY_CPU_DEVICE(ADSP2115, adsp2115);
+DECLARE_LEGACY_CPU_DEVICE(ADSP2181, adsp2181);
+
 /* transmit and receive data callbacks types */
 typedef INT32 (*adsp21xx_rx_func)(cpu_device &device, int port);
 typedef void  (*adsp21xx_tx_func)(cpu_device &device, int port, INT32 data);
@@ -69,9 +76,6 @@ enum
 #define ADSP2100_IRQ2		2		/* IRQ2 */
 #define ADSP2100_IRQ3		3		/* IRQ3 */
 
-CPU_GET_INFO( adsp2100 );
-#define CPU_ADSP2100 CPU_GET_INFO_NAME( adsp2100 )
-
 
 /**************************************************************************
  * ADSP2101 section
@@ -85,9 +89,6 @@ CPU_GET_INFO( adsp2100 );
 #define ADSP2101_SPORT0_RX	3		/* SPORT0 receive IRQ */
 #define ADSP2101_SPORT0_TX	4		/* SPORT0 transmit IRQ */
 #define ADSP2101_TIMER		5		/* internal timer IRQ */
-
-CPU_GET_INFO( adsp2101 );
-#define CPU_ADSP2101 CPU_GET_INFO_NAME( adsp2101 )
 
 
 /**************************************************************************
@@ -103,9 +104,6 @@ CPU_GET_INFO( adsp2101 );
 #define ADSP2104_SPORT0_TX	4		/* SPORT0 transmit IRQ */
 #define ADSP2104_TIMER		5		/* internal timer IRQ */
 
-CPU_GET_INFO( adsp2104 );
-#define CPU_ADSP2104 CPU_GET_INFO_NAME( adsp2104 )
-
 void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 
 
@@ -119,9 +117,6 @@ void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #define ADSP2105_SPORT1_TX	1		/* SPORT1 transmit IRQ */
 #define ADSP2105_IRQ2		2		/* IRQ2 */
 #define ADSP2105_TIMER		5		/* internal timer IRQ */
-
-CPU_GET_INFO( adsp2105 );
-#define CPU_ADSP2105 CPU_GET_INFO_NAME( adsp2105 )
 
 void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 
@@ -138,9 +133,6 @@ void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #define ADSP2115_SPORT0_RX	3		/* SPORT0 receive IRQ */
 #define ADSP2115_SPORT0_TX	4		/* SPORT0 transmit IRQ */
 #define ADSP2115_TIMER		5		/* internal timer IRQ */
-
-CPU_GET_INFO( adsp2115 );
-#define CPU_ADSP2115 CPU_GET_INFO_NAME( adsp2115 )
 
 void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 
@@ -160,9 +152,6 @@ void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #define ADSP2181_IRQE		6		/* IRQE */
 #define ADSP2181_IRQL1		7		/* IRQL1 */
 #define ADSP2181_IRQL2		8		/* IRQL2 */
-
-CPU_GET_INFO( adsp2181 );
-#define CPU_ADSP2181 CPU_GET_INFO_NAME( adsp2181 )
 
 void adsp2181_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 void adsp2181_idma_addr_w(running_device *device, UINT16 data);

@@ -216,7 +216,7 @@ static MACHINE_DRIVER_START( sbugger )
 
 	MDRV_DRIVER_DATA( sbugger_state )
 
-	MDRV_CPU_ADD("maincpu", 8085A, 6000000)        /* 3.00 MHz??? */
+	MDRV_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sbugger_map)
 	MDRV_CPU_IO_MAP(sbugger_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq3_line_hold,NUM_INTS_FRAME)

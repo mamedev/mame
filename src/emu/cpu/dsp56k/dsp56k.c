@@ -620,3 +620,5 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_STR_REGISTER + DSP56K_ST15:		sprintf(info->s, "ST15: %08x", ST15);	break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(DSP56156, dsp56k);

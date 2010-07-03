@@ -90,8 +90,7 @@ struct _m6509_Regs {
 INLINE m6509_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M6509);
+	assert(device->type() == M6509);
 	return (m6509_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -414,3 +413,4 @@ CPU_GET_INFO( m6509 )
 	}
 }
 
+DEFINE_LEGACY_CPU_DEVICE(M6509, m6509);

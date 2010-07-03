@@ -407,7 +407,8 @@ MACHINE_RESET( leland )
 		memory_set_bankptr(machine, "bank3", &slave_base[0x10000]);
 
 	/* if we have an I80186 CPU, reset it */
-	if (devtag_get_device(machine, "audiocpu") != NULL && cpu_get_type(devtag_get_device(machine, "audiocpu")) == CPU_I80186)
+	device_t *audiocpu = machine->device("audiocpu");
+	if (audiocpu != NULL && audiocpu->type() == I80186)
 		leland_80186_sound_init();
 }
 

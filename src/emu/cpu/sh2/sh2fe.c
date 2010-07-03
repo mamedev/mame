@@ -18,13 +18,13 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
-static int describe_group_2(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
-static int describe_group_3(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
-static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
-static int describe_group_6(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
-static int describe_group_8(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
-static int describe_group_12(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
+static int describe_group_0(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
+static int describe_group_2(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
+static int describe_group_3(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
+static int describe_group_4(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
+static int describe_group_6(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
+static int describe_group_8(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
+static int describe_group_12(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode);
 
 
 
@@ -39,7 +39,7 @@ static int describe_group_12(SH2 *context, opcode_desc *desc, const opcode_desc 
 
 int sh2_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 {
-	SH2 *context = (SH2 *)param;
+	sh2_state *context = (sh2_state *)param;
 	UINT16 opcode;
 
 	/* fetch the opcode */
@@ -123,7 +123,7 @@ int sh2_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 	return FALSE;
 }
 
-static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
+static int describe_group_0(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
 {
 	switch (opcode & 0x3F)
 	{
@@ -292,7 +292,7 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 	return FALSE;
 }
 
-static int describe_group_2(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
+static int describe_group_2(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
@@ -340,7 +340,7 @@ static int describe_group_2(SH2 *context, opcode_desc *desc, const opcode_desc *
 	return FALSE;
 }
 
-static int describe_group_3(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
+static int describe_group_3(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
@@ -389,7 +389,7 @@ static int describe_group_3(SH2 *context, opcode_desc *desc, const opcode_desc *
 	return FALSE;
 }
 
-static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
+static int describe_group_4(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
 {
 	switch (opcode & 0x3F)
 	{
@@ -619,7 +619,7 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 	return FALSE;
 }
 
-static int describe_group_6(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
+static int describe_group_6(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
@@ -660,7 +660,7 @@ static int describe_group_6(SH2 *context, opcode_desc *desc, const opcode_desc *
 	return FALSE;
 }
 
-static int describe_group_8(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
+static int describe_group_8(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
 {
 	INT32 disp;
 
@@ -715,7 +715,7 @@ static int describe_group_8(SH2 *context, opcode_desc *desc, const opcode_desc *
 	return FALSE;
 }
 
-static int describe_group_12(SH2 *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
+static int describe_group_12(sh2_state *context, opcode_desc *desc, const opcode_desc *prev, UINT16 opcode)
 {
 	switch (opcode & (15<<8))
 	{

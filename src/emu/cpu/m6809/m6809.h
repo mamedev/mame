@@ -15,12 +15,10 @@ enum
 #define M6809_IRQ_LINE	0	/* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
 
-CPU_GET_INFO( m6809 );
-#define CPU_M6809 CPU_GET_INFO_NAME( m6809 )
+DECLARE_LEGACY_CPU_DEVICE(M6809, m6809);
+DECLARE_LEGACY_CPU_DEVICE(M6809E, m6809e);
 
 /* M6809e has LIC line to indicate opcode/data fetch */
-CPU_GET_INFO( m6809e );
-#define CPU_M6809E CPU_GET_INFO_NAME( m6809e )
 
 
 CPU_DISASSEMBLE( m6809 );

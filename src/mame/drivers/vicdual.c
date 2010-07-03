@@ -307,7 +307,7 @@ static MACHINE_DRIVER_START( depthch )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(vicdual_root)
-	MDRV_CPU_REPLACE("maincpu", 8080, VICDUAL_MAIN_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(depthch_map)
 	MDRV_CPU_IO_MAP(depthch_io_map)
 

@@ -133,23 +133,23 @@ struct _cop400_interface
 ***************************************************************************/
 
 /* COP410 family */
-extern CPU_GET_INFO( cop401 );
-extern CPU_GET_INFO( cop410 );
-extern CPU_GET_INFO( cop411 );
+DECLARE_LEGACY_CPU_DEVICE(COP401, cop401);
+DECLARE_LEGACY_CPU_DEVICE(COP410, cop410);
+DECLARE_LEGACY_CPU_DEVICE(COP411, cop411);
 
 /* COP420 family */
-extern CPU_GET_INFO( cop402 );
-extern CPU_GET_INFO( cop420 );
-extern CPU_GET_INFO( cop421 );
-extern CPU_GET_INFO( cop422 );
+DECLARE_LEGACY_CPU_DEVICE(COP402, cop402);
+DECLARE_LEGACY_CPU_DEVICE(COP420, cop420);
+DECLARE_LEGACY_CPU_DEVICE(COP421, cop421);
+DECLARE_LEGACY_CPU_DEVICE(COP422, cop422);
 
 /* COP444 family */
-extern CPU_GET_INFO( cop404 );
-extern CPU_GET_INFO( cop424 );
-extern CPU_GET_INFO( cop425 );
-extern CPU_GET_INFO( cop426 );
-extern CPU_GET_INFO( cop444 );
-extern CPU_GET_INFO( cop445 );
+DECLARE_LEGACY_CPU_DEVICE(COP404, cop404);
+DECLARE_LEGACY_CPU_DEVICE(COP424, cop424);
+DECLARE_LEGACY_CPU_DEVICE(COP425, cop425);
+DECLARE_LEGACY_CPU_DEVICE(COP426, cop426);
+DECLARE_LEGACY_CPU_DEVICE(COP444, cop444);
+DECLARE_LEGACY_CPU_DEVICE(COP445, cop445);
 
 /* disassemblers */
 extern CPU_DISASSEMBLE( cop410 );

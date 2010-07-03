@@ -37,7 +37,6 @@ enum
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern CPU_GET_INFO( asap );
-#define CPU_ASAP CPU_GET_INFO_NAME( asap )
+DECLARE_LEGACY_CPU_DEVICE(ASAP, asap);
 
 #endif /* __ASAP_H__ */

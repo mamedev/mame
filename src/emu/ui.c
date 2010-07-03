@@ -1016,7 +1016,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 		count = 1;
 		for (scandevice = device->typenext(); scandevice != NULL; scandevice = scandevice->typenext())
 		{
-			if (cpu_get_type(device) != cpu_get_type(scandevice) || device->clock() != scandevice->clock())
+			if (device->type() != scandevice->type() || device->clock() != scandevice->clock())
 				break;
 			count++;
 		}

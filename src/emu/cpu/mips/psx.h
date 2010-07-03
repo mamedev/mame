@@ -214,10 +214,7 @@ struct _DasmPSXCPU_state
 
 extern unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UINT8 *opram );
 
-CPU_GET_INFO( psxcpu );
-#define CPU_PSXCPU CPU_GET_INFO_NAME( psxcpu )
-
-CPU_GET_INFO( cxd8661r );
-#define CPU_CXD8661R CPU_GET_INFO_NAME( cxd8661r )
+DECLARE_LEGACY_CPU_DEVICE(PSXCPU, psxcpu);
+DECLARE_LEGACY_CPU_DEVICE(CXD8661R, cxd8661r);
 
 #endif /* __PSX_H__ */

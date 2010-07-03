@@ -53,7 +53,6 @@ struct _mb86233_cpu_core
 	const char *tablergn;
 };
 
-extern CPU_GET_INFO( mb86233 );
-#define CPU_MB86233 CPU_GET_INFO_NAME( mb86233 )
+DECLARE_LEGACY_CPU_DEVICE(MB86233, mb86233);
 
 #endif /* __MB86233_H__ */

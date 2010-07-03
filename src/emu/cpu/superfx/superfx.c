@@ -69,8 +69,7 @@ struct _superfx_state
 INLINE superfx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SUPERFX);
+	assert(device->type() == SUPERFX);
 	return (superfx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1677,3 +1676,5 @@ CPU_GET_INFO( superfx )
 	case CPUINFO_STR_REGISTER + SUPERFX_RAMADDR:	sprintf(info->s, "RAMADDR: %04X", cpustate->ramaddr);	break;
     }
 }
+
+DEFINE_LEGACY_CPU_DEVICE(SUPERFX, superfx);

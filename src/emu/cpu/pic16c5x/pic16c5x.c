@@ -106,12 +106,11 @@ struct _pic16c5x_state
 INLINE pic16c5x_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_PIC16C54 ||
-		   cpu_get_type(device) == CPU_PIC16C55 ||
-		   cpu_get_type(device) == CPU_PIC16C56 ||
-		   cpu_get_type(device) == CPU_PIC16C57 ||
-		   cpu_get_type(device) == CPU_PIC16C58);
+	assert(device->type() == PIC16C54 ||
+		   device->type() == PIC16C55 ||
+		   device->type() == PIC16C56 ||
+		   device->type() == PIC16C57 ||
+		   device->type() == PIC16C58);
 	return (pic16c5x_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1384,3 +1383,9 @@ CPU_GET_INFO( pic16c58 )
 		default:										CPU_GET_INFO_CALL(pic16c5x);			break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(PIC16C54, pic16c54);
+DEFINE_LEGACY_CPU_DEVICE(PIC16C55, pic16c55);
+DEFINE_LEGACY_CPU_DEVICE(PIC16C56, pic16c56);
+DEFINE_LEGACY_CPU_DEVICE(PIC16C57, pic16c57);
+DEFINE_LEGACY_CPU_DEVICE(PIC16C58, pic16c58);

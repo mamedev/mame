@@ -152,8 +152,7 @@ struct _z180_state
 INLINE z180_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_Z180);
+	assert(device->type() == Z180);
 	return (z180_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -2733,3 +2732,5 @@ CPU_GET_INFO( z180 )
 			break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(Z180, z180);

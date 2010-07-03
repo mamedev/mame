@@ -4,8 +4,7 @@
 #define __SPC700_H__
 
 
-extern CPU_GET_INFO( spc700 );
-#define CPU_SPC700 CPU_GET_INFO_NAME( spc700 )
+DECLARE_LEGACY_CPU_DEVICE(SPC700, spc700);
 
 /* ======================================================================== */
 /* ============================= Configuration ============================ */

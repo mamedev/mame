@@ -78,8 +78,7 @@ enum
 INLINE avr8_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->type() == CPU);
-    assert(cpu_get_type(device) == CPU_AVR8);
+    assert(device->type() == AVR8);
     return (avr8_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1157,3 +1156,5 @@ CPU_GET_INFO( avr8 )
         case CPUINFO_STR_REGISTER + AVR8_SP:            sprintf(info->s, "SP: %04x", SPREG ); break;
     }
 }
+
+DEFINE_LEGACY_CPU_DEVICE(AVR8, avr8);

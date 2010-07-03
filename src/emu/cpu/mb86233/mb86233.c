@@ -68,8 +68,7 @@ struct _mb86233_state
 INLINE mb86233_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_MB86233);
+	assert(device->type() == MB86233);
 	return (mb86233_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1711,3 +1710,5 @@ CPU_GET_INFO( mb86233 )
 		case CPUINFO_STR_REGISTER + MB86233_R15:		sprintf(info->s, "R15:%08X", GETGPR(15));				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(MB86233, mb86233);

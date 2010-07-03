@@ -20,8 +20,7 @@ enum
 #define KONAMI_FIRQ_LINE 1   /* FIRQ line number */
 
 /* PUBLIC FUNCTIONS */
-CPU_GET_INFO( konami );
-#define CPU_KONAMI CPU_GET_INFO_NAME( konami )
+DECLARE_LEGACY_CPU_DEVICE(KONAMI, konami);
 
 CPU_DISASSEMBLE( konami );
 

@@ -635,16 +635,15 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 
 static void print_game_chips(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config *devconfig;
-
 	/* iterate over CPUs */
-	for (devconfig = cpu_first(config); devconfig != NULL; devconfig = cpu_next(devconfig))
+	const device_config_execute_interface *exec;
+	for (bool gotone = config->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
 		fprintf(out, "\t\t<chip");
 		fprintf(out, " type=\"cpu\"");
-		fprintf(out, " tag=\"%s\"", xml_normalize_string(devconfig->tag()));
-		fprintf(out, " name=\"%s\"", xml_normalize_string(devconfig->name()));
-		fprintf(out, " clock=\"%d\"", devconfig->clock());
+		fprintf(out, " tag=\"%s\"", xml_normalize_string(exec->devconfig().tag()));
+		fprintf(out, " name=\"%s\"", xml_normalize_string(exec->devconfig().name()));
+		fprintf(out, " clock=\"%d\"", exec->devconfig().clock());
 		fprintf(out, "/>\n");
 	}
 

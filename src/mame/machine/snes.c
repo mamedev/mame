@@ -1697,9 +1697,9 @@ MACHINE_START( snes )
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), snes_direct);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), spc_direct);
 
-	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->soundcpu = machine->device<cpu_device>("soundcpu");
-	state->spc700 = machine->device<cpu_device>("spc700");
+	state->maincpu = machine->device<_5a22_device>("maincpu");
+	state->soundcpu = machine->device<spc700_device>("soundcpu");
+	state->spc700 = machine->device<snes_sound_sound_device>("spc700");
 	state->superfx = machine->device<cpu_device>("superfx");
 
 	// power-on sets these registers like this

@@ -54,8 +54,7 @@ struct _i4004_state
 INLINE i4004_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_I4004);
+	assert(device->type() == I4004);
 	return (i4004_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -617,3 +616,5 @@ CPU_GET_INFO( i4004 )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(I4004, i4004);

@@ -55,8 +55,7 @@ typedef void (*ti99xx_ckon_ckof_func)(running_device *device, int state);
 typedef void (*ti99xx_error_interrupt_func)(running_device *device, int state);
 
 
-extern CPU_GET_INFO( ti990_10 );
-#define CPU_TI990_10 CPU_GET_INFO_NAME( ti990_10 )
+DECLARE_LEGACY_CPU_DEVICE(TI990_10, ti990_10);
 
 /*
     structure with the parameters ti990_10_reset wants.
@@ -83,8 +82,7 @@ extern WRITE8_HANDLER(ti990_10_eir_cru_w);
 
 
 
-extern CPU_GET_INFO( tms9900 );
-#define CPU_TMS9900 CPU_GET_INFO_NAME( tms9900 )
+DECLARE_LEGACY_CPU_DEVICE(TMS9900, tms9900);
 
 /*
     structure with optional parameters for tms9900_reset.
@@ -96,8 +94,7 @@ typedef struct tms9900reset_param
 
 
 
-extern CPU_GET_INFO( tms9940 );
-#define CPU_TMS9940 CPU_GET_INFO_NAME( tms9940 )
+//DECLARE_LEGACY_CPU_DEVICE(TMS9940, tms9940);
 
 /*
     structure with optional parameters for tms9940_reset.
@@ -109,8 +106,7 @@ typedef struct tms9940reset_param
 
 
 
-extern CPU_GET_INFO( tms9980a );
-#define CPU_TMS9980 CPU_GET_INFO_NAME( tms9980a )
+DECLARE_LEGACY_CPU_DEVICE(TMS9980, tms9980a);
 
 /*
     structure with optional parameters for tms9980a_reset.
@@ -122,10 +118,9 @@ typedef struct tms9980areset_param
 
 
 
-extern CPU_GET_INFO( tms9985 );
-#define CPU_TMS9986 CPU_GET_INFO_NAME( tms9985 )
+//DECLARE_LEGACY_CPU_DEVICE(TMS9985, tms9985);
 
-/*
+/*//
     structure with optional parameters for tms9985_reset.
 */
 typedef struct tms9985reset_param
@@ -135,8 +130,7 @@ typedef struct tms9985reset_param
 
 
 
-extern CPU_GET_INFO( tms9989 );
-#define CPU_TMS9989 CPU_GET_INFO_NAME( tms9989 )
+//DECLARE_LEGACY_CPU_DEVICE(TMS9989, tms9989);
 
 /*
     structure with optional parameters for tms9989_reset.
@@ -148,8 +142,7 @@ typedef struct tms9989reset_param
 
 
 
-extern CPU_GET_INFO( tms9995 );
-#define CPU_TMS9995 CPU_GET_INFO_NAME( tms9995 )
+DECLARE_LEGACY_CPU_DEVICE(TMS9995, tms9995);
 
 /*
   structure with the parameters tms9995_reset wants.
@@ -177,8 +170,7 @@ extern WRITE8_HANDLER(tms9995_internal2_w);
 
 
 
-extern CPU_GET_INFO( tms99000 );
-#define CPU_TMS99000 CPU_GET_INFO_NAME( tms99000 )
+//DECLARE_LEGACY_CPU_DEVICE(TMS99000, tms99000);
 
 /*
     structure with optional parameters for tms99000_reset.
@@ -190,8 +182,7 @@ typedef struct tms99000reset_param
 
 
 
-extern CPU_GET_INFO( tms99105a );
-#define CPU_TMS99105A CPU_GET_INFO_NAME( tms99105a )
+//DECLARE_LEGACY_CPU_DEVICE(TMS99105A, tms99105a);
 
 /*
     structure with optional parameters for tms99105a_reset.
@@ -203,8 +194,7 @@ typedef struct tms99105areset_param
 
 
 
-extern CPU_GET_INFO( tms99110a );
-#define CPU_TMS99110A CPU_GET_INFO_NAME( tms99110a )
+//DECLARE_LEGACY_CPU_DEVICE(TMS99110A, tms99110a);
 
 /*
     structure with optional parameters for tms99110a_reset.

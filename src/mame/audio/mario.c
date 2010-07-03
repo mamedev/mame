@@ -474,7 +474,7 @@ static SOUND_START( mario )
 #endif
 
 	state->eabank = NULL;
-	if (audiocpu != NULL && cpu_get_type(audiocpu) != CPU_Z80)
+	if (audiocpu != NULL && audiocpu->type() != Z80)
 	{
 		state->eabank = "bank1";
 		memory_install_read_bank(cpu_get_address_space(audiocpu, ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, "bank1");

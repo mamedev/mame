@@ -63,11 +63,10 @@ typedef struct
 INLINE t90_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TMP90840 ||
-		   cpu_get_type(device) == CPU_TMP90841 ||
-		   cpu_get_type(device) == CPU_TMP91640 ||
-		   cpu_get_type(device) == CPU_TMP91641);
+	assert(device->type() == TMP90840 ||
+		   device->type() == TMP90841 ||
+		   device->type() == TMP91640 ||
+		   device->type() == TMP91641);
 	return (t90_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -2938,3 +2937,8 @@ CPU_GET_INFO( tmp91641 )
 
 	CPU_GET_INFO_CALL(tmp90840);
 }
+
+DEFINE_LEGACY_CPU_DEVICE(TMP90840, tmp90840);
+DEFINE_LEGACY_CPU_DEVICE(TMP90841, tmp90841);
+DEFINE_LEGACY_CPU_DEVICE(TMP91640, tmp91640);
+DEFINE_LEGACY_CPU_DEVICE(TMP91641, tmp91641);

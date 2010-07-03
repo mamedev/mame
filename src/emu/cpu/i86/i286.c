@@ -84,8 +84,7 @@ struct _i80286_state
 INLINE i80286_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_I80286);
+	assert(device->type() == I80286);
 	return (i80286_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -516,3 +515,6 @@ CPU_GET_INFO( i80286 )
 		case CPUINFO_STR_REGISTER + I80286_IDTR_LIMIT:	sprintf(info->s, "%04X", cpustate->idtr.limit); break;
 	}
 }
+
+#undef I80286
+DEFINE_LEGACY_CPU_DEVICE(I80286, i80286);

@@ -807,7 +807,7 @@ static FILE *slapsticlog;
 
 void slapstic_init(running_machine *machine, int chip)
 {
-	cpu_type cputype = cpu_get_type(devtag_get_device(machine, "maincpu"));
+	device_type cputype = machine->device("maincpu")->type();
 
 	/* only a small number of chips are known to exist */
 	if (chip < 101 || chip > 118)
@@ -822,7 +822,7 @@ void slapstic_init(running_machine *machine, int chip)
 	slapstic_reset();
 
 	/* see if we're 68k or 6502/6809 based */
-	access_68k = (cputype == CPU_M68000 || cputype == CPU_M68010);
+	access_68k = (cputype == M68000 || cputype == M68010);
 
 	/* save state */
 	state_save_register_item(machine, "slapstic", NULL, 0, state);

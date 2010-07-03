@@ -18,7 +18,6 @@ enum
 };
 
 /* Public functions */
-extern CPU_GET_INFO( v30mz );
-#define CPU_V30MZ CPU_GET_INFO_NAME( v30mz )
+DECLARE_LEGACY_CPU_DEVICE(V30MZ, v30mz);
 
 #endif /* __NECINTRF_H__ */

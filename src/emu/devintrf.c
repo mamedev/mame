@@ -112,7 +112,11 @@ void device_list::import_config_list(const device_config_list &list, running_mac
 
 	// append each device from the configuration list
 	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next())
-		append(devconfig->tag(), devconfig->alloc_device(*m_machine));
+	{
+		device_t *newdevice = devconfig->alloc_device(*m_machine);
+		append(devconfig->tag(), newdevice);
+		newdevice->find_interfaces();
+	}
 }
 
 
@@ -684,6 +688,7 @@ device_t::device_t(running_machine &_machine, const device_config &config)
 	: machine(&_machine),
 	  m_machine(_machine),
 	  m_execute(NULL),
+	  m_memory(NULL),
 	  m_state(NULL),
 	  m_next(NULL),
 	  m_owner((config.m_owner != NULL) ? _machine.m_devicelist.find(config.m_owner->tag()) : NULL),
@@ -816,14 +821,24 @@ UINT64 device_t::attotime_to_clocks(attotime duration) const
 
 
 //-------------------------------------------------
+//  find_interfaces - locate fast interfaces
+//-------------------------------------------------
+
+void device_t::find_interfaces()
+{
+	// look up the common interfaces
+	m_execute = dynamic_cast<device_execute_interface *>(this);
+	m_memory = dynamic_cast<device_memory_interface *>(this);
+	m_state = dynamic_cast<device_state_interface *>(this);
+}
+
+
+//-------------------------------------------------
 //  start - start a device
 //-------------------------------------------------
 
 void device_t::start()
 {
-	// look up the common interfaces
-	m_execute = dynamic_cast<device_execute_interface *>(this);
-	m_state = dynamic_cast<device_state_interface *>(this);
 
 	// populate the region field
 	m_region = m_machine.region(tag());

@@ -59,16 +59,10 @@ struct _r3000_cpu_core
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern CPU_GET_INFO( r3000be );
-extern CPU_GET_INFO( r3000le );
+DECLARE_LEGACY_CPU_DEVICE(R3000BE, r3000be);
+DECLARE_LEGACY_CPU_DEVICE(R3000LE, r3000le);
 
-#define CPU_R3000BE CPU_GET_INFO_NAME( r3000be )
-#define CPU_R3000LE CPU_GET_INFO_NAME( r3000le )
-
-extern CPU_GET_INFO( r3041be );
-extern CPU_GET_INFO( r3041le );
-
-#define CPU_R3041BE CPU_GET_INFO_NAME( r3041be )
-#define CPU_R3041LE CPU_GET_INFO_NAME( r3041le )
+DECLARE_LEGACY_CPU_DEVICE(R3041BE, r3041be);
+DECLARE_LEGACY_CPU_DEVICE(R3041LE, r3041le);
 
 #endif /* __R3000_H__ */

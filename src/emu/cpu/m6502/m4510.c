@@ -159,8 +159,7 @@ struct _m4510_Regs {
 INLINE m4510_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M4510);
+	assert(device->type() == M4510);
 	return (m4510_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -553,3 +552,5 @@ CPU_GET_INFO( m4510 )
 	}
 }
 
+#undef M4510
+DEFINE_LEGACY_CPU_DEVICE(M4510, m4510);

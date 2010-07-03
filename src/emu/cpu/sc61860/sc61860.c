@@ -63,8 +63,7 @@ struct _sc61860_state
 INLINE sc61860_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SC61860);
+	assert(device->type() == SC61860);
 	return (sc61860_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -245,3 +244,5 @@ CPU_GET_INFO( sc61860 )
 		case CPUINFO_STR_REGISTER + SC61860_ZERO:	sprintf(info->s, "Zero: %d", cpustate->zero);break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(SC61860, sc61860);

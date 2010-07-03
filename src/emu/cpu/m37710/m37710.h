@@ -85,11 +85,8 @@ enum
 	M37710_SER0_XMIT, M37710_SER1_REC, M37710_SER1_XMIT
 };
 
-CPU_GET_INFO( m37710 );
-CPU_GET_INFO( m37702 );
-
-#define CPU_M37710 CPU_GET_INFO_NAME( m37710 )
-#define CPU_M37702 CPU_GET_INFO_NAME( m37702 )
+DECLARE_LEGACY_CPU_DEVICE(M37710, m37710);
+DECLARE_LEGACY_CPU_DEVICE(M37702, m37702);
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

@@ -83,9 +83,8 @@ struct _tms34010_state
 INLINE tms34010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TMS34010 ||
-		   cpu_get_type(device) == CPU_TMS34020);
+	assert(device->type() == TMS34010 ||
+		   device->type() == TMS34020);
 	return (tms34010_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1087,8 +1086,8 @@ VIDEO_UPDATE( tms340x0 )
 	/* find the owning CPU */
 	for (cpu = screen->machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
 	{
-		cpu_type type = cpu_get_type(cpu);
-		if (type == CPU_TMS34010 || type == CPU_TMS34020)
+		device_type type = cpu->type();
+		if (type == TMS34010 || type == TMS34020)
 		{
 			tms = get_safe_token(cpu);
 			if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
@@ -1785,3 +1784,6 @@ CPU_GET_INFO( tms34020 )
 		default:										CPU_GET_INFO_CALL(tms34010);		break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(TMS34010, tms34010);
+DEFINE_LEGACY_CPU_DEVICE(TMS34020, tms34020);

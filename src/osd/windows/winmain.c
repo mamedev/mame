@@ -389,7 +389,8 @@ int main(int argc, char *argv[])
 	InitCommonControls();
 
 	// allocate symbols
-	symbols = global_alloc(symbol_manager(argv[0]));
+	symbol_manager local_symbols(argv[0]);
+	symbols = &local_symbols;
 
 	// set up exception handling
 	pass_thru_filter = SetUnhandledExceptionFilter(exception_filter);
@@ -409,7 +410,7 @@ int main(int argc, char *argv[])
 	DWORD result = cli_execute(argc, argv, mame_win_options);
 
 	// free symbols
-	global_free(symbols);
+	symbols = NULL;
 	return result;
 }
 

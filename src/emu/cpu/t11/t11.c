@@ -41,8 +41,7 @@ struct _t11_state
 INLINE t11_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_T11);
+	assert(device->type() == T11);
 	return (t11_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -493,3 +492,5 @@ CPU_GET_INFO( t11 )
 		case CPUINFO_STR_REGISTER + T11_R5:				sprintf(info->s, "R5:%04X", cpustate->reg[5].w.l); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(T11, t11);

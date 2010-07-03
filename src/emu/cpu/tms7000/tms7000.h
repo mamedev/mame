@@ -47,11 +47,9 @@ enum
 
 /* PUBLIC FUNCTIONS */
 extern void tms7000_A6EC1( running_device *device ); /* External event counter */
-extern CPU_GET_INFO( tms7000 );
-extern CPU_GET_INFO( tms7000_exl );
 
-#define CPU_TMS7000 CPU_GET_INFO_NAME( tms7000 )
-#define CPU_TMS7000_EXL CPU_GET_INFO_NAME( tms7000_exl )
+DECLARE_LEGACY_CPU_DEVICE(TMS7000, tms7000);
+DECLARE_LEGACY_CPU_DEVICE(TMS7000_EXL, tms7000_exl);
 
 extern CPU_DISASSEMBLE( tms7000 );
 

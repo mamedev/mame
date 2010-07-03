@@ -25,8 +25,7 @@ enum
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-CPU_GET_INFO( i8008 );
-#define CPU_I8008 CPU_GET_INFO_NAME( i8008 )
+DECLARE_LEGACY_CPU_DEVICE(I8008, i8008);
 
 CPU_DISASSEMBLE( i8008 );
 #endif

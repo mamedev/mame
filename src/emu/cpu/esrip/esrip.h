@@ -94,9 +94,7 @@ struct _esrip_config_
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-CPU_GET_INFO( esrip );
-
-#define CPU_ESRIP CPU_GET_INFO_NAME( esrip )
+DECLARE_LEGACY_CPU_DEVICE(ESRIP, esrip);
 
 extern UINT8 get_rip_status(running_device *cpu);
 

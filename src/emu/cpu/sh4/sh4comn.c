@@ -30,15 +30,14 @@ static const UINT16 tcnt[] = { TCNT0, TCNT1, TCNT2 };
 static const UINT16 tcor[] = { TCOR0, TCOR1, TCOR2 };
 static const UINT16 tcr[] = { TCR0, TCR1, TCR2 };
 
-INLINE SH4 *get_safe_token(running_device *device)
+INLINE sh4_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SH4);
-	return (SH4 *)downcast<legacy_cpu_device *>(device)->token();
+	assert(device->type() == SH4);
+	return (sh4_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-void sh4_change_register_bank(SH4 *sh4, int to)
+void sh4_change_register_bank(sh4_state *sh4, int to)
 {
 int s;
 
@@ -60,7 +59,7 @@ int s;
 	}
 }
 
-void sh4_swap_fp_registers(SH4 *sh4)
+void sh4_swap_fp_registers(sh4_state *sh4)
 {
 int s;
 UINT32 z;
@@ -74,7 +73,7 @@ UINT32 z;
 }
 
 #ifdef LSB_FIRST
-void sh4_swap_fp_couples(SH4 *sh4)
+void sh4_swap_fp_couples(sh4_state *sh4)
 {
 int s;
 UINT32 z;
@@ -91,7 +90,7 @@ UINT32 z;
 }
 #endif
 
-void sh4_syncronize_register_bank(SH4 *sh4, int to)
+void sh4_syncronize_register_bank(sh4_state *sh4, int to)
 {
 int s;
 
@@ -101,7 +100,7 @@ int s;
 	}
 }
 
-void sh4_default_exception_priorities(SH4 *sh4) // setup default priorities for exceptions
+void sh4_default_exception_priorities(sh4_state *sh4) // setup default priorities for exceptions
 {
 int a;
 
@@ -117,7 +116,7 @@ int a;
 		sh4->exception_priority[a] = INTPRI(0, a);
 }
 
-void sh4_exception_recompute(SH4 *sh4) // checks if there is any interrupt with high enough priority
+void sh4_exception_recompute(sh4_state *sh4) // checks if there is any interrupt with high enough priority
 {
 	int a,z;
 
@@ -136,7 +135,7 @@ void sh4_exception_recompute(SH4 *sh4) // checks if there is any interrupt with 
 	}
 }
 
-void sh4_exception_request(SH4 *sh4, int exception) // start requesting an exception
+void sh4_exception_request(sh4_state *sh4, int exception) // start requesting an exception
 {
 	if (!sh4->exception_requesting[exception])
 	{
@@ -146,7 +145,7 @@ void sh4_exception_request(SH4 *sh4, int exception) // start requesting an excep
 	}
 }
 
-void sh4_exception_unrequest(SH4 *sh4, int exception) // stop requesting an exception
+void sh4_exception_unrequest(sh4_state *sh4, int exception) // stop requesting an exception
 {
 	if (sh4->exception_requesting[exception])
 	{
@@ -156,7 +155,7 @@ void sh4_exception_unrequest(SH4 *sh4, int exception) // stop requesting an exce
 	}
 }
 
-void sh4_exception_checkunrequest(SH4 *sh4, int exception)
+void sh4_exception_checkunrequest(sh4_state *sh4, int exception)
 {
 	if (exception == SH4_INTC_NMI)
 		sh4_exception_unrequest(sh4, exception);
@@ -165,7 +164,7 @@ void sh4_exception_checkunrequest(SH4 *sh4, int exception)
 		sh4_exception_unrequest(sh4, exception);
 }
 
-void sh4_exception(SH4 *sh4, const char *message, int exception) // handle exception
+void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle exception
 {
 	UINT32 vector;
 
@@ -223,7 +222,7 @@ static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base,
 	return base + (UINT32)((attotime_to_double(timer_timeelapsed(timer)) * (double)hertz) / (double)divisor);
 }
 
-static void sh4_refresh_timer_recompute(SH4 *sh4)
+static void sh4_refresh_timer_recompute(sh4_state *sh4)
 {
 UINT32 ticks;
 
@@ -254,7 +253,7 @@ static UINT32 compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
 	return (UINT32)ret;
 }
 
-static void sh4_timer_recompute(SH4 *sh4, int which)
+static void sh4_timer_recompute(sh4_state *sh4, int which)
 {
 	double ticks;
 
@@ -264,7 +263,7 @@ static void sh4_timer_recompute(SH4 *sh4, int which)
 
 static TIMER_CALLBACK( sh4_refresh_timer_callback )
 {
-	SH4 *sh4 = (SH4 *)ptr;
+	sh4_state *sh4 = (sh4_state *)ptr;
 
 	sh4->m[RTCNT] = 0;
 	sh4_refresh_timer_recompute(sh4);
@@ -280,7 +279,7 @@ static TIMER_CALLBACK( sh4_refresh_timer_callback )
 	}
 }
 
-static void increment_rtc_time(SH4 *sh4, int mode)
+static void increment_rtc_time(sh4_state *sh4, int mode)
 {
 	int carry, year, leap, days;
 
@@ -375,7 +374,7 @@ static void increment_rtc_time(SH4 *sh4, int mode)
 
 static TIMER_CALLBACK( sh4_rtc_timer_callback )
 {
-	SH4 *sh4 = (SH4 *)ptr;
+	sh4_state *sh4 = (sh4_state *)ptr;
 
 	timer_adjust_oneshot(sh4->rtc_timer, ATTOTIME_IN_HZ(128), 0);
 	sh4->m[R64CNT] = (sh4->m[R64CNT]+1) & 0x7f;
@@ -390,7 +389,7 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 static TIMER_CALLBACK( sh4_timer_callback )
 {
 	static const UINT16 tuni[] = { SH4_INTC_TUNI0, SH4_INTC_TUNI1, SH4_INTC_TUNI2 };
-	SH4 *sh4 = (SH4 *)ptr;
+	sh4_state *sh4 = (sh4_state *)ptr;
 	int which = param;
 	int idx = tcr[which];
 
@@ -403,7 +402,7 @@ static TIMER_CALLBACK( sh4_timer_callback )
 
 static TIMER_CALLBACK( sh4_dmac_callback )
 {
-	SH4 *sh4 = (SH4 *)ptr;
+	sh4_state *sh4 = (sh4_state *)ptr;
 	int channel = param;
 
 	LOG(("SH4 '%s': DMA %d complete\n", sh4->device->tag(), channel));
@@ -437,7 +436,7 @@ static TIMER_CALLBACK( sh4_dmac_callback )
 	}
 }
 
-static int sh4_dma_transfer(SH4 *sh4, int channel, int timermode, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
+static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
 {
 	int incs, incd, size;
 	UINT32 src, dst, count;
@@ -564,7 +563,7 @@ static int sh4_dma_transfer(SH4 *sh4, int channel, int timermode, UINT32 chcr, U
 	return 1;
 }
 
-static void sh4_dmac_check(SH4 *sh4, int channel)
+static void sh4_dmac_check(sh4_state *sh4, int channel)
 {
 UINT32 dmatcr,chcr,sar,dar;
 
@@ -615,7 +614,7 @@ UINT32 dmatcr,chcr,sar,dar;
 	}
 }
 
-static void sh4_dmac_nmi(SH4 *sh4) // manage dma when nmi
+static void sh4_dmac_nmi(sh4_state *sh4) // manage dma when nmi
 {
 int s;
 
@@ -633,7 +632,7 @@ int s;
 
 WRITE32_HANDLER( sh4_internal_w )
 {
-	SH4 *sh4 = get_safe_token(space->cpu);
+	sh4_state *sh4 = get_safe_token(space->cpu);
 	int a;
 	UINT32 old = sh4->m[offset];
 	COMBINE_DATA(sh4->m+offset);
@@ -945,7 +944,7 @@ WRITE32_HANDLER( sh4_internal_w )
 
 READ32_HANDLER( sh4_internal_r )
 {
-	SH4 *sh4 = get_safe_token(space->cpu);
+	sh4_state *sh4 = get_safe_token(space->cpu);
 	//  logerror("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
 	switch( offset )
 	{
@@ -998,7 +997,7 @@ READ32_HANDLER( sh4_internal_r )
 
 void sh4_set_frt_input(running_device *device, int state)
 {
-	SH4 *sh4 = get_safe_token(device);
+	sh4_state *sh4 = get_safe_token(device);
 
 	if(state == PULSE_LINE)
 	{
@@ -1034,7 +1033,7 @@ void sh4_set_frt_input(running_device *device, int state)
 
 void sh4_set_irln_input(running_device *device, int value)
 {
-	SH4 *sh4 = get_safe_token(device);
+	sh4_state *sh4 = get_safe_token(device);
 
 	if (sh4->irln == value)
 		return;
@@ -1043,7 +1042,7 @@ void sh4_set_irln_input(running_device *device, int value)
 	cpu_set_input_line(device, SH4_IRLn, CLEAR_LINE);
 }
 
-void sh4_set_irq_line(SH4 *sh4, int irqline, int state) // set state of external interrupt line
+void sh4_set_irq_line(sh4_state *sh4, int irqline, int state) // set state of external interrupt line
 {
 	int s;
 
@@ -1113,7 +1112,7 @@ void sh4_set_irq_line(SH4 *sh4, int irqline, int state) // set state of external
 		sh4_check_pending_irq(sh4, "sh4_set_irq_line");
 }
 
-void sh4_parse_configuration(SH4 *sh4, const struct sh4_config *conf)
+void sh4_parse_configuration(sh4_state *sh4, const struct sh4_config *conf)
 {
 	if(conf)
 	{
@@ -1163,7 +1162,7 @@ void sh4_parse_configuration(SH4 *sh4, const struct sh4_config *conf)
 
 void sh4_common_init(running_device *device)
 {
-	SH4 *sh4 = get_safe_token(device);
+	sh4_state *sh4 = get_safe_token(device);
 	int i;
 
 	for (i=0; i<3; i++)
@@ -1190,7 +1189,7 @@ void sh4_common_init(running_device *device)
 
 void sh4_dma_ddt(running_device *device, struct sh4_ddt_dma *s)
 {
-	SH4 *sh4 = get_safe_token(device);
+	sh4_state *sh4 = get_safe_token(device);
 	UINT32 chcr;
 	UINT32 *p32bits;
 	UINT64 *p32bytes;

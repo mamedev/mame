@@ -70,10 +70,9 @@ typedef struct
 INLINE m6805_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M6805 ||
-		   cpu_get_type(device) == CPU_M68705 ||
-		   cpu_get_type(device) == CPU_HD63705);
+	assert(device->type() == M6805 ||
+		   device->type() == M68705 ||
+		   device->type() == HD63705);
 	return (m6805_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1075,3 +1074,7 @@ CPU_GET_INFO( hd63705 )
 		default:										CPU_GET_INFO_CALL(m6805);	break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(M6805, m6805);
+DEFINE_LEGACY_CPU_DEVICE(M68705, m68705);
+DEFINE_LEGACY_CPU_DEVICE(HD63705, hd63705);

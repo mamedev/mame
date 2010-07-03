@@ -308,7 +308,6 @@ union machine_config_token
 	palette_init_func palette_init;
 	video_eof_func video_eof;
 	video_update_func video_update;
-	cpu_type cputype;
 	device_interrupt_func cpu_interrupt;
 	driver_data_alloc_func driver_data_alloc;
 };

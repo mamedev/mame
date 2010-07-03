@@ -126,9 +126,8 @@ struct _tms32031_state
 INLINE tms32031_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TMS32031 ||
-		   cpu_get_type(device) == CPU_TMS32032);
+	assert(device->type() == TMS32031 ||
+		   device->type() == TMS32032);
 	return (tms32031_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -859,3 +858,6 @@ CPU_GET_INFO( tms32032 )
 		default:										CPU_GET_INFO_CALL(tms32031);			break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(TMS32031, tms32031);
+DEFINE_LEGACY_CPU_DEVICE(TMS32032, tms32032);

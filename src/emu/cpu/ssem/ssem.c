@@ -29,8 +29,7 @@ struct _ssem_state
 INLINE ssem_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->type() == CPU);
-    assert(cpu_get_type(device) == CPU_SSEM);
+    assert(device->type() == SSEM);
     return (ssem_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -306,3 +305,5 @@ CPU_GET_INFO( ssem )
         case CPUINFO_STR_REGISTER + SSEM_HALT:          sprintf(info->s, "HALT: %d", cpustate->halt);   break;
     }
 }
+
+DEFINE_LEGACY_CPU_DEVICE(SSEM, ssem);

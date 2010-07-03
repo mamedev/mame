@@ -11,8 +11,7 @@ enum
         MINX_XI, MINX_YI,
 };
 
-CPU_GET_INFO( minx );
-#define CPU_MINX CPU_GET_INFO_NAME( minx )
+DECLARE_LEGACY_CPU_DEVICE(MINX, minx);
 
 extern CPU_DISASSEMBLE( minx );
 

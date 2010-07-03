@@ -98,8 +98,7 @@ TODO general:
 INLINE g65816i_cpu_struct *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_G65816 || cpu_get_type(device) == CPU_5A22);
+	assert(device->type() == G65816 || device->type() == _5A22);
 	return (g65816i_cpu_struct *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -538,7 +537,7 @@ static CPU_INIT( 5a22 )
 }
 
 
-CPU_GET_INFO( 5a22 )
+CPU_GET_INFO( _5a22 )
 {
 	switch (state)
 	{
@@ -551,6 +550,9 @@ CPU_GET_INFO( 5a22 )
 		default:										CPU_GET_INFO_CALL(g65816);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(G65816, g65816);
+DEFINE_LEGACY_CPU_DEVICE(_5A22, _5a22);
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

@@ -87,7 +87,6 @@ enum
 
 CPU_DISASSEMBLE( saturn );
 
-CPU_GET_INFO( saturn );
-#define CPU_SATURN CPU_GET_INFO_NAME( saturn )
+DECLARE_LEGACY_CPU_DEVICE(SATURN, saturn);
 
 #endif /* __SATURN_H__ */

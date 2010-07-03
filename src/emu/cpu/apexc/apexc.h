@@ -19,8 +19,7 @@ enum
 	APEXC_PC	/* doesn't actually exist; is there for the disassembler */
 };
 
-CPU_GET_INFO( apexc );
-#define CPU_APEXC CPU_GET_INFO_NAME( apexc )
+DECLARE_LEGACY_CPU_DEVICE(APEXC, apexc);
 
 CPU_DISASSEMBLE( apexc );
 

@@ -88,9 +88,8 @@ struct _tms7000_state
 INLINE tms7000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TMS7000 ||
-		   cpu_get_type(device) == CPU_TMS7000_EXL);
+	assert(device->type() == TMS7000 ||
+		   device->type() == TMS7000_EXL);
 	return (tms7000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -726,3 +725,6 @@ static READ8_HANDLER( tms7000_internal_r ) {
 	tms7000_state *cpustate = get_safe_token(space->cpu);
 	return cpustate->rf[ offset ];
 }
+
+DEFINE_LEGACY_CPU_DEVICE(TMS7000, tms7000);
+DEFINE_LEGACY_CPU_DEVICE(TMS7000_EXL, tms7000_exl);

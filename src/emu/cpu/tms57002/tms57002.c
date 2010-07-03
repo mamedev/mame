@@ -112,8 +112,7 @@ typedef struct {
 INLINE tms57002_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TMS57002);
+	assert(device->type() == TMS57002);
 	return (tms57002_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1390,3 +1389,5 @@ CPU_GET_INFO(tms57002)
 	case DEVINFO_STR_CREDITS:				strcpy( info->s, "Copyright Olivier Galibert" ); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(TMS57002, tms57002);

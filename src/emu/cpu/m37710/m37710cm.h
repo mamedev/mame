@@ -130,9 +130,8 @@ struct _m37710i_cpu_struct
 INLINE m37710i_cpu_struct *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M37710 ||
-		   cpu_get_type(device) == CPU_M37702);
+	assert(device->type() == M37710 ||
+		   device->type() == M37702);
 	return (m37710i_cpu_struct *)downcast<legacy_cpu_device *>(device)->token();
 }
 

@@ -43,8 +43,7 @@ struct _i960_state_t {
 INLINE i960_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_I960);
+	assert(device->type() == I960);
 	return (i960_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -2227,3 +2226,5 @@ void i960_stall(running_device *device)
 	i960_state_t *i960 = get_safe_token(device);
 	i960->IP = i960->PIP;
 }
+
+DEFINE_LEGACY_CPU_DEVICE(I960, i960);

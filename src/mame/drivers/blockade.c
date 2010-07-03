@@ -486,7 +486,7 @@ static MACHINE_DRIVER_START( blockade )
 	MDRV_DRIVER_DATA(blockade_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/10)
+	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/10)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", blockade_interrupt)

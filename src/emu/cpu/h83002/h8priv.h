@@ -50,11 +50,10 @@ extern h83xx_state h8;
 INLINE h83xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_H83002 ||
-		   cpu_get_type(device) == CPU_H83007 ||
-		   cpu_get_type(device) == CPU_H83044 ||
-		   cpu_get_type(device) == CPU_H83334);
+	assert(device->type() == H83002 ||
+		   device->type() == H83007 ||
+		   device->type() == H83044 ||
+		   device->type() == H83334);
 	return (h83xx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 

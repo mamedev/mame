@@ -512,7 +512,7 @@ static MACHINE_DRIVER_START( spacefev )
 	MDRV_DRIVER_DATA(n8080_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
+	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
 	MDRV_CPU_IO_MAP(main_io_map)
@@ -546,7 +546,7 @@ static MACHINE_DRIVER_START( sheriff )
 	MDRV_DRIVER_DATA(n8080_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
+	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
 	MDRV_CPU_IO_MAP(main_io_map)
@@ -580,7 +580,7 @@ static MACHINE_DRIVER_START( helifire )
 	MDRV_DRIVER_DATA(n8080_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
+	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map)
 	MDRV_CPU_IO_MAP(main_io_map)

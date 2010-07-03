@@ -195,7 +195,7 @@ static VIDEO_UPDATE( photon )
 static MACHINE_DRIVER_START( photon )
 
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8080, 1780000)
+    MDRV_CPU_ADD("maincpu",I8080, 1780000)
     MDRV_CPU_PROGRAM_MAP(pk8000_mem)
     MDRV_CPU_IO_MAP(pk8000_io)
     MDRV_CPU_VBLANK_INT("screen", pk8000_interrupt)

@@ -965,7 +965,7 @@ static MACHINE_DRIVER_START( dwarfd )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MDRV_CPU_ADD("maincpu", 8085A, 10595000/3*2)        /* ? MHz */
+	MDRV_CPU_ADD("maincpu", I8085A, 10595000/3*2)        /* ? MHz */
 	MDRV_CPU_CONFIG(dwarfd_i8085_config)
 	MDRV_CPU_PROGRAM_MAP(mem_map)
 	MDRV_CPU_IO_MAP(io_map)

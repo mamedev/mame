@@ -773,7 +773,7 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				/* bit 2 resets the mcu */
 				if (data & 0x04)
 				{
-					if (state->mcu != NULL && cpu_get_type(state->mcu) == CPU_I8742)
+					if (state->mcu != NULL && state->mcu->type() == I8742)
 						cpu_set_input_line(state->mcu, INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */

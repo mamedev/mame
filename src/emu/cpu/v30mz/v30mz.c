@@ -104,8 +104,7 @@ extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec
 INLINE v30mz_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_V30MZ);
+	assert(device->type() == V30MZ);
 	return (v30mz_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1167,3 +1166,4 @@ CPU_GET_INFO( v30mz )
 	}
 }
 
+DEFINE_LEGACY_CPU_DEVICE(V30MZ, v30mz);

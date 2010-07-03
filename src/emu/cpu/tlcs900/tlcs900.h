@@ -39,8 +39,7 @@ struct _tlcs900_interface
 };
 
 
-extern CPU_GET_INFO( tlcs900h );
-#define CPU_TLCS900H CPU_GET_INFO_NAME( tlcs900h )
+DECLARE_LEGACY_CPU_DEVICE(TLCS900H, tlcs900h);
 
 extern CPU_DISASSEMBLE( tlcs900 );
 

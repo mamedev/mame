@@ -101,8 +101,7 @@ typedef struct
 INLINE spc700i_cpu *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SPC700);
+	assert(device->type() == SPC700);
 	return (spc700i_cpu *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1750,6 +1749,7 @@ CPU_GET_INFO( spc700 )
 	}
 }
 
+DEFINE_LEGACY_CPU_DEVICE(SPC700, spc700);
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

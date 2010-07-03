@@ -1141,7 +1141,7 @@ static const samples_interface alphamc07_samples_interface =
 // the sound board is the same in all games
 static MACHINE_DRIVER_START( common_sound )
 
-	MDRV_CPU_ADD("audiocpu", 8085A, XTAL_6_144MHz)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
 

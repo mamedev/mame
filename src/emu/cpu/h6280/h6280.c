@@ -120,8 +120,7 @@ static void set_irq_line(h6280_Regs* cpustate, int irqline, int state);
 INLINE h6280_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_H6280);
+	assert(device->type() == H6280);
 	return (h6280_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -530,3 +529,5 @@ CPU_GET_INFO( h6280 )
 		case CPUINFO_STR_REGISTER + H6280_M8:			sprintf(info->s, "M8:%02X", cpustate->mmr[7]); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(H6280, h6280);

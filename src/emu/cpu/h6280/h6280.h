@@ -72,9 +72,7 @@ typedef struct
 } h6280_Regs;
 
 
-
-CPU_GET_INFO( h6280 );
-#define CPU_H6280 CPU_GET_INFO_NAME( h6280 )
+DECLARE_LEGACY_CPU_DEVICE(H6280, h6280);
 
 READ8_HANDLER( h6280_irq_status_r );
 WRITE8_HANDLER( h6280_irq_status_w );

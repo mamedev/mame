@@ -503,7 +503,7 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_DRIVER_DATA(snes_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
+	MDRV_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
 	MDRV_CPU_PROGRAM_MAP(snesb_map)
 
 	/* audio CPU */

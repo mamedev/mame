@@ -156,14 +156,13 @@ struct _m6800_state
 INLINE m6800_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M6800 ||
-		   cpu_get_type(device) == CPU_M6801 ||
-		   cpu_get_type(device) == CPU_M6802 ||
-		   cpu_get_type(device) == CPU_M6803 ||
-		   cpu_get_type(device) == CPU_M6808 ||
-		   cpu_get_type(device) == CPU_HD63701 ||
-		   cpu_get_type(device) == CPU_NSC8105);
+	assert(device->type() == M6800 ||
+		   device->type() == M6801 ||
+		   device->type() == M6802 ||
+		   device->type() == M6803 ||
+		   device->type() == M6808 ||
+		   device->type() == HD63701 ||
+		   device->type() == NSC8105);
 	return (m6800_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -2888,3 +2887,11 @@ CPU_GET_INFO( nsc8105 )
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(M6800, m6800);
+DEFINE_LEGACY_CPU_DEVICE(M6801, m6801);
+DEFINE_LEGACY_CPU_DEVICE(M6802, m6802);
+DEFINE_LEGACY_CPU_DEVICE(M6803, m6803);
+DEFINE_LEGACY_CPU_DEVICE(M6808, m6808);
+DEFINE_LEGACY_CPU_DEVICE(HD63701, hd63701);
+DEFINE_LEGACY_CPU_DEVICE(NSC8105, nsc8105);

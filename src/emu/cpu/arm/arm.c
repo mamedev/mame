@@ -253,8 +253,7 @@ static void arm_check_irq_state(ARM_REGS* cpustate);
 INLINE ARM_REGS *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_ARM);
+	assert(device->type() == ARM);
 	return (ARM_REGS *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1567,3 +1566,5 @@ CPU_GET_INFO( arm )
 		case CPUINFO_STR_REGISTER + ARM32_SR14:	sprintf( info->s, "SR14:%08x", cpustate->sArmRegister[eR14_SVC] ); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(ARM, arm);

@@ -15,8 +15,7 @@ enum
 	SSP_PR0, SSP_PR1, SSP_PR2, SSP_PR3, SSP_PR4, SSP_PR5, SSP_PR6, SSP_PR7
 };
 
-CPU_GET_INFO( ssp1601 );
-#define CPU_SSP1601 CPU_GET_INFO_NAME( ssp1601 )
+DECLARE_LEGACY_CPU_DEVICE(SSP1601, ssp1601);
 
 extern unsigned dasm_ssp1601(char *buffer, unsigned pc, const UINT8 *oprom);
 

@@ -93,8 +93,7 @@ struct _z8000_state
 INLINE z8000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_Z8001 || cpu_get_type(device) == CPU_Z8002);
+	assert(device->type() == Z8001 || device->type() == Z8002);
 	return (z8000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -710,3 +709,6 @@ CPU_GET_INFO( z8001 )
 		default:										CPU_GET_INFO_CALL(z8002);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(Z8001, z8001);
+DEFINE_LEGACY_CPU_DEVICE(Z8002, z8002);

@@ -251,9 +251,8 @@ static void (*const dsp_op_table[64])(jaguar_state *jaguar, UINT16 op) =
 INLINE jaguar_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_JAGUARGPU ||
-		   cpu_get_type(device) == CPU_JAGUARDSP);
+	assert(device->type() == JAGUARGPU ||
+		   device->type() == JAGUARDSP);
 	return (jaguar_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1663,3 +1662,6 @@ CPU_GET_INFO( jaguardsp )
 		default:										CPU_GET_INFO_CALL(jaguargpu);						break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(JAGUARGPU, jaguargpu);
+DEFINE_LEGACY_CPU_DEVICE(JAGUARDSP, jaguardsp);

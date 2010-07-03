@@ -401,7 +401,7 @@ static MACHINE_DRIVER_START( safarir )
 	MDRV_DRIVER_DATA( safarir_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8085A, 18000000/8)	/* 2.25 MHz ? */
+	MDRV_CPU_ADD("maincpu", I8085A, 18000000/8)	/* 2.25 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(safarir)

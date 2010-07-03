@@ -240,7 +240,7 @@ static MACHINE_DRIVER_START( dynadice )
 	MDRV_DRIVER_DATA(dynadice_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080,18432000/8)
+	MDRV_CPU_ADD("maincpu", I8080,18432000/8)
 	MDRV_CPU_PROGRAM_MAP(dynadice_map)
 	MDRV_CPU_IO_MAP(dynadice_io_map)
 

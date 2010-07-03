@@ -64,8 +64,7 @@ enum
 #define DSP56K_IRQ_RESET 3	/* Is this needed? */
 
 // Needed for MAME
-extern CPU_GET_INFO( dsp56k );
-#define CPU_DSP56156 CPU_GET_INFO_NAME( dsp56k )
+DECLARE_LEGACY_CPU_DEVICE(DSP56156, dsp56k);
 
 
 /***************************************************************************

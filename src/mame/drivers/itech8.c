@@ -592,7 +592,7 @@ static const via6522_interface via_interface =
 
 void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter)
 {
-	cpu_type main_cpu_type = cpu_get_type(devtag_get_device(machine, "maincpu"));
+	device_type main_cpu_type = machine->device("maincpu")->type();
 
 	/* update the states */
 	if (periodic != -1) periodic_int = periodic;
@@ -600,7 +600,7 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 	if (blitter != -1) blitter_int = blitter;
 
 	/* handle the 6809 case */
-	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
+	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
 		/* just modify lines that have changed */
 		if (periodic != -1) cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
@@ -671,10 +671,10 @@ static MACHINE_START( sstrike )
 
 static MACHINE_RESET( itech8 )
 {
-	cpu_type main_cpu_type = cpu_get_type(devtag_get_device(machine, "maincpu"));
+	device_type main_cpu_type = machine->device("maincpu")->type();
 
 	/* make sure bank 0 is selected */
-	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
+	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
 		memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x4000]);
 		machine->device("maincpu")->reset();

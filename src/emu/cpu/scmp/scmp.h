@@ -33,12 +33,10 @@ struct _scmp_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-CPU_GET_INFO( scmp );
-#define CPU_SCMP CPU_GET_INFO_NAME( scmp )
+DECLARE_LEGACY_CPU_DEVICE(SCMP, scmp);
 
 CPU_DISASSEMBLE( scmp );
 
-CPU_GET_INFO( ins8060 );
-#define CPU_INS8060 CPU_GET_INFO_NAME( ins8060 )
+DECLARE_LEGACY_CPU_DEVICE(INS8060, ins8060);
 
 #endif

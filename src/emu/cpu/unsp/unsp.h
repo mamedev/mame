@@ -65,8 +65,7 @@ enum
     UNSP_NUM_LINES
 };
 
-CPU_GET_INFO( unsp );
-#define CPU_UNSP CPU_GET_INFO_NAME( unsp )
+DECLARE_LEGACY_CPU_DEVICE(UNSP, unsp);
 CPU_DISASSEMBLE( unsp );
 
 #endif /* __UNSP_H__ */

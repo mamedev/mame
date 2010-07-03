@@ -100,8 +100,7 @@ struct _tms32010_state
 INLINE tms32010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TMS32010);
+	assert(device->type() == TMS32010);
 	return (tms32010_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1034,3 +1033,5 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_STR_REGISTER + TMS32010_STK3:	sprintf(info->s, "STK3:%04X", cpustate->STACK[3]); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(TMS32010, tms32010);

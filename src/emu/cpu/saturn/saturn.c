@@ -90,8 +90,7 @@ struct _saturn_state
 INLINE saturn_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SATURN);
+	assert(device->type() == SATURN);
 	return (saturn_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -407,3 +406,5 @@ CPU_GET_INFO( saturn )
 	        case CPUINFO_STR_REGISTER + SATURN_SLEEPING:	sprintf(info->s, "sleep:%c", cpustate->sleeping?'S':'.'); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(SATURN, saturn);

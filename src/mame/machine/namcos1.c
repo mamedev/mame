@@ -596,7 +596,13 @@ WRITE8_HANDLER( namcos1_cpu_control_w )
 
 WRITE8_HANDLER( namcos1_watchdog_w )
 {
-	wdog |= 1 << cpu_get_index(space->cpu);
+	if (space->cpu == space->machine->device("maincpu"))
+		wdog |= 1;
+	else if (space->cpu == space->machine->device("sub"))
+		wdog |= 2;
+	else if (space->cpu == space->machine->device("audiocpu"))
+		wdog |= 4;
+		
 	if (wdog == 7 || !namcos1_reset)
 	{
 		wdog = 0;

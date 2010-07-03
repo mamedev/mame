@@ -71,8 +71,7 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 INLINE arm_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_ARM7 || cpu_get_type(device) == CPU_ARM9 || cpu_get_type(device) == CPU_PXA255);
+	assert(device->type() == ARM7 || device->type() == ARM9 || device->type() == PXA255);
 	return (arm_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -837,3 +836,7 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 {
 }
 
+DEFINE_LEGACY_CPU_DEVICE(ARM7, arm7);
+DEFINE_LEGACY_CPU_DEVICE(ARM9, arm9);
+DEFINE_LEGACY_CPU_DEVICE(PXA255, pxa255);
+DEFINE_LEGACY_CPU_DEVICE(SA1110, sa1110);

@@ -123,8 +123,7 @@ typedef struct
 INLINE esrip_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_ESRIP);
+	assert(device->type() == ESRIP);
 	return (esrip_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1995,3 +1994,5 @@ CPU_GET_INFO( esrip )
 		case CPUINFO_STR_REGISTER + ESRIP_IADDR:		sprintf(info->s, "IADR: %04X", cpustate->iaddr_latch); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(ESRIP, esrip);

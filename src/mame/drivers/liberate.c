@@ -874,10 +874,8 @@ static MACHINE_DRIVER_START( liberatb )
 	MDRV_IMPORT_FROM(liberate)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_TYPE(M6502)
+	MDRV_CPU_REPLACE("maincpu", M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(liberatb_map)
-	MDRV_CPU_IO_MAP(0)
 	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
 MACHINE_DRIVER_END
 

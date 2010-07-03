@@ -96,47 +96,30 @@ extern void i8051_set_serial_tx_callback(running_device *device, mcs51_serial_tx
 extern void i8051_set_serial_rx_callback(running_device *device, mcs51_serial_rx_func rx_func);
 
 /* variants with no internal rom and 128 byte internal memory */
-CPU_GET_INFO( i8031 );
-#define CPU_I8031 CPU_GET_INFO_NAME( i8031 )
+DECLARE_LEGACY_CPU_DEVICE(I8031, i8031);
 
 /* variants with no internal rom and 256 byte internal memory */
-CPU_GET_INFO( i8032 );
-#define CPU_I8032 CPU_GET_INFO_NAME( i8032 )
+DECLARE_LEGACY_CPU_DEVICE(I8032, i8032);
 
 /* variants 4k internal rom and 128 byte internal memory */
-CPU_GET_INFO( i8051 );
-CPU_GET_INFO( i8751 );
-
-#define CPU_I8051 CPU_GET_INFO_NAME( i8051 )
-#define CPU_I8751 CPU_GET_INFO_NAME( i8751 )
+DECLARE_LEGACY_CPU_DEVICE(I8051, i8051);
+DECLARE_LEGACY_CPU_DEVICE(I8751, i8751);
 
 /* variants 8k internal rom and 256 byte internal memory and more registers */
-CPU_GET_INFO( i8052 );
-CPU_GET_INFO( i8752 );
-
-#define CPU_I8052 CPU_GET_INFO_NAME( i8052 )
-#define CPU_I8752 CPU_GET_INFO_NAME( i8752 )
+DECLARE_LEGACY_CPU_DEVICE(I8052, i8052);
+DECLARE_LEGACY_CPU_DEVICE(I8752, i8752);
 
 /* cmos variants */
-CPU_GET_INFO( i80c31 );
-CPU_GET_INFO( i80c51 );
-CPU_GET_INFO( i87c51 );
+DECLARE_LEGACY_CPU_DEVICE(I80C31, i80c31);
+DECLARE_LEGACY_CPU_DEVICE(I80C51, i80c51);
+DECLARE_LEGACY_CPU_DEVICE(I87C51, i87c51);
 
-#define CPU_I80C31 CPU_GET_INFO_NAME( i80c31 )
-#define CPU_I80C32 CPU_GET_INFO_NAME( i80c32 )
-#define CPU_I80C51 CPU_GET_INFO_NAME( i80c51 )
-
-CPU_GET_INFO( i80c32 );
-CPU_GET_INFO( i80c52 );
-CPU_GET_INFO( i87c52 );
-
-#define CPU_I80C52 CPU_GET_INFO_NAME( i80c52 )
-#define CPU_I87C51 CPU_GET_INFO_NAME( i87c51 )
-#define CPU_I87C52 CPU_GET_INFO_NAME( i87c52 )
+DECLARE_LEGACY_CPU_DEVICE(I80C32, i80c32);
+DECLARE_LEGACY_CPU_DEVICE(I80C52, i80c52);
+DECLARE_LEGACY_CPU_DEVICE(I87C52, i87c52);
 
 /* 4k internal perom and 128 internal ram and 2 analog comparators */
-CPU_GET_INFO( at89c4051 );
-#define CPU_AT89C4051 CPU_GET_INFO_NAME( at89c4051 )
+DECLARE_LEGACY_CPU_DEVICE(AT89C4051, at89c4051);
 
 /*
  * The DS5002FP has 2 16 bits data address buses (the byte-wide bus and the expanded bus). The exact memory position accessed depends on the
@@ -154,8 +137,7 @@ CPU_GET_INFO( at89c4051 );
  * Internal ram 128k and security features
  */
 
-CPU_GET_INFO( ds5002fp );
-#define CPU_DS5002FP CPU_GET_INFO_NAME( ds5002fp )
+DECLARE_LEGACY_CPU_DEVICE(DS5002FP, ds5002fp);
 
 
 /****************************************************************************

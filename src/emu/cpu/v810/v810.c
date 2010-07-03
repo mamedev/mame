@@ -40,8 +40,7 @@ struct _v810_state
 INLINE v810_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_V810);
+	assert(device->type() == V810);
 	return (v810_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1285,3 +1284,5 @@ CPU_GET_INFO( v810 )
 		case CPUINFO_STR_REGISTER + V810_ADTRE:			sprintf(info->s, "ADTRE:%08X", cpustate->ADTRE);	break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(V810, v810);

@@ -59,8 +59,7 @@ struct _sm8500_state
 INLINE sm8500_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SM8500);
+	assert(device->type() == SM8500);
 	return (sm8500_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -553,3 +552,5 @@ CPU_GET_INFO( sm8500 )
 	}
 }
 
+
+DEFINE_LEGACY_CPU_DEVICE(SM8500, sm8500);

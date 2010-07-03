@@ -60,8 +60,7 @@ struct _ssp1601_state_t
 INLINE ssp1601_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SSP1601);
+	assert(device->type() == SSP1601);
 	return (ssp1601_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -911,3 +910,5 @@ CPU_GET_INFO( ssp1601 )
 
 // vim:ts=4
 
+
+DEFINE_LEGACY_CPU_DEVICE(SSP1601, ssp1601);

@@ -639,7 +639,7 @@ static MACHINE_DRIVER_START( enigma2a )
 	MDRV_DRIVER_DATA(enigma2_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", I8080, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(engima2a_main_cpu_map)
 	MDRV_CPU_IO_MAP(engima2a_main_cpu_io_map)
 

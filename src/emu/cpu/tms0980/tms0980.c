@@ -449,14 +449,13 @@ static const UINT32 tms1100_default_decode[256] = {
 INLINE tms0980_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TMS0980 ||
-			cpu_get_type(device) == CPU_TMS1000 ||
-			cpu_get_type(device) == CPU_TMS1070 ||
-			cpu_get_type(device) == CPU_TMS1100 ||
-			cpu_get_type(device) == CPU_TMS1200 ||
-			cpu_get_type(device) == CPU_TMS1270 ||
-			cpu_get_type(device) == CPU_TMS1300 );
+	assert(device->type() == TMS0980 ||
+			device->type() == TMS1000 ||
+			device->type() == TMS1070 ||
+			device->type() == TMS1100 ||
+			device->type() == TMS1200 ||
+			device->type() == TMS1270 ||
+			device->type() == TMS1300 );
 	return (tms0980_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1275,3 +1274,12 @@ CPU_GET_INFO( tms1300 )
 	}
 }
 
+
+DEFINE_LEGACY_CPU_DEVICE(TMS0980, tms0980);
+
+DEFINE_LEGACY_CPU_DEVICE(TMS1000, tms1000);
+DEFINE_LEGACY_CPU_DEVICE(TMS1070, tms1070);
+DEFINE_LEGACY_CPU_DEVICE(TMS1100, tms1100);
+DEFINE_LEGACY_CPU_DEVICE(TMS1200, tms1200);
+DEFINE_LEGACY_CPU_DEVICE(TMS1270, tms1270);
+DEFINE_LEGACY_CPU_DEVICE(TMS1300, tms1300);

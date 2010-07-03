@@ -76,8 +76,7 @@ struct _dsp32_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern CPU_GET_INFO( dsp32c );
-#define CPU_DSP32C CPU_GET_INFO_NAME( dsp32c )
+DECLARE_LEGACY_CPU_DEVICE(DSP32C, dsp32c);
 
 extern void dsp32c_pio_w(running_device *device, int reg, int data);
 extern int dsp32c_pio_r(running_device *device, int reg);

@@ -239,7 +239,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( redalert_audio_voice )
 
-	MDRV_CPU_ADD("voice", 8085A, REDALERT_VOICE_CPU_CLOCK)
+	MDRV_CPU_ADD("voice", I8085A, REDALERT_VOICE_CPU_CLOCK)
 	MDRV_CPU_CONFIG(redalert_voice_i8085_config)
 	MDRV_CPU_PROGRAM_MAP(redalert_voice_map)
 

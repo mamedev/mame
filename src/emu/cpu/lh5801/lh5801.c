@@ -71,8 +71,7 @@ struct _lh5810_state
 INLINE lh5801_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_LH5801);
+	assert(device->type() == LH5801);
 	return (lh5801_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -268,3 +267,5 @@ CPU_GET_INFO( lh5801 )
 		case CPUINFO_STR_REGISTER + LH5801_DP:			sprintf(info->s, "DP:%04X", cpustate->dp); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(LH5801, lh5801);

@@ -294,11 +294,8 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/spc700/spc700.h"
-#include "cpu/g65816/g65816.h"
 #include "cpu/z80/z80.h"
 #include "includes/snes.h"
-#include "audio/snes_snd.h"
 
 static ADDRESS_MAP_START( snes_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
@@ -618,7 +615,7 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_DRIVER_DATA(snes_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
+	MDRV_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
 	MDRV_CPU_PROGRAM_MAP(snes_map)
 
 	MDRV_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */

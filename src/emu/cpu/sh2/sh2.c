@@ -116,7 +116,7 @@ CPU_DISASSEMBLE( sh2 );
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 static int sh2_icount;
-SH2 *sh2;
+sh2_state *sh2;
 
 INLINE UINT8 RB(offs_t A)
 {
@@ -2154,7 +2154,7 @@ static CPU_RESET( sh2 )
 	save_is_slave = sh2->is_slave;
 	dma_callback_kludge = sh2->dma_callback_kludge;
 
-	memset(sh2, 0, sizeof(SH2));
+	memset(sh2, 0, sizeof(sh2_state));
 
 	sh2->dma_callback_kludge = dma_callback_kludge;
 	sh2->is_slave = save_is_slave;
@@ -2318,7 +2318,7 @@ CPU_GET_INFO( sh2 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(SH2);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(sh2_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 16;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
@@ -2463,5 +2463,8 @@ void sh2drc_add_pcflush(running_device *device, offs_t address)
 {
 	/* doesn't apply here */
 }
+
+DEFINE_LEGACY_CPU_DEVICE(SH1, sh1);
+DEFINE_LEGACY_CPU_DEVICE(SH2, sh2);
 
 #endif

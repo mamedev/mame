@@ -197,7 +197,7 @@ static MACHINE_DRIVER_START( sstrangr )
 	MDRV_DRIVER_DATA( sstrangr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",8080,1996800)	/* clock is a guess, taken from mw8080bw */
+	MDRV_CPU_ADD("maincpu",I8080,1996800)	/* clock is a guess, taken from mw8080bw */
 	MDRV_CPU_PROGRAM_MAP(sstrangr_map)
 	MDRV_CPU_IO_MAP(sstrangr_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)

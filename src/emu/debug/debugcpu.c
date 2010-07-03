@@ -339,11 +339,9 @@ symbol_table *debug_cpu_get_symtable(device_t *device)
 
 int debug_cpu_translate(const address_space *space, int intention, offs_t *address)
 {
-	if (space->cpu != NULL && space->cpu->type() == CPU)
-	{
-		cpu_debug_data *cpudebug = cpu_get_debug_data(space->cpu);
-		return cpudebug->cpudevice->translate(space->spacenum, intention, *address);
-	}
+	device_memory_interface *memory;
+	if (space->cpu->interface(memory))
+		return memory->translate(space->spacenum, intention, *address);
 	return TRUE;
 }
 
@@ -1283,7 +1281,6 @@ int debug_cpu_hotspot_track(device_t *device, int numspots, int threshhold)
 
 UINT8 debug_read_byte(const address_space *space, offs_t address, int apply_translation)
 {
-	cpu_debug_data *cpudebug = (space->cpu->type() == CPU) ? cpu_get_debug_data(space->cpu) : NULL;
 	debugcpu_private *global = space->machine->debugcpu_data;
 	UINT64 custom;
 	UINT8 result;
@@ -1299,7 +1296,7 @@ UINT8 debug_read_byte(const address_space *space, offs_t address, int apply_tran
 		result = 0xff;
 
 	/* if there is a custom read handler, and it returns TRUE, use that value */
-	else if (cpudebug != NULL && cpudebug->cpudevice->read(space->spacenum, address, 1, custom))
+	else if (device_memory(space->cpu)->read(space->spacenum, address, 1, custom))
 		result = custom;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -1341,7 +1338,6 @@ UINT16 debug_read_word(const address_space *space, offs_t address, int apply_tra
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
-		cpu_debug_data *cpudebug = (space->cpu->type() == CPU) ? cpu_get_debug_data(space->cpu) : NULL;
 		UINT64 custom;
 
 		/* all accesses from this point on are for the debugger */
@@ -1352,7 +1348,7 @@ UINT16 debug_read_word(const address_space *space, offs_t address, int apply_tra
 			result = 0xffff;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
-		else if (cpudebug != NULL && cpudebug->cpudevice->read(space->spacenum, address, 2, custom))
+		else if (device_memory(space->cpu)->read(space->spacenum, address, 2, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1396,7 +1392,6 @@ UINT32 debug_read_dword(const address_space *space, offs_t address, int apply_tr
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
-		cpu_debug_data *cpudebug = (space->cpu->type() == CPU) ? cpu_get_debug_data(space->cpu) : NULL;
 		UINT64 custom;
 
 		/* all accesses from this point on are for the debugger */
@@ -1407,7 +1402,7 @@ UINT32 debug_read_dword(const address_space *space, offs_t address, int apply_tr
 			result = 0xffffffff;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
-		else if (cpudebug != NULL && cpudebug->cpudevice->read(space->spacenum, address, 4, custom))
+		else if (device_memory(space->cpu)->read(space->spacenum, address, 4, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1451,7 +1446,6 @@ UINT64 debug_read_qword(const address_space *space, offs_t address, int apply_tr
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
-		cpu_debug_data *cpudebug = (space->cpu->type() == CPU) ? cpu_get_debug_data(space->cpu) : NULL;
 		UINT64 custom;
 
 		/* all accesses from this point on are for the debugger */
@@ -1462,7 +1456,7 @@ UINT64 debug_read_qword(const address_space *space, offs_t address, int apply_tr
 			result = ~(UINT64)0;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
-		else if (cpudebug != NULL && cpudebug->cpudevice->read(space->spacenum, address, 8, custom))
+		else if (device_memory(space->cpu)->read(space->spacenum, address, 8, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1503,7 +1497,6 @@ UINT64 debug_read_memory(const address_space *space, offs_t address, int size, i
 
 void debug_write_byte(const address_space *space, offs_t address, UINT8 data, int apply_translation)
 {
-	cpu_debug_data *cpudebug = (space->cpu->type() == CPU) ? cpu_get_debug_data(space->cpu) : NULL;
 	debugcpu_private *global = space->machine->debugcpu_data;
 
 	/* mask against the logical byte mask */
@@ -1517,7 +1510,7 @@ void debug_write_byte(const address_space *space, offs_t address, UINT8 data, in
 		;
 
 	/* if there is a custom write handler, and it returns TRUE, use that */
-	else if (cpudebug != NULL && cpudebug->cpudevice->write(space->spacenum, address, 1, data))
+	else if (device_memory(space->cpu)->write(space->spacenum, address, 1, data))
 		;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -1560,8 +1553,6 @@ void debug_write_word(const address_space *space, offs_t address, UINT16 data, i
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
-		cpu_debug_data *cpudebug = (space->cpu->type() == CPU) ? cpu_get_debug_data(space->cpu) : NULL;
-
 		/* all accesses from this point on are for the debugger */
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
@@ -1570,7 +1561,7 @@ void debug_write_word(const address_space *space, offs_t address, UINT16 data, i
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
-		else if (cpudebug != NULL && cpudebug->cpudevice->write(space->spacenum, address, 2, data))
+		else if (device_memory(space->cpu)->write(space->spacenum, address, 2, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1614,8 +1605,6 @@ void debug_write_dword(const address_space *space, offs_t address, UINT32 data, 
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
-		cpu_debug_data *cpudebug = (space->cpu->type() == CPU) ? cpu_get_debug_data(space->cpu) : NULL;
-
 		/* all accesses from this point on are for the debugger */
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
@@ -1624,7 +1613,7 @@ void debug_write_dword(const address_space *space, offs_t address, UINT32 data, 
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
-		else if (cpudebug != NULL && cpudebug->cpudevice->write(space->spacenum, address, 4, data))
+		else if (device_memory(space->cpu)->write(space->spacenum, address, 4, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1668,8 +1657,6 @@ void debug_write_qword(const address_space *space, offs_t address, UINT64 data, 
 	/* otherwise, this proceeds like the byte case */
 	else
 	{
-		cpu_debug_data *cpudebug = (space->cpu->type() == CPU) ? cpu_get_debug_data(space->cpu) : NULL;
-
 		/* all accesses from this point on are for the debugger */
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
@@ -1678,7 +1665,7 @@ void debug_write_qword(const address_space *space, offs_t address, UINT64 data, 
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
-		else if (cpudebug != NULL && cpudebug->cpudevice->write(space->spacenum, address, 8, data))
+		else if (device_memory(space->cpu)->write(space->spacenum, address, 8, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -2852,7 +2839,17 @@ static UINT64 get_wpdata(void *globalref, void *ref)
 static UINT64 get_cpunum(void *globalref, void *ref)
 {
 	running_machine *machine = (running_machine *)globalref;
-	return cpu_get_index(machine->debugcpu_data->visiblecpu);
+	device_t *target = machine->debugcpu_data->visiblecpu;
+	
+	device_execute_interface *exec;
+	int index = 0;
+	for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+	{
+		if (&exec->device() == target)
+			return index;
+		index++;
+	}
+	return 0;
 }
 
 

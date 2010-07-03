@@ -271,8 +271,7 @@ static void (*const conditiontable[16])(asap_state *) =
 INLINE asap_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_ASAP);
+	assert(device->type() == ASAP);
 	return (asap_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1848,3 +1847,5 @@ CPU_GET_INFO( asap )
 		case CPUINFO_STR_REGISTER + ASAP_R31:			sprintf(info->s, "R31:%08X", asap->src2val[REGBASE + 31]); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(ASAP, asap);

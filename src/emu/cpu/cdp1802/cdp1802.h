@@ -92,8 +92,7 @@ struct _cdp1802_interface
 };
 #define CDP1802_INTERFACE(name) const cdp1802_interface (name) =
 
-extern CPU_GET_INFO( cdp1802 );
-#define CPU_CDP1802 CPU_GET_INFO_NAME( cdp1802 )
+DECLARE_LEGACY_CPU_DEVICE(CDP1802, cdp1802);
 
 extern CPU_DISASSEMBLE( cdp1802 );
 

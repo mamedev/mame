@@ -32,8 +32,7 @@ struct t11_setup
 };
 
 
-extern CPU_GET_INFO( t11 );
-#define CPU_T11 CPU_GET_INFO_NAME( t11 )
+DECLARE_LEGACY_CPU_DEVICE(T11, t11);
 
 CPU_DISASSEMBLE( t11 );
 

@@ -98,7 +98,7 @@ typedef struct
 	UINT32 sh4_tlb_data[64];
 	UINT8 sh4_mmu_enabled;
 
-} SH4;
+} sh4_state;
 
 enum
 {
@@ -134,23 +134,23 @@ enum
 #define Rn	((opcode>>8)&15)
 #define Rm	((opcode>>4)&15)
 
-void sh4_exception_recompute(SH4 *sh4); // checks if there is any interrupt with high enough priority
-void sh4_exception_request(SH4 *sh4, int exception); // start requesting an exception
-void sh4_exception_unrequest(SH4 *sh4, int exception); // stop requesting an exception
-void sh4_exception_checkunrequest(SH4 *sh4, int exception);
-void sh4_exception(SH4 *sh4, const char *message, int exception); // handle exception
-void sh4_change_register_bank(SH4 *sh4, int to);
-void sh4_syncronize_register_bank(SH4 *sh4, int to);
-void sh4_swap_fp_registers(SH4 *sh4);
-void sh4_default_exception_priorities(SH4 *sh4); // setup default priorities for exceptions
-void sh4_parse_configuration(SH4 *sh4, const struct sh4_config *conf);
-void sh4_set_irq_line(SH4 *sh4, int irqline, int state); // set state of external interrupt line
+void sh4_exception_recompute(sh4_state *sh4); // checks if there is any interrupt with high enough priority
+void sh4_exception_request(sh4_state *sh4, int exception); // start requesting an exception
+void sh4_exception_unrequest(sh4_state *sh4, int exception); // stop requesting an exception
+void sh4_exception_checkunrequest(sh4_state *sh4, int exception);
+void sh4_exception(sh4_state *sh4, const char *message, int exception); // handle exception
+void sh4_change_register_bank(sh4_state *sh4, int to);
+void sh4_syncronize_register_bank(sh4_state *sh4, int to);
+void sh4_swap_fp_registers(sh4_state *sh4);
+void sh4_default_exception_priorities(sh4_state *sh4); // setup default priorities for exceptions
+void sh4_parse_configuration(sh4_state *sh4, const struct sh4_config *conf);
+void sh4_set_irq_line(sh4_state *sh4, int irqline, int state); // set state of external interrupt line
 #ifdef LSB_FIRST
-void sh4_swap_fp_couples(SH4 *sh4);
+void sh4_swap_fp_couples(sh4_state *sh4);
 #endif
 void sh4_common_init(running_device *device);
 
-INLINE void sh4_check_pending_irq(SH4 *sh4, const char *message) // look for highest priority active exception and handle it
+INLINE void sh4_check_pending_irq(sh4_state *sh4, const char *message) // look for highest priority active exception and handle it
 {
 	int a,irq,z;
 

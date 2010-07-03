@@ -216,8 +216,7 @@ struct _rsp_state
 	rspimp_state* impstate;
 };
 
-CPU_GET_INFO( rsp );
-#define CPU_RSP CPU_GET_INFO_NAME( rsp )
+DECLARE_LEGACY_CPU_DEVICE(RSP, rsp);
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 

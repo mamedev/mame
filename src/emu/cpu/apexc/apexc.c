@@ -371,8 +371,7 @@ struct _apexc_state
 INLINE apexc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_APEXC);
+	assert(device->type() == APEXC);
 	return (apexc_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -951,3 +950,5 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_STR_REGISTER + APEXC_STATE:		sprintf(info->s, "CPU state:%01X", cpustate->running ? TRUE : FALSE); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(APEXC, apexc);

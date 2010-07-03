@@ -4,6 +4,9 @@
 #include "devlegcy.h"
 #include "devcb.h"
 #include "streams.h"
+#include "cpu/spc700/spc700.h"
+#include "cpu/g65816/g65816.h"
+#include "audio/snes_snd.h"
 
 /*
     SNES timing theory:
@@ -457,9 +460,9 @@ public:
 	snes_cart_info cart[2];	// the second one is used by MESS for Sufami Turbo and, eventually, BS-X
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *soundcpu;
-	cpu_device *spc700;
+	_5a22_device *maincpu;
+	spc700_device *soundcpu;
+	snes_sound_sound_device *spc700;
 	cpu_device *superfx;
 };
 

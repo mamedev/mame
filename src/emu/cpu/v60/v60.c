@@ -114,9 +114,8 @@ struct _v60_state
 INLINE v60_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_V60 ||
-		   cpu_get_type(device) == CPU_V70);
+	assert(device->type() == V60 ||
+		   device->type() == V70);
 	return (v60_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -744,3 +743,6 @@ CPU_GET_INFO( v70 )
 		default:										CPU_GET_INFO_CALL(v60);					break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(V60, v60);
+DEFINE_LEGACY_CPU_DEVICE(V70, v70);

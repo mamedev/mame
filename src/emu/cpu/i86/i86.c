@@ -73,11 +73,10 @@ struct _i8086_state
 INLINE i8086_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_I8086 ||
-		   cpu_get_type(device) == CPU_I8088 ||
-		   cpu_get_type(device) == CPU_I80186 ||
-		   cpu_get_type(device) == CPU_I80188);
+	assert(device->type() == I8086 ||
+		   device->type() == I8088 ||
+		   device->type() == I80186 ||
+		   device->type() == I80188);
 	return (i8086_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -644,3 +643,8 @@ CPU_GET_INFO( i80188 )
 		default:										CPU_GET_INFO_CALL(i8086);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(I8086, i8086);
+DEFINE_LEGACY_CPU_DEVICE(I8088, i8088);
+DEFINE_LEGACY_CPU_DEVICE(I80186, i80186);
+DEFINE_LEGACY_CPU_DEVICE(I80188, i80188);

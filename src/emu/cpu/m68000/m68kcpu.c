@@ -496,18 +496,17 @@ const UINT8 m68ki_ea_idx_cycle_table[64] =
 INLINE m68ki_cpu_core *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M68000 ||
-		   cpu_get_type(device) == CPU_M68008 ||
-		   cpu_get_type(device) == CPU_M68010 ||
-		   cpu_get_type(device) == CPU_M68EC020 ||
-		   cpu_get_type(device) == CPU_M68020 ||
-		   cpu_get_type(device) == CPU_M68020_68851 ||
-		   cpu_get_type(device) == CPU_M68EC030 ||
-		   cpu_get_type(device) == CPU_M68030 ||
-		   cpu_get_type(device) == CPU_M68EC040 ||
-		   cpu_get_type(device) == CPU_M68040 ||
-		   cpu_get_type(device) == CPU_SCC68070);
+	assert(device->type() == M68000 ||
+		   device->type() == M68008 ||
+		   device->type() == M68010 ||
+		   device->type() == M68EC020 ||
+		   device->type() == M68020 ||
+		   device->type() == M68020PMMU ||
+		   device->type() == M68EC030 ||
+		   device->type() == M68030 ||
+		   device->type() == M68EC040 ||
+		   device->type() == M68040 ||
+		   device->type() == SCC68070);
 	return (m68ki_cpu_core *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1812,4 +1811,17 @@ CPU_GET_INFO( scc68070 )
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(M68000, m68000);
+DEFINE_LEGACY_CPU_DEVICE(M68008, m68008);
+DEFINE_LEGACY_CPU_DEVICE(M68010, m68010);
+DEFINE_LEGACY_CPU_DEVICE(M68EC020, m68ec020);
+DEFINE_LEGACY_CPU_DEVICE(M68020, m68020);
+DEFINE_LEGACY_CPU_DEVICE(M68020PMMU, m68020pmmu);
+DEFINE_LEGACY_CPU_DEVICE(M68EC030, m68ec030);
+DEFINE_LEGACY_CPU_DEVICE(M68030, m68030);
+DEFINE_LEGACY_CPU_DEVICE(M68EC040, m68ec040);
+DEFINE_LEGACY_CPU_DEVICE(M68LC040, m68lc040);
+DEFINE_LEGACY_CPU_DEVICE(M68040, m68040);
+DEFINE_LEGACY_CPU_DEVICE(SCC68070, scc68070);
 

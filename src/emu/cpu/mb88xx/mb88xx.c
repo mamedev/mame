@@ -84,12 +84,11 @@ struct _mb88_state
 INLINE mb88_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_MB88 ||
-		   cpu_get_type(device) == CPU_MB8841 ||
-		   cpu_get_type(device) == CPU_MB8842 ||
-		   cpu_get_type(device) == CPU_MB8843 ||
-		   cpu_get_type(device) == CPU_MB8844);
+	assert(device->type() == MB88 ||
+		   device->type() == MB8841 ||
+		   device->type() == MB8842 ||
+		   device->type() == MB8843 ||
+		   device->type() == MB8844);
 	return (mb88_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1100,3 +1099,9 @@ CPU_GET_INFO( mb8844 )
 		default:										CPU_GET_INFO_CALL(mb88);			break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(MB88, mb88);
+DEFINE_LEGACY_CPU_DEVICE(MB8841, mb8841);
+DEFINE_LEGACY_CPU_DEVICE(MB8842, mb8842);
+DEFINE_LEGACY_CPU_DEVICE(MB8843, mb8843);
+DEFINE_LEGACY_CPU_DEVICE(MB8844, mb8844);

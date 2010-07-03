@@ -114,9 +114,8 @@ struct _m68_state_t
 INLINE m68_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M6809 ||
-		   cpu_get_type(device) == CPU_M6809E);
+	assert(device->type() == M6809 ||
+		   device->type() == M6809E);
 	return (m68_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1203,3 +1202,6 @@ CPU_GET_INFO( m6809e )
 		default:										CPU_GET_INFO_CALL(m6809);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(M6809, m6809);
+DEFINE_LEGACY_CPU_DEVICE(M6809E, m6809e);

@@ -30,8 +30,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 INLINE rsp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_RSP);
+	assert(device->type() == RSP);
 	return (rsp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -2989,3 +2988,5 @@ CPU_GET_INFO( rsp )
         case CPUINFO_STR_REGISTER + RSP_STEPCNT:        sprintf(info->s, "STEP: %d",  rsp->step_count);  break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(RSP, rsp);

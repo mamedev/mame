@@ -301,13 +301,12 @@ static void check_irqs(adsp2100_state *adsp);
 INLINE adsp2100_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_ADSP2100 ||
-		   cpu_get_type(device) == CPU_ADSP2101 ||
-		   cpu_get_type(device) == CPU_ADSP2104 ||
-		   cpu_get_type(device) == CPU_ADSP2105 ||
-		   cpu_get_type(device) == CPU_ADSP2115 ||
-		   cpu_get_type(device) == CPU_ADSP2181);
+	assert(device->type() == ADSP2100 ||
+		   device->type() == ADSP2101 ||
+		   device->type() == ADSP2104 ||
+		   device->type() == ADSP2105 ||
+		   device->type() == ADSP2115 ||
+		   device->type() == ADSP2181);
 	return (adsp2100_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -2199,3 +2198,10 @@ UINT16 adsp2181_idma_data_r(running_device *device)
 
 	return result;
 }
+
+DEFINE_LEGACY_CPU_DEVICE(ADSP2100, adsp2100);
+DEFINE_LEGACY_CPU_DEVICE(ADSP2101, adsp2101);
+DEFINE_LEGACY_CPU_DEVICE(ADSP2104, adsp2104);
+DEFINE_LEGACY_CPU_DEVICE(ADSP2105, adsp2105);
+DEFINE_LEGACY_CPU_DEVICE(ADSP2115, adsp2115);
+DEFINE_LEGACY_CPU_DEVICE(ADSP2181, adsp2181);

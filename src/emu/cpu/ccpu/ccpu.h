@@ -54,8 +54,7 @@ struct _ccpu_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-CPU_GET_INFO( ccpu );
-#define CPU_CCPU CPU_GET_INFO_NAME( ccpu )
+DECLARE_LEGACY_CPU_DEVICE(CCPU, ccpu);
 
 void ccpu_wdt_timer_trigger(running_device *device);
 

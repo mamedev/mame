@@ -339,7 +339,7 @@ static MACHINE_DRIVER_START( ace )
 	MDRV_DRIVER_DATA(ace_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/9)	/* 2 MHz ? */
+	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(ace)

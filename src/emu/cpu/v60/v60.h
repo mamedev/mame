@@ -79,10 +79,7 @@ enum
 
 void v60_stall(running_device *device);
 
-CPU_GET_INFO( v60 );
-#define CPU_V60 CPU_GET_INFO_NAME( v60 )
-
-CPU_GET_INFO( v70 );
-#define CPU_V70 CPU_GET_INFO_NAME( v70 )
+DECLARE_LEGACY_CPU_DEVICE(V60, v60);
+DECLARE_LEGACY_CPU_DEVICE(V70, v70);
 
 #endif /* __V60_H__ */

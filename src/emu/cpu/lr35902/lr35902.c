@@ -116,8 +116,7 @@ union _lr35902_state {
 INLINE lr35902_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_LR35902);
+	assert(device->type() == LR35902);
 	return (lr35902_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -491,3 +490,5 @@ CPU_GET_INFO( lr35902 )
 	case CPUINFO_STR_REGISTER + LR35902_IF: sprintf(info->s, "IF:%02X", cpustate->w.IF); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(LR35902, lr35902);

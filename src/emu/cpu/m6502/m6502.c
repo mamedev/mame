@@ -87,16 +87,15 @@ struct _m6502_Regs
 INLINE m6502_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M6502 ||
-		   cpu_get_type(device) == CPU_M6510 ||
-		   cpu_get_type(device) == CPU_M6510T ||
-		   cpu_get_type(device) == CPU_M7501 ||
-		   cpu_get_type(device) == CPU_M8502 ||
-		   cpu_get_type(device) == CPU_N2A03 ||
-		   cpu_get_type(device) == CPU_M65C02 ||
-		   cpu_get_type(device) == CPU_M65SC02 ||
-		   cpu_get_type(device) == CPU_DECO16);
+	assert(device->type() == M6502 ||
+		   device->type() == M6510 ||
+		   device->type() == M6510T ||
+		   device->type() == M7501 ||
+		   device->type() == M8502 ||
+		   device->type() == N2A03 ||
+		   device->type() == M65C02 ||
+		   device->type() == M65SC02 ||
+		   device->type() == DECO16);
 	return (m6502_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -967,3 +966,13 @@ CPU_GET_INFO( deco16 )
 		default:										CPU_GET_INFO_CALL(m6502);			break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(M6502, m6502);
+DEFINE_LEGACY_CPU_DEVICE(M6510, m6510);
+DEFINE_LEGACY_CPU_DEVICE(M6510T, m6510t);
+DEFINE_LEGACY_CPU_DEVICE(M7501, m7501);
+DEFINE_LEGACY_CPU_DEVICE(M8502, m8502);
+DEFINE_LEGACY_CPU_DEVICE(N2A03, n2a03);
+DEFINE_LEGACY_CPU_DEVICE(M65C02, m65c02);
+DEFINE_LEGACY_CPU_DEVICE(M65SC02, m65sc02);
+DEFINE_LEGACY_CPU_DEVICE(DECO16, deco16);

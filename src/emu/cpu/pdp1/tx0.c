@@ -71,9 +71,8 @@ struct _tx0_state
 INLINE tx0_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TX0_64KW ||
-		   cpu_get_type(device) == CPU_TX0_8KW);
+	assert(device->type() == TX0_64KW ||
+		   device->type() == TX0_8KW);
 	return (tx0_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1299,3 +1298,6 @@ static void pulse_reset(running_device *device)
 	if (cpustate->iface->io_reset_callback)
 		(*cpustate->iface->io_reset_callback)(device);
 }
+
+DEFINE_LEGACY_CPU_DEVICE(TX0_64KW, tx0_64kw);
+DEFINE_LEGACY_CPU_DEVICE(TX0_8KW, tx0_8kw);

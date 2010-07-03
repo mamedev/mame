@@ -227,9 +227,8 @@ typedef struct {
 INLINE alpha8201_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_ALPHA8201 ||
-		   cpu_get_type(device) == CPU_ALPHA8301);
+	assert(device->type() == ALPHA8201 ||
+		   device->type() == ALPHA8301);
 	return (alpha8201_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -994,3 +993,6 @@ CPU_GET_INFO( alpha8301 )
 		CPU_GET_INFO_CALL(alpha8xxx);
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(ALPHA8201, alpha8201);
+DEFINE_LEGACY_CPU_DEVICE(ALPHA8301, alpha8301);

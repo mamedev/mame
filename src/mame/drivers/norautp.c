@@ -1337,7 +1337,7 @@ static MACHINE_DRIVER_START( dphl )
 	MDRV_IMPORT_FROM(noraut_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphl_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
 
@@ -1351,7 +1351,7 @@ static MACHINE_DRIVER_START( dphla )
 	MDRV_IMPORT_FROM(noraut_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphla_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
 
@@ -1365,7 +1365,7 @@ static MACHINE_DRIVER_START( kimbldhl )
 	MDRV_IMPORT_FROM(noraut_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kimbldhl_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
 
@@ -1379,7 +1379,7 @@ static MACHINE_DRIVER_START( dphltest )
 	MDRV_IMPORT_FROM(noraut_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphltest_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
 
@@ -1393,7 +1393,7 @@ static MACHINE_DRIVER_START( drhl )
 	MDRV_IMPORT_FROM(noraut_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drhl_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
 

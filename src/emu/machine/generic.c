@@ -41,6 +41,7 @@ struct _generic_machine_private
 	int 		memcard_inserted;
 
 	/* interrupt status for up to 8 CPUs */
+	device_t *	interrupt_device[8];
 	UINT8		interrupt_enable[8];
 };
 
@@ -58,8 +59,10 @@ struct _generic_machine_private
 INLINE int interrupt_enabled(running_device *device)
 {
 	generic_machine_private *state = device->machine->generic_machine_data;
-	int cpunum = cpu_get_index(device);
-	return (cpunum >= ARRAY_LENGTH(state->interrupt_enable) || state->interrupt_enable[cpunum]);
+	for (int index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
+		if (state->interrupt_device[index] == device)
+			return state->interrupt_enable[index];
+	return TRUE;
 }
 
 
@@ -88,6 +91,13 @@ void generic_machine_init(running_machine *machine)
 		state->lastcoin[counternum] = 0;
 		state->coinlockedout[counternum] = 0;
 	}
+
+	// map devices to the interrupt state	
+	memset(state->interrupt_device, 0, sizeof(state->interrupt_device));
+	device_execute_interface *exec;
+	int index = 0;
+	for (bool gotone = machine->m_devicelist.first(exec); gotone && index < ARRAY_LENGTH(state->interrupt_device); gotone = exec->next(exec))
+		state->interrupt_device[index++] = &exec->device();
 
 	/* register coin save state */
 	state_save_register_item_array(machine, "coin", NULL, 0, state->coin_count);
@@ -708,12 +718,15 @@ void cpu_interrupt_enable(running_device *device, int enabled)
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 
 	generic_machine_private *state = device->machine->generic_machine_data;
-	int cpunum = cpu_get_index(device);
-	assert_always(cpunum < ARRAY_LENGTH(state->interrupt_enable), "cpu_interrupt_enable() called for a CPU > position 7!");
+	int index;
+	for (index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
+		if (state->interrupt_device[index] == device)
+			break;
+	assert_always(index < ARRAY_LENGTH(state->interrupt_enable), "cpu_interrupt_enable() called for invalid CPU!");
 
 	/* set the new state */
-	if (cpunum < ARRAY_LENGTH(state->interrupt_enable))
-		state->interrupt_enable[cpunum] = enabled;
+	if (index < ARRAY_LENGTH(state->interrupt_enable))
+		state->interrupt_enable[index] = enabled;
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)

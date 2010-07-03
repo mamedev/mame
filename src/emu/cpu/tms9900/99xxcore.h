@@ -512,8 +512,7 @@ struct _tms99xx_state
 INLINE tms99xx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == TMS99XX_GET_INFO);
+//	assert(device->type() == TMS99XX_GET_INFO);
 	return (tms99xx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 

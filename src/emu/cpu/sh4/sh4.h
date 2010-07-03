@@ -90,8 +90,7 @@ struct sh4_ddt_dma
 
 typedef void (*sh4_ftcsr_callback)(UINT32);
 
-extern CPU_GET_INFO( sh4 );
-#define CPU_SH4 CPU_GET_INFO_NAME( sh4 )
+DECLARE_LEGACY_CPU_DEVICE(SH4, sh4);
 
 WRITE32_HANDLER( sh4_internal_w );
 READ32_HANDLER( sh4_internal_r );

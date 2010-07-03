@@ -16,15 +16,15 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 #ifdef USE_SH2DRC
-#define GET_SH2(dev) *(SH2 **)downcast<legacy_cpu_device *>(dev)->token()
+#define GET_SH2(dev) *(sh2_state **)downcast<legacy_cpu_device *>(dev)->token()
 #else
-#define GET_SH2(dev) (SH2 *)downcast<legacy_cpu_device *>(dev)->token()
+#define GET_SH2(dev) (sh2_state *)downcast<legacy_cpu_device *>(dev)->token()
 #endif
 
 
 static const int div_tab[4] = { 3, 5, 7, 0 };
 
-INLINE UINT32 RL(SH2 *sh2, offs_t A)
+INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
@@ -38,7 +38,7 @@ INLINE UINT32 RL(SH2 *sh2, offs_t A)
   return memory_read_dword_32be(sh2->program, A & AM);
 }
 
-INLINE void WL(SH2 *sh2, offs_t A, UINT32 V)
+INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
 {
 	if (A >= 0xe0000000)
 	{
@@ -58,7 +58,7 @@ INLINE void WL(SH2 *sh2, offs_t A, UINT32 V)
 	memory_write_dword_32be(sh2->program, A & AM,V);
 }
 
-static void sh2_timer_resync(SH2 *sh2)
+static void sh2_timer_resync(sh2_state *sh2)
 {
 	int divider = div_tab[(sh2->m[5] >> 8) & 3];
 	UINT64 cur_time = sh2->device->total_cycles();
@@ -68,7 +68,7 @@ static void sh2_timer_resync(SH2 *sh2)
 	sh2->frc_base = cur_time;
 }
 
-static void sh2_timer_activate(SH2 *sh2)
+static void sh2_timer_activate(sh2_state *sh2)
 {
 	int max_delta = 0xfffff;
 	UINT16 frc;
@@ -108,7 +108,7 @@ static void sh2_timer_activate(SH2 *sh2)
 
 static TIMER_CALLBACK( sh2_timer_callback )
 {
-	SH2 *sh2 = (SH2 *)ptr;
+	sh2_state *sh2 = (sh2_state *)ptr;
 	UINT16 frc;
 
 	sh2_timer_resync(sh2);
@@ -136,7 +136,7 @@ static TIMER_CALLBACK( sh2_timer_callback )
 static TIMER_CALLBACK( sh2_dmac_callback )
 {
 	int dma = param & 1;
-	SH2 *sh2 = (SH2 *)ptr;
+	sh2_state *sh2 = (sh2_state *)ptr;
 
 	LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag(), dma));
 	sh2->m[0x63+4*dma] |= 2;
@@ -144,7 +144,7 @@ static TIMER_CALLBACK( sh2_dmac_callback )
 	sh2_recalc_irq(sh2);
 }
 
-static void sh2_dmac_check(SH2 *sh2, int dma)
+static void sh2_dmac_check(sh2_state *sh2, int dma)
 {
 	if(sh2->m[0x63+4*dma] & sh2->m[0x6c] & 1)
 	{
@@ -284,7 +284,7 @@ static void sh2_dmac_check(SH2 *sh2, int dma)
 
 WRITE32_HANDLER( sh2_internal_w )
 {
-	SH2 *sh2 = GET_SH2(space->cpu);
+	sh2_state *sh2 = GET_SH2(space->cpu);
 	UINT32 old;
 
 #ifdef USE_SH2DRC
@@ -462,7 +462,7 @@ WRITE32_HANDLER( sh2_internal_w )
 
 READ32_HANDLER( sh2_internal_r )
 {
-	SH2 *sh2 = GET_SH2(space->cpu);
+	sh2_state *sh2 = GET_SH2(space->cpu);
 
 #ifdef USE_SH2DRC
 	offset &= 0x7f;
@@ -502,13 +502,13 @@ READ32_HANDLER( sh2_internal_r )
 
 void sh2_set_ftcsr_read_callback(running_device *device, void (*callback)(UINT32))
 {
-	SH2 *sh2 = GET_SH2(device);
+	sh2_state *sh2 = GET_SH2(device);
 	sh2->ftcsr_read_callback = callback;
 }
 
 void sh2_set_frt_input(running_device *device, int state)
 {
-	SH2 *sh2 = GET_SH2(device);
+	sh2_state *sh2 = GET_SH2(device);
 
 	if(state == PULSE_LINE)
 	{
@@ -540,7 +540,7 @@ void sh2_set_frt_input(running_device *device, int state)
 	sh2_recalc_irq(sh2);
 }
 
-void sh2_set_irq_line(SH2 *sh2, int irqline, int state)
+void sh2_set_irq_line(sh2_state *sh2, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
@@ -590,7 +590,7 @@ void sh2_set_irq_line(SH2 *sh2, int irqline, int state)
 	}
 }
 
-void sh2_recalc_irq(SH2 *sh2)
+void sh2_recalc_irq(sh2_state *sh2)
 {
 	int irq = 0, vector = -1;
 	int  level;
@@ -634,7 +634,7 @@ void sh2_recalc_irq(SH2 *sh2)
 	sh2->test_irq = 1;
 }
 
-void sh2_exception(SH2 *sh2, const char *message, int irqline)
+void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 {
 	int vector;
 
@@ -699,7 +699,7 @@ void sh2_exception(SH2 *sh2, const char *message, int irqline)
 	#endif
 }
 
-void sh2_common_init(SH2 *sh2, legacy_cpu_device *device, device_irq_callback irqcallback)
+void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config();
 

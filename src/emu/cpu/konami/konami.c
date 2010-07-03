@@ -69,8 +69,7 @@ struct _konami_state
 INLINE konami_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_KONAMI);
+	assert(device->type() == KONAMI);
 	return (konami_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -627,3 +626,5 @@ CPU_GET_INFO( konami )
 		case CPUINFO_STR_REGISTER + KONAMI_DP:			sprintf(info->s, "DP:%02X", cpustate->dp.b.h); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(KONAMI, konami);

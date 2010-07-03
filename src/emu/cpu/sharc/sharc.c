@@ -187,8 +187,7 @@ static void (* sharc_op[512])(SHARC_REGS *cpustate);
 INLINE SHARC_REGS *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_ADSP21062);
+	assert(device->type() == ADSP21062);
 	return (SHARC_REGS *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1319,3 +1318,5 @@ CPU_GET_INFO( adsp21062 )
 		default:										CPU_GET_INFO_CALL(sharc);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(ADSP21062, adsp21062);

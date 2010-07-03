@@ -6368,7 +6368,7 @@ static void megadriv_init_common(running_machine *machine)
 	_genesis_snd_z80_cpu = machine->device<cpu_device>("genesis_snd_z80");
 	if (_genesis_snd_z80_cpu != NULL)
 	{
-		//printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
+		//printf("GENESIS Sound Z80 cpu found '%s'\n", _genesis_snd_z80_cpu->tag() );
 
 		genz80.z80_prgram = auto_alloc_array(machine, UINT8, 0x2000);
 		memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
@@ -6378,14 +6378,14 @@ static void megadriv_init_common(running_machine *machine)
 	_32x_master_cpu = machine->device<cpu_device>("32x_master_sh2");
 	if (_32x_master_cpu != NULL)
 	{
-		printf("32x MASTER SH2 cpu found %d\n", cpu_get_index(_32x_master_cpu) );
+		printf("32x MASTER SH2 cpu found '%s'\n", _32x_master_cpu->tag() );
 	}
 
 	/* Look to see if this system has the 32x Slave SH2 */
 	_32x_slave_cpu = machine->device<cpu_device>("32x_slave_sh2");
 	if (_32x_slave_cpu != NULL)
 	{
-		printf("32x SLAVE SH2 cpu found %d\n", cpu_get_index(_32x_slave_cpu) );
+		printf("32x SLAVE SH2 cpu found '%s'\n", _32x_slave_cpu->tag() );
 	}
 
 	if ((_32x_master_cpu != NULL) && (_32x_slave_cpu != NULL))
@@ -6400,13 +6400,13 @@ static void megadriv_init_common(running_machine *machine)
 	_segacd_68k_cpu = machine->device<cpu_device>("segacd_68k");
 	if (_segacd_68k_cpu != NULL)
 	{
-		printf("Sega CD secondary 68k cpu found %d\n", cpu_get_index(_segacd_68k_cpu) );
+		printf("Sega CD secondary 68k cpu found '%s'\n", _segacd_68k_cpu->tag() );
 	}
 
 	_svp_cpu = machine->device<cpu_device>("svp");
 	if (_svp_cpu != NULL)
 	{
-		printf("SVP (cpu) found %d\n", cpu_get_index(_svp_cpu) );
+		printf("SVP (cpu) found '%s'\n", _svp_cpu->tag() );
 	}
 
 

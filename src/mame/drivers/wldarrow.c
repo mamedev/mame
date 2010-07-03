@@ -347,7 +347,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( wldarrow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, 2000000)
+	MDRV_CPU_ADD("maincpu", I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(wldarrow_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

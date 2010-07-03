@@ -26,8 +26,7 @@ enum
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-CPU_GET_INFO( i4004 );
-#define CPU_I4004 CPU_GET_INFO_NAME( i4004 )
+DECLARE_LEGACY_CPU_DEVICE(I4004, i4004);
 
 CPU_DISASSEMBLE( i4004 );
 

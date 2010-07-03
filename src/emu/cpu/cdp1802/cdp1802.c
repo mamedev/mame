@@ -70,8 +70,7 @@ struct _cdp1802_state
 INLINE cdp1802_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_CDP1802);
+	assert(device->type() == CDP1802);
 	return (cdp1802_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1105,3 +1104,5 @@ CPU_GET_INFO( cdp1802 )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(CDP1802, cdp1802);

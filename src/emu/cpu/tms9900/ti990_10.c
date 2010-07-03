@@ -9,3 +9,5 @@
 #define TMS99XX_MODEL TI990_10_ID
 
 #include "99xxcore.h"
+
+DEFINE_LEGACY_CPU_DEVICE(TI990_10, ti990_10);

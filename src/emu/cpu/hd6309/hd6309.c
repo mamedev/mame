@@ -154,8 +154,7 @@ struct _m68_state_t
 INLINE m68_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_HD6309);
+	assert(device->type() == HD6309);
 	return (m68_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1353,3 +1352,5 @@ CPU_GET_INFO( hd6309 )
 		case CPUINFO_STR_REGISTER + HD6309_DP:			sprintf(info->s, "DP:%02X", m68_state->dp.b.h); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(HD6309, hd6309);

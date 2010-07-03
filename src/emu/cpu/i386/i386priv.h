@@ -260,11 +260,10 @@ struct _i386_state
 INLINE i386_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_I386 ||
-		   cpu_get_type(device) == CPU_I486 ||
-		   cpu_get_type(device) == CPU_PENTIUM ||
-		   cpu_get_type(device) == CPU_MEDIAGX);
+	assert(device->type() == I386 ||
+		   device->type() == I486 ||
+		   device->type() == PENTIUM ||
+		   device->type() == MEDIAGX);
 	return (i386_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 

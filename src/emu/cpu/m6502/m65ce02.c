@@ -84,8 +84,7 @@ struct	_m65ce02_Regs {
 INLINE m65ce02_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_M65CE02);
+	assert(device->type() == M65CE02);
 	return (m65ce02_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -360,3 +359,5 @@ CPU_GET_INFO( m65ce02 )
 		case CPUINFO_STR_REGISTER + M65CE02_ZP:			sprintf(info->s, "ZP:%03X", cpustate->zp.w.l); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(M65CE02, m65ce02);

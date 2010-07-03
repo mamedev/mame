@@ -184,12 +184,11 @@ struct _nec_state_t
 INLINE nec_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_V20 ||
-		   cpu_get_type(device) == CPU_V25 ||
-		   cpu_get_type(device) == CPU_V30 ||
-		   cpu_get_type(device) == CPU_V33 ||
-		   cpu_get_type(device) == CPU_V35);
+	assert(device->type() == V20 ||
+		   device->type() == V25 ||
+		   device->type() == V30 ||
+		   device->type() == V33 ||
+		   device->type() == V35);
 	return (nec_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1219,7 +1218,7 @@ static CPU_INIT( v20 )
 
 	nec_init(device, irqcallback, 0);
 	configure_memory_8bit(nec_state);
-	nec_state->chip_type=V20;
+	nec_state->chip_type=V20_TYPE;
 	nec_state->prefetch_size = 4;		/* 3 words */
 	nec_state->prefetch_cycles = 4;		/* four cycles per byte */
 }
@@ -1230,7 +1229,7 @@ static CPU_INIT( v30 )
 
 	nec_init(device, irqcallback, 1);
 	configure_memory_16bit(nec_state);
-	nec_state->chip_type=V30;
+	nec_state->chip_type=V30_TYPE;
 	nec_state->prefetch_size = 6;		/* 3 words */
 	nec_state->prefetch_cycles = 2;		/* two cycles per byte / four per word */
 
@@ -1241,7 +1240,7 @@ static CPU_INIT( v33 )
 	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_init(device, irqcallback, 2);
-	nec_state->chip_type=V33;
+	nec_state->chip_type=V33_TYPE;
 	nec_state->prefetch_size = 6;
 	/* FIXME: Need information about prefetch size and cycles for V33.
      * complete guess below, nbbatman will not work
@@ -1529,3 +1528,9 @@ CPU_GET_INFO( v35 )
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(V20, v20);
+DEFINE_LEGACY_CPU_DEVICE(V25, v25);
+DEFINE_LEGACY_CPU_DEVICE(V30, v30);
+DEFINE_LEGACY_CPU_DEVICE(V33, v33);
+DEFINE_LEGACY_CPU_DEVICE(V35, v35);

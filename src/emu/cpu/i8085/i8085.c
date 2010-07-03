@@ -275,9 +275,8 @@ static void execute_one(i8085_state *cpustate, int opcode);
 INLINE i8085_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_8080 ||
-		   cpu_get_type(device) == CPU_8085A);
+	assert(device->type() == I8080 ||
+		   device->type() == I8085A);
 	return (i8085_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1290,3 +1289,7 @@ CPU_GET_INFO( i8080a )
 		default:										CPU_GET_INFO_CALL(i8085); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(I8080, i8080);
+DEFINE_LEGACY_CPU_DEVICE(I8080A, i8080a);
+DEFINE_LEGACY_CPU_DEVICE(I8085A, i8085);

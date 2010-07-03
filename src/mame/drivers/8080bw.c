@@ -1059,7 +1059,7 @@ static MACHINE_DRIVER_START( schaser )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
-	MDRV_CPU_REPLACE("maincpu",8080,1996800)    	/* 19.968MHz / 10 */
+	MDRV_CPU_REPLACE("maincpu",I8080,1996800)    	/* 19.968MHz / 10 */
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
 	MDRV_CPU_IO_MAP(schaser_io_map)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
@@ -1468,7 +1468,7 @@ static MACHINE_DRIVER_START( polaris )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
-	MDRV_CPU_REPLACE("maincpu",8080,1996800)    	/* 19.968MHz / 10 */
+	MDRV_CPU_REPLACE("maincpu",I8080,1996800)    	/* 19.968MHz / 10 */
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
 	MDRV_CPU_IO_MAP(polaris_io_map)
 	MDRV_WATCHDOG_VBLANK_INIT(255)

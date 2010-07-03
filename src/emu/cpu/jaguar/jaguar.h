@@ -99,13 +99,11 @@ struct _jaguar_cpu_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern CPU_GET_INFO( jaguargpu );
-#define CPU_JAGUARGPU CPU_GET_INFO_NAME( jaguargpu )
+DECLARE_LEGACY_CPU_DEVICE(JAGUARGPU, jaguargpu);
 extern void jaguargpu_ctrl_w(running_device *device, offs_t offset, UINT32 data, UINT32 mem_mask);
 extern UINT32 jaguargpu_ctrl_r(running_device *device, offs_t offset);
 
-extern CPU_GET_INFO( jaguardsp );
-#define CPU_JAGUARDSP CPU_GET_INFO_NAME( jaguardsp )
+DECLARE_LEGACY_CPU_DEVICE(JAGUARDSP, jaguardsp);
 extern void jaguardsp_ctrl_w(running_device *device, offs_t offset, UINT32 data, UINT32 mem_mask);
 extern UINT32 jaguardsp_ctrl_r(running_device *device, offs_t offset);
 

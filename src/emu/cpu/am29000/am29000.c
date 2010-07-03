@@ -144,8 +144,7 @@ typedef struct _am29000_state
 INLINE am29000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_AM29000);
+	assert(device->type() == AM29000);
 	return (am29000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1209,3 +1208,5 @@ CPU_GET_INFO( am29000 )
 	}
 }
 
+
+DEFINE_LEGACY_CPU_DEVICE(AM29000, am29000);

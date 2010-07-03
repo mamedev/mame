@@ -154,12 +154,8 @@ void cubeqcpu_clear_stack(running_device *device);
 UINT8 cubeqcpu_get_ptr_ram_val(running_device *device, int i);
 UINT32* cubeqcpu_get_stack_ram(running_device *device);
 
-CPU_GET_INFO( cquestsnd );
-CPU_GET_INFO( cquestrot );
-CPU_GET_INFO( cquestlin );
-
-#define CPU_CQUESTSND CPU_GET_INFO_NAME( cquestsnd )
-#define CPU_CQUESTROT CPU_GET_INFO_NAME( cquestrot )
-#define CPU_CQUESTLIN CPU_GET_INFO_NAME( cquestlin )
+DECLARE_LEGACY_CPU_DEVICE(CQUESTSND, cquestsnd);
+DECLARE_LEGACY_CPU_DEVICE(CQUESTROT, cquestrot);
+DECLARE_LEGACY_CPU_DEVICE(CQUESTLIN, cquestlin);
 
 #endif /* _CUBEQCPU_H */

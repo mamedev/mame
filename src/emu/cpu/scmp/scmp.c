@@ -56,8 +56,7 @@ struct _scmp_state
 INLINE scmp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SCMP || cpu_get_type(device) == CPU_INS8060);
+	assert(device->type() == SCMP || device->type() == INS8060);
 	return (scmp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -664,3 +663,6 @@ CPU_GET_INFO( ins8060 )
 		default:										CPU_GET_INFO_CALL(scmp);			break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(SCMP, scmp);
+DEFINE_LEGACY_CPU_DEVICE(INS8060, ins8060);

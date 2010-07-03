@@ -452,7 +452,7 @@ static MACHINE_RESET( phoenix )
 static MACHINE_DRIVER_START( phoenix )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8085A, CPU_CLOCK)	/* 2.75 MHz */
+	MDRV_CPU_ADD("maincpu", I8085A, CPU_CLOCK)	/* 2.75 MHz */
 	MDRV_CPU_PROGRAM_MAP(phoenix_memory_map)
 
 	MDRV_MACHINE_RESET(phoenix)
@@ -524,7 +524,7 @@ static I8085_CONFIG( survival_i8085_config )
 static MACHINE_DRIVER_START( survival )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8085A, CPU_CLOCK)	/* 5.50 MHz */
+	MDRV_CPU_ADD("maincpu", I8085A, CPU_CLOCK)	/* 5.50 MHz */
 	MDRV_CPU_CONFIG(survival_i8085_config)
 	MDRV_CPU_PROGRAM_MAP(survival_memory_map)
 

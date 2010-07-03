@@ -215,7 +215,7 @@ static MACHINE_RESET( system18 )
 	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
-	if (state->mcu != NULL && cpu_get_type(state->mcu) == CPU_I8751)
+	if (state->mcu != NULL && state->mcu->type() == I8751)
 		timer_call_after_resynch(machine, NULL, 0, boost_interleave);
 }
 

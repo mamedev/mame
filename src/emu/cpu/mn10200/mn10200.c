@@ -149,8 +149,7 @@ INLINE void mn102_change_pc(mn102_info *mn102, UINT32 pc)
 INLINE mn102_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_MN10200);
+	assert(device->type() == MN10200);
 
 	return (mn102_info *)downcast<legacy_cpu_device *>(device)->token();
 }
@@ -2437,3 +2436,5 @@ CPU_GET_INFO( mn10200 )
 		case CPUINFO_STR_REGISTER + MN10200_IAGR:          sprintf(info->s, "IAGR:  %02x", cpustate->iagr); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(MN10200, mn10200);

@@ -13,8 +13,7 @@
 INLINE unsp_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->type() == CPU);
-    assert(cpu_get_type(device) == CPU_UNSP);
+    assert(device->type() == UNSP);
     return (unsp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -921,3 +920,5 @@ CPU_GET_INFO( unsp )
 		case CPUINFO_STR_REGISTER + UNSP_SB:			sprintf(info->s, "SB: %d", unsp->sb);       break;
     }
 }
+
+DEFINE_LEGACY_CPU_DEVICE(UNSP, unsp);

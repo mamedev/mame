@@ -207,12 +207,8 @@ struct _tms34010_config
 VIDEO_UPDATE( tms340x0 );
 void tms34010_get_display_params(running_device *cpu, tms34010_display_params *params);
 
-CPU_GET_INFO( tms34010 );
-#define CPU_TMS34010 CPU_GET_INFO_NAME( tms34010 )
-
-/* PUBLIC FUNCTIONS - 34020 */
-CPU_GET_INFO( tms34020 );
-#define CPU_TMS34020 CPU_GET_INFO_NAME( tms34020 )
+DECLARE_LEGACY_CPU_DEVICE(TMS34010, tms34010);
+DECLARE_LEGACY_CPU_DEVICE(TMS34020, tms34020);
 
 
 /* Host control interface */

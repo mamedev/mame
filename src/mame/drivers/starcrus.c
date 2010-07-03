@@ -153,7 +153,7 @@ static const samples_interface starcrus_samples_interface =
 static MACHINE_DRIVER_START( starcrus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080,9750000/9)  /* 8224 chip is a divide by 9 */
+	MDRV_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
 	MDRV_CPU_PROGRAM_MAP(starcrus_map)
 	MDRV_CPU_IO_MAP(starcrus_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)

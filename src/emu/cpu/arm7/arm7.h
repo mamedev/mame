@@ -37,16 +37,10 @@
 /****************************************************************************************************
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
-extern CPU_GET_INFO( arm7 );
-#define CPU_ARM7 CPU_GET_INFO_NAME( arm7 )
 
-extern CPU_GET_INFO( arm9 );
-#define CPU_ARM9 CPU_GET_INFO_NAME( arm9 )
-
-extern CPU_GET_INFO( pxa255 );
-#define CPU_PXA255 CPU_GET_INFO_NAME( pxa255 )
-
-extern CPU_GET_INFO( sa1110 );
-#define CPU_SA1110 CPU_GET_INFO_NAME( sa1110 )
+DECLARE_LEGACY_CPU_DEVICE(ARM7, arm7);
+DECLARE_LEGACY_CPU_DEVICE(ARM9, arm9);
+DECLARE_LEGACY_CPU_DEVICE(PXA255, pxa255);
+DECLARE_LEGACY_CPU_DEVICE(SA1110, sa1110);
 
 #endif /* __ARM7_H__ */

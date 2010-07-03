@@ -536,9 +536,13 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, dev
 	}
 
 	/* if we got a valid one, return */
-	*result = machine->m_devicelist.find(CPU, cpunum);
-	if (*result != NULL)
-		return TRUE;
+	device_execute_interface *exec;
+	for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+		if (cpunum-- == 0)
+		{
+			*result = &exec->device();
+			return TRUE;
+		}
 
 	/* if out of range, complain */
 	debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)cpunum);

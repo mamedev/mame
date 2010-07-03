@@ -14,8 +14,7 @@
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
-extern CPU_GET_INFO( arm );
-#define CPU_ARM CPU_GET_INFO_NAME( arm )
+DECLARE_LEGACY_CPU_DEVICE(ARM, arm);
 
 enum
 {

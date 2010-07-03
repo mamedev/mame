@@ -39,7 +39,6 @@ enum
    positiv edge sets overflow flag */
 #define M6509_SET_OVERFLOW 3
 
-CPU_GET_INFO( m6509 );
-#define CPU_M6509 CPU_GET_INFO_NAME( m6509 )
+DECLARE_LEGACY_CPU_DEVICE(M6509, m6509);
 
 #endif /* __M6509_H__ */

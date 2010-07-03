@@ -568,7 +568,7 @@ static const tms9927_interface tms9927_intf =
 static MACHINE_DRIVER_START( statriv2 )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-    MDRV_CPU_ADD("maincpu", 8085A, MASTER_CLOCK)
+    MDRV_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(statriv2_map)
 	MDRV_CPU_IO_MAP(statriv2_io_map)
 	MDRV_CPU_VBLANK_INT("screen", statriv2_interrupt)

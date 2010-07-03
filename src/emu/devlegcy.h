@@ -202,12 +202,12 @@ public:																			\
 extern const device_type name
 
 // macro for defining the implementation needed for configuration and device classes
-#define _DEFINE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass)		\
+#define _DEFINE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass) \
 																				\
 deviceclass::deviceclass(running_machine &_machine, const configclass &config)	\
-		: basedeviceclass(_machine, config)										\
-	{																			\
-	}																			\
+	: basedeviceclass(_machine, config)											\
+{																				\
+}																				\
 																				\
 configclass::configclass(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock) \
 	: baseconfigclass(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(basename)) \

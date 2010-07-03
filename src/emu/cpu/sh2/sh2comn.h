@@ -170,11 +170,11 @@ typedef struct
 	drcuml_codehandle *	nocode;					/* nocode */
 	drcuml_codehandle *	out_of_cycles;				/* out of cycles exception handler */
 #endif
-} SH2;
+} sh2_state;
 
-void sh2_common_init(SH2 *sh2, legacy_cpu_device *device, device_irq_callback irqcallback);
-void sh2_recalc_irq(SH2 *sh2);
-void sh2_set_irq_line(SH2 *sh2, int irqline, int state);
-void sh2_exception(SH2 *sh2, const char *message, int irqline);
+void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callback irqcallback);
+void sh2_recalc_irq(sh2_state *sh2);
+void sh2_set_irq_line(sh2_state *sh2, int irqline, int state);
+void sh2_exception(sh2_state *sh2, const char *message, int irqline);
 
 #endif /* __SH2COMN_H__ */

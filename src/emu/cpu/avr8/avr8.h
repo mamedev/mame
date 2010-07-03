@@ -83,8 +83,7 @@ enum
     AVR8_INT_SPM_RDY,
 };
 
-CPU_GET_INFO( avr8 );
-#define CPU_AVR8 CPU_GET_INFO_NAME( avr8 )
+DECLARE_LEGACY_CPU_DEVICE(AVR8, avr8);
 
 CPU_DISASSEMBLE( avr8 );
 

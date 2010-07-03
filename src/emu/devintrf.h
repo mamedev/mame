@@ -107,6 +107,7 @@ class device_config_interface;
 class device_t;
 class device_interface;
 class device_execute_interface;
+class device_memory_interface;
 class device_state_interface;
 struct rom_entry;
 union machine_config_token;
@@ -377,6 +378,7 @@ public:
 	
 	// specialized helpers
 	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != NULL); }
+	bool interface(device_memory_interface *&intf) { intf = m_memory; return (intf != NULL); }
 	bool interface(device_state_interface *&intf) { intf = m_state; return (intf != NULL); }
 
 	// owned object helpers
@@ -417,6 +419,7 @@ public:
 
 protected:
 	// miscellaneous helpers
+	void find_interfaces();
 	void start();
 	void debug_setup();
 	void pre_save();
@@ -439,6 +442,7 @@ protected:
 	
 	// for speed
 	device_execute_interface *m_execute;
+	device_memory_interface *m_memory;
 	device_state_interface *m_state;
 
 	// device relationships

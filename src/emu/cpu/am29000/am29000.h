@@ -433,7 +433,6 @@ enum
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern CPU_GET_INFO( am29000 );
-#define CPU_AM29000 CPU_GET_INFO_NAME( am29000 )
+DECLARE_LEGACY_CPU_DEVICE(AM29000, am29000);
 
 #endif /* __AM29000_H__ */

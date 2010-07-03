@@ -64,68 +64,27 @@ cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type 
 //  legacy_cpu_device_config - constructor
 //-------------------------------------------------
 
-legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock)
+legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, cpu_get_info_func get_info)
 	: cpu_device_config(mconfig, type, "CPU", tag, owner, clock),
-	  m_cputype(NULL)
+	  m_get_info(get_info)
 {
+	// build up our address spaces; legacy devices don't have logical spaces
 	memset(m_space_config, 0, sizeof(m_space_config));
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - static allocator
-//-------------------------------------------------
-
-device_config *legacy_cpu_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(legacy_cpu_device_config(mconfig, static_alloc_device_config, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a device based on the
-//  provided configuration
-//-------------------------------------------------
-
-device_t *legacy_cpu_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(&machine, legacy_cpu_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  device_process_token - custom inline
-//  config callback for populating class data
-//-------------------------------------------------
-
-bool legacy_cpu_device_config::device_process_token(UINT32 entrytype, const machine_config_token *&tokens)
-{
-	switch (entrytype)
+	for (int spacenum = 0; spacenum < ARRAY_LENGTH(m_space_config); spacenum++)
 	{
-		// custom config 1 is the CPU type
-		case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1:
-			m_cputype = TOKEN_GET_PTR(tokens, cputype);
-
-			// build up our address spaces; legacy devices don't have logical spaces
-			memset(m_space_config, 0, sizeof(m_space_config));
-			for (int spacenum = 0; spacenum < ARRAY_LENGTH(m_space_config); spacenum++)
-			{
-				m_space_config[spacenum].m_name = (spacenum == 1) ? "data" : (spacenum == 2) ? "i/o" : "program";
-				m_space_config[spacenum].m_endianness = static_cast<endianness_t>(get_legacy_config_int(DEVINFO_INT_ENDIANNESS));
-				m_space_config[spacenum].m_databus_width = get_legacy_config_int(DEVINFO_INT_DATABUS_WIDTH + spacenum);
-				m_space_config[spacenum].m_addrbus_width = get_legacy_config_int(DEVINFO_INT_ADDRBUS_WIDTH + spacenum);
-				m_space_config[spacenum].m_addrbus_shift = get_legacy_config_int(DEVINFO_INT_ADDRBUS_SHIFT + spacenum);
-				m_space_config[spacenum].m_logaddr_width = get_legacy_config_int(CPUINFO_INT_LOGADDR_WIDTH + spacenum);
-				m_space_config[spacenum].m_page_shift = get_legacy_config_int(CPUINFO_INT_PAGE_SHIFT + spacenum);
-				m_space_config[spacenum].m_internal_map = reinterpret_cast<const addrmap_token *>(get_legacy_config_ptr(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum));
-				m_space_config[spacenum].m_default_map = reinterpret_cast<const addrmap_token *>(get_legacy_config_ptr(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum));
-			}
-			m_name = get_legacy_config_string(DEVINFO_STR_NAME);
-			return true;
+		m_space_config[spacenum].m_name = (spacenum == 1) ? "data" : (spacenum == 2) ? "i/o" : "program";
+		m_space_config[spacenum].m_endianness = static_cast<endianness_t>(get_legacy_config_int(DEVINFO_INT_ENDIANNESS));
+		m_space_config[spacenum].m_databus_width = get_legacy_config_int(DEVINFO_INT_DATABUS_WIDTH + spacenum);
+		m_space_config[spacenum].m_addrbus_width = get_legacy_config_int(DEVINFO_INT_ADDRBUS_WIDTH + spacenum);
+		m_space_config[spacenum].m_addrbus_shift = get_legacy_config_int(DEVINFO_INT_ADDRBUS_SHIFT + spacenum);
+		m_space_config[spacenum].m_logaddr_width = get_legacy_config_int(CPUINFO_INT_LOGADDR_WIDTH + spacenum);
+		m_space_config[spacenum].m_page_shift = get_legacy_config_int(CPUINFO_INT_PAGE_SHIFT + spacenum);
+		m_space_config[spacenum].m_internal_map = reinterpret_cast<const addrmap_token *>(get_legacy_config_ptr(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum));
+		m_space_config[spacenum].m_default_map = reinterpret_cast<const addrmap_token *>(get_legacy_config_ptr(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum));
 	}
-
-	// everything else goes to our parent
-	return device_config::device_process_token(entrytype, tokens);
+	
+	// set the real name
+	m_name = get_legacy_config_string(DEVINFO_STR_NAME);
 }
 
 
@@ -171,7 +130,7 @@ UINT64 legacy_cpu_device_config::execute_cycles_to_clocks(UINT64 cycles) const
 INT64 legacy_cpu_device_config::get_legacy_config_int(UINT32 state) const
 {
 	cpuinfo info = { 0 };
-	(*m_cputype)(this, NULL, state, &info);
+	(*m_get_info)(this, NULL, state, &info);
 	return info.i;
 }
 
@@ -184,7 +143,7 @@ INT64 legacy_cpu_device_config::get_legacy_config_int(UINT32 state) const
 void *legacy_cpu_device_config::get_legacy_config_ptr(UINT32 state) const
 {
 	cpuinfo info = { 0 };
-	(*m_cputype)(this, NULL, state, &info);
+	(*m_get_info)(this, NULL, state, &info);
 	return info.p;
 }
 
@@ -197,7 +156,7 @@ void *legacy_cpu_device_config::get_legacy_config_ptr(UINT32 state) const
 genf *legacy_cpu_device_config::get_legacy_config_fct(UINT32 state) const
 {
 	cpuinfo info = { 0 };
-	(*m_cputype)(this, NULL, state, &info);
+	(*m_get_info)(this, NULL, state, &info);
 	return info.f;
 }
 
@@ -211,7 +170,7 @@ const char *legacy_cpu_device_config::get_legacy_config_string(UINT32 state) con
 {
 	cpuinfo info;
 	info.s = get_temp_string_buffer();
-	(*m_cputype)(this, NULL, state, &info);
+	(*m_get_info)(this, NULL, state, &info);
 	return info.s;
 }
 
@@ -488,7 +447,7 @@ offs_t legacy_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 INT64 legacy_cpu_device::get_legacy_runtime_int(UINT32 state)
 {
 	cpuinfo info = { 0 };
-	(*m_cpu_config.m_cputype)(&m_cpu_config, this, state, &info);
+	(*m_cpu_config.m_get_info)(&m_cpu_config, this, state, &info);
 	return info.i;
 }
 
@@ -501,7 +460,7 @@ INT64 legacy_cpu_device::get_legacy_runtime_int(UINT32 state)
 void *legacy_cpu_device::get_legacy_runtime_ptr(UINT32 state)
 {
 	cpuinfo info = { 0 };
-	(*m_cpu_config.m_cputype)(&m_cpu_config, this, state, &info);
+	(*m_cpu_config.m_get_info)(&m_cpu_config, this, state, &info);
 	return info.p;
 }
 
@@ -515,7 +474,7 @@ const char *legacy_cpu_device::get_legacy_runtime_string(UINT32 state)
 {
 	cpuinfo info;
 	info.s = get_temp_string_buffer();
-	(*m_cpu_config.m_cputype)(&m_cpu_config, this, state, &info);
+	(*m_cpu_config.m_get_info)(&m_cpu_config, this, state, &info);
 	return info.s;
 }
 
@@ -579,5 +538,3 @@ void legacy_cpu_device::state_string_export(const device_state_entry &entry, ast
 	else if (m_string_export != NULL)
 		(*m_string_export)(this, entry, string);
 }
-
-const device_type CPU = legacy_cpu_device_config::static_alloc_device_config;

@@ -46,8 +46,7 @@ enum
 #define F8_INT_NONE  0
 #define F8_INT_INTR  1
 
-CPU_GET_INFO( f8 );
-#define CPU_F8 CPU_GET_INFO_NAME( f8 )
+DECLARE_LEGACY_CPU_DEVICE(F8, f8);
 
 #ifdef __cplusplus
 }

@@ -42,23 +42,13 @@ enum
 	M6803_PORT4
 };
 
-CPU_GET_INFO( m6800 );
-#define CPU_M6800 CPU_GET_INFO_NAME( m6800 )
-
-CPU_GET_INFO( m6801 );
-#define CPU_M6801 CPU_GET_INFO_NAME( m6801 )
-
-CPU_GET_INFO( m6802 );
-#define CPU_M6802 CPU_GET_INFO_NAME( m6802 )
-
-CPU_GET_INFO( m6803 );
-#define CPU_M6803 CPU_GET_INFO_NAME( m6803 )
-
-CPU_GET_INFO( m6808 );
-#define CPU_M6808 CPU_GET_INFO_NAME( m6808 )
-
-CPU_GET_INFO( hd63701 );
-#define CPU_HD63701 CPU_GET_INFO_NAME( hd63701 )
+DECLARE_LEGACY_CPU_DEVICE(M6800, m6800);
+DECLARE_LEGACY_CPU_DEVICE(M6801, m6801);
+DECLARE_LEGACY_CPU_DEVICE(M6802, m6802);
+DECLARE_LEGACY_CPU_DEVICE(M6803, m6803);
+DECLARE_LEGACY_CPU_DEVICE(M6808, m6808);
+DECLARE_LEGACY_CPU_DEVICE(HD63701, hd63701);
+DECLARE_LEGACY_CPU_DEVICE(NSC8105, nsc8105);
 
 /* FIMXE: these should be replaced to use m6803 ones */
 #define HD63701_DDR1 M6803_DDR1
@@ -73,10 +63,6 @@ CPU_GET_INFO( hd63701 );
 
 READ8_HANDLER( hd63701_internal_registers_r );
 WRITE8_HANDLER( hd63701_internal_registers_w );
-
-
-CPU_GET_INFO( nsc8105 );
-#define CPU_NSC8105 CPU_GET_INFO_NAME( nsc8105 )
 
 
 CPU_DISASSEMBLE( m6800 );
@@ -106,8 +92,6 @@ CPU_DISASSEMBLE( nsc8105 );
 #define M6801_WAI					M6800_WAI
 #define M6801_IRQ_LINE				M6800_IRQ_LINE
 
-extern CPU_GET_INFO( m6801 );
-
 /****************************************************************************
  * For now make the 6802 using the m6800 variables and functions
  ****************************************************************************/
@@ -123,8 +107,6 @@ extern CPU_GET_INFO( m6801 );
 
 #define M6802_WAI					M6800_WAI
 #define M6802_IRQ_LINE				M6800_IRQ_LINE
-
-extern CPU_GET_INFO( m6802 );
 
 /****************************************************************************
  * For now make the 6803 using the m6800 variables and functions
@@ -142,8 +124,6 @@ extern CPU_GET_INFO( m6802 );
 #define M6803_WAI					M6800_WAI
 #define M6803_IRQ_LINE				M6800_IRQ_LINE
 #define M6803_TIN_LINE				M6800_TIN_LINE
-
-extern CPU_GET_INFO( m6803 );
 
 /* By default, on a port write port bits which are not set as output in the DDR */
 /* are set to the value returned by a read from the same port. If you need to */
@@ -175,8 +155,6 @@ extern CPU_GET_INFO( m6803 );
 #define M6808_WAI                   M6800_WAI
 #define M6808_IRQ_LINE              M6800_IRQ_LINE
 
-extern CPU_GET_INFO( m6808 );
-
 /****************************************************************************
  * For now make the HD63701 using the m6800 variables and functions
  ****************************************************************************/
@@ -194,8 +172,6 @@ extern CPU_GET_INFO( m6808 );
 #define HD63701_SLP 				 M6800_SLP
 #define HD63701_IRQ_LINE			 M6800_IRQ_LINE
 #define HD63701_TIN_LINE			 M6800_TIN_LINE
-
-extern CPU_GET_INFO( hd63701 );
 
 #define HD63701_DDR1 M6803_DDR1
 #define HD63701_DDR2 M6803_DDR2
@@ -227,8 +203,6 @@ WRITE8_HANDLER( hd63701_internal_registers_w );
 #define NSC8105_WAI 				 M6800_WAI
 #define NSC8105_IRQ_LINE			 M6800_IRQ_LINE
 #define NSC8105_TIN_LINE			 M6800_TIN_LINE
-
-extern CPU_GET_INFO( nsc8105 );
 
 #endif
 #endif /* __M6800_H__ */

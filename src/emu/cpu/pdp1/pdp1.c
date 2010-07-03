@@ -425,8 +425,7 @@ struct _pdp1_state
 INLINE pdp1_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_PDP1);
+	assert(device->type() == PDP1);
 	return (pdp1_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1887,3 +1886,5 @@ static void pulse_start_clear(pdp1_state *cpustate)
 	if (cpustate->io_sc_callback)
 		(*cpustate->io_sc_callback)(cpustate->device);
 }
+
+DEFINE_LEGACY_CPU_DEVICE(PDP1, pdp1);

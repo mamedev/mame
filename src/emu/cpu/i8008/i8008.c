@@ -57,8 +57,7 @@ struct _i8008_state
 INLINE i8008_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_I8008);
+	assert(device->type() == I8008);
 	return (i8008_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -720,3 +719,5 @@ CPU_GET_INFO( i8008 )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(I8008, i8008);

@@ -60,8 +60,7 @@ enum
   I960_IRQ3 = 3
 };
 
-CPU_GET_INFO( i960 );
-#define CPU_I960 CPU_GET_INFO_NAME( i960 )
+DECLARE_LEGACY_CPU_DEVICE(I960, i960);
 
 void i960_noburst(running_device *device);
 void i960_stall(running_device *device);

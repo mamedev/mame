@@ -508,12 +508,11 @@ struct _upd7810_state
 INLINE upd7810_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_UPD7810 ||
-		   cpu_get_type(device) == CPU_UPD7807 ||
-		   cpu_get_type(device) == CPU_UPD7801 ||
-		   cpu_get_type(device) == CPU_UPD78C05 ||
-		   cpu_get_type(device) == CPU_UPD78C06);
+	assert(device->type() == UPD7810 ||
+		   device->type() == UPD7807 ||
+		   device->type() == UPD7801 ||
+		   device->type() == UPD78C05 ||
+		   device->type() == UPD78C06);
 	return (upd7810_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -2380,3 +2379,9 @@ CPU_GET_INFO( upd78c06 ) {
 		default:										CPU_GET_INFO_CALL(upd78c05);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(UPD7810, upd7810);
+DEFINE_LEGACY_CPU_DEVICE(UPD7807, upd7807);
+DEFINE_LEGACY_CPU_DEVICE(UPD7801, upd7801);
+DEFINE_LEGACY_CPU_DEVICE(UPD78C05, upd78c05);
+DEFINE_LEGACY_CPU_DEVICE(UPD78C06, upd78c06);

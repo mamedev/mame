@@ -29,8 +29,7 @@ enum
 /****************************************************************************/
 /* Return register contents                                                 */
 /****************************************************************************/
-extern CPU_GET_INFO( lr35902 );
-#define CPU_LR35902 CPU_GET_INFO_NAME( lr35902 )
+DECLARE_LEGACY_CPU_DEVICE(LR35902, lr35902);
 
 extern CPU_DISASSEMBLE( lr35902 );
 

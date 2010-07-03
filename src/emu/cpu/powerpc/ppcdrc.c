@@ -438,16 +438,15 @@ static const UINT8 fcmp_cr_table_source[32] =
 INLINE powerpc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_PPC403GA ||
-		   cpu_get_type(device) == CPU_PPC403GCX ||
-		   cpu_get_type(device) == CPU_PPC601 ||
-		   cpu_get_type(device) == CPU_PPC602 ||
-		   cpu_get_type(device) == CPU_PPC603 ||
-		   cpu_get_type(device) == CPU_PPC603E ||
-		   cpu_get_type(device) == CPU_PPC603R ||
-		   cpu_get_type(device) == CPU_PPC604 ||
-		   cpu_get_type(device) == CPU_MPC8240);
+	assert(device->type() == PPC403GA ||
+		   device->type() == PPC403GCX ||
+		   device->type() == PPC601 ||
+		   device->type() == PPC602 ||
+		   device->type() == PPC603 ||
+		   device->type() == PPC603E ||
+		   device->type() == PPC603R ||
+		   device->type() == PPC604 ||
+		   device->type() == MPC8240);
 	return *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -4621,3 +4620,14 @@ CPU_GET_INFO( mpc8240 )
 		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);
+DEFINE_LEGACY_CPU_DEVICE(PPC403GCX, ppc403gcx);
+
+DEFINE_LEGACY_CPU_DEVICE(PPC601, ppc601);
+DEFINE_LEGACY_CPU_DEVICE(PPC602, ppc602);
+DEFINE_LEGACY_CPU_DEVICE(PPC603, ppc603);
+DEFINE_LEGACY_CPU_DEVICE(PPC603E, ppc603e);
+DEFINE_LEGACY_CPU_DEVICE(PPC603R, ppc603r);
+DEFINE_LEGACY_CPU_DEVICE(PPC604, ppc604);
+DEFINE_LEGACY_CPU_DEVICE(MPC8240, mpc8240);

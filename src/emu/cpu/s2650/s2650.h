@@ -21,8 +21,7 @@ enum
 	S2650_FO_PORT		= 0x0103	/* Fake FO Line */
 };
 
-extern CPU_GET_INFO( s2650 );
-#define CPU_S2650 CPU_GET_INFO_NAME( s2650 )
+DECLARE_LEGACY_CPU_DEVICE(S2650, s2650);
 
 extern CPU_DISASSEMBLE( s2650 );
 

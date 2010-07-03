@@ -193,7 +193,7 @@ static MACHINE_DRIVER_START( kopunch )
 	MDRV_DRIVER_DATA(kopunch_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
+	MDRV_CPU_ADD("maincpu", I8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map)
 	MDRV_CPU_IO_MAP(kopunch_io_map)
 	MDRV_CPU_VBLANK_INT("screen",kopunch_interrupt)

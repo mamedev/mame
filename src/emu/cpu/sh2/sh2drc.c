@@ -99,26 +99,26 @@ struct _compiler_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void static_generate_entry_point(SH2 *sh2);
-static void static_generate_nocode_handler(SH2 *sh2);
-static void static_generate_out_of_cycles(SH2 *sh2);
-static void static_generate_memory_accessor(SH2 *sh2, int size, int iswrite, const char *name, drcuml_codehandle **handleptr);
+static void static_generate_entry_point(sh2_state *sh2);
+static void static_generate_nocode_handler(sh2_state *sh2);
+static void static_generate_out_of_cycles(sh2_state *sh2);
+static void static_generate_memory_accessor(sh2_state *sh2, int size, int iswrite, const char *name, drcuml_codehandle **handleptr);
 
-static void generate_update_cycles(SH2 *sh2, drcuml_block *block, compiler_state *compiler, drcuml_ptype ptype, UINT64 pvalue, int allow_exception);
-static void generate_checksum_block(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-static void generate_sequence_instruction(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-static void generate_delay_slot(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+static void generate_update_cycles(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, drcuml_ptype ptype, UINT64 pvalue, int allow_exception);
+static void generate_checksum_block(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+static void generate_sequence_instruction(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+static void generate_delay_slot(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
-static int generate_opcode(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-static int generate_group_0(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
-static int generate_group_2(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
-static int generate_group_3(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode);
-static int generate_group_4(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
-static int generate_group_6(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
-static int generate_group_8(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
-static int generate_group_12(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
+static int generate_opcode(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
+static int generate_group_2(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
+static int generate_group_3(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode);
+static int generate_group_4(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
+static int generate_group_6(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
+static int generate_group_8(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
+static int generate_group_12(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot);
 
-static void code_compile_block(SH2 *sh2, UINT8 mode, offs_t pc);
+static void code_compile_block(sh2_state *sh2, UINT8 mode, offs_t pc);
 
 static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
 static void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist);
@@ -137,16 +137,15 @@ static void cfunc_DIV1(void *param);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE SH2 *get_safe_token(running_device *device)
+INLINE sh2_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SH1 ||
-		   cpu_get_type(device) == CPU_SH2);
-	return *(SH2 **)downcast<legacy_cpu_device *>(device)->token();
+	assert(device->type() == SH1 ||
+		   device->type() == SH2);
+	return *(sh2_state **)downcast<legacy_cpu_device *>(device)->token();
 }
 
-INLINE UINT16 RW(SH2 *sh2, offs_t A)
+INLINE UINT16 RW(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
@@ -157,7 +156,7 @@ INLINE UINT16 RW(SH2 *sh2, offs_t A)
 	return memory_read_word_32be(sh2->program, A & AM);
 }
 
-INLINE UINT32 RL(SH2 *sh2, offs_t A)
+INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
@@ -194,7 +193,7 @@ INLINE void alloc_handle(drcuml_state *drcuml, drcuml_codehandle **handleptr, co
     registers
 -------------------------------------------------*/
 
-INLINE void load_fast_iregs(SH2 *sh2, drcuml_block *block)
+INLINE void load_fast_iregs(sh2_state *sh2, drcuml_block *block)
 {
 	int regnum;
 
@@ -213,7 +212,7 @@ INLINE void load_fast_iregs(SH2 *sh2, drcuml_block *block)
     registers
 -------------------------------------------------*/
 
-INLINE void save_fast_iregs(SH2 *sh2, drcuml_block *block)
+INLINE void save_fast_iregs(sh2_state *sh2, drcuml_block *block)
 {
 	int regnum;
 
@@ -233,7 +232,7 @@ INLINE void save_fast_iregs(SH2 *sh2, drcuml_block *block)
 
 static void cfunc_printf_probe(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	UINT32 pc = sh2->pc;
 
 	printf(" PC=%08X          r0=%08X  r1=%08X  r2=%08X\n",
@@ -273,7 +272,7 @@ static void cfunc_printf_probe(void *param)
 
 static void cfunc_unimplemented(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	UINT16 opcode = sh2->arg0;
 	fatalerror("PC=%08X: Unimplemented op %04X", sh2->pc, opcode);
 }
@@ -283,7 +282,7 @@ static void cfunc_unimplemented(void *param)
 -------------------------------------------------*/
 static void cfunc_checkirqs(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	// if NMI is pending, evec etc are already set up
 	if (sh2->pending_nmi)
 	{
@@ -301,7 +300,7 @@ static void cfunc_checkirqs(void *param)
 -------------------------------------------------*/
 static void cfunc_fastirq(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	sh2_exception(sh2, "fastirq",sh2->irqline);
 }
 
@@ -310,7 +309,7 @@ static void cfunc_fastirq(void *param)
 -------------------------------------------------*/
 static void cfunc_MAC_W(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	INT32 tempm, tempn, dest, src, ans;
 	UINT32 templ;
 	UINT16 opcode;
@@ -393,7 +392,7 @@ static void cfunc_MAC_W(void *param)
 -------------------------------------------------*/
 static void cfunc_MAC_L(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	UINT32 RnL, RnH, RmL, RmH, Res0, Res1, Res2;
 	UINT32 temp0, temp1, temp2, temp3;
 	INT32 tempm, tempn, fnLmL;
@@ -481,7 +480,7 @@ static void cfunc_MAC_L(void *param)
 -------------------------------------------------*/
 static void cfunc_DIV1(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	UINT32 tmp0;
 	UINT32 old_q;
 	UINT16 opcode;
@@ -586,7 +585,7 @@ static void cfunc_DIV1(void *param)
 -------------------------------------------------*/
 static void cfunc_ADDV(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	INT32 dest, src, ans;
 	UINT16 opcode;
 	int n, m;
@@ -629,7 +628,7 @@ static void cfunc_ADDV(void *param)
 -------------------------------------------------*/
 static void cfunc_SUBV(void *param)
 {
-	SH2 *sh2 = (SH2 *)param;
+	sh2_state *sh2 = (sh2_state *)param;
 	INT32 dest, src, ans;
 	UINT16 opcode;
 	int n, m;
@@ -681,20 +680,20 @@ static CPU_INIT( sh2 )
 		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
 		sh2_describe			/* callback to describe a single instruction */
 	};
-	SH2 *sh2 = get_safe_token(device);
+	sh2_state *sh2 = get_safe_token(device);
 	drccache *cache;
 	drcbe_info beinfo;
 	UINT32 flags = 0;
 	int regnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = drccache_alloc(CACHE_SIZE + sizeof(SH2));
+	cache = drccache_alloc(CACHE_SIZE + sizeof(sh2_state));
 	if (cache == NULL)
-		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(SH2)));
+		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(sh2_state)));
 
 	/* allocate the core memory */
-	*(SH2 **)device->token() = sh2 = (SH2 *)drccache_memory_alloc_near(cache, sizeof(SH2));
-	memset(sh2, 0, sizeof(SH2));
+	*(sh2_state **)device->token() = sh2 = (sh2_state *)drccache_memory_alloc_near(cache, sizeof(sh2_state));
+	memset(sh2, 0, sizeof(sh2_state));
 
 	/* initialize the common core parts */
 	sh2_common_init(sh2, device, irqcallback);
@@ -776,7 +775,7 @@ static CPU_INIT( sh2 )
 
 static CPU_EXIT( sh2 )
 {
-	SH2 *sh2 = get_safe_token(device);
+	sh2_state *sh2 = get_safe_token(device);
 
 	/* clean up the DRC */
 	drcfe_exit(sh2->drcfe);
@@ -791,7 +790,7 @@ static CPU_EXIT( sh2 )
 
 static CPU_RESET( sh2 )
 {
-	SH2 *sh2 = get_safe_token(device);
+	sh2_state *sh2 = get_safe_token(device);
 	emu_timer *tsave, *tsaved0, *tsaved1;
 	UINT32 *m;
 
@@ -845,7 +844,7 @@ static CPU_RESET( sh2 )
 
 static CPU_RESET( sh1 )
 {
-	SH2 *sh2 = get_safe_token(device);
+	sh2_state *sh2 = get_safe_token(device);
 	CPU_RESET_CALL(sh2);
 	sh2->cpu_type = CPU_TYPE_SH1;
 }
@@ -855,7 +854,7 @@ static CPU_RESET( sh1 )
     regenerate static code
 -------------------------------------------------*/
 
-static void code_flush_cache(SH2 *sh2)
+static void code_flush_cache(sh2_state *sh2)
 {
 	drcuml_state *drcuml = sh2->drcuml;
 
@@ -881,7 +880,7 @@ static void code_flush_cache(SH2 *sh2)
 /* Execute cycles - returns number of cycles actually run */
 static CPU_EXECUTE( sh2 )
 {
-	SH2 *sh2 = get_safe_token(device);
+	sh2_state *sh2 = get_safe_token(device);
 	drcuml_state *drcuml = sh2->drcuml;
 	int execute_result;
 
@@ -916,7 +915,7 @@ static CPU_EXECUTE( sh2 )
     given mode at the specified pc
 -------------------------------------------------*/
 
-static void code_compile_block(SH2 *sh2, UINT8 mode, offs_t pc)
+static void code_compile_block(sh2_state *sh2, UINT8 mode, offs_t pc)
 {
 	drcuml_state *drcuml = sh2->drcuml;
 	compiler_state compiler = { 0 };
@@ -1025,7 +1024,7 @@ static void code_compile_block(SH2 *sh2, UINT8 mode, offs_t pc)
     static entry point
 -------------------------------------------------*/
 
-static void static_generate_entry_point(SH2 *sh2)
+static void static_generate_entry_point(sh2_state *sh2)
 {
 	drcuml_state *drcuml = sh2->drcuml;
 	drcuml_codelabel skip = 1;
@@ -1110,7 +1109,7 @@ static void static_generate_entry_point(SH2 *sh2)
     exception handler for "out of code"
 -------------------------------------------------*/
 
-static void static_generate_nocode_handler(SH2 *sh2)
+static void static_generate_nocode_handler(sh2_state *sh2)
 {
 	drcuml_state *drcuml = sh2->drcuml;
 	drcuml_block *block;
@@ -1140,7 +1139,7 @@ static void static_generate_nocode_handler(SH2 *sh2)
     out of cycles exception handler
 -------------------------------------------------*/
 
-static void static_generate_out_of_cycles(SH2 *sh2)
+static void static_generate_out_of_cycles(sh2_state *sh2)
 {
 	drcuml_state *drcuml = sh2->drcuml;
 	drcuml_block *block;
@@ -1168,7 +1167,7 @@ static void static_generate_out_of_cycles(SH2 *sh2)
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-static void static_generate_memory_accessor(SH2 *sh2, int size, int iswrite, const char *name, drcuml_codehandle **handleptr)
+static void static_generate_memory_accessor(sh2_state *sh2, int size, int iswrite, const char *name, drcuml_codehandle **handleptr)
 {
 	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I0 */
@@ -1427,7 +1426,7 @@ static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
     subtract cycles from the icount and generate
     an exception if out
 -------------------------------------------------*/
-static void generate_update_cycles(SH2 *sh2, drcuml_block *block, compiler_state *compiler, drcuml_ptype ptype, UINT64 pvalue, int allow_exception)
+static void generate_update_cycles(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, drcuml_ptype ptype, UINT64 pvalue, int allow_exception)
 {
 	/* check full interrupts if pending */
 	if (compiler->checkints)
@@ -1505,7 +1504,7 @@ static void generate_update_cycles(SH2 *sh2, drcuml_block *block, compiler_state
     validate a sequence of opcodes
 -------------------------------------------------*/
 
-static void generate_checksum_block(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
+static void generate_checksum_block(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
 {
 	const opcode_desc *curdesc;
 	if (LOG_UML)
@@ -1560,7 +1559,7 @@ static void generate_checksum_block(SH2 *sh2, drcuml_block *block, compiler_stat
     for a single instruction in a sequence
 -------------------------------------------------*/
 
-static void generate_sequence_instruction(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+static void generate_sequence_instruction(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	offs_t expc;
 
@@ -1644,7 +1643,7 @@ static void generate_sequence_instruction(SH2 *sh2, drcuml_block *block, compile
     generate_delay_slot
 ------------------------------------------------------------------*/
 
-static void generate_delay_slot(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+static void generate_delay_slot(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	compiler_state compiler_temp = *compiler;
 
@@ -1661,7 +1660,7 @@ static void generate_delay_slot(SH2 *sh2, drcuml_block *block, compiler_state *c
     opcode
 -------------------------------------------------*/
 
-static int generate_opcode(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+static int generate_opcode(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	UINT32 scratch, scratch2;
 	INT32 disp;
@@ -1795,7 +1794,7 @@ static int generate_opcode(SH2 *sh2, drcuml_block *block, compiler_state *compil
 	return FALSE;
 }
 
-static int generate_group_0(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
+static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
 {
 	switch (opcode & 0x3F)
 	{
@@ -2058,7 +2057,7 @@ static int generate_group_0(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	return FALSE;
 }
 
-static int generate_group_2(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
+static int generate_group_2(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
 {
 	switch (opcode & 15)
 	{
@@ -2227,7 +2226,7 @@ static int generate_group_2(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	return FALSE;
 }
 
-static int generate_group_3(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode)
+static int generate_group_3(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
@@ -2339,7 +2338,7 @@ static int generate_group_3(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	return FALSE;
 }
 
-static int generate_group_4(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
+static int generate_group_4(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
 {
 	switch (opcode & 0x3F)
 	{
@@ -2704,7 +2703,7 @@ static int generate_group_4(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	return FALSE;
 }
 
-static int generate_group_6(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
+static int generate_group_6(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
 {
 	switch (opcode & 15)
 	{
@@ -2834,7 +2833,7 @@ static int generate_group_6(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	return FALSE;
 }
 
-static int generate_group_8(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
+static int generate_group_8(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
 {
 	INT32 disp;
 	UINT32 udisp;
@@ -2978,7 +2977,7 @@ static int generate_group_8(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	return FALSE;
 }
 
-static int generate_group_12(SH2 *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
+static int generate_group_12(sh2_state *sh2, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT16 opcode, int in_delay_slot)
 {
 	UINT32 scratch;
 
@@ -3153,7 +3152,7 @@ static int generate_group_12(SH2 *sh2, drcuml_block *block, compiler_state *comp
 
 void sh2drc_set_options(running_device *device, UINT32 options)
 {
-	SH2 *sh2 = get_safe_token(device);
+	sh2_state *sh2 = get_safe_token(device);
 	sh2->drcoptions = options;
 }
 
@@ -3165,7 +3164,7 @@ void sh2drc_set_options(running_device *device, UINT32 options)
 
 void sh2drc_add_pcflush(running_device *device, offs_t address)
 {
-	SH2 *sh2 = get_safe_token(device);
+	sh2_state *sh2 = get_safe_token(device);
 
 	if (sh2->pcfsel < ARRAY_LENGTH(sh2->pcflushes))
 		sh2->pcflushes[sh2->pcfsel++] = address;
@@ -3199,7 +3198,7 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( sh2 )
 {
-	SH2 *sh2 = get_safe_token(device);
+	sh2_state *sh2 = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -3258,11 +3257,11 @@ static CPU_SET_INFO( sh2 )
 
 CPU_GET_INFO( sh2 )
 {
-	SH2 *sh2 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+	sh2_state *sh2 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(SH2 *);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(sh2_state *);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 16;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
@@ -3407,5 +3406,8 @@ CPU_GET_INFO( sh1 )
 		default:							CPU_GET_INFO_CALL(sh2);			break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(SH1, sh1);
+DEFINE_LEGACY_CPU_DEVICE(SH2, sh2);
 
 #endif	// USE_SH2DRC

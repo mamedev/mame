@@ -202,20 +202,19 @@ struct _cop400_opcode_map {
 INLINE cop400_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_COP401 ||
-		   cpu_get_type(device) == CPU_COP410 ||
-		   cpu_get_type(device) == CPU_COP411 ||
-		   cpu_get_type(device) == CPU_COP402 ||
-		   cpu_get_type(device) == CPU_COP420 ||
-		   cpu_get_type(device) == CPU_COP421 ||
-		   cpu_get_type(device) == CPU_COP422 ||
-		   cpu_get_type(device) == CPU_COP404 ||
-		   cpu_get_type(device) == CPU_COP424 ||
-		   cpu_get_type(device) == CPU_COP425 ||
-		   cpu_get_type(device) == CPU_COP426 ||
-		   cpu_get_type(device) == CPU_COP444 ||
-		   cpu_get_type(device) == CPU_COP445);
+	assert(device->type() == COP401 ||
+		   device->type() == COP410 ||
+		   device->type() == COP411 ||
+		   device->type() == COP402 ||
+		   device->type() == COP420 ||
+		   device->type() == COP421 ||
+		   device->type() == COP422 ||
+		   device->type() == COP404 ||
+		   device->type() == COP424 ||
+		   device->type() == COP425 ||
+		   device->type() == COP426 ||
+		   device->type() == COP444 ||
+		   device->type() == COP445);
 	return (cop400_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1685,3 +1684,22 @@ CPU_GET_INFO( cop404 )
 		default:										CPU_GET_INFO_CALL(cop444);								break;
 	}
 }
+
+/* COP410 family */
+DEFINE_LEGACY_CPU_DEVICE(COP401, cop401);
+DEFINE_LEGACY_CPU_DEVICE(COP410, cop410);
+DEFINE_LEGACY_CPU_DEVICE(COP411, cop411);
+
+/* COP420 family */
+DEFINE_LEGACY_CPU_DEVICE(COP402, cop402);
+DEFINE_LEGACY_CPU_DEVICE(COP420, cop420);
+DEFINE_LEGACY_CPU_DEVICE(COP421, cop421);
+DEFINE_LEGACY_CPU_DEVICE(COP422, cop422);
+
+/* COP444 family */
+DEFINE_LEGACY_CPU_DEVICE(COP404, cop404);
+DEFINE_LEGACY_CPU_DEVICE(COP424, cop424);
+DEFINE_LEGACY_CPU_DEVICE(COP425, cop425);
+DEFINE_LEGACY_CPU_DEVICE(COP426, cop426);
+DEFINE_LEGACY_CPU_DEVICE(COP444, cop444);
+DEFINE_LEGACY_CPU_DEVICE(COP445, cop445);

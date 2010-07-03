@@ -61,8 +61,7 @@ static _OP *OpTable=NULL;
 INLINE se3208_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SE3208);
+	assert(device->type() == SE3208);
 	return (se3208_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1935,3 +1934,5 @@ CPU_GET_INFO( se3208 )
 	}
 }
 
+
+DEFINE_LEGACY_CPU_DEVICE(SE3208, se3208);

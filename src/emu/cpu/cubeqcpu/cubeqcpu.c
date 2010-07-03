@@ -196,24 +196,21 @@ typedef struct
 INLINE cquestsnd_state *get_safe_token_snd(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_CQUESTSND);
+	assert(device->type() == CQUESTSND);
 	return (cquestsnd_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE cquestrot_state *get_safe_token_rot(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_CQUESTROT);
+	assert(device->type() == CQUESTROT);
 	return (cquestrot_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE cquestlin_state *get_safe_token_lin(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_CQUESTLIN);
+	assert(device->type() == CQUESTLIN);
 	return (cquestlin_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1897,3 +1894,7 @@ CPU_GET_INFO( cquestlin )
 		case CPUINFO_STR_REGISTER + CQUESTLIN_ZLATCH:	sprintf(info->s, "ZLATCH: %04X", cpustate->zlatch); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(CQUESTSND, cquestsnd);
+DEFINE_LEGACY_CPU_DEVICE(CQUESTROT, cquestrot);
+DEFINE_LEGACY_CPU_DEVICE(CQUESTLIN, cquestlin);

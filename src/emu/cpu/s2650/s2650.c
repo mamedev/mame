@@ -50,8 +50,7 @@ struct _s2650_regs {
 INLINE s2650_regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_S2650);
+	assert(device->type() == S2650);
 	return (s2650_regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1641,3 +1640,5 @@ CPU_GET_INFO( s2650 )
 		case CPUINFO_STR_REGISTER + S2650_FO:			sprintf(info->s, "FO:%X", (s2650c->psu & FO) ? 1 : 0); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(S2650, s2650);

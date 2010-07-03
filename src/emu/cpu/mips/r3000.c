@@ -165,11 +165,10 @@ struct _r3000_state
 INLINE r3000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_R3000BE ||
-		   cpu_get_type(device) == CPU_R3000LE ||
-		   cpu_get_type(device) == CPU_R3041BE ||
-		   cpu_get_type(device) == CPU_R3041LE);
+	assert(device->type() == R3000BE ||
+		   device->type() == R3000LE ||
+		   device->type() == R3041BE ||
+		   device->type() == R3041LE);
 	return (r3000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1369,3 +1368,9 @@ CPU_GET_INFO( r3041le )
 		default:										CPU_GET_INFO_CALL(r3000);						break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(R3000BE, r3000be);
+DEFINE_LEGACY_CPU_DEVICE(R3000LE, r3000le);
+
+DEFINE_LEGACY_CPU_DEVICE(R3041BE, r3041be);
+DEFINE_LEGACY_CPU_DEVICE(R3041LE, r3041le);

@@ -220,24 +220,23 @@ static int check_irqs(mcs48_state *cpustate);
 INLINE mcs48_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_I8035 ||
-		   cpu_get_type(device) == CPU_I8048 ||
-		   cpu_get_type(device) == CPU_I8648 ||
-		   cpu_get_type(device) == CPU_I8748 ||
-		   cpu_get_type(device) == CPU_I8039 ||
-		   cpu_get_type(device) == CPU_I8049 ||
-		   cpu_get_type(device) == CPU_I8749 ||
-		   cpu_get_type(device) == CPU_I8040 ||
-		   cpu_get_type(device) == CPU_I8050 ||
-		   cpu_get_type(device) == CPU_I8041 ||
-		   cpu_get_type(device) == CPU_I8741 ||
-		   cpu_get_type(device) == CPU_I8042 ||
-		   cpu_get_type(device) == CPU_I8242 ||
-		   cpu_get_type(device) == CPU_I8742 ||
-		   cpu_get_type(device) == CPU_MB8884 ||
-		   cpu_get_type(device) == CPU_N7751 ||
-		   cpu_get_type(device) == CPU_M58715);
+	assert(device->type() == I8035 ||
+		   device->type() == I8048 ||
+		   device->type() == I8648 ||
+		   device->type() == I8748 ||
+		   device->type() == I8039 ||
+		   device->type() == I8049 ||
+		   device->type() == I8749 ||
+		   device->type() == I8040 ||
+		   device->type() == I8050 ||
+		   device->type() == I8041 ||
+		   device->type() == I8741 ||
+		   device->type() == I8042 ||
+		   device->type() == I8242 ||
+		   device->type() == I8742 ||
+		   device->type() == MB8884 ||
+		   device->type() == N7751 ||
+		   device->type() == M58715);
 	return (mcs48_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1516,3 +1515,28 @@ CPU_GET_INFO( i8742 )  { mcs48_generic_get_info(devconfig, device, state, info, 
 CPU_GET_INFO( mb8884 ) { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE,    0,  64, "MB8884"); }
 CPU_GET_INFO( n7751 )  { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 1024,  64, "N7751"); }
 CPU_GET_INFO( m58715 ) { mcs48_generic_get_info(devconfig, device, state, info, MCS48_FEATURE, 2048, 128, "M58715"); }
+
+/* Official Intel MCS-48 parts */
+DEFINE_LEGACY_CPU_DEVICE(I8021, i8021);			/* 1k internal ROM,      64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8022, i8022);			/* 2k internal ROM,     128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8035, i8035);			/* external ROM,         64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8048, i8048);			/* 1k internal ROM,      64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8648, i8648);			/* 1k internal OTP ROM,  64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8748, i8748);			/* 1k internal EEPROM,   64 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8039, i8039);			/* external ROM,        128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8049, i8049);			/* 2k internal ROM,     128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8749, i8749);			/* 2k internal EEPROM,  128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8040, i8040);			/* external ROM,        256 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8050, i8050);			/* 4k internal ROM,     256 bytes internal RAM */
+
+/* Official Intel UPI-41 parts */
+DEFINE_LEGACY_CPU_DEVICE(I8041, i8041);			/* 1k internal ROM,     128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8741, i8741);			/* 1k internal EEPROM,  128 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8042, i8042);			/* 2k internal ROM,     256 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8242, i8242);			/* 2k internal ROM,     256 bytes internal RAM */
+DEFINE_LEGACY_CPU_DEVICE(I8742, i8742);			/* 2k internal EEPROM,  256 bytes internal RAM */
+
+/* Clones */
+DEFINE_LEGACY_CPU_DEVICE(MB8884, mb8884);		/* 8035 clone */
+DEFINE_LEGACY_CPU_DEVICE(N7751, n7751);			/* 8048 clone */
+DEFINE_LEGACY_CPU_DEVICE(M58715, m58715);		/* 8049 clone */

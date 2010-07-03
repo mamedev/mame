@@ -220,7 +220,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( tiamc1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080,16000000/9)		 /* 16 MHz */
+	MDRV_CPU_ADD("maincpu", I8080,16000000/9)		 /* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(tiamc1_map)
 	MDRV_CPU_IO_MAP(tiamc1_io_map)
 
