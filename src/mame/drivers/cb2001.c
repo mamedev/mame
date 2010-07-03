@@ -70,11 +70,11 @@ static const UINT8 cb2001_decryption_table[256] = {
 //    ????      pppp pppp pppp ???? pppp !!!!  pppp      pppp pppp pppp pppp      pppp
 	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x13,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
 //    pppp      pppp           pppp                 ???? pppp      pppp      pppp pppp
-	xxxx,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,xxxx,xxxx,0x2e,xxxx, /* C0 */
-//         pppp pppp           pppp pppp                 pppp ????           pppp
+	0xcb,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,xxxx,xxxx,0x2e,xxxx, /* C0 */
+//    pppp pppp pppp           pppp pppp                 pppp ????           pppp
 	xxxx,0xf3,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //         ???? pppp      ????      pppp pppp  pppp                     ???? !!!! pppp
-	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, xxxx,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
+	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //    pppp gggg      !!!!      ????            pppp ????
 	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,0x1c,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
 //         ???? pppp                     ????            ????      ????
@@ -82,31 +82,15 @@ static const UINT8 cb2001_decryption_table[256] = {
 
 /* robiza's notes:
 
-sure but for now don't add
-e8 -> 9a
-
-aa opcode:
-e0086 aa
-e0087 3e cc 00          mov iy,0cc
-e008a aa
-e008b 36 1c 05          mov ix,51c
-e008e 9c 08 00          mov cw,8h
-e0091 23 26             cmp4s
-e0093 78 03             bc e0098
+sure:
+e8 -> 9a call_far
+c0 -> cb ret_f
 
 aa -> 8d
-
-1) aa 1e ## ## -> bb mov bw,####
-_     1e ## ## -> 89 mov
-
-2) aa 26 ## ## -> bc mov sp,####
-_     26 ##    -> b5 mov ch,##
-
-3) aa 36 ## ## -> be mov ix,####
-_     36       -> ????
-
-4) aa 3e ## ## -> bf mov iy,####
-_     3e       -> ????
+aa 1e ## ## -> bb mov bw,####
+aa 26 ## ## -> bc mov sp,####
+aa 36 ## ## -> be mov ix,####
+aa 3e ## ## -> bf mov iy,####
 
 e01f7-e0204 (b0 -> ac) (ce -> 2e) (a4 -> aa) : this routine write the "dyna..." string in nvram
 e33ac / 2bbc : c6 -> 87, 9a -> 57, 28 -> 56, 46 -> 5e, 0f -> 5f, a8 -> 4e, ab -> 50, 73 -> 58
@@ -126,7 +110,7 @@ e0033 45 01      mov al,1
 e0035 49 d3 06   mov [6d3],al
 
 0089 call 2a9d                            e0038 call e30a2
-  2a9d ld hl,d0b3                           e30a2 premov bw,[04a6]          (1e -> bb)
+  2a9d ld hl,d0b3                           e30a2 lea bw,[04a6]          (1e -> bb)
   2aa0 inc (hl)                             e30a5 inc b ptr[bw]
   2aa1 inc hl                               e30a8 inc bw
   2aa2 inc (hl)                             e30a9 inc b ptr[bw]
@@ -213,7 +197,7 @@ cmv4                          cb2001                     (en -> de)
 02a1 call $0c38               e0239 call 0e30b8h
 02a4 ld hl,$d023              e023d mov ix,90h           (36 -> be)
 02a7 call $2b2d               e0240 call 0e32a6h         (00 -> e8)
-  2b2d ld a,$01                 e32a6 mov al,1h                                                                           c3ecf
+  2b2d ld a,$01                 e32a6 mov al,1h
   2b2f or a                     e32a8 and al,al
   2b30 add a,(hl)               e32aa add al,b ptr [ix]
   2b31 daa                      e32ac daa                (13 -> 27) not sure
@@ -263,7 +247,7 @@ cmv4                          cb2001                     (en -> de)
   4ab2 xor a                    .
   4ab3 ld ($d618),a             e66f5 mov b ptr[72dh],ah (d8 -> 88)
   4ab6 ld ($d619),a             e66f9 mov b ptr[72eh],ah
-  4ab9 ld ($d61a),hl            e66fd mov w ptr[72fh],bw (1e -> 89) BAD DUMP, i think
+  4ab9 ld ($d61a),hl            e66fd mov w ptr[72fh],bw
   4abc jr $4ac9                 e6701 br 0e6712h
 
   4abe ld a,($d619)             e6703 mov al,[72eh]
@@ -286,7 +270,7 @@ cmv4                          cb2001                     (en -> de)
   4add sub $50                  e672f sub al,50h         (52 -> 2c)
   4adf cp $50                   e6731 cmp al,50h
   4ae1 jr c,$4ae7               e6733 bc 0e6739          (78 -> 72)
-  4ae3 ld b,$04                 e6735 mov ch,4h          (26 -> b5) but 26 in other place probably is mov sp,xxxx (BAD DUMP?)
+  4ae3 ld b,$04                 e6735 mov ch,4h          (26 -> b5)
   4ae5 sub $50                  e6737 sub al,50h
   4ae7 ld c,a                   e6739 mov cl,al
   4ae8 and $0f                  e673b and al,0fh         (76 -> 24)
