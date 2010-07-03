@@ -154,6 +154,7 @@ Notes:
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "includes/dec0.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
@@ -499,6 +500,10 @@ static ADDRESS_MAP_START( automat_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(dec0_mcu_port_r, dec0_mcu_port_w)
+ADDRESS_MAP_END
 
 /******************************************************************************/
 
@@ -1191,6 +1196,9 @@ static MACHINE_DRIVER_START( hbarrel )
 	MDRV_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
+	MDRV_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MDRV_CPU_IO_MAP(mcu_io_map)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57.41)
@@ -1587,7 +1595,7 @@ ROM_START( hbarrel )
 	ROM_LOAD( "hb07.bin",     0x8000, 0x8000, CRC(a127f0f7) SHA1(2cf962410936ac336e384dda2bf434a297bc940f) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
-	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "hb31.9a",      0x0000, 0x1000, CRC(239d726f) SHA1(969f38ae981ffde6053ece93cc51614d492edbbb) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "hb25.bin",     0x00000, 0x10000, CRC(8649762c) SHA1(84d3d82d4d011c54271ef7a0dc5857a34b61cf8a) )
@@ -1636,7 +1644,7 @@ ROM_START( hbarrelw )
 	ROM_LOAD( "hb_ec07.rom",  0x8000, 0x8000, CRC(16a5a1aa) SHA1(27eb8c09be6b1be502bda9ae9c9ff860d2560d46) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )	/* i8751 microcontroller */
-	ROM_LOAD( "i8751",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "ec31.9a",      0x0000, 0x1000, BAD_DUMP CRC(aa14a2ae) SHA1(d456a55a01478286fecea7c33029b7ab74d9ec00) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "hb_ec25.rom",  0x00000, 0x10000, CRC(2e5732a2) SHA1(b730ce11db1876b81d2b7cde0f129bd6fbfeb771) )
@@ -2909,7 +2917,7 @@ static DRIVER_INIT( midresb )
 /******************************************************************************/
 
 GAME( 1987, hbarrel,  0,        hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East USA",         "Heavy Barrel (US)", 0 )
-GAME( 1987, hbarrelw, hbarrel,  hbarrel,  hbarrel,  hbarrelw, ROT270, "Data East Corporation", "Heavy Barrel (World)", 0 )
+GAME( 1987, hbarrelw, hbarrel,  hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East Corporation", "Heavy Barrel (World)", 0 )
 GAME( 1988, baddudes, 0,        baddudes, baddudes, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", 0 )
 GAME( 1988, drgninja, baddudes, baddudes, baddudes, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", 0 )
 /* A Bad Dudes bootleg with 68705 like the midres and ffantasy ones exists, but is not dumped */

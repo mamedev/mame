@@ -9,8 +9,9 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 #include "emu.h"
 #include "includes/dec0.h"
 #include "cpu/h6280/h6280.h"
+#include "cpu/mcs51/mcs51.h"
 
-static int GAME,i8751_return,slyspy_state;
+static int GAME,i8751_return,i8751_command,slyspy_state;
 
 /******************************************************************************/
 
@@ -28,7 +29,7 @@ READ16_HANDLER( dec0_controls_r )
 			return input_port_read(space->machine, "DSW");
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(space->cpu), 0x30c000+offset);
+			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(space->cpu), 0x30c000+offset, i8751_return);
 			return i8751_return;
 	}
 
@@ -291,74 +292,77 @@ static WRITE16_HANDLER( hippodrm_68000_share_w )
 
 /******************************************************************************/
 
-static void hbarrel_i8751_write(int data)
+/*
+	Heavy Barrel I8751 connections
+	
+	P0.0 - P0.7 <-> 4 * LS374 latches 8B,8C,7B,7C
+
+	P1.0	-> MIXFLG1
+	P1.1	-> MIXFLG2
+	P1.2	-> B0FLG
+	P1.3	-> B1FLG1
+	P1.4	-> B1FLG2
+	P1.5	-> SOUNDFLG1
+	P1.6	-> SOUNDFLG2
+
+	P2.0	-> B2FLG 0
+	P2.1	-> B2FLG 1
+	P2.2	<- SEL2
+	P2.3	-> acknowledge INT1
+	P2.4 	-> Enable latch 7B
+	P2.5	-> Enable latch 8B
+	P2.6	-> Enable latch 8C
+	P2.7	-> Enable latch 7C
+	
+	P3.0	-> CRBACK0
+	P3.1	-> CRBACK1
+	P3.2	-> CRBACK2
+	P3.3	<- /INT1
+	P3.5	<- SEL3
+	P3.6 	<- SEL4
+	P3.7	<- SEL5
+	
+	The outputs to the graphics & audio hardware are not directly emulated, but the 
+	values are not known to change after bootup.
+*/
+
+static UINT8 i8751_ports[4];
+
+READ8_HANDLER(dec0_mcu_port_r )
 {
-	static int level,state;
-
-	static const int title[]={  1, 2, 5, 6, 9,10,13,14,17,18,21,22,25,26,29,30,33,34,37,38,41,42,0,
-                 3, 4, 7, 8,11,12,15,16,19,20,23,24,27,28,31,32,35,36,39,40,43,44,0,
-                45,46,49,50,53,54,57,58,61,62,65,66,69,70,73,74,77,78,81,82,0,
-                47,48,51,52,55,56,59,60,63,64,67,68,71,72,75,76,79,80,83,84,0,
-                85,86,89,90,93,94,97,98,101,102,105,106,109,110,113,114,117,118,121,122,125,126,0,
-                87,88,91,92,95,96,99,100,103,104,107,108,111,112,115,116,119,120,123,124,127,128,0,
-                129,130,133,134,137,138,141,142,145,146,149,150,153,154,157,158,161,162,165,166,169,170,173,174,0,
-                131,132,135,136,139,140,143,144,147,148,151,152,155,156,159,160,163,164,167,168,171,172,175,176,0,
-                0x10b1,0x10b2,0,0x10b3,0x10b4,-1
-	};
-
-	/* This table is from the USA version - others could be different.. */
-	static const int weapons_table[][0x20]={
-		{ 0x558,0x520,0x5c0,0x600,0x520,0x540,0x560,0x5c0,0x688,0x688,0x7a8,0x850,0x880,0x880,0x990,0x9b0,0x9b0,0x9e0,0xffff }, /* Level 1 */
-		{ 0x330,0x370,0x3d8,0x580,0x5b0,0x640,0x6a0,0x8e0,0x8e0,0x940,0x9f0,0xa20,0xa50,0xa80,0xffff }, /* Level 2 */
-		{ 0xb20,0xbd0,0xb20,0xb20,0xbd8,0xb50,0xbd8,0xb20,0xbe0,0xb40,0xb80,0xa18,0xa08,0xa08,0x980,0x8e0,0x780,0x790,0x650,0x600,0x5d0,0x5a0,0x570,0x590,0x5e0,0xffff }, /* Level 3 */
-		{ 0x530,0x5d0,0x5e0,0x5c8,0x528,0x520,0x5d8,0x5e0,0x5d8,0x540,0x570,0x5a0,0x658,0x698,0x710,0x7b8,0x8e0,0x8e0,0x8d8,0x818,0x8e8,0x820,0x8e0,0x848,0x848,0xffff }, /* Level 4 */
-		{ 0x230,0x280,0x700,0x790,0x790,0x7e8,0x7e8,0x8d0,0x920,0x950,0xad0,0xb90,0xb50,0xb10,0xbe0,0xbe0,0xffff }, /* Level 5 */
-		{ 0xd20,0xde0,0xd20,0xde0,0xd80,0xd80,0xd90,0xdd0,0xdb0,0xb20,0xa40,0x9e0,0x960,0x8a0,0x870,0x840,0x7e0,0x7b0,0x780,0xffff }, /* Level 6 */
-		{ 0x730,0x7e0,0x720,0x7e0,0x740,0x7c0,0x730,0x7d0,0x740,0x7c0,0x730,0x7d0,0x720,0x7e0,0x720,0x7e0,0x720,0x7e0,0x720,0x7e0,0x730,0x7d0,0xffff } /* Level 7 */
-	};
-
-	switch (data>>8) {
-		case 0x2:	/* Selects level */
-			i8751_return=level;
-			break;
-		case 0x3:	/* Increment level counter */
-			level++;
-			i8751_return=0x301;
-			break;
-		case 0x5:	/* Set level 0 */
-			i8751_return=0xb3b;
-			level=0;
-			break;
-		case 0x06:	/* Controls appearance & placement of special weapons */
-			i8751_return=weapons_table[level][data&0x1f];
-			//logerror("%s: warning - write %02x to i8751, returning %04x\n",cpuexec_describe_context(machine),data,i8751_return);
-			break;
-		case 0xb:	/* Initialise the variables? */
-			i8751_return=0;
-			break;
-		default:
-			i8751_return=0;
+	int latchEnable=i8751_ports[2]>>4;
+	
+	// P0 connected to 4 latches
+	if (offset==0)
+	{
+		if ((latchEnable&1)==0)
+			return i8751_command>>8;
+		else if ((latchEnable&2)==0)
+			return i8751_command&0xff;
+		else if ((latchEnable&4)==0)
+			return i8751_return>>8;
+		else if ((latchEnable&8)==0)
+			return i8751_return&0xff;
 	}
+	
+	return 0xff;
+}
 
-	/* Protection */
-	if (data==7) i8751_return=0xc000; /* Stack pointer */
-	if (data==0x175) i8751_return=0x68b; /* ID check - USA version */
-	if (data==0x174) i8751_return=0x68c; /* ID check - World version */
+WRITE8_HANDLER(dec0_mcu_port_w )
+{
+	i8751_ports[offset]=data;
 
-	/* All commands in range 4xx are related to title screen.. */
-	if (data==0x4ff) state=0;
-	if (data>0x3ff && data<0x4ff) {
-		state++;
-
-		if (title[state-1]==0) i8751_return=0xfffe;
-		else if (title[state-1]==-1) i8751_return=0xffff;
-		else if (title[state-1]>0x1000) i8751_return=(title[state-1]&0xfff)+128+15;
-		else i8751_return=title[state-1]+128+15+0x2000;
-
-		/* We have to use a state as the microcontroller remembers previous commands */
+	if (offset==2)
+	{
+		if ((data&0x4)==0)
+			cputag_set_input_line(space->machine, "maincpu", 5, HOLD_LINE);
+		if ((data&0x8)==0)
+			cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);	
+		if ((data&0x40)==0)
+			i8751_return=(i8751_return&0xff00)|(i8751_ports[0]);
+		if ((data&0x80)==0)
+			i8751_return=(i8751_return&0xff)|(i8751_ports[0]<<8);
 	}
-
-//logerror("%s: warning - write %02x to i8751\n",cpuexec_describe_context(machine),data);
 }
 
 static void baddudes_i8751_write(running_machine *machine, int data)
@@ -385,6 +389,7 @@ static void baddudes_i8751_write(running_machine *machine, int data)
 	}
 
 	if (!i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",cpuexec_describe_context(machine),data);
+	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 }
 
 static void birdtry_i8751_write(running_machine *machine, int data)
@@ -455,52 +460,24 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 		case 0x7ff: i8751_return = 0x200;     break;
 		default: logerror("%s: warning - write unknown command %02x to 8571\n",cpuexec_describe_context(machine),data);
 	}
-}
-
-#if 0
-static emu_timer *i8751_timer;
-
-static TIMER_CALLBACK( i8751_callback )
-{
-	/* Signal main cpu microcontroller task is complete */
 	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
-	i8751_timer = NULL;
-
-	logerror("i8751:  Timer called!!!\n");
 }
-#endif
 
 void dec0_i8751_write(running_machine *machine, int data)
 {
+	i8751_command=data;
+
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
-	if (GAME == 1) hbarrel_i8751_write(data);
+	if (GAME == 1) cputag_set_input_line(machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
 	if (GAME == 2) baddudes_i8751_write(machine, data);
 	if (GAME == 3) birdtry_i8751_write(machine, data);
 
-	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
-
-	/* Simulate the processing time of the i8751, time value is guessed
-    if (i8751_timer)
-        logerror("i8751:  Missed a timer!!!\n");
-    else
-        i8751_timer = timer_call_after_resynch(machine, NULL, 0, i8751_callback);*/
-
-/* There is a timing problem in Heavy Barrel if the processing time is not
-simulated - if the interrupt is triggered straight away then HB will reset
-at the end of level one, the processing time needs to be at least the cycles
-of a TST.W + BMI.S (ie, not very much at all).
-
-See the code about 0xb60 (USA version)
-
-*/
-
-logerror("%s: warning - write %02x to i8751\n",cpuexec_describe_context(machine),data);
-
+	//logerror("%s: warning - write %02x to i8751\n",cpuexec_describe_context(machine),data);
 }
 
 void dec0_i8751_reset(void)
 {
-	i8751_return=0;
+	i8751_return=i8751_command=0;
 }
 
 /******************************************************************************/
@@ -581,19 +558,6 @@ DRIVER_INIT( baddudes )
 DRIVER_INIT( hbarrel )
 {
 	GAME = 1;
-{ /* Remove this patch once processing time of i8751 is simulated */
-UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-rom[0xb68/2] = 0x8008;
-}
-}
-
-DRIVER_INIT( hbarrelw )
-{
-	GAME = 1;
-{ /* Remove this patch once processing time of i8751 is simulated */
-UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-rom[0xb3e/2] = 0x8008;
-}
 }
 
 DRIVER_INIT( birdtry )

@@ -60,12 +60,13 @@ DRIVER_INIT( hippodrm );
 DRIVER_INIT( robocop );
 DRIVER_INIT( baddudes );
 DRIVER_INIT( hbarrel );
-DRIVER_INIT( hbarrelw );
 DRIVER_INIT( birdtry );
 
 extern void dec0_i8751_write(running_machine *machine, int data);
 extern void dec0_i8751_reset(void);
 READ8_HANDLER( hippodrm_prot_r );
+WRITE8_HANDLER( dec0_mcu_port_w );
+READ8_HANDLER( dec0_mcu_port_r );
 WRITE8_HANDLER( hippodrm_prot_w );
 READ8_HANDLER( hippodrm_shared_r );
 WRITE8_HANDLER( hippodrm_shared_w );
