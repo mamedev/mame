@@ -1048,6 +1048,18 @@ static INPUT_PORTS_START( ghostb3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( meikyuh )
+	PORT_INCLUDE(ghostb)
+
+	PORT_MODIFY("I8751")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	
+INPUT_PORTS_END
+
+	
 static INPUT_PORTS_START( srdarwin )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -3540,8 +3552,8 @@ GAME( 1988, cobracom, 0,        cobracom, cobracom, cobracom,    ROT0,   "Data E
 GAME( 1988, cobracomj,cobracom, cobracom, cobracom, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ghostb,   0,        ghostb,   ghostb,   ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3,  ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1987, meikyuh,  ghostb,   ghostb,   ghostb,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, meikyuha, ghostb,   ghostb,   ghostb,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, meikyuh,  ghostb,   ghostb,   meikyuh,  meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, meikyuha, ghostb,   ghostb,   meikyuh,  meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (World)", GAME_SUPPORTS_SAVE )
 GAME( 1987, srdarwinj,srdarwin, srdarwin, srdarwin, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, gondo,    0,        gondo,    gondo,    gondo,       ROT270, "Data East USA", "Gondomania (US)", GAME_SUPPORTS_SAVE )
