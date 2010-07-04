@@ -131,7 +131,7 @@ static WRITE8_HANDLER( dec8_i8751_w )
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
 		cpu_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
-		timer_set(space->machine, cpu_clocks_to_attotime(state->mcu, 64), NULL, 0, dec8_i8751_timer_callback); // 64 clocks not confirmed
+		timer_set(space->machine, state->mcu->clocks_to_attotime(64), NULL, 0, dec8_i8751_timer_callback); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
