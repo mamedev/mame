@@ -745,6 +745,7 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 
 					if (!size16k)
 					{
+						bank = ((mmc1_shiftreg >> 1) & mmc1_rom_mask) * 0x4000;
 						/* switch 32k */
 						memcpy(&prg[0x08000], multigam_mmc1_prg_base + bank, 0x8000);
 					}
