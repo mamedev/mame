@@ -110,6 +110,13 @@ static READ8_HANDLER( jumpcoas_custom_io_r )
 	return 0x00;
 }
 
+static READ8_HANDLER( boggy83_custom_io_r )
+{
+	if (offset == 0x100)  return 0x6a;
+
+	return 0x00;
+}
+
 /*
     Imago sprites DMA
 */
@@ -826,6 +833,24 @@ ROM_END
 
 ROM_START( boggy84 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p1.d1", 0x0000, 0x2000, CRC(722cc0ec) SHA1(7daacffd9dfcbc8a441485943e45cc8958d19167) )
+	ROM_LOAD( "p2.d2", 0x2000, 0x2000, CRC(6c096798) SHA1(74ea860ef10cb566bcb07d67e6c79f542a66de91) )
+	ROM_LOAD( "p3.d3", 0x4000, 0x2000, CRC(9da59104) SHA1(167af18d50d99e66111e4ebd52d0dd86d5d6d391) )
+	ROM_LOAD( "p4.d4", 0x6000, 0x2000, CRC(73ef6807) SHA1(3144285019ab5cc7f2e1ba0a31956964ea1c706c) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "g1.h10", 0x0000, 0x1000, CRC(f4238c68) SHA1(a14cedb126e49e40bab6f46870af64c04ccb01f4) )
+	ROM_LOAD( "g2.h11", 0x1000, 0x1000, CRC(ce285bd2) SHA1(61e58920553f56448e76d859c1b0f316f299363f) )
+	ROM_LOAD( "g3.h12", 0x2000, 0x1000, CRC(02f5f4fa) SHA1(d28dc23cd3a39bb483d05b59869ed2300e5e77a7) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "r.e10", 0x0000, 0x0100, CRC(f3862912) SHA1(128ba48202299ef5852f08fd0f910d8e9f68f22c) )
+	ROM_LOAD( "g.e11", 0x0100, 0x0100, CRC(80b87220) SHA1(7bd81060b986d5cd4a27dc8a9394423959deaa05) )
+	ROM_LOAD( "b.e12", 0x0200, 0x0100, CRC(52b7f445) SHA1(6395ac705a35e602a355cbf700025ff917e89b37) )
+ROM_END
+
+ROM_START( boggy84bl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpurom1.bin", 0x0000, 0x2000, CRC(665266c0) SHA1(7785a7d710948718236f9be4b3e2a3fdc00662a5) )
 	ROM_LOAD( "cpurom2.bin", 0x2000, 0x2000, CRC(6c096798) SHA1(74ea860ef10cb566bcb07d67e6c79f542a66de91) )
 	ROM_LOAD( "cpurom3.bin", 0x4000, 0x2000, CRC(9da59104) SHA1(167af18d50d99e66111e4ebd52d0dd86d5d6d391) )
@@ -984,6 +1009,14 @@ static DRIVER_INIT( boggy84 )
 	fastfred_hardware_type = 2;
 }
 
+static DRIVER_INIT( boggy83 )
+{
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, boggy83_custom_io_r);
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	fastfred_hardware_type = 2;
+}
+
+
 static DRIVER_INIT( imago )
 {
 	fastfred_hardware_type = 3;
@@ -994,7 +1027,8 @@ GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   flyboyb,  ROT90, "bootleg", 
 GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", 0 )
 GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko", "Jump Coaster", 0 )
 GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", 0 )
-GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  boggy84,  ROT90, "bootleg", "Boggy '84", 0 ) // bootleg of Kaneko/Taito Boggy '83
+GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  boggy83,  ROT90, "Kaneko", "Boggy '84 (Kaneko)", 0 )
+GAME( 1983, boggy84bl,boggy84,  jumpcoas, boggy84,  boggy84,  ROT90, "bootleg", "Boggy '84 (bootleg)", 0 ) // bootleg of Kaneko/Taito Boggy '83
 GAME( 1986, redrobin, 0,        fastfred, redrobin, flyboyb,  ROT90, "Elettronolo", "Red Robin", 0 )
 GAME( 1984, imago,    0,		imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
 GAME( 1983, imagoa,   imago,	imago,    imagoa,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

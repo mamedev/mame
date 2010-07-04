@@ -244,7 +244,7 @@ static MACHINE_DRIVER_START( flower )
 	MDRV_CPU_ADD("maincpu", Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_cpu1_2)
 //  MDRV_CPU_VBLANK_INT_HACK(flower_cpu0_interrupt,10)
-  MDRV_CPU_VBLANK_INT("screen", flower_cpu0_interrupt) //nmis stuff up the writes to shared ram
+	MDRV_CPU_VBLANK_INT("screen", flower_cpu0_interrupt) //nmis stuff up the writes to shared ram
 
 	MDRV_CPU_ADD("sub", Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_cpu1_2)

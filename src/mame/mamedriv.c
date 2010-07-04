@@ -340,7 +340,8 @@ const game_driver * const drivers[] =
 	DRIVER( fastfred )	/* 136009   (c) 1982 Atari */
 	DRIVER( jumpcoas )	/* (c) 1983 Kaneko */
 	DRIVER( jumpcoast )	/* (c) 1983 Taito */
-	DRIVER( boggy84 )	/* bootleg, original is (c)1983 Taito/Kaneko */
+	DRIVER( boggy84 )	/* (c) 1984 Kaneko */
+	DRIVER( boggy84bl )	/* bootleg */
 	DRIVER( redrobin )	/* (c) 1986 Elettronolo */
 	DRIVER( imago )		/* (c) 1984 Acom */
 	DRIVER( imagoa )	/* (c) 1983 Acom */
