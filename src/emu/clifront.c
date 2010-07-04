@@ -890,7 +890,7 @@ static int info_listsoftware(core_options *options, const char *gamename)
 
 									fprintf(out, "\t<softwarelist name=\"%s\">\n", swlist->list_name[i] );
 
-									for ( software_info *swinfo = software_list_first( list ); swinfo != NULL; swinfo = software_list_next( list ) )
+									for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
 									{
 										fprintf( out, "\t\t<software name=\"%s\"", swinfo->shortname );
 										if ( swinfo->parentname != NULL )
@@ -1007,7 +1007,7 @@ static void softlist_match_roms(core_options *options, const char *hash, int len
 					{
 						software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
 
-						for ( software_info *swinfo = software_list_first( list ); swinfo != NULL; swinfo = software_list_next( list ) )
+						for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
 						{
 							for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
 							{

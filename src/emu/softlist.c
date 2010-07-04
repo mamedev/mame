@@ -38,21 +38,14 @@ typedef struct _parse_state
 } parse_state;
 
 
-struct software_info_list
-{
-	software_info				info;
-	struct software_info_list	*next;
-};
-
-
 struct _software_list
 {
 	mame_file	*file;
 	object_pool	*pool;
 	parse_state	state;
 	const char *description;
-	struct software_info_list	*software_info_list;
-	struct software_info_list	*current_software_info;
+	struct software_info	*software_info_list;
+	struct software_info	*current_software_info;
 	software_info	*softinfo;
 	const char *look_for;
 	int part_entries;
@@ -379,44 +372,44 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					}
 				}
 
-				if ( name && !mame_strwildcmp( swlist->look_for, name ) )
+				if ( name )
 				{
-					struct software_info_list *elem = (struct software_info_list *)pool_malloc_lib(swlist->pool,sizeof(struct software_info_list));
+					struct software_info *elem = (struct software_info *)pool_malloc_lib(swlist->pool,sizeof(struct software_info));
 
 					if ( !elem )
 						return;
 
 					/* Clear element and add element to list */
-					memset(elem,0,sizeof(struct software_info_list));
+					memset(elem,0,sizeof(struct software_info));
 
 					/* Allocate space to hold the shortname and copy the short name */
-					elem->info.shortname = (const char*)pool_malloc_lib(swlist->pool, ( strlen( name ) + 1 ) * sizeof(char) );
+					elem->shortname = (const char*)pool_malloc_lib(swlist->pool, ( strlen( name ) + 1 ) * sizeof(char) );
 
-					if ( ! elem->info.shortname )
+					if ( ! elem->shortname )
 						return;
 
-					strcpy( (char *)elem->info.shortname, name );
+					strcpy( (char *)elem->shortname, name );
 
 					/* Allocate space to hold the parentname and copy the parent name */
 					if (parent)
 					{
-						elem->info.parentname = (const char*)pool_malloc_lib(swlist->pool, ( strlen(parent) + 1 ) * sizeof(char) );
-						strcpy((char *)elem->info.parentname, parent);
+						elem->parentname = (const char*)pool_malloc_lib(swlist->pool, ( strlen(parent) + 1 ) * sizeof(char) );
+						strcpy((char *)elem->parentname, parent);
 					}
 
 					/* Allocate initial space to hold part information */
 					swlist->part_entries = 2;
 					swlist->current_part_entry = 0;
-					elem->info.partdata = (software_part *)pool_malloc_lib(swlist->pool, swlist->part_entries * sizeof(software_part) );
-					if ( !elem->info.partdata )
+					elem->partdata = (software_part *)pool_malloc_lib(swlist->pool, swlist->part_entries * sizeof(software_part) );
+					if ( !elem->partdata )
 						return;
 
 					/* Handle the supported flag */
-					elem->info.supported = SOFTWARE_SUPPORTED_YES;
+					elem->supported = SOFTWARE_SUPPORTED_YES;
 					if ( supported && ! strcmp( supported, "partial" ) )
-						elem->info.supported = SOFTWARE_SUPPORTED_PARTIAL;
+						elem->supported = SOFTWARE_SUPPORTED_PARTIAL;
 					if ( supported && ! strcmp( supported, "no" ) )
-						elem->info.supported = SOFTWARE_SUPPORTED_NO;
+						elem->supported = SOFTWARE_SUPPORTED_NO;
 
 					/* Add the entry to the end of the list */
 					if ( swlist->software_info_list == NULL )
@@ -431,7 +424,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					}
 
 					/* Quick lookup for setting software information */
-					swlist->softinfo = &swlist->current_software_info->info;
+					swlist->softinfo = swlist->current_software_info;
 				}
 				else
 				{
@@ -828,8 +821,11 @@ software_list *software_list_open(core_options *options, const char *listname, i
 	if (filerr != FILERR_NONE)
 		goto error;
 
-//  if (is_preload)
-//      software_list_parse(swlist, swlist->error_proc, NULL);
+	if (is_preload)
+	{
+		software_list_parse(swlist, swlist->error_proc, NULL);
+		swlist->current_software_info = NULL;
+	}
 
 	return swlist;
 
@@ -859,39 +855,22 @@ void software_list_close(software_list *swlist)
     software_list_find
 -------------------------------------------------*/
 
-software_info *software_list_find(software_list *swlist, const char *software)
+software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev)
 {
 	if (swlist == NULL)
 		return NULL;
 
-	swlist->look_for = software;
-	software_list_parse( swlist, swlist->error_proc, NULL );
+	/* If we haven't read in the xml file yet, then do it now */
+	if ( ! swlist->software_info_list )
+		software_list_parse( swlist, swlist->error_proc, NULL );
 
-	return swlist->current_software_info ? &swlist->current_software_info->info : NULL;
-}
-
-
-/*-------------------------------------------------
-    software_list_first
--------------------------------------------------*/
-
-software_info *software_list_first(software_list *swlist)
-{
-	return software_list_find(swlist, "*");
-}
-
-
-/*-------------------------------------------------
-    software_list_next
--------------------------------------------------*/
-
-software_info *software_list_next(software_list *swlist)
-{
-	if ( swlist->current_software_info )
+	for ( prev = prev ? prev->next : swlist->software_info_list; prev; prev = prev->next )
 	{
-		swlist->current_software_info = swlist->current_software_info->next;
+		if ( !mame_strwildcmp( look_for, prev->shortname ) )
+			break;
 	}
-	return swlist->current_software_info ? &swlist->current_software_info->info : NULL;
+
+	return prev;
 }
 
 
@@ -1001,7 +980,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 		if ( software_list_ptr )
 		{
-			software_info_ptr = software_list_find( software_list_ptr, swname );
+			software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
 
 			if ( software_info_ptr )
 			{
@@ -1035,7 +1014,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 					if ( software_list_ptr )
 					{
-						software_info_ptr = software_list_find( software_list_ptr, swname );
+						software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
 
 						if ( software_info_ptr )
 						{
@@ -1061,7 +1040,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 			if ( software_list_ptr )
 			{
-				software_info_ptr = software_list_find( software_list_ptr, swname );
+				software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
 
 				if ( software_info_ptr )
 				{
@@ -1087,7 +1066,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 			if ( software_list_ptr )
 			{
-				software_info_ptr = software_list_find( software_list_ptr, swname );
+				software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
 
 				if ( software_info_ptr )
 				{
@@ -1207,7 +1186,7 @@ static DEVICE_VALIDITY_CHECK( software_list )
 			if (list == NULL)
 				return FALSE;
 
-			for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
+			for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 			{
 				const char *s;
 				int is_clone = 0;
@@ -1254,7 +1233,18 @@ static DEVICE_VALIDITY_CHECK( software_list )
 				}
 
 				if (swinfo->parentname != NULL)
+				{
 					is_clone = 1;
+
+					/* make sure the parent exists */
+					software_info *swinfo2 = software_list_find(list, swinfo->parentname, NULL );
+
+					if ( !swinfo2 )
+					{
+						mame_printf_error("%s: parent '%s' software for '%s' not found\n", swlist->list_name[i], swinfo->parentname, swinfo->shortname );
+						error = TRUE;
+					}
+				}
 
 				/* make sure the driver name is 8 chars or less */
 				if ((is_clone && strlen(swinfo->shortname) > NAME_LEN_CLONE) || ((!is_clone) && strlen(swinfo->shortname) > NAME_LEN_PARENT))
@@ -1340,7 +1330,7 @@ static void ui_mess_menu_populate_software_entries(running_machine *machine, ui_
 
 	if (list)
 	{
-		for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
+		for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 		{
 			software_entry_state *entry = (software_entry_state *) ui_menu_pool_alloc(menu, sizeof(*entry));
 			entry->short_name = ui_menu_pool_strdup(menu, swinfo->shortname);
@@ -1412,7 +1402,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 					if (list)
 					{
 						/* todo: fix this */
-						for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
+						for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 						{
 						}
 
