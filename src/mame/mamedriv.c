@@ -7414,7 +7414,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ginganin )	/* (c) 1987 Jaleco */
 	DRIVER( ginganina )	/* (c) 1987 Jaleco */
 	DRIVER( skyfox )	/* (c) 1987 Jaleco + Nichibutsu USA license */
-	DRIVER( exerizrb )	/* bootleg */
+	DRIVER( exerizer )	/* (c) 1987? Jaleco */
+	DRIVER( exerizerb )	/* bootleg */
 	DRIVER( homerun )	/* (c) 1988 Jaleco */
 	DRIVER( dynashot )	/* (c) 1988 Jaleco */
 	DRIVER( bigrun )	/* (c) 1989 Jaleco */
