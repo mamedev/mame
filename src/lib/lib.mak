@@ -37,6 +37,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/coreutil.o \
 	$(LIBOBJ)/util/harddisk.o \
 	$(LIBOBJ)/util/huffman.o \
+	$(LIBOBJ)/util/imageutl.o \
 	$(LIBOBJ)/util/jedparse.o \
 	$(LIBOBJ)/util/md5.o \
 	$(LIBOBJ)/util/opresolv.o \

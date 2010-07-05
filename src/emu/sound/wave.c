@@ -17,7 +17,6 @@
 #include "streams.h"
 #ifdef MESS
 #include "messdrv.h"
-#include "utils.h"
 #include "devices/cassette.h"
 #endif
 #include "wave.h"
