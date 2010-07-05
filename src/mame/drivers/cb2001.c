@@ -330,6 +330,7 @@ e328e 18 c0 xor al,al
 */
 
 static UINT16 *cb2001_vram;
+static int cb2001_videobank;
 
 static VIDEO_START(cb2001)
 {
@@ -347,13 +348,42 @@ static VIDEO_UPDATE(cb2001)
 		for (x=0;x<64;x++)
 		{
 			int tile;
+			int colour;
 
-			tile = (cb2001_vram[count] & 0x3fff);
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x*8,y*8);
+			tile = (cb2001_vram[count] & 0x0fff);
+			colour = (cb2001_vram[count] & 0xf000)>>12;
+			tile += cb2001_videobank*0x2000;
+
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
 			count++;
 		}
 	}
 	return 0;
+}
+
+
+/* these ports sometimes get written with similar values
+ - they could be hooked up wrong, or subject to change it the code
+   is being executed incorrectly */
+WRITE16_HANDLER( cb2001_vidctrl_w )
+{
+	if (mem_mask&0xff00) // video control?
+	{
+		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
+		cb2001_videobank = (data & 0x0800)>>11;
+	}
+	else // something else
+		logerror("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
+}
+
+WRITE16_HANDLER( cb2001_vidctrl2_w )
+{
+	if (mem_mask&0xff00) // video control?
+	{
+		logerror("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask);
+	}
+	else // something else
+		logerror("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
 }
 
 static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -368,6 +398,9 @@ static ADDRESS_MAP_START( cb2001_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", ppi8255_r, ppi8255_w, 0xffff)	/* DIP switches */
 	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_data_address_w, 0xffff)
+
+	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
+	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cb2001 )
@@ -573,6 +606,7 @@ static PALETTE_INIT(cb2001)
 		int r,g,b;
 
 		UINT8*proms = memory_region(machine, "proms");
+		int length = memory_region_length(machine, "proms");
 		UINT16 dat;
 
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];
@@ -582,7 +616,14 @@ static PALETTE_INIT(cb2001)
 		r = ((dat >> 6 )& 0x1f)<<3;
 		g = ((dat >> 11 ) & 0x1f)<<3;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		if (length==0x400) // are the cb2001 proms dumped incorrectly?
+		{
+			if (!(i&0x20)) palette_set_color(machine, (i&0x1f) | ((i&~0x3f)>>1), MAKE_RGB(r, g, b));
+		}
+		else
+		{
+			palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		}
 	}
 }
 
@@ -638,7 +679,7 @@ static MACHINE_DRIVER_START( cb2001 )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(cb2001)
 	MDRV_VIDEO_UPDATE(cb2001)
@@ -667,8 +708,8 @@ ROM_START( scherrym )
 	ROM_REGION( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
 
-	ROM_REGION( 0x080000, "gfx", 0 )
-	ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB
+	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
+//	ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB - 2 PCBs have been found this way, it probably uploads the GFX.
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )
