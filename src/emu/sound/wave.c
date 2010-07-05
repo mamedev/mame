@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "streams.h"
 #ifdef MESS
-#include "messdrv.h"
 #include "devices/cassette.h"
 #endif
 #include "wave.h"

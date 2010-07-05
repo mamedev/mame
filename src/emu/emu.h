@@ -105,7 +105,6 @@
 // the running machine
 #ifdef MESS
 #include "mess.h"
-#include "messdrv.h"
 #endif /* MESS */
 #include "machine.h"
 #include "mame.h"

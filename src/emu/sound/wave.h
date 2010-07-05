@@ -9,10 +9,6 @@
  *  CassetteWave interface
  *****************************************************************************/
 
-#ifdef MESS
-#include "messdrv.h"
-#endif
-
 DECLARE_LEGACY_SOUND_DEVICE(WAVE, wave);
 
 
