@@ -110,7 +110,7 @@ static READ8_HANDLER( jumpcoas_custom_io_r )
 	return 0x00;
 }
 
-static READ8_HANDLER( boggy83_custom_io_r )
+static READ8_HANDLER( boggy84_custom_io_r )
 {
 	if (offset == 0x100)  return 0x6a;
 
@@ -849,7 +849,7 @@ ROM_START( boggy84 )
 	ROM_LOAD( "b.e12", 0x0200, 0x0100, CRC(52b7f445) SHA1(6395ac705a35e602a355cbf700025ff917e89b37) )
 ROM_END
 
-ROM_START( boggy84bl )
+ROM_START( boggy84b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpurom1.bin", 0x0000, 0x2000, CRC(665266c0) SHA1(7785a7d710948718236f9be4b3e2a3fdc00662a5) )
 	ROM_LOAD( "cpurom2.bin", 0x2000, 0x2000, CRC(6c096798) SHA1(74ea860ef10cb566bcb07d67e6c79f542a66de91) )
@@ -1002,16 +1002,16 @@ static DRIVER_INIT( jumpcoas )
 	fastfred_hardware_type = 0;
 }
 
-static DRIVER_INIT( boggy84 )
+static DRIVER_INIT( boggy84b )
 {
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
 	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	fastfred_hardware_type = 2;
 }
 
-static DRIVER_INIT( boggy83 )
+static DRIVER_INIT( boggy84 )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, boggy83_custom_io_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, boggy84_custom_io_r);
 	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	fastfred_hardware_type = 2;
 }
@@ -1027,8 +1027,8 @@ GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   flyboyb,  ROT90, "bootleg", 
 GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", 0 )
 GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko", "Jump Coaster", 0 )
 GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", 0 )
-GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  boggy83,  ROT90, "Kaneko", "Boggy '84 (Kaneko)", 0 )
-GAME( 1983, boggy84bl,boggy84,  jumpcoas, boggy84,  boggy84,  ROT90, "bootleg", "Boggy '84 (bootleg)", 0 ) // bootleg of Kaneko/Taito Boggy '83
+GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  boggy84,  ROT90, "Kaneko", "Boggy '84", 0 )
+GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84,  boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", 0 )
 GAME( 1986, redrobin, 0,        fastfred, redrobin, flyboyb,  ROT90, "Elettronolo", "Red Robin", 0 )
-GAME( 1984, imago,    0,		imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
-GAME( 1983, imagoa,   imago,	imago,    imagoa,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
+GAME( 1984, imago,    0,        imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,   imago,    imago,    imagoa,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
