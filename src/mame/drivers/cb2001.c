@@ -329,7 +329,8 @@ e328e 18 c0 xor al,al
       70    ret
 */
 
-static UINT16 *cb2001_vram;
+static UINT16 *cb2001_vram_fg;
+static UINT16* cb2001_vram_bg;
 static int cb2001_videobank;
 
 static VIDEO_START(cb2001)
@@ -350,11 +351,31 @@ static VIDEO_UPDATE(cb2001)
 			int tile;
 			int colour;
 
-			tile = (cb2001_vram[count] & 0x0fff);
-			colour = (cb2001_vram[count] & 0xf000)>>12;
+			tile = (cb2001_vram_bg[count] & 0x0fff);
+			colour = (cb2001_vram_bg[count] & 0xf000)>>12;
 			tile += cb2001_videobank*0x2000;
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
+
+			count++;
+		}
+	}
+	
+
+	count = 0x0000;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<64;x++)
+		{
+			int tile;
+			int colour;
+
+			tile = (cb2001_vram_fg[count] & 0x0fff);
+			colour = (cb2001_vram_fg[count] & 0xf000)>>12;
+			tile += cb2001_videobank*0x2000;
+
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8, 0);
 			count++;
 		}
 	}
@@ -388,7 +409,8 @@ WRITE16_HANDLER( cb2001_vidctrl2_w )
 
 static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0x21fff) AM_RAM AM_BASE(&cb2001_vram)
+	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_BASE(&cb2001_vram_fg)
+	AM_RANGE(0x21000, 0x21fff) AM_RAM AM_BASE(&cb2001_vram_bg)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
