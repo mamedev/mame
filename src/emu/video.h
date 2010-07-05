@@ -318,10 +318,10 @@ extern const device_type SCREEN;
 	MDRV_DEVICE_INLINE_DATA16(screen_device_config::INLINE_VIS_MAXY, _maxy)
 
 #define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
-	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_XOFFSET, (_xoffs) * (double)(1 << 24)) \
-	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_XSCALE, (_xscale) * (double)(1 << 24)) \
-	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_YOFFSET, (_yoffs) * (double)(1 << 24)) \
-	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_YSCALE, (_yscale) * (double)(1 << 24))
+	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_XOFFSET, (INT32)((_xoffs) * (double)(1 << 24))) \
+	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_XSCALE, (INT32)((_xscale) * (double)(1 << 24))) \
+	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_YOFFSET, (INT32)((_yoffs) * (double)(1 << 24))) \
+	MDRV_DEVICE_INLINE_DATA32(screen_device_config::INLINE_YSCALE, (INT32)((_yscale) * (double)(1 << 24)))
 
 
 

@@ -133,9 +133,9 @@ extern const device_type SPEAKER;
 /* add/remove speakers */
 #define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
 	MDRV_DEVICE_ADD(_tag, SPEAKER, 0) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_X, (_x) * (double)(1 << 24)) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Y, (_y) * (double)(1 << 24)) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Z, (_z) * (double)(1 << 24))
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_X, (INT32)((_x) * (double)(1 << 24))) \
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Y, (INT32)((_y) * (double)(1 << 24))) \
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Z, (INT32)((_z) * (double)(1 << 24)))
 
 #define MDRV_SPEAKER_STANDARD_MONO(_tag) \
 	MDRV_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
