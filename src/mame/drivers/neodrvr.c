@@ -7990,13 +7990,13 @@ GAME( 2003, mslug5,    neogeo,   neogeo,   neogeo,   mslug5,   ROT0, "SNK Playmo
 GAME( 2003, mslug5h,   mslug5,   neogeo,   neogeo,   mslug5,   ROT0, "SNK Playmore", "Metal Slug 5 (AES Cart)", GAME_SUPPORTS_SAVE ) /* Also found in later MVS carts */
 GAME( 2003, ms5pcb,    0,        neogeo,   ms5pcb,   ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 2003, ms5plus,   mslug5,   neogeo,   neogeo,   ms5plus,  ROT0, "bootleg", "Metal Slug 5 Plus (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 2003, svcpcb,    0,        neogeo,   svcpcb,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. CAPCOM SVC CHAOS (JAMMA PCB, set 1)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
-GAME( 2003, svcpcba,   svcpcb,   neogeo,   svcpcb,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. CAPCOM SVC CHAOS (JAMMA PCB, set 2)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code */
-GAME( 2003, svc,       neogeo,   neogeo,   neogeo,   svc,      ROT0, "SNK Playmore", "SNK vs. CAPCOM SVC CHAOS", GAME_SUPPORTS_SAVE )
-GAME( 2003, svcboot,   svc,      neogeo,   neogeo,   svcboot,  ROT0, "bootleg", "SNK vs. CAPCOM SVC CHAOS (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 2003, svcplus,   svc,      neogeo,   neogeo,   svcplus,  ROT0, "bootleg", "SNK vs. CAPCOM SVC CHAOS Plus (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 2003, svcplusa,  svc,      neogeo,   neogeo,   svcplusa, ROT0, "bootleg", "SNK vs. CAPCOM SVC CHAOS Plus (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 2003, svcsplus,  svc,      neogeo,   neogeo,   svcsplus, ROT0, "bootleg", "SNK vs. CAPCOM SVC CHAOS Super Plus (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 2003, svcpcb,    0,        neogeo,   svcpcb,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
+GAME( 2003, svcpcba,   svcpcb,   neogeo,   svcpcb,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code */
+GAME( 2003, svc,       neogeo,   neogeo,   neogeo,   svc,      ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos", GAME_SUPPORTS_SAVE )
+GAME( 2003, svcboot,   svc,      neogeo,   neogeo,   svcboot,  ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 2003, svcplus,   svc,      neogeo,   neogeo,   svcplus,  ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos Plus (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 2003, svcplusa,  svc,      neogeo,   neogeo,   svcplusa, ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos Plus (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 2003, svcsplus,  svc,      neogeo,   neogeo,   svcsplus, ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos Super Plus (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 2003, samsho5,   neogeo,   neogeo,   neogeo,   samsho5,  ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V / Samurai Spirits Zero (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 2003, samsho5h,  samsho5,  neogeo,   neogeo,   samsho5,  ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V / Samurai Spirits Zero (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 2003, samsho5b,  samsho5,  neogeo,   neogeo,   samsho5b, ROT0, "bootleg", "Samurai Shodown V / Samurai Spirits Zero (bootleg)", GAME_SUPPORTS_SAVE ) // different program scrambling
