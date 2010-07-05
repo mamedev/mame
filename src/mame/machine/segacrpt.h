@@ -23,13 +23,3 @@ void teddybb_decode(running_machine *machine, const char *cputag);
 void myheroj_decode(running_machine *machine, const char *cputag);
 void hvymetal_decode(running_machine *machine, const char *cputag);
 void lvcards_decode(running_machine *machine, const char *cputag);
-
-void fdwarrio_decode(running_machine *machine, const char *cputag);
-void astrofl_decode(running_machine *machine, const char *cputag);
-void wboy2_decode(running_machine *machine, const char *cputag);
-void robowres_decode(running_machine *machine, const char *cputag);
-void calorie_decode(running_machine *machine, const char *cputag);
-void spcpostn_decode(running_machine *machine, const char *cputag);
-void gardia_decode(running_machine *machine, const char *cputag);
-void gardiab_decode(running_machine *machine, const char *cputag);
-

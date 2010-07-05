@@ -79,7 +79,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrp2.h"
 #include "sound/ay8910.h"
 
 
@@ -549,7 +549,7 @@ ROM_END
 
 static DRIVER_INIT( calorie )
 {
-	calorie_decode(machine, "maincpu");
+	sega_317_0004_decode(machine, "maincpu");
 }
 
 static DRIVER_INIT( calorieb )

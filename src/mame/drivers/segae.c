@@ -297,7 +297,7 @@ covert megatech / megaplay drivers to use new code etc. etc.
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "machine/mc8123.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrp2.h"
 #include "includes/segamsys.h"
 
 /****************************************************************************************
@@ -996,7 +996,7 @@ static DRIVER_INIT( astrofl )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	astrofl_decode(machine, "maincpu");
+	sega_315_5177_decode(machine, "maincpu");
 }
 
 GAME( 1985, hangonjr, 0,        systeme, hangonjr, hangonjr, ROT0,  "Sega", "Hang-On Jr.", 0 )

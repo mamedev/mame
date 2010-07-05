@@ -128,7 +128,7 @@ Dumped by Chackn
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrp2.h"
 #include "sound/2203intf.h"
 #include "includes/angelkds.h"
 
@@ -762,7 +762,7 @@ static DRIVER_INIT( spcpostn )
 {
 	UINT8 *RAM = memory_region(machine, "user1");
 
-	spcpostn_decode(machine, "maincpu");
+	sega_317_0005_decode(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 10, &RAM[0x0000], 0x4000);
 }
 

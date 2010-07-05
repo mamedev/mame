@@ -194,6 +194,7 @@ Notes:
 #include "machine/z80pio.h"
 #include "machine/8255ppi.h"
 #include "machine/segacrpt.h"
+#include "machine/segacrp2.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
 
@@ -4515,19 +4516,19 @@ static DRIVER_INIT( seganinj )	{ DRIVER_INIT_CALL(bank00); seganinj_decode(machi
 static DRIVER_INIT( imsorry )	{ DRIVER_INIT_CALL(bank00); imsorry_decode(machine, "maincpu"); }
 static DRIVER_INIT( teddybb )	{ DRIVER_INIT_CALL(bank00); teddybb_decode(machine, "maincpu"); }
 static DRIVER_INIT( myheroj )	{ DRIVER_INIT_CALL(bank00); myheroj_decode(machine, "maincpu"); }
-static DRIVER_INIT( 4dwarrio )	{ DRIVER_INIT_CALL(bank00); fdwarrio_decode(machine, "maincpu"); }
-static DRIVER_INIT( wboy )		{ DRIVER_INIT_CALL(bank00); astrofl_decode(machine, "maincpu"); }
-static DRIVER_INIT( wboy2 )		{ DRIVER_INIT_CALL(bank00); wboy2_decode(machine, "maincpu"); }
+static DRIVER_INIT( 4dwarrio )	{ DRIVER_INIT_CALL(bank00); sega_315_5162_decode(machine, "maincpu"); }
+static DRIVER_INIT( wboy )		{ DRIVER_INIT_CALL(bank00); sega_315_5177_decode(machine, "maincpu"); }
+static DRIVER_INIT( wboy2 )		{ DRIVER_INIT_CALL(bank00); sega_315_5178_decode(machine, "maincpu"); }
 static DRIVER_INIT( wboyo )		{ DRIVER_INIT_CALL(bank00); hvymetal_decode(machine, "maincpu"); }
 static DRIVER_INIT( blockgal )	{ DRIVER_INIT_CALL(bank00); mc8123_decrypt_rom(machine, "maincpu", "key", NULL, 0); }
 
 static DRIVER_INIT( hvymetal )	{ DRIVER_INIT_CALL(bank44); hvymetal_decode(machine, "maincpu"); }
-static DRIVER_INIT( gardia )	{ DRIVER_INIT_CALL(bank44); gardia_decode(machine, "maincpu"); }
-static DRIVER_INIT( gardiab )	{ DRIVER_INIT_CALL(bank44); gardiab_decode(machine, "maincpu"); }
+static DRIVER_INIT( gardia )	{ DRIVER_INIT_CALL(bank44); sega_317_0006_decode(machine, "maincpu"); }
+static DRIVER_INIT( gardiab )	{ DRIVER_INIT_CALL(bank44); sega_317_0007_decode(machine, "maincpu"); }
 
 static DRIVER_INIT( wbml )		{ DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4); }
 static DRIVER_INIT( ufosensi )  { DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4); }
-static DRIVER_INIT( wboysys2 )	{ DRIVER_INIT_CALL(bank0c); astrofl_decode(machine, "maincpu"); }
+static DRIVER_INIT( wboysys2 )	{ DRIVER_INIT_CALL(bank0c); sega_315_5177_decode(machine, "maincpu"); }
 
 
 static DRIVER_INIT( dakkochn )

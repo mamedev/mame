@@ -164,7 +164,7 @@ Language
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/appoooh.h"
-#include "machine/segacrpt.h"		// needed for robowres_decode
+#include "machine/segacrp2.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
 
@@ -600,7 +600,7 @@ ROM_END
 
 static DRIVER_INIT(robowres)
 {
-	robowres_decode(machine, "maincpu");
+	sega_315_5179_decode(machine, "maincpu");
 }
 
 static DRIVER_INIT(robowresb)
