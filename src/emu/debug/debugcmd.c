@@ -1280,7 +1280,7 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 			debug_console_printf(machine, "Device '%s' breakpoints:\n", device->tag());
 
 			/* loop over the breakpoints */
-			for (debug_cpu_breakpoint *bp = device->debug()->breakpoint_first(); bp != NULL; bp = bp->next())
+			for (device_debug::breakpoint *bp = device->debug()->breakpoint_first(); bp != NULL; bp = bp->next())
 			{
 				buffer.printf("%c%4X @ %s", bp->enabled() ? ' ' : 'D', bp->index(), core_i64_hex_format(bp->address(), device->debug()->logaddrchars()));
 				if (bp->condition() != NULL)
@@ -1441,7 +1441,7 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 				debug_console_printf(machine, "Device '%s' %s space watchpoints:\n", device->tag(), device->debug()->watchpoint_first(spacenum)->space().name);
 
 				/* loop over the watchpoints */
-				for (debug_cpu_watchpoint *wp = device->debug()->watchpoint_first(spacenum); wp != NULL; wp = wp->next())
+				for (device_debug::watchpoint *wp = device->debug()->watchpoint_first(spacenum); wp != NULL; wp = wp->next())
 				{
 					buffer.printf("%c%4X @ %s-%s %s", wp->enabled() ? ' ' : 'D', wp->index(),
 							core_i64_hex_format(memory_byte_to_address(&wp->space(), wp->address()), wp->space().addrchars),
@@ -2377,13 +2377,13 @@ static void execute_history(running_machine *machine, int ref, int params, const
 	if (!debug_command_parameter_cpu_space(machine, (params > 0) ? param[0] : NULL, ADDRESS_SPACE_PROGRAM, &space))
 		return;
 
-	UINT64 count = DEBUG_HISTORY_SIZE;
+	UINT64 count = device_debug::HISTORY_SIZE;
 	if (!debug_command_parameter_number(machine, param[1], &count))
 		return;
 
 	/* further validation */
-	if (count > DEBUG_HISTORY_SIZE)
-		count = DEBUG_HISTORY_SIZE;
+	if (count > device_debug::HISTORY_SIZE)
+		count = device_debug::HISTORY_SIZE;
 
 	device_debug *debug = space->cpu->debug();
 

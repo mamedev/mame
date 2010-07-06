@@ -2255,7 +2255,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 						INT32 bpindex = -1;
 
 						/* first find an existing breakpoint at this address */
-						for (debug_cpu_breakpoint *bp = debug->breakpoint_first(); bp != NULL; bp = bp->next())
+						for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != NULL; bp = bp->next())
 							if (address == bp->address())
 							{
 								bpindex = bp->index();

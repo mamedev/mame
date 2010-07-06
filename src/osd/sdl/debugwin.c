@@ -1011,7 +1011,7 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 		{
 			offs_t address = downcast<debug_view_disasm *>(disasm->view)->selected_address();
 			device_debug *cpuinfo = disasm->view->source()->device()->debug();
-			debug_cpu_breakpoint *bp;
+			device_debug::breakpoint *bp;
 			INT32 bpindex = -1;
 
 			/* first find an existing breakpoint at this address */

@@ -1005,24 +1005,20 @@ astring &game_info_astring(running_machine *machine, astring &string)
 
 	/* loop over all CPUs */
 	device_execute_interface *exec;
-	int count = 1;
 	for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
-		// skip over any we already claimed
-		if (--count != 0)
-			continue;
-	
 		/* get cpu specific clock that takes internal multiplier/dividers into account */
 		int clock = exec->device().clock();
 
 		/* count how many identical CPUs we have */
-		count = 1;
+		int count = 1;
 		device_execute_interface *scan;
 		for (bool gotone = exec->next(scan); gotone; gotone = scan->next(scan))
 		{
 			if (exec->device().type() != scan->device().type() || exec->device().clock() != scan->device().clock())
 				break;
 			count++;
+			exec = scan;
 		}
 
 		/* if more than one, prepend a #x in front of the CPU name */
@@ -1047,9 +1043,9 @@ astring &game_info_astring(running_machine *machine, astring &string)
 		found_sound = TRUE;
 
 		/* count how many identical sound chips we have */
-		count = 1;
-		device_sound_interface *scan = sound;
-		for (bool gotanother = scan->next(scan); gotanother; gotanother = scan->next(scan))
+		int count = 1;
+		device_sound_interface *scan;
+		for (bool gotanother = sound->next(scan); gotanother; gotanother = scan->next(scan))
 		{
 			if (sound->device().type() != scan->device().type() || sound->device().clock() != scan->device().clock())
 				break;

@@ -872,9 +872,9 @@ void console_create_window(running_machine *machine)
 
 @implementation MAMEDisassemblyView
 
-- (debug_cpu_breakpoint *)findBreakpointAtAddress:(offs_t)address inAddressSpace:(const address_space *)space {
+- (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address inAddressSpace:(const address_space *)space {
 	cpu_debug_data			*cpuinfo = cpu_get_debug_data(space->cpu);
-	debug_cpu_breakpoint	*bp;
+	device_debug::breakpoint	*bp;
 	for (bp = cpuinfo->bplist; (bp != NULL) && (address != bp->address); bp = bp->next) {}
 	return bp;
 }
@@ -946,7 +946,7 @@ void console_create_window(running_machine *machine)
 	SEL						action = [item action];
 	BOOL					inContextMenu = ([item menu] == [self menu]);
 	BOOL					haveCursor = NO, isCurrent = NO;
-	debug_cpu_breakpoint	*breakpoint = NULL;
+	device_debug::breakpoint	*breakpoint = NULL;
 
 	if (view->cursor_visible()) {
 		if (debug_cpu_get_visible_cpu(machine) == view->source()->device()) {
@@ -1078,7 +1078,7 @@ void console_create_window(running_machine *machine)
 		const address_space *space = downcast<const debug_view_disasm_source *>(view->source())->space();
 		if (!useConsole || (debug_cpu_get_visible_cpu(machine) == space->cpu)) {
 			offs_t				address = downcast<debug_view_disasm *>(view)->selected_address();
-			debug_cpu_breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
+			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
 
 			// if it doesn't exist, add a new one
 			if (useConsole) {
@@ -1104,7 +1104,7 @@ void console_create_window(running_machine *machine)
 		const address_space *space = downcast<const debug_view_disasm_source *>(view->source())->space();
 		if (!useConsole || (debug_cpu_get_visible_cpu(machine) == space->cpu)) {
 			offs_t				address = downcast<debug_view_disasm *>(view)->selected_address();
-			debug_cpu_breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
+			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
 
 			if (bp != NULL) {
 				NSString *command;

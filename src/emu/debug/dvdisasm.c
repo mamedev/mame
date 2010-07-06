@@ -578,7 +578,7 @@ recompute:
 			// if we're on a line with a breakpoint, tag it changed
 			else
 			{
-				for (debug_cpu_breakpoint *bp = source.m_device.debug()->breakpoint_first(); bp != NULL; bp = bp->next())
+				for (device_debug::breakpoint *bp = source.m_device.debug()->breakpoint_first(); bp != NULL; bp = bp->next())
 					if (m_byteaddress[effrow] == (memory_address_to_byte(source.m_space, bp->address()) & source.m_space->logbytemask))
 						attrib = DCA_CHANGED;
 			}
