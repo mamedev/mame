@@ -150,7 +150,7 @@ void debug_view_source_list::reset()
 		m_head = source->m_next;
 		auto_free(&m_machine, source);
 	}
-	
+
 	// reset the tail pointer and index
 	m_tail = NULL;
 	m_count = 0;
@@ -158,7 +158,7 @@ void debug_view_source_list::reset()
 
 
 //-------------------------------------------------
-//  append - add a view_source to the end of the 
+//  append - add a view_source to the end of the
 //  list
 //-------------------------------------------------
 
@@ -237,7 +237,7 @@ debug_view::~debug_view()
 
 
 //-------------------------------------------------
-//  end_update - bracket a sequence of changes so 
+//  end_update - bracket a sequence of changes so
 //  that only one update occurs
 //-------------------------------------------------
 
@@ -272,7 +272,7 @@ void debug_view::end_update()
 
 
 //-------------------------------------------------
-//  flush_osd_updates - notify the OSD of any 
+//  flush_osd_updates - notify the OSD of any
 //  pending updates
 //-------------------------------------------------
 
@@ -285,7 +285,7 @@ void debug_view::flush_osd_updates()
 
 
 //-------------------------------------------------
-//  set_visible_size - set the visible size in 
+//  set_visible_size - set the visible size in
 //  rows and columns
 //-------------------------------------------------*/
 
@@ -303,8 +303,8 @@ void debug_view::set_visible_size(debug_view_xy size)
 
 
 //-------------------------------------------------
-//  set_visible_position - set the top left 
-//  position of the visible area in rows and 
+//  set_visible_position - set the top left
+//  position of the visible area in rows and
 //  columns
 //-------------------------------------------------
 
@@ -322,7 +322,7 @@ void debug_view::set_visible_position(debug_view_xy pos)
 
 
 //-------------------------------------------------
-//  set_cursor_position - set the current cursor 
+//  set_cursor_position - set the current cursor
 //  position as a row and column
 //-------------------------------------------------
 
@@ -340,7 +340,7 @@ void debug_view::set_cursor_position(debug_view_xy pos)
 
 
 //-------------------------------------------------
-//  set_cursor_visible - set the visible state of 
+//  set_cursor_visible - set the visible state of
 //  the cursor
 //-------------------------------------------------
 
@@ -415,7 +415,7 @@ void debug_view::view_notify(debug_view_notification type)
 
 
 //-------------------------------------------------
-//  view_char - handle a character typed within 
+//  view_char - handle a character typed within
 //  the current view
 //-------------------------------------------------
 
@@ -480,11 +480,11 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 			return append(auto_alloc(&m_machine, debug_view_log(m_machine, osdupdate, osdprivate)));
 
 		case DVT_TIMERS:
-//			return append(auto_alloc(&m_machine, debug_view_timers(m_machine, osdupdate, osdprivate)));
+//          return append(auto_alloc(&m_machine, debug_view_timers(m_machine, osdupdate, osdprivate)));
 
 		case DVT_ALLOCS:
-//			return append(auto_alloc(&m_machine, debug_view_allocs(m_machine, osdupdate, osdprivate)));
-		
+//          return append(auto_alloc(&m_machine, debug_view_allocs(m_machine, osdupdate, osdprivate)));
+
 		default:
 			fatalerror("Attempt to create invalid debug view type %d\n", type);
 	}
@@ -523,13 +523,13 @@ void debug_view_manager::update_all(debug_view_type type)
 
 
 //-------------------------------------------------
-//  flush_osd_updates - flush all pending OSD 
+//  flush_osd_updates - flush all pending OSD
 //  updates
 //-------------------------------------------------
 
 void debug_view_manager::flush_osd_updates()
 {
-	for (debug_view *view = m_viewlist; view != NULL; view = view->m_next) 
+	for (debug_view *view = m_viewlist; view != NULL; view = view->m_next)
 		view->flush_osd_updates();
 }
 
@@ -591,7 +591,7 @@ void debug_view_expression::set_string(const char *string)
 
 
 //-------------------------------------------------
-//  set_context - set the context for the 
+//  set_context - set the context for the
 //  expression
 //-------------------------------------------------
 
@@ -603,7 +603,7 @@ void debug_view_expression::set_context(symbol_table *context)
 
 
 //-------------------------------------------------
-//  recompute - recompute the value of an 
+//  recompute - recompute the value of an
 //  expression
 //-------------------------------------------------
 

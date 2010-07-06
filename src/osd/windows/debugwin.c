@@ -2425,7 +2425,7 @@ void console_create_window(running_machine *machine)
 		// set the view and fetch the width
 		info->view[0].view->set_source(*source);
 		dischars = info->view[0].view->total_size().x;
-		
+
 		// compute the preferred width
 		minwidth = EDGE_WIDTH + main_console_regwidth * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + 100 + EDGE_WIDTH;
 		maxwidth = EDGE_WIDTH + main_console_regwidth * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + MAX(dischars, conchars) * debug_font_width + vscroll_width + EDGE_WIDTH;

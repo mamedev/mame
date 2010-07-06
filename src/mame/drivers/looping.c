@@ -809,7 +809,7 @@ ROM_START( looping )
 	ROM_LOAD( "loop555.bin",		0x4000, 0x1000, CRC(0ef4c922) SHA1(df6db0897a51aa10e106865a643588d866ef8c4e) )
 	ROM_LOAD( "loop556.bin",		0x5000, 0x1000, CRC(3419a5d5) SHA1(2b0249c54985ab5e12de17c0e3d62caa0c7575e3) )
 	ROM_LOAD( "loop557.bin",		0x6000, 0x1000, CRC(d430e287) SHA1(b0edd25ef4d2468cc1f8c10ac49c545a89d398d7) )
-	
+
 	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
 	ROM_LOAD( "loopc13.bin",		0x0000, 0x1000, CRC(ff9ac4ec) SHA1(9f8df94cd79d86fe4c384df1d5d729b58a7ca7a8) )
 	ROM_LOAD( "loopa13.bin",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )

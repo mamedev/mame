@@ -79,7 +79,7 @@
                 - calls debugger_init() [debugger.c] to set up the debugger
                 - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
                 - calls cheat_init() [cheat.c] to initialize the cheat system
-				- calls image_init() [image.c] to initialize the image system
+                - calls image_init() [image.c] to initialize the image system
 
             - calls config_load_settings() [config.c] to load the configuration file
             - calls nvram_load [machine/generic.c] to load NVRAM
@@ -313,7 +313,7 @@ void running_machine::start()
 
 	// start up the devices
 	m_devicelist.start_all();
-	
+
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
@@ -481,7 +481,7 @@ void running_machine::schedule_exit()
 
 
 //-------------------------------------------------
-//  schedule_hard_reset - schedule a hard-reset of 
+//  schedule_hard_reset - schedule a hard-reset of
 //  the machine
 //-------------------------------------------------
 
@@ -495,7 +495,7 @@ void running_machine::schedule_hard_reset()
 
 
 //-------------------------------------------------
-//  schedule_soft_reset - schedule a soft-reset of 
+//  schedule_soft_reset - schedule a soft-reset of
 //  the system
 //-------------------------------------------------
 
@@ -512,7 +512,7 @@ void running_machine::schedule_soft_reset()
 
 
 //-------------------------------------------------
-//  schedule_new_driver - schedule a new game to 
+//  schedule_new_driver - schedule a new game to
 //  be loaded
 //-------------------------------------------------
 
@@ -548,7 +548,7 @@ void running_machine::set_saveload_filename(const char *filename)
 
 
 //-------------------------------------------------
-//  schedule_save - schedule a save to occur as 
+//  schedule_save - schedule a save to occur as
 //  soon as possible
 //-------------------------------------------------
 
@@ -567,7 +567,7 @@ void running_machine::schedule_save(const char *filename)
 
 
 //-------------------------------------------------
-//  schedule_load - schedule a load to occur as 
+//  schedule_load - schedule a load to occur as
 //  soon as possible
 //-------------------------------------------------
 
@@ -595,7 +595,7 @@ void running_machine::pause()
 	if (m_paused)
 		return;
 	m_paused = true;
-	
+
 	// call the callbacks
 	call_notifiers(MACHINE_NOTIFY_PAUSE);
 }
@@ -611,7 +611,7 @@ void running_machine::resume()
 	if (!m_paused)
 		return;
 	m_paused = false;
-	
+
 	// call the callbacks
 	call_notifiers(MACHINE_NOTIFY_RESUME);
 }
@@ -651,7 +651,7 @@ void running_machine::region_free(const char *name)
 void running_machine::add_notifier(machine_notification event, notify_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_notifier at init time!");
-	
+
 	// exit notifiers are added to the head, and executed in reverse order
 	if (event == MACHINE_NOTIFY_EXIT)
 	{
@@ -726,7 +726,7 @@ void CLIB_DECL running_machine::vlogerror(const char *format, va_list args)
 
 
 //-------------------------------------------------
-//  base_datetime - retrieve the time of the host 
+//  base_datetime - retrieve the time of the host
 //  system; useful for RTC implementations
 //-------------------------------------------------
 
@@ -737,8 +737,8 @@ void running_machine::base_datetime(system_time &systime)
 
 
 //-------------------------------------------------
-//  current_datetime - retrieve the current time 
-//  (offset by the base); useful for RTC 
+//  current_datetime - retrieve the current time
+//  (offset by the base); useful for RTC
 //  implementations
 //-------------------------------------------------
 
@@ -790,7 +790,7 @@ void running_machine::handle_saveload()
 	if (m_saveload_pending_file.len() == 0)
 		goto cancel;
 
-	// if there are anonymous timers, we can't save just yet, and we can't load yet either 
+	// if there are anonymous timers, we can't save just yet, and we can't load yet either
 	// because the timers might overwrite data we have loaded
 	if (timer_count_anonymous(this) > 0)
 	{
@@ -990,7 +990,7 @@ void system_time::set(time_t t)
 
 
 //-------------------------------------------------
-//  get_tm_time - converts a tm struction to a 
+//  get_tm_time - converts a tm struction to a
 //  MAME mame_system_tm structure
 //-------------------------------------------------
 

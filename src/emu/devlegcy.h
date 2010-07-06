@@ -613,7 +613,7 @@ protected:
     astring m_instance_name;
     astring m_brief_instance_name;
 	astring m_interface_name;
-	
+
     /* creation info */
     const option_guide *m_create_option_guide;
     image_device_format *m_formatlist;
@@ -630,8 +630,8 @@ public:
 	virtual bool load(const char *path);
 	virtual bool finish_load();
 	virtual void unload();
-	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);	
-	
+	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
+
 	virtual int call_load();
 	virtual int call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
@@ -646,9 +646,9 @@ protected:
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
-	void clear();	
+	void clear();
 	bool is_loaded();
-	
+
 	bool m_is_loading;
 };
 

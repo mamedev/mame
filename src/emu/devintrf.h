@@ -376,7 +376,7 @@ public:
 				return true;
 		return false;
 	}
-	
+
 	// specialized helpers
 	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != NULL); }
 	bool interface(device_memory_interface *&intf) { intf = m_memory; return (intf != NULL); }
@@ -405,7 +405,7 @@ public:
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(UINT64 clocks) const;
 	UINT64 attotime_to_clocks(attotime duration) const;
-	
+
 	// debugging
 	device_debug *debug() const { return m_debug; }
 	void set_debug(device_debug &debug) { m_debug = &debug; }
@@ -445,7 +445,7 @@ protected:
 
 	running_machine &		m_machine;
 	device_debug *			m_debug;
-	
+
 	// for speed
 	device_execute_interface *m_execute;
 	device_memory_interface *m_memory;

@@ -123,7 +123,7 @@ debug_view_disasm::~debug_view_disasm()
 
 
 //-------------------------------------------------
-//  enumerate_sources - enumerate all possible 
+//  enumerate_sources - enumerate all possible
 //  sources for a disassembly view
 //-------------------------------------------------
 
@@ -155,14 +155,14 @@ void debug_view_disasm::view_notify(debug_view_notification type)
 {
 	if (type == VIEW_NOTIFY_CURSOR_CHANGED)
 		adjust_visible_y_for_cursor();
-	
+
 	else if (type == VIEW_NOTIFY_SOURCE_CHANGED)
 		m_expression.set_context(downcast<const debug_view_disasm_source *>(m_source)->device().debug()->symtable());
 }
 
 
 //-------------------------------------------------
-//  view_char - handle a character typed within 
+//  view_char - handle a character typed within
 //  the current view
 //-------------------------------------------------
 
@@ -233,7 +233,7 @@ void debug_view_disasm::view_char(int chval)
 
 
 //-------------------------------------------------
-//  find_pc_backwards - back up the specified 
+//  find_pc_backwards - back up the specified
 //  number of instructions from the given PC
 //-------------------------------------------------
 
@@ -312,7 +312,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 
 
 //-------------------------------------------------
-//  generate_bytes - generate the opcode byte 
+//  generate_bytes - generate the opcode byte
 //  values
 //-------------------------------------------------
 
@@ -338,7 +338,7 @@ void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes
 
 
 //-------------------------------------------------
-//  recompute - recompute selected info for the 
+//  recompute - recompute selected info for the
 //  disassembly view
 //-------------------------------------------------
 
@@ -460,7 +460,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 
 //-------------------------------------------------
-//  view_update - update the contents of the 
+//  view_update - update the contents of the
 //  disassembly view
 //-------------------------------------------------
 
@@ -620,7 +620,7 @@ recompute:
 
 
 //-------------------------------------------------
-//  selected_address - return the PC of the 
+//  selected_address - return the PC of the
 //  currently selected address in the view
 //-------------------------------------------------
 
@@ -632,7 +632,7 @@ offs_t debug_view_disasm::selected_address()
 
 
 //-------------------------------------------------
-//  set_sexpression - set the expression string 
+//  set_sexpression - set the expression string
 //  describing the home address
 //-------------------------------------------------
 
@@ -646,7 +646,7 @@ void debug_view_disasm::set_expression(const char *expression)
 
 
 //-------------------------------------------------
-//  set_right_column - set the contents of the 
+//  set_right_column - set the contents of the
 //  right column
 //-------------------------------------------------
 
@@ -660,7 +660,7 @@ void debug_view_disasm::set_right_column(disasm_right_column contents)
 
 
 //-------------------------------------------------
-//  set_backward_steps - set the number of 
+//  set_backward_steps - set the number of
 //  instructions displayed before the home address
 //-------------------------------------------------
 
@@ -674,7 +674,7 @@ void debug_view_disasm::set_backward_steps(UINT32 steps)
 
 
 //-------------------------------------------------
-//  set_disasm_width - set the width in characters 
+//  set_disasm_width - set the width in characters
 //  of the main disassembly section
 //-------------------------------------------------
 
@@ -688,7 +688,7 @@ void debug_view_disasm::set_disasm_width(UINT32 width)
 
 
 //-------------------------------------------------
-//  set_selected_address - set the PC of the 
+//  set_selected_address - set the PC of the
 //  currently selected address in the view
 //-------------------------------------------------
 

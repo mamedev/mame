@@ -92,7 +92,7 @@ void generic_machine_init(running_machine *machine)
 		state->coinlockedout[counternum] = 0;
 	}
 
-	// map devices to the interrupt state	
+	// map devices to the interrupt state
 	memset(state->interrupt_device, 0, sizeof(state->interrupt_device));
 	device_execute_interface *exec;
 	int index = 0;

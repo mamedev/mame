@@ -626,10 +626,10 @@ static CUSTOM_INPUT( mcu_status_r )
 		if (!main_sent)
 			res |= 0x01;
 		if (!mcu_sent)
-			res |= 0x02;	
+			res |= 0x02;
 	}
 
-	return res;	
+	return res;
 }
 
 /********************************************************************************************/
@@ -710,8 +710,8 @@ static ADDRESS_MAP_START( renegade_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(renegade_68705_ddr_a_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(renegade_68705_ddr_b_w)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(renegade_68705_ddr_c_w)
-//	AM_RANGE(0x0008, 0x0008) AM_READWRITE(m68705_tdr_r, m68705_tdr_w)
-//	AM_RANGE(0x0009, 0x0009) AM_READWRITE(m68705_tcr_r, m68705_tcr_w)
+//  AM_RANGE(0x0008, 0x0008) AM_READWRITE(m68705_tdr_r, m68705_tdr_w)
+//  AM_RANGE(0x0009, 0x0009) AM_READWRITE(m68705_tcr_r, m68705_tcr_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -991,7 +991,7 @@ ROM_START( renegade )
 	ROM_LOAD( "nc-5.bin",     0x0000, 0x8000, CRC(9adfaa5d) SHA1(7bdb7bd4387b49e0489f9539161e1ed9d8f9f6a0) )
 
 	ROM_REGION( 0x30000, "tiles", 0 )
-	ROM_LOAD( "n1-5.ic1",     0x00000, 0x8000, CRC(4a9f47f3) SHA1(01c94bc4c85314f1e0caa3afe91705875d118c13) ) 
+	ROM_LOAD( "n1-5.ic1",     0x00000, 0x8000, CRC(4a9f47f3) SHA1(01c94bc4c85314f1e0caa3afe91705875d118c13) )
 	ROM_LOAD( "n6-5.ic28",    0x08000, 0x8000, CRC(d62a0aa8) SHA1(a0b55cd3eee352fb91d9bb8c6c4f4f55b2df83e9) )
 	ROM_LOAD( "n7-5.ic27",    0x10000, 0x8000, CRC(7ca5a532) SHA1(1110aa1c7562805dd4b298ab2860c66a6cc2685b) )
 	ROM_LOAD( "n2-5.ic14",    0x18000, 0x8000, CRC(8d2e7982) SHA1(72fc85ff7b54be10501a2a24303dadd5f33e5650) )

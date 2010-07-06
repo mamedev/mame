@@ -68,7 +68,7 @@ static void image_dirs_load(running_machine *machine, int config_type, xml_data_
 	const char *dev_instance;
 	const char *working_directory;
 	device_image_interface *image = NULL;
-	
+
 	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != NULL))
 	{
 		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
@@ -83,7 +83,7 @@ static void image_dirs_load(running_machine *machine, int config_type, xml_data_
 						working_directory = xml_get_attribute_string(node, "directory", NULL);
 						if (working_directory != NULL)
 							image->set_working_directory(working_directory);
-					}					
+					}
 				}
 			}
 		}
@@ -115,7 +115,7 @@ static void image_dirs_save(running_machine *machine, int config_type, xml_data_
 			{
 				xml_set_attribute(node, "instance", dev_instance);
 				xml_set_attribute(node, "directory", image->working_directory());
-			}		
+			}
 		}
 	}
 }
@@ -160,16 +160,16 @@ static void image_options_extract(running_machine *machine)
 {
 	/* only extract the device options if we've added them */
 	if (options_get_bool(machine->options(), OPTION_ADDED_DEVICE_OPTIONS)) {
-		int index = 0;		
+		int index = 0;
 		device_image_interface *image = NULL;
 
 		for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
-		{		
+		{
 			const char *filename = image->filename();
 
 			/* and set the option */
-			options_set_string(machine->options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);				
-			
+			options_set_string(machine->options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);
+
 			index++;
 		}
 	}
@@ -188,7 +188,7 @@ void image_unload_all(running_machine &machine)
 {
     device_image_interface *image = NULL;
 
-	// extract the options 
+	// extract the options
 	image_options_extract(&machine);
 
 	for (bool gotone = machine.m_devicelist.first(image); gotone; gotone = image->next(image))
@@ -217,7 +217,7 @@ void image_device_init(running_machine *machine)
 		{
 			/* mark init state */
 			image->set_init_phase();
-			
+
 			/* try to load this image */
 			bool result = image->load(image_name);
 
@@ -245,7 +245,7 @@ void image_device_init(running_machine *machine)
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Driver requires that device \"%s\" must have an image to load", image->image_config().instance_name());
 			}
 		}
-		
+
 		image->call_get_devices();
 	}
 }
@@ -434,7 +434,7 @@ astring *image_info_astring(running_machine *machine, astring *string)
 		else
 		{
 			astring_catprintf(string, "%s: ---\n", image->image_config().devconfig().name());
-		}		
+		}
 	}
 	return string;
 }
@@ -489,7 +489,7 @@ void image_battery_save_by_name(const char *filename, const void *buffer, int le
 
 /*-------------------------------------------------
     image_from_absolute_index - retreives index number
-	of image in device list
+    of image in device list
 -------------------------------------------------*/
 device_image_interface *image_from_absolute_index(running_machine *machine, int absolute_index)
 {
@@ -506,21 +506,21 @@ device_image_interface *image_from_absolute_index(running_machine *machine, int 
 
 /*-------------------------------------------------
     image_add_device_with_subdevices - adds
-	device with parameters sent, and all subdevices
-	from it's machine config devices list
+    device with parameters sent, and all subdevices
+    from it's machine config devices list
 -------------------------------------------------*/
 void image_add_device_with_subdevices(device_t *owner, device_type type, const char *tag, UINT32 clock)
 {
 	astring tempstring;
-	device_list *device_list = &owner->machine->m_devicelist;	
+	device_list *device_list = &owner->machine->m_devicelist;
 	machine_config *config = (machine_config *)owner->machine->config;
-	
+
 	device_config *devconfig = type(*config, owner->subtag(tempstring,tag), &owner->baseconfig(), clock);
 	running_device *device = device_list->append(devconfig->tag(), devconfig->alloc_device(*owner->machine));
-	
+
 	const machine_config_token *tokens = device->machine_config_tokens();
-	if (tokens != NULL) 
-    {		
+	if (tokens != NULL)
+    {
 		config->detokenize(tokens,devconfig);
         for (const device_config *config_dev = config->m_devicelist.first(); config_dev != NULL; config_dev = config_dev->next())
         {

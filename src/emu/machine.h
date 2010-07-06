@@ -183,7 +183,7 @@ public:
 	endianness_t endianness() const { return ((m_flags & ROMREGION_ENDIANMASK) == ROMREGION_LE) ? ENDIANNESS_LITTLE : ENDIANNESS_BIG; }
 	UINT8 width() const { return 1 << ((m_flags & ROMREGION_WIDTHMASK) >> 8); }
 	bool invert() const { return ((m_flags & ROMREGION_INVERTMASK) != 0); }
-	
+
 	// data access
 	UINT8 &u8(offs_t offset = 0) const { return m_base.u8[offset]; }
 	UINT16 &u16(offs_t offset = 0) const { return m_base.u16[offset]; }
@@ -241,20 +241,20 @@ public:
 	{
 		void set(struct tm &t);
 
-		UINT8 		second;		// seconds (0-59)
-		UINT8 		minute;		// minutes (0-59)
-		UINT8 		hour;		// hours (0-23)
-		UINT8 		mday;		// day of month (1-31)
-		UINT8 		month;		// month (0-11)
-		INT32 		year;		// year (1=1 AD)
-		UINT8 		weekday;	// day of week (0-6)
-		UINT16 		day;		// day of year (0-365)
-		UINT8 		is_dst;		// is this daylight savings?
+		UINT8		second;		// seconds (0-59)
+		UINT8		minute;		// minutes (0-59)
+		UINT8		hour;		// hours (0-23)
+		UINT8		mday;		// day of month (1-31)
+		UINT8		month;		// month (0-11)
+		INT32		year;		// year (1=1 AD)
+		UINT8		weekday;	// day of week (0-6)
+		UINT16		day;		// day of year (0-365)
+		UINT8		is_dst;		// is this daylight savings?
 	};
 
-	INT64 			time;		// number of seconds elapsed since midnight, January 1 1970 UTC
-	full_time 		local_time;	// local time
-	full_time	 	utc_time;	// UTC coordinated time
+	INT64			time;		// number of seconds elapsed since midnight, January 1 1970 UTC
+	full_time		local_time;	// local time
+	full_time		utc_time;	// UTC coordinated time
 };
 
 
@@ -270,16 +270,16 @@ public:
 	// construction/destruction
 	running_machine(const game_driver &driver, const machine_config &config, core_options &options, bool exit_to_game_select = false);
 	~running_machine();
-	
+
 	// fetch items by name
 	inline device_t *device(const char *tag);
 	template<class T> inline T *device(const char *tag) { return downcast<T *>(device(tag)); }
 	inline const input_port_config *port(const char *tag);
 	inline const region_info *region(const char *tag);
-	
+
 	// configuration helpers
 	UINT32 total_colors() const { return m_config.m_total_colors; }
-	
+
 	// getters
 	const char *basename() const { return m_basename; }
 	core_options *options() const { return &m_options; }
@@ -299,7 +299,7 @@ public:
 	void add_notifier(machine_notification event, notify_callback callback);
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);
-	
+
 	// scheduled operations
 	void schedule_exit();
 	void schedule_hard_reset();
@@ -311,7 +311,7 @@ public:
 	// time
 	void base_datetime(system_time &systime);
 	void current_datetime(system_time &systime);
-	
+
 	// regions
 	region_info *region_alloc(const char *name, UINT32 length, UINT32 flags);
 	void region_free(const char *name);
@@ -392,7 +392,7 @@ private:
 	void set_saveload_filename(const char *filename);
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
-	
+
 	static TIMER_CALLBACK( static_soft_reset );
 	void soft_reset();
 
@@ -406,7 +406,7 @@ private:
 		notify_callback				m_func;
 	};
 	notifier_callback_item *m_notifier_list[MACHINE_NOTIFY_COUNT];
-	
+
 	// logerror callbacks
 	struct logerror_callback_item
 	{
@@ -437,7 +437,7 @@ private:
 		SLS_NONE,
 		SLS_SAVE,
 		SLS_LOAD
-	};	
+	};
 	saveload_schedule		m_saveload_schedule;
 	attotime				m_saveload_schedule_time;
 	astring					m_saveload_pending_file;

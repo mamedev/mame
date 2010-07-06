@@ -175,7 +175,7 @@ static void memory_error(const char *message)
 
 device_image_interface::device_image_interface(running_machine &machine, const device_config &config, device_t &device)
 	: device_interface(machine, config, device),
-	  m_image_config(dynamic_cast<const device_config_image_interface &>(config)),	  
+	  m_image_config(dynamic_cast<const device_config_image_interface &>(config)),
 	  m_file(NULL),
 	  m_full_software_name(NULL),
 	  m_software_info_ptr(NULL),
@@ -192,7 +192,7 @@ device_image_interface::device_image_interface(running_machine &machine, const d
 
 device_image_interface::~device_image_interface()
 {
-    pool_free_lib(m_mempool);    
+    pool_free_lib(m_mempool);
 }
 
 /*-------------------------------------------------
@@ -205,7 +205,7 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
     m_name = filename;
     zippath_parent(&m_working_directory, filename);
 	m_basename = m_name.cpy(m_name);
-	
+
 	int loc1 = m_name.rchr(0,'\\');
 	int loc2 = m_name.rchr(0,'/');
 	int loc3 = m_name.rchr(0,':');
@@ -328,7 +328,7 @@ void device_image_interface::seterror(image_error_t err, const char *message)
 void device_image_interface::message(const char *format, ...)
 {
     va_list args;
-    char buffer[256];	
+    char buffer[256];
 
     /* format the message */
     va_start(args, format);
@@ -412,7 +412,7 @@ void device_image_interface::setup_working_directory()
 //  valid even if not mounted
 //-------------------------------------------------
 
-const char * device_image_interface::working_directory() 
+const char * device_image_interface::working_directory()
 {
    /* check to see if we've never initialized the working directory */
     if (m_working_directory.len() == 0)
@@ -544,7 +544,7 @@ int device_image_interface::read_hash_config(const char *sysname)
         goto done;
 
     /* copy the relevant entries */
-    m_longname     = info->longname        ? astring(info->longname)  	  : "";
+    m_longname     = info->longname        ? astring(info->longname)	  : "";
     m_manufacturer = info->manufacturer    ? astring(info->manufacturer)  : "";
     m_year         = info->year            ? astring(info->year)          : "";
     m_playable     = info->playable        ? astring(info->playable)      : "";
@@ -625,11 +625,11 @@ void device_image_interface::image_checkhash()
     return;
 }
 
-UINT32 device_image_interface::crc() 
-{    
+UINT32 device_image_interface::crc()
+{
     UINT32 crc = 0;
 
-	image_checkhash();    
+	image_checkhash();
     if (m_hash != NULL)
         crc = hash_data_extract_crc32(m_hash);
 

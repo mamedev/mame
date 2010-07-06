@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 static UINT8 mux_data;
 
 static ADDRESS_MAP_START( rbmk_mcu_mem, ADDRESS_SPACE_PROGRAM, 8 )
-//	AM_RANGE(0x0000, 0x0fff) AM_ROM
+//  AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static READ8_HANDLER( rbmk_mcu_io_r )
@@ -547,7 +547,7 @@ static MACHINE_DRIVER_START( rbmk )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, 22000000 / 8)
-//	MDRV_SOUND_CONFIG(ym2151_config)
+//  MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_DRIVER_END

@@ -133,19 +133,19 @@ public:
 class debug_view_source
 {
 	DISABLE_COPYING(debug_view_source);
-	
+
 	friend class debug_view_source_list;
 
 public:
 	// construction/destruction
 	debug_view_source(const char *name, device_t *device = NULL);
 	virtual ~debug_view_source();
-	
+
 	// getters
 	const char *name() const { return m_name; }
 	debug_view_source *next() const { return m_next; }
 	device_t *device() const { return m_device; }
-	
+
 private:
 	// internal state
 	debug_view_source *		m_next;					// link to next item
@@ -163,19 +163,19 @@ public:
 	// construction/destruction
 	debug_view_source_list(running_machine &machine);
 	~debug_view_source_list();
-	
+
 	// getters
 	const debug_view_source *head() const { return m_head; }
 	int count() const { return m_count; }
 	int index(const debug_view_source &source) const;
 	const debug_view_source *by_index(int index) const;
-	
+
 	// operations
 	void reset();
 	void append(debug_view_source &view_source);
 	const debug_view_source *match_device(device_t *device) const;
 	int match_device_index(device_t *device) const { return index(*match_device(device)); }
-	
+
 private:
 	// internal state
 	running_machine &		m_machine;				// reference to our machine
@@ -189,7 +189,7 @@ private:
 class debug_view
 {
 	friend class debug_view_manager;
-	
+
 protected:
 	// construction/destruction
 	debug_view(running_machine &machine, debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate);
@@ -242,7 +242,7 @@ protected:
 	running_machine &		m_machine;			// machine associated with this view
 	debug_view_type			m_type;				// type of view
 	const debug_view_source *m_source;			// currently selected data source
-	debug_view_source_list 	m_source_list;		// list of available data sources
+	debug_view_source_list	m_source_list;		// list of available data sources
 
 	// OSD data
 	debug_view_osd_update_func m_osdupdate;		// callback for the update
@@ -274,7 +274,7 @@ public:
 	debug_view_manager(running_machine &machine);
 	~debug_view_manager();
 
-	// view allocation	
+	// view allocation
 	debug_view *alloc_view(debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate);
 	void free_view(debug_view &view);
 
@@ -299,7 +299,7 @@ public:
 	// construction/destruction
 	debug_view_expression(running_machine &machine);
 	~debug_view_expression();
-	
+
 	// getters
 	bool dirty() const { return m_dirty; }
 	UINT64 last_value() const { return m_result; }
@@ -307,7 +307,7 @@ public:
 	const char *string() const { return m_string; }
 	symbol_table *context() const { return m_context; }
 
-	// setters	
+	// setters
 	void mark_dirty() { m_dirty = true; }
 	void set_string(const char *string);
 	void set_context(symbol_table *context);

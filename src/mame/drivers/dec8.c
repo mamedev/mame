@@ -814,14 +814,14 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 /*
-	Gondomania schematics show the following:
-	
-	Port P0 - attached to 2 * LS374 at location 4C & 1C
-	Port P1 - attached to 2 * LS374 at location 3C & 2C
-	Port P2.2 -> SECIRQ (IRQ to main CPU)
-	Port P2.3 -> 'COUNT' (Enable coin counter - also wired directly to coinage) [not emulated]
-	Port P2.4-7 -> Enable latches 4C, 1C, 3C, 2C
-	Port P3.4-7 -> Directly attached to coinage connector (3 coins & service)
+    Gondomania schematics show the following:
+
+    Port P0 - attached to 2 * LS374 at location 4C & 1C
+    Port P1 - attached to 2 * LS374 at location 3C & 2C
+    Port P2.2 -> SECIRQ (IRQ to main CPU)
+    Port P2.3 -> 'COUNT' (Enable coin counter - also wired directly to coinage) [not emulated]
+    Port P2.4-7 -> Enable latches 4C, 1C, 3C, 2C
+    Port P3.4-7 -> Directly attached to coinage connector (3 coins & service)
 
 */
 
@@ -847,11 +847,11 @@ static READ8_HANDLER( dec8_mcu_from_main_r )
 static WRITE8_HANDLER( dec8_mcu_to_main_w )
 {
 	dec8_state *state = (dec8_state *)space->machine->driver_data;
-	
+
 	// Outputs P0 and P1 are latched
 	if (offset==0) state->i8751_port0=data;
 	else if (offset==1) state->i8751_port1=data;
-	
+
 	// P2 - controls latches for main CPU communication
 	if (offset==2 && (data&0x10)==0)
 		state->i8751_port0 = state->i8751_value>>8;
@@ -861,7 +861,7 @@ static WRITE8_HANDLER( dec8_mcu_to_main_w )
 		state->i8751_return = (state->i8751_return & 0xff) | (state->i8751_port0 << 8);
 	if (offset==2 && (data&0x80)==0)
 		state->i8751_return = (state->i8751_return & 0xff00) | state->i8751_port1;
-	
+
 	// P2 - IRQ to main CPU
 	if (offset==2 && (data&4)==0)
 		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
@@ -1002,7 +1002,7 @@ static INPUT_PORTS_START( ghostb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("I8751")	
+	PORT_START("I8751")
 	/* Low 4 bits not connected on schematics */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1056,10 +1056,10 @@ static INPUT_PORTS_START( meikyuh )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-	
+
 INPUT_PORTS_END
 
-	
+
 static INPUT_PORTS_START( srdarwin )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY

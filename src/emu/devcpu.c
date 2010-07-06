@@ -82,7 +82,7 @@ legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig
 		m_space_config[spacenum].m_internal_map = reinterpret_cast<const addrmap_token *>(get_legacy_config_ptr(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum));
 		m_space_config[spacenum].m_default_map = reinterpret_cast<const addrmap_token *>(get_legacy_config_ptr(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum));
 	}
-	
+
 	// set the real name
 	m_name = get_legacy_config_string(DEVINFO_STR_NAME);
 }

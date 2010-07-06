@@ -142,7 +142,7 @@ OLDE is a status flag which is only used for determining whether
   frame being parsed (which will become the new target frame) is zero.
   It is used for determining whether interpolation of the next frame is
   inhibited or not. It is updated at IP=0 PC=0 T=16. See next section.
-  
+
 Interpolation is inhibited (i.e. interpolation at IP frames will not happen
   except for IP=0) under the following circumstances:
   "P=0" != "OLDP" ("P=0" = 1, and OLDP = 0; OR "P=0" = 0, and OLDP = 1)
@@ -150,7 +150,7 @@ Interpolation is inhibited (i.e. interpolation at IP frames will not happen
     versa.
   "OLDE" = 1 and "E=0" = 0
     This means the new frame is not silent, and the old frame was silent.
-  
+
 
 
 ****Documentation of chip commands:***

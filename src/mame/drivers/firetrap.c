@@ -118,11 +118,11 @@ Notes:
       FI-1.1A - 82S129 Bipolar PROM
       FI-2.3B - 82S135 Bipolar PROM
       FI-3.4B - 82S129 Bipolar PROM
-      
+
       6502   - clock 1.500MHz [12/8]
       YM3526 - clock 3.000MHz [12/4]
       M5205  - clock 375kHz [12/32]. Sample rate: Pin 1 High & Pin 2 Low = 0.375/48 = 7.8125kHz
-      
+
       Measurements
       ------------
       XTAL1 - 11.9911MHz

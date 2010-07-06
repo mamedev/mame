@@ -170,13 +170,13 @@ public:
 	virtual bool uses_file_extension(const char *file_extension) const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
 	virtual image_device_format *formatlist() const = 0;
-	
+
 	static const char *device_typename(iodevice_t type);
-	static const char *device_brieftypename(iodevice_t type);	
+	static const char *device_brieftypename(iodevice_t type);
 	static iodevice_t device_typeid(const char *name);
 
 	virtual device_image_partialhash_func get_partial_hash() const = 0;
-	virtual void device_compute_hash(char *dest, const void *data, size_t length, unsigned int functions) const;	
+	virtual void device_compute_hash(char *dest, const void *data, size_t length, unsigned int functions) const;
 protected:
 	static const image_device_type_info *find_device_type(iodevice_t type);
 	static const image_device_type_info m_device_info_array[];
@@ -198,7 +198,7 @@ public:
 	virtual bool load(const char *path) = 0;
 	virtual bool finish_load() = 0;
 	virtual void unload() = 0;
-	
+
 	virtual int call_load() = 0;
 	virtual int call_create(int format_type, option_resolution *format_options) = 0;
 	virtual void call_unload() = 0;
@@ -206,14 +206,14 @@ public:
 	virtual device_image_partialhash_func get_partial_hash() = 0;
 	virtual void call_get_devices() = 0;
 	virtual void *get_device_specific_call() = 0;
-		
+
 	virtual const image_device_format *device_get_indexed_creatable_format(int index);
 	virtual const image_device_format *device_get_named_creatable_format(const char *format_name);
 	const option_guide *device_get_creation_option_guide() { return m_image_config.create_option_guide(); }
-	const image_device_format *device_get_creatable_formats() { return m_image_config.formatlist(); }	
+	const image_device_format *device_get_creatable_formats() { return m_image_config.formatlist(); }
 
 	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args) = 0;
-	
+
 	const char *error();
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...);
@@ -234,34 +234,34 @@ public:
 	UINT64 ftell() { check_for_file(); return core_ftell(m_file); }
 	int fgetc() { char ch; if (fread(&ch, 1) != 1) ch = '\0'; return ch; }
 	char *fgets(char *buffer, UINT32 length) { check_for_file(); return core_fgets(buffer, length, m_file); }
-	int feof() { check_for_file(); return core_feof(m_file); }	
-	void *ptr() {check_for_file(); return (void *) core_fbuffer(m_file); }	
+	int feof() { check_for_file(); return core_feof(m_file); }
+	void *ptr() {check_for_file(); return (void *) core_fbuffer(m_file); }
 	// configuration access
 	const device_config_image_interface &image_config() const { return m_image_config; }
-	
+
 	void set_init_phase() { m_init_phase = TRUE; }
-	
+
 	const char* longname() { return m_longname; }
 	const char* manufacturer() { return m_manufacturer; }
 	const char* year() { return m_year; }
 	const char* playable() { return m_playable; }
 	const char* pcb() { return m_pcb; }
 	const char* extrainfo() { return m_extrainfo; }
-	
+
 	const software_info *software_entry() { return m_software_info_ptr; }
-	
+
 	virtual void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
-	virtual const char * working_directory();	
-	
+	virtual const char * working_directory();
+
 	UINT8 *get_software_region(const char *tag);
 	UINT32 get_software_region_length(const char *tag);
 	const char *get_feature(const char *feature_name);
-	
+
 	void *image_malloc(size_t size);
 	char *image_strdup(const char *src);
 	void *image_realloc(void *ptr, size_t size);
 	void image_freeptr(void *ptr);
-	
+
 	UINT32 crc();
 
 	void battery_load(void *buffer, int length, int fill);
@@ -270,9 +270,9 @@ protected:
 	image_error_t set_image_filename(const char *filename);
 
 	void clear_error();
-	
+
 	void check_for_file() { assert_always(m_file != NULL, "Illegal operation on unmounted image"); }
-	
+
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
 
@@ -282,22 +282,22 @@ protected:
 	// derived class overrides
 
 	// configuration
-	const device_config_image_interface &m_image_config;	// reference to our device_config_execute_interface	
+	const device_config_image_interface &m_image_config;	// reference to our device_config_execute_interface
 
     /* error related info */
     image_error_t m_err;
-    astring m_err_message;	
-	
+    astring m_err_message;
+
     /* variables that are only non-zero when an image is mounted */
-	core_file *m_file;	
-	astring m_name;	
+	core_file *m_file;
+	astring m_name;
 	astring m_basename;
 	astring m_basename_noext;
 	astring m_filetype;
 
 	/* working directory; persists across mounts */
 	astring m_working_directory;
-	
+
 	/* Software information */
 	char *m_full_software_name;
 	software_info *m_software_info_ptr;
@@ -313,15 +313,15 @@ protected:
 
     /* flags */
     bool m_writeable;
-    bool m_created;	
+    bool m_created;
 	bool m_init_phase;
-	
+
     /* special - used when creating */
     int m_create_format;
     option_resolution *m_create_args;
-	
+
 	object_pool *m_mempool;
-	
+
 	char *m_hash;
 };
 

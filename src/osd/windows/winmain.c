@@ -105,12 +105,12 @@ public:
 
 	// bool to test if the function is NULL or not
 	operator bool() const { return (m_function != NULL); }
-	
+
 	// dereference to get the underlying pointer
 	func_ptr operator *() const { return m_function; }
 
 private:
-	func_ptr 	m_function;
+	func_ptr	m_function;
 };
 
 
@@ -118,14 +118,14 @@ class stack_walker
 {
 public:
 	stack_walker();
-	
+
 	FPTR ip() const { return m_stackframe.AddrPC.Offset; }
 	FPTR sp() const { return m_stackframe.AddrStack.Offset; }
 	FPTR frame() const { return m_stackframe.AddrFrame.Offset; }
-	
+
 	void reset(CONTEXT &context, HANDLE thread);
 	bool unwind();
-	
+
 private:
 	HANDLE			m_process;
 	HANDLE			m_thread;
@@ -138,7 +138,7 @@ private:
 	dynamic_bind<BOOL (WINAPI *)(HANDLE, LPCTSTR, BOOL)> m_sym_initialize;
 	dynamic_bind<PVOID (WINAPI *)(HANDLE, DWORD64)> m_sym_function_table_access_64;
 	dynamic_bind<DWORD64 (WINAPI *)(HANDLE, DWORD64)> m_sym_get_module_base_64;
-	
+
 	static bool		s_initialized;
 };
 
@@ -149,10 +149,10 @@ public:
 	// construction/destruction
 	symbol_manager(const char *argv0);
 	~symbol_manager();
-	
+
 	// getters
 	FPTR last_base() const { return m_last_base; }
-	
+
 	// core symbol lookup
 	const char *symbol_for_address(FPTR address);
 	const char *symbol_for_address(PVOID address) { return symbol_for_address(reinterpret_cast<FPTR>(address)); }
@@ -197,11 +197,11 @@ class sampling_profiler
 public:
 	sampling_profiler(UINT32 max_seconds, UINT8 stack_depth);
 	~sampling_profiler();
-	
+
 	void start();
 	void stop();
 
-//	void reset();
+//  void reset();
 	void print_results(symbol_manager &symbols);
 
 private:
@@ -210,7 +210,7 @@ private:
 
 	static int CLIB_DECL compare_address(const void *item1, const void *item2);
 	static int CLIB_DECL compare_frequency(const void *item1, const void *item2);
-	
+
 	HANDLE			m_target_thread;
 
 	HANDLE			m_thread;
@@ -549,7 +549,7 @@ static void osd_exit(running_machine &machine)
 		profiler->print_results(*symbols);
 		global_free(profiler);
 	}
-	
+
 	// turn off our multimedia tasks
 //      if (av_revert_mm_thread_characteristics)
 //          (*av_revert_mm_thread_characteristics)(mm_task);
@@ -790,7 +790,7 @@ void stack_walker::reset(CONTEXT &initial, HANDLE thread)
 	m_stackframe.AddrPC.Mode = AddrModeFlat;
 	m_stackframe.AddrFrame.Mode = AddrModeFlat;
 	m_stackframe.AddrStack.Mode = AddrModeFlat;
-	
+
 	// pull architecture-specific fields from the context
 #ifdef PTR64
 	m_stackframe.AddrPC.Offset = m_context.Rip;
@@ -855,7 +855,7 @@ symbol_manager::symbol_manager(const char *argv0)
 	if (extoffs != -1)
 		m_mapfile.substr(0, extoffs);
 	m_mapfile.cat(".map");
-	
+
 	// and the name of the symfile
 	extoffs = m_symfile.rchr(0, '.');
 	if (extoffs != -1)
@@ -905,7 +905,7 @@ const char *symbol_manager::symbol_for_address(FPTR address)
 		// if that fails, scan the cache if we have one
 		if (m_cache != NULL)
 			scan_cache_for_address(address);
-			
+
 		// or else try to open a sym/map file and find it there
 		else
 			scan_file_for_address(address, false);
@@ -961,13 +961,13 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 {
 	bool is_symfile = false;
 	FILE *srcfile = NULL;
-	
+
 #ifdef __GNUC__
 	// see if we have a symbol file (gcc only)
 	srcfile = fopen(m_symfile, "r");
 	is_symfile = (srcfile != NULL);
 #endif
-	
+
 	// if not, see if we have a map file
 	if (srcfile == NULL)
 		srcfile = fopen(m_mapfile, "r");
@@ -999,7 +999,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 				best_addr = addr;
 				best_symbol = symbol;
 			}
-			
+
 			// also create a cache entry if we can
 			if (create_cache)
 			{
@@ -1008,10 +1008,10 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 			}
 		}
 	}
-	
+
 	// close the file
 	fclose(srcfile);
-	
+
 	// format the symbol and remember the last base
 	format_symbol(best_symbol, address - best_addr);
 	m_last_base = best_addr;
@@ -1028,17 +1028,17 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 	// reset the best info
 	astring best_symbol;
 	FPTR best_addr = 0;
-	
+
 	// walk the cache, looking for valid entries
 	for (cache_entry *entry = m_cache; entry != NULL; entry = entry->m_next)
-	
+
 		// if this is the best one so far, remember it
 		if (entry->m_address <= address && entry->m_address > best_addr)
 		{
 			best_addr = entry->m_address;
 			best_symbol = entry->m_name;
 		}
-	
+
 	// format the symbol and remember the last base
 	format_symbol(best_symbol, address - best_addr);
 	m_last_base = best_addr;
@@ -1054,13 +1054,13 @@ bool symbol_manager::parse_sym_line(const char *line, FPTR &address, astring &sy
 {
 #ifdef __GNUC__
 /*
-	32-bit gcc symbol line:
+    32-bit gcc symbol line:
 [271778](sec  1)(fl 0x00)(ty  20)(scl   3) (nx 0) 0x007df675 line_to_symbol(char const*, unsigned int&, bool)
 
-	64-bit gcc symbol line:
+    64-bit gcc symbol line:
 [271775](sec  1)(fl 0x00)(ty  20)(scl   3) (nx 0) 0x00000000008dd1e9 line_to_symbol(char const*, unsigned long long&, bool)
 */
-	
+
 	// first look for a (ty) entry
 	const char *type = strstr(line, "(ty  20)");
 	if (type == NULL)
@@ -1075,7 +1075,7 @@ bool symbol_manager::parse_sym_line(const char *line, FPTR &address, astring &sy
 			in_parens = true;
 		else if (*chptr == ')')
 			in_parens = false;
-		
+
 		// otherwise, look for an 0x address
 		else if (!in_parens && *chptr == '0' && chptr[1] == 'x')
 		{
@@ -1084,11 +1084,11 @@ bool symbol_manager::parse_sym_line(const char *line, FPTR &address, astring &sy
 			if (sscanf(chptr, "0x%p", &temp) != 1)
 				return false;
 			address = m_text_base + reinterpret_cast<FPTR>(temp);
-			
+
 			// skip forward until we're past the space
 			while (*chptr != 0 && !isspace(*chptr))
 				chptr++;
-			
+
 			// extract the symbol name
 			symbol.cpy(chptr).trimspace();
 			return (symbol.len() > 0);
@@ -1123,12 +1123,12 @@ bool symbol_manager::parse_map_line(const char *line, FPTR &address, astring &sy
 		if (sscanf(&line[16], "0x%p", &temp) != 1)
 			return false;
 		address = reinterpret_cast<FPTR>(temp);
-		
+
 		// skip forward until we're past the space
 		const char *chptr = &line[16];
 		while (*chptr != 0 && !isspace(*chptr))
 			chptr++;
-		
+
 		// extract the symbol name
 		symbol.cpy(chptr).trimspace();
 		return (symbol.len() > 0);
@@ -1143,7 +1143,7 @@ bool symbol_manager::parse_map_line(const char *line, FPTR &address, astring &sy
 //-------------------------------------------------
 
 void symbol_manager::format_symbol(const char *name, UINT32 displacement, const char *filename, int linenumber)
-{		
+{
 	// start with the address and offset
 	m_buffer.printf(" (%s", name);
 	if (displacement != 0)
@@ -1156,7 +1156,7 @@ void symbol_manager::format_symbol(const char *name, UINT32 displacement, const 
 	// close up the string
 	m_buffer.cat(")");
 }
-		
+
 
 //-------------------------------------------------
 //  get_text_section_base - figure out the base
@@ -1171,20 +1171,20 @@ FPTR symbol_manager::get_text_section_base()
 	// start with the image base
 	PVOID base = reinterpret_cast<PVOID>(GetModuleHandle(NULL));
 	assert(base != NULL);
-	
+
 	// make sure we have the functions we need
 	if (image_nt_header != NULL && image_rva_to_section != NULL)
 	{
 		// get the NT header
 		PIMAGE_NT_HEADERS headers = (*image_nt_header)(base);
 		assert(headers != NULL);
-		
+
 		// look ourself up (assuming we are in the .text section)
 		PIMAGE_SECTION_HEADER section = (*image_rva_to_section)(headers, base, reinterpret_cast<FPTR>(get_text_section_base) - reinterpret_cast<FPTR>(base));
 		if (section != NULL)
 			return reinterpret_cast<FPTR>(base) + section->VirtualAddress;
 	}
-	
+
 	// fallback to returning the image base (wrong)
 	return reinterpret_cast<FPTR>(base);
 }
@@ -1255,7 +1255,7 @@ void sampling_profiler::stop()
 	// set the flag and wait a couple of seconds (max)
 	m_thread_exit = true;
 	WaitForSingleObject(m_thread, 2000);
-	
+
 	// regardless, close the handle
 	CloseHandle(m_thread);
 }
@@ -1272,18 +1272,18 @@ int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *
 	const FPTR *entry2 = reinterpret_cast<const FPTR *>(item2);
 	int mincount = MIN(entry1[0], entry2[0]);
 
-	// sort in order of: bucket, caller, caller's caller, etc.	
+	// sort in order of: bucket, caller, caller's caller, etc.
 	for (int index = 1; index <= mincount; index++)
 		if (entry1[index] != entry2[index])
 			return entry1[index] - entry2[index];
-	
+
 	// if we match to the end, sort by the depth of the stack
 	return entry1[0] - entry2[0];
 }
 
 
 //-------------------------------------------------
-//  compare_frequency - compare two entries by 
+//  compare_frequency - compare two entries by
 //  their frequency of occurrence
 //-------------------------------------------------
 
@@ -1312,15 +1312,15 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	for (FPTR *current = m_buffer; current < m_buffer_ptr; current += m_entry_stride)
 	{
 		assert(current[0] >= 1 && current[0] < m_entry_stride);
-		
+
 		// convert the sampled PC to its function base as a bucket
 		symbols.symbol_for_address(current[1]);
 		current[1] = symbols.last_base();
 	}
-	
+
 	// step 2: sort the results
 	qsort(m_buffer, (m_buffer_ptr - m_buffer) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_address);
-	
+
 	// step 3: count and collapse unique entries
 	UINT32 total_count = 0;
 	for (FPTR *current = m_buffer; current < m_buffer_ptr; )
@@ -1341,7 +1341,7 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 
 	// step 4: sort the results again, this time by frequency
 	qsort(m_buffer, (m_buffer_ptr - m_buffer) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_frequency);
-	
+
 	// step 5: print the results
 	UINT32 num_printed = 0;
 	for (FPTR *current = m_buffer; current < m_buffer_ptr && num_printed < 30; current += m_entry_stride)
@@ -1349,7 +1349,7 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 		// once we hit 0 frequency, we're done
 		if (current[0] == 0)
 			break;
-		
+
 		// output the result
 		printf("%4.1f%% - %6d : %p%s\n", (double)current[0] * 100.0 / (double)total_count, (UINT32)current[0], reinterpret_cast<void *>(current[1]), symbols.symbol_for_address(current[1]));
 		for (int index = 2; index < m_entry_stride; index++)
@@ -1392,11 +1392,11 @@ void sampling_profiler::thread_run()
 		SuspendThread(m_target_thread);
 		context.ContextFlags = CONTEXT_FULL;
 		GetThreadContext(m_target_thread, &context);
-		
+
 		// first entry is a count
 		FPTR *count = m_buffer_ptr++;
 		*count = 0;
-	
+
 		// iterate over the frames until we run out or hit an error
 		walker.reset(context, m_target_thread);
 		int frame;
@@ -1405,11 +1405,11 @@ void sampling_profiler::thread_run()
 			*m_buffer_ptr++ = walker.ip();
 			*count += 1;
 		}
-		
+
 		// fill in any missing parts with NULLs
 		for (; frame <= m_stack_depth; frame++)
 			*m_buffer_ptr++ = 0;
-			
+
 		// resume the thread
 		ResumeThread(m_target_thread);
 

@@ -560,7 +560,7 @@ static void cclimber_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, c
 	{
 		int x = cclimber_spriteram[offs + 3] + 1;
 		/* x + 1 is evident in cclimber and ckong. It looks worse,
-		but it has been confirmed on several PCBs. */
+        but it has been confirmed on several PCBs. */
 
 		int y = 240 - cclimber_spriteram[offs + 2];
 

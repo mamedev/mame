@@ -94,7 +94,7 @@ void machine_config::detokenize(const machine_config_token *tokens, const device
 {
 	device_config *device = NULL;
 	astring tempstring;
-	
+
 	// increase the parse level
 	m_parse_level++;
 
@@ -278,7 +278,7 @@ void machine_config::detokenize(const machine_config_token *tokens, const device
 				break;
 		}
 	}
-	
+
 	// if we started at parse level 0 (and are thus at level 1), do post-processing
 	if (m_parse_level == 1)
 	{
@@ -299,7 +299,7 @@ void machine_config::detokenize(const machine_config_token *tokens, const device
 				devconfig->m_config_complete = true;
 			}
 	}
-	
+
 	// bump down the parse level
 	m_parse_level--;
 }

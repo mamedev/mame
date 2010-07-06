@@ -183,7 +183,7 @@ legacy_image_device_config_base::~legacy_image_device_config_base()
 
 device_image_partialhash_func legacy_image_device_config_base::get_partial_hash() const
 {
-	return reinterpret_cast<device_image_partialhash_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));	
+	return reinterpret_cast<device_image_partialhash_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
 }
 
 
@@ -225,7 +225,7 @@ bool legacy_image_device_base::is_loaded()
 image_error_t legacy_image_device_base::load_image_by_path(UINT32 open_flags, const char *path)
 {
     file_error filerr = FILERR_NOT_FOUND;
-    image_error_t err = IMAGE_ERROR_FILENOTFOUND;	
+    image_error_t err = IMAGE_ERROR_FILENOTFOUND;
     astring revised_path;
 
     /* attempt to read the file */
@@ -272,7 +272,7 @@ image_error_t legacy_image_device_base::load_image_by_path(UINT32 open_flags, co
 
     return err;
 }
-  
+
 /*-------------------------------------------------
     determine_open_plan - determines which open
     flags to use, and in what order
@@ -312,7 +312,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 
     /* we are now loading */
     m_is_loading = TRUE;
-	
+
     /* record the filename */
     err = set_image_filename(path);
     if (err)
@@ -342,14 +342,14 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 		m_year = m_software_info_ptr->year;
 		//m_playable = m_software_info_ptr->supported;
 	}
-	
+
 	/* did we fail to find the file? */
 	if (!is_loaded())
 	{
 		err = IMAGE_ERROR_FILENOTFOUND;
 		goto done;
 	}
-		
+
 	/* call device load or create */
 	m_create_format = create_format;
 	m_create_args = create_args;
@@ -462,14 +462,14 @@ void legacy_image_device_base::clear()
 {
 	if (m_file)
     {
-        core_fclose(m_file);		
+        core_fclose(m_file);
         m_file = NULL;
     }
 
     m_name.reset();
     m_writeable = FALSE;
     m_created = FALSE;
-	
+
     m_longname.reset();
     m_manufacturer.reset();
     m_year.reset();
@@ -480,7 +480,7 @@ void legacy_image_device_base::clear()
 
 	m_full_software_name = NULL;
 	m_software_info_ptr = NULL;
-	m_software_part_ptr = NULL;	
+	m_software_part_ptr = NULL;
 }
 
 /*-------------------------------------------------
@@ -526,7 +526,7 @@ void legacy_image_device_base::call_display()
 
 device_image_partialhash_func legacy_image_device_base::get_partial_hash()
 {
-	return reinterpret_cast<device_image_partialhash_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));	
+	return reinterpret_cast<device_image_partialhash_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
 }
 
 void legacy_image_device_base::call_get_devices()
@@ -534,7 +534,7 @@ void legacy_image_device_base::call_get_devices()
 	device_image_get_devices_func func = reinterpret_cast<device_image_get_devices_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_GET_DEVICES));
 	if (func) (*func)(*this);
 }
-	
+
 void *legacy_image_device_base::get_device_specific_call()
 {
 	return (void*) m_config.get_legacy_config_fct(DEVINFO_FCT_DEVICE_SPECIFIC);

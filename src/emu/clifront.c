@@ -97,7 +97,7 @@ static const options_entry cli_options[] =
 	{ "listdevices;ld",           "0",        OPTION_COMMAND,    "list available devices" },
 	{ "listmedia;lm",             "0",        OPTION_COMMAND,    "list available media for the system" },
 	{ "listsoftware",             "0",        OPTION_COMMAND,    "list known software for the system" },
-	
+
 	{ NULL }
 };
 
@@ -904,8 +904,8 @@ static int info_listsoftware(core_options *options, const char *gamename)
 										fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
 										if ( part->interface_ )
 											fprintf( out, " interface=\"%s\"", part->interface_ );
-//											if ( part->feature )
-//												fprintf( out, " features=\"%s\"", part->feature );
+//                                          if ( part->feature )
+//                                              fprintf( out, " features=\"%s\"", part->feature );
 										fprintf( out, ">\n");
 
 										/* TODO: display rom region information */
@@ -977,8 +977,8 @@ static int info_listsoftware(core_options *options, const char *gamename)
 
 
 /*-------------------------------------------------
-    softlist_match_roms - scan for a matching 
-	software ROM by hash
+    softlist_match_roms - scan for a matching
+    software ROM by hash
 -------------------------------------------------*/
 static void softlist_match_roms(core_options *options, const char *hash, int length, int *found)
 {
@@ -1073,7 +1073,7 @@ static int info_listmedia(core_options *options, const char *gamename)
 
 				printf("%-13s%-12s%-8s   ", driver_name, name, paren_shortname);
 				driver_name = " ";
-				
+
 				astring extensions(src);
 				char *ext = strtok((char*)extensions.cstr(),",");
 				while (ext != NULL)

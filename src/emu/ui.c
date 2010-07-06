@@ -1261,8 +1261,8 @@ void ui_paste(running_machine *machine)
 }
 
 /*-------------------------------------------------
-    ui_image_handler_ingame - execute display 
-	callback function for each image device
+    ui_image_handler_ingame - execute display
+    callback function for each image device
 -------------------------------------------------*/
 
 void ui_image_handler_ingame(running_machine *machine)

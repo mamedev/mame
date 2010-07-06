@@ -1,12 +1,12 @@
 /*
         Driver: aristmk4
-        
+
         Manufacturer: Aristocrat Leisure Industries
         Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
         Driver by Palindrome & FraSher
-        
+
         Technical Notes:
-        
+
         68B09EP Motorola Processor
         R6545AP for CRT video controller
         UPD43256BCZ-70LL for 32kb of static ram used for 3 way electronic meters / 3 way memory
@@ -16,59 +16,59 @@
         2 x WF19054 = AY3-8910 sound chips driven by the 6522 VIA
         1 x PML 2852 ( programmable logic ) used as address decoder.
         1 x PML 2852 programmed as a PIA
-        
-        
+
+
         PIA provides output signals to six mechanical meters.
         It also provides the real time clock DS1287 to the CPU.
-        
+
         VIA drives the programmable sound generators and generates
         a timing interrupt to the CPU (M6809_FIRQ_LINE)
-        
+
         The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
         The remaining 4 bits are connected to other hardware, read via the VIA.
-        
+
         The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
         The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
 
         *************************************************************************************************************
-     
+
         27/04/10 - FrasheR
         2 x Sound Chips connected to the 6522 VIA.
-        
-        
+
+
         16/05/10 - FrasheR
         Fixed VIA for good. 5010 - 501F.
         Hooked up push button inputs - FrasheR
         Hooked up ports for the PML 2852 U3 - FrasheR
-        
+
         16/05/10 - Palindrome
         Lamp outputs and layout added - Palindrome
-        NVRAM backup - Palindrome 
-        
+        NVRAM backup - Palindrome
+
         20/05/10 - Palindrome
         Connected SW7 for BGCOLOUR map select
         Added LK13. 3Mhz or 1.5 Mhz CPU speed select
         Added sound sample for mechanical meter pulse ( aristmk4.zip  ).
-        
+
         30/5/10 - Palindrome
         Now using mc146818 rtc driver instead of rtc_get_reg.
-        
+
         The mc146818 driver is buggy - reported problem to Firewave and issues will be addressed.
         In this driver, the wrong day of the month is shown, wrong hours are shown.
         rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data.
-                
+
         TODO:
         1.Create layouts for each game  ( each game is currently using the generic aristmk4.lay for now ).
         - Games may have different button configuration requirements ( ie.. 9 or 5 lines and different bet values )
-        
+
         2.Extend the driver to use the keno keyboard input for keno games.
-        
+
         3.Some with cashcade jackpot systems such as topgear do not work yet. Eforest does not work.
-        
+
         5.Add note acceptor support
-        
+
         6.Robot test
-       
+
 ***********************************************************************************************************************************************/
 
 #define MAIN_CLOCK	XTAL_12MHz
@@ -111,17 +111,17 @@ static VIDEO_START(aristmk4)
     int tile;
     for (tile = 0; tile < machine->gfx[0]->total_elements; tile++)
     {
-		gfx_element_decode(machine->gfx[0], tile); 
+		gfx_element_decode(machine->gfx[0], tile);
     }
 }
 
 INLINE void uBackgroundColour(running_machine *machine)
 {
-    /* SW7 can be set when the main door is open, this allows the colours for the background 
-        to be adjusted whilst the machine is running. 
-       
+    /* SW7 can be set when the main door is open, this allows the colours for the background
+        to be adjusted whilst the machine is running.
+
        There are 4 possible combinations for colour select via SW7, colours vary based on software installed.
-    
+
     */
     switch(input_port_read(machine, "SW7"))
 	{
@@ -131,19 +131,19 @@ INLINE void uBackgroundColour(running_machine *machine)
                                                              // OE enabled on both shapes
              break;
         case 0x01:
-             // unselect U22 via SW7 . OE on U22 is low. 
+             // unselect U22 via SW7 . OE on U22 is low.
              memset(&shapeRomPtr[0x4000],0xff,0x2000);               // fill unused space with 0xff
              memcpy(&shapeRomPtr[0xa000],&shapeRom[0xa000], 0x2000); // restore defaults here
              break;
         case 0x02:
-             // unselect U47 via SW7 . OE on U47 is low. 
+             // unselect U47 via SW7 . OE on U47 is low.
              memcpy(&shapeRomPtr[0x4000],&shapeRom[0x4000], 0x2000);
-             memset(&shapeRomPtr[0xa000],0xff,0x2000);              
+             memset(&shapeRomPtr[0xa000],0xff,0x2000);
              break;
         case 0x03:
              // unselect U47 & u22 via SW7. both output enable low.
              memset(&shapeRomPtr[0x4000],0xff,0x2000);
-             memset(&shapeRomPtr[0xa000],0xff,0x2000); 
+             memset(&shapeRomPtr[0xa000],0xff,0x2000);
              break;
     }
 }
@@ -158,7 +158,7 @@ static VIDEO_UPDATE(aristmk4)
     int bgtile;
     int flipx;
     int flipy;
-    
+
 	for (y=27;y--;)
 	{
 		for (x=38;x--;)
@@ -191,7 +191,7 @@ static READ8_HANDLER(ldsw)
 
 static READ8_HANDLER(cgdrr)
 {
-    
+
    if(cgdrsw) // is the LC closed
    {
         return ripple; // return a positive value from the ripple counter
@@ -201,9 +201,9 @@ static READ8_HANDLER(cgdrr)
 
 static WRITE8_HANDLER(cgdrw)
 {
-   
+
     ripple = data;
-      
+
 }
 
 static WRITE8_HANDLER(u3_p0)
@@ -224,7 +224,7 @@ static READ8_HANDLER(u3_p2)
     output_set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
 
     if (u3_p0_w&0x20) // DOPTE on
-    { 
+    {
         if (u3_p3_ret&0x02) // door closed
     	        u3_p2_ret = u3_p2_ret^0x08; // DOPTI on
 	}
@@ -266,7 +266,7 @@ PORTB - MECHANICAL METERS
 
 
 static READ8_HANDLER(mkiv_pia_ina)
-{  
+{
     return mc146818_port_r(space,1);
 }
 
@@ -278,15 +278,15 @@ static WRITE8_HANDLER(mkiv_pia_outa)
     {
         mc146818_port_w(space,1,data);
         //logerror("rtc protocol write data: %02X\n",data);
-        
+
     }
-    else 
+    else
     {
         mc146818_port_w(space,0,data);
         //logerror("rtc protocol write address: %02X\n",data);
-        
+
     }
-    
+
 }
 
 //output ca2
@@ -316,18 +316,18 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
      emet[0] = data & 0x01;	/* emet1  -  bit 1 - PB0 */
     						/* seren1 -  bit 2 - PB1 */
      emet[1] = data & 0x04; /* emet3  -  bit 3 - PB2 */
-     emet[2] = data & 0x08; /* emet4  -  bit 4 - PB3 */  
-     emet[3] = data & 0x10; /* emet5  -  bit 5 - PB4 */  
-     emet[4] = data & 0x20; /* emet6  -  bit 6 - PB5 */ 
-    
-     
+     emet[2] = data & 0x08; /* emet4  -  bit 4 - PB3 */
+     emet[3] = data & 0x10; /* emet5  -  bit 5 - PB4 */
+     emet[4] = data & 0x20; /* emet6  -  bit 6 - PB5 */
+
+
 
      for(i = 0;i<sizeof(emet);i++)
      {
             if(emet[i])
             {
                 //logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
-                sample_start(samples,i,0, FALSE); // pulse sound for mechanical meters 
+                sample_start(samples,i,0, FALSE); // pulse sound for mechanical meters
             }
      }
 
@@ -338,8 +338,8 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
 static const char *const meter_sample_names[] =
 {
     "*aristmk4",
-	"tick.wav",  
-	0	
+	"tick.wav",
+	0
 };
 
 static const samples_interface meter_samples_interface =
@@ -426,7 +426,7 @@ static READ8_DEVICE_HANDLER(via_b_r)
 			break;
 
 		default:
-		 	break; //timer will reset the input
+			break; //timer will reset the input
 	}
 
 
@@ -578,7 +578,7 @@ static WRITE8_DEVICE_HANDLER(via_cb2_w)
 	// as soon as it is 1, HOPCO1 to remain 'ON'
 
 	if (data==0x01)
-   		hopper_motor=data;
+		hopper_motor=data;
 	else if (hopper_motor<0x02)
 		hopper_motor=data;
 }
@@ -596,7 +596,7 @@ static WRITE8_DEVICE_HANDLER(pblp_out)
     output_set_lamp_value(4, (data >> 5) & 1);
     output_set_lamp_value(2, (data >> 6) & 1);
     output_set_lamp_value(10,(data >> 7) & 1);
-    
+
     //logerror("Lights port A %02X\n",data);
 }
 
@@ -610,7 +610,7 @@ static WRITE8_DEVICE_HANDLER(pbltlp_out)
     output_set_lamp_value(15, (data >> 5) & 1); // light tower
     output_set_lamp_value(16, (data >> 6) & 1); // light tower
     output_set_lamp_value(17, (data >> 7) & 1); // light tower
-    
+
     //logerror("Lights port B: %02X\n",data);
 
 
@@ -641,7 +641,7 @@ static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_BASE_SIZE_GENERIC(nvram)
-	
+
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
 	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
 	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("5003")
@@ -652,7 +652,7 @@ static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE("via6522_0",via_r,via_w)
 	AM_RANGE(0x5200, 0x5200) AM_READ_PORT("5200")
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
-	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w) 
+	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
 	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0",pia6821_r,pia6821_w)  // RTC data - PORT A , mechanical meters - PORTB ??
 	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
@@ -663,7 +663,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(aristmk4)
 
     /***********************************************************************************************************/
-    
+
     PORT_START("via_port_b")
     PORT_DIPNAME( 0x40, 0x40, "HOPCO1" )
     PORT_DIPSETTING(    0x40, DEF_STR( On ) ) PORT_DIPLOCATION("AY:3")
@@ -671,16 +671,16 @@ static INPUT_PORTS_START(aristmk4)
     PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("AY:4")
 
 	/************************************************************************************************************
-    
+
     5002
- 
+
     ************************************************************************************************************/
-    
+
     PORT_START("5002")
 	PORT_DIPNAME( 0x01, 0x00, "HOPCO2") // coins out hopper 2 , why triggers logic door ?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-   	PORT_DIPNAME( 0x02, 0x02, "CBOPT2") // coin in cash box 2
+	PORT_DIPNAME( 0x02, 0x02, "CBOPT2") // coin in cash box 2
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) ) PORT_DIPLOCATION("5002:2")
 	PORT_DIPNAME( 0x04, 0x00, "HOPHI2") // hopper 2 full
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:3")
@@ -688,7 +688,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x08, 0x00, "DOPTI")  // photo optic door
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("AUDTSW") PORT_TOGGLE PORT_CODE(KEYCODE_K)
-   	PORT_DIPNAME( 0x20, 0x00, "HOPLO1") // hopper 1 low
+	PORT_DIPNAME( 0x20, 0x00, "HOPLO1") // hopper 1 low
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "HOPLO2") // hopper 2 low
@@ -698,16 +698,16 @@ static INPUT_PORTS_START(aristmk4)
 
 
     /************************************************************************************************************
-    
+
     5003
- 
+
     ************************************************************************************************************/
-    
+
     PORT_START("5003")
 	PORT_DIPNAME( 0x01, 0x00, "OPTAUI") // opto audit in
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-   	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DSWDT") PORT_TOGGLE PORT_CODE(KEYCODE_M) // main door switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DSWDT") PORT_TOGGLE PORT_CODE(KEYCODE_M) // main door switch
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("JKPTSW") PORT_TOGGLE PORT_CODE(KEYCODE_J) // jackpot reset switch
 	PORT_DIPNAME( 0x08, 0x00, "HOPHI1") // hopper 1 full
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:4")
@@ -715,7 +715,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x10, 0x00, "OPTA2") // coin in a2
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-   	PORT_DIPNAME( 0x20, 0x20, "OPTB2") // coin in b2
+	PORT_DIPNAME( 0x20, 0x20, "OPTB2") // coin in b2
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "PTRTAC") // printer taco
@@ -724,13 +724,13 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x80, 0x00, "PTRHOM") // printer home
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	
+
 	/************************************************************************************************************
-    
+
     5300
- 
+
     ************************************************************************************************************/
-    
+
     PORT_START("5300")
 	PORT_DIPNAME( 0x01, 0x00, "5300-1")
 	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:1")
@@ -761,31 +761,31 @@ static INPUT_PORTS_START(aristmk4)
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_T) // 5 credits per line
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10 CREDITS PER LINE") PORT_CODE(KEYCODE_Y) // 10 credits per line
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_Q)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESERVE") PORT_CODE(KEYCODE_A) // reserve 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESERVE") PORT_CODE(KEYCODE_A) // reserve
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("GAMBLE") PORT_CODE(KEYCODE_U) // auto gamble & gamble
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TAKE WIN") PORT_CODE(KEYCODE_J)
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_U)
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_I)
-    
+
     PORT_START("500e")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 CREDIT PER LINE") PORT_CODE(KEYCODE_W) // 1 credit per line
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1") PORT_CODE(KEYCODE_S) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1") PORT_CODE(KEYCODE_S)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2 CREDITS PER LINE") PORT_CODE(KEYCODE_E) // 2 credits per line
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 9") PORT_CODE(KEYCODE_H) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 9") PORT_CODE(KEYCODE_H)
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3 CREDITS PER LINE") PORT_CODE(KEYCODE_R) // 3 credits per line
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 7") PORT_CODE(KEYCODE_G)
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5") PORT_CODE(KEYCODE_F)
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3") PORT_CODE(KEYCODE_D)
-    
+
     PORT_START("500f")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_1)
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_2)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_3)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("AUX - PB5") PORT_CODE(KEYCODE_X) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("AUX - PB5") PORT_CODE(KEYCODE_X)
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("MEM TEST - PB4") PORT_CODE(KEYCODE_C)
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOPPER TEST - PB3") PORT_CODE(KEYCODE_V)
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PRINT DATA - PB2") PORT_CODE(KEYCODE_B)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("CLOCK INIT - PB1") PORT_CODE(KEYCODE_N) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("CLOCK INIT - PB1") PORT_CODE(KEYCODE_N)
 
 	PORT_START("5200")
 	PORT_DIPNAME( 0x01, 0x00, "5200-1")
@@ -843,28 +843,28 @@ static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("insertcoin")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Insert Credit")
-	
+
 	/************************************************************************************************************
-    
+
     Logic Door switch
- 
+
     ************************************************************************************************************/
-    
+
     PORT_START("CGDRSW")
     PORT_DIPNAME( 0x10, 0x10, "CGDRSW" ) PORT_DIPLOCATION("CGDRSW:1")	/* toggle switch */
     PORT_DIPSETTING(    0x00, "Open" )
 	PORT_DIPSETTING(    0x10, "Closed" )
-	
+
 	/************************************** LINKS ***************************************************************/
-   
+
     PORT_START("LK13")
-    PORT_DIPNAME( 0x10, 0x10, "Speed Select" ) PORT_DIPLOCATION("LK13:1")	
+    PORT_DIPNAME( 0x10, 0x10, "Speed Select" ) PORT_DIPLOCATION("LK13:1")
     PORT_DIPSETTING(    0x00, "3 Mhz" )
 	PORT_DIPSETTING(    0x10, "1.5 Mhz" )
 
-	
+
 	/********************************* Dip switch for background color *************************************************/
-	
+
 	PORT_START("SW7")
 	PORT_DIPNAME( 0x01, 0x01, "SW7 - U22 BG COLOR" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW7:1")
@@ -872,10 +872,10 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x02, 0x00, "SW7 - U47 BG COLOR" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW7:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	
-	
+
+
 	/********************************* 9 way control rotary switches ***************************************************/
-	
+
 	PORT_START("SW3")
     PORT_DIPNAME( 0x0f, 0x00, "SW3 - M/C NO" )
 	PORT_DIPSETTING(    0x00, "0" )
@@ -901,7 +901,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x07, "7" )
 	PORT_DIPSETTING(    0x08, "8" )
 	PORT_DIPSETTING(    0x09, "9" )
-	
+
 	PORT_START("SW5")
     PORT_DIPNAME( 0x0f, 0x00, "SW5 - M/C NO" )
 	PORT_DIPSETTING(    0x00, "0" )
@@ -914,7 +914,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x07, "7" )
 	PORT_DIPSETTING(    0x08, "8" )
 	PORT_DIPSETTING(    0x09, "9" )
-	
+
 	PORT_START("SW6")
     PORT_DIPNAME( 0x0f, 0x00, "SW6 - M/C NO" )
 	PORT_DIPSETTING(    0x00, "0" )
@@ -927,9 +927,9 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x07, "7" )
 	PORT_DIPSETTING(    0x08, "8" )
 	PORT_DIPSETTING(    0x09, "9" )
-	
+
 	/***************** DIP SWITCHES **********************************************************************/
-	
+
     PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "DSW1 - Maxbet rejection" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW1:1")
@@ -1135,13 +1135,13 @@ static PALETTE_INIT( aristmk4 )
 static DRIVER_INIT( aristmk4 )
 {
     mc146818_init(machine, MC146818_IGNORE_CENTURY);
-	shapeRomPtr = (UINT8 *)memory_region(machine, "tile_gfx"); 
+	shapeRomPtr = (UINT8 *)memory_region(machine, "tile_gfx");
     memcpy(shapeRom,shapeRomPtr,sizeof(shapeRom)); // back up
 }
 
 static MACHINE_START( aristmk4 )
 {
-    
+
 	samples = devtag_get_device(machine, "samples");
     state_save_register_global_pointer(machine, nvram,0x1000); // nvram
 }
@@ -1204,11 +1204,11 @@ static MACHINE_DRIVER_START( aristmk4 )
     MDRV_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
     MDRV_SOUND_CONFIG(ay8910_config2)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-    
+
     MDRV_SOUND_ADD("samples", SAMPLES, 0)
     MDRV_SOUND_CONFIG(meter_samples_interface)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-    
+
 
 MACHINE_DRIVER_END
 

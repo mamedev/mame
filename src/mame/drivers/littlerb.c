@@ -77,7 +77,7 @@ static int paldac_offset = 0;
 
 
 WRITE16_HANDLER( region4_w )
-{	
+{
 	COMBINE_DATA(&littlerb_region4[offset]);
 }
 
@@ -93,19 +93,19 @@ WRITE16_HANDLER(palette_offset_w)
 WRITE16_HANDLER( palette_data_w )
 {
 	//printf("palette write %04x\n",data);
-	
+
 	paldac[paldac_select][paldac_offset] = data;
 	paldac_select++;
 	if (paldac_select==3)
 	{
 		int r,g,b;
-		
+
 		r = paldac[0][paldac_offset];
 		g = paldac[1][paldac_offset];
 		b = paldac[2][paldac_offset];
-		
+
 		palette_set_color(space->machine,paldac_offset,MAKE_RGB(r,g,b));
-	
+
 		paldac_select = 0;
 		paldac_offset++;
 		paldac_offset&=0x7f;
@@ -114,27 +114,27 @@ WRITE16_HANDLER( palette_data_w )
 
 WRITE16_HANDLER( palette_reset_w )
 {
-//	printf("palette reset write %04x\n",data);
-	
+//  printf("palette reset write %04x\n",data);
+
 	paldac_select = 0;
 	paldac_offset = 0;
-	
+
 }
 
 /* this map is wrong because our VDP access is wrong! */
 static ADDRESS_MAP_START( littlerb_vdp_map8, 0, 16 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM_WRITE(region4_w)
-	
+
 	/* these are definitely written by a non-incrementing access to the VDP */
 	AM_RANGE(0x00800000, 0x00800001) AM_WRITE(palette_offset_w)
 	AM_RANGE(0x00800002 ,0x00800003) AM_WRITE(palette_data_w)
 	AM_RANGE(0x00800004 ,0x00800005) AM_WRITE(palette_reset_w)
-	
+
 
 
 	AM_RANGE(0x0ff80000, 0x0fffffff) AM_RAM_WRITE(region4_w)
-	
-	
+
+
 	AM_RANGE(0x1ff80000, 0x1fffffff)  AM_RAM_WRITE(region4_w) AM_BASE(&littlerb_region4)
 ADDRESS_MAP_END
 
@@ -166,7 +166,7 @@ public:
 	{
 		return global_alloc(littlerb_vdp_device_config(mconfig, tag, owner, clock));
 	}
-	
+
 	virtual device_t *alloc_device(running_machine &machine) const
 	{
 		return auto_alloc(&machine, littlerb_vdp_device(machine, *this));
@@ -177,7 +177,7 @@ protected:
 	{
 		return (spacenum == 0) ? &m_space_config : NULL;
 	}
-	
+
 	address_space_config		m_space_config;
 };
 
@@ -424,7 +424,7 @@ static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int x
 	UINT16* spritegfx = littlerb_region4;
 	int x,y;
 	//int pal = 1;
-	
+
 	for (y=0;y<ysize;y++)
 	{
 		for (x=0;x<xsize;x++)
@@ -434,7 +434,7 @@ static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int x
 			UINT8 pix2 = (spritegfx[offset]>>8)&0x0f;
 			drawxpos = xpos+x*2;
 			drawypos = ypos+y;
-			
+
 			pix1+=pal*0x10;
 			pix2+=pal*0x10;
 
@@ -477,11 +477,11 @@ static VIDEO_UPDATE(littlerb)
 		// e.g  ffc010000
 		code =  (spriteregion[offs+0] & 0xfff0)>>4;
 		code |=  (spriteregion[offs+1] & 0x003f)<<12;
-		
+
 		pal = 0;//(spriteregion[offs+4] & 0xf000)>>13; // where is the colour bit?!
-		
+
 		//if (code!=0) printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
-		
+
 		draw_sprite(bitmap,xsize,ysize,code,x-8,y-16, pal);
 	}
 

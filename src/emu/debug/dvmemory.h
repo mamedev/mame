@@ -51,7 +51,7 @@
 class debug_view_memory_source : public debug_view_source
 {
 	friend class debug_view_memory;
-	
+
 	debug_view_memory_source(const char *name, const address_space &space);
 	debug_view_memory_source(const char *name, const region_info &region);
 	debug_view_memory_source(const char *name, void *base, int element_size, int num_elements);

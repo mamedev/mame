@@ -572,7 +572,7 @@ static WRITE16_HANDLER( adsp_rombank_w )
 static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 {
 	cpu_device *adsp = timer.machine->device<cpu_device>("adsp");
-	
+
 	/* get the index register */
 	int reg = adsp->state(ADSP2100_I0 + adsp_ireg);
 

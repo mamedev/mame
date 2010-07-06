@@ -47,11 +47,11 @@ static ADDRESS_MAP_START( janshi_vdp_map8, 0, 8 )
 
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE(&janshi_back_vram) // bg tilemap?
 	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE(&janshi_vram1) // xpos, colour, tile number etc.
-	
+
 	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_BASE(&janshi_unk1) // ?? height related?
 	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_BASE(&janshi_widthflags)
 	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_BASE(&janshi_unk2) // 2x increasing tables 00 10 20 30 etc.
-	
+
 	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_BASE(&janshi_vram2) // y pos + unknown
 
 	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
@@ -320,7 +320,7 @@ static VIDEO_UPDATE( pinkiri8 )
 				}
 				else if (spr_offs<0x580)
 				{
-				//	height = 2;
+				//  height = 2;
 				}
 				else if (spr_offs<0x880)
 				{
@@ -328,11 +328,11 @@ static VIDEO_UPDATE( pinkiri8 )
 				}
 				else if (spr_offs<0x1000)
 				{
-				//	height = 2;
+				//  height = 2;
 				}
 				else if (spr_offs<0x1080)
 				{
-				//	height = 2;
+				//  height = 2;
 				}
 				else if (spr_offs<0x1700)
 				{
@@ -340,7 +340,7 @@ static VIDEO_UPDATE( pinkiri8 )
 				}
 				else if (spr_offs<0x1730)
 				{
-				//	height = 2;
+				//  height = 2;
 				}
 				else if (spr_offs<0x1930)
 				{

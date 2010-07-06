@@ -4027,7 +4027,7 @@ WRITE8_HANDLER( K053247_w )
 	else
 		K053247_ram[offs] = (K053247_ram[offs] & 0x00ff) | (data<<8);
 }
-#endif 
+#endif
 
 // Mystic Warriors hardware games support a non-OBJCHA based ROM readback
 // write the address to the 246 as usual, but there's a completely separate ROM

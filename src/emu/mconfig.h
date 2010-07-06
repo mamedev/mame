@@ -243,11 +243,11 @@ class machine_config
 	DISABLE_COPYING(machine_config);
 
 	friend class running_machine;
-	
+
 public:
 	machine_config(const machine_config_token *tokens);
 	~machine_config();
-	
+
 	void detokenize(const machine_config_token *tokens, const device_config *owner = NULL);
 
 	driver_data_alloc_func	m_driver_data_alloc;		// allocator for driver data
@@ -260,15 +260,15 @@ public:
 	machine_start_func		m_machine_start;			// one-time machine start callback
 	machine_reset_func		m_machine_reset;			// machine reset callback
 
-	nvram_handler_func		m_nvram_handler;			// NVRAM save/load callback 
-	memcard_handler_func	m_memcard_handler;			// memory card save/load callback 
+	nvram_handler_func		m_nvram_handler;			// NVRAM save/load callback
+	memcard_handler_func	m_memcard_handler;			// memory card save/load callback
 
 	UINT32					m_video_attributes;			// flags describing the video system
 	const gfx_decode_entry *m_gfxdecodeinfo;			// pointer to array of graphics decoding information
 	UINT32					m_total_colors;				// total number of colors in the palette
 	const char *			m_default_layout;			// default layout for this machine
 
-	palette_init_func		m_init_palette;				// one-time palette init callback 
+	palette_init_func		m_init_palette;				// one-time palette init callback
 	video_start_func		m_video_start;				// one-time video start callback
 	video_reset_func		m_video_reset;				// video reset callback
 	video_eof_func			m_video_eof;				// end-of-frame video callback

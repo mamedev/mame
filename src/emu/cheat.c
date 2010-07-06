@@ -409,7 +409,7 @@ void cheat_reload(running_machine *machine)
 
 	/* load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
        and MAME will load gamename.xml */
-	device_image_interface *image = NULL;	
+	device_image_interface *image = NULL;
 	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		if (image->exists())
@@ -423,7 +423,7 @@ void cheat_reload(running_machine *machine)
 			}
 		}
 	}
-	if (cheatinfo->cheatlist == NULL) 
+	if (cheatinfo->cheatlist == NULL)
 	{
 		cheatinfo->cheatlist = cheat_list_load(machine, machine->basename());
 	}

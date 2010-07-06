@@ -141,7 +141,7 @@ debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_up
 
 
 //-------------------------------------------------
-//  enumerate_sources - enumerate all possible 
+//  enumerate_sources - enumerate all possible
 //  sources for a memory view
 //-------------------------------------------------
 
@@ -195,7 +195,7 @@ void debug_view_memory::enumerate_sources()
 
 
 //-------------------------------------------------
-//  view_notify - handle notification of updates 
+//  view_notify - handle notification of updates
 //  to cursor changes
 //-------------------------------------------------
 
@@ -308,7 +308,7 @@ void debug_view_memory::view_update()
 
 
 //-------------------------------------------------
-//  view_char - handle a character typed within 
+//  view_char - handle a character typed within
 //  the current view
 //-------------------------------------------------
 
@@ -426,7 +426,7 @@ void debug_view_memory::view_char(int chval)
 
 
 //-------------------------------------------------
-//  recompute - recompute the internal data and 
+//  recompute - recompute the internal data and
 //  structure of the memory view
 //-------------------------------------------------
 
@@ -502,7 +502,7 @@ void debug_view_memory::recompute()
 
 
 //-------------------------------------------------
-//  needs_recompute - determine if anything has 
+//  needs_recompute - determine if anything has
 //  changed that requires a recomputation
 //-------------------------------------------------
 
@@ -535,7 +535,7 @@ bool debug_view_memory::needs_recompute()
 
 
 //-------------------------------------------------
-//  get_cursor_pos - return the cursor position as 
+//  get_cursor_pos - return the cursor position as
 //  an address and a shift value
 //-------------------------------------------------
 
@@ -569,7 +569,7 @@ debug_view_memory::cursor_pos debug_view_memory::get_cursor_pos()
 
 
 //-------------------------------------------------
-//  set_cursor_pos - set the cursor position as a 
+//  set_cursor_pos - set the cursor position as a
 //  function of an address and a shift value
 //-------------------------------------------------
 
@@ -717,7 +717,7 @@ void debug_view_memory::write(UINT8 size, offs_t offs, UINT64 data)
 
 
 //-------------------------------------------------
-//  set_expression - set the expression string 
+//  set_expression - set the expression string
 //  describing the home address
 //-------------------------------------------------
 
@@ -731,7 +731,7 @@ void debug_view_memory::set_expression(const char *expression)
 
 
 //-------------------------------------------------
-//  set_bytes_per_chunk - specify the number of 
+//  set_bytes_per_chunk - specify the number of
 //  bytes displayed per chunk
 //-------------------------------------------------
 
@@ -756,7 +756,7 @@ void debug_view_memory::set_bytes_per_chunk(UINT8 chunkbytes)
 
 
 //-------------------------------------------------
-//  set_chunks_per_row - specify the number of 
+//  set_chunks_per_row - specify the number of
 //  chunks displayed across a row
 //-------------------------------------------------
 
@@ -773,7 +773,7 @@ void debug_view_memory::set_chunks_per_row(UINT32 rowchunks)
 
 
 //-------------------------------------------------
-//  set_reverse - specify true if the memory view 
+//  set_reverse - specify true if the memory view
 //  is displayed reverse
 //-------------------------------------------------
 
@@ -787,7 +787,7 @@ void debug_view_memory::set_reverse(bool reverse)
 
 
 //-------------------------------------------------
-//  set_ascii - specify TRUE if the memory view 
+//  set_ascii - specify TRUE if the memory view
 //  should display an ASCII representation
 //-------------------------------------------------
 
@@ -801,8 +801,8 @@ void debug_view_memory::set_ascii(bool ascii)
 
 
 //-------------------------------------------------
-//  set_physical - specify true if the memory view 
-//  should display physical addresses versus 
+//  set_physical - specify true if the memory view
+//  should display physical addresses versus
 //  logical addresses
 //-------------------------------------------------
 

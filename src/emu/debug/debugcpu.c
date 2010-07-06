@@ -1529,7 +1529,7 @@ static UINT64 get_cpunum(void *globalref, void *ref)
 {
 	running_machine *machine = (running_machine *)globalref;
 	device_t *target = machine->debugcpu_data->visiblecpu;
-	
+
 	device_execute_interface *exec;
 	int index = 0;
 	for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
@@ -1579,7 +1579,7 @@ device_debug::device_debug(device_t &device, symbol_table *globalsyms)
 {
 	memset(m_pc_history, 0, sizeof(m_pc_history));
 	memset(m_wplist, 0, sizeof(m_wplist));
-	
+
 	// find out which interfaces we have to work with
 	device.interface(m_exec);
 	device.interface(m_memory);
@@ -1592,7 +1592,7 @@ device_debug::device_debug(device_t &device, symbol_table *globalsyms)
 		// add a global symbol for the current instruction pointer
 		if (m_exec != NULL)
 			symtable_add_register(m_symtable, "cycles", NULL, get_cycles, NULL);
-		
+
 		// add entries to enable/disable unmap reporting for each space
 		if (m_memory != NULL)
 		{
@@ -1615,7 +1615,7 @@ device_debug::device_debug(device_t &device, symbol_table *globalsyms)
 	{
 		m_flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
 		m_opwidth = min_opcode_bytes();
-	
+
 		// if no curpc, add one
 		if (m_state != NULL && symtable_find(m_symtable, "curpc") == NULL)
 			symtable_add_register(m_symtable, "curpc", NULL, get_current_pc, 0);
@@ -1632,7 +1632,7 @@ device_debug::~device_debug()
 	// free the symbol table
 	if (m_symtable != NULL)
 		symtable_free(m_symtable);
-	
+
 	// free breakpoints and watchpoints
 	breakpoint_clear_all();
 	watchpoint_clear_all();
@@ -1640,7 +1640,7 @@ device_debug::~device_debug()
 
 
 //-------------------------------------------------
-//  start_hook - the scheduler calls this hook 
+//  start_hook - the scheduler calls this hook
 //  before beginning execution for the given device
 //-------------------------------------------------
 
@@ -1699,7 +1699,7 @@ void device_debug::start_hook(attotime endtime)
 
 
 //-------------------------------------------------
-//  stop_hook - the scheduler calls this hook when 
+//  stop_hook - the scheduler calls this hook when
 //  ending execution for the given device
 //-------------------------------------------------
 
@@ -1722,7 +1722,7 @@ void device_debug::stop_hook()
 
 
 //-------------------------------------------------
-//  interrupt_hook - called when an interrupt is 
+//  interrupt_hook - called when an interrupt is
 //  acknowledged
 //-------------------------------------------------
 
@@ -1741,7 +1741,7 @@ void device_debug::interrupt_hook(int irqline)
 
 
 //-------------------------------------------------
-//  exception_hook - called when an exception is 
+//  exception_hook - called when an exception is
 //  generated
 //-------------------------------------------------
 
@@ -1760,7 +1760,7 @@ void device_debug::exception_hook(int exception)
 
 
 //-------------------------------------------------
-//  instruction_hook - called by the CPU cores 
+//  instruction_hook - called by the CPU cores
 //  before executing each instruction
 //-------------------------------------------------
 
@@ -1889,8 +1889,8 @@ void device_debug::instruction_hook(offs_t curpc)
 
 
 //-------------------------------------------------
-//  memory_read_hook - the memory system calls 
-//  this hook when watchpoints are enabled and a 
+//  memory_read_hook - the memory system calls
+//  this hook when watchpoints are enabled and a
 //  memory read happens
 //-------------------------------------------------
 
@@ -1906,8 +1906,8 @@ void device_debug::memory_read_hook(const address_space &space, offs_t address, 
 
 
 //-------------------------------------------------
-//  memory_write_hook - the memory system calls 
-//  this hook when watchpoints are enabled and a 
+//  memory_write_hook - the memory system calls
+//  this hook when watchpoints are enabled and a
 //  memory write happens
 //-------------------------------------------------
 
@@ -1918,7 +1918,7 @@ void device_debug::memory_write_hook(const address_space &space, offs_t address,
 
 
 //-------------------------------------------------
-//  set_instruction_hook - set a hook to be 
+//  set_instruction_hook - set a hook to be
 //  called on each instruction for a given device
 //-------------------------------------------------
 
@@ -1934,7 +1934,7 @@ void device_debug::set_instruction_hook(debug_instruction_hook_func hook)
 
 
 //-------------------------------------------------
-//  disassemble - disassemble a line at a given 
+//  disassemble - disassemble a line at a given
 //  PC on a given device
 //-------------------------------------------------
 
@@ -1988,14 +1988,14 @@ void device_debug::ignore(bool ignore)
 
 
 //-------------------------------------------------
-//  single_step - single step the device past the 
+//  single_step - single step the device past the
 //  requested number of instructions
 //-------------------------------------------------
 
 void device_debug::single_step(int numsteps)
 {
 	debugcpu_private *global = m_device.machine->debugcpu_data;
-	
+
 	assert(m_exec != NULL);
 
 	m_stepsleft = numsteps;
@@ -2006,7 +2006,7 @@ void device_debug::single_step(int numsteps)
 
 
 //-------------------------------------------------
-//  single_step_over - single step the device over 
+//  single_step_over - single step the device over
 //  the requested number of instructions
 //-------------------------------------------------
 
@@ -2024,7 +2024,7 @@ void device_debug::single_step_over(int numsteps)
 
 
 //-------------------------------------------------
-//  single_step_out - single step the device 
+//  single_step_out - single step the device
 //  out of the current function
 //-------------------------------------------------
 
@@ -2042,7 +2042,7 @@ void device_debug::single_step_out()
 
 
 //-------------------------------------------------
-//  go - execute the device until it hits the given 
+//  go - execute the device until it hits the given
 //  address
 //-------------------------------------------------
 
@@ -2075,7 +2075,7 @@ void device_debug::go_vblank()
 
 
 //-------------------------------------------------
-//  go_interrupt - execute until the specified 
+//  go_interrupt - execute until the specified
 //  interrupt fires on the device
 //-------------------------------------------------
 
@@ -2092,7 +2092,7 @@ void device_debug::go_interrupt(int irqline)
 
 
 //-------------------------------------------------
-//  go_exception - execute until the specified 
+//  go_exception - execute until the specified
 //  exception fires on the visible CPU
 //-------------------------------------------------
 
@@ -2109,7 +2109,7 @@ void device_debug::go_exception(int exception)
 
 
 //-------------------------------------------------
-//  go_milliseconds - execute until the specified 
+//  go_milliseconds - execute until the specified
 //  delay elapses
 //-------------------------------------------------
 
@@ -2126,7 +2126,7 @@ void device_debug::go_milliseconds(UINT64 milliseconds)
 
 
 //-------------------------------------------------
-//  go_next_device - execute until we hit the next 
+//  go_next_device - execute until we hit the next
 //  device
 //-------------------------------------------------
 
@@ -2142,7 +2142,7 @@ void device_debug::go_next_device()
 
 
 //-------------------------------------------------
-//  halt_on_next_instruction - halt in the 
+//  halt_on_next_instruction - halt in the
 //  debugger on the next instruction
 //-------------------------------------------------
 
@@ -2175,7 +2175,7 @@ void device_debug::halt_on_next_instruction(const char *fmt, ...)
 
 
 //-------------------------------------------------
-//  breakpoint_set - set a new breakpoint, 
+//  breakpoint_set - set a new breakpoint,
 //  returning its index
 //-------------------------------------------------
 
@@ -2187,7 +2187,7 @@ int device_debug::breakpoint_set(offs_t address, parsed_expression *condition, c
 	// hook it into our list
 	bp->m_next = m_bplist;
 	m_bplist = bp;
-	
+
 	// update the flags and return the index
 	breakpoint_update_flags();
 	return bp->m_index;
@@ -2264,7 +2264,7 @@ void device_debug::breakpoint_enable_all(bool enable)
 
 
 //-------------------------------------------------
-//  watchpoint_set - set a new watchpoint, 
+//  watchpoint_set - set a new watchpoint,
 //  returning its index
 //-------------------------------------------------
 
@@ -2278,7 +2278,7 @@ int device_debug::watchpoint_set(const address_space &space, int type, offs_t ad
 	// hook it into our list
 	wp->m_next = m_wplist[space.spacenum];
 	m_wplist[space.spacenum] = wp;
-	
+
 	// update the flags and return the index
 	watchpoint_update_flags(wp->m_space);
 	return wp->m_index;
@@ -2360,7 +2360,7 @@ void device_debug::watchpoint_enable_all(bool enable)
 
 
 //-------------------------------------------------
-//  hotspot_track - enable/disable tracking of 
+//  hotspot_track - enable/disable tracking of
 //  hotspots
 //-------------------------------------------------
 
@@ -2673,7 +2673,7 @@ void device_debug::watchpoint_check(const address_space &space, int type, offs_t
 
 
 //-------------------------------------------------
-//  hotspot_check - check for hotspots on a 
+//  hotspot_check - check for hotspots on a
 //  memory read access
 //-------------------------------------------------
 
@@ -2836,7 +2836,7 @@ device_debug::breakpoint::breakpoint(int index, offs_t address, parsed_expressio
 	  m_action((action != NULL) ? action : "")
 {
 }
-	
+
 
 //-------------------------------------------------
 //  ~breakpoint - destructor
@@ -2854,7 +2854,7 @@ device_debug::breakpoint::~breakpoint()
 //-------------------------------------------------
 
 bool device_debug::breakpoint::hit(offs_t pc)
-{	
+{
 	// don't hit if disabled
 	if (!m_enabled)
 		return false;
@@ -2862,12 +2862,12 @@ bool device_debug::breakpoint::hit(offs_t pc)
 	// must match our address
 	if (m_address != pc)
 		return false;
-	
+
 	// must satisfy the condition
 	UINT64 result;
 	if (m_condition != NULL && expression_execute(m_condition, &result) == EXPRERR_NONE && result == 0)
 		return false;
-	
+
 	return true;
 }
 
@@ -2893,7 +2893,7 @@ device_debug::watchpoint::watchpoint(int index, const address_space &space, int 
 	  m_action((action != NULL) ? action : "")
 {
 }
-	
+
 
 //-------------------------------------------------
 //  ~watchpoint - destructor
@@ -2915,7 +2915,7 @@ bool device_debug::watchpoint::hit(int type, offs_t address, int size)
 	// don't hit if disabled
 	if (!m_enabled)
 		return false;
-	
+
 	// must match the type
 	if ((m_type & type) == 0)
 		return false;
@@ -2923,12 +2923,12 @@ bool device_debug::watchpoint::hit(int type, offs_t address, int size)
 	// must match our address
 	if (address + size <= m_address || address >= m_address + m_length)
 		return false;
-	
+
 	// must satisfy the condition
 	UINT64 result;
 	if (m_condition != NULL && expression_execute(m_condition, &result) == EXPRERR_NONE && result == 0)
 		return false;
-	
+
 	return true;
 }
 
@@ -2967,7 +2967,7 @@ device_debug::tracer::~tracer()
 
 
 //-------------------------------------------------
-//  update - log to the tracefile the data for a 
+//  update - log to the tracefile the data for a
 //  given instruction
 //-------------------------------------------------
 
@@ -3047,7 +3047,7 @@ void device_debug::tracer::vprintf(const char *format, va_list va)
 
 
 //-------------------------------------------------
-//  flush - flush any pending changes to the trace 
+//  flush - flush any pending changes to the trace
 //  file
 //-------------------------------------------------
 

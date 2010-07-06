@@ -51,7 +51,7 @@
                 - calls debugger_init() [debugger.c] to set up the debugger
                 - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
                 - calls cheat_init() [cheat.c] to initialize the cheat system
-				- calls image_init() [image.c] to initialize the image system
+                - calls image_init() [image.c] to initialize the image system
 
             - calls config_load_settings() [config.c] to load the configuration file
             - calls nvram_load [machine/generic.c] to load NVRAM
@@ -187,7 +187,7 @@ int mame_execute(core_options *options)
 			options_revert(options, OPTION_PRIORITY_INI);
 			mame_parse_ini_files(options, driver);
 		}
-		
+
 		// create the machine configuration
 		const machine_config *config = global_alloc(machine_config(driver->machine_config));
 
@@ -196,11 +196,11 @@ int mame_execute(core_options *options)
 
 		// looooong term: remove this
 		global_machine = machine;
-		
+
 		// run the machine
 		error = machine->run(firstrun);
 		firstrun = false;
-		
+
 		// check the state of the machine
 		if (machine->new_driver_pending())
 		{

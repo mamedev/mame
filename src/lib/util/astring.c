@@ -233,7 +233,7 @@ void astring_free(astring *str)
 
 
 /*-------------------------------------------------
-    astring_expand - expand an astring to 
+    astring_expand - expand an astring to
     guarantee the given amount of space
 -------------------------------------------------*/
 

@@ -293,37 +293,37 @@ static WRITE16_HANDLER( hippodrm_68000_share_w )
 /******************************************************************************/
 
 /*
-	Heavy Barrel I8751 connections
-	
-	P0.0 - P0.7 <-> 4 * LS374 latches 8B,8C,7B,7C
+    Heavy Barrel I8751 connections
 
-	P1.0	-> MIXFLG1
-	P1.1	-> MIXFLG2
-	P1.2	-> B0FLG
-	P1.3	-> B1FLG1
-	P1.4	-> B1FLG2
-	P1.5	-> SOUNDFLG1
-	P1.6	-> SOUNDFLG2
+    P0.0 - P0.7 <-> 4 * LS374 latches 8B,8C,7B,7C
 
-	P2.0	-> B2FLG 0
-	P2.1	-> B2FLG 1
-	P2.2	<- SEL2
-	P2.3	-> acknowledge INT1
-	P2.4 	-> Enable latch 7B
-	P2.5	-> Enable latch 8B
-	P2.6	-> Enable latch 8C
-	P2.7	-> Enable latch 7C
-	
-	P3.0	-> CRBACK0
-	P3.1	-> CRBACK1
-	P3.2	-> CRBACK2
-	P3.3	<- /INT1
-	P3.5	<- SEL3
-	P3.6 	<- SEL4
-	P3.7	<- SEL5
-	
-	The outputs to the graphics & audio hardware are not directly emulated, but the 
-	values are not known to change after bootup.
+    P1.0    -> MIXFLG1
+    P1.1    -> MIXFLG2
+    P1.2    -> B0FLG
+    P1.3    -> B1FLG1
+    P1.4    -> B1FLG2
+    P1.5    -> SOUNDFLG1
+    P1.6    -> SOUNDFLG2
+
+    P2.0    -> B2FLG 0
+    P2.1    -> B2FLG 1
+    P2.2    <- SEL2
+    P2.3    -> acknowledge INT1
+    P2.4    -> Enable latch 7B
+    P2.5    -> Enable latch 8B
+    P2.6    -> Enable latch 8C
+    P2.7    -> Enable latch 7C
+
+    P3.0    -> CRBACK0
+    P3.1    -> CRBACK1
+    P3.2    -> CRBACK2
+    P3.3    <- /INT1
+    P3.5    <- SEL3
+    P3.6    <- SEL4
+    P3.7    <- SEL5
+
+    The outputs to the graphics & audio hardware are not directly emulated, but the
+    values are not known to change after bootup.
 */
 
 static UINT8 i8751_ports[4];
@@ -331,7 +331,7 @@ static UINT8 i8751_ports[4];
 READ8_HANDLER(dec0_mcu_port_r )
 {
 	int latchEnable=i8751_ports[2]>>4;
-	
+
 	// P0 connected to 4 latches
 	if (offset==0)
 	{
@@ -344,7 +344,7 @@ READ8_HANDLER(dec0_mcu_port_r )
 		else if ((latchEnable&8)==0)
 			return i8751_return&0xff;
 	}
-	
+
 	return 0xff;
 }
 
@@ -357,7 +357,7 @@ WRITE8_HANDLER(dec0_mcu_port_w )
 		if ((data&0x4)==0)
 			cputag_set_input_line(space->machine, "maincpu", 5, HOLD_LINE);
 		if ((data&0x8)==0)
-			cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);	
+			cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
 		if ((data&0x40)==0)
 			i8751_return=(i8751_return&0xff00)|(i8751_ports[0]);
 		if ((data&0x80)==0)

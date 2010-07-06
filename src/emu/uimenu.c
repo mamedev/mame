@@ -1537,7 +1537,7 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 	ui_menu_item_append(menu, CAPSTARTGAMENOUN " Information", NULL, 0, (void *)menu_game_info);
 
 	device_image_interface *image = NULL;
-	if (machine->m_devicelist.first(image)) 
+	if (machine->m_devicelist.first(image))
 	{
 		/* add image info menu */
 		ui_menu_item_append(menu, "Image Information", NULL, 0, (void*)ui_image_menu_image_info);

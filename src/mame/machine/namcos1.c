@@ -602,7 +602,7 @@ WRITE8_HANDLER( namcos1_watchdog_w )
 		wdog |= 2;
 	else if (space->cpu == space->machine->device("audiocpu"))
 		wdog |= 4;
-		
+
 	if (wdog == 7 || !namcos1_reset)
 	{
 		wdog = 0;

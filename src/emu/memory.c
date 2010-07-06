@@ -1848,7 +1848,7 @@ static void memory_init_preflight(running_machine *machine)
 				const region_info *region = machine->region(entry->region);
 				if (region == NULL)
 					fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag(), space->name, entry->addrstart, entry->addrend, entry->region);
-				
+
 				/* validate the region */
 				if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > region->bytes())
 					fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag(), space->name, entry->addrstart, entry->addrend, entry->region, region->bytes());

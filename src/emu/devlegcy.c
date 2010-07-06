@@ -58,7 +58,7 @@ legacy_device_config_base::legacy_device_config_base(const machine_config &mconf
 	UINT32 configlen = (UINT32)get_legacy_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES);
 	if (configlen != 0)
 		m_inline_config = global_alloc_array_clear(UINT8, configlen);
-	
+
 	// set the proper name
 	m_name = get_legacy_config_string(DEVINFO_STR_NAME);
 }

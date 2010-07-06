@@ -5288,11 +5288,11 @@ INPUT_PORTS_END /* Time Crisis */
 static CUSTOM_INPUT( acedrvr_shift_read )
 {
 	int shift = input_port_read(field->port->machine, "SHIFT");
-	
+
 	if (shift > 0 && shift != prev_stick_state)
 	{
 		prev_stick_state = shift;
-		
+
 		switch (shift)
 		{
 			case 0x01:
@@ -5306,7 +5306,7 @@ static CUSTOM_INPUT( acedrvr_shift_read )
 				break;
 		}
 	}
-	
+
 	return stick_input;
 }
 

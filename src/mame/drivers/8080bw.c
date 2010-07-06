@@ -1059,7 +1059,7 @@ static MACHINE_DRIVER_START( schaser )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
-	MDRV_CPU_REPLACE("maincpu",I8080,1996800)    	/* 19.968MHz / 10 */
+	MDRV_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
 	MDRV_CPU_IO_MAP(schaser_io_map)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
@@ -1468,7 +1468,7 @@ static MACHINE_DRIVER_START( polaris )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mw8080bw_root)
-	MDRV_CPU_REPLACE("maincpu",I8080,1996800)    	/* 19.968MHz / 10 */
+	MDRV_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
 	MDRV_CPU_IO_MAP(polaris_io_map)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
@@ -2235,7 +2235,7 @@ static DRIVER_INIT( vortex )
 /* unknown gun game by Model Racing, possibly Gun Champ?
 
 BOARD 1:
- _________________________________________________________________________________________________________________________________ 
+ _________________________________________________________________________________________________________________________________
 |                                                          12     13     14     15     16     17     18     19                    |
 |                            _________    _______         ___    ___    ___    ___    ___    ___    ___    ___                    |
 |___  11                    |74LS241N |  |74LS159|       |AM9|  |AM9|  |AM9|  |AM9|  |AM9|  |AM9|  |AM9|  |AM9|                   |
@@ -2292,11 +2292,11 @@ BOARD 1:
 |_________________________________________________________________________________________________________________________________|
 
 
-												XTAL=19,66080MHz
+                                                XTAL=19,66080MHz
 
 
 BOARD 2:
- _________________________________________________________________________________________________________________________________ 
+ _________________________________________________________________________________________________________________________________
 |                                                                                                                                 |
 |                            _______     _______     _______     _______     _________                                            |
 |___             11         |74LS175|   |74LS151|   |74LS151|   |74LS153|   |74LS244N |                  Model                    |
@@ -2311,7 +2311,7 @@ BOARD 2:
 |  _|                        _______     _______     _______     _______                ____________                              |
 |  _|                       |74LS174|   |74LS151|   |74LS151|   |74LS153|      9       |            |                           __|
 |  _|                       |_______|   |_______|   |_______|   |_______|              |            |                          |
-|  _|                                                                                  |            |                          |__ 
+|  _|                                                                                  |            |                          |__
 |  _|                                                                                  |            |                            =|
 |  _|                        _______     _______     _______     _______               |            |                            =|
 |  _|                       |74LS174|   |74LS151|   |74LS151|   |74LS153|      8       |            |                            =|
@@ -2337,7 +2337,7 @@ BOARD 2:
 |  _|                                                                                                                            =|
 |  _|                        _______     _______     ______________                        _______     ____                     __|
 |  _|                 3     |74LS14N|   |74LS74A|   |   SN76477N   |                      |74LS107|   |DIP1|                   |
-|  _|                       |_______|   |_______|   |    7923XY    |                      |_______|   |____|                   |__ 
+|  _|                       |_______|   |_______|   |    7923XY    |                      |_______|   |____|                   |__
 |  _|                                               |   SINGAPORE  |                                                              |
 |  _|                                               |______________|                                                              |
 |  _|                        _______     _______                                           _______     _______    _______         |
@@ -2359,11 +2359,11 @@ BOARD 2:
 // might need custom implementation
 
 static ADDRESS_MAP_START( modelr_io_map, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x00, 0x00) AM_DEVWRITE("mb14241", mb14241_shift_count_w)
-//	AM_RANGE(0x01, 0x01) AM_DEVREAD("mb14241", mb14241_shift_result_r)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("mb14241", mb14241_shift_count_w)
+//  AM_RANGE(0x01, 0x01) AM_DEVREAD("mb14241", mb14241_shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_shift_result_r)
-//	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_shift_count_w)
+//  AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 

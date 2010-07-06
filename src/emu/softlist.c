@@ -995,7 +995,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 		{
 			if ( swlists )
 			{
-				
+
 				software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
 				UINT32 i = DEVINFO_STR_SWLIST_0;
 
@@ -1378,7 +1378,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 {
 	bool haveCompatible = FALSE;
 	const char *interface = image->image_config().image_interface();
-	
+
 	for (const device_config *dev = machine->config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
@@ -1398,7 +1398,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 						if (strcmp(interface,part->interface_)==0) {
 							found = TRUE;
 						}
-					}					
+					}
 					if (found) {
 						ui_menu_item_append(menu, list->description, NULL, 0, swlist->list_name[i]);
 					}
@@ -1408,7 +1408,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 			}
 		}
 	}
-	
+
 	for (const device_config *dev = machine->config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
@@ -1428,7 +1428,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 						if (strcmp(interface,part->interface_)==0) {
 							found = TRUE;
 						}
-					}					
+					}
 					if (found) {
 						if (!haveCompatible) {
 							ui_menu_item_append(menu, "[compatible lists]", NULL, 0, NULL);
@@ -1442,7 +1442,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 			}
 		}
 	}
-	
+
 }
 
 void ui_image_menu_software(running_machine *machine, ui_menu *menu, void *parameter, void *state)

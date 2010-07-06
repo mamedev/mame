@@ -307,9 +307,9 @@ static MACHINE_DRIVER_START( tp84 )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-							
+
 	MDRV_MACHINE_START(tp84)
-	
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

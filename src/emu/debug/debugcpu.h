@@ -74,12 +74,12 @@ public:
 	class breakpoint
 	{
 		friend class device_debug;
-		
+
 	public:
 		// construction/destruction
 		breakpoint(int index, offs_t address, parsed_expression *condition = NULL, const char *action = NULL);
 		~breakpoint();
-		
+
 		// getters
 		breakpoint *next() const { return m_next; }
 		int index() const { return m_index; }
@@ -87,7 +87,7 @@ public:
 		offs_t address() const { return m_address; }
 		const char *condition() const { return (m_condition != NULL) ? expression_original_string(m_condition) : NULL; }
 		const char *action() const { return m_action; }
-		
+
 	private:
 		// internals
 		bool hit(offs_t pc);
@@ -109,7 +109,7 @@ public:
 		// construction/destruction
 		watchpoint(int index, const address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition = NULL, const char *action = NULL);
 		~watchpoint();
-		
+
 		// getters
 		watchpoint *next() const { return m_next; }
 		const address_space &space() const { return m_space; }
@@ -120,7 +120,7 @@ public:
 		offs_t length() const { return m_length; }
 		const char *condition() const { return (m_condition != NULL) ? expression_original_string(m_condition) : NULL; }
 		const char *action() const { return m_action; }
-		
+
 	private:
 		// internals
 		bool hit(int type, offs_t address, int size);
@@ -140,7 +140,7 @@ public:
 	// construction/destruction
 	device_debug(device_t &device, symbol_table *globalsyms);
 	~device_debug();
-	
+
 	// getters
 	symbol_table *symtable() const { return m_symtable; }
 
@@ -150,7 +150,7 @@ public:
 	int min_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
 	int max_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
 
-	// hooks used by the rest of the system	
+	// hooks used by the rest of the system
 	void start_hook(attotime endtime);
 	void stop_hook();
 	void interrupt_hook(int irqline);
@@ -163,7 +163,7 @@ public:
 	void set_instruction_hook(debug_instruction_hook_func hook);
 	void set_dasm_override(dasm_override_func dasm_override) { m_dasm_override = dasm_override; }
 
-	// disassembly	
+	// disassembly
 	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 	// debugger focus
@@ -174,7 +174,7 @@ public:
 	void single_step(int numsteps = 1);
 	void single_step_over(int numsteps = 1);
 	void single_step_out();
-	
+
 	// execution
 	void go(offs_t targetpc = ~0);
 	void go_vblank();
@@ -204,7 +204,7 @@ public:
 	bool hotspot_tracking_enabled() const { return (m_hotspots != NULL); }
 	void hotspot_track(int numspots, int threshhold);
 
-	// history	
+	// history
 	offs_t history_pc(int index) const;
 
 	// tracing
@@ -236,7 +236,7 @@ private:
 	static void set_logunmap(void *globalref, void *ref, UINT64 value);
 	static UINT64 get_cpu_reg(void *globalref, void *ref);
 	static void set_state(void *globalref, void *ref, UINT64 value);
-	
+
 	// basic device information
 	device_t &				m_device;					// device we are attached to
 	device_execute_interface *m_exec;					// execute interface, if present
@@ -278,11 +278,11 @@ private:
 	public:
 		tracer(device_debug &debug, FILE &file, bool trace_over, const char *action);
 		~tracer();
-		
+
 		void update(offs_t pc);
 		void vprintf(const char *format, va_list va);
 		void flush();
-	
+
 	private:
 		static const int TRACE_LOOPS = 64;
 
@@ -330,7 +330,7 @@ private:
 
 	static const UINT32 DEBUG_FLAG_STEPPING_ANY		= DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
 	static const UINT32 DEBUG_FLAG_TRACING_ANY		= DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
-	static const UINT32 DEBUG_FLAG_TRANSIENT		= DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_STOP_CONTEXT | 
+	static const UINT32 DEBUG_FLAG_TRANSIENT		= DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_STOP_CONTEXT |
 			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
 
 public: // until comments get folded in

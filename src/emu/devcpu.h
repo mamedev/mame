@@ -209,7 +209,7 @@ device_config *basename##_device_config::static_alloc_device_config(const machin
 	return global_alloc(basename##_device_config(mconfig, static_alloc_device_config, tag, owner, clock)); \
 }																							\
 																							\
-device_t *basename##_device_config::alloc_device(running_machine &machine) const 			\
+device_t *basename##_device_config::alloc_device(running_machine &machine) const			\
 {																							\
 	return pool_alloc(machine_get_pool(machine), basename##_device(machine, *this));		\
 }																							\

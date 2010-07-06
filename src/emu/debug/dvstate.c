@@ -93,7 +93,7 @@ debug_view_state::~debug_view_state()
 
 
 //-------------------------------------------------
-//  enumerate_sources - enumerate all possible 
+//  enumerate_sources - enumerate all possible
 //  sources for a registers view
 //-------------------------------------------------
 
@@ -133,7 +133,7 @@ void debug_view_state::reset()
 
 
 //-------------------------------------------------
-//  recompute - recompute all info for the 
+//  recompute - recompute all info for the
 //  registers view
 //-------------------------------------------------
 
@@ -187,7 +187,7 @@ void debug_view_state::recompute()
 		maxtaglen = MAX(maxtaglen, item->m_symbol.len());
 		maxvallen = MAX(maxvallen, item->m_vallen);
 	}
-	
+
 	// set the current divider and total cols
 	m_divider = 1 + maxtaglen + 1;
 	m_total.x = 1 + maxtaglen + 2 + maxvallen + 1;
@@ -213,7 +213,7 @@ void debug_view_state::view_notify(debug_view_notification type)
 
 
 //-------------------------------------------------
-//  view_update - update the contents of the 
+//  view_update - update the contents of the
 //  register view
 //-------------------------------------------------
 
@@ -228,7 +228,7 @@ void debug_view_state::view_update()
 	UINT64 total_cycles = 0;
 	if (source.m_execintf != NULL)
 		total_cycles = source.m_execintf->total_cycles();
-	
+
 	// find the first entry
 	state_item *curitem = m_state_list;
 	for (int index = 0; curitem != NULL && index < m_topleft.y; index++)
@@ -335,7 +335,7 @@ void debug_view_state::view_update()
 				dest++;
 				col++;
 			}
-			
+
 			// advance to the next item
 			curitem = curitem->m_next;
 		}

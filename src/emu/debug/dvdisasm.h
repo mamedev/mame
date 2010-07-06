@@ -66,7 +66,7 @@ enum disasm_right_column
 class debug_view_disasm_source : public debug_view_source
 {
 	friend class debug_view_disasm;
-	
+
 	// construction/destruction
 	debug_view_disasm_source(const char *name, device_t &device);
 
@@ -92,7 +92,7 @@ class debug_view_disasm : public debug_view
 	// construction/destruction
 	debug_view_disasm(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate);
 	virtual ~debug_view_disasm();
-	
+
 public:
 	// getters
 	const char *expression() const { return m_expression.string(); }
@@ -100,7 +100,7 @@ public:
 	UINT32 backward_steps() const { return m_backwards_steps; }
 	UINT32 disasm_width() const { return m_dasm_width; }
 	offs_t selected_address();
-	
+
 	// setters
 	void set_expression(const char *expression);
 	void set_right_column(disasm_right_column contents);
@@ -135,7 +135,7 @@ private:
 	debug_view_xy		m_allocated;			// allocated rows/columns
 	offs_t *			m_byteaddress;			// addresses of the instructions
 	char *				m_dasm;					// disassembled instructions
-	
+
 	// constants
 	static const int DEFAULT_DASM_LINES = 1000;
 	static const int DEFAULT_DASM_WIDTH = 50;
