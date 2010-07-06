@@ -1290,7 +1290,7 @@ const game_driver * const drivers[] =
 	DRIVER( searthin )	/* bootleg */
 	DRIVER( searthina )	/* bootleg */
 	DRIVER( invadrmr )	/* (c) 1978 Model Racing */
-	DRIVER( suprshot )	/* (c) 1979 Model Racing */
+	DRIVER( modelr )	/* (c) 19?? Model Racing */
 	DRIVER( spaceatt )	/* (c) 1978 Video Games GMBH */
 	DRIVER( spaceat2 )	/* (c) 1980 Zenitone-Microsec Ltd */
 	DRIVER( sinvzen )	/* Zenitone-Microsec Ltd */

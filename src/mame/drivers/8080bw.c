@@ -2232,7 +2232,7 @@ static DRIVER_INIT( vortex )
 	auto_free(machine, buf1);
 }
 
-/* Super Shot by Model Racing
+/* unknown gun game by Model Racing, possibly Gun Champ?
 
 BOARD 1:
  _________________________________________________________________________________________________________________________________ 
@@ -2358,7 +2358,7 @@ BOARD 2:
 // the invaders shifter stuff doesn't seem correct for this, if i hook up the count_w the gfx are corrupt, otherwise they're incorrectly offset?
 // might need custom implementation
 
-static ADDRESS_MAP_START( suprshot_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( modelr_io_map, ADDRESS_SPACE_IO, 8 )
 //	AM_RANGE(0x00, 0x00) AM_DEVWRITE("mb14241", mb14241_shift_count_w)
 //	AM_RANGE(0x01, 0x01) AM_DEVREAD("mb14241", mb14241_shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("mb14241", mb14241_shift_data_w)
@@ -2368,12 +2368,12 @@ static ADDRESS_MAP_START( suprshot_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-MACHINE_DRIVER_START( suprshot )
+MACHINE_DRIVER_START( modelr )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(invaders)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(suprshot_io_map)
+	MDRV_CPU_IO_MAP(modelr_io_map)
 
 MACHINE_DRIVER_END
 
@@ -2412,7 +2412,7 @@ ROM_START( invadrmr )
 	ROM_LOAD( "sv06.1g",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
 ROM_END
 
-ROM_START( suprshot )
+ROM_START( modelr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "251.bin",       0x0000, 0x0400, CRC(f27a8c1e) SHA1(510debd1ac2c0986f99c217e3078208a39d7837c) )
 	ROM_LOAD( "252.bin",       0x0400, 0x0400, CRC(d53b8f91) SHA1(56919f4c88fb3b5c23b5365f0866698bfceb2762) )
@@ -3392,4 +3392,4 @@ GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku T
 GAME( 1979, yosakdona,yosakdon, yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
 GAMEL(1979, shuttlei, 0,        shuttlei, shuttlei, 0, ROT270, "Omori", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
 GAMEL(1979, skylove,  0,        shuttlei, skylove,  0, ROT270, "Omori", "Sky Love", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL, layout_shuttlei )
-GAME (1979, suprshot, 0,        suprshot, invadrmr, 0, ROT0,   "Model Racing", "Super Shot", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no titlescreen
+GAME (19??, modelr,   0,        modelr,   invadrmr, 0, ROT0,   "Model Racing", "unknown Model Racing gun game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // no titlescreen
