@@ -67,7 +67,117 @@ The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
 'idle' and not speaking, in this order:
 e[0 or f] p[0] k1[0] k2[0] k3[0] k4[0] k5[f] k6[f] k7[f] k8[7] k9[7] k10[7]
 
-Driver specific notes:
+Patent notes (important timing info for interpolation):
+* TCycle ranges from 1 to 20, is clocked based on the clock input or RC clock
+  to the chip / 4. This emulation core completely ignores TCycle, as it isn't
+  very relevant.
+    Every full TCycle count (i.e. overflow from 20 to 1), Subcycle is
+    incremented.
+* Subcycle ranges from 0 to 2, reload is 0 in SPKSLOW mode, 1 normally, and
+  corresponds to whether an interpolation value is being calculated (0 or 1)
+  or being written to ram (2). 0 and 1 correspond to 'A' cycles on the
+  patent, while 2 corresponds to 'B' cycles.
+    Every Subcycle full count (i.e. overflow from 2 to (0 or 1)), PC is
+    incremented. (NOTE: if PC=12, overflow happens on the 1->2 transition,
+    not 2->0; PC=12 has no B cycle.)
+* PC ranges from 0 to 12, and corresponds to the parameter being interpolated
+  or otherwise read from rom using PROMOUT.
+  The order is:
+  0 = Energy
+  1 = Pitch
+  2 = K1
+  3 = K2
+  ...
+  11 = K10
+  12 = nothing
+    Every PC full count (i.e. overflow from 12 to 0), IP (aka interp_period)
+    is incremented.
+* IP (aka interp_period) ranges from 0 to 7, and corresponds with the amount
+  of rightshift that the difference between current and target for a given
+  parameter will have applied to it, before being added to the current
+  parameter. Note that when interpolation is inhibited, only IP=0 will
+  cause any change to the current values of the coefficients.
+  The order is, after new frame parse (last ip was 0 before parse):
+  1 = >>3 (/8)
+  2 = >>3 (/8)
+  3 = >>3 (/8)
+  4 = >>2 (/4)
+  5 = >>2 (/4)
+  6 = >>1 (/2) (NOTE: this value may actually be >>2 (/4), the patent has an error on it and is unclear)
+  7 = >>1 (/2)
+  0 = >>0 (/1, forcing current values to equal target values)
+    Every IP full count, a new frame is parsed, but ONLY on the 0->* transition.
+    NOTE: on TMS5220C ONLY, the rate setting is implied by the datasheet to
+    determines what IP is reloaded to upon overflow; depending on the rate
+    setting it will be 0, 2, 4 or 6; other chips always reload to 0.
+    This means, the tms5220c with rates set to n counts IP as follows:
+    (new frame parse is indicated with a #)
+    Rate    IP Count
+    00      7 0#1 2 3 4 5 6 7 0#1 2 3 4 5 6 7
+    01      7 0#3 4 5 6 7 0#3 4 5 6 7 0#3 4 5
+    10      7 0#5 6 7 0#5 6 7 0#5 6 7 0#5 6 7
+    11      7 0#7 0#7 0#7 0#7 0#7 0#7 0#7 0#7
+
+Most of the following is based on figure 8c of 4,331,836, which is the
+  TMS5100/TMC0280 patent, but the same information applies to the TMS52xx
+  as well.
+
+OLDP is a status flag which controls whether unvoiced or voiced excitation is
+  being generated. It is latched from "P=0" at IP=7 PC=12 T=16.
+  (This means that, during normal operation, between IP=7 PC=12 T16 and
+  IP=0 PC=1 T=?, OLDP and P=0 are the same)
+"P=0" is a status flag which is set if the index value for pitch for the new
+  frame being parsed (which will become the new target frame) is zero.
+  It is used for determining whether interpolation of the next frame is
+  inhibited or not. It is updated at IP=0 PC=1 T=?. See next section.
+OLDE is a status flag which is only used for determining whether
+  interpolation is inhibited or not.
+  It is latched from "E=0" at IP=7 PC=12 T=16.
+  (This means that, during normal operation, between IP=7 PC=12 T16 and
+  IP=0 PC=0 T=16, OLDE and E=0 are the same)
+"E=0" is a status flag which is set if the index value for energy for the new
+  frame being parsed (which will become the new target frame) is zero.
+  It is used for determining whether interpolation of the next frame is
+  inhibited or not. It is updated at IP=0 PC=0 T=16. See next section.
+  
+Interpolation is inhibited (i.e. interpolation at IP frames will not happen
+  except for IP=0) under the following circumstances:
+  "P=0" != "OLDP" ("P=0" = 1, and OLDP = 0; OR "P=0" = 0, and OLDP = 1)
+    This means the new frame is unvoiced and the old one was voiced, or vice
+    versa.
+  "OLDE" = 1 and "E=0" = 0
+    This means the new frame is not silent, and the old frame was silent.
+  
+
+
+****Documentation of chip commands:***
+    x0x0xbcc : on 5200/5220: NOP (does nothing); on 5220C: Select frame length by cc, and b selects whether every frame is preceeded by 2 bits to select the frame length (instead of using the value set by cc); the default (and after a reset command) is as if '0x00' was written, i.e. for frame length (200 samples) and 0 for whether the preceeding 2 bits are enabled (off)
+
+    x001xxxx: READ BYTE (RDBY) Sends eight read bit commands (M0 high M1 low) to VSM and reads the resulting bits serially into a temporary register, which becomes readable as the next byte read from the tms52xx once ready goes active. Note the bit order of the byte read from the TMS52xx is BACKWARDS as compared to the actual data order as in the rom on the VSM chips; the read byte command of the tms5100 reads the bits in the 'correct' order. This was IMHO a rather silly design decision of TI. (I (LN) asked Larry Brantingham about this but he wasn't involved with the TMS52xx chips, just the 5100); There's ASCII data in the TI 99/4 speech module VSMs which has the bit order reversed on purpose because of this!
+    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
+
+    x011xxxx: READ AND BRANCH (RB) Sends a read and branch command (M0 high, M1 high) to force VSM to set its data pointer to whatever the data is at its current pointer location is)
+    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
+
+    x100aaaa: LOAD ADDRESS (LA) Send a load address command (M0 low M1 high) to VSM with the 4 'a' bits; Note you need to send four or five of these in sequence to actually specify an address to the vsm.
+    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
+
+    x101xxxx: SPEAK (SPK) Begins speaking, pulling spech data from the current address pointer location of the VSM modules.
+
+    x110xxxx: SPEAK EXTERNAL (SPKEXT) Clears the FIFO using SPKEE line, then sets TALKD (TALKST remains zero) until 8 bytes have been written to the FIFO, at which point it begins speaking, pulling data from the 16 byte fifo.
+    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
+
+    x111xxxx: RESET (RST) Resets the speech synthesis core immediately, and clears the FIFO.
+
+
+    Other chip differences:
+    The 5220 is 'noisier' when playing unvoiced frames than the 5220C is; I (LN) think the 5220C may use a different energy table (or use one value lower in the normal energy table) than the 5220 does, possibly only when playing unvoiced frames, but I can't prove this without a decap; the 5220C's PROMOUT pin (for dumping the lpc tables as played) is non-functional due to a changed design or a die bug (or may need special timing to know exactly when to read it, different than the 5200 and 5220 which are both easily readable).
+    In addition, the NOP commands on the FIFO interface have been changed on the 5220C and data passed in the low bits has a meaning regarding frame length, see above.
+
+    It is also possible but inconclusive that the chirp table was changed; The LPC tables between the 5220 and 5220C are MOSTLY the same of not completely so, but as mentioned above the energy table has some sort of difference.
+
+
+***MAME Driver specific notes:***
 
     Looping has the tms5220 hooked up directly to the cpu. However currently the
     tms9900 cpu core does not support a ready line.
@@ -94,33 +204,6 @@ victory(audio/exidy.c): uses new interface (couriersud)
 looping: uses old interface
 portraits: uses *NO* interface; the i/o cpu hasn't been hooked to anything!
 dotron and midwayfb(mcr.c): uses old interface
-
-
-    Documentation of chip commands:
-    x0x0xbcc : on 5200/5220: NOP (does nothing); on 5220C: Select frame length by cc, and b selects whether every frame is preceeded by 2 bits to select the frame length (instead of using the value set by cc); the default (and after a reset command) is as if '0x00' was written, i.e. for frame length (200 samples) and 0 for whether the preceeding 2 bits are enabled (off)
-
-    x001xxxx: READ BYTE (RDBY) Sends eight read bit commands (M0 high M1 low) to VSM and reads the resulting bits serially into a temporary register, which becomes readable as the next byte read from the tms52xx once ready goes active. Note the bit order of the byte read from the TMS52xx is BACKWARDS as compared to the actual data order as in the rom on the VSM chips; the read byte command of the tms5100 reads the bits in the 'correct' order. This was IMHO a rather silly design decision of TI. (I (LN) asked Larry Brantingham about this but he wasn't involved with the TMS52xx chips, just the 5100); There's ASCII data in the TI 99/4 speech module VSMs which has the bit order reversed on purpose because of this!
-    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
-
-    x011xxxx: READ AND BRANCH (RB) Sends a read and branch command (M0 high, M1 high) to force VSM to set its data pointer to whatever the data is at its current pointer location is)
-    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
-
-    x100aaaa: LOAD ADDRESS (LA) Send a load address command (M0 low M1 high) to VSM with the 4 'a' bits; Note you need to send four or five of these in sequence to actually specify an address to the vsm.
-    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
-
-    x101xxxx: SPEAK (SPK) Begins speaking, pulling spech data from the current address pointer location of the VSM modules.
-
-    x110xxxx: SPEAK EXTERNAL (SPKEXT) Clears the FIFO using SPKEE line, then sets TALKD (TALKST remains zero) until 8 bytes have been written to the FIFO, at which point it begins speaking, pulling data from the 16 byte fifo.
-    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
-
-    x111xxxx: RESET (RST) Resets the speech synthesis core immediately, and clears the FIFO.
-
-
-    Other chip differences:
-    The 5220 is 'noisier' when playing unvoiced frames than the 5220C is; I (LN) think the 5220C may use a different energy table (or use one value lower in the normal energy table) than the 5220 does, possibly only when playing unvoiced frames, but I can't prove this without a decap; the 5220C's PROMOUT pin (for dumping the lpc tables as played) is non-functional due to a changed design or a die bug (or may need special timing to know exactly when to read it, different than the 5200 and 5220 which are both easily readable).
-    In addition, the NOP commands on the FIFO interface have been changed on the 5220C and data passed in the low bits has a meaning regarding frame length, see above.
-
-    It is also possible but inconclusive that the chirp table was changed; The LPC tables between the 5220 and 5220C are MOSTLY the same of not completely so, but as mentioned above the energy table has some sort of difference.
 
 
 As for which games used which chips:
@@ -525,7 +608,7 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 				/* TODO: the 3 lines below (and others) are needed for victory to not fail its selftest due to a sample ending too late, may require additional investigation */
 				tms->subcycle = tms->subc_reload;
 				tms->PC = 0;
-				tms->interp_period = reload_table[tms->tms5220c_rate&0x3];
+				tms->interp_period = reload_table[tms->tms5220c_rate&0x3]; // is this correct? should this be always 7 instead, so that the new frame is loaded quickly?
 				tms->new_frame_energy_idx = 0;
 				tms->new_frame_pitch_idx = 0;
 				for (i = 0; i < 4; i++)
@@ -778,7 +861,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
     /* if speak external is set, but talk status is not (yet) set,
     wait for buffer low to clear */
-	if (!tms->talk_status && tms->speak_external && (tms->buffer_low == 1))
+	if (!tms->talk_status && tms->speak_external && tms->buffer_low)
            goto empty;
 
     /* loop until the buffer is full or we've stopped speaking */
@@ -795,6 +878,10 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
         /* if we're ready for a new frame, i.e. when IP=0, PC=12, Sub=1 */
         if ((tms->interp_period == 0) && (tms->PC == 12) && (tms->subcycle == 1))
         {
+			// HACK for regression testing, be sure to comment out before release!
+			//tms->RNG = 0x1234;
+			// end HACK
+
 			/* appropriately override the interp count if needed */
 			tms->interp_period = reload_table[tms->tms5220c_rate&0x3];
 
@@ -991,7 +1078,8 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 	}
 		this_sample = lattice_filter(tms); /* execute lattice filter */
 #ifdef DEBUG_GENERATION_VERBOSE
-		fprintf(stderr,"X:%04d; E:%04d; P:%04d; Pc:%04d ",tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
+		//fprintf(stderr,"IP: %01d; PC: %02d; X:%04d; E:%04d; P:%04d; Pc:%04d ",tms->interp_period, tms->PC, tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
+		fprintf(stderr,"X:%04d; E:%04d; P:%04d; Pc:%04d ", tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
 		for (i=0; i<10; i++)
 			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
 		fprintf(stderr,"Out:%06d", this_sample);
