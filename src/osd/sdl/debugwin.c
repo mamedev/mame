@@ -1015,10 +1015,10 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 			INT32 bpindex = -1;
 
 			/* first find an existing breakpoint at this address */
-			for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
-				if (address == bp->address)
+			for (bp = cpuinfo->breakpoint_first(); bp != NULL; bp = bp->next())
+				if (address == bp->address())
 				{
-					bpindex = bp->index;
+					bpindex = bp->index();
 					break;
 				}
 
