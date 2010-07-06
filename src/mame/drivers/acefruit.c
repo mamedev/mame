@@ -716,4 +716,4 @@ GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, sidewndr, ROT270, "ACE", "
 GAMEL( 1981?, spellbnd, sidewndr, acefruit, spellbnd, 0,        ROT270, "ACE", "Spellbound", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
 GAME ( 1982?, starspnr, 0,        acefruit, starspnr, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", GAME_NOT_WORKING | GAME_NO_SOUND )
 // inputs need fixing on this one, no idea what it's called either
-GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, 0,        ROT270, "ACE", "Unknown ACE Fruits Game", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, 0,        ROT270, "ACE", "unknown ACE fruits game", GAME_NOT_WORKING | GAME_NO_SOUND )
