@@ -106,14 +106,17 @@ Patent notes (important timing info for interpolation):
   6 = >>1 (/2) (NOTE: this value may actually be >>2 (/4), the patent has an error on it and is unclear)
   7 = >>1 (/2)
   0 = >>0 (/1, forcing current values to equal target values)
-    Every IP full count, a new frame is parsed, but ONLY on the 0->* transition.
-    NOTE: on TMS5220C ONLY, the rate setting is implied by the datasheet to
-    determines what IP is reloaded to upon overflow; depending on the rate
-    setting it will be 0, 2, 4 or 6; other chips always reload to 0.
+    Every IP full count, a new frame is parsed, but ONLY on the 0->*
+    transition.
+    NOTE: on TMS5220C ONLY, the datasheet IMPLIES the following:
+    Upon new frame parse (end of IP=0), the IP is forced to a value depending
+    on the TMS5220C-specific rate setting. For rate settings 0, 1, 2, 3, it
+    will be forced to 1, 3, 5 or 7 respectively. On non-TMS5220 chips, it
+    counts as expected (IP=1 follows IP=0) always.
     This means, the tms5220c with rates set to n counts IP as follows:
     (new frame parse is indicated with a #)
     Rate    IP Count
-    00      7 0#1 2 3 4 5 6 7 0#1 2 3 4 5 6 7
+    00      7 0#1 2 3 4 5 6 7 0#1 2 3 4 5 6 7    <- non-tms5220c chips always follow this pattern
     01      7 0#3 4 5 6 7 0#3 4 5 6 7 0#3 4 5
     10      7 0#5 6 7 0#5 6 7 0#5 6 7 0#5 6 7
     11      7 0#7 0#7 0#7 0#7 0#7 0#7 0#7 0#7
