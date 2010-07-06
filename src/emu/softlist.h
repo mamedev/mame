@@ -74,8 +74,6 @@ void ui_image_menu_software(running_machine *machine, ui_menu *menu, void *param
 
 *********************************************************************/
 DECLARE_LEGACY_DEVICE(SOFTWARE_LIST, software_list);
-#define __SOFTWARE_LIST_TAG	"software_list"
-
 
 #define SOFTWARE_SUPPORTED_YES		0
 #define SOFTWARE_SUPPORTED_PARTIAL	1
@@ -99,13 +97,13 @@ struct _software_list_config
 #define MDRV_SOFTWARE_LIST_CONFIG(_idx,_list)								\
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(software_list_config, list_name, _idx, _list)
 
-#define MDRV_SOFTWARE_LIST_ADD( _list )										\
-	MDRV_DEVICE_ADD( __SOFTWARE_LIST_TAG, SOFTWARE_LIST, 0 )				\
+#define MDRV_SOFTWARE_LIST_ADD( _tag, _list )										\
+	MDRV_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 )				\
 	MDRV_SOFTWARE_LIST_CONFIG(0,_list)
 
 
-#define MDRV_SOFTWARE_LIST_MODIFY( _list )									\
-	MDRV_DEVICE_MODIFY( __SOFTWARE_LIST_TAG )								\
+#define MDRV_SOFTWARE_LIST_MODIFY( _tag, _list )									\
+	MDRV_DEVICE_MODIFY( _tag )								\
 	MDRV_SOFTWARE_LIST_CONFIG(0,_list)
 
 

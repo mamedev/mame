@@ -921,18 +921,15 @@ static void print_game_images(FILE *out, const game_driver *game, const machine_
 
 static void print_game_software_list(FILE *out, const game_driver *game, const machine_config *config)
 {
-	for (const device_config *dev = config->m_devicelist.first(); dev != NULL; dev = dev->next())
+	for (const device_config *dev = config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
-		if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
-		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
-			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+		for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+		{
+			if ( swlist->list_name[i] )
 			{
-				if ( swlist->list_name[i] )
-				{
-					fprintf(out, "\t\t<softwarelist name=\"%s\" />\n", swlist->list_name[i] );
-				}
+				fprintf(out, "\t\t<softwarelist name=\"%s\" />\n", swlist->list_name[i] );
 			}
 		}
 	}

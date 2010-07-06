@@ -991,38 +991,39 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 	else
 	{
 		/* Loop through all the software lists named in the driver */
-		running_device *swlists = devtag_get_device( image->device().machine, __SOFTWARE_LIST_TAG );
-
-		if ( swlists )
+		for (device_t *swlists = image->device().machine->m_devicelist.first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
 		{
-			
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
-			UINT32 i = DEVINFO_STR_SWLIST_0;
-
-			while ( ! software_part_ptr && i <= DEVINFO_STR_SWLIST_MAX )
+			if ( swlists )
 			{
-				swlist_name = swlist->list_name[i-DEVINFO_STR_SWLIST_0];
+				
+				software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
+				UINT32 i = DEVINFO_STR_SWLIST_0;
 
-				if ( swlist_name && *swlist_name )
+				while ( ! software_part_ptr && i <= DEVINFO_STR_SWLIST_MAX )
 				{
-					if ( software_list_ptr )
+					swlist_name = swlist->list_name[i-DEVINFO_STR_SWLIST_0];
+
+					if ( swlist_name && *swlist_name )
 					{
-						software_list_close( software_list_ptr );
-					}
-
-					software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
-
-					if ( software_list_ptr )
-					{
-						software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
-
-						if ( software_info_ptr )
+						if ( software_list_ptr )
 						{
-							software_part_ptr = software_find_part( software_info_ptr, swpart, interface );
+							software_list_close( software_list_ptr );
+						}
+
+						software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
+
+						if ( software_list_ptr )
+						{
+							software_info_ptr = software_list_find( software_list_ptr, swname, NULL );
+
+							if ( software_info_ptr )
+							{
+								software_part_ptr = software_find_part( software_info_ptr, swpart, interface );
+							}
 						}
 					}
+					i++;
 				}
-				i++;
 			}
 		}
 
@@ -1387,29 +1388,26 @@ void ui_mess_menu_software_list(running_machine *machine, ui_menu *menu, void *p
 /* list of available software lists - i.e. cartridges, floppies */
 static void ui_mess_menu_populate_software_list(running_machine *machine, ui_menu *menu)
 {
-	for (const device_config *dev = machine->config->m_devicelist.first(); dev != NULL; dev = dev->next())
+	for (const device_config *dev = machine->config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
-		if (!strcmp(dev->tag(), __SOFTWARE_LIST_TAG))
+		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+
+		for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
 		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
-
-			for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
+			if (swlist->list_name[i])
 			{
-				if (swlist->list_name[i])
+				software_list *list = software_list_open(machine->options(), swlist->list_name[i], FALSE, NULL);
+
+				if (list)
 				{
-					software_list *list = software_list_open(machine->options(), swlist->list_name[i], FALSE, NULL);
-
-					if (list)
+					/* todo: fix this */
+					for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 					{
-						/* todo: fix this */
-						for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
-						{
-						}
-
-						ui_menu_item_append(menu, list->description, NULL, 0, swlist->list_name[i]);
-
-						software_list_close(list);
 					}
+
+					ui_menu_item_append(menu, list->description, NULL, 0, swlist->list_name[i]);
+
+					software_list_close(list);
 				}
 			}
 		}
