@@ -873,9 +873,9 @@ void console_create_window(running_machine *machine)
 @implementation MAMEDisassemblyView
 
 - (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address inAddressSpace:(const address_space *)space {
-	cpu_debug_data			*cpuinfo = cpu_get_debug_data(space->cpu);
+	device_debug			*cpuinfo = space->cpu->debug();
 	device_debug::breakpoint	*bp;
-	for (bp = cpuinfo->bplist; (bp != NULL) && (address != bp->address); bp = bp->next) {}
+	for (bp = cpuinfo->breakpoint_first(); (bp != NULL) && (address != bp->address()); bp = bp->next()) {}
 	return bp;
 }
 
@@ -980,7 +980,7 @@ void console_create_window(running_machine *machine)
 		}
 		return haveCursor;
 	} else if (action == @selector(debugToggleBreakpointEnable:)) {
-		if ((breakpoint != NULL) && !breakpoint->enabled) {
+		if ((breakpoint != NULL) && !breakpoint->enabled()) {
 			if (inContextMenu)
 				[item setTitle:@"Enable Breakpoint"];
 			else
