@@ -55,6 +55,7 @@ enum _file_selector_entry_type
 {
 	SELECTOR_ENTRY_TYPE_EMPTY,
 	SELECTOR_ENTRY_TYPE_CREATE,
+	SELECTOR_ENTRY_TYPE_SOFTWARE_LIST,
 	SELECTOR_ENTRY_TYPE_DRIVE,
 	SELECTOR_ENTRY_TYPE_DIRECTORY,
 	SELECTOR_ENTRY_TYPE_FILE
@@ -644,6 +645,10 @@ static void append_file_selector_entry_menu_item(ui_menu *menu, const file_selec
 			text = "[create]";
 			break;
 
+		case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
+			text = "[software list]";
+			break;
+
 		case SELECTOR_ENTRY_TYPE_DRIVE:
 			text = entry->basename;
 			subtext = "[DRIVE]";
@@ -697,6 +702,9 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 		/* add the "[create]" entry */
 		append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_CREATE, NULL, NULL);
 	}
+
+	/* add the "[software list]" entry */
+	append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, NULL, NULL);
 
 	/* add the drives */
 	i = 0;
@@ -808,7 +816,10 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 					child_menustate->manager_menustate = menustate->manager_menustate;
 					ui_menu_stack_push(child_menu);
 					break;
-
+				case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
+					child_menu = ui_menu_alloc(machine, render_container_get_ui(), ui_image_menu_software, menustate->manager_menustate->selected_device);
+					ui_menu_stack_push(child_menu);
+					break;
 				case SELECTOR_ENTRY_TYPE_DRIVE:
 				case SELECTOR_ENTRY_TYPE_DIRECTORY:
 					/* drive/directory - first check the path */

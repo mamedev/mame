@@ -927,7 +927,7 @@ static void print_game_software_list(FILE *out, const game_driver *game, const m
 
 		for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 		{
-			if ( swlist->list_name[i] )
+			if ( swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
 			{
 				fprintf(out, "\t\t<softwarelist name=\"%s\" />\n", swlist->list_name[i] );
 			}

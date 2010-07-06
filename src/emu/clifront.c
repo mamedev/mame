@@ -801,7 +801,7 @@ static int info_listsoftware(core_options *options, const char *gamename)
 
 				for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 				{
-					if ( swlist->list_name[i] && *swlist->list_name[i] )
+					if ( swlist->list_name[i] && *swlist->list_name[i]  && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
 						nr_lists++;
 				}
 			}
@@ -862,7 +862,7 @@ static int info_listsoftware(core_options *options, const char *gamename)
 
 				for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 				{
-					if ( swlist->list_name[i] && *swlist->list_name[i] )
+					if ( swlist->list_name[i] && *swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
 					{
 						software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
 

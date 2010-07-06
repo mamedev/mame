@@ -1544,10 +1544,6 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 
 		/* add file manager menu */
 		ui_menu_item_append(menu, "File Manager", NULL, 0, (void*)ui_image_menu_file_manager);
-
-		/* add software menu */
-		ui_menu_item_append(menu, "Software", NULL, 0, (void*)ui_image_menu_software);
-		
 	#ifdef MESS
 		/* add MESS-specific menus */
 		ui_mess_main_menu_populate(machine, menu);

@@ -1292,7 +1292,8 @@ void load_software_part_region(running_device *device, char *swlist, char *swnam
 		const region_info *memregion = romdata->machine->region(regiontag);
 		if (memregion != NULL)
 		{
-			regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
+			if (romdata->machine->device(regiontag) != NULL)
+				regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
 
 			/* clear old region (todo: should be moved to an image unload function) */
 			romdata->machine->region_free(memregion->name());
