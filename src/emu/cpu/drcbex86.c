@@ -3357,7 +3357,7 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		/* push the parameter */
 		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &pcp);							// mov   [esp+4],pcp
 		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)drcbe->device);					// mov   [esp],device
-		emit_call(&dst, (x86code *)debug_cpu_instruction_hook);							// call  debug_cpu_instruction_hook
+		emit_call(&dst, (x86code *)debugger_instruction_hook);							// call  debug_cpu_instruction_hook
 
 		track_resolve_link(drcbe, &dst, &skip);										// skip:
 	}

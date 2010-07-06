@@ -730,7 +730,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, runnin
 	drcbe->double1 = 1.0;
 
 	/* get pointers to C functions we need to call */
-	drcbe->debug_cpu_instruction_hook = (x86code *)debug_cpu_instruction_hook;
+	drcbe->debug_cpu_instruction_hook = (x86code *)debugger_instruction_hook;
 	if (LOG_HASHJMPS)
 		drcbe->debug_log_hashjmp = (x86code *)debug_log_hashjmp;
 	drcbe->drcmap_get_value = (x86code *)drcmap_get_value;

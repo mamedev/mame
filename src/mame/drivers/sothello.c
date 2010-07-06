@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 
 static void unlock_shared_ram(const address_space *space)
 {
-    if(!cputag_is_suspended(space->machine, "sub", SUSPEND_REASON_HALT))
+    if(!space->machine->device<cpu_device>("sub")->suspended(SUSPEND_REASON_HALT))
     {
         subcpu_status|=1;
     }

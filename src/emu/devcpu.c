@@ -189,8 +189,7 @@ cpu_device::cpu_device(running_machine &machine, const cpu_device_config &config
 	  device_execute_interface(machine, config, *this),
 	  device_memory_interface(machine, config, *this),
 	  device_state_interface(machine, config, *this),
-	  device_disasm_interface(machine, config, *this),
-	  m_debug(NULL)
+	  device_disasm_interface(machine, config, *this)
 {
 }
 

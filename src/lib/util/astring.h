@@ -82,6 +82,9 @@ astring *astring_alloc(void);
 /* free an astring */
 void astring_free(astring *str);
 
+/* free an astring */
+void astring_expand(astring *str, int length);
+
 
 
 /* ----- inline astring changes ----- */
@@ -315,7 +318,9 @@ public:
 	astring &operator=(const astring &string) { return cpy(string); }
 
 	astring &reset() { return cpy(""); }
+	astring &expand(int length) { astring_expand(this, length); return *this; }
 
+	operator char *() { return this->text; }
 	operator const char *() const { return astring_c(this); }
 	const char *cstr() const { return astring_c(this); }
 	int len() const { return astring_len(this); }

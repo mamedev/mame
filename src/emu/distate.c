@@ -427,11 +427,11 @@ device_state_interface::~device_state_interface()
 
 
 //-------------------------------------------------
-//  state_value - return the value of the given
-//  pieces of indexed state as a UINT64
+//  state - return the value of the given piece
+//  of indexed state as a UINT64
 //-------------------------------------------------
 
-UINT64 device_state_interface::state_value(int index)
+UINT64 device_state_interface::state(int index)
 {
 	// NULL or out-of-range entry returns 0
 	const device_state_entry *entry = state_find_entry(index);
@@ -488,11 +488,11 @@ int device_state_interface::state_string_max_length(int index)
 
 
 //-------------------------------------------------
-//  state_set_value - set the value of the given
-//  pieces of indexed state from a UINT64
+//  set_state - set the value of the given piece
+//  of indexed state from a UINT64
 //-------------------------------------------------
 
-void device_state_interface::state_set_value(int index, UINT64 value)
+void device_state_interface::set_state(int index, UINT64 value)
 {
 	// NULL or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);
@@ -509,11 +509,11 @@ void device_state_interface::state_set_value(int index, UINT64 value)
 
 
 //-------------------------------------------------
-//  state_set_value - set the value of the given
-//  pieces of indexed state from a string
+//  set_state - set the value of the given piece
+//  of indexed state from a string
 //-------------------------------------------------
 
-void device_state_interface::state_set_value(int index, const char *string)
+void device_state_interface::set_state(int index, const char *string)
 {
 	// NULL or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);

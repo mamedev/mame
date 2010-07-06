@@ -98,7 +98,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 			/* X register as the intensity */
 			if (data != last_control && data)
 			{
-				int xval = cpu->state_value(CCPU_X) & 0x0f;
+				int xval = cpu->state(CCPU_X) & 0x0f;
 				i = (xval + 1) * 255 / 16;
 				vector_color = MAKE_RGB(i,i,i);
 			}
@@ -109,7 +109,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 			/* X register as the intensity */
 			if (data != last_control && data)
 			{
-				int xval = cpu->state_value(CCPU_X);
+				int xval = cpu->state(CCPU_X);
 				xval = (~xval >> 2) & 0x3f;
 				i = (xval + 1) * 255 / 64;
 				vector_color = MAKE_RGB(i,i,i);
@@ -121,7 +121,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 			/* as 4-4-4 BGR values */
 			if (data != last_control && data)
 			{
-				int xval = cpu->state_value(CCPU_X);
+				int xval = cpu->state(CCPU_X);
 				r = (~xval >> 0) & 0x0f;
 				r = r * 255 / 15;
 				g = (~xval >> 4) & 0x0f;
@@ -142,15 +142,15 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 				/* on an IV instruction if data == 0 here */
 				if (data != last_control && !data)
 				{
-					lastx = cpu->state_value(CCPU_X);
-					lasty = cpu->state_value(CCPU_Y);
+					lastx = cpu->state(CCPU_X);
+					lasty = cpu->state(CCPU_Y);
 				}
 
 				/* on the rising edge of the data value, latch the Y register */
 				/* as 2-3-3 BGR values */
 				if (data != last_control && data)
 				{
-					int yval = cpu->state_value(CCPU_Y);
+					int yval = cpu->state(CCPU_Y);
 					r = (~yval >> 0) & 0x07;
 					r = r * 255 / 7;
 					g = (~yval >> 3) & 0x07;
@@ -160,8 +160,8 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 					vector_color = MAKE_RGB(r,g,b);
 
 					/* restore the original X,Y values */
-					cpu->state_set_value(CCPU_X, lastx);
-					cpu->state_set_value(CCPU_Y, lasty);
+					cpu->set_state(CCPU_X, lastx);
+					cpu->set_state(CCPU_Y, lasty);
 				}
 			}
 			break;

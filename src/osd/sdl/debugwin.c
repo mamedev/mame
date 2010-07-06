@@ -491,7 +491,7 @@ void debugwin_update_during_game(running_machine *machine)
 static void debugmain_process_string(win_i *win, const char *str)
 {
 	if(!str[0])
-		debug_cpu_single_step(win->machine, 1);
+		debug_cpu_get_visible_cpu(win->machine)->debug()->single_step();
 	else
 		debug_console_execute_command(win->machine, str, 1);
 }
@@ -850,43 +850,43 @@ void on_new_errorlog_activate(GtkWidget *win)
 
 void on_run_activate(GtkWidget *win)
 {
-	debug_cpu_go(get_running_machine(win), ~0);
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go();
 }
 
 void on_run_h_activate(GtkWidget *win)
 {
 	debugwin_show(0);
-	debug_cpu_go(get_running_machine(win), ~0);
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go();
 }
 
 void on_run_cpu_activate(GtkWidget *win)
 {
-	debug_cpu_next_cpu(get_running_machine(win));
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go_next_device();
 }
 
 void on_run_irq_activate(GtkWidget *win)
 {
-	debug_cpu_go_interrupt(get_running_machine(win), -1);
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go_interrupt();
 }
 
 void on_run_vbl_activate(GtkWidget *win)
 {
-	debug_cpu_go_vblank(get_running_machine(win));
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go_vblank();
 }
 
 void on_step_into_activate(GtkWidget *win)
 {
-	debug_cpu_single_step(get_running_machine(win), 1);
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->single_step();
 }
 
 void on_step_over_activate(GtkWidget *win)
 {
-	debug_cpu_single_step_over(get_running_machine(win), 1);
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->single_step_over();
 }
 
 void on_step_out_activate(GtkWidget *win)
 {
-	debug_cpu_single_step_out(get_running_machine(win));
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->single_step_out();
 }
 
 void on_hard_reset_activate(GtkWidget *win)
@@ -897,7 +897,7 @@ void on_hard_reset_activate(GtkWidget *win)
 void on_soft_reset_activate(GtkWidget *win)
 {
 	get_running_machine(win)->schedule_soft_reset();
-	debug_cpu_go(get_running_machine(win), ~0);
+	debug_cpu_get_visible_cpu(get_running_machine(win))->debug()->go();
 }
 
 void on_exit_activate(GtkWidget *win)
@@ -1010,7 +1010,7 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 		if (debug_cpu_get_visible_cpu(info->machine) == disasm->view->source()->device())
 		{
 			offs_t address = downcast<debug_view_disasm *>(disasm->view)->selected_address();
-			cpu_debug_data *cpuinfo = cpu_get_debug_data(disasm->view->source()->device());
+			device_debug *cpuinfo = disasm->view->source()->device()->debug();
 			debug_cpu_breakpoint *bp;
 			INT32 bpindex = -1;
 

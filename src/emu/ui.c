@@ -998,25 +998,29 @@ static astring &warnings_string(running_machine *machine, astring &string)
 astring &game_info_astring(running_machine *machine, astring &string)
 {
 	int scrcount = screen_count(*machine->config);
-	device_t *scandevice;
-	device_t *device;
 	int found_sound = FALSE;
-	int count;
 
 	/* print description, manufacturer, and CPU: */
 	string.printf("%s\n%s %s\n\nCPU:\n", machine->gamedrv->description, machine->gamedrv->year, machine->gamedrv->manufacturer);
 
 	/* loop over all CPUs */
-	for (device = machine->firstcpu; device != NULL; device = scandevice)
+	device_execute_interface *exec;
+	int count = 1;
+	for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
+		// skip over any we already claimed
+		if (--count != 0)
+			continue;
+	
 		/* get cpu specific clock that takes internal multiplier/dividers into account */
-		int clock = device->clock();
+		int clock = exec->device().clock();
 
 		/* count how many identical CPUs we have */
 		count = 1;
-		for (scandevice = device->typenext(); scandevice != NULL; scandevice = scandevice->typenext())
+		device_execute_interface *scan;
+		for (bool gotone = exec->next(scan); gotone; gotone = scan->next(scan))
 		{
-			if (device->type() != scandevice->type() || device->clock() != scandevice->clock())
+			if (exec->device().type() != scan->device().type() || exec->device().clock() != scan->device().clock())
 				break;
 			count++;
 		}
@@ -1024,7 +1028,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
-		string.cat(device->name());
+		string.cat(exec->device().name());
 
 		/* display clock in kHz or MHz */
 		if (clock >= 1000000)
@@ -1645,10 +1649,11 @@ static slider_state *slider_init(running_machine *machine)
 	/* add CPU overclocking (cheat only) */
 	if (options_get_bool(machine->options(), OPTION_CHEAT))
 	{
-		for (device = machine->firstcpu; device != NULL; device = cpu_next(device))
+		device_execute_interface *exec;
+		for (bool gotone = machine->m_devicelist.first(exec); exec != NULL; gotone = exec->next(exec))
 		{
-			void *param = (void *)device;
-			string.printf("Overclock CPU %s", device->tag());
+			void *param = (void *)&exec->device();
+			string.printf("Overclock CPU %s", exec->device().tag());
 			*tailptr = slider_alloc(machine, string, 10, 1000, 2000, 1, slider_overclock, param);
 			tailptr = &(*tailptr)->next;
 		}

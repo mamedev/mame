@@ -232,6 +232,17 @@ void astring_free(astring *str)
 #endif
 
 
+/*-------------------------------------------------
+    astring_expand - expand an astring to 
+    guarantee the given amount of space
+-------------------------------------------------*/
+
+void astring_expand(astring *str, int length)
+{
+	ensure_room(str, length);
+}
+
+
 
 /***************************************************************************
     INLINE ASTRING CHANGES

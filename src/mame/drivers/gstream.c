@@ -627,7 +627,7 @@ ROM_END
 static READ32_HANDLER( gstream_speedup_r )
 {
 	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	if (state->maincpu->state_value(STATE_GENPC) == 0xc0001592)
+	if (state->maincpu->state(STATE_GENPC) == 0xc0001592)
 	{
 		state->maincpu->eat_cycles(50);
 	}

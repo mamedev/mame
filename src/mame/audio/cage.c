@@ -474,7 +474,7 @@ static void update_control_lines(running_machine *machine)
 	val &= ~0x88;
 	if (cpu_to_cage_ready) val |= 0x08;
 	if (cage_to_cpu_ready) val |= 0x80;
-	cage_cpu->state_set_value(TMS32031_IOF, val);
+	cage_cpu->set_state(TMS32031_IOF, val);
 }
 
 

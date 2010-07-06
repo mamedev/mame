@@ -258,7 +258,7 @@ static void set_default_key_params(running_machine *machine);
 static void load_overlay_file(running_machine *machine);
 static void save_overlay_file(running_machine *machine);
 
-static int instruction_hook(running_device *device, offs_t curpc);
+static int instruction_hook(device_t &device, offs_t curpc);
 
 static void execute_fdsave(running_machine *machine, int ref, int params, const char **param);
 static void execute_fdoutput(running_machine *machine, int ref, int params, const char **param);
@@ -535,7 +535,7 @@ void fd1094_init_debugging(running_machine *machine, const char *cpureg, const c
 	debug_console_register_command(machine, "fdcsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdcsearch);
 
 	/* set up the instruction hook */
-	debug_cpu_set_instruction_hook(devtag_get_device(machine, "maincpu"), instruction_hook);
+	machine->device("maincpu")->debug()->set_instruction_hook(instruction_hook);
 
 	/* regenerate the key */
 	if (keydirty)
@@ -688,7 +688,7 @@ void fd1094_regenerate_key(running_machine *machine)
     instruction_hook - per-instruction hook
 -----------------------------------------------*/
 
-static int instruction_hook(running_device *device, offs_t curpc)
+static int instruction_hook(device_t &device, offs_t curpc)
 {
 	int curfdstate = fd1094_set_state(keyregion, -1);
 	UINT8 instrbuffer[10], keybuffer[5];
@@ -720,20 +720,20 @@ static int instruction_hook(running_device *device, offs_t curpc)
 	}
 
 	/* try all possible decodings at the current pc */
-	posscount = try_all_possibilities(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+	posscount = try_all_possibilities(cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM), curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 	if (keydirty)
-		fd1094_regenerate_key(device->machine);
+		fd1094_regenerate_key(device.machine);
 
 	/* if we only ended up with one possibility, mark that one as good */
 	if (posscount == 1)
 	{
-		tag_possibility(device->machine, &posslist[0], STATUS_LOCKED);
-		fd1094_regenerate_key(device->machine);
+		tag_possibility(device.machine, &posslist[0], STATUS_LOCKED);
+		fd1094_regenerate_key(device.machine);
 		return 0;
 	}
 
 	/* print possibilities and break */
-	print_possibilities(device->machine);
+	print_possibilities(device.machine);
 	return 1;
 }
 
@@ -948,7 +948,7 @@ static void execute_fdignore(running_machine *machine, int ref, int params, cons
 
 	/* if no parameter given, implicitly run as well */
 	if (params == 0)
-		debug_cpu_go(machine, ~0);
+		debug_cpu_get_visible_cpu(machine)->debug()->go();
 }
 
 
@@ -1041,7 +1041,7 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
 	cpu_set_reg(cpu, STATE_GENPC, newpc);
 
 	/* recompute around that */
-	instruction_hook(cpu, newpc);
+	instruction_hook(*cpu, newpc);
 }
 
 
@@ -1092,7 +1092,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 
 			/* set this as our current PC and run the instruction hook */
 			cpu_set_reg(space->cpu, STATE_GENPC, pc);
-			if (instruction_hook(space->cpu, pc))
+			if (instruction_hook(*space->cpu, pc))
 				break;
 		}
 		keystatus[pc/2] |= SEARCH_MASK;

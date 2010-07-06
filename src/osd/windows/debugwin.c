@@ -514,7 +514,7 @@ void debugwin_update_during_game(running_machine *machine)
 			HWND focuswnd = GetFocus();
 			debugwin_info *info;
 
-			debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(machine), "User-initiated break\n");
+			debug_cpu_get_visible_cpu(machine)->debug()->halt_on_next_instruction("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (info = window_list; info != NULL; info = info->next)
@@ -795,7 +795,7 @@ static LRESULT CALLBACK debugwin_window_proc(HWND wnd, UINT message, WPARAM wpar
 			if (main_console && main_console->wnd == wnd)
 			{
 				smart_show_all(FALSE);
-				debug_cpu_go(info->machine, ~0);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->go();
 			}
 			else
 				DestroyWindow(wnd);
@@ -2251,14 +2251,14 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 					if (dasmview->cursor_visible() && debug_cpu_get_visible_cpu(info->machine) == dasmview->source()->device())
 					{
 						offs_t address = dasmview->selected_address();
-						cpu_debug_data *cpuinfo = cpu_get_debug_data(dasmview->source()->device());
+						device_debug *debug = dasmview->source()->device()->debug();
 						INT32 bpindex = -1;
 
 						/* first find an existing breakpoint at this address */
-						for (debug_cpu_breakpoint *bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
-							if (address == bp->address)
+						for (debug_cpu_breakpoint *bp = debug->breakpoint_first(); bp != NULL; bp = bp->next())
+							if (address == bp->address())
 							{
-								bpindex = bp->index;
+								bpindex = bp->index();
 								break;
 							}
 
@@ -2533,7 +2533,7 @@ static void console_process_string(debugwin_info *info, const char *string)
 
 	// an empty string is a single step
 	if (string[0] == 0)
-		debug_cpu_single_step(info->machine, 1);
+		debug_cpu_get_visible_cpu(info->machine)->debug()->single_step();
 
 	// otherwise, just process the command
 	else
@@ -2638,31 +2638,31 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 			case ID_RUN_AND_HIDE:
 				smart_show_all(FALSE);
 			case ID_RUN:
-				debug_cpu_go(info->machine, ~0);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->go();
 				return 1;
 
 			case ID_NEXT_CPU:
-				debug_cpu_next_cpu(info->machine);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->go_next_device();
 				return 1;
 
 			case ID_RUN_VBLANK:
-				debug_cpu_go_vblank(info->machine);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->go_vblank();
 				return 1;
 
 			case ID_RUN_IRQ:
-				debug_cpu_go_interrupt(info->machine, -1);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->go_interrupt();
 				return 1;
 
 			case ID_STEP:
-				debug_cpu_single_step(info->machine, 1);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->single_step();
 				return 1;
 
 			case ID_STEP_OVER:
-				debug_cpu_single_step_over(info->machine, 1);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->single_step_over();
 				return 1;
 
 			case ID_STEP_OUT:
-				debug_cpu_single_step_out(info->machine);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->single_step_out();
 				return 1;
 
 			case ID_HARD_RESET:
@@ -2671,7 +2671,7 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 
 			case ID_SOFT_RESET:
 				info->machine->schedule_soft_reset();
-				debug_cpu_go(info->machine, ~0);
+				debug_cpu_get_visible_cpu(info->machine)->debug()->go();
 				return 1;
 
 			case ID_EXIT:

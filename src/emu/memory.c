@@ -3494,7 +3494,7 @@ static READ8_HANDLER( watchpoint_read8 )
 	UINT8 *oldtable = spacerw->readlookup;
 	UINT8 result;
 
-	debug_cpu_memory_read_hook(spacerw, offset, 0xff);
+	spacerw->cpu->debug()->memory_read_hook(*spacerw, offset, 0xff);
 	spacerw->readlookup = space->read.table;
 	result = read_byte_generic(spacerw, offset);
 	spacerw->readlookup = oldtable;
@@ -3507,7 +3507,7 @@ static READ16_HANDLER( watchpoint_read16 )
 	UINT8 *oldtable = spacerw->readlookup;
 	UINT16 result;
 
-	debug_cpu_memory_read_hook(spacerw, offset << 1, mem_mask);
+	spacerw->cpu->debug()->memory_read_hook(*spacerw, offset << 1, mem_mask);
 	spacerw->readlookup = spacerw->read.table;
 	result = read_word_generic(spacerw, offset << 1, mem_mask);
 	spacerw->readlookup = oldtable;
@@ -3520,7 +3520,7 @@ static READ32_HANDLER( watchpoint_read32 )
 	UINT8 *oldtable = spacerw->readlookup;
 	UINT32 result;
 
-	debug_cpu_memory_read_hook(spacerw, offset << 2, mem_mask);
+	spacerw->cpu->debug()->memory_read_hook(*spacerw, offset << 2, mem_mask);
 	spacerw->readlookup = spacerw->read.table;
 	result = read_dword_generic(spacerw, offset << 2, mem_mask);
 	spacerw->readlookup = oldtable;
@@ -3533,7 +3533,7 @@ static READ64_HANDLER( watchpoint_read64 )
 	UINT8 *oldtable = spacerw->readlookup;
 	UINT64 result;
 
-	debug_cpu_memory_read_hook(spacerw, offset << 3, mem_mask);
+	spacerw->cpu->debug()->memory_read_hook(*spacerw, offset << 3, mem_mask);
 	spacerw->readlookup = spacerw->read.table;
 	result = read_qword_generic(spacerw, offset << 3, mem_mask);
 	spacerw->readlookup = oldtable;
@@ -3545,7 +3545,7 @@ static WRITE8_HANDLER( watchpoint_write8 )
 	address_space *spacerw = (address_space *)space;
 	UINT8 *oldtable = spacerw->writelookup;
 
-	debug_cpu_memory_write_hook(spacerw, offset, data, 0xff);
+	spacerw->cpu->debug()->memory_write_hook(*spacerw, offset, data, 0xff);
 	spacerw->writelookup = spacerw->write.table;
 	write_byte_generic(spacerw, offset, data);
 	spacerw->writelookup = oldtable;
@@ -3556,7 +3556,7 @@ static WRITE16_HANDLER( watchpoint_write16 )
 	address_space *spacerw = (address_space *)space;
 	UINT8 *oldtable = spacerw->writelookup;
 
-	debug_cpu_memory_write_hook(spacerw, offset << 1, data, mem_mask);
+	spacerw->cpu->debug()->memory_write_hook(*spacerw, offset << 1, data, mem_mask);
 	spacerw->writelookup = spacerw->write.table;
 	write_word_generic(spacerw, offset << 1, data, mem_mask);
 	spacerw->writelookup = oldtable;
@@ -3567,7 +3567,7 @@ static WRITE32_HANDLER( watchpoint_write32 )
 	address_space *spacerw = (address_space *)space;
 	UINT8 *oldtable = spacerw->writelookup;
 
-	debug_cpu_memory_write_hook(spacerw, offset << 2, data, mem_mask);
+	spacerw->cpu->debug()->memory_write_hook(*spacerw, offset << 2, data, mem_mask);
 	spacerw->writelookup = spacerw->write.table;
 	write_dword_generic(spacerw, offset << 2, data, mem_mask);
 	spacerw->writelookup = oldtable;
@@ -3578,7 +3578,7 @@ static WRITE64_HANDLER( watchpoint_write64 )
 	address_space *spacerw = (address_space *)space;
 	UINT8 *oldtable = spacerw->writelookup;
 
-	debug_cpu_memory_write_hook(spacerw, offset << 3, data, mem_mask);
+	spacerw->cpu->debug()->memory_write_hook(*spacerw, offset << 3, data, mem_mask);
 	spacerw->writelookup = spacerw->write.table;
 	write_qword_generic(spacerw, offset << 3, data, mem_mask);
 	spacerw->writelookup = oldtable;

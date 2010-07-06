@@ -1080,11 +1080,11 @@ VIDEO_UPDATE( tms340x0 )
 	pen_t blackpen = get_black_pen(screen->machine);
 	tms34010_display_params params;
 	tms34010_state *tms = NULL;
-	running_device *cpu;
+	device_t *cpu;
 	int x;
 
 	/* find the owning CPU */
-	for (cpu = screen->machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	for (cpu = screen->machine->m_devicelist.first(); cpu != NULL; cpu = cpu->next())
 	{
 		device_type type = cpu->type();
 		if (type == TMS34010 || type == TMS34020)

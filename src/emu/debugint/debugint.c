@@ -957,7 +957,7 @@ static void process_string(DView *dv, const char *str)
 		break;
 	case DVT_CONSOLE:
 		if(!dv->editor.str[0])
-			debug_cpu_single_step(dv->machine, 1);
+			debug_cpu_get_visible_cpu(dv->machine)->debug()->single_step();
 		else
 			debug_console_execute_command(dv->machine, str, 1);
 		break;
@@ -1025,46 +1025,46 @@ static void on_close_activate(DView *dv, const ui_menu_event *event)
 
 static void on_run_activate(DView *dv, const ui_menu_event *event)
 {
-	debug_cpu_go(dv->machine, ~0);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->go();
 }
 
 #if 0
 void on_run_h_activate(DView *dv, const ui_menu_event *event)
 {
 	debugwin_show(0);
-	debug_cpu_go(dv->machine, ~0);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->go();
 }
 #endif
 
 static void on_run_cpu_activate(DView *dv, const ui_menu_event *event)
 {
-	debug_cpu_next_cpu(dv->machine);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->go_next_device();
 }
 
 static void on_run_irq_activate(DView *dv, const ui_menu_event *event)
 {
-	debug_cpu_go_interrupt(dv->machine, -1);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->go_interrupt();
 }
 
 static void on_run_vbl_activate(DView *dv, const ui_menu_event *event)
 {
-	debug_cpu_go_vblank(dv->machine);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->go_vblank();
 }
 
 static void on_step_into_activate(DView *dv, const ui_menu_event *event)
 {
-	debug_cpu_single_step(dv->machine, 1);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->single_step();
 }
 
 static void on_step_over_activate(DView *dv, const ui_menu_event *event)
 {
-	debug_cpu_single_step_over(dv->machine, 1);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->single_step_over();
 }
 
 #ifdef UNUSED_CODE
 static void on_step_out_activate(DView *dv, const ui_menu_event *event)
 {
-	debug_cpu_single_step_out(dv->machine);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->single_step_out();
 }
 #endif
 
@@ -1076,7 +1076,7 @@ static void on_hard_reset_activate(DView *dv, const ui_menu_event *event)
 static void on_soft_reset_activate(DView *dv, const ui_menu_event *event)
 {
 	dv->machine->schedule_soft_reset();
-	debug_cpu_go(dv->machine, ~0);
+	debug_cpu_get_visible_cpu(dv->machine)->debug()->go();
 }
 
 static void on_exit_activate(DView *dv, const ui_menu_event *event)

@@ -650,7 +650,7 @@ void console_create_window(running_machine *machine)
 
 
 - (void)insertNewline:(id)sender {
-	debug_cpu_single_step(machine, 1);
+	debug_cpu_get_visible_cpu(machine)->debug()->single_step();
 }
 
 
@@ -1086,13 +1086,13 @@ void console_create_window(running_machine *machine)
 				if (bp == NULL)
 					command = [NSString stringWithFormat:@"bpset %lX", (unsigned long)address];
 				else
-					command = [NSString stringWithFormat:@"bpclear %X", (unsigned)bp->index];
+					command = [NSString stringWithFormat:@"bpclear %X", (unsigned)bp->index()];
 				debug_console_execute_command(machine, [command UTF8String], 1);
 			} else {
 				if (bp == NULL)
-					debug_cpu_breakpoint_set(space->cpu, address, NULL, NULL);
+					space->cpu->debug()->breakpoint_set(address, NULL, NULL);
 				else
-					debug_cpu_breakpoint_clear(machine, bp->index);
+					space->cpu->debug()->breakpoint_clear(bp->index());
 			}
 		}
 	}
@@ -1109,13 +1109,13 @@ void console_create_window(running_machine *machine)
 			if (bp != NULL) {
 				NSString *command;
 				if (useConsole) {
-					if (bp->enabled)
-						command = [NSString stringWithFormat:@"bpdisable %X", (unsigned)bp->index];
+					if (bp->enabled())
+						command = [NSString stringWithFormat:@"bpdisable %X", (unsigned)bp->index()];
 					else
-						command = [NSString stringWithFormat:@"bpenable %X", (unsigned)bp->index];
+						command = [NSString stringWithFormat:@"bpenable %X", (unsigned)bp->index()];
 					debug_console_execute_command(machine, [command UTF8String], 1);
 				} else {
-					debug_cpu_breakpoint_enable(machine, bp->index, !bp->enabled);
+					space->cpu->debug()->breakpoint_enable(bp->index(), !bp->enabled());
 				}
 			}
 		}
@@ -1132,7 +1132,7 @@ void console_create_window(running_machine *machine)
 				NSString *command = [NSString stringWithFormat:@"go %lX", (unsigned long)address];
 				debug_console_execute_command(machine, [command UTF8String], 1);
 			} else {
-				debug_cpu_go(machine, address);
+				debug_cpu_get_visible_cpu(machine)->debug()->go(address);
 			}
 		}
 	}
@@ -1470,49 +1470,49 @@ void console_create_window(running_machine *machine)
 
 
 - (IBAction)debugRun:(id)sender {
-	debug_cpu_go(machine, ~0);
+	debug_cpu_get_visible_cpu(machine)->debug()->go();
 }
 
 
 - (IBAction)debugRunAndHide:(id)sender {
 	[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification object:self];
-	debug_cpu_go(machine, ~0);
+	debug_cpu_get_visible_cpu(machine)->debug()->go();
 }
 
 
 - (IBAction)debugRunToNextCPU:(id)sender {
-	debug_cpu_next_cpu(machine);
+	debug_cpu_get_visible_cpu(machine)->debug()->go_next_device();
 }
 
 
 - (IBAction)debugRunToNextInterrupt:(id)sender {
-	debug_cpu_go_interrupt(machine, -1);
+	debug_cpu_get_visible_cpu(machine)->debug()->go_interrupt();
 }
 
 
 - (IBAction)debugRunToNextVBLANK:(id)sender {
-	debug_cpu_go_vblank(machine);
+	debug_cpu_get_visible_cpu(machine)->debug()->go_vblank();
 }
 
 
 - (IBAction)debugStepInto:(id)sender {
-	debug_cpu_single_step(machine, 1);
+	debug_cpu_get_visible_cpu(machine)->debug()->single_step();
 }
 
 
 - (IBAction)debugStepOver:(id)sender {
-	debug_cpu_single_step_over(machine, 1);
+	debug_cpu_get_visible_cpu(machine)->debug()->single_step_over();
 }
 
 
 - (IBAction)debugStepOut:(id)sender {
-	debug_cpu_single_step_out(machine);
+	debug_cpu_get_visible_cpu(machine)->debug()->single_step_out();
 }
 
 
 - (IBAction)debugSoftReset:(id)sender {
 	machine->schedule_soft_reset();
-	debug_cpu_go(machine, ~0);
+	debug_cpu_get_visible_cpu(machine)->debug()->go();
 }
 
 
@@ -1740,7 +1740,7 @@ void console_create_window(running_machine *machine)
 - (IBAction)doCommand:(id)sender {
 	NSString *command = [sender stringValue];
 	if ([command length] == 0) {
-		debug_cpu_single_step(machine, 1);
+		debug_cpu_get_visible_cpu(machine)->debug()->single_step();
 	} else {
 		debug_console_execute_command(machine, [command UTF8String], 1);
 		[history add:command];
@@ -1819,7 +1819,7 @@ void console_create_window(running_machine *machine)
 	if ([notification object] != window)
 		return;
 	[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification object:self];
-	debug_cpu_go(machine, ~0);
+	debug_cpu_get_visible_cpu(machine)->debug()->go();
 }
 
 

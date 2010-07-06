@@ -687,6 +687,7 @@ void device_interface::interface_debug_setup()
 device_t::device_t(running_machine &_machine, const device_config &config)
 	: machine(&_machine),
 	  m_machine(_machine),
+	  m_debug(NULL),
 	  m_execute(NULL),
 	  m_memory(NULL),
 	  m_state(NULL),
@@ -839,7 +840,6 @@ void device_t::find_interfaces()
 
 void device_t::start()
 {
-
 	// populate the region field
 	m_region = m_machine.region(tag());
 

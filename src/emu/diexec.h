@@ -207,7 +207,7 @@ public:
 	bool disabled() const { return m_execute_config.disabled(); }
 
 	// execution management
-	bool is_executing() const;
+	bool executing() const;
 	INT32 cycles_remaining() const;
 	void eat_cycles(int cycles);
 	void adjust_icount(int delta);
@@ -226,7 +226,7 @@ public:
 	// suspend/resume
 	void suspend(UINT32 reason, bool eatcycles);
 	void resume(UINT32 reason);
-	bool is_suspended(UINT32 reason = SUSPEND_ANY_REASON) { return (m_nextsuspend & reason) != 0; }
+	bool suspended(UINT32 reason = SUSPEND_ANY_REASON) { return (m_nextsuspend & reason) != 0; }
 	void yield() { suspend(SUSPEND_REASON_TIMESLICE, false); }
 	void spin() { suspend(SUSPEND_REASON_TIMESLICE, true); }
 	void spin_until_trigger(int trigid) { suspend_until_trigger(trigid, true); }
@@ -392,18 +392,6 @@ inline void device_suspend(device_t *device, int reason, bool eatcycles)
 inline void device_resume(device_t *device, int reason)
 {
 	device_execute(device)->resume(reason);
-}
-
-// return TRUE if the given device is within its execute function
-inline bool device_is_executing(device_t *device)
-{
-	return device_execute(device)->is_executing();
-}
-
-// returns TRUE if the given device is suspended for any of the given reasons
-inline int device_is_suspended(device_t *device, int reason)
-{
-	return device_execute(device)->is_suspended(reason);
 }
 
 

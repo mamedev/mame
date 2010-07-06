@@ -102,6 +102,7 @@
 
 // forward references
 class region_info;
+class device_debug;
 class device_config;
 class device_config_interface;
 class device_t;
@@ -404,6 +405,10 @@ public:
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(UINT64 clocks) const;
 	UINT64 attotime_to_clocks(attotime duration) const;
+	
+	// debugging
+	device_debug *debug() const { return m_debug; }
+	void set_debug(device_debug &debug) { m_debug = &debug; }
 
 	// basic information getters ... pass through to underlying config
 	device_type type() const { return m_baseconfig.type(); }
@@ -439,6 +444,7 @@ protected:
 	//------------------- end derived class overrides
 
 	running_machine &		m_machine;
+	device_debug *			m_debug;
 	
 	// for speed
 	device_execute_interface *m_execute;

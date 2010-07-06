@@ -164,17 +164,17 @@ public:
 	const device_state_entry *state_first() const { return m_state_list; }
 
 	// state getters
-	UINT64 state_value(int index);
-	offs_t pc() { return state_value(STATE_GENPC); }
-	offs_t pcbase() { return state_value(STATE_GENPCBASE); }
-	offs_t sp() { return state_value(STATE_GENSP); }
-	UINT64 flags() { return state_value(STATE_GENFLAGS); }
+	UINT64 state(int index);
+	offs_t pc() { return state(STATE_GENPC); }
+	offs_t pcbase() { return state(STATE_GENPCBASE); }
+	offs_t sp() { return state(STATE_GENSP); }
+	UINT64 flags() { return state(STATE_GENFLAGS); }
 	astring &state_string(int index, astring &dest);
 	int state_string_max_length(int index);
 
 	// state setters
-	void state_set_value(int index, UINT64 value);
-	void state_set_value(int index, const char *string);
+	void set_state(int index, UINT64 value);
+	void set_state(int index, const char *string);
 
 public:	// protected eventually
 

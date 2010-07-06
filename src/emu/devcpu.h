@@ -216,12 +216,6 @@ device_t *basename##_device_config::alloc_device(running_machine &machine) const
 const device_type name = basename##_device_config::static_alloc_device_config
 
 
-// device iteration helpers
-#define cpu_count(config)				(config)->m_devicelist.count(CPU)
-#define cpu_first(config)				(config)->m_devicelist.first(CPU)
-#define cpu_next(previous)				(previous)->typenext()
-
-
 // CPU interface functions
 #define CPU_GET_INFO_NAME(name)			cpu_get_info_##name
 #define CPU_GET_INFO(name)				void CPU_GET_INFO_NAME(name)(const device_config *devconfig, legacy_cpu_device *device, UINT32 state, cpuinfo *info)
@@ -293,8 +287,6 @@ const device_type name = basename##_device_config::static_alloc_device_config
 // CPU scheduling
 #define cpu_suspend							device_suspend
 #define cpu_resume							device_resume
-#define cpu_is_executing					device_is_executing
-#define cpu_is_suspended					device_is_suspended
 
 // synchronization helpers
 #define cpu_yield							device_yield
@@ -310,10 +302,8 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define cpu_set_clockscale					device_set_clock_scale
 
 // CPU timing
-#define cpu_get_local_time					device_get_local_time
 #define cpu_eat_cycles						device_eat_cycles
 #define cpu_adjust_icount					device_adjust_icount
-#define cpu_abort_timeslice					device_abort_timeslice
 
 #define cpu_triggerint						device_triggerint
 #define cpu_set_input_line					device_set_input_line
@@ -324,11 +314,11 @@ const device_type name = basename##_device_config::static_alloc_device_config
 
 #define cpu_get_address_space				device_get_space
 
-#define cpu_get_reg(cpu, _reg)				device_state(cpu)->state_value(_reg)
-#define	cpu_get_previouspc(cpu)				((offs_t)device_state(cpu)->state_value(STATE_GENPCBASE))
-#define	cpu_get_pc(cpu)						((offs_t)device_state(cpu)->state_value(STATE_GENPC))
+#define cpu_get_reg(cpu, _reg)				device_state(cpu)->state(_reg)
+#define	cpu_get_previouspc(cpu)				((offs_t)device_state(cpu)->state(STATE_GENPCBASE))
+#define	cpu_get_pc(cpu)						((offs_t)device_state(cpu)->state(STATE_GENPC))
 
-#define cpu_set_reg(cpu, _reg, val)			device_state(cpu)->state_set_value(_reg, val)
+#define cpu_set_reg(cpu, _reg, val)			device_state(cpu)->set_state(_reg, val)
 
 #define INTERRUPT_GEN(func)		void func(device_t *device)
 
@@ -341,7 +331,6 @@ const device_type name = basename##_device_config::static_alloc_device_config
 
 #define cputag_suspend(mach, tag, reason, eat)							device_suspend((mach)->device(tag), reason, eat)
 #define cputag_resume(mach, tag, reason)								device_resume((mach)->device(tag), reason)
-#define cputag_is_suspended(mach, tag, reason)							device_is_suspended((mach)->device(tag), reason)
 
 #define cputag_set_input_line(mach, tag, line, state)					downcast<cpu_device *>((mach)->device(tag))->set_input_line(line, state)
 #define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	downcast<cpu_device *>((mach)->device(tag))->set_input_line_and_vector(line, state, vec)
@@ -356,7 +345,6 @@ const device_type name = basename##_device_config::static_alloc_device_config
 union cpuinfo;
 class cpu_device;
 class legacy_cpu_device;
-class cpu_debug_data;
 
 
 // CPU interface functions
@@ -490,9 +478,6 @@ protected:
 	// construction/destruction
 	cpu_device(running_machine &machine, const cpu_device_config &config);
 	virtual ~cpu_device();
-
-public:
-	cpu_debug_data *		m_debug;					// debugging data
 };
 
 
@@ -564,20 +549,6 @@ protected:
 	UINT64					m_state_io;					// temporary buffer for state I/O
 	bool					m_using_legacy_state;		// true if we are using the old-style state access
 };
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-// ======================> additional helpers
-
-// return a pointer to the given CPU's debugger data
-inline cpu_debug_data *cpu_get_debug_data(device_t *device)
-{
-	return downcast<cpu_device *>(device)->m_debug;
-}
 
 
 #endif	/* __CPUINTRF_H__ */

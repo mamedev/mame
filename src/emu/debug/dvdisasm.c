@@ -157,7 +157,7 @@ void debug_view_disasm::view_notify(debug_view_notification type)
 		adjust_visible_y_for_cursor();
 	
 	else if (type == VIEW_NOTIFY_SOURCE_CHANGED)
-		m_expression.set_context(debug_cpu_get_symtable(&downcast<const debug_view_disasm_source *>(m_source)->device()));
+		m_expression.set_context(downcast<const debug_view_disasm_source *>(m_source)->device().debug()->symtable());
 }
 
 
@@ -578,9 +578,8 @@ recompute:
 			// if we're on a line with a breakpoint, tag it changed
 			else
 			{
-				const cpu_debug_data *cpuinfo = cpu_get_debug_data(&source.m_device);
-				for (debug_cpu_breakpoint *bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
-					if (m_byteaddress[effrow] == (memory_address_to_byte(source.m_space, bp->address) & source.m_space->logbytemask))
+				for (debug_cpu_breakpoint *bp = source.m_device.debug()->breakpoint_first(); bp != NULL; bp = bp->next())
+					if (m_byteaddress[effrow] == (memory_address_to_byte(source.m_space, bp->address()) & source.m_space->logbytemask))
 						attrib = DCA_CHANGED;
 			}
 
