@@ -272,12 +272,12 @@ void console_create_window(running_machine *machine)
 	position.y = lround(floor(location.y / fontHeight));
 	if (position.x < 0)
 		position.x = 0;
-	else if (position.x >= totalSize.x)
-		position.x = totalSize.x - 1;
+	else if (position.x >= totalSize->x)
+		position.x = totalSize->x - 1;
 	if (position.y < 0)
 		position.y = 0;
-	else if (position.y >= totalSize.y)
-		position.y = totalSize.y - 1;
+	else if (position.y >= totalSize->y)
+		position.y = totalSize->y - 1;
 	return position;
 }
 
@@ -299,12 +299,13 @@ void console_create_window(running_machine *machine)
 
 		// need to render entire lines or we get screwed up characters when widening views
 		origin.x = 0;
-		size.x = totalSize.x;
+		size.x = totalSize->x;
 
 		// tell them what we think
 		view->set_visible_size(size);
 		view->set_visible_position(origin);
-		topLeft = origin;
+		topLeft->x = origin.x;
+		topLeft->y = origin.y;
 	}
 }
 
@@ -344,8 +345,10 @@ void console_create_window(running_machine *machine)
 		[self release];
 		return nil;
 	}
-	totalSize.x = totalSize.y = 0;
-	topLeft.x = topLeft.y = 0;
+	totalSize = global_alloc(debug_view_xy());
+	topLeft = global_alloc(debug_view_xy());
+	totalSize->x = totalSize->y = 0;
+	topLeft->x = topLeft->y = 0;
 	[self setFont:[[self class] defaultFont]];
 	return self;
 }
@@ -355,6 +358,8 @@ void console_create_window(running_machine *machine)
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	if (font != nil)
 		[font release];
+	global_free(totalSize);
+	global_free(topLeft);
 	[super dealloc];
 }
 
@@ -364,16 +369,17 @@ void console_create_window(running_machine *machine)
 
 	// resize our frame if the total size has changed
 	newSize = view->total_size();
-	if ((newSize.x != totalSize.x) || (newSize.y != totalSize.y)) {
+	if ((newSize.x != totalSize->x) || (newSize.y != totalSize->y)) {
 		[self setFrameSize:NSMakeSize(fontWidth * newSize.x, fontHeight * newSize.y)];
-		totalSize = newSize;
+		totalSize->x = newSize.x;
+		totalSize->y = newSize.y;
 	}
 
 	// scroll the view if we're being told to
 	newOrigin = view->visible_position();
-	if (newOrigin.y != topLeft.y) {
+	if (newOrigin.y != topLeft->y) {
 		[self scrollPoint:NSMakePoint([self visibleRect].origin.x, newOrigin.y * fontHeight)];
-		topLeft.y = newOrigin.y;
+		topLeft->y = newOrigin.y;
 	}
 
 	// recompute the visible area and mark as dirty
@@ -400,7 +406,7 @@ void console_create_window(running_machine *machine)
 	fontHeight = ceil([font ascender] - [font descender]);
 	fontAscent = [font ascender];
 	[[self enclosingScrollView] setLineScroll:fontHeight];
-	totalSize.x = totalSize.y = 0;
+	totalSize->x = totalSize->y = 0;
 	[self update];
 }
 
