@@ -1817,10 +1817,10 @@ static INT32 slider_overclock(running_machine *machine, void *arg, astring *stri
 {
 	device_t *cpu = (device_t *)arg;
 	if (newval != SLIDER_NOCHANGE)
-		cpu_set_clockscale(cpu, (float)newval * 0.001f);
+		cpu->set_clock_scale((float)newval * 0.001f);
 	if (string != NULL)
-		string->printf("%3.0f%%", floor(cpu_get_clockscale(cpu) * 100.0f + 0.5f));
-	return floor(cpu_get_clockscale(cpu) * 1000.0f + 0.5f);
+		string->printf("%3.0f%%", floor(cpu->clock_scale() * 100.0f + 0.5f));
+	return floor(cpu->clock_scale() * 1000.0f + 0.5f);
 }
 
 

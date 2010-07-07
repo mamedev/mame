@@ -7831,7 +7831,7 @@ static DRIVER_INIT( cps2 )
 	state->scancount = 0;
 	state->cps2networkpresent = 0;
 
-	cpu_set_clockscale(machine->device("maincpu"), 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	machine->device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static DRIVER_INIT( ssf2tb )

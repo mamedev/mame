@@ -691,7 +691,7 @@ static DRIVER_INIT( backfire )
 	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine, "gfx2"); /* 141 */
 	deco156_decrypt(machine);
-	cpu_set_clockscale(machine->device("maincpu"), 4.0f); /* core timings aren't accurate */
+	machine->device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
 }

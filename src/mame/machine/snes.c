@@ -727,7 +727,7 @@ WRITE8_HANDLER( snes_w_io )
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
              * Currently we are just increasing it no matter what */
-//          cpu_set_clockscale(state->maincpu, (data & 0x1) ? 1.335820896 : 1.0 );
+//          state->maincpu->set_clock_scale((data & 0x1) ? 1.335820896 : 1.0 );
 #ifdef SNES_DBG_REG_W
 			if ((data & 0x1) != (snes_ram[MEMSEL] & 0x1))
 				mame_printf_debug( "CPU speed: %f Mhz\n", (data & 0x1) ? 3.58 : 2.68 );

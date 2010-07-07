@@ -96,7 +96,7 @@ static void h8_itu_refresh_timer(h83xx_state *h8, int tnum)
 	ourTCR = h8->per_regs[tcr[tnum]];
 	ourTVAL = h8->h8TCNT[tnum];
 
-	period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device)), tscales[ourTCR & 3] * (65536 - ourTVAL));
+	period = attotime_mul(ATTOTIME_IN_HZ(h8->device->unscaled_clock()), tscales[ourTCR & 3] * (65536 - ourTVAL));
 
 	if (ourTCR & 4)
 	{
@@ -115,7 +115,7 @@ static void h8_itu_sync_timers(h83xx_state *h8, int tnum)
 	ourTCR = h8->per_regs[tcr[tnum]];
 
 	// get the time per unit
-	cycle_time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device)), tscales[ourTCR & 3]);
+	cycle_time = attotime_mul(ATTOTIME_IN_HZ(h8->device->unscaled_clock()), tscales[ourTCR & 3]);
 	cur = timer_timeelapsed(h8->timer[tnum]);
 
 	ratio = attotime_to_double(cur) / attotime_to_double(cycle_time);
@@ -457,7 +457,7 @@ static void h8_3007_itu_refresh_timer(h83xx_state *h8, int tnum)
 	attotime period;
 	int ourTCR = h8->per_regs[0x68+(tnum*8)];
 
-	period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device)), tscales[ourTCR & 3]);
+	period = attotime_mul(ATTOTIME_IN_HZ(h8->device->unscaled_clock()), tscales[ourTCR & 3]);
 
 	if (ourTCR & 4)
 	{

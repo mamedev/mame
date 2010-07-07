@@ -762,7 +762,7 @@ DRIVER_INIT( micro3d )
 	/* TODO? BOTSS crashes when starting the final stage because the 68000
     overwrites memory in use by the Am29000. Slowing down the 68000 slightly
     avoids this */
-	cpu_set_clockscale(machine->device("maincpu"), 0.945f);
+	machine->device("maincpu")->set_clock_scale(0.945f);
 }
 
 DRIVER_INIT( botssa )

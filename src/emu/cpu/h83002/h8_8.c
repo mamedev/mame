@@ -416,13 +416,13 @@ static void recalc_8bit_timer(h83xx_state *h8, int t)
 
 	if (h8->TCORA[t])
 	{
-		time = (cpu_get_clock(h8->device) / dividers[div]) / (h8->TCORA[t] - h8->TCNT[t]);
+		time = (h8->device->unscaled_clock() / dividers[div]) / (h8->TCORA[t] - h8->TCNT[t]);
 		timer_adjust_oneshot(h8->timer[(t*2)], ATTOTIME_IN_HZ(time), 0);
 	}
 
 	if (h8->TCORB[t])
 	{
-		time = (cpu_get_clock(h8->device) / dividers[div]) / (h8->TCORB[t] - h8->TCNT[t]);
+		time = (h8->device->unscaled_clock() / dividers[div]) / (h8->TCORB[t] - h8->TCNT[t]);
 		timer_adjust_oneshot(h8->timer[(t*2)+1], ATTOTIME_IN_HZ(time), 0);
 	}
 }

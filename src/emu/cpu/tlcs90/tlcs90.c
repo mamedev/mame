@@ -2715,7 +2715,7 @@ static CPU_INIT( t90 )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);
 
-	cpustate->timer_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device)), 8);
+	cpustate->timer_period = attotime_mul(ATTOTIME_IN_HZ(device->unscaled_clock()), 8);
 
 	// Reset registers to their initial values
 

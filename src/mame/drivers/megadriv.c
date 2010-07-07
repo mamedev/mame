@@ -5998,8 +5998,8 @@ MACHINE_RESET( megadriv )
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
-		cpu_set_clockscale(machine->device("maincpu"), 0.9950f); /* Fatal Rewind is very fussy... */
-	//  cpu_set_clockscale(machine->device("maincpu"), 0.3800f); /* Fatal Rewind is very fussy... */
+		machine->device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... */
+	//  machine->device("maincpu")->set_clock_scale(0.3800f); /* Fatal Rewind is very fussy... */
 
 		memset(megadrive_ram,0x00,0x10000);
 	}

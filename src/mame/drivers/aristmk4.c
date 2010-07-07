@@ -1153,10 +1153,10 @@ static MACHINE_RESET( aristmk4 )
     switch(input_port_read(machine, "LK13"))  // cpu speed cotrol.. 3mhz or 1.5mhz
     {
         case  0x00:
-            cpu_set_clock(machine->device("maincpu"), MAIN_CLOCK/4);  // 3 Mhz
+            machine->device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 Mhz
             break;
         case  0x10:
-            cpu_set_clock(machine->device("maincpu"), MAIN_CLOCK/8);  // 1.5 Mhz
+            machine->device("maincpu")->set_unscaled_clock(MAIN_CLOCK/8);  // 1.5 Mhz
             break;
     }
 

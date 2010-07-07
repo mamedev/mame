@@ -758,7 +758,7 @@ static DRIVER_INIT( mlc )
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
-	cpu_set_clockscale(machine->device("maincpu"), 2.0f);
+	machine->device("maincpu")->set_clock_scale(2.0f);
 	mainCpuIsArm = 1;
 	deco156_decrypt(machine);
 	descramble_sound(machine);

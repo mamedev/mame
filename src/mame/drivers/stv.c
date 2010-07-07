@@ -94,7 +94,7 @@ ToDo / Notes:
 -Add the RS232c interface (serial port),needed by fhboxers.
 -(PCB owners) check if the clocks documented in the manuals are really right for ST-V.
 -SCSP to master irq: see if there is a sound cpu mask bit.
--Does the cpu_set_clock really works?Investigate.
+-Does the device_set_clock really works?Investigate.
 -We need to check every game if can be completed or there are any hanging/crash/protection
  issues on them.
 -Memo: Some tests done on the original & working PCB,to be implemented:

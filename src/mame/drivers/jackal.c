@@ -355,7 +355,7 @@ static MACHINE_RESET( jackal )
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
-	cpu_set_clockscale(machine->device("slave"), 1.2f);
+	machine->device("slave")->set_clock_scale(1.2f);
 
 	state->rambank = rgn;
 	state->spritebank = rgn;

@@ -188,7 +188,7 @@ static void refresh_timer(mn102_info *cpustate, int tmr)
 			if (cpustate->prescaler[source-2].mode & 0x80)
 			{
 				// rate = (sysclock / prescaler) / our count
-				rate = cpu_get_clock(cpustate->device) / cpustate->prescaler[source-2].cycles;
+				rate = cpustate->device->unscaled_clock() / cpustate->prescaler[source-2].cycles;
 				rate /= cpustate->simple_timer[tmr].base;
 
 				if (tmr != 8)	// HACK: timer 8 is run at 500 kHz by the Taito program for no obvious reason, which kills performance

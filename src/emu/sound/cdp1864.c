@@ -365,7 +365,7 @@ static STREAM_UPDATE( cdp1864_stream_update )
 
 	if (cdp1864->aoe)
 	{
-		double frequency = cpu_get_clock(cdp1864->cpu) / 8 / 4 / (cdp1864->latch + 1) / 2;
+		double frequency = cdp1864->cpu->unscaled_clock() / 8 / 4 / (cdp1864->latch + 1) / 2;
 		int rate = device->machine->sample_rate / 2;
 
 		/* get progress through wave */

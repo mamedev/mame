@@ -327,7 +327,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 			switch (cpustate->m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	    	// timer mode
-					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(cpustate->device)), tscales[cpustate->m37710_regs[tcr[timer]]>>6]);
+					time = attotime_mul(ATTOTIME_IN_HZ(cpustate->device->unscaled_clock()), tscales[cpustate->m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
 					#if M37710_DEBUG
@@ -362,7 +362,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 			switch (cpustate->m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	    	// timer mode
-					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(cpustate->device)), tscales[cpustate->m37710_regs[tcr[timer]]>>6]);
+					time = attotime_mul(ATTOTIME_IN_HZ(cpustate->device->unscaled_clock()), tscales[cpustate->m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
 					#if M37710_DEBUG
