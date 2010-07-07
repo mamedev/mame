@@ -578,16 +578,16 @@ static WRITE32_HANDLER(serial_w)
 */
 }
 
-static WRITE32_HANDLER(security_w)
+static WRITE32_DEVICE_HANDLER(security_w)
 {
-	i2cmem_write( space->machine, 0, I2CMEM_SCL, ( data >> 4 ) & 1 );
-	i2cmem_write( space->machine, 0, I2CMEM_SDA, ( data >> 3 ) & 1 );
+	i2cmem_scl_write( device, ( data >> 4 ) & 1 );
+	i2cmem_sda_write( device, ( data >> 3 ) & 1 );
 }
 
-static READ32_HANDLER(security_r)
+static READ32_DEVICE_HANDLER(security_r)
 {
 	/* 0x4000 ?? */
-	return i2cmem_read( space->machine, 0, I2CMEM_SDA ) << 12;
+	return i2cmem_sda_read( device ) << 12;
 }
 
 static WRITE32_HANDLER(shared_psx_w)
@@ -636,8 +636,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 
 	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
-	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE(security_w)
-	AM_RANGE(0x1f280000, 0x1f280003) AM_READ(security_r)
+	AM_RANGE(0x1f270000, 0x1f270003) AM_DEVWRITE("security",security_w)
+	AM_RANGE(0x1f280000, 0x1f280003) AM_DEVREAD("security",security_r)
 	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_rtc_r, rtc65271_rtc_w, 0x00ff00ff)
 	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_xram_r, rtc65271_xram_w, 0x00ff00ff)
 	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
@@ -875,11 +875,11 @@ static DRIVER_INIT( twinkle )
 	psx_dma_install_read_handler(5, scsi_dma_read);
 	psx_dma_install_write_handler(5, scsi_dma_write);
 
-	i2cmem_init( machine, 0, I2CMEM_SLAVE_ADDRESS, 0, memory_region_length( machine, "user2" ), memory_region( machine, "user2" ) );
-	i2cmem_write( machine, 0, I2CMEM_E0, 0 );
-	i2cmem_write( machine, 0, I2CMEM_E1, 0 );
-	i2cmem_write( machine, 0, I2CMEM_E2, 0 );
-	i2cmem_write( machine, 0, I2CMEM_WC, 0 );
+	running_device *i2cmem = devtag_get_device(machine, "security");
+	i2cmem_e0_write( i2cmem, 0 );
+	i2cmem_e1_write( i2cmem, 0 );
+	i2cmem_e2_write( i2cmem, 0 );
+	i2cmem_wc_write( i2cmem, 0 );
 }
 
 static MACHINE_RESET( twinkle )
@@ -903,6 +903,11 @@ static const psx_spu_interface twinkle_psxspu_interface =
 	psx_dma_install_write_handler
 };
 
+static const i2cmem_interface i2cmem_interface =
+{
+	I2CMEM_SLAVE_ADDRESS, 0, 0x100
+};
+
 static MACHINE_DRIVER_START( twinkle )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
@@ -915,7 +920,7 @@ static MACHINE_DRIVER_START( twinkle )
 	MDRV_WATCHDOG_TIME_INIT(MSEC(1200)) /* check TD pin on LTC1232 */
 
 	MDRV_MACHINE_RESET( twinkle )
-	MDRV_NVRAM_HANDLER( i2cmem_0 )
+	MDRV_I2CMEM_ADD("security",i2cmem_interface)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MDRV_RTC65271_ADD("rtc", NULL)
@@ -1015,7 +1020,7 @@ ROM_END
 ROM_START( bmiidx )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", ROMREGION_ERASE00 )		/* security */
+	ROM_REGION( 0x100, "security", 0 )
 
 	DISK_REGION( "cdrom0" )	// program
 	DISK_IMAGE_READONLY("863jaa01", 0, SHA1(aee12de1dc5dd44e5bf7b62133ed695b80999390) )
@@ -1028,13 +1033,13 @@ ROM_START( bmiidx )
 ROM_END
 
 ROM_START( bmiidx3 )
- TWINKLE_BIOS
+	TWINKLE_BIOS
 
- ROM_REGION( 0x100, "user2", 0 )
- ROM_LOAD( "992j.pd",      0x000000, 0x000100, BAD_DUMP CRC(51f24913) SHA1(574b555e3d0c234011198d218d7ae5e95091acb1) )
+	ROM_REGION( 0x100, "security", 0 )
+	ROM_LOAD( "992j.pd",      0x000000, 0x000100, BAD_DUMP CRC(51f24913) SHA1(574b555e3d0c234011198d218d7ae5e95091acb1) )
 
- DISK_REGION( "cdrom0" )
- DISK_IMAGE_READONLY( "992jaa01", 0, BAD_DUMP SHA1(7e5389735dff379bb286ba3744edf59b7dfcc74b) )
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "992jaa01", 0, BAD_DUMP SHA1(7e5389735dff379bb286ba3744edf59b7dfcc74b) )
 //  DISK_IMAGE_READONLY( "992jaahd", 1, NO_DUMP )
 //  DISK_IMAGE_READONLY( "992jaa02", 2, NO_DUMP )
 ROM_END
@@ -1042,7 +1047,7 @@ ROM_END
 ROM_START( bmiidx4 )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", 0 )
+	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "a03j.pd",      0x000000, 0x000100, CRC(8860cfb6) SHA1(85a5b27f24d4baa7960e692b91c0cf3dc5388e72) )
 
 	DISK_REGION( "cdrom0" )
@@ -1054,7 +1059,7 @@ ROM_END
 ROM_START( bmiidx6 )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", 0 )
+	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b4uj.pd",      0x000000, 0x000100, BAD_DUMP CRC(0ab15633) SHA1(df004ff41f35b16089f69808ccf53a5e5cc13ac3) )
 
 	DISK_REGION( "cdrom0" )
@@ -1066,7 +1071,7 @@ ROM_END
 ROM_START( bmiidx7 )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", 0 )
+	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b44j.pd",      0x000000, 0x000100, BAD_DUMP CRC(5baf4761) SHA1(aa7e07eb2cada03b85bdf11ac6a3de65f4253eef) )
 
 	DISK_REGION( "cdrom0" )
@@ -1078,7 +1083,7 @@ ROM_END
 ROM_START( bmiidx8 )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", 0 )
+	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "c44j.pd",      0x000000, 0x000100, BAD_DUMP CRC(04c22349) SHA1(d1cb78911cb1ca660d393a81ed3ed07b24c51525) )
 
 	DISK_REGION( "cdrom0" )
@@ -1090,7 +1095,7 @@ ROM_END
 ROM_START( bmiidxc )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", 0 )
+	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "896j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1e5caf37) SHA1(75b378662b651cb322e41564d3bae68cc9edadc5) )
 
 	DISK_REGION( "cdrom0" )
@@ -1102,7 +1107,7 @@ ROM_END
 ROM_START( bmiidxc2 )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", 0 )
+	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "984j.pd",      0x000000, 0x000100, BAD_DUMP CRC(213843e5) SHA1(5571db155a60fa4087dd996af48e8e27fc1c518c) )
 
 	DISK_REGION( "cdrom0" )
@@ -1114,7 +1119,7 @@ ROM_END
 ROM_START( bmiidxca )
 	TWINKLE_BIOS
 
-	ROM_REGION( 0x100, "user2", 0 )
+	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "896j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1e5caf37) SHA1(75b378662b651cb322e41564d3bae68cc9edadc5) )
 
 	DISK_REGION( "cdrom0" )
@@ -1123,7 +1128,7 @@ ROM_START( bmiidxca )
 //  DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
 ROM_END
 
-GAME( 1999, gq863,   0,     twinkle, twinkle, twinkle, ROT0, "Konami", "Twinkle System", GAME_IS_BIOS_ROOT )
+GAME( 1999, gq863,    0,       twinkle, twinkle, twinkle, ROT0, "Konami", "Twinkle System", GAME_IS_BIOS_ROOT )
 
 /* VCD */
 GAME( 1999, bmiidx,   gq863,   twinkle, twinkle, twinkle, ROT0, "Konami", "beatmania IIDX (863 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

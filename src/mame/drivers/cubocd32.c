@@ -330,6 +330,7 @@ routines :
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
 #include "machine/6526cia.h"
+#include "machine/i2cmem.h"
 
 
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */
@@ -1042,6 +1043,14 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL
 };
 
+#define	NVRAM_SIZE 1024
+#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
+
+static const i2cmem_interface i2cmem_interface =
+{
+	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
+};
+
 static MACHINE_DRIVER_START( cd32 )
 
 	/* basic machine hardware */
@@ -1049,7 +1058,8 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_CPU_PROGRAM_MAP(cd32_map)
 
 	MDRV_MACHINE_RESET(amiga)
-	MDRV_NVRAM_HANDLER(cd32)
+
+	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

@@ -27,9 +27,6 @@ TODO: Add CDDA support
 #define CD_SECTOR_TIME		(1000/((150*1024)/2048))	/* 1X CDROM sector time in msec (300KBps) */
 
 
-#define	NVRAM_SIZE 1024
-#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
-
 static struct akiko_def
 {
 	/* chunky to planar converter */
@@ -63,6 +60,7 @@ static struct akiko_def
 	UINT8 *	cdrom_toc;
 	emu_timer *dma_timer;
 	emu_timer *frame_timer;
+	running_device *i2cmem;
 } akiko;
 
 static TIMER_CALLBACK(akiko_dma_proc);
@@ -78,8 +76,6 @@ static void amiga_akiko_exit(running_machine& machine)
 
 void amiga_akiko_init(running_machine* machine)
 {
-	i2cmem_init( machine, 0, I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE, NULL );
-
 	akiko.c2p_input_index = 0;
 	akiko.c2p_output_index = 0;
 
@@ -106,6 +102,7 @@ void amiga_akiko_init(running_machine* machine)
 	akiko.cdrom_toc = NULL;
 	akiko.dma_timer = timer_alloc(machine, akiko_dma_proc, NULL);
 	akiko.frame_timer = timer_alloc(machine, akiko_frame_proc, NULL);
+	akiko.i2cmem = devtag_get_device(machine, "i2cmem");
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, amiga_akiko_exit);
 
@@ -166,8 +163,8 @@ static void akiko_nvram_write(running_machine *machine, UINT32 data)
 	akiko.i2c_scl_dir = BIT(data,15);
 	akiko.i2c_sda_dir = BIT(data,14);
 
-	i2cmem_write( machine, 0, I2CMEM_SCL, akiko.i2c_scl_out );
-	i2cmem_write( machine, 0, I2CMEM_SDA, akiko.i2c_sda_out );
+	i2cmem_scl_write( akiko.i2cmem, akiko.i2c_scl_out );
+	i2cmem_sda_write( akiko.i2cmem, akiko.i2c_sda_out );
 }
 
 static UINT32 akiko_nvram_read(running_machine *machine)
@@ -189,18 +186,13 @@ static UINT32 akiko_nvram_read(running_machine *machine)
 	}
 	else
 	{
-		v |= i2cmem_read( machine, 0, I2CMEM_SDA ) << 30;
+		v |= i2cmem_sda_read( akiko.i2cmem ) << 30;
 	}
 
 	v |= akiko.i2c_scl_dir << 15;
 	v |= akiko.i2c_sda_dir << 14;
 
 	return v;
-}
-
-NVRAM_HANDLER( cd32 )
-{
-	NVRAM_HANDLER_CALL(i2cmem_0);
 }
 
 /*************************************

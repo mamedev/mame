@@ -217,6 +217,12 @@ static int sda_dir = 0;
 #define CMOS_NVRAM_SIZE     0x2000
 #define eeprom_NVRAM_SIZE   0x200 // 4k Bit
 
+/* EEPROM is a X2404P 4K-bit Serial I2C Bus */
+static const i2cmem_interface i2cmem_interface =
+{
+	I2CMEM_SLAVE_ADDRESS, 8, eeprom_NVRAM_SIZE
+};
+
 /* prototypes */
 static WRITE_LINE_DEVICE_HANDLER(crtc_vsync);
 static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
@@ -275,8 +281,6 @@ static NVRAM_HANDLER( peplus )
 			memset(cmos_ram, 0, CMOS_NVRAM_SIZE);
 		}
 	}
-
-	NVRAM_HANDLER_CALL(i2cmem_0);
 }
 
 
@@ -457,11 +461,11 @@ static WRITE8_HANDLER( peplus_output_bank_c_w )
 	output_set_value("pe_bnkc7",(data >> 7) & 1); /* Game Meter */
 }
 
-static WRITE8_HANDLER(i2c_nvram_w)
+static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 {
-	i2cmem_write(space->machine, 0, I2CMEM_SCL, BIT(data, 2));
+	i2cmem_scl_write(device,BIT(data, 2));
 	sda_dir = BIT(data, 1);
-	i2cmem_write(space->machine, 0, I2CMEM_SDA, BIT(data, 0));
+	i2cmem_sda_write(device,BIT(data, 0));
 }
 
 
@@ -531,7 +535,7 @@ static READ8_HANDLER( peplus_watchdog_r )
 	return 0x00; // Watchdog
 }
 
-static READ8_HANDLER( peplus_input_bank_a_r )
+static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 {
 /*
         Bit 0 = COIN DETECTOR A
@@ -546,25 +550,25 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	UINT8 bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
 	UINT8 coin_optics = 0x00;
     UINT8 coin_out = 0x00;
-	UINT64 curr_cycles = space->machine->firstcpu->total_cycles();
+	UINT64 curr_cycles = device->machine->firstcpu->total_cycles();
 	UINT16 door_wait = 500;
 
 	UINT8 sda = 0;
 	if(!sda_dir)
 	{
-		sda = i2cmem_read(space->machine, 0, I2CMEM_SDA);
+		sda = i2cmem_sda_read(device);
 	}
 
-	if ((input_port_read_safe(space->machine, "SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
+	if ((input_port_read_safe(device->machine, "SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
 		coin_state = 1; // Start Coin Cycle
-		last_cycles = space->machine->firstcpu->total_cycles();
+		last_cycles = device->machine->firstcpu->total_cycles();
 	} else {
 		/* Process Next Coin Optic State */
 		if (curr_cycles - last_cycles > 600000/6 && coin_state != 0) {
 			coin_state++;
 			if (coin_state > 5)
 				coin_state = 0;
-			last_cycles = space->machine->firstcpu->total_cycles();
+			last_cycles = device->machine->firstcpu->total_cycles();
 		}
 	}
 
@@ -594,12 +598,12 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 		door_wait = 12345;
 
 	if (curr_cycles - last_door > door_wait) {
-		if ((input_port_read_safe(space->machine, "DOOR",0xff) & 0x01) == 0x01) {
+		if ((input_port_read_safe(device->machine, "DOOR",0xff) & 0x01) == 0x01) {
 			door_open = (!door_open & 0x01);
 		} else {
 			door_open = 1;
 		}
-		last_door = space->machine->firstcpu->total_cycles();
+		last_door = device->machine->firstcpu->total_cycles();
 	}
 
 	if (curr_cycles - last_coin_out > 600000/12 && coin_out_state != 0) { // Guessing with 600000
@@ -609,7 +613,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
             coin_out_state = 3; // Coin-Out On
         }
 
-		last_coin_out = space->machine->firstcpu->total_cycles();
+		last_coin_out = device->machine->firstcpu->total_cycles();
 	}
 
     switch (coin_out_state)
@@ -757,10 +761,10 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_BASE(&s7000_ram)
 
 	// Input Bank A, Output Bank C
-	AM_RANGE(0x8000, 0x8000) AM_READ(peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("i2cmem",peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
 
 	// Drop Door, I2C EEPROM Writes
-	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_WRITE(i2c_nvram_w)
+	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_DEVWRITE("i2cmem",i2c_nvram_w)
 
 	// Input Banks B & C, Output Bank B
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") AM_WRITE(peplus_output_bank_b_w)
@@ -1037,6 +1041,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_PALETTE_LENGTH(16*16*2)
 
 	MDRV_MC6845_ADD("crtc", R6545_1, MC6845_CLOCK, mc6845_intf)
+	MDRV_I2CMEM_ADD("i2cmem", i2cmem_interface)
 
 	MDRV_PALETTE_INIT(peplus)
 	MDRV_VIDEO_START(peplus)
@@ -1057,9 +1062,6 @@ MACHINE_DRIVER_END
 /* Normal board */
 static void peplus_init(running_machine *machine)
 {
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(machine, 0, I2CMEM_SLAVE_ADDRESS, 8, eeprom_NVRAM_SIZE, NULL);
-
 	/* default : no address to patch in program RAM to enable autohold feature */
 	autohold_addr = 0;
 }
