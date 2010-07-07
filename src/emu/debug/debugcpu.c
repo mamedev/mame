@@ -1530,7 +1530,7 @@ static UINT64 get_cpunum(void *globalref, void *ref)
 	running_machine *machine = (running_machine *)globalref;
 	device_t *target = machine->debugcpu_data->visiblecpu;
 
-	device_execute_interface *exec;
+	device_execute_interface *exec = NULL;
 	int index = 0;
 	for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{

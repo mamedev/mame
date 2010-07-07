@@ -94,7 +94,7 @@ void generic_machine_init(running_machine *machine)
 
 	// map devices to the interrupt state
 	memset(state->interrupt_device, 0, sizeof(state->interrupt_device));
-	device_execute_interface *exec;
+	device_execute_interface *exec = NULL;
 	int index = 0;
 	for (bool gotone = machine->m_devicelist.first(exec); gotone && index < ARRAY_LENGTH(state->interrupt_device); gotone = exec->next(exec))
 		state->interrupt_device[index++] = &exec->device();

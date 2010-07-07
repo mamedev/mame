@@ -534,7 +534,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, dev
 	}
 
 	/* if we got a valid one, return */
-	device_execute_interface *exec;
+	device_execute_interface *exec = NULL;
 	for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 		if (cpunum-- == 0)
 		{
@@ -972,7 +972,7 @@ static void execute_focus(running_machine *machine, int ref, int params, const c
 	cpu->debug()->ignore(false);
 
 	/* then loop over CPUs and set the ignore flags on all other CPUs */
-	device_execute_interface *exec;
+	device_execute_interface *exec = NULL;
 	for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 		if (&exec->device() != cpu)
 			exec->device().debug()->ignore(true);
@@ -992,7 +992,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 		astring buffer;
 
 		/* loop over all executable devices */
-		device_execute_interface *exec;
+		device_execute_interface *exec = NULL;
 		for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 
 			/* build up a comma-separated list */
@@ -1024,7 +1024,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 		for (int paramnum = 0; paramnum < params; paramnum++)
 		{
 			/* make sure this isn't the last live CPU */
-			device_execute_interface *exec;
+			device_execute_interface *exec = NULL;
 			bool gotone;
 			for (gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 				if (&exec->device() != devicelist[paramnum] && exec->device().debug()->observing())
@@ -1054,7 +1054,7 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 		astring buffer;
 
 		/* loop over all executable devices */
-		device_execute_interface *exec;
+		device_execute_interface *exec = NULL;
 		for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 
 			/* build up a comma-separated list */
