@@ -128,6 +128,7 @@ typedef struct
 	int		frt_input;
 	int 	internal_irq_level;
 	int 	internal_irq_vector;
+	int				icount;
 
 	emu_timer *timer;
 	emu_timer *dma_timer[2];
@@ -143,8 +144,6 @@ typedef struct
 	drcuml_state *		drcuml;					/* DRC UML generator state */
 	drcfe_state *		drcfe;					/* pointer to the DRC front-end state */
 	UINT32				drcoptions;			/* configurable DRC options */
-
-	int				icount;
 
 	/* internal stuff */
 	UINT8				cache_dirty;		    	/* true if we need to flush the cache */
