@@ -303,6 +303,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
     image_error_t err;
     UINT32 open_plan[4];
     int i;
+	bool softload = FALSE;
 
     /* first unload the image */
     unload();
@@ -319,7 +320,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
         goto done;
 
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
-	if (is_create || !load_software_part( this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name ) )
+	if (is_create || !(softload=load_software_part( this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name )) )
 	{
 		/* determine open plan */
 		determine_open_plan(is_create, open_plan);
@@ -333,7 +334,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 				goto done;
 		}
 	}
-
+	
 	/* Copy some image information when we have been loaded through a software list */
 	if ( m_software_info_ptr )
 	{
@@ -344,7 +345,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 	}
 
 	/* did we fail to find the file? */
-	if (!is_loaded())
+	if (!is_loaded() && !softload)
 	{
 		err = IMAGE_ERROR_FILENOTFOUND;
 		goto done;
@@ -497,6 +498,16 @@ int legacy_image_device_base::call_load()
 	device_image_load_func func = reinterpret_cast<device_image_load_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_LOAD));
 	if (func) {
 		return (*func)(*this);
+	} else {
+		return FALSE;
+	}
+}
+
+bool legacy_image_device_base::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+{
+	device_image_softlist_load_func func = reinterpret_cast<device_image_softlist_load_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_SOFTLIST_LOAD));
+	if (func) {
+		return (*func)(*this,swlist,swname,start_entry);
 	} else {
 		return FALSE;
 	}

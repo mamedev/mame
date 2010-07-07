@@ -159,6 +159,7 @@ enum
     DEVINFO_FCT_IMAGE_DISPLAY,                                  /* R/O: device_image_display_func */
     DEVINFO_FCT_IMAGE_PARTIAL_HASH,                             /* R/O: device_image_partialhash_func */
     DEVINFO_FCT_IMAGE_GET_DEVICES,                              /* R/O: device_image_get_devices_func */
+	DEVINFO_FCT_IMAGE_SOFTLIST_LOAD,                            /* R/O: device_image_softlist_load_func */
     DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff,
 
     /* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -633,6 +634,7 @@ public:
 	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
 
 	virtual int call_load();
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
 	virtual int call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display();

@@ -115,7 +115,7 @@ typedef void (*device_image_unload_func)(device_image_interface &image);
 typedef void (*device_image_display_func)(device_image_interface &image);
 typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
 typedef void (*device_image_get_devices_func)(device_image_interface &device);
-
+typedef bool (*device_image_softlist_load_func)(device_image_interface &image, char *swlist, char *swname, rom_entry *start_entry);
 
 //**************************************************************************
 //  MACROS
@@ -141,6 +141,8 @@ typedef void (*device_image_get_devices_func)(device_image_interface &device);
 #define DEVICE_IMAGE_GET_DEVICES_NAME(name) device_image_get_devices_##name
 #define DEVICE_IMAGE_GET_DEVICES(name)      void DEVICE_IMAGE_GET_DEVICES_NAME(name)(device_image_interface &image)
 
+#define DEVICE_IMAGE_SOFTLIST_LOAD_NAME(name)        device_softlist_load_##name
+#define DEVICE_IMAGE_SOFTLIST_LOAD(name)             bool DEVICE_IMAGE_SOFTLIST_LOAD_NAME(name)(device_image_interface &image, char *swlist, char *swname, rom_entry *start_entry)
 
 // ======================> device_config_image_interface
 
@@ -200,6 +202,7 @@ public:
 	virtual void unload() = 0;
 
 	virtual int call_load() = 0;
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) = 0;
 	virtual int call_create(int format_type, option_resolution *format_options) = 0;
 	virtual void call_unload() = 0;
 	virtual void call_display() = 0;
@@ -234,7 +237,7 @@ public:
 	UINT64 ftell() { check_for_file(); return core_ftell(m_file); }
 	int fgetc() { char ch; if (fread(&ch, 1) != 1) ch = '\0'; return ch; }
 	char *fgets(char *buffer, UINT32 length) { check_for_file(); return core_fgets(buffer, length, m_file); }
-	int feof() { check_for_file(); return core_feof(m_file); }
+	int image_feof() { check_for_file(); return core_feof(m_file); }
 	void *ptr() {check_for_file(); return (void *) core_fbuffer(m_file); }
 	// configuration access
 	const device_config_image_interface &image_config() const { return m_image_config; }
