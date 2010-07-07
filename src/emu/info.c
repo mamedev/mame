@@ -636,7 +636,7 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 static void print_game_chips(FILE *out, const game_driver *game, const machine_config *config)
 {
 	/* iterate over CPUs */
-	const device_config_execute_interface *exec;
+	const device_config_execute_interface *exec = NULL;
 	for (bool gotone = config->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
 		fprintf(out, "\t\t<chip");
