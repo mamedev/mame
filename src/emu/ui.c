@@ -1645,7 +1645,7 @@ static slider_state *slider_init(running_machine *machine)
 	/* add CPU overclocking (cheat only) */
 	if (options_get_bool(machine->options(), OPTION_CHEAT))
 	{
-		device_execute_interface *exec;
+		device_execute_interface *exec = NULL;
 		for (bool gotone = machine->m_devicelist.first(exec); exec != NULL; gotone = exec->next(exec))
 		{
 			void *param = (void *)&exec->device();
