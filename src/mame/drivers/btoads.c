@@ -68,7 +68,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	main_to_sound_data = param;
 	main_to_sound_ready = 1;
-	cpu_triggerint(devtag_get_device(machine, "audiocpu"));
+	cpu_triggerint(machine->device("audiocpu"));
 
 	/* use a timer to make long transfers faster */
 	timer_set(machine, ATTOTIME_IN_USEC(50), NULL, 0, 0);

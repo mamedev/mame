@@ -369,7 +369,7 @@ static MACHINE_START( chanbara )
 {
 	chanbara_state *state = (chanbara_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->scroll);
 	state_save_register_global(machine, state->scrollhi);

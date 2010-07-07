@@ -303,12 +303,12 @@ static MACHINE_START( gradius3 )
 {
 	gradius3_state *state = (gradius3_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->k007232 = devtag_get_device(machine, "k007232");
-	state->k052109 = devtag_get_device(machine, "k052109");
-	state->k051960 = devtag_get_device(machine, "k051960");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->subcpu = machine->device("sub");
+	state->k007232 = machine->device("k007232");
+	state->k052109 = machine->device("k052109");
+	state->k051960 = machine->device("k051960");
 
 	state_save_register_global(machine, state->irqAen);
 	state_save_register_global(machine, state->irqBmask);

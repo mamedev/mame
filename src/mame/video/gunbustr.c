@@ -212,7 +212,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 VIDEO_UPDATE( gunbustr )
 {
-	running_device *tc0480scp = devtag_get_device(screen->machine, "tc0480scp");
+	running_device *tc0480scp = screen->machine->device("tc0480scp");
 	UINT8 layer[5];
 	UINT16 priority;
 	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};

@@ -192,7 +192,7 @@ static READ8_HANDLER(photon2_fe_r)
 
 static WRITE8_HANDLER(photon2_fe_w)
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	spectrum_port_fe = data;
 
 	speaker_level_w(speaker, BIT(data,4));

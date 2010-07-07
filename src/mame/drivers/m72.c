@@ -322,7 +322,7 @@ INLINE DRIVER_INIT( m72_8751 )
 	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	const address_space *sndio = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_IO);
-	running_device *dac = devtag_get_device(machine, "dac");
+	running_device *dac = machine->device("dac");
 
 	protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
 	memory_install_read_bank(program, 0xb0000, 0xbffff, 0, 0, "bank1");
@@ -406,7 +406,7 @@ static INTERRUPT_GEN(fake_nmi)
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int sample = m72_sample_r(space,0);
 	if (sample)
-		m72_sample_w(devtag_get_device(device->machine, "dac"),0,sample);
+		m72_sample_w(device->machine->device("dac"),0,sample);
 }
 
 

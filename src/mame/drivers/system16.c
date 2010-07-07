@@ -3312,8 +3312,8 @@ static DRIVER_INIT( common )
 
 	state->beautyb_unkx = 0;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
 }
 
 /* Sys16A */

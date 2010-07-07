@@ -559,7 +559,7 @@ static MACHINE_START( yunsun16 )
 {
 	yunsun16_state *state = (yunsun16_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->sprites_scrolldx);
 	state_save_register_global(machine, state->sprites_scrolldy);

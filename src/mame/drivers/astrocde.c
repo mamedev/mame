@@ -207,7 +207,7 @@ static WRITE8_HANDLER( seawolf2_lamps_w )
 
 static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	UINT8 rising_bits = data & ~port_1_last;
 	port_1_last = data;
 
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 
 static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	UINT8 rising_bits = data & ~port_2_last;
 	port_2_last = data;
 
@@ -337,8 +337,8 @@ static READ8_HANDLER( gorf_io_1_r )
 		case 4: astrocade_sparkle[2] = data;	break;
 		case 5: astrocade_sparkle[3] = data;	break;
 		case 6:
-			sound_set_output_gain(devtag_get_device(space->machine, "astrocade1"), 0, data ? 0.0 : 1.0);
-			sound_set_output_gain(devtag_get_device(space->machine, "samples"), 0, data ? 1.0 : 0.0);
+			sound_set_output_gain(space->machine->device("astrocade1"), 0, data ? 0.0 : 1.0);
+			sound_set_output_gain(space->machine->device("samples"), 0, data ? 1.0 : 0.0);
 			break;
 		case 7:	mame_printf_debug("io_1:%d\n", data); break;
 	}

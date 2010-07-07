@@ -697,9 +697,9 @@ static WRITE8_HANDLER( hotchase_sound_control_w )
 
 	int reg[8];
 
-	sound[0] = devtag_get_device(space->machine, "konami1");
-	sound[1] = devtag_get_device(space->machine, "konami2");
-	sound[2] = devtag_get_device(space->machine, "konami3");
+	sound[0] = space->machine->device("konami1");
+	sound[1] = space->machine->device("konami2");
+	sound[2] = space->machine->device("konami3");
 
 	reg[offset] = data;
 
@@ -1049,7 +1049,7 @@ static INTERRUPT_GEN( wecleman_interrupt )
 
 static MACHINE_RESET( wecleman )
 {
-	k007232_set_bank( devtag_get_device(machine, "konami"), 0, 1 );
+	k007232_set_bank( machine->device("konami"), 0, 1 );
 }
 
 static MACHINE_DRIVER_START( wecleman )

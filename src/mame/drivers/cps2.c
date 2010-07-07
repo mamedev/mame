@@ -1195,8 +1195,8 @@ static MACHINE_START( cps2 )
 {
 	cps_state *state = (cps_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->scancount);
 
@@ -7831,7 +7831,7 @@ static DRIVER_INIT( cps2 )
 	state->scancount = 0;
 	state->cps2networkpresent = 0;
 
-	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	cpu_set_clockscale(machine->device("maincpu"), 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static DRIVER_INIT( ssf2tb )
@@ -7887,7 +7887,7 @@ static DRIVER_INIT( gigamn2 )
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
 	memory_set_decrypted_region(space, 0x000000, (length) - 1, &rom[length/4]);
-	m68k_set_encrypted_opcode_range(devtag_get_device(machine, "maincpu"), 0, length);
+	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
 }
 
 

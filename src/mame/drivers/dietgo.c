@@ -194,9 +194,9 @@ static MACHINE_START( dietgo )
 {
 	dietgo_state *state = (dietgo_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->deco16ic = machine->device("deco_custom");
 }
 
 static MACHINE_DRIVER_START( dietgo )

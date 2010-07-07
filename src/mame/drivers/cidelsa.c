@@ -475,7 +475,7 @@ static MACHINE_START( cidelsa )
 {
 	cidelsa_state *state = (cidelsa_state *)machine->driver_data;
 
-	state->cdp1802 = devtag_get_device(machine, CDP1802_TAG);
+	state->cdp1802 = machine->device(CDP1802_TAG);
 
 	/* reset the CPU */
 	state->cdp1802_mode = CDP1802_MODE_RESET;

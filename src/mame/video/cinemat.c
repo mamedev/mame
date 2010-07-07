@@ -226,7 +226,7 @@ VIDEO_UPDATE( cinemat )
 	VIDEO_UPDATE_CALL(vector);
 	vector_clear_list();
 
-	ccpu_wdt_timer_trigger(devtag_get_device(screen->machine, "maincpu"));
+	ccpu_wdt_timer_trigger(screen->machine->device("maincpu"));
 
 	return 0;
 }

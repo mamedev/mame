@@ -494,22 +494,22 @@ ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrit
 	UINT16 *pC148RegAlt = NULL;
 	UINT16 result = 0;
 
-	if (space->cpu == devtag_get_device(space->machine, "maincpu"))
+	if (space->cpu == space->machine->device("maincpu"))
 	{
 		pC148Reg = namcos2_68k_master_C148;
-		altcpu = devtag_get_device(space->machine, "slave");
+		altcpu = space->machine->device("slave");
 		pC148RegAlt = namcos2_68k_slave_C148;
 	}
-	else if (space->cpu == devtag_get_device(space->machine, "slave"))
+	else if (space->cpu == space->machine->device("slave"))
 	{
 		pC148Reg = namcos2_68k_slave_C148;
-		altcpu = devtag_get_device(space->machine, "maincpu");
+		altcpu = space->machine->device("maincpu");
 		pC148RegAlt = namcos2_68k_master_C148;
 	}
-	else if (space->cpu == devtag_get_device(space->machine, "gpu"))
+	else if (space->cpu == space->machine->device("gpu"))
 	{
 		pC148Reg = namcos2_68k_gpu_C148;
-		altcpu = devtag_get_device(space->machine, "maincpu");
+		altcpu = space->machine->device("maincpu");
 		pC148RegAlt = namcos2_68k_master_C148;
 	}
 
@@ -584,7 +584,7 @@ ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrit
 		break;
 
 	case 0x1e2000: /* Sound CPU Reset control */
-		if (space->cpu == devtag_get_device(space->machine, "maincpu")) /* ? */
+		if (space->cpu == space->machine->device("maincpu")) /* ? */
 		{
 			if (data & 0x01)
 			{
@@ -609,7 +609,7 @@ ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrit
 		break;
 
 	case 0x1e4000: /* Alt 68000 & IO CPU Reset */
-		if (space->cpu == devtag_get_device(space->machine, "maincpu")) /* ? */
+		if (space->cpu == space->machine->device("maincpu")) /* ? */
 		{
 			if (data & 0x01)
 			{ /* Resume execution */
@@ -787,7 +787,7 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 		/* If the interrupt enable bit is set trigger an A/D IRQ */
 		if(data & 0x20)
 		{
-			generic_pulse_irq_line(devtag_get_device(space->machine, "mcu"), HD63705_INT_ADCONV);
+			generic_pulse_irq_line(space->machine->device("mcu"), HD63705_INT_ADCONV);
 		}
 	}
 }

@@ -118,12 +118,12 @@ VIDEO_START( playch10_hboard )
 
 VIDEO_UPDATE( playch10 )
 {
-	running_device *ppu = devtag_get_device(screen->machine, "ppu");
+	running_device *ppu = screen->machine->device("ppu");
 
 	/* Dual monitor version */
 	if (pc10_bios == 1)
 	{
-		running_device *top_screen = devtag_get_device(screen->machine, "top");
+		running_device *top_screen = screen->machine->device("top");
 
 		/* On Playchoice 10 single monitor, this bit toggles    */
 		/* between PPU and BIOS display.                        */

@@ -149,7 +149,7 @@ static CUSTOM_INPUT( prot_r )
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	pc = cpu_get_pc(devtag_get_device(field->port->machine, "main"));
+	pc = cpu_get_pc(field->port->machine->device("main"));
 	if (pc == 0x6134)
 	{
 		bit = prot & 1;

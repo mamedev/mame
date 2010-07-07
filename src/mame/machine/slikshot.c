@@ -506,7 +506,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 
 	/* this is a big kludge: only allow a reset if the Z80 is stopped */
 	/* at its endpoint; otherwise, we never get a result from the Z80 */
-	if ((data & 0x10) || cpu_get_reg(devtag_get_device(machine, "sub"), Z80_PC) == 0x13a)
+	if ((data & 0x10) || cpu_get_reg(machine->device("sub"), Z80_PC) == 0x13a)
 	{
 		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 

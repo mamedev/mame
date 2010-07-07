@@ -859,37 +859,37 @@ static MACHINE_START( darius )
 	memory_configure_bank(machine, "bank1", 4, 1, memory_region(machine, "audiocpu"), 0x8000);
 	memory_set_bank(machine, "bank1", 4);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->cpub = devtag_get_device(machine, "cpub");
-	state->adpcm = devtag_get_device(machine, "adpcm");
-	state->pc080sn = devtag_get_device(machine, "pc080sn");
-	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->cpub = machine->device("cpub");
+	state->adpcm = machine->device("adpcm");
+	state->pc080sn = machine->device("pc080sn");
+	state->tc0140syt = machine->device("tc0140syt");
 
-	state->lscreen = devtag_get_device(machine, "lscreen");
-	state->mscreen = devtag_get_device(machine, "mscreen");
-	state->rscreen = devtag_get_device(machine, "rscreen");
+	state->lscreen = machine->device("lscreen");
+	state->mscreen = machine->device("mscreen");
+	state->rscreen = machine->device("rscreen");
 
-	state->filter0_0l = devtag_get_device(machine, "filter0.0l");
-	state->filter0_0r = devtag_get_device(machine, "filter0.0r");
-	state->filter0_1l = devtag_get_device(machine, "filter0.1l");
-	state->filter0_1r = devtag_get_device(machine, "filter0.1r");
-	state->filter0_2l = devtag_get_device(machine, "filter0.2l");
-	state->filter0_2r = devtag_get_device(machine, "filter0.2r");
-	state->filter0_3l = devtag_get_device(machine, "filter0.3l");
-	state->filter0_3r = devtag_get_device(machine, "filter0.3r");
+	state->filter0_0l = machine->device("filter0.0l");
+	state->filter0_0r = machine->device("filter0.0r");
+	state->filter0_1l = machine->device("filter0.1l");
+	state->filter0_1r = machine->device("filter0.1r");
+	state->filter0_2l = machine->device("filter0.2l");
+	state->filter0_2r = machine->device("filter0.2r");
+	state->filter0_3l = machine->device("filter0.3l");
+	state->filter0_3r = machine->device("filter0.3r");
 
-	state->filter1_0l = devtag_get_device(machine, "filter1.0l");
-	state->filter1_0r = devtag_get_device(machine, "filter1.0r");
-	state->filter1_1l = devtag_get_device(machine, "filter1.1l");
-	state->filter1_1r = devtag_get_device(machine, "filter1.1r");
-	state->filter1_2l = devtag_get_device(machine, "filter1.2l");
-	state->filter1_2r = devtag_get_device(machine, "filter1.2r");
-	state->filter1_3l = devtag_get_device(machine, "filter1.3l");
-	state->filter1_3r = devtag_get_device(machine, "filter1.3r");
+	state->filter1_0l = machine->device("filter1.0l");
+	state->filter1_0r = machine->device("filter1.0r");
+	state->filter1_1l = machine->device("filter1.1l");
+	state->filter1_1r = machine->device("filter1.1r");
+	state->filter1_2l = machine->device("filter1.2l");
+	state->filter1_2r = machine->device("filter1.2r");
+	state->filter1_3l = machine->device("filter1.3l");
+	state->filter1_3r = machine->device("filter1.3r");
 
-	state->msm5205_l = devtag_get_device(machine, "msm5205.l");
-	state->msm5205_r = devtag_get_device(machine, "msm5205.r");
+	state->msm5205_l = machine->device("msm5205.l");
+	state->msm5205_r = machine->device("msm5205.r");
 
 	state_save_register_global(machine, state->cpua_ctrl);
 	state_save_register_global(machine, state->coin_word);

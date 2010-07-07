@@ -73,8 +73,8 @@ static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	running_device *pia0 = devtag_get_device(device->machine, "pia_main");
-	running_device *pia1 = devtag_get_device(device->machine, "pia_audio");
+	running_device *pia0 = device->machine->device("pia_main");
+	running_device *pia1 = device->machine->device("pia_audio");
 	int combined_state = pia6821_get_irq_a(pia0) | pia6821_get_irq_b(pia0) |
 						 pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1);
 
@@ -150,10 +150,10 @@ static READ8_DEVICE_HANDLER( AY8910_port_r )
 	UINT8 ret = 0;
 
 	if (AY8910_selected & 0x08)
-		ret = ay8910_r(devtag_get_device(device->machine, "ay1"), 0);
+		ret = ay8910_r(device->machine->device("ay1"), 0);
 
 	if (AY8910_selected & 0x10)
-		ret = ay8910_r(devtag_get_device(device->machine, "ay2"), 0);
+		ret = ay8910_r(device->machine->device("ay2"), 0);
 
 	return ret;
 }
@@ -162,10 +162,10 @@ static READ8_DEVICE_HANDLER( AY8910_port_r )
 static WRITE8_DEVICE_HANDLER( AY8910_port_w )
 {
 	if (AY8910_selected & 0x08)
-		ay8910_data_address_w(devtag_get_device(device->machine, "ay1"), AY8910_selected >> 2, data);
+		ay8910_data_address_w(device->machine->device("ay1"), AY8910_selected >> 2, data);
 
 	if (AY8910_selected & 0x10)
-		ay8910_data_address_w(devtag_get_device(device->machine, "ay2"), AY8910_selected >> 2, data);
+		ay8910_data_address_w(device->machine->device("ay2"), AY8910_selected >> 2, data);
 }
 
 
@@ -206,7 +206,7 @@ static const ay8910_interface ay8910_2_interface =
 
 static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 {
-	running_device *pia = devtag_get_device(device->machine, "pia_main");
+	running_device *pia = device->machine->device("pia_main");
 	pia6821_ca1_w(pia, 0, data);
 	ttl74123_output = data;
 }
@@ -362,7 +362,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 {
-	ttl74123_a_w(devtag_get_device(device->machine, "74123"), 0, state);
+	ttl74123_a_w(device->machine->device("74123"), 0, state);
 }
 
 
@@ -383,7 +383,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( r2dtank )
 {
-	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

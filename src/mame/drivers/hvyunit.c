@@ -295,7 +295,7 @@ static VIDEO_START(hvyunit)
 
 static VIDEO_UPDATE(hvyunit)
 {
-	running_device *pandora = devtag_get_device(screen->machine, "pandora");
+	running_device *pandora = screen->machine->device("pandora");
 	tilemap_set_scrollx( bg_tilemap,0, ((port0_data&0x40)<<2)+ hu_scrollx + SX_POS); //TODO
 	tilemap_set_scrolly( bg_tilemap,0, ((port0_data&0x80)<<1)+ hu_scrolly + SY_POS); // TODO
 
@@ -309,7 +309,7 @@ static VIDEO_UPDATE(hvyunit)
 
 static VIDEO_EOF(hvyunit)
 {
-	running_device *pandora = devtag_get_device(machine, "pandora");
+	running_device *pandora = machine->device("pandora");
 	pandora_eof(pandora);
 }
 

@@ -359,9 +359,9 @@ static MACHINE_START( missb2 )
 {
 	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->slave = devtag_get_device(machine, "slave");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->slave = machine->device("slave");
 	state->mcu = NULL;
 
 	state_save_register_global(machine, state->sound_nmi_enable);

@@ -600,13 +600,13 @@ void midway_ioasic_init(running_machine *machine, int shuffle, int upper, int ye
 	ioasic_register_state(machine);
 
 	/* do we have a DCS2 sound chip connected? (most likely) */
-	ioasic.has_dcs = (devtag_get_device(machine, "dcs2") != NULL || devtag_get_device(machine, "dsio") != NULL || devtag_get_device(machine, "denver") != NULL);
-	ioasic.has_cage = (devtag_get_device(machine, "cage") != NULL);
-	ioasic.dcs_cpu = devtag_get_device(machine, "dcs2");
+	ioasic.has_dcs = (machine->device("dcs2") != NULL || machine->device("dsio") != NULL || machine->device("denver") != NULL);
+	ioasic.has_cage = (machine->device("cage") != NULL);
+	ioasic.dcs_cpu = machine->device("dcs2");
 	if (ioasic.dcs_cpu == NULL)
-		ioasic.dcs_cpu = devtag_get_device(machine, "dsio");
+		ioasic.dcs_cpu = machine->device("dsio");
 	if (ioasic.dcs_cpu == NULL)
-		ioasic.dcs_cpu = devtag_get_device(machine, "denver");
+		ioasic.dcs_cpu = machine->device("denver");
 	ioasic.shuffle_type = shuffle;
 	ioasic.shuffle_map = &shuffle_maps[shuffle][0];
 	ioasic.auto_ack = 0;

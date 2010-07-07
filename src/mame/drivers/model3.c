@@ -1143,7 +1143,7 @@ static void real3d_dma_callback(running_machine *machine, UINT32 src, UINT32 dst
 		case 0x9c:		/* Unknown */
 			break;
 		default:
-			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(devtag_get_device(machine, "maincpu")));
+			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(machine->device("maincpu")));
 			break;
 	}
 }
@@ -1203,10 +1203,10 @@ static void model3_exit(running_machine &machine)
 static void configure_fast_ram(running_machine *machine)
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
+	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, work_ram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x007fffff, FALSE, work_ram);
 }
 
 static MACHINE_START(model3_10)
@@ -1369,7 +1369,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 		case 0:
 			if (ACCESSING_BITS_56_63)
 			{
-				running_device *device = devtag_get_device(space->machine, "eeprom");
+				running_device *device = space->machine->device("eeprom");
 				int reg = (data >> 56) & 0xff;
 				eeprom_write_bit(device, (reg & 0x20) ? 1 : 0);
 				eeprom_set_clock_line(device, (reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -1620,7 +1620,7 @@ static WRITE64_HANDLER(model3_sound_w)
 	// serial configuration writes
 	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
 	{
-		scsp_midi_in(devtag_get_device(space->machine, "scsp1"), 0, (data>>56)&0xff, 0);
+		scsp_midi_in(space->machine->device("scsp1"), 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));

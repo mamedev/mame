@@ -97,9 +97,9 @@ static MACHINE_START( dcheese )
 {
 	dcheese_state *state = (dcheese_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->bsmt = devtag_get_device(machine, "bsmt");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->bsmt = machine->device("bsmt");
 
 	cpu_set_irq_callback(state->maincpu, irq_callback);
 
@@ -131,7 +131,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
-		ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, (data & 1) << 7);
+		ticket_dispenser_w(space->machine->device("ticket"), 0, (data & 1) << 7);
 	}
 }
 

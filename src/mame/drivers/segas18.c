@@ -166,7 +166,7 @@ static void system18_generic_init(running_machine *machine, int _rom_board)
 	workram              = auto_alloc_array(machine, UINT16, 0x04000/2);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(devtag_get_device(machine, "maincpu"), region_info_list[state->rom_board], sound_w, sound_r);
+	segaic16_memory_mapper_init(machine->device("maincpu"), region_info_list[state->rom_board], sound_w, sound_r);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
@@ -175,9 +175,9 @@ static void system18_generic_init(running_machine *machine, int _rom_board)
 	state->custom_io_r = NULL;
 	state->custom_io_w = NULL;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
+	state->mcu = machine->device("mcu");
 
 	state_save_register_global(machine, state->mcu_data);
 	state_save_register_global(machine, state->lghost_value);
@@ -212,7 +212,7 @@ static MACHINE_RESET( system18 )
 
 	segaic16_memory_mapper_reset(machine);
 	segaic16_tilemap_reset(machine, 0);
-	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
+	fd1094_machine_init(machine->device("maincpu"));
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
 	if (state->mcu != NULL && state->mcu->type() == I8751)

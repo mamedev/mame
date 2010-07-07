@@ -297,9 +297,9 @@ static MACHINE_START( cbuster )
 {
 	cbuster_state *state = (cbuster_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->deco16ic = devtag_get_device(machine, "deco_custom");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->deco16ic = machine->device("deco_custom");
 
 	state_save_register_global(machine, state->prot);
 	state_save_register_global(machine, state->pri);

@@ -594,18 +594,18 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(gamecstl)
 {
-	gamecstl_devices.pit8254 = devtag_get_device( machine, "pit8254" );
-	gamecstl_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
-	gamecstl_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
-	gamecstl_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
-	gamecstl_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
+	gamecstl_devices.pit8254 = machine->device( "pit8254" );
+	gamecstl_devices.pic8259_1 = machine->device( "pic8259_1" );
+	gamecstl_devices.pic8259_2 = machine->device( "pic8259_2" );
+	gamecstl_devices.dma8237_1 = machine->device( "dma8237_1" );
+	gamecstl_devices.dma8237_2 = machine->device( "dma8237_2" );
 }
 
 static MACHINE_RESET(gamecstl)
 {
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x30000);
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 

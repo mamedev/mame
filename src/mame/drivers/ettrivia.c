@@ -94,20 +94,20 @@ static WRITE8_HANDLER( b800_w )
 		/* special case to return the value written to 0xb000 */
 		/* does it reset the chips too ? */
 		case 0:	break;
-		case 0xc4: b000_ret = ay8910_r(devtag_get_device(space->machine, "ay1"), 0);	break;
-		case 0x94: b000_ret = ay8910_r(devtag_get_device(space->machine, "ay2"), 0);	break;
-		case 0x86: b000_ret = ay8910_r(devtag_get_device(space->machine, "ay3"), 0);	break;
+		case 0xc4: b000_ret = ay8910_r(space->machine->device("ay1"), 0);	break;
+		case 0x94: b000_ret = ay8910_r(space->machine->device("ay2"), 0);	break;
+		case 0x86: b000_ret = ay8910_r(space->machine->device("ay3"), 0);	break;
 
 		case 0x80:
 			switch(b800_prev)
 			{
-				case 0xe0: ay8910_address_w(devtag_get_device(space->machine, "ay1"),0,b000_val);	break;
-				case 0x98: ay8910_address_w(devtag_get_device(space->machine, "ay2"),0,b000_val);	break;
-				case 0x83: ay8910_address_w(devtag_get_device(space->machine, "ay3"),0,b000_val);	break;
+				case 0xe0: ay8910_address_w(space->machine->device("ay1"),0,b000_val);	break;
+				case 0x98: ay8910_address_w(space->machine->device("ay2"),0,b000_val);	break;
+				case 0x83: ay8910_address_w(space->machine->device("ay3"),0,b000_val);	break;
 
-				case 0xa0: ay8910_data_w(devtag_get_device(space->machine, "ay1"),0,b000_val);	break;
-				case 0x88: ay8910_data_w(devtag_get_device(space->machine, "ay2"),0,b000_val);	break;
-				case 0x81: ay8910_data_w(devtag_get_device(space->machine, "ay3"),0,b000_val);	break;
+				case 0xa0: ay8910_data_w(space->machine->device("ay1"),0,b000_val);	break;
+				case 0x88: ay8910_data_w(space->machine->device("ay2"),0,b000_val);	break;
+				case 0x81: ay8910_data_w(space->machine->device("ay3"),0,b000_val);	break;
 
 			}
 		break;

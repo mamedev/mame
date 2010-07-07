@@ -155,13 +155,13 @@ static int coin;
 static WRITE8_HANDLER( sprite_dma_0_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu1"), source );
+	ppu2c0x_spriteram_dma( space, space->machine->device("ppu1"), source );
 }
 
 static WRITE8_HANDLER( sprite_dma_1_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu2"), source );
+	ppu2c0x_spriteram_dma( space, space->machine->device("ppu2"), source );
 }
 
 static WRITE8_HANDLER( vsnes_coin_counter_w )

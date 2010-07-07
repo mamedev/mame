@@ -681,7 +681,7 @@ static CUSTOM_INPUT( get_audio_result )
 	neogeo_state *state = (neogeo_state *)field->port->machine->driver_data;
 	UINT32 ret = state->audio_result;
 
-//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(devtag_get_device(field->port->machine, "maincpu")), ret);
+//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field->port->machine->device("maincpu")), ret);
 
 	return ret;
 }
@@ -1076,9 +1076,9 @@ static MACHINE_START( neogeo )
 	state->irq3_pending = 1;
 
 	/* get devices */
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->upd4990a = devtag_get_device(machine, "upd4990a");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->upd4990a = machine->device("upd4990a");
 
 	/* register state save */
 	state_save_register_global(machine, state->display_position_interrupt_control);

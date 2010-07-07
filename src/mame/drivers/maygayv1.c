@@ -969,14 +969,14 @@ static MACHINE_START( maygayv1 )
 
 //  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
 
-	i8051_set_serial_tx_callback(devtag_get_device(machine, "soundcpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(devtag_get_device(machine, "soundcpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(machine->device("soundcpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(machine->device("soundcpu"), data_to_i8031);
 }
 
 static MACHINE_RESET( maygayv1 )
 {
 	// ?
-	maygayv1_devices.duart68681 = devtag_get_device( machine, "duart68681" );
+	maygayv1_devices.duart68681 = machine->device( "duart68681" );
 	memset(i82716.dram, 0, 0x40000);
 	i82716.r[RWBA] = 0x0200;
 }

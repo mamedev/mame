@@ -497,21 +497,21 @@ const pia6821_interface carpolo_pia1_intf =
 MACHINE_START( carpolo )
 {
 	/* find flip-flops */
-	ttl7474_2s_1 = devtag_get_device(machine, "7474_2s_1");
-	ttl7474_2s_2 = devtag_get_device(machine, "7474_2s_2");
-	ttl7474_2u_1 = devtag_get_device(machine, "7474_2u_1");
-	ttl7474_2u_2 = devtag_get_device(machine, "7474_2u_2");
-	ttl7474_1f_1 = devtag_get_device(machine, "7474_1f_1");
-	ttl7474_1f_2 = devtag_get_device(machine, "7474_1f_2");
-	ttl7474_1d_1 = devtag_get_device(machine, "7474_1d_1");
-	ttl7474_1d_2 = devtag_get_device(machine, "7474_1d_2");
-	ttl7474_1c_1 = devtag_get_device(machine, "7474_1c_1");
-	ttl7474_1c_2 = devtag_get_device(machine, "7474_1c_2");
-	ttl7474_1a_1 = devtag_get_device(machine, "7474_1a_1");
-	ttl7474_1a_2 = devtag_get_device(machine, "7474_1a_2");
+	ttl7474_2s_1 = machine->device("7474_2s_1");
+	ttl7474_2s_2 = machine->device("7474_2s_2");
+	ttl7474_2u_1 = machine->device("7474_2u_1");
+	ttl7474_2u_2 = machine->device("7474_2u_2");
+	ttl7474_1f_1 = machine->device("7474_1f_1");
+	ttl7474_1f_2 = machine->device("7474_1f_2");
+	ttl7474_1d_1 = machine->device("7474_1d_1");
+	ttl7474_1d_2 = machine->device("7474_1d_2");
+	ttl7474_1c_1 = machine->device("7474_1c_1");
+	ttl7474_1c_2 = machine->device("7474_1c_2");
+	ttl7474_1a_1 = machine->device("7474_1a_1");
+	ttl7474_1a_2 = machine->device("7474_1a_2");
 
-	ttl74148_3s = devtag_get_device(machine, "74148_3s");
-	ttl74153_1k = devtag_get_device(machine, "74153_1k");
+	ttl74148_3s = machine->device("74148_3s");
+	ttl74153_1k = machine->device("74153_1k");
 
     state_save_register_global(machine, ball_screen_collision_cause);
     state_save_register_global(machine, car_ball_collision_x);

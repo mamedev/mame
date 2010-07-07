@@ -52,8 +52,8 @@ static MACHINE_START( crgolf )
 {
 	crgolf_state *state = (crgolf_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	/* configure the banking */
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
@@ -603,7 +603,7 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	running_device *msm = devtag_get_device(machine, "msm");
+	running_device *msm = machine->device("msm");
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 

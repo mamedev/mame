@@ -297,7 +297,7 @@ static MACHINE_START( goal92 )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->fg_bank);
 	state_save_register_global(machine, state->msm5205next);

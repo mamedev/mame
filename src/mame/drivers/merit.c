@@ -1095,7 +1095,7 @@ INPUT_PORTS_END
 
 static VIDEO_UPDATE( merit )
 {
-	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

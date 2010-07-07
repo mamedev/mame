@@ -133,7 +133,7 @@ static WRITE16_HANDLER( bit_controls_w )
 			switch (offset)
 			{
 				case 7:
-					ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, data << 7);
+					ticket_dispenser_w(space->machine->device("ticket"), 0, data << 7);
 					break;
 
 				case 8:

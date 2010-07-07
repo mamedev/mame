@@ -1047,7 +1047,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	workram              = auto_alloc_array(machine, UINT16, 0x04000 / 2);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(devtag_get_device(machine, "maincpu"), region_info_list[state->rom_board], sound_w, NULL);
+	segaic16_memory_mapper_init(machine->device("maincpu"), region_info_list[state->rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
@@ -1059,13 +1059,13 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	state->i8751_initial_config = NULL;
 	state->disable_screen_blanking = 0;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->mcu = devtag_get_device(machine, "mcu");
-	state->ymsnd = devtag_get_device(machine, "ymsnd");
-	state->_315_5248_1 = devtag_get_device(machine, "315_5248");
-	state->_315_5250_1 = devtag_get_device(machine, "315_5250_1");
-	state->_315_5250_2 = devtag_get_device(machine, "315_5250_2");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
+	state->mcu = machine->device("mcu");
+	state->ymsnd = machine->device("ymsnd");
+	state->_315_5248_1 = machine->device("315_5248");
+	state->_315_5250_1 = machine->device("315_5250_1");
+	state->_315_5250_2 = machine->device("315_5250_2");
 
 	state_save_register_global(machine, state->disable_screen_blanking);
 	state_save_register_global(machine, state->mj_input_num);
@@ -1112,7 +1112,7 @@ static MACHINE_RESET( system16b )
 		segaic16_memory_mapper_config(machine, state->i8751_initial_config);
 	segaic16_tilemap_reset(machine, 0);
 
-	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
+	fd1094_machine_init(machine->device("maincpu"));
 
 	/* if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave */
 	if (state->i8751_vblank_hook != NULL)

@@ -309,8 +309,8 @@ static MACHINE_START( munchmo )
 {
 	munchmo_state *state = (munchmo_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->palette_bank);
 	state_save_register_global(machine, state->flipscreen);

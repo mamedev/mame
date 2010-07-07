@@ -363,7 +363,7 @@ static READ32_HANDLER( fghthist_control_r )
 	switch (offset) {
 	case 0: return 0xffff0000 | input_port_read(space->machine, "IN0");
 	case 1: return 0xffff0000 | input_port_read(space->machine, "IN1"); //check top bits??
-	case 2: return 0xfffffffe | eeprom_read_bit(devtag_get_device(space->machine, "eeprom"));
+	case 2: return 0xfffffffe | eeprom_read_bit(space->machine->device("eeprom"));
 	}
 
 	return 0xffffffff;
@@ -631,7 +631,7 @@ static READ32_HANDLER( nslasher_prot_r )
 	switch (offset<<1) {
 	case 0x280: return input_port_read(space->machine, "IN0") << 16| 0xffff; /* IN0 */
 	case 0x4c4: return input_port_read(space->machine, "IN1") << 16| 0xffff; /* IN1 */
-	case 0x35a: return (eeprom_read_bit(devtag_get_device(space->machine, "eeprom"))<< 16) | 0xffff; // Debug switch in low word??
+	case 0x35a: return (eeprom_read_bit(space->machine->device("eeprom"))<< 16) | 0xffff; // Debug switch in low word??
 	}
 
 	//logerror("%08x: Read unmapped prot %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);

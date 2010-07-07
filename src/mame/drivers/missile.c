@@ -679,7 +679,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		pokey_w(devtag_get_device(space->machine, "pokey"), offset & 0x0f, data);
+		pokey_w(space->machine->device("pokey"), offset & 0x0f, data);
 
 	/* OUT0 */
 	else if (offset < 0x4900)
@@ -738,7 +738,7 @@ static READ8_HANDLER( missile_r )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		result = pokey_r(devtag_get_device(space->machine, "pokey"), offset & 0x0f);
+		result = pokey_r(space->machine->device("pokey"), offset & 0x0f);
 
 	/* IN0 */
 	else if (offset < 0x4900)

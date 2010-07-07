@@ -360,9 +360,9 @@ static MACHINE_START( lkage )
 {
 	lkage_state *state = (lkage_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->mcu = machine->device("mcu");
 
 	state_save_register_global(machine, state->bg_tile_bank);
 	state_save_register_global(machine, state->fg_tile_bank);

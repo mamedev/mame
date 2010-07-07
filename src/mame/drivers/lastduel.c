@@ -476,7 +476,7 @@ static MACHINE_START( lastduel )
 {
 	lastduel_state *state = (lastduel_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->tilemap_priority);
 	state_save_register_global_array(machine, state->scroll);

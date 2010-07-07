@@ -587,12 +587,12 @@ static MACHINE_START( lethalen )
 
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x3800 + 0x02);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "soundcpu");
-	state->k054539 = devtag_get_device(machine, "k054539");
-	state->k053244 = devtag_get_device(machine, "k053244");
-	state->k056832 = devtag_get_device(machine, "k056832");
-	state->k054000 = devtag_get_device(machine, "k054000");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("soundcpu");
+	state->k054539 = machine->device("k054539");
+	state->k053244 = machine->device("k053244");
+	state->k056832 = machine->device("k056832");
+	state->k054000 = machine->device("k054000");
 
 	state_save_register_global(machine, state->cur_control2);
 	state_save_register_global(machine, state->sprite_colorbase);

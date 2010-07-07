@@ -858,7 +858,7 @@ static MACHINE_START( trackfld )
 	trackfld_state *state = (trackfld_state *)machine->driver_data;
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->vlm = devtag_get_device(machine, "vlm");
+	state->vlm = machine->device("vlm");
 
 	/* video */
 	state_save_register_global(machine, state->bg_bank);

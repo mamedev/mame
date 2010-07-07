@@ -334,7 +334,7 @@ static MACHINE_START( ashnojoe )
 {
 	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->adpcm_byte);
 	state_save_register_global(machine, state->soundlatch_status);

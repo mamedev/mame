@@ -159,13 +159,13 @@ static void stop_mono_flop( running_device *sn, int n )
 
 static TIMER_CALLBACK( stop_mono_flop_callback )
 {
-	stop_mono_flop(devtag_get_device(machine, "snsnd"), param);
+	stop_mono_flop(machine->device("snsnd"), param);
 }
 
 
 static void spacefev_sound_pins_changed( running_machine *machine )
 {
-	running_device *sn = devtag_get_device(machine, "snsnd");
+	running_device *sn = machine->device("snsnd");
 	n8080_state *state = (n8080_state *)machine->driver_data;
 	UINT16 changes = ~state->curr_sound_pins & state->prev_sound_pins;
 
@@ -191,14 +191,14 @@ static void spacefev_sound_pins_changed( running_machine *machine )
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), 0);
+		generic_pulse_irq_line(machine->device("audiocpu"), 0);
 	}
 }
 
 
 static void sheriff_sound_pins_changed( running_machine *machine )
 {
-	running_device *sn = devtag_get_device(machine, "snsnd");
+	running_device *sn = machine->device("snsnd");
 	n8080_state *state = (n8080_state *)machine->driver_data;
 	UINT16 changes = ~state->curr_sound_pins & state->prev_sound_pins;
 
@@ -216,7 +216,7 @@ static void sheriff_sound_pins_changed( running_machine *machine )
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), 0);
+		generic_pulse_irq_line(machine->device("audiocpu"), 0);
 	}
 }
 
@@ -232,7 +232,7 @@ static void helifire_sound_pins_changed( running_machine *machine )
 
 	if (changes & (1 << 6))
 	{
-		generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), 0);
+		generic_pulse_irq_line(machine->device("audiocpu"), 0);
 	}
 }
 
@@ -403,14 +403,14 @@ static READ8_HANDLER( helifire_8035_p2_r )
 
 static WRITE8_HANDLER( n8080_dac_w )
 {
-	dac_data_w(devtag_get_device(space->machine, "dac"), data & 0x80);
+	dac_data_w(space->machine->device("dac"), data & 0x80);
 }
 
 
 static WRITE8_HANDLER( helifire_dac_w )
 {
 	n8080_state *state = (n8080_state *)space->machine->driver_data;
-	dac_data_w(devtag_get_device(space->machine, "dac"), data * state->helifire_dac_volume);
+	dac_data_w(space->machine->device("dac"), data * state->helifire_dac_volume);
 }
 
 
@@ -437,7 +437,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 
 static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 {
-	running_device *sn = devtag_get_device(timer.machine, "snsnd");
+	running_device *sn = timer.machine->device("snsnd");
 	n8080_state *state = (n8080_state *)timer.machine->driver_data;
 	double voltage = 0;
 

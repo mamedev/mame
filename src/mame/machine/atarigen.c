@@ -295,7 +295,7 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
 
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(devtag_get_device(machine, "maincpu"));
+	atarigen_scanline_int_gen(machine->device("maincpu"));
 
 	/* set a new timer to go off at the same scan line next frame */
 	timer_adjust_oneshot(timer, screen.frame_period(), 0);
@@ -859,7 +859,7 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
 	/* set up the states and signal the sound interrupt to the main CPU */
 	state->sound_to_cpu = param;
 	state->sound_to_cpu_ready = 1;
-	atarigen_sound_int_gen(devtag_get_device(machine, "maincpu"));
+	atarigen_sound_int_gen(machine->device("maincpu"));
 }
 
 
@@ -1408,7 +1408,7 @@ int atarigen_get_hblank(screen_device &screen)
 
 void atarigen_halt_until_hblank_0(screen_device &screen)
 {
-	running_device *cpu = devtag_get_device(screen.machine, "maincpu");
+	running_device *cpu = screen.machine->device("maincpu");
 
 	/* halt the CPU until the next HBLANK */
 	int hpos = screen.hpos();

@@ -304,7 +304,7 @@ static MACHINE_START( mgolf )
 {
 	mgolf_state *state = (mgolf_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->prev);
 	state_save_register_global(machine, state->mask);

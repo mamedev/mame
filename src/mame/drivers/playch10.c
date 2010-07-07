@@ -333,7 +333,7 @@ static WRITE8_HANDLER( ram_8w_w )
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu"), source );
+	ppu2c0x_spriteram_dma( space, space->machine->device("ppu"), source );
 }
 
 static NVRAM_HANDLER( playch10 )

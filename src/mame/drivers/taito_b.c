@@ -2194,13 +2194,13 @@ static MACHINE_START( taitob )
 {
 	taitob_state *state = (taitob_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mb87078 = devtag_get_device(machine, "mb87078");
-	state->ym = devtag_get_device(machine, "ymsnd");
-	state->tc0180vcu = devtag_get_device(machine, "tc0180vcu");
-	state->tc0640fio = devtag_get_device(machine, "tc0640fio");
-	state->tc0220ioc = devtag_get_device(machine, "tc0220ioc");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->mb87078 = machine->device("mb87078");
+	state->ym = machine->device("ymsnd");
+	state->tc0180vcu = machine->device("tc0180vcu");
+	state->tc0640fio = machine->device("tc0640fio");
+	state->tc0220ioc = machine->device("tc0220ioc");
 
 	state_save_register_global(machine, state->eep_latch);
 	state_save_register_global(machine, state->coin_word);

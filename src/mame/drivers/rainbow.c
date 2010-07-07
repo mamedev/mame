@@ -668,10 +668,10 @@ static MACHINE_START( rainbow )
 {
 	rainbow_state *state = (rainbow_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->pc080sn = devtag_get_device(machine, "pc080sn");
-	state->pc090oj = devtag_get_device(machine, "pc090oj");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->pc080sn = machine->device("pc080sn");
+	state->pc090oj = machine->device("pc090oj");
 }
 
 static MACHINE_DRIVER_START( rainbow )

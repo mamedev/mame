@@ -170,13 +170,13 @@ WRITE8_HANDLER( redalert_voice_command_w )
 
 static WRITE_LINE_DEVICE_HANDLER( sod_callback )
 {
-	hc55516_digit_w(devtag_get_device(device->machine, "cvsd"), state);
+	hc55516_digit_w(device->machine->device("cvsd"), state);
 }
 
 
 static READ_LINE_DEVICE_HANDLER( sid_callback )
 {
-	return hc55516_clock_state_r(devtag_get_device(device->machine, "cvsd"));
+	return hc55516_clock_state_r(device->machine->device("cvsd"));
 }
 
 
@@ -309,8 +309,8 @@ static READ8_DEVICE_HANDLER( demoneye_ay8910_latch_2_r )
 
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 {
-	running_device *ay1 = devtag_get_device(device->machine, "ay1");
-	running_device *ay2 = devtag_get_device(device->machine, "ay2");
+	running_device *ay1 = device->machine->device("ay1");
+	running_device *ay2 = device->machine->device("ay2");
 
 	switch (ay8910_latch_1 & 0x03)
 	{

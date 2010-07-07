@@ -334,7 +334,7 @@ MACHINE_RESET( seibu_sound )
 	int romlength = memory_region_length(machine, "audiocpu");
 	UINT8 *rom = memory_region(machine, "audiocpu");
 
-	sound_cpu = devtag_get_device(machine, "audiocpu");
+	sound_cpu = machine->device("audiocpu");
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
 		memory_configure_bank(machine, "bank1", 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);

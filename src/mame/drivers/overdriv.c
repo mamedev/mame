@@ -298,15 +298,15 @@ static MACHINE_START( overdriv )
 {
 	overdriv_state *state = (overdriv_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->k051316_1 = devtag_get_device(machine, "k051316_1");
-	state->k051316_2 = devtag_get_device(machine, "k051316_2");
-	state->k053260_1 = devtag_get_device(machine, "k053260_1");
-	state->k053260_2 = devtag_get_device(machine, "k053260_2");
-	state->k053246 = devtag_get_device(machine, "k053246");
-	state->k053251 = devtag_get_device(machine, "k053251");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->subcpu = machine->device("sub");
+	state->k051316_1 = machine->device("k051316_1");
+	state->k051316_2 = machine->device("k051316_2");
+	state->k053260_1 = machine->device("k053260_1");
+	state->k053260_2 = machine->device("k053260_2");
+	state->k053246 = machine->device("k053246");
+	state->k053251 = machine->device("k053251");
 
 	state_save_register_global(machine, state->cpuB_ctrl);
 	state_save_register_global(machine, state->sprite_colorbase);

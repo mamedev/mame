@@ -1149,11 +1149,11 @@ static MACHINE_START( homedata )
 {
 	homedata_state *state = (homedata_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->ym = devtag_get_device(machine, "ymsnd");
-	state->sn = devtag_get_device(machine, "snsnd");
-	state->dac = devtag_get_device(machine, "dac");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->ym = machine->device("ymsnd");
+	state->sn = machine->device("snsnd");
+	state->dac = machine->device("dac");
 
 	state_save_register_global(machine, state->visible_page);
 	state_save_register_global(machine, state->flipscreen);

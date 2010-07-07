@@ -591,7 +591,7 @@ static MACHINE_START( pipedrm )
 {
 	fromance_state *state = (fromance_state *)machine->driver_data;
 
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->subcpu = machine->device("sub");
 
 	/* initialize main Z80 bank */
 	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x2000);

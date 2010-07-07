@@ -144,7 +144,7 @@ static WRITE8_DEVICE_HANDLER(fake2_w)
 
 static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 {
-	running_device *eeprom = devtag_get_device(device->machine, "eeprom");
+	running_device *eeprom = device->machine->device("eeprom");
 	static UINT8 old;
 	int i;
 
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 
 static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 {
-	running_device *eeprom = devtag_get_device(device->machine, "eeprom");
+	running_device *eeprom = device->machine->device("eeprom");
 
 	if (~data & ~0xf8)
 	{

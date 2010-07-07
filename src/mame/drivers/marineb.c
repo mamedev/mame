@@ -69,7 +69,7 @@ static MACHINE_START( marineb )
 {
 	espial_state *state = (espial_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 	state->audiocpu = NULL;
 
 	state_save_register_global(machine, state->marineb_active_low_flipscreen);

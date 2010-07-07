@@ -3599,7 +3599,7 @@ static MACHINE_RESET( metro )
 	metro_state *state = (metro_state *)machine->driver_data;
 
 	if (state->irq_line == -1)
-		cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), metro_irq_callback);
+		cpu_set_irq_callback(machine->device("maincpu"), metro_irq_callback);
 }
 
 

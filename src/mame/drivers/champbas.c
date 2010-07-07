@@ -568,8 +568,8 @@ static MACHINE_START( champbas )
 {
 	champbas_state *state = (champbas_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->mcu = devtag_get_device(machine, CPUTAG_MCU);
+	state->maincpu = machine->device("maincpu");
+	state->mcu = machine->device(CPUTAG_MCU);
 
 	state_save_register_global(machine, state->watchdog_count);
 	state_save_register_global(machine, state->palette_bank);
@@ -579,7 +579,7 @@ static MACHINE_START( champbas )
 static MACHINE_START( exctsccr )
 {
 	champbas_state *state = (champbas_state *)machine->driver_data;
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	// FIXME
 	timer_pulse(machine, ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */

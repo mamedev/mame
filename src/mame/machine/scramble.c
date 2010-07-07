@@ -20,7 +20,7 @@ MACHINE_RESET( scramble )
 {
 	MACHINE_RESET_CALL(galaxold);
 
-	if (devtag_get_device(machine, "audiocpu") != NULL)
+	if (machine->device("audiocpu") != NULL)
 		scramble_sh_init(machine);
 
   security_2B_counter = 0;
@@ -60,7 +60,7 @@ static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 
 static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	switch (cpu_get_pc(devtag_get_device(device->machine, "maincpu")))
+	switch (cpu_get_pc(device->machine->device("maincpu")))
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;
@@ -120,9 +120,9 @@ static READ8_HANDLER( cavelon_banksw_r )
 	cavelon_banksw(space->machine);
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), offset - 0x0100);
+		return ppi8255_r(space->machine->device("ppi8255_0"), offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset - 0x0200);
+		return ppi8255_r(space->machine->device("ppi8255_1"), offset - 0x0200);
 
 	return 0xff;
 }
@@ -132,9 +132,9 @@ static WRITE8_HANDLER( cavelon_banksw_w )
 	cavelon_banksw(space->machine);
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), offset - 0x0100, data);
+		ppi8255_w(space->machine->device("ppi8255_0"), offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset - 0x0200, data);
+		ppi8255_w(space->machine->device("ppi8255_1"), offset - 0x0200, data);
 }
 
 

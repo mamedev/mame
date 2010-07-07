@@ -380,13 +380,13 @@ static READ8_DEVICE_HANDLER(via_a_r)
 
     if (ay8910_1&0x03) // SW1 read.
     {
-    	psg_ret = ay8910_r(devtag_get_device(device->machine, "ay1"), 0);
+    	psg_ret = ay8910_r(device->machine->device("ay1"), 0);
     	//logerror("PSG porta ay1 returned %02X\n",psg_ret);
     }
 
 	else if (ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
 	{
-		psg_ret = ay8910_r(devtag_get_device(device->machine, "ay2"), 0);
+		psg_ret = ay8910_r(device->machine->device("ay2"), 0);
 		//logerror("PSG porta ay2 returned %02X\n",psg_ret);
 	}
 	return psg_ret;
@@ -493,14 +493,14 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 
 		case 0x06:  //WRITE
         {
-        	ay8910_data_w( devtag_get_device(device->machine, "ay1"), 0 , psg_data );
+        	ay8910_data_w( device->machine->device("ay1"), 0 , psg_data );
         	//logerror("VIA Port A write data ay1: %02X\n",psg_data);
         	break;
         }
 
 		case 0x07:  //LATCH Address (set register)
         {
-        	ay8910_address_w( devtag_get_device(device->machine, "ay1"), 0 , psg_data );
+        	ay8910_address_w( device->machine->device("ay1"), 0 , psg_data );
         	//logerror("VIA Port B write register ay1: %02X\n",psg_data);
         	break;
         }
@@ -526,14 +526,14 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 
 		case 0x06:  //WRITE
         {
-        	ay8910_data_w( devtag_get_device(device->machine, "ay2"), 0 , psg_data );
+        	ay8910_data_w( device->machine->device("ay2"), 0 , psg_data );
         	//logerror("VIA Port A write data ay2: %02X\n",psg_data);
         	break;
         }
 
 		case 0x07:  //LATCH Address (set register)
         {
-            ay8910_address_w( devtag_get_device(device->machine, "ay2"), 0 , psg_data );
+            ay8910_address_w( device->machine->device("ay2"), 0 , psg_data );
             //logerror("VIA Port B write register ay2: %02X\n",psg_data);
             break;
         }
@@ -1142,7 +1142,7 @@ static DRIVER_INIT( aristmk4 )
 static MACHINE_START( aristmk4 )
 {
 
-	samples = devtag_get_device(machine, "samples");
+	samples = machine->device("samples");
     state_save_register_global_pointer(machine, nvram,0x1000); // nvram
 }
 
@@ -1153,10 +1153,10 @@ static MACHINE_RESET( aristmk4 )
     switch(input_port_read(machine, "LK13"))  // cpu speed cotrol.. 3mhz or 1.5mhz
     {
         case  0x00:
-            cpu_set_clock(devtag_get_device(machine, "maincpu"), MAIN_CLOCK/4);  // 3 Mhz
+            cpu_set_clock(machine->device("maincpu"), MAIN_CLOCK/4);  // 3 Mhz
             break;
         case  0x10:
-            cpu_set_clock(devtag_get_device(machine, "maincpu"), MAIN_CLOCK/8);  // 1.5 Mhz
+            cpu_set_clock(machine->device("maincpu"), MAIN_CLOCK/8);  // 1.5 Mhz
             break;
     }
 

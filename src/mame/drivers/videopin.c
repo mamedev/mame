@@ -66,7 +66,7 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static MACHINE_RESET( videopin )
 {
-	running_device *discrete = devtag_get_device(machine, "discrete");
+	running_device *discrete = machine->device("discrete");
 
 	timer_set(machine, machine->primary_screen->time_until_pos(32), NULL, 32, interrupt_callback);
 

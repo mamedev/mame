@@ -2035,7 +2035,7 @@ static UINT32 copro_fifoout_pop(const address_space *space)
 	if (copro_fifoout_num == 0)
 	{
 		// Reading from empty FIFO causes the v60 to enter wait state
-		v60_stall(devtag_get_device(space->machine, "maincpu"));
+		v60_stall(space->machine->device("maincpu"));
 
 		timer_call_after_resynch(space->machine, NULL, 0, NULL);
 

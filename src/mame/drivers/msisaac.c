@@ -455,7 +455,7 @@ static MACHINE_START( msisaac )
 {
 	buggychl_state *state = (buggychl_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	/* video */
 	state_save_register_global(machine, state->bg2_textbank);
@@ -467,7 +467,7 @@ static MACHINE_START( msisaac )
 	state_save_register_global(machine, state->snd_ctrl1);
 
 #ifdef USE_MCU
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->mcu = machine->device("mcu");
 
 	/* mcu */
 	state_save_register_global(machine, state->from_main);

@@ -370,10 +370,10 @@ static MACHINE_START( rastan )
 	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 1, 3, &ROM[0x10000], 0x4000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->pc080sn = devtag_get_device(machine, "pc080sn");
-	state->pc090oj = devtag_get_device(machine, "pc090oj");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->pc080sn = machine->device("pc080sn");
+	state->pc090oj = machine->device("pc090oj");
 
 	state_save_register_global(machine, state->sprite_ctrl);
 	state_save_register_global(machine, state->sprites_flipscreen);

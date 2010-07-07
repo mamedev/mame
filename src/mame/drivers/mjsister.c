@@ -452,8 +452,8 @@ static MACHINE_START( mjsister )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->dac = devtag_get_device(machine, "dac");
+	state->maincpu = machine->device("maincpu");
+	state->dac = machine->device("dac");
 
 	state_save_register_global(machine, state->dac_busy);
 	state_save_register_global(machine, state->flip_screen);

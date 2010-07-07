@@ -84,7 +84,7 @@ static void cage_irq_callback(running_machine *machine, int reason)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (reason)
-		atarigen_sound_int_gen(devtag_get_device(machine, "maincpu"));
+		atarigen_sound_int_gen(machine->device("maincpu"));
 	else
 		atarigen_sound_int_ack_w(space,0,0,0xffff);
 }

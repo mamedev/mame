@@ -681,13 +681,13 @@ static MACHINE_START( nyny )
 {
 	nyny_state *state = (nyny_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->audiocpu2 = devtag_get_device(machine, "audio2");
-	state->ic48_1 = devtag_get_device(machine, "ic48_1");
-	state->mc6845 = devtag_get_device(machine, "crtc");
-	state->pia1 = devtag_get_device(machine, "pia1");
-	state->pia2 = devtag_get_device(machine, "pia2");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->audiocpu2 = machine->device("audio2");
+	state->ic48_1 = machine->device("ic48_1");
+	state->mc6845 = machine->device("crtc");
+	state->pia1 = machine->device("pia1");
+	state->pia2 = machine->device("pia2");
 
 	/* setup for save states */
 	state_save_register_global(machine, state->flipscreen);

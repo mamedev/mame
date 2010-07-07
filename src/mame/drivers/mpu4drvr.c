@@ -357,8 +357,8 @@ static WRITE8_DEVICE_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		running_device *acia_0 = devtag_get_device(device->machine, "acia6850_0");
-		running_device *acia_1 = devtag_get_device(device->machine, "acia6850_1");
+		running_device *acia_0 = device->machine->device("acia6850_0");
+		running_device *acia_1 = device->machine->device("acia6850_1");
 		acia6850_tx_clock_in(acia_0);
 		acia6850_rx_clock_in(acia_0);
 		acia6850_tx_clock_in(acia_1);
@@ -1894,8 +1894,8 @@ static WRITE16_DEVICE_HANDLER( oki_w )
 
 static void video_reset(running_device *device)
 {
-	devtag_get_device(device->machine, "6840ptm_68k")->reset();
-	devtag_get_device(device->machine, "acia6850_1")->reset();
+	device->machine->device("6840ptm_68k")->reset();
+	device->machine->device("acia6850_1")->reset();
 }
 
 /* machine start (called only once) */
@@ -1919,7 +1919,7 @@ static MACHINE_START( mpu4_vid )
 	ROC10937_init(0, MSC1937, 0);
 
 	/* Hook the reset line */
-	m68k_set_reset_callback(devtag_get_device(machine, "video"), video_reset);
+	m68k_set_reset_callback(machine->device("video"), video_reset);
 }
 
 static MACHINE_RESET( mpu4_vid )
@@ -2502,7 +2502,7 @@ static DRIVER_INIT (crmaze3a)
 static DRIVER_INIT (mating)
 {
 	const address_space *space = cputag_get_address_space(machine, "video", ADDRESS_SPACE_PROGRAM);
-	running_device *device = devtag_get_device(machine, "oki");
+	running_device *device = machine->device("oki");
 
 	/* The Mating Game has an extra 256kB RAM on the program card */
 	memory_install_ram(space, 0x600000, 0x63ffff, 0, 0, NULL);

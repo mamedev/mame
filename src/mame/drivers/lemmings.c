@@ -259,7 +259,7 @@ static MACHINE_START( lemmings )
 {
 	lemmings_state *state = (lemmings_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 }
 
 static MACHINE_DRIVER_START( lemmings )

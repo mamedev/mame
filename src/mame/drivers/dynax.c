@@ -456,7 +456,7 @@ static MACHINE_RESET( adpcm )
 	dynax_state *state = (dynax_state *)machine->driver_data;
 	/* start with the MSM5205 reset */
 	state->resetkludge = 0;
-	msm5205_reset_w(devtag_get_device(machine, "msm"), 1);
+	msm5205_reset_w(machine->device("msm"), 1);
 }
 
 static WRITE8_HANDLER( yarunara_layer_half_w )
@@ -4204,10 +4204,10 @@ static MACHINE_START( dynax )
 {
 	dynax_state *state = (dynax_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->rtc = devtag_get_device(machine, "rtc");
-	state->ymsnd = devtag_get_device(machine, "ymsnd");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
+	state->rtc = machine->device("rtc");
+	state->ymsnd = machine->device("ymsnd");
 
 	state_save_register_global(machine, state->sound_irq);
 	state_save_register_global(machine, state->vblank_irq);
@@ -4244,7 +4244,7 @@ static MACHINE_RESET( dynax )
 {
 	dynax_state *state = (dynax_state *)machine->driver_data;
 
-	if (devtag_get_device(machine, "msm") != NULL)
+	if (machine->device("msm") != NULL)
 		MACHINE_RESET_CALL(adpcm);
 
 	state->sound_irq = 0;
@@ -4701,8 +4701,8 @@ static MACHINE_START( jantouki )
 	memory_configure_bank(machine, "bank1", 0, 0x10, &MAIN[0x8000],  0x8000);
 	memory_configure_bank(machine, "bank2", 0, 12,   &SOUND[0x8000], 0x8000);
 
-	state->top_scr = devtag_get_device(machine, "top");
-	state->bot_scr = devtag_get_device(machine, "bottom");
+	state->top_scr = machine->device("top");
+	state->bot_scr = machine->device("bottom");
 
 	MACHINE_START_CALL(dynax);
 }

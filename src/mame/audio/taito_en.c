@@ -48,7 +48,7 @@ static WRITE16_HANDLER( f3_es5505_bank_w )
 
 	/* mask out unused bits */
 	data &= max_banks_this_game;
-	es5505_voice_bank_w(devtag_get_device(space->machine, "ensoniq"),offset,data<<20);
+	es5505_voice_bank_w(space->machine->device("ensoniq"),offset,data<<20);
 }
 
 static WRITE16_HANDLER( f3_volume_w )
@@ -74,7 +74,7 @@ static TIMER_DEVICE_CALLBACK( taito_en_timer_callback )
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr & 0x08)
 	{
-		cpu_set_input_line_vector(devtag_get_device(timer.machine, "audiocpu"), 6, vector_reg);
+		cpu_set_input_line_vector(timer.machine->device("audiocpu"), 6, vector_reg);
 		cputag_set_input_line(timer.machine, "audiocpu", 6, ASSERT_LINE);
 		imr_status |= 0x08;
 	}

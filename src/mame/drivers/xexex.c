@@ -469,19 +469,19 @@ static MACHINE_START( xexex )
 	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank2", 0);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k053246 = devtag_get_device(machine, "k053246");
-	state->k053250 = devtag_get_device(machine, "k053250");
-	state->k053251 = devtag_get_device(machine, "k053251");
-	state->k053252 = devtag_get_device(machine, "k053252");
-	state->k056832 = devtag_get_device(machine, "k056832");
-	state->k054338 = devtag_get_device(machine, "k054338");
-	state->k054539 = devtag_get_device(machine, "k054539");
-	state->filter1l = devtag_get_device(machine, "filter1l");
-	state->filter1r = devtag_get_device(machine, "filter1r");
-	state->filter2l = devtag_get_device(machine, "filter2l");
-	state->filter2r = devtag_get_device(machine, "filter2r");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k053246 = machine->device("k053246");
+	state->k053250 = machine->device("k053250");
+	state->k053251 = machine->device("k053251");
+	state->k053252 = machine->device("k053252");
+	state->k056832 = machine->device("k056832");
+	state->k054338 = machine->device("k054338");
+	state->k054539 = machine->device("k054539");
+	state->filter1l = machine->device("filter1l");
+	state->filter1r = machine->device("filter1r");
+	state->filter2l = machine->device("filter2l");
+	state->filter2r = machine->device("filter2r");
 
 	state_save_register_global(machine, state->cur_alpha);
 	state_save_register_global(machine, state->sprite_colorbase);
@@ -516,7 +516,7 @@ static MACHINE_RESET( xexex )
 	state->suspension_active = 0;
 	state->resume_trigger = 1000;
 	state->frame = -1;
-	k054539_init_flags(devtag_get_device(machine, "k054539"), K054539_REVERSE_STEREO);
+	k054539_init_flags(machine->device("k054539"), K054539_REVERSE_STEREO);
 }
 
 static MACHINE_DRIVER_START( xexex )

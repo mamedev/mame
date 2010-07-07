@@ -186,10 +186,10 @@ static MACHINE_START( trvquest )
 {
 	gameplan_state *state = (gameplan_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->via_0 = devtag_get_device(machine, "via6522_0");
-	state->via_1 = devtag_get_device(machine, "via6522_1");
-	state->via_2 = devtag_get_device(machine, "via6522_2");
+	state->maincpu = machine->device("maincpu");
+	state->via_0 = machine->device("via6522_0");
+	state->via_1 = machine->device("via6522_1");
+	state->via_2 = machine->device("via6522_2");
 
 	/* register for save states */
 	state_save_register_global(machine, state->video_x);

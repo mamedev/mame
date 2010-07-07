@@ -110,8 +110,8 @@ static VIDEO_UPDATE( cubeqst )
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
 		int i;
-		int num_entries = cubeqcpu_get_ptr_ram_val(devtag_get_device(screen->machine, "line_cpu"), y);
-		UINT32 *stk_ram = cubeqcpu_get_stack_ram(devtag_get_device(screen->machine, "line_cpu"));
+		int num_entries = cubeqcpu_get_ptr_ram_val(screen->machine->device("line_cpu"), y);
+		UINT32 *stk_ram = cubeqcpu_get_stack_ram(screen->machine->device("line_cpu"));
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 		UINT32 pen;
 
@@ -240,10 +240,10 @@ static WRITE16_HANDLER( control_w )
 
 static TIMER_CALLBACK( delayed_bank_swap )
 {
-	cubeqcpu_swap_line_banks(devtag_get_device(machine, "line_cpu"));
+	cubeqcpu_swap_line_banks(machine->device("line_cpu"));
 
 	/* TODO: This is a little dubious */
-	cubeqcpu_clear_stack(devtag_get_device(machine, "line_cpu"));
+	cubeqcpu_clear_stack(machine->device("line_cpu"));
 }
 
 
@@ -375,22 +375,22 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( read_rotram )
 {
-	return cubeqcpu_rotram_r(devtag_get_device(space->machine, "rotate_cpu"), offset, mem_mask);
+	return cubeqcpu_rotram_r(space->machine->device("rotate_cpu"), offset, mem_mask);
 }
 
 static WRITE16_HANDLER( write_rotram )
 {
-	cubeqcpu_rotram_w(devtag_get_device(space->machine, "rotate_cpu"), offset, data, mem_mask);
+	cubeqcpu_rotram_w(space->machine->device("rotate_cpu"), offset, data, mem_mask);
 }
 
 static READ16_HANDLER( read_sndram )
 {
-	return cubeqcpu_sndram_r(devtag_get_device(space->machine, "sound_cpu"), offset, mem_mask);
+	return cubeqcpu_sndram_r(space->machine->device("sound_cpu"), offset, mem_mask);
 }
 
 static WRITE16_HANDLER( write_sndram )
 {
-	cubeqcpu_sndram_w(devtag_get_device(space->machine, "sound_cpu"), offset, data, mem_mask);
+	cubeqcpu_sndram_w(space->machine->device("sound_cpu"), offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -427,7 +427,7 @@ ADDRESS_MAP_END
 
 static MACHINE_START( cubeqst )
 {
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	laserdisc = machine->device("laserdisc");
 }
 
 static MACHINE_RESET( cubeqst )
@@ -467,7 +467,7 @@ static void sound_dac_w(running_device *device, UINT16 data)
 		"rdac6", "ldac6",
 		"rdac7", "ldac7"
 	};
-	dac_signed_data_16_w(devtag_get_device(device->machine, dacs[data & 15]), (data & 0xfff0) ^ 0x8000);
+	dac_signed_data_16_w(device->machine->device(dacs[data & 15]), (data & 0xfff0) ^ 0x8000);
 }
 
 static const cubeqst_snd_config snd_config =

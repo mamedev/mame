@@ -1816,7 +1816,7 @@ INPUT_PORTS_END
 static MACHINE_RESET( naomi )
 {
 	MACHINE_RESET_CALL(dc);
-	aica_set_ram_base(devtag_get_device(machine, "aica"), dc_sound_ram, 8*1024*1024);
+	aica_set_ram_base(machine->device("aica"), dc_sound_ram, 8*1024*1024);
 }
 
 /*

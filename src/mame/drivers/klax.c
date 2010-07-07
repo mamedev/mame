@@ -41,7 +41,7 @@ static void scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0 && !(input_port_read(screen.machine, "P1") & 0x800))
-		atarigen_scanline_int_gen(devtag_get_device(screen.machine, "maincpu"));
+		atarigen_scanline_int_gen(screen.machine->device("maincpu"));
 }
 
 

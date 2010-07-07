@@ -214,9 +214,9 @@ static MACHINE_START( tail2nos )
 	memory_configure_bank(machine, "bank3", 0, 2, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank3", 0);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k051316 = devtag_get_device(machine, "k051316");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k051316 = machine->device("k051316");
 
 	state_save_register_global(machine, state->charbank);
 	state_save_register_global(machine, state->charpalette);

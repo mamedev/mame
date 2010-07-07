@@ -211,7 +211,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ hi_addr++; }	/* Low byte */
 	if (mem_mask == 0xff000000) {}				/* High byte */
 
-	value = dsp56k_host_interface_read(devtag_get_device(space->machine, "dsp"), hi_addr);
+	value = dsp56k_host_interface_read(space->machine->device("dsp"), hi_addr);
 
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
@@ -295,7 +295,7 @@ static WRITE32_HANDLER( dsp_host_interface_w )
 	if (mem_mask == 0xff000000) { hi_data = (data & 0xff000000) >> 24; }
 
 	logerror("write (host-side) %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
-	dsp56k_host_interface_write(devtag_get_device(space->machine, "dsp"), hi_addr, hi_data);
+	dsp56k_host_interface_write(space->machine->device("dsp"), hi_addr, hi_data);
 }
 
 

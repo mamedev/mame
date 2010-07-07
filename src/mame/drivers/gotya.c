@@ -178,7 +178,7 @@ static MACHINE_START( gotya )
 {
 	gotya_state *state = (gotya_state *)machine->driver_data;
 
-	state->samples = devtag_get_device(machine, "samples");
+	state->samples = machine->device("samples");
 
 	state_save_register_global(machine, state->scroll_bit_8);
 	state_save_register_global(machine, state->theme_playing);

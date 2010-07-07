@@ -283,8 +283,8 @@ static MACHINE_START( blktiger )
 {
 	blktiger_state *state = (blktiger_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->audiocpu = machine->device("audiocpu");
+	state->mcu = machine->device("mcu");
 
 	/* configure bankswitching */
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);

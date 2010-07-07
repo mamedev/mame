@@ -738,7 +738,7 @@ static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 	set_led_status(space->machine, 1, data & 0x01);
 	set_led_status(space->machine, 2, data & 0x02);
 	set_led_status(space->machine, 3, data & 0x04);
-	ticket_dispenser_w(devtag_get_device(device->machine, "ticket"), 0, (data & 0x10) << 3);
+	ticket_dispenser_w(device->machine->device("ticket"), 0, (data & 0x10) << 3);
 	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
 
@@ -757,7 +757,7 @@ static WRITE8_DEVICE_HANDLER( pia_portb_out )
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	ticket_dispenser_w(devtag_get_device(device->machine, "ticket"), 0, (data & 0x10) << 3);
+	ticket_dispenser_w(device->machine->device("ticket"), 0, (data & 0x10) << 3);
 	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
 
@@ -4045,7 +4045,7 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 
 static void install_timekeeper(running_machine *machine)
 {
-	running_device *device = devtag_get_device(machine, "m48t02");
+	running_device *device = machine->device("m48t02");
 	memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
 }
 

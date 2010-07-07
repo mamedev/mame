@@ -247,7 +247,7 @@ static MACHINE_START( diverboy )
 {
 	diverboy_state *state = (diverboy_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 }
 
 static MACHINE_DRIVER_START( diverboy )

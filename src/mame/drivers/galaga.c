@@ -745,19 +745,19 @@ static WRITE8_HANDLER( bosco_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQ1 */
-			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(space->machine->device("maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
-			cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
+			cpu_interrupt_enable(space->machine->device("sub"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
-			cpu_interrupt_enable(devtag_get_device(space->machine, "sub2"), !bit);
+			cpu_interrupt_enable(space->machine->device("sub2"), !bit);
 			break;
 
 		case 0x03:	/* RESET */
@@ -866,7 +866,7 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 {
 	int scanline = param;
 
-	nmi_line_pulse(devtag_get_device(machine, "sub2"));
+	nmi_line_pulse(machine->device("sub2"));
 
 	scanline = scanline + 128;
 	if (scanline >= 272)

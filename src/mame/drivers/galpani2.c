@@ -229,7 +229,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 
 static void galpani2_mcu_nmi2(running_machine *machine)
 {
-		galpani2_write_kaneko(devtag_get_device(machine, "maincpu"));
+		galpani2_write_kaneko(machine->device("maincpu"));
 		//logerror("%s : MCU executes CHECKs synchro\n", cpuexec_describe_context(machine));
 }
 

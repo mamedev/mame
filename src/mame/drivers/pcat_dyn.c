@@ -483,12 +483,12 @@ static MACHINE_START( pcat_dyn )
 //  bank = -1;
 //  lastvalue = -1;
 //  hv_blank = 0;
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
-	pcat_dyn_devices.pit8253 = devtag_get_device( machine, "pit8254" );
-	pcat_dyn_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
-	pcat_dyn_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
-	pcat_dyn_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
-	pcat_dyn_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	pcat_dyn_devices.pit8253 = machine->device( "pit8254" );
+	pcat_dyn_devices.pic8259_1 = machine->device( "pic8259_1" );
+	pcat_dyn_devices.pic8259_2 = machine->device( "pic8259_2" );
+	pcat_dyn_devices.dma8237_1 = machine->device( "dma8237_1" );
+	pcat_dyn_devices.dma8237_2 = machine->device( "dma8237_2" );
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, pcat_dyn_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);

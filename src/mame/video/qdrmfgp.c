@@ -29,7 +29,7 @@ void qdrmfgp2_tile_callback(running_machine *machine, int layer, int *code, int 
 
 VIDEO_START( qdrmfgp )
 {
-	running_device *k056832 = devtag_get_device(machine, "k056832");
+	running_device *k056832 = machine->device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 
@@ -41,7 +41,7 @@ VIDEO_START( qdrmfgp )
 
 VIDEO_START( qdrmfgp2 )
 {
-	running_device *k056832 = devtag_get_device(machine, "k056832");
+	running_device *k056832 = machine->device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 
@@ -59,7 +59,7 @@ VIDEO_START( qdrmfgp2 )
 
 VIDEO_UPDATE( qdrmfgp )
 {
-	running_device *k056832 = devtag_get_device(screen->machine, "k056832");
+	running_device *k056832 = screen->machine->device("k056832");
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 1);

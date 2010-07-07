@@ -195,9 +195,9 @@ static MACHINE_START( mogura )
 {
 	mogura_state *state = (mogura_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->dac1 = devtag_get_device(machine, "dac1");
-	state->dac2 = devtag_get_device(machine, "dac2");
+	state->maincpu = machine->device("maincpu");
+	state->dac1 = machine->device("dac1");
+	state->dac2 = machine->device("dac2");
 }
 
 static MACHINE_DRIVER_START( mogura )

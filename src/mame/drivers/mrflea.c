@@ -329,8 +329,8 @@ static MACHINE_START( mrflea )
 {
 	mrflea_state *state = (mrflea_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->maincpu = machine->device("maincpu");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global(machine, state->gfx_bank);
 	state_save_register_global(machine, state->io);

@@ -413,7 +413,7 @@ static MACHINE_START( bking )
 {
 	buggychl_state *state = (buggychl_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	/* video */
 	state_save_register_global_array(machine, state->pc3259_output);
@@ -439,7 +439,7 @@ static MACHINE_START( bking3 )
 {
 	buggychl_state *state = (buggychl_state *)machine->driver_data;
 
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->mcu = machine->device("mcu");
 
 	MACHINE_START_CALL(bking);
 

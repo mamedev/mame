@@ -7921,7 +7921,7 @@ static DEVICE_START( k056832 )
 	k056832->active_layer = 0;
 	k056832->linemap_enabled = 0;
 
-	k056832->k055555 = devtag_get_device(device->machine, intf->k055555);
+	k056832->k055555 = device->machine->device(intf->k055555);
 
 	memset(k056832->line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
 
@@ -8414,7 +8414,7 @@ static DEVICE_START( k054338 )
 	const k054338_interface *intf = k054338_get_interface(device);
 
 	k054338->screen = device->machine->device<screen_device>(intf->screen);
-	k054338->k055555 = devtag_get_device(device->machine, intf->k055555);
+	k054338->k055555 = device->machine->device(intf->k055555);
 
 	k054338->alphainverted = intf->alpha_inv;
 
@@ -10079,10 +10079,10 @@ static DEVICE_START( k001005 )
 	const k001005_interface *intf = k001005_get_interface(device);
 	int i, width, height;
 
-	k001005->cpu = devtag_get_device(device->machine, intf->cpu);
-	k001005->dsp = devtag_get_device(device->machine, intf->dsp);
-	k001005->k001006_1 = devtag_get_device(device->machine, intf->k001006_1);
-	k001005->k001006_2 = devtag_get_device(device->machine, intf->k001006_2);
+	k001005->cpu = device->machine->device(intf->cpu);
+	k001005->dsp = device->machine->device(intf->dsp);
+	k001005->k001006_1 = device->machine->device(intf->k001006_1);
+	k001005->k001006_2 = device->machine->device(intf->k001006_2);
 
 	k001005->screen = device->machine->device<screen_device>(intf->screen);
 	width = k001005->screen->width();

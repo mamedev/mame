@@ -7576,8 +7576,8 @@ static MACHINE_START( ddenlovr )
 {
 	dynax_state *state = (dynax_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
 	state->oki = machine->device<okim6295_device>("oki");
 
 	state_save_register_global(machine, state->input_sel);

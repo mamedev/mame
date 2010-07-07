@@ -313,7 +313,7 @@ static WRITE8_HANDLER( c6_w )
 // 02 hopper motor on (active low)?
 static WRITE8_HANDLER( c8_w )
 {
-	ticket_dispenser_w(devtag_get_device(space->machine, "hopper"), 0, (!(data & 0x02) && (data & 0x01)) ? 0x00 : 0x80);
+	ticket_dispenser_w(space->machine->device("hopper"), 0, (!(data & 0x02) && (data & 0x01)) ? 0x00 : 0x80);
 
 	c8 = data;
 	show_outputs();

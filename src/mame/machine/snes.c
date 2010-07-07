@@ -1679,7 +1679,7 @@ static void snes_init_ram( running_machine *machine )
 
 static DIRECT_UPDATE_HANDLER( spc_direct )
 {
-	direct->raw = direct->decrypted = spc_get_ram(devtag_get_device(space->machine, "spc700"));
+	direct->raw = direct->decrypted = spc_get_ram(space->machine->device("spc700"));
 	return ~0;
 }
 

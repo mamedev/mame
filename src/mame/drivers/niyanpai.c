@@ -122,10 +122,10 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 			niyanpai_soundbank_w(space->machine, data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_WRITE(devtag_get_device(space->machine, "dac2"), 0, data);
+			DAC_WRITE(space->machine->device("dac2"), 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_WRITE(devtag_get_device(space->machine, "dac1"), 0, data);
+			DAC_WRITE(space->machine->device("dac1"), 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;

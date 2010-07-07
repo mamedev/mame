@@ -274,7 +274,7 @@ static MACHINE_START( himesiki )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global_array(machine, state->scrollx);
 	state_save_register_global(machine, state->flipscreen);

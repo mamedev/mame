@@ -204,7 +204,7 @@ static MACHINE_START( galspnbl )
 {
 	galspnbl_state *state = (galspnbl_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 }
 
 static MACHINE_DRIVER_START( galspnbl )

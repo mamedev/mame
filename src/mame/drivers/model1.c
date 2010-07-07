@@ -713,7 +713,7 @@ static IRQ_CALLBACK(irq_callback)
 static void irq_init(running_machine *machine)
 {
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 static INTERRUPT_GEN(model1_interrupt)
@@ -838,7 +838,7 @@ static WRITE16_HANDLER(mr2_w)
 
 static READ16_HANDLER( snd_68k_ready_r )
 {
-	int sr = cpu_get_reg(devtag_get_device(space->machine, "audiocpu"), M68K_SR);
+	int sr = cpu_get_reg(space->machine->device("audiocpu"), M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{

@@ -776,7 +776,7 @@ static WRITE8_HANDLER( pia_portb_out )
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	pia_portb_data = data;
-	ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, (data & 0x10) << 3);
+	ticket_dispenser_w(space->machine->device("ticket"), 0, (data & 0x10) << 3);
 	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
 
@@ -790,7 +790,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	pia_portb_data = data;
-	ticket_dispenser_w(devtag_get_device(device->machine, "ticket"), 0, data & 0x80);
+	ticket_dispenser_w(device->machine->device("ticket"), 0, data & 0x80);
 	coin_counter_w(device->machine, 0, (data & 0x20) >> 5);
 }
 

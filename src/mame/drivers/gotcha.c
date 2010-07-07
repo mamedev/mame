@@ -252,7 +252,7 @@ static MACHINE_START( gotcha )
 {
 	gotcha_state *state = (gotcha_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->banksel);
 	state_save_register_global_array(machine, state->gfxbank);

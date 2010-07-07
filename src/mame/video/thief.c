@@ -110,7 +110,7 @@ VIDEO_UPDATE( thief ){
 	int flipscreen = thief_video_control&1;
 	const UINT8 *source = screen->machine->generic.videoram.u8;
 
-	if (tms9927_screen_reset(devtag_get_device(screen->machine, "tms")))
+	if (tms9927_screen_reset(screen->machine->device("tms")))
 	{
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;

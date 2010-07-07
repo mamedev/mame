@@ -542,7 +542,7 @@ static WRITE8_HANDLER( mux_port_w )
 */
 	input_selector = data & 0x0f;	/* Input Selector */
 
-	dac_data_w(devtag_get_device(space->machine, "dac"), data & 0x80);		/* Sound DAC */
+	dac_data_w(space->machine->device("dac"), data & 0x80);		/* Sound DAC */
 
 	coin_counter_w(space->machine, 0, data & 0x40);	/* Coin1 */
 	coin_counter_w(space->machine, 1, data & 0x10);	/* Coin2 */

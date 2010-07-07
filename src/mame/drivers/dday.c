@@ -224,7 +224,7 @@ static MACHINE_START( dday )
 {
 	dday_state *state = (dday_state *)machine->driver_data;
 
-	state->ay1 = devtag_get_device(machine, "ay1");
+	state->ay1 = machine->device("ay1");
 
 	state_save_register_global(machine, state->control);
 	state_save_register_global(machine, state->sl_enable);

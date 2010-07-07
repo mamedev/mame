@@ -558,13 +558,13 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(calchase)
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
-	calchase_devices.pit8254 = devtag_get_device( machine, "pit8254" );
-	calchase_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
-	calchase_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
-	calchase_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
-	calchase_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
+	calchase_devices.pit8254 = machine->device( "pit8254" );
+	calchase_devices.pic8259_1 = machine->device( "pic8259_1" );
+	calchase_devices.pic8259_2 = machine->device( "pic8259_2" );
+	calchase_devices.dma8237_1 = machine->device( "dma8237_1" );
+	calchase_devices.dma8237_2 = machine->device( "dma8237_2" );
 }
 
 /*************************************************************

@@ -803,7 +803,7 @@ static DEVICE_START( mos6560 )
 	const mos6560_interface *intf = (mos6560_interface *)device->baseconfig().static_config();
 	int width, height;
 
-	mos6560->screen = downcast<screen_device *>(devtag_get_device(device->machine, intf->screen));
+	mos6560->screen = downcast<screen_device *>(device->machine->device(intf->screen));
 	width = mos6560->screen->width();
 	height = mos6560->screen->height();
 

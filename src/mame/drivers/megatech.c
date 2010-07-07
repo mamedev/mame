@@ -489,8 +489,8 @@ static VIDEO_START(mtnew)
 //attotime_never
 static VIDEO_UPDATE(mtnew)
 {
-	running_device *megadriv_screen = devtag_get_device(screen->machine, "megadriv");
-	running_device *menu_screen     = devtag_get_device(screen->machine, "menu");
+	running_device *megadriv_screen = screen->machine->device("megadriv");
+	running_device *menu_screen     = screen->machine->device("menu");
 
 	if (screen == megadriv_screen)
 	{

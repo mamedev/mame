@@ -2624,7 +2624,7 @@ VIDEO_UPDATE( multi32 )
 {
 	UINT8 enablemask;
 
-	running_device *left_screen  = devtag_get_device(screen->machine, "lscreen");
+	running_device *left_screen  = screen->machine->device("lscreen");
 
 	/* update the visible area */
 	if (system32_videoram[0x1ff00/2] & 0x8000)

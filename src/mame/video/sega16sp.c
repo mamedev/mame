@@ -1461,9 +1461,9 @@ void segaic16_sprites_draw(running_device *screen, bitmap_t *bitmap, const recta
 	sega16sp_state *sega16sp;
 
 	if (!which)
-		device = devtag_get_device(screen->machine,"segaspr1");
+		device = screen->machine->device("segaspr1");
 	else
-		device = devtag_get_device(screen->machine,"segaspr2");
+		device = screen->machine->device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_draw device not found\n");
@@ -1491,9 +1491,9 @@ void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum,
 	running_device* device = 0;
 
 	if (!which)
-		device = devtag_get_device(machine,"segaspr1");
+		device = machine->device("segaspr1");
 	else
-		device = devtag_get_device(machine,"segaspr2");
+		device = machine->device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_set_bank device not found\n");
@@ -1521,9 +1521,9 @@ void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 	running_device* device = 0;
 
 	if (!which)
-		device = devtag_get_device(machine,"segaspr1");
+		device = machine->device("segaspr1");
 	else
-		device = devtag_get_device(machine,"segaspr2");
+		device = machine->device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_set_flip device not found\n");
@@ -1552,9 +1552,9 @@ void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow
 	running_device* device = 0;
 
 	if (!which)
-		device = devtag_get_device(machine,"segaspr1");
+		device = machine->device("segaspr1");
 	else
-		device = devtag_get_device(machine,"segaspr2");
+		device = machine->device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_set_shadow device not found\n");
@@ -1614,7 +1614,7 @@ WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 {
 	running_device* device = 0;
 
-	device = devtag_get_device(space->machine,"segaspr1");
+	device = space->machine->device("segaspr1");
 
 	if (!device)
 		fatalerror("segaic16_sprites_draw_0_w device not found\n");
@@ -1627,7 +1627,7 @@ WRITE16_HANDLER( segaic16_sprites_draw_1_w )
 {
 	running_device* device = 0;
 
-	device = devtag_get_device(space->machine,"segaspr2");
+	device = space->machine->device("segaspr2");
 
 	if (!device)
 		fatalerror("segaic16_sprites_draw_1_w device not found\n");

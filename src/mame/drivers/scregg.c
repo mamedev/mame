@@ -204,7 +204,7 @@ static MACHINE_START( scregg )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 	state->audiocpu = NULL;
 
 	state_save_register_global(machine, state->btime_palette);

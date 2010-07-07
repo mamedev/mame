@@ -500,7 +500,7 @@ static MACHINE_START( seattle )
 {
 	int index;
 
-	voodoo = devtag_get_device(machine, "voodoo");
+	voodoo = machine->device("voodoo");
 
 	/* allocate timers for the galileo */
 	galileo.timer[0].timer = timer_alloc(machine, galileo_timer_callback, NULL);
@@ -509,11 +509,11 @@ static MACHINE_START( seattle )
 	galileo.timer[3].timer = timer_alloc(machine, galileo_timer_callback, NULL);
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, rambase);
-	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x007fffff, FALSE, rambase);
+	mips3drc_add_fastram(machine->device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 
 	/* register for save states */
 	state_save_register_global_array(machine, galileo.reg);
@@ -556,12 +556,12 @@ static MACHINE_RESET( seattle )
 	cpu_stalled_on_voodoo = FALSE;
 
 	/* reset either the DCS2 board or the CAGE board */
-	if (devtag_get_device(machine, "dcs2") != NULL)
+	if (machine->device("dcs2") != NULL)
 	{
 		dcs_reset_w(1);
 		dcs_reset_w(0);
 	}
-	else if (devtag_get_device(machine, "cage") != NULL)
+	else if (machine->device("cage") != NULL)
 	{
 		cage_control_w(machine, 0);
 		cage_control_w(machine, 3);
@@ -1333,8 +1333,8 @@ static void voodoo_stall(running_device *device, int stall)
 		}
 		else
 		{
-			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
-			cpu_spinuntil_trigger(devtag_get_device(device->machine, "maincpu"), 45678);
+			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine->device("maincpu")));
+			cpu_spinuntil_trigger(device->machine->device("maincpu"), 45678);
 		}
 	}
 
@@ -1720,7 +1720,7 @@ static READ32_DEVICE_HANDLER( seattle_ide_r )
 {
 	/* note that blitz times out if we don't have this cycle stealing */
 	if (offset == 0x3f6/4)
-		cpu_eat_cycles(devtag_get_device(device->machine, "maincpu"), 100);
+		cpu_eat_cycles(device->machine->device("maincpu"), 100);
 	return ide_controller32_r(device, offset, mem_mask);
 }
 
@@ -2795,7 +2795,7 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
-			device = devtag_get_device(machine, "ethernet");
+			device = machine->device("ethernet");
 			memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
 			break;
 
@@ -2804,7 +2804,7 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 			memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
 
 			/* set up the ethernet controller */
-			device = devtag_get_device(machine, "ethernet");
+			device = machine->device("ethernet");
 			memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
 			break;
 	}
@@ -2817,9 +2817,9 @@ static DRIVER_INIT( wg3dh )
 	init_common(machine, MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8004413C, 0x0C0054B4, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80094930, 0x00A2102B, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80092984, 0x3C028011, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x8004413C, 0x0C0054B4, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80094930, 0x00A2102B, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80092984, 0x3C028011, 250);		/* confirmed */
 }
 
 
@@ -2829,7 +2829,7 @@ static DRIVER_INIT( mace )
 	init_common(machine, MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800108F8, 0x8C420000, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x800108F8, 0x8C420000, 250);		/* confirmed */
 }
 
 
@@ -2839,9 +2839,9 @@ static DRIVER_INIT( sfrush )
 	init_common(machine, MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80059F34, 0x3C028012, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800A5AF4, 0x8E300010, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8004C260, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80059F34, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x800A5AF4, 0x8E300010, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x8004C260, 0x3C028012, 250);		/* confirmed */
 }
 
 
@@ -2851,10 +2851,10 @@ static DRIVER_INIT( sfrushrk )
 	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800343E8, 0x3C028012, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8008F4F0, 0x3C028012, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800A365C, 0x8E300014, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80051DAC, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x800343E8, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x8008F4F0, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x800A365C, 0x8E300014, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80051DAC, 0x3C028012, 250);		/* confirmed */
 }
 
 
@@ -2865,8 +2865,8 @@ static DRIVER_INIT( calspeed )
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80032534, 0x02221024, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800B1BE4, 0x8E110014, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80032534, 0x02221024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x800B1BE4, 0x8E110014, 250);		/* confirmed */
 }
 
 
@@ -2876,9 +2876,9 @@ static DRIVER_INIT( vaportrx )
 	init_common(machine, MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80049F14, 0x3C028020, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8004859C, 0x3C028020, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8005922C, 0x8E020014, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80049F14, 0x3C028020, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x8004859C, 0x3C028020, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x8005922C, 0x8E020014, 250);		/* confirmed */
 }
 
 
@@ -2900,8 +2900,8 @@ static DRIVER_INIT( blitz )
 	rombase[0x934/4] += 4;
 
 	/* main CPU speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80135510, 0x3C028024, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x800087DC, 0x8E820010, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80135510, 0x3C028024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x800087DC, 0x8E820010, 250);		/* confirmed */
 }
 
 
@@ -2911,8 +2911,8 @@ static DRIVER_INIT( blitz99 )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8014E41C, 0x3C038025, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80011F10, 0x8E020018, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x8014E41C, 0x3C038025, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80011F10, 0x8E020018, 250);		/* confirmed */
 }
 
 
@@ -2922,8 +2922,8 @@ static DRIVER_INIT( blitz2k )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8015773C, 0x3C038025, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80012CA8, 0x8E020018, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x8015773C, 0x3C038025, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80012CA8, 0x8E020018, 250);		/* confirmed */
 }
 
 
@@ -2936,8 +2936,8 @@ static DRIVER_INIT( carnevil )
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x8015176C, 0x3C03801A, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80011FBC, 0x8E020018, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x8015176C, 0x3C03801A, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80011FBC, 0x8E020018, 250);		/* confirmed */
 }
 
 
@@ -2947,9 +2947,9 @@ static DRIVER_INIT( hyprdriv )
 	init_common(machine, MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x801643BC, 0x3C03801B, 250);		/* confirmed */
-	mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80011FB8, 0x8E020018, 250);		/* confirmed */
-	//mips3drc_add_hotspot(devtag_get_device(machine, "maincpu"), 0x80136A80, 0x3C02801D, 250);      /* potential */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x801643BC, 0x3C03801B, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->device("maincpu"), 0x80011FB8, 0x8E020018, 250);		/* confirmed */
+	//mips3drc_add_hotspot(machine->device("maincpu"), 0x80136A80, 0x3C02801D, 250);      /* potential */
 }
 
 

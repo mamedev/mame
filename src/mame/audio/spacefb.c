@@ -36,7 +36,7 @@ READ8_HANDLER( spacefb_audio_t1_r )
 
 WRITE8_HANDLER( spacefb_port_1_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 
 	cputag_set_input_line(space->machine, "audiocpu", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 

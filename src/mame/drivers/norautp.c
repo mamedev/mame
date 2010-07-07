@@ -651,7 +651,7 @@ static WRITE8_DEVICE_HANDLER( soundlamps_w )
   xxxx ----  * Discrete Sound Lines.
 */
 
-	running_device *discrete = devtag_get_device(device->machine, "discrete");
+	running_device *discrete = device->machine->device("discrete");
 
 	output_set_lamp_value(8, (data >> 0) & 1);	/* DEAL / DRAW lamp */
 	output_set_lamp_value(9, (data >> 1) & 1);	/* BET / COLLECT lamp */
@@ -721,8 +721,8 @@ static WRITE8_HANDLER( vram_data_w )
 	np_vram[np_addr] = data & 0xff;
 
 	/* trigger 8255-2 port C bit 7 (/OBF) */
-//  i8255a_pc7_w(devtag_get_device(device->machine, "ppi8255_2"), 0);
-//  i8255a_pc7_w(devtag_get_device(device->machine, "ppi8255_2"), 1);
+//  i8255a_pc7_w(device->machine->device("ppi8255_2"), 0);
+//  i8255a_pc7_w(device->machine->device("ppi8255_2"), 1);
 
 }
 

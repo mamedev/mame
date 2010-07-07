@@ -206,9 +206,9 @@ static MACHINE_START( skattv )
 	adp_state *state = (adp_state *)machine->driver_data;
 	microtouch_init(machine, microtouch_tx, 0);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->duart = devtag_get_device(machine, "duart68681");
-	state->hd63484 = devtag_get_device(machine, "hd63484");
+	state->maincpu = machine->device("maincpu");
+	state->duart = machine->device("duart68681");
+	state->hd63484 = machine->device("hd63484");
 
 	state_save_register_global(machine, state->mux_data);
 	state_save_register_global(machine, state->register_active);
@@ -227,7 +227,7 @@ static MACHINE_START( skattv )
 		UINT16 *rom = (UINT16*)memory_region(machine, "gfx1");
 		int i;
 
-		running_device *hd63484 = devtag_get_device(machine, "hd63484");
+		running_device *hd63484 = machine->device("hd63484");
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{

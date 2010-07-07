@@ -360,7 +360,7 @@ static MACHINE_START( ironhors )
 {
 	ironhors_state *state = (ironhors_state *)machine->driver_data;
 
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->soundcpu = machine->device("soundcpu");
 
 	state_save_register_global(machine, state->palettebank);
 	state_save_register_global(machine, state->charbank);

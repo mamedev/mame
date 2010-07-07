@@ -454,8 +454,8 @@ static READ8_DEVICE_HANDLER( port_c_r )
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	port_b_data = data;
-// running_device *beep = devtag_get_device(device->machine, "beep");
-// running_device *cvsd = devtag_get_device(device->machine, "cvsd");
+// running_device *beep = device->machine->device("beep");
+// running_device *cvsd = device->machine->device("cvsd");
 //  hc55516_digit_w(cvsd, data);
 //  popmessage("%02x\n",data);
 //  beep_set_state(beep, 0);
@@ -909,12 +909,12 @@ static MACHINE_RESET( filetto )
 	bank = -1;
 	lastvalue = -1;
 	hv_blank = 0;
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
-	filetto_devices.pit8253 = devtag_get_device( machine, "pit8253" );
-	filetto_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
-	filetto_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
-	filetto_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
-	filetto_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	filetto_devices.pit8253 = machine->device( "pit8253" );
+	filetto_devices.pic8259_1 = machine->device( "pic8259_1" );
+	filetto_devices.pic8259_2 = machine->device( "pic8259_2" );
+	filetto_devices.dma8237_1 = machine->device( "dma8237_1" );
+	filetto_devices.dma8237_2 = machine->device( "dma8237_2" );
 }
 
 static MACHINE_DRIVER_START( filetto )

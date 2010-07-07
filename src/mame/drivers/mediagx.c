@@ -973,7 +973,7 @@ static MACHINE_RESET(mediagx)
 {
 	UINT8 *rom = memory_region(machine, "bios");
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
 	machine->device("maincpu")->reset();

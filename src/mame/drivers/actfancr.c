@@ -280,8 +280,8 @@ static MACHINE_START( actfancr )
 {
 	actfancr_state *state = (actfancr_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 }
 
 static MACHINE_START( triothep )

@@ -63,8 +63,8 @@ MACHINE_START( espial )
 {
 	espial_state *state = (espial_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	//state_save_register_global_array(machine, mcu_out[1]);
 	state_save_register_global(machine, state->sound_nmi_enabled);

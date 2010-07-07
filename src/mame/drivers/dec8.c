@@ -1931,10 +1931,10 @@ static MACHINE_START( dec8 )
 {
 	dec8_state *state = (dec8_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->maincpu = machine->device("maincpu");
+	state->subcpu = machine->device("sub");
+	state->audiocpu = machine->device("audiocpu");
+	state->mcu = machine->device("mcu");
 
 	state_save_register_global(machine, state->latch);
 	state_save_register_global(machine, state->nmi_enable);

@@ -1194,9 +1194,9 @@ static void tx1_combine_layers(running_machine *machine, bitmap_t *bitmap, int s
 
 VIDEO_UPDATE( tx1 )
 {
-	running_device *left_screen   = devtag_get_device(screen->machine, "lscreen");
-	running_device *centre_screen = devtag_get_device(screen->machine, "cscreen");
-	running_device *right_screen  = devtag_get_device(screen->machine, "rscreen");
+	running_device *left_screen   = screen->machine->device("lscreen");
+	running_device *centre_screen = screen->machine->device("cscreen");
+	running_device *right_screen  = screen->machine->device("rscreen");
 
 	if (screen == left_screen)
 	{
@@ -3081,9 +3081,9 @@ VIDEO_EOF( buggyboy )
 
 VIDEO_UPDATE( buggyboy )
 {
-	running_device *left_screen = devtag_get_device(screen->machine, "lscreen");
-	running_device *center_screen = devtag_get_device(screen->machine, "cscreen");
-	running_device *right_screen = devtag_get_device(screen->machine, "rscreen");
+	running_device *left_screen = screen->machine->device("lscreen");
+	running_device *center_screen = screen->machine->device("cscreen");
+	running_device *right_screen = screen->machine->device("rscreen");
 
 	if (screen == left_screen)
 	{

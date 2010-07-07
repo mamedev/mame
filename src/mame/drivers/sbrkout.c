@@ -120,7 +120,7 @@ static TIMER_CALLBACK( scanline_callback )
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	/* update the DAC state */
-	dac_data_w(devtag_get_device(machine, "dac"), (machine->generic.videoram.u8[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
+	dac_data_w(machine->device("dac"), (machine->generic.videoram.u8[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == machine->primary_screen->visible_area().max_y + 1)

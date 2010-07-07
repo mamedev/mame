@@ -1683,10 +1683,10 @@ static UINT32 *work_ram;
 static MACHINE_START( firebeat )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x01ffffff, FALSE, work_ram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x01ffffff, FALSE, work_ram);
 }
 
 static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1909,7 +1909,7 @@ static MACHINE_RESET( firebeat )
 	}
 
 	SCSIGetDevice( atapi_device_data[1], &cd );
-	cdda_set_cdrom(devtag_get_device(machine, "cdda"), cd);
+	cdda_set_cdrom(machine->device("cdda"), cd);
 }
 
 static MACHINE_DRIVER_START(firebeat)
@@ -2157,7 +2157,7 @@ static void security_w(running_device *device, UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
-		ppc4xx_spu_receive_byte(devtag_get_device(device->machine, "maincpu"), r);
+		ppc4xx_spu_receive_byte(device->machine->device("maincpu"), r);
 }
 
 /*****************************************************************************/
@@ -2190,7 +2190,7 @@ static void init_firebeat(running_machine *machine)
 
 	cur_cab_data = cab_data;
 
-	ppc4xx_spu_set_tx_handler(devtag_get_device(machine, "maincpu"), security_w);
+	ppc4xx_spu_set_tx_handler(machine->device("maincpu"), security_w);
 
 	set_ibutton(rom);
 

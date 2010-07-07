@@ -150,13 +150,13 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	set_led_status(device->machine, 9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	ticket_dispenser_w(devtag_get_device(device->machine, "ticket"), 0, (data & 0x20)<< 2);
+	ticket_dispenser_w(device->machine->device("ticket"), 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
 	interrupt_enable_w(space, 0, data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(devtag_get_device(device->machine, "dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(device->machine->device("dac"), ((data & 0x80) >> 7) * 255);
 }
 
 static WRITE8_DEVICE_HANDLER( sound2_w )
@@ -173,7 +173,7 @@ static WRITE8_DEVICE_HANDLER( sound2_w )
 	set_led_status(device->machine, 12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(devtag_get_device(device->machine, "dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(device->machine->device("dac"), ((data & 0x80) >> 7) * 255);
 }
 
 static WRITE8_DEVICE_HANDLER( lamps2_w )

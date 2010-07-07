@@ -287,9 +287,9 @@ static MACHINE_START( dribling )
 {
 	dribling_state *state = (dribling_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->ppi_0 = devtag_get_device(machine, "ppi8255_0");
-	state->ppi_1 = devtag_get_device(machine, "ppi8255_1");
+	state->maincpu = machine->device("maincpu");
+	state->ppi_0 = machine->device("ppi8255_0");
+	state->ppi_1 = machine->device("ppi8255_1");
 
 	state_save_register_global(machine, state->abca);
 	state_save_register_global(machine, state->di);

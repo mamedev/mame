@@ -148,7 +148,7 @@ static void scanline_update(screen_device &screen, int scanline)
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(devtag_get_device(screen.machine, "audiocpu"));
+		atarigen_6502_irq_gen(screen.machine->device("audiocpu"));
 	else
 		atarigen_6502_irq_ack_r(space, 0);
 }
@@ -173,7 +173,7 @@ static MACHINE_RESET( gauntlet )
 	atarigen_slapstic_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 32);
-	atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
+	atarigen_sound_io_reset(machine->device("audiocpu"));
 }
 
 
@@ -217,7 +217,7 @@ static WRITE16_HANDLER( sound_reset_w )
 			{
 				devtag_reset(space->machine, "ymsnd");
 				devtag_reset(space->machine, "tms");
-				tms5220_set_frequency(devtag_get_device(space->machine, "tms"), ATARI_CLOCK_14MHz/2 / 11);
+				tms5220_set_frequency(space->machine->device("tms"), ATARI_CLOCK_14MHz/2 / 11);
 				atarigen_set_ym2151_vol(space->machine, 0);
 				atarigen_set_pokey_vol(space->machine, 0);
 				atarigen_set_tms5220_vol(space->machine, 0);
@@ -241,7 +241,7 @@ static READ8_HANDLER( switch_6502_r )
 
 	if (state->atarigen.cpu_to_sound_ready) temp ^= 0x80;
 	if (state->atarigen.sound_to_cpu_ready) temp ^= 0x40;
-	if (!tms5220_readyq_r(devtag_get_device(space->machine, "tms"))) temp ^= 0x20;
+	if (!tms5220_readyq_r(space->machine->device("tms"))) temp ^= 0x20;
 	if (!(input_port_read(space->machine, "803008") & 0x0008)) temp ^= 0x10;
 
 	return temp;
@@ -256,7 +256,7 @@ static READ8_HANDLER( switch_6502_r )
 
 static WRITE8_HANDLER( sound_ctl_w )
 {
-	running_device *tms = devtag_get_device(space->machine, "tms");
+	running_device *tms = space->machine->device("tms");
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */
@@ -1627,7 +1627,7 @@ static void gauntlet_common_init(running_machine *machine, int slapstic, int vin
 	gauntlet_state *state = (gauntlet_state *)machine->driver_data;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	state->atarigen.eeprom_default = NULL;
-	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x038000, 0, slapstic);
+	atarigen_slapstic_init(machine->device("maincpu"), 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	atarigen_swap_mem(rom + 0x000000, rom + 0x008000, 0x8000);

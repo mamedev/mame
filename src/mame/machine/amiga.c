@@ -318,9 +318,9 @@ static void amiga_m68k_reset(running_device *device)
 MACHINE_RESET( amiga )
 {
 	/* set m68k reset  function */
-	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), amiga_m68k_reset);
+	m68k_set_reset_callback(machine->device("maincpu"), amiga_m68k_reset);
 
-	amiga_m68k_reset(devtag_get_device(machine, "maincpu"));
+	amiga_m68k_reset(machine->device("maincpu"));
 
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)
@@ -341,8 +341,8 @@ MACHINE_RESET( amiga )
 static TIMER_CALLBACK( scanline_callback )
 {
 	int scanline = param;
-	running_device *cia_0 = devtag_get_device(machine, "cia_0");
-	running_device *cia_1 = devtag_get_device(machine, "cia_1");
+	running_device *cia_0 = machine->device("cia_0");
+	running_device *cia_1 = machine->device("cia_1");
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
@@ -1046,14 +1046,14 @@ READ16_HANDLER( amiga_cia_r )
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
 	{
-		cia = devtag_get_device(space->machine, "cia_1");
+		cia = space->machine->device("cia_1");
 		shift = 8;
 	}
 
 	/* offsets 0800-0fff reference CIA A, and are accessed via the LSB */
 	else
 	{
-		cia = devtag_get_device(space->machine, "cia_0");
+		cia = space->machine->device("cia_0");
 		shift = 0;
 	}
 
@@ -1086,7 +1086,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	{
 		if (!ACCESSING_BITS_8_15)
 			return;
-		cia = devtag_get_device(space->machine, "cia_1");
+		cia = space->machine->device("cia_1");
 		data >>= 8;
 	}
 
@@ -1095,7 +1095,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	{
 		if (!ACCESSING_BITS_0_7)
 			return;
-		cia = devtag_get_device(space->machine, "cia_0");
+		cia = space->machine->device("cia_0");
 		data &= 0xff;
 	}
 
@@ -1444,8 +1444,8 @@ WRITE16_HANDLER( amiga_custom_w )
 				CUSTOM_REG(REG_SERDATR) &= ~0x8000;
 
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
-			cia_0 = devtag_get_device(space->machine, "cia_0");
-			cia_1 = devtag_get_device(space->machine, "cia_1");
+			cia_0 = space->machine->device("cia_0");
+			cia_1 = space->machine->device("cia_1");
 			if ( mos6526_irq_r( cia_0 ) ) data |= INTENA_PORTS;
 			if ( mos6526_irq_r( cia_1 ) ) data |= INTENA_EXTER;
 			CUSTOM_REG(offset) = data;

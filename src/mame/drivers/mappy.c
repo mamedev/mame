@@ -587,20 +587,20 @@ static WRITE8_DEVICE_HANDLER( mappy_snd_sharedram_w )
 
 static WRITE8_HANDLER( superpac_latch_w )
 {
-	running_device *namcoio_1 = devtag_get_device(space->machine, "namcoio_1");
-	running_device *namcoio_2 = devtag_get_device(space->machine, "namcoio_2");
+	running_device *namcoio_1 = space->machine->device("namcoio_1");
+	running_device *namcoio_2 = space->machine->device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
+			cpu_interrupt_enable(space->machine->device("sub"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(space->machine->device("maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
@@ -609,7 +609,7 @@ static WRITE8_HANDLER( superpac_latch_w )
 			break;
 
 		case 0x06:	/* SOUND ON */
-			mappy_sound_enable(devtag_get_device(space->machine, "namco"), bit);
+			mappy_sound_enable(space->machine->device("namco"), bit);
 			break;
 
 		case 0x08:	/* 4 RESET */
@@ -631,32 +631,32 @@ static WRITE8_HANDLER( superpac_latch_w )
 
 static WRITE8_HANDLER( phozon_latch_w )
 {
-	running_device *namcoio_1 = devtag_get_device(space->machine, "namcoio_1");
-	running_device *namcoio_2 = devtag_get_device(space->machine, "namcoio_2");
+	running_device *namcoio_1 = space->machine->device("namcoio_1");
+	running_device *namcoio_2 = space->machine->device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
 	{
 		case 0x00:
-			cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
+			cpu_interrupt_enable(space->machine->device("sub"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
-			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(space->machine->device("maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x04:
-			cpu_interrupt_enable(devtag_get_device(space->machine, "sub2"), bit);
+			cpu_interrupt_enable(space->machine->device("sub2"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub2", 0, CLEAR_LINE);
 			break;
 
 		case 0x06:
-			mappy_sound_enable(devtag_get_device(space->machine, "namco"), bit);
+			mappy_sound_enable(space->machine->device("namco"), bit);
 			break;
 
 		case 0x08:
@@ -679,20 +679,20 @@ static WRITE8_HANDLER( phozon_latch_w )
 
 static WRITE8_HANDLER( mappy_latch_w )
 {
-	running_device *namcoio_1 = devtag_get_device(space->machine, "namcoio_1");
-	running_device *namcoio_2 = devtag_get_device(space->machine, "namcoio_2");
+	running_device *namcoio_1 = space->machine->device("namcoio_1");
+	running_device *namcoio_2 = space->machine->device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
+			cpu_interrupt_enable(space->machine->device("sub"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(space->machine->device("maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
@@ -702,7 +702,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 			break;
 
 		case 0x06:	/* SOUND ON */
-			mappy_sound_enable(devtag_get_device(space->machine, "namco"), bit);
+			mappy_sound_enable(space->machine->device("namco"), bit);
 			break;
 
 		case 0x08:	/* 4 RESET */
@@ -757,8 +757,8 @@ static MACHINE_RESET( mappy )
 
 static TIMER_CALLBACK( superpac_io_run )
 {
-	running_device *io56xx_1 = devtag_get_device(machine, "namcoio_1");
-	running_device *io56xx_2 = devtag_get_device(machine, "namcoio_2");
+	running_device *io56xx_1 = machine->device("namcoio_1");
+	running_device *io56xx_2 = machine->device("namcoio_2");
 
 	switch (param)
 	{
@@ -773,8 +773,8 @@ static TIMER_CALLBACK( superpac_io_run )
 
 static INTERRUPT_GEN( superpac_interrupt_1 )
 {
-	running_device *namcoio_1 = devtag_get_device(device->machine, "namcoio_1");
-	running_device *namcoio_2 = devtag_get_device(device->machine, "namcoio_2");
+	running_device *namcoio_1 = device->machine->device("namcoio_1");
+	running_device *namcoio_2 = device->machine->device("namcoio_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -788,8 +788,8 @@ static INTERRUPT_GEN( superpac_interrupt_1 )
 
 static TIMER_CALLBACK( pacnpal_io_run )
 {
-	running_device *io56xx = devtag_get_device(machine, "namcoio_1");
-	running_device *io59xx = devtag_get_device(machine, "namcoio_2");
+	running_device *io56xx = machine->device("namcoio_1");
+	running_device *io59xx = machine->device("namcoio_2");
 
 	switch (param)
 	{
@@ -804,8 +804,8 @@ static TIMER_CALLBACK( pacnpal_io_run )
 
 static INTERRUPT_GEN( pacnpal_interrupt_1 )
 {
-	running_device *namcoio_1 = devtag_get_device(device->machine, "namcoio_1");
-	running_device *namcoio_2 = devtag_get_device(device->machine, "namcoio_2");
+	running_device *namcoio_1 = device->machine->device("namcoio_1");
+	running_device *namcoio_2 = device->machine->device("namcoio_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -819,8 +819,8 @@ static INTERRUPT_GEN( pacnpal_interrupt_1 )
 
 static TIMER_CALLBACK( phozon_io_run )
 {
-	running_device *io58xx = devtag_get_device(machine, "namcoio_1");
-	running_device *io56xx = devtag_get_device(machine, "namcoio_2");
+	running_device *io58xx = machine->device("namcoio_1");
+	running_device *io56xx = machine->device("namcoio_2");
 
 	switch (param)
 	{
@@ -835,8 +835,8 @@ static TIMER_CALLBACK( phozon_io_run )
 
 static INTERRUPT_GEN( phozon_interrupt_1 )
 {
-	running_device *namcoio_1 = devtag_get_device(device->machine, "namcoio_1");
-	running_device *namcoio_2 = devtag_get_device(device->machine, "namcoio_2");
+	running_device *namcoio_1 = device->machine->device("namcoio_1");
+	running_device *namcoio_2 = device->machine->device("namcoio_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -850,8 +850,8 @@ static INTERRUPT_GEN( phozon_interrupt_1 )
 
 static TIMER_CALLBACK( mappy_io_run )
 {
-	running_device *io58xx_1 = devtag_get_device(machine, "namcoio_1");
-	running_device *io58xx_2 = devtag_get_device(machine, "namcoio_2");
+	running_device *io58xx_1 = machine->device("namcoio_1");
+	running_device *io58xx_2 = machine->device("namcoio_2");
 
 	switch (param)
 	{
@@ -866,8 +866,8 @@ static TIMER_CALLBACK( mappy_io_run )
 
 static INTERRUPT_GEN( mappy_interrupt_1 )
 {
-	running_device *namcoio_1 = devtag_get_device(device->machine, "namcoio_1");
-	running_device *namcoio_2 = devtag_get_device(device->machine, "namcoio_2");
+	running_device *namcoio_1 = device->machine->device("namcoio_1");
+	running_device *namcoio_2 = device->machine->device("namcoio_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -2258,7 +2258,7 @@ static DRIVER_INIT( grobda )
        However, removing the 15XX from the board causes sound to disappear completely, so
        the DAC might be built-in after all.
       */
-	running_device *dac = devtag_get_device(machine, "dac");
+	running_device *dac = machine->device("dac");
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
 }
 

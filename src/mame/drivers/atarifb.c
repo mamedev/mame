@@ -509,7 +509,7 @@ static MACHINE_START( atarifb )
 {
 	atarifb_state *state = (atarifb_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->CTRLD);
 	state_save_register_global(machine, state->sign_x_1);

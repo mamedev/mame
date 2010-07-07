@@ -322,7 +322,7 @@ static MACHINE_START( inufuku )
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->pending_command);
 	state_save_register_global(machine, state->bg_scrollx);

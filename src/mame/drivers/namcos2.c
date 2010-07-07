@@ -4975,7 +4975,7 @@ static DRIVER_INIT( assaultp_hack ){
 	//
 	// This is used in conjunction with the interleave increase in the
 	// MACHINE_DRIVER
-	cpu_set_clockscale(devtag_get_device(machine, "mcu"), 4.0f);
+	cpu_set_clockscale(machine->device("mcu"), 4.0f);
 
 	DRIVER_INIT_CALL( assaultp );
 }

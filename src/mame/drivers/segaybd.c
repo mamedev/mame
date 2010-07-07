@@ -195,10 +195,10 @@ static MACHINE_START( yboard )
 {
 	segas1x_state *state = (segas1x_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->subx = devtag_get_device(machine, "subx");
-	state->suby = devtag_get_device(machine, "suby");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
+	state->subx = machine->device("subx");
+	state->suby = machine->device("suby");
 
 	state_save_register_global(machine, state->vblank_irq_state);
 	state_save_register_global(machine, state->timer_irq_state);

@@ -22,10 +22,10 @@ static SOUND_START( irem_audio )
 {
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 
-	state->adpcm1 = devtag_get_device(machine, "msm1");
-	state->adpcm2 = devtag_get_device(machine, "msm2");
-	state->ay1 = devtag_get_device(machine, "ay1");
-	state->ay2 = devtag_get_device(machine, "ay2");
+	state->adpcm1 = machine->device("msm1");
+	state->adpcm2 = machine->device("msm2");
+	state->ay1 = machine->device("ay1");
+	state->ay2 = machine->device("ay2");
 
 	state_save_register_global(machine, state->port1);
 	state_save_register_global(machine, state->port2);

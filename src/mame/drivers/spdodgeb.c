@@ -61,7 +61,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( spd_adpcm_w )
 {
 	int chip = offset & 1;
-	running_device *adpcm = devtag_get_device(space->machine, (chip == 0) ? "msm1" : "msm2");
+	running_device *adpcm = space->machine->device((chip == 0) ? "msm1" : "msm2");
 
 	switch (offset/2)
 	{

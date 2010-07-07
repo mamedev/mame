@@ -317,7 +317,7 @@ static MACHINE_START( m14 )
 {
 	m14_state *state = (m14_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->hop_mux);
 }

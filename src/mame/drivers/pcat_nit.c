@@ -213,7 +213,7 @@ static const struct pc_vga_interface vga_interface =
 
 static MACHINE_START( streetg2 )
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pcat_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), pcat_irq_callback);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, streetg2_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);

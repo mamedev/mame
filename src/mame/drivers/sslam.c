@@ -441,7 +441,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 		data = soundlatch_r(space,0);
 	}
 	else if ((state->oki_control & 0x38) == 0x28) {
-		data = (okim6295_r(devtag_get_device(space->machine, "oki"),0) & 0x0f);
+		data = (okim6295_r(space->machine->device("oki"),0) & 0x0f);
 	}
 
 	return data;
@@ -471,7 +471,7 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 
 	if ((data & 0x38) == 0x18)
 	{
-		okim6295_w(devtag_get_device(space->machine, "oki"), 0, state->oki_command);
+		okim6295_w(space->machine->device("oki"), 0, state->oki_command);
 	}
 
 //  !(data & 0x80) -> sound enable

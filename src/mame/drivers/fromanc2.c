@@ -517,11 +517,11 @@ static MACHINE_START( fromanc4 )
 {
 	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->eeprom = devtag_get_device(machine, "eeprom");
-	state->left_screen = devtag_get_device(machine, "lscreen");
-	state->right_screen = devtag_get_device(machine, "rscreen");
+	state->audiocpu = machine->device("audiocpu");
+	state->subcpu = machine->device("sub");
+	state->eeprom = machine->device("eeprom");
+	state->left_screen = machine->device("lscreen");
+	state->right_screen = machine->device("rscreen");
 
 	state_save_register_global(machine, state->portselect);
 	state_save_register_global(machine, state->sndcpu_nmi_flag);

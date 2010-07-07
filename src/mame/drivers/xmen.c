@@ -317,14 +317,14 @@ static MACHINE_START( xmen )
 	memory_configure_bank(machine, "bank4", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank4", 0);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k053246 = devtag_get_device(machine, "k053246");
-	state->k053251 = devtag_get_device(machine, "k053251");
-	state->k052109 = devtag_get_device(machine, "k052109");
-	state->k054539 = devtag_get_device(machine, "k054539");
-	state->lscreen = devtag_get_device(machine, "lscreen");
-	state->rscreen = devtag_get_device(machine, "rscreen");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k053246 = machine->device("k053246");
+	state->k053251 = machine->device("k053251");
+	state->k052109 = machine->device("k052109");
+	state->k054539 = machine->device("k054539");
+	state->lscreen = machine->device("lscreen");
+	state->rscreen = machine->device("rscreen");
 
 	state_save_register_global(machine, state->sound_curbank);
 	state_save_register_global(machine, state->sprite_colorbase);

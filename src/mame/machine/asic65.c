@@ -131,7 +131,7 @@ void asic65_config(running_machine *machine, int asictype)
 	asic65.type = asictype;
 	asic65.yorigin = 0x1800;
 	if (asic65.type == ASIC65_ROMBASED)
-		asic65.cpu = devtag_get_device(machine, "asic65");
+		asic65.cpu = machine->device("asic65");
 }
 
 

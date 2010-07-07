@@ -438,7 +438,7 @@ static MACHINE_START( dacholer )
 {
 	dacholer_state *state = (dacholer_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->bg_bank);
 	state_save_register_global(machine, state->msm_data);

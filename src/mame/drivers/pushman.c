@@ -422,9 +422,9 @@ static MACHINE_START( pushman )
 {
 	pushman_state *state = (pushman_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->mcu = machine->device("mcu");
 
 	state_save_register_global_array(machine, state->control);
 	state_save_register_global_array(machine, state->shared_ram);

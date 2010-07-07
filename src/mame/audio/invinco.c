@@ -66,7 +66,7 @@ enum
 WRITE8_HANDLER( invinco_audio_w )
 {
 	static int port2State = 0;
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	int bitsChanged;
 	//int bitsGoneHigh;
 	int bitsGoneLow;

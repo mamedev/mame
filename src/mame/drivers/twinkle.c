@@ -875,7 +875,7 @@ static DRIVER_INIT( twinkle )
 	psx_dma_install_read_handler(5, scsi_dma_read);
 	psx_dma_install_write_handler(5, scsi_dma_write);
 
-	running_device *i2cmem = devtag_get_device(machine, "security");
+	running_device *i2cmem = machine->device("security");
 	i2cmem_e0_write( i2cmem, 0 );
 	i2cmem_e1_write( i2cmem, 0 );
 	i2cmem_e2_write( i2cmem, 0 );
@@ -887,7 +887,7 @@ static MACHINE_RESET( twinkle )
 	psx_machine_init(machine);
 
 	/* also hook up CDDA audio to the CD-ROM drive */
-	cdda_set_cdrom(devtag_get_device(machine, "cdda"), am53cf96_get_device(SCSI_ID_4));
+	cdda_set_cdrom(machine->device("cdda"), am53cf96_get_device(SCSI_ID_4));
 }
 
 static void spu_irq(running_device *device, UINT32 data)

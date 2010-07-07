@@ -209,10 +209,10 @@ static MACHINE_START( surpratk )
 
 	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->k053244 = devtag_get_device(machine, "k053244");
-	state->k053251 = devtag_get_device(machine, "k053251");
-	state->k052109 = devtag_get_device(machine, "k052109");
+	state->maincpu = machine->device("maincpu");
+	state->k053244 = machine->device("k053244");
+	state->k053251 = machine->device("k053251");
+	state->k052109 = machine->device("k052109");
 
 	state_save_register_global(machine, state->videobank);
 	state_save_register_global(machine, state->sprite_colorbase);
@@ -226,7 +226,7 @@ static MACHINE_RESET( surpratk )
 	surpratk_state *state = (surpratk_state *)machine->driver_data;
 	int i;
 
-	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), surpratk_banking);
+	konami_configure_set_lines(machine->device("maincpu"), surpratk_banking);
 
 	for (i = 0; i < 3; i++)
 	{

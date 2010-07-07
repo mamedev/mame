@@ -955,11 +955,11 @@ static MACHINE_START( wgp )
 
 	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
-	state->tc0100scn = devtag_get_device(machine, "tc0100scn");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->subcpu = machine->device("sub");
+	state->tc0140syt = machine->device("tc0140syt");
+	state->tc0100scn = machine->device("tc0100scn");
 
 	state_save_register_global(machine, state->cpua_ctrl);
 	state_save_register_global(machine, state->banknum);

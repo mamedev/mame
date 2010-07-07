@@ -185,7 +185,7 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 
 	if (~data & 8)
 	{
-		running_device *device = devtag_get_device(machine, data & 4 ? "noise_2" : "noise_1");
+		running_device *device = machine->device(data & 4 ? "noise_2" : "noise_1");
 		noise_state *nstate = (noise_state *)downcast<legacy_device_base *>(device)->token();
 
 		if (state->dac_data != nstate->dac[data & 3])
@@ -397,7 +397,7 @@ WRITE8_HANDLER( micro3d_sound_io_w )
 		}
 		case 0x03:
 		{
-			running_device *upd = devtag_get_device(space->machine, "upd7759");
+			running_device *upd = space->machine->device("upd7759");
 			upd7759_set_bank_base(upd, (data & 0x4) ? 0x20000 : 0);
 			upd7759_reset_w(upd, (data & 0x10) ? 0 : 1);
 			break;
@@ -412,7 +412,7 @@ READ8_HANDLER( micro3d_sound_io_r )
 	switch (offset)
 	{
 		case 0x01:	return (state->sound_port_latch[offset] & 0x7f) | input_port_read(space->machine, "SOUND_SW");
-		case 0x03:	return (state->sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(devtag_get_device(space->machine, "upd7759")) ? 0x08 : 0);
+		case 0x03:	return (state->sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(space->machine->device("upd7759")) ? 0x08 : 0);
 		default:	return 0;
 	}
 }

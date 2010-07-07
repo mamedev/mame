@@ -339,7 +339,7 @@ static WRITE16_HANDLER( ssv_lockout_inv_w )
 static MACHINE_RESET( ssv )
 {
 	requested_int = 0;
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), ssv_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), ssv_irq_callback);
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
 }
 
@@ -766,7 +766,7 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		running_device *device = devtag_get_device(space->machine, "ensoniq");
+		running_device *device = space->machine->device("ensoniq");
 		int bank = 0x400000/2 * (data & 1);	// UINT16 address
 		int voice;
 		for (voice = 0; voice < 32; voice++)

@@ -455,7 +455,7 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 		case 0x100/2   :	megasys1_sprite_flag = new_data;		break;
 
 		case 0x300/2   :	megasys1_screen_flag = new_data;
-							if (devtag_get_device(space->machine, "soundcpu"))
+							if (space->machine->device("soundcpu"))
 							{
 								if (new_data & 0x10)
 									cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);

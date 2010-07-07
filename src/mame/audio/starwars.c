@@ -21,7 +21,7 @@ static running_device *riot;
 
 SOUND_START( starwars )
 {
-	riot = devtag_get_device(machine, "riot");
+	riot = machine->device("riot");
 }
 
 
@@ -46,7 +46,7 @@ static READ8_DEVICE_HANDLER( r6532_porta_r )
 	/* Note: bit 4 is always set to avoid sound self test */
 	UINT8 olddata = riot6532_porta_in_get(device);
 
-	return (olddata & 0xc0) | 0x10 | (tms5220_readyq_r(devtag_get_device(device->machine, "tms")) << 2);
+	return (olddata & 0xc0) | 0x10 | (tms5220_readyq_r(device->machine->device("tms")) << 2);
 }
 
 

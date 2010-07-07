@@ -1650,7 +1650,7 @@ static MACHINE_START( nemesis )
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->vlm = devtag_get_device(machine, "vlm");
+	state->vlm = machine->device("vlm");
 
 	state_save_register_global(machine, state->irq_on);
 	state_save_register_global(machine, state->irq1_on);

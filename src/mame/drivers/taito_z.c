@@ -1508,7 +1508,7 @@ static WRITE8_HANDLER( taitoz_pancontrol )
 //  state->pandata[offset] = data;
 //  popmessage(" pan %02x %02x %02x %02x", state->pandata[0], state->pandata[1], state->pandata[2], state->pandata[3] );
 
-	flt_volume_set_volume(devtag_get_device(space->machine, fltname[offset & 3]), data / 255.0f);
+	flt_volume_set_volume(space->machine->device(fltname[offset & 3]), data / 255.0f);
 }
 
 static WRITE16_HANDLER( spacegun_pancontrol )
@@ -2968,15 +2968,15 @@ static MACHINE_START( bshark )
 {
 	taitoz_state *state = (taitoz_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->eeprom = devtag_get_device(machine, "eeprom");
-	state->tc0100scn = devtag_get_device(machine, "tc0100scn");
-	state->tc0150rod = devtag_get_device(machine, "tc0150rod");
-	state->tc0480scp = devtag_get_device(machine, "tc0480scp");
-	state->tc0220ioc = devtag_get_device(machine, "tc0220ioc");
-	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
+	state->maincpu = machine->device("maincpu");
+	state->subcpu = machine->device("sub");
+	state->audiocpu = machine->device("audiocpu");
+	state->eeprom = machine->device("eeprom");
+	state->tc0100scn = machine->device("tc0100scn");
+	state->tc0150rod = machine->device("tc0150rod");
+	state->tc0480scp = machine->device("tc0480scp");
+	state->tc0220ioc = machine->device("tc0220ioc");
+	state->tc0140syt = machine->device("tc0140syt");
 
 	state_save_register_global(machine, state->cpua_ctrl);
 

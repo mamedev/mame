@@ -115,7 +115,7 @@ static NVRAM_HANDLER( mitchell )
 
 static READ8_HANDLER( pang_port5_r )
 {
-	int bit = eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
+	int bit = eeprom_read_bit(space->machine->device("eeprom")) << 7;
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
         bit 3 is checked before updating the palette so it really seems to be vblank.

@@ -2237,19 +2237,19 @@ static MACHINE_START( common )
 {
 	tmnt_state *state = (tmnt_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k007232 = devtag_get_device(machine, "k007232");
-	state->k053260 = devtag_get_device(machine, "k053260");
-	state->k054539 = devtag_get_device(machine, "k054539");
-	state->upd = devtag_get_device(machine, "upd");
-	state->samples = devtag_get_device(machine, "samples");
-	state->k052109 = devtag_get_device(machine, "k052109");
-	state->k051960 = devtag_get_device(machine, "k051960");
-	state->k053245 = devtag_get_device(machine, "k053245");
-	state->k053251 = devtag_get_device(machine, "k053251");
-	state->k053936 = devtag_get_device(machine, "k053936");
-	state->k054000 = devtag_get_device(machine, "k054000");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k007232 = machine->device("k007232");
+	state->k053260 = machine->device("k053260");
+	state->k054539 = machine->device("k054539");
+	state->upd = machine->device("upd");
+	state->samples = machine->device("samples");
+	state->k052109 = machine->device("k052109");
+	state->k051960 = machine->device("k051960");
+	state->k053245 = machine->device("k053245");
+	state->k053251 = machine->device("k053251");
+	state->k053936 = machine->device("k053936");
+	state->k054000 = machine->device("k054000");
 
 	state_save_register_global(machine, state->toggle);
 	state_save_register_global(machine, state->last);

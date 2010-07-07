@@ -119,9 +119,9 @@ static TIMER_CALLBACK( setvector_callback )
 	}
 
 	if (irqvector & 0x2)		/* YM2151 has precedence */
-		cpu_set_input_line_vector(devtag_get_device(machine, "soundcpu"), 0, 0x18);
+		cpu_set_input_line_vector(machine->device("soundcpu"), 0, 0x18);
 	else if (irqvector & 0x1)	/* V30 */
-		cpu_set_input_line_vector(devtag_get_device(machine, "soundcpu"), 0, 0x19);
+		cpu_set_input_line_vector(machine->device("soundcpu"), 0, 0x19);
 
 	if (irqvector == 0)	/* no IRQs pending */
 		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);

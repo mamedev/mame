@@ -44,8 +44,8 @@ static MACHINE_RESET( skeetsht )
 {
 	skeetsht_state *state = (skeetsht_state *)machine->driver_data;
 
-	state->ay = devtag_get_device(machine, "aysnd");
-	state->tms = devtag_get_device(machine, "tms");
+	state->ay = machine->device("aysnd");
+	state->tms = machine->device("tms");
 
 	/* Setup the Bt476 VGA RAMDAC palette chip */
 	tlc34076_reset(6);

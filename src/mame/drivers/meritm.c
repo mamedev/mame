@@ -963,8 +963,8 @@ static const z80_daisy_config meritm_daisy_chain[] =
 
 static MACHINE_START(merit_common)
 {
-	meritm_z80pio[0] = devtag_get_device( machine, "z80pio_0" );
-	meritm_z80pio[1] = devtag_get_device( machine, "z80pio_1" );
+	meritm_z80pio[0] = machine->device( "z80pio_0" );
+	meritm_z80pio[1] = machine->device( "z80pio_1" );
 
 	z80pio_astb_w(meritm_z80pio[0], 1);
 	z80pio_bstb_w(meritm_z80pio[0], 1);

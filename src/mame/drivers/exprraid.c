@@ -477,8 +477,8 @@ static MACHINE_START( exprraid )
 {
 	exprraid_state *state = (exprraid_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->slave = devtag_get_device(machine, "slave");
+	state->maincpu = machine->device("maincpu");
+	state->slave = machine->device("slave");
 
 	state_save_register_global_array(machine, state->bg_index);
 }

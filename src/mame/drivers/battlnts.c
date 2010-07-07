@@ -225,9 +225,9 @@ static MACHINE_START( battlnts )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k007342 = devtag_get_device(machine, "k007342");
-	state->k007420 = devtag_get_device(machine, "k007420");
+	state->audiocpu = machine->device("audiocpu");
+	state->k007342 = machine->device("k007342");
+	state->k007420 = machine->device("k007420");
 
 	state_save_register_global(machine, state->spritebank);
 	state_save_register_global_array(machine, state->layer_colorbase);

@@ -176,9 +176,9 @@ static MACHINE_START( contra )
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k007121_1 = devtag_get_device(machine, "k007121_1");
-	state->k007121_2 = devtag_get_device(machine, "k007121_2");
+	state->audiocpu = machine->device("audiocpu");
+	state->k007121_1 = machine->device("k007121_1");
+	state->k007121_2 = machine->device("k007121_2");
 }
 
 static MACHINE_DRIVER_START( contra )

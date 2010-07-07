@@ -376,10 +376,10 @@ static MACHINE_START( toratora )
 {
 	toratora_state *state = (toratora_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->pia_u1 = devtag_get_device(machine, "pia_u1");
-	state->pia_u2 = devtag_get_device(machine, "pia_u2");
-	state->pia_u3 = devtag_get_device(machine, "pia_u3");
+	state->maincpu = machine->device("maincpu");
+	state->pia_u1 = machine->device("pia_u1");
+	state->pia_u2 = machine->device("pia_u2");
+	state->pia_u3 = machine->device("pia_u3");
 
 	state_save_register_global(machine, state->timer);
 	state_save_register_global(machine, state->last);

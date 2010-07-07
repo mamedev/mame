@@ -83,11 +83,11 @@ static WRITE32_HANDLER( int_ack_w )
 static MACHINE_START( ultrsprt )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x80000000, 0x8007ffff, FALSE, vram);
-	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0xff000000, 0xff01ffff, FALSE, workram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x80000000, 0x8007ffff, FALSE, vram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0xff000000, 0xff01ffff, FALSE, workram);
 }
 
 
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( K056800_68k_r )
 {
-	running_device *k056800 = devtag_get_device(space->machine, "k056800");
+	running_device *k056800 = space->machine->device("k056800");
 	UINT16 r = 0;
 
 	if (ACCESSING_BITS_8_15)
@@ -125,7 +125,7 @@ static READ16_HANDLER( K056800_68k_r )
 
 static WRITE16_HANDLER( K056800_68k_w )
 {
-	running_device *k056800 = devtag_get_device(space->machine, "k056800");
+	running_device *k056800 = space->machine->device("k056800");
 
 	if (ACCESSING_BITS_8_15)
 		k056800_sound_w(k056800, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
@@ -190,7 +190,7 @@ static INTERRUPT_GEN( ultrsprt_vblank )
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		/*generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), INPUT_LINE_IRQ5)*/;
+		/*generic_pulse_irq_line(machine->device("audiocpu"), INPUT_LINE_IRQ5)*/;
 	else
 		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ6, HOLD_LINE);
 }

@@ -165,7 +165,7 @@ static const samples_interface spacewar_samples_interface =
 
 static void spacewar_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* Explosion - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -245,7 +245,7 @@ static const samples_interface barrier_samples_interface =
 
 static void barrier_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* Player die - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -299,7 +299,7 @@ static const samples_interface speedfrk_samples_interface =
 
 static void speedfrk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* on the falling edge of bit 0x08, clock the inverse of bit 0x04 into the top of the shiftreg */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
@@ -365,7 +365,7 @@ static const samples_interface starhawk_samples_interface =
 
 static void starhawk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -442,7 +442,7 @@ static const samples_interface sundance_samples_interface =
 
 static void sundance_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* bong - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -516,7 +516,7 @@ static void tailg_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
 	/* the falling edge of bit 0x10 clocks bit 0x08 into the mux selected by bits 0x07 */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
 	{
-		running_device *samples = devtag_get_device(machine, "samples");
+		running_device *samples = machine->device("samples");
 
 		/* update the shift register (actually just a simple mux) */
 		current_shift = (current_shift & ~(1 << (sound_val & 7))) | (((sound_val >> 3) & 1) << (sound_val & 7));
@@ -602,7 +602,7 @@ static const samples_interface warrior_samples_interface =
 
 static void warrior_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* normal level - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -674,7 +674,7 @@ static const samples_interface armora_samples_interface =
 
 static void armora_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -776,7 +776,7 @@ static const samples_interface ripoff_samples_interface =
 
 static void ripoff_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* on the rising edge of bit 0x02, clock bit 0x01 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x02))
@@ -864,7 +864,7 @@ static const samples_interface starcas_samples_interface =
 
 static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -978,7 +978,7 @@ static const samples_interface solarq_samples_interface =
 
 static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 	static float target_volume, current_volume;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1119,7 +1119,7 @@ static const samples_interface boxingb_samples_interface =
 
 static void boxingb_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1251,7 +1251,7 @@ static const samples_interface wotw_samples_interface =
 
 static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1365,7 +1365,7 @@ static const samples_interface wotwc_samples_interface =
 
 static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1554,7 +1554,7 @@ static MACHINE_RESET( demon_sound )
 	last_portb_write = 0xff;
 
 	/* turn off channel A on AY8910 #0 because it is used as a low-pass filter */
-	ay8910_set_volume(devtag_get_device(machine, "ay1"), 0, 0);
+	ay8910_set_volume(machine->device("ay1"), 0, 0);
 }
 
 
@@ -1623,7 +1623,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( qb3_sound_w )
 {
-	UINT16 rega = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), CCPU_A);
+	UINT16 rega = cpu_get_reg(space->machine->device("maincpu"), CCPU_A);
 	demon_sound_w(space->machine, 0x00 | (~rega & 0x0f), 0x10);
 }
 

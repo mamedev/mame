@@ -359,10 +359,10 @@ static WRITE8_HANDLER( tmpz84c011_pio_w )
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_WRITE(devtag_get_device(space->machine, "dac2"), 0, data);
+				DAC_WRITE(space->machine->device("dac2"), 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_WRITE(devtag_get_device(space->machine, "dac1"), 0, data);
+				DAC_WRITE(space->machine->device("dac1"), 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
@@ -397,10 +397,10 @@ static WRITE8_HANDLER( tmpz84c011_pio_w )
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_WRITE(devtag_get_device(space->machine, "dac2"), 0, data);
+				DAC_WRITE(space->machine->device("dac2"), 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_WRITE(devtag_get_device(space->machine, "dac1"), 0, data);
+				DAC_WRITE(space->machine->device("dac1"), 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
@@ -471,7 +471,7 @@ static WRITE8_HANDLER( tmpz84c011_1_dir_pe_w )	{ pio_dir[9] = data; }
 /* CTC of main cpu, ch0 trigger is vblank */
 static INTERRUPT_GEN( ctc0_trg1 )
 {
-	running_device *ctc = devtag_get_device(device->machine, "main_ctc");
+	running_device *ctc = device->machine->device("main_ctc");
 	z80ctc_trg1_w(ctc, 1);
 	z80ctc_trg1_w(ctc, 0);
 }

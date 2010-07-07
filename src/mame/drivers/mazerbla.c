@@ -1403,8 +1403,8 @@ static MACHINE_START( mazerbla )
 {
 	mazerbla_state *state = (mazerbla_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->maincpu = machine->device("maincpu");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global_array(machine, state->vcu_video_reg);
 	state_save_register_global(machine, state->vcu_gfx_addr);
@@ -1470,7 +1470,7 @@ static MACHINE_RESET( mazerbla )
 
 	memset(state->lookup_ram, 0, ARRAY_LENGTH(state->lookup_ram));
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 

@@ -113,8 +113,8 @@ static MACHINE_START( cheekyms )
 {
 	cheekyms_state *state = (cheekyms_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->dac = devtag_get_device(machine, "dac");
+	state->maincpu = machine->device("maincpu");
+	state->dac = machine->device("dac");
 }
 
 static MACHINE_DRIVER_START( cheekyms )

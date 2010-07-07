@@ -55,9 +55,9 @@ static WRITE8_HANDLER( spcforce_SN76496_latch_w )
 
 static READ8_HANDLER( spcforce_SN76496_select_r )
 {
-	if (~spcforce_SN76496_select & 0x40) return sn76496_ready_r(devtag_get_device(space->machine, "sn1"), 0 );
-	if (~spcforce_SN76496_select & 0x20) return sn76496_ready_r(devtag_get_device(space->machine, "sn2"), 0 );
-	if (~spcforce_SN76496_select & 0x10) return sn76496_ready_r(devtag_get_device(space->machine, "sn3"), 0 );
+	if (~spcforce_SN76496_select & 0x40) return sn76496_ready_r(space->machine->device("sn1"), 0 );
+	if (~spcforce_SN76496_select & 0x20) return sn76496_ready_r(space->machine->device("sn2"), 0 );
+	if (~spcforce_SN76496_select & 0x10) return sn76496_ready_r(space->machine->device("sn3"), 0 );
 
 	return 0;
 }
@@ -66,9 +66,9 @@ static WRITE8_HANDLER( spcforce_SN76496_select_w )
 {
     spcforce_SN76496_select = data;
 
-	if (~data & 0x40)  sn76496_w(devtag_get_device(space->machine, "sn1"), 0, spcforce_SN76496_latch);
-	if (~data & 0x20)  sn76496_w(devtag_get_device(space->machine, "sn2"), 0, spcforce_SN76496_latch);
-	if (~data & 0x10)  sn76496_w(devtag_get_device(space->machine, "sn3"), 0, spcforce_SN76496_latch);
+	if (~data & 0x40)  sn76496_w(space->machine->device("sn1"), 0, spcforce_SN76496_latch);
+	if (~data & 0x20)  sn76496_w(space->machine->device("sn2"), 0, spcforce_SN76496_latch);
+	if (~data & 0x10)  sn76496_w(space->machine->device("sn3"), 0, spcforce_SN76496_latch);
 }
 
 static READ8_HANDLER( spcforce_t0_r )

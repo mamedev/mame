@@ -325,7 +325,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-			device = devtag_get_device(space->machine, "snsnd");
+			device = space->machine->device("snsnd");
 			if (device != NULL && ACCESSING_BITS_0_7)
 				sn76496_w(device, 0, data & 0xff);
 			break;

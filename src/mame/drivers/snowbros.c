@@ -82,7 +82,7 @@ static WRITE16_HANDLER( snowbros_flipscreen_w )
 
 static VIDEO_UPDATE( snowbros )
 {
-	running_device *pandora = devtag_get_device(screen->machine, "pandora");
+	running_device *pandora = screen->machine->device("pandora");
 
 	/* This clears & redraws the entire screen each pass */
 	bitmap_fill(bitmap,cliprect,0xf0);
@@ -93,7 +93,7 @@ static VIDEO_UPDATE( snowbros )
 
 static VIDEO_EOF( snowbros )
 {
-	running_device *pandora = devtag_get_device(machine, "pandora");
+	running_device *pandora = machine->device("pandora");
 	pandora_eof(pandora);
 }
 
@@ -124,7 +124,7 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	running_device *adpcm = devtag_get_device(device->machine, "oki");
+	running_device *adpcm = device->machine->device("oki");
 	int status = okim6295_r(adpcm,0);
 
 	cpu_set_input_line(device, cpu_getiloops(device) + 2, ASSERT_LINE);	/* IRQs 4, 3, and 2 */

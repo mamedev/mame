@@ -154,7 +154,7 @@ WRITE16_HANDLER( cyberbal_sound_68k_w )
 WRITE16_HANDLER( cyberbal_sound_68k_dac_w )
 {
 	cyberbal_state *state = (cyberbal_state *)space->machine->driver_data;
-	running_device *dac = devtag_get_device(space->machine, (offset & 8) ? "dac2" : "dac1");
+	running_device *dac = space->machine->device((offset & 8) ? "dac2" : "dac1");
 	dac_data_16_w(dac, (((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
 
 	if (state->fast_68k_int)

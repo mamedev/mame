@@ -466,16 +466,16 @@ static MACHINE_START( lockon )
 {
 	lockon_state *state = (lockon_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->ground = devtag_get_device(machine, "ground");
-	state->object = devtag_get_device(machine, "object");
-	state->f2203_1l = devtag_get_device(machine, "f2203.1l");
-	state->f2203_2l = devtag_get_device(machine, "f2203.2l");
-	state->f2203_3l = devtag_get_device(machine, "f2203.3l");
-	state->f2203_1r = devtag_get_device(machine, "f2203.1r");
-	state->f2203_2r = devtag_get_device(machine, "f2203.2r");
-	state->f2203_3r = devtag_get_device(machine, "f2203.3r");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->ground = machine->device("ground");
+	state->object = machine->device("object");
+	state->f2203_1l = machine->device("f2203.1l");
+	state->f2203_2l = machine->device("f2203.2l");
+	state->f2203_3l = machine->device("f2203.3l");
+	state->f2203_1r = machine->device("f2203.1r");
+	state->f2203_2r = machine->device("f2203.2r");
+	state->f2203_3r = machine->device("f2203.3r");
 
 	state_save_register_global(machine, state->ground_ctrl);
 	state_save_register_global(machine, state->scroll_h);

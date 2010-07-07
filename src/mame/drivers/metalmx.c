@@ -787,11 +787,11 @@ static DRIVER_INIT( metalmx )
 	UINT8 *adsp_boot = (UINT8*)memory_region(machine, "adsp");
 	metalmx_state *state = (metalmx_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->adsp = devtag_get_device(machine, "adsp");
-	state->gsp = devtag_get_device(machine, "gsp");
-	state->dsp32c_1 = devtag_get_device(machine, "dsp32c_1");
-	state->dsp32c_2 = devtag_get_device(machine, "dsp32c_2");
+	state->maincpu = machine->device("maincpu");
+	state->adsp = machine->device("adsp");
+	state->gsp = machine->device("gsp");
+	state->dsp32c_1 = machine->device("dsp32c_1");
+	state->dsp32c_2 = machine->device("dsp32c_2");
 
 	adsp2105_load_boot_data(adsp_boot, state->adsp_internal_program_ram);
 

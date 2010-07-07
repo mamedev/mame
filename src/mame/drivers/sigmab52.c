@@ -146,7 +146,7 @@ static VIDEO_START( jwildb52 )
 
 static VIDEO_UPDATE( jwildb52 )
 {
-	running_device *hd63484 = devtag_get_device(screen->machine, "hd63484");
+	running_device *hd63484 = screen->machine->device("hd63484");
 
 	int x, y, b, src;
 
@@ -226,7 +226,7 @@ static WRITE8_HANDLER(acrtc_w)
 {
 	static int latch=0;
 	static unsigned int acrtc_data=0;
-	running_device *hd63484 = devtag_get_device(space->machine, "hd63484");
+	running_device *hd63484 = space->machine->device("hd63484");
 	if(!offset)
 	{
 		//address select
@@ -257,7 +257,7 @@ static READ8_HANDLER(acrtc_r)
 {
 	if(offset&1)
 	{
-		running_device *hd63484 = devtag_get_device(space->machine, "hd63484");
+		running_device *hd63484 = space->machine->device("hd63484");
 		return hd63484_data_r(hd63484, 0, 0xff);
 	}
 
@@ -546,7 +546,7 @@ static MACHINE_START(jwildb52)
 		UINT16 *rom = (UINT16*)memory_region(machine, "gfx1");
 		int i;
 
-		running_device *hd63484 = devtag_get_device(machine, "hd63484");
+		running_device *hd63484 = machine->device("hd63484");
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{

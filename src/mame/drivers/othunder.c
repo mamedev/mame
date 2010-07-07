@@ -688,19 +688,19 @@ static MACHINE_START( othunder )
 
 	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->eeprom = devtag_get_device(machine, "eeprom");
-	state->tc0220ioc = devtag_get_device(machine, "tc0220ioc");
-	state->tc0100scn = devtag_get_device(machine, "tc0100scn");
-	state->tc0110pcr = devtag_get_device(machine, "tc0110pcr");
-	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
-	state->_2610_0l = devtag_get_device(machine, "2610.0l");
-	state->_2610_0r = devtag_get_device(machine, "2610.0r");
-	state->_2610_1l = devtag_get_device(machine, "2610.1l");
-	state->_2610_1r = devtag_get_device(machine, "2610.1r");
-	state->_2610_2l = devtag_get_device(machine, "2610.2l");
-	state->_2610_2r = devtag_get_device(machine, "2610.2r");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->eeprom = machine->device("eeprom");
+	state->tc0220ioc = machine->device("tc0220ioc");
+	state->tc0100scn = machine->device("tc0100scn");
+	state->tc0110pcr = machine->device("tc0110pcr");
+	state->tc0140syt = machine->device("tc0140syt");
+	state->_2610_0l = machine->device("2610.0l");
+	state->_2610_0r = machine->device("2610.0r");
+	state->_2610_1l = machine->device("2610.1l");
+	state->_2610_1r = machine->device("2610.1r");
+	state->_2610_2l = machine->device("2610.2l");
+	state->_2610_2r = machine->device("2610.2r");
 
 	state_save_register_global(machine, state->vblank_irq);
 	state_save_register_global(machine, state->ad_irq);

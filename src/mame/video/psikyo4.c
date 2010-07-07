@@ -129,8 +129,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( psikyo4 )
 {
-	running_device *left_screen  = devtag_get_device(screen->machine, "lscreen");
-	running_device *right_screen = devtag_get_device(screen->machine, "rscreen");
+	running_device *left_screen  = screen->machine->device("lscreen");
+	running_device *right_screen = screen->machine->device("rscreen");
 
 	if (screen == left_screen)
 	{

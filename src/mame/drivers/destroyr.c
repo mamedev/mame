@@ -436,7 +436,7 @@ static MACHINE_START( destroyr )
 {
 	destroyr_state *state = (destroyr_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->cursor);
 	state_save_register_global(machine, state->wavemod);

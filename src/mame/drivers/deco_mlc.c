@@ -742,11 +742,11 @@ static READ32_HANDLER( avengrgs_speedup_r )
 static DRIVER_INIT( avengrgs )
 {
 	// init options
-	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x3234);
-	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x32dc);
+	sh2drc_add_pcflush(machine->device("maincpu"), 0x3234);
+	sh2drc_add_pcflush(machine->device("maincpu"), 0x32dc);
 
 	mainCpuIsArm = 0;
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
@@ -758,7 +758,7 @@ static DRIVER_INIT( mlc )
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
-	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 2.0f);
+	cpu_set_clockscale(machine->device("maincpu"), 2.0f);
 	mainCpuIsArm = 1;
 	deco156_decrypt(machine);
 	descramble_sound(machine);

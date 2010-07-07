@@ -51,7 +51,7 @@ static WRITE8_HANDLER( cpu2_reset_w )
 static WRITE8_HANDLER( mcu_reset_w )
 {
 	/* the bootlegs don't have a MCU, so make sure it's there before trying to reset it */
-	if (devtag_get_device(space->machine, "68705") != NULL)
+	if (space->machine->device("68705") != NULL)
 		cputag_set_input_line(space->machine, "68705", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -75,7 +75,7 @@ static WRITE8_HANDLER( irq0_ack_w )
 {
 	int bit = data & 1;
 
-	cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
+	cpu_interrupt_enable(space->machine->device("maincpu"), bit);
 	if (!bit)
 		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
@@ -84,7 +84,7 @@ static WRITE8_HANDLER( irq1_ack_w )
 {
 	int bit = data & 1;
 
-	cpu_interrupt_enable(devtag_get_device(space->machine, "sub"), bit);
+	cpu_interrupt_enable(space->machine->device("sub"), bit);
 	if (!bit)
 		cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 }

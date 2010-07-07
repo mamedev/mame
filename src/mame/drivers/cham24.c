@@ -111,7 +111,7 @@ static READ8_HANDLER( nt_r )
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = (data & 7);
-	ppu2c0x_spriteram_dma(space, devtag_get_device(space->machine, "ppu"), source);
+	ppu2c0x_spriteram_dma(space, space->machine->device("ppu"), source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -272,7 +272,7 @@ static VIDEO_START( cham24 )
 static VIDEO_UPDATE( cham24 )
 {
 	/* render the ppu */
-	ppu2c0x_render(devtag_get_device(screen->machine, "ppu"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_render(screen->machine->device("ppu"), bitmap, 0, 0, 0, 0);
 	return 0;
 }
 
@@ -287,7 +287,7 @@ static MACHINE_START( cham24 )
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "gfx1"));
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
@@ -298,7 +298,7 @@ static MACHINE_START( cham24 )
 	nt_page[3] = nt_ram + 0xc00;
 
 	/* and read/write handlers */
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);
 }
 
 static DRIVER_INIT( cham24 )

@@ -523,8 +523,8 @@ static MACHINE_START( esd16 )
 
 	memory_configure_bank(machine, "bank1", 0, 17, &AUDIO[0x0000], 0x4000);
 
-	state->audio_cpu = devtag_get_device(machine, "audiocpu");
-	state->eeprom = devtag_get_device(machine, "eeprom");
+	state->audio_cpu = machine->device("audiocpu");
+	state->eeprom = machine->device("eeprom");
 
 	state_save_register_global(machine, state->tilemap0_color);
 }

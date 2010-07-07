@@ -317,7 +317,7 @@ static void latch_timer_cnt(int tmr)
 READ32_HANDLER(archimedes_ioc_r)
 {
 	#ifdef MESS
-	running_device *fdc = (running_device *)devtag_get_device(space->machine, "wd1772");
+	running_device *fdc = (running_device *)space->machine->device("wd1772");
 	#endif
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
@@ -367,7 +367,7 @@ READ32_HANDLER(archimedes_ioc_r)
 WRITE32_HANDLER(archimedes_ioc_w)
 {
 	#ifdef MESS
-	running_device *fdc = (running_device *)devtag_get_device(space->machine, "wd1772");
+	running_device *fdc = (running_device *)space->machine->device("wd1772");
 	#endif
 
 	if (offset >= 0x80000 && offset < 0xc0000)
@@ -597,7 +597,7 @@ WRITE32_HANDLER(archimedes_memc_w)
 				else
 				{
 					timer_adjust_oneshot(snd_timer, attotime_never, 0);
-					dac_signed_data_w(devtag_get_device(space->machine, "dac"), 0x80);
+					dac_signed_data_w(space->machine->device("dac"), 0x80);
 				}
 				break;
 

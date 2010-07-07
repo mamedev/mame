@@ -196,7 +196,7 @@ static void scanline_update(screen_device &screen, int scanline)
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (state->interrupt_enable & 4)
-				atarigen_scanline_int_gen(devtag_get_device(screen.machine, "maincpu"));
+				atarigen_scanline_int_gen(screen.machine->device("maincpu"));
 	}
 }
 
@@ -243,7 +243,7 @@ static MACHINE_RESET( atarisy2 )
 	atarigen_eeprom_reset(&state->atarigen);
 	slapstic_reset();
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarigen_sound_io_reset(devtag_get_device(machine, "soundcpu"));
+	atarigen_sound_io_reset(machine->device("soundcpu"));
 	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 64);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
 
@@ -379,7 +379,7 @@ static READ8_HANDLER( switch_6502_r )
 
 	if (state->atarigen.cpu_to_sound_ready) result |= 0x01;
 	if (state->atarigen.sound_to_cpu_ready) result |= 0x02;
-	if ((state->has_tms5220) && (tms5220_readyq_r(devtag_get_device(space->machine, "tms")) == 0))
+	if ((state->has_tms5220) && (tms5220_readyq_r(space->machine->device("tms")) == 0))
 		result &= ~0x04;
 	if (!(input_port_read(space->machine, "1801") & 0x80)) result |= 0x10;
 
@@ -394,7 +394,7 @@ static WRITE8_HANDLER( switch_6502_w )
 	if (state->has_tms5220)
 	{
 		data = 12 | ((data >> 5) & 1);
-		tms5220_set_frequency(devtag_get_device(space->machine, "tms"), MASTER_CLOCK/4 / (16 - data) / 2);
+		tms5220_set_frequency(space->machine->device("tms"), MASTER_CLOCK/4 / (16 - data) / 2);
 	}
 }
 
@@ -623,7 +623,7 @@ static WRITE8_HANDLER( sound_reset_w )
 		return;
 
 	/* a large number of signals are reset when this happens */
-	atarigen_sound_io_reset(devtag_get_device(space->machine, "soundcpu"));
+	atarigen_sound_io_reset(space->machine->device("soundcpu"));
 	devtag_reset(space->machine, "ymsnd");
 	if (state->has_tms5220)
 	{
@@ -684,7 +684,7 @@ static WRITE8_HANDLER( tms5220_w )
 	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
 	if (state->has_tms5220)
 	{
-		tms5220_data_w(devtag_get_device(space->machine, "tms"), 0, data);
+		tms5220_data_w(space->machine->device("tms"), 0, data);
 	}
 }
 
@@ -693,7 +693,7 @@ static WRITE8_HANDLER( tms5220_strobe_w )
 	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
 	if (state->has_tms5220)
 	{
-		tms5220_wsq_w(devtag_get_device(space->machine, "tms"), 1-(offset & 1));
+		tms5220_wsq_w(space->machine->device("tms"), 1-(offset & 1));
 	}
 }
 
@@ -3053,7 +3053,7 @@ static DRIVER_INIT( paperboy )
 
 	state->pedal_count = 0;
 	state->has_tms5220 = 1;
-	tms5220_rsq_w(devtag_get_device(machine, "tms"),  1); // /RS is tied high on sys2 hw
+	tms5220_rsq_w(machine->device("tms"),  1); // /RS is tied high on sys2 hw
 }
 
 
@@ -3094,7 +3094,7 @@ static DRIVER_INIT( 720 )
 
 	state->pedal_count = -1;
 	state->has_tms5220 = 1;
-	tms5220_rsq_w(devtag_get_device(machine, "tms"),  1); // /RS is tied high on sys2 hw
+	tms5220_rsq_w(machine->device("tms"),  1); // /RS is tied high on sys2 hw
 }
 
 
@@ -3250,7 +3250,7 @@ static DRIVER_INIT( apb )
 
 	state->pedal_count = 2;
 	state->has_tms5220 = 1;
-	tms5220_rsq_w(devtag_get_device(machine, "tms"),  1); // /RS is tied high on sys2 hw
+	tms5220_rsq_w(machine->device("tms"),  1); // /RS is tied high on sys2 hw
 }
 
 

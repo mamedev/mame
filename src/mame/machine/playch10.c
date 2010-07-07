@@ -51,7 +51,7 @@ static chr_bank chr_page[8];	// Simple wrapper for ROM/RAM, since we could be ba
 
 MACHINE_RESET( pc10 )
 {
-	running_device *rp5h01 = devtag_get_device(machine, "rp5h01");
+	running_device *rp5h01 = machine->device("rp5h01");
 
 	/* initialize latches and flip-flops */
 	pc10_nmi_enable = pc10_dog_di = pc10_dispmask = pc10_sdcs = pc10_int_detect = 0;
@@ -84,8 +84,8 @@ MACHINE_START( pc10 )
 	/* move to individual boards as documentation of actual boards allows */
 	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
 
 	if (NULL != vram)
 		set_videoram_bank(machine, 0, 8, 0, 8);
@@ -104,8 +104,8 @@ MACHINE_START( playch10_hboard )
 
 	vram = auto_alloc_array(machine, UINT8, 0x2000);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
 }
 
 /*************************************
@@ -193,7 +193,7 @@ WRITE8_HANDLER( pc10_CARTSEL_w )
 
 READ8_HANDLER( pc10_prot_r )
 {
-	running_device *rp5h01 = devtag_get_device(space->machine, "rp5h01");
+	running_device *rp5h01 = space->machine->device("rp5h01");
 	int data = 0xe7;
 
 	/* we only support a single cart connected at slot 0 */
@@ -209,7 +209,7 @@ READ8_HANDLER( pc10_prot_r )
 
 WRITE8_HANDLER( pc10_prot_w )
 {
-	running_device *rp5h01 = devtag_get_device(space->machine, "rp5h01");
+	running_device *rp5h01 = space->machine->device("rp5h01");
 	/* we only support a single cart connected at slot 0 */
 	if (cart_sel == 0)
 	{
@@ -277,7 +277,7 @@ READ8_HANDLER( pc10_in1_r )
 	/* do the gun thing */
 	if (pc10_gun_controller)
 	{
-		running_device *ppu = devtag_get_device(space->machine, "ppu");
+		running_device *ppu = space->machine->device("ppu");
 		int trigger = input_port_read(space->machine, "P1");
 		int x = input_port_read(space->machine, "GUNX");
 		int y = input_port_read(space->machine, "GUNY");
@@ -869,14 +869,14 @@ static void gboard_scanline_cb( running_device *device, int scanline, int vblank
 		if (--gboard_scanline_counter == -1)
 		{
 			gboard_scanline_counter = gboard_scanline_latch;
-			generic_pulse_irq_line(devtag_get_device(device->machine, "cart"), 0);
+			generic_pulse_irq_line(device->machine->device("cart"), 0);
 		}
 	}
 }
 
 static WRITE8_HANDLER( gboard_rom_switch_w )
 {
-	running_device *ppu = devtag_get_device(space->machine, "ppu");
+	running_device *ppu = space->machine->device("ppu");
 
 	/* basically, a MMC3 mapper from the nes */
 

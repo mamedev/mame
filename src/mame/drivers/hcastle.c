@@ -183,9 +183,9 @@ static MACHINE_START( hcastle )
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k007121_1 = devtag_get_device(machine, "k007121_1");
-	state->k007121_2 = devtag_get_device(machine, "k007121_2");
+	state->audiocpu = machine->device("audiocpu");
+	state->k007121_1 = machine->device("k007121_1");
+	state->k007121_2 = machine->device("k007121_2");
 
 	state_save_register_global(machine, state->pf2_bankbase);
 	state_save_register_global(machine, state->pf1_bankbase);

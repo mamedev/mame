@@ -224,7 +224,7 @@ static MACHINE_START( skyfox )
 {
 	skyfox_state *state = (skyfox_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->bg_pos);
 	state_save_register_global(machine, state->bg_ctrl);

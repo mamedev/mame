@@ -243,11 +243,11 @@ static MACHINE_START( rollerg )
 	memory_configure_bank(machine, "bank1", 6, 2, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k053244 = devtag_get_device(machine, "k053244");
-	state->k051316 = devtag_get_device(machine, "k051316");
-	state->k053260 = devtag_get_device(machine, "k053260");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k053244 = machine->device("k053244");
+	state->k051316 = machine->device("k051316");
+	state->k053260 = machine->device("k053260");
 
 	state_save_register_global(machine, state->readzoomroms);
 }
@@ -256,7 +256,7 @@ static MACHINE_RESET( rollerg )
 {
 	rollerg_state *state = (rollerg_state *)machine->driver_data;
 
-	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), rollerg_banking);
+	konami_configure_set_lines(machine->device("maincpu"), rollerg_banking);
 
 	state->readzoomroms = 0;
 }

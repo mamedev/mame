@@ -318,7 +318,7 @@ static MACHINE_START( safarir )
 	state->ram_2 = auto_alloc_array(machine, UINT8, state->ram_size);
 	state->port_last = 0;
 	state->port_last2 = 0;
-	state->samples = devtag_get_device(machine, "samples");
+	state->samples = machine->device("samples");
 
 	/* setup for save states */
 	state_save_register_global_pointer(machine, state->ram_1, state->ram_size);

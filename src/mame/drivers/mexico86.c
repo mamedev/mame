@@ -426,10 +426,10 @@ static MACHINE_START( mexico86 )
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->subcpu = machine->device("sub");
+	state->mcu = machine->device("mcu");
 
 	state_save_register_global(machine, state->port_a_in);
 	state_save_register_global(machine, state->port_a_out);
@@ -452,7 +452,7 @@ static MACHINE_RESET( mexico86 )
 	mexico86_state *state = (mexico86_state *)machine->driver_data;
 
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
-	if (devtag_get_device(machine, "sub") != NULL)
+	if (machine->device("sub") != NULL)
 		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	state->port_a_in = 0;

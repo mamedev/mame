@@ -280,8 +280,8 @@ static MACHINE_START( 20pacgal )
 {
 	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->eeprom = devtag_get_device(machine, "eeprom");
+	state->maincpu = machine->device("maincpu");
+	state->eeprom = machine->device("eeprom");
 
 	state_save_register_global(machine, state->game_selected);
 	state_save_register_global_pointer(machine, state->ram_48000, 0x2000);

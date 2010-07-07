@@ -311,7 +311,7 @@ static MACHINE_RESET( konamigv )
 	psx_machine_init(machine);
 
 	/* also hook up CDDA audio to the CD-ROM drive */
-	cdda_set_cdrom(devtag_get_device(machine, "cdda"), am53cf96_get_device(SCSI_ID_4));
+	cdda_set_cdrom(machine->device("cdda"), am53cf96_get_device(SCSI_ID_4));
 }
 
 static void spu_irq(running_device *device, UINT32 data)

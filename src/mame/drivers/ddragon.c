@@ -152,11 +152,11 @@ static MACHINE_START( ddragon )
 	/* configure banks */
 	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->sub_cpu = devtag_get_device(machine, "sub");
-	state->snd_cpu = devtag_get_device(machine, "soundcpu");
-	state->adpcm_1 = devtag_get_device(machine, "adpcm1");
-	state->adpcm_2 = devtag_get_device(machine, "adpcm2");
+	state->maincpu = machine->device("maincpu");
+	state->sub_cpu = machine->device("sub");
+	state->snd_cpu = machine->device("soundcpu");
+	state->adpcm_1 = machine->device("adpcm1");
+	state->adpcm_2 = machine->device("adpcm2");
 
 	/* register for save states */
 	state_save_register_global(machine, state->dd_sub_cpu_busy);

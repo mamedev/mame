@@ -53,7 +53,7 @@ MACHINE_RESET( taitosj )
 	zaccept = 1;
 	zready = 0;
 	busreq = 0;
-	if (devtag_get_device(machine, "mcu") != NULL)
+	if (machine->device("mcu") != NULL)
 		cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 
 	spacecr_prot_value = 0;

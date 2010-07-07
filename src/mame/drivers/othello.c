@@ -383,11 +383,11 @@ static MACHINE_START( othello )
 {
 	othello_state *state = (othello_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->mc6845 = devtag_get_device(machine, "crtc");
-	state->n7751 = devtag_get_device(machine, "n7751");
-	state->ay1 = devtag_get_device(machine, "ay1");
-	state->ay2 = devtag_get_device(machine, "ay2");
+	state->maincpu = machine->device("maincpu");
+	state->mc6845 = machine->device("crtc");
+	state->n7751 = machine->device("n7751");
+	state->ay1 = machine->device("ay1");
+	state->ay2 = machine->device("ay2");
 
 	state_save_register_global(machine, state->tile_bank);
 	state_save_register_global(machine, state->ay_select);

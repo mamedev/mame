@@ -468,8 +468,8 @@ VIDEO_UPDATE( gaelco2_dual )
 {
 	int i;
 
-	running_device *left_screen  = devtag_get_device(screen->machine, "lscreen");
-	running_device *right_screen = devtag_get_device(screen->machine, "rscreen");
+	running_device *left_screen  = screen->machine->device("lscreen");
+	running_device *right_screen = screen->machine->device("rscreen");
 
 	/* read scroll values */
 	int scroll0x = gaelco2_videoram[0x2802/2] + 0x14;

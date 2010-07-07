@@ -516,12 +516,12 @@ static MACHINE_START( spy )
 	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
 	state->pmcram = auto_alloc_array_clear(machine, UINT8, 0x800);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k052109 = devtag_get_device(machine, "k052109");
-	state->k051960 = devtag_get_device(machine, "k051960");
-	state->k007232_1 = devtag_get_device(machine, "k007232_1");
-	state->k007232_2 = devtag_get_device(machine, "k007232_2");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k052109 = machine->device("k052109");
+	state->k051960 = machine->device("k051960");
+	state->k007232_1 = machine->device("k007232_1");
+	state->k007232_2 = machine->device("k007232_2");
 
 	state_save_register_global(machine, state->rambank);
 	state_save_register_global(machine, state->pmcbank);

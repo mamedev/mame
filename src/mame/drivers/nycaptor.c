@@ -699,10 +699,10 @@ static MACHINE_START( nycaptor )
 {
 	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->subcpu = machine->device("sub");
+	state->mcu = machine->device("mcu");
 
 	state_save_register_global(machine, state->generic_control_reg);
 	state_save_register_global(machine, state->sound_nmi_enable);

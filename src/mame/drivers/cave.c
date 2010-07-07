@@ -1712,8 +1712,8 @@ static MACHINE_START( cave )
 {
 	cave_state *state = (cave_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->soundbuf_len);
 	state_save_register_global_array(machine, state->soundbuf_data);

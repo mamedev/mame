@@ -301,7 +301,7 @@ static WRITE16_HANDLER( ml_sub_reset_w )
 
 static WRITE16_HANDLER( ml_to_sound_w )
 {
-	running_device *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	running_device *tc0140syt = space->machine->device("tc0140syt");
 	if (offset == 0)
 		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
@@ -313,7 +313,7 @@ static WRITE16_HANDLER( ml_to_sound_w )
 
 static WRITE8_HANDLER( ml_sound_to_main_w )
 {
-	running_device *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	running_device *tc0140syt = space->machine->device("tc0140syt");
 	if (offset == 0)
 		tc0140syt_slave_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)

@@ -90,7 +90,7 @@ READ8_HANDLER ( atari_antic_r )
 		data = antic.r.antic09;
 		break;
 	case 10: /* WSYNC read */
-		cpu_spinuntil_trigger(devtag_get_device(space->machine, "maincpu"), TRIGGER_HSYNC);
+		cpu_spinuntil_trigger(space->machine->device("maincpu"), TRIGGER_HSYNC);
 		antic.w.wsync = 1;
 		data = antic.r.antic0a;
 		break;
@@ -200,7 +200,7 @@ WRITE8_HANDLER ( atari_antic_w )
 		break;
 	case 10: /* WSYNC write */
 		LOG(("ANTIC 0A write WSYNC  $%02X\n", data));
-		cpu_spinuntil_trigger(devtag_get_device(space->machine, "maincpu"), TRIGGER_HSYNC);
+		cpu_spinuntil_trigger(space->machine->device("maincpu"), TRIGGER_HSYNC);
 		antic.w.wsync = 1;
 		break;
 	case 11:

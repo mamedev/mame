@@ -965,7 +965,7 @@ static MACHINE_START( fromance )
 
 	memory_configure_bank(machine, "bank1", 0, 0x100, &ROM[0x10000], 0x4000);
 
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global(machine, state->directionflag);
 	state_save_register_global(machine, state->commanddata);

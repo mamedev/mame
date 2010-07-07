@@ -103,7 +103,7 @@ static VIDEO_UPDATE( vcombat )
 {
 	int y;
 	const rgb_t *const pens = tlc34076_get_pens();
-	running_device *aux = devtag_get_device(screen->machine, "aux");
+	running_device *aux = screen->machine->device("aux");
 
 	UINT16 *m68k_buf = m68k_framebuffer[(*framebuffer_ctrl & 0x20) ? 1 : 0];
 	UINT16 *i860_buf = i860_framebuffer[(screen == aux) ? 1 : 0][0];
@@ -217,26 +217,26 @@ static void wiggle_i860_common(running_device *device, UINT16 data)
 
 static WRITE16_HANDLER( wiggle_i860p0_pins_w )
 {
-	wiggle_i860_common(devtag_get_device(space->machine, "vid_0"), data);
+	wiggle_i860_common(space->machine->device("vid_0"), data);
 }
 
 static WRITE16_HANDLER( wiggle_i860p1_pins_w )
 {
-	wiggle_i860_common(devtag_get_device(space->machine, "vid_1"), data);
+	wiggle_i860_common(space->machine->device("vid_1"), data);
 }
 
 static READ16_HANDLER( main_irqiack_r )
 {
 	//fprintf(stderr, "M0: irq iack\n");
-	cpu_set_input_line(devtag_get_device(space->machine, "maincpu"), M68K_IRQ_1, CLEAR_LINE);
-	//cpu_set_input_line(devtag_get_device(space->machine, "maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(space->machine->device("maincpu"), M68K_IRQ_1, CLEAR_LINE);
+	//cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
 }
 
 static READ16_HANDLER( sound_resetmain_r )
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//cpu_set_input_line(devtag_get_device(space->machine, "maincpu"), INPUT_LINE_RESET, PULSE_LINE);
+	//cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -286,7 +286,7 @@ static WRITE64_HANDLER( v1_fb_w )
 
 static WRITE16_HANDLER( crtc_w )
 {
-	running_device *crtc = devtag_get_device(space->machine, "crtc");
+	running_device *crtc = space->machine->device("crtc");
 
 	if (crtc == NULL)
 		return;
@@ -378,8 +378,8 @@ static MACHINE_RESET( vcombat )
 	/* Setup the Bt476 VGA RAMDAC palette chip */
 	tlc34076_reset(6);
 
-	i860_set_pin(devtag_get_device(machine, "vid_0"), DEC_PIN_BUS_HOLD, 1);
-	i860_set_pin(devtag_get_device(machine, "vid_1"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(machine->device("vid_0"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(machine->device("vid_1"), DEC_PIN_BUS_HOLD, 1);
 
 	crtc_select = 0;
 }
@@ -389,7 +389,7 @@ static MACHINE_RESET( shadfgtr )
 	/* Setup the Bt476 VGA RAMDAC palette chip */
 	tlc34076_reset(6);
 
-	i860_set_pin(devtag_get_device(machine, "vid_0"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(machine->device("vid_0"), DEC_PIN_BUS_HOLD, 1);
 
 	crtc_select = 0;
 }
@@ -530,7 +530,7 @@ INPUT_PORTS_END
 static WRITE_LINE_DEVICE_HANDLER(sound_update)
 {
 	/* Seems reasonable */
-	cpu_set_input_line(devtag_get_device(device->machine, "soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =

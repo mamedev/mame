@@ -247,7 +247,7 @@ static MACHINE_START( finalizr )
 {
 	finalizr_state *state = (finalizr_state *)machine->driver_data;
 
-	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+	state->audio_cpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->spriterambank);
 	state_save_register_global(machine, state->charbank);

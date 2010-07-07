@@ -1021,9 +1021,9 @@ static TIMER_CALLBACK( real_nmk004_init )
 	memset(&NMK004_state, 0, sizeof(NMK004_state));
 
 	NMK004_state.machine = machine;
-	NMK004_state.ymdevice = devtag_get_device(machine, "ymsnd");
-	NMK004_state.oki1device = devtag_get_device(machine, "oki1");
-	NMK004_state.oki2device = devtag_get_device(machine, "oki2");
+	NMK004_state.ymdevice = machine->device("ymsnd");
+	NMK004_state.oki1device = machine->device("oki1");
+	NMK004_state.oki2device = machine->device("oki2");
 
 	NMK004_state.rom = memory_region(machine, "audiocpu");
 

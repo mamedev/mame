@@ -1346,7 +1346,7 @@ static MACHINE_START( pgm )
 
 	state->soundcpu = machine->device<cpu_device>("soundcpu");
 	state->prot = machine->device<cpu_device>("prot");
-	state->ics = devtag_get_device(machine, "ics");
+	state->ics = machine->device("ics");
 
 	state_save_register_global(machine, state->cal_val);
 	state_save_register_global(machine, state->cal_mask);

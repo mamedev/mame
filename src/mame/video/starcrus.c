@@ -64,7 +64,7 @@ VIDEO_START( starcrus )
 
 WRITE8_HANDLER( starcrus_ship_parm_1_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 
     s1_sprite = data&0x1f;
     engine1_on = ((data&0x20)>>5)^0x01;
@@ -90,7 +90,7 @@ WRITE8_HANDLER( starcrus_ship_parm_1_w )
 
 WRITE8_HANDLER( starcrus_ship_parm_2_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 
     s2_sprite = data&0x1f;
     set_led_status(space->machine, 2,~data & 0x80); 		/* game over lamp */
@@ -118,7 +118,7 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 
 WRITE8_HANDLER( starcrus_proj_parm_1_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 
     p1_sprite = data&0x0f;
     launch1_on = ((data&0x20)>>5)^0x01;
@@ -157,7 +157,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 
 WRITE8_HANDLER( starcrus_proj_parm_2_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 
     p2_sprite = data&0x0f;
     launch2_on = ((data&0x20)>>5)^0x01;

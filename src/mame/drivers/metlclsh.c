@@ -277,8 +277,8 @@ static MACHINE_START( metlclsh )
 {
 	metlclsh_state *state = (metlclsh_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->maincpu = machine->device("maincpu");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global(machine, state->write_mask);
 	state_save_register_global(machine, state->gfxbank);

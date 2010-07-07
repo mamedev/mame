@@ -453,13 +453,13 @@ static MACHINE_RESET( mpu4 )
 /* 6809 IRQ handler */
 static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 {
-	running_device *pia3 = devtag_get_device(device->machine, "pia_ic3");
-	running_device *pia4 = devtag_get_device(device->machine, "pia_ic4");
-	running_device *pia5 = devtag_get_device(device->machine, "pia_ic5");
-	running_device *pia6 = devtag_get_device(device->machine, "pia_ic6");
-	running_device *pia7 = devtag_get_device(device->machine, "pia_ic7");
-	running_device *pia8 = devtag_get_device(device->machine, "pia_ic8");
-	running_device *ptm6840 = devtag_get_device(device->machine, "6840ptm");
+	running_device *pia3 = device->machine->device("pia_ic3");
+	running_device *pia4 = device->machine->device("pia_ic4");
+	running_device *pia5 = device->machine->device("pia_ic5");
+	running_device *pia6 = device->machine->device("pia_ic6");
+	running_device *pia7 = device->machine->device("pia_ic7");
+	running_device *pia8 = device->machine->device("pia_ic8");
+	running_device *ptm6840 = device->machine->device("6840ptm");
 
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
 	int combined_state = pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3) |
@@ -484,7 +484,7 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 
 static WRITE_LINE_DEVICE_HANDLER( cpu0_irq_m6840 )
 {
-	cpu0_irq(devtag_get_device(device->machine, "pia_ic3"), state);
+	cpu0_irq(device->machine->device("pia_ic3"), state);
 }
 
 
@@ -513,7 +513,7 @@ static WRITE8_DEVICE_HANDLER( ic2_o1_callback )
 
 static WRITE8_DEVICE_HANDLER( ic2_o2_callback )
 {
-	running_device *pia = devtag_get_device(device->machine, "pia_ic3");
+	running_device *pia = device->machine->device("pia_ic3");
 	pia6821_ca1_w(pia, 0, data); /* copy output value to IC3 ca1 */
 
 	/* the output from timer2 is the input clock for timer3 */
@@ -755,7 +755,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 
 static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 {
-	running_device *pia_ic5 = devtag_get_device(device->machine, "pia_ic5");
+	running_device *pia_ic5 = device->machine->device("pia_ic5");
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",cpuexec_describe_context(device->machine)));
 	coin_lockout_w(device->machine, 0, (pia6821_get_output_b(pia_ic5) & 0x01) );
 	coin_lockout_w(device->machine, 1, (pia6821_get_output_b(pia_ic5) & 0x02) );
@@ -808,14 +808,14 @@ static void update_ay(running_device *device)
 		    }
 			case 0x01:
 			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
-				running_device *pia_ic6 = devtag_get_device(device->machine, "pia_ic6");
+				running_device *pia_ic6 = device->machine->device("pia_ic6");
 				LOG(("AY8913 address = %d \n",pia6821_get_output_a(pia_ic6)&0x0f));
 				break;
 			}
 			case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-				running_device *pia_ic6 = devtag_get_device(device->machine, "pia_ic6");
-				running_device *ay = devtag_get_device(device->machine, "ay8913");
+				running_device *pia_ic6 = device->machine->device("pia_ic6");
+				running_device *ay = device->machine->device("ay8913");
 				ay8910_data_w(ay, 0, pia6821_get_output_a(pia_ic6));
 				LOG(("AY Chip Write \n"));
 				break;
@@ -823,8 +823,8 @@ static void update_ay(running_device *device)
 			case 0x03:
 			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
              The register will remain selected until another is chosen.*/
-				running_device *pia_ic6 = devtag_get_device(device->machine, "pia_ic6");
-				running_device *ay = devtag_get_device(device->machine, "ay8913");
+				running_device *pia_ic6 = device->machine->device("pia_ic6");
+				running_device *ay = device->machine->device("ay8913");
 				ay8910_address_w(ay, 0, pia6821_get_output_a(pia_ic6));
 				LOG(("AY Chip Select \n"));
 				break;
@@ -1027,7 +1027,7 @@ static const pia6821_interface pia_ic7_intf =
 static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 {
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
-	running_device *pia_ic5 = devtag_get_device(device->machine, "pia_ic5");
+	running_device *pia_ic5 = device->machine->device("pia_ic5");
 
 	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", cpuexec_describe_context(device->machine)));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
@@ -1088,7 +1088,7 @@ static const pia6821_interface pia_ic8_intf =
 
 static WRITE8_DEVICE_HANDLER( pia_gb_porta_w )
 {
-	running_device *msm6376 = devtag_get_device(device->machine, "msm6376");
+	running_device *msm6376 = device->machine->device("msm6376");
 
 	LOG(("%s: GAMEBOARD: PIA Port A Set to %2x\n", cpuexec_describe_context(device->machine),data));
 	okim6376_w(msm6376, 0, data);
@@ -1745,7 +1745,7 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
     oscillating signal.*/
 	signal_50hz = signal_50hz?0:1;
 	update_lamps();
-	pia6821_ca1_w(devtag_get_device(timer.machine, "pia_ic4"), 0,  signal_50hz);	/* signal is connected to IC4 CA1 */
+	pia6821_ca1_w(timer.machine->device("pia_ic4"), 0,  signal_50hz);	/* signal is connected to IC4 CA1 */
 }
 
 

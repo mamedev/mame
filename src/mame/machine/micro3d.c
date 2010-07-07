@@ -349,12 +349,12 @@ READ32_HANDLER( micro3d_scc_r )
 
 READ16_HANDLER( micro3d_tms_host_r )
 {
-	return tms34010_host_r(devtag_get_device(space->machine, "vgb"), offset);
+	return tms34010_host_r(space->machine->device("vgb"), offset);
 }
 
 WRITE16_HANDLER( micro3d_tms_host_w )
 {
-	tms34010_host_w(devtag_get_device(space->machine, "vgb"), offset, data);
+	tms34010_host_w(space->machine->device("vgb"), offset, data);
 }
 
 
@@ -748,10 +748,10 @@ DRIVER_INIT( micro3d )
 	micro3d_state *state = (micro3d_state*)machine->driver_data;
 	const address_space *space = cputag_get_address_space(machine, "drmath", ADDRESS_SPACE_DATA);
 
-	i8051_set_serial_tx_callback(devtag_get_device(machine, "audiocpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(devtag_get_device(machine, "audiocpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(machine->device("audiocpu"), data_from_i8031);
+	i8051_set_serial_rx_callback(machine->device("audiocpu"), data_to_i8031);
 
-	state->duart68681 = devtag_get_device(machine, "duart68681");
+	state->duart68681 = machine->device("duart68681");
 
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
     non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
@@ -762,7 +762,7 @@ DRIVER_INIT( micro3d )
 	/* TODO? BOTSS crashes when starting the final stage because the 68000
     overwrites memory in use by the Am29000. Slowing down the 68000 slightly
     avoids this */
-	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.945f);
+	cpu_set_clockscale(machine->device("maincpu"), 0.945f);
 }
 
 DRIVER_INIT( botssa )

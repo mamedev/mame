@@ -311,18 +311,18 @@ READ32_HANDLER( K001005_r )
 				if (K001005_fifo_read_ptr < 0x3ff)
 				{
 					//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
-					sharc_set_flag_input(devtag_get_device(space->machine, "dsp"), 1, CLEAR_LINE);
+					sharc_set_flag_input(space->machine->device("dsp"), 1, CLEAR_LINE);
 				}
 				else
 				{
 					//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-					sharc_set_flag_input(devtag_get_device(space->machine, "dsp"), 1, ASSERT_LINE);
+					sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
 				}
 			}
 			else
 			{
 				//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-				sharc_set_flag_input(devtag_get_device(space->machine, "dsp"), 1, ASSERT_LINE);
+				sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
 			}
 
 			K001005_fifo_read_ptr++;
@@ -364,18 +364,18 @@ WRITE32_HANDLER( K001005_w )
 				if (K001005_fifo_write_ptr < 0x400)
 				{
 					//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-					sharc_set_flag_input(devtag_get_device(space->machine, "dsp"), 1, ASSERT_LINE);
+					sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
 				}
 				else
 				{
 					//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
-					sharc_set_flag_input(devtag_get_device(space->machine, "dsp"), 1, CLEAR_LINE);
+					sharc_set_flag_input(space->machine->device("dsp"), 1, CLEAR_LINE);
 				}
 			}
 			else
 			{
 				//cputag_set_input_line(space->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-				sharc_set_flag_input(devtag_get_device(space->machine, "dsp"), 1, ASSERT_LINE);
+				sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
 			}
 
 	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, cpu_get_pc(space->cpu));
@@ -979,7 +979,7 @@ VIDEO_START( gticlub )
 
 VIDEO_UPDATE( gticlub )
 {
-	running_device *k001604 = devtag_get_device(screen->machine, "k001604_1");
+	running_device *k001604 = screen->machine->device("k001604_1");
 
 	k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -1041,7 +1041,7 @@ VIDEO_UPDATE( gticlub )
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);
 
 	//cputag_set_input_line(screen->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
-	sharc_set_flag_input(devtag_get_device(screen->machine, "dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 

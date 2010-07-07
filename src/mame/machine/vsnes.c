@@ -201,7 +201,7 @@ static void v_set_videorom_bank( running_machine* machine, int start, int count,
 
 MACHINE_START( vsnes )
 {
-	const address_space *ppu1_space = cpu_get_address_space(devtag_get_device(machine, "ppu1"), ADDRESS_SPACE_PROGRAM);
+	const address_space *ppu1_space = cpu_get_address_space(machine->device("ppu1"), ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* establish nametable ram */
@@ -256,12 +256,12 @@ MACHINE_START( vsdual )
 	nt_page[1][2] = nt_ram[1] + 0x800;
 	nt_page[1][3] = nt_ram[1] + 0xc00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt0_r, vsnes_nt0_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt1_r, vsnes_nt1_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu1"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt0_r, vsnes_nt0_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu2"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt1_r, vsnes_nt1_w);
 	// read only!
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank2");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank2");
 	// read only!
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank3");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank3");
 	memory_configure_bank(machine, "bank2", 0, vrom_size[0] / 0x2000, vrom[0], 0x2000);
 	memory_configure_bank(machine, "bank3", 0, vrom_size[1] / 0x2000, vrom[1], 0x2000);
 	memory_set_bank(machine, "bank2", 0);
@@ -362,7 +362,7 @@ DRIVER_INIT( vsnormal )
 
 static WRITE8_HANDLER( gun_in0_w )
 {
-	running_device *ppu1 = devtag_get_device(space->machine, "ppu1");
+	running_device *ppu1 = space->machine->device("ppu1");
 	static int zapstore;
 
 	if (vsnes_do_vrom_bank)
@@ -699,7 +699,7 @@ static void mapper4_irq( running_device *device, int scanline, int vblank, int b
 
 static WRITE8_HANDLER( mapper4_w )
 {
-	running_device *ppu1 = devtag_get_device(space->machine, "ppu1");
+	running_device *ppu1 = space->machine->device("ppu1");
 	UINT8 MMC3_helper, cmd;
 
 	switch (offset & 0x6001)
@@ -1019,16 +1019,16 @@ DRIVER_INIT( bnglngby )
 
 static WRITE8_HANDLER( vsdual_vrom_banking )
 {
-	running_device *other_cpu = (space->cpu == devtag_get_device(space->machine, "maincpu")) ? devtag_get_device(space->machine, "sub") : devtag_get_device(space->machine, "maincpu");
+	running_device *other_cpu = (space->cpu == space->machine->device("maincpu")) ? space->machine->device("sub") : space->machine->device("maincpu");
 
 	/* switch vrom */
-	(space->cpu == devtag_get_device(space->machine, "maincpu")) ? memory_set_bank(space->machine, "bank2", BIT(data, 2)) : memory_set_bank(space->machine, "bank3", BIT(data, 2));
+	(space->cpu == space->machine->device("maincpu")) ? memory_set_bank(space->machine, "bank2", BIT(data, 2)) : memory_set_bank(space->machine, "bank3", BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	cpu_set_input_line(other_cpu, 0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* move along */
-	if (space->cpu == devtag_get_device(space->machine, "maincpu"))
+	if (space->cpu == space->machine->device("maincpu"))
 		vsnes_in0_w(space, offset, data);
 	else
 		vsnes_in0_1_w(space, offset, data);

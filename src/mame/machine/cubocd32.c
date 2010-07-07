@@ -102,7 +102,7 @@ void amiga_akiko_init(running_machine* machine)
 	akiko.cdrom_toc = NULL;
 	akiko.dma_timer = timer_alloc(machine, akiko_dma_proc, NULL);
 	akiko.frame_timer = timer_alloc(machine, akiko_frame_proc, NULL);
-	akiko.i2cmem = devtag_get_device(machine, "i2cmem");
+	akiko.i2cmem = machine->device("i2cmem");
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, amiga_akiko_exit);
 
@@ -729,7 +729,7 @@ READ32_HANDLER(amiga_akiko32_r)
 	switch( offset )
 	{
 		case 0x00/4:	/* ID */
-			if ( akiko.cdrom != NULL ) cdda_set_cdrom(devtag_get_device(space->machine, "cdda"), akiko.cdrom);
+			if ( akiko.cdrom != NULL ) cdda_set_cdrom(space->machine->device("cdda"), akiko.cdrom);
 			return 0x0000cafe;
 
 		case 0x04/4:	/* CDROM STATUS 1 */

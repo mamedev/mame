@@ -143,8 +143,8 @@ static MACHINE_START( taito_l )
 {
 	taitol_state *state = (taitol_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state->rambanks = auto_alloc_array(machine, UINT8, 0x1000 * 12);
 	state->palette_ram = auto_alloc_array(machine, UINT8, 0x1000);

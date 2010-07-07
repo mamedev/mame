@@ -80,7 +80,7 @@ static VIDEO_UPDATE( istellar )
 
 static MACHINE_START( istellar )
 {
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	laserdisc = machine->device("laserdisc");
 }
 
 

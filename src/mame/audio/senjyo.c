@@ -59,7 +59,7 @@ WRITE8_HANDLER( senjyo_volume_w )
 
 static TIMER_CALLBACK( senjyo_sh_update )
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 
 	/* ctc2 timer single tone generator frequency */
 	z80ctc_device *ctc = machine->device<z80ctc_device>("z80ctc");

@@ -1837,7 +1837,7 @@ static MACHINE_RESET( spi )
 	UINT8 flash_data = rombase[0x1ffffc];
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), spi_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000680, 0x00000683, 0, 0, sound_fifo_r);
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
@@ -1920,10 +1920,10 @@ static MACHINE_RESET( sxx2f )
 
 	memcpy(z80_rom, rom, 0x40000);
 
-	memory_install_write32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), devtag_get_device(machine, "eeprom"), 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
+	memory_install_write32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), machine->device("eeprom"), 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000680, 0x00000683, 0, 0, sb_coin_r);
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), spi_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 
 	sb_coin_latch = 0;
 }
@@ -2195,7 +2195,7 @@ static DRIVER_INIT( rdft22kc )
 
 static MACHINE_RESET( seibu386 )
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), spi_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 }
 
 static MACHINE_DRIVER_START( seibu386 )

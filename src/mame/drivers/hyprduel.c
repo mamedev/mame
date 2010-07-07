@@ -654,8 +654,8 @@ static MACHINE_START( hyprduel )
 {
 	hyprduel_state *state = (hyprduel_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->maincpu = machine->device("maincpu");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global(machine, state->blitter_bit);
 	state_save_register_global(machine, state->requested_int);

@@ -212,12 +212,12 @@ static void skimaxx_scanline_update(screen_device &screen, bitmap_t *bitmap, int
 
 static WRITE32_HANDLER( m68k_tms_w )
 {
-	tms34010_host_w(devtag_get_device(space->machine, "tms"), offset, data);
+	tms34010_host_w(space->machine->device("tms"), offset, data);
 }
 
 static READ32_HANDLER( m68k_tms_r )
 {
-	return tms34010_host_r(devtag_get_device(space->machine, "tms"), offset);
+	return tms34010_host_r(space->machine->device("tms"), offset);
 }
 
 
@@ -274,7 +274,7 @@ static WRITE32_HANDLER( skimaxx_sub_ctrl_w )
 	// 7e/7f at the start. 3f/7f, related to reads from 1018xxxx
 	if (ACCESSING_BITS_0_7)
 	{
-		running_device *subcpu = devtag_get_device(space->machine, "subcpu");
+		running_device *subcpu = space->machine->device("subcpu");
 
 		cpu_set_input_line(subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 		cpu_set_input_line(subcpu, INPUT_LINE_HALT,  (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);

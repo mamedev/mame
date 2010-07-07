@@ -603,7 +603,7 @@ static MACHINE_START( lazercmd )
 {
 	lazercmd_state *state = (lazercmd_state *)machine->driver_data;
 
-	state->dac = devtag_get_device(machine, "dac");
+	state->dac = machine->device("dac");
 
 	state_save_register_global(machine, state->marker_x);
 	state_save_register_global(machine, state->marker_y);

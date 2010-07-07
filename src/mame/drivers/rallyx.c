@@ -241,7 +241,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 
 		case 0x02:	/* SOUND ON */
 			/* this doesn't work in New Rally X so I'm not supporting it */
-//          pacman_sound_enable_w(devtag_get_device(space->machine, "namco"), bit);
+//          pacman_sound_enable_w(space->machine->device("namco"), bit);
 			break;
 
 		case 0x03:	/* FLIP */
@@ -877,7 +877,7 @@ static MACHINE_START( rallyx )
 	timeplt_state *state = (timeplt_state *)machine->driver_data;
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->samples = devtag_get_device(machine, "samples");
+	state->samples = machine->device("samples");
 
 	state_save_register_global(machine, state->last_bang);
 	state_save_register_global(machine, state->stars_enable);

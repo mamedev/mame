@@ -268,9 +268,9 @@ static MACHINE_START( circus )
 {
 	circus_state *state = (circus_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->samples = devtag_get_device(machine, "samples");
-	state->discrete = devtag_get_device(machine, "discrete");
+	state->maincpu = machine->device("maincpu");
+	state->samples = machine->device("samples");
+	state->discrete = machine->device("discrete");
 
 	state_save_register_global(machine, state->clown_x);
 	state_save_register_global(machine, state->clown_y);

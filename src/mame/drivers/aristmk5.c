@@ -45,7 +45,7 @@ static MACHINE_START( aristmk5 )
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
-	dac_signed_data_w(devtag_get_device(machine, "dac"), 0x80);
+	dac_signed_data_w(machine->device("dac"), 0x80);
 }
 
 static MACHINE_RESET( aristmk5 )

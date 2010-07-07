@@ -384,7 +384,7 @@ static WRITE8_HANDLER( namcos1_coin_w )
 
 static void namcos1_update_DACs(running_machine *machine)
 {
-	dac_signed_data_16_w(devtag_get_device(machine, "dac"),0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
+	dac_signed_data_16_w(machine->device("dac"),0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
 }
 
 void namcos1_init_DACs(void)

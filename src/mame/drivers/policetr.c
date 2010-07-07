@@ -155,7 +155,7 @@ static WRITE32_HANDLER( control_w )
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		running_device *device = devtag_get_device(space->machine, "eeprom");
+		running_device *device = space->machine->device("eeprom");
 		eeprom_write_bit(device, data & 0x00800000);
 		eeprom_set_cs_line(device, (data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
 		eeprom_set_clock_line(device, (data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
@@ -164,7 +164,7 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (control_data & 0x80000000))
 	{
-		running_device *device = devtag_get_device(space->machine, "bsmt");
+		running_device *device = space->machine->device("bsmt");
 		bsmt2000_data_w(device, bsmt_data_bank, 0, 0xffff);
 		device->reset();
 	}

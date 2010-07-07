@@ -395,7 +395,7 @@ static DRIVER_INIT( xybots )
 {
 	xybots_state *state = (xybots_state *)machine->driver_data;
 	state->h256 = 0x0400;
-	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x008000, 0, 107);
+	atarigen_slapstic_init(machine->device("maincpu"), 0x008000, 0, 107);
 	atarijsa_init(machine, "FFE200", 0x0100);
 }
 

@@ -132,7 +132,7 @@ MACHINE_DRIVER_END
 
 static TIMER_CALLBACK( frogs_croak_callback )
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 	sample_stop(samples, 2);
 }
 
@@ -145,8 +145,8 @@ MACHINE_START( frogs_audio )
 
 WRITE8_HANDLER( frogs_audio_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *samples = space->machine->device("samples");
+	running_device *discrete = space->machine->device("discrete");
 	static int last_croak = 0;
 	static int last_buzzz = 0;
 	int new_croak = data & 0x08;
@@ -462,7 +462,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( headon_audio_w )
 {
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = space->machine->device("discrete");
 	if (discrete == NULL)
 		return;
 	discrete_sound_w(discrete, HEADON_HISPEED_PC_EN, data & 0x01);
@@ -477,7 +477,7 @@ WRITE8_HANDLER( headon_audio_w )
 
 WRITE8_HANDLER( invho2_audio_w )
 {
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = space->machine->device("discrete");
 	if (discrete == NULL)
 		return;
 	discrete_sound_w(discrete, HEADON_HISPEED_PC_EN, data & 0x10);

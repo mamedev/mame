@@ -458,9 +458,9 @@ static MACHINE_START( kingofb )
 {
 	kingofb_state *state = (kingofb_state *)machine->driver_data;
 
-	state->video_cpu = devtag_get_device(machine, "video");
-	state->sprite_cpu = devtag_get_device(machine, "sprite");
-	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+	state->video_cpu = machine->device("video");
+	state->sprite_cpu = machine->device("sprite");
+	state->audio_cpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->nmi_enable);
 	state_save_register_global(machine, state->palette_bank);

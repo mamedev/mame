@@ -53,11 +53,11 @@ static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 
 	/* bit 5 goes to 8910 #0 BDIR pin  */
 	if ((state->last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), state->last_snd_ctrl >> 4, state->soundlatch);
+		ay8910_data_address_w(space->machine->device("ay1"), state->last_snd_ctrl >> 4, state->soundlatch);
 
 	/* bit 7 goes to 8910 #1 BDIR pin  */
 	if ((state->last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), state->last_snd_ctrl >> 6, state->soundlatch);
+		ay8910_data_address_w(space->machine->device("ay2"), state->last_snd_ctrl >> 6, state->soundlatch);
 
 	state->last_snd_ctrl = data;
 }
@@ -217,7 +217,7 @@ static MACHINE_START( dogfgt )
 {
 	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
 
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global(machine, state->bm_plane);
 	state_save_register_global(machine, state->lastflip);

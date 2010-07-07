@@ -619,7 +619,7 @@ static READ8_HANDLER( soundram_r )
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		return namcos1_cus30_r(devtag_get_device(space->machine, "namco"),offset);
+		return namcos1_cus30_r(space->machine->device("namco"),offset);
 	}
 	else
 	{
@@ -637,7 +637,7 @@ static WRITE8_HANDLER( soundram_w )
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		namcos1_cus30_w(devtag_get_device(space->machine, "namco"),offset,data);
+		namcos1_cus30_w(space->machine->device("namco"),offset,data);
 	}
 	else
 	{
@@ -745,7 +745,7 @@ WRITE8_HANDLER( namcos1_bankswitch_w )
 {
 //  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", space->cpu->tag(), offset, data);
 
-	namcos1_bankswitch(space->machine, (space->cpu == devtag_get_device(space->machine, "maincpu")) ? 0 : 1, offset, data);
+	namcos1_bankswitch(space->machine, (space->cpu == space->machine->device("maincpu")) ? 0 : 1, offset, data);
 }
 
 /* Sub cpu set start bank port */

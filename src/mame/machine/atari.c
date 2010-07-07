@@ -159,7 +159,7 @@ static int atari_last;
 
 void a800_handle_keyboard(running_machine *machine)
 {
-	running_device *pokey = devtag_get_device(machine, "pokey");
+	running_device *pokey = machine->device("pokey");
 	int atari_code, count, ipt, i;
 	static const char *const tag[] = {
 		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
@@ -244,7 +244,7 @@ void a800_handle_keyboard(running_machine *machine)
 
 void a5200_handle_keypads(running_machine *machine)
 {
-	running_device *pokey = devtag_get_device(machine, "pokey");
+	running_device *pokey = machine->device("pokey");
 	int atari_code, count, ipt, i;
 	static const char *const tag[] = { "keypad_0", "keypad_1", "keypad_2", "keypad_3" };
 
@@ -322,7 +322,7 @@ static UINT8 console_read(const address_space *space)
 
 static void console_write(const address_space *space, UINT8 data)
 {
-	running_device *dac = devtag_get_device(space->machine, "dac");
+	running_device *dac = space->machine->device("dac");
 	if (data & 0x08)
 		dac_data_w(dac, (UINT8)-120);
 	else

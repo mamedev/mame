@@ -412,8 +412,8 @@ WRITE8_DEVICE_HANDLER( bb_ym2_a_w )
 
 WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 {
-	running_device *ym1 = devtag_get_device(device->machine, "ym1");
-	running_device *ym2 = devtag_get_device(device->machine, "ym2");
+	running_device *ym1 = device->machine->device("ym1");
+	running_device *ym2 = device->machine->device("ym2");
 	double gain;
 
 	stream_update(stream);

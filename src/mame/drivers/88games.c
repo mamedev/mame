@@ -317,12 +317,12 @@ static MACHINE_START( 88games )
 {
 	_88games_state *state = (_88games_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k052109 = devtag_get_device(machine, "k052109");
-	state->k051960 = devtag_get_device(machine, "k051960");
-	state->k051316 = devtag_get_device(machine, "k051316");
-	state->upd_1 = devtag_get_device(machine, "upd1");
-	state->upd_2 = devtag_get_device(machine, "upd2");
+	state->audiocpu = machine->device("audiocpu");
+	state->k052109 = machine->device("k052109");
+	state->k051960 = machine->device("k051960");
+	state->k051316 = machine->device("k051316");
+	state->upd_1 = machine->device("upd1");
+	state->upd_2 = machine->device("upd2");
 
 	state_save_register_global(machine, state->videobank);
 	state_save_register_global(machine, state->zoomreadroms);
@@ -337,7 +337,7 @@ static MACHINE_RESET( 88games )
 {
 	_88games_state *state = (_88games_state *)machine->driver_data;
 
-	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), k88games_banking);
+	konami_configure_set_lines(machine->device("maincpu"), k88games_banking);
 	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x20000];
 
 	state->videobank = 0;

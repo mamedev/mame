@@ -140,10 +140,10 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(quakeat)
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
-	quakeat_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
-	quakeat_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
+	quakeat_devices.pic8259_1 = machine->device( "pic8259_1" );
+	quakeat_devices.pic8259_2 = machine->device( "pic8259_2" );
 }
 /*************************************************************/
 

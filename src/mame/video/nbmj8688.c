@@ -717,9 +717,9 @@ VIDEO_UPDATE( mbmj8688_LCD )
 {
 	int x, y, b;
 
-	running_device *main_screen = devtag_get_device(screen->machine, "screen");
-	running_device *lcd0_screen = devtag_get_device(screen->machine, "lcd0");
-	running_device *lcd1_screen = devtag_get_device(screen->machine, "lcd1");
+	running_device *main_screen = screen->machine->device("screen");
+	running_device *lcd0_screen = screen->machine->device("lcd0");
+	running_device *lcd1_screen = screen->machine->device("lcd1");
 
 	if (screen == main_screen) VIDEO_UPDATE_CALL(mbmj8688);
 

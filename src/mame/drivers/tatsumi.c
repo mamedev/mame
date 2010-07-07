@@ -851,7 +851,7 @@ static MACHINE_RESET( apache3 )
 	cputag_set_input_line(machine, "sub2", INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
 	/* Hook the RESET line, which resets the Z80 */
-	m68k_set_reset_callback(devtag_get_device(machine, "sub"), apache3_68000_reset);
+	m68k_set_reset_callback(machine->device("sub"), apache3_68000_reset);
 }
 
 

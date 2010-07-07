@@ -343,9 +343,9 @@ static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rec
 	rectangle visarea = screen.visible_area();
 
 	/* for 2p games, the left screen is the main screen */
-	running_device *left_screen = devtag_get_device(screen.machine, "lscreen");
+	running_device *left_screen = screen.machine->device("lscreen");
 	if (left_screen == NULL)
-		left_screen = devtag_get_device(screen.machine, "screen");
+		left_screen = screen.machine->device("screen");
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, (&screen == left_screen) ? state->atarigen.playfield_tilemap : state->atarigen.playfield2_tilemap, 0, 0);

@@ -2945,8 +2945,8 @@ static MACHINE_START( common )
 {
 	cps_state *state = (cps_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 }
 
 static MACHINE_START( cps1 )

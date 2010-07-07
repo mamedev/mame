@@ -216,13 +216,13 @@ static WRITE16_HANDLER( scroll_w )
 
 static READ16_HANDLER(bmcbowl_via_r)
 {
-	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *via_0 = space->machine->device("via6522_0");
 	return via_r(via_0, offset);
 }
 
 static WRITE16_HANDLER(bmcbowl_via_w)
 {
-	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *via_0 = space->machine->device("via6522_0");
 	via_w(via_0, offset, data);
 }
 

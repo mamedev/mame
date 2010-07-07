@@ -290,8 +290,8 @@ static DEVICE_START( tc0140syt )
 	const tc0140syt_interface *intf = get_interface(device);
 
 	/* use the given gfx set */
-	tc0140syt->mastercpu = devtag_get_device(device->machine, intf->master);
-	tc0140syt->slavecpu = devtag_get_device(device->machine, intf->slave);
+	tc0140syt->mastercpu = device->machine->device(intf->master);
+	tc0140syt->slavecpu = device->machine->device(intf->slave);
 
 	state_save_register_device_item(device, 0, tc0140syt->mainmode);
 	state_save_register_device_item(device, 0, tc0140syt->submode);

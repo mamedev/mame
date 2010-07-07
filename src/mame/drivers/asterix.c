@@ -253,12 +253,12 @@ static MACHINE_START( asterix )
 {
 	asterix_state *state = (asterix_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k053260 = devtag_get_device(machine, "k053260");
-	state->k056832 = devtag_get_device(machine, "k056832");
-	state->k053244 = devtag_get_device(machine, "k053244");
-	state->k053251 = devtag_get_device(machine, "k053251");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k053260 = machine->device("k053260");
+	state->k056832 = machine->device("k056832");
+	state->k053244 = machine->device("k053244");
+	state->k053251 = machine->device("k053251");
 
 	state_save_register_global(machine, state->cur_control2);
 	state_save_register_global_array(machine, state->prot);

@@ -725,14 +725,14 @@ GFXDECODE_END
 static MACHINE_START( ladybug )
 {
 	ladybug_state *state = (ladybug_state *)machine->driver_data;
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 }
 
 static MACHINE_START( sraider )
 {
 	ladybug_state *state = (ladybug_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->grid_color);
 	state_save_register_global(machine, state->sound_low);

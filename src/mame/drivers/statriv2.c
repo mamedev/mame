@@ -164,7 +164,7 @@ static WRITE8_HANDLER( statriv2_videoram_w )
 
 static VIDEO_UPDATE( statriv2 )
 {
-	if (tms9927_screen_reset(devtag_get_device(screen->machine, "tms")))
+	if (tms9927_screen_reset(screen->machine->device("tms")))
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	else
 		tilemap_draw(bitmap, cliprect, statriv2_tilemap, 0, 0);

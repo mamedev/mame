@@ -363,7 +363,7 @@ static MACHINE_START( system1 )
 		memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "maincpu") + 0x8000, 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	z80_set_cycle_tables(devtag_get_device(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
+	z80_set_cycle_tables(machine->device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
 	mute_xor = 0x00;
 
@@ -410,7 +410,7 @@ static void bank0c_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata
 
 static WRITE8_HANDLER( videomode_w )
 {
-	running_device *i8751 = devtag_get_device(space->machine, "mcu");
+	running_device *i8751 = space->machine->device("mcu");
 
 	/* bit 6 is connected to the 8751 IRQ */
 	if (i8751 != NULL)
@@ -608,7 +608,7 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
        enough, the MCU will fail; on shtngmst this happens after 3
        VBLANKs without a tick */
 
-	running_device *mcu = devtag_get_device(timer.machine, "mcu");
+	running_device *mcu = timer.machine->device("mcu");
 	cpu_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
 	cpu_set_input_line(mcu, MCS51_T0_LINE, CLEAR_LINE);
 }

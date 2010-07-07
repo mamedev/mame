@@ -591,7 +591,7 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		dac_signed_data_w(devtag_get_device(machine, "dac"), data);
+		dac_signed_data_w(machine->device("dac"), data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -605,7 +605,7 @@ static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		dac_signed_data_w(devtag_get_device(machine, "dac"), data);
+		dac_signed_data_w(machine->device("dac"), data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);

@@ -264,8 +264,8 @@ static VIDEO_UPDATE( hangplt )
 
 	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
-		running_device *k001604 = devtag_get_device(screen->machine, "k001604_1");
-		running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
+		running_device *k001604 = screen->machine->device("k001604_1");
+		running_device *voodoo = screen->machine->device("voodoo0");
 
 	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -275,8 +275,8 @@ static VIDEO_UPDATE( hangplt )
 	}
 	else if (strcmp(screen->tag(), "rscreen") == 0)
 	{
-		running_device *k001604 = devtag_get_device(screen->machine, "k001604_2");
-		running_device *voodoo = devtag_get_device(screen->machine, "voodoo1");
+		running_device *k001604 = screen->machine->device("k001604_2");
+		running_device *voodoo = screen->machine->device("voodoo1");
 
 	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -293,38 +293,38 @@ static VIDEO_UPDATE( hangplt )
 
 static READ32_HANDLER( gticlub_k001604_tile_r )
 {
-	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_tile_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_tile_w )
 {
-	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_tile_w(k001604, offset, data, mem_mask);
 }
 
 
 static READ32_HANDLER( gticlub_k001604_char_r )
 {
-	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_char_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_char_w )
 {
-	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_char_w(k001604, offset, data, mem_mask);
 }
 
 static READ32_HANDLER( gticlub_k001604_reg_r )
 {
-	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_reg_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_reg_w )
 {
-	running_device *k001604 = devtag_get_device(space->machine, get_cgboard_id() ? "k001604_2" : "k001604_1");
+	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_reg_w(k001604, offset, data, mem_mask);
 }
 
@@ -348,8 +348,8 @@ static const eeprom_interface eeprom_intf =
 static READ8_HANDLER( sysreg_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	running_device *adc1038 = devtag_get_device(space->machine, "adc1038");
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *adc1038 = space->machine->device("adc1038");
+	running_device *eeprom = space->machine->device("eeprom");
 
 	switch (offset)
 	{
@@ -383,8 +383,8 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	running_device *adc1038 = devtag_get_device(space->machine, "adc1038");
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *adc1038 = space->machine->device("adc1038");
+	running_device *eeprom = space->machine->device("eeprom");
 
 	switch (offset)
 	{
@@ -422,10 +422,10 @@ static WRITE8_HANDLER( sysreg_w )
 static MACHINE_START( gticlub )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x000fffff, FALSE, work_ram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x000fffff, FALSE, work_ram);
 }
 
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )

@@ -262,8 +262,8 @@ static WRITE16_HANDLER( tickee_control_w )
 
 	if (offset == 3)
 	{
-		ticket_dispenser_w(devtag_get_device(space->machine, "ticket1"), 0, (data & 8) << 4);
-		ticket_dispenser_w(devtag_get_device(space->machine, "ticket2"), 0, (data & 4) << 5);
+		ticket_dispenser_w(space->machine->device("ticket1"), 0, (data & 8) << 4);
+		ticket_dispenser_w(space->machine->device("ticket2"), 0, (data & 4) << 5);
 	}
 
 	if (olddata != tickee_control[offset])

@@ -280,7 +280,7 @@ static READ8_HANDLER( qb3_frame_r )
 
 static WRITE8_HANDLER( qb3_ram_bank_w )
 {
-	memory_set_bank(space->machine, "bank1", cpu_get_reg(devtag_get_device(space->machine, "maincpu"), CCPU_P) & 3);
+	memory_set_bank(space->machine, "bank1", cpu_get_reg(space->machine->device("maincpu"), CCPU_P) & 3);
 }
 
 

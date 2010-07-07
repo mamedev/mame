@@ -284,8 +284,8 @@ MACHINE_START( nitedrvr )
 {
 	nitedrvr_state *state = (nitedrvr_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->discrete = devtag_get_device(machine, "discrete");
+	state->maincpu = machine->device("maincpu");
+	state->discrete = machine->device("discrete");
 
 	state_save_register_global(machine, state->gear);
 	state_save_register_global(machine, state->track);

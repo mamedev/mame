@@ -97,12 +97,12 @@ static void hangon_generic_init( running_machine *machine )
 	/* reset the custom handlers and other pointers */
 	state->i8751_vblank_hook = NULL;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->mcu = devtag_get_device(machine, "mcu");
-	state->ppi8255_1 = devtag_get_device(machine, "ppi8255_1");
-	state->ppi8255_2 = devtag_get_device(machine, "ppi8255_2");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
+	state->subcpu = machine->device("sub");
+	state->mcu = machine->device("mcu");
+	state->ppi8255_1 = machine->device("ppi8255_1");
+	state->ppi8255_2 = machine->device("ppi8255_2");
 
 	state_save_register_global(machine, state->adc_select);
 }
@@ -126,7 +126,7 @@ static MACHINE_RESET( hangon )
 {
 	segas1x_state *state = (segas1x_state *)machine->driver_data;
 
-	fd1094_machine_init(devtag_get_device(machine, "sub"));
+	fd1094_machine_init(machine->device("sub"));
 
 	/* reset misc components */
 	segaic16_tilemap_reset(machine, 0);

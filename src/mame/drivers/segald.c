@@ -329,7 +329,7 @@ GFXDECODE_END
 
 static MACHINE_START( astron )
 {
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	laserdisc = machine->device("laserdisc");
 }
 
 

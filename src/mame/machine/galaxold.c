@@ -45,14 +45,14 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
 
 WRITE8_HANDLER( galaxold_nmi_enable_w )
 {
-    running_device *target = devtag_get_device(space->machine, "7474_9m_1");
+    running_device *target = space->machine->device("7474_9m_1");
 	ttl7474_preset_w(target, data ? 1 : 0);
 }
 
 
 TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 {
-    running_device *target = devtag_get_device(timer.machine, "7474_9m_2");
+    running_device *target = timer.machine->device("7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
 	ttl7474_d_w(target, ((param & 0xe0) != 0xe0) ? 1 : 0);
@@ -68,8 +68,8 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 
 static void machine_reset_common(running_machine *machine, int line)
 {
-    running_device *ttl7474_9m_1 = devtag_get_device(machine, "7474_9m_1");
-    running_device *ttl7474_9m_2 = devtag_get_device(machine, "7474_9m_2");
+    running_device *ttl7474_9m_1 = machine->device("7474_9m_1");
+    running_device *ttl7474_9m_2 = machine->device("7474_9m_2");
 	irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */
@@ -98,7 +98,7 @@ MACHINE_RESET( devilfsg )
 MACHINE_RESET( hunchbkg )
 {
 	machine_reset_common(machine, 0);
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), hunchbkg_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), hunchbkg_irq_callback);
 }
 
 WRITE8_HANDLER( galaxold_coin_lockout_w )

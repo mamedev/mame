@@ -449,8 +449,8 @@ static MACHINE_START( f1gp )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k053936 = devtag_get_device(machine, "k053936");
+	state->audiocpu = machine->device("audiocpu");
+	state->k053936 = machine->device("k053936");
 
 	MACHINE_START_CALL(f1gpb);
 }

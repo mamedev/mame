@@ -198,12 +198,12 @@ static MACHINE_RESET( jpmimpct )
 
 static WRITE16_HANDLER( m68k_tms_w )
 {
-	tms34010_host_w(devtag_get_device(space->machine, "dsp"), offset, data);
+	tms34010_host_w(space->machine->device("dsp"), offset, data);
 }
 
 static READ16_HANDLER( m68k_tms_r )
 {
-	return tms34010_host_r(devtag_get_device(space->machine, "dsp"), offset);
+	return tms34010_host_r(space->machine->device("dsp"), offset);
 }
 
 

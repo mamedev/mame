@@ -370,8 +370,8 @@ static void punchout_copy_bot_palette(running_machine *machine, int bank)
 
 VIDEO_UPDATE( punchout )
 {
-	running_device *top_screen    = devtag_get_device(screen->machine, "top");
-	running_device *bottom_screen = devtag_get_device(screen->machine, "bottom");
+	running_device *top_screen    = screen->machine->device("top");
+	running_device *bottom_screen = screen->machine->device("bottom");
 
 	if (screen == top_screen)
 	{
@@ -404,8 +404,8 @@ VIDEO_UPDATE( punchout )
 
 VIDEO_UPDATE( armwrest )
 {
-	running_device *top_screen    = devtag_get_device(screen->machine, "top");
-	running_device *bottom_screen = devtag_get_device(screen->machine, "bottom");
+	running_device *top_screen    = screen->machine->device("top");
+	running_device *bottom_screen = screen->machine->device("bottom");
 
 	if (screen == top_screen)
 	{

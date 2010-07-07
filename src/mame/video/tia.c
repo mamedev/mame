@@ -1863,7 +1863,7 @@ WRITE8_HANDLER( tia_w )
 	case 0x18: /* AUDF1 */
 	case 0x19: /* AUDV0 */
 	case 0x1A: /* AUDV1 */
-		tia_sound_w(devtag_get_device(space->machine, "tia"), offset, data);
+		tia_sound_w(space->machine->device("tia"), offset, data);
 		break;
 
 	case 0x1B:

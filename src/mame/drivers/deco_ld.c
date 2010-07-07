@@ -484,7 +484,7 @@ GFXDECODE_END
 
 static MACHINE_START( rblaster )
 {
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	laserdisc = machine->device("laserdisc");
 }
 
 static MACHINE_DRIVER_START( rblaster )

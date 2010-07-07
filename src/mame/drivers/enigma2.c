@@ -155,8 +155,8 @@ static MACHINE_START( enigma2 )
 	enigma2_state *state = (enigma2_state *)machine->driver_data;
 	create_interrupt_timers(machine);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->blink_count);
 	state_save_register_global(machine, state->sound_latch);

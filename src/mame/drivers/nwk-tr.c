@@ -245,8 +245,8 @@ static void voodoo_vblank_0(running_device *device, int param)
 
 static VIDEO_UPDATE( nwktr )
 {
-	running_device *voodoo = devtag_get_device(screen->machine, "voodoo");
-	running_device *k001604 = devtag_get_device(screen->machine, "k001604");
+	running_device *voodoo = screen->machine->device("voodoo");
+	running_device *k001604 = screen->machine->device("k001604");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -263,7 +263,7 @@ static VIDEO_UPDATE( nwktr )
 
 static READ32_HANDLER( sysreg_r )
 {
-	running_device *adc12138 = devtag_get_device(space->machine, "adc12138");
+	running_device *adc12138 = space->machine->device("adc12138");
 	UINT32 r = 0;
 	if (offset == 0)
 	{
@@ -296,7 +296,7 @@ static READ32_HANDLER( sysreg_r )
 
 static WRITE32_HANDLER( sysreg_w )
 {
-	running_device *adc12138 = devtag_get_device(space->machine, "adc12138");
+	running_device *adc12138 = space->machine->device("adc12138");
 	if( offset == 0 )
 	{
 		if (ACCESSING_BITS_24_31)
@@ -463,10 +463,10 @@ static WRITE32_HANDLER( lanc2_w )
 static MACHINE_START( nwktr )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x003fffff, FALSE, work_ram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x003fffff, FALSE, work_ram);
 }
 
 static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -618,9 +618,9 @@ static const adc12138_interface nwktr_adc_interface = {
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), INPUT_LINE_IRQ1);
+		generic_pulse_irq_line(machine->device("audiocpu"), INPUT_LINE_IRQ1);
 	else
-		generic_pulse_irq_line(devtag_get_device(machine, "audiocpu"), INPUT_LINE_IRQ2);
+		generic_pulse_irq_line(machine->device("audiocpu"), INPUT_LINE_IRQ2);
 }
 
 static const k056800_interface nwktr_k056800_interface =

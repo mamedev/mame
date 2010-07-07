@@ -701,7 +701,7 @@ static MACHINE_START( psikyo4 )
 {
 	psikyo4_state *state = (psikyo4_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 #if ROMTEST
 //  FIXME: Too many banks! it cannot be handled in this way, currently

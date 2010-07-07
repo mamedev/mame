@@ -217,7 +217,7 @@ static VIDEO_UPDATE( gpworld )
 
 static MACHINE_START( gpworld )
 {
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	laserdisc = machine->device("laserdisc");
 }
 
 

@@ -371,8 +371,8 @@ static MACHINE_RESET( cojag )
 	jaguar_dsp_resume(machine);
 
 	/* halt the CPUs */
-	jaguargpu_ctrl_w(devtag_get_device(machine, "gpu"), G_CTRL, 0, 0xffffffff);
-	jaguardsp_ctrl_w(devtag_get_device(machine, "audiocpu"), D_CTRL, 0, 0xffffffff);
+	jaguargpu_ctrl_w(machine->device("gpu"), G_CTRL, 0, 0xffffffff);
+	jaguardsp_ctrl_w(machine->device("audiocpu"), D_CTRL, 0, 0xffffffff);
 
 	/* set blitter idle flag */
 	blitter_status = 1;
@@ -418,8 +418,8 @@ static WRITE32_HANDLER( misc_control_w )
 		jaguar_dsp_resume(space->machine);
 
 		/* halt the CPUs */
-		jaguargpu_ctrl_w(devtag_get_device(space->machine, "gpu"), G_CTRL, 0, 0xffffffff);
-		jaguardsp_ctrl_w(devtag_get_device(space->machine, "audiocpu"), D_CTRL, 0, 0xffffffff);
+		jaguargpu_ctrl_w(space->machine->device("gpu"), G_CTRL, 0, 0xffffffff);
+		jaguardsp_ctrl_w(space->machine->device("audiocpu"), D_CTRL, 0, 0xffffffff);
 	}
 
 	/* adjust banking */
@@ -442,13 +442,13 @@ static WRITE32_HANDLER( misc_control_w )
 
 static READ32_HANDLER( gpuctrl_r )
 {
-	return jaguargpu_ctrl_r(devtag_get_device(space->machine, "gpu"), offset);
+	return jaguargpu_ctrl_r(space->machine->device("gpu"), offset);
 }
 
 
 static WRITE32_HANDLER( gpuctrl_w )
 {
-	jaguargpu_ctrl_w(devtag_get_device(space->machine, "gpu"), offset, data, mem_mask);
+	jaguargpu_ctrl_w(space->machine->device("gpu"), offset, data, mem_mask);
 }
 
 
@@ -461,13 +461,13 @@ static WRITE32_HANDLER( gpuctrl_w )
 
 static READ32_HANDLER( dspctrl_r )
 {
-	return jaguardsp_ctrl_r(devtag_get_device(space->machine, "audiocpu"), offset);
+	return jaguardsp_ctrl_r(space->machine->device("audiocpu"), offset);
 }
 
 
 static WRITE32_HANDLER( dspctrl_w )
 {
-	jaguardsp_ctrl_w(devtag_get_device(space->machine, "audiocpu"), offset, data, mem_mask);
+	jaguardsp_ctrl_w(space->machine->device("audiocpu"), offset, data, mem_mask);
 }
 
 

@@ -1019,14 +1019,14 @@ MACHINE_START( cvs )
 	start_393hz_timer(machine);
 
 	/* set devices */
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->speech = devtag_get_device(machine, "speech");
-	state->dac3 = devtag_get_device(machine, "dac3");
-	state->tms = devtag_get_device(machine, "tms");
-	state->s2636_0 = devtag_get_device(machine, "s2636_0");
-	state->s2636_1 = devtag_get_device(machine, "s2636_1");
-	state->s2636_2 = devtag_get_device(machine, "s2636_2");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->speech = machine->device("speech");
+	state->dac3 = machine->device("dac3");
+	state->tms = machine->device("tms");
+	state->s2636_0 = machine->device("s2636_0");
+	state->s2636_1 = machine->device("s2636_1");
+	state->s2636_2 = machine->device("s2636_2");
 
 	/* register state save */
 	state_save_register_global_pointer(machine, state->color_ram, 0x400);

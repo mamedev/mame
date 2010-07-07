@@ -446,7 +446,7 @@ static WRITE8_HANDLER( outport7_w )
 
 //static WRITE8_HANDLER( sound_w )
 //{
-//  dac_data_w(devtag_get_device(space->machine, "dac"), data);
+//  dac_data_w(space->machine->device("dac"), data);
 //}
 */
 

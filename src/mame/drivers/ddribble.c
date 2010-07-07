@@ -254,9 +254,9 @@ static MACHINE_START( ddribble )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 5, &ROM[0x10000], 0x2000);
 
-	state->filter1 = devtag_get_device(machine, "filter1");
-	state->filter2 = devtag_get_device(machine, "filter2");
-	state->filter3 = devtag_get_device(machine, "filter3");
+	state->filter1 = machine->device("filter1");
+	state->filter2 = machine->device("filter2");
+	state->filter3 = machine->device("filter3");
 
 	state_save_register_global(machine, state->int_enable_0);
 	state_save_register_global(machine, state->int_enable_1);

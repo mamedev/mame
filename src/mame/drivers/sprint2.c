@@ -71,7 +71,7 @@ static int service_mode(running_machine *machine)
 
 static INTERRUPT_GEN( sprint2 )
 {
-	running_device *discrete = devtag_get_device(device->machine, "discrete");
+	running_device *discrete = device->machine->device("discrete");
 	static UINT8 dial[2];
 
 	/* handle steering wheels */

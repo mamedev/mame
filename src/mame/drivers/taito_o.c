@@ -242,8 +242,8 @@ static MACHINE_START( taitoo )
 {
 	taitoo_state *state = (taitoo_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->tc0080vco = devtag_get_device(machine, "tc0080vco");
+	state->maincpu = machine->device("maincpu");
+	state->tc0080vco = machine->device("tc0080vco");
 }
 
 static MACHINE_DRIVER_START( parentj )

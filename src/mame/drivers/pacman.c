@@ -397,7 +397,7 @@ static MACHINE_RESET( mschamp )
 
 static WRITE8_HANDLER( pacman_interrupt_vector_w )
 {
-	cpu_set_input_line_vector(devtag_get_device(space->machine, "maincpu"), 0, data);
+	cpu_set_input_line_vector(space->machine->device("maincpu"), 0, data);
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
@@ -479,7 +479,7 @@ static WRITE8_HANDLER( piranha_interrupt_vector_w)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	cpu_set_input_line_vector(devtag_get_device(space->machine, "maincpu"), 0, data );
+	cpu_set_input_line_vector(space->machine->device("maincpu"), 0, data );
 }
 
 
@@ -488,7 +488,7 @@ static WRITE8_HANDLER( nmouse_interrupt_vector_w)
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	cpu_set_input_line_vector(devtag_get_device(space->machine, "maincpu"), 0, data );
+	cpu_set_input_line_vector(space->machine->device("maincpu"), 0, data );
 }
 
 
@@ -528,11 +528,11 @@ static WRITE8_HANDLER( alibaba_sound_w )
 	/* since the sound region in Ali Baba is not contiguous, translate the
        offset into the 0-0x1f range */
 	if (offset < 0x10)
-		pacman_sound_w(devtag_get_device(space->machine, "namco"), offset, data);
+		pacman_sound_w(space->machine->device("namco"), offset, data);
 	else if (offset < 0x20)
 		space->machine->generic.spriteram2.u8[offset - 0x10] = data;
 	else
-		pacman_sound_w(devtag_get_device(space->machine, "namco"), offset - 0x10, data);
+		pacman_sound_w(space->machine->device("namco"), offset - 0x10, data);
 }
 
 

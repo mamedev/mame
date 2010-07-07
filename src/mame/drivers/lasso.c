@@ -466,10 +466,10 @@ static MACHINE_START( lasso )
 {
 	lasso_state *state = (lasso_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->sn_1 = devtag_get_device(machine, "sn76489.1");
-	state->sn_2 = devtag_get_device(machine, "sn76489.2");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->sn_1 = machine->device("sn76489.1");
+	state->sn_2 = machine->device("sn76489.2");
 
 	state_save_register_global(machine, state->gfxbank);
 }

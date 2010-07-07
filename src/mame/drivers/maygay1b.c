@@ -455,7 +455,7 @@ static void m1_stepper_reset(void)
 static MACHINE_RESET( m1 )
 {
 	ROC10937_reset(0);	// reset display1
-	maygaym1_devices.duart68681 = devtag_get_device( machine, "duart68681" );
+	maygaym1_devices.duart68681 = machine->device( "duart68681" );
 	m1_stepper_reset();
 }
 

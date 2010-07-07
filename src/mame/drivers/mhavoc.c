@@ -205,9 +205,9 @@ static READ8_HANDLER( dual_pokey_r )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		return pokey_r(devtag_get_device(space->machine, "pokey1"), pokey_reg);
+		return pokey_r(space->machine->device("pokey1"), pokey_reg);
 	else
-		return pokey_r(devtag_get_device(space->machine, "pokey2"), pokey_reg);
+		return pokey_r(space->machine->device("pokey2"), pokey_reg);
 }
 
 
@@ -218,9 +218,9 @@ static WRITE8_HANDLER( dual_pokey_w )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		pokey_w(devtag_get_device(space->machine, "pokey1"), pokey_reg, data);
+		pokey_w(space->machine->device("pokey1"), pokey_reg, data);
 	else
-		pokey_w(devtag_get_device(space->machine, "pokey2"), pokey_reg, data);
+		pokey_w(space->machine->device("pokey2"), pokey_reg, data);
 }
 
 

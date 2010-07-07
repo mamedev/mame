@@ -205,8 +205,8 @@ static MACHINE_START( fastlane )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state->konami2 = devtag_get_device(machine, "konami2");
-	state->k007121 = devtag_get_device(machine, "k007121");
+	state->konami2 = machine->device("konami2");
+	state->k007121 = machine->device("k007121");
 }
 
 static MACHINE_DRIVER_START( fastlane )

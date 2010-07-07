@@ -1012,8 +1012,8 @@ static MACHINE_START( nmg5 )
 {
 	nmg5_state *state = (nmg5_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
 
 	state_save_register_global(machine, state->gfx_bank);
 	state_save_register_global(machine, state->priority_reg);

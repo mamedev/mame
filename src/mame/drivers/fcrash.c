@@ -696,10 +696,10 @@ static MACHINE_START( fcrash )
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "soundcpu");
-	state->msm_1 = devtag_get_device(machine, "msm1");
-	state->msm_2 = devtag_get_device(machine, "msm2");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("soundcpu");
+	state->msm_1 = machine->device("msm1");
+	state->msm_2 = machine->device("msm2");
 
 	state_save_register_global(machine, state->sample_buffer1);
 	state_save_register_global(machine, state->sample_buffer2);
@@ -711,8 +711,8 @@ static MACHINE_START( kodb )
 {
 	cps_state *state = (cps_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "soundcpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("soundcpu");
 }
 
 static MACHINE_RESET( fcrash )

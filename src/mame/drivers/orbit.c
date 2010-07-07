@@ -276,8 +276,8 @@ static MACHINE_START( orbit )
 {
 	orbit_state *state = (orbit_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->discrete = devtag_get_device(machine, "discrete");
+	state->maincpu = machine->device("maincpu");
+	state->discrete = machine->device("discrete");
 
 	state_save_register_global(machine, state->misc_flags);
 	state_save_register_global(machine, state->flip_screen);

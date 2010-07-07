@@ -545,7 +545,7 @@ static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALG
 
 static READ16_HANDLER( galgames_eeprom_r )
 {
-	running_device *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
+	running_device *eeprom = space->machine->device(galgames_eeprom_names[galgames_cart]);
 
 	return eeprom_read_bit(eeprom) ? 0x80 : 0x00;
 }
@@ -557,7 +557,7 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 
 	if ( ACCESSING_BITS_0_7 )
 	{
-		running_device *eeprom = devtag_get_device(space->machine, galgames_eeprom_names[galgames_cart]);
+		running_device *eeprom = space->machine->device(galgames_eeprom_names[galgames_cart]);
 
 		// latch the bit
 		eeprom_write_bit(eeprom, data & 0x0001);
@@ -633,7 +633,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 		{
 			case 0x07:		// 7 resets the eeprom
 				for (i = 0; i < 5; i++)
-					eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[i]), ASSERT_LINE);
+					eeprom_set_cs_line(space->machine->device(galgames_eeprom_names[i]), ASSERT_LINE);
 				break;
 
 			case 0x00:
@@ -641,12 +641,12 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 			case 0x02:
 			case 0x03:
 			case 0x04:
-				eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
+				eeprom_set_cs_line(space->machine->device(galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
 				galgames_update_rombank(space->machine, data & 0xff);
 				break;
 
 			default:
-				eeprom_set_cs_line(devtag_get_device(space->machine, galgames_eeprom_names[0]), CLEAR_LINE);
+				eeprom_set_cs_line(space->machine->device(galgames_eeprom_names[0]), CLEAR_LINE);
 				galgames_update_rombank(space->machine, 0);
 				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(space->cpu), data);
 				break;
@@ -848,7 +848,7 @@ static MACHINE_RESET( tmaster )
 	tmaster_gfx_offs = 0;
 	tmaster_gfx_size = memory_region_length(machine, "blitter");
 
-	tmaster_devices.duart68681 = devtag_get_device( machine, "duart68681" );
+	tmaster_devices.duart68681 = machine->device( "duart68681" );
 }
 
 static INTERRUPT_GEN( tm3k_interrupt )

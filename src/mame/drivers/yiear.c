@@ -194,7 +194,7 @@ static MACHINE_START( yiear )
 	trackfld_state *state = (trackfld_state *)machine->driver_data;
 
 	state->audiocpu = NULL;
-	state->vlm = devtag_get_device(machine, "vlm");
+	state->vlm = machine->device("vlm");
 
 	state_save_register_global(machine, state->yiear_nmi_enable);
 

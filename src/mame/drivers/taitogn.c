@@ -347,7 +347,7 @@ static void rf5c296_reg_w(ATTR_UNUSED running_machine *machine, UINT8 reg, UINT8
 			{
 				devtag_reset(machine, "card");
 				locked = 0x1ff;
-				ide_set_gnet_readlock (devtag_get_device(machine, "card"), 1);
+				ide_set_gnet_readlock (machine->device("card"), 1);
 			}
 		break;
 
@@ -365,7 +365,7 @@ static UINT8 rf5c296_reg_r(ATTR_UNUSED running_machine *machine, UINT8 reg)
 static WRITE32_HANDLER(rf5c296_io_w)
 {
 	if(offset < 2) {
-		ide_controller32_pcmcia_w(devtag_get_device(space->machine, "card"), offset, data, mem_mask);
+		ide_controller32_pcmcia_w(space->machine->device("card"), offset, data, mem_mask);
 		return;
 	}
 
@@ -380,7 +380,7 @@ static WRITE32_HANDLER(rf5c296_io_w)
 static READ32_HANDLER(rf5c296_io_r)
 {
 	if(offset < 2)
-		return ide_controller32_pcmcia_r(devtag_get_device(space->machine, "card"), offset, mem_mask);
+		return ide_controller32_pcmcia_r(space->machine->device("card"), offset, mem_mask);
 
 	offset *= 4;
 
@@ -430,7 +430,7 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 		else
 			locked |= 1 << pos;
 		if (!locked) {
-			ide_set_gnet_readlock (devtag_get_device(space->machine, "card"), 0);
+			ide_set_gnet_readlock (space->machine->device("card"), 0);
 		}
 	}
 }
@@ -548,7 +548,7 @@ static WRITE32_HANDLER(control_w)
 	// selection too, but they're always 0.
 
 	UINT32 p = control;
-	running_device *mb3773 = devtag_get_device(space->machine, "mb3773");
+	running_device *mb3773 = space->machine->device("mb3773");
 
 	COMBINE_DATA(&control);
 
@@ -852,7 +852,7 @@ static MACHINE_RESET( coh3002t )
 	control = 0;
 	psx_machine_init(machine);
 	devtag_reset(machine, "card");
-	ide_set_gnet_readlock(devtag_get_device(machine, "card"), 1);
+	ide_set_gnet_readlock(machine->device("card"), 1);
 
 	// halt sound CPU since it has no valid program at start
 	cputag_set_input_line(machine, "mn10200",INPUT_LINE_RESET,ASSERT_LINE); /* MCU */

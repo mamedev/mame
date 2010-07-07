@@ -238,7 +238,7 @@ static MACHINE_START( 1942 )
 {
 	_1942_state *state = (_1942_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->palette_bank);
 	state_save_register_global_array(machine, state->scroll);

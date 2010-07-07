@@ -543,7 +543,7 @@ static MACHINE_RESET( hnayayoi )
 	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
 
 	/* start with the MSM5205 reset */
-	msm5205_reset_w(devtag_get_device(machine, "msm"), 1);
+	msm5205_reset_w(machine->device("msm"), 1);
 
 	state->palbank = 0;
 	state->blit_layer = 0;

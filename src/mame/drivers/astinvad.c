@@ -228,10 +228,10 @@ static MACHINE_START( kamikaze )
 {
 	astinvad_state *state = (astinvad_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->ppi8255_0 = devtag_get_device(machine, "ppi8255_0");
-	state->ppi8255_1 = devtag_get_device(machine, "ppi8255_1");
-	state->samples = devtag_get_device(machine, "samples");
+	state->maincpu = machine->device("maincpu");
+	state->ppi8255_0 = machine->device("ppi8255_0");
+	state->ppi8255_1 = machine->device("ppi8255_1");
+	state->samples = machine->device("samples");
 
 	state->int_timer = timer_alloc(machine, kamizake_int_gen, NULL);
 	timer_adjust_oneshot(state->int_timer, machine->primary_screen->time_until_pos(128), 128);
@@ -256,8 +256,8 @@ static MACHINE_START( spaceint )
 {
 	astinvad_state *state = (astinvad_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->samples = devtag_get_device(machine, "samples");
+	state->maincpu = machine->device("maincpu");
+	state->samples = machine->device("samples");
 
 	state_save_register_global(machine, state->screen_flip);
 	state_save_register_global_array(machine, state->sound_state);

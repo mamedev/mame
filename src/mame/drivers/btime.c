@@ -1427,8 +1427,8 @@ static MACHINE_START( btime )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->btime_palette);
 	state_save_register_global(machine, state->bnj_scroll1);
@@ -2088,7 +2088,7 @@ static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 	for (addr = 0; addr < 0x10000; addr++)
 		decrypt[addr] = swap_bits_5_6(rom[addr]);
 
-	if (space->cpu == devtag_get_device(machine, "maincpu"))
+	if (space->cpu == machine->device("maincpu"))
 		decrypted = decrypt;
 }
 

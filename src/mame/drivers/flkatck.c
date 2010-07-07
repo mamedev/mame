@@ -202,8 +202,8 @@ static MACHINE_START( flkatck )
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k007121 = devtag_get_device(machine, "k007121");
+	state->audiocpu = machine->device("audiocpu");
+	state->k007121 = machine->device("k007121");
 
 	state_save_register_global(machine, state->irq_enabled);
 	state_save_register_global_array(machine, state->multiply_reg);
@@ -214,7 +214,7 @@ static MACHINE_RESET( flkatck )
 {
 	flkatck_state *state = (flkatck_state *)machine->driver_data;
 
-	k007232_set_bank(devtag_get_device(machine, "konami"), 0, 1);
+	k007232_set_bank(machine->device("konami"), 0, 1);
 
 	state->irq_enabled = 0;
 	state->multiply_reg[0] = 0;

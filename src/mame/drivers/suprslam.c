@@ -300,8 +300,8 @@ static MACHINE_START( suprslam )
 {
 	suprslam_state *state = (suprslam_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k053936 = devtag_get_device(machine, "k053936");
+	state->audiocpu = machine->device("audiocpu");
+	state->k053936 = machine->device("k053936");
 
 	state_save_register_global(machine, state->screen_bank);
 	state_save_register_global(machine, state->bg_bank);

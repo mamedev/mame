@@ -227,7 +227,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "pcm");
+	running_device *samples = space->machine->device("pcm");
 	const UINT8* const rom = memory_region(space->machine, "pcm");
 
 	// only Ninja Kid II uses this

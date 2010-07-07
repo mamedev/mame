@@ -175,7 +175,7 @@ static MACHINE_START( kopunch )
 {
 	kopunch_state *state = (kopunch_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->gfxbank);
 }

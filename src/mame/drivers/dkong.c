@@ -389,10 +389,10 @@ static void dkong_init_device_driver_data( running_machine *machine )
 {
 	dkong_state *state = (dkong_state *)machine->driver_data;
 
-	state->dev_n2a03a = devtag_get_device(machine, "n2a03a");
-	state->dev_n2a03b = devtag_get_device(machine, "n2a03b");
-	state->dev_6h = devtag_get_device(machine, "ls259.6h");
-	state->dev_vp2 = devtag_get_device(machine, "virtual_p2");
+	state->dev_n2a03a = machine->device("n2a03a");
+	state->dev_n2a03b = machine->device("n2a03b");
+	state->dev_6h = machine->device("ls259.6h");
+	state->dev_vp2 = machine->device("virtual_p2");
 }
 
 static MACHINE_START( dkong2b )

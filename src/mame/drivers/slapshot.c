@@ -538,12 +538,12 @@ static MACHINE_START( slapshot )
 
 	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->tc0140syt = devtag_get_device(machine, "tc0140syt");
-	state->tc0480scp = devtag_get_device(machine, "tc0480scp");
-	state->tc0360pri = devtag_get_device(machine, "tc0360pri");
-	state->tc0640fio = devtag_get_device(machine, "tc0640fio");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->tc0140syt = machine->device("tc0140syt");
+	state->tc0480scp = machine->device("tc0480scp");
+	state->tc0360pri = machine->device("tc0360pri");
+	state->tc0640fio = machine->device("tc0640fio");
 
 	state->banknum = 0;
 	state_save_register_global(machine, state->banknum);

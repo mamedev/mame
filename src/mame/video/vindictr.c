@@ -187,7 +187,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 				break;
 
 			case 6:		/* /VIRQ */
-				atarigen_scanline_int_gen(devtag_get_device(screen.machine, "maincpu"));
+				atarigen_scanline_int_gen(screen.machine->device("maincpu"));
 				break;
 
 			case 7:		/* /PFVS */

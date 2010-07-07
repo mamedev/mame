@@ -218,12 +218,12 @@ static void system16a_generic_init(running_machine *machine)
 	state->lamp_changed_w = NULL;
 	state->i8751_vblank_hook = NULL;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->mcu = devtag_get_device(machine, "mcu");
-	state->ymsnd = devtag_get_device(machine, "ymsnd");
-	state->ppi8255 = devtag_get_device(machine, "ppi8255");
-	state->n7751 = devtag_get_device(machine, "n7751");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
+	state->mcu = machine->device("mcu");
+	state->ymsnd = machine->device("ymsnd");
+	state->ppi8255 = machine->device("ppi8255");
+	state->n7751 = machine->device("n7751");
 }
 
 
@@ -260,7 +260,7 @@ static MACHINE_RESET( system16a )
 {
 	segas1x_state *state = (segas1x_state *)machine->driver_data;
 
-	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
+	fd1094_machine_init(machine->device("maincpu"));
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (state->i8751_vblank_hook != NULL)

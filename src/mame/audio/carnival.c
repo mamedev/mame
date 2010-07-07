@@ -127,7 +127,7 @@ static int psgData = 0;
 WRITE8_HANDLER( carnival_audio_1_w )
 {
 	static int port1State = 0;
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;
@@ -206,7 +206,7 @@ WRITE8_HANDLER( carnival_audio_1_w )
 
 WRITE8_HANDLER( carnival_audio_2_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;

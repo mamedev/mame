@@ -616,9 +616,9 @@ static MACHINE_START( taitoair )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->dsp = devtag_get_device(machine, "dsp");
-	state->tc0080vco = devtag_get_device(machine, "tc0080vco");
+	state->audiocpu = machine->device("audiocpu");
+	state->dsp = machine->device("dsp");
+	state->tc0080vco = machine->device("tc0080vco");
 
 	state_save_register_global(machine, state->banknum);
 	state_save_register_global(machine, state->q.col);

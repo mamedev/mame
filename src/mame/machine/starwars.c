@@ -113,7 +113,7 @@ WRITE8_HANDLER( starwars_out_w )
 			break;
 
 		case 7:		/* NVRAM array recall */
-			x2212_array_recall(devtag_get_device(space->machine, "x2212"), data >> 7);
+			x2212_array_recall(space->machine->device("x2212"), data >> 7);
 			break;
 	}
 }

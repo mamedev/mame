@@ -680,7 +680,7 @@ static READ8_HANDLER( buckrog_cpu2_command_r )
 {
 	/* assert ACK */
 	turbo_state *state = (turbo_state *)space->machine->driver_data;
-	ppi8255_set_port_c(devtag_get_device(space->machine, "ppi8255_0"), 0x00);
+	ppi8255_set_port_c(space->machine->device("ppi8255_0"), 0x00);
 	return state->buckrog_command;
 }
 
@@ -719,7 +719,7 @@ static READ8_HANDLER( buckrog_port_3_r )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-    ppi8255_w(devtag_get_device(machine, "ppi8255_0"), param >> 8, param & 0xff);
+    ppi8255_w(machine->device("ppi8255_0"), param >> 8, param & 0xff);
 }
 
 

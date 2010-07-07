@@ -999,8 +999,8 @@ static MACHINE_START( common )
 {
 	buggychl_state *state = (buggychl_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->audiocpu = machine->device("audiocpu");
+	state->mcu = machine->device("mcu");
 
 	/* video */
 	state_save_register_global(machine, state->pix1);

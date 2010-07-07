@@ -289,7 +289,7 @@ static MACHINE_START( blueprnt )
 {
 	blueprnt_state *state = (blueprnt_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->dipsw);
 }

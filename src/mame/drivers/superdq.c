@@ -319,7 +319,7 @@ static MACHINE_START( superdq )
 {
 	superdq_state *state = (superdq_state *)machine->driver_data;
 
-	state->laserdisc = devtag_get_device(machine, "laserdisc");
+	state->laserdisc = machine->device("laserdisc");
 }
 
 

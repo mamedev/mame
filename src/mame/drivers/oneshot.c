@@ -345,8 +345,8 @@ static MACHINE_START( oneshot )
 {
 	oneshot_state *state = (oneshot_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->gun_x_p1);
 	state_save_register_global(machine, state->gun_y_p1);

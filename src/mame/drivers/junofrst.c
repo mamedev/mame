@@ -283,11 +283,11 @@ static MACHINE_START( junofrst )
 	timeplt_state *state = (timeplt_state *)machine->driver_data;
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->i8039 = devtag_get_device(machine, "mcu");
+	state->i8039 = machine->device("mcu");
 	state->soundcpu = machine->device<cpu_device>("audiocpu");
-	state->filter_0_0 = devtag_get_device(machine, "filter.0.0");
-	state->filter_0_1 = devtag_get_device(machine, "filter.0.1");
-	state->filter_0_2 = devtag_get_device(machine, "filter.0.2");
+	state->filter_0_0 = machine->device("filter.0.0");
+	state->filter_0_1 = machine->device("filter.0.1");
+	state->filter_0_2 = machine->device("filter.0.2");
 
 	state_save_register_global(machine, state->i8039_status);
 	state_save_register_global(machine, state->last_irq);

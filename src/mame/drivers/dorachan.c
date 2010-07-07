@@ -227,7 +227,7 @@ static MACHINE_START( dorachan )
 {
 	dorachan_state *state = (dorachan_state *)machine->driver_data;
 
-	state->main_cpu = devtag_get_device(machine, "maincpu");
+	state->main_cpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->flip_screen);
 }

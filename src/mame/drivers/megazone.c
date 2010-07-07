@@ -52,7 +52,7 @@ static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
 			C += 220000;	/* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter_rc_set_RC(devtag_get_device(device->machine, fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
+		filter_rc_set_RC(device->machine->device(fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
 	}
 }
 

@@ -106,13 +106,13 @@ static MACHINE_RESET( artmagic )
 
 static READ16_HANDLER( tms_host_r )
 {
-	return tms34010_host_r(devtag_get_device(space->machine, "tms"), offset);
+	return tms34010_host_r(space->machine->device("tms"), offset);
 }
 
 
 static WRITE16_HANDLER( tms_host_w )
 {
-	tms34010_host_w(devtag_get_device(space->machine, "tms"), offset, data);
+	tms34010_host_w(space->machine->device("tms"), offset, data);
 }
 
 

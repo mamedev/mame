@@ -175,9 +175,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_r(devtag_get_device(space->machine, "konami2"), offset);
+		ret |= k054539_r(space->machine->device("konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_r(devtag_get_device(space->machine, "konami1"), offset)<<8;
+		ret |= k054539_r(space->machine->device("konami1"), offset)<<8;
 
 	return ret;
 }
@@ -185,9 +185,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_w(devtag_get_device(space->machine, "konami2"), offset, data);
+		k054539_w(space->machine->device("konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_w(devtag_get_device(space->machine, "konami1"), offset, data>>8);
+		k054539_w(space->machine->device("konami1"), offset, data>>8);
 }
 
 
@@ -246,7 +246,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 
 static READ32_HANDLER( v_rom_r )
 {
-	running_device *k056832 = devtag_get_device(space->machine, "k056832");
+	running_device *k056832 = space->machine->device("k056832");
 	UINT8 *mem8 = memory_region(space->machine, "gfx2");
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
@@ -1437,7 +1437,7 @@ static STATE_POSTLOAD( djmain_postload )
 
 static MACHINE_START( djmain )
 {
-	running_device *ide = devtag_get_device(machine, "ide");
+	running_device *ide = machine->device("ide");
 
 	if (ide != NULL && ide_master_password != NULL)
 		ide_set_master_password(ide, ide_master_password);

@@ -105,7 +105,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 	/* 150 below to scale to volume 100 */
 	v = (150 * table[ba]) / (4700 + table[ba]);
 	//printf("dac1w %02d %04d\n", ba, v);
-	ay8910_set_volume(devtag_get_device(device->machine, "ay2"), 1, v);
+	ay8910_set_volume(device->machine->device("ay2"), 1, v);
 }
 
 
@@ -121,7 +121,7 @@ static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
-	return ay8910_r(devtag_get_device(device->machine, (active_8910 == 0) ? "ay1" : "ay2"), 0);
+	return ay8910_r(device->machine->device((active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
@@ -136,7 +136,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 	if ((last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(device->machine, "ay1"), last_port0b, port0a);
+		ay8910_data_address_w(device->machine->device("ay1"), last_port0b, port0a);
 	}
 	else if ((last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -148,7 +148,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 	if ((last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(device->machine, "ay2"), last_port0b >> 2, port0a);
+		ay8910_data_address_w(device->machine->device("ay2"), last_port0b >> 2, port0a);
 	}
 	else if ((last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -162,7 +162,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
-	running_device *pia0 = devtag_get_device(device->machine, "pia0");
+	running_device *pia0 = device->machine->device("pia0");
 	static int toggle = 0;
 
 	pia6821_cb1_w(pia0,0, toggle & 1);
@@ -171,7 +171,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
-	running_device *tms = devtag_get_device(device->machine, "tms");
+	running_device *tms = device->machine->device("tms");
 
 	// bit 0 = /RS
 	tms5220_rsq_w(tms, (data >> 0) & 0x01);
@@ -194,7 +194,7 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	running_device *pia0 = devtag_get_device(space->machine, "pia0");
+	running_device *pia0 = space->machine->device("pia0");
 	pia6821_ca1_w(pia0, 0, data & 0x80);
 	soundlatch2_w(space, 0, data);
 }

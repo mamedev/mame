@@ -108,7 +108,7 @@ static int plural;
 
 READ8_HANDLER( wow_speech_r )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	int Phoneme/*, Intonation*/;
 	int i = 0;
 
@@ -177,6 +177,6 @@ READ8_HANDLER( wow_speech_r )
 
 CUSTOM_INPUT( wow_speech_status_r )
 {
-	running_device *samples = devtag_get_device(field->port->machine, "samples");
+	running_device *samples = field->port->machine->device("samples");
 	return !sample_playing(samples, 0);
 }

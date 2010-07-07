@@ -678,8 +678,8 @@ static MACHINE_START( combatsc )
 	state->interleave_timer = timer_alloc(machine, NULL, NULL);
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->k007121_1 = devtag_get_device(machine, "k007121_1");
-	state->k007121_2 = devtag_get_device(machine, "k007121_2");
+	state->k007121_1 = machine->device("k007121_1");
+	state->k007121_2 = machine->device("k007121_2");
 
 	memory_configure_bank(machine, "bank1", 0, 10, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 

@@ -1075,7 +1075,7 @@ static READ64_HANDLER(cpu_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)((space->cpu != devtag_get_device(space->machine, "maincpu")) ? 0x80000000 : 0);
+		r = (UINT64)((space->cpu != space->machine->device("maincpu")) ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}

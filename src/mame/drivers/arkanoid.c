@@ -910,7 +910,7 @@ static MACHINE_START( arkanoid )
 {
 	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
 
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->mcu = machine->device("mcu");
 
 	state_save_register_global(machine, state->bootleg_cmd);
 

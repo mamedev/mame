@@ -55,7 +55,7 @@ static void trigger_sample(running_device *samples, UINT8 data);
 
 WRITE8_HANDLER( gottlieb_sh_w )
 {
-	running_device *riot = devtag_get_device(space->machine, "riot");
+	running_device *riot = space->machine->device("riot");
 
 	/* identify rev1 boards by the presence of a 6532 RIOT device */
 	if (riot != NULL)
@@ -74,7 +74,7 @@ WRITE8_HANDLER( gottlieb_sh_w )
 
 static void gottlieb1_sh_w(running_device *riot, UINT8 data)
 {
-	running_device *samples = devtag_get_device(riot->machine, "samples");
+	running_device *samples = riot->machine->device("samples");
 	int pa7 = (data & 0x0f) != 0xf;
 	int pa0_5 = ~data & 0x3f;
 
@@ -196,7 +196,7 @@ static void trigger_sample(running_device *samples, UINT8 data)
 #ifdef UNUSED_FUNCTION
 void gottlieb_knocker(running_machine *machine)
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	if (!strcmp(machine->gamedrv->name,"reactor"))	/* reactor */
 	{
 	}
@@ -244,7 +244,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	{
 		if (votrax_queuepos > 1)
 		{
-			running_device *samples = devtag_get_device(space->machine, "samples");
+			running_device *samples = space->machine->device("samples");
 			int last = -1;
 			int i;
 			char phonemes[200];
@@ -469,7 +469,7 @@ static WRITE8_HANDLER( nmi_rate_w )
 
 static CUSTOM_INPUT( speech_drq_custom_r )
 {
-	return sp0250_drq_r(devtag_get_device(field->port->machine, "spsnd"));
+	return sp0250_drq_r(field->port->machine->device("spsnd"));
 }
 
 
@@ -497,7 +497,7 @@ static WRITE8_HANDLER( speech_control_w )
 	{
 		/* bit 3 selects which of the two 8913 to enable */
 		/* bit 4 goes to the 8913 BC1 pin */
-		running_device *ay = devtag_get_device(space->machine, (data & 0x08) ? "ay1" : "ay2");
+		running_device *ay = space->machine->device((data & 0x08) ? "ay1" : "ay2");
 		ay8910_data_address_w(ay, data >> 4, *psg_latch);
 	}
 
@@ -506,7 +506,7 @@ static WRITE8_HANDLER( speech_control_w )
 	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
 	{
-		running_device *sp = devtag_get_device(space->machine, "spsnd");
+		running_device *sp = space->machine->device("spsnd");
 		sp0250_w(sp, 0, *sp0250_latch);
 	}
 

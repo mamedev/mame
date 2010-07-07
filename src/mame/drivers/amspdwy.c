@@ -254,7 +254,7 @@ static MACHINE_START( amspdwy )
 {
 	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global_array(machine, state->wheel_old);

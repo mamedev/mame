@@ -434,8 +434,8 @@ static MACHINE_START( mcatadv )
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 1);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
 
 	state_save_register_global(machine, state->palette_bank1);
 	state_save_register_global(machine, state->palette_bank2);

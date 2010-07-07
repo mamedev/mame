@@ -327,7 +327,7 @@ static WRITE8_HANDLER( cus115_w )
 		case 1:
 		case 2:
 		case 3:
-			namco_63701x_w(devtag_get_device(space->machine, "namco2"), (offset & 0x1e00) >> 9,data);
+			namco_63701x_w(space->machine->device("namco2"), (offset & 0x1e00) >> 9,data);
 			break;
 
 		case 4:

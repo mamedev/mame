@@ -340,13 +340,13 @@ static MACHINE_START( dbz )
 {
 	dbz_state *state = (dbz_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k053936_1 = devtag_get_device(machine, "k053936_1");
-	state->k053936_2 = devtag_get_device(machine, "k053936_2");
-	state->k056832 = devtag_get_device(machine, "k056832");
-	state->k053246 = devtag_get_device(machine, "k053246");
-	state->k053251 = devtag_get_device(machine, "k053251");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k053936_1 = machine->device("k053936_1");
+	state->k053936_2 = machine->device("k053936_2");
+	state->k056832 = machine->device("k056832");
+	state->k053246 = machine->device("k053246");
+	state->k053251 = machine->device("k053251");
 
 	state_save_register_global(machine, state->control);
 	state_save_register_global(machine, state->sprite_colorbase);

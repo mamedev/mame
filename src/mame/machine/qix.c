@@ -252,7 +252,7 @@ MACHINE_START( qixmcu )
 
 WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed )
 {
-	running_device *pia = devtag_get_device(device->machine, "sndpia0");
+	running_device *pia = device->machine->device("sndpia0");
 	pia6821_cb1_w(pia, 0, state);
 }
 
@@ -508,7 +508,7 @@ static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
 static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
 {
 	/* write to the sound chip */
-	sn76496_w(devtag_get_device(device->machine, "sn1"), 0, data);
+	sn76496_w(device->machine->device("sn1"), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia6821_cb1_w(device, 0, 0);
@@ -519,7 +519,7 @@ static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
 static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 {
 	/* write to the sound chip */
-	sn76496_w(devtag_get_device(device->machine, "sn2"), 0, data);
+	sn76496_w(device->machine->device("sn2"), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia6821_cb1_w(device, 0, 0);

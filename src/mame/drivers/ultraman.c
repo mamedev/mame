@@ -195,12 +195,12 @@ static MACHINE_START( ultraman )
 {
 	ultraman_state *state = (ultraman_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k051960 = devtag_get_device(machine, "k051960");
-	state->k051316_1 = devtag_get_device(machine, "k051316_1");
-	state->k051316_2 = devtag_get_device(machine, "k051316_2");
-	state->k051316_3 = devtag_get_device(machine, "k051316_3");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k051960 = machine->device("k051960");
+	state->k051316_1 = machine->device("k051316_1");
+	state->k051316_2 = machine->device("k051316_2");
+	state->k051316_3 = machine->device("k051316_3");
 
 	state_save_register_global(machine, state->bank0);
 	state_save_register_global(machine, state->bank1);

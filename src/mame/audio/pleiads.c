@@ -436,7 +436,7 @@ WRITE8_HANDLER( pleiads_sound_control_b_w )
 	if (pitch == 3)
 		pitch = 2;	/* 2 and 3 are the same */
 
-	tms36xx_note_w(devtag_get_device(space->machine, "tms"), pitch, note);
+	tms36xx_note_w(space->machine->device("tms"), pitch, note);
 
 	stream_update(channel);
 	sound_latch_b = data;

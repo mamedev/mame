@@ -860,10 +860,10 @@ static MACHINE_START( djboy )
 	memory_configure_bank(machine, "bank3", 3, 5,  &CPU2[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank4", 0, 1,  &MAIN[0x10000], 0x3000); /* unsure if/how this area is banked */
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->cpu1 = devtag_get_device(machine, "cpu1");
-	state->cpu2 = devtag_get_device(machine, "cpu2");
-	state->pandora = devtag_get_device(machine, "pandora");
+	state->maincpu = machine->device("maincpu");
+	state->cpu1 = machine->device("cpu1");
+	state->cpu2 = machine->device("cpu2");
+	state->pandora = machine->device("pandora");
 
 	state_save_register_global(machine, state->videoreg);
 	state_save_register_global(machine, state->scrollx);

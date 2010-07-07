@@ -366,13 +366,13 @@ static MACHINE_START( rng )
 
 	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "soundcpu");
-	state->k053936 = devtag_get_device(machine, "k053936");
-	state->k055673 = devtag_get_device(machine, "k055673");
-	state->k053252 = devtag_get_device(machine, "k053252");
-	state->k054539_1 = devtag_get_device(machine, "k054539_1");
-	state->k054539_2 = devtag_get_device(machine, "k054539_2");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("soundcpu");
+	state->k053936 = machine->device("k053936");
+	state->k055673 = machine->device("k055673");
+	state->k053252 = machine->device("k053252");
+	state->k054539_1 = machine->device("k054539_1");
+	state->k054539_2 = machine->device("k054539_2");
 
 	state_save_register_global(machine, state->z80_control);
 	state_save_register_global(machine, state->sound_status);
@@ -384,7 +384,7 @@ static MACHINE_RESET( rng )
 {
 	rungun_state *state = (rungun_state *)machine->driver_data;
 
-	k054539_init_flags(devtag_get_device(machine, "k054539_1"), K054539_REVERSE_STEREO);
+	k054539_init_flags(machine->device("k054539_1"), K054539_REVERSE_STEREO);
 
 	memset(state->sysreg, 0, 0x20);
 	memset(state->ttl_vram, 0, 0x1000);

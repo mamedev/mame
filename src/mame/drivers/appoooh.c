@@ -404,7 +404,7 @@ static MACHINE_START( appoooh )
 {
 	appoooh_state *state = (appoooh_state *)machine->driver_data;
 
-	state->adpcm = devtag_get_device(machine, "msm");
+	state->adpcm = machine->device("msm");
 
 	state_save_register_global(machine, state->adpcm_data);
 	state_save_register_global(machine, state->adpcm_address);

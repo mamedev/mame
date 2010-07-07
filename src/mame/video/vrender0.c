@@ -566,7 +566,7 @@ static DEVICE_START( vr0video )
 	vr0video_state *vr0 = get_safe_token(device);
 	const vr0video_interface *intf = get_interface(device);
 
-	vr0->cpu = devtag_get_device(device->machine, intf->cpu);
+	vr0->cpu = device->machine->device(intf->cpu);
 
 	state_save_register_device_item_array(device, 0, vr0->InternalPalette);
 	state_save_register_device_item(device, 0, vr0->LastPalUpdate);

@@ -161,7 +161,7 @@ static void set_videoram_bank(running_machine* machine, int start, int count, in
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = (data & 7);
-	ppu2c0x_spriteram_dma(space, devtag_get_device(space->machine, "ppu"), source);
+	ppu2c0x_spriteram_dma(space, space->machine->device("ppu"), source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -341,14 +341,14 @@ static void multigam3_mmc3_scanline_cb( running_device *device, int scanline, in
 		if (--multigam3_mmc3_scanline_counter == -1)
 		{
 			multigam3_mmc3_scanline_counter = multigam3_mmc3_scanline_latch;
-			generic_pulse_irq_line(devtag_get_device(device->machine, "maincpu"), 0);
+			generic_pulse_irq_line(device->machine->device("maincpu"), 0);
 		}
 	}
 }
 
 static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 {
-	running_device *ppu = devtag_get_device(space->machine, "ppu");
+	running_device *ppu = space->machine->device("ppu");
 
 	/* basically, a MMC3 mapper from the nes */
 	static int multigam3_mmc3_command;
@@ -620,7 +620,7 @@ static void multigam_init_mapper02(running_machine *machine, UINT8* prg_base, in
 	multigam_mapper02_prg_base = prg_base;
 	multigam_mapper02_prg_size = prg_size;
 
-	ppu2c0x_set_scanline_callback(devtag_get_device(machine, "ppu"), 0);
+	ppu2c0x_set_scanline_callback(machine->device("ppu"), 0);
 }
 
 /******************************************************
@@ -785,7 +785,7 @@ static void multigam_init_mmc1(running_machine *machine, UINT8 *prg_base, int pr
 	multigam_mmc1_prg_size = prg_size;
 	multigam_mmc1_chr_bank_base = chr_bank_base;
 
-	ppu2c0x_set_scanline_callback(devtag_get_device(machine, "ppu"), 0);
+	ppu2c0x_set_scanline_callback(machine->device("ppu"), 0);
 
 };
 
@@ -816,7 +816,7 @@ static UINT8 supergm3_chr_bank;
 
 static void supergm3_set_bank(running_machine *machine)
 {
-	running_device *ppu = devtag_get_device(machine, "ppu");
+	running_device *ppu = machine->device("ppu");
 	UINT8* mem = memory_region(machine, "maincpu");
 
 	// video bank
@@ -1059,7 +1059,7 @@ static VIDEO_START( multigam )
 static VIDEO_UPDATE( multigam )
 {
 	/* render the ppu */
-	ppu2c0x_render(devtag_get_device(screen->machine, "ppu"), bitmap, 0, 0, 0, 0);
+	ppu2c0x_render(screen->machine->device("ppu"), bitmap, 0, 0, 0, 0);
 	return 0;
 }
 
@@ -1092,8 +1092,8 @@ static MACHINE_START( multigam )
 	nt_page[2] = nt_ram + 0x800;
 	nt_page[3] = nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "gfx1"));
 }
 
@@ -1105,16 +1105,16 @@ static MACHINE_START( multigm3 )
 	nt_page[2] = nt_ram + 0x800;
 	nt_page[3] = nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
 
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
-	memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
+	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
 
 	set_videorom_bank(machine, 0, 8, 0, 8);
 };
@@ -1127,7 +1127,7 @@ static MACHINE_START( supergm3 )
 	nt_page[2] = nt_ram + 0x800;
 	nt_page[3] = nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
 
 	vram = auto_alloc_array(machine, UINT8, 0x2000);
 	multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);

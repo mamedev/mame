@@ -298,9 +298,9 @@ static WRITE16_HANDLER( hammer_motor_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ticket_dispenser_w(devtag_get_device(space->machine, "prize1"), 0, (data & 0x0001) << 7);
-		ticket_dispenser_w(devtag_get_device(space->machine, "prize2"), 0, (data & 0x0002) << 6);
-		ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, (data & 0x0010) << 3);
+		ticket_dispenser_w(space->machine->device("prize1"), 0, (data & 0x0001) << 7);
+		ticket_dispenser_w(space->machine->device("prize2"), 0, (data & 0x0002) << 6);
+		ticket_dispenser_w(space->machine->device("ticket"), 0, (data & 0x0010) << 3);
 		// data & 0x0080 ?
 	}
 #ifdef MAME_DEBUG

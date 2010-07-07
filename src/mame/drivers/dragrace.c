@@ -318,7 +318,7 @@ static MACHINE_START( dragrace )
 {
 	dragrace_state *state = (dragrace_state *)machine->driver_data;
 
-	state->discrete = devtag_get_device(machine, "discrete");
+	state->discrete = machine->device("discrete");
 
 	state_save_register_global(machine, state->misc_flags);
 	state_save_register_global_array(machine, state->gear);

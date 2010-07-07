@@ -270,7 +270,7 @@ void williams_cvsd_init(running_machine *machine)
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = devtag_get_device(machine, "cvsdcpu");
+	sound_cpu = machine->device("cvsdcpu");
 	soundalt_cpu = NULL;
 
 	/* configure master CPU banks */
@@ -288,7 +288,7 @@ void williams_cvsd_init(running_machine *machine)
 	memory_set_bank(machine, "bank5", 0);
 
 	/* reset the IRQ state */
-	pia6821_ca1_w(devtag_get_device(machine, "cvsdpia"), 0, 1);
+	pia6821_ca1_w(machine->device("cvsdpia"), 0, 1);
 
 	/* register for save states */
 	state_save_register_global(machine, williams_sound_int_state);
@@ -302,8 +302,8 @@ void williams_narc_init(running_machine *machine)
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = devtag_get_device(machine, "narc1cpu");
-	soundalt_cpu = devtag_get_device(machine, "narc2cpu");
+	sound_cpu = machine->device("narc1cpu");
+	soundalt_cpu = machine->device("narc2cpu");
 
 	/* configure master CPU banks */
 	ROM = memory_region(machine, "narc1cpu");
@@ -345,7 +345,7 @@ void williams_adpcm_init(running_machine *machine)
 	UINT8 *ROM;
 
 	/* configure the CPU */
-	sound_cpu = devtag_get_device(machine, "adpcm");
+	sound_cpu = machine->device("adpcm");
 	soundalt_cpu = NULL;
 
 	/* configure banks */
@@ -407,7 +407,7 @@ static void init_audio_state(running_machine *machine)
 
 static void cvsd_ym2151_irq(running_device *device, int state)
 {
-	pia6821_ca1_w(devtag_get_device(device->machine, "cvsdpia"), 0, !state);
+	pia6821_ca1_w(device->machine->device("cvsdpia"), 0, !state);
 }
 
 
@@ -471,7 +471,7 @@ static WRITE8_DEVICE_HANDLER( cvsd_clock_set_w )
 
 static TIMER_CALLBACK( williams_cvsd_delayed_data_w )
 {
-	running_device *pia = devtag_get_device(machine, "cvsdpia");
+	running_device *pia = machine->device("cvsdpia");
 	pia6821_portb_w(pia, 0, param & 0xff);
 	pia6821_cb1_w(pia, 0, (param >> 8) & 1);
 	pia6821_cb2_w(pia, 0, (param >> 9) & 1);

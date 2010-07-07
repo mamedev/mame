@@ -230,7 +230,7 @@ static MACHINE_START( drmicro )
 {
 	drmicro_state *state = (drmicro_state *)machine->driver_data;
 
-	state->msm = devtag_get_device(machine, "msm");
+	state->msm = machine->device("msm");
 
 	state_save_register_global(machine, state->nmi_enable);
 	state_save_register_global(machine, state->pcm_adr);

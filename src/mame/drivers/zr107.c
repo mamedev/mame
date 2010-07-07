@@ -189,7 +189,7 @@ static VIDEO_START( jetwave )
 
 static VIDEO_UPDATE( jetwave )
 {
-	running_device *k001604 = devtag_get_device(screen->machine, "k001604");
+	running_device *k001604 = screen->machine->device("k001604");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -200,7 +200,7 @@ static VIDEO_UPDATE( jetwave )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	sharc_set_flag_input(devtag_get_device(screen->machine, "dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -224,7 +224,7 @@ static void game_tile_callback(running_machine *machine, int layer, int *code, i
 
 static VIDEO_START( zr107 )
 {
-	running_device *k056832 = devtag_get_device(machine, "k056832");
+	running_device *k056832 = machine->device("k056832");
 
 	k056832_set_layer_offs(k056832, 0, -29, -27);
 	k056832_set_layer_offs(k056832, 1, -29, -27);
@@ -241,7 +241,7 @@ static VIDEO_START( zr107 )
 
 static VIDEO_UPDATE( zr107 )
 {
-	running_device *k056832 = devtag_get_device(screen->machine, "k056832");
+	running_device *k056832 = screen->machine->device("k056832");
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
@@ -251,7 +251,7 @@ static VIDEO_UPDATE( zr107 )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	sharc_set_flag_input(devtag_get_device(screen->machine, "dsp"), 1, ASSERT_LINE);
+	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -379,10 +379,10 @@ static UINT32 *workram;
 static MACHINE_START( zr107 )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x000fffff, FALSE, workram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x000fffff, FALSE, workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -443,9 +443,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_r(devtag_get_device(space->machine, "konami2"), offset);
+		ret |= k054539_r(space->machine->device("konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_r(devtag_get_device(space->machine, "konami1"), offset)<<8;
+		ret |= k054539_r(space->machine->device("konami1"), offset)<<8;
 
 	return ret;
 }
@@ -453,9 +453,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_w(devtag_get_device(space->machine, "konami2"), offset, data);
+		k054539_w(space->machine->device("konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_w(devtag_get_device(space->machine, "konami1"), offset, data>>8);
+		k054539_w(space->machine->device("konami1"), offset, data>>8);
 }
 
 static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )

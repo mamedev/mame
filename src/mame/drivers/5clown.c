@@ -1228,7 +1228,7 @@ static DRIVER_INIT( fclown )
 
 	/* Assigning AY-3-8910 sound device */
 
-	ay8910 = devtag_get_device(machine, "ay8910");
+	ay8910 = machine->device("ay8910");
 }
 
 

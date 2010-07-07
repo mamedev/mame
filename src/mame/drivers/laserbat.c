@@ -706,16 +706,16 @@ static MACHINE_START( laserbat )
 {
 	laserbat_state *state = (laserbat_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->s2636_1 = devtag_get_device(machine, "s2636_1");
-	state->s2636_2 = devtag_get_device(machine, "s2636_2");
-	state->s2636_3 = devtag_get_device(machine, "s2636_3");
-	state->pia = devtag_get_device(machine, "pia");
-	state->sn = devtag_get_device(machine, "snsnd");
-	state->tms1 = devtag_get_device(machine, "tms1");
-	state->tms2 = devtag_get_device(machine, "tms2");
-	state->ay1 = devtag_get_device(machine, "ay1");
-	state->ay2 = devtag_get_device(machine, "ay2");
+	state->audiocpu = machine->device("audiocpu");
+	state->s2636_1 = machine->device("s2636_1");
+	state->s2636_2 = machine->device("s2636_2");
+	state->s2636_3 = machine->device("s2636_3");
+	state->pia = machine->device("pia");
+	state->sn = machine->device("snsnd");
+	state->tms1 = machine->device("tms1");
+	state->tms2 = machine->device("tms2");
+	state->ay1 = machine->device("ay1");
+	state->ay2 = machine->device("ay2");
 
 	state_save_register_global(machine, state->video_page);
 	state_save_register_global(machine, state->input_mux);

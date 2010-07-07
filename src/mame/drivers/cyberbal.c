@@ -65,7 +65,7 @@ static MACHINE_RESET( cyberbal )
 	atarigen_slapstic_reset(&state->atarigen);
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(*machine->primary_screen, cyberbal_scanline_update, 8);
-	atarigen_sound_io_reset(devtag_get_device(machine, "audiocpu"));
+	atarigen_sound_io_reset(machine->device("audiocpu"));
 
 	cyberbal_sound_reset(machine);
 
@@ -999,7 +999,7 @@ static DRIVER_INIT( cyberbal )
 {
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
 	state->atarigen.eeprom_default = default_eeprom;
-	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x018000, 0, 0);
+	atarigen_slapstic_init(machine->device("maincpu"), 0x018000, 0, 0);
 }
 
 
@@ -1007,7 +1007,7 @@ static DRIVER_INIT( cyberbalt )
 {
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
 	state->atarigen.eeprom_default = default_eeprom;
-	atarigen_slapstic_init(devtag_get_device(machine, "maincpu"), 0x018000, 0, 116);
+	atarigen_slapstic_init(machine->device("maincpu"), 0x018000, 0, 116);
 }
 
 

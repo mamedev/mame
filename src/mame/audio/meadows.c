@@ -60,7 +60,7 @@ SAMPLES_START( meadows_sh_start )
 /************************************/
 void meadows_sh_update(running_machine *machine)
 {
-	running_device *samples = devtag_get_device(machine, "samples");
+	running_device *samples = machine->device("samples");
 	int preset, amp;
 
 	if (latched_0c01 != meadows_0c01 || latched_0c03 != meadows_0c03)
@@ -68,7 +68,7 @@ void meadows_sh_update(running_machine *machine)
 		/* amplitude is a combination of the upper 4 bits of 0c01 */
 		/* and bit 4 merged from S2650's flag output */
 		amp = ((meadows_0c03 & ENABLE_CTR1) == 0) ? 0 : (meadows_0c01 & 0xf0) >> 1;
-		if( cpu_get_reg(devtag_get_device(machine, "maincpu"), S2650_FO) )
+		if( cpu_get_reg(machine->device("maincpu"), S2650_FO) )
 			amp += 0x80;
 		/* calculate frequency for counter #1 */
 		/* bit 0..3 of 0c01 are ctr preset */
@@ -104,9 +104,9 @@ void meadows_sh_update(running_machine *machine)
 		dac_enable = meadows_0c03 & ENABLE_DAC;
 
 		if (dac_enable)
-			dac_data_w(devtag_get_device(machine, "dac"), meadows_dac);
+			dac_data_w(machine->device("dac"), meadows_dac);
 		else
-			dac_data_w(devtag_get_device(machine, "dac"), 0);
+			dac_data_w(machine->device("dac"), 0);
 	}
 
 	latched_0c01 = meadows_0c01;
@@ -121,9 +121,9 @@ void meadows_sh_dac_w(running_machine *machine, int data)
 {
 	meadows_dac = data;
 	if (dac_enable)
-		dac_data_w(devtag_get_device(machine, "dac"), meadows_dac);
+		dac_data_w(machine->device("dac"), meadows_dac);
 	else
-		dac_data_w(devtag_get_device(machine, "dac"), 0);
+		dac_data_w(machine->device("dac"), 0);
 }
 
 

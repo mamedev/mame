@@ -436,7 +436,7 @@ static MACHINE_START( n8080 )
 {
 	n8080_state *state = (n8080_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	state_save_register_global(machine, state->shift_data);
 	state_save_register_global(machine, state->shift_bits);

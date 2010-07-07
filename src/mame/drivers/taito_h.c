@@ -529,9 +529,9 @@ static MACHINE_START( taitoh )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->tc0220ioc = devtag_get_device(machine, "tc0220ioc");
-	state->tc0080vco = devtag_get_device(machine, "tc0080vco");
+	state->audiocpu = machine->device("audiocpu");
+	state->tc0220ioc = machine->device("tc0220ioc");
+	state->tc0080vco = machine->device("tc0080vco");
 
 	state_save_register_global(machine, state->banknum);
 	state_save_register_postload(machine, taitoh_postload, NULL);

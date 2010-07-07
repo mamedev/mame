@@ -277,10 +277,10 @@ static void xboard_generic_init(running_machine *machine)
 
 	state->gprider_hack = 0;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->subcpu = devtag_get_device(machine, "sub");
-	state->_315_5250_1 = devtag_get_device(machine, "5250_main");
+	state->maincpu = machine->device("maincpu");
+	state->soundcpu = machine->device("soundcpu");
+	state->subcpu = machine->device("sub");
+	state->_315_5250_1 = machine->device("5250_main");
 
 	state_save_register_global(machine, state->iochip_force_input);
 	state_save_register_global(machine, state->vblank_irq_state);
@@ -434,11 +434,11 @@ static void xboard_reset(running_device *device)
 
 static MACHINE_RESET( xboard )
 {
-	fd1094_machine_init(devtag_get_device(machine, "maincpu"));
+	fd1094_machine_init(machine->device("maincpu"));
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), xboard_reset);
+	m68k_set_reset_callback(machine->device("maincpu"), xboard_reset);
 
 	/* start timers to track interrupts */
 	timer_set(machine, machine->primary_screen->time_until_pos(1), NULL, 1, scanline_callback);

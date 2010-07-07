@@ -88,7 +88,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static MACHINE_START( cball )
 {
 	cball_state *state = (cball_state *)machine->driver_data;
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 }
 
 static MACHINE_RESET( cball )

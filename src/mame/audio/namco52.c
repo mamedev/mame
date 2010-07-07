@@ -210,7 +210,7 @@ static DEVICE_START( namco_52xx )
 
 	/* find the attached discrete sound device */
 	assert(intf->discrete != NULL);
-	state->discrete = devtag_get_device(device->machine, intf->discrete);
+	state->discrete = device->machine->device(intf->discrete);
 	assert(state->discrete != NULL);
 	state->basenode = intf->firstnode;
 

@@ -1337,10 +1337,10 @@ MACHINE_START( decocass )
 {
 	decocass_state *state = (decocass_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mcu = devtag_get_device(machine, "mcu");
-	state->cassette = devtag_get_device(machine, "cassette");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->mcu = machine->device("mcu");
+	state->cassette = machine->device("cassette");
 }
 
 static void decocass_reset_common( running_machine *machine )

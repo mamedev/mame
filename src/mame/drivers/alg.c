@@ -86,7 +86,7 @@ static VIDEO_START( alg )
 
 static MACHINE_START( alg )
 {
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	laserdisc = machine->device("laserdisc");
 
 	serial_timer = timer_alloc(machine, response_timer, NULL);
 	serial_timer_active = FALSE;

@@ -340,8 +340,8 @@ static MACHINE_START( fgoal )
 {
 	fgoal_state *state = (fgoal_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->mb14241 = devtag_get_device(machine, "mb14241");
+	state->maincpu = machine->device("maincpu");
+	state->mb14241 = machine->device("mb14241");
 
 	state_save_register_global(machine, state->xpos);
 	state_save_register_global(machine, state->ypos);

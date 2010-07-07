@@ -100,7 +100,7 @@ static WRITE8_HANDLER( firefox_disc_lock_w )
 
 static WRITE8_HANDLER( audio_enable_w )
 {
-	sound_set_output_gain(devtag_get_device(space->machine, "ldsound"), ~offset & 1, (data & 0x80) ? 1.0 : 0.0);
+	sound_set_output_gain(space->machine->device("ldsound"), ~offset & 1, (data & 0x80) ? 1.0 : 0.0);
 }
 
 static WRITE8_HANDLER( firefox_disc_reset_w )
@@ -304,7 +304,7 @@ static READ8_DEVICE_HANDLER( riot_porta_r )
 
 static WRITE8_DEVICE_HANDLER( riot_porta_w )
 {
-	running_device *tms = devtag_get_device(device->machine, "tms");
+	running_device *tms = device->machine->device("tms");
 
 	/* handle 5220 read */
 	tms5220_rsq_w(tms, (data>>1) & 1);
@@ -430,10 +430,10 @@ static void firq_gen(running_device *device, int state)
 static MACHINE_START( firefox )
 {
 	memory_configure_bank(machine, "bank1", 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x1000);
-	nvram_1c = devtag_get_device(machine, "nvram_1c");
-	nvram_1d = devtag_get_device(machine, "nvram_1d");
+	nvram_1c = machine->device("nvram_1c");
+	nvram_1d = machine->device("nvram_1d");
 
-	laserdisc = devtag_get_device(machine, "laserdisc");
+	laserdisc = machine->device("laserdisc");
 	vp931_set_data_ready_callback(laserdisc, firq_gen);
 
 	control_num = 0;

@@ -304,7 +304,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			cpu_interrupt_enable(devtag_get_device(space->machine, "maincpu"), bit);
+			cpu_interrupt_enable(space->machine->device("maincpu"), bit);
 			if (!bit)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x02:	/* CLSON */
-			polepos_sound_enable(devtag_get_device(space->machine, "namco"),bit);
+			polepos_sound_enable(space->machine->device("namco"),bit);
 			if (!bit)
 			{
 				polepos_engine_sound_lsb_w(space, 0, 0);
@@ -468,8 +468,8 @@ static MACHINE_RESET( polepos )
 		polepos_latch_w(space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	cpu_set_input_line_vector(devtag_get_device(machine, "sub"), 0, Z8000_NVI);
-	cpu_set_input_line_vector(devtag_get_device(machine, "sub2"), 0, Z8000_NVI);
+	cpu_set_input_line_vector(machine->device("sub"), 0, Z8000_NVI);
+	cpu_set_input_line_vector(machine->device("sub2"), 0, Z8000_NVI);
 }
 
 

@@ -620,9 +620,9 @@ static MACHINE_START( firetrap )
 	UINT8 *MAIN = memory_region(machine, "maincpu");
 	UINT8 *SOUND = memory_region(machine, "audiocpu");
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->msm = devtag_get_device(machine, "msm");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->msm = machine->device("msm");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &MAIN[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 2, &SOUND[0x10000], 0x4000);

@@ -526,9 +526,9 @@ static MACHINE_START( chinagat )
 {
 	ddragon_state *state = (ddragon_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->sub_cpu = devtag_get_device(machine, "sub");
-	state->snd_cpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->sub_cpu = machine->device("sub");
+	state->snd_cpu = machine->device("audiocpu");
 
 	/* configure banks */
 	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);

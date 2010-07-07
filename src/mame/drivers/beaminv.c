@@ -135,7 +135,7 @@ static MACHINE_START( beaminv )
 	beaminv_state *state = (beaminv_state *)machine->driver_data;
 	create_interrupt_timer(machine);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	/* setup for save states */
 	state_save_register_global(machine, state->controller_select);

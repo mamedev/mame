@@ -231,9 +231,9 @@ static READ8_DEVICE_HANDLER( gfx_rom_r );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	running_device *pia1 = devtag_get_device(device->machine, "pia1");
-	running_device *pia2 = devtag_get_device(device->machine, "pia2");
-	running_device *pia3 = devtag_get_device(device->machine, "pia3");
+	running_device *pia1 = device->machine->device("pia1");
+	running_device *pia2 = device->machine->device("pia2");
+	running_device *pia3 = device->machine->device("pia3");
 	int combined_state = pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1) |
 											      pia6821_get_irq_b(pia2) |
 						 pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3);
@@ -279,7 +279,7 @@ static const pia6821_interface pia_1_intf =
 
 static INTERRUPT_GEN( update_pia_1 )
 {
-	running_device *pia1 = devtag_get_device(device->machine, "pia1");
+	running_device *pia1 = device->machine->device("pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
@@ -382,7 +382,7 @@ static const pia6821_interface pia_4_intf =
 
 static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
-	running_device *pia2 = devtag_get_device(device->machine, "pia2");
+	running_device *pia2 = device->machine->device("pia2");
 	pia6821_ca1_w(pia2, 0, data);
 }
 
@@ -509,7 +509,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 {
-	ttl74123_a_w(devtag_get_device(device->machine, "ic60"), 0, state);
+	ttl74123_a_w(device->machine->device("ic60"), 0, state);
 }
 
 
@@ -530,7 +530,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( spiders )
 {
-	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

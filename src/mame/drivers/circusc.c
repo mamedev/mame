@@ -62,10 +62,10 @@ static MACHINE_START( circusc )
 	circusc_state *state = (circusc_state *)machine->driver_data;
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->sn1 = devtag_get_device(machine, "sn1");
-	state->sn2 = devtag_get_device(machine, "sn2");
-	state->dac = devtag_get_device(machine, "dac");
-	state->discrete = devtag_get_device(machine, "fltdisc");
+	state->sn1 = machine->device("sn1");
+	state->sn2 = machine->device("sn2");
+	state->dac = machine->device("dac");
+	state->discrete = machine->device("fltdisc");
 
 	state_save_register_global(machine, state->sn_latch);
 }

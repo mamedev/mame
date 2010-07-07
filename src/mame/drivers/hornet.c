@@ -331,38 +331,38 @@ static UINT32 jvs_sdata_ptr = 0;
 
 static READ32_HANDLER( hornet_k037122_sram_r )
 {
-	running_device *k037122 = devtag_get_device(space->machine, get_cgboard_id() ? "k037122_2" : "k037122_1");
+	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_sram_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_sram_w )
 {
-	running_device *k037122 = devtag_get_device(space->machine, get_cgboard_id() ? "k037122_2" : "k037122_1");
+	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_sram_w(k037122, offset, data, mem_mask);
 }
 
 
 static READ32_HANDLER( hornet_k037122_char_r )
 {
-	running_device *k037122 = devtag_get_device(space->machine, get_cgboard_id() ? "k037122_2" : "k037122_1");
+	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_char_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_char_w )
 {
-	running_device *k037122 = devtag_get_device(space->machine, get_cgboard_id() ? "k037122_2" : "k037122_1");
+	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_char_w(k037122, offset, data, mem_mask);
 }
 
 static READ32_HANDLER( hornet_k037122_reg_r )
 {
-	running_device *k037122 = devtag_get_device(space->machine, get_cgboard_id() ? "k037122_2" : "k037122_1");
+	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_reg_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_reg_w )
 {
-	running_device *k037122 = devtag_get_device(space->machine, get_cgboard_id() ? "k037122_2" : "k037122_1");
+	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_reg_w(k037122, offset, data, mem_mask);
 }
 
@@ -378,8 +378,8 @@ static void voodoo_vblank_1(running_device *device, int param)
 
 static VIDEO_UPDATE( hornet )
 {
-	running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
-	running_device *k037122 = devtag_get_device(screen->machine, "k037122_1");
+	running_device *voodoo = screen->machine->device("voodoo0");
+	running_device *k037122 = screen->machine->device("k037122_1");
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
@@ -394,8 +394,8 @@ static VIDEO_UPDATE( hornet_2board )
 {
 	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
-		running_device *k037122 = devtag_get_device(screen->machine, "k037122_1");
-		running_device *voodoo = devtag_get_device(screen->machine, "voodoo0");
+		running_device *k037122 = screen->machine->device("k037122_1");
+		running_device *voodoo = screen->machine->device("voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -403,8 +403,8 @@ static VIDEO_UPDATE( hornet_2board )
 	}
 	else if (strcmp(screen->tag(), "rscreen") == 0)
 	{
-		running_device *k037122 = devtag_get_device(screen->machine, "k037122_2");
-		running_device *voodoo = devtag_get_device(screen->machine, "voodoo1");
+		running_device *k037122 = screen->machine->device("k037122_2");
+		running_device *voodoo = screen->machine->device("voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -422,8 +422,8 @@ static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
-	running_device *adc12138 = devtag_get_device(space->machine, "adc12138");
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *adc12138 = space->machine->device("adc12138");
+	running_device *eeprom = space->machine->device("eeprom");
 
 	switch (offset)
 	{
@@ -456,7 +456,7 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	running_device *adc12138 = devtag_get_device(space->machine, "adc12138");
+	running_device *adc12138 = space->machine->device("adc12138");
 
 	switch (offset)
 	{
@@ -836,10 +836,10 @@ static MACHINE_START( hornet )
 	jvs_sdata = auto_alloc_array_clear(machine, UINT8, 1024);
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(devtag_get_device(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x003fffff, FALSE, workram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x003fffff, FALSE, workram);
 
 	state_save_register_global(machine, led_reg0);
 	state_save_register_global(machine, led_reg1);
@@ -1083,19 +1083,19 @@ static int jvs_encode_data(running_machine *machine, UINT8 *in, int length)
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
-			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xd0);
-			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xdf);
+			ppc4xx_spu_receive_byte(machine->device("maincpu"), 0xd0);
+			ppc4xx_spu_receive_byte(machine->device("maincpu"), 0xdf);
 		}
 		else if (b == 0xd0)
 		{
 			sum += 0xd0 + 0xcf;
-			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xd0);
-			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xcf);
+			ppc4xx_spu_receive_byte(machine->device("maincpu"), 0xd0);
+			ppc4xx_spu_receive_byte(machine->device("maincpu"), 0xcf);
 		}
 		else
 		{
 			sum += b;
-			ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), b);
+			ppc4xx_spu_receive_byte(machine->device("maincpu"), b);
 		}
 	}
 	return sum;
@@ -1188,11 +1188,11 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 
 	// write jvs return data
 	sum = 0x00 + (rdata_ptr+1);
-	ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0xe0);			// sync
-	ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), 0x00);			// node
-	ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), rdata_ptr + 1);	// num of bytes
+	ppc4xx_spu_receive_byte(machine->device("maincpu"), 0xe0);			// sync
+	ppc4xx_spu_receive_byte(machine->device("maincpu"), 0x00);			// node
+	ppc4xx_spu_receive_byte(machine->device("maincpu"), rdata_ptr + 1);	// num of bytes
 	sum += jvs_encode_data(machine, rdata, rdata_ptr);
-	ppc4xx_spu_receive_byte(devtag_get_device(machine, "maincpu"), sum - 1);		// checksum
+	ppc4xx_spu_receive_byte(machine->device("maincpu"), sum - 1);		// checksum
 
 	jvs_sdata_ptr = 0;
 }
@@ -1207,7 +1207,7 @@ static DRIVER_INIT(hornet)
 
 	led_reg0 = led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(devtag_get_device(machine, "maincpu"), jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(machine->device("maincpu"), jamma_jvs_w);
 }
 
 static DRIVER_INIT(hornet_2board)
@@ -1218,7 +1218,7 @@ static DRIVER_INIT(hornet_2board)
 
 	led_reg0 = led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(devtag_get_device(machine, "maincpu"), jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(machine->device("maincpu"), jamma_jvs_w);
 }
 
 /*****************************************************************************/

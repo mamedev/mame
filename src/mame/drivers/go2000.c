@@ -316,7 +316,7 @@ static MACHINE_START( go2000 )
 
 	memory_set_bank(machine, "bank1", 0);
 
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->soundcpu = machine->device("soundcpu");
 }
 
 static MACHINE_DRIVER_START( go2000 )

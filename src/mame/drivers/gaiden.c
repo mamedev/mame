@@ -306,7 +306,7 @@ static MACHINE_RESET( raiga )
 static MACHINE_START( raiga )
 {
 	gaiden_state *state = (gaiden_state *)machine->driver_data;
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->prot);
 	state_save_register_global(machine, state->jumpcode);

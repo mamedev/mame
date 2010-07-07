@@ -20,7 +20,7 @@
 
 static VIDEO_START(kongambl)
 {
-	running_device *k056832 = devtag_get_device(machine, "k056832");
+	running_device *k056832 = machine->device("k056832");
 
 	k056832_set_layer_association(k056832, 0);
 	k056832_set_layer_offs(k056832, 0, -2, 0);
@@ -31,7 +31,7 @@ static VIDEO_START(kongambl)
 
 static VIDEO_UPDATE(kongambl)
 {
-	running_device *k056832 = devtag_get_device(screen->machine, "k056832");
+	running_device *k056832 = screen->machine->device("k056832");
 
 	bitmap_fill(bitmap, cliprect, 0);
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);

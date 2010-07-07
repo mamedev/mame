@@ -377,8 +377,8 @@ static MACHINE_START( buggychl )
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->audiocpu = machine->device("audiocpu");
+	state->mcu = machine->device("mcu");
 
 	state_save_register_global(machine, state->sound_nmi_enable);
 	state_save_register_global(machine, state->pending_nmi);

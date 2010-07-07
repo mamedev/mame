@@ -480,7 +480,7 @@ static MACHINE_START( yunsung8 )
 	memory_configure_bank(machine, "bank2", 0, 3, &AUDIO[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank2", 3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global_pointer(machine, state->videoram, 0x4000);
 	state_save_register_global(machine, state->layers_ctrl);

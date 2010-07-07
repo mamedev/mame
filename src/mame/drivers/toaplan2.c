@@ -319,7 +319,7 @@ static MACHINE_RESET( toaplan2 )
       This is important for games with common RAM; the RAM test will fail
       when leaving service mode if the sound CPU is not reset.
     */
-	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), toaplan2_reset);
+	m68k_set_reset_callback(machine->device("maincpu"), toaplan2_reset);
 }
 
 static MACHINE_RESET( ghox )
@@ -366,24 +366,24 @@ static void register_state_save(running_machine *machine)
 static DRIVER_INIT( T2_Z80 )		/* init_t2_Z80(); */
 {
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = devtag_get_device(machine, "audiocpu");
+	sub_cpu = machine->device("audiocpu");
 	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_Z180 )
 {
 	toaplan2_sub_cpu = CPU_2_HD647180;
-	sub_cpu = devtag_get_device(machine, "mcu");
+	sub_cpu = machine->device("mcu");
 	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_V25 )
 {
 	toaplan2_sub_cpu = CPU_2_V25;
-	if (devtag_get_device(machine, "mcu") != NULL)
-		sub_cpu = devtag_get_device(machine, "mcu");
-	else if (devtag_get_device(machine, "audiocpu") != NULL)
-		sub_cpu = devtag_get_device(machine, "audiocpu");
+	if (machine->device("mcu") != NULL)
+		sub_cpu = machine->device("mcu");
+	else if (machine->device("audiocpu") != NULL)
+		sub_cpu = machine->device("audiocpu");
 	register_state_save(machine);
 }
 
@@ -395,7 +395,7 @@ static DRIVER_INIT( T2_noZ80 )
 
 static DRIVER_INIT( fixeight )
 {
-	sub_cpu = devtag_get_device(machine, "audiocpu");
+	sub_cpu = machine->device("audiocpu");
 
 	if (fixeight_sec_cpu_mem)
 	{
@@ -494,7 +494,7 @@ static DRIVER_INIT( pipibibi )
 	}
 
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = devtag_get_device(machine, "audiocpu");
+	sub_cpu = machine->device("audiocpu");
 	register_state_save(machine);
 }
 
@@ -502,7 +502,7 @@ static DRIVER_INIT( batrider )
 {
 	raizing_sndirq_line = 4;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = devtag_get_device(machine, "audiocpu");
+	sub_cpu = machine->device("audiocpu");
 	register_state_save(machine);
 }
 
@@ -511,7 +511,7 @@ static DRIVER_INIT( bbakraid )
 	bbakraid_unlimited_ver = 0;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = devtag_get_device(machine, "audiocpu");
+	sub_cpu = machine->device("audiocpu");
 	register_state_save(machine);
 }
 
@@ -520,7 +520,7 @@ static DRIVER_INIT( bbakradu )
 	bbakraid_unlimited_ver = 1;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	sub_cpu = devtag_get_device(machine, "audiocpu");
+	sub_cpu = machine->device("audiocpu");
 	register_state_save(machine);
 }
 
@@ -876,7 +876,7 @@ static WRITE16_HANDLER( dogyuun_snd_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_data = data;
-		dogyuun_okisnd_w(devtag_get_device(space->machine, "oki"), data);
+		dogyuun_okisnd_w(space->machine->device("oki"), data);
 	}
 	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
@@ -914,7 +914,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 		if (mcu_data & 0xff00)
 		{
 			mcu_data = (mcu_data & 0xff00) | (data & 0xff);
-			fixeight_okisnd_w(devtag_get_device(space->machine, "oki"), data);
+			fixeight_okisnd_w(space->machine->device("oki"), data);
 		}
 		else if (mcu_data == 0xff00)
 		{
@@ -957,7 +957,7 @@ static WRITE16_HANDLER( batsugun_snd_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_data = data;
-		batsugun_okisnd_w(devtag_get_device(space->machine, "oki"), data);
+		batsugun_okisnd_w(space->machine->device("oki"), data);
 	}
 	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",cpu_get_previouspc(space->cpu),mcu_data,(offset*2));
 }
@@ -990,7 +990,7 @@ static WRITE16_HANDLER( kbash_snd_cpu_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kbash_okisnd_w(devtag_get_device(space->machine, "oki"), data);
+		kbash_okisnd_w(space->machine->device("oki"), data);
 	}
 	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",cpu_get_previouspc(space->cpu),data);
 }

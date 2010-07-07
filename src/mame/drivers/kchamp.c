@@ -393,7 +393,7 @@ static MACHINE_START( kchamp )
 {
 	kchamp_state *state = (kchamp_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->nmi_enable);
 	state_save_register_global(machine, state->sound_nmi_enable);

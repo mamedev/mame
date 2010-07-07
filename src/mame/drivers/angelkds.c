@@ -579,7 +579,7 @@ static MACHINE_START( angelkds )
 {
 	angelkds_state *state = (angelkds_state *)machine->driver_data;
 
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global(machine, state->layer_ctrl);
 	state_save_register_global(machine, state->txbank);

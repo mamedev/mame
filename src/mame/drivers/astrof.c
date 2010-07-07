@@ -500,8 +500,8 @@ static MACHINE_START( astrof )
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(machine, 0xff);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->samples = devtag_get_device(machine, "samples");
+	state->maincpu = machine->device("maincpu");
+	state->samples = machine->device("samples");
 
 	/* register for state saving */
 	state_save_register_global(machine, state->red_on);
@@ -534,7 +534,7 @@ static MACHINE_START( spfghmk2 )
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(machine, 0xff);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 
 	/* the red background circuit is disabled */
 	state->red_on = FALSE;
@@ -553,8 +553,8 @@ static MACHINE_START( tomahawk )
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(machine, 0xff);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->sn = devtag_get_device(machine, "snsnd");
+	state->maincpu = machine->device("maincpu");
+	state->sn = machine->device("snsnd");
 
 	/* register for state saving */
 	state_save_register_global(machine, state->red_on);

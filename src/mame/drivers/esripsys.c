@@ -130,7 +130,7 @@ static READ8_HANDLER( uart_r )
 
 static READ8_HANDLER( g_status_r )
 {
-	int bank4 = BIT(get_rip_status(devtag_get_device(space->machine, "video_cpu")), 2);
+	int bank4 = BIT(get_rip_status(space->machine->device("video_cpu")), 2);
 	int vblank = space->machine->primary_screen->vblank();
 
 	return (!vblank << 7) | (bank4 << 6) | (f_status & 0x2f);
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( g_status_w )
 static READ8_HANDLER( f_status_r )
 {
 	int vblank = space->machine->primary_screen->vblank();
-	UINT8 rip_status = get_rip_status(devtag_get_device(space->machine, "video_cpu"));
+	UINT8 rip_status = get_rip_status(space->machine->device("video_cpu"));
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
 
@@ -554,7 +554,7 @@ static READ8_HANDLER( tms5220_r )
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		running_device *tms = devtag_get_device(space->machine, "tms5220nl");
+		running_device *tms = space->machine->device("tms5220nl");
 		UINT8 status = tms5220_status_r(tms, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
@@ -567,7 +567,7 @@ static READ8_HANDLER( tms5220_r )
 /* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
-	running_device *tms = devtag_get_device(space->machine, "tms5220nl");
+	running_device *tms = space->machine->device("tms5220nl");
 	if (offset == 0)
 	{
 		tms_data = data;

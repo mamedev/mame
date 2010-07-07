@@ -3379,15 +3379,15 @@ static MACHINE_START( common )
 {
 	taitof2_state *state = (taitof2_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");;
-	state->tc0100scn = devtag_get_device(machine, "tc0100scn");;
-	state->tc0100scn_1 = devtag_get_device(machine, "tc0100scn_1");;
-	state->tc0100scn_2 = devtag_get_device(machine, "tc0100scn_2");;
-	state->tc0360pri = devtag_get_device(machine, "tc0360pri");;
-	state->tc0280grd = devtag_get_device(machine, "tc0280grd");;
-	state->tc0430grw = devtag_get_device(machine, "tc0430grw");;
-	state->tc0480scp = devtag_get_device(machine, "tc0480scp");;
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");;
+	state->tc0100scn = machine->device("tc0100scn");;
+	state->tc0100scn_1 = machine->device("tc0100scn_1");;
+	state->tc0100scn_2 = machine->device("tc0100scn_2");;
+	state->tc0360pri = machine->device("tc0360pri");;
+	state->tc0280grd = machine->device("tc0280grd");;
+	state->tc0430grw = machine->device("tc0430grw");;
+	state->tc0480scp = machine->device("tc0480scp");;
 }
 
 static MACHINE_START( f2 )

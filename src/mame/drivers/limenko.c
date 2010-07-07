@@ -199,7 +199,7 @@ static READ8_HANDLER( spotty_sound_r )
 	if(spotty_sound_cmd == 0xf7)
 		return soundlatch_r(space,0);
 	else
-		return okim6295_r(devtag_get_device(space->machine, "oki"),0);
+		return okim6295_r(space->machine->device("oki"),0);
 }
 
 static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )

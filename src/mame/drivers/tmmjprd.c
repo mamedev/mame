@@ -265,8 +265,8 @@ static void ttmjprd_draw_tilemap(running_machine *machine, bitmap_t *bitmap, con
 static VIDEO_UPDATE( tmmjprd )
 {
 	UINT8* gfxroms = memory_region(screen->machine,"gfx2");
-	running_device *left_screen  = devtag_get_device(screen->machine, "lscreen");
-	running_device *right_screen = devtag_get_device(screen->machine, "rscreen");
+	running_device *left_screen  = screen->machine->device("lscreen");
+	running_device *right_screen = screen->machine->device("rscreen");
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 

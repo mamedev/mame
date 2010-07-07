@@ -652,7 +652,7 @@ int snk6502_music0_playing(void)
 
 WRITE8_HANDLER( sasuke_sound_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	switch (offset)
 	{
 	case 0:
@@ -718,7 +718,7 @@ WRITE8_HANDLER( sasuke_sound_w )
 
 WRITE8_HANDLER( satansat_sound_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	switch (offset)
 	{
 	case 0:
@@ -781,7 +781,7 @@ WRITE8_HANDLER( satansat_sound_w )
 
 WRITE8_HANDLER( vanguard_sound_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	switch (offset)
 	{
 	case 0:
@@ -827,7 +827,7 @@ WRITE8_HANDLER( vanguard_sound_w )
 		}
 
 		/* SHOT B */
-		sn76477_enable_w(devtag_get_device(space->machine, "sn76477.2"), (data & 0x40) ? 0 : 1);
+		sn76477_enable_w(space->machine->device("sn76477.2"), (data & 0x40) ? 0 : 1);
 
 		LastPort1 = data;
 		break;
@@ -917,7 +917,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 		}
 
 		/* BOMB */
-		discrete_sound_w(devtag_get_device(space->machine, "discrete"), FANTASY_BOMB_EN, data & 0x80);
+		discrete_sound_w(space->machine->device("discrete"), FANTASY_BOMB_EN, data & 0x80);
 
 		LastPort1 = data;
 		break;
@@ -1034,7 +1034,7 @@ static void snk6502_speech_w(running_machine *machine, UINT8 data, const UINT16 
 
 	if ((data & HD38880_CTP) && (data & HD38880_CMV))
 	{
-		running_device *samples = devtag_get_device(machine, "samples");
+		running_device *samples = machine->device("samples");
 		data &= HD68880_SYBS;
 
 		switch (hd38880_cmd)
@@ -1053,7 +1053,7 @@ static void snk6502_speech_w(running_machine *machine, UINT8 data, const UINT16 
 					{
 						if (table[i] && table[i] == hd38880_addr)
 						{
-							running_device *samples = devtag_get_device(machine, "samples");
+							running_device *samples = machine->device("samples");
 							sample_start(samples, 0, start + i, 0);
 							break;
 						}

@@ -800,10 +800,10 @@ static MACHINE_START( common )
 {
 	jangou_state *state = (jangou_state *)machine->driver_data;
 
-	state->cpu_0 = devtag_get_device(machine, "cpu0");
-	state->cpu_1 = devtag_get_device(machine, "cpu1");
-	state->cvsd = devtag_get_device(machine, "cvsd");
-	state->nsc = devtag_get_device(machine, "nsc");
+	state->cpu_0 = machine->device("cpu0");
+	state->cpu_1 = machine->device("cpu1");
+	state->cvsd = machine->device("cvsd");
+	state->nsc = machine->device("nsc");
 
 	state_save_register_global_array(machine, state->pen_data);
 	state_save_register_global_array(machine, state->blit_data);

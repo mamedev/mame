@@ -829,7 +829,7 @@ static MACHINE_START( fantland )
 {
 	fantland_state *state = (fantland_state *)machine->driver_data;
 
-	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+	state->audio_cpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->nmi_enable);
 }
@@ -978,10 +978,10 @@ static MACHINE_START( borntofi )
 
 	MACHINE_START_CALL(fantland);
 
-	state->msm1 = devtag_get_device(machine, "msm1");
-	state->msm2 = devtag_get_device(machine, "msm2");
-	state->msm3 = devtag_get_device(machine, "msm3");
-	state->msm4 = devtag_get_device(machine, "msm4");
+	state->msm1 = machine->device("msm1");
+	state->msm2 = machine->device("msm2");
+	state->msm3 = machine->device("msm3");
+	state->msm4 = machine->device("msm4");
 
 	state_save_register_global_array(machine, state->old_x);
 	state_save_register_global_array(machine, state->old_y);
@@ -1016,10 +1016,10 @@ static MACHINE_RESET( borntofi )
 		state->adpcm_nibble[i] = 0;
 	}
 
-	borntofi_adpcm_stop(devtag_get_device(machine, "msm1"), 0);
-	borntofi_adpcm_stop(devtag_get_device(machine, "msm2"), 1);
-	borntofi_adpcm_stop(devtag_get_device(machine, "msm3"), 2);
-	borntofi_adpcm_stop(devtag_get_device(machine, "msm4"), 3);
+	borntofi_adpcm_stop(machine->device("msm1"), 0);
+	borntofi_adpcm_stop(machine->device("msm2"), 1);
+	borntofi_adpcm_stop(machine->device("msm3"), 2);
+	borntofi_adpcm_stop(machine->device("msm4"), 3);
 }
 
 static MACHINE_DRIVER_START( borntofi )

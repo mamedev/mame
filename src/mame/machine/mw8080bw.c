@@ -100,16 +100,16 @@ MACHINE_START( mw8080bw )
 
 	mw8080bw_create_interrupt_timer(machine);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->samples = devtag_get_device(machine, "samples");
-	state->samples1 = devtag_get_device(machine, "samples1");
-	state->samples2 = devtag_get_device(machine, "samples2");
-	state->sn = devtag_get_device(machine, "snsnd");
-	state->sn1 = devtag_get_device(machine, "sn1");
-	state->sn2 = devtag_get_device(machine, "sn2");
-	state->discrete = devtag_get_device(machine, "discrete");
-	state->speaker = devtag_get_device(machine, "speaker");
-	state->mb14241 = devtag_get_device(machine, "mb14241");
+	state->maincpu = machine->device("maincpu");
+	state->samples = machine->device("samples");
+	state->samples1 = machine->device("samples1");
+	state->samples2 = machine->device("samples2");
+	state->sn = machine->device("snsnd");
+	state->sn1 = machine->device("sn1");
+	state->sn2 = machine->device("sn2");
+	state->discrete = machine->device("discrete");
+	state->speaker = machine->device("speaker");
+	state->mb14241 = machine->device("mb14241");
 }
 
 

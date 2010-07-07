@@ -319,7 +319,7 @@ static const es5503_interface es5503_intf =
 static MACHINE_RESET(mquake)
 {
 	/* set ES5503 wave memory (this is banked in 64k increments) */
-	es5503_set_base(devtag_get_device(machine, "ensoniq"), memory_region(machine, "ensoniq"));
+	es5503_set_base(machine->device("ensoniq"), memory_region(machine, "ensoniq"));
 
 	MACHINE_RESET_CALL(amiga);
 }

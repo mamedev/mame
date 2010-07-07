@@ -787,9 +787,9 @@ static MACHINE_START( cntsteer )
 {
 	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->subcpu = devtag_get_device(machine, "subcpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->subcpu = machine->device("subcpu");
 
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->bg_bank);

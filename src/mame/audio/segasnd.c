@@ -645,7 +645,7 @@ static DEVICE_START( usb_sound )
 	int tchan, tgroup;
 
 	/* find the CPU we are associated with */
-	usb.cpu = devtag_get_device(machine, "usbcpu");
+	usb.cpu = machine->device("usbcpu");
 	assert(usb.cpu != NULL);
 
 	/* allocate work RAM */

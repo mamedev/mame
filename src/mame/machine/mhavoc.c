@@ -102,7 +102,7 @@ MACHINE_START( mhavoc )
 MACHINE_RESET( mhavoc )
 {
 	const address_space *space = cputag_get_address_space(machine, "alpha", ADDRESS_SPACE_PROGRAM);
-	has_gamma_cpu = (devtag_get_device(machine, "gamma") != NULL);
+	has_gamma_cpu = (machine->device("gamma") != NULL);
 
 	memory_configure_bank(machine, "bank1", 0, 1, mhavoc_zram0, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, mhavoc_zram1, 0);
@@ -223,7 +223,7 @@ WRITE8_HANDLER( mhavoc_rom_banksel_w )
 
 CUSTOM_INPUT( tms5220_r )
 {
-	return tms5220_readyq_r(devtag_get_device(field->port->machine, "tms")) ? 1 : 0;
+	return tms5220_readyq_r(field->port->machine->device("tms")) ? 1 : 0;
 }
 
 CUSTOM_INPUT( mhavoc_bit67_r )
@@ -328,7 +328,7 @@ static WRITE8_HANDLER( mhavocrv_speech_data_w )
 
 static WRITE8_HANDLER( mhavocrv_speech_strobe_w )
 {
-	running_device *tms = devtag_get_device(space->machine, "tms");
+	running_device *tms = space->machine->device("tms");
 	tms5220_data_w(tms, 0, speech_write_buffer);
 }
 

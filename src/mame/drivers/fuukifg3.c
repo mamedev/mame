@@ -515,8 +515,8 @@ static MACHINE_START( fuuki32 )
 
 	memory_configure_bank(machine, "bank1", 0, 0x3e, &ROM[0x10000], 0x8000);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "soundcpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("soundcpu");
 
 	state->raster_interrupt_timer = timer_alloc(machine, raster_interrupt_callback, NULL);
 

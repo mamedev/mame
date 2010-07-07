@@ -107,7 +107,7 @@ static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 	tankbatt_sound_enable = !data;
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
-	if (data) sample_stop (devtag_get_device(space->machine, "samples"), 2);
+	if (data) sample_stop (space->machine->device("samples"), 2);
 //  interrupt_enable_w (offset, !data);
 }
 
@@ -121,14 +121,14 @@ static WRITE8_HANDLER( tankbatt_sh_expl_w )
 {
 	if (tankbatt_sound_enable)
 	{
-		running_device *samples = devtag_get_device(space->machine, "samples");
+		running_device *samples = space->machine->device("samples");
 		sample_start (samples, 1, 3, 0);
 	}
 }
 
 static WRITE8_HANDLER( tankbatt_sh_engine_w )
 {
-	running_device *samples = devtag_get_device(space->machine, "samples");
+	running_device *samples = space->machine->device("samples");
 	if (tankbatt_sound_enable)
 	{
 		if (data)
@@ -143,7 +143,7 @@ static WRITE8_HANDLER( tankbatt_sh_fire_w )
 {
 	if (tankbatt_sound_enable)
 	{
-		running_device *samples = devtag_get_device(space->machine, "samples");
+		running_device *samples = space->machine->device("samples");
 		sample_start (samples, 0, 0, 0);
 	}
 }

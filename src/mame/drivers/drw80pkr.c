@@ -179,11 +179,11 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 
 		// ay8910 control port
 		if (p1 == 0xfc)
-			ay8910_address_w(devtag_get_device(space->machine, "aysnd"), 0, data);
+			ay8910_address_w(space->machine->device("aysnd"), 0, data);
 
 		// ay8910_write_port_0_w
 		if (p1 == 0xfe)
-			ay8910_data_w(devtag_get_device(space->machine, "aysnd"), 0, data);
+			ay8910_data_w(space->machine->device("aysnd"), 0, data);
 	}
 }
 

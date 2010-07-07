@@ -287,7 +287,7 @@ static MACHINE_START( ladyfrog )
 {
 	ladyfrog_state *state = (ladyfrog_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->tilebank);
 	state_save_register_global(machine, state->palette_bank);

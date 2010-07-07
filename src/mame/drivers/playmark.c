@@ -909,8 +909,8 @@ static MACHINE_START( playmark )
 {
 	playmark_state *state = (playmark_state *)machine->driver_data;
 
-	state->oki = devtag_get_device(machine, "oki");
-	state->eeprom = devtag_get_device(machine, "eeprom");
+	state->oki = machine->device("oki");
+	state->eeprom = machine->device("eeprom");
 
 	state_save_register_global(machine, state->bgscrollx);
 	state_save_register_global(machine, state->bgscrolly);
@@ -1518,7 +1518,7 @@ static DRIVER_INIT( bigtwin )
 			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(devtag_get_device(machine, "audiocpu"), data);
+			pic16c5x_set_config(machine->device("audiocpu"), data);
 
 			src_pos = 0x7fff;		/* Force Exit */
 		}

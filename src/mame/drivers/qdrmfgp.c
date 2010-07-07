@@ -87,7 +87,7 @@ static WRITE16_HANDLER( gp_control_w )
 		int vol = space->machine->generic.nvram.u16[0x10] & 0xff;
 		if (vol)
 		{
-			running_device *k054539 = devtag_get_device(space->machine, "konami");
+			running_device *k054539 = space->machine->device("konami");
 			int i;
 			double gain = vol / 90.0;
 
@@ -117,7 +117,7 @@ static WRITE16_HANDLER( gp2_control_w )
 		int vol = space->machine->generic.nvram.u16[0x8] & 0xff;
 		if (vol)
 		{
-			running_device *k054539 = devtag_get_device(space->machine, "konami");
+			running_device *k054539 = space->machine->device("konami");
 			int i;
 			double gain = vol / 90.0;
 
@@ -130,7 +130,7 @@ static WRITE16_HANDLER( gp2_control_w )
 
 static READ16_HANDLER( v_rom_r )
 {
-	running_device *k056832 = devtag_get_device(space->machine, "k056832");
+	running_device *k056832 = space->machine->device("k056832");
 	UINT8 *mem8 = memory_region(space->machine, "gfx1");
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
@@ -145,7 +145,7 @@ static READ16_HANDLER( v_rom_r )
 
 static READ16_HANDLER( gp2_vram_r )
 {
-	running_device *k056832 = devtag_get_device(space->machine, "k056832");
+	running_device *k056832 = space->machine->device("k056832");
 
 	if (offset < 0x1000 / 2)
 		return k056832_ram_word_r(k056832, offset * 2 + 1, mem_mask);
@@ -155,7 +155,7 @@ static READ16_HANDLER( gp2_vram_r )
 
 static READ16_HANDLER( gp2_vram_mirror_r )
 {
-	running_device *k056832 = devtag_get_device(space->machine, "k056832");
+	running_device *k056832 = space->machine->device("k056832");
 
 	if (offset < 0x1000 / 2)
 		return k056832_ram_word_r(k056832, offset * 2, mem_mask);
@@ -165,7 +165,7 @@ static READ16_HANDLER( gp2_vram_mirror_r )
 
 static WRITE16_HANDLER( gp2_vram_w )
 {
-	running_device *k056832 = devtag_get_device(space->machine, "k056832");
+	running_device *k056832 = space->machine->device("k056832");
 
 	if (offset < 0x1000 / 2)
 		k056832_ram_word_w(k056832, offset * 2 + 1, data, mem_mask);
@@ -175,7 +175,7 @@ static WRITE16_HANDLER( gp2_vram_w )
 
 static WRITE16_HANDLER( gp2_vram_mirror_w )
 {
-	running_device *k056832 = devtag_get_device(space->machine, "k056832");
+	running_device *k056832 = space->machine->device("k056832");
 
 	if (offset < 0x1000 / 2)
 		k056832_ram_word_w(k056832, offset * 2, data, mem_mask);
@@ -242,7 +242,7 @@ static WRITE16_DEVICE_HANDLER( ide_alt_w )
 
 static READ16_HANDLER( gp2_ide_std_r )
 {
-	running_device *device = devtag_get_device(space->machine, "ide");
+	running_device *device = space->machine->device("ide");
 	if (offset & 0x01)
 	{
 		if (offset == 0x07)

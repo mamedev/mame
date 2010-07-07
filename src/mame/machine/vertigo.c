@@ -220,7 +220,7 @@ MACHINE_RESET( vertigo )
 {
 	int i;
 
-	ttl74148 = devtag_get_device(machine, "74148");
+	ttl74148 = machine->device("74148");
 	ttl74148_enable_input_w(ttl74148, 0);
 
 	for (i = 0; i < 8; i++)

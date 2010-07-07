@@ -201,7 +201,7 @@ static MACHINE_START( ccastles )
 	rectangle visarea;
 
 	/* initialize globals */
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device("maincpu");
 	state->syncprom = memory_region(machine, "proms") + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */

@@ -252,7 +252,7 @@ static MACHINE_START( kncljoe )
 {
 	kncljoe_state *state = (kncljoe_state *)machine->driver_data;
 
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->soundcpu = machine->device("soundcpu");
 
 	state_save_register_global(machine, state->port1);
 	state_save_register_global(machine, state->port2);

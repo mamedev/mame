@@ -441,7 +441,7 @@ static MACHINE_START(changela)
 {
 	changela_state *state = (changela_state *)machine->driver_data;
 
-	state->mcu = devtag_get_device(machine, "mcu");
+	state->mcu = machine->device("mcu");
 
 	/* video */
 	state_save_register_global(machine, state->slopeROM_bank);

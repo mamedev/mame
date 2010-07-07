@@ -288,7 +288,7 @@ static WRITE8_HANDLER( xain_68705_w )
 	from_main = data;
 	_mcu_accept = 0;
 
-	if (devtag_get_device(space->machine, "mcu") != NULL)
+	if (space->machine->device("mcu") != NULL)
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 }
 
@@ -378,7 +378,7 @@ static CUSTOM_INPUT( mcu_status_r )
 {
 	UINT8 res = 0;
 
-	if (devtag_get_device(field->port->machine, "mcu") != NULL)
+	if (field->port->machine->device("mcu") != NULL)
 	{
 		if (_mcu_ready == 1)
 			res |= 0x01;
@@ -398,7 +398,7 @@ READ8_HANDLER( mcu_comm_reset_r )
 	_mcu_ready = 1;
 	_mcu_accept = 1;
 
-	if (devtag_get_device(space->machine, "mcu") != NULL)
+	if (space->machine->device("mcu") != NULL)
 		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 
 	return 0xff;

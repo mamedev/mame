@@ -196,10 +196,10 @@ static MACHINE_START( m10 )
 {
 	m10_state *state = (m10_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->ic8j1 = devtag_get_device(machine, "ic8j1");
-	state->ic8j2 = devtag_get_device(machine, "ic8j2");
-	state->samples = devtag_get_device(machine, "samples");
+	state->maincpu = machine->device("maincpu");
+	state->ic8j1 = machine->device("ic8j1");
+	state->ic8j2 = machine->device("ic8j2");
+	state->samples = machine->device("samples");
 
 	state_save_register_global(machine, state->bottomline);
 	state_save_register_global(machine, state->flip);

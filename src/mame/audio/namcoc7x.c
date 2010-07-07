@@ -88,7 +88,7 @@ void namcoc7x_on_driver_init(running_machine *machine)
 	memset(pROM, 0, 4);
 
 	// install speedup cheat
-	for (cpu = devtag_get_device(machine, "maincpu"); cpu != NULL; cpu = cpu->typenext())
+	for (cpu = machine->device("maincpu"); cpu != NULL; cpu = cpu->typenext())
 		if (cpu->type() == M37702)
 			memory_install_readwrite16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, speedup_r, speedup_w);
 }

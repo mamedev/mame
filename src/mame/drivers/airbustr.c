@@ -587,10 +587,10 @@ static MACHINE_START( airbustr )
 	memory_configure_bank(machine, "bank3", 0, 3, &AUDIO[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank3", 3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->master = devtag_get_device(machine, "master");
-	state->slave = devtag_get_device(machine, "slave");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->pandora = devtag_get_device(machine, "pandora");
+	state->master = machine->device("master");
+	state->slave = machine->device("slave");
+	state->audiocpu = machine->device("audiocpu");
+	state->pandora = machine->device("pandora");
 
 	state_save_register_global(machine, state->soundlatch_status);
 	state_save_register_global(machine, state->soundlatch2_status);

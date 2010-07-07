@@ -377,7 +377,7 @@ static WRITE32_HANDLER( aga_overlay_w )
 static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 {
 	/* bit 1 = cd audio mute */
-	sound_set_output_gain(devtag_get_device(device->machine, "cdda"), 0, ( data & 1 ) ? 0.0 : 1.0 );
+	sound_set_output_gain(device->machine->device("cdda"), 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(device->machine, 0, (data & 2) ? 0 : 1);
@@ -1190,11 +1190,11 @@ static DRIVER_INIT( cd32 )
 
 static void cndypuzl_input_hack(running_machine *machine)
 {
-	if(cpu_get_pc(devtag_get_device(machine,"maincpu")) < amiga_chip_ram_size)
+	if(cpu_get_pc(machine->device("maincpu")) < amiga_chip_ram_size)
 	{
 //      amiga_chip_ram_w(0x051c02, 0x0000);
 
-		UINT32 r_A5 = cpu_get_reg(devtag_get_device(machine,"maincpu"), M68K_A5);
+		UINT32 r_A5 = cpu_get_reg(machine->device("maincpu"), M68K_A5);
 		amiga_chip_ram_w(r_A5 - 0x7ebe, 0x0000);
 	}
 }
@@ -1207,11 +1207,11 @@ static DRIVER_INIT(cndypuzl)
 
 static void haremchl_input_hack(running_machine *machine)
 {
-	if(cpu_get_pc(devtag_get_device(machine,"maincpu")) < amiga_chip_ram_size)
+	if(cpu_get_pc(machine->device("maincpu")) < amiga_chip_ram_size)
 	{
 //      amiga_chip_ram_w8(0x002907, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(devtag_get_device(machine,"maincpu"), M68K_A5);
+		UINT32 r_A5 = cpu_get_reg(machine->device("maincpu"), M68K_A5);
 		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7f00 + 2));
 		amiga_chip_ram_w8(r_A2 + 0x1f, 0x00);
 	}
@@ -1225,11 +1225,11 @@ static DRIVER_INIT(haremchl)
 
 static void lsrquiz_input_hack(running_machine *machine)
 {
-	if(cpu_get_pc(devtag_get_device(machine,"maincpu")) < amiga_chip_ram_size)
+	if(cpu_get_pc(machine->device("maincpu")) < amiga_chip_ram_size)
 	{
 //      amiga_chip_ram_w8(0x001e1b, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(devtag_get_device(machine,"maincpu"), M68K_A5);
+		UINT32 r_A5 = cpu_get_reg(machine->device("maincpu"), M68K_A5);
 		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fe0 + 2));
 		amiga_chip_ram_w8(r_A2 + 0x13, 0x00);
 	}
@@ -1244,11 +1244,11 @@ static DRIVER_INIT(lsrquiz)
 /* The hack isn't working if you exit the test mode with P1 button 2 ! */
 static void lsrquiz2_input_hack(running_machine *machine)
 {
-	if(cpu_get_pc(devtag_get_device(machine,"maincpu")) < amiga_chip_ram_size)
+	if(cpu_get_pc(machine->device("maincpu")) < amiga_chip_ram_size)
 	{
 //      amiga_chip_ram_w8(0x046107, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(devtag_get_device(machine,"maincpu"), M68K_A5);
+		UINT32 r_A5 = cpu_get_reg(machine->device("maincpu"), M68K_A5);
 		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fdc + 2));
 		amiga_chip_ram_w8(r_A2 + 0x17, 0x00);
 	}
@@ -1262,11 +1262,11 @@ static DRIVER_INIT(lsrquiz2)
 
 static void lasstixx_input_hack(running_machine *machine)
 {
-	if(cpu_get_pc(devtag_get_device(machine,"maincpu")) < amiga_chip_ram_size)
+	if(cpu_get_pc(machine->device("maincpu")) < amiga_chip_ram_size)
 	{
 //      amiga_chip_ram_w8(0x00281c, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(devtag_get_device(machine,"maincpu"), M68K_A5);
+		UINT32 r_A5 = cpu_get_reg(machine->device("maincpu"), M68K_A5);
 		UINT32 r_A2 = (amiga_chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (amiga_chip_ram_r(r_A5 - 0x7fa2 + 2));
 		amiga_chip_ram_w8(r_A2 + 0x24, 0x00);
 	}
@@ -1280,11 +1280,11 @@ static DRIVER_INIT(lasstixx)
 
 static void mgnumber_input_hack(running_machine *machine)
 {
-	if(cpu_get_pc(devtag_get_device(machine,"maincpu")) < amiga_chip_ram_size)
+	if(cpu_get_pc(machine->device("maincpu")) < amiga_chip_ram_size)
 	{
 //      amiga_chip_ram_w(0x04bfa0, 0x0000);
 
-		UINT32 r_A5 = cpu_get_reg(devtag_get_device(machine,"maincpu"), M68K_A5);
+		UINT32 r_A5 = cpu_get_reg(machine->device("maincpu"), M68K_A5);
 		amiga_chip_ram_w(r_A5 - 0x7ed8, 0x0000);
 	}
 }
@@ -1297,11 +1297,11 @@ static DRIVER_INIT(mgnumber)
 
 static void mgprem11_input_hack(running_machine *machine)
 {
-	if(cpu_get_pc(devtag_get_device(machine,"maincpu")) < amiga_chip_ram_size)
+	if(cpu_get_pc(machine->device("maincpu")) < amiga_chip_ram_size)
 	{
 //      amiga_chip_ram_w8(0x044f7e, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(devtag_get_device(machine,"maincpu"), M68K_A5);
+		UINT32 r_A5 = cpu_get_reg(machine->device("maincpu"), M68K_A5);
 		amiga_chip_ram_w8(r_A5 - 0x7eca, 0x00);
 	}
 }

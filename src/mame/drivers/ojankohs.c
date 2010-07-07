@@ -796,8 +796,8 @@ static MACHINE_START( common )
 {
 	ojankohs_state *state = (ojankohs_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->msm = devtag_get_device(machine, "msm");
+	state->maincpu = machine->device("maincpu");
+	state->msm = machine->device("msm");
 
 	state_save_register_global(machine, state->gfxreg);
 	state_save_register_global(machine, state->flipscreen);

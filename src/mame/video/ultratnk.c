@@ -96,7 +96,7 @@ VIDEO_EOF( ultratnk )
 {
 	int i;
 	UINT16 BG = colortable_entry_get_value(machine->colortable, 0);
-	running_device *discrete = devtag_get_device(machine, "discrete");
+	running_device *discrete = machine->device("discrete");
 	UINT8 *videoram = machine->generic.videoram.u8;
 
 	/* check for sprite-playfield collisions */

@@ -3853,8 +3853,8 @@ static WRITE16_DEVICE_HANDLER( okim6295_both_w )
 
 static DRIVER_INIT( jitsupro )
 {
-	running_device *oki1 = devtag_get_device(machine, "oki1");
-	running_device *oki2 = devtag_get_device(machine, "oki2");
+	running_device *oki1 = machine->device("oki1");
+	running_device *oki2 = machine->device("oki2");
 	UINT16 *RAM  = (UINT16 *) memory_region(machine, "maincpu");
 
 	astyanax_rom_decode(machine, "maincpu");		// Code

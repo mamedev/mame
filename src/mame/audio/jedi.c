@@ -147,7 +147,7 @@ static WRITE8_HANDLER( speech_strobe_w )
 
 	if ((new_speech_strobe_state != state->speech_strobe_state) && new_speech_strobe_state)
 	{
-		running_device *tms = devtag_get_device(space->machine, "tms");
+		running_device *tms = space->machine->device("tms");
 		tms5220_data_w(tms, 0, *state->speech_data);
 	}
 	state->speech_strobe_state = new_speech_strobe_state;
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( speech_strobe_w )
 
 static READ8_HANDLER( speech_ready_r )
 {
-	return (tms5220_readyq_r(devtag_get_device(space->machine, "tms"))) << 7;
+	return (tms5220_readyq_r(space->machine->device("tms"))) << 7;
 }
 
 

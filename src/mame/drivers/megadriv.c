@@ -698,7 +698,7 @@ static void megadrive_do_insta_68k_to_vram_dma(running_machine *machine, UINT32 
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(devtag_get_device(machine, "maincpu"), ATTOTIME_IN_NSEC(length * 1000 / 3500));
+	cpu_spinuntil_time(machine->device("maincpu"), ATTOTIME_IN_NSEC(length * 1000 / 3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -983,8 +983,8 @@ WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_BITS_0_7) sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, (data >>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_w(space->machine->device("snsnd"), 0, data & 0xff);
+			//if (ACCESSING_BITS_8_15) sn76496_w(space->machine->device("snsnd"), 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -2374,7 +2374,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, data);
+			sn76496_w(space->machine->device("snsnd"), 0, data);
 			break;
 
 		default:
@@ -2405,7 +2405,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 	else if (fulladdress == 0xc00011)
 	{
 		/* quite a few early games write here, most of the later ones don't */
-		sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, data);
+		sn76496_w(space->machine->device("snsnd"), 0, data);
 	}
 	else
 	{
@@ -5884,7 +5884,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 
 
-		if (devtag_get_device(timer.machine, "genesis_snd_z80") != NULL)
+		if (timer.machine->device("genesis_snd_z80") != NULL)
 		{
 			if (genesis_scanline_counter == megadrive_z80irq_scanline)
 			{
@@ -5972,7 +5972,7 @@ MACHINE_RESET( megadriv )
 		break;
 	}
 
-	if (devtag_get_device(machine, "genesis_snd_z80") != NULL)
+	if (machine->device("genesis_snd_z80") != NULL)
 	{
 		genz80.z80_is_reset = 1;
 		genz80.z80_has_bus = 1;
@@ -5998,8 +5998,8 @@ MACHINE_RESET( megadriv )
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
-		cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.9950f); /* Fatal Rewind is very fussy... */
-	//  cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.3800f); /* Fatal Rewind is very fussy... */
+		cpu_set_clockscale(machine->device("maincpu"), 0.9950f); /* Fatal Rewind is very fussy... */
+	//  cpu_set_clockscale(machine->device("maincpu"), 0.3800f); /* Fatal Rewind is very fussy... */
 
 		memset(megadrive_ram,0x00,0x10000);
 	}
@@ -6410,13 +6410,13 @@ static void megadriv_init_common(running_machine *machine)
 	}
 
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), genesis_int_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), genesis_int_callback);
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
-	m68k_set_tas_callback(devtag_get_device(machine, "maincpu"), megadriv_tas_callback);
+	m68k_set_tas_callback(machine->device("maincpu"), megadriv_tas_callback);
 
 	if ((ipt == INPUT_PORTS_NAME(megadri6)) || (ipt == INPUT_PORTS_NAME(ssf2ghw)) || (ipt == INPUT_PORTS_NAME(mk3ghw)))
 	{
@@ -6543,7 +6543,7 @@ static WRITE8_HANDLER( z80_unmapped_w )
 /* sets the megadrive z80 to it's normal ports / map */
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag)
 {
-	running_device *ym = devtag_get_device(machine, "ymsnd");
+	running_device *ym = machine->device("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
@@ -6634,8 +6634,8 @@ DRIVER_INIT( _32x )
 	_32x_240mode = 0;
 
 // checking if these help brutal, they don't.
-	sh2drc_set_options(devtag_get_device(machine, "32x_master_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
-	sh2drc_set_options(devtag_get_device(machine, "32x_slave_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(machine->device("32x_master_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(machine->device("32x_slave_sh2"), SH2DRC_COMPATIBLE_OPTIONS);
 
 	DRIVER_INIT_CALL(megadriv);
 }

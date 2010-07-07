@@ -58,21 +58,21 @@ VIDEO_START( vsdual )
 VIDEO_UPDATE( vsnes )
 {
 	/* render the ppu */
-	ppu2c0x_render( devtag_get_device(screen->machine, "ppu1"), bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render( screen->machine->device("ppu1"), bitmap, 0, 0, 0, 0 );
 	return 0;
 }
 
 
 VIDEO_UPDATE( vsdual )
 {
-	running_device *top_screen = devtag_get_device(screen->machine, "top");
-	running_device *bottom_screen = devtag_get_device(screen->machine, "bottom");
+	running_device *top_screen = screen->machine->device("top");
+	running_device *bottom_screen = screen->machine->device("bottom");
 
 	/* render the ppu's */
 	if (screen == top_screen)
-		ppu2c0x_render(devtag_get_device(screen->machine, "ppu1"), bitmap, 0, 0, 0, 0);
+		ppu2c0x_render(screen->machine->device("ppu1"), bitmap, 0, 0, 0, 0);
 	else if (screen == bottom_screen)
-		ppu2c0x_render(devtag_get_device(screen->machine, "ppu2"), bitmap, 0, 0, 0, 0);
+		ppu2c0x_render(screen->machine->device("ppu2"), bitmap, 0, 0, 0, 0);
 
 	return 0;
 }

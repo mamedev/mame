@@ -518,7 +518,7 @@ static MACHINE_START( imolagp )
 {
 	imolagp_state *state = (imolagp_state *)machine->driver_data;
 
-	state->slavecpu = devtag_get_device(machine, "slave");
+	state->slavecpu = machine->device("slave");
 
 	state_save_register_global(machine, state->control);
 	state_save_register_global(machine, state->scroll);

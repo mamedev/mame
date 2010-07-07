@@ -49,7 +49,7 @@ DASM code snippets:
 
 static VIDEO_UPDATE(viper)
 {
-	running_device *device = devtag_get_device(screen->machine, "voodoo");
+	running_device *device = screen->machine->device("voodoo");
 	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
@@ -462,7 +462,7 @@ static UINT32 voodoo3_pci_r(running_device *busdevice, running_device *device, i
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(device->machine->device("maincpu")));
 	}
 	return 0;
 }
@@ -530,7 +530,7 @@ static void voodoo3_pci_w(running_device *busdevice, running_device *device, int
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(device->machine->device("maincpu")));
 	}
 }
 
@@ -658,7 +658,7 @@ static DRIVER_INIT(viper)
 
 static DRIVER_INIT(vipercf)
 {
-	running_device *ide = devtag_get_device(machine, "ide");
+	running_device *ide = machine->device("ide");
 
 	DRIVER_INIT_CALL(viper);
 

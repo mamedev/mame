@@ -231,13 +231,13 @@ static DEVICE_START( namco_06xx )
 	assert(state->nmicpu != NULL);
 
 	/* resolve our devices */
-	state->device[0] = (config->chip0 != NULL) ? devtag_get_device(device->machine, config->chip0) : NULL;
+	state->device[0] = (config->chip0 != NULL) ? device->machine->device(config->chip0) : NULL;
 	assert(state->device[0] != NULL || config->chip0 == NULL);
-	state->device[1] = (config->chip1 != NULL) ? devtag_get_device(device->machine, config->chip1) : NULL;
+	state->device[1] = (config->chip1 != NULL) ? device->machine->device(config->chip1) : NULL;
 	assert(state->device[1] != NULL || config->chip1 == NULL);
-	state->device[2] = (config->chip2 != NULL) ? devtag_get_device(device->machine, config->chip2) : NULL;
+	state->device[2] = (config->chip2 != NULL) ? device->machine->device(config->chip2) : NULL;
 	assert(state->device[2] != NULL || config->chip2 == NULL);
-	state->device[3] = (config->chip3 != NULL) ? devtag_get_device(device->machine, config->chip3) : NULL;
+	state->device[3] = (config->chip3 != NULL) ? device->machine->device(config->chip3) : NULL;
 	assert(state->device[3] != NULL || config->chip3 == NULL);
 
 	/* loop over devices and set their read/write handlers */

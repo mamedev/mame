@@ -1121,7 +1121,7 @@ VIDEO_UPDATE( galsnew )
 
 VIDEO_UPDATE( sandscrp )
 {
-	running_device *pandora = devtag_get_device(screen->machine, "pandora");
+	running_device *pandora = screen->machine->device("pandora");
 	kaneko16_fill_bitmap(screen->machine,bitmap,cliprect);
 
 	// if the display is disabled, do nothing?

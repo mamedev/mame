@@ -2388,8 +2388,8 @@ VIDEO_UPDATE(konamigx)
 
 	if (konamigx_has_dual_screen)
 	{
-		running_device *left_screen  = devtag_get_device(screen->machine, "screen");
-		running_device *right_screen = devtag_get_device(screen->machine, "screen2");
+		running_device *left_screen  = screen->machine->device("screen");
+		running_device *right_screen = screen->machine->device("screen2");
 
 		/* the video gets demuxed by a board which plugs into the jamma connector */
 		if (screen==left_screen)
@@ -2599,8 +2599,8 @@ VIDEO_UPDATE(konamigx)
 
 	if (konamigx_has_dual_screen)
 	{
-		running_device *left_screen  = devtag_get_device(screen->machine, "screen");
-		running_device *right_screen = devtag_get_device(screen->machine, "screen2");
+		running_device *left_screen  = screen->machine->device("screen");
+		running_device *right_screen = screen->machine->device("screen2");
 
 		if (screen==left_screen)
 		{

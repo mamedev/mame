@@ -78,14 +78,14 @@ static WRITE8_HANDLER( mystston_ay8910_select_w )
 	if (((*state->ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), *state->ay8910_select >> 4, *state->ay8910_data);
+		ay8910_data_address_w(space->machine->device("ay1"), *state->ay8910_select >> 4, *state->ay8910_data);
 	}
 
 	/* bit 7 goes to 8910 #1 BDIR pin */
 	if (((*state->ay8910_select & 0x80) == 0x80) && ((data & 0x80) == 0x00))
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), *state->ay8910_select >> 6, *state->ay8910_data);
+		ay8910_data_address_w(space->machine->device("ay2"), *state->ay8910_select >> 6, *state->ay8910_data);
 	}
 
 	*state->ay8910_select = data;

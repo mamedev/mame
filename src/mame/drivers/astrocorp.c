@@ -237,10 +237,10 @@ static WRITE16_HANDLER( skilldrp_outputs_w )
 		coin_counter_w(space->machine, 0,	(data & 0x0001));	// key in  |
 		coin_counter_w(space->machine, 0,	(data & 0x0002));	// coin in |- manual shows 1 in- and 1 out- counter
 		coin_counter_w(space->machine, 1,	(data & 0x0004));	// key out |
-		ticket_dispenser_w(devtag_get_device(space->machine, "hopper"), 0, (data & 0x0008)<<4);	// hopper motor?
+		ticket_dispenser_w(space->machine->device("hopper"), 0, (data & 0x0008)<<4);	// hopper motor?
 		//                                  (data & 0x0010)     // hopper?
 		set_led_status(space->machine, 0,	(data & 0x0020));	// error lamp (coin/hopper jam: "call attendant")
-		ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, data & 0x0080);	// ticket motor?
+		ticket_dispenser_w(space->machine->device("ticket"), 0, data & 0x0080);	// ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{

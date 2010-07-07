@@ -703,10 +703,10 @@ static MACHINE_START( m63 )
 {
 	m63_state *state = (m63_state *)machine->driver_data;
 
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
-	state->ay1 = devtag_get_device(machine, "ay1");
-	state->ay2 = devtag_get_device(machine, "ay2");
-	state->samples = devtag_get_device(machine, "samples");
+	state->soundcpu = machine->device("soundcpu");
+	state->ay1 = machine->device("ay1");
+	state->ay2 = machine->device("ay2");
+	state->samples = machine->device("samples");
 
 	state_save_register_global(machine, state->pal_bank);
 	state_save_register_global(machine, state->fg_flag);

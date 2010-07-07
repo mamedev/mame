@@ -451,8 +451,8 @@ static MACHINE_START( kyugo )
 {
 	kyugo_state *state = (kyugo_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->subcpu = devtag_get_device(machine, "sub");
+	state->maincpu = machine->device("maincpu");
+	state->subcpu = machine->device("sub");
 
 	state_save_register_global(machine, state->scroll_x_lo);
 	state_save_register_global(machine, state->scroll_x_hi);
@@ -467,7 +467,7 @@ static MACHINE_RESET( kyugo )
 	kyugo_state *state = (kyugo_state *)machine->driver_data;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	// must start with interrupts and sub CPU disabled
-	cpu_interrupt_enable(devtag_get_device(machine, "maincpu"), 0);
+	cpu_interrupt_enable(machine->device("maincpu"), 0);
 	kyugo_sub_cpu_control_w(space, 0, 0);
 
 	state->scroll_x_lo = 0;

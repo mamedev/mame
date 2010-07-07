@@ -435,10 +435,10 @@ static MACHINE_START( opwolf )
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->pc080sn = devtag_get_device(machine, "pc080sn");
-	state->pc090oj = devtag_get_device(machine, "pc090oj");
-	state->msm1 = devtag_get_device(machine, "msm1");
-	state->msm2 = devtag_get_device(machine, "msm2");
+	state->pc080sn = machine->device("pc080sn");
+	state->pc090oj = machine->device("pc090oj");
+	state->msm1 = machine->device("msm1");
+	state->msm2 = machine->device("msm2");
 
 	state_save_register_global(machine, state->sprite_ctrl);
 	state_save_register_global(machine, state->sprites_flipscreen);
@@ -462,8 +462,8 @@ static MACHINE_RESET( opwolf )
 	state->sprite_ctrl = 0;
 	state->sprites_flipscreen = 0;
 
-	msm5205_reset_w(devtag_get_device(machine, "msm1"), 1);
-	msm5205_reset_w(devtag_get_device(machine, "msm2"), 1);
+	msm5205_reset_w(machine->device("msm1"), 1);
+	msm5205_reset_w(machine->device("msm2"), 1);
 }
 
 static void opwolf_msm5205_vck( running_device *device )

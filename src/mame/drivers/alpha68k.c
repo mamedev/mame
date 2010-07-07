@@ -1854,7 +1854,7 @@ static MACHINE_START( common )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->trigstate);
 	state_save_register_global(machine, state->deposits1);

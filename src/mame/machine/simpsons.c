@@ -86,12 +86,12 @@ MACHINE_START( simpsons )
 	state->xtraram = auto_alloc_array_clear(machine, UINT8, 0x1000);
 	state->spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000 / 2);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k053260 = devtag_get_device(machine, "k053260");
-	state->k052109 = devtag_get_device(machine, "k052109");
-	state->k053246 = devtag_get_device(machine, "k053246");
-	state->k053251 = devtag_get_device(machine, "k053251");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k053260 = machine->device("k053260");
+	state->k052109 = machine->device("k052109");
+	state->k053246 = machine->device("k053246");
+	state->k053251 = machine->device("k053251");
 
 	state_save_register_global(machine, state->firq_enabled);
 	state_save_register_global(machine, state->video_bank);
@@ -109,7 +109,7 @@ MACHINE_RESET( simpsons )
 	simpsons_state *state = (simpsons_state *)machine->driver_data;
 	int i;
 
-	konami_configure_set_lines(devtag_get_device(machine, "maincpu"), simpsons_banking);
+	konami_configure_set_lines(machine->device("maincpu"), simpsons_banking);
 
 	for (i = 0; i < 3; i++)
 	{

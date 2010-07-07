@@ -563,11 +563,11 @@ static MACHINE_START( crystal )
 	crystal_state *state = (crystal_state *)machine->driver_data;
 	int i;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->ds1302 = devtag_get_device(machine, "rtc");
-	state->vr0video = devtag_get_device(machine, "vr0");
+	state->maincpu = machine->device("maincpu");
+	state->ds1302 = machine->device("rtc");
+	state->vr0video = machine->device("vr0");
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), icallback);
+	cpu_set_irq_callback(machine->device("maincpu"), icallback);
 	for (i = 0; i < 4; i++)
 		state->Timer[i] = timer_alloc(machine, Timercb, (void*)(FPTR)i);
 
@@ -597,7 +597,7 @@ static MACHINE_RESET( crystal )
 	memset(state->vidregs, 0, 0x10000);
 	state->FlipCount = 0;
 	state->IntHigh = 0;
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), icallback);
+	cpu_set_irq_callback(machine->device("maincpu"), icallback);
 	state->Bank = 0;
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0);
 	state->FlashCmd = 0xff;
@@ -612,7 +612,7 @@ static MACHINE_RESET( crystal )
 		timer_adjust_oneshot(state->Timer[i], attotime_never, 0);
 	}
 
-	vr0_snd_set_areas(devtag_get_device(machine, "vrender"), state->textureram, state->frameram);
+	vr0_snd_set_areas(machine->device("vrender"), state->textureram, state->frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	state->FlipCntRead = 0;
 #endif

@@ -121,7 +121,7 @@ static INTERRUPT_GEN( sandscrp_interrupt )
 
 static VIDEO_EOF( sandscrp )
 {
-	running_device *pandora = devtag_get_device(machine, "pandora");
+	running_device *pandora = machine->device("pandora");
 	sprite_irq = 1;
 	update_irq_state(machine);
 	pandora_eof(pandora);

@@ -1156,7 +1156,7 @@ static UINT8 *taitofx1_eeprom2 = NULL;
 
 static WRITE32_HANDLER( bank_coh1000t_w )
 {
-	running_device *mb3773 = devtag_get_device(space->machine, "mb3773");
+	running_device *mb3773 = space->machine->device("mb3773");
 	mb3773_set_ck(mb3773, 0, (data & 0x20) >> 5);
 	verboselog( space->machine, 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	memory_set_bankptr(space->machine,  "bank1", memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
@@ -1169,13 +1169,13 @@ static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
 
 static READ32_HANDLER( taitofx1a_ymsound_r )
 {
-	running_device *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	running_device *tc0140syt = space->machine->device("tc0140syt");
 	return tc0140syt_comm_r(tc0140syt, 0) << 16;
 }
 
 static WRITE32_HANDLER( taitofx1a_ymsound_w )
 {
-	running_device *tc0140syt = devtag_get_device(space->machine, "tc0140syt");
+	running_device *tc0140syt = space->machine->device("tc0140syt");
 
 	if (mem_mask == 0x0000ffff)
 	{
@@ -1469,7 +1469,7 @@ static void atpsx_interrupt(running_device *device, int state)
 
 static void atpsx_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	running_device *ide = devtag_get_device(machine, "ide");
+	running_device *ide = machine->device("ide");
 
 	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
@@ -1497,7 +1497,7 @@ static void atpsx_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 
 static DRIVER_INIT( coh1000w )
 {
-	running_device *ide = devtag_get_device(machine, "ide");
+	running_device *ide = machine->device("ide");
 
 	memory_install_read_bank         ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f1fffff, 0, 0, "bank1" );
 	memory_nop_write                         ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f000003, 0, 0 );
@@ -2170,7 +2170,7 @@ static DRIVER_INIT( coh1000a )
 	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
 		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
 	{
-		running_device *ide = devtag_get_device(machine, "ide");
+		running_device *ide = machine->device("ide");
 
 		memory_install_read32_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0x1fbfff8c, 0x1fbfff8f, 0, 0, jdredd_idestat_r );
 		memory_nop_write                    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fbfff8c, 0x1fbfff8f, 0, 0 );
