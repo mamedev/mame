@@ -295,12 +295,6 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define cpu_spinuntil_time					device_spin_until_time
 #define cpu_spinuntil_int					device_spin_until_interrupt
 
-// CPU clock management
-#define device_get_clock						device_get_clock
-#define device_set_clock						device_set_clock
-#define device_get_clock_scale					device_get_clock_scale
-#define device_set_clock_scale					device_set_clock_scale
-
 // CPU timing
 #define cpu_eat_cycles						device_eat_cycles
 #define cpu_adjust_icount					device_adjust_icount
