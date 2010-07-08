@@ -578,18 +578,6 @@ static WRITE32_HANDLER(serial_w)
 */
 }
 
-static WRITE32_DEVICE_HANDLER(security_w)
-{
-	i2cmem_scl_write( device, ( data >> 4 ) & 1 );
-	i2cmem_sda_write( device, ( data >> 3 ) & 1 );
-}
-
-static READ32_DEVICE_HANDLER(security_r)
-{
-	/* 0x4000 ?? */
-	return i2cmem_sda_read( device ) << 12;
-}
-
 static WRITE32_HANDLER(shared_psx_w)
 {
 	if (mem_mask == 0xff)
@@ -636,8 +624,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 
 	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
-	AM_RANGE(0x1f270000, 0x1f270003) AM_DEVWRITE("security",security_w)
-	AM_RANGE(0x1f280000, 0x1f280003) AM_DEVREAD("security",security_r)
+	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE_PORT("OUTSEC")
+	AM_RANGE(0x1f280000, 0x1f280003) AM_READ_PORT("INSEC")
 	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_rtc_r, rtc65271_rtc_w, 0x00ff00ff)
 	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_xram_r, rtc65271_xram_w, 0x00ff00ff)
 	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
@@ -1002,6 +990,12 @@ static INPUT_PORTS_START( twinkle )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
+	PORT_START("OUTSEC")
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("security", i2cmem_scl_write)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("security", i2cmem_sda_write)
+
+	PORT_START("INSEC")
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("security", i2cmem_sda_read)
 INPUT_PORTS_END
 
 #define TWINKLE_BIOS	\
@@ -1019,8 +1013,6 @@ ROM_END
 
 ROM_START( bmiidx )
 	TWINKLE_BIOS
-
-	ROM_REGION( 0x100, "security", 0 )
 
 	DISK_REGION( "cdrom0" )	// program
 	DISK_IMAGE_READONLY("863jaa01", 0, SHA1(aee12de1dc5dd44e5bf7b62133ed695b80999390) )
