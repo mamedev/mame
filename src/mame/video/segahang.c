@@ -85,3 +85,4 @@ VIDEO_UPDATE( hangon )
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 	return 0;
 }
+

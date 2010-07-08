@@ -330,3 +330,4 @@ static const sega16sp_interface xboard_sega16sp_intf =
 extern struct palette_info segaic16_palette;
 extern struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
 extern struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
+

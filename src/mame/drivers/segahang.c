@@ -1916,3 +1916,4 @@ GAME( 1986, enduror,   0,        enduror,  enduror,  enduror,  ROT0, "Sega",    
 GAME( 1986, enduror1,  enduror,  enduror1, enduror,  enduror,  ROT0, "Sega",    "Enduro Racer (YM2203, FD1089B 317-0013A)", 0 )
 GAME( 1986, endurobl,  enduror,  enduror1, enduror,  endurobl, ROT0, "bootleg", "Enduro Racer (bootleg set 1)", 0 )
 GAME( 1986, endurob2,  enduror,  endurob2, enduror,  endurob2, ROT0, "bootleg", "Enduro Racer (bootleg set 2)", GAME_NOT_WORKING )
+
