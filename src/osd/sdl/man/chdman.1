@@ -1,0 +1,78 @@
+.\"  -*- nroff -*-
+.\"
+.\" chdman.1
+.\"
+.\" Man page created from source and usage information by 
+.\" Ashley T. Howes <debiandev@ashleyhowes.com>, February 2005
+.\" updated by Cesare Falco <cesare.falco@gmail.com>, February 2007
+.\"
+.TH CHDMAN 1 2010-06-26 0.138u4 "chdman"
+.\"
+.\" NAME chapter
+.SH NAME
+chdman \- MAME Compressed Hunks of Data (CHD) manager
+.\"
+.\" SYNOPSIS chapter
+.SH SYNOPSIS
+.B chdman
+.I option file
+.\"
+.\" DESCRIPTION chapter
+.SH DESCRIPTION
+.B chdman
+is the (C)ompressed (H)unks of (D)ata (CHD) manager for MAME.
+It is a tool to manage CHD images.
+.\"
+.\" OPTIONS chapter
+.SH OPTIONS
+.TP
+.B \-info \fIinput\fR.chd
+Dump the header information from a drive image.
+.TP
+.B \-createraw \fIinputhd\fR.raw \fIoutput\fR.chd [\fIinputoffs\fR [\fIhunksize\fR]]
+Create a new compressed raw image from a raw file.
+.TP
+.B \-createhd \fIinputhd\fR.raw \fIoutput\fR.chd [\fIinputoffs\fR [\fIcylinders \
+heads sectors \fR[\fIsectorsize\fR [\fIhunksize\fR]]]]
+Create a new compressed hard disk image from a raw file.
+.TP
+.B \-createblankhd \fIoutput\fR.chd \fIcylinders heads sectors\fR [\fIsectorsize \
+\fR[\fIhunksize\fR]]
+Create a new non\-compressed hard disk image, with all hunks filled with 0s.
+.TP
+.B \-createcd \fIinput\fR.toc \fIoutput\fR.chd
+Create a new compressed CD image from a raw file.
+.TP
+.B \-copydata \fIinput\fR.chd \fIoutput\fR.chd
+Copy all hunks of data from one CHD file to another. The hunk sizes do not need to match.
+If the source is shorter than the destination, the source data will be padded with 0s.
+.TP
+.B \-extract \fIinput\fR.chd \fIoutput\fR.raw
+Extract a raw file from a CHD image.
+.TP
+.B \-extractcd \fIinput\fR.chd \fIoutput\fR.toc \fIoutput\fR.bin
+Extract a CDRDAO .toc/.bin file from a CHD\-CD image.
+.TP
+.B \-verify \fIinput\fR.chd
+Validate the MD5/SHA1 on a drive image.
+.TP
+.B \-verifyfix \fIinput\fR.chd
+Validate and fix the MD5/SHA1 on a drive image.
+.TP
+.B \-update \fIinput\fR.chd \fIoutput\fR.chd
+Update CHD image using metadata from input file.
+.TP
+.B \-chomp \fIinput\fR.chd \fIoutput\fR.chd \fImaxhunk
+Chomp hunk from CHD image.
+.TP
+.B \-merge \fIparent\fR.chd \fIdiff\fR.chd \fIoutput\fR.chd
+Merge a parent and its child together.
+.TP
+.B \-diff \fIparent\fR.chd \fIcompare\fR.chd \fIdiff\fR.chd
+Generate a difference between two CHD files.
+.TP
+.B \-setchs \fIinout\fR.chd \fIcylinders heads sections
+Change the CHS values on a hard disk image.
+.TP
+.B \-split \fIinput\fR.chd \fIoutput\fR.chd \fIlength
+Split a CHD file into multiple parts.
