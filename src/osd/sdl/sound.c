@@ -447,7 +447,7 @@ static int sdl_init(running_machine *machine)
 
 	// set up the audio specs
 	aspec.freq = machine->sample_rate;
-	aspec.format = AUDIO_S16SYS;	// keep endian independant
+	aspec.format = AUDIO_S16SYS;	// keep endian independent
 	aspec.channels = n_channels;
 	aspec.samples = sdl_xfer_samples;
 	aspec.callback = sdl_callback;

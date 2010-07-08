@@ -470,7 +470,7 @@ ROM_START( marioo )
 	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 
 	ROM_REGION( 0x0020, "unk_proms", 0 ) /* is this the color prom? */
-	ROM_LOAD( "tma1-c-5p.5p", 0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, unkown use */
+	ROM_LOAD( "tma1-c-5p.5p", 0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, unknown use */
 ROM_END
 
 ROM_START( marioj )
@@ -504,7 +504,7 @@ ROM_START( marioj )
 	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 
 	ROM_REGION( 0x0020, "unk_proms", 0 ) /* is this the color prom? */
-	ROM_LOAD( "tma1-c-5p.5p", 0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, unkown use */
+	ROM_LOAD( "tma1-c-5p.5p", 0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, unknown use */
 ROM_END
 
 ROM_START( masao )

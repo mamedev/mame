@@ -63,7 +63,7 @@ Linescroll:
 R,G,B Brightness:
    The Electro Design games have this set darker than 0xff for sprites and bg's anyway.
    Galpanis uses it to dim the bg's in attract on the stats screens for the characters (bg's hidden by white pen atm).
-Lots of games use them to fade, haven't seen r,g,b used independantly yet but you never know.
+Lots of games use them to fade, haven't seen r,g,b used independently yet but you never know.
 
 etc.etc.
 

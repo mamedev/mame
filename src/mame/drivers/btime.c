@@ -1360,7 +1360,7 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
  */
 #define BTIME_R49	RES_K(47)	/* pcb: 47.4k */
 
-/* The input divider R51 R50 is not independant of R52, which
+/* The input divider R51 R50 is not independent of R52, which
  * also depends on ay internal resistance.
  * FIXME: Develop proper model when I am retired.
  *

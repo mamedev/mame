@@ -59,9 +59,9 @@ enum
 
 static const char *const opmode[] =
 {
-	"000 continous mode",
+	"000 continuous mode",
 	"001 freq comparison mode",
-	"010 continous mode",
+	"010 continuous mode",
 	"011 pulse width comparison mode",
 	"100 single shot mode",
 	"101 freq comparison mode",

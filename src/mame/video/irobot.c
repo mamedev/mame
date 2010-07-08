@@ -150,7 +150,7 @@ VIDEO_START( irobot )
         Word 0, Slope (0xFFFF = side done)
         Word 1, bits 7..15: Ending Y of vector
 
-    Each side is a continous set of vectors. Both sides are drawn at
+    Each side is a continuous set of vectors. Both sides are drawn at
     the same time and the space between them is filled in.
 
 ***************************************************************************/

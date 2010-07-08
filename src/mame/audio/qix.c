@@ -41,7 +41,7 @@ static WRITE8_DEVICE_HANDLER( qix_vol_w )
 /* qix Sound System Analog emulation                                    */
 /************************************************************************/
 /*
- * This hardware is capable of independant L/R volume control,
+ * This hardware is capable of independent L/R volume control,
  * but only sdungeon uses it for a stereo effect.
  * Other games just use it for fixed L/R volume control.
  *

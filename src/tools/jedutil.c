@@ -312,6 +312,6 @@ int main(int argc, char *argv[])
 	if (err != 0)
 		return 1;
 
-	printf("Target file written succesfully\n");
+	printf("Target file written successfully\n");
 	return 0;
 }

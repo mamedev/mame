@@ -75,7 +75,7 @@ Warzard / Red Earth                                  1996   96/11/21       CAP-W
 ** NOT DUMPED but known to exist
 
 The Game Region / No CD Flags / Development flags etc. are controlled by a byte in the bios roms.  The CDs
-contain revisions of the game code and are independant of the region.
+contain revisions of the game code and are independent of the region.
 
 The CP SYSTEM III comprises a main board with several custom ASICs, custom 72-pin SIMMs for program
 and graphics storage (the same SIMMs are also used in some CPS2 titles), SCSI CDROM and CDROM disc,

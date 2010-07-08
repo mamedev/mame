@@ -321,7 +321,7 @@ VIDEO_UPDATE( fuuki32 )
 	UINT16 scrollx_offs,   scrolly_offs;
 
 	/*
-    It's not independant bits causing layers to switch, that wouldn't make sense with 3 bits.
+    It's not independent bits causing layers to switch, that wouldn't make sense with 3 bits.
     */
 
 	static const int pri_table[6][3] = {

@@ -175,7 +175,7 @@ usage for each character/tile.
 
 The 16 colours at offset $C0 appear to be the text palette. This group of
 colours does not appear to change throughout the game, and the lower 192
-colours fade in/out independantly of these 16 - consistent with observations
+colours fade in/out independently of these 16 - consistent with observations
 of the real game. You'd think then that the palette would be reaonably
 easy to deduce from the text video ram attribute byte - go ahead and try! :P
 

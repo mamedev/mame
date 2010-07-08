@@ -646,7 +646,7 @@ MACHINE_DRIVER_END
 
                           Paradise / Paradise Deluxe
 
-(c) Yun Sung  year unkown
+(c) Yun Sung  year unknown
 
 Another porn qix like game
 

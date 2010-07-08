@@ -9,7 +9,7 @@ Driver's Eyes works,
     DIP4 ON for Screen on the right
     should not toggle on both
 
-    -The left, center and right screens have separate programs and boards, each would work independantly.
+    -The left, center and right screens have separate programs and boards, each would work independently.
     About projection angles of left and right screen, the angle is correct on "DRIVER'S EYES" title screen, however in the tracks of demo mode it doesn't seem correct.
 
     -On demo screen, should fog effects be turned off?

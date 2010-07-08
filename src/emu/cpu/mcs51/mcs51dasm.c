@@ -252,7 +252,7 @@ static const struct {
 	{ FEATURE_I83C751, 0x1fe, "idle"	},
 	{ FEATURE_I83C751, 0x1ff, "i2sta.7"	},
 
-	/* unkown
+	/* unknown
      * "ibf",    "obf",    "idsm",   "obfc",    e8 - eb
      * "ma0",    "ma1",    "mb0",    "mb1",     ec - ef
      */

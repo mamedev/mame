@@ -923,7 +923,7 @@ WRITE16_HANDLER( toaplan2_1_scroll_reg_select_w )
 static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
 {
 	/************************************************************************/
-	/***** layer X and Y flips can be set independantly, so emulate it ******/
+	/***** layer X and Y flips can be set independently, so emulate it ******/
 	/************************************************************************/
 
 	//printf("toaplan2_scroll_reg_data_w %04x %04x\n", offset, data);

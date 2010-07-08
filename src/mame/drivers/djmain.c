@@ -1178,14 +1178,14 @@ INPUT_PORTS_END
 	PORT_DIPSETTING(    0x00, "8" )
 
 #define POPN_DSW2_GAUGEDECREMENT \
-	PORT_DIPNAME( 0x0c, 0x0c, "Guage Decrement Level" ) PORT_DIPLOCATION("SW2:6,5") \
+	PORT_DIPNAME( 0x0c, 0x0c, "Gauge Decrement Level" ) PORT_DIPLOCATION("SW2:6,5") \
 	PORT_DIPSETTING(    0x04, "0" ) \
 	PORT_DIPSETTING(    0x0c, "1" ) \
 	PORT_DIPSETTING(    0x08, "2" ) \
 	PORT_DIPSETTING(    0x00, "3" )
 
 #define POPN_DSW2_GAUGEINCREMENT \
-	PORT_DIPNAME( 0x03, 0x03, "Guage Increment Level" ) PORT_DIPLOCATION("SW2:8,7") \
+	PORT_DIPNAME( 0x03, 0x03, "Gauge Increment Level" ) PORT_DIPLOCATION("SW2:8,7") \
 	PORT_DIPSETTING(    0x01, "0" ) \
 	PORT_DIPSETTING(    0x03, "1" ) \
 	PORT_DIPSETTING(    0x02, "2" ) \
@@ -1343,12 +1343,12 @@ static INPUT_PORTS_START( popnstage )
 	PORT_DIPSETTING(    0x80, DEF_STR ( Medium ) )
 	PORT_DIPSETTING(    0x40, DEF_STR ( Low ) )
 	PORT_DIPSETTING(    0x00, "Silent" )
-	PORT_DIPNAME( 0x30, 0x30, "Guage Decrement Level" ) PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPNAME( 0x30, 0x30, "Gauge Decrement Level" ) PORT_DIPLOCATION("SW1:4,3")
 	PORT_DIPSETTING(    0x20, "0" )
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Guage Increment Level" ) PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, "Gauge Increment Level" ) PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x08, "0" )
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x04, "2" )

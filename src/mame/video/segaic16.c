@@ -328,7 +328,7 @@ Quick review of the system16 hardware:
     probably because they had it handy and it handles medium res.
 
   System32:
-    5-layer tilemap hardware consisting of 4 independant rom-based
+    5-layer tilemap hardware consisting of 4 independent rom-based
     layers with linescroll, lineselection, linezoom and window
     clipping capability and one simpler ram-based text plane.  Mixed
     ram/rom sprite engine with palette indirection, per-color priority

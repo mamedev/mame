@@ -581,7 +581,7 @@ static void display_profiling(const discrete_info *info)
 	/* print statistics */
 	printf("Total Samples  : %16" I64FMT "d\n", info->total_samples);
 	tresh = total / count;
-	printf("Treshold (mean): %16" I64FMT "d\n", tresh / info->total_samples );
+	printf("Threshold (mean): %16" I64FMT "d\n", tresh / info->total_samples );
 	for (entry = info->node_list; entry != NULL; entry = entry->next)
 	{
 		node_description *node = (node_description *) entry->ptr;
