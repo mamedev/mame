@@ -177,6 +177,7 @@ device_image_interface::device_image_interface(running_machine &machine, const d
 	: device_interface(machine, config, device),
 	  m_image_config(dynamic_cast<const device_config_image_interface &>(config)),
 	  m_file(NULL),
+	  m_mame_file(NULL),
 	  m_full_software_name(NULL),
 	  m_software_info_ptr(NULL),
 	  m_software_part_ptr(NULL),

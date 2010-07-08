@@ -632,6 +632,7 @@ public:
 	virtual bool finish_load();
 	virtual void unload();
 	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
+	virtual bool load_software(char *swlist, char *swname, rom_entry *entry);
 
 	virtual int call_load();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);

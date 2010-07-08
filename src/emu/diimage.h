@@ -200,6 +200,7 @@ public:
 	virtual bool load(const char *path) = 0;
 	virtual bool finish_load() = 0;
 	virtual void unload() = 0;
+	virtual bool load_software(char *swlist, char *swname, rom_entry *entry) = 0;
 
 	virtual int call_load() = 0;
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) = 0;
@@ -293,6 +294,7 @@ protected:
 
     /* variables that are only non-zero when an image is mounted */
 	core_file *m_file;
+	mame_file *m_mame_file;
 	astring m_name;
 	astring m_basename;
 	astring m_basename_noext;
