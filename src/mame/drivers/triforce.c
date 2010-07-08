@@ -454,14 +454,10 @@ MACHINE_DRIVER_END
 
 ROM_START( triforce )
 	TRIFORCE_BIOS
-
-	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
 
 ROM_START( vs2002j )
 	TRIFORCE_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0001", 0, SHA1(1b4b16b0715fa5717904f0b3141cc48cca99b7a4) )
@@ -490,9 +486,6 @@ PIC
 ROM_START( vs2002ex )
 	TRIFORCE_BIOS
 
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0002", 0, SHA1(471e896d43167c93cc229cfc94ff7ac6de7cf9a4) )
 
@@ -503,9 +496,6 @@ ROM_END
 
 ROM_START( avalons )
 	TRIFORCE_BIOS
-
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0005c", 0, SHA1(9edb3d9ff492d2207d57bfdb6859e796f76c5e0c) )
@@ -518,9 +508,6 @@ ROM_END
 ROM_START( gekpurya )
 	TRIFORCE_BIOS
 
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0008c", 0, SHA1(2c1bdb8324efc216edd771fe45c680ac726111a0) )
 
@@ -531,9 +518,6 @@ ROM_END
 
 ROM_START( tfupdate )
 	TRIFORCE_BIOS
-
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0011", 0, SHA1(71bfa8f53d211085c020d54f55eeeabf85212a0b) )
@@ -570,9 +554,6 @@ PIC
 ROM_START( vs4 )
 	TRIFORCE_BIOS
 
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(1f83712b2b170d6edf4a27c15b6f763cc3cc4b71) )
 
@@ -601,9 +582,6 @@ PIC
 
 ROM_START( vs4j )
 	TRIFORCE_BIOS
-
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0013e", 0, SHA1(b69cc5cab889114eda5c6e9ddcca42de9bc235b3) )
@@ -634,9 +612,6 @@ track03.bin 45150   549299  1185760800
 
 ROM_START( avalon13 )
 	TRIFORCE_BIOS
-
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0010c", 0, SHA1(716c441d8dc9036a13c66ef0048cd6d32ac63c4e) )
@@ -669,9 +644,6 @@ track03.bin 45150   549299  1185760800
 ROM_START( avalon20 )
 	TRIFORCE_BIOS
 
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0017b", 0, SHA1(e2dd32c322ffcaf38b82275d2721b71bb3dfc1f2) )
 
@@ -682,9 +654,6 @@ ROM_END
 
 ROM_START( vs42006 )
 	TRIFORCE_BIOS
-
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdt-0020d", 0, SHA1(db256d094b9754d452d7a2b8a370699d21141c1f) )
@@ -705,4 +674,4 @@ GAME( 200?, tfupdate, triforce, triforcegd,    triforce,    0, ROT0, "Sega",    
 GAME( 2004, vs4j,     triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 (Japan) (GDT-0013E)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vs4,      triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 (Export) (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, avalon20, triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GAME( 2006, vs42006,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 ver. 2006 (Rev D) (Japan) (GDT-0020D)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, vs42006,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 ver. 2006 (Rev D) (Japan) (GDT-0020D)", GAME_NO_SOUND|GAME_NOT_WORKING )

@@ -129,8 +129,6 @@ MACHINE_DRIVER_END
 ROM_START( chihiro )
 	CHIHIRO_BIOS
 
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
@@ -141,8 +139,6 @@ ROM_END
 ROM_START( hotd3 )
 	CHIHIRO_BIOS
 
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0001", 0,  SHA1(174c72f851d0c97e8993227467f16b0781ed2f5c) )
 
@@ -152,8 +148,6 @@ ROM_END
 
 ROM_START( outr2 )
 	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0004a", 0, SHA1(27acd2d0680e6bafa0d052f60b4372adc37224fd) )
@@ -183,13 +177,22 @@ PIC
 ROM_START( ghostsqu )
 	CHIHIRO_BIOS
 
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0012a", 0,  SHA1(d7d78ce4992cb16ee5b4ac6ca7a37c46b07e8c14) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
+ROM_END
+
+
+ROM_START( gundamos )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0013", 0, SHA1(96b3dafcc2d2d6803fe3bf43a245d43ee5e0e5a6) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdx-0013.data", 0x00, 0x50, CRC(0479c383) SHA1(7e86a037d2f9d09cec61a38cb19de510bf9482b3) )
 ROM_END
 
 /*
@@ -219,8 +222,6 @@ PIC
 ROM_START( vcop3 )
 	CHIHIRO_BIOS
 
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0003a", 0,  SHA1(cdfec1d2ef02ae9e29cb1462f08904177bc4c9ea) )
 
@@ -231,8 +232,6 @@ ROM_END
 
 ROM_START( mj2 )
 	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0006c", 0, SHA1(505653117a73ed8b256ccf19450e7573a4dc57e9) )
@@ -245,8 +244,6 @@ ROM_END
 ROM_START( wangmid )
 	CHIHIRO_BIOS
 
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0009b", 0, SHA1(e032b9fd8d5d09255592f02f7531a608e8179c9c) )
 
@@ -257,8 +254,6 @@ ROM_END
 
 ROM_START( wangmid2 )
 	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0015", 0, SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
@@ -271,8 +266,6 @@ ROM_END
 ROM_START( mj3 )
 	CHIHIRO_BIOS
 
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0017d", 0, SHA1(cfbbd452c8f4efe0e99f398f5521fc3574b913bb) )
 
@@ -280,14 +273,29 @@ ROM_START( mj3 )
 	ROM_LOAD("gdx-0017d.pic_data", 0x00, 0x50, NO_DUMP )
 ROM_END
 
+ROM_START( scg06nt )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0018a", 0, SHA1(e6f3dc8066392854ad7d83f81d3cbc81a5e340b3) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdx-0018.data", 0x00, 0x50, CRC(1a210abd) SHA1(43a54d028315d2dfa9f8ea6fb59265e0b980b02f) )
+ROM_END
+
+
+
+
 
 GAME( 200?, chihiro,  0,       chihiro_base, chihiro,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2002, hotd3,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "The House of the Dead III [GDX-0001]", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, outr2,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Out Run 2 (Rev. A) [GDX-0004A]", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, outr2,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Out Run 2 (Rev. A) [GDX-0004A]", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, mj2,      chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 2 (Rev C) [GDX-0006C]", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid,  chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Rev. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid2, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Export) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ghostsqu, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, gundamos, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Gundam Battle Operating Simulator (GDX-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, vcop3,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, mj3,      chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 3 (Rev D) [GDX-0017D]", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, scg06nt,  chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Club Golf 2006 Next Tours (Rev A) [GDX-0018A]", GAME_NO_SOUND|GAME_NOT_WORKING )
 

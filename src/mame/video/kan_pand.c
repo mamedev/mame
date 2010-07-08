@@ -59,6 +59,7 @@ struct _kaneko_pandora_state
 	int          clear_bitmap;
 	UINT8        region;
 	int          xoffset, yoffset;
+	int			 bg_pen; // might work some other way..
 };
 
 /*****************************************************************************
@@ -83,6 +84,12 @@ INLINE const kaneko_pandora_interface *get_interface( running_device *device )
 /*****************************************************************************
     IMPLEMENTATION
 *****************************************************************************/
+
+void pandora_set_bg_pen( running_device *device, int pen )
+{
+	kaneko_pandora_state *pandora = get_safe_token(device);
+	pandora->bg_pen = pen;
+}
 
 void pandora_set_clear_bitmap( running_device *device, int clear )
 {
@@ -195,7 +202,7 @@ void pandora_eof( running_device *device )
 
 	// the games can disable the clearing of the sprite bitmap, to leave sprite trails
 	if (pandora->clear_bitmap)
-		bitmap_fill(pandora->sprites_bitmap, &pandora->screen->visible_area(), 0);
+		bitmap_fill(pandora->sprites_bitmap, &pandora->screen->visible_area(), pandora->bg_pen);
 
 	pandora_draw(device, pandora->sprites_bitmap, &pandora->screen->visible_area());
 }
@@ -298,6 +305,7 @@ static DEVICE_START( kaneko_pandora )
 	pandora->region = intf->gfx_region;
 	pandora->xoffset = intf->x;
 	pandora->yoffset = intf->y;
+	pandora->bg_pen = 0;
 
 	pandora->spriteram = auto_alloc_array(device->machine, UINT8, 0x1000);
 

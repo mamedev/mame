@@ -4826,7 +4826,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.04 Virtua Striker 4 ver.A */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
 						/* 2005.12 Mario Kart Arcade Grand Prix */
-						/* 2006.05 Virtua Striker 4 ver.2006 */
+	DRIVER( vs42006 )	/* 2006.05 Virtua Striker 4 ver.2006 */
 						/* 2007.03 Mario Kart Arcade Grand Prix 2 */
 
 	DRIVER( tfupdate )	/* Triforce GDROM Boot Update (GDT-0011) */
@@ -4851,7 +4851,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
 						/* 2004.12 Quest of D ver.1.10a */
 						/* 2005.03 Sangokushi Taisen */
-						/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
+	DRIVER( gundamos )	/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
 						/* 2005.04 Quest of D ver.1.20 */
 						/* 2005.04 Sega Network Taisen Mahjong MJ 2 ver.E */
 	DRIVER( wangmid2 )	/* 2005.04 Wangan Midnight Maximum Tune 2 */
@@ -4866,7 +4866,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.12 Kidou Senshi Gundam 0079 Card Builder */
 	DRIVER( mj3 )		/* 2005.12 Sega Network Taisen Mahjong MJ 3 */
 						/* 2005.12 Quest of D Gofu no Keisyousya ver.2.01 */
-						/* 2005.12 Sega Golf Club 2006 Next Tours */
+	DRIVER( scg06nt )	/* 2005.12 Sega Golf Club 2006 Next Tours */
 						/* 2006.02 Sangokushi Taisen Ranse no Gunrou ver.1.12 */
 						/* 2006.03 Kidou Senshi Gundam 0079 Card Builder ver.1.007 */
 						/* 2006.03 Quest of D Gofu no Keisyousya ver.2.02b */

@@ -917,7 +917,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
  *
  *************************************/
 
-#define FILENAME_LENGTH 16
+#define FILENAME_LENGTH 24
 
 static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 {
@@ -1790,7 +1790,7 @@ static DEVICE_START( naomibd )
 			break;
 
 		case DIMM_BOARD:
-			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
+			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine, UINT8, 0x40000000); // 0x40000000 is needed for some Chihiro sets, Naomi should be less, we should pass as device param
 			v->gdromchd = get_disk_handle(device->machine, config->gdromregiontag);
 			v->picdata = (UINT8 *)memory_region(device->machine, config->picregiontag);
 			if (v->memory != NULL && v->gdromchd != NULL && v->picdata != NULL)
