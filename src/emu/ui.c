@@ -1646,7 +1646,7 @@ static slider_state *slider_init(running_machine *machine)
 	if (options_get_bool(machine->options(), OPTION_CHEAT))
 	{
 		device_execute_interface *exec = NULL;
-		for (bool gotone = machine->m_devicelist.first(exec); exec != NULL; gotone = exec->next(exec))
+		for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 		{
 			void *param = (void *)&exec->device();
 			string.printf("Overclock CPU %s", exec->device().tag());
