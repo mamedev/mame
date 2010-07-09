@@ -147,6 +147,10 @@ ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tc574000ad_u11_2.bin", 0x000000, 0x080000, CRC(b235c4d9) SHA1(fbb308a5f6e769f3277824cb6a3b50c308969ac2) )
 	ROM_LOAD16_BYTE( "tc574000ad_u12_1.bin", 0x000001, 0x080000, CRC(e826f6ad) SHA1(23ec8bb608f954d3b915f061e7076c0c63b8259e) )
+	
+	// not hooked up yet
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "89c51.bin", 0x0000, 0x1000, CRC(595475c8) SHA1(8313819ba06cc92b54f88c1ca9f34be8d1ec94d0) )
 ROM_END
 
 static READ16_HANDLER(topshoot_200051_r)

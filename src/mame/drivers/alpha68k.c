@@ -2389,6 +2389,12 @@ ROM_START( kyros )
 	ROM_LOAD( "2s.1f",      0x00000, 0x4000, CRC(800ceb27) SHA1(4daa1b8adcad7a90cfd5d20704a7c431673c4995) )
 	ROM_LOAD( "1s.1d",      0x04000, 0x8000, CRC(87d3e719) SHA1(4b8b1b600c7c1de3a77030001e7e6f0ff118f294) )
 
+	// not hooked up yet
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "kyros_68705u3.bin",    0x0000, 0x1000, CRC(c20880b7) SHA1(b041c36cbc4f348d74e0548df5cb14727f2d353b) ) // this one is from a bootleg PCB, program code *might* be compatible.
+	ROM_LOAD( "kyros_mcu.bin",    0x0000, 0x0800,  CRC(3a902a19) SHA1(af1be8894c899b27b1106663ffaf2ab43fa1cdaa) ) // original MCU? (HD6805U1)
+
+
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "8.9pr",  0x00000, 0x8000, CRC(c5290944) SHA1(ec97482dc59220002780ae4d02be4cd172cf65ac) )
 	ROM_LOAD( "11.11m", 0x08000, 0x8000, CRC(fbd44f1e) SHA1(d095544ea76674a7ad17c1b8c88614e65890281c) )

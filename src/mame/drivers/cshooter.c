@@ -535,8 +535,9 @@ ROM_START( cshooter )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Sub/Sound CPU?
 	ROM_LOAD( "r4",  0x00000, 0x08000, CRC(84fed017) SHA1(9a564c9379eb48569cfba48562889277991864d8) )
 
+	// not hooked up yet (Taito version has this instead of encryption!
 	ROM_REGION( 0x0800, "cpu2", 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "68705.bin",    0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "crshooter.3j",    0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )	// TX Layer
 	ROM_LOAD( "r3",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )	// only 1 byte difference with 3.f11, bad dump?

@@ -909,6 +909,11 @@ ROM_START( josvolly )
 
 	ROM_REGION( 0x04000, "user1", 0 )	/* music data and samples - not sure where it's mapped */
 	ROM_LOAD( "aa0-14.4j",    0x0000, 0x2000, CRC(436fe91f) SHA1(feb29501090c6db911e13ce6e9935ba004b0ce7e) )
+	
+	// there are other undumped chips on this, not sure how many
+	// not hooked up yet
+	ROM_REGION( 0x400, "mcu", 0 )
+	ROM_LOAD( "aa003.bin",    0x0000, 0x400, CRC(68b399d9) SHA1(053482d12c2b714c23fc80ad0589a2afd258a5a6) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "aa0-10.9n",    0x0000, 0x2000, CRC(207c4f42) SHA1(4cf2922d55cfc9e68cc07c3252ea3b5619b8aca5) )	/* tiles */

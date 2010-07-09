@@ -463,8 +463,9 @@ ROM_START( pasha2 )
 	ROM_LOAD16_BYTE( "pp2-u1.u102",  0x400001, 0x200000, CRC(7a3492fb) SHA1(de72c4d10e17eaf2b7531f637b42cbb3d07819b5) )
 	// empty space, but no empty sockets on the pcb
 
-	ROM_REGION( 0x0800, "cpu1", 0 ) /* AT89C52 (protected) */
-	ROM_LOAD( "pasha2_at89c52",  0x0000, 0x0800, NO_DUMP ) /* MCU internal 8K flash */
+	// not hooked up yet
+	ROM_REGION( 0x1000, "cpu1", 0 ) /* AT89C52 */
+	ROM_LOAD( "89c52.bin",  0x0000, 0x2000, CRC(9ce43ce4) SHA1(8027a3549b38e9a2e7bb8f518a0defcaf9743371) )
 
 	ROM_REGION( 0x80000, "user3", 0 ) /* SAM9773 sound data */
 	ROM_LOAD( "pp2.um2",      0x00000, 0x80000, CRC(86814b37) SHA1(70f8a94410e362669570c39e00492c0d69de6b17) )

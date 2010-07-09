@@ -5153,6 +5153,11 @@ static GFXDECODE_START( ncb3 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
+static GFXDECODE_START( magical )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 0, 16 )
+GFXDECODE_END
+
 static GFXDECODE_START( cm )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
@@ -5975,6 +5980,23 @@ static MACHINE_DRIVER_START( lucky8 )
 
 MACHINE_DRIVER_END
 
+static PALETTE_INIT(magical)
+{
+	int i;
+	for (i = 0; i < 0x100; i++)
+	{
+		int r,g,b;
+
+		UINT8*proms = memory_region(machine, "proms");
+
+		b = proms[0x000 + i] << 4;
+		g = proms[0x100 + i] << 4;
+		r = proms[0x200 + i] << 4;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
 static MACHINE_DRIVER_START( magical )
 
 	MDRV_DRIVER_DATA(goldstar_state)
@@ -5997,9 +6019,9 @@ static MACHINE_DRIVER_START( magical )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MDRV_PALETTE_INIT(lucky8)
+	MDRV_PALETTE_INIT(magical)
 
-	MDRV_GFXDECODE(ncb3)
+	MDRV_GFXDECODE(magical)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_NVRAM_HANDLER(goldstar)
 
@@ -7463,6 +7485,62 @@ ROM_START( lucky8 )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+
+/*
+
+Magical Tonic
+
+unknown, 40 pin cpu (plastic box, with "Tonic" sticker on it)
+8255 x3
+YM2203
+12 MHz
+
+4x DSW
+
+*/
+
+/* is this the original magical odds? */
+static DRIVER_INIT(mtonic)
+{
+	int A;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	for (A = 0;A < 0x8000;A++)
+	{
+		if ((A & 4) == 4)
+			ROM[A] ^= 0x01;
+
+		ROM[A] = BITSWAP8(ROM[A], 3,6,5,4,7,2,1,0);
+	}
+}
+
+
+ROM_START( mtonic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.e6",	0x0000, 0x8000, CRC(01daf2af) SHA1(cb9b12c79dce3c9123510a49dffc9f3cee056cf6) )
+	ROM_LOAD( "9.e6",	0x8000, 0x8000, CRC(1770ac79) SHA1(cadfd00ae75b90b1d202d741828e0afbd5ba0bec) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5.j10",	0x00000, 0x10000, CRC(b8032ea3) SHA1(15e5335a583d8e7a5422cd4d1d7342874a4962ab) )
+	ROM_LOAD( "6.j11",	0x10000, 0x10000, CRC(ff38ff30) SHA1(8fef6e1fe7c307c69c9dcafa69ecf66467b9cb41) )
+	ROM_LOAD( "7.j12",	0x20000, 0x10000, CRC(8f1d2db9) SHA1(200de01334905079dca542541e442d4194ecd913) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "1.l10",	0x0000, 0x4000, CRC(746588db) SHA1(2a0af552011246d4cc0cd0b670907cf8685ce8ef) )
+	ROM_LOAD( "2.l11",	0x4000, 0x4000, CRC(8b7dd248) SHA1(a3ebde9fd0b6b1e42aa9b6d8e30c225abf2f80ce) )
+	ROM_LOAD( "3.l12",	0x8000, 0x4000, CRC(de05e678) SHA1(8b9fcb9f912075a20a9ae38100006b57d508e0e7) )
+	ROM_LOAD( "4.l13",	0xc000, 0x4000, CRC(8c542eee) SHA1(cb424e2a67c6d39302beca7cd5244bcad4a91189) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1",	0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "prom2",	0x0100, 0x0100, NO_DUMP )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "prom3",	0x0000, 0x0020, NO_DUMP )
+ROM_END
+
+
+// is this a bootleg board?
 ROM_START( magical )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "8_p6_d12.512", 0x00000, 0x08000, CRC(6978c662) SHA1(cfdbcdcd4085c264e1d0ad4f18160b40d2d4e406) )
@@ -7471,32 +7549,67 @@ ROM_START( magical )
 	ROM_IGNORE(0xc000) // BADADDR        --xxxxxxxxxxxxxx
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "5_l5_g2.512", 0x00000, 0x10000, CRC(f0ffb199) SHA1(383406e6ab74e8cecaf5574a879bf24aa606ac37) )
+	ROM_LOAD( "5_l5_g2.512", 0x20000, 0x10000, CRC(f0ffb199) SHA1(383406e6ab74e8cecaf5574a879bf24aa606ac37) )
 	ROM_LOAD( "6_l6_g3.512", 0x10000, 0x10000, CRC(3e44d92b) SHA1(4e00e26a4dbf326c0c919c40382505189e82c85b) )
-	ROM_LOAD( "7_l7_g5.512", 0x20000, 0x10000, CRC(654bb754) SHA1(346bfbf85fc38797cf422da47d474e2ef2ef459c) )
+	ROM_LOAD( "7_l7_g5.512", 0x00000, 0x10000, CRC(654bb754) SHA1(346bfbf85fc38797cf422da47d474e2ef2ef459c) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "1_m1_h2.764", 0x00000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
+	ROM_LOAD( "1_m1_h2.764", 0x06000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
 	ROM_LOAD( "2_m2_h3.764", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
 	ROM_LOAD( "3_m3_h5.764", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
-	ROM_LOAD( "4_m4_h6.764", 0x06000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
+	ROM_LOAD( "4_m4_h6.764", 0x00000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "proms", 0x0000, 0x0200, NO_DUMP )
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129a.3c", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
+	ROM_LOAD( "82s129a.1c", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
+	ROM_LOAD( "82s129a.2c", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
 
-	ROM_REGION( 0x20, "proms2", ROMREGION_ERASE00 )
-	ROM_COPY( "proms", 0x00000, 0x00000, 0x20 ) // copy some fake colours from the no dump region
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129a.6j", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
 
-	ROM_REGION( 0x100, "unkprom", ROMREGION_ERASE00 )
-	//ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+	ROM_REGION( 0x100, "proms3", 0 )
+	ROM_LOAD( "dm74s288.1a", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
+	ROM_LOAD( "dm74s288.1b", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
+	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
+ROM_END
 
-	ROM_REGION( 0x20, "unkprom2", ROMREGION_ERASE00 )
-	//ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+// is this a bootleg board?
+// program is the same as above set (but without the oversized rom 9), only gfx1 differs
+// the proms came from this board
+ROM_START( magicala )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "8.12e", 0x00000, 0x08000, CRC(6978c662) SHA1(cfdbcdcd4085c264e1d0ad4f18160b40d2d4e406) )
+	ROM_IGNORE(0x8000) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "9.14e", 0x0c000, 0x04000, CRC(b3661c55) SHA1(f576d434ccec6f342455c18ada156d29634627cb) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5.2f", 0x20000, 0x10000, CRC(39e6ad6f) SHA1(0075015b3e794d82fb62984a41be48d17833c9f0) )
+	ROM_LOAD( "6.3f", 0x10000, 0x10000, CRC(42e03002) SHA1(5c4f2a1aa91d3c0906665bec7423f8579f434dc1) )
+	ROM_LOAD( "7.5f", 0x00000, 0x10000, CRC(5301a9a4) SHA1(f592bfc5f0d835cab6029aed7d6dcdd9d2ee1a2c) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1_m1_h2.764", 0x06000, 0x2000, CRC(d7d657e4) SHA1(53e2717edb4cdeac83cd519b08225784600afa61) )
+	ROM_LOAD( "2_m2_h3.764", 0x02000, 0x2000, CRC(fb7541d5) SHA1(62a36c186b32bd98dff5c3f0fa5f2ad13992835c) )
+	ROM_LOAD( "3_m3_h5.764", 0x04000, 0x2000, CRC(49572d8b) SHA1(ceaaf911f58cceec82f429ca9114bffa1a67ec12) )
+	ROM_LOAD( "4_m4_h6.764", 0x00000, 0x2000, CRC(cccfaa5d) SHA1(69d9b8a26c769fd69093610e92918c9a086a2077) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129a.3c", 0x000, 0x100, CRC(8c4c0dc8) SHA1(1b3ddbd253555efd1f48d469b42b272b9d96bacf) )
+	ROM_LOAD( "82s129a.1c", 0x100, 0x100, CRC(55e3c65f) SHA1(f51d08e0b2e4d97d2eacb1f6d52777065bbe1ae5) )
+	ROM_LOAD( "82s129a.2c", 0x200, 0x100, CRC(4d46f40a) SHA1(c141e94ae5705773605b7a094e65625b4a21db73) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129a.6j", 0x000, 0x100, CRC(1200815e) SHA1(8c9a856274246644af25961a2e731dbcb73f12b9) )
+
+	ROM_REGION( 0x100, "proms3", 0 )
+	ROM_LOAD( "dm74s288.1a", 0x00, 0x20, CRC(6a13320b) SHA1(6d7c663477f3fbc22fb716e15bfdd9c452eb686a) )
+	ROM_LOAD( "dm74s288.1b", 0x20, 0x20, CRC(e04abac8) SHA1(4f2adf9f1482470b6de6d0e547623f62e95eaf24) )
+	ROM_LOAD( "dm74s288.12k",0x40, 0x20, CRC(03231e84) SHA1(92abdf6f8ef705b260378e90e6d591da056c2cee) )
 ROM_END
 
 /*
 
-unknown koren or chinese bootleg of something?
+unknown korean or chinese bootleg of something?
 
 XTAL 12MHz
 Z80 @ 3MHz
@@ -7997,58 +8110,6 @@ ROM_START( wcat3 )
 
 	ROM_REGION( 0x40, "unkprom2", 0 )
 	ROM_LOAD( "wcat3.d13",	0x0000, 0x0020, CRC(eab832ed) SHA1(0fbc8914ba1805cfc6698fe7f137a934e63a4f89) )
-ROM_END
-
-/*
-
-Magical Tonic
-
-unknown, 40 pin cpu (plastic box, with "Tonic" sticker on it)
-8255 x3
-YM2203
-12 MHz
-
-4x DSW
-
-*/
-
-static DRIVER_INIT(mtonic)
-{
-	int A;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for (A = 0;A < 0x8000;A++)
-	{
-		if ((A & 4) == 4)
-			ROM[A] ^= 0x01;
-
-		ROM[A] = BITSWAP8(ROM[A], 3,6,5,4,7,2,1,0);
-	}
-}
-
-
-ROM_START( mtonic )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "8.e6",	0x0000, 0x8000, CRC(01daf2af) SHA1(cb9b12c79dce3c9123510a49dffc9f3cee056cf6) )
-	ROM_LOAD( "9.e6",	0x8000, 0x8000, CRC(1770ac79) SHA1(cadfd00ae75b90b1d202d741828e0afbd5ba0bec) )
-
-	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "5.j10",	0x00000, 0x10000, CRC(b8032ea3) SHA1(15e5335a583d8e7a5422cd4d1d7342874a4962ab) )
-	ROM_LOAD( "6.j11",	0x10000, 0x10000, CRC(ff38ff30) SHA1(8fef6e1fe7c307c69c9dcafa69ecf66467b9cb41) )
-	ROM_LOAD( "7.j12",	0x20000, 0x10000, CRC(8f1d2db9) SHA1(200de01334905079dca542541e442d4194ecd913) )
-
-	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "1.l10",	0x0000, 0x4000, CRC(746588db) SHA1(2a0af552011246d4cc0cd0b670907cf8685ce8ef) )
-	ROM_LOAD( "2.l11",	0x4000, 0x4000, CRC(8b7dd248) SHA1(a3ebde9fd0b6b1e42aa9b6d8e30c225abf2f80ce) )
-	ROM_LOAD( "3.l12",	0x8000, 0x4000, CRC(de05e678) SHA1(8b9fcb9f912075a20a9ae38100006b57d508e0e7) )
-	ROM_LOAD( "4.l13",	0xc000, 0x4000, CRC(8c542eee) SHA1(cb424e2a67c6d39302beca7cd5244bcad4a91189) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "prom1",	0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "prom2",	0x0100, 0x0100, NO_DUMP )
-
-	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "prom3",	0x0000, 0x0020, NO_DUMP )
 ROM_END
 
 
@@ -9917,7 +9978,8 @@ GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Aust
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",               "Wild Cat 3",                                               GAME_NOT_WORKING )
 
 GAME(  1992, magical,   0,        magical,  magical,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1991, mtonic,    magical,  magical,  mtonic,   mtonic,    ROT0, "Pal Company",                            "Magical Odds (set 2, alt hardware)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND) // Magical Odds logo / company in GFX
+GAME(  1992, magicala,  magical,  magical,  magical,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1991, mtonic,    magical,  magical,  mtonic,   mtonic,    ROT0, "Pal Company",                            "Magical Odds (set 3, alt hardware)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND) // Magical Odds logo / company in GFX
 
 
 /* --- Amcoe games --- */

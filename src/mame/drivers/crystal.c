@@ -902,6 +902,10 @@ ROM_START( topbladv )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
+	ROM_REGION( 0x4300, "pic", 0 ) // pic16c727 - we don't have a core for this
+	ROM_LOAD("top_blade_v_pic16c727.bin",  0x000000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b) )
+
+
 	ROM_REGION32_LE( 0x1000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
 
@@ -912,6 +916,10 @@ ROM_END
 ROM_START( officeye )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
 	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
+
+	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this
+	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.bin",  0x000000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f) )
+
 
 	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )

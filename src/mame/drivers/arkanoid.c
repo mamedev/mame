@@ -2,6 +2,12 @@
 
     Arkanoid driver
 
+	- I think the MCU dump we're using with the original sets is actually
+	  from a bootleg?  It's similar to the ones dumped from other bootlegs
+	  and the 2/3 of the decapped MCUs appear to be very different.  Another
+	  bootleg had a dump very similar to the fresh decaps instead.  This
+	  needs sorting out properly.  The hookups for the different types of MCU
+	  is not identical.
 
     Japanese version support cocktail mode (DSW #7), the others don't.
 
@@ -1059,6 +1065,12 @@ ROM_START( arkanoid )
 	ROM_LOAD( "a75-07.bpr",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )	/* red component */
 	ROM_LOAD( "a75-08.bpr",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )	/* green component */
 	ROM_LOAD( "a75-09.bpr",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )	/* blue component */
+
+	// these were decapped, sort them!
+	ROM_REGION( 0x0800, "alt_mcus", 0 )	/* 2k for the microcontroller */
+	ROM_LOAD( "arkanoid1_68705p3.bin",  0x0000, 0x0800, CRC(1b68e2d8) SHA1(f642a7cb624ee14fb0e410de5ae1fc799d2fa1c2) ) // this is close to the supported MCU, is it a bootleg?
+	ROM_LOAD( "arkanoid_mcu.bin",       0x0000, 0x0800, CRC(4e44b50a) SHA1(c61e7d158dc8e2b003c8158053ec139b904599af) ) // this has a more genuine Programmed By Yasu 1986 string in it with 0x00 fill near the end
+	ROM_LOAD( "arkanoid_68705p5.bin",   0x0000, 0x0800, CRC(0be83647) SHA1(625fd1e6061123df612f115ef14a06cd6009f5d1) ) // same as above, but with 0xff fill
 ROM_END
 
 ROM_START( arkanoidu )
@@ -1158,7 +1170,7 @@ ROM_START( arkmcubl )
 
 	/* Until we know what this MCU is supposed to do, we put it here */
 	ROM_REGION( 0x0800, "user1", 0 )
-	ROM_LOAD( "68705p3.6i",   0x0000, 0x0800, CRC(389a8cfb) SHA1(9530c051b61b5bdec7018c6fdc1ea91288a406bd) )
+	ROM_LOAD( "68705p3.6i",   0x0000, 0x0800, CRC(389a8cfb) SHA1(9530c051b61b5bdec7018c6fdc1ea91288a406bd) ) // this has the 1986 by Yasu copyright like some of the new decaps loaded in the parent set!
 ROM_END
 
 ROM_START( ark1ball )

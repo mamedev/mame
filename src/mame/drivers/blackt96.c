@@ -153,7 +153,7 @@ static WRITE16_HANDLER( blackt96_c0000_w )
 static WRITE16_HANDLER( blackt96_80000_w )
 {
 	// TO sound MCU?
-	//printf("blackt96_80000_w %04x %04x\n",data,mem_mask);
+	printf("blackt96_80000_w %04x %04x\n",data,mem_mask);
 }
 
 
@@ -342,12 +342,12 @@ static INPUT_PORTS_START( blackt96 )
 
     /* Dipswitch Port A */
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x0c00, 0x0000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
@@ -414,7 +414,6 @@ static const gfx_layout blackt962_layout =
 };
 
 
-/* wrong layout, but we can see some tiles */
 static const gfx_layout blackt963_layout =
 {
 	8,8,
@@ -432,8 +431,45 @@ static GFXDECODE_START( blackt96 )
 	GFXDECODE_ENTRY( "gfx3", 0, blackt963_layout,   0x0, 0x80  )
 GFXDECODE_END
 
+
+static READ8_HANDLER( PIC16C5X_T0_clk_r )
+{
+	return 0;
+}
+
+static WRITE8_HANDLER( blackt96_soundio_port00_w )
+{
+	
+}
+
+static READ8_HANDLER( blackt96_soundio_port01_r )
+{
+	return mame_rand(space->machine);
+}
+
+static WRITE8_HANDLER( blackt96_soundio_port01_w )
+{
+
+}
+
+static READ8_HANDLER( blackt96_soundio_port02_r )
+{
+	return mame_rand(space->machine);
+}
+
+static WRITE8_HANDLER( blackt96_soundio_port02_w )
+{
+
+}
+
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_WRITE( blackt96_soundio_port00_w )
+	AM_RANGE(0x01, 0x01) AM_READWRITE( blackt96_soundio_port01_r, blackt96_soundio_port01_w )
+	AM_RANGE(0x02, 0x02) AM_READWRITE( blackt96_soundio_port02_r, blackt96_soundio_port02_w )
+	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
+
+
 
 static MACHINE_DRIVER_START( blackt96 )
 	MDRV_CPU_ADD("maincpu", M68000, 18000000 /2)
@@ -441,7 +477,6 @@ static MACHINE_DRIVER_START( blackt96 )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C57, 8000000)	/* ? */
-	MDRV_DEVICE_DISABLE()
 	MDRV_CPU_IO_MAP(sound_io_map)
 
 	MDRV_GFXDECODE(blackt96)
@@ -477,7 +512,7 @@ ROM_START( blackt96 )
 	ROM_LOAD16_BYTE( "4", 0x00000, 0x40000, CRC(caff5b4a) SHA1(9a388cbb07211fa66f27082a8a5b847168c86a4f) )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 ) /* PIC16c57 Code */
-	ROM_LOAD( "pic16c57", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "pic16c57.bin", 0x00000, 0x2000, CRC(6053ba2f) SHA1(5dd28ddff17555de0e8574b78ff9e71204c503d3) )
 
 	ROM_REGION( 0x080000, "oki1", 0 ) /* Samples */
 	ROM_LOAD( "1", 0x00000, 0x80000, CRC(6a934174) SHA1(087f5fa226dc68ee217f99c64d16cdf14372d44c) )

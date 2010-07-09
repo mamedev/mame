@@ -1635,6 +1635,7 @@ const game_driver * const drivers[] =
 	DRIVER( uccopsar )	/* (c) 1992 Irem (World) */
 	DRIVER( uccopsj )	/* (c) 1992 Irem (Japan) */
 	DRIVER( mysticri )	/* (c) 1992 Irem (World) */
+	DRIVER( mysticrib )	/* bootleg? */
 	DRIVER( gunhohki )	/* (c) 1992 Irem (Japan) */
 	DRIVER( majtitl2 )	/* (c) 1992 Irem (World) */
 	DRIVER( majtitl2j )	/* (c) 1992 Irem (Japan) */

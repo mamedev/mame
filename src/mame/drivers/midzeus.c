@@ -13,6 +13,9 @@
     Known bugs:
         * not done yet
 
+	To Do
+		* make version 1.0 of MK4 work
+
 According to a Midway service bulletin
 As of 2/12/2001 the lastest software levels:
 
@@ -28,6 +31,7 @@ The Grid         v1.2   10/18/2000
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "includes/midzeus.h"
 #include "machine/midwayic.h"
 #include "machine/timekpr.h"
@@ -1128,6 +1132,23 @@ static MACHINE_DRIVER_START( midzeus )
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
 MACHINE_DRIVER_END
 
+static READ8_HANDLER( PIC16C5X_T0_clk_r )
+{
+	return 0;
+}
+
+static ADDRESS_MAP_START( pic_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
+ADDRESS_MAP_END
+
+
+static MACHINE_DRIVER_START( invasn )
+
+	MDRV_IMPORT_FROM(midzeus)
+
+	MDRV_CPU_ADD("pic", PIC16C57, 8000000)	/* ? */
+	MDRV_CPU_IO_MAP(pic_io_map)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( midzeus2 )
 
@@ -1222,6 +1243,9 @@ ROM_START( invasnab ) /* Version 5.0 Program roms, v4.0 Graphics roms, v2.0 Soun
 	ROM_LOAD16_BYTE( "invasion2.u4", 0x800000, 0x200000, CRC(5ef1fab5) SHA1(987afa0672fa89b18cf20d28644848a9e5ee9b17) )
 	ROM_LOAD16_BYTE( "invasion2.u5", 0xc00000, 0x200000, CRC(e42805c9) SHA1(e5b71eb1852809a649ac43a82168b3bdaf4b1526) )
 
+	ROM_REGION( 0x2000, "pic", 0 ) /* PIC16c57 Code */
+	ROM_LOAD( "pic16c57.u76", 0x00000, 0x2000, CRC(f62729c9) SHA1(9642c53dd7eceeb7eb178497d367691c44abc5c5) ) // is this even a valid dump?
+
 	ROM_REGION32_LE( 0x1800000, "user1", 0 )
 	ROM_LOAD32_WORD( "invasion5.u10", 0x0000000, 0x200000, CRC(8c7785d9) SHA1(701602314cd4eba4215c47ea0ae75fd4eddad43b) ) /* Roms U10 & U11 were labeled as v5.0 */
 	ROM_LOAD32_WORD( "invasion5.u11", 0x0000002, 0x200000, CRC(8ceb1f32) SHA1(82d01f25cba25d77b11c347632e8b72776e12984) )
@@ -1241,6 +1265,9 @@ ROM_START( invasnv4 ) /* Version 4.0 Program roms & Graphics roms, v2.0 Sound ro
 	ROM_LOAD16_BYTE( "invasion2.u3", 0x400000, 0x200000, CRC(86b956ae) SHA1(f7fd4601a2ce3e7e9b67e7d77908bfa206ee7e62) )
 	ROM_LOAD16_BYTE( "invasion2.u4", 0x800000, 0x200000, CRC(5ef1fab5) SHA1(987afa0672fa89b18cf20d28644848a9e5ee9b17) )
 	ROM_LOAD16_BYTE( "invasion2.u5", 0xc00000, 0x200000, CRC(e42805c9) SHA1(e5b71eb1852809a649ac43a82168b3bdaf4b1526) )
+
+	ROM_REGION( 0x2000, "pic", 0 ) /* PIC16c57 Code */
+	ROM_LOAD( "pic16c57.u76", 0x00000, 0x2000, CRC(f62729c9) SHA1(9642c53dd7eceeb7eb178497d367691c44abc5c5) ) // is this even a valid dump?
 
 	ROM_REGION32_LE( 0x1800000, "user1", 0 )
 	ROM_LOAD32_WORD( "invasion4.u10", 0x0000000, 0x200000, CRC(b3ce958b) SHA1(ed51c167d85bc5f6155b8046ec056a4f4ad5cf9d) ) /* These rom were all labeled as v4.0 */
@@ -1436,8 +1463,8 @@ static DRIVER_INIT( thegrid )
 GAME(  1997, mk4,      0,        midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1997, mk4a,     mk4,      midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME(  1997, mk4b,     mk4,      midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME(  1999, invasnab, 0,        midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME(  1999, invasnv4, invasnab, midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  1999, invasnab, 0,        invasn,   invasn,   invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME(  1999, invasnv4, invasnab, invasn,   invasn,   invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAMEL( 1999, crusnexo, 0,        midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
 GAMEL( 1999, crusnexoa,crusnexo, midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
 GAMEL( 1999, crusnexob,crusnexo, midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )

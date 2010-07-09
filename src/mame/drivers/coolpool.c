@@ -9,8 +9,8 @@
 
     The main cpu is a 34010; it is encrypted in 9 Ball Shootout.
 
-    The second CPU in AmeriDarts is a 32015, whose built-in ROM hasn't
-    been read. A simulation of the I/O behavior is included, but since the
+    The second CPU in AmeriDarts is a 32015, which hasn't been hooked up yet.
+    A simulation of the I/O behavior is included, but since the
     second CPU controls sound, there is no sound.
 
     The second CPU in Cool Pool and 9 Ball Shootout is a 320C26; the code
@@ -758,9 +758,9 @@ ROM_START( amerdart )
 	ROM_LOAD16_BYTE( "u57",  0x080001, 0x10000, CRC(f620f935) SHA1(bf891fce1f04f3ad5b8b72d43d041ceacb0b65bc) )
 	ROM_LOAD16_BYTE( "u58",  0x080000, 0x10000, CRC(f1b3d7c4) SHA1(7b897230d110be7a5eb05eda927d00561ebb9ce3) )
 
-	ROM_REGION( 0x18000, "dsp", 0 )	/* 32015 code (missing) */
-	ROM_LOAD16_BYTE( "dspl",         0x00000, 0x08000, NO_DUMP )
-	ROM_LOAD16_BYTE( "dsph",         0x00001, 0x08000, NO_DUMP )
+	// not hooked up yet
+	ROM_REGION( 0x2000, "dsp", 0 )	/* 32015 code  */
+	ROM_LOAD( "tms320e15.bin",         0x00000, 0x02000, CRC(21c6f9b0) SHA1(48b0a063b60861db76f85ebc1de010aa8c772158) )
 
 	ROM_REGION( 0x100000, "user2", 0 )				/* 32015 data? (incl. samples?) */
 	ROM_LOAD16_WORD( "u1",   0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) )
@@ -794,9 +794,9 @@ ROM_START( amerdart2 )
 	ROM_LOAD16_BYTE( "u57.bin", 0x080001, 0x10000, CRC(8a70f849) SHA1(dfd4cf90de2ab8cbeff458f0fd20110c1ed009e9) )
 	ROM_LOAD16_BYTE( "u58.bin", 0x080000, 0x10000, CRC(8bb81975) SHA1(b7666572ab543991c7deaa0ebefb8b4526a7e386) )
 
-	ROM_REGION( 0x18000, "dsp", 0 )	/* 32015 code (missing) */
-	ROM_LOAD16_BYTE( "dspl",         0x00000, 0x08000, NO_DUMP )
-	ROM_LOAD16_BYTE( "dsph",         0x00001, 0x08000, NO_DUMP )
+	// not hooked up yet
+	ROM_REGION( 0x2000, "dsp", 0 )	/* 32015 code  */
+	ROM_LOAD( "tms320e15.bin",         0x00000, 0x02000, CRC(21c6f9b0) SHA1(48b0a063b60861db76f85ebc1de010aa8c772158) )
 
 	ROM_REGION( 0x100000, "user2", 0 )				/* 32015 data? (incl. samples?) */
 	ROM_LOAD16_WORD( "u1.bin",   0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) )

@@ -1675,6 +1675,35 @@ ROM_START( gunhohki )
 	ROM_LOAD( "mr-da.bin", 0x000000, 0x040000, CRC(1a11fc59) SHA1(6d1f4ca688bf015ecbbe369fbc0eb5e2bcaefcfc) )
 ROM_END
 
+ROM_START( mysticrib )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "h0", 0x000001, 0x040000, CRC(e38c1f56) SHA1(491f370c66c36ab56a4bee3f335fe7357ff5668b) )
+	ROM_LOAD16_BYTE( "l0", 0x000000, 0x040000, CRC(77846e48) SHA1(c715136c4ed8dda24ec1ed634e6308d23c92ec05) )
+	ROM_LOAD16_BYTE( "h1", 0x080001, 0x010000, CRC(4dcb085b) SHA1(7c053f5ef2978e574d3d2d9f5c12035473d13c3b) )
+	ROM_LOAD16_BYTE( "l1", 0x080000, 0x010000, CRC(88df4f70) SHA1(f55769a107fe3f5446d8268f66e895b02727c61e) )
+
+	ROM_REGION( 0x100000, "soundcpu", 0 )	/* 1MB for the audio CPU - encrypted V30 = NANAO custom D80001 (?) */
+	// older revision code? rev 3.31, doesn't work?
+	ROM_LOAD16_BYTE( "sh0", 0x000001, 0x010000, CRC(fc7221ee) SHA1(4e714f31ce0d1bb2f6c649a26af748f96912848e) )
+	ROM_LOAD16_BYTE( "sl0", 0x000000, 0x010000, CRC(65c809e6) SHA1(45a860b250219a15aa8a2177251f4d3f2e559b9e) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* Tiles */
+	ROM_LOAD( "mr-c0.bin", 0x000000, 0x040000, CRC(872a8fad) SHA1(236406e5959c81a1cffe96fef02d637c2150ce1e) )
+	ROM_LOAD( "mr-c1.bin", 0x040000, 0x040000, CRC(d2ffb27a) SHA1(fedfb430ce8a8953b2f78970d0b0dc5571de333c) )
+	ROM_LOAD( "mr-c2.bin", 0x080000, 0x040000, CRC(62bff287) SHA1(cb7b73c4a26737f1a1f9cc9423ae51c284368b1b) )
+	ROM_LOAD( "mr-c3.bin", 0x0c0000, 0x040000, CRC(d0da62ab) SHA1(96c7c8e1d8dafb797731652fa91d3048aa157185) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
+	ROM_LOAD( "mr-o00.bin", 0x000000, 0x080000, CRC(a0f9ce16) SHA1(ae423313d189ebddc6d5d0785ac484e0cdf79112) )
+	ROM_LOAD( "mr-o10.bin", 0x100000, 0x080000, CRC(4e70a9e9) SHA1(8f6b043b03420a590a1081c99311723169126332) )
+	ROM_LOAD( "mr-o20.bin", 0x200000, 0x080000, CRC(b9c468fc) SHA1(dc42a5b80cad5373fce03cc416b9d742fcbec6e9) )
+	ROM_LOAD( "mr-o30.bin", 0x300000, 0x080000, CRC(cc32433a) SHA1(a1a1ab09c4bd6c9ae85529c1aa5427ad3126b914) )
+
+	ROM_REGION( 0x40000, "irem", 0 )
+	ROM_LOAD( "mr-da.bin", 0x000000, 0x040000, CRC(1a11fc59) SHA1(6d1f4ca688bf015ecbbe369fbc0eb5e2bcaefcfc) )
+ROM_END
+
+
 ROM_START( uccops )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "uc_h0.rom", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
@@ -2199,6 +2228,9 @@ GAME( 1992, uccopsar, uccops,   uccops,        uccops,   uccops,   ROT0,   "Irem
 GAME( 1992, uccopsj,  uccops,   uccops,        uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Japan)", 0 )
 GAME( 1992, mysticri, 0,        mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (World)", 0 )
 GAME( 1992, gunhohki, mysticri, mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Gun Hohki (Japan)", 0 )
+// cheaply produced Korean board, has original chips, but lacks any proper labels - uses older revision sound program that doesn't work in MAME right now
+// main code is also significantly different to the supported original set, so it might just be a legitimate early revision on a cheap board
+GAME( 1992, mysticrib,mysticri, mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (bootleg?)", GAME_NO_SOUND )
 GAME( 1992, majtitl2, 0,        majtitl2,      majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (World)", 0 )
 GAME( 1992, majtitl2j,majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (Japan)", 0 )
 GAME( 1992, skingame, majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 1)", 0 )
