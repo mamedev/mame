@@ -10,7 +10,6 @@ CuboCD32 definitions
 /*----------- defined in machine/cubocd32.c -----------*/
 
 extern void amiga_akiko_init(running_machine* machine);
-extern NVRAM_HANDLER( cd32 );
 extern READ32_HANDLER(amiga_akiko32_r);
 extern WRITE32_HANDLER(amiga_akiko32_w);
 
