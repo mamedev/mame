@@ -126,7 +126,7 @@ void i2cmem_device_config::device_config_complete()
 		*static_cast<i2cmem_interface *>(this) = *intf;
 	}
 
-	m_space_config = address_space_config( "ic2mem", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME( i2cmem_map8 ) );
+	m_space_config = address_space_config( "i2cmem", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME( i2cmem_map8 ) );
 }
 
 
