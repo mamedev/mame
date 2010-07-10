@@ -9763,6 +9763,7 @@ Other Sun games
 	DRIVER( wcat3 )
 	DRIVER( mtonic )	/* 198? (c) Tonic */
 	DRIVER( magical )	/* 198? (c) Micro Manufacturing Ltd. */
+	DRIVER( magicala )	/* 198? (c) Micro Manufacturing Ltd. */
 
 	DRIVER( sfbonus )	/* (c) 2003 Amcoe - Skill Fruit Bonus */
 	DRIVER( sfbonusd1 )	/* (c) 2003 Amcoe */
