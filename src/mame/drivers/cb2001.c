@@ -68,16 +68,16 @@ static const UINT8 cb2001_decryption_table[256] = {
 //              pppp           pppp                      pppp      pppp      pppp
 	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0x8d,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
 //    ****      pppp pppp pppp **** pppp !!!!  pppp      pppp pppp pppp pppp      pppp
-	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x13,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
-//    pppp      pppp           pppp                 **** pppp      pppp      pppp pppp
+	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x05,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
+//    pppp      pppp           pppp                 pppp pppp      pppp      pppp pppp
 	0xcb,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,0x48,xxxx,0x2e,xxxx, /* C0 */
 //    pppp pppp pppp           pppp pppp                 pppp **** ****      pppp
 	xxxx,0xf2,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //         ???? pppp      ****      pppp pppp  pppp                     **** !!!! pppp
 	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //    pppp gggg      !!!!      ****            pppp ****
-	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
-//         ???? pppp                     ****                      
+	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,xxxx,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
+//         ???? pppp                     ****                      pppp
 };
 
 /* robiza's notes:
