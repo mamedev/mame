@@ -307,7 +307,7 @@ Dumped by tirino73 >isolani (at) interfree.it<
 ROM_START( ttchampa )
 	/* this is from a different board */
 
-	ROM_REGION16_BE( 0x200000, "user1", 0 )
+	ROM_REGION16_LE( 0x200000, "user1", 0 )
 	ROM_LOAD16_BYTE( "ttennis2.bin", 0x000000, 0x080000,  CRC(b060e72c) SHA1(376e71bb4b1687fec4b719cbc5a7b25b64d159ac) )
 	ROM_LOAD16_BYTE( "ttennis3.bin", 0x000001, 0x080000,  CRC(33e085a8) SHA1(ea6af05690b4b0803c303a3c858df10e4d907fb1) )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
