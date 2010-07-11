@@ -2173,7 +2173,7 @@ static DRIVER_INIT( rdft2us )
 }
 
 
-static DRIVER_INIT( rfjet )
+static void init_rfjet(running_machine *machine)
 {
 	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
@@ -2186,11 +2186,21 @@ static DRIVER_INIT( rfjet )
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
 
+static DRIVER_INIT( rfjet )
+{
+	init_rfjet(machine);
+}
+
 /* SYS386 */
 
 static DRIVER_INIT( rdft22kc )
 {
 	init_rf2(machine);
+}
+
+static DRIVER_INIT( rfjet2k )
+{
+	init_rfjet(machine);
 }
 
 static MACHINE_RESET( seibu386 )
@@ -3438,10 +3448,13 @@ ROM_START( rdjet2kc )
 	ROM_LOAD("obj-3.u0749", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
 
 	ROM_REGION( 0x80000, "oki1", 0)	/* sound data for MSM6295 */
-	ROM_LOAD("rfj-05.u1022", 0x000000, 0x80000, CRC(bc6e78fb) SHA1(f58df5dae9fc804cbabf1156e053c9f1e22e7068) )
+	// this is empty!!
+	ROM_LOAD("rfj-04.u1023", 0x000000, 0x80000, BAD_DUMP CRC(2061a9f6) SHA1(ef0282ea649ed0ff47f6b3935a0d1e02a737e4b1) )
 
 	ROM_REGION( 0x80000, "oki2", 0)	/* sound data for MSM6295 */
-	ROM_LOAD("rfj-04.u1023", 0x000000, 0x80000, CRC(2061a9f6) SHA1(ef0282ea649ed0ff47f6b3935a0d1e02a737e4b1) )
+	// the first half is empty.. just different bank setting, or bad dump?
+	ROM_LOAD("rfj-05.u1022", 0x000000, 0x40000, BAD_DUMP CRC(bc6e78fb) SHA1(f58df5dae9fc804cbabf1156e053c9f1e22e7068) )
+	ROM_CONTINUE(0x00000,0x40000)
 ROM_END
 
 /*
