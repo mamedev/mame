@@ -3895,6 +3895,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( timescan1 )	/* (c) 1987 (FD1089B, decrypted) */
 	DRIVER( wb31 )		/* (c) 1988 Sega / Westone (FD1094, decrypted) */
 	DRIVER( wb35 )		/* (c) 1988 Sega / Westone (FD1089A, decrypted) */
+	DRIVER( wb35a )		/* (c) 1988 Sega / Westone (FD1089A, decrypted) */
 	DRIVER( passsht16a )/* (c) 1988 */
 
 	/* System 16B */
