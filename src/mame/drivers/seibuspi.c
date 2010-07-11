@@ -2198,11 +2198,6 @@ static DRIVER_INIT( rdft22kc )
 	init_rf2(machine);
 }
 
-static DRIVER_INIT( rfjet2k )
-{
-	init_rfjet(machine);
-}
-
 static MACHINE_RESET( seibu386 )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
