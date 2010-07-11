@@ -240,6 +240,17 @@ ROM_START( mj2 )
 	ROM_LOAD("gdx-0006c.pic_data", 0x00, 0x50, NO_DUMP )
 ROM_END
 
+ROM_START( ollie )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0007", 0, SHA1(8898a571a427936bffcecd3ef27cb79087d22798) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdx-0007.data", 0x00, 0x50, CRC(d2a8b31f) SHA1(e9ee2df30031826db6bc4bd91969e6680255dcf9) )
+ROM_END
+
+
 
 ROM_START( wangmid )
 	CHIHIRO_BIOS
@@ -288,14 +299,15 @@ ROM_END
 
 
 GAME( 200?, chihiro,  0,       chihiro_base, chihiro,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2002, hotd3,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "The House of the Dead III [GDX-0001]", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, outr2,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Out Run 2 (Rev. A) [GDX-0004A]", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, mj2,      chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 2 (Rev C) [GDX-0006C]", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, hotd3,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "The House of the Dead III (GDX-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, outr2,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Out Run 2 (Rev. A) (GDX-0004A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, mj2,      chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 2 (Rev C) (GDX-0006C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ollie,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Ollie King (GDX-0007)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid,  chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Rev. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid2, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Export) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ghostsqu, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, gundamos, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Gundam Battle Operating Simulator (GDX-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, vcop3,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, mj3,      chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 3 (Rev D) [GDX-0017D]", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2006, scg06nt,  chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Club Golf 2006 Next Tours (Rev A) [GDX-0018A]", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, mj3,      chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 3 (Rev D) (GDX-0017D)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, scg06nt,  chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Sega Club Golf 2006 Next Tours (Rev A) (GDX-0018A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 

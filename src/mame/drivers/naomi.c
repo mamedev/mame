@@ -5465,7 +5465,7 @@ ROM_START( dygolf )
 	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d502155ddaf881c2c9505528004b9904aa32a59c) )
+	DISK_IMAGE_READONLY( "gds-0009a", 0, SHA1(d502155ddaf881c2c9505528004b9904aa32a59c) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//ROM_LOAD("317-0308-com.data", 0x00, 0x50,  CRC(56f63af0) SHA1(3c453226fc53d2f700b3634db3ef8ce206d94392) )
@@ -5772,7 +5772,7 @@ GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",      
 //GDS-0006 Virtua Striker 3 (NAOMI 2)
 //GDS-0007 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
 GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2001, dygolf,    naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2001, dygolf,    naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (Rev A) (GDS-0009A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDS-0012 Virtua Fighter 4 (NAOMI 2)

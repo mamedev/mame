@@ -4839,7 +4839,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
 	DRIVER( outr2 )		/* 2003.12 Outrun 2 */
 						/* 2004.03 Sega Network Taisen Mahjong MJ 2 */
-						/* 2004.03 Ollie King */
+	DRIVER( ollie )		/* 2004.03 Ollie King */
 						/* 2004.04 Sega Network Taisen Mahjong MJ 2 ver.B */
 	DRIVER( wangmid )	/* 2004.07 Wangan Midnight Maximum Tune */
 	DRIVER( mj2 )		/* 2004.07 Sega Network Taisen Mahjong MJ 2 ver.C */
