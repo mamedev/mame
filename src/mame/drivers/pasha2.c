@@ -464,7 +464,7 @@ ROM_START( pasha2 )
 	// empty space, but no empty sockets on the pcb
 
 	// not hooked up yet
-	ROM_REGION( 0x1000, "cpu1", 0 ) /* AT89C52 */
+	ROM_REGION( 0x2000, "cpu1", 0 ) /* AT89C52 */
 	ROM_LOAD( "89c52.bin",  0x0000, 0x2000, CRC(9ce43ce4) SHA1(8027a3549b38e9a2e7bb8f518a0defcaf9743371) )
 
 	ROM_REGION( 0x80000, "user3", 0 ) /* SAM9773 sound data */
