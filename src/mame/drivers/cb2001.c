@@ -297,7 +297,7 @@ e3 -> c6
 */
 
 static UINT16 *cb2001_vram_fg;
-// static UINT16* cb2001_vram_bg;
+static UINT16* cb2001_vram_bg;
 static int cb2001_videobank;
 
 static VIDEO_START(cb2001)
@@ -310,7 +310,7 @@ static VIDEO_UPDATE(cb2001)
 	int count,x,y;
 
 	count = 0x0000;
-/*
+
 	for (y=0;y<32;y++)
 	{
 		for (x=0;x<64;x++)
@@ -327,7 +327,7 @@ static VIDEO_UPDATE(cb2001)
 			count++;
 		}
 	}
-*/
+
 
 	count = 0x0000;
 
@@ -342,7 +342,7 @@ static VIDEO_UPDATE(cb2001)
 			colour = (cb2001_vram_fg[count] & 0xf000)>>12;
 			tile += cb2001_videobank*0x2000;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -390,7 +390,7 @@ static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x21c00, 0x21c7f) AM_RAM /* AM_BASE_MEMBER(cb2001_state,reel3_scroll) */
 	AM_RANGE(0x21c80, 0x21fff) AM_RAM
 
-//	AM_RANGE(0x21000, 0x21fff) AM_RAM AM_BASE(&cb2001_vram_bg)
+	AM_RANGE(0x21000, 0x21fff) AM_RAM AM_BASE(&cb2001_vram_bg)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
@@ -712,7 +712,7 @@ ROM_START( scherrym )
 	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
 
 	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB - 2 PCBs have been found this way, it probably uploads the GFX.
+//	ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB - 2 PCBs have been found this way, it probably uploads the GFX.
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )
