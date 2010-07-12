@@ -760,7 +760,7 @@ ROM_START( amerdart )
 
 	// not hooked up yet
 	ROM_REGION( 0x2000, "dsp", 0 )	/* 32015 code  */
-	ROM_LOAD( "tms320e15.bin",         0x00000, 0x02000, CRC(21c6f9b0) SHA1(48b0a063b60861db76f85ebc1de010aa8c772158) )
+	ROM_LOAD( "tms320e15.bin", 0x00000, 0x02000, BAD_DUMP CRC(21c6f9b0) SHA1(48b0a063b60861db76f85ebc1de010aa8c772158) )
 
 	ROM_REGION( 0x100000, "user2", 0 )				/* 32015 data? (incl. samples?) */
 	ROM_LOAD16_WORD( "u1",   0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) )
@@ -796,7 +796,7 @@ ROM_START( amerdart2 )
 
 	// not hooked up yet
 	ROM_REGION( 0x2000, "dsp", 0 )	/* 32015 code  */
-	ROM_LOAD( "tms320e15.bin",         0x00000, 0x02000, CRC(21c6f9b0) SHA1(48b0a063b60861db76f85ebc1de010aa8c772158) )
+	ROM_LOAD( "tms320e15.bin", 0x00000, 0x02000, BAD_DUMP CRC(21c6f9b0) SHA1(48b0a063b60861db76f85ebc1de010aa8c772158) )
 
 	ROM_REGION( 0x100000, "user2", 0 )				/* 32015 data? (incl. samples?) */
 	ROM_LOAD16_WORD( "u1.bin",   0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) )
