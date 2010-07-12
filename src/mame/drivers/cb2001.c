@@ -36,6 +36,8 @@ In test mode (c) is 2000
 
 ------------------------------
 
+this seems more like 8-bit hardware, maybe it should be v25, not v35...
+
 *************************************************************************************************/
 
 #include "emu.h"
@@ -299,35 +301,79 @@ e3 -> c6
 static UINT16 *cb2001_vram_fg;
 static UINT16* cb2001_vram_bg;
 static int cb2001_videobank;
+static int cb2001_videomode;
 
-static VIDEO_START(cb2001)
-{
+static tilemap_t *reel1_tilemap, *reel2_tilemap, *reel3_tilemap;
 
-}
+
+// these areas are wrong
+static const rectangle visible1 = { 0*8, (14+48)*8-1,  3*8,  (3+7)*8-1 };
+static const rectangle visible2 = { 0*8, (14+48)*8-1, 10*8, (10+7)*8-1 };
+static const rectangle visible3 = { 0*8, (14+48)*8-1, 17*8, (17+7)*8-1 };
 
 static VIDEO_UPDATE(cb2001)
 {
 	int count,x,y;
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	count = 0x0000;
 
-	for (y=0;y<32;y++)
+	// render bg as 8x8 tilemaps
+	if (!(cb2001_videomode & 0x03))
 	{
-		for (x=0;x<64;x++)
+		for (y=0;y<32;y++)
 		{
-			int tile;
-			int colour;
+			for (x=0;x<64;x++)
+			{
+				int tile;
+				int colour;
 
-			tile = (cb2001_vram_bg[count] & 0x0fff);
-			colour = (cb2001_vram_bg[count] & 0xf000)>>12;
-			tile += cb2001_videobank*0x2000;
+				tile = (cb2001_vram_bg[count] & 0x0fff);
+				colour = (cb2001_vram_bg[count] & 0xf000)>>12;
+				tile += cb2001_videobank*0x2000;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
 
-			count++;
+				count++;
+			}
 		}
 	}
+	else
+	{
+		int i;
+	
+		for (i= 0;i < 64;i++)
+		{
+			UINT16 scroll;
+			
+			scroll = cb2001_vram_bg[0x800/2 + i/2];
+			if (i&1)
+				scroll >>=8;
+			scroll &=0xff;
+		
+			tilemap_set_scrolly(reel2_tilemap, i, scroll);
 
+			scroll = cb2001_vram_bg[0xa00/2 + i/2];
+			if (i&1)
+				scroll >>=8;
+			scroll &=0xff;
+		
+			tilemap_set_scrolly(reel1_tilemap, i, scroll);
+
+			scroll = cb2001_vram_bg[0xc00/2 + i/2];
+			if (i&1)
+				scroll >>=8;
+			scroll &=0xff;
+		
+			tilemap_set_scrolly(reel3_tilemap, i, scroll);
+
+		}
+
+
+		tilemap_draw(bitmap, &visible1, reel1_tilemap, 0, 0);
+		tilemap_draw(bitmap, &visible2, reel2_tilemap, 0, 0);
+		tilemap_draw(bitmap, &visible3, reel3_tilemap, 0, 0);
+	}
 
 	count = 0x0000;
 
@@ -358,39 +404,124 @@ WRITE16_HANDLER( cb2001_vidctrl_w )
 	if (mem_mask&0xff00) // video control?
 	{
 		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
-		cb2001_videobank = (data & 0x0800)>>11;
+		cb2001_videobank = (data & 0x0800)>>11; 
 	}
 	else // something else
-		logerror("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
+		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
 }
 
 WRITE16_HANDLER( cb2001_vidctrl2_w )
 {
 	if (mem_mask&0xff00) // video control?
 	{
-		logerror("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask);
+		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
+		cb2001_videomode = (data>>8) & 0x03; // which bit??
 	}
 	else // something else
-		logerror("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
+		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
+}
+
+
+static TILE_GET_INFO( get_cb2001_reel1_tile_info )
+{
+	int code = cb2001_vram_bg[(0x0000/2) + tile_index/2];
+	
+	if (tile_index&1)
+		code >>=8;
+
+	code &=0xff;
+	
+	int colour = 0;//= (cb2001_out_c&0x7) + 8;
+
+	SET_TILE_INFO(
+			1,
+			code+0x800,
+			colour,
+			0);
+}
+
+static TILE_GET_INFO( get_cb2001_reel2_tile_info )
+{
+	int code = cb2001_vram_bg[(0x0200/2) + tile_index/2];
+	
+	if (tile_index&1)
+		code >>=8;
+
+	code &=0xff;
+	
+	int colour = 0;//(cb2001_out_c&0x7) + 8;
+
+	SET_TILE_INFO(
+			1,
+			code+0x800,
+			colour,
+			0);
+}
+
+
+static TILE_GET_INFO( get_cb2001_reel3_tile_info )
+{
+	int code = cb2001_vram_bg[(0x0400/2) + tile_index/2];
+	int colour = 0;//(cb2001_out_c&0x7) + 8;
+
+	if (tile_index&1)
+		code >>=8;
+
+	code &=0xff;
+
+	SET_TILE_INFO(
+			1,
+			code+0x800,
+			colour,
+			0);
+}
+
+
+static VIDEO_START(cb2001)
+{
+	reel1_tilemap = tilemap_create(machine,get_cb2001_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	reel2_tilemap = tilemap_create(machine,get_cb2001_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	reel3_tilemap = tilemap_create(machine,get_cb2001_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+
+	tilemap_set_scroll_cols(reel1_tilemap, 64);
+	tilemap_set_scroll_cols(reel2_tilemap, 64);
+	tilemap_set_scroll_cols(reel3_tilemap, 64);
+}
+
+WRITE16_HANDLER( cb2001_bg_w )
+{
+	COMBINE_DATA(&cb2001_vram_bg[offset]);
+	
+	// also used for the reel tilemaps in a different mode
+/*
+	if (offset<0x200/2)
+	{
+		tilemap_mark_tile_dirty(reel1_tilemap,(offset&0xff)/2);
+	}
+	else if (offset<0x400/2)
+	{
+		tilemap_mark_tile_dirty(reel2_tilemap,(offset&0xff)/2);	
+	}
+	else if (offset<0x600/2)
+	{
+		tilemap_mark_tile_dirty(reel3_tilemap,(offset&0xff)/2);	
+	}
+	else if (offset<0x800/2)
+	{
+	//	tilemap_mark_tile_dirty(reel4_tilemap,(offset&0xff)/2);	
+	}
+*/
+	tilemap_mark_all_tiles_dirty (reel1_tilemap);
+	tilemap_mark_all_tiles_dirty (reel2_tilemap);
+	tilemap_mark_all_tiles_dirty (reel3_tilemap);
+
+	
 }
 
 static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_BASE(&cb2001_vram_fg)
-
-	AM_RANGE(0x21000, 0x211ff) AM_RAM /* _WRITE( cb2001_reel1_ram_w ) AM_BASE_MEMBER(cb2001_state,reel1_ram) */
-	AM_RANGE(0x21200, 0x213ff) AM_RAM /* _WRITE( cb2001_reel2_ram_w ) AM_BASE_MEMBER(cb2001_state,reel2_ram) */
-	AM_RANGE(0x21400, 0x215ff) AM_RAM /* _WRITE( cb2001_reel3_ram_w ) AM_BASE_MEMBER(cb2001_state,reel3_ram) */
-	AM_RANGE(0x21600, 0x217ff) AM_RAM
-
-	AM_RANGE(0x21800, 0x2187f) AM_RAM /* AM_BASE_MEMBER(cb2001_state,reel1_scroll) */
-	AM_RANGE(0x21880, 0x219ff) AM_RAM
-	AM_RANGE(0x21a00, 0x21a7f) AM_RAM /* AM_BASE_MEMBER(cb2001_state,reel2_scroll) */
-	AM_RANGE(0x21a80, 0x21bff) AM_RAM
-	AM_RANGE(0x21c00, 0x21c7f) AM_RAM /* AM_BASE_MEMBER(cb2001_state,reel3_scroll) */
-	AM_RANGE(0x21c80, 0x21fff) AM_RAM
-
-	AM_RANGE(0x21000, 0x21fff) AM_RAM AM_BASE(&cb2001_vram_bg)
+	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(&cb2001_bg_w) AM_BASE(&cb2001_vram_bg)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
@@ -721,4 +852,5 @@ ROM_END
 
 GAME( 2001, cb2001,    0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Cherry Bonus 2001", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2001, scherrym,  0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Super Cherry Master", GAME_NOT_WORKING|GAME_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+
 
