@@ -462,7 +462,7 @@ bool legacy_image_device_base::finish_load()
     {
 		image_checkhash();
 
-        if (has_been_created())
+        if (has_been_created() && m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_CREATE)!=NULL)
         {
             err = call_create(m_create_format, m_create_args);
             if (err)
@@ -543,7 +543,11 @@ void legacy_image_device_base::clear()
 
 void legacy_image_device_base::unload()
 {
+	if (is_loaded()) {
+		call_unload();
+	}
     clear();
+	clear_error();
 }
 
 int legacy_image_device_base::call_load()
