@@ -48,8 +48,8 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #define xxxx 0x90 /* Unknown */
 
 static const UINT8 cb2001_decryption_table[256] = {
-	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,xxxx, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
-//    pppp                pppp **** pppp       pppp           pppp                pppp
+	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,0x2f, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
+//    pppp                pppp **** pppp pppp  pppp           pppp                pppp
 	0x86,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
 //    wwww           **** pppp                 pppp      pppp pppp pppp pppp pppp pppp
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,xxxx, /* 20 */
@@ -64,8 +64,8 @@ static const UINT8 cb2001_decryption_table[256] = {
 //                        pppp                 pppp pppp                pppp pppp
 	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
 //    pppp pppp pppp pppp           pppp       pppp      pppp           pppp
-	0x26,xxxx,xxxx,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x02,xxxx, /* 80 */
-//    pppp                     pppp **** pppp            pppp      pppp      wwww 
+	0x26,xxxx,xxxx,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
+//    pppp                     pppp **** pppp            pppp      pppp      pppp 
 	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
 //              pppp           pppp                      pppp      pppp      pppp
 	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0x8d,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
