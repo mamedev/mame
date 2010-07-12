@@ -548,7 +548,7 @@ static MACHINE_START( paradise )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 3, bank_n - 4, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 3, bank_n - 3, &ROM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->palbank);
 	state_save_register_global(machine, state->priority);
