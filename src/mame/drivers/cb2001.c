@@ -76,8 +76,8 @@ static const UINT8 cb2001_decryption_table[256] = {
 //    pppp pppp pppp           pppp pppp                 pppp **** ****      pppp
 	xxxx,0xf2,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,0x04,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //         ???? pppp      ****      pppp pppp  pppp           wwww      **** !!!! pppp
-	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,0x04, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
-//    pppp gggg      !!!!      ****      wwww  pppp ****
+	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,0xb2, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
+//    pppp gggg      !!!!      ****      pppp  pppp ****
 	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,xxxx,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
 //         ???? pppp                     ****                      pppp
 };
