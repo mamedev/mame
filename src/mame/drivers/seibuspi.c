@@ -2198,6 +2198,11 @@ static DRIVER_INIT( rdft22kc )
 	init_rf2(machine);
 }
 
+static DRIVER_INIT( rfjet2k )
+{
+	init_rfjet(machine);
+}
+
 static MACHINE_RESET( seibu386 )
 {
 	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
@@ -3421,7 +3426,7 @@ ROM_START( rdft22kc )
 	ROM_LOAD("pcm1.1023", 0x000000, 0x80000, CRC(8b716356) SHA1(42ee1896c02518cd1e9cb0dc130321834665a79e) )
 ROM_END
 
-ROM_START( rdjet2kc )
+ROM_START( rfjet2kc )
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
 	ROM_LOAD32_WORD("prg01.u267", 0x000000, 0x100000, CRC(36019fa8) SHA1(28baf0ed4a53b818c1e6986d5d3491373524eca1) )
 	ROM_LOAD32_WORD("prg23.u266", 0x000002, 0x100000, CRC(65695dde) SHA1(1b25dde03bc9319414144fc13b34c455112f4076) )
@@ -3443,13 +3448,10 @@ ROM_START( rdjet2kc )
 	ROM_LOAD("obj-3.u0749", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
 
 	ROM_REGION( 0x80000, "oki1", 0)	/* sound data for MSM6295 */
-	// this is empty!!
-	ROM_LOAD("rfj-04.u1023", 0x000000, 0x80000, BAD_DUMP CRC(2061a9f6) SHA1(ef0282ea649ed0ff47f6b3935a0d1e02a737e4b1) )
+	ROM_LOAD("rfj-05.u1022", 0x000000, 0x80000, CRC(fd599b35) SHA1(00c0307d1b503bd5ce02d7960ce5e1ad600a7290) )
 
 	ROM_REGION( 0x80000, "oki2", 0)	/* sound data for MSM6295 */
-	// the first half is empty.. just different bank setting, or bad dump?
-	ROM_LOAD("rfj-05.u1022", 0x000000, 0x40000, BAD_DUMP CRC(bc6e78fb) SHA1(f58df5dae9fc804cbabf1156e053c9f1e22e7068) )
-	ROM_CONTINUE(0x00000,0x40000)
+	ROM_LOAD("rfj-04.u1023", 0x000000, 0x80000, CRC(1d10cd08) SHA1(c431d3f1a7b580024b083dafb76c53b771c88726) )
 ROM_END
 
 /*
@@ -3576,7 +3578,7 @@ GAME( 1999, rfjetus,   rfjet,   sxx2g,    spi_2button, rfjet,    ROT270, "Seibu 
 
 /* SYS386 */
 GAME( 2000, rdft22kc,  rdft2,   seibu386, seibu386_2button, rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, rdjet2kc,  rfjet,   seibu386, seibu386_2button, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet - 2000 (China)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND )
+GAME( 2000, rfjet2kc,  rfjet,   seibu386, seibu386_2button, rfjet2k,  ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
 
 /* SYS386F V2.0 */
 GAME( 1999, ejsakura,   0,        sys386f2, spi_ejsakura, sys386f2, ROT0, "Seibu Kaihatsu", "E-Jan Sakurasou (v2.0)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
