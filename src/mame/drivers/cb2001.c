@@ -346,14 +346,14 @@ static VIDEO_UPDATE(cb2001)
 		{
 			UINT16 scroll;
 			
-			scroll = cb2001_vram_bg[0x800/2 + i/2];
+			scroll = cb2001_vram_bg[0xa00/2 + i/2];
 			if (i&1)
 				scroll >>=8;
 			scroll &=0xff;
 		
 			tilemap_set_scrolly(reel2_tilemap, i, scroll);
 
-			scroll = cb2001_vram_bg[0xa00/2 + i/2];
+			scroll = cb2001_vram_bg[0x800/2 + i/2];
 			if (i&1)
 				scroll >>=8;
 			scroll &=0xff;
