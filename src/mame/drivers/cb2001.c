@@ -49,11 +49,11 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 
 static const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,0x2f, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
-//    pppp                pppp **** pppp pppp  pppp           pppp                pppp
+//    ----                ---- **** pppp pppp  pppp           pppp                pppp
 	0x86,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
 //    wwww           **** pppp                 pppp      pppp pppp pppp pppp pppp pppp
-	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,xxxx, /* 20 */
-//         !!!!      pppp      pppp pppp       pppp           pppp pppp pppp
+	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,0x39, /* 20 */
+//         !!!!      pppp      pppp pppp       pppp           pppp pppp pppp      ****
 	0x89,xxxx,xxxx,xxxx,xxxx,0x22,0x5b,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
 //    wwww                     **** pppp                 debu           pppp      pppp
 	xxxx,0xea,xxxx,xxxx,0xd0,0xb0,0x5e,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,0xb3, /* 40 */
@@ -62,24 +62,24 @@ static const UINT8 cb2001_decryption_table[256] = {
 //              pppp      ****      pppp pppp  ****      ****      pppp pppp
 	xxxx,xxxx,xxxx,xxxx,0x0a,xxxx,xxxx,xxxx, 0xa1,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
 //                        pppp                 pppp pppp                pppp pppp
-	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
-//    pppp pppp pppp pppp           pppp       pppp      pppp           pppp
-	0x26,xxxx,xxxx,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
-//    pppp                     pppp **** pppp            pppp      pppp      pppp 
-	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
-//              pppp           pppp                      pppp      pppp      pppp
+	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,0x34, /* 70 */
+//    pppp pppp pppp pppp           pppp       pppp      pppp           pppp      ****
+	0x26,xxxx,0x81,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
+//    pppp      wwww           pppp **** pppp            pppp      pppp      pppp 
+	xxxx,0x3d,0xe9,xxxx,xxxx,0xbe,0xf9,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
+//         wwww pppp           pppp ****                 pppp      pppp      pppp
 	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0x8d,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
 //    ****      pppp pppp pppp **** pppp !!!!  pppp      pppp pppp pppp pppp      pppp
-	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x05,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
-//    pppp      pppp           pppp                 pppp pppp      pppp      pppp pppp
+	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x05,0x03,xxxx,0x1e,0x43,0x07,0xcf, /* B0 */
+//    pppp      pppp           pppp                 pppp pppp      pppp **** pppp pppp
 	0xcb,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,0x48,xxxx,0x2e,xxxx, /* C0 */
 //    pppp pppp pppp           pppp pppp                 pppp **** ****      pppp
 	xxxx,0xf2,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,0x04,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //         ???? pppp      ****      pppp pppp  pppp           wwww      **** !!!! pppp
 	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,0xb2, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //    pppp gggg      !!!!      ****      pppp  pppp ****
-	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,xxxx,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
-//         ???? pppp                     ****                      pppp
+	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,0x04,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
+//         ???? pppp                     ****            wwww      pppp
 };
 
 /* robiza's notes:
@@ -526,10 +526,9 @@ static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cb2001_io, ADDRESS_SPACE_IO, 16 )
-//  ADDRESS_MAP_GLOBAL_MASK(0x00ff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ppi8255_0", ppi8255_r, ppi8255_w, 0xffff)	/* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", ppi8255_r, ppi8255_w, 0xffff)	/* DIP switches */
-	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_r, 0xff00)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_data_address_w, 0xffff)
 
 	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
@@ -538,8 +537,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cb2001 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Big")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / D-UP")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All / Take")
