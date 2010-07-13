@@ -1253,7 +1253,7 @@ static void execute_bpdisenable(running_machine *machine, int ref, int params, c
 	{
 		bool found = false;
 		for (device_t *device = machine->m_devicelist.first(); device != NULL; device = device->next())
-			if (device->debug()->breakpoint_enable(ref))
+			if (device->debug()->breakpoint_enable(bpindex, ref))
 				found = true;
 		if (found)
 			debug_console_printf(machine, "Breakpoint %X %s\n", (UINT32)bpindex, ref ? "enabled" : "disabled");
