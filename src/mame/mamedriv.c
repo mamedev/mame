@@ -7164,6 +7164,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Cinematronics vector games */
 	DRIVER( spacewar )	/* (c) 1977 */
+	DRIVER( spaceshp )	/* (c) 1978 Cinematronics (Sega licence) */
 	DRIVER( barrier )	/* (c) 1979 Vectorbeam */
 	DRIVER( starcas )	/* (c) 1980 */
 	DRIVER( starcas1 )	/* (c) 1980 */
