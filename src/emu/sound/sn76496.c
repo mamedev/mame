@@ -149,7 +149,7 @@ INLINE sn76496_state *get_safe_token(running_device *device)
 	return (sn76496_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-READ8_DEVICE_HANDLER( sn76496_ready_r )
+READ_LINE_DEVICE_HANDLER( sn76496_ready_r )
 {
 	sn76496_state *R = get_safe_token(device);
 	stream_update(R->Channel);

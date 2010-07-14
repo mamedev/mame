@@ -5,7 +5,7 @@
 
 #include "devlegcy.h"
 
-READ8_DEVICE_HANDLER( sn76496_ready_r );
+READ_LINE_DEVICE_HANDLER( sn76496_ready_r );
 WRITE8_DEVICE_HANDLER( sn76496_w );
 WRITE8_DEVICE_HANDLER( sn76496_stereo_w );
 

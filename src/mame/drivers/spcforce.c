@@ -55,9 +55,9 @@ static WRITE8_HANDLER( spcforce_SN76496_latch_w )
 
 static READ8_HANDLER( spcforce_SN76496_select_r )
 {
-	if (~spcforce_SN76496_select & 0x40) return sn76496_ready_r(space->machine->device("sn1"), 0 );
-	if (~spcforce_SN76496_select & 0x20) return sn76496_ready_r(space->machine->device("sn2"), 0 );
-	if (~spcforce_SN76496_select & 0x10) return sn76496_ready_r(space->machine->device("sn3"), 0 );
+	if (~spcforce_SN76496_select & 0x40) return sn76496_ready_r(space->machine->device("sn1"));
+	if (~spcforce_SN76496_select & 0x20) return sn76496_ready_r(space->machine->device("sn2"));
+	if (~spcforce_SN76496_select & 0x10) return sn76496_ready_r(space->machine->device("sn3"));
 
 	return 0;
 }
