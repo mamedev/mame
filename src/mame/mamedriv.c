@@ -2716,7 +2716,8 @@ V-V                           TP-027
 	DRIVER( kodu )		/* 10/09/1991 (c) 1991 (US)    */
 	DRIVER( kodj )		/* 05/08/1991 (c) 1991 (Japan) */
 	DRIVER( kodb )		/* bootleg */
-	DRIVER( captcomm )	/* 14/10/1991 (c) 1991 (World) */
+	DRIVER( captcomm )	/* 02/12/1991 (c) 1991 (World) */
+	DRIVER( captcommr1 )	/* 14/10/1991 (c) 1991 (World) */
 	DRIVER( captcommu )	/* 28/ 9/1991 (c) 1991 (US)    */
 	DRIVER( captcommj )	/* 02/12/1991 (c) 1991 (Japan) */
 	DRIVER( captcommb )	/* bootleg */
