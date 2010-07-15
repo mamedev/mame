@@ -3069,6 +3069,7 @@ src/mame/layout/tceptor2.lay svneol=native#text/plain
 src/mame/layout/tenpindx.lay svneol=native#text/plain
 src/mame/layout/tinv2650.lay svneol=native#text/plain
 src/mame/layout/tisub.lay svneol=native#text/plain
+src/mame/layout/topracer.lay svneol=native#text/plain
 src/mame/layout/topspeed.lay svneol=native#text/plain
 src/mame/layout/turbo.lay svneol=native#text/plain
 src/mame/layout/turbotag.lay svneol=native#text/plain

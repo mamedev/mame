@@ -1800,7 +1800,8 @@ $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
 						$(LAYOUT)/pe_keno.lh \
 						$(LAYOUT)/pe_slots.lh
 
-$(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh
+$(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh \
+						$(LAYOUT)/topracer.lh
 
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 

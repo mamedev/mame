@@ -24,7 +24,6 @@ extern UINT16 *polepos_view16_memory;
 extern UINT16 *polepos_road16_memory;
 extern UINT16 *polepos_alpha16_memory;
 extern UINT16 *polepos_sprite16_memory;
-extern int polepos_gear_bit;
 
 VIDEO_START( polepos );
 PALETTE_INIT( polepos );

@@ -19,8 +19,6 @@ static UINT16 road16_vscroll;
 static tilemap_t *bg_tilemap,*tx_tilemap;
 static int polepos_chacl;
 
-int polepos_gear_bit;
-
 /***************************************************************************
 
   Convert the color PROMs.
