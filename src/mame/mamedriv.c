@@ -6481,7 +6481,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( 2020bba )	/* 0030 (c) 1991 SNK / Pallas */
 	DRIVER( 2020bbh )	/* 0030 (c) 1991 SNK / Pallas */
 	DRIVER( socbrawl )	/* 0031 (c) 1991 SNK */
-	DRIVER( socbrawla )	/* 0031 (c) 1991 SNK */
+	DRIVER( socbrawlh )	/* 0031 (c) 1991 SNK */
 	DRIVER( roboarmy )	/* 0032 (c) 1991 SNK */
 	DRIVER( fatfury1 )	/* 0033 (c) 1991 SNK */
 	DRIVER( fbfrenzy )	/* 0034 (c) 1992 SNK */
@@ -6551,7 +6551,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tws96 )		/* 0086 (c) 1996 Tecmo */
 	DRIVER( samsho3 )	/* 0087 (c) 1995 SNK */
 	DRIVER( samsho3h )	/* 0087 (c) 1995 SNK */
-	DRIVER( fswords )	/* Korean hack of samsho3 */
+	DRIVER( fswords )	/* 0187 Korean hack of samsho3 */
 	DRIVER( stakwin )	/* 0088 (c) 1995 Saurus */
 	DRIVER( pulstar )	/* 0089 (c) 1995 Aicom */
 	DRIVER( whp )		/* 0090 (c) 1995 ADK / SNK */
@@ -6562,7 +6562,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rbff1 )		/* 0095 (c) 1995 SNK */
 	DRIVER( rbff1a )	/* 0095 (c) 1995 SNK */
 	DRIVER( aof3 )		/* 0096 (c) 1996 SNK */
-	DRIVER( aof3k )		/* Censored Korean release of aof3 */
+	DRIVER( aof3k )		/* 0196 Censored Korean release of aof3 */
 	DRIVER( sonicwi3 )	/* 0097 (c) 1995 Video System Co. */
 						/* 0098 Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist) */
 						/* 0099 Neo Pool Masters */
@@ -6609,7 +6609,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( magdrop3 )	/* 0233 (c) 1997 Data East Corporation */
 	DRIVER( lastblad )	/* 0234 (c) 1997 SNK */
 	DRIVER( lastbladh )	/* 0234 (c) 1997 SNK */
-	DRIVER( lastsold )	/* Censored Korean release of lastblad */
+	DRIVER( lastsold )	/* 0196 Censored Korean release of lastblad */
 	DRIVER( puzzldpr )	/* 0235 (c) 1997 Taito (Visco license) */
 	DRIVER( irrmaze )	/* 0236 (c) 1997 SNK / Saurus */
 	DRIVER( popbounc )	/* 0237 (c) 1997 Video System Co. */
@@ -6618,7 +6618,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( blazstar )	/* 0239 (c) 1998 Yumekobo */
 	DRIVER( rbff2 )		/* 0240 (c) 1998 SNK */
 	DRIVER( rbff2h )	/* 0240 (c) 1998 SNK */
-	DRIVER( rbff2k )	/* Censored Korean release of rbff2 */
+	DRIVER( rbff2k )	/* 0140 Censored Korean release of rbff2 */
 	DRIVER( mslug2 )	/* 0241 (c) 1998 SNK */
 	DRIVER( kof98 )		/* 0242 (c) 1998 SNK */
 	DRIVER( kof98k )	/* 0242 (c) 1998 SNK */
@@ -6636,7 +6636,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kof99 )		/* 0251 (c) 1999 SNK */
 	DRIVER( kof99a )	/* 0251 (c) 1999 SNK */
 	DRIVER( kof99e )	/* 0251 (c) 1999 SNK */
-	DRIVER( kof99n )	/* 0251 (c) 1999 SNK */
+	DRIVER( kof99k )	/* 0152 (c) 1999 SNK */
 	DRIVER( kof99p )	/* 0251 (c) 1999 SNK */
 	DRIVER( ganryu )	/* 0252 (c) 1999 Visco */
 	DRIVER( garou )		/* 0253 (c) 1999 SNK */
