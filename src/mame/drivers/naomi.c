@@ -171,7 +171,7 @@ Naomi 2 / GD-ROM             |           |              |
 
 NAOMI ROM cart usage
 -------------------------
-There are 3 know types of carts manufactured by Sega: 171-7919A, 171-7978B, 171-8132B
+There are 4 known types of carts manufactured by Sega: 171-7919A, 171-7978B, 171-8132B, 171-8346C
 There are also 2 types of carts manufactured by Namco: MASK-B, MASK-C
 
 837-13668  171-7919A (C) Sega 1998
@@ -192,7 +192,7 @@ Notes:
       The other side of the cart PCB just has more locations for
       SOP44 MASKROMs... IC12S to IC21S (ROM12 to ROM21)
 
-  IC1-IC21S - MaskROM (SOP44), either 32M or 64M. Not all positions are populated.
+  IC1-IC21S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated.
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
       IC37  - FLASHROM (SOIC8) Xicor X76F100 Secure SerialFlash
@@ -283,7 +283,7 @@ Notes:
       IC13S - EEPROM (SOIC8) 25LC040 serial EEPROM
       IC14  - 256 x 9 AsyncFIFO, 5.0V (SOP28)
       IC15  - SRAM (SOJ28) 32kx8, IDT71256
-IC17S-IC38S - MaskROM (SOP44), either 32M or 64M
+IC17S-IC38S - MaskROM (SOP44), either 32Mb or 64Mb
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
@@ -316,11 +316,11 @@ Virtua Tennis 2 / Power Smash 2 (Rev A) 840-0084C  22327A  18 (64Mb)  A54SX32   
 |                                                          |
 |        ----CN3----                    ----CN1----        |
 |----------------------------------------------------------|
-
 Notes:
+      The female side of the cart PCB only has traces
 
       OSC1  - oscillator 28.000MHz
-  IC1-IC11  - MaskROM (TSOP48), 128M
+  IC1-IC11  - MaskROM (TSOP48), 128Mb
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
       IC27  - PLD Sega 315-6319A ALTERA EPM7032 (PLCC44)
@@ -347,6 +347,45 @@ Wild Riders                             840-0046C  23622   10 (128Mb)  315-6319A
 WWF Royal Rumble                        840-0040C  22261    8 (128Mb)  315-6319   315-6213  317-0285-COM
 Zero Gunner 2                           841-0020C  23689    ? (128Mb)  315-6319A  315-6213  317-5073-COM
 
+
+
+171-8346C (C) Sega 2005
+|---------------------------------------------------------|
+|  IC12          IC8                    ----CN2----       -|
+|             (IC22,1-7)                    IC7            |
+|                          IC6                             |
+|  IC13          IC9                              IC4      |
+|             (IC8-15)                                     |
+|                            IC5            IC2      IC3   | male side
+|  IC14          IC10             JP1             IC16     |
+|             (IC16-21)           JP2                      |
+|                                           IC1            |
+|  IC15          IC11                                      |
+|        ----CN3----                    ----CN1----        |
+|----------------------------------------------------------|
+Notes:
+      The female side of the cart PCB only has traces
+
+      IC1   - 74LVCH16245A (16bit transceiver with direction pin)
+      IC2   - XC3S50 Xilinx Spartan FPGA (TQFP144)
+      IC3   - PIC16C621A EPROM-Based 8-Bit CMOS Microcontroller (PDIP18) with internal memory.
+              On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
+      IC4   - XCF01SVG Xilinx Platform Flash In-System Programmable Configuration PROMS (TSSOP20)
+      IC5   - 74LVC08A (Quad 2-input AND gate)
+      IC6   - 74LVCH16245A (16bit transceiver with direction pin)
+      IC7   - empty socket for EPROM (DIP42), either 27C160 or 27C322
+  IC8-IC15  - S29GL512N FlashROM (TSOP56), 512Mb.
+      IC16  - R3112N431A Low voltage detector with output delay (SOT-23-5)
+      JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
+      JP2   - JUMPER unknown function
+   CN1/2/3  - connectors joining to main board
+      CN4   - 6 legs connector for ISP programming
+
+   Games known to use this PCB include....
+                          Sticker    EPROM        # of SOP56
+Game                      on cart    IC7#         FLASHROMs   IC2#    IC3#          IC4#    Notes
+-----------------------------------------------------------------------------------------------------------------------
+Touch De Zunou (Rev A)    840-0166C  unpopulated   2 (512Mb)  XC3S50  317-0435-JPN  XCF01S  IC4# is marked "18"
 
 
       Note! Generally, games that require a special I/O board or controller will not boot at all with a
