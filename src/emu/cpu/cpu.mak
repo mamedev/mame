@@ -1232,9 +1232,12 @@ $(CPUOBJ)/minx/minx.o:		$(CPUSRC)/minx/minx.c \
 
 ifneq ($(filter RSP,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/rsp
-CPUOBJS += $(CPUOBJ)/rsp/rspdrc.o	$(CPUOBJ)/rsp/rspfe.o	$(DRCOBJ)
+CPUOBJS += $(CPUOBJ)/rsp/rsp.o $(CPUOBJ)/rsp/rspdrc.o $(CPUOBJ)/rsp/rspfe.o $(DRCOBJ)
 DASMOBJS += $(CPUOBJ)/rsp/rsp_dasm.o
 endif
+
+$(CPUOBJ)/rsp/rsp.o:	$(CPUSRC)/rsp/rsp.c \
+				$(CPUSRC)/rsp/rsp.h
 
 $(CPUOBJ)/rsp/rspdrc.o:	$(CPUSRC)/rsp/rspdrc.c \
 			$(CPUSRC)/rsp/rsp.h \

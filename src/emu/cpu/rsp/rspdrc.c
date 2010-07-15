@@ -31,6 +31,8 @@ CPU_DISASSEMBLE( rsp );
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
+#ifdef USE_RSPDRC
+
 /***************************************************************************
     DEBUGGING
 ***************************************************************************/
@@ -546,12 +548,14 @@ void rspdrc_add_dmem(running_device *device, void *base)
     debugging
 -------------------------------------------------*/
 
-//static void cfunc_printf_debug(void *param)
-//{
-//  rsp_state *rsp = (rsp_state *)param;
-//  printf(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
-//  logerror(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
-//}
+#ifdef UNUSED_FUNCTION
+static void cfunc_printf_debug(void *param)
+{
+	rsp_state *rsp = (rsp_state *)param;
+	printf(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
+	logerror(rsp->impstate->format, rsp->impstate->arg0, rsp->impstate->arg1);
+}
+#endif
 
 
 /*-------------------------------------------------
@@ -559,13 +563,14 @@ void rspdrc_add_dmem(running_device *device, void *base)
     debugging 64-bit values
 -------------------------------------------------*/
 
-//static void cfunc_printf_debug64(void *param)
-//{
-//  rsp_state *rsp = (rsp_state *)param;
-//  printf(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
-//  logerror(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
-//}
-
+#ifdef UNUSED_FUNCTION
+static void cfunc_printf_debug64(void *param)
+{
+	rsp_state *rsp = (rsp_state *)param;
+	printf(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
+	logerror(rsp->impstate->format, (UINT32)(rsp->impstate->arg64 >> 32), (UINT32)(rsp->impstate->arg64 & 0x00000000ffffffff));
+}
+#endif
 
 static void cfunc_get_cop0_reg(void *param)
 {
@@ -713,14 +718,14 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ca
 	rsp->reciprocal_high = 0;
 #endif
 
-    // ...except for the accumulators.
-    for(accumIdx = 0; accumIdx < 8; accumIdx++ )
-    {
-        rsp->accum[accumIdx].l = 0;
-    }
+	// ...except for the accumulators.
+	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
+	{
+		rsp->accum[accumIdx].l = 0;
+	}
 
 	rsp->sr = RSP_STATUS_HALT;
-    rsp->step_count = 0;
+	rsp->step_count = 0;
 }
 
 static CPU_INIT( rsp )
@@ -1452,14 +1457,14 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 #endif
 		case 0x07:		/* LUV */
 #if (DRC_LUV)
-	/*
-    ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+#ifdef UNUSED_CODE
+	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
-    for (i=0; i < 8; i++)
-    {
-        W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7);
-    }
-    */
+	for (i=0; i < 8; i++)
+	{
+		W_VREG_S(dest, i, READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7);
+	}
+#endif
 			offset <<= 3;
 
 			UML_ADD(block, IREG(2), R32(RSREG), IMM(offset));						// add     i2,<rsreg>,offset
@@ -2115,25 +2120,25 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 #if (DRC_VMADN)
 static void generate_saturate_accum_unsigned(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int accum)
 {
-	/*
-    int skip, skip2;
+#ifdef UNUSED_CODE
+	int skip, skip2;
 
-    UML_CMP(block, VACCUMWMH(accum), IMM(-32768));
-    UML_JMPc(block, IF_GE, skip = compiler->labelnum++);
-    UML_MOV(block, IREG(0), IMM(0));
-    UML_JMP(block, skip2 = compiler->labelnum++);
+	UML_CMP(block, VACCUMWMH(accum), IMM(-32768));
+	UML_JMPc(block, IF_GE, skip = compiler->labelnum++);
+	UML_MOV(block, IREG(0), IMM(0));
+	UML_JMP(block, skip2 = compiler->labelnum++);
 
-    UML_LABEL(block, skip);
-    UML_CMP(block, VACCUMWMH(accum), IMM(32767));
-    UML_JMPc(block, IF_L, skip = compiler->labelnum++);
-    UML_MOV(block, IREG(0), IMM(0x0000ffff));
-    UML_JMP(block, skip2);
+	UML_LABEL(block, skip);
+	UML_CMP(block, VACCUMWMH(accum), IMM(32767));
+	UML_JMPc(block, IF_L, skip = compiler->labelnum++);
+	UML_MOV(block, IREG(0), IMM(0x0000ffff));
+	UML_JMP(block, skip2);
 
-    UML_LABEL(block, skip);
-    UML_SEXT(block, IREG(0), VACCUMHL(accum), WORD);
-    UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff));
-    UML_LABEL(block, skip2);
-    */
+	UML_LABEL(block, skip);
+	UML_SEXT(block, IREG(0), VACCUMHL(accum), WORD);
+	UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff));
+	UML_LABEL(block, skip2);
+#endif
 	UML_SEXT(block, IREG(0), VACCUMHL(accum), WORD);
 	UML_AND(block, IREG(0), IREG(0), IMM(0x0000ffff));
 	UML_CMP(block, VACCUMWMH(accum), IMM(-32768));
@@ -2210,18 +2215,18 @@ INLINE UINT16 SATURATE_ACCUM_SIGNED(rsp_state *rsp, int accum)
 #if 0
 static float float_round(float input)
 {
-    INT32 integer = (INT32)input;
-    float fraction = input - (float)integer;
-    float output = 0.0f;
-    if( fraction >= 0.5f )
-    {
-        output = (float)( integer + 1 );
-    }
-    else
-    {
-        output = (float)integer;
-    }
-    return output;
+	INT32 integer = (INT32)input;
+	float fraction = input - (float)integer;
+	float output = 0.0f;
+	if( fraction >= 0.5f )
+	{
+		output = (float)( integer + 1 );
+	}
+	else
+	{
+		output = (float)integer;
+	}
+	return output;
 }
 #endif
 
@@ -2865,23 +2870,23 @@ INLINE void cfunc_rsp_vmudm(void *param)
 			break;
 	}
 
-	/*
-    for (i=0; i < 8; i++)
-    {
-        int del = VEC_EL_1(EL, i);
-        int sel = VEC_EL_2(EL, del);
-        INT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
-        INT32 s2 = (UINT16)R_VREG_S(VS2REG, sel);   // not sign-extended
-        INT32 r =  s1 * s2;
+#ifdef UNUSED_CODE
+	for (i=0; i < 8; i++)
+	{
+		int del = VEC_EL_1(EL, i);
+		int sel = VEC_EL_2(EL, del);
+		INT32 s1 = (INT32)(INT16)R_VREG_S(VS1REG, del);
+		INT32 s2 = (UINT16)R_VREG_S(VS2REG, sel);   // not sign-extended
+		INT32 r =  s1 * s2;
 
-        W_ACCUM_H(del, (r < 0) ? 0xffff : 0);       // sign-extend to 48-bit
-        W_ACCUM_M(del, (INT16)(r >> 16));
-        W_ACCUM_L(del, (UINT16)(r));
+		W_ACCUM_H(del, (r < 0) ? 0xffff : 0);       // sign-extend to 48-bit
+		W_ACCUM_M(del, (INT16)(r >> 16));
+		W_ACCUM_L(del, (UINT16)(r));
 
-        vres[del] = ACCUM(del).h.mid;
-    }
-    WRITEBACK_RESULT();
-    */
+		vres[del] = ACCUM(del).h.mid;
+	}
+	WRITEBACK_RESULT();
+#endif
 }
 #endif
 
@@ -7306,10 +7311,12 @@ static void cfunc_unimplemented(void *param)
     cfunc_fatalerror - a generic fatalerror call
 -------------------------------------------------*/
 
-//static void cfunc_fatalerror(void *param)
-//{
-	//fatalerror("fatalerror");
-//}
+#ifdef UNUSED_CODE
+static void cfunc_fatalerror(void *param)
+{
+	fatalerror("fatalerror");
+}
+#endif
 
 
 /***************************************************************************
@@ -7654,12 +7661,14 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 	}
 
 	/* if we hit an unmapped address, fatal error */
-	//if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
-	//{
-	//  UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));                               // mov     [pc],desc->pc
-	//  save_fast_iregs(rsp, block);
-	//  UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));                                // exit    EXECUTE_UNMAPPED_CODE
-	//}
+#if 0
+	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
+	{
+		UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));							   // mov     [pc],desc->pc
+		save_fast_iregs(rsp, block);
+		UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));								// exit	EXECUTE_UNMAPPED_CODE
+	}
+#endif
 
 	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
 	/*else*/ if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
@@ -8196,7 +8205,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		/* ----- unimplemented/illegal instructions ----- */
 
-//      default:    /* ??? */       invalid_instruction(op);                                                break;
+		//default:    /* ??? */       invalid_instruction(op);                                                break;
 	}
 
 	return FALSE;
@@ -8547,43 +8556,43 @@ static CPU_SET_INFO( rsp )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
-        case CPUINFO_INT_REGISTER + RSP_PC:             rsp->pc = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R0:             rsp->r[0] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R1:             rsp->r[1] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R2:             rsp->r[2] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R3:             rsp->r[3] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R4:             rsp->r[4] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R5:             rsp->r[5] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R6:             rsp->r[6] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R7:             rsp->r[7] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R8:             rsp->r[8] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R9:             rsp->r[9] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R10:            rsp->r[10] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R11:            rsp->r[11] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R12:            rsp->r[12] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R13:            rsp->r[13] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R14:            rsp->r[14] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R15:            rsp->r[15] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R16:            rsp->r[16] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R17:            rsp->r[17] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R18:            rsp->r[18] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R19:            rsp->r[19] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R20:            rsp->r[20] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R21:            rsp->r[21] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R22:            rsp->r[22] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R23:            rsp->r[23] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R24:            rsp->r[24] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R25:            rsp->r[25] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R26:            rsp->r[26] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R27:            rsp->r[27] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R28:            rsp->r[28] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R29:            rsp->r[29] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R30:            rsp->r[30] = info->i;        break;
-        case CPUINFO_INT_SP:
-        case CPUINFO_INT_REGISTER + RSP_R31:            rsp->r[31] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_SR:             rsp->sr = info->i;           break;
-        case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp->nextpc = info->i;       break;
-        case CPUINFO_INT_REGISTER + RSP_STEPCNT:        rsp->step_count = info->i;   break;
+		case CPUINFO_INT_REGISTER + RSP_PC:             rsp->pc = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R0:             rsp->r[0] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R1:             rsp->r[1] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R2:             rsp->r[2] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R3:             rsp->r[3] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R4:             rsp->r[4] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R5:             rsp->r[5] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R6:             rsp->r[6] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R7:             rsp->r[7] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R8:             rsp->r[8] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R9:             rsp->r[9] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R10:            rsp->r[10] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R11:            rsp->r[11] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R12:            rsp->r[12] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R13:            rsp->r[13] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R14:            rsp->r[14] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R15:            rsp->r[15] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R16:            rsp->r[16] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R17:            rsp->r[17] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R18:            rsp->r[18] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R19:            rsp->r[19] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R20:            rsp->r[20] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R21:            rsp->r[21] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R22:            rsp->r[22] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R23:            rsp->r[23] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R24:            rsp->r[24] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R25:            rsp->r[25] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R26:            rsp->r[26] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R27:            rsp->r[27] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R28:            rsp->r[28] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R29:            rsp->r[29] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R30:            rsp->r[30] = info->i;        break;
+		case CPUINFO_INT_SP:
+		case CPUINFO_INT_REGISTER + RSP_R31:            rsp->r[31] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_SR:             rsp->sr = info->i;           break;
+		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp->nextpc = info->i;       break;
+		case CPUINFO_INT_REGISTER + RSP_STEPCNT:        rsp->step_count = info->i;   break;
 	}
 }
 
@@ -8657,7 +8666,7 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_INT_REGISTER + RSP_R31:			info->i = rsp->r[31];					break;
 		case CPUINFO_INT_REGISTER + RSP_SR:             info->i = rsp->sr;                       break;
 		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp->nextpc;                   break;
-        case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp->step_count;               break;
+		case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp->step_count;               break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(rsp);			break;
@@ -8714,8 +8723,10 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_STR_REGISTER + RSP_R31:			sprintf(info->s, "R31: %08X", rsp->r[31]); break;
 		case CPUINFO_STR_REGISTER + RSP_SR:             sprintf(info->s, "SR: %08X",  rsp->sr);    break;
 		case CPUINFO_STR_REGISTER + RSP_NEXTPC:         sprintf(info->s, "NPC: %08X", rsp->nextpc);break;
-        case CPUINFO_STR_REGISTER + RSP_STEPCNT:        sprintf(info->s, "STEP: %d",  rsp->step_count);  break;
+		case CPUINFO_STR_REGISTER + RSP_STEPCNT:        sprintf(info->s, "STEP: %d",  rsp->step_count);  break;
 	}
 }
 
 DEFINE_LEGACY_CPU_DEVICE(RSP, rsp);
+
+#endif // USE_RSPDRC

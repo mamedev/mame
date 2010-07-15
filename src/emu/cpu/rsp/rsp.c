@@ -10,6 +10,8 @@
 
 CPU_DISASSEMBLE( rsp );
 
+#ifndef USE_RSPDRC
+
 #define LOG_INSTRUCTION_EXECUTION		0
 #define SAVE_DISASM						0
 #define SAVE_DMEM						0
@@ -183,11 +185,11 @@ static UINT32 get_cop0_reg(rsp_state *rsp, int reg)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		return (rsp->config->sp_reg_r)(rsp->program, reg, 0x00000000);
+		return (rsp->config->sp_reg_r)(rsp->device, reg, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (rsp->config->dp_reg_r)(rsp->program, reg - 8, 0x00000000);
+		return (rsp->config->dp_reg_r)(rsp->device, reg - 8, 0x00000000);
 	}
 	else
 	{
@@ -199,11 +201,11 @@ static void set_cop0_reg(rsp_state *rsp, int reg, UINT32 data)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		(rsp->config->sp_reg_w)(rsp->program, reg, data, 0x00000000);
+		(rsp->config->sp_reg_w)(rsp->device, reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(rsp->config->dp_reg_w)(rsp->program, reg - 8, data, 0x00000000);
+		(rsp->config->dp_reg_w)(rsp->device, reg - 8, data, 0x00000000);
 	}
 	else
 	{
@@ -298,8 +300,8 @@ static const int vector_elements_2[16][8] =
 static CPU_INIT( rsp )
 {
 	rsp_state *rsp = get_safe_token(device);
-    int regIdx;
-    int accumIdx;
+	int regIdx;
+	int accumIdx;
 	rsp->config = (const rsp_config *)device->baseconfig().static_config();
 
 	if (LOG_INSTRUCTION_EXECUTION)
@@ -310,7 +312,7 @@ static CPU_INIT( rsp )
 	rsp->program = device->space(AS_PROGRAM);
 
 #if 1
-    // Inaccurate.  RSP registers power on to a random state...
+	// Inaccurate.  RSP registers power on to a random state...
 	for(regIdx = 0; regIdx < 32; regIdx++ )
 	{
 		rsp->r[regIdx] = 0;
@@ -327,16 +329,16 @@ static CPU_INIT( rsp )
 	rsp->reciprocal_high = 0;
 #endif
 
-    // ...except for the accumulators.
-    // We're not calling mame_rand() because initializing something with mame_rand()
-    //   makes me retch uncontrollably.
-    for(accumIdx = 0; accumIdx < 8; accumIdx++ )
-    {
-        rsp->accum[accumIdx].l = 0;
-    }
+	// ...except for the accumulators.
+	// We're not calling mame_rand() because initializing something with mame_rand()
+	//   makes me retch uncontrollably.
+	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
+	{
+		rsp->accum[accumIdx].l = 0;
+	}
 
 	rsp->sr = RSP_STATUS_HALT;
-    rsp->step_count = 0;
+	rsp->step_count = 0;
 }
 
 static CPU_EXIT( rsp )
@@ -1034,18 +1036,18 @@ INLINE UINT16 SATURATE_ACCUM(rsp_state *rsp, int accum, int slice, UINT16 negati
 #if 0
 static float float_round(float input)
 {
-    INT32 integer = (INT32)input;
-    float fraction = input - (float)integer;
-    float output = 0.0f;
-    if( fraction >= 0.5f )
-    {
-        output = (float)( integer + 1 );
-    }
-    else
-    {
-        output = (float)integer;
-    }
-    return output;
+	INT32 integer = (INT32)input;
+	float fraction = input - (float)integer;
+	float output = 0.0f;
+	if( fraction >= 0.5f )
+	{
+		output = (float)( integer + 1 );
+	}
+	else
+	{
+		output = (float)integer;
+	}
+	return output;
 }
 #endif
 
@@ -2668,19 +2670,19 @@ static CPU_EXECUTE( rsp )
 						// ------------------------------------------------
 						//
 
-                        if (RTREG)
-                        {
-                            if (RDREG == 2)
-                            {
-                                // Anciliary clipping flags
-                                RTVAL = rsp->flag[RDREG] & 0x00ff;
-                            }
-                            else
-                            {
-                                // All other flags are 16 bits but sign-extended at retrieval
-                                RTVAL = (UINT32)rsp->flag[RDREG] | ( ( rsp->flag[RDREG] & 0x8000 ) ? 0xffff0000 : 0 );
-                            }
-                        }
+						if (RTREG)
+						{
+							if (RDREG == 2)
+							{
+								// Anciliary clipping flags
+								RTVAL = rsp->flag[RDREG] & 0x00ff;
+							}
+							else
+							{
+								// All other flags are 16 bits but sign-extended at retrieval
+								RTVAL = (UINT32)rsp->flag[RDREG] | ( ( rsp->flag[RDREG] & 0x8000 ) ? 0xffff0000 : 0 );
+							}
+						}
 						break;
 					}
 					case 0x04:	/* MTC2 */
@@ -2787,14 +2789,14 @@ static CPU_EXECUTE( rsp )
 
 		if( rsp->sr & RSP_STATUS_SSTEP )
 		{
-            if( rsp->step_count )
-            {
-                rsp->step_count--;
-            }
-            else
-            {
-                rsp->sr |= RSP_STATUS_BROKE;
-            }
+			if( rsp->step_count )
+			{
+				rsp->step_count--;
+			}
+			else
+			{
+				rsp->sr |= RSP_STATUS_BROKE;
+			}
 		}
 
 		if( rsp->sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
@@ -2818,43 +2820,43 @@ static CPU_SET_INFO( rsp )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
-        case CPUINFO_INT_REGISTER + RSP_PC:             rsp->pc = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R0:             rsp->r[0] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R1:             rsp->r[1] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R2:             rsp->r[2] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R3:             rsp->r[3] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R4:             rsp->r[4] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R5:             rsp->r[5] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R6:             rsp->r[6] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R7:             rsp->r[7] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R8:             rsp->r[8] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R9:             rsp->r[9] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R10:            rsp->r[10] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R11:            rsp->r[11] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R12:            rsp->r[12] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R13:            rsp->r[13] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R14:            rsp->r[14] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R15:            rsp->r[15] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R16:            rsp->r[16] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R17:            rsp->r[17] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R18:            rsp->r[18] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R19:            rsp->r[19] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R20:            rsp->r[20] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R21:            rsp->r[21] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R22:            rsp->r[22] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R23:            rsp->r[23] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R24:            rsp->r[24] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R25:            rsp->r[25] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R26:            rsp->r[26] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R27:            rsp->r[27] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R28:            rsp->r[28] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R29:            rsp->r[29] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_R30:            rsp->r[30] = info->i;        break;
-        case CPUINFO_INT_SP:
-        case CPUINFO_INT_REGISTER + RSP_R31:            rsp->r[31] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_SR:             rsp->sr = info->i;           break;
-        case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp->nextpc = info->i;       break;
-        case CPUINFO_INT_REGISTER + RSP_STEPCNT:        rsp->step_count = info->i;   break;
+		case CPUINFO_INT_REGISTER + RSP_PC:             rsp->pc = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R0:             rsp->r[0] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R1:             rsp->r[1] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R2:             rsp->r[2] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R3:             rsp->r[3] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R4:             rsp->r[4] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R5:             rsp->r[5] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R6:             rsp->r[6] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R7:             rsp->r[7] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R8:             rsp->r[8] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R9:             rsp->r[9] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R10:            rsp->r[10] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R11:            rsp->r[11] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R12:            rsp->r[12] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R13:            rsp->r[13] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R14:            rsp->r[14] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R15:            rsp->r[15] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R16:            rsp->r[16] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R17:            rsp->r[17] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R18:            rsp->r[18] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R19:            rsp->r[19] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R20:            rsp->r[20] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R21:            rsp->r[21] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R22:            rsp->r[22] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R23:            rsp->r[23] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R24:            rsp->r[24] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R25:            rsp->r[25] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R26:            rsp->r[26] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R27:            rsp->r[27] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R28:            rsp->r[28] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R29:            rsp->r[29] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_R30:            rsp->r[30] = info->i;        break;
+		case CPUINFO_INT_SP:
+		case CPUINFO_INT_REGISTER + RSP_R31:            rsp->r[31] = info->i;        break;
+		case CPUINFO_INT_REGISTER + RSP_SR:             rsp->sr = info->i;           break;
+		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp->nextpc = info->i;       break;
+		case CPUINFO_INT_REGISTER + RSP_STEPCNT:        rsp->step_count = info->i;   break;
 	}
 }
 
@@ -2928,7 +2930,7 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_INT_REGISTER + RSP_R31:			info->i = rsp->r[31];					break;
 		case CPUINFO_INT_REGISTER + RSP_SR:             info->i = rsp->sr;                       break;
 		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp->nextpc;                   break;
-        case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp->step_count;               break;
+		case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp->step_count;               break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(rsp);			break;
@@ -2985,8 +2987,26 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_STR_REGISTER + RSP_R31:			sprintf(info->s, "R31: %08X", rsp->r[31]); break;
 		case CPUINFO_STR_REGISTER + RSP_SR:             sprintf(info->s, "SR: %08X",  rsp->sr);    break;
 		case CPUINFO_STR_REGISTER + RSP_NEXTPC:         sprintf(info->s, "NPC: %08X", rsp->nextpc);break;
-        case CPUINFO_STR_REGISTER + RSP_STEPCNT:        sprintf(info->s, "STEP: %d",  rsp->step_count);  break;
+		case CPUINFO_STR_REGISTER + RSP_STEPCNT:        sprintf(info->s, "STEP: %d",  rsp->step_count);  break;
 	}
 }
 
+void rspdrc_set_options(running_device *device, UINT32 options)
+{
+}
+
+void rspdrc_add_imem(running_device *device, void *base)
+{
+}
+
+void rspdrc_add_dmem(running_device *device, void *base)
+{
+}
+
+void rspdrc_flush_drc_cache(running_device *device)
+{
+}
+
 DEFINE_LEGACY_CPU_DEVICE(RSP, rsp);
+
+#endif // USE_RSPDRC

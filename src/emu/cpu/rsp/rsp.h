@@ -16,7 +16,7 @@
 #ifndef __RSP_H__
 #define __RSP_H__
 
-
+#define USE_RSPDRC
 
 /***************************************************************************
     REGISTER ENUMERATION
@@ -197,7 +197,7 @@ struct _rsp_state
 	VECTOR_REG v[32];
 	UINT16 flag[4];
 	UINT32 sr;
-    UINT32 step_count;
+	UINT32 step_count;
 
 	ACCUMULATOR accum[8];
 	INT32 square_root_res;
