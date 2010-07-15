@@ -259,8 +259,8 @@ $(LIBSOUND): $(SOUNDOBJS)
 
 $(EMUOBJ)/rendfont.o:	$(EMUOBJ)/uismall.fh
 
-$(EMUOBJ)/video.o:		$(EMUSRC)/rendersw.c
-
+$(EMUOBJ)/video.o:	$(EMUSRC)/rendersw.c
+$(EMUVIDEO)/v9938.o:	$(EMUSRC)/video/v9938mod.c
 
 
 #-------------------------------------------------

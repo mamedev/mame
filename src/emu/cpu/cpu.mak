@@ -194,7 +194,8 @@ DASMOBJS += $(CPUOBJ)/dsp32/dsp32dis.o
 endif
 
 $(CPUOBJ)/dsp32/dsp32.o:	$(CPUSRC)/dsp32/dsp32.c \
-							$(CPUSRC)/dsp32/dsp32.h
+							$(CPUSRC)/dsp32/dsp32.h \
+							$(CPUSRC)/dsp32/dsp32ops.c
 
 
 
@@ -657,12 +658,16 @@ I86DEPS = \
 
 $(CPUOBJ)/i86/i86.o:	$(CPUSRC)/i86/i86.c \
 						$(CPUSRC)/i86/i86.h \
+						$(CPUSRC)/i86/i86mem.c \
+						$(CPUSRC)/i86/i86time.c \
 						$(CPUSRC)/i86/instr86.c \
 						$(CPUSRC)/i86/instr186.c \
 						$(I86DEPS)
 
 $(CPUOBJ)/i86/i286.o:	$(CPUSRC)/i86/i286.c \
 						$(CPUSRC)/i86/i286.h \
+						$(CPUSRC)/i86/i86mem.c \
+						$(CPUSRC)/i86/i86time.c \
 						$(CPUSRC)/i86/instr86.c \
 						$(CPUSRC)/i86/instr186.c \
 						$(CPUSRC)/i86/instr286.c \
@@ -909,6 +914,9 @@ CPUOBJS += $(CPUOBJ)/m6502/m4510.o
 DASMOBJS += $(CPUOBJ)/m6502/6502dasm.o
 endif
 
+$(CPUOBJ)/m6502/m4510.o:	$(CPUSRC)/m6502/m4510.c \
+							$(CPUSRC)/m6502/t65ce02.c
+
 $(CPUOBJ)/m6502/m6502.o:	$(CPUSRC)/m6502/m6502.c \
 							$(CPUSRC)/m6502/m6502.h \
 							$(CPUSRC)/m6502/ops02.h \
@@ -916,6 +924,7 @@ $(CPUOBJ)/m6502/m6502.o:	$(CPUSRC)/m6502/m6502.c \
 							$(CPUSRC)/m6502/t65c02.c \
 							$(CPUSRC)/m6502/t65sc02.c \
 							$(CPUSRC)/m6502/t6510.c \
+							$(CPUSRC)/m6502/tn2a03.c \
 							$(CPUSRC)/m6502/tdeco16.c
 
 $(CPUOBJ)/m6502/m65ce02.o:	$(CPUSRC)/m6502/m65ce02.c \
@@ -991,7 +1000,7 @@ DASMOBJS += $(CPUOBJ)/mc68hc11/hc11dasm.o
 endif
 
 $(CPUOBJ)/mc68hc11/mc68hc11.o:	$(CPUSRC)/mc68hc11/mc68hc11.c \
-								$(CPUSRC)/mc68hc11/hc11dasm.c
+								$(CPUSRC)/mc68hc11/hc11ops.c
 
 
 
@@ -1161,6 +1170,7 @@ $(CPUOBJ)/v60/v60.o:	$(CPUSRC)/v60/am.c \
 						$(CPUSRC)/v60/optable.c \
 						$(CPUSRC)/v60/v60.c \
 						$(CPUSRC)/v60/v60.h \
+						$(CPUSRC)/v60/v60mem.c \
 						$(CPUSRC)/v60/v60d.c
 
 
@@ -1405,7 +1415,9 @@ DASMOBJS += $(CPUOBJ)/tms7000/7000dasm.o
 endif
 
 $(CPUOBJ)/tms7000/tms7000.o:	$(CPUSRC)/tms7000/tms7000.h \
-								$(CPUSRC)/tms7000/tms7000.c
+								$(CPUSRC)/tms7000/tms7000.c \
+								$(CPUSRC)/tms7000/tms70op.c \
+								$(CPUSRC)/tms7000/tms70tb.c
 
 $(CPUOBJ)/tms7000/7000dasm.o:	$(CPUSRC)/tms7000/tms7000.h \
 								$(CPUSRC)/tms7000/7000dasm.c
@@ -1523,7 +1535,8 @@ DASMOBJS += $(CPUOBJ)/tms32051/dis32051.o
 endif
 
 $(CPUOBJ)/tms32051/tms32051.o:	$(CPUSRC)/tms32051/tms32051.c \
-								$(CPUSRC)/tms32051/tms32051.h
+								$(CPUSRC)/tms32051/tms32051.h \
+								$(CPUSRC)/tms32051/32051ops.c
 
 
 

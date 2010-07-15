@@ -1910,5 +1910,8 @@ $(MACHINE)/snes.o:		$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/snesst10.c \
 				$(MAMESRC)/machine/snes7110.c \
 				$(MAMESRC)/machine/snesbsx.c
+$(VIDEO)/jaguar.o:		$(MAMESRC)/video/jagobj.c \
+				$(MAMESRC)/video/jagblit.c
 $(VIDEO)/model2.o:		$(MAMESRC)/video/model2rd.c
 $(VIDEO)/model3.o:		$(MAMESRC)/video/m3raster.c
+$(VIDEO)/n64.o:			$(MAMESRC)/video/rdpfiltr.c
