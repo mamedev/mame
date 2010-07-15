@@ -1811,6 +1811,7 @@ const game_driver * const drivers[] =
 	DRIVER( storming )	/* A64 (c) 1986 Taito Corporation */
 	DRIVER( daikaiju )	/* A74 (c) 1986 Taito */
 	DRIVER( tokio )		/* A71 1986 */
+	DRIVER( tokioo )	/* A71 1986 */
 	DRIVER( tokiou )	/* A71 1986 */
 	DRIVER( tokiob )	/* bootleg */
 	DRIVER( bublbobl )	/* A78 (c) 1986 Taito Corporation */
