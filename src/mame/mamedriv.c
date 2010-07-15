@@ -3910,9 +3910,10 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( altbeastj )	/* (c) 1988 (8751) */
 	DRIVER( altbeast5 )	/* (c) 1988 (8751) */
 	DRIVER( altbeast4 )	/* (c) 1988 (MC-8123B) */
-	DRIVER( altbeastj3 )	/* (c) 1988 (FD1094, decrypted) */
 	DRIVER( altbeast2 )	/* (c) 1988 (MC-8123B) */
 	DRIVER( altbeastj1 )	/* (c) 1988 (protected) */
+	DRIVER( altbeastj2 )	/* (c) 1988 (protected) */
+	DRIVER( altbeastj3 )	/* (c) 1988 (FD1094, decrypted) */
 	DRIVER( aurail )	/* (c) 1990 Sega / Westone */
 	DRIVER( aurail1 )	/* (c) 1990 Sega / Westone (FD1089B, decrypted) */
 	DRIVER( aurailj )	/* (C) 1990 Sega / Westone (FD1089A, decrypted) */
