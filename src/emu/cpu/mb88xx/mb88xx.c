@@ -245,7 +245,7 @@ static int pla( mb88_state *cpustate, int inA, int inB )
 static void set_irq_line(mb88_state *cpustate, int state)
 {
 	/* on falling edge trigger interrupt */
-	if ( (cpustate->pio & 0x04) && cpustate->nf && state == CLEAR_LINE )
+	if ( (cpustate->pio & 0x04) && cpustate->nf == 0 && state != CLEAR_LINE )
 	{
 		cpustate->pending_interrupt |= INT_CAUSE_EXTERNAL;
 	}
@@ -593,7 +593,7 @@ static CPU_EXECUTE( mb88 )
 
 			case 0x24: /* tstr ZCS:..x */
 				arg = READPORT( MB88_PORTR0+(cpustate->Y/4) );
-				cpustate->st = ( arg & ( 1 << (cpustate->Y%4) ) ) ? 1 : 0;
+				cpustate->st = ( arg & ( 1 << (cpustate->Y%4) ) ) ? 0 : 1;
 				break;
 
 			case 0x25: /* tsti ZCS:..x */
@@ -679,7 +679,7 @@ static CPU_EXECUTE( mb88 )
 
 			case 0x38: case 0x39: case 0x3a: case 0x3b: /* tbit ZCS:... */
 				arg = RDMEM(GETEA());
-				cpustate->st = ( arg & (1 << (opcode&3) ) ) ? 1 : 0;
+				cpustate->st = ( arg & (1 << (opcode&3) ) ) ? 0 : 1;
 				break;
 
 			case 0x3c: /* rti ZCS:... */
@@ -729,11 +729,11 @@ static CPU_EXECUTE( mb88 )
 
 			case 0x48:	case 0x49:	case 0x4a:	case 0x4b: /* tstD ZCS:..x */
 				arg = READPORT(MB88_PORTR2);
-				cpustate->st = (arg & (1 << (opcode&3))) ? 1 : 0;
+				cpustate->st = (arg & (1 << (opcode&3))) ? 0 : 1;
 				break;
 
 			case 0x4c:	case 0x4d:	case 0x4e:	case 0x4f: /* tba ZCS:..x */
-				cpustate->st = (cpustate->A & (1 << (opcode&3))) ? 1 : 0;
+				cpustate->st = (cpustate->A & (1 << (opcode&3))) ? 0 : 1;
 				break;
 
 			case 0x50:	case 0x51:	case 0x52:	case 0x53: /* xd ZCS:x.. */
