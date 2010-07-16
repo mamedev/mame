@@ -177,7 +177,7 @@ static const pia6821_interface qixsnd_pia_0_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DEVICE_HANDLER("sndpia1", sync_sndpia1_porta_w),			/* port A out */
 	DEVCB_DEVICE_HANDLER("discrete", qix_vol_w),					/* port B out */
-	DEVCB_DEVICE_HANDLER("sndpia1", pia6821_ca1_w),						/* line CA2 out */
+	DEVCB_DEVICE_LINE("sndpia1", pia6821_ca1_w),						/* line CA2 out */
 	DEVCB_HANDLER(qix_flip_screen_w),								/* port CB2 out */
 	DEVCB_LINE(qix_pia_dint),										/* IRQA */
 	DEVCB_LINE(qix_pia_dint)										/* IRQB */
@@ -193,7 +193,7 @@ static const pia6821_interface qixsnd_pia_1_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DEVICE_HANDLER("sndpia0", pia6821_porta_w),			/* port A out */
 	DEVCB_DEVICE_HANDLER("discrete", qix_dac_w),			/* port B out */
-	DEVCB_DEVICE_HANDLER("sndpia0", pia6821_ca1_w),				/* line CA2 out */
+	DEVCB_DEVICE_LINE("sndpia0", pia6821_ca1_w),				/* line CA2 out */
 	DEVCB_NULL,		/* line CB2 out */
 	DEVCB_LINE(qix_pia_sint),								/* IRQA */
 	DEVCB_LINE(qix_pia_sint)								/* IRQB */

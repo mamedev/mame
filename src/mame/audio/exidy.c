@@ -734,8 +734,8 @@ static const pia6821_interface venture_pia0_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DEVICE_HANDLER("pia1", pia6821_portb_w),		/* port A out */
 	DEVCB_DEVICE_HANDLER("pia1", pia6821_porta_w),		/* port B out */
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_cb1_w),		/* line CA2 out */
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_ca1_w),		/* port CB2 out */
+	DEVCB_DEVICE_LINE("pia1", pia6821_cb1_w),		/* line CA2 out */
+	DEVCB_DEVICE_LINE("pia1", pia6821_ca1_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -751,8 +751,8 @@ static const pia6821_interface venture_pia1_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DEVICE_HANDLER("pia0", pia6821_portb_w),		/* port A out */
 	DEVCB_DEVICE_HANDLER("pia0", pia6821_porta_w),		/* port B out */
-	DEVCB_DEVICE_HANDLER("pia0", pia6821_cb1_w),		/* line CA2 out */
-	DEVCB_DEVICE_HANDLER("pia0", pia6821_ca1_w),		/* port CB2 out */
+	DEVCB_DEVICE_LINE("pia0", pia6821_cb1_w),		/* line CA2 out */
+	DEVCB_DEVICE_LINE("pia0", pia6821_ca1_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_LINE(update_irq_state)		/* IRQB */
 };
@@ -930,7 +930,7 @@ READ8_HANDLER( victory_sound_response_r )
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", cpu_get_previouspc(space->cpu), ret);
 
-	pia6821_cb1_w(pia1, 0, 0);
+	pia6821_cb1_w(pia1, 0);
 
 	return ret;
 }
@@ -939,7 +939,7 @@ READ8_HANDLER( victory_sound_response_r )
 READ8_HANDLER( victory_sound_status_r )
 {
 	running_device *pia1 = space->machine->device("pia1");
-	UINT8 ret = (pia6821_ca1_r(pia1, 0) << 7) | (pia6821_cb1_r(pia1, 0) << 6);
+	UINT8 ret = (pia6821_ca1_r(pia1) << 7) | (pia6821_cb1_r(pia1) << 6);
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", cpu_get_previouspc(space->cpu), ret);
 
@@ -951,7 +951,7 @@ static TIMER_CALLBACK( delayed_command_w )
 {
 	running_device *pia1 = machine->device("pia1");
 	pia6821_set_input_a(pia1, param, 0);
-	pia6821_ca1_w(pia1, 0, 0);
+	pia6821_ca1_w(pia1, 0);
 }
 
 WRITE8_HANDLER( victory_sound_command_w )
@@ -966,7 +966,7 @@ static WRITE8_DEVICE_HANDLER( victory_sound_irq_clear_w )
 {
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", cpuexec_describe_context(device->machine), data);
 
-	if (!data) pia6821_ca1_w(device, 0, 1);
+	if (!data) pia6821_ca1_w(device, 1);
 }
 
 
@@ -975,7 +975,7 @@ static WRITE8_DEVICE_HANDLER( victory_main_ack_w )
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", cpuexec_describe_context(device->machine), data);
 
 	if (victory_sound_response_ack_clk && !data)
-		pia6821_cb1_w(device, 0, 1);
+		pia6821_cb1_w(device, 1);
 
 	victory_sound_response_ack_clk = data;
 }
@@ -1019,12 +1019,12 @@ static DEVICE_RESET( victory_sound )
 
 	/* the flip-flop @ F4 is reset */
 	victory_sound_response_ack_clk = 0;
-	pia6821_cb1_w(pia1, 0, 1);
+	pia6821_cb1_w(pia1, 1);
 
 	/* these two lines shouldn't be needed, but it avoids the log entry
        as the sound CPU checks port A before the main CPU ever writes to it */
 	pia6821_set_input_a(pia1, 0, 0);
-	pia6821_ca1_w(pia1, 0, 1);
+	pia6821_ca1_w(pia1, 1);
 }
 
 

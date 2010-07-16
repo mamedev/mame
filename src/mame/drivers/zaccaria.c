@@ -165,7 +165,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 	running_device *pia0 = device->machine->device("pia0");
 	static int toggle = 0;
 
-	pia6821_cb1_w(pia0,0, toggle & 1);
+	pia6821_cb1_w(pia0, toggle & 1);
 	toggle ^= 1;
 }
 
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( sound1_command_w )
 {
 	running_device *pia0 = space->machine->device("pia0");
-	pia6821_ca1_w(pia0, 0, data & 0x80);
+	pia6821_ca1_w(pia0, data & 0x80);
 	soundlatch2_w(space, 0, data);
 }
 
@@ -532,8 +532,8 @@ static const pia6821_interface pia_1_config =
 
 static const tms5220_interface tms5220_config =
 {
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_cb1_w),	/* IRQ handler */
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_ca2_w)		/* READYQ handler */
+	DEVCB_DEVICE_LINE("pia1", pia6821_cb1_w),	/* IRQ handler */
+	DEVCB_DEVICE_LINE("pia1", pia6821_ca2_w)		/* READYQ handler */
 };
 
 

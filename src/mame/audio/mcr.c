@@ -517,7 +517,7 @@ static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 	running_device *pia = machine->device("csdpia");
 
 	pia6821_portb_w(pia, 0, param & 0x0f);
-	pia6821_ca1_w(pia, 0, ~param & 0x10);
+	pia6821_ca1_w(pia, ~param & 0x10);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -655,7 +655,7 @@ static TIMER_CALLBACK( soundsgood_delayed_data_w )
 	running_device *pia = machine->device("sgpia");
 
 	pia6821_portb_w(pia, 0, (param >> 1) & 0x0f);
-	pia6821_ca1_w(pia, 0, ~param & 0x01);
+	pia6821_ca1_w(pia, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -759,7 +759,7 @@ static TIMER_CALLBACK( turbocs_delayed_data_w )
 	running_device *pia = machine->device("tcspia");
 
 	pia6821_portb_w(pia, 0, (param >> 1) & 0x0f);
-	pia6821_ca1_w(pia, 0, ~param & 0x01);
+	pia6821_ca1_w(pia, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -864,8 +864,8 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 		tms5220_data_w(tms, offset, squawkntalk_tms_command);
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia6821_ca2_w(device, 0, 1);
-		pia6821_ca2_w(device, 0, 0);
+		pia6821_ca2_w(device, 1);
+		pia6821_ca2_w(device, 0);
 	}
 
 	/* read strobe -- read the current status from the TMS5200 */
@@ -874,8 +874,8 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 		pia6821_porta_w(device, 0, tms5220_status_r(tms, offset));
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia6821_ca2_w(device, 0, 1);
-		pia6821_ca2_w(device, 0, 0);
+		pia6821_ca2_w(device, 1);
+		pia6821_ca2_w(device, 0);
 	}
 
 	/* remember the state */
@@ -896,7 +896,7 @@ static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 	running_device *pia0 = machine->device("sntpia0");
 
 	pia6821_porta_w(pia0, 0, ~param & 0x0f);
-	pia6821_cb1_w(pia0, 0, ~param & 0x10);
+	pia6821_cb1_w(pia0, ~param & 0x10);
 }
 
 

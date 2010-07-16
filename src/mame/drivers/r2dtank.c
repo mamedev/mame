@@ -207,7 +207,7 @@ static const ay8910_interface ay8910_2_interface =
 static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 {
 	running_device *pia = device->machine->device("pia_main");
-	pia6821_ca1_w(pia, 0, data);
+	pia6821_ca1_w(pia, data);
 	ttl74123_output = data;
 }
 

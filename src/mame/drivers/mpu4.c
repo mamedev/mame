@@ -514,7 +514,7 @@ static WRITE8_DEVICE_HANDLER( ic2_o1_callback )
 static WRITE8_DEVICE_HANDLER( ic2_o2_callback )
 {
 	running_device *pia = device->machine->device("pia_ic3");
-	pia6821_ca1_w(pia, 0, data); /* copy output value to IC3 ca1 */
+	pia6821_ca1_w(pia, data); /* copy output value to IC3 ca1 */
 
 	/* the output from timer2 is the input clock for timer3 */
 	ptm6840_set_c3(device, 0, data);
@@ -686,12 +686,12 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 	if ( serial_data )
 	{
 		ic4_input_b |=  0x80;
-		pia6821_cb1_w(device, 0, 1);
+		pia6821_cb1_w(device, 1);
 	}
 	else
 	{
 		ic4_input_b &= ~0x80;
-		pia6821_cb1_w(device, 0, 0);
+		pia6821_cb1_w(device, 0);
 	}
 
 	if ( optic_pattern & 0x01 ) ic4_input_b |=  0x40; /* reel A tab */
@@ -1033,7 +1033,7 @@ static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
-	pia6821_cb1_w(pia_ic5, 0, (input_port_read(device->machine, "AUX2") & 0x80));
+	pia6821_cb1_w(pia_ic5, (input_port_read(device->machine, "AUX2") & 0x80));
 	return input_port_read(device->machine, portnames[input_strobe]);
 }
 
@@ -1745,7 +1745,7 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
     oscillating signal.*/
 	signal_50hz = signal_50hz?0:1;
 	update_lamps();
-	pia6821_ca1_w(timer.machine->device("pia_ic4"), 0,  signal_50hz);	/* signal is connected to IC4 CA1 */
+	pia6821_ca1_w(timer.machine->device("pia_ic4"), signal_50hz);	/* signal is connected to IC4 CA1 */
 }
 
 

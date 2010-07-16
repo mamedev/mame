@@ -152,8 +152,8 @@ static INTERRUPT_GEN( toratora_timer )
 		generic_pulse_irq_line(device, 0);
 	}
 	pia6821_set_input_a(state->pia_u1, input_port_read(device->machine, "INPUT") & 0x0f, 0);
-	pia6821_ca1_w(state->pia_u1, 0, input_port_read(device->machine, "INPUT") & 0x10);
-	pia6821_ca2_w(state->pia_u1, 0, input_port_read(device->machine, "INPUT") & 0x20);
+	pia6821_ca1_w(state->pia_u1, input_port_read(device->machine, "INPUT") & 0x10);
+	pia6821_ca2_w(state->pia_u1, input_port_read(device->machine, "INPUT") & 0x20);
 }
 
 static READ8_HANDLER( timer_r )

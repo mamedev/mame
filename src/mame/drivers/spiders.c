@@ -283,13 +283,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia6821_ca1_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x02);
+	pia6821_ca1_w(pia1, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia6821_ca2_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x01);
+	pia6821_ca2_w(pia1, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia6821_cb1_w(pia1, 0, input_port_read(device->machine, "XHATCH"));
+	pia6821_cb1_w(pia1, input_port_read(device->machine, "XHATCH"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -383,7 +383,7 @@ static const pia6821_interface pia_4_intf =
 static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
 	running_device *pia2 = device->machine->device("pia2");
-	pia6821_ca1_w(pia2, 0, data);
+	pia6821_ca1_w(pia2, data);
 }
 
 

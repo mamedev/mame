@@ -553,7 +553,7 @@ static UINT8 control_a_r(running_device *device)
 
 	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
 	if (p->in_ca1_func.read != NULL)
-		pia6821_ca1_w(device, 0, devcb_call_read_line(&p->in_ca1_func));
+		pia6821_ca1_w(device, devcb_call_read_line(&p->in_ca1_func));
 	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
 	{
 		logerror("PIA #%s: Warning! No CA1 read handler. Assuming pin not connected\n", device->tag());
@@ -561,7 +561,7 @@ static UINT8 control_a_r(running_device *device)
 	}
 
 	if (p->in_ca2_func.read != NULL)
-		pia6821_ca2_w(device, 0, devcb_call_read_line(&p->in_ca2_func));
+		pia6821_ca2_w(device, devcb_call_read_line(&p->in_ca2_func));
 	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
 	{
 		logerror("PIA #%s: Warning! No CA2 read handler. Assuming pin not connected\n", device->tag());
@@ -595,7 +595,7 @@ static UINT8 control_b_r(running_device *device)
 
 	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
 	if (p->in_cb1_func.read != NULL)
-		pia6821_cb1_w(device, 0, devcb_call_read_line(&p->in_cb1_func));
+		pia6821_cb1_w(device, devcb_call_read_line(&p->in_cb1_func));
 	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
 	{
 		logerror("PIA #%s: Error! no CB1 read handler. Three-state pin is undefined\n", device->tag());
@@ -603,7 +603,7 @@ static UINT8 control_b_r(running_device *device)
 	}
 
 	if (p->in_cb2_func.read != NULL)
-		pia6821_cb2_w(device, 0, devcb_call_read_line(&p->in_cb2_func));
+		pia6821_cb2_w(device, devcb_call_read_line(&p->in_cb2_func));
 	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
 	{
 		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", device->tag());
@@ -1010,7 +1010,7 @@ UINT8 pia6821_get_output_a(running_device *device)
     pia6821_ca1_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( pia6821_ca1_r )
+READ_LINE_DEVICE_HANDLER( pia6821_ca1_r )
 {
 	pia6821_state *p = get_token(device);
 
@@ -1022,18 +1022,15 @@ READ8_DEVICE_HANDLER( pia6821_ca1_r )
     pia6821_ca1_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( pia6821_ca1_w )
+WRITE_LINE_DEVICE_HANDLER( pia6821_ca1_w )
 {
 	pia6821_state *p = get_token(device);
 
-	/* limit the data to 0 or 1 */
-	data = data ? TRUE : FALSE;
-
-	LOG(("PIA #%s: set input CA1 = %d\n", device->tag(), data));
+	LOG(("PIA #%s: set input CA1 = %d\n", device->tag(), state));
 
 	/* the new state has caused a transition */
-	if ((p->in_ca1 != data) &&
-		((data && C1_LOW_TO_HIGH(p->ctl_a)) || (!data && C1_HIGH_TO_LOW(p->ctl_a))))
+	if ((p->in_ca1 != state) &&
+		((state && C1_LOW_TO_HIGH(p->ctl_a)) || (!state && C1_HIGH_TO_LOW(p->ctl_a))))
 	{
 		LOG(("PIA #%s: CA1 triggering\n", device->tag()));
 
@@ -1049,7 +1046,7 @@ WRITE8_DEVICE_HANDLER( pia6821_ca1_w )
 	}
 
 	/* set the new value for CA1 */
-	p->in_ca1 = data;
+	p->in_ca1 = state;
 	p->in_ca1_pushed = TRUE;
 }
 
@@ -1058,7 +1055,7 @@ WRITE8_DEVICE_HANDLER( pia6821_ca1_w )
     pia6821_ca2_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( pia6821_ca2_r )
+READ_LINE_DEVICE_HANDLER( pia6821_ca2_r )
 {
 	pia6821_state *p = get_token(device);
 
@@ -1070,19 +1067,16 @@ READ8_DEVICE_HANDLER( pia6821_ca2_r )
     pia6821_ca2_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( pia6821_ca2_w )
+WRITE_LINE_DEVICE_HANDLER( pia6821_ca2_w )
 {
 	pia6821_state *p = get_token(device);
 
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
-
-	LOG(("PIA #%s: set input CA2 = %d\n", device->tag(), data));
+	LOG(("PIA #%s: set input CA2 = %d\n", device->tag(), state));
 
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_a) &&
-		(p->in_ca2 != data) &&
-		((data && C2_LOW_TO_HIGH(p->ctl_a)) || (!data && C2_HIGH_TO_LOW(p->ctl_a))))
+		(p->in_ca2 != state) &&
+		((state && C2_LOW_TO_HIGH(p->ctl_a)) || (!state && C2_HIGH_TO_LOW(p->ctl_a))))
 	{
 		LOG(("PIA #%s: CA2 triggering\n", device->tag()));
 
@@ -1094,7 +1088,7 @@ WRITE8_DEVICE_HANDLER( pia6821_ca2_w )
 	}
 
 	/* set the new value for CA2 */
-	p->in_ca2 = data;
+	p->in_ca2 = state;
 	p->in_ca2_pushed = TRUE;
 }
 
@@ -1179,7 +1173,7 @@ UINT8 pia6821_get_output_b(running_device *device)
     pia6821_cb1_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( pia6821_cb1_r )
+READ_LINE_DEVICE_HANDLER( pia6821_cb1_r )
 {
 	pia6821_state *p = get_token(device);
 
@@ -1191,18 +1185,15 @@ READ8_DEVICE_HANDLER( pia6821_cb1_r )
     pia6821_cb1_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( pia6821_cb1_w )
+WRITE_LINE_DEVICE_HANDLER( pia6821_cb1_w )
 {
 	pia6821_state *p = get_token(device);
 
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
-
-	LOG(("PIA #%s: set input CB1 = %d\n", device->tag(), data));
+	LOG(("PIA #%s: set input CB1 = %d\n", device->tag(), state));
 
 	/* the new state has caused a transition */
-	if ((p->in_cb1 != data) &&
-		((data && C1_LOW_TO_HIGH(p->ctl_b)) || (!data && C1_HIGH_TO_LOW(p->ctl_b))))
+	if ((p->in_cb1 != state) &&
+		((state && C1_LOW_TO_HIGH(p->ctl_b)) || (!state && C1_HIGH_TO_LOW(p->ctl_b))))
 	{
 		LOG(("PIA #%s: CB1 triggering\n", device->tag()));
 
@@ -1219,7 +1210,7 @@ WRITE8_DEVICE_HANDLER( pia6821_cb1_w )
 	}
 
 	/* set the new value for CB1 */
-	p->in_cb1 = data;
+	p->in_cb1 = state;
 	p->in_cb1_pushed = TRUE;
 }
 
@@ -1228,7 +1219,7 @@ WRITE8_DEVICE_HANDLER( pia6821_cb1_w )
     pia6821_cb2_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( pia6821_cb2_r )
+READ_LINE_DEVICE_HANDLER( pia6821_cb2_r )
 {
 	pia6821_state *p = get_token(device);
 
@@ -1240,19 +1231,16 @@ READ8_DEVICE_HANDLER( pia6821_cb2_r )
     pia6821_cb2_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( pia6821_cb2_w )
+WRITE_LINE_DEVICE_HANDLER( pia6821_cb2_w )
 {
 	pia6821_state *p = get_token(device);
 
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
-
-	LOG(("PIA #%s: set input CB2 = %d\n", device->tag(), data));
+	LOG(("PIA #%s: set input CB2 = %d\n", device->tag(), state));
 
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_b) &&
-		(p->in_cb2 != data) &&
-		((data && C2_LOW_TO_HIGH(p->ctl_b)) || (!data && C2_HIGH_TO_LOW(p->ctl_b))))
+		(p->in_cb2 != state) &&
+		((state && C2_LOW_TO_HIGH(p->ctl_b)) || (!state && C2_HIGH_TO_LOW(p->ctl_b))))
 	{
 		LOG(("PIA #%s: CB2 triggering\n", device->tag()));
 
@@ -1264,7 +1252,7 @@ WRITE8_DEVICE_HANDLER( pia6821_cb2_w )
 	}
 
 	/* set the new value for CA2 */
-	p->in_cb2 = data;
+	p->in_cb2 = state;
 	p->in_cb2_pushed = TRUE;
 }
 

@@ -676,7 +676,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	laserbat_state *state = (laserbat_state *)device->machine->driver_data;
 
-	pia6821_cb1_w(state->pia, 0, state->cb1_toggle & 1);
+	pia6821_cb1_w(state->pia, state->cb1_toggle & 1);
 	state->cb1_toggle ^= 1;
 }
 

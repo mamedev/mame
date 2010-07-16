@@ -157,13 +157,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
-	pia6821_ca1_w(state->pia1, 0, input_port_read(device->machine, "IN0") & 0x01);
+	pia6821_ca1_w(state->pia1, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CA2 - copy of PA1 (SERVICE1) */
-	pia6821_ca2_w(state->pia1, 0, input_port_read(device->machine, "IN0") & 0x02);
+	pia6821_ca2_w(state->pia1, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CB1 - (crosshatch) */
-	pia6821_cb1_w(state->pia1, 0, input_port_read(device->machine, "CROSS"));
+	pia6821_cb1_w(state->pia1, input_port_read(device->machine, "CROSS"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -248,7 +248,7 @@ static const pia6821_interface pia_2_intf =
 static WRITE8_DEVICE_HANDLER( ic48_1_74123_output_changed )
 {
 	nyny_state *state = (nyny_state *)device->machine->driver_data;
-	pia6821_ca1_w(state->pia2, 0, data);
+	pia6821_ca1_w(state->pia2, data);
 }
 
 
