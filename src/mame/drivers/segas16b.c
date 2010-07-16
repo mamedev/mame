@@ -4884,6 +4884,7 @@ ROM_END
 */
 ROM_START( goldnaxej )
 	ROM_REGION( 0x0c0000, "maincpu", 0 ) /* 68000 code */
+	/* fails rom test on 8 & 6 ?! roms verfied from two seperate sources */
 	ROM_LOAD16_BYTE( "epr-12540.a7", 0x00000, 0x20000, CRC(0c7ccc6d) SHA1(25bc29eee731befc665472c2c1998cac8447cc21) )
 	ROM_LOAD16_BYTE( "epr-12539.a5", 0x00001, 0x20000, CRC(1f24f7d0) SHA1(a09cdf394c03069707f7ed400b8fbdc13674fa74) )
 	/* emtpy 0x40000 - 0x80000 */
