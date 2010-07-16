@@ -607,7 +607,7 @@ static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
 	running_device *pia = machine->device("pia0");
-	pia6821_ca1_w(pia, 0, 0);
+	pia6821_ca1_w(pia, 0);
 }
 
 
@@ -615,7 +615,7 @@ static TIMER_CALLBACK( zwackery_493_callback )
 {
 	running_device *pia = machine->device("pia0");
 
-	pia6821_ca1_w(pia, 0, 1);
+	pia6821_ca1_w(pia, 1);
 	timer_set(machine, machine->primary_screen->scan_period(), NULL, 0, zwackery_493_off_callback);
 }
 
