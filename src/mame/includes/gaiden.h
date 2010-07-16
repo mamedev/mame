@@ -19,11 +19,12 @@ public:
 	size_t      spriteram_size;
 
 	/* video-related */
-	tilemap_t     *text_layer,*foreground,*background;
+	tilemap_t   *text_layer,*foreground,*background;
 	bitmap_t    *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
 	UINT16      tx_scroll_x, tx_scroll_y;
 	UINT16      bg_scroll_x, bg_scroll_y;
 	UINT16      fg_scroll_x, fg_scroll_y;
+	INT8		tx_offset_y, bg_offset_y, fg_offset_y, spr_offset_y;
 
 	/* misc */
 	int         sprite_sizey;
@@ -52,10 +53,14 @@ READ16_HANDLER( gaiden_videoram2_r );
 WRITE16_HANDLER( gaiden_videoram3_w );
 READ16_HANDLER( gaiden_videoram3_r );
 
+WRITE16_HANDLER( gaiden_flip_w );
 WRITE16_HANDLER( gaiden_txscrollx_w );
 WRITE16_HANDLER( gaiden_txscrolly_w );
 WRITE16_HANDLER( gaiden_fgscrollx_w );
 WRITE16_HANDLER( gaiden_fgscrolly_w );
 WRITE16_HANDLER( gaiden_bgscrollx_w );
 WRITE16_HANDLER( gaiden_bgscrolly_w );
-WRITE16_HANDLER( gaiden_flip_w );
+WRITE16_HANDLER( gaiden_txoffsety_w );
+WRITE16_HANDLER( gaiden_fgoffsety_w );
+WRITE16_HANDLER( gaiden_bgoffsety_w );
+WRITE16_HANDLER( gaiden_sproffsety_w );

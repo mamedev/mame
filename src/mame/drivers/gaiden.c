@@ -9,8 +9,6 @@ Ninja Gaiden memory map (preliminary)
 076000-077fff Sprite RAM
 078000-079fff Palette RAM
 
-07a100-07a1ff Unknown
-
 memory mapped ports:
 
 read:
@@ -22,12 +20,19 @@ read:
 see the input_ports definition below for details on the input bits
 
 write:
-07a104-07a105 text  layer Y scroll
-07a10c-07a10d text  layer X scroll
-07a204-07a205 front layer Y scroll
-07a20c-07a20d front layer X scroll
-07a304-07a305 back  layer Y scroll
-07a30c-07a30d back  layer X scroll
+07a002-07a003 sprite layer Y offset
+07a104-07a105 text   layer Y scroll
+07a108-07a109 text   layer Y scroll offset
+07a10c-07a10d text   layer X scroll
+07a204-07a205 front  layer Y scroll
+07a208-07a209 front  layer Y scroll offset
+07a20c-07a20d front  layer X scroll
+07a304-07a305 back   layer Y scroll
+07a308-07a309 back   layer Y scroll offset
+07a30c-07a30d back   layer X scroll
+
+unknown writes during boot sequence and/or game start:
+07a000, 07a004, 07a006, 07a100, 07a110, 07a200, 07a210, 07a300, 07a310
 
 Notes:
 - The sprite Y size control is slightly different from gaiden/wildfang to
@@ -301,6 +306,11 @@ static MACHINE_RESET( raiga )
 	state->bg_scroll_y = 0;
 	state->fg_scroll_x = 0;
 	state->fg_scroll_y = 0;
+
+	state->tx_offset_y = 0;
+	state->fg_offset_y = 0;
+	state->bg_offset_y = 0;
+	state->spr_offset_y = 0;
 }
 
 static MACHINE_START( raiga )
@@ -317,6 +327,11 @@ static MACHINE_START( raiga )
 	state_save_register_global(machine, state->bg_scroll_y);
 	state_save_register_global(machine, state->fg_scroll_x);
 	state_save_register_global(machine, state->fg_scroll_y);
+
+	state_save_register_global(machine, state->tx_offset_y);
+	state_save_register_global(machine, state->fg_offset_y);
+	state_save_register_global(machine, state->bg_offset_y);
+	state_save_register_global(machine, state->spr_offset_y);
 }
 
 static WRITE16_HANDLER( raiga_protection_w )
@@ -387,13 +402,16 @@ static ADDRESS_MAP_START( gaiden_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE_MEMBER(gaiden_state, spriteram, spriteram_size)
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2") AM_WRITE(gaiden_sproffsety_w)
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
 	AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
+	AM_RANGE(0x07a108, 0x07a109) AM_WRITE(gaiden_txoffsety_w)
 	AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
 	AM_RANGE(0x07a204, 0x07a205) AM_WRITE(gaiden_fgscrolly_w)
+	AM_RANGE(0x07a208, 0x07a209) AM_WRITE(gaiden_fgoffsety_w)
 	AM_RANGE(0x07a20c, 0x07a20d) AM_WRITE(gaiden_fgscrollx_w)
 	AM_RANGE(0x07a304, 0x07a305) AM_WRITE(gaiden_bgscrolly_w)
+	AM_RANGE(0x07a308, 0x07a309) AM_WRITE(gaiden_bgoffsety_w)
 	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
@@ -873,7 +891,7 @@ static MACHINE_DRIVER_START( shadoww )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 
 	MDRV_GFXDECODE(gaiden)
 	MDRV_PALETTE_LENGTH(4096)
