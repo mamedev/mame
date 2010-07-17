@@ -52,7 +52,7 @@ TODO:
 Prebillian :
 ------------
 
-PCB Layout (Prebillian, from The Guru ( http://unemulated.emuunlim.com/ )
+PCB Layout (Prebillian, from The Guru ( http://guru.mameworld.info )
 
  M6100211A
  -------------------------------------------------------------------

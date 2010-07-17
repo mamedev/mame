@@ -77,9 +77,6 @@ HM27C101AG   bmc_10.bin - Sound samples
 
 BrianT
 
-* There is a MESS driver for this chip (gm68b45s CTR controller):
-http://cvs.mess.org:6502/cgi-bin/viewcvs.cgi/mess/video/m6845.c?rev=1.10
-
 Top board:
           --- Edge Connection ---
 GS9403      7EX    8EX   Part #      Misc HD74LS374p

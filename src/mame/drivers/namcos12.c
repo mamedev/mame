@@ -57,13 +57,13 @@ Toukon Retsuden 3 (TR1/VER.A)            (C) Namco,        1997  COH-700     SYS
 Wanted Games
 ------------
 Aerosmith - Quest for Fame              (C) Namco,        2001
-http://www.bandainamcogames.co.jp/aa/am/vg/questforfame/
+http://www.bandainamcogames.co.jp/am/vg/questforfame/
 
 Attack Pla-Rail                         (C) Tomy/Namco,   199?
 Possibly some kind of redemption game for kids
 
 Kart Duel                               (C) Namco,        2000
-http://www.bandainamcogames.co.jp/aa/am/vg/kartduel/
+http://www.bandainamcogames.co.jp/am/english/aa/kartduel/
 
 Oh Bakyuuun                             (C) Namco/Raizing,1999
 http://www.8ing.net/prd/ohbakyun/index.html
@@ -77,18 +77,18 @@ This was cancelled, only the flyer exists.
 It was shown only at an amusement show. Possibly a prototype still exists. Possibly not.
 
 Techno Drive                            (C) Namco,        1998
-http://www.bandainamcogames.co.jp/aa/am/em/techno-drive/main/index.php
+http://www.bandainamcogames.co.jp/am/em/techno-drive/main/index.php
 
 Tekno Werk                              (C) Namco,        1999
 Some kind of music game similar to Konami's Keyboard Mania series
 
 Truck Kyosokyoku                        (C) Namco,        2000
-http://www.bandainamcogames.co.jp/aa/am/vg/truckkyosokyoku/
+http://www.bandainamcogames.co.jp/am/english/aa/truckkyosokyoku/
 
 Um Jammer Lammy                         (C) Namco,        1999
-http://www.bandainamcogames.co.jp/aa/am/vg/umjammerlammy/#nbgiWrapper
+http://www.wailee.com/sys/lpic/UM_Jammer_Lammy.jpg
 
-If you can help with the remaining undumped S12 games, please contact me at http://www.mameworld.net/gurudumps/
+If you can help with the remaining undumped S12 games, please contact me at http://guru.mameworld.info/
 Note that this list above may not be 100% complete. Alternative versions are also welcome :-)
 
 The Namco System 12 system comprises 3 mandatory PCB's....

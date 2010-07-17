@@ -21,7 +21,7 @@
     Sega Vector memory map (preliminary)
 
     Most of the info here comes from the wiretap archive at:
-    http://www.spies.com/arcade/simulation/gameHardware/
+    http://www.mikesarcade.com/cgi-bin/spies.cgi?action=url&type=info&page=segaxyfaq1.6.txt
 
      * Sega G80 Vector Simulation
 

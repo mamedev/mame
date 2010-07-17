@@ -46,7 +46,7 @@ Soul Edge Ver. III      (C) Namco, 1996
 Tekken Ver.C            (C) Namco, 1995
 Tekken II Ver.C         (C) Namco, 1995
 
-If you can help with the remaining undumped S11 games, please contact http://www.mameworld.net/gurudumps/comments.html
+If you can help with the remaining undumped S11 games, please contact http://guru.mameworld.info/
 
 
 The Namco System 11 system comprises 3 PCB's....

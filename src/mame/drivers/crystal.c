@@ -2,7 +2,7 @@
     CRYSTAL SYSTEM by Brezzasoft (2001)
     using VRender0 System on a Chip
 
-    The VRender0 (http://www.mesdigital.com/english/Products/product_vrender0.asp) chip contains:
+    The VRender0 (info at archive.org for http://www.mesdigital.com) chip contains:
         - CPU Core SE3208 (info at www.adc.co.kr) @ 43Mhz
         - 2 DMA chans
         - 4 Timers

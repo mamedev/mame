@@ -12,10 +12,8 @@
 
   Cross Pang New - Is shown on the website but is not currently dumped
 
-  No Copyright Notice is displayed for Cross Pang however the following page
-  lists it as being by F2 System, Released April 1998
-  http://www.f2.co.kr/eng/f2system/intro5.asp (page no longer valid, check www.f2.co.kr)
-
+  No Copyright Notice is displayed for Cross Pang however http://www.f2.co.kr
+  at one time did list it as being by F2 System, Released April 1998
 
   Cross Pang:
     Audio Test isn't correct when a sound is tested, instead musics are right.

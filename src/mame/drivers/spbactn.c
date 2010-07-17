@@ -55,8 +55,6 @@
  U112: TECMO-5
 
  --- Team Japump!!! ---
- http://www.rainemu.com/japump/
- http://japump.i.am/
  Dumped by Noel Miruru
  17/Oct/2000
 

@@ -17,7 +17,7 @@ Notes:
     It's capable of changing the input ports dynamically (maybe explaining Roads Edge's "do not touch" quote below).
     It probably has a lot to do with the network (Roads Edge network connectors are on this board).
 
-  * The Toshiba CPU datasheet is here : http://www.semicon.toshiba.co.jp/openb2b/websearch/productDetails.jsp?partKey=TMP87CH40N
+  * The Toshiba CPU datasheet is here : http://kr.ic-on-line.cn/IOL/viewpdf/TMP87CH40N_1029113.htm
 
   * From the Roads Edge manual : "The Network Check screen will be displayed for about 40 seconds whether
                                   the cabinet is connected for communication competition or not.  After this,

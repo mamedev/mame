@@ -407,12 +407,8 @@ I couldn't test this board so I don't know the manufakturer, sorry.
 1 OSC 8 Mhz
 1 MPU 8751 (which is read-protected)
 
-
-
 If you need more info or if this package doesn't
 Work, mail me.
-
-Visit The ROMLiST Homepage: Http://hem.passagen.se/ogg/
 
 ..............CaBBe!...................................
 

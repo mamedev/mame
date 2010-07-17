@@ -854,9 +854,6 @@ MACHINE_DRIVER_END
 Vamp 1/2 (Semi Vamp)
 Danbi, 1999
 
-Official page here...
-http://f2.co.kr/eng/product/intro1-17.asp
-
 
 PCB Layout
 ----------

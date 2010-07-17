@@ -127,8 +127,6 @@ c13_u17.u17     HN62418  - GFX   / note, contents of these are identical.
 c13_u11.u11     HN624116 - GFX
 c13_u12.u12     HN624116 - GFX
 
-              Screenshots and board pics are available here...
-              http://unemulated.emuunlim.com/shopraid/index.html
 
 *** ROMSET: vgoalsca
 

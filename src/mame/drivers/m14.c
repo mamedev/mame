@@ -44,7 +44,6 @@ mgpa10.bin
 
 
 --- Team Japump!!! ---
-http://japump.i.am/
 Dumped by Chackn
 01/30/2000
 

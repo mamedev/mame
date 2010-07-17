@@ -57,7 +57,6 @@
   Mosfat, Unique, GEI, etc...
 
   You can see some legal issues in the following links:
-  http://www.altlaw.org/v1/cases/533481
   http://cases.justia.com/us-court-of-appeals/F2/783/421/41759/
 
 

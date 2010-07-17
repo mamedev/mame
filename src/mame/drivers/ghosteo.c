@@ -550,7 +550,6 @@ Notes:
       IC42S16800 - ISSI IC42S16800 4(2)M x 8(16) Bits x 4 Banks (128MBit) SDRAM
 
       QS1000     - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
-                   see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
       QS1001A    - QDSP QS1001A 512k x8 MaskROM (SOP32)
 
       qs1001a.u17 was not dumped from this PCB, but is a standard sample rom found on many Eolith games

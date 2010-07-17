@@ -1000,7 +1000,6 @@ MB7051.6S
 
 dumped by sayu
 --- Team Japump!!! ---
-http://japump.i.am/
 
 
 */

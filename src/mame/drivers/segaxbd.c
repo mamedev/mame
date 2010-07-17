@@ -35,7 +35,7 @@ Super Monaco GP    (C) Sega 1989
 Thunder Blade      (C) Sega 1987
 
 * denotes not dumped. There are also several revisions of the above games not dumper either.
-If you can help, please contact us via http://www.mameworld.net/gurudumps/ or http://www.mamedev.org
+If you can help, please contact us via http://guru.mameworld.info or http://www.mamedev.org
 
 Main Board
 ----------

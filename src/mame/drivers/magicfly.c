@@ -16,7 +16,7 @@
     **** NOTE ****
     This hardware was clearly designed for poker games.
     You can find a complete hardware & software analysis here:
-    http://www.mameworld.net/robbie
+    http://mamedev.emulab.it/robbie
 
 
 *******************************************************************************

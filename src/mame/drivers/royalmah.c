@@ -4326,9 +4326,7 @@ MSM2128x4
 
 
 dumped by sayu
-
 --- Team Japump!!! ---
-http://japump.i.am/
 
 */
 

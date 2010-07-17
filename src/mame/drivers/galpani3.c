@@ -56,8 +56,6 @@ GP310100.40
 
 
 --- Team Japump!!! ---
-http://www.rainemu.com/japump/
-http://japump.i.am/
 Dumped by Uki
 10/22/2000
 

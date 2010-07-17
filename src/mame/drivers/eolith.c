@@ -419,7 +419,6 @@ Notes:
       IS61C1024    - ISSI 128k x4 High Speed CMOS Static RAM (SOJ32)
       KM6161002    - Samsung 64k x4 Ultra High Speed CMOS Video Static RAM (SOJ44)
       QS1000       - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
-                     see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
       QS1001A      - QDSP QS1001A 512k x8 MaskROM (SOP32)
       EV0514-001   - Custom Eolith IC (QFP100)
       VSync        - 60Hz
@@ -553,7 +552,6 @@ Notes:
       KM6161002    - Samsung 64k x16 Ultra High Speed CMOS Video Static RAM (SOJ44)
       TDA1519      - Audio Power AMP
       QS1000       - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
-                     see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
       QS1001A      - QDSP QS1001A 512k x8 MaskROM (SOP32)
       EV0514-001   - Custom Eolith IC (QFP100)
       VSync        - 60Hz
@@ -626,7 +624,6 @@ Notes:
       KM6161002    - Samsung 64k x16 Ultra High Speed CMOS Video Static RAM (SOJ44)
       TDA1519      - Audio Power AMP
       QS1000       - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
-                     see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
       QS1001A      - QDSP QS1001A 512k x8 MaskROM (SOP32)
       EV0514-001   - Custom Eolith IC (QFP100)
       VSync        - 60Hz
@@ -716,7 +713,6 @@ Notes:
       KM6161002    - Samsung 64k x16 Ultra High Speed CMOS Video Static RAM (SOJ44)
       KA22065      - Audio Power AMP
       QS1000       - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
-                     see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
       QS1001A      - QDSP QS1001A 512k x8 MaskROM (SOP32)
       EV0514-001   - Custom Eolith IC (QFP100)
       VSync        - 60Hz
@@ -989,7 +985,6 @@ Notes:
       KM6161002    - Samsung 64k x16 Ultra High Speed CMOS Video Static RAM (SOJ44)
       TDA1519      - Audio Power AMP
       QS1000       - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
-                     see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
       QS1001A      - QDSP QS1001A 512k x8 MaskROM (SOP32)
       EV0514-001   - Custom Eolith IC (QFP100)
       VSync        - 60Hz

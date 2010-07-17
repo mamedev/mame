@@ -9,7 +9,7 @@
         * This driver was made possible by the research done by
           Charles MacDonald.  For a detailed description of the Neo-Geo
           hardware, please visit his page at:
-          http://cgfm2.emuviews.com/temp/mvstech.txt
+          http://cgfm2.emuviews.com/txt/mvstech.txt
         * Presented to you by the Shin Emu Keikaku team.
         * The following people have all spent probably far
           too much time on this:

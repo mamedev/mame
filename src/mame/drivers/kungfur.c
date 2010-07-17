@@ -22,8 +22,11 @@ KR2-KR6 : VOICE
 
 50pin cable to 7seg&lamp control board.
 
-flyer.gif from
-http://www.hoizinger.com/ed/EM.HTML
+Information:
+http://www.wshin.com/games/review/ka/kung-fu-roushi.htm
+http://www.youtube.com/watch?v=ssEfw-RbSjs
+
+
 ----------------------------------------------------------------
 
 ***************************************************************************/

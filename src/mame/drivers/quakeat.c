@@ -31,7 +31,7 @@ The "backup" directory on hard disk was created by the dumper.
 
 
  -- Hardware info found in the following press release:
-http://www.quantum3d.com/press/HTMLarchive/4-20-98.html
+http://www.wave-report.com/archives/1998/98170702.htm
 
 QUANTUM3D'S HEAVY METAL SYSTEM - HM233G
 NLX form factor system that is based on the Intel 440LX chipset

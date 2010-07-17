@@ -57,7 +57,7 @@
   28-04-2006: El Condor
   20-05-2004: Re-Animator
 
-  See http://www.mameworld.net/agemame/techinfo/mpu4.php for Information.
+  See http://agemame.mameworld.info/techinfo/mpu4.php for Information.
 
 --- Board Setup ---
 

@@ -23,9 +23,6 @@
 
     --------
 
-    Most of the info here comes from the wiretap archive at:
-    http://www.spies.com/arcade/simulation/gameHardware/
-
 
     Omega Race Memory Map
     Version 1.1 (Jul 24,1997)

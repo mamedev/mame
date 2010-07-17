@@ -44,8 +44,7 @@ Notes:
 
       Chips:
          QS1000: QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
-                 see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
-          PRIME: LGS Prime 3C 9930R, clock input of 14.31818MHz (QFP100)
+           PRIME: LGS Prime 3C 9930R, clock input of 14.31818MHz (QFP100)
          QL2003: QuickLogic QL2003-XPL84C 0003BA FPGA (PLCC84)
       CL-PS7500: Cirrus Logic CL-PS7500FE-56QC-A 84903-951BD ARM 9843J
                  clock input of 54.000MHz, ARM710C; ARM7-core CPU (QFP240)
@@ -96,7 +95,6 @@ PCB Layout
 Notes:
       Chips:
          QS1000: QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
-                 see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
           PRIME: LGS Prime 3C 9849R, clock input of 14.31818MHz (QFP100)
    XILINX XCS10: Xilinx Spartan XCS10 FPGA (QFP144)
       CL-PS7500: Cirrus Logic CL-PS7500FE-56QC-A 84877-951BD ARM 9843J

@@ -1,11 +1,9 @@
 /***************************************************************************
 
 Deniam games
-
 driver by Nicola Salmoria
 
-
-http://deniam.co.kr/text/c_game01.htm
+Check archive.org for http://deniam.co.kr
 
 Title            System     Date
 ---------------- ---------- ----------

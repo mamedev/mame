@@ -1407,8 +1407,6 @@ static DISCRETE_SOUND_START( btime_sound )
 
 	/* Amplifier is upc1181H3
      *
-     * http://www.mydarc.de/dj7oh/fad/ics/upc1181/upc1181.htm
-     *
      * A linear frequency response is mentioned as well as a lower
      * edge frequency determined by cap on pin3, however no formula given.
      *

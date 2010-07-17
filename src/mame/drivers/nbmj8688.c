@@ -3465,7 +3465,6 @@ Subboard
 
 dumped by sayu
 --- Team Japump!!! ---
-http://japump.i.am/
 
 */
 

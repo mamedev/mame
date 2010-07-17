@@ -116,8 +116,6 @@ EPR10135.19
 
 
 --- Team Japump!!! ---
-http://www.rainemu.com/japump/
-http://japump.i.am/
 Dumped by Chackn
 02/25/2000
 

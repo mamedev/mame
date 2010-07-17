@@ -23,7 +23,7 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
   - 01 x lm324n
 
   To not overload the driver, I put the rest of technical info in
-  http://www.mameworld.net/robbie/trucocl.htm
+  http://robbie.mameworld.info/trucocl.htm
 
 - Added 2 "hidden" color proms (am27s19)
 - One GAL is connected to the color proms inputs.
