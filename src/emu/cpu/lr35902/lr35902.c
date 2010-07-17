@@ -488,6 +488,7 @@ CPU_GET_INFO( lr35902 )
 	case CPUINFO_STR_REGISTER + LR35902_IRQ_STATE: sprintf(info->s, "IRQ:%X", cpustate->w.enable & IME ); break;
 	case CPUINFO_STR_REGISTER + LR35902_IE: sprintf(info->s, "IE:%02X", cpustate->w.IE); break;
 	case CPUINFO_STR_REGISTER + LR35902_IF: sprintf(info->s, "IF:%02X", cpustate->w.IF); break;
+	case CPUINFO_STR_REGISTER + LR35902_SPEED: sprintf(info->s, "SPD:%02x", 0x7E | ( ( cpustate->w.gb_speed - 1 ) << 7 ) | cpustate->w.gb_speed_change_pending ); break;
 	}
 }
 
