@@ -1157,7 +1157,7 @@ static UINT8 *taitofx1_eeprom2 = NULL;
 static WRITE32_HANDLER( bank_coh1000t_w )
 {
 	running_device *mb3773 = space->machine->device("mb3773");
-	mb3773_set_ck(mb3773, 0, (data & 0x20) >> 5);
+	mb3773_set_ck(mb3773, (data & 0x20) >> 5);
 	verboselog( space->machine, 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	memory_set_bankptr(space->machine,  "bank1", memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
 }

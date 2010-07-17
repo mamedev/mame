@@ -552,7 +552,7 @@ static WRITE32_HANDLER(control_w)
 
 	COMBINE_DATA(&control);
 
-	mb3773_set_ck(mb3773, 0, (control & 0x20) >> 5);
+	mb3773_set_ck(mb3773, (control & 0x20) >> 5);
 
 #if 0
 	if((p ^ control) & ~0x20)
