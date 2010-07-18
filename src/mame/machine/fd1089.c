@@ -397,6 +397,11 @@ static UINT16 fd1089_decrypt(offs_t addr,UINT16 val,const UINT8 *key,int opcode,
 
 static UINT16 *decrypted;
 
+static void clear_decrypted(running_machine &machine)
+{
+	decrypted = NULL;
+}
+
 static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -405,6 +410,7 @@ static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype
 	int A;
 	decrypted = auto_alloc_array(machine, UINT16, size/2);
 
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, clear_decrypted);
 	memory_set_decrypted_region(space, 0x000000, size - 1, decrypted);
 
 	for (A = 0;A < size;A+=2)
