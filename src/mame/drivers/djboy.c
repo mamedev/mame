@@ -22,22 +22,6 @@ Self Test has two parts:
 
 - The "BEAST" protection device has access to dipswitches and player inputs.
 
-Genre: Scrolling Fighter
-Orientation: Horizontal
-Type: Raster: Standard Resolution
-CRT: Color
-Conversion Class: JAMMA
-Number of Simultaneous Players: 2
-Maximum number of Players: 2
-Gameplay: Joint
-Control Panel Layout: Multiple Player
-Joystick: 8-way
-Buttons: 3 - Punch, Kick, Jump
-Sound: Amplified Mono (one channel) - Stereo sound is available
-through a 4-pin header (voice of Wolfman Jack!!)
-
-DJ Boy
-1990, Kaneko / American Sammy Corp.
 
 PCB Layout
 ----------
@@ -66,7 +50,7 @@ BS
 
 Notes:
       D780C-2 - Z80 CPU. clock 6.000MHz [12/2] (for all 3 Z80 CPUs)
-      BEAST   - DIP40 Microcontroller, 8xxx series (8041/8042/8751 etc).
+      BEAST   - DIP40 Microcontroller, 8xxx series (8041/8042/8051 etc).
                      Clock 6.000MHz on pins 18 & 19
                 chip is stamped 'KANEKO Beast (C)Intel '80 (C)KANEKO 1988'
       YM2203  - Yamaha YM2203, clock 3.000MHz [12/4]
@@ -151,11 +135,16 @@ Notes:
                 |SPEAKER     STEREO                       OFF|
                 |OUTPUT      MONO                          ON|
                 |--------------------------------------------|
+
+	TODO: Hook-up Beast MCU and remove simulation.
+	The internal ROM has been hand-typed from a photograph of the
+	chip die and should marked BAD_DUMP until confirmed correct.
 */
 
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
@@ -726,6 +715,17 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
+/* Program/data maps are defined in the 8051 core */
+
+static ADDRESS_MAP_START( djboy_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+//	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0)
+//	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1)
+//	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2)
+//	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3)
+ADDRESS_MAP_END
+
+/******************************************************************************/
+
 static INPUT_PORTS_START( djboy )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -930,6 +930,9 @@ static MACHINE_DRIVER_START( djboy )
 	MDRV_CPU_IO_MAP(cpu2_port_am)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_CPU_ADD("mcu", I80C51, 6000000)
+	MDRV_CPU_IO_MAP(djboy_mcu_io_map)
+
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_START(djboy)
@@ -979,8 +982,8 @@ ROM_START( djboy )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* i8751 microcontroller */
-	ROM_LOAD( "i8751_beast", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 ) /* MSM80C51F microcontroller */
+	ROM_LOAD( "beast.9s", 0x00000, 0x1000, BAD_DUMP CRC(73cae0a8) SHA1(1456ad3387d1255b9ca44f3e3505e458b0ed078c) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
@@ -1015,8 +1018,8 @@ ROM_START( djboya )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* i8751 microcontroller */
-	ROM_LOAD( "i8751_beast", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 ) /* MSM80C51F microcontroller*/
+	ROM_LOAD( "beast.9s", 0x00000, 0x1000, BAD_DUMP CRC(73cae0a8) SHA1(1456ad3387d1255b9ca44f3e3505e458b0ed078c) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
@@ -1051,8 +1054,8 @@ ROM_START( djboyj )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* i8751 microcontroller */
-	ROM_LOAD( "i8751_beast", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 ) /* MSM80C51F microcontroller */
+	ROM_LOAD( "beast.9s", 0x00000, 0x1000, BAD_DUMP CRC(73cae0a8) SHA1(1456ad3387d1255b9ca44f3e3505e458b0ed078c) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
