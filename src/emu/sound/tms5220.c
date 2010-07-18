@@ -262,7 +262,7 @@ device), PES Speech adapter (serial port connection)
 /* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
 #define FORCE_DIGITAL 0
 
-/* must be defined; if 1, normal speech (1xA, 1xB per interpolation step); if 0; speak as if SPKSLOW was used (2xA, 1xB per interpolation step) */
+/* must be defined; if 1, normal speech (one A cycle, one B cycle per interpolation step); if 0; speak as if SPKSLOW was used (two A cycles, one B cycle per interpolation step) */
 #define FORCE_SUBC_RELOAD 1
 
 /* if defined, outputs the low 4 bits of the lattice filter to the i/o or clip logic, even though the real hardware doesn't do this */
@@ -301,7 +301,7 @@ device), PES Speech adapter (serial port connection)
 #undef DEBUG_IO_READY
 // above debugs the io ready callback
 #undef DEBUG_RS_WS
-// above debugs the new tms5220_data_r and data_w access methods which actually respect rs and ws
+// above debugs the tms5220_data_r and data_w access methods which actually respect rs and ws
 
 #define MAX_SAMPLE_CHUNK	512
 #define FIFO_SIZE 16
@@ -314,7 +314,7 @@ device), PES Speech adapter (serial port connection)
 
 #define TMS5220_IS_TMC0285	TMS5220_IS_5200
 
-static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //is the sample count reload for 5220c only; 5200 and 5220 always reload with 0
+static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5220c only; 5200 and 5220 always reload with 0; keep in mind this is loaded on IP=0 PC=12 subcycle=1 so it immediately will increment after one sample, effectively being 1,3,5,7 as in the comments above.
 
 typedef struct _tms5220_state tms5220_state;
 struct _tms5220_state
@@ -871,21 +871,22 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 	while ((size > 0) && tms->speaking_now)
     {
         /* if it is the appropriate time to update the old energy/pitch idxes,
-         * i.e. when IP=7, do so. */
-        if (tms->interp_period == 7)
+         * i.e. when IP=7, PC=12, do so. */
+        if ((tms->interp_period == 7) && (tms->PC == 12))
 		{
 			tms->OLDE = (tms->new_frame_energy_idx == 0);
 			tms->OLDP = (tms->new_frame_pitch_idx == 0);
 		}
 
-        /* if we're ready for a new frame, i.e. when IP=0, PC=12, Sub=1 */
+        /* if we're ready for a new frame to be applied, i.e. when IP=0, PC=12, Sub=1 */
+		/* (In reality, the frame was really loaded incrementally during the entire IP=0 PC=x time period, but it doesn't affect anything until IP=0 PC=12 happens) */
         if ((tms->interp_period == 0) && (tms->PC == 12) && (tms->subcycle == 1))
         {
 			// HACK for regression testing, be sure to comment out before release!
 			//tms->RNG = 0x1234;
 			// end HACK
 
-			/* appropriately override the interp count if needed */
+			/* appropriately override the interp count if needed; this will be incremented after the frame parse! */
 			tms->interp_period = reload_table[tms->tms5220c_rate&0x3];
 
 #ifdef PERFECT_INTERPOLATION_HACK
@@ -966,67 +967,43 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		}
 		else // Not a new frame, just interpolate the existing frame.
 		{
-		if (tms->interp_period == 0) tms->inhibit = 0; // disable inhibit when reaching the last interp period
+			if (tms->interp_period == 0) tms->inhibit = 0; // disable inhibit when reaching the last interp period
 #ifdef PERFECT_INTERPOLATION_HACK
-		int samples_per_frame = tms->subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
-		int current_sample = ((tms->PC*(3-tms->subc_reload))+((tms->subc_reload?38:25)*tms->interp_period));
-		zpar = OLD_FRAME_UNVOICED_FLAG;
-		// reset the current energy, pitch, etc to what it was at frame start
-		tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
-		tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
-		for (i = 0; i < 4; i++)
-			tms->current_k[i] = tms->coeff->ktable[i][tms->old_frame_k_idx[i]];
-		for (i = 4; i < tms->coeff->num_k; i++)
-			tms->current_k[i] = (tms->coeff->ktable[i][tms->old_frame_k_idx[i]] * (1-zpar));
-		// now adjust each value to be exactly correct for each of the samples per frsme
-		tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit))*current_sample)/samples_per_frame;
-		tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit))*current_sample)/samples_per_frame;
-		for (i = 0; i < tms->coeff->num_k; i++)
-			tms->current_k[i] += (((tms->target_k[i] - tms->current_k[i])*(1-tms->inhibit))*current_sample)/samples_per_frame;
+			int samples_per_frame = tms->subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
+			int current_sample = ((tms->PC*(3-tms->subc_reload))+((tms->subc_reload?38:25)*tms->interp_period));
+			zpar = OLD_FRAME_UNVOICED_FLAG;
+			// reset the current energy, pitch, etc to what it was at frame start
+			tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
+			tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
+			for (i = 0; i < 4; i++)
+				tms->current_k[i] = tms->coeff->ktable[i][tms->old_frame_k_idx[i]];
+			for (i = 4; i < tms->coeff->num_k; i++)
+				tms->current_k[i] = (tms->coeff->ktable[i][tms->old_frame_k_idx[i]] * (1-zpar));
+			// now adjust each value to be exactly correct for each of the samples per frsme
+			tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit))*current_sample)/samples_per_frame;
+			tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit))*current_sample)/samples_per_frame;
+			for (i = 0; i < tms->coeff->num_k; i++)
+				tms->current_k[i] += (((tms->target_k[i] - tms->current_k[i])*(1-tms->inhibit))*current_sample)/samples_per_frame;
 #else
-		//Updates to parameters only happen on subcycle '2' (B cycle) of PCs.
-		if (tms->subcycle == 2)
-		{
-			switch(tms->PC)
+			//Updates to parameters only happen on subcycle '2' (B cycle) of PCs.
+			if (tms->subcycle == 2)
 			{
-				case 0: /* PC = 0, B cycle, write updated energy */
-				tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 1: /* PC = 1, B cycle, write updated pitch */
-				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 2: /* PC = 2, B cycle, write updated K1 */
-				tms->current_k[0] += (((tms->target_k[0] - tms->current_k[0])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 3: /* PC = 3, B cycle, write updated K2 */
-				tms->current_k[1] += (((tms->target_k[1] - tms->current_k[1])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 4: /* PC = 4, B cycle, write updated K3 */
-				tms->current_k[2] += (((tms->target_k[2] - tms->current_k[2])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 5: /* PC = 5, B cycle, write updated K4 */
-				tms->current_k[3] += (((tms->target_k[3] - tms->current_k[3])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 6: /* PC = 6, B cycle, write updated K5 */
-				tms->current_k[4] += (((tms->target_k[4] - tms->current_k[4])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 7: /* PC = 7, B cycle, write updated K6 */
-				tms->current_k[5] += (((tms->target_k[5] - tms->current_k[5])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 8: /* PC = 8, B cycle, write updated K7 */
-				tms->current_k[6] += (((tms->target_k[6] - tms->current_k[6])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 9: /* PC = 9, B cycle, write updated K8 */
-				tms->current_k[7] += (((tms->target_k[7] - tms->current_k[7])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 10: /* PC = 10, B cycle, write updated K9 */
-				tms->current_k[8] += (((tms->target_k[8] - tms->current_k[8])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
-				case 11: /* PC = 11, B cycle, write updated K10 */
-				tms->current_k[9] += (((tms->target_k[9] - tms->current_k[9])*(1-tms->inhibit)) INTERP_SHIFT);
-				break;
+				switch(tms->PC)
+				{
+					case 0: /* PC = 0, B cycle, write updated energy */
+					tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit)) INTERP_SHIFT);
+					break;
+					case 1: /* PC = 1, B cycle, write updated pitch */
+					tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit)) INTERP_SHIFT);
+					break;
+					case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11:
+					/* PC = 2 thru 11, B cycle, write updated K1 thru K10 */
+					tms->current_k[tms->PC-2] += (((tms->target_k[tms->PC-2] - tms->current_k[tms->PC-2])*(1-tms->inhibit)) INTERP_SHIFT);
+					break;
+					case 12: /* PC = 12, do nothing */
+					break;
+				}
 			}
-		}
 #endif
         }
 
@@ -1069,7 +1046,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #endif
         }
 
-        /* Update LFSR *20* times every sample, like patent shows */
+        /* Update LFSR *20* times every sample (once per T cycle), like patent shows */
 	for (i=0; i<20; i++)
 	{
             bitout = ((tms->RNG >> 12) & 1) ^
@@ -1110,7 +1087,6 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		}
         /* Update all counts */
 
-        size--;
         tms->subcycle++;
         if ((tms->subcycle == 2) && (tms->PC == 12))
         {
@@ -1127,6 +1103,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
         tms->pitch_count++;
         if (tms->pitch_count >= tms->current_pitch) tms->pitch_count = 0;
         buf_count++;
+        size--;
     }
 
 empty:
