@@ -490,12 +490,6 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( shadoww )
-	PORT_INCLUDE(  common )
-
-	/* Dip Switches order fits the first screen */
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:3,2,1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
@@ -537,35 +531,17 @@ static INPUT_PORTS_START( shadoww )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SWB:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( drgnbowl )
+	PORT_INCLUDE(  common )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SWA:7" ) /* No Flip Screen */
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( wildfang )
 	PORT_INCLUDE(  common )
 
-	/* Dip Switches order fits the first screen */
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:3,2,1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:6,5,4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:7")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:2,1")
 	PORT_DIPSETTING(      0x8000, "1" )
 	PORT_DIPSETTING(      0xc000, "2" )
@@ -583,55 +559,18 @@ static INPUT_PORTS_START( wildfang )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SWB:7" )
 	PORT_DIPNAME( 0x0100, 0x0100, "Title" ) PORT_DIPLOCATION("SWB:8")	// also affects Difficulty Table (see above)
 	PORT_DIPSETTING(      0x0100, "Wild Fang" )
 	PORT_DIPSETTING(      0x0000, "Tecmo Knight" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tknight )
-	PORT_INCLUDE(  common )
+	PORT_INCLUDE(  wildfang )
 
-	/* Dip Switches order fits the first screen */
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:3,2,1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:6,5,4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:7")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:2,1")
-	PORT_DIPSETTING(      0x8000, "1" )
-	PORT_DIPSETTING(      0xc000, "2" )
-	PORT_DIPSETTING(      0x4000, "3" )
-/*  PORT_DIPSETTING(      0x0000, "2" ) */
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SWB:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SWB:4" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:6,5")
-	PORT_DIPSETTING(      0x0c00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SWB:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SWB:8" )
+	PORT_MODIFY("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SWB:3" ) /* No seperate difficulty option like parent set */
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SWB:4" ) /* No seperate difficulty option like parent set */
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SWB:8" ) /* No title change option */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raiga )
@@ -642,7 +581,7 @@ static INPUT_PORTS_START( raiga )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Dip Switches order fits the first screen */
-	PORT_START("DSW")
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:4,3,2,1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 4C_1C ) )
@@ -696,49 +635,6 @@ static INPUT_PORTS_START( raiga )
 	PORT_DIPSETTING(      0x0100, "100k 300k" )
 	PORT_DIPSETTING(      0x0200, "50k only" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( drgnbowl )
-	PORT_INCLUDE(  common )
-
-	/* Dip Switches order fits the first screen */
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:3,2,1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:6,5,4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_4C ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SWA:7" )
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:2,1")
-	PORT_DIPSETTING(      0x0000, "1" )
-	PORT_DIPSETTING(      0xc000, "2" )
-	PORT_DIPSETTING(      0x4000, "3" )
-	PORT_DIPSETTING(      0x8000, "4" )
-	PORT_DIPNAME( 0x3000, 0x3000, "Energy" ) PORT_DIPLOCATION("SWB:4,3")
-	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPSETTING(      0x3000, "3" )
-	PORT_DIPSETTING(      0x1000, "4" )
-	PORT_DIPSETTING(      0x2000, "5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SWB:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SWB:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SWB:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SWB:8" )
 INPUT_PORTS_END
 
 
@@ -1374,35 +1270,7 @@ ROM_START( mastninj )
 ROM_END
 
 
-ROM_START( tknight )
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "tkni1.bin",    0x00000, 0x20000, CRC(9121daa8) SHA1(06ba7779602df8fae32e859371d27c0dbb8d3430) )
-	ROM_LOAD16_BYTE( "tkni2.bin",    0x00001, 0x20000, CRC(6669cd87) SHA1(8888522a3aef76a979ffc80ba457dd49f279abf1) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
-
-	ROM_REGION( 0x1000, "mcu", 0 )	/* protection NEC D8749 */
-	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x010000, "gfx1", 0 )
-	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) )	/* 8x8 tiles */
-
-	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "tkni7.bin",    0x000000, 0x80000, CRC(4b4d4286) SHA1(d386aa223eb288ea829c98d3f39279a75dc66b71) )
-
-	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
-
-	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) )	/* sprites */
-	ROM_LOAD( "tkni8.bin",    0x080000, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) )	/* sprites */
-
-	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
-ROM_END
-
-ROM_START( wildfang )
+ROM_START( wildfang ) /* Dipswitch selectable title of Wild Fang or Temco Knight */
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "1.3st",    0x00000, 0x20000, CRC(ab876c9b) SHA1(b02c822f107df4c9c4f0024998f225c1ddbbd496) )
 	ROM_LOAD16_BYTE( "2.5st",    0x00001, 0x20000, CRC(1dc74b3b) SHA1(c99051ebefd6ce666b13ab56c0a10b188f15ec28) )
@@ -1421,6 +1289,65 @@ ROM_START( wildfang )
 	ROM_LOAD( "15.3b",        0x020000, 0x20000, CRC(3f40a6b4) SHA1(7486ddfe4b0ac4198512548b74402f4194c804f1) )
 	ROM_LOAD( "16.1a",        0x040000, 0x20000, CRC(0f31639e) SHA1(e150db4f617c5fcf505e5ca95d94073c1f6b7d0d) )
 	ROM_LOAD( "17.1b",        0x060000, 0x20000, CRC(f32c158e) SHA1(2861754bda37e30799151b5ca73771937edf38a9) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 )
+	ROM_LOAD( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) )	/* sprites */
+	ROM_LOAD( "tkni8.bin",    0x080000, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) )	/* sprites */
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
+ROM_END
+
+ROM_START( wildfangs ) /* Wild Fang - No title change option */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
+	ROM_LOAD16_BYTE( "1.3s",    0x00000, 0x20000, CRC(3421f691) SHA1(7829729e2007a53fc598db3ae3524b971cbf49e9) )
+	ROM_LOAD16_BYTE( "2.5s",    0x00001, 0x20000, CRC(d3547708) SHA1(91cc0575b25fe15d668eec26dd74945c51ed67eb) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection NEC D8749 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )
+	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) )	/* 8x8 tiles */
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "14.3a",        0x000000, 0x20000, CRC(0d20c10c) SHA1(209ca4e166d0b91ff99a338e135e5388af2c51f5) )
+	ROM_LOAD( "15.3b",        0x020000, 0x20000, CRC(3f40a6b4) SHA1(7486ddfe4b0ac4198512548b74402f4194c804f1) )
+	ROM_LOAD( "16.1a",        0x040000, 0x20000, CRC(0f31639e) SHA1(e150db4f617c5fcf505e5ca95d94073c1f6b7d0d) )
+	ROM_LOAD( "17.1b",        0x060000, 0x20000, CRC(f32c158e) SHA1(2861754bda37e30799151b5ca73771937edf38a9) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 )
+	ROM_LOAD( "tkni9.bin",    0x000000, 0x80000, CRC(d22f4239) SHA1(360a9a821faabe911eef407ef85452d8b706538f) )	/* sprites */
+	ROM_LOAD( "tkni8.bin",    0x080000, 0x80000, CRC(4931b184) SHA1(864e827ac109c0ee52a898034c021cd5e92ff000) )	/* sprites */
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
+ROM_END
+
+ROM_START( tknight ) /* Temco Knight - No title change option */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
+	ROM_LOAD16_BYTE( "tkni1.bin",    0x00000, 0x20000, CRC(9121daa8) SHA1(06ba7779602df8fae32e859371d27c0dbb8d3430) )
+	ROM_LOAD16_BYTE( "tkni2.bin",    0x00001, 0x20000, CRC(6669cd87) SHA1(8888522a3aef76a979ffc80ba457dd49f279abf1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
+
+	ROM_REGION( 0x1000, "mcu", 0 )	/* protection NEC D8749 */
+	ROM_LOAD( "a-6v.mcu",         0x00000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )
+	ROM_LOAD( "tkni5.bin",    0x000000, 0x10000, CRC(5ed15896) SHA1(87bdddb26934af0b2c4e704e6d85c69a7531aeb1) )	/* 8x8 tiles */
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "tkni7.bin",    0x000000, 0x80000, CRC(4b4d4286) SHA1(d386aa223eb288ea829c98d3f39279a75dc66b71) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
 	ROM_LOAD( "tkni6.bin",    0x000000, 0x80000, CRC(f68fafb1) SHA1(aeca38eaea2f6dfc484e48ac1114c0c4abaafb9c) )
@@ -1702,13 +1629,14 @@ static DRIVER_INIT(mastninj)
 	DRIVER_INIT_CALL(shadoww);
 }
 
-GAME( 1988, shadoww,  0,        shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Shadow Warriors (World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, shadowwa, shadoww,  shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Shadow Warriors (World, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, gaiden,   shadoww,  shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Ninja Gaiden (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ryukendn, shadoww,  shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Ninja Ryukenden (Japan, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ryukendna,shadoww,  shadoww, shadoww,  shadoww,  ROT0, "Tecmo", "Ninja Ryukenden (Japan, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mastninj, shadoww,  mastninj,shadoww,  mastninj, ROT0, "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too.
+GAME( 1988, shadoww,  0,        shadoww, common,   shadoww,  ROT0, "Tecmo", "Shadow Warriors (World, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, shadowwa, shadoww,  shadoww, common,   shadoww,  ROT0, "Tecmo", "Shadow Warriors (World, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, gaiden,   shadoww,  shadoww, common,   shadoww,  ROT0, "Tecmo", "Ninja Gaiden (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ryukendn, shadoww,  shadoww, common,   shadoww,  ROT0, "Tecmo", "Ninja Ryukenden (Japan, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ryukendna,shadoww,  shadoww, common,   shadoww,  ROT0, "Tecmo", "Ninja Ryukenden (Japan, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mastninj, shadoww,  mastninj,common,   mastninj, ROT0, "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too.
 GAME( 1989, wildfang, 0,        shadoww, wildfang, wildfang, ROT0, "Tecmo", "Wild Fang / Tecmo Knight", GAME_SUPPORTS_SAVE )
+GAME( 1989, wildfangs,wildfang, shadoww, tknight,  wildfang, ROT0, "Tecmo", "Wild Fang", GAME_SUPPORTS_SAVE )
 GAME( 1989, tknight,  wildfang, shadoww, tknight,  wildfang, ROT0, "Tecmo", "Tecmo Knight", GAME_SUPPORTS_SAVE )
 GAME( 1991, stratof,  0,        raiga,   raiga,    raiga,    ROT0, "Tecmo", "Raiga - Strato Fighter (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, raiga,    stratof,  raiga,   raiga,    raiga,    ROT0, "Tecmo", "Raiga - Strato Fighter (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

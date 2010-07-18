@@ -5325,6 +5325,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ryukendna )	/* 6215 - (c) 1989 Tecmo (Japan) */
 	DRIVER( mastninj )	/* bootleg */
 	DRIVER( wildfang )	/* (c) 1989 Tecmo */
+	DRIVER( wildfangs )	/* (c) 1989 Tecmo */
 	DRIVER( tknight )	/* (c) 1989 Tecmo */
 	DRIVER( stratof )	/* (c) 1991 Tecmo */
 	DRIVER( raiga )		/* (c) 1991 Tecmo */
