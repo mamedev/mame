@@ -1407,6 +1407,8 @@ static DISCRETE_SOUND_START( btime_sound )
 
 	/* Amplifier is upc1181H3
      *
+     * http://www.ic-ts-histo.de/fad/ics/upc1181/upc1181.htm
+     *
      * A linear frequency response is mentioned as well as a lower
      * edge frequency determined by cap on pin3, however no formula given.
      *
@@ -1829,7 +1831,7 @@ ROM_START( tisland )
 ROM_END
 
 /* There is a flyer with a screen shot for Lock'n'Chase at:
-   http://www.gamearchive.com/flyers/video/taito/locknchase_f.jpg  */
+   http://www.arcadeflyers.com/?page=flyer&db=videodb&id=608&image=1  */
 
 ROM_START( lnc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
