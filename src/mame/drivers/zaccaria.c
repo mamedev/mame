@@ -28,7 +28,10 @@ Notes:
   0-3 are connected to regular devices (6400-6407 has 4-bit RAM, while 6c00-6c07
   has a 4-bit input port).
 
-- The 6802 driving the TMS5220 has a push button connected to the NMI line. Test?
+- The 6802 driving the TMS5220 has a push button connected to the NMI line. On
+  Zaccaria pinballs, when pressed, this causes the speech 6802 and the slave
+  sound 6802 to play a few speech effects and sound effects;
+  This currently doesn't work in MAME
 
 ***************************************************************************/
 
@@ -282,6 +285,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
+/* slave sound cpu, produces music and sound effects */
+
 static ADDRESS_MAP_START( sound_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
@@ -289,14 +294,33 @@ static ADDRESS_MAP_START( sound_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+/* master sound cpu, controls speech directly */
+/* mapping:
+   A15 A14 A13 A12 A11 A10 A09 A08 A07 A06 A05 A04 A03 A02 A01 A00
+     0   0   0   0   0   0   0   0   0   *   *   *   *   *   *   *  RW 6802 internal ram
+     x   0   0   0   x   x   x   x   1   x   x   1   x   x   *   *  RW 6821 PIA @ 1I
+     x   0   0   1   0   0   x   x   x   x   x   x   x   x   x   x  W  MC1408 DAC
+     x   x   0   1   0   1   x   x   x   x   x   x   x   x   x   x  W  Command to slave sound1 cpu
+     x   x   0   1   1   0   x   x   x   x   x   x   x   x   x   x  R  Command read latch from z80
+     x   x   0   1   1   1   x   x   x   x   x   x   x   x   x   x  Open bus
+     %   %   1   0   *   *   *   *   *   *   *   *   *   *   *   *  R /CS1A: Enable Rom 8
+     %   %   1   1   *   *   *   *   *   *   *   *   *   *   *   *  R /CS0A: Enable Rom 7
+	 note that the % bits go to pins 2 (6802 A14) and 26 (6802 A15) of the roms
+	 monymony and jackrabt both use 2764 roms, which use pin 2 as A12 and pin 26 as N/C don't care
+	 hence for actual chips used, the mem map is:
+     x   *   1   0   *   *   *   *   *   *   *   *   *   *   *   *  R /CS1A: Enable Rom 8
+     x   *   1   1   *   *   *   *   *   *   *   *   *   *   *   *  R /CS0A: Enable Rom 7
+*/
 static ADDRESS_MAP_START( sound_map_2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w)	/* MC1408 */
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x007f) AM_RAM /* 6802 internal ram */
+	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w) AM_MIRROR(0x8F6C)
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */
+	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w) AM_MIRROR(0xC3FF)
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r) AM_MIRROR(0xC3FF)
+	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 low
+	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_MIRROR(0x8000) // rom 7 with A12 low
+	AM_RANGE(0x6000, 0x6fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 high
+	AM_RANGE(0x7000, 0x7fff) AM_ROM AM_MIRROR(0x8000) // rom 7 with A12 high
 ADDRESS_MAP_END
 
 
@@ -622,10 +646,10 @@ ROM_START( monymony )
 	ROM_LOAD( "snd9.1i",           0xe000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* 64k for second 6802 */
-	ROM_LOAD( "snd8.1h",           0xa000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
-	ROM_CONTINUE(             0xe000, 0x1000 )
-	ROM_LOAD( "snd7.1g",           0xb000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
-	ROM_CONTINUE(             0xf000, 0x1000 )
+	ROM_LOAD( "snd8.1h",           0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
+	ROM_CONTINUE(             0x6000, 0x1000 )
+	ROM_LOAD( "snd7.1g",           0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
+	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "bg1.2d",           0x0000, 0x2000, CRC(82ab4d1a) SHA1(5aaf42a508df236f2e7c844d377132d73053907b) )
@@ -657,10 +681,10 @@ ROM_START( jackrabt )
 	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* 64k for second 6802 */
-	ROM_LOAD( "8snd.1h",      0xa000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
-	ROM_CONTINUE(             0xe000, 0x1000 )
-	ROM_LOAD( "7snd.1g",      0xb000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
-	ROM_CONTINUE(             0xf000, 0x1000 )
+	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
+	ROM_CONTINUE(             0x6000, 0x1000 )
+	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
+	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "1bg.2d",       0x0000, 0x2000, CRC(9f880ef5) SHA1(0ee20fb7c794f6dafdaf2c9ee8456221c9d668c5) )
@@ -696,10 +720,10 @@ ROM_START( jackrabt2 )
 	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* 64k for second 6802 */
-	ROM_LOAD( "8snd.1h",      0xa000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
-	ROM_CONTINUE(             0xe000, 0x1000 )
-	ROM_LOAD( "7snd.1g",      0xb000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
-	ROM_CONTINUE(             0xf000, 0x1000 )
+	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
+	ROM_CONTINUE(             0x6000, 0x1000 )
+	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
+	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "1bg.2d",       0x0000, 0x2000, CRC(9f880ef5) SHA1(0ee20fb7c794f6dafdaf2c9ee8456221c9d668c5) )
@@ -731,10 +755,10 @@ ROM_START( jackrabts )
 	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* 64k for second 6802 */
-	ROM_LOAD( "8snd.1h",      0xa000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
-	ROM_CONTINUE(             0xe000, 0x1000 )
-	ROM_LOAD( "7snd.1g",      0xb000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
-	ROM_CONTINUE(             0xf000, 0x1000 )
+	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
+	ROM_CONTINUE(             0x6000, 0x1000 )
+	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
+	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "1bg.2d",       0x0000, 0x2000, CRC(9f880ef5) SHA1(0ee20fb7c794f6dafdaf2c9ee8456221c9d668c5) )
