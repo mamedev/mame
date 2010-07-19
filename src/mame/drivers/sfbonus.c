@@ -49,13 +49,57 @@ In a couple of cases, due to too many older revisions, I used: parent + version 
 
 ------------------------------------------------------------
 
-There is known to be a "Classic Edition Compact Format" PCB
+"Classic Edition Compact Format" PCB:
 
-ROM1 (program rom) and ROM2 (sound sample) are stadard 32 pin
-style PROMs.  The graphics are stored in ROM3 & ROM4 which
-appear to be surface mounted 8 Mbit roms.
+  +-------+   +-------------+   +------------+
+  | VR1   +---+  Connector  +---+ +---+ +---+|
++-+386D            +---+          | R | | R ||
+|  ULN2003A        | R |          | O | | O ||
+|                  | O |          | M | | M ||
+|8                 | M |          | 3 | | 4 ||
+|  ULN2003A        | 2 |          +---+ +---+|
+|L          +----+ +---+                     |
+|i          |6295|                    62H256 |
+|n          +----+      +----------+         |
+|e ULN2003A             |          |         |
+|r         +-----+      |  AMCOE   |  25MHz  |
+|          |9536 |      |  SALTIRE |         |
+|C         |     |      |          |         |
+|o         +-----+      +----------+         |
+|n                                        CN1|
+|n             CN3      12MHz   4.9152MHz    |
+|e                                        CN2|
+|c                      +----------+         |
+|t  +---------+         |   ROM1   |         |
+|o  | HM86171 |         +----------+      SW4|
+|r  +---------+                              |
+|                       FM1608-120           |
+|                                         SW5|
++-+                        H3                |
+  +------------------------------------------+
 
-------------------------------------------------------------
+     CPU: Amcoe Saltire 208PQFP (Z80 core)
+Graphics: HM86171
+     OSC: 25.000MHz, 12.000MHz & 4.9152MHz
+   Sound: OKI M6295
+   Other: XILINX XC9536XL (used for programable protection, connected to H2)
+
+HM86171-120 - HMC 28 pin DIP Color Pallete RAMDAC
+ FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
+   ULN2003A - 16 pin DIP Seven Darlington Arrays
+       386D - JRC 386D low voltage AMP
+        VR1 - Sound adjust pot
+
+H2 - 6 pin header used to program the XC9536XL (JTAG?)
+H3 - 20 pin dual row connector
+
+CN1 & CN2 are RJ45 LINK connectors
+
+ROMs 1 is a AMIC 290021T
+ROM  2 is a AMIC A29040BV surface mounted
+ROMs 3 & 4 are MX 29LV400TTC surface mounted
+
+--------------------------------------------------------------------
 
 Model No. S2000-B
 +---------+   +-------------+   +--------------------+
@@ -88,7 +132,7 @@ Model No. S2000-B
 +-+      S   S   S   S   S        B     R          +-+
   |      W   W   W   W   W        A     S            |
 +-+      1   2   3   4   5        T     T            |
-+---------------------------------------------------+
++----------------------------------------------------+
 
      CPU: Amcoe SGC2000 208PQFP (Z80 core)
 Graphics: HM86171
@@ -4955,12 +4999,12 @@ ROM_START( fb6s1 ) /* "Compact" PCB, the surface mounted roms haven't been dumpe
 	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x080000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
 	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x080000, NO_DUMP )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fb617re.id", 0x00, 0x20, CRC(132908c4) SHA1(4e4c58327a181c511c8144349432a178936a997f) )
@@ -4974,12 +5018,12 @@ ROM_START( fb6s2 ) /* "Compact" PCB, the surface mounted roms haven't been dumpe
 	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x080000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
 	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x080000, NO_DUMP )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fb617lt.id", 0x00, 0x20, CRC(9903b0a6) SHA1(840873524b1cc33539926655ef94d23f6b219f76) )
@@ -4993,12 +5037,12 @@ ROM_START( fb6s3 ) /* "Compact" PCB, the surface mounted roms haven't been dumpe
 	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x080000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
 	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x080000, NO_DUMP )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fb6130r.id", 0x00, 0x20, CRC(18fb9502) SHA1(87fe308394950dff22c0ed57d27a901b38b6396c) )
