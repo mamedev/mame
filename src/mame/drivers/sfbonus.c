@@ -4947,48 +4947,61 @@ ROM_START( fb6v2 )
 	ROM_LOAD_OPTIONAL( "fb617lt.id", 0x00, 0x20, CRC(9903b0a6) SHA1(840873524b1cc33539926655ef94d23f6b219f76) )
 ROM_END
 
-ROM_START( fb6s1 )
+ROM_START( fb6s1 ) /* "Compact" PCB, the surface mounted roms haven't been dumped yet */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17r.bin", 0x00000, 0x40000, CRC(679747d1) SHA1(ca702324c436d54f4c23350b1af4f0250915883c) )
 
-	// this is a 'compact' board,  the standard roms don't seem correct
-
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
+	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) )
+	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
 	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	/* these should be different */
-	ROM_LOAD16_BYTE( "fb06rom5_s.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fb06rom6_s.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x100000, NO_DUMP )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fb617re.id", 0x00, 0x20, CRC(132908c4) SHA1(4e4c58327a181c511c8144349432a178936a997f) )
 ROM_END
 
-ROM_START( fb6s2 )
+ROM_START( fb6s2 ) /* "Compact" PCB, the surface mounted roms haven't been dumped yet */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17lt.bin", 0x00000, 0x40000, CRC(2008a56f) SHA1(1dec4818c49cd63cc29fcb5abdab7a256731ae7b) )
 
-	// this is a 'compact' board,  the standard roms don't seem correct
-
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
+	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) )
+	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
 	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	/* these should be different */
-	ROM_LOAD16_BYTE( "fb06rom5_s.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fb06rom6_s.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x100000, NO_DUMP )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fb617lt.id", 0x00, 0x20, CRC(9903b0a6) SHA1(840873524b1cc33539926655ef94d23f6b219f76) )
+ROM_END
+
+ROM_START( fb6s3 ) /* "Compact" PCB, the surface mounted roms haven't been dumped yet */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "f06s13r.bin", 0x00000, 0x40000, CRC(93ba8c7c) SHA1(905572e98bd01c4db597ee30afbe5f9cb1b114ed) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x100000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
+	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb6130r.id", 0x00, 0x20, CRC(18fb9502) SHA1(87fe308394950dff22c0ed57d27a901b38b6396c) )
 ROM_END
 
 /* Fruit Bonus 2006 Special Edition */
@@ -5827,6 +5840,7 @@ GAME( 2006, fb6v1,       fb6,      sfbonus,    amcoe1_reels3,    fb6v,          
 GAME( 2006, fb6d2,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, set 1)", 0)
 GAME( 2006, fb6s2,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, set 2)", GAME_NOT_WORKING) // no reel gfx
 GAME( 2006, fb6v2,       fb6,      sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT Dual)", 0)
+GAME( 2006, fb6s3,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.3R CGA)", GAME_NOT_WORKING) // no reel gfx
 
 GAME( 2006, fb6se,       0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E CGA)", 0) /* Released August 2006 according to Amcoe web site */
 GAME( 2006, fb6sev,      fb6se,    sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E Dual)", 0)
@@ -5841,8 +5855,8 @@ GAME( 2006, bugfeverd,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverd,     
 GAME( 2006, bugfeverv2,  bugfever, sfbonus,    amcoe1_reels3,    bugfeverv2,      ROT0,  "Amcoe", "Bugs Fever (Version 1.7E Dual)", 0)
 GAME( 2006, bugfevero,   bugfever, sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bugs Fever (Version 1.6R CGA)", 0)
 
-GAME( 2007, atworld,     0,        sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site - too new */
-GAME( 2007, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0) /* Year according to Amcoe web site - too new */
+GAME( 2007, atworld,     0,        sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site */
+GAME( 2007, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0) /* Year according to Amcoe web site */
 
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
 GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING)

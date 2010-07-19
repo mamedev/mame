@@ -9784,12 +9784,12 @@ Other Sun games
 	DRIVER( parrot3v1 )	/* (c) 2004 Amcoe */
 	DRIVER( parrot3o )	/* (c) 2004 Amcoe */
 	DRIVER( hldspin1 )	/* (c) 2000 Amcoe - Hold & Spin I */
-	DRIVER( hldspin1dt )/* (c) 2000 Amcoe */
-	DRIVER( hldspin1vt )/* (c) 2000 Amcoe */
+	DRIVER( hldspin1dt )	/* (c) 2000 Amcoe */
+	DRIVER( hldspin1vt )	/* (c) 2000 Amcoe */
 	DRIVER( hldspin1o )	/* (c) 2000 Amcoe */
 	DRIVER( hldspin2 )	/* (c) 2000 Amcoe - Hold & Spin II */
-	DRIVER( hldspin2d1 )/* (c) 2000 Amcoe */
-	DRIVER( hldspin2v1 )/* (c) 2000 Amcoe */
+	DRIVER( hldspin2d1 )	/* (c) 2000 Amcoe */
+	DRIVER( hldspin2v1 )	/* (c) 2000 Amcoe */
 	DRIVER( hldspin2o )	/* (c) 2000 Amcoe */
 	DRIVER( fcnudge )	/* (c) 2003 Amcoe - Fruit Carnival Nudge */
 	DRIVER( fcnudgeo )	/* (c) 2003 Amcoe */
@@ -9836,18 +9836,18 @@ Other Sun games
 	DRIVER( pirpok2v1 )	/* (c) 2003 Amcoe */
 	DRIVER( pirpok2o )	/* (c) 2003 Amcoe */
 	DRIVER( anibonus )	/* (c) 2003 Amcoe - Animal Bonus */
-	DRIVER( anibonusv1 )/* (c) 2003 Amcoe */
-	DRIVER( anibonusv2 )/* (c) 2003 Amcoe */
-	DRIVER( anibonusb1 )/* (c) 2003 Amcoe */
-	DRIVER( anibonusd1 )/* (c) 2003 Amcoe */
-	DRIVER( anibonusb2 )/* (c) 2003 Amcoe */
-	DRIVER( anibonusd2 )/* (c) 2003 Amcoe */
+	DRIVER( anibonusv1 )	/* (c) 2003 Amcoe */
+	DRIVER( anibonusv2 )	/* (c) 2003 Amcoe */
+	DRIVER( anibonusb1 )	/* (c) 2003 Amcoe */
+	DRIVER( anibonusd1 )	/* (c) 2003 Amcoe */
+	DRIVER( anibonusb2 )	/* (c) 2003 Amcoe */
+	DRIVER( anibonusd2 )	/* (c) 2003 Amcoe */
 	DRIVER( anibonuso )	/* (c) 2003 Amcoe */
-	DRIVER( anibonuso2 )/* (c) 2003 Amcoe */
-	DRIVER( anibonuso3 )/* (c) 2003 Amcoe */
-	DRIVER( anibonusxo )/* (c) 2003 Amcoe */
-	DRIVER( anibonusxo2 )/* (c) 2003 Amcoe */
-	DRIVER( anibonusxo3 )/* (c) 2003 Amcoe */
+	DRIVER( anibonuso2 )	/* (c) 2003 Amcoe */
+	DRIVER( anibonuso3 )	/* (c) 2003 Amcoe */
+	DRIVER( anibonusxo )	/* (c) 2003 Amcoe */
+	DRIVER( anibonusxo2 )	/* (c) 2003 Amcoe */
+	DRIVER( anibonusxo3 )	/* (c) 2003 Amcoe */
 	DRIVER( abnudge )	/* (c) 2003 Amcoe - Animal Bonus Nudge */
 	DRIVER( abnudgeb )	/* (c) 2003 Amcoe */
 	DRIVER( abnudged )	/* (c) 2003 Amcoe */
@@ -9858,10 +9858,10 @@ Other Sun games
 	DRIVER( dblchalv1 )	/* (c) 2003 Amcoe */
 	DRIVER( dblchalo )	/* (c) 2003 Amcoe */
 	DRIVER( anithunt )	/* (c) 2003 Amcoe - Animal Treasure Hunt */
-	DRIVER( anithuntd1 )/* (c) 2003 Amcoe */
-	DRIVER( anithuntv1 )/* (c) 2003 Amcoe */
+	DRIVER( anithuntd1 )	/* (c) 2003 Amcoe */
+	DRIVER( anithuntv1 )	/* (c) 2003 Amcoe */
 	DRIVER( anithunto )	/* (c) 2003 Amcoe */
-	DRIVER( anithunto2 )/* (c) 2003 Amcoe */
+	DRIVER( anithunto2 )	/* (c) 2003 Amcoe */
 	DRIVER( sfruitb )	/* (c) 2002 Amcoe - Super Fruit Bonus */
 	DRIVER( sfruitbb1 )	/* (c) 2002 Amcoe */
 	DRIVER( sfruitbd1 )	/* (c) 2002 Amcoe */
@@ -9907,29 +9907,32 @@ Other Sun games
 	DRIVER( fb5c )		/* (c) 2005 Amcoe */
 	DRIVER( fb5d )		/* (c) 2005 Amcoe */
 	DRIVER( fb5v )		/* (c) 2005 Amcoe */
-	DRIVER( fb6 )		/* (c) 200? Amcoe - Fruit Bonus '06 - 10th anniversary */
-	DRIVER( fb6v )		/* (c) 200? Amcoe */
-	DRIVER( fb6d1 )		/* (c) 200? Amcoe */
-	DRIVER( fb6s1 )		/* (c) 200? Amcoe */
-	DRIVER( fb6v1 )		/* (c) 200? Amcoe */
-	DRIVER( fb6d2 )		/* (c) 200? Amcoe */
-	DRIVER( fb6s2 )		/* (c) 200? Amcoe */
-	DRIVER( fb6v2 )		/* (c) 200? Amcoe */
-	DRIVER( fb6se )		/* (c) 200? Amcoe - Fruit Bonus 2006 Special Edition */
-	DRIVER( fb6sev )	/* (c) 200? Amcoe */
-	DRIVER( fb6sed1 )	/* (c) 200? Amcoe */
-	DRIVER( fb6sev1 )	/* (c) 200? Amcoe */
-	DRIVER( fb6sed2 )	/* (c) 200? Amcoe */
-	DRIVER( fb6sev2 )	/* (c) 200? Amcoe */
-	DRIVER( version4 )	/* (c) 200? Amcoe - Version 4 ? */
-	DRIVER( bugfever )	/* (c) 200? Amcoe - Bug Fever */
-	DRIVER( bugfevero )	/* (c) 200? Amcoe */
-	DRIVER( bugfeverd )	/* (c) 200? Amcoe */
-	DRIVER( bugfeverv )	/* (c) 200? Amcoe */
-	DRIVER( bugfeverv2 )	/* (c) 200? Amcoe */
-	DRIVER( dvisland )	/* (c) 200? Amcoe - Devil's Island */
-	DRIVER( funriver )	/* (c) 200? Amcoe - Fun River */
-	DRIVER( funriverv )	/* (c) 200? Amcoe */
+	DRIVER( fb6 )		/* (c) 2006 Amcoe - Fruit Bonus '06 - 10th anniversary */
+	DRIVER( fb6v )		/* (c) 2006 Amcoe */
+	DRIVER( fb6d1 )		/* (c) 2006 Amcoe */
+	DRIVER( fb6s1 )		/* (c) 2006 Amcoe */
+	DRIVER( fb6v1 )		/* (c) 2006 Amcoe */
+	DRIVER( fb6d2 )		/* (c) 2006 Amcoe */
+	DRIVER( fb6s2 )		/* (c) 2006 Amcoe */
+	DRIVER( fb6v2 )		/* (c) 2006 Amcoe */
+	DRIVER( fb6s3 )		/* (c) 2006 Amcoe */
+	DRIVER( fb6se )		/* (c) 2006 Amcoe - Fruit Bonus 2006 Special Edition */
+	DRIVER( fb6sev )	/* (c) 2006 Amcoe */
+	DRIVER( fb6sed1 )	/* (c) 2006 Amcoe */
+	DRIVER( fb6sev1 )	/* (c) 2006 Amcoe */
+	DRIVER( fb6sed2 )	/* (c) 2006 Amcoe */
+	DRIVER( fb6sev2 )	/* (c) 2006 Amcoe */
+	DRIVER( version4 )	/* (c) 2006 Amcoe - Version 4 ? */
+	DRIVER( bugfever )	/* (c) 2006 Amcoe - Bug Fever */
+	DRIVER( bugfevero )	/* (c) 2006 Amcoe */
+	DRIVER( bugfeverd )	/* (c) 2006 Amcoe */
+	DRIVER( bugfeverv )	/* (c) 2006 Amcoe */
+	DRIVER( bugfeverv2 )	/* (c) 2006 Amcoe */
+	DRIVER( funriver )	/* (c) 2005 Amcoe - Fun River */
+	DRIVER( funriverv )	/* (c) 2005 Amcoe */
+	DRIVER( dvisland )	/* (c) 2006 Amcoe - Devil's Island */
+	DRIVER( atworld )	/* (c) 2007 Amcoe - Around The World */
+	DRIVER( atworldd1 )	/* (c) 2007 Amcoe */
 	DRIVER( amclink )	/* (c) 200? Amcoe - Amcoe Link Control Box? */
 
 	DRIVER( act2000 )	/* (c) 1999 Amcoe - Action 2000 */
