@@ -48,6 +48,10 @@
  *  RK  (23-Nov-2006) Ver 1.22                                              *
  *   - Fixed state of the Overflow Flag on reset                            *
  *   - Fixed the SUBC instruction which was incorrectly zeroing the divisor *
+ *  TLP (13-Jul-2010) Ver 1.30                                              *
+ *   - LST instruction was incorrectly setting an Indirect Addressing       *
+ *     feature when Direct Addressing mode was selected                     *
+ *   - Added TMS32015 and TMS32016 variants                                 *
  *                                                                          *
  \**************************************************************************/
 
@@ -100,20 +104,15 @@ struct _tms32010_state
 INLINE tms32010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == TMS32010);
+	assert(device->type() == TMS32010 ||
+		   device->type() == TMS32015 ||
+		   device->type() == TMS32016);
 	return (tms32010_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* opcode table entry */
 typedef struct _tms32010_opcode tms32010_opcode;
 struct _tms32010_opcode
-{
-	UINT8	cycles;
-	void	(*function)(tms32010_state *);
-};
-/* opcode table entry (Opcode 7F has sub-opcodes) */
-typedef struct _tms32010_opcode_7F tms32010_opcode_7F;
-struct _tms32010_opcode_7F
 {
 	UINT8	cycles;
 	void	(*function)(tms32010_state *);
@@ -476,7 +475,7 @@ static void call(tms32010_state *cpustate)
 {
 	cpustate->PC++ ;
 	PUSH_STACK(cpustate, cpustate->PC);
-	cpustate->PC = M_RDOP_ARG((cpustate->PC - 1)) & cpustate->addr_mask;
+	cpustate->PC = M_RDOP_ARG((cpustate->PC - 1));
 }
 static void dint(tms32010_state *cpustate)
 {
@@ -547,7 +546,9 @@ static void ldpk(tms32010_state *cpustate)
 }
 static void lst(tms32010_state *cpustate)
 {
-	cpustate->opcode.b.l |= 0x08; /* Next arp not supported here, so mask it */
+	if (cpustate->opcode.b.l & 0x80) {
+		cpustate->opcode.b.l |= 0x08; /* In Indirect Addressing mode, next ARP is not supported here so mask it */
+	}
 	getdata(cpustate, 0,0);
 	cpustate->ALU.w.l &= (~INTM_FLAG);	/* Must not affect INTM */
 	cpustate->STR &= INTM_FLAG;
@@ -761,7 +762,7 @@ static const tms32010_opcode opcode_main[256]=
 /*F8*/  {2, call	},{2, br		},{2, blz		},{2, blez		},{2, bgz		},{2, bgez		},{2, bnz		},{2, bz		}
 };
 
-static const tms32010_opcode_7F opcode_7F[32]=
+static const tms32010_opcode opcode_7F[32]=
 {
 /*80*/  {1, nop		},{1, dint		},{1, eint		},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
 /*88*/  {1, abst	},{1, zac		},{1, rovm		},{1, sovm		},{2, cala		},{2, ret		},{1, pac		},{1, apac		},
@@ -774,6 +775,7 @@ static const tms32010_opcode_7F opcode_7F[32]=
 /****************************************************************************
  *  Inits CPU emulation
  ****************************************************************************/
+
 static CPU_INIT( tms32010 )
 {
 	tms32010_state *cpustate = get_safe_token(device);
@@ -806,32 +808,28 @@ static CPU_INIT( tms32010 )
 
 
 /****************************************************************************
- *  Reset registers to their initial values
+ *  Shut down CPU emulation
  ****************************************************************************/
-static CPU_RESET( tms32010 )
-{
-	tms32010_state *cpustate = get_safe_token(device);
 
-	cpustate->PC    = 0;
-	cpustate->STR   = 0x7efe;	// OV cleared
-	cpustate->ACC.d = 0;
-	cpustate->INTF  = TMS32010_INT_NONE;
-	cpustate->addr_mask = 0x0fff;	/* TMS32010 can only address 0x0fff */
-									/* however other TMS3201x devices   */
-									/* can address up to 0xffff (incase */
-									/* their support is ever added).    */
-}
+static CPU_EXIT( tms32010 ) { }
 
 
 /****************************************************************************
- *  Shut down CPU emulation
+ *  Set IRQ line state
  ****************************************************************************/
-static CPU_EXIT( tms32010 ) { }
+
+static void set_irq_line(tms32010_state *cpustate, int irqline, int state)
+{
+	/* Pending Interrupts cannot be cleared! */
+	if (state == ASSERT_LINE) cpustate->INTF |= TMS32010_INT_PENDING;
+}
+
 
 
 /****************************************************************************
  *  Issue an interrupt if necessary
  ****************************************************************************/
+
 static int Ext_IRQ(tms32010_state *cpustate)
 {
 	if (INTM == 0)
@@ -847,10 +845,10 @@ static int Ext_IRQ(tms32010_state *cpustate)
 }
 
 
-
 /****************************************************************************
  *  Execute IPeriod. Return 0 if emulation should be stopped
  ****************************************************************************/
+
 static CPU_EXECUTE( tms32010 )
 {
 	tms32010_state *cpustate = get_safe_token(device);
@@ -884,17 +882,7 @@ static CPU_EXECUTE( tms32010 )
 
 
 /****************************************************************************
- *  Set IRQ line state
- ****************************************************************************/
-static void set_irq_line(tms32010_state *cpustate, int irqline, int state)
-{
-	/* Pending Interrupts cannot be cleared! */
-	if (state == ASSERT_LINE) cpustate->INTF |=  TMS32010_INT_PENDING;
-}
-
-
-/****************************************************************************
- *  Internal Memory Map
+ *  TMS32010 Internal Memory Map
  ****************************************************************************/
 
 static ADDRESS_MAP_START( tms32010_ram, ADDRESS_SPACE_DATA, 16 )
@@ -903,8 +891,27 @@ static ADDRESS_MAP_START( tms32010_ram, ADDRESS_SPACE_DATA, 16 )
 ADDRESS_MAP_END
 
 
+/****************************************************************************
+ *  TMS32010 Reset registers to their initial values
+ ****************************************************************************/
+
+static CPU_RESET( tms32010 )
+{
+	tms32010_state *cpustate = get_safe_token(device);
+
+	cpustate->PC    = 0;
+	cpustate->ACC.d = 0;
+	cpustate->INTF  = TMS32010_INT_NONE;
+	/* Setup Status Register : 7efe */
+	CLR(cpustate, (OV_FLAG | ARP_REG | DP_REG));
+	SET(cpustate, (OVM_FLAG | INTM_FLAG));
+
+	cpustate->addr_mask = 0x0fff;
+}
+
+
 /**************************************************************************
- *  Generic set_info
+ *  TMS32010 set_info
  **************************************************************************/
 
 static CPU_SET_INFO( tms32010 )
@@ -934,7 +941,7 @@ static CPU_SET_INFO( tms32010 )
 
 
 /**************************************************************************
- *  Generic get_info
+ *  TMS32010 get_info
  **************************************************************************/
 
 CPU_GET_INFO( tms32010 )
@@ -990,14 +997,14 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32010);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;					break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:	info->internal_map16 = ADDRESS_MAP_NAME(tms32010_ram); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:	info->internal_map16 = ADDRESS_MAP_NAME(tms32010_ram);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS32010");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments TMS32010");	break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.22");						break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Tony La Porta");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Texas Instruments TMS32010");	break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.30");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Tony La Porta");		break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
@@ -1034,4 +1041,71 @@ CPU_GET_INFO( tms32010 )
 	}
 }
 
+
+/****************************************************************************
+ *  TMS32015 Internal Memory Map
+ ****************************************************************************/
+
+static ADDRESS_MAP_START( tms32015_ram, ADDRESS_SPACE_DATA, 16 )
+	AM_RANGE(0x00, 0x7f) AM_RAM		/* Page 0 */
+	AM_RANGE(0x80, 0xff) AM_RAM		/* Page 1 */
+ADDRESS_MAP_END
+
+
+/**************************************************************************
+ *  TMS32015 CPU-specific get_info
+ **************************************************************************/
+
+CPU_GET_INFO( tms32015 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map16 = ADDRESS_MAP_NAME(tms32015_ram);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS32015");	break;
+
+		default:										CPU_GET_INFO_CALL(tms32010);	break;
+	}
+}
+
+
+
+/****************************************************************************
+ *  TMS32016 Reset registers to their initial values
+ ****************************************************************************/
+
+static CPU_RESET( tms32016 )
+{
+	tms32010_state *cpustate = get_safe_token(device);
+
+	CPU_RESET_CALL(tms32010);
+	cpustate->addr_mask = 0xffff;
+}
+
+
+/**************************************************************************
+ *  TMS32016 CPU-specific get_info
+ **************************************************************************/
+
+CPU_GET_INFO( tms32016 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(tms32016);		break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map16 = ADDRESS_MAP_NAME(tms32015_ram);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS32016");	break;
+
+		default:										CPU_GET_INFO_CALL(tms32010);	break;
+	}
+}
+
+
+
 DEFINE_LEGACY_CPU_DEVICE(TMS32010, tms32010);
+DEFINE_LEGACY_CPU_DEVICE(TMS32015, tms32015);
+DEFINE_LEGACY_CPU_DEVICE(TMS32016, tms32016);
