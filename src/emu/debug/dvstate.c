@@ -149,12 +149,12 @@ void debug_view_state::recompute()
 	*tailptr = auto_alloc(&m_machine, state_item(REG_CYCLES, "cycles", 8));
 	tailptr = &(*tailptr)->m_next;
 
-	// add a beam entry: beamx:123
-	*tailptr = auto_alloc(&m_machine, state_item(REG_BEAMX, "beamx", 3));
+	// add a beam entry: beamx:1234
+	*tailptr = auto_alloc(&m_machine, state_item(REG_BEAMX, "beamx", 4));
 	tailptr = &(*tailptr)->m_next;
 
-	// add a beam entry: beamy:456
-	*tailptr = auto_alloc(&m_machine, state_item(REG_BEAMY, "beamy", 3));
+	// add a beam entry: beamy:5678
+	*tailptr = auto_alloc(&m_machine, state_item(REG_BEAMY, "beamy", 4));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: frame:123456
