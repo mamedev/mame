@@ -1003,7 +1003,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 				{
 					swlist_name = swlist->list_name[i-DEVINFO_STR_SWLIST_0];
 
-					if ( swlist_name && *swlist_name )
+					if ( swlist_name && *swlist_name && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
 					{
 						if ( software_list_ptr )
 						{
