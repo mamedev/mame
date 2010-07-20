@@ -7,13 +7,12 @@
     driver by Nicola Salmoria and Aaron Giles
 
 
-    The main cpu is a 34010; it is encrypted in 9 Ball Shootout.
+    The main cpu is a TMS34010; it is encrypted in 9 Ball Shootout.
 
-    The second CPU in AmeriDarts is a 32015, which hasn't been hooked up yet.
-    A simulation of the I/O behavior is included, but since the
-    second CPU controls sound, there is no sound.
+    The second CPU in AmeriDarts is a TMS32015; it controls sound and
+    the trackball inputs.
 
-    The second CPU in Cool Pool and 9 Ball Shootout is a 320C26; the code
+    The second CPU in Cool Pool and 9 Ball Shootout is a TMS320C26; the code
     is the same in the two games.
 
     Cool Pool:
@@ -30,6 +29,7 @@
 #include "cpu/tms32025/tms32025.h"
 #include "video/tlc34076.h"
 #include "sound/dac.h"
+#include "includes/coolpool.h"
 
 
 
@@ -39,13 +39,7 @@
  *
  *************************************/
 
-static UINT16 *vram_base;
 
-static UINT8 cmd_pending;
-static UINT16 iop_cmd;
-static UINT16 iop_answer;
-static int iop_romaddr;
-static UINT8 amerdart_iop_echo;
 
 static const UINT16 nvram_unlock_seq[] =
 {
@@ -65,7 +59,9 @@ static UINT8 nvram_write_enable;
 
 static void amerdart_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0xff00];
+	coolpool_state *state = (coolpool_state *)screen.machine->driver_data;
+
+	UINT16 *vram = &state->vram_base[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	rgb_t pens[16];
 	int coladdr = params->coladdr;
@@ -75,7 +71,7 @@ static void amerdart_scanline(screen_device &screen, bitmap_t *bitmap, int scanl
 	if (scanline < 256)
 		for (x = 0; x < 16; x++)
 		{
-			UINT16 pal = vram_base[x];
+			UINT16 pal = state->vram_base[x];
 			pens[x] = MAKE_RGB(pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
 
@@ -92,7 +88,9 @@ static void amerdart_scanline(screen_device &screen, bitmap_t *bitmap, int scanl
 
 static void coolpool_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0x1ff00];
+	coolpool_state *state = (coolpool_state *)screen.machine->driver_data;
+
+	UINT16 *vram = &state->vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	const rgb_t *pens = tlc34076_get_pens();
 	int coladdr = params->coladdr;
@@ -116,13 +114,17 @@ static void coolpool_scanline(screen_device &screen, bitmap_t *bitmap, int scanl
 
 static void coolpool_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	memcpy(shiftreg, &vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+	memcpy(shiftreg, &state->vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
 }
 
 
 static void coolpool_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	memcpy(&vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+	memcpy(&state->vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
 }
 
 
@@ -196,79 +198,232 @@ static WRITE16_HANDLER( nvram_thrash_data_w )
 
 /*************************************
  *
- *  AmeriDarts fake IOP handling
+ *  AmeriDarts IOP handling
  *
  *************************************/
 
 static WRITE16_HANDLER( amerdart_misc_w )
 {
-	logerror("%08x:IOP_reset_w %04x\n",cpu_get_pc(space->cpu),data);
+	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(space->cpu),data);
 
 	coin_counter_w(space->machine, 0, ~data & 0x0001);
 	coin_counter_w(space->machine, 1, ~data & 0x0002);
 
-	cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
-
 	/* bits 10-15 are counted down over time */
-	if (data & 0x0400) amerdart_iop_echo = 1;
+
+	cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-static TIMER_CALLBACK( amerdart_iop_response )
+static READ16_HANDLER( amerdart_dsp_bio_line_r )
 {
-	/* echo values until we get 0x19 */
-	iop_answer = iop_cmd;
-	if (amerdart_iop_echo && iop_cmd != 0x19)
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+	static UINT8 old_cmd;
+	static UINT8 same_cmd_count;
+
+	/* Skip idle checking */
+	if (old_cmd == state->cmd_pending)
+		same_cmd_count += 1;
+	else
+		same_cmd_count = 0;
+
+	if (same_cmd_count >= 5)
 	{
-		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
-		return;
+		same_cmd_count = 5;
+		cpu_spin(space->cpu);
 	}
-	amerdart_iop_echo = 0;
+	old_cmd = state->cmd_pending;
 
-	/* rest is based off the command */
-	switch (iop_cmd)
-	{
-		default:
-			logerror("Unknown IOP command %04X\n", iop_cmd);
-
-		case 0x000:
-		case 0x019:
-		case 0x600:
-		case 0x60f:
-		case 0x6f0:
-		case 0x6ff:
-			iop_answer = 0x6c00;
-			break;
-
-		case 0x100:
-			iop_answer = (INT8)(-input_port_read(machine, "YAXIS2") - input_port_read(machine, "XAXIS2")) << 6;
-			break;
-		case 0x101:
-			iop_answer = (INT8)(-input_port_read(machine, "YAXIS2") + input_port_read(machine, "XAXIS2")) << 6;
-			break;
-		case 0x102:
-			iop_answer = (INT8)(-input_port_read(machine, "YAXIS1") - input_port_read(machine, "XAXIS1")) << 6;
-			break;
-		case 0x103:
-			iop_answer = (INT8)(-input_port_read(machine, "YAXIS1") + input_port_read(machine, "XAXIS1")) << 6;
-			break;
-
-		case 0x500:
-			iop_answer = input_port_read(machine, "IN1");
-			break;
-	}
-
-	cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
+	return state->cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }
 
+static READ16_HANDLER( amerdart_iop_r )
+{
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+//	logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),state->iop_answer);
+	cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
+
+	return state->iop_answer;
+}
 
 static WRITE16_HANDLER( amerdart_iop_w )
 {
-	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
-	COMBINE_DATA(&iop_cmd);
-	timer_set(space->machine, ATTOTIME_IN_USEC(100), NULL, 0, amerdart_iop_response);
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+//	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
+	COMBINE_DATA(&state->iop_cmd);
+	state->cmd_pending = 1;
 }
 
+static READ16_HANDLER( amerdart_dsp_cmd_r )
+{
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+//	logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(space->cpu), state->iop_cmd);
+	state->cmd_pending = 0;
+	return state->iop_cmd;
+}
+
+static WRITE16_HANDLER( amerdart_dsp_answer_w )
+{
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+//	logerror("%08x:DSP answer %04x\n", cpu_get_pc(space->cpu), data);
+	state->iop_answer = data;
+	cputag_set_input_line(space->machine, "maincpu", 1, ASSERT_LINE);
+}
+
+
+/*************************************
+ *
+ *  Ameri Darts trackball inputs
+ *
+ *************************************/
+
+static int amerdart_trackball_inc(int data)
+{
+	switch (data & 0x03)	/* Bits of opposite track direction must both change with identical levels */
+	{
+		case 0x00:	data ^= 0x03;	break;
+		case 0x01:	data ^= 0x01;	break;
+		case 0x02:	data ^= 0x01;	break;
+		case 0x03:	data ^= 0x03;	break;
+	}
+	return data;
+}
+static int amerdart_trackball_dec(int data)
+{
+	switch (data & 0x03)	/* Bits of opposite track direction must both change with opposing levels */
+	{
+		case 0x00:	data ^= 0x01;	break;
+		case 0x01:	data ^= 0x03;	break;
+		case 0x02:	data ^= 0x03;	break;
+		case 0x03:	data ^= 0x01;	break;
+	}
+	return data;
+}
+
+static int amerdart_trackball_direction(const address_space *space, int num, int data)
+{
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+	UINT16 result_x = (data & 0x0c) >> 2;
+	UINT16 result_y = (data & 0x03) >> 0;
+	
+
+	if ((state->dx[num] == 0) && (state->dy[num] < 0)) {		/* Up */
+		state->oldy[num]--;
+		result_x = amerdart_trackball_inc(result_x);
+		result_y = amerdart_trackball_inc(result_y);
+	}
+	if ((state->dx[num] == 0) && (state->dy[num] > 0)) {		/* Down */
+		state->oldy[num]++;
+		result_x = amerdart_trackball_dec(result_x);
+		result_y = amerdart_trackball_dec(result_y);
+	}
+	if ((state->dx[num] < 0) && (state->dy[num] == 0)) {		/* Left */
+		state->oldx[num]--;
+		result_x = amerdart_trackball_inc(result_x);
+		result_y = amerdart_trackball_dec(result_y);
+	}
+	if ((state->dx[num] > 0) && (state->dy[num] == 0)) {		/* Right */
+		state->oldx[num]++;
+		result_x = amerdart_trackball_dec(result_x);
+		result_y = amerdart_trackball_inc(result_y);
+	}
+	if ((state->dx[num] < 0) && (state->dy[num] < 0)) {			/* Left & Up */
+		state->oldx[num]--;
+		state->oldy[num]--;
+		result_x = amerdart_trackball_inc(result_x);
+	}
+	if ((state->dx[num] < 0) && (state->dy[num] > 0)) {			/* Left & Down */
+		state->oldx[num]--;
+		state->oldy[num]++;
+		result_y = amerdart_trackball_dec(result_y);
+	}
+	if ((state->dx[num] > 0) && (state->dy[num] < 0)) {			/* Right & Up */
+		state->oldx[num]++;
+		state->oldy[num]--;
+		result_y = amerdart_trackball_inc(result_y);
+	}
+	if ((state->dx[num] > 0) && (state->dy[num] > 0)) {			/* Right & Down */
+		state->oldx[num]++;
+		state->oldy[num]++;
+		result_x = amerdart_trackball_dec(result_x);
+	}
+
+	data = ((result_x << 2) & 0x0c) | ((result_y << 0) & 0x03);
+
+	return data;
+}
+
+
+static READ16_HANDLER( amerdart_trackball_r )
+{
+/*
+    Trackballs seem to be handled as though they're rotated 45 degrees anti-clockwise.
+
+    Sensor data as shown on Input test screen and associated bits read by TMS32015 DSP port:
+    xxyy xxyy ???? ????
+    |||| |||| |||| ||||
+    |||| |||| ++++-++++-- Unused
+    |||| |||| 
+    |||| |||+------------ Trackball 1 Up    sensor
+    |||| ||+------------- Trackball 1 Down  sensor
+    |||| |+-------------- Trackball 1 Left  sensor
+    |||| +--------------- Trackball 1 Right sensor
+    ||||
+    |||+----------------- Trackball 2 Up    sensor
+    ||+------------------ Trackball 2 Down  sensor
+    |+------------------- Trackball 2 Left  sensor
+    +-------------------- Trackball 2 Right sensor
+
+    Opposite direction bits toggling the   same   level indicate increment (+) input movement  (00 -> 11 -> 00, etc)
+    Opposite direction bits toggling the opposite level indicate decrement (-) input movement  (01 -> 10 -> 01, etc)
+
+    Input state requirements to indicate trackball direction.
+    Direction      StateX  StateY
+    =============================
+    UP              X +     Y +
+    Down            X -     Y -
+    Left            X +     Y -
+    Right           X -     Y +
+    Up   & Left     X +     Y 0
+    Up   & Right    X 0     Y +
+    Down & Left     X 0     Y -
+    Down & Right    X -     Y 0	
+
+*/
+
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+
+	state->result = (state->lastresult | 0x00ff);
+
+	state->newx[1] = input_port_read(space->machine, "XAXIS1");	/* Trackball 1  Left - Right */
+	state->newy[1] = input_port_read(space->machine, "YAXIS1");	/* Trackball 1   Up  - Down  */
+	state->newx[2] = input_port_read(space->machine, "XAXIS2");	/* Trackball 2  Left - Right */
+	state->newy[2] = input_port_read(space->machine, "YAXIS2");	/* Trackball 2   Up  - Down  */
+
+	state->dx[1] = (INT8)(state->newx[1] - state->oldx[1]);
+	state->dy[1] = (INT8)(state->newy[1] - state->oldy[1]);
+	state->dx[2] = (INT8)(state->newx[2] - state->oldx[2]);
+	state->dy[2] = (INT8)(state->newy[2] - state->oldy[2]);
+
+	/* Determine Trackball 1 direction state */
+	state->result = (state->result & 0xf0ff) | (amerdart_trackball_direction(space, 1, ((state->result >>  8) & 0xf)) <<  8);
+
+	/* Determine Trackball 2 direction state */
+	state->result = (state->result & 0x0fff) | (amerdart_trackball_direction(space, 2, ((state->result >> 12) & 0xf)) << 12);
+
+
+//	logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", cpu_get_pc(space->cpu), state->newx, state->newy, state->oldx, state->oldy, state->lastresult, state->result);
+
+	state->lastresult = state->result;
+
+	return state->result;
+}
 
 
 /*************************************
@@ -279,7 +434,7 @@ static WRITE16_HANDLER( amerdart_iop_w )
 
 static WRITE16_HANDLER( coolpool_misc_w )
 {
-	logerror("%08x:IOP_reset_w %04x\n",cpu_get_pc(space->cpu),data);
+	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(space->cpu),data);
 
 	coin_counter_w(space->machine, 0, ~data & 0x0001);
 	coin_counter_w(space->machine, 1, ~data & 0x0002);
@@ -298,8 +453,10 @@ static WRITE16_HANDLER( coolpool_misc_w )
 
 static TIMER_CALLBACK( deferred_iop_w )
 {
-	iop_cmd = param;
-	cmd_pending = 1;
+	coolpool_state *state = (coolpool_state *)machine->driver_data;
+
+	state->iop_cmd = param;
+	state->cmd_pending = 1;
 	cputag_set_input_line(machine, "dsp", 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 															/* the DSP polls the status bit so it isn't strictly */
 															/* necessary to also have an IRQ */
@@ -316,10 +473,12 @@ static WRITE16_HANDLER( coolpool_iop_w )
 
 static READ16_HANDLER( coolpool_iop_r )
 {
-	logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),iop_answer);
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+	logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),state->iop_answer);
 	cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
 
-	return iop_answer;
+	return state->iop_answer;
 }
 
 
@@ -333,23 +492,29 @@ static READ16_HANDLER( coolpool_iop_r )
 
 static READ16_HANDLER( dsp_cmd_r )
 {
-	cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(space->cpu), iop_cmd);
-	return iop_cmd;
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+	state->cmd_pending = 0;
+	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(space->cpu), state->iop_cmd);
+	return state->iop_cmd;
 }
 
 
 static WRITE16_HANDLER( dsp_answer_w )
 {
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
 	logerror("%08x:IOP answer %04x\n", cpu_get_pc(space->cpu), data);
-	iop_answer = data;
+	state->iop_answer = data;
 	cputag_set_input_line(space->machine, "maincpu", 1, ASSERT_LINE);
 }
 
 
 static READ16_HANDLER( dsp_bio_line_r )
 {
-	return cmd_pending ? CLEAR_LINE : ASSERT_LINE;
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
+	return state->cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
@@ -368,21 +533,25 @@ static READ16_HANDLER( dsp_hold_line_r )
 
 static READ16_HANDLER( dsp_rom_r )
 {
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
 	UINT8 *rom = memory_region(space->machine, "user2");
-	return rom[iop_romaddr & (memory_region_length(space->machine, "user2") - 1)];
+
+	return rom[state->iop_romaddr & (memory_region_length(space->machine, "user2") - 1)];
 }
 
 
 static WRITE16_HANDLER( dsp_romaddr_w )
 {
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0:
-			iop_romaddr = (iop_romaddr & 0xffff00) | (data >> 8);
+			state->iop_romaddr = (state->iop_romaddr & 0xffff00) | (data >> 8);
 			break;
 
 		case 1:
-			iop_romaddr = (iop_romaddr & 0x0000ff) | (data << 8);
+			state->iop_romaddr = (state->iop_romaddr & 0x0000ff) | (data << 8);
 			break;
 	}
 }
@@ -403,65 +572,64 @@ static WRITE16_DEVICE_HANDLER( dsp_dac_w )
 
 static READ16_HANDLER( coolpool_input_r )
 {
-	static UINT8 oldx, oldy;
-	static UINT16 lastresult;
+	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
 
-	int result = (input_port_read(space->machine, "IN1") & 0x00ff) | (lastresult & 0xff00);
-	UINT8 newx = input_port_read(space->machine, "XAXIS");
-	UINT8 newy = input_port_read(space->machine, "YAXIS");
-	int dx = (INT8)(newx - oldx);
-	int dy = (INT8)(newy - oldy);
+	state->result = (input_port_read(space->machine, "IN1") & 0x00ff) | (state->lastresult & 0xff00);
+	state->newx[1] = input_port_read(space->machine, "XAXIS");
+	state->newy[1] = input_port_read(space->machine, "YAXIS");
+	state->dx[1] = (INT8)(state->newx[1] - state->oldx[1]);
+	state->dy[1] = (INT8)(state->newy[1] - state->oldy[1]);
 
-	if (dx < 0)
+	if (state->dx[1] < 0)
 	{
-		oldx--;
-		switch (result & 0x300)
+		state->oldx[1]--;
+		switch (state->result & 0x300)
 		{
-			case 0x000:	result ^= 0x200;	break;
-			case 0x100:	result ^= 0x100;	break;
-			case 0x200:	result ^= 0x100;	break;
-			case 0x300:	result ^= 0x200;	break;
+			case 0x000:	state->result ^= 0x200;	break;
+			case 0x100:	state->result ^= 0x100;	break;
+			case 0x200:	state->result ^= 0x100;	break;
+			case 0x300:	state->result ^= 0x200;	break;
 		}
 	}
-	if (dx > 0)
+	if (state->dx[1] > 0)
 	{
-		oldx++;
-		switch (result & 0x300)
+		state->oldx[1]++;
+		switch (state->result & 0x300)
 		{
-			case 0x000:	result ^= 0x100;	break;
-			case 0x100:	result ^= 0x200;	break;
-			case 0x200:	result ^= 0x200;	break;
-			case 0x300:	result ^= 0x100;	break;
+			case 0x000:	state->result ^= 0x100;	break;
+			case 0x100:	state->result ^= 0x200;	break;
+			case 0x200:	state->result ^= 0x200;	break;
+			case 0x300:	state->result ^= 0x100;	break;
 		}
 	}
 
-	if (dy < 0)
+	if (state->dy[1] < 0)
 	{
-		oldy--;
-		switch (result & 0xc00)
+		state->oldy[1]--;
+		switch (state->result & 0xc00)
 		{
-			case 0x000:	result ^= 0x800;	break;
-			case 0x400:	result ^= 0x400;	break;
-			case 0x800:	result ^= 0x400;	break;
-			case 0xc00:	result ^= 0x800;	break;
+			case 0x000:	state->result ^= 0x800;	break;
+			case 0x400:	state->result ^= 0x400;	break;
+			case 0x800:	state->result ^= 0x400;	break;
+			case 0xc00:	state->result ^= 0x800;	break;
 		}
 	}
-	if (dy > 0)
+	if (state->dy[1] > 0)
 	{
-		oldy++;
-		switch (result & 0xc00)
+		state->oldy[1]++;
+		switch (state->result & 0xc00)
 		{
-			case 0x000:	result ^= 0x400;	break;
-			case 0x400:	result ^= 0x800;	break;
-			case 0x800:	result ^= 0x800;	break;
-			case 0xc00:	result ^= 0x400;	break;
+			case 0x000:	state->result ^= 0x400;	break;
+			case 0x400:	state->result ^= 0x800;	break;
+			case 0x800:	state->result ^= 0x800;	break;
+			case 0xc00:	state->result ^= 0x400;	break;
 		}
 	}
 
 //  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(space->cpu),
-//      newx, newy, oldx, oldy, result);
-	lastresult = result;
-	return result;
+//      state->newx[1], state->newy[1], state->oldx[1], state->oldy[1], state->result);
+	state->lastresult = state->result;
+	return state->result;
 }
 
 
@@ -473,9 +641,9 @@ static READ16_HANDLER( coolpool_input_r )
  *************************************/
 
 static ADDRESS_MAP_START( amerdart_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(&vram_base)
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE_MEMBER(coolpool_state,vram_base)
 	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(amerdart_misc_w)
-	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(coolpool_iop_r, amerdart_iop_w)
+	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(amerdart_iop_r, amerdart_iop_w)
 	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffb00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
@@ -483,7 +651,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( coolpool_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&vram_base)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(coolpool_state,vram_base)
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)	// IMSG176P-40
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
@@ -495,7 +663,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nballsht_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&vram_base)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(coolpool_state,vram_base)
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x04000000, 0x040000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)	// IMSG176P-40
@@ -513,18 +681,31 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( amerdart_dsp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x011f) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+static ADDRESS_MAP_START( amerdart_dsp_pgm_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+	/* 000 - 0FF  TMS32015 Internal Data RAM (256 words) in Data Address Space */
+
+
+static ADDRESS_MAP_START( amerdart_dsp_io_map, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(amerdart_dsp_answer_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dsp_dac_w)
+	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
+	AM_RANGE(0x06, 0x06) AM_READ(amerdart_trackball_r)
+	AM_RANGE(0x07, 0x07) AM_READ(amerdart_dsp_cmd_r)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(amerdart_dsp_bio_line_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsp_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+
+static ADDRESS_MAP_START( coolpool_dsp_pgm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsp_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( coolpool_dsp_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dsp_dac_w)
@@ -545,28 +726,55 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( amerdart )
-	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 )	PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("XAXIS1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("YAXIS1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("XAXIS2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 	PORT_START("YAXIS2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( coolpool )
+	PORT_START("IN0")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_SPECIAL )
+
+	PORT_START("XAXIS")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
+	PORT_START("YAXIS")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
 
@@ -601,33 +809,6 @@ static INPUT_PORTS_START( 9ballsht )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( coolpool )
-	PORT_START("IN0")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_SPECIAL )
-
-	PORT_START("XAXIS")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
-	PORT_START("YAXIS")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
-INPUT_PORTS_END
-
-
 
 /*************************************
  *
@@ -639,7 +820,7 @@ static const tms34010_config tms_config_amerdart =
 {
 	FALSE,							/* halt on reset */
 	"screen",						/* the screen operated on */
-	40000000/12,					/* pixel clock */
+	XTAL_40MHz/12,					/* pixel clock */
 	2,								/* pixels per clock */
 	amerdart_scanline,				/* scanline callback */
 	NULL,							/* generate interrupt */
@@ -652,7 +833,7 @@ static const tms34010_config tms_config_coolpool =
 {
 	FALSE,							/* halt on reset */
 	"screen",						/* the screen operated on */
-	40000000/6,						/* pixel clock */
+	XTAL_40MHz/6,					/* pixel clock */
 	1,								/* pixels per clock */
 	coolpool_scanline,				/* scanline callback */
 	NULL,							/* generate interrupt */
@@ -670,14 +851,18 @@ static const tms34010_config tms_config_coolpool =
 
 static MACHINE_DRIVER_START( amerdart )
 
+	MDRV_DRIVER_DATA( coolpool_state )
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
+	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MDRV_CPU_CONFIG(tms_config_amerdart)
 	MDRV_CPU_PROGRAM_MAP(amerdart_map)
 
-	MDRV_CPU_ADD("dsp", TMS32010, 15000000/2)
-	MDRV_DEVICE_DISABLE()
-	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map)
+	MDRV_CPU_ADD("dsp", TMS32015, XTAL_40MHz/2)
+	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
+	/* Data Map is internal to the CPU */
+	MDRV_CPU_IO_MAP(amerdart_dsp_io_map)
+	MDRV_CPU_PERIODIC_INT(irq0_line_pulse, 14400)
 
 	MDRV_MACHINE_RESET(amerdart)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -689,7 +874,7 @@ static MACHINE_DRIVER_START( amerdart )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(40000000/6, 212*2, 0, 161*2, 262, 0, 241)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 212*2, 0, 161*2, 262, 0, 241)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -701,14 +886,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coolpool )
 
+	MDRV_DRIVER_DATA( coolpool_state )
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
+	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MDRV_CPU_CONFIG(tms_config_coolpool)
 	MDRV_CPU_PROGRAM_MAP(coolpool_map)
 
-	MDRV_CPU_ADD("dsp", TMS32026,40000000)
-	MDRV_CPU_PROGRAM_MAP(dsp_program_map)
-	MDRV_CPU_IO_MAP(dsp_io_map)
+	MDRV_CPU_ADD("dsp", TMS32026,XTAL_40MHz)
+	MDRV_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
+	MDRV_CPU_IO_MAP(coolpool_dsp_io_map)
 
 	MDRV_MACHINE_RESET(coolpool)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -720,7 +907,7 @@ static MACHINE_DRIVER_START( coolpool )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(40000000/6, 424, 0, 320, 262, 0, 240)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 424, 0, 320, 262, 0, 240)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -758,11 +945,8 @@ ROM_START( amerdart )
 	ROM_LOAD16_BYTE( "u57",  0x080001, 0x10000, CRC(f620f935) SHA1(bf891fce1f04f3ad5b8b72d43d041ceacb0b65bc) )
 	ROM_LOAD16_BYTE( "u58",  0x080000, 0x10000, CRC(f1b3d7c4) SHA1(7b897230d110be7a5eb05eda927d00561ebb9ce3) )
 
-	// not hooked up yet
-	ROM_REGION( 0x18000, "dsp", 0 )	/* TMS32015 code  */
-//	ROM_LOAD16_WORD( "tms320e15.bin", 0x00000, 0x02000, BAD_DUMP CRC(21c6f9b0) SHA1(48b0a063b60861db76f85ebc1de010aa8c772158) )
-	ROM_LOAD16_BYTE( "dspl",         0x00000, 0x08000, NO_DUMP )
-	ROM_LOAD16_BYTE( "dsph",         0x00001, 0x08000, NO_DUMP )
+	ROM_REGION( 0x10000, "dsp", 0 )	/* TMS32015 code  */
+	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) )
 
 	ROM_REGION( 0x100000, "user2", 0 )				/* TMS32015 audio sample data */
 	ROM_LOAD16_WORD( "u1",   0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) )
@@ -796,14 +980,11 @@ ROM_START( amerdart2 )
 	ROM_LOAD16_BYTE( "u57.bin", 0x080001, 0x10000, CRC(8a70f849) SHA1(dfd4cf90de2ab8cbeff458f0fd20110c1ed009e9) )
 	ROM_LOAD16_BYTE( "u58.bin", 0x080000, 0x10000, CRC(8bb81975) SHA1(b7666572ab543991c7deaa0ebefb8b4526a7e386) )
 
-	// not hooked up yet
-	ROM_REGION( 0x18000, "dsp", 0 )	/* TMS32015 code  */
-//	ROM_LOAD16_WORD( "tms320e15.bin", 0x00000, 0x02000, BAD_DUMP CRC(21c6f9b0) SHA1(48b0a063b60861db76f85ebc1de010aa8c772158) )
-	ROM_LOAD16_BYTE( "dspl",         0x00000, 0x08000, NO_DUMP )
-	ROM_LOAD16_BYTE( "dsph",         0x00001, 0x08000, NO_DUMP )
+	ROM_REGION( 0x10000, "dsp", 0 )	/* TMS32015 code  */
+	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) )
 
 	ROM_REGION( 0x100000, "user2", 0 )				/* TMS32015 audio sample data */
-	ROM_LOAD16_WORD( "u1.bin",   0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) )
+	ROM_LOAD16_WORD( "u1.bin",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) )
 	ROM_LOAD16_WORD( "u16",     0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
 	ROM_LOAD16_WORD( "u2",      0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
 	ROM_LOAD16_WORD( "u17",     0x030000, 0x10000, CRC(e32bdd0f) SHA1(0662abbe84f0bad2631566b506ef016fcd79b9ee) )
@@ -948,9 +1129,37 @@ ROM_END
  *
  *************************************/
 
+static void register_state_save(running_machine *machine)
+{
+	coolpool_state *state = (coolpool_state *)machine->driver_data;
+
+	state_save_register_global_array(machine, state->oldx);
+	state_save_register_global_array(machine, state->oldy);
+	state_save_register_global(machine, state->result);
+	state_save_register_global(machine, state->lastresult);
+
+	state_save_register_global(machine, state->cmd_pending);
+	state_save_register_global(machine, state->iop_cmd);
+	state_save_register_global(machine, state->iop_answer);
+	state_save_register_global(machine, state->iop_romaddr);
+}
+
+
+
+static DRIVER_INIT( amerdart )
+{
+	coolpool_state *state = (coolpool_state *)machine->driver_data;
+
+	state->lastresult = 0xffff;
+
+	register_state_save(machine);
+}
+
 static DRIVER_INIT( coolpool )
 {
 	memory_install_read16_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, coolpool_input_r);
+	
+	register_state_save(machine);
 }
 
 
@@ -993,6 +1202,8 @@ static DRIVER_INIT( 9ballsht )
 		rom[a] = rom[a+1];
 		rom[a+1] = tmp;
 	}
+
+	register_state_save(machine);
 }
 
 
@@ -1003,8 +1214,8 @@ static DRIVER_INIT( 9ballsht )
  *
  *************************************/
 
-GAME( 1989, amerdart, 0,        amerdart, amerdart, 0,        ROT0, "Ameri",   "AmeriDarts (set 1)", GAME_NO_SOUND )
-GAME( 1989, amerdart2,amerdart, amerdart, amerdart, 0,        ROT0, "Ameri",   "AmeriDarts (set 2)", GAME_NO_SOUND )
+GAME( 1989, amerdart, 0,        amerdart, amerdart, amerdart, ROT0, "Ameri",   "AmeriDarts (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, amerdart2,amerdart, amerdart, amerdart, amerdart, ROT0, "Ameri",   "AmeriDarts (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1992, coolpool, 0,        coolpool, coolpool, coolpool, ROT0, "Catalina", "Cool Pool", 0 )
 GAME( 1993, 9ballsht, 0,        9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)", 0 )
 GAME( 1993, 9ballsht2,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)", 0 )

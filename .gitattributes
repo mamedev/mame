@@ -2518,6 +2518,7 @@ src/mame/includes/combatsc.h svneol=native#text/plain
 src/mame/includes/commando.h svneol=native#text/plain
 src/mame/includes/compgolf.h svneol=native#text/plain
 src/mame/includes/contra.h svneol=native#text/plain
+src/mame/includes/coolpool.h svneol=native#text/plain
 src/mame/includes/cop01.h svneol=native#text/plain
 src/mame/includes/copsnrob.h svneol=native#text/plain
 src/mame/includes/cosmic.h svneol=native#text/plain
