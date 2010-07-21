@@ -985,8 +985,8 @@ ROM_START( aliencha )
 	ROM_REGION( 0x40000, "oki2", 0 ) // Samples
 	ROM_LOAD( "hfh_g.u66", 0x00000, 0x40000, CRC(7cfcd98e) SHA1(3b03123160adfd3404a9e0c4c68420930e80ae48) )
 
-	ROM_REGION( 0x200000, "ymf", 0 ) // Samples
-	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, NO_DUMP CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) ) // not present in this set: Yamaha YRW801 2MB ROM with samples for the OPL4
+	ROM_REGION( 0x200000, "ymf", 0 ) // Samples (Standard Yamaha YRW801 2MB samples ROM)
+	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) ) /* Not dumped from PCB, but is a standard samples rom */
 ROM_END
 
 /***************************************************************************
@@ -1008,19 +1008,19 @@ ROM_START( alienchac )
 	ROM_LOAD( "hfh_s.u86", 0x00000, 0x10000, CRC(5728a9ed) SHA1(e5a9e4a1a2cc6c848b08608bc8727bc739270873) )
 
 	ROM_REGION( 0x300000, "tiles0", 0 )	// Tilemaps 0 & 3
-	ROM_LOAD( "igst0101.u9",  0x000000, 0x100000, NO_DUMP CRC(2ce12d7b) SHA1(aa93a82e5f4015c46bb705efb2051b62cd5d7e04) )
-	ROM_LOAD( "igst0102.u10", 0x100000, 0x100000, NO_DUMP CRC(542a76a0) SHA1(6947b50a024d0053c1eaf9da8c90652bab875142) )
-	ROM_LOAD( "igst0103.u11", 0x200000, 0x100000, NO_DUMP CRC(adf5698a) SHA1(4b798f8acc5d7581c7e0989260863ae0ca654acd) )
+	ROM_LOAD( "igst0101.u9",  0x000000, 0x100000, BAD_DUMP CRC(2ce12d7b) SHA1(aa93a82e5f4015c46bb705efb2051b62cd5d7e04) ) /* Graphics ROMs not confirmed to be the same */
+	ROM_LOAD( "igst0102.u10", 0x100000, 0x100000, BAD_DUMP CRC(542a76a0) SHA1(6947b50a024d0053c1eaf9da8c90652bab875142) ) /* Use these until roms are dumped / verified */
+	ROM_LOAD( "igst0103.u11", 0x200000, 0x100000, BAD_DUMP CRC(adf5698a) SHA1(4b798f8acc5d7581c7e0989260863ae0ca654acd) )
 
 	ROM_REGION( 0x600000, "tiles1", 0 )	// Tilemaps 1 & 2
-	ROM_LOAD( "igsb0101.u8", 0x000000, 0x200000, NO_DUMP CRC(5c995f7e) SHA1(4f08cf13e313c6802c924b914c73cab4b450da61) )
-	ROM_LOAD( "igsb0102.u7", 0x200000, 0x200000, NO_DUMP CRC(a2ae9baf) SHA1(338ee260c33448568f138ca00e1d4edda4da018f) )
-	ROM_LOAD( "igsb0103.u6", 0x400000, 0x200000, NO_DUMP CRC(11b927af) SHA1(2f15e5cea1b86cde3b679bdd0f3d79672d0ddd3e) )
+	ROM_LOAD( "igsb0101.u8", 0x000000, 0x200000, BAD_DUMP CRC(5c995f7e) SHA1(4f08cf13e313c6802c924b914c73cab4b450da61) ) /* Graphics ROMs not confirmed to be the same */
+	ROM_LOAD( "igsb0102.u7", 0x200000, 0x200000, BAD_DUMP CRC(a2ae9baf) SHA1(338ee260c33448568f138ca00e1d4edda4da018f) ) /* Use these until roms are dumped / verified */
+	ROM_LOAD( "igsb0103.u6", 0x400000, 0x200000, BAD_DUMP CRC(11b927af) SHA1(2f15e5cea1b86cde3b679bdd0f3d79672d0ddd3e) )
 
 	ROM_REGION( 0xc00000, "sprites", 0 ) // Sprites
-	ROM_LOAD( "igsa0101.u3", 0x000000, 0x400000, NO_DUMP CRC(374d07c4) SHA1(87e9bfe32cbfe9964ba7253847fbd14aa3c8ed20) )
-	ROM_LOAD( "igsa0102.u2", 0x400000, 0x400000, NO_DUMP CRC(dbeee7ac) SHA1(e0eb0d73d9230aa6f69f5ac25d44fa19affebe88) )
-	ROM_LOAD( "igsa0103.u1", 0x800000, 0x400000, NO_DUMP CRC(e5f19041) SHA1(c92a29bbbcb9a1f63364c665e3e0f9679add4389) )
+	ROM_LOAD( "igsa0101.u3", 0x000000, 0x400000, BAD_DUMP CRC(374d07c4) SHA1(87e9bfe32cbfe9964ba7253847fbd14aa3c8ed20) ) /* Graphics ROMs not confirmed to be the same */
+	ROM_LOAD( "igsa0102.u2", 0x400000, 0x400000, BAD_DUMP CRC(dbeee7ac) SHA1(e0eb0d73d9230aa6f69f5ac25d44fa19affebe88) ) /* Use these until roms are dumped / verified */
+	ROM_LOAD( "igsa0103.u1", 0x800000, 0x400000, BAD_DUMP CRC(e5f19041) SHA1(c92a29bbbcb9a1f63364c665e3e0f9679add4389) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
 	ROM_LOAD( "hfh_g.u65", 0x00000, 0x40000, CRC(ec469b57) SHA1(ba1668078987ad51f47bcd3e61c51a0cf2545350) )
@@ -1028,8 +1028,8 @@ ROM_START( alienchac )
 	ROM_REGION( 0x40000, "oki2", 0 ) // Samples
 	ROM_LOAD( "hfh_g.u66", 0x00000, 0x40000, CRC(7cfcd98e) SHA1(3b03123160adfd3404a9e0c4c68420930e80ae48) )
 
-	ROM_REGION( 0x200000, "ymf", 0 ) // Samples
-	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, NO_DUMP CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) ) // not present in this set: Yamaha YRW801 2MB ROM with samples for the OPL4
+	ROM_REGION( 0x200000, "ymf", 0 ) // Samples (Standard Yamaha YRW801 2MB samples ROM)
+	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) ) /* Not dumped from PCB, but is a standard samples rom */
 ROM_END
 
 
