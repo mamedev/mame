@@ -495,6 +495,30 @@ int options_parse_command_line(core_options *opts, int argc, char **argv, int pr
 
 
 /*-------------------------------------------------
+    options_force_option_callback - set option value
+	and execute callback call
+-------------------------------------------------*/
+
+int options_force_option_callback(core_options *opts, const char *optionname, const char *newval, int priority)
+{
+	options_data *data = find_entry_data(opts, optionname, TRUE);
+	if (data == NULL)
+	{
+		message(opts, OPTMSG_ERROR, "Error: unknown option: %s\n", optionname);
+		return 1;
+	}
+
+	/* invoke callback, if present */
+	if (data->callback != NULL)
+		(*data->callback)(opts, newval);
+
+	/* allocate a new copy of data for this */
+	update_data(opts, data, newval, priority);	
+	return 0;
+}
+
+
+/*-------------------------------------------------
     options_parse_ini_file - parse a series
     of entries in an INI file
 -------------------------------------------------*/
