@@ -5045,7 +5045,7 @@ ROM_START( fb6s3 ) /* "Compact" PCB, the surface mounted roms haven't been dumpe
 	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x080000, NO_DUMP )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
-	ROM_LOAD_OPTIONAL( "fb6130r.id", 0x00, 0x20, CRC(18fb9502) SHA1(87fe308394950dff22c0ed57d27a901b38b6396c) )
+	ROM_LOAD_OPTIONAL( "fb6130r.id", 0x00, 0x20, CRC(959969d1) SHA1(885b4708fb459c96ead67ae911e5296adc148ee3) )
 ROM_END
 
 /* Fruit Bonus 2006 Special Edition */
