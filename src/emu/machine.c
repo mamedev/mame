@@ -225,6 +225,8 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 
 running_machine::~running_machine()
 {
+	/* clear flag for added devices */
+	options_set_bool(&m_options, OPTION_ADDED_DEVICE_OPTIONS, FALSE, OPTION_PRIORITY_CMDLINE);
 }
 
 
