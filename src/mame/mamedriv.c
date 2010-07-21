@@ -7000,7 +7000,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( trog4 )		/* (c) 1990 Midway */
 	DRIVER( trog3 )		/* (c) 1990 Midway */
 	DRIVER( trogpa6 )	/* (c) 1990 Midway */
-	DRIVER( trogp )		/* (c) 1990 Midway */
+	DRIVER( trogpa4 )	/* (c) 1990 Midway */
 	DRIVER( smashtv )	/* (c) 1990 Williams */
 	DRIVER( smashtv6 )	/* (c) 1990 Williams */
 	DRIVER( smashtv5 )	/* (c) 1990 Williams */
@@ -7029,6 +7029,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mkla4 )		/* (c) 1992 Midway */
 	DRIVER( mkyawdim )	/* bootleg */
 	DRIVER( term2 )		/* (c) 1992 Midway */
+	DRIVER( term2la3 )	/* (c) 1992 Midway */
 	DRIVER( term2la2 )	/* (c) 1992 Midway */
 	DRIVER( term2la1 )	/* (c) 1992 Midway */
 	DRIVER( totcarn )	/* (c) 1992 Midway */

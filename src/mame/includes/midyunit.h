@@ -29,6 +29,7 @@ DRIVER_INIT( mkyunit );
 DRIVER_INIT( mkyturbo );
 DRIVER_INIT( mkyawdim );
 DRIVER_INIT( term2 );
+DRIVER_INIT( term2la3 );
 DRIVER_INIT( term2la2 );
 DRIVER_INIT( term2la1 );
 DRIVER_INIT( totcarn );

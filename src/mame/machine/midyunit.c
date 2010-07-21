@@ -213,6 +213,16 @@ static WRITE16_HANDLER( term2_sound_w )
 
 static WRITE16_HANDLER( term2_hack_w )
 {
+    if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce5230) /* FIX ME - Not correct for LA4 */
+    {
+        t2_hack_mem[offset] = 0;
+        return;
+    }
+	COMBINE_DATA(&t2_hack_mem[offset]);
+}
+
+static WRITE16_HANDLER( term2la3_hack_w )
+{
     if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce5230)
     {
         t2_hack_mem[offset] = 0;
@@ -530,6 +540,7 @@ static void term2_init_common(running_machine *machine, write16_space_func hack_
 }
 
 DRIVER_INIT( term2 ) { term2_init_common(machine, term2_hack_w); }
+DRIVER_INIT( term2la3 ) { term2_init_common(machine, term2la3_hack_w); }
 DRIVER_INIT( term2la2 ) { term2_init_common(machine, term2la2_hack_w); }
 DRIVER_INIT( term2la1 ) { term2_init_common(machine, term2la1_hack_w); }
 
