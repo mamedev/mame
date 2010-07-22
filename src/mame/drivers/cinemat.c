@@ -23,7 +23,7 @@
         * War of the Worlds
         * Boxing Bugs
         * QB-3
-		* Space Ship
+        * Space Ship
 
     To do:
         * look into bad sample latency
@@ -1209,7 +1209,7 @@ ROM_START( spaceshp )
 	ROMX_LOAD( "pr09.64", 0x0800, 0x0400, CRC(7946086c) SHA1(09d5435bc602a10ddd4206fd546f5b758e746cb2), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 	ROMX_LOAD( "pr06.84", 0x0801, 0x0400, CRC(f19c8eb0) SHA1(80f66d00caaf258232ea5e6adf515899abf53896), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
 	ROMX_LOAD( "pr05.86", 0x0801, 0x0400, CRC(3dbc6360) SHA1(8d59dfee6e02ec29f755cc1c85ae236621009715), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
-	
+
 	ROM_REGION( 0x1a0, "proms", 0 )
 	ROM_LOAD( "pr13.139", 0x0000, 0x0100, CRC(9edbf536) SHA1(036ad8a231284e05f44b1106d38fc0c7e041b6e8) )
 	ROM_LOAD( "pr17.138", 0x0100, 0x0020, CRC(29dbfb87) SHA1(d8c40ab010b2ea30f29b2c443819e2b69f376c04) )

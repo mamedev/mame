@@ -2,12 +2,12 @@
 
     Arkanoid driver
 
-	- I think the MCU dump we're using with the original sets is actually
-	  from a bootleg?  It's similar to the ones dumped from other bootlegs
-	  and the 2/3 of the decapped MCUs appear to be very different.  Another
-	  bootleg had a dump very similar to the fresh decaps instead.  This
-	  needs sorting out properly.  The hookups for the different types of MCU
-	  is not identical.
+    - I think the MCU dump we're using with the original sets is actually
+      from a bootleg?  It's similar to the ones dumped from other bootlegs
+      and the 2/3 of the decapped MCUs appear to be very different.  Another
+      bootleg had a dump very similar to the fresh decaps instead.  This
+      needs sorting out properly.  The hookups for the different types of MCU
+      is not identical.
 
     Japanese version support cocktail mode (DSW #7), the others don't.
 

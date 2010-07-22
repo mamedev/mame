@@ -909,7 +909,7 @@ ROM_START( josvolly )
 
 	ROM_REGION( 0x04000, "user1", 0 )	/* music data and samples - not sure where it's mapped */
 	ROM_LOAD( "aa0-14.4j",    0x0000, 0x2000, CRC(436fe91f) SHA1(feb29501090c6db911e13ce6e9935ba004b0ce7e) )
-	
+
 	// there are other undumped chips on this, not sure how many
 	// not hooked up yet
 	ROM_REGION( 0x400, "mcu", 0 )

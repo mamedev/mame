@@ -439,7 +439,7 @@ static READ8_HANDLER( PIC16C5X_T0_clk_r )
 
 static WRITE8_HANDLER( blackt96_soundio_port00_w )
 {
-	
+
 }
 
 static READ8_HANDLER( blackt96_soundio_port01_r )

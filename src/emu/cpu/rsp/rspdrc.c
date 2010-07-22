@@ -7666,7 +7666,7 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 	{
 		UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));							   // mov     [pc],desc->pc
 		save_fast_iregs(rsp, block);
-		UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));								// exit	EXECUTE_UNMAPPED_CODE
+		UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));								// exit EXECUTE_UNMAPPED_CODE
 	}
 #endif
 

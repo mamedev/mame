@@ -65,7 +65,7 @@ static const UINT8 cb2001_decryption_table[256] = {
 	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,0x34, /* 70 */
 //    pppp pppp pppp pppp           pppp       pppp      pppp           pppp      ****
 	0x26,xxxx,0x81,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
-//    pppp      wwww           pppp **** pppp            pppp      pppp      pppp 
+//    pppp      wwww           pppp **** pppp            pppp      pppp      pppp
 	xxxx,0x3d,0xe9,xxxx,xxxx,0xbe,0xf9,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
 //         wwww pppp           pppp ****                 pppp      pppp      pppp
 	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0x8d,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
@@ -341,30 +341,30 @@ static VIDEO_UPDATE(cb2001)
 	else
 	{
 		int i;
-	
+
 		for (i= 0;i < 64;i++)
 		{
 			UINT16 scroll;
-			
+
 			scroll = cb2001_vram_bg[0xa00/2 + i/2];
 			if (i&1)
 				scroll >>=8;
 			scroll &=0xff;
-		
+
 			tilemap_set_scrolly(reel2_tilemap, i, scroll);
 
 			scroll = cb2001_vram_bg[0x800/2 + i/2];
 			if (i&1)
 				scroll >>=8;
 			scroll &=0xff;
-		
+
 			tilemap_set_scrolly(reel1_tilemap, i, scroll);
 
 			scroll = cb2001_vram_bg[0xc00/2 + i/2];
 			if (i&1)
 				scroll >>=8;
 			scroll &=0xff;
-		
+
 			tilemap_set_scrolly(reel3_tilemap, i, scroll);
 
 		}
@@ -404,7 +404,7 @@ WRITE16_HANDLER( cb2001_vidctrl_w )
 	if (mem_mask&0xff00) // video control?
 	{
 		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
-		cb2001_videobank = (data & 0x0800)>>11; 
+		cb2001_videobank = (data & 0x0800)>>11;
 	}
 	else // something else
 		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
@@ -425,12 +425,12 @@ WRITE16_HANDLER( cb2001_vidctrl2_w )
 static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 {
 	int code = cb2001_vram_bg[(0x0000/2) + tile_index/2];
-	
+
 	if (tile_index&1)
 		code >>=8;
 
 	code &=0xff;
-	
+
 	int colour = 0;//= (cb2001_out_c&0x7) + 8;
 
 	SET_TILE_INFO(
@@ -443,12 +443,12 @@ static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 {
 	int code = cb2001_vram_bg[(0x0200/2) + tile_index/2];
-	
+
 	if (tile_index&1)
 		code >>=8;
 
 	code &=0xff;
-	
+
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
 
 	SET_TILE_INFO(
@@ -491,31 +491,31 @@ static VIDEO_START(cb2001)
 WRITE16_HANDLER( cb2001_bg_w )
 {
 	COMBINE_DATA(&cb2001_vram_bg[offset]);
-	
+
 	// also used for the reel tilemaps in a different mode
 /*
-	if (offset<0x200/2)
-	{
-		tilemap_mark_tile_dirty(reel1_tilemap,(offset&0xff)/2);
-	}
-	else if (offset<0x400/2)
-	{
-		tilemap_mark_tile_dirty(reel2_tilemap,(offset&0xff)/2);	
-	}
-	else if (offset<0x600/2)
-	{
-		tilemap_mark_tile_dirty(reel3_tilemap,(offset&0xff)/2);	
-	}
-	else if (offset<0x800/2)
-	{
-	//	tilemap_mark_tile_dirty(reel4_tilemap,(offset&0xff)/2);	
-	}
+    if (offset<0x200/2)
+    {
+        tilemap_mark_tile_dirty(reel1_tilemap,(offset&0xff)/2);
+    }
+    else if (offset<0x400/2)
+    {
+        tilemap_mark_tile_dirty(reel2_tilemap,(offset&0xff)/2);
+    }
+    else if (offset<0x600/2)
+    {
+        tilemap_mark_tile_dirty(reel3_tilemap,(offset&0xff)/2);
+    }
+    else if (offset<0x800/2)
+    {
+    //  tilemap_mark_tile_dirty(reel4_tilemap,(offset&0xff)/2);
+    }
 */
 	tilemap_mark_all_tiles_dirty (reel1_tilemap);
 	tilemap_mark_all_tiles_dirty (reel2_tilemap);
 	tilemap_mark_all_tiles_dirty (reel3_tilemap);
 
-	
+
 }
 
 static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -842,7 +842,7 @@ ROM_START( scherrym )
 	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
 
 	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
-//	ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB - 2 PCBs have been found this way, it probably uploads the GFX.
+//  ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB - 2 PCBs have been found this way, it probably uploads the GFX.
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )

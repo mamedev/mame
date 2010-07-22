@@ -300,13 +300,13 @@ ADDRESS_MAP_END
      0   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x  Open bus
      1   0   %   %   *   *   *   *   *   *   *   *   *   *   *   *  R /CS4A: Enable Rom 13
      1   1   %   %   *   *   *   *   *   *   *   *   *   *   *   *  R /CS5A: Enable Rom 9
-	 note that the % bits go to pins 2 (6802 A12) and 26 (6802 A13) of the roms
-	 monymony and jackrabt both use 2764 roms, which use pin 2 as A12 and pin 26 as N/C don't care
-	 hence for actual chips used, the mem map is:
+     note that the % bits go to pins 2 (6802 A12) and 26 (6802 A13) of the roms
+     monymony and jackrabt both use 2764 roms, which use pin 2 as A12 and pin 26 as N/C don't care
+     hence for actual chips used, the mem map is:
      1   0   x   *   *   *   *   *   *   *   *   *   *   *   *   *  R /CS4A: Enable Rom 13
      1   1   x   *   *   *   *   *   *   *   *   *   *   *   *   *  R /CS5A: Enable Rom 9
-	 
-	 6821 PIA: CA1 comes from the master sound cpu's latch bit 7 (which is also connected to the AY chip at 4G's IOB1); CB1 comes from a periodic counter clocked by the 6802's clock, divided by 4096. CA2 and CB2 are disconnected. PA0-7 connect to the data busses of the AY-3-8910 chips; PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 4G; PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 4H.
+
+     6821 PIA: CA1 comes from the master sound cpu's latch bit 7 (which is also connected to the AY chip at 4G's IOB1); CB1 comes from a periodic counter clocked by the 6802's clock, divided by 4096. CA2 and CB2 are disconnected. PA0-7 connect to the data busses of the AY-3-8910 chips; PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 4G; PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 4H.
 */
 static ADDRESS_MAP_START( sound_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
@@ -327,13 +327,13 @@ ADDRESS_MAP_END
      x   x   0   1   1   1   x   x   x   x   x   x   x   x   x   x  Open bus
      %   %   1   0   *   *   *   *   *   *   *   *   *   *   *   *  R /CS1A: Enable Rom 8
      %   %   1   1   *   *   *   *   *   *   *   *   *   *   *   *  R /CS0A: Enable Rom 7
-	 note that the % bits go to pins 2 (6802 A14) and 26 (6802 A15) of the roms
-	 monymony and jackrabt both use 2764 roms, which use pin 2 as A12 and pin 26 as N/C don't care
-	 hence for actual chips used, the mem map is:
+     note that the % bits go to pins 2 (6802 A14) and 26 (6802 A15) of the roms
+     monymony and jackrabt both use 2764 roms, which use pin 2 as A12 and pin 26 as N/C don't care
+     hence for actual chips used, the mem map is:
      x   *   1   0   *   *   *   *   *   *   *   *   *   *   *   *  R /CS1A: Enable Rom 8
      x   *   1   1   *   *   *   *   *   *   *   *   *   *   *   *  R /CS0A: Enable Rom 7
-	 
-	 6821 PIA: PA0-7, CA2 and CB1 connect to the TMS5200; CA1 and CB2 are disconnected, though the test mode assumes there's something connected to CB2 (possibly another LED like the one connected to PB4); PB3 connects to 'ACS' which goes to the z80.
+
+     6821 PIA: PA0-7, CA2 and CB1 connect to the TMS5200; CA1 and CB2 are disconnected, though the test mode assumes there's something connected to CB2 (possibly another LED like the one connected to PB4); PB3 connects to 'ACS' which goes to the z80.
 */
 static ADDRESS_MAP_START( sound_map_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM /* 6802 internal ram */

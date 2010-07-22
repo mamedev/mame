@@ -241,7 +241,7 @@ static READ16_HANDLER( amerdart_iop_r )
 {
 	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
 
-//	logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),state->iop_answer);
+//  logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),state->iop_answer);
 	cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
 
 	return state->iop_answer;
@@ -251,7 +251,7 @@ static WRITE16_HANDLER( amerdart_iop_w )
 {
 	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
 
-//	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
+//  logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
 	COMBINE_DATA(&state->iop_cmd);
 	state->cmd_pending = 1;
 }
@@ -260,7 +260,7 @@ static READ16_HANDLER( amerdart_dsp_cmd_r )
 {
 	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
 
-//	logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(space->cpu), state->iop_cmd);
+//  logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(space->cpu), state->iop_cmd);
 	state->cmd_pending = 0;
 	return state->iop_cmd;
 }
@@ -269,7 +269,7 @@ static WRITE16_HANDLER( amerdart_dsp_answer_w )
 {
 	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
 
-//	logerror("%08x:DSP answer %04x\n", cpu_get_pc(space->cpu), data);
+//  logerror("%08x:DSP answer %04x\n", cpu_get_pc(space->cpu), data);
 	state->iop_answer = data;
 	cputag_set_input_line(space->machine, "maincpu", 1, ASSERT_LINE);
 }
@@ -310,7 +310,7 @@ static int amerdart_trackball_direction(const address_space *space, int num, int
 
 	UINT16 result_x = (data & 0x0c) >> 2;
 	UINT16 result_y = (data & 0x03) >> 0;
-	
+
 
 	if ((state->dx[num] == 0) && (state->dy[num] < 0)) {		/* Up */
 		state->oldy[num]--;
@@ -368,7 +368,7 @@ static READ16_HANDLER( amerdart_trackball_r )
     xxyy xxyy ???? ????
     |||| |||| |||| ||||
     |||| |||| ++++-++++-- Unused
-    |||| |||| 
+    |||| ||||
     |||| |||+------------ Trackball 1 Up    sensor
     |||| ||+------------- Trackball 1 Down  sensor
     |||| |+-------------- Trackball 1 Left  sensor
@@ -392,7 +392,7 @@ static READ16_HANDLER( amerdart_trackball_r )
     Up   & Left     X +     Y 0
     Up   & Right    X 0     Y +
     Down & Left     X 0     Y -
-    Down & Right    X -     Y 0	
+    Down & Right    X -     Y 0
 
 */
 
@@ -418,7 +418,7 @@ static READ16_HANDLER( amerdart_trackball_r )
 	state->result = (state->result & 0x0fff) | (amerdart_trackball_direction(space, 2, ((state->result >> 12) & 0xf)) << 12);
 
 
-//	logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", cpu_get_pc(space->cpu), state->newx, state->newy, state->oldx, state->oldy, state->lastresult, state->result);
+//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", cpu_get_pc(space->cpu), state->newx, state->newy, state->oldx, state->oldy, state->lastresult, state->result);
 
 	state->lastresult = state->result;
 
@@ -1158,7 +1158,7 @@ static DRIVER_INIT( amerdart )
 static DRIVER_INIT( coolpool )
 {
 	memory_install_read16_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, coolpool_input_r);
-	
+
 	register_state_save(machine);
 }
 

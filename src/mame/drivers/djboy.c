@@ -136,9 +136,9 @@ Notes:
                 |OUTPUT      MONO                          ON|
                 |--------------------------------------------|
 
-	TODO: Hook-up Beast MCU and remove simulation.
-	The internal ROM has been hand-typed from a photograph of the
-	chip die and should marked BAD_DUMP until confirmed correct.
+    TODO: Hook-up Beast MCU and remove simulation.
+    The internal ROM has been hand-typed from a photograph of the
+    chip die and should marked BAD_DUMP until confirmed correct.
 */
 
 #include "emu.h"
@@ -718,10 +718,10 @@ ADDRESS_MAP_END
 /* Program/data maps are defined in the 8051 core */
 
 static ADDRESS_MAP_START( djboy_mcu_io_map, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0)
-//	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1)
-//	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2)
-//	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3)
+//  AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0)
+//  AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1)
+//  AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2)
+//  AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3)
 ADDRESS_MAP_END
 
 /******************************************************************************/

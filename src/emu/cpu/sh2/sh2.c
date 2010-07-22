@@ -1839,7 +1839,7 @@ INLINE void op0000(sh2_state *sh2, UINT16 opcode)
 	case 0x07: MULL(sh2, Rm, Rn);				break;
 	case 0x08: CLRT(sh2);						break;
 	case 0x09: NOP();						break;
-	case 0x0a: STSMACH(sh2, Rn); 				break;
+	case 0x0a: STSMACH(sh2, Rn);				break;
 	case 0x0b: RTS(sh2);						break;
 	case 0x0c: MOVBL0(sh2, Rm, Rn);				break;
 	case 0x0d: MOVWL0(sh2, Rm, Rn);				break;
@@ -1855,9 +1855,9 @@ INLINE void op0000(sh2_state *sh2, UINT16 opcode)
 	case 0x16: MOVLS0(sh2, Rm, Rn);				break;
 	case 0x17: MULL(sh2, Rm, Rn);				break;
 	case 0x18: SETT(sh2);						break;
-	case 0x19: DIV0U(sh2); 					break;
-	case 0x1a: STSMACL(sh2, Rn); 				break;
-	case 0x1b: SLEEP(sh2); 					break;
+	case 0x19: DIV0U(sh2);					break;
+	case 0x1a: STSMACL(sh2, Rn);				break;
+	case 0x1b: SLEEP(sh2);					break;
 	case 0x1c: MOVBL0(sh2, Rm, Rn);				break;
 	case 0x1d: MOVWL0(sh2, Rm, Rn);				break;
 	case 0x1e: MOVLL0(sh2, Rm, Rn);				break;
@@ -1911,20 +1911,20 @@ INLINE void op0010(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: MOVBS(sh2, Rm, Rn); 				break;
-	case  1: MOVWS(sh2, Rm, Rn); 				break;
-	case  2: MOVLS(sh2, Rm, Rn); 				break;
+	case  0: MOVBS(sh2, Rm, Rn);				break;
+	case  1: MOVWS(sh2, Rm, Rn);				break;
+	case  2: MOVLS(sh2, Rm, Rn);				break;
 	case  3: NOP(); 						break;
-	case  4: MOVBM(sh2, Rm, Rn); 				break;
-	case  5: MOVWM(sh2, Rm, Rn); 				break;
-	case  6: MOVLM(sh2, Rm, Rn); 				break;
-	case  7: DIV0S(sh2, Rm, Rn); 				break;
+	case  4: MOVBM(sh2, Rm, Rn);				break;
+	case  5: MOVWM(sh2, Rm, Rn);				break;
+	case  6: MOVLM(sh2, Rm, Rn);				break;
+	case  7: DIV0S(sh2, Rm, Rn);				break;
 	case  8: TST(sh2, Rm, Rn);					break;
 	case  9: AND(sh2, Rm, Rn);					break;
 	case 10: XOR(sh2, Rm, Rn);					break;
 	case 11: OR(sh2, Rm, Rn);					break;
 	case 12: CMPSTR(sh2, Rm, Rn);				break;
-	case 13: XTRCT(sh2, Rm, Rn); 				break;
+	case 13: XTRCT(sh2, Rm, Rn);				break;
 	case 14: MULU(sh2, Rm, Rn);					break;
 	case 15: MULS(sh2, Rm, Rn);					break;
 	}
@@ -1934,20 +1934,20 @@ INLINE void op0011(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: CMPEQ(sh2, Rm, Rn); 				break;
+	case  0: CMPEQ(sh2, Rm, Rn);				break;
 	case  1: NOP(); 						break;
-	case  2: CMPHS(sh2, Rm, Rn); 				break;
-	case  3: CMPGE(sh2, Rm, Rn); 				break;
+	case  2: CMPHS(sh2, Rm, Rn);				break;
+	case  3: CMPGE(sh2, Rm, Rn);				break;
 	case  4: DIV1(sh2, Rm, Rn);					break;
-	case  5: DMULU(sh2, Rm, Rn); 				break;
-	case  6: CMPHI(sh2, Rm, Rn); 				break;
-	case  7: CMPGT(sh2, Rm, Rn); 				break;
+	case  5: DMULU(sh2, Rm, Rn);				break;
+	case  6: CMPHI(sh2, Rm, Rn);				break;
+	case  7: CMPGT(sh2, Rm, Rn);				break;
 	case  8: SUB(sh2, Rm, Rn);					break;
 	case  9: NOP(); 						break;
 	case 10: SUBC(sh2, Rm, Rn);					break;
 	case 11: SUBV(sh2, Rm, Rn);					break;
 	case 12: ADD(sh2, Rm, Rn);					break;
-	case 13: DMULS(sh2, Rm, Rn); 				break;
+	case 13: DMULS(sh2, Rm, Rn);				break;
 	case 14: ADDC(sh2, Rm, Rn);					break;
 	case 15: ADDV(sh2, Rm, Rn);					break;
 	}
@@ -1967,8 +1967,8 @@ INLINE void op0100(sh2_state *sh2, UINT16 opcode)
 	case 0x07: LDCMSR(sh2, Rn);					break;
 	case 0x08: SHLL2(sh2, Rn);					break;
 	case 0x09: SHLR2(sh2, Rn);					break;
-	case 0x0a: LDSMACH(sh2, Rn); 				break;
-	case 0x0b: JSR(sh2, Rn); 					break;
+	case 0x0a: LDSMACH(sh2, Rn);				break;
+	case 0x0b: JSR(sh2, Rn);					break;
 	case 0x0c: NOP();						break;
 	case 0x0d: NOP();						break;
 	case 0x0e: LDCSR(sh2, Rn);					break;
@@ -1977,15 +1977,15 @@ INLINE void op0100(sh2_state *sh2, UINT16 opcode)
 	case 0x10: DT(sh2, Rn);						break;
 	case 0x11: CMPPZ(sh2, Rn);					break;
 	case 0x12: STSMMACL(sh2, Rn);				break;
-	case 0x13: STCMGBR(sh2, Rn); 				break;
+	case 0x13: STCMGBR(sh2, Rn);				break;
 	case 0x14: NOP();						break;
 	case 0x15: CMPPL(sh2, Rn);					break;
 	case 0x16: LDSMMACL(sh2, Rn);				break;
-	case 0x17: LDCMGBR(sh2, Rn); 				break;
+	case 0x17: LDCMGBR(sh2, Rn);				break;
 	case 0x18: SHLL8(sh2, Rn);					break;
 	case 0x19: SHLR8(sh2, Rn);					break;
-	case 0x1a: LDSMACL(sh2, Rn); 				break;
-	case 0x1b: TAS(sh2, Rn); 					break;
+	case 0x1a: LDSMACL(sh2, Rn);				break;
+	case 0x1b: TAS(sh2, Rn);					break;
 	case 0x1c: NOP();						break;
 	case 0x1d: NOP();						break;
 	case 0x1e: LDCGBR(sh2, Rn);					break;
@@ -1994,15 +1994,15 @@ INLINE void op0100(sh2_state *sh2, UINT16 opcode)
 	case 0x20: SHAL(sh2, Rn);					break;
 	case 0x21: SHAR(sh2, Rn);					break;
 	case 0x22: STSMPR(sh2, Rn);					break;
-	case 0x23: STCMVBR(sh2, Rn); 				break;
+	case 0x23: STCMVBR(sh2, Rn);				break;
 	case 0x24: ROTCL(sh2, Rn);					break;
 	case 0x25: ROTCR(sh2, Rn);					break;
 	case 0x26: LDSMPR(sh2, Rn);					break;
-	case 0x27: LDCMVBR(sh2, Rn); 				break;
+	case 0x27: LDCMVBR(sh2, Rn);				break;
 	case 0x28: SHLL16(sh2, Rn);					break;
 	case 0x29: SHLR16(sh2, Rn);					break;
 	case 0x2a: LDSPR(sh2, Rn);					break;
-	case 0x2b: JMP(sh2, Rn); 					break;
+	case 0x2b: JMP(sh2, Rn);					break;
 	case 0x2c: NOP();						break;
 	case 0x2d: NOP();						break;
 	case 0x2e: LDCVBR(sh2, Rn);					break;
@@ -2037,22 +2037,22 @@ INLINE void op0110(sh2_state *sh2, UINT16 opcode)
 {
 	switch (opcode & 15)
 	{
-	case  0: MOVBL(sh2, Rm, Rn); 				break;
-	case  1: MOVWL(sh2, Rm, Rn); 				break;
-	case  2: MOVLL(sh2, Rm, Rn); 				break;
+	case  0: MOVBL(sh2, Rm, Rn);				break;
+	case  1: MOVWL(sh2, Rm, Rn);				break;
+	case  2: MOVLL(sh2, Rm, Rn);				break;
 	case  3: MOV(sh2, Rm, Rn);					break;
-	case  4: MOVBP(sh2, Rm, Rn); 				break;
-	case  5: MOVWP(sh2, Rm, Rn); 				break;
-	case  6: MOVLP(sh2, Rm, Rn); 				break;
+	case  4: MOVBP(sh2, Rm, Rn);				break;
+	case  5: MOVWP(sh2, Rm, Rn);				break;
+	case  6: MOVLP(sh2, Rm, Rn);				break;
 	case  7: NOT(sh2, Rm, Rn);					break;
-	case  8: SWAPB(sh2, Rm, Rn); 				break;
-	case  9: SWAPW(sh2, Rm, Rn); 				break;
+	case  8: SWAPB(sh2, Rm, Rn);				break;
+	case  9: SWAPW(sh2, Rm, Rn);				break;
 	case 10: NEGC(sh2, Rm, Rn);					break;
 	case 11: NEG(sh2, Rm, Rn);					break;
-	case 12: EXTUB(sh2, Rm, Rn); 				break;
-	case 13: EXTUW(sh2, Rm, Rn); 				break;
-	case 14: EXTSB(sh2, Rm, Rn); 				break;
-	case 15: EXTSW(sh2, Rm, Rn); 				break;
+	case 12: EXTUB(sh2, Rm, Rn);				break;
+	case 13: EXTUW(sh2, Rm, Rn);				break;
+	case 14: EXTSB(sh2, Rm, Rn);				break;
+	case 15: EXTSW(sh2, Rm, Rn);				break;
 	}
 }
 
@@ -2069,14 +2069,14 @@ INLINE void op1000(sh2_state *sh2, UINT16 opcode)
 	case  1 << 8: MOVWS4(sh2, opcode & 0x0f, Rm);	break;
 	case  2<< 8: NOP(); 				break;
 	case  3<< 8: NOP(); 				break;
-	case  4<< 8: MOVBL4(sh2, Rm, opcode & 0x0f); 	break;
-	case  5<< 8: MOVWL4(sh2, Rm, opcode & 0x0f); 	break;
+	case  4<< 8: MOVBL4(sh2, Rm, opcode & 0x0f);	break;
+	case  5<< 8: MOVWL4(sh2, Rm, opcode & 0x0f);	break;
 	case  6<< 8: NOP(); 				break;
 	case  7<< 8: NOP(); 				break;
 	case  8<< 8: CMPIM(sh2, opcode & 0xff);		break;
-	case  9<< 8: BT(sh2, opcode & 0xff); 		break;
+	case  9<< 8: BT(sh2, opcode & 0xff);		break;
 	case 10<< 8: NOP(); 				break;
-	case 11<< 8: BF(sh2, opcode & 0xff); 		break;
+	case 11<< 8: BF(sh2, opcode & 0xff);		break;
 	case 12<< 8: NOP(); 				break;
 	case 13<< 8: BTS(sh2, opcode & 0xff);		break;
 	case 14<< 8: NOP(); 				break;

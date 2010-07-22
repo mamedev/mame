@@ -672,4 +672,4 @@ void device_image_interface::battery_save(const void *buffer, int length)
     image_battery_save_by_name(astring_c(fname), buffer, length);
     astring_free(fname);
 }
-	
+

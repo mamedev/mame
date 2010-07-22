@@ -495,7 +495,7 @@ ROM_START( empcity )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
-	
+
 	// not hooked up yet, what's it for, coinage?
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )

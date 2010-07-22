@@ -315,17 +315,17 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 				UINT32 crc = 0;
 				UINT8 crcbytes[4];
 				file_error filerr;
-				
+
 				bool has_crc = hash_data_extract_binary_checksum(ROM_GETHASHDATA(romp), HASH_CRC, crcbytes);
 				if (has_crc)
 					crc = (crcbytes[0] << 24) | (crcbytes[1] << 16) | (crcbytes[2] << 8) | crcbytes[3];
-					
+
 				astring fname(swlist, PATH_SEPARATOR, swname, PATH_SEPARATOR, ROM_GETNAME(romp));
 				if (has_crc)
 					filerr = mame_fopen_crc(SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ, &m_mame_file);
 				else
 					filerr = mame_fopen(SEARCHPATH_ROM, fname, OPEN_FLAG_READ, &m_mame_file);
-					
+
 				if (filerr == FILERR_NONE)
 				{
 					m_file = mame_core_file(m_mame_file);
@@ -380,7 +380,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 				goto done;
 		}
 	}
-	
+
 	/* Copy some image information when we have been loaded through a software list */
 	if ( m_software_info_ptr )
 	{

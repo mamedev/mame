@@ -13,8 +13,8 @@
     Known bugs:
         * not done yet
 
-	To Do
-		* make version 1.0 of MK4 work
+    To Do
+        * make version 1.0 of MK4 work
 
 According to a Midway service bulletin
 As of 2/12/2001 the lastest software levels:
