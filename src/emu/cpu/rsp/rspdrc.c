@@ -5151,7 +5151,7 @@ INLINE void cfunc_rsp_vcl(void *param)
 			{
 				if (rsp->flag[2] & (1 << (del)))
 				{
-					if (((UINT32)(INT16)(s1) + (UINT32)(INT16)(s2)) > 0x10000)
+					if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
 					{
 						W_ACCUM_L(del, s1);
 						CLEAR_COMPARE_FLAG(del);
