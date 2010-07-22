@@ -25,4 +25,6 @@ enum
 	ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
 };
 
+void arm_set_endianness( legacy_cpu_device *device, endianness_t endianness );
+
 #endif /* __ARM_H__ */

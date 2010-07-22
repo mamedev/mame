@@ -236,6 +236,7 @@ typedef struct
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	const address_space *program;
+	endianness_t endian;
 } ARM_REGS;
 
 /* Prototypes */
@@ -497,11 +498,13 @@ static CPU_INIT( arm )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->endian = ENDIANNESS_LITTLE;
 
 	state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
 	state_save_register_device_item_array(device, 0, cpustate->coproRegister);
 	state_save_register_device_item(device, 0, cpustate->pendingIrq);
 	state_save_register_device_item(device, 0, cpustate->pendingFiq);
+	state_save_register_device_item(device, 0, cpustate->endian);
 }
 
 /***************************************************************************/
@@ -593,7 +596,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		{
 			if (ARM_DEBUG_CORE && rd == eR15)
 				logerror("read byte R15 %08x\n", R15);
-			SetRegister(cpustate, rd,(UINT32) READ8(rnv));
+			SetRegister(cpustate, rd,(UINT32) READ8( ( cpustate->endian == ENDIANNESS_LITTLE ? rnv : (rnv ^ 0x03) ) ) );
 		}
 		else
 		{
@@ -629,7 +632,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 			if (ARM_DEBUG_CORE && rd==eR15)
 				logerror("Wrote R15 in byte mode\n");
 
-			WRITE8(rnv, (UINT8) GetRegister(cpustate, rd) & 0xffu);
+			WRITE8( ( cpustate->endian == ENDIANNESS_LITTLE ? rnv : (rnv ^ 0x03) ), (UINT8) GetRegister(cpustate, rd) & 0xffu);
 		}
 		else
 		{
@@ -1373,6 +1376,14 @@ static void HandleCoPro( ARM_REGS* cpustate, UINT32 insn )
 	{
 		logerror("%08x:  Unimplemented copro instruction %08x\n", R15, insn);
 	}
+}
+
+
+void arm_set_endianness( legacy_cpu_device *device, endianness_t endianness )
+{
+	ARM_REGS *cpustate = get_safe_token(device);
+
+	cpustate->endian = endianness;
 }
 
 /**************************************************************************
