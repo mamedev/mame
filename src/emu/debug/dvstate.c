@@ -274,7 +274,7 @@ void debug_view_state::view_update()
 						if (screen != NULL)
 						{
 							curitem->m_currval = screen->hpos();
-							valstr.printf("%3d", (UINT32)curitem->m_currval);
+							valstr.printf("%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -282,7 +282,7 @@ void debug_view_state::view_update()
 						if (screen != NULL)
 						{
 							curitem->m_currval = screen->vpos();
-							valstr.printf("%3d", (UINT32)curitem->m_currval);
+							valstr.printf("%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -290,7 +290,7 @@ void debug_view_state::view_update()
 						if (screen != NULL)
 						{
 							curitem->m_currval = screen->frame_number();
-							valstr.printf("%3d", (UINT32)curitem->m_currval);
+							valstr.printf("%6d", (UINT32)curitem->m_currval);
 						}
 						break;
 				}
