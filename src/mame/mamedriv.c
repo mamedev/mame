@@ -8987,6 +8987,7 @@ Other Sun games
 	DRIVER( ppchamp )	/* (c) 1997 Dongsung + "presented by Para" */
 	DRIVER( amerdart )	/* (c) 1989 Ameri Corporation */
 	DRIVER( amerdart2 )	/* (c) 1989 Ameri Corporation */
+	DRIVER( amerdart3 )	/* (c) 1989 Ameri Corporation */
 	DRIVER( coolpool )	/* (c) 1992 Catalina Games */
 	DRIVER( 9ballsht )	/* (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games" */
 	DRIVER( 9ballsht2 )	/* (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games" */

@@ -932,74 +932,109 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-ROM_START( amerdart )
+ROM_START( amerdart ) /* You need to check the sum16 values listed on the labels to determine different sets */
 	ROM_REGION16_LE( 0x0a0000, "user1", 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "u31",  0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
-	ROM_LOAD16_BYTE( "u32",  0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
-	ROM_LOAD16_BYTE( "u38",  0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
-	ROM_LOAD16_BYTE( "u39",  0x020000, 0x10000, CRC(2ab1ea68) SHA1(4e29a274c5c62b6ca92119eb320200beb784ca55) )
-	ROM_LOAD16_BYTE( "u45",  0x040001, 0x10000, CRC(74394375) SHA1(ceb7ae4e3253351da362cd0ada87702164005d17) )
-	ROM_LOAD16_BYTE( "u46",  0x040000, 0x10000, CRC(1188047e) SHA1(249f25582ab72eeee37798418460de312053660e) )
-	ROM_LOAD16_BYTE( "u52",  0x060001, 0x10000, CRC(5ac2f06d) SHA1(b3a5d0cd94bdffdbf5bd17dbb30c07bfad3fa5d0) )
-	ROM_LOAD16_BYTE( "u53",  0x060000, 0x10000, CRC(4bd25cf0) SHA1(d1092cc3b6172d6567acd21f79b22043380102b7) )
-	ROM_LOAD16_BYTE( "u57",  0x080001, 0x10000, CRC(f620f935) SHA1(bf891fce1f04f3ad5b8b72d43d041ceacb0b65bc) )
-	ROM_LOAD16_BYTE( "u58",  0x080000, 0x10000, CRC(f1b3d7c4) SHA1(7b897230d110be7a5eb05eda927d00561ebb9ce3) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u31 4e74", 0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u32 0ef7", 0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u38 10b4", 0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u39 f45a", 0x020000, 0x10000, CRC(2ab1ea68) SHA1(4e29a274c5c62b6ca92119eb320200beb784ca55) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u45 c1f9", 0x040001, 0x10000, CRC(74394375) SHA1(ceb7ae4e3253351da362cd0ada87702164005d17) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u46 1f84", 0x040000, 0x10000, CRC(1188047e) SHA1(249f25582ab72eeee37798418460de312053660e) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u52 cdfd", 0x060001, 0x10000, CRC(5ac2f06d) SHA1(b3a5d0cd94bdffdbf5bd17dbb30c07bfad3fa5d0) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u53 d432", 0x060000, 0x10000, CRC(4bd25cf0) SHA1(d1092cc3b6172d6567acd21f79b22043380102b7) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 6016", 0x080001, 0x10000, CRC(f620f935) SHA1(bf891fce1f04f3ad5b8b72d43d041ceacb0b65bc) ) /* Different then set 2 or 3 */
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 48af", 0x080000, 0x10000, CRC(f1b3d7c4) SHA1(7b897230d110be7a5eb05eda927d00561ebb9ce3) ) /* Different then set 2 or 3 */
 
 	ROM_REGION( 0x10000, "dsp", 0 )	/* TMS32015 code  */
-	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) )
+	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, BAD_DUMP CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) ) /* Hand repaired from decapped image */
 
 	ROM_REGION( 0x100000, "user2", 0 )				/* TMS32015 audio sample data */
-	ROM_LOAD16_WORD( "u1",   0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) )
-	ROM_LOAD16_WORD( "u16",  0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
-	ROM_LOAD16_WORD( "u2",   0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
-	ROM_LOAD16_WORD( "u17",  0x030000, 0x10000, CRC(e32bdd0f) SHA1(0662abbe84f0bad2631566b506ef016fcd79b9ee) )
-	ROM_LOAD16_WORD( "u3",   0x040000, 0x10000, CRC(984d343a) SHA1(ee214830de4cb22d2d8e9d3ca335eff05af4abb6) )
-	ROM_LOAD16_WORD( "u18",  0x050000, 0x10000, CRC(de3b4d7c) SHA1(68e7ffe2d84aef7c24d1787c4f9b6950c0107741) )
-	ROM_LOAD16_WORD( "u4",   0x060000, 0x10000, CRC(c4765ff6) SHA1(7dca61d32300047ca1c089057e617553d60a0995) )
-	ROM_LOAD16_WORD( "u19",  0x070000, 0x10000, CRC(7109247c) SHA1(201809ec6599b30c26823bde6851b6eaa2589710) )
-	ROM_LOAD16_WORD( "u5",   0x080000, 0x10000, CRC(3b63b890) SHA1(a1223cb8884d5365af7d3f607657efff877f8845) )
-	ROM_LOAD16_WORD( "u20",  0x090000, 0x10000, CRC(038b7d2d) SHA1(80bab18ca36d2bc101da7f3f6e1c82d8a802c14c) )
-	ROM_LOAD16_WORD( "u6",   0x0a0000, 0x10000, CRC(5cdb9aa9) SHA1(fae5d2c7f649bcba8068c8bc8266ee411258535e) )
-	ROM_LOAD16_WORD( "u21",  0x0b0000, 0x10000, CRC(9b0b8978) SHA1(b31d0451ecd7085c191d20b2b41d0e8fe551996c) )
-	ROM_LOAD16_WORD( "u7",   0x0c0000, 0x10000, CRC(147083a2) SHA1(c04c38145ab159bd519e6325477a3f7d0eebbda1) )
-	ROM_LOAD16_WORD( "u22",  0x0d0000, 0x10000, CRC(4b92588a) SHA1(eea262c1a122015364a0046ff2bc7816f5f6821d) )
-	ROM_LOAD16_WORD( "u8",   0x0e0000, 0x10000, CRC(975b368c) SHA1(1d637ce8c5d60833bb25aab2610e1a856720235e) )
-	ROM_LOAD16_WORD( "u23",  0x0f0000, 0x10000, CRC(d7c2b13b) SHA1(3561e08011f649e4d0c47792745b2a014167e816) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 4461",  0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) ) /* Different then set 2 or 3 */
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u17 b791", 0x030000, 0x10000, CRC(e32bdd0f) SHA1(0662abbe84f0bad2631566b506ef016fcd79b9ee) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u3 046e",  0x040000, 0x10000, CRC(984d343a) SHA1(ee214830de4cb22d2d8e9d3ca335eff05af4abb6) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u18 100e", 0x050000, 0x10000, CRC(de3b4d7c) SHA1(68e7ffe2d84aef7c24d1787c4f9b6950c0107741) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u4 7887",  0x060000, 0x10000, CRC(c4765ff6) SHA1(7dca61d32300047ca1c089057e617553d60a0995) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u19 94cf", 0x070000, 0x10000, CRC(7109247c) SHA1(201809ec6599b30c26823bde6851b6eaa2589710) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u5 47cb",  0x080000, 0x10000, CRC(3b63b890) SHA1(a1223cb8884d5365af7d3f607657efff877f8845) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u20 6cd4", 0x090000, 0x10000, CRC(038b7d2d) SHA1(80bab18ca36d2bc101da7f3f6e1c82d8a802c14c) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u6 ef71",  0x0a0000, 0x10000, CRC(5cdb9aa9) SHA1(fae5d2c7f649bcba8068c8bc8266ee411258535e) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u21 fe8a", 0x0b0000, 0x10000, CRC(9b0b8978) SHA1(b31d0451ecd7085c191d20b2b41d0e8fe551996c) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u7 2671",  0x0c0000, 0x10000, CRC(147083a2) SHA1(c04c38145ab159bd519e6325477a3f7d0eebbda1) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u22 8fd7", 0x0d0000, 0x10000, CRC(4b92588a) SHA1(eea262c1a122015364a0046ff2bc7816f5f6821d) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u8 961c",  0x0e0000, 0x10000, CRC(975b368c) SHA1(1d637ce8c5d60833bb25aab2610e1a856720235e) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u23 abef", 0x0f0000, 0x10000, CRC(d7c2b13b) SHA1(3561e08011f649e4d0c47792745b2a014167e816) ) /* Different then set 2 or 3 */
 ROM_END
 
-ROM_START( amerdart2 )
+ROM_START( amerdart2 ) /* You need to check the sum16 values listed on the labels to determine different sets */
 	ROM_REGION16_LE( 0x0a0000, "user1", 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "u31",     0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
-	ROM_LOAD16_BYTE( "u32",     0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
-	ROM_LOAD16_BYTE( "u38",     0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
-	ROM_LOAD16_BYTE( "u39",     0x020000, 0x10000, CRC(2ab1ea68) SHA1(4e29a274c5c62b6ca92119eb320200beb784ca55) )
-	ROM_LOAD16_BYTE( "u45",     0x040001, 0x10000, CRC(74394375) SHA1(ceb7ae4e3253351da362cd0ada87702164005d17) )
-	ROM_LOAD16_BYTE( "u46",     0x040000, 0x10000, CRC(1188047e) SHA1(249f25582ab72eeee37798418460de312053660e) )
-	ROM_LOAD16_BYTE( "u52",     0x060001, 0x10000, CRC(5ac2f06d) SHA1(b3a5d0cd94bdffdbf5bd17dbb30c07bfad3fa5d0) )
-	ROM_LOAD16_BYTE( "u53",     0x060000, 0x10000, CRC(4bd25cf0) SHA1(d1092cc3b6172d6567acd21f79b22043380102b7) )
-	ROM_LOAD16_BYTE( "u57.bin", 0x080001, 0x10000, CRC(8a70f849) SHA1(dfd4cf90de2ab8cbeff458f0fd20110c1ed009e9) )
-	ROM_LOAD16_BYTE( "u58.bin", 0x080000, 0x10000, CRC(8bb81975) SHA1(b7666572ab543991c7deaa0ebefb8b4526a7e386) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u31 4e74", 0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u32 0ef7", 0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u38 10b4", 0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u39 f45a", 0x020000, 0x10000, CRC(2ab1ea68) SHA1(4e29a274c5c62b6ca92119eb320200beb784ca55) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u45 c1f9", 0x040001, 0x10000, CRC(74394375) SHA1(ceb7ae4e3253351da362cd0ada87702164005d17) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u46 1f84", 0x040000, 0x10000, CRC(1188047e) SHA1(249f25582ab72eeee37798418460de312053660e) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u52 cdfd", 0x060001, 0x10000, CRC(5ac2f06d) SHA1(b3a5d0cd94bdffdbf5bd17dbb30c07bfad3fa5d0) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u53 d432", 0x060000, 0x10000, CRC(4bd25cf0) SHA1(d1092cc3b6172d6567acd21f79b22043380102b7) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 1a0c", 0x080001, 0x10000, CRC(8a70f849) SHA1(dfd4cf90de2ab8cbeff458f0fd20110c1ed009e9) ) /* Different then set 1 or 3 */
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 0d81", 0x080000, 0x10000, CRC(8bb81975) SHA1(b7666572ab543991c7deaa0ebefb8b4526a7e386) ) /* Different then set 1 or 3 */
 
 	ROM_REGION( 0x10000, "dsp", 0 )	/* TMS32015 code  */
-	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) )
+	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, BAD_DUMP CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) ) /* Hand repaired from decapped image */
 
 	ROM_REGION( 0x100000, "user2", 0 )				/* TMS32015 audio sample data */
-	ROM_LOAD16_WORD( "u1.bin",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) )
-	ROM_LOAD16_WORD( "u16",     0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
-	ROM_LOAD16_WORD( "u2",      0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
-	ROM_LOAD16_WORD( "u17",     0x030000, 0x10000, CRC(e32bdd0f) SHA1(0662abbe84f0bad2631566b506ef016fcd79b9ee) )
-	ROM_LOAD16_WORD( "u3",      0x040000, 0x10000, CRC(984d343a) SHA1(ee214830de4cb22d2d8e9d3ca335eff05af4abb6) )
-	ROM_LOAD16_WORD( "u18",     0x050000, 0x10000, CRC(de3b4d7c) SHA1(68e7ffe2d84aef7c24d1787c4f9b6950c0107741) )
-	ROM_LOAD16_WORD( "u4",      0x060000, 0x10000, CRC(c4765ff6) SHA1(7dca61d32300047ca1c089057e617553d60a0995) )
-	ROM_LOAD16_WORD( "u19",     0x070000, 0x10000, CRC(7109247c) SHA1(201809ec6599b30c26823bde6851b6eaa2589710) )
-	ROM_LOAD16_WORD( "u5",      0x080000, 0x10000, CRC(3b63b890) SHA1(a1223cb8884d5365af7d3f607657efff877f8845) )
-	ROM_LOAD16_WORD( "u20",     0x090000, 0x10000, CRC(038b7d2d) SHA1(80bab18ca36d2bc101da7f3f6e1c82d8a802c14c) )
-	ROM_LOAD16_WORD( "u6",      0x0a0000, 0x10000, CRC(5cdb9aa9) SHA1(fae5d2c7f649bcba8068c8bc8266ee411258535e) )
-	ROM_LOAD16_WORD( "u21",     0x0b0000, 0x10000, CRC(9b0b8978) SHA1(b31d0451ecd7085c191d20b2b41d0e8fe551996c) )
-	ROM_LOAD16_WORD( "u7",      0x0c0000, 0x10000, CRC(147083a2) SHA1(c04c38145ab159bd519e6325477a3f7d0eebbda1) )
-	ROM_LOAD16_WORD( "u22",     0x0d0000, 0x10000, CRC(4b92588a) SHA1(eea262c1a122015364a0046ff2bc7816f5f6821d) )
-	ROM_LOAD16_WORD( "u8",      0x0e0000, 0x10000, CRC(975b368c) SHA1(1d637ce8c5d60833bb25aab2610e1a856720235e) )
-	ROM_LOAD16_WORD( "u23.bin", 0x0f0000, 0x10000, CRC(7c1e6f2e) SHA1(21ae530e4bd7c0c9f1a84f01f136c71952c8adc4) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 222f",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) ) /* Different then set 1 */
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u17 b791", 0x030000, 0x10000, CRC(e32bdd0f) SHA1(0662abbe84f0bad2631566b506ef016fcd79b9ee) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u3 046e",  0x040000, 0x10000, CRC(984d343a) SHA1(ee214830de4cb22d2d8e9d3ca335eff05af4abb6) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u18 100e", 0x050000, 0x10000, CRC(de3b4d7c) SHA1(68e7ffe2d84aef7c24d1787c4f9b6950c0107741) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u4 7887",  0x060000, 0x10000, CRC(c4765ff6) SHA1(7dca61d32300047ca1c089057e617553d60a0995) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u19 94cf", 0x070000, 0x10000, CRC(7109247c) SHA1(201809ec6599b30c26823bde6851b6eaa2589710) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u5 47cb",  0x080000, 0x10000, CRC(3b63b890) SHA1(a1223cb8884d5365af7d3f607657efff877f8845) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u20 6cd4", 0x090000, 0x10000, CRC(038b7d2d) SHA1(80bab18ca36d2bc101da7f3f6e1c82d8a802c14c) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u6 ef71",  0x0a0000, 0x10000, CRC(5cdb9aa9) SHA1(fae5d2c7f649bcba8068c8bc8266ee411258535e) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u21 fe8a", 0x0b0000, 0x10000, CRC(9b0b8978) SHA1(b31d0451ecd7085c191d20b2b41d0e8fe551996c) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u7 2671",  0x0c0000, 0x10000, CRC(147083a2) SHA1(c04c38145ab159bd519e6325477a3f7d0eebbda1) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u22 8fd7", 0x0d0000, 0x10000, CRC(4b92588a) SHA1(eea262c1a122015364a0046ff2bc7816f5f6821d) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u8 961c",  0x0e0000, 0x10000, CRC(975b368c) SHA1(1d637ce8c5d60833bb25aab2610e1a856720235e) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u23 b806", 0x0f0000, 0x10000, CRC(7c1e6f2e) SHA1(21ae530e4bd7c0c9f1a84f01f136c71952c8adc4) ) /* Different then set 1 */
+ROM_END
+
+ROM_START( amerdart3 ) /* You need to check the sum16 values listed on the labels to determine different sets */
+	ROM_REGION16_LE( 0x0a0000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u31 4e74", 0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u32 0ef7", 0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u38 10b4", 0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u39 f45a", 0x020000, 0x10000, CRC(2ab1ea68) SHA1(4e29a274c5c62b6ca92119eb320200beb784ca55) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u45 c1f9", 0x040001, 0x10000, CRC(74394375) SHA1(ceb7ae4e3253351da362cd0ada87702164005d17) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u46 1f84", 0x040000, 0x10000, CRC(1188047e) SHA1(249f25582ab72eeee37798418460de312053660e) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u52 cdfd", 0x060001, 0x10000, CRC(5ac2f06d) SHA1(b3a5d0cd94bdffdbf5bd17dbb30c07bfad3fa5d0) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u53 d432", 0x060000, 0x10000, CRC(4bd25cf0) SHA1(d1092cc3b6172d6567acd21f79b22043380102b7) )
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 4cac", 0x080001, 0x10000, CRC(2d653c7b) SHA1(0feebe6440aabe844049013aa063ed0259b7bec4) ) /* Different then set 2 or 3 */
+	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 729e", 0x080000, 0x10000, CRC(8cef479a) SHA1(80002e215416a11ff071523ee67218a1aabe155b) ) /* Different then set 2 or 3 */
+
+	ROM_REGION( 0x10000, "dsp", 0 )	/* TMS32015 code  */
+	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, BAD_DUMP CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) ) /* Hand repaired from decapped image */
+
+	ROM_REGION( 0x100000, "user2", 0 )				/* TMS32015 audio sample data */
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 222f",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) ) /* Same as set 2 */
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u17 b791", 0x030000, 0x10000, CRC(e32bdd0f) SHA1(0662abbe84f0bad2631566b506ef016fcd79b9ee) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u3 046e",  0x040000, 0x10000, CRC(984d343a) SHA1(ee214830de4cb22d2d8e9d3ca335eff05af4abb6) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u18 100e", 0x050000, 0x10000, CRC(de3b4d7c) SHA1(68e7ffe2d84aef7c24d1787c4f9b6950c0107741) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u4 7887",  0x060000, 0x10000, CRC(c4765ff6) SHA1(7dca61d32300047ca1c089057e617553d60a0995) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u19 94cf", 0x070000, 0x10000, CRC(7109247c) SHA1(201809ec6599b30c26823bde6851b6eaa2589710) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u5 47cb",  0x080000, 0x10000, CRC(3b63b890) SHA1(a1223cb8884d5365af7d3f607657efff877f8845) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u20 6cd4", 0x090000, 0x10000, CRC(038b7d2d) SHA1(80bab18ca36d2bc101da7f3f6e1c82d8a802c14c) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u6 ef71",  0x0a0000, 0x10000, CRC(5cdb9aa9) SHA1(fae5d2c7f649bcba8068c8bc8266ee411258535e) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u21 fe8a", 0x0b0000, 0x10000, CRC(9b0b8978) SHA1(b31d0451ecd7085c191d20b2b41d0e8fe551996c) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u7 2671",  0x0c0000, 0x10000, CRC(147083a2) SHA1(c04c38145ab159bd519e6325477a3f7d0eebbda1) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u22 8fd7", 0x0d0000, 0x10000, CRC(4b92588a) SHA1(eea262c1a122015364a0046ff2bc7816f5f6821d) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u8 961c",  0x0e0000, 0x10000, CRC(975b368c) SHA1(1d637ce8c5d60833bb25aab2610e1a856720235e) )
+	ROM_LOAD16_WORD( "ameri corp copyright 1989 u23 b806", 0x0f0000, 0x10000, CRC(7c1e6f2e) SHA1(21ae530e4bd7c0c9f1a84f01f136c71952c8adc4) ) /* Same as set 2 */
 ROM_END
 
 
@@ -1048,12 +1083,12 @@ ROM_START( 9ballsht )
 	ROM_LOAD16_BYTE( "u113",         0x00001, 0x40000, CRC(30cbf462) SHA1(64b2e2d40c2a92c4f4823dc866e5464792954ac3) )
 
 	ROM_REGION16_LE( 0x100000, "gfx1", 0 )	/* gfx data read by main CPU */
-	ROM_LOAD16_BYTE( "u110",         0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
-	ROM_LOAD16_BYTE( "u111",         0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 c316.u110", 0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 13f2.u111", 0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
 
 	ROM_REGION( 0x40000, "dsp", 0 )	/* TMS320C26 */
-	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
-	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
 	ROM_REGION( 0x100000, "user2", 0 )	/* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
@@ -1070,12 +1105,12 @@ ROM_START( 9ballsht2 )
 	ROM_LOAD16_BYTE( "e-scape.113",  0x00001, 0x40000, CRC(ccd472a7) SHA1(d074080e987c233b26b3c72248411c575f7a2293) )
 
 	ROM_REGION16_LE( 0x100000, "gfx1", 0 )	/* gfx data read by main CPU */
-	ROM_LOAD16_BYTE( "u110",         0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
-	ROM_LOAD16_BYTE( "u111",         0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 c316.u110", 0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 13f2.u111", 0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
 
 	ROM_REGION( 0x40000, "dsp", 0 )	/* TMS320C26 */
-	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
-	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
 	ROM_REGION( 0x100000, "user2", 0 )	/* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
@@ -1088,12 +1123,12 @@ ROM_START( 9ballsht3 )
 	ROM_LOAD16_BYTE( "8e_6166.113",  0x00001, 0x40000, CRC(c41db70a) SHA1(162112f9f5bb6345920a45c41da6a249796bd21f) )
 
 	ROM_REGION16_LE( 0x100000, "gfx1", 0 )	/* gfx data read by main CPU */
-	ROM_LOAD16_BYTE( "u110",         0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
-	ROM_LOAD16_BYTE( "u111",         0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 c316.u110", 0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 13f2.u111", 0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
 
 	ROM_REGION( 0x40000, "dsp", 0 )	/* TMS320C26 */
-	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
-	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
 	ROM_REGION( 0x100000, "user2", 0 )	/* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
@@ -1108,16 +1143,16 @@ ROM_START( 9ballshtc )
 	ROM_LOAD16_BYTE( "e-scape (c)1994 b72f.u113",  0x00001, 0x40000, CRC(1e0f3c62) SHA1(3c24a38dcb553fd84b0b44a5a8d93a14435e22b0) )
 
 	ROM_REGION16_LE( 0x100000, "gfx1", 0 )	/* gfx data read by main CPU */
-	ROM_LOAD16_BYTE( "e-scape (c)1994 c316.u110",         0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
-	ROM_LOAD16_BYTE( "e-scape (c)1994 13f2.u111",         0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 c316.u110", 0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 13f2.u111", 0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
 
 	ROM_REGION( 0x40000, "dsp", 0 )	/* TMS320C26 */
-	ROM_LOAD16_BYTE( "e-scape (c)1994 89bc.u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
-	ROM_LOAD16_BYTE( "e-scape (c)1994 af4a.u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
+	ROM_LOAD16_BYTE( "e-scape (c)1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
 	ROM_REGION( 0x100000, "user2", 0 )	/* TMS32026 data */
-	ROM_LOAD( "e-scape (c)1994 0000.u54",          0x00000, 0x80000, CRC(04b509a0) SHA1(093343741a3d8d0786fd443e68dd85b414c6cf9e) )
-	ROM_LOAD( "e-scape (c)1994 2df8.u53",          0x80000, 0x80000, CRC(c8a7b576) SHA1(7eb71dd791fdcbfe71764a454f0a1d3130d8a57e) )
+	ROM_LOAD( "e-scape (c)1994 0000.u54", 0x00000, 0x80000, CRC(04b509a0) SHA1(093343741a3d8d0786fd443e68dd85b414c6cf9e) )
+	ROM_LOAD( "e-scape (c)1994 2df8.u53", 0x80000, 0x80000, CRC(c8a7b576) SHA1(7eb71dd791fdcbfe71764a454f0a1d3130d8a57e) )
 ROM_END
 
 
@@ -1214,10 +1249,11 @@ static DRIVER_INIT( 9ballsht )
  *
  *************************************/
 
-GAME( 1989, amerdart, 0,        amerdart, amerdart, amerdart, ROT0, "Ameri",   "AmeriDarts (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, amerdart2,amerdart, amerdart, amerdart, amerdart, ROT0, "Ameri",   "AmeriDarts (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1992, coolpool, 0,        coolpool, coolpool, coolpool, ROT0, "Catalina", "Cool Pool", 0 )
-GAME( 1993, 9ballsht, 0,        9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)", 0 )
-GAME( 1993, 9ballsht2,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)", 0 )
-GAME( 1993, 9ballsht3,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)", 0 )
-GAME( 1993, 9ballshtc,9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", 0 )
+GAME( 1989, amerdart,  0,        amerdart, amerdart, amerdart, ROT0, "Ameri",    "AmeriDarts (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, amerdart2, amerdart, amerdart, amerdart, amerdart, ROT0, "Ameri",    "AmeriDarts (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, amerdart3, amerdart, amerdart, amerdart, amerdart, ROT0, "Ameri",    "AmeriDarts (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1992, coolpool,  0,        coolpool, coolpool, coolpool, ROT0, "Catalina", "Cool Pool", 0 )
+GAME( 1993, 9ballsht,  0,        9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)", 0 )
+GAME( 1993, 9ballsht2, 9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)", 0 )
+GAME( 1993, 9ballsht3, 9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)", 0 )
+GAME( 1993, 9ballshtc, 9ballsht, 9ballsht, 9ballsht, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", 0 )
