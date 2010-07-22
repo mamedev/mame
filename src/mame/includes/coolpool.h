@@ -1,4 +1,4 @@
-﻿class coolpool_state
+class coolpool_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, coolpool_state(machine)); }
