@@ -2758,10 +2758,10 @@ V-V                           TP-027
 	DRIVER( wofa )		/* 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound) */
 	DRIVER( wofu )		/* 31/10/1992 (c) 1992 (US) (CPS1 + QSound) */
 	DRIVER( wofj )		/* 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound) */
-	DRIVER( wofhfh )	/* bootleg */
+	DRIVER( wofhfb )	/* bootleg */
 	DRIVER( sf2hf )		/* 09/12/1992 (c) 1992 (World) */
 	DRIVER( sf2hfu )	/* 09/12/1992 (c) 1992 (US)    */
-	DRIVER( sf2tj )		/* 09/12/1992 (c) 1992 (Japan) */
+	DRIVER( sf2hfj )	/* 09/12/1992 (c) 1992 (Japan) */
 	DRIVER( dino )		/* 01/02/1993 (c) 1993 (World) (CPS1 + QSound) */
 	DRIVER( dinou )		/* 01/02/1993 (c) 1993 (US)    (CPS1 + QSound) */
 	DRIVER( dinoj )		/* 01/02/1993 (c) 1993 (Japan) (CPS1 + QSound) */
@@ -2774,7 +2774,7 @@ V-V                           TP-027
 	DRIVER( punipic )	/* bootleg */
 	DRIVER( punipic2 )	/* bootleg */
 	DRIVER( punipic3 )	/* bootleg */
-	DRIVER( punisherbz )/* bootleg */
+	DRIVER( punisherbz )	/* bootleg */
 	DRIVER( slammast )	/* 13/07/1993 (c) 1993 (World) (CPS1 + QSound) */
 	DRIVER( slammastu )	/* 13/07/1993 (c) 1993 (US)    (CPS1 + QSound) */
 	DRIVER( mbomberj )	/* 13/07/1993 (c) 1993 (Japan) (CPS1 + QSound) */
@@ -2783,7 +2783,7 @@ V-V                           TP-027
 	DRIVER( pnickj )	/* 08/06/1994 (c) 1994 Compile + Capcom license (Japan) not listed on Capcom's site */
 	DRIVER( qad )		/* 01/07/1992 (c) 1992 (US)    */
 	DRIVER( qadj )		/* 21/09/1994 (c) 1994 (Japan) */
-	DRIVER( qtono2 )	/* 23/01/1995 (c) 1995 (Japan) */
+	DRIVER( qtono2j )	/* 23/01/1995 (c) 1995 (Japan) */
 	DRIVER( pang3 )		/* 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
 	DRIVER( pang3n )	/* 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
 	DRIVER( pang3j )	/* 11/05/1995 (c) 1995 Mitchell (Japan) not listed on Capcom's site */

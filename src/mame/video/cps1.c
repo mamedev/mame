@@ -8,9 +8,10 @@ and interchangeable except for 89626A-4 DASH used by sf2 which has a 12MHz xtal
 replacing the 10Hz one. Note that it's likely that from one point onwards Capcom
 simply switched to make only 89626A-4 DASH board, that is all games after a
 certain point should use the 12MHz xtal not just sf2.
-Verified: Quiz and Dragons (US) comes with the DASH version (original pcb with sticker).
+Verified: Quiz and Dragons (USA) comes with the DASH version (original pcb with sticker).
 
 Known A-board revisions:
+
 88617A-4
 88617A-5
 88617A-7
@@ -18,78 +19,87 @@ Known A-board revisions:
 89626A-4
 89626A-4 DASH
 
-NAME                                        Year  B-board #      B-board PALs      C-board #         CPS-B #           C-board PALs
-------------------------------------------- ----  --------  ---------------------  ---------  -----------------------  -------------
-Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  N/A
-  (alt B-board revision)                          88621B-2  LW621            LWIO  None       CPS-B-01  DL-0411-10001  N/A
-Ghouls 'n Ghosts (World / US)               1988  88620-B-2 DM620            LWIO  None       CPS-B-01  DL-0411-10001  N/A
-  (alt B-board revision - Japan)                  88622B-2  DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
-  (alt B-board revision - Japan)                  91634B-2  DAM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Strider                                     1989  89624B-2  ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
-  (alt B-board revision)                          89624B-2  ST24M2           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
-  (alt B-board revision)                          89624B-3  ST24B2           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
-  (alt B-board revision - Japan)                  ?         ST22B            ?
-Dynasty Wars                                1989  89624B-3  TK24B?           ?     88622-C-2  CPS-B-02  DL-0411-10002  None
-  (alt B-board revision - Japan)                  88622B-3  TK22B            LWIO
-Willow                                      1989  89624B-3  WL24B            LWIO  88622-C-4  CPS-B-03  DL-0411-10003  None
-  (alt B-board revision - Japan)                  88622B-3  WL22B            LWIO  88622-C-2  CPS-B-03  DL-0411-10003  None
-UN Squadron / Area 88                       1989  89624B-3  AR24B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
-  (alt B-board revision - Japan)                  88622B-2  AR22B            LWIO
-  (alt B-board revision - Japan)                  88622B-3  AR22B            LWIO
-Final Fight (first rev)                     1989  89624B-3  S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
-Final Fight (US/Japan 900112)                                                      ?          CPS-B-04@ DL-0411-10001  None
-Final Fight (US 900613)                           89624B-3                   IOB1  88622-C-5  CPS-B-05  DL-0411-10006  None
-Final Fight (Japan 900305) (alt B-board revision) 88622B-2  S222B            LWIO  88622-C-5  CPS-B-02  DL-0411-10002  None
-1941                                        1990  ?         YI24B            ?     88622-C-5  CPS-B-05  DL-0411-10006  ?
-  (alt B-board revision - Japan)                  ?         YI22B?           ?
-Mercs                                       1990  89624B-3  O224B            IOB1  90628-C-1  CPS-B-12  DL-0411-10007  C628
-  (alt B-board revision - Japan)                  ?         O222B?           ?
-  (alt C-board revision)                                                           90628-C-2
-Magic Sword                                 1990  89624B-3  MS24B            IOB1  88622-C-5  CPS-B-13  DL-0411-10008  None
-  (alt B-board revision - Japan)                  89625B-1  MS22B            IOB1
-Chiki Chiki Boys / Mega Twins               1990  89624B-3  CK24B            IOB1  88622-C-5  CPS-B-14  DL-0411-10009  None
-  (alt B-board revision - Japan)                  ?         CK22B?           ?
-Nemo                                        1990  89624B-3  NM24B            IOB1  88622-C-5  CPS-B-15  DL-0411-10010  None
-  (alt B-board revision - Japan)                  89625B-1  NM22B            ?
-Carrier Air Wing / U.S. Navy                1990  89624B-3  CA24B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
-  (alt B-board revision - Japan)                  89625B-1  CA22B            LWIO
-Street Fighter II (910214)                  1991  90629B-2  STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
-Street Fighter II (US 910206)                                                                 CPS-B-17  DL-0411-10012
-Street Fighter II (US 910228)                                                ??               CPS-B-18  DL-0411-10013  C632B
-Street Fighter II (Japan 910306)                                                              CPS-B-12  DL-0411-10007
-Street Fighter II (US 910318)                                                                 CPS-B-05  DL-0411-10006
-Street Fighter II (US 910411)                                                                 CPS-B-15  DL-0411-10010
-Street Fighter II (World 910522)                                                              CPS-B-11  DL-0411-10004
-Street Fighter II (US 910522)                                                                 CPS-B-14  DL-0411-10009
-Street Fighter II (US 911101)                                                                 CPS-B-17  DL-0411-10012
-Street Fighter II (Japan 911210)                                                              CPS-B-13  DL-0411-10008
-Three Wonders*                              1991  89624B-3  RT24B            IOB1  90630C-4   CPS-B-21  DL-0921-10014        IOC1
-  (alt B-board revision - Japan)                  89625B-1  RT22B            IOB1
-  (alt B-board revision)                          91634B-2  RT63B?    BPRG1? IOB1
-King of Dragons*                            1991  90629B-3  KD29B            IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-Captain Commando*                           1991  91635B-2  CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-Knights of the Round*                       1991  91635B-2  KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-  (alt B-board revision)                          ?         KR29B?           ?
-Street Fighter II' Champion Edition         1992  91635B-2  S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-  (alt B-board revision - Japan)                  91634B-2  S9263B    BPRG1  IOB1
-Varth (World)                               1992  89624B-3  VA24B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
-  (alt B-board revision - US)                     ?         VA63B?           ?
-Varth (Japan)*                                    88622B-3  VA22B            LWIO  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Capcom World 2*                             1992  ?         Q522B            IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
-Quiz and Dragons (US)*                      1992  89625B-1  QD22B            IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Quiz and Dragons (Japan)                    1994  ?         ?                IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
-Warriors of Fate*                           1992  91634B-2  TK263B    BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Street Fighter II Turbo Hyper Fighting      1992  91635B-2  S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Cadillacs and Dinosaurs*                    1993  ?         CD63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Punisher*                                   1993  91635B-2  PS63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Saturday Night Slam Masters*                1993  ?         MB63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Muscle Bomber Duo*                          1993  ?         ?                      92641C-1   CPS-B-21  DL-0921-10014  ?
-Quiz Tonosama no Yabou 2                    1995  ?         ?                      ?          ?
-Pnickies                                    1994  ?         ?                      ?          CPS-B-21? DL-0921-10014? ?
-Pang 3                                      1995  94916-10  CP1B1F,CP1B8K,CP1B9KA  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Megaman the Power Battle                    1995  91634B-2  RCM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+NAME                                              Year  B-board #       B-board PALs      C-board #          CPS-B #          C-board PALs
+------------------------------------------------  ----  ---------  ---------------------  ---------  -----------------------  ------------
+Forgotten Worlds (USA / Japan)                    1988  88618B-2   LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  N/A
+  (alt B-board revision - World)                        88621B-2   LW621            LWIO  None       CPS-B-01  DL-0411-10001  N/A
+Ghouls'n Ghosts (World / USA)                     1988  88620-B-2  DM620            LWIO  None       CPS-B-01  DL-0411-10001  N/A
+  (alt B-board revision - Japan)                        88622B-2   DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
+  (alt B-board revision - Japan Resale Ver.)            91634B-2   DAM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Strider (USA)                                     1989  89624B-2   ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
+  (alt C-board revision - USA)                          89624B-2   ST24M1           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
+  (alt B-board revision - USA)                          89624B-3   ST24B2           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
+  (alt B-board revision - Japan)                        ?          ST22B            ?     ?          CPS-B-01  DL-0411-10001
+  (alt B-board revision - Japan Resale Ver.)            91634B-2   STH63B?   BPRG1  IOB1  ?          ?         ?
+Dynasty Wars (USA)                                1989  89624B-3   TK24B1           LWIO? 88622-C-2  CPS-B-02  DL-0411-10002  None
+  (alt B-board revision - Japan)                        88622B-3   TK22B            LWIO  88622-C-2  CPS-B-02  DL-0411-10002  None
+Willow (USA)                                      1989  89624B-3   WL24B            LWIO  88622-C-4  CPS-B-03  DL-0411-10003  None
+  (alt B-board revision - Japan)                        88622B-3   WL22B            LWIO  88622-C-2  CPS-B-03  DL-0411-10003  None
+U.N. Squadron (USA)                               1989  89624B-3   AR24B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
+  (alt B-board revision - Japan)                        88622B-3   AR22B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
+Final Fight (World)                               1989  89624B-3   S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
+Final Fight (USA)                                       89624B-3   S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
+Final Fight (USA 900112)                                89624B-3   S224B            IOB1  88622-C-5  CPS-B-04@ DL-0411-10001  None
+Final Fight (USA 900613)                                89624B-3   S224B            IOB1  88622-C-5  CPS-B-05  DL-0411-10006  None
+Final Fight (Japan)                                     88622B-?   S222B            ?     ?          CPS-B-04  DL-0411-10005
+Final Fight (Japan 900112)                              88622B-?   S222B            ?     ?          CPS-B-01  DL-0411-10001
+Final Fight (Japan 900305)                              88622B-?   S222B            ?     ?          CPS-B-02  DL-0411-10002
+Street Smart / Final Fight (Japan, hack)                91634B-2   GAL16V8A-15LP    IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+1941 (World)                                      1990  ?          YI24B            ?     88622-C-5  CPS-B-05  DL-0411-10006  None
+  (alt B-board revision - Japan)                        89625B-1   YI22B?           LWIO? 88622-C-5  CPS-B-05  DL-0411-10006  None
+Mercs (World / USA)                               1990  89624B-3   O224B            IOB1  90628-C-1  CPS-B-12  DL-0411-10007  C628
+  (alt B-board revision - Japan)                        89625B-1   O222B            LWIO? 90628-C-1  CPS-B-12  DL-0411-10007  C628
+Mega Twins (World)                                1990  89624B-3   CK24B            IOB1  88622-C-5  CPS-B-14  DL-0411-10009  None
+  (alt B-board revision - Japan)                        ?          CK22B?           ?     ?          CPS-B-14  DL-0411-10009
+Magic Sword (World / USA)                         1990  89624B-3   MS24B            IOB1  88622-C-5  CPS-B-13  DL-0411-10008  None
+  (alt B-board revision - Japan)                        89625B-1   MS22B            IOB1  88622-C-5  CPS-B-13  DL-0411-10008  None
+Carrier Air Wing (World / USA)                    1990  89624B-3   CA24B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
+  (alt B-board revision - Japan)                        89625B-1   CA22B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
+Nemo (World)                                      1990  89624B-3   NM24B            IOB1  88622-C-5  CPS-B-15  DL-0411-10010  None
+  (alt B-board revision - Japan)                        89625B-1   NM22B            ?     ?          CPS-B-15  DL-0411-10010
+Street Fighter II (World 910214)                  1991  90629B-2   STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
+Street Fighter II (World 910522)                        90629B-3   STF29            IOB1  90632C-1   CPS-B-11  DL-0411-10004  C632
+Street Fighter II (USA 910206)                          90629B-?   STF29            IOB1  ?          CPS-B-17  DL-0411-10012  C632
+Street Fighter II (USA 910214)                          90629B-3   STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
+Street Fighter II (USA 910228)                          90629B-3   STF29            IOB2  90632C-1   CPS-B-18  DL-0411-10013  C632B
+Street Fighter II (USA 910318)                          90629B-?   STF29            IOB1  ?          CPS-B-05  DL-0411-10006  C632
+Street Fighter II (USA 910411)                          90629B-?   STF29?           ?     ?          CPS-B-15  DL-0411-10010
+Street Fighter II (USA 910522)                          90629B-3   STF29            IOB1  90632C-1   CPS-B-14  DL-0411-10009  C632
+Street Fighter II (USA 911101)                          90629B-?   STF29?           ?     ?          CPS-B-17  DL-0411-10012
+Street Fighter II (Japan 910214)                        90629B-2   STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
+Street Fighter II (Japan 910306)                        90629B-?   STF29?           IOB1  ?          CPS-B-12  DL-0411-10007  C632
+Street Fighter II (Japan 911210)                        90629B-?   STF29?           IOB1  ?          CPS-B-13  DL-0411-10008  C632
+Three Wonders* (World / USA)                      1991  89624B-3   RT24B            IOB1  90630C-4   CPS-B-21  DL-0921-10014        IOC1
+  (alt B-board revision - Japan)                        89625B-1   RT22B            IOB1  90630C-4   CPS-B-21  DL-0921-10014        IOC1
+The King of Dragons* (World / USA)                1991  90629B-3   KD29B            IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+Captain Commando* (World 911014)                  1991  91635B-2   CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+Captain Commando* (World 911202)                        91635B-2   CC63B     CCPRG1 IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632B IOC1
+Captain Commando* (USA 910928)                          91635B-2   CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+Captain Commando* (Japan 911202)                        91634B-2   CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+Knights of the Round* (World / USA)               1991  91635B-2   KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+  (alt B-board revision - Japan)                        ?          KR29B?           ?     ?          CPS-B-21  DL-0921-10014
+Street Fighter II' Champion Edition (World /USA)  1992  91635B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+  (alt B-board revision - Japan)                        91634B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Capcom World 2* (Japan)                           1992  89625B-1   Q522B            LWIO  92641C-6   CPS-B-21  DL-0921-10014        IOC1
+Varth* (World)                                    1992  89624B-3   VA24B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
+  (alt B-board revision - USA)                          91635B-2   VA63B     BPRG1  IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
+  (alt B-board revision - Japan)                        88622B-3   VA22B            LWIO  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Quiz & Dragons* (USA)                             1992  89625B-1   QD22B            IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+  (alt B-board revision - Japan)                  1994  ?          ?                IOB1  ?          CPS-B-21  DL-0921-10014
+Warriors of Fate* (USA)                           1992  91635B-2   TK263B    BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Street Fighter II' Hyper Fighting (World / USA)   1992  91635B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+  (alt B-board revision - Japan)                        91634B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Cadillacs and Dinosaurs (World / USA)             1993  91635B-2   CD63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+The Punisher* (World / USA)                       1993  91635B-2   PS63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Saturday Night Slam Masters* (USA)                1993  91635B-2   MB63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Muscle Bomber Duo*                                1993  ?          ?                ?     92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Ken Sei Mogura (Japan)                            1994  ?          ?                ?     ?          ?         ?
+Pnickies (Japan)                                  1994  89625B-1   PKB10B           IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Quiz Tonosama no Yabou 2 (Japan)                  1995  90629B-3   ?                IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Pang! 3 (Euro / Japan)                            1995  94916-10   CP1B1F,CP1B8K,CP1B9KA  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Mega Man / Rockman (Asia / Japan)                 1995  91634B-2   RCM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
 
-@actually CPS-B-01, the original number was scratched out and "04" stamped over it
+@the original number (CPS-B-01) was scratched out and "04" stamped over it.
 *denotes Suicide Battery
 
 The C628/C632 PALs on some C-boards probably handle the extra inputs (6 buttons/third player).
@@ -167,7 +177,7 @@ Following example strider
             bits 14-15 seem to be unused
                 ghouls sets bits 15 in service mode when you press button 2 in
                 the input test, with no apparent effect on the pcb.
-                qtono2 sets them both at the game over screen.
+                qtono2j sets them both at the game over screen.
             bits 6-13 (4 groups of 2 bits) select layer draw order
             bits 1-5 enable the three tilemap layers and the two starfield
                 layers (the bit order changes from game to game).
@@ -1087,8 +1097,8 @@ static const struct gfx_range mapper_qadj_table[] =
 };
 
 
-#define mapper_qtono2	{ 0x8000, 0x8000, 0, 0 }, mapper_qtono2_table
-static const struct gfx_range mapper_qtono2_table[] =
+#define mapper_qtono2j	{ 0x8000, 0x8000, 0, 0 }, mapper_qtono2j_table
+static const struct gfx_range mapper_qtono2j_table[] =
 {
 	/* type                              start   end     bank */
 	{ GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
@@ -1118,8 +1128,8 @@ static const struct gfx_range mapper_RCM63B_table[] =
 };
 
 
-#define mapper_pnickj	{ 0x8000, 0, 0, 0 }, mapper_pnickj_table
-static const struct gfx_range mapper_pnickj_table[] =
+#define mapper_PKB10B	{ 0x8000, 0, 0, 0 }, mapper_PKB10B_table
+static const struct gfx_range mapper_PKB10B_table[] =
 {
 	/* type                              start   end     bank */
 	{ GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
@@ -1173,155 +1183,155 @@ static const struct gfx_range mapper_cps2_table[] =
 
 static const struct CPS1config cps1_config_table[]=
 {
-	/* name       CPSB         gfx mapper   in2  in3  out2   kludge */
-	{"forgottn", CPS_B_01,     mapper_LW621 },
-	{"forgottnu",CPS_B_01,     mapper_LWCHR },
-	{"lostwrld", CPS_B_01,     mapper_LWCHR },
-	{"lostwrldo",CPS_B_01,     mapper_LWCHR },
-	{"ghouls",   CPS_B_01,     mapper_DM620 },
-	{"ghoulsu",  CPS_B_01,     mapper_DM620 },
-	{"daimakai", CPS_B_01,     mapper_DM22A },	// equivalent to DM620
-	{"daimakair",CPS_B_21_DEF, mapper_DAM63B },	// equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
-	{"strider",  CPS_B_01,     mapper_ST24M1 },
-	{"striderua",CPS_B_01,     mapper_ST24M1 },
-	{"striderj", CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
-	{"striderjr",CPS_B_01,     mapper_ST24M1 },
-	{"dynwar",   CPS_B_02,     mapper_TK22B },
-	{"dynwaru",  CPS_B_02,     mapper_TK22B },
-	{"dynwarj",  CPS_B_02,     mapper_TK22B },
-	{"willow",   CPS_B_03,     mapper_WL24B },
-	{"willowj",  CPS_B_03,     mapper_WL24B },
-	{"willowje", CPS_B_03,     mapper_WL24B },
-	{"ffight",   CPS_B_04,     mapper_S224B },
-	{"ffightu",  CPS_B_04,     mapper_S224B },
-	{"ffightua", CPS_B_01,     mapper_S224B },
-	{"ffightub", CPS_B_05,     mapper_S224B },
-	{"ffightj",  CPS_B_04,     mapper_S224B },
-	{"ffightj1", CPS_B_02,     mapper_S224B },
-	{"ffightj2", CPS_B_01,     mapper_S224B },
-	{"ffightjh", CPS_B_01,     mapper_S224B },
-	{"1941",     CPS_B_05,     mapper_YI24B },
-	{"1941j",    CPS_B_05,     mapper_YI24B },
-	{"unsquad",  CPS_B_11,     mapper_AR24B },	/* CPSB ID not checked, but it's the same as sf2eg */
-	{"area88",   CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
-	{"mercs",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
-	{"mercsu",   CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
-	{"mercsua",  CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
-	{"mercsj",   CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
-	{"msword",   CPS_B_13,     mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
-	{"mswordr1", CPS_B_13,     mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
-	{"mswordu",  CPS_B_13,     mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
-	{"mswordj",  CPS_B_13,     mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
-	{"mtwins",   CPS_B_14,     mapper_CK24B },
-	{"chikij",   CPS_B_14,     mapper_CK24B },
-	{"nemo",     CPS_B_15,     mapper_NM24B },
-	{"nemoj",    CPS_B_15,     mapper_NM24B },
-	{"cawing",   CPS_B_16,     mapper_CA24B },
-	{"cawingr1", CPS_B_16,     mapper_CA24B },
-	{"cawingu",  CPS_B_16,     mapper_CA24B },
-	{"cawingj",  CPS_B_16,     mapper_CA22B },	// equivalent to CA24B
-	{"sf2",      CPS_B_11,     mapper_STF29,  0x36 },
-	{"sf2eb",    CPS_B_17,     mapper_STF29,  0x36 },
-	{"sf2ebbl",  CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
-	{"sf2ua",    CPS_B_17,     mapper_STF29,  0x36 },
-	{"sf2ub",    CPS_B_17,     mapper_STF29,  0x36 },
-	{"sf2ud",    CPS_B_05,     mapper_STF29,  0x36 },
-	{"sf2ue",    CPS_B_18,     mapper_STF29,  0x3c },
-	{"sf2uf",    CPS_B_15,     mapper_STF29,  0x36 },
-	{"sf2ui",    CPS_B_14,     mapper_STF29,  0x36 },
-	{"sf2uk",    CPS_B_17,     mapper_STF29,  0x36 }, // check CPS_B
-	{"sf2j",     CPS_B_13,     mapper_STF29,  0x36 },
-	{"sf2ja",    CPS_B_17,     mapper_STF29,  0x36 },
-	{"sf2jc",    CPS_B_12,     mapper_STF29,  0x36 },
-	{"sf2qp1",   CPS_B_17,     mapper_STF29,  0x36 },
-	{"sf2thndr", CPS_B_17,     mapper_STF29,  0x36 },
+	/* name        CPSB          gfx mapper   in2  in3  out2   kludge */
+	{"forgottn",   CPS_B_01,     mapper_LW621 },
+	{"forgottnu",  CPS_B_01,     mapper_LWCHR },
+	{"lostwrld",   CPS_B_01,     mapper_LWCHR },
+	{"lostwrldo",  CPS_B_01,     mapper_LWCHR },
+	{"ghouls",     CPS_B_01,     mapper_DM620 },
+	{"ghoulsu",    CPS_B_01,     mapper_DM620 },
+	{"daimakai",   CPS_B_01,     mapper_DM22A },	// equivalent to DM620
+	{"daimakair",  CPS_B_21_DEF, mapper_DAM63B },	// equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
+	{"strider",    CPS_B_01,     mapper_ST24M1 },
+	{"striderua",  CPS_B_01,     mapper_ST24M1 },	// wrong, this set uses ST24B2, still non dumped
+	{"striderj",   CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
+	{"striderjr",  CPS_B_01,     mapper_ST24M1 },	// wrong, PAL used could be STH63B, check CPS_B
+	{"dynwar",     CPS_B_02,     mapper_TK22B },	// wrong, this set uses TK24B1, dumped but equations still not added
+	{"dynwaru",    CPS_B_02,     mapper_TK22B },
+	{"dynwarj",    CPS_B_02,     mapper_TK22B },
+	{"willow",     CPS_B_03,     mapper_WL24B },
+	{"willowj",    CPS_B_03,     mapper_WL24B },	// wrong, this set uses WL22B, still non dumped
+	{"willowje",   CPS_B_03,     mapper_WL24B },
+	{"ffight",     CPS_B_04,     mapper_S224B },
+	{"ffightu",    CPS_B_04,     mapper_S224B },
+	{"ffightua",   CPS_B_01,     mapper_S224B },
+	{"ffightub",   CPS_B_05,     mapper_S224B },
+	{"ffightj",    CPS_B_04,     mapper_S224B },	// wrong, this set uses S222B, still non dumped
+	{"ffightj1",   CPS_B_01,     mapper_S224B },	// wrong, this set uses S222B, still non dumped
+	{"ffightj2",   CPS_B_02,     mapper_S224B },	// wrong, this set uses S222B, still non dumped
+	{"ffightjh",   CPS_B_01,     mapper_S224B },	// wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
+	{"1941",       CPS_B_05,     mapper_YI24B },
+	{"1941j",      CPS_B_05,     mapper_YI24B },	// PAL used could be YI22B
+	{"unsquad",    CPS_B_11,     mapper_AR24B },
+	{"area88",     CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
+	{"mercs",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
+	{"mercsu",     CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
+	{"mercsua",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
+	{"mercsj",     CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },	// wrong, this set uses O222B, still non dumped
+	{"msword",     CPS_B_13,     mapper_MS24B },
+	{"mswordr1",   CPS_B_13,     mapper_MS24B },
+	{"mswordu",    CPS_B_13,     mapper_MS24B },
+	{"mswordj",    CPS_B_13,     mapper_MS24B },	// wrong, this set uses MS22B, still non dumped
+	{"mtwins",     CPS_B_14,     mapper_CK24B },
+	{"chikij",     CPS_B_14,     mapper_CK24B },	// PAL used could be CK22B
+	{"nemo",       CPS_B_15,     mapper_NM24B },
+	{"nemoj",      CPS_B_15,     mapper_NM24B },	// wrong, this set uses NM22B, still non dumped
+	{"cawing",     CPS_B_16,     mapper_CA24B },
+	{"cawingr1",   CPS_B_16,     mapper_CA24B },
+	{"cawingu",    CPS_B_16,     mapper_CA24B },
+	{"cawingj",    CPS_B_16,     mapper_CA22B },	// equivalent to CA24B
+	{"sf2",        CPS_B_11,     mapper_STF29,  0x36 },
+	{"sf2eb",      CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2ebbl",    CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
+	{"sf2ua",      CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2ub",      CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2ud",      CPS_B_05,     mapper_STF29,  0x36 },
+	{"sf2ue",      CPS_B_18,     mapper_STF29,  0x3c },
+	{"sf2uf",      CPS_B_15,     mapper_STF29,  0x36 },
+	{"sf2ui",      CPS_B_14,     mapper_STF29,  0x36 },
+	{"sf2uk",      CPS_B_17,     mapper_STF29,  0x36 },	// check CPS_B
+	{"sf2j",       CPS_B_13,     mapper_STF29,  0x36 },
+	{"sf2ja",      CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2jc",      CPS_B_12,     mapper_STF29,  0x36 },
+	{"sf2qp1",     CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2thndr",   CPS_B_17,     mapper_STF29,  0x36 },
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
-	{"3wonders", CPS_B_21_BT1, mapper_RT24B },
-	{"3wondersu",CPS_B_21_BT1, mapper_RT24B },
-	{"wonder3",  CPS_B_21_BT1, mapper_RT22B },	// equivalent to RT24B
-	{"3wondersh",CPS_B_02    , mapper_RT24B },	/* Not 100% sure of the CPS B-ID */
-	{"kod",      CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
-	{"kodu",     CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
-	{"kodj",     CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
-	{"kodb",     CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },	/* bootleg, doesn't use multiply protection */
-	{"captcomm", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"3wonders",   CPS_B_21_BT1, mapper_RT24B },
+	{"3wondersu",  CPS_B_21_BT1, mapper_RT24B },
+	{"wonder3",    CPS_B_21_BT1, mapper_RT22B },	// equivalent to RT24B
+	{"3wondersh",  CPS_B_02    , mapper_RT24B },	/* Not 100% sure of the CPS B-ID */
+	{"kod",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
+	{"kodu",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
+	{"kodj",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
+	{"kodb",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },	/* bootleg, doesn't use multiply protection */
+	{"captcomm",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommr1", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
-	{"captcommu",CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
-	{"captcommj",CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
-	{"captcommb",CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
-	{"knights",  CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
-	{"knightsu", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
-	{"knightsj", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
-	{"knightsb", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
-	{"sf2ce",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2ceua",  CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2ceub",  CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2ceuc",  CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2cej",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2rb",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2rb2",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2rb3",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2red",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2v004",  CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2acc",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2accp2", CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2dkot2", CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2m1",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2m2",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m3",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2m4",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m5",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m6",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m7",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2yyc",   CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2koryu", CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2mdt",   CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"varth",    CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
-	{"varthr1",  CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
-	{"varthu",   CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
-	{"varthj",   CPS_B_21_BT5, mapper_VA22B },	/* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
-	{"cworld2j", CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },	/* (ports 36, 34 probably leftover input code from another game) */
-	{"wof",      CPS_B_21_DEF, mapper_TK263B },	/* bootleg? */
-	{"wofa",     CPS_B_21_DEF, mapper_TK263B },	/* bootleg? */
-	{"wofu",     CPS_B_21_QS1, mapper_TK263B },
-	{"wofj",     CPS_B_21_QS1, mapper_TK263B },
-	{"wofhfh",   CPS_B_21_DEF, mapper_TK263B, 0x36 }, /* Chinese bootleg */
-	{"dino",     CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
-	{"dinou",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
-	{"dinoj",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
-	{"dinopic",  CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
-	{"dinopic2", CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
-	{"dinohunt", CPS_B_21_DEF, mapper_CD63B },	/* Chinese bootleg */
-	{"punisher", CPS_B_21_QS3, mapper_PS63B },
-	{"punisheru",CPS_B_21_QS3, mapper_PS63B },
-	{"punisherj",CPS_B_21_QS3, mapper_PS63B },
-	{"punipic",  CPS_B_21_QS3, mapper_PS63B },
-	{"punipic2", CPS_B_21_QS3, mapper_PS63B },
-	{"punipic3", CPS_B_21_QS3, mapper_PS63B },
+	{"captcommu",  CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"captcommj",  CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"captcommb",  CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"knights",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
+	{"knightsu",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
+	{"knightsj",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// PAL could be different if B-Board is 90629B
+	{"knightsb",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// wrong, knightsb bootleg doesn't use the KR63B PAL
+	{"sf2ce",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2ceua",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2ceub",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2ceuc",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2cej",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2rb",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2rb2",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2rb3",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2red",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2v004",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2acc",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2accp2",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2dkot2",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2m1",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2m2",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2m3",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2m4",      HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2m5",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2m6",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2m7",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2yyc",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2koryu",   CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2mdt",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"varth",      CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */	// wrong, this set uses VA24B, still non dumped
+	{"varthr1",    CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */	// wrong, this set uses VA24B, still non dumped
+	{"varthu",     CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
+	{"varthj",     CPS_B_21_BT5, mapper_VA22B },	/* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
+	{"cworld2j",   CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },	/* (ports 36, 34 probably leftover input code from another game) */
+	{"wof",        CPS_B_21_DEF, mapper_TK263B },
+	{"wofa",       CPS_B_21_DEF, mapper_TK263B },
+	{"wofu",       CPS_B_21_QS1, mapper_TK263B },
+	{"wofj",       CPS_B_21_QS1, mapper_TK263B },
+	{"wofhfb",     CPS_B_21_DEF, mapper_TK263B, 0x36 },	/* Chinese bootleg */
+	{"dino",       CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinou",      CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinoj",      CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinopic",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinopic2",   CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinohunt",   CPS_B_21_DEF, mapper_CD63B },	/* Chinese bootleg */
+	{"punisher",   CPS_B_21_QS3, mapper_PS63B },
+	{"punisheru",  CPS_B_21_QS3, mapper_PS63B },
+	{"punisherj",  CPS_B_21_QS3, mapper_PS63B },
+	{"punipic",    CPS_B_21_QS3, mapper_PS63B },
+	{"punipic2",   CPS_B_21_QS3, mapper_PS63B },
+	{"punipic3",   CPS_B_21_QS3, mapper_PS63B },
 	{"punisherbz", CPS_B_21_DEF, mapper_PS63B },	/* Chinese bootleg */
-	{"slammast", CPS_B_21_QS4, mapper_MB63B },
-	{"slammastu",CPS_B_21_QS4, mapper_MB63B },
-	{"mbomberj", CPS_B_21_QS4, mapper_MB63B },
-	{"mbombrd",  CPS_B_21_QS5, mapper_MB63B },
-	{"mbombrdj", CPS_B_21_QS5, mapper_MB63B },
-	{"sf2hf",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2hfu",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2tj",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"qad",      CPS_B_21_BT7, mapper_QD22B,  0x36 },	/* TODO: layer enable (port 36 probably leftover input code from another game) */
-	{"qadj",     CPS_B_21_DEF, mapper_qadj,   0x36, 0x38, 0x34 },	/* (ports 36, 38, 34 probably leftover input code from another game) */
-	{"qtono2",   CPS_B_21_DEF, mapper_qtono2, 0x36, 0x38, 0x34 },	/* (ports 36, 38, 34 probably leftover input code from another game) */
-	{"megaman",  CPS_B_21_DEF, mapper_RCM63B },
-	{"rockmanj", CPS_B_21_DEF, mapper_RCM63B },
-	{"pnickj",   CPS_B_21_DEF, mapper_pnickj },
-	{"pang3",    CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
-	{"pang3n",   CPS_B_21_DEF, mapper_pang3 },	/* ^^ */
-	{"pang3j",   CPS_B_21_DEF, mapper_pang3 },	/* ^^ */
+	{"slammast",   CPS_B_21_QS4, mapper_MB63B },
+	{"slammastu",  CPS_B_21_QS4, mapper_MB63B },
+	{"mbomberj",   CPS_B_21_QS4, mapper_MB63B },
+	{"mbombrd",    CPS_B_21_QS5, mapper_MB63B },
+	{"mbombrdj",   CPS_B_21_QS5, mapper_MB63B },
+	{"sf2hf",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2hfu",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2hfj",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"qad",        CPS_B_21_BT7, mapper_QD22B,  0x36 },	/* TODO: layer enable (port 36 probably leftover input code from another game) */
+	{"qadj",       CPS_B_21_DEF, mapper_qadj,   0x36, 0x38, 0x34 },	/* (ports 36, 38, 34 probably leftover input code from another game) */
+	{"qtono2j",    CPS_B_21_DEF, mapper_qtono2j,0x36, 0x38, 0x34 },	/* (ports 36, 38, 34 probably leftover input code from another game) */
+	{"megaman",    CPS_B_21_DEF, mapper_RCM63B },
+	{"rockmanj",   CPS_B_21_DEF, mapper_RCM63B },
+	{"pnickj",     CPS_B_21_DEF, mapper_PKB10B },
+	{"pang3",      CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9KA still not dumped
+	{"pang3n",     CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9KA still not dumped
+	{"pang3j",     CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9KA still not dumped
 	#ifdef MESS
-	{"sfzch",    CPS_B_21_DEF, mapper_sfzch },
+	{"sfzch",      CPS_B_21_DEF, mapper_sfzch },	// not an arcade game and no more in MAME, should not be removed?
 	#endif
 
     /* CPS2 games */
-	{"cps2",     CPS_B_21_DEF, mapper_cps2 },
+	{"cps2",       CPS_B_21_DEF, mapper_cps2 },
 
 	{0}		/* End of table */
 };
