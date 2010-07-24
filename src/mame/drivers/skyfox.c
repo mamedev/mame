@@ -244,11 +244,11 @@ static MACHINE_DRIVER_START( skyfox )
 	MDRV_DRIVER_DATA(skyfox_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* Verified at 4MHz */
 	MDRV_CPU_PROGRAM_MAP(skyfox_map)
 	MDRV_CPU_VBLANK_INT("screen", skyfox_interrupt)		/* NMI caused by coin insertion */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 1748000)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/8) /* Verified at 1.789772MHz */
 	MDRV_CPU_PROGRAM_MAP(skyfox_sound_map)
 
 	MDRV_MACHINE_START(skyfox)
@@ -256,7 +256,7 @@ static MACHINE_DRIVER_START( skyfox )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(62.65)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
@@ -271,10 +271,10 @@ static MACHINE_DRIVER_START( skyfox )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1748000)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_14_31818MHz/8) /* Verified at 1.789772MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 1748000)
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_14_31818MHz/8) /* Verified at 1.789772MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -344,9 +344,14 @@ Notes  -  This archive is of a bootleg copy,
        -  Although the colour PROMs have the same checksums,
           they are not the same.
 
-Main processor  - Z80  4MHz
-Sound processor - Z80  1.748MHz
-                - YM2203C x2
+Main processor  - Z80 @ 4MHz (8MHz OSC / 2)
+Sound processor - Z80 @ 1.789772MHz (14.31818MHz OSC / 8)
+                - YM2203C x2 @ 1.789772MHzMHz (14.31818MHz OSC / 8)
+
+Vsync: 62.65hz
+
+  CPU board: Jaleco made in japan ER-8736
+Video Board: Jaleco made in japan ER-8737
 
 ***************************************************************************/
 
