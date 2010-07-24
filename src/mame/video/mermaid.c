@@ -121,11 +121,11 @@ READ8_HANDLER( mermaid_collision_r )
 	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
 	int collision = 0xff;
 
-	if (state->coll_bit0) collision &= 0xfe;
-	if (state->coll_bit1) collision &= 0xfd;
-	if (state->coll_bit2) collision &= 0xfb;
-	if (state->coll_bit3) collision &= 0xf7;
-	if (state->coll_bit6) collision &= 0xbf;
+	if (state->coll_bit0) collision ^= 0x01;
+	if (state->coll_bit1) collision ^= 0x02;
+	if (state->coll_bit2) collision ^= 0x04;
+	if (state->coll_bit3) collision ^= 0x08;
+	if (state->coll_bit6) collision ^= 0x40;
 
 	return collision;
 }
@@ -229,11 +229,11 @@ static UINT8 collision_check( running_machine *machine, rectangle* rect )
 	for (y = rect->min_y; y <= rect->max_y; y++)
 		for (x = rect->min_x; x <= rect->max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper, y, x));
-			UINT16 b = colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper2, y, x));
+			UINT16 a = colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper, y, x)) & 0x3f;
+			UINT16 b = colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper2, y, x)) & 0x3f;
 
-			if (b != 0)
-				if ((a != 0) & (a != 0x40))
+			if (b)
+				if (a)
 					data |= 0x01;
 		}
 
@@ -248,11 +248,11 @@ VIDEO_EOF( mermaid )
 
 	int offs, offs2;
 
+	state->coll_bit0 = 0;
 	state->coll_bit1 = 0;
 	state->coll_bit2 = 0;
 	state->coll_bit3 = 0;
 	state->coll_bit6 = 0;
-	state->coll_bit0 = 0;
 
 	// check for bit 0 (sprite-sprite), 1 (sprite-foreground), 2 (sprite-background)
 
