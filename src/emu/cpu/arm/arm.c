@@ -619,7 +619,16 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 			}
 			else
 			{
-				SetRegister(cpustate, rd,READ32(rnv));
+				UINT32 data = READ32(rnv);
+
+				if ( cpustate->endian == ENDIANNESS_BIG )
+				{
+					if ( rnv & 0x02 )
+						data = ( data >> 16 ) | ( data << 16 );
+					if ( rnv & 0x01 )
+						data = ( data >> 24 ) | ( data << 8 );
+				}
+				SetRegister(cpustate, rd, data);
 			}
 		}
 	}
