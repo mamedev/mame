@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Ms.Pac-Man/Galaga - 20 Year Reunion hardware
+    Ms.Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion
 
     driver by Nicola Salmoria
 
@@ -34,6 +34,11 @@
         * Is the clock divide 3 or 4?
 
     Versions known to exist but not dumped: v1.0 & v1.03
+
+    Pacman 25th Anniversary is a program update giving Pacman it's own start button
+        instead of using the above mentioned "joystick maneuver"
+
+    Versions known to exist but not dumped: v2.0
 
 ***************************************************************************/
 
@@ -380,7 +385,7 @@ static DRIVER_INIT(20pacgal)
  *
  *************************************/
 
-GAME( 2000, 20pacgal,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20 Year Reunion (V1.08)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20 Year Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr2, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20 Year Reunion (V1.02)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr1, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20 Year Reunion (V1.01)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, 20pacgal,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr2, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.02)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr1, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.01)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
