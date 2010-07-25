@@ -10,17 +10,17 @@ Self Test has two parts:
 - CPU0 manages sprites, which are also used to display text
         irq (0x10) - timing/watchdog
         irq (0x30) - processes sprites
-        nmi: wakes up this cpu
+        nmi: wakes up this CPU
 
 - CPU1 manages the protection device, palette, and tilemap(s)
-        nmi: resets this cpu
+        nmi: resets this CPU
         irq: game update
 
 - CPU2 manages sound chips
         irq: update music
         nmi: handle sound command
 
-- The "BEAST" protection device has access to dipswitches and player inputs.
+- The "BEAST" protection device has access to DIP switches and player inputs.
 
 
 PCB Layout
@@ -49,8 +49,8 @@ BS
 |----------------------------------------------|
 
 Notes:
-      D780C-2 - Z80 CPU. clock 6.000MHz [12/2] (for all 3 Z80 CPUs)
-      BEAST   - DIP40 Microcontroller, 8xxx series (8041/8042/8051 etc).
+      D780C-2 - Z80 CPU. Clock 6.000MHz [12/2] (for all 3 Z80 CPUs)
+      BEAST   - OKI MSM80C51F microcontroller
                      Clock 6.000MHz on pins 18 & 19
                 chip is stamped 'KANEKO Beast (C)Intel '80 (C)KANEKO 1988'
       YM2203  - Yamaha YM2203, clock 3.000MHz [12/4]
@@ -135,8 +135,6 @@ Notes:
                 |SPEAKER     STEREO                       OFF|
                 |OUTPUT      MONO                          ON|
                 |--------------------------------------------|
-
-	To do: Finish verifying the Beast internal ROM and remove BAD_DUMP flag
 */
 
 #include "emu.h"
@@ -654,8 +652,8 @@ ROM_START( djboy )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x1000, "beast", 0 ) /* MSM80C51F microcontroller */
-	ROM_LOAD( "beast.9s", 0x00000, 0x1000, BAD_DUMP CRC(6e889917) SHA1(ff4c483b4876f7976e671bb8e6f3da537be6e099) )
+	ROM_REGION( 0x1000, "beast", 0 )
+	ROM_LOAD( "beast.9s", 0x00000, 0x1000, CRC(ebe0f5f3) SHA1(6081343c9b4510c4c16b71f6340266a1f76170ac) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
@@ -690,8 +688,8 @@ ROM_START( djboya )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x1000, "beast", 0 ) /* MSM80C51F microcontroller*/
-	ROM_LOAD( "beast.9s", 0x00000, 0x1000, BAD_DUMP CRC(6e889917) SHA1(ff4c483b4876f7976e671bb8e6f3da537be6e099) )
+	ROM_REGION( 0x1000, "beast", 0 )
+	ROM_LOAD( "beast.9s", 0x00000, 0x1000, CRC(ebe0f5f3) SHA1(6081343c9b4510c4c16b71f6340266a1f76170ac) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
@@ -726,8 +724,8 @@ ROM_START( djboyj )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x1000, "beast", 0 ) /* MSM80C51F microcontroller */
-	ROM_LOAD( "beast.9s", 0x00000, 0x1000, BAD_DUMP CRC(6e889917) SHA1(ff4c483b4876f7976e671bb8e6f3da537be6e099) )
+	ROM_REGION( 0x1000, "beast", 0 )
+	ROM_LOAD( "beast.9s", 0x00000, 0x1000, CRC(ebe0f5f3) SHA1(6081343c9b4510c4c16b71f6340266a1f76170ac) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
 	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
