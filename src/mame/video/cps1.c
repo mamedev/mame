@@ -1185,6 +1185,7 @@ static const struct CPS1config cps1_config_table[]=
 {
 	/* name        CPSB          gfx mapper   in2  in3  out2   kludge */
 	{"forgottn",   CPS_B_01,     mapper_LW621 },
+	{"forgottnua", CPS_B_01,     mapper_LW621 },
 	{"forgottnu",  CPS_B_01,     mapper_LWCHR },
 	{"lostwrld",   CPS_B_01,     mapper_LWCHR },
 	{"lostwrldo",  CPS_B_01,     mapper_LWCHR },

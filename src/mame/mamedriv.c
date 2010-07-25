@@ -2650,6 +2650,7 @@ V-V                           TP-027
 	/* Capcom CPS1 games */
 	DRIVER( forgottn )	/*  7/1988 (c) 1988 (World) */
 	DRIVER( forgottnu )	/*  7/1988 (c) 1988 (US) */
+	DRIVER( forgottnua )	/*  7/1988 (c) 1988 (US) */
 	DRIVER( lostwrld )	/*  7/1988 (c) 1988 (Japan) */
 	DRIVER( lostwrldo )	/*  7/1988 (c) 1988 (Japan) */
 	DRIVER( ghouls )	/* 12/1988 (c) 1988 (World) */
