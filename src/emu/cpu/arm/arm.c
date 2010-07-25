@@ -20,6 +20,7 @@
 #include "arm.h"
 
 CPU_DISASSEMBLE( arm );
+CPU_DISASSEMBLE( arm_be );
 
 #define READ8(addr)			cpu_read8(cpustate,addr)
 #define WRITE8(addr,data)	cpu_write8(cpustate,addr,data)
@@ -254,25 +255,36 @@ static void arm_check_irq_state(ARM_REGS* cpustate);
 INLINE ARM_REGS *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == ARM);
+	assert(device->type() == ARM || device->type() == ARM_BE);
 	return (ARM_REGS *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void cpu_write32( ARM_REGS* cpustate, int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
-	memory_write_dword_32le(cpustate->program, addr&ADDRESS_MASK,data);
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		memory_write_dword_32be(cpustate->program, addr&ADDRESS_MASK,data);
+	else
+		memory_write_dword_32le(cpustate->program, addr&ADDRESS_MASK,data);
 	if (ARM_DEBUG_CORE && addr&3) logerror("%08x: Unaligned write %08x\n",R15,addr);
 }
 
 INLINE void cpu_write8( ARM_REGS* cpustate, int addr, UINT8 data )
 {
-	memory_write_byte_32le(cpustate->program,addr,data);
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		memory_write_byte_32be(cpustate->program,addr,data);
+	else
+		memory_write_byte_32le(cpustate->program,addr,data);
 }
 
 INLINE UINT32 cpu_read32( ARM_REGS* cpustate, int addr )
 {
-	UINT32 result = memory_read_dword_32le(cpustate->program,addr&ADDRESS_MASK);
+	UINT32 result;
+
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		result = memory_read_dword_32be(cpustate->program,addr&ADDRESS_MASK);
+	else
+		result = memory_read_dword_32le(cpustate->program,addr&ADDRESS_MASK);
 
 	/* Unaligned reads rotate the word, they never combine words */
 	if (addr&3) {
@@ -292,7 +304,10 @@ INLINE UINT32 cpu_read32( ARM_REGS* cpustate, int addr )
 
 INLINE UINT8 cpu_read8( ARM_REGS* cpustate, int addr )
 {
-	return memory_read_byte_32le(cpustate->program, addr);
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		return memory_read_byte_32be(cpustate->program, addr);
+	else
+		return memory_read_byte_32le(cpustate->program, addr);
 }
 
 INLINE UINT32 GetRegister( ARM_REGS* cpustate, int rIndex )
@@ -312,8 +327,11 @@ static CPU_RESET( arm )
 	ARM_REGS *cpustate = get_safe_token(device);
 
 	device_irq_callback save_irqcallback = cpustate->irq_callback;
+	endianness_t save_endian = cpustate->endian;
+
 	memset(cpustate, 0, sizeof(ARM_REGS));
 	cpustate->irq_callback = save_irqcallback;
+	cpustate->endian = save_endian;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 
@@ -507,6 +525,24 @@ static CPU_INIT( arm )
 	state_save_register_device_item(device, 0, cpustate->endian);
 }
 
+
+static CPU_INIT( arm_be )
+{
+	ARM_REGS *cpustate = get_safe_token(device);
+
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->endian = ENDIANNESS_BIG;
+
+	state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
+	state_save_register_device_item_array(device, 0, cpustate->coproRegister);
+	state_save_register_device_item(device, 0, cpustate->pendingIrq);
+	state_save_register_device_item(device, 0, cpustate->pendingFiq);
+	state_save_register_device_item(device, 0, cpustate->endian);
+}
+
+
 /***************************************************************************/
 
 static void HandleBranch( ARM_REGS* cpustate, UINT32 insn )
@@ -596,7 +632,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		{
 			if (ARM_DEBUG_CORE && rd == eR15)
 				logerror("read byte R15 %08x\n", R15);
-			SetRegister(cpustate, rd,(UINT32) READ8( ( cpustate->endian == ENDIANNESS_LITTLE ? rnv : (rnv ^ 0x03) ) ) );
+			SetRegister(cpustate, rd,(UINT32) READ8(rnv) );
 		}
 		else
 		{
@@ -619,16 +655,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 			}
 			else
 			{
-				UINT32 data = READ32(rnv);
-
-				if ( cpustate->endian == ENDIANNESS_BIG )
-				{
-					if ( rnv & 0x02 )
-						data = ( data >> 16 ) | ( data << 16 );
-					if ( rnv & 0x01 )
-						data = ( data >> 24 ) | ( data << 8 );
-				}
-				SetRegister(cpustate, rd, data);
+				SetRegister(cpustate, rd, READ32(rnv));
 			}
 		}
 	}
@@ -641,7 +668,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 			if (ARM_DEBUG_CORE && rd==eR15)
 				logerror("Wrote R15 in byte mode\n");
 
-			WRITE8( ( cpustate->endian == ENDIANNESS_LITTLE ? rnv : (rnv ^ 0x03) ), (UINT8) GetRegister(cpustate, rd) & 0xffu);
+			WRITE8(rnv, (UINT8) GetRegister(cpustate, rd) & 0xffu);
 		}
 		else
 		{
@@ -1388,13 +1415,6 @@ static void HandleCoPro( ARM_REGS* cpustate, UINT32 insn )
 }
 
 
-void arm_set_endianness( legacy_cpu_device *device, endianness_t endianness )
-{
-	ARM_REGS *cpustate = get_safe_token(device);
-
-	cpustate->endian = endianness;
-}
-
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
@@ -1587,4 +1607,26 @@ CPU_GET_INFO( arm )
 	}
 }
 
+
+CPU_GET_INFO( arm_be )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(arm_be);					break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(arm_be);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+        case DEVINFO_STR_NAME:							strcpy(info->s, "ARM (big endian)");				break;
+
+		default:										CPU_GET_INFO_CALL(arm);								break;
+	}
+}
+
+
 DEFINE_LEGACY_CPU_DEVICE(ARM, arm);
+DEFINE_LEGACY_CPU_DEVICE(ARM_BE, arm_be);
+

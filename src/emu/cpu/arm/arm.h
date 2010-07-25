@@ -15,6 +15,7 @@
  ***************************************************************************************************/
 
 DECLARE_LEGACY_CPU_DEVICE(ARM, arm);
+DECLARE_LEGACY_CPU_DEVICE(ARM_BE, arm_be);
 
 enum
 {
@@ -24,7 +25,5 @@ enum
 	ARM32_FR8, ARM32_FR9, ARM32_FR10, ARM32_FR11, ARM32_FR12, ARM32_FR13, ARM32_FR14,
 	ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
 };
-
-void arm_set_endianness( legacy_cpu_device *device, endianness_t endianness );
 
 #endif /* __ARM_H__ */
