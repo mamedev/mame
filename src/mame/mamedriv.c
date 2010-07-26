@@ -9654,6 +9654,7 @@ Other Sun games
 	DRIVER( showhand )	/* (c) 2000  Astro Corp. */
 	DRIVER( showhanc )	/* (c) 2000  Astro Corp. */
 	DRIVER( skilldrp )	/* (c) 2002  Astro Corp. */
+	DRIVER( speeddrp )	/* (c) 2003  Astro Corp. */
 	DRIVER( winbingo )	/* (c) 2005? Astro Corp. */
 	DRIVER( winbingoa )	/* (c) 2005? Astro Corp. */
 	DRIVER( zoo )		/* (c) 2005? Astro Corp. */
