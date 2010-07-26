@@ -143,8 +143,6 @@ static WRITE32_HANDLER( mo_command_w )
  *
  *************************************/
 
-static UINT16 last_write;
-static UINT16 last_write_offset;
 
 static WRITE32_HANDLER( atarigx2_protection_w )
 {
@@ -164,13 +162,13 @@ static WRITE32_HANDLER( atarigx2_protection_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		last_write = state->protection_base[offset] >> 16;
-		last_write_offset = offset*2;
+		state->last_write = state->protection_base[offset] >> 16;
+		state->last_write_offset = offset*2;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		last_write = state->protection_base[offset] & 0xffff;
-		last_write_offset = offset*2+1;
+		state->last_write = state->protection_base[offset] & 0xffff;
+		state->last_write_offset = offset*2+1;
 	}
 }
 
@@ -1112,7 +1110,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 		result |= 0x80000000;
 	if (offset == 0x3f0)
 	{
-		UINT32 tag = (last_write_offset << 17) | last_write;
+		UINT32 tag = (state->last_write_offset << 17) | state->last_write;
 		int i = 0;
 
 		while (lookup_table[i][0] != 0xffffffff)
@@ -1127,7 +1125,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 
 		if (lookup_table[i][0] == 0xffffffff)
 		{
-			if (last_write_offset*2 >= 0x700 && last_write_offset*2 < 0x720)
+			if (state->last_write_offset*2 >= 0x700 && state->last_write_offset*2 < 0x720)
 				result = mame_rand(space->machine) << 16;
 			else
 				result = 0xffff << 16;

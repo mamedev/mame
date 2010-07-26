@@ -105,24 +105,6 @@
 
 
 
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static UINT32 *	ram_base;
-static UINT32 *	rom_base;
-
-static double		hblank_offset;
-
-static UINT8		irq_line_state;
-static UINT8		irq_enable[3];
-static UINT8		irq_state[3];
-
-static UINT8		eeprom_enabled;
-
-
 #define MAX_SCANLINES	262
 
 
@@ -137,6 +119,7 @@ static void update_interrupts(running_machine *machine);
 
 static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
+	beathead_state *state = (beathead_state *)timer.machine->driver_data;
 	int scanline = param;
 
 	/* update the video */
@@ -152,11 +135,11 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 		scanline = 0;
 
 	/* set the scanline IRQ */
-	irq_state[2] = 1;
+	state->irq_state[2] = 1;
 	update_interrupts(timer.machine);
 
 	/* set the timer for the next one */
-	timer.adjust(double_to_attotime(attotime_to_double(timer.machine->primary_screen->time_until_pos(scanline)) - hblank_offset), scanline);
+	timer.adjust(double_to_attotime(attotime_to_double(timer.machine->primary_screen->time_until_pos(scanline)) - state->hblank_offset), scanline);
 }
 
 
@@ -177,17 +160,17 @@ static MACHINE_RESET( beathead )
 
 	/* the code is temporarily mapped at 0 at startup */
 	/* just copying the first 0x40 bytes is sufficient */
-	memcpy(ram_base, rom_base, 0x40);
+	memcpy(state->ram_base, state->rom_base, 0x40);
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
-	hblank_offset = attotime_to_double(machine->primary_screen->scan_period()) * ((455. - 336. - 25.) / 455.);
+	state->hblank_offset = attotime_to_double(machine->primary_screen->scan_period()) * ((455. - 336. - 25.) / 455.);
 	timer_device *scanline_timer = machine->device<timer_device>("scan_timer");
-	scanline_timer->adjust(double_to_attotime(attotime_to_double(machine->primary_screen->time_until_pos(0)) - hblank_offset));
+	scanline_timer->adjust(double_to_attotime(attotime_to_double(machine->primary_screen->time_until_pos(0)) - state->hblank_offset));
 
 	/* reset IRQs */
-	irq_line_state = CLEAR_LINE;
-	irq_state[0] = irq_state[1] = irq_state[2] = 0;
-	irq_enable[0] = irq_enable[1] = irq_enable[2] = 0;
+	state->irq_line_state = CLEAR_LINE;
+	state->irq_state[0] = state->irq_state[1] = state->irq_state[2] = 0;
+	state->irq_enable[0] = state->irq_enable[1] = state->irq_enable[2] = 0;
 }
 
 
@@ -200,38 +183,40 @@ static MACHINE_RESET( beathead )
 
 static void update_interrupts(running_machine *machine)
 {
+	beathead_state *state = (beathead_state *)machine->driver_data;
 	int gen_int;
 
 	/* compute the combined interrupt signal */
-	gen_int  = irq_state[0] & irq_enable[0];
-	gen_int |= irq_state[1] & irq_enable[1];
-	gen_int |= irq_state[2] & irq_enable[2];
+	gen_int  = state->irq_state[0] & state->irq_enable[0];
+	gen_int |= state->irq_state[1] & state->irq_enable[1];
+	gen_int |= state->irq_state[2] & state->irq_enable[2];
 	gen_int  = gen_int ? ASSERT_LINE : CLEAR_LINE;
 
 	/* if it's changed since the last time, call through */
-	if (irq_line_state != gen_int)
+	if (state->irq_line_state != gen_int)
 	{
-		irq_line_state = gen_int;
-//      if (irq_line_state != CLEAR_LINE)
-			cputag_set_input_line(machine, "maincpu", ASAP_IRQ0, irq_line_state);
-//      else
-//          asap_set_irq_line(ASAP_IRQ0, irq_line_state);
+		state->irq_line_state = gen_int;
+		//if (state->irq_line_state != CLEAR_LINE)
+			cputag_set_input_line(machine, "maincpu", ASAP_IRQ0, state->irq_line_state);
+		//else
+			//asap_set_irq_line(ASAP_IRQ0, state->irq_line_state);
 	}
 }
 
 
 static WRITE32_HANDLER( interrupt_control_w )
 {
+	beathead_state *state = (beathead_state *)space->machine->driver_data;
 	int irq = offset & 3;
 	int control = (offset >> 2) & 1;
 
 	/* offsets 1-3 seem to be the enable latches for the IRQs */
 	if (irq != 0)
-		irq_enable[irq - 1] = control;
+		state->irq_enable[irq - 1] = control;
 
 	/* offset 0 seems to be the interrupt ack */
 	else
-		irq_state[0] = irq_state[1] = irq_state[2] = 0;
+		state->irq_state[0] = state->irq_state[1] = state->irq_state[2] = 0;
 
 	/* update the current state */
 	update_interrupts(space->machine);
@@ -240,8 +225,10 @@ static WRITE32_HANDLER( interrupt_control_w )
 
 static READ32_HANDLER( interrupt_control_r )
 {
+	beathead_state *state = (beathead_state *)space->machine->driver_data;
+
 	/* return the enables as a bitfield */
-	return (irq_enable[0]) | (irq_enable[1] << 1) | (irq_enable[2] << 2);
+	return (state->irq_enable[0]) | (state->irq_enable[1] << 1) | (state->irq_enable[2] << 2);
 }
 
 
@@ -254,18 +241,22 @@ static READ32_HANDLER( interrupt_control_r )
 
 static WRITE32_HANDLER( eeprom_data_w )
 {
-	if (eeprom_enabled)
+	beathead_state *state = (beathead_state *)space->machine->driver_data;
+
+	if (state->eeprom_enabled)
 	{
 		mem_mask &= 0x000000ff;
 		COMBINE_DATA(space->machine->generic.nvram.u32 + offset);
-		eeprom_enabled = 0;
+		state->eeprom_enabled = 0;
 	}
 }
 
 
 static WRITE32_HANDLER( eeprom_enable_w )
 {
-	eeprom_enabled = 1;
+	beathead_state *state = (beathead_state *)space->machine->driver_data;
+
+	state->eeprom_enabled = 1;
 }
 
 
@@ -334,8 +325,8 @@ static WRITE32_HANDLER( coin_count_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(&ram_base)
-	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rom_base)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(beathead_state, ram_base)
+	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(beathead_state, rom_base)
 	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x41000000, 0x41000003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x41000100, 0x41000103) AM_READ(interrupt_control_r)

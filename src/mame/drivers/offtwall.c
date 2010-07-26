@@ -146,23 +146,24 @@ static WRITE16_HANDLER( io_latch_w )
 
 -------------------------------------------------------------------------*/
 
-static UINT16 *bankswitch_base;
-static UINT16 *bankrom_base;
-static UINT32 bank_offset;
 
 
 static READ16_HANDLER( bankswitch_r )
 {
-	/* this is the table lookup; the bank is determined by the address that was requested */
-	bank_offset = (offset & 3) * 0x1000;
-	logerror("Bankswitch index %d -> %04X\n", offset, bank_offset);
+	offtwall_state *state = (offtwall_state *)space->machine->driver_data;
 
-	return bankswitch_base[offset];
+	/* this is the table lookup; the bank is determined by the address that was requested */
+	state->bank_offset = (offset & 3) * 0x1000;
+	logerror("Bankswitch index %d -> %04X\n", offset, state->bank_offset);
+
+	return state->bankswitch_base[offset];
 }
 
 
 static READ16_HANDLER( bankrom_r )
 {
+	offtwall_state *state = (offtwall_state *)space->machine->driver_data;
+
 	/* this is the banked ROM read */
 	logerror("%06X: %04X\n", cpu_get_previouspc(space->cpu), offset);
 
@@ -178,7 +179,7 @@ static READ16_HANDLER( bankrom_r )
 			return us >> 16;
 	}
 
-	return bankrom_base[(bank_offset + offset) & 0x3fff];
+	return state->bankrom_base[(state->bank_offset + offset) & 0x3fff];
 }
 
 
@@ -200,18 +201,17 @@ static READ16_HANDLER( bankrom_r )
 
 -------------------------------------------------------------------------*/
 
-static UINT16 *spritecache_count;
-
 
 static READ16_HANDLER( spritecache_count_r )
 {
+	offtwall_state *state = (offtwall_state *)space->machine->driver_data;
 	int prevpc = cpu_get_previouspc(space->cpu);
 
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
 	{
-		UINT16 *data = &spritecache_count[-0x100];
-		int oldword = spritecache_count[0];
+		UINT16 *data = &state->spritecache_count[-0x100];
+		int oldword = state->spritecache_count[0];
 		int count = oldword >> 8;
 		int i, width = 0;
 
@@ -232,12 +232,12 @@ static READ16_HANDLER( spritecache_count_r )
 			}
 
 			/* update the final count in memory */
-			spritecache_count[0] = (count << 8) | (oldword & 0xff);
+			state->spritecache_count[0] = (count << 8) | (oldword & 0xff);
 		}
 	}
 
 	/* and then read the data */
-	return spritecache_count[offset];
+	return state->spritecache_count[offset];
 }
 
 
@@ -255,16 +255,16 @@ static READ16_HANDLER( spritecache_count_r )
 
 -------------------------------------------------------------------------*/
 
-static UINT16 *unknown_verify_base;
 
 
 static READ16_HANDLER( unknown_verify_r )
 {
+	offtwall_state *state = (offtwall_state *)space->machine->driver_data;
 	int prevpc = cpu_get_previouspc(space->cpu);
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
-		return unknown_verify_base[offset];
+		return state->unknown_verify_base[offset];
 	else
-		return unknown_verify_base[offset] | 0x100;
+		return state->unknown_verify_base[offset] | 0x100;
 }
 
 
@@ -277,7 +277,7 @@ static READ16_HANDLER( unknown_verify_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
-	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_BASE(&bankrom_base)
+	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_BASE_MEMBER(offtwall_state, bankrom_base)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(offtwall_state, atarigen.eeprom, atarigen.eeprom_size)
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("260002")
@@ -357,15 +357,15 @@ static INPUT_PORTS_START( offtwall )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260020")
-    PORT_BIT( 0xff, 0, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260022")
-    PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260024")
-    PORT_BIT( 0xff, 0, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
+	PORT_BIT( 0xff, 0, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
@@ -508,9 +508,9 @@ static DRIVER_INIT( offtwall )
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	spritecache_count = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
-	bankswitch_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x037ec2, 0x037f39, 0, 0, bankswitch_r);
-	unknown_verify_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3fdf1e, 0x3fdf1f, 0, 0, unknown_verify_r);
+	state->spritecache_count = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
+	state->bankswitch_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x037ec2, 0x037f39, 0, 0, bankswitch_r);
+	state->unknown_verify_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3fdf1e, 0x3fdf1f, 0, 0, unknown_verify_r);
 }
 
 
@@ -522,9 +522,9 @@ static DRIVER_INIT( offtwalc )
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	spritecache_count = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
-	bankswitch_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x037eca, 0x037f43, 0, 0, bankswitch_r);
-	unknown_verify_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3fdf24, 0x3fdf25, 0, 0, unknown_verify_r);
+	state->spritecache_count = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
+	state->bankswitch_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x037eca, 0x037f43, 0, 0, bankswitch_r);
+	state->unknown_verify_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3fdf24, 0x3fdf25, 0, 0, unknown_verify_r);
 }
 
 

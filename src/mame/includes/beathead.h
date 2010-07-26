@@ -24,6 +24,17 @@ public:
 	offs_t			hsyncram_offset;
 	offs_t			hsyncram_start;
 	UINT8			hsyncram[0x800];
+
+	UINT32 *		ram_base;
+	UINT32 *		rom_base;
+
+	double			hblank_offset;
+
+	UINT8			irq_line_state;
+	UINT8			irq_enable[3];
+	UINT8			irq_state[3];
+
+	UINT8			eeprom_enabled;
 };
 
 

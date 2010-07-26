@@ -26,6 +26,9 @@ public:
 	UINT8			playfield_color_bank;
 	UINT16			playfield_xscroll;
 	UINT16			playfield_yscroll;
+
+	UINT16			last_write;
+	UINT16			last_write_offset;
 };
 
 
