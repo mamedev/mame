@@ -71,7 +71,7 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 INLINE arm_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == ARM7 || device->type() == ARM9 || device->type() == PXA255);
+	assert(device->type() == ARM7 || device->type() == ARM7_BE || device->type() == ARM9 || device->type() == PXA255);
 	return (arm_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -236,6 +236,14 @@ static CPU_RESET( arm7 )
 	cpustate->archFlags = eARM_ARCHFLAGS_T;	// has Thumb
 }
 
+static CPU_RESET( arm7_be )
+{
+	arm_state *cpustate = get_safe_token(device);
+
+	CPU_RESET_CALL( arm7 );
+	cpustate->endian = ENDIANNESS_BIG;
+}
+
 static CPU_RESET( arm9 )
 {
 	arm_state *cpustate = get_safe_token(device);
@@ -298,6 +306,19 @@ static CPU_DISASSEMBLE( arm7 )
     	return CPU_DISASSEMBLE_CALL(arm7thumb);
     else
     	return CPU_DISASSEMBLE_CALL(arm7arm);
+}
+
+static CPU_DISASSEMBLE( arm7_be )
+{
+	CPU_DISASSEMBLE( arm7arm_be );
+	CPU_DISASSEMBLE( arm7thumb_be );
+
+	arm_state *cpustate = get_safe_token(device);
+
+	if (T_IS_SET(GET_CPSR))
+		return CPU_DISASSEMBLE_CALL(arm7thumb_be);
+	else
+		return CPU_DISASSEMBLE_CALL(arm7arm_be);
 }
 
 
@@ -551,6 +572,19 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_STR_REGISTER + ARM7_UR14:  sprintf(info->s, "UR14:%08x", ARM7REG(eR14_UND) ); break;
         case CPUINFO_STR_REGISTER + ARM7_USPSR: sprintf(info->s, "UR16:%08x", ARM7REG(eSPSR_UND)); break;
     }
+}
+
+
+CPU_GET_INFO( arm7_be )
+{
+	switch (state)
+	{
+		case DEVINFO_INT_ENDIANNESS:		info->i = ENDIANNESS_BIG;								break;
+		case CPUINFO_FCT_RESET:				info->reset = CPU_RESET_NAME(arm7_be);					break;
+		case CPUINFO_FCT_DISASSEMBLE:		info->disassemble = CPU_DISASSEMBLE_NAME(arm7_be);		break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "ARM7 (big endian)");					break;
+		default:							CPU_GET_INFO_CALL(arm7);
+	}
 }
 
 CPU_GET_INFO( arm9 )
@@ -837,6 +871,7 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 }
 
 DEFINE_LEGACY_CPU_DEVICE(ARM7, arm7);
+DEFINE_LEGACY_CPU_DEVICE(ARM7_BE, arm7_be);
 DEFINE_LEGACY_CPU_DEVICE(ARM9, arm9);
 DEFINE_LEGACY_CPU_DEVICE(PXA255, pxa255);
 DEFINE_LEGACY_CPU_DEVICE(SA1110, sa1110);

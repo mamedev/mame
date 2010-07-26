@@ -39,6 +39,7 @@
  ***************************************************************************************************/
 
 DECLARE_LEGACY_CPU_DEVICE(ARM7, arm7);
+DECLARE_LEGACY_CPU_DEVICE(ARM7_BE, arm7_be);
 DECLARE_LEGACY_CPU_DEVICE(ARM9, arm9);
 DECLARE_LEGACY_CPU_DEVICE(PXA255, pxa255);
 DECLARE_LEGACY_CPU_DEVICE(SA1110, sa1110);

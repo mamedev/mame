@@ -135,7 +135,10 @@ INLINE void arm7_cpu_write32(arm_state *cpustate, UINT32 addr, UINT32 data)
     }
 
     addr &= ~3;
-    memory_write_dword_32le(cpustate->program, addr, data);
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		memory_write_dword_32be(cpustate->program, addr, data);
+	else
+	    memory_write_dword_32le(cpustate->program, addr, data);
 }
 
 
@@ -147,7 +150,10 @@ INLINE void arm7_cpu_write16(arm_state *cpustate, UINT32 addr, UINT16 data)
     }
 
     addr &= ~1;
-    memory_write_word_32le(cpustate->program, addr, data);
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		memory_write_word_32be(cpustate->program, addr, data);
+	else
+		memory_write_word_32le(cpustate->program, addr, data);
 }
 
 INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data)
@@ -157,7 +163,10 @@ INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data)
         addr = arm7_tlb_translate( cpustate, addr );
     }
 
-    memory_write_byte_32le(cpustate->program, addr, data);
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		memory_write_byte_32be(cpustate->program, addr, data);
+	else
+		memory_write_byte_32le(cpustate->program, addr, data);
 }
 
 INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, offs_t addr)
@@ -171,12 +180,18 @@ INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, offs_t addr)
 
     if (addr & 3)
     {
-        result = memory_read_dword_32le(cpustate->program, addr & ~3);
+		if ( cpustate->endian == ENDIANNESS_BIG )
+			result = memory_read_dword_32be(cpustate->program, addr & ~3);
+		else
+			result = memory_read_dword_32le(cpustate->program, addr & ~3);
         result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
     }
     else
     {
-        result = memory_read_dword_32le(cpustate->program, addr);
+		if ( cpustate->endian == ENDIANNESS_BIG )
+			result = memory_read_dword_32be(cpustate->program, addr);
+		else
+			result = memory_read_dword_32le(cpustate->program, addr);
     }
 
     return result;
@@ -191,7 +206,10 @@ INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, offs_t addr)
         addr = arm7_tlb_translate( cpustate, addr );
     }
 
-    result = memory_read_word_32le(cpustate->program, addr & ~1);
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		result = memory_read_word_32be(cpustate->program, addr & ~1);
+	else
+		result = memory_read_word_32le(cpustate->program, addr & ~1);
 
     if (addr & 1)
     {
@@ -209,7 +227,10 @@ INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr)
     }
 
     // Handle through normal 8 bit handler (for 32 bit cpu)
-    return memory_read_byte_32le(cpustate->program, addr);
+	if ( cpustate->endian == ENDIANNESS_BIG )
+		return memory_read_byte_32be(cpustate->program, addr);
+	else
+		return memory_read_byte_32le(cpustate->program, addr);
 }
 
 /***************
@@ -553,6 +574,7 @@ static void arm7_core_reset(legacy_cpu_device *device)
     cpustate->irq_callback = save_irqcallback;
     cpustate->device = device;
     cpustate->program = device->space(AS_PROGRAM);
+	cpustate->endian = ENDIANNESS_LITTLE;
 
     /* start up in SVC mode with interrupts disabled. */
     SwitchMode(cpustate, eARM7_MODE_SVC);
