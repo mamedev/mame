@@ -2415,6 +2415,9 @@ void screen_device::update_burnin()
 		return;
 
 	bitmap_t *srcbitmap = m_bitmap[m_curtexture];
+	if (srcbitmap == NULL)
+		return;
+
 	int srcwidth = srcbitmap->width;
 	int srcheight = srcbitmap->height;
 	int dstwidth = m_burnin->width;
@@ -2490,27 +2493,37 @@ void screen_device::finalize_burnin()
 				                        scaledvis.max_y + 1 - scaledvis.min_y,
 				                        BITMAP_FORMAT_ARGB32));
 
+	int srcwidth = m_burnin->width;
+	int srcheight = m_burnin->height;
+	int dstwidth = finalmap->width;
+	int dstheight = finalmap->height;
+	int xstep = (srcwidth << 16) / dstwidth;
+	int ystep = (srcheight << 16) / dstheight;
+
 	// find the maximum value
 	UINT64 minval = ~(UINT64)0;
 	UINT64 maxval = 0;
-	for (int y = 0; y < finalmap->height; y++)
+	for (int y = 0; y < srcheight; y++)
 	{
 		UINT64 *src = BITMAP_ADDR64(m_burnin, y, 0);
-		for (int x = 0; x < finalmap->width; x++)
+		for (int x = 0; x < srcwidth; x++)
 		{
 			minval = MIN(minval, src[x]);
 			maxval = MAX(maxval, src[x]);
 		}
 	}
 
+	if (minval == maxval)
+		return;
+
 	// now normalize and convert to RGB
-	for (int y = 0; y < finalmap->height; y++)
+	for (int y = 0, srcy = 0; y < dstheight; y++, srcy += ystep)
 	{
-		UINT64 *src = BITMAP_ADDR64(m_burnin, y, 0);
+		UINT64 *src = BITMAP_ADDR64(m_burnin, srcy >> 16, 0);
 		UINT32 *dst = BITMAP_ADDR32(finalmap, y, 0);
-		for (int x = 0; x < finalmap->width; x++)
+		for (int x = 0, srcx = 0; x < dstwidth; x++, srcx += xstep)
 		{
-			int brightness = (UINT64)(maxval - src[x]) * 255 / (maxval - minval);
+			int brightness = (UINT64)(maxval - src[srcx >> 16]) * 255 / (maxval - minval);
 			dst[x] = MAKE_ARGB(0xff, brightness, brightness, brightness);
 		}
 	}
