@@ -21,4 +21,7 @@ public:
 
 	UINT16 result;
 	UINT16 lastresult;
+
+	running_device *maincpu;
+	running_device *dsp;
 };

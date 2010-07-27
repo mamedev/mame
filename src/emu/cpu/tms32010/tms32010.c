@@ -52,6 +52,8 @@
  *   - LST instruction was incorrectly setting an Indirect Addressing       *
  *     feature when Direct Addressing mode was selected                     *
  *   - Added TMS32015 and TMS32016 variants                                 *
+ *  TLP (27-Jul-2010) Ver 1.31                                              *
+ *   - Corrected cycle timing for conditional branch instructions           *
  *                                                                          *
  \**************************************************************************/
 
@@ -117,6 +119,8 @@ struct _tms32010_opcode
 	UINT8	cycles;
 	void	(*function)(tms32010_state *);
 };
+
+INLINE int add_branch_cycle(tms32010_state *cpustate);
 
 
 /*********  The following is the Status (Flag) register definition.  *********/
@@ -400,8 +404,10 @@ static void br(tms32010_state *cpustate)
 }
 static void banz(tms32010_state *cpustate)
 {
-	if (cpustate->AR[ARP] & 0x01ff)
+	if (cpustate->AR[ARP] & 0x01ff) {
 		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
+	}
 	else
 		cpustate->PC++ ;
 	cpustate->ALU.w.l = cpustate->AR[ARP];
@@ -410,59 +416,74 @@ static void banz(tms32010_state *cpustate)
 }
 static void bgez(tms32010_state *cpustate)
 {
-	if ( (INT32)(cpustate->ACC.d) >= 0 )
+	if ( (INT32)(cpustate->ACC.d) >= 0 ) {
 		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
+	}
 	else
 		cpustate->PC++ ;
 }
 static void bgz(tms32010_state *cpustate)
 {
-	if ( (INT32)(cpustate->ACC.d) > 0 )
+	if ( (INT32)(cpustate->ACC.d) > 0 ) {
 		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
+	}
 	else
 		cpustate->PC++ ;
 }
 static void bioz(tms32010_state *cpustate)
 {
-	if (BIO_IN != CLEAR_LINE)
+	if (BIO_IN != CLEAR_LINE) {
 		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
+	}
 	else
 		cpustate->PC++ ;
 }
 static void blez(tms32010_state *cpustate)
 {
-	if ( (INT32)(cpustate->ACC.d) <= 0 )
+	if ( (INT32)(cpustate->ACC.d) <= 0 ) {
 		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
+	}
 	else
 		cpustate->PC++ ;
 }
 static void blz(tms32010_state *cpustate)
 {
-	if ( (INT32)(cpustate->ACC.d) <  0 )
+	if ( (INT32)(cpustate->ACC.d) <  0 ) {
 		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
+	}
 	else
 		cpustate->PC++ ;
 }
 static void bnz(tms32010_state *cpustate)
 {
-	if (cpustate->ACC.d != 0)
+	if (cpustate->ACC.d != 0) {
 		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
+	}
 	else
 		cpustate->PC++ ;
 }
 static void bv(tms32010_state *cpustate)
 {
 	if (OV) {
-		cpustate->PC = M_RDOP_ARG(cpustate->PC);
 		CLR(cpustate, OV_FLAG);
+		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
 	}
 	else
 		cpustate->PC++ ;
 }
 static void bz(tms32010_state *cpustate)
 {
-	if (cpustate->ACC.d == 0)
+	if (cpustate->ACC.d == 0) {
 		cpustate->PC = M_RDOP_ARG(cpustate->PC);
+		cpustate->icount -= add_branch_cycle(cpustate);
+	}
 	else
 		cpustate->PC++ ;
 }
@@ -726,6 +747,8 @@ static void zals(tms32010_state *cpustate)
  *  Opcode Table (Cycles, Instruction)
  ***********************************************************************/
 
+/* Conditional Branch instructions take two cycles when the test condition is met and the branch performed */
+
 static const tms32010_opcode opcode_main[256]=
 {
 /*00*/  {1, add_sh	},{1, add_sh	},{1, add_sh	},{1, add_sh	},{1, add_sh	},{1, add_sh	},{1, add_sh	},{1, add_sh	},
@@ -758,8 +781,8 @@ static const tms32010_opcode opcode_main[256]=
 /*D8*/  {0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
 /*E0*/  {0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
 /*E8*/  {0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
-/*F0*/  {0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{2, banz		},{2, bv		},{2, bioz		},{0, illegal	},
-/*F8*/  {2, call	},{2, br		},{2, blz		},{2, blez		},{2, bgz		},{2, bgez		},{2, bnz		},{2, bz		}
+/*F0*/  {0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{1, banz		},{1, bv		},{1, bioz		},{0, illegal	},
+/*F8*/  {2, call	},{2, br		},{1, blz		},{1, blez		},{1, bgz		},{1, bgez		},{1, bnz		},{1, bz		}
 };
 
 static const tms32010_opcode opcode_7F[32]=
@@ -770,7 +793,10 @@ static const tms32010_opcode opcode_7F[32]=
 /*98*/  {0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{2, push		},{2, pop		},{0, illegal	},{0, illegal	}
 };
 
-
+INLINE int add_branch_cycle(tms32010_state *cpustate)
+{
+	return opcode_main[cpustate->opcode.b.h].cycles;
+}
 
 /****************************************************************************
  *  Inits CPU emulation
@@ -839,7 +865,7 @@ static int Ext_IRQ(tms32010_state *cpustate)
 		SET(cpustate, INTM_FLAG);
 		PUSH_STACK(cpustate, cpustate->PC);
 		cpustate->PC = 0x0002;
-		return (3);	/* 3 cycles used due to PUSH and DINT operation ? */
+		return (opcode_7F[0x1c].cycles + opcode_7F[0x01].cycles);	/* 3 cycles used due to PUSH and DINT operation ? */
 	}
 	return (0);
 }
@@ -1002,7 +1028,7 @@ CPU_GET_INFO( tms32010 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS32010");					break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Texas Instruments TMS32010");	break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.30");						break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.31");						break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Tony La Porta");		break;
 

@@ -137,6 +137,11 @@ static void coolpool_from_shiftreg(const address_space *space, UINT32 address, U
 
 static MACHINE_RESET( amerdart )
 {
+	coolpool_state *state = (coolpool_state *)machine->driver_data;
+
+	state->maincpu = machine->device("maincpu");
+	state->dsp = machine->device("dsp");
+
 	nvram_write_enable = 0;
 }
 
@@ -201,6 +206,15 @@ static WRITE16_HANDLER( nvram_thrash_data_w )
  *  AmeriDarts IOP handling
  *
  *************************************/
+
+static TIMER_DEVICE_CALLBACK( amerdart_audio_int_gen )
+{
+	coolpool_state *state = (coolpool_state *)timer.machine->driver_data;
+
+	cpu_set_input_line(state->dsp, 0, ASSERT_LINE);
+	cpu_set_input_line(state->dsp, 0, CLEAR_LINE);
+}
+
 
 static WRITE16_HANDLER( amerdart_misc_w )
 {
@@ -862,7 +876,7 @@ static MACHINE_DRIVER_START( amerdart )
 	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
 	/* Data Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(amerdart_dsp_io_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_pulse, 14400)
+	MDRV_TIMER_ADD_SCANLINE("audioint", amerdart_audio_int_gen, "screen", 0, 1)
 
 	MDRV_MACHINE_RESET(amerdart)
 	MDRV_NVRAM_HANDLER(generic_0fill)
