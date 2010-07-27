@@ -4089,6 +4089,7 @@ DokiDoki Penguin Land *not confirmed
 						/* 1988.05 Galaxy Force (Japan) */
 						/* 1988.08 Galaxy Force (US) */
 	DRIVER( gforce2j )	/* 1988.07 Galaxy Force II (Japan) */
+	DRIVER( gforce2ja )	/* 1988.07 Galaxy Force II (Japan) */
 	DRIVER( gforce2 )	/* 1988.?? Galaxy Force II (World) */
 						/* 1988.12 Galaxy Force II (US) */
 						/* 1988.08 Power Drift (US) */
