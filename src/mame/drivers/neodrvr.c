@@ -8380,9 +8380,9 @@ GAME( 2003, kf2k3bl,   kof2003,  neogeo,   neogeo,   kf2k3bl , ROT0, "bootleg", 
 GAME( 2003, kf2k3bla,  kof2003,  neogeo,   neogeo,   kf2k3pl,  ROT0, "bootleg", "The King of Fighters 2003 (bootleg set 2)", GAME_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart
 GAME( 2003, kf2k3pl,   kof2003,  neogeo,   neogeo,   kf2k3pl,  ROT0, "bootleg", "The King of Fighters 2004 Plus / Hero (The King of Fighters 2003 bootleg)", GAME_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart
 GAME( 2003, kf2k3upl,  kof2003,  neogeo,   neogeo,   kf2k3upl, ROT0, "bootleg", "The King of Fighters 2004 Ultra Plus (The King of Fighters 2003 bootleg)", GAME_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart
-GAME( 2003, samsh5sp,  neogeo,   neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 1, uncensored)", GAME_SUPPORTS_SAVE )
-GAME( 2003, samsh5sph, samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 2, censored)", GAME_SUPPORTS_SAVE )
-GAME( 2003, samsh5spn, samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 3, less censored)", GAME_SUPPORTS_SAVE )
+GAME( 2004, samsh5sp,  neogeo,   neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 1, uncensored)", GAME_SUPPORTS_SAVE )
+GAME( 2004, samsh5sph, samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 2, censored)", GAME_SUPPORTS_SAVE )
+GAME( 2004, samsh5spn, samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 3, less censored)", GAME_SUPPORTS_SAVE )
 
 /* there are other bootlegs kof96ep, kf2k1pls etc.? -- work out which should be supported */
 
