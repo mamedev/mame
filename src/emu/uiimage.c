@@ -869,7 +869,7 @@ static void fix_working_directory(device_image_interface *image)
 
 	/* check to see if the path exists; if not clear it */
 	if (check_path(image->working_directory()) != FILERR_NONE)
-		image->set_working_directory(NULL);
+		image->set_working_directory("");
 }
 
 
