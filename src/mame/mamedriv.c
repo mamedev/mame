@@ -10044,6 +10044,7 @@ Other Sun games
 	DRIVER( smshilo )	/* (c) 1983 SMS Manufacturing Corp. */
 	DRIVER( drhl )		/* (c) Drew, Inc. */
 	DRIVER( tpoker2 )	/* (c) 1993 Micro Manufacturing, Inc. */
+	DRIVER( ssjkrpkr )	/* (c) 1982 Southern Systems & Assembly, Ltd. */
 	DRIVER( fastdrwp )	/* Stern? */
 	DRIVER( dphlunka )	/* SMS Manufacturing Corp? */
 	DRIVER( dphlunkb )	/* SMS Manufacturing Corp? */
