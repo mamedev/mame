@@ -180,8 +180,7 @@ device_image_interface::device_image_interface(running_machine &machine, const d
 	  m_mame_file(NULL),
 	  m_full_software_name(NULL),
 	  m_software_info_ptr(NULL),
-	  m_software_part_ptr(NULL),
-	  m_hash(NULL)
+	  m_software_part_ptr(NULL)
 {
 	m_mempool = pool_alloc_lib(memory_error);
 }
@@ -539,7 +538,7 @@ int device_image_interface::read_hash_config(const char *sysname)
         goto done;
 
     /* look up this entry in the hash file */
-    info = hashfile_lookup(hashfile, m_hash);
+    info = hashfile_lookup(hashfile, m_hash.cstr());
 
     if (!info)
         goto done;
@@ -596,7 +595,7 @@ void device_image_interface::image_checkhash()
     int rc;
 
     /* only calculate CRC if it hasn't been calculated, and the open_mode is read only */
-    if (!m_hash && !m_writeable && !m_created)
+    if (m_hash.len()==0 && !m_writeable && !m_created)
     {
         /* do not cause a linear read of 600 megs please */
         /* TODO: use SHA/MD5 in the CHD header as the hash */
@@ -631,8 +630,8 @@ UINT32 device_image_interface::crc()
     UINT32 crc = 0;
 
 	image_checkhash();
-    if (m_hash != NULL)
-        crc = hash_data_extract_crc32(m_hash);
+    if (m_hash.len()!= 0)
+        crc = hash_data_extract_crc32(m_hash.cstr());
 
     return crc;
 }

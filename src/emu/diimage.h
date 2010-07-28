@@ -327,7 +327,7 @@ protected:
 
 	object_pool *m_mempool;
 
-	char *m_hash;
+	astring m_hash;
 };
 
 
