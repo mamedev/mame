@@ -5,7 +5,7 @@
     Bellfruit scorpion2/3 driver, (under heavy construction !!!)
 
 *****************************************************************************************
-  25-07-2010: J Wallace: Hooked EEPROM up to generic I2C handler - removing our workaround
+
   30-12-2006: J Wallace: Fixed init routines.
   07-03-2006: El Condor: Recoded to more accurately represent the hardware setup.
   18-01-2006: Cleaned up for MAME inclusion
@@ -134,16 +134,19 @@ Adder hardware:
     Known issues:
         * Need to find the 'missing' game numbers
         * Fix RS232 protocol
-		* ACIA needs to be converted to use MAME 6850 code
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/i2cmem.h"
+
 #include "video/bfm_adr2.h"
 
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
+
+/* fruit machines only */
+#include "video/awpvid.h"
+#include "machine/steppers.h" // stepper motor
 
 #include "machine/bfm_bd1.h"  // vfd
 #include "machine/meters.h"
@@ -158,10 +161,6 @@ Adder hardware:
 #include "sltblgtk.lh"
 #include "slots.lh"
 
-/* fruit machines only */
-#include "video/awpvid.h"
-#include "machine/steppers.h" // stepper motor
-
 #ifdef MAME_DEBUG
 #define VERBOSE 1
 #else
@@ -171,7 +170,6 @@ Adder hardware:
 // log serial communication between mainboard (scorpion2) and videoboard (adder2)
 #define LOG_SERIAL(x) do { if (VERBOSE) logerror x; } while (0)
 #define UART_LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define MASTER_CLOCK		(XTAL_8MHz)
@@ -180,13 +178,20 @@ Adder hardware:
 
 static int  get_scorpion2_uart_status(void);	// retrieve status of uart on scorpion2 board
 
+static int  read_e2ram(void);
+static void e2ram_reset(void);
+
 // global vars ////////////////////////////////////////////////////////////
 
 static int sc2gui_update_mmtr;	// bit pattern which mechanical meter needs updating
 
 // local vars /////////////////////////////////////////////////////////////
 
+static UINT8 *nvram;		// pointer to NVRAM
+static size_t nvram_size;	// size of NVRAM
 static UINT8 key[16];		// security device on gamecard (video games only)
+
+static UINT8 e2ram[1024];	// x24C08 e2ram
 
 static int mmtr_latch;		// mechanical meter latch
 static int triac_latch;		// payslide triac latch
@@ -332,6 +337,8 @@ static void on_scorpion2_reset(running_machine *machine)
 	BFM_BD1_reset(0);	// reset display1
 	BFM_BD1_reset(1);	// reset display2
 
+	e2ram_reset();
+
 	devtag_reset(machine, "ymsnd");
 
   // reset stepper motors /////////////////////////////////////////////////
@@ -427,6 +434,46 @@ int Scorpion2_GetSwitchState(int strobe, int data)
 		}
 	}
 	return state;
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+static NVRAM_HANDLER( bfm_sc2 )
+{
+	static const UINT8 init_e2ram[10] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
+	if ( read_or_write )
+	{	// writing
+		mame_fwrite(file,nvram,nvram_size);
+		mame_fwrite(file,e2ram,sizeof(e2ram));
+	}
+	else
+	{ // reading
+		if ( file )
+		{
+			mame_fread(file,nvram,nvram_size);
+			mame_fread(file,e2ram,sizeof(e2ram));
+		}
+		else
+		{
+			memset(nvram,0x00,nvram_size);
+			memset(e2ram,0x00,sizeof(e2ram));
+			memcpy(e2ram,init_e2ram,sizeof(init_e2ram));
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+static READ8_HANDLER( ram_r )
+{
+	return nvram[offset];	// read from RAM
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+static WRITE8_HANDLER( ram_w )
+{
+	nvram[offset] = data;	// write to RAM
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1048,6 +1095,20 @@ static READ8_HANDLER( vid_uart_ctrl_r )
 }
 
 ///////////////////////////////////////////////////////////////////////////
+
+static READ8_HANDLER( key_r )
+{
+	int result = key[ offset ];
+
+	if ( offset == 7 )
+	{
+		result = (result & 0xFE) | read_e2ram();
+	}
+
+	return result;
+}
+
+///////////////////////////////////////////////////////////////////////////
 /*
 
 The X24C08 is a CMOS 8,192 bit serial EEPROM,
@@ -1055,29 +1116,301 @@ internally organized 1024 x 8. The X24C08 features a
 serial interface and software protocol allowing operation
 on a simple two wire bus.
 
-In the Adder 2 setup, it is used alongside the security key, working
-as additional datalogging and protection.
 */
 
-static READ8_DEVICE_HANDLER( key_r )
-{
-	int result = key[ offset ];
 
-	if ( offset == 7 )
+static int e2reg;
+static int e2state;
+static int e2cnt;
+static int e2data;
+static int e2address;
+static int e2rw;
+static int e2data_pin;
+static int e2dummywrite;
+
+static int e2data_to_read;
+
+#define SCL 0x01	//SCL pin (clock)
+#define SDA	0x02	//SDA pin (data)
+
+
+static void e2ram_reset(void)
+{
+	e2reg   = 0;
+	e2state = 0;
+	e2address = 0;
+	e2rw    = 0;
+	e2data_pin = 0;
+	e2data  = (SDA|SCL);
+	e2dummywrite = 0;
+	e2data_to_read = 0;
+}
+
+static int recdata(int changed, int data)
+{
+	int res = 1;
+
+	if ( e2cnt < 8 )
 	{
-		result = (result & 0xFE) | i2cmem_sda_read(device);
+		res = 0;
+
+		if ( (changed & SCL) && (data & SCL) )
+		{ // clocked in new data
+			int pattern = 1 << (7-e2cnt);
+
+			if ( data & SDA ) e2data |=  pattern;
+			else              e2data &= ~pattern;
+
+			e2data_pin = e2data_to_read & 0x80 ? 1 : 0;
+
+			e2data_to_read <<= 1;
+
+			LOG(("e2d pin= %d\n", e2data_pin));
+
+			e2cnt++;
+			if ( e2cnt >= 8 )
+			{
+				res++;
+			}
+		}
 	}
 
+	return res;
+}
+
+static int recAck(int changed, int data)
+{
+	int result = 0;
+
+	if ( (changed & SCL) && (data & SCL) )
+	{
+		if ( data & SDA )
+		{
+			result = 1;
+		}
+		else
+		{
+			result = -1;
+		}
+	}
 	return result;
 }
 
-static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
-{
-	i2cmem_scl_write(device,BIT(data, 0));
-	i2cmem_sda_write(device,BIT(data, 1));
+//
+static WRITE8_HANDLER( e2ram_w )
+{ // b0 = clock b1 = data
+
+	int changed, ack;
+
+	data ^= (SDA|SCL);  // invert signals
+
+	changed  = (e2reg^data) & 0x03;
+
+	e2reg = data;
+
+	if ( changed )
+	{
+		while ( 1 )
+		{
+			if ( (  (changed & SDA) && !(data & SDA))	&&  // 1->0 on SDA  AND
+				( !(changed & SCL) && (data & SCL) )    // SCL=1 and not changed
+				)
+			{	// X24C08 Start condition (1->0 on SDA while SCL=1)
+				e2dummywrite = ( e2state == 5 );
+
+				LOG(("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, e2dummywrite ));
+
+				e2state = 1; // ready for commands
+				e2cnt   = 0;
+				e2data  = 0;
+				break;
+			}
+
+			if ( (  (changed & SDA) && (data & SDA))	&&  // 0->1 on SDA  AND
+				( !(changed & SCL) && (data & SCL) )     // SCL=1 and not changed
+				)
+			{	// X24C08 Stop condition (0->1 on SDA while SCL=1)
+				LOG(("e2ram:   c:%d d:%d Stop condition\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
+				e2state = 0;
+				e2data  = 0;
+				break;
+			}
+
+			switch ( e2state )
+			{
+				case 1: // Receiving address + R/W bit
+
+					if ( recdata(changed, data) )
+					{
+						e2address = (e2address & 0x00FF) | ((e2data>>1) & 0x03) << 8;
+						e2cnt   = 0;
+						e2rw    = e2data & 1;
+
+						LOG(("e2ram: Slave address received !!  device id=%01X device adr=%01d high order adr %0X RW=%d) %02X\n",
+							e2data>>4, (e2data & 0x08)?1:0, (e2data>>1) & 0x03, e2rw , e2data ));
+
+						e2state = 2;
+					}
+					break;
+
+				case 2: // Receive Acknowledge
+
+					ack = recAck(changed,data);
+					if ( ack )
+					{
+						e2data_pin = 0;
+
+						if ( ack < 0 )
+						{
+							LOG(("ACK = 0\n"));
+							e2state = 0;
+						}
+						else
+						{
+							LOG(("ACK = 1\n"));
+							if ( e2dummywrite )
+							{
+								e2dummywrite = 0;
+
+								e2data_to_read = e2ram[e2address];
+
+								if ( e2rw & 1 ) e2state = 7; // read data
+								else		  e2state = 0; //?not sure
+							}
+							else
+							{
+								if ( e2rw & 1 ) e2state = 7; // reading
+								else            e2state = 3; // writing
+							}
+							switch ( e2state )
+							{
+								case 7:
+									LOG(("read address %04X\n",e2address));
+									e2data_to_read = e2ram[e2address];
+									break;
+								case 3:
+									LOG(("write, awaiting address\n"));
+									break;
+								default:
+									LOG(("?unknow action %04X\n",e2address));
+									break;
+							}
+						}
+						e2data = 0;
+					}
+					break;
+
+				case 3: // writing data, receiving address
+
+					if ( recdata(changed, data) )
+					{
+						e2data_pin = 0;
+						e2address = (e2address & 0xFF00) | e2data;
+
+						LOG(("write address = %04X waiting for ACK\n", e2address));
+						e2state = 4;
+						e2cnt   = 0;
+						e2data  = 0;
+					}
+					break;
+
+				case 4: // wait ack, for write address
+
+					ack = recAck(changed,data);
+					if ( ack )
+					{
+						e2data_pin = 0;	// pin=0, no error !!
+
+						if ( ack < 0 )
+						{
+							e2state = 0;
+							LOG(("ACK = 0, cancel write\n" ));
+						}
+						else
+						{
+							e2state = 5;
+							LOG(("ACK = 1, awaiting data to write\n" ));
+						}
+					}
+					break;
+
+				case 5: // receive data to write
+					if ( recdata(changed, data) )
+					{
+						LOG(("write data = %02X received, awaiting ACK\n", e2data));
+						e2cnt   = 0;
+						e2state = 6;  // wait ack
+					}
+					break;
+
+				case 6: // Receive Acknowlede after writing
+
+					ack = recAck(changed,data);
+					if ( ack )
+					{
+						if ( ack < 0 )
+						{
+							e2state = 0;
+							LOG(("ACK=0, write canceled\n"));
+						}
+						else
+						{
+							LOG(("ACK=1, writing %02X to %04X\n", e2data, e2address));
+
+							e2ram[e2address] = e2data;
+
+							e2address = (e2address & ~0x000F) | ((e2address+1)&0x0F);
+
+							e2state = 5; // write next address
+						}
+					}
+					break;
+
+				case 7: // receive address from read
+
+					if ( recdata(changed, data) )
+					{
+						//e2data_pin = 0;
+
+						LOG(("address read, data = %02X waiting for ACK\n", e2data ));
+
+						e2state = 8;
+					}
+					break;
+
+				case 8:
+
+					if ( recAck(changed, data) )
+					{
+						e2state = 7;
+
+						e2address = (e2address & ~0x0F) | ((e2address+1)&0x0F); // lower 4 bits wrap around
+
+						e2data_to_read = e2ram[e2address];
+
+						LOG(("ready for next address %04X\n", e2address));
+
+						e2cnt   = 0;
+						e2data  = 0;
+					}
+					break;
+
+				case 0:
+
+					LOG(("e2ram: ? c:%d d:%d\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
+					break;
+			}
+			break;
+		}
+	}
 }
 
-///////////////////////////////////////////////////////////////////////////
+static int read_e2ram(void)
+{
+	LOG(("e2ram: r %d (%02X) \n", e2data_pin, e2data_to_read ));
+
+	return e2data_pin;
+}
 
 static const UINT16 AddressDecode[]=
 {
@@ -1175,7 +1508,7 @@ static VIDEO_UPDATE( addersc2 )
 
 static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // 8k RAM
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SIZE(&nvram_size)// 8k RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)		// vfd status register
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_vid_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -1215,8 +1548,8 @@ static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)			// write bank (rom page select for 0x6000 - 0x7fff )
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)			// vfd2 data
 
-	AM_RANGE(0x3C00, 0x3C07) AM_DEVREAD("i2cmem",key_r   )
-	AM_RANGE(0x3C80, 0x3C80) AM_DEVWRITE("i2cmem",i2c_nvram_w)
+	AM_RANGE(0x3C00, 0x3C07) AM_READ(  key_r   )
+	AM_RANGE(0x3C80, 0x3C80) AM_WRITE( e2ram_w )
 
 	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE(vid_uart_ctrl_r, vid_uart_ctrl_w)		// video uart control reg
 	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r, vid_uart_tx_w)			// video uart data  reg
@@ -1878,10 +2211,6 @@ static INPUT_PORTS_START( pokio )
 	PORT_DIPSETTING(    0x18, "3" )
 INPUT_PORTS_END
 
-static const i2cmem_interface i2cmem_interface =
-{
-	0x0a, 1024, 8
-};
 
 ///////////////////////////////////////////////////////////////////////////
 // machine driver for scorpion2 board + adder2 expansion //////////////////
@@ -1894,8 +2223,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_CPU_PROGRAM_MAP(memmap_vid)					// setup scorpion2 board memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
 
-	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_HANDLER(bfm_sc2)
 	MDRV_DEFAULT_LAYOUT(layout_bfm_sc2)
 
 	MDRV_SCREEN_ADD("adder", RASTER)
@@ -2420,7 +2748,7 @@ static MACHINE_RESET( dm01_init )
 
 
 static ADDRESS_MAP_START( sc2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // 8k RAM
+	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -2469,7 +2797,7 @@ ADDRESS_MAP_END
 
 /* memory map for scorpion3 board */
 static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // 8k RAM
+	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -2518,7 +2846,7 @@ ADDRESS_MAP_END
 
 /* memory map for scorpion2 board + dm01 dot matrix board */
 static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // 8k RAM
+	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_dm01_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -3652,7 +3980,7 @@ static MACHINE_DRIVER_START( scorpion2 )
 	MDRV_SOUND_ADD("ymsnd",YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_HANDLER(bfm_sc2)
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_awpvid14)
@@ -3682,7 +4010,7 @@ static MACHINE_DRIVER_START( scorpion2_dm01 )
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_HANDLER(bfm_sc2)
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_awpdmd)
