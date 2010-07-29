@@ -487,6 +487,14 @@ void osd_init(running_machine *machine)
 	winsound_init(machine);
 	wininput_init(machine);
 	winoutput_init(machine);
+	
+	// notify listeners of screen configuration
+	astring tempstring;
+	for (win_window_info *info = win_window_list; info != NULL; info = info->next)
+	{
+		tempstring.printf("Orientation(%s)", utf8_from_tstring(info->monitor->info.szDevice));
+		output_set_value(tempstring, info->targetorient);
+	}
 
 	// hook up the debugger log
 	if (options_get_bool(machine->options(), WINOPTION_OSLOG))
