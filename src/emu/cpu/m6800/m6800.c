@@ -596,19 +596,29 @@ INLINE void CHECK_IRQ_LINES(m6800_state *cpustate)
 {
 	if (cpustate->nmi_pending)
 	{
+		if(cpustate->wai_state & M6800_SLP)
+			cpustate->wai_state &= ~M6800_SLP;
+
 		cpustate->nmi_pending = FALSE;
 		enter_interrupt(cpustate, "M6800 '%s' take NMI\n",0xfffc);
 	}
-	else if( !(CC & 0x10) )
+	else 
 	{
 		if( cpustate->irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
 		{	/* standard IRQ */
-			enter_interrupt(cpustate, "M6800 '%s' take IRQ1\n",0xfff8);
-			if( cpustate->irq_callback )
-				(void)(*cpustate->irq_callback)(cpustate->device, M6800_IRQ_LINE);
+			if(cpustate->wai_state & M6800_SLP)
+				cpustate->wai_state &= ~M6800_SLP;
+			
+			if( !(CC & 0x10) )
+			{
+				enter_interrupt(cpustate, "M6800 '%s' take IRQ1\n",0xfff8);
+				if( cpustate->irq_callback )
+					(void)(*cpustate->irq_callback)(cpustate->device, M6800_IRQ_LINE);
+			}
 		}
 		else
-			m6800_check_irq2(cpustate);
+			if( !(CC & 0x10) )
+				m6800_check_irq2(cpustate);
 	}
 }
 
@@ -622,6 +632,8 @@ static void check_timer_event(m6800_state *cpustate)
 		cpustate->tcsr |= TCSR_OCF;
 		cpustate->pending_tcsr |= TCSR_OCF;
 		MODIFIED_tcsr;
+		if((cpustate->tcsr & TCSR_EOCI) && cpustate->wai_state & M6800_SLP)
+			cpustate->wai_state &= ~M6800_SLP;
 		if ( !(CC & 0x10) && (cpustate->tcsr & TCSR_EOCI))
 			TAKE_OCI;
 	}
@@ -635,6 +647,8 @@ static void check_timer_event(m6800_state *cpustate)
 		cpustate->tcsr |= TCSR_TOF;
 		cpustate->pending_tcsr |= TCSR_TOF;
 		MODIFIED_tcsr;
+		if((cpustate->tcsr & TCSR_ETOI) && cpustate->wai_state & M6800_SLP)
+			cpustate->wai_state &= ~M6800_SLP;
 		if ( !(CC & 0x10) && (cpustate->tcsr & TCSR_ETOI))
 			TAKE_TOI;
 	}
