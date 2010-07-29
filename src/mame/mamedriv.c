@@ -353,37 +353,37 @@ const game_driver * const drivers[] =
 	DRIVER( turpins )	/* (c) 1981 bootleg */
 
 	/* "Crazy Climber hardware" games */
-	DRIVER( cclimber )    /* (c) 1980 Nichibutsu */
-	DRIVER( cclimberj )    /* (c) 1980 Nichibutsu */
-	DRIVER( ccboot )    /* bootleg */
-	DRIVER( ccboot2 )    /* bootleg */
+	DRIVER( cclimber )	/* (c) 1980 Nichibutsu */
+	DRIVER( cclimberj )	/* (c) 1980 Nichibutsu */
+	DRIVER( ccboot )	/* bootleg */
+	DRIVER( ccboot2 )	/* bootleg */
 
-	DRIVER( ckong )        /* (c) 1981 (Falcon?) */
-	DRIVER( ckongo )    /* bootleg (Orca) */
-	DRIVER( ckongalc )    /* bootleg (Alca) */
-	DRIVER( bigkong )    /* bootleg */
-	DRIVER( monkeyd )    /* bootleg */
+	DRIVER( ckong )		/* (c) 1981 (Falcon?) */
+	DRIVER( ckongo )	/* bootleg (Orca) */
+	DRIVER( ckongalc )	/* bootleg (Alca) */
+	DRIVER( bigkong )	/* bootleg */
+	DRIVER( monkeyd )	/* bootleg */
 
-	DRIVER( ckongpt2 )    /* (c) 1981 Falcon */
-	DRIVER( ckongpt2a ) /* (c) 1981 Falcon */
-	DRIVER( ckongpt2j ) /* (c) 1981 Falcon */
-	DRIVER( ckongpt2jeu )/* bootleg (Jeutel) */
-	DRIVER( ckongpt2b )    /* bootleg */
+	DRIVER( ckongpt2 )		/* (c) 1981 Falcon */
+	DRIVER( ckongpt2a )		/* (c) 1981 Falcon */
+	DRIVER( ckongpt2j )		/* (c) 1981 Falcon */
+	DRIVER( ckongpt2jeu )	/* bootleg (Jeutel) */
+	DRIVER( ckongpt2b )		/* bootleg */
 
-	DRIVER( rpatrol )    /* Orca, from a suspicious set */
-	DRIVER( rpatrolb )    /* bootleg */
-	DRIVER( silvland )    /* Falcon */
-	DRIVER( yamato )    /* (c) 1983 Sega */
-	DRIVER( yamato2 )    /* (c) 1983 Sega */
-	DRIVER( toprollr )    /* (c) 1983 Jaleco */
-	DRIVER( swimmer )    /* (c) 1982 Tehkan */
-	DRIVER( swimmera )    /* (c) 1982 Tehkan */
-	DRIVER( swimmerb )    /* (c) 1982 Tehkan */
-	DRIVER( guzzler )    /* (c) 1983 Tehkan */
-	DRIVER( cannonb )    /* (c) 1985 Soft */
-	DRIVER( cannonb2 )    /* (c) 1985 TV Game Gruenberg */
-	DRIVER( cannonb3 )    /* (c) 1985 Soft */
-	DRIVER( bagmanf )    /* bootleg on Falcon FCK-00 (Falcon Crazy Kong) PCB */
+	DRIVER( rpatrol )	/* Orca, from a suspicious set */
+	DRIVER( rpatrolb )	/* bootleg */
+	DRIVER( silvland )	/* Falcon */
+	DRIVER( yamato )	/* (c) 1983 Sega */
+	DRIVER( yamato2 )	/* (c) 1983 Sega */
+	DRIVER( toprollr )	/* (c) 1983 Jaleco */
+	DRIVER( swimmer )	/* (c) 1982 Tehkan */
+	DRIVER( swimmera )	/* (c) 1982 Tehkan */
+	DRIVER( swimmerb )	/* (c) 1982 Tehkan */
+	DRIVER( guzzler )	/* (c) 1983 Tehkan */
+	DRIVER( cannonb )	/* (c) 1985 Soft */
+	DRIVER( cannonb2 )	/* (c) 1985 TV Game Gruenberg */
+	DRIVER( cannonb3 )	/* (c) 1985 Soft */
+	DRIVER( bagmanf )	/* bootleg on Falcon FCK-00 (Falcon Crazy Kong) PCB */
 
 	/* Nichibutsu games */
 	DRIVER( gomoku )	/* (c) 1981 */
@@ -398,7 +398,8 @@ const game_driver * const drivers[] =
 	DRIVER( sectrzon )	/* (c) 1984 + Alice */
 	DRIVER( firebatl )	/* (c) 1984 Taito */
 	DRIVER( clshroad )	/* (c) 1986 Wood Place Inc. */
-	DRIVER( clshroads )	/* (c) 1986 Status Games */
+	DRIVER( clshroads )	/* (c) 1986 Wood Place Inc. (Status Games license) */
+	DRIVER( clshroadd )	/* (c) 1986 Wood Place Inc. (Data East license) */
 	DRIVER( tubep )		/* (c) 1984 + Fujitek */
 	DRIVER( tubepb )	/* (c) 1984 + bootleg */
 	DRIVER( rjammer )	/* (c) 1984 + Alice */
@@ -421,7 +422,7 @@ const game_driver * const drivers[] =
 	DRIVER( dangarb )	/* bootleg */
 	DRIVER( ninjemak )	/* (c) 1986 (US?) */
 	DRIVER( youma )		/* (c) 1986 (Japan) */
-	DRIVER( youma2 )		/* (c) 1986 (Japan) */
+	DRIVER( youma2 )	/* (c) 1986 (Japan) */
 	DRIVER( youmab )	/* bootleg */
 	DRIVER( youmab2 )	/* bootleg */
 	DRIVER( legion )	/* (c) 1986 */

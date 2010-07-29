@@ -443,7 +443,46 @@ ROM_START( clshroads )
 	ROM_LOAD( "clashrd.g7",  0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )	/* high 4 bits */
 ROM_END
 
+// this set came from a bootleg board, but I believe it to be original for the following reason:
+//  the ONLY difference between this and the parent set is the Wood Place string, however, in the parent
+//  set the Wood Place string is padded with several 0x20 (Space) characters to fit the same number of bytes
+//  in which the Data East Corporation string fits, suggesting that they always planned to put it there.
+ROM_START( clshroadd )
+	ROM_REGION( 0x10000, "maincpu", 0 )		/* Main Z80 Code */
+	ROM_LOAD( "crdeco-3.bin",  0x0000, 0x8000, CRC(1d54195c) SHA1(4b1d7d333707b5ebd57572742eb74df5abe8a70d) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
+	ROM_LOAD( "clashr2.bin", 0x0000, 0x2000, CRC(e6389ec1) SHA1(6ec94d5e389e9104f40fc48df6f15674415851c0) )
+
+	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT )	/* Sprites */
+	ROM_LOAD( "clashr5.bin", 0x0000, 0x4000, CRC(094858b8) SHA1(a19f79cb665bbb1e25a94e9dd09a9e99f553afe8) )
+	ROM_LOAD( "clashr6.bin", 0x4000, 0x4000, CRC(daa1daf3) SHA1(cc24c97c9950adc0041f68832774e40c87d1d4b2) )
+
+	ROM_REGION( 0x08000, "gfx2", ROMREGION_INVERT )	/* Layer 0 */
+	ROM_LOAD( "clashr8.bin", 0x0000, 0x4000, CRC(cbb66719) SHA1(2497575f84a956bc2b9e4c3f2c71ae42d036355e) )
+	ROM_LOAD( "clashr9.bin", 0x4000, 0x4000, CRC(c15e8eed) SHA1(3b1e7fa014d176a01d5f9214051b0c8cc5556684) )
+
+	ROM_REGION( 0x04000, "gfx3", ROMREGION_INVERT)	/* Layer 1 */
+	ROM_LOAD( "clashr4.bin", 0x0000, 0x2000, CRC(664201d9) SHA1(4eb85306f0c9683d0e0cf787f6389df8fe4a3d9d) )
+	ROM_LOAD( "clashr7.bin", 0x2000, 0x2000, CRC(97973030) SHA1(cca7a9d2751add7f6dd9bac83f7f63ece8021dbc) )
+
+	ROM_REGION( 0x0b40, "proms", 0 )
+	ROM_LOAD( "82s129.6", 0x0000, 0x0100, CRC(38f443da) SHA1(a015217508b18eb3f1987cd5b53f31608b13de08) )	/* r */
+	ROM_LOAD( "82s129.7", 0x0100, 0x0100, CRC(977fab0c) SHA1(78e7b4f1e9891d2d9cf1e1ec0c4f59a311cef1c5) )	/* g */
+	ROM_LOAD( "82s129.8", 0x0200, 0x0100, CRC(ae7ae54d) SHA1(d7d4682e437f2f7adb7fceb813437c06f27f2711) )	/* b */
+	/* all other proms that firebatl has are missing */
+	ROM_LOAD( "clashrd.a2",  0x0900, 0x0100, CRC(4e2a2781) SHA1(7be2e066499ea0af76f6ae926fe87e02f8c36a6f) )	/* unknown */
+	ROM_LOAD( "clashrd.g4",  0x0a00, 0x0020, CRC(1afc04f0) SHA1(38207cf3e15bac7034ac06469b95708d22b57da4) )	/* timing? */
+	ROM_LOAD( "clashrd.b11", 0x0a20, 0x0020, CRC(d453f2c5) SHA1(7fdc5bf59bad9e8f00e970565ff6f6b3773541db) )	/* unknown (possibly bad dump) */
+	ROM_LOAD( "clashrd.g10", 0x0a40, 0x0100, CRC(73afefd0) SHA1(d14c5490c5b174d54043bfdf5c6fb675e67492e7) )	/* unknown (possibly bad dump) */
+
+	ROM_REGION( 0x2000, "samples", 0 )	/* samples */
+	ROM_LOAD( "clashr1.bin", 0x0000, 0x2000, CRC(0d0a8068) SHA1(529878d0c5f078590e07ec0fffc27b212843c0ad) )
+
+	ROM_REGION( 0x0200, "soundproms", 0 )	/* 4bit->8bit sample expansion PROMs */
+	ROM_LOAD( "clashrd.g8",  0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )	/* low 4 bits */
+	ROM_LOAD( "clashrd.g7",  0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )	/* high 4 bits */
+ROM_END
 
 static DRIVER_INIT ( firebatl )
 {
@@ -466,3 +505,4 @@ die once, it would be nice to avoid the hack however
 GAME( 1984, firebatl, 0,        firebatl, firebatl, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS )
 GAME( 1986, clshroad, 0,        clshroad, clshroad, 0,        ROT0,  "Wood Place Inc.", "Clash-Road", 0 )
 GAME( 1986, clshroads,clshroad, clshroad, clshroad, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )
+GAME( 1986, clshroadd,clshroad, clshroad, clshroad, 0,        ROT0,  "Wood Place Inc. (Data East license)", "Clash-Road (Data East license)", 0 )
