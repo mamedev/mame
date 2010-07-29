@@ -221,6 +221,13 @@ static UINT8 scn2674_cursor_h;
 static UINT8 scn2674_screen2_l;
 static UINT8 scn2674_screen2_h;
 
+static UINT8 scn2674_irq_register = 0;
+static UINT8 scn2674_status_register = 0;
+static UINT8 scn2674_irq_mask = 0;
+static UINT8 scn2674_gfx_enabled;
+static UINT8 scn2674_display_enabled;
+static UINT8 scn2674_cursor_enabled;
+
 static READ16_HANDLER( characteriser16_r );
 static WRITE16_HANDLER( characteriser16_w );
 
@@ -477,8 +484,6 @@ static UINT8 IR13_scn2674_split_register_2;
 
 static VIDEO_UPDATE( mpu4_vid )
 {
-	int i;
-
 	int x, y/*, count = 0*/;
 
 	bitmap_fill(bitmap,cliprect,0);
@@ -489,6 +494,66 @@ static VIDEO_UPDATE( mpu4_vid )
 	/* we're in row table mode...thats why */
 	for(y = 0; y <= IR4_scn2674_rows_per_screen; y++)
 	{
+
+		if (y == 0)
+		{
+			scn2674_status_register |= 0x02;
+			/* Ready - this triggers for the first scanline of the screen */
+			if (scn2674_irq_mask&0x02)
+			{
+				LOGSTUFF(("SCN2674 Ready\n"));
+				scn2674_irq_state = 1;
+				scn2674_irq_register |= 0x02;
+				update_mpu68_interrupts(screen->machine);
+			}
+		}
+		/* Line 0 - this triggers for the first scanline of each row
+		Since we are doing this row by row, just call every time*/
+		scn2674_status_register |= 0x08;
+		if (scn2674_irq_mask&0x08)
+		{
+			LOGSTUFF(("SCN2674 Line Zero\n"));
+			scn2674_irq_state = 1;
+			scn2674_irq_register |= 0x08;
+			update_mpu68_interrupts(screen->machine);
+		}
+
+		if (y == IR12_scn2674_split_register_1)
+		/* Split Screen 1 */
+		{
+			if (scn2674_screen2_h & 0x40)
+			{
+				popmessage("Split screen 1 address shift required, contact MAMEDEV");
+			}
+			scn2674_status_register |= 0x04;
+			if (scn2674_irq_mask&0x04)
+			{
+				LOGSTUFF(("SCN2674 Split Screen 1\n"));
+				scn2674_irq_state = 1;
+				update_mpu68_interrupts(screen->machine);
+
+				scn2674_irq_register |= 0x04;
+			}
+		}
+
+		if (y == IR13_scn2674_split_register_2)
+		/* Split Screen 2 */
+		{
+			if (scn2674_screen2_h & 0x80)
+			{
+				popmessage("Split screen 2 address shift required, contact MAMEDEV");
+			}
+			scn2674_status_register |= 0x01;
+			if (scn2674_irq_mask&0x01)
+			{
+				LOGSTUFF(("SCN2674 Split Screen 2 irq\n"));
+				scn2674_irq_state = 1;
+				scn2674_irq_register |= 0x01;
+				update_mpu68_interrupts(screen->machine);
+			}
+
+		}
+
 		int screen2_base = (scn2674_screen2_h << 8) | scn2674_screen2_l;
 
 		UINT16 rowbase = (mpu4_vid_mainram[1+screen2_base+(y*2)]<<8)|mpu4_vid_mainram[screen2_base+(y*2)];
@@ -516,9 +581,6 @@ static VIDEO_UPDATE( mpu4_vid )
 		if (dbl_size&2) y++; /* skip a row? */
 
 	}
-
-	for (i = 0; i < 8; i++)
-		mpu4_draw_led(i, led_segs[i]);
 
 	return 0;
 }
@@ -682,13 +744,6 @@ static void scn2674_write_init_regs(UINT8 data)
 	scn2675_IR_pointer++;
 	if (scn2675_IR_pointer>14)scn2675_IR_pointer=14;
 }
-
-static UINT8 scn2674_irq_register = 0;
-static UINT8 scn2674_status_register = 0;
-static UINT8 scn2674_irq_mask = 0;
-static UINT8 scn2674_gfx_enabled;
-static UINT8 scn2674_display_enabled;
-static UINT8 scn2674_cursor_enabled;
 
 static void scn2674_write_command(running_machine *machine, UINT8 data)
 {
@@ -3051,33 +3106,6 @@ ROM_START( vgpoker )
 	ROM_LOAD16_BYTE("video-7.bin",  0x060000, 0x010000,  CRC(231cf163) SHA1(02b28ef0e1661a82d0fba2ecc5474c79651fa9e7))
 	ROM_LOAD16_BYTE("video-8.bin",  0x060001, 0x010000,  CRC(076efdc8) SHA1(bef0a1d8f0e7486ee5dc7407ce5c96854cefa5cf))
 ROM_END
-
-ROM_START( connect4 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "connect4.p2",  0x8000, 0x4000,  CRC(6090633c) SHA1(0cd2725a235bf93cfe94f2ca648d5fccb87b8e5c) )
-	ROM_LOAD( "connect4.p1",  0xC000, 0x4000,  CRC(b1af50c0) SHA1(7c9645ea378f0857b849ca24a239d9114f62da7f) )
-ROM_END
-
-ROM_START( mpu4utst )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
-ROM_END
-
-ROM_START( mpu4tst2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "ut2.p1",  0xE000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
-ROM_END
-
-ROM_START( mpu4met0 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "meter-zero.p1",  0x8000, 0x8000,  CRC(e74297e5) SHA1(49a2cc85eda14199975ec37a794b685c839d3ab9))
-ROM_END
-
-static DRIVER_INIT (connect4)
-{
-	led_extend=1;
-}
-
 /*Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
 and reel assembly with this kit and a supplied monitor.
 The real Deal 'Em ran on Summit Coin hardware, and was made by someone else.
@@ -3138,9 +3166,3 @@ GAME( 199?,  vgpoker,   0,        vgpoker,  mpu4,     0,        ROT0, "BwB",			"
 GAME( 199?,  prizeinv,  0,        mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Prize Space Invaders (20\" v1.1)",									GAME_NOT_WORKING )
 GAME( 199?,  blox,      0,        mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0)",														GAME_NOT_WORKING )
 GAME( 199?,  bloxd,     blox,     mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0, Datapak)",												GAME_NOT_WORKING )
-
-/* Games below are non-video (why are they in this file? not mpu4.c?) */
-GAMEL(1989?, connect4,  0,        mpu4mod2, connect4, connect4, ROT0, "Dolbeck Systems","Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
-GAME( 198?,  mpu4utst,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Unit Test (Program 4)",										0 )
-GAME( 198?,  mpu4tst2,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Unit Test (Program 2)",										0 )
-GAME( 198?,  mpu4met0,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Meter Clear ROM",												0 )

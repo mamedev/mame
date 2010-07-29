@@ -1918,6 +1918,11 @@ static MACHINE_DRIVER_START( mpu4dutch )
 	MDRV_MACHINE_START(mpu4dutch)						// main mpu4 board initialisation
 MACHINE_DRIVER_END
 
+static DRIVER_INIT (connect4)
+{
+	led_extend=1;
+}
+
 ROM_START( m_oldtmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
@@ -1933,9 +1938,38 @@ ROM_START( m_gmball )
 	ROM_LOAD( "gbbx.p1",	0x0000, 0x10000,  CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc))
 ROM_END
 
+ROM_START( connect4 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "connect4.p2",  0x8000, 0x4000,  CRC(6090633c) SHA1(0cd2725a235bf93cfe94f2ca648d5fccb87b8e5c) )
+	ROM_LOAD( "connect4.p1",  0xC000, 0x4000,  CRC(b1af50c0) SHA1(7c9645ea378f0857b849ca24a239d9114f62da7f) )
+ROM_END
+
+ROM_START( mpu4utst )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
+ROM_END
+
+ROM_START( mpu4tst2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "ut2.p1",  0xE000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
+ROM_END
+
+ROM_START( mpu4met0 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "meter-zero.p1",  0x8000, 0x8000,  CRC(e74297e5) SHA1(49a2cc85eda14199975ec37a794b685c839d3ab9))
+ROM_END
+
 //    year, name,    parent,  machine,  input,       init,    monitor, company,         fullname,                                    flags
 GAME( 198?, m_oldtmr,0,       mpu4dutch,mpu4,		 0,        ROT0,   "Barcrest",		"Old Timer",														GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME( 198?, m_ccelbr,0,       mpu4mod2, mpu4,		 m_ccelbr, ROT0,   "Barcrest",		"Club Celebration",													GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
 GAMEL(198?, m_gmball,0,		  mod4yam,  gamball,     m_gmball, ROT0,   "Barcrest",      "Gamball",															GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_gamball )
+
+//SWP
+GAMEL(1989?, connect4,  0,        mpu4mod2, connect4, connect4, ROT0, "Dolbeck Systems","Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
+
+//Diagnostic ROMs
+GAME( 198?,  mpu4utst,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Unit Test (Program 4)",										0 )
+GAME( 198?,  mpu4tst2,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Unit Test (Program 2)",										0 )
+GAME( 198?,  mpu4met0,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Meter Clear ROM",												0 )
 
 #include "drivers/mpu4drvr.c"
