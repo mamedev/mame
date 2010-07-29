@@ -6478,6 +6478,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( joyjoy )	/* 0021 (c) 1990 SNK */
 	DRIVER( bjourney )	/* 0022 (c) 1990 Alpha Denshi Co. */
 	DRIVER( quizdais )	/* 0023 (c) 1991 SNK */
+	DRIVER( quizdaisk )	/* 0123 (c) 1991 SNK */
 	DRIVER( lresort )	/* 0024 (c) 1992 SNK */
 	DRIVER( eightman )	/* 0025 (c) 1991 SNK / Pallas */
 						/* 0026 Fun Fun Brothers (prototype) 1991 Alpha */
@@ -6548,6 +6549,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( galaxyfg )	/* 0078 (c) 1995 Sunsoft */
 	DRIVER( strhoop )	/* 0079 (c) 1994 Data East Corporation */
 	DRIVER( quizkof )	/* 0080 (c) 1995 Saurus */
+	DRIVER( quizkofk )	/* 0080 (c) 1995 Saurus */
 	DRIVER( ssideki3 )	/* 0081 (c) 1995 SNK */
 	DRIVER( doubledr )	/* 0082 (c) 1995 Technos */
 	DRIVER( pbobblen )	/* 0083 (c) 1994 Taito */
@@ -6601,6 +6603,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( samsho4 )	/* 0222 (c) 1996 SNK */
 	DRIVER( samsho4k )	/* Censored Korean release of samsho4 */
 	DRIVER( rbffspec )	/* 0223 (c) 1996 SNK */
+	DRIVER( rbffspeck )	/* 0124 (c) 1996 SNK */
 	DRIVER( twinspri )	/* 0224 (c) 1996 ADK */
 	DRIVER( wakuwak7 )	/* 0225 (c) 1996 Sunsoft */
 						/* 0226 Pair Pair Wars (prototype) 1996 Sunsoft? */
