@@ -1421,7 +1421,7 @@ static MACHINE_DRIVER_START( ssjkrpkr )
 	MDRV_IMPORT_FROM(noraut_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(ssjkrpkr_map)
 
 	/* sound hardware */
