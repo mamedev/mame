@@ -381,6 +381,7 @@ offs_t naomibd_get_dmaoffset(running_device *device)
 		}
 	}
 
+	result = get_safe_token(device)->dma_offset;
 	return result;
 }
 
