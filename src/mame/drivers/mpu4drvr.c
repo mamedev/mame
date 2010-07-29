@@ -508,7 +508,7 @@ static VIDEO_UPDATE( mpu4_vid )
 			}
 		}
 		/* Line 0 - this triggers for the first scanline of each row
-		Since we are doing this row by row, just call every time*/
+        Since we are doing this row by row, just call every time*/
 		scn2674_status_register |= 0x08;
 		if (scn2674_irq_mask&0x08)
 		{

@@ -487,7 +487,7 @@ void osd_init(running_machine *machine)
 	winsound_init(machine);
 	wininput_init(machine);
 	winoutput_init(machine);
-	
+
 	// notify listeners of screen configuration
 	astring tempstring;
 	for (win_window_info *info = win_window_list; info != NULL; info = info->next)

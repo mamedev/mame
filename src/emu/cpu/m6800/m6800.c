@@ -602,13 +602,13 @@ INLINE void CHECK_IRQ_LINES(m6800_state *cpustate)
 		cpustate->nmi_pending = FALSE;
 		enter_interrupt(cpustate, "M6800 '%s' take NMI\n",0xfffc);
 	}
-	else 
+	else
 	{
 		if( cpustate->irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
 		{	/* standard IRQ */
 			if(cpustate->wai_state & M6800_SLP)
 				cpustate->wai_state &= ~M6800_SLP;
-			
+
 			if( !(CC & 0x10) )
 			{
 				enter_interrupt(cpustate, "M6800 '%s' take IRQ1\n",0xfff8);
