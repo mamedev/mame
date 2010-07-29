@@ -28,6 +28,29 @@
 #endif
 
 
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+class parent_info
+{
+public:
+	const game_driver *drv;
+	machine_config mconfig;
+
+	parent_info(const game_driver *drv) : mconfig(drv->machine_config)
+	{
+		this->drv = drv;
+	}
+};
+
+
+
+/***************************************************************************
+    CORE IMPLEMENTATION
+***************************************************************************/
+
 /*-------------------------------------------------
     print_game_switches - print the DIP switch
     settings for a game
@@ -423,6 +446,38 @@ static void print_game_bios(FILE *out, const game_driver *game)
 		}
 }
 
+/*-------------------------------------------------
+    get_merge_name - get the rom name from a
+    parent set
+-------------------------------------------------*/
+
+static const char *get_merge_name(const rom_entry *rom, int parents, const parent_info **pinfoarray)
+{
+	int parent;
+	const char *merge_name = NULL;
+
+	for (parent = 0; parent < parents; ++parent)
+	{
+		const game_driver *clone_of = pinfoarray[parent]->drv;
+		const machine_config *pconfig = &pinfoarray[parent]->mconfig;
+		const rom_source *psource;
+		const rom_entry *pregion, *prom;
+
+		/* scan the clone_of ROM for a matching ROM entry */
+		for (psource = rom_first_source(clone_of, pconfig); psource != NULL; psource = rom_next_source(clone_of, pconfig, psource))
+			for (pregion = rom_first_region(clone_of, psource); pregion != NULL; pregion = rom_next_region(pregion))
+				for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
+					if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
+					{
+						merge_name = ROM_GETNAME(prom);
+						break;
+					}
+	}
+
+	return merge_name;
+}
+
+
 
 /*-------------------------------------------------
     print_game_rom - print the roms section of
@@ -433,7 +488,14 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 {
 	const game_driver *clone_of = driver_get_clone(game);
 	int rom_type;
-	machine_config *pconfig = (clone_of != NULL) ? global_alloc(machine_config(clone_of->machine_config)) : NULL;
+	int parents = 0;
+	const parent_info *pinfoarray[4];
+
+	for (; clone_of != NULL; clone_of = driver_get_clone(clone_of))
+	{
+		assert_always(parents < ARRAY_LENGTH(pinfoarray), "too many parents");
+		pinfoarray[parents++] = global_alloc(parent_info(clone_of));
+	}
 
 	/* iterate over 3 different ROM "types": BIOS, ROMs, DISKs */
 	for (rom_type = 0; rom_type < 3; rom_type++)
@@ -458,7 +520,7 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 					int is_bios = ROM_GETBIOSFLAGS(rom);
 					const char *name = ROM_GETNAME(rom);
 					int offset = ROM_GETOFFSET(rom);
-					const rom_entry *parent_rom = NULL;
+					const char *merge_name = NULL;
 					char bios_name[100];
 
 					/* BIOS ROMs only apply to bioses */
@@ -466,20 +528,9 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 						continue;
 
 					/* if we have a valid ROM and we are a clone, see if we can find the parent ROM */
-					if (!ROM_NOGOODDUMP(rom) && clone_of != NULL)
+					if (!ROM_NOGOODDUMP(rom) && parents > 0)
 					{
-						const rom_source *psource;
-						const rom_entry *pregion, *prom;
-
-						/* scan the clone_of ROM for a matching ROM entry */
-						for (psource = rom_first_source(clone_of, pconfig); psource != NULL; psource = rom_next_source(clone_of, pconfig, psource))
-							for (pregion = rom_first_region(clone_of, psource); pregion != NULL; pregion = rom_next_region(pregion))
-								for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
-									if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
-									{
-										parent_rom = prom;
-										break;
-									}
+						merge_name = get_merge_name(rom, parents, pinfoarray);
 					}
 
 					/* scan for a BIOS name */
@@ -506,8 +557,8 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 					/* add name, merge, bios, and size tags */
 					if (name != NULL && name[0] != 0)
 						fprintf(out, " name=\"%s\"", xml_normalize_string(name));
-					if (parent_rom != NULL)
-						fprintf(out, " merge=\"%s\"", xml_normalize_string(ROM_GETNAME(parent_rom)));
+					if (merge_name != NULL)
+						fprintf(out, " merge=\"%s\"", xml_normalize_string(merge_name));
 					if (bios_name[0] != 0)
 						fprintf(out, " bios=\"%s\"", xml_normalize_string(bios_name));
 					if (!is_disk)
@@ -550,7 +601,8 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 			}
 	}
 
-	global_free(pconfig);
+	for (; parents > 0; parents--)
+		global_free(pinfoarray[parents - 1]);
 }
 
 
