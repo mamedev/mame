@@ -1452,6 +1452,7 @@ src/mame/drivers/bishjan.c svneol=native#text/plain
 src/mame/drivers/bking.c svneol=native#text/plain
 src/mame/drivers/blackt96.c svneol=native#text/plain
 src/mame/drivers/bladestl.c svneol=native#text/plain
+src/mame/drivers/blitz.c svneol=native#text/plain
 src/mame/drivers/blktiger.c svneol=native#text/plain
 src/mame/drivers/blmbycar.c svneol=native#text/plain
 src/mame/drivers/blockade.c svneol=native#text/plain

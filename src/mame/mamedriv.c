@@ -10286,4 +10286,7 @@ Other Sun games
 
 	DRIVER( chkun )
 
+	/* Blitz System Inc. */
+	DRIVER( megadpkr )	/* (c) 1990 Blitz System Inc */
+
 #endif	/* DRIVER_RECURSIVE */
