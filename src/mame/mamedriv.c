@@ -9514,6 +9514,7 @@ Other Sun games
 	DRIVER( quizoa )	/* (c) 1985 Seoul Coin Corp. */
 	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
 	DRIVER( miniboy7 )	/* (c) 1983, Bonanza Enterprises */
+	DRIVER( miniboy7a )	/* (c) 1983, Bonanza Enterprises */
 	DRIVER( 39in1 )		/* MAME based bootleg */
 	DRIVER( 48in1 )		/* MAME based bootleg */
 	DRIVER( 48in1a )    	/* MAME based bootleg */

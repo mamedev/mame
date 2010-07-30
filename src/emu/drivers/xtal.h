@@ -94,6 +94,7 @@ enum
 	XTAL_12MHz  		= 12000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_12_096MHz		= 12096000,		/* Some early 80's Atari games */
 	XTAL_12_288MHz  	= 12288000,		/* Sega Model 3 digital audio board */
+	XTAL_12_4725MHz 	= 12472500,		/* Bonanza's Mini Boy 7 */
 	XTAL_12_48MHz		= 12480000,		/* TRS-80 Model II */
 	XTAL_12_5MHz		= 12500000,		/* Red Alert audio board */
 	XTAL_12_9792MHz		= 12979200,		/* Exidy 440 */
