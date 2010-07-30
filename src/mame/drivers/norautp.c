@@ -1423,6 +1423,7 @@ static MACHINE_DRIVER_START( ssjkrpkr )
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(ssjkrpkr_map)
+	MDRV_CPU_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("discrete")
@@ -3448,7 +3449,12 @@ static DRIVER_INIT( ssa )
 /* Passing the video PPI handshaking lines */
 /* Just for debugging purposes */
 {
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+
+//	ROM[0x073b] = 0x00;
+//	ROM[0x073c] = 0x00;
+//	ROM[0x073d] = 0x00;
+
 //  ROM[0x07af] = 0x00;
 //  ROM[0x07b0] = 0x00;
 //  ROM[0x07b1] = 0x00;
