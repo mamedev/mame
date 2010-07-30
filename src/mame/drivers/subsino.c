@@ -200,6 +200,20 @@
   - Added technical notes.
 
 
+  2010-07-30
+  ----------
+
+  - Added Magic Train.
+
+    Since it's driven by a HD647180X0CP6 (Subsino - SS9600)
+    plus SS9601 and SS9602 (for video and I/O respectively),
+    it's possible that needs to be moved to a new driver in
+    a near future.
+
+  - Added technical notes.
+
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -2678,6 +2692,7 @@ ROM_START( sharkpy )
 	ROM_LOAD( "n82s129an.u12", 0x100, 0x100, CRC(5a7a25ed) SHA1(eebd679195e6ea50f64f3c46cd06ee21a1550491) )
 	ROM_LOAD( "n82s129an.u13", 0x200, 0x100, CRC(0ef5f218) SHA1(a02cf266661385aa078563bd83240d36549c1cf0) )
 ROM_END
+
 /***************************************************************************
 
 Shark Party (alt)
@@ -2910,9 +2925,12 @@ ROM_START( smoto20 )
 	ROM_LOAD( "82s129.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
 ROM_END
 
-/* Super Treasure Island
+/***************************************************************************
+
+   Super Treasure Island
  - is this better here or in bishjan.c?
-*/
+
+***************************************************************************/
 
 ROM_START( stisub )
 	ROM_REGION( 0x18000, "maincpu", 0 )
@@ -2929,6 +2947,47 @@ ROM_START( stisub )
 	ROM_LOAD( "sti-alpha_7-ver1.1.u24", 0x20000, 0x20000, CRC(05bc7ed2) SHA1(23ae716cd149ee940ac4bdc114fbfeb290e91b11) )
 	ROM_LOAD( "sti-alpha_8-ver1.1.u23", 0x40000, 0x20000, CRC(d3c11545) SHA1(0383358d223c9bfe67c3b5de7a9cc3e43a9769b2) )
 	ROM_LOAD( "sti-alpha_9-ver1.1.u22", 0x60000, 0x20000, CRC(9710a223) SHA1(76ef6bd77ae33d91a9b6a9a615d07caee3356dfb) )
+ROM_END
+
+/***************************************************************************
+
+  Magic Train
+  -----------
+
+  CPU:   1x Hitachi 6D1R - HD647180X0CP6 (Subsino - SS9600) (U23)
+
+  NVRAM: 1x SANYO LC36256AML (SMD) (U16).
+  VRAM:  2x UMC UM62256 (U7-U8).
+
+  Video: Subsino (SMD-40PX40P) SS9601 - 9732WX011 (U1).
+  I/O:   Subsino (SMD-30PX20P) SS9602 - 9732LX006 (U11).
+
+  ROM?: HMC HM86171-80 9745E-C7B34
+
+  Xtal: 12 MHz.
+
+  Color PROMs (3) are undumped.
+
+***************************************************************************/
+
+ROM_START( mtrain )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "out_1v131.u17", 0x10000, 0x8000, CRC(6761be7f) SHA1(a492f8179d461a454516dde33ff04473d4cfbb27) )
+	ROM_CONTINUE(0x0000,0x8000)
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "rom_1.u05", 0x00000, 0x40000, CRC(96067e95) SHA1(bec7dffaf6920ff2bd85a43fb001a997583e25ee) )
+	ROM_LOAD( "rom_2.u04", 0x40000, 0x40000, CRC(a794f287) SHA1(7b9c0d57224a700f49e55ba5aeb7ed9d35a71e02) )
+	ROM_LOAD( "rom_3.u03", 0x80000, 0x40000, CRC(cef2c079) SHA1(9ee54a08ef8db90a80a4b3568bb82ce09ee41e65) )
+	ROM_LOAD( "rom_4.u02", 0xc0000, 0x40000, CRC(b7e65d04) SHA1(5eea1b8c1129963b3b83a59410cd0e1de70621e4) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "rom_5.snd", 0x00000, 0x40000, CRC(51cae476) SHA1(d1da4e5c3d53d18d8b69dfb57796d0ae311d99bf) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129.u11", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "82s129.u12", 0x100, 0x100, NO_DUMP )
+	ROM_LOAD( "82s129.u13", 0x200, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -3109,6 +3168,14 @@ static DRIVER_INIT( stisub )
 
 }
 
+DRIVER_INIT( mtrain )
+{
+/*
+    - crsbingo XORs (0xbb, 0xcc, 0xcc, 0xdd, 0xaa, 0x11, 0x44, 0xee)
+    - start 8000
+*/
+}
+
 
 /***************************************************************************
 *                               Game Drivers                               *
@@ -3126,3 +3193,4 @@ GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino", 
 GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Shark Party (English, Alpha license)", 0,      layout_sharkpye )	// PCB black-box was marked 'victor 6'
 GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,      layout_smoto )
 GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,      layout_smoto )
+GAME(  1997, mtrain,   0,        sharkpy,  stisub,   mtrain,   ROT0, "Subsino",         "Magic Train",                          GAME_NOT_WORKING )
