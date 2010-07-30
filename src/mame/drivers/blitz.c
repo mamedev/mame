@@ -142,7 +142,7 @@
   Connections... (pins in parenthesis)
   ------------------------------------
 
-  The following diagrams are still incomplete an could have errors.
+  The following diagrams are still incomplete and could have errors.
   At simple sight, mega-2.u2 & mega-3.u3 ROMs are sharing the same
   addressing space, but /CE line for both devices are connected to
   the same places... Need to be traced from the scratch.
