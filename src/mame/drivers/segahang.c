@@ -1908,7 +1908,7 @@ static DRIVER_INIT( shangonro )
 
 GAME( 1985, hangon,    0,        hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On (Rev A)", 0 )
 GAME( 1985, hangon1,   hangon,   hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On", 0 )
-GAME( 1992, shangonro, shangon,  shangupb, shangonro,shangonro,ROT0, "Sega",    "Super Hang-On (Japan, FD1094 317-0038)", 0 )
+GAME( 1987, shangonro, shangon,  shangupb, shangonro,shangonro,ROT0, "Sega",    "Super Hang-On (ride-on, Japan, FD1094 317-0038)", 0 )
 GAME( 1992, shangonrb, shangon,  shangupb, shangupb, hangon,   ROT0, "bootleg", "Super Hang-On (bootleg)", 0 )
 GAME( 1985, sharrier,  0,        sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (Rev A, 8751 315-5163A)", 0 )
 GAME( 1985, sharrier1, sharrier, sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (8751 315-5163)", 0 )
