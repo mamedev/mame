@@ -494,66 +494,6 @@ static VIDEO_UPDATE( mpu4_vid )
 	/* we're in row table mode...thats why */
 	for(y = 0; y <= IR4_scn2674_rows_per_screen; y++)
 	{
-
-		if (y == 0)
-		{
-			scn2674_status_register |= 0x02;
-			/* Ready - this triggers for the first scanline of the screen */
-			if (scn2674_irq_mask&0x02)
-			{
-				LOGSTUFF(("SCN2674 Ready\n"));
-				scn2674_irq_state = 1;
-				scn2674_irq_register |= 0x02;
-				update_mpu68_interrupts(screen->machine);
-			}
-		}
-		/* Line 0 - this triggers for the first scanline of each row
-        Since we are doing this row by row, just call every time*/
-		scn2674_status_register |= 0x08;
-		if (scn2674_irq_mask&0x08)
-		{
-			LOGSTUFF(("SCN2674 Line Zero\n"));
-			scn2674_irq_state = 1;
-			scn2674_irq_register |= 0x08;
-			update_mpu68_interrupts(screen->machine);
-		}
-
-		if (y == IR12_scn2674_split_register_1)
-		/* Split Screen 1 */
-		{
-			if (scn2674_screen2_h & 0x40)
-			{
-				popmessage("Split screen 1 address shift required, contact MAMEDEV");
-			}
-			scn2674_status_register |= 0x04;
-			if (scn2674_irq_mask&0x04)
-			{
-				LOGSTUFF(("SCN2674 Split Screen 1\n"));
-				scn2674_irq_state = 1;
-				update_mpu68_interrupts(screen->machine);
-
-				scn2674_irq_register |= 0x04;
-			}
-		}
-
-		if (y == IR13_scn2674_split_register_2)
-		/* Split Screen 2 */
-		{
-			if (scn2674_screen2_h & 0x80)
-			{
-				popmessage("Split screen 2 address shift required, contact MAMEDEV");
-			}
-			scn2674_status_register |= 0x01;
-			if (scn2674_irq_mask&0x01)
-			{
-				LOGSTUFF(("SCN2674 Split Screen 2 irq\n"));
-				scn2674_irq_state = 1;
-				scn2674_irq_register |= 0x01;
-				update_mpu68_interrupts(screen->machine);
-			}
-
-		}
-
 		int screen2_base = (scn2674_screen2_h << 8) | scn2674_screen2_l;
 
 		UINT16 rowbase = (mpu4_vid_mainram[1+screen2_base+(y*2)]<<8)|mpu4_vid_mainram[screen2_base+(y*2)];
@@ -1077,25 +1017,7 @@ static VIDEO_START( mpu4_vid )
 	scn2675_IR_pointer = 0;
 }
 
-static INTERRUPT_GEN( mpu4_vid_irq )
-{
-	LOGSTUFF(("scn2674_irq_mask %02x\n",scn2674_irq_mask));
-	if (cpu_getiloops(device)==0) /* vbl */
-	{
-	/*  if (scn2674_display_enabled) ? */
-		{
-			if (scn2674_irq_mask&0x10)
-			{
-				LOGSTUFF(("vblank irq\n"));
-				scn2674_irq_state = 1;
-				update_mpu68_interrupts(device->machine);
 
-				scn2674_irq_register |= 0x10;
-			}
-		}
-		scn2674_status_register |= 0x10;
-	}
-}
 
 
 /****************************
@@ -1377,7 +1299,7 @@ static INPUT_PORTS_START( mating )
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right Yellow")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Right Red")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Red") // selects the answer
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("26")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left Yellow")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left Red")
@@ -2199,6 +2121,108 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP/* 64k  paged ROM (4 pages) */
 ADDRESS_MAP_END
 
+static int rowcounter = 0;
+static int linecounter = 0;
+
+
+static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
+{
+	int current_scanline=param;
+	timer_call_after_resynch(timer.machine, NULL, 0, 0);
+
+
+	if (current_scanline==0)
+	{
+		// these will be used to track which row / line we're on eventually
+		// and used by the renderer to render the correct data
+		rowcounter = 0; linecounter = 0;
+
+	//	scn2674_status_register &= ~0x10; // clear vblank
+
+		scn2674_status_register |= 0x02;
+		/* Ready - this triggers for the first scanline of the screen */
+		if (scn2674_irq_mask&0x02)
+		{
+			LOGSTUFF(("SCN2674 Ready\n"));
+			scn2674_irq_state = 1;
+			scn2674_irq_register |= 0x02;
+			update_mpu68_interrupts(timer.machine);
+		}
+	}
+	
+	// should be triggered at the start of each ROW (line zero for that row)
+	if ((current_scanline%8 == 7) && (current_scanline<296))
+	{	
+		scn2674_status_register |= 0x08;
+		if (scn2674_irq_mask&0x08)
+		{
+			LOGSTUFF(("SCN2674 Line Zero\n"));
+			scn2674_irq_state = 1;
+			scn2674_irq_register |= 0x08;
+			update_mpu68_interrupts(timer.machine);
+		}
+	}
+
+	// this is ROWS not scanlines!!
+	if (current_scanline == IR12_scn2674_split_register_1*8)
+	/* Split Screen 1 */
+	{
+		if (scn2674_screen2_h & 0x40)
+		{
+			popmessage("Split screen 1 address shift required, contact MAMEDEV");
+		}
+		scn2674_status_register |= 0x04;
+		if (scn2674_irq_mask&0x04)
+		{
+			LOGSTUFF(("SCN2674 Split Screen 1\n"));
+			scn2674_irq_state = 1;
+			update_mpu68_interrupts(timer.machine);
+			timer.machine->primary_screen->update_partial(timer.machine->primary_screen->vpos());
+
+			scn2674_irq_register |= 0x04;
+		}
+	}
+
+	// this is in ROWS not scanlines!!!
+	if (current_scanline == IR13_scn2674_split_register_2*8)
+	/* Split Screen 2 */
+	{
+		if (scn2674_screen2_h & 0x80)
+		{
+			popmessage("Split screen 2 address shift required, contact MAMEDEV");
+		}
+		scn2674_status_register |= 0x01;
+		if (scn2674_irq_mask&0x01)
+		{
+			LOGSTUFF(("SCN2674 Split Screen 2 irq\n"));
+			scn2674_irq_state = 1;
+			scn2674_irq_register |= 0x01;
+			update_mpu68_interrupts(timer.machine);
+			timer.machine->primary_screen->update_partial(timer.machine->primary_screen->vpos());
+
+		}
+	}
+
+	// vblank?
+	if (current_scanline == 300)
+	{
+	/*  if (scn2674_display_enabled) ? */
+		{
+			if (scn2674_irq_mask&0x10)
+			{
+				LOGSTUFF(("vblank irq\n"));
+				scn2674_irq_state = 1;
+				update_mpu68_interrupts(timer.machine);
+
+				scn2674_irq_register |= 0x10;
+			}
+		}
+		scn2674_status_register |= 0x10;
+	}
+
+//	printf("scanline %d\n",current_scanline);
+}
+
 
 static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
@@ -2219,14 +2243,13 @@ static MACHINE_DRIVER_START( mpu4_vid )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
 	MDRV_SCREEN_REFRESH_RATE(50)
 
 	MDRV_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map)
-	MDRV_CPU_VBLANK_INT("screen", mpu4_vid_irq)
 
 	MDRV_QUANTUM_TIME(HZ(960))
 
@@ -2252,6 +2275,9 @@ static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
 	MDRV_ACIA6850_ADD("acia6850_1", m68k_acia_if)
+
+	// for the video timing
+	MDRV_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( crmaze )
