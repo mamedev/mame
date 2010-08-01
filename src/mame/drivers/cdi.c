@@ -4712,7 +4712,7 @@ ROM_START( quizard )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd17", 0, SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
+    DISK_IMAGE_READONLY( "quizrd32", 0, SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 ROM_END
 
 ROM_START( quizrd22 )
@@ -4729,7 +4729,7 @@ ROM_START( quizrd22 )
     DISK_IMAGE_READONLY( "quizrd22", 0, SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 ROM_END
 
-ROM_START( quizrd32 )
+ROM_START( quizrd17 )
     ROM_REGION(0x80000, "maincpu", 0)
     ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -4740,7 +4740,35 @@ ROM_START( quizrd32 )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd32", 0, SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
+    DISK_IMAGE_READONLY( "quizrd17", 0, SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
+ROM_END
+
+ROM_START( quizrd12 ) /* CD-ROM printed 01/95 */
+    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+
+    ROM_REGION(0x2000, "cdic", 0)
+    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+    ROM_REGION(0x2000, "slave", 0)
+    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+    DISK_REGION( "cdrom" )
+    DISK_IMAGE_READONLY( "quizrd12", 0, SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
+ROM_END
+
+ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
+    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+
+    ROM_REGION(0x2000, "cdic", 0)
+    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+    ROM_REGION(0x2000, "slave", 0)
+    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+    DISK_REGION( "cdrom" )
+    DISK_IMAGE_READONLY( "quizrr42", 0, SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 ROM_END
 
 ROM_START( quizrr41 )
@@ -4763,7 +4791,9 @@ ROM_END
 
 /*          rom       parent    machine   inp       init */
 GAME( 1991, cdi,      0,        cdi,      cdi,      0,        ROT0,     "Philips", "CD-i (Mono-I) BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1996, quizard,  cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 1.7",   GAME_NOT_WORKING )
+GAME( 1996, quizard,  cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 3.2",   GAME_NOT_WORKING )
 GAME( 1995, quizrd22, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 2.2",   GAME_NOT_WORKING )
-GAME( 1996, quizrd32, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 3.2",   GAME_NOT_WORKING )
+GAME( 1995, quizrd17, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 1.7",   GAME_NOT_WORKING )
+GAME( 1995, quizrd12, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 1.2",   GAME_NOT_WORKING )
+GAME( 1998, quizrr42, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard Rainbow 4.2",   GAME_NOT_WORKING )
 GAME( 1998, quizrr41, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard Rainbow 4.1",   GAME_NOT_WORKING )

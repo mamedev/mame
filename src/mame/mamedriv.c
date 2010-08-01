@@ -10192,7 +10192,9 @@ Other Sun games
 	DRIVER( cdi )		/* Base unit */
 	DRIVER( quizard )	/* (c) Disney 1996 */
 	DRIVER( quizrd22 )	/* (c) Disney 1995 */
-	DRIVER( quizrd32 )	/* (c) Disney 1996 */
+	DRIVER( quizrd17 )	/* (c) Disney 1996 */
+	DRIVER( quizrd12 )	/* (c) Disney 1996 */
+	DRIVER( quizrr42 )	/* (c) Disney 1998 */
 	DRIVER( quizrr41 )	/* (c) Disney 1998 */
 
 /* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
