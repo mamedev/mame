@@ -395,9 +395,6 @@ static void memory_init_allocate(running_machine *machine);
 static void memory_init_locate(running_machine *machine);
 static void memory_exit(running_machine &machine);
 
-/* address map helpers */
-static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const device_config *devconfig, const addrmap_token *tokens);
-
 /* memory mapping helpers */
 static void space_map_range(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
 static void *space_find_backing_memory(const address_space *space, offs_t addrstart, offs_t addrend);
@@ -818,62 +815,6 @@ void memory_init(running_machine *machine)
 
 	/* we are now initialized */
 	memdata->initialized = TRUE;
-}
-
-
-
-/***************************************************************************
-    ADDRESS MAPS
-***************************************************************************/
-
-/*-------------------------------------------------
-    address_map_alloc - build and allocate an
-    address map for a device's address space
--------------------------------------------------*/
-
-address_map *address_map_alloc(const device_config *devconfig, const game_driver *driver, int spacenum, void *memdata)
-{
-	address_map *map = global_alloc_clear(address_map);
-
-	const device_config_memory_interface *memintf;
-	if (!devconfig->interface(memintf))
-		throw emu_fatalerror("No memory interface defined for device '%s'\n", devconfig->tag());
-
-	const address_space_config *spaceconfig = memintf->space_config(spacenum);
-
-	/* append the internal device map (first so it takes priority) */
-	if (spaceconfig != NULL && spaceconfig->m_internal_map != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig, spaceconfig->m_internal_map);
-
-	/* construct the standard map */
-	if (memintf->address_map(spacenum) != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig, memintf->address_map(spacenum));
-
-	/* append the default device map (last so it can be overridden) */
-	if (spaceconfig != NULL && spaceconfig->m_default_map != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig, spaceconfig->m_default_map);
-
-	return map;
-}
-
-
-/*-------------------------------------------------
-    address_map_free - release allocated memory
-    for an address map
--------------------------------------------------*/
-
-void address_map_free(address_map *map)
-{
-	/* free all entries */
-	while (map->entrylist != NULL)
-	{
-		address_map_entry *entry = map->entrylist;
-		map->entrylist = entry->next;
-		global_free(entry);
-	}
-
-	/* free the map */
-	global_free(map);
 }
 
 
@@ -1811,52 +1752,56 @@ static void memory_init_preflight(running_machine *machine)
 		int entrynum;
 
 		/* allocate the address map */
-		space->map = address_map_alloc(&space->cpu->baseconfig(), machine->gamedrv, space->spacenum, memdata);
+		space->map = global_alloc(address_map(space->cpu->baseconfig(), space->spacenum));
 
 		/* extract global parameters specified by the map */
-		space->unmap = (space->map->unmapval == 0) ? 0 : ~0;
-		if (space->map->globalmask != 0)
+		space->unmap = (space->map->m_unmapval == 0) ? 0 : ~0;
+		if (space->map->m_globalmask != 0)
 		{
-			space->addrmask = space->map->globalmask;
+			space->addrmask = space->map->m_globalmask;
 			space->bytemask = memory_address_to_byte_end(space, space->addrmask);
 		}
 
 		/* make a pass over the address map, adjusting for the device and getting memory pointers */
-		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+		for (entry = space->map->m_entrylist; entry != NULL; entry = entry->m_next)
 		{
+			/* if we have a share entry, add it to our map */
+			if (entry->m_share != NULL)
+				memdata->sharemap.add(entry->m_share, UNMAPPED_SHARE_PTR, FALSE);
+		
 			/* computed adjusted addresses first */
-			entry->bytestart = entry->addrstart;
-			entry->byteend = entry->addrend;
-			entry->bytemirror = entry->addrmirror;
-			entry->bytemask = entry->addrmask;
-			adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
+			entry->m_bytestart = entry->m_addrstart;
+			entry->m_byteend = entry->m_addrend;
+			entry->m_bytemirror = entry->m_addrmirror;
+			entry->m_bytemask = entry->m_addrmask;
+			adjust_addresses(space, &entry->m_bytestart, &entry->m_byteend, &entry->m_bytemask, &entry->m_bytemirror);
 
 			/* if this is a ROM handler without a specified region, attach it to the implicit region */
-			if (space->spacenum == ADDRESS_SPACE_0 && entry->read.type == AMH_ROM && entry->region == NULL)
+			if (space->spacenum == ADDRESS_SPACE_0 && entry->m_read.type == AMH_ROM && entry->m_region == NULL)
 			{
 				/* make sure it fits within the memory region before doing so, however */
-				if (entry->byteend < devregionsize)
+				if (entry->m_byteend < devregionsize)
 				{
-					entry->region = space->cpu->tag();
-					entry->rgnoffs = entry->bytestart;
+					entry->m_region = space->cpu->tag();
+					entry->m_rgnoffs = entry->m_bytestart;
 				}
 			}
 
 			/* validate adjusted addresses against implicit regions */
-			if (entry->region != NULL && entry->share == NULL && entry->baseptr == NULL)
+			if (entry->m_region != NULL && entry->m_share == NULL && entry->m_baseptr == NULL)
 			{
-				const region_info *region = machine->region(entry->region);
+				const region_info *region = machine->region(entry->m_region);
 				if (region == NULL)
-					fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag(), space->name, entry->addrstart, entry->addrend, entry->region);
+					fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag(), space->name, entry->m_addrstart, entry->m_addrend, entry->m_region);
 
 				/* validate the region */
-				if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > region->bytes())
-					fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag(), space->name, entry->addrstart, entry->addrend, entry->region, region->bytes());
+				if (entry->m_rgnoffs + (entry->m_byteend - entry->m_bytestart + 1) > region->bytes())
+					fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag(), space->name, entry->m_addrstart, entry->m_addrend, entry->m_region, region->bytes());
 			}
 
 			/* convert any region-relative entries to their memory pointers */
-			if (entry->region != NULL)
-				entry->memory = machine->region(entry->region)->base() + entry->rgnoffs;
+			if (entry->m_region != NULL)
+				entry->m_memory = machine->region(entry->m_region)->base() + entry->m_rgnoffs;
 		}
 
 		/* now loop over all the handlers and enforce the address mask */
@@ -1887,12 +1832,12 @@ static void memory_init_populate(running_machine *machine)
 			const address_map_entry *last_entry = NULL;
 
 			/* install the handlers, using the original, unadjusted memory map */
-			while (last_entry != space->map->entrylist)
+			while (last_entry != space->map->m_entrylist)
 			{
 				const address_map_entry *entry;
 
 				/* find the entry before the last one we processed */
-				for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
+				for (entry = space->map->m_entrylist; entry->m_next != last_entry; entry = entry->m_next) ;
 				last_entry = entry;
 
 				/* map both read and write halves */
@@ -1911,7 +1856,7 @@ static void memory_init_populate(running_machine *machine)
 
 static void memory_init_map_entry(address_space *space, const address_map_entry *entry, read_or_write readorwrite)
 {
-	const map_handler_data *handler = (readorwrite == ROW_READ) ? &entry->read : &entry->write;
+	const map_handler_data *handler = (readorwrite == ROW_READ) ? &entry->m_read : &entry->m_write;
 	device_t *device;
 
 	/* based on the handler type, alter the bits, name, funcptr, and object */
@@ -1926,17 +1871,17 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 			/* fall through to the RAM case otherwise */
 
 		case AMH_RAM:
-			_memory_install_ram(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+			_memory_install_ram(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 								readorwrite == ROW_READ, readorwrite == ROW_WRITE, NULL);
 			break;
 
 		case AMH_NOP:
-			_memory_unmap(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+			_memory_unmap(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 							readorwrite == ROW_READ, readorwrite == ROW_WRITE, TRUE);
 			break;
 
 		case AMH_UNMAP:
-			_memory_unmap(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+			_memory_unmap(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 							readorwrite == ROW_READ, readorwrite == ROW_WRITE, FALSE);
 			break;
 
@@ -1944,28 +1889,28 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 			switch ((handler->bits != 0) ? handler->bits : space->dbits)
 			{
 				case 8:
-					_memory_install_handler8(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+					_memory_install_handler8(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 												(readorwrite == ROW_READ) ? handler->handler.read.shandler8 : NULL, handler->name,
 												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler8 : NULL, handler->name,
 												handler->mask);
 					break;
 
 				case 16:
-					_memory_install_handler16(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+					_memory_install_handler16(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 												(readorwrite == ROW_READ) ? handler->handler.read.shandler16 : NULL, handler->name,
 												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler16 : NULL, handler->name,
 												handler->mask);
 					break;
 
 				case 32:
-					_memory_install_handler32(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+					_memory_install_handler32(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 												(readorwrite == ROW_READ) ? handler->handler.read.shandler32 : NULL, handler->name,
 												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler32 : NULL, handler->name,
 												handler->mask);
 					break;
 
 				case 64:
-					_memory_install_handler64(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+					_memory_install_handler64(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 												(readorwrite == ROW_READ) ? handler->handler.read.shandler64 : NULL, handler->name,
 												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler64 : NULL, handler->name,
 												handler->mask);
@@ -1980,28 +1925,28 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 			switch ((handler->bits != 0) ? handler->bits : space->dbits)
 			{
 				case 8:
-					_memory_install_device_handler8(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+					_memory_install_device_handler8(space, device, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 													(readorwrite == ROW_READ) ? handler->handler.read.dhandler8 : NULL, handler->name,
 													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler8 : NULL, handler->name,
 													handler->mask);
 					break;
 
 				case 16:
-					_memory_install_device_handler16(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+					_memory_install_device_handler16(space, device, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 													(readorwrite == ROW_READ) ? handler->handler.read.dhandler16 : NULL, handler->name,
 													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler16 : NULL, handler->name,
 													handler->mask);
 					break;
 
 				case 32:
-					_memory_install_device_handler32(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+					_memory_install_device_handler32(space, device, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 													(readorwrite == ROW_READ) ? handler->handler.read.dhandler32 : NULL, handler->name,
 													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler32 : NULL, handler->name,
 													handler->mask);
 					break;
 
 				case 64:
-					_memory_install_device_handler64(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+					_memory_install_device_handler64(space, device, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 													(readorwrite == ROW_READ) ? handler->handler.read.dhandler64 : NULL, handler->name,
 													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler64 : NULL, handler->name,
 													handler->mask);
@@ -2010,13 +1955,13 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 			break;
 
 		case AMH_PORT:
-			_memory_install_port(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+			_memory_install_port(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 									(readorwrite == ROW_READ) ? handler->tag : NULL,
 									(readorwrite == ROW_WRITE) ? handler->tag : NULL);
 			break;
 
 		case AMH_BANK:
-			_memory_install_bank(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+			_memory_install_bank(space, entry->m_addrstart, entry->m_addrend, entry->m_addrmask, entry->m_addrmirror,
 									(readorwrite == ROW_READ) ? handler->tag : NULL,
 									(readorwrite == ROW_WRITE) ? handler->tag : NULL);
 			break;
@@ -2044,9 +1989,9 @@ static void memory_init_allocate(running_machine *machine)
 
 		/* make a first pass over the memory map and track blocks with hardcoded pointers */
 		/* we do this to make sure they are found by space_find_backing_memory first */
-		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-			if (entry->memory != NULL)
-				block_allocate(space, entry->bytestart, entry->byteend, entry->memory);
+		for (entry = space->map->m_entrylist; entry != NULL; entry = entry->m_next)
+			if (entry->m_memory != NULL)
+				block_allocate(space, entry->m_bytestart, entry->m_byteend, entry->m_memory);
 
 		/* loop over all blocks just allocated and assign pointers from them */
 		for (memblock = memdata->memory_block_list; memblock != prev_memblock_head; memblock = memblock->next)
@@ -2064,8 +2009,8 @@ static void memory_init_allocate(running_machine *machine)
 			void *block;
 
 			/* work in MEMORY_BLOCK_CHUNK-sized chunks */
-			offs_t curblockstart = unassigned->bytestart / MEMORY_BLOCK_CHUNK;
-			offs_t curblockend = unassigned->byteend / MEMORY_BLOCK_CHUNK;
+			offs_t curblockstart = unassigned->m_bytestart / MEMORY_BLOCK_CHUNK;
+			offs_t curblockend = unassigned->m_byteend / MEMORY_BLOCK_CHUNK;
 
 			/* loop while we keep finding unassigned blocks in neighboring MEMORY_BLOCK_CHUNK chunks */
 			do
@@ -2073,14 +2018,14 @@ static void memory_init_allocate(running_machine *machine)
 				changed = FALSE;
 
 				/* scan for unmapped blocks in the adjusted map */
-				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-					if (entry->memory == NULL && entry != unassigned && space_needs_backing_store(space, entry))
+				for (entry = space->map->m_entrylist; entry != NULL; entry = entry->m_next)
+					if (entry->m_memory == NULL && entry != unassigned && space_needs_backing_store(space, entry))
 					{
 						offs_t blockstart, blockend;
 
 						/* get block start/end blocks for this block */
-						blockstart = entry->bytestart / MEMORY_BLOCK_CHUNK;
-						blockend = entry->byteend / MEMORY_BLOCK_CHUNK;
+						blockstart = entry->m_bytestart / MEMORY_BLOCK_CHUNK;
+						blockend = entry->m_byteend / MEMORY_BLOCK_CHUNK;
 
 						/* if we intersect or are adjacent, adjust the start/end */
 						if (blockstart <= curblockend + 1 && blockend >= curblockstart - 1)
@@ -2122,20 +2067,20 @@ static void memory_init_locate(running_machine *machine)
 		const address_map_entry *entry;
 
 		/* fill in base/size entries */
-		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+		for (entry = space->map->m_entrylist; entry != NULL; entry = entry->m_next)
 		{
-			if (entry->baseptr != NULL)
-				*entry->baseptr = entry->memory;
-			if (entry->baseptroffs_plus1 != 0)
-				*(void **)((UINT8 *)machine->driver_data + entry->baseptroffs_plus1 - 1) = entry->memory;
-			if (entry->genbaseptroffs_plus1 != 0)
-				*(void **)((UINT8 *)&machine->generic + entry->genbaseptroffs_plus1 - 1) = entry->memory;
-			if (entry->sizeptr != NULL)
-				*entry->sizeptr = entry->byteend - entry->bytestart + 1;
-			if (entry->sizeptroffs_plus1 != 0)
-				*(size_t *)((UINT8 *)machine->driver_data + entry->sizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
-			if (entry->gensizeptroffs_plus1 != 0)
-				*(size_t *)((UINT8 *)&machine->generic + entry->gensizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
+			if (entry->m_baseptr != NULL)
+				*entry->m_baseptr = entry->m_memory;
+			if (entry->m_baseptroffs_plus1 != 0)
+				*(void **)((UINT8 *)machine->driver_data + entry->m_baseptroffs_plus1 - 1) = entry->m_memory;
+			if (entry->m_genbaseptroffs_plus1 != 0)
+				*(void **)((UINT8 *)&machine->generic + entry->m_genbaseptroffs_plus1 - 1) = entry->m_memory;
+			if (entry->m_sizeptr != NULL)
+				*entry->m_sizeptr = entry->m_byteend - entry->m_bytestart + 1;
+			if (entry->m_sizeptroffs_plus1 != 0)
+				*(size_t *)((UINT8 *)machine->driver_data + entry->m_sizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
+			if (entry->m_gensizeptroffs_plus1 != 0)
+				*(size_t *)((UINT8 *)&machine->generic + entry->m_gensizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
 		}
 	}
 
@@ -2148,12 +2093,12 @@ static void memory_init_locate(running_machine *machine)
 
 		/* set the initial bank pointer */
 		for (ref = bank->reflist; !foundit && ref != NULL; ref = ref->next)
-			for (entry = ref->space->map->entrylist; entry != NULL; entry = entry->next)
-				if (entry->bytestart == bank->bytestart && entry->memory != NULL)
+			for (entry = ref->space->map->m_entrylist; entry != NULL; entry = entry->m_next)
+				if (entry->m_bytestart == bank->bytestart && entry->m_memory != NULL)
 				{
-					memdata->bank_ptr[bank->index] = (UINT8 *)entry->memory;
+					memdata->bank_ptr[bank->index] = (UINT8 *)entry->m_memory;
 					foundit = TRUE;
-					VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank->tag, entry->addrstart, entry->addrend, entry->memory));
+					VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank->tag, entry->m_addrstart, entry->m_addrend, entry->m_memory));
 					break;
 				}
 
@@ -2180,240 +2125,8 @@ static void memory_exit(running_machine &machine)
 	for (space = (address_space *)memdata->spacelist; space != NULL; space = space->next)
 	{
 		/* free the address map and tables */
-		if (space->map != NULL)
-			address_map_free(space->map);
+		global_free(space->map);
 	}
-}
-
-
-
-/***************************************************************************
-    ADDRESS MAP HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    map_detokenize - detokenize an array of
-    address map tokens
--------------------------------------------------*/
-
-#define check_map(field) do { \
-	if (map->field != 0 && map->field != tmap.field) \
-		fatalerror("%s: %s included a mismatched address map (%s %d) for an existing map with %s %d!\n", driver->source_file, driver->name, #field, tmap.field, #field, map->field); \
-	} while (0)
-
-#define check_entry_handler(row) do { \
-	if (entry->row.type != AMH_NONE) \
-		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) %s handler already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #row); \
-	} while (0)
-
-#define check_entry_field(field) do { \
-	if (entry->field != 0) \
-		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
-	} while (0)
-
-static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const device_config *devconfig, const addrmap_token *tokens)
-{
-	address_map_entry **firstentryptr;
-	address_map_entry **entryptr;
-	address_map_entry *entry;
-	address_map tmap = {0};
-	UINT32 entrytype;
-	int maptype;
-
-	/* check the first token */
-	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, tmap.spacenum, 8, tmap.databits, 8);
-	if (entrytype != ADDRMAP_TOKEN_START)
-		fatalerror("%s: %s Address map missing ADDRMAP_TOKEN_START!\n", driver->source_file, driver->name);
-	if (tmap.spacenum >= ADDRESS_SPACES)
-		fatalerror("%s: %s Invalid address space %d for memory map!\n", driver->source_file, driver->name, tmap.spacenum);
-	if (tmap.databits != 8 && tmap.databits != 16 && tmap.databits != 32 && tmap.databits != 64)
-		fatalerror("%s: %s Invalid data bits %d for memory map!\n", driver->source_file, driver->name, tmap.databits);
-	check_map(spacenum);
-	check_map(databits);
-
-	/* fill in the map values */
-	map->spacenum = tmap.spacenum;
-	map->databits = tmap.databits;
-
-	/* find the end of the list */
-	for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
-	firstentryptr = entryptr;
-	entry = NULL;
-
-	/* loop over tokens until we hit the end */
-	while (entrytype != ADDRMAP_TOKEN_END)
-	{
-		/* unpack the token from the first entry */
-		TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
-		switch (entrytype)
-		{
-			/* end */
-			case ADDRMAP_TOKEN_END:
-				break;
-
-			/* including */
-			case ADDRMAP_TOKEN_INCLUDE:
-				map_detokenize(memdata, map, driver, devconfig, TOKEN_GET_PTR(tokens, tokenptr));
-				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
-				entry = NULL;
-				break;
-
-			/* global flags */
-			case ADDRMAP_TOKEN_GLOBAL_MASK:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, tmap.globalmask, 32);
-				check_map(globalmask);
-				map->globalmask = tmap.globalmask;
-				break;
-
-			case ADDRMAP_TOKEN_UNMAP_VALUE:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, tmap.unmapval, 1);
-				check_map(unmapval);
-				map->unmapval = tmap.unmapval;
-				break;
-
-			/* start a new range */
-			case ADDRMAP_TOKEN_RANGE:
-				entry = *entryptr = global_alloc_clear(address_map_entry);
-				entryptr = &entry->next;
-				TOKEN_GET_UINT64_UNPACK2(tokens, entry->addrstart, 32, entry->addrend, 32);
-				break;
-
-			case ADDRMAP_TOKEN_MASK:
-				check_entry_field(addrmask);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmask, 32);
-				break;
-
-			case ADDRMAP_TOKEN_MIRROR:
-				check_entry_field(addrmirror);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmirror, 32);
-				if (entry->addrmirror != 0)
-				{
-					entry->addrstart &= ~entry->addrmirror;
-					entry->addrend &= ~entry->addrmirror;
-				}
-				break;
-
-			case ADDRMAP_TOKEN_READ:
-				check_entry_handler(read);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->read.bits, 8, entry->read.mask, 8);
-				entry->read.type = (map_handler_type)maptype;
-				if (entry->read.type == AMH_HANDLER || entry->read.type == AMH_DEVICE_HANDLER)
-				{
-					entry->read.handler.read = TOKEN_GET_PTR(tokens, read);
-					entry->read.name = TOKEN_GET_STRING(tokens);
-				}
-				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
-					entry->read.tag = devconfig->siblingtag(entry->read.derived_tag, TOKEN_GET_STRING(tokens));
-				break;
-
-			case ADDRMAP_TOKEN_WRITE:
-				check_entry_handler(write);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->write.bits, 8, entry->write.mask, 8);
-				entry->write.type = (map_handler_type)maptype;
-				if (entry->write.type == AMH_HANDLER || entry->write.type == AMH_DEVICE_HANDLER)
-				{
-					entry->write.handler.write = TOKEN_GET_PTR(tokens, write);
-					entry->write.name = TOKEN_GET_STRING(tokens);
-				}
-				if (entry->write.type == AMH_DEVICE_HANDLER || entry->write.type == AMH_PORT || entry->write.type == AMH_BANK)
-					entry->write.tag = devconfig->siblingtag(entry->write.derived_tag, TOKEN_GET_STRING(tokens));
-				break;
-
-			case ADDRMAP_TOKEN_READWRITE:
-				check_entry_handler(read);
-				check_entry_handler(write);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->read.bits, 8, entry->read.mask, 8);
-				entry->write.type = entry->read.type = (map_handler_type)maptype;
-				entry->write.bits = entry->read.bits;
-				entry->write.mask = entry->read.mask;
-				if (entry->read.type == AMH_HANDLER || entry->read.type == AMH_DEVICE_HANDLER)
-				{
-					entry->read.handler.read = TOKEN_GET_PTR(tokens, read);
-					entry->read.name = TOKEN_GET_STRING(tokens);
-					entry->write.handler.write = TOKEN_GET_PTR(tokens, write);
-					entry->write.name = TOKEN_GET_STRING(tokens);
-				}
-				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
-				{
-					const char *basetag = TOKEN_GET_STRING(tokens);
-					entry->read.tag = devconfig->siblingtag(entry->read.derived_tag, basetag);
-					entry->write.tag = devconfig->siblingtag(entry->write.derived_tag, basetag);
-				}
-				break;
-
-			case ADDRMAP_TOKEN_REGION:
-				check_entry_field(region);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
-				entry->region = devconfig->siblingtag(entry->region_string, TOKEN_GET_STRING(tokens));
-				break;
-
-			case ADDRMAP_TOKEN_SHARE:
-				check_entry_field(share);
-				entry->share = TOKEN_GET_STRING(tokens);
-				if (memdata != NULL)
-					memdata->sharemap.add(entry->share, UNMAPPED_SHARE_PTR, FALSE);
-				break;
-
-			case ADDRMAP_TOKEN_BASEPTR:
-				check_entry_field(baseptr);
-				entry->baseptr = (void **)TOKEN_GET_PTR(tokens, voidptr);
-				break;
-
-			case ADDRMAP_TOKEN_BASE_MEMBER:
-				check_entry_field(baseptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->baseptroffs_plus1, 24);
-				entry->baseptroffs_plus1++;
-				break;
-
-			case ADDRMAP_TOKEN_BASE_GENERIC:
-				check_entry_field(genbaseptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->genbaseptroffs_plus1, 24);
-				entry->genbaseptroffs_plus1++;
-				break;
-
-			case ADDRMAP_TOKEN_SIZEPTR:
-				check_entry_field(sizeptr);
-				entry->sizeptr = TOKEN_GET_PTR(tokens, sizeptr);
-				break;
-
-			case ADDRMAP_TOKEN_SIZE_MEMBER:
-				check_entry_field(sizeptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->sizeptroffs_plus1, 24);
-				entry->sizeptroffs_plus1++;
-				break;
-
-			case ADDRMAP_TOKEN_SIZE_GENERIC:
-				check_entry_field(gensizeptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->gensizeptroffs_plus1, 24);
-				entry->gensizeptroffs_plus1++;
-				break;
-
-			default:
-				fatalerror("Invalid token %d in address map\n", entrytype);
-				break;
-		}
-	}
-
-	/* post-process to apply the global mask */
-	if (map->globalmask != 0)
-		for (entry = map->entrylist; entry != NULL; entry = entry->next)
-		{
-			entry->addrstart &= map->globalmask;
-			entry->addrend &= map->globalmask;
-			entry->addrmask &= map->globalmask;
-		}
 }
 
 
@@ -2498,14 +2211,14 @@ static void *space_find_backing_memory(const address_space *space, offs_t addrst
 	VPRINTF(("space_find_backing_memory('%s',%s,%08X-%08X) -> ", space->cpu->tag(), space->name, bytestart, byteend));
 
 	/* look in the address map first */
-	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+	for (entry = space->map->m_entrylist; entry != NULL; entry = entry->m_next)
 	{
-		offs_t maskstart = bytestart & entry->bytemask;
-		offs_t maskend = byteend & entry->bytemask;
-		if (entry->memory != NULL && maskstart >= entry->bytestart && maskend <= entry->byteend)
+		offs_t maskstart = bytestart & entry->m_bytemask;
+		offs_t maskend = byteend & entry->m_bytemask;
+		if (entry->m_memory != NULL && maskstart >= entry->m_bytestart && maskend <= entry->m_byteend)
 		{
-			VPRINTF(("found in entry %08X-%08X [%p]\n", entry->addrstart, entry->addrend, (UINT8 *)entry->memory + (maskstart - entry->bytestart)));
-			return (UINT8 *)entry->memory + (maskstart - entry->bytestart);
+			VPRINTF(("found in entry %08X-%08X [%p]\n", entry->m_addrstart, entry->m_addrend, (UINT8 *)entry->m_memory + (maskstart - entry->m_bytestart)));
+			return (UINT8 *)entry->m_memory + (maskstart - entry->m_bytestart);
 		}
 	}
 
@@ -2531,17 +2244,17 @@ static void *space_find_backing_memory(const address_space *space, offs_t addrst
 static int space_needs_backing_store(const address_space *space, const address_map_entry *entry)
 {
 	/* if we are asked to provide a base pointer, then yes, we do need backing */
-	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0 || entry->genbaseptroffs_plus1 != 0)
+	if (entry->m_baseptr != NULL || entry->m_baseptroffs_plus1 != 0 || entry->m_genbaseptroffs_plus1 != 0)
 		return TRUE;
 
 	/* if we're writing to any sort of bank or RAM, then yes, we do need backing */
-	if (entry->write.type == AMH_BANK || entry->write.type == AMH_RAM)
+	if (entry->m_write.type == AMH_BANK || entry->m_write.type == AMH_RAM)
 		return TRUE;
 
 	/* if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing */
 	const region_info *region = space->machine->region(space->cpu->tag());
-	if (entry->read.type == AMH_RAM ||
-		(entry->read.type == AMH_ROM && (space->spacenum != ADDRESS_SPACE_0 || region == NULL || entry->addrstart >= region->bytes())))
+	if (entry->m_read.type == AMH_RAM ||
+		(entry->m_read.type == AMH_ROM && (space->spacenum != ADDRESS_SPACE_0 || region == NULL || entry->m_addrstart >= region->bytes())))
 		return TRUE;
 
 	/* all other cases don't need backing */
@@ -3384,36 +3097,36 @@ static address_map_entry *block_assign_intersecting(address_space *space, offs_t
 	address_map_entry *entry, *unassigned = NULL;
 
 	/* loop over the adjusted map and assign memory to any blocks we can */
-	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+	for (entry = space->map->m_entrylist; entry != NULL; entry = entry->m_next)
 	{
 		/* if we haven't assigned this block yet, see if we have a mapped shared pointer for it */
-		if (entry->memory == NULL && entry->share != NULL)
+		if (entry->m_memory == NULL && entry->m_share != NULL)
 		{
-			void *shareptr = memdata->sharemap.find(entry->share);
+			void *shareptr = memdata->sharemap.find(entry->m_share);
 			if (shareptr != UNMAPPED_SHARE_PTR)
 			{
-				entry->memory = shareptr;
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->addrstart, entry->addrend, entry->share, entry->memory));
+				entry->m_memory = shareptr;
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_share, entry->m_memory));
 			}
 		}
 
 		/* otherwise, look for a match in this block */
-		if (entry->memory == NULL && entry->bytestart >= bytestart && entry->byteend <= byteend)
+		if (entry->m_memory == NULL && entry->m_bytestart >= bytestart && entry->m_byteend <= byteend)
 		{
-			entry->memory = base + (entry->bytestart - bytestart);
-			VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", entry->addrstart, entry->addrend, bytestart, byteend, entry->memory));
+			entry->m_memory = base + (entry->m_bytestart - bytestart);
+			VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", entry->m_addrstart, entry->m_addrend, bytestart, byteend, entry->m_memory));
 		}
 
 		/* if we're the first match on a shared pointer, assign it now */
-		if (entry->memory != NULL && entry->share != NULL)
+		if (entry->m_memory != NULL && entry->m_share != NULL)
 		{
-			void *shareptr = memdata->sharemap.find(entry->share);
+			void *shareptr = memdata->sharemap.find(entry->m_share);
 			if (shareptr == UNMAPPED_SHARE_PTR)
-				memdata->sharemap.add(entry->share, entry->memory, TRUE);
+				memdata->sharemap.add(entry->m_share, entry->m_memory, TRUE);
 		}
 
 		/* keep track of the first unassigned entry */
-		if (entry->memory == NULL && unassigned == NULL && space_needs_backing_store(space, entry))
+		if (entry->m_memory == NULL && unassigned == NULL && space_needs_backing_store(space, entry))
 			unassigned = entry;
 	}
 

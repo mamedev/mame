@@ -37,6 +37,7 @@ OBJDIRS += \
 #-------------------------------------------------
 
 EMUOBJS = \
+	$(EMUOBJ)/addrmap.o \
 	$(EMUOBJ)/attotime.o \
 	$(EMUOBJ)/audit.o \
 	$(EMUOBJ)/cheat.o \

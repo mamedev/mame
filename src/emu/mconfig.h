@@ -295,7 +295,7 @@ union machine_config_token
 	TOKEN_COMMON_FIELDS
 	const machine_config_token *tokenptr;
 	const gfx_decode_entry *gfxdecode;
-	const addrmap_token *addrmap;
+	address_map_constructor addrmap;
 	device_type devtype;
 	nvram_handler_func nvram_handler;
 	memcard_handler_func memcard_handler;

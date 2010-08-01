@@ -183,13 +183,13 @@ static WRITE32_HANDLER( dsp_flags_w );
 
 void jaguar_dsp_suspend(running_machine *machine)
 {
-	cputag_suspend(machine, "audiocpu", SUSPEND_REASON_SPIN, 1);
+	machine->device<cpu_device>("audiocpu")->suspend(SUSPEND_REASON_SPIN, 1);
 }
 
 
 void jaguar_dsp_resume(running_machine *machine)
 {
-	cputag_resume(machine, "audiocpu", SUSPEND_REASON_SPIN);
+	machine->device<cpu_device>("audiocpu")->resume(SUSPEND_REASON_SPIN);
 }
 
 

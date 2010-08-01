@@ -859,9 +859,11 @@ static ADDRESS_MAP_START( kimble_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM	/* working RAM? */
 ADDRESS_MAP_END
 
+#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( norautxp_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
+#endif
 
 
 /*********** 8080 based **********/

@@ -2654,7 +2654,7 @@ static DRIVER_INIT( demoderb )
 	ssio_set_custom_output(4, 0xff, demoderb_op4_w);
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	cputag_suspend(machine, "tcscpu", SUSPEND_REASON_DISABLE, 1);
+	machine->device<cpu_device>("tcscpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 }
 
 

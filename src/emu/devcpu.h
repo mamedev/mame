@@ -304,7 +304,6 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define cpu_set_input_line_vector			device_set_input_line_vector
 #define cpu_set_input_line_and_vector		device_set_input_line_and_vector
 #define cpu_set_irq_callback				device_set_irq_callback
-#define cpu_spin_until_int					device_spin_until_int
 
 #define cpu_get_address_space				device_get_space
 
@@ -320,11 +319,6 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define cputag_get_address_space(mach, tag, spc)						downcast<cpu_device *>((mach)->device(tag))->space(spc)
 #define cputag_get_clock(mach, tag)										(mach)->device(tag)->unscaled_clock()
 #define cputag_set_clock(mach, tag, clock)								(mach)->device(tag)->set_unscaled_clock(clock)
-#define cputag_clocks_to_attotime(mach, tag, clocks)					(mach)->device(tag)->clocks_to_attotime(clocks)
-#define cputag_attotime_to_clocks(mach, tag, duration)					(mach)->device(tag)->attotime_to_clocks(duration)
-
-#define cputag_suspend(mach, tag, reason, eat)							device_suspend((mach)->device(tag), reason, eat)
-#define cputag_resume(mach, tag, reason)								device_resume((mach)->device(tag), reason)
 
 #define cputag_set_input_line(mach, tag, line, state)					downcast<cpu_device *>((mach)->device(tag))->set_input_line(line, state)
 #define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	downcast<cpu_device *>((mach)->device(tag))->set_input_line_and_vector(line, state, vec)
@@ -384,14 +378,14 @@ union cpuinfo
 	cpu_string_io_func		import_string;				// CPUINFO_FCT_IMPORT_STRING
 	cpu_string_io_func		export_string;				// CPUINFO_FCT_EXPORT_STRING
 	int *					icount;						// CPUINFO_PTR_INSTRUCTION_COUNTER
-	const addrmap8_token *	internal_map8;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	const addrmap16_token *	internal_map16;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	const addrmap32_token *	internal_map32;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	const addrmap64_token *	internal_map64;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	const addrmap8_token *	default_map8;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	const addrmap16_token *	default_map16;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	const addrmap32_token *	default_map32;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	const addrmap64_token *	default_map64;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
+	address_map_constructor	internal_map8;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
+	address_map_constructor	internal_map16;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
+	address_map_constructor	internal_map32;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
+	address_map_constructor	internal_map64;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
+	address_map_constructor	default_map8;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
+	address_map_constructor	default_map16;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
+	address_map_constructor	default_map32;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
+	address_map_constructor	default_map64;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
 };
 
 

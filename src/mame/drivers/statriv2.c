@@ -283,6 +283,7 @@ static ADDRESS_MAP_START( statriv2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
 
+#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( statusbj_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
@@ -290,6 +291,7 @@ static ADDRESS_MAP_START( statusbj_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
+#endif
 
 
 

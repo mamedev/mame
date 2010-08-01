@@ -309,13 +309,13 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 
 void jaguar_gpu_suspend(running_machine *machine)
 {
-	cputag_suspend(machine, "gpu", SUSPEND_REASON_SPIN, 1);
+	machine->device<cpu_device>("gpu")->suspend(SUSPEND_REASON_SPIN, 1);
 }
 
 
 void jaguar_gpu_resume(running_machine *machine)
 {
-	cputag_resume(machine, "gpu", SUSPEND_REASON_SPIN);
+	machine->device<cpu_device>("gpu")->resume(SUSPEND_REASON_SPIN);
 }
 
 

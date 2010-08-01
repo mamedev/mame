@@ -178,7 +178,7 @@ static READ16_HANDLER(tomcat_inputs2_r)
 static READ16_HANDLER(tomcat_320bio_r)
 {
 	dsp_BIO = 1;
-	cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_SPIN, 1);
+	space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_SPIN, 1);
 	return 0;
 }
 
@@ -199,7 +199,7 @@ static READ16_HANDLER(dsp_BIO_r)
 		{
 			dsp_idle = 0;
 			dsp_BIO = 0;
-			cputag_resume(space->machine, "maincpu", SUSPEND_REASON_SPIN );
+			space->machine->device<cpu_device>("maincpu")->resume(SUSPEND_REASON_SPIN );
 			return 0;
 		}
 		else

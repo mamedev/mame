@@ -73,12 +73,12 @@ static WRITE8_HANDLER(bank_w)
 
 static TIMER_CALLBACK( subcpu_suspend )
 {
-    cputag_suspend(machine, "sub", SUSPEND_REASON_HALT, 1);
+    machine->device<cpu_device>("sub")->suspend(SUSPEND_REASON_HALT, 1);
 }
 
 static TIMER_CALLBACK( subcpu_resume )
 {
-    cputag_resume(machine, "sub", SUSPEND_REASON_HALT);
+    machine->device<cpu_device>("sub")->resume(SUSPEND_REASON_HALT);
     cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 

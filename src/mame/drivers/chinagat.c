@@ -194,7 +194,7 @@ static READ8_HANDLER( saiyugoub1_mcu_command_r )
 #if 0
 	if (state->mcu_command == 0x78)
 	{
-		cputag_suspend(space->machine, "mcu", SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
+		space->machine->device<cpu_device>("mcu")->suspend(SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
 	}
 #endif
 	return state->mcu_command;
@@ -207,7 +207,7 @@ static WRITE8_HANDLER( saiyugoub1_mcu_command_w )
 #if 0
 	if (data != 0x78)
 	{
-		cputag_resume(space->machine, "mcu", SUSPEND_REASON_HALT);	/* Wake up */
+		space->machine->device<cpu_device>("mcu")->resume(SUSPEND_REASON_HALT);	/* Wake up */
 	}
 #endif
 }

@@ -290,7 +290,7 @@ static DRIVER_INIT( kuniokun )
 	mcu_encrypt_table = kuniokun_xor_table;
 	mcu_encrypt_table_len = 0x2a;
 
-	cputag_suspend(machine, "mcu", SUSPEND_REASON_DISABLE, 1);
+	machine->device<cpu_device>("mcu")->suspend(SUSPEND_REASON_DISABLE, 1);
 }
 
 static DRIVER_INIT( kuniokunb )

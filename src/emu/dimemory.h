@@ -83,7 +83,7 @@ const int TRANSLATE_FETCH_DEBUG		= (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 
 #define MDRV_DEVICE_ADDRESS_MAP(_space, _map) \
 	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DIMEMORY_MAP, 8, _space, 8), \
-	TOKEN_PTR(addrmap, (const addrmap_token *)ADDRESS_MAP_NAME(_map)),
+	TOKEN_PTR(addrmap, (address_map_constructor)ADDRESS_MAP_NAME(_map)),
 
 #define MDRV_DEVICE_PROGRAM_MAP(_map) \
 	MDRV_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
@@ -106,8 +106,8 @@ class address_space_config
 {
 public:
 	address_space_config();
-	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift = 0, const addrmap_token *internal = NULL, const addrmap_token *defmap = NULL);
-	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, const addrmap_token *internal = NULL, const addrmap_token *defmap = NULL);
+	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift = 0, address_map_constructor internal = NULL, address_map_constructor defmap = NULL);
+	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_constructor internal = NULL, address_map_constructor defmap = NULL);
 
 	inline offs_t addr2byte(offs_t address) const
 	{
@@ -136,8 +136,8 @@ public:
 	INT8				m_addrbus_shift;
 	UINT8				m_logaddr_width;
 	UINT8				m_page_shift;
-	const addrmap_token *m_internal_map;
-	const addrmap_token *m_default_map;
+	address_map_constructor m_internal_map;
+	address_map_constructor m_default_map;
 };
 
 
@@ -155,7 +155,7 @@ public:
 	virtual ~device_config_memory_interface();
 
 	// basic information getters
-	const addrmap_token *address_map(int spacenum = 0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : NULL; }
+	address_map_constructor address_map(int spacenum = 0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : NULL; }
 	const address_space_config *space_config(int spacenum = 0) const { return memory_space_config(spacenum); }
 
 protected:
@@ -166,7 +166,7 @@ protected:
 	virtual bool interface_process_token(UINT32 entrytype, const machine_config_token *&tokens);
 	virtual bool interface_validity_check(const game_driver &driver) const;
 
-	const addrmap_token *	m_address_map[ADDRESS_SPACES]; // address maps for each address space
+	address_map_constructor	m_address_map[ADDRESS_SPACES]; // address maps for each address space
 };
 
 

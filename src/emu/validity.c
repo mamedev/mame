@@ -1187,49 +1187,57 @@ bool mame_validitychecks(const game_driver *curdriver)
 	for (drivnum = 0; drivers[drivnum]; drivnum++)
 	{
 		const game_driver *driver = drivers[drivnum];
+		machine_config *config = NULL;
 		ioport_list portlist;
-		machine_config *config;
 		region_array rgninfo;
 
 		/* non-debug builds only care about games in the same driver */
 		if (curdriver != NULL && strcmp(curdriver->source_file, driver->source_file) != 0)
 			continue;
 
-		/* expand the machine driver */
-		expansion -= get_profile_ticks();
-		config = global_alloc(machine_config(driver->machine_config));
-		expansion += get_profile_ticks();
+		try
+		{
+			/* expand the machine driver */
+			expansion -= get_profile_ticks();
+			config = global_alloc(machine_config(driver->machine_config));
+			expansion += get_profile_ticks();
 
-		/* validate the driver entry */
-		driver_checks -= get_profile_ticks();
-		error = validate_driver(drivnum, config, names, descriptions) || error;
-		driver_checks += get_profile_ticks();
+			/* validate the driver entry */
+			driver_checks -= get_profile_ticks();
+			error = validate_driver(drivnum, config, names, descriptions) || error;
+			driver_checks += get_profile_ticks();
 
-		/* validate the ROM information */
-		rom_checks -= get_profile_ticks();
-		error = validate_roms(drivnum, config, &rgninfo, roms) || error;
-		rom_checks += get_profile_ticks();
+			/* validate the ROM information */
+			rom_checks -= get_profile_ticks();
+			error = validate_roms(drivnum, config, &rgninfo, roms) || error;
+			rom_checks += get_profile_ticks();
 
-		/* validate input ports */
-		input_checks -= get_profile_ticks();
-		error = validate_inputs(drivnum, config, defstr, portlist) || error;
-		input_checks += get_profile_ticks();
+			/* validate input ports */
+			input_checks -= get_profile_ticks();
+			error = validate_inputs(drivnum, config, defstr, portlist) || error;
+			input_checks += get_profile_ticks();
 
-		/* validate the display */
-		display_checks -= get_profile_ticks();
-		error = validate_display(drivnum, config) || error;
-		display_checks += get_profile_ticks();
+			/* validate the display */
+			display_checks -= get_profile_ticks();
+			error = validate_display(drivnum, config) || error;
+			display_checks += get_profile_ticks();
 
-		/* validate the graphics decoding */
-		gfx_checks -= get_profile_ticks();
-		error = validate_gfx(drivnum, config, &rgninfo) || error;
-		gfx_checks += get_profile_ticks();
+			/* validate the graphics decoding */
+			gfx_checks -= get_profile_ticks();
+			error = validate_gfx(drivnum, config, &rgninfo) || error;
+			gfx_checks += get_profile_ticks();
 
-		/* validate devices */
-		device_checks -= get_profile_ticks();
-		error = validate_devices(drivnum, config, portlist, &rgninfo) || error;
-		device_checks += get_profile_ticks();
-
+			/* validate devices */
+			device_checks -= get_profile_ticks();
+			error = validate_devices(drivnum, config, portlist, &rgninfo) || error;
+			device_checks += get_profile_ticks();
+		}
+		catch (emu_fatalerror &err)
+		{
+			global_free(config);
+			throw emu_fatalerror("Validating %s (%s): %s", driver->name, driver->source_file, err.string());
+		}
+		
 		global_free(config);
 	}
 

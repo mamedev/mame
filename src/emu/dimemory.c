@@ -78,7 +78,7 @@ address_space_config::address_space_config()
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, const addrmap_token *internal, const addrmap_token *defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 	  m_endianness(endian),
 	  m_databus_width(datawidth),
@@ -91,7 +91,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, const addrmap_token *internal, const addrmap_token *defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 	  m_endianness(endian),
 	  m_databus_width(datawidth),
@@ -188,43 +188,43 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 			int alignunit = datawidth / 8;
 
 			// construct the maps
-			::address_map *map = address_map_alloc(devconfig, &driver, spacenum, NULL);
+			::address_map *map = global_alloc(::address_map(*devconfig, spacenum));
 
 			// if this is an empty map, just skip it
-			if (map->entrylist == NULL)
+			if (map->m_entrylist == NULL)
 			{
-				address_map_free(map);
+				global_free(map);
 				continue;
 			}
 
 			// validate the global map parameters
-			if (map->spacenum != spacenum)
+			if (map->m_spacenum != spacenum)
 			{
-				mame_printf_error("%s: %s device '%s' space %d has address space %d handlers!\n", driver.source_file, driver.name, devconfig->tag(), spacenum, map->spacenum);
+				mame_printf_error("%s: %s device '%s' space %d has address space %d handlers!\n", driver.source_file, driver.name, devconfig->tag(), spacenum, map->m_spacenum);
 				error = true;
 			}
-			if (map->databits != datawidth)
+			if (map->m_databits != datawidth)
 			{
-				mame_printf_error("%s: %s device '%s' uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, datawidth, map->databits);
+				mame_printf_error("%s: %s device '%s' uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, datawidth, map->m_databits);
 				error = true;
 			}
 
 			// loop over entries and look for errors
-			for (address_map_entry *entry = map->entrylist; entry != NULL; entry = entry->next)
+			for (address_map_entry *entry = map->m_entrylist; entry != NULL; entry = entry->m_next)
 			{
-				UINT32 bytestart = spaceconfig->addr2byte(entry->addrstart);
-				UINT32 byteend = spaceconfig->addr2byte_end(entry->addrend);
+				UINT32 bytestart = spaceconfig->addr2byte(entry->m_addrstart);
+				UINT32 byteend = spaceconfig->addr2byte_end(entry->m_addrend);
 
 				// look for overlapping entries
 				if (!detected_overlap)
 				{
 					address_map_entry *scan;
-					for (scan = map->entrylist; scan != entry; scan = scan->next)
-						if (entry->addrstart <= scan->addrend && entry->addrend >= scan->addrstart &&
-							((entry->read.type != AMH_NONE && scan->read.type != AMH_NONE) ||
-							 (entry->write.type != AMH_NONE && scan->write.type != AMH_NONE)))
+					for (scan = map->m_entrylist; scan != entry; scan = scan->m_next)
+						if (entry->m_addrstart <= scan->m_addrend && entry->m_addrend >= scan->m_addrstart &&
+							((entry->m_read.type != AMH_NONE && scan->m_read.type != AMH_NONE) ||
+							 (entry->m_write.type != AMH_NONE && scan->m_write.type != AMH_NONE)))
 						{
-							mame_printf_warning("%s: %s '%s' %s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->addrstart, entry->addrend, entry->read.type, entry->write.type, scan->addrstart, scan->addrend, scan->read.type, scan->write.type);
+							mame_printf_warning("%s: %s '%s' %s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_read.type, entry->m_write.type, scan->m_addrstart, scan->m_addrend, scan->m_read.type, scan->m_write.type);
 							detected_overlap = true;
 							break;
 						}
@@ -233,26 +233,26 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 				// look for inverted start/end pairs
 				if (byteend < bytestart)
 				{
-					mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver.source_file, driver.name, spaceconfig->m_name, entry->addrstart, entry->addrend);
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver.source_file, driver.name, spaceconfig->m_name, entry->m_addrstart, entry->m_addrend);
 					error = true;
 				}
 
 				// look for misaligned entries
 				if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
 				{
-					mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver.source_file, driver.name, spaceconfig->m_name, entry->addrstart, entry->addrend, alignunit);
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver.source_file, driver.name, spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, alignunit);
 					error = true;
 				}
 
 				// if this is a program space, auto-assign implicit ROM entries
-				if (entry->read.type == AMH_ROM && entry->region == NULL)
+				if (entry->m_read.type == AMH_ROM && entry->m_region == NULL)
 				{
-					entry->region = devconfig->tag();
-					entry->rgnoffs = entry->addrstart;
+					entry->m_region = devconfig->tag();
+					entry->m_rgnoffs = entry->m_addrstart;
 				}
 
 				// if this entry references a memory region, validate it
-				if (entry->region != NULL && entry->share == 0)
+				if (entry->m_region != NULL && entry->m_share == 0)
 				{
 					// look for the region
 					bool found = false;
@@ -264,13 +264,13 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 							{
 								astring fulltag;
 								rom_region_name(fulltag, &driver, source, romp);
-								if (fulltag.cmp(entry->region) == 0)
+								if (fulltag.cmp(entry->m_region) == 0)
 								{
 									// verify the address range is within the region's bounds
 									offs_t length = ROMREGION_GETLENGTH(romp);
-									if (entry->rgnoffs + (byteend - bytestart + 1) > length)
+									if (entry->m_rgnoffs + (byteend - bytestart + 1) > length)
 									{
-										mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->addrstart, entry->addrend, entry->region, length);
+										mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_region, length);
 										error = true;
 									}
 									found = true;
@@ -281,38 +281,38 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 					// error if not found
 					if (!found)
 					{
-						mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X references non-existant region '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->addrstart, entry->addrend, entry->region);
+						mame_printf_error("%s: %s device '%s' %s space memory map entry %X-%X references non-existant region '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
 						error = true;
 					}
 				}
 
 				// make sure all devices exist
-				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && m_machine_config.m_devicelist.find(entry->read.tag) == NULL) ||
-					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && m_machine_config.m_devicelist.find(entry->write.tag) == NULL))
+				if ((entry->m_read.type == AMH_DEVICE_HANDLER && entry->m_read.tag != NULL && m_machine_config.m_devicelist.find(entry->m_read.tag) == NULL) ||
+					(entry->m_write.type == AMH_DEVICE_HANDLER && entry->m_write.tag != NULL && m_machine_config.m_devicelist.find(entry->m_write.tag) == NULL))
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->write.tag);
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_write.tag);
 					error = true;
 				}
 
 				// make sure ports exist
-//              if ((entry->read.type == AMH_PORT && entry->read.tag != NULL && portlist.find(entry->read.tag) == NULL) ||
-//                  (entry->write.type == AMH_PORT && entry->write.tag != NULL && portlist.find(entry->write.tag) == NULL))
+//              if ((entry->m_read.type == AMH_PORT && entry->m_read.tag != NULL && portlist.find(entry->m_read.tag) == NULL) ||
+//                  (entry->m_write.type == AMH_PORT && entry->m_write.tag != NULL && portlist.find(entry->m_write.tag) == NULL))
 //              {
-//                  mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->read.tag);
+//                  mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_read.tag);
 //                  error = true;
 //              }
 
 				// validate bank and share tags
-				if (entry->read.type == AMH_BANK && !validate_tag(&driver, "bank", entry->read.tag))
+				if (entry->m_read.type == AMH_BANK && !validate_tag(&driver, "bank", entry->m_read.tag))
 					error = true ;
-				if (entry->write.type == AMH_BANK && !validate_tag(&driver, "bank", entry->write.tag))
+				if (entry->m_write.type == AMH_BANK && !validate_tag(&driver, "bank", entry->m_write.tag))
 					error = true;
-				if (entry->share != NULL && !validate_tag(&driver, "share", entry->share))
+				if (entry->m_share != NULL && !validate_tag(&driver, "share", entry->m_share))
 					error = true;
 			}
 
 			// release the address map
-			address_map_free(map);
+			global_free(map);
 		}
 	}
 	return error;

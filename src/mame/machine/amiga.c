@@ -1451,7 +1451,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, cputag_clocks_to_attotime(space->machine, "maincpu", AMIGA_IRQ_DELAY_CYCLES ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're clearing irq's, process right away */
 				update_irqs(space->machine);
 			break;

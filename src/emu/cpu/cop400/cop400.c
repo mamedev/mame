@@ -1258,9 +1258,11 @@ static ADDRESS_MAP_START( data_128b, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x00, 0x7f) AM_RAM
 ADDRESS_MAP_END
 
+#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( data_160b, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x00, 0x9f) AM_RAM
 ADDRESS_MAP_END
+#endif
 
 /***************************************************************************
     VALIDITY CHECKS

@@ -95,7 +95,7 @@ static void update_irq_encoder(running_machine *machine, int line, int state)
 static WRITE_LINE_DEVICE_HANDLER( v_irq4_w )
 {
 	update_irq_encoder(device->machine, INPUT_LINE_IRQ4, state);
-	vertigo_vproc(cputag_attotime_to_clocks(device->machine, "maincpu", attotime_sub(timer_get_time(device->machine), irq4_time)), state);
+	vertigo_vproc(device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(attotime_sub(timer_get_time(device->machine), irq4_time)), state);
 	irq4_time = timer_get_time(device->machine);
 }
 

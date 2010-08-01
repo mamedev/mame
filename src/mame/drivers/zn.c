@@ -323,7 +323,7 @@ static TIMER_CALLBACK( dip_timer_fired )
 
 	if( param )
 	{
-		timer_adjust_oneshot( dip_timer, cputag_clocks_to_attotime( machine, "maincpu", 50 ), 0 );
+		timer_adjust_oneshot( dip_timer, machine->device<cpu_device>( "maincpu" )->cycles_to_attotime(50 ), 0 );
 	}
 }
 
@@ -694,7 +694,7 @@ static DRIVER_INIT( coh1000c )
 		/* disable:
             the QSound CPU for glpracr as it doesn't have any roms &
             the link cpu for glprac2l as the h/w is not emulated yet. */
-		cputag_suspend( machine, "audiocpu", SUSPEND_REASON_DISABLE, 1 );
+		machine->device<cpu_device>( "audiocpu" )->suspend(SUSPEND_REASON_DISABLE, 1 );
 	}
 }
 

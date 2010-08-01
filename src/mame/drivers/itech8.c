@@ -940,10 +940,10 @@ ADDRESS_MAP_END
 /*------ Ninja Clowns layout ------*/
 static ADDRESS_MAP_START( ninclown_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
-	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_BASE((void *)&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_BASE((UINT16 **)&main_ram) AM_SIZE(&main_ram_size)
 	AM_RANGE(0x004000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
-	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w) AM_BASE((void *)&itech8_grom_bank)
+	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w) AM_BASE((UINT16 **)&itech8_grom_bank)
 	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
 	AM_RANGE(0x100240, 0x100241) AM_WRITE8(tms34061_latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP

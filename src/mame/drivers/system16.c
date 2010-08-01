@@ -515,7 +515,7 @@ static void set_bg_page( running_machine *machine, int data )
 	state->bg_page[3] = data & 0x0f;
 }
 
-
+#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( bayroute_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
@@ -533,6 +533,7 @@ static ADDRESS_MAP_START( bayroute_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0006, 0xff0007) AM_WRITE(sound_command_w)
 	AM_RANGE(0xff0020, 0xff003f) AM_WRITENOP // config regs
 ADDRESS_MAP_END
+#endif
 
 /***************************************************************************/
 

@@ -1712,18 +1712,18 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 	{
 		offset = 0;
 		length = space->bytemask + 1;
-		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+		for (entry = space->map->m_entrylist; entry != NULL; entry = entry->m_next)
 		{
-			cheat_region[region_count].offset = memory_address_to_byte(space, entry->addrstart) & space->bytemask;
-			cheat_region[region_count].endoffset = memory_address_to_byte(space, entry->addrend) & space->bytemask;
-			cheat_region[region_count].share = entry->share;
-			cheat_region[region_count].disabled = (entry->write.type == AMH_RAM) ? FALSE : TRUE;
+			cheat_region[region_count].offset = memory_address_to_byte(space, entry->m_addrstart) & space->bytemask;
+			cheat_region[region_count].endoffset = memory_address_to_byte(space, entry->m_addrend) & space->bytemask;
+			cheat_region[region_count].share = entry->m_share;
+			cheat_region[region_count].disabled = (entry->m_write.type == AMH_RAM) ? FALSE : TRUE;
 
 			/* disable double share regions */
-			if (entry->share != NULL)
+			if (entry->m_share != NULL)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share != NULL)
-						if (strcmp(cheat_region[i].share, entry->share)==0)
+						if (strcmp(cheat_region[i].share, entry->m_share)==0)
 							cheat_region[region_count].disabled = TRUE;
 
 			region_count++;

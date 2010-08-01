@@ -593,7 +593,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		timer_adjust_oneshot(atapi_timer, cputag_clocks_to_attotime(machine, "maincpu", (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+		timer_adjust_oneshot(atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 	}
 	else
 	{
@@ -1060,7 +1060,7 @@ static void cdrom_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	timer_adjust_oneshot(atapi_timer, cputag_clocks_to_attotime(machine, "maincpu", (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+	timer_adjust_oneshot(atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 }
 
 static UINT32 m_n_security_control;

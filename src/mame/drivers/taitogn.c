@@ -730,7 +730,7 @@ static TIMER_CALLBACK( dip_timer_fired )
 
 	if( param )
 	{
-		timer_adjust_oneshot(dip_timer, cputag_clocks_to_attotime(machine, "maincpu", 50), 0);
+		timer_adjust_oneshot(dip_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(50), 0);
 	}
 }
 

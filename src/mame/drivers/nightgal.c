@@ -297,7 +297,7 @@ master-slave algorythm
 #define MAIN_Z80_HALT  if(offset == 2) state->z80_latch = 0x80
 //#define SUB_NCS_RUN state->ncs_latch = 0x00
 //#define SUB_NCS_HALT state->ncs_latch = 0x80
-
+#ifdef UNUSED_CODE
 static WRITE8_HANDLER( nsc_latch_w )
 {
 	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
@@ -337,7 +337,7 @@ static READ8_HANDLER( nsc_blit_r )
 	MAIN_Z80_RUN;
 	return state->blit_raw_data[offset];
 }
-
+#endif
 /* TODO: simplify this (error in the document) */
 
 static WRITE8_HANDLER( royalqn_blitter_0_w )
@@ -383,7 +383,7 @@ static WRITE8_HANDLER( royalqn_comm_w )
 	state->comms_ram[offset] = data & 0x80;
 }
 
-
+#ifdef UNUSED_CODE
 static WRITE8_HANDLER( blit_vregs_w )
 {
 	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
@@ -395,7 +395,7 @@ static READ8_HANDLER( blit_vregs_r )
 	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
 	return state->pen_raw_data[offset];
 }
-
+#endif
 static WRITE8_HANDLER( blit_true_vregs_w )
 {
 	nightgal_state *state = (nightgal_state *)space->machine->driver_data;
@@ -464,7 +464,7 @@ static READ8_DEVICE_HANDLER( input_2p_r )
 /********************************
 * Night Gal
 ********************************/
-
+#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( nightgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc100, 0xc100) AM_READ(nsc_latch_r)
@@ -500,6 +500,7 @@ static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x1000, 0xdfff) AM_ROM AM_REGION("gfx1", 0 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
+#endif
 
 /********************************
 * Sexy Gal
