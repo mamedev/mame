@@ -148,7 +148,7 @@ Main PCB
 |              |315-5195|      | | 2018    |315-5196|  | |  |
 |   D8751H     |        |      |-|         |        |  |-|  |
 |    20MHz     |--------|                  |--------|       |
-|MB3771                          25.1748MHz                 |
+|MB3771    CN5                   25.1748MHz                 |
 |-----------------------------------------------------------|
 Notes:
       68000    - Motorola MC68000P8 CPU (DIP40), running at 10.000MHz [20/2]. Is replaced with a Hitachi FD1094 in some games.
@@ -168,6 +168,7 @@ Notes:
       CN1/2/3/4- Connectors to join ROM board to main board
       MB3771   - Fujitsu MB3771 Master Reset IC (DIP8)
       MB3733   - Fujitsu MB3733 Power Amp IC
+      CN5      - 30 pin dual row male connetor
 
 
 ROM Boards
@@ -5046,42 +5047,44 @@ ROM_END
     Heavyweight Champ, Sega System 16B
     CPU: 68000
     ROM Board: 171-5521
+    Filter Board: 834-6383 (takes input from controls and routes through the CN5 connector on the mainboard)
+    Sega ID# for ROM board: 834-6398-02
 */
 ROM_START( hwchamp )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "rom0-e.a7", 0x000000, 0x20000, CRC(e5abfed7) SHA1(1f875dbaf8665c1dbfe336470580361b18a8ed4e) )
-	ROM_LOAD16_BYTE( "rom0-o.a5", 0x000001, 0x20000, CRC(25180124) SHA1(77b414f8cd88270713c57bddadec5d8dca490e86) )
+	ROM_LOAD16_BYTE( "epr-11239.a7", 0x000000, 0x20000, CRC(e5abfed7) SHA1(1f875dbaf8665c1dbfe336470580361b18a8ed4e) )
+	ROM_LOAD16_BYTE( "epr-11238.a5", 0x000001, 0x20000, CRC(25180124) SHA1(77b414f8cd88270713c57bddadec5d8dca490e86) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD( "scr01.a14",     0x00000, 0x20000, CRC(fc586a86) SHA1(2c26ef3ab94089940add3be9952804a6e62f5113) )
-	ROM_LOAD( "epr-11213.b14", 0x20000, 0x20000, CRC(aeaaa9d8) SHA1(6b7e5320f515c1c35445d3320b3edaef911191e1) )
-	ROM_LOAD( "scr02.a15",     0x40000, 0x20000, CRC(7715a742) SHA1(e6040ff0e9c68f3f502e5f6d7e7ca04b14059752) )
-	ROM_LOAD( "epr-11214.b15", 0x60000, 0x20000, CRC(63a82afa) SHA1(a02bbb6dd84cdf7cdab8e738c6927f5b1e3fcad5) )
-	ROM_LOAD( "scr03.a16",     0x80000, 0x20000, CRC(f30cd5fd) SHA1(df6118ca4b724c37b11e18d9f2ea18e9591ae7aa) )
-	ROM_LOAD( "epr-11215.b16", 0xA0000, 0x20000, CRC(5b8494a8) SHA1(9e3f09f4037a007b6a188dd81ec8f9c635e87650) )
+	ROM_LOAD( "mpr-11241.a14", 0x00000, 0x20000, CRC(fc586a86) SHA1(2c26ef3ab94089940add3be9952804a6e62f5113) ) /* all MPR-11xxx here are 28 pin Fujitsu MB831000 MASK roms */
+	ROM_LOAD( "mpr-11166.b14", 0x20000, 0x20000, CRC(aeaaa9d8) SHA1(6b7e5320f515c1c35445d3320b3edaef911191e1) )
+	ROM_LOAD( "mpr-11242.a15", 0x40000, 0x20000, CRC(7715a742) SHA1(e6040ff0e9c68f3f502e5f6d7e7ca04b14059752) )
+	ROM_LOAD( "mpr-11167.b15", 0x60000, 0x20000, CRC(63a82afa) SHA1(a02bbb6dd84cdf7cdab8e738c6927f5b1e3fcad5) )
+	ROM_LOAD( "mpr-11243.a16", 0x80000, 0x20000, CRC(f30cd5fd) SHA1(df6118ca4b724c37b11e18d9f2ea18e9591ae7aa) )
+	ROM_LOAD( "mpr-11168.b16", 0xA0000, 0x20000, CRC(5b8494a8) SHA1(9e3f09f4037a007b6a188dd81ec8f9c635e87650) )
 
 	ROM_REGION16_BE( 0x200000, "gfx2", 0 ) /* sprites */
-	ROM_LOAD16_BYTE( "epr-11205.b1", 0x000001, 0x010000, CRC(fc098a13) SHA1(b4a6e00d4765265bad170dabf0b2a4a58e063b16) )
+	ROM_LOAD16_BYTE( "mpr-11158.b1", 0x000001, 0x010000, CRC(fc098a13) SHA1(b4a6e00d4765265bad170dabf0b2a4a58e063b16) ) /* all MPR-111xx here are 28 pin Fujitsu MB831000 MASK roms */
 	ROM_CONTINUE(                    0x020001, 0x010000 )
-	ROM_LOAD16_BYTE( "epr-11209.b5", 0x000000, 0x010000, CRC(5db934a8) SHA1(ba7cc93025af71ad2674b1376b61afbb7ae910ff) )
+	ROM_LOAD16_BYTE( "mpr-11162.b5", 0x000000, 0x010000, CRC(5db934a8) SHA1(ba7cc93025af71ad2674b1376b61afbb7ae910ff) )
 	ROM_CONTINUE(                    0x020000, 0x010000 )
-	ROM_LOAD16_BYTE( "epr-11206.b2", 0x040001, 0x010000, CRC(1f27ee74) SHA1(a60d50a4f501623187c067a3c17bff49151ca3b2) )
+	ROM_LOAD16_BYTE( "mpr-11159.b2", 0x040001, 0x010000, CRC(1f27ee74) SHA1(a60d50a4f501623187c067a3c17bff49151ca3b2) )
 	ROM_CONTINUE(                    0x060001, 0x010000 )
-	ROM_LOAD16_BYTE( "epr-11210.b6", 0x040000, 0x010000, CRC(8a6a5cf1) SHA1(28b22aa326682ef3b54891dda7aa9a432da12a4d) )
+	ROM_LOAD16_BYTE( "mpr-11163.b6", 0x040000, 0x010000, CRC(8a6a5cf1) SHA1(28b22aa326682ef3b54891dda7aa9a432da12a4d) )
 	ROM_CONTINUE(                    0x060000, 0x010000 )
-	ROM_LOAD16_BYTE( "epr-11207.b3", 0x080001, 0x010000, CRC(c0b2ba82) SHA1(30349c86a99bbe3dfb423027ad534a9333e27679) )
+	ROM_LOAD16_BYTE( "mpr-11160.b3", 0x080001, 0x010000, CRC(c0b2ba82) SHA1(30349c86a99bbe3dfb423027ad534a9333e27679) )
 	ROM_CONTINUE(                    0x0a0001, 0x010000 )
-	ROM_LOAD16_BYTE( "epr-11211.b7", 0x080000, 0x010000, CRC(d6c7917b) SHA1(8b313a5634c14f4c90bfa9f9616d600283f72768) )
+	ROM_LOAD16_BYTE( "mpr-11164.b7", 0x080000, 0x010000, CRC(d6c7917b) SHA1(8b313a5634c14f4c90bfa9f9616d600283f72768) )
 	ROM_CONTINUE(                    0x0a0000, 0x010000 )
-	ROM_LOAD16_BYTE( "epr-11208.b4", 0x0c0001, 0x010000, CRC(35c9e44b) SHA1(2de32cb684c46d1169d8afcb0d3058d08e452a49) )
+	ROM_LOAD16_BYTE( "mpr-11161.b4", 0x0c0001, 0x010000, CRC(35c9e44b) SHA1(2de32cb684c46d1169d8afcb0d3058d08e452a49) )
 	ROM_CONTINUE(                    0x0e0001, 0x010000 )
-	ROM_LOAD16_BYTE( "epr-11212.b8", 0x0c0000, 0x010000, CRC(57e8f9d2) SHA1(1804677820d05a421120660f91e3a5f1df1e6a8d) )
+	ROM_LOAD16_BYTE( "mpr-11165.b8", 0x0c0000, 0x010000, CRC(57e8f9d2) SHA1(1804677820d05a421120660f91e3a5f1df1e6a8d) )
 	ROM_CONTINUE(                    0x0e0000, 0x010000 )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "s-prog.a10",  0x00000, 0x08000, CRC(96a12d9d) SHA1(f4ba70c3b5d80a1b6a187c940b922d5182d5ab12) )
-	ROM_LOAD( "speech0.a11", 0x10000, 0x20000, CRC(4191c03d) SHA1(40809fb80527980015d3b5c4ca7cf159bc09cf5a) )
-	ROM_LOAD( "speech1.a12", 0x30000, 0x20000, CRC(a4d53f7b) SHA1(71123a8ecfa093897c6f2bb7312e6c755be14521) )
+	ROM_LOAD( "epr-11239.a10", 0x00000, 0x08000, CRC(96a12d9d) SHA1(f4ba70c3b5d80a1b6a187c940b922d5182d5ab12) )
+	ROM_LOAD( "mpr-11244.a11", 0x10000, 0x20000, CRC(4191c03d) SHA1(40809fb80527980015d3b5c4ca7cf159bc09cf5a) ) /* 28 pin Fujitsu MB831000 MASK rom */
+	ROM_LOAD( "mpr-11245.a12", 0x30000, 0x20000, CRC(a4d53f7b) SHA1(71123a8ecfa093897c6f2bb7312e6c755be14521) ) /* 28 pin Fujitsu MB831000 MASK rom */
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pls153.bin",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) )
