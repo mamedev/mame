@@ -9193,9 +9193,11 @@ Other Sun games
 	DRIVER( megat4te )	/* (c) 1996 Merit */
 	DRIVER( megat4tea )	/* (c) 1996 Merit */
 	DRIVER( megat4st )	/* (c) 1996 Merit */
+	DRIVER( megat4stg )	/* (c) 1996 Merit */
 	DRIVER( megat5 )	/* (c) 1997 Merit */
 	DRIVER( megat5a )	/* (c) 1997 Merit */
 	DRIVER( megat5nj )	/* (c) 1997 Merit */
+	DRIVER( megat5tg )	/* (c) 1997 Merit */
 	DRIVER( megat6 )	/* (c) 1998 Merit */
 	DRIVER( suprgolf )	/* (c) 1989 Nasco */
 	DRIVER( hotblock )	/* (c) 1993 Nics? / Nix? */
