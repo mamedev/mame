@@ -1821,5 +1821,5 @@ GAME( 1996, megat4stg, megat4, meritm_crt260, meritm_crt260, megat4st, ROT0, "Me
 GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROI, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, megat5a,   megat5, meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC, Standard version)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 GAME( 1998, megat5nj,  megat5, meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-07 RON, New Jersey version)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, megat5tg,  megat5, meritm_crt260, meritm_crt260, megat5tg, ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 RON, Bi-Lingual ENG/GER version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, megat5tg,  megat5, meritm_crt260, meritm_crt260, megat5tg, ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 ROD, Bi-Lingual ENG/GER version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, megat6,   ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA, Standard version)", GAME_IMPERFECT_GRAPHICS )
