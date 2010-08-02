@@ -711,6 +711,7 @@ device_t::device_t(running_machine &_machine, const device_config &config)
 
 device_t::~device_t()
 {
+	auto_free(&m_machine, m_debug);
 }
 
 
