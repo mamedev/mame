@@ -81,7 +81,7 @@ xx = game/version code:
  50 - Megatouch 4 Tournament
  51 - Megatouch Super 4 Tournament
  60 - Megatouch 5
- 70 - Megatouch 5 Tournament??
+ 70 - Megatouch 5 Tournament
  80 - Megatouch 6
 
 Not all regional versions are available for each Megatouch series
@@ -1575,11 +1575,11 @@ ROM_START( megat4stg ) /* Dallas DS1204V security key at U5 labeled 9255-51-50 U
 	ROM_RELOAD(                     0x180000, 0x80000)
 	ROM_LOAD( "qs9255-02_u37-r0",   0x200000, 0x80000,  CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) ) /* Location U37 */
 	ROM_RELOAD(                     0x280000, 0x80000)
-	ROM_LOAD( "9255-51-50_u38-r0a", 0x300000, 0x080000, CRC(f7c2914d) SHA1(5d05b8db5ca734f7b05c3e215c0ef5b917455537) ) /* Location U38, 11/18/1996 10:11:01 - Bi-Lingual ENG/GER Version */
+	ROM_LOAD( "9255-51-50_u38-r0a", 0x300000, 0x080000, CRC(f7c2914d) SHA1(5d05b8db5ca734f7b05c3e215c0ef5b917455537) ) /* Location U38, 11/18/1996 10:11:01 - Bi-Lingual GER/ENG Version */
 	ROM_RELOAD(                     0x380000, 0x080000 )
 
 	ROM_REGION( 0x8000, "user1", 0 ) // DS1644 nv ram
-	ROM_LOAD( "mt4sgt_ds1644.u31",  0x00000,  0x8000,   CRC(7f6f8e57) SHA1(d65f20ae19afc05b33d7605143b8362d6e955e89) ) /* No actual label, so use a unique name for this set */
+	ROM_LOAD( "mt4stg_ds1644.u31",  0x00000,  0x8000,   CRC(7f6f8e57) SHA1(d65f20ae19afc05b33d7605143b8362d6e955e89) ) /* No actual label, so use a unique name for this set */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
 	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
@@ -1643,7 +1643,7 @@ ROM_START( megat5tg ) /* Dallas DS1204V security key at U5 labeled 9255-70-50 U5
 	ROM_RELOAD(                     0x180000, 0x80000)
 	ROM_LOAD( "qs9255-05_u37-r0",   0x200000, 0x80000,  CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
 	ROM_RELOAD(                     0x280000, 0x80000)
-	ROM_LOAD( "9255-70-50_u38-r0d", 0x300000, 0x100000, CRC(044d123f) SHA1(d73df1f97f6da03fdee2ca3fda3845ec262a0f9a) ) /* Location U38, 10/29/1997 10:19:08 - Bi-Lingual ENG/GER Version */
+	ROM_LOAD( "9255-70-50_u38-r0d", 0x300000, 0x100000, CRC(044d123f) SHA1(d73df1f97f6da03fdee2ca3fda3845ec262a0f9a) ) /* Location U38, 10/29/1997 10:19:08 - Bi-Lingual GER/ENG Version */
 
 	ROM_REGION( 0x8000, "user1", 0 ) // DS1644 nv ram
 	ROM_LOAD( "mt5tg_ds1644.u31",  0x00000,  0x8000,   CRC(a054bb32) SHA1(4efc19cb0a671dfe9249ce85d31f6bd633f2a237) ) /* No actual label, so use a unique name for this set */
@@ -1774,12 +1774,14 @@ static DRIVER_INIT(megat5)
 
 }
 
-static DRIVER_INIT(megat5tg)
+static DRIVER_INIT(megat5t)
 {
 	static const UINT8 megat5_ds1204_nvram[16] =
 		{ 0x08, 0x22, 0x97, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00 };
 
 	ds1204_init(machine, 0, megat5_ds1204_nvram);
+
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 }
 
@@ -1817,9 +1819,9 @@ GAME( 1996, megat4sn,  megat4, meritm_crt260, meritm_crt260, megat4,   ROT0, "Me
 GAME( 1996, megat4te,  megat4, meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROD, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4tea, megat4, meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROA, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4st,  megat4, meritm_crt260, meritm_crt260, megat4st, ROT0, "Merit", "Super Megatouch IV Tournament Edition (9255-51-01 ROB, Standard version)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4stg, megat4, meritm_crt260, meritm_crt260, megat4st, ROT0, "Merit", "Super Megatouch IV Turnier Version (9255-51-50 ROA, Bi-Lingual ENG/GER version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4stg, megat4, meritm_crt260, meritm_crt260, megat4st, ROT0, "Merit", "Super Megatouch IV Turnier Version (9255-51-50 ROA, Bi-Lingual GER/ENG version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROI, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, megat5a,   megat5, meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC, Standard version)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 GAME( 1998, megat5nj,  megat5, meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-07 RON, New Jersey version)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, megat5tg,  megat5, meritm_crt260, meritm_crt260, megat5tg, ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 ROD, Bi-Lingual ENG/GER version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, megat5tg,  megat5, meritm_crt260, meritm_crt260, megat5t,  ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 ROD, Bi-Lingual GER/ENG version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, megat6,   ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA, Standard version)", GAME_IMPERFECT_GRAPHICS )
