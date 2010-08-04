@@ -324,10 +324,12 @@ static WRITE16_HANDLER( video_regs_w )
 	{
 
 		case 0x5e/2: // bank switch, used by ROM check
+		{
+			const UINT8 *rom = memory_region(space->machine, "nile");
 			LOG(("%x\n",data));
-
-			memory_set_bankptr(space->machine, "bank1",(UINT16 *)(memory_region(space->machine, "nile") + (data & 0x0f)*0x200000));
+			memory_set_bankptr(space->machine, "bank1",(UINT16 *)(rom + (data & 0x0f)*0x200000));
 			break;
+		}
 
 		// set by IT4
 		case 0x5c/2: // either 0x40 explicitely in many places, or according $2083b0 (IT4)
@@ -548,7 +550,7 @@ static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_BASE_MEMBER(srmp6_state,dmaram)
 
 	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_BASE_MEMBER(srmp6_state,video_regs)	// ? gfx regs ST-0026 NiLe
-	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_snd_r, nile_snd_w) AM_BASE(&nile_sound_regs)
+	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_snd_r, nile_snd_w)
 	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE("nile", nile_sndctrl_r, nile_sndctrl_w)
 	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
 	//AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???

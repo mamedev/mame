@@ -466,7 +466,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank17")	/* Banked ROMs */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ymsnd", ym2151_status_port_r)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) AM_BASE(&namco_wavedata) /* PSG ( Shared ) */
+	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
 	AM_RANGE(0x7000, 0x77ff) AM_RAMBANK("bank18")	/* TRIRAM (shared) */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM	/* Sound RAM 3 */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos1_sound_bankswitch_w) /* ROM bank selector */

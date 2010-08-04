@@ -19,18 +19,12 @@ void polepos_sound_enable(running_device *device, int enable);
 WRITE8_DEVICE_HANDLER( polepos_sound_w );
 
 void mappy_sound_enable(running_device *device, int enable);
-WRITE8_DEVICE_HANDLER( namco_15xx_w );
 
 WRITE8_DEVICE_HANDLER( namcos1_cus30_w );	/* wavedata + sound registers + RAM */
 READ8_DEVICE_HANDLER( namcos1_cus30_r );
 
-WRITE8_DEVICE_HANDLER( _20pacgal_wavedata_w );
-
-extern UINT8 *namco_soundregs;
-extern UINT8 *namco_wavedata;
-
-#define pacman_soundregs namco_soundregs
-#define polepos_soundregs namco_soundregs
+READ8_DEVICE_HANDLER( namco_snd_sharedram_r );
+WRITE8_DEVICE_HANDLER( namco_snd_sharedram_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(NAMCO, namco);
 DECLARE_LEGACY_SOUND_DEVICE(NAMCO_15XX, namco_15xx);

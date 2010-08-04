@@ -37,19 +37,6 @@ TODO:
 #include "includes/toypop.h"
 
 
-static READ8_DEVICE_HANDLER( toypop_sound_sharedram_r )
-{
-	return namco_soundregs[offset];
-}
-
-static WRITE8_DEVICE_HANDLER( toypop_sound_sharedram_w )
-{
-	if (offset < 0x40)
-		namco_15xx_w(device,offset,data);
-	else
-		namco_soundregs[offset] = data;
-}
-
 static READ16_HANDLER( toypop_m68000_sharedram_r )
 {
 	toypop_state *state = space->machine->driver_data<toypop_state>();
@@ -201,7 +188,7 @@ static ADDRESS_MAP_START( liblrabl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,videoram)	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,spriteram)										/* general RAM, area 1 */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m68000_sharedram)		/* shared RAM with the 68000 CPU */
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", toypop_sound_sharedram_r, toypop_sound_sharedram_w) /* shared RAM with sound CPU */
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6820, 0x682f) AM_DEVREADWRITE("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
@@ -222,7 +209,7 @@ static ADDRESS_MAP_START( toypop_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
-	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", toypop_sound_sharedram_r, toypop_sound_sharedram_w) /* shared RAM with sound CPU */
+	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(toypop_main_interrupt_enable_r, toypop_main_interrupt_disable_w) /* disable interrupt */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(toypop_m68000_clear_w)				/* reset 68000 */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(toypop_m68000_assert_w)				/* reset 68000 */
@@ -240,7 +227,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", toypop_sound_sharedram_r, toypop_sound_sharedram_w) AM_BASE(&namco_soundregs)	/* shared RAM with the main CPU + sound registers */
+	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(toypop_sound_interrupt_disable_w)	/* ??? toypop doesn't write here */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(toypop_sound_interrupt_enable_acknowledge_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(watchdog_reset_w)

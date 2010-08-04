@@ -486,7 +486,7 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_READONLY						/* Sound Memory */
 	AM_RANGE(0x8000, 0x83bf) AM_MIRROR(0x0c00) AM_WRITEONLY						/* Sound Memory */
-	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVWRITE("namco", polepos_sound_w) AM_BASE(&polepos_soundregs)/* Sound data */
+	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVWRITE("namco", polepos_sound_w)	/* Sound data */
 
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)

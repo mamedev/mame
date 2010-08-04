@@ -187,9 +187,9 @@ static ADDRESS_MAP_START( 20pacgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0a000, 0x0ffff) AM_MIRROR(0x40000) AM_ROM
 	AM_RANGE(0x10000, 0x3ffff) AM_ROM
 	AM_RANGE(0x44000, 0x447ff) AM_RAM AM_BASE_MEMBER(_20pacgal_state, video_ram)
-	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
+	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", pacman_sound_w)
 	AM_RANGE(0x44800, 0x45eff) AM_RAM
-	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE("namco", _20pacgal_wavedata_w) AM_BASE(&namco_wavedata)
+	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE("namco", namcos1_cus30_w)
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, char_gfx_ram)
 	AM_RANGE(0x47100, 0x47100) AM_RAM	/* leftover from original Galaga code */
 	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)	/* this should be a mirror of 08000-09ffff */

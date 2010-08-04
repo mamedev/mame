@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( skykid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x5fff) AM_RAM AM_BASE(&skykid_spriteram)	/* RAM + Sprite RAM */
 	AM_RANGE(0x6000, 0x60ff) AM_WRITE(skykid_scroll_y_w)		/* Y scroll register map */
 	AM_RANGE(0x6200, 0x63ff) AM_WRITE(skykid_scroll_x_w)		/* X scroll register map */
-	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namcos1_cus30_r,namcos1_cus30_w) AM_BASE(&namco_wavedata)/* PSG device, shared RAM */
+	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(skykid_irq_1_ctrl_w)		/* IRQ control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)			/* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM					/* ROM */
@@ -132,7 +132,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_internal_registers_r, hd63701_internal_registers_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) AM_BASE(&namco_wavedata)		/* PSG device, shared RAM */
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(watchdog_reset_w)		/* watchdog? */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(skykid_irq_2_ctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM

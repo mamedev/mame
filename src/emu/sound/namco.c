@@ -51,16 +51,14 @@ typedef struct
 } sound_channel;
 
 
-/* globals available to everyone */
-UINT8 *namco_soundregs;
-UINT8 *namco_wavedata;
-
 typedef struct _namco_sound namco_sound;
 struct _namco_sound
 {
 	/* data about the sound system */
 	sound_channel channel_list[MAX_VOICES];
 	sound_channel *last_channel;
+	UINT8 *soundregs;
+	UINT8 *wavedata;
 
 	/* global sound parameters */
 	int wave_size;
@@ -122,9 +120,8 @@ static void build_decoded_waveform(running_machine *machine, namco_sound *chip, 
 	int offset;
 	int v;
 
-	if (rgnbase != NULL)
-		namco_wavedata = rgnbase;
-
+	chip->wavedata = (rgnbase != NULL) ? rgnbase : auto_alloc_array_clear(machine, UINT8, 0x400);
+		
 	/* 20pacgal has waves in RAM but old sound system */
 	if (rgnbase == NULL && chip->num_voices != 3)
 	{
@@ -146,10 +143,10 @@ static void build_decoded_waveform(running_machine *machine, namco_sound *chip, 
 	}
 
 	/* We need waveform data. It fails if region is not specified. */
-	if (namco_wavedata)
+	if (chip->wavedata)
 	{
 		for (offset = 0; offset < 256; offset++)
-			update_namco_waveform(chip, offset, namco_wavedata[offset]);
+			update_namco_waveform(chip, offset, chip->wavedata[offset]);
 	}
 }
 
@@ -373,6 +370,8 @@ static DEVICE_START( namco )
 	chip->last_channel = chip->channel_list + chip->num_voices;
 	chip->stereo = intf->stereo;
 
+	chip->soundregs = auto_alloc_array_clear(device->machine, UINT8, 0x400);
+
 	/* adjust internal clock */
 	chip->namco_clock = device->clock();
 	for (clock_multiple = 0; chip->namco_clock < INTERNAL_RATE; clock_multiple++)
@@ -463,14 +462,14 @@ WRITE8_DEVICE_HANDLER( pacman_sound_w )
 	int ch;
 
 	data &= 0x0f;
-	if (namco_soundregs[offset] == data)
+	if (chip->soundregs[offset] == data)
 		return;
 
 	/* update the streams */
 	stream_update(chip->stream);
 
 	/* set the register */
-	namco_soundregs[offset] = data;
+	chip->soundregs[offset] = data;
 
 	if (offset < 0x10)
 		ch = (offset - 5) / 5;
@@ -497,11 +496,11 @@ WRITE8_DEVICE_HANDLER( pacman_sound_w )
 	case 0x14:
 		/* the frequency has 20 bits */
 		/* the first voice has extra frequency bits */
-		voice->frequency = (ch == 0) ? namco_soundregs[0x10] : 0;
-		voice->frequency += (namco_soundregs[ch * 5 + 0x11] << 4);
-		voice->frequency += (namco_soundregs[ch * 5 + 0x12] << 8);
-		voice->frequency += (namco_soundregs[ch * 5 + 0x13] << 12);
-		voice->frequency += (namco_soundregs[ch * 5 + 0x14] << 16);	/* always 0 */
+		voice->frequency = (ch == 0) ? chip->soundregs[0x10] : 0;
+		voice->frequency += (chip->soundregs[ch * 5 + 0x11] << 4);
+		voice->frequency += (chip->soundregs[ch * 5 + 0x12] << 8);
+		voice->frequency += (chip->soundregs[ch * 5 + 0x13] << 12);
+		voice->frequency += (chip->soundregs[ch * 5 + 0x14] << 16);	/* always 0 */
 		break;
 
 	case 0x15:
@@ -559,14 +558,14 @@ WRITE8_DEVICE_HANDLER( polepos_sound_w )
 	sound_channel *voice;
 	int ch;
 
-	if (namco_soundregs[offset] == data)
+	if (chip->soundregs[offset] == data)
 		return;
 
 	/* update the streams */
 	stream_update(chip->stream);
 
 	/* set the register */
-	namco_soundregs[offset] = data;
+	chip->soundregs[offset] = data;
 
 	ch = (offset & 0x1f) / 4;
 
@@ -577,8 +576,8 @@ WRITE8_DEVICE_HANDLER( polepos_sound_w )
 	case 0x00:
 	case 0x01:
 		/* the frequency has 16 bits */
-		voice->frequency = namco_soundregs[ch * 4 + 0x00];
-		voice->frequency += namco_soundregs[ch * 4 + 0x01] << 8;
+		voice->frequency = chip->soundregs[ch * 4 + 0x00];
+		voice->frequency += chip->soundregs[ch * 4 + 0x01] << 8;
 		break;
 
 	case 0x23:
@@ -588,17 +587,17 @@ WRITE8_DEVICE_HANDLER( polepos_sound_w )
 	case 0x03:
 		voice->volume[0] = voice->volume[1] = 0;
 		// front speakers ?
-		voice->volume[0] += namco_soundregs[ch * 4 + 0x03] >> 4;
-		voice->volume[1] += namco_soundregs[ch * 4 + 0x03] & 0x0f;
+		voice->volume[0] += chip->soundregs[ch * 4 + 0x03] >> 4;
+		voice->volume[1] += chip->soundregs[ch * 4 + 0x03] & 0x0f;
 		// rear speakers ?
-		voice->volume[0] += namco_soundregs[ch * 4 + 0x23] >> 4;
-		voice->volume[1] += namco_soundregs[ch * 4 + 0x02] >> 4;
+		voice->volume[0] += chip->soundregs[ch * 4 + 0x23] >> 4;
+		voice->volume[1] += chip->soundregs[ch * 4 + 0x02] >> 4;
 
 		voice->volume[0] /= 2;
 		voice->volume[1] /= 2;
 
 		/* if 54XX or 52XX selected, silence this voice */
-		if (namco_soundregs[ch * 4 + 0x23] & 8)
+		if (chip->soundregs[ch * 4 + 0x23] & 8)
 			voice->volume[0] = voice->volume[1] = 0;
 		break;
 	}
@@ -631,20 +630,20 @@ void mappy_sound_enable(running_device *device, int enable)
 	chip->sound_enable = enable;
 }
 
-WRITE8_DEVICE_HANDLER( namco_15xx_w )
+static WRITE8_DEVICE_HANDLER( namco_15xx_w )
 {
 	namco_sound *chip = get_safe_token(device);
 	sound_channel *voice;
 	int ch;
 
-	if (namco_soundregs[offset] == data)
+	if (chip->soundregs[offset] == data)
 		return;
 
 	/* update the streams */
 	stream_update(chip->stream);
 
 	/* set the register */
-	namco_soundregs[offset] = data;
+	chip->soundregs[offset] = data;
 
 	ch = offset / 8;
 	if (ch >= chip->num_voices)
@@ -663,9 +662,9 @@ WRITE8_DEVICE_HANDLER( namco_15xx_w )
 	case 0x04:
 	case 0x05:
 		/* the frequency has 20 bits */
-		voice->frequency = namco_soundregs[ch * 8 + 0x04];
-		voice->frequency += namco_soundregs[ch * 8 + 0x05] << 8;
-		voice->frequency += (namco_soundregs[ch * 8 + 0x06] & 15) << 16;	/* high bits are from here */
+		voice->frequency = chip->soundregs[ch * 8 + 0x04];
+		voice->frequency += chip->soundregs[ch * 8 + 0x05] << 8;
+		voice->frequency += (chip->soundregs[ch * 8 + 0x06] & 15) << 16;	/* high bits are from here */
 		break;
 	}
 }
@@ -712,16 +711,16 @@ static WRITE8_DEVICE_HANDLER( namcos1_sound_w )
 		return;
 	}
 
-	namco_soundregs = namco_wavedata + 0x100;
+	chip->soundregs = chip->wavedata + 0x100;
 
-	if (namco_soundregs[offset] == data)
+	if (chip->soundregs[offset] == data)
 		return;
 
 	/* update the streams */
 	stream_update(chip->stream);
 
 	/* set the register */
-	namco_soundregs[offset] = data;
+	chip->soundregs[offset] = data;
 
 	ch = offset / 8;
 	if (ch >= chip->num_voices)
@@ -740,9 +739,9 @@ static WRITE8_DEVICE_HANDLER( namcos1_sound_w )
 	case 0x02:
 	case 0x03:
 		/* the frequency has 20 bits */
-		voice->frequency = (namco_soundregs[ch * 8 + 0x01] & 15) << 16;	/* high bits are from here */
-		voice->frequency += namco_soundregs[ch * 8 + 0x02] << 8;
-		voice->frequency += namco_soundregs[ch * 8 + 0x03];
+		voice->frequency = (chip->soundregs[ch * 8 + 0x01] & 15) << 16;	/* high bits are from here */
+		voice->frequency += chip->soundregs[ch * 8 + 0x02] << 8;
+		voice->frequency += chip->soundregs[ch * 8 + 0x03];
 		break;
 
 	case 0x04:
@@ -758,15 +757,16 @@ static WRITE8_DEVICE_HANDLER( namcos1_sound_w )
 
 WRITE8_DEVICE_HANDLER( namcos1_cus30_w )
 {
+	namco_sound *chip = get_safe_token(device);
+
 	if (offset < 0x100)
 	{
-		if (namco_wavedata[offset] != data)
+		if (chip->wavedata[offset] != data)
 		{
-			namco_sound *chip = get_safe_token(device);
 			/* update the streams */
 			stream_update(chip->stream);
 
-			namco_wavedata[offset] = data;
+			chip->wavedata[offset] = data;
 
 			/* update the decoded waveform table */
 			update_namco_waveform(chip, offset, data);
@@ -775,27 +775,31 @@ WRITE8_DEVICE_HANDLER( namcos1_cus30_w )
 	else if (offset < 0x140)
 		namcos1_sound_w(device, offset - 0x100,data);
 	else
-		namco_wavedata[offset] = data;
+		chip->wavedata[offset] = data;
 }
 
 READ8_DEVICE_HANDLER( namcos1_cus30_r )
 {
-	return namco_wavedata[offset];
+	namco_sound *chip = get_safe_token(device);
+
+	return chip->wavedata[offset];
 }
 
-WRITE8_DEVICE_HANDLER( _20pacgal_wavedata_w )
+READ8_DEVICE_HANDLER( namco_snd_sharedram_r )
 {
 	namco_sound *chip = get_safe_token(device);
 
-	if (namco_wavedata[offset] != data)
+	return chip->soundregs[offset];
+}
+
+WRITE8_DEVICE_HANDLER( namco_snd_sharedram_w )
+{
+	if (offset < 0x40)
+		namco_15xx_w(device, offset, data);
+	else
 	{
-		/* update the streams */
-		stream_update(chip->stream);
-
-		namco_wavedata[offset] = data;
-
-		/* update the decoded waveform table */
-		update_namco_waveform(chip, offset, data);
+		namco_sound *chip = get_safe_token(device);
+		chip->soundregs[offset] = data;
 	}
 }
 

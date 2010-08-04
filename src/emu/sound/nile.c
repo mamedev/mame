@@ -52,13 +52,12 @@ enum
 
 
 
-UINT16 *nile_sound_regs;
-
 typedef struct _nile_state nile_state;
 struct _nile_state
 {
 	sound_stream * stream;
 	UINT8 *sound_ram;
+	UINT16 sound_regs[0x80];
 	int vpos[NILE_VOICES], frac[NILE_VOICES], lponce[NILE_VOICES];
 	UINT16 ctrl;
 };
@@ -104,7 +103,7 @@ READ16_DEVICE_HANDLER( nile_snd_r )
 	if(reg==2 || reg==3)
 	{
 		int slot=offset/16;
-		int sptr = ((nile_sound_regs[slot*16+3]<<16)|nile_sound_regs[slot*16+2])+info->vpos[slot];
+		int sptr = ((info->sound_regs[slot*16+3]<<16)|info->sound_regs[slot*16+2])+info->vpos[slot];
 
 		if(reg==2)
 		{
@@ -115,7 +114,7 @@ READ16_DEVICE_HANDLER( nile_snd_r )
 			return sptr>>16;
 		}
 	}
-	return nile_sound_regs[offset];
+	return info->sound_regs[offset];
 }
 
 WRITE16_DEVICE_HANDLER( nile_snd_w )
@@ -125,7 +124,7 @@ WRITE16_DEVICE_HANDLER( nile_snd_w )
 
 	stream_update(info->stream);
 
-	COMBINE_DATA(&nile_sound_regs[offset]);
+	COMBINE_DATA(&info->sound_regs[offset]);
 
 	v = offset / 16;
 	r = offset % 16;
@@ -135,7 +134,7 @@ WRITE16_DEVICE_HANDLER( nile_snd_w )
 		info->vpos[v] = info->frac[v] = info->lponce[v] = 0;
 	}
 
-//  printf("v%02d: %04x to reg %02d (PC=%x)\n", v, nile_sound_regs[offset], r, cpu_get_pc(space->cpu));
+	//printf("v%02d: %04x to reg %02d (PC=%x)\n", v, info->sound_regs[offset], r, cpu_get_pc(space->cpu));
 }
 
 static STREAM_UPDATE( nile_update )
@@ -155,7 +154,7 @@ static STREAM_UPDATE( nile_update )
 
 	for (v = 0; v < NILE_VOICES; v++)
 	{
-		slot = &nile_sound_regs[v * 16];
+		slot = &info->sound_regs[v * 16];
 
 		if (info->ctrl&(1<<v))
 		{

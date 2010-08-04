@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_internal_registers_r, hd63701_internal_registers_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) AM_BASE(&namco_wavedata)
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x1400, 0x154d) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_RAM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("share3")
