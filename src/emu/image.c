@@ -225,16 +225,15 @@ void image_device_init(running_machine *machine)
 			if (result)
 			{
 				/* retrieve image error message */
-				const char *image_err = image->error();
+				astring image_err = astring(image->error());
 				const char *image_basename_str = image->basename();
-
 				/* unload all images */
 				image_unload_all(*machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
 					image->image_config().devconfig().name(),
 					image_basename_str,
-					image_err);
+					image_err.cstr());
 			}
 		}
 		else
@@ -267,7 +266,7 @@ void image_postdevice_init(running_machine *machine)
 			if (result)
 			{
 				/* retrieve image error message */
-				const char *image_err = image->error();
+				astring image_err = astring(image->error());
 				const char *image_basename_str = image->basename();
 
 				/* unload all images */
@@ -276,7 +275,7 @@ void image_postdevice_init(running_machine *machine)
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
 					image->image_config().devconfig().name(),
 					image_basename_str,
-					image_err);
+					image_err.cstr());
 			}
 	}
 
