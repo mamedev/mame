@@ -1054,14 +1054,30 @@ ifneq ($(filter DSP56156,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/dsp56k
 CPUOBJS += $(CPUOBJ)/dsp56k/dsp56k.o
 DASMOBJS += $(CPUOBJ)/dsp56k/dsp56dsm.o
+DASMOBJS += $(CPUOBJ)/dsp56k/opcode.o
+DASMOBJS += $(CPUOBJ)/dsp56k/inst.o
+DASMOBJS += $(CPUOBJ)/dsp56k/pmove.o
+DASMOBJS += $(CPUOBJ)/dsp56k/tables.o
 endif
 
 $(CPUOBJ)/dsp56k/dsp56k.o:	$(CPUSRC)/dsp56k/dsp56k.c \
+							$(CPUSRC)/dsp56k/opcode.c \
+							$(CPUSRC)/dsp56k/inst.c \
+							$(CPUSRC)/dsp56k/pmove.c \
+							$(CPUSRC)/dsp56k/tables.c \
 							$(CPUSRC)/dsp56k/dsp56ops.c \
 							$(CPUSRC)/dsp56k/dsp56mem.c \
 							$(CPUSRC)/dsp56k/dsp56pcu.c \
 							$(CPUSRC)/dsp56k/dsp56k.h
 
+$(CPUOBJ)/dsp56k/dsp56dsm.o:	$(CPUSRC)/dsp56k/opcode.c \
+								$(CPUSRC)/dsp56k/opcode.h \
+								$(CPUSRC)/dsp56k/inst.c \
+    							$(CPUSRC)/dsp56k/inst.h \
+								$(CPUSRC)/dsp56k/pmove.c \
+								$(CPUSRC)/dsp56k/pmove.h \
+								$(CPUSRC)/dsp56k/tables.c \
+								$(CPUSRC)/dsp56k/tables.h
 
 
 #-------------------------------------------------
