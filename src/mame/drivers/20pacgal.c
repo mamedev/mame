@@ -38,8 +38,6 @@
     Pacman 25th Anniversary is a program update giving Pacman it's own start button
         instead of using the above mentioned "joystick maneuver"
 
-    Versions known to exist but not dumped: v2.0
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -337,6 +335,23 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+
+/*
+     Pacman - 25th Anniversary Edition
+*/
+
+ROM_START( 25pacman ) /* Version 2.0 */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) )
+
+	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) ) /* Same as the MS. Pacman / Galaga graphics rom */
+ROM_END
+
+/*
+     Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion
+*/
+
 ROM_START( 20pacgal ) /* Version 1.08 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.08.u13", 0x00000, 0x40000, CRC(2ea16809) SHA1(27f041bdbb590917e9dcb70c21aa6b6d6c9f04fb) )
@@ -384,6 +399,8 @@ static DRIVER_INIT(20pacgal)
  *  Game driver
  *
  *************************************/
+
+GAME( 2005, 25pacman,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Pacman - 25th Anniversary Edition (V2.0)", GAME_NOT_WORKING)
 
 GAME( 2000, 20pacgal,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)

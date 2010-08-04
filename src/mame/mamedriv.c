@@ -983,6 +983,7 @@ const game_driver * const drivers[] =
 	DRIVER( taiko10 )
 
 	/* Misc Namco games */
+	DRIVER( 25pacman )	/* (c) 2005 Ver 2.0 - Same hardware as 20pacgal */
 	DRIVER( 20pacgal )	/* (c) 2000 Ver 1.08 */
 	DRIVER( 20pacgalr4 )	/* (c) 2000 Ver 1.04 */
 	DRIVER( 20pacgalr2 )	/* (c) 2000 Ver 1.02 */
