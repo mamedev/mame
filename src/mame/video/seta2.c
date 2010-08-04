@@ -71,11 +71,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/seta.h"
-
-UINT16 *seta2_vregs;
-
-static int yoffset;
+#include "includes/seta2.h"
 
 /***************************************************************************
 
@@ -124,9 +120,11 @@ WRITE16_HANDLER( seta2_vregs_w )
                grdians =  019a
     */
 
-	UINT16 olddata = seta2_vregs[offset];
-	COMBINE_DATA(&seta2_vregs[offset]);
-	if ( seta2_vregs[offset] != olddata )
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+	UINT16 olddata = state->vregs[offset];
+
+	COMBINE_DATA(&state->vregs[offset]);
+	if ( state->vregs[offset] != olddata )
 		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",cpu_get_pc(space->cpu),offset*2,data);
 
 	switch( offset*2 )
@@ -163,9 +161,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 {
 	/* Sprites list */
 
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	seta2_state *state = machine->driver_data<seta2_state>();
+	UINT16 *buffered_spriteram16 = state->buffered_spriteram;
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
-	UINT16 *end = &buffered_spriteram16[machine->generic.spriteram_size/2];
+	UINT16 *end = &buffered_spriteram16[state->spriteram_size/2];
 
 	for ( ; s1 < end; s1+=4 )
 	{
@@ -259,7 +258,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
                    fine in all the games we have for now. */
 				for (y = 0; y < (0x40 >> tilesize); y++)
 				{
-					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - yoffset;
+					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - state->yoffset;
 
 					if (py < clip.min_y - 0x10) continue;
 					if (py > clip.max_y) continue;
@@ -322,7 +321,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 				sx = (sx & 0x1ff) - (sx & 0x200);
 				sy &= 0x1ff;
-				sy -= yoffset;
+				sy -= state->yoffset;
 
 				code &= ~((sizex+1) * (sizey+1) - 1);	// see myangel, myangel2 and grdians
 
@@ -355,29 +354,35 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_START( seta2 )
 {
+	seta2_state *state = machine->driver_data<seta2_state>();
+
 	machine->gfx[2]->color_granularity = 16;
 	machine->gfx[3]->color_granularity = 16;
 	machine->gfx[4]->color_granularity = 16;
 	machine->gfx[5]->color_granularity = 16;
 
-	machine->generic.buffered_spriteram.u16 = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->buffered_spriteram = auto_alloc_array(machine, UINT16, state->spriteram_size/2);
 
-	yoffset = 0;
+	state->yoffset = 0;
 }
 
 VIDEO_START( seta2_offset )
 {
+	seta2_state *state = machine->driver_data<seta2_state>();
+
 	VIDEO_START_CALL(seta2);
 
-	yoffset = 0x10;
+	state->yoffset = 0x10;
 }
 
 VIDEO_UPDATE( seta2 )
 {
+	seta2_state *state = screen->machine->driver_data<seta2_state>();
+
 	/* Black or pen 0? */
 	bitmap_fill(bitmap,cliprect,0);
 
-	if (seta2_vregs[0x30/2] & 1)	return 0;		// BLANK SCREEN
+	if (state->vregs[0x30/2] & 1)	return 0;		// BLANK SCREEN
 
 	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
@@ -385,6 +390,8 @@ VIDEO_UPDATE( seta2 )
 
 VIDEO_EOF( seta2 )
 {
+	seta2_state *state = machine->driver_data<seta2_state>();
+
 	/* Buffer sprites by 1 frame */
-	memcpy(machine->generic.buffered_spriteram.u16,machine->generic.spriteram.u16,machine->generic.spriteram_size);
+	memcpy(state->buffered_spriteram, state->spriteram, state->spriteram_size);
 }

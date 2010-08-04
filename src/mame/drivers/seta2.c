@@ -535,7 +535,7 @@ The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 #include "cpu/h83002/h8.h"
 #include "machine/eeprom.h"
 #include "sound/x1_010.h"
-#include "includes/seta.h"
+#include "includes/seta2.h"
 
 /***************************************************************************
 
@@ -588,10 +588,10 @@ static ADDRESS_MAP_START( grdians_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000c, 0x70000d) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)	// Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)	// TMP68301 Registers
 ADDRESS_MAP_END
@@ -626,10 +626,10 @@ static ADDRESS_MAP_START( gundamex_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)	// Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_DEVREADWRITE("eeprom", gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)	// TMP68301 Registers
@@ -640,38 +640,42 @@ ADDRESS_MAP_END
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
 
-static int keyboard_row;
-
 static READ16_HANDLER( mj4simai_p1_r )
 {
-	switch (keyboard_row)
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
+	switch (state->keyboard_row)
 	{
 		case 0x01: return input_port_read(space->machine, "P1_KEY0");
 		case 0x02: return input_port_read(space->machine, "P1_KEY1");
 		case 0x04: return input_port_read(space->machine, "P1_KEY2");
 		case 0x08: return input_port_read(space->machine, "P1_KEY3");
 		case 0x10: return input_port_read(space->machine, "P1_KEY4");
-		default:   logerror("p1_r with keyboard_row = %02x\n",keyboard_row); return 0xffff;
+		default:   logerror("p1_r with keyboard_row = %02x\n", state->keyboard_row); return 0xffff;
 	}
 }
 
 static READ16_HANDLER( mj4simai_p2_r )
 {
-	switch (keyboard_row)
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
+	switch (state->keyboard_row)
 	{
 		case 0x01: return input_port_read(space->machine, "P2_KEY0");
 		case 0x02: return input_port_read(space->machine, "P2_KEY1");
 		case 0x04: return input_port_read(space->machine, "P2_KEY2");
 		case 0x08: return input_port_read(space->machine, "P2_KEY3");
 		case 0x10: return input_port_read(space->machine, "P2_KEY4");
-		default:   logerror("p2_r with keyboard_row = %02x\n",keyboard_row); return 0xffff;
+		default:   logerror("p2_r with keyboard_row = %02x\n", state->keyboard_row); return 0xffff;
 	}
 }
 
 static WRITE16_HANDLER( mj4simai_keyboard_w )
 {
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
 	if (ACCESSING_BITS_0_7)
-		keyboard_row = data & 0xff;
+		state->keyboard_row = data & 0xff;
 }
 
 static ADDRESS_MAP_START( mj4simai_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -687,9 +691,9 @@ static ADDRESS_MAP_START( mj4simai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)	// Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)	// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -710,9 +714,9 @@ static ADDRESS_MAP_START( myangel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x700310, 0x70031f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)				// Video Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)				// Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -733,9 +737,9 @@ static ADDRESS_MAP_START( myangel2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs	)			// Video Registers
+	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)			// Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -777,9 +781,9 @@ static ADDRESS_MAP_START( pzlbowl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(pzlbowl_coins_r,pzlbowl_coin_counter_w)	// Coins + Protection?
 	AM_RANGE(0x500006, 0x500007) AM_READ(watchdog_reset16_r)			// Watchdog
 	AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)			// Protection
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x860000, 0x86003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)				// Video Registers
+	AM_RANGE(0x860000, 0x86003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)				// Video Registers
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
 ADDRESS_MAP_END
@@ -802,10 +806,10 @@ static ADDRESS_MAP_START( penbros_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)	// Coins Counter
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
-//  AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
+	//AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
+	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs	)
+	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
 ADDRESS_MAP_END
@@ -846,9 +850,9 @@ static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN")	AM_WRITE( samshoot_coin_w )	// Coins
 	AM_RANGE( 0x700006, 0x700007 ) AM_READ( watchdog_reset16_r )	// Watchdog?
 
-	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
+	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)	// Video Registers
 
 	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w	)	// Sound
 
@@ -860,16 +864,6 @@ ADDRESS_MAP_END
 /***************************************************************************
                                   Funcube
 ***************************************************************************/
-
-static UINT8 *funcube_outputs;
-static UINT8 *funcube_leds;
-
-static UINT64 funcube_coin_start_cycles;
-static UINT8 funcube_hopper_motor;
-static UINT8 funcube_press;
-
-static UINT8 funcube_serial_fifo[4];
-static UINT8 funcube_serial_count;
 
 // Bus conversion functions:
 
@@ -894,12 +888,16 @@ static WRITE32_HANDLER( funcube_nvram_dword_w )
 
 static WRITE16_HANDLER( spriteram16_word_w )
 {
-	COMBINE_DATA( &space->machine->generic.spriteram.u16[offset] );
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
+	COMBINE_DATA( &state->spriteram[offset] );
 }
 
 static READ16_HANDLER( spriteram16_word_r )
 {
-	return space->machine->generic.spriteram.u16[offset];
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
+	return state->spriteram[offset];
 }
 
 static READ16_HANDLER( paletteram16_word_r )
@@ -924,15 +922,17 @@ enum {
 	CF_MBSR		=	0x1ec/4
 };
 
-static UINT32 *coldfire_regs;
-
 static WRITE32_HANDLER( coldfire_regs_w )
 {
-	COMBINE_DATA( &coldfire_regs[offset] );
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
+	COMBINE_DATA( &state->coldfire_regs[offset] );
 }
 
 static READ32_HANDLER( coldfire_regs_r )
 {
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
 	switch( offset )
 	{
 		case CF_MBSR:
@@ -942,7 +942,7 @@ static READ32_HANDLER( coldfire_regs_r )
 			return input_port_read(space->machine, "BATTERY") << 16;
 	}
 
-	return coldfire_regs[offset];
+	return state->coldfire_regs[offset];
 }
 
 static READ32_HANDLER( funcube_debug_r )
@@ -966,13 +966,13 @@ static ADDRESS_MAP_START( funcube_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE( 0x00600000, 0x00600003 ) AM_WRITENOP	// sound chip
 
-	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE_GENERIC(spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)
 	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE_GENERIC(paletteram)
-	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE( seta2_vregs_dword_w )                            AM_BASE((UINT32**)&seta2_vregs)
+	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE( seta2_vregs_dword_w )                            AM_BASE_MEMBER(seta2_state, vregs)
 
 	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE( funcube_nvram_dword_r, funcube_nvram_dword_w )
 
-	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE( coldfire_regs_r, coldfire_regs_w ) AM_BASE(&coldfire_regs)	// Module
+	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE( coldfire_regs_r, coldfire_regs_w ) AM_BASE_MEMBER(seta2_state, coldfire_regs)	// Module
 	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM	// SRAM
 ADDRESS_MAP_END
 
@@ -992,29 +992,30 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( funcube_coins_r )
 {
+	seta2_state *state = space->machine->driver_data<seta2_state>();
 	UINT8 ret = input_port_read(space->machine,"SWITCH");
 	UINT8 coin_bit0 = 1;	// active low
 	UINT8 coin_bit1 = 1;
 
-	UINT8 hopper_bit = (funcube_hopper_motor && !(space->machine->primary_screen->frame_number()%20)) ? 1 : 0;
+	UINT8 hopper_bit = (state->funcube_hopper_motor && !(space->machine->primary_screen->frame_number()%20)) ? 1 : 0;
 
 	const UINT64 coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK / (1000/20);
 
-	if ( funcube_coin_start_cycles )
+	if ( state->funcube_coin_start_cycles )
 	{
-		UINT64 elapsed = downcast<cpu_device *>(space->cpu)->total_cycles() - funcube_coin_start_cycles;
+		UINT64 elapsed = downcast<cpu_device *>(space->cpu)->total_cycles() - state->funcube_coin_start_cycles;
 
 		if ( elapsed < coin_total_cycles/2 )
 			coin_bit0 = 0;
 		else if ( elapsed < coin_total_cycles )
 			coin_bit1 = 0;
 		else
-			funcube_coin_start_cycles = 0;
+			state->funcube_coin_start_cycles = 0;
 	}
 	else
 	{
 		if (!(ret & 1))
-			funcube_coin_start_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
+			state->funcube_coin_start_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
 	}
 
 	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;
@@ -1022,18 +1023,19 @@ static READ8_HANDLER( funcube_coins_r )
 
 static READ8_HANDLER( funcube_serial_r )
 {
+	seta2_state *state = space->machine->driver_data<seta2_state>();
 	UINT8 ret = 0xff;
 
-	switch( funcube_serial_count )
+	switch( state->funcube_serial_count )
 	{
-		case 4:	ret = funcube_serial_fifo[0];	break;
-		case 3:	ret = funcube_serial_fifo[1];	break;
-		case 2:	ret = funcube_serial_fifo[2];	break;
-		case 1:	ret = funcube_serial_fifo[3];	break;
+		case 4:	ret = state->funcube_serial_fifo[0];	break;
+		case 3:	ret = state->funcube_serial_fifo[1];	break;
+		case 2:	ret = state->funcube_serial_fifo[2];	break;
+		case 1:	ret = state->funcube_serial_fifo[3];	break;
 	}
 
-	if (funcube_serial_count)
-		funcube_serial_count--;
+	if (state->funcube_serial_count)
+		state->funcube_serial_count--;
 
 	return ret;
 }
@@ -1047,7 +1049,9 @@ static void funcube_debug_outputs(void)
 
 static WRITE8_HANDLER( funcube_leds_w )
 {
-	*funcube_leds = data;
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
+	*state->funcube_leds = data;
 
 	set_led_status( space->machine, 0, (~data) & 0x01 );	// win lamp (red)
 	set_led_status( space->machine, 1, (~data) & 0x02 );	// win lamp (green)
@@ -1063,18 +1067,22 @@ static WRITE8_HANDLER( funcube_leds_w )
 
 static READ8_HANDLER( funcube_outputs_r )
 {
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
 	// Bits 1,2,3 read
-	return *funcube_outputs;
+	return *state->funcube_outputs;
 }
 
 static WRITE8_HANDLER( funcube_outputs_w )
 {
-	*funcube_outputs = data;
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+
+	*state->funcube_outputs = data;
 
 	// Bits 0,1,3 written
 
 	// Bit 0: hopper motor
-	funcube_hopper_motor = (~data) & 0x01;
+	state->funcube_hopper_motor = (~data) & 0x01;
 
 	// Bit 1: high on pay out
 
@@ -1088,8 +1096,8 @@ static WRITE8_HANDLER( funcube_outputs_w )
 static ADDRESS_MAP_START( funcube_sub_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ( funcube_coins_r )
 	AM_RANGE( H8_PORT_4,   H8_PORT_4   )	AM_NOP	// unused
-	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE( funcube_outputs_r, funcube_outputs_w ) AM_BASE( &funcube_outputs )
-	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE( funcube_leds_w )                           AM_BASE( &funcube_leds )
+	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE( funcube_outputs_r, funcube_outputs_w ) AM_BASE_MEMBER( seta2_state, funcube_outputs )
+	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE( funcube_leds_w )                           AM_BASE_MEMBER( seta2_state, funcube_leds )
 //  AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )    // cabinets linking (jpunit)
 	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )	AM_READ( funcube_serial_r )
 ADDRESS_MAP_END
@@ -2269,6 +2277,8 @@ static const x1_010_interface x1_010_sound_intf =
 
 static MACHINE_DRIVER_START( mj4simai )
 
+	MDRV_DRIVER_DATA( seta2_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
 	MDRV_CPU_PROGRAM_MAP(mj4simai_map)
@@ -2413,25 +2423,27 @@ static INTERRUPT_GEN( funcube_interrupt )
 
 static INTERRUPT_GEN( funcube_sub_timer_irq )
 {
-	if ( funcube_serial_count )
+	seta2_state *state = device->machine->driver_data<seta2_state>();
+
+	if ( state->funcube_serial_count )
 	{
 		cpu_set_input_line(device, H8_SCI_1_RX, HOLD_LINE);
 	}
 	else
 	{
 		UINT8 press   = input_port_read(device->machine,"TOUCH_PRESS");
-		UINT8 release = funcube_press && !press;
+		UINT8 release = state->funcube_press && !press;
 
 		if ( press || release )
 		{
-			funcube_serial_fifo[0] = press ? 0xfe : 0xfd;
-			funcube_serial_fifo[1] = input_port_read(device->machine,"TOUCH_X");
-			funcube_serial_fifo[2] = input_port_read(device->machine,"TOUCH_Y");
-			funcube_serial_fifo[3] = 0xff;
-			funcube_serial_count = 4;
+			state->funcube_serial_fifo[0] = press ? 0xfe : 0xfd;
+			state->funcube_serial_fifo[1] = input_port_read(device->machine,"TOUCH_X");
+			state->funcube_serial_fifo[2] = input_port_read(device->machine,"TOUCH_Y");
+			state->funcube_serial_fifo[3] = 0xff;
+			state->funcube_serial_count = 4;
 		}
 
-		funcube_press = press;
+		state->funcube_press = press;
 	}
 
 	cpu_set_input_line(device, H8_METRO_TIMER_HACK, HOLD_LINE);
@@ -2439,13 +2451,17 @@ static INTERRUPT_GEN( funcube_sub_timer_irq )
 
 static MACHINE_RESET( funcube )
 {
-	funcube_coin_start_cycles = 0;
-	funcube_serial_count = 0;
-	funcube_press = 0;
-	funcube_hopper_motor = 0;
+	seta2_state *state = machine->driver_data<seta2_state>();
+	state->funcube_coin_start_cycles = 0;
+	state->funcube_serial_count = 0;
+	state->funcube_press = 0;
+	state->funcube_hopper_motor = 0;
 }
 
 static MACHINE_DRIVER_START( funcube )
+
+	MDRV_DRIVER_DATA( seta2_state )
+
 	MDRV_CPU_ADD("maincpu", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
 	MDRV_CPU_PROGRAM_MAP(funcube_map)
 	MDRV_CPU_VBLANK_INT_HACK(funcube_interrupt,2)

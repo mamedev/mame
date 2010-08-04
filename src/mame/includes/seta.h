@@ -6,16 +6,85 @@
 
 #define	__uPD71054_TIMER	1
 
+typedef struct _uPD71054_state uPD71054_state;
+struct _uPD71054_state
+{
+	emu_timer *timer[3];			// Timer
+	UINT16	max[3];				// Max counter
+	UINT16	write_select;		// Max counter write select
+	UINT8	reg[4];				//
+};
+
+typedef struct _game_offset game_offset;
+struct _game_offset
+{
+	/* 2 values, for normal and flipped */
+	const char *gamename;
+	int sprite_offs[2];
+	int tilemap_offs[2];
+};
+
+class seta_state : public driver_data_t
+{
+public:
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, seta_state(machine)); }
+
+	seta_state(running_machine &machine)
+		: driver_data_t(machine) { }
+
+	UINT8 *sharedram;
+	UINT16 *workram;
+	UINT16 *vregs;
+	UINT16 *vram_0;
+	UINT16 *vctrl_0;
+	UINT16 *vram_2;
+	UINT16 *vctrl_2;
+	UINT16 *spriteram;
+	UINT16 *spriteram2;
+	UINT16 *paletteram;
+	size_t paletteram_size;
+
+	int tiles_offset;
+	tilemap_t *tilemap_0;
+	tilemap_t *tilemap_1;	// Layer 0
+	tilemap_t *tilemap_2;
+	tilemap_t *tilemap_3;	// Layer 1
+	int tilemaps_flip;
+	int samples_bank;
+
+	uPD71054_state uPD71054;
+	const game_offset *global_offsets;
+
+	int coin_lockout;
+	const game_driver *driver;
+
+	int sub_ctrl_data;
+
+	int gun_input_bit;
+	int gun_input_src;
+	int gun_bit_count;
+	int gun_old_clock;
+
+	UINT8 usclssic_port_select;
+	int keroppi_prize_hop;
+	int keroppi_protection_count;
+	UINT16 *kiwame_nvram;
+
+	int wiggie_soundlatch;
+
+	UINT16 *inttoote_key_select;
+	UINT16 *inttoote_700000;
+	UINT8 jockeyc_key_select;
+
+	UINT8 twineagl_xram[8];
+	int twineagl_tilebank[4];
+
+	UINT16 pairslove_protram[0x200];
+	UINT16 pairslove_protram_old[0x200];
+	UINT16 downtown_protection[0x200/2];
+};
+
 /*----------- defined in video/seta.c -----------*/
-
-extern UINT16 *seta_vram_0, *seta_vctrl_0;
-extern UINT16 *seta_vram_2, *seta_vctrl_2;
-extern UINT16 *seta_vregs;
-extern size_t seta_paletteram_size;
-
-extern UINT16 *seta_workram; // Needed for zombraid Crosshair hack
-
-extern int seta_tiles_offset;
 
 void seta_coin_lockout_w(running_machine *machine, int data);
 
@@ -45,41 +114,3 @@ VIDEO_UPDATE( usclssic );
 VIDEO_UPDATE( inttoote );
 
 
-/*----------- defined in video/seta2.c -----------*/
-
-extern UINT16 *seta2_vregs;
-
-WRITE16_HANDLER( seta2_vregs_w );
-
-VIDEO_START( seta2 );
-VIDEO_START( seta2_offset );
-VIDEO_UPDATE( seta2 );
-VIDEO_EOF( seta2 );
-
-
-/*----------- defined in video/ssv.c -----------*/
-
-extern UINT16 *ssv_scroll;
-
-extern int ssv_special;
-
-extern int ssv_tile_code[16];
-
-extern int ssv_sprites_offsx, ssv_sprites_offsy;
-extern int ssv_tilemap_offsx, ssv_tilemap_offsy;
-
-extern UINT16 *eaglshot_gfxram, *gdfs_tmapram, *gdfs_tmapscroll;
-
-READ16_HANDLER( ssv_vblank_r );
-WRITE16_HANDLER( ssv_scroll_w );
-WRITE16_HANDLER( paletteram16_xrgb_swap_word_w );
-WRITE16_HANDLER( gdfs_tmapram_w );
-void ssv_enable_video(int enable);
-
-VIDEO_START( ssv );
-VIDEO_START( eaglshot );
-VIDEO_START( gdfs );
-
-VIDEO_UPDATE( ssv );
-VIDEO_UPDATE( eaglshot );
-VIDEO_UPDATE( gdfs );

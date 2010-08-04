@@ -139,36 +139,9 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "sound/x1_010.h"
 #include "includes/seta.h"
 
-/* Variables only used here */
-
-static tilemap_t *tilemap_0, *tilemap_1;	// Layer 0
-static tilemap_t *tilemap_2, *tilemap_3;	// Layer 1
-static int tilemaps_flip;
-
-/* Variables used elsewhere */
-
-int seta_tiles_offset;
-
-UINT16 *seta_vram_0, *seta_vctrl_0;
-UINT16 *seta_vram_2, *seta_vctrl_2;
-UINT16 *seta_vregs;
-size_t seta_paletteram_size;
-
-UINT16 *seta_workram; // Used for zombraid crosshair hack
-
-static int twineagl_tilebank[4];
-static int	seta_samples_bank;
-
-struct x_offset
-{
-	/* 2 values, for normal and flipped */
-	const char *gamename;
-	int sprite_offs[2];
-	int tilemap_offs[2];
-};
 
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
-static const struct x_offset game_offsets[] =
+static const game_offset game_offsets[] =
 {
 	/* only sprites */
 	{ "tndrcade", { -1,  0 } },				// correct (wall at beginning of game)
@@ -233,8 +206,6 @@ static const struct x_offset game_offsets[] =
 	{ NULL }
 };
 
-static const struct x_offset *global_offsets;
-
 
 /*  ---- 3---       Coin #1 Lock Out
     ---- -2--       Coin #0 Lock Out
@@ -243,23 +214,22 @@ static const struct x_offset *global_offsets;
 
 void seta_coin_lockout_w(running_machine *machine, int data)
 {
-	static int seta_coin_lockout;
-	static const game_driver *seta_driver = NULL;
+	seta_state *state = machine->driver_data<seta_state>();
 	static const char *const seta_nolockout[8] = { "blandia", "gundhara", "kamenrid", "zingzip", "eightfrc", "extdwnhl", "sokonuke", "zombraid"};
 
 	/* Only compute seta_coin_lockout when confronted with a new gamedrv */
-	if (seta_driver != machine->gamedrv)
+	if (state->driver != machine->gamedrv)
 	{
 		int i;
-		seta_driver = machine->gamedrv;
+		state->driver = machine->gamedrv;
 
-		seta_coin_lockout = 1;
+		state->coin_lockout = 1;
 		for (i=0; i<ARRAY_LENGTH(seta_nolockout); i++)
 		{
-			if (strcmp(seta_driver->name, seta_nolockout[i]) == 0 ||
-				strcmp(seta_driver->parent, seta_nolockout[i]) == 0)
+			if (strcmp(state->driver->name, seta_nolockout[i]) == 0 ||
+				strcmp(state->driver->parent, seta_nolockout[i]) == 0)
 			{
-				seta_coin_lockout = 0;
+				state->coin_lockout = 0;
 				break;
 			}
 		}
@@ -269,7 +239,7 @@ void seta_coin_lockout_w(running_machine *machine, int data)
 	coin_counter_w		(machine, 1, (( data) >> 1) & 1 );
 
 	/* blandia, gundhara, kamenrid & zingzip haven't the coin lockout device */
-	if (	!seta_coin_lockout )
+	if (	!state->coin_lockout )
 		return;
 	coin_lockout_w		(machine, 0, ((~data) >> 2) & 1 );
 	coin_lockout_w		(machine, 1, ((~data) >> 3) & 1 );
@@ -278,7 +248,8 @@ void seta_coin_lockout_w(running_machine *machine, int data)
 
 WRITE16_HANDLER( seta_vregs_w )
 {
-	COMBINE_DATA(&seta_vregs[offset]);
+	seta_state *state = space->machine->driver_data<seta_state>();
+	COMBINE_DATA(&state->vregs[offset]);
 	switch (offset)
 	{
 		case 0/2:
@@ -318,13 +289,13 @@ WRITE16_HANDLER( seta_vregs_w )
 
 				new_bank = (data >> 3) & 0x7;
 
-				if (new_bank != seta_samples_bank)
+				if (new_bank != state->samples_bank)
 				{
 					UINT8 *rom = memory_region(space->machine, "x1snd");
 					int samples_len = memory_region_length(space->machine, "x1snd");
 					int addr;
 
-					seta_samples_bank = new_bank;
+					state->samples_bank = new_bank;
 
 					if (samples_len == 0x240000)	/* blandia, eightfrc */
 					{
@@ -388,58 +359,68 @@ Offset + 0x4:
 
 ***************************************************************************/
 
-INLINE void twineagl_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, UINT16 *vram )
+INLINE void twineagl_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int offset )
 {
+	seta_state *state = machine->driver_data<seta_state>();
+	UINT16 *vram = state->vram_0 + offset;
 	UINT16 code =	vram[ tile_index ];
 	UINT16 attr =	vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
-		code = (code & 0xc07f) | ((twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
+		code = (code & 0xc07f) | ((state->twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
 	SET_TILE_INFO( 1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-static TILE_GET_INFO( twineagl_get_tile_info_0 ) { twineagl_tile_info( machine, tileinfo, tile_index, seta_vram_0 + 0x0000 ); }
-static TILE_GET_INFO( twineagl_get_tile_info_1 ) { twineagl_tile_info( machine, tileinfo, tile_index, seta_vram_0 + 0x1000 ); }
+static TILE_GET_INFO( twineagl_get_tile_info_0 ) { twineagl_tile_info( machine, tileinfo, tile_index, 0x0000 ); }
+static TILE_GET_INFO( twineagl_get_tile_info_1 ) { twineagl_tile_info( machine, tileinfo, tile_index, 0x1000 ); }
 
 
-INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int layer, UINT16 *vram )
+INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int layer, int offset )
 {
+	seta_state *state = machine->driver_data<seta_state>();
+	UINT16 *vram = (layer == 0) ? state->vram_0 + offset : state->vram_2 + offset;
 	UINT16 code =	vram[ tile_index ];
 	UINT16 attr =	vram[ tile_index + 0x800 ];
-	SET_TILE_INFO( 1 + layer, seta_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
+
+	SET_TILE_INFO( 1 + layer, state->tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info( machine, tileinfo, tile_index, 0, seta_vram_0 + 0x0000 ); }
-static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info( machine, tileinfo, tile_index, 0, seta_vram_0 + 0x1000 ); }
-static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info( machine, tileinfo, tile_index, 1, seta_vram_2 + 0x0000 ); }
-static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info( machine, tileinfo, tile_index, 1, seta_vram_2 + 0x1000 ); }
+static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info( machine, tileinfo, tile_index, 0, 0x0000 ); }
+static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info( machine, tileinfo, tile_index, 0, 0x1000 ); }
+static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info( machine, tileinfo, tile_index, 1, 0x0000 ); }
+static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info( machine, tileinfo, tile_index, 1, 0x1000 ); }
 
 
 WRITE16_HANDLER( seta_vram_0_w )
 {
-	COMBINE_DATA(&seta_vram_0[offset]);
+	seta_state *state = space->machine->driver_data<seta_state>();
+
+	COMBINE_DATA(&state->vram_0[offset]);
 	if (offset & 0x1000)
-		tilemap_mark_tile_dirty(tilemap_1, offset & 0x7ff);
+		tilemap_mark_tile_dirty(state->tilemap_1, offset & 0x7ff);
 	else
-		tilemap_mark_tile_dirty(tilemap_0, offset & 0x7ff);
+		tilemap_mark_tile_dirty(state->tilemap_0, offset & 0x7ff);
 }
 
 WRITE16_HANDLER( seta_vram_2_w )
 {
-	COMBINE_DATA(&seta_vram_2[offset]);
+	seta_state *state = space->machine->driver_data<seta_state>();
+
+	COMBINE_DATA(&state->vram_2[offset]);
 	if (offset & 0x1000)
-		tilemap_mark_tile_dirty(tilemap_3, offset & 0x7ff);
+		tilemap_mark_tile_dirty(state->tilemap_3, offset & 0x7ff);
 	else
-		tilemap_mark_tile_dirty(tilemap_2, offset & 0x7ff);
+		tilemap_mark_tile_dirty(state->tilemap_2, offset & 0x7ff);
 }
 
 WRITE16_HANDLER( twineagl_tilebank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		seta_state *state = space->machine->driver_data<seta_state>();
 		data &= 0xff;
-		if (twineagl_tilebank[offset] != data)
+		if (state->twineagl_tilebank[offset] != data)
 		{
-			twineagl_tilebank[offset] = data;
+			state->twineagl_tilebank[offset] = data;
 			tilemap_mark_all_tiles_dirty_all(space->machine);
 		}
 	}
@@ -447,115 +428,106 @@ WRITE16_HANDLER( twineagl_tilebank_w )
 
 
 
-static void find_offsets(running_machine *machine)
-{
-	global_offsets = game_offsets;
-	while (global_offsets->gamename && strcmp(machine->gamedrv->name,global_offsets->gamename))
-		global_offsets++;
-}
-
 /* 2 layers */
 VIDEO_START( seta_2_layers )
 {
+	seta_state *state = machine->driver_data<seta_state>();
+
+	VIDEO_START_CALL( seta_no_layers );
+
 	/* Each layer consists of 2 tilemaps: only one can be displayed
        at any given time */
 
 	/* layer 0 */
-	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16,16, 64,32 );
 
 
 	/* layer 1 */
-	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
+	state->tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
+	state->tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-		tilemaps_flip = 0;
+	state->tilemaps_flip = 0;
 
-		tilemap_set_transparent_pen(tilemap_0,0);
-		tilemap_set_transparent_pen(tilemap_1,0);
-		tilemap_set_transparent_pen(tilemap_2,0);
-		tilemap_set_transparent_pen(tilemap_3,0);
-
-		find_offsets(machine);
-		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
+	tilemap_set_transparent_pen(state->tilemap_0, 0);
+	tilemap_set_transparent_pen(state->tilemap_1, 0);
+	tilemap_set_transparent_pen(state->tilemap_2, 0);
+	tilemap_set_transparent_pen(state->tilemap_3, 0);
 }
 
 
 /* 1 layer */
 VIDEO_START( seta_1_layer )
 {
+	seta_state *state = machine->driver_data<seta_state>();
+
+	VIDEO_START_CALL( seta_no_layers );
+
 	/* Each layer consists of 2 tilemaps: only one can be displayed
        at any given time */
 
 	/* layer 0 */
-	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-
-	/* NO layer 1 */
-	tilemap_2 = 0;
-	tilemap_3 = 0;
-
-		tilemaps_flip = 0;
-
-		tilemap_set_transparent_pen(tilemap_0,0);
-		tilemap_set_transparent_pen(tilemap_1,0);
-
-		find_offsets(machine);
-		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
+	tilemap_set_transparent_pen(state->tilemap_0, 0);
+	tilemap_set_transparent_pen(state->tilemap_1, 0);
 }
 
 VIDEO_START( twineagl_1_layer )
 {
+	seta_state *state = machine->driver_data<seta_state>();
+
+	VIDEO_START_CALL( seta_no_layers );
+
 	/* Each layer consists of 2 tilemaps: only one can be displayed
        at any given time */
 
 	/* layer 0 */
-	tilemap_0 = tilemap_create(	machine, twineagl_get_tile_info_0, tilemap_scan_rows,
+	state->tilemap_0 = tilemap_create(	machine, twineagl_get_tile_info_0, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_1 = tilemap_create(	machine, twineagl_get_tile_info_1, tilemap_scan_rows,
+	state->tilemap_1 = tilemap_create(	machine, twineagl_get_tile_info_1, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-
-	/* NO layer 1 */
-	tilemap_2 = 0;
-	tilemap_3 = 0;
-
-		tilemaps_flip = 0;
-
-		tilemap_set_transparent_pen(tilemap_0,0);
-		tilemap_set_transparent_pen(tilemap_1,0);
-
-		find_offsets(machine);
-		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
+	tilemap_set_transparent_pen(state->tilemap_0, 0);
+	tilemap_set_transparent_pen(state->tilemap_1, 0);
 }
 
 
 /* NO layers, only sprites */
 VIDEO_START( seta_no_layers )
 {
-	tilemap_0 = 0;
-	tilemap_1 = 0;
-	tilemap_2 = 0;
-	tilemap_3 = 0;
-	find_offsets(machine);
-	seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
+	seta_state *state = machine->driver_data<seta_state>();
+
+	state->tilemap_0 = 0;
+	state->tilemap_1 = 0;
+	state->tilemap_2 = 0;
+	state->tilemap_3 = 0;
+
+	state->tilemaps_flip = 0;
+
+	state->global_offsets = game_offsets;
+	while (state->global_offsets->gamename && strcmp(machine->gamedrv->name, state->global_offsets->gamename))
+		state->global_offsets++;
+	state->samples_bank = -1;	// set the samples bank to an out of range value at start-up
 }
 
 VIDEO_START( oisipuzl_2_layers )
 {
+	seta_state *state = machine->driver_data<seta_state>();
+
 	VIDEO_START_CALL(seta_2_layers);
-	tilemaps_flip = 1;
+	state->tilemaps_flip = 1;
 }
 
 
@@ -689,11 +661,12 @@ PALETTE_INIT( usclssic )
 
 static void set_pens(running_machine *machine)
 {
+	seta_state *state = machine->driver_data<seta_state>();
 	offs_t i;
 
-	for (i = 0; i < seta_paletteram_size / 2; i++)
+	for (i = 0; i < state->paletteram_size / 2; i++)
 	{
-		UINT16 data = machine->generic.paletteram.u16[i];
+		UINT16 data = state->paletteram[i];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
@@ -707,11 +680,12 @@ static void set_pens(running_machine *machine)
 
 static void usclssic_set_pens(running_machine *machine)
 {
+	seta_state *state = machine->driver_data<seta_state>();
 	offs_t i;
 
 	for (i = 0; i < 0x200; i++)
 	{
-		UINT16 data = machine->generic.paletteram.u16[i];
+		UINT16 data = state->paletteram[i];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
@@ -735,7 +709,8 @@ static void usclssic_set_pens(running_machine *machine)
 
 static void draw_sprites_map(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	seta_state *state = machine->driver_data<seta_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -748,7 +723,7 @@ static void draw_sprites_map(running_machine *machine, bitmap_t *bitmap,const re
 	int numcol	=	ctrl2 & 0x000f;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = state->spriteram2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int upper	=	( spriteram16[ 0x604/2 ] & 0xFF ) +
 					( spriteram16[ 0x606/2 ] & 0xFF ) * 256;
@@ -839,7 +814,8 @@ twineagl:   000 027 00 0f   (test mode)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	seta_state *state = machine->driver_data<seta_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 	int xoffs, yoffs;
 
@@ -851,7 +827,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	int flip	=	ctrl & 0x40;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = state->spriteram2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int max_y	=	0xf0;
 
@@ -859,7 +835,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	draw_sprites_map(machine,bitmap,cliprect);
 
 
-	xoffs = global_offsets->sprite_offs[flip ? 1 : 0];
+	xoffs = state->global_offsets->sprite_offs[flip ? 1 : 0];
 	yoffs = -2;
 
 	for ( offs = (0x400-2)/2 ; offs >= 0/2; offs -= 2/2 )
@@ -920,26 +896,27 @@ VIDEO_UPDATE( seta_no_layers )
 /* For games with 1 or 2 tilemaps */
 static VIDEO_UPDATE( seta_layers )
 {
+	seta_state *state = screen->machine->driver_data<seta_state>();
 	int layers_ctrl = -1;
 	int enab_0, enab_1, x_0, x_1, y_0, y_1;
 
 	int order	=	0;
-	int flip	=	(screen->machine->generic.spriteram.u16[ 0x600/2 ] & 0x40) >> 6;
+	int flip	=	(state->spriteram[ 0x600/2 ] & 0x40) >> 6;
 
 	const rectangle &visarea = screen->visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
 
-	flip ^= tilemaps_flip;
+	flip ^= state->tilemaps_flip;
 
 	tilemap_set_flip_all(screen->machine, flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
 
-	x_0		=	seta_vctrl_0[ 0/2 ];
-	y_0		=	seta_vctrl_0[ 2/2 ];
-	enab_0	=	seta_vctrl_0[ 4/2 ];
+	x_0		=	state->vctrl_0[ 0/2 ];
+	y_0		=	state->vctrl_0[ 2/2 ];
+	enab_0	=	state->vctrl_0[ 4/2 ];
 
 	/* Only one tilemap per layer is enabled! */
-	tilemap_set_enable(tilemap_0, (!(enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
-	tilemap_set_enable(tilemap_1, ( (enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
+	tilemap_set_enable(state->tilemap_0, (!(enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
+	tilemap_set_enable(state->tilemap_1, ( (enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
 
 	/* the hardware wants different scroll values when flipped */
 
@@ -949,7 +926,7 @@ static VIDEO_UPDATE( seta_layers )
                     fff0 0260 = -$10, $400-$190 -$10
                     ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
 
-	x_0 += 0x10 - global_offsets->tilemap_offs[flip ? 1 : 0];
+	x_0 += 0x10 - state->global_offsets->tilemap_offs[flip ? 1 : 0];
 	y_0 -= (256 - vis_dimy)/2;
 	if (flip)
 	{
@@ -957,21 +934,21 @@ static VIDEO_UPDATE( seta_layers )
 		y_0 = y_0 - vis_dimy;
 	}
 
-	tilemap_set_scrollx (tilemap_0, 0, x_0);
-	tilemap_set_scrollx (tilemap_1, 0, x_0);
-	tilemap_set_scrolly (tilemap_0, 0, y_0);
-	tilemap_set_scrolly (tilemap_1, 0, y_0);
+	tilemap_set_scrollx(state->tilemap_0, 0, x_0);
+	tilemap_set_scrollx(state->tilemap_1, 0, x_0);
+	tilemap_set_scrolly(state->tilemap_0, 0, y_0);
+	tilemap_set_scrolly(state->tilemap_1, 0, y_0);
 
-	if (tilemap_2)
+	if (state->tilemap_2)
 	{
-		x_1		=	seta_vctrl_2[ 0/2 ];
-		y_1		=	seta_vctrl_2[ 2/2 ];
-		enab_1	=	seta_vctrl_2[ 4/2 ];
+		x_1		=	state->vctrl_2[ 0/2 ];
+		y_1		=	state->vctrl_2[ 2/2 ];
+		enab_1	=	state->vctrl_2[ 4/2 ];
 
-		tilemap_set_enable(tilemap_2, (!(enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
-		tilemap_set_enable(tilemap_3, ( (enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
+		tilemap_set_enable(state->tilemap_2, (!(enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
+		tilemap_set_enable(state->tilemap_3, ( (enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
 
-		x_1 += 0x10 - global_offsets->tilemap_offs[flip ? 1 : 0];
+		x_1 += 0x10 - state->global_offsets->tilemap_offs[flip ? 1 : 0];
 		y_1 -= (256 - vis_dimy)/2;
 		if (flip)
 		{
@@ -979,12 +956,12 @@ static VIDEO_UPDATE( seta_layers )
 			y_1 = y_1 - vis_dimy;
 		}
 
-		tilemap_set_scrollx (tilemap_2, 0, x_1);
-		tilemap_set_scrollx (tilemap_3, 0, x_1);
-		tilemap_set_scrolly (tilemap_2, 0, y_1);
-		tilemap_set_scrolly (tilemap_3, 0, y_1);
+		tilemap_set_scrollx(state->tilemap_2, 0, x_1);
+		tilemap_set_scrollx(state->tilemap_3, 0, x_1);
+		tilemap_set_scrolly(state->tilemap_2, 0, y_1);
+		tilemap_set_scrolly(state->tilemap_3, 0, y_1);
 
-		order	=	seta_vregs[ 2/2 ];
+		order	=	state->vregs[ 2/2 ];
 	}
 
 
@@ -996,8 +973,10 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 
-	if (tilemap_2)		popmessage("VR:%04X-%04X-%04X L0:%04X L1:%04X",seta_vregs[0],seta_vregs[1],seta_vregs[2],seta_vctrl_0[4/2],seta_vctrl_2[4/2]);
-	else if (tilemap_0)	popmessage("L0:%04X",seta_vctrl_0[4/2]);
+	if (state->tilemap_2)
+		popmessage("VR:%04X-%04X-%04X L0:%04X L1:%04X",
+			state->vregs[0], state->vregs[1], state->vregs[2], state->vctrl_0[4/2], state->vctrl_2[4/2]);
+	else if (state->tilemap_0)	popmessage("L0:%04X", state->vctrl_0[4/2]);
 }
 #endif
 
@@ -1005,46 +984,46 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 
 	if (order & 1)	// swap the layers?
 	{
-		if (tilemap_2)
+		if (state->tilemap_2)
 		{
-			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_2, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_3, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_2, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_3, TILEMAP_DRAW_OPAQUE, 0);
 		}
 
 		if (order & 2)	// layer-sprite priority?
 		{
 			if (layers_ctrl & 8)	draw_sprites(screen->machine,bitmap,cliprect);
-			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  0, 0);
-			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  0, 0);
+			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
+			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_1, 0, 0);
 		}
 		else
 		{
-			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  0, 0);
-			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  0, 0);
+			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0,  0, 0);
+			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_1,  0, 0);
 			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 		}
 	}
 	else
 	{
-		if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  TILEMAP_DRAW_OPAQUE, 0);
-		if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0,  TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_1,  TILEMAP_DRAW_OPAQUE, 0);
 
 		if (order & 2)	// layer-sprite priority?
 		{
 			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 
-			if (tilemap_2)
+			if (state->tilemap_2)
 			{
-				if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_2,  0, 0);
-				if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_3,  0, 0);
+				if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
+				if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_3, 0, 0);
 			}
 		}
 		else
 		{
-			if (tilemap_2)
+			if (state->tilemap_2)
 			{
-				if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_2,  0, 0);
-				if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_3,  0, 0);
+				if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
+				if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_3, 0, 0);
 			}
 
 			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
