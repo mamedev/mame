@@ -4586,6 +4586,7 @@ ROM_END
     E-Swat (US), Sega System 16B
     CPU: FD1094 (317-0129)
     ROM Board: 171-5797
+    Sega ID# for ROM board: 834-7165-01
 */
 ROM_START( eswatu )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
