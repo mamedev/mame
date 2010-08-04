@@ -36,7 +36,7 @@
 
 static WRITE8_HANDLER( dealer_decrypt_rom )
 {
-	epos_state *state = (epos_state *)space->machine->driver_data;
+	epos_state *state = space->machine->driver_data<epos_state>();
 
 	if (offset & 0x04)
 		state->counter = (state->counter + 1) & 0x03;
@@ -365,7 +365,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( epos )
 {
-	epos_state *state = (epos_state *)machine->driver_data;
+	epos_state *state = machine->driver_data<epos_state>();
 
 	state_save_register_global(machine, state->palette);
 	state_save_register_global(machine, state->counter);
@@ -373,7 +373,7 @@ static MACHINE_START( epos )
 
 static MACHINE_RESET( epos )
 {
-	epos_state *state = (epos_state *)machine->driver_data;
+	epos_state *state = machine->driver_data<epos_state>();
 
 	state->palette = 0;
 	state->counter = 0;

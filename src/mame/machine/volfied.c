@@ -280,7 +280,7 @@ static const UINT16 *const palette_data_lookup[] =
 
 static TIMER_CALLBACK( volfied_timer_callback )
 {
-	volfied_state *state = (volfied_state *)machine->driver_data;
+	volfied_state *state = machine->driver_data<volfied_state>();
 
 	// Palette commands - palette data written to bank 0: $10 - $af
 	if (state->current_cmd >= 0x1 && state->current_cmd < 0x12)
@@ -335,13 +335,13 @@ WRITE16_HANDLER( volfied_cchip_ctrl_w )
 
 WRITE16_HANDLER( volfied_cchip_bank_w )
 {
-	volfied_state *state = (volfied_state *)space->machine->driver_data;
+	volfied_state *state = space->machine->driver_data<volfied_state>();
 	state->current_bank = data & 7;
 }
 
 WRITE16_HANDLER( volfied_cchip_ram_w )
 {
-	volfied_state *state = (volfied_state *)space->machine->driver_data;
+	volfied_state *state = space->machine->driver_data<volfied_state>();
 
 	state->cchip_ram[(state->current_bank * 0x400) + offset] = data;
 
@@ -432,7 +432,7 @@ READ16_HANDLER( volfied_cchip_ctrl_r )
 
 READ16_HANDLER( volfied_cchip_ram_r )
 {
-	volfied_state *state = (volfied_state *)space->machine->driver_data;
+	volfied_state *state = space->machine->driver_data<volfied_state>();
 
 	/* Check for input ports */
 	if (state->current_bank == 0)
@@ -487,7 +487,7 @@ READ16_HANDLER( volfied_cchip_ram_r )
 
 void volfied_cchip_init( running_machine *machine )
 {
-	volfied_state *state = (volfied_state *)machine->driver_data;
+	volfied_state *state = machine->driver_data<volfied_state>();
 
 	state->cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
 
@@ -500,7 +500,7 @@ void volfied_cchip_init( running_machine *machine )
 
 void volfied_cchip_reset( running_machine *machine )
 {
-	volfied_state *state = (volfied_state *)machine->driver_data;
+	volfied_state *state = machine->driver_data<volfied_state>();
 
 	state->current_bank = 0;
 	state->current_flag = 0;

@@ -225,15 +225,16 @@ struct scroll_info
 };
 
 
-class wheelfir_state
+class wheelfir_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine)
+	static driver_data_t *alloc(running_machine &machine)
 	{
 		return auto_alloc_clear(&machine, wheelfir_state(machine));
 	}
 
-	wheelfir_state(running_machine &machine) { }
+	wheelfir_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	running_device *maincpu;
 	running_device *subcpu;
@@ -289,20 +290,20 @@ static READ16_HANDLER( wheelfir_status_r )
     ---------------x  ? eeprom
 
 */
-	wheelfir_state *state = (wheelfir_state *)space->machine->driver_data;
+	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
 	return state->toggle_bit| (mame_rand(space->machine)&0x2000);
 }
 
 static WRITE16_HANDLER( wheelfir_scanline_cnt_w )
 {
-	wheelfir_state *state = (wheelfir_state *)space->machine->driver_data;
+	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
 	COMBINE_DATA(&state->scanline_cnt);
 }
 
 
 static WRITE16_HANDLER(wheelfir_blit_w)
 {
-	wheelfir_state *state = (wheelfir_state *)space->machine->driver_data;
+	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
 
 	COMBINE_DATA(&state->blitter_data[offset]);
 
@@ -564,14 +565,14 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 static VIDEO_START(wheelfir)
 {
-	wheelfir_state *state = (wheelfir_state *)machine->driver_data;
+	wheelfir_state *state = machine->driver_data<wheelfir_state>();
 	state->tmp_bitmap[0] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 	state->tmp_bitmap[1] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 }
 
 static VIDEO_UPDATE(wheelfir)
 {
-	wheelfir_state *state = (wheelfir_state *)screen->machine->driver_data;
+	wheelfir_state *state = screen->machine->driver_data<wheelfir_state>();
 
 	bitmap_fill(bitmap, cliprect,0);
 
@@ -602,20 +603,20 @@ static VIDEO_UPDATE(wheelfir)
 
 static VIDEO_EOF( wheelfir )
 {
-	wheelfir_state *state = (wheelfir_state *)machine->driver_data;
+	wheelfir_state *state = machine->driver_data<wheelfir_state>();
 	bitmap_fill(state->tmp_bitmap[LAYER_FG], &machine->primary_screen->visible_area(),0);
 }
 
 
 static WRITE16_HANDLER( pal_reset_pos_w )
 {
-	wheelfir_state *state = (wheelfir_state *)space->machine->driver_data;
+	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
 	state->palpos = 0;
 }
 
 static WRITE16_HANDLER( pal_data_w )
 {
-	wheelfir_state *state = (wheelfir_state *)space->machine->driver_data;
+	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
 	int color=state->palpos/3;
 	state->palette[state->palpos] = data & 0xff;
 	++state->palpos;
@@ -638,7 +639,7 @@ static WRITE16_HANDLER(wheelfir_7c0000_w)
 
 static WRITE16_HANDLER(wheelfir_snd_w)
 {
-	wheelfir_state *state = (wheelfir_state *)space->machine->driver_data;
+	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
 	COMBINE_DATA(&state->soundlatch);
 	cputag_set_input_line(space->machine, "subcpu", 1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
 	timer_call_after_resynch(space->machine, NULL, 0, 0);
@@ -646,7 +647,7 @@ static WRITE16_HANDLER(wheelfir_snd_w)
 
 static READ16_HANDLER( wheelfir_snd_r )
 {
-	wheelfir_state *state = (wheelfir_state *)space->machine->driver_data;
+	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
 	return state->soundlatch;
 }
 
@@ -724,7 +725,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
-	wheelfir_state *state = (wheelfir_state *)timer.machine->driver_data;
+	wheelfir_state *state = timer.machine->driver_data<wheelfir_state>();
 	timer_call_after_resynch(timer.machine, NULL, 0, 0);
 	state->current_scanline=param;
 
@@ -769,7 +770,7 @@ static MACHINE_RESET(wheelfir)
 
 static MACHINE_START( wheelfir )
 {
-	wheelfir_state *state = (wheelfir_state *)machine->driver_data;
+	wheelfir_state *state = machine->driver_data<wheelfir_state>();
 
 	state->maincpu = machine->device( "maincpu");
 	state->subcpu = machine->device(  "subcpu");

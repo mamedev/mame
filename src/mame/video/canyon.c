@@ -10,7 +10,7 @@ Atari Canyon Bomber video emulation
 
 WRITE8_HANDLER( canyon_videoram_w )
 {
-	canyon_state *state = (canyon_state *)space->machine->driver_data;
+	canyon_state *state = space->machine->driver_data<canyon_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -18,7 +18,7 @@ WRITE8_HANDLER( canyon_videoram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	canyon_state *state = (canyon_state *)machine->driver_data;
+	canyon_state *state = machine->driver_data<canyon_state>();
 	UINT8 code = state->videoram[tile_index];
 
 	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0);
@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( canyon )
 {
-	canyon_state *state = (canyon_state *)machine->driver_data;
+	canyon_state *state = machine->driver_data<canyon_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
@@ -35,7 +35,7 @@ VIDEO_START( canyon )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle* cliprect )
 {
-	canyon_state *state = (canyon_state *)machine->driver_data;
+	canyon_state *state = machine->driver_data<canyon_state>();
 	int i;
 
 	for (i = 0; i < 2; i++)
@@ -57,7 +57,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_bombs( running_machine *machine, bitmap_t *bitmap, const rectangle* cliprect )
 {
-	canyon_state *state = (canyon_state *)machine->driver_data;
+	canyon_state *state = machine->driver_data<canyon_state>();
 	int i;
 
 	for (i = 0; i < 2; i++)
@@ -84,7 +84,7 @@ static void draw_bombs( running_machine *machine, bitmap_t *bitmap, const rectan
 
 VIDEO_UPDATE( canyon )
 {
-	canyon_state *state = (canyon_state *)screen->machine->driver_data;
+	canyon_state *state = screen->machine->driver_data<canyon_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 

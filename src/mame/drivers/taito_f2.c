@@ -355,7 +355,7 @@ static READ16_HANDLER( ninjak_input_r )
 
 static READ16_HANDLER( cameltry_paddle_r )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 	int curr, res = 0xff;
 
 	switch (offset)
@@ -400,7 +400,7 @@ static READ16_HANDLER( mjnquest_dsw_r )
 
 static READ16_HANDLER( mjnquest_input_r )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 	switch (state->mjnquest_input)
 	{
 		case 0x01:
@@ -427,7 +427,7 @@ static READ16_HANDLER( mjnquest_input_r )
 
 static WRITE16_HANDLER( mjnquest_inputselect_w )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 	state->mjnquest_input = (data >> 6);
 }
 
@@ -577,7 +577,7 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 static TIMER_CALLBACK( taitof2_interrupt6 )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
@@ -605,7 +605,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static READ8_HANDLER( driveout_sound_command_r)
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 
 	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 //  logerror("sound IRQ OFF (sound command=%02x)\n", state->driveout_sound_latch);
@@ -615,13 +615,13 @@ static READ8_HANDLER( driveout_sound_command_r)
 
 static void reset_driveout_sound_region( running_machine *machine )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	state->oki->set_bank_base(state->oki_bank * 0x40000);
 }
 
 static WRITE8_HANDLER( oki_bank_w )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 	if ((data & 4) && (state->oki_bank != (data & 3)) )
 	{
 		state->oki_bank = (data & 3);
@@ -632,7 +632,7 @@ static WRITE8_HANDLER( oki_bank_w )
 
 static WRITE16_HANDLER( driveout_sound_command_w )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -668,7 +668,7 @@ static WRITE16_HANDLER( driveout_sound_command_w )
 
 static WRITE16_HANDLER( cchip2_word_w )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 
 	logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(space->cpu), offset, data);
 
@@ -677,7 +677,7 @@ static WRITE16_HANDLER( cchip2_word_w )
 
 static READ16_HANDLER( cchip2_word_r )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 
 	/* C-Chip ID */
 	if (offset == 0x401)
@@ -3138,7 +3138,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irq_handler( running_device *device, int irq )
 {
-	taitof2_state *state = (taitof2_state *)device->machine->driver_data;
+	taitof2_state *state = device->machine->driver_data<taitof2_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -3346,7 +3346,7 @@ static const tc0140syt_interface taitof2_tc0140syt_intf =
 
 static MACHINE_START( common )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");;
@@ -5598,7 +5598,7 @@ static DRIVER_INIT( finalb )
 
 static DRIVER_INIT( cameltry )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	state->last[0] = 0;
 	state->last[1] = 0;
@@ -5609,7 +5609,7 @@ static DRIVER_INIT( cameltry )
 
 static DRIVER_INIT( mjnquest )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	int i, len = memory_region_length(machine, "gfx2");
 	UINT8 *gfx = memory_region(machine, "gfx2");
 
@@ -5636,7 +5636,7 @@ static STATE_POSTLOAD( driveout_postload )
 
 static DRIVER_INIT( driveout )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	state->driveout_sound_latch = 0;
 	state->oki_bank = 0;

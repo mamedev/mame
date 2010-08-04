@@ -66,14 +66,14 @@ PALETTE_INIT( karnov )
 
 void karnov_flipscreen_w( running_machine *machine, int data )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	state->flipscreen = data;
 	tilemap_set_flip_all(machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	int my, mx, offs, color, tile, fx, fy;
 	int scrollx = state->scroll[0];
 	int scrolly = state->scroll[1];
@@ -122,7 +122,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
@@ -187,7 +187,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( karnov )
 {
-	karnov_state *state = (karnov_state *)screen->machine->driver_data;
+	karnov_state *state = screen->machine->driver_data<karnov_state>();
 	draw_background(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
@@ -198,7 +198,7 @@ VIDEO_UPDATE( karnov )
 
 static TILE_GET_INFO( get_fix_tile_info )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	int tile = state->videoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -209,14 +209,14 @@ static TILE_GET_INFO( get_fix_tile_info )
 
 WRITE16_HANDLER( karnov_videoram_w )
 {
-	karnov_state *state = (karnov_state *)space->machine->driver_data;
+	karnov_state *state = space->machine->driver_data<karnov_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->fix_tilemap, offset);
 }
 
 WRITE16_HANDLER( karnov_playfield_swap_w )
 {
-	karnov_state *state = (karnov_state *)space->machine->driver_data;
+	karnov_state *state = space->machine->driver_data<karnov_state>();
 	offset = ((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5);
 	COMBINE_DATA(&state->pf_data[offset]);
 }
@@ -225,7 +225,7 @@ WRITE16_HANDLER( karnov_playfield_swap_w )
 
 VIDEO_START( karnov )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 
 	/* Allocate bitmap & tilemap */
 	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());
@@ -238,7 +238,7 @@ VIDEO_START( karnov )
 
 VIDEO_START( wndrplnt )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 
 	/* Allocate bitmap & tilemap */
 	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());

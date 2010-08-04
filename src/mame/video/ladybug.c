@@ -137,14 +137,14 @@ PALETTE_INIT( sraider )
 
 WRITE8_HANDLER( ladybug_videoram_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ladybug_colorram_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -160,7 +160,7 @@ WRITE8_HANDLER( ladybug_flipscreen_w )
 
 WRITE8_HANDLER( sraider_io_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 
 	// bit7 = flip
 	// bit6 = grid red
@@ -190,7 +190,7 @@ WRITE8_HANDLER( sraider_io_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	int code = state->videoram[tile_index] + 32 * (state->colorram[tile_index] & 0x08);
 	int color = state->colorram[tile_index] & 0x07;
 
@@ -211,7 +211,7 @@ static TILE_GET_INFO( get_grid_tile_info )
 
 VIDEO_START( ladybug )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
@@ -220,7 +220,7 @@ VIDEO_START( ladybug )
 
 VIDEO_START( sraider )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 
 	state->grid_tilemap = tilemap_create(machine, get_grid_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_rows(state->grid_tilemap, 32);
@@ -233,7 +233,7 @@ VIDEO_START( sraider )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -284,7 +284,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( ladybug )
 {
-	ladybug_state *state = (ladybug_state *)screen->machine->driver_data;
+	ladybug_state *state = screen->machine->driver_data<ladybug_state>();
 	int offs;
 
 	// clear the bg bitmap
@@ -313,7 +313,7 @@ VIDEO_EOF( sraider )	/* update starfield position */
 
 VIDEO_UPDATE( sraider )
 {
-	ladybug_state *state = (ladybug_state *)screen->machine->driver_data;
+	ladybug_state *state = screen->machine->driver_data<ladybug_state>();
 
 	// this part is boilerplate from ladybug, not sure if hardware does this,
 	// since it's not used

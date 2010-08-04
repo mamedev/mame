@@ -33,7 +33,7 @@
 
 static TILE_GET_INFO( get_tile_info_glass_screen0 )
 {
-	glass_state *state = (glass_state *)machine->driver_data;
+	glass_state *state = machine->driver_data<glass_state>();
 	int data = state->videoram[tile_index << 1];
 	int data2 = state->videoram[(tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
@@ -44,7 +44,7 @@ static TILE_GET_INFO( get_tile_info_glass_screen0 )
 
 static TILE_GET_INFO( get_tile_info_glass_screen1 )
 {
-	glass_state *state = (glass_state *)machine->driver_data;
+	glass_state *state = machine->driver_data<glass_state>();
 	int data = state->videoram[(0x1000 / 2) + (tile_index << 1)];
 	int data2 = state->videoram[(0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
@@ -69,7 +69,7 @@ static TILE_GET_INFO( get_tile_info_glass_screen1 )
 
 WRITE16_HANDLER( glass_blitter_w )
 {
-	glass_state *state = (glass_state *)space->machine->driver_data;
+	glass_state *state = space->machine->driver_data<glass_state>();
 	state->blitter_serial_buffer[state->current_bit] = data & 0x01;
 	state->current_bit++;
 
@@ -115,7 +115,7 @@ WRITE16_HANDLER( glass_blitter_w )
 
 WRITE16_HANDLER( glass_vram_w )
 {
-	glass_state *state = (glass_state *)space->machine->driver_data;
+	glass_state *state = space->machine->driver_data<glass_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->pant[offset >> 11], ((offset << 1) & 0x0fff) >> 2);
 }
@@ -129,7 +129,7 @@ WRITE16_HANDLER( glass_vram_w )
 
 VIDEO_START( glass )
 {
-	glass_state *state = (glass_state *)machine->driver_data;
+	glass_state *state = machine->driver_data<glass_state>();
 	state->pant[0] = tilemap_create(machine, get_tile_info_glass_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->pant[1] = tilemap_create(machine, get_tile_info_glass_screen1, tilemap_scan_rows, 16, 16, 32, 32);
 	state->screen_bitmap = auto_bitmap_alloc (machine, 320, 200, machine->primary_screen->format());
@@ -166,7 +166,7 @@ VIDEO_START( glass )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	glass_state *state = (glass_state *)machine->driver_data;
+	glass_state *state = machine->driver_data<glass_state>();
 	int i;
 	const gfx_element *gfx = machine->gfx[0];
 
@@ -197,7 +197,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( glass )
 {
-	glass_state *state = (glass_state *)screen->machine->driver_data;
+	glass_state *state = screen->machine->driver_data<glass_state>();
 	/* set scroll registers */
 	tilemap_set_scrolly(state->pant[0], 0, state->vregs[0]);
 	tilemap_set_scrollx(state->pant[0], 0, state->vregs[1] + 0x04);

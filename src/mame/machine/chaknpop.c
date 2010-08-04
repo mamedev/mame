@@ -47,7 +47,7 @@ static const UINT8 mcu_data[256] = {
 
 static void mcu_update_seed( running_machine *machine, UINT8 data )
 {
-	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	chaknpop_state *state = machine->driver_data<chaknpop_state>();
 
 	if (!(data & 0x80))
 	{
@@ -67,7 +67,7 @@ static void mcu_update_seed( running_machine *machine, UINT8 data )
 
 READ8_HANDLER( chaknpop_mcu_port_a_r )
 {
-	chaknpop_state *state = (chaknpop_state *)space->machine->driver_data;
+	chaknpop_state *state = space->machine->driver_data<chaknpop_state>();
 	//logerror("%04x: MCU port_a read\n", cpu_get_pc(space->cpu));
 	return state->mcu_result;
 }
@@ -88,7 +88,7 @@ READ8_HANDLER( chaknpop_mcu_port_c_r )
 
 WRITE8_HANDLER( chaknpop_mcu_port_a_w )
 {
-	chaknpop_state *state = (chaknpop_state *)space->machine->driver_data;
+	chaknpop_state *state = space->machine->driver_data<chaknpop_state>();
 	UINT8 mcu_command;
 
 	mcu_command = data + state->mcu_seed;

@@ -43,7 +43,7 @@ write
 
 static MACHINE_RESET( marineb )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 
 	state->palette_bank = 0;
 	state->column_scroll = 0;
@@ -55,7 +55,7 @@ static MACHINE_RESET( marineb )
 
 static MACHINE_RESET( springer )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 
 	state->palette_bank = 0;
 	state->column_scroll = 0;
@@ -67,7 +67,7 @@ static MACHINE_RESET( springer )
 
 static MACHINE_START( marineb )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = NULL;

@@ -92,7 +92,7 @@ static const ppi8255_interface hangon_ppi_intf[2] =
 
 static void hangon_generic_init( running_machine *machine )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	/* reset the custom handlers and other pointers */
 	state->i8751_vblank_hook = NULL;
@@ -110,7 +110,7 @@ static void hangon_generic_init( running_machine *machine )
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	cpu_suspend(state->mcu, SUSPEND_REASON_DISABLE, 1);
 }
 
@@ -124,7 +124,7 @@ static TIMER_CALLBACK( suspend_i8751 )
 
 static MACHINE_RESET( hangon )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	fd1094_machine_init(machine->device("sub"));
 
@@ -159,14 +159,14 @@ static INTERRUPT_GEN( hangon_irq )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	ppi8255_w(state->ppi8255_1, param >> 8, param & 0xff);
 }
 
 
 static READ16_HANDLER( hangon_io_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	switch (offset & 0x3020/2)
 	{
@@ -196,7 +196,7 @@ static READ16_HANDLER( hangon_io_r )
 
 static WRITE16_HANDLER( hangon_io_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	if (ACCESSING_BITS_0_7)
 		switch (offset & 0x3020/2)
@@ -221,7 +221,7 @@ static WRITE16_HANDLER( hangon_io_w )
 
 static READ16_HANDLER( sharrier_io_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	switch (offset & 0x0030/2)
 	{
@@ -252,7 +252,7 @@ static READ16_HANDLER( sharrier_io_r )
 
 static WRITE16_HANDLER( sharrier_io_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	if (ACCESSING_BITS_0_7)
 		switch (offset & 0x0030/2)
@@ -284,7 +284,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
-	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, offset, data);
 }
@@ -313,7 +313,7 @@ static WRITE8_DEVICE_HANDLER( video_lamps_w )
 
 static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 {
-	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
 	/* Port C : Tilemap origin and audio mute */
 	/* D7 : Port A handshaking signal /OBF */
@@ -333,7 +333,7 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 
 static WRITE8_DEVICE_HANDLER( sub_control_adc_w )
 {
-	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
 	/* Port A : S.CPU control and ADC channel select */
 	/* D6 : INTR line on second CPU */
@@ -371,7 +371,7 @@ static READ8_DEVICE_HANDLER( adc_status_r )
 
 static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
-	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (state->i8751_vblank_hook != NULL)
@@ -402,14 +402,14 @@ static void sharrier_i8751_sim(running_machine *machine)
 
 static void sound_irq(running_device *device, int irq)
 {
-	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 	cpu_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	/* assert ACK */
 	ppi8255_set_port_c(state->ppi8255_1, 0x00);
@@ -1850,7 +1850,7 @@ static DRIVER_INIT( hangon )
 
 static DRIVER_INIT( sharrier )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	hangon_generic_init(machine);
 	state->i8751_vblank_hook = sharrier_i8751_sim;

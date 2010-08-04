@@ -632,7 +632,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 static SAMPLES_START( kageki_init_samples )
 {
 	running_machine *machine = device->machine;
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	UINT8 *scan, *src;
 	INT16 *dest;
 	int start, size;
@@ -676,7 +676,7 @@ static SAMPLES_START( kageki_init_samples )
 
 static READ8_DEVICE_HANDLER( kageki_csport_r )
 {
-	tnzs_state *state = (tnzs_state *)device->machine->driver_data;
+	tnzs_state *state = device->machine->driver_data<tnzs_state>();
 	int dsw, dsw1, dsw2;
 
 	dsw1 = input_port_read(device->machine, "DSWA");
@@ -706,7 +706,7 @@ static READ8_DEVICE_HANDLER( kageki_csport_r )
 
 static WRITE8_DEVICE_HANDLER( kageki_csport_w )
 {
-	tnzs_state *state = (tnzs_state *)device->machine->driver_data;
+	tnzs_state *state = device->machine->driver_data<tnzs_state>();
 	char mess[80];
 
 	if (data > 0x3f)
@@ -805,7 +805,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
@@ -1561,7 +1561,7 @@ static const ym2203_interface ym2203_config =
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	tnzs_state *state = (tnzs_state *)device->machine->driver_data;
+	tnzs_state *state = device->machine->driver_data<tnzs_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 

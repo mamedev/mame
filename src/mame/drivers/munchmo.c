@@ -39,13 +39,13 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 static WRITE8_HANDLER( mnchmobl_nmi_enable_w )
 {
-	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	munchmo_state *state = space->machine->driver_data<munchmo_state>();
 	state->nmi_enable = data;
 }
 
 static INTERRUPT_GEN( mnchmobl_interrupt )
 {
-	munchmo_state *state = (munchmo_state *)device->machine->driver_data;
+	munchmo_state *state = device->machine->driver_data<munchmo_state>();
 	state->which = !state->which;
 
 	if (state->which)
@@ -56,7 +56,7 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 
 static INTERRUPT_GEN( mnchmobl_sound_irq )
 {
-	munchmo_state *state = (munchmo_state *)device->machine->driver_data;
+	munchmo_state *state = device->machine->driver_data<munchmo_state>();
 
 	if (!(state->sound_nmi_enable))
 		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
@@ -64,7 +64,7 @@ static INTERRUPT_GEN( mnchmobl_sound_irq )
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
-	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	munchmo_state *state = space->machine->driver_data<munchmo_state>();
 
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE );
@@ -72,14 +72,14 @@ static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 
 static WRITE8_HANDLER( sound_nmi_enable_w )
 {
-	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	munchmo_state *state = space->machine->driver_data<munchmo_state>();
 	state->sound_nmi_enable = data & 1;
 }
 
 
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
-	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	munchmo_state *state = space->machine->driver_data<munchmo_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
@@ -307,7 +307,7 @@ GFXDECODE_END
 
 static MACHINE_START( munchmo )
 {
-	munchmo_state *state = (munchmo_state *)machine->driver_data;
+	munchmo_state *state = machine->driver_data<munchmo_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -320,7 +320,7 @@ static MACHINE_START( munchmo )
 
 static MACHINE_RESET( munchmo )
 {
-	munchmo_state *state = (munchmo_state *)machine->driver_data;
+	munchmo_state *state = machine->driver_data<munchmo_state>();
 
 	state->palette_bank = 0;
 	state->flipscreen = 0;

@@ -64,12 +64,13 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-class supdrapo_state
+class supdrapo_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supdrapo_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supdrapo_state(machine)); }
 
-	supdrapo_state(running_machine &machine) { }
+	supdrapo_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8 *char_bank;
 	UINT8 *col_line;
@@ -89,7 +90,7 @@ static VIDEO_START( supdrapo )
 
 static VIDEO_UPDATE( supdrapo )
 {
-	supdrapo_state *state = (supdrapo_state *)screen->machine->driver_data;
+	supdrapo_state *state = screen->machine->driver_data<supdrapo_state>();
 	int x, y;
 	int count;
 	int color;
@@ -179,7 +180,7 @@ static WRITE8_HANDLER( wdog8000_w )
   Watchdog: 00
 
 */
-	supdrapo_state *state = (supdrapo_state *)space->machine->driver_data;
+	supdrapo_state *state = space->machine->driver_data<supdrapo_state>();
 
 	if (state->wdog == data)
 	{
@@ -232,7 +233,7 @@ static MACHINE_START( supdrapo )
 
 static MACHINE_RESET( supdrapo )
 {
-	supdrapo_state *state = (supdrapo_state *)machine->driver_data;
+	supdrapo_state *state = machine->driver_data<supdrapo_state>();
 	state->wdog = 1;
 }
 

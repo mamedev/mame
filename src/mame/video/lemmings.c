@@ -74,7 +74,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static TILE_GET_INFO( get_tile_info )
 {
-	lemmings_state *state = (lemmings_state *)machine->driver_data;
+	lemmings_state *state = machine->driver_data<lemmings_state>();
 	UINT16 tile = state->vram_data[tile_index];
 
 	SET_TILE_INFO(
@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( lemmings )
 {
-	lemmings_state *state = (lemmings_state *)machine->driver_data;
+	lemmings_state *state = machine->driver_data<lemmings_state>();
 	state->bitmap0 = auto_bitmap_alloc(machine, 2048, 256, machine->primary_screen->format());
 	state->vram_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 
@@ -107,7 +107,7 @@ VIDEO_START( lemmings )
 
 VIDEO_EOF( lemmings )
 {
-	lemmings_state *state = (lemmings_state *)machine->driver_data;
+	lemmings_state *state = machine->driver_data<lemmings_state>();
 
 	memcpy(state->sprite_triple_buffer_0, machine->generic.buffered_spriteram.u16, 0x800);
 	memcpy(state->sprite_triple_buffer_1, machine->generic.buffered_spriteram2.u16, 0x800);
@@ -117,7 +117,7 @@ VIDEO_EOF( lemmings )
 
 WRITE16_HANDLER( lemmings_pixel_0_w )
 {
-	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
+	lemmings_state *state = space->machine->driver_data<lemmings_state>();
 	int sx, sy, src, old;
 
 	old = state->pixel_0_data[offset];
@@ -138,7 +138,7 @@ WRITE16_HANDLER( lemmings_pixel_0_w )
 
 WRITE16_HANDLER( lemmings_pixel_1_w )
 {
-	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
+	lemmings_state *state = space->machine->driver_data<lemmings_state>();
 	int sx, sy, src, /*old,*/ tile;
 
 //  old = state->pixel_1_data[offset];
@@ -161,14 +161,14 @@ WRITE16_HANDLER( lemmings_pixel_1_w )
 
 WRITE16_HANDLER( lemmings_vram_w )
 {
-	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
+	lemmings_state *state = space->machine->driver_data<lemmings_state>();
 	COMBINE_DATA(&state->vram_data[offset]);
 	tilemap_mark_tile_dirty(state->vram_tilemap, offset);
 }
 
 VIDEO_UPDATE( lemmings )
 {
-	lemmings_state *state = (lemmings_state *)screen->machine->driver_data;
+	lemmings_state *state = screen->machine->driver_data<lemmings_state>();
 	int x1 = -state->control_data[0];
 	int x0 = -state->control_data[2];
 	int y = 0;

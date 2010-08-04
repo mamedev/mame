@@ -93,7 +93,7 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	buggychl_state *state = machine->driver_data<buggychl_state>();
 
 	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -109,13 +109,13 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	buggychl_state *state = space->machine->driver_data<buggychl_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	buggychl_state *state = space->machine->driver_data<buggychl_state>();
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
@@ -372,7 +372,7 @@ static const msm5232_interface msm5232_config =
 
 static MACHINE_START( buggychl )
 {
-	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	buggychl_state *state = machine->driver_data<buggychl_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x2000);
@@ -406,7 +406,7 @@ static MACHINE_START( buggychl )
 
 static MACHINE_RESET( buggychl )
 {
-	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	buggychl_state *state = machine->driver_data<buggychl_state>();
 
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 

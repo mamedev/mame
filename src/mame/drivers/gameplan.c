@@ -91,7 +91,7 @@ TODO:
 
 static WRITE8_DEVICE_HANDLER( io_select_w )
 {
-	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data<gameplan_state>();
 
 	switch (data)
 	{
@@ -108,7 +108,7 @@ static WRITE8_DEVICE_HANDLER( io_select_w )
 static READ8_DEVICE_HANDLER( io_port_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
-	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data<gameplan_state>();
 
 	return input_port_read(device->machine, portnames[state->current_port]);
 }
@@ -139,7 +139,7 @@ static const via6522_interface via_1_interface =
 
 static WRITE8_DEVICE_HANDLER( audio_reset_w )
 {
-	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data<gameplan_state>();
 
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 
@@ -153,14 +153,14 @@ static WRITE8_DEVICE_HANDLER( audio_reset_w )
 
 static WRITE8_DEVICE_HANDLER( audio_cmd_w )
 {
-	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data<gameplan_state>();
 	riot6532_porta_in_set(state->riot, data, 0x7f);
 }
 
 
 static WRITE8_DEVICE_HANDLER( audio_trigger_w )
 {
-	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data<gameplan_state>();
 	riot6532_porta_in_set(state->riot, data << 7, 0x80);
 }
 
@@ -184,7 +184,7 @@ static const via6522_interface via_2_interface =
 
 static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 {
-	gameplan_state *gameplan = (gameplan_state *)device->machine->driver_data;
+	gameplan_state *gameplan = device->machine->driver_data<gameplan_state>();
 
 	cpu_set_input_line(gameplan->audiocpu, 0, state);
 	if (state == ASSERT_LINE)
@@ -982,7 +982,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( gameplan )
 {
-	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	gameplan_state *state = machine->driver_data<gameplan_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -1002,7 +1002,7 @@ static MACHINE_START( gameplan )
 
 static MACHINE_RESET( gameplan )
 {
-	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	gameplan_state *state = machine->driver_data<gameplan_state>();
 	state->current_port = 0;
 	state->video_x = 0;
 	state->video_y = 0;

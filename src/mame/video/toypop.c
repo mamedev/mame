@@ -96,7 +96,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	toypop_state *state = (toypop_state *)machine->driver_data;
+	toypop_state *state = machine->driver_data<toypop_state>();
 	UINT8 attr = state->videoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
@@ -115,7 +115,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( toypop )
 {
-	toypop_state *state = (toypop_state *)machine->driver_data;
+	toypop_state *state = machine->driver_data<toypop_state>();
 	state->bg_tilemap = tilemap_create(machine,get_tile_info,tilemap_scan,8,8,36,28);
 
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
@@ -131,14 +131,14 @@ VIDEO_START( toypop )
 
 WRITE8_HANDLER( toypop_videoram_w )
 {
-	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	toypop_state *state = space->machine->driver_data<toypop_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( toypop_palettebank_w )
 {
-	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	toypop_state *state = space->machine->driver_data<toypop_state>();
 	if (state->palettebank != (offset & 1))
 	{
 		state->palettebank = offset & 1;
@@ -148,13 +148,13 @@ WRITE8_HANDLER( toypop_palettebank_w )
 
 WRITE16_HANDLER( toypop_flipscreen_w )
 {
-	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	toypop_state *state = space->machine->driver_data<toypop_state>();
 	state->bitmapflip = offset & 1;
 }
 
 READ16_HANDLER( toypop_merged_background_r )
 {
-	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	toypop_state *state = space->machine->driver_data<toypop_state>();
 	int data1, data2;
 
 	// 0x0a0b0c0d is read as 0xabcd
@@ -165,7 +165,7 @@ READ16_HANDLER( toypop_merged_background_r )
 
 WRITE16_HANDLER( toypop_merged_background_w )
 {
-	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	toypop_state *state = space->machine->driver_data<toypop_state>();
 
 	// 0xabcd is written as 0x0a0b0c0d in the background image
 	if (ACCESSING_BITS_8_15)
@@ -177,7 +177,7 @@ WRITE16_HANDLER( toypop_merged_background_w )
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap)
 {
-	toypop_state *state = (toypop_state *)machine->driver_data;
+	toypop_state *state = machine->driver_data<toypop_state>();
 	int offs, x, y;
 	pen_t pen_base = 0x300 + 0x10*state->palettebank;
 
@@ -225,7 +225,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap)
 
 VIDEO_UPDATE( toypop )
 {
-	toypop_state *state = (toypop_state *)screen->machine->driver_data;
+	toypop_state *state = screen->machine->driver_data<toypop_state>();
 	draw_background(screen->machine, bitmap);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	mappy_draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, -31, -8, 0xff);

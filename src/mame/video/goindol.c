@@ -17,7 +17,7 @@
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	goindol_state *state = (goindol_state *)machine->driver_data;
+	goindol_state *state = machine->driver_data<goindol_state>();
 	int code = state->fg_videoram[2 * tile_index + 1];
 	int attr = state->fg_videoram[2 * tile_index];
 	SET_TILE_INFO(
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	goindol_state *state = (goindol_state *)machine->driver_data;
+	goindol_state *state = machine->driver_data<goindol_state>();
 	int code = state->bg_videoram[2 * tile_index + 1];
 	int attr = state->bg_videoram[2 * tile_index];
 	SET_TILE_INFO(
@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( goindol )
 {
-	goindol_state *state = (goindol_state *)machine->driver_data;
+	goindol_state *state = machine->driver_data<goindol_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -65,14 +65,14 @@ VIDEO_START( goindol )
 
 WRITE8_HANDLER( goindol_fg_videoram_w )
 {
-	goindol_state *state = (goindol_state *)space->machine->driver_data;
+	goindol_state *state = space->machine->driver_data<goindol_state>();
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( goindol_bg_videoram_w )
 {
-	goindol_state *state = (goindol_state *)space->machine->driver_data;
+	goindol_state *state = space->machine->driver_data<goindol_state>();
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
@@ -87,7 +87,7 @@ WRITE8_HANDLER( goindol_bg_videoram_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int gfxbank, UINT8 *sprite_ram )
 {
-	goindol_state *state = (goindol_state *)machine->driver_data;
+	goindol_state *state = machine->driver_data<goindol_state>();
 	int offs, sx, sy, tile, palette;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -125,7 +125,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( goindol )
 {
-	goindol_state *state = (goindol_state *)screen->machine->driver_data;
+	goindol_state *state = screen->machine->driver_data<goindol_state>();
 	tilemap_set_scrollx(state->fg_tilemap, 0, *state->fg_scrollx);
 	tilemap_set_scrolly(state->fg_tilemap, 0, *state->fg_scrolly);
 

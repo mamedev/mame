@@ -306,7 +306,7 @@ Notes:
 
 static WRITE32_HANDLER( paletteram32_macrossp_w )
 {
-	macrossp_state *state = (macrossp_state *)space->machine->driver_data;
+	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 	int r,g,b;
 	COMBINE_DATA(&state->paletteram[offset]);
 
@@ -320,7 +320,7 @@ static WRITE32_HANDLER( paletteram32_macrossp_w )
 
 static READ32_HANDLER ( macrossp_soundstatus_r )
 {
-	macrossp_state *state = (macrossp_state *)space->machine->driver_data;
+	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 
 	//  logerror("%08x read soundstatus\n", cpu_get_pc(space->cpu));
 
@@ -334,7 +334,7 @@ static READ32_HANDLER ( macrossp_soundstatus_r )
 
 static WRITE32_HANDLER( macrossp_soundcmd_w )
 {
-	macrossp_state *state = (macrossp_state *)space->machine->driver_data;
+	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -349,7 +349,7 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 
 static READ16_HANDLER( macrossp_soundcmd_r )
 {
-	macrossp_state *state = (macrossp_state *)space->machine->driver_data;
+	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 
 	//  logerror("%06x read soundcmd\n",cpu_get_pc(space->cpu));
 	state->sndpending = 0;
@@ -358,7 +358,7 @@ static READ16_HANDLER( macrossp_soundcmd_r )
 
 static void update_colors( running_machine *machine )
 {
-	macrossp_state *state = (macrossp_state *)machine->driver_data;
+	macrossp_state *state = machine->driver_data<macrossp_state>();
 	int i, r, g, b;
 
 	for (i = 0; i < 0x1000; i++)
@@ -388,7 +388,7 @@ static void update_colors( running_machine *machine )
 
 static WRITE32_HANDLER( macrossp_palette_fade_w )
 {
-	macrossp_state *state = (macrossp_state *)space->machine->driver_data;
+	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 
 	state->fade_effect = ((data & 0xff00) >> 8) - 0x28; //it writes two times, first with a -0x28 then with the proper data
 	//  popmessage("%02x",fade_effect);
@@ -584,7 +584,7 @@ GFXDECODE_END
 
 static void irqhandler(running_device *device, int irq)
 {
-	// macrossp_state *state = (macrossp_state *)space->machine->driver_data;
+	// macrossp_state *state = space->machine->driver_data<macrossp_state>();
 	logerror("ES5506 irq %d\n", irq);
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
@@ -604,7 +604,7 @@ static const es5506_interface es5506_config =
 
 static MACHINE_START( macrossp )
 {
-	macrossp_state *state = (macrossp_state *)machine->driver_data;
+	macrossp_state *state = machine->driver_data<macrossp_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -617,7 +617,7 @@ static MACHINE_START( macrossp )
 
 static MACHINE_RESET( macrossp )
 {
-	macrossp_state *state = (macrossp_state *)machine->driver_data;
+	macrossp_state *state = machine->driver_data<macrossp_state>();
 
 	state->sndpending = 0;
 	state->snd_toggle = 0;
@@ -778,7 +778,7 @@ PC :00018104 018104: addq.w  #1, $f1015a.l
 PC :0001810A 01810A: cmp.w   $f10140.l, D0
 PC :00018110 018110: beq     18104
 */
-	macrossp_state *state = (macrossp_state *)space->machine->driver_data;
+	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->mainram[0x10158 / 4]);
 	if (cpu_get_pc(space->cpu) == 0x001810A) cpu_spinuntil_int(space->cpu);
@@ -787,7 +787,7 @@ PC :00018110 018110: beq     18104
 #ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER( quizmoon_speedup_w )
 {
-	macrossp_state *state = (macrossp_state *)space->machine->driver_data;
+	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->mainram[0x00020 / 4]);
 	if (cpu_get_pc(space->cpu) == 0x1cc) cpu_spinuntil_int(space->cpu);

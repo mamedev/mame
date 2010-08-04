@@ -26,13 +26,14 @@
 #define POLY17_ADD	0x18000
 
 
-class balsente_state
+class balsente_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, balsente_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, balsente_state(machine)); }
 
 	balsente_state(running_machine &machine)
-		: scanline_timer(machine.device<timer_device>("scan_timer")),
+		: driver_data_t(machine),
+		  scanline_timer(machine.device<timer_device>("scan_timer")),
 		  counter_0_timer(machine.device<timer_device>("8253_0_timer"))
 	{
 		astring temp;

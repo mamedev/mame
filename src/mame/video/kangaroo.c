@@ -18,7 +18,7 @@ static void blitter_execute(running_machine *machine);
 
 VIDEO_START( kangaroo )
 {
-	kangaroo_state *state = (kangaroo_state *)machine->driver_data;
+	kangaroo_state *state = machine->driver_data<kangaroo_state>();
 
 	/* video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels) */
 	state->videoram = auto_alloc_array(machine, UINT32, 256 * 64);
@@ -35,7 +35,7 @@ VIDEO_START( kangaroo )
 
 static void videoram_write( running_machine *machine, UINT16 offset, UINT8 data, UINT8 mask )
 {
-	kangaroo_state *state = (kangaroo_state *)machine->driver_data;
+	kangaroo_state *state = machine->driver_data<kangaroo_state>();
 	UINT32 expdata, layermask;
 
 	/* data contains 4 2-bit values packed as DCBADCBA; expand these into 4 8-bit values */
@@ -63,7 +63,7 @@ static void videoram_write( running_machine *machine, UINT16 offset, UINT8 data,
 
 WRITE8_HANDLER( kangaroo_videoram_w )
 {
-	kangaroo_state *state = (kangaroo_state *)space->machine->driver_data;
+	kangaroo_state *state = space->machine->driver_data<kangaroo_state>();
 	videoram_write(space->machine, offset, data, state->video_control[8]);
 }
 
@@ -77,7 +77,7 @@ WRITE8_HANDLER( kangaroo_videoram_w )
 
 WRITE8_HANDLER( kangaroo_video_control_w )
 {
-	kangaroo_state *state = (kangaroo_state *)space->machine->driver_data;
+	kangaroo_state *state = space->machine->driver_data<kangaroo_state>();
 	state->video_control[offset] = data;
 
 	switch (offset)
@@ -102,7 +102,7 @@ WRITE8_HANDLER( kangaroo_video_control_w )
 
 static void blitter_execute( running_machine *machine )
 {
-	kangaroo_state *state = (kangaroo_state *)machine->driver_data;
+	kangaroo_state *state = machine->driver_data<kangaroo_state>();
 	UINT32 gfxhalfsize = memory_region_length(machine, "gfx1") / 2;
 	const UINT8 *gfxbase = memory_region(machine, "gfx1");
 	UINT16 src = state->video_control[0] + 256 * state->video_control[1];
@@ -138,7 +138,7 @@ static void blitter_execute( running_machine *machine )
 
 VIDEO_UPDATE( kangaroo )
 {
-	kangaroo_state *state = (kangaroo_state *)screen->machine->driver_data;
+	kangaroo_state *state = screen->machine->driver_data<kangaroo_state>();
 	UINT8 scrolly = state->video_control[6];
 	UINT8 scrollx = state->video_control[7];
 	UINT8 maska = (state->video_control[10] & 0x28) >> 3;

@@ -328,14 +328,14 @@ static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched 
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	ninjaw_state *state = machine->driver_data<ninjaw_state>();
 	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
 {
-	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+	ninjaw_state *state = space->machine->driver_data<ninjaw_state>();
 
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;
@@ -353,13 +353,13 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 static void reset_sound_region( running_machine *machine )
 {
-	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	ninjaw_state *state = machine->driver_data<ninjaw_state>();
 	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+	ninjaw_state *state = space->machine->driver_data<ninjaw_state>();
 
 	state->banknum = data & 7;
 	reset_sound_region(space->machine);
@@ -367,7 +367,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static WRITE16_HANDLER( ninjaw_sound_w )
 {
-	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+	ninjaw_state *state = space->machine->driver_data<ninjaw_state>();
 
 	if (offset == 0)
 		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
@@ -382,7 +382,7 @@ static WRITE16_HANDLER( ninjaw_sound_w )
 
 static READ16_HANDLER( ninjaw_sound_r )
 {
-	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+	ninjaw_state *state = space->machine->driver_data<ninjaw_state>();
 
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
@@ -395,7 +395,7 @@ static READ16_HANDLER( ninjaw_sound_r )
 
 static WRITE8_HANDLER( ninjaw_pancontrol )
 {
-	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+	ninjaw_state *state = space->machine->driver_data<ninjaw_state>();
 	running_device *flt = NULL;
 	offset &= 3;
 
@@ -415,7 +415,7 @@ static WRITE8_HANDLER( ninjaw_pancontrol )
 
 static WRITE16_HANDLER( tc0100scn_triple_screen_w )
 {
-	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
+	ninjaw_state *state = space->machine->driver_data<ninjaw_state>();
 
 	tc0100scn_word_w(state->tc0100scn_1, offset, data, mem_mask);
 	tc0100scn_word_w(state->tc0100scn_2, offset, data, mem_mask);
@@ -648,7 +648,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	ninjaw_state *state = (ninjaw_state *)device->machine->driver_data;
+	ninjaw_state *state = device->machine->driver_data<ninjaw_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -759,7 +759,7 @@ static STATE_POSTLOAD( ninjaw_postload )
 
 static MACHINE_START( ninjaw )
 {
-	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	ninjaw_state *state = machine->driver_data<ninjaw_state>();
 
 	memory_configure_bank(machine, "bank10", 0, 8, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
 
@@ -788,7 +788,7 @@ static MACHINE_START( ninjaw )
 
 static MACHINE_RESET( ninjaw )
 {
-	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	ninjaw_state *state = machine->driver_data<ninjaw_state>();
 	state->cpua_ctrl = 0xff;
 	state->banknum = 0;
 	memset(state->pandata, 0, sizeof(state->pandata));

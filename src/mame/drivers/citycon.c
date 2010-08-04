@@ -21,7 +21,7 @@ static READ8_HANDLER( citycon_in_r )
 
 static READ8_HANDLER( citycon_irq_ack_r )
 {
-	citycon_state *state = (citycon_state *)space->machine->driver_data;
+	citycon_state *state = space->machine->driver_data<citycon_state>();
 	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
@@ -189,7 +189,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( citycon )
 {
-	citycon_state *state = (citycon_state *)machine->driver_data;
+	citycon_state *state = machine->driver_data<citycon_state>();
 
 	state->maincpu = machine->device("maincpu");
 
@@ -198,7 +198,7 @@ static MACHINE_START( citycon )
 
 static MACHINE_RESET( citycon )
 {
-	citycon_state *state = (citycon_state *)machine->driver_data;
+	citycon_state *state = machine->driver_data<citycon_state>();
 
 	state->bg_image = 0;
 }

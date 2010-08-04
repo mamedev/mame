@@ -31,7 +31,7 @@ PALETTE_INIT( galspnbl )
  */
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	galspnbl_state *state = (galspnbl_state *)machine->driver_data;
+	galspnbl_state *state = machine->driver_data<galspnbl_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -86,7 +86,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	galspnbl_state *state = (galspnbl_state *)machine->driver_data;
+	galspnbl_state *state = machine->driver_data<galspnbl_state>();
 	offs_t offs;
 
 //  int screenscroll = 4 - (state->scroll[0] & 0xff);
@@ -103,7 +103,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 VIDEO_UPDATE( galspnbl )
 {
-	galspnbl_state *state = (galspnbl_state *)screen->machine->driver_data;
+	galspnbl_state *state = screen->machine->driver_data<galspnbl_state>();
 	int offs;
 
 	draw_background(screen->machine, bitmap, cliprect);

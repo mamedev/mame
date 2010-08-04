@@ -32,7 +32,7 @@
 
 static READ8_HANDLER( hanaawas_input_port_0_r )
 {
-	hanaawas_state *state = (hanaawas_state *)space->machine->driver_data;
+	hanaawas_state *state = space->machine->driver_data<hanaawas_state>();
 	int i, ordinal = 0;
 	UINT16 buttons = 0;
 
@@ -66,7 +66,7 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 
 static WRITE8_HANDLER( hanaawas_inputs_mux_w )
 {
-	hanaawas_state *state = (hanaawas_state *)space->machine->driver_data;
+	hanaawas_state *state = space->machine->driver_data<hanaawas_state>();
 	state->mux = data;
 }
 
@@ -186,14 +186,14 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( hanaawas )
 {
-	hanaawas_state *state = (hanaawas_state *)machine->driver_data;
+	hanaawas_state *state = machine->driver_data<hanaawas_state>();
 
 	state_save_register_global(machine, state->mux);
 }
 
 static MACHINE_RESET( hanaawas )
 {
-	hanaawas_state *state = (hanaawas_state *)machine->driver_data;
+	hanaawas_state *state = machine->driver_data<hanaawas_state>();
 
 	state->mux = 0;
 }

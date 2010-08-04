@@ -270,7 +270,7 @@ static TILEMAP_MAPPER( mappy_tilemap_scan )
 
 static TILE_GET_INFO( superpac_get_tile_info )
 {
-	mappy_state *state = (mappy_state *)machine->driver_data;
+	mappy_state *state = machine->driver_data<mappy_state>();
 	UINT8 attr = state->videoram[tile_index + 0x400];
 
 	tileinfo->category = (attr & 0x40) >> 6;
@@ -284,7 +284,7 @@ static TILE_GET_INFO( superpac_get_tile_info )
 
 static TILE_GET_INFO( phozon_get_tile_info )
 {
-	mappy_state *state = (mappy_state *)machine->driver_data;
+	mappy_state *state = machine->driver_data<mappy_state>();
 	UINT8 attr = state->videoram[tile_index + 0x400];
 
 	tileinfo->category = (attr & 0x40) >> 6;
@@ -298,7 +298,7 @@ static TILE_GET_INFO( phozon_get_tile_info )
 
 static TILE_GET_INFO( mappy_get_tile_info )
 {
-	mappy_state *state = (mappy_state *)machine->driver_data;
+	mappy_state *state = machine->driver_data<mappy_state>();
 	UINT8 attr = state->videoram[tile_index + 0x800];
 
 	tileinfo->category = (attr & 0x40) >> 6;
@@ -320,7 +320,7 @@ static TILE_GET_INFO( mappy_get_tile_info )
 
 VIDEO_START( superpac )
 {
-	mappy_state *state = (mappy_state *)machine->driver_data;
+	mappy_state *state = machine->driver_data<mappy_state>();
 
 	state->bg_tilemap = tilemap_create(machine, superpac_get_tile_info,superpac_tilemap_scan,8,8,36,28);
 	state->sprite_bitmap = machine->primary_screen->alloc_compatible_bitmap();
@@ -330,7 +330,7 @@ VIDEO_START( superpac )
 
 VIDEO_START( phozon )
 {
-	mappy_state *state = (mappy_state *)machine->driver_data;
+	mappy_state *state = machine->driver_data<mappy_state>();
 
 	state->bg_tilemap = tilemap_create(machine, phozon_get_tile_info,superpac_tilemap_scan,8,8,36,28);
 
@@ -341,7 +341,7 @@ VIDEO_START( phozon )
 
 VIDEO_START( mappy )
 {
-	mappy_state *state = (mappy_state *)machine->driver_data;
+	mappy_state *state = machine->driver_data<mappy_state>();
 
 	state->bg_tilemap = tilemap_create(machine, mappy_get_tile_info,mappy_tilemap_scan,8,8,36,60);
 
@@ -359,7 +359,7 @@ VIDEO_START( mappy )
 
 WRITE8_HANDLER( superpac_videoram_w )
 {
-	mappy_state *state = (mappy_state *)space->machine->driver_data;
+	mappy_state *state = space->machine->driver_data<mappy_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
@@ -367,7 +367,7 @@ WRITE8_HANDLER( superpac_videoram_w )
 
 WRITE8_HANDLER( mappy_videoram_w )
 {
-	mappy_state *state = (mappy_state *)space->machine->driver_data;
+	mappy_state *state = space->machine->driver_data<mappy_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x7ff);
@@ -386,7 +386,7 @@ READ8_HANDLER( superpac_flipscreen_r )
 
 WRITE8_HANDLER( mappy_scroll_w )
 {
-	mappy_state *state = (mappy_state *)space->machine->driver_data;
+	mappy_state *state = space->machine->driver_data<mappy_state>();
 
 	state->scroll = offset >> 3;
 }
@@ -537,7 +537,7 @@ static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( superpac )
 {
-	mappy_state *state = (mappy_state *)screen->machine->driver_data;
+	mappy_state *state = screen->machine->driver_data<mappy_state>();
 	bitmap_t *sprite_bitmap = state->sprite_bitmap;
 	int x,y;
 
@@ -567,7 +567,7 @@ VIDEO_UPDATE( superpac )
 
 VIDEO_UPDATE( phozon )
 {
-	mappy_state *state = (mappy_state *)screen->machine->driver_data;
+	mappy_state *state = screen->machine->driver_data<mappy_state>();
 
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(screen->machine, state->spriteram[0x1f7f-0x800] & 1);
@@ -586,7 +586,7 @@ VIDEO_UPDATE( phozon )
 
 VIDEO_UPDATE( mappy )
 {
-	mappy_state *state = (mappy_state *)screen->machine->driver_data;
+	mappy_state *state = screen->machine->driver_data<mappy_state>();
 	int offs;
 
 	tilemap_set_scrolldx(state->bg_tilemap, 0, 96);

@@ -24,7 +24,7 @@ static TILEMAP_MAPPER( citycon_scan )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	citycon_state *state = (citycon_state *)machine->driver_data;
+	citycon_state *state = machine->driver_data<citycon_state>();
 	SET_TILE_INFO(
 			0,
 			state->videoram[tile_index],
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	citycon_state *state = (citycon_state *)machine->driver_data;
+	citycon_state *state = machine->driver_data<citycon_state>();
 	UINT8 *rom = memory_region(machine, "gfx4");
 	int code = rom[0x1000 * state->bg_image + tile_index];
 	SET_TILE_INFO(
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( citycon )
 {
-	citycon_state *state = (citycon_state *)machine->driver_data;
+	citycon_state *state = machine->driver_data<citycon_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, citycon_scan, 8, 8, 128, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, citycon_scan, 8, 8, 128, 32);
 
@@ -72,7 +72,7 @@ VIDEO_START( citycon )
 
 WRITE8_HANDLER( citycon_videoram_w )
 {
-	citycon_state *state = (citycon_state *)space->machine->driver_data;
+	citycon_state *state = space->machine->driver_data<citycon_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
@@ -80,14 +80,14 @@ WRITE8_HANDLER( citycon_videoram_w )
 
 WRITE8_HANDLER( citycon_linecolor_w )
 {
-	citycon_state *state = (citycon_state *)space->machine->driver_data;
+	citycon_state *state = space->machine->driver_data<citycon_state>();
 	state->linecolor[offset] = data;
 }
 
 
 WRITE8_HANDLER( citycon_background_w )
 {
-	citycon_state *state = (citycon_state *)space->machine->driver_data;
+	citycon_state *state = space->machine->driver_data<citycon_state>();
 
 	/* bits 4-7 control the background image */
 	if (state->bg_image != (data >> 4))
@@ -108,7 +108,7 @@ WRITE8_HANDLER( citycon_background_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	citycon_state *state = (citycon_state *)machine->driver_data;
+	citycon_state *state = machine->driver_data<citycon_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
@@ -142,7 +142,7 @@ INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine *machine, int color, i
 
 VIDEO_UPDATE( citycon )
 {
-	citycon_state *state = (citycon_state *)screen->machine->driver_data;
+	citycon_state *state = screen->machine->driver_data<citycon_state>();
 	int offs, scroll;
 
 	/* Update the virtual palette to support text color code changing on every scanline. */

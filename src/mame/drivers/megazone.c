@@ -20,7 +20,7 @@ To enter service mode, keep 1&2 pressed on reset
 
 static READ8_DEVICE_HANDLER( megazone_port_a_r )
 {
-	megazone_state *state = (megazone_state *)device->machine->driver_data;
+	megazone_state *state = device->machine->driver_data<megazone_state>();
 	int clock, timer;
 
 
@@ -58,13 +58,13 @@ static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
 
 static WRITE8_HANDLER( megazone_i8039_irq_w )
 {
-	megazone_state *state = (megazone_state *)space->machine->driver_data;
+	megazone_state *state = space->machine->driver_data<megazone_state>();
 	cpu_set_input_line(state->daccpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
-	megazone_state *state = (megazone_state *)space->machine->driver_data;
+	megazone_state *state = space->machine->driver_data<megazone_state>();
 
 	if ((data & 0x80) == 0)
 		cpu_set_input_line(state->daccpu, 0, CLEAR_LINE);
@@ -226,7 +226,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( megazone )
 {
-	megazone_state *state = (megazone_state *)machine->driver_data;
+	megazone_state *state = machine->driver_data<megazone_state>();
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
@@ -238,7 +238,7 @@ static MACHINE_START( megazone )
 
 static MACHINE_RESET( megazone )
 {
-	megazone_state *state = (megazone_state *)machine->driver_data;
+	megazone_state *state = machine->driver_data<megazone_state>();
 
 	state->flipscreen = 0;
 	state->i8039_status = 0;

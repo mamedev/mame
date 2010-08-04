@@ -21,14 +21,14 @@
 
 WRITE8_HANDLER( tutankhm_flip_screen_x_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 	state->flip_x = data & 0x01;
 }
 
 
 WRITE8_HANDLER( tutankhm_flip_screen_y_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 	state->flip_y = data & 0x01;
 }
 
@@ -41,7 +41,7 @@ WRITE8_HANDLER( tutankhm_flip_screen_y_w )
 
 static void get_pens( running_machine *machine, pen_t *pens )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 	offs_t i;
 
 	for (i = 0; i < NUM_PENS; i++)
@@ -61,7 +61,7 @@ static void get_pens( running_machine *machine, pen_t *pens )
 
 VIDEO_UPDATE( tutankhm )
 {
-	timeplt_state *state = (timeplt_state *)screen->machine->driver_data;
+	timeplt_state *state = screen->machine->driver_data<timeplt_state>();
 	int xorx = state->flip_x ? 255 : 0;
 	int xory = state->flip_y ? 255 : 0;
 	pen_t pens[NUM_PENS];
@@ -109,7 +109,7 @@ VIDEO_UPDATE( tutankhm )
 
 WRITE8_HANDLER( junofrst_blitter_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 	state->blitterdata[offset] = data;
 
 	/* blitter is triggered by $8073 */

@@ -194,7 +194,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 {
-	wwfsstar_state *state = (wwfsstar_state *)space->machine->driver_data;
+	wwfsstar_state *state = space->machine->driver_data<wwfsstar_state>();
 
 	switch (offset)
 	{
@@ -242,7 +242,7 @@ static WRITE16_HANDLER( wwfsstar_irqack_w )
 
 static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 {
-	wwfsstar_state *state = (wwfsstar_state *)timer.machine->driver_data;
+	wwfsstar_state *state = timer.machine->driver_data<wwfsstar_state>();
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */
@@ -274,7 +274,7 @@ static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 
 static CUSTOM_INPUT( wwfsstar_vblank_r )
 {
-	wwfsstar_state *state = (wwfsstar_state *)field->port->machine->driver_data;
+	wwfsstar_state *state = field->port->machine->driver_data<wwfsstar_state>();
 
 	return state->vblank;
 }

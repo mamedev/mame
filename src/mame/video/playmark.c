@@ -10,7 +10,7 @@
 
 static TILE_GET_INFO( bigtwin_get_tx_tile_info )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	UINT16 code = state->videoram1[2 * tile_index];
 	UINT16 color = state->videoram1[2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -22,7 +22,7 @@ static TILE_GET_INFO( bigtwin_get_tx_tile_info )
 
 static TILE_GET_INFO( bigtwin_get_fg_tile_info )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	UINT16 code = state->videoram2[2 * tile_index];
 	UINT16 color = state->videoram2[2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -34,7 +34,7 @@ static TILE_GET_INFO( bigtwin_get_fg_tile_info )
 
 static TILE_GET_INFO( wbeachvl_get_tx_tile_info )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	UINT16 code = state->videoram1[2 * tile_index];
 	UINT16 color = state->videoram1[2 * tile_index + 1];
 
@@ -47,7 +47,7 @@ static TILE_GET_INFO( wbeachvl_get_tx_tile_info )
 
 static TILE_GET_INFO( wbeachvl_get_fg_tile_info )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	UINT16 code = state->videoram2[2 * tile_index];
 	UINT16 color = state->videoram2[2 * tile_index + 1];
 
@@ -60,7 +60,7 @@ static TILE_GET_INFO( wbeachvl_get_fg_tile_info )
 
 static TILE_GET_INFO( wbeachvl_get_bg_tile_info )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	UINT16 code = state->videoram3[2 * tile_index];
 	UINT16 color = state->videoram3[2 * tile_index + 1];
 
@@ -73,7 +73,7 @@ static TILE_GET_INFO( wbeachvl_get_bg_tile_info )
 
 static TILE_GET_INFO( hrdtimes_get_tx_tile_info )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	int code = state->videoram1[tile_index] & 0x03ff;
 	int colr = state->videoram1[tile_index] & 0xe000;
 
@@ -82,7 +82,7 @@ static TILE_GET_INFO( hrdtimes_get_tx_tile_info )
 
 static TILE_GET_INFO( hrdtimes_get_fg_tile_info )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	int code = state->videoram2[tile_index] & 0x1fff;
 	int colr = state->videoram2[tile_index] & 0xe000;
 
@@ -91,7 +91,7 @@ static TILE_GET_INFO( hrdtimes_get_fg_tile_info )
 
 static TILE_GET_INFO( hrdtimes_get_bg_tile_info )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	int code = state->videoram3[tile_index] & 0x1fff;
 	int colr = state->videoram3[tile_index] & 0xe000;
 
@@ -106,7 +106,7 @@ static TILE_GET_INFO( hrdtimes_get_bg_tile_info )
 
 VIDEO_START( bigtwin )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 
 	state->tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state->fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
@@ -125,7 +125,7 @@ VIDEO_START( bigtwin )
 
 VIDEO_START( wbeachvl )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 
 	state->tx_tilemap = tilemap_create(machine, wbeachvl_get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state->fg_tilemap = tilemap_create(machine, wbeachvl_get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
@@ -145,7 +145,7 @@ VIDEO_START( wbeachvl )
 
 VIDEO_START( excelsr )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 
 	state->tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
@@ -163,7 +163,7 @@ VIDEO_START( excelsr )
 
 VIDEO_START( hotmind )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 
 	state->tx_tilemap = tilemap_create(machine, hrdtimes_get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
@@ -187,7 +187,7 @@ VIDEO_START( hotmind )
 
 VIDEO_START( hrdtimes )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 
 	state->tx_tilemap = tilemap_create(machine, hrdtimes_get_tx_tile_info,tilemap_scan_rows, 8, 8, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
@@ -217,7 +217,7 @@ VIDEO_START( hrdtimes )
 
 WRITE16_HANDLER( wbeachvl_txvideoram_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->videoram1[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset / 2);
@@ -225,7 +225,7 @@ WRITE16_HANDLER( wbeachvl_txvideoram_w )
 
 WRITE16_HANDLER( wbeachvl_fgvideoram_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->videoram2[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
@@ -233,7 +233,7 @@ WRITE16_HANDLER( wbeachvl_fgvideoram_w )
 
 WRITE16_HANDLER( wbeachvl_bgvideoram_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->videoram3[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -241,7 +241,7 @@ WRITE16_HANDLER( wbeachvl_bgvideoram_w )
 
 WRITE16_HANDLER( hrdtimes_txvideoram_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->videoram1[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
@@ -249,7 +249,7 @@ WRITE16_HANDLER( hrdtimes_txvideoram_w )
 
 WRITE16_HANDLER( hrdtimes_fgvideoram_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->videoram2[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -257,7 +257,7 @@ WRITE16_HANDLER( hrdtimes_fgvideoram_w )
 
 WRITE16_HANDLER( hrdtimes_bgvideoram_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	COMBINE_DATA(&state->videoram3[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -284,7 +284,7 @@ WRITE16_HANDLER( bigtwin_paletteram_w )
 
 WRITE16_HANDLER( bigtwin_scroll_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	data = COMBINE_DATA(&state->scroll[offset]);
 
@@ -304,7 +304,7 @@ WRITE16_HANDLER( bigtwin_scroll_w )
 
 WRITE16_HANDLER( wbeachvl_scroll_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	data = COMBINE_DATA(&state->scroll[offset]);
 
@@ -323,7 +323,7 @@ WRITE16_HANDLER( wbeachvl_scroll_w )
 
 WRITE16_HANDLER( excelsr_scroll_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	data = COMBINE_DATA(&state->scroll[offset]);
 
@@ -343,7 +343,7 @@ WRITE16_HANDLER( excelsr_scroll_w )
 
 WRITE16_HANDLER( hrdtimes_scroll_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	data = COMBINE_DATA(&state->scroll[offset]);
 
@@ -366,7 +366,7 @@ WRITE16_HANDLER( hrdtimes_scroll_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int codeshift )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	int offs, start_offset = state->spriteram_size / 2 - 4;
 	int height = machine->gfx[0]->height;
 	int colordiv = machine->gfx[0]->color_granularity / 16;
@@ -409,7 +409,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_bitmap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	int x, y, count;
 	int color;
 	UINT8 *pri;
@@ -450,7 +450,7 @@ static void draw_bitmap( running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( bigtwin )
 {
-	playmark_state *state = (playmark_state *)screen->machine->driver_data;
+	playmark_state *state = screen->machine->driver_data<playmark_state>();
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
@@ -464,7 +464,7 @@ VIDEO_UPDATE( bigtwin )
 
 VIDEO_UPDATE( excelsr )
 {
-	playmark_state *state = (playmark_state *)screen->machine->driver_data;
+	playmark_state *state = screen->machine->driver_data<playmark_state>();
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
@@ -478,7 +478,7 @@ VIDEO_UPDATE( excelsr )
 
 VIDEO_UPDATE( wbeachvl )
 {
-	playmark_state *state = (playmark_state *)screen->machine->driver_data;
+	playmark_state *state = screen->machine->driver_data<playmark_state>();
 
 	if (state->fg_rowscroll_enable)
 	{
@@ -505,7 +505,7 @@ VIDEO_UPDATE( wbeachvl )
 
 VIDEO_UPDATE( hrdtimes )
 {
-	playmark_state *state = (playmark_state *)screen->machine->driver_data;
+	playmark_state *state = screen->machine->driver_data<playmark_state>();
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 

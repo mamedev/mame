@@ -24,19 +24,19 @@
 
 static WRITE8_DEVICE_HANDLER( compgolf_scrollx_lo_w )
 {
-	compgolf_state *state = (compgolf_state *)device->machine->driver_data;
+	compgolf_state *state = device->machine->driver_data<compgolf_state>();
 	state->scrollx_lo = data;
 }
 
 static WRITE8_DEVICE_HANDLER( compgolf_scrolly_lo_w )
 {
-	compgolf_state *state = (compgolf_state *)device->machine->driver_data;
+	compgolf_state *state = device->machine->driver_data<compgolf_state>();
 	state->scrolly_lo = data;
 }
 
 static WRITE8_HANDLER( compgolf_ctrl_w )
 {
-	compgolf_state *state = (compgolf_state *)space->machine->driver_data;
+	compgolf_state *state = space->machine->driver_data<compgolf_state>();
 
 	/* bit 4 and 6 are always set */
 
@@ -228,7 +228,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( compgolf )
 {
-	compgolf_state *state = (compgolf_state *)machine->driver_data;
+	compgolf_state *state = machine->driver_data<compgolf_state>();
 
 	state_save_register_global(machine, state->bank);
 	state_save_register_global(machine, state->scrollx_lo);
@@ -239,7 +239,7 @@ static MACHINE_START( compgolf )
 
 static MACHINE_RESET( compgolf )
 {
-	compgolf_state *state = (compgolf_state *)machine->driver_data;
+	compgolf_state *state = machine->driver_data<compgolf_state>();
 
 	state->bank = -1;
 	state->scrollx_lo = 0;

@@ -15,7 +15,7 @@
 
 INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int plane )
 {
-	othldrby_state *state = (othldrby_state *)machine->driver_data;
+	othldrby_state *state = machine->driver_data<othldrby_state>();
 	UINT16 attr;
 
 	tile_index = 2 * tile_index + 0x800 * plane;
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_tile_info2 )
 
 VIDEO_START( othldrby )
 {
-	othldrby_state *state = (othldrby_state *)machine->driver_data;
+	othldrby_state *state = machine->driver_data<othldrby_state>();
 
 	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
@@ -81,13 +81,13 @@ VIDEO_START( othldrby )
 
 WRITE16_HANDLER( othldrby_videoram_addr_w )
 {
-	othldrby_state *state = (othldrby_state *)space->machine->driver_data;
+	othldrby_state *state = space->machine->driver_data<othldrby_state>();
 	state->vram_addr = data;
 }
 
 READ16_HANDLER( othldrby_videoram_r )
 {
-	othldrby_state *state = (othldrby_state *)space->machine->driver_data;
+	othldrby_state *state = space->machine->driver_data<othldrby_state>();
 
 	if (state->vram_addr < VIDEORAM_SIZE)
 		return state->vram[state->vram_addr++];
@@ -100,7 +100,7 @@ READ16_HANDLER( othldrby_videoram_r )
 
 WRITE16_HANDLER( othldrby_videoram_w )
 {
-	othldrby_state *state = (othldrby_state *)space->machine->driver_data;
+	othldrby_state *state = space->machine->driver_data<othldrby_state>();
 
 	if (state->vram_addr < VIDEORAM_SIZE)
 	{
@@ -114,13 +114,13 @@ WRITE16_HANDLER( othldrby_videoram_w )
 
 WRITE16_HANDLER( othldrby_vreg_addr_w )
 {
-	othldrby_state *state = (othldrby_state *)space->machine->driver_data;
+	othldrby_state *state = space->machine->driver_data<othldrby_state>();
 	state->vreg_addr = data & 0x7f;	/* bit 7 is set when screen is flipped */
 }
 
 WRITE16_HANDLER( othldrby_vreg_w )
 {
-	othldrby_state *state = (othldrby_state *)space->machine->driver_data;
+	othldrby_state *state = space->machine->driver_data<othldrby_state>();
 
 	if (state->vreg_addr < OTHLDRBY_VREG_SIZE)
 		state->vreg[state->vreg_addr++] = data;
@@ -138,7 +138,7 @@ WRITE16_HANDLER( othldrby_vreg_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	othldrby_state *state = (othldrby_state *)machine->driver_data;
+	othldrby_state *state = machine->driver_data<othldrby_state>();
 	int offs;
 
 	for (offs = 0; offs < SPRITERAM_SIZE; offs += 4)
@@ -182,7 +182,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( othldrby )
 {
-	othldrby_state *state = (othldrby_state *)screen->machine->driver_data;
+	othldrby_state *state = screen->machine->driver_data<othldrby_state>();
 	int layer;
 
 	flip_screen_set(screen->machine, state->vreg[0x0f] & 0x80);
@@ -226,7 +226,7 @@ VIDEO_UPDATE( othldrby )
 
 VIDEO_EOF( othldrby )
 {
-	othldrby_state *state = (othldrby_state *)machine->driver_data;
+	othldrby_state *state = machine->driver_data<othldrby_state>();
 
 	/* sprites need to be delayed two frames */
 	memcpy(state->buf_spriteram, state->buf_spriteram2, SPRITERAM_SIZE * sizeof(state->buf_spriteram[0]));

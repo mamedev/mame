@@ -58,12 +58,13 @@ and two large (paddles pretending to be) guns.
 #include "includes/m79amb.h"
 #include "cpu/i8085/i8085.h"
 
-class m79amb_state
+class m79amb_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m79amb_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m79amb_state(machine)); }
 
-	m79amb_state(running_machine &machine) { }
+	m79amb_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *        videoram;
@@ -77,13 +78,13 @@ public:
 
 static WRITE8_HANDLER( ramtek_videoram_w )
 {
-	m79amb_state *state = (m79amb_state *)space->machine->driver_data;
+	m79amb_state *state = space->machine->driver_data<m79amb_state>();
 	state->videoram[offset] = data & ~*state->mask;
 }
 
 static VIDEO_UPDATE( ramtek )
 {
-	m79amb_state *state = (m79amb_state *)screen->machine->driver_data;
+	m79amb_state *state = screen->machine->driver_data<m79amb_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)
@@ -110,7 +111,7 @@ static VIDEO_UPDATE( ramtek )
 
 static READ8_HANDLER( gray5bit_controller0_r )
 {
-	m79amb_state *state = (m79amb_state *)space->machine->driver_data;
+	m79amb_state *state = space->machine->driver_data<m79amb_state>();
 	UINT8 port_data = input_port_read(space->machine, "8004");
 	UINT8 gun_pos = input_port_read(space->machine, "GUN1");
 
@@ -119,7 +120,7 @@ static READ8_HANDLER( gray5bit_controller0_r )
 
 static READ8_HANDLER( gray5bit_controller1_r )
 {
-	m79amb_state *state = (m79amb_state *)space->machine->driver_data;
+	m79amb_state *state = space->machine->driver_data<m79amb_state>();
 	UINT8 port_data = input_port_read(space->machine, "8005");
 	UINT8 gun_pos = input_port_read(space->machine, "GUN2");
 
@@ -292,7 +293,7 @@ static const UINT8 lut_pos[0x20] = {
 
 static DRIVER_INIT( m79amb )
 {
-	m79amb_state *state = (m79amb_state *)machine->driver_data;
+	m79amb_state *state = machine->driver_data<m79amb_state>();
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int i, j;
 

@@ -2107,7 +2107,7 @@ static void expand_roms(running_machine *machine, UINT8 cd_rom_mask)
 
 INLINE void config_shooter_adc(running_machine *machine, UINT8 shooter, UINT8 adc_shift)
 {
-	balsente_state *state = (balsente_state *)machine->driver_data;
+	balsente_state *state = machine->driver_data<balsente_state>();
 	state->shooter = shooter;
 	state->adc_shift = adc_shift;
 }

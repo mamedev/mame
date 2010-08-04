@@ -74,7 +74,7 @@ static MACHINE_RESET( aquarium_hack )
 
 static READ16_HANDLER( aquarium_coins_r )
 {
-	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
+	aquarium_state *state = space->machine->driver_data<aquarium_state>();
 
 	int data;
 	data = (input_port_read(space->machine, "SYSTEM") & 0x7fff);
@@ -86,14 +86,14 @@ static READ16_HANDLER( aquarium_coins_r )
 
 static WRITE8_HANDLER( aquarium_snd_ack_w )
 {
-	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
+	aquarium_state *state = space->machine->driver_data<aquarium_state>();
 	state->aquarium_snd_ack = 0x8000;
 }
 
 static WRITE16_HANDLER( aquarium_sound_w )
 {
 //  popmessage("sound write %04x",data);
-	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
+	aquarium_state *state = space->machine->driver_data<aquarium_state>();
 
 	soundlatch_w(space, 1, data & 0xff);
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
@@ -328,7 +328,7 @@ GFXDECODE_END
 
 static void irq_handler( running_device *device, int irq )
 {
-	aquarium_state *state = (aquarium_state *)device->machine->driver_data;
+	aquarium_state *state = device->machine->driver_data<aquarium_state>();
 	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -340,7 +340,7 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_START( aquarium )
 {
-	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	aquarium_state *state = machine->driver_data<aquarium_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -349,7 +349,7 @@ static MACHINE_START( aquarium )
 
 static MACHINE_RESET( aquarium )
 {
-	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	aquarium_state *state = machine->driver_data<aquarium_state>();
 	state->aquarium_snd_ack = 0;
 
 #if AQUARIUS_HACK

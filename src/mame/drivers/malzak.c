@@ -72,7 +72,7 @@
 
 static READ8_HANDLER( fake_VRLE_r )
 {
-	malzak_state *state = (malzak_state *)space->machine->driver_data;
+	malzak_state *state = space->machine->driver_data<malzak_state>();
 	return (s2636_work_ram_r(state->s2636_0, 0xcb) & 0x3f) + (space->machine->primary_screen->vblank() * 0x40);
 }
 
@@ -157,21 +157,21 @@ static WRITE8_HANDLER( port40_w )
 
 static WRITE8_HANDLER( port60_w )
 {
-	malzak_state *state = (malzak_state *)space->machine->driver_data;
+	malzak_state *state = space->machine->driver_data<malzak_state>();
 	state->malzak_x = data;
 	//  logerror("I/O: port 0x60 write 0x%02x\n", data);
 }
 
 static WRITE8_HANDLER( portc0_w )
 {
-	malzak_state *state = (malzak_state *)space->machine->driver_data;
+	malzak_state *state = space->machine->driver_data<malzak_state>();
 	state->malzak_y = data;
 	//  logerror("I/O: port 0xc0 write 0x%02x\n", data);
 }
 
 static READ8_HANDLER( collision_r )
 {
-	malzak_state *state = (malzak_state *)space->machine->driver_data;
+	malzak_state *state = space->machine->driver_data<malzak_state>();
 
 	// High 4 bits seem to refer to the row affected.
 	if(++state->collision_counter > 15)
@@ -368,7 +368,7 @@ static const saa5050_interface malzac_saa5050_intf =
 
 static MACHINE_START( malzak )
 {
-	malzak_state *state = (malzak_state *)machine->driver_data;
+	malzak_state *state = machine->driver_data<malzak_state>();
 
 	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "user2"), 0x400);
 
@@ -383,7 +383,7 @@ static MACHINE_START( malzak )
 
 static MACHINE_RESET( malzak )
 {
-	malzak_state *state = (malzak_state *)machine->driver_data;
+	malzak_state *state = machine->driver_data<malzak_state>();
 
 	memset(state->playfield_code, 0, 256);
 

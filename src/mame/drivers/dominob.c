@@ -64,12 +64,13 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-class dominob_state
+class dominob_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dominob_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dominob_state(machine)); }
 
-	dominob_state(running_machine &machine) { }
+	dominob_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  spriteram;
@@ -90,7 +91,7 @@ static VIDEO_START( dominob )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	dominob_state *state = (dominob_state *)machine->driver_data;
+	dominob_state *state = machine->driver_data<dominob_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -120,7 +121,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_UPDATE( dominob )
 {
-	dominob_state *state = (dominob_state *)screen->machine->driver_data;
+	dominob_state *state = screen->machine->driver_data<dominob_state>();
 	int x,y;
 	int index = 0;
 

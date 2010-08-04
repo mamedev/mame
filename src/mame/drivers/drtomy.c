@@ -11,12 +11,13 @@ similar hardware.
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-class drtomy_state
+class drtomy_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drtomy_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drtomy_state(machine)); }
 
-	drtomy_state(running_machine &machine) { }
+	drtomy_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *  spriteram;
@@ -35,7 +36,7 @@ public:
 
 static TILE_GET_INFO( get_tile_info_fg )
 {
-	drtomy_state *state = (drtomy_state *)machine->driver_data;
+	drtomy_state *state = machine->driver_data<drtomy_state>();
 	int code  = state->videoram_fg[tile_index] & 0xfff;
 	int color = (state->videoram_fg[tile_index] & 0xf000) >> 12;
 	SET_TILE_INFO(2, code, color, 0);
@@ -44,7 +45,7 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	drtomy_state *state = (drtomy_state *)machine->driver_data;
+	drtomy_state *state = machine->driver_data<drtomy_state>();
 	int code  = state->videoram_bg[tile_index] & 0xfff;
 	int color = (state->videoram_bg[tile_index] & 0xf000) >> 12;
 	SET_TILE_INFO(1, code, color, 0);
@@ -70,7 +71,7 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	drtomy_state *state = (drtomy_state *)machine->driver_data;
+	drtomy_state *state = machine->driver_data<drtomy_state>();
 	int i, x, y, ex, ey;
 	const gfx_element *gfx = machine->gfx[0];
 
@@ -115,7 +116,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_START( drtomy )
 {
-	drtomy_state *state = (drtomy_state *)machine->driver_data;
+	drtomy_state *state = machine->driver_data<drtomy_state>();
 
 	state->tilemap_bg = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 16, 16, 32, 32);
 	state->tilemap_fg = tilemap_create(machine, get_tile_info_fg, tilemap_scan_rows, 16, 16, 32, 32);
@@ -125,7 +126,7 @@ static VIDEO_START( drtomy )
 
 static VIDEO_UPDATE( drtomy )
 {
-	drtomy_state *state = (drtomy_state *)screen->machine->driver_data;
+	drtomy_state *state = screen->machine->driver_data<drtomy_state>();
 
 	tilemap_draw(bitmap, cliprect, state->tilemap_bg, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->tilemap_fg, 0, 0);
@@ -135,21 +136,21 @@ static VIDEO_UPDATE( drtomy )
 
 static WRITE16_HANDLER( drtomy_vram_fg_w )
 {
-	drtomy_state *state = (drtomy_state *)space->machine->driver_data;
+	drtomy_state *state = space->machine->driver_data<drtomy_state>();
 	COMBINE_DATA(&state->videoram_fg[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_fg, offset);
 }
 
 static WRITE16_HANDLER( drtomy_vram_bg_w )
 {
-	drtomy_state *state = (drtomy_state *)space->machine->driver_data;
+	drtomy_state *state = space->machine->driver_data<drtomy_state>();
 	COMBINE_DATA(&state->videoram_bg[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_bg, offset);
 }
 
 static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 {
-	drtomy_state *state = (drtomy_state *)device->machine->driver_data;
+	drtomy_state *state = device->machine->driver_data<drtomy_state>();
 	if (state->oki_bank != (data & 3))
 	{
 		state->oki_bank = data & 3;
@@ -279,14 +280,14 @@ INPUT_PORTS_END
 
 static MACHINE_START( drtomy )
 {
-	drtomy_state *state = (drtomy_state *)machine->driver_data;
+	drtomy_state *state = machine->driver_data<drtomy_state>();
 
 	state_save_register_global(machine, state->oki_bank);
 }
 
 static MACHINE_RESET( drtomy )
 {
-	drtomy_state *state = (drtomy_state *)machine->driver_data;
+	drtomy_state *state = machine->driver_data<drtomy_state>();
 
 	state->oki_bank = 0;
 }

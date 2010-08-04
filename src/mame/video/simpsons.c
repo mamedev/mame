@@ -10,7 +10,7 @@
 
 void simpsons_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	simpsons_state *state = (simpsons_state *)machine->driver_data;
+	simpsons_state *state = machine->driver_data<simpsons_state>();
 	*code |= ((*color & 0x3f) << 8) | (bank << 14);
 	*color = state->layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
@@ -24,7 +24,7 @@ void simpsons_tile_callback( running_machine *machine, int layer, int bank, int 
 
 void simpsons_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	simpsons_state *state = (simpsons_state *)machine->driver_data;
+	simpsons_state *state = machine->driver_data<simpsons_state>();
 	int pri = (*color & 0x0f80) >> 6;	/* ??????? */
 
 	if (pri <= state->layerpri[2])
@@ -48,19 +48,19 @@ void simpsons_sprite_callback( running_machine *machine, int *code, int *color, 
 
 static READ8_HANDLER( simpsons_k052109_r )
 {
-	simpsons_state *state = (simpsons_state *)space->machine->driver_data;
+	simpsons_state *state = space->machine->driver_data<simpsons_state>();
 	return k052109_r(state->k052109, offset + 0x2000);
 }
 
 static WRITE8_HANDLER( simpsons_k052109_w )
 {
-	simpsons_state *state = (simpsons_state *)space->machine->driver_data;
+	simpsons_state *state = space->machine->driver_data<simpsons_state>();
 	k052109_w(state->k052109, offset + 0x2000, data);
 }
 
 static READ8_HANDLER( simpsons_k053247_r )
 {
-	simpsons_state *state = (simpsons_state *)space->machine->driver_data;
+	simpsons_state *state = space->machine->driver_data<simpsons_state>();
 	int offs;
 
 	if (offset < 0x1000)
@@ -78,7 +78,7 @@ static READ8_HANDLER( simpsons_k053247_r )
 
 static WRITE8_HANDLER( simpsons_k053247_w )
 {
-	simpsons_state *state = (simpsons_state *)space->machine->driver_data;
+	simpsons_state *state = space->machine->driver_data<simpsons_state>();
 	int offs;
 
 	if (offset < 0x1000)
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( simpsons_k053247_w )
 
 void simpsons_video_banking( running_machine *machine, int bank )
 {
-	simpsons_state *state = (simpsons_state *)machine->driver_data;
+	simpsons_state *state = machine->driver_data<simpsons_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (bank & 1)
@@ -124,7 +124,7 @@ void simpsons_video_banking( running_machine *machine, int bank )
 
 VIDEO_UPDATE( simpsons )
 {
-	simpsons_state *state = (simpsons_state *)screen->machine->driver_data;
+	simpsons_state *state = screen->machine->driver_data<simpsons_state>();
 	int layer[3], bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI0);

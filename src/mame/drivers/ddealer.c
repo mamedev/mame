@@ -113,12 +113,13 @@ Few words about protection:
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 
-class ddealer_state
+class ddealer_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddealer_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddealer_state(machine)); }
 
-	ddealer_state(running_machine &machine) { }
+	ddealer_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *  mcu_shared_ram;
@@ -145,13 +146,13 @@ public:
 
 static WRITE16_HANDLER( ddealer_flipscreen_w )
 {
-	ddealer_state *state = (ddealer_state *)space->machine->driver_data;
+	ddealer_state *state = space->machine->driver_data<ddealer_state>();
 	state->flipscreen = data & 0x01;
 }
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	ddealer_state *state = (ddealer_state *)machine->driver_data;
+	ddealer_state *state = machine->driver_data<ddealer_state>();
 	int code = state->back_vram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -162,7 +163,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static VIDEO_START( ddealer )
 {
-	ddealer_state *state = (ddealer_state *)machine->driver_data;
+	ddealer_state *state = machine->driver_data<ddealer_state>();
 	state->flipscreen = 0;
 	state->back_tilemap = tilemap_create(machine, get_back_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 }
@@ -252,7 +253,7 @@ static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_bas
 
 static VIDEO_UPDATE( ddealer )
 {
-	ddealer_state *state = (ddealer_state *)screen->machine->driver_data;
+	ddealer_state *state = screen->machine->driver_data<ddealer_state>();
 	tilemap_set_scrollx(state->back_tilemap, 0, state->flipscreen ? -192 : -64);
 	tilemap_set_flip(state->back_tilemap, state->flipscreen ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
 	tilemap_draw(bitmap, cliprect, state->back_tilemap, 0, 0);
@@ -294,7 +295,7 @@ static VIDEO_UPDATE( ddealer )
 
 static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 {
-	ddealer_state *state = (ddealer_state *)timer.machine->driver_data;
+	ddealer_state *state = timer.machine->driver_data<ddealer_state>();
 
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
@@ -361,7 +362,7 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 
 static WRITE16_HANDLER( back_vram_w )
 {
-	ddealer_state *state = (ddealer_state *)space->machine->driver_data;
+	ddealer_state *state = space->machine->driver_data<ddealer_state>();
 	COMBINE_DATA(&state->back_vram[offset]);
 	tilemap_mark_tile_dirty(state->back_tilemap, offset);
 }
@@ -369,7 +370,7 @@ static WRITE16_HANDLER( back_vram_w )
 
 static WRITE16_HANDLER( ddealer_vregs_w )
 {
-	ddealer_state *state = (ddealer_state *)space->machine->driver_data;
+	ddealer_state *state = space->machine->driver_data<ddealer_state>();
 	COMBINE_DATA(&state->vregs[offset]);
 }
 
@@ -397,7 +398,7 @@ Protection handling,identical to Hacha Mecha Fighter / Thunder Dragon with diffe
 
 static WRITE16_HANDLER( ddealer_mcu_shared_w )
 {
-	ddealer_state *state = (ddealer_state *)space->machine->driver_data;
+	ddealer_state *state = space->machine->driver_data<ddealer_state>();
 	COMBINE_DATA(&state->mcu_shared_ram[offset]);
 
 	switch(offset)
@@ -591,7 +592,7 @@ GFXDECODE_END
 
 static MACHINE_START( ddealer )
 {
-	ddealer_state *state = (ddealer_state *)machine->driver_data;
+	ddealer_state *state = machine->driver_data<ddealer_state>();
 
 	state_save_register_global(machine, state->respcount);
 	state_save_register_global(machine, state->flipscreen);
@@ -601,7 +602,7 @@ static MACHINE_START( ddealer )
 
 static MACHINE_RESET (ddealer)
 {
-	ddealer_state *state = (ddealer_state *)machine->driver_data;
+	ddealer_state *state = machine->driver_data<ddealer_state>();
 
 	state->respcount = 0;
 	state->flipscreen = 0;
@@ -652,7 +653,7 @@ MACHINE_DRIVER_END
 
 static READ16_HANDLER( ddealer_mcu_r )
 {
-	ddealer_state *state = (ddealer_state *)space->machine->driver_data;
+	ddealer_state *state = space->machine->driver_data<ddealer_state>();
 	static const int resp[] =
 	{
 		0x93, 0xc7, 0x00, 0x8000,

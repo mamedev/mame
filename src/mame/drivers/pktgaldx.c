@@ -312,7 +312,7 @@ static const deco16ic_interface pktgaldx_deco16ic_intf =
 
 static MACHINE_START( pktgaldx )
 {
-	pktgaldx_state *state = (pktgaldx_state *)machine->driver_data;
+	pktgaldx_state *state = machine->driver_data<pktgaldx_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->deco16ic = machine->device("deco_custom");

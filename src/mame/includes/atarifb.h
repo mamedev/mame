@@ -15,12 +15,13 @@
 #define ATARIFB_HIT_EN			NODE_05
 
 
-class atarifb_state
+class atarifb_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarifb_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarifb_state(machine)); }
 
-	atarifb_state(running_machine &machine) { }
+	atarifb_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* video-related */
 	UINT8 *  alphap1_videoram;

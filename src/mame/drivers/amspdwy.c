@@ -36,7 +36,7 @@ Sound:  YM2151
 
 static UINT8 amspdwy_wheel_r( running_machine *machine, int index )
 {
-	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+	amspdwy_state *state = machine->driver_data<amspdwy_state>();
 	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
 	UINT8 wheel = input_port_read(machine, portnames[2 + index]);
 	if (wheel != state->wheel_old[index])
@@ -69,7 +69,7 @@ static READ8_DEVICE_HANDLER( amspdwy_sound_r )
 
 static WRITE8_HANDLER( amspdwy_sound_w )
 {
-	amspdwy_state *state = (amspdwy_state *)space->machine->driver_data;
+	amspdwy_state *state = space->machine->driver_data<amspdwy_state>();
 	soundlatch_w(space, 0, data);
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -241,7 +241,7 @@ GFXDECODE_END
 
 static void irq_handler( running_device *device, int irq )
 {
-	amspdwy_state *state = (amspdwy_state *)device->machine->driver_data;
+	amspdwy_state *state = device->machine->driver_data<amspdwy_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -252,7 +252,7 @@ static const ym2151_interface amspdwy_ym2151_interface =
 
 static MACHINE_START( amspdwy )
 {
-	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+	amspdwy_state *state = machine->driver_data<amspdwy_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -263,7 +263,7 @@ static MACHINE_START( amspdwy )
 
 static MACHINE_RESET( amspdwy )
 {
-	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+	amspdwy_state *state = machine->driver_data<amspdwy_state>();
 	state->flipscreen = 0;
 	state->wheel_old[0] = 0;
 	state->wheel_old[1] = 0;

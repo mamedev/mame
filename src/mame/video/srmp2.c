@@ -61,7 +61,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
       ---- ----  -x-- ---- : Flip screen
 */
 
-	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	srmp2_state *state = machine->driver_data<srmp2_state>();
 	UINT16 *spriteram16 = state->spriteram1.u16;
 	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs;
@@ -115,7 +115,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	srmp2_state *state = machine->driver_data<srmp2_state>();
 	UINT8 *spriteram = state->spriteram1.u8;
 	UINT8 *spriteram_2 = state->spriteram2.u8;
 	UINT8 *spriteram_3 = state->spriteram3.u8;
@@ -225,7 +225,7 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
       -x-- ---- : Flip screen
 */
 
-	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	srmp2_state *state = machine->driver_data<srmp2_state>();
 	UINT8 *spriteram = state->spriteram1.u8;
 	UINT8 *spriteram_2 = state->spriteram2.u8;
 	UINT8 *spriteram_3 = state->spriteram3.u8;
@@ -279,7 +279,7 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	srmp2_state *state = machine->driver_data<srmp2_state>();
 	UINT16 *spriteram16 = state->spriteram1.u16;
 	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs, col;
@@ -384,7 +384,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
       ---- ----  -x-- ---- : Flip screen
 */
 
-	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	srmp2_state *state = machine->driver_data<srmp2_state>();
 	UINT16 *spriteram16 = state->spriteram1.u16;
 	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs;

@@ -119,7 +119,7 @@ static void update_interrupts(running_machine *machine);
 
 static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
-	beathead_state *state = (beathead_state *)timer.machine->driver_data;
+	beathead_state *state = timer.machine->driver_data<beathead_state>();
 	int scanline = param;
 
 	/* update the video */
@@ -151,11 +151,11 @@ static MACHINE_START( beathead )
 
 static MACHINE_RESET( beathead )
 {
-	beathead_state *state = (beathead_state *)machine->driver_data;
+	beathead_state *state = machine->driver_data<beathead_state>();
 
 	/* reset the common subsystems */
-	atarigen_eeprom_reset(&state->atarigen);
-	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
+	atarigen_eeprom_reset(state);
+	atarigen_interrupt_reset(state, update_interrupts);
 	atarijsa_reset();
 
 	/* the code is temporarily mapped at 0 at startup */
@@ -183,7 +183,7 @@ static MACHINE_RESET( beathead )
 
 static void update_interrupts(running_machine *machine)
 {
-	beathead_state *state = (beathead_state *)machine->driver_data;
+	beathead_state *state = machine->driver_data<beathead_state>();
 	int gen_int;
 
 	/* compute the combined interrupt signal */
@@ -206,7 +206,7 @@ static void update_interrupts(running_machine *machine)
 
 static WRITE32_HANDLER( interrupt_control_w )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 	int irq = offset & 3;
 	int control = (offset >> 2) & 1;
 
@@ -225,7 +225,7 @@ static WRITE32_HANDLER( interrupt_control_w )
 
 static READ32_HANDLER( interrupt_control_r )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 
 	/* return the enables as a bitfield */
 	return (state->irq_enable[0]) | (state->irq_enable[1] << 1) | (state->irq_enable[2] << 2);
@@ -241,7 +241,7 @@ static READ32_HANDLER( interrupt_control_r )
 
 static WRITE32_HANDLER( eeprom_data_w )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 
 	if (state->eeprom_enabled)
 	{
@@ -254,7 +254,7 @@ static WRITE32_HANDLER( eeprom_data_w )
 
 static WRITE32_HANDLER( eeprom_enable_w )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 
 	state->eeprom_enabled = 1;
 }
@@ -269,10 +269,10 @@ static WRITE32_HANDLER( eeprom_enable_w )
 
 static READ32_HANDLER( input_2_r )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 	int result = input_port_read(space->machine, "IN2");
-	if (state->atarigen.sound_to_cpu_ready) result ^= 0x10;
-	if (state->atarigen.cpu_to_sound_ready) result ^= 0x20;
+	if (state->sound_to_cpu_ready) result ^= 0x10;
+	if (state->cpu_to_sound_ready) result ^= 0x20;
 	return result;
 }
 

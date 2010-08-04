@@ -61,7 +61,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 
 static WRITE8_HANDLER( fantland_nmi_enable_w )
 {
-	fantland_state *state = (fantland_state *)space->machine->driver_data;
+	fantland_state *state = space->machine->driver_data<fantland_state>();
 	state->nmi_enable = data;
 
 	if ((state->nmi_enable != 0) && (state->nmi_enable != 8))
@@ -76,7 +76,7 @@ static WRITE16_HANDLER( fantland_nmi_enable_16_w )
 
 static WRITE8_HANDLER( fantland_soundlatch_w )
 {
-	fantland_state *state = (fantland_state *)space->machine->driver_data;
+	fantland_state *state = space->machine->driver_data<fantland_state>();
 	soundlatch_w(space, 0, data);
 	cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( borntofi_nmi_enable_w )
 {
-	fantland_state *state = (fantland_state *)space->machine->driver_data;
+	fantland_state *state = space->machine->driver_data<fantland_state>();
 	state->nmi_enable = data;
 
 	// data & 0x31 changes when lightgun fires
@@ -180,7 +180,7 @@ static WRITE8_HANDLER( borntofi_nmi_enable_w )
 // Trackball doesn't work correctly
 static READ8_HANDLER( borntofi_inputs_r )
 {
-	fantland_state *state = (fantland_state *)space->machine->driver_data;
+	fantland_state *state = space->machine->driver_data<fantland_state>();
 	int x, y, f;
 
 	switch (input_port_read(space->machine, "Controls") & 0x03)
@@ -313,7 +313,7 @@ ADDRESS_MAP_END
 
 static void borntofi_adpcm_start( running_device *device, int voice )
 {
-	fantland_state *state = (fantland_state *)device->machine->driver_data;
+	fantland_state *state = device->machine->driver_data<fantland_state>();
 	msm5205_reset_w(device, 0);
 	state->adpcm_playing[voice] = 1;
 	state->adpcm_nibble[voice] = 0;
@@ -322,14 +322,14 @@ static void borntofi_adpcm_start( running_device *device, int voice )
 
 static void borntofi_adpcm_stop( running_device *device, int voice )
 {
-	fantland_state *state = (fantland_state *)device->machine->driver_data;
+	fantland_state *state = device->machine->driver_data<fantland_state>();
 	msm5205_reset_w(device, 1);
 	state->adpcm_playing[voice] = 0;
 }
 
 static WRITE8_HANDLER( borntofi_msm5205_w )
 {
-	fantland_state *state = (fantland_state *)space->machine->driver_data;
+	fantland_state *state = space->machine->driver_data<fantland_state>();
 	int voice = offset / 8;
 	int reg = offset % 8;
 	running_device *msm;
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 
 static void borntofi_adpcm_int( running_device *device, int voice )
 {
-	fantland_state *state = (fantland_state *)device->machine->driver_data;
+	fantland_state *state = device->machine->driver_data<fantland_state>();
 	UINT8 *rom;
 	size_t len;
 	int start, stop;
@@ -827,7 +827,7 @@ GFXDECODE_END
 
 static MACHINE_START( fantland )
 {
-	fantland_state *state = (fantland_state *)machine->driver_data;
+	fantland_state *state = machine->driver_data<fantland_state>();
 
 	state->audio_cpu = machine->device("audiocpu");
 
@@ -836,13 +836,13 @@ static MACHINE_START( fantland )
 
 static MACHINE_RESET( fantland )
 {
-	fantland_state *state = (fantland_state *)machine->driver_data;
+	fantland_state *state = machine->driver_data<fantland_state>();
 	state->nmi_enable = 0;
 }
 
 static INTERRUPT_GEN( fantland_irq )
 {
-	fantland_state *state = (fantland_state *)device->machine->driver_data;
+	fantland_state *state = device->machine->driver_data<fantland_state>();
 	if (state->nmi_enable & 8)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -900,7 +900,7 @@ MACHINE_DRIVER_END
 
 static void galaxygn_sound_irq( running_device *device, int line )
 {
-	fantland_state *state = (fantland_state *)device->machine->driver_data;
+	fantland_state *state = device->machine->driver_data<fantland_state>();
 	cpu_set_input_line_and_vector(state->audio_cpu, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
@@ -974,7 +974,7 @@ static const msm5205_interface msm5205_config_3 =
 
 static MACHINE_START( borntofi )
 {
-	fantland_state *state = (fantland_state *)machine->driver_data;
+	fantland_state *state = machine->driver_data<fantland_state>();
 
 	MACHINE_START_CALL(fantland);
 
@@ -995,7 +995,7 @@ static MACHINE_START( borntofi )
 
 static MACHINE_RESET( borntofi )
 {
-	fantland_state *state = (fantland_state *)machine->driver_data;
+	fantland_state *state = machine->driver_data<fantland_state>();
 	int i;
 
 	MACHINE_RESET_CALL(fantland);
@@ -1064,7 +1064,7 @@ MACHINE_DRIVER_END
 
 static void wheelrun_ym3526_irqhandler( running_device *device, int state )
 {
-	fantland_state *driver = (fantland_state *)device->machine->driver_data;
+	fantland_state *driver = device->machine->driver_data<fantland_state>();
 	cpu_set_input_line(driver->audio_cpu, INPUT_LINE_IRQ0, state);
 }
 

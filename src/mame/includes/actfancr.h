@@ -4,12 +4,13 @@
 
 *************************************************************************/
 
-class actfancr_state
+class actfancr_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, actfancr_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, actfancr_state(machine)); }
 
-	actfancr_state(running_machine &machine) { }
+	actfancr_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *        pf1_data;

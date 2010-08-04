@@ -37,7 +37,7 @@ PALETTE_INIT( bogeyman )
 
 WRITE8_HANDLER( bogeyman_videoram_w )
 {
-	bogeyman_state *state = (bogeyman_state *)space->machine->driver_data;
+	bogeyman_state *state = space->machine->driver_data<bogeyman_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -45,7 +45,7 @@ WRITE8_HANDLER( bogeyman_videoram_w )
 
 WRITE8_HANDLER( bogeyman_colorram_w )
 {
-	bogeyman_state *state = (bogeyman_state *)space->machine->driver_data;
+	bogeyman_state *state = space->machine->driver_data<bogeyman_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -53,7 +53,7 @@ WRITE8_HANDLER( bogeyman_colorram_w )
 
 WRITE8_HANDLER( bogeyman_videoram2_w )
 {
-	bogeyman_state *state = (bogeyman_state *)space->machine->driver_data;
+	bogeyman_state *state = space->machine->driver_data<bogeyman_state>();
 
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -61,7 +61,7 @@ WRITE8_HANDLER( bogeyman_videoram2_w )
 
 WRITE8_HANDLER( bogeyman_colorram2_w )
 {
-	bogeyman_state *state = (bogeyman_state *)space->machine->driver_data;
+	bogeyman_state *state = space->machine->driver_data<bogeyman_state>();
 
 	state->colorram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -75,7 +75,7 @@ WRITE8_HANDLER( bogeyman_paletteram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	bogeyman_state *state = (bogeyman_state *)machine->driver_data;
+	bogeyman_state *state = machine->driver_data<bogeyman_state>();
 	int attr = state->colorram[tile_index];
 	int gfxbank = ((((attr & 0x01) << 8) + state->videoram[tile_index]) / 0x80) + 3;
 	int code = state->videoram[tile_index] & 0x7f;
@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	bogeyman_state *state = (bogeyman_state *)machine->driver_data;
+	bogeyman_state *state = machine->driver_data<bogeyman_state>();
 	int attr = state->colorram2[tile_index];
 	int tile = state->videoram2[tile_index] | ((attr & 0x03) << 8);
 	int gfxbank = tile / 0x200;
@@ -97,7 +97,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( bogeyman )
 {
-	bogeyman_state *state = (bogeyman_state *)machine->driver_data;
+	bogeyman_state *state = machine->driver_data<bogeyman_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -106,7 +106,7 @@ VIDEO_START( bogeyman )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	bogeyman_state *state = (bogeyman_state *)machine->driver_data;
+	bogeyman_state *state = machine->driver_data<bogeyman_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -153,7 +153,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( bogeyman )
 {
-	bogeyman_state *state = (bogeyman_state *)screen->machine->driver_data;
+	bogeyman_state *state = screen->machine->driver_data<bogeyman_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

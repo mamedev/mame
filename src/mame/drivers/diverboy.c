@@ -53,12 +53,13 @@
 
 
 
-class diverboy_state
+class diverboy_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, diverboy_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, diverboy_state(machine)); }
 
-	diverboy_state(running_machine &machine) { }
+	diverboy_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *  spriteram;
@@ -76,7 +77,7 @@ static VIDEO_START(diverboy)
 
 static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	diverboy_state *state = (diverboy_state *)machine->driver_data;
+	diverboy_state *state = machine->driver_data<diverboy_state>();
 	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + (state->spriteram_size / 2);
 
@@ -120,7 +121,7 @@ static VIDEO_UPDATE(diverboy)
 
 static WRITE16_HANDLER( soundcmd_w )
 {
-	diverboy_state *state = (diverboy_state *)space->machine->driver_data;
+	diverboy_state *state = space->machine->driver_data<diverboy_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -245,7 +246,7 @@ GFXDECODE_END
 
 static MACHINE_START( diverboy )
 {
-	diverboy_state *state = (diverboy_state *)machine->driver_data;
+	diverboy_state *state = machine->driver_data<diverboy_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 }

@@ -55,12 +55,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 
 
-class beaminv_state
+class beaminv_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, beaminv_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, beaminv_state(machine)); }
 
-	beaminv_state(running_machine &machine) { }
+	beaminv_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *    videoram;
@@ -93,7 +94,7 @@ static const int interrupt_lines[INTERRUPTS_PER_FRAME] = { 0x00, 0x80 };
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	beaminv_state *state = (beaminv_state *)machine->driver_data;
+	beaminv_state *state = machine->driver_data<beaminv_state>();
 	int interrupt_number = param;
 	int next_interrupt_number;
 	int next_vpos;
@@ -110,14 +111,14 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static void create_interrupt_timer( running_machine *machine )
 {
-	beaminv_state *state = (beaminv_state *)machine->driver_data;
+	beaminv_state *state = machine->driver_data<beaminv_state>();
 	state->interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
 }
 
 
 static void start_interrupt_timer( running_machine *machine )
 {
-	beaminv_state *state = (beaminv_state *)machine->driver_data;
+	beaminv_state *state = machine->driver_data<beaminv_state>();
 	int vpos = interrupt_lines[0];
 	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(vpos), 0);
 }
@@ -132,7 +133,7 @@ static void start_interrupt_timer( running_machine *machine )
 
 static MACHINE_START( beaminv )
 {
-	beaminv_state *state = (beaminv_state *)machine->driver_data;
+	beaminv_state *state = machine->driver_data<beaminv_state>();
 	create_interrupt_timer(machine);
 
 	state->maincpu = machine->device("maincpu");
@@ -151,7 +152,7 @@ static MACHINE_START( beaminv )
 
 static MACHINE_RESET( beaminv )
 {
-	beaminv_state *state = (beaminv_state *)machine->driver_data;
+	beaminv_state *state = machine->driver_data<beaminv_state>();
 	start_interrupt_timer(machine);
 
 	state->controller_select = 0;
@@ -167,7 +168,7 @@ static MACHINE_RESET( beaminv )
 
 static VIDEO_UPDATE( beaminv )
 {
-	beaminv_state *state = (beaminv_state *)screen->machine->driver_data;
+	beaminv_state *state = screen->machine->driver_data<beaminv_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -211,7 +212,7 @@ static READ8_HANDLER( v128_r )
 
 static WRITE8_HANDLER( controller_select_w )
 {
-	beaminv_state *state = (beaminv_state *)space->machine->driver_data;
+	beaminv_state *state = space->machine->driver_data<beaminv_state>();
 	/* 0x01 (player 1) or 0x02 (player 2) */
 	state->controller_select = data;
 }
@@ -219,7 +220,7 @@ static WRITE8_HANDLER( controller_select_w )
 
 static READ8_HANDLER( controller_r )
 {
-	beaminv_state *state = (beaminv_state *)space->machine->driver_data;
+	beaminv_state *state = space->machine->driver_data<beaminv_state>();
 	return input_port_read(space->machine, (state->controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
 }
 

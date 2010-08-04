@@ -24,13 +24,13 @@
 
 static WRITE8_HANDLER( bogeyman_8910_latch_w )
 {
-	bogeyman_state *state = (bogeyman_state *)space->machine->driver_data;
+	bogeyman_state *state = space->machine->driver_data<bogeyman_state>();
 	state->psg_latch = data;
 }
 
 static WRITE8_HANDLER( bogeyman_8910_control_w )
 {
-	bogeyman_state *state = (bogeyman_state *)space->machine->driver_data;
+	bogeyman_state *state = space->machine->driver_data<bogeyman_state>();
 
 	// bit 0 is flipscreen
 	flip_screen_set(space->machine, data & 0x01);
@@ -207,7 +207,7 @@ GFXDECODE_END
 
 static MACHINE_START( bogeyman )
 {
-	bogeyman_state *state = (bogeyman_state *)machine->driver_data;
+	bogeyman_state *state = machine->driver_data<bogeyman_state>();
 
 	state_save_register_global(machine, state->psg_latch);
 	state_save_register_global(machine, state->last_write);
@@ -215,7 +215,7 @@ static MACHINE_START( bogeyman )
 
 static MACHINE_RESET( bogeyman )
 {
-	bogeyman_state *state = (bogeyman_state *)machine->driver_data;
+	bogeyman_state *state = machine->driver_data<bogeyman_state>();
 
 	state->psg_latch = 0;
 	state->last_write = 0;
@@ -223,7 +223,7 @@ static MACHINE_RESET( bogeyman )
 
 static WRITE8_DEVICE_HANDLER( bogeyman_colbank_w )
 {
-	bogeyman_state *state = (bogeyman_state *)device->machine->driver_data;
+	bogeyman_state *state = device->machine->driver_data<bogeyman_state>();
 
 	if((data & 1) != (state->colbank & 1))
 	{

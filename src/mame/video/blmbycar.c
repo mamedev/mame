@@ -44,7 +44,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE16_HANDLER( blmbycar_palette_w )
 {
-	blmbycar_state *state = (blmbycar_state *)space->machine->driver_data;
+	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
 
 	data = COMBINE_DATA(&state->paletteram[offset]);
 	palette_set_color_rgb( space->machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
@@ -73,7 +73,7 @@ WRITE16_HANDLER( blmbycar_palette_w )
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
+	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 	UINT16 code = state->vram_0[tile_index * 2 + 0];
 	UINT16 attr = state->vram_0[tile_index * 2 + 1];
 	SET_TILE_INFO(
@@ -87,7 +87,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
+	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 	UINT16 code = state->vram_1[tile_index * 2 + 0];
 	UINT16 attr = state->vram_1[tile_index * 2 + 1];
 	SET_TILE_INFO(
@@ -102,14 +102,14 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE16_HANDLER( blmbycar_vram_0_w )
 {
-	blmbycar_state *state = (blmbycar_state *)space->machine->driver_data;
+	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
 	COMBINE_DATA(&state->vram_0[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_0, offset / 2);
 }
 
 WRITE16_HANDLER( blmbycar_vram_1_w )
 {
-	blmbycar_state *state = (blmbycar_state *)space->machine->driver_data;
+	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
 	COMBINE_DATA(&state->vram_1[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_1, offset / 2);
 }
@@ -125,7 +125,7 @@ WRITE16_HANDLER( blmbycar_vram_1_w )
 
 VIDEO_START( blmbycar )
 {
-	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
+	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 
 	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, DIM_NX, DIM_NY );
 	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, DIM_NX, DIM_NY );
@@ -167,7 +167,7 @@ VIDEO_START( blmbycar )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
+	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 	UINT16 *source, *finish;
 
 	source = state->spriteram + 0x6 / 2;				// !
@@ -221,7 +221,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( blmbycar )
 {
-	blmbycar_state *state = (blmbycar_state *)screen->machine->driver_data;
+	blmbycar_state *state = screen->machine->driver_data<blmbycar_state>();
 	int i, layers_ctrl = -1;
 
 	tilemap_set_scrolly(state->tilemap_0, 0, state->scroll_0[0]);

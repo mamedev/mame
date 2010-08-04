@@ -6,7 +6,7 @@
 
 VIDEO_START( slapshot )
 {
-	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	slapshot_state *state = machine->driver_data<slapshot_state>();
 	int i;
 
 	state->spriteram_delayed = auto_alloc_array(machine, UINT16, state->spriteram_size / 2);
@@ -89,7 +89,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
         000b - 000f : unused
 
     */
-	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	slapshot_state *state = machine->driver_data<slapshot_state>();
 	int x, y, off, extoffs;
 	int code, color, spritedata, spritecont, flipx, flipy;
 	int xcurrent, ycurrent, big_sprite = 0;
@@ -379,7 +379,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void taito_handle_sprite_buffering( running_machine *machine )
 {
-	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	slapshot_state *state = machine->driver_data<slapshot_state>();
 
 	if (state->prepare_sprites)	/* no buffering */
 	{
@@ -390,7 +390,7 @@ static void taito_handle_sprite_buffering( running_machine *machine )
 
 static void taito_update_sprites_active_area( running_machine *machine )
 {
-	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	slapshot_state *state = machine->driver_data<slapshot_state>();
 	int off;
 
 	/* if the frame was skipped, we'll have to do the buffering now */
@@ -430,7 +430,7 @@ static void taito_update_sprites_active_area( running_machine *machine )
 
 VIDEO_EOF( taito_no_buffer )
 {
-	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	slapshot_state *state = machine->driver_data<slapshot_state>();
 
 	taito_update_sprites_active_area(machine);
 
@@ -456,7 +456,7 @@ a bg layer given priority over some sprites.
 
 VIDEO_UPDATE( slapshot )
 {
-	slapshot_state *state = (slapshot_state *)screen->machine->driver_data;
+	slapshot_state *state = screen->machine->driver_data<slapshot_state>();
 	UINT8 layer[5];
 	UINT8 tilepri[5];
 	UINT8 spritepri[4];

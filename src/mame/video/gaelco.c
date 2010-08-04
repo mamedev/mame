@@ -33,7 +33,7 @@
 
 static TILE_GET_INFO( get_tile_info_gaelco_screen0 )
 {
-	gaelco_state *state = (gaelco_state *)machine->driver_data;
+	gaelco_state *state = machine->driver_data<gaelco_state>();
 	int data = state->videoram[tile_index << 1];
 	int data2 = state->videoram[(tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_tile_info_gaelco_screen0 )
 
 static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
 {
-	gaelco_state *state = (gaelco_state *)machine->driver_data;
+	gaelco_state *state = machine->driver_data<gaelco_state>();
 	int data = state->videoram[(0x1000 / 2) + (tile_index << 1)];
 	int data2 = state->videoram[(0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
 
 WRITE16_HANDLER( gaelco_vram_w )
 {
-	gaelco_state *state = (gaelco_state *)space->machine->driver_data;
+	gaelco_state *state = space->machine->driver_data<gaelco_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->tilemap[offset >> 11], ((offset << 1) & 0x0fff) >> 2);
 }
@@ -77,7 +77,7 @@ WRITE16_HANDLER( gaelco_vram_w )
 
 VIDEO_START( bigkarnk )
 {
-	gaelco_state *state = (gaelco_state *)machine->driver_data;
+	gaelco_state *state = machine->driver_data<gaelco_state>();
 	state->tilemap[0] = tilemap_create(machine, get_tile_info_gaelco_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->tilemap[1] = tilemap_create(machine, get_tile_info_gaelco_screen1, tilemap_scan_rows, 16, 16, 32, 32);
 
@@ -87,7 +87,7 @@ VIDEO_START( bigkarnk )
 
 VIDEO_START( maniacsq )
 {
-	gaelco_state *state = (gaelco_state *)machine->driver_data;
+	gaelco_state *state = machine->driver_data<gaelco_state>();
 	state->tilemap[0] = tilemap_create(machine, get_tile_info_gaelco_screen0, tilemap_scan_rows, 16, 16, 32, 32);
 	state->tilemap[1] = tilemap_create(machine, get_tile_info_gaelco_screen1, tilemap_scan_rows, 16, 16, 32, 32);
 
@@ -123,7 +123,7 @@ VIDEO_START( maniacsq )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	gaelco_state *state = (gaelco_state *)machine->driver_data;
+	gaelco_state *state = machine->driver_data<gaelco_state>();
 	int i, x, y, ex, ey;
 	const gfx_element *gfx = machine->gfx[0];
 
@@ -189,7 +189,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( maniacsq )
 {
-	gaelco_state *state = (gaelco_state *)screen->machine->driver_data;
+	gaelco_state *state = screen->machine->driver_data<gaelco_state>();
 
 	/* set scroll registers */
 	tilemap_set_scrolly(state->tilemap[0], 0, state->vregs[0]);
@@ -218,7 +218,7 @@ VIDEO_UPDATE( maniacsq )
 
 VIDEO_UPDATE( bigkarnk )
 {
-	gaelco_state *state = (gaelco_state *)screen->machine->driver_data;
+	gaelco_state *state = screen->machine->driver_data<gaelco_state>();
 
 	/* set scroll registers */
 	tilemap_set_scrolly(state->tilemap[0], 0, state->vregs[0]);

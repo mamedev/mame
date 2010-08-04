@@ -31,26 +31,26 @@ PALETTE_INIT( mnchmobl )
 
 WRITE8_HANDLER( mnchmobl_palette_bank_w )
 {
-	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	munchmo_state *state = space->machine->driver_data<munchmo_state>();
 	state->palette_bank = data & 0x3;
 }
 
 WRITE8_HANDLER( mnchmobl_flipscreen_w )
 {
-	munchmo_state *state = (munchmo_state *)space->machine->driver_data;
+	munchmo_state *state = space->machine->driver_data<munchmo_state>();
 	state->flipscreen = data;
 }
 
 
 VIDEO_START( mnchmobl )
 {
-	munchmo_state *state = (munchmo_state *)machine->driver_data;
+	munchmo_state *state = machine->driver_data<munchmo_state>();
 	state->tmpbitmap = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());
 }
 
 static void draw_status( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	munchmo_state *state = (munchmo_state *)machine->driver_data;
+	munchmo_state *state = machine->driver_data<munchmo_state>();
 	const gfx_element *gfx = machine->gfx[0];
 	int row;
 
@@ -82,7 +82,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
     ROM B1.2C contains 256 tilemaps defining 4x4 configurations of
     the tiles in ROM B2.2B
 */
-	munchmo_state *state = (munchmo_state *)machine->driver_data;
+	munchmo_state *state = machine->driver_data<munchmo_state>();
 	UINT8 *rom = memory_region(machine, "gfx2");
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
@@ -117,7 +117,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	munchmo_state *state = (munchmo_state *)machine->driver_data;
+	munchmo_state *state = machine->driver_data<munchmo_state>();
 	int scroll = state->vreg[6];
 	int flags = state->vreg[7];							/*   XB?????? */
 	int xadjust = - 128 - 16 - ((flags & 0x80) ? 1 : 0);

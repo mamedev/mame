@@ -47,13 +47,14 @@ Notes:
 #define MASTER_CLOCK	XTAL_16MHz
 
 
-class k3_state
+class k3_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, k3_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, k3_state(machine)); }
 
 	k3_state(running_machine &machine)
-		: oki1(machine.device<okim6295_device>("oki1")),
+		: driver_data_t(machine),
+		  oki1(machine.device<okim6295_device>("oki1")),
 		  oki2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
@@ -73,27 +74,27 @@ public:
 
 static WRITE16_HANDLER( k3_bgram_w )
 {
-	k3_state *state = (k3_state *)space->machine->driver_data;
+	k3_state *state = space->machine->driver_data<k3_state>();
 	COMBINE_DATA(&state->bgram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_k3_bg_tile_info )
 {
-	k3_state *state = (k3_state *)machine->driver_data;
+	k3_state *state = machine->driver_data<k3_state>();
 	int tileno = state->bgram[tile_index];
 	SET_TILE_INFO(1, tileno, 0, 0);
 }
 
 static VIDEO_START(k3)
 {
-	k3_state *state = (k3_state *)machine->driver_data;
+	k3_state *state = machine->driver_data<k3_state>();
 	state->bg_tilemap = tilemap_create(machine, get_k3_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 64);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	k3_state *state = (k3_state *)machine->driver_data;
+	k3_state *state = machine->driver_data<k3_state>();
 	const gfx_element *gfx = machine->gfx[0];
 	UINT16 *source = state->spriteram_1;
 	UINT16 *source2 = state->spriteram_2;
@@ -119,7 +120,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_UPDATE(k3)
 {
-	k3_state *state = (k3_state *)screen->machine->driver_data;
+	k3_state *state = screen->machine->driver_data<k3_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
@@ -128,19 +129,19 @@ static VIDEO_UPDATE(k3)
 
 static WRITE16_HANDLER( k3_scrollx_w )
 {
-	k3_state *state = (k3_state *)space->machine->driver_data;
+	k3_state *state = space->machine->driver_data<k3_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, data);
 }
 
 static WRITE16_HANDLER( k3_scrolly_w )
 {
-	k3_state *state = (k3_state *)space->machine->driver_data;
+	k3_state *state = space->machine->driver_data<k3_state>();
 	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 static WRITE16_HANDLER( k3_soundbanks_w )
 {
-	k3_state *state = (k3_state *)space->machine->driver_data;
+	k3_state *state = space->machine->driver_data<k3_state>();
 	state->oki1->set_bank_base((data & 4) ? 0x40000 : 0);
 	state->oki2->set_bank_base((data & 2) ? 0x40000 : 0);
 }

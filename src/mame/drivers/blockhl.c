@@ -32,7 +32,7 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking );
 
 static INTERRUPT_GEN( blockhl_interrupt )
 {
-	blockhl_state *state = (blockhl_state *)device->machine->driver_data;
+	blockhl_state *state = device->machine->driver_data<blockhl_state>();
 
 	if (k052109_is_irq_enabled(state->k052109) && state->rombank == 0)	/* kludge to prevent crashes */
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
@@ -40,7 +40,7 @@ static INTERRUPT_GEN( blockhl_interrupt )
 
 static READ8_HANDLER( bankedram_r )
 {
-	blockhl_state *state = (blockhl_state *)space->machine->driver_data;
+	blockhl_state *state = space->machine->driver_data<blockhl_state>();
 
 	if (state->palette_selected)
 		return space->machine->generic.paletteram.u8[offset];
@@ -50,7 +50,7 @@ static READ8_HANDLER( bankedram_r )
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	blockhl_state *state = (blockhl_state *)space->machine->driver_data;
+	blockhl_state *state = space->machine->driver_data<blockhl_state>();
 
 	if (state->palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
@@ -60,7 +60,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
 {
-	blockhl_state *state = (blockhl_state *)space->machine->driver_data;
+	blockhl_state *state = space->machine->driver_data<blockhl_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
 /* special handlers to combine 052109 & 051960 */
 static READ8_HANDLER( k052109_051960_r )
 {
-	blockhl_state *state = (blockhl_state *)space->machine->driver_data;
+	blockhl_state *state = space->machine->driver_data<blockhl_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -85,7 +85,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	blockhl_state *state = (blockhl_state *)space->machine->driver_data;
+	blockhl_state *state = space->machine->driver_data<blockhl_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -193,7 +193,7 @@ static const k051960_interface blockhl_k051960_intf =
 
 static MACHINE_START( blockhl )
 {
-	blockhl_state *state = (blockhl_state *)machine->driver_data;
+	blockhl_state *state = machine->driver_data<blockhl_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
@@ -209,7 +209,7 @@ static MACHINE_START( blockhl )
 
 static MACHINE_RESET( blockhl )
 {
-	blockhl_state *state = (blockhl_state *)machine->driver_data;
+	blockhl_state *state = machine->driver_data<blockhl_state>();
 
 	konami_configure_set_lines(machine->device("maincpu"), blockhl_banking);
 
@@ -323,7 +323,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 {
-	blockhl_state *state = (blockhl_state *)device->machine->driver_data;
+	blockhl_state *state = device->machine->driver_data<blockhl_state>();
 
 	/* bits 0-1 = ROM bank */
 	state->rombank = lines & 0x03;

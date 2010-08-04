@@ -39,13 +39,14 @@ MR_01-.3A    [a0b758aa]
 #include "video/deco16ic.h"
 #include "sound/okim6295.h"
 
-class mirage_state
+class mirage_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mirage_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mirage_state(machine)); }
 
 	mirage_state(running_machine &machine)
-		: maincpu(machine.device<cpu_device>("maincpu")),
+		: driver_data_t(machine),
+		  maincpu(machine.device<cpu_device>("maincpu")),
 		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
 		  oki_sfx(machine.device<okim6295_device>("oki_sfx")),
 		  oki_bgm(machine.device<okim6295_device>("oki_bgm")) { }
@@ -70,7 +71,7 @@ public:
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	mirage_state *state = (mirage_state *)machine->driver_data;
+	mirage_state *state = machine->driver_data<mirage_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -143,7 +144,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_UPDATE( mirage )
 {
-	mirage_state *state = (mirage_state *)screen->machine->driver_data;
+	mirage_state *state = screen->machine->driver_data<mirage_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
@@ -162,13 +163,13 @@ static VIDEO_UPDATE( mirage )
 
 static WRITE16_HANDLER( mirage_mux_w )
 {
-	mirage_state *state = (mirage_state *)space->machine->driver_data;
+	mirage_state *state = space->machine->driver_data<mirage_state>();
 	state->mux_data = data & 0x1f;
 }
 
 static READ16_HANDLER( mirage_input_r )
 {
-	mirage_state *state = (mirage_state *)space->machine->driver_data;
+	mirage_state *state = space->machine->driver_data<mirage_state>();
 	switch (state->mux_data & 0x1f)
 	{
 		case 0x01: return input_port_read(space->machine, "KEY0");
@@ -183,13 +184,13 @@ static READ16_HANDLER( mirage_input_r )
 
 static WRITE16_HANDLER( okim1_rombank_w )
 {
-	mirage_state *state = (mirage_state *)space->machine->driver_data;
+	mirage_state *state = space->machine->driver_data<mirage_state>();
 	state->oki_sfx->set_bank_base(0x40000 * (data & 0x3));
 }
 
 static WRITE16_HANDLER( okim0_rombank_w )
 {
-	mirage_state *state = (mirage_state *)space->machine->driver_data;
+	mirage_state *state = space->machine->driver_data<mirage_state>();
 
 	/*bits 4-6 used on POST? */
 	state->oki_bgm->set_bank_base(0x40000 * (data & 0x7));
@@ -363,14 +364,14 @@ static const deco16ic_interface mirage_deco16ic_intf =
 
 static MACHINE_START( mirage )
 {
-	mirage_state *state = (mirage_state *)machine->driver_data;
+	mirage_state *state = machine->driver_data<mirage_state>();
 
 	state_save_register_global(machine, state->mux_data);
 }
 
 static MACHINE_RESET( mirage )
 {
-	mirage_state *state = (mirage_state *)machine->driver_data;
+	mirage_state *state = machine->driver_data<mirage_state>();
 
 	state->mux_data = 0;
 }

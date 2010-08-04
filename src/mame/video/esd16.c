@@ -52,7 +52,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 	UINT16 code = state->vram_0[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_0_16x16 )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 	UINT16 code = state->vram_0[tile_index];
 	SET_TILE_INFO(
 			2,
@@ -75,7 +75,7 @@ static TILE_GET_INFO( get_tile_info_0_16x16 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 	UINT16 code = state->vram_1[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 static TILE_GET_INFO( get_tile_info_1_16x16 )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 	UINT16 code = state->vram_1[tile_index];
 	SET_TILE_INFO(
 			2,
@@ -97,7 +97,7 @@ static TILE_GET_INFO( get_tile_info_1_16x16 )
 
 WRITE16_HANDLER( esd16_vram_0_w )
 {
-	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	esd16_state *state = space->machine->driver_data<esd16_state>();
 	COMBINE_DATA(&state->vram_0[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_0, offset);
 	tilemap_mark_tile_dirty(state->tilemap_0_16x16, offset);
@@ -105,7 +105,7 @@ WRITE16_HANDLER( esd16_vram_0_w )
 
 WRITE16_HANDLER( esd16_vram_1_w )
 {
-	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	esd16_state *state = space->machine->driver_data<esd16_state>();
 	COMBINE_DATA(&state->vram_1[offset]);
 	tilemap_mark_tile_dirty(state->tilemap_1, offset);
 	tilemap_mark_tile_dirty(state->tilemap_1_16x16, offset);
@@ -113,7 +113,7 @@ WRITE16_HANDLER( esd16_vram_1_w )
 
 WRITE16_HANDLER( esd16_tilemap0_color_w )
 {
-	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	esd16_state *state = space->machine->driver_data<esd16_state>();
 	state->tilemap0_color = data & 3;
 	tilemap_mark_all_tiles_dirty(state->tilemap_0);
 
@@ -132,7 +132,7 @@ WRITE16_HANDLER( esd16_tilemap0_color_w )
 
 VIDEO_START( esd16 )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 
 	state->tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 0x80, 0x40);
 	state->tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 0x80, 0x40);
@@ -185,7 +185,7 @@ VIDEO_START( esd16 )
 
 static void esd16_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 	int offs;
 
 	int max_x = machine->primary_screen->width();
@@ -249,7 +249,7 @@ static void esd16_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 /* note, check if i can re-merge this with the other or if its really different */
 static void hedpanic_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 	int offs;
 
 	int max_x = machine->primary_screen->width();
@@ -325,7 +325,7 @@ static void hedpanic_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 VIDEO_UPDATE( esd16 )
 {
-	esd16_state *state = (esd16_state *)screen->machine->driver_data;
+	esd16_state *state = screen->machine->driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
@@ -359,7 +359,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 
 VIDEO_UPDATE( hedpanic )
 {
-	esd16_state *state = (esd16_state *)screen->machine->driver_data;
+	esd16_state *state = screen->machine->driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
@@ -422,7 +422,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 // uses older style sprites
 VIDEO_UPDATE( hedpanio )
 {
-	esd16_state *state = (esd16_state *)screen->machine->driver_data;
+	esd16_state *state = screen->machine->driver_data<esd16_state>();
 	int layers_ctrl = -1;
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);

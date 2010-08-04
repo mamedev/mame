@@ -727,7 +727,7 @@ void dp_full_sync(running_machine *machine)
 
 READ32_DEVICE_HANDLER( n64_dp_reg_r )
 {
-	_n64_state *state = (_n64_state *)device->machine->driver_data;
+	_n64_state *state = device->machine->driver_data<_n64_state>();
 
 	switch (offset)
 	{
@@ -753,7 +753,7 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 
 WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 {
-	_n64_state *state = (_n64_state *)device->machine->driver_data;
+	_n64_state *state = device->machine->driver_data<_n64_state>();
 
 	switch (offset)
 	{
@@ -814,7 +814,7 @@ static UINT32 n64_vi_intr,  n64_vi_vburst;
 
 static void n64_vi_recalculate_resolution(running_machine *machine)
 {
-	_n64_state *state = (_n64_state *)machine->driver_data;
+	_n64_state *state = machine->driver_data<_n64_state>();
 
     int x_start = (n64_vi_hstart & 0x03ff0000) >> 16;
     int x_end = n64_vi_hstart & 0x000003ff;
@@ -913,7 +913,7 @@ READ32_HANDLER( n64_vi_reg_r )
 
 WRITE32_HANDLER( n64_vi_reg_w )
 {
-	_n64_state *state = (_n64_state *)space->machine->driver_data;
+	_n64_state *state = space->machine->driver_data<_n64_state>();
 
 	switch (offset)
 	{

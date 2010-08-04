@@ -35,7 +35,7 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	bionicc_state *state = (bionicc_state *)machine->driver_data;
+	bionicc_state *state = machine->driver_data<bionicc_state>();
 
 	int attr = state->bgvideoram[2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	bionicc_state *state = (bionicc_state *)machine->driver_data;
+	bionicc_state *state = machine->driver_data<bionicc_state>();
 
 	int attr = state->fgvideoram[2 * tile_index + 1];
 	int flags;
@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	bionicc_state *state = (bionicc_state *)machine->driver_data;
+	bionicc_state *state = machine->driver_data<bionicc_state>();
 
 	int attr = state->txvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
@@ -94,7 +94,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( bionicc )
 {
-	bionicc_state *state = (bionicc_state *)machine->driver_data;
+	bionicc_state *state = machine->driver_data<bionicc_state>();
 
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
@@ -116,7 +116,7 @@ VIDEO_START( bionicc )
 
 WRITE16_HANDLER( bionicc_bgvideoram_w )
 {
-	bionicc_state *state = (bionicc_state *)space->machine->driver_data;
+	bionicc_state *state = space->machine->driver_data<bionicc_state>();
 
 	COMBINE_DATA(&state->bgvideoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -124,7 +124,7 @@ WRITE16_HANDLER( bionicc_bgvideoram_w )
 
 WRITE16_HANDLER( bionicc_fgvideoram_w )
 {
-	bionicc_state *state = (bionicc_state *)space->machine->driver_data;
+	bionicc_state *state = space->machine->driver_data<bionicc_state>();
 
 	COMBINE_DATA(&state->fgvideoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
@@ -132,7 +132,7 @@ WRITE16_HANDLER( bionicc_fgvideoram_w )
 
 WRITE16_HANDLER( bionicc_txvideoram_w )
 {
-	bionicc_state *state = (bionicc_state *)space->machine->driver_data;
+	bionicc_state *state = space->machine->driver_data<bionicc_state>();
 
 	COMBINE_DATA(&state->txvideoram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset & 0x3ff);
@@ -140,7 +140,7 @@ WRITE16_HANDLER( bionicc_txvideoram_w )
 
 WRITE16_HANDLER( bionicc_paletteram_w )
 {
-	bionicc_state *state = (bionicc_state *)space->machine->driver_data;
+	bionicc_state *state = space->machine->driver_data<bionicc_state>();
 	int r, g, b, bright;
 	data = COMBINE_DATA(&state->paletteram[offset]);
 
@@ -162,7 +162,7 @@ WRITE16_HANDLER( bionicc_paletteram_w )
 
 WRITE16_HANDLER( bionicc_scroll_w )
 {
-	bionicc_state *state = (bionicc_state *)space->machine->driver_data;
+	bionicc_state *state = space->machine->driver_data<bionicc_state>();
 
 	data = COMBINE_DATA(&state->scroll[offset]);
 
@@ -185,7 +185,7 @@ WRITE16_HANDLER( bionicc_scroll_w )
 
 WRITE16_HANDLER( bionicc_gfxctrl_w )
 {
-	bionicc_state *state = (bionicc_state *)space->machine->driver_data;
+	bionicc_state *state = space->machine->driver_data<bionicc_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -210,7 +210,7 @@ WRITE16_HANDLER( bionicc_gfxctrl_w )
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
-//  bionicc_state *state = (bionicc_state *)machine->driver_data;
+//  bionicc_state *state = machine->driver_data<bionicc_state>();
 	int offs;
 	const gfx_element *gfx = machine->gfx[3];
 
@@ -248,7 +248,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( bionicc )
 {
-	bionicc_state *state = (bionicc_state *)screen->machine->driver_data;
+	bionicc_state *state = screen->machine->driver_data<bionicc_state>();
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 1 | TILEMAP_DRAW_LAYER1, 0);	/* nothing in FRONT */

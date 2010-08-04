@@ -19,19 +19,19 @@
 
 static WRITE8_HANDLER( n8080_shift_bits_w )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	state->shift_bits = data & 7;
 }
 static WRITE8_HANDLER( n8080_shift_data_w )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	state->shift_data = (state->shift_data >> 8) | (data << 8);
 }
 
 
 static READ8_HANDLER( n8080_shift_r )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	return state->shift_data >> (8 - state->shift_bits);
 }
 
@@ -393,7 +393,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( rst1_tick )
 {
-	n8080_state *n8080 = (n8080_state *)timer.machine->driver_data;
+	n8080_state *n8080 = timer.machine->driver_data<n8080_state>();
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
@@ -402,7 +402,7 @@ static TIMER_DEVICE_CALLBACK( rst1_tick )
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
 {
-	n8080_state *n8080 = (n8080_state *)timer.machine->driver_data;
+	n8080_state *n8080 = timer.machine->driver_data<n8080_state>();
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
@@ -411,7 +411,7 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 
 static WRITE_LINE_DEVICE_HANDLER( n8080_inte_callback )
 {
-	n8080_state *n8080 = (n8080_state *)device->machine->driver_data;
+	n8080_state *n8080 = device->machine->driver_data<n8080_state>();
 	n8080->inte = state;
 }
 
@@ -434,7 +434,7 @@ static I8085_CONFIG( n8080_cpu_config )
 
 static MACHINE_START( n8080 )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state->maincpu = machine->device("maincpu");
 
@@ -464,7 +464,7 @@ static MACHINE_START( helifire )
 
 static MACHINE_RESET( n8080 )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state->shift_data = 0;
 	state->shift_bits = 0;
@@ -473,7 +473,7 @@ static MACHINE_RESET( n8080 )
 
 static MACHINE_RESET( spacefev )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	MACHINE_RESET_CALL(n8080);
 	MACHINE_RESET_CALL(spacefev_sound);
@@ -484,7 +484,7 @@ static MACHINE_RESET( spacefev )
 
 static MACHINE_RESET( sheriff )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	MACHINE_RESET_CALL(n8080);
 	MACHINE_RESET_CALL(sheriff_sound);
@@ -495,7 +495,7 @@ static MACHINE_RESET( sheriff )
 
 static MACHINE_RESET( helifire )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	MACHINE_RESET_CALL(n8080);
 	MACHINE_RESET_CALL(helifire_sound);

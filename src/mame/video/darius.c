@@ -18,7 +18,7 @@ INLINE void actual_get_fg_tile_info( running_machine *machine, tile_data *tilein
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	actual_get_fg_tile_info(machine, tileinfo, tile_index, state->fg_ram, 2);
 }
 
@@ -26,7 +26,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( darius )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
 
@@ -37,7 +37,7 @@ VIDEO_START( darius )
 
 WRITE16_HANDLER( darius_fg_layer_w )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 
 	COMBINE_DATA(&state->fg_ram[offset]);
 	if (offset < 0x4000)
@@ -48,7 +48,7 @@ WRITE16_HANDLER( darius_fg_layer_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int x_offs, int y_offs )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, curx, cury;
 	UINT16 code, data, sx, sy;
@@ -94,7 +94,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( darius )
 {
-	darius_state *state = (darius_state *)screen->machine->driver_data;
+	darius_state *state = screen->machine->driver_data<darius_state>();
 	int xoffs = 0;
 
 	if (screen == state->lscreen)

@@ -5,7 +5,7 @@
 
 static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	dietgo_state *state = (dietgo_state *)machine->driver_data;
+	dietgo_state *state = machine->driver_data<dietgo_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -74,7 +74,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( dietgo )
 {
-	dietgo_state *state = (dietgo_state *)screen->machine->driver_data;
+	dietgo_state *state = screen->machine->driver_data<dietgo_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));

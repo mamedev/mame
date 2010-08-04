@@ -1066,7 +1066,7 @@ DISCRETE_SOUND_END
 
 static SOUND_START( dkong)
 {
-	dkong_state *state = (dkong_state *)machine->driver_data;
+	dkong_state *state = machine->driver_data<dkong_state>();
 
 	state->snd_rom = memory_region(machine, "soundcpu");
 }
@@ -1196,7 +1196,7 @@ static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 
 static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
-	dkong_state *state = (dkong_state *)device->machine->driver_data;
+	dkong_state *state = device->machine->driver_data<dkong_state>();
 	UINT8 page = latch8_r(state->dev_vp2,0) & 0x47;
 
 	if ( page & 0x40 )

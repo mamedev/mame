@@ -41,7 +41,7 @@ static WRITE16_HANDLER( sf_coin_w )
 
 static WRITE16_HANDLER( soundcmd_w )
 {
-	sf_state *state = (sf_state *)space->machine->driver_data;
+	sf_state *state = space->machine->driver_data<sf_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -789,7 +789,7 @@ GFXDECODE_END
 
 static void irq_handler( running_device *device, int irq )
 {
-	sf_state *state = (sf_state *)device->machine->driver_data;
+	sf_state *state = device->machine->driver_data<sf_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -806,7 +806,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( sf )
 {
-	sf_state *state = (sf_state *)machine->driver_data;
+	sf_state *state = machine->driver_data<sf_state>();
 
 	/* devices */
 	state->maincpu = machine->device("maincpu");
@@ -819,7 +819,7 @@ static MACHINE_START( sf )
 
 static MACHINE_RESET( sf )
 {
-	sf_state *state = (sf_state *)machine->driver_data;
+	sf_state *state = machine->driver_data<sf_state>();
 
 	state->sf_active = 0;
 	state->bgscroll = 0;

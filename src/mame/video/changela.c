@@ -19,7 +19,7 @@ static TIMER_CALLBACK( changela_scanline_callback );
 
 VIDEO_START( changela )
 {
-	changela_state *state = (changela_state *)machine->driver_data;
+	changela_state *state = machine->driver_data<changela_state>();
 
 	state->memory_devices = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
 	state->tree_ram = auto_alloc_array(machine, UINT8, 2 * 0x20);
@@ -44,7 +44,7 @@ VIDEO_START( changela )
 
 static void draw_obj0( running_machine *machine, bitmap_t *bitmap, int sy )
 {
-	changela_state *state = (changela_state *)machine->driver_data;
+	changela_state *state = machine->driver_data<changela_state>();
 	int sx, i;
 
 	UINT8* ROM = memory_region(machine, "user1");
@@ -107,7 +107,7 @@ static void draw_obj0( running_machine *machine, bitmap_t *bitmap, int sy )
 
 static void draw_obj1( running_machine *machine, bitmap_t *bitmap )
 {
-	changela_state *state = (changela_state *)machine->driver_data;
+	changela_state *state = machine->driver_data<changela_state>();
 	int sx, sy;
 
 	UINT8* ROM = memory_region(machine, "gfx2");
@@ -172,7 +172,7 @@ static void draw_obj1( running_machine *machine, bitmap_t *bitmap )
 
 static void draw_river( running_machine *machine, bitmap_t *bitmap, int sy )
 {
-	changela_state *state = (changela_state *)machine->driver_data;
+	changela_state *state = machine->driver_data<changela_state>();
 	int sx, i, j;
 
 	UINT8* ROM = memory_region(machine, "user2");
@@ -351,7 +351,7 @@ static void draw_river( running_machine *machine, bitmap_t *bitmap, int sy )
 
 static void draw_tree( running_machine *machine, bitmap_t *bitmap, int sy, int tree_num )
 {
-	changela_state *state = (changela_state *)machine->driver_data;
+	changela_state *state = machine->driver_data<changela_state>();
 	int sx, i, j;
 
 	/* State machine */
@@ -647,7 +647,7 @@ e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
 
 static TIMER_CALLBACK( changela_scanline_callback )
 {
-	changela_state *state = (changela_state *)machine->driver_data;
+	changela_state *state = machine->driver_data<changela_state>();
 	int sy = param;
 	int sx;
 
@@ -724,7 +724,7 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 VIDEO_UPDATE( changela )
 {
-	changela_state *state = (changela_state *)screen->machine->driver_data;
+	changela_state *state = screen->machine->driver_data<changela_state>();
 	copybitmap(bitmap, state->river_bitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, state->obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, state->tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
@@ -773,7 +773,7 @@ WRITE8_HANDLER( changela_colors_w )
 
 WRITE8_HANDLER( changela_mem_device_select_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->mem_dev_selected = (data & 0x07) * 0x800;
 	state->tree_en = (data & 0x30) >> 4;
 
@@ -790,7 +790,7 @@ WRITE8_HANDLER( changela_mem_device_select_w )
 
 WRITE8_HANDLER( changela_mem_device_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->memory_devices[state->mem_dev_selected + offset] = data;
 
 	if (state->mem_dev_selected == 0x800)
@@ -803,20 +803,20 @@ WRITE8_HANDLER( changela_mem_device_w )
 
 READ8_HANDLER( changela_mem_device_r )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	return state->memory_devices[state->mem_dev_selected + offset];
 }
 
 
 WRITE8_HANDLER( changela_slope_rom_addr_hi_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->slopeROM_bank = (data & 0x03) << 9;
 }
 
 WRITE8_HANDLER( changela_slope_rom_addr_lo_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->horizon = data;
 }
 

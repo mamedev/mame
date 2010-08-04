@@ -21,7 +21,7 @@
 
 WRITE8_HANDLER( cm_girl_scroll_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->cm_girl_scroll = data;
 	/*
@@ -35,7 +35,7 @@ WRITE8_HANDLER( cm_girl_scroll_w )
 
 WRITE8_HANDLER( cm_outport0_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->cm_enable_reg = data;
 	/*
@@ -52,7 +52,7 @@ WRITE8_HANDLER( cm_outport0_w )
 
 WRITE8_HANDLER( goldstar_fg_vidram_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->fg_vidram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
@@ -60,7 +60,7 @@ WRITE8_HANDLER( goldstar_fg_vidram_w )
 
 WRITE8_HANDLER( goldstar_fg_atrram_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->fg_atrram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
@@ -68,7 +68,7 @@ WRITE8_HANDLER( goldstar_fg_atrram_w )
 
 static TILE_GET_INFO( get_goldstar_fg_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->fg_vidram[tile_index];
 	int attr = state->fg_atrram[tile_index];
 
@@ -81,7 +81,7 @@ static TILE_GET_INFO( get_goldstar_fg_tile_info )
 
 static TILE_GET_INFO( get_magical_fg_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->fg_vidram[tile_index];
 	int attr = state->fg_atrram[tile_index];
 
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_magical_fg_tile_info )
 // colour / high tile bits are swapped around
 static TILE_GET_INFO( get_cherrym_fg_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->fg_vidram[tile_index];
 	int attr = state->fg_atrram[tile_index];
 
@@ -111,7 +111,7 @@ static TILE_GET_INFO( get_cherrym_fg_tile_info )
 
 WRITE8_HANDLER( goldstar_reel1_ram_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->reel1_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel1_tilemap,offset);
@@ -119,7 +119,7 @@ WRITE8_HANDLER( goldstar_reel1_ram_w )
 
 static TILE_GET_INFO( get_goldstar_reel1_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->reel1_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -132,14 +132,14 @@ static TILE_GET_INFO( get_goldstar_reel1_tile_info )
 
 WRITE8_HANDLER( goldstar_reel2_ram_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 	state->reel2_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel2_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_goldstar_reel2_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->reel2_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -151,7 +151,7 @@ static TILE_GET_INFO( get_goldstar_reel2_tile_info )
 
 WRITE8_HANDLER( goldstar_reel3_ram_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->reel3_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel3_tilemap,offset);
@@ -159,7 +159,7 @@ WRITE8_HANDLER( goldstar_reel3_ram_w )
 
 static TILE_GET_INFO( get_goldstar_reel3_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->reel3_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -171,7 +171,7 @@ static TILE_GET_INFO( get_goldstar_reel3_tile_info )
 
 WRITE8_HANDLER( unkch_reel1_attrram_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->reel1_attrram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel1_tilemap,offset);
@@ -179,7 +179,7 @@ WRITE8_HANDLER( unkch_reel1_attrram_w )
 
 WRITE8_HANDLER( unkch_reel2_attrram_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->reel2_attrram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel2_tilemap,offset);
@@ -188,7 +188,7 @@ WRITE8_HANDLER( unkch_reel2_attrram_w )
 
 WRITE8_HANDLER( unkch_reel3_attrram_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->reel3_attrram[offset] = data;
 	tilemap_mark_tile_dirty(state->reel3_tilemap,offset);
@@ -197,7 +197,7 @@ WRITE8_HANDLER( unkch_reel3_attrram_w )
 
 static TILE_GET_INFO( get_unkch_reel1_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->reel1_ram[tile_index];
 	int attr = state->reel1_attrram[tile_index];
 
@@ -210,7 +210,7 @@ static TILE_GET_INFO( get_unkch_reel1_tile_info )
 
 static TILE_GET_INFO( get_unkch_reel2_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->reel2_ram[tile_index];
 	int attr = state->reel2_attrram[tile_index];
 
@@ -223,7 +223,7 @@ static TILE_GET_INFO( get_unkch_reel2_tile_info )
 
 static TILE_GET_INFO( get_unkch_reel3_tile_info )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 	int code = state->reel3_ram[tile_index];
 	int attr = state->reel3_attrram[tile_index];
 
@@ -239,7 +239,7 @@ static TILE_GET_INFO( get_unkch_reel3_tile_info )
 
 VIDEO_START( goldstar )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 
 	state->reel1_tilemap = tilemap_create(machine,get_goldstar_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
 	state->reel2_tilemap = tilemap_create(machine,get_goldstar_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
@@ -258,7 +258,7 @@ VIDEO_START( goldstar )
 
 VIDEO_START( magical )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 
 	state->reel1_tilemap = tilemap_create(machine,get_goldstar_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
 	state->reel2_tilemap = tilemap_create(machine,get_goldstar_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
@@ -277,7 +277,7 @@ VIDEO_START( magical )
 
 VIDEO_START( unkch )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 
 	state->reel1_tilemap = tilemap_create(machine,get_unkch_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
 	state->reel2_tilemap = tilemap_create(machine,get_unkch_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
@@ -299,7 +299,7 @@ VIDEO_START( unkch )
 
 VIDEO_START( cherrym )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 
 	state->reel1_tilemap = tilemap_create(machine,get_goldstar_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
 	state->reel2_tilemap = tilemap_create(machine,get_goldstar_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
@@ -322,7 +322,7 @@ VIDEO_START( cherrym )
 
 WRITE8_HANDLER( goldstar_fa00_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	/* bit 1 toggles continuously - might be irq enable or watchdog reset */
 
@@ -335,7 +335,7 @@ WRITE8_HANDLER( goldstar_fa00_w )
 
 WRITE8_HANDLER( cm_background_col_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	//printf("cm_background_col_w %02x\n",data);
 
@@ -398,7 +398,7 @@ static const rectangle magical_visible2alt = { 0*8, (16+48)*8-1, 16*8,  28*8-1 }
 
 VIDEO_UPDATE( goldstar )
 {
-	goldstar_state *state = (goldstar_state *)screen->machine->driver_data;
+	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
@@ -444,7 +444,7 @@ VIDEO_UPDATE( goldstar )
 
 VIDEO_UPDATE( magical )
 {
-	goldstar_state *state = (goldstar_state *)screen->machine->driver_data;
+	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
@@ -496,7 +496,7 @@ VIDEO_UPDATE( magical )
 
 VIDEO_UPDATE( unkch )
 {
-	goldstar_state *state = (goldstar_state *)screen->machine->driver_data;
+	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
@@ -546,7 +546,7 @@ VIDEO_UPDATE( unkch )
 
 VIDEO_UPDATE( cmast91 )
 {
-	goldstar_state *state = (goldstar_state *)screen->machine->driver_data;
+	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
@@ -578,7 +578,7 @@ VIDEO_UPDATE( cmast91 )
 
 VIDEO_UPDATE( amcoe1a )
 {
-	goldstar_state *state = (goldstar_state *)screen->machine->driver_data;
+	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));

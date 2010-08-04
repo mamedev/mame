@@ -45,12 +45,13 @@ to prevent disabling inputs.
 
 static const int input_tab[]= { 0x22, 0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0x28, 0x21, 0x41, 0x82, 0x81, 0x42 };
 
-class koikoi_state
+class koikoi_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, koikoi_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, koikoi_state(machine)); }
 
-	koikoi_state(running_machine &machine) { }
+	koikoi_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -74,7 +75,7 @@ public:
 
 static TILE_GET_INFO( get_tile_info )
 {
-	koikoi_state *state = (koikoi_state *)machine->driver_data;
+	koikoi_state *state = machine->driver_data<koikoi_state>();
 	int code  = state->videoram[tile_index] | ((state->videoram[tile_index + 0x400] & 0x40) << 2);
 	int color = (state->videoram[tile_index + 0x400] & 0x1f);
 	int flip  = (state->videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
@@ -129,13 +130,13 @@ static PALETTE_INIT( koikoi )
 
 static VIDEO_START(koikoi)
 {
-	koikoi_state *state = (koikoi_state *)machine->driver_data;
+	koikoi_state *state = machine->driver_data<koikoi_state>();
 	state->tmap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE(koikoi)
 {
-	koikoi_state *state = (koikoi_state *)screen->machine->driver_data;
+	koikoi_state *state = screen->machine->driver_data<koikoi_state>();
 	tilemap_draw(bitmap, cliprect, state->tmap, 0, 0);
 	return 0;
 }
@@ -148,14 +149,14 @@ static VIDEO_UPDATE(koikoi)
 
 static WRITE8_HANDLER( vram_w )
 {
-	koikoi_state *state = (koikoi_state *)space->machine->driver_data;
+	koikoi_state *state = space->machine->driver_data<koikoi_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tmap, offset & 0x3ff);
 }
 
 static READ8_DEVICE_HANDLER( input_r )
 {
-	koikoi_state *state = (koikoi_state *)device->machine->driver_data;
+	koikoi_state *state = device->machine->driver_data<koikoi_state>();
 
 	if (state->inputcnt < 0)
 		return 0;
@@ -198,7 +199,7 @@ static WRITE8_DEVICE_HANDLER( unknown_w )
 
 static READ8_HANDLER( io_r )
 {
-	koikoi_state *state = (koikoi_state *)space->machine->driver_data;
+	koikoi_state *state = space->machine->driver_data<koikoi_state>();
 	if (!offset)
 		return input_port_read(space->machine, "IN0") ^ state->ioram[4]; //coin
 
@@ -207,7 +208,7 @@ static READ8_HANDLER( io_r )
 
 static WRITE8_HANDLER( io_w )
 {
-	koikoi_state *state = (koikoi_state *)space->machine->driver_data;
+	koikoi_state *state = space->machine->driver_data<koikoi_state>();
 	if (offset == 7 && data == 0)
 		state->inputcnt = 0; //reset read cycle counter
 
@@ -335,7 +336,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( koikoi )
 {
-	koikoi_state *state = (koikoi_state *)machine->driver_data;
+	koikoi_state *state = machine->driver_data<koikoi_state>();
 
 	state_save_register_global(machine, state->inputcnt);
 	state_save_register_global(machine, state->inputval);
@@ -345,7 +346,7 @@ static MACHINE_START( koikoi )
 
 static MACHINE_RESET( koikoi )
 {
-	koikoi_state *state = (koikoi_state *)machine->driver_data;
+	koikoi_state *state = machine->driver_data<koikoi_state>();
 	int i;
 
 	state->inputcnt = -1;

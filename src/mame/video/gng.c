@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	gng_state *state = (gng_state *)machine->driver_data;
+	gng_state *state = machine->driver_data<gng_state>();
 	UINT8 attr = state->fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	gng_state *state = (gng_state *)machine->driver_data;
+	gng_state *state = machine->driver_data<gng_state>();
 	UINT8 attr = state->bgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			1,
@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( gng )
 {
-	gng_state *state = (gng_state *)machine->driver_data;
+	gng_state *state = machine->driver_data<gng_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 
@@ -67,14 +67,14 @@ VIDEO_START( gng )
 
 WRITE8_HANDLER( gng_fgvideoram_w )
 {
-	gng_state *state = (gng_state *)space->machine->driver_data;
+	gng_state *state = space->machine->driver_data<gng_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( gng_bgvideoram_w )
 {
-	gng_state *state = (gng_state *)space->machine->driver_data;
+	gng_state *state = space->machine->driver_data<gng_state>();
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x3ff);
 }
@@ -82,14 +82,14 @@ WRITE8_HANDLER( gng_bgvideoram_w )
 
 WRITE8_HANDLER( gng_bgscrollx_w )
 {
-	gng_state *state = (gng_state *)space->machine->driver_data;
+	gng_state *state = space->machine->driver_data<gng_state>();
 	state->scrollx[offset] = data;
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * state->scrollx[1]);
 }
 
 WRITE8_HANDLER( gng_bgscrolly_w )
 {
-	gng_state *state = (gng_state *)space->machine->driver_data;
+	gng_state *state = space->machine->driver_data<gng_state>();
 	state->scrolly[offset] = data;
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[0] + 256 * state->scrolly[1]);
 }
@@ -141,7 +141,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( gng )
 {
-	gng_state *state = (gng_state *)screen->machine->driver_data;
+	gng_state *state = screen->machine->driver_data<gng_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

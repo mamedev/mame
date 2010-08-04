@@ -212,7 +212,7 @@ GFXDECODE_END
 
 static MACHINE_START( bsktball )
 {
-	bsktball_state *state = (bsktball_state *)machine->driver_data;
+	bsktball_state *state = machine->driver_data<bsktball_state>();
 
 	state_save_register_global(machine, state->nmi_on);
 	state_save_register_global(machine, state->i256v);
@@ -230,7 +230,7 @@ static MACHINE_START( bsktball )
 
 static MACHINE_RESET( bsktball )
 {
-	bsktball_state *state = (bsktball_state *)machine->driver_data;
+	bsktball_state *state = machine->driver_data<bsktball_state>();
 
 	state->nmi_on = 0;
 	state->i256v = 0;

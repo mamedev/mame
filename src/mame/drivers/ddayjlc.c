@@ -56,12 +56,13 @@ $842f = lives
 #include "sound/ay8910.h"
 
 
-class ddayjlc_state
+class ddayjlc_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddayjlc_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ddayjlc_state(machine)); }
 
-	ddayjlc_state(running_machine &machine) { }
+	ddayjlc_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  bgram;
@@ -131,25 +132,25 @@ static const UINT8 prot_data[0x10] =
 
 static CUSTOM_INPUT( prot_r )
 {
-	ddayjlc_state *state = (ddayjlc_state *)field->port->machine->driver_data;
+	ddayjlc_state *state = field->port->machine->driver_data<ddayjlc_state>();
 	return prot_data[state->prot_addr];
 }
 
 static WRITE8_HANDLER( prot_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 	state->prot_addr = (state->prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
 static WRITE8_HANDLER( char_bank_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 	state->char_bank = data;
 }
 
 static WRITE8_HANDLER( ddayjlc_bgram_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 
 	if (!offset)
 		tilemap_set_scrollx(state->bg_tilemap, 0, data + 8);
@@ -160,38 +161,38 @@ static WRITE8_HANDLER( ddayjlc_bgram_w )
 
 static WRITE8_HANDLER( ddayjlc_videoram_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 	state->videoram[offset] = data;
 }
 
 
 static WRITE8_HANDLER(sound_nmi_w)
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 	state->sound_nmi_enable = data;
 }
 
 static WRITE8_HANDLER(main_nmi_w)
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 	state->main_nmi_enable = data;
 }
 
 static WRITE8_HANDLER( bg0_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 	state->bgadr = (state->bgadr & 0xfe) | (data & 1);
 }
 
 static WRITE8_HANDLER( bg1_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 	state->bgadr = (state->bgadr & 0xfd) | ((data & 1) << 1);
 }
 
 static WRITE8_HANDLER( bg2_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 
 	state->bgadr = (state->bgadr & 0xfb) | ((data & 1) << 2);
 	if (state->bgadr > 2)
@@ -202,7 +203,7 @@ static WRITE8_HANDLER( bg2_w )
 
 static WRITE8_HANDLER( sound_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
@@ -210,7 +211,7 @@ static WRITE8_HANDLER( sound_w )
 
 static WRITE8_HANDLER( i8257_CH0_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 
 	state->e00x_d[offset][state->e00x_l[offset]] = data;
 	state->e00x_l[offset] ^= 1;
@@ -218,7 +219,7 @@ static WRITE8_HANDLER( i8257_CH0_w )
 
 static WRITE8_HANDLER( i8257_LMSR_w )
 {
-	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 
 	if (!data)
 	{
@@ -367,7 +368,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+	ddayjlc_state *state = machine->driver_data<ddayjlc_state>();
 	int code = state->bgram[tile_index] + ((state->bgram[tile_index + 0x400] & 0x08) << 5);
 	int color = (state->bgram[tile_index + 0x400] & 0x7);
 	color |= (state->bgram[tile_index + 0x400] & 0x40) >> 3;
@@ -377,13 +378,13 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 static VIDEO_START( ddayjlc )
 {
-	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+	ddayjlc_state *state = machine->driver_data<ddayjlc_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE( ddayjlc )
 {
-	ddayjlc_state *state = (ddayjlc_state *)screen->machine->driver_data;
+	ddayjlc_state *state = screen->machine->driver_data<ddayjlc_state>();
 	UINT32 i;
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
@@ -430,14 +431,14 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN( ddayjlc_interrupt )
 {
-	ddayjlc_state *state = (ddayjlc_state *)device->machine->driver_data;
+	ddayjlc_state *state = device->machine->driver_data<ddayjlc_state>();
 	if(state->main_nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 {
-	ddayjlc_state *state = (ddayjlc_state *)device->machine->driver_data;
+	ddayjlc_state *state = device->machine->driver_data<ddayjlc_state>();
 	if(state->sound_nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -445,7 +446,7 @@ static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 
 static MACHINE_START( ddayjlc )
 {
-	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+	ddayjlc_state *state = machine->driver_data<ddayjlc_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -464,7 +465,7 @@ static MACHINE_START( ddayjlc )
 
 static MACHINE_RESET( ddayjlc )
 {
-	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+	ddayjlc_state *state = machine->driver_data<ddayjlc_state>();
 	int i;
 
 	state->char_bank = 0;

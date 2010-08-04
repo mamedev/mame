@@ -228,7 +228,7 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 /* Read/Write Handlers */
 static READ8_HANDLER( devram_r )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 
 	// There's an MCU here, possibly
 	switch (offset)
@@ -263,7 +263,7 @@ static READ8_HANDLER( devram_r )
 
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	cpu_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -274,7 +274,7 @@ static WRITE8_HANDLER( master_bankswitch_w )
 
 static WRITE8_HANDLER( slave_bankswitch_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 
 	memory_set_bank(space->machine, "bank2", data & 0x07);
 
@@ -291,7 +291,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static READ8_HANDLER( soundcommand_status_r )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
 	return 4 + state->soundlatch_status * 2 + (1 - state->soundlatch2_status);
@@ -299,21 +299,21 @@ static READ8_HANDLER( soundcommand_status_r )
 
 static READ8_HANDLER( soundcommand_r )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	state->soundlatch_status = 0;	// soundlatch has been read
 	return soundlatch_r(space, 0);
 }
 
 static READ8_HANDLER( soundcommand2_r )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	state->soundlatch2_status = 0;	// soundlatch2 has been read
 	return soundlatch2_r(space, 0);
 }
 
 static WRITE8_HANDLER( soundcommand_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	soundlatch_w(space, 0, data);
 	state->soundlatch_status = 1;	// soundlatch has been written
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
@@ -321,14 +321,14 @@ static WRITE8_HANDLER( soundcommand_w )
 
 static WRITE8_HANDLER( soundcommand2_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	soundlatch2_w(space, 0, data);
 	state->soundlatch2_status = 1;	// soundlatch2 has been written
 }
 
 static WRITE8_HANDLER( airbustr_paletteram_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	int val;
 
 	/*  ! byte 1 ! ! byte 0 !   */
@@ -559,14 +559,14 @@ static const ym2203_interface ym2203_config =
 
 static INTERRUPT_GEN( master_interrupt )
 {
-	airbustr_state *state = (airbustr_state *)device->machine->driver_data;
+	airbustr_state *state = device->machine->driver_data<airbustr_state>();
 	state->master_addr ^= 0x02;
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, state->master_addr);
 }
 
 static INTERRUPT_GEN( slave_interrupt )
 {
-	airbustr_state *state = (airbustr_state *)device->machine->driver_data;
+	airbustr_state *state = device->machine->driver_data<airbustr_state>();
 	state->slave_addr ^= 0x02;
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, state->slave_addr);
 }
@@ -575,7 +575,7 @@ static INTERRUPT_GEN( slave_interrupt )
 
 static MACHINE_START( airbustr )
 {
-	airbustr_state *state = (airbustr_state *)machine->driver_data;
+	airbustr_state *state = machine->driver_data<airbustr_state>();
 	UINT8 *MASTER = memory_region(machine, "master");
 	UINT8 *SLAVE = memory_region(machine, "slave");
 	UINT8 *AUDIO = memory_region(machine, "audiocpu");
@@ -605,7 +605,7 @@ static MACHINE_START( airbustr )
 
 static MACHINE_RESET( airbustr )
 {
-	airbustr_state *state = (airbustr_state *)machine->driver_data;
+	airbustr_state *state = machine->driver_data<airbustr_state>();
 
 	state->soundlatch_status = state->soundlatch2_status = 0;
 	state->master_addr = 0xff;

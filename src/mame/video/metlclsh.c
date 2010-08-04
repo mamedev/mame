@@ -24,7 +24,7 @@
 
 WRITE8_HANDLER( metlclsh_rambank_w )
 {
-	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
 
 	if (data & 1)
 	{
@@ -40,7 +40,7 @@ WRITE8_HANDLER( metlclsh_rambank_w )
 
 WRITE8_HANDLER( metlclsh_gfxbank_w )
 {
-	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
 
 	if (!(data & 4) && (state->gfxbank != data))
 	{
@@ -73,13 +73,13 @@ static TILEMAP_MAPPER( metlclsh_bgtilemap_scan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	metlclsh_state *state = (metlclsh_state *)machine->driver_data;
+	metlclsh_state *state = machine->driver_data<metlclsh_state>();
 	SET_TILE_INFO(1, state->bgram[tile_index] + (state->gfxbank << 7), 0, 0);
 }
 
 WRITE8_HANDLER( metlclsh_bgram_w )
 {
-	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
 
 	/*  This ram is banked: it's either the tilemap (e401 = 1)
         or bit n of another area (e401 = n << 1)? (that I don't understand) */
@@ -117,7 +117,7 @@ WRITE8_HANDLER( metlclsh_bgram_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	metlclsh_state *state = (metlclsh_state *)machine->driver_data;
+	metlclsh_state *state = machine->driver_data<metlclsh_state>();
 	UINT8 code = state->fgram[tile_index + 0x000];
 	UINT8 attr = state->fgram[tile_index + 0x400];
 	SET_TILE_INFO(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0);
@@ -126,7 +126,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE8_HANDLER( metlclsh_fgram_w )
 {
-	metlclsh_state *state = (metlclsh_state *)space->machine->driver_data;
+	metlclsh_state *state = space->machine->driver_data<metlclsh_state>();
 	state->fgram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 }
@@ -140,7 +140,7 @@ WRITE8_HANDLER( metlclsh_fgram_w )
 
 VIDEO_START( metlclsh )
 {
-	metlclsh_state *state = (metlclsh_state *)machine->driver_data;
+	metlclsh_state *state = machine->driver_data<metlclsh_state>();
 
 	state->otherram = auto_alloc_array(machine, UINT8, 0x800);	// banked ram
 
@@ -176,7 +176,7 @@ VIDEO_START( metlclsh )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	metlclsh_state *state = (metlclsh_state *)machine->driver_data;
+	metlclsh_state *state = machine->driver_data<metlclsh_state>();
 	UINT8 *spriteram = state->spriteram;
 	gfx_element *gfx = machine->gfx[0];
 	int offs;
@@ -244,7 +244,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( metlclsh )
 {
-	metlclsh_state *state = (metlclsh_state *)screen->machine->driver_data;
+	metlclsh_state *state = screen->machine->driver_data<metlclsh_state>();
 
 	bitmap_fill(bitmap, cliprect, 0x10);
 

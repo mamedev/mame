@@ -52,7 +52,7 @@ static WRITE8_DEVICE_HANDLER( toypop_sound_sharedram_w )
 
 static READ16_HANDLER( toypop_m68000_sharedram_r )
 {
-	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	toypop_state *state = space->machine->driver_data<toypop_state>();
 	return state->m68000_sharedram[offset];
 }
 
@@ -60,7 +60,7 @@ static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toypop_state *state = (toypop_state *)space->machine->driver_data;
+		toypop_state *state = space->machine->driver_data<toypop_state>();
 		state->m68000_sharedram[offset] = data & 0xff;
 	}
 }
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( toypop_m68000_assert_w )
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	toypop_state *state = (toypop_state *)machine->driver_data;
+	toypop_state *state = machine->driver_data<toypop_state>();
 	cpu_interrupt_enable(machine->device("maincpu"), 0);
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	cpu_interrupt_enable(machine->device("audiocpu"), 0);
@@ -172,20 +172,20 @@ static MACHINE_RESET( toypop )
 
 static INTERRUPT_GEN( toypop_m68000_interrupt )
 {
-	toypop_state *state = (toypop_state *)device->machine->driver_data;
+	toypop_state *state = device->machine->driver_data<toypop_state>();
 	if (state->interrupt_enable_68k)
 		cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )
 {
-	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	toypop_state *state = space->machine->driver_data<toypop_state>();
 	state->interrupt_enable_68k = 1;
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
 {
-	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	toypop_state *state = space->machine->driver_data<toypop_state>();
 	state->interrupt_enable_68k = 0;
 }
 

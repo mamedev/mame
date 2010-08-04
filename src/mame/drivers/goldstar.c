@@ -121,7 +121,7 @@
 
 static NVRAM_HANDLER( goldstar )
 {
-	goldstar_state *state = (goldstar_state *)machine->driver_data;
+	goldstar_state *state = machine->driver_data<goldstar_state>();
 
 	if (read_or_write)
 		mame_fwrite(file,state->nvram,state->nvram_size);
@@ -137,7 +137,7 @@ static NVRAM_HANDLER( goldstar )
 
 static WRITE8_HANDLER( protection_w )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	if (data == 0x2a)
 		state->dataoffset = 0;
@@ -145,7 +145,7 @@ static WRITE8_HANDLER( protection_w )
 
 static READ8_HANDLER( protection_r )
 {
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 	static const int data[4] = { 0x47, 0x4f, 0x4c, 0x44 };
 
 	state->dataoffset %= 4;
@@ -400,7 +400,7 @@ static WRITE8_HANDLER( magical_outb850_w )
 {
 	// guess, could be wrong, this might just be lights
 
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	if (data&0x20)
 		state->tile_bank = 1;
@@ -569,7 +569,7 @@ static WRITE8_HANDLER( unkcm_0x02_w )
 static WRITE8_HANDLER( unkcm_0x03_w )
 {
 	//popmessage("unkcm_0x03_w %02x", data);
-	goldstar_state *state = (goldstar_state *)space->machine->driver_data;
+	goldstar_state *state = space->machine->driver_data<goldstar_state>();
 
 	state->unkch_vidreg = data;
 
@@ -5360,21 +5360,21 @@ static const ppi8255_interface cm_ppi8255_intf[2] =
 
 static WRITE8_DEVICE_HANDLER( system_outputa_w )
 {
-	//goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	//goldstar_state *state = device->machine->driver_data<goldstar_state>();
 	//popmessage("system_outputa_w %02x",data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( system_outputb_w )
 {
-	//goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	//goldstar_state *state = device->machine->driver_data<goldstar_state>();
 	//popmessage("system_outputb_w %02x",data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( system_outputc_w )
 {
-	goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	goldstar_state *state = device->machine->driver_data<goldstar_state>();
 
 	state->lucky8_nmi_enable = data & 8;
 	state->unkch_vidreg = data & 2;
@@ -5480,13 +5480,13 @@ static const ay8910_interface cm_ay8910_config =
 
 static WRITE8_DEVICE_HANDLER( ay8910_outputa_w )
 {
-	//goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	//goldstar_state *state = device->machine->driver_data<goldstar_state>();
 	//popmessage("ay8910_outputa_w %02x",data);
 }
 
 static WRITE8_DEVICE_HANDLER( ay8910_outputb_w )
 {
-	//goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	//goldstar_state *state = device->machine->driver_data<goldstar_state>();
 	//popmessage("ay8910_outputb_w %02x",data);
 }
 
@@ -5931,7 +5931,7 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( lucky8_irq )
 {
-	goldstar_state *state = (goldstar_state *)device->machine->driver_data;
+	goldstar_state *state = device->machine->driver_data<goldstar_state>();
 
 	if(state->lucky8_nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);

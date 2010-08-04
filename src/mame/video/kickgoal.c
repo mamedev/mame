@@ -6,21 +6,21 @@
 
 WRITE16_HANDLER( kickgoal_fgram_w )
 {
-	kickgoal_state *state = (kickgoal_state *)space->machine->driver_data;
+	kickgoal_state *state = space->machine->driver_data<kickgoal_state>();
 	state->fgram[offset] = data;
 	tilemap_mark_tile_dirty(state->fgtm, offset / 2);
 }
 
 WRITE16_HANDLER( kickgoal_bgram_w )
 {
-	kickgoal_state *state = (kickgoal_state *)space->machine->driver_data;
+	kickgoal_state *state = space->machine->driver_data<kickgoal_state>();
 	state->bgram[offset] = data;
 	tilemap_mark_tile_dirty(state->bgtm, offset / 2);
 }
 
 WRITE16_HANDLER( kickgoal_bg2ram_w )
 {
-	kickgoal_state *state = (kickgoal_state *)space->machine->driver_data;
+	kickgoal_state *state = space->machine->driver_data<kickgoal_state>();
 	state->bg2ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg2tm, offset / 2);
 }
@@ -30,7 +30,7 @@ WRITE16_HANDLER( kickgoal_bg2ram_w )
 /* FG */
 static TILE_GET_INFO( get_kickgoal_fg_tile_info )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 	int tileno = state->fgram[tile_index * 2] & 0x0fff;
 	int color = state->fgram[tile_index * 2 + 1] & 0x000f;
 
@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_kickgoal_fg_tile_info )
 /* BG */
 static TILE_GET_INFO( get_kickgoal_bg_tile_info )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 	int tileno = state->bgram[tile_index * 2] & 0x0fff;
 	int color = state->bgram[tile_index * 2 + 1] & 0x000f;
 
@@ -50,7 +50,7 @@ static TILE_GET_INFO( get_kickgoal_bg_tile_info )
 /* BG 2 */
 static TILE_GET_INFO( get_kickgoal_bg2_tile_info )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 	int tileno = state->bg2ram[tile_index * 2] & 0x07ff;
 	int color = state->bg2ram[tile_index * 2 + 1] & 0x000f;
 	int flipx = state->bg2ram[tile_index * 2 + 1] & 0x0020;
@@ -80,7 +80,7 @@ static TILEMAP_MAPPER( tilemap_scan_kicksfg )
 
 VIDEO_START( kickgoal )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 
 	state->fgtm = tilemap_create(machine, get_kickgoal_fg_tile_info, tilemap_scan_kicksfg, 8, 16, 64, 64);
 	state->bgtm = tilemap_create(machine, get_kickgoal_bg_tile_info, tilemap_scan_kicksbg, 16, 32, 64, 64);
@@ -94,7 +94,7 @@ VIDEO_START( kickgoal )
 
 static void kickgoal_draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 	UINT16 *spriteram = state->spriteram;
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
@@ -124,7 +124,7 @@ static void kickgoal_draw_sprites( running_machine *machine, bitmap_t *bitmap,co
 
 VIDEO_UPDATE( kickgoal )
 {
-	kickgoal_state *state = (kickgoal_state *)screen->machine->driver_data;
+	kickgoal_state *state = screen->machine->driver_data<kickgoal_state>();
 
 	/* set scroll */
 	tilemap_set_scrollx(state->fgtm, 0, state->scrram[0]);
@@ -161,7 +161,7 @@ VIDEO_UPDATE( kickgoal )
 /* FG */
 static TILE_GET_INFO( get_actionhw_fg_tile_info )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 	int tileno = state->fgram[tile_index * 2] & 0x0fff;
 	int color = state->fgram[tile_index * 2 + 1] & 0x000f;
 
@@ -171,7 +171,7 @@ static TILE_GET_INFO( get_actionhw_fg_tile_info )
 /* BG */
 static TILE_GET_INFO( get_actionhw_bg_tile_info )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 	int tileno = state->bgram[tile_index * 2] & 0x1fff;
 	int color = state->bgram[tile_index * 2 + 1] & 0x000f;
 	int flipx = state->bgram[tile_index * 2 + 1] & 0x0020;
@@ -183,7 +183,7 @@ static TILE_GET_INFO( get_actionhw_bg_tile_info )
 /* BG 2 */
 static TILE_GET_INFO( get_actionhw_bg2_tile_info )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 	int tileno = state->bg2ram[tile_index * 2] & 0x1fff;
 	int color = state->bg2ram[tile_index * 2 + 1] & 0x000f;
 	int flipx = state->bg2ram[tile_index * 2 + 1] & 0x0020;
@@ -214,7 +214,7 @@ static TILEMAP_MAPPER( tilemap_scan_actionhwfg )
 
 VIDEO_START( actionhw )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 
 	state->fgtm = tilemap_create(machine, get_actionhw_fg_tile_info, tilemap_scan_actionhwfg, 8, 8, 64, 64);
 	state->bgtm = tilemap_create(machine, get_actionhw_bg_tile_info, tilemap_scan_actionhwbg, 16, 16, 64, 64);
@@ -227,7 +227,7 @@ VIDEO_START( actionhw )
 
 static void actionhw_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 	UINT16 *spriteram = state->spriteram;
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
@@ -255,7 +255,7 @@ static void actionhw_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 VIDEO_UPDATE( actionhw )
 {
-	kickgoal_state *state = (kickgoal_state *)screen->machine->driver_data;
+	kickgoal_state *state = screen->machine->driver_data<kickgoal_state>();
 	/* set scroll */
 	tilemap_set_scrollx(state->fgtm, 0, state->scrram[0]);
 	tilemap_set_scrolly(state->fgtm, 0, state->scrram[1]);

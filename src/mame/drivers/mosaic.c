@@ -14,7 +14,7 @@
 
 static WRITE8_HANDLER( protection_w )
 {
-	mosaic_state *state = (mosaic_state *)space->machine->driver_data;
+	mosaic_state *state = space->machine->driver_data<mosaic_state>();
 
 	if (!BIT(data, 7))
 	{
@@ -40,7 +40,7 @@ static WRITE8_HANDLER( protection_w )
 
 static READ8_HANDLER( protection_r )
 {
-	mosaic_state *state = (mosaic_state *)space->machine->driver_data;
+	mosaic_state *state = space->machine->driver_data<mosaic_state>();
 	int res = (state->prot_val >> 8) & 0xff;
 
 	logerror("%06x: protection_r %02x\n", cpu_get_pc(space->cpu), res);
@@ -52,7 +52,7 @@ static READ8_HANDLER( protection_r )
 
 static WRITE8_HANDLER( gfire2_protection_w )
 {
-	mosaic_state *state = (mosaic_state *)space->machine->driver_data;
+	mosaic_state *state = space->machine->driver_data<mosaic_state>();
 
 	logerror("%06x: protection_w %02x\n", cpu_get_pc(space->cpu), data);
 
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( gfire2_protection_w )
 
 static READ8_HANDLER( gfire2_protection_r )
 {
-	mosaic_state *state = (mosaic_state *)space->machine->driver_data;
+	mosaic_state *state = space->machine->driver_data<mosaic_state>();
 	int res = state->prot_val & 0xff;
 
 	state->prot_val >>= 8;
@@ -255,14 +255,14 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( mosaic )
 {
-	mosaic_state *state = (mosaic_state *)machine->driver_data;
+	mosaic_state *state = machine->driver_data<mosaic_state>();
 
 	state_save_register_global(machine, state->prot_val);
 }
 
 static MACHINE_RESET( mosaic )
 {
-	mosaic_state *state = (mosaic_state *)machine->driver_data;
+	mosaic_state *state = machine->driver_data<mosaic_state>();
 
 	state->prot_val = 0;
 }

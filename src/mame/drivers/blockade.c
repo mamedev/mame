@@ -58,7 +58,7 @@
 
 static INTERRUPT_GEN( blockade_interrupt )
 {
-	blockade_state *state = (blockade_state *)device->machine->driver_data;
+	blockade_state *state = device->machine->driver_data<blockade_state>();
 	cpu_resume(device, SUSPEND_ANY_REASON);
 
 	if ((input_port_read(device->machine, "IN0") & 0x80) == 0)
@@ -76,7 +76,7 @@ static INTERRUPT_GEN( blockade_interrupt )
 
 static READ8_HANDLER( blockade_input_port_0_r )
 {
-	blockade_state *state = (blockade_state *)space->machine->driver_data;
+	blockade_state *state = space->machine->driver_data<blockade_state>();
 	/* coin latch is bit 7 */
 	UINT8 temp = (input_port_read(space->machine, "IN0") & 0x7f);
 
@@ -85,7 +85,7 @@ static READ8_HANDLER( blockade_input_port_0_r )
 
 static WRITE8_HANDLER( blockade_coin_latch_w )
 {
-	blockade_state *state = (blockade_state *)space->machine->driver_data;
+	blockade_state *state = space->machine->driver_data<blockade_state>();
 
 	if (data & 0x80)
 	{
@@ -466,7 +466,7 @@ static PALETTE_INIT( bw )
 
 static MACHINE_START( blockade )
 {
-	blockade_state *state = (blockade_state *)machine->driver_data;
+	blockade_state *state = machine->driver_data<blockade_state>();
 
 	state_save_register_global(machine, state->coin_latch);
 	state_save_register_global(machine, state->just_been_reset);
@@ -474,7 +474,7 @@ static MACHINE_START( blockade )
 
 static MACHINE_RESET( blockade )
 {
-	blockade_state *state = (blockade_state *)machine->driver_data;
+	blockade_state *state = machine->driver_data<blockade_state>();
 
 	state->coin_latch = 1;
 	state->just_been_reset = 0;

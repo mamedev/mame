@@ -25,7 +25,7 @@ PALETTE_INIT( bladestl )
 
 static void set_pens( running_machine *machine )
 {
-	bladestl_state *state = (bladestl_state *)machine->driver_data;
+	bladestl_state *state = machine->driver_data<bladestl_state>();
 	int i;
 
 	for (i = 0x00; i < 0x60; i += 2)
@@ -48,7 +48,7 @@ static void set_pens( running_machine *machine )
 
 void bladestl_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags )
 {
-	bladestl_state *state = (bladestl_state *)machine->driver_data;
+	bladestl_state *state = machine->driver_data<bladestl_state>();
 
 	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
 	*color = state->layer_colorbase[layer];
@@ -62,7 +62,7 @@ void bladestl_tile_callback( running_machine *machine, int layer, int bank, int 
 
 void bladestl_sprite_callback( running_machine *machine, int *code,int *color )
 {
-	bladestl_state *state = (bladestl_state *)machine->driver_data;
+	bladestl_state *state = machine->driver_data<bladestl_state>();
 
 	*code |= ((*color & 0xc0) << 2) + state->spritebank;
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
@@ -78,7 +78,7 @@ void bladestl_sprite_callback( running_machine *machine, int *code,int *color )
 
 VIDEO_UPDATE( bladestl )
 {
-	bladestl_state *state = (bladestl_state *)screen->machine->driver_data;
+	bladestl_state *state = screen->machine->driver_data<bladestl_state>();
 	set_pens(screen->machine);
 
 	k007342_tilemap_update(state->k007342);

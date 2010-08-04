@@ -6,14 +6,14 @@
 
 #include "machine/atarigen.h"
 
-class atarigx2_state
+class atarigx2_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarigx2_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarigx2_state(machine)); }
 
-	atarigx2_state(running_machine &machine) { }
+	atarigx2_state(running_machine &machine)
+		: atarigen_state(machine) { }
 
-	atarigen_state	atarigen;
 	UINT16			playfield_base;
 	UINT16			motion_object_base;
 	UINT16			motion_object_mask;

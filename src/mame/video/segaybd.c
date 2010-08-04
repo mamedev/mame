@@ -17,7 +17,7 @@
 
 VIDEO_START( yboard )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	/* compute palette info */
 	segaic16_palette_init(0x2000);
@@ -41,7 +41,7 @@ VIDEO_START( yboard )
 
 VIDEO_UPDATE( yboard )
 {
-	segas1x_state *state = (segas1x_state *)screen->machine->driver_data;
+	segas1x_state *state = screen->machine->driver_data<segas1x_state>();
 	rectangle yboard_clip;
 
 	/* if no drawing is happening, fill with black and get out */

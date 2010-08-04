@@ -42,7 +42,7 @@ WRITE8_HANDLER( tgtball_flipscreen_w )
 /* 800 bytes for red, followed by 800 bytes for green & 800 bytes for blue */
 WRITE8_HANDLER( paradise_palette_w )
 {
-	paradise_state *state = (paradise_state *)space->machine->driver_data;
+	paradise_state *state = space->machine->driver_data<paradise_state>();
 	state->paletteram[offset] = data;
 	offset %= 0x800;
 	palette_set_color_rgb(space->machine, offset, state->paletteram[offset + 0x800 * 0], state->paletteram[offset + 0x800 * 1],
@@ -63,7 +63,7 @@ WRITE8_HANDLER( paradise_palette_w )
 /* Background */
 WRITE8_HANDLER( paradise_vram_0_w )
 {
-	paradise_state *state = (paradise_state *)space->machine->driver_data;
+	paradise_state *state = space->machine->driver_data<paradise_state>();
 	state->vram_0[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap_0, offset % 0x400);
 }
@@ -71,7 +71,7 @@ WRITE8_HANDLER( paradise_vram_0_w )
 /* 16 color tiles with paradise_palbank as color code */
 WRITE8_HANDLER( paradise_palbank_w )
 {
-	paradise_state *state = (paradise_state *)space->machine->driver_data;
+	paradise_state *state = space->machine->driver_data<paradise_state>();
 	int i;
 	int bank1 = (data & 0x0e) | 1;
 	int bank2 = (data & 0xf0);
@@ -89,7 +89,7 @@ WRITE8_HANDLER( paradise_palbank_w )
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 	int code = state->vram_0[tile_index] + (state->vram_0[tile_index + 0x400] << 8);
 	SET_TILE_INFO(1, code, state->palbank, 0);
 }
@@ -98,14 +98,14 @@ static TILE_GET_INFO( get_tile_info_0 )
 /* Midground */
 WRITE8_HANDLER( paradise_vram_1_w )
 {
-	paradise_state *state = (paradise_state *)space->machine->driver_data;
+	paradise_state *state = space->machine->driver_data<paradise_state>();
 	state->vram_1[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap_1, offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 	int code = state->vram_1[tile_index] + (state->vram_1[tile_index + 0x400] << 8);
 	SET_TILE_INFO(2, code, 0, 0);
 }
@@ -114,14 +114,14 @@ static TILE_GET_INFO( get_tile_info_1 )
 /* Foreground */
 WRITE8_HANDLER( paradise_vram_2_w )
 {
-	paradise_state *state = (paradise_state *)space->machine->driver_data;
+	paradise_state *state = space->machine->driver_data<paradise_state>();
 	state->vram_2[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap_2, offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_2 )
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 	int code = state->vram_2[tile_index] + (state->vram_2[tile_index + 0x400] << 8);
 	SET_TILE_INFO(3, code, 0, 0);
 }
@@ -130,7 +130,7 @@ static TILE_GET_INFO( get_tile_info_2 )
 
 WRITE8_HANDLER( paradise_pixmap_w )
 {
-	paradise_state *state = (paradise_state *)space->machine->driver_data;
+	paradise_state *state = space->machine->driver_data<paradise_state>();
 	int x, y;
 
 	state->videoram[offset] = data;
@@ -151,7 +151,7 @@ WRITE8_HANDLER( paradise_pixmap_w )
 
 VIDEO_START( paradise )
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 
 	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 0x20, 0x20);
 	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 0x20, 0x20);
@@ -177,13 +177,13 @@ VIDEO_START( paradise )
 /* Sprites / Layers priority */
 WRITE8_HANDLER( paradise_priority_w )
 {
-	paradise_state *state = (paradise_state *)space->machine->driver_data;
+	paradise_state *state = space->machine->driver_data<paradise_state>();
 	state->priority = data;
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 	UINT8 *spriteram = state->spriteram;
 	int i;
 	for (i = 0; i < state->spriteram_size ; i += state->sprite_inc)
@@ -232,7 +232,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( paradise )
 {
-	paradise_state *state = (paradise_state *)screen->machine->driver_data;
+	paradise_state *state = screen->machine->driver_data<paradise_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -283,7 +283,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 /* no pix layer, no tilemap_0, different priority bits */
 VIDEO_UPDATE( torus )
 {
-	paradise_state *state = (paradise_state *)screen->machine->driver_data;
+	paradise_state *state = screen->machine->driver_data<paradise_state>();
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -315,7 +315,7 @@ VIDEO_UPDATE( torus )
 /* I don't know how the priority bits work on this one */
 VIDEO_UPDATE( madball )
 {
-	paradise_state *state = (paradise_state *)screen->machine->driver_data;
+	paradise_state *state = screen->machine->driver_data<paradise_state>();
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);

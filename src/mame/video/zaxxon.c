@@ -17,7 +17,7 @@
 
 PALETTE_INIT( zaxxon )
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -80,7 +80,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( zaxxon_get_fg_tile_info )
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 	int sx = tile_index % 32;
 	int sy = tile_index / 32;
 	int code = state->videoram[tile_index];
@@ -92,7 +92,7 @@ static TILE_GET_INFO( zaxxon_get_fg_tile_info )
 
 static TILE_GET_INFO( razmataz_get_fg_tile_info )
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 	int code = state->videoram[tile_index];
 	int color = state->color_codes[code] & 0x0f;
 
@@ -102,7 +102,7 @@ static TILE_GET_INFO( razmataz_get_fg_tile_info )
 
 static TILE_GET_INFO( congo_get_fg_tile_info )
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 	int code = state->videoram[tile_index] + (state->congo_fg_bank << 8);
 	int color = state->colorram[tile_index] & 0x1f;
 
@@ -119,7 +119,7 @@ static TILE_GET_INFO( congo_get_fg_tile_info )
 
 static void video_start_common(running_machine *machine, tile_get_info_func fg_tile_info)
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 
 	/* reset globals */
 	state->bg_enable = 0;
@@ -161,7 +161,7 @@ VIDEO_START( razmataz )
 
 VIDEO_START( congo )
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 
 	/* allocate our own spriteram since it is not accessible by the main CPU */
 	state->spriteram = auto_alloc_array(machine, UINT8, 0x100);
@@ -185,7 +185,7 @@ VIDEO_START( congo )
 
 WRITE8_HANDLER( zaxxon_flipscreen_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	/* low bit controls flip; background and sprite flip are handled at render time */
 	flip_screen_set_no_update(space->machine, ~data & 1);
@@ -195,7 +195,7 @@ WRITE8_HANDLER( zaxxon_flipscreen_w )
 
 WRITE8_HANDLER( zaxxon_fg_color_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	/* low bit selects high color palette index */
 	state->fg_color = (data & 1) * 0x80;
@@ -205,7 +205,7 @@ WRITE8_HANDLER( zaxxon_fg_color_w )
 
 WRITE8_HANDLER( zaxxon_bg_position_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	/* 11 bits of scroll position are stored */
 	if (offset == 0)
@@ -217,7 +217,7 @@ WRITE8_HANDLER( zaxxon_bg_position_w )
 
 WRITE8_HANDLER( zaxxon_bg_color_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	/* low bit selects high color palette index */
 	state->bg_color = (data & 1) * 0x80;
@@ -226,7 +226,7 @@ WRITE8_HANDLER( zaxxon_bg_color_w )
 
 WRITE8_HANDLER( zaxxon_bg_enable_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	/* low bit enables/disables the background layer */
 	state->bg_enable = data & 1;
@@ -235,7 +235,7 @@ WRITE8_HANDLER( zaxxon_bg_enable_w )
 
 WRITE8_HANDLER( congo_fg_bank_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	/* low bit controls the topmost character bit */
 	state->congo_fg_bank = data & 1;
@@ -245,7 +245,7 @@ WRITE8_HANDLER( congo_fg_bank_w )
 
 WRITE8_HANDLER( congo_color_bank_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	/* low bit controls the topmost bit into the color PROM */
 	state->congo_color_bank = data & 1;
@@ -262,7 +262,7 @@ WRITE8_HANDLER( congo_color_bank_w )
 
 WRITE8_HANDLER( zaxxon_videoram_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -271,7 +271,7 @@ WRITE8_HANDLER( zaxxon_videoram_w )
 
 WRITE8_HANDLER( congo_colorram_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -287,7 +287,7 @@ WRITE8_HANDLER( congo_colorram_w )
 
 WRITE8_HANDLER( congo_sprite_custom_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 	UINT8 *spriteram = state->spriteram;
 
 	state->congo_custom[offset] = data;
@@ -324,7 +324,7 @@ WRITE8_HANDLER( congo_sprite_custom_w )
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int skew)
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 
 	/* only draw if enabled */
 	if (state->bg_enable)
@@ -442,7 +442,7 @@ INLINE int find_minimum_x(UINT8 value, int flip)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 	UINT8 *spriteram = state->spriteram;
 	const gfx_element *gfx = machine->gfx[2];
 	int flip = flip_screen_get(machine);
@@ -477,7 +477,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( zaxxon )
 {
-	zaxxon_state *state = (zaxxon_state *)screen->machine->driver_data;
+	zaxxon_state *state = screen->machine->driver_data<zaxxon_state>();
 
 	draw_background(screen->machine, bitmap, cliprect, TRUE);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x140, 0x180);
@@ -488,7 +488,7 @@ VIDEO_UPDATE( zaxxon )
 
 VIDEO_UPDATE( futspy )
 {
-	zaxxon_state *state = (zaxxon_state *)screen->machine->driver_data;
+	zaxxon_state *state = screen->machine->driver_data<zaxxon_state>();
 
 	draw_background(screen->machine, bitmap, cliprect, TRUE);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x180, 0x180);
@@ -499,7 +499,7 @@ VIDEO_UPDATE( futspy )
 
 VIDEO_UPDATE( razmataz )
 {
-	zaxxon_state *state = (zaxxon_state *)screen->machine->driver_data;
+	zaxxon_state *state = screen->machine->driver_data<zaxxon_state>();
 
 	draw_background(screen->machine, bitmap, cliprect, FALSE);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x140, 0x180);
@@ -510,7 +510,7 @@ VIDEO_UPDATE( razmataz )
 
 VIDEO_UPDATE( congo )
 {
-	zaxxon_state *state = (zaxxon_state *)screen->machine->driver_data;
+	zaxxon_state *state = screen->machine->driver_data<zaxxon_state>();
 
 	draw_background(screen->machine, bitmap, cliprect, TRUE);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x280, 0x180);

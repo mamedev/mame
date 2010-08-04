@@ -67,7 +67,7 @@ static WRITE8_HANDLER ( funybubl_cpurombank_w )
 
 static WRITE8_HANDLER( funybubl_soundcommand_w )
 {
-	funybubl_state *state = (funybubl_state *)space->machine->driver_data;
+	funybubl_state *state = space->machine->driver_data<funybubl_state>();
 	soundlatch_w(space, 0, data);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -202,7 +202,7 @@ GFXDECODE_END
 
 static MACHINE_START( funybubl )
 {
-	funybubl_state *state = (funybubl_state *)machine->driver_data;
+	funybubl_state *state = machine->driver_data<funybubl_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	state->audiocpu = machine->device("audiocpu");

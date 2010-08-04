@@ -60,13 +60,13 @@ Head Panic
 
 static WRITE16_HANDLER( esd16_spriteram_w )
 {
-	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	esd16_state *state = space->machine->driver_data<esd16_state>();
 	COMBINE_DATA(&state->spriteram[offset]);
 }
 
 static WRITE16_HANDLER( esd16_sound_command_w )
 {
-	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	esd16_state *state = space->machine->driver_data<esd16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
@@ -105,7 +105,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER(hedpanic_platform_w)
 {
-	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	esd16_state *state = space->machine->driver_data<esd16_state>();
 	int offsets = state->headpanic_platform_x[0] + 0x40 * state->headpanic_platform_y[0];
 
 	state->vram_1[offsets] = data;
@@ -115,7 +115,7 @@ static WRITE16_HANDLER(hedpanic_platform_w)
 
 static READ16_HANDLER( esd_eeprom_r )
 {
-	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	esd16_state *state = space->machine->driver_data<esd16_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		return ((eeprom_read_bit(state->eeprom) & 0x01) << 15);
@@ -240,7 +240,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( esd16_sound_command_r )
 {
-	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	esd16_state *state = space->machine->driver_data<esd16_state>();
 
 	/* Clear IRQ only after reading the command, or some get lost */
 	cpu_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
@@ -518,7 +518,7 @@ GFXDECODE_END
 
 static MACHINE_START( esd16 )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 	UINT8 *AUDIO = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank1", 0, 17, &AUDIO[0x0000], 0x4000);
@@ -531,7 +531,7 @@ static MACHINE_START( esd16 )
 
 static MACHINE_RESET( esd16 )
 {
-	esd16_state *state = (esd16_state *)machine->driver_data;
+	esd16_state *state = machine->driver_data<esd16_state>();
 
 	state->tilemap0_color = 0;
 }

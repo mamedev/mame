@@ -4,7 +4,7 @@
 
 WRITE8_HANDLER(ksayakyu_videoram_w)
 {
-	ksayakyu_state *state = (ksayakyu_state *)space->machine->driver_data;
+	ksayakyu_state *state = space->machine->driver_data<ksayakyu_state>();
 	state->videoram[offset]=data;
 	tilemap_mark_tile_dirty(state->textmap, offset >> 1);
 }
@@ -20,7 +20,7 @@ WRITE8_HANDLER(ksayakyu_videoctrl_w)
         xxx      - scroll offset
 
      */
-	ksayakyu_state *state = (ksayakyu_state *)space->machine->driver_data;
+	ksayakyu_state *state = space->machine->driver_data<ksayakyu_state>();
 	state->video_ctrl = data;
 
 	state->flipscreen = data & 4;
@@ -62,7 +62,7 @@ xy-- ---- flip bits
 */
 static TILE_GET_INFO( get_text_tile_info )
 {
-	ksayakyu_state *state = (ksayakyu_state *)machine->driver_data;
+	ksayakyu_state *state = machine->driver_data<ksayakyu_state>();
 	int code = state->videoram[tile_index * 2 + 1];
 	int attr = state->videoram[tile_index * 2];
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ksayakyu_state *state = (ksayakyu_state *)machine->driver_data;
+	ksayakyu_state *state = machine->driver_data<ksayakyu_state>();
 	const UINT8 *source = state->spriteram + state->spriteram_size - 4;
 	const UINT8 *finish = state->spriteram;
 
@@ -118,7 +118,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_START(ksayakyu)
 {
-	ksayakyu_state *state = (ksayakyu_state *)machine->driver_data;
+	ksayakyu_state *state = machine->driver_data<ksayakyu_state>();
 	state->tilemap = tilemap_create(machine, get_ksayakyu_tile_info, tilemap_scan_rows, 8, 8, 32, 32 * 8);
 	state->textmap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->textmap, 0);
@@ -126,7 +126,7 @@ VIDEO_START(ksayakyu)
 
 VIDEO_UPDATE(ksayakyu)
 {
-	ksayakyu_state *state = (ksayakyu_state *)screen->machine->driver_data;
+	ksayakyu_state *state = screen->machine->driver_data<ksayakyu_state>();
 
 	bitmap_fill(bitmap, cliprect, 0);
 

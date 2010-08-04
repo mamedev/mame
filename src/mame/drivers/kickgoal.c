@@ -216,7 +216,7 @@ WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 
 static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 {
-	kickgoal_state *state = (kickgoal_state *)device->machine->driver_data;
+	kickgoal_state *state = device->machine->driver_data<kickgoal_state>();
 	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",cpuexec_describe_context(device->machine),data,mem_mask);
 
 	if (!ACCESSING_BITS_0_7)
@@ -305,7 +305,7 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 
 static INTERRUPT_GEN( kickgoal_interrupt )
 {
-	kickgoal_state *state = (kickgoal_state *)device->machine->driver_data;
+	kickgoal_state *state = device->machine->driver_data<kickgoal_state>();
 
 	if ((okim6295_r(state->adpcm, 0) & 0x08) == 0)
 	{
@@ -459,7 +459,7 @@ static const UINT8 kickgoal_default_eeprom_type1[128] = {
 
 static READ16_HANDLER( kickgoal_eeprom_r )
 {
-	kickgoal_state *state = (kickgoal_state *)space->machine->driver_data;
+	kickgoal_state *state = space->machine->driver_data<kickgoal_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		return eeprom_read_bit(state->eeprom);
@@ -470,7 +470,7 @@ static READ16_HANDLER( kickgoal_eeprom_r )
 
 static WRITE16_HANDLER( kickgoal_eeprom_w )
 {
-	kickgoal_state *state = (kickgoal_state *)space->machine->driver_data;
+	kickgoal_state *state = space->machine->driver_data<kickgoal_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -658,7 +658,7 @@ GFXDECODE_END
 
 static MACHINE_START( kickgoal )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 
 	state_save_register_global_array(machine, state->snd_sam);
 	state_save_register_global(machine, state->melody_loop);
@@ -670,7 +670,7 @@ static MACHINE_START( kickgoal )
 
 static MACHINE_RESET( kickgoal )
 {
-	kickgoal_state *state = (kickgoal_state *)machine->driver_data;
+	kickgoal_state *state = machine->driver_data<kickgoal_state>();
 
 	state->melody_loop = 0;
 	state->snd_new = 0;

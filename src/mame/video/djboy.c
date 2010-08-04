@@ -9,19 +9,19 @@
 
 WRITE8_HANDLER( djboy_scrollx_w )
 {
-	djboy_state *state = (djboy_state *)space->machine->driver_data;
+	djboy_state *state = space->machine->driver_data<djboy_state>();
 	state->scrollx = data;
 }
 
 WRITE8_HANDLER( djboy_scrolly_w )
 {
-	djboy_state *state = (djboy_state *)space->machine->driver_data;
+	djboy_state *state = space->machine->driver_data<djboy_state>();
 	state->scrolly = data;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	djboy_state *state = (djboy_state *)machine->driver_data;
+	djboy_state *state = machine->driver_data<djboy_state>();
 	UINT8 attr = state->videoram[tile_index + 0x800];
 	int code = state->videoram[tile_index] + (attr & 0xf) * 256;
 	int color = attr >> 4;
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 WRITE8_HANDLER( djboy_videoram_w )
 {
-	djboy_state *state = (djboy_state *)space->machine->driver_data;
+	djboy_state *state = space->machine->driver_data<djboy_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->background, offset & 0x7ff);
@@ -42,13 +42,13 @@ WRITE8_HANDLER( djboy_videoram_w )
 
 VIDEO_START( djboy )
 {
-	djboy_state *state = (djboy_state *)machine->driver_data;
+	djboy_state *state = machine->driver_data<djboy_state>();
 	state->background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 }
 
 WRITE8_HANDLER( djboy_paletteram_w )
 {
-	djboy_state *state = (djboy_state *)space->machine->driver_data;
+	djboy_state *state = space->machine->driver_data<djboy_state>();
 	int val;
 
 	state->paletteram[offset] = data;
@@ -66,7 +66,7 @@ VIDEO_UPDATE( djboy )
      * ---x---- flipscreen?
      * ----xxxx ROM bank
      */
-	djboy_state *state = (djboy_state *)screen->machine->driver_data;
+	djboy_state *state = screen->machine->driver_data<djboy_state>();
 	int scroll;
 
 	scroll = state->scrollx | ((state->videoreg & 0xc0) << 2);
@@ -83,6 +83,6 @@ VIDEO_UPDATE( djboy )
 
 VIDEO_EOF( djboy )
 {
-	djboy_state *state = (djboy_state *)machine->driver_data;
+	djboy_state *state = machine->driver_data<djboy_state>();
 	pandora_eof(state->pandora);
 }

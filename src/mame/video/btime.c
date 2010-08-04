@@ -114,7 +114,7 @@ Start the video hardware emulation.
 
 VIDEO_START( btime )
 {
-	btime_state *state = (btime_state *)machine->driver_data;
+	btime_state *state = machine->driver_data<btime_state>();
 
 	if (machine->gfx[0]->srcdata == NULL)
 		gfx_element_set_source(machine->gfx[0], state->deco_charram);
@@ -125,7 +125,7 @@ VIDEO_START( btime )
 
 VIDEO_START( bnj )
 {
-	btime_state *state = (btime_state *)machine->driver_data;
+	btime_state *state = machine->driver_data<btime_state>();
 	/* the background area is twice as wide as the screen */
 	int width = 256;
 	int height = 256;
@@ -146,14 +146,14 @@ WRITE8_HANDLER( btime_paletteram_w )
 
 WRITE8_HANDLER( lnc_videoram_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	state->videoram[offset] = data;
 	state->colorram[offset] = *state->lnc_charbank;
 }
 
 READ8_HANDLER( btime_mirrorvideoram_r )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	int x, y;
 
 	/* swap x and y coordinates */
@@ -166,7 +166,7 @@ READ8_HANDLER( btime_mirrorvideoram_r )
 
 READ8_HANDLER( btime_mirrorcolorram_r )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	int x, y;
 
 	/* swap x and y coordinates */
@@ -179,7 +179,7 @@ READ8_HANDLER( btime_mirrorcolorram_r )
 
 WRITE8_HANDLER( btime_mirrorvideoram_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	int x, y;
 
 	/* swap x and y coordinates */
@@ -204,7 +204,7 @@ WRITE8_HANDLER( lnc_mirrorvideoram_w )
 
 WRITE8_HANDLER( btime_mirrorcolorram_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	int x, y;
 
 	/* swap x and y coordinates */
@@ -217,7 +217,7 @@ WRITE8_HANDLER( btime_mirrorcolorram_w )
 
 WRITE8_HANDLER( deco_charram_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	if (state->deco_charram[offset] == data)
 		return;
 
@@ -234,19 +234,19 @@ WRITE8_HANDLER( deco_charram_w )
 
 WRITE8_HANDLER( bnj_background_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	state->bnj_backgroundram[offset] = data;
 }
 
 WRITE8_HANDLER( bnj_scroll1_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	state->bnj_scroll1 = data;
 }
 
 WRITE8_HANDLER( bnj_scroll2_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	state->bnj_scroll2 = data;
 }
 
@@ -278,7 +278,7 @@ WRITE8_HANDLER( bnj_video_control_w )
 
 WRITE8_HANDLER( zoar_video_control_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	// Zoar video control
 	//
 	// Bit 0-2 = Unknown (always 0). Marked as MCOL on schematics
@@ -293,7 +293,7 @@ WRITE8_HANDLER( zoar_video_control_w )
 
 WRITE8_HANDLER( disco_video_control_w )
 {
-	btime_state *state = (btime_state *)space->machine->driver_data;
+	btime_state *state = space->machine->driver_data<btime_state>();
 	state->btime_palette = (data >> 2) & 0x03;
 
 	if (!(input_port_read(space->machine, "DSW1") & 0x40)) /* cocktail mode */
@@ -303,7 +303,7 @@ WRITE8_HANDLER( disco_video_control_w )
 
 static void draw_chars( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 transparency, UINT8 color, int priority )
 {
-	btime_state *state = (btime_state *)machine->driver_data;
+	btime_state *state = machine->driver_data<btime_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -384,7 +384,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* tmap, UINT8 color )
 {
-	btime_state *state = (btime_state *)machine->driver_data;
+	btime_state *state = machine->driver_data<btime_state>();
 	int i;
 	const UINT8 *gfx = memory_region(machine, "bg_map");
 	int scroll = -(state->bnj_scroll2 | ((state->bnj_scroll1 & 0x03) << 8));
@@ -424,7 +424,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 VIDEO_UPDATE( btime )
 {
-	btime_state *state = (btime_state *)screen->machine->driver_data;
+	btime_state *state = screen->machine->driver_data<btime_state>();
 	if (state->bnj_scroll1 & 0x10)
 	{
 		int i, start;
@@ -455,7 +455,7 @@ VIDEO_UPDATE( btime )
 
 VIDEO_UPDATE( eggs )
 {
-	btime_state *state = (btime_state *)screen->machine->driver_data;
+	btime_state *state = screen->machine->driver_data<btime_state>();
 	draw_chars(screen->machine, bitmap, cliprect, FALSE, 0, -1);
 	draw_sprites(screen->machine, bitmap, cliprect, 0, 0, 0, state->videoram, 0x20);
 
@@ -465,7 +465,7 @@ VIDEO_UPDATE( eggs )
 
 VIDEO_UPDATE( lnc )
 {
-	btime_state *state = (btime_state *)screen->machine->driver_data;
+	btime_state *state = screen->machine->driver_data<btime_state>();
 	draw_chars(screen->machine, bitmap, cliprect, FALSE, 0, -1);
 	draw_sprites(screen->machine, bitmap, cliprect, 0, 1, 2, state->videoram, 0x20);
 
@@ -475,7 +475,7 @@ VIDEO_UPDATE( lnc )
 
 VIDEO_UPDATE( zoar )
 {
-	btime_state *state = (btime_state *)screen->machine->driver_data;
+	btime_state *state = screen->machine->driver_data<btime_state>();
 	if (state->bnj_scroll1 & 0x04)
 	{
 		draw_background(screen->machine, bitmap, cliprect, state->zoar_scrollram, state->btime_palette);
@@ -494,7 +494,7 @@ VIDEO_UPDATE( zoar )
 
 VIDEO_UPDATE( bnj )
 {
-	btime_state *state = (btime_state *)screen->machine->driver_data;
+	btime_state *state = screen->machine->driver_data<btime_state>();
 	if (state->bnj_scroll1)
 	{
 		int scroll, offs;
@@ -544,7 +544,7 @@ VIDEO_UPDATE( bnj )
 
 VIDEO_UPDATE( cookrace )
 {
-	btime_state *state = (btime_state *)screen->machine->driver_data;
+	btime_state *state = screen->machine->driver_data<btime_state>();
 	int offs;
 
 	for (offs = state->bnj_backgroundram_size - 1; offs >=0; offs--)
@@ -576,7 +576,7 @@ VIDEO_UPDATE( cookrace )
 
 VIDEO_UPDATE( disco )
 {
-	btime_state *state = (btime_state *)screen->machine->driver_data;
+	btime_state *state = screen->machine->driver_data<btime_state>();
 	draw_chars(screen->machine, bitmap, cliprect, FALSE, state->btime_palette, -1);
 	draw_sprites(screen->machine, bitmap, cliprect, state->btime_palette, 0, 0, state->spriteram, 1);
 

@@ -2072,13 +2072,13 @@ static void memory_init_locate(running_machine *machine)
 			if (entry->m_baseptr != NULL)
 				*entry->m_baseptr = entry->m_memory;
 			if (entry->m_baseptroffs_plus1 != 0)
-				*(void **)((UINT8 *)machine->driver_data + entry->m_baseptroffs_plus1 - 1) = entry->m_memory;
+				*(void **)(reinterpret_cast<UINT8 *>(machine->driver_data<void>()) + entry->m_baseptroffs_plus1 - 1) = entry->m_memory;
 			if (entry->m_genbaseptroffs_plus1 != 0)
 				*(void **)((UINT8 *)&machine->generic + entry->m_genbaseptroffs_plus1 - 1) = entry->m_memory;
 			if (entry->m_sizeptr != NULL)
 				*entry->m_sizeptr = entry->m_byteend - entry->m_bytestart + 1;
 			if (entry->m_sizeptroffs_plus1 != 0)
-				*(size_t *)((UINT8 *)machine->driver_data + entry->m_sizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
+				*(size_t *)(reinterpret_cast<UINT8 *>(machine->driver_data<void>()) + entry->m_sizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
 			if (entry->m_gensizeptroffs_plus1 != 0)
 				*(size_t *)((UINT8 *)&machine->generic + entry->m_gensizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
 		}

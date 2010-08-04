@@ -32,12 +32,13 @@
 #define JONGKYO_CLOCK 18432000
 
 
-class jongkyo_state
+class jongkyo_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jongkyo_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jongkyo_state(machine)); }
 
-	jongkyo_state(running_machine &machine) { }
+	jongkyo_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -62,7 +63,7 @@ static VIDEO_START( jongkyo )
 
 static VIDEO_UPDATE( jongkyo )
 {
-	jongkyo_state *state = (jongkyo_state *)screen->machine->driver_data;
+	jongkyo_state *state = screen->machine->driver_data<jongkyo_state>();
 	int y;
 
 	for (y = 0; y < 256; ++y)
@@ -112,7 +113,7 @@ static VIDEO_UPDATE( jongkyo )
 
 static WRITE8_HANDLER( bank_select_w )
 {
-	jongkyo_state *state = (jongkyo_state *)space->machine->driver_data;
+	jongkyo_state *state = space->machine->driver_data<jongkyo_state>();
 	int mask = 1 << (offset >> 1);
 
 	state->rom_bank &= ~mask;
@@ -125,7 +126,7 @@ static WRITE8_HANDLER( bank_select_w )
 
 static WRITE8_HANDLER( mux_w )
 {
-	jongkyo_state *state = (jongkyo_state *)space->machine->driver_data;
+	jongkyo_state *state = space->machine->driver_data<jongkyo_state>();
 	state->mux_data = ~data;
 	//  printf("%02x\n", state->mux_data);
 }
@@ -140,7 +141,7 @@ static WRITE8_HANDLER( jongkyo_coin_counter_w )
 
 static READ8_DEVICE_HANDLER( input_1p_r )
 {
-	jongkyo_state *state = (jongkyo_state *)device->machine->driver_data;
+	jongkyo_state *state = device->machine->driver_data<jongkyo_state>();
 	UINT8 cr_clear = input_port_read(device->machine, "CR_CLEAR");
 
 	switch (state->mux_data)
@@ -160,7 +161,7 @@ static READ8_DEVICE_HANDLER( input_1p_r )
 
 static READ8_DEVICE_HANDLER( input_2p_r )
 {
-	jongkyo_state *state = (jongkyo_state *)device->machine->driver_data;
+	jongkyo_state *state = device->machine->driver_data<jongkyo_state>();
 	UINT8 coin_port = input_port_read(device->machine, "COINS");
 
 	switch (state->mux_data)
@@ -180,7 +181,7 @@ static READ8_DEVICE_HANDLER( input_2p_r )
 
 static WRITE8_HANDLER( videoram2_w )
 {
-	jongkyo_state *state = (jongkyo_state *)space->machine->driver_data;
+	jongkyo_state *state = space->machine->driver_data<jongkyo_state>();
 	state->videoram2[offset] = data;
 }
 
@@ -467,7 +468,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( jongkyo )
 {
-	jongkyo_state *state = (jongkyo_state *)machine->driver_data;
+	jongkyo_state *state = machine->driver_data<jongkyo_state>();
 
 	state->videoram2 = auto_alloc_array(machine, UINT8, 0x4000);
 	state_save_register_global_pointer(machine, state->videoram2, 0x4000);
@@ -478,7 +479,7 @@ static MACHINE_START( jongkyo )
 
 static MACHINE_RESET( jongkyo )
 {
-	jongkyo_state *state = (jongkyo_state *)machine->driver_data;
+	jongkyo_state *state = machine->driver_data<jongkyo_state>();
 
 	state->rom_bank = 0;
 	state->mux_data = 0;

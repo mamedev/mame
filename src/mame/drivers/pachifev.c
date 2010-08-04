@@ -48,12 +48,13 @@ Driver by Tomasz Slanina
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50
 
-class pachifev_state
+class pachifev_state : public driver_data_t
 {
 public:
-    static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pachifev_state(machine)); }
+    static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pachifev_state(machine)); }
 
-    pachifev_state(running_machine &machine) { }
+    pachifev_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
  /* controls related */
 
@@ -69,7 +70,7 @@ static WRITE8_HANDLER(controls_w)
 {
     if(!data)
     {
-        pachifev_state *state = (pachifev_state *)space->machine->driver_data;
+        pachifev_state *state = space->machine->driver_data<pachifev_state>();
 
         /*end of input read*/
         state->power=0;
@@ -84,7 +85,7 @@ static WRITE8_HANDLER(controls_w)
 
 static READ8_HANDLER(controls_r)
 {
-    pachifev_state *state = (pachifev_state *)space->machine->driver_data;
+    pachifev_state *state = space->machine->driver_data<pachifev_state>();
     int output_bit=(state->power < state->max_power)?0:1;
     ++state->power;
     return output_bit;
@@ -220,7 +221,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_RESET( pachifev )
 {
-    pachifev_state *state = (pachifev_state *)machine->driver_data;
+    pachifev_state *state = machine->driver_data<pachifev_state>();
 
     state->power=0;
     state->max_power=0;
@@ -239,7 +240,7 @@ static INTERRUPT_GEN( pachifev_vblank_irq )
     TMS9928A_interrupt(device->machine);
 
     {
-        pachifev_state *state = (pachifev_state *)device->machine->driver_data;
+        pachifev_state *state = device->machine->driver_data<pachifev_state>();
         int current_power=input_port_read(device->machine, "PLUNGER") & 0x3f;
         if(current_power != state->previous_power)
         {
@@ -270,7 +271,7 @@ static MACHINE_START( pachifev)
     /* configure VDP */
     TMS9928A_configure(&tms9928a_interface);
     {
-        pachifev_state *state = (pachifev_state *)machine->driver_data;
+        pachifev_state *state = machine->driver_data<pachifev_state>();
 
         state_save_register_global(machine, state->power);
         state_save_register_global(machine, state->max_power);

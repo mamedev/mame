@@ -6,7 +6,7 @@
 
 static TILE_GET_INFO( get_freek_tile_info )
 {
-	freekick_state *state = (freekick_state *)machine->driver_data;
+	freekick_state *state = machine->driver_data<freekick_state>();
 	int tileno, palno;
 
 	tileno = state->videoram[tile_index] + ((state->videoram[tile_index + 0x400] & 0xe0) << 3);
@@ -17,21 +17,21 @@ static TILE_GET_INFO( get_freek_tile_info )
 
 VIDEO_START( freekick )
 {
-	freekick_state *state = (freekick_state *)machine->driver_data;
+	freekick_state *state = machine->driver_data<freekick_state>();
 	state->freek_tilemap = tilemap_create(machine, get_freek_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 WRITE8_HANDLER( freek_videoram_w )
 {
-	freekick_state *state = (freekick_state *)space->machine->driver_data;
+	freekick_state *state = space->machine->driver_data<freekick_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->freek_tilemap, offset & 0x3ff);
 }
 
 static void gigas_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	freekick_state *state = (freekick_state *)machine->driver_data;
+	freekick_state *state = machine->driver_data<freekick_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -66,7 +66,7 @@ static void gigas_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 
 static void pbillrd_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	freekick_state *state = (freekick_state *)machine->driver_data;
+	freekick_state *state = machine->driver_data<freekick_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -102,7 +102,7 @@ static void pbillrd_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 static void freekick_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	freekick_state *state = (freekick_state *)machine->driver_data;
+	freekick_state *state = machine->driver_data<freekick_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -136,7 +136,7 @@ static void freekick_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 VIDEO_UPDATE( gigas )
 {
-	freekick_state *state = (freekick_state *)screen->machine->driver_data;
+	freekick_state *state = screen->machine->driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->freek_tilemap, 0, 0);
 	gigas_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
@@ -144,7 +144,7 @@ VIDEO_UPDATE( gigas )
 
 VIDEO_UPDATE( pbillrd )
 {
-	freekick_state *state = (freekick_state *)screen->machine->driver_data;
+	freekick_state *state = screen->machine->driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->freek_tilemap, 0, 0);
 	pbillrd_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
@@ -152,7 +152,7 @@ VIDEO_UPDATE( pbillrd )
 
 VIDEO_UPDATE( freekick )
 {
-	freekick_state *state = (freekick_state *)screen->machine->driver_data;
+	freekick_state *state = screen->machine->driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->freek_tilemap, 0, 0);
 	freekick_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;

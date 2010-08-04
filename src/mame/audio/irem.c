@@ -20,7 +20,7 @@
 
 static SOUND_START( irem_audio )
 {
-	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+	irem_z80_state *state = machine->driver_data<irem_z80_state>();
 
 	state->adpcm1 = machine->device("msm1");
 	state->adpcm2 = machine->device("msm2");
@@ -58,7 +58,7 @@ WRITE8_HANDLER( irem_sound_cmd_w )
 
 static WRITE8_HANDLER( m6803_port1_w )
 {
-	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
 
 	state->port1 = data;
 }
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( m6803_port1_w )
 
 static WRITE8_HANDLER( m6803_port2_w )
 {
-	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
 
 	/* write latch */
 	if ((state->port2 & 0x01) && !(data & 0x01))
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( m6803_port2_w )
 
 static READ8_HANDLER( m6803_port1_r )
 {
-	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
 
 	/* PSG 0 or 1? */
 	if (state->port2 & 0x08)
@@ -128,7 +128,7 @@ static READ8_HANDLER( m6803_port2_r )
 
 static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
 {
-	irem_z80_state *state = (irem_z80_state *)device->machine->driver_data;
+	irem_z80_state *state = device->machine->driver_data<irem_z80_state>();
 
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	msm5205_playmode_w(state->adpcm1, (data >> 2) & 7);
@@ -165,7 +165,7 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 
 static WRITE8_HANDLER( m52_adpcm_w )
 {
-	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
 
 	if (offset & 1)
 	{
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( m52_adpcm_w )
 
 static WRITE8_HANDLER( m62_adpcm_w )
 {
-	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
 
 	running_device *adpcm = (offset & 1) ? state->adpcm2 : state->adpcm1;
 	if (adpcm != NULL)
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( m62_adpcm_w )
 
 static void adpcm_int(running_device *device)
 {
-	irem_z80_state *state = (irem_z80_state *)device->machine->driver_data;
+	irem_z80_state *state = device->machine->driver_data<irem_z80_state>();
 
 	cputag_set_input_line(device->machine, "iremsound", INPUT_LINE_NMI, PULSE_LINE);
 

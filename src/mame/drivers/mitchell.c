@@ -164,7 +164,7 @@ static WRITE8_HANDLER( pang_bankswitch_w )
 
 static READ8_HANDLER( block_input_r )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *const portnames[] = { "IN1", "IN2" };
 
@@ -209,7 +209,7 @@ static READ8_HANDLER( block_input_r )
 
 static WRITE8_HANDLER( block_dial_control_w )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 
 	if (data == 0x08)
 	{
@@ -226,7 +226,7 @@ static WRITE8_HANDLER( block_dial_control_w )
 
 static READ8_HANDLER( mahjong_input_r )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 	int i;
 	static const char *const keynames[2][5] =
 			{
@@ -245,14 +245,14 @@ static READ8_HANDLER( mahjong_input_r )
 
 static WRITE8_HANDLER( mahjong_input_select_w )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 	state->keymatrix = data;
 }
 
 
 static READ8_HANDLER( input_r )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
 	switch (state->input_type)
@@ -280,7 +280,7 @@ static READ8_HANDLER( input_r )
 
 static WRITE8_HANDLER( input_w )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 
 	switch (state->input_type)
 	{
@@ -368,7 +368,7 @@ ADDRESS_MAP_END
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( spangbl_msm5205_data_w )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 	state->sample_buffer = data;
 }
 #endif
@@ -387,7 +387,7 @@ ADDRESS_MAP_END
 /**** Monsters World ****/
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
-	mitchell_state *state = (mitchell_state *)device->machine->driver_data;
+	mitchell_state *state = device->machine->driver_data<mitchell_state>();
 	state->oki->set_bank_base(0x40000 * (data & 3));
 }
 
@@ -401,7 +401,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(mstworld_sound_w)
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 	soundlatch_w(space, 0, data);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -1080,7 +1080,7 @@ GFXDECODE_END
 
 static MACHINE_START( mitchell )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 
 	state_save_register_global(machine, state->sample_buffer);
 	state_save_register_global(machine, state->sample_select);
@@ -1093,7 +1093,7 @@ static MACHINE_START( mitchell )
 
 static MACHINE_RESET( mitchell )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 
 	state->sample_buffer = 0;
 	state->sample_select = 0;
@@ -1208,7 +1208,7 @@ GFXDECODE_END
 
 static void spangbl_adpcm_int( running_device *device )
 {
-	mitchell_state *state = (mitchell_state *)device->machine->driver_data;
+	mitchell_state *state = device->machine->driver_data<mitchell_state>();
 	msm5205_data_w(device, state->sample_buffer & 0x0f);
 	state->sample_buffer >>= 4;
 	state->sample_select ^= 1;
@@ -2133,7 +2133,7 @@ static void configure_banks( running_machine *machine )
 
 static DRIVER_INIT( dokaben )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
 	nvram_size = 0;
 	mgakuen2_decode(machine);
@@ -2141,7 +2141,7 @@ static DRIVER_INIT( dokaben )
 }
 static DRIVER_INIT( pang )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
 	nvram_size = 0;
 	pang_decode(machine);
@@ -2149,7 +2149,7 @@ static DRIVER_INIT( pang )
 }
 static DRIVER_INIT( pangb )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
 	nvram_size = 0;
 	bootleg_decode(machine);
@@ -2157,7 +2157,7 @@ static DRIVER_INIT( pangb )
 }
 static DRIVER_INIT( cworld )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
 	nvram_size = 0;
 	cworld_decode(machine);
@@ -2165,7 +2165,7 @@ static DRIVER_INIT( cworld )
 }
 static DRIVER_INIT( hatena )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
 	nvram_size = 0;
 	hatena_decode(machine);
@@ -2173,7 +2173,7 @@ static DRIVER_INIT( hatena )
 }
 static DRIVER_INIT( spang )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
@@ -2183,7 +2183,7 @@ static DRIVER_INIT( spang )
 
 static DRIVER_INIT( spangbl )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
@@ -2193,7 +2193,7 @@ static DRIVER_INIT( spangbl )
 
 static DRIVER_INIT( spangj )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
@@ -2202,7 +2202,7 @@ static DRIVER_INIT( spangj )
 }
 static DRIVER_INIT( sbbros )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
@@ -2211,7 +2211,7 @@ static DRIVER_INIT( sbbros )
 }
 static DRIVER_INIT( qtono1 )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
 	nvram_size = 0;
 	qtono1_decode(machine);
@@ -2219,7 +2219,7 @@ static DRIVER_INIT( qtono1 )
 }
 static DRIVER_INIT( qsangoku )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
 	nvram_size = 0;
 	qsangoku_decode(machine);
@@ -2227,7 +2227,7 @@ static DRIVER_INIT( qsangoku )
 }
 static DRIVER_INIT( mgakuen )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
 	configure_banks(machine);
 	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW0");
@@ -2235,7 +2235,7 @@ static DRIVER_INIT( mgakuen )
 }
 static DRIVER_INIT( mgakuen2 )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
 	nvram_size = 0;
 	mgakuen2_decode(machine);
@@ -2243,7 +2243,7 @@ static DRIVER_INIT( mgakuen2 )
 }
 static DRIVER_INIT( pkladies )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
 	nvram_size = 0;
 	mgakuen2_decode(machine);
@@ -2251,7 +2251,7 @@ static DRIVER_INIT( pkladies )
 }
 static DRIVER_INIT( pkladiesbl )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
 	nvram_size = 0;
 	bootleg_decode(machine);
@@ -2259,7 +2259,7 @@ static DRIVER_INIT( pkladiesbl )
 }
 static DRIVER_INIT( marukin )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
 	nvram_size = 0;
 	marukin_decode(machine);
@@ -2267,7 +2267,7 @@ static DRIVER_INIT( marukin )
 }
 static DRIVER_INIT( block )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 2;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xff80];	/* NVRAM */
@@ -2276,7 +2276,7 @@ static DRIVER_INIT( block )
 }
 static DRIVER_INIT( blockbl )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 2;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xff80];	/* NVRAM */

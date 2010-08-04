@@ -26,7 +26,7 @@ Notes:
 
 static WRITE8_HANDLER( goindol_bankswitch_w )
 {
-	goindol_state *state = (goindol_state *)space->machine->driver_data;
+	goindol_state *state = space->machine->driver_data<goindol_state>();
 
 	memory_set_bank(space->machine, "bank1", data & 0x03);
 
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( goindol_bankswitch_w )
 
 static READ8_HANDLER( prot_f422_r )
 {
-	goindol_state *state = (goindol_state *)space->machine->driver_data;
+	goindol_state *state = space->machine->driver_data<goindol_state>();
 
 	/* bit 7 = vblank? */
 	state->prot_toggle ^= 0x80;
@@ -54,7 +54,7 @@ static READ8_HANDLER( prot_f422_r )
 
 static WRITE8_HANDLER( prot_fc44_w )
 {
-	goindol_state *state = (goindol_state *)space->machine->driver_data;
+	goindol_state *state = space->machine->driver_data<goindol_state>();
 
 	logerror("%04x: prot_fc44_w(%02x)\n", cpu_get_pc(space->cpu), data);
 	state->ram[0x0419] = 0x5b;
@@ -64,7 +64,7 @@ static WRITE8_HANDLER( prot_fc44_w )
 
 static WRITE8_HANDLER( prot_fd99_w )
 {
-	goindol_state *state = (goindol_state *)space->machine->driver_data;
+	goindol_state *state = space->machine->driver_data<goindol_state>();
 
 	logerror("%04x: prot_fd99_w(%02x)\n", cpu_get_pc(space->cpu), data);
 	state->ram[0x0421] = 0x3f;
@@ -72,7 +72,7 @@ static WRITE8_HANDLER( prot_fd99_w )
 
 static WRITE8_HANDLER( prot_fc66_w )
 {
-	goindol_state *state = (goindol_state *)space->machine->driver_data;
+	goindol_state *state = space->machine->driver_data<goindol_state>();
 
 	logerror("%04x: prot_fc66_w(%02x)\n", cpu_get_pc(space->cpu), data);
 	state->ram[0x0423] = 0x06;
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( prot_fc66_w )
 
 static WRITE8_HANDLER( prot_fcb0_w )
 {
-	goindol_state *state = (goindol_state *)space->machine->driver_data;
+	goindol_state *state = space->machine->driver_data<goindol_state>();
 
 	logerror("%04x: prot_fcb0_w(%02x)\n", cpu_get_pc(space->cpu), data);
 	state->ram[0x0425] = 0x06;
@@ -226,7 +226,7 @@ GFXDECODE_END
 
 static MACHINE_START( goindol )
 {
-	goindol_state *state = (goindol_state *)machine->driver_data;
+	goindol_state *state = machine->driver_data<goindol_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
@@ -237,7 +237,7 @@ static MACHINE_START( goindol )
 
 static MACHINE_RESET( goindol )
 {
-	goindol_state *state = (goindol_state *)machine->driver_data;
+	goindol_state *state = machine->driver_data<goindol_state>();
 
 	state->char_bank = 0;
 	state->prot_toggle = 0;

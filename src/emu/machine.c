@@ -174,7 +174,6 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 	  generic_video_data(NULL),
 	  generic_audio_data(NULL),
 	  m_debug_view(NULL),
-	  driver_data(NULL),
 	  m_logerror_list(NULL),
 	  m_scheduler(*this),
 	  m_options(options),
@@ -190,7 +189,8 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 	  m_saveload_schedule(SLS_NONE),
 	  m_saveload_schedule_time(attotime_zero),
 	  m_saveload_searchpath(NULL),
-	  m_rand_seed(0x9d14abd7)
+	  m_rand_seed(0x9d14abd7),
+	  m_driver_data(NULL)
 {
 	memset(gfx, 0, sizeof(gfx));
 	memset(&generic, 0, sizeof(generic));
@@ -202,7 +202,7 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 
 	// allocate the driver data (after devices)
 	if (m_config.m_driver_data_alloc != NULL)
-		driver_data = (*m_config.m_driver_data_alloc)(*this);
+		m_driver_data = (*m_config.m_driver_data_alloc)(*this);
 
 	// find devices
 	primary_screen = screen_first(*this);
@@ -960,6 +960,30 @@ running_machine::notifier_callback_item::notifier_callback_item(notify_callback 
 running_machine::logerror_callback_item::logerror_callback_item(logerror_callback func)
 	: m_next(NULL),
 	  m_func(func)
+{
+}
+
+
+
+//**************************************************************************
+//  DRIVER DATA
+//**************************************************************************
+
+//-------------------------------------------------
+//  driver_data_t - constructor
+//-------------------------------------------------
+
+driver_data_t::driver_data_t(running_machine &machine)
+	: m_machine(machine) 
+{
+}
+
+
+//-------------------------------------------------
+//  driver_data_t - destructor
+//-------------------------------------------------
+
+driver_data_t::~driver_data_t()
 {
 }
 

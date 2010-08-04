@@ -421,7 +421,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( mexico86 )
 {
-	mexico86_state *state = (mexico86_state *)machine->driver_data;
+	mexico86_state *state = machine->driver_data<mexico86_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
@@ -449,7 +449,7 @@ static MACHINE_START( mexico86 )
 
 static MACHINE_RESET( mexico86 )
 {
-	mexico86_state *state = (mexico86_state *)machine->driver_data;
+	mexico86_state *state = machine->driver_data<mexico86_state>();
 
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
 	if (machine->device("sub") != NULL)

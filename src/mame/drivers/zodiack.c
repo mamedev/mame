@@ -87,7 +87,7 @@ TODO:
 
 static MACHINE_START( zodiack )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 
 	state_save_register_global(machine, state->percuss_hardware);
 	MACHINE_START_CALL(espial);
@@ -95,7 +95,7 @@ static MACHINE_START( zodiack )
 
 static MACHINE_RESET( zodiack )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 
 	state->percuss_hardware = 0;
 	MACHINE_RESET_CALL(espial);
@@ -103,7 +103,7 @@ static MACHINE_RESET( zodiack )
 
 static MACHINE_RESET( percuss )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 
 	state->percuss_hardware = 1;
 	MACHINE_RESET_CALL(espial);

@@ -74,7 +74,7 @@ PALETTE_INIT( matmania )
 
 WRITE8_HANDLER( matmania_paletteram_w )
 {
-	matmania_state *state = (matmania_state *)space->machine->driver_data;
+	matmania_state *state = space->machine->driver_data<matmania_state>();
 	int bit0, bit1, bit2, bit3, val;
 	int r, g, b;
 	int offs2;
@@ -115,7 +115,7 @@ WRITE8_HANDLER( matmania_paletteram_w )
 
 VIDEO_START( matmania )
 {
-	matmania_state *state = (matmania_state *)machine->driver_data;
+	matmania_state *state = machine->driver_data<matmania_state>();
 	int width = machine->primary_screen->width();
 	int height = machine->primary_screen->height();
 	bitmap_format format = machine->primary_screen->format();
@@ -129,7 +129,7 @@ VIDEO_START( matmania )
 
 VIDEO_UPDATE( matmania )
 {
-	matmania_state *state = (matmania_state *)screen->machine->driver_data;
+	matmania_state *state = screen->machine->driver_data<matmania_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -201,7 +201,7 @@ VIDEO_UPDATE( matmania )
 
 VIDEO_UPDATE( maniach )
 {
-	matmania_state *state = (matmania_state *)screen->machine->driver_data;
+	matmania_state *state = screen->machine->driver_data<matmania_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 

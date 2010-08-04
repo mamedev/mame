@@ -25,12 +25,13 @@ Protection TODO:
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 
-class dblewing_state
+class dblewing_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dblewing_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dblewing_state(machine)); }
 
-	dblewing_state(running_machine &machine) { }
+	dblewing_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
@@ -103,7 +104,7 @@ x = xpos
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	dblewing_state *state = (dblewing_state *)machine->driver_data;
+	dblewing_state *state = machine->driver_data<dblewing_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -193,7 +194,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_UPDATE(dblewing)
 {
-	dblewing_state *state = (dblewing_state *)screen->machine->driver_data;
+	dblewing_state *state = screen->machine->driver_data<dblewing_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
@@ -220,7 +221,7 @@ static VIDEO_UPDATE(dblewing)
 */
 static READ16_HANDLER ( dblewing_prot_r )
 {
-	dblewing_state *state = (dblewing_state *)space->machine->driver_data;
+	dblewing_state *state = space->machine->driver_data<dblewing_state>();
 
 	switch (offset * 2)
 	{
@@ -284,7 +285,7 @@ static READ16_HANDLER ( dblewing_prot_r )
 
 static WRITE16_HANDLER( dblewing_prot_w )
 {
-	dblewing_state *state = (dblewing_state *)space->machine->driver_data;
+	dblewing_state *state = space->machine->driver_data<dblewing_state>();
 
 //  if (offset * 2 != 0x380)
 //  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask, data);
@@ -432,7 +433,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(irq_latch_r)
 {
-	dblewing_state *state = (dblewing_state *)space->machine->driver_data;
+	dblewing_state *state = space->machine->driver_data<dblewing_state>();
 
 	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
 	state->sound_irq &= ~0x02;
@@ -624,7 +625,7 @@ INPUT_PORTS_END
 
 static void sound_irq( running_device *device, int state )
 {
-	dblewing_state *driver_state = (dblewing_state *)device->machine->driver_data;
+	dblewing_state *driver_state = device->machine->driver_data<dblewing_state>();
 
 	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
 	if (state)
@@ -659,7 +660,7 @@ static const deco16ic_interface dblewing_deco16ic_intf =
 
 static MACHINE_START( dblewing )
 {
-	dblewing_state *state = (dblewing_state *)machine->driver_data;
+	dblewing_state *state = machine->driver_data<dblewing_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -698,7 +699,7 @@ static MACHINE_START( dblewing )
 
 static MACHINE_RESET( dblewing )
 {
-	dblewing_state *state = (dblewing_state *)machine->driver_data;
+	dblewing_state *state = machine->driver_data<dblewing_state>();
 
 	state->_008_data = 0;
 	state->_104_data = 0;

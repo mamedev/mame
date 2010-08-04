@@ -83,7 +83,7 @@ other supported games as well.
 
 static READ8_HANDLER( ldrun2_bankswitch_r )
 {
-	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
 	if (state->ldrun2_bankswap)
 	{
 		state->ldrun2_bankswap--;
@@ -97,7 +97,7 @@ static READ8_HANDLER( ldrun2_bankswitch_r )
 
 static WRITE8_HANDLER( ldrun2_bankswitch_w )
 {
-	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
 	static const int banks[30] =
 	{
 		0,0,0,0,0,1,0,1,0,0,
@@ -931,7 +931,7 @@ GFXDECODE_END
 
 static MACHINE_START( m62 )
 {
-	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+	irem_z80_state *state = machine->driver_data<irem_z80_state>();
 
 	state_save_register_global(machine, state->ldrun2_bankswap);
 	state_save_register_global_array(machine, state->bankcontrol);
@@ -939,7 +939,7 @@ static MACHINE_START( m62 )
 
 static MACHINE_RESET( m62 )
 {
-	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+	irem_z80_state *state = machine->driver_data<irem_z80_state>();
 
 	state->flipscreen = 0;
 	state->m62_background_hscroll = 0;

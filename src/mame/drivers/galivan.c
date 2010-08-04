@@ -396,7 +396,7 @@ GFXDECODE_END
 
 static MACHINE_START( galivan )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 
 	/* configure ROM banking */
 	UINT8 *rombase = memory_region(machine, "maincpu");
@@ -413,7 +413,7 @@ static MACHINE_START( galivan )
 
 static MACHINE_START( ninjemak )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 
 	/* configure ROM banking */
 	UINT8 *rombase = memory_region(machine, "maincpu");
@@ -429,7 +429,7 @@ static MACHINE_START( ninjemak )
 
 static MACHINE_RESET( galivan )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 
 	machine->device("maincpu")->reset();
 
@@ -443,7 +443,7 @@ static MACHINE_RESET( galivan )
 
 static MACHINE_RESET( ninjemak )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 
 	machine->device("maincpu")->reset();
 

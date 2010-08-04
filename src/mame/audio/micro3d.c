@@ -181,7 +181,7 @@ static void recompute_filter(lp_filter *iir, double k, double q, double fc)
 
 void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 {
-	micro3d_state *state = (micro3d_state*)machine->driver_data;
+	micro3d_state *state = machine->driver_data<micro3d_state>();
 
 	if (~data & 8)
 	{
@@ -373,7 +373,7 @@ DEVICE_GET_INFO( micro3d_sound )
 
 WRITE8_HANDLER( micro3d_snd_dac_a )
 {
-	micro3d_state *state = (micro3d_state*)space->machine->driver_data;
+	micro3d_state *state = space->machine->driver_data<micro3d_state>();
 	state->dac_data = data;
 }
 
@@ -384,7 +384,7 @@ WRITE8_HANDLER( micro3d_snd_dac_b )
 
 WRITE8_HANDLER( micro3d_sound_io_w )
 {
-	micro3d_state *state = (micro3d_state*)space->machine->driver_data;
+	micro3d_state *state = space->machine->driver_data<micro3d_state>();
 
 	state->sound_port_latch[offset] = data;
 
@@ -407,7 +407,7 @@ WRITE8_HANDLER( micro3d_sound_io_w )
 
 READ8_HANDLER( micro3d_sound_io_r )
 {
-	micro3d_state *state = (micro3d_state*)space->machine->driver_data;
+	micro3d_state *state = space->machine->driver_data<micro3d_state>();
 
 	switch (offset)
 	{

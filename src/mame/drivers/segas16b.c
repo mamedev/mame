@@ -1022,7 +1022,7 @@ static const segaic16_memory_map_entry *const region_info_list[] =
 
 static void sound_w(running_machine *machine, UINT8 data)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	if (state->soundcpu != NULL)
 	{
@@ -1035,7 +1035,7 @@ static void sound_w(running_machine *machine, UINT8 data)
 
 static void system16b_generic_init(running_machine *machine, int _rom_board)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	/* set the ROM board */
 	state->rom_board = _rom_board;
@@ -1083,7 +1083,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	cpu_suspend(state->mcu, SUSPEND_REASON_DISABLE, 1);
 }
 
@@ -1103,7 +1103,7 @@ static TIMER_CALLBACK( boost_interleave )
 
 static MACHINE_RESET( system16b )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 	static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
 	int i;
@@ -1129,7 +1129,7 @@ static MACHINE_RESET( system16b )
 
 static TIMER_DEVICE_CALLBACK( atomicp_sound_irq )
 {
-	segas1x_state *state = (segas1x_state *)timer.machine->driver_data;
+	segas1x_state *state = timer.machine->driver_data<segas1x_state>();
 
 	if (++state->atomicp_sound_count >= state->atomicp_sound_divisor)
 	{
@@ -1167,7 +1167,7 @@ static READ16_HANDLER( standard_io_r )
 
 static WRITE16_HANDLER( standard_io_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -1199,7 +1199,7 @@ static WRITE16_HANDLER( standard_io_w )
 
 static READ16_HANDLER( misc_io_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	if (state->custom_io_r)
 		return (*state->custom_io_r)(space, offset, mem_mask);
@@ -1210,7 +1210,7 @@ static READ16_HANDLER( misc_io_r )
 
 static WRITE16_HANDLER( misc_io_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	if (state->custom_io_w)
 		(*state->custom_io_w)(space, offset, data, mem_mask);
@@ -1235,7 +1235,7 @@ static WRITE16_HANDLER( rom_5704_bank_w )
 
 static READ16_HANDLER( rom_5797_bank_math_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -1254,7 +1254,7 @@ static READ16_HANDLER( rom_5797_bank_math_r )
 
 static WRITE16_HANDLER( rom_5797_bank_math_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	offset &= 0x1fff;
 	switch (offset & (0x3000/2))
@@ -1279,7 +1279,7 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 
 static READ16_HANDLER( unknown_rgn2_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	logerror("Region 2: read from %04X\n", offset * 2);
 	return segaic16_compare_timer_r(state->_315_5250_2, offset & 7, mem_mask);
@@ -1288,7 +1288,7 @@ static READ16_HANDLER( unknown_rgn2_r )
 
 static WRITE16_HANDLER( unknown_rgn2_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
 	segaic16_compare_timer_w(state->_315_5250_2, offset & 7, data, mem_mask);
@@ -1304,7 +1304,7 @@ static WRITE16_HANDLER( unknown_rgn2_w )
 
 static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 {
-	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 	int size = memory_region_length(device->machine, "soundcpu") - 0x10000;
 	if (size > 0)
 	{
@@ -1375,7 +1375,7 @@ static READ8_DEVICE_HANDLER( upd7759_status_r )
 
 static void upd7759_generate_nmi(running_device *device, int state)
 {
-	segas1x_state *driver = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *driver = device->machine->driver_data<segas1x_state>();
 
 	if (state)
 		cpu_set_input_line(driver->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -1385,7 +1385,7 @@ static void upd7759_generate_nmi(running_device *device, int state)
 #if 0
 static WRITE8_HANDLER( mcu_data_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	state->mcu_data = data;
 	generic_pulse_irq_line(state->mcu, 1);
 }
@@ -1400,7 +1400,7 @@ static WRITE8_HANDLER( mcu_data_w )
 
 static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
-	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (state->i8751_vblank_hook != NULL)
@@ -1417,7 +1417,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 
 static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs, offs_t inputoffs)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
@@ -1457,7 +1457,7 @@ static void altbeast_i8751_sim(running_machine *machine)
 
 static void ddux_i8751_sim(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
@@ -1476,7 +1476,7 @@ static void ddux_i8751_sim(running_machine *machine)
 
 static void goldnaxe_i8751_init(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	static const UINT8 memory_control_5704[0x10] =
 		{ 0x02,0x00, 0x02,0x08, 0x00,0x1f, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
 	static const UINT8 memory_control_5797[0x10] =
@@ -1495,7 +1495,7 @@ static void goldnaxe_i8751_init(running_machine *machine)
 
 static void goldnaxe_i8751_sim(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
@@ -1527,7 +1527,7 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 
 static void tturf_i8751_sim(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
@@ -1551,7 +1551,7 @@ static void tturf_i8751_sim(running_machine *machine)
 
 static void wb3_i8751_sim(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
@@ -1577,14 +1577,14 @@ static void wb3_i8751_sim(running_machine *machine)
 
 static MACHINE_START( atomicp )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	state_save_register_global(machine, state->atomicp_sound_count);
 }
 
 
 static WRITE16_HANDLER( atomicp_sound_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	ym2413_w(state->ymsnd, offset, data >> 8);
 }
 
@@ -1627,7 +1627,7 @@ static READ16_HANDLER( dunkshot_custom_io_r )
 
 static READ16_HANDLER( hwchamp_custom_io_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	UINT16 result;
 
 	switch (offset & (0x3000/2))
@@ -1648,7 +1648,7 @@ static READ16_HANDLER( hwchamp_custom_io_r )
 
 static WRITE16_HANDLER( hwchamp_custom_io_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	static const char *const portname[4] = { "MONITOR", "LEFT", "RIGHT", "DUMMY" };
 	switch (offset & (0x3000/2))
 	{
@@ -1733,7 +1733,7 @@ static READ16_HANDLER( sdi_custom_io_r )
 
 static READ16_HANDLER( sjryuko_custom_io_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	static const char *const portname[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5" };
 
 	switch (offset & (0x3000/2))
@@ -1757,7 +1757,7 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 
 static WRITE16_HANDLER( sjryuko_custom_io_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	switch (offset & (0x3000/2))
 	{
@@ -6375,7 +6375,7 @@ static DRIVER_INIT( aliensy3_5358 )
 
 static DRIVER_INIT( altbeast_5521 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5521);
 	state->i8751_vblank_hook = altbeast_i8751_sim;
@@ -6384,7 +6384,7 @@ static DRIVER_INIT( altbeast_5521 )
 
 static DRIVER_INIT( altbeasj_5521 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5521);
 	state->i8751_vblank_hook = altbeasj_i8751_sim;
@@ -6393,7 +6393,7 @@ static DRIVER_INIT( altbeasj_5521 )
 
 static DRIVER_INIT( altbeas5_5521 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5521);
 	state->i8751_vblank_hook = altbeas5_i8751_sim;
@@ -6423,7 +6423,7 @@ static DRIVER_INIT( aurailj_5704 )
 
 static DRIVER_INIT( ddux_5704 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5704);
 	state->i8751_vblank_hook = ddux_i8751_sim;
@@ -6432,7 +6432,7 @@ static DRIVER_INIT( ddux_5704 )
 
 static DRIVER_INIT( dunkshot_5358 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089a_decrypt(machine);
@@ -6442,7 +6442,7 @@ static DRIVER_INIT( dunkshot_5358 )
 
 static DRIVER_INIT( exctleag_5358 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
 	state->custom_io_r = sdi_custom_io_r;
@@ -6451,7 +6451,7 @@ static DRIVER_INIT( exctleag_5358 )
 
 static DRIVER_INIT( goldnaxe_5704 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5704);
 	goldnaxe_i8751_init(machine);
@@ -6461,7 +6461,7 @@ static DRIVER_INIT( goldnaxe_5704 )
 
 static DRIVER_INIT( goldnaxe_5797 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5797);
 	goldnaxe_i8751_init(machine);
@@ -6471,7 +6471,7 @@ static DRIVER_INIT( goldnaxe_5797 )
 
 static DRIVER_INIT( hwchamp_5521 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5521);
 	state->custom_io_r = hwchamp_custom_io_r;
@@ -6481,7 +6481,7 @@ static DRIVER_INIT( hwchamp_5521 )
 
 static DRIVER_INIT( sdi_5358 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
 	state->custom_io_r = sdi_custom_io_r;
@@ -6489,7 +6489,7 @@ static DRIVER_INIT( sdi_5358 )
 
 static DRIVER_INIT( defense_5358 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089a_decrypt(machine);
@@ -6513,7 +6513,7 @@ static DRIVER_INIT( shinobi3_5358 )
 
 static DRIVER_INIT( sjryuko_5358 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089b_decrypt(machine);
@@ -6524,7 +6524,7 @@ static DRIVER_INIT( sjryuko_5358 )
 
 static DRIVER_INIT( passshtj_5358 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
 	state->custom_io_r = passshtj_custom_io_r;
@@ -6533,7 +6533,7 @@ static DRIVER_INIT( passshtj_5358 )
 
 static DRIVER_INIT( tturf_5704 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5704);
 	state->i8751_vblank_hook = tturf_i8751_sim;
@@ -6542,7 +6542,7 @@ static DRIVER_INIT( tturf_5704 )
 
 static DRIVER_INIT( wb3_5704 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5704);
 	state->i8751_vblank_hook = wb3_i8751_sim;
@@ -6551,7 +6551,7 @@ static DRIVER_INIT( wb3_5704 )
 
 static DRIVER_INIT( atomicp )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	system16b_generic_init(machine, ROM_BOARD_ATOMICP);
 	state->disable_screen_blanking = 1;
@@ -6563,7 +6563,7 @@ static DRIVER_INIT( atomicp )
 
 static DRIVER_INIT( snapper )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	system16b_generic_init(machine, ROM_BOARD_ATOMICP);
 	state->disable_screen_blanking = 1;

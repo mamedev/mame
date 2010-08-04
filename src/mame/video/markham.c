@@ -41,7 +41,7 @@ PALETTE_INIT( markham )
 
 WRITE8_HANDLER( markham_videoram_w )
 {
-	markham_state *state = (markham_state *)space->machine->driver_data;
+	markham_state *state = space->machine->driver_data<markham_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
@@ -57,7 +57,7 @@ WRITE8_HANDLER( markham_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	markham_state *state = (markham_state *)machine->driver_data;
+	markham_state *state = machine->driver_data<markham_state>();
 	int attr = state->videoram[tile_index * 2];
 	int code = state->videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
 	int color = (attr & 0x1f) | ((attr & 0x80) >> 2);
@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( markham )
 {
-	markham_state *state = (markham_state *)machine->driver_data;
+	markham_state *state = machine->driver_data<markham_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
@@ -75,7 +75,7 @@ VIDEO_START( markham )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	markham_state *state = (markham_state *)machine->driver_data;
+	markham_state *state = machine->driver_data<markham_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -119,7 +119,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( markham )
 {
-	markham_state *state = (markham_state *)screen->machine->driver_data;
+	markham_state *state = screen->machine->driver_data<markham_state>();
 	int i;
 
 	for (i = 0; i < 32; i++)

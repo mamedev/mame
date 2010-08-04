@@ -57,7 +57,7 @@ VIDEO_START( arcadecl )
 		0,					/* resulting value to indicate "special" */
 		0,					/* callback routine for special entries */
 	};
-	rampart_state *state = (rampart_state *)machine->driver_data;
+	rampart_state *state = machine->driver_data<rampart_state>();
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -78,7 +78,7 @@ VIDEO_START( arcadecl )
 
 VIDEO_UPDATE( arcadecl )
 {
-	rampart_state *state = (rampart_state *)screen->machine->driver_data;
+	rampart_state *state = screen->machine->driver_data<rampart_state>();
 
 	/* draw the playfield */
 	rampart_bitmap_render(screen->machine, bitmap, cliprect);

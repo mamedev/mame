@@ -71,7 +71,7 @@ static const sn76477_interface spacefev_sn76477_interface =
 
 static void spacefev_update_SN76477_status( running_device *sn )
 {
-	n8080_state *state = (n8080_state *)sn->machine->driver_data;
+	n8080_state *state = sn->machine->driver_data<n8080_state>();
 	double dblR0 = RES_M(1.0);
 	double dblR1 = RES_M(1.5);
 
@@ -101,7 +101,7 @@ static void spacefev_update_SN76477_status( running_device *sn )
 
 static void sheriff_update_SN76477_status( running_device *sn )
 {
-	n8080_state *state = (n8080_state *)sn->machine->driver_data;
+	n8080_state *state = sn->machine->driver_data<n8080_state>();
 	if (state->mono_flop[1])
 	{
 		sn76477_vco_voltage_w(sn, 5);
@@ -123,7 +123,7 @@ static void sheriff_update_SN76477_status( running_device *sn )
 
 static void update_SN76477_status( running_device *device )
 {
-	n8080_state *state = (n8080_state *)device->machine->driver_data;
+	n8080_state *state = device->machine->driver_data<n8080_state>();
 	if (state->n8080_hardware == 1)
 	{
 		spacefev_update_SN76477_status(device);
@@ -137,7 +137,7 @@ static void update_SN76477_status( running_device *device )
 
 static void start_mono_flop( running_device *sn, int n, attotime expire )
 {
-	n8080_state *state = (n8080_state *)sn->machine->driver_data;
+	n8080_state *state = sn->machine->driver_data<n8080_state>();
 	state->mono_flop[n] = 1;
 
 	update_SN76477_status(sn);
@@ -148,7 +148,7 @@ static void start_mono_flop( running_device *sn, int n, attotime expire )
 
 static void stop_mono_flop( running_device *sn, int n )
 {
-	n8080_state *state = (n8080_state *)sn->machine->driver_data;
+	n8080_state *state = sn->machine->driver_data<n8080_state>();
 	state->mono_flop[n] = 0;
 
 	update_SN76477_status(sn);
@@ -166,7 +166,7 @@ static TIMER_CALLBACK( stop_mono_flop_callback )
 static void spacefev_sound_pins_changed( running_machine *machine )
 {
 	running_device *sn = machine->device("snsnd");
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 	UINT16 changes = ~state->curr_sound_pins & state->prev_sound_pins;
 
 	if (changes & (1 << 0x3))
@@ -199,7 +199,7 @@ static void spacefev_sound_pins_changed( running_machine *machine )
 static void sheriff_sound_pins_changed( running_machine *machine )
 {
 	running_device *sn = machine->device("snsnd");
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 	UINT16 changes = ~state->curr_sound_pins & state->prev_sound_pins;
 
 	if (changes & (1 << 0x6))
@@ -223,7 +223,7 @@ static void sheriff_sound_pins_changed( running_machine *machine )
 
 static void helifire_sound_pins_changed( running_machine *machine )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 	UINT16 changes = ~state->curr_sound_pins & state->prev_sound_pins;
 
 	/* ((state->curr_sound_pins >> 0xa) & 1) not emulated */
@@ -239,7 +239,7 @@ static void helifire_sound_pins_changed( running_machine *machine )
 
 static void sound_pins_changed( running_machine *machine )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	if (state->n8080_hardware == 1)
 		spacefev_sound_pins_changed(machine);
@@ -254,7 +254,7 @@ static void sound_pins_changed( running_machine *machine )
 
 static void delayed_sound_1( running_machine *machine, int data )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state->curr_sound_pins &= ~(
 		(1 << 0x7) |
@@ -295,7 +295,7 @@ static TIMER_CALLBACK( delayed_sound_1_callback )
 
 static void delayed_sound_2( running_machine *machine, int data )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state->curr_sound_pins &= ~(
 		(1 << 0x8) |
@@ -340,7 +340,7 @@ WRITE8_HANDLER( n8080_sound_2_w )
 
 static READ8_HANDLER( n8080_8035_p1_r )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	UINT8 val = 0;
 
 	if ((state->curr_sound_pins >> 0xb) & 1) val |= 0x01;
@@ -358,31 +358,31 @@ static READ8_HANDLER( n8080_8035_p1_r )
 
 static READ8_HANDLER( n8080_8035_t0_r )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	return (state->curr_sound_pins >> 0x7) & 1;
 }
 static READ8_HANDLER( n8080_8035_t1_r )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	return (state->curr_sound_pins >> 0xc) & 1;
 }
 
 
 static READ8_HANDLER( helifire_8035_t0_r )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	return (state->curr_sound_pins >> 0x3) & 1;
 }
 static READ8_HANDLER( helifire_8035_t1_r )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	return (state->curr_sound_pins >> 0x4) & 1;
 }
 
 
 static READ8_HANDLER( helifire_8035_external_ram_r )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	UINT8 val = 0;
 
 	if ((state->curr_sound_pins >> 0x7) & 1) val |= 0x01;
@@ -396,7 +396,7 @@ static READ8_HANDLER( helifire_8035_external_ram_r )
 
 static READ8_HANDLER( helifire_8035_p2_r )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	return ((state->curr_sound_pins >> 0xc) & 1) ? 0x10 : 0x00; /* not used */
 }
 
@@ -409,14 +409,14 @@ static WRITE8_HANDLER( n8080_dac_w )
 
 static WRITE8_HANDLER( helifire_dac_w )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	dac_data_w(space->machine->device("dac"), data * state->helifire_dac_volume);
 }
 
 
 static WRITE8_HANDLER( helifire_sound_ctrl_w )
 {
-	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	n8080_state *state = space->machine->driver_data<n8080_state>();
 	state->helifire_dac_phase = data & 0x80;
 
 	/* data & 0x40 not emulated */
@@ -438,7 +438,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 {
 	running_device *sn = timer.machine->device("snsnd");
-	n8080_state *state = (n8080_state *)timer.machine->driver_data;
+	n8080_state *state = timer.machine->driver_data<n8080_state>();
 	double voltage = 0;
 
 	if (state->mono_flop[2])
@@ -452,7 +452,7 @@ static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 
 static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
 {
-	n8080_state *state = (n8080_state *)timer.machine->driver_data;
+	n8080_state *state = timer.machine->driver_data<n8080_state>();
 	double t = state->helifire_dac_timing - attotime_to_double(timer_get_time(timer.machine));
 
 	if (state->helifire_dac_phase)
@@ -468,7 +468,7 @@ static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
 
 MACHINE_START( spacefev_sound )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state->sound_timer[0] = timer_alloc(machine, stop_mono_flop_callback, NULL);
 	state->sound_timer[1] = timer_alloc(machine, stop_mono_flop_callback, NULL);
@@ -483,7 +483,7 @@ MACHINE_START( spacefev_sound )
 
 MACHINE_RESET( spacefev_sound )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 	state->n8080_hardware = 1;
 
 	state->mono_flop[0] = 0;
@@ -500,7 +500,7 @@ MACHINE_RESET( spacefev_sound )
 
 MACHINE_START( sheriff_sound )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state->sound_timer[0] = timer_alloc(machine, stop_mono_flop_callback, NULL);
 	state->sound_timer[1] = timer_alloc(machine, stop_mono_flop_callback, NULL);
@@ -514,7 +514,7 @@ MACHINE_START( sheriff_sound )
 
 MACHINE_RESET( sheriff_sound )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 	state->n8080_hardware = 2;
 
 	state->mono_flop[0] = 0;
@@ -530,7 +530,7 @@ MACHINE_RESET( sheriff_sound )
 
 MACHINE_START( helifire_sound )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state_save_register_global(machine, state->prev_snd_data);
 	state_save_register_global(machine, state->prev_sound_pins);
@@ -543,7 +543,7 @@ MACHINE_START( helifire_sound )
 
 MACHINE_RESET( helifire_sound )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	n8080_state *state = machine->driver_data<n8080_state>();
 	state->n8080_hardware = 3;
 
 	state->helifire_dac_volume = 1;

@@ -245,13 +245,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static READ16_HANDLER( sharedram_r )
 {
-	topspeed_state *state = (topspeed_state *)space->machine->driver_data;
+	topspeed_state *state = space->machine->driver_data<topspeed_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE16_HANDLER( sharedram_w )
 {
-	topspeed_state *state = (topspeed_state *)space->machine->driver_data;
+	topspeed_state *state = space->machine->driver_data<topspeed_state>();
 	COMBINE_DATA(&state->sharedram[offset]);
 }
 
@@ -260,13 +260,13 @@ static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched 
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	topspeed_state *state = (topspeed_state *)machine->driver_data;
+	topspeed_state *state = machine->driver_data<topspeed_state>();
 	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
 {
-	topspeed_state *state = (topspeed_state *)space->machine->driver_data;
+	topspeed_state *state = space->machine->driver_data<topspeed_state>();
 
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
@@ -287,7 +287,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 static TIMER_CALLBACK( topspeed_interrupt6  )
 {
-	topspeed_state *state = (topspeed_state *)machine->driver_data;
+	topspeed_state *state = machine->driver_data<topspeed_state>();
 	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
@@ -295,7 +295,7 @@ static TIMER_CALLBACK( topspeed_interrupt6  )
 
 static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 {
-	topspeed_state *state = (topspeed_state *)machine->driver_data;
+	topspeed_state *state = machine->driver_data<topspeed_state>();
 	cpu_set_input_line(state->subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
@@ -325,7 +325,7 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 
 static READ8_HANDLER( topspeed_input_bypass_r )
 {
-	topspeed_state *state = (topspeed_state *)space->machine->driver_data;
+	topspeed_state *state = space->machine->driver_data<topspeed_state>();
 	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 	int steer = 0;
 	int analogue_steer = input_port_read_safe(space->machine, STEER_PORT_TAG, 0x00);
@@ -395,20 +395,20 @@ static WRITE16_HANDLER( topspeed_motor_w )
 
 static void reset_sound_region( running_machine *machine )
 {
-	topspeed_state *state = (topspeed_state *)machine->driver_data;
+	topspeed_state *state = machine->driver_data<topspeed_state>();
 	memory_set_bank(machine,  "bank10", state->banknum);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
 {
-	topspeed_state *state = (topspeed_state *)device->machine->driver_data;
+	topspeed_state *state = device->machine->driver_data<topspeed_state>();
 	state->banknum = data & 7;
 	reset_sound_region(device->machine);
 }
 
 static void topspeed_msm5205_vck( running_device *device )
 {
-	topspeed_state *state = (topspeed_state *)device->machine->driver_data;
+	topspeed_state *state = device->machine->driver_data<topspeed_state>();
 	if (state->adpcm_data != -1)
 	{
 		msm5205_data_w(device, state->adpcm_data & 0x0f);
@@ -424,14 +424,14 @@ static void topspeed_msm5205_vck( running_device *device )
 
 static WRITE8_DEVICE_HANDLER( topspeed_msm5205_address_w )
 {
-	topspeed_state *state = (topspeed_state *)device->machine->driver_data;
+	topspeed_state *state = device->machine->driver_data<topspeed_state>();
 	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
 	msm5205_reset_w(device, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
 {
-	topspeed_state *state = (topspeed_state *)device->machine->driver_data;
+	topspeed_state *state = device->machine->driver_data<topspeed_state>();
 	msm5205_reset_w(device, 1);
 	state->adpcm_pos &= 0xff00;
 }
@@ -619,7 +619,7 @@ GFXDECODE_END
 
 static void irq_handler( running_device *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
-	topspeed_state *state = (topspeed_state *)device->machine->driver_data;
+	topspeed_state *state = device->machine->driver_data<topspeed_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -648,7 +648,7 @@ static STATE_POSTLOAD( topspeed_postload )
 
 static MACHINE_START( topspeed )
 {
-	topspeed_state *state = (topspeed_state *)machine->driver_data;
+	topspeed_state *state = machine->driver_data<topspeed_state>();
 
 	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
 
@@ -667,7 +667,7 @@ static MACHINE_START( topspeed )
 
 static MACHINE_RESET( topspeed )
 {
-	topspeed_state *state = (topspeed_state *)machine->driver_data;
+	topspeed_state *state = machine->driver_data<topspeed_state>();
 
 	state->cpua_ctrl = 0xff;
 	state->ioc220_port = 0;

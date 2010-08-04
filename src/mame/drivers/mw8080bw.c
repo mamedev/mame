@@ -167,7 +167,7 @@
 
 static READ8_HANDLER( mw8080bw_shift_result_rev_r )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	UINT8 ret = mb14241_shift_result_r(state->mb14241, 0);
 
 	return BITSWAP8(ret,0,1,2,3,4,5,6,7);
@@ -176,7 +176,7 @@ static READ8_HANDLER( mw8080bw_shift_result_rev_r )
 
 static READ8_HANDLER( mw8080bw_reversable_shift_result_r )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	UINT8 ret;
 
 	if (state->rev_shift_res)
@@ -193,7 +193,7 @@ static READ8_HANDLER( mw8080bw_reversable_shift_result_r )
 
 static WRITE8_HANDLER( mw8080bw_reversable_shift_count_w)
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	mb14241_shift_count_w(state->mb14241, offset, data);
 
 	state->rev_shift_res = data & 0x08;
@@ -430,7 +430,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( gunfight_io_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	if (offset & 0x01)
 		gunfight_audio_w(space, 0, data);
 
@@ -627,7 +627,7 @@ static CUSTOM_INPUT( tornbase_score_input_r )
 
 static WRITE8_HANDLER( tornbase_io_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 
 	if (offset & 0x01)
 		tornbase_audio_w(space->machine->device("discrete"), 0, data);
@@ -882,14 +882,14 @@ MACHINE_DRIVER_END
 
 static STATE_POSTLOAD( maze_update_discrete )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	maze_write_discrete(machine->device("discrete"), state->maze_tone_timing_state);
 }
 
 
 static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	state->maze_tone_timing_state = !state->maze_tone_timing_state;
 	maze_write_discrete(state->discrete, state->maze_tone_timing_state);
 }
@@ -897,7 +897,7 @@ static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 
 static MACHINE_START( maze )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* create astable timer for IC B1 */
 	timer_pulse(machine, MAZE_555_B1_PERIOD, NULL, 0, maze_tone_timing_timer_callback);
@@ -991,7 +991,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( boothill )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->rev_shift_res);
@@ -1087,7 +1087,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( checkmat_io_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 
 	if (offset & 0x01)  checkmat_audio_w(state->discrete, 0, data);
 
@@ -1195,7 +1195,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( desertgu )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->desertgun_controller_select);
@@ -1206,7 +1206,7 @@ static MACHINE_START( desertgu )
 
 static CUSTOM_INPUT( desertgu_gun_input_r )
 {
-	mw8080bw_state *state = (mw8080bw_state *)field->port->machine->driver_data;
+	mw8080bw_state *state = field->port->machine->driver_data<mw8080bw_state>();
 	UINT32 ret;
 
 	if (state->desertgun_controller_select)
@@ -1220,7 +1220,7 @@ static CUSTOM_INPUT( desertgu_gun_input_r )
 
 static CUSTOM_INPUT( desertgu_dip_sw_0_1_r )
 {
-	mw8080bw_state *state = (mw8080bw_state *)field->port->machine->driver_data;
+	mw8080bw_state *state = field->port->machine->driver_data<mw8080bw_state>();
 	UINT32 ret;
 
 	if (state->desertgun_controller_select)
@@ -1525,7 +1525,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( gmissile )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->rev_shift_res);
@@ -1622,7 +1622,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( m4 )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->rev_shift_res);
@@ -1721,7 +1721,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( clowns )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->clowns_controller_select);
@@ -1732,7 +1732,7 @@ static MACHINE_START( clowns )
 
 static CUSTOM_INPUT( clowns_controller_r )
 {
-	mw8080bw_state *state = (mw8080bw_state *)field->port->machine->driver_data;
+	mw8080bw_state *state = field->port->machine->driver_data<mw8080bw_state>();
 	UINT32 ret;
 
 	if (state->clowns_controller_select)
@@ -2156,14 +2156,14 @@ MACHINE_DRIVER_END
 
 static TIMER_DEVICE_CALLBACK( spcenctr_strobe_timer_callback )
 {
-	mw8080bw_state *state = (mw8080bw_state *)timer.machine->driver_data;
+	mw8080bw_state *state = timer.machine->driver_data<mw8080bw_state>();
 	output_set_value("STROBE", param && state->spcenctr_strobe_state);
 }
 
 
 static MACHINE_START( spcenctr )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->spcenctr_strobe_state);
@@ -2177,28 +2177,28 @@ static MACHINE_START( spcenctr )
 #if 0
 UINT8 spcenctr_get_trench_width( *running_machine *machine )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	return state->spcenctr_trench_width;
 }
 
 
 UINT8 spcenctr_get_trench_center( *running_machine *machine )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	return state->spcenctr_trench_center;
 }
 
 
 UINT8 spcenctr_get_trench_slope( *running_machine *machine , UINT8 addr )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	return state->spcenctr_trench_slope[addr & 0x0f];
 }
 #endif
 
 static WRITE8_HANDLER( spcenctr_io_w )
 {												/* A7 A6 A5 A4 A3 A2 A1 A0 */
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 
 	if ((offset & 0x07) == 0x02)
 		watchdog_reset_w(space, 0, data);		/*  -  -  -  -  -  0  1  0 */
@@ -2326,7 +2326,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( phantom2 )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->phantom2_cloud_counter);
@@ -2420,7 +2420,7 @@ static READ8_HANDLER( bowler_shift_result_r )
 	/* ZV - not too sure why this is needed, I don't see
        anything unusual on the schematics that would cause
        the bits to flip */
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 
 	return ~mb14241_shift_result_r(state->mb14241, 0);
 }
@@ -2557,7 +2557,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( invaders )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->invaders_flip_screen);

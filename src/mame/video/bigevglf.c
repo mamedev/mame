@@ -11,7 +11,7 @@
 
 WRITE8_HANDLER(bigevglf_palette_w)
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	int color;
 
 	state->paletteram[offset] = data;
@@ -21,7 +21,7 @@ WRITE8_HANDLER(bigevglf_palette_w)
 
 WRITE8_HANDLER( bigevglf_gfxcontrol_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 
 /* bits used: 0,1,2,3
  0 and 2 select plane,
@@ -33,13 +33,13 @@ WRITE8_HANDLER( bigevglf_gfxcontrol_w )
 
 WRITE8_HANDLER( bigevglf_vidram_addr_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	state->vidram_bank = (data & 0xff) * 0x100;
 }
 
 WRITE8_HANDLER( bigevglf_vidram_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	UINT32 x, y, o;
 	o = state->vidram_bank + offset;
 	state->vidram[o + 0x10000 * state->plane_selected] = data;
@@ -50,13 +50,13 @@ WRITE8_HANDLER( bigevglf_vidram_w )
 
 READ8_HANDLER( bigevglf_vidram_r )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	return state->vidram[0x10000 * state->plane_selected + state->vidram_bank + offset];
 }
 
 VIDEO_START( bigevglf )
 {
-	bigevglf_state *state = (bigevglf_state *)machine->driver_data;
+	bigevglf_state *state = machine->driver_data<bigevglf_state>();
 
 	state->tmp_bitmap[0] = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmp_bitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
@@ -74,7 +74,7 @@ VIDEO_START( bigevglf )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	bigevglf_state *state = (bigevglf_state *)machine->driver_data;
+	bigevglf_state *state = machine->driver_data<bigevglf_state>();
 	int i, j;
 	for (i = 0xc0-4; i >= 0; i-= 4)
 	{
@@ -93,7 +93,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( bigevglf )
 {
-	bigevglf_state *state = (bigevglf_state *)screen->machine->driver_data;
+	bigevglf_state *state = screen->machine->driver_data<bigevglf_state>();
 
 	copybitmap(bitmap, state->tmp_bitmap[state->plane_visible], 0, 0, 0, 0, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect);

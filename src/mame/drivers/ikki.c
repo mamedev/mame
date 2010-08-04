@@ -208,7 +208,7 @@ GFXDECODE_END
 
 static MACHINE_START( ikki )
 {
-	ikki_state *state = (ikki_state *)machine->driver_data;
+	ikki_state *state = machine->driver_data<ikki_state>();
 
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->punch_through_pen);
@@ -216,7 +216,7 @@ static MACHINE_START( ikki )
 
 static MACHINE_RESET( ikki )
 {
-	ikki_state *state = (ikki_state *)machine->driver_data;
+	ikki_state *state = machine->driver_data<ikki_state>();
 
 	state->flipscreen = 0;
 }

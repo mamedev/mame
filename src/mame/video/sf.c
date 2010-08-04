@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	sf_state *state = (sf_state *)machine->driver_data;
+	sf_state *state = machine->driver_data<sf_state>();
 	int code = state->videoram[tile_index];
 	SET_TILE_INFO(
 			3,
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( sf )
 {
-	sf_state *state = (sf_state *)machine->driver_data;
+	sf_state *state = machine->driver_data<sf_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 2048, 16);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, 2048, 16);
@@ -74,21 +74,21 @@ VIDEO_START( sf )
 
 WRITE16_HANDLER( sf_videoram_w )
 {
-	sf_state *state = (sf_state *)space->machine->driver_data;
+	sf_state *state = space->machine->driver_data<sf_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 WRITE16_HANDLER( sf_bg_scroll_w )
 {
-	sf_state *state = (sf_state *)space->machine->driver_data;
+	sf_state *state = space->machine->driver_data<sf_state>();
 	COMBINE_DATA(&state->bgscroll);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->bgscroll);
 }
 
 WRITE16_HANDLER( sf_fg_scroll_w )
 {
-	sf_state *state = (sf_state *)space->machine->driver_data;
+	sf_state *state = space->machine->driver_data<sf_state>();
 	COMBINE_DATA(&state->fgscroll);
 	tilemap_set_scrollx(state->fg_tilemap, 0, state->fgscroll);
 }
@@ -104,7 +104,7 @@ WRITE16_HANDLER( sf_gfxctrl_w )
 	/* b6 = active middle plane */
 	/* b7 = active sprites */
 
-	sf_state *state = (sf_state *)space->machine->driver_data;
+	sf_state *state = space->machine->driver_data<sf_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->sf_active = data & 0xff;
@@ -131,7 +131,7 @@ INLINE int sf_invert( int nb )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	sf_state *state = (sf_state *)machine->driver_data;
+	sf_state *state = machine->driver_data<sf_state>();
 	int offs;
 
 	for (offs = 0x1000 - 0x20; offs >= 0; offs -= 0x20)
@@ -220,7 +220,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 VIDEO_UPDATE( sf )
 {
-	sf_state *state = (sf_state *)screen->machine->driver_data;
+	sf_state *state = screen->machine->driver_data<sf_state>();
 
 	if (state->sf_active & 0x20)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

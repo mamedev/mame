@@ -70,7 +70,7 @@
 
 static WRITE8_HANDLER( irqack_w )
 {
-	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
 	int bit = data & 1;
 
 	cpu_interrupt_enable(state->maincpu, bit);
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( irqack_w )
 
 static WRITE8_HANDLER( timer_pulse_w )
 {
-	//_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
+	//_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
 	//printf("timer pulse %02x\n", data);
 }
 
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( _20pacgal_coin_counter_w )
 
 static void set_bankptr(running_machine *machine)
 {
-	_20pacgal_state *state = (_20pacgal_state *) machine->driver_data;
+	_20pacgal_state *state =  machine->driver_data<_20pacgal_state>();
 	if (state->game_selected == 0)
 	{
 		UINT8 *rom = memory_region(machine, "maincpu");
@@ -150,7 +150,7 @@ static void set_bankptr(running_machine *machine)
 
 static WRITE8_HANDLER( ram_bank_select_w )
 {
-	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
 
 	state->game_selected = data & 1;
 	set_bankptr(space->machine);
@@ -158,7 +158,7 @@ static WRITE8_HANDLER( ram_bank_select_w )
 
 static WRITE8_HANDLER( ram_48000_w )
 {
-	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
 
 	if (state->game_selected)
 	{
@@ -283,7 +283,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( 20pacgal )
 {
-	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
+	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->eeprom = machine->device("eeprom");
@@ -295,7 +295,7 @@ static MACHINE_START( 20pacgal )
 
 static MACHINE_RESET( 20pacgal )
 {
-	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
+	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
 
 	state->game_selected = 0;
 }
@@ -372,7 +372,7 @@ ROM_END
 
 static DRIVER_INIT(20pacgal)
 {
-	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
+	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
 
 	state->ram_48000 = auto_alloc_array(machine, UINT8, 0x2000);
 }

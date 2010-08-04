@@ -109,14 +109,14 @@ static DRIVER_INIT( srmp3 )
 
 static MACHINE_RESET( srmp2 )
 {
-	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	srmp2_state *state = machine->driver_data<srmp2_state>();
 
 	state->port_select = 0;
 }
 
 static MACHINE_RESET( srmp3 )
 {
-	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	srmp2_state *state = machine->driver_data<srmp2_state>();
 
 	state->port_select = 0;
 }
@@ -137,7 +137,7 @@ static WRITE16_HANDLER( srmp2_flags_w )
     x--- ---- : Palette Bank
 */
 
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 
 	coin_counter_w( space->machine, 0, ((data & 0x01) >> 0) );
 	coin_lockout_w( space->machine, 0, (((~data) & 0x10) >> 4) );
@@ -165,7 +165,7 @@ static WRITE16_HANDLER( mjyuugi_adpcm_bank_w )
     --xx ---- : GFX Bank
 */
 
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 
 	state->adpcm_bank = (data & 0x0f);
 	state->gfx_bank = ((data >> 4) & 0x03);
@@ -181,7 +181,7 @@ static WRITE16_DEVICE_HANDLER( srmp2_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	srmp2_state *state = (srmp2_state *)device->machine->driver_data;
+	srmp2_state *state = device->machine->driver_data<srmp2_state>();
 	UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
@@ -205,7 +205,7 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	srmp2_state *state = (srmp2_state *)device->machine->driver_data;
+	srmp2_state *state = device->machine->driver_data<srmp2_state>();
 	UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
@@ -222,7 +222,7 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 
 static void srmp2_adpcm_int(running_device *device)
 {
-	srmp2_state *state = (srmp2_state *)device->machine->driver_data;
+	srmp2_state *state = device->machine->driver_data<srmp2_state>();
 	UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 	if (state->adpcm_sptr)
@@ -275,7 +275,7 @@ static READ16_HANDLER( srmp2_input_1_r )
     --x- ---- : Player 1 and 2 side flag
 */
 
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	if (!ACCESSING_BITS_0_7)
@@ -323,7 +323,7 @@ static READ16_HANDLER( srmp2_input_2_r )
 
 static WRITE16_HANDLER( srmp2_input_1_w )
 {
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 
 	state->port_select = (data != 0x0000) ? 1 : 0;
 }
@@ -331,7 +331,7 @@ static WRITE16_HANDLER( srmp2_input_1_w )
 
 static WRITE16_HANDLER( srmp2_input_2_w )
 {
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 
 	state->port_select = (data == 0x0000) ? 2 : 0;
 }
@@ -344,7 +344,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
     xxx- ---- : ADPCM ROM bank
 */
 
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	int addr;
 
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( srmp3_input_1_w )
     ---- -x-- : Player 2 side flag ?
 */
 
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 	logerror("PC:%04X DATA:%02X  srmp3_input_1_w\n", cpu_get_pc(space->cpu), data);
 
 	state->port_select = 0;
@@ -451,7 +451,7 @@ static WRITE8_HANDLER( srmp3_input_1_w )
 
 static WRITE8_HANDLER( srmp3_input_2_w )
 {
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 
 	/* Key matrix reading related ? */
 
@@ -515,7 +515,7 @@ static WRITE8_HANDLER( srmp3_flags_w )
     xx-- ---- : GFX Bank
 */
 
-	srmp2_state *state = (srmp2_state *)space->machine->driver_data;
+	srmp2_state *state = space->machine->driver_data<srmp2_state>();
 
 	coin_counter_w( space->machine, 0, ((data & 0x01) >> 0) );
 	coin_lockout_w( space->machine, 0, (((~data) & 0x10) >> 4) );

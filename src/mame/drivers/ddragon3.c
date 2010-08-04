@@ -162,7 +162,7 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 
 static WRITE16_HANDLER( ddragon3_io_w )
 {
-	ddragon3_state *state = (ddragon3_state *)space->machine->driver_data;
+	ddragon3_state *state = space->machine->driver_data<ddragon3_state>();
 
 	COMBINE_DATA(&state->io_reg[offset]);
 
@@ -516,7 +516,7 @@ GFXDECODE_END
 
 static void dd3_ymirq_handler(running_device *device, int irq)
 {
-	ddragon3_state *state = (ddragon3_state *)device->machine->driver_data;
+	ddragon3_state *state = device->machine->driver_data<ddragon3_state>();
 	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
@@ -533,7 +533,7 @@ static const ym2151_interface ym2151_config =
 
 static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 {
-	ddragon3_state *state = (ddragon3_state *)timer.machine->driver_data;
+	ddragon3_state *state = timer.machine->driver_data<ddragon3_state>();
 	int scanline = param;
 
 	/* An interrupt is generated every 16 scanlines */
@@ -560,7 +560,7 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 
 static MACHINE_START( ddragon3 )
 {
-	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
+	ddragon3_state *state = machine->driver_data<ddragon3_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -576,7 +576,7 @@ static MACHINE_START( ddragon3 )
 
 static MACHINE_RESET( ddragon3 )
 {
-	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
+	ddragon3_state *state = machine->driver_data<ddragon3_state>();
 	int i;
 
 	state->vreg = 0;

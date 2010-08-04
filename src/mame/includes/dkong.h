@@ -69,12 +69,13 @@ enum
 #define DK3_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
 #define RS_PALETTE_LENGTH		(256+256+8+1)
 
-class dkong_state
+class dkong_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dkong_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dkong_state(machine)); }
 
-	dkong_state(running_machine &machine) { }
+	dkong_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *           video_ram;

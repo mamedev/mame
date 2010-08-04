@@ -6,12 +6,13 @@
 
 /*----------- driver state -----------*/
 
-class _n64_state
+class _n64_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _n64_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _n64_state(machine)); }
 
-	_n64_state(running_machine &machine) { }
+	_n64_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* video-related */
 	N64::RDP::Processor m_rdp;

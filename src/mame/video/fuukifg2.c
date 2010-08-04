@@ -48,7 +48,7 @@
 \
 static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
-	fuuki16_state *state = (fuuki16_state *)machine->driver_data; \
+	fuuki16_state *state = machine->driver_data<fuuki16_state>(); \
 	UINT16 code = state->vram_##_N_[2 * tile_index + 0]; \
 	UINT16 attr = state->vram_##_N_[2 * tile_index + 1]; \
 	SET_TILE_INFO(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3)); \
@@ -56,7 +56,7 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 \
 WRITE16_HANDLER( fuuki16_vram_##_N_##_w ) \
 { \
-	fuuki16_state *state = (fuuki16_state *)space->machine->driver_data; \
+	fuuki16_state *state = space->machine->driver_data<fuuki16_state>(); \
 	COMBINE_DATA(&state->vram_##_N_[offset]); \
 	tilemap_mark_tile_dirty(state->tilemap_##_N_, offset / 2); \
 }
@@ -90,7 +90,7 @@ PALETTE_INIT( fuuki16 )
 
 VIDEO_START( fuuki16 )
 {
-	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 64, 32);
 	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 64, 32);
 	state->tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 64, 32);
@@ -134,7 +134,7 @@ VIDEO_START( fuuki16 )
 
 static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	fuuki16_state *state = (fuuki16_state *)screen.machine->driver_data;
+	fuuki16_state *state = screen.machine->driver_data<fuuki16_state>();
 	int offs;
 	const gfx_element *gfx = screen.machine->gfx[0];
 	bitmap_t *priority_bitmap = screen.machine->priority_bitmap;
@@ -264,7 +264,7 @@ if (input_code_pressed(screen.machine, KEYCODE_X))
 /* Wrapper to handle bg and bg2 ttogether */
 static void fuuki16_draw_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int i, int flag, int pri )
 {
-	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	int buffer = (state->vregs[0x1e / 2] & 0x40);
 
 	switch( i )
@@ -281,7 +281,7 @@ static void fuuki16_draw_layer( running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( fuuki16 )
 {
-	fuuki16_state *state = (fuuki16_state *)screen->machine->driver_data;
+	fuuki16_state *state = screen->machine->driver_data<fuuki16_state>();
 	UINT16 layer0_scrollx, layer0_scrolly;
 	UINT16 layer1_scrollx, layer1_scrolly;
 	UINT16 layer2_scrollx, layer2_scrolly;

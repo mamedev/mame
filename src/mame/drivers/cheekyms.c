@@ -14,7 +14,7 @@
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cheekyms_state *state = (cheekyms_state *)field->port->machine->driver_data;
+	cheekyms_state *state = field->port->machine->driver_data<cheekyms_state>();
 
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
@@ -111,7 +111,7 @@ GFXDECODE_END
 
 static MACHINE_START( cheekyms )
 {
-	cheekyms_state *state = (cheekyms_state *)machine->driver_data;
+	cheekyms_state *state = machine->driver_data<cheekyms_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->dac = machine->device("dac");

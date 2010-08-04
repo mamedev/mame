@@ -58,7 +58,7 @@ WRITE8_HANDLER( decocass_coin_counter_w )
 
 WRITE8_HANDLER( decocass_sound_command_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	LOG(2,("CPU %s sound command -> $%02x\n", space->cpu->tag(), data));
 	soundlatch_w(space, 0, data);
 	state->sound_ack |= 0x80;
@@ -76,7 +76,7 @@ READ8_HANDLER( decocass_sound_data_r )
 
 READ8_HANDLER( decocass_sound_ack_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data = state->sound_ack;	/* D6+D7 */
 	LOG(4,("CPU %s sound ack     <- $%02x\n", space->cpu->tag(), data));
 	return data;
@@ -84,7 +84,7 @@ READ8_HANDLER( decocass_sound_ack_r )
 
 WRITE8_HANDLER( decocass_sound_data_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	LOG(2,("CPU %s sound data    -> $%02x\n", space->cpu->tag(), data));
 	soundlatch2_w(space, 0, data);
 	state->sound_ack |= 0x40;
@@ -92,7 +92,7 @@ WRITE8_HANDLER( decocass_sound_data_w )
 
 READ8_HANDLER( decocass_sound_command_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data = soundlatch_r(space, 0);
 	LOG(4,("CPU %s sound command <- $%02x\n", space->cpu->tag(), data));
 	cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, CLEAR_LINE);
@@ -102,7 +102,7 @@ READ8_HANDLER( decocass_sound_command_r )
 
 TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen )
 {
-	decocass_state *state = (decocass_state *)timer.machine->driver_data;
+	decocass_state *state = timer.machine->driver_data<decocass_state>();
 	int scanline = param;
 	state->audio_nmi_state = scanline & 8;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
@@ -110,14 +110,14 @@ TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen )
 
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->audio_nmi_enabled = 1;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_HANDLER( decocass_sound_nmi_enable_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->audio_nmi_enabled = 1;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	return 0xff;
@@ -125,7 +125,7 @@ READ8_HANDLER( decocass_sound_nmi_enable_r )
 
 READ8_HANDLER( decocass_sound_data_ack_reset_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data = 0xff;
 	LOG(2,("CPU %s sound ack rst <- $%02x\n", space->cpu->tag(), data));
 	state->sound_ack &= ~0x40;
@@ -134,20 +134,20 @@ READ8_HANDLER( decocass_sound_data_ack_reset_r )
 
 WRITE8_HANDLER( decocass_sound_data_ack_reset_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	LOG(2,("CPU %s sound ack rst -> $%02x\n", space->cpu->tag(), data));
 	state->sound_ack &= ~0x40;
 }
 
 WRITE8_HANDLER( decocass_nmi_reset_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 
 	/* just latch the analog controls here */
 	state->quadrature_decoder[0] = input_port_read(space->machine, "AN0");
@@ -172,7 +172,7 @@ WRITE8_HANDLER( decocass_adc_w )
  */
 READ8_HANDLER( decocass_input_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data = 0xff;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
@@ -207,7 +207,7 @@ READ8_HANDLER( decocass_input_r )
 
 WRITE8_HANDLER( decocass_reset_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	LOG(1,("%10s 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data));
 	state->decocass_reset = data;
 
@@ -229,7 +229,7 @@ WRITE8_HANDLER( decocass_reset_w )
 #ifdef MAME_DEBUG
 static void decocass_fno( running_machine *machine, offs_t offset, UINT8 data )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	/* 8041ENA/ and is this a FNO write (function number)? */
 	if (0 == (state->i8041_p2 & 0x01))
 	{
@@ -276,7 +276,7 @@ static void decocass_fno( running_machine *machine, offs_t offset, UINT8 data )
 
 static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -356,7 +356,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_pass_136_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -436,7 +436,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 
 static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -516,7 +516,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -598,7 +598,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -679,7 +679,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
  ***************************************************************************/
 static READ8_HANDLER( decocass_type2_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == state->type2_xx_latch)
@@ -709,7 +709,7 @@ static READ8_HANDLER( decocass_type2_r )
 
 static WRITE8_HANDLER( decocass_type2_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (1 == state->type2_xx_latch)
 	{
 		if (1 == (offset & 1))
@@ -761,7 +761,7 @@ static WRITE8_HANDLER( decocass_type2_w )
  ***************************************************************************/
 static READ8_HANDLER( decocass_type3_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data, save;
 
 	if (1 == (offset & 1))
@@ -949,7 +949,7 @@ static READ8_HANDLER( decocass_type3_r )
 
 static WRITE8_HANDLER( decocass_type3_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (1 == (offset & 1))
 	{
 		if (1 == state->type3_pal_19)
@@ -989,7 +989,7 @@ static WRITE8_HANDLER( decocass_type3_w )
 
 static READ8_HANDLER( decocass_type4_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -1035,7 +1035,7 @@ static READ8_HANDLER( decocass_type4_r )
 
 static WRITE8_HANDLER( decocass_type4_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (1 == (offset & 1))
 	{
 		if (1 == state->type4_latch)
@@ -1074,7 +1074,7 @@ static WRITE8_HANDLER( decocass_type4_w )
 
 static READ8_HANDLER( decocass_type5_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -1117,7 +1117,7 @@ static READ8_HANDLER( decocass_type5_r )
 
 static WRITE8_HANDLER( decocass_type5_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (1 == (offset & 1))
 	{
 		if (1 == state->type5_latch)
@@ -1152,7 +1152,7 @@ static WRITE8_HANDLER( decocass_type5_w )
 
 static READ8_HANDLER( decocass_nodong_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -1193,7 +1193,7 @@ static READ8_HANDLER( decocass_nodong_r )
 
 READ8_HANDLER( decocass_e5xx_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	/* E5x2-E5x3 and mirrors */
@@ -1236,7 +1236,7 @@ READ8_HANDLER( decocass_e5xx_r )
 
 WRITE8_HANDLER( decocass_e5xx_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (state->dongle_w)
 	{
 		(*state->dongle_w)(space, offset, data);
@@ -1271,7 +1271,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 
 WRITE8_HANDLER( decocass_e900_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->de0091_enable = data & 1;
 	memory_set_bank(space->machine, "bank1", data & 1);
 	/* Perhaps the second row of ROMs is enabled by another bit.
@@ -1283,7 +1283,7 @@ WRITE8_HANDLER( decocass_e900_w )
 
 WRITE8_HANDLER( decocass_de0091_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	/* don't allow writes to the ROMs */
 	if (!state->de0091_enable)
 		decocass_charram_w(space, offset, data);
@@ -1297,7 +1297,7 @@ WRITE8_HANDLER( decocass_de0091_w )
 /* To be called once from driver_init, i.e. decocass_init */
 void decocass_machine_state_save_init( running_machine *machine )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	state_save_register_global(machine, state->firsttime);
 	state_save_register_global(machine, state->decocass_reset);
 	state_save_register_global(machine, state->i8041_p1);
@@ -1335,7 +1335,7 @@ void decocass_machine_state_save_init( running_machine *machine )
 
 MACHINE_START( decocass )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -1345,7 +1345,7 @@ MACHINE_START( decocass )
 
 static void decocass_reset_common( running_machine *machine )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	state->firsttime = 1;
 	state->latch1 = 0;
 
@@ -1404,7 +1404,7 @@ MACHINE_RESET( decocass )
 
 MACHINE_RESET( ctsttape )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	state->dongle_r = decocass_type1_pass_136_r;
@@ -1412,7 +1412,7 @@ MACHINE_RESET( ctsttape )
 
 MACHINE_RESET( chwy )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
 	state->dongle_r = decocass_type1_latch_27_pass_3_inv_2_r;
@@ -1420,7 +1420,7 @@ MACHINE_RESET( chwy )
 
 MACHINE_RESET( clocknch )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 2-3)\n"));
 	state->dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
@@ -1430,7 +1430,7 @@ MACHINE_RESET( clocknch )
 
 MACHINE_RESET( ctisland )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 0-2)\n"));
 	state->dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
@@ -1440,7 +1440,7 @@ MACHINE_RESET( ctisland )
 
 MACHINE_RESET( csuperas )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 4-5)\n"));
 	state->dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
@@ -1450,7 +1450,7 @@ MACHINE_RESET( csuperas )
 
 MACHINE_RESET( castfant )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	state->dongle_r = decocass_type1_latch_16_pass_3_inv_1_r;
@@ -1458,7 +1458,7 @@ MACHINE_RESET( castfant )
 
 MACHINE_RESET( cluckypo )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 1-3)\n"));
 	state->dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
@@ -1468,7 +1468,7 @@ MACHINE_RESET( cluckypo )
 
 MACHINE_RESET( cterrani )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 straight)\n"));
 	state->dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
@@ -1478,7 +1478,7 @@ MACHINE_RESET( cterrani )
 
 MACHINE_RESET( cexplore )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
 	state->dongle_r = decocass_type1_latch_26_pass_5_inv_2_r;
@@ -1486,7 +1486,7 @@ MACHINE_RESET( cexplore )
 
 MACHINE_RESET( cprogolf )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 0-1)\n"));
 	state->dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
@@ -1496,7 +1496,7 @@ MACHINE_RESET( cprogolf )
 
 MACHINE_RESET( cmissnx )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #2 (CS82-007)\n"));
 	state->dongle_r = decocass_type2_r;
@@ -1505,7 +1505,7 @@ MACHINE_RESET( cmissnx )
 
 MACHINE_RESET( cdiscon1 )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #2 (CS82-007)\n"));
 	state->dongle_r = decocass_type2_r;
@@ -1514,7 +1514,7 @@ MACHINE_RESET( cdiscon1 )
 
 MACHINE_RESET( cptennis )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #2 (CS82-007)\n"));
 	state->dongle_r = decocass_type2_r;
@@ -1523,7 +1523,7 @@ MACHINE_RESET( cptennis )
 
 MACHINE_RESET( ctornado )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #2 (CS82-007)\n"));
 	state->dongle_r = decocass_type2_r;
@@ -1532,7 +1532,7 @@ MACHINE_RESET( ctornado )
 
 MACHINE_RESET( cbnj )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1542,7 +1542,7 @@ MACHINE_RESET( cbnj )
 
 MACHINE_RESET( cburnrub )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1552,7 +1552,7 @@ MACHINE_RESET( cburnrub )
 
 MACHINE_RESET( cbtime )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1562,7 +1562,7 @@ MACHINE_RESET( cbtime )
 
 MACHINE_RESET( cgraplop )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1572,7 +1572,7 @@ MACHINE_RESET( cgraplop )
 
 MACHINE_RESET( cgraplop2 )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1582,7 +1582,7 @@ MACHINE_RESET( cgraplop2 )
 
 MACHINE_RESET( clapapa )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1592,7 +1592,7 @@ MACHINE_RESET( clapapa )
 
 MACHINE_RESET( cfghtice )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1602,7 +1602,7 @@ MACHINE_RESET( cfghtice )
 
 MACHINE_RESET( cprobowl )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1612,7 +1612,7 @@ MACHINE_RESET( cprobowl )
 
 MACHINE_RESET( cnightst )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1622,7 +1622,7 @@ MACHINE_RESET( cnightst )
 
 MACHINE_RESET( cprosocc )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1632,7 +1632,7 @@ MACHINE_RESET( cprosocc )
 
 MACHINE_RESET( cppicf )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;
@@ -1642,7 +1642,7 @@ MACHINE_RESET( cppicf )
 
 MACHINE_RESET( cscrtry )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #4 (32K ROM)\n"));
 	state->dongle_r = decocass_type4_r;
@@ -1651,7 +1651,7 @@ MACHINE_RESET( cscrtry )
 
 MACHINE_RESET( cbdash )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #5 (NOP)\n"));
 	state->dongle_r = decocass_type5_r;
@@ -1660,7 +1660,7 @@ MACHINE_RESET( cbdash )
 
 MACHINE_RESET( cflyball )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	decocass_reset_common(machine);
 	LOG(0,("no dongle\n"));
 	state->dongle_r = decocass_nodong_r;
@@ -1668,7 +1668,7 @@ MACHINE_RESET( cflyball )
 
 MACHINE_RESET( czeroize )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	UINT8 *mem = memory_region(machine, "dongle");
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
@@ -1698,7 +1698,7 @@ MACHINE_RESET( czeroize )
 
 WRITE8_HANDLER( i8041_p1_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data != state->i8041_p1_write_latch)
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p1_w: $%02x (%s%s%s%s%s%s%s%s)\n",
@@ -1733,7 +1733,7 @@ WRITE8_HANDLER( i8041_p1_w )
 
 READ8_HANDLER( i8041_p1_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data = state->i8041_p1;
 
 	if (data != state->i8041_p1_read_latch)
@@ -1757,7 +1757,7 @@ READ8_HANDLER( i8041_p1_r )
 
 WRITE8_HANDLER( i8041_p2_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data != state->i8041_p2_write_latch)
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p2_w: $%02x (%s%s%s%s%s%s%s%s)\n",
@@ -1779,7 +1779,7 @@ WRITE8_HANDLER( i8041_p2_w )
 
 READ8_HANDLER( i8041_p2_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	UINT8 data;
 
 	data = (state->i8041_p2 & ~0xe0) | tape_get_status_bits(state->cassette);

@@ -100,7 +100,7 @@ PALETTE_INIT( circusc )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	circusc_state *state = (circusc_state *)machine->driver_data;
+	circusc_state *state = machine->driver_data<circusc_state>();
 	UINT8 attr = state->colorram[tile_index];
 	tileinfo->category = (attr & 0x10) >> 4;
 
@@ -120,7 +120,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( circusc )
 {
-	circusc_state *state = (circusc_state *)machine->driver_data;
+	circusc_state *state = machine->driver_data<circusc_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
@@ -136,14 +136,14 @@ VIDEO_START( circusc )
 
 WRITE8_HANDLER( circusc_videoram_w )
 {
-	circusc_state *state = (circusc_state *)space->machine->driver_data;
+	circusc_state *state = space->machine->driver_data<circusc_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( circusc_colorram_w )
 {
-	circusc_state *state = (circusc_state *)space->machine->driver_data;
+	circusc_state *state = space->machine->driver_data<circusc_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -163,7 +163,7 @@ WRITE8_HANDLER( circusc_flipscreen_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	circusc_state *state = (circusc_state *)machine->driver_data;
+	circusc_state *state = machine->driver_data<circusc_state>();
 	int offs;
 	UINT8 *sr;
 
@@ -200,7 +200,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( circusc )
 {
-	circusc_state *state = (circusc_state *)screen->machine->driver_data;
+	circusc_state *state = screen->machine->driver_data<circusc_state>();
 	int i;
 
 	for (i = 0; i < 10; i++)

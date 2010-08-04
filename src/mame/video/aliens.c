@@ -10,7 +10,7 @@
 
 void aliens_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	aliens_state *state = (aliens_state *)machine->driver_data;
+	aliens_state *state = machine->driver_data<aliens_state>();
 
 	*code |= ((*color & 0x3f) << 8) | (bank << 14);
 	*color = state->layer_colorbase[layer] + ((*color & 0xc0) >> 6);
@@ -25,7 +25,7 @@ void aliens_tile_callback( running_machine *machine, int layer, int bank, int *c
 
 void aliens_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask, int *shadow )
 {
-	aliens_state *state = (aliens_state *)machine->driver_data;
+	aliens_state *state = machine->driver_data<aliens_state>();
 
 	/* The PROM allows for mixed priorities, where sprites would have */
 	/* priority over text but not on one or both of the other two planes. */
@@ -55,7 +55,7 @@ void aliens_sprite_callback( running_machine *machine, int *code, int *color, in
 
 VIDEO_START( aliens )
 {
-	aliens_state *state = (aliens_state *)machine->driver_data;
+	aliens_state *state = machine->driver_data<aliens_state>();
 
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x400);
 
@@ -77,7 +77,7 @@ VIDEO_START( aliens )
 
 VIDEO_UPDATE( aliens )
 {
-	aliens_state *state = (aliens_state *)screen->machine->driver_data;
+	aliens_state *state = screen->machine->driver_data<aliens_state>();
 
 	k052109_tilemap_update(state->k052109);
 

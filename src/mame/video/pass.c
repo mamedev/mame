@@ -7,7 +7,7 @@
 
 static TILE_GET_INFO( get_pass_bg_tile_info )
 {
-	pass_state *state = (pass_state *)machine->driver_data;
+	pass_state *state = machine->driver_data<pass_state>();
 	int tileno, fx;
 
 	tileno = state->bg_videoram[tile_index] & 0x1fff;
@@ -18,7 +18,7 @@ static TILE_GET_INFO( get_pass_bg_tile_info )
 
 WRITE16_HANDLER( pass_bg_videoram_w )
 {
-	pass_state *state = (pass_state *)space->machine->driver_data;
+	pass_state *state = space->machine->driver_data<pass_state>();
 
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -28,7 +28,7 @@ WRITE16_HANDLER( pass_bg_videoram_w )
 
 static TILE_GET_INFO( get_pass_fg_tile_info )
 {
-	pass_state *state = (pass_state *)machine->driver_data;
+	pass_state *state = machine->driver_data<pass_state>();
 	int tileno, flip;
 
 	tileno = state->fg_videoram[tile_index] & 0x3fff;
@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_pass_fg_tile_info )
 
 WRITE16_HANDLER( pass_fg_videoram_w )
 {
-	pass_state *state = (pass_state *)space->machine->driver_data;
+	pass_state *state = space->machine->driver_data<pass_state>();
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
@@ -49,7 +49,7 @@ WRITE16_HANDLER( pass_fg_videoram_w )
 
 VIDEO_START( pass )
 {
-	pass_state *state = (pass_state *)machine->driver_data;
+	pass_state *state = machine->driver_data<pass_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_pass_bg_tile_info, tilemap_scan_rows, 8, 8,  64, 32);
 	state->fg_tilemap = tilemap_create(machine, get_pass_fg_tile_info, tilemap_scan_rows, 4, 4, 128, 64);
@@ -59,7 +59,7 @@ VIDEO_START( pass )
 
 VIDEO_UPDATE( pass )
 {
-	pass_state *state = (pass_state *)screen->machine->driver_data;
+	pass_state *state = screen->machine->driver_data<pass_state>();
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap, 0, 0);

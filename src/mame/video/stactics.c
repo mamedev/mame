@@ -91,7 +91,7 @@ static PALETTE_INIT( stactics )
 
 WRITE8_HANDLER( stactics_scroll_ram_w )
 {
-	stactics_state *state = (stactics_state *)space->machine->driver_data;
+	stactics_state *state = space->machine->driver_data<stactics_state>();
 
 	if (data & 0x01)
 	{
@@ -114,7 +114,7 @@ WRITE8_HANDLER( stactics_scroll_ram_w )
 
 CUSTOM_INPUT( stactics_get_frame_count_d3 )
 {
-	stactics_state *state = (stactics_state *)field->port->machine->driver_data;
+	stactics_state *state = field->port->machine->driver_data<stactics_state>();
 
 	return (state->frame_count >> 3) & 0x01;
 }
@@ -129,7 +129,7 @@ CUSTOM_INPUT( stactics_get_frame_count_d3 )
 
 WRITE8_HANDLER( stactics_speed_latch_w )
 {
-	stactics_state *state = (stactics_state *)space->machine->driver_data;
+	stactics_state *state = space->machine->driver_data<stactics_state>();
 
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -156,7 +156,7 @@ WRITE8_HANDLER( stactics_speed_latch_w )
 
 WRITE8_HANDLER( stactics_shot_trigger_w )
 {
-	stactics_state *state = (stactics_state *)space->machine->driver_data;
+	stactics_state *state = space->machine->driver_data<stactics_state>();
 
 	state->shot_standby = 0;
 }
@@ -164,7 +164,7 @@ WRITE8_HANDLER( stactics_shot_trigger_w )
 
 WRITE8_HANDLER( stactics_shot_flag_clear_w )
 {
-	stactics_state *state = (stactics_state *)space->machine->driver_data;
+	stactics_state *state = space->machine->driver_data<stactics_state>();
 
 	state->shot_arrive = 0;
 }
@@ -172,7 +172,7 @@ WRITE8_HANDLER( stactics_shot_flag_clear_w )
 
 CUSTOM_INPUT( stactics_get_shot_standby )
 {
-	stactics_state *state = (stactics_state *)field->port->machine->driver_data;
+	stactics_state *state = field->port->machine->driver_data<stactics_state>();
 
 	return state->shot_standby;
 }
@@ -180,7 +180,7 @@ CUSTOM_INPUT( stactics_get_shot_standby )
 
 CUSTOM_INPUT( stactics_get_not_shot_arrive )
 {
-	stactics_state *state = (stactics_state *)field->port->machine->driver_data;
+	stactics_state *state = field->port->machine->driver_data<stactics_state>();
 
 	return !state->shot_arrive;
 }
@@ -367,7 +367,7 @@ static void update_artwork(running_machine *machine, stactics_state *state)
 
 static VIDEO_START( stactics )
 {
-	stactics_state *state = (stactics_state *)machine->driver_data;
+	stactics_state *state = machine->driver_data<stactics_state>();
 
 	state->y_scroll_d = 0;
 	state->y_scroll_e = 0;
@@ -390,7 +390,7 @@ static VIDEO_START( stactics )
 
 static VIDEO_UPDATE( stactics )
 {
-	stactics_state *state = (stactics_state *)screen->machine->driver_data;
+	stactics_state *state = screen->machine->driver_data<stactics_state>();
 
 	update_beam(state);
 	draw_background(state, bitmap, cliprect);

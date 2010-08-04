@@ -83,7 +83,7 @@
 
 static WRITE8_DEVICE_HANDLER( ay8910_porta_w )
 {
-	arabian_state *state = (arabian_state *)device->machine->driver_data;
+	arabian_state *state = device->machine->driver_data<arabian_state>();
 
 	/*
         bit 7 = ENA
@@ -98,7 +98,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_porta_w )
 
 static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 {
-	arabian_state *state = (arabian_state *)device->machine->driver_data;
+	arabian_state *state = device->machine->driver_data<arabian_state>();
 
 	/*
         bit 5 = /IREQ to custom CPU
@@ -125,7 +125,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 
 static READ8_HANDLER( custom_cpu_r )
 {
-	arabian_state *state = (arabian_state *)space->machine->driver_data;
+	arabian_state *state = space->machine->driver_data<arabian_state>();
 
 	/* since we don't have a simulator for the Fujitsu 8841 4-bit microprocessor */
 	/* we have to simulate its behavior; it looks like Arabian reads out of the  */
@@ -171,7 +171,7 @@ static READ8_HANDLER( custom_cpu_r )
 
 static WRITE8_HANDLER( custom_cpu_w )
 {
-	arabian_state *state = (arabian_state *)space->machine->driver_data;
+	arabian_state *state = space->machine->driver_data<arabian_state>();
 
 	state->custom_cpu_ram[0x7f0 + offset] = data;
 }
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( custom_cpu_w )
 
 static void update_flip_state( running_machine *machine )
 {
-	arabian_state *state = (arabian_state *)machine->driver_data;
+	arabian_state *state = machine->driver_data<arabian_state>();
 
 	/* the custom CPU also controls the video flip control line; unfortunately,    */
 	/* it appears that the custom is smart enough to flip the screen itself, based */
@@ -199,7 +199,7 @@ static void update_flip_state( running_machine *machine )
 
 static WRITE8_HANDLER( custom_flip_w )
 {
-	arabian_state *state = (arabian_state *)space->machine->driver_data;
+	arabian_state *state = space->machine->driver_data<arabian_state>();
 
 	state->custom_cpu_ram[0x34b + offset] = data;
 	update_flip_state(space->machine);
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( custom_flip_w )
 
 static WRITE8_HANDLER( custom_cocktail_w )
 {
-	arabian_state *state = (arabian_state *)space->machine->driver_data;
+	arabian_state *state = space->machine->driver_data<arabian_state>();
 
 	state->custom_cpu_ram[0x400 + offset] = data;
 	update_flip_state(space->machine);
@@ -374,7 +374,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( arabian )
 {
-	arabian_state *state = (arabian_state *)machine->driver_data;
+	arabian_state *state = machine->driver_data<arabian_state>();
 
 	state_save_register_global(machine, state->custom_cpu_reset);
 	state_save_register_global(machine, state->custom_cpu_busy);
@@ -382,7 +382,7 @@ static MACHINE_START( arabian )
 
 static MACHINE_RESET( arabian )
 {
-	arabian_state *state = (arabian_state *)machine->driver_data;
+	arabian_state *state = machine->driver_data<arabian_state>();
 
 	state->custom_cpu_reset = 0;
 	state->custom_cpu_busy = 0;

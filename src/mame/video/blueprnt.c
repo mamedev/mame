@@ -48,7 +48,7 @@ PALETTE_INIT( blueprnt )
 
 WRITE8_HANDLER( blueprnt_videoram_w )
 {
-	blueprnt_state *state = (blueprnt_state *)space->machine->driver_data;
+	blueprnt_state *state = space->machine->driver_data<blueprnt_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -56,7 +56,7 @@ WRITE8_HANDLER( blueprnt_videoram_w )
 
 WRITE8_HANDLER( blueprnt_colorram_w )
 {
-	blueprnt_state *state = (blueprnt_state *)space->machine->driver_data;
+	blueprnt_state *state = space->machine->driver_data<blueprnt_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -64,7 +64,7 @@ WRITE8_HANDLER( blueprnt_colorram_w )
 
 WRITE8_HANDLER( blueprnt_flipscreen_w )
 {
-	blueprnt_state *state = (blueprnt_state *)space->machine->driver_data;
+	blueprnt_state *state = space->machine->driver_data<blueprnt_state>();
 
 	flip_screen_set(space->machine, ~data & 0x02);
 
@@ -77,7 +77,7 @@ WRITE8_HANDLER( blueprnt_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	blueprnt_state *state = (blueprnt_state *)machine->driver_data;
+	blueprnt_state *state = machine->driver_data<blueprnt_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + 256 * state->gfx_bank;
 	int color = attr & 0x7f;
@@ -89,7 +89,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( blueprnt )
 {
-	blueprnt_state *state = (blueprnt_state *)machine->driver_data;
+	blueprnt_state *state = machine->driver_data<blueprnt_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
@@ -100,7 +100,7 @@ VIDEO_START( blueprnt )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	blueprnt_state *state = (blueprnt_state *)machine->driver_data;
+	blueprnt_state *state = machine->driver_data<blueprnt_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -126,7 +126,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( blueprnt )
 {
-	blueprnt_state *state = (blueprnt_state *)screen->machine->driver_data;
+	blueprnt_state *state = screen->machine->driver_data<blueprnt_state>();
 	int i;
 
 	if (flip_screen_get(screen->machine))

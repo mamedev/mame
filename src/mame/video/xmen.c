@@ -11,7 +11,7 @@
 
 void xmen_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	if (layer == 0)
@@ -28,7 +28,7 @@ void xmen_tile_callback( running_machine *machine, int layer, int bank, int *cod
 
 void xmen_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 	int pri = (*color & 0x00e0) >> 4;	/* ??????? */
 
 	if (pri <= state->layerpri[2])
@@ -53,7 +53,7 @@ void xmen_sprite_callback( running_machine *machine, int *code, int *color, int 
 
 VIDEO_START( xmen6p )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 
 	k053247_get_ram(state->k053246, &state->k053247_ram);
 
@@ -73,7 +73,7 @@ VIDEO_START( xmen6p )
 
 VIDEO_UPDATE( xmen )
 {
-	xmen_state *state = (xmen_state *)screen->machine->driver_data;
+	xmen_state *state = screen->machine->driver_data<xmen_state>();
 	int layer[3], bg_colorbase;
 
 	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI4);
@@ -109,7 +109,7 @@ VIDEO_UPDATE( xmen )
 
 VIDEO_UPDATE( xmen6p )
 {
-	xmen_state *state = (xmen_state *)screen->machine->driver_data;
+	xmen_state *state = screen->machine->driver_data<xmen_state>();
 	int x, y;
 
 	if (screen == state->lscreen)
@@ -137,7 +137,7 @@ VIDEO_UPDATE( xmen6p )
 /* my lefts and rights are mixed up in several places.. */
 VIDEO_EOF( xmen6p )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 	int layer[3], bg_colorbase;
 	bitmap_t * renderbitmap;
 	rectangle cliprect;

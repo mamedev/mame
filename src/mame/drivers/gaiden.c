@@ -138,7 +138,7 @@ Notes:
 
 static WRITE16_HANDLER( gaiden_sound_command_w )
 {
-	gaiden_state *state = (gaiden_state *)space->machine->driver_data;
+	gaiden_state *state = space->machine->driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, data & 0xff);	/* Ninja Gaiden */
@@ -149,7 +149,7 @@ static WRITE16_HANDLER( gaiden_sound_command_w )
 
 static WRITE16_HANDLER( drgnbowl_sound_command_w )
 {
-	gaiden_state *state = (gaiden_state *)space->machine->driver_data;
+	gaiden_state *state = space->machine->driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -166,7 +166,7 @@ static WRITE16_HANDLER( drgnbowl_sound_command_w )
 
 static WRITE16_HANDLER( wildfang_protection_w )
 {
-	gaiden_state *state = (gaiden_state *)space->machine->driver_data;
+	gaiden_state *state = space->machine->driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -217,7 +217,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 static READ16_HANDLER( wildfang_protection_r )
 {
-	gaiden_state *state = (gaiden_state *)space->machine->driver_data;
+	gaiden_state *state = space->machine->driver_data<gaiden_state>();
 //  logerror("PC %06x: read prot %02x\n", cpu_get_pc(space->cpu), state->prot);
 	return state->prot;
 }
@@ -295,7 +295,7 @@ static const int jumppoints_other[0x100] =
 
 static MACHINE_RESET( raiga )
 {
-	gaiden_state *state = (gaiden_state *)machine->driver_data;
+	gaiden_state *state = machine->driver_data<gaiden_state>();
 
 	state->prot = 0;
 	state->jumpcode = 0;
@@ -315,7 +315,7 @@ static MACHINE_RESET( raiga )
 
 static MACHINE_START( raiga )
 {
-	gaiden_state *state = (gaiden_state *)machine->driver_data;
+	gaiden_state *state = machine->driver_data<gaiden_state>();
 	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->prot);
@@ -336,7 +336,7 @@ static MACHINE_START( raiga )
 
 static WRITE16_HANDLER( raiga_protection_w )
 {
-	gaiden_state *state = (gaiden_state *)space->machine->driver_data;
+	gaiden_state *state = space->machine->driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -388,7 +388,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 
 static READ16_HANDLER( raiga_protection_r )
 {
-	gaiden_state *state = (gaiden_state *)space->machine->driver_data;
+	gaiden_state *state = space->machine->driver_data<gaiden_state>();
 //  logerror("PC %06x: read prot %02x\n", cpu_get_pc(space->cpu), state->prot);
 	return state->prot;
 }
@@ -750,7 +750,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	gaiden_state *state = (gaiden_state *)device->machine->driver_data;
+	gaiden_state *state = device->machine->driver_data<gaiden_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -1501,7 +1501,7 @@ ROM_END
 
 static DRIVER_INIT( shadoww )
 {
-	gaiden_state *state = (gaiden_state *)machine->driver_data;
+	gaiden_state *state = machine->driver_data<gaiden_state>();
 	/* sprite size Y = sprite size X */
 	state->sprite_sizey = 0;
 	state->raiga_jumppoints = jumppoints_00;
@@ -1509,7 +1509,7 @@ static DRIVER_INIT( shadoww )
 
 static DRIVER_INIT( wildfang )
 {
-	gaiden_state *state = (gaiden_state *)machine->driver_data;
+	gaiden_state *state = machine->driver_data<gaiden_state>();
 	/* sprite size Y = sprite size X */
 	state->sprite_sizey = 0;
 	state->raiga_jumppoints = jumppoints_00;
@@ -1522,7 +1522,7 @@ static DRIVER_INIT( wildfang )
 
 static DRIVER_INIT( raiga )
 {
-	gaiden_state *state = (gaiden_state *)machine->driver_data;
+	gaiden_state *state = machine->driver_data<gaiden_state>();
 	/* sprite size Y independent from sprite size X */
 	state->sprite_sizey = 2;
 	state->raiga_jumppoints = jumppoints_00;
@@ -1574,7 +1574,7 @@ static void descramble_drgnbowl_gfx(running_machine *machine)
 
 static DRIVER_INIT( drgnbowl )
 {
-	gaiden_state *state = (gaiden_state *)machine->driver_data;
+	gaiden_state *state = machine->driver_data<gaiden_state>();
 	state->raiga_jumppoints = jumppoints_00;
 
 	descramble_drgnbowl_gfx(machine);

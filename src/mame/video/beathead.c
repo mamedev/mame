@@ -17,7 +17,7 @@
 
 VIDEO_START( beathead )
 {
-	beathead_state *state = (beathead_state *)machine->driver_data;
+	beathead_state *state = machine->driver_data<beathead_state>();
 	state_save_register_global(machine, state->finescroll);
 	state_save_register_global(machine, state->vram_latch_offset);
 	state_save_register_global(machine, state->hsyncram_offset);
@@ -46,7 +46,7 @@ WRITE32_HANDLER( beathead_vram_transparent_w )
 
 WRITE32_HANDLER( beathead_vram_bulk_w )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 
 	/* it appears that writes to this area pass in a mask for 4 words in VRAM */
 	/* allowing them to be filled from a preset latch */
@@ -67,7 +67,7 @@ WRITE32_HANDLER( beathead_vram_bulk_w )
 WRITE32_HANDLER( beathead_vram_latch_w )
 {
 	/* latch the address */
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 	state->vram_latch_offset = (4 * offset) & 0x7ffff;
 }
 
@@ -75,7 +75,7 @@ WRITE32_HANDLER( beathead_vram_latch_w )
 WRITE32_HANDLER( beathead_vram_copy_w )
 {
 	/* copy from VRAM to VRAM, for 1024 bytes */
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 	offs_t dest_offset = (4 * offset) & 0x7ffff;
 	memcpy(&space->machine->generic.videoram.u32[dest_offset / 4], &space->machine->generic.videoram.u32[state->vram_latch_offset / 4], 0x400);
 }
@@ -90,7 +90,7 @@ WRITE32_HANDLER( beathead_vram_copy_w )
 
 WRITE32_HANDLER( beathead_finescroll_w )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 	UINT32 oldword = state->finescroll;
 	UINT32 newword = COMBINE_DATA(&state->finescroll);
 
@@ -129,7 +129,7 @@ WRITE32_HANDLER( beathead_palette_w )
 
 READ32_HANDLER( beathead_hsync_ram_r )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 
 	/* offset 0 is probably write-only */
 	if (offset == 0)
@@ -144,7 +144,7 @@ READ32_HANDLER( beathead_hsync_ram_r )
 
 WRITE32_HANDLER( beathead_hsync_ram_w )
 {
-	beathead_state *state = (beathead_state *)space->machine->driver_data;
+	beathead_state *state = space->machine->driver_data<beathead_state>();
 
 	/* offset 0 selects the address, and can specify the start address */
 	if (offset == 0)
@@ -169,7 +169,7 @@ WRITE32_HANDLER( beathead_hsync_ram_w )
 
 VIDEO_UPDATE( beathead )
 {
-	beathead_state *state = (beathead_state *)screen->machine->driver_data;
+	beathead_state *state = screen->machine->driver_data<beathead_state>();
 	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int x, y;
 

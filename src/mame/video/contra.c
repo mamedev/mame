@@ -54,7 +54,7 @@ PALETTE_INIT( contra )
 
 static void set_pens( running_machine *machine )
 {
-	contra_state *state = (contra_state *)machine->driver_data;
+	contra_state *state = machine->driver_data<contra_state>();
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
@@ -77,7 +77,7 @@ static void set_pens( running_machine *machine )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	contra_state *state = (contra_state *)machine->driver_data;
+	contra_state *state = machine->driver_data<contra_state>();
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121_1, 3);
 	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121_1, 4);
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121_1, 5);
@@ -106,7 +106,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	contra_state *state = (contra_state *)machine->driver_data;
+	contra_state *state = machine->driver_data<contra_state>();
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121_2, 3);
 	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121_2, 4);
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121_2, 5);
@@ -136,7 +136,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	contra_state *state = (contra_state *)machine->driver_data;
+	contra_state *state = machine->driver_data<contra_state>();
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121_1, 5);
 	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_1, 6);
 	int attr = state->tx_cram[tile_index];
@@ -166,7 +166,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( contra )
 {
-	contra_state *state = (contra_state *)machine->driver_data;
+	contra_state *state = machine->driver_data<contra_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -199,7 +199,7 @@ VIDEO_START( contra )
 
 WRITE8_HANDLER( contra_fg_vram_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 
 	state->fg_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -207,7 +207,7 @@ WRITE8_HANDLER( contra_fg_vram_w )
 
 WRITE8_HANDLER( contra_fg_cram_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 
 	state->fg_cram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -215,7 +215,7 @@ WRITE8_HANDLER( contra_fg_cram_w )
 
 WRITE8_HANDLER( contra_bg_vram_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 
 	state->bg_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -223,7 +223,7 @@ WRITE8_HANDLER( contra_bg_vram_w )
 
 WRITE8_HANDLER( contra_bg_cram_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 
 	state->bg_cram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -231,7 +231,7 @@ WRITE8_HANDLER( contra_bg_cram_w )
 
 WRITE8_HANDLER( contra_text_vram_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 
 	state->tx_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
@@ -239,7 +239,7 @@ WRITE8_HANDLER( contra_text_vram_w )
 
 WRITE8_HANDLER( contra_text_cram_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 
 	state->tx_cram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
@@ -247,7 +247,7 @@ WRITE8_HANDLER( contra_text_cram_w )
 
 WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_1, 6);
 
 	if (offset == 3)
@@ -272,7 +272,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 
 WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_2, 6);
 
 	if (offset == 3)
@@ -303,7 +303,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank )
 {
-	contra_state *state = (contra_state *)machine->driver_data;
+	contra_state *state = machine->driver_data<contra_state>();
 	running_device *k007121 = bank ? state->k007121_2 : state->k007121_1;
 	int base_color = (k007121_ctrlram_r(k007121, 6) & 0x30) * 2;
 	const UINT8 *source;
@@ -318,7 +318,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( contra )
 {
-	contra_state *state = (contra_state *)screen->machine->driver_data;
+	contra_state *state = screen->machine->driver_data<contra_state>();
 	UINT8 ctrl_1_0 = k007121_ctrlram_r(state->k007121_1, 0);
 	UINT8 ctrl_1_2 = k007121_ctrlram_r(state->k007121_1, 2);
 	UINT8 ctrl_2_0 = k007121_ctrlram_r(state->k007121_2, 0);

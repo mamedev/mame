@@ -9,7 +9,7 @@
 
 WRITE8_HANDLER( nitedrvr_videoram_w )
 {
-	nitedrvr_state *state = (nitedrvr_state *)space->machine->driver_data;
+	nitedrvr_state *state = space->machine->driver_data<nitedrvr_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -17,7 +17,7 @@ WRITE8_HANDLER( nitedrvr_videoram_w )
 
 WRITE8_HANDLER( nitedrvr_hvc_w )
 {
-	nitedrvr_state *state = (nitedrvr_state *)space->machine->driver_data;
+	nitedrvr_state *state = space->machine->driver_data<nitedrvr_state>();
 
 	state->hvc[offset & 0x3f] = data;
 
@@ -27,7 +27,7 @@ WRITE8_HANDLER( nitedrvr_hvc_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	nitedrvr_state *state = (nitedrvr_state *)machine->driver_data;
+	nitedrvr_state *state = machine->driver_data<nitedrvr_state>();
 	int code = state->videoram[tile_index] & 0x3f;
 
 	SET_TILE_INFO(0, code, 0, 0);
@@ -37,7 +37,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( nitedrvr )
 {
-	nitedrvr_state *state = (nitedrvr_state *)machine->driver_data;
+	nitedrvr_state *state = machine->driver_data<nitedrvr_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
@@ -57,7 +57,7 @@ static void draw_box( bitmap_t *bitmap, int bx, int by, int ex, int ey )
 
 static void draw_roadway( running_machine *machine, bitmap_t *bitmap )
 {
-	nitedrvr_state *state = (nitedrvr_state *)machine->driver_data;
+	nitedrvr_state *state = machine->driver_data<nitedrvr_state>();
 	int roadway;
 
 	for (roadway = 0; roadway < 16; roadway++)
@@ -75,7 +75,7 @@ static void draw_roadway( running_machine *machine, bitmap_t *bitmap )
 
 VIDEO_UPDATE( nitedrvr )
 {
-	nitedrvr_state *state = (nitedrvr_state *)screen->machine->driver_data;
+	nitedrvr_state *state = screen->machine->driver_data<nitedrvr_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_roadway(screen->machine, bitmap);

@@ -32,7 +32,7 @@ static WRITE8_HANDLER( crimfght_coin_w )
 
 static WRITE8_HANDLER( crimfght_sh_irqtrigger_w )
 {
-	crimfght_state *state = (crimfght_state *)space->machine->driver_data;
+	crimfght_state *state = space->machine->driver_data<crimfght_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
@@ -42,7 +42,7 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 	/* b1: bank for channel A */
 	/* b0: bank for channel B */
 
-	crimfght_state *state = (crimfght_state *)device->machine->driver_data;
+	crimfght_state *state = device->machine->driver_data<crimfght_state>();
 	int bank_A = BIT(data, 1);
 	int bank_B = BIT(data, 0);
 
@@ -51,7 +51,7 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 
 static READ8_HANDLER( k052109_051960_r )
 {
-	crimfght_state *state = (crimfght_state *)space->machine->driver_data;
+	crimfght_state *state = space->machine->driver_data<crimfght_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -68,7 +68,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	crimfght_state *state = (crimfght_state *)space->machine->driver_data;
+	crimfght_state *state = space->machine->driver_data<crimfght_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -257,7 +257,7 @@ static const k051960_interface crimfght_k051960_intf =
 
 static MACHINE_START( crimfght )
 {
-	crimfght_state *state = (crimfght_state *)machine->driver_data;
+	crimfght_state *state = machine->driver_data<crimfght_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank2", 0, 12, &ROM[0x10000], 0x2000);
@@ -408,7 +408,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 {
-	crimfght_state *state = (crimfght_state *)device->machine->driver_data;
+	crimfght_state *state = device->machine->driver_data<crimfght_state>();
 
 	/* bit 5 = select work RAM or palette */
 	if (lines & 0x20)

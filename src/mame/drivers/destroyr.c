@@ -9,12 +9,13 @@ Atari Destroyer Driver
 #include "deprecat.h"
 
 
-class destroyr_state
+class destroyr_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, destroyr_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, destroyr_state(machine)); }
 
-	destroyr_state(running_machine &machine) { }
+	destroyr_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *        major_obj_ram;
@@ -39,7 +40,7 @@ public:
 
 static VIDEO_UPDATE( destroyr )
 {
-	destroyr_state *state = (destroyr_state *)screen->machine->driver_data;
+	destroyr_state *state = screen->machine->driver_data<destroyr_state>();
 	int i, j;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -105,7 +106,7 @@ static VIDEO_UPDATE( destroyr )
 
 static TIMER_CALLBACK( destroyr_dial_callback )
 {
-	destroyr_state *state = (destroyr_state *)machine->driver_data;
+	destroyr_state *state = machine->driver_data<destroyr_state>();
 	int dial = param;
 
 	/* Analog inputs come from the player's depth control potentiometer.
@@ -126,7 +127,7 @@ static TIMER_CALLBACK( destroyr_dial_callback )
 
 static TIMER_CALLBACK( destroyr_frame_callback )
 {
-	destroyr_state *state = (destroyr_state *)machine->driver_data;
+	destroyr_state *state = machine->driver_data<destroyr_state>();
 	state->potsense[0] = 0;
 	state->potsense[1] = 0;
 
@@ -138,7 +139,7 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 
 static MACHINE_RESET( destroyr )
 {
-	destroyr_state *state = (destroyr_state *)machine->driver_data;
+	destroyr_state *state = machine->driver_data<destroyr_state>();
 
 	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, destroyr_frame_callback);
 
@@ -156,7 +157,7 @@ static MACHINE_RESET( destroyr )
 
 static WRITE8_HANDLER( destroyr_misc_w )
 {
-	destroyr_state *state = (destroyr_state *)space->machine->driver_data;
+	destroyr_state *state = space->machine->driver_data<destroyr_state>();
 
 	/* bits 0 to 2 connect to the sound circuits */
 	state->attract = data & 0x01;
@@ -173,7 +174,7 @@ static WRITE8_HANDLER( destroyr_misc_w )
 
 static WRITE8_HANDLER( destroyr_cursor_load_w )
 {
-	destroyr_state *state = (destroyr_state *)space->machine->driver_data;
+	destroyr_state *state = space->machine->driver_data<destroyr_state>();
 	state->cursor = data;
 	watchdog_reset_w(space, offset, data);
 }
@@ -181,7 +182,7 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 
 static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
-	destroyr_state *state = (destroyr_state *)space->machine->driver_data;
+	destroyr_state *state = space->machine->driver_data<destroyr_state>();
 	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
@@ -228,7 +229,7 @@ static WRITE8_HANDLER( destroyr_output_w )
 
 static READ8_HANDLER( destroyr_input_r )
 {
-	destroyr_state *state = (destroyr_state *)space->machine->driver_data;
+	destroyr_state *state = space->machine->driver_data<destroyr_state>();
 	offset &= 0x0f;
 
 	if (offset == 0)
@@ -434,7 +435,7 @@ static PALETTE_INIT( destroyr )
 
 static MACHINE_START( destroyr )
 {
-	destroyr_state *state = (destroyr_state *)machine->driver_data;
+	destroyr_state *state = machine->driver_data<destroyr_state>();
 
 	state->maincpu = machine->device("maincpu");
 

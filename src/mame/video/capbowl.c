@@ -18,7 +18,7 @@
 
 static void generate_interrupt( running_machine *machine, int state )
 {
-	capbowl_state *driver = (capbowl_state *)machine->driver_data;
+	capbowl_state *driver = machine->driver_data<capbowl_state>();
 	cpu_set_input_line(driver->maincpu, M6809_FIRQ_LINE, state);
 }
 
@@ -54,7 +54,7 @@ VIDEO_START( capbowl )
 
 WRITE8_HANDLER( capbowl_tms34061_w )
 {
-	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+	capbowl_state *state = space->machine->driver_data<capbowl_state>();
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
 
@@ -70,7 +70,7 @@ WRITE8_HANDLER( capbowl_tms34061_w )
 
 READ8_HANDLER( capbowl_tms34061_r )
 {
-	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+	capbowl_state *state = space->machine->driver_data<capbowl_state>();
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
 
@@ -93,7 +93,7 @@ READ8_HANDLER( capbowl_tms34061_r )
 
 WRITE8_HANDLER( bowlrama_blitter_w )
 {
-	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+	capbowl_state *state = space->machine->driver_data<capbowl_state>();
 
 	switch (offset)
 	{
@@ -118,7 +118,7 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 
 READ8_HANDLER( bowlrama_blitter_r )
 {
-	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+	capbowl_state *state = space->machine->driver_data<capbowl_state>();
 	UINT8 data = memory_region(space->machine, "gfx1")[state->blitter_addr];
 	UINT8 result = 0;
 

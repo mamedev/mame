@@ -34,33 +34,33 @@ PALETTE_INIT( kopunch )
 
 WRITE8_HANDLER( kopunch_videoram_w )
 {
-	kopunch_state *state = (kopunch_state *)space->machine->driver_data;
+	kopunch_state *state = space->machine->driver_data<kopunch_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kopunch_videoram2_w )
 {
-	kopunch_state *state = (kopunch_state *)space->machine->driver_data;
+	kopunch_state *state = space->machine->driver_data<kopunch_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kopunch_scroll_x_w )
 {
-	kopunch_state *state = (kopunch_state *)space->machine->driver_data;
+	kopunch_state *state = space->machine->driver_data<kopunch_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( kopunch_scroll_y_w )
 {
-	kopunch_state *state = (kopunch_state *)space->machine->driver_data;
+	kopunch_state *state = space->machine->driver_data<kopunch_state>();
 	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( kopunch_gfxbank_w )
 {
-	kopunch_state *state = (kopunch_state *)space->machine->driver_data;
+	kopunch_state *state = space->machine->driver_data<kopunch_state>();
 	if (state->gfxbank != (data & 0x07))
 	{
 		state->gfxbank = data & 0x07;
@@ -72,7 +72,7 @@ WRITE8_HANDLER( kopunch_gfxbank_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	kopunch_state *state = (kopunch_state *)machine->driver_data;
+	kopunch_state *state = machine->driver_data<kopunch_state>();
 	int code = state->videoram[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
@@ -80,7 +80,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	kopunch_state *state = (kopunch_state *)machine->driver_data;
+	kopunch_state *state = machine->driver_data<kopunch_state>();
 	int code = (state->videoram2[tile_index] & 0x7f) + 128 * state->gfxbank;
 
 	SET_TILE_INFO(1, code, 0, 0);
@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( kopunch )
 {
-	kopunch_state *state = (kopunch_state *)machine->driver_data;
+	kopunch_state *state = machine->driver_data<kopunch_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8,  8, 32, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 
@@ -99,7 +99,7 @@ VIDEO_START( kopunch )
 
 VIDEO_UPDATE( kopunch )
 {
-	kopunch_state *state = (kopunch_state *)screen->machine->driver_data;
+	kopunch_state *state = screen->machine->driver_data<kopunch_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);

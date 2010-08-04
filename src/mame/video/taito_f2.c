@@ -29,7 +29,7 @@ enum
 static void taitof2_core_vh_start (running_machine *machine, int sprite_type, int hide, int flip_hide )
 {
 	int i;
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	state->sprite_type = sprite_type;
 	state->hide_pixels = hide;
 	state->flip_hide_pixels = flip_hide;
@@ -137,7 +137,7 @@ VIDEO_START( taitof2_thundfox )
 
 VIDEO_START( taitof2_mjnquest )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	taitof2_core_vh_start(machine, 0, 0, 0);
 
@@ -146,7 +146,7 @@ VIDEO_START( taitof2_mjnquest )
 
 VIDEO_START( taitof2_footchmp )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	taitof2_core_vh_start(machine, 0, 3, 3);
 
@@ -155,7 +155,7 @@ VIDEO_START( taitof2_footchmp )
 
 VIDEO_START( taitof2_hthero )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	taitof2_core_vh_start(machine, 0, 3, 3);
 
@@ -194,7 +194,7 @@ VIDEO_START( taitof2_dinorex )
 
 VIDEO_START( taitof2_dondokod )	/* dondokod, cameltry */
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	state->pivot_xdisp = -16;
 	state->pivot_ydisp = 0;
@@ -203,7 +203,7 @@ VIDEO_START( taitof2_dondokod )	/* dondokod, cameltry */
 
 VIDEO_START( taitof2_pulirula )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	state->pivot_xdisp = -10;	/* alignment seems correct (see level 2, falling */
 	state->pivot_ydisp = 16;	/* block of ice after armour man) */
@@ -212,7 +212,7 @@ VIDEO_START( taitof2_pulirula )
 
 VIDEO_START( taitof2_driftout )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	state->pivot_xdisp = -16;
 	state->pivot_ydisp = 16;
@@ -233,7 +233,7 @@ altering spritebanks of sprites while they're on screen.
 WRITE16_HANDLER( taitof2_sprite_extension_w )
 {
 	/* areas above 0x1000 cleared in some games, but not used */
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 
 	if (offset < 0x800)
 	{
@@ -244,7 +244,7 @@ WRITE16_HANDLER( taitof2_sprite_extension_w )
 
 WRITE16_HANDLER( taitof2_spritebank_w )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 	int i = 0;
 	int j = 0;
 
@@ -274,7 +274,7 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 
 WRITE16_HANDLER( koshien_spritebank_w )
 {
-	taitof2_state *state = (taitof2_state *)space->machine->driver_data;
+	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 	state->spritebank_buffered[0] = 0x0000;   /* never changes */
 	state->spritebank_buffered[1] = 0x0400;
 
@@ -289,7 +289,7 @@ WRITE16_HANDLER( koshien_spritebank_w )
 static void taito_f2_tc360_spritemixdraw( running_machine *machine, bitmap_t *dest_bmp, const rectangle *clip, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
@@ -494,7 +494,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
     non zoom parts.
 
     */
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	int i, x, y, off, extoffs;
 	int code, color, spritedata, spritecont, flipx, flipy;
 	int xcurrent, ycurrent, big_sprite = 0;
@@ -819,7 +819,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void update_spritebanks( running_machine *machine )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	int i;
 #if 1
 	for (i = 0; i < 8; i ++)
@@ -838,7 +838,7 @@ static void update_spritebanks( running_machine *machine )
 
 static void taitof2_handle_sprite_buffering( running_machine *machine )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	if (state->prepare_sprites)	/* no buffering */
 	{
@@ -849,7 +849,7 @@ static void taitof2_handle_sprite_buffering( running_machine *machine )
 
 static void taitof2_update_sprites_active_area( running_machine *machine )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	int off;
 
 	update_spritebanks(machine);
@@ -895,7 +895,7 @@ static void taitof2_update_sprites_active_area( running_machine *machine )
 
 VIDEO_EOF( taitof2_no_buffer )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	taitof2_update_sprites_active_area(machine);
 
@@ -904,7 +904,7 @@ VIDEO_EOF( taitof2_no_buffer )
 
 VIDEO_EOF( taitof2_full_buffer_delayed )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	UINT16 *spriteram = state->spriteram;
 	int i;
 
@@ -919,7 +919,7 @@ VIDEO_EOF( taitof2_full_buffer_delayed )
 
 VIDEO_EOF( taitof2_partial_buffer_delayed )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	UINT16 *spriteram = state->spriteram;
 	int i;
 
@@ -934,7 +934,7 @@ VIDEO_EOF( taitof2_partial_buffer_delayed )
 
 VIDEO_EOF( taitof2_partial_buffer_delayed_thundfox )
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	UINT16 *spriteram = state->spriteram;
 	int i;
 
@@ -956,7 +956,7 @@ VIDEO_EOF( taitof2_partial_buffer_delayed_qzchikyu )
 	/* spriteram[2] and [3] are 1 frame behind...
        probably thundfox_eof_callback would work fine */
 
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 	UINT16 *spriteram = state->spriteram;
 	int i;
 
@@ -993,7 +993,7 @@ VIDEO_UPDATE( taitof2_ssi )
 
 VIDEO_UPDATE( taitof2_yesnoj )
 {
-	taitof2_state *state = (taitof2_state *)screen->machine->driver_data;
+	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 
 	taitof2_handle_sprite_buffering(screen->machine);
 
@@ -1011,7 +1011,7 @@ VIDEO_UPDATE( taitof2_yesnoj )
 
 VIDEO_UPDATE( taitof2 )
 {
-	taitof2_state *state = (taitof2_state *)screen->machine->driver_data;
+	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 
 	taitof2_handle_sprite_buffering(screen->machine);
 
@@ -1029,7 +1029,7 @@ VIDEO_UPDATE( taitof2 )
 
 VIDEO_UPDATE( taitof2_pri )
 {
-	taitof2_state *state = (taitof2_state *)screen->machine->driver_data;
+	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	int layer[3];
 
 	taitof2_handle_sprite_buffering(screen->machine);
@@ -1065,7 +1065,7 @@ VIDEO_UPDATE( taitof2_pri )
 
 static void draw_roz_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 priority)
 {
-	taitof2_state *state = (taitof2_state *)machine->driver_data;
+	taitof2_state *state = machine->driver_data<taitof2_state>();
 
 	if (state->tc0280grd != NULL)
 		tc0280grd_zoom_draw(state->tc0280grd, bitmap, cliprect, state->pivot_xdisp, state->pivot_ydisp, priority);
@@ -1076,7 +1076,7 @@ static void draw_roz_layer( running_machine *machine, bitmap_t *bitmap, const re
 
 VIDEO_UPDATE( taitof2_pri_roz )
 {
-	taitof2_state *state = (taitof2_state *)screen->machine->driver_data;
+	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	int tilepri[3];
 	int rozpri;
 	int layer[3];
@@ -1145,7 +1145,7 @@ VIDEO_UPDATE( taitof2_pri_roz )
 /* Thunderfox */
 VIDEO_UPDATE( taitof2_thundfox )
 {
-	taitof2_state *state = (taitof2_state *)screen->machine->driver_data;
+	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	int tilepri[2][3];
 	int spritepri[4];
 	int layer[2][3];
@@ -1282,7 +1282,7 @@ and it changes these (and the sprite pri settings) a lot.
 
 VIDEO_UPDATE( taitof2_metalb )
 {
-	taitof2_state *state = (taitof2_state *)screen->machine->driver_data;
+	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	UINT8 layer[5], invlayer[4];
 	UINT16 priority;
 
@@ -1333,7 +1333,7 @@ VIDEO_UPDATE( taitof2_metalb )
 /* Deadconx, Footchmp */
 VIDEO_UPDATE( taitof2_deadconx )
 {
-	taitof2_state *state = (taitof2_state *)screen->machine->driver_data;
+	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	UINT8 layer[5];
 	UINT8 tilepri[5];
 	UINT8 spritepri[4];

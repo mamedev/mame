@@ -27,12 +27,13 @@
 #define IREMM15_VBSTART			(240)
 #define IREMM15_VBEND			(16)
 
-class m10_state
+class m10_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m10_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, m10_state(machine)); }
 
-	m10_state(running_machine &machine) { }
+	m10_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *             chargen;

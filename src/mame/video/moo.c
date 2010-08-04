@@ -14,7 +14,7 @@
 
 void moo_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	moo_state *state = (moo_state *)machine->driver_data;
+	moo_state *state = machine->driver_data<moo_state>();
 	int pri = (*color & 0x03e0) >> 4;
 
 	if (pri <= state->layerpri[2])
@@ -31,13 +31,13 @@ void moo_sprite_callback( running_machine *machine, int *code, int *color, int *
 
 void moo_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
 {
-	moo_state *state = (moo_state *)machine->driver_data;
+	moo_state *state = machine->driver_data<moo_state>();
 	*color = state->layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
 VIDEO_START(moo)
 {
-	moo_state *state = (moo_state *)machine->driver_data;
+	moo_state *state = machine->driver_data<moo_state>();
 
 	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
 
@@ -65,7 +65,7 @@ VIDEO_START(moo)
 
 VIDEO_UPDATE(moo)
 {
-	moo_state *state = (moo_state *)screen->machine->driver_data;
+	moo_state *state = screen->machine->driver_data<moo_state>();
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layers[3];
 	int new_colorbase, plane, dirty, alpha;

@@ -157,14 +157,14 @@ static STATE_POSTLOAD( bankselect_postload );
 
 static void update_interrupts(running_machine *machine)
 {
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 
-	if (state->atarigen.video_int_state)
+	if (state->video_int_state)
 		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
 
-	if (state->atarigen.scanline_int_state)
+	if (state->scanline_int_state)
 		cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
@@ -190,7 +190,7 @@ static void update_interrupts(running_machine *machine)
 
 static void scanline_update(screen_device &screen, int scanline)
 {
-	atarisy2_state *state = (atarisy2_state *)screen.machine->driver_data;
+	atarisy2_state *state = screen.machine->driver_data<atarisy2_state>();
 	if (scanline <= screen.height())
 	{
 		/* generate the 32V interrupt (IRQ 2) */
@@ -210,7 +210,7 @@ static void scanline_update(screen_device &screen, int scanline)
 
 static DIRECT_UPDATE_HANDLER( atarisy2_direct_handler )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
 	/* make sure slapstic area looks like ROM */
 	if (address >= 0x8000 && address < 0x8200)
@@ -224,7 +224,7 @@ static DIRECT_UPDATE_HANDLER( atarisy2_direct_handler )
 
 static MACHINE_START( atarisy2 )
 {
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 	atarigen_init(machine);
 
 	state_save_register_global(machine, state->interrupt_enable);
@@ -238,11 +238,11 @@ static MACHINE_START( atarisy2 )
 
 static MACHINE_RESET( atarisy2 )
 {
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 
-	atarigen_eeprom_reset(&state->atarigen);
+	atarigen_eeprom_reset(state);
 	slapstic_reset();
-	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
+	atarigen_interrupt_reset(state, update_interrupts);
 	atarigen_sound_io_reset(machine->device("soundcpu"));
 	atarigen_scanline_timer_reset(*machine->primary_screen, scanline_update, 64);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
@@ -263,7 +263,7 @@ static MACHINE_RESET( atarisy2 )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	atarisy2_state *state = (atarisy2_state *)device->machine->driver_data;
+	atarisy2_state *state = device->machine->driver_data<atarisy2_state>();
 
 	/* clock the VBLANK through */
 	if (state->interrupt_enable & 8)
@@ -274,7 +274,7 @@ static INTERRUPT_GEN( vblank_int )
 static WRITE16_HANDLER( int0_ack_w )
 {
 	/* reset sound IRQ */
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 	state->p2portrd_state = 0;
 	atarigen_update_interrupts(space->machine);
 }
@@ -290,7 +290,7 @@ static WRITE16_HANDLER( int1_ack_w )
 
 static TIMER_CALLBACK( delayed_int_enable_w )
 {
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 	state->interrupt_enable = param;
 }
 
@@ -331,7 +331,7 @@ static WRITE16_HANDLER( bankselect_w )
 		0x8e000, 0x86000, 0x7e000, 0x76000
 	};
 
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 	int newword = state->bankselect[offset];
 	UINT8 *base;
 
@@ -346,7 +346,7 @@ static WRITE16_HANDLER( bankselect_w )
 static STATE_POSTLOAD( bankselect_postload )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 
 	bankselect_w(space, 0, state->bankselect[0], 0xffff);
 	bankselect_w(space, 1, state->bankselect[1], 0xffff);
@@ -362,11 +362,11 @@ static STATE_POSTLOAD( bankselect_postload )
 
 static READ16_HANDLER( switch_r )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 	int result = input_port_read(space->machine, "1800") | (input_port_read(space->machine, "1801") << 8);
 
-	if (state->atarigen.cpu_to_sound_ready) result ^= 0x20;
-	if (state->atarigen.sound_to_cpu_ready) result ^= 0x10;
+	if (state->cpu_to_sound_ready) result ^= 0x20;
+	if (state->sound_to_cpu_ready) result ^= 0x10;
 
 	return result;
 }
@@ -374,11 +374,11 @@ static READ16_HANDLER( switch_r )
 
 static READ8_HANDLER( switch_6502_r )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 	int result = input_port_read(space->machine, "1840");
 
-	if (state->atarigen.cpu_to_sound_ready) result |= 0x01;
-	if (state->atarigen.sound_to_cpu_ready) result |= 0x02;
+	if (state->cpu_to_sound_ready) result |= 0x01;
+	if (state->sound_to_cpu_ready) result |= 0x02;
 	if ((state->has_tms5220) && (tms5220_readyq_r(space->machine->device("tms")) == 0))
 		result &= ~0x04;
 	if (!(input_port_read(space->machine, "1801") & 0x80)) result |= 0x10;
@@ -389,7 +389,7 @@ static READ8_HANDLER( switch_6502_r )
 
 static WRITE8_HANDLER( switch_6502_w )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
 	if (state->has_tms5220)
 	{
@@ -408,7 +408,7 @@ static WRITE8_HANDLER( switch_6502_w )
 
 static WRITE16_HANDLER( adc_strobe_w )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 	state->which_adc = offset & 3;
 }
 
@@ -416,7 +416,7 @@ static WRITE16_HANDLER( adc_strobe_w )
 static READ16_HANDLER( adc_r )
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
 	if (state->which_adc < state->pedal_count)
 		return ~input_port_read(space->machine, adcnames[state->which_adc]);
@@ -428,7 +428,7 @@ static READ16_HANDLER( adc_r )
 static READ8_HANDLER( leta_r )
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
     if (state->pedal_count == -1)   /* 720 */
 	{
@@ -611,7 +611,7 @@ static WRITE8_HANDLER( mixer_w )
 
 static WRITE8_HANDLER( sound_reset_w )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
 	/* if no change, do nothing */
 	if ((data & 1) == state->sound_reset_state)
@@ -635,7 +635,7 @@ static WRITE8_HANDLER( sound_reset_w )
 
 static READ16_HANDLER( sound_r )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
 	/* clear the p2portwr state on a p1portrd */
 	state->p2portwr_state = 0;
@@ -648,7 +648,7 @@ static READ16_HANDLER( sound_r )
 
 static WRITE8_HANDLER( sound_6502_w )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
 	/* clock the state through */
 	state->p2portwr_state = (state->interrupt_enable & 2) != 0;
@@ -661,7 +661,7 @@ static WRITE8_HANDLER( sound_6502_w )
 
 static READ8_HANDLER( sound_6502_r )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
 	/* clock the state through */
 	state->p2portrd_state = (state->interrupt_enable & 1) != 0;
@@ -681,7 +681,7 @@ static READ8_HANDLER( sound_6502_r )
 
 static WRITE8_HANDLER( tms5220_w )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 	if (state->has_tms5220)
 	{
 		tms5220_data_w(space->machine->device("tms"), 0, data);
@@ -690,7 +690,7 @@ static WRITE8_HANDLER( tms5220_w )
 
 static WRITE8_HANDLER( tms5220_strobe_w )
 {
-	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 	if (state->has_tms5220)
 	{
 		tms5220_wsq_w(space->machine->device("tms"), 1-(offset & 1));
@@ -729,8 +729,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x15e0, 0x15e1) AM_MIRROR(0x001e) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0x1600, 0x1601) AM_MIRROR(0x007e) AM_WRITE(int_enable_w)
 	AM_RANGE(0x1680, 0x1681) AM_MIRROR(0x007e) AM_WRITE(atarigen_sound_w)
-	AM_RANGE(0x1700, 0x1701) AM_MIRROR(0x007e) AM_WRITE(atarisy2_xscroll_w) AM_BASE_MEMBER(atarisy2_state, atarigen.xscroll)
-	AM_RANGE(0x1780, 0x1781) AM_MIRROR(0x007e) AM_WRITE(atarisy2_yscroll_w) AM_BASE_MEMBER(atarisy2_state, atarigen.yscroll)
+	AM_RANGE(0x1700, 0x1701) AM_MIRROR(0x007e) AM_WRITE(atarisy2_xscroll_w) AM_BASE_MEMBER(atarisy2_state, xscroll)
+	AM_RANGE(0x1780, 0x1781) AM_MIRROR(0x007e) AM_WRITE(atarisy2_yscroll_w) AM_BASE_MEMBER(atarisy2_state, yscroll)
 	AM_RANGE(0x1800, 0x1801) AM_MIRROR(0x03fe) AM_READWRITE(switch_r, watchdog_reset16_w)
 	AM_RANGE(0x1c00, 0x1c01) AM_MIRROR(0x03fe) AM_READ(sound_r)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(atarisy2_videoram_r, atarisy2_videoram_w)
@@ -751,7 +751,7 @@ ADDRESS_MAP_END
 /* full memory map derived from schematics */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_RAM AM_BASE_SIZE_MEMBER(atarisy2_state, atarigen.eeprom, atarigen.eeprom_size)
+	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_RAM AM_BASE_SIZE_MEMBER(atarisy2_state, eeprom, eeprom_size)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x1810, 0x1813) AM_MIRROR(0x278c) AM_READ(leta_r)
 	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
@@ -3037,10 +3037,10 @@ static DRIVER_INIT( paperboy )
 		0x0000
 	};
 	int i;
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 	UINT8 *cpu1 = memory_region(machine, "maincpu");
 
-	state->atarigen.eeprom_default = compressed_default_eeprom;
+	state->eeprom_default = compressed_default_eeprom;
 	slapstic_init(machine, 105);
 
 	/* expand the 16k program ROMs into full 64k chunks */
@@ -3088,8 +3088,8 @@ static DRIVER_INIT( 720 )
 		0x0152,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0x06ff,
 		0x0000
 	};
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
-	state->atarigen.eeprom_default = compressed_default_eeprom;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
+	state->eeprom_default = compressed_default_eeprom;
 	slapstic_init(machine, 107);
 
 	state->pedal_count = -1;
@@ -3100,11 +3100,11 @@ static DRIVER_INIT( 720 )
 
 static void ssprint_init_common(running_machine *machine, const UINT16 *default_eeprom)
 {
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 	int i;
 	UINT8 *cpu1 = memory_region(machine, "maincpu");
 
-	state->atarigen.eeprom_default = default_eeprom;
+	state->eeprom_default = default_eeprom;
 	slapstic_init(machine, 108);
 
 	/* expand the 32k program ROMs into full 64k chunks */
@@ -3226,10 +3226,10 @@ static DRIVER_INIT( csprint )
 		0x0186,0x0100,0x011B,0x01BC,0x011D,0x011F,0x0000
 	};
 	int i;
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 	UINT8 *cpu1 = memory_region(machine, "maincpu");
 
-	state->atarigen.eeprom_default = compressed_default_eeprom;
+	state->eeprom_default = compressed_default_eeprom;
 	slapstic_init(machine, 109);
 
 	/* expand the 32k program ROMs into full 64k chunks */
@@ -3243,9 +3243,9 @@ static DRIVER_INIT( csprint )
 
 static DRIVER_INIT( apb )
 {
-	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 
-	state->atarigen.eeprom_default = NULL;
+	state->eeprom_default = NULL;
 	slapstic_init(machine, 110);
 
 	state->pedal_count = 2;

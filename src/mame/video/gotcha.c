@@ -14,7 +14,7 @@ static TILEMAP_MAPPER( gotcha_tilemap_scan )
 
 INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index ,UINT16 *vram, int color_offs)
 {
-	gotcha_state *state = (gotcha_state *)machine->driver_data;
+	gotcha_state *state = machine->driver_data<gotcha_state>();
 	UINT16 data = vram[tile_index];
 	int code = (data & 0x3ff) | (state->gfxbank[(data & 0x0c00) >> 10] << 10);
 
@@ -23,13 +23,13 @@ INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int ti
 
 static TILE_GET_INFO( fg_get_tile_info )
 {
-	gotcha_state *state = (gotcha_state *)machine->driver_data;
+	gotcha_state *state = machine->driver_data<gotcha_state>();
 	get_tile_info(machine, tileinfo, tile_index, state->fgvideoram, 0);
 }
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
-	gotcha_state *state = (gotcha_state *)machine->driver_data;
+	gotcha_state *state = machine->driver_data<gotcha_state>();
 	get_tile_info(machine, tileinfo, tile_index, state->bgvideoram, 16);
 }
 
@@ -43,7 +43,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 VIDEO_START( gotcha )
 {
-	gotcha_state *state = (gotcha_state *)machine->driver_data;
+	gotcha_state *state = machine->driver_data<gotcha_state>();
 	state->fg_tilemap = tilemap_create(machine, fg_get_tile_info, gotcha_tilemap_scan, 16, 16, 64, 32);
 	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info, gotcha_tilemap_scan, 16, 16, 64, 32);
 
@@ -56,28 +56,28 @@ VIDEO_START( gotcha )
 
 WRITE16_HANDLER( gotcha_fgvideoram_w )
 {
-	gotcha_state *state = (gotcha_state *)space->machine->driver_data;
+	gotcha_state *state = space->machine->driver_data<gotcha_state>();
 	COMBINE_DATA(&state->fgvideoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE16_HANDLER( gotcha_bgvideoram_w )
 {
-	gotcha_state *state = (gotcha_state *)space->machine->driver_data;
+	gotcha_state *state = space->machine->driver_data<gotcha_state>();
 	COMBINE_DATA(&state->bgvideoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE16_HANDLER( gotcha_gfxbank_select_w )
 {
-	gotcha_state *state = (gotcha_state *)space->machine->driver_data;
+	gotcha_state *state = space->machine->driver_data<gotcha_state>();
 	if (ACCESSING_BITS_8_15)
 		state->banksel = (data & 0x0300) >> 8;
 }
 
 WRITE16_HANDLER( gotcha_gfxbank_w )
 {
-	gotcha_state *state = (gotcha_state *)space->machine->driver_data;
+	gotcha_state *state = space->machine->driver_data<gotcha_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		if (state->gfxbank[state->banksel] != ((data & 0x0f00) >> 8))
@@ -90,7 +90,7 @@ WRITE16_HANDLER( gotcha_gfxbank_w )
 
 WRITE16_HANDLER( gotcha_scroll_w )
 {
-	gotcha_state *state = (gotcha_state *)space->machine->driver_data;
+	gotcha_state *state = space->machine->driver_data<gotcha_state>();
 	COMBINE_DATA(&state->scroll[offset]);
 
 	switch (offset)
@@ -107,7 +107,7 @@ WRITE16_HANDLER( gotcha_scroll_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	gotcha_state *state = (gotcha_state *)machine->driver_data;
+	gotcha_state *state = machine->driver_data<gotcha_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -137,7 +137,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( gotcha )
 {
-	gotcha_state *state = (gotcha_state *)screen->machine->driver_data;
+	gotcha_state *state = screen->machine->driver_data<gotcha_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

@@ -28,20 +28,20 @@ Protection comms between main cpu and i8751
 
 static READ8_HANDLER( blktiger_from_mcu_r )
 {
-	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	blktiger_state *state = space->machine->driver_data<blktiger_state>();
 	return state->i8751_latch;
 }
 
 static WRITE8_HANDLER( blktiger_to_mcu_w )
 {
-	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	blktiger_state *state = space->machine->driver_data<blktiger_state>();
 	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
 	state->z80_latch = data;
 }
 
 static READ8_HANDLER( blktiger_from_main_r )
 {
-	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	blktiger_state *state = space->machine->driver_data<blktiger_state>();
 	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
 	return state->z80_latch;
@@ -49,7 +49,7 @@ static READ8_HANDLER( blktiger_from_main_r )
 
 static WRITE8_HANDLER( blktiger_to_main_w )
 {
-	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	blktiger_state *state = space->machine->driver_data<blktiger_state>();
 	//printf("%02x write\n",data);
 	state->i8751_latch = data;
 }
@@ -265,7 +265,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	blktiger_state *state = (blktiger_state *)device->machine->driver_data;
+	blktiger_state *state = device->machine->driver_data<blktiger_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -281,7 +281,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( blktiger )
 {
-	blktiger_state *state = (blktiger_state *)machine->driver_data;
+	blktiger_state *state = machine->driver_data<blktiger_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 	state->mcu = machine->device("mcu");
@@ -302,7 +302,7 @@ static MACHINE_START( blktiger )
 
 static MACHINE_RESET( blktiger )
 {
-	blktiger_state *state = (blktiger_state *)machine->driver_data;
+	blktiger_state *state = machine->driver_data<blktiger_state>();
 
 	/* configure bankswitching */
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);

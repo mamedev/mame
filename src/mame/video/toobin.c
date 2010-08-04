@@ -18,8 +18,8 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	toobin_state *state = (toobin_state *)machine->driver_data;
-	UINT16 data = state->atarigen.alpha[tile_index];
+	toobin_state *state = machine->driver_data<toobin_state>();
+	UINT16 data = state->alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
 	SET_TILE_INFO(2, code, color, (data >> 10) & 1);
@@ -28,9 +28,9 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	toobin_state *state = (toobin_state *)machine->driver_data;
-	UINT16 data1 = state->atarigen.playfield[tile_index * 2];
-	UINT16 data2 = state->atarigen.playfield[tile_index * 2 + 1];
+	toobin_state *state = machine->driver_data<toobin_state>();
+	UINT16 data1 = state->playfield[tile_index * 2];
+	UINT16 data2 = state->playfield[tile_index * 2 + 1];
 	int code = data2 & 0x3fff;
 	int color = data1 & 0x0f;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX(data2 >> 14));
@@ -83,17 +83,17 @@ VIDEO_START( toobin )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	toobin_state *state = (toobin_state *)machine->driver_data;
+	toobin_state *state = machine->driver_data<toobin_state>();
 
 	/* initialize the playfield */
-	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);
+	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
-	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
+	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
+	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
 
 	/* allocate a playfield bitmap for rendering */
 	state->pfbitmap = auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
@@ -111,7 +111,7 @@ VIDEO_START( toobin )
 
 WRITE16_HANDLER( toobin_paletteram_w )
 {
-	toobin_state *state = (toobin_state *)space->machine->driver_data;
+	toobin_state *state = space->machine->driver_data<toobin_state>();
 	int newword;
 
 	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
@@ -137,7 +137,7 @@ WRITE16_HANDLER( toobin_paletteram_w )
 
 WRITE16_HANDLER( toobin_intensity_w )
 {
-	toobin_state *state = (toobin_state *)space->machine->driver_data;
+	toobin_state *state = space->machine->driver_data<toobin_state>();
 	int i;
 
 	if (ACCESSING_BITS_0_7)
@@ -160,8 +160,8 @@ WRITE16_HANDLER( toobin_intensity_w )
 
 WRITE16_HANDLER( toobin_xscroll_w )
 {
-	toobin_state *state = (toobin_state *)space->machine->driver_data;
-	UINT16 oldscroll = *state->atarigen.xscroll;
+	toobin_state *state = space->machine->driver_data<toobin_state>();
+	UINT16 oldscroll = *state->xscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -170,18 +170,18 @@ WRITE16_HANDLER( toobin_xscroll_w )
 		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
-	tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll >> 6);
+	tilemap_set_scrollx(state->playfield_tilemap, 0, newscroll >> 6);
 	atarimo_set_xscroll(0, newscroll >> 6);
 
 	/* update the data */
-	*state->atarigen.xscroll = newscroll;
+	*state->xscroll = newscroll;
 }
 
 
 WRITE16_HANDLER( toobin_yscroll_w )
 {
-	toobin_state *state = (toobin_state *)space->machine->driver_data;
-	UINT16 oldscroll = *state->atarigen.yscroll;
+	toobin_state *state = space->machine->driver_data<toobin_state>();
+	UINT16 oldscroll = *state->yscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -190,11 +190,11 @@ WRITE16_HANDLER( toobin_yscroll_w )
 		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
-	tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll >> 6);
+	tilemap_set_scrolly(state->playfield_tilemap, 0, newscroll >> 6);
 	atarimo_set_yscroll(0, (newscroll >> 6) & 0x1ff);
 
 	/* update the data */
-	*state->atarigen.yscroll = newscroll;
+	*state->yscroll = newscroll;
 }
 
 
@@ -229,7 +229,7 @@ WRITE16_HANDLER( toobin_slip_w )
 
 VIDEO_UPDATE( toobin )
 {
-	toobin_state *state = (toobin_state *)screen->machine->driver_data;
+	toobin_state *state = screen->machine->driver_data<toobin_state>();
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 	const rgb_t *palette = palette_entry_list_adjusted(screen->machine->palette);
 	atarimo_rect_list rectlist;
@@ -238,10 +238,10 @@ VIDEO_UPDATE( toobin )
 
 	/* draw the playfield */
 	bitmap_fill(priority_bitmap, cliprect, 0);
-	tilemap_draw(state->pfbitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
-	tilemap_draw(state->pfbitmap, cliprect, state->atarigen.playfield_tilemap, 1, 1);
-	tilemap_draw(state->pfbitmap, cliprect, state->atarigen.playfield_tilemap, 2, 2);
-	tilemap_draw(state->pfbitmap, cliprect, state->atarigen.playfield_tilemap, 3, 3);
+	tilemap_draw(state->pfbitmap, cliprect, state->playfield_tilemap, 0, 0);
+	tilemap_draw(state->pfbitmap, cliprect, state->playfield_tilemap, 1, 1);
+	tilemap_draw(state->pfbitmap, cliprect, state->playfield_tilemap, 2, 2);
+	tilemap_draw(state->pfbitmap, cliprect, state->playfield_tilemap, 3, 3);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -274,6 +274,6 @@ VIDEO_UPDATE( toobin )
 	}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->atarigen.alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
 	return 0;
 }

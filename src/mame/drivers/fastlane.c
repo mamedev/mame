@@ -20,7 +20,7 @@
 
 static INTERRUPT_GEN( fastlane_interrupt )
 {
-	fastlane_state *state = (fastlane_state *)device->machine->driver_data;
+	fastlane_state *state = device->machine->driver_data<fastlane_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -36,7 +36,7 @@ static INTERRUPT_GEN( fastlane_interrupt )
 
 static WRITE8_HANDLER( k007121_registers_w )
 {
-	fastlane_state *state = (fastlane_state *)space->machine->driver_data;
+	fastlane_state *state = space->machine->driver_data<fastlane_state>();
 
 	if (offset < 8)
 		k007121_ctrl_w(state->k007121, offset, data);
@@ -46,7 +46,7 @@ static WRITE8_HANDLER( k007121_registers_w )
 
 static WRITE8_HANDLER( fastlane_bankswitch_w )
 {
-	fastlane_state *state = (fastlane_state *)space->machine->driver_data;
+	fastlane_state *state = space->machine->driver_data<fastlane_state>();
 
 	/* bits 0 & 1 coin counters */
 	coin_counter_w(space->machine, 0,data & 0x01);
@@ -200,7 +200,7 @@ static const k007232_interface k007232_interface_2 =
 
 static MACHINE_START( fastlane )
 {
-	fastlane_state *state = (fastlane_state *)machine->driver_data;
+	fastlane_state *state = machine->driver_data<fastlane_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);

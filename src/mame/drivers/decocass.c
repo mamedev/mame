@@ -57,42 +57,42 @@ INLINE int swap_bits_5_6(int data)
 
 static WRITE8_HANDLER( ram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->decrypted[0x0000 + offset] = swap_bits_5_6(data);
 	state->rambase[0x0000 + offset] = data;
 }
 
 static WRITE8_HANDLER( charram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->decrypted[0x6000 + offset] = swap_bits_5_6(data);
 	decocass_charram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( fgvideoram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->decrypted[0xc000 + offset] = swap_bits_5_6(data);
 	decocass_fgvideoram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( fgcolorram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->decrypted[0xc400 + offset] = swap_bits_5_6(data);
 	decocass_colorram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( tileram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->decrypted[0xd000 + offset] = swap_bits_5_6(data);
 	decocass_tileram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( objectram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->decrypted[0xd800 + offset] = swap_bits_5_6(data);
 	decocass_objectram_w(space, offset, data);
 }
@@ -102,14 +102,14 @@ static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((
 
 static READ8_HANDLER( mirrorvideoram_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return state->fgvideoram[offset];
 }
 
 static READ8_HANDLER( mirrorcolorram_r )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return state->colorram[offset];
 }
@@ -1355,7 +1355,7 @@ ROM_END
 
 static DRIVER_INIT( decocass )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
@@ -1380,7 +1380,7 @@ static DRIVER_INIT( decocass )
 
 static DRIVER_INIT( decocrom )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	int romlength = memory_region_length(machine, "user3");
 	UINT8 *rom = memory_region(machine, "user3");
 	int i;

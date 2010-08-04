@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	vastar_state *state = (vastar_state *)machine->driver_data;
+	vastar_state *state = machine->driver_data<vastar_state>();
 	UINT8 *videoram = state->fgvideoram;
 	int code, color;
 
@@ -33,7 +33,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	vastar_state *state = (vastar_state *)machine->driver_data;
+	vastar_state *state = machine->driver_data<vastar_state>();
 	UINT8 *videoram = state->bg1videoram;
 	int code, color;
 
@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	vastar_state *state = (vastar_state *)machine->driver_data;
+	vastar_state *state = machine->driver_data<vastar_state>();
 	UINT8 *videoram = state->bg2videoram;
 	int code, color;
 
@@ -70,7 +70,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( vastar )
 {
-	vastar_state *state = (vastar_state *)machine->driver_data;
+	vastar_state *state = machine->driver_data<vastar_state>();
 
 	state->fg_tilemap  = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,8,8,32,32);
 	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows,8,8,32,32);
@@ -93,7 +93,7 @@ VIDEO_START( vastar )
 
 WRITE8_HANDLER( vastar_fgvideoram_w )
 {
-	vastar_state *state = (vastar_state *)space->machine->driver_data;
+	vastar_state *state = space->machine->driver_data<vastar_state>();
 
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
@@ -101,7 +101,7 @@ WRITE8_HANDLER( vastar_fgvideoram_w )
 
 WRITE8_HANDLER( vastar_bg1videoram_w )
 {
-	vastar_state *state = (vastar_state *)space->machine->driver_data;
+	vastar_state *state = space->machine->driver_data<vastar_state>();
 
 	state->bg1videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg1_tilemap,offset & 0x3ff);
@@ -109,7 +109,7 @@ WRITE8_HANDLER( vastar_bg1videoram_w )
 
 WRITE8_HANDLER( vastar_bg2videoram_w )
 {
-	vastar_state *state = (vastar_state *)space->machine->driver_data;
+	vastar_state *state = space->machine->driver_data<vastar_state>();
 
 	state->bg2videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg2_tilemap,offset & 0x3ff);
@@ -118,14 +118,14 @@ WRITE8_HANDLER( vastar_bg2videoram_w )
 
 READ8_HANDLER( vastar_bg1videoram_r )
 {
-	vastar_state *state = (vastar_state *)space->machine->driver_data;
+	vastar_state *state = space->machine->driver_data<vastar_state>();
 
 	return state->bg1videoram[offset];
 }
 
 READ8_HANDLER( vastar_bg2videoram_r )
 {
-	vastar_state *state = (vastar_state *)space->machine->driver_data;
+	vastar_state *state = space->machine->driver_data<vastar_state>();
 
 	return state->bg2videoram[offset];
 }
@@ -139,7 +139,7 @@ READ8_HANDLER( vastar_bg2videoram_r )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	vastar_state *state = (vastar_state *)machine->driver_data;
+	vastar_state *state = machine->driver_data<vastar_state>();
 	UINT8 *spriteram = state->spriteram1;
 	UINT8 *spriteram_2 = state->spriteram2;
 	UINT8 *spriteram_3 = state->spriteram3;
@@ -198,7 +198,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( vastar )
 {
-	vastar_state *state = (vastar_state *)screen->machine->driver_data;
+	vastar_state *state = screen->machine->driver_data<vastar_state>();
 	int i;
 
 

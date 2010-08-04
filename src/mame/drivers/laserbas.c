@@ -20,12 +20,13 @@
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 
-class laserbas_state
+class laserbas_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, laserbas_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, laserbas_state(machine)); }
 
-	laserbas_state(running_machine &machine) { }
+	laserbas_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* video-related */
 	UINT8    *vram1;
@@ -39,7 +40,7 @@ public:
 
 static VIDEO_START(laserbas)
 {
-	laserbas_state *state = (laserbas_state *)machine->driver_data;
+	laserbas_state *state = machine->driver_data<laserbas_state>();
 
 	state->vram1 = auto_alloc_array(machine, UINT8, 0x8000);
 	state->vram2 = auto_alloc_array(machine, UINT8, 0x8000);
@@ -50,7 +51,7 @@ static VIDEO_START(laserbas)
 
 static VIDEO_UPDATE(laserbas)
 {
-	laserbas_state *state = (laserbas_state *)screen->machine->driver_data;
+	laserbas_state *state = screen->machine->driver_data<laserbas_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)
@@ -71,7 +72,7 @@ static VIDEO_UPDATE(laserbas)
 
 static READ8_HANDLER(vram_r)
 {
-	laserbas_state *state = (laserbas_state *)space->machine->driver_data;
+	laserbas_state *state = space->machine->driver_data<laserbas_state>();
 
 	if(!state->vrambank)
 		return state->vram1[offset];
@@ -81,7 +82,7 @@ static READ8_HANDLER(vram_r)
 
 static WRITE8_HANDLER(vram_w)
 {
-	laserbas_state *state = (laserbas_state *)space->machine->driver_data;
+	laserbas_state *state = space->machine->driver_data<laserbas_state>();
 
 	if(!state->vrambank)
 		state->vram1[offset] = data;
@@ -91,7 +92,7 @@ static WRITE8_HANDLER(vram_w)
 
 static READ8_HANDLER( read_unk )
 {
-	laserbas_state *state = (laserbas_state *)space->machine->driver_data;
+	laserbas_state *state = space->machine->driver_data<laserbas_state>();
 
 	state->count ^= 0x80;
 	return state->count | 0x7f;
@@ -104,7 +105,7 @@ static WRITE8_HANDLER(palette_w)
 
 static WRITE8_HANDLER(vrambank_w)
 {
-	laserbas_state *state = (laserbas_state *)space->machine->driver_data;
+	laserbas_state *state = space->machine->driver_data<laserbas_state>();
 
 	if ((offset & 0xf1) == 0x10)
 		state->vrambank = data & 0x40;
@@ -158,7 +159,7 @@ static INTERRUPT_GEN( laserbas_interrupt )
 
 static MACHINE_START( laserbas )
 {
-	laserbas_state *state = (laserbas_state *)machine->driver_data;
+	laserbas_state *state = machine->driver_data<laserbas_state>();
 
 	state_save_register_global(machine, state->vrambank);
 	state_save_register_global(machine, state->count);
@@ -166,7 +167,7 @@ static MACHINE_START( laserbas )
 
 static MACHINE_RESET( laserbas )
 {
-	laserbas_state *state = (laserbas_state *)machine->driver_data;
+	laserbas_state *state = machine->driver_data<laserbas_state>();
 
 	state->vrambank = 0;
 	state->count = 0;

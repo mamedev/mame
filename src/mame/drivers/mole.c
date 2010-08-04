@@ -53,12 +53,13 @@
 #include "sound/ay8910.h"
 
 
-class mole_state
+class mole_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mole_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mole_state(machine)); }
 
-	mole_state(running_machine &machine) { }
+	mole_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *     tileram;
@@ -85,7 +86,7 @@ static PALETTE_INIT( mole )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mole_state *state = (mole_state *)machine->driver_data;
+	mole_state *state = machine->driver_data<mole_state>();
 	UINT16 code = state->tileram[tile_index];
 
 	SET_TILE_INFO((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
@@ -93,7 +94,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( mole )
 {
-	mole_state *state = (mole_state *)machine->driver_data;
+	mole_state *state = machine->driver_data<mole_state>();
 	state->tileram = auto_alloc_array_clear(machine, UINT16, 0x400);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 
@@ -102,7 +103,7 @@ static VIDEO_START( mole )
 
 static WRITE8_HANDLER( mole_videoram_w )
 {
-	mole_state *state = (mole_state *)space->machine->driver_data;
+	mole_state *state = space->machine->driver_data<mole_state>();
 
 	state->tileram[offset] = data | (state->tile_bank << 8);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -110,7 +111,7 @@ static WRITE8_HANDLER( mole_videoram_w )
 
 static WRITE8_HANDLER( mole_tilebank_w )
 {
-	mole_state *state = (mole_state *)space->machine->driver_data;
+	mole_state *state = space->machine->driver_data<mole_state>();
 
 	state->tile_bank = data;
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
@@ -123,7 +124,7 @@ static WRITE8_HANDLER( mole_flipscreen_w )
 
 static VIDEO_UPDATE( mole )
 {
-	mole_state *state = (mole_state *)screen->machine->driver_data;
+	mole_state *state = screen->machine->driver_data<mole_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
@@ -303,14 +304,14 @@ GFXDECODE_END
 
 static MACHINE_START( mole )
 {
-	mole_state *state = (mole_state *)machine->driver_data;
+	mole_state *state = machine->driver_data<mole_state>();
 
 	state_save_register_global(machine, state->tile_bank);
 }
 
 static MACHINE_RESET( mole )
 {
-	mole_state *state = (mole_state *)machine->driver_data;
+	mole_state *state = machine->driver_data<mole_state>();
 
 	state->tile_bank = 0;
 }

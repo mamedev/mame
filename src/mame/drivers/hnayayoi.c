@@ -41,7 +41,7 @@ TODO:
 
 static READ8_HANDLER( keyboard_0_r )
 {
-	hnayayoi_state *state = (hnayayoi_state *)space->machine->driver_data;
+	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
 	int res = 0x3f;
 	int i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
@@ -63,7 +63,7 @@ static READ8_HANDLER( keyboard_1_r )
 
 static WRITE8_HANDLER( keyboard_w )
 {
-	hnayayoi_state *state = (hnayayoi_state *)space->machine->driver_data;
+	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
 	state->keyb = data;
 }
 
@@ -529,7 +529,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( hnayayoi )
 {
-	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 
 	state_save_register_global(machine, state->palbank);
 	state_save_register_global(machine, state->blit_layer);
@@ -540,7 +540,7 @@ static MACHINE_START( hnayayoi )
 
 static MACHINE_RESET( hnayayoi )
 {
-	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 
 	/* start with the MSM5205 reset */
 	msm5205_reset_w(machine->device("msm"), 1);

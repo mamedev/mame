@@ -55,14 +55,14 @@ Memo:
 
 static READ8_HANDLER( fromance_commanddata_r )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 	return state->commanddata;
 }
 
 
 static TIMER_CALLBACK( deferred_commanddata_w )
 {
-	fromance_state *state = (fromance_state *)machine->driver_data;
+	fromance_state *state = machine->driver_data<fromance_state>();
 	state->commanddata = param;
 	state->directionflag = 1;
 }
@@ -77,7 +77,7 @@ static WRITE8_HANDLER( fromance_commanddata_w )
 
 static READ8_HANDLER( fromance_busycheck_main_r )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 
 	/* set a timer to force synchronization after the read */
 	timer_call_after_resynch(space->machine, NULL, 0, NULL);
@@ -91,7 +91,7 @@ static READ8_HANDLER( fromance_busycheck_main_r )
 
 static READ8_HANDLER( fromance_busycheck_sub_r )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 
 	if (state->directionflag)
 		return 0xff;		// standby
@@ -102,7 +102,7 @@ static READ8_HANDLER( fromance_busycheck_sub_r )
 
 static WRITE8_HANDLER( fromance_busycheck_sub_w )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 	state->directionflag = 0;
 }
 
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( fromance_rombank_w )
 
 static WRITE8_DEVICE_HANDLER( fromance_adpcm_reset_w )
 {
-	fromance_state *state = (fromance_state *)device->machine->driver_data;
+	fromance_state *state = device->machine->driver_data<fromance_state>();
 	state->adpcm_reset = (data & 0x01);
 	state->vclk_left = 0;
 
@@ -139,7 +139,7 @@ static WRITE8_DEVICE_HANDLER( fromance_adpcm_reset_w )
 
 static WRITE8_HANDLER( fromance_adpcm_w )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 	state->adpcm_data = data;
 	state->vclk_left = 2;
 }
@@ -147,7 +147,7 @@ static WRITE8_HANDLER( fromance_adpcm_w )
 
 static void fromance_adpcm_int( running_device *device )
 {
-	fromance_state *state = (fromance_state *)device->machine->driver_data;
+	fromance_state *state = device->machine->driver_data<fromance_state>();
 
 	/* skip if we're reset */
 	if (!state->adpcm_reset)
@@ -176,14 +176,14 @@ static void fromance_adpcm_int( running_device *device )
 
 static WRITE8_HANDLER( fromance_portselect_w )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 	state->portselect = data;
 }
 
 
 static READ8_HANDLER( fromance_keymatrix_r )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 	int ret = 0xff;
 
 	if (state->portselect & 0x01)
@@ -960,7 +960,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( fromance )
 {
-	fromance_state *state = (fromance_state *)machine->driver_data;
+	fromance_state *state = machine->driver_data<fromance_state>();
 	UINT8 *ROM = memory_region(machine, "sub");
 
 	memory_configure_bank(machine, "bank1", 0, 0x100, &ROM[0x10000], 0x4000);
@@ -980,7 +980,7 @@ static MACHINE_START( fromance )
 
 static MACHINE_RESET( fromance )
 {
-	fromance_state *state = (fromance_state *)machine->driver_data;
+	fromance_state *state = machine->driver_data<fromance_state>();
 	int i;
 
 	state->directionflag = 0;

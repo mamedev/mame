@@ -98,13 +98,13 @@ PALETTE_INIT( megazone )
 
 WRITE8_HANDLER( megazone_flipscreen_w )
 {
-	megazone_state *state = (megazone_state *)space->machine->driver_data;
+	megazone_state *state = space->machine->driver_data<megazone_state>();
 	state->flipscreen = data & 1;
 }
 
 VIDEO_START( megazone )
 {
-	megazone_state *state = (megazone_state *)machine->driver_data;
+	megazone_state *state = machine->driver_data<megazone_state>();
 	state->tmpbitmap = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
 
 	state_save_register_global_bitmap(machine, state->tmpbitmap);
@@ -113,7 +113,7 @@ VIDEO_START( megazone )
 
 VIDEO_UPDATE( megazone )
 {
-	megazone_state *state = (megazone_state *)screen->machine->driver_data;
+	megazone_state *state = screen->machine->driver_data<megazone_state>();
 	int offs;
 	int x, y;
 

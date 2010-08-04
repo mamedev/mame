@@ -6,7 +6,7 @@
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
 {
-	fitfight_state *state = (fitfight_state *)machine->driver_data;
+	fitfight_state *state = machine->driver_data<fitfight_state>();
 	const gfx_element *gfx = machine->gfx[3];
 	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + 0x800 / 2;
@@ -43,7 +43,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static TILE_GET_INFO( get_fof_bak_tile_info )
 {
-	fitfight_state *state = (fitfight_state *)machine->driver_data;
+	fitfight_state *state = machine->driver_data<fitfight_state>();
 	int code = state->fof_bak_tileram[tile_index * 2 + 1];
 	int colr = state->fof_bak_tileram[tile_index * 2] & 0x1f;
 	int xflip = (state->fof_bak_tileram[tile_index * 2] & 0x0020) >> 5;
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_fof_bak_tile_info )
 
 WRITE16_HANDLER(  fof_bak_tileram_w )
 {
-	fitfight_state *state = (fitfight_state *)space->machine->driver_data;
+	fitfight_state *state = space->machine->driver_data<fitfight_state>();
 
 	COMBINE_DATA(&state->fof_bak_tileram[offset]);
 	tilemap_mark_tile_dirty(state->fof_bak_tilemap, offset / 2);
@@ -63,7 +63,7 @@ WRITE16_HANDLER(  fof_bak_tileram_w )
 
 static TILE_GET_INFO( get_fof_mid_tile_info )
 {
-	fitfight_state *state = (fitfight_state *)machine->driver_data;
+	fitfight_state *state = machine->driver_data<fitfight_state>();
 	int code = state->fof_mid_tileram[tile_index * 2 + 1];
 	int colr = state->fof_mid_tileram[tile_index * 2] & 0x1f;
 	int xflip = (state->fof_mid_tileram[tile_index * 2] & 0x0020) >> 5;
@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_fof_mid_tile_info )
 
 WRITE16_HANDLER( fof_mid_tileram_w )
 {
-	fitfight_state *state = (fitfight_state *)space->machine->driver_data;
+	fitfight_state *state = space->machine->driver_data<fitfight_state>();
 
 	COMBINE_DATA(&state->fof_mid_tileram[offset]);
 	tilemap_mark_tile_dirty(state->fof_mid_tilemap, offset / 2);
@@ -82,7 +82,7 @@ WRITE16_HANDLER( fof_mid_tileram_w )
 
 static TILE_GET_INFO( get_fof_txt_tile_info )
 {
-	fitfight_state *state = (fitfight_state *)machine->driver_data;
+	fitfight_state *state = machine->driver_data<fitfight_state>();
 	int code = state->fof_txt_tileram[tile_index * 2 + 1];
 	int colr = state->fof_txt_tileram[tile_index * 2] & 0x1f;
 	int xflip = (state->fof_txt_tileram[tile_index * 2] & 0x0020) >> 5;
@@ -93,7 +93,7 @@ static TILE_GET_INFO( get_fof_txt_tile_info )
 
 WRITE16_HANDLER( fof_txt_tileram_w )
 {
-	fitfight_state *state = (fitfight_state *)space->machine->driver_data;
+	fitfight_state *state = space->machine->driver_data<fitfight_state>();
 
 	COMBINE_DATA(&state->fof_txt_tileram[offset]);
 	tilemap_mark_tile_dirty(state->fof_txt_tilemap, offset / 2);
@@ -103,7 +103,7 @@ WRITE16_HANDLER( fof_txt_tileram_w )
 
 VIDEO_START(fitfight)
 {
-	fitfight_state *state = (fitfight_state *)machine->driver_data;
+	fitfight_state *state = machine->driver_data<fitfight_state>();
 	state->fof_bak_tilemap = tilemap_create(machine, get_fof_bak_tile_info, tilemap_scan_cols, 8, 8, 128, 32);
 	/* opaque */
 
@@ -116,7 +116,7 @@ VIDEO_START(fitfight)
 
 VIDEO_UPDATE(fitfight)
 {
-	fitfight_state *state = (fitfight_state *)screen->machine->driver_data;
+	fitfight_state *state = screen->machine->driver_data<fitfight_state>();
 
 	/* scroll isn't right */
 

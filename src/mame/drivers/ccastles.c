@@ -149,7 +149,7 @@ static UINT8 *nvram_stage;
 
 INLINE void schedule_next_irq( running_machine *machine, int curscanline )
 {
-	ccastles_state *state = (ccastles_state *)machine->driver_data;
+	ccastles_state *state = machine->driver_data<ccastles_state>();
 
 	/* scan for a rising edge on the IRQCK signal */
 	for (curscanline++; ; curscanline = (curscanline + 1) & 0xff)
@@ -163,7 +163,7 @@ INLINE void schedule_next_irq( running_machine *machine, int curscanline )
 
 static TIMER_CALLBACK( clock_irq )
 {
-	ccastles_state *state = (ccastles_state *)machine->driver_data;
+	ccastles_state *state = machine->driver_data<ccastles_state>();
 
 	/* assert the IRQ if not already asserted */
 	if (!state->irq_state)
@@ -182,7 +182,7 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	ccastles_state *state = (ccastles_state *)field->port->machine->driver_data;
+	ccastles_state *state = field->port->machine->driver_data<ccastles_state>();
 	int scanline = field->port->machine->primary_screen->vpos();
 	return state->syncprom[scanline & 0xff] & 1;
 }
@@ -197,7 +197,7 @@ static CUSTOM_INPUT( get_vblank )
 
 static MACHINE_START( ccastles )
 {
-	ccastles_state *state = (ccastles_state *)machine->driver_data;
+	ccastles_state *state = machine->driver_data<ccastles_state>();
 	rectangle visarea;
 
 	/* initialize globals */
@@ -246,7 +246,7 @@ static MACHINE_START( ccastles )
 
 static MACHINE_RESET( ccastles )
 {
-	ccastles_state *state = (ccastles_state *)machine->driver_data;
+	ccastles_state *state = machine->driver_data<ccastles_state>();
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	state->irq_state = 0;
 }
@@ -261,7 +261,7 @@ static MACHINE_RESET( ccastles )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 	if (state->irq_state)
 	{
 		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
@@ -326,7 +326,7 @@ static WRITE8_HANDLER( nvram_recall_w )
 
 static WRITE8_HANDLER( nvram_store_w )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 
 	state->nvram_store[offset] = data & 1;
 	if (!state->nvram_store[0] && state->nvram_store[1])

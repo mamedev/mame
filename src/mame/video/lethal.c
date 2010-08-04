@@ -43,13 +43,13 @@ void lethalen_sprite_callback( running_machine *machine, int *code, int *color, 
 
 void lethalen_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
 {
-	lethal_state *state = (lethal_state *)machine->driver_data;
+	lethal_state *state = machine->driver_data<lethal_state>();
 	*color = state->layer_colorbase[layer] + ((*color & 0x3c) << 2);
 }
 
 VIDEO_START(lethalen)
 {
-	lethal_state *state = (lethal_state *)machine->driver_data;
+	lethal_state *state = machine->driver_data<lethal_state>();
 
 	// this game uses external linescroll RAM
 	k056832_SetExtLinescroll(state->k056832);
@@ -78,7 +78,7 @@ VIDEO_START(lethalen)
 
 WRITE8_HANDLER(lethalen_palette_control)
 {
-	lethal_state *state = (lethal_state *)space->machine->driver_data;
+	lethal_state *state = space->machine->driver_data<lethal_state>();
 
 	switch (offset)
 	{
@@ -104,7 +104,7 @@ WRITE8_HANDLER(lethalen_palette_control)
 
 VIDEO_UPDATE(lethalen)
 {
-	lethal_state *state = (lethal_state *)screen->machine->driver_data;
+	lethal_state *state = screen->machine->driver_data<lethal_state>();
 
 	bitmap_fill(bitmap, cliprect, 7168);
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);

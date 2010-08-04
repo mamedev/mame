@@ -20,14 +20,14 @@
 
 static INTERRUPT_GEN( ddribble_interrupt_0 )
 {
-	ddribble_state *state = (ddribble_state *)device->machine->driver_data;
+	ddribble_state *state = device->machine->driver_data<ddribble_state>();
 	if (state->int_enable_0)
 		cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( ddribble_interrupt_1 )
 {
-	ddribble_state *state = (ddribble_state *)device->machine->driver_data;
+	ddribble_state *state = device->machine->driver_data<ddribble_state>();
 	if (state->int_enable_1)
 		cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
@@ -41,25 +41,25 @@ static WRITE8_HANDLER( ddribble_bankswitch_w )
 
 static READ8_HANDLER( ddribble_sharedram_r )
 {
-	ddribble_state *state = (ddribble_state *)space->machine->driver_data;
+	ddribble_state *state = space->machine->driver_data<ddribble_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( ddribble_sharedram_w )
 {
-	ddribble_state *state = (ddribble_state *)space->machine->driver_data;
+	ddribble_state *state = space->machine->driver_data<ddribble_state>();
 	state->sharedram[offset] = data;
 }
 
 static READ8_HANDLER( ddribble_snd_sharedram_r )
 {
-	ddribble_state *state = (ddribble_state *)space->machine->driver_data;
+	ddribble_state *state = space->machine->driver_data<ddribble_state>();
 	return state->snd_sharedram[offset];
 }
 
 static WRITE8_HANDLER( ddribble_snd_sharedram_w )
 {
-	ddribble_state *state = (ddribble_state *)space->machine->driver_data;
+	ddribble_state *state = space->machine->driver_data<ddribble_state>();
 	state->snd_sharedram[offset] = data;
 }
 
@@ -85,7 +85,7 @@ static READ8_DEVICE_HANDLER( ddribble_vlm5030_busy_r )
 
 static WRITE8_DEVICE_HANDLER( ddribble_vlm5030_ctrl_w )
 {
-	ddribble_state *state = (ddribble_state *)device->machine->driver_data;
+	ddribble_state *state = device->machine->driver_data<ddribble_state>();
 	UINT8 *SPEECH_ROM = memory_region(device->machine, "vlm");
 
 	/* b7 : vlm data bus OE   */
@@ -250,7 +250,7 @@ static const vlm5030_interface vlm5030_config =
 
 static MACHINE_START( ddribble )
 {
-	ddribble_state *state = (ddribble_state *)machine->driver_data;
+	ddribble_state *state = machine->driver_data<ddribble_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 5, &ROM[0x10000], 0x2000);
 
@@ -267,7 +267,7 @@ static MACHINE_START( ddribble )
 
 static MACHINE_RESET( ddribble )
 {
-	ddribble_state *state = (ddribble_state *)machine->driver_data;
+	ddribble_state *state = machine->driver_data<ddribble_state>();
 	int i;
 
 	for (i = 0; i < 5; i++)

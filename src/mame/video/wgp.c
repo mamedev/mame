@@ -7,7 +7,7 @@
 
 INLINE void common_get_piv_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int num )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	UINT16 tilenum = state->pivram[tile_index + num * 0x1000];	/* 3 blocks of $2000 */
 	UINT16 attr = state->pivram[tile_index + num * 0x1000 + 0x8000];	/* 3 blocks of $2000 */
 
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_piv2_tile_info )
 
 static void wgp_core_vh_start( running_machine *machine, int piv_xoffs, int piv_yoffs )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 
 	state->piv_tilemap[0] = tilemap_create(machine, get_piv0_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->piv_tilemap[1] = tilemap_create(machine, get_piv1_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
@@ -124,13 +124,13 @@ custom chip capable of four rather than three tilemaps.)
 
 READ16_HANDLER( wgp_pivram_word_r )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 	return state->pivram[offset];
 }
 
 WRITE16_HANDLER( wgp_pivram_word_w )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 
 	COMBINE_DATA(&state->pivram[offset]);
 
@@ -150,13 +150,13 @@ WRITE16_HANDLER( wgp_pivram_word_w )
 
 READ16_HANDLER( wgp_piv_ctrl_word_r )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 	return state->piv_ctrlram[offset];
 }
 
 WRITE16_HANDLER( wgp_piv_ctrl_word_w )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 	UINT16 a, b;
 
 	COMBINE_DATA(&state->piv_ctrlram[offset]);
@@ -348,7 +348,7 @@ static const UINT8 ylookup[16] =
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, i, j, k;
 	int x, y, curx, cury;
@@ -520,7 +520,7 @@ INLINE void bryan2_drawscanline( bitmap_t *bitmap, int x, int y, int length,
 
 static void wgp_piv_layer_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	bitmap_t *srcbitmap = tilemap_get_pixmap(state->piv_tilemap[layer]);
 	bitmap_t *flagsbitmap = tilemap_get_flagsmap(state->piv_tilemap[layer]);
 
@@ -645,7 +645,7 @@ static void wgp_piv_layer_draw( running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( wgp )
 {
-	wgp_state *state = (wgp_state *)screen->machine->driver_data;
+	wgp_state *state = screen->machine->driver_data<wgp_state>();
 	int i;
 	UINT8 layer[3];
 

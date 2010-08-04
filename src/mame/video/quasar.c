@@ -92,7 +92,7 @@ PALETTE_INIT( quasar )
 
 VIDEO_START( quasar )
 {
-	cvs_state *state = (cvs_state *)machine->driver_data;
+	cvs_state *state = machine->driver_data<cvs_state>();
 	state->effectram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* create helper bitmap */
@@ -105,7 +105,7 @@ VIDEO_START( quasar )
 
 VIDEO_UPDATE( quasar )
 {
-	cvs_state *state = (cvs_state *)screen->machine->driver_data;
+	cvs_state *state = screen->machine->driver_data<cvs_state>();
 	int offs;
 	bitmap_t *s2636_0_bitmap, *s2636_1_bitmap, *s2636_2_bitmap;
 

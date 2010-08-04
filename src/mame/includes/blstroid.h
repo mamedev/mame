@@ -6,14 +6,13 @@
 
 #include "machine/atarigen.h"
 
-class blstroid_state
+class blstroid_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, blstroid_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, blstroid_state(machine)); }
 
-	blstroid_state(running_machine &machine) { }
-
-	atarigen_state	atarigen;
+	blstroid_state(running_machine &machine)
+		: atarigen_state(machine) { }
 
 	UINT16 *		priorityram;
 };

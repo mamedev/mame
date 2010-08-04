@@ -17,8 +17,8 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	skullxbo_state *state = (skullxbo_state *)machine->driver_data;
-	UINT16 data = state->atarigen.alpha[tile_index];
+	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	UINT16 data = state->alpha[tile_index];
 	int code = (data ^ 0x400) & 0x7ff;
 	int color = (data >> 11) & 0x0f;
 	int opaque = data & 0x8000;
@@ -28,9 +28,9 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	skullxbo_state *state = (skullxbo_state *)machine->driver_data;
-	UINT16 data1 = state->atarigen.playfield[tile_index];
-	UINT16 data2 = state->atarigen.playfield_upper[tile_index] & 0xff;
+	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	UINT16 data1 = state->playfield[tile_index];
+	UINT16 data2 = state->playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO(1, code, color, (data1 >> 15) & 1);
@@ -82,17 +82,17 @@ VIDEO_START( skullxbo )
 		0,					/* resulting value to indicate "special" */
 		0,					/* callback routine for special entries */
 	};
-	skullxbo_state *state = (skullxbo_state *)machine->driver_data;
+	skullxbo_state *state = machine->driver_data<skullxbo_state>();
 
 	/* initialize the playfield */
-	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  16,8, 64,64);
+	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  16,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  16,8, 64,32);
-	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
+	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  16,8, 64,32);
+	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
 }
 
 
@@ -105,10 +105,10 @@ VIDEO_START( skullxbo )
 
 WRITE16_HANDLER( skullxbo_xscroll_w )
 {
-	skullxbo_state *state = (skullxbo_state *)space->machine->driver_data;
+	skullxbo_state *state = space->machine->driver_data<skullxbo_state>();
 
 	/* combine data */
-	UINT16 oldscroll = *state->atarigen.xscroll;
+	UINT16 oldscroll = *state->xscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -117,21 +117,21 @@ WRITE16_HANDLER( skullxbo_xscroll_w )
 		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 
 	/* adjust the actual scrolls */
-	tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, 2 * (newscroll >> 7));
+	tilemap_set_scrollx(state->playfield_tilemap, 0, 2 * (newscroll >> 7));
 	atarimo_set_xscroll(0, 2 * (newscroll >> 7));
 
 	/* update the data */
-	*state->atarigen.xscroll = newscroll;
+	*state->xscroll = newscroll;
 }
 
 
 WRITE16_HANDLER( skullxbo_yscroll_w )
 {
-	skullxbo_state *state = (skullxbo_state *)space->machine->driver_data;
+	skullxbo_state *state = space->machine->driver_data<skullxbo_state>();
 
 	/* combine data */
 	int scanline = space->machine->primary_screen->vpos();
-	UINT16 oldscroll = *state->atarigen.yscroll;
+	UINT16 oldscroll = *state->yscroll;
 	UINT16 newscroll = oldscroll;
 	UINT16 effscroll;
 	COMBINE_DATA(&newscroll);
@@ -146,11 +146,11 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 	effscroll = (newscroll >> 7) - scanline;
 
 	/* adjust the actual scrolls */
-	tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, effscroll);
+	tilemap_set_scrolly(state->playfield_tilemap, 0, effscroll);
 	atarimo_set_yscroll(0, effscroll & 0x1ff);
 
 	/* update the data */
-	*state->atarigen.yscroll = newscroll;
+	*state->yscroll = newscroll;
 }
 
 
@@ -177,8 +177,8 @@ WRITE16_HANDLER( skullxbo_mobmsb_w )
 
 WRITE16_HANDLER( skullxbo_playfieldlatch_w )
 {
-	skullxbo_state *state = (skullxbo_state *)space->machine->driver_data;
-	atarigen_set_playfield_latch(&state->atarigen, data);
+	skullxbo_state *state = space->machine->driver_data<skullxbo_state>();
+	atarigen_set_playfield_latch(state, data);
 }
 
 
@@ -191,19 +191,19 @@ WRITE16_HANDLER( skullxbo_playfieldlatch_w )
 
 void skullxbo_scanline_update(running_machine *machine, int scanline)
 {
-	skullxbo_state *state = (skullxbo_state *)machine->driver_data;
-	UINT16 *base = &state->atarigen.alpha[(scanline / 8) * 64 + 42];
+	skullxbo_state *state = machine->driver_data<skullxbo_state>();
+	UINT16 *base = &state->alpha[(scanline / 8) * 64 + 42];
 	int x;
 
 	/* keep in range */
-	if (base >= &state->atarigen.alpha[0x7c0])
+	if (base >= &state->alpha[0x7c0])
 		return;
 
 	/* special case: scanline 0 should re-latch the previous raw scroll */
 	if (scanline == 0)
 	{
-		int newscroll = (*state->atarigen.yscroll >> 7) & 0x1ff;
-		tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll);
+		int newscroll = (*state->yscroll >> 7) & 0x1ff;
+		tilemap_set_scrolly(state->playfield_tilemap, 0, newscroll);
 		atarimo_set_yscroll(0, newscroll);
 	}
 
@@ -224,12 +224,12 @@ void skullxbo_scanline_update(running_machine *machine, int scanline)
 				machine->primary_screen->update_partial(scanline - 1);
 
 			/* update the new scroll */
-			tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll);
+			tilemap_set_scrolly(state->playfield_tilemap, 0, newscroll);
 			atarimo_set_yscroll(0, newscroll);
 
 			/* make sure we change this value so that writes to the scroll register */
 			/* know whether or not they are a different scroll */
-			*state->atarigen.yscroll = data;
+			*state->yscroll = data;
 		}
 	}
 }
@@ -244,13 +244,13 @@ void skullxbo_scanline_update(running_machine *machine, int scanline)
 
 VIDEO_UPDATE( skullxbo )
 {
-	skullxbo_state *state = (skullxbo_state *)screen->machine->driver_data;
+	skullxbo_state *state = screen->machine->driver_data<skullxbo_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -314,6 +314,6 @@ VIDEO_UPDATE( skullxbo )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->atarigen.alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
 	return 0;
 }

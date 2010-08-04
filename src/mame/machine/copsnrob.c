@@ -17,7 +17,7 @@ static const int gun_mask[] = {0x7e, 0x7d, 0x7b, 0x77, 0x6f, 0x5f, 0x3f};
 
 READ8_HANDLER( copsnrob_gun_position_r )
 {
-	copsnrob_state *state = (copsnrob_state *)space->machine->driver_data;
+	copsnrob_state *state = space->machine->driver_data<copsnrob_state>();
 	int keys, current_car_image, current_gun_pos = 0;
 
 	// Determine which player we need

@@ -209,7 +209,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int irq )
 {
-	volfied_state *state = (volfied_state *)device->machine->driver_data;
+	volfied_state *state = device->machine->driver_data<volfied_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -233,7 +233,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( volfied )
 {
-	volfied_state *state = (volfied_state *)machine->driver_data;
+	volfied_state *state = machine->driver_data<volfied_state>();
 
 	volfied_cchip_init(machine);
 

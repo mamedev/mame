@@ -6,14 +6,13 @@
 
 #include "machine/atarigen.h"
 
-class beathead_state
+class beathead_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, beathead_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, beathead_state(machine)); }
 
-	beathead_state(running_machine &machine) { }
-
-	atarigen_state	atarigen;
+	beathead_state(running_machine &machine)
+		: atarigen_state(machine) { }
 
 	UINT32 *		vram_bulk_latch;
 	UINT32 *		palette_select;

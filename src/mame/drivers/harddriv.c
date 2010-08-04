@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( driver_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE(hd68k_msp_io_r, hd68k_msp_io_w)
 	AM_RANGE(0xff0000, 0xff001f) AM_READWRITE(hd68k_duart_r, hd68k_duart_w)
-	AM_RANGE(0xff4000, 0xff4fff) AM_READWRITE(hd68k_zram_r, hd68k_zram_w) AM_BASE_SIZE_MEMBER(harddriv_state, atarigen.eeprom, atarigen.eeprom_size)
+	AM_RANGE(0xff4000, 0xff4fff) AM_READWRITE(hd68k_zram_r, hd68k_zram_w) AM_BASE_SIZE_MEMBER(harddriv_state, eeprom, eeprom_size)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -470,7 +470,7 @@ static ADDRESS_MAP_START( multisync_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE(hd68k_msp_io_r, hd68k_msp_io_w)
 	AM_RANGE(0xff0000, 0xff001f) AM_READWRITE(hd68k_duart_r, hd68k_duart_w)
-	AM_RANGE(0xff4000, 0xff4fff) AM_READWRITE(hd68k_zram_r, hd68k_zram_w) AM_BASE_SIZE_MEMBER(harddriv_state, atarigen.eeprom, atarigen.eeprom_size)
+	AM_RANGE(0xff4000, 0xff4fff) AM_READWRITE(hd68k_zram_r, hd68k_zram_w) AM_BASE_SIZE_MEMBER(harddriv_state, eeprom, eeprom_size)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -508,7 +508,7 @@ static ADDRESS_MAP_START( multisync2_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE(hd68k_msp_io_r, hd68k_msp_io_w)
 	AM_RANGE(0xfc0000, 0xfc001f) AM_READWRITE(hd68k_duart_r, hd68k_duart_w)
-	AM_RANGE(0xfd0000, 0xfd0fff) AM_MIRROR(0x004000) AM_READWRITE(hd68k_zram_r, hd68k_zram_w) AM_BASE_SIZE_MEMBER(harddriv_state, atarigen.eeprom, atarigen.eeprom_size)
+	AM_RANGE(0xfd0000, 0xfd0fff) AM_MIRROR(0x004000) AM_READWRITE(hd68k_zram_r, hd68k_zram_w) AM_BASE_SIZE_MEMBER(harddriv_state, eeprom, eeprom_size)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -3643,22 +3643,22 @@ static const UINT16 default_eeprom[] =
 /* COMMON INIT: initialize the original "driver" main board */
 static void init_driver(running_machine *machine)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* note that we're not multisync and set the default EEPROM data */
 	state->gsp_multisync = FALSE;
-	state->atarigen.eeprom_default = default_eeprom;
+	state->eeprom_default = default_eeprom;
 }
 
 
 /* COMMON INIT: initialize the later "multisync" main board */
 static void init_multisync(running_machine *machine, int compact_inputs)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* note that we're multisync and set the default EEPROM data */
 	state->gsp_multisync = TRUE;
-	state->atarigen.eeprom_default = default_eeprom;
+	state->eeprom_default = default_eeprom;
 
 	/* install handlers for the compact driving games' inputs */
 	if (compact_inputs)
@@ -3673,7 +3673,7 @@ static void init_multisync(running_machine *machine, int compact_inputs)
 /* COMMON INIT: initialize the ADSP/ADSP2 board */
 static void init_adsp(running_machine *machine)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* install ADSP program RAM */
 	memory_install_readwrite16_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x800000, 0x807fff, 0, 0, hd68k_adsp_program_r, hd68k_adsp_program_w);
@@ -3694,7 +3694,7 @@ static void init_adsp(running_machine *machine)
 /* COMMON INIT: initialize the DS3 board */
 static void init_ds3(running_machine *machine)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* install ADSP program RAM */
 	memory_install_readwrite16_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x800000, 0x807fff, 0, 0, hd68k_ds3_program_r, hd68k_ds3_program_w);
@@ -3792,7 +3792,7 @@ static void init_ds3(running_machine *machine)
 /* COMMON INIT: initialize the DSK add-on board */
 static void init_dsk(running_machine *machine)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 	UINT8 *usr3 = memory_region(machine, "user3");
 
 	/* install ASIC61 */
@@ -3826,7 +3826,7 @@ static void init_dsk(running_machine *machine)
 /* COMMON INIT: initialize the DSK II add-on board */
 static void init_dsk2(running_machine *machine)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 	UINT8 *usr3 = memory_region(machine, "user3");
 
 	/* install ASIC65 */
@@ -3856,7 +3856,7 @@ static void init_dsk2(running_machine *machine)
 /* COMMON INIT: initialize the DSPCOM add-on board */
 static void init_dspcom(running_machine *machine)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* install ASIC65 */
 	memory_install_write16_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x900000, 0x900003, 0, 0, asic65_data_w);
@@ -3874,7 +3874,7 @@ static void init_dspcom(running_machine *machine)
 /* COMMON INIT: initialize the original "driver" sound board */
 static void init_driver_sound(running_machine *machine)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	hdsnd_init(machine);
 
@@ -3895,7 +3895,7 @@ static void init_driver_sound(running_machine *machine)
 
 static DRIVER_INIT( harddriv )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_driver(machine);
@@ -3920,7 +3920,7 @@ static DRIVER_INIT( harddriv )
 
 static DRIVER_INIT( harddrivc )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_multisync(machine, 1);
@@ -3945,7 +3945,7 @@ static DRIVER_INIT( harddrivc )
 
 static DRIVER_INIT( stunrun )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_multisync(machine, 0);
@@ -3965,7 +3965,7 @@ static DRIVER_INIT( stunrun )
 
 static READ32_HANDLER( rddsp32_speedup_r )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	if (cpu_get_pc(space->cpu) == state->rddsp32_speedup_pc && (*state->rddsp32_speedup >> 16) == 0)
 	{
 		UINT32 r14 = cpu_get_reg(space->cpu, DSP32_R14);
@@ -3984,7 +3984,7 @@ static READ32_HANDLER( rddsp32_speedup_r )
 
 static DRIVER_INIT( racedriv )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_driver(machine);
@@ -4011,7 +4011,7 @@ static DRIVER_INIT( racedriv )
 
 static void racedrivc_init_common(running_machine *machine, offs_t gsp_protection)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_multisync(machine, 1);
@@ -4057,7 +4057,7 @@ static READ16_HANDLER( steeltal_dummy_r )
 
 static void steeltal_init_common(running_machine *machine, offs_t ds3_transfer_pc, int proto_sloop)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_multisync(machine, 0);
@@ -4106,7 +4106,7 @@ static DRIVER_INIT( steeltalp ) { steeltal_init_common(machine, 0x52290, 1); }
 
 static DRIVER_INIT( strtdriv )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_multisync(machine, 1);
@@ -4137,7 +4137,7 @@ static DRIVER_INIT( strtdriv )
 
 static DRIVER_INIT( hdrivair )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_multisync(machine, 1);
@@ -4164,7 +4164,7 @@ static DRIVER_INIT( hdrivair )
 
 static DRIVER_INIT( hdrivairp )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* initialize the boards */
 	init_multisync(machine, 1);

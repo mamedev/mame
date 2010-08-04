@@ -109,7 +109,7 @@ VIDEO_UPDATE( rampart )
 
 void rampart_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	rampart_state *state = (rampart_state *)machine->driver_data;
+	rampart_state *state = machine->driver_data<rampart_state>();
 	int x, y;
 
 	/* update any dirty scanlines */

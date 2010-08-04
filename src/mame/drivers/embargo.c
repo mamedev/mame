@@ -8,12 +8,13 @@
 #include "cpu/s2650/s2650.h"
 
 
-class embargo_state
+class embargo_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, embargo_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, embargo_state(machine)); }
 
-	embargo_state(running_machine &machine) { }
+	embargo_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -34,7 +35,7 @@ public:
 
 static VIDEO_UPDATE( embargo )
 {
-	embargo_state *state = (embargo_state *)screen->machine->driver_data;
+	embargo_state *state = screen->machine->driver_data<embargo_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -68,14 +69,14 @@ static VIDEO_UPDATE( embargo )
 
 static READ8_HANDLER( input_port_bit_r )
 {
-	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	embargo_state *state = space->machine->driver_data<embargo_state>();
 	return (input_port_read(space->machine, "IN1") << (7 - state->input_select)) & 0x80;
 }
 
 
 static READ8_HANDLER( dial_r )
 {
-	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	embargo_state *state = space->machine->driver_data<embargo_state>();
 
 	UINT8 lo = 0;
 	UINT8 hi = 0;
@@ -127,21 +128,21 @@ static READ8_HANDLER( dial_r )
 
 static WRITE8_HANDLER( port_1_w )
 {
-	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	embargo_state *state = space->machine->driver_data<embargo_state>();
 	state->dial_enable_1 = data & 0x01; /* other bits unknown */
 }
 
 
 static WRITE8_HANDLER( port_2_w )
 {
-	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	embargo_state *state = space->machine->driver_data<embargo_state>();
 	state->dial_enable_2 = data & 0x01; /* other bits unknown */
 }
 
 
 static WRITE8_HANDLER( input_select_w )
 {
-	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	embargo_state *state = space->machine->driver_data<embargo_state>();
 	state->input_select = data & 0x07;
 }
 
@@ -229,7 +230,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( embargo )
 {
-	embargo_state *state = (embargo_state *)machine->driver_data;
+	embargo_state *state = machine->driver_data<embargo_state>();
 
 	/* register for state saving */
 	state_save_register_global(machine, state->dial_enable_1);
@@ -240,7 +241,7 @@ static MACHINE_START( embargo )
 
 static MACHINE_RESET( embargo )
 {
-	embargo_state *state = (embargo_state *)machine->driver_data;
+	embargo_state *state = machine->driver_data<embargo_state>();
 
 	state->dial_enable_1 = 0;
 	state->dial_enable_2 = 0;

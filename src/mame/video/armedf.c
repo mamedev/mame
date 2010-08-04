@@ -27,7 +27,7 @@ static TILEMAP_MAPPER( armedf_scan_type3 )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	armedf_state *state = (armedf_state *)machine->driver_data;
+	armedf_state *state = machine->driver_data<armedf_state>();
 	int tile_number = state->text_videoram[tile_index] & 0xff;
 	int attributes;
 
@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	armedf_state *state = (armedf_state *)machine->driver_data;
+	armedf_state *state = machine->driver_data<armedf_state>();
 	int data = state->fg_videoram[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -57,7 +57,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	armedf_state *state = (armedf_state *)machine->driver_data;
+	armedf_state *state = machine->driver_data<armedf_state>();
 	int data = state->bg_videoram[tile_index];
 	SET_TILE_INFO(
 			2,
@@ -76,7 +76,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( armedf )
 {
-	armedf_state *state = (armedf_state *)machine->driver_data;
+	armedf_state *state = machine->driver_data<armedf_state>();
 
 	if (state->scroll_type == 4 || /* cclimbr2 */
 		state->scroll_type == 3 || /* legion */
@@ -122,7 +122,7 @@ VIDEO_START( armedf )
 
 WRITE16_HANDLER( armedf_text_videoram_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	COMBINE_DATA(&state->text_videoram[offset]);
 	if (state->scroll_type == 1)
 		tilemap_mark_tile_dirty(state->tx_tilemap, offset & 0x7ff);
@@ -141,21 +141,21 @@ WRITE16_HANDLER( armedf_text_videoram_w )
 
 WRITE16_HANDLER( armedf_fg_videoram_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	COMBINE_DATA(&state->fg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE16_HANDLER( armedf_bg_videoram_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	COMBINE_DATA(&state->bg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE16_HANDLER( terraf_fg_scrollx_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		state->fg_scrollx = data >> 8;
@@ -165,7 +165,7 @@ WRITE16_HANDLER( terraf_fg_scrollx_w )
 
 WRITE16_HANDLER( terraf_fg_scrolly_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		if (state->waiting_msb)
@@ -177,40 +177,40 @@ WRITE16_HANDLER( terraf_fg_scrolly_w )
 
 WRITE16_HANDLER( terraf_fg_scroll_msb_arm_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	if (ACCESSING_BITS_8_15)
 		state->waiting_msb = 0;
 }
 
 WRITE16_HANDLER( armedf_fg_scrollx_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	COMBINE_DATA(&state->fg_scrollx);
 }
 
 WRITE16_HANDLER( armedf_fg_scrolly_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	COMBINE_DATA(&state->fg_scrolly);
 }
 
 WRITE16_HANDLER( armedf_bg_scrollx_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	COMBINE_DATA(&state->bg_scrollx);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->bg_scrollx);
 }
 
 WRITE16_HANDLER( armedf_bg_scrolly_w )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	COMBINE_DATA(&state->bg_scrolly);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->bg_scrolly);
 }
 
 WRITE16_HANDLER( armedf_mcu_cmd )
 {
-	armedf_state *state = (armedf_state *)space->machine->driver_data;
+	armedf_state *state = space->machine->driver_data<armedf_state>();
 	COMBINE_DATA(&state->mcu_mode);
 }
 
@@ -225,7 +225,7 @@ WRITE16_HANDLER( armedf_mcu_cmd )
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
-	armedf_state *state = (armedf_state *)machine->driver_data;
+	armedf_state *state = machine->driver_data<armedf_state>();
 	int offs;
 
 	for (offs = 0; offs < machine->generic.spriteram_size / 2; offs += 4)
@@ -260,7 +260,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( armedf )
 {
-	armedf_state *state = (armedf_state *)screen->machine->driver_data;
+	armedf_state *state = screen->machine->driver_data<armedf_state>();
 	int sprite_enable = state->vreg & 0x200;
 
 	tilemap_set_enable(state->bg_tilemap, state->vreg & 0x800);

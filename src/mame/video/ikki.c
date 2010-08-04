@@ -13,7 +13,7 @@ Video hardware driver by Uki
 
 PALETTE_INIT( ikki )
 {
-	ikki_state *state = (ikki_state *)machine->driver_data;
+	ikki_state *state = machine->driver_data<ikki_state>();
 	int i;
 
 	/* allocate the colortable - extra pen for the punch through pen */
@@ -57,14 +57,14 @@ PALETTE_INIT( ikki )
 
 WRITE8_HANDLER( ikki_scrn_ctrl_w )
 {
-	ikki_state *state = (ikki_state *)space->machine->driver_data;
+	ikki_state *state = space->machine->driver_data<ikki_state>();
 	state->flipscreen = (data >> 2) & 1;
 }
 
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ikki_state *state = (ikki_state *)machine->driver_data;
+	ikki_state *state = machine->driver_data<ikki_state>();
 	UINT8 *spriteram = state->spriteram;
 	int y;
 	offs_t offs;
@@ -118,7 +118,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_START( ikki )
 {
-	ikki_state *state = (ikki_state *)machine->driver_data;
+	ikki_state *state = machine->driver_data<ikki_state>();
 	state->sprite_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 	state_save_register_global_bitmap(machine, state->sprite_bitmap);
 }
@@ -126,7 +126,7 @@ VIDEO_START( ikki )
 
 VIDEO_UPDATE( ikki )
 {
-	ikki_state *state = (ikki_state *)screen->machine->driver_data;
+	ikki_state *state = screen->machine->driver_data<ikki_state>();
 	offs_t offs;
 	UINT8 *VIDEOATTR = memory_region(screen->machine, "user1");
 

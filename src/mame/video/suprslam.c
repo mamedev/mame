@@ -30,7 +30,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
     */
 
-	suprslam_state *state = (suprslam_state *)machine->driver_data;
+	suprslam_state *state = machine->driver_data<suprslam_state>();
 	const gfx_element *gfx = machine->gfx[1];
 	UINT16 *source = state->spriteram;
 	UINT16 *source2 = state->spriteram;
@@ -99,7 +99,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 WRITE16_HANDLER( suprslam_screen_videoram_w )
 {
-	suprslam_state *state = (suprslam_state *)space->machine->driver_data;
+	suprslam_state *state = space->machine->driver_data<suprslam_state>();
 
 	state->screen_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->screen_tilemap, offset);
@@ -108,7 +108,7 @@ WRITE16_HANDLER( suprslam_screen_videoram_w )
 
 static TILE_GET_INFO( get_suprslam_tile_info )
 {
-	suprslam_state *state = (suprslam_state *)machine->driver_data;
+	suprslam_state *state = machine->driver_data<suprslam_state>();
 	int tileno = state->screen_videoram[tile_index] & 0x0fff;
 	int colour = state->screen_videoram[tile_index] & 0xf000;
 
@@ -122,7 +122,7 @@ static TILE_GET_INFO( get_suprslam_tile_info )
 /* BG LAYER */
 WRITE16_HANDLER( suprslam_bg_videoram_w )
 {
-	suprslam_state *state = (suprslam_state *)space->machine->driver_data;
+	suprslam_state *state = space->machine->driver_data<suprslam_state>();
 
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -131,7 +131,7 @@ WRITE16_HANDLER( suprslam_bg_videoram_w )
 
 static TILE_GET_INFO( get_suprslam_bg_tile_info )
 {
-	suprslam_state *state = (suprslam_state *)machine->driver_data;
+	suprslam_state *state = machine->driver_data<suprslam_state>();
 	int tileno = state->bg_videoram[tile_index] & 0x0fff;
 	int colour = state->bg_videoram[tile_index] & 0xf000;
 
@@ -144,7 +144,7 @@ static TILE_GET_INFO( get_suprslam_bg_tile_info )
 
 VIDEO_START( suprslam )
 {
-	suprslam_state *state = (suprslam_state *)machine->driver_data;
+	suprslam_state *state = machine->driver_data<suprslam_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_suprslam_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->screen_tilemap = tilemap_create(machine, get_suprslam_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -154,7 +154,7 @@ VIDEO_START( suprslam )
 
 VIDEO_UPDATE( suprslam )
 {
-	suprslam_state *state = (suprslam_state *)screen->machine->driver_data;
+	suprslam_state *state = screen->machine->driver_data<suprslam_state>();
 	tilemap_set_scrollx( state->screen_tilemap,0, state->screen_vregs[0x04/2] );
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -169,7 +169,7 @@ VIDEO_UPDATE( suprslam )
 
 WRITE16_HANDLER (suprslam_bank_w)
 {
-	suprslam_state *state = (suprslam_state *)space->machine->driver_data;
+	suprslam_state *state = space->machine->driver_data<suprslam_state>();
 	UINT16 old_screen_bank, old_bg_bank;
 	old_screen_bank = state->screen_bank;
 	old_bg_bank = state->bg_bank;

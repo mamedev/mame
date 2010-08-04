@@ -15,7 +15,7 @@
 
 MACHINE_START( extra_8080bw_vh )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	state_save_register_global(machine, state->c8080bw_flip_screen);
 	state_save_register_global(machine, state->color_map);
@@ -65,7 +65,7 @@ static void cosmo_get_pens( pen_t *pens )
 
 INLINE void set_pixel( running_machine *machine, bitmap_t *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
@@ -94,7 +94,7 @@ INLINE void set_8_pixels( running_machine *machine, bitmap_t *bitmap, UINT8 y, U
 /* this is needed as this driver doesn't emulate the shift register like mw8080bw does */
 static void clear_extra_columns( running_machine *machine, bitmap_t *bitmap, pen_t *pens, UINT8 color )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	UINT8 x;
 
 	for (x = 0; x < 4; x++)
@@ -114,7 +114,7 @@ static void clear_extra_columns( running_machine *machine, bitmap_t *bitmap, pen
 
 VIDEO_UPDATE( invadpt2 )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *prom;
@@ -146,7 +146,7 @@ VIDEO_UPDATE( invadpt2 )
 
 VIDEO_UPDATE( ballbomb )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -179,7 +179,7 @@ VIDEO_UPDATE( ballbomb )
 
 VIDEO_UPDATE( schaser )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *background_map_base;
@@ -220,7 +220,7 @@ VIDEO_UPDATE( schaser )
 
 VIDEO_UPDATE( schasercv )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -246,7 +246,7 @@ VIDEO_UPDATE( schasercv )
 
 VIDEO_UPDATE( rollingc )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -271,7 +271,7 @@ VIDEO_UPDATE( rollingc )
 
 VIDEO_UPDATE( polaris )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -343,7 +343,7 @@ VIDEO_UPDATE( polaris )
 
 VIDEO_UPDATE( lupin3 )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -368,7 +368,7 @@ VIDEO_UPDATE( lupin3 )
 
 VIDEO_UPDATE( cosmo )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
@@ -395,7 +395,7 @@ VIDEO_UPDATE( cosmo )
 
 VIDEO_UPDATE( indianbt )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -427,7 +427,7 @@ VIDEO_UPDATE( indianbt )
 
 VIDEO_UPDATE( shuttlei )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
 	offs_t offs;
 
@@ -458,7 +458,7 @@ VIDEO_UPDATE( shuttlei )
 
 VIDEO_UPDATE( sflush )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 

@@ -914,7 +914,7 @@ static const ay8910_interface hexa_ay8910_config =
 
 static MACHINE_START( arkanoid )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 
 	state->mcu = machine->device("mcu");
 
@@ -939,7 +939,7 @@ static MACHINE_START( arkanoid )
 
 static MACHINE_RESET( arkanoid )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 
 	state->port_a_in = 0;
 	state->port_a_out = 0;
@@ -1459,21 +1459,21 @@ static void arkanoid_bootleg_init( running_machine *machine )
 
 static DRIVER_INIT( arkangc )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	state->bootleg_id = ARKANGC;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkangc2 )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	state->bootleg_id = ARKANGC2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( block2 )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	// the graphics on this bootleg have the data scrambled
 	int tile;
 	UINT8* srcgfx = memory_region(machine,"gfx1");
@@ -1509,28 +1509,28 @@ static DRIVER_INIT( block2 )
 
 static DRIVER_INIT( arkblock )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	state->bootleg_id = ARKBLOCK;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkbloc2 )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	state->bootleg_id = ARKBLOC2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkgcbl )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	state->bootleg_id = ARKGCBL;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( paddle2 )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	state->bootleg_id = PADDLE2;
 	arkanoid_bootleg_init(machine);
 }

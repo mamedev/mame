@@ -6,7 +6,7 @@
 
 VIDEO_START( taitoz )
 {
-	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	taitoz_state *state = machine->driver_data<taitoz_state>();
 	state->road_palbank = 3;
 	state->sci_spriteframe = 0;
 
@@ -21,13 +21,13 @@ VIDEO_START( taitoz )
 
 READ16_HANDLER( sci_spriteframe_r )
 {
-	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+	taitoz_state *state = space->machine->driver_data<taitoz_state>();
 	return (state->sci_spriteframe << 8);
 }
 
 WRITE16_HANDLER( sci_spriteframe_w )
 {
-	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+	taitoz_state *state = space->machine->driver_data<taitoz_state>();
 	state->sci_spriteframe = (data >> 8) & 0xff;
 }
 
@@ -148,7 +148,7 @@ confirmed
 
 static void contcirc_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
-	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	taitoz_state *state = machine->driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
@@ -243,7 +243,7 @@ static void contcirc_draw_sprites_16x8( running_machine *machine, bitmap_t *bitm
 
 static void chasehq_draw_sprites_16x16( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
-	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	taitoz_state *state = machine->driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
@@ -429,7 +429,7 @@ static void chasehq_draw_sprites_16x16( running_machine *machine, bitmap_t *bitm
 
 static void bshark_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
-	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	taitoz_state *state = machine->driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
@@ -525,7 +525,7 @@ static void bshark_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap
 
 static void sci_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
-	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	taitoz_state *state = machine->driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT16 *spriteram = state->spriteram;
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
@@ -630,7 +630,7 @@ static void sci_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, c
 
 static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
-	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	taitoz_state *state = machine->driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
@@ -725,7 +725,7 @@ static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 
 static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
-	taitoz_state *state = (taitoz_state *)machine->driver_data;
+	taitoz_state *state = machine->driver_data<taitoz_state>();
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
@@ -823,7 +823,7 @@ static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 
 WRITE16_HANDLER( contcirc_out_w )
 {
-	taitoz_state *state = (taitoz_state *)space->machine->driver_data;
+	taitoz_state *state = space->machine->driver_data<taitoz_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -844,7 +844,7 @@ WRITE16_HANDLER( contcirc_out_w )
 
 VIDEO_UPDATE( contcirc )
 {
-	taitoz_state *state = (taitoz_state *)screen->machine->driver_data;
+	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -871,7 +871,7 @@ VIDEO_UPDATE( contcirc )
 
 VIDEO_UPDATE( chasehq )
 {
-	taitoz_state *state = (taitoz_state *)screen->machine->driver_data;
+	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -897,7 +897,7 @@ VIDEO_UPDATE( chasehq )
 
 VIDEO_UPDATE( bshark )
 {
-	taitoz_state *state = (taitoz_state *)screen->machine->driver_data;
+	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -923,7 +923,7 @@ VIDEO_UPDATE( bshark )
 
 VIDEO_UPDATE( sci )
 {
-	taitoz_state *state = (taitoz_state *)screen->machine->driver_data;
+	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -949,7 +949,7 @@ VIDEO_UPDATE( sci )
 
 VIDEO_UPDATE( aquajack )
 {
-	taitoz_state *state = (taitoz_state *)screen->machine->driver_data;
+	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -975,7 +975,7 @@ VIDEO_UPDATE( aquajack )
 
 VIDEO_UPDATE( spacegun )
 {
-	taitoz_state *state = (taitoz_state *)screen->machine->driver_data;
+	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
 
 	tc0100scn_tilemap_update(state->tc0100scn);
@@ -1001,7 +1001,7 @@ VIDEO_UPDATE( spacegun )
 
 VIDEO_UPDATE( dblaxle )
 {
-	taitoz_state *state = (taitoz_state *)screen->machine->driver_data;
+	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[5];
 	UINT16 priority;
 

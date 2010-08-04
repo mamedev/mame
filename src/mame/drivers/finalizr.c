@@ -23,7 +23,7 @@
 
 static INTERRUPT_GEN( finalizr_interrupt )
 {
-	finalizr_state *state = (finalizr_state *)device->machine->driver_data;
+	finalizr_state *state = device->machine->driver_data<finalizr_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -45,7 +45,7 @@ static WRITE8_HANDLER( finalizr_coin_w )
 
 static WRITE8_HANDLER( finalizr_flipscreen_w )
 {
-	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+	finalizr_state *state = space->machine->driver_data<finalizr_state>();
 	state->nmi_enable = data & 0x01;
 	state->irq_enable = data & 0x02;
 
@@ -54,13 +54,13 @@ static WRITE8_HANDLER( finalizr_flipscreen_w )
 
 static WRITE8_HANDLER( finalizr_i8039_irq_w )
 {
-	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+	finalizr_state *state = space->machine->driver_data<finalizr_state>();
 	cpu_set_input_line(state->audio_cpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_w )
 {
-	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+	finalizr_state *state = space->machine->driver_data<finalizr_state>();
 
 	/*  bit 0x80 goes active low, indicating that the
         external IRQ being serviced is complete
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( i8039_irqen_w )
 
 static READ8_HANDLER( i8039_T1_r )
 {
-	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+	finalizr_state *state = space->machine->driver_data<finalizr_state>();
 
 	/*  I suspect the clock-out from the I8039 T0 line should be connected
         here (See the i8039_T0_w handler below).
@@ -245,7 +245,7 @@ GFXDECODE_END
 
 static MACHINE_START( finalizr )
 {
-	finalizr_state *state = (finalizr_state *)machine->driver_data;
+	finalizr_state *state = machine->driver_data<finalizr_state>();
 
 	state->audio_cpu = machine->device("audiocpu");
 
@@ -258,7 +258,7 @@ static MACHINE_START( finalizr )
 
 static MACHINE_RESET( finalizr )
 {
-	finalizr_state *state = (finalizr_state *)machine->driver_data;
+	finalizr_state *state = machine->driver_data<finalizr_state>();
 
 	state->spriterambank = 0;
 	state->charbank = 0;

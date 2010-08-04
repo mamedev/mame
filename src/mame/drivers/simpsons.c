@@ -114,7 +114,7 @@ static WRITE8_HANDLER( z80_bankswitch_w )
 #if 0
 static void sound_nmi_callback( running_machine *machine, int param )
 {
-	simpsons_state *state = (simpsons_state *)machine->driver_data;
+	simpsons_state *state = machine->driver_data<simpsons_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->nmi_enabled) ? CLEAR_LINE : ASSERT_LINE );
 	state->nmi_enabled = 0;
 }
@@ -122,13 +122,13 @@ static void sound_nmi_callback( running_machine *machine, int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	simpsons_state *state = (simpsons_state *)machine->driver_data;
+	simpsons_state *state = machine->driver_data<simpsons_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
-	simpsons_state *state = (simpsons_state *)space->machine->driver_data;
+	simpsons_state *state = space->machine->driver_data<simpsons_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(space->machine, ATTOTIME_IN_USEC(25), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
@@ -229,7 +229,7 @@ INPUT_PORTS_END
 
 static void simpsons_objdma( running_machine *machine )
 {
-	simpsons_state *state = (simpsons_state *)machine->driver_data;
+	simpsons_state *state = machine->driver_data<simpsons_state>();
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
@@ -255,7 +255,7 @@ static void simpsons_objdma( running_machine *machine )
 
 static TIMER_CALLBACK( dmaend_callback )
 {
-	simpsons_state *state = (simpsons_state *)machine->driver_data;
+	simpsons_state *state = machine->driver_data<simpsons_state>();
 	if (state->firq_enabled)
 		cpu_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, HOLD_LINE);
 }
@@ -263,7 +263,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 static INTERRUPT_GEN( simpsons_irq )
 {
-	simpsons_state *state = (simpsons_state *)device->machine->driver_data;
+	simpsons_state *state = device->machine->driver_data<simpsons_state>();
 
 	if (k053246_is_irq_enabled(state->k053246))
 	{

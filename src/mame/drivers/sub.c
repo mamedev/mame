@@ -112,12 +112,13 @@ PCB2  (Top board, CPU board)
 
 #define MASTER_CLOCK			XTAL_18_432MHz
 
-class sub_state
+class sub_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sub_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sub_state(machine)); }
 
-	sub_state(running_machine &machine) { }
+	sub_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8* vid;
 	UINT8* attr;
@@ -133,7 +134,7 @@ static VIDEO_START(sub)
 
 static VIDEO_UPDATE(sub)
 {
-	sub_state *state = (sub_state *)screen->machine->driver_data;
+	sub_state *state = screen->machine->driver_data<sub_state>();
 	const gfx_element *gfx = screen->machine->gfx[0];
 	const gfx_element *gfx_1 = screen->machine->gfx[1];
 	int y,x;
@@ -244,7 +245,7 @@ static WRITE8_HANDLER( subm_to_sound_w )
 
 static WRITE8_HANDLER( nmi_mask_w )
 {
-	sub_state *state = (sub_state *)space->machine->driver_data;
+	sub_state *state = space->machine->driver_data<sub_state>();
 
 	state->nmi_en = data & 1;
 }
@@ -412,7 +413,7 @@ static PALETTE_INIT( sub )
 
 static INTERRUPT_GEN( subm_sound_irq )
 {
-	sub_state *state = (sub_state *)device->machine->driver_data;
+	sub_state *state = device->machine->driver_data<sub_state>();
 
 	if(state->nmi_en)
 		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);

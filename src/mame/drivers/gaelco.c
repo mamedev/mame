@@ -23,7 +23,7 @@
 
 static WRITE16_HANDLER( bigkarnk_sound_command_w )
 {
-	gaelco_state *state = (gaelco_state *)space->machine->driver_data;
+	gaelco_state *state = space->machine->driver_data<gaelco_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -64,7 +64,7 @@ static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 
 static WRITE16_HANDLER( gaelco_vram_encrypted_w )
 {
-	gaelco_state *state = (gaelco_state *)space->machine->driver_data;
+	gaelco_state *state = space->machine->driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -76,7 +76,7 @@ static WRITE16_HANDLER( gaelco_vram_encrypted_w )
 
 static WRITE16_HANDLER(gaelco_encrypted_w)
 {
-	gaelco_state *state = (gaelco_state *)space->machine->driver_data;
+	gaelco_state *state = space->machine->driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -87,7 +87,7 @@ static WRITE16_HANDLER(gaelco_encrypted_w)
 
 static WRITE16_HANDLER( thoop_vram_encrypted_w )
 {
-	gaelco_state *state = (gaelco_state *)space->machine->driver_data;
+	gaelco_state *state = space->machine->driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
@@ -98,7 +98,7 @@ static WRITE16_HANDLER( thoop_vram_encrypted_w )
 
 static WRITE16_HANDLER(thoop_encrypted_w)
 {
-	gaelco_state *state = (gaelco_state *)space->machine->driver_data;
+	gaelco_state *state = space->machine->driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
@@ -492,7 +492,7 @@ GFXDECODEINFO(0x100000,64)
 
 static MACHINE_START( gaelco )
 {
-	gaelco_state *state = (gaelco_state *)machine->driver_data;
+	gaelco_state *state = machine->driver_data<gaelco_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 }

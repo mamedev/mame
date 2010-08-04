@@ -60,13 +60,13 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( control2_r )
 {
-	gijoe_state *state = (gijoe_state *)space->machine->driver_data;
+	gijoe_state *state = space->machine->driver_data<gijoe_state>();
 	return state->cur_control2;
 }
 
 static WRITE16_HANDLER( control2_w )
 {
-	gijoe_state *state = (gijoe_state *)space->machine->driver_data;
+	gijoe_state *state = space->machine->driver_data<gijoe_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -87,7 +87,7 @@ static WRITE16_HANDLER( control2_w )
 
 static void gijoe_objdma( running_machine *machine )
 {
-	gijoe_state *state = (gijoe_state *)machine->driver_data;
+	gijoe_state *state = machine->driver_data<gijoe_state>();
 	UINT16 *src_head, *src_tail, *dst_head, *dst_tail;
 
 	src_head = state->spriteram;
@@ -112,7 +112,7 @@ static void gijoe_objdma( running_machine *machine )
 
 static TIMER_CALLBACK( dmaend_callback )
 {
-	gijoe_state *state = (gijoe_state *)machine->driver_data;
+	gijoe_state *state = machine->driver_data<gijoe_state>();
 
 	if (state->cur_control2 & 0x0020)
 		cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
@@ -120,7 +120,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 static INTERRUPT_GEN( gijoe_interrupt )
 {
-	gijoe_state *state = (gijoe_state *)device->machine->driver_data;
+	gijoe_state *state = device->machine->driver_data<gijoe_state>();
 
 	// global interrupt masking (*this game only)
 	if (!k056832_is_irq_enabled(state->k056832, 0))
@@ -150,7 +150,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	gijoe_state *state = (gijoe_state *)space->machine->driver_data;
+	gijoe_state *state = space->machine->driver_data<gijoe_state>();
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -161,7 +161,7 @@ static READ16_HANDLER( sound_status_r )
 
 static void sound_nmi( running_device *device )
 {
-	gijoe_state *state = (gijoe_state *)device->machine->driver_data;
+	gijoe_state *state = device->machine->driver_data<gijoe_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -276,7 +276,7 @@ static const k053247_interface gijoe_k053247_intf =
 
 static MACHINE_START( gijoe )
 {
-	gijoe_state *state = (gijoe_state *)machine->driver_data;
+	gijoe_state *state = machine->driver_data<gijoe_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -292,7 +292,7 @@ static MACHINE_START( gijoe )
 
 static MACHINE_RESET( gijoe )
 {
-	gijoe_state *state = (gijoe_state *)machine->driver_data;
+	gijoe_state *state = machine->driver_data<gijoe_state>();
 	state->cur_control2 = 0;
 }
 

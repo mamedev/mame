@@ -144,13 +144,13 @@ static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched 
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	cpu_set_input_line(state->cpub, INPUT_LINE_RESET, (state->cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;
@@ -174,7 +174,7 @@ static WRITE16_HANDLER( darius_watchdog_w )
 
 static READ16_HANDLER( darius_ioc_r )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 
 	switch (offset)
 	{
@@ -204,7 +204,7 @@ logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(
 
 static WRITE16_HANDLER( darius_ioc_w )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 
 	switch (offset)
 	{
@@ -276,13 +276,13 @@ ADDRESS_MAP_END
 
 static void reset_sound_region( running_machine *machine )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	memory_set_bank(machine, "bank1", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 
 	state->banknum = data & 0x03;
 	reset_sound_region(space->machine);
@@ -292,7 +292,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static WRITE8_HANDLER( adpcm_command_w )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 	state->adpcm_command = data;
 	/* logerror("#ADPCM command write =%2x\n",data); */
 }
@@ -311,7 +311,7 @@ static WRITE8_HANDLER( display_value )
 
 static void update_fm0( running_machine *machine )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	int left  = (        state->pan[0]  * state->vol[6]) >> 8;
 	int right = ((0xff - state->pan[0]) * state->vol[6]) >> 8;
 
@@ -323,7 +323,7 @@ static void update_fm0( running_machine *machine )
 
 static void update_fm1( running_machine *machine )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	int left  = (        state->pan[1]  * state->vol[7]) >> 8;
 	int right = ((0xff - state->pan[1]) * state->vol[7]) >> 8;
 
@@ -335,7 +335,7 @@ static void update_fm1( running_machine *machine )
 
 static void update_psg0( running_machine *machine, int port )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	running_device *lvol = NULL, *rvol = NULL;
 	int left, right;
 
@@ -358,7 +358,7 @@ static void update_psg0( running_machine *machine, int port )
 
 static void update_psg1( running_machine *machine, int port )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	running_device *lvol = NULL, *rvol = NULL;
 	int left, right;
 
@@ -381,7 +381,7 @@ static void update_psg1( running_machine *machine, int port )
 
 static void update_da( running_machine *machine )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	int left  = state->def_vol[(state->pan[4] >> 4) & 0x0f];
 	int right = state->def_vol[(state->pan[4] >> 0) & 0x0f];
 
@@ -393,21 +393,21 @@ static void update_da( running_machine *machine )
 
 static WRITE8_HANDLER( darius_fm0_pan )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 	state->pan[0] = data & 0xff;  /* data 0x00:right 0xff:left */
 	update_fm0(space->machine);
 }
 
 static WRITE8_HANDLER( darius_fm1_pan )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 	state->pan[1] = data & 0xff;
 	update_fm1(space->machine);
 }
 
 static WRITE8_HANDLER( darius_psg0_pan )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 	state->pan[2] = data & 0xff;
 	update_psg0(space->machine, 0);
 	update_psg0(space->machine, 1);
@@ -416,7 +416,7 @@ static WRITE8_HANDLER( darius_psg0_pan )
 
 static WRITE8_HANDLER( darius_psg1_pan )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 	state->pan[3] = data & 0xff;
 	update_psg1(space->machine, 0);
 	update_psg1(space->machine, 1);
@@ -425,7 +425,7 @@ static WRITE8_HANDLER( darius_psg1_pan )
 
 static WRITE8_HANDLER( darius_da_pan )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 	state->pan[4] = data & 0xff;
 	update_da(space->machine);
 }
@@ -434,7 +434,7 @@ static WRITE8_HANDLER( darius_da_pan )
 
 static WRITE8_DEVICE_HANDLER( darius_write_portA0 )
 {
-	darius_state *state = (darius_state *)device->machine->driver_data;
+	darius_state *state = device->machine->driver_data<darius_state>();
 
 	// volume control FM #0 PSG #0 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", state->pan[0], state->pan[1], state->pan[2], state->pan[3], state->pan[4] );
@@ -448,7 +448,7 @@ static WRITE8_DEVICE_HANDLER( darius_write_portA0 )
 
 static WRITE8_DEVICE_HANDLER( darius_write_portA1 )
 {
-	darius_state *state = (darius_state *)device->machine->driver_data;
+	darius_state *state = device->machine->driver_data<darius_state>();
 
 	// volume control FM #1 PSG #1 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", state->pan[0], state->pan[1], state->pan[2], state->pan[3], state->pan[4] );
@@ -461,7 +461,7 @@ static WRITE8_DEVICE_HANDLER( darius_write_portA1 )
 
 static WRITE8_DEVICE_HANDLER( darius_write_portB0 )
 {
-	darius_state *state = (darius_state *)device->machine->driver_data;
+	darius_state *state = device->machine->driver_data<darius_state>();
 
 	// volume control PSG #0 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", state->pan[0], state->pan[1], state->pan[2], state->pan[3], state->pan[4] );
@@ -474,7 +474,7 @@ static WRITE8_DEVICE_HANDLER( darius_write_portB0 )
 
 static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
 {
-	darius_state *state = (darius_state *)device->machine->driver_data;
+	darius_state *state = device->machine->driver_data<darius_state>();
 
 	// volume control PSG #1 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", state->pan[0], state->pan[1], state->pan[2], state->pan[3], state->pan[4] );
@@ -515,7 +515,7 @@ ADDRESS_MAP_END
 
 static void darius_adpcm_int( running_device *device )
 {
-	darius_state *state = (darius_state *)device->machine->driver_data;
+	darius_state *state = device->machine->driver_data<darius_state>();
 
 	if (state->nmi_enable)
 		cpu_set_input_line(state->adpcm, INPUT_LINE_NMI, PULSE_LINE);
@@ -529,7 +529,7 @@ static const msm5205_interface msm5205_config =
 
 static READ8_HANDLER( adpcm_command_read )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 
 	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(space->cpu) ); */
 	return state->adpcm_command;
@@ -547,7 +547,7 @@ static READ8_HANDLER( readport3 )
 
 static WRITE8_HANDLER( adpcm_nmi_disable )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 
 	state->nmi_enable = 0;
 	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(space->cpu) ); */
@@ -555,7 +555,7 @@ static WRITE8_HANDLER( adpcm_nmi_disable )
 
 static WRITE8_HANDLER( adpcm_nmi_enable )
 {
-	darius_state *state = (darius_state *)space->machine->driver_data;
+	darius_state *state = space->machine->driver_data<darius_state>();
 	state->nmi_enable = 1;
 	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(space->cpu) ); */
 }
@@ -800,7 +800,7 @@ GFXDECODE_END
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
-	darius_state *state = (darius_state *)device->machine->driver_data;
+	darius_state *state = device->machine->driver_data<darius_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -853,7 +853,7 @@ static STATE_POSTLOAD( darius_postload )
 
 static MACHINE_START( darius )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 
 	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
 	memory_configure_bank(machine, "bank1", 4, 1, memory_region(machine, "audiocpu"), 0x8000);
@@ -905,7 +905,7 @@ static MACHINE_START( darius )
 
 static MACHINE_RESET( darius )
 {
-	darius_state *state = (darius_state *)machine->driver_data;
+	darius_state *state = machine->driver_data<darius_state>();
 	int  i;
 
 	state->cpua_ctrl = 0xff;

@@ -11,7 +11,7 @@
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	crshrace_state *state = (crshrace_state *)machine->driver_data;
+	crshrace_state *state = machine->driver_data<crshrace_state>();
 	int code = state->videoram1[tile_index];
 
 	SET_TILE_INFO(1, (code & 0xfff) + (state->roz_bank << 12), code >> 12, 0);
@@ -19,7 +19,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 static TILE_GET_INFO( get_tile_info2 )
 {
-	crshrace_state *state = (crshrace_state *)machine->driver_data;
+	crshrace_state *state = machine->driver_data<crshrace_state>();
 	int code = state->videoram2[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_tile_info2 )
 
 VIDEO_START( crshrace )
 {
-	crshrace_state *state = (crshrace_state *)machine->driver_data;
+	crshrace_state *state = machine->driver_data<crshrace_state>();
 
 	state->tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 16, 64, 64);
 	state->tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8, 8, 64, 64);
@@ -52,7 +52,7 @@ VIDEO_START( crshrace )
 
 WRITE16_HANDLER( crshrace_videoram1_w )
 {
-	crshrace_state *state = (crshrace_state *)space->machine->driver_data;
+	crshrace_state *state = space->machine->driver_data<crshrace_state>();
 
 	COMBINE_DATA(&state->videoram1[offset]);
 	tilemap_mark_tile_dirty(state->tilemap1, offset);
@@ -60,7 +60,7 @@ WRITE16_HANDLER( crshrace_videoram1_w )
 
 WRITE16_HANDLER( crshrace_videoram2_w )
 {
-	crshrace_state *state = (crshrace_state *)space->machine->driver_data;
+	crshrace_state *state = space->machine->driver_data<crshrace_state>();
 
 	COMBINE_DATA(&state->videoram2[offset]);
 	tilemap_mark_tile_dirty(state->tilemap2, offset);
@@ -68,7 +68,7 @@ WRITE16_HANDLER( crshrace_videoram2_w )
 
 WRITE16_HANDLER( crshrace_roz_bank_w )
 {
-	crshrace_state *state = (crshrace_state *)space->machine->driver_data;
+	crshrace_state *state = space->machine->driver_data<crshrace_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -83,7 +83,7 @@ WRITE16_HANDLER( crshrace_roz_bank_w )
 
 WRITE16_HANDLER( crshrace_gfxctrl_w )
 {
-	crshrace_state *state = (crshrace_state *)space->machine->driver_data;
+	crshrace_state *state = space->machine->driver_data<crshrace_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -101,7 +101,7 @@ WRITE16_HANDLER( crshrace_gfxctrl_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	crshrace_state *state = (crshrace_state *)machine->driver_data;
+	crshrace_state *state = machine->driver_data<crshrace_state>();
 	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
 	UINT16 *buffered_spriteram_2 = machine->generic.buffered_spriteram2.u16;
 	int offs;
@@ -173,21 +173,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	crshrace_state *state = (crshrace_state *)machine->driver_data;
+	crshrace_state *state = machine->driver_data<crshrace_state>();
 	tilemap_draw(bitmap, cliprect, state->tilemap2, 0, 0);
 }
 
 
 static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	crshrace_state *state = (crshrace_state *)machine->driver_data;
+	crshrace_state *state = machine->driver_data<crshrace_state>();
 	k053936_zoom_draw(state->k053936, bitmap, cliprect, state->tilemap1, 0, 0, 1);
 }
 
 
 VIDEO_UPDATE( crshrace )
 {
-	crshrace_state *state = (crshrace_state *)screen->machine->driver_data;
+	crshrace_state *state = screen->machine->driver_data<crshrace_state>();
 
 	if (state->gfxctrl & 0x04)	/* display disable? */
 	{

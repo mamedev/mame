@@ -116,7 +116,7 @@
 
 static READ16_HANDLER( rohga_irq_ack_r )
 {
-	rohga_state *state = (rohga_state *)space->machine->driver_data;
+	rohga_state *state = space->machine->driver_data<rohga_state>();
 
 	cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
 	return 0;
@@ -127,7 +127,7 @@ static WRITE16_HANDLER( wizdfire_irq_ack_w )
 	/* This might actually do more, nitrobal for example sets 0xca->0xffff->0x80 at startup then writes 7 all the time
        except when a credit is inserted (writes 6 twice).
        Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
-	rohga_state *state = (rohga_state *)space->machine->driver_data;
+	rohga_state *state = space->machine->driver_data<rohga_state>();
 	cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
 }
 
@@ -722,13 +722,13 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	rohga_state *driver_state = (rohga_state *)device->machine->driver_data;
+	rohga_state *driver_state = device->machine->driver_data<rohga_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	rohga_state *state = (rohga_state *)device->machine->driver_data;
+	rohga_state *state = device->machine->driver_data<rohga_state>();
 	state->oki1->set_bank_base(BIT(data, 0) * 0x40000);
 	state->oki2->set_bank_base(BIT(data, 1) * 0x40000);
 }

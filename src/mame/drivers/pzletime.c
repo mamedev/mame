@@ -19,12 +19,13 @@
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-class pzletime_state
+class pzletime_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pzletime_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pzletime_state(machine)); }
 
-	pzletime_state(running_machine &machine) { }
+	pzletime_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *       bg_videoram;
@@ -45,7 +46,7 @@ public:
 
 static TILE_GET_INFO( get_mid_tile_info )
 {
-	pzletime_state *state = (pzletime_state *)machine->driver_data;
+	pzletime_state *state = machine->driver_data<pzletime_state>();
 	int tileno = state->mid_videoram[tile_index] & 0x0fff;
 	int colour = state->mid_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
@@ -54,7 +55,7 @@ static TILE_GET_INFO( get_mid_tile_info )
 
 static TILE_GET_INFO( get_txt_tile_info )
 {
-	pzletime_state *state = (pzletime_state *)machine->driver_data;
+	pzletime_state *state = machine->driver_data<pzletime_state>();
 	int tileno = state->txt_videoram[tile_index] & 0x0fff;
 	int colour = state->txt_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
@@ -66,7 +67,7 @@ static TILE_GET_INFO( get_txt_tile_info )
 
 static VIDEO_START( pzletime )
 {
-	pzletime_state *state = (pzletime_state *)machine->driver_data;
+	pzletime_state *state = machine->driver_data<pzletime_state>();
 
 	state->mid_tilemap = tilemap_create(machine, get_mid_tile_info, tilemap_scan_cols, 16, 16, 64, 16);
 	state->txt_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
@@ -77,7 +78,7 @@ static VIDEO_START( pzletime )
 
 static VIDEO_UPDATE( pzletime )
 {
-	pzletime_state *state = (pzletime_state *)screen->machine->driver_data;
+	pzletime_state *state = screen->machine->driver_data<pzletime_state>();
 	int count;
 	int y, x;
 
@@ -136,14 +137,14 @@ static VIDEO_UPDATE( pzletime )
 
 static WRITE16_HANDLER( mid_videoram_w )
 {
-	pzletime_state *state = (pzletime_state *)space->machine->driver_data;
+	pzletime_state *state = space->machine->driver_data<pzletime_state>();
 	COMBINE_DATA(&state->mid_videoram[offset]);
 	tilemap_mark_tile_dirty(state->mid_tilemap, offset);
 }
 
 static WRITE16_HANDLER( txt_videoram_w )
 {
-	pzletime_state *state = (pzletime_state *)space->machine->driver_data;
+	pzletime_state *state = space->machine->driver_data<pzletime_state>();
 	COMBINE_DATA(&state->txt_videoram[offset]);
 	tilemap_mark_tile_dirty(state->txt_tilemap, offset);
 }
@@ -160,7 +161,7 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 
 static WRITE16_HANDLER( ticket_w )
 {
-	pzletime_state *state = (pzletime_state *)space->machine->driver_data;
+	pzletime_state *state = space->machine->driver_data<pzletime_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->ticket = data & 1;
@@ -168,7 +169,7 @@ static WRITE16_HANDLER( ticket_w )
 
 static WRITE16_HANDLER( video_regs_w )
 {
-	pzletime_state *state = (pzletime_state *)space->machine->driver_data;
+	pzletime_state *state = space->machine->driver_data<pzletime_state>();
 	int i;
 
 	COMBINE_DATA(&state->video_regs[offset]);
@@ -202,7 +203,7 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 
 static CUSTOM_INPUT( ticket_status_r )
 {
-	pzletime_state *state = (pzletime_state *)field->port->machine->driver_data;
+	pzletime_state *state = field->port->machine->driver_data<pzletime_state>();
 	return (state->ticket && !(field->port->machine->primary_screen->frame_number() % 128));
 }
 
@@ -295,14 +296,14 @@ static PALETTE_INIT( pzletime )
 
 static MACHINE_START( pzletime )
 {
-	pzletime_state *state = (pzletime_state *)machine->driver_data;
+	pzletime_state *state = machine->driver_data<pzletime_state>();
 
 	state_save_register_global(machine, state->ticket);
 }
 
 static MACHINE_RESET( pzletime )
 {
-	pzletime_state *state = (pzletime_state *)machine->driver_data;
+	pzletime_state *state = machine->driver_data<pzletime_state>();
 
 	state->ticket = 0;
 }

@@ -5,7 +5,7 @@
 
 static TILE_GET_INFO( get_sbugger_tile_info )
 {
-	sbugger_state *state = (sbugger_state *)machine->driver_data;
+	sbugger_state *state = machine->driver_data<sbugger_state>();
 	int tileno, color;
 
 	tileno = state->videoram[tile_index];
@@ -16,7 +16,7 @@ static TILE_GET_INFO( get_sbugger_tile_info )
 
 WRITE8_HANDLER( sbugger_videoram_w )
 {
-	sbugger_state *state = (sbugger_state *)space->machine->driver_data;
+	sbugger_state *state = space->machine->driver_data<sbugger_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset);
@@ -24,7 +24,7 @@ WRITE8_HANDLER( sbugger_videoram_w )
 
 WRITE8_HANDLER( sbugger_videoram_attr_w )
 {
-	sbugger_state *state = (sbugger_state *)space->machine->driver_data;
+	sbugger_state *state = space->machine->driver_data<sbugger_state>();
 
 	state->videoram_attr[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap,offset);
@@ -32,13 +32,13 @@ WRITE8_HANDLER( sbugger_videoram_attr_w )
 
 VIDEO_START(sbugger)
 {
-	sbugger_state *state = (sbugger_state *)machine->driver_data;
+	sbugger_state *state = machine->driver_data<sbugger_state>();
 	state->tilemap = tilemap_create(machine, get_sbugger_tile_info, tilemap_scan_rows, 8, 16, 64, 16);
 }
 
 VIDEO_UPDATE(sbugger)
 {
-	sbugger_state *state = (sbugger_state *)screen->machine->driver_data;
+	sbugger_state *state = screen->machine->driver_data<sbugger_state>();
 	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
 	return 0;
 }

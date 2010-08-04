@@ -12,7 +12,7 @@
 
 VIDEO_UPDATE( bublbobl )
 {
-	bublbobl_state *state = (bublbobl_state *)screen->machine->driver_data;
+	bublbobl_state *state = screen->machine->driver_data<bublbobl_state>();
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;

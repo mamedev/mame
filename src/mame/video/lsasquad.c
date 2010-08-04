@@ -3,7 +3,7 @@
 
 static void draw_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *scrollram )
 {
-	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	lsasquad_state *state = machine->driver_data<lsasquad_state>();
 	int offs, scrollx, scrolly;
 
 	scrollx = scrollram[3];
@@ -50,7 +50,7 @@ static void draw_layer( running_machine *machine, bitmap_t *bitmap, const rectan
 
 static int draw_layer_daikaiju( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int  * previd, int type )
 {
-	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	lsasquad_state *state = machine->driver_data<lsasquad_state>();
 	int id, scrollx, scrolly, initoffs, globalscrollx;
 	int stepx = 0;
 
@@ -140,7 +140,7 @@ static int draw_layer_daikaiju( running_machine *machine, bitmap_t *bitmap, cons
 
 static void drawbg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int type )
 {
-	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	lsasquad_state *state = machine->driver_data<lsasquad_state>();
 	int i = 0;
 	int id = -1;
 
@@ -160,7 +160,7 @@ static void drawbg( running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	lsasquad_state *state = machine->driver_data<lsasquad_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -200,7 +200,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( lsasquad )
 {
-	lsasquad_state *state = (lsasquad_state *)screen->machine->driver_data;
+	lsasquad_state *state = screen->machine->driver_data<lsasquad_state>();
 	bitmap_fill(bitmap, cliprect, 511);
 
 	draw_layer(screen->machine, bitmap, cliprect, state->scrollram + 0x000);

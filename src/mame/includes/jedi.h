@@ -14,12 +14,13 @@
 #define JEDI_TMS5220_CLOCK		(JEDI_AUDIO_CPU_OSC / 2 / 9) /* div by 9 is via a binary counter that counts from 7 to 16 */
 
 
-class jedi_state
+class jedi_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jedi_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jedi_state(machine)); }
 
-	jedi_state(running_machine &machine) { }
+	jedi_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* machine state */
 	UINT8  a2d_select;

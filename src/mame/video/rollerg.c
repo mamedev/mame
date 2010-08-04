@@ -10,7 +10,7 @@
 
 void rollerg_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	rollerg_state *state = (rollerg_state *)machine->driver_data;
+	rollerg_state *state = machine->driver_data<rollerg_state>();
 #if 0
 	if (input_code_pressed(machine, KEYCODE_Q) && (*color & 0x80)) *color = rand();
 	if (input_code_pressed(machine, KEYCODE_W) && (*color & 0x40)) *color = rand();
@@ -30,7 +30,7 @@ void rollerg_sprite_callback( running_machine *machine, int *code, int *color, i
 
 void rollerg_zoom_callback( running_machine *machine, int *code, int *color, int *flags )
 {
-	rollerg_state *state = (rollerg_state *)machine->driver_data;
+	rollerg_state *state = machine->driver_data<rollerg_state>();
 	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
 	*color = state->zoom_colorbase + ((*color & 0x30) >> 4);
@@ -46,7 +46,7 @@ void rollerg_zoom_callback( running_machine *machine, int *code, int *color, int
 
 VIDEO_START( rollerg )
 {
-	rollerg_state *state = (rollerg_state *)machine->driver_data;
+	rollerg_state *state = machine->driver_data<rollerg_state>();
 	state->sprite_colorbase = 16;
 	state->zoom_colorbase = 0;
 }
@@ -61,7 +61,7 @@ VIDEO_START( rollerg )
 
 VIDEO_UPDATE( rollerg )
 {
-	rollerg_state *state = (rollerg_state *)screen->machine->driver_data;
+	rollerg_state *state = screen->machine->driver_data<rollerg_state>();
 	int bg_colorbase = 16;
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);

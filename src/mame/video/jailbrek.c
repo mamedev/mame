@@ -36,21 +36,21 @@ PALETTE_INIT( jailbrek )
 
 WRITE8_HANDLER( jailbrek_videoram_w )
 {
-	jailbrek_state *state = (jailbrek_state *)space->machine->driver_data;
+	jailbrek_state *state = space->machine->driver_data<jailbrek_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( jailbrek_colorram_w )
 {
-	jailbrek_state *state = (jailbrek_state *)space->machine->driver_data;
+	jailbrek_state *state = space->machine->driver_data<jailbrek_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	jailbrek_state *state = (jailbrek_state *)machine->driver_data;
+	jailbrek_state *state = machine->driver_data<jailbrek_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
@@ -60,14 +60,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( jailbrek )
 {
-	jailbrek_state *state = (jailbrek_state *)machine->driver_data;
+	jailbrek_state *state = machine->driver_data<jailbrek_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_scrolldx(state->bg_tilemap, 0, 396 - 256);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	jailbrek_state *state = (jailbrek_state *)machine->driver_data;
+	jailbrek_state *state = machine->driver_data<jailbrek_state>();
 	UINT8 *spriteram = state->spriteram;
 	int i;
 
@@ -97,7 +97,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( jailbrek )
 {
-	jailbrek_state *state = (jailbrek_state *)screen->machine->driver_data;
+	jailbrek_state *state = screen->machine->driver_data<jailbrek_state>();
 	int i;
 
 	// added support for vertical scrolling (credits).  23/1/2002  -BR

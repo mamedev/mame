@@ -158,7 +158,7 @@ some kind of zoom table?
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	taitoh_state *state = (taitoh_state *)device->machine->driver_data;
+	taitoh_state *state = device->machine->driver_data<taitoh_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -183,7 +183,7 @@ static READ8_HANDLER( syvalion_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	taitoh_state *state = (taitoh_state *)space->machine->driver_data;
+	taitoh_state *state = space->machine->driver_data<taitoh_state>();
 	UINT8	port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
 
 	switch( port )
@@ -231,13 +231,13 @@ static READ8_HANDLER( syvalion_input_bypass_r )
 
 static void reset_sound_region(running_machine *machine)
 {
-	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	taitoh_state *state = machine->driver_data<taitoh_state>();
 	memory_set_bank(machine, "bank1", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	taitoh_state *state = (taitoh_state *)space->machine->driver_data;
+	taitoh_state *state = space->machine->driver_data<taitoh_state>();
 	state->banknum = data & 3;
 	reset_sound_region(space->machine);
 }
@@ -518,13 +518,13 @@ static STATE_POSTLOAD( taitoh_postload )
 
 static MACHINE_RESET( taitoh )
 {
-	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	taitoh_state *state = machine->driver_data<taitoh_state>();
 	state->banknum = 0;
 }
 
 static MACHINE_START( taitoh )
 {
-	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	taitoh_state *state = machine->driver_data<taitoh_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);

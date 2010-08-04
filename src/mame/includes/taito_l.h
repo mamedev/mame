@@ -1,12 +1,13 @@
 
 #define TAITOL_SPRITERAM_SIZE 0x400
 
-class taitol_state
+class taitol_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitol_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitol_state(machine)); }
 
-	taitol_state(running_machine &machine) { }
+	taitol_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *       rambanks;

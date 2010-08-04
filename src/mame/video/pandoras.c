@@ -89,7 +89,7 @@ PALETTE_INIT( pandoras )
 
 static TILE_GET_INFO( get_tile_info0 )
 {
-	pandoras_state *state = (pandoras_state *)machine->driver_data;
+	pandoras_state *state = machine->driver_data<pandoras_state>();
 	UINT8 attr = state->colorram[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -107,7 +107,7 @@ static TILE_GET_INFO( get_tile_info0 )
 
 VIDEO_START( pandoras )
 {
-	pandoras_state *state = (pandoras_state *)machine->driver_data;
+	pandoras_state *state = machine->driver_data<pandoras_state>();
 	state->layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
 
 	state_save_register_global(machine, state->flipscreen);
@@ -121,7 +121,7 @@ VIDEO_START( pandoras )
 
 WRITE8_HANDLER( pandoras_vram_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	tilemap_mark_tile_dirty(state->layer0, offset);
 	state->videoram[offset] = data;
@@ -129,7 +129,7 @@ WRITE8_HANDLER( pandoras_vram_w )
 
 WRITE8_HANDLER( pandoras_cram_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	tilemap_mark_tile_dirty(state->layer0, offset);
 	state->colorram[offset] = data;
@@ -137,14 +137,14 @@ WRITE8_HANDLER( pandoras_cram_w )
 
 WRITE8_HANDLER( pandoras_scrolly_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	tilemap_set_scrolly(state->layer0, 0, data);
 }
 
 WRITE8_HANDLER( pandoras_flipscreen_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	state->flipscreen = data;
 	tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -179,7 +179,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( pandoras )
 {
-	pandoras_state *state = (pandoras_state *)screen->machine->driver_data;
+	pandoras_state *state = screen->machine->driver_data<pandoras_state>();
 	tilemap_draw(bitmap,cliprect, state->layer0, 1 ,0);
 	draw_sprites(screen->machine, bitmap, cliprect, &state->spriteram[0x800] );
 	tilemap_draw(bitmap,cliprect, state->layer0, 0 ,0);

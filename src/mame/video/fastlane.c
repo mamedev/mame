@@ -25,7 +25,7 @@ PALETTE_INIT( fastlane )
 
 static void set_pens( running_machine *machine )
 {
-	fastlane_state *state = (fastlane_state *)machine->driver_data;
+	fastlane_state *state = machine->driver_data<fastlane_state>();
 	int i;
 
 	for (i = 0x00; i < 0x800; i += 2)
@@ -48,7 +48,7 @@ static void set_pens( running_machine *machine )
 
 static TILE_GET_INFO( get_tile_info0 )
 {
-	fastlane_state *state = (fastlane_state *)machine->driver_data;
+	fastlane_state *state = machine->driver_data<fastlane_state>();
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121, 3);
 	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121, 4);
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121, 5);
@@ -77,7 +77,7 @@ static TILE_GET_INFO( get_tile_info0 )
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	fastlane_state *state = (fastlane_state *)machine->driver_data;
+	fastlane_state *state = machine->driver_data<fastlane_state>();
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121, 3);
 	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121, 4);
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121, 5);
@@ -112,7 +112,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( fastlane )
 {
-	fastlane_state *state = (fastlane_state *)machine->driver_data;
+	fastlane_state *state = machine->driver_data<fastlane_state>();
 
 	state->layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
 	state->layer1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
@@ -135,14 +135,14 @@ VIDEO_START( fastlane )
 
 WRITE8_HANDLER( fastlane_vram1_w )
 {
-	fastlane_state *state = (fastlane_state *)space->machine->driver_data;
+	fastlane_state *state = space->machine->driver_data<fastlane_state>();
 	state->videoram1[offset] = data;
 	tilemap_mark_tile_dirty(state->layer0, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( fastlane_vram2_w )
 {
-	fastlane_state *state = (fastlane_state *)space->machine->driver_data;
+	fastlane_state *state = space->machine->driver_data<fastlane_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->layer1, offset & 0x3ff);
 }
@@ -157,7 +157,7 @@ WRITE8_HANDLER( fastlane_vram2_w )
 
 VIDEO_UPDATE( fastlane )
 {
-	fastlane_state *state = (fastlane_state *)screen->machine->driver_data;
+	fastlane_state *state = screen->machine->driver_data<fastlane_state>();
 	rectangle finalclip0 = state->clip0, finalclip1 = state->clip1;
 	int i, xoffs;
 

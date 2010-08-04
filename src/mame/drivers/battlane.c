@@ -22,7 +22,7 @@
 
 static WRITE8_HANDLER( battlane_cpu_command_w )
 {
-	battlane_state *state = (battlane_state *)space->machine->driver_data;
+	battlane_state *state = space->machine->driver_data<battlane_state>();
 
 	state->cpu_control = data;
 
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
 
 static INTERRUPT_GEN( battlane_cpu1_interrupt )
 {
-	battlane_state *state = (battlane_state *)device->machine->driver_data;
+	battlane_state *state = device->machine->driver_data<battlane_state>();
 
 	/* See note in battlane_cpu_command_w */
 	if (~state->cpu_control & 0x08)
@@ -258,7 +258,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int irq )
 {
-	battlane_state *state = (battlane_state *)device->machine->driver_data;
+	battlane_state *state = device->machine->driver_data<battlane_state>();
 	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -276,7 +276,7 @@ static const ym3526_interface ym3526_config =
 
 static MACHINE_START( battlane )
 {
-	battlane_state *state = (battlane_state *)machine->driver_data;
+	battlane_state *state = machine->driver_data<battlane_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->subcpu = machine->device("sub");
@@ -287,7 +287,7 @@ static MACHINE_START( battlane )
 
 static MACHINE_RESET( battlane )
 {
-	battlane_state *state = (battlane_state *)machine->driver_data;
+	battlane_state *state = machine->driver_data<battlane_state>();
 
 	state->video_ctrl = 0;
 	state->cpu_control = 0;

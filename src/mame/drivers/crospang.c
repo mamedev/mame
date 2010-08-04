@@ -273,7 +273,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int linestate )
 {
-	crospang_state *state = (crospang_state *)device->machine->driver_data;
+	crospang_state *state = device->machine->driver_data<crospang_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate);
 }
 
@@ -285,7 +285,7 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( crospang )
 {
-	crospang_state *state = (crospang_state *)machine->driver_data;
+	crospang_state *state = machine->driver_data<crospang_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -296,7 +296,7 @@ static MACHINE_START( crospang )
 
 static MACHINE_RESET( crospang )
 {
-	crospang_state *state = (crospang_state *)machine->driver_data;
+	crospang_state *state = machine->driver_data<crospang_state>();
 
 	state->bestri_tilebank = 0;
 //  state->xsproff = 4;

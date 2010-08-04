@@ -17,7 +17,7 @@
 
 WRITE16_HANDLER( wwfsstar_fg0_videoram_w )
 {
-	wwfsstar_state *state = (wwfsstar_state *)space->machine->driver_data;
+	wwfsstar_state *state = space->machine->driver_data<wwfsstar_state>();
 
 	COMBINE_DATA(&state->fg0_videoram[offset]);
 	tilemap_mark_tile_dirty(state->fg0_tilemap,offset/2);
@@ -25,7 +25,7 @@ WRITE16_HANDLER( wwfsstar_fg0_videoram_w )
 
 WRITE16_HANDLER( wwfsstar_bg0_videoram_w )
 {
-	wwfsstar_state *state = (wwfsstar_state *)space->machine->driver_data;
+	wwfsstar_state *state = space->machine->driver_data<wwfsstar_state>();
 
 	COMBINE_DATA(&state->bg0_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg0_tilemap,offset/2);
@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_fg0_tile_info )
 
     **- End of Comments -*/
 
-	wwfsstar_state *state = (wwfsstar_state *)machine->driver_data;
+	wwfsstar_state *state = machine->driver_data<wwfsstar_state>();
 	UINT16 *tilebase;
 	int tileno;
 	int colbank;
@@ -90,7 +90,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
     **- End of Comments -*/
 
-	wwfsstar_state *state = (wwfsstar_state *)machine->driver_data;
+	wwfsstar_state *state = machine->driver_data<wwfsstar_state>();
 	UINT16 *tilebase;
 	int tileno, colbank, flipx;
 
@@ -134,7 +134,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
     **- End of Comments -*/
 
-	wwfsstar_state *state = (wwfsstar_state *)machine->driver_data;
+	wwfsstar_state *state = machine->driver_data<wwfsstar_state>();
 	const gfx_element *gfx = machine->gfx[1];
 	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + 0x3ff/2;
@@ -211,7 +211,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( wwfsstar )
 {
-	wwfsstar_state *state = (wwfsstar_state *)machine->driver_data;
+	wwfsstar_state *state = machine->driver_data<wwfsstar_state>();
 
 	state->fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	tilemap_set_transparent_pen(state->fg0_tilemap,0);
@@ -222,7 +222,7 @@ VIDEO_START( wwfsstar )
 
 VIDEO_UPDATE( wwfsstar )
 {
-	wwfsstar_state *state = (wwfsstar_state *)screen->machine->driver_data;
+	wwfsstar_state *state = screen->machine->driver_data<wwfsstar_state>();
 
 	tilemap_set_scrolly( state->bg0_tilemap, 0, state->scrolly  );
 	tilemap_set_scrollx( state->bg0_tilemap, 0, state->scrollx  );

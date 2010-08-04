@@ -88,7 +88,7 @@
 
 static INTERRUPT_GEN( gberet_interrupt )
 {
-	gberet_state *state = (gberet_state *)device->machine->driver_data;
+	gberet_state *state = device->machine->driver_data<gberet_state>();
 	if (cpu_getiloops(device) == 0)
 	{
 		if (state->irq_enable)
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( gberet_coin_counter_w )
 
 static WRITE8_HANDLER( gberet_flipscreen_w )
 {
-	gberet_state *state = (gberet_state *)space->machine->driver_data;
+	gberet_state *state = space->machine->driver_data<gberet_state>();
 	state->nmi_enable = data & 0x01;
 	state->irq_enable = data & 0x04;
 
@@ -137,7 +137,7 @@ static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 
 static WRITE8_HANDLER( mrgoemon_flipscreen_w )
 {
-	gberet_state *state = (gberet_state *)space->machine->driver_data;
+	gberet_state *state = space->machine->driver_data<gberet_state>();
 	state->nmi_enable = data & 0x01;
 	state->irq_enable = data & 0x02;
 
@@ -371,7 +371,7 @@ GFXDECODE_END
 
 static MACHINE_START( gberet )
 {
-	gberet_state *state = (gberet_state *)machine->driver_data;
+	gberet_state *state = machine->driver_data<gberet_state>();
 
 	state_save_register_global(machine, state->irq_enable);
 	state_save_register_global(machine, state->nmi_enable);
@@ -380,7 +380,7 @@ static MACHINE_START( gberet )
 
 static MACHINE_RESET( gberet )
 {
-	gberet_state *state = (gberet_state *)machine->driver_data;
+	gberet_state *state = machine->driver_data<gberet_state>();
 
 	state->irq_enable = 0;
 	state->nmi_enable = 0;

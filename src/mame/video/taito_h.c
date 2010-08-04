@@ -75,7 +75,7 @@ static void syvalion_draw_sprites( running_machine *machine,bitmap_t *bitmap, co
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	taitoh_state *state = machine->driver_data<taitoh_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -168,7 +168,7 @@ static void recordbr_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	taitoh_state *state = machine->driver_data<taitoh_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -280,7 +280,7 @@ static void dleague_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoh_state *state = (taitoh_state *)machine->driver_data;
+	taitoh_state *state = machine->driver_data<taitoh_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -393,7 +393,7 @@ static void taitoh_log_vram(running_machine *machine)
 
 VIDEO_UPDATE( syvalion )
 {
-	taitoh_state *state = (taitoh_state *)screen->machine->driver_data;
+	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 
@@ -412,7 +412,7 @@ VIDEO_UPDATE( syvalion )
 
 VIDEO_UPDATE( recordbr )
 {
-	taitoh_state *state = (taitoh_state *)screen->machine->driver_data;
+	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 
@@ -443,7 +443,7 @@ VIDEO_UPDATE( recordbr )
 
 VIDEO_UPDATE( dleague )
 {
-	taitoh_state *state = (taitoh_state *)screen->machine->driver_data;
+	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 

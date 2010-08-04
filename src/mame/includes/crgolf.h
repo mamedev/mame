@@ -7,12 +7,13 @@
 #define MASTER_CLOCK		18432000
 
 
-class crgolf_state
+class crgolf_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crgolf_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crgolf_state(machine)); }
 
-	crgolf_state(running_machine &machine) { }
+	crgolf_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  videoram_a;

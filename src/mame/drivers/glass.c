@@ -15,13 +15,13 @@ The DS5002FP has up to 128KB undumped gameplay code making the game unplayable :
 
 static WRITE16_HANDLER( clr_int_w )
 {
-	glass_state *state = (glass_state *)space->machine->driver_data;
+	glass_state *state = space->machine->driver_data<glass_state>();
 	state->cause_interrupt = 1;
 }
 
 static INTERRUPT_GEN( glass_interrupt )
 {
-	glass_state *state = (glass_state *)device->machine->driver_data;
+	glass_state *state = device->machine->driver_data<glass_state>();
 
 	if (state->cause_interrupt)
 	{
@@ -173,7 +173,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( glass )
 {
-	glass_state *state = (glass_state *)machine->driver_data;
+	glass_state *state = machine->driver_data<glass_state>();
 
 	state_save_register_global(machine, state->cause_interrupt);
 	state_save_register_global(machine, state->current_bit);
@@ -183,7 +183,7 @@ static MACHINE_START( glass )
 
 static MACHINE_RESET( glass )
 {
-	glass_state *state = (glass_state *)machine->driver_data;
+	glass_state *state = machine->driver_data<glass_state>();
 	int i;
 
 	state->cause_interrupt = 1;

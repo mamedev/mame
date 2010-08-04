@@ -49,7 +49,7 @@ PALETTE_INIT( dcheese )
 
 static void update_scanline_irq( running_machine *machine )
 {
-	dcheese_state *state = (dcheese_state *)machine->driver_data;
+	dcheese_state *state = machine->driver_data<dcheese_state>();
 
 	/* if not in range, don't bother */
 	if (state->blitter_vidparam[0x22/2] <= state->blitter_vidparam[0x1e/2])
@@ -92,7 +92,7 @@ static TIMER_CALLBACK( dcheese_signal_irq_callback )
 
 VIDEO_START( dcheese )
 {
-	dcheese_state *state = (dcheese_state *)machine->driver_data;
+	dcheese_state *state = machine->driver_data<dcheese_state>();
 
 	/* the destination bitmap is not directly accessible to the CPU */
 	state->dstbitmap = auto_bitmap_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine->primary_screen->format());
@@ -118,7 +118,7 @@ VIDEO_START( dcheese )
 
 VIDEO_UPDATE( dcheese )
 {
-	dcheese_state *state = (dcheese_state *)screen->machine->driver_data;
+	dcheese_state *state = screen->machine->driver_data<dcheese_state>();
 	int x, y;
 
 	/* update the pixels */
@@ -143,7 +143,7 @@ VIDEO_UPDATE( dcheese )
 
 static void do_clear( running_machine *machine )
 {
-	dcheese_state *state = (dcheese_state *)machine->driver_data;
+	dcheese_state *state = machine->driver_data<dcheese_state>();
 	int y;
 
 	/* clear the requested scanlines */
@@ -157,7 +157,7 @@ static void do_clear( running_machine *machine )
 
 static void do_blit( running_machine *machine )
 {
-	dcheese_state *state = (dcheese_state *)machine->driver_data;
+	dcheese_state *state = machine->driver_data<dcheese_state>();
 	INT32 srcminx = state->blitter_xparam[0] << 12;
 	INT32 srcmaxx = state->blitter_xparam[1] << 12;
 	INT32 srcminy = state->blitter_yparam[0] << 12;
@@ -236,28 +236,28 @@ static void do_blit( running_machine *machine )
 
 WRITE16_HANDLER( madmax_blitter_color_w )
 {
-	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+	dcheese_state *state = space->machine->driver_data<dcheese_state>();
 	COMBINE_DATA(&state->blitter_color[offset]);
 }
 
 
 WRITE16_HANDLER( madmax_blitter_xparam_w )
 {
-	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+	dcheese_state *state = space->machine->driver_data<dcheese_state>();
 	COMBINE_DATA(&state->blitter_xparam[offset]);
 }
 
 
 WRITE16_HANDLER( madmax_blitter_yparam_w )
 {
-	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+	dcheese_state *state = space->machine->driver_data<dcheese_state>();
 	COMBINE_DATA(&state->blitter_yparam[offset]);
 }
 
 
 WRITE16_HANDLER( madmax_blitter_vidparam_w )
 {
-	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+	dcheese_state *state = space->machine->driver_data<dcheese_state>();
 	COMBINE_DATA(&state->blitter_vidparam[offset]);
 
 	switch (offset)

@@ -222,27 +222,27 @@ static WRITE8_HANDLER( questions_bank_w )
 
 WRITE8_HANDLER( hyprolyb_adpcm_w )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	soundlatch2_w(space, offset, data);
 	state->hyprolyb_adpcm_ready = 0x80;
 }
 
 static READ8_HANDLER( hyprolyb_adpcm_busy_r )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	return state->hyprolyb_adpcm_busy ? 0x10 : 0x00;
 }
 
 static WRITE8_DEVICE_HANDLER( hyprolyb_msm_data_w )
 {
-	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	trackfld_state *state = device->machine->driver_data<trackfld_state>();
 	msm5205_data_w(device, data);
 	state->hyprolyb_adpcm_busy = ~data & 0x80;
 }
 
 static READ8_DEVICE_HANDLER( hyprolyb_msm_vck_r )
 {
-	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	trackfld_state *state = device->machine->driver_data<trackfld_state>();
 	UINT8 old = state->hyprolyb_vck_ready;
 	state->hyprolyb_vck_ready = 0x00;
 	return old;
@@ -250,13 +250,13 @@ static READ8_DEVICE_HANDLER( hyprolyb_msm_vck_r )
 
 static READ8_HANDLER( hyprolyb_adpcm_ready_r )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	return state->hyprolyb_adpcm_ready;
 }
 
 static READ8_HANDLER( hyprolyb_adpcm_data_r )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	state->hyprolyb_adpcm_ready = 0x00;
 	return soundlatch2_r(space, offset);
 }
@@ -841,7 +841,7 @@ GFXDECODE_END
 
 static void adpcm_vck_callback( running_device *device )
 {
-	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	trackfld_state *state = device->machine->driver_data<trackfld_state>();
 	state->hyprolyb_vck_ready = 0x80;
 }
 
@@ -855,7 +855,7 @@ const msm5205_interface hyprolyb_msm5205_config =
 
 static MACHINE_START( trackfld )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->vlm = machine->device("vlm");
@@ -874,7 +874,7 @@ static MACHINE_START( trackfld )
 
 static MACHINE_START( hyprolyb )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	MACHINE_START_CALL(trackfld);
 
@@ -885,7 +885,7 @@ static MACHINE_START( hyprolyb )
 
 static MACHINE_RESET( trackfld )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	state->bg_bank = 0;
 	state->sprite_bank1 = 0;
@@ -898,7 +898,7 @@ static MACHINE_RESET( trackfld )
 
 static MACHINE_RESET( hyprolyb )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	MACHINE_RESET_CALL(trackfld);
 

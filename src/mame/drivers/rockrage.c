@@ -58,7 +58,7 @@ Notes:
 
 static INTERRUPT_GEN( rockrage_interrupt )
 {
-	rockrage_state *state = (rockrage_state *)device->machine->driver_data;
+	rockrage_state *state = device->machine->driver_data<rockrage_state>();
 	if (k007342_is_int_enabled(state->k007342))
 		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
@@ -77,7 +77,7 @@ static WRITE8_HANDLER( rockrage_bankswitch_w )
 
 static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 {
-	rockrage_state *state = (rockrage_state *)space->machine->driver_data;
+	rockrage_state *state = space->machine->driver_data<rockrage_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
@@ -273,7 +273,7 @@ static const k007420_interface rockrage_k007420_intf =
 
 static MACHINE_START( rockrage )
 {
-	rockrage_state *state = (rockrage_state *)machine->driver_data;
+	rockrage_state *state = machine->driver_data<rockrage_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
@@ -288,7 +288,7 @@ static MACHINE_START( rockrage )
 
 static MACHINE_RESET( rockrage )
 {
-	rockrage_state *state = (rockrage_state *)machine->driver_data;
+	rockrage_state *state = machine->driver_data<rockrage_state>();
 
 	state->vreg = 0;
 	state->layer_colorbase[0] = 0x00;

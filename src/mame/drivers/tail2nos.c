@@ -19,7 +19,7 @@
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	tail2nos_state *state = (tail2nos_state *)space->machine->driver_data;
+	tail2nos_state *state = space->machine->driver_data<tail2nos_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -180,7 +180,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int irq )
 {
-	tail2nos_state *state = (tail2nos_state *)device->machine->driver_data;
+	tail2nos_state *state = device->machine->driver_data<tail2nos_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -208,7 +208,7 @@ static const k051316_interface tail2nos_k051316_intf =
 
 static MACHINE_START( tail2nos )
 {
-	tail2nos_state *state = (tail2nos_state *)machine->driver_data;
+	tail2nos_state *state = machine->driver_data<tail2nos_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank3", 0, 2, &ROM[0x10000], 0x8000);
@@ -225,7 +225,7 @@ static MACHINE_START( tail2nos )
 
 static MACHINE_RESET( tail2nos )
 {
-	tail2nos_state *state = (tail2nos_state *)machine->driver_data;
+	tail2nos_state *state = machine->driver_data<tail2nos_state>();
 
 	/* point to the extra ROMs */
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));

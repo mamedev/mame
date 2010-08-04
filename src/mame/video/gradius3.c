@@ -14,7 +14,7 @@
 
 void gradius3_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	gradius3_state *state = (gradius3_state *)machine->driver_data;
+	gradius3_state *state = machine->driver_data<gradius3_state>();
 
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
@@ -38,7 +38,7 @@ void gradius3_sprite_callback( running_machine *machine, int *code, int *color, 
 		{ L0|L2, L0, L0|L2, L0|L1|L2 },
 		{ L1|L2, L2, 0,     L0|L1|L2 }
 	};
-	gradius3_state *state = (gradius3_state *)machine->driver_data;
+	gradius3_state *state = machine->driver_data<gradius3_state>();
 	int pri = ((*color & 0x60) >> 5);
 
 	if (state->priority == 0)
@@ -70,7 +70,7 @@ static STATE_POSTLOAD( gradius3_postload )
 
 VIDEO_START( gradius3 )
 {
-	gradius3_state *state = (gradius3_state *)machine->driver_data;
+	gradius3_state *state = machine->driver_data<gradius3_state>();
 	int i;
 
 	state->layer_colorbase[0] = 0;
@@ -108,7 +108,7 @@ READ16_HANDLER( gradius3_gfxrom_r )
 
 WRITE16_HANDLER( gradius3_gfxram_w )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 	int oldword = state->gfxram[offset];
 
 	COMBINE_DATA(&state->gfxram[offset]);
@@ -125,7 +125,7 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 
 VIDEO_UPDATE( gradius3 )
 {
-	gradius3_state *state = (gradius3_state *)screen->machine->driver_data;
+	gradius3_state *state = screen->machine->driver_data<gradius3_state>();
 
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
 	k052109_w(state->k052109, 0x1d80, 0x10);

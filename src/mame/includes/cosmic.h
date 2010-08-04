@@ -8,12 +8,13 @@
 #define Z80_MASTER_CLOCK         XTAL_10_816MHz
 
 
-class cosmic_state
+class cosmic_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cosmic_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cosmic_state(machine)); }
 
-	cosmic_state(running_machine &machine) { }
+	cosmic_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *        videoram;

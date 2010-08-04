@@ -11,7 +11,7 @@ todo - convert to tilemap
 
 WRITE8_HANDLER ( funybubl_paldatawrite )
 {
-	funybubl_state *state = (funybubl_state *)space->machine->driver_data;
+	funybubl_state *state = space->machine->driver_data<funybubl_state>();
 	int colchanged ;
 	UINT32 coldat;
 
@@ -30,7 +30,7 @@ VIDEO_START(funybubl)
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	funybubl_state *state = (funybubl_state *)machine->driver_data;
+	funybubl_state *state = machine->driver_data<funybubl_state>();
 	UINT8 *source = &state->banked_vram[0x2000 - 0x20];
 	UINT8 *finish = source - 0x1000;
 
@@ -75,7 +75,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE(funybubl)
 {
-	funybubl_state *state = (funybubl_state *)screen->machine->driver_data;
+	funybubl_state *state = screen->machine->driver_data<funybubl_state>();
 	int x, y, offs;
 	offs = 0;
 

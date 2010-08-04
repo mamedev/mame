@@ -57,7 +57,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 static TILE_GET_INFO( metro_k053936_get_tile_info )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	int code = state->k053936_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -69,7 +69,7 @@ static TILE_GET_INFO( metro_k053936_get_tile_info )
 
 static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	int code = state->k053936_ram[tile_index];
 
 	SET_TILE_INFO(
@@ -81,7 +81,7 @@ static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
 
 WRITE16_HANDLER( metro_k053936_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	COMBINE_DATA(&state->k053936_ram[offset]);
 	tilemap_mark_tile_dirty(state->k053936_tilemap, offset);
 }
@@ -144,7 +144,7 @@ static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
 // returns if to draw the pixel or not, pixel colour is placed in pix
 INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8 y, int big, UINT16* pix )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	int table_index;
 	UINT32 tile;
 
@@ -250,16 +250,16 @@ INLINE void metro_vram_w( running_machine *machine, offs_t offset, UINT16 data, 
 	COMBINE_DATA(&vram[offset]);
 }
 
-WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = (metro_state *)space->machine->driver_data;  metro_vram_w(space->machine, offset, data, mem_mask, 0, state->vram_0); }
-WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = (metro_state *)space->machine->driver_data;  metro_vram_w(space->machine, offset, data, mem_mask, 1, state->vram_1); }
-WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = (metro_state *)space->machine->driver_data;  metro_vram_w(space->machine, offset, data, mem_mask, 2, state->vram_2); }
+WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = space->machine->driver_data<metro_state>();  metro_vram_w(space->machine, offset, data, mem_mask, 0, state->vram_0); }
+WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = space->machine->driver_data<metro_state>();  metro_vram_w(space->machine, offset, data, mem_mask, 1, state->vram_1); }
+WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = space->machine->driver_data<metro_state>();  metro_vram_w(space->machine, offset, data, mem_mask, 2, state->vram_2); }
 
 
 
 /* Dirty the relevant tilemap when its window changes */
 WRITE16_HANDLER( metro_window_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	COMBINE_DATA(&state->window[offset]);
 
 }
@@ -286,7 +286,7 @@ WRITE16_HANDLER( metro_window_w )
 
 VIDEO_START( metro_14100 )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	state->support_8bpp = 0;
 	state->support_16x16 = 0;
@@ -307,7 +307,7 @@ VIDEO_START( metro_14100 )
 
 VIDEO_START( metro_14220 )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	state->support_8bpp = 1;
 	state->support_16x16 = 0;
@@ -328,7 +328,7 @@ VIDEO_START( metro_14220 )
 
 VIDEO_START( metro_14300 )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	state->support_8bpp = 1;
 	state->support_16x16 = 1;
@@ -349,7 +349,7 @@ VIDEO_START( metro_14300 )
 
 VIDEO_START( blzntrnd )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	VIDEO_START_CALL(metro_14220);
 
@@ -364,7 +364,7 @@ VIDEO_START( blzntrnd )
 
 VIDEO_START( gstrik2 )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	VIDEO_START_CALL(metro_14220);
 
@@ -441,7 +441,7 @@ VIDEO_START( gstrik2 )
 
 void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	UINT8 *base_gfx = memory_region(machine, "gfx1");
 	UINT8 *gfx_max  = base_gfx + memory_region_length(machine, "gfx1");
 
@@ -592,7 +592,7 @@ void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const recta
 static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 pcode,
 						 int sx, int sy, int wx, int wy, int big, UINT16* tilemapram, int layer )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	int y;
 
 	bitmap_t *priority_bitmap = machine->priority_bitmap;
@@ -688,7 +688,7 @@ static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rect
 /* Draw all the layers that match the given priority */
 static void draw_layers( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	UINT16 layers_pri = state->videoregs[0x10 / 2];
 	int layer;
 
@@ -722,7 +722,7 @@ static void draw_layers( running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( metro )
 {
-	metro_state *state = (metro_state *)screen->machine->driver_data;
+	metro_state *state = screen->machine->driver_data<metro_state>();
 	int pri, layers_ctrl = -1;
 	UINT16 screenctrl = *state->screenctrl;
 

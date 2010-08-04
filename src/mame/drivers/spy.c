@@ -28,7 +28,7 @@
 
 static INTERRUPT_GEN( spy_interrupt )
 {
-	spy_state *state = (spy_state *)device->machine->driver_data;
+	spy_state *state = device->machine->driver_data<spy_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		cpu_set_input_line(device, 0, HOLD_LINE);
@@ -36,7 +36,7 @@ static INTERRUPT_GEN( spy_interrupt )
 
 static READ8_HANDLER( spy_bankedram1_r )
 {
-	spy_state *state = (spy_state *)space->machine->driver_data;
+	spy_state *state = space->machine->driver_data<spy_state>();
 
 	if (state->rambank & 1)
 	{
@@ -61,7 +61,7 @@ static READ8_HANDLER( spy_bankedram1_r )
 
 static WRITE8_HANDLER( spy_bankedram1_w )
 {
-	spy_state *state = (spy_state *)space->machine->driver_data;
+	spy_state *state = space->machine->driver_data<spy_state>();
 
 	if (state->rambank & 1)
 	{
@@ -173,7 +173,7 @@ static void spy_collision( running_machine *machine )
 #define NEAR_PLANE_ZOOM 0x0100
 #define FAR_PLANE_ZOOM 0x0000
 
-	spy_state *state = (spy_state *)machine->driver_data;
+	spy_state *state = machine->driver_data<spy_state>();
 	int op1, x1, w1, z1, d1, y1, h1;
 	int op2, x2, w2, z2, d2, y2, h2;
 	int mode, i, loopend, nearplane;
@@ -251,7 +251,7 @@ static void spy_collision( running_machine *machine )
 
 static WRITE8_HANDLER( spy_3f90_w )
 {
-	spy_state *state = (spy_state *)space->machine->driver_data;
+	spy_state *state = space->machine->driver_data<spy_state>();
 
 	/*********************************************************************
     *
@@ -336,13 +336,13 @@ static WRITE8_HANDLER( spy_3f90_w )
 
 static WRITE8_HANDLER( spy_sh_irqtrigger_w )
 {
-	spy_state *state = (spy_state *)space->machine->driver_data;
+	spy_state *state = space->machine->driver_data<spy_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	spy_state *state = (spy_state *)space->machine->driver_data;
+	spy_state *state = space->machine->driver_data<spy_state>();
 	int bank_A, bank_B;
 
 	bank_A = (data >> 0) & 0x03;
@@ -357,7 +357,7 @@ static WRITE8_HANDLER( sound_bank_w )
 
 static READ8_HANDLER( k052109_051960_r )
 {
-	spy_state *state = (spy_state *)space->machine->driver_data;
+	spy_state *state = space->machine->driver_data<spy_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -374,7 +374,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	spy_state *state = (spy_state *)space->machine->driver_data;
+	spy_state *state = space->machine->driver_data<spy_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -480,7 +480,7 @@ static const k007232_interface spy_k007232_interface =
 
 static void irqhandler( running_device *device, int linestate )
 {
-	spy_state *state = (spy_state *)device->machine->driver_data;
+	spy_state *state = device->machine->driver_data<spy_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, linestate);
 }
 
@@ -508,7 +508,7 @@ static const k051960_interface spy_k051960_intf =
 
 static MACHINE_START( spy )
 {
-	spy_state *state = (spy_state *)machine->driver_data;
+	spy_state *state = machine->driver_data<spy_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
@@ -533,7 +533,7 @@ static MACHINE_START( spy )
 
 static MACHINE_RESET( spy )
 {
-	spy_state *state = (spy_state *)machine->driver_data;
+	spy_state *state = machine->driver_data<spy_state>();
 
 	state->rambank = 0;
 	state->pmcbank = 0;

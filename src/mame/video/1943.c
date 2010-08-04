@@ -120,7 +120,7 @@ PALETTE_INIT( 1943 )
 
 WRITE8_HANDLER( c1943_videoram_w )
 {
-	_1943_state *state = (_1943_state *)space->machine->driver_data;
+	_1943_state *state = space->machine->driver_data<_1943_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -128,7 +128,7 @@ WRITE8_HANDLER( c1943_videoram_w )
 
 WRITE8_HANDLER( c1943_colorram_w )
 {
-	_1943_state *state = (_1943_state *)space->machine->driver_data;
+	_1943_state *state = space->machine->driver_data<_1943_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -136,7 +136,7 @@ WRITE8_HANDLER( c1943_colorram_w )
 
 WRITE8_HANDLER( c1943_c804_w )
 {
-	_1943_state *state = (_1943_state *)space->machine->driver_data;
+	_1943_state *state = space->machine->driver_data<_1943_state>();
 	int bank;
 
 	/* bits 0 and 1 are coin counters */
@@ -161,7 +161,7 @@ WRITE8_HANDLER( c1943_c804_w )
 
 WRITE8_HANDLER( c1943_d806_w )
 {
-	_1943_state *state = (_1943_state *)space->machine->driver_data;
+	_1943_state *state = space->machine->driver_data<_1943_state>();
 
 	/* bit 4 enables bg 1 */
 	state->bg1_on = data & 0x10;
@@ -202,7 +202,7 @@ static TILE_GET_INFO( c1943_get_bg_tile_info )
 
 static TILE_GET_INFO( c1943_get_fg_tile_info )
 {
-	_1943_state *state = (_1943_state *)machine->driver_data;
+	_1943_state *state = machine->driver_data<_1943_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0xe0) << 3);
 	int color = attr & 0x1f;
@@ -212,7 +212,7 @@ static TILE_GET_INFO( c1943_get_fg_tile_info )
 
 VIDEO_START( 1943 )
 {
-	_1943_state *state = (_1943_state *)machine->driver_data;
+	_1943_state *state = machine->driver_data<_1943_state>();
 	state->bg2_tilemap = tilemap_create(machine, c1943_get_bg2_tile_info, tilemap_scan_cols, 32, 32, 2048, 8);
 	state->bg_tilemap = tilemap_create(machine, c1943_get_bg_tile_info, tilemap_scan_cols, 32, 32, 2048, 8);
 	state->fg_tilemap = tilemap_create(machine, c1943_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -228,7 +228,7 @@ VIDEO_START( 1943 )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	_1943_state *state = (_1943_state *)machine->driver_data;
+	_1943_state *state = machine->driver_data<_1943_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 32; offs >= 0; offs -= 32)
@@ -261,7 +261,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( 1943 )
 {
-	_1943_state *state = (_1943_state *)screen->machine->driver_data;
+	_1943_state *state = screen->machine->driver_data<_1943_state>();
 	tilemap_set_scrollx(state->bg2_tilemap, 0, state->bgscrollx[0] + 256 * state->bgscrollx[1]);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * state->scrollx[1]);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[0]);

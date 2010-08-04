@@ -236,7 +236,7 @@ static WRITE16_HANDLER( shadfrce_flip_screen )
 
 static READ16_HANDLER( shadfrce_input_ports_r )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 	UINT16 data = 0xffff;
 
 	switch (offset)
@@ -283,7 +283,7 @@ static WRITE16_HANDLER( shadfrce_irq_ack_w )
 
 static WRITE16_HANDLER( shadfrce_irq_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	state->irqs_enable = data & 1;	/* maybe, it's set/unset inside every trap instruction which is executed */
 	state->video_enable = data & 8;	/* probably */
@@ -305,14 +305,14 @@ static WRITE16_HANDLER( shadfrce_irq_w )
 
 static WRITE16_HANDLER( shadfrce_scanline_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	state->raster_scanline = data;	/* guess, 0 is always written */
 }
 
 static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 {
-	shadfrce_state *state = (shadfrce_state *)timer.machine->driver_data;
+	shadfrce_state *state = timer.machine->driver_data<shadfrce_state>();
 	int scanline = param;
 
 	/* Vblank is lowered on scanline 0 */

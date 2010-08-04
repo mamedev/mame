@@ -15,7 +15,7 @@
 
 void bishi_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
 {
-	bishi_state *state = (bishi_state *)machine->driver_data;
+	bishi_state *state = machine->driver_data<bishi_state>();
 
 //  *code -= '0';
 //  *color = state->layer_colorbase[layer] | (*color>>2 & 0x0f);
@@ -27,7 +27,7 @@ void bishi_tile_callback( running_machine *machine, int layer, int *code, int *c
 
 VIDEO_START( bishi )
 {
-	bishi_state *state = (bishi_state *)machine->driver_data;
+	bishi_state *state = machine->driver_data<bishi_state>();
 
 	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
 
@@ -47,7 +47,7 @@ VIDEO_START( bishi )
 
 VIDEO_UPDATE(bishi)
 {
-	bishi_state *state = (bishi_state *)screen->machine->driver_data;
+	bishi_state *state = screen->machine->driver_data<bishi_state>();
 	int layers[4], layerpri[4], i;/*, old;*/
 /*  int bg_colorbase, new_colorbase, plane, dirty; */
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };

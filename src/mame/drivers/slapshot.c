@@ -148,13 +148,13 @@ Region byte at offset 0x031:
 
 static READ16_HANDLER( color_ram_word_r )
 {
-	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 	return state->color_ram[offset];
 }
 
 static WRITE16_HANDLER( color_ram_word_w )
 {
-	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 	int r,g,b;
 	COMBINE_DATA(&state->color_ram[offset]);
 
@@ -175,7 +175,7 @@ static WRITE16_HANDLER( color_ram_word_w )
 
 static TIMER_CALLBACK( slapshot_interrupt6 )
 {
-	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	slapshot_state *state = machine->driver_data<slapshot_state>();
 	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
@@ -193,7 +193,7 @@ static INTERRUPT_GEN( slapshot_interrupt )
 
 static READ16_HANDLER( slapshot_service_input_r )
 {
-	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 	switch (offset)
 	{
 		case 0x03:
@@ -233,7 +233,7 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
 		output_set_value("Player2_Gun_Recoil",0);
 	break;
 	}
-	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 
 	/* 4 writes a frame - one for each analogue port */
 	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);
@@ -245,13 +245,13 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
 
 static void reset_sound_region( running_machine *machine )
 {
-	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	slapshot_state *state = machine->driver_data<slapshot_state>();
 	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static WRITE16_HANDLER( slapshot_msb_sound_w )
 {
-	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 	if (offset == 0)
 		tc0140syt_port_w(state->tc0140syt, 0, (data >> 8) & 0xff);
 	else if (offset == 1)
@@ -277,7 +277,7 @@ static WRITE16_HANDLER( slapshot_msb_sound_w )
 
 static READ16_HANDLER( slapshot_msb_sound_r )
 {
-	slapshot_state *state = (slapshot_state *)space->machine->driver_data;
+	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff) << 8);
 	else
@@ -492,7 +492,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	slapshot_state *state = (slapshot_state *)device->machine->driver_data;
+	slapshot_state *state = device->machine->driver_data<slapshot_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -534,7 +534,7 @@ static STATE_POSTLOAD( slapshot_postload )
 
 static MACHINE_START( slapshot )
 {
-	slapshot_state *state = (slapshot_state *)machine->driver_data;
+	slapshot_state *state = machine->driver_data<slapshot_state>();
 
 	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
 

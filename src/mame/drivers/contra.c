@@ -32,7 +32,7 @@ static WRITE8_HANDLER( contra_bankswitch_w )
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
 {
-	contra_state *state = (contra_state *)space->machine->driver_data;
+	contra_state *state = space->machine->driver_data<contra_state>();
 	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -171,7 +171,7 @@ GFXDECODE_END
 
 static MACHINE_START( contra )
 {
-	contra_state *state = (contra_state *)machine->driver_data;
+	contra_state *state = machine->driver_data<contra_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);

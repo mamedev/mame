@@ -6,14 +6,14 @@
 
 #include "machine/atarigen.h"
 
-class gauntlet_state
+class gauntlet_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gauntlet_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gauntlet_state(machine)); }
 
-	gauntlet_state(running_machine &machine) { }
+	gauntlet_state(running_machine &machine)
+		: atarigen_state(machine) { }
 
-	atarigen_state	atarigen;
 	UINT16			sound_reset_val;
 	UINT8			vindctr2_screen_refresh;
 	UINT8			playfield_tile_bank;

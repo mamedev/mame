@@ -19,7 +19,7 @@
 
 static READ8_HANDLER( mcu_tnzs_r )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	UINT8 data;
 
 	data = upi41_master_r(state->mcu, offset & 1);
@@ -32,7 +32,7 @@ static READ8_HANDLER( mcu_tnzs_r )
 
 static WRITE8_HANDLER( mcu_tnzs_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 //  logerror("PC %04x: write %02x to mcu $c00%01x\n", cpu_get_previouspc(space->cpu), data, offset);
 
 	upi41_master_w(state->mcu, offset & 1, data);
@@ -41,7 +41,7 @@ static WRITE8_HANDLER( mcu_tnzs_w )
 
 READ8_HANDLER( tnzs_port1_r )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	int data = 0;
 
 	switch (state->input_select & 0x0f)
@@ -68,7 +68,7 @@ READ8_HANDLER( tnzs_port2_r )
 
 WRITE8_HANDLER( tnzs_port2_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 //  logerror("I8742:%04x  Write %02x to port 2\n", cpu_get_previouspc(space->cpu), data);
 
 	coin_lockout_w(space->machine, 0, (data & 0x40));
@@ -97,7 +97,7 @@ READ8_HANDLER( arknoid2_sh_f000_r )
 
 static void mcu_reset( running_machine *machine )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 
 	state->mcu_initializing = 3;
 	state->mcu_coinage_init = 0;
@@ -114,7 +114,7 @@ static void mcu_reset( running_machine *machine )
 
 static void mcu_handle_coins( running_machine *machine, int coin )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 
 	/* The coin inputs and coin counters are managed by the i8742 mcu. */
 	/* Here we simulate it. */
@@ -189,7 +189,7 @@ static void mcu_handle_coins( running_machine *machine, int coin )
 static READ8_HANDLER( mcu_arknoid2_r )
 {
 	static const char mcu_startup[] = "\x55\xaa\x5a";
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 
 //  logerror("PC %04x: read mcu %04x\n", cpu_get_pc(space->cpu), 0xc000 + offset);
 
@@ -250,7 +250,7 @@ static READ8_HANDLER( mcu_arknoid2_r )
 
 static WRITE8_HANDLER( mcu_arknoid2_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	if (offset == 0)
 	{
 //      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(space->cpu), data, 0xc000 + offset);
@@ -296,7 +296,7 @@ static WRITE8_HANDLER( mcu_arknoid2_w )
 
 static READ8_HANDLER( mcu_extrmatn_r )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	static const char mcu_startup[] = "\x5a\xa5\x55";
 
 //  logerror("PC %04x: read mcu %04x\n", cpu_get_pc(space->cpu), 0xc000 + offset);
@@ -381,7 +381,7 @@ static READ8_HANDLER( mcu_extrmatn_r )
 
 static WRITE8_HANDLER( mcu_extrmatn_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	if (offset == 0)
 	{
 //      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(space->cpu), data, 0xc000 + offset);
@@ -492,25 +492,25 @@ static WRITE8_HANDLER( tnzs_sync_kludge_w )
 
 DRIVER_INIT( plumpop )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_PLUMPOP;
 }
 
 DRIVER_INIT( extrmatn )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_EXTRMATN;
 }
 
 DRIVER_INIT( arknoid2 )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_ARKANOID;
 }
 
 DRIVER_INIT( drtoppel )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_DRTOPPEL;
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
@@ -519,13 +519,13 @@ DRIVER_INIT( drtoppel )
 
 DRIVER_INIT( chukatai )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_CHUKATAI;
 }
 
 DRIVER_INIT( tnzs )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
 //  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
@@ -533,7 +533,7 @@ DRIVER_INIT( tnzs )
 
 DRIVER_INIT( tnzsb )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_NONE_TNZSB;
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
@@ -542,7 +542,7 @@ DRIVER_INIT( tnzsb )
 
 DRIVER_INIT( kabukiz )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	UINT8 *SOUND = memory_region(machine, "audiocpu");
 	state->mcu_type = MCU_NONE_KABUKIZ;
 
@@ -551,7 +551,7 @@ DRIVER_INIT( kabukiz )
 
 DRIVER_INIT( insectx )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_NONE_INSECTX;
 
 	/* this game has no mcu, replace the handler with plain input port handlers */
@@ -562,14 +562,14 @@ DRIVER_INIT( insectx )
 
 DRIVER_INIT( kageki )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_NONE_KAGEKI;
 }
 
 
 READ8_HANDLER( tnzs_mcu_r )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	switch (state->mcu_type)
 	{
 		case MCU_TNZS:
@@ -588,7 +588,7 @@ READ8_HANDLER( tnzs_mcu_r )
 
 WRITE8_HANDLER( tnzs_mcu_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	switch (state->mcu_type)
 	{
 		case MCU_TNZS:
@@ -610,7 +610,7 @@ WRITE8_HANDLER( tnzs_mcu_w )
 
 INTERRUPT_GEN( arknoid2_interrupt )
 {
-	tnzs_state *state = (tnzs_state *)device->machine->driver_data;
+	tnzs_state *state = device->machine->driver_data<tnzs_state>();
 	int coin;
 
 	switch (state->mcu_type)
@@ -635,7 +635,7 @@ INTERRUPT_GEN( arknoid2_interrupt )
 
 MACHINE_RESET( tnzs )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	/* initialize the mcu simulation */
 	switch (state->mcu_type)
 	{
@@ -658,7 +658,7 @@ MACHINE_RESET( tnzs )
 
 MACHINE_RESET( jpopnics )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 
 	state->screenflip = 0;
 	state->mcu_type = -1;
@@ -666,7 +666,7 @@ MACHINE_RESET( jpopnics )
 
 static STATE_POSTLOAD( tnzs_postload )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_set_bank(machine, "bank1", state->bank1);
@@ -680,7 +680,7 @@ static STATE_POSTLOAD( tnzs_postload )
 
 MACHINE_START( tnzs )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *SUB = memory_region(machine, "sub");
 
@@ -718,7 +718,7 @@ MACHINE_START( tnzs )
 
 MACHINE_START( jpopnics )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *SUB = memory_region(machine, "sub");
 
@@ -741,7 +741,7 @@ MACHINE_START( jpopnics )
 
 WRITE8_HANDLER( tnzs_bankswitch_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 
 //  logerror("PC %04x: writing %02x to bankswitch\n", cpu_get_pc(space->cpu),data);
 
@@ -763,7 +763,7 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 
 WRITE8_HANDLER( tnzs_bankswitch1_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 //  logerror("PC %04x: writing %02x to bankswitch 1\n", cpu_get_pc(space->cpu),data);
 
 	switch (state->mcu_type)

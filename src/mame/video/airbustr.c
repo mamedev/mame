@@ -36,28 +36,28 @@
 
 WRITE8_HANDLER( airbustr_videoram_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( airbustr_colorram_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( airbustr_videoram2_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( airbustr_colorram2_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	state->colorram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
@@ -76,7 +76,7 @@ WRITE8_HANDLER( airbustr_colorram2_w )
 
 WRITE8_HANDLER( airbustr_scrollregs_w )
 {
-	airbustr_state *state = (airbustr_state *)space->machine->driver_data;
+	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	switch (offset)		// offset 0 <-> port 4
 	{
 		case 0x00:	state->fg_scrolly = data;	break;	// low 8 bits
@@ -96,7 +96,7 @@ WRITE8_HANDLER( airbustr_scrollregs_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	airbustr_state *state = (airbustr_state *)machine->driver_data;
+	airbustr_state *state = machine->driver_data<airbustr_state>();
 	int attr = state->colorram2[tile_index];
 	int code = state->videoram2[tile_index] + ((attr & 0x0f) << 8);
 	int color = attr >> 4;
@@ -106,7 +106,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	airbustr_state *state = (airbustr_state *)machine->driver_data;
+	airbustr_state *state = machine->driver_data<airbustr_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4) + 16;
@@ -116,7 +116,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( airbustr )
 {
-	airbustr_state *state = (airbustr_state *)machine->driver_data;
+	airbustr_state *state = machine->driver_data<airbustr_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
@@ -135,7 +135,7 @@ VIDEO_START( airbustr )
 
 VIDEO_UPDATE( airbustr )
 {
-	airbustr_state *state = (airbustr_state *)screen->machine->driver_data;
+	airbustr_state *state = screen->machine->driver_data<airbustr_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
@@ -148,7 +148,7 @@ VIDEO_UPDATE( airbustr )
 
 VIDEO_EOF( airbustr )
 {
-	airbustr_state *state = (airbustr_state *)machine->driver_data;
+	airbustr_state *state = machine->driver_data<airbustr_state>();
 
 	// update the sprite bitmap
 	pandora_eof(state->pandora);

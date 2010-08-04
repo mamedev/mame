@@ -76,19 +76,19 @@ Sound Board 1b11107
 
 static WRITE8_HANDLER( video_page_select_w )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 	state->page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( io_page_select_w )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 	state->io_page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( quasar_video_w )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 
 	switch (state->page)
 	{
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( quasar_video_w )
 
 static READ8_HANDLER( quasar_IO_r )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 	UINT8 ans = 0;
 
 	switch (state->io_page)
@@ -117,7 +117,7 @@ static READ8_HANDLER( quasar_IO_r )
 
 static WRITE8_HANDLER( quasar_bullet_w )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 	state->bullet_ram[offset] = (data ^ 0xff);
 }
 
@@ -335,7 +335,7 @@ static const s2636_interface s2636_2_config =
 
 static MACHINE_START( quasar )
 {
-	cvs_state *state = (cvs_state *)machine->driver_data;
+	cvs_state *state = machine->driver_data<cvs_state>();
 
 	MACHINE_START_CALL(cvs);
 
@@ -347,7 +347,7 @@ static MACHINE_START( quasar )
 
 static MACHINE_RESET( quasar )
 {
-	cvs_state *state = (cvs_state *)machine->driver_data;
+	cvs_state *state = machine->driver_data<cvs_state>();
 
 	MACHINE_RESET_CALL(cvs);
 

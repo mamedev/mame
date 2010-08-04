@@ -22,7 +22,7 @@
 
 static INTERRUPT_GEN( flkatck_interrupt )
 {
-	flkatck_state *state = (flkatck_state *)device->machine->driver_data;
+	flkatck_state *state = device->machine->driver_data<flkatck_state>();
 
 	if (state->irq_enabled)
 		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
@@ -62,7 +62,7 @@ static READ8_HANDLER( flkatck_ls138_r )
 
 static WRITE8_HANDLER( flkatck_ls138_w )
 {
-	flkatck_state *state = (flkatck_state *)space->machine->driver_data;
+	flkatck_state *state = space->machine->driver_data<flkatck_state>();
 
 	switch ((offset & 0x1c) >> 2)
 	{
@@ -84,13 +84,13 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 /* Protection - an external multiplyer connected to the sound CPU */
 static READ8_HANDLER( multiply_r )
 {
-	flkatck_state *state = (flkatck_state *)space->machine->driver_data;
+	flkatck_state *state = space->machine->driver_data<flkatck_state>();
 	return (state->multiply_reg[0] * state->multiply_reg[1]) & 0xff;
 }
 
 static WRITE8_HANDLER( multiply_w )
 {
-	flkatck_state *state = (flkatck_state *)space->machine->driver_data;
+	flkatck_state *state = space->machine->driver_data<flkatck_state>();
 	state->multiply_reg[offset] = data;
 }
 
@@ -197,7 +197,7 @@ static const k007232_interface k007232_config =
 
 static MACHINE_START( flkatck )
 {
-	flkatck_state *state = (flkatck_state *)machine->driver_data;
+	flkatck_state *state = machine->driver_data<flkatck_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x2000);
@@ -212,7 +212,7 @@ static MACHINE_START( flkatck )
 
 static MACHINE_RESET( flkatck )
 {
-	flkatck_state *state = (flkatck_state *)machine->driver_data;
+	flkatck_state *state = machine->driver_data<flkatck_state>();
 
 	k007232_set_bank(machine->device("konami"), 0, 1);
 

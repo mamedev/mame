@@ -45,7 +45,7 @@ static WRITE8_HANDLER( ojankohs_rombank_w )
 
 static WRITE8_HANDLER( ojankoy_rombank_w )
 {
-	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
+	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
 
 	memory_set_bank(space->machine, "bank1", data & 0x1f);
 
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( ojankoy_rombank_w )
 
 static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
 {
-	ojankohs_state *state = (ojankohs_state *)device->machine->driver_data;
+	ojankohs_state *state = device->machine->driver_data<ojankohs_state>();
 	state->adpcm_reset = BIT(data, 0);
 	state->vclk_left = 0;
 
@@ -67,14 +67,14 @@ static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
 
 static WRITE8_HANDLER( ojankohs_msm5205_w )
 {
-	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
+	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
 	state->adpcm_data = data;
 	state->vclk_left = 2;
 }
 
 static void ojankohs_adpcm_int( running_device *device )
 {
-	ojankohs_state *state = (ojankohs_state *)device->machine->driver_data;
+	ojankohs_state *state = device->machine->driver_data<ojankohs_state>();
 
 	/* skip if we're reset */
 	if (!state->adpcm_reset)
@@ -95,7 +95,7 @@ static void ojankohs_adpcm_int( running_device *device )
 
 static WRITE8_HANDLER( ojankoc_ctrl_w )
 {
-	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
+	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
 
 	memory_set_bank(space->machine, "bank1", data & 0x0f);
 
@@ -106,13 +106,13 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 
 static WRITE8_HANDLER( ojankohs_portselect_w )
 {
-	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
+	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
 	state->portselect = data;
 }
 
 static READ8_HANDLER( ojankohs_keymatrix_r )
 {
-	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
+	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
 	int ret;
 
 	switch (state->portselect)
@@ -140,7 +140,7 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 
 static READ8_HANDLER( ojankoc_keymatrix_r )
 {
-	ojankohs_state *state = (ojankohs_state *)space->machine->driver_data;
+	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
 	int i;
 	int ret = 0;
 	static const char *const keynames[2][5] =
@@ -794,7 +794,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( common )
 {
-	ojankohs_state *state = (ojankohs_state *)machine->driver_data;
+	ojankohs_state *state = machine->driver_data<ojankohs_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->msm = machine->device("msm");
@@ -840,7 +840,7 @@ static MACHINE_START( ojankoc )
 
 static MACHINE_RESET( ojankohs )
 {
-	ojankohs_state *state = (ojankohs_state *)machine->driver_data;
+	ojankohs_state *state = machine->driver_data<ojankohs_state>();
 
 	state->portselect = 0;
 

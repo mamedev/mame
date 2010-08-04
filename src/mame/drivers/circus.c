@@ -45,7 +45,7 @@ D000      Paddle Position and Interrupt Reset
 #if 0
 static READ8_HANDLER( ripcord_IN2_r )
 {
-	circus_state *state = (circus_state *)space->machine->driver_data;
+	circus_state *state = space->machine->driver_data<circus_state>();
 	state->interrupt++;
 	logerror("circus_int: %02x\n", state->interrupt);
 	return readinputport (2);
@@ -266,7 +266,7 @@ static INTERRUPT_GEN( ripcord_interrupt )
 
 static MACHINE_START( circus )
 {
-	circus_state *state = (circus_state *)machine->driver_data;
+	circus_state *state = machine->driver_data<circus_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->samples = machine->device("samples");
@@ -279,7 +279,7 @@ static MACHINE_START( circus )
 
 static MACHINE_RESET( circus )
 {
-	circus_state *state = (circus_state *)machine->driver_data;
+	circus_state *state = machine->driver_data<circus_state>();
 
 	state->clown_x = 0;
 	state->clown_y = 0;
@@ -584,23 +584,23 @@ ROM_END
 
 static DRIVER_INIT( circus )
 {
-	circus_state *state = (circus_state *)machine->driver_data;
+	circus_state *state = machine->driver_data<circus_state>();
 	state->game_id = 1;
 }
 
 static DRIVER_INIT( robotbwl )
 {
-	circus_state *state = (circus_state *)machine->driver_data;
+	circus_state *state = machine->driver_data<circus_state>();
 	state->game_id = 2;
 }
 static DRIVER_INIT( crash )
 {
-	circus_state *state = (circus_state *)machine->driver_data;
+	circus_state *state = machine->driver_data<circus_state>();
 	state->game_id = 3;
 }
 static DRIVER_INIT( ripcord )
 {
-	circus_state *state = (circus_state *)machine->driver_data;
+	circus_state *state = machine->driver_data<circus_state>();
 	state->game_id = 4;
 }
 

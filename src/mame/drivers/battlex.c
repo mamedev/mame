@@ -204,7 +204,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( battlex )
 {
-	battlex_state *state = (battlex_state *)machine->driver_data;
+	battlex_state *state = machine->driver_data<battlex_state>();
 
 	state->scroll_lsb = 0;
 	state->scroll_msb = 0;

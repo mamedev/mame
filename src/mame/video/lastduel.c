@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( ld_get_bg_tile_info )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 	int tile = state->scroll2[2 * tile_index] & 0x1fff;
 	int color = state->scroll2[2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -29,7 +29,7 @@ static TILE_GET_INFO( ld_get_bg_tile_info )
 
 static TILE_GET_INFO( ld_get_fg_tile_info )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 	int tile = state->scroll1[2 * tile_index] & 0x1fff;
 	int color = state->scroll1[2 * tile_index + 1];
 	SET_TILE_INFO(
@@ -42,7 +42,7 @@ static TILE_GET_INFO( ld_get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 	int tile = state->scroll2[tile_index] & 0x1fff;
 	int color = state->scroll2[tile_index + 0x0800];
 	SET_TILE_INFO(
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 	int tile = state->scroll1[tile_index] & 0x1fff;
 	int color = state->scroll1[tile_index + 0x0800];
 	SET_TILE_INFO(
@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_fix_info )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 	int tile = state->vram[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_fix_info )
 
 VIDEO_START( lastduel )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 	state->bg_tilemap = tilemap_create(machine, ld_get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, ld_get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->tx_tilemap = tilemap_create(machine, get_fix_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -102,7 +102,7 @@ VIDEO_START( lastduel )
 
 VIDEO_START( madgear )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,64,32);
 	state->tx_tilemap = tilemap_create(machine, get_fix_info,tilemap_scan_rows,8,8,64,32);
@@ -139,7 +139,7 @@ WRITE16_HANDLER( lastduel_flip_w )
 
 WRITE16_HANDLER( lastduel_scroll_w )
 {
-	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+	lastduel_state *state = space->machine->driver_data<lastduel_state>();
 
 	data = COMBINE_DATA(&state->scroll[offset]);
 	switch (offset)
@@ -157,7 +157,7 @@ WRITE16_HANDLER( lastduel_scroll_w )
 
 WRITE16_HANDLER( lastduel_scroll1_w )
 {
-	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+	lastduel_state *state = space->machine->driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->scroll1[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
@@ -165,7 +165,7 @@ WRITE16_HANDLER( lastduel_scroll1_w )
 
 WRITE16_HANDLER( lastduel_scroll2_w )
 {
-	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+	lastduel_state *state = space->machine->driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->scroll2[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -173,7 +173,7 @@ WRITE16_HANDLER( lastduel_scroll2_w )
 
 WRITE16_HANDLER( lastduel_vram_w )
 {
-	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+	lastduel_state *state = space->machine->driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->vram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
@@ -181,7 +181,7 @@ WRITE16_HANDLER( lastduel_vram_w )
 
 WRITE16_HANDLER( madgear_scroll1_w )
 {
-	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+	lastduel_state *state = space->machine->driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->scroll1[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x7ff);
@@ -189,7 +189,7 @@ WRITE16_HANDLER( madgear_scroll1_w )
 
 WRITE16_HANDLER( madgear_scroll2_w )
 {
-	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+	lastduel_state *state = space->machine->driver_data<lastduel_state>();
 
 	COMBINE_DATA(&state->scroll2[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x7ff);
@@ -197,7 +197,7 @@ WRITE16_HANDLER( madgear_scroll2_w )
 
 WRITE16_HANDLER( lastduel_palette_word_w )
 {
-	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+	lastduel_state *state = space->machine->driver_data<lastduel_state>();
 
 	int red, green, blue, bright;
 	data = COMBINE_DATA(&state->paletteram[offset]);
@@ -220,7 +220,7 @@ WRITE16_HANDLER( lastduel_palette_word_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 
 	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
@@ -271,7 +271,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( lastduel )
 {
-	lastduel_state *state = (lastduel_state *)screen->machine->driver_data;
+	lastduel_state *state = screen->machine->driver_data<lastduel_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
@@ -284,7 +284,7 @@ VIDEO_UPDATE( lastduel )
 
 VIDEO_UPDATE( madgear )
 {
-	lastduel_state *state = (lastduel_state *)screen->machine->driver_data;
+	lastduel_state *state = screen->machine->driver_data<lastduel_state>();
 
 	if (state->tilemap_priority)
 	{

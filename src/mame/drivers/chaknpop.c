@@ -244,7 +244,7 @@ GFXDECODE_END
 
 static MACHINE_START( chaknpop )
 {
-	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	chaknpop_state *state = machine->driver_data<chaknpop_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
@@ -260,7 +260,7 @@ static MACHINE_START( chaknpop )
 
 static MACHINE_RESET( chaknpop )
 {
-	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	chaknpop_state *state = machine->driver_data<chaknpop_state>();
 
 	state->gfxmode = 0;
 	state->flip_x = 0;

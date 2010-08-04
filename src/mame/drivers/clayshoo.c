@@ -17,12 +17,13 @@
 #include "machine/8255ppi.h"
 
 
-class clayshoo_state
+class clayshoo_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, clayshoo_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, clayshoo_state(machine)); }
 
-	clayshoo_state(running_machine &machine) { }
+	clayshoo_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *   videoram;
@@ -43,7 +44,7 @@ public:
 
 static WRITE8_DEVICE_HANDLER( input_port_select_w )
 {
-	clayshoo_state *state = (clayshoo_state *)device->machine->driver_data;
+	clayshoo_state *state = device->machine->driver_data<clayshoo_state>();
 	state->input_port_select = data;
 }
 
@@ -68,7 +69,7 @@ static UINT8 difficulty_input_port_r( running_machine *machine, int bit )
 
 static READ8_DEVICE_HANDLER( input_port_r )
 {
-	clayshoo_state *state = (clayshoo_state *)device->machine->driver_data;
+	clayshoo_state *state = device->machine->driver_data<clayshoo_state>();
 	UINT8 ret = 0;
 
 	switch (state->input_port_select)
@@ -95,7 +96,7 @@ static READ8_DEVICE_HANDLER( input_port_r )
 
 static TIMER_CALLBACK( reset_analog_bit )
 {
-	clayshoo_state *state = (clayshoo_state *)machine->driver_data;
+	clayshoo_state *state = machine->driver_data<clayshoo_state>();
 	state->analog_port_val &= ~param;
 }
 
@@ -110,7 +111,7 @@ static attotime compute_duration( running_device *device, int analog_pos )
 
 static WRITE8_HANDLER( analog_reset_w )
 {
-	clayshoo_state *state = (clayshoo_state *)space->machine->driver_data;
+	clayshoo_state *state = space->machine->driver_data<clayshoo_state>();
 
 	/* reset the analog value, and start the two times that will fire
        off in a short period proportional to the position of the
@@ -125,14 +126,14 @@ static WRITE8_HANDLER( analog_reset_w )
 
 static READ8_HANDLER( analog_r )
 {
-	clayshoo_state *state = (clayshoo_state *)space->machine->driver_data;
+	clayshoo_state *state = space->machine->driver_data<clayshoo_state>();
 	return state->analog_port_val;
 }
 
 
 static void create_analog_timers( running_machine *machine )
 {
-	clayshoo_state *state = (clayshoo_state *)machine->driver_data;
+	clayshoo_state *state = machine->driver_data<clayshoo_state>();
 	state->analog_timer_1 = timer_alloc(machine, reset_analog_bit, NULL);
 	state->analog_timer_2 = timer_alloc(machine, reset_analog_bit, NULL);
 }
@@ -168,7 +169,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static MACHINE_START( clayshoo )
 {
-	clayshoo_state *state = (clayshoo_state *)machine->driver_data;
+	clayshoo_state *state = machine->driver_data<clayshoo_state>();
 	create_analog_timers(machine);
 
 	/* register for state saving */
@@ -186,7 +187,7 @@ static MACHINE_START( clayshoo )
 
 static VIDEO_UPDATE( clayshoo )
 {
-	clayshoo_state *state = (clayshoo_state *)screen->machine->driver_data;
+	clayshoo_state *state = screen->machine->driver_data<clayshoo_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -316,7 +317,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( clayshoo )
 {
-	clayshoo_state *state = (clayshoo_state *)machine->driver_data;
+	clayshoo_state *state = machine->driver_data<clayshoo_state>();
 
 	state->input_port_select = 0;
 	state->analog_port_val = 0;

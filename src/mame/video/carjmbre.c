@@ -37,7 +37,7 @@ PALETTE_INIT( carjmbre )
 
 WRITE8_HANDLER( carjmbre_flipscreen_w )
 {
-	carjmbre_state *state = (carjmbre_state *)space->machine->driver_data;
+	carjmbre_state *state = space->machine->driver_data<carjmbre_state>();
 
 	state->flipscreen = data ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 	tilemap_set_flip_all(space->machine, state->flipscreen);
@@ -45,7 +45,7 @@ WRITE8_HANDLER( carjmbre_flipscreen_w )
 
 WRITE8_HANDLER( carjmbre_bgcolor_w )
 {
-	carjmbre_state *state = (carjmbre_state *)space->machine->driver_data;
+	carjmbre_state *state = space->machine->driver_data<carjmbre_state>();
 	int oldbg, i;
 
 	oldbg = state->bgcolor;
@@ -63,7 +63,7 @@ WRITE8_HANDLER( carjmbre_bgcolor_w )
 
 static TILE_GET_INFO( get_carjmbre_tile_info )
 {
-	carjmbre_state *state = (carjmbre_state *)machine->driver_data;
+	carjmbre_state *state = machine->driver_data<carjmbre_state>();
 	UINT32 tile_number = state->videoram[tile_index] & 0xff;
 	UINT8 attr  = state->videoram[tile_index + 0x400];
 	tile_number += (attr & 0x80) << 1; /* bank */
@@ -76,7 +76,7 @@ static TILE_GET_INFO( get_carjmbre_tile_info )
 
 WRITE8_HANDLER( carjmbre_videoram_w )
 {
-	carjmbre_state *state = (carjmbre_state *)space->machine->driver_data;
+	carjmbre_state *state = space->machine->driver_data<carjmbre_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->cj_tilemap, offset & 0x3ff);
@@ -86,7 +86,7 @@ WRITE8_HANDLER( carjmbre_videoram_w )
 
 VIDEO_START( carjmbre )
 {
-	carjmbre_state *state = (carjmbre_state *)machine->driver_data;
+	carjmbre_state *state = machine->driver_data<carjmbre_state>();
 
 	state->cj_tilemap = tilemap_create(machine, get_carjmbre_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state_save_register_global(machine, state->flipscreen);
@@ -95,7 +95,7 @@ VIDEO_START( carjmbre )
 
 VIDEO_UPDATE( carjmbre )
 {
-	carjmbre_state *state = (carjmbre_state *)screen->machine->driver_data;
+	carjmbre_state *state = screen->machine->driver_data<carjmbre_state>();
 	int offs, troffs, sx, sy, flipx, flipy;
 
 	//colorram

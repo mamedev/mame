@@ -51,7 +51,7 @@ CPU/Video Board Parts:
 
 static WRITE8_HANDLER( sbasketb_sh_irqtrigger_w )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -174,7 +174,7 @@ GFXDECODE_END
 
 static MACHINE_START( sbasketb )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->vlm = machine->device("vlm");
@@ -187,7 +187,7 @@ static MACHINE_START( sbasketb )
 
 static MACHINE_RESET( sbasketb )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	state->SN76496_latch = 0;
 	state->last_addr = 0;

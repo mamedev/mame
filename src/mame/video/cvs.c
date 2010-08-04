@@ -68,7 +68,7 @@ PALETTE_INIT( cvs )
 
 static void set_pens( running_machine *machine )
 {
-	cvs_state *state = (cvs_state *)machine->driver_data;
+	cvs_state *state = machine->driver_data<cvs_state>();
 	int i;
 
 	for (i = 0; i < 0x10; i++)
@@ -85,7 +85,7 @@ static void set_pens( running_machine *machine )
 
 WRITE8_HANDLER( cvs_video_fx_w )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 
 	if (data & 0xce)
 		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",cpu_get_pc(space->cpu), data & 0xce);
@@ -107,13 +107,13 @@ WRITE8_HANDLER( cvs_video_fx_w )
 
 READ8_HANDLER( cvs_collision_r )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 	return state->collision_register;
 }
 
 READ8_HANDLER( cvs_collision_clear )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 	state->collision_register = 0;
 	return 0;
 }
@@ -121,14 +121,14 @@ READ8_HANDLER( cvs_collision_clear )
 
 WRITE8_HANDLER( cvs_scroll_w )
 {
-	cvs_state *state = (cvs_state *)space->machine->driver_data;
+	cvs_state *state = space->machine->driver_data<cvs_state>();
 	state->scroll_reg = 255 - data;
 }
 
 
 VIDEO_START( cvs )
 {
-	cvs_state *state = (cvs_state *)machine->driver_data;
+	cvs_state *state = machine->driver_data<cvs_state>();
 	int generator = 0;
 	int y;
 
@@ -182,14 +182,14 @@ VIDEO_START( cvs )
 
 void cvs_scroll_stars( running_machine *machine )
 {
-	cvs_state *state = (cvs_state *)machine->driver_data;
+	cvs_state *state = machine->driver_data<cvs_state>();
 	state->stars_scroll++;
 }
 
 
 VIDEO_UPDATE( cvs )
 {
-	cvs_state *state = (cvs_state *)screen->machine->driver_data;
+	cvs_state *state = screen->machine->driver_data<cvs_state>();
 	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
 	offs_t offs;
 	int scroll[8];

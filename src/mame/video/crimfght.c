@@ -11,7 +11,7 @@
 
 void crimfght_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	crimfght_state *state = (crimfght_state *)machine->driver_data;
+	crimfght_state *state = machine->driver_data<crimfght_state>();
 
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x1f) << 8) | (bank << 13);
@@ -30,7 +30,7 @@ void crimfght_sprite_callback( running_machine *machine, int *code, int *color, 
 	/* The PROM allows for mixed priorities, where sprites would have */
 	/* priority over text but not on one or both of the other two planes. */
 	/* Luckily, this isn't used by the game. */
-	crimfght_state *state = (crimfght_state *)machine->driver_data;
+	crimfght_state *state = machine->driver_data<crimfght_state>();
 
 	switch (*color & 0x70)
 	{
@@ -57,7 +57,7 @@ void crimfght_sprite_callback( running_machine *machine, int *code, int *color, 
 
 VIDEO_START( crimfght )
 {
-	crimfght_state *state = (crimfght_state *)machine->driver_data;
+	crimfght_state *state = machine->driver_data<crimfght_state>();
 
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x400);
 
@@ -79,7 +79,7 @@ VIDEO_START( crimfght )
 
 VIDEO_UPDATE( crimfght )
 {
-	crimfght_state *state = (crimfght_state *)screen->machine->driver_data;
+	crimfght_state *state = screen->machine->driver_data<crimfght_state>();
 
 	k052109_tilemap_update(state->k052109);
 

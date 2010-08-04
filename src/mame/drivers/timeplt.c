@@ -59,7 +59,7 @@
 
 static INTERRUPT_GEN( timeplt_interrupt )
 {
-	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+	timeplt_state *state = device->machine->driver_data<timeplt_state>();
 
 	if (state->nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
@@ -68,7 +68,7 @@ static INTERRUPT_GEN( timeplt_interrupt )
 
 static WRITE8_HANDLER( timeplt_nmi_enable_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 
 	state->nmi_enable = data & 1;
 	if (!state->nmi_enable)
@@ -355,14 +355,14 @@ GFXDECODE_END
 
 static MACHINE_START( common )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 }
 
 static MACHINE_START( timeplt )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 
 	MACHINE_START_CALL(common);
 
@@ -371,7 +371,7 @@ static MACHINE_START( timeplt )
 
 static MACHINE_RESET( timeplt )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 
 	state->nmi_enable = 0;
 }

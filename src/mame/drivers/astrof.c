@@ -81,7 +81,7 @@
 
 static READ8_HANDLER( irq_clear_r )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
@@ -90,7 +90,7 @@ static READ8_HANDLER( irq_clear_r )
 
 static TIMER_DEVICE_CALLBACK( irq_callback )
 {
-	astrof_state *state = (astrof_state *)timer.machine->driver_data;
+	astrof_state *state = timer.machine->driver_data<astrof_state>();
 	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
@@ -104,7 +104,7 @@ static TIMER_DEVICE_CALLBACK( irq_callback )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	astrof_state *state = (astrof_state *)field->port->machine->driver_data;
+	astrof_state *state = field->port->machine->driver_data<astrof_state>();
 
 	/* coin insertion causes an NMI */
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -114,7 +114,7 @@ static INPUT_CHANGED( coin_inserted )
 
 static INPUT_CHANGED( service_coin_inserted )
 {
-	astrof_state *state = (astrof_state *)field->port->machine->driver_data;
+	astrof_state *state = field->port->machine->driver_data<astrof_state>();
 
 	/* service coin insertion causes an NMI */
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -146,7 +146,7 @@ static CUSTOM_INPUT( astrof_p2_controls_r )
 static CUSTOM_INPUT( tomahawk_controls_r )
 {
 	UINT32 ret;
-	astrof_state *state = (astrof_state *)field->port->machine->driver_data;
+	astrof_state *state = field->port->machine->driver_data<astrof_state>();
 
 	/* on a cocktail cabinet, two sets of controls are
        multiplexed on a single set of inputs
@@ -174,7 +174,7 @@ static CUSTOM_INPUT( tomahawk_controls_r )
 
 static VIDEO_START( astrof )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
 	state->colorram = auto_alloc_array(machine, UINT8, state->videoram_size / 2);
@@ -184,7 +184,7 @@ static VIDEO_START( astrof )
 
 static rgb_t make_pen( running_machine *machine, UINT8 data )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	UINT8 r1_bit = state->red_on ? 0x01 : (data >> 0) & 0x01;
 	UINT8 r2_bit = state->red_on ? 0x01 : (data >> 1) & 0x01;
@@ -205,7 +205,7 @@ static rgb_t make_pen( running_machine *machine, UINT8 data )
 
 static void astrof_get_pens( running_machine *machine, pen_t *pens )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 	offs_t i;
 	UINT8 bank = (state->astrof_palette_bank ? 0x10 : 0x00);
 	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
@@ -282,7 +282,7 @@ static void tomahawk_get_pens( running_machine *machine, pen_t *pens )
 
 static WRITE8_HANDLER( astrof_videoram_w )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 
 	state->videoram[offset] = data;
 	state->colorram[offset >> 1] = *state->astrof_color & 0x0e;
@@ -291,7 +291,7 @@ static WRITE8_HANDLER( astrof_videoram_w )
 
 static WRITE8_HANDLER( tomahawk_videoram_w )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 
 	state->videoram[offset] = data;
 	state->colorram[offset >> 1] = (*state->astrof_color & 0x0e) | ((*state->astrof_color & 0x01) << 4);
@@ -300,7 +300,7 @@ static WRITE8_HANDLER( tomahawk_videoram_w )
 
 static WRITE8_HANDLER( video_control_1_w )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 
 	state->flipscreen = ((data >> 0) & 0x01) & input_port_read(space->machine, "CAB");
 
@@ -316,7 +316,7 @@ static WRITE8_HANDLER( video_control_1_w )
 
 static void astrof_set_video_control_2( running_machine *machine, UINT8 data )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
@@ -339,7 +339,7 @@ static WRITE8_HANDLER( astrof_video_control_2_w )
 
 static void spfghmk2_set_video_control_2( running_machine *machine, UINT8 data )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( spfghmk2_video_control_2_w )
 
 static void tomahawk_set_video_control_2( running_machine *machine, UINT8 data )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
@@ -378,7 +378,7 @@ static WRITE8_HANDLER( tomahawk_video_control_2_w )
 
 static void video_update_common( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, pen_t *pens )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -461,7 +461,7 @@ static READ8_HANDLER( shoot_r )
 
 static READ8_HANDLER( abattle_coin_prot_r )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 
 	state->abattle_count = (state->abattle_count + 1) % 0x0101;
 	return state->abattle_count ? 0x07 : 0x00;
@@ -470,7 +470,7 @@ static READ8_HANDLER( abattle_coin_prot_r )
 
 static READ8_HANDLER( afire_coin_prot_r )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 
 	state->abattle_count = state->abattle_count ^ 0x01;
 	return state->abattle_count ? 0x07 : 0x00;
@@ -479,7 +479,7 @@ static READ8_HANDLER( afire_coin_prot_r )
 
 static READ8_HANDLER( tomahawk_protection_r )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 
 	/* flip the byte */
 	return BITSWAP8(*state->tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -495,7 +495,7 @@ static READ8_HANDLER( tomahawk_protection_r )
 
 static MACHINE_START( astrof )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(machine, 0xff);
@@ -518,7 +518,7 @@ static MACHINE_START( astrof )
 
 static MACHINE_START( abattle )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* register for state saving */
 	state_save_register_global(machine, state->abattle_count);
@@ -529,7 +529,7 @@ static MACHINE_START( abattle )
 
 static MACHINE_START( spfghmk2 )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(machine, 0xff);
@@ -548,7 +548,7 @@ static MACHINE_START( spfghmk2 )
 
 static MACHINE_START( tomahawk )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(machine, 0xff);
@@ -572,7 +572,7 @@ static MACHINE_START( tomahawk )
 
 static MACHINE_RESET( abattle )
 {
-	astrof_state *state = (astrof_state *)machine->driver_data;
+	astrof_state *state = machine->driver_data<astrof_state>();
 	state->abattle_count = 0;
 }
 

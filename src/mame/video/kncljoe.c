@@ -82,7 +82,7 @@ PALETTE_INIT( kncljoe )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	kncljoe_state *state = (kncljoe_state *)machine->driver_data;
+	kncljoe_state *state = machine->driver_data<kncljoe_state>();
 	int attr = state->videoram[2 * tile_index + 1];
 	int code = state->videoram[2 * tile_index] + ((attr & 0xc0) << 2) + (state->tile_bank << 10);
 
@@ -103,7 +103,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( kncljoe )
 {
-	kncljoe_state *state = (kncljoe_state *)machine->driver_data;
+	kncljoe_state *state = machine->driver_data<kncljoe_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
 	tilemap_set_scroll_rows(state->bg_tilemap, 4);
@@ -119,14 +119,14 @@ VIDEO_START( kncljoe )
 
 WRITE8_HANDLER( kncljoe_videoram_w )
 {
-	kncljoe_state *state = (kncljoe_state *)space->machine->driver_data;
+	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( kncljoe_control_w )
 {
-	kncljoe_state *state = (kncljoe_state *)space->machine->driver_data;
+	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
 	int i;
 	/*
             0x01    screen flip
@@ -161,7 +161,7 @@ WRITE8_HANDLER( kncljoe_control_w )
 
 WRITE8_HANDLER( kncljoe_scroll_w )
 {
-	kncljoe_state *state = (kncljoe_state *)space->machine->driver_data;
+	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
 	int scrollx;
 
 	state->scrollregs[offset] = data;
@@ -182,7 +182,7 @@ WRITE8_HANDLER( kncljoe_scroll_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	kncljoe_state *state = (kncljoe_state *)machine->driver_data;
+	kncljoe_state *state = machine->driver_data<kncljoe_state>();
 	UINT8 *spriteram = state->spriteram;
 	rectangle clip = *cliprect;
 	const gfx_element *gfx = machine->gfx[1 + state->sprite_bank];
@@ -240,7 +240,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( kncljoe )
 {
-	kncljoe_state *state = (kncljoe_state *)screen->machine->driver_data;
+	kncljoe_state *state = screen->machine->driver_data<kncljoe_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

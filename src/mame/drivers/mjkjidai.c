@@ -115,7 +115,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 
 static READ8_HANDLER( keyboard_r )
 {
-	mjkjidai_state *state = (mjkjidai_state *)space->machine->driver_data;
+	mjkjidai_state *state = space->machine->driver_data<mjkjidai_state>();
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "PL2_1", "PL2_2", "PL2_3", "PL2_4", "PL2_5", "PL2_6", "PL1_1", "PL1_2", "PL1_3", "PL1_4", "PL1_5", "PL1_6" };
 
@@ -143,7 +143,7 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_select_w )
 {
-	mjkjidai_state *state = (mjkjidai_state *)space->machine->driver_data;
+	mjkjidai_state *state = space->machine->driver_data<mjkjidai_state>();
 
 //  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
 
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( keyboard_select_w )
 
 static NVRAM_HANDLER( mjkjidai )
 {
-	mjkjidai_state *state = (mjkjidai_state *)machine->driver_data;
+	mjkjidai_state *state = machine->driver_data<mjkjidai_state>();
 
 	if (read_or_write)
 		mame_fwrite(file, state->nvram, state->nvram_size);

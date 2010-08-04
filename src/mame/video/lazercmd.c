@@ -52,7 +52,7 @@ static void plot_pattern( running_machine *machine, bitmap_t *bitmap, int x, int
 
 VIDEO_UPDATE( lazercmd )
 {
-	lazercmd_state *state = (lazercmd_state *)screen->machine->driver_data;
+	lazercmd_state *state = screen->machine->driver_data<lazercmd_state>();
 	int i, x, y;
 
 	int video_inverted = input_port_read(screen->machine, "DSW") & 0x20;

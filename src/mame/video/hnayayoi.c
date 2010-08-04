@@ -14,7 +14,7 @@ The blitter reads compressed data from ROM and copies it to the bitmap RAM.
 
 static void common_vh_start( running_machine *machine, int num_pixmaps )
 {
-	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 	int i;
 
 	state->total_pixmaps = num_pixmaps;
@@ -32,7 +32,7 @@ static void common_vh_start( running_machine *machine, int num_pixmaps )
 
 VIDEO_START( hnayayoi )
 {
-	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 	common_vh_start(machine, 4);	/* 4 bitmaps -> 2 layers */
 
 	state_save_register_global_pointer(machine, state->pixmap[0], 256 * 256);
@@ -43,7 +43,7 @@ VIDEO_START( hnayayoi )
 
 VIDEO_START( untoucha )
 {
-	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 	common_vh_start(machine, 8);	/* 8 bitmaps -> 4 layers */
 
 	state_save_register_global_pointer(machine, state->pixmap[0], 256 * 256);
@@ -102,7 +102,7 @@ up blit_src for the second call.
 
 WRITE8_HANDLER( dynax_blitter_rev1_param_w )
 {
-	hnayayoi_state *state = (hnayayoi_state *)space->machine->driver_data;
+	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
 	switch (offset)
 	{
 		case 0: state->blit_dest = (state->blit_dest & 0xff00) | (data << 0); break;
@@ -116,7 +116,7 @@ WRITE8_HANDLER( dynax_blitter_rev1_param_w )
 
 static void copy_pixel( running_machine *machine, int x, int y, int pen )
 {
-	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 	if (x >= 0 && x <= 255 && y >= 0 && y <= 255)
 	{
 		int i;
@@ -131,7 +131,7 @@ static void copy_pixel( running_machine *machine, int x, int y, int pen )
 
 WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 {
-	hnayayoi_state *state = (hnayayoi_state *)space->machine->driver_data;
+	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
 	UINT8 *rom = memory_region(space->machine, "gfx1");
 	int romlen = memory_region_length(space->machine, "gfx1");
 	int sx = state->blit_dest & 0xff;
@@ -207,7 +207,7 @@ WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 
 WRITE8_HANDLER( dynax_blitter_rev1_clear_w )
 {
-	hnayayoi_state *state = (hnayayoi_state *)space->machine->driver_data;
+	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
 	int pen = data >> 4;
 	int i;
 
@@ -221,7 +221,7 @@ WRITE8_HANDLER( dynax_blitter_rev1_clear_w )
 
 WRITE8_HANDLER( hnayayoi_palbank_w )
 {
-	hnayayoi_state *state = (hnayayoi_state *)space->machine->driver_data;
+	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
 	offset *= 8;
 	state->palbank = (state->palbank & (0xff00 >> offset)) | (data << offset);
 }
@@ -229,7 +229,7 @@ WRITE8_HANDLER( hnayayoi_palbank_w )
 
 static void draw_layer_interleaved( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int left_pixmap, int right_pixmap, int palbase, int transp )
 {
-	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 	int county, countx, pen;
 	UINT8 *src1 = state->pixmap[left_pixmap];
 	UINT8 *src2 = state->pixmap[right_pixmap];
@@ -265,7 +265,7 @@ static void draw_layer_interleaved( running_machine *machine, bitmap_t *bitmap, 
 
 VIDEO_UPDATE( hnayayoi )
 {
-	hnayayoi_state *state = (hnayayoi_state *)screen->machine->driver_data;
+	hnayayoi_state *state = screen->machine->driver_data<hnayayoi_state>();
 	int col0 = (state->palbank >>  0) & 0x0f;
 	int col1 = (state->palbank >>  4) & 0x0f;
 	int col2 = (state->palbank >>  8) & 0x0f;

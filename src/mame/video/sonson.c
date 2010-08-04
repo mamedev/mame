@@ -96,21 +96,21 @@ PALETTE_INIT( sonson )
 
 WRITE8_HANDLER( sonson_videoram_w )
 {
-	sonson_state *state = (sonson_state *)space->machine->driver_data;
+	sonson_state *state = space->machine->driver_data<sonson_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sonson_colorram_w )
 {
-	sonson_state *state = (sonson_state *)space->machine->driver_data;
+	sonson_state *state = space->machine->driver_data<sonson_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sonson_scrollx_w )
 {
-	sonson_state *state = (sonson_state *)space->machine->driver_data;
+	sonson_state *state = space->machine->driver_data<sonson_state>();
 	int row;
 
 	for (row = 5; row < 32; row++)
@@ -124,7 +124,7 @@ WRITE8_HANDLER( sonson_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	sonson_state *state = (sonson_state *)machine->driver_data;
+	sonson_state *state = machine->driver_data<sonson_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + 256 * (attr & 0x03);
 	int color = attr >> 2;
@@ -134,7 +134,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( sonson )
 {
-	sonson_state *state = (sonson_state *)machine->driver_data;
+	sonson_state *state = machine->driver_data<sonson_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
@@ -142,7 +142,7 @@ VIDEO_START( sonson )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	sonson_state *state = (sonson_state *)machine->driver_data;
+	sonson_state *state = machine->driver_data<sonson_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -177,7 +177,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( sonson )
 {
-	sonson_state *state = (sonson_state *)screen->machine->driver_data;
+	sonson_state *state = screen->machine->driver_data<sonson_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;

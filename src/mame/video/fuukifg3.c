@@ -52,7 +52,7 @@
 \
 static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data; \
+	fuuki32_state *state = machine->driver_data<fuuki32_state>(); \
 	UINT16 code = (state->vram_##_N_[tile_index] & 0xffff0000) >> 16; \
 	UINT16 attr = (state->vram_##_N_[tile_index] & 0x0000ffff); \
 	SET_TILE_INFO(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3)); \
@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 \
 WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
 { \
-	fuuki32_state *state = (fuuki32_state *)space->machine->driver_data; \
+	fuuki32_state *state = space->machine->driver_data<fuuki32_state>(); \
 	COMBINE_DATA(&state->vram_##_N_[offset]); \
 	tilemap_mark_tile_dirty(state->tilemap_##_N_,offset); \
 }
@@ -69,7 +69,7 @@ WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
 \
 static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data; \
+	fuuki32_state *state = machine->driver_data<fuuki32_state>(); \
 	UINT16 code = (state->vram_##_N_[tile_index] & 0xffff0000) >> 16; \
 	UINT16 attr = (state->vram_##_N_[tile_index] & 0x0000ffff); \
 	SET_TILE_INFO(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3)); \
@@ -77,7 +77,7 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 \
 WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
 { \
-	fuuki32_state *state = (fuuki32_state *)space->machine->driver_data; \
+	fuuki32_state *state = space->machine->driver_data<fuuki32_state>(); \
 	COMBINE_DATA(&state->vram_##_N_[offset]); \
 	tilemap_mark_tile_dirty(state->tilemap_##_N_, offset); \
 }
@@ -99,7 +99,7 @@ LAYER_4BPP( 3 )
 
 VIDEO_START( fuuki32 )
 {
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
+	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 	state->buf_spriteram = auto_alloc_array(machine, UINT32, state->spriteram_size / 4);
 	state->buf_spriteram2 = auto_alloc_array(machine, UINT32, state->spriteram_size / 4);
 
@@ -151,7 +151,7 @@ VIDEO_START( fuuki32 )
 
 static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	fuuki32_state *state = (fuuki32_state *)screen.machine->driver_data;
+	fuuki32_state *state = screen.machine->driver_data<fuuki32_state>();
 	int offs;
 	const gfx_element *gfx = screen.machine->gfx[0];
 	bitmap_t *priority_bitmap = screen.machine->priority_bitmap;
@@ -297,7 +297,7 @@ if (input_code_pressed(screen.machine, KEYCODE_X))
 /* Wrapper to handle bg and bg2 ttogether */
 static void fuuki32_draw_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int i, int flag, int pri )
 {
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
+	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 	int buffer = ((state->vregs[0x1e / 4] & 0x0000ffff) & 0x40);
 
 	switch( i )
@@ -314,7 +314,7 @@ static void fuuki32_draw_layer( running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( fuuki32 )
 {
-	fuuki32_state *state = (fuuki32_state *)screen->machine->driver_data;
+	fuuki32_state *state = screen->machine->driver_data<fuuki32_state>();
 	UINT16 layer0_scrollx, layer0_scrolly;
 	UINT16 layer1_scrollx, layer1_scrolly;
 	UINT16 layer2_scrollx, layer2_scrolly;
@@ -375,7 +375,7 @@ VIDEO_UPDATE( fuuki32 )
 
 VIDEO_EOF( fuuki32 )
 {
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
+	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 
 	/* Buffer sprites and tilebank by 2 frames */
 	state->spr_buffered_tilebank[1] = state->spr_buffered_tilebank[0];

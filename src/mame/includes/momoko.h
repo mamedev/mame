@@ -4,12 +4,13 @@
 
 *************************************************************************/
 
-class momoko_state
+class momoko_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, momoko_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, momoko_state(machine)); }
 
-	momoko_state(running_machine &machine) { }
+	momoko_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *        bg_scrollx;

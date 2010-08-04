@@ -23,7 +23,7 @@ static KONAMI_SETLINES_CALLBACK( rollerg_banking );
 
 static WRITE8_HANDLER( rollerg_0010_w )
 {
-	rollerg_state *state = (rollerg_state *)space->machine->driver_data;
+	rollerg_state *state = space->machine->driver_data<rollerg_state>();
 	logerror("%04x: write %02x to 0010\n",cpu_get_pc(space->cpu), data);
 
 	/* bits 0/1 are coin counters */
@@ -41,7 +41,7 @@ static WRITE8_HANDLER( rollerg_0010_w )
 
 static READ8_HANDLER( rollerg_k051316_r )
 {
-	rollerg_state *state = (rollerg_state *)space->machine->driver_data;
+	rollerg_state *state = space->machine->driver_data<rollerg_state>();
 
 	if (state->readzoomroms)
 		return k051316_rom_r(state->k051316, offset);
@@ -58,19 +58,19 @@ static READ8_DEVICE_HANDLER( rollerg_sound_r )
 
 static WRITE8_HANDLER( soundirq_w )
 {
-	rollerg_state *state = (rollerg_state *)space->machine->driver_data;
+	rollerg_state *state = space->machine->driver_data<rollerg_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	rollerg_state *state = (rollerg_state *)machine->driver_data;
+	rollerg_state *state = machine->driver_data<rollerg_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	rollerg_state *state = (rollerg_state *)space->machine->driver_data;
+	rollerg_state *state = space->machine->driver_data<rollerg_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
@@ -236,7 +236,7 @@ static const k051316_interface rollerg_k051316_intf =
 
 static MACHINE_START( rollerg )
 {
-	rollerg_state *state = (rollerg_state *)machine->driver_data;
+	rollerg_state *state = machine->driver_data<rollerg_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
@@ -254,7 +254,7 @@ static MACHINE_START( rollerg )
 
 static MACHINE_RESET( rollerg )
 {
-	rollerg_state *state = (rollerg_state *)machine->driver_data;
+	rollerg_state *state = machine->driver_data<rollerg_state>();
 
 	konami_configure_set_lines(machine->device("maincpu"), rollerg_banking);
 

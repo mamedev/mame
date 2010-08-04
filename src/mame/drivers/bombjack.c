@@ -103,7 +103,7 @@ Dip Locations and factory settings verified with manual
 
 static TIMER_CALLBACK( soundlatch_callback )
 {
-	bombjack_state *state = (bombjack_state *)machine->driver_data;
+	bombjack_state *state = machine->driver_data<bombjack_state>();
 	state->latch = param;
 }
 
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( bombjack_soundlatch_w )
 
 static READ8_HANDLER( bombjack_soundlatch_r )
 {
-	bombjack_state *state = (bombjack_state *)space->machine->driver_data;
+	bombjack_state *state = space->machine->driver_data<bombjack_state>();
 	int res;
 
 	res = state->latch;
@@ -328,7 +328,7 @@ GFXDECODE_END
 
 static MACHINE_START( bombjack )
 {
-	bombjack_state *state = (bombjack_state *)machine->driver_data;
+	bombjack_state *state = machine->driver_data<bombjack_state>();
 
 	state_save_register_global(machine, state->latch);
 	state_save_register_global(machine, state->background_image);
@@ -337,7 +337,7 @@ static MACHINE_START( bombjack )
 
 static MACHINE_RESET( bombjack )
 {
-	bombjack_state *state = (bombjack_state *)machine->driver_data;
+	bombjack_state *state = machine->driver_data<bombjack_state>();
 
 	state->latch = 0;
 	state->background_image = 0;

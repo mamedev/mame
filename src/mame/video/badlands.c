@@ -17,8 +17,8 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	badlands_state *state = (badlands_state *)machine->driver_data;
-	UINT16 data = state->atarigen.playfield[tile_index];
+	badlands_state *state = machine->driver_data<badlands_state>();
+	UINT16 data = state->playfield[tile_index];
 	int code = (data & 0x1fff) + ((data & 0x1000) ? (state->playfield_tile_bank << 12) : 0);
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO(0, code, color, 0);
@@ -70,10 +70,10 @@ VIDEO_START( badlands )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	badlands_state *state = (badlands_state *)machine->driver_data;
+	badlands_state *state = machine->driver_data<badlands_state>();
 
 	/* initialize the playfield */
-	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,32);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -92,13 +92,13 @@ VIDEO_START( badlands )
 
 WRITE16_HANDLER( badlands_pf_bank_w )
 {
-	badlands_state *state = (badlands_state *)space->machine->driver_data;
+	badlands_state *state = space->machine->driver_data<badlands_state>();
 	if (ACCESSING_BITS_0_7)
 		if (state->playfield_tile_bank != (data & 1))
 		{
 			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 			state->playfield_tile_bank = data & 1;
-			tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
+			tilemap_mark_all_tiles_dirty(state->playfield_tilemap);
 		}
 }
 
@@ -112,13 +112,13 @@ WRITE16_HANDLER( badlands_pf_bank_w )
 
 VIDEO_UPDATE( badlands )
 {
-	badlands_state *state = (badlands_state *)screen->machine->driver_data;
+	badlands_state *state = screen->machine->driver_data<badlands_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

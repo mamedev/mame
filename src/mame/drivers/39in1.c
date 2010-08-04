@@ -27,12 +27,13 @@
 #include "machine/pxa255.h"
 #include "sound/dmadac.h"
 
-class _39in1_state
+class _39in1_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _39in1_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _39in1_state(machine)); }
 
-	_39in1_state(running_machine &machine) { }
+	_39in1_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT32 seed;
 	UINT32 magic;
@@ -111,7 +112,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine* machine, int n_level, 
 
 static READ32_HANDLER( pxa255_i2s_r )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_I2S_Regs *i2s_regs = &state->i2s_regs;
 
 	switch(PXA255_I2S_BASE_ADDR | (offset << 2))
@@ -146,7 +147,7 @@ static READ32_HANDLER( pxa255_i2s_r )
 
 static WRITE32_HANDLER( pxa255_i2s_w )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_I2S_Regs *i2s_regs = &state->i2s_regs;
 
 #if 0
@@ -225,7 +226,7 @@ static WRITE32_HANDLER( pxa255_i2s_w )
 
 static void pxa255_dma_irq_check(running_machine* machine)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 	int channel = 0;
 	int set_intr = 0;
@@ -248,7 +249,7 @@ static void pxa255_dma_irq_check(running_machine* machine)
 
 static void pxa255_dma_load_descriptor_and_start(running_machine* machine, int channel)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 	attotime period;
 
@@ -290,7 +291,7 @@ static void pxa255_dma_load_descriptor_and_start(running_machine* machine, int c
 
 static TIMER_CALLBACK( pxa255_dma_dma_end )
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 	UINT32 sadr = dma_regs->dsadr[param];
 	UINT32 tadr = dma_regs->dtadr[param];
@@ -400,7 +401,7 @@ static TIMER_CALLBACK( pxa255_dma_dma_end )
 
 static READ32_HANDLER( pxa255_dma_r )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
@@ -459,7 +460,7 @@ static READ32_HANDLER( pxa255_dma_r )
 
 static WRITE32_HANDLER( pxa255_dma_w )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_DMA_Regs *dma_regs = &state->dma_regs;
 
 	switch(PXA255_DMA_BASE_ADDR | (offset << 2))
@@ -551,7 +552,7 @@ static WRITE32_HANDLER( pxa255_dma_w )
 
 static void pxa255_ostimer_irq_check(running_machine* machine)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_OSTMR_Regs *ostimer_regs = &state->ostimer_regs;
 
 	pxa255_set_irq_line(machine, PXA255_INT_OSTIMER0, (ostimer_regs->oier & PXA255_OIER_E0) ? ((ostimer_regs->ossr & PXA255_OSSR_M0) ? 1 : 0) : 0);
@@ -562,7 +563,7 @@ static void pxa255_ostimer_irq_check(running_machine* machine)
 
 static TIMER_CALLBACK( pxa255_ostimer_match )
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_OSTMR_Regs *ostimer_regs = &state->ostimer_regs;
 
 	if (0) verboselog(machine, 3, "pxa255_ostimer_match channel %d\n", param);
@@ -573,7 +574,7 @@ static TIMER_CALLBACK( pxa255_ostimer_match )
 
 static READ32_HANDLER( pxa255_ostimer_r )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_OSTMR_Regs *ostimer_regs = &state->ostimer_regs;
 
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
@@ -613,7 +614,7 @@ static READ32_HANDLER( pxa255_ostimer_r )
 
 static WRITE32_HANDLER( pxa255_ostimer_w )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_OSTMR_Regs *ostimer_regs = &state->ostimer_regs;
 
 	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
@@ -705,7 +706,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 
 static void pxa255_update_interrupts(running_machine* machine)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_INTC_Regs *intc_regs = &state->intc_regs;
 
 	intc_regs->icfp = (intc_regs->icpr & intc_regs->icmr) & intc_regs->iclr;
@@ -716,7 +717,7 @@ static void pxa255_update_interrupts(running_machine* machine)
 
 static void pxa255_set_irq_line(running_machine* machine, UINT32 line, int irq_state)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_INTC_Regs *intc_regs = &state->intc_regs;
 
 	intc_regs->icpr &= ~line;
@@ -727,7 +728,7 @@ static void pxa255_set_irq_line(running_machine* machine, UINT32 line, int irq_s
 
 static READ32_HANDLER( pxa255_intc_r )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_INTC_Regs *intc_regs = &state->intc_regs;
 
 	switch(PXA255_INTC_BASE_ADDR | (offset << 2))
@@ -759,7 +760,7 @@ static READ32_HANDLER( pxa255_intc_r )
 
 static WRITE32_HANDLER( pxa255_intc_w )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_INTC_Regs *intc_regs = &state->intc_regs;
 
 	switch(PXA255_INTC_BASE_ADDR | (offset << 2))
@@ -801,7 +802,7 @@ static WRITE32_HANDLER( pxa255_intc_w )
 
 static READ32_HANDLER( pxa255_gpio_r )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_GPIO_Regs *gpio_regs = &state->gpio_regs;
 
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
@@ -899,7 +900,7 @@ static READ32_HANDLER( pxa255_gpio_r )
 
 static WRITE32_HANDLER( pxa255_gpio_w )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_GPIO_Regs *gpio_regs = &state->gpio_regs;
 
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
@@ -1049,7 +1050,7 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 
 static void pxa255_lcd_load_dma_descriptor(const address_space* space, UINT32 address, int channel)
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	lcd_regs->dma[channel].fdadr = memory_read_dword_32le(space, address);
@@ -1065,7 +1066,7 @@ static void pxa255_lcd_load_dma_descriptor(const address_space* space, UINT32 ad
 
 static void pxa255_lcd_irq_check(running_machine* machine)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	if(((lcd_regs->lcsr & PXA255_LCSR_BS)  != 0 && (lcd_regs->lccr0 & PXA255_LCCR0_BM)  == 0) ||
@@ -1082,7 +1083,7 @@ static void pxa255_lcd_irq_check(running_machine* machine)
 
 static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	if(lcd_regs->dma[channel].fdadr != 0)
@@ -1123,7 +1124,7 @@ static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel)
 
 static void pxa255_lcd_check_load_next_branch(running_machine* machine, int channel)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	if(lcd_regs->fbr[channel] & 1)
@@ -1152,7 +1153,7 @@ static void pxa255_lcd_check_load_next_branch(running_machine* machine, int chan
 
 static TIMER_CALLBACK( pxa255_lcd_dma_eof )
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	if (0) verboselog( machine, 3, "End of frame callback\n" );
@@ -1167,7 +1168,7 @@ static TIMER_CALLBACK( pxa255_lcd_dma_eof )
 
 static READ32_HANDLER( pxa255_lcd_r )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
@@ -1235,7 +1236,7 @@ static READ32_HANDLER( pxa255_lcd_r )
 
 static WRITE32_HANDLER( pxa255_lcd_w )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;
 
 	switch(PXA255_LCD_BASE_ADDR | (offset << 2))
@@ -1358,7 +1359,7 @@ static READ32_HANDLER( unknown_r )
 
 static READ32_HANDLER( cpld_r )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 
 	//if (cpu_get_pc(space->cpu) != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(space->cpu), state);
 
@@ -1415,7 +1416,7 @@ static READ32_HANDLER( cpld_r )
 
 static WRITE32_HANDLER( cpld_w )
 {
-	_39in1_state *state = (_39in1_state *)space->machine->driver_data;
+	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 
 	if (mem_mask == 0xffff)
 	{
@@ -1449,7 +1450,7 @@ static READ32_HANDLER( prot_cheater_r )
 
 static DRIVER_INIT( 39in1 )
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 
 	state->dmadac[0] = machine->device<dmadac_sound_device>("dac1");
 	state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");
@@ -1509,7 +1510,7 @@ INPUT_PORTS_END
 
 static VIDEO_UPDATE( 39in1 )
 {
-	_39in1_state *state = (_39in1_state *)screen->machine->driver_data;
+	_39in1_state *state = screen->machine->driver_data<_39in1_state>();
 	int x = 0;
 	int y = 0;
 
@@ -1527,7 +1528,7 @@ static VIDEO_UPDATE( 39in1 )
 /* To be moved to DEVICE_START( pxa255 ) upon completion */
 static void pxa255_start(running_machine* machine)
 {
-	_39in1_state *state = (_39in1_state *)machine->driver_data;
+	_39in1_state *state = machine->driver_data<_39in1_state>();
 	int index = 0;
 
 	//pxa255_t* pxa255 = pxa255_get_safe_token( device );

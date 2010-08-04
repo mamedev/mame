@@ -104,10 +104,10 @@ static READ16_HANDLER( nvram_r )
 
 static void update_interrupts(running_machine *machine)
 {
-	foodf_state *state = (foodf_state *)machine->driver_data;
-	cputag_set_input_line(machine, "maincpu", 1, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, state->atarigen.scanline_int_state && state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	foodf_state *state = machine->driver_data<foodf_state>();
+	cputag_set_input_line(machine, "maincpu", 1, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 3, state->scanline_int_state && state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -135,7 +135,7 @@ static TIMER_DEVICE_CALLBACK( scanline_update )
 
 static MACHINE_START( foodf )
 {
-	foodf_state *state = (foodf_state *)machine->driver_data;
+	foodf_state *state = machine->driver_data<foodf_state>();
 	atarigen_init(machine);
 	state_save_register_global(machine, state->whichport);
 }
@@ -143,8 +143,8 @@ static MACHINE_START( foodf )
 
 static MACHINE_RESET( foodf )
 {
-	foodf_state *state = (foodf_state *)machine->driver_data;
-	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
+	foodf_state *state = machine->driver_data<foodf_state>();
+	atarigen_interrupt_reset(state, update_interrupts);
 	timer_device *scan_timer = machine->device<timer_device>("scan_timer");
 	scan_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
@@ -159,7 +159,7 @@ static MACHINE_RESET( foodf )
 
 static WRITE16_HANDLER( digital_w )
 {
-	foodf_state *state = (foodf_state *)space->machine->driver_data;
+	foodf_state *state = space->machine->driver_data<foodf_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		foodf_set_flip(state, data & 0x01);
@@ -190,7 +190,7 @@ static WRITE16_HANDLER( digital_w )
 static READ16_HANDLER( analog_r )
 {
 	static const char *const portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
-	foodf_state *state = (foodf_state *)space->machine->driver_data;
+	foodf_state *state = space->machine->driver_data<foodf_state>();
 
 	return input_port_read(space->machine, portnames[state->whichport]);
 }
@@ -198,7 +198,7 @@ static READ16_HANDLER( analog_r )
 
 static WRITE16_HANDLER( analog_w )
 {
-	foodf_state *state = (foodf_state *)space->machine->driver_data;
+	foodf_state *state = space->machine->driver_data<foodf_state>();
 	state->whichport = offset ^ 3;
 }
 
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x014000, 0x014fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x018000, 0x018fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x01c000, 0x01c0ff) AM_MIRROR(0x3e3f00) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(foodf_state, atarigen.playfield)
+	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(foodf_state, playfield)
 	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_RAM_READ(nvram_r) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x940000, 0x940007) AM_MIRROR(0x023ff8) AM_READ(analog_r)
 	AM_RANGE(0x944000, 0x944007) AM_MIRROR(0x023ff8) AM_WRITE(analog_w)

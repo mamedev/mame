@@ -11,7 +11,7 @@
 
 void gbusters_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	gbusters_state *state = (gbusters_state *)machine->driver_data;
+	gbusters_state *state = machine->driver_data<gbusters_state>();
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x0d) << 8) | ((*color & 0x10) << 5) | (bank << 12);
 	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >> 5);
@@ -25,7 +25,7 @@ void gbusters_tile_callback( running_machine *machine, int layer, int bank, int 
 
 void gbusters_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
 {
-	gbusters_state *state = (gbusters_state *)machine->driver_data;
+	gbusters_state *state = machine->driver_data<gbusters_state>();
 	*priority = (*color & 0x30) >> 4;
 	*color = state->sprite_colorbase + (*color & 0x0f);
 }
@@ -39,7 +39,7 @@ void gbusters_sprite_callback( running_machine *machine, int *code, int *color, 
 
 VIDEO_START( gbusters )
 {
-	gbusters_state *state = (gbusters_state *)machine->driver_data;
+	gbusters_state *state = machine->driver_data<gbusters_state>();
 	state->layer_colorbase[0] = 48;
 	state->layer_colorbase[1] = 0;
 	state->layer_colorbase[2] = 16;
@@ -49,7 +49,7 @@ VIDEO_START( gbusters )
 
 VIDEO_UPDATE( gbusters )
 {
-	gbusters_state *state = (gbusters_state *)screen->machine->driver_data;
+	gbusters_state *state = screen->machine->driver_data<gbusters_state>();
 
 	k052109_tilemap_update(state->k052109);
 

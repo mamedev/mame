@@ -1158,7 +1158,7 @@ MACHINE_DRIVER_END
 
 static CUSTOM_INPUT( sflush_80_r )
 {
-	mw8080bw_state *state = (mw8080bw_state *)field->port->machine->driver_data;
+	mw8080bw_state *state = field->port->machine->driver_data<mw8080bw_state>();
 	state->sfl_int ^= 1;	/* vblank flag ? */
 
 	return state->sfl_int;
@@ -1166,7 +1166,7 @@ static CUSTOM_INPUT( sflush_80_r )
 
 static MACHINE_START( sflush )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	state_save_register_global(machine, state->sfl_int);
 
 	MACHINE_START_CALL(mw8080bw);
@@ -1374,7 +1374,7 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( polaris_interrupt )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 	state->polaris_cloud_speed++;
 
 	if (state->polaris_cloud_speed >= 4)	/* every 4 frames - this was verified against real machine */
@@ -1386,7 +1386,7 @@ static INTERRUPT_GEN( polaris_interrupt )
 
 static MACHINE_START( polaris )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	state_save_register_global(machine, state->polaris_cloud_speed);
 	state_save_register_global(machine, state->polaris_cloud_pos);
 

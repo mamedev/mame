@@ -7,13 +7,14 @@
 #include "cpu/tms34010/tms34010.h"
 #include "machine/atarigen.h"
 
-class harddriv_state
+class harddriv_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, harddriv_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, harddriv_state(machine)); }
 
 	harddriv_state(running_machine &machine)
-		: maincpu(machine.device<cpu_device>("maincpu")),
+		: atarigen_state(machine),
+		  maincpu(machine.device<cpu_device>("maincpu")),
 		  gsp(machine.device<cpu_device>("gsp")),
 		  msp(machine.device<cpu_device>("msp")),
 		  adsp(machine.device<cpu_device>("adsp")),
@@ -22,8 +23,6 @@ public:
 		  jsacpu(machine.device<cpu_device>("jsa")),
 		  dsp32(machine.device<cpu_device>("dsp32")),
 		  duart_timer(machine.device<timer_device>("duart_timer")) { }
-
-	atarigen_state			atarigen;
 
 	cpu_device *			maincpu;
 	cpu_device *			gsp;

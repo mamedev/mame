@@ -24,19 +24,19 @@ Todo :
 
 static WRITE8_DEVICE_HANDLER(pa_w)
 {
-	homerun_state *state = (homerun_state *)device->machine->driver_data;
+	homerun_state *state = device->machine->driver_data<homerun_state>();
 	state->xpa = data;
 }
 
 static WRITE8_DEVICE_HANDLER(pb_w)
 {
-	homerun_state *state = (homerun_state *)device->machine->driver_data;
+	homerun_state *state = device->machine->driver_data<homerun_state>();
 	state->xpb = data;
 }
 
 static WRITE8_DEVICE_HANDLER(pc_w)
 {
-	homerun_state *state = (homerun_state *)device->machine->driver_data;
+	homerun_state *state = device->machine->driver_data<homerun_state>();
 	state->xpc = data;
 }
 
@@ -192,7 +192,7 @@ GFXDECODE_END
 
 static MACHINE_START( homerun )
 {
-	homerun_state *state = (homerun_state *)machine->driver_data;
+	homerun_state *state = machine->driver_data<homerun_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
@@ -208,7 +208,7 @@ static MACHINE_START( homerun )
 
 static MACHINE_RESET( homerun )
 {
-	homerun_state *state = (homerun_state *)machine->driver_data;
+	homerun_state *state = machine->driver_data<homerun_state>();
 
 	state->gfx_ctrl = 0;
 	state->gc_up = 0;

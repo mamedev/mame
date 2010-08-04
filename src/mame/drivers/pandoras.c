@@ -37,7 +37,7 @@ Boards:
 
 static INTERRUPT_GEN( pandoras_master_interrupt )
 {
-	pandoras_state *state = (pandoras_state *)device->machine->driver_data;
+	pandoras_state *state = device->machine->driver_data<pandoras_state>();
 
 	if (state->irq_enable_a)
 		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
@@ -45,7 +45,7 @@ static INTERRUPT_GEN( pandoras_master_interrupt )
 
 static INTERRUPT_GEN( pandoras_slave_interrupt )
 {
-	pandoras_state *state = (pandoras_state *)device->machine->driver_data;
+	pandoras_state *state = device->machine->driver_data<pandoras_state>();
 
 	if (state->irq_enable_b)
 		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
@@ -62,7 +62,7 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 
         other bytes unknown */
 
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	switch (offset)
 	{
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 
 static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	if (!state->firq_old_data_a && data)
 		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w )
 
 static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	if (!state->firq_old_data_b && data)
 		cpu_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE);
@@ -110,13 +110,13 @@ static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w )
 
 static WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 	cpu_set_input_line(state->mcu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
@@ -128,7 +128,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 {
-	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -300,7 +300,7 @@ GFXDECODE_END
 
 static MACHINE_START( pandoras )
 {
-	pandoras_state *state = (pandoras_state *)machine->driver_data;
+	pandoras_state *state = machine->driver_data<pandoras_state>();
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->subcpu = machine->device<cpu_device>("sub");
@@ -316,7 +316,7 @@ static MACHINE_START( pandoras )
 
 static MACHINE_RESET( pandoras )
 {
-	pandoras_state *state = (pandoras_state *)machine->driver_data;
+	pandoras_state *state = machine->driver_data<pandoras_state>();
 
 	state->firq_old_data_a = 0;
 	state->firq_old_data_b = 0;
@@ -329,13 +329,13 @@ static MACHINE_RESET( pandoras )
 
 static READ8_DEVICE_HANDLER( pandoras_portA_r )
 {
-	pandoras_state *state = (pandoras_state *)device->machine->driver_data;
+	pandoras_state *state = device->machine->driver_data<pandoras_state>();
 	return state->i8039_status;
 }
 
 static READ8_DEVICE_HANDLER( pandoras_portB_r )
 {
-	pandoras_state *state = (pandoras_state *)device->machine->driver_data;
+	pandoras_state *state = device->machine->driver_data<pandoras_state>();
 	return (state->audiocpu->total_cycles() / 512) & 0x0f;
 }
 

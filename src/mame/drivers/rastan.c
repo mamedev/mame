@@ -174,7 +174,7 @@ static WRITE8_DEVICE_HANDLER( rastan_bankswitch_w )
 
 static void rastan_msm5205_vck( running_device *device )
 {
-	rastan_state *state = (rastan_state *)device->machine->driver_data;
+	rastan_state *state = device->machine->driver_data<rastan_state>();
 	if (state->adpcm_data != -1)
 	{
 		msm5205_data_w(device, state->adpcm_data & 0x0f);
@@ -190,7 +190,7 @@ static void rastan_msm5205_vck( running_device *device )
 
 static WRITE8_HANDLER( rastan_msm5205_address_w )
 {
-	rastan_state *state = (rastan_state *)space->machine->driver_data;
+	rastan_state *state = space->machine->driver_data<rastan_state>();
 	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
 }
 
@@ -201,7 +201,7 @@ static WRITE8_DEVICE_HANDLER( rastan_msm5205_start_w )
 
 static WRITE8_DEVICE_HANDLER( rastan_msm5205_stop_w )
 {
-	rastan_state *state = (rastan_state *)device->machine->driver_data;
+	rastan_state *state = device->machine->driver_data<rastan_state>();
 	msm5205_reset_w(device, 1);
 	state->adpcm_pos &= 0xff00;
 }
@@ -346,7 +346,7 @@ GFXDECODE_END
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	rastan_state *state = (rastan_state *)device->machine->driver_data;
+	rastan_state *state = device->machine->driver_data<rastan_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -364,7 +364,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( rastan )
 {
-	rastan_state *state = (rastan_state *)machine->driver_data;
+	rastan_state *state = machine->driver_data<rastan_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
@@ -384,7 +384,7 @@ static MACHINE_START( rastan )
 
 static MACHINE_RESET( rastan )
 {
-	rastan_state *state = (rastan_state *)machine->driver_data;
+	rastan_state *state = machine->driver_data<rastan_state>();
 
 	state->sprite_ctrl = 0;
 	state->sprites_flipscreen = 0;

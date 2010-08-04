@@ -32,15 +32,15 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	batman_state *state = (batman_state *)machine->driver_data;
-	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	batman_state *state = machine->driver_data<batman_state>();
+	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static MACHINE_START( batman )
 {
-	batman_state *state = (batman_state *)machine->driver_data;
+	batman_state *state = machine->driver_data<batman_state>();
 	atarigen_init(machine);
 
 	state_save_register_global(machine, state->latch_data);
@@ -50,11 +50,11 @@ static MACHINE_START( batman )
 
 static MACHINE_RESET( batman )
 {
-	batman_state *state = (batman_state *)machine->driver_data;
+	batman_state *state = machine->driver_data<batman_state>();
 
-	atarigen_eeprom_reset(&state->atarigen);
-	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarivc_reset(*machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
+	atarigen_eeprom_reset(state);
+	atarigen_interrupt_reset(state, update_interrupts);
+	atarivc_reset(*machine->primary_screen, state->atarivc_eof_data, 2);
 	atarigen_scanline_timer_reset(*machine->primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
 }
@@ -88,17 +88,17 @@ static WRITE16_HANDLER( batman_atarivc_w )
 
 static READ16_HANDLER( special_port2_r )
 {
-	batman_state *state = (batman_state *)space->machine->driver_data;
+	batman_state *state = space->machine->driver_data<batman_state>();
 	int result = input_port_read(space->machine, "260010");
-	if (state->atarigen.sound_to_cpu_ready) result ^= 0x0010;
-	if (state->atarigen.cpu_to_sound_ready) result ^= 0x0020;
+	if (state->sound_to_cpu_ready) result ^= 0x0010;
+	if (state->cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }
 
 
 static WRITE16_HANDLER( latch_w )
 {
-	batman_state *state = (batman_state *)space->machine->driver_data;
+	batman_state *state = space->machine->driver_data<batman_state>();
 	int oldword = state->latch_data;
 	COMBINE_DATA(&state->latch_data);
 
@@ -112,7 +112,7 @@ static WRITE16_HANDLER( latch_w )
 	if ((oldword ^ state->latch_data) & 0x7000)
 	{
 		space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
-		tilemap_mark_all_tiles_dirty(state->atarigen.alpha_tilemap);
+		tilemap_mark_all_tiles_dirty(state->alpha_tilemap);
 		state->alpha_tile_bank = (state->latch_data >> 12) & 7;
 	}
 }
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM
-	AM_RANGE(0x120000, 0x120fff) AM_MIRROR(0x01f000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(batman_state, atarigen.eeprom, atarigen.eeprom_size)
+	AM_RANGE(0x120000, 0x120fff) AM_MIRROR(0x01f000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(batman_state, eeprom, eeprom_size)
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x11ff8c) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_MIRROR(0x11ff8c) AM_READ_PORT("260002")
 	AM_RANGE(0x260010, 0x260011) AM_MIRROR(0x11ff8e) AM_READ(special_port2_r)
@@ -143,13 +143,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_MIRROR(0x100000) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_READWRITE(batman_atarivc_r, batman_atarivc_w) AM_BASE_MEMBER(batman_state, atarigen.atarivc_data)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(batman_state, atarigen.playfield2)
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(batman_state, atarigen.playfield)
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(batman_state, atarigen.playfield_upper)
+	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_READWRITE(batman_atarivc_r, batman_atarivc_w) AM_BASE_MEMBER(batman_state, atarivc_data)
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(batman_state, playfield2)
+	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(batman_state, playfield)
+	AM_RANGE(0x3f4000, 0x3f5fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(batman_state, playfield_upper)
 	AM_RANGE(0x3f6000, 0x3f7fff) AM_MIRROR(0x100000) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
-	AM_RANGE(0x3f8000, 0x3f8fef) AM_MIRROR(0x100000) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(batman_state, atarigen.alpha)
-	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_MIRROR(0x100000) AM_BASE_MEMBER(batman_state, atarigen.atarivc_eof_data)
+	AM_RANGE(0x3f8000, 0x3f8fef) AM_MIRROR(0x100000) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(batman_state, alpha)
+	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_MIRROR(0x100000) AM_BASE_MEMBER(batman_state, atarivc_eof_data)
 	AM_RANGE(0x3f8f80, 0x3f8fff) AM_MIRROR(0x100000) AM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x3f0000, 0x3fffff) AM_MIRROR(0x100000) AM_RAM
 ADDRESS_MAP_END
@@ -347,8 +347,8 @@ static DRIVER_INIT( batman )
 		0x0150,0x0218,0x01D0,0x0100,0x01D0,0x0300,0x01D0,0x0600,
 		0x01D0,0x02C8,0x0000
 	};
-	batman_state *state = (batman_state *)machine->driver_data;
-	state->atarigen.eeprom_default = default_eeprom;
+	batman_state *state = machine->driver_data<batman_state>();
+	state->eeprom_default = default_eeprom;
 	atarijsa_init(machine, "260010", 0x0040);
 }
 

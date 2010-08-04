@@ -55,7 +55,7 @@ static void get_pens( running_machine *machine, pen_t *pens )
 
 WRITE8_HANDLER( epos_port_1_w )
 {
-	epos_state *state = (epos_state *)space->machine->driver_data;
+	epos_state *state = space->machine->driver_data<epos_state>();
 	/* D0 - start light #1
        D1 - start light #2
        D2 - coin counter
@@ -74,7 +74,7 @@ WRITE8_HANDLER( epos_port_1_w )
 
 VIDEO_UPDATE( epos )
 {
-	epos_state *state = (epos_state *)screen->machine->driver_data;
+	epos_state *state = screen->machine->driver_data<epos_state>();
 	pen_t pens[0x20];
 	offs_t offs;
 

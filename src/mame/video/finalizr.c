@@ -45,7 +45,7 @@ PALETTE_INIT( finalizr )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	finalizr_state *state = (finalizr_state *)machine->driver_data;
+	finalizr_state *state = machine->driver_data<finalizr_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0xc0) << 2) + (state->charbank << 10);
 	int color = attr & 0x0f;
@@ -56,7 +56,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	finalizr_state *state = (finalizr_state *)machine->driver_data;
+	finalizr_state *state = machine->driver_data<finalizr_state>();
 	int attr = state->colorram2[tile_index];
 	int code = state->videoram2[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( finalizr )
 {
-	finalizr_state *state = (finalizr_state *)machine->driver_data;
+	finalizr_state *state = machine->driver_data<finalizr_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -77,7 +77,7 @@ VIDEO_START( finalizr )
 
 WRITE8_HANDLER( finalizr_videoctrl_w )
 {
-	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+	finalizr_state *state = space->machine->driver_data<finalizr_state>();
 	state->charbank = data & 3;
 	state->spriterambank = data & 8;
 	/* other bits unknown */
@@ -87,7 +87,7 @@ WRITE8_HANDLER( finalizr_videoctrl_w )
 
 VIDEO_UPDATE( finalizr )
 {
-	finalizr_state *state = (finalizr_state *)screen->machine->driver_data;
+	finalizr_state *state = screen->machine->driver_data<finalizr_state>();
 	int offs;
 
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);

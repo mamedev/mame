@@ -56,7 +56,7 @@ PALETTE_INIT( popper )
 
 WRITE8_HANDLER( popper_ol_videoram_w )
 {
-	popper_state *state = (popper_state *)space->machine->driver_data;
+	popper_state *state = space->machine->driver_data<popper_state>();
 
 	state->ol_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->ol_p123_tilemap, offset);
@@ -65,7 +65,7 @@ WRITE8_HANDLER( popper_ol_videoram_w )
 
 WRITE8_HANDLER( popper_videoram_w )
 {
-	popper_state *state = (popper_state *)space->machine->driver_data;
+	popper_state *state = space->machine->driver_data<popper_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->p123_tilemap, offset);
@@ -74,7 +74,7 @@ WRITE8_HANDLER( popper_videoram_w )
 
 WRITE8_HANDLER( popper_ol_attribram_w )
 {
-	popper_state *state = (popper_state *)space->machine->driver_data;
+	popper_state *state = space->machine->driver_data<popper_state>();
 
 	state->ol_attribram[offset] = data;
 	tilemap_mark_tile_dirty(state->ol_p123_tilemap, offset);
@@ -83,7 +83,7 @@ WRITE8_HANDLER( popper_ol_attribram_w )
 
 WRITE8_HANDLER( popper_attribram_w )
 {
-	popper_state *state = (popper_state *)space->machine->driver_data;
+	popper_state *state = space->machine->driver_data<popper_state>();
 
 	state->attribram[offset] = data;
 	tilemap_mark_tile_dirty(state->p123_tilemap, offset);
@@ -92,7 +92,7 @@ WRITE8_HANDLER( popper_attribram_w )
 
 WRITE8_HANDLER( popper_flipscreen_w )
 {
-	popper_state *state = (popper_state *)space->machine->driver_data;
+	popper_state *state = space->machine->driver_data<popper_state>();
 
 	state->flipscreen = data;
 	tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
@@ -105,13 +105,13 @@ WRITE8_HANDLER( popper_flipscreen_w )
 
 WRITE8_HANDLER( popper_e002_w )
 {
-	popper_state *state = (popper_state *)space->machine->driver_data;
+	popper_state *state = space->machine->driver_data<popper_state>();
 	state->e002 = data;
 }
 
 WRITE8_HANDLER( popper_gfx_bank_w )
 {
-	popper_state *state = (popper_state *)space->machine->driver_data;
+	popper_state *state = space->machine->driver_data<popper_state>();
 
 	if (state->gfx_bank != data)
 	{
@@ -122,7 +122,7 @@ WRITE8_HANDLER( popper_gfx_bank_w )
 
 static TILE_GET_INFO( get_popper_p123_tile_info )
 {
-	popper_state *state = (popper_state *)machine->driver_data;
+	popper_state *state = machine->driver_data<popper_state>();
 	UINT32 tile_number = state->videoram[tile_index];
 	UINT8 attr = state->attribram[tile_index];
 	tile_number += state->gfx_bank << 8;
@@ -137,7 +137,7 @@ static TILE_GET_INFO( get_popper_p123_tile_info )
 
 static TILE_GET_INFO( get_popper_p0_tile_info )
 {
-	popper_state *state = (popper_state *)machine->driver_data;
+	popper_state *state = machine->driver_data<popper_state>();
 	UINT32 tile_number = state->videoram[tile_index];
 	UINT8 attr = state->attribram[tile_index];
 	tile_number += state->gfx_bank << 8;
@@ -154,7 +154,7 @@ static TILE_GET_INFO( get_popper_p0_tile_info )
 
 static TILE_GET_INFO( get_popper_ol_p123_tile_info )
 {
-	popper_state *state = (popper_state *)machine->driver_data;
+	popper_state *state = machine->driver_data<popper_state>();
 	UINT32 tile_number = state->ol_videoram[tile_index];
 	UINT8 attr  = state->ol_attribram[tile_index];
 	tile_number += state->gfx_bank << 8;
@@ -169,7 +169,7 @@ static TILE_GET_INFO( get_popper_ol_p123_tile_info )
 
 static TILE_GET_INFO( get_popper_ol_p0_tile_info )
 {
-	popper_state *state = (popper_state *)machine->driver_data;
+	popper_state *state = machine->driver_data<popper_state>();
 	UINT32 tile_number = state->ol_videoram[tile_index];
 	UINT8 attr = state->ol_attribram[tile_index];
 	tile_number += state->gfx_bank << 8;
@@ -186,7 +186,7 @@ static TILE_GET_INFO( get_popper_ol_p0_tile_info )
 
 VIDEO_START( popper )
 {
-	popper_state *state = (popper_state *)machine->driver_data;
+	popper_state *state = machine->driver_data<popper_state>();
 	state->p123_tilemap    = tilemap_create(machine, get_popper_p123_tile_info,    tilemap_scan_cols, 8, 8, 33, 32 );
 	state->p0_tilemap      = tilemap_create(machine, get_popper_p0_tile_info,      tilemap_scan_cols, 8, 8, 33, 32);
 	state->ol_p123_tilemap = tilemap_create(machine, get_popper_ol_p123_tile_info, tilemap_scan_cols, 8, 8, 2, 32);
@@ -206,7 +206,7 @@ VIDEO_START( popper )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	popper_state *state = (popper_state *)machine->driver_data;
+	popper_state *state = machine->driver_data<popper_state>();
 	int offs, sx, sy, flipx, flipy;
 
 	for (offs = 0; offs < state->spriteram_size - 4; offs += 4)
@@ -248,7 +248,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 VIDEO_UPDATE( popper )
 {
-	popper_state *state = (popper_state *)screen->machine->driver_data;
+	popper_state *state = screen->machine->driver_data<popper_state>();
 	rectangle finalclip = state->tilemap_clip;
 	sect_rect(&finalclip, cliprect);
 

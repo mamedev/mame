@@ -450,7 +450,7 @@ DISCRETE_SOUND_END
 
 static void set_ea(const address_space *space, int ea)
 {
-	mario_state	*state = (mario_state *)space->machine->driver_data;
+	mario_state	*state = space->machine->driver_data<mario_state>();
 	//printf("ea: %d\n", ea);
 	//cputag_set_input_line(machine, "audiocpu", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (state->eabank != NULL)
@@ -465,7 +465,7 @@ static void set_ea(const address_space *space, int ea)
 
 static SOUND_START( mario )
 {
-	mario_state	*state = (mario_state *)machine->driver_data;
+	mario_state	*state = machine->driver_data<mario_state>();
 	running_device *audiocpu = machine->device("audiocpu");
 #if USE_8039
 	UINT8 *SND = memory_region(machine, "audiocpu");
@@ -488,7 +488,7 @@ static SOUND_START( mario )
 
 static SOUND_RESET( mario )
 {
-	mario_state	*state = (mario_state *)machine->driver_data;
+	mario_state	*state = machine->driver_data<mario_state>();
 	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
 #if USE_8039
@@ -567,7 +567,7 @@ static WRITE8_HANDLER( mario_sh_p2_w )
 
 WRITE8_HANDLER( masao_sh_irqtrigger_w )
 {
-	mario_state	*state = (mario_state *)space->machine->driver_data;
+	mario_state	*state = space->machine->driver_data<mario_state>();
 
 	if (state->last == 1 && data == 0)
 	{
@@ -600,7 +600,7 @@ WRITE8_DEVICE_HANDLER( mario_sh2_w )
 /* Misc samples */
 WRITE8_HANDLER( mario_sh3_w )
 {
-	mario_state	*state = (mario_state *)space->machine->driver_data;
+	mario_state	*state = space->machine->driver_data<mario_state>();
 
 	switch (offset)
 	{

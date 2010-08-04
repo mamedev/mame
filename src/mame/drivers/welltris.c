@@ -332,7 +332,7 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		welltris_state *state = (welltris_state *)space->machine->driver_data;
+		welltris_state *state = space->machine->driver_data<welltris_state>();
 
 		state->pending_command = 1;
 		soundlatch_w(space, 0, data & 0xff);
@@ -342,13 +342,13 @@ static WRITE16_HANDLER( sound_command_w )
 
 static CUSTOM_INPUT( pending_sound_r )
 {
-	welltris_state *state = (welltris_state *)field->port->machine->driver_data;
+	welltris_state *state = field->port->machine->driver_data<welltris_state>();
 	return state->pending_command ? 1 : 0;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	welltris_state *state = (welltris_state *)space->machine->driver_data;
+	welltris_state *state = space->machine->driver_data<welltris_state>();
 
 	state->pending_command = 0;
 }

@@ -41,7 +41,7 @@ static const struct gotya_sample gotya_samples[] =
 
 WRITE8_HANDLER( gotya_soundlatch_w )
 {
-	gotya_state *state = (gotya_state *)space->machine->driver_data;
+	gotya_state *state = space->machine->driver_data<gotya_state>();
 	int sample_number;
 
 	if (data == 0)

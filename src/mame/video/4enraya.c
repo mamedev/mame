@@ -11,7 +11,7 @@
 
 WRITE8_HANDLER( fenraya_videoram_w )
 {
-	_4enraya_state *state = (_4enraya_state *)space->machine->driver_data;
+	_4enraya_state *state = space->machine->driver_data<_4enraya_state>();
 
 	state->videoram[(offset & 0x3ff) * 2] = data;
 	state->videoram[(offset & 0x3ff) * 2 + 1] = (offset & 0xc00) >> 10;
@@ -20,7 +20,7 @@ WRITE8_HANDLER( fenraya_videoram_w )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	_4enraya_state *state = (_4enraya_state *)machine->driver_data;
+	_4enraya_state *state = machine->driver_data<_4enraya_state>();
 
 	int code = state->videoram[tile_index * 2] + (state->videoram[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(
@@ -32,14 +32,14 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( 4enraya )
 {
-	_4enraya_state *state = (_4enraya_state *)machine->driver_data;
+	_4enraya_state *state = machine->driver_data<_4enraya_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 VIDEO_UPDATE( 4enraya )
 {
-	_4enraya_state *state = (_4enraya_state *)screen->machine->driver_data;
+	_4enraya_state *state = screen->machine->driver_data<_4enraya_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;

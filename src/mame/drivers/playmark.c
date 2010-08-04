@@ -80,7 +80,7 @@ static const eeprom_interface eeprom_intf =
 
 static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -99,7 +99,7 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 
 static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -119,7 +119,7 @@ static WRITE16_HANDLER( hrdtimes_coin_w )
 
 static WRITE16_HANDLER( playmark_snd_command_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -131,7 +131,7 @@ static WRITE16_HANDLER( playmark_snd_command_w )
 
 static READ8_HANDLER( playmark_snd_command_r )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 	int data = 0;
 
 	if ((state->oki_control & 0x38) == 0x30)
@@ -150,7 +150,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 
 static READ8_HANDLER( playmark_snd_flag_r )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 
 	if (state->snd_flag)
 	{
@@ -164,7 +164,7 @@ static READ8_HANDLER( playmark_snd_flag_r )
 
 static WRITE8_DEVICE_HANDLER( playmark_oki_banking_w )
 {
-	playmark_state *state = (playmark_state *)device->machine->driver_data;
+	playmark_state *state = device->machine->driver_data<playmark_state>();
 
 	if (state->old_oki_bank != (data & 7))
 	{
@@ -179,13 +179,13 @@ static WRITE8_DEVICE_HANDLER( playmark_oki_banking_w )
 
 static WRITE8_HANDLER( playmark_oki_w )
 {
-	playmark_state *state = (playmark_state *)space->machine->driver_data;
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 	state->oki_command = data;
 }
 
 static WRITE8_DEVICE_HANDLER( playmark_snd_control_w )
 {
-	playmark_state *state = (playmark_state *)device->machine->driver_data;
+	playmark_state *state = device->machine->driver_data<playmark_state>();
 //  const address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
     /*  This port controls communications to and from the 68K, and the OKI
@@ -907,7 +907,7 @@ GFXDECODE_END
 
 static MACHINE_START( playmark )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 
 	state->oki = machine->device("oki");
 	state->eeprom = machine->device("eeprom");
@@ -929,7 +929,7 @@ static MACHINE_START( playmark )
 
 static MACHINE_RESET( playmark )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 
 	state->bgscrollx = 0;
 	state->bgscrolly = 0;
@@ -1462,7 +1462,7 @@ static UINT8 playmark_asciitohex(UINT8 data)
 
 static DRIVER_INIT( bigtwin )
 {
-	playmark_state *state = (playmark_state *)machine->driver_data;
+	playmark_state *state = machine->driver_data<playmark_state>();
 	UINT8 *playmark_PICROM_HEX = memory_region(machine, "user1");
 	UINT16 *playmark_PICROM = (UINT16 *)memory_region(machine, "audiocpu");
 	INT32 offs, data;

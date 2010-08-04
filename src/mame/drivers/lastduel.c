@@ -442,7 +442,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	lastduel_state *state = (lastduel_state *)device->machine->driver_data;
+	lastduel_state *state = device->machine->driver_data<lastduel_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -474,7 +474,7 @@ static INTERRUPT_GEN( madgear_interrupt )
 
 static MACHINE_START( lastduel )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -493,7 +493,7 @@ static MACHINE_START( madgear )
 
 static MACHINE_RESET( lastduel )
 {
-	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	lastduel_state *state = machine->driver_data<lastduel_state>();
 	int i;
 
 	state->tilemap_priority = 0;

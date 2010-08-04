@@ -101,52 +101,52 @@ PALETTE_INIT( ghostb )
 
 WRITE8_HANDLER( dec8_bac06_0_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->pf0_control[offset] = data;
 }
 
 WRITE8_HANDLER( dec8_bac06_1_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->pf1_control[offset] = data;
 }
 
 WRITE8_HANDLER( dec8_pf0_data_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->pf0_data[offset] = data;
 	tilemap_mark_tile_dirty(state->pf0_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( dec8_pf1_data_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->pf1_data[offset] = data;
 	tilemap_mark_tile_dirty(state->pf1_tilemap, offset / 2);
 }
 
 READ8_HANDLER( dec8_pf0_data_r )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	return state->pf0_data[offset];
 }
 
 READ8_HANDLER( dec8_pf1_data_r )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	return state->pf1_data[offset];
 }
 
 WRITE8_HANDLER( dec8_videoram_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fix_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( srdarwin_videoram_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fix_tilemap, offset);
 }
@@ -154,20 +154,20 @@ WRITE8_HANDLER( srdarwin_videoram_w )
 #ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( dec8_scroll1_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->scroll1[offset] = data;
 }
 #endif
 
 WRITE8_HANDLER( dec8_scroll2_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->scroll2[offset] = data;
 }
 
 WRITE8_HANDLER( srdarwin_control_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 
 	switch (offset)
 	{
@@ -184,7 +184,7 @@ WRITE8_HANDLER( srdarwin_control_w )
 
 WRITE8_HANDLER( lastmisn_control_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 
 	/*
         Bit 0x0f - ROM bank switch.
@@ -206,7 +206,7 @@ WRITE8_HANDLER( lastmisn_control_w )
 
 WRITE8_HANDLER( shackled_control_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 
 	/* Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs */
 	memory_set_bank(space->machine, "bank1", data & 0x0f);
@@ -217,19 +217,19 @@ WRITE8_HANDLER( shackled_control_w )
 
 WRITE8_HANDLER( lastmisn_scrollx_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->scroll2[1] = data;
 }
 
 WRITE8_HANDLER( lastmisn_scrolly_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	state->scroll2[3] = data;
 }
 
 WRITE8_HANDLER( gondo_scroll_w )
 {
-	dec8_state *state = (dec8_state *)space->machine->driver_data;
+	dec8_state *state = space->machine->driver_data<dec8_state>();
 	switch (offset)
 	{
 	case 0x0:
@@ -429,7 +429,7 @@ static void srdarwin_draw_sprites( running_machine* machine, bitmap_t *bitmap, c
 #if 0
 static void draw_characters( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int mask, int shift )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int mx, my, tile, color, offs;
 
 	for (offs = 0x800 - 2; offs >= 0; offs -= 2)
@@ -452,7 +452,7 @@ static void draw_characters( running_machine* machine, bitmap_t *bitmap, const r
 
 VIDEO_UPDATE( cobracom )
 {
-	dec8_state *state = (dec8_state *)screen->machine->driver_data;
+	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, (state->pf0_control[0x10] << 8) + state->pf0_control[0x11]);
 	tilemap_set_scrolly(state->pf0_tilemap, 0, (state->pf0_control[0x12] << 8) + state->pf0_control[0x13]);
 	tilemap_set_scrollx(state->pf1_tilemap, 0, (state->pf1_control[0x10] << 8) + state->pf1_control[0x11]);
@@ -471,7 +471,7 @@ VIDEO_UPDATE( cobracom )
 
 static TILE_GET_INFO( get_bac0_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int tile, color, offs = tile_index << 1;
 
 	tile = (state->pf0_data[offs] << 8) | state->pf0_data[offs + 1];
@@ -490,7 +490,7 @@ static TILE_GET_INFO( get_bac0_tile_info )
 
 static TILE_GET_INFO( get_bac1_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int tile, color, offs = tile_index << 1;
 
 	tile = (state->pf1_data[offs] << 8) | state->pf1_data[offs + 1];
@@ -515,7 +515,7 @@ static TILEMAP_MAPPER( bac0_scan_rows )
 
 static TILE_GET_INFO( get_cobracom_fix_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int offs = tile_index << 1;
 	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
 	int color = (tile & 0xe000) >> 13;
@@ -529,7 +529,7 @@ static TILE_GET_INFO( get_cobracom_fix_tile_info )
 
 VIDEO_START( cobracom )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	state->pf0_tilemap = tilemap_create(machine, get_bac0_tile_info, bac0_scan_rows, 16, 16, 32, 32);
 	state->pf1_tilemap = tilemap_create(machine, get_bac1_tile_info, bac0_scan_rows, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_cobracom_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -545,7 +545,7 @@ VIDEO_START( cobracom )
 
 VIDEO_UPDATE( ghostb )
 {
-	dec8_state *state = (dec8_state *)screen->machine->driver_data;
+	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	if (state->pf0_control[0] & 0x4)
 	{ /* Rowscroll */
 		int offs;
@@ -570,7 +570,7 @@ VIDEO_UPDATE( ghostb )
 
 static TILE_GET_INFO( get_ghostb_fix_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int offs = tile_index << 1;
 	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
 	int color = (tile & 0xc00) >> 10;
@@ -584,7 +584,7 @@ static TILE_GET_INFO( get_ghostb_fix_tile_info )
 
 VIDEO_START( ghostb )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	state->pf0_tilemap = tilemap_create(machine, get_bac0_tile_info, bac0_scan_rows, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_ghostb_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->fix_tilemap, 0);
@@ -597,7 +597,7 @@ VIDEO_START( ghostb )
 
 VIDEO_UPDATE( oscar )
 {
-	dec8_state *state = (dec8_state *)screen->machine->driver_data;
+	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap,0, (state->pf0_control[0x10] << 8) + state->pf0_control[0x11]);
 	tilemap_set_scrolly(state->pf0_tilemap,0, (state->pf0_control[0x12] << 8) + state->pf0_control[0x13]);
 	flip_screen_set(screen->machine, state->pf0_control[1] >> 7);
@@ -613,7 +613,7 @@ VIDEO_UPDATE( oscar )
 
 static TILE_GET_INFO( get_oscar_fix_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int offs = tile_index << 1;
 	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
 	int color = (tile & 0xf000) >> 14;
@@ -627,7 +627,7 @@ static TILE_GET_INFO( get_oscar_fix_tile_info )
 
 VIDEO_START( oscar )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	state->pf0_tilemap = tilemap_create(machine, get_bac0_tile_info, bac0_scan_rows, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_oscar_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -642,7 +642,7 @@ VIDEO_START( oscar )
 
 VIDEO_UPDATE( lastmisn )
 {
-	dec8_state *state = (dec8_state *)screen->machine->driver_data;
+	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8)+ state->scroll2[1]));
 	tilemap_set_scrolly(state->pf0_tilemap, 0, ((state->scroll2[2] << 8)+ state->scroll2[3]));
 
@@ -654,7 +654,7 @@ VIDEO_UPDATE( lastmisn )
 
 VIDEO_UPDATE( shackled )
 {
-	dec8_state *state = (dec8_state *)screen->machine->driver_data;
+	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));
 	tilemap_set_scrolly(state->pf0_tilemap, 0, ((state->scroll2[2] << 8) + state->scroll2[3]));
 
@@ -675,7 +675,7 @@ static TILEMAP_MAPPER( lastmisn_scan_rows )
 
 static TILE_GET_INFO( get_lastmisn_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int offs = tile_index * 2;
 	int tile = state->pf0_data[offs + 1] + (state->pf0_data[offs] << 8);
 	int color = tile >> 12;
@@ -694,7 +694,7 @@ static TILE_GET_INFO( get_lastmisn_tile_info )
 
 static TILE_GET_INFO( get_lastmisn_fix_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int offs = tile_index << 1;
 	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
 	int color = (tile & 0xc000) >> 14;
@@ -708,7 +708,7 @@ static TILE_GET_INFO( get_lastmisn_fix_tile_info )
 
 VIDEO_START( lastmisn )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	state->pf0_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -718,7 +718,7 @@ VIDEO_START( lastmisn )
 
 VIDEO_START( shackled )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	state->pf0_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -731,7 +731,7 @@ VIDEO_START( shackled )
 
 VIDEO_UPDATE( srdarwin )
 {
-	dec8_state *state = (dec8_state *)screen->machine->driver_data;
+	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, (state->scroll2[0] << 8) + state->scroll2[1]);
 
 	tilemap_draw(bitmap, cliprect, state->pf0_tilemap, TILEMAP_DRAW_LAYER1, 0);
@@ -744,7 +744,7 @@ VIDEO_UPDATE( srdarwin )
 
 static TILE_GET_INFO( get_srdarwin_fix_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int tile = state->videoram[tile_index];
 	int color = 0; /* ? */
 
@@ -763,7 +763,7 @@ static TILE_GET_INFO( get_srdarwin_fix_tile_info )
 //AT: improved priority and fixed stage 4+ crashes caused by bank overflow
 static TILE_GET_INFO( get_srdarwin_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int tile = state->pf0_data[2 * tile_index + 1] + (state->pf0_data[2 * tile_index] << 8);
 	int color = tile >> 12 & 3;
 	int bank;
@@ -781,7 +781,7 @@ static TILE_GET_INFO( get_srdarwin_tile_info )
 
 VIDEO_START( srdarwin )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	state->pf0_tilemap = tilemap_create(machine, get_srdarwin_tile_info, tilemap_scan_rows, 16, 16, 32, 16);
 	state->fix_tilemap = tilemap_create(machine, get_srdarwin_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -796,7 +796,7 @@ VIDEO_START( srdarwin )
 
 VIDEO_UPDATE( gondo )
 {
-	dec8_state *state = (dec8_state *)screen->machine->driver_data;
+	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));
 	tilemap_set_scrolly(state->pf0_tilemap, 0, ((state->scroll2[2] << 8) + state->scroll2[3]));
 
@@ -810,7 +810,7 @@ VIDEO_UPDATE( gondo )
 
 VIDEO_UPDATE( garyoret )
 {
-	dec8_state *state = (dec8_state *)screen->machine->driver_data;
+	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));
 	tilemap_set_scrolly(state->pf0_tilemap, 0, ((state->scroll2[2] << 8) + state->scroll2[3]));
 
@@ -823,7 +823,7 @@ VIDEO_UPDATE( garyoret )
 
 static TILE_GET_INFO( get_gondo_fix_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int offs = tile_index * 2;
 	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
 	int color = (tile & 0x7000) >> 12;
@@ -837,7 +837,7 @@ static TILE_GET_INFO( get_gondo_fix_tile_info )
 
 static TILE_GET_INFO( get_gondo_tile_info )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	int offs = tile_index * 2;
 	int tile = state->pf0_data[offs + 1] + (state->pf0_data[offs] << 8);
 	int color = tile>> 12;
@@ -856,7 +856,7 @@ static TILE_GET_INFO( get_gondo_tile_info )
 
 VIDEO_START( gondo )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	state->fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->pf0_tilemap = tilemap_create(machine, get_gondo_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
@@ -867,7 +867,7 @@ VIDEO_START( gondo )
 
 VIDEO_START( garyoret )
 {
-	dec8_state *state = (dec8_state *)machine->driver_data;
+	dec8_state *state = machine->driver_data<dec8_state>();
 	state->fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->pf0_tilemap = tilemap_create(machine, get_gondo_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 

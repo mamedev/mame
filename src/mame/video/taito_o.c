@@ -30,7 +30,7 @@ static void parentj_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoo_state *state = (taitoo_state *)machine->driver_data;
+	taitoo_state *state = machine->driver_data<taitoo_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -140,7 +140,7 @@ static void parentj_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( parentj )
 {
-	taitoo_state *state = (taitoo_state *)screen->machine->driver_data;
+	taitoo_state *state = screen->machine->driver_data<taitoo_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 

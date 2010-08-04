@@ -30,13 +30,13 @@
 
 static READ16_HANDLER( k052109_halfword_r )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 	return k052109_r(state->k052109, offset);
 }
 
 static WRITE16_HANDLER( k052109_halfword_w )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 
 	if (ACCESSING_BITS_0_7)
 		k052109_w(state->k052109, offset, data & 0xff);
@@ -49,13 +49,13 @@ static WRITE16_HANDLER( k052109_halfword_w )
 
 static READ16_HANDLER( k051937_halfword_r )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 	return k051937_r(state->k051960, offset);
 }
 
 static WRITE16_HANDLER( k051937_halfword_w )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 
 	if (ACCESSING_BITS_0_7)
 		k051937_w(state->k051960, offset, data & 0xff);
@@ -63,20 +63,20 @@ static WRITE16_HANDLER( k051937_halfword_w )
 
 static READ16_HANDLER( k051960_halfword_r )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 	return k051960_r(state->k051960, offset);
 }
 
 static WRITE16_HANDLER( k051960_halfword_w )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 	if (ACCESSING_BITS_0_7)
 		k051960_w(state->k051960, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( cpuA_ctrl_w )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -102,7 +102,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 
 static WRITE16_HANDLER( cpuB_irqenable_w )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 
 	if (ACCESSING_BITS_8_15)
 		state->irqBmask = (data >> 8) & 0x07;
@@ -110,14 +110,14 @@ static WRITE16_HANDLER( cpuB_irqenable_w )
 
 static INTERRUPT_GEN( cpuA_interrupt )
 {
-	gradius3_state *state = (gradius3_state *)device->machine->driver_data;
+	gradius3_state *state = device->machine->driver_data<gradius3_state>();
 	if (state->irqAen)
 		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cpuB_interrupt )
 {
-	gradius3_state *state = (gradius3_state *)device->machine->driver_data;
+	gradius3_state *state = device->machine->driver_data<gradius3_state>();
 
 	if (cpu_getiloops(device) & 1)	/* ??? */
 	{
@@ -133,7 +133,7 @@ static INTERRUPT_GEN( cpuB_interrupt )
 
 static WRITE16_HANDLER( cpuB_irqtrigger_w )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 
 	if (state->irqBmask & 4)
 	{
@@ -152,7 +152,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	gradius3_state *state = (gradius3_state *)space->machine->driver_data;
+	gradius3_state *state = space->machine->driver_data<gradius3_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -301,7 +301,7 @@ static const k051960_interface gradius3_k051960_intf =
 
 static MACHINE_START( gradius3 )
 {
-	gradius3_state *state = (gradius3_state *)machine->driver_data;
+	gradius3_state *state = machine->driver_data<gradius3_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -317,7 +317,7 @@ static MACHINE_START( gradius3 )
 
 static MACHINE_RESET( gradius3 )
 {
-	gradius3_state *state = (gradius3_state *)machine->driver_data;
+	gradius3_state *state = machine->driver_data<gradius3_state>();
 
 	/* start with cpu B halted */
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);

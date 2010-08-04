@@ -11,7 +11,7 @@
 
 void _88games_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	_88games_state *state = (_88games_state *)machine->driver_data;
+	_88games_state *state = machine->driver_data<_88games_state>();
 
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
 	*color = state->layer_colorbase[layer] + ((*color & 0xf0) >> 4);
@@ -26,7 +26,7 @@ void _88games_tile_callback( running_machine *machine, int layer, int bank, int 
 
 void _88games_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
 {
-	_88games_state *state = (_88games_state *)machine->driver_data;
+	_88games_state *state = machine->driver_data<_88games_state>();
 
 	*priority = (*color & 0x20) >> 5;	/* ??? */
 	*color = state->sprite_colorbase + (*color & 0x0f);
@@ -41,7 +41,7 @@ void _88games_sprite_callback( running_machine *machine, int *code, int *color, 
 
 void _88games_zoom_callback( running_machine *machine, int *code, int *color, int *flags )
 {
-	_88games_state *state = (_88games_state *)machine->driver_data;
+	_88games_state *state = machine->driver_data<_88games_state>();
 
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x07) << 8);
@@ -56,7 +56,7 @@ void _88games_zoom_callback( running_machine *machine, int *code, int *color, in
 
 VIDEO_UPDATE( 88games )
 {
-	_88games_state *state = (_88games_state *)screen->machine->driver_data;
+	_88games_state *state = screen->machine->driver_data<_88games_state>();
 
 	k052109_tilemap_update(state->k052109);
 

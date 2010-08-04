@@ -348,7 +348,7 @@ static READ16_HANDLER( tumblepb_prot_r )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( tumblepb_sound_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -356,7 +356,7 @@ static WRITE16_HANDLER( tumblepb_sound_w )
 
 static WRITE16_HANDLER( jumppop_sound_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 }
@@ -452,7 +452,7 @@ command 1 - stop?
 
 static void tumbleb2_playmusic( running_device *device )
 {
-	tumbleb_state *state = (tumbleb_state *)device->machine->driver_data;
+	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
 	int status = okim6295_r(device, 0);
 
 	if (state->music_is_playing)
@@ -468,7 +468,7 @@ static void tumbleb2_playmusic( running_device *device )
 
 static INTERRUPT_GEN( tumbleb2_interrupt )
 {
-	tumbleb_state *state = (tumbleb_state *)device->machine->driver_data;
+	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
 	cpu_set_input_line(device, 6, HOLD_LINE);
 	tumbleb2_playmusic(state->oki);
 }
@@ -535,7 +535,7 @@ static void tumbleb2_play_sound( running_device *device, int data )
 
 static void process_tumbleb2_music_command( running_device *device, int data )
 {
-	tumbleb_state *state = (tumbleb_state *)device->machine->driver_data;
+	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
 	int status = okim6295_r(device, 0);
 
 	if (data == 1) // stop?
@@ -740,7 +740,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( jumpkids_sound_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -825,7 +825,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(jumppop_z80latch_r)
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
@@ -1985,7 +1985,7 @@ GFXDECODE_END
 
 static MACHINE_START( tumbleb )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -2002,7 +2002,7 @@ static MACHINE_START( tumbleb )
 
 static MACHINE_RESET( tumbleb )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	state->music_command = 0;
 	state->music_bank = 0;
@@ -2162,7 +2162,7 @@ MACHINE_DRIVER_END
 
 static void semicom_irqhandler( running_device *device, int irq )
 {
-	tumbleb_state *state = (tumbleb_state *)device->machine->driver_data;
+	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2174,7 +2174,7 @@ static const ym2151_interface semicom_ym2151_interface =
 
 static MACHINE_RESET (htchctch)
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	/* copy protection data every reset */
 	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
@@ -3401,7 +3401,7 @@ static DRIVER_INIT ( bcstory )
 static DRIVER_INIT( htchctch )
 {
 
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 //  UINT16 *HCROM = (UINT16*)memory_region(machine, "maincpu");
 	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
 	int i, len = memory_region_length(machine, "user1");

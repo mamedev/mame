@@ -19,7 +19,7 @@ Notes:
 
 static WRITE16_HANDLER( ohmygod_ctrl_w )
 {
-	ohmygod_state *state = (ohmygod_state *)space->machine->driver_data;
+	ohmygod_state *state = space->machine->driver_data<ohmygod_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -296,7 +296,7 @@ GFXDECODE_END
 
 static MACHINE_START( ohmygod )
 {
-	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	ohmygod_state *state = machine->driver_data<ohmygod_state>();
 
 	state_save_register_global(machine, state->spritebank);
 	state_save_register_global(machine, state->scrollx);
@@ -306,7 +306,7 @@ static MACHINE_START( ohmygod )
 
 static MACHINE_RESET( ohmygod )
 {
-	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	ohmygod_state *state = machine->driver_data<ohmygod_state>();
 	UINT8 *rom = memory_region(machine, "oki");
 
 	state->sndbank = 0;
@@ -396,13 +396,13 @@ ROM_END
 
 static DRIVER_INIT( ohmygod )
 {
-	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	ohmygod_state *state = machine->driver_data<ohmygod_state>();
 	state->adpcm_bank_shift = 4;
 }
 
 static DRIVER_INIT( naname )
 {
-	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	ohmygod_state *state = machine->driver_data<ohmygod_state>();
 	state->adpcm_bank_shift = 0;
 }
 

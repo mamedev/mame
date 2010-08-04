@@ -43,7 +43,7 @@ PALETTE_INIT( sidepckt )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	sidepckt_state *state = (sidepckt_state *)machine->driver_data;
+	sidepckt_state *state = machine->driver_data<sidepckt_state>();
 	UINT8 attr = state->colorram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( sidepckt )
 {
-	sidepckt_state *state = (sidepckt_state *)machine->driver_data;
+	sidepckt_state *state = machine->driver_data<sidepckt_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transmask(state->bg_tilemap,0,0xff,0x00); /* split type 0 is totally transparent in front half */
@@ -82,14 +82,14 @@ VIDEO_START( sidepckt )
 
 WRITE8_HANDLER( sidepckt_videoram_w )
 {
-	sidepckt_state *state = (sidepckt_state *)space->machine->driver_data;
+	sidepckt_state *state = space->machine->driver_data<sidepckt_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( sidepckt_colorram_w )
 {
-	sidepckt_state *state = (sidepckt_state *)space->machine->driver_data;
+	sidepckt_state *state = space->machine->driver_data<sidepckt_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
@@ -109,7 +109,7 @@ WRITE8_HANDLER( sidepckt_flipscreen_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	sidepckt_state *state = (sidepckt_state *)machine->driver_data;
+	sidepckt_state *state = machine->driver_data<sidepckt_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -143,7 +143,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( sidepckt )
 {
-	sidepckt_state *state = (sidepckt_state *)screen->machine->driver_data;
+	sidepckt_state *state = screen->machine->driver_data<sidepckt_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER0,0);

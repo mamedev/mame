@@ -167,7 +167,7 @@ PALETTE_INIT( buckrog )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	turbo_state *state = (turbo_state *)machine->driver_data;
+	turbo_state *state = machine->driver_data<turbo_state>();
 	int code = state->videoram[tile_index];
 	SET_TILE_INFO(0, code, code >> 2, 0);
 }
@@ -175,7 +175,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( turbo )
 {
-	turbo_state *state = (turbo_state *)machine->driver_data;
+	turbo_state *state = machine->driver_data<turbo_state>();
 
 	/* initialize the foreground tilemap */
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
@@ -184,7 +184,7 @@ VIDEO_START( turbo )
 
 VIDEO_START( buckrog )
 {
-	turbo_state *state = (turbo_state *)machine->driver_data;
+	turbo_state *state = machine->driver_data<turbo_state>();
 
 	/* initialize the foreground tilemap */
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
@@ -204,7 +204,7 @@ VIDEO_START( buckrog )
 
 WRITE8_HANDLER( turbo_videoram_w )
 {
-	turbo_state *state = (turbo_state *)space->machine->driver_data;
+	turbo_state *state = space->machine->driver_data<turbo_state>();
 	state->videoram[offset] = data;
 	if (offset < 0x400)
 	{
@@ -216,7 +216,7 @@ WRITE8_HANDLER( turbo_videoram_w )
 
 WRITE8_HANDLER( buckrog_bitmap_w )
 {
-	turbo_state *state = (turbo_state *)space->machine->driver_data;
+	turbo_state *state = space->machine->driver_data<turbo_state>();
 	state->buckrog_bitmap_ram[offset] = data & 1;
 }
 
@@ -406,7 +406,7 @@ static UINT32 turbo_get_sprite_bits(running_machine *machine, UINT8 road, sprite
 
 VIDEO_UPDATE( turbo )
 {
-	turbo_state *state = (turbo_state *)screen->machine->driver_data;
+	turbo_state *state = screen->machine->driver_data<turbo_state>();
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
 	const UINT8 *road_gfxdata = memory_region(screen->machine, "gfx3");
 	const UINT8 *prom_base = memory_region(screen->machine, "proms");
@@ -761,7 +761,7 @@ static UINT32 subroc3d_get_sprite_bits(running_machine *machine, sprite_info *sp
 
 VIDEO_UPDATE( subroc3d )
 {
-	turbo_state *state = (turbo_state *)screen->machine->driver_data;
+	turbo_state *state = screen->machine->driver_data<turbo_state>();
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
 	const UINT8 *prom_base = memory_region(screen->machine, "proms");
 	const UINT8 *pr1419 = prom_base + 0x000;
@@ -981,7 +981,7 @@ static UINT32 buckrog_get_sprite_bits(running_machine *machine, sprite_info *spr
 
 VIDEO_UPDATE( buckrog )
 {
-	turbo_state *state = (turbo_state *)screen->machine->driver_data;
+	turbo_state *state = screen->machine->driver_data<turbo_state>();
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
 	const UINT8 *bgcolor = memory_region(screen->machine, "gfx3");
 	const UINT8 *prom_base = memory_region(screen->machine, "proms");

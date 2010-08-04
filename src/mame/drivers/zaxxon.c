@@ -299,7 +299,7 @@ static INPUT_CHANGED( service_switch )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	zaxxon_state *state = (zaxxon_state *)device->machine->driver_data;
+	zaxxon_state *state = device->machine->driver_data<zaxxon_state>();
 
 	if (state->int_enabled)
 		cpu_set_input_line(device, 0, ASSERT_LINE);
@@ -308,7 +308,7 @@ static INTERRUPT_GEN( vblank_int )
 
 static WRITE8_HANDLER( int_enable_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	state->int_enabled = data & 1;
 	if (!state->int_enabled)
@@ -325,7 +325,7 @@ static WRITE8_HANDLER( int_enable_w )
 
 static MACHINE_START( zaxxon )
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 
 	/* register for save states */
 	state_save_register_global(machine, state->int_enabled);
@@ -350,7 +350,7 @@ static MACHINE_RESET( razmataz )
 
 static READ8_HANDLER( razmataz_counter_r )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
@@ -362,7 +362,7 @@ static READ8_HANDLER( razmataz_counter_r )
 
 static CUSTOM_INPUT( razmataz_dial_r )
 {
-	zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
+	zaxxon_state *state = field->port->machine->driver_data<zaxxon_state>();
 	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;
 	int delta, res;
@@ -403,7 +403,7 @@ static WRITE8_HANDLER( zaxxon_coin_counter_w )
 // the coin input, which then needs to be explicitly cleared by the game.
 static WRITE8_HANDLER( zaxxon_coin_enable_w )
 {
-	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+	zaxxon_state *state = space->machine->driver_data<zaxxon_state>();
 
 	state->coin_enable[offset] = data & 1;
 	if (!state->coin_enable[offset])
@@ -415,7 +415,7 @@ static INPUT_CHANGED( zaxxon_coin_inserted )
 {
 	if (newval)
 	{
-		zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
+		zaxxon_state *state = field->port->machine->driver_data<zaxxon_state>();
 
 		state->coin_status[(int)(FPTR)param] = state->coin_enable[(int)(FPTR)param];
 	}
@@ -424,7 +424,7 @@ static INPUT_CHANGED( zaxxon_coin_inserted )
 
 static CUSTOM_INPUT( zaxxon_coin_r )
 {
-	zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
+	zaxxon_state *state = field->port->machine->driver_data<zaxxon_state>();
 
 	return state->coin_status[(int)(FPTR)param];
 }
@@ -1510,7 +1510,7 @@ static DRIVER_INIT( futspy )
 
 static DRIVER_INIT( razmataz )
 {
-	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+	zaxxon_state *state = machine->driver_data<zaxxon_state>();
 
 	nprinces_decode(machine, "maincpu");
 

@@ -129,7 +129,7 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( simpl156_inputs_read )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	int eep = eeprom_read_bit(state->eeprom);
 	UINT32 returndata = input_port_read(space->machine, "IN0") ^ 0xffff0000;
 
@@ -169,7 +169,7 @@ static READ32_HANDLER(  simpl156_system_r )
 
 static WRITE32_HANDLER( simpl156_eeprom_w )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	//int okibank;
 
 	//okibank = data & 0x07;
@@ -200,13 +200,13 @@ static WRITE32_HANDLER( simpl156_spriteram_w )
 
 static READ32_HANDLER( simpl156_mainram_r )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	return state->mainram[offset]^0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_mainram_w )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -215,13 +215,13 @@ static WRITE32_HANDLER( simpl156_mainram_w )
 
 static READ32_HANDLER( simpl156_pf1_rowscroll_r )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	return state->pf1_rowscroll[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -230,13 +230,13 @@ static WRITE32_HANDLER( simpl156_pf1_rowscroll_w )
 
 static READ32_HANDLER( simpl156_pf2_rowscroll_r )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	return state->pf2_rowscroll[offset] ^ 0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
@@ -1050,7 +1050,7 @@ static DRIVER_INIT( simpl156 )
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
 static READ32_HANDLER( joemacr_speedup_r )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x284)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0x18/4];
@@ -1065,7 +1065,7 @@ static DRIVER_INIT( joemacr )
 
 static READ32_HANDLER( chainrec_speedup_r )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x2d4)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0x18/4];
@@ -1079,7 +1079,7 @@ static DRIVER_INIT( chainrec )
 
 static READ32_HANDLER( prtytime_speedup_r )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x4f0)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0xae0/4];
@@ -1094,7 +1094,7 @@ static DRIVER_INIT( prtytime )
 
 static READ32_HANDLER( charlien_speedup_r )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0xc8c8)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0x10/4];
@@ -1108,7 +1108,7 @@ static DRIVER_INIT( charlien )
 
 static READ32_HANDLER( osman_speedup_r )
 {
-	simpl156_state *state = (simpl156_state *)space->machine->driver_data;
+	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x5974)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400));
 	return state->systemram[0x10/4];

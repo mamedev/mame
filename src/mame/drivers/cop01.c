@@ -68,14 +68,14 @@ Mighty Guy board layout:
 
 static WRITE8_HANDLER( cop01_sound_command_w )
 {
-	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	cop01_state *state = space->machine->driver_data<cop01_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )
 {
-	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	cop01_state *state = space->machine->driver_data<cop01_state>();
 	int res = (soundlatch_r(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
@@ -156,7 +156,7 @@ ADDRESS_MAP_END
 /* this just gets some garbage out of the YM3526 */
 static READ8_HANDLER( kludge )
 {
-	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	cop01_state *state = space->machine->driver_data<cop01_state>();
 	return state->timer++;
 }
 
@@ -414,7 +414,7 @@ GFXDECODE_END
 
 static MACHINE_START( cop01 )
 {
-	cop01_state *state = (cop01_state *)machine->driver_data;
+	cop01_state *state = machine->driver_data<cop01_state>();
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 
@@ -425,7 +425,7 @@ static MACHINE_START( cop01 )
 
 static MACHINE_RESET( cop01 )
 {
-	cop01_state *state = (cop01_state *)machine->driver_data;
+	cop01_state *state = machine->driver_data<cop01_state>();
 
 	state->pulse = 0;
 	state->timer = 0;

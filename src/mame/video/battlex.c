@@ -42,19 +42,19 @@ WRITE8_HANDLER( battlex_palette_w )
 
 WRITE8_HANDLER( battlex_scroll_x_lsb_w )
 {
-	battlex_state *state = (battlex_state *)space->machine->driver_data;
+	battlex_state *state = space->machine->driver_data<battlex_state>();
 	state->scroll_lsb = data;
 }
 
 WRITE8_HANDLER( battlex_scroll_x_msb_w )
 {
-	battlex_state *state = (battlex_state *)space->machine->driver_data;
+	battlex_state *state = space->machine->driver_data<battlex_state>();
 	state->scroll_msb = data;
 }
 
 WRITE8_HANDLER( battlex_videoram_w )
 {
-	battlex_state *state = (battlex_state *)space->machine->driver_data;
+	battlex_state *state = space->machine->driver_data<battlex_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
@@ -74,7 +74,7 @@ WRITE8_HANDLER( battlex_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	battlex_state *state = (battlex_state *)machine->driver_data;
+	battlex_state *state = machine->driver_data<battlex_state>();
 	int tile = state->videoram[tile_index * 2] | (((state->videoram[tile_index * 2 + 1] & 0x01)) << 8);
 	int color = (state->videoram[tile_index * 2 + 1] & 0x0e) >> 1;
 
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( battlex )
 {
-	battlex_state *state = (battlex_state *)machine->driver_data;
+	battlex_state *state = machine->driver_data<battlex_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state_save_register_global(machine, state->scroll_lsb);
@@ -92,7 +92,7 @@ VIDEO_START( battlex )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	battlex_state *state = (battlex_state *)machine->driver_data;
+	battlex_state *state = machine->driver_data<battlex_state>();
 	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *source = state->spriteram;
 	UINT8 *finish = state->spriteram + 0x200;
@@ -122,7 +122,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE(battlex)
 {
-	battlex_state *state = (battlex_state *)screen->machine->driver_data;
+	battlex_state *state = screen->machine->driver_data<battlex_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_lsb | (state->scroll_msb << 8));
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

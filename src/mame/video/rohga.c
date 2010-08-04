@@ -13,14 +13,14 @@ WRITE16_HANDLER( rohga_buffer_spriteram16_w )
 {
 	// Spriteram seems to be triple buffered (no sprite lag on real pcb, but there
 	// is on driver with only double buffering)
-	rohga_state *state = (rohga_state *)space->machine->driver_data;
+	rohga_state *state = space->machine->driver_data<rohga_state>();
 	memcpy(state->spriteram, space->machine->generic.buffered_spriteram.u16, 0x800);
 	memcpy(space->machine->generic.buffered_spriteram.u16, space->machine->generic.spriteram.u16, 0x800);
 }
 
 VIDEO_START( rohga )
 {
-	rohga_state *state = (rohga_state *)machine->driver_data;
+	rohga_state *state = machine->driver_data<rohga_state>();
 	state->spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
 	state_save_register_global_pointer(machine, state->spriteram, 0x800/2);
 }
@@ -213,7 +213,7 @@ static void wizdfire_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void nitrobal_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank )
 {
-	rohga_state *state = (rohga_state *)machine->driver_data;
+	rohga_state *state = machine->driver_data<rohga_state>();
 	int offs, end, inc;
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 
@@ -421,7 +421,7 @@ sprite 2:
 
 static void update_rohga( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr )
 {
-	rohga_state *state = (rohga_state *)screen->machine->driver_data;
+	rohga_state *state = screen->machine->driver_data<rohga_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 
@@ -482,7 +482,7 @@ VIDEO_UPDATE( schmeisr )
 
 VIDEO_UPDATE( wizdfire )
 {
-	rohga_state *state = (rohga_state *)screen->machine->driver_data;
+	rohga_state *state = screen->machine->driver_data<rohga_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 
@@ -515,7 +515,7 @@ VIDEO_UPDATE( wizdfire )
 
 VIDEO_UPDATE( nitrobal )
 {
-	rohga_state *state = (rohga_state *)screen->machine->driver_data;
+	rohga_state *state = screen->machine->driver_data<rohga_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	/* Update playfields */

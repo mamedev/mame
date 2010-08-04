@@ -203,7 +203,7 @@ void atarijsa_reset(void)
 
 static READ8_HANDLER( jsa1_io_r )
 {
-	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
+	atarigen_state *atarigen = space->machine->driver_data<atarigen_state>();
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -333,7 +333,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 
 static READ8_HANDLER( jsa2_io_r )
 {
-	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
+	atarigen_state *atarigen = space->machine->driver_data<atarigen_state>();
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -458,7 +458,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 
 static READ8_HANDLER( jsa3_io_r )
 {
-	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
+	atarigen_state *atarigen = space->machine->driver_data<atarigen_state>();
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -592,7 +592,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 static READ8_HANDLER( jsa3s_io_r )
 {
-	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
+	atarigen_state *atarigen = space->machine->driver_data<atarigen_state>();
 	int result = 0xff;
 
 	switch (offset & 0x206)

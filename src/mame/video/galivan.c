@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] | ((attr & 0x01) << 8);
 	SET_TILE_INFO(
@@ -158,7 +158,7 @@ static TILE_GET_INFO( ninjemak_get_bg_tile_info )
 
 static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
@@ -178,7 +178,7 @@ static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 
 VIDEO_START( galivan )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
@@ -188,7 +188,7 @@ VIDEO_START( galivan )
 
 VIDEO_START( ninjemak )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 
 	state->bg_tilemap = tilemap_create(machine, ninjemak_get_bg_tile_info, tilemap_scan_cols, 16, 16, 512, 32);
 	state->tx_tilemap = tilemap_create(machine, ninjemak_get_tx_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
@@ -206,14 +206,14 @@ VIDEO_START( ninjemak )
 
 WRITE8_HANDLER( galivan_videoram_w )
 {
-	galivan_state *state = (galivan_state *)space->machine->driver_data;
+	galivan_state *state = space->machine->driver_data<galivan_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 WRITE8_HANDLER( galivan_colorram_w )
 {
-	galivan_state *state = (galivan_state *)space->machine->driver_data;
+	galivan_state *state = space->machine->driver_data<galivan_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
@@ -221,7 +221,7 @@ WRITE8_HANDLER( galivan_colorram_w )
 /* Written through port 40 */
 WRITE8_HANDLER( galivan_gfxbank_w )
 {
-	galivan_state *state = (galivan_state *)space->machine->driver_data;
+	galivan_state *state = space->machine->driver_data<galivan_state>();
 
 	/* bits 0 and 1 coin counters */
 	coin_counter_w(space->machine, 0,data & 1);
@@ -240,7 +240,7 @@ WRITE8_HANDLER( galivan_gfxbank_w )
 
 WRITE8_HANDLER( ninjemak_gfxbank_w )
 {
-	galivan_state *state = (galivan_state *)space->machine->driver_data;
+	galivan_state *state = space->machine->driver_data<galivan_state>();
 
 	/* bits 0 and 1 coin counters */
 	coin_counter_w(space->machine, 0,data & 1);
@@ -296,7 +296,7 @@ WRITE8_HANDLER( ninjemak_gfxbank_w )
 /* Written through port 41-42 */
 WRITE8_HANDLER( galivan_scrollx_w )
 {
-	galivan_state *state = (galivan_state *)space->machine->driver_data;
+	galivan_state *state = space->machine->driver_data<galivan_state>();
 	if (offset == 1)
 	{
 		if (data & 0x80)
@@ -313,20 +313,20 @@ WRITE8_HANDLER( galivan_scrollx_w )
 /* Written through port 43-44 */
 WRITE8_HANDLER( galivan_scrolly_w )
 {
-	galivan_state *state = (galivan_state *)space->machine->driver_data;
+	galivan_state *state = space->machine->driver_data<galivan_state>();
 	state->scrolly[offset] = data;
 }
 
 
 WRITE8_HANDLER( ninjemak_scrollx_w )
 {
-	galivan_state *state = (galivan_state *)space->machine->driver_data;
+	galivan_state *state = space->machine->driver_data<galivan_state>();
 	state->scrollx[offset] = data;
 }
 
 WRITE8_HANDLER( ninjemak_scrolly_w )
 {
-	galivan_state *state = (galivan_state *)space->machine->driver_data;
+	galivan_state *state = space->machine->driver_data<galivan_state>();
 	state->scrolly[offset] = data;
 }
 
@@ -340,7 +340,7 @@ WRITE8_HANDLER( ninjemak_scrolly_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	galivan_state *state = (galivan_state *)machine->driver_data;
+	galivan_state *state = machine->driver_data<galivan_state>();
 	const UINT8 *spritepalettebank = memory_region(machine, "user1");
 	UINT8 *spriteram = state->spriteram;
 	int offs;
@@ -379,7 +379,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( galivan )
 {
-	galivan_state *state = (galivan_state *)screen->machine->driver_data;
+	galivan_state *state = screen->machine->driver_data<galivan_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * (state->scrollx[1] & 0x07));
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[0] + 256 * (state->scrolly[1] & 0x07));
 
@@ -406,7 +406,7 @@ VIDEO_UPDATE( galivan )
 
 VIDEO_UPDATE( ninjemak )
 {
-	galivan_state *state = (galivan_state *)screen->machine->driver_data;
+	galivan_state *state = screen->machine->driver_data<galivan_state>();
 
 	/* (scrollx[1] & 0x40) does something */
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * (state->scrollx[1] & 0x1f));

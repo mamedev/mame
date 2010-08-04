@@ -19,7 +19,7 @@
 
 VIDEO_START( jumping )
 {
-	rainbow_state *state = (rainbow_state *)machine->driver_data;
+	rainbow_state *state = machine->driver_data<rainbow_state>();
 
 	pc080sn_set_trans_pen(state->pc080sn, 1, 15);
 
@@ -34,7 +34,7 @@ VIDEO_START( jumping )
 
 WRITE16_HANDLER( rastan_spritectrl_w )
 {
-	rastan_state *state = (rastan_state *)space->machine->driver_data;
+	rastan_state *state = space->machine->driver_data<rastan_state>();
 
 	/* bits 5-7 are the sprite palette bank */
 	pc090oj_set_sprite_ctrl(state->pc090oj, (data & 0xe0) >> 5);
@@ -52,7 +52,7 @@ WRITE16_HANDLER( rastan_spritectrl_w )
 
 WRITE16_HANDLER( rainbow_spritectrl_w )
 {
-	rainbow_state *state = (rainbow_state *)space->machine->driver_data;
+	rainbow_state *state = space->machine->driver_data<rainbow_state>();
 
 	if (offset == 0)
 	{
@@ -66,7 +66,7 @@ WRITE16_HANDLER( rainbow_spritectrl_w )
 
 WRITE16_HANDLER( opwolf_spritectrl_w )
 {
-	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	opwolf_state *state = space->machine->driver_data<opwolf_state>();
 
 	if (offset == 0)
 	{
@@ -90,7 +90,7 @@ WRITE16_HANDLER( opwolf_spritectrl_w )
 
 WRITE16_HANDLER( jumping_spritectrl_w )
 {
-	rainbow_state *state = (rainbow_state *)space->machine->driver_data;
+	rainbow_state *state = space->machine->driver_data<rainbow_state>();
 
 	if (offset == 0)
 	{
@@ -108,7 +108,7 @@ WRITE16_HANDLER( jumping_spritectrl_w )
 
 VIDEO_UPDATE( rastan )
 {
-	rastan_state *state = (rastan_state *)screen->machine->driver_data;
+	rastan_state *state = screen->machine->driver_data<rastan_state>();
 	int layer[2];
 
 	pc080sn_tilemap_update(state->pc080sn);
@@ -129,7 +129,7 @@ VIDEO_UPDATE( rastan )
 
 VIDEO_UPDATE( opwolf )
 {
-	opwolf_state *state = (opwolf_state *)screen->machine->driver_data;
+	opwolf_state *state = screen->machine->driver_data<opwolf_state>();
 	int layer[2];
 
 	pc080sn_tilemap_update(state->pc080sn);
@@ -154,7 +154,7 @@ VIDEO_UPDATE( opwolf )
 
 VIDEO_UPDATE( rainbow )
 {
-	rainbow_state *state = (rainbow_state *)screen->machine->driver_data;
+	rainbow_state *state = screen->machine->driver_data<rainbow_state>();
 	int layer[2];
 
 	pc080sn_tilemap_update(state->pc080sn);
@@ -183,7 +183,7 @@ the Y settings are active low.
 
 VIDEO_UPDATE( jumping )
 {
-	rainbow_state *state = (rainbow_state *)screen->machine->driver_data;
+	rainbow_state *state = screen->machine->driver_data<rainbow_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, layer[2];
 	int sprite_colbank = (state->sprite_ctrl & 0xe0) >> 1;

@@ -22,7 +22,7 @@ Notes:
 
 static READ16_HANDLER( pip )
 {
-	othldrby_state *state = (othldrby_state *)space->machine->driver_data;
+	othldrby_state *state = space->machine->driver_data<othldrby_state>();
 	return state->toggle ^= 1;
 }
 
@@ -218,7 +218,7 @@ GFXDECODE_END
 
 static MACHINE_START( othldrby )
 {
-	othldrby_state *state = (othldrby_state *)machine->driver_data;
+	othldrby_state *state = machine->driver_data<othldrby_state>();
 
 	state_save_register_global(machine, state->toggle);
 	state_save_register_global(machine, state->vram_addr);
@@ -228,7 +228,7 @@ static MACHINE_START( othldrby )
 
 static MACHINE_RESET( othldrby )
 {
-	othldrby_state *state = (othldrby_state *)machine->driver_data;
+	othldrby_state *state = machine->driver_data<othldrby_state>();
 
 	state->toggle = 0xff;
 	state->vram_addr = 0;

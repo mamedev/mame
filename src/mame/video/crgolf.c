@@ -20,7 +20,7 @@
 
 WRITE8_HANDLER( crgolf_videoram_w )
 {
-	crgolf_state *state = (crgolf_state *)space->machine->driver_data;
+	crgolf_state *state = space->machine->driver_data<crgolf_state>();
 
 	if (*state->screen_select & 1)
 		state->videoram_b[offset] = data;
@@ -31,7 +31,7 @@ WRITE8_HANDLER( crgolf_videoram_w )
 
 READ8_HANDLER( crgolf_videoram_r )
 {
-	crgolf_state *state = (crgolf_state *)space->machine->driver_data;
+	crgolf_state *state = space->machine->driver_data<crgolf_state>();
 	UINT8 ret;
 
 	if (*state->screen_select & 1)
@@ -92,7 +92,7 @@ static void get_pens( running_machine *machine, pen_t *pens )
 
 static VIDEO_START( crgolf )
 {
-	crgolf_state *state = (crgolf_state *)machine->driver_data;
+	crgolf_state *state = machine->driver_data<crgolf_state>();
 
 	/* allocate memory for the two bitmaps */
 	state->videoram_a = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
@@ -113,7 +113,7 @@ static VIDEO_START( crgolf )
 
 static VIDEO_UPDATE( crgolf )
 {
-	crgolf_state *state = (crgolf_state *)screen->machine->driver_data;
+	crgolf_state *state = screen->machine->driver_data<crgolf_state>();
 	int flip = *state->screen_flip & 1;
 
 	offs_t offs;

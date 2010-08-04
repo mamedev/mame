@@ -105,7 +105,7 @@ PALETTE_INIT( exerion )
 
 VIDEO_START( exerion )
 {
-	exerion_state *state = (exerion_state *)machine->driver_data;
+	exerion_state *state = machine->driver_data<exerion_state>();
 	int i;
 	UINT8 *gfx;
 
@@ -185,7 +185,7 @@ VIDEO_START( exerion )
 
 WRITE8_HANDLER( exerion_videoreg_w )
 {
-	exerion_state *state = (exerion_state *)space->machine->driver_data;
+	exerion_state *state = space->machine->driver_data<exerion_state>();
 
 	/* bit 0 = flip screen and joystick input multiplexer */
 	state->cocktail_flip = data & 1;
@@ -205,7 +205,7 @@ WRITE8_HANDLER( exerion_videoreg_w )
 
 WRITE8_HANDLER( exerion_video_latch_w )
 {
-	exerion_state *state = (exerion_state *)space->machine->driver_data;
+	exerion_state *state = space->machine->driver_data<exerion_state>();
 	int scanline = space->machine->primary_screen->vpos();
 	if (scanline > 0)
 		space->machine->primary_screen->update_partial(scanline - 1);
@@ -236,7 +236,7 @@ READ8_HANDLER( exerion_video_timing_r )
 
 static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	exerion_state *state = (exerion_state *)machine->driver_data;
+	exerion_state *state = machine->driver_data<exerion_state>();
 	int x, y;
 
 	/* loop over all visible scanlines */
@@ -352,7 +352,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 VIDEO_UPDATE( exerion )
 {
-	exerion_state *state = (exerion_state *)screen->machine->driver_data;
+	exerion_state *state = screen->machine->driver_data<exerion_state>();
 	int sx, sy, offs, i;
 
 	/* draw background */

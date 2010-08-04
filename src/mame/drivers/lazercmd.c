@@ -239,7 +239,7 @@
 
 static INTERRUPT_GEN( lazercmd_timer )
 {
-	lazercmd_state *state = (lazercmd_state *)device->machine->driver_data;
+	lazercmd_state *state = device->machine->driver_data<lazercmd_state>();
 
 	if (++state->timer_count >= 64 * 128)
 	{
@@ -251,7 +251,7 @@ static INTERRUPT_GEN( lazercmd_timer )
 
 static INTERRUPT_GEN( bbonk_timer )
 {
-	lazercmd_state *state = (lazercmd_state *)device->machine->driver_data;
+	lazercmd_state *state = device->machine->driver_data<lazercmd_state>();
 
 	if (++state->timer_count >= 64 * 128)
 		state->timer_count = 0;
@@ -289,7 +289,7 @@ static READ8_HANDLER( lazercmd_data_port_r )
 
 static WRITE8_HANDLER( lazercmd_hardware_w )
 {
-	lazercmd_state *state = (lazercmd_state *)space->machine->driver_data;
+	lazercmd_state *state = space->machine->driver_data<lazercmd_state>();
 
 	switch (offset)
 	{
@@ -313,7 +313,7 @@ static WRITE8_HANDLER( lazercmd_hardware_w )
 
 static WRITE8_HANDLER( medlanes_hardware_w )
 {
-	lazercmd_state *state = (lazercmd_state *)space->machine->driver_data;
+	lazercmd_state *state = space->machine->driver_data<lazercmd_state>();
 
 	switch (offset)
 	{
@@ -340,7 +340,7 @@ static WRITE8_HANDLER( medlanes_hardware_w )
 
 static WRITE8_HANDLER( bbonk_hardware_w )
 {
-	lazercmd_state *state = (lazercmd_state *)space->machine->driver_data;
+	lazercmd_state *state = space->machine->driver_data<lazercmd_state>();
 
 	switch (offset)
 	{
@@ -361,7 +361,7 @@ static WRITE8_HANDLER( bbonk_hardware_w )
 
 static READ8_HANDLER( lazercmd_hardware_r )
 {
-	lazercmd_state *state = (lazercmd_state *)space->machine->driver_data;
+	lazercmd_state *state = space->machine->driver_data<lazercmd_state>();
 	UINT8 data = 0;
 
 	switch (offset)
@@ -601,7 +601,7 @@ static PALETTE_INIT( lazercmd )
 
 static MACHINE_START( lazercmd )
 {
-	lazercmd_state *state = (lazercmd_state *)machine->driver_data;
+	lazercmd_state *state = machine->driver_data<lazercmd_state>();
 
 	state->dac = machine->device("dac");
 
@@ -614,7 +614,7 @@ static MACHINE_START( lazercmd )
 
 static MACHINE_RESET( lazercmd )
 {
-	lazercmd_state *state = (lazercmd_state *)machine->driver_data;
+	lazercmd_state *state = machine->driver_data<lazercmd_state>();
 
 	state->marker_x = 0;
 	state->marker_y = 0;

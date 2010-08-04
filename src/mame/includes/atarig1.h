@@ -6,14 +6,14 @@
 
 #include "machine/atarigen.h"
 
-class atarig1_state
+class atarig1_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarig1_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarig1_state(machine)); }
 
-	atarig1_state(running_machine &machine) { }
+	atarig1_state(running_machine &machine)
+		: atarigen_state(machine) { }
 
-	atarigen_state	atarigen;
 	UINT8			is_pitfight;
 
 	UINT8			which_input;

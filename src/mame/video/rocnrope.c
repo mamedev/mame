@@ -84,14 +84,14 @@ PALETTE_INIT( rocnrope )
 
 WRITE8_HANDLER( rocnrope_videoram_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( rocnrope_colorram_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -107,7 +107,7 @@ WRITE8_HANDLER( rocnrope_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + 2 * (attr & 0x80);
 	int color = attr & 0x0f;
@@ -118,13 +118,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( rocnrope )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -144,7 +144,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( rocnrope )
 {
-	timeplt_state *state = (timeplt_state *)screen->machine->driver_data;
+	timeplt_state *state = screen->machine->driver_data<timeplt_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;

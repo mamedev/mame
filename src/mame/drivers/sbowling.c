@@ -45,12 +45,13 @@ PROMs : NEC B406 (1kx4) x2
 #include "sound/ay8910.h"
 
 
-class sbowling_state
+class sbowling_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sbowling_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sbowling_state(machine)); }
 
-	sbowling_state(running_machine &machine) { }
+	sbowling_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	int bgmap;
 	UINT8 *videoram;
@@ -65,7 +66,7 @@ public:
 
 static TILE_GET_INFO( get_sb_tile_info )
 {
-	sbowling_state *state = (sbowling_state *)machine->driver_data;
+	sbowling_state *state = machine->driver_data<sbowling_state>();
 	UINT8 *rom = memory_region(machine, "user1");
 	int tileno = rom[tile_index + state->bgmap * 1024];
 
@@ -84,7 +85,7 @@ static void plot_pixel_sbw(bitmap_t *tmpbitmap, int x, int y, int col, int flip)
 
 static WRITE8_HANDLER( sbw_videoram_w )
 {
-	sbowling_state *state = (sbowling_state *)space->machine->driver_data;
+	sbowling_state *state = space->machine->driver_data<sbowling_state>();
 	int flip = flip_screen_get(space->machine);
 	int x,y,i,v1,v2;
 
@@ -108,7 +109,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 
 static VIDEO_UPDATE(sbowling)
 {
-	sbowling_state *state = (sbowling_state *)screen->machine->driver_data;
+	sbowling_state *state = screen->machine->driver_data<sbowling_state>();
 
 	bitmap_fill(bitmap, cliprect, 0x18);
 	tilemap_draw(bitmap, cliprect,state->sb_tilemap, 0, 0);
@@ -118,7 +119,7 @@ static VIDEO_UPDATE(sbowling)
 
 static VIDEO_START(sbowling)
 {
-	sbowling_state *state = (sbowling_state *)machine->driver_data;
+	sbowling_state *state = machine->driver_data<sbowling_state>();
 
 	state->tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,machine->primary_screen->format());
 	state->sb_tilemap = tilemap_create(machine, get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -126,20 +127,20 @@ static VIDEO_START(sbowling)
 
 static WRITE8_HANDLER( pix_shift_w )
 {
-	sbowling_state *state = (sbowling_state *)space->machine->driver_data;
+	sbowling_state *state = space->machine->driver_data<sbowling_state>();
 
 	state->pix_sh = data;
 }
 static WRITE8_HANDLER( pix_data_w )
 {
-	sbowling_state *state = (sbowling_state *)space->machine->driver_data;
+	sbowling_state *state = space->machine->driver_data<sbowling_state>();
 
 	state->pix[0] = state->pix[1];
 	state->pix[1] = data;
 }
 static READ8_HANDLER( pix_data_r )
 {
-	sbowling_state *state = (sbowling_state *)space->machine->driver_data;
+	sbowling_state *state = space->machine->driver_data<sbowling_state>();
 	UINT32 p1, p0;
 	int res;
 	int sh = state->pix_sh & 7;
@@ -170,7 +171,7 @@ static WRITE8_HANDLER (system_w)
         -----x-- 1 ?
         ----x--- flip screen/controls
     */
-	sbowling_state *state = (sbowling_state *)space->machine->driver_data;
+	sbowling_state *state = space->machine->driver_data<sbowling_state>();
 
 	flip_screen_set(space->machine, data&1);
 
@@ -193,7 +194,7 @@ static WRITE8_HANDLER(graph_control_w)
         xx------ color PROM address lines A4,A3
     */
 
-	sbowling_state *state = (sbowling_state *)space->machine->driver_data;
+	sbowling_state *state = space->machine->driver_data<sbowling_state>();
 
 	state->color_prom_address = ((data&0x07)<<7) | ((data&0xc0)>>3);
 
@@ -203,7 +204,7 @@ static WRITE8_HANDLER(graph_control_w)
 
 static READ8_HANDLER (controls_r)
 {
-	sbowling_state *state = (sbowling_state *)space->machine->driver_data;
+	sbowling_state *state = space->machine->driver_data<sbowling_state>();
 
 	if (state->sbw_system & 2)
 		return input_port_read(space->machine, "TRACKY");

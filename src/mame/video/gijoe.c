@@ -4,7 +4,7 @@
 
 void gijoe_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	gijoe_state *state = (gijoe_state *)machine->driver_data;
+	gijoe_state *state = machine->driver_data<gijoe_state>();
 	int pri = (*color & 0x03e0) >> 4;
 
 	if (pri <= state->layer_pri[3])
@@ -23,7 +23,7 @@ void gijoe_sprite_callback( running_machine *machine, int *code, int *color, int
 
 void gijoe_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
 {
-	gijoe_state *state = (gijoe_state *)machine->driver_data;
+	gijoe_state *state = machine->driver_data<gijoe_state>();
 	int tile = *code;
 
 	if (tile >= 0xf000 && tile <= 0xf4ff)
@@ -52,7 +52,7 @@ void gijoe_tile_callback( running_machine *machine, int layer, int *code, int *c
 
 VIDEO_START( gijoe )
 {
-	gijoe_state *state = (gijoe_state *)machine->driver_data;
+	gijoe_state *state = machine->driver_data<gijoe_state>();
 	int i;
 
 	k056832_linemap_enable(state->k056832, 1);
@@ -77,7 +77,7 @@ VIDEO_START( gijoe )
 
 VIDEO_UPDATE( gijoe )
 {
-	gijoe_state *state = (gijoe_state *)screen->machine->driver_data;
+	gijoe_state *state = screen->machine->driver_data<gijoe_state>();
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[4];
 	int vrc_mode, vrc_new, colorbase_new, /*primode,*/ dirty, i;

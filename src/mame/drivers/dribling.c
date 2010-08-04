@@ -40,7 +40,7 @@
 
 static INTERRUPT_GEN( dribling_irq_gen )
 {
-	dribling_state *state = (dribling_state *)device->machine->driver_data;
+	dribling_state *state = device->machine->driver_data<dribling_state>();
 	if (state->di)
 		cpu_set_input_line(device, 0, ASSERT_LINE);
 }
@@ -55,7 +55,7 @@ static INTERRUPT_GEN( dribling_irq_gen )
 
 static READ8_DEVICE_HANDLER( dsr_r )
 {
-	dribling_state *state = (dribling_state *)device->machine->driver_data;
+	dribling_state *state = device->machine->driver_data<dribling_state>();
 
 	/* return DSR0-7 */
 	return (state->ds << state->sh) | (state->dr >> (8 - state->sh));
@@ -64,7 +64,7 @@ static READ8_DEVICE_HANDLER( dsr_r )
 
 static READ8_DEVICE_HANDLER( input_mux0_r )
 {
-	dribling_state *state = (dribling_state *)device->machine->driver_data;
+	dribling_state *state = device->machine->driver_data<dribling_state>();
 
 	/* low value in the given bit selects */
 	if (!(state->input_mux & 0x01))
@@ -86,7 +86,7 @@ static READ8_DEVICE_HANDLER( input_mux0_r )
 
 static WRITE8_DEVICE_HANDLER( misc_w )
 {
-	dribling_state *state = (dribling_state *)device->machine->driver_data;
+	dribling_state *state = device->machine->driver_data<dribling_state>();
 
 	/* bit 7 = di */
 	state->di = (data >> 7) & 1;
@@ -132,7 +132,7 @@ static WRITE8_DEVICE_HANDLER( pb_w )
 
 static WRITE8_DEVICE_HANDLER( shr_w )
 {
-	dribling_state *state = (dribling_state *)device->machine->driver_data;
+	dribling_state *state = device->machine->driver_data<dribling_state>();
 
 	/* bit 3 = watchdog */
 	if (data & 0x08)
@@ -152,7 +152,7 @@ static WRITE8_DEVICE_HANDLER( shr_w )
 
 static READ8_HANDLER( ioread )
 {
-	dribling_state *state = (dribling_state *)space->machine->driver_data;
+	dribling_state *state = space->machine->driver_data<dribling_state>();
 
 	if (offset & 0x08)
 		return ppi8255_r(state->ppi_0, offset & 3);
@@ -164,7 +164,7 @@ static READ8_HANDLER( ioread )
 
 static WRITE8_HANDLER( iowrite )
 {
-	dribling_state *state = (dribling_state *)space->machine->driver_data;
+	dribling_state *state = space->machine->driver_data<dribling_state>();
 
 	if (offset & 0x08)
 		ppi8255_w(state->ppi_0, offset & 3, data);
@@ -285,7 +285,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( dribling )
 {
-	dribling_state *state = (dribling_state *)machine->driver_data;
+	dribling_state *state = machine->driver_data<dribling_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->ppi_0 = machine->device("ppi8255_0");
@@ -301,7 +301,7 @@ static MACHINE_START( dribling )
 
 static MACHINE_RESET( dribling )
 {
-	dribling_state *state = (dribling_state *)machine->driver_data;
+	dribling_state *state = machine->driver_data<dribling_state>();
 
 	state->abca = 0;
 	state->di = 0;

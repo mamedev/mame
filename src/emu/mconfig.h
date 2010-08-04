@@ -106,6 +106,8 @@
 #define video_update_0				NULL
 
 
+class driver_data_t;
+
 typedef void   (*nvram_handler_func)(running_machine *machine, mame_file *file, int read_or_write);
 typedef void   (*memcard_handler_func)(running_machine *machine, mame_file *file, int action);
 typedef void   (*machine_start_func)(running_machine *machine);
@@ -117,7 +119,7 @@ typedef void   (*video_reset_func)(running_machine *machine);
 typedef void   (*palette_init_func)(running_machine *machine, const UINT8 *color_prom);
 typedef void   (*video_eof_func)(running_machine *machine);
 typedef UINT32 (*video_update_func)(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
-typedef void * (*driver_data_alloc_func)(running_machine &machine);
+typedef driver_data_t *(*driver_data_alloc_func)(running_machine &machine);
 
 
 

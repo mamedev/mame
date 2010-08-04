@@ -19,7 +19,7 @@ static TILEMAP_MAPPER( pf1_scan )
 
 static TILE_GET_INFO( get_pf1_tile_info )
 {
-	madmotor_state *state = (madmotor_state *)machine->driver_data;
+	madmotor_state *state = machine->driver_data<madmotor_state>();
 	int tile = state->pf1_data[tile_index];
 	int color = tile >> 12;
 
@@ -41,7 +41,7 @@ static TILEMAP_MAPPER( pf2_scan )
 
 static TILE_GET_INFO( get_pf2_tile_info )
 {
-	madmotor_state *state = (madmotor_state *)machine->driver_data;
+	madmotor_state *state = machine->driver_data<madmotor_state>();
 	int tile = state->pf2_data[tile_index];
 	int color = tile >> 12;
 
@@ -63,7 +63,7 @@ static TILEMAP_MAPPER( pf3_scan )
 
 static TILE_GET_INFO( get_pf3_tile_info )
 {
-	madmotor_state *state = (madmotor_state *)machine->driver_data;
+	madmotor_state *state = machine->driver_data<madmotor_state>();
 	int tile = state->pf3_data[tile_index];
 	int color = tile >> 12;
 
@@ -85,7 +85,7 @@ static TILEMAP_MAPPER( pf3a_scan )
 
 static TILE_GET_INFO( get_pf3a_tile_info )
 {
-	madmotor_state *state = (madmotor_state *)machine->driver_data;
+	madmotor_state *state = machine->driver_data<madmotor_state>();
 	int tile = state->pf3_data[tile_index];
 	int color = tile >> 12;
 
@@ -102,7 +102,7 @@ static TILE_GET_INFO( get_pf3a_tile_info )
 
 VIDEO_START( madmotor )
 {
-	madmotor_state *state = (madmotor_state *)machine->driver_data;
+	madmotor_state *state = machine->driver_data<madmotor_state>();
 
 	state->pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,  pf1_scan,   8,  8,  64, 64);
 	state->pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,  pf2_scan,  16, 16,  32, 32);
@@ -118,7 +118,7 @@ VIDEO_START( madmotor )
 
 WRITE16_HANDLER( madmotor_pf1_data_w )
 {
-	madmotor_state *state = (madmotor_state *)space->machine->driver_data;
+	madmotor_state *state = space->machine->driver_data<madmotor_state>();
 
 	COMBINE_DATA(&state->pf1_data[offset]);
 	tilemap_mark_tile_dirty(state->pf1_tilemap, offset);
@@ -126,7 +126,7 @@ WRITE16_HANDLER( madmotor_pf1_data_w )
 
 WRITE16_HANDLER( madmotor_pf2_data_w )
 {
-	madmotor_state *state = (madmotor_state *)space->machine->driver_data;
+	madmotor_state *state = space->machine->driver_data<madmotor_state>();
 
 	COMBINE_DATA(&state->pf2_data[offset]);
 	tilemap_mark_tile_dirty(state->pf2_tilemap, offset);
@@ -134,7 +134,7 @@ WRITE16_HANDLER( madmotor_pf2_data_w )
 
 WRITE16_HANDLER( madmotor_pf3_data_w )
 {
-	madmotor_state *state = (madmotor_state *)space->machine->driver_data;
+	madmotor_state *state = space->machine->driver_data<madmotor_state>();
 
 	COMBINE_DATA(&state->pf3_data[offset]);
 
@@ -149,7 +149,7 @@ WRITE16_HANDLER( madmotor_pf3_data_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask, int pri_val )
 {
-	madmotor_state *state = (madmotor_state *)machine->driver_data;
+	madmotor_state *state = machine->driver_data<madmotor_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -224,7 +224,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( madmotor )
 {
-	madmotor_state *state = (madmotor_state *)screen->machine->driver_data;
+	madmotor_state *state = screen->machine->driver_data<madmotor_state>();
 	int offs;
 
 	/* Update flipscreen */

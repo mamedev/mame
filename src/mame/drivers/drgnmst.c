@@ -50,7 +50,7 @@ static WRITE16_HANDLER( drgnmst_coin_w )
 
 static WRITE16_HANDLER( drgnmst_snd_command_w )
 {
-	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
+	drgnmst_state *state = space->machine->driver_data<drgnmst_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -61,7 +61,7 @@ static WRITE16_HANDLER( drgnmst_snd_command_w )
 
 static WRITE16_HANDLER( drgnmst_snd_flag_w )
 {
-	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
+	drgnmst_state *state = space->machine->driver_data<drgnmst_state>();
 
 	/* Enables the following 68K write operation to latch through to the PIC */
 	if (ACCESSING_BITS_0_7)
@@ -71,13 +71,13 @@ static WRITE16_HANDLER( drgnmst_snd_flag_w )
 
 static READ8_HANDLER( pic16c5x_port0_r )
 {
-	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
+	drgnmst_state *state = space->machine->driver_data<drgnmst_state>();
 	return state->pic16c5x_port0;
 }
 
 static READ8_HANDLER( drgnmst_snd_command_r )
 {
-	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
+	drgnmst_state *state = space->machine->driver_data<drgnmst_state>();
 	int data = 0;
 
 	switch (state->oki_control & 0x1f)
@@ -94,7 +94,7 @@ static READ8_HANDLER( drgnmst_snd_command_r )
 
 static READ8_HANDLER( drgnmst_snd_flag_r )
 {
-	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
+	drgnmst_state *state = space->machine->driver_data<drgnmst_state>();
 	if (state->snd_flag)
 	{
 		state->snd_flag = 0;
@@ -106,7 +106,7 @@ static READ8_HANDLER( drgnmst_snd_flag_r )
 
 static WRITE8_HANDLER( drgnmst_pcm_banksel_w )
 {
-	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
+	drgnmst_state *state = space->machine->driver_data<drgnmst_state>();
 	/*  This is a 4 bit port.
         Each pair of bits is used in part of the OKI PCM ROM bank selectors.
         See the Port 2 write handler below (drgnmst_snd_control_w) for details.
@@ -117,7 +117,7 @@ static WRITE8_HANDLER( drgnmst_pcm_banksel_w )
 
 static WRITE8_HANDLER( drgnmst_oki_w )
 {
-	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
+	drgnmst_state *state = space->machine->driver_data<drgnmst_state>();
 	state->oki_command = data;
 }
 
@@ -146,7 +146,7 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
         The OKI0 banks are pre-configured below in the driver init.
     */
 
-	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
+	drgnmst_state *state = space->machine->driver_data<drgnmst_state>();
 	int oki_new_bank;
 	state->oki_control = data;
 
@@ -379,7 +379,7 @@ GFXDECODE_END
 
 static MACHINE_START( drgnmst )
 {
-	drgnmst_state *state = (drgnmst_state *)machine->driver_data;
+	drgnmst_state *state = machine->driver_data<drgnmst_state>();
 
 	state_save_register_global(machine, state->snd_flag);
 	state_save_register_global(machine, state->snd_command);
@@ -392,7 +392,7 @@ static MACHINE_START( drgnmst )
 
 static MACHINE_RESET( drgnmst )
 {
-	drgnmst_state *state = (drgnmst_state *)machine->driver_data;
+	drgnmst_state *state = machine->driver_data<drgnmst_state>();
 
 	state->snd_flag = 0;
 	state->snd_command = 0;

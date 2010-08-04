@@ -5,7 +5,7 @@
 
 static void reset_spritebank( running_machine *machine )
 {
-	asterix_state *state = (asterix_state *)machine->driver_data;
+	asterix_state *state = machine->driver_data<asterix_state>();
 	k053244_bankselect(state->k053244, state->spritebank & 7);
 	state->spritebanks[0] = (state->spritebank << 12) & 0x7000;
 	state->spritebanks[1] = (state->spritebank <<  9) & 0x7000;
@@ -15,14 +15,14 @@ static void reset_spritebank( running_machine *machine )
 
 WRITE16_HANDLER( asterix_spritebank_w )
 {
-	asterix_state *state = (asterix_state *)space->machine->driver_data;
+	asterix_state *state = space->machine->driver_data<asterix_state>();
 	COMBINE_DATA(&state->spritebank);
 	reset_spritebank(space->machine);
 }
 
 void asterix_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	asterix_state *state = (asterix_state *)machine->driver_data;
+	asterix_state *state = machine->driver_data<asterix_state>();
 	int pri = (*color & 0x00e0) >> 2;
 	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
@@ -39,7 +39,7 @@ void asterix_sprite_callback( running_machine *machine, int *code, int *color, i
 
 void asterix_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
 {
-	asterix_state *state = (asterix_state *)machine->driver_data;
+	asterix_state *state = machine->driver_data<asterix_state>();
 
 	*flags = *code & 0x1000 ? TILE_FLIPX : 0;
 	*color = (state->layer_colorbase[layer] + ((*code & 0xe000) >> 13)) & 0x7f;
@@ -48,7 +48,7 @@ void asterix_tile_callback( running_machine *machine, int layer, int *code, int 
 
 VIDEO_UPDATE( asterix )
 {
-	asterix_state *state = (asterix_state *)screen->machine->driver_data;
+	asterix_state *state = screen->machine->driver_data<asterix_state>();
 	static const int K053251_CI[4] = { K053251_CI0, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[3], plane, new_colorbase;
 

@@ -130,14 +130,14 @@ Notes (couriersud)
 
 static WRITE8_DEVICE_HANDLER( ic8j1_output_changed )
 {
-	m10_state *state = (m10_state *)device->machine->driver_data;
+	m10_state *state = device->machine->driver_data<m10_state>();
 	LOG(("ic8j1: %d %d\n", data, device->machine->primary_screen->vpos()));
 	cpu_set_input_line(state->maincpu, 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
 {
-	m10_state *state = (m10_state *)device->machine->driver_data;
+	m10_state *state = device->machine->driver_data<m10_state>();
 
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
@@ -194,7 +194,7 @@ static PALETTE_INIT( m10 )
 
 static MACHINE_START( m10 )
 {
-	m10_state *state = (m10_state *)machine->driver_data;
+	m10_state *state = machine->driver_data<m10_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->ic8j1 = machine->device("ic8j1");
@@ -208,7 +208,7 @@ static MACHINE_START( m10 )
 
 static MACHINE_RESET( m10 )
 {
-	m10_state *state = (m10_state *)machine->driver_data;
+	m10_state *state = machine->driver_data<m10_state>();
 
 	state->bottomline = 0;
 	state->flip = 0;
@@ -242,7 +242,7 @@ static MACHINE_RESET( m10 )
 
 static WRITE8_HANDLER( m10_ctrl_w )
 {
-	m10_state *state = (m10_state *)space->machine->driver_data;
+	m10_state *state = space->machine->driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0x40)
@@ -319,7 +319,7 @@ static WRITE8_HANDLER( m10_ctrl_w )
 
 static WRITE8_HANDLER( m11_ctrl_w )
 {
-	m10_state *state = (m10_state *)space->machine->driver_data;
+	m10_state *state = space->machine->driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0x4c)
@@ -352,7 +352,7 @@ static WRITE8_HANDLER( m11_ctrl_w )
 
 static WRITE8_HANDLER( m15_ctrl_w )
 {
-	m10_state *state = (m10_state *)space->machine->driver_data;
+	m10_state *state = space->machine->driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0xf0)
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( m10_a500_w )
 
 static WRITE8_HANDLER( m11_a100_w )
 {
-	m10_state *state = (m10_state *)space->machine->driver_data;
+	m10_state *state = space->machine->driver_data<m10_state>();
 	int raising_bits = data & ~state->last;
 	//int falling_bits = ~data & state->last;
 
@@ -423,7 +423,7 @@ static WRITE8_HANDLER( m11_a100_w )
 
 static WRITE8_HANDLER( m15_a100_w )
 {
-	m10_state *state = (m10_state *)space->machine->driver_data;
+	m10_state *state = space->machine->driver_data<m10_state>();
 	//int raising_bits = data & ~state->last;
 	int falling_bits = ~data & state->last;
 
@@ -481,7 +481,7 @@ static WRITE8_HANDLER( m15_a100_w )
 
 static READ8_HANDLER( m10_a700_r )
 {
-	m10_state *state = (m10_state *)space->machine->driver_data;
+	m10_state *state = space->machine->driver_data<m10_state>();
 	//LOG(("rd:%d\n",space->machine->primary_screen->vpos()));
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
@@ -491,7 +491,7 @@ static READ8_HANDLER( m10_a700_r )
 
 static READ8_HANDLER( m11_a700_r )
 {
-	m10_state *state = (m10_state *)space->machine->driver_data;
+	m10_state *state = space->machine->driver_data<m10_state>();
 	//LOG(("rd:%d\n",space->machine->primary_screen->vpos()));
 	//cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 	LOG(("clear\n"));
@@ -508,7 +508,7 @@ static READ8_HANDLER( m11_a700_r )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	m10_state *state = (m10_state *)field->port->machine->driver_data;
+	m10_state *state = field->port->machine->driver_data<m10_state>();
 	/* coin insertion causes an NMI */
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -516,7 +516,7 @@ static INPUT_CHANGED( coin_inserted )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	m10_state *state = (m10_state *)machine->driver_data;
+	m10_state *state = machine->driver_data<m10_state>();
 	if (param == 0)
 	{
 		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
@@ -938,7 +938,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( andromed )
 {
 	int i;
-	m10_state *state = (m10_state *)machine->driver_data;
+	m10_state *state = machine->driver_data<m10_state>();
 
 	for (i = 0x1c00; i < 0x2000; i++)
 		state->rom[i] = 0x60;
@@ -947,7 +947,7 @@ static DRIVER_INIT( andromed )
 static DRIVER_INIT( ipminva1 )
 {
 	int i;
-	m10_state *state = (m10_state *)machine->driver_data;
+	m10_state *state = machine->driver_data<m10_state>();
 
 	for (i = 0x1400; i < 0x17ff; i++)
 		state->rom[i] = 0x60;

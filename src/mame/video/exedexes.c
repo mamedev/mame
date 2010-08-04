@@ -82,7 +82,7 @@ PALETTE_INIT( exedexes )
 
 WRITE8_HANDLER( exedexes_videoram_w )
 {
-	exedexes_state *state = (exedexes_state *)space->machine->driver_data;
+	exedexes_state *state = space->machine->driver_data<exedexes_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
@@ -90,7 +90,7 @@ WRITE8_HANDLER( exedexes_videoram_w )
 
 WRITE8_HANDLER( exedexes_colorram_w )
 {
-	exedexes_state *state = (exedexes_state *)space->machine->driver_data;
+	exedexes_state *state = space->machine->driver_data<exedexes_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
@@ -98,7 +98,7 @@ WRITE8_HANDLER( exedexes_colorram_w )
 
 WRITE8_HANDLER( exedexes_c804_w )
 {
-	exedexes_state *state = (exedexes_state *)space->machine->driver_data;
+	exedexes_state *state = space->machine->driver_data<exedexes_state>();
 
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(space->machine, 0, data & 0x01);
@@ -115,7 +115,7 @@ WRITE8_HANDLER( exedexes_c804_w )
 
 WRITE8_HANDLER( exedexes_gfxctrl_w )
 {
-	exedexes_state *state = (exedexes_state *)space->machine->driver_data;
+	exedexes_state *state = space->machine->driver_data<exedexes_state>();
 
 	/* bit 4 is bg enable */
 	state->sc2on = data & 0x10;
@@ -151,7 +151,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	exedexes_state *state = (exedexes_state *)machine->driver_data;
+	exedexes_state *state = machine->driver_data<exedexes_state>();
 	int code = state->videoram[tile_index] + 2 * (state->colorram[tile_index] & 0x80);
 	int color = state->colorram[tile_index] & 0x3f;
 
@@ -174,7 +174,7 @@ static TILEMAP_MAPPER( exedexes_fg_tilemap_scan )
 
 VIDEO_START( exedexes )
 {
-	exedexes_state *state = (exedexes_state *)machine->driver_data;
+	exedexes_state *state = machine->driver_data<exedexes_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, exedexes_bg_tilemap_scan, 32, 32, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, exedexes_fg_tilemap_scan, 16, 16, 128, 128);
@@ -186,7 +186,7 @@ VIDEO_START( exedexes )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	exedexes_state *state = (exedexes_state *)machine->driver_data;
+	exedexes_state *state = machine->driver_data<exedexes_state>();
 	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
@@ -219,7 +219,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( exedexes )
 {
-	exedexes_state *state = (exedexes_state *)screen->machine->driver_data;
+	exedexes_state *state = screen->machine->driver_data<exedexes_state>();
 	if (state->sc2on)
 	{
 		tilemap_set_scrollx(state->bg_tilemap, 0, ((state->bg_scroll[1]) << 8) + state->bg_scroll[0]);

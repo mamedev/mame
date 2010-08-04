@@ -84,7 +84,7 @@ static UINT16 cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
 
 static READ16_HANDLER( k052109_word_noA12_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -94,7 +94,7 @@ static READ16_HANDLER( k052109_word_noA12_r )
 
 static WRITE16_HANDLER( k052109_word_noA12_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -104,7 +104,7 @@ static WRITE16_HANDLER( k052109_word_noA12_w )
 
 static WRITE16_HANDLER( punkshot_k052109_word_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
@@ -128,7 +128,7 @@ static WRITE16_HANDLER( punkshot_k052109_word_noA12_w )
 /* A1, A5 and A6 don't go to the 053245. */
 static READ16_HANDLER( k053245_scattered_word_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	if (offset & 0x0031)
 		return space->machine->generic.spriteram.u16[offset];
@@ -141,7 +141,7 @@ static READ16_HANDLER( k053245_scattered_word_r )
 
 static WRITE16_HANDLER( k053245_scattered_word_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	COMBINE_DATA(space->machine->generic.spriteram.u16 + offset);
 
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( k053245_scattered_word_w )
 
 static READ16_HANDLER( k053244_word_noA1_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	offset &= ~1;	/* handle mirror address */
 
@@ -163,7 +163,7 @@ static READ16_HANDLER( k053244_word_noA1_r )
 
 static WRITE16_HANDLER( k053244_word_noA1_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	offset &= ~1;	/* handle mirror address */
 
@@ -175,7 +175,7 @@ static WRITE16_HANDLER( k053244_word_noA1_w )
 
 static INTERRUPT_GEN(cuebrick_interrupt)
 {
-	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
+	tmnt_state *state = device->machine->driver_data<tmnt_state>();
 
 	// cheap IRQ multiplexing to avoid losing sound IRQs
 	switch (cpu_getiloops(device))
@@ -193,7 +193,7 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 
 static INTERRUPT_GEN( punkshot_interrupt )
 {
-	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
+	tmnt_state *state = device->machine->driver_data<tmnt_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		irq4_line_hold(device);
@@ -201,7 +201,7 @@ static INTERRUPT_GEN( punkshot_interrupt )
 
 static INTERRUPT_GEN( lgtnfght_interrupt )
 {
-	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
+	tmnt_state *state = device->machine->driver_data<tmnt_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		irq5_line_hold(device);
@@ -224,7 +224,7 @@ static READ8_DEVICE_HANDLER( punkshot_sound_r )
 
 static WRITE8_DEVICE_HANDLER( glfgreat_sound_w )
 {
-	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
+	tmnt_state *state = device->machine->driver_data<tmnt_state>();
 	k053260_w(device, offset, data);
 
 	if (offset)
@@ -250,7 +250,7 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 
 static WRITE16_HANDLER( prmrsocr_sound_irq_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -262,13 +262,13 @@ static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
 
 static READ8_HANDLER( tmnt_sres_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	return state->tmnt_soundlatch;
 }
 
 static WRITE8_HANDLER( tmnt_sres_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	/* bit 1 resets the UPD7795C sound chip */
 	upd7759_reset_w(state->upd, data & 2);
@@ -298,7 +298,7 @@ static READ8_DEVICE_HANDLER( tmnt_upd_busy_r )
 static SAMPLES_START( tmnt_decode_sample )
 {
 	running_machine *machine = device->machine;
-	tmnt_state *state = (tmnt_state *)machine->driver_data;
+	tmnt_state *state = machine->driver_data<tmnt_state>();
 	int i;
 	UINT8 *source = memory_region(machine, "title");
 
@@ -340,13 +340,13 @@ static void sound_nmi_callback( int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	tmnt_state *state = (tmnt_state *)machine->driver_data;
+	tmnt_state *state = machine->driver_data<tmnt_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 //  sound_nmi_enabled = 1;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
@@ -366,7 +366,7 @@ static READ16_HANDLER( punkshot_kludge_r )
 /* protection simulation derived from a bootleg */
 static READ16_HANDLER( ssriders_protection_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	int data = memory_read_word(space, 0x105a0a);
 	int cmd = memory_read_word(space, 0x1058fc);
 
@@ -410,7 +410,7 @@ static READ16_HANDLER( ssriders_protection_r )
 
 static WRITE16_HANDLER( ssriders_protection_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	if (offset == 1)
 	{
@@ -456,7 +456,7 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( blswhstl_coin_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	int res;
 
 	/* bit 3 is service button */
@@ -469,7 +469,7 @@ static READ16_HANDLER( blswhstl_coin_r )
 
 static READ16_HANDLER( ssriders_eeprom_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
@@ -484,7 +484,7 @@ static READ16_HANDLER( ssriders_eeprom_r )
 
 static READ16_HANDLER( sunsetbl_eeprom_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
@@ -521,7 +521,7 @@ static const eeprom_interface thndrx2_eeprom_intf =
 
 static READ16_HANDLER( thndrx2_eeprom_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
@@ -535,7 +535,7 @@ static READ16_HANDLER( thndrx2_eeprom_r )
 
 static WRITE16_HANDLER( thndrx2_eeprom_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -572,19 +572,19 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 
 static READ16_HANDLER( cuebrick_nv_r )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	return cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)];
 }
 
 static WRITE16_HANDLER( cuebrick_nv_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
        COMBINE_DATA(&cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)]);
 }
 
 static WRITE16_HANDLER( cuebrick_nvbank_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	state->cuebrick_nvram_bank = data >> 8;
 }
 
@@ -695,7 +695,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( ssriders_soundkludge_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	/* I think this is more than just a trigger */
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
@@ -725,7 +725,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( k053251_glfgreat_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	int i;
 
 	if (ACCESSING_BITS_8_15)
@@ -795,7 +795,7 @@ ADDRESS_MAP_END
 #if 1
 INLINE UINT32 tmnt2_get_word( running_machine *machine, UINT32 addr )
 {
-	tmnt_state *state = (tmnt_state *)machine->driver_data;
+	tmnt_state *state = machine->driver_data<tmnt_state>();
 
 	if (addr <= 0x07ffff / 2)
 		return(state->tmnt2_rom[addr]);
@@ -808,7 +808,7 @@ INLINE UINT32 tmnt2_get_word( running_machine *machine, UINT32 addr )
 
 static void tmnt2_put_word( const address_space *space, UINT32 addr, UINT16 data )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	UINT32 offs;
 	if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
@@ -827,7 +827,7 @@ static void tmnt2_put_word( const address_space *space, UINT32 addr, UINT16 data
 
 static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	UINT32 src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
 	UINT16 *mcu;
@@ -948,7 +948,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 #else // for reference; do not remove
 static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
-	tmnt_state *state = (tmnt_state *)space->machine->driver_data;
+	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 	COMBINE_DATA(state->tmnt2_1c0800 + offset);
 	if (offset == 0x0008 && (state->tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
 	{
@@ -2065,7 +2065,7 @@ INPUT_PORTS_END
 
 static void cuebrick_irq_handler( running_device *device, int state )
 {
-	tmnt_state *tmnt = (tmnt_state *)device->machine->driver_data;
+	tmnt_state *tmnt = device->machine->driver_data<tmnt_state>();
 	tmnt->cuebrick_snd_irqlatch = state;
 }
 
@@ -2235,7 +2235,7 @@ static const k053936_interface prmrsocr_k053936_interface =
 
 static MACHINE_START( common )
 {
-	tmnt_state *state = (tmnt_state *)machine->driver_data;
+	tmnt_state *state = machine->driver_data<tmnt_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -2264,7 +2264,7 @@ static MACHINE_START( common )
 
 static MACHINE_RESET( common )
 {
-	tmnt_state *state = (tmnt_state *)machine->driver_data;
+	tmnt_state *state = machine->driver_data<tmnt_state>();
 
 	state->toggle = 0;
 	state->last = 0;
@@ -2366,7 +2366,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( tmnt )
 {
-	tmnt_state *state = (tmnt_state *)machine->driver_data;
+	tmnt_state *state = machine->driver_data<tmnt_state>();
 
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
 	upd7759_start_w(state->upd, 0);
@@ -2642,7 +2642,7 @@ MACHINE_DRIVER_END
 
 static void sound_nmi( running_device *device )
 {
-	tmnt_state *state = (tmnt_state *)device->machine->driver_data;
+	tmnt_state *state = device->machine->driver_data<tmnt_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 

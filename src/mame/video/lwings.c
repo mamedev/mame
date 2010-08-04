@@ -22,7 +22,7 @@ static TILEMAP_MAPPER( get_bg2_memory_offset )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	lwings_state *state = (lwings_state *)machine->driver_data;
+	lwings_state *state = machine->driver_data<lwings_state>();
 	int code = state->fgvideoram[tile_index];
 	int color = state->fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( lwings_get_bg1_tile_info )
 {
-	lwings_state *state = (lwings_state *)machine->driver_data;
+	lwings_state *state = machine->driver_data<lwings_state>();
 	int code = state->bg1videoram[tile_index];
 	int color = state->bg1videoram[tile_index + 0x400];
 	SET_TILE_INFO(
@@ -46,7 +46,7 @@ static TILE_GET_INFO( lwings_get_bg1_tile_info )
 
 static TILE_GET_INFO( trojan_get_bg1_tile_info )
 {
-	lwings_state *state = (lwings_state *)machine->driver_data;
+	lwings_state *state = machine->driver_data<lwings_state>();
 	int code = state->bg1videoram[tile_index];
 	int color = state->bg1videoram[tile_index + 0x400];
 	code += (color & 0xe0)<<3;
@@ -61,7 +61,7 @@ static TILE_GET_INFO( trojan_get_bg1_tile_info )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	lwings_state *state = (lwings_state *)machine->driver_data;
+	lwings_state *state = machine->driver_data<lwings_state>();
 	int code, color;
 	UINT8 *rom = memory_region(machine, "gfx5");
 	int mask = memory_region_length(machine, "gfx5") - 1;
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( lwings )
 {
-	lwings_state *state = (lwings_state *)machine->driver_data;
+	lwings_state *state = machine->driver_data<lwings_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg1_tilemap = tilemap_create(machine, lwings_get_bg1_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
@@ -94,7 +94,7 @@ VIDEO_START( lwings )
 
 VIDEO_START( trojan )
 {
-	lwings_state *state = (lwings_state *)machine->driver_data;
+	lwings_state *state = machine->driver_data<lwings_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg1_tilemap = tilemap_create(machine, trojan_get_bg1_tile_info,tilemap_scan_cols, 16, 16, 32, 32);
@@ -109,7 +109,7 @@ VIDEO_START( trojan )
 
 VIDEO_START( avengers )
 {
-	lwings_state *state = (lwings_state *)machine->driver_data;
+	lwings_state *state = machine->driver_data<lwings_state>();
 
 	VIDEO_START_CALL(trojan);
 	state->bg2_avenger_hw = 1;
@@ -123,14 +123,14 @@ VIDEO_START( avengers )
 
 WRITE8_HANDLER( lwings_fgvideoram_w )
 {
-	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	lwings_state *state = space->machine->driver_data<lwings_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( lwings_bg1videoram_w )
 {
-	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	lwings_state *state = space->machine->driver_data<lwings_state>();
 	state->bg1videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg1_tilemap, offset & 0x3ff);
 }
@@ -138,27 +138,27 @@ WRITE8_HANDLER( lwings_bg1videoram_w )
 
 WRITE8_HANDLER( lwings_bg1_scrollx_w )
 {
-	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	lwings_state *state = space->machine->driver_data<lwings_state>();
 	state->scroll_x[offset] = data;
 	tilemap_set_scrollx(state->bg1_tilemap, 0, state->scroll_x[0] | (state->scroll_x[1] << 8));
 }
 
 WRITE8_HANDLER( lwings_bg1_scrolly_w )
 {
-	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	lwings_state *state = space->machine->driver_data<lwings_state>();
 	state->scroll_y[offset] = data;
 	tilemap_set_scrolly(state->bg1_tilemap, 0, state->scroll_y[0] | (state->scroll_y[1] << 8));
 }
 
 WRITE8_HANDLER( trojan_bg2_scrollx_w )
 {
-	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	lwings_state *state = space->machine->driver_data<lwings_state>();
 	tilemap_set_scrollx(state->bg2_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( trojan_bg2_image_w )
 {
-	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	lwings_state *state = space->machine->driver_data<lwings_state>();
 
 	if (state->bg2_image != data)
 	{
@@ -222,7 +222,7 @@ static void lwings_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 static void trojan_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	lwings_state *state = (lwings_state *)machine->driver_data;
+	lwings_state *state = machine->driver_data<lwings_state>();
 	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
@@ -271,7 +271,7 @@ static void trojan_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 VIDEO_UPDATE( lwings )
 {
-	lwings_state *state = (lwings_state *)screen->machine->driver_data;
+	lwings_state *state = screen->machine->driver_data<lwings_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
 	lwings_draw_sprites(screen->machine, bitmap, cliprect);
@@ -281,7 +281,7 @@ VIDEO_UPDATE( lwings )
 
 VIDEO_UPDATE( trojan )
 {
-	lwings_state *state = (lwings_state *)screen->machine->driver_data;
+	lwings_state *state = screen->machine->driver_data<lwings_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, TILEMAP_DRAW_LAYER1, 0);

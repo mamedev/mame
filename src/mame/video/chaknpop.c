@@ -61,7 +61,7 @@ PALETTE_INIT( chaknpop )
 
 static void tx_tilemap_mark_all_dirty( running_machine *machine )
 {
-	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	chaknpop_state *state = machine->driver_data<chaknpop_state>();
 
 	tilemap_mark_all_tiles_dirty(state->tx_tilemap);
 	tilemap_set_flip(state->tx_tilemap, state->flip_x | state->flip_y);
@@ -69,13 +69,13 @@ static void tx_tilemap_mark_all_dirty( running_machine *machine )
 
 READ8_HANDLER( chaknpop_gfxmode_r )
 {
-	chaknpop_state *state = (chaknpop_state *)space->machine->driver_data;
+	chaknpop_state *state = space->machine->driver_data<chaknpop_state>();
 	return state->gfxmode;
 }
 
 WRITE8_HANDLER( chaknpop_gfxmode_w )
 {
-	chaknpop_state *state = (chaknpop_state *)space->machine->driver_data;
+	chaknpop_state *state = space->machine->driver_data<chaknpop_state>();
 
 	if (state->gfxmode != data)
 	{
@@ -103,7 +103,7 @@ WRITE8_HANDLER( chaknpop_gfxmode_w )
 
 WRITE8_HANDLER( chaknpop_txram_w )
 {
-	chaknpop_state *state = (chaknpop_state *)space->machine->driver_data;
+	chaknpop_state *state = space->machine->driver_data<chaknpop_state>();
 
 	state->tx_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
@@ -111,7 +111,7 @@ WRITE8_HANDLER( chaknpop_txram_w )
 
 WRITE8_HANDLER( chaknpop_attrram_w )
 {
-	chaknpop_state *state = (chaknpop_state *)space->machine->driver_data;
+	chaknpop_state *state = space->machine->driver_data<chaknpop_state>();
 
 	if (state->attr_ram[offset] != data)
 	{
@@ -133,7 +133,7 @@ WRITE8_HANDLER( chaknpop_attrram_w )
 
 static TILE_GET_INFO( chaknpop_get_tx_tile_info )
 {
-	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	chaknpop_state *state = machine->driver_data<chaknpop_state>();
 	int tile = state->tx_ram[tile_index];
 	int tile_h_bank = (state->gfxmode & GFX_TX_BANK2) << 2;	/* 0x00-0xff -> 0x200-0x2ff */
 	int color = state->attr_ram[TX_COLOR2];
@@ -162,7 +162,7 @@ static STATE_POSTLOAD( chaknpop_postload )
 
 VIDEO_START( chaknpop )
 {
-	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	chaknpop_state *state = machine->driver_data<chaknpop_state>();
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	/*                          info                       offset             type             w   h  col row */
@@ -191,7 +191,7 @@ VIDEO_START( chaknpop )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	chaknpop_state *state = machine->driver_data<chaknpop_state>();
 	int offs;
 
 	/* Draw the sprites */
@@ -226,7 +226,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_bitmap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	chaknpop_state *state = machine->driver_data<chaknpop_state>();
 	int dx = state->flip_x ? -1 : 1;
 	int offs, i;
 
@@ -266,7 +266,7 @@ static void draw_bitmap( running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( chaknpop )
 {
-	chaknpop_state *state = (chaknpop_state *)screen->machine->driver_data;
+	chaknpop_state *state = screen->machine->driver_data<chaknpop_state>();
 
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

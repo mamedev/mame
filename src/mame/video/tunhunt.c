@@ -50,7 +50,7 @@
 
 WRITE8_HANDLER( tunhunt_videoram_w )
 {
-	tunhunt_state *state = (tunhunt_state *)space->machine->driver_data;
+	tunhunt_state *state = space->machine->driver_data<tunhunt_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -58,7 +58,7 @@ WRITE8_HANDLER( tunhunt_videoram_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
+	tunhunt_state *state = machine->driver_data<tunhunt_state>();
 	int attr = state->videoram[tile_index];
 	int code = attr & 0x3f;
 	int color = attr >> 6;
@@ -74,7 +74,7 @@ VIDEO_START( tunhunt )
     We keep track of dirty lines and cache the expanded bitmap.
     With max RLE expansion, bitmap size is 256x64.
     */
-	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
+	tunhunt_state *state = machine->driver_data<tunhunt_state>();
 
 	machine->generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, machine->primary_screen->format());
 
@@ -213,7 +213,7 @@ static void draw_motion_object(running_machine *machine, bitmap_t *bitmap, const
  *          always 0x00?
  */
 
-	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
+	tunhunt_state *state = machine->driver_data<tunhunt_state>();
 	bitmap_t *tmpbitmap = machine->generic.tmpbitmap;
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *tunhunt_ram = state->workram;
@@ -292,7 +292,7 @@ static void draw_box(running_machine *machine, bitmap_t *bitmap, const rectangle
         1280: 07 03 00      01  07 06 04 05 02 07 03 00     09 0a   0b 0c       palette select
         ->hue 06 02 ff      60  06 05 03 04 01 06 02 ff     d2 00   c2 ff
 */
-	tunhunt_state *state = (tunhunt_state *)machine->driver_data;
+	tunhunt_state *state = machine->driver_data<tunhunt_state>();
 	UINT8 *tunhunt_ram = state->workram;
 	int span,x,y;
 	int color;
@@ -378,7 +378,7 @@ static void draw_shell(running_machine *machine,
 
 VIDEO_UPDATE( tunhunt )
 {
-	tunhunt_state *state = (tunhunt_state *)screen->machine->driver_data;
+	tunhunt_state *state = screen->machine->driver_data<tunhunt_state>();
 	set_pens(screen->machine);
 
 	draw_box(screen->machine, bitmap, cliprect);

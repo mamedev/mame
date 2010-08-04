@@ -16,7 +16,7 @@ PALETTE_INIT( grchamp )
 {
 	static const int resistances[3] = { 100, 270, 470 };
 	double rweights[3], gweights[3], bweights[2];
-	grchamp_state *state = (grchamp_state *)machine->driver_data;
+	grchamp_state *state = machine->driver_data<grchamp_state>();
 	int i;
 
 	/* compute the color output resistor weights */
@@ -54,46 +54,46 @@ PALETTE_INIT( grchamp )
 
 WRITE8_HANDLER( grchamp_left_w )
 {
-	grchamp_state *state = (grchamp_state *)space->machine->driver_data;
+	grchamp_state *state = space->machine->driver_data<grchamp_state>();
 	state->leftram[offset] = data;
 	tilemap_mark_tile_dirty(state->left_tilemap, offset);
 }
 
 WRITE8_HANDLER( grchamp_center_w )
 {
-	grchamp_state *state = (grchamp_state *)space->machine->driver_data;
+	grchamp_state *state = space->machine->driver_data<grchamp_state>();
 	state->centerram[offset] = data;
 	tilemap_mark_tile_dirty(state->center_tilemap, offset);
 }
 
 WRITE8_HANDLER( grchamp_right_w )
 {
-	grchamp_state *state = (grchamp_state *)space->machine->driver_data;
+	grchamp_state *state = space->machine->driver_data<grchamp_state>();
 	state->rightram[offset] = data;
 	tilemap_mark_tile_dirty(state->right_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	grchamp_state *state = (grchamp_state *)machine->driver_data;
+	grchamp_state *state = machine->driver_data<grchamp_state>();
 	SET_TILE_INFO(0, state->videoram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_left_tile_info )
 {
-	grchamp_state *state = (grchamp_state *)machine->driver_data;
+	grchamp_state *state = machine->driver_data<grchamp_state>();
 	SET_TILE_INFO(1, state->leftram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_right_tile_info )
 {
-	grchamp_state *state = (grchamp_state *)machine->driver_data;
+	grchamp_state *state = machine->driver_data<grchamp_state>();
 	SET_TILE_INFO(2, state->rightram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_center_tile_info )
 {
-	grchamp_state *state = (grchamp_state *)machine->driver_data;
+	grchamp_state *state = machine->driver_data<grchamp_state>();
 	SET_TILE_INFO(3, state->centerram[tile_index], 0, 0);
 }
 
@@ -105,7 +105,7 @@ static TILEMAP_MAPPER( get_memory_offset )
 
 VIDEO_START( grchamp )
 {
-	grchamp_state *state = (grchamp_state *)machine->driver_data;
+	grchamp_state *state = machine->driver_data<grchamp_state>();
 
 	state->work_bitmap = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
 
@@ -366,7 +366,7 @@ VIDEO_UPDATE( grchamp )
 		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
-	grchamp_state *state = (grchamp_state *)screen->machine->driver_data;
+	grchamp_state *state = screen->machine->driver_data<grchamp_state>();
 	const UINT8 *amedata = memory_region(screen->machine, "gfx5");
 	const UINT8 *headdata = memory_region(screen->machine, "gfx6");
 	const UINT8 *pldata = memory_region(screen->machine, "gfx7");

@@ -17,7 +17,7 @@
 
 VIDEO_START( cloud9 )
 {
-	cloud9_state *state = (cloud9_state *)machine->driver_data;
+	cloud9_state *state = machine->driver_data<cloud9_state>();
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* allocate second bank of videoram */
@@ -54,7 +54,7 @@ VIDEO_START( cloud9 )
 
 WRITE8_HANDLER( cloud9_video_control_w )
 {
-	cloud9_state *state = (cloud9_state *)space->machine->driver_data;
+	cloud9_state *state = space->machine->driver_data<cloud9_state>();
 
 	/* only D7 matters */
 	state->video_control[offset] = (data >> 7) & 1;
@@ -70,7 +70,7 @@ WRITE8_HANDLER( cloud9_video_control_w )
 
 WRITE8_HANDLER( cloud9_paletteram_w )
 {
-	cloud9_state *state = (cloud9_state *)space->machine->driver_data;
+	cloud9_state *state = space->machine->driver_data<cloud9_state>();
 	int bit0, bit1, bit2;
 	int r, g, b;
 
@@ -111,7 +111,7 @@ WRITE8_HANDLER( cloud9_paletteram_w )
 
 INLINE void cloud9_write_vram( running_machine *machine, UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
 {
-	cloud9_state *state = (cloud9_state *)machine->driver_data;
+	cloud9_state *state = machine->driver_data<cloud9_state>();
 	UINT8 *dest = &state->videoram[0x0000 | (addr & 0x3fff)];
 	UINT8 *dest2 = &state->videoram[0x4000 | (addr & 0x3fff)];
 	UINT8 promaddr = 0;
@@ -161,7 +161,7 @@ INLINE void cloud9_write_vram( running_machine *machine, UINT16 addr, UINT8 data
 
 INLINE void bitmode_autoinc( running_machine *machine )
 {
-	cloud9_state *state = (cloud9_state *)machine->driver_data;
+	cloud9_state *state = machine->driver_data<cloud9_state>();
 
 	/* auto increment in the x-direction if it's enabled */
 	if (!state->video_control[0])	/* /AX */
@@ -196,7 +196,7 @@ WRITE8_HANDLER( cloud9_videoram_w )
 
 READ8_HANDLER( cloud9_bitmode_r )
 {
-	cloud9_state *state = (cloud9_state *)space->machine->driver_data;
+	cloud9_state *state = space->machine->driver_data<cloud9_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (state->bitmode_addr[1] << 6) | (state->bitmode_addr[0] >> 2);
@@ -214,7 +214,7 @@ READ8_HANDLER( cloud9_bitmode_r )
 
 WRITE8_HANDLER( cloud9_bitmode_w )
 {
-	cloud9_state *state = (cloud9_state *)space->machine->driver_data;
+	cloud9_state *state = space->machine->driver_data<cloud9_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (state->bitmode_addr[1] << 6) | (state->bitmode_addr[0] >> 2);
@@ -232,7 +232,7 @@ WRITE8_HANDLER( cloud9_bitmode_w )
 
 WRITE8_HANDLER( cloud9_bitmode_addr_w )
 {
-	cloud9_state *state = (cloud9_state *)space->machine->driver_data;
+	cloud9_state *state = space->machine->driver_data<cloud9_state>();
 
 	/* write through to video RAM and also to the addressing latches */
 	cloud9_write_vram(space->machine, offset, data, 0, 0);
@@ -249,7 +249,7 @@ WRITE8_HANDLER( cloud9_bitmode_addr_w )
 
 VIDEO_UPDATE( cloud9 )
 {
-	cloud9_state *state = (cloud9_state *)screen->machine->driver_data;
+	cloud9_state *state = screen->machine->driver_data<cloud9_state>();
 	UINT8 *spriteaddr = state->spriteram;
 	int flip = state->video_control[5] ? 0xff : 0x00;	/* PLAYER2 */
 	pen_t black = get_black_pen(screen->machine);

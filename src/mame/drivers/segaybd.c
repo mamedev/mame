@@ -64,7 +64,7 @@ static UINT16 pdrift_bank;
 
 static void yboard_generic_init( running_machine *machine )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	/* reset globals */
 	state->vblank_irq_state = 0;
@@ -84,7 +84,7 @@ static void yboard_generic_init( running_machine *machine )
 
 static void update_main_irqs(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	cpu_set_input_line(state->maincpu, 2, state->timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	cpu_set_input_line(state->subx, 2, state->timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -137,7 +137,7 @@ static void update_main_irqs(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
-	segas1x_state *state = (segas1x_state *)timer.machine->driver_data;
+	segas1x_state *state = timer.machine->driver_data<segas1x_state>();
 	int scanline = param;
 
 	/* on scanline 'irq2_scanline' generate an IRQ2 */
@@ -193,7 +193,7 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 
 static MACHINE_START( yboard )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->soundcpu = machine->device("soundcpu");
@@ -210,7 +210,7 @@ static MACHINE_START( yboard )
 
 static MACHINE_RESET( yboard )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	state->irq2_scanline = 170;
 
@@ -227,7 +227,7 @@ static MACHINE_RESET( yboard )
 
 static void sound_cpu_irq(running_device *device, int state)
 {
-	segas1x_state *driver = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *driver = device->machine->driver_data<segas1x_state>();
 
 	cpu_set_input_line(driver->soundcpu, 0, state);
 }
@@ -235,7 +235,7 @@ static void sound_cpu_irq(running_device *device, int state)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, param);
@@ -252,7 +252,7 @@ static WRITE16_HANDLER( sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
@@ -267,7 +267,7 @@ static READ8_HANDLER( sound_data_r )
 
 static READ16_HANDLER( io_chip_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	static const char *const portnames[] = { "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 	offset &= 0x1f/2;
 
@@ -315,7 +315,7 @@ static READ16_HANDLER( io_chip_r )
 
 static WRITE16_HANDLER( io_chip_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	UINT8 old;
 
 	/* generic implementation */
@@ -387,7 +387,7 @@ static WRITE16_HANDLER( io_chip_w )
 
 static READ16_HANDLER( analog_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	int result = 0xff;
 	if (ACCESSING_BITS_0_7)
 	{
@@ -400,7 +400,7 @@ static READ16_HANDLER( analog_r )
 
 static WRITE16_HANDLER( analog_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
 	int selected = ((offset & 3) == 3) ? (3 + (state->misc_io_data[0x08/2] & 3)) : (offset & 3);
 	int value = input_port_read_safe(space->machine, ports[selected], 0xff);

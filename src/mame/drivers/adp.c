@@ -152,12 +152,13 @@ Video board has additional chips:
 #include "machine/microtch.h"
 #include "machine/68681.h"
 
-class adp_state
+class adp_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, adp_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, adp_state(machine)); }
 
-	adp_state(running_machine &machine) { }
+	adp_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* misc */
 	UINT8 mux_data;
@@ -178,7 +179,7 @@ public:
 
 static void duart_irq_handler( running_device *device, UINT8 vector )
 {
-	adp_state *state = (adp_state *)device->machine->driver_data;
+	adp_state *state = device->machine->driver_data<adp_state>();
 	cpu_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
 };
 
@@ -192,7 +193,7 @@ static void duart_tx( running_device *device, int channel, UINT8 data )
 
 static void microtouch_tx( running_machine *machine, UINT8 data )
 {
-	adp_state *state = (adp_state *)machine->driver_data;
+	adp_state *state = machine->driver_data<adp_state>();
 	duart68681_rx_data(state->duart, 0, data);
 }
 
@@ -203,7 +204,7 @@ static UINT8 duart_input( running_device *device )
 
 static MACHINE_START( skattv )
 {
-	adp_state *state = (adp_state *)machine->driver_data;
+	adp_state *state = machine->driver_data<adp_state>();
 	microtouch_init(machine, microtouch_tx, 0);
 
 	state->maincpu = machine->device("maincpu");
@@ -241,7 +242,7 @@ static MACHINE_START( skattv )
 
 static MACHINE_RESET( skattv )
 {
-	adp_state *state = (adp_state *)machine->driver_data;
+	adp_state *state = machine->driver_data<adp_state>();
 
 	state->mux_data = 0;
 	state->register_active = 0;
@@ -291,7 +292,7 @@ static VIDEO_START(adp)
 
 static VIDEO_UPDATE( adp )
 {
-	adp_state *state = (adp_state *)screen->machine->driver_data;
+	adp_state *state = screen->machine->driver_data<adp_state>();
 	int x, y, b, src;
 
 	b = ((hd63484_regs_r(state->hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->hd63484, 0xce/2, 0xffff);
@@ -368,7 +369,7 @@ if (!input_code_pressed(screen->machine, KEYCODE_O)) // debug: toggle window
 
 static READ16_HANDLER( test_r )
 {
-	adp_state *state = (adp_state *)space->machine->driver_data;
+	adp_state *state = space->machine->driver_data<adp_state>();
 	int value = 0xffff;
 
 	switch (state->mux_data)
@@ -410,7 +411,7 @@ static READ16_HANDLER( test_r )
 /*???*/
 static WRITE16_HANDLER(wh2_w)
 {
-	adp_state *state = (adp_state *)space->machine->driver_data;
+	adp_state *state = space->machine->driver_data<adp_state>();
 	state->register_active = data;
 }
 

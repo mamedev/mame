@@ -73,7 +73,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 static WRITE8_HANDLER( pbaction_sh_command_w )
 {
-	pbaction_state *state = (pbaction_state *)space->machine->driver_data;
+	pbaction_state *state = space->machine->driver_data<pbaction_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x00);
 }
@@ -254,7 +254,7 @@ static INTERRUPT_GEN( pbaction_interrupt )
 
 static MACHINE_START( pbaction )
 {
-	pbaction_state *state = (pbaction_state *)machine->driver_data;
+	pbaction_state *state = machine->driver_data<pbaction_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -264,7 +264,7 @@ static MACHINE_START( pbaction )
 
 static MACHINE_RESET( pbaction )
 {
-	pbaction_state *state = (pbaction_state *)machine->driver_data;
+	pbaction_state *state = machine->driver_data<pbaction_state>();
 
 	state->scroll = 0;
 }
@@ -463,7 +463,7 @@ ROM_END
 
 static READ8_HANDLER( pbactio3_prot_kludge_r )
 {
-	pbaction_state *state = (pbaction_state *)space->machine->driver_data;
+	pbaction_state *state = space->machine->driver_data<pbaction_state>();
 
 	/* on startup, the game expect this location to NOT act as RAM */
 	if (cpu_get_pc(space->cpu) == 0xab80)

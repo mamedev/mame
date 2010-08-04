@@ -39,7 +39,7 @@ static INTERRUPT_GEN( fromanc2_interrupt )
 
 static WRITE16_HANDLER( fromanc2_sndcmd_w )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 
 	soundlatch_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
 	soundlatch2_w(space, offset, data & 0xff);			// 2P (RIGHT)
@@ -50,13 +50,13 @@ static WRITE16_HANDLER( fromanc2_sndcmd_w )
 
 static WRITE16_HANDLER( fromanc2_portselect_w )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->portselect = data;
 }
 
 static READ16_HANDLER( fromanc2_keymatrix_r )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	UINT16 ret;
 
 	switch (state->portselect)
@@ -75,19 +75,19 @@ static READ16_HANDLER( fromanc2_keymatrix_r )
 
 static CUSTOM_INPUT( subcpu_int_r )
 {
-	fromanc2_state *state = (fromanc2_state *)field->port->machine->driver_data;
+	fromanc2_state *state = field->port->machine->driver_data<fromanc2_state>();
 	return state->subcpu_int_flag & 0x01;
 }
 
 static CUSTOM_INPUT( sndcpu_nmi_r )
 {
-	fromanc2_state *state = (fromanc2_state *)field->port->machine->driver_data;
+	fromanc2_state *state = field->port->machine->driver_data<fromanc2_state>();
 	return state->sndcpu_nmi_flag & 0x01;
 }
 
 static CUSTOM_INPUT( subcpu_nmi_r )
 {
-	fromanc2_state *state = (fromanc2_state *)field->port->machine->driver_data;
+	fromanc2_state *state = field->port->machine->driver_data<fromanc2_state>();
 	return state->subcpu_nmi_flag & 0x01;
 }
 
@@ -114,7 +114,7 @@ static WRITE16_HANDLER( fromanc4_eeprom_w )
 
 static WRITE16_HANDLER( fromanc2_subcpu_w )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->datalatch1 = data;
 
 	cpu_set_input_line(state->subcpu, 0, HOLD_LINE);
@@ -123,7 +123,7 @@ static WRITE16_HANDLER( fromanc2_subcpu_w )
 
 static READ16_HANDLER( fromanc2_subcpu_r )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 	state->subcpu_nmi_flag = 0;
 
@@ -132,13 +132,13 @@ static READ16_HANDLER( fromanc2_subcpu_r )
 
 static READ8_HANDLER( fromanc2_maincpu_r_l )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	return state->datalatch1 & 0x00ff;
 }
 
 static READ8_HANDLER( fromanc2_maincpu_r_h )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->subcpu_int_flag = 1;
 
 	return (state->datalatch1 & 0xff00) >> 8;
@@ -146,25 +146,25 @@ static READ8_HANDLER( fromanc2_maincpu_r_h )
 
 static WRITE8_HANDLER( fromanc2_maincpu_w_l )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->datalatch_2l = data;
 }
 
 static WRITE8_HANDLER( fromanc2_maincpu_w_h )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->datalatch_2h = data;
 }
 
 static WRITE8_HANDLER( fromanc2_subcpu_nmi_clr )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->subcpu_nmi_flag = 1;
 }
 
 static READ8_HANDLER( fromanc2_sndcpu_nmi_clr )
 {
-	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->sndcpu_nmi_flag = 1;
 
 	return 0xff;
@@ -497,7 +497,7 @@ GFXDECODE_END
 
 static void irqhandler(running_device *device, int irq)
 {
-	fromanc2_state *state = (fromanc2_state *)device->machine->driver_data;
+	fromanc2_state *state = device->machine->driver_data<fromanc2_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -515,7 +515,7 @@ static const ym2610_interface ym2610_config =
 
 static MACHINE_START( fromanc4 )
 {
-	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+	fromanc2_state *state = machine->driver_data<fromanc2_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 	state->subcpu = machine->device("sub");
@@ -534,7 +534,7 @@ static MACHINE_START( fromanc4 )
 
 static MACHINE_START( fromanc2 )
 {
-	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+	fromanc2_state *state = machine->driver_data<fromanc2_state>();
 
 	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "sub"), 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, "sub") + 0x08000, 0x4000);
@@ -548,7 +548,7 @@ static MACHINE_START( fromanc2 )
 
 static MACHINE_RESET( fromanc2 )
 {
-	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+	fromanc2_state *state = machine->driver_data<fromanc2_state>();
 
 	state->portselect = 0;
 	state->datalatch1 = 0;
@@ -834,7 +834,7 @@ ROM_END
 
 static DRIVER_INIT( fromanc2 )
 {
-	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+	fromanc2_state *state = machine->driver_data<fromanc2_state>();
 	state->subcpu_nmi_flag = 1;
 	state->subcpu_int_flag = 1;
 	state->sndcpu_nmi_flag = 1;
@@ -842,7 +842,7 @@ static DRIVER_INIT( fromanc2 )
 
 static DRIVER_INIT( fromanc4 )
 {
-	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+	fromanc2_state *state = machine->driver_data<fromanc2_state>();
 	state->sndcpu_nmi_flag = 1;
 }
 

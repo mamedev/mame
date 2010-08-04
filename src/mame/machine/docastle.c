@@ -29,7 +29,7 @@ if it was a small shared buffer. The order of operations is:
 */
 READ8_HANDLER( docastle_shared0_r )
 {
-	docastle_state *state = (docastle_state *)space->machine->driver_data;
+	docastle_state *state = space->machine->driver_data<docastle_state>();
 	if (offset == 8) logerror("CPU #0 shared0r  clock = %d\n", (UINT32)state->maincpu->total_cycles());
 	return state->buffer0[offset];
 }
@@ -37,7 +37,7 @@ READ8_HANDLER( docastle_shared0_r )
 
 READ8_HANDLER( docastle_shared1_r )
 {
-	docastle_state *state = (docastle_state *)space->machine->driver_data;
+	docastle_state *state = space->machine->driver_data<docastle_state>();
 	if (offset == 8) logerror("CPU #1 shared1r  clock = %d\n", (UINT32)state->slave->total_cycles());
 	return state->buffer1[offset];
 }
@@ -45,7 +45,7 @@ READ8_HANDLER( docastle_shared1_r )
 
 WRITE8_HANDLER( docastle_shared0_w )
 {
-	docastle_state *state = (docastle_state *)space->machine->driver_data;
+	docastle_state *state = space->machine->driver_data<docastle_state>();
 	if (offset == 8) logerror("CPU #1 shared0w %02x %02x %02x %02x %02x %02x %02x %02x %02x clock = %d\n",
 		state->buffer0[0], state->buffer0[1], state->buffer0[2], state->buffer0[3],
 		state->buffer0[4], state->buffer0[5], state->buffer0[6], state->buffer0[7],
@@ -61,7 +61,7 @@ WRITE8_HANDLER( docastle_shared0_w )
 
 WRITE8_HANDLER( docastle_shared1_w )
 {
-	docastle_state *state = (docastle_state *)space->machine->driver_data;
+	docastle_state *state = space->machine->driver_data<docastle_state>();
 	state->buffer1[offset] = data;
 
 	if (offset == 8)
@@ -80,6 +80,6 @@ WRITE8_HANDLER( docastle_shared1_w )
 
 WRITE8_HANDLER( docastle_nmitrigger_w )
 {
-	docastle_state *state = (docastle_state *)space->machine->driver_data;
+	docastle_state *state = space->machine->driver_data<docastle_state>();
 	cpu_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 }

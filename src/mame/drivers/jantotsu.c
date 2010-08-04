@@ -99,12 +99,13 @@ dumped by sayu
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
 
-class jantotsu_state
+class jantotsu_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jantotsu_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jantotsu_state(machine)); }
 
-	jantotsu_state(running_machine &machine) { }
+	jantotsu_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* video-related */
 	UINT8    *bitmap;
@@ -129,7 +130,7 @@ public:
 
 static VIDEO_START(jantotsu)
 {
-	jantotsu_state *state = (jantotsu_state *)machine->driver_data;
+	jantotsu_state *state = machine->driver_data<jantotsu_state>();
 
 	state->bitmap = auto_alloc_array(machine, UINT8, 0x8000);
 	state_save_register_global_pointer(machine, state->bitmap, 0x8000);
@@ -137,7 +138,7 @@ static VIDEO_START(jantotsu)
 
 static VIDEO_UPDATE(jantotsu)
 {
-	jantotsu_state *state = (jantotsu_state *)screen->machine->driver_data;
+	jantotsu_state *state = screen->machine->driver_data<jantotsu_state>();
 	int x, y, i;
 	int count = 0;
 
@@ -174,19 +175,19 @@ static VIDEO_UPDATE(jantotsu)
 /* banked vram */
 static READ8_HANDLER( jantotsu_bitmap_r )
 {
-	jantotsu_state *state = (jantotsu_state *)space->machine->driver_data;
+	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
 	return state->bitmap[offset + ((state->vram_bank & 3) * 0x2000)];
 }
 
 static WRITE8_HANDLER( jantotsu_bitmap_w )
 {
-	jantotsu_state *state = (jantotsu_state *)space->machine->driver_data;
+	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
 	state->bitmap[offset + ((state->vram_bank & 3) * 0x2000)] = data;
 }
 
 static WRITE8_HANDLER( bankaddr_w )
 {
-	jantotsu_state *state = (jantotsu_state *)space->machine->driver_data;
+	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
 
 	state->vram_bank = ((data & 0xc0) >> 6); // top 2 bits?
 
@@ -230,7 +231,7 @@ static PALETTE_INIT( jantotsu )
 /*Multiplexer is mapped as 6-bits reads,bits 6 & 7 are always connected to the coin mechs.*/
 static READ8_HANDLER( jantotsu_mux_r )
 {
-	jantotsu_state *state = (jantotsu_state *)space->machine->driver_data;
+	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
 	UINT8 coin_port = input_port_read(space->machine, "COINS");
 
 	//  printf("%02x\n", state->mux_data);
@@ -252,7 +253,7 @@ static READ8_HANDLER( jantotsu_mux_r )
 
 static WRITE8_HANDLER( jantotsu_mux_w )
 {
-	jantotsu_state *state = (jantotsu_state *)space->machine->driver_data;
+	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
 	state->mux_data = ~data;
 }
 
@@ -267,7 +268,7 @@ static READ8_HANDLER( jantotsu_dsw2_r )
 
 static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 {
-	jantotsu_state *state = (jantotsu_state *)device->machine->driver_data;
+	jantotsu_state *state = device->machine->driver_data<jantotsu_state>();
 
 	switch (offset)
 	{
@@ -292,7 +293,7 @@ static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 
 static void jan_adpcm_int( running_device *device )
 {
-	jantotsu_state *state = (jantotsu_state *)device->machine->driver_data;
+	jantotsu_state *state = device->machine->driver_data<jantotsu_state>();
 
 	if (state->adpcm_pos >= 0x10000 || state->adpcm_idle)
 	{
@@ -477,7 +478,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( jantotsu )
 {
-	jantotsu_state *state = (jantotsu_state *)machine->driver_data;
+	jantotsu_state *state = machine->driver_data<jantotsu_state>();
 
 	state_save_register_global(machine, state->vram_bank);
 	state_save_register_global(machine, state->mux_data);
@@ -489,7 +490,7 @@ static MACHINE_START( jantotsu )
 
 static MACHINE_RESET( jantotsu )
 {
-	jantotsu_state *state = (jantotsu_state *)machine->driver_data;
+	jantotsu_state *state = machine->driver_data<jantotsu_state>();
 
 	/*Load hard-wired background color.*/
 	state->col_bank = (input_port_read(machine, "DSW2") & 0xc0) >> 3;

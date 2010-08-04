@@ -49,7 +49,7 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 		{42,43,46,47,58,59,62,63}
 	};
 
-	spbactn_state *state = (spbactn_state *)machine->driver_data;
+	spbactn_state *state = machine->driver_data<spbactn_state>();
 	int count = 0;
 	int offs;
 
@@ -108,7 +108,7 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 VIDEO_START( spbactn )
 {
-	spbactn_state *state = (spbactn_state *)machine->driver_data;
+	spbactn_state *state = machine->driver_data<spbactn_state>();
 
 	/* allocate bitmaps */
 	int width = machine->primary_screen->width();
@@ -120,7 +120,7 @@ VIDEO_START( spbactn )
 
 VIDEO_UPDATE( spbactn )
 {
-	spbactn_state *state = (spbactn_state *)screen->machine->driver_data;
+	spbactn_state *state = screen->machine->driver_data<spbactn_state>();
 	int offs, sx, sy;
 
 	bitmap_fill(state->tile_bitmap_fg, cliprect, 0);

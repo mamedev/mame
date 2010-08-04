@@ -10,7 +10,7 @@
 
 void ultraman_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
 {
-	ultraman_state *state = (ultraman_state *)machine->driver_data;
+	ultraman_state *state = machine->driver_data<ultraman_state>();
 
 	*priority = (*color & 0x80) >> 7;
 	*color = state->sprite_colorbase + ((*color & 0x7e) >> 1);
@@ -26,21 +26,21 @@ void ultraman_sprite_callback( running_machine *machine, int *code, int *color, 
 
 void ultraman_zoom_callback_0(running_machine *machine, int *code, int *color, int *flags )
 {
-	ultraman_state *state = (ultraman_state *)machine->driver_data;
+	ultraman_state *state = machine->driver_data<ultraman_state>();
 	*code |= ((*color & 0x07) << 8) | (state->bank0 << 11);
 	*color = state->zoom_colorbase[0] + ((*color & 0xf8) >> 3);
 }
 
 void ultraman_zoom_callback_1(running_machine *machine, int *code, int *color, int *flags )
 {
-	ultraman_state *state = (ultraman_state *)machine->driver_data;
+	ultraman_state *state = machine->driver_data<ultraman_state>();
 	*code |= ((*color & 0x07) << 8) | (state->bank1 << 11);
 	*color = state->zoom_colorbase[1] + ((*color & 0xf8) >> 3);
 }
 
 void ultraman_zoom_callback_2(running_machine *machine, int *code, int *color, int *flags )
 {
-	ultraman_state *state = (ultraman_state *)machine->driver_data;
+	ultraman_state *state = machine->driver_data<ultraman_state>();
 	*code |= ((*color & 0x07) << 8) | (state->bank2 << 11);
 	*color = state->zoom_colorbase[2] + ((*color & 0xf8) >> 3);
 }
@@ -55,7 +55,7 @@ void ultraman_zoom_callback_2(running_machine *machine, int *code, int *color, i
 
 VIDEO_START( ultraman )
 {
-	ultraman_state *state = (ultraman_state *)machine->driver_data;
+	ultraman_state *state = machine->driver_data<ultraman_state>();
 	state->sprite_colorbase = 192;
 	state->zoom_colorbase[0] = 0;
 	state->zoom_colorbase[1] = 64;
@@ -72,7 +72,7 @@ VIDEO_START( ultraman )
 
 WRITE16_HANDLER( ultraman_gfxctrl_w )
 {
-	ultraman_state *state = (ultraman_state *)space->machine->driver_data;
+	ultraman_state *state = space->machine->driver_data<ultraman_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -124,7 +124,7 @@ WRITE16_HANDLER( ultraman_gfxctrl_w )
 
 VIDEO_UPDATE( ultraman )
 {
-	ultraman_state *state = (ultraman_state *)screen->machine->driver_data;
+	ultraman_state *state = screen->machine->driver_data<ultraman_state>();
 
 	k051316_zoom_draw(state->k051316_3, bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(state->k051316_2, bitmap, cliprect, 0, 0);

@@ -119,7 +119,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 VIDEO_START( simpl156 )
 {
-	simpl156_state *state = (simpl156_state *)machine->driver_data;
+	simpl156_state *state = machine->driver_data<simpl156_state>();
 
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
 	state->pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
@@ -134,7 +134,7 @@ VIDEO_START( simpl156 )
 
 VIDEO_UPDATE( simpl156 )
 {
-	simpl156_state *state = (simpl156_state *)screen->machine->driver_data;
+	simpl156_state *state = screen->machine->driver_data<simpl156_state>();
 
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 

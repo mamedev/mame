@@ -40,7 +40,7 @@ static void setcolor( running_machine *machine, int color, int rgb )
 
 WRITE16_HANDLER( blockout_paletteram_w )
 {
-	blockout_state *state = (blockout_state *)space->machine->driver_data;
+	blockout_state *state = space->machine->driver_data<blockout_state>();
 
 	COMBINE_DATA(&state->paletteram[offset]);
 	setcolor(space->machine, offset, state->paletteram[offset]);
@@ -48,7 +48,7 @@ WRITE16_HANDLER( blockout_paletteram_w )
 
 WRITE16_HANDLER( blockout_frontcolor_w )
 {
-	blockout_state *state = (blockout_state *)space->machine->driver_data;
+	blockout_state *state = space->machine->driver_data<blockout_state>();
 
 	COMBINE_DATA(&state->color);
 	setcolor(space->machine, 512, state->color);
@@ -63,7 +63,7 @@ WRITE16_HANDLER( blockout_frontcolor_w )
 ***************************************************************************/
 VIDEO_START( blockout )
 {
-	blockout_state *state = (blockout_state *)machine->driver_data;
+	blockout_state *state = machine->driver_data<blockout_state>();
 
 	/* Allocate temporary bitmaps */
 	state->tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
@@ -72,7 +72,7 @@ VIDEO_START( blockout )
 
 static void update_pixels( running_machine *machine, int x, int y )
 {
-	blockout_state *state = (blockout_state *)machine->driver_data;
+	blockout_state *state = machine->driver_data<blockout_state>();
 	UINT16 front, back;
 	int color;
 	const rectangle &visarea = machine->primary_screen->visible_area();
@@ -102,7 +102,7 @@ static void update_pixels( running_machine *machine, int x, int y )
 
 WRITE16_HANDLER( blockout_videoram_w )
 {
-	blockout_state *state = (blockout_state *)space->machine->driver_data;
+	blockout_state *state = space->machine->driver_data<blockout_state>();
 
 	COMBINE_DATA(&state->videoram[offset]);
 	update_pixels(space->machine, (offset % 256) * 2, (offset / 256) % 256);
@@ -112,7 +112,7 @@ WRITE16_HANDLER( blockout_videoram_w )
 
 VIDEO_UPDATE( blockout )
 {
-	blockout_state *state = (blockout_state *)screen->machine->driver_data;
+	blockout_state *state = screen->machine->driver_data<blockout_state>();
 	int x, y;
 	pen_t color = 512;
 

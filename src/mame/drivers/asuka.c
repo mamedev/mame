@@ -232,7 +232,7 @@ DIP locations verified for:
 
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
-	asuka_state *state = (asuka_state *)machine->driver_data;
+	asuka_state *state = machine->driver_data<asuka_state>();
 	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
@@ -261,7 +261,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
 
 static void asuka_msm5205_vck( running_device *device )
 {
-	asuka_state *state = (asuka_state *)device->machine->driver_data;
+	asuka_state *state = device->machine->driver_data<asuka_state>();
 
 	if (state->adpcm_data != -1)
 	{
@@ -278,7 +278,7 @@ static void asuka_msm5205_vck( running_device *device )
 
 static WRITE8_HANDLER( asuka_msm5205_address_w )
 {
-	asuka_state *state = (asuka_state *)space->machine->driver_data;
+	asuka_state *state = space->machine->driver_data<asuka_state>();
 	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
 }
 
@@ -289,7 +289,7 @@ static WRITE8_DEVICE_HANDLER( asuka_msm5205_start_w )
 
 static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
 {
-	asuka_state *state = (asuka_state *)device->machine->driver_data;
+	asuka_state *state = device->machine->driver_data<asuka_state>();
 	msm5205_reset_w(device, 1);
 	state->adpcm_pos &= 0xff00;
 }
@@ -835,7 +835,7 @@ static const tc0110pcr_interface asuka_tc0110pcr_intf =
 
 static MACHINE_START( asuka )
 {
-	asuka_state *state = (asuka_state *)machine->driver_data;
+	asuka_state *state = machine->driver_data<asuka_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -860,7 +860,7 @@ static MACHINE_START( asuka )
 
 static MACHINE_RESET( asuka )
 {
-	asuka_state *state = (asuka_state *)machine->driver_data;
+	asuka_state *state = machine->driver_data<asuka_state>();
 
 	state->adpcm_pos = 0;
 	state->adpcm_data = -1;
@@ -876,7 +876,7 @@ static MACHINE_RESET( asuka )
 
 static VIDEO_EOF( asuka )
 {
-	asuka_state *state = (asuka_state *)machine->driver_data;
+	asuka_state *state = machine->driver_data<asuka_state>();
 	pc090oj_eof_callback(state->pc090oj);
 }
 

@@ -17,7 +17,7 @@
 
 static WRITE16_HANDLER( goal92_sound_command_w )
 {
-	goal92_state *state = (goal92_state *)space->machine->driver_data;
+	goal92_state *state = space->machine->driver_data<goal92_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
@@ -77,7 +77,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	goal92_state *state = (goal92_state *)space->machine->driver_data;
+	goal92_state *state = space->machine->driver_data<goal92_state>();
 	state->msm5205next = data;
 }
 
@@ -213,7 +213,7 @@ INPUT_PORTS_END
 static void irqhandler( running_device *device, int irq )
 {
 	/* NMI writes to MSM ports *only*! -AS */
-	//goal92_state *state = (goal92_state *)device->machine->driver_data;
+	//goal92_state *state = device->machine->driver_data<goal92_state>();
 	//cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -229,7 +229,7 @@ static const ym2203_interface ym2203_config =
 
 static void goal92_adpcm_int( running_device *device )
 {
-	goal92_state *state = (goal92_state *)device->machine->driver_data;
+	goal92_state *state = device->machine->driver_data<goal92_state>();
 	msm5205_data_w(device, state->msm5205next);
 	state->msm5205next >>= 4;
 	state->adpcm_toggle^= 1;
@@ -292,7 +292,7 @@ GFXDECODE_END
 
 static MACHINE_START( goal92 )
 {
-	goal92_state *state = (goal92_state *)machine->driver_data;
+	goal92_state *state = machine->driver_data<goal92_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
@@ -306,7 +306,7 @@ static MACHINE_START( goal92 )
 
 static MACHINE_RESET( goal92 )
 {
-	goal92_state *state = (goal92_state *)machine->driver_data;
+	goal92_state *state = machine->driver_data<goal92_state>();
 
 	state->fg_bank = 0;
 	state->msm5205next = 0;

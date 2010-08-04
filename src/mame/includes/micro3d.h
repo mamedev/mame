@@ -12,12 +12,13 @@
 #define VGB_MONITOR_DISPLAY			0
 #define DRMATH_MONITOR_DISPLAY		0
 
-class micro3d_state
+class micro3d_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, micro3d_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, micro3d_state(machine)); }
 
-	micro3d_state(running_machine &machine) { }
+	micro3d_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	struct
 	{

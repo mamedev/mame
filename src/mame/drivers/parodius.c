@@ -21,14 +21,14 @@ static KONAMI_SETLINES_CALLBACK( parodius_banking );
 
 static INTERRUPT_GEN( parodius_interrupt )
 {
-	parodius_state *state = (parodius_state *)device->machine->driver_data;
+	parodius_state *state = device->machine->driver_data<parodius_state>();
 	if (k052109_is_irq_enabled(state->k052109))
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
 {
-	parodius_state *state = (parodius_state *)space->machine->driver_data;
+	parodius_state *state = space->machine->driver_data<parodius_state>();
 
 	if (state->videobank & 0x01)
 	{
@@ -43,7 +43,7 @@ static READ8_HANDLER( bankedram_r )
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	parodius_state *state = (parodius_state *)space->machine->driver_data;
+	parodius_state *state = space->machine->driver_data<parodius_state>();
 
 	if (state->videobank & 0x01)
 	{
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static READ8_HANDLER( parodius_052109_053245_r )
 {
-	parodius_state *state = (parodius_state *)space->machine->driver_data;
+	parodius_state *state = space->machine->driver_data<parodius_state>();
 
 	if (state->videobank & 0x02)
 		return k053245_r(state->k053245, offset);
@@ -68,7 +68,7 @@ static READ8_HANDLER( parodius_052109_053245_r )
 
 static WRITE8_HANDLER( parodius_052109_053245_w )
 {
-	parodius_state *state = (parodius_state *)space->machine->driver_data;
+	parodius_state *state = space->machine->driver_data<parodius_state>();
 
 	if (state->videobank & 0x02)
 		k053245_w(state->k053245, offset, data);
@@ -78,7 +78,7 @@ static WRITE8_HANDLER( parodius_052109_053245_w )
 
 static WRITE8_HANDLER( parodius_videobank_w )
 {
-	parodius_state *state = (parodius_state *)space->machine->driver_data;
+	parodius_state *state = space->machine->driver_data<parodius_state>();
 
 	if (state->videobank & 0xf8)
 		logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
@@ -91,7 +91,7 @@ static WRITE8_HANDLER( parodius_videobank_w )
 
 static WRITE8_HANDLER( parodius_3fc0_w )
 {
-	parodius_state *state = (parodius_state *)space->machine->driver_data;
+	parodius_state *state = space->machine->driver_data<parodius_state>();
 
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
@@ -113,7 +113,7 @@ static READ8_DEVICE_HANDLER( parodius_sound_r )
 
 static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
 {
-	parodius_state *state = (parodius_state *)space->machine->driver_data;
+	parodius_state *state = space->machine->driver_data<parodius_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -121,7 +121,7 @@ static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
 
 static void sound_nmi_callback( running_machine *machine, int param )
 {
-	parodius_state *state = (parodius_state *)machine->driver_data;
+	parodius_state *state = machine->driver_data<parodius_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ( state->nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	nmi_enabled = 0;
@@ -130,13 +130,13 @@ static void sound_nmi_callback( running_machine *machine, int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	parodius_state *state = (parodius_state *)machine->driver_data;
+	parodius_state *state = machine->driver_data<parodius_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	parodius_state *state = (parodius_state *)space->machine->driver_data;
+	parodius_state *state = space->machine->driver_data<parodius_state>();
 
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
@@ -257,7 +257,7 @@ static const k05324x_interface parodius_k05324x_intf =
 
 static MACHINE_START( parodius )
 {
-	parodius_state *state = (parodius_state *)machine->driver_data;
+	parodius_state *state = machine->driver_data<parodius_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 14, &ROM[0x10000], 0x4000);
@@ -282,7 +282,7 @@ static MACHINE_START( parodius )
 
 static MACHINE_RESET( parodius )
 {
-	parodius_state *state = (parodius_state *)machine->driver_data;
+	parodius_state *state = machine->driver_data<parodius_state>();
 	int i;
 
 	konami_configure_set_lines(machine->device("maincpu"), parodius_banking);

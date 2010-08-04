@@ -47,14 +47,14 @@ The driver has been updated accordingly.
 
 static WRITE8_HANDLER( matmania_sh_command_w )
 {
-	matmania_state *state = (matmania_state *)space->machine->driver_data;
+	matmania_state *state = space->machine->driver_data<matmania_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( maniach_sh_command_w )
 {
-	matmania_state *state = (matmania_state *)space->machine->driver_data;
+	matmania_state *state = space->machine->driver_data<matmania_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
@@ -301,7 +301,7 @@ GFXDECODE_END
 
 static MACHINE_START( matmania )
 {
-	matmania_state *state = (matmania_state *)machine->driver_data;
+	matmania_state *state = machine->driver_data<matmania_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -359,7 +359,7 @@ MACHINE_DRIVER_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_device *device, int linestate)
 {
-	matmania_state *state = (matmania_state *)device->machine->driver_data;
+	matmania_state *state = device->machine->driver_data<matmania_state>();
 	cpu_set_input_line(state->audiocpu, 1, linestate);
 }
 
@@ -371,7 +371,7 @@ static const ym3526_interface ym3526_config =
 
 static MACHINE_START( maniach )
 {
-	matmania_state *state = (matmania_state *)machine->driver_data;
+	matmania_state *state = machine->driver_data<matmania_state>();
 
 	MACHINE_START_CALL(matmania);
 
@@ -392,7 +392,7 @@ static MACHINE_START( maniach )
 
 static MACHINE_RESET( maniach )
 {
-	matmania_state *state = (matmania_state *)machine->driver_data;
+	matmania_state *state = machine->driver_data<matmania_state>();
 
 	state->port_a_in = 0;
 	state->port_a_out = 0;

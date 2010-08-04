@@ -171,7 +171,7 @@ Language
 
 static void appoooh_adpcm_int(running_device *device)
 {
-	appoooh_state *state = (appoooh_state *)device->machine->driver_data;
+	appoooh_state *state = device->machine->driver_data<appoooh_state>();
 
 	if (state->adpcm_address != 0xffffffff)
 	{
@@ -199,7 +199,7 @@ static void appoooh_adpcm_int(running_device *device)
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
-	appoooh_state *state = (appoooh_state *)space->machine->driver_data;
+	appoooh_state *state = space->machine->driver_data<appoooh_state>();
 
 	state->adpcm_address = data << 8;
 	msm5205_reset_w(state->adpcm, 0);
@@ -402,7 +402,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( appoooh )
 {
-	appoooh_state *state = (appoooh_state *)machine->driver_data;
+	appoooh_state *state = machine->driver_data<appoooh_state>();
 
 	state->adpcm = machine->device("msm");
 
@@ -413,7 +413,7 @@ static MACHINE_START( appoooh )
 
 static MACHINE_RESET( appoooh )
 {
-	appoooh_state *state = (appoooh_state *)machine->driver_data;
+	appoooh_state *state = machine->driver_data<appoooh_state>();
 
 	state->adpcm_address = 0xffffffff;
 	state->adpcm_data = 0;

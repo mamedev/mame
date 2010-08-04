@@ -17,13 +17,14 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-class mosaicf2_state
+class mosaicf2_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mosaicf2_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mosaicf2_state(machine)); }
 
 	mosaicf2_state(running_machine &machine)
-		: maincpu(machine.device<cpu_device>("maincpu")) { }
+		: driver_data_t(machine),
+		  maincpu(machine.device<cpu_device>("maincpu")) { }
 
 	/* memory pointers */
 	cpu_device *	maincpu;
@@ -33,7 +34,7 @@ public:
 
 static VIDEO_UPDATE( mosaicf2 )
 {
-	mosaicf2_state *state = (mosaicf2_state *)screen->machine->driver_data;
+	mosaicf2_state *state = screen->machine->driver_data<mosaicf2_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x10000; offs++)
@@ -63,7 +64,7 @@ ADDRESS_MAP_END
 static READ32_HANDLER( f32_input_port_1_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	mosaicf2_state *state = (mosaicf2_state *)space->machine->driver_data;
+	mosaicf2_state *state = space->machine->driver_data<mosaicf2_state>();
 	offs_t pc = state->maincpu->pc();
 	if ((pc == 0x000379de) || (pc == 0x000379cc) )
 		state->maincpu->eat_cycles(100);

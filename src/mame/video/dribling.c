@@ -44,7 +44,7 @@ PALETTE_INIT( dribling )
 
 WRITE8_HANDLER( dribling_colorram_w )
 {
-	dribling_state *state = (dribling_state *)space->machine->driver_data;
+	dribling_state *state = space->machine->driver_data<dribling_state>();
 
 	/* it is very important that we mask off the two bits here */
 	state->colorram[offset & 0x1f9f] = data;
@@ -60,7 +60,7 @@ WRITE8_HANDLER( dribling_colorram_w )
 
 VIDEO_UPDATE( dribling )
 {
-	dribling_state *state = (dribling_state *)screen->machine->driver_data;
+	dribling_state *state = screen->machine->driver_data<dribling_state>();
 	UINT8 *prombase = memory_region(screen->machine, "proms");
 	UINT8 *gfxbase = memory_region(screen->machine, "gfx1");
 	int x, y;

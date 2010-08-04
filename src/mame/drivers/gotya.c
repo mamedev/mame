@@ -176,7 +176,7 @@ static const samples_interface gotya_samples_interface =
 
 static MACHINE_START( gotya )
 {
-	gotya_state *state = (gotya_state *)machine->driver_data;
+	gotya_state *state = machine->driver_data<gotya_state>();
 
 	state->samples = machine->device("samples");
 
@@ -186,7 +186,7 @@ static MACHINE_START( gotya )
 
 static MACHINE_RESET( gotya )
 {
-	gotya_state *state = (gotya_state *)machine->driver_data;
+	gotya_state *state = machine->driver_data<gotya_state>();
 
 	state->scroll_bit_8 = 0;
 	state->theme_playing = 0;

@@ -24,7 +24,7 @@ OKI M6295 sound ROM dump is bad.
 
 static VIDEO_UPDATE( missb2 )
 {
-	bublbobl_state *state = (bublbobl_state *)screen->machine->driver_data;
+	bublbobl_state *state = screen->machine->driver_data<bublbobl_state>();
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
@@ -125,7 +125,7 @@ INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( running_machine *machine, pen_t col
 
 static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 {
-	bublbobl_state *state = (bublbobl_state *)space->machine->driver_data;
+	bublbobl_state *state = space->machine->driver_data<bublbobl_state>();
 	state->bg_paletteram[offset] = data;
 	bg_changecolor_RRRRGGGGBBBBxxxx(space->machine, offset / 2, state->bg_paletteram[offset | 1] | (state->bg_paletteram[offset & ~1] << 8));
 }
@@ -357,7 +357,7 @@ static INTERRUPT_GEN( missb2_interrupt )
 
 static MACHINE_START( missb2 )
 {
-	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+	bublbobl_state *state = machine->driver_data<bublbobl_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -372,7 +372,7 @@ static MACHINE_START( missb2 )
 
 static MACHINE_RESET( missb2 )
 {
-	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+	bublbobl_state *state = machine->driver_data<bublbobl_state>();
 
 	state->sound_nmi_enable = 0;
 	state->pending_nmi = 0;
@@ -476,7 +476,7 @@ static void configure_banks( running_machine* machine )
 
 static DRIVER_INIT( missb2 )
 {
-	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+	bublbobl_state *state = machine->driver_data<bublbobl_state>();
 
 	configure_banks(machine);
 	state->video_enable = 0;

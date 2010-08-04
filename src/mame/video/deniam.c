@@ -4,7 +4,7 @@
 
 static void deniam_common_init( running_machine *machine )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 	int i;
 
 	state->bg_scrollx_reg = 0x00a4/2;
@@ -26,7 +26,7 @@ static void deniam_common_init( running_machine *machine )
 
 DRIVER_INIT( logicpro )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 
 	deniam_common_init(machine);
 
@@ -38,7 +38,7 @@ DRIVER_INIT( logicpro )
 
 DRIVER_INIT( karianx )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 
 	deniam_common_init(machine);
 
@@ -64,7 +64,7 @@ static TILEMAP_MAPPER( scan_pages )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 	int page = tile_index >> 11;
 	UINT16 attr = state->videoram[state->bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
 	SET_TILE_INFO(
@@ -76,7 +76,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 	int page = tile_index >> 11;
 	UINT16 attr = state->videoram[state->fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
 	SET_TILE_INFO(
@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 	UINT16 attr = state->textram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -107,7 +107,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( deniam )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, scan_pages, 8, 8, 128, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, scan_pages, 8, 8, 128, 64);
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -126,7 +126,7 @@ VIDEO_START( deniam )
 
 WRITE16_HANDLER( deniam_videoram_w )
 {
-	deniam_state *state = (deniam_state *)space->machine->driver_data;
+	deniam_state *state = space->machine->driver_data<deniam_state>();
 	int page, i;
 	COMBINE_DATA(&state->videoram[offset]);
 
@@ -143,7 +143,7 @@ WRITE16_HANDLER( deniam_videoram_w )
 
 WRITE16_HANDLER( deniam_textram_w )
 {
-	deniam_state *state = (deniam_state *)space->machine->driver_data;
+	deniam_state *state = space->machine->driver_data<deniam_state>();
 	COMBINE_DATA(&state->textram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
@@ -151,7 +151,7 @@ WRITE16_HANDLER( deniam_textram_w )
 
 WRITE16_HANDLER( deniam_palette_w )
 {
-	deniam_state *state = (deniam_state *)space->machine->driver_data;
+	deniam_state *state = space->machine->driver_data<deniam_state>();
 	int r, g, b;
 
 	data = COMBINE_DATA(&state->paletteram[offset]);
@@ -164,13 +164,13 @@ WRITE16_HANDLER( deniam_palette_w )
 
 READ16_HANDLER( deniam_coinctrl_r )
 {
-	deniam_state *state = (deniam_state *)space->machine->driver_data;
+	deniam_state *state = space->machine->driver_data<deniam_state>();
 	return state->coinctrl;
 }
 
 WRITE16_HANDLER( deniam_coinctrl_w )
 {
-	deniam_state *state = (deniam_state *)space->machine->driver_data;
+	deniam_state *state = space->machine->driver_data<deniam_state>();
 	COMBINE_DATA(&state->coinctrl);
 
 	/* bit 0 is coin counter */
@@ -216,7 +216,7 @@ WRITE16_HANDLER( deniam_coinctrl_w )
  */
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 	int offs;
 	UINT8 *gfx = memory_region(machine, "gfx2");
 
@@ -353,7 +353,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void set_bg_page( running_machine *machine, int page, int value )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 	int tile_index;
 
 	if (state->bg_page[page] != value)
@@ -366,7 +366,7 @@ static void set_bg_page( running_machine *machine, int page, int value )
 
 static void set_fg_page( running_machine *machine, int page, int value )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 	int tile_index;
 
 	if (state->fg_page[page] != value)
@@ -379,7 +379,7 @@ static void set_fg_page( running_machine *machine, int page, int value )
 
 VIDEO_UPDATE( deniam )
 {
-	deniam_state *state = (deniam_state *)screen->machine->driver_data;
+	deniam_state *state = screen->machine->driver_data<deniam_state>();
 	int bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly;
 	int page;
 

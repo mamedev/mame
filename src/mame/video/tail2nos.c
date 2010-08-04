@@ -13,7 +13,7 @@
 
 static TILE_GET_INFO( get_tile_info )
 {
-	tail2nos_state *state = (tail2nos_state *)machine->driver_data;
+	tail2nos_state *state = machine->driver_data<tail2nos_state>();
 	UINT16 code = state->bgvideoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -43,7 +43,7 @@ void tail2nos_zoom_callback( running_machine *machine, int *code, int *color, in
 
 static STATE_POSTLOAD( tail2nos_postload )
 {
-	tail2nos_state *state = (tail2nos_state *)machine->driver_data;
+	tail2nos_state *state = machine->driver_data<tail2nos_state>();
 	int i;
 
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
@@ -56,7 +56,7 @@ static STATE_POSTLOAD( tail2nos_postload )
 
 VIDEO_START( tail2nos )
 {
-	tail2nos_state *state = (tail2nos_state *)machine->driver_data;
+	tail2nos_state *state = machine->driver_data<tail2nos_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
@@ -78,7 +78,7 @@ VIDEO_START( tail2nos )
 
 WRITE16_HANDLER( tail2nos_bgvideoram_w )
 {
-	tail2nos_state *state = (tail2nos_state *)space->machine->driver_data;
+	tail2nos_state *state = space->machine->driver_data<tail2nos_state>();
 
 	COMBINE_DATA(&state->bgvideoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -86,13 +86,13 @@ WRITE16_HANDLER( tail2nos_bgvideoram_w )
 
 READ16_HANDLER( tail2nos_zoomdata_r )
 {
-	tail2nos_state *state = (tail2nos_state *)space->machine->driver_data;
+	tail2nos_state *state = space->machine->driver_data<tail2nos_state>();
 	return state->zoomdata[offset];
 }
 
 WRITE16_HANDLER( tail2nos_zoomdata_w )
 {
-	tail2nos_state *state = (tail2nos_state *)space->machine->driver_data;
+	tail2nos_state *state = space->machine->driver_data<tail2nos_state>();
 	int oldword = state->zoomdata[offset];
 
 	COMBINE_DATA(&state->zoomdata[offset]);
@@ -102,7 +102,7 @@ WRITE16_HANDLER( tail2nos_zoomdata_w )
 
 WRITE16_HANDLER( tail2nos_gfxbank_w )
 {
-	tail2nos_state *state = (tail2nos_state *)space->machine->driver_data;
+	tail2nos_state *state = space->machine->driver_data<tail2nos_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -148,7 +148,7 @@ WRITE16_HANDLER( tail2nos_gfxbank_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	tail2nos_state *state = (tail2nos_state *)machine->driver_data;
+	tail2nos_state *state = machine->driver_data<tail2nos_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -179,7 +179,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( tail2nos )
 {
-	tail2nos_state *state = (tail2nos_state *)screen->machine->driver_data;
+	tail2nos_state *state = screen->machine->driver_data<tail2nos_state>();
 
 	if (state->video_enable)
 	{

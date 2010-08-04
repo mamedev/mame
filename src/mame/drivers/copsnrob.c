@@ -82,13 +82,13 @@ static PALETTE_INIT( copsnrob )
 
 static READ8_HANDLER( copsnrob_misc_r )
 {
-	copsnrob_state *state = (copsnrob_state *)space->machine->driver_data;
+	copsnrob_state *state = space->machine->driver_data<copsnrob_state>();
 	return state->misc | (input_port_read(space->machine, "IN0") & 0x80);
 }
 
 static WRITE8_HANDLER( copsnrob_misc_w )
 {
-	copsnrob_state *state = (copsnrob_state *)space->machine->driver_data;
+	copsnrob_state *state = space->machine->driver_data<copsnrob_state>();
 	state->misc = data & 0x7f;
 	set_led_status(space->machine, 1, ~data & 0x40);
 }
@@ -258,14 +258,14 @@ GFXDECODE_END
 
 static MACHINE_START( copsnrob )
 {
-	copsnrob_state *state = (copsnrob_state *)machine->driver_data;
+	copsnrob_state *state = machine->driver_data<copsnrob_state>();
 
 	state_save_register_global(machine, state->misc);
 }
 
 static MACHINE_RESET( copsnrob )
 {
-	copsnrob_state *state = (copsnrob_state *)machine->driver_data;
+	copsnrob_state *state = machine->driver_data<copsnrob_state>();
 
 	state->misc = 0;
 }

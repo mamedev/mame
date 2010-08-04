@@ -35,21 +35,21 @@ PALETTE_INIT( compgolf )
 
 WRITE8_HANDLER( compgolf_video_w )
 {
-	compgolf_state *state = (compgolf_state *)space->machine->driver_data;
+	compgolf_state *state = space->machine->driver_data<compgolf_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->text_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( compgolf_back_w )
 {
-	compgolf_state *state = (compgolf_state *)space->machine->driver_data;
+	compgolf_state *state = space->machine->driver_data<compgolf_state>();
 	state->bg_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_text_info )
 {
-	compgolf_state *state = (compgolf_state *)machine->driver_data;
+	compgolf_state *state = machine->driver_data<compgolf_state>();
 	tile_index <<= 1;
 	SET_TILE_INFO(2, state->videoram[tile_index + 1] | (state->videoram[tile_index] << 8), state->videoram[tile_index] >> 2, 0);
 }
@@ -62,7 +62,7 @@ static TILEMAP_MAPPER( back_scan )
 
 static TILE_GET_INFO( get_back_info )
 {
-	compgolf_state *state = (compgolf_state *)machine->driver_data;
+	compgolf_state *state = machine->driver_data<compgolf_state>();
 	int attr = state->bg_ram[tile_index * 2];
 	int code = state->bg_ram[tile_index * 2 + 1] + ((attr & 1) << 8);
 	int color = (attr & 0x3e) >> 1;
@@ -72,7 +72,7 @@ static TILE_GET_INFO( get_back_info )
 
 VIDEO_START( compgolf )
 {
-	compgolf_state *state = (compgolf_state *)machine->driver_data;
+	compgolf_state *state = machine->driver_data<compgolf_state>();
 	state->bg_tilemap = tilemap_create(machine, get_back_info, back_scan, 16, 16, 32, 32);
 	state->text_tilemap = tilemap_create(machine, get_text_info, tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -92,7 +92,7 @@ xx------ xxxxxxxx -------- -------- sprite code
 */
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	compgolf_state *state = (compgolf_state *)machine->driver_data;
+	compgolf_state *state = machine->driver_data<compgolf_state>();
 	int offs, fx, fy, x, y, color, sprite;
 
 	for (offs = 0; offs < 0x60; offs += 4)
@@ -120,7 +120,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( compgolf )
 {
-	compgolf_state *state = (compgolf_state *)screen->machine->driver_data;
+	compgolf_state *state = screen->machine->driver_data<compgolf_state>();
 	int scrollx = state->scrollx_hi + state->scrollx_lo;
 	int scrolly = state->scrolly_hi + state->scrolly_lo;
 

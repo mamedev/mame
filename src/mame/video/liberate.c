@@ -39,7 +39,7 @@ static TILEMAP_MAPPER( fix_scan )
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	const UINT8 *RAM = memory_region(machine, "user1");
 	int tile, bank;
 
@@ -69,7 +69,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_fix_tile_info )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *colorram = state->colorram;
 	int tile, color;
@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_fix_tile_info )
 
 static TILE_GET_INFO( prosport_get_back_tile_info )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	int tile;
 
 	/*
@@ -104,7 +104,7 @@ static TILE_GET_INFO( prosport_get_back_tile_info )
 
 WRITE8_HANDLER( deco16_io_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
 		tilemap_mark_all_tiles_dirty(state->back_tilemap);
@@ -135,7 +135,7 @@ WRITE8_HANDLER( deco16_io_w )
 
 WRITE8_HANDLER( prosoccr_io_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
 		tilemap_mark_all_tiles_dirty(state->back_tilemap);
@@ -165,7 +165,7 @@ WRITE8_HANDLER( prosoccr_io_w )
 /* completely different i/o...*/
 WRITE8_HANDLER( prosport_io_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->io_ram[offset] = data;
 
 	switch (offset)
@@ -187,21 +187,21 @@ WRITE8_HANDLER( prosport_io_w )
 
 WRITE8_HANDLER( liberate_videoram_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fix_tilemap, offset);
 }
 
 WRITE8_HANDLER( liberate_colorram_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fix_tilemap, offset);
 }
 
 WRITE8_HANDLER( prosport_bg_vram_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->bg_vram[offset] = data;
 	tilemap_mark_tile_dirty(state->back_tilemap, offset);
 }
@@ -210,7 +210,7 @@ WRITE8_HANDLER( prosport_bg_vram_w )
 
 VIDEO_START( prosoccr )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	state->back_tilemap = tilemap_create(machine, get_back_tile_info, back_scan, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, fix_scan, 8, 8, 32, 32);
 
@@ -221,7 +221,7 @@ VIDEO_START( prosoccr )
 
 VIDEO_START( boomrang )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	state->back_tilemap = tilemap_create(machine, get_back_tile_info, back_scan, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, fix_scan, 8, 8, 32, 32);
 
@@ -231,7 +231,7 @@ VIDEO_START( boomrang )
 
 VIDEO_START( liberate )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	state->back_tilemap = tilemap_create(machine, get_back_tile_info, back_scan, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, fix_scan, 8, 8, 32, 32);
 
@@ -240,7 +240,7 @@ VIDEO_START( liberate )
 
 VIDEO_START( prosport )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	state->back_tilemap = tilemap_create(machine, prosport_get_back_tile_info, back_scan, 16, 16, 32, 32);
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, fix_scan, 8, 8, 32, 32);
 
@@ -251,7 +251,7 @@ VIDEO_START( prosport )
 
 WRITE8_HANDLER( prosport_paletteram_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->paletteram[offset] = data;
 
 	/* RGB output is inverted */
@@ -292,7 +292,7 @@ PALETTE_INIT( liberate )
 
 static void liberate_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -361,7 +361,7 @@ static void liberate_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void prosport_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color, gfx_region;
 	UINT8 *spriteram = state->spriteram;
 
@@ -426,7 +426,7 @@ static void prosport_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void boomrang_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color;
 
@@ -487,7 +487,7 @@ static void boomrang_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void prosoccr_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs, code, fx, fy, sx, sy;
 
@@ -514,7 +514,7 @@ static void prosoccr_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 VIDEO_UPDATE( prosoccr )
 {
-	liberate_state *state = (liberate_state *)screen->machine->driver_data;
+	liberate_state *state = screen->machine->driver_data<liberate_state>();
 	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);
 	tilemap_set_scrollx(state->back_tilemap, 0, -state->io_ram[0]);
 
@@ -531,7 +531,7 @@ VIDEO_UPDATE( prosoccr )
 
 VIDEO_UPDATE( prosport )
 {
-	liberate_state *state = (liberate_state *)screen->machine->driver_data;
+	liberate_state *state = screen->machine->driver_data<liberate_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *colorram = state->colorram;
 	int mx, my, tile, offs, gfx_region;
@@ -575,7 +575,7 @@ VIDEO_UPDATE( prosport )
 
 VIDEO_UPDATE( boomrang )
 {
-	liberate_state *state = (liberate_state *)screen->machine->driver_data;
+	liberate_state *state = screen->machine->driver_data<liberate_state>();
 	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);
 	tilemap_set_scrollx(state->back_tilemap, 0, -state->io_ram[0]);
 
@@ -595,7 +595,7 @@ VIDEO_UPDATE( boomrang )
 
 VIDEO_UPDATE( liberate )
 {
-	liberate_state *state = (liberate_state *)screen->machine->driver_data;
+	liberate_state *state = screen->machine->driver_data<liberate_state>();
 	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);
 	tilemap_set_scrollx(state->back_tilemap, 0, -state->io_ram[0]);
 

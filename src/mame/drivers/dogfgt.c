@@ -16,20 +16,20 @@ driver by Nicola Salmoria
 
 static READ8_HANDLER( sharedram_r )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( sharedram_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 	state->sharedram[offset] = data;
 }
 
 
 static WRITE8_HANDLER( subirqtrigger_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 	/* bit 0 used but unknown */
 	if (data & 0x04)
 		cpu_set_input_line(state->subcpu, 0, ASSERT_LINE);
@@ -37,19 +37,19 @@ static WRITE8_HANDLER( subirqtrigger_w )
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 	cpu_set_input_line(state->subcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dogfgt_soundlatch_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 	state->soundlatch = data;
 }
 
 static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 
 	/* bit 5 goes to 8910 #0 BDIR pin  */
 	if ((state->last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
@@ -215,7 +215,7 @@ GFXDECODE_END
 
 static MACHINE_START( dogfgt )
 {
-	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+	dogfgt_state *state = machine->driver_data<dogfgt_state>();
 
 	state->subcpu = machine->device("sub");
 
@@ -231,7 +231,7 @@ static MACHINE_START( dogfgt )
 
 static MACHINE_RESET( dogfgt )
 {
-	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+	dogfgt_state *state = machine->driver_data<dogfgt_state>();
 	int i;
 
 	state->bm_plane = 0;

@@ -202,7 +202,7 @@ GFXDECODE_END
 
 static MACHINE_START( scregg )
 {
-	btime_state *state = (btime_state *)machine->driver_data;
+	btime_state *state = machine->driver_data<btime_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = NULL;
@@ -215,7 +215,7 @@ static MACHINE_START( scregg )
 
 static MACHINE_RESET( scregg )
 {
-	btime_state *state = (btime_state *)machine->driver_data;
+	btime_state *state = machine->driver_data<btime_state>();
 
 	state->btime_palette = 0;
 	state->bnj_scroll1 = 0;

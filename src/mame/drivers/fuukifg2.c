@@ -53,7 +53,7 @@ To Do:
 
 static WRITE16_HANDLER( fuuki16_vregs_w )
 {
-	fuuki16_state *state = (fuuki16_state *)space->machine->driver_data;
+	fuuki16_state *state = space->machine->driver_data<fuuki16_state>();
 	UINT16 old_data = state->vregs[offset];
 	UINT16 new_data = COMBINE_DATA(&state->vregs[offset]);
 	if ((offset == 0x1c/2) && old_data != new_data)
@@ -66,7 +66,7 @@ static WRITE16_HANDLER( fuuki16_vregs_w )
 
 static WRITE16_HANDLER( fuuki16_sound_command_w )
 {
-	fuuki16_state *state = (fuuki16_state *)space->machine->driver_data;
+	fuuki16_state *state = space->machine->driver_data<fuuki16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
@@ -376,7 +376,7 @@ GFXDECODE_END
 
 static void soundirq( running_device *device, int state )
 {
-	fuuki16_state *fuuki16 = (fuuki16_state *)device->machine->driver_data;
+	fuuki16_state *fuuki16 = device->machine->driver_data<fuuki16_state>();
 	cpu_set_input_line(fuuki16->audiocpu, 0, state);
 }
 
@@ -399,7 +399,7 @@ static const ym3812_interface fuuki16_ym3812_intf =
 
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
-	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
 	timer_set(machine, machine->primary_screen->time_until_pos(248), NULL, 0, level_1_interrupt_callback);
 }
@@ -407,7 +407,7 @@ static TIMER_CALLBACK( level_1_interrupt_callback )
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
 	timer_set(machine, machine->primary_screen->time_until_vblank_start(), NULL, 0, vblank_interrupt_callback);
 }
@@ -415,7 +415,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
-	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	timer_adjust_oneshot(state->raster_interrupt_timer, machine->primary_screen->frame_period(), 0);
@@ -424,7 +424,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 
 static MACHINE_START( fuuki16 )
 {
-	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x8000);
@@ -438,7 +438,7 @@ static MACHINE_START( fuuki16 )
 
 static MACHINE_RESET( fuuki16 )
 {
-	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	timer_set(machine, machine->primary_screen->time_until_pos(248), NULL, 0, level_1_interrupt_callback);

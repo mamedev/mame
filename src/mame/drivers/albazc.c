@@ -14,12 +14,13 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-class albazc_state
+class albazc_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, albazc_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, albazc_state(machine)); }
 
-	albazc_state(running_machine &machine) { }
+	albazc_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* video-related */
 	UINT8 *  spriteram1;
@@ -54,7 +55,7 @@ static VIDEO_START( hanaroku )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	albazc_state *state = (albazc_state *)machine->driver_data;
+	albazc_state *state = machine->driver_data<albazc_state>();
 	int i;
 
 	for (i = 511; i >= 0; i--)
@@ -130,7 +131,7 @@ static WRITE8_HANDLER( hanaroku_out_2_w )
 
 static WRITE8_HANDLER( albazc_vregs_w )
 {
-	albazc_state *state = (albazc_state *)space->machine->driver_data;
+	albazc_state *state = space->machine->driver_data<albazc_state>();
 
 	#ifdef UNUSED_FUNCTION
 	{

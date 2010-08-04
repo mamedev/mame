@@ -48,7 +48,7 @@ behavior we use .
 
 static WRITE16_HANDLER( mugsmash_reg2_w )
 {
-	mugsmash_state *state = (mugsmash_state *)space->machine->driver_data;
+	mugsmash_state *state = space->machine->driver_data<mugsmash_state>();
 
 	state->regs2[offset] = data;
 	//popmessage ("Regs2 %04x, %04x, %04x, %04x", state->regs2[0], state->regs2[1], state->regs2[2], state->regs2[3]);
@@ -391,7 +391,7 @@ GFXDECODE_END
 
 static void irq_handler(running_device *device, int irq)
 {
-	mugsmash_state *state = (mugsmash_state *)device->machine->driver_data;
+	mugsmash_state *state = device->machine->driver_data<mugsmash_state>();
 	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
@@ -402,7 +402,7 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_START( mugsmash )
 {
-	mugsmash_state *state = (mugsmash_state *)machine->driver_data;
+	mugsmash_state *state = machine->driver_data<mugsmash_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");

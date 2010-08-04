@@ -33,7 +33,7 @@ Notes:
 
 static INTERRUPT_GEN( mainevt_interrupt )
 {
-	mainevt_state *state = (mainevt_state *)device->machine->driver_data;
+	mainevt_state *state = device->machine->driver_data<mainevt_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		irq0_line_hold(device);
@@ -41,13 +41,13 @@ static INTERRUPT_GEN( mainevt_interrupt )
 
 static WRITE8_HANDLER( dv_nmienable_w )
 {
-	mainevt_state *state = (mainevt_state *)space->machine->driver_data;
+	mainevt_state *state = space->machine->driver_data<mainevt_state>();
 	state->nmi_enable = data;
 }
 
 static INTERRUPT_GEN( dv_interrupt )
 {
-	mainevt_state *state = (mainevt_state *)device->machine->driver_data;
+	mainevt_state *state = device->machine->driver_data<mainevt_state>();
 
 	if (state->nmi_enable)
 		nmi_line_pulse(device);
@@ -56,7 +56,7 @@ static INTERRUPT_GEN( dv_interrupt )
 
 static WRITE8_HANDLER( mainevt_bankswitch_w )
 {
-	mainevt_state *state = (mainevt_state *)space->machine->driver_data;
+	mainevt_state *state = space->machine->driver_data<mainevt_state>();
 
 	/* bit 0-1 ROM bank select */
 	memory_set_bank(space->machine, "bank1", data & 0x03);
@@ -84,7 +84,7 @@ static WRITE8_HANDLER( mainevt_coin_w )
 
 static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
 {
-	mainevt_state *state = (mainevt_state *)space->machine->driver_data;
+	mainevt_state *state = space->machine->driver_data<mainevt_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -95,7 +95,7 @@ static READ8_DEVICE_HANDLER( mainevt_sh_busy_r )
 
 static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
 {
-	mainevt_state *state = (mainevt_state *)space->machine->driver_data;
+	mainevt_state *state = space->machine->driver_data<mainevt_state>();
 
 	upd7759_reset_w(state->upd, data & 2);
 	upd7759_start_w(state->upd, data & 1);
@@ -110,7 +110,7 @@ static WRITE8_HANDLER( devstor_sh_irqcontrol_w )
 
 static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
 {
-	mainevt_state *state = (mainevt_state *)space->machine->driver_data;
+	mainevt_state *state = space->machine->driver_data<mainevt_state>();
 	int bank_A, bank_B;
 
 //logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(space->cpu),data);
@@ -138,7 +138,7 @@ static WRITE8_DEVICE_HANDLER( dv_sh_bankswitch_w )
 
 static READ8_HANDLER( k052109_051960_r )
 {
-	mainevt_state *state = (mainevt_state *)space->machine->driver_data;
+	mainevt_state *state = space->machine->driver_data<mainevt_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -155,7 +155,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	mainevt_state *state = (mainevt_state *)space->machine->driver_data;
+	mainevt_state *state = space->machine->driver_data<mainevt_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -417,7 +417,7 @@ static const k051960_interface mainevt_k051960_intf =
 
 static MACHINE_START( mainevt )
 {
-	mainevt_state *state = (mainevt_state *)machine->driver_data;
+	mainevt_state *state = machine->driver_data<mainevt_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
@@ -434,7 +434,7 @@ static MACHINE_START( mainevt )
 
 static MACHINE_RESET( mainevt )
 {
-	mainevt_state *state = (mainevt_state *)machine->driver_data;
+	mainevt_state *state = machine->driver_data<mainevt_state>();
 
 	state->nmi_enable = 0;
 }

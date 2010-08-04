@@ -1,11 +1,12 @@
 
 
-class appoooh_state
+class appoooh_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, appoooh_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, appoooh_state(machine)); }
 
-	appoooh_state(running_machine &machine) { }
+	appoooh_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  bg_videoram;

@@ -94,12 +94,13 @@ Note
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-class spool99_state
+class spool99_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spool99_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spool99_state(machine)); }
 
-	spool99_state(running_machine &machine) { }
+	spool99_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8 *main;
 	tilemap_t *sc0_tilemap;
@@ -109,7 +110,7 @@ public:
 
 static TILE_GET_INFO( get_spool99_tile_info )
 {
-	spool99_state *state = (spool99_state *)machine->driver_data;
+	spool99_state *state = machine->driver_data<spool99_state>();
 	int code = ((state->vram[tile_index*2+1]<<8) | (state->vram[tile_index*2+0]));
 	int color = state->cram[tile_index*2+0];
 
@@ -122,14 +123,14 @@ static TILE_GET_INFO( get_spool99_tile_info )
 
 static VIDEO_START(spool99)
 {
-	spool99_state *state = (spool99_state *)machine->driver_data;
+	spool99_state *state = machine->driver_data<spool99_state>();
 
 	state->sc0_tilemap = tilemap_create(machine, get_spool99_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
 static VIDEO_UPDATE(spool99)
 {
-	spool99_state *state = (spool99_state *)screen->machine->driver_data;
+	spool99_state *state = screen->machine->driver_data<spool99_state>();
 
 	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
 	return 0;
@@ -137,7 +138,7 @@ static VIDEO_UPDATE(spool99)
 
 static WRITE8_HANDLER( spool99_vram_w )
 {
-	spool99_state *state = (spool99_state *)space->machine->driver_data;
+	spool99_state *state = space->machine->driver_data<spool99_state>();
 
 	state->vram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset/2);
@@ -145,7 +146,7 @@ static WRITE8_HANDLER( spool99_vram_w )
 
 static WRITE8_HANDLER( spool99_cram_w )
 {
-	spool99_state *state = (spool99_state *)space->machine->driver_data;
+	spool99_state *state = space->machine->driver_data<spool99_state>();
 
 	state->cram[offset] = data;
 	tilemap_mark_tile_dirty(state->sc0_tilemap,offset/2);
@@ -415,7 +416,7 @@ ROM_END
 
 static DRIVER_INIT( spool99 )
 {
-	spool99_state *state = (spool99_state *)machine->driver_data;
+	spool99_state *state = machine->driver_data<spool99_state>();
 
 	UINT8 *ROM = memory_region(machine, "maincpu");
 //  vram = auto_alloc_array(machine, UINT8, 0x2000);

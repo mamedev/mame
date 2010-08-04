@@ -24,7 +24,7 @@
 
 static WRITE16_HANDLER( lemmings_control_w )
 {
-	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
+	lemmings_state *state = space->machine->driver_data<lemmings_state>();
 
 	/* Offset==0 Pixel layer X scroll */
 	if (offset == 4)
@@ -64,7 +64,7 @@ static READ16_HANDLER( lemmings_prot_r )
 
 static WRITE16_HANDLER( lemmings_palette_24bit_w )
 {
-	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
+	lemmings_state *state = space->machine->driver_data<lemmings_state>();
 	int r, g, b;
 
 	COMBINE_DATA(&state->paletteram[offset]);
@@ -80,14 +80,14 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 
 static WRITE16_HANDLER( lemmings_sound_w )
 {
-	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
+	lemmings_state *state = space->machine->driver_data<lemmings_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )
 {
-	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
+	lemmings_state *state = space->machine->driver_data<lemmings_state>();
 	cpu_set_input_line(state->audiocpu, 1, CLEAR_LINE);
 }
 
@@ -246,7 +246,7 @@ GFXDECODE_END
 
 static void sound_irq( running_device *device, int state )
 {
-	lemmings_state *lemmings = (lemmings_state *)device->machine->driver_data;
+	lemmings_state *lemmings = device->machine->driver_data<lemmings_state>();
 	cpu_set_input_line(lemmings->audiocpu, 0, state);
 }
 
@@ -257,7 +257,7 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_START( lemmings )
 {
-	lemmings_state *state = (lemmings_state *)machine->driver_data;
+	lemmings_state *state = machine->driver_data<lemmings_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 }

@@ -7,7 +7,7 @@
 
 static TILE_GET_INFO( get_bg0_tile_info )
 {
-	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
+	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
 	UINT16 tilenum = state->tilemapram[0 + tile_index * 2];
 	UINT16 attr    = state->tilemapram[1 + tile_index * 2];
 
@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
+	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
 	UINT16 tilenum = state->tilemapram[0x800 + tile_index * 2];
 	UINT16 attr    = state->tilemapram[0x801 + tile_index * 2];
 
@@ -33,7 +33,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
+	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
 	UINT16 tilenum = state->tilemapram[0x1000 + tile_index];
 
 	SET_TILE_INFO(
@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static void gcpinbal_core_vh_start( running_machine *machine )
 {
-	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
+	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
 	int xoffs = 0;
 	int yoffs = 0;
 
@@ -78,13 +78,13 @@ VIDEO_START( gcpinbal )
 
 READ16_HANDLER( gcpinbal_tilemaps_word_r )
 {
-	gcpinbal_state *state = (gcpinbal_state *)space->machine->driver_data;
+	gcpinbal_state *state = space->machine->driver_data<gcpinbal_state>();
 	return state->tilemapram[offset];
 }
 
 WRITE16_HANDLER( gcpinbal_tilemaps_word_w )
 {
-	gcpinbal_state *state = (gcpinbal_state *)space->machine->driver_data;
+	gcpinbal_state *state = space->machine->driver_data<gcpinbal_state>();
 	COMBINE_DATA(&state->tilemapram[offset]);
 
 	if (offset < 0x800)	/* BG0 */
@@ -171,7 +171,7 @@ WRITE16_HANDLER( gcpinbal_ctrl_word_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
-	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
+	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, chain_pos;
 	int x, y, curx, cury;
@@ -250,7 +250,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( gcpinbal )
 {
-	gcpinbal_state *state = (gcpinbal_state *)screen->machine->driver_data;
+	gcpinbal_state *state = screen->machine->driver_data<gcpinbal_state>();
 	int i;
 	UINT16 tile_sets = 0;
 	UINT8 layer[3];

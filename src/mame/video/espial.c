@@ -67,7 +67,7 @@ PALETTE_INIT( espial )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 	UINT8 code = state->videoram[tile_index];
 	UINT8 col = state->colorram[tile_index];
 	UINT8 attr = state->attributeram[tile_index];
@@ -87,7 +87,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( espial )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
@@ -97,7 +97,7 @@ VIDEO_START( espial )
 
 VIDEO_START( netwars )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 
 	/* Net Wars has a tile map that's twice as big as Espial's */
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 64);
@@ -117,7 +117,7 @@ VIDEO_START( netwars )
 
 WRITE8_HANDLER( espial_videoram_w )
 {
-	espial_state *state = (espial_state *)space->machine->driver_data;
+	espial_state *state = space->machine->driver_data<espial_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -126,7 +126,7 @@ WRITE8_HANDLER( espial_videoram_w )
 
 WRITE8_HANDLER( espial_colorram_w )
 {
-	espial_state *state = (espial_state *)space->machine->driver_data;
+	espial_state *state = space->machine->driver_data<espial_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -135,7 +135,7 @@ WRITE8_HANDLER( espial_colorram_w )
 
 WRITE8_HANDLER( espial_attributeram_w )
 {
-	espial_state *state = (espial_state *)space->machine->driver_data;
+	espial_state *state = space->machine->driver_data<espial_state>();
 
 	state->attributeram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -144,7 +144,7 @@ WRITE8_HANDLER( espial_attributeram_w )
 
 WRITE8_HANDLER( espial_scrollram_w )
 {
-	espial_state *state = (espial_state *)space->machine->driver_data;
+	espial_state *state = space->machine->driver_data<espial_state>();
 
 	state->scrollram[offset] = data;
 	tilemap_set_scrolly(state->bg_tilemap, offset, data);
@@ -153,7 +153,7 @@ WRITE8_HANDLER( espial_scrollram_w )
 
 WRITE8_HANDLER( espial_flipscreen_w )
 {
-	espial_state *state = (espial_state *)space->machine->driver_data;
+	espial_state *state = space->machine->driver_data<espial_state>();
 
 	state->flipscreen = data;
 	tilemap_set_flip(state->bg_tilemap, state->flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -168,7 +168,7 @@ WRITE8_HANDLER( espial_flipscreen_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	espial_state *state = (espial_state *)machine->driver_data;
+	espial_state *state = machine->driver_data<espial_state>();
 	int offs;
 
 	/* Note that it is important to draw them exactly in this */
@@ -234,7 +234,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( espial )
 {
-	espial_state *state = (espial_state *)screen->machine->driver_data;
+	espial_state *state = screen->machine->driver_data<espial_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

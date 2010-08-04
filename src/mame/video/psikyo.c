@@ -73,7 +73,7 @@ Offset:
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 	UINT16 code = ((UINT16 *)state->vram_0)[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO(
 			1,
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 	UINT16 code = ((UINT16 *)state->vram_1)[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO(
 			1,
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE32_HANDLER( psikyo_vram_0_w )
 {
-	psikyo_state *state = (psikyo_state *)space->machine->driver_data;
+	psikyo_state *state = space->machine->driver_data<psikyo_state>();
 
 	COMBINE_DATA(&state->vram_0[offset]);
 	if (ACCESSING_BITS_16_31)
@@ -118,7 +118,7 @@ WRITE32_HANDLER( psikyo_vram_0_w )
 
 WRITE32_HANDLER( psikyo_vram_1_w )
 {
-	psikyo_state *state = (psikyo_state *)space->machine->driver_data;
+	psikyo_state *state = space->machine->driver_data<psikyo_state>();
 
 	COMBINE_DATA(&state->vram_1[offset]);
 	if (ACCESSING_BITS_16_31)
@@ -140,7 +140,7 @@ WRITE32_HANDLER( psikyo_vram_1_w )
 
 void psikyo_switch_banks( running_machine *machine, int tmap, int bank )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	if ((tmap == 0) && (bank != state->tilemap_0_bank))
 	{
@@ -163,7 +163,7 @@ void psikyo_switch_banks( running_machine *machine, int tmap, int bank )
 
 VIDEO_START( psikyo )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
        the various sized tilemaps now as opposed to later */
@@ -265,7 +265,7 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int trans_pen )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
@@ -384,7 +384,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 // it might be a problem with the actual bootleg
 static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int trans_pen )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
@@ -526,7 +526,7 @@ static int tilemap_width( int size )
 
 VIDEO_UPDATE( psikyo )
 {
-	psikyo_state *state = (psikyo_state *)screen->machine->driver_data;
+	psikyo_state *state = screen->machine->driver_data<psikyo_state>();
 	int i, layers_ctrl = -1;
 
 	UINT32 tm0size, tm1size;
@@ -700,7 +700,7 @@ VIDEO_UPDATE( psikyo )
 
 VIDEO_UPDATE( psikyo_bootleg )
 {
-	psikyo_state *state = (psikyo_state *)screen->machine->driver_data;
+	psikyo_state *state = screen->machine->driver_data<psikyo_state>();
 	int i, layers_ctrl = -1;
 
 	UINT32 tm0size, tm1size;
@@ -867,7 +867,7 @@ VIDEO_UPDATE( psikyo_bootleg )
 
 VIDEO_EOF( psikyo )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 	memcpy(state->spritebuf2, state->spritebuf1, 0x2000);
 	memcpy(state->spritebuf1, machine->generic.spriteram.u32, 0x2000);
 }

@@ -48,14 +48,14 @@
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( skyfox_vregs_r )	// for debug
 {
-	skyfox_state *state = (skyfox_state *)space->machine->driver_data;
+	skyfox_state *state = space->machine->driver_data<skyfox_state>();
 	return state->vreg[offset];
 }
 #endif
 
 WRITE8_HANDLER( skyfox_vregs_w )
 {
-	skyfox_state *state = (skyfox_state *)space->machine->driver_data;
+	skyfox_state *state = space->machine->driver_data<skyfox_state>();
 
 	state->vreg[offset] = data;
 
@@ -161,7 +161,7 @@ Offset:         Value:
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	skyfox_state *state = (skyfox_state *)machine->driver_data;
+	skyfox_state *state = machine->driver_data<skyfox_state>();
 	int offs;
 
 	int width = machine->primary_screen->width();
@@ -240,7 +240,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	skyfox_state *state = (skyfox_state *)machine->driver_data;
+	skyfox_state *state = machine->driver_data<skyfox_state>();
 	UINT8 *RAM = memory_region(machine, "gfx2");
 	int x, y, i;
 

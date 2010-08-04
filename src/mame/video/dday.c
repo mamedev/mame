@@ -20,13 +20,13 @@
 
 READ8_HANDLER( dday_countdown_timer_r )
 {
-	dday_state *state = (dday_state *)space->machine->driver_data;
+	dday_state *state = space->machine->driver_data<dday_state>();
 	return ((state->timer_value / 10) << 4) | (state->timer_value % 10);
 }
 
 static TIMER_CALLBACK( countdown_timer_callback )
 {
-	dday_state *state = (dday_state *)machine->driver_data;
+	dday_state *state = machine->driver_data<dday_state>();
 	state->timer_value--;
 
 	if (state->timer_value < 0)
@@ -35,7 +35,7 @@ static TIMER_CALLBACK( countdown_timer_callback )
 
 static void start_countdown_timer(running_machine *machine)
 {
-	dday_state *state = (dday_state *)machine->driver_data;
+	dday_state *state = machine->driver_data<dday_state>();
 
 	state->timer_value = 0;
 
@@ -155,7 +155,7 @@ PALETTE_INIT( dday )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	dday_state *state = (dday_state *)machine->driver_data;
+	dday_state *state = machine->driver_data<dday_state>();
 	int code;
 
 	code = state->bgvideoram[tile_index];
@@ -164,7 +164,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	dday_state *state = (dday_state *)machine->driver_data;
+	dday_state *state = machine->driver_data<dday_state>();
 	int code, flipx;
 
 	flipx = state->colorram[tile_index & 0x03e0] & 0x01;
@@ -174,7 +174,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	dday_state *state = (dday_state *)machine->driver_data;
+	dday_state *state = machine->driver_data<dday_state>();
 	int code;
 
 	code = state->textvideoram[tile_index];
@@ -183,7 +183,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 static TILE_GET_INFO( get_sl_tile_info )
 {
-	dday_state *state = (dday_state *)machine->driver_data;
+	dday_state *state = machine->driver_data<dday_state>();
 	int code, sl_flipx, flipx;
 	UINT8* sl_map;
 
@@ -213,7 +213,7 @@ static TILE_GET_INFO( get_sl_tile_info )
 
 VIDEO_START( dday )
 {
-	dday_state *state = (dday_state *)machine->driver_data;
+	dday_state *state = machine->driver_data<dday_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -230,7 +230,7 @@ VIDEO_START( dday )
 
 WRITE8_HANDLER( dday_bgvideoram_w )
 {
-	dday_state *state = (dday_state *)space->machine->driver_data;
+	dday_state *state = space->machine->driver_data<dday_state>();
 
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -238,7 +238,7 @@ WRITE8_HANDLER( dday_bgvideoram_w )
 
 WRITE8_HANDLER( dday_fgvideoram_w )
 {
-	dday_state *state = (dday_state *)space->machine->driver_data;
+	dday_state *state = space->machine->driver_data<dday_state>();
 
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -247,7 +247,7 @@ WRITE8_HANDLER( dday_fgvideoram_w )
 
 WRITE8_HANDLER( dday_textvideoram_w )
 {
-	dday_state *state = (dday_state *)space->machine->driver_data;
+	dday_state *state = space->machine->driver_data<dday_state>();
 
 	state->textvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->text_tilemap, offset);
@@ -255,7 +255,7 @@ WRITE8_HANDLER( dday_textvideoram_w )
 
 WRITE8_HANDLER( dday_colorram_w )
 {
-	dday_state *state = (dday_state *)space->machine->driver_data;
+	dday_state *state = space->machine->driver_data<dday_state>();
 	int i;
 
 	offset &= 0x03e0;
@@ -268,14 +268,14 @@ WRITE8_HANDLER( dday_colorram_w )
 
 READ8_HANDLER( dday_colorram_r )
 {
-	dday_state *state = (dday_state *)space->machine->driver_data;
+	dday_state *state = space->machine->driver_data<dday_state>();
 	return state->colorram[offset & 0x03e0];
 }
 
 
 WRITE8_HANDLER( dday_sl_control_w )
 {
-	dday_state *state = (dday_state *)space->machine->driver_data;
+	dday_state *state = space->machine->driver_data<dday_state>();
 
 	if (state->sl_image != data)
 	{
@@ -287,7 +287,7 @@ WRITE8_HANDLER( dday_sl_control_w )
 
 WRITE8_HANDLER( dday_control_w )
 {
-	dday_state *state = (dday_state *)space->machine->driver_data;
+	dday_state *state = space->machine->driver_data<dday_state>();
 
 	//if (data & 0xac)  logerror("Control = %02X\n", data & 0xac);
 
@@ -317,7 +317,7 @@ WRITE8_HANDLER( dday_control_w )
 
 VIDEO_UPDATE( dday )
 {
-	dday_state *state = (dday_state *)screen->machine->driver_data;
+	dday_state *state = screen->machine->driver_data<dday_state>();
 
 	tilemap_draw(state->main_bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	tilemap_draw(state->main_bitmap, cliprect, state->fg_tilemap, 0, 0);

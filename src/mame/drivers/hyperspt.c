@@ -268,7 +268,7 @@ GFXDECODE_END
 
 static MACHINE_START( hyperspt )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->vlm = machine->device("vlm");
@@ -281,7 +281,7 @@ static MACHINE_START( hyperspt )
 
 static MACHINE_START( hypersptb )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	MACHINE_START_CALL(hyperspt);
 
@@ -292,7 +292,7 @@ static MACHINE_START( hypersptb )
 
 static MACHINE_RESET( hyperspt )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	state->SN76496_latch = 0;
 	state->last_addr = 0;
@@ -301,7 +301,7 @@ static MACHINE_RESET( hyperspt )
 
 static MACHINE_RESET( hypersptb )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	MACHINE_RESET_CALL(hyperspt);
 

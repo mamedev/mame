@@ -303,7 +303,7 @@ GFXDECODE_END
 
 static MACHINE_START( gng )
 {
-	gng_state *state = (gng_state *)machine->driver_data;
+	gng_state *state = machine->driver_data<gng_state>();
 
 	UINT8 *rombase = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x2000);
@@ -315,7 +315,7 @@ static MACHINE_START( gng )
 
 static MACHINE_RESET( gng )
 {
-	gng_state *state = (gng_state *)machine->driver_data;
+	gng_state *state = machine->driver_data<gng_state>();
 
 	state->scrollx[0] = 0;
 	state->scrollx[1] = 0;

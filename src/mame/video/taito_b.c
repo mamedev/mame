@@ -5,7 +5,7 @@
 
 WRITE16_HANDLER( hitice_pixelram_w )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	int sy = offset >> 9;
 	int sx = offset & 0x1ff;
 
@@ -21,7 +21,7 @@ WRITE16_HANDLER( hitice_pixelram_w )
 
 WRITE16_HANDLER( hitice_pixel_scroll_w )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	COMBINE_DATA(&state->pixel_scroll[offset]);
 }
 
@@ -37,7 +37,7 @@ static void hitice_clear_pixel_bitmap( running_machine *machine )
 
 static VIDEO_START( taitob_core )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 
 	state->framebuffer[0] = auto_bitmap_alloc(machine, 512, 256, machine->primary_screen->format());
 	state->framebuffer[1] = auto_bitmap_alloc(machine, 512, 256, machine->primary_screen->format());
@@ -56,7 +56,7 @@ VIDEO_START( taitob_color_order0 )
 
 	/*Note that in both this and color order 1 pixel_color_base/color_granularity is equal to sprites color base. Pure coincidence? */
 
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	state->b_sp_color_base = 0x40 * 16;	/*sprites   */
 
 	/* bg, fg, tx color_base are set in the tc0180vcu interface */
@@ -67,7 +67,7 @@ VIDEO_START( taitob_color_order0 )
 VIDEO_START( taitob_color_order1 )
 {
 	/* this is the reversed layout used in: Crime City, Puzzle Bobble */
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	state->b_sp_color_base = 0x80 * 16;
 
 	VIDEO_START_CALL(taitob_core);
@@ -76,7 +76,7 @@ VIDEO_START( taitob_color_order1 )
 VIDEO_START( taitob_color_order2 )
 {
 	/*this is used in: rambo3a, masterw, silentd, selfeena, ryujin */
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	state->b_sp_color_base = 0x10 * 16;
 
 	VIDEO_START_CALL(taitob_core);
@@ -85,7 +85,7 @@ VIDEO_START( taitob_color_order2 )
 
 VIDEO_START( hitice )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 
 	VIDEO_START_CALL(taitob_color_order0);
 
@@ -105,7 +105,7 @@ VIDEO_RESET( hitice )
 
 READ16_HANDLER( tc0180vcu_framebuffer_word_r )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
 
@@ -114,7 +114,7 @@ READ16_HANDLER( tc0180vcu_framebuffer_word_r )
 
 WRITE16_HANDLER( tc0180vcu_framebuffer_word_w )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
 
@@ -156,7 +156,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
   000c - 000f: unused
 */
 
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	int x, y, xlatch = 0, ylatch = 0, x_no = 0, y_no = 0, x_num = 0, y_num = 0, big_sprite = 0;
 	int offs, code, color, flipx, flipy;
 	UINT32 data, zoomx, zoomy, zx, zy, zoomxlatch = 0, zoomylatch = 0;
@@ -252,7 +252,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_framebuffer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	rectangle myclip = *cliprect;
 	int x, y;
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);
@@ -357,7 +357,7 @@ profiler_mark_end();
 
 VIDEO_UPDATE( taitob )
 {
-	taitob_state *state = (taitob_state *)screen->machine->driver_data;
+	taitob_state *state = screen->machine->driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);
 
 	if ((video_control & 0x20) == 0)
@@ -393,7 +393,7 @@ VIDEO_UPDATE( taitob )
 
 VIDEO_EOF( taitob )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);
 	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->tc0180vcu, 0);
 

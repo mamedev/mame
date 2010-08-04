@@ -28,7 +28,7 @@
 
 static SOUND_START( timeplt )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 
 	state->soundcpu = machine->device<cpu_device>("tpsound");
 	state->filter_0_0 = machine->device("filter.0.0");
@@ -69,7 +69,7 @@ static SOUND_START( timeplt )
 
 static READ8_DEVICE_HANDLER( timeplt_portB_r )
 {
-	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+	timeplt_state *state = device->machine->driver_data<timeplt_state>();
 
 	static const int timeplt_timer[10] =
 	{
@@ -102,7 +102,7 @@ static void filter_w( running_device *device, int data )
 
 static WRITE8_HANDLER( timeplt_filter_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 	filter_w(state->filter_1_0, (offset >>  0) & 3);
 	filter_w(state->filter_1_1, (offset >>  2) & 3);
 	filter_w(state->filter_1_2, (offset >>  4) & 3);
@@ -121,7 +121,7 @@ static WRITE8_HANDLER( timeplt_filter_w )
 
 WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 
 	if (state->last_irq_state == 0 && data)
 	{

@@ -22,7 +22,7 @@ static  int nycaptor_mask = 0;
 */
 static int nycaptor_spot( running_machine *machine )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 
 	if (state->gametype == 0 || state->gametype == 2)
 		return state->sharedram[0x299] ? state->sharedram[0x298] : 0;
@@ -32,19 +32,19 @@ static int nycaptor_spot( running_machine *machine )
 
 WRITE8_HANDLER(nycaptor_spriteram_w)
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	state->spriteram[offset] = data;
 }
 
 READ8_HANDLER(nycaptor_spriteram_r)
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	return state->spriteram[offset];
 }
 
 static TILE_GET_INFO( get_tile_info )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 	int pal = state->videoram[tile_index * 2 + 1] & 0x0f;
 	tileinfo->category = (state->videoram[tile_index * 2 + 1] & 0x30) >> 4;
 
@@ -79,7 +79,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( nycaptor )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 
 	state->spriteram = auto_alloc_array(machine, UINT8, 160);
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32 );
@@ -100,20 +100,20 @@ VIDEO_START( nycaptor )
 
 WRITE8_HANDLER( nycaptor_videoram_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset >> 1);
 }
 
 READ8_HANDLER( nycaptor_videoram_r )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( nycaptor_palette_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 
 	if (state->gametype == 2) //colt
 		return;
@@ -126,7 +126,7 @@ WRITE8_HANDLER( nycaptor_palette_w )
 
 READ8_HANDLER( nycaptor_palette_r )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 
 	if (offset & 0x100)
 		return space->machine->generic.paletteram2.u8[(offset & 0xff) + (state->palette_bank << 8)];
@@ -136,7 +136,7 @@ READ8_HANDLER( nycaptor_palette_r )
 
 WRITE8_HANDLER( nycaptor_gfxctrl_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 
 	if (state->gfxctrl == data)
 		return;
@@ -155,26 +155,26 @@ WRITE8_HANDLER( nycaptor_gfxctrl_w )
 
 READ8_HANDLER( nycaptor_gfxctrl_r )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	return state->gfxctrl;
 }
 
 READ8_HANDLER( nycaptor_scrlram_r )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	return state->scrlram[offset];
 }
 
 WRITE8_HANDLER( nycaptor_scrlram_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	state->scrlram[offset] = data;
 	tilemap_set_scrolly(state->bg_tilemap, offset, data);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 	int i;
 
 	for (i = 0; i < 0x20; i++)
@@ -233,7 +233,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void nycaptor_setmask( running_machine *machine )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 
 	mKEY_MASK(KEYCODE_Q, 1); /* bg */
 	mKEY_MASK(KEYCODE_W, 2);
@@ -256,7 +256,7 @@ static void nycaptor_setmask( running_machine *machine )
 
 VIDEO_UPDATE( nycaptor )
 {
-	nycaptor_state *state = (nycaptor_state *)screen->machine->driver_data;
+	nycaptor_state *state = screen->machine->driver_data<nycaptor_state>();
 
 #if NYCAPTOR_DEBUG
 	nycaptor_setmask(screen->machine);

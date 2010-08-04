@@ -101,7 +101,7 @@ PALETTE_INIT( redclash )
 
 WRITE8_HANDLER( redclash_videoram_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -109,7 +109,7 @@ WRITE8_HANDLER( redclash_videoram_w )
 
 WRITE8_HANDLER( redclash_gfxbank_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 
 	if (state->gfxbank != (data & 0x01))
 	{
@@ -139,7 +139,7 @@ star_speed:
 */
 WRITE8_HANDLER( redclash_star0_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 
 	state->star_speed = (state->star_speed & ~1) | ((data & 1) << 0);
 	redclash_set_stars_speed(space->machine, state->star_speed);
@@ -147,7 +147,7 @@ WRITE8_HANDLER( redclash_star0_w )
 
 WRITE8_HANDLER( redclash_star1_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 
 	state->star_speed = (state->star_speed & ~2) | ((data & 1) << 1);
 	redclash_set_stars_speed(space->machine, state->star_speed);
@@ -155,7 +155,7 @@ WRITE8_HANDLER( redclash_star1_w )
 
 WRITE8_HANDLER( redclash_star2_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 
 	state->star_speed = (state->star_speed & ~4) | ((data & 1) << 2);
 	redclash_set_stars_speed(space->machine, state->star_speed);
@@ -168,7 +168,7 @@ WRITE8_HANDLER( redclash_star_reset_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	int code = state->videoram[tile_index];
 	int color = (state->videoram[tile_index] & 0x70) >> 4; // ??
 
@@ -177,7 +177,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( redclash )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
@@ -185,7 +185,7 @@ VIDEO_START( redclash )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	UINT8 *spriteram = state->spriteram;
 	int i, offs;
 
@@ -269,7 +269,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_bullets( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x20; offs++)
@@ -304,7 +304,7 @@ static void draw_bullets( running_machine *machine, bitmap_t *bitmap, const rect
 
 /* This line can reset the LFSR to zero and disables the star generator */
 void redclash_set_stars_enable( running_machine *machine, UINT8 on )
-{	ladybug_state *state = (ladybug_state *)machine->driver_data;
+{	ladybug_state *state = machine->driver_data<ladybug_state>();
 
 	if ((state->stars_enable == 0) && (on == 1))
 	{
@@ -319,7 +319,7 @@ void redclash_set_stars_enable( running_machine *machine, UINT8 on )
 
 void redclash_update_stars_state( running_machine *machine )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	if (state->stars_enable == 0)
 		return;
 
@@ -351,7 +351,7 @@ void redclash_update_stars_state( running_machine *machine )
 
 void redclash_set_stars_speed( running_machine *machine, UINT8 speed )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	state->stars_speed = speed;
 }
 
@@ -362,7 +362,7 @@ void redclash_set_stars_speed( running_machine *machine, UINT8 speed )
 
 void redclash_draw_stars( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx )
 {
-	ladybug_state *redclash = (ladybug_state *)machine->driver_data;
+	ladybug_state *redclash = machine->driver_data<ladybug_state>();
 	int i;
 	UINT8 tempbit, feedback, star_color, xloc, yloc;
 	UINT32 state;
@@ -425,7 +425,7 @@ VIDEO_EOF( redclash )
 
 VIDEO_UPDATE( redclash )
 {
-	ladybug_state *state = (ladybug_state *)screen->machine->driver_data;
+	ladybug_state *state = screen->machine->driver_data<ladybug_state>();
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	redclash_draw_stars(screen->machine, bitmap, cliprect, 0x60, 0, 0x00, 0xff);

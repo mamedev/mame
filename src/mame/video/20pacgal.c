@@ -407,7 +407,7 @@ static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle
 
 static VIDEO_UPDATE( 20pacgal )
 {
-	_20pacgal_state *state = (_20pacgal_state *)screen->machine->driver_data;
+	_20pacgal_state *state = screen->machine->driver_data<_20pacgal_state>();
 
 	bitmap_fill(bitmap,cliprect,0);
 	draw_stars(state, bitmap,cliprect);

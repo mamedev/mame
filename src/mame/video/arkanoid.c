@@ -12,14 +12,14 @@
 
 WRITE8_HANDLER( arkanoid_videoram_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( arkanoid_d008_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
@@ -75,7 +75,7 @@ WRITE8_HANDLER( arkanoid_d008_w )
 /* different hook-up, everything except for bits 0-1 and 7 aren't tested afaik. */
 WRITE8_HANDLER( tetrsark_d008_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
@@ -122,7 +122,7 @@ WRITE8_HANDLER( tetrsark_d008_w )
 
 WRITE8_HANDLER( hexa_d008_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 
 	/* bit 0 = flipx (or y?) */
 	if (flip_screen_x_get(space->machine) != (data & 0x01))
@@ -155,7 +155,7 @@ WRITE8_HANDLER( hexa_d008_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	int offs = tile_index * 2;
 	int code = state->videoram[offs + 1] + ((state->videoram[offs] & 0x07) << 8) + 2048 * state->gfxbank;
 	int color = ((state->videoram[offs] & 0xf8) >> 3) + 32 * state->palettebank;
@@ -165,14 +165,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( arkanoid )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -204,7 +204,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( arkanoid )
 {
-	arkanoid_state *state = (arkanoid_state *)screen->machine->driver_data;
+	arkanoid_state *state = screen->machine->driver_data<arkanoid_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -213,7 +213,7 @@ VIDEO_UPDATE( arkanoid )
 
 VIDEO_UPDATE( hexa )
 {
-	arkanoid_state *state = (arkanoid_state *)screen->machine->driver_data;
+	arkanoid_state *state = screen->machine->driver_data<arkanoid_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;

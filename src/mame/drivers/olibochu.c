@@ -56,12 +56,13 @@ $7004 writes, related to $7000 reads
 #include "deprecat.h"
 #include "sound/ay8910.h"
 
-class olibochu_state
+class olibochu_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, olibochu_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, olibochu_state(machine)); }
 
-	olibochu_state(running_machine &machine) { }
+	olibochu_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -120,14 +121,14 @@ static PALETTE_INIT( olibochu )
 
 static WRITE8_HANDLER( olibochu_videoram_w )
 {
-	olibochu_state *state = (olibochu_state *)space->machine->driver_data;
+	olibochu_state *state = space->machine->driver_data<olibochu_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( olibochu_colorram_w )
 {
-	olibochu_state *state = (olibochu_state *)space->machine->driver_data;
+	olibochu_state *state = space->machine->driver_data<olibochu_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -145,7 +146,7 @@ static WRITE8_HANDLER( olibochu_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	olibochu_state *state = (olibochu_state *)machine->driver_data;
+	olibochu_state *state = machine->driver_data<olibochu_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = (attr & 0x1f) + 0x20;
@@ -156,13 +157,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( olibochu )
 {
-	olibochu_state *state = (olibochu_state *)machine->driver_data;
+	olibochu_state *state = machine->driver_data<olibochu_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	olibochu_state *state = (olibochu_state *)machine->driver_data;
+	olibochu_state *state = machine->driver_data<olibochu_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -222,7 +223,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_UPDATE( olibochu )
 {
-	olibochu_state *state = (olibochu_state *)screen->machine->driver_data;
+	olibochu_state *state = screen->machine->driver_data<olibochu_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
@@ -231,7 +232,7 @@ static VIDEO_UPDATE( olibochu )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	olibochu_state *state = (olibochu_state *)space->machine->driver_data;
+	olibochu_state *state = space->machine->driver_data<olibochu_state>();
 	int c;
 
 	if (offset == 0)
@@ -425,14 +426,14 @@ static INTERRUPT_GEN( olibochu_interrupt )
 
 static MACHINE_START( olibochu )
 {
-	olibochu_state *state = (olibochu_state *)machine->driver_data;
+	olibochu_state *state = machine->driver_data<olibochu_state>();
 
 	state_save_register_global(machine, state->cmd);
 }
 
 static MACHINE_RESET( olibochu )
 {
-	olibochu_state *state = (olibochu_state *)machine->driver_data;
+	olibochu_state *state = machine->driver_data<olibochu_state>();
 
 	state->cmd = 0;
 }

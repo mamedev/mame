@@ -39,14 +39,14 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE8_HANDLER( yunsung8_videobank_w )
 {
-	yunsung8_state *state = (yunsung8_state *)space->machine->driver_data;
+	yunsung8_state *state = space->machine->driver_data<yunsung8_state>();
 	state->videobank = data;
 }
 
 
 READ8_HANDLER( yunsung8_videoram_r )
 {
-	yunsung8_state *state = (yunsung8_state *)space->machine->driver_data;
+	yunsung8_state *state = space->machine->driver_data<yunsung8_state>();
 	int bank;
 
 	/*  Bit 1 of the bankswitching register contols the c000-c7ff
@@ -66,7 +66,7 @@ READ8_HANDLER( yunsung8_videoram_r )
 
 WRITE8_HANDLER( yunsung8_videoram_w )
 {
-	yunsung8_state *state = (yunsung8_state *)space->machine->driver_data;
+	yunsung8_state *state = space->machine->driver_data<yunsung8_state>();
 
 	if (offset < 0x0800)		// c000-c7ff    Banked Palette RAM
 	{
@@ -136,7 +136,7 @@ WRITE8_HANDLER( yunsung8_flipscreen_w )
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	yunsung8_state *state = (yunsung8_state *)machine->driver_data;
+	yunsung8_state *state = machine->driver_data<yunsung8_state>();
 	int code  =  state->videoram_0[0x1000 + tile_index * 2 + 0] + state->videoram_0[0x1000 + tile_index * 2 + 1] * 256;
 	int color =  state->videoram_0[0x0800 + tile_index] & 0x07;
 	SET_TILE_INFO(
@@ -153,7 +153,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	yunsung8_state *state = (yunsung8_state *)machine->driver_data;
+	yunsung8_state *state = machine->driver_data<yunsung8_state>();
 	int code  =  state->videoram_1[0x1000 + tile_index * 2 + 0] + state->videoram_1[0x1000 + tile_index * 2 + 1] * 256;
 	int color =  state->videoram_1[0x0800 + tile_index] & 0x3f;
 	SET_TILE_INFO(
@@ -176,7 +176,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 VIDEO_START( yunsung8 )
 {
-	yunsung8_state *state = (yunsung8_state *)machine->driver_data;
+	yunsung8_state *state = machine->driver_data<yunsung8_state>();
 
 	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, DIM_NX_0, DIM_NY_0 );
 	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, DIM_NX_1, DIM_NY_1 );
@@ -196,7 +196,7 @@ VIDEO_START( yunsung8 )
 
 VIDEO_UPDATE( yunsung8 )
 {
-	yunsung8_state *state = (yunsung8_state *)screen->machine->driver_data;
+	yunsung8_state *state = screen->machine->driver_data<yunsung8_state>();
 	int layers_ctrl = (~state->layers_ctrl) >> 4;
 
 #ifdef MAME_DEBUG

@@ -157,7 +157,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
-	fuuki32_state *state = (fuuki32_state *)space->machine->driver_data;
+	fuuki32_state *state = space->machine->driver_data<fuuki32_state>();
 	if(ACCESSING_BITS_16_31)
 	{
 		int r,g,b;
@@ -194,14 +194,14 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 /* Sound comms */
 static READ32_HANDLER( snd_020_r )
 {
-	fuuki32_state *state = (fuuki32_state *)space->machine->driver_data;
+	fuuki32_state *state = space->machine->driver_data<fuuki32_state>();
 	UINT32 retdata = state->shared_ram[offset * 2] << 16 | state->shared_ram[(offset * 2) + 1];
 	return retdata;
 }
 
 static WRITE32_HANDLER( snd_020_w )
 {
-	fuuki32_state *state = (fuuki32_state *)space->machine->driver_data;
+	fuuki32_state *state = space->machine->driver_data<fuuki32_state>();
 
 	if (ACCESSING_BITS_16_23)
 		state->shared_ram[offset * 2] = data >> 16;
@@ -212,7 +212,7 @@ static WRITE32_HANDLER( snd_020_w )
 
 static WRITE32_HANDLER( fuuki32_vregs_w )
 {
-	fuuki32_state *state = (fuuki32_state *)space->machine->driver_data;
+	fuuki32_state *state = space->machine->driver_data<fuuki32_state>();
 
 	if (state->vregs[offset] != data)
 	{
@@ -274,14 +274,14 @@ static WRITE8_HANDLER ( fuuki32_sound_bw_w )
 
 static READ8_HANDLER( snd_z80_r )
 {
-	fuuki32_state *state = (fuuki32_state *)space->machine->driver_data;
+	fuuki32_state *state = space->machine->driver_data<fuuki32_state>();
 	UINT8 retdata = state->shared_ram[offset];
 	return retdata;
 }
 
 static WRITE8_HANDLER( snd_z80_w )
 {
-	fuuki32_state *state = (fuuki32_state *)space->machine->driver_data;
+	fuuki32_state *state = space->machine->driver_data<fuuki32_state>();
 	state->shared_ram[offset] = data;
 }
 
@@ -485,7 +485,7 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
+	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
 	timer_set(machine, machine->primary_screen->time_until_pos(248), NULL, 0, level_1_interrupt_callback);
 }
@@ -493,7 +493,7 @@ static TIMER_CALLBACK( level_1_interrupt_callback )
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
+	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
 	timer_set(machine, machine->primary_screen->time_until_vblank_start(), NULL, 0, vblank_interrupt_callback);
 }
@@ -501,7 +501,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
+	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	timer_adjust_oneshot(state->raster_interrupt_timer, machine->primary_screen->frame_period(), 0);
@@ -510,7 +510,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 
 static MACHINE_START( fuuki32 )
 {
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
+	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 	UINT8 *ROM = memory_region(machine, "soundcpu");
 
 	memory_configure_bank(machine, "bank1", 0, 0x3e, &ROM[0x10000], 0x8000);
@@ -527,7 +527,7 @@ static MACHINE_START( fuuki32 )
 
 static MACHINE_RESET( fuuki32 )
 {
-	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
+	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	timer_set(machine, machine->primary_screen->time_until_pos(248), NULL, 0, level_1_interrupt_callback);
@@ -538,7 +538,7 @@ static MACHINE_RESET( fuuki32 )
 
 static void irqhandler( running_device *device, int irq )
 {
-	fuuki32_state *state = (fuuki32_state *)device->machine->driver_data;
+	fuuki32_state *state = device->machine->driver_data<fuuki32_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 

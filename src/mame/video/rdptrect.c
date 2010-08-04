@@ -12,7 +12,7 @@ namespace RDP
 
 void TexRectangle::SetMachine(running_machine* machine)
 {
-	_n64_state *state = (_n64_state *)machine->driver_data;
+	_n64_state *state = machine->driver_data<_n64_state>();
 
 	m_machine = machine;
 	m_rdp = &state->m_rdp;

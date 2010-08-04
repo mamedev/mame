@@ -60,7 +60,7 @@ static WRITE16_HANDLER( blmbycar_okibank_w )
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_reset_w )
 {
-	blmbycar_state *state = (blmbycar_state *)space->machine->driver_data;
+	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->pot_wheel = ~input_port_read(space->machine, "WHEEL") & 0xff;
@@ -68,7 +68,7 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_reset_w )
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 {
-	blmbycar_state *state = (blmbycar_state *)space->machine->driver_data;
+	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -80,7 +80,7 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 
 static READ16_HANDLER( blmbycar_pot_wheel_r )
 {
-	blmbycar_state *state = (blmbycar_state *)space->machine->driver_data;
+	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
 	return ((state->pot_wheel & 0x80) ? 0x04 : 0) | (mame_rand(space->machine) & 0x08);
 }
 
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( waterball_unk_r )
 {
-	blmbycar_state *state = (blmbycar_state *)space->machine->driver_data;
+	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
 
 	state->retvalue ^= 0x0008; // must toggle.. but not vblank?
 	return state->retvalue;
@@ -341,7 +341,7 @@ GFXDECODE_END
 
 static MACHINE_START( blmbycar )
 {
-	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
+	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 
 	state_save_register_global(machine, state->pot_wheel);
 	state_save_register_global(machine, state->old_val);
@@ -349,7 +349,7 @@ static MACHINE_START( blmbycar )
 
 static MACHINE_RESET( blmbycar )
 {
-	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
+	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 
 	state->pot_wheel = 0;
 	state->old_val = 0;
@@ -394,14 +394,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( watrball )
 {
-	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
+	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 
 	state_save_register_global(machine, state->retvalue);
 }
 
 static MACHINE_RESET( watrball )
 {
-	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
+	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 
 	state->retvalue = 0;
 }

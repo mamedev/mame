@@ -1177,7 +1177,7 @@ N64::RDP::Triangle::Triangle(running_machine *machine, bool shade, bool texture,
 void N64::RDP::Triangle::InitFromData(running_machine *machine, bool shade, bool texture, bool zbuffer)
 {
 	m_machine = machine;
-	m_rdp = &((_n64_state *)machine->driver_data)->m_rdp;
+	m_rdp = &(machine->driver_data<_n64_state>())->m_rdp;
 	m_cmd_data = m_rdp->GetCommandData();
 	m_misc_state = m_rdp->GetMiscState();
 	m_shade = shade;
@@ -2503,7 +2503,7 @@ void N64::RDP::Processor::ProcessList()
 
 VIDEO_START(n64)
 {
-	_n64_state *state = (_n64_state *)machine->driver_data;
+	_n64_state *state = machine->driver_data<_n64_state>();
 
 	state->m_rdp.SetMachine(machine);
 	state->m_rdp.InitInternalState();
@@ -2526,7 +2526,7 @@ VIDEO_START(n64)
 
 VIDEO_UPDATE(n64)
 {
-	_n64_state *state = (_n64_state *)screen->machine->driver_data;
+	_n64_state *state = screen->machine->driver_data<_n64_state>();
 
     int height = state->m_rdp.GetMiscState()->m_fb_height;
 	//UINT16 *frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];

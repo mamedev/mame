@@ -28,7 +28,7 @@
 
 VIDEO_START( system18 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	int width, height;
 
 	state->grayscale_enable = 0;
@@ -66,7 +66,7 @@ VIDEO_START( system18 )
 
 void system18_set_grayscale(running_machine *machine, int enable)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	enable = (enable != 0);
 	if (enable != state->grayscale_enable)
@@ -80,7 +80,7 @@ void system18_set_grayscale(running_machine *machine, int enable)
 
 void system18_set_vdp_enable(running_machine *machine, int enable)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	enable = (enable != 0);
 	if (enable != state->vdp_enable)
@@ -96,7 +96,7 @@ void system18_set_vdp_enable(running_machine *machine, int enable)
 
 void system18_set_vdp_mixing(running_machine *machine, int mixing)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	if (mixing != state->vdp_mixing)
 	{
@@ -118,7 +118,7 @@ void system18_set_vdp_mixing(running_machine *machine, int mixing)
 
 static void draw_vdp(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
-	segas1x_state *state = (segas1x_state *)screen->machine->driver_data;
+	segas1x_state *state = screen->machine->driver_data<segas1x_state>();
 	int x, y;
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 
@@ -150,7 +150,7 @@ static void draw_vdp(running_device *screen, bitmap_t *bitmap, const rectangle *
 
 VIDEO_UPDATE( system18 )
 {
-	segas1x_state *state = (segas1x_state *)screen->machine->driver_data;
+	segas1x_state *state = screen->machine->driver_data<segas1x_state>();
 	int vdppri, vdplayer;
 
 /*

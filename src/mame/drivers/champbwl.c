@@ -158,7 +158,7 @@ Notes:
 
 static READ8_HANDLER( trackball_r )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	UINT8 ret;
 	UINT8 port4 = input_port_read(space->machine, "FAKEX");
 	UINT8 port5 = input_port_read(space->machine, "FAKEY");
@@ -184,7 +184,7 @@ static WRITE8_HANDLER( champbwl_misc_w )
 
 static WRITE8_HANDLER( champbwl_objctrl_w )
 {
-	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	if(offset != 0)
 		data ^= 0xff;
 
@@ -332,7 +332,7 @@ static const x1_010_interface champbwl_sound_intf =
 
 static MACHINE_START( champbwl )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	state->mcu = NULL;
@@ -345,7 +345,7 @@ static MACHINE_START( champbwl )
 
 static MACHINE_RESET( champbwl )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 
 	state->screenflip = 0;
 	state->mcu_type = -1;

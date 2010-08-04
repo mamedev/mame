@@ -75,7 +75,7 @@ static STATE_POSTLOAD(cave_sprite_postload);
 
 PALETTE_INIT( cave )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int maxpen = state->paletteram_size / 2;
 	int pen;
 
@@ -88,7 +88,7 @@ PALETTE_INIT( cave )
 
 PALETTE_INIT( dfeveron )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int color, pen;
 
 	/* Fill the 0-3fff range, used by sprites ($40 color codes * $100 pens)
@@ -105,7 +105,7 @@ PALETTE_INIT( dfeveron )
 
 PALETTE_INIT( ddonpach )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int color, pen;
 
 	/* Fill the 8000-83ff range ($40 color codes * $10 pens) for
@@ -122,7 +122,7 @@ PALETTE_INIT( ddonpach )
 
 PALETTE_INIT( mazinger )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int color, pen;
 
 	PALETTE_INIT_CALL(cave);
@@ -141,7 +141,7 @@ PALETTE_INIT( mazinger )
 
 PALETTE_INIT( sailormn )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int color, pen;
 
 	PALETTE_INIT_CALL(cave);
@@ -160,7 +160,7 @@ PALETTE_INIT( sailormn )
 
 PALETTE_INIT( pwrinst2 )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int color, pen;
 
 	PALETTE_INIT_CALL(cave);
@@ -175,7 +175,7 @@ PALETTE_INIT( pwrinst2 )
 
 PALETTE_INIT( korokoro )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int color, pen;
 
 	PALETTE_INIT_CALL(cave);
@@ -188,7 +188,7 @@ PALETTE_INIT( korokoro )
 
 static void set_pens( running_machine *machine )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int pen;
 
 	for (pen = 0; pen < machine->total_colors(); pen++)
@@ -259,7 +259,7 @@ INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int ti
 
 void sailormn_tilebank_w( running_machine *machine, int bank )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	if (state->sailormn_tilebank != bank)
 	{
 		state->sailormn_tilebank = bank;
@@ -269,7 +269,7 @@ void sailormn_tilebank_w( running_machine *machine, int bank )
 
 static TILE_GET_INFO( sailormn_get_tile_info_2 )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	UINT32 code, color, pri;
 
 	if (state->tiledim_2)
@@ -337,56 +337,56 @@ INLINE void vram_8x8_w( UINT16 *VRAM, tilemap_t *TILEMAP, ATTR_UNUSED offs_t off
 }
 
 
-static TILE_GET_INFO( get_tile_info_0 )	{ cave_state *state = (cave_state *)machine->driver_data; get_tile_info(machine, tileinfo, tile_index, 0, state->vram_0, state->tiledim_0); }
-static TILE_GET_INFO( get_tile_info_1 )	{ cave_state *state = (cave_state *)machine->driver_data; get_tile_info(machine, tileinfo, tile_index, 1, state->vram_1, state->tiledim_1); }
-static TILE_GET_INFO( get_tile_info_2 )	{ cave_state *state = (cave_state *)machine->driver_data; get_tile_info(machine, tileinfo, tile_index, 2, state->vram_2, state->tiledim_2); }
-static TILE_GET_INFO( get_tile_info_3 )	{ cave_state *state = (cave_state *)machine->driver_data; get_tile_info(machine, tileinfo, tile_index, 3, state->vram_3, state->tiledim_3); }
+static TILE_GET_INFO( get_tile_info_0 )	{ cave_state *state = machine->driver_data<cave_state>(); get_tile_info(machine, tileinfo, tile_index, 0, state->vram_0, state->tiledim_0); }
+static TILE_GET_INFO( get_tile_info_1 )	{ cave_state *state = machine->driver_data<cave_state>(); get_tile_info(machine, tileinfo, tile_index, 1, state->vram_1, state->tiledim_1); }
+static TILE_GET_INFO( get_tile_info_2 )	{ cave_state *state = machine->driver_data<cave_state>(); get_tile_info(machine, tileinfo, tile_index, 2, state->vram_2, state->tiledim_2); }
+static TILE_GET_INFO( get_tile_info_3 )	{ cave_state *state = machine->driver_data<cave_state>(); get_tile_info(machine, tileinfo, tile_index, 3, state->vram_3, state->tiledim_3); }
 
 WRITE16_HANDLER( cave_vram_0_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	vram_w(state->vram_0, state->tilemap_0, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_0_8x8_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	vram_8x8_w(state->vram_0, state->tilemap_0, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_1_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	vram_w(state->vram_1, state->tilemap_1, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_1_8x8_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	vram_8x8_w(state->vram_1, state->tilemap_1, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_2_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	vram_w(state->vram_2, state->tilemap_2, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_2_8x8_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	vram_8x8_w(state->vram_2, state->tilemap_2, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_3_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	vram_w(state->vram_3, state->tilemap_3, offset, data, mem_mask);
 }
 
 WRITE16_HANDLER( cave_vram_3_8x8_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	vram_8x8_w(state->vram_3, state->tilemap_3, offset, data, mem_mask);
 }
 
@@ -402,7 +402,7 @@ WRITE16_HANDLER( cave_vram_3_8x8_w )
 
 static void cave_vh_start( running_machine *machine, int num )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 
 	assert(state->palette_map != NULL);
 
@@ -496,7 +496,7 @@ VIDEO_START( cave_4_layers )	{	cave_vh_start(machine, 4);	}
 
 VIDEO_START( sailormn_3_layers )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	cave_vh_start(machine, 2);
 
 	/* Layer 2 (8x8) needs to be handled differently */
@@ -541,7 +541,7 @@ VIDEO_START( sailormn_3_layers )
 
 static void get_sprite_info_cave( running_machine *machine )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	pen_t base_pal = 0;
 	const UINT8 *base_gfx = memory_region(machine, "sprites");
 	int code_max = memory_region_length(machine, "sprites") / (16*16);
@@ -670,7 +670,7 @@ static void get_sprite_info_cave( running_machine *machine )
 
 static void get_sprite_info_donpachi( running_machine *machine )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	pen_t base_pal = 0;
 	const UINT8 *base_gfx = memory_region(machine, "sprites");
 	int code_max = memory_region_length(machine, "sprites") / (16*16);
@@ -757,7 +757,7 @@ static void get_sprite_info_donpachi( running_machine *machine )
 
 static void sprite_init_cave( running_machine *machine )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int screen_width = machine->primary_screen->width();
 	int screen_height = machine->primary_screen->height();
 
@@ -799,7 +799,7 @@ static void sprite_init_cave( running_machine *machine )
 
 static void cave_sprite_check( screen_device &screen, const rectangle *clip )
 {
-	cave_state *state = (cave_state *)screen.machine->driver_data;
+	cave_state *state = screen.machine->driver_data<cave_state>();
 
 	{	/* set clip */
 		int left = clip->min_x;
@@ -878,7 +878,7 @@ static void cave_sprite_check( screen_device &screen, const rectangle *clip )
 static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_cave *sprite )
 {
 	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int x1, x2, y1, y2, dx, dy;
 	int xcount0 = 0x10000 + sprite->xcount0, ycount0 = 0x10000 + sprite->ycount0;
 
@@ -1011,7 +1011,7 @@ static void do_blit_zoom16_cave( running_machine *machine, const struct sprite_c
 static void do_blit_zoom16_cave_zb( running_machine *machine, const struct sprite_cave *sprite )
 {
 	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int x1, x2, y1, y2, dx, dy;
 	int xcount0 = 0x10000 + sprite->xcount0, ycount0 = 0x10000 + sprite->ycount0;
 
@@ -1147,7 +1147,7 @@ static void do_blit_zoom16_cave_zb( running_machine *machine, const struct sprit
 static void do_blit_16_cave( running_machine *machine, const struct sprite_cave *sprite )
 {
 	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int x1, x2, y1, y2, dx, dy;
 	int xcount0 = 0, ycount0 = 0;
 
@@ -1243,7 +1243,7 @@ static void do_blit_16_cave( running_machine *machine, const struct sprite_cave 
 static void do_blit_16_cave_zb( running_machine *machine,  const struct sprite_cave *sprite )
 {
 	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int x1, x2, y1, y2, dx, dy;
 	int xcount0 = 0, ycount0 = 0;
 
@@ -1346,7 +1346,7 @@ static void do_blit_16_cave_zb( running_machine *machine,  const struct sprite_c
 
 static void sprite_draw_cave( running_machine *machine, int priority )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int i = 0;
 	while (state->sprite_table[priority][i])
 	{
@@ -1360,7 +1360,7 @@ static void sprite_draw_cave( running_machine *machine, int priority )
 
 static void sprite_draw_cave_zbuf( running_machine *machine, int priority )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int i = 0;
 	while (state->sprite_table[priority][i])
 	{
@@ -1374,7 +1374,7 @@ static void sprite_draw_cave_zbuf( running_machine *machine, int priority )
 
 static void sprite_draw_donpachi( running_machine *machine, int priority )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int i = 0;
 	while (state->sprite_table[priority][i])
 		do_blit_16_cave(machine, state->sprite_table[priority][i++]);
@@ -1382,7 +1382,7 @@ static void sprite_draw_donpachi( running_machine *machine, int priority )
 
 static void sprite_draw_donpachi_zbuf( running_machine *machine, int priority )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int i = 0;
 	while (state->sprite_table[priority][i])
 		do_blit_16_cave_zb(machine, state->sprite_table[priority][i++]);
@@ -1450,7 +1450,7 @@ INLINE void cave_tilemap_draw(
 	tilemap_t *TILEMAP, UINT16 *VRAM, UINT16 *VCTRL,
 	UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	int sx, sy, flipx, flipy, offs_x, offs_y, offs_row;
 
 	/* Bail out if ... */
@@ -1567,32 +1567,32 @@ INLINE void cave_tilemap_draw(
 
 static void cave_tilemap_0_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_0, state->vram_0, state->vctrl_0, flags, priority, priority2);
 }
 
 static void cave_tilemap_1_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_1, state->vram_1, state->vctrl_1, flags, priority, priority2);
 }
 
 static void cave_tilemap_2_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_2, state->vram_2, state->vctrl_2, flags, priority, priority2);
 }
 
 static void cave_tilemap_3_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	cave_tilemap_draw(machine, bitmap, cliprect, state->tilemap_3, state->vram_3, state->vctrl_3, flags, priority, priority2);
 }
 
 
 VIDEO_UPDATE( cave )
 {
-	cave_state *state = (cave_state *)screen->machine->driver_data;
+	cave_state *state = screen->machine->driver_data<cave_state>();
 	int pri, pri2;
 	int layers_ctrl = -1;
 
@@ -1740,7 +1740,7 @@ VIDEO_UPDATE( cave )
 
 void cave_get_sprite_info( running_machine *machine )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	if (state->kludge == 3)	/* mazinger metmqstr */
 	{
 		if (video_skip_this_frame() == 0)

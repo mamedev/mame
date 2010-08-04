@@ -10,7 +10,7 @@
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	news_state *state = (news_state *)machine->driver_data;
+	news_state *state = machine->driver_data<news_state>();
 	int code = (state->fgram[tile_index * 2] << 8) | state->fgram[tile_index * 2 + 1];
 	SET_TILE_INFO(
 			0,
@@ -21,7 +21,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	news_state *state = (news_state *)machine->driver_data;
+	news_state *state = machine->driver_data<news_state>();
 	int code = (state->bgram[tile_index * 2] << 8) | state->bgram[tile_index * 2 + 1];
 	int color = (code & 0xf000) >> 12;
 
@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( news )
 {
-	news_state *state = (news_state *)machine->driver_data;
+	news_state *state = machine->driver_data<news_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
@@ -64,7 +64,7 @@ VIDEO_START( news )
 
 WRITE8_HANDLER( news_fgram_w )
 {
-	news_state *state = (news_state *)space->machine->driver_data;
+	news_state *state = space->machine->driver_data<news_state>();
 
 	state->fgram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
@@ -72,7 +72,7 @@ WRITE8_HANDLER( news_fgram_w )
 
 WRITE8_HANDLER( news_bgram_w )
 {
-	news_state *state = (news_state *)space->machine->driver_data;
+	news_state *state = space->machine->driver_data<news_state>();
 
 	state->bgram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -80,7 +80,7 @@ WRITE8_HANDLER( news_bgram_w )
 
 WRITE8_HANDLER( news_bgpic_w )
 {
-	news_state *state = (news_state *)space->machine->driver_data;
+	news_state *state = space->machine->driver_data<news_state>();
 
 	if (state->bgpic != data)
 	{
@@ -99,7 +99,7 @@ WRITE8_HANDLER( news_bgpic_w )
 
 VIDEO_UPDATE( news )
 {
-	news_state *state = (news_state *)screen->machine->driver_data;
+	news_state *state = screen->machine->driver_data<news_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;

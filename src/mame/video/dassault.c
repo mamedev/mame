@@ -12,7 +12,7 @@
 
 static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pf_priority )
 {
-	dassault_state *state = (dassault_state *)machine->driver_data;
+	dassault_state *state = machine->driver_data<dassault_state>();
 	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
 	int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 	int offs, bank, gfxbank;
@@ -174,7 +174,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( dassault )
 {
-	dassault_state *state = (dassault_state *)screen->machine->driver_data;
+	dassault_state *state = screen->machine->driver_data<dassault_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 

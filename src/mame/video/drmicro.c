@@ -15,7 +15,7 @@ Video hardware
 
 WRITE8_HANDLER( drmicro_videoram_w )
 {
-	drmicro_state *state = (drmicro_state *)space->machine->driver_data;
+	drmicro_state *state = space->machine->driver_data<drmicro_state>();
 	state->videoram[offset] = data;
 
 	if (offset < 0x800)
@@ -29,7 +29,7 @@ WRITE8_HANDLER( drmicro_videoram_w )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	drmicro_state *state = (drmicro_state *)machine->driver_data;
+	drmicro_state *state = machine->driver_data<drmicro_state>();
 	int code, col, flags;
 
 	code = state->videoram[tile_index + 0x0800];
@@ -44,7 +44,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	drmicro_state *state = (drmicro_state *)machine->driver_data;
+	drmicro_state *state = machine->driver_data<drmicro_state>();
 	int code, col, flags;
 
 	code = state->videoram[tile_index + 0x0000];
@@ -105,7 +105,7 @@ PALETTE_INIT( drmicro )
 
 VIDEO_START( drmicro)
 {
-	drmicro_state *state = (drmicro_state *)machine->driver_data;
+	drmicro_state *state = machine->driver_data<drmicro_state>();
 
 	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
 	state_save_register_global_pointer(machine, state->videoram, 0x1000);
@@ -118,7 +118,7 @@ VIDEO_START( drmicro)
 
 VIDEO_UPDATE( drmicro )
 {
-	drmicro_state *state = (drmicro_state *)screen->machine->driver_data;
+	drmicro_state *state = screen->machine->driver_data<drmicro_state>();
 	int offs, adr, g;
 	int chr, col, attr;
 	int x, y, fx, fy;

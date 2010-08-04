@@ -275,7 +275,7 @@ static const UINT16 *const level_data_lookup[] =
 
 static TIMER_CALLBACK( opwolf_timer_callback )
 {
-	opwolf_state *state = (opwolf_state *)machine->driver_data;
+	opwolf_state *state = machine->driver_data<opwolf_state>();
 
 	// Level data command
 	if (state->current_cmd == 0xf5)
@@ -316,7 +316,7 @@ static TIMER_CALLBACK( opwolf_timer_callback )
 
 static void updateDifficulty( running_machine *machine, int mode )
 {
-	opwolf_state *state = (opwolf_state *)machine->driver_data;
+	opwolf_state *state = machine->driver_data<opwolf_state>();
 
 	// The game is made up of 6 rounds, when you complete the
 	// sixth you return to the start but with harder difficulty.
@@ -394,7 +394,7 @@ WRITE16_HANDLER( opwolf_cchip_status_w )
 	// We use it to setup some initial state (it's not clear if the real
 	// c-chip sets this here, or if it's as a side-effect of the other
 	// init sequence data).
-	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	opwolf_state *state = space->machine->driver_data<opwolf_state>();
 
 	state->cchip_ram[0x3d] = 1;
 	state->cchip_ram[0x7a] = 1;
@@ -403,13 +403,13 @@ WRITE16_HANDLER( opwolf_cchip_status_w )
 
 WRITE16_HANDLER( opwolf_cchip_bank_w )
 {
-	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	opwolf_state *state = space->machine->driver_data<opwolf_state>();
 	state->current_bank = data & 7;
 }
 
 WRITE16_HANDLER( opwolf_cchip_data_w )
 {
-	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	opwolf_state *state = space->machine->driver_data<opwolf_state>();
 
 	state->cchip_ram[(state->current_bank * 0x400) + offset] = data & 0xff;
 
@@ -514,7 +514,7 @@ READ16_HANDLER( opwolf_cchip_status_r )
 
 READ16_HANDLER( opwolf_cchip_data_r )
 {
-	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	opwolf_state *state = space->machine->driver_data<opwolf_state>();
 
 //  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(space->cpu)!=0xc18 && cpu_get_pc(space->cpu)!=0xc2e && cpu_get_pc(space->cpu)!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
 //      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(space->cpu), offset, state->current_bank);
@@ -530,7 +530,7 @@ READ16_HANDLER( opwolf_cchip_data_r )
 
 static TIMER_CALLBACK( cchip_timer )
 {
-	opwolf_state *state = (opwolf_state *)machine->driver_data;
+	opwolf_state *state = machine->driver_data<opwolf_state>();
 
 	// Update input ports, these are used by both the 68k directly and by the c-chip
 	state->cchip_ram[0x4] = input_port_read(machine, "IN0");
@@ -720,7 +720,7 @@ static TIMER_CALLBACK( cchip_timer )
 
 void opwolf_cchip_init( running_machine *machine )
 {
-	opwolf_state *state = (opwolf_state *)machine->driver_data;
+	opwolf_state *state = machine->driver_data<opwolf_state>();
 
 	state->cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
 

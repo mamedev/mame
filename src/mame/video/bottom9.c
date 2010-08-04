@@ -11,7 +11,7 @@
 
 void bottom9_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	bottom9_state *state = (bottom9_state *)machine->driver_data;
+	bottom9_state *state = machine->driver_data<bottom9_state>();
 	*code |= (*color & 0x3f) << 8;
 	*color = state->layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
@@ -27,7 +27,7 @@ void bottom9_sprite_callback( running_machine *machine, int *code, int *color, i
 {
 	/* bit 4 = priority over zoom (0 = have priority) */
 	/* bit 5 = priority over B (1 = have priority) */
-	bottom9_state *state = (bottom9_state *)machine->driver_data;
+	bottom9_state *state = machine->driver_data<bottom9_state>();
 	*priority = (*color & 0x30) >> 4;
 	*color = state->sprite_colorbase + (*color & 0x0f);
 }
@@ -41,7 +41,7 @@ void bottom9_sprite_callback( running_machine *machine, int *code, int *color, i
 
 void bottom9_zoom_callback( running_machine *machine, int *code, int *color, int *flags )
 {
-	bottom9_state *state = (bottom9_state *)machine->driver_data;
+	bottom9_state *state = machine->driver_data<bottom9_state>();
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = state->zoom_colorbase + ((*color & 0x3c) >> 2);
@@ -56,7 +56,7 @@ void bottom9_zoom_callback( running_machine *machine, int *code, int *color, int
 
 VIDEO_START( bottom9 )
 {
-	bottom9_state *state = (bottom9_state *)machine->driver_data;
+	bottom9_state *state = machine->driver_data<bottom9_state>();
 
 	state->layer_colorbase[0] = 0;	/* not used */
 	state->layer_colorbase[1] = 0;
@@ -75,7 +75,7 @@ VIDEO_START( bottom9 )
 
 VIDEO_UPDATE( bottom9 )
 {
-	bottom9_state *state = (bottom9_state *)screen->machine->driver_data;
+	bottom9_state *state = screen->machine->driver_data<bottom9_state>();
 
 	k052109_tilemap_update(state->k052109);
 

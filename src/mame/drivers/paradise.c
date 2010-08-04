@@ -543,7 +543,7 @@ GFXDECODE_END
 
 static MACHINE_START( paradise )
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 	int bank_n = memory_region_length(machine, "maincpu") / 0x4000 - 1;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
@@ -556,7 +556,7 @@ static MACHINE_START( paradise )
 
 static MACHINE_RESET( paradise )
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 
 	state->palbank = 0;
 	state->priority = 0;
@@ -1043,21 +1043,21 @@ ROM_END
 
 static DRIVER_INIT (paradise)
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 	state->sprite_inc = 0x20;
 }
 
 // Inverted flipscreen and sprites are packed in less memory (same number though)
 static DRIVER_INIT (tgtball)
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 	state->sprite_inc = 4;
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
 }
 
 static DRIVER_INIT (torus)
 {
-	paradise_state *state = (paradise_state *)machine->driver_data;
+	paradise_state *state = machine->driver_data<paradise_state>();
 	state->sprite_inc = 4;
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
 }

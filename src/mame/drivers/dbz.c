@@ -63,7 +63,7 @@ Notes:
 
 static INTERRUPT_GEN( dbz_interrupt )
 {
-	dbz_state *state = (dbz_state *)device->machine->driver_data;
+	dbz_state *state = device->machine->driver_data<dbz_state>();
 
 	switch (cpu_getiloops(device))
 	{
@@ -81,14 +81,14 @@ static INTERRUPT_GEN( dbz_interrupt )
 #if 0
 static READ16_HANDLER( dbzcontrol_r )
 {
-	dbz_state *state = (dbz_state *)space->machine->driver_data;
+	dbz_state *state = space->machine->driver_data<dbz_state>();
 	return state->control;
 }
 #endif
 
 static WRITE16_HANDLER( dbzcontrol_w )
 {
-	dbz_state *state = (dbz_state *)space->machine->driver_data;
+	dbz_state *state = space->machine->driver_data<dbz_state>();
 	/* bit 10 = enable '246 readback */
 
 	COMBINE_DATA(&state->control);
@@ -109,13 +109,13 @@ static WRITE16_HANDLER( dbz_sound_command_w )
 
 static WRITE16_HANDLER( dbz_sound_cause_nmi )
 {
-	dbz_state *state = (dbz_state *)space->machine->driver_data;
+	dbz_state *state = space->machine->driver_data<dbz_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq( running_device *device, int irq )
 {
-	dbz_state *state = (dbz_state *)device->machine->driver_data;
+	dbz_state *state = device->machine->driver_data<dbz_state>();
 
 	if (irq)
 		cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
@@ -338,7 +338,7 @@ static const k053936_interface dbz_k053936_intf =
 
 static MACHINE_START( dbz )
 {
-	dbz_state *state = (dbz_state *)machine->driver_data;
+	dbz_state *state = machine->driver_data<dbz_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -356,7 +356,7 @@ static MACHINE_START( dbz )
 
 static MACHINE_RESET( dbz )
 {
-	dbz_state *state = (dbz_state *)machine->driver_data;
+	dbz_state *state = machine->driver_data<dbz_state>();
 	int i;
 
 	for (i = 0; i < 5; i++)

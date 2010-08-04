@@ -10,7 +10,7 @@
 
 WRITE8_HANDLER( bsktball_videoram_w )
 {
-	bsktball_state *state = (bsktball_state *)space->machine->driver_data;
+	bsktball_state *state = space->machine->driver_data<bsktball_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -18,7 +18,7 @@ WRITE8_HANDLER( bsktball_videoram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	bsktball_state *state = (bsktball_state *)machine->driver_data;
+	bsktball_state *state = machine->driver_data<bsktball_state>();
 	int attr = state->videoram[tile_index];
 	int code = ((attr & 0x0f) << 2) | ((attr & 0x30) >> 4);
 	int color = (attr & 0x40) >> 6;
@@ -29,13 +29,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( bsktball )
 {
-	bsktball_state *state = (bsktball_state *)machine->driver_data;
+	bsktball_state *state = machine->driver_data<bsktball_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine *machine,  bitmap_t *bitmap, const rectangle *cliprect )
 {
-	bsktball_state *state = (bsktball_state *)machine->driver_data;
+	bsktball_state *state = machine->driver_data<bsktball_state>();
 	int mot;
 
 	for (mot = 0; mot < 16; mot++)
@@ -55,7 +55,7 @@ static void draw_sprites( running_machine *machine,  bitmap_t *bitmap, const rec
 
 VIDEO_UPDATE( bsktball )
 {
-	bsktball_state *state = (bsktball_state *)screen->machine->driver_data;
+	bsktball_state *state = screen->machine->driver_data<bsktball_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

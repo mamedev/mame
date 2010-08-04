@@ -133,14 +133,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 static CUSTOM_INPUT( exerion_controls_r )
 {
 	static const char *const inname[2] = { "P1", "P2" };
-	exerion_state *state = (exerion_state *)field->port->machine->driver_data;
+	exerion_state *state = field->port->machine->driver_data<exerion_state>();
 	return input_port_read(field->port->machine, inname[state->cocktail_flip]) & 0x3f;
 }
 
 
 static INPUT_CHANGED( coin_inserted )
 {
-	exerion_state *state = (exerion_state *)field->port->machine->driver_data;
+	exerion_state *state = field->port->machine->driver_data<exerion_state>();
 	/* coin insertion causes an NMI */
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -157,7 +157,7 @@ static INPUT_CHANGED( coin_inserted )
 /* protection or some sort of timer. */
 static READ8_DEVICE_HANDLER( exerion_porta_r )
 {
-	exerion_state *state = (exerion_state *)device->machine->driver_data;
+	exerion_state *state = device->machine->driver_data<exerion_state>();
 	state->porta ^= 0x40;
 	return state->porta;
 }
@@ -165,7 +165,7 @@ static READ8_DEVICE_HANDLER( exerion_porta_r )
 
 static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 {
-	exerion_state *state = (exerion_state *)device->machine->driver_data;
+	exerion_state *state = device->machine->driver_data<exerion_state>();
 	/* pull the expected value from the ROM */
 	state->porta = memory_region(device->machine, "maincpu")[0x5f76];
 	state->portb = data;
@@ -176,7 +176,7 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 
 static READ8_HANDLER( exerion_protection_r )
 {
-	exerion_state *state = (exerion_state *)space->machine->driver_data;
+	exerion_state *state = space->machine->driver_data<exerion_state>();
 	if (cpu_get_pc(space->cpu) == 0x4143)
 		return memory_region(space->machine, "maincpu")[0x33c0 + (state->main_ram[0xd] << 2) + offset];
 	else
@@ -384,7 +384,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( exerion )
 {
-	exerion_state *state = (exerion_state *)machine->driver_data;
+	exerion_state *state = machine->driver_data<exerion_state>();
 
 	state->maincpu = machine->device("maincpu");
 
@@ -399,7 +399,7 @@ static MACHINE_START( exerion )
 
 static MACHINE_RESET( exerion )
 {
-	exerion_state *state = (exerion_state *)machine->driver_data;
+	exerion_state *state = machine->driver_data<exerion_state>();
 	int i;
 
 	state->porta = 0;

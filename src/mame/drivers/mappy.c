@@ -1551,14 +1551,14 @@ static READ8_DEVICE_HANDLER( dipA_h )	{ return input_port_read(device->machine, 
 
 static READ8_DEVICE_HANDLER( dipB_mux )	// dips B
 {
-	mappy_state *state = (mappy_state *)device->machine->driver_data;
+	mappy_state *state = device->machine->driver_data<mappy_state>();
 
 	return input_port_read(device->machine, "DSW2") >> (4 * state->mux);
 }
 
 static READ8_DEVICE_HANDLER( dipB_muxi )	// dips B
 {
-	mappy_state *state = (mappy_state *)device->machine->driver_data;
+	mappy_state *state = device->machine->driver_data<mappy_state>();
 
 	// bits are interleaved in Phozon
 	return BITSWAP8(input_port_read(device->machine, "DSW2"),6,4,2,0,7,5,3,1) >> (4 * state->mux);
@@ -1566,7 +1566,7 @@ static READ8_DEVICE_HANDLER( dipB_muxi )	// dips B
 
 static WRITE8_DEVICE_HANDLER( out_mux )
 {
-	mappy_state *state = (mappy_state *)device->machine->driver_data;
+	mappy_state *state = device->machine->driver_data<mappy_state>();
 
 	state->mux = data & 1;
 }

@@ -66,7 +66,7 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( control2_r )
 {
-	moo_state *state = (moo_state *)space->machine->driver_data;
+	moo_state *state = space->machine->driver_data<moo_state>();
 	return state->cur_control2;
 }
 
@@ -80,7 +80,7 @@ static WRITE16_HANDLER( control2_w )
 	/* bit 10 is watchdog */
 	/* bit 11 is enable irq 4 (unconfirmed) */
 
-	moo_state *state = (moo_state *)space->machine->driver_data;
+	moo_state *state = space->machine->driver_data<moo_state>();
 	COMBINE_DATA(&state->cur_control2);
 
 	input_port_write(space->machine, "EEPROMOUT", state->cur_control2, 0xff);
@@ -94,7 +94,7 @@ static WRITE16_HANDLER( control2_w )
 
 static void moo_objdma( running_machine *machine, int type )
 {
-	moo_state *state = (moo_state *)machine->driver_data;
+	moo_state *state = machine->driver_data<moo_state>();
 	int num_inactive;
 	UINT16 *src, *dst, zmask;
 	int counter = k053247_get_dy(state->k053246);
@@ -121,14 +121,14 @@ static void moo_objdma( running_machine *machine, int type )
 
 static TIMER_CALLBACK( dmaend_callback )
 {
-	moo_state *state = (moo_state *)machine->driver_data;
+	moo_state *state = machine->driver_data<moo_state>();
 	if (state->cur_control2 & 0x800)
 		cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( moo_interrupt )
 {
-	moo_state *state = (moo_state *)device->machine->driver_data;
+	moo_state *state = device->machine->driver_data<moo_state>();
 	if (k053246_is_irq_enabled(state->k053246))
 	{
 		moo_objdma(device->machine, state->game_type);
@@ -144,7 +144,7 @@ static INTERRUPT_GEN( moo_interrupt )
 
 static INTERRUPT_GEN( moobl_interrupt )
 {
-	moo_state *state = (moo_state *)device->machine->driver_data;
+	moo_state *state = device->machine->driver_data<moo_state>();
 	moo_objdma(device->machine, state->game_type);
 
 	// schedule DMA end interrupt (delay shortened to catch up with V-blank)
@@ -171,7 +171,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	moo_state *state = (moo_state *)space->machine->driver_data;
+	moo_state *state = space->machine->driver_data<moo_state>();
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
 static READ16_HANDLER( K053247_scattered_word_r )
 {
-	moo_state *state = (moo_state *)space->machine->driver_data;
+	moo_state *state = space->machine->driver_data<moo_state>();
 
 	if (offset & 0x0078)
 		return state->spriteram[offset];
@@ -205,7 +205,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
-	moo_state *state = (moo_state *)space->machine->driver_data;
+	moo_state *state = space->machine->driver_data<moo_state>();
 
 	if (offset & 0x0078)
 		COMBINE_DATA(state->spriteram + offset);
@@ -222,7 +222,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 
 static WRITE16_HANDLER( moo_prot_w )
 {
-	moo_state *state = (moo_state *)space->machine->driver_data;
+	moo_state *state = space->machine->driver_data<moo_state>();
 	UINT32 src1, src2, dst, length, a, b, res;
 
 	COMBINE_DATA(&state->protram[offset]);
@@ -431,7 +431,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( moo )
 {
-	moo_state *state = (moo_state *)machine->driver_data;
+	moo_state *state = machine->driver_data<moo_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("soundcpu");
@@ -451,7 +451,7 @@ static MACHINE_START( moo )
 
 static MACHINE_RESET( moo )
 {
-	moo_state *state = (moo_state *)machine->driver_data;
+	moo_state *state = machine->driver_data<moo_state>();
 	int i;
 
 	for (i = 0; i < 16; i++)
@@ -885,7 +885,7 @@ ROM_END
 
 static DRIVER_INIT( moo )
 {
-	moo_state *state = (moo_state *)machine->driver_data;
+	moo_state *state = machine->driver_data<moo_state>();
 	state->game_type = (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua"));
 }
 

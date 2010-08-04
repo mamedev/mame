@@ -153,7 +153,7 @@ PALETTE_INIT( arabian )
 
 VIDEO_START( arabian )
 {
-	arabian_state *state = (arabian_state *)machine->driver_data;
+	arabian_state *state = machine->driver_data<arabian_state>();
 	UINT8 *gfxbase = memory_region(machine, "gfx1");
 	int offs;
 
@@ -222,7 +222,7 @@ VIDEO_START( arabian )
 
 static void blit_area( running_machine *machine, UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy )
 {
-	arabian_state *state = (arabian_state *)machine->driver_data;
+	arabian_state *state = machine->driver_data<arabian_state>();
 	UINT8 *srcdata = &state->converted_gfx[src * 4];
 	int i,j;
 
@@ -269,7 +269,7 @@ static void blit_area( running_machine *machine, UINT8 plane, UINT16 src, UINT8 
 
 WRITE8_HANDLER( arabian_blitter_w )
 {
-	arabian_state *state = (arabian_state *)space->machine->driver_data;
+	arabian_state *state = space->machine->driver_data<arabian_state>();
 
 	/* write the data */
 	state->blitter[offset] = data;
@@ -300,7 +300,7 @@ WRITE8_HANDLER( arabian_blitter_w )
 
 WRITE8_HANDLER( arabian_videoram_w )
 {
-	arabian_state *state = (arabian_state *)space->machine->driver_data;
+	arabian_state *state = space->machine->driver_data<arabian_state>();
 	UINT8 *base;
 	UINT8 x, y;
 
@@ -370,7 +370,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 
 VIDEO_UPDATE( arabian )
 {
-	arabian_state *state = (arabian_state *)screen->machine->driver_data;
+	arabian_state *state = screen->machine->driver_data<arabian_state>();
 	const pen_t *pens = &screen->machine->pens[(state->video_control >> 3) << 8];
 	int y;
 

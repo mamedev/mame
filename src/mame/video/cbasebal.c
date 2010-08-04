@@ -10,7 +10,7 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	cbasebal_state *state = (cbasebal_state *)machine->driver_data;
+	cbasebal_state *state = machine->driver_data<cbasebal_state>();
 	UINT8 attr = state->scrollram[2 * tile_index + 1];
 	SET_TILE_INFO(
 			1,
@@ -21,7 +21,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	cbasebal_state *state = (cbasebal_state *)machine->driver_data;
+	cbasebal_state *state = machine->driver_data<cbasebal_state>();
 	UINT8 attr = state->textram[tile_index + 0x800];
 	SET_TILE_INFO(
 			0,
@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( cbasebal )
 {
-	cbasebal_state *state = (cbasebal_state *)machine->driver_data;
+	cbasebal_state *state = machine->driver_data<cbasebal_state>();
 
 	state->textram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->scrollram = auto_alloc_array(machine, UINT8, 0x1000);
@@ -64,7 +64,7 @@ VIDEO_START( cbasebal )
 
 WRITE8_HANDLER( cbasebal_textram_w )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 
 	state->textram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x7ff);
@@ -72,13 +72,13 @@ WRITE8_HANDLER( cbasebal_textram_w )
 
 READ8_HANDLER( cbasebal_textram_r )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 	return state->textram[offset];
 }
 
 WRITE8_HANDLER( cbasebal_scrollram_w )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 
 	state->scrollram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -86,13 +86,13 @@ WRITE8_HANDLER( cbasebal_scrollram_w )
 
 READ8_HANDLER( cbasebal_scrollram_r )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 	return state->scrollram[offset];
 }
 
 WRITE8_HANDLER( cbasebal_gfxctrl_w )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 
 	/* bit 0 is unknown - toggles continuously */
 
@@ -124,14 +124,14 @@ WRITE8_HANDLER( cbasebal_gfxctrl_w )
 
 WRITE8_HANDLER( cbasebal_scrollx_w )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 	state->scroll_x[offset] = data;
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_x[0] + 256 * state->scroll_x[1]);
 }
 
 WRITE8_HANDLER( cbasebal_scrolly_w )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 	state->scroll_y[offset] = data;
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_y[0] + 256 * state->scroll_y[1]);
 }
@@ -146,7 +146,7 @@ WRITE8_HANDLER( cbasebal_scrolly_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	cbasebal_state *state = (cbasebal_state *)machine->driver_data;
+	cbasebal_state *state = machine->driver_data<cbasebal_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs, sx, sy;
 
@@ -180,7 +180,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( cbasebal )
 {
-	cbasebal_state *state = (cbasebal_state *)screen->machine->driver_data;
+	cbasebal_state *state = screen->machine->driver_data<cbasebal_state>();
 
 	if (state->bg_on)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

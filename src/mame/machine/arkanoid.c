@@ -17,7 +17,7 @@
 
 READ8_HANDLER( arkanoid_Z80_mcu_r )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 
 	/* return the last value the 68705 wrote, and mark that we've read it */
 	state->m68705write = 0;
@@ -26,7 +26,7 @@ READ8_HANDLER( arkanoid_Z80_mcu_r )
 
 static TIMER_CALLBACK( test )
 {
-	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	arkanoid_state *state = machine->driver_data<arkanoid_state>();
 
 	state->z80write = 1;
 	state->fromz80 = param;
@@ -41,21 +41,21 @@ WRITE8_HANDLER( arkanoid_Z80_mcu_w )
 
 READ8_HANDLER( arkanoid_68705_port_a_r )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( arkanoid_68705_port_a_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 
 	state->port_a_out = data;
 }
 
 WRITE8_HANDLER( arkanoid_68705_ddr_a_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 
 	state->ddr_a = data;
 }
@@ -63,7 +63,7 @@ WRITE8_HANDLER( arkanoid_68705_ddr_a_w )
 
 READ8_HANDLER( arkanoid_68705_port_c_r )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	int res = 0;
 
 	/* bit 0 is high on a write strobe; clear it once we've detected it */
@@ -79,7 +79,7 @@ READ8_HANDLER( arkanoid_68705_port_c_r )
 
 WRITE8_HANDLER( arkanoid_68705_port_c_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 
 	if ((state->ddr_c & 0x04) && (~data & 0x04) && (state->port_c_out & 0x04))
 	{
@@ -99,14 +99,14 @@ WRITE8_HANDLER( arkanoid_68705_port_c_w )
 
 WRITE8_HANDLER( arkanoid_68705_ddr_c_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 
 	state->ddr_c = data;
 }
 
 CUSTOM_INPUT( arkanoid_68705_input_r )
 {
-	arkanoid_state *state = (arkanoid_state *)field->port->machine->driver_data;
+	arkanoid_state *state = field->port->machine->driver_data<arkanoid_state>();
 	int res = 0;
 
 	/* bit 0x40 of comes from the sticky bit */
@@ -122,7 +122,7 @@ CUSTOM_INPUT( arkanoid_68705_input_r )
 
 CUSTOM_INPUT( arkanoid_input_mux )
 {
-	arkanoid_state *state = (arkanoid_state *)field->port->machine->driver_data;
+	arkanoid_state *state = field->port->machine->driver_data<arkanoid_state>();
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
 	return input_port_read(field->port->machine, (state->paddle_select == 0) ? tag1 : tag2);
@@ -191,7 +191,7 @@ TO DO (2006.09.12) :
 /* Kludge for some bootlegs that read this address */
 READ8_HANDLER( arkanoid_bootleg_f000_r )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	UINT8 arkanoid_bootleg_val = 0x00;
 
 	switch (state->bootleg_id)
@@ -234,7 +234,7 @@ READ8_HANDLER( arkanoid_bootleg_f000_r )
 /* Kludge for some bootlegs that read this address */
 READ8_HANDLER( arkanoid_bootleg_f002_r )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	UINT8 arkanoid_bootleg_val = 0x00;
 
 	switch (state->bootleg_id)
@@ -322,7 +322,7 @@ READ8_HANDLER( arkanoid_bootleg_f002_r )
 /* Kludge for some bootlegs that write this address */
 WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	state->bootleg_cmd = 0x00;
 
 	switch (state->bootleg_id)
@@ -578,7 +578,7 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 #ifdef UNUSED_CODE
 READ8_HANDLER( block2_bootleg_f000_r )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	return state->bootleg_cmd;
 }
 #endif
@@ -586,7 +586,7 @@ READ8_HANDLER( block2_bootleg_f000_r )
 /* Kludge for some bootlegs that read this address */
 READ8_HANDLER( arkanoid_bootleg_d008_r )
 {
-	arkanoid_state *state = (arkanoid_state *)space->machine->driver_data;
+	arkanoid_state *state = space->machine->driver_data<arkanoid_state>();
 	UINT8 arkanoid_bootleg_d008_bit[8];
 	UINT8 arkanoid_bootleg_d008_val;
 	UINT8 arkanoid_paddle_value = input_port_read(space->machine, "MUX");

@@ -21,7 +21,7 @@ static KONAMI_SETLINES_CALLBACK( aliens_banking );
 
 static INTERRUPT_GEN( aliens_interrupt )
 {
-	aliens_state *state = (aliens_state *)device->machine->driver_data;
+	aliens_state *state = device->machine->driver_data<aliens_state>();
 
 	if (k051960_is_irq_enabled(state->k051960))
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
@@ -29,7 +29,7 @@ static INTERRUPT_GEN( aliens_interrupt )
 
 static READ8_HANDLER( bankedram_r )
 {
-	aliens_state *state = (aliens_state *)space->machine->driver_data;
+	aliens_state *state = space->machine->driver_data<aliens_state>();
 
 	if (state->palette_selected)
 		return space->machine->generic.paletteram.u8[offset];
@@ -39,7 +39,7 @@ static READ8_HANDLER( bankedram_r )
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	aliens_state *state = (aliens_state *)space->machine->driver_data;
+	aliens_state *state = space->machine->driver_data<aliens_state>();
 
 	if (state->palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
@@ -49,7 +49,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( aliens_coin_counter_w )
 {
-	aliens_state *state = (aliens_state *)space->machine->driver_data;
+	aliens_state *state = space->machine->driver_data<aliens_state>();
 
 	/* bits 0-1 = coin counters */
 	coin_counter_w(space->machine, 0, data & 0x01);
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( aliens_coin_counter_w )
 
 static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
 {
-	aliens_state *state = (aliens_state *)space->machine->driver_data;
+	aliens_state *state = space->machine->driver_data<aliens_state>();
 
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
 
 static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
 {
-	aliens_state *state = (aliens_state *)device->machine->driver_data;
+	aliens_state *state = device->machine->driver_data<aliens_state>();
 
 	/* b1: bank for chanel A */
 	/* b0: bank for chanel B */
@@ -95,7 +95,7 @@ static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
 
 static READ8_HANDLER( k052109_051960_r )
 {
-	aliens_state *state = (aliens_state *)space->machine->driver_data;
+	aliens_state *state = space->machine->driver_data<aliens_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -112,7 +112,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	aliens_state *state = (aliens_state *)space->machine->driver_data;
+	aliens_state *state = space->machine->driver_data<aliens_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -237,7 +237,7 @@ static const k051960_interface aliens_k051960_intf =
 
 static MACHINE_START( aliens )
 {
-	aliens_state *state = (aliens_state *)machine->driver_data;
+	aliens_state *state = machine->driver_data<aliens_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 20, &ROM[0x10000], 0x2000);
@@ -254,7 +254,7 @@ static MACHINE_START( aliens )
 
 static MACHINE_RESET( aliens )
 {
-	aliens_state *state = (aliens_state *)machine->driver_data;
+	aliens_state *state = machine->driver_data<aliens_state>();
 
 	konami_configure_set_lines(machine->device("maincpu"), aliens_banking);
 

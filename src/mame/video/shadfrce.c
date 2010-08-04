@@ -5,7 +5,7 @@ static TILE_GET_INFO( get_shadfrce_fgtile_info )
 {
 
 	/* ---- ----  tttt tttt  ---- ----  pppp TTTT */
-	shadfrce_state *state = (shadfrce_state *)machine->driver_data;
+	shadfrce_state *state = machine->driver_data<shadfrce_state>();
 	int tileno, colour;
 
 	tileno = (state->fgvideoram[tile_index *2] & 0x00ff) | ((state->fgvideoram[tile_index *2+1] & 0x000f) << 8);
@@ -16,7 +16,7 @@ static TILE_GET_INFO( get_shadfrce_fgtile_info )
 
 WRITE16_HANDLER( shadfrce_fgvideoram_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fgtilemap,offset/2);
@@ -26,7 +26,7 @@ static TILE_GET_INFO( get_shadfrce_bg0tile_info )
 {
 
 	/* ---- ----  ---- cccc  --TT TTTT TTTT TTTT */
-	shadfrce_state *state = (shadfrce_state *)machine->driver_data;
+	shadfrce_state *state = machine->driver_data<shadfrce_state>();
 	int tileno, colour,fyx;
 
 	tileno = (state->bg0videoram[tile_index *2+1] & 0x3fff);
@@ -39,7 +39,7 @@ static TILE_GET_INFO( get_shadfrce_bg0tile_info )
 
 WRITE16_HANDLER( shadfrce_bg0videoram_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	state->bg0videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg0tilemap,offset/2);
@@ -47,7 +47,7 @@ WRITE16_HANDLER( shadfrce_bg0videoram_w )
 
 static TILE_GET_INFO( get_shadfrce_bg1tile_info )
 {
-	shadfrce_state *state = (shadfrce_state *)machine->driver_data;
+	shadfrce_state *state = machine->driver_data<shadfrce_state>();
 	int tileno, colour;
 
 	tileno = (state->bg1videoram[tile_index] & 0x0fff);
@@ -58,7 +58,7 @@ static TILE_GET_INFO( get_shadfrce_bg1tile_info )
 
 WRITE16_HANDLER( shadfrce_bg1videoram_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	state->bg1videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg1tilemap,offset);
@@ -69,7 +69,7 @@ WRITE16_HANDLER( shadfrce_bg1videoram_w )
 
 VIDEO_START( shadfrce )
 {
-	shadfrce_state *state = (shadfrce_state *)machine->driver_data;
+	shadfrce_state *state = machine->driver_data<shadfrce_state>();
 
 	state->fgtilemap = tilemap_create(machine, get_shadfrce_fgtile_info,tilemap_scan_rows,    8,  8,64,32);
 	tilemap_set_transparent_pen(state->fgtilemap,0);
@@ -84,28 +84,28 @@ VIDEO_START( shadfrce )
 
 WRITE16_HANDLER ( shadfrce_bg0scrollx_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	tilemap_set_scrollx( state->bg0tilemap, 0, data & 0x1ff );
 }
 
 WRITE16_HANDLER ( shadfrce_bg0scrolly_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	tilemap_set_scrolly( state->bg0tilemap, 0, data  & 0x1ff );
 }
 
 WRITE16_HANDLER ( shadfrce_bg1scrollx_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	tilemap_set_scrollx( state->bg1tilemap, 0, data  & 0x1ff );
 }
 
 WRITE16_HANDLER ( shadfrce_bg1scrolly_w )
 {
-	shadfrce_state *state = (shadfrce_state *)space->machine->driver_data;
+	shadfrce_state *state = space->machine->driver_data<shadfrce_state>();
 
 	tilemap_set_scrolly( state->bg1tilemap, 0, data & 0x1ff );
 }
@@ -130,7 +130,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
        P = priority
     */
 
-	shadfrce_state *state = (shadfrce_state *)machine->driver_data;
+	shadfrce_state *state = machine->driver_data<shadfrce_state>();
 	const gfx_element *gfx = machine->gfx[1];
 	UINT16 *finish = state->spvideoram_old;
 	UINT16 *source = finish + 0x2000/2 - 8;
@@ -164,7 +164,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( shadfrce )
 {
-	shadfrce_state *state = (shadfrce_state *)screen->machine->driver_data;
+	shadfrce_state *state = screen->machine->driver_data<shadfrce_state>();
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if (state->video_enable)
@@ -184,7 +184,7 @@ VIDEO_UPDATE( shadfrce )
 
 VIDEO_EOF( shadfrce )
 {
-	shadfrce_state *state = (shadfrce_state *)machine->driver_data;
+	shadfrce_state *state = machine->driver_data<shadfrce_state>();
 
 	/* looks like sprites are *two* frames ahead */
 	memcpy(state->spvideoram_old, state->spvideoram, state->spvideoram_size);

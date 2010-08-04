@@ -21,7 +21,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 static void tumblepb_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -87,7 +87,7 @@ static void tumblepb_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void jumpkids_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -154,7 +154,7 @@ static void jumpkids_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void fncywld_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -221,7 +221,7 @@ static void fncywld_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 WRITE16_HANDLER( bcstory_tilebank_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	state->tilebank = data;
 	tilemap_mark_all_tiles_dirty(state->pf1_tilemap);
@@ -231,7 +231,7 @@ WRITE16_HANDLER( bcstory_tilebank_w )
 
 WRITE16_HANDLER( chokchok_tilebank_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	state->tilebank = data << 1;
 	tilemap_mark_all_tiles_dirty(state->pf1_tilemap);
@@ -241,7 +241,7 @@ WRITE16_HANDLER( chokchok_tilebank_w )
 
 WRITE16_HANDLER( wlstar_tilebank_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	/* it just writes 0000 or ffff */
 	state->tilebank = data & 0x4000;
@@ -253,7 +253,7 @@ WRITE16_HANDLER( wlstar_tilebank_w )
 
 WRITE16_HANDLER( suprtrio_tilebank_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	state->tilebank = data << 14; // shift it here, makes using bcstory_tilebank easier
 	tilemap_mark_all_tiles_dirty(state->pf1_tilemap);
@@ -264,7 +264,7 @@ WRITE16_HANDLER( suprtrio_tilebank_w )
 
 WRITE16_HANDLER( tumblepb_pf1_data_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->pf1_data[offset]);
 	tilemap_mark_tile_dirty(state->pf1_tilemap, offset);
@@ -273,7 +273,7 @@ WRITE16_HANDLER( tumblepb_pf1_data_w )
 
 WRITE16_HANDLER( tumblepb_pf2_data_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->pf2_data[offset]);
 	tilemap_mark_tile_dirty(state->pf2_tilemap, offset);
@@ -284,7 +284,7 @@ WRITE16_HANDLER( tumblepb_pf2_data_w )
 
 WRITE16_HANDLER( fncywld_pf1_data_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->pf1_data[offset]);
 	tilemap_mark_tile_dirty(state->pf1_tilemap, offset / 2);
@@ -293,7 +293,7 @@ WRITE16_HANDLER( fncywld_pf1_data_w )
 
 WRITE16_HANDLER( fncywld_pf2_data_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->pf2_data[offset]);
 	tilemap_mark_tile_dirty(state->pf2_tilemap, offset / 2);
@@ -301,14 +301,14 @@ WRITE16_HANDLER( fncywld_pf2_data_w )
 
 WRITE16_HANDLER( tumblepb_control_0_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 	COMBINE_DATA(&state->control_0[offset]);
 }
 
 
 WRITE16_HANDLER( pangpang_pf1_data_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->pf1_data[offset]);
 	tilemap_mark_tile_dirty(state->pf1_tilemap, offset / 2);
@@ -317,7 +317,7 @@ WRITE16_HANDLER( pangpang_pf1_data_w )
 
 WRITE16_HANDLER( pangpang_pf2_data_w )
 {
-	tumbleb_state *state = (tumbleb_state *)space->machine->driver_data;
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
 
 	COMBINE_DATA(&state->pf2_data[offset]);
 	tilemap_mark_tile_dirty(state->pf2_tilemap, offset / 2);
@@ -336,7 +336,7 @@ static TILEMAP_MAPPER( tumblep_scan )
 
 INLINE void get_bg_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	int data = gfx_base[tile_index];
 
 	SET_TILE_INFO(
@@ -346,12 +346,12 @@ INLINE void get_bg_tile_info( running_machine *machine, tile_data *tileinfo, int
 			0);
 }
 
-static TILE_GET_INFO( get_bg1_tile_info ) { tumbleb_state *state = (tumbleb_state *)machine->driver_data;	get_bg_tile_info(machine, tileinfo, tile_index, 2, state->pf1_data); }
-static TILE_GET_INFO( get_bg2_tile_info ) { tumbleb_state *state = (tumbleb_state *)machine->driver_data;	get_bg_tile_info(machine, tileinfo, tile_index, 1, state->pf2_data); }
+static TILE_GET_INFO( get_bg1_tile_info ) { tumbleb_state *state = machine->driver_data<tumbleb_state>();	get_bg_tile_info(machine, tileinfo, tile_index, 2, state->pf1_data); }
+static TILE_GET_INFO( get_bg2_tile_info ) { tumbleb_state *state = machine->driver_data<tumbleb_state>();	get_bg_tile_info(machine, tileinfo, tile_index, 1, state->pf2_data); }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	int data = state->pf1_data[tile_index];
 
 	SET_TILE_INFO(
@@ -373,12 +373,12 @@ INLINE void get_fncywld_bg_tile_info( running_machine *machine, tile_data *tilei
 			0);
 }
 
-static TILE_GET_INFO( get_fncywld_bg1_tile_info ) { tumbleb_state *state = (tumbleb_state *)machine->driver_data;	get_fncywld_bg_tile_info(machine, tileinfo, tile_index, 2, state->pf1_data); }
-static TILE_GET_INFO( get_fncywld_bg2_tile_info ) { tumbleb_state *state = (tumbleb_state *)machine->driver_data;	get_fncywld_bg_tile_info(machine, tileinfo, tile_index, 1, state->pf2_data); }
+static TILE_GET_INFO( get_fncywld_bg1_tile_info ) { tumbleb_state *state = machine->driver_data<tumbleb_state>();	get_fncywld_bg_tile_info(machine, tileinfo, tile_index, 2, state->pf1_data); }
+static TILE_GET_INFO( get_fncywld_bg2_tile_info ) { tumbleb_state *state = machine->driver_data<tumbleb_state>();	get_fncywld_bg_tile_info(machine, tileinfo, tile_index, 1, state->pf2_data); }
 
 static TILE_GET_INFO( get_fncywld_fg_tile_info )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	int data = state->pf1_data[tile_index * 2];
 	int attr = state->pf1_data[tile_index * 2 + 1];
 
@@ -393,7 +393,7 @@ static TILE_GET_INFO( get_fncywld_fg_tile_info )
 /* jump pop */
 static TILE_GET_INFO( get_jumppop_bg1_tile_info )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	int data = state->pf1_data[tile_index];
 
 	SET_TILE_INFO(
@@ -405,7 +405,7 @@ static TILE_GET_INFO( get_jumppop_bg1_tile_info )
 
 static TILE_GET_INFO( get_jumppop_bg2_tile_info )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	int data = state->pf2_data[tile_index];
 
 	SET_TILE_INFO(
@@ -417,7 +417,7 @@ static TILE_GET_INFO( get_jumppop_bg2_tile_info )
 
 static TILE_GET_INFO( get_jumppop_bg2_alt_tile_info )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	int data = state->pf2_data[tile_index];
 
 	SET_TILE_INFO(
@@ -430,7 +430,7 @@ static TILE_GET_INFO( get_jumppop_bg2_alt_tile_info )
 
 static TILE_GET_INFO( get_jumppop_fg_tile_info )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	int data = state->pf1_data[tile_index];
 
 	SET_TILE_INFO(
@@ -465,12 +465,12 @@ INLINE void pangpang_get_bg2x_tile_info( running_machine *machine, tile_data *ti
 }
 
 
-static TILE_GET_INFO( pangpang_get_bg1_tile_info ) { tumbleb_state *state = (tumbleb_state *)machine->driver_data;	pangpang_get_bg_tile_info(machine, tileinfo, tile_index, 2, state->pf1_data); }
-static TILE_GET_INFO( pangpang_get_bg2_tile_info ) { tumbleb_state *state = (tumbleb_state *)machine->driver_data;	pangpang_get_bg2x_tile_info(machine, tileinfo, tile_index, 1, state->pf2_data); }
+static TILE_GET_INFO( pangpang_get_bg1_tile_info ) { tumbleb_state *state = machine->driver_data<tumbleb_state>();	pangpang_get_bg_tile_info(machine, tileinfo, tile_index, 2, state->pf1_data); }
+static TILE_GET_INFO( pangpang_get_bg2_tile_info ) { tumbleb_state *state = machine->driver_data<tumbleb_state>();	pangpang_get_bg2x_tile_info(machine, tileinfo, tile_index, 1, state->pf2_data); }
 
 static TILE_GET_INFO( pangpang_get_fg_tile_info )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	int data = state->pf1_data[tile_index * 2 + 1];
 	int attr = state->pf1_data[tile_index * 2];
 
@@ -484,7 +484,7 @@ static TILE_GET_INFO( pangpang_get_fg_tile_info )
 
 static STATE_POSTLOAD( tumbleb_tilemap_redraw )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	tilemap_mark_all_tiles_dirty(state->pf1_tilemap);
 	tilemap_mark_all_tiles_dirty(state->pf1_alt_tilemap);
@@ -495,7 +495,7 @@ static STATE_POSTLOAD( tumbleb_tilemap_redraw )
 
 VIDEO_START( pangpang )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	state->pf1_tilemap =     tilemap_create(machine, pangpang_get_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 32);
 	state->pf1_alt_tilemap = tilemap_create(machine, pangpang_get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
@@ -513,7 +513,7 @@ VIDEO_START( pangpang )
 
 VIDEO_START( tumblepb )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	state->pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 32);
 	state->pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
@@ -530,7 +530,7 @@ VIDEO_START( tumblepb )
 
 VIDEO_START( sdfight )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	state->pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
 	state->pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
@@ -548,7 +548,7 @@ VIDEO_START( sdfight )
 
 VIDEO_START( fncywld )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	state->pf1_tilemap =     tilemap_create(machine, get_fncywld_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 32);
 	state->pf1_alt_tilemap = tilemap_create(machine, get_fncywld_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
@@ -565,7 +565,7 @@ VIDEO_START( fncywld )
 
 VIDEO_START( jumppop )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	state->pf1_tilemap =     tilemap_create(machine, get_jumppop_fg_tile_info,      tilemap_scan_rows,     8,  8, 128, 64);
 	state->pf1_alt_tilemap = tilemap_create(machine, get_jumppop_bg1_tile_info,     tilemap_scan_rows,    16, 16,  64, 64);
@@ -589,7 +589,7 @@ VIDEO_START( jumppop )
 
 VIDEO_START( suprtrio )
 {
-	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 
 	state->pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 32);
 	state->pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
@@ -605,7 +605,7 @@ VIDEO_START( suprtrio )
 
 VIDEO_UPDATE( tumblepb )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->flipscreen = state->control_0[0] & 0x80;
@@ -641,7 +641,7 @@ VIDEO_UPDATE( tumblepb )
 
 VIDEO_UPDATE( jumpkids )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->flipscreen = state->control_0[0] & 0x80;
@@ -677,7 +677,7 @@ VIDEO_UPDATE( jumpkids )
 
 VIDEO_UPDATE( semicom )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->flipscreen = state->control_0[0] & 0x80;
@@ -713,7 +713,7 @@ VIDEO_UPDATE( semicom )
 
 VIDEO_UPDATE( semicom_altoffsets )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offsx, offsy, offsx2;
 
 	state->flipscreen = state->control_0[0] & 0x80;
@@ -742,7 +742,7 @@ VIDEO_UPDATE( semicom_altoffsets )
 
 VIDEO_UPDATE( bcstory )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->flipscreen = state->control_0[0] & 0x80;
@@ -780,7 +780,7 @@ VIDEO_UPDATE( bcstory )
 
 VIDEO_UPDATE( semibase )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->flipscreen = state->control_0[0] & 0x80;
@@ -809,7 +809,7 @@ VIDEO_UPDATE( semibase )
 
 VIDEO_UPDATE( sdfight )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->flipscreen = state->control_0[0] & 0x80;
@@ -839,7 +839,7 @@ VIDEO_UPDATE( sdfight )
 
 VIDEO_UPDATE( fncywld )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->flipscreen = state->control_0[0] & 0x80;
@@ -876,7 +876,7 @@ VIDEO_UPDATE( fncywld )
 
 VIDEO_UPDATE( jumppop )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 
 	//  bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -908,7 +908,7 @@ VIDEO_UPDATE( jumppop )
 
 VIDEO_UPDATE( suprtrio )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 
 	tilemap_set_scrollx(state->pf1_alt_tilemap, 0, -state->control[1] - 6);
 	tilemap_set_scrolly(state->pf1_alt_tilemap, 0, -state->control[2]);
@@ -936,7 +936,7 @@ popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
 
 VIDEO_UPDATE( pangpang )
 {
-	tumbleb_state *state = (tumbleb_state *)screen->machine->driver_data;
+	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
 
 	state->flipscreen = state->control_0[0] & 0x80;

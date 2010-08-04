@@ -80,21 +80,21 @@ PALETTE_INIT( ironhors )
 
 WRITE8_HANDLER( ironhors_videoram_w )
 {
-	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+	ironhors_state *state = space->machine->driver_data<ironhors_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ironhors_colorram_w )
 {
-	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+	ironhors_state *state = space->machine->driver_data<ironhors_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ironhors_charbank_w )
 {
-	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+	ironhors_state *state = space->machine->driver_data<ironhors_state>();
 	if (state->charbank != (data & 0x03))
 	{
 		state->charbank = data & 0x03;
@@ -108,7 +108,7 @@ WRITE8_HANDLER( ironhors_charbank_w )
 
 WRITE8_HANDLER( ironhors_palettebank_w )
 {
-	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+	ironhors_state *state = space->machine->driver_data<ironhors_state>();
 	if (state->palettebank != (data & 0x07))
 	{
 		state->palettebank = data & 0x07;
@@ -137,7 +137,7 @@ WRITE8_HANDLER( ironhors_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	ironhors_state *state = machine->driver_data<ironhors_state>();
 	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x40) << 2) +
 		((state->colorram[tile_index] & 0x20) << 4) + (state->charbank << 10);
 	int color = (state->colorram[tile_index] & 0x0f) + 16 * state->palettebank;
@@ -149,7 +149,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( ironhors )
 {
-	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	ironhors_state *state = machine->driver_data<ironhors_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
@@ -157,7 +157,7 @@ VIDEO_START( ironhors )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	ironhors_state *state = machine->driver_data<ironhors_state>();
 	int offs;
 	UINT8 *sr;
 
@@ -241,7 +241,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( ironhors )
 {
-	ironhors_state *state = (ironhors_state *)screen->machine->driver_data;
+	ironhors_state *state = screen->machine->driver_data<ironhors_state>();
 	int row;
 
 	for (row = 0; row < 32; row++)
@@ -254,7 +254,7 @@ VIDEO_UPDATE( ironhors )
 
 static TILE_GET_INFO( farwest_get_bg_tile_info )
 {
-	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	ironhors_state *state = machine->driver_data<ironhors_state>();
 	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x40) << 2) +
 		((state->colorram[tile_index] & 0x20) << 4) + (state->charbank << 10);
 	int color = (state->colorram[tile_index] & 0x0f) + 16 * state->palettebank;
@@ -265,7 +265,7 @@ static TILE_GET_INFO( farwest_get_bg_tile_info )
 
 VIDEO_START( farwest )
 {
-	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	ironhors_state *state = machine->driver_data<ironhors_state>();
 	state->bg_tilemap = tilemap_create(machine, farwest_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
@@ -273,7 +273,7 @@ VIDEO_START( farwest )
 
 static void farwest_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	ironhors_state *state = machine->driver_data<ironhors_state>();
 	int offs;
 	UINT8 *sr = state->spriteram2;
 	UINT8 *sr2 = state->spriteram;
@@ -354,7 +354,7 @@ static void farwest_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( farwest)
 {
-	ironhors_state *state = (ironhors_state *)screen->machine->driver_data;
+	ironhors_state *state = screen->machine->driver_data<ironhors_state>();
 	int row;
 
 	for (row = 0; row < 32; row++)

@@ -137,7 +137,7 @@ INPUT_PORTS_END
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	ajax_state *state = (ajax_state *)space->machine->driver_data;
+	ajax_state *state = space->machine->driver_data<ajax_state>();
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */

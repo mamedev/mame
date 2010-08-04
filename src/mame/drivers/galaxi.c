@@ -44,12 +44,13 @@ Notes:
 #include "sound/okim6295.h"
 #include "galaxi.lh"
 
-class galaxi_state
+class galaxi_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, galaxi_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, galaxi_state(machine)); }
 
-	galaxi_state(running_machine &machine) { }
+	galaxi_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *  bg1_ram;
@@ -75,77 +76,77 @@ public:
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	galaxi_state *state = (galaxi_state *)machine->driver_data;
+	galaxi_state *state = machine->driver_data<galaxi_state>();
 	UINT16 code = state->bg1_ram[tile_index];
 	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	galaxi_state *state = (galaxi_state *)machine->driver_data;
+	galaxi_state *state = machine->driver_data<galaxi_state>();
 	UINT16 code = state->bg2_ram[tile_index];
 	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg3_tile_info )
 {
-	galaxi_state *state = (galaxi_state *)machine->driver_data;
+	galaxi_state *state = machine->driver_data<galaxi_state>();
 	UINT16 code = state->bg3_ram[tile_index];
 	SET_TILE_INFO(0, code, (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg4_tile_info )
 {
-	galaxi_state *state = (galaxi_state *)machine->driver_data;
+	galaxi_state *state = machine->driver_data<galaxi_state>();
 	UINT16 code = state->bg4_ram[tile_index];
 	SET_TILE_INFO(0, code, (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	galaxi_state *state = (galaxi_state *)machine->driver_data;
+	galaxi_state *state = machine->driver_data<galaxi_state>();
 	UINT16 code = state->fg_ram[tile_index];
 	SET_TILE_INFO(1, code, 0x20 + (code >> 12), 0);
 }
 
 static WRITE16_HANDLER( galaxi_bg1_w )
 {
-	galaxi_state *state = (galaxi_state *)space->machine->driver_data;
+	galaxi_state *state = space->machine->driver_data<galaxi_state>();
 	COMBINE_DATA(&state->bg1_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg1_tmap, offset);
 }
 
 static WRITE16_HANDLER( galaxi_bg2_w )
 {
-	galaxi_state *state = (galaxi_state *)space->machine->driver_data;
+	galaxi_state *state = space->machine->driver_data<galaxi_state>();
 	COMBINE_DATA(&state->bg2_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg2_tmap, offset);
 }
 
 static WRITE16_HANDLER( galaxi_bg3_w )
 {
-	galaxi_state *state = (galaxi_state *)space->machine->driver_data;
+	galaxi_state *state = space->machine->driver_data<galaxi_state>();
 	COMBINE_DATA(&state->bg3_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg3_tmap, offset);
 }
 
 static WRITE16_HANDLER( galaxi_bg4_w )
 {
-	galaxi_state *state = (galaxi_state *)space->machine->driver_data;
+	galaxi_state *state = space->machine->driver_data<galaxi_state>();
 	COMBINE_DATA(&state->bg4_ram[offset]);
 	tilemap_mark_tile_dirty(state->bg4_tmap, offset);
 }
 
 static WRITE16_HANDLER( galaxi_fg_w )
 {
-	galaxi_state *state = (galaxi_state *)space->machine->driver_data;
+	galaxi_state *state = space->machine->driver_data<galaxi_state>();
 	COMBINE_DATA(&state->fg_ram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tmap, offset);
 }
 
 static VIDEO_START(galaxi)
 {
-	galaxi_state *state = (galaxi_state *)machine->driver_data;
+	galaxi_state *state = machine->driver_data<galaxi_state>();
 
 	state->bg1_tmap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 16, 16, 0x20, 0x10);
 	state->bg2_tmap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 16, 16, 0x20, 0x10);
@@ -166,7 +167,7 @@ static VIDEO_START(galaxi)
 
 static VIDEO_UPDATE(galaxi)
 {
-	galaxi_state *state = (galaxi_state *)screen->machine->driver_data;
+	galaxi_state *state = screen->machine->driver_data<galaxi_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -199,27 +200,27 @@ static VIDEO_UPDATE(galaxi)
 
 static void show_out( running_machine *machine )
 {
-//  galaxi_state *state = (galaxi_state *)machine->driver_data;
+//  galaxi_state *state = machine->driver_data<galaxi_state>();
 //  popmessage("%04x %04x %04x", state->out[0], state->out[1], state->out[2]);
 }
 
 static WRITE16_HANDLER( galaxi_500000_w )
 {
-	galaxi_state *state = (galaxi_state *)space->machine->driver_data;
+	galaxi_state *state = space->machine->driver_data<galaxi_state>();
 	COMBINE_DATA(&state->out[0]);
 	show_out(space->machine);
 }
 
 static WRITE16_HANDLER( galaxi_500002_w )
 {
-	galaxi_state *state = (galaxi_state *)space->machine->driver_data;
+	galaxi_state *state = space->machine->driver_data<galaxi_state>();
 	COMBINE_DATA(&state->out[1]);
 	show_out(space->machine);
 }
 
 static WRITE16_HANDLER( galaxi_500004_w )
 {
-	galaxi_state *state = (galaxi_state *)space->machine->driver_data;
+	galaxi_state *state = space->machine->driver_data<galaxi_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -256,13 +257,13 @@ static WRITE16_HANDLER( galaxi_500004_w )
 
 static CUSTOM_INPUT( ticket_r )
 {
-	galaxi_state *state = (galaxi_state *)field->port->machine->driver_data;
+	galaxi_state *state = field->port->machine->driver_data<galaxi_state>();
 	return state->ticket && !(field->port->machine->primary_screen->frame_number() % 10);
 }
 
 static CUSTOM_INPUT( hopper_r )
 {
-	galaxi_state *state = (galaxi_state *)field->port->machine->driver_data;
+	galaxi_state *state = field->port->machine->driver_data<galaxi_state>();
 	return state->hopper && !(field->port->machine->primary_screen->frame_number() % 10);
 }
 
@@ -373,7 +374,7 @@ GFXDECODE_END
 
 static MACHINE_START( galaxi )
 {
-	galaxi_state *state = (galaxi_state *)machine->driver_data;
+	galaxi_state *state = machine->driver_data<galaxi_state>();
 
 	state_save_register_global(machine, state->hopper);
 	state_save_register_global(machine, state->ticket);
@@ -382,7 +383,7 @@ static MACHINE_START( galaxi )
 
 static MACHINE_RESET( galaxi )
 {
-	galaxi_state *state = (galaxi_state *)machine->driver_data;
+	galaxi_state *state = machine->driver_data<galaxi_state>();
 
 	state->hopper = 0;
 	state->ticket = 0;

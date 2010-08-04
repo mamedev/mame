@@ -156,32 +156,32 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 
 static WRITE8_HANDLER( sub_cpu_halt_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	cpu_set_input_line(state->subcpu, INPUT_LINE_HALT, (data) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( from_snd_r )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	return state->snd_data;
 }
 
 static WRITE8_HANDLER( to_main_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	state->snd_data = data;
 }
 
 
 static READ8_HANDLER(nycaptor_sharedram_r)
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER(nycaptor_sharedram_w)
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	state->sharedram[offset] = data;
 }
 
@@ -192,7 +192,7 @@ static READ8_HANDLER( nycaptor_b_r )
 
 static READ8_HANDLER( nycaptor_by_r )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	int port = input_port_read(space->machine, "LIGHTY");
 
 	if (state->gametype == 1)
@@ -209,14 +209,14 @@ static READ8_HANDLER( nycaptor_bx_r )
 
 static WRITE8_HANDLER( sound_cpu_reset_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static MACHINE_RESET( ta7630 )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 	int i;
 	double db			= 0.0;
 	double db_step		= 0.50;	/* 0.50 dB step (at least, maybe more) */
@@ -234,7 +234,7 @@ static MACHINE_RESET( ta7630 )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -249,13 +249,13 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	state->sound_nmi_enable = 1;
 
 	if (state->pending_nmi)
@@ -288,13 +288,13 @@ static const msm5232_interface msm5232_config =
 
 static READ8_HANDLER ( nycaptor_generic_control_r )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	return state->generic_control_reg;
 }
 
 static WRITE8_HANDLER( nycaptor_generic_control_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	state->generic_control_reg = data;
 	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x10000 + ((data&0x08)>>3)*0x4000 );
 }
@@ -398,7 +398,7 @@ static READ8_HANDLER(cyclshtg_mcu_status_r1)
 
 static WRITE8_HANDLER( cyclshtg_generic_control_w )
 {
-	nycaptor_state *state = (nycaptor_state *)space->machine->driver_data;
+	nycaptor_state *state = space->machine->driver_data<nycaptor_state>();
 	int bank = (data >> 2) & 3;
 
 	state->generic_control_reg = data;
@@ -697,7 +697,7 @@ GFXDECODE_END
 
 static MACHINE_START( nycaptor )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -731,7 +731,7 @@ static MACHINE_START( nycaptor )
 
 static MACHINE_RESET( nycaptor )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 
 	MACHINE_RESET_CALL(ta7630);
 
@@ -1284,7 +1284,7 @@ ROM_END
 
 static DRIVER_INIT( bronx )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 	int i;
 	UINT8 *rom = memory_region(machine, "maincpu");
 
@@ -1296,7 +1296,7 @@ static DRIVER_INIT( bronx )
 
 static DRIVER_INIT( colt )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 	int i;
 	UINT8 *rom = memory_region(machine, "maincpu");
 
@@ -1308,13 +1308,13 @@ static DRIVER_INIT( colt )
 
 static DRIVER_INIT( nycaptor )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 	state->gametype = 0;
 }
 
 static DRIVER_INIT( cyclshtg )
 {
-	nycaptor_state *state = (nycaptor_state *)machine->driver_data;
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
 	state->gametype = 1;
 }
 

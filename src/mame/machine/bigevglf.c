@@ -13,31 +13,31 @@
 
 READ8_HANDLER( bigevglf_68705_port_a_r )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( bigevglf_68705_port_a_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	state->port_a_out = data;
 }
 
 WRITE8_HANDLER( bigevglf_68705_ddr_a_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	state->ddr_a = data;
 }
 
 READ8_HANDLER( bigevglf_68705_port_b_r )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 WRITE8_HANDLER( bigevglf_68705_port_b_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 
 	if ((state->ddr_b & 0x02) && (~state->port_b_out & 0x02) && (data & 0x02)) /* positive going transition of the clock */
 	{
@@ -56,13 +56,13 @@ WRITE8_HANDLER( bigevglf_68705_port_b_w )
 
 WRITE8_HANDLER( bigevglf_68705_ddr_b_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	state->ddr_b = data;
 }
 
 READ8_HANDLER( bigevglf_68705_port_c_r )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 
 	state->port_c_in = 0;
 	if (state->main_sent)
@@ -75,19 +75,19 @@ READ8_HANDLER( bigevglf_68705_port_c_r )
 
 WRITE8_HANDLER( bigevglf_68705_port_c_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	state->port_c_out = data;
 }
 
 WRITE8_HANDLER( bigevglf_68705_ddr_c_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	state->ddr_c = data;
 }
 
 WRITE8_HANDLER( bigevglf_mcu_w )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 
 	state->port_a_in = data;
 	state->main_sent = 1;
@@ -97,7 +97,7 @@ WRITE8_HANDLER( bigevglf_mcu_w )
 
 READ8_HANDLER( bigevglf_mcu_r )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 
 	state->mcu_sent = 1;
 	return state->from_mcu;
@@ -105,7 +105,7 @@ READ8_HANDLER( bigevglf_mcu_r )
 
 READ8_HANDLER( bigevglf_mcu_status_r )
 {
-	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
+	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	int res = 0;
 
 	if (!state->main_sent)

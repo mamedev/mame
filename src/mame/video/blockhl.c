@@ -11,7 +11,7 @@
 
 void blockhl_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	blockhl_state *state = (blockhl_state *)machine->driver_data;
+	blockhl_state *state = machine->driver_data<blockhl_state>();
 	*code |= ((*color & 0x0f) << 8);
 	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
@@ -24,7 +24,7 @@ void blockhl_tile_callback( running_machine *machine, int layer, int bank, int *
 
 void blockhl_sprite_callback( running_machine *machine, int *code, int *color, int *priority, int *shadow )
 {
-	blockhl_state *state = (blockhl_state *)machine->driver_data;
+	blockhl_state *state = machine->driver_data<blockhl_state>();
 
 	if(*color & 0x10)
 		*priority = 0xfe; // under K052109_tilemap[0]
@@ -43,7 +43,7 @@ void blockhl_sprite_callback( running_machine *machine, int *code, int *color, i
 
 VIDEO_START( blockhl )
 {
-	blockhl_state *state = (blockhl_state *)machine->driver_data;
+	blockhl_state *state = machine->driver_data<blockhl_state>();
 
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x800);
 
@@ -57,7 +57,7 @@ VIDEO_START( blockhl )
 
 VIDEO_UPDATE( blockhl )
 {
-	blockhl_state *state = (blockhl_state *)screen->machine->driver_data;
+	blockhl_state *state = screen->machine->driver_data<blockhl_state>();
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 

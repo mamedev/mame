@@ -79,7 +79,7 @@ This was pointed out by Bart Puype
 
 static CUSTOM_INPUT( z80_nmi_r )
 {
-	psikyo_state *state = (psikyo_state *)field->port->machine->driver_data;
+	psikyo_state *state = field->port->machine->driver_data<psikyo_state>();
 	int ret = 0x00;
 
 	if (state->z80_nmi)
@@ -97,7 +97,7 @@ static CUSTOM_INPUT( z80_nmi_r )
 
 static CUSTOM_INPUT( mcu_status_r )
 {
-	psikyo_state *state = (psikyo_state *)field->port->machine->driver_data;
+	psikyo_state *state = field->port->machine->driver_data<psikyo_state>();
 	int ret = 0x00;
 
 	/* Don't know exactly what this bit is, but s1945 and tengai
@@ -148,7 +148,7 @@ static READ32_HANDLER( gunbird_input_r )
 
 static TIMER_CALLBACK( psikyo_soundlatch_callback )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 	state->soundlatch = param;
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 	state->z80_nmi = 1;
@@ -190,7 +190,7 @@ static const UINT8 s1945j_table[256] = {
 
 static WRITE32_HANDLER( s1945_mcu_w )
 {
-	psikyo_state *state = (psikyo_state *)space->machine->driver_data;
+	psikyo_state *state = space->machine->driver_data<psikyo_state>();
 
 	// Accesses are always bytes, so resolve it
 	int suboff;
@@ -262,7 +262,7 @@ static WRITE32_HANDLER( s1945_mcu_w )
 
 static READ32_HANDLER( s1945_mcu_r )
 {
-	psikyo_state *state = (psikyo_state *)space->machine->driver_data;
+	psikyo_state *state = space->machine->driver_data<psikyo_state>();
 
 	switch (offset)
 	{
@@ -390,19 +390,19 @@ ADDRESS_MAP_END
 
 static void sound_irq( running_device *device, int irq )
 {
-	psikyo_state *state = (psikyo_state *)device->machine->driver_data;
+	psikyo_state *state = device->machine->driver_data<psikyo_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( psikyo_soundlatch_r )
 {
-	psikyo_state *state = (psikyo_state *)space->machine->driver_data;
+	psikyo_state *state = space->machine->driver_data<psikyo_state>();
 	return state->soundlatch;
 }
 
 static WRITE8_HANDLER( psikyo_clear_nmi_w )
 {
-	psikyo_state *state = (psikyo_state *)space->machine->driver_data;
+	psikyo_state *state = space->machine->driver_data<psikyo_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	state->z80_nmi = 0;
 }
@@ -1026,7 +1026,7 @@ GFXDECODE_END
 
 static MACHINE_START( psikyo )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -1039,7 +1039,7 @@ static MACHINE_START( psikyo )
 
 static MACHINE_RESET( psikyo )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	state->soundlatch = 0;
 	state->z80_nmi = 0;
@@ -1200,7 +1200,7 @@ MACHINE_DRIVER_END
 
 static void irqhandler( running_device *device, int linestate )
 {
-	psikyo_state *state = (psikyo_state *)device->machine->driver_data;
+	psikyo_state *state = device->machine->driver_data<psikyo_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -1832,7 +1832,7 @@ ROM_END
 
 static DRIVER_INIT( sngkace )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	{
 		UINT8 *RAM = memory_region(machine, "ymsnd");
@@ -1874,7 +1874,7 @@ static DRIVER_INIT( sngkace )
 
 static void s1945_mcu_init( running_machine *machine )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 	state->s1945_mcu_direction = 0x00;
 	state->s1945_mcu_inlatch = 0xff;
 	state->s1945_mcu_latch1 = 0xff;
@@ -1898,7 +1898,7 @@ static void s1945_mcu_init( running_machine *machine )
 
 static DRIVER_INIT( tengai )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
@@ -1921,7 +1921,7 @@ static DRIVER_INIT( tengai )
 
 static DRIVER_INIT( gunbird )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
@@ -1939,7 +1939,7 @@ static DRIVER_INIT( gunbird )
 
 static DRIVER_INIT( s1945 )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
@@ -1962,7 +1962,7 @@ static DRIVER_INIT( s1945 )
 
 static DRIVER_INIT( s1945a )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
@@ -1985,7 +1985,7 @@ static DRIVER_INIT( s1945a )
 
 static DRIVER_INIT( s1945j )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports*/
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
@@ -2008,7 +2008,7 @@ static DRIVER_INIT( s1945j )
 
 static DRIVER_INIT( s1945jn )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
@@ -2025,7 +2025,7 @@ static DRIVER_INIT( s1945jn )
 
 static DRIVER_INIT( s1945bl )
 {
-	psikyo_state *state = (psikyo_state *)machine->driver_data;
+	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);

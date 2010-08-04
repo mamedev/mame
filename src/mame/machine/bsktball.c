@@ -12,7 +12,7 @@
 ***************************************************************************/
 WRITE8_HANDLER( bsktball_nmion_w )
 {
-	bsktball_state *state = (bsktball_state *)space->machine->driver_data;
+	bsktball_state *state = space->machine->driver_data<bsktball_state>();
 	state->nmi_on = offset & 0x01;
 }
 
@@ -22,7 +22,7 @@ WRITE8_HANDLER( bsktball_nmion_w )
 /* NMI every 32V, IRQ every VBLANK */
 INTERRUPT_GEN( bsktball_interrupt )
 {
-	bsktball_state *state = (bsktball_state *)device->machine->driver_data;
+	bsktball_state *state = device->machine->driver_data<bsktball_state>();
 
 	/* We mod by 8 because we're interrupting 8x per frame, 1 per 32V */
 	state->i256v = (state->i256v + 1) % 8;
@@ -39,13 +39,13 @@ INTERRUPT_GEN( bsktball_interrupt )
 
 WRITE8_HANDLER( bsktball_ld1_w )
 {
-	bsktball_state *state = (bsktball_state *)space->machine->driver_data;
+	bsktball_state *state = space->machine->driver_data<bsktball_state>();
 	state->ld1 = (offset & 0x01);
 }
 
 WRITE8_HANDLER( bsktball_ld2_w )
 {
-	bsktball_state *state = (bsktball_state *)space->machine->driver_data;
+	bsktball_state *state = space->machine->driver_data<bsktball_state>();
 	state->ld2 = (offset & 0x01);
 }
 
@@ -56,7 +56,7 @@ WRITE8_HANDLER( bsktball_ld2_w )
 
 READ8_HANDLER( bsktball_in0_r )
 {
-	bsktball_state *state = (bsktball_state *)space->machine->driver_data;
+	bsktball_state *state = space->machine->driver_data<bsktball_state>();
 	int p1_horiz;
 	int p1_vert;
 	int p2_horiz;

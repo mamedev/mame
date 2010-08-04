@@ -11,7 +11,7 @@
 
 static TILE_GET_INFO( get_joe_tile_info )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 	int code = state->tileram[tile_index];
 
 	SET_TILE_INFO(
@@ -23,7 +23,7 @@ static TILE_GET_INFO( get_joe_tile_info )
 
 static TILE_GET_INFO( get_joe_tile_info_2 )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 	int code = state->tileram_2[tile_index * 2];
 	int attr = state->tileram_2[tile_index * 2 + 1];
 
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_joe_tile_info_2 )
 
 static TILE_GET_INFO( get_joe_tile_info_3 )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 	int code = state->tileram_3[tile_index];
 
 	SET_TILE_INFO(
@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_joe_tile_info_3 )
 
 static TILE_GET_INFO( get_joe_tile_info_4 )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 	int code = state->tileram_4[tile_index];
 
 	SET_TILE_INFO(
@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_joe_tile_info_4 )
 
 static TILE_GET_INFO( get_joe_tile_info_5 )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 	int code = state->tileram_5[tile_index * 2];
 	int attr = state->tileram_5[tile_index * 2 + 1];
 
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_joe_tile_info_5 )
 
 static TILE_GET_INFO( get_joe_tile_info_6 )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 	int code = state->tileram_6[tile_index * 2];
 	int attr = state->tileram_6[tile_index * 2 + 1];
 
@@ -87,7 +87,7 @@ static TILE_GET_INFO( get_joe_tile_info_6 )
 
 static TILE_GET_INFO( get_joe_tile_info_7 )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 	int code = state->tileram_7[tile_index * 2];
 	int attr = state->tileram_7[tile_index * 2 + 1];
 
@@ -100,7 +100,7 @@ static TILE_GET_INFO( get_joe_tile_info_7 )
 
 WRITE16_HANDLER( ashnojoe_tileram_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	state->tileram[offset] = data;
 	tilemap_mark_tile_dirty(state->joetilemap, offset);
@@ -109,7 +109,7 @@ WRITE16_HANDLER( ashnojoe_tileram_w )
 
 WRITE16_HANDLER( ashnojoe_tileram2_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	state->tileram_2[offset] = data;
 	tilemap_mark_tile_dirty(state->joetilemap2, offset / 2);
@@ -117,7 +117,7 @@ WRITE16_HANDLER( ashnojoe_tileram2_w )
 
 WRITE16_HANDLER( ashnojoe_tileram3_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	state->tileram_3[offset] = data;
 	tilemap_mark_tile_dirty(state->joetilemap3, offset);
@@ -125,7 +125,7 @@ WRITE16_HANDLER( ashnojoe_tileram3_w )
 
 WRITE16_HANDLER( ashnojoe_tileram4_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	state->tileram_4[offset] = data;
 	tilemap_mark_tile_dirty(state->joetilemap4, offset);
@@ -133,7 +133,7 @@ WRITE16_HANDLER( ashnojoe_tileram4_w )
 
 WRITE16_HANDLER( ashnojoe_tileram5_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	state->tileram_5[offset] = data;
 	tilemap_mark_tile_dirty(state->joetilemap5, offset / 2);
@@ -141,7 +141,7 @@ WRITE16_HANDLER( ashnojoe_tileram5_w )
 
 WRITE16_HANDLER( ashnojoe_tileram6_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	state->tileram_6[offset] = data;
 	tilemap_mark_tile_dirty(state->joetilemap6, offset / 2);
@@ -149,7 +149,7 @@ WRITE16_HANDLER( ashnojoe_tileram6_w )
 
 WRITE16_HANDLER( ashnojoe_tileram7_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	state->tileram_7[offset] = data;
 	tilemap_mark_tile_dirty(state->joetilemap7, offset / 2);
@@ -157,7 +157,7 @@ WRITE16_HANDLER( ashnojoe_tileram7_w )
 
 WRITE16_HANDLER( joe_tilemaps_xscroll_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	switch( offset )
 	{
@@ -182,7 +182,7 @@ WRITE16_HANDLER( joe_tilemaps_xscroll_w )
 
 WRITE16_HANDLER( joe_tilemaps_yscroll_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 
 	switch( offset )
 	{
@@ -207,7 +207,7 @@ WRITE16_HANDLER( joe_tilemaps_yscroll_w )
 
 VIDEO_START( ashnojoe )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 
 	state->joetilemap = tilemap_create(machine, get_joe_tile_info,  tilemap_scan_rows, 8, 8, 64, 32);
 	state->joetilemap2 = tilemap_create(machine, get_joe_tile_info_2, tilemap_scan_rows, 16, 16, 32, 32);
@@ -226,7 +226,7 @@ VIDEO_START( ashnojoe )
 
 VIDEO_UPDATE( ashnojoe )
 {
-	ashnojoe_state *state = (ashnojoe_state *)screen->machine->driver_data;
+	ashnojoe_state *state = screen->machine->driver_data<ashnojoe_state>();
 
 	//state->tilemap_reg[0] & 0x10 // ?? on coin insertion
 

@@ -20,7 +20,7 @@ Tomasz Slanina
 
 static READ8_HANDLER( mcu_r )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 
 	//mame_printf_debug("Z80 MCU  R = %x\n", state->mcu_out);
 	return state->mcu_out;
@@ -29,7 +29,7 @@ static READ8_HANDLER( mcu_r )
 /* latch LS374 at U39 */
 static WRITE8_HANDLER( mcu_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->mcu_in = data;
 }
 
@@ -40,49 +40,49 @@ static WRITE8_HANDLER( mcu_w )
 
 static READ8_HANDLER( changela_68705_port_a_r )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 static WRITE8_HANDLER( changela_68705_port_a_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->port_a_out = data;
 }
 
 static WRITE8_HANDLER( changela_68705_ddr_a_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->ddr_a = data;
 }
 
 static READ8_HANDLER( changela_68705_port_b_r )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	return (state->port_b_out & state->ddr_b) | (input_port_read(space->machine, "MCU") & ~state->ddr_b);
 }
 
 static WRITE8_HANDLER( changela_68705_port_b_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->port_b_out = data;
 }
 
 static WRITE8_HANDLER( changela_68705_ddr_b_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->ddr_b = data;
 }
 
 static READ8_HANDLER( changela_68705_port_c_r )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	return (state->port_c_out & state->ddr_c) | (state->port_c_in & ~state->ddr_c);
 }
 
 static WRITE8_HANDLER( changela_68705_port_c_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	/* PC3 is connected to the CLOCK input of the LS374,
         so we latch the data on positive going edge of the clock */
 
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( changela_68705_port_c_w )
 
 static WRITE8_HANDLER( changela_68705_ddr_c_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->ddr_c = data;
 }
 
@@ -123,13 +123,13 @@ ADDRESS_MAP_END
 /* U30 */
 static READ8_HANDLER( changela_24_r )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	return ((state->port_c_out & 2) << 2) | 7;	/* bits 2,1,0-N/C inputs */
 }
 
 static READ8_HANDLER( changela_25_r )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	//collisions on bits 3,2, bits 1,0-N/C inputs
 	return (state->tree1_col << 3) | (state->tree0_col << 2) | 0x03;
 }
@@ -141,7 +141,7 @@ static READ8_HANDLER( changela_30_r )
 
 static READ8_HANDLER( changela_31_r )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	/* If the new value is less than the old value, and it did not wrap around,
        or if the new value is greater than the old value, and it did wrap around,
        then we are moving LEFT. */
@@ -197,19 +197,19 @@ static READ8_HANDLER( changela_2d_r )
 
 static WRITE8_HANDLER( mcu_pc_0_w )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->port_c_in = (state->port_c_in & 0xfe) | (data & 1);
 }
 
 static WRITE8_HANDLER( changela_collision_reset_0 )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->collision_reset = data & 0x01;
 }
 
 static WRITE8_HANDLER( changela_collision_reset_1 )
 {
-	changela_state *state = (changela_state *)space->machine->driver_data;
+	changela_state *state = space->machine->driver_data<changela_state>();
 	state->tree_collision_reset = data & 0x01;
 }
 
@@ -422,7 +422,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 static INTERRUPT_GEN( chl_interrupt )
 {
-	changela_state *state = (changela_state *)device->machine->driver_data;
+	changela_state *state = device->machine->driver_data<changela_state>();
 	int vector = device->machine->primary_screen->vblank() ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
 
 //    device->machine->primary_screen->update_partial(device->machine->primary_screen->vpos());
@@ -439,7 +439,7 @@ static INTERRUPT_GEN( chl_interrupt )
 
 static MACHINE_START(changela)
 {
-	changela_state *state = (changela_state *)machine->driver_data;
+	changela_state *state = machine->driver_data<changela_state>();
 
 	state->mcu = machine->device("mcu");
 
@@ -481,7 +481,7 @@ static MACHINE_START(changela)
 
 static MACHINE_RESET (changela)
 {
-	changela_state *state = (changela_state *)machine->driver_data;
+	changela_state *state = machine->driver_data<changela_state>();
 
 	/* video */
 	state->slopeROM_bank = 0;

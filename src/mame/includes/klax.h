@@ -6,14 +6,13 @@
 
 #include "machine/atarigen.h"
 
-class klax_state
+class klax_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, klax_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, klax_state(machine)); }
 
-	klax_state(running_machine &machine) { }
-
-	atarigen_state			atarigen;
+	klax_state(running_machine &machine)
+		: atarigen_state(machine) { }
 };
 
 

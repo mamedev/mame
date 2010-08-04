@@ -277,7 +277,7 @@ GFXDECODE_END
 
 static void sound_irq( running_device *device, int state )
 {
-	funkyjet_state *driver_state = (funkyjet_state *)device->machine->driver_data;
+	funkyjet_state *driver_state = device->machine->driver_data<funkyjet_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -298,7 +298,7 @@ static const deco16ic_interface funkyjet_deco16ic_intf =
 
 static MACHINE_START( funkyjet )
 {
-	funkyjet_state *state = (funkyjet_state *)machine->driver_data;
+	funkyjet_state *state = machine->driver_data<funkyjet_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");

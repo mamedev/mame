@@ -16,12 +16,13 @@ Todo:
 #define NUM_PENS	(8)
 
 
-class dorachan_state
+class dorachan_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dorachan_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dorachan_state(machine)); }
 
-	dorachan_state(running_machine &machine) { }
+	dorachan_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -43,7 +44,7 @@ public:
 
 static CUSTOM_INPUT( dorachan_protection_r )
 {
-	dorachan_state *state = (dorachan_state *)field->port->machine->driver_data;
+	dorachan_state *state = field->port->machine->driver_data<dorachan_state>();
 	UINT8 ret = 0;
 
 	switch (cpu_get_previouspc(state->main_cpu))
@@ -81,7 +82,7 @@ static void get_pens(pen_t *pens)
 
 static VIDEO_UPDATE( dorachan )
 {
-	dorachan_state *state = (dorachan_state *)screen->machine->driver_data;
+	dorachan_state *state = screen->machine->driver_data<dorachan_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	const UINT8 *color_map_base;
@@ -124,14 +125,14 @@ static VIDEO_UPDATE( dorachan )
 
 static WRITE8_HANDLER(dorachan_ctrl_w)
 {
-	dorachan_state *state = (dorachan_state *)space->machine->driver_data;
+	dorachan_state *state = space->machine->driver_data<dorachan_state>();
 	state->flip_screen = (data >> 6) & 0x01;
 }
 
 
 static CUSTOM_INPUT( dorachan_v128_r )
 {
-	dorachan_state *state = (dorachan_state *)field->port->machine->driver_data;
+	dorachan_state *state = field->port->machine->driver_data<dorachan_state>();
 
 	/* to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped */
 	return ((field->port->machine->primary_screen->vpos() >> 7) & 0x01) ^ state->flip_screen;
@@ -225,7 +226,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( dorachan )
 {
-	dorachan_state *state = (dorachan_state *)machine->driver_data;
+	dorachan_state *state = machine->driver_data<dorachan_state>();
 
 	state->main_cpu = machine->device("maincpu");
 
@@ -234,7 +235,7 @@ static MACHINE_START( dorachan )
 
 static MACHINE_RESET( dorachan )
 {
-	dorachan_state *state = (dorachan_state *)machine->driver_data;
+	dorachan_state *state = machine->driver_data<dorachan_state>();
 
 	state->flip_screen = 0;
 }

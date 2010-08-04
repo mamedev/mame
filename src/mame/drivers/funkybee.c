@@ -280,14 +280,14 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( funkybee )
 {
-	funkybee_state *state = (funkybee_state *)machine->driver_data;
+	funkybee_state *state = machine->driver_data<funkybee_state>();
 
 	state_save_register_global(machine, state->gfx_bank);
 }
 
 static MACHINE_RESET( funkybee )
 {
-	funkybee_state *state = (funkybee_state *)machine->driver_data;
+	funkybee_state *state = machine->driver_data<funkybee_state>();
 
 	state->gfx_bank = 0;
 }

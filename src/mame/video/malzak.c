@@ -20,7 +20,7 @@
 
 VIDEO_UPDATE( malzak )
 {
-	malzak_state *state = (malzak_state *)screen->machine->driver_data;
+	malzak_state *state = screen->machine->driver_data<malzak_state>();
 	int sx, sy;
 	int x,y;
 	bitmap_t *s2636_0_bitmap;
@@ -77,7 +77,7 @@ VIDEO_UPDATE( malzak )
 
 WRITE8_HANDLER( malzak_playfield_w )
 {
-	malzak_state *state = (malzak_state *)space->machine->driver_data;
+	malzak_state *state = space->machine->driver_data<malzak_state>();
 	int tile = ((state->malzak_x / 16) * 16) + (offset / 16);
 
 //  state->playfield_x[tile] = state->malzak_x / 16;

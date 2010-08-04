@@ -188,7 +188,7 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static TIMER_CALLBACK( rsaga2_interrupt2  )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 2, HOLD_LINE);
 }
 
@@ -201,7 +201,7 @@ static INTERRUPT_GEN( rastansaga2_interrupt )
 
 static TIMER_CALLBACK( crimec_interrupt3 )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);
 }
 
@@ -214,7 +214,7 @@ static INTERRUPT_GEN( crimec_interrupt )
 
 static TIMER_CALLBACK( hitice_interrupt6 )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
@@ -227,7 +227,7 @@ static INTERRUPT_GEN( hitice_interrupt )
 
 static TIMER_CALLBACK( rambo3_interrupt1 )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
 }
 
@@ -240,7 +240,7 @@ static INTERRUPT_GEN( rambo3_interrupt )
 
 static TIMER_CALLBACK( pbobble_interrupt5 )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
@@ -252,7 +252,7 @@ static INTERRUPT_GEN( pbobble_interrupt )
 
 static TIMER_CALLBACK( viofight_interrupt1 )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
 }
 
@@ -264,7 +264,7 @@ static INTERRUPT_GEN( viofight_interrupt )
 
 static TIMER_CALLBACK( masterw_interrupt4 )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
@@ -276,7 +276,7 @@ static INTERRUPT_GEN( masterw_interrupt )
 
 static TIMER_CALLBACK( silentd_interrupt4 )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
@@ -288,7 +288,7 @@ static INTERRUPT_GEN( silentd_interrupt )
 
 static TIMER_CALLBACK( selfeena_interrupt4 )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
@@ -300,7 +300,7 @@ static INTERRUPT_GEN( selfeena_interrupt )
 
 static TIMER_CALLBACK( sbm_interrupt5 )//4
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
@@ -355,7 +355,7 @@ static READ16_HANDLER( trackx2_lo_r )
 
 static WRITE16_HANDLER( gain_control_w )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		if (offset == 0)
@@ -390,13 +390,13 @@ static const eeprom_interface taitob_eeprom_intf =
 
 static READ16_HANDLER( eep_latch_r )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	return state->eep_latch;
 }
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 
 	COMBINE_DATA(&state->eep_latch);
 
@@ -431,13 +431,13 @@ static WRITE16_HANDLER( eeprom_w )
 
 static READ16_HANDLER( player_34_coin_ctrl_r )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	return state->coin_word;
 }
 
 static WRITE16_HANDLER( player_34_coin_ctrl_w )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 
 	COMBINE_DATA(&state->coin_word);
 
@@ -450,7 +450,7 @@ static WRITE16_HANDLER( player_34_coin_ctrl_w )
 
 static READ16_HANDLER( pbobble_input_bypass_r )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	switch (offset)
 	{
 		case 0x01:
@@ -463,7 +463,7 @@ static READ16_HANDLER( pbobble_input_bypass_r )
 
 static WRITE16_HANDLER( spacedxo_tc0220ioc_w )
 {
-	taitob_state *state = (taitob_state *)space->machine->driver_data;
+	taitob_state *state = space->machine->driver_data<taitob_state>();
 	if (ACCESSING_BITS_0_7)
 		tc0220ioc_w(state->tc0220ioc, offset, data & 0xff);
 	else
@@ -2091,7 +2091,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	taitob_state *state = (taitob_state *)device->machine->driver_data;
+	taitob_state *state = device->machine->driver_data<taitob_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2126,7 +2126,7 @@ static const ym2203_interface ym2203_config =
 */
 static void mb87078_gain_changed( running_machine *machine, int channel, int percent )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 
 	if (channel == 1)
 	{
@@ -2192,7 +2192,7 @@ static const tc0140syt_interface taitob_tc0140syt_intf =
 
 static MACHINE_START( taitob )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -2208,7 +2208,7 @@ static MACHINE_START( taitob )
 
 static MACHINE_RESET( taitob )
 {
-	taitob_state *state = (taitob_state *)machine->driver_data;
+	taitob_state *state = machine->driver_data<taitob_state>();
 
 	state->eep_latch = 0;
 	state->coin_word = 0;

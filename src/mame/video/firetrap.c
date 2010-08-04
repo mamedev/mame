@@ -85,7 +85,7 @@ static TILEMAP_MAPPER( get_bg_memory_offset )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	firetrap_state *state = machine->driver_data<firetrap_state>();
 	int code = state->fgvideoram[tile_index];
 	int color = state->fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
@@ -108,13 +108,13 @@ INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int 
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	firetrap_state *state = machine->driver_data<firetrap_state>();
 	get_bg_tile_info(machine, tileinfo, tile_index, state->bg1videoram, 1);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	firetrap_state *state = machine->driver_data<firetrap_state>();
 	get_bg_tile_info(machine, tileinfo, tile_index, state->bg2videoram, 2);
 }
 
@@ -127,7 +127,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( firetrap )
 {
-	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	firetrap_state *state = machine->driver_data<firetrap_state>();
 	state->fg_tilemap  = tilemap_create(machine, get_fg_tile_info, get_fg_memory_offset, 8, 8, 32, 32);
 	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, get_bg_memory_offset, 16, 16, 32, 32);
 	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, get_bg_memory_offset, 16, 16, 32, 32);
@@ -145,21 +145,21 @@ VIDEO_START( firetrap )
 
 WRITE8_HANDLER( firetrap_fgvideoram_w )
 {
-	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( firetrap_bg1videoram_w )
 {
-	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	state->bg1videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg1_tilemap, offset & 0x6ff);
 }
 
 WRITE8_HANDLER( firetrap_bg2videoram_w )
 {
-	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	state->bg2videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg2_tilemap, offset & 0x6ff);
 }
@@ -167,28 +167,28 @@ WRITE8_HANDLER( firetrap_bg2videoram_w )
 
 WRITE8_HANDLER( firetrap_bg1_scrollx_w )
 {
-	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	state->scroll1_x[offset] = data;
 	tilemap_set_scrollx(state->bg1_tilemap, 0, state->scroll1_x[0] | (state->scroll1_x[1] << 8));
 }
 
 WRITE8_HANDLER( firetrap_bg1_scrolly_w )
 {
-	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	state->scroll1_y[offset] = data;
 	tilemap_set_scrolly(state->bg1_tilemap, 0, -(state->scroll1_y[0] | (state->scroll1_y[1] << 8)));
 }
 
 WRITE8_HANDLER( firetrap_bg2_scrollx_w )
 {
-	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	state->scroll2_x[offset] = data;
 	tilemap_set_scrollx(state->bg2_tilemap, 0, state->scroll2_x[0] | (state->scroll2_x[1] << 8));
 }
 
 WRITE8_HANDLER( firetrap_bg2_scrolly_w )
 {
-	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	state->scroll2_y[offset] = data;
 	tilemap_set_scrolly(state->bg2_tilemap, 0, -(state->scroll2_y[0] | (state->scroll2_y[1] << 8)));
 }
@@ -202,7 +202,7 @@ WRITE8_HANDLER( firetrap_bg2_scrolly_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	firetrap_state *state = machine->driver_data<firetrap_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -273,7 +273,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( firetrap )
 {
-	firetrap_state *state = (firetrap_state *)screen->machine->driver_data;
+	firetrap_state *state = screen->machine->driver_data<firetrap_state>();
 	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

@@ -23,7 +23,7 @@
 
 static INTERRUPT_GEN( bottom9_interrupt )
 {
-	bottom9_state *state = (bottom9_state *)device->machine->driver_data;
+	bottom9_state *state = device->machine->driver_data<bottom9_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
 		cpu_set_input_line(device, 0, HOLD_LINE);
@@ -31,7 +31,7 @@ static INTERRUPT_GEN( bottom9_interrupt )
 
 static READ8_HANDLER( k052109_051960_r )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 
 	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
 	{
@@ -48,7 +48,7 @@ static READ8_HANDLER( k052109_051960_r )
 
 static WRITE8_HANDLER( k052109_051960_w )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(state->k051960, offset - 0x3800, data);
@@ -60,7 +60,7 @@ static WRITE8_HANDLER( k052109_051960_w )
 
 static READ8_HANDLER( bottom9_bankedram1_r )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 
 	if (state->k052109_selected)
 		return k052109_051960_r(space, offset);
@@ -75,7 +75,7 @@ static READ8_HANDLER( bottom9_bankedram1_r )
 
 static WRITE8_HANDLER( bottom9_bankedram1_w )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 
 	if (state->k052109_selected)
 		k052109_051960_w(space, offset, data);
@@ -85,7 +85,7 @@ static WRITE8_HANDLER( bottom9_bankedram1_w )
 
 static READ8_HANDLER( bottom9_bankedram2_r )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 
 	if (state->k052109_selected)
 		return k052109_051960_r(space, offset + 0x2000);
@@ -95,7 +95,7 @@ static READ8_HANDLER( bottom9_bankedram2_r )
 
 static WRITE8_HANDLER( bottom9_bankedram2_w )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 
 	if (state->k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static WRITE8_HANDLER( bottom9_1f90_w )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 
 	/* bits 0/1 = coin counters */
 	coin_counter_w(space->machine, 0, data & 0x01);
@@ -143,26 +143,26 @@ static WRITE8_HANDLER( bottom9_1f90_w )
 
 static WRITE8_HANDLER( bottom9_sh_irqtrigger_w )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static INTERRUPT_GEN( bottom9_sound_interrupt )
 {
-	bottom9_state *state = (bottom9_state *)device->machine->driver_data;
+	bottom9_state *state = device->machine->driver_data<bottom9_state>();
 	if (state->nmienable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 	state->nmienable = data;
 }
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	bottom9_state *state = (bottom9_state *)space->machine->driver_data;
+	bottom9_state *state = space->machine->driver_data<bottom9_state>();
 	int bank_A, bank_B;
 
 	bank_A = ((data >> 0) & 0x03);
@@ -332,7 +332,7 @@ static const k051316_interface bottom9_k051316_intf =
 
 static MACHINE_START( bottom9 )
 {
-	bottom9_state *state = (bottom9_state *)machine->driver_data;
+	bottom9_state *state = machine->driver_data<bottom9_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
@@ -353,7 +353,7 @@ static MACHINE_START( bottom9 )
 
 static MACHINE_RESET( bottom9 )
 {
-	bottom9_state *state = (bottom9_state *)machine->driver_data;
+	bottom9_state *state = machine->driver_data<bottom9_state>();
 
 	state->video_enable = 0;
 	state->zoomreadroms = 0;

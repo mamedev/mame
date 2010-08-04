@@ -108,7 +108,7 @@ static const int pstar_80[0x1a3]={
 
 READ16_HANDLER( pstars_protram_r )
 {
-	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	pgm_state *state = space->machine->driver_data<pgm_state>();
 
 	if (offset == 4)		//region
 		return input_port_read(space->machine, "Region");
@@ -122,7 +122,7 @@ READ16_HANDLER( pstars_protram_r )
 
 READ16_HANDLER( pstars_r )
 {
-	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	pgm_state *state = space->machine->driver_data<pgm_state>();
 
 	if (offset == 0)
 	{
@@ -147,7 +147,7 @@ READ16_HANDLER( pstars_r )
 
 WRITE16_HANDLER( pstars_w )
 {
-	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	pgm_state *state = space->machine->driver_data<pgm_state>();
 
 	if (offset == 0)
 	{
@@ -276,7 +276,7 @@ WRITE16_HANDLER( pstars_w )
 
 static void asic3_compute_hold(running_machine *machine)
 {
-	pgm_state *state = (pgm_state *)machine->driver_data;
+	pgm_state *state = machine->driver_data<pgm_state>();
 
 	// The mode is dependent on the region
 	static const int modes[4] = { 1, 1, 3, 2 };
@@ -313,7 +313,7 @@ static void asic3_compute_hold(running_machine *machine)
 
 READ16_HANDLER( pgm_asic3_r )
 {
-	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	pgm_state *state = space->machine->driver_data<pgm_state>();
 	UINT8 res = 0;
 	/* region is supplied by the protection device */
 
@@ -357,7 +357,7 @@ READ16_HANDLER( pgm_asic3_r )
 
 WRITE16_HANDLER( pgm_asic3_w )
 {
-	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	pgm_state *state = space->machine->driver_data<pgm_state>();
 
 	if(ACCESSING_BITS_0_7)
 	{
@@ -393,7 +393,7 @@ WRITE16_HANDLER( pgm_asic3_w )
 
 WRITE16_HANDLER( pgm_asic3_reg_w )
 {
-	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	pgm_state *state = space->machine->driver_data<pgm_state>();
 
 	if(ACCESSING_BITS_0_7)
 		state->asic3_reg = data & 0xff;
@@ -457,7 +457,7 @@ READ16_HANDLER( sango_protram_r )
 
 READ16_HANDLER( asic28_r )
 {
-	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	pgm_state *state = space->machine->driver_data<pgm_state>();
 	UINT32 val = (state->asic28_regs[1] << 16) | (state->asic28_regs[0]);
 
 	//logerror("Asic28 Read PC = %06x Command = %02x ??\n", cpu_get_pc(space->cpu), state->asic28_regs[1]);
@@ -599,7 +599,7 @@ READ16_HANDLER( asic28_r )
 
 WRITE16_HANDLER( asic28_w )
 {
-	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	pgm_state *state = space->machine->driver_data<pgm_state>();
 
 	if (offset == 0)
 	{

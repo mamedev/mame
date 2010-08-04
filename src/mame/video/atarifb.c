@@ -29,21 +29,21 @@ static void get_tile_info_common( running_machine *machine, tile_data *tileinfo,
 
 static TILE_GET_INFO( alpha1_get_tile_info )
 {
-	atarifb_state *state = (atarifb_state *)machine->driver_data;
+	atarifb_state *state = machine->driver_data<atarifb_state>();
 	get_tile_info_common(machine, tileinfo, tile_index, state->alphap1_videoram);
 }
 
 
 static TILE_GET_INFO( alpha2_get_tile_info )
 {
-	atarifb_state *state = (atarifb_state *)machine->driver_data;
+	atarifb_state *state = machine->driver_data<atarifb_state>();
 	get_tile_info_common(machine, tileinfo, tile_index, state->alphap2_videoram);
 }
 
 
 static TILE_GET_INFO( field_get_tile_info )
 {
-	atarifb_state *state = (atarifb_state *)machine->driver_data;
+	atarifb_state *state = machine->driver_data<atarifb_state>();
 	int code = state->field_videoram[tile_index] & 0x3f;
 	int flipyx = state->field_videoram[tile_index] >> 6;
 
@@ -61,7 +61,7 @@ static TILE_GET_INFO( field_get_tile_info )
 
 WRITE8_HANDLER( atarifb_alpha1_videoram_w )
 {
-	atarifb_state *state = (atarifb_state *)space->machine->driver_data;
+	atarifb_state *state = space->machine->driver_data<atarifb_state>();
 
 	state->alphap1_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->alpha1_tilemap, offset);
@@ -70,7 +70,7 @@ WRITE8_HANDLER( atarifb_alpha1_videoram_w )
 
 WRITE8_HANDLER( atarifb_alpha2_videoram_w )
 {
-	atarifb_state *state = (atarifb_state *)space->machine->driver_data;
+	atarifb_state *state = space->machine->driver_data<atarifb_state>();
 
 	state->alphap2_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->alpha2_tilemap, offset);
@@ -79,7 +79,7 @@ WRITE8_HANDLER( atarifb_alpha2_videoram_w )
 
 WRITE8_HANDLER( atarifb_field_videoram_w )
 {
-	atarifb_state *state = (atarifb_state *)space->machine->driver_data;
+	atarifb_state *state = space->machine->driver_data<atarifb_state>();
 
 	state->field_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->field_tilemap, offset);
@@ -95,7 +95,7 @@ WRITE8_HANDLER( atarifb_field_videoram_w )
 
 VIDEO_START( atarifb )
 {
-	atarifb_state *state = (atarifb_state *)machine->driver_data;
+	atarifb_state *state = machine->driver_data<atarifb_state>();
 
 	state->alpha1_tilemap = tilemap_create(machine, alpha1_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
 	state->alpha2_tilemap = tilemap_create(machine, alpha2_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
@@ -106,7 +106,7 @@ VIDEO_START( atarifb )
 
 static void draw_playfield_and_alpha( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int playfield_x_offset, int playfield_y_offset )
 {
-	atarifb_state *state = (atarifb_state *)machine->driver_data;
+	atarifb_state *state = machine->driver_data<atarifb_state>();
 	static const rectangle bigfield_area = { 4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1 };
 
 	int scroll_x[1];
@@ -123,7 +123,7 @@ static void draw_playfield_and_alpha( running_machine *machine, bitmap_t *bitmap
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int gfx, int is_soccer )
 {
-	atarifb_state *state = (atarifb_state *)machine->driver_data;
+	atarifb_state *state = machine->driver_data<atarifb_state>();
 	static const rectangle bigfield_area = { 4 * 8, 34 * 8 - 1, 0 * 8, 32 * 8 - 1 };
 
 	int obj;

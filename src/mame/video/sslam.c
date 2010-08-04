@@ -6,7 +6,7 @@
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	sslam_state *state = (sslam_state *)machine->driver_data;
+	sslam_state *state = machine->driver_data<sslam_state>();
 	const gfx_element *gfx = machine->gfx[0];
 	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + 0x1000/2;
@@ -75,7 +75,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static TILE_GET_INFO( get_sslam_tx_tile_info )
 {
-	sslam_state *state = (sslam_state *)machine->driver_data;
+	sslam_state *state = machine->driver_data<sslam_state>();
 	int code = state->tx_tileram[tile_index] & 0x0fff;
 	int colr = state->tx_tileram[tile_index] & 0xf000;
 
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_sslam_tx_tile_info )
 
 WRITE16_HANDLER( sslam_tx_tileram_w )
 {
-	sslam_state *state = (sslam_state *)space->machine->driver_data;
+	sslam_state *state = space->machine->driver_data<sslam_state>();
 
 	COMBINE_DATA(&state->tx_tileram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
@@ -94,7 +94,7 @@ WRITE16_HANDLER( sslam_tx_tileram_w )
 
 static TILE_GET_INFO( get_sslam_md_tile_info )
 {
-	sslam_state *state = (sslam_state *)machine->driver_data;
+	sslam_state *state = machine->driver_data<sslam_state>();
 	int code = state->md_tileram[tile_index] & 0x0fff;
 	int colr = state->md_tileram[tile_index] & 0xf000;
 
@@ -103,7 +103,7 @@ static TILE_GET_INFO( get_sslam_md_tile_info )
 
 WRITE16_HANDLER( sslam_md_tileram_w )
 {
-	sslam_state *state = (sslam_state *)space->machine->driver_data;
+	sslam_state *state = space->machine->driver_data<sslam_state>();
 
 	COMBINE_DATA(&state->md_tileram[offset]);
 	tilemap_mark_tile_dirty(state->md_tilemap,offset);
@@ -113,7 +113,7 @@ WRITE16_HANDLER( sslam_md_tileram_w )
 
 static TILE_GET_INFO( get_sslam_bg_tile_info )
 {
-	sslam_state *state = (sslam_state *)machine->driver_data;
+	sslam_state *state = machine->driver_data<sslam_state>();
 	int code = state->bg_tileram[tile_index] & 0x1fff;
 	int colr = state->bg_tileram[tile_index] & 0xe000;
 
@@ -122,7 +122,7 @@ static TILE_GET_INFO( get_sslam_bg_tile_info )
 
 WRITE16_HANDLER( sslam_bg_tileram_w )
 {
-	sslam_state *state = (sslam_state *)space->machine->driver_data;
+	sslam_state *state = space->machine->driver_data<sslam_state>();
 
 	COMBINE_DATA(&state->bg_tileram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -130,7 +130,7 @@ WRITE16_HANDLER( sslam_bg_tileram_w )
 
 static TILE_GET_INFO( get_powerbls_bg_tile_info )
 {
-	sslam_state *state = (sslam_state *)machine->driver_data;
+	sslam_state *state = machine->driver_data<sslam_state>();
 	int code = state->bg_tileram[tile_index*2+1] & 0x0fff;
 	int colr = (state->bg_tileram[tile_index*2+1] & 0xf000) >> 12;
 	code |= (state->bg_tileram[tile_index*2] & 0x0f00) << 4;
@@ -142,7 +142,7 @@ static TILE_GET_INFO( get_powerbls_bg_tile_info )
 
 WRITE16_HANDLER( powerbls_bg_tileram_w )
 {
-	sslam_state *state = (sslam_state *)space->machine->driver_data;
+	sslam_state *state = space->machine->driver_data<sslam_state>();
 
 	COMBINE_DATA(&state->bg_tileram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset>>1);
@@ -150,7 +150,7 @@ WRITE16_HANDLER( powerbls_bg_tileram_w )
 
 VIDEO_START(sslam)
 {
-	sslam_state *state = (sslam_state *)machine->driver_data;
+	sslam_state *state = machine->driver_data<sslam_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_sslam_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->md_tilemap = tilemap_create(machine, get_sslam_md_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
@@ -165,7 +165,7 @@ VIDEO_START(sslam)
 
 VIDEO_START(powerbls)
 {
-	sslam_state *state = (sslam_state *)machine->driver_data;
+	sslam_state *state = machine->driver_data<sslam_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_powerbls_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 
@@ -175,7 +175,7 @@ VIDEO_START(powerbls)
 
 VIDEO_UPDATE(sslam)
 {
-	sslam_state *state = (sslam_state *)screen->machine->driver_data;
+	sslam_state *state = screen->machine->driver_data<sslam_state>();
 
 	if (!(state->regs[6] & 1))
 	{
@@ -215,7 +215,7 @@ VIDEO_UPDATE(sslam)
 
 VIDEO_UPDATE(powerbls)
 {
-	sslam_state *state = (sslam_state *)screen->machine->driver_data;
+	sslam_state *state = screen->machine->driver_data<sslam_state>();
 
 	if (!(state->regs[6] & 1))
 	{

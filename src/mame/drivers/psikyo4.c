@@ -203,7 +203,7 @@ static CUSTOM_INPUT( system_port_r )
 
 static CUSTOM_INPUT( mahjong_ctrl_r ) /* used by hotgmck/hgkairak */
 {
-	psikyo4_state *state = (psikyo4_state *)field->port->machine->driver_data;
+	psikyo4_state *state = field->port->machine->driver_data<psikyo4_state>();
 	int player = (FPTR)param;
 	int sel = (state->io_select[0] & 0x0000ff00) >> 8;
 	int ret = 0xff;
@@ -218,7 +218,7 @@ static CUSTOM_INPUT( mahjong_ctrl_r ) /* used by hotgmck/hgkairak */
 
 static WRITE32_HANDLER( ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 {
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 	int r, g, b;
 	COMBINE_DATA(&state->paletteram[offset]);
 
@@ -232,7 +232,7 @@ static WRITE32_HANDLER( ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_
 
 static WRITE32_HANDLER( ps4_bgpen_1_dword_w )
 {
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 	int r, g, b;
 	COMBINE_DATA(&state->bgpen_1[0]);
 
@@ -245,7 +245,7 @@ static WRITE32_HANDLER( ps4_bgpen_1_dword_w )
 
 static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
 {
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 	int r, g, b;
 	COMBINE_DATA(&state->bgpen_2[0]);
 
@@ -258,7 +258,7 @@ static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
 
 static WRITE32_HANDLER( ps4_screen1_brt_w )
 {
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -289,7 +289,7 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 
 static WRITE32_HANDLER( ps4_screen2_brt_w )
 {
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -321,7 +321,7 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 
 static WRITE32_HANDLER( ps4_vidregs_w )
 {
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 	COMBINE_DATA(&state->vidregs[offset]);
 
 #if ROMTEST
@@ -338,7 +338,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 #if ROMTEST
 static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 {
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 	UINT8 *ROM = memory_region(space->machine, "ymf");
 	return ROM[state->sample_offs++] << 16;
 }
@@ -348,7 +348,7 @@ static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 
 static void set_hotgmck_pcm_bank( running_machine *machine, int n )
 {
-	psikyo4_state *state = (psikyo4_state *)machine->driver_data;
+	psikyo4_state *state = machine->driver_data<psikyo4_state>();
 	UINT8 *ymf_pcmbank = memory_region(machine, "ymf") + 0x200000;
 	UINT8 *pcm_rom = memory_region(machine, "ymfsource");
 
@@ -357,7 +357,7 @@ static void set_hotgmck_pcm_bank( running_machine *machine, int n )
 
 static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 {
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 	int old_bank0 = PCM_BANK_NO(0);
 	int old_bank1 = PCM_BANK_NO(1);
 	int new_bank0, new_bank1;
@@ -687,7 +687,7 @@ INPUT_PORTS_END
 
 static void irqhandler( running_device *device, int linestate )
 {
-	psikyo4_state *state = (psikyo4_state *)device->machine->driver_data;
+	psikyo4_state *state = device->machine->driver_data<psikyo4_state>();
 	cpu_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -699,7 +699,7 @@ static const ymf278b_interface ymf278b_config =
 
 static MACHINE_START( psikyo4 )
 {
-	psikyo4_state *state = (psikyo4_state *)machine->driver_data;
+	psikyo4_state *state = machine->driver_data<psikyo4_state>();
 
 	state->maincpu = machine->device("maincpu");
 
@@ -717,7 +717,7 @@ static MACHINE_START( psikyo4 )
 
 static MACHINE_RESET( psikyo4 )
 {
-	psikyo4_state *state = (psikyo4_state *)machine->driver_data;
+	psikyo4_state *state = machine->driver_data<psikyo4_state>();
 
 	state->oldbrt1 = -1;
 	state->oldbrt2 = -1;
@@ -1011,7 +1011,7 @@ PC  :00001B44: MOV.L   @R1,R2
 PC  :00001B46: TST     R2,R2
 PC  :00001B48: BT      $00001B3C
 */
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 
 	if (cpu_get_pc(space->cpu) == 0x00001b3e)
 		cpu_spinuntil_int(space->cpu);
@@ -1030,7 +1030,7 @@ PC  :00001B50: MOV.L   @R1,R2
 PC  :00001B52: TST     R2,R2
 PC  :00001B54: BT      $00001B48
 */
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 
 	if (cpu_get_pc(space->cpu) == 0x00001b4a)
 		cpu_spinuntil_int(space->cpu);
@@ -1049,7 +1049,7 @@ PC  :000029F4: MOV.L   @R1,R3
 PC  :000029F6: TST     R3,R3
 PC  :000029F8: BT      $000029EC
 */
-	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
+	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 
 	if (cpu_get_pc(space->cpu) == 0x000029ee)
 		cpu_spinuntil_int(space->cpu);
@@ -1064,7 +1064,7 @@ static STATE_POSTLOAD( hotgmck_pcm_bank_postload )
 
 static void install_hotgmck_pcm_bank(running_machine *machine)
 {
-	psikyo4_state *state = (psikyo4_state *)machine->driver_data;
+	psikyo4_state *state = machine->driver_data<psikyo4_state>();
 	UINT8 *ymf_pcm = memory_region(machine, "ymf");
 	UINT8 *pcm_rom = memory_region(machine, "ymfsource");
 

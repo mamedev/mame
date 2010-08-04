@@ -381,7 +381,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( m52 )
 {
-	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+	irem_z80_state *state = machine->driver_data<irem_z80_state>();
 
 	state->bg1xpos = 0;
 	state->bg1ypos = 0;

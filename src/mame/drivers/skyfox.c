@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	skyfox_state *state = (skyfox_state *)field->port->machine->driver_data;
+	skyfox_state *state = field->port->machine->driver_data<skyfox_state>();
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -214,7 +214,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( skyfox_interrupt )
 {
-	skyfox_state *state = (skyfox_state *)device->machine->driver_data;
+	skyfox_state *state = device->machine->driver_data<skyfox_state>();
 
 	/* Scroll the bg */
 	state->bg_pos += (state->bg_ctrl >> 1) & 0x7;	// maybe..
@@ -222,7 +222,7 @@ static INTERRUPT_GEN( skyfox_interrupt )
 
 static MACHINE_START( skyfox )
 {
-	skyfox_state *state = (skyfox_state *)machine->driver_data;
+	skyfox_state *state = machine->driver_data<skyfox_state>();
 
 	state->maincpu = machine->device("maincpu");
 
@@ -232,7 +232,7 @@ static MACHINE_START( skyfox )
 
 static MACHINE_RESET( skyfox )
 {
-	skyfox_state *state = (skyfox_state *)machine->driver_data;
+	skyfox_state *state = machine->driver_data<skyfox_state>();
 
 	state->bg_pos = 0;
 	state->bg_ctrl = 0;

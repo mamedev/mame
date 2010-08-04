@@ -30,7 +30,7 @@
 
 VIDEO_START( harddriv )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 	UINT32 *destmask, mask;
 	int i;
 
@@ -98,7 +98,7 @@ VIDEO_START( harddriv )
 
 void hdgsp_write_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 
 	/* access to the 1bpp/2bpp area */
 	if (address >= 0x02000000 && address <= 0x020fffff)
@@ -126,7 +126,7 @@ void hdgsp_write_to_shiftreg(const address_space *space, UINT32 address, UINT16 
 
 void hdgsp_read_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 
 	if (!state->shiftreg_enable)
 		return;
@@ -164,7 +164,7 @@ void hdgsp_read_from_shiftreg(const address_space *space, UINT32 address, UINT16
 
 static void update_palette_bank(running_machine *machine, int newbank)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	state->gfx_palettebank = newbank;
 }
@@ -179,14 +179,14 @@ static void update_palette_bank(running_machine *machine, int newbank)
 
 READ16_HANDLER( hdgsp_control_lo_r )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	return state->gsp_control_lo[offset];
 }
 
 
 WRITE16_HANDLER( hdgsp_control_lo_w )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	int oldword = state->gsp_control_lo[offset];
 	int newword;
 
@@ -207,14 +207,14 @@ WRITE16_HANDLER( hdgsp_control_lo_w )
 
 READ16_HANDLER( hdgsp_control_hi_r )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	return state->gsp_control_hi[offset];
 }
 
 
 WRITE16_HANDLER( hdgsp_control_hi_w )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	int val = (offset >> 3) & 1;
 
 	int oldword = state->gsp_control_hi[offset];
@@ -275,7 +275,7 @@ READ16_HANDLER( hdgsp_vram_2bpp_r )
 
 WRITE16_HANDLER( hdgsp_vram_1bpp_w )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	UINT32 *dest = (UINT32 *)&state->gsp_vram[offset * 16];
 	UINT32 *mask = &state->mask_table[data * 4];
 	UINT32 color = state->gsp_control_lo[0] & 0xff;
@@ -304,7 +304,7 @@ WRITE16_HANDLER( hdgsp_vram_1bpp_w )
 
 WRITE16_HANDLER( hdgsp_vram_2bpp_w )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	UINT32 *dest = (UINT32 *)&state->gsp_vram[offset * 8];
 	UINT32 *mask = &state->mask_table[data * 2];
 	UINT32 color = state->gsp_control_lo[0];
@@ -331,7 +331,7 @@ WRITE16_HANDLER( hdgsp_vram_2bpp_w )
 
 INLINE void gsp_palette_change(running_machine *machine, int offset)
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = machine->driver_data<harddriv_state>();
 	int red = (state->gsp_paletteram_lo[offset] >> 8) & 0xff;
 	int green = state->gsp_paletteram_lo[offset] & 0xff;
 	int blue = state->gsp_paletteram_hi[offset] & 0xff;
@@ -341,7 +341,7 @@ INLINE void gsp_palette_change(running_machine *machine, int offset)
 
 READ16_HANDLER( hdgsp_paletteram_lo_r )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -353,7 +353,7 @@ READ16_HANDLER( hdgsp_paletteram_lo_r )
 
 WRITE16_HANDLER( hdgsp_paletteram_lo_w )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -373,7 +373,7 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w )
 
 READ16_HANDLER( hdgsp_paletteram_hi_r )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -385,7 +385,7 @@ READ16_HANDLER( hdgsp_paletteram_hi_r )
 
 WRITE16_HANDLER( hdgsp_paletteram_hi_w )
 {
-	harddriv_state *state = (harddriv_state *)space->machine->driver_data;
+	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 
 	/* note that the palette is only accessed via the first 256 entries */
 	/* others are selected via the palette bank */
@@ -425,7 +425,7 @@ static void display_speedups(void)
 
 void harddriv_scanline_driver(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	harddriv_state *state = (harddriv_state *)screen.machine->driver_data;
+	harddriv_state *state = screen.machine->driver_data<harddriv_state>();
 	UINT8 *vram_base = &state->gsp_vram[(params->rowaddr << 12) & state->vram_mask];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (state->gfx_finescroll & 0x0f);
@@ -441,7 +441,7 @@ void harddriv_scanline_driver(screen_device &screen, bitmap_t *bitmap, int scanl
 
 void harddriv_scanline_multisync(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	harddriv_state *state = (harddriv_state *)screen.machine->driver_data;
+	harddriv_state *state = screen.machine->driver_data<harddriv_state>();
 	UINT8 *vram_base = &state->gsp_vram[(params->rowaddr << 11) & state->vram_mask];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (state->gfx_finescroll & 0x07);

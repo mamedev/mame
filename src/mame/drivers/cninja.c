@@ -55,7 +55,7 @@ Note about version levels using Mutant Fighter as the example:
 
 static WRITE16_HANDLER( cninja_sound_w )
 {
-	cninja_state *state = (cninja_state *)space->machine->driver_data;
+	cninja_state *state = space->machine->driver_data<cninja_state>();
 
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
@@ -63,7 +63,7 @@ static WRITE16_HANDLER( cninja_sound_w )
 
 static WRITE16_HANDLER( stoneage_sound_w )
 {
-	cninja_state *state = (cninja_state *)space->machine->driver_data;
+	cninja_state *state = space->machine->driver_data<cninja_state>();
 
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -71,7 +71,7 @@ static WRITE16_HANDLER( stoneage_sound_w )
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	cninja_state *state = (cninja_state *)timer.machine->driver_data;
+	cninja_state *state = timer.machine->driver_data<cninja_state>();
 
 	cpu_set_input_line(state->maincpu, (state->irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
 	state->raster_irq_timer->reset();
@@ -79,7 +79,7 @@ static TIMER_DEVICE_CALLBACK( interrupt_gen )
 
 static READ16_HANDLER( cninja_irq_r )
 {
-	cninja_state *state = (cninja_state *)space->machine->driver_data;
+	cninja_state *state = space->machine->driver_data<cninja_state>();
 
 	switch (offset)
 	{
@@ -99,7 +99,7 @@ static READ16_HANDLER( cninja_irq_r )
 
 static WRITE16_HANDLER( cninja_irq_w )
 {
-	cninja_state *state = (cninja_state *)space->machine->driver_data;
+	cninja_state *state = space->machine->driver_data<cninja_state>();
 
 	switch (offset)
 	{
@@ -151,7 +151,7 @@ static READ16_HANDLER( robocop2_prot_r )
 
 static WRITE16_HANDLER( cninja_pf12_control_w )
 {
-	cninja_state *state = (cninja_state *)space->machine->driver_data;
+	cninja_state *state = space->machine->driver_data<cninja_state>();
 	deco16ic_pf12_control_w(state->deco16ic, offset, data, mem_mask);
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
@@ -159,7 +159,7 @@ static WRITE16_HANDLER( cninja_pf12_control_w )
 
 static WRITE16_HANDLER( cninja_pf34_control_w )
 {
-	cninja_state *state = (cninja_state *)space->machine->driver_data;
+	cninja_state *state = space->machine->driver_data<cninja_state>();
 	deco16ic_pf34_control_w(state->deco16ic, offset, data, mem_mask);
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
@@ -721,19 +721,19 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cninja_state *driver_state = (cninja_state *)device->machine->driver_data;
+	cninja_state *driver_state = device->machine->driver_data<cninja_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static void sound_irq2(running_device *device, int state)
 {
-	cninja_state *driver_state = (cninja_state *)device->machine->driver_data;
+	cninja_state *driver_state = device->machine->driver_data<cninja_state>();
 	cpu_set_input_line(driver_state->audiocpu, 0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	cninja_state *state = (cninja_state *)device->machine->driver_data;
+	cninja_state *state = device->machine->driver_data<cninja_state>();
 
 	/* the second OKIM6295 ROM is bank switched */
 	state->oki2->set_bank_base((data & 1) * 0x40000);
@@ -828,7 +828,7 @@ static const deco16ic_interface mutantf_deco16ic_intf =
 
 static MACHINE_START( cninja )
 {
-	cninja_state *state = (cninja_state *)machine->driver_data;
+	cninja_state *state = machine->driver_data<cninja_state>();
 
 	state_save_register_global(machine, state->scanline);
 	state_save_register_global(machine, state->irq_mask);
@@ -836,7 +836,7 @@ static MACHINE_START( cninja )
 
 static MACHINE_RESET( cninja )
 {
-	cninja_state *state = (cninja_state *)machine->driver_data;
+	cninja_state *state = machine->driver_data<cninja_state>();
 
 	state->scanline = 0;
 	state->irq_mask = 0;

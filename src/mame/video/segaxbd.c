@@ -36,7 +36,7 @@ VIDEO_START( xboard )
 
 VIDEO_UPDATE( xboard )
 {
-	segas1x_state *state = (segas1x_state *)screen->machine->driver_data;
+	segas1x_state *state = screen->machine->driver_data<segas1x_state>();
 
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)

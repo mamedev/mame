@@ -6,7 +6,7 @@
 
 VIDEO_START( ninjaw )
 {
-	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	ninjaw_state *state = machine->driver_data<ninjaw_state>();
 
 	/* Ensure palette from correct TC0110PCR used for each screen */
 	tc0100scn_set_colbanks(state->tc0100scn_1, 0x0, 0x100, 0x200);
@@ -18,7 +18,7 @@ VIDEO_START( ninjaw )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int x_offs, int y_offs )
 {
-	ninjaw_state *state = (ninjaw_state *)machine->driver_data;
+	ninjaw_state *state = machine->driver_data<ninjaw_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -99,7 +99,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( ninjaw )
 {
-	ninjaw_state *state = (ninjaw_state *)screen->machine->driver_data;
+	ninjaw_state *state = screen->machine->driver_data<ninjaw_state>();
 	int xoffs = 0;
 	UINT8 layer[3], nodraw;
 	running_device *tc0100scn = NULL;

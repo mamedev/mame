@@ -6,14 +6,13 @@
 
 #include "machine/atarigen.h"
 
-class cyberbal_state
+class cyberbal_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cyberbal_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cyberbal_state(machine)); }
 
-	cyberbal_state(running_machine &machine) { }
-
-	atarigen_state	atarigen;
+	cyberbal_state(running_machine &machine)
+		: atarigen_state(machine) { }
 
 	UINT16 *		paletteram_0;
 	UINT16 *		paletteram_1;

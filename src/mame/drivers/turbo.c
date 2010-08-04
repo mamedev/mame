@@ -189,7 +189,7 @@ static READ8_DEVICE_HANDLER( turbo_analog_r );
 
 static MACHINE_RESET( buckrog )
 {
-	turbo_state *state = (turbo_state *)machine->driver_data;
+	turbo_state *state = machine->driver_data<turbo_state>();
 	state->buckrog_command = 0x00;
 }
 
@@ -212,7 +212,7 @@ static MACHINE_RESET( buckrog )
 static WRITE8_DEVICE_HANDLER( turbo_ppi0a_w )
 {
 	/* bit0-7 = 0PA0-7 */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->turbo_opa = data;
 }
 
@@ -220,7 +220,7 @@ static WRITE8_DEVICE_HANDLER( turbo_ppi0a_w )
 static WRITE8_DEVICE_HANDLER( turbo_ppi0b_w )
 {
 	/* bit0-7 = 0PB0-7 */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->turbo_opb = data;
 }
 
@@ -228,7 +228,7 @@ static WRITE8_DEVICE_HANDLER( turbo_ppi0b_w )
 static WRITE8_DEVICE_HANDLER( turbo_ppi0c_w )
 {
 	/* bit0-7 = 0PC0-7 */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->turbo_opc = data;
 }
 
@@ -236,7 +236,7 @@ static WRITE8_DEVICE_HANDLER( turbo_ppi0c_w )
 static WRITE8_DEVICE_HANDLER( turbo_ppi1a_w )
 {
 	/* bit0-7 = 1PA0-7 */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->turbo_ipa = data;
 }
 
@@ -244,7 +244,7 @@ static WRITE8_DEVICE_HANDLER( turbo_ppi1a_w )
 static WRITE8_DEVICE_HANDLER( turbo_ppi1b_w )
 {
 	/* bit0-7 = 1PB0-7 */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->turbo_ipb = data;
 }
 
@@ -252,7 +252,7 @@ static WRITE8_DEVICE_HANDLER( turbo_ppi1b_w )
 static WRITE8_DEVICE_HANDLER( turbo_ppi1c_w )
 {
 	/* bit0-7 = 1PC0-7 */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->turbo_ipc = data;
 }
 
@@ -262,7 +262,7 @@ static WRITE8_DEVICE_HANDLER( turbo_ppi3c_w )
 	/* bit 0-3 = PLA0-3 */
 	/* bit 4-6 = COL0-2 */
 	/* bit   7 = n/c */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->turbo_fbpla = data & 0x0f;
 	state->turbo_fbcol = (data >> 4) & 0x07;
 }
@@ -322,7 +322,7 @@ static WRITE8_DEVICE_HANDLER( subroc3d_ppi0a_w )
 {
 	/* bit 0-3 = PLY0-3 */
 	/* bit 4-7 = n/c */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->subroc3d_ply = data & 0x0f;
 }
 
@@ -330,7 +330,7 @@ static WRITE8_DEVICE_HANDLER( subroc3d_ppi0a_w )
 static WRITE8_DEVICE_HANDLER( subroc3d_ppi0c_w )
 {
 	/* bit 0-3 = COL0-3 */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->subroc3d_col = data & 0x0f;
 }
 
@@ -342,7 +342,7 @@ static WRITE8_DEVICE_HANDLER( subroc3d_ppi0b_w )
 	/* bit 2 = STLA (START LAMP) */
 	/* bit 3 = NOUSE (n/c) */
 	/* bit 4 = FLIP (not really flip, just offset) */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	coin_counter_w(device->machine, 0, data & 0x01);
 	coin_counter_w(device->machine, 1, data & 0x02);
 	set_led_status(device->machine, 0, data & 0x04);
@@ -381,7 +381,7 @@ static const ppi8255_interface subroc3d_8255_intf[2] =
 static WRITE8_DEVICE_HANDLER( buckrog_ppi0a_w )
 {
 	/* bit 0-7 = data to be read on the /IOREQ */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->buckrog_command = data;
 }
 
@@ -390,7 +390,7 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi0b_w )
 {
 	/* bit 0-5 = MOV0-5 */
 	/* bit 6-7 = n/c */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->buckrog_mov = data & 0x3f;
 }
 
@@ -401,7 +401,7 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi0c_w )
 	/* bit 3-5 = n/c */
 	/* bit   6 = /IOREQ on the 2nd CPU */
 	/* bit   7 = /INT on the 2nd CPU */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->buckrog_fchg = data & 0x07;
 	cputag_set_input_line(device->machine, "sub", 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -415,7 +415,7 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi1c_w )
 	/* bit   5 = COM2 (COIN METER 2) */
 	/* bit   6 = STLA (START LAMP) */
 	/* bit   7 = NOUSE (BODY SONIC) */
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	state->buckrog_obch = data & 0x07;
 	coin_counter_w(device->machine, 0, data & 0x10);
 	coin_counter_w(device->machine, 1, data & 0x20);
@@ -479,7 +479,7 @@ static void update_outputs(i8279_state *chip, UINT16 which)
 
 static READ8_HANDLER( turbo_8279_r )
 {
-	turbo_state *state = (turbo_state *)space->machine->driver_data;
+	turbo_state *state = space->machine->driver_data<turbo_state>();
 	i8279_state *chip = &state->i8279;
 	UINT8 result = 0xff;
 	UINT8 addr;
@@ -520,7 +520,7 @@ static READ8_HANDLER( turbo_8279_r )
 
 static WRITE8_HANDLER( turbo_8279_w )
 {
-	turbo_state *state = (turbo_state *)space->machine->driver_data;
+	turbo_state *state = space->machine->driver_data<turbo_state>();
 	i8279_state *chip = &state->i8279;
 	UINT8 addr;
 
@@ -624,7 +624,7 @@ static WRITE8_HANDLER( turbo_8279_w )
 
 static READ8_HANDLER( turbo_collision_r )
 {
-	turbo_state *state = (turbo_state *)space->machine->driver_data;
+	turbo_state *state = space->machine->driver_data<turbo_state>();
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	return input_port_read(space->machine, "DSW3") | (state->turbo_collision & 15);
 }
@@ -632,7 +632,7 @@ static READ8_HANDLER( turbo_collision_r )
 
 static WRITE8_HANDLER( turbo_collision_clear_w )
 {
-	turbo_state *state = (turbo_state *)space->machine->driver_data;
+	turbo_state *state = space->machine->driver_data<turbo_state>();
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	state->turbo_collision = 0;
 }
@@ -640,14 +640,14 @@ static WRITE8_HANDLER( turbo_collision_clear_w )
 
 static READ8_DEVICE_HANDLER( turbo_analog_r )
 {
-	turbo_state *state = (turbo_state *)device->machine->driver_data;
+	turbo_state *state = device->machine->driver_data<turbo_state>();
 	return input_port_read(device->machine, "DIAL") - state->turbo_last_analog;
 }
 
 
 static WRITE8_HANDLER( turbo_analog_reset_w )
 {
-	turbo_state *state = (turbo_state *)space->machine->driver_data;
+	turbo_state *state = space->machine->driver_data<turbo_state>();
 	state->turbo_last_analog = input_port_read(space->machine, "DIAL");
 }
 
@@ -679,7 +679,7 @@ static WRITE8_HANDLER( turbo_coin_and_lamp_w )
 static READ8_HANDLER( buckrog_cpu2_command_r )
 {
 	/* assert ACK */
-	turbo_state *state = (turbo_state *)space->machine->driver_data;
+	turbo_state *state = space->machine->driver_data<turbo_state>();
 	ppi8255_set_port_c(space->machine->device("ppi8255_0"), 0x00);
 	return state->buckrog_command;
 }

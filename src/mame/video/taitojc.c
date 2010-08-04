@@ -31,7 +31,7 @@ static const gfx_layout taitojc_char_layout =
 
 static TILE_GET_INFO( taitojc_tile_info )
 {
-	taitojc_state *state = (taitojc_state *)machine->driver_data;
+	taitojc_state *state = machine->driver_data<taitojc_state>();
 
 	UINT32 val = state->tile_ram[tile_index];
 	int color = (val >> 22) & 0xff;
@@ -41,21 +41,21 @@ static TILE_GET_INFO( taitojc_tile_info )
 
 READ32_HANDLER(taitojc_tile_r)
 {
-	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+	taitojc_state *state = space->machine->driver_data<taitojc_state>();
 
 	return state->tile_ram[offset];
 }
 
 READ32_HANDLER(taitojc_char_r)
 {
-	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+	taitojc_state *state = space->machine->driver_data<taitojc_state>();
 
 	return state->char_ram[offset];
 }
 
 WRITE32_HANDLER(taitojc_tile_w)
 {
-	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+	taitojc_state *state = space->machine->driver_data<taitojc_state>();
 
 	COMBINE_DATA(state->tile_ram + offset);
 	tilemap_mark_tile_dirty(state->tilemap, offset);
@@ -63,7 +63,7 @@ WRITE32_HANDLER(taitojc_tile_w)
 
 WRITE32_HANDLER(taitojc_char_w)
 {
-	taitojc_state *state = (taitojc_state *)space->machine->driver_data;
+	taitojc_state *state = space->machine->driver_data<taitojc_state>();
 
 	COMBINE_DATA(state->char_ram + offset);
 	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index], offset/32);
@@ -81,7 +81,7 @@ WRITE32_HANDLER(taitojc_char_w)
 
 static void draw_object(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 w1, UINT32 w2)
 {
-	taitojc_state *state = (taitojc_state *)machine->driver_data;
+	taitojc_state *state = machine->driver_data<taitojc_state>();
 	int x, y, width, height, palette;
 	int i, j;
 	int x1, x2, y1, y2;
@@ -167,13 +167,13 @@ static void draw_object(running_machine *machine, bitmap_t *bitmap, const rectan
 
 static void taitojc_exit(running_machine &machine)
 {
-	taitojc_state *state = (taitojc_state *)machine.driver_data;
+	taitojc_state *state = machine.driver_data<taitojc_state>();
 	poly_free(state->poly);
 }
 
 VIDEO_START( taitojc )
 {
-	taitojc_state *state = (taitojc_state *)machine->driver_data;
+	taitojc_state *state = machine->driver_data<taitojc_state>();
 	int width, height;
 
 	state->poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
@@ -208,7 +208,7 @@ VIDEO_START( taitojc )
 //static int tick = 0;
 VIDEO_UPDATE( taitojc )
 {
-	taitojc_state *state = (taitojc_state *)screen->machine->driver_data;
+	taitojc_state *state = screen->machine->driver_data<taitojc_state>();
 	int i;
 
 #if 0
@@ -412,7 +412,7 @@ static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *e
 
 void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int length)
 {
-	taitojc_state *state = (taitojc_state *)machine->driver_data;
+	taitojc_state *state = machine->driver_data<taitojc_state>();
 	poly_vertex vert[4];
 	int i;
 	int ptr;
@@ -622,7 +622,7 @@ void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int
 
 void taitojc_clear_frame(running_machine *machine)
 {
-	taitojc_state *state = (taitojc_state *)machine->driver_data;
+	taitojc_state *state = machine->driver_data<taitojc_state>();
 	rectangle cliprect;
 
 	cliprect.min_x = 0;

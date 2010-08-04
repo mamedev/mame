@@ -20,7 +20,7 @@
 
 READ8_HANDLER( trackfld_sh_timer_r )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	UINT32 clock = state->audiocpu->total_cycles() / TIMER_RATE;
 
 	return clock & 0xF;
@@ -33,7 +33,7 @@ READ8_DEVICE_HANDLER( trackfld_speech_r )
 
 WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 {
-	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	trackfld_state *state = device->machine->driver_data<trackfld_state>();
 	int changes = offset ^ state->last_addr;
 
 	/* A7 = data enable for VLM5030 (don't care )          */
@@ -53,7 +53,7 @@ WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 
 READ8_HANDLER( hyperspt_sh_timer_r )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	UINT32 clock = state->audiocpu->total_cycles() / TIMER_RATE;
 
 	if (state->vlm != NULL)
@@ -64,7 +64,7 @@ READ8_HANDLER( hyperspt_sh_timer_r )
 
 WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 {
-	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	trackfld_state *state = device->machine->driver_data<trackfld_state>();
 	int changes = offset ^ state->last_addr;
 
 	/* A3 = data enable for VLM5030 (don't care )          */
@@ -89,7 +89,7 @@ WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 
 WRITE8_HANDLER( konami_sh_irqtrigger_w )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	if (state->last_irq == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
@@ -102,13 +102,13 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
 
 WRITE8_HANDLER( konami_SN76496_latch_w )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	state->SN76496_latch = data;
 }
 
 
 WRITE8_DEVICE_HANDLER( konami_SN76496_w )
 {
-	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	trackfld_state *state = device->machine->driver_data<trackfld_state>();
 	sn76496_w(device, offset, state->SN76496_latch);
 }

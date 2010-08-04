@@ -24,7 +24,7 @@
 
 static WRITE16_HANDLER( madmotor_sound_w )
 {
-	madmotor_state *state = (madmotor_state *)space->machine->driver_data;
+	madmotor_state *state = space->machine->driver_data<madmotor_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -214,7 +214,7 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	madmotor_state *driver_state = (madmotor_state *)device->machine->driver_data;
+	madmotor_state *driver_state = device->machine->driver_data<madmotor_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -225,7 +225,7 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_START( madmotor )
 {
-	madmotor_state *state = (madmotor_state *)machine->driver_data;
+	madmotor_state *state = machine->driver_data<madmotor_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -235,7 +235,7 @@ static MACHINE_START( madmotor )
 
 static MACHINE_RESET( madmotor )
 {
-	madmotor_state *state = (madmotor_state *)machine->driver_data;
+	madmotor_state *state = machine->driver_data<madmotor_state>();
 
 	state->flipscreen = 0;
 }

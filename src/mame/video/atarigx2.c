@@ -33,8 +33,8 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	atarigx2_state *state = (atarigx2_state *)machine->driver_data;
-	UINT16 data = state->atarigen.alpha32[tile_index / 2] >> (16 * (~tile_index & 1));
+	atarigx2_state *state = machine->driver_data<atarigx2_state>();
+	UINT16 data = state->alpha32[tile_index / 2] >> (16 * (~tile_index & 1));
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 	int opaque = data & 0x8000;
@@ -44,8 +44,8 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	atarigx2_state *state = (atarigx2_state *)machine->driver_data;
-	UINT16 data = state->atarigen.playfield32[tile_index / 2] >> (16 * (~tile_index & 1));
+	atarigx2_state *state = machine->driver_data<atarigx2_state>();
+	UINT16 data = state->playfield32[tile_index / 2] >> (16 * (~tile_index & 1));
 	int code = (state->playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (state->playfield_base >> 5) + ((state->playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
 	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
@@ -89,7 +89,7 @@ VIDEO_START( atarigx2 )
 		{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
 		{{ 0 }}						/* mask for the VRAM target */
 	};
-	atarigx2_state *state = (atarigx2_state *)machine->driver_data;
+	atarigx2_state *state = machine->driver_data<atarigx2_state>();
 	atarirle_desc adjusted_modesc = modesc;
 	int i;
 
@@ -97,7 +97,7 @@ VIDEO_START( atarigx2 )
 	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x30);
 
 	/* initialize the playfield */
-	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, atarigx2_playfield_scan,  8,8, 128,64);
+	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, atarigx2_playfield_scan,  8,8, 128,64);
 
 	/* initialize the motion objects */
 	adjusted_modesc.palettebase = state->motion_object_base;
@@ -106,8 +106,8 @@ VIDEO_START( atarigx2 )
 	atarirle_init(machine, 0, &adjusted_modesc);
 
 	/* initialize the alphanumerics */
-	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
+	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
 
 	/* save states */
 	state_save_register_global(machine, state->current_control);
@@ -127,7 +127,7 @@ VIDEO_START( atarigx2 )
 
 WRITE16_HANDLER( atarigx2_mo_control_w )
 {
-	atarigx2_state *state = (atarigx2_state *)space->machine->driver_data;
+	atarigx2_state *state = space->machine->driver_data<atarigx2_state>();
 
 	logerror("MOCONT = %d (scan = %d)\n", data, space->machine->primary_screen->vpos());
 
@@ -138,14 +138,14 @@ WRITE16_HANDLER( atarigx2_mo_control_w )
 
 void atarigx2_scanline_update(screen_device &screen, int scanline)
 {
-	atarigx2_state *state = (atarigx2_state *)screen.machine->driver_data;
-	UINT32 *base = &state->atarigen.alpha32[(scanline / 8) * 32 + 24];
+	atarigx2_state *state = screen.machine->driver_data<atarigx2_state>();
+	UINT32 *base = &state->alpha32[(scanline / 8) * 32 + 24];
 	int i;
 
 	if (scanline == 0) logerror("-------\n");
 
 	/* keep in range */
-	if (base >= &state->atarigen.alpha32[0x400])
+	if (base >= &state->alpha32[0x400])
 		return;
 
 	/* update the playfield scrolls */
@@ -161,14 +161,14 @@ void atarigx2_scanline_update(screen_device &screen, int scanline)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll);
+				tilemap_set_scrollx(state->playfield_tilemap, 0, newscroll);
 				state->playfield_xscroll = newscroll;
 			}
 			if (newbank != state->playfield_color_bank)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
+				tilemap_mark_all_tiles_dirty(state->playfield_tilemap);
 				state->playfield_color_bank = newbank;
 			}
 		}
@@ -181,14 +181,14 @@ void atarigx2_scanline_update(screen_device &screen, int scanline)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, newscroll);
+				tilemap_set_scrolly(state->playfield_tilemap, 0, newscroll);
 				state->playfield_yscroll = newscroll;
 			}
 			if (newbank != state->playfield_tile_bank)
 			{
 				if (scanline + i > 0)
 					screen.update_partial(scanline + i - 1);
-				tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
+				tilemap_mark_all_tiles_dirty(state->playfield_tilemap);
 				state->playfield_tile_bank = newbank;
 			}
 		}
@@ -205,19 +205,19 @@ void atarigx2_scanline_update(screen_device &screen, int scanline)
 
 VIDEO_UPDATE( atarigx2 )
 {
-	atarigx2_state *state = (atarigx2_state *)screen->machine->driver_data;
+	atarigx2_state *state = screen->machine->driver_data<atarigx2_state>();
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 
 	/* draw the playfield */
 	bitmap_fill(priority_bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 1, 1);
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 2, 2);
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 3, 3);
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 4, 4);
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 5, 5);
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 6, 6);
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 7, 7);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 1, 1);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 2, 2);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 3, 3);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 4, 4);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 5, 5);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 6, 6);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 7, 7);
 
 	/* copy the motion objects on top */
 	{
@@ -241,6 +241,6 @@ VIDEO_UPDATE( atarigx2 )
 	}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->atarigen.alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
 	return 0;
 }

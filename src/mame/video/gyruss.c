@@ -93,7 +93,7 @@ PALETTE_INIT( gyruss )
 
 WRITE8_HANDLER( gyruss_spriteram_w )
 {
-	gyruss_state *state = (gyruss_state *)space->machine->driver_data;
+	gyruss_state *state = space->machine->driver_data<gyruss_state>();
 	space->machine->primary_screen->update_now();
 	state->spriteram[offset] = data;
 }
@@ -101,7 +101,7 @@ WRITE8_HANDLER( gyruss_spriteram_w )
 
 static TILE_GET_INFO( gyruss_get_tile_info )
 {
-	gyruss_state *state = (gyruss_state *)machine->driver_data;
+	gyruss_state *state = machine->driver_data<gyruss_state>();
 	int code = ((state->colorram[tile_index] & 0x20) << 3) | state->videoram[tile_index];
 	int color = state->colorram[tile_index] & 0x0f;
 	int flags = TILE_FLIPYX(state->colorram[tile_index] >> 6);
@@ -114,7 +114,7 @@ static TILE_GET_INFO( gyruss_get_tile_info )
 
 VIDEO_START( gyruss )
 {
-	gyruss_state *state = (gyruss_state *)machine->driver_data;
+	gyruss_state *state = machine->driver_data<gyruss_state>();
 	state->tilemap = tilemap_create(machine, gyruss_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transmask(state->tilemap, 0, 0x00, 0);	/* opaque */
 	tilemap_set_transmask(state->tilemap, 1, 0x0f, 0);  /* transparent */
@@ -131,7 +131,7 @@ READ8_HANDLER( gyruss_scanline_r )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx )
 {
-	gyruss_state *state = (gyruss_state *)machine->driver_data;
+	gyruss_state *state = machine->driver_data<gyruss_state>();
 	int offs;
 
 	for (offs = 0xbc; offs >= 0; offs -= 4)
@@ -152,7 +152,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( gyruss )
 {
-	gyruss_state *state = (gyruss_state *)screen->machine->driver_data;
+	gyruss_state *state = screen->machine->driver_data<gyruss_state>();
 
 	if (cliprect->min_y == screen->visible_area().min_y)
 	{

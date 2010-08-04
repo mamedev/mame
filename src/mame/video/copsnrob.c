@@ -10,7 +10,7 @@
 
 VIDEO_UPDATE( copsnrob )
 {
-	copsnrob_state *state = (copsnrob_state *)screen->machine->driver_data;
+	copsnrob_state *state = screen->machine->driver_data<copsnrob_state>();
 	int offs, x, y;
 
 	/* redrawing the entire display is faster in this case */

@@ -150,12 +150,13 @@ Dumped by Chack'n
 #define NUM_PENS (4*8)
 #define VMEM_SIZE 0x100
 
-class ssingles_state
+class ssingles_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ssingles_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ssingles_state(machine)); }
 
-	ssingles_state(running_machine &machine) { }
+	ssingles_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8 *videoram;
 	UINT8 *colorram;
@@ -178,7 +179,7 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 
 static MC6845_UPDATE_ROW( update_row )
 {
-	ssingles_state *state = (ssingles_state *)device->machine->driver_data;
+	ssingles_state *state = device->machine->driver_data<ssingles_state>();
 	int cx,x;
 	UINT32 tile_address;
 	UINT16 cell,palette;
@@ -230,20 +231,20 @@ static const mc6845_interface mc6845_intf =
 
 static WRITE8_HANDLER(ssingles_videoram_w)
 {
-	ssingles_state *state = (ssingles_state *)space->machine->driver_data;
+	ssingles_state *state = space->machine->driver_data<ssingles_state>();
 	state->videoram[offset]=data;
 }
 
 static WRITE8_HANDLER(ssingles_colorram_w)
 {
-	ssingles_state *state = (ssingles_state *)space->machine->driver_data;
+	ssingles_state *state = space->machine->driver_data<ssingles_state>();
 	state->colorram[offset]=data;
 }
 
 
 static VIDEO_START(ssingles)
 {
-	ssingles_state *state = (ssingles_state *)machine->driver_data;
+	ssingles_state *state = machine->driver_data<ssingles_state>();
 
 	{
 		int i;
@@ -266,14 +267,14 @@ static VIDEO_UPDATE( ssingles )
 
 static READ8_HANDLER(c000_r)
 {
-	ssingles_state *state = (ssingles_state *)space->machine->driver_data;
+	ssingles_state *state = space->machine->driver_data<ssingles_state>();
 
 	return state->prot_data;
 }
 
 static READ8_HANDLER(c001_r)
 {
-	ssingles_state *state = (ssingles_state *)space->machine->driver_data;
+	ssingles_state *state = space->machine->driver_data<ssingles_state>();
 
 	state->prot_data=0xc4;
 	return 0;
@@ -281,7 +282,7 @@ static READ8_HANDLER(c001_r)
 
 static WRITE8_HANDLER(c001_w)
 {
-	ssingles_state *state = (ssingles_state *)space->machine->driver_data;
+	ssingles_state *state = space->machine->driver_data<ssingles_state>();
 
 	state->prot_data^=data^0x11;
 }
@@ -551,7 +552,7 @@ ROM_END
 
 static DRIVER_INIT(ssingles)
 {
-	ssingles_state *state = (ssingles_state *)machine->driver_data;
+	ssingles_state *state = machine->driver_data<ssingles_state>();
 
 	state->videoram=auto_alloc_array_clear(machine, UINT8, VMEM_SIZE);
 	state->colorram=auto_alloc_array_clear(machine, UINT8, VMEM_SIZE);

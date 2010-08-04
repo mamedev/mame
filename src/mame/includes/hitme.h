@@ -12,12 +12,13 @@
 #define HITME_ENABLE_VAL         NODE_03
 #define HITME_OUT1               NODE_04
 
-class hitme_state
+class hitme_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hitme_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hitme_state(machine)); }
 
-	hitme_state(running_machine &machine) { }
+	hitme_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;

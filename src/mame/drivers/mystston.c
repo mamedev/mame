@@ -72,7 +72,7 @@ static INPUT_CHANGED( coin_inserted )
 
 static WRITE8_HANDLER( mystston_ay8910_select_w )
 {
-	mystston_state *state = (mystston_state *)space->machine->driver_data;
+	mystston_state *state = space->machine->driver_data<mystston_state>();
 
 	/* bit 5 goes to 8910 #0 BDIR pin */
 	if (((*state->ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))

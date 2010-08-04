@@ -6,18 +6,17 @@
 
 #include "machine/atarigen.h"
 
-class atarisy1_state
+class atarisy1_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarisy1_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarisy1_state(machine)); }
 
 	atarisy1_state(running_machine &machine)
-		: joystick_timer(machine.device<timer_device>("joystick_timer")),
+		: atarigen_state(machine),
+		  joystick_timer(machine.device<timer_device>("joystick_timer")),
 		  yscroll_reset_timer(machine.device<timer_device>("yreset_timer")),
 		  scanline_timer(machine.device<timer_device>("scan_timer")),
 		  int3off_timer(machine.device<timer_device>("int3off_timer")) { }
-
-	atarigen_state	atarigen;
 
 	UINT16 *		bankselect;
 

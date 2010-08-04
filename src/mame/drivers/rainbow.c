@@ -331,7 +331,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static WRITE16_HANDLER( jumping_sound_w )
 {
-	rainbow_state *state = (rainbow_state *)space->machine->driver_data;
+	rainbow_state *state = space->machine->driver_data<rainbow_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -403,7 +403,7 @@ static WRITE8_DEVICE_HANDLER( bankswitch_w )
 
 static READ8_HANDLER( jumping_latch_r )
 {
-	rainbow_state *state = (rainbow_state *)space->machine->driver_data;
+	rainbow_state *state = space->machine->driver_data<rainbow_state>();
 	return state->jumping_latch;
 }
 
@@ -627,7 +627,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int irq )
 {
-	rainbow_state *state = (rainbow_state *)device->machine->driver_data;
+	rainbow_state *state = device->machine->driver_data<rainbow_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -666,7 +666,7 @@ static const tc0140syt_interface rainbow_tc0140syt_intf =
 
 static MACHINE_START( rainbow )
 {
-	rainbow_state *state = (rainbow_state *)machine->driver_data;
+	rainbow_state *state = machine->driver_data<rainbow_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -895,7 +895,7 @@ static DRIVER_INIT( rainbowe )
 
 static DRIVER_INIT( jumping )
 {
-	rainbow_state *state = (rainbow_state *)machine->driver_data;
+	rainbow_state *state = machine->driver_data<rainbow_state>();
 	int i, len = memory_region_length(machine, "gfx2");
 	UINT8 *rom = memory_region(machine, "gfx2");
 

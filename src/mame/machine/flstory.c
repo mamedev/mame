@@ -22,7 +22,7 @@
 
 READ8_HANDLER( flstory_68705_port_a_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 
 	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(space->cpu), state->port_a_in);
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
@@ -30,7 +30,7 @@ READ8_HANDLER( flstory_68705_port_a_r )
 
 WRITE8_HANDLER( flstory_68705_port_a_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 
 	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(space->cpu), data);
 	state->port_a_out = data;
@@ -38,7 +38,7 @@ WRITE8_HANDLER( flstory_68705_port_a_w )
 
 WRITE8_HANDLER( flstory_68705_ddr_a_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	state->ddr_a = data;
 }
 
@@ -55,13 +55,13 @@ WRITE8_HANDLER( flstory_68705_ddr_a_w )
 
 READ8_HANDLER( flstory_68705_port_b_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 WRITE8_HANDLER( flstory_68705_port_b_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data);
 
 	if ((state->ddr_b & 0x02) && (~data & 0x02) && (state->port_b_out & 0x02))
@@ -84,14 +84,14 @@ WRITE8_HANDLER( flstory_68705_port_b_w )
 
 WRITE8_HANDLER( flstory_68705_ddr_b_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	state->ddr_b = data;
 }
 
 
 READ8_HANDLER( flstory_68705_port_c_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 
 	state->port_c_in = 0;
 	if (state->main_sent)
@@ -106,20 +106,20 @@ READ8_HANDLER( flstory_68705_port_c_r )
 
 WRITE8_HANDLER( flstory_68705_port_c_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	logerror("%04x: 68705 port C write %02x\n", cpu_get_pc(space->cpu), data);
 	state->port_c_out = data;
 }
 
 WRITE8_HANDLER( flstory_68705_ddr_c_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	state->ddr_c = data;
 }
 
 WRITE8_HANDLER( flstory_mcu_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 
 	logerror("%04x: mcu_w %02x\n", cpu_get_pc(space->cpu), data);
 	state->from_main = data;
@@ -129,7 +129,7 @@ WRITE8_HANDLER( flstory_mcu_w )
 
 READ8_HANDLER( flstory_mcu_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 
 	logerror("%04x: mcu_r %02x\n",cpu_get_pc(space->cpu), state->from_mcu);
 	state->mcu_sent = 0;
@@ -138,7 +138,7 @@ READ8_HANDLER( flstory_mcu_r )
 
 READ8_HANDLER( flstory_mcu_status_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	int res = 0;
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
@@ -154,7 +154,7 @@ READ8_HANDLER( flstory_mcu_status_r )
 
 WRITE8_HANDLER( onna34ro_mcu_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	UINT16 score_adr = state->workram[0x29e] * 0x100 + state->workram[0x29d];
 
 	switch (data)
@@ -184,7 +184,7 @@ WRITE8_HANDLER( onna34ro_mcu_w )
 
 READ8_HANDLER( onna34ro_mcu_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	return state->from_mcu;
 }
 
@@ -236,7 +236,7 @@ static const UINT8 victnine_mcu_data[0x100] =
 
 WRITE8_HANDLER( victnine_mcu_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	UINT8 seed = VICTNINE_MCU_SEED;
 
 	if (!seed && (data & 0x37) == 0x37)
@@ -273,7 +273,7 @@ WRITE8_HANDLER( victnine_mcu_w )
 
 READ8_HANDLER( victnine_mcu_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	//logerror("%04x: mcu read (0x%02x)\n", cpu_get_previouspc(space->cpu), state->from_mcu);
 
 	return state->from_mcu - VICTNINE_MCU_SEED;

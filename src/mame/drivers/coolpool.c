@@ -59,7 +59,7 @@ static UINT8 nvram_write_enable;
 
 static void amerdart_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	coolpool_state *state = (coolpool_state *)screen.machine->driver_data;
+	coolpool_state *state = screen.machine->driver_data<coolpool_state>();
 
 	UINT16 *vram = &state->vram_base[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -88,7 +88,7 @@ static void amerdart_scanline(screen_device &screen, bitmap_t *bitmap, int scanl
 
 static void coolpool_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	coolpool_state *state = (coolpool_state *)screen.machine->driver_data;
+	coolpool_state *state = screen.machine->driver_data<coolpool_state>();
 
 	UINT16 *vram = &state->vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -114,7 +114,7 @@ static void coolpool_scanline(screen_device &screen, bitmap_t *bitmap, int scanl
 
 static void coolpool_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	memcpy(shiftreg, &state->vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
 }
@@ -122,7 +122,7 @@ static void coolpool_to_shiftreg(const address_space *space, UINT32 address, UIN
 
 static void coolpool_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	memcpy(&state->vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
 }
@@ -137,7 +137,7 @@ static void coolpool_from_shiftreg(const address_space *space, UINT32 address, U
 
 static MACHINE_RESET( amerdart )
 {
-	coolpool_state *state = (coolpool_state *)machine->driver_data;
+	coolpool_state *state = machine->driver_data<coolpool_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->dsp = machine->device("dsp");
@@ -209,7 +209,7 @@ static WRITE16_HANDLER( nvram_thrash_data_w )
 
 static TIMER_DEVICE_CALLBACK( amerdart_audio_int_gen )
 {
-	coolpool_state *state = (coolpool_state *)timer.machine->driver_data;
+	coolpool_state *state = timer.machine->driver_data<coolpool_state>();
 
 	cpu_set_input_line(state->dsp, 0, ASSERT_LINE);
 	cpu_set_input_line(state->dsp, 0, CLEAR_LINE);
@@ -230,7 +230,7 @@ static WRITE16_HANDLER( amerdart_misc_w )
 
 static READ16_HANDLER( amerdart_dsp_bio_line_r )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	static UINT8 old_cmd;
 	static UINT8 same_cmd_count;
@@ -253,7 +253,7 @@ static READ16_HANDLER( amerdart_dsp_bio_line_r )
 
 static READ16_HANDLER( amerdart_iop_r )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 //  logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),state->iop_answer);
 	cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
@@ -263,7 +263,7 @@ static READ16_HANDLER( amerdart_iop_r )
 
 static WRITE16_HANDLER( amerdart_iop_w )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 //  logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
 	COMBINE_DATA(&state->iop_cmd);
@@ -272,7 +272,7 @@ static WRITE16_HANDLER( amerdart_iop_w )
 
 static READ16_HANDLER( amerdart_dsp_cmd_r )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 //  logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(space->cpu), state->iop_cmd);
 	state->cmd_pending = 0;
@@ -281,7 +281,7 @@ static READ16_HANDLER( amerdart_dsp_cmd_r )
 
 static WRITE16_HANDLER( amerdart_dsp_answer_w )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 //  logerror("%08x:DSP answer %04x\n", cpu_get_pc(space->cpu), data);
 	state->iop_answer = data;
@@ -320,7 +320,7 @@ static int amerdart_trackball_dec(int data)
 
 static int amerdart_trackball_direction(const address_space *space, int num, int data)
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	UINT16 result_x = (data & 0x0c) >> 2;
 	UINT16 result_y = (data & 0x03) >> 0;
@@ -410,7 +410,7 @@ static READ16_HANDLER( amerdart_trackball_r )
 
 */
 
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 
 	state->result = (state->lastresult | 0x00ff);
@@ -467,7 +467,7 @@ static WRITE16_HANDLER( coolpool_misc_w )
 
 static TIMER_CALLBACK( deferred_iop_w )
 {
-	coolpool_state *state = (coolpool_state *)machine->driver_data;
+	coolpool_state *state = machine->driver_data<coolpool_state>();
 
 	state->iop_cmd = param;
 	state->cmd_pending = 1;
@@ -487,7 +487,7 @@ static WRITE16_HANDLER( coolpool_iop_w )
 
 static READ16_HANDLER( coolpool_iop_r )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),state->iop_answer);
 	cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
@@ -506,7 +506,7 @@ static READ16_HANDLER( coolpool_iop_r )
 
 static READ16_HANDLER( dsp_cmd_r )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	state->cmd_pending = 0;
 	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(space->cpu), state->iop_cmd);
@@ -516,7 +516,7 @@ static READ16_HANDLER( dsp_cmd_r )
 
 static WRITE16_HANDLER( dsp_answer_w )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	logerror("%08x:IOP answer %04x\n", cpu_get_pc(space->cpu), data);
 	state->iop_answer = data;
@@ -526,7 +526,7 @@ static WRITE16_HANDLER( dsp_answer_w )
 
 static READ16_HANDLER( dsp_bio_line_r )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	return state->cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }
@@ -547,7 +547,7 @@ static READ16_HANDLER( dsp_hold_line_r )
 
 static READ16_HANDLER( dsp_rom_r )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 	UINT8 *rom = memory_region(space->machine, "user2");
 
 	return rom[state->iop_romaddr & (memory_region_length(space->machine, "user2") - 1)];
@@ -556,7 +556,7 @@ static READ16_HANDLER( dsp_rom_r )
 
 static WRITE16_HANDLER( dsp_romaddr_w )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	switch (offset)
 	{
@@ -586,7 +586,7 @@ static WRITE16_DEVICE_HANDLER( dsp_dac_w )
 
 static READ16_HANDLER( coolpool_input_r )
 {
-	coolpool_state *state = (coolpool_state *)space->machine->driver_data;
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
 	state->result = (input_port_read(space->machine, "IN1") & 0x00ff) | (state->lastresult & 0xff00);
 	state->newx[1] = input_port_read(space->machine, "XAXIS");
@@ -1180,7 +1180,7 @@ ROM_END
 
 static void register_state_save(running_machine *machine)
 {
-	coolpool_state *state = (coolpool_state *)machine->driver_data;
+	coolpool_state *state = machine->driver_data<coolpool_state>();
 
 	state_save_register_global_array(machine, state->oldx);
 	state_save_register_global_array(machine, state->oldy);
@@ -1197,7 +1197,7 @@ static void register_state_save(running_machine *machine)
 
 static DRIVER_INIT( amerdart )
 {
-	coolpool_state *state = (coolpool_state *)machine->driver_data;
+	coolpool_state *state = machine->driver_data<coolpool_state>();
 
 	state->lastresult = 0xffff;
 

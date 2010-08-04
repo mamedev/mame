@@ -24,7 +24,7 @@
 
 static READ16_HANDLER( fatfury2_protection_16_r )
 {
-	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 	UINT16 res = state->fatfury2_prot_data >> 24;
 
 	switch (offset)
@@ -50,7 +50,7 @@ static READ16_HANDLER( fatfury2_protection_16_r )
 
 static WRITE16_HANDLER( fatfury2_protection_16_w )
 {
-	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
 	switch (offset)
 	{
@@ -97,7 +97,7 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 
 void fatfury2_install_protection( running_machine *machine )
 {
-	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	neogeo_state *state = machine->driver_data<neogeo_state>();
 
 	/* the protection involves reading and writing addresses in the */
 	/* 0x2xxxxx range. There are several checks all around the code. */
@@ -375,7 +375,7 @@ static READ16_HANDLER( prot_9a37_r )
 
 static READ16_HANDLER( sma_random_r )
 {
-	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 	UINT16 old = state->neogeo_rng;
 
 	UINT16 newbit = ((state->neogeo_rng >> 2) ^
@@ -395,14 +395,14 @@ static READ16_HANDLER( sma_random_r )
 
 void neogeo_reset_rng( running_machine *machine )
 {
-	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	neogeo_state *state = machine->driver_data<neogeo_state>();
 	state->neogeo_rng = 0x2345;
 }
 
 
 static void sma_install_random_read_handler( running_machine *machine, int addr1, int addr2 )
 {
-	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	neogeo_state *state = machine->driver_data<neogeo_state>();
 	state_save_register_global(machine, state->neogeo_rng);
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr1, addr1 + 1, 0, 0, sma_random_r);
@@ -462,14 +462,14 @@ void kof2000_install_protection( running_machine *machine )
 
 static void pvc_w8( running_machine *machine, offs_t offset, UINT8 data )
 {
-	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	neogeo_state *state = machine->driver_data<neogeo_state>();
 	*(((UINT8*)state->pvc_cartridge_ram) + BYTE_XOR_LE(offset)) = data;
 }
 
 
 static UINT8 pvc_r8( running_machine *machine, offs_t offset )
 {
-	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	neogeo_state *state = machine->driver_data<neogeo_state>();
 	return *(((UINT8*)state->pvc_cartridge_ram) + BYTE_XOR_LE(offset));
 }
 
@@ -502,7 +502,7 @@ static void pvc_prot2( running_machine *machine ) // on writes to e8/e9/ea/eb
 
 static void pvc_write_bankswitch( const address_space *space )
 {
-	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 	UINT32 bankaddress;
 
 	bankaddress = ((state->pvc_cartridge_ram[0xff8] >> 8)|(state->pvc_cartridge_ram[0xff9] << 8));
@@ -515,14 +515,14 @@ static void pvc_write_bankswitch( const address_space *space )
 
 static READ16_HANDLER( pvc_prot_r )
 {
-	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 	return state->pvc_cartridge_ram[offset];
 }
 
 
 static WRITE16_HANDLER( pvc_prot_w )
 {
-	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
 	COMBINE_DATA(&state->pvc_cartridge_ram[offset] );
 	if (offset == 0xff0)
@@ -536,7 +536,7 @@ static WRITE16_HANDLER( pvc_prot_w )
 
 void install_pvc_protection( running_machine *machine )
 {
-	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	neogeo_state *state = machine->driver_data<neogeo_state>();
 	state->pvc_cartridge_ram = auto_alloc_array(machine, UINT16, 0x2000 / 2);
 	state_save_register_global_pointer(machine, state->pvc_cartridge_ram, 0x2000 / 2);
 

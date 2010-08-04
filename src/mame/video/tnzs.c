@@ -45,7 +45,7 @@ PALETTE_INIT( arknoid2 )
 
 static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *m )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	int x, y, column, tot, transpen;
 	int scrollx, scrolly;
 	UINT32 upperbits;
@@ -129,7 +129,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 static void draw_foreground( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 							 UINT8 *char_pointer, UINT8 *x_pointer, UINT8 *y_pointer, UINT8 *ctrl_pointer, UINT8 *color_pointer)
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	int i;
 	int ctrl2 = state->objctrl[1];
 
@@ -180,7 +180,7 @@ static void draw_foreground( running_machine *machine, bitmap_t *bitmap, const r
 
 VIDEO_UPDATE( tnzs )
 {
-	tnzs_state *state = (tnzs_state *)screen->machine->driver_data;
+	tnzs_state *state = screen->machine->driver_data<tnzs_state>();
 	/* If the byte at f300 has bit 6 set, flip the screen
        (I'm not 100% sure about this) */
 	state->screenflip = (state->objctrl[0] & 0x40) >> 6;
@@ -204,7 +204,7 @@ VIDEO_UPDATE( tnzs )
 
 VIDEO_EOF( tnzs )
 {
-	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	tnzs_state *state = machine->driver_data<tnzs_state>();
 	int ctrl2 =	state->objctrl[1];
 	if (~ctrl2 & 0x20)
 	{

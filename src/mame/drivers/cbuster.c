@@ -28,7 +28,7 @@
 
 static WRITE16_HANDLER( twocrude_control_w )
 {
-	cbuster_state *state = (cbuster_state *)space->machine->driver_data;
+	cbuster_state *state = space->machine->driver_data<cbuster_state>();
 
 	switch (offset << 1)
 	{
@@ -81,7 +81,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 
 static READ16_HANDLER( twocrude_control_r )
 {
-	cbuster_state *state = (cbuster_state *)space->machine->driver_data;
+	cbuster_state *state = space->machine->driver_data<cbuster_state>();
 
 	switch (offset << 1)
 	{
@@ -266,7 +266,7 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cbuster_state *driver_state = (cbuster_state *)device->machine->driver_data;
+	cbuster_state *driver_state = device->machine->driver_data<cbuster_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -295,7 +295,7 @@ static const deco16ic_interface twocrude_deco16ic_intf =
 
 static MACHINE_START( cbuster )
 {
-	cbuster_state *state = (cbuster_state *)machine->driver_data;
+	cbuster_state *state = machine->driver_data<cbuster_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -307,7 +307,7 @@ static MACHINE_START( cbuster )
 
 static MACHINE_RESET( cbuster )
 {
-	cbuster_state *state = (cbuster_state *)machine->driver_data;
+	cbuster_state *state = machine->driver_data<cbuster_state>();
 
 	state->prot = 0;
 	state->pri = 0;

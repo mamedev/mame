@@ -50,7 +50,7 @@ Notes:
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	deniam_state *state = (deniam_state *)space->machine->driver_data;
+	deniam_state *state = space->machine->driver_data<deniam_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space,offset, (data >> 8) & 0xff);
@@ -223,7 +223,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int linestate )
 {
-	deniam_state *state = (deniam_state *)device->machine->driver_data;
+	deniam_state *state = device->machine->driver_data<deniam_state>();
 
 	/* system 16c doesn't have the sound CPU */
 	if (state->audio_cpu != NULL)
@@ -239,7 +239,7 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( deniam )
 {
-	deniam_state *state = (deniam_state *)machine->driver_data;
+	deniam_state *state = machine->driver_data<deniam_state>();
 
 	state->audio_cpu = machine->device("audiocpu");
 

@@ -72,7 +72,7 @@ PALETTE_INIT( brkthru )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	brkthru_state *state = (brkthru_state *)machine->driver_data;
+	brkthru_state *state = machine->driver_data<brkthru_state>();
 	/* BG RAM format
         0         1
         ---- -c-- ---- ---- = Color
@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 WRITE8_HANDLER( brkthru_bgram_w )
 {
-	brkthru_state *state = (brkthru_state *)space->machine->driver_data;
+	brkthru_state *state = space->machine->driver_data<brkthru_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -97,14 +97,14 @@ WRITE8_HANDLER( brkthru_bgram_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	brkthru_state *state = (brkthru_state *)machine->driver_data;
+	brkthru_state *state = machine->driver_data<brkthru_state>();
 	UINT8 code = state->fg_videoram[tile_index];
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
 WRITE8_HANDLER( brkthru_fgram_w )
 {
-	brkthru_state *state = (brkthru_state *)space->machine->driver_data;
+	brkthru_state *state = space->machine->driver_data<brkthru_state>();
 
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
@@ -112,7 +112,7 @@ WRITE8_HANDLER( brkthru_fgram_w )
 
 VIDEO_START( brkthru )
 {
-	brkthru_state *state = (brkthru_state *)machine->driver_data;
+	brkthru_state *state = machine->driver_data<brkthru_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 16);
@@ -124,7 +124,7 @@ VIDEO_START( brkthru )
 
 WRITE8_HANDLER( brkthru_1800_w )
 {
-	brkthru_state *state = (brkthru_state *)space->machine->driver_data;
+	brkthru_state *state = space->machine->driver_data<brkthru_state>();
 
 	if (offset == 0)	/* low 8 bits of scroll */
 		state->bgscroll = (state->bgscroll & 0x100) | data;
@@ -168,7 +168,7 @@ static void show_register( bitmap_t *bitmap, int x, int y, UINT32 data )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int prio )
 {
-	brkthru_state *state = (brkthru_state *)machine->driver_data;
+	brkthru_state *state = machine->driver_data<brkthru_state>();
 	int offs;
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
 	/* order, to have the correct priorities. */
@@ -252,7 +252,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( brkthru )
 {
-	brkthru_state *state = (brkthru_state *)screen->machine->driver_data;
+	brkthru_state *state = screen->machine->driver_data<brkthru_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->bgscroll);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);

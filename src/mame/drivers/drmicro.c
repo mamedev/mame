@@ -25,7 +25,7 @@ Quite similar to Appoooh
 
 static INTERRUPT_GEN( drmicro_interrupt )
 {
-	drmicro_state *state = (drmicro_state *)device->machine->driver_data;
+	drmicro_state *state = device->machine->driver_data<drmicro_state>();
 
 	if (state->nmi_enable)
 		 cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -33,7 +33,7 @@ static INTERRUPT_GEN( drmicro_interrupt )
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	drmicro_state *state = (drmicro_state *)space->machine->driver_data;
+	drmicro_state *state = space->machine->driver_data<drmicro_state>();
 
 	state->nmi_enable = data & 1;
 	state->flipscreen = (data & 2) ? 1 : 0;
@@ -45,7 +45,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static void pcm_w(running_device *device)
 {
-	drmicro_state *state = (drmicro_state *)device->machine->driver_data;
+	drmicro_state *state = device->machine->driver_data<drmicro_state>();
 	UINT8 *PCM = memory_region(device->machine, "adpcm");
 
 	int data = PCM[state->pcm_adr / 2];
@@ -66,7 +66,7 @@ static void pcm_w(running_device *device)
 
 static WRITE8_HANDLER( pcm_set_w )
 {
-	drmicro_state *state = (drmicro_state *)space->machine->driver_data;
+	drmicro_state *state = space->machine->driver_data<drmicro_state>();
 	state->pcm_adr = ((data & 0x3f) << 9);
 	pcm_w(state->msm);
 }
@@ -228,7 +228,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( drmicro )
 {
-	drmicro_state *state = (drmicro_state *)machine->driver_data;
+	drmicro_state *state = machine->driver_data<drmicro_state>();
 
 	state->msm = machine->device("msm");
 
@@ -239,7 +239,7 @@ static MACHINE_START( drmicro )
 
 static MACHINE_RESET( drmicro )
 {
-	drmicro_state *state = (drmicro_state *)machine->driver_data;
+	drmicro_state *state = machine->driver_data<drmicro_state>();
 
 	state->nmi_enable = 0;
 	state->pcm_adr = 0;

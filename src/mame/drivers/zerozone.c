@@ -54,7 +54,7 @@ static READ16_HANDLER( zerozone_input_r )
 
 static WRITE16_HANDLER( zerozone_sound_w )
 {
-	zerozone_state *state = (zerozone_state *)space->machine->driver_data;
+	zerozone_state *state = space->machine->driver_data<zerozone_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -171,7 +171,7 @@ GFXDECODE_END
 
 static MACHINE_START( zerozone )
 {
-	zerozone_state *state = (zerozone_state *)machine->driver_data;
+	zerozone_state *state = machine->driver_data<zerozone_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -180,7 +180,7 @@ static MACHINE_START( zerozone )
 
 static MACHINE_RESET( zerozone )
 {
-	zerozone_state *state = (zerozone_state *)machine->driver_data;
+	zerozone_state *state = machine->driver_data<zerozone_state>();
 	state->tilebank = 0;
 }
 

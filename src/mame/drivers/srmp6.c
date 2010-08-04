@@ -71,12 +71,13 @@ Dumped 06/15/2000
 #include "deprecat.h"
 #include "sound/nile.h"
 
-class srmp6_state
+class srmp6_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp6_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp6_state(machine)); }
 
-	srmp6_state(running_machine &machine) { }
+	srmp6_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT16* tileram;
 	UINT16* dmaram;
@@ -109,7 +110,7 @@ static const gfx_layout tiles8x8_layout =
 
 static void update_palette(running_machine *machine)
 {
-	srmp6_state *state = (srmp6_state *)machine->driver_data;
+	srmp6_state *state = machine->driver_data<srmp6_state>();
 	INT8 r, g ,b;
 	int brg = state->brightness - 0x60;
 	int i;
@@ -142,7 +143,7 @@ static void update_palette(running_machine *machine)
 
 static VIDEO_START(srmp6)
 {
-	srmp6_state *state = (srmp6_state *)machine->driver_data;
+	srmp6_state *state = machine->driver_data<srmp6_state>();
 
 	state->tileram = auto_alloc_array_clear(machine, UINT16, 0x100000*16/2);
 	state->dmaram = auto_alloc_array(machine, UINT16, 0x100/2);
@@ -161,7 +162,7 @@ static int xixi=0;
 
 static VIDEO_UPDATE(srmp6)
 {
-	srmp6_state *state = (srmp6_state *)screen->machine->driver_data;
+	srmp6_state *state = screen->machine->driver_data<srmp6_state>();
 	int alpha;
 	int x,y,tileno,height,width,xw,yw,sprite,xb,yb;
 	UINT16 *sprite_list = state->sprram_old;
@@ -291,14 +292,14 @@ static VIDEO_UPDATE(srmp6)
 
 static WRITE16_HANDLER( srmp6_input_select_w )
 {
-	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+	srmp6_state *state = space->machine->driver_data<srmp6_state>();
 
 	state->input_select = data & 0x0f;
 }
 
 static READ16_HANDLER( srmp6_inputs_r )
 {
-	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+	srmp6_state *state = space->machine->driver_data<srmp6_state>();
 
 	if (offset == 0)			// DSW
 		return input_port_read(space->machine, "DSW");
@@ -317,7 +318,7 @@ static READ16_HANDLER( srmp6_inputs_r )
 
 static WRITE16_HANDLER( video_regs_w )
 {
-	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+	srmp6_state *state = space->machine->driver_data<srmp6_state>();
 
 	switch(offset)
 	{
@@ -357,7 +358,7 @@ static WRITE16_HANDLER( video_regs_w )
 
 static READ16_HANDLER( video_regs_r )
 {
-	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+	srmp6_state *state = space->machine->driver_data<srmp6_state>();
 
 	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(space->cpu), offset*2);
 	return state->video_regs[offset];
@@ -367,7 +368,7 @@ static READ16_HANDLER( video_regs_r )
 /* DMA RLE stuff - the same as CPS3 */
 static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 {
-	srmp6_state *state = (srmp6_state *)machine->driver_data;
+	srmp6_state *state = machine->driver_data<srmp6_state>();
 	int l=0;
 
 	UINT8 *tram=(UINT8*)state->tileram;
@@ -403,7 +404,7 @@ static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 
 static WRITE16_HANDLER(srmp6_dma_w)
 {
-	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+	srmp6_state *state = space->machine->driver_data<srmp6_state>();
 	UINT16* dmaram = state->dmaram;
 
 	COMBINE_DATA(&dmaram[offset]);
@@ -496,7 +497,7 @@ static WRITE16_HANDLER(tileram_w)
 
 static WRITE16_HANDLER(paletteram_w)
 {
-	srmp6_state *state = (srmp6_state *)space->machine->driver_data;
+	srmp6_state *state = space->machine->driver_data<srmp6_state>();
 	INT8 r, g, b;
 	int brg = state->brightness - 0x60;
 

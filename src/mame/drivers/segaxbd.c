@@ -262,7 +262,7 @@ static UINT16 *backupram1, *backupram2;
 
 static void xboard_generic_init(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", NULL);
@@ -301,7 +301,7 @@ static void xboard_generic_init(running_machine *machine)
 
 static void update_main_irqs(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	int irq = 0;
 
 	if (state->timer_irq_state)
@@ -330,7 +330,7 @@ static void update_main_irqs(running_machine *machine)
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	int scanline = param;
 	int next_scanline = (scanline + 2) % 262;
@@ -368,7 +368,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 static void timer_ack_callback(running_machine *machine)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	/* clear the timer IRQ */
 	state->timer_irq_state = 0;
@@ -385,7 +385,7 @@ static void timer_ack_callback(running_machine *machine)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, param);
@@ -401,7 +401,7 @@ static void sound_data_w(running_machine *machine, UINT8 data)
 
 static void sound_cpu_irq(running_device *device, int state)
 {
-	segas1x_state *driver = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *driver = device->machine->driver_data<segas1x_state>();
 
 	cpu_set_input_line(driver->soundcpu, 0, state);
 }
@@ -409,7 +409,7 @@ static void sound_cpu_irq(running_device *device, int state)
 
 static READ8_HANDLER( sound_data_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, offset);
@@ -425,7 +425,7 @@ static READ8_HANDLER( sound_data_r )
 
 static void xboard_reset(running_device *device)
 {
-	segas1x_state *state = (segas1x_state *)device->machine->driver_data;
+	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
 	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, PULSE_LINE);
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
@@ -454,7 +454,7 @@ static MACHINE_RESET( xboard )
 
 static READ16_HANDLER( adc_r )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
 	int which = (state->iochip_regs[0][2] >> 2) & 7;
 
@@ -477,7 +477,7 @@ static WRITE16_HANDLER( adc_w )
 
 INLINE UINT16 iochip_r(running_machine *machine, int which, int port, int inputval)
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	UINT16 result = state->iochip_regs[which][port];
 
 	/* if there's custom I/O, do that to get the input value */
@@ -546,7 +546,7 @@ static READ16_HANDLER( iochip_0_r )
 
 static WRITE16_HANDLER( iochip_0_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	UINT8 oldval;
 
 	/* access is via the low 8 bits */
@@ -622,7 +622,7 @@ static READ16_HANDLER( iochip_1_r )
 
 static WRITE16_HANDLER( iochip_1_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	/* access is via the low 8 bits */
 	if (!ACCESSING_BITS_0_7)
@@ -658,7 +658,7 @@ static WRITE16_HANDLER( iocontrol_w )
 
 static WRITE16_HANDLER( aburner2_iochip_0_D_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	/* access is via the low 8 bits */
 	if (!ACCESSING_BITS_0_7)
@@ -684,7 +684,7 @@ static WRITE16_HANDLER( aburner2_iochip_0_D_w )
 
 static WRITE16_HANDLER( loffire_sync0_w )
 {
-	segas1x_state *state = (segas1x_state *)space->machine->driver_data;
+	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	COMBINE_DATA(&state->loffire_sync[offset]);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
@@ -2848,7 +2848,7 @@ static DRIVER_INIT( generic_xboard )
 
 static DRIVER_INIT( aburner2 )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	xboard_generic_init(machine);
 
@@ -2860,7 +2860,7 @@ static DRIVER_INIT( aburner2 )
 
 static DRIVER_INIT( aburner )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	xboard_generic_init(machine);
 
@@ -2870,7 +2870,7 @@ static DRIVER_INIT( aburner )
 
 static DRIVER_INIT( loffire )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	xboard_generic_init(machine);
 	state->adc_reverse[1] = state->adc_reverse[3] = 1;
@@ -2889,7 +2889,7 @@ static DRIVER_INIT( smgp )
 
 static DRIVER_INIT( gprider )
 {
-	segas1x_state *state = (segas1x_state *)machine->driver_data;
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	xboard_generic_init(machine);
 	state->gprider_hack = 1;

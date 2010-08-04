@@ -48,7 +48,7 @@ static const UINT32 tile_offset[32*32] = {
  ********************************************/
 void decocass_video_state_save_init( running_machine *machine )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 
 	state_save_register_global(machine, state->watchdog_count);
 	state_save_register_global(machine, state->watchdog_flip);
@@ -82,7 +82,7 @@ static TILEMAP_MAPPER( bgvideoram_scan_cols )
 
 static TILE_GET_INFO( get_bg_l_tile_info )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	int color = (state->color_center_bot >> 7) & 1;
 	SET_TILE_INFO(
 			2,
@@ -93,7 +93,7 @@ static TILE_GET_INFO( get_bg_l_tile_info )
 
 static TILE_GET_INFO( get_bg_r_tile_info )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	int color = (state->color_center_bot >> 7) & 1;
 	SET_TILE_INFO(
 			2,
@@ -104,7 +104,7 @@ static TILE_GET_INFO( get_bg_r_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	UINT8 code = state->fgvideoram[tile_index];
 	UINT8 attr = state->colorram[tile_index];
 	SET_TILE_INFO(
@@ -120,7 +120,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static void draw_object( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	int sx, sy, color;
 
 	if (0 == (state->mode_set & 0x80))  /* part_h_enable off? */
@@ -143,7 +143,7 @@ static void draw_object( running_machine* machine, bitmap_t *bitmap, const recta
 
 static void draw_center( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	int sx, sy, x, y, color;
 
 	color = 0;
@@ -185,7 +185,7 @@ WRITE8_HANDLER( decocass_paletteram_w )
 
 WRITE8_HANDLER( decocass_charram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->charram[offset] = data;
 	/* dirty sprite */
 	gfx_element_mark_dirty(space->machine->gfx[1], (offset >> 5) & 255);
@@ -196,21 +196,21 @@ WRITE8_HANDLER( decocass_charram_w )
 
 WRITE8_HANDLER( decocass_fgvideoram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( decocass_colorram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 static void mark_bg_tile_dirty( running_machine *machine, offs_t offset )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	if (offset & 0x80)
 		tilemap_mark_tile_dirty(state->bg_tilemap_r, offset);
 	else
@@ -219,7 +219,7 @@ static void mark_bg_tile_dirty( running_machine *machine, offs_t offset )
 
 WRITE8_HANDLER( decocass_tileram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->tileram[offset] = data;
 	/* dirty tile (64 bytes per tile) */
 	gfx_element_mark_dirty(space->machine->gfx[2], (offset / 64) & 15);
@@ -230,7 +230,7 @@ WRITE8_HANDLER( decocass_tileram_w )
 
 WRITE8_HANDLER( decocass_objectram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->objectram[offset] = data;
 	/* dirty the object */
 	gfx_element_mark_dirty(space->machine->gfx[3], 0);
@@ -239,7 +239,7 @@ WRITE8_HANDLER( decocass_objectram_w )
 
 WRITE8_HANDLER( decocass_bgvideoram_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	state->bgvideoram[offset] = data;
 	mark_bg_tile_dirty(space->machine, offset);
 }
@@ -247,21 +247,21 @@ WRITE8_HANDLER( decocass_bgvideoram_w )
 /* The watchdog is a 4bit counter counting down every frame */
 WRITE8_HANDLER( decocass_watchdog_count_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	LOG(1,("decocass_watchdog_count_w: $%02x\n", data));
 	state->watchdog_count = data & 0x0f;
 }
 
 WRITE8_HANDLER( decocass_watchdog_flip_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	LOG(1,("decocass_watchdog_flip_w: $%02x\n", data));
 	state->watchdog_flip = data;
 }
 
 WRITE8_HANDLER( decocass_color_missiles_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	LOG(1,("decocass_color_missiles_w: $%02x\n", data));
 	/* only bits D0-D2 and D4-D6 are connected to
      * the color RAM demux:
@@ -283,7 +283,7 @@ WRITE8_HANDLER( decocass_color_missiles_w )
  */
 WRITE8_HANDLER( decocass_mode_set_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data == state->mode_set)
 		return;
 	LOG(1,("decocass_mode_set_w: $%02x (%s%s%s%s%s%s%s%s)\n", data,
@@ -301,7 +301,7 @@ WRITE8_HANDLER( decocass_mode_set_w )
 
 WRITE8_HANDLER( decocass_color_center_bot_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data == state->color_center_bot)
 		return;
 	LOG(1,("decocass_color_center_bot_w: $%02x (color:%d, center_bot:%d)\n", data, data & 3, data >> 4));
@@ -328,7 +328,7 @@ WRITE8_HANDLER( decocass_color_center_bot_w )
 
 WRITE8_HANDLER( decocass_back_h_shift_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data == state->back_h_shift)
 		return;
 	LOG(1,("decocass_back_h_shift_w: $%02x\n", data));
@@ -337,7 +337,7 @@ WRITE8_HANDLER( decocass_back_h_shift_w )
 
 WRITE8_HANDLER( decocass_back_vl_shift_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data == state->back_vl_shift)
 		return;
 	LOG(1,("decocass_back_vl_shift_w: $%02x\n", data));
@@ -346,7 +346,7 @@ WRITE8_HANDLER( decocass_back_vl_shift_w )
 
 WRITE8_HANDLER( decocass_back_vr_shift_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data == state->back_vr_shift)
 		return;
 	LOG(1,("decocass_back_vr_shift_w: $%02x\n", data));
@@ -355,7 +355,7 @@ WRITE8_HANDLER( decocass_back_vr_shift_w )
 
 WRITE8_HANDLER( decocass_part_h_shift_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data == state->part_v_shift )
 		return;
 	LOG(1,("decocass_part_h_shift_w: $%02x\n", data));
@@ -364,7 +364,7 @@ WRITE8_HANDLER( decocass_part_h_shift_w )
 
 WRITE8_HANDLER( decocass_part_v_shift_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data == state->part_v_shift )
 		return;
 	LOG(1,("decocass_part_v_shift_w: $%02x\n", data));
@@ -373,7 +373,7 @@ WRITE8_HANDLER( decocass_part_v_shift_w )
 
 WRITE8_HANDLER( decocass_center_h_shift_space_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	if (data == state->center_h_shift_space)
 		return;
 	LOG(1,("decocass_center_h_shift_space_w: $%02x\n", data));
@@ -382,7 +382,7 @@ WRITE8_HANDLER( decocass_center_h_shift_space_w )
 
 WRITE8_HANDLER( decocass_center_v_shift_w )
 {
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	decocass_state *state = space->machine->driver_data<decocass_state>();
 	LOG(1,("decocass_center_v_shift_w: $%02x\n", data));
 	state->center_v_shift = data;
 }
@@ -444,7 +444,7 @@ static void draw_missiles(running_machine *machine,bitmap_t *bitmap, const recta
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						UINT8 *missile_ram, int interleave)
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	int i, offs, x;
 
 	/* Draw the missiles (16 of them) seemingly with alternating colors
@@ -490,7 +490,7 @@ static void draw_missiles(running_machine *machine,bitmap_t *bitmap, const recta
 
 VIDEO_START( decocass )
 {
-	decocass_state *state = (decocass_state *)machine->driver_data;
+	decocass_state *state = machine->driver_data<decocass_state>();
 	state->bg_tilemap_l = tilemap_create(machine, get_bg_l_tile_info, bgvideoram_scan_cols, 16, 16, 32, 32);
 	state->bg_tilemap_r = tilemap_create(machine, get_bg_r_tile_info, bgvideoram_scan_cols, 16, 16, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, fgvideoram_scan_cols, 8, 8, 32, 32);
@@ -521,7 +521,7 @@ VIDEO_START( decocass )
 
 VIDEO_UPDATE( decocass )
 {
-	decocass_state *state = (decocass_state *)screen->machine->driver_data;
+	decocass_state *state = screen->machine->driver_data<decocass_state>();
 	int scrollx, scrolly_l, scrolly_r;
 	rectangle clip;
 

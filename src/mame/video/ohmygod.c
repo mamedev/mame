@@ -9,7 +9,7 @@
 
 static TILE_GET_INFO( get_tile_info )
 {
-	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	ohmygod_state *state = machine->driver_data<ohmygod_state>();
 	UINT16 code = state->videoram[2 * tile_index + 1];
 	UINT16 attr = state->videoram[2 * tile_index];
 	SET_TILE_INFO(
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( ohmygod )
 {
-	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	ohmygod_state *state = machine->driver_data<ohmygod_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 }
 
@@ -43,28 +43,28 @@ VIDEO_START( ohmygod )
 
 WRITE16_HANDLER( ohmygod_videoram_w )
 {
-	ohmygod_state *state = (ohmygod_state *)space->machine->driver_data;
+	ohmygod_state *state = space->machine->driver_data<ohmygod_state>();
 	COMBINE_DATA(&state->videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE16_HANDLER( ohmygod_spritebank_w )
 {
-	ohmygod_state *state = (ohmygod_state *)space->machine->driver_data;
+	ohmygod_state *state = space->machine->driver_data<ohmygod_state>();
 	if (ACCESSING_BITS_8_15)
 		state->spritebank = data & 0x8000;
 }
 
 WRITE16_HANDLER( ohmygod_scrollx_w )
 {
-	ohmygod_state *state = (ohmygod_state *)space->machine->driver_data;
+	ohmygod_state *state = space->machine->driver_data<ohmygod_state>();
 	COMBINE_DATA(&state->scrollx);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx - 0x81ec);
 }
 
 WRITE16_HANDLER( ohmygod_scrolly_w )
 {
-	ohmygod_state *state = (ohmygod_state *)space->machine->driver_data;
+	ohmygod_state *state = space->machine->driver_data<ohmygod_state>();
 	COMBINE_DATA(&state->scrolly);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly - 0x81ef);
 }
@@ -78,7 +78,7 @@ WRITE16_HANDLER( ohmygod_scrolly_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	ohmygod_state *state = (ohmygod_state *)machine->driver_data;
+	ohmygod_state *state = machine->driver_data<ohmygod_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -107,7 +107,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( ohmygod )
 {
-	ohmygod_state *state = (ohmygod_state *)screen->machine->driver_data;
+	ohmygod_state *state = screen->machine->driver_data<ohmygod_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

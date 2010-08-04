@@ -7,13 +7,14 @@
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-class kickgoal_state
+class kickgoal_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kickgoal_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kickgoal_state(machine)); }
 
 	kickgoal_state(running_machine &machine)
-		: adpcm(machine.device<okim6295_device>("oki")),
+		: driver_data_t(machine),
+		  adpcm(machine.device<okim6295_device>("oki")),
 		  eeprom(machine.device<eeprom_device>("eeprom")) { }
 
 	/* memory pointers */

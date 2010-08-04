@@ -1,10 +1,11 @@
 
-class pgm_state
+class pgm_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pgm_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pgm_state(machine)); }
 
-	pgm_state(running_machine &machine) { }
+	pgm_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 //  UINT16 *      mainram;  // currently this is also used by nvram handler

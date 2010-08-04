@@ -18,7 +18,7 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	gundealr_state *state = (gundealr_state *)machine->driver_data;
+	gundealr_state *state = machine->driver_data<gundealr_state>();
 	UINT8 attr = state->bg_videoram[2 * tile_index + 1];
 	SET_TILE_INFO(
 			0,
@@ -35,7 +35,7 @@ static TILEMAP_MAPPER( gundealr_scan )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	gundealr_state *state = (gundealr_state *)machine->driver_data;
+	gundealr_state *state = machine->driver_data<gundealr_state>();
 	UINT8 attr = state->fg_videoram[2 * tile_index + 1];
 	SET_TILE_INFO(
 			1,
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( gundealr )
 {
-	gundealr_state *state = (gundealr_state *)machine->driver_data;
+	gundealr_state *state = machine->driver_data<gundealr_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, gundealr_scan, 16, 16, 64, 32);
 
@@ -71,21 +71,21 @@ VIDEO_START( gundealr )
 
 WRITE8_HANDLER( gundealr_bg_videoram_w )
 {
-	gundealr_state *state = (gundealr_state *)space->machine->driver_data;
+	gundealr_state *state = space->machine->driver_data<gundealr_state>();
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( gundealr_fg_videoram_w )
 {
-	gundealr_state *state = (gundealr_state *)space->machine->driver_data;
+	gundealr_state *state = space->machine->driver_data<gundealr_state>();
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( gundealr_paletteram_w )
 {
-	gundealr_state *state = (gundealr_state *)space->machine->driver_data;
+	gundealr_state *state = space->machine->driver_data<gundealr_state>();
 	int r,g,b,val;
 
 	state->paletteram[offset] = data;
@@ -103,7 +103,7 @@ WRITE8_HANDLER( gundealr_paletteram_w )
 
 WRITE8_HANDLER( gundealr_fg_scroll_w )
 {
-	gundealr_state *state = (gundealr_state *)space->machine->driver_data;
+	gundealr_state *state = space->machine->driver_data<gundealr_state>();
 	state->scroll[offset] = data;
 	tilemap_set_scrollx(state->fg_tilemap, 0, state->scroll[1] | ((state->scroll[0] & 0x03) << 8));
 	tilemap_set_scrolly(state->fg_tilemap, 0, state->scroll[3] | ((state->scroll[2] & 0x03) << 8));
@@ -111,7 +111,7 @@ WRITE8_HANDLER( gundealr_fg_scroll_w )
 
 WRITE8_HANDLER( yamyam_fg_scroll_w )
 {
-	gundealr_state *state = (gundealr_state *)space->machine->driver_data;
+	gundealr_state *state = space->machine->driver_data<gundealr_state>();
 	state->scroll[offset] = data;
 	tilemap_set_scrollx(state->fg_tilemap, 0, state->scroll[0] | ((state->scroll[1] & 0x03) << 8));
 	tilemap_set_scrolly(state->fg_tilemap, 0, state->scroll[2] | ((state->scroll[3] & 0x03) << 8));
@@ -119,7 +119,7 @@ WRITE8_HANDLER( yamyam_fg_scroll_w )
 
 WRITE8_HANDLER( gundealr_flipscreen_w )
 {
-	gundealr_state *state = (gundealr_state *)space->machine->driver_data;
+	gundealr_state *state = space->machine->driver_data<gundealr_state>();
 	state->flipscreen = data;
 	tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
@@ -134,7 +134,7 @@ WRITE8_HANDLER( gundealr_flipscreen_w )
 
 VIDEO_UPDATE( gundealr )
 {
-	gundealr_state *state = (gundealr_state *)screen->machine->driver_data;
+	gundealr_state *state = screen->machine->driver_data<gundealr_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;

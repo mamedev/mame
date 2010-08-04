@@ -34,12 +34,13 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 
-class go2000_state
+class go2000_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, go2000_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, go2000_state(machine)); }
 
-	go2000_state(running_machine &machine) { }
+	go2000_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *  videoram;
@@ -53,7 +54,7 @@ public:
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	go2000_state *state = (go2000_state *)space->machine->driver_data;
+	go2000_state *state = space->machine->driver_data<go2000_state>();
 	soundlatch_w(space, offset, data & 0xff);
 	cpu_set_input_line(state->soundcpu, 0, HOLD_LINE);
 }
@@ -172,7 +173,7 @@ static VIDEO_START(go2000)
 
 static VIDEO_UPDATE(go2000)
 {
-	go2000_state *state = (go2000_state *)screen->machine->driver_data;
+	go2000_state *state = screen->machine->driver_data<go2000_state>();
 	int x,y;
 	int count = 0;
 
@@ -307,7 +308,7 @@ static VIDEO_UPDATE(go2000)
 
 static MACHINE_START( go2000 )
 {
-	go2000_state *state = (go2000_state *)machine->driver_data;
+	go2000_state *state = machine->driver_data<go2000_state>();
 	UINT8 *SOUND = memory_region(machine, "soundcpu");
 	int i;
 

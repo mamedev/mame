@@ -261,7 +261,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( bankp )
 {
-	bankp_state *state = (bankp_state *)machine->driver_data;
+	bankp_state *state = machine->driver_data<bankp_state>();
 
 	state->scroll_x = 0;
 	state->priority = 0;

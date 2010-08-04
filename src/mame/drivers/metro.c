@@ -112,7 +112,7 @@ driver modified by Eisuke Watanabe
 
 static READ16_HANDLER( metro_irq_cause_r )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 	return	state->requested_int[0] * 0x01 +	// vblank
 			state->requested_int[1] * 0x02 +
@@ -128,7 +128,7 @@ static READ16_HANDLER( metro_irq_cause_r )
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state( running_machine *machine )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
@@ -161,7 +161,7 @@ static void update_irq_state( running_machine *machine )
 /* For games that supply an *IRQ Vector* on the data bus */
 static IRQ_CALLBACK( metro_irq_callback )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	// logerror("%s: irq callback returns %04X\n", cpuexec_describe_context(device->machine), state->irq_vectors[int_level]);
 	return state->irq_vectors[irqline] & 0xff;
@@ -170,7 +170,7 @@ static IRQ_CALLBACK( metro_irq_callback )
 
 static WRITE16_HANDLER( metro_irq_cause_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", cpu_get_pc(space->cpu), data);
 
@@ -194,7 +194,7 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 
 static INTERRUPT_GEN( metro_interrupt )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	switch (cpu_getiloops(device))
 	{
@@ -213,7 +213,7 @@ static INTERRUPT_GEN( metro_interrupt )
 /* Lev 1. Lev 2 seems sound related */
 static INTERRUPT_GEN( bangball_interrupt )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	state->requested_int[0] = 1;	// set scroll regs if a flag is set
 	state->requested_int[4] = 1;	// clear that flag
@@ -222,7 +222,7 @@ static INTERRUPT_GEN( bangball_interrupt )
 
 static INTERRUPT_GEN( msgogo_interrupt )
 {
-    metro_state *state = (metro_state *)device->machine->driver_data;
+    metro_state *state = device->machine->driver_data<metro_state>();
 
     switch (cpu_getiloops(device))
     {
@@ -241,14 +241,14 @@ static INTERRUPT_GEN( msgogo_interrupt )
 
 static TIMER_CALLBACK( vblank_end_callback )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	state->requested_int[5] = param;
 }
 
 /* lev 2-7 (lev 1 seems sound related) */
 static INTERRUPT_GEN( karatour_interrupt )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	switch (cpu_getiloops(device))
 	{
@@ -270,7 +270,7 @@ static INTERRUPT_GEN( karatour_interrupt )
 
 static TIMER_CALLBACK( mouja_irq_callback )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	state->requested_int[0] = 1;
 	update_irq_state(machine);
@@ -278,7 +278,7 @@ static TIMER_CALLBACK( mouja_irq_callback )
 
 static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2;					/* 0xff=58Hz, 0x80=116Hz? */
 
 	timer_adjust_periodic(state->mouja_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(freq));
@@ -286,7 +286,7 @@ static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 
 static INTERRUPT_GEN( mouja_interrupt )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	state->requested_int[1] = 1;
 	update_irq_state(device->machine);
@@ -295,7 +295,7 @@ static INTERRUPT_GEN( mouja_interrupt )
 
 static INTERRUPT_GEN( gakusai_interrupt )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	switch (cpu_getiloops(device))
 	{
@@ -308,7 +308,7 @@ static INTERRUPT_GEN( gakusai_interrupt )
 
 static INTERRUPT_GEN( dokyusei_interrupt )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	switch (cpu_getiloops(device))
 	{
@@ -325,7 +325,7 @@ static INTERRUPT_GEN( dokyusei_interrupt )
 
 static void ymf278b_interrupt( running_device *device, int active )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 	cpu_set_input_line(state->maincpu, 2, active);
 }
 
@@ -339,7 +339,7 @@ static void ymf278b_interrupt( running_device *device, int active )
 
 static int metro_io_callback( running_device *device, int ioline, int state )
 {
-	metro_state *driver_state = (metro_state *)device->machine->driver_data;
+	metro_state *driver_state = device->machine->driver_data<metro_state>();
 	const address_space *space = cpu_get_address_space(driver_state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 data = 0;
 
@@ -359,7 +359,7 @@ static int metro_io_callback( running_device *device, int ioline, int state )
 
 static WRITE16_HANDLER( metro_soundlatch_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -373,19 +373,19 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 
 static READ16_HANDLER( metro_soundstatus_r )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	return (state->busy_sndcpu ? 0x00 : 0x01);
 }
 
 static CUSTOM_INPUT( custom_soundstatus_r )
 {
-	metro_state *state = (metro_state *)field->port->machine->driver_data;
+	metro_state *state = field->port->machine->driver_data<metro_state>();
 	return (state->busy_sndcpu ? 0x01 : 0x00);
 }
 
 static WRITE16_HANDLER( metro_soundstatus_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->soundstatus = data & 0x01;
@@ -417,13 +417,13 @@ static WRITE8_HANDLER( daitorid_sound_rombank_w )
 
 static READ8_HANDLER( metro_porta_r )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	return state->porta;
 }
 
 static WRITE8_HANDLER( metro_porta_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	state->porta = data;
 }
 
@@ -440,7 +440,7 @@ static WRITE8_HANDLER( metro_portb_w )
        0
     */
 
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 	if (BIT(state->portb, 7) && !BIT(data, 7))	/* clock 1->0 */
 	{
@@ -482,7 +482,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
        1 select YM2151 register or data port
        0
     */
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 	if (BIT(state->portb, 7) && !BIT(data, 7))	/* clock 1->0 */
 	{
@@ -528,7 +528,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 
 static void metro_sound_irq_handler( running_device *device, int state )
 {
-	metro_state *driver_state = (metro_state *)device->machine->driver_data;
+	metro_state *driver_state = device->machine->driver_data<metro_state>();
 	cpu_set_input_line(driver_state->audiocpu, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -592,7 +592,7 @@ static WRITE16_HANDLER( metro_coin_lockout_4words_w )
 
 static READ16_HANDLER( metro_bankedrom_r )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	UINT8 *ROM = memory_region(space->machine, "gfx1");
 	size_t len = memory_region_length(space->machine, "gfx1");
 
@@ -655,7 +655,7 @@ static READ16_HANDLER( metro_bankedrom_r )
 
 static TIMER_CALLBACK( metro_blit_done )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	state->requested_int[state->blitter_bit] = 1;
 	update_irq_state(machine);
 }
@@ -679,7 +679,7 @@ INLINE void blt_write( const address_space *space, const int tmap, const offs_t 
 
 static WRITE16_HANDLER( metro_blitter_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	COMBINE_DATA(&state->blitter_regs[offset]);
 
 	if (offset == 0x0c / 2)
@@ -1120,7 +1120,7 @@ ADDRESS_MAP_END
 #define KARATOUR_VRAM( _n_ ) \
 static READ16_HANDLER( karatour_vram_##_n_##_r ) \
 { \
-	metro_state *state = (metro_state *)space->machine->driver_data; \
+	metro_state *state = space->machine->driver_data<metro_state>(); \
 	return state->vram_##_n_[KARATOUR_OFFS(offset)]; \
 } \
 static WRITE16_HANDLER( karatour_vram_##_n_##_w ) \
@@ -1272,14 +1272,14 @@ ADDRESS_MAP_END
 
 static void gakusai_oki_bank_set(running_device *device)
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 	int bank = (state->gakusai_oki_bank_lo & 7) + (state->gakusai_oki_bank_hi & 1) * 8;
 	downcast<okim6295_device *>(device)->set_bank_base(bank * 0x40000);
 }
 
 static WRITE16_DEVICE_HANDLER( gakusai_oki_bank_hi_w )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1290,7 +1290,7 @@ static WRITE16_DEVICE_HANDLER( gakusai_oki_bank_hi_w )
 
 static WRITE16_DEVICE_HANDLER( gakusai_oki_bank_lo_w )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1302,7 +1302,7 @@ static WRITE16_DEVICE_HANDLER( gakusai_oki_bank_lo_w )
 
 static READ16_HANDLER( gakusai_input_r )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 	UINT16 input_sel = (*state->input_sel) ^ 0x3e;
 	// Bit 0 ??
 	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY0");
@@ -1691,7 +1691,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( blzntrnd_sound_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 	soundlatch_w(space, offset, data >> 8);
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -1708,7 +1708,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 
 static void blzntrnd_irqhandler(running_device *device, int irq)
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -1769,7 +1769,7 @@ ADDRESS_MAP_END
 
 static WRITE16_DEVICE_HANDLER( mouja_sound_rombank_w )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	if (ACCESSING_BITS_0_7)
 		state->oki->set_bank_base(((data >> 3) & 0x07) * 0x40000);
@@ -1817,7 +1817,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( puzzlet_irq_enable_w )
 {
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 	if (ACCESSING_BITS_0_7)
 		*state->irq_enable = data ^ 0xffff;
@@ -1827,7 +1827,7 @@ static WRITE16_HANDLER( puzzlet_irq_enable_w )
 static WRITE16_HANDLER( vram_0_clr_w )
 {
 	static int i;
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 //  printf("0 %04x %04x\n",offset,data);
 	for(i=0;i<0x20/2;i++)
@@ -1837,7 +1837,7 @@ static WRITE16_HANDLER( vram_0_clr_w )
 static WRITE16_HANDLER( vram_1_clr_w )
 {
 	static int i;
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 //  printf("0 %04x %04x\n",offset,data);
 	for(i=0;i<0x20/2;i++)
@@ -1847,7 +1847,7 @@ static WRITE16_HANDLER( vram_1_clr_w )
 static WRITE16_HANDLER( vram_2_clr_w )
 {
 	static int i;
-	metro_state *state = (metro_state *)space->machine->driver_data;
+	metro_state *state = space->machine->driver_data<metro_state>();
 
 //  printf("0 %04x %04x\n",offset,data);
 	for(i=0;i<0x20/2;i++)
@@ -3577,7 +3577,7 @@ GFXDECODE_END
 
 static MACHINE_START( metro )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	state_save_register_global(machine, state->blitter_bit);
 	state_save_register_global(machine, state->irq_line);
@@ -3596,7 +3596,7 @@ static MACHINE_START( metro )
 
 static MACHINE_RESET( metro )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	if (state->irq_line == -1)
 		cpu_set_irq_callback(machine->device("maincpu"), metro_irq_callback);
@@ -4593,7 +4593,7 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( puzzlet_interrupt )
 {
-	metro_state *state = (metro_state *)device->machine->driver_data;
+	metro_state *state = device->machine->driver_data<metro_state>();
 
 	switch (cpu_getiloops(device))
 	{
@@ -6082,7 +6082,7 @@ ROM_END
 
 static void metro_common( running_machine *machine )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	memset(state->requested_int, 0, ARRAY_LENGTH(state->requested_int));
 	state->irq_line = 2;
@@ -6094,7 +6094,7 @@ static void metro_common( running_machine *machine )
 
 static DRIVER_INIT( metro )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	metro_common(machine);
@@ -6107,7 +6107,7 @@ static DRIVER_INIT( metro )
 
 static DRIVER_INIT( karatour )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	UINT16 *RAM = auto_alloc_array(machine, UINT16, 0x20000*3/2);
 	int i;
 
@@ -6127,7 +6127,7 @@ static DRIVER_INIT( karatour )
 
 static DRIVER_INIT( daitorid )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	metro_common(machine);
@@ -6142,7 +6142,7 @@ static DRIVER_INIT( daitorid )
 /* Unscramble the GFX ROMs */
 static DRIVER_INIT( balcube )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 
 	const size_t len = memory_region_length(machine, "gfx1");
 	UINT8 *src       = memory_region(machine, "gfx1");
@@ -6185,14 +6185,14 @@ static DRIVER_INIT( dharmak )
 
 static DRIVER_INIT( blzntrnd )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	metro_common(machine);
 	state->irq_line = 1;
 }
 
 static DRIVER_INIT( mouja )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	metro_common(machine);
 	state->irq_line = -1;	/* split interrupt handlers */
 	state->mouja_irq_timer = timer_alloc(machine, mouja_irq_callback, NULL);
@@ -6200,7 +6200,7 @@ static DRIVER_INIT( mouja )
 
 static DRIVER_INIT( gakusai )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	metro_common(machine);
 	state->irq_line = -1;
 	state->blitter_bit = 3;
@@ -6208,7 +6208,7 @@ static DRIVER_INIT( gakusai )
 
 static DRIVER_INIT( puzzlet )
 {
-	metro_state *state = (metro_state *)machine->driver_data;
+	metro_state *state = machine->driver_data<metro_state>();
 	metro_common(machine);
 	state->irq_line = 0;
 	state->blitter_bit = 0;

@@ -49,7 +49,7 @@ PALETTE_INIT( ambush )
 
 static void draw_chars( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	ambush_state *state = (ambush_state *)machine->driver_data;
+	ambush_state *state = machine->driver_data<ambush_state>();
 	int offs, transpen;
 
 	transpen = (priority == 0) ? -1 : 0;
@@ -90,7 +90,7 @@ static void draw_chars( running_machine *machine, bitmap_t *bitmap, const rectan
 
 VIDEO_UPDATE( ambush )
 {
-	ambush_state *state = (ambush_state *)screen->machine->driver_data;
+	ambush_state *state = screen->machine->driver_data<ambush_state>();
 	int offs;
 
 	bitmap_fill(bitmap, cliprect, 0);

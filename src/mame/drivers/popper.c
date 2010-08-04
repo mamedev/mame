@@ -141,7 +141,7 @@ static READ8_HANDLER( popper_input_ports_r )
 
 static READ8_HANDLER( popper_soundcpu_nmi_r )
 {
-	popper_state *state = (popper_state *)space->machine->driver_data;
+	popper_state *state = space->machine->driver_data<popper_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
@@ -307,7 +307,7 @@ GFXDECODE_END
 
 static MACHINE_START( popper )
 {
-	popper_state *state = (popper_state *)machine->driver_data;
+	popper_state *state = machine->driver_data<popper_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -318,7 +318,7 @@ static MACHINE_START( popper )
 
 static MACHINE_RESET( popper )
 {
-	popper_state *state = (popper_state *)machine->driver_data;
+	popper_state *state = machine->driver_data<popper_state>();
 
 	state->flipscreen = 0;
 	state->e002 = 0;

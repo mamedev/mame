@@ -49,7 +49,7 @@
 
 static void update_irq_state( running_device *cpu )
 {
-	dcheese_state *state = (dcheese_state *)cpu->machine->driver_data;
+	dcheese_state *state = cpu->machine->driver_data<dcheese_state>();
 
 	int i;
 	for (i = 1; i < 5; i++)
@@ -59,7 +59,7 @@ static void update_irq_state( running_device *cpu )
 
 static IRQ_CALLBACK( irq_callback )
 {
-	dcheese_state *state = (dcheese_state *)device->machine->driver_data;
+	dcheese_state *state = device->machine->driver_data<dcheese_state>();
 
 	/* auto-ack the IRQ */
 	state->irq_state[irqline] = 0;
@@ -72,7 +72,7 @@ static IRQ_CALLBACK( irq_callback )
 
 void dcheese_signal_irq( running_machine *machine, int which )
 {
-	dcheese_state *state = (dcheese_state *)machine->driver_data;
+	dcheese_state *state = machine->driver_data<dcheese_state>();
 
 	state->irq_state[which] = 1;
 	update_irq_state(state->maincpu);
@@ -95,7 +95,7 @@ static INTERRUPT_GEN( dcheese_vblank )
 
 static MACHINE_START( dcheese )
 {
-	dcheese_state *state = (dcheese_state *)machine->driver_data;
+	dcheese_state *state = machine->driver_data<dcheese_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -119,7 +119,7 @@ static MACHINE_START( dcheese )
 
 static CUSTOM_INPUT( sound_latch_state_r )
 {
-	dcheese_state *state = (dcheese_state *)field->port->machine->driver_data;
+	dcheese_state *state = field->port->machine->driver_data<dcheese_state>();
 	return state->soundlatch_full;
 }
 
@@ -138,7 +138,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+	dcheese_state *state = space->machine->driver_data<dcheese_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -159,7 +159,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static READ8_HANDLER( sound_command_r )
 {
-	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+	dcheese_state *state = space->machine->driver_data<dcheese_state>();
 
 	/* read the latch and clear the IRQ */
 	state->soundlatch_full = 0;
@@ -177,7 +177,7 @@ static READ8_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_control_w )
 {
-	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+	dcheese_state *state = space->machine->driver_data<dcheese_state>();
 	UINT8 diff = data ^ state->sound_control;
 	state->sound_control = data;
 
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( sound_control_w )
 
 static WRITE8_DEVICE_HANDLER( bsmt_data_w )
 {
-	dcheese_state *state = (dcheese_state *)device->machine->driver_data;
+	dcheese_state *state = device->machine->driver_data<dcheese_state>();
 
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)

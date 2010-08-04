@@ -42,7 +42,7 @@ Notes:
 
 static READ8_HANDLER( trvquest_question_r )
 {
-	gameplan_state *state = (gameplan_state *)space->machine->driver_data;
+	gameplan_state *state = space->machine->driver_data<gameplan_state>();
 
 	return memory_region(space->machine, "questions")[*state->trvquest_question * 0x2000 + offset];
 }
@@ -148,7 +148,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	gameplan_state *state = machine->driver_data<gameplan_state>();
 	cpu_set_input_line(state->maincpu, 0, param);
 }
 
@@ -184,7 +184,7 @@ static const via6522_interface via_2_interface =
 
 static MACHINE_START( trvquest )
 {
-	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	gameplan_state *state = machine->driver_data<gameplan_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->via_0 = machine->device("via6522_0");
@@ -200,7 +200,7 @@ static MACHINE_START( trvquest )
 
 static MACHINE_RESET( trvquest )
 {
-	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	gameplan_state *state = machine->driver_data<gameplan_state>();
 
 	state->video_x = 0;
 	state->video_y = 0;
@@ -210,7 +210,7 @@ static MACHINE_RESET( trvquest )
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data<gameplan_state>();
 	via_ca1_w(state->via_2, 1);
 	via_ca1_w(state->via_2, 0);
 }

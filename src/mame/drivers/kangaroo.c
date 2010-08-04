@@ -180,7 +180,7 @@ static MACHINE_START( kangaroo )
 
 static MACHINE_START( kangaroo_mcu )
 {
-	kangaroo_state *state = (kangaroo_state *)machine->driver_data;
+	kangaroo_state *state = machine->driver_data<kangaroo_state>();
 
 	MACHINE_START_CALL(kangaroo);
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
@@ -190,7 +190,7 @@ static MACHINE_START( kangaroo_mcu )
 
 static MACHINE_RESET( kangaroo )
 {
-	kangaroo_state *state = (kangaroo_state *)machine->driver_data;
+	kangaroo_state *state = machine->driver_data<kangaroo_state>();
 
 	/* I think there is a bug in the startup checks of the game. At the very */
 	/* beginning, during the RAM check, it goes one byte too far, and ends up */
@@ -222,7 +222,7 @@ static MACHINE_RESET( kangaroo )
 
 static READ8_HANDLER( mcu_sim_r )
 {
-	kangaroo_state *state = (kangaroo_state *)space->machine->driver_data;
+	kangaroo_state *state = space->machine->driver_data<kangaroo_state>();
 	return ++state->clock & 0x0f;
 }
 

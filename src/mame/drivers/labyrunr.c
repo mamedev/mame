@@ -19,7 +19,7 @@
 
 static INTERRUPT_GEN( labyrunr_interrupt )
 {
-	labyrunr_state *state = (labyrunr_state *)device->machine->driver_data;
+	labyrunr_state *state = device->machine->driver_data<labyrunr_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -185,7 +185,7 @@ static const ym2203_interface ym2203_interface_2 =
 
 static MACHINE_START( labyrunr )
 {
-	labyrunr_state *state = (labyrunr_state *)machine->driver_data;
+	labyrunr_state *state = machine->driver_data<labyrunr_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);

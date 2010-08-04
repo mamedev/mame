@@ -14,63 +14,63 @@
 
 WRITE8_HANDLER ( momoko_fg_scrollx_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->fg_scrollx = data;
 }
 
 WRITE8_HANDLER ( momoko_fg_scrolly_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->fg_scrolly = data;
 }
 
 WRITE8_HANDLER ( momoko_fg_select_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->fg_select = data & 0x0f;
 	state->fg_mask = data & 0x10;
 }
 
 WRITE8_HANDLER ( momoko_text_scrolly_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->text_scrolly = data;
 }
 
 WRITE8_HANDLER ( momoko_text_mode_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->text_mode = data;
 }
 
 WRITE8_HANDLER ( momoko_bg_scrollx_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->bg_scrollx[offset] = data;
 }
 
 WRITE8_HANDLER ( momoko_bg_scrolly_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->bg_scrolly[offset] = data;
 }
 
 WRITE8_HANDLER( momoko_bg_select_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->bg_select = data & 0x0f;
 	state->bg_mask = data & 0x10;
 }
 
 WRITE8_HANDLER( momoko_bg_priority_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->bg_priority = data & 0x01;
 }
 
 WRITE8_HANDLER( momoko_flipscreen_w )
 {
-	momoko_state *state = (momoko_state *)space->machine->driver_data;
+	momoko_state *state = space->machine->driver_data<momoko_state>();
 	state->flipscreen = data & 0x01;
 }
 
@@ -113,7 +113,7 @@ static void momoko_draw_bg_pri( running_machine *machine, bitmap_t *bitmap, int 
 
 VIDEO_UPDATE( momoko )
 {
-	momoko_state *state = (momoko_state *)screen->machine->driver_data;
+	momoko_state *state = screen->machine->driver_data<momoko_state>();
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
 	UINT8 *spriteram = state->spriteram;
 

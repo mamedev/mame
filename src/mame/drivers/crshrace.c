@@ -165,7 +165,7 @@ static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	crshrace_state *state = (crshrace_state *)space->machine->driver_data;
+	crshrace_state *state = space->machine->driver_data<crshrace_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -177,13 +177,13 @@ static WRITE16_HANDLER( sound_command_w )
 
 static CUSTOM_INPUT( country_sndpending_r )
 {
-	crshrace_state *state = (crshrace_state *)field->port->machine->driver_data;
+	crshrace_state *state = field->port->machine->driver_data<crshrace_state>();
 	return state->pending_command;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	crshrace_state *state = (crshrace_state *)space->machine->driver_data;
+	crshrace_state *state = space->machine->driver_data<crshrace_state>();
 	state->pending_command = 0;
 }
 
@@ -430,7 +430,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int irq )
 {
-	crshrace_state *state = (crshrace_state *)device->machine->driver_data;
+	crshrace_state *state = device->machine->driver_data<crshrace_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -447,7 +447,7 @@ static const k053936_interface crshrace_k053936_intf =
 
 static MACHINE_START( crshrace )
 {
-	crshrace_state *state = (crshrace_state *)machine->driver_data;
+	crshrace_state *state = machine->driver_data<crshrace_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 	state->k053936 = machine->device("k053936");
@@ -460,7 +460,7 @@ static MACHINE_START( crshrace )
 
 static MACHINE_RESET( crshrace )
 {
-	crshrace_state *state = (crshrace_state *)machine->driver_data;
+	crshrace_state *state = machine->driver_data<crshrace_state>();
 
 	state->roz_bank = 0;
 	state->gfxctrl = 0;

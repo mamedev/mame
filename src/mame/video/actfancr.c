@@ -22,7 +22,7 @@ static TILEMAP_MAPPER( actfancr_scan2 )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = machine->driver_data<actfancr_state>();
 	int tile = state->pf1_data[2 * tile_index] + (state->pf1_data[2 * tile_index + 1] << 8);
 	int color = tile >> 12;
 
@@ -43,7 +43,7 @@ static TILEMAP_MAPPER( triothep_scan )
 
 static TILE_GET_INFO( get_trio_tile_info )
 {
-	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = machine->driver_data<actfancr_state>();
 	int tile = state->pf1_data[2 * tile_index] + (state->pf1_data[2 * tile_index + 1] << 8);
 	int color = tile >> 12;
 
@@ -58,7 +58,7 @@ static TILE_GET_INFO( get_trio_tile_info )
 
 static TILE_GET_INFO( get_pf2_tile_info )
 {
-	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = machine->driver_data<actfancr_state>();
 	int tile = state->pf2_data[2 * tile_index] + (state->pf2_data[2 * tile_index + 1] << 8);
 	int color = tile >> 12;
 
@@ -76,7 +76,7 @@ static TILE_GET_INFO( get_pf2_tile_info )
 
 static void register_savestate( running_machine *machine )
 {
-	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = machine->driver_data<actfancr_state>();
 	state_save_register_global_array(machine, state->control_1);
 	state_save_register_global_array(machine, state->control_2);
 	state_save_register_global(machine, state->flipscreen);
@@ -84,7 +84,7 @@ static void register_savestate( running_machine *machine )
 
 VIDEO_START( actfancr )
 {
-	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = machine->driver_data<actfancr_state>();
 	state->pf1_tilemap = tilemap_create(machine, get_tile_info, actfancr_scan, 16, 16, 256, 16);
 	state->pf1_alt_tilemap = tilemap_create(machine, get_tile_info, actfancr_scan2, 16, 16, 128, 32);
 	state->pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -96,7 +96,7 @@ VIDEO_START( actfancr )
 
 VIDEO_START( triothep )
 {
-	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	actfancr_state *state = machine->driver_data<actfancr_state>();
 	state->pf1_tilemap = tilemap_create(machine, get_trio_tile_info, triothep_scan, 16, 16, 32, 32);
 	state->pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->pf1_alt_tilemap = NULL;
@@ -110,19 +110,19 @@ VIDEO_START( triothep )
 
 WRITE8_HANDLER( actfancr_pf1_control_w )
 {
-	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	actfancr_state *state = space->machine->driver_data<actfancr_state>();
 	state->control_1[offset] = data;
 }
 
 WRITE8_HANDLER( actfancr_pf2_control_w )
 {
-	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	actfancr_state *state = space->machine->driver_data<actfancr_state>();
 	state->control_2[offset] = data;
 }
 
 WRITE8_HANDLER( actfancr_pf1_data_w )
 {
-	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	actfancr_state *state = space->machine->driver_data<actfancr_state>();
 	state->pf1_data[offset] = data;
 	tilemap_mark_tile_dirty(state->pf1_tilemap, offset / 2);
 	if (state->pf1_alt_tilemap)
@@ -131,20 +131,20 @@ WRITE8_HANDLER( actfancr_pf1_data_w )
 
 READ8_HANDLER( actfancr_pf1_data_r )
 {
-	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	actfancr_state *state = space->machine->driver_data<actfancr_state>();
 	return state->pf1_data[offset];
 }
 
 WRITE8_HANDLER( actfancr_pf2_data_w )
 {
-	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	actfancr_state *state = space->machine->driver_data<actfancr_state>();
 	state->pf2_data[offset] = data;
 	tilemap_mark_tile_dirty(state->pf2_tilemap, offset / 2);
 }
 
 READ8_HANDLER( actfancr_pf2_data_r )
 {
-	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	actfancr_state *state = space->machine->driver_data<actfancr_state>();
 	return state->pf2_data[offset];
 }
 
@@ -152,7 +152,7 @@ READ8_HANDLER( actfancr_pf2_data_r )
 
 VIDEO_UPDATE( actfancr )
 {
-	actfancr_state *state = (actfancr_state *)screen->machine->driver_data;
+	actfancr_state *state = screen->machine->driver_data<actfancr_state>();
 	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
 	int offs, mult;
 	int scrollx = (state->control_1[0x10] + (state->control_1[0x11] << 8));
@@ -238,7 +238,7 @@ VIDEO_UPDATE( actfancr )
 
 VIDEO_UPDATE( triothep )
 {
-	actfancr_state *state = (actfancr_state *)screen->machine->driver_data;
+	actfancr_state *state = screen->machine->driver_data<actfancr_state>();
 	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
 	int offs, i, mult;
 	int scrollx = (state->control_1[0x10] + (state->control_1[0x11] << 8));

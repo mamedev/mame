@@ -20,7 +20,7 @@ End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimj)
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	supbtime_state *state = (supbtime_state *)machine->driver_data;
+	supbtime_state *state = machine->driver_data<supbtime_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -90,7 +90,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE(supbtime)
 {
-	supbtime_state *state = (supbtime_state *)screen->machine->driver_data;
+	supbtime_state *state = screen->machine->driver_data<supbtime_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));

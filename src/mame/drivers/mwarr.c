@@ -46,12 +46,13 @@ Notes:
 #define SOUND_CLOCK      XTAL_45MHz
 
 
-class mwarr_state
+class mwarr_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mwarr_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mwarr_state(machine)); }
 
-	mwarr_state(running_machine &machine) { }
+	mwarr_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *bg_videoram, *mlow_videoram, *mhigh_videoram, *tx_videoram, *sprites_buffer;
@@ -76,7 +77,7 @@ public:
 
 static WRITE16_HANDLER( bg_videoram_w )
 {
-	mwarr_state *state = (mwarr_state *)space->machine->driver_data;
+	mwarr_state *state = space->machine->driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->bg_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -84,7 +85,7 @@ static WRITE16_HANDLER( bg_videoram_w )
 
 static WRITE16_HANDLER( mlow_videoram_w )
 {
-	mwarr_state *state = (mwarr_state *)space->machine->driver_data;
+	mwarr_state *state = space->machine->driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->mlow_videoram[offset]);
 	tilemap_mark_tile_dirty(state->mlow_tilemap,offset);
@@ -92,7 +93,7 @@ static WRITE16_HANDLER( mlow_videoram_w )
 
 static WRITE16_HANDLER( mhigh_videoram_w )
 {
-	mwarr_state *state = (mwarr_state *)space->machine->driver_data;
+	mwarr_state *state = space->machine->driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->mhigh_videoram[offset]);
 	tilemap_mark_tile_dirty(state->mhigh_tilemap,offset);
@@ -100,7 +101,7 @@ static WRITE16_HANDLER( mhigh_videoram_w )
 
 static WRITE16_HANDLER( tx_videoram_w )
 {
-	mwarr_state *state = (mwarr_state *)space->machine->driver_data;
+	mwarr_state *state = space->machine->driver_data<mwarr_state>();
 
 	COMBINE_DATA(&state->tx_videoram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
@@ -113,7 +114,7 @@ static WRITE16_DEVICE_HANDLER( oki1_bank_w )
 
 static WRITE16_HANDLER( sprites_commands_w )
 {
-	mwarr_state *state = (mwarr_state *)space->machine->driver_data;
+	mwarr_state *state = space->machine->driver_data<mwarr_state>();
 
 	if (state->which)
 	{
@@ -151,7 +152,7 @@ static WRITE16_HANDLER( sprites_commands_w )
 
 static WRITE16_HANDLER( mwarr_brightness_w )
 {
-	mwarr_state *state = (mwarr_state *)space->machine->driver_data;
+	mwarr_state *state = space->machine->driver_data<mwarr_state>();
 	int i;
 	double brightness;
 
@@ -331,7 +332,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mwarr_state *state = (mwarr_state *)machine->driver_data;
+	mwarr_state *state = machine->driver_data<mwarr_state>();
 	int tileno = state->bg_videoram[tile_index] & 0x1fff;
 	int colour = (state->bg_videoram[tile_index] & 0xe000) >> 13;
 
@@ -340,7 +341,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_mlow_tile_info )
 {
-	mwarr_state *state = (mwarr_state *)machine->driver_data;
+	mwarr_state *state = machine->driver_data<mwarr_state>();
 	int tileno = state->mlow_videoram[tile_index] & 0x1fff;
 	int colour = (state->mlow_videoram[tile_index] & 0xe000) >> 13;
 
@@ -349,7 +350,7 @@ static TILE_GET_INFO( get_mlow_tile_info )
 
 static TILE_GET_INFO( get_mhigh_tile_info )
 {
-	mwarr_state *state = (mwarr_state *)machine->driver_data;
+	mwarr_state *state = machine->driver_data<mwarr_state>();
 	int tileno = state->mhigh_videoram[tile_index] & 0x1fff;
 	int colour = (state->mhigh_videoram[tile_index] & 0xe000) >> 13;
 
@@ -358,7 +359,7 @@ static TILE_GET_INFO( get_mhigh_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	mwarr_state *state = (mwarr_state *)machine->driver_data;
+	mwarr_state *state = machine->driver_data<mwarr_state>();
 	int tileno = state->tx_videoram[tile_index] & 0x1fff;
 	int colour = (state->tx_videoram[tile_index] & 0xe000) >> 13;
 
@@ -367,7 +368,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( mwarr )
 {
-	mwarr_state *state = (mwarr_state *)machine->driver_data;
+	mwarr_state *state = machine->driver_data<mwarr_state>();
 
 	state->bg_tilemap    = tilemap_create(machine, get_bg_tile_info,    tilemap_scan_cols, 16, 16, 64, 16);
 	state->mlow_tilemap  = tilemap_create(machine, get_mlow_tile_info,  tilemap_scan_cols, 16, 16, 64, 16);
@@ -389,7 +390,7 @@ static VIDEO_START( mwarr )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	mwarr_state *state = (mwarr_state *)machine->driver_data;
+	mwarr_state *state = machine->driver_data<mwarr_state>();
 	const UINT16 *source = state->sprites_buffer + 0x800 - 4;
 	const UINT16 *finish = state->sprites_buffer;
 	const gfx_element *gfx = machine->gfx[0];
@@ -460,7 +461,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_UPDATE( mwarr )
 {
-	mwarr_state *state = (mwarr_state *)screen->machine->driver_data;
+	mwarr_state *state = screen->machine->driver_data<mwarr_state>();
 	int i;
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
@@ -521,14 +522,14 @@ static VIDEO_UPDATE( mwarr )
 
 static MACHINE_START( mwarr )
 {
-	mwarr_state *state = (mwarr_state *)machine->driver_data;
+	mwarr_state *state = machine->driver_data<mwarr_state>();
 
 	state_save_register_global(machine, state->which);
 }
 
 static MACHINE_RESET( mwarr )
 {
-	mwarr_state *state = (mwarr_state *)machine->driver_data;
+	mwarr_state *state = machine->driver_data<mwarr_state>();
 
 	state->which = 0;
 }

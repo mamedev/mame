@@ -83,7 +83,7 @@ TODO:
 
 static WRITE16_HANDLER( inufuku_soundcommand_w )
 {
-	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	inufuku_state *state = space->machine->driver_data<inufuku_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		/* hack... sound doesn't work otherwise */
@@ -98,7 +98,7 @@ static WRITE16_HANDLER( inufuku_soundcommand_w )
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	inufuku_state *state = space->machine->driver_data<inufuku_state>();
 	state->pending_command = 0;
 }
 
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( inufuku_soundrombank_w )
 
 static CUSTOM_INPUT( soundflag_r )
 {
-	inufuku_state *state = (inufuku_state *)field->port->machine->driver_data;
+	inufuku_state *state = field->port->machine->driver_data<inufuku_state>();
 	UINT16 soundflag = state->pending_command ? 0 : 1;
 
 	return soundflag;
@@ -298,7 +298,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int irq )
 {
-	inufuku_state *state = (inufuku_state *)device->machine->driver_data;
+	inufuku_state *state = device->machine->driver_data<inufuku_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -316,7 +316,7 @@ static const ym2610_interface ym2610_config =
 
 static MACHINE_START( inufuku )
 {
-	inufuku_state *state = (inufuku_state *)machine->driver_data;
+	inufuku_state *state = machine->driver_data<inufuku_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
@@ -336,7 +336,7 @@ static MACHINE_START( inufuku )
 
 static MACHINE_RESET( inufuku )
 {
-	inufuku_state *state = (inufuku_state *)machine->driver_data;
+	inufuku_state *state = machine->driver_data<inufuku_state>();
 
 	state->pending_command = 1;
 	state->bg_scrollx = 0;

@@ -97,7 +97,7 @@ TODO:
 
 static VIDEO_EOF( champbas )
 {
-	champbas_state *state = (champbas_state *)machine->driver_data;
+	champbas_state *state = machine->driver_data<champbas_state>();
 	state->watchdog_count++;
 
 	if (state->watchdog_count == 0x10)
@@ -113,20 +113,20 @@ static VIDEO_EOF( champbas )
 
 static WRITE8_HANDLER( champbas_watchdog_reset_w )
 {
-	champbas_state *state = (champbas_state *)space->machine->driver_data;
+	champbas_state *state = space->machine->driver_data<champbas_state>();
 	state->watchdog_count = 0;
 }
 
 static CUSTOM_INPUT( champbas_watchdog_bit2 )
 {
-	champbas_state *state = (champbas_state *)field->port->machine->driver_data;
+	champbas_state *state = field->port->machine->driver_data<champbas_state>();
 	return BIT(state->watchdog_count, 2);
 }
 
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	champbas_state *state = (champbas_state *)space->machine->driver_data;
+	champbas_state *state = space->machine->driver_data<champbas_state>();
 	int bit = data & 1;
 
 	cpu_interrupt_enable(state->maincpu, bit);
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
-	champbas_state *state = (champbas_state *)machine->driver_data;
+	champbas_state *state = machine->driver_data<champbas_state>();
 	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -161,7 +161,7 @@ static WRITE8_HANDLER( champbas_mcu_switch_w )
 
 static WRITE8_HANDLER( champbas_mcu_halt_w )
 {
-	champbas_state *state = (champbas_state *)space->machine->driver_data;
+	champbas_state *state = space->machine->driver_data<champbas_state>();
 
 	// MCU not present/not used in champbas
 	if (state->mcu == NULL)
@@ -566,7 +566,7 @@ GFXDECODE_END
 
 static MACHINE_START( champbas )
 {
-	champbas_state *state = (champbas_state *)machine->driver_data;
+	champbas_state *state = machine->driver_data<champbas_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->mcu = machine->device(CPUTAG_MCU);
@@ -578,7 +578,7 @@ static MACHINE_START( champbas )
 
 static MACHINE_START( exctsccr )
 {
-	champbas_state *state = (champbas_state *)machine->driver_data;
+	champbas_state *state = machine->driver_data<champbas_state>();
 	state->audiocpu = machine->device("audiocpu");
 
 	// FIXME
@@ -590,7 +590,7 @@ static MACHINE_START( exctsccr )
 
 static MACHINE_RESET( champbas )
 {
-	champbas_state *state = (champbas_state *)machine->driver_data;
+	champbas_state *state = machine->driver_data<champbas_state>();
 
 	state->palette_bank = 0;
 	state->gfx_bank = 0;	// talbot has only 1 bank

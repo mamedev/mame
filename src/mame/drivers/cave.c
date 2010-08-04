@@ -93,7 +93,7 @@ Versions known to exist but not dumped:
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state( running_machine *machine )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	if (state->vblank_irq || state->sound_irq || state->unknown_irq)
 		cpu_set_input_line(state->maincpu, state->irq_level, ASSERT_LINE);
 	else
@@ -102,7 +102,7 @@ static void update_irq_state( running_machine *machine )
 
 static TIMER_CALLBACK( cave_vblank_start )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	state->vblank_irq = 1;
 	update_irq_state(machine);
 	cave_get_sprite_info(machine);
@@ -111,7 +111,7 @@ static TIMER_CALLBACK( cave_vblank_start )
 
 static TIMER_CALLBACK( cave_vblank_end )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	if (state->kludge == 3)	/* mazinger metmqstr */
 	{
 		state->unknown_irq = 1;
@@ -123,7 +123,7 @@ static TIMER_CALLBACK( cave_vblank_end )
 /* Called once/frame to generate the VBLANK interrupt */
 static INTERRUPT_GEN( cave_interrupt )
 {
-	cave_state *state = (cave_state *)device->machine->driver_data;
+	cave_state *state = device->machine->driver_data<cave_state>();
 	timer_set(device->machine, ATTOTIME_IN_USEC(17376 - state->time_vblank_irq), NULL, 0, cave_vblank_start);
 	timer_set(device->machine, ATTOTIME_IN_USEC(17376 - state->time_vblank_irq + 2000), NULL, 0, cave_vblank_end);
 }
@@ -131,7 +131,7 @@ static INTERRUPT_GEN( cave_interrupt )
 /* Called by the YMZ280B to set the IRQ state */
 static void sound_irq_gen( running_device *device, int state )
 {
-	cave_state *cave = (cave_state *)device->machine->driver_data;
+	cave_state *cave = device->machine->driver_data<cave_state>();
 	cave->sound_irq = (state != 0);
 	update_irq_state(device->machine);
 }
@@ -155,7 +155,7 @@ static void sound_irq_gen( running_device *device, int state )
 
 static READ16_HANDLER( cave_irq_cause_r )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	int result = 0x0003;
 
 	if (state->vblank_irq)
@@ -200,7 +200,7 @@ static READ8_HANDLER( soundflags_r )
 {
 	// bit 2 is low: can read command (lo)
 	// bit 3 is low: can read command (hi)
-//  cave_state *state = (cave_state *)space->machine->driver_data;
+//  cave_state *state = space->machine->driver_data<cave_state>();
 //  return  (state->sound_flag1 ? 0 : 4) |
 //          (state->sound_flag2 ? 0 : 8) ;
 return 0;
@@ -210,7 +210,7 @@ static READ16_HANDLER( soundflags_ack_r )
 {
 	// bit 0 is low: can write command
 	// bit 1 is low: can read answer
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 //  return  ((state->sound_flag1 | state->sound_flag2) ? 1 : 0) |
 //          ((state->soundbuf_len > 0) ? 0 : 2) ;
 
@@ -220,7 +220,7 @@ static READ16_HANDLER( soundflags_ack_r )
 /* Main CPU: write a 16 bit sound latch and generate a NMI on the sound CPU */
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 //  state->sound_flag1 = 1;
 //  state->sound_flag2 = 1;
 	soundlatch_word_w(space, offset, data, mem_mask);
@@ -231,7 +231,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
 static READ8_HANDLER( soundlatch_lo_r )
 {
-//  cave_state *state = (cave_state *)space->machine->driver_data;
+//  cave_state *state = space->machine->driver_data<cave_state>();
 //  state->sound_flag1 = 0;
 	return soundlatch_word_r(space, offset, 0x00ff) & 0xff;
 }
@@ -239,7 +239,7 @@ static READ8_HANDLER( soundlatch_lo_r )
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 static READ8_HANDLER( soundlatch_hi_r )
 {
-//  cave_state *state = (cave_state *)space->machine->driver_data;
+//  cave_state *state = space->machine->driver_data<cave_state>();
 //  state->sound_flag2 = 0;
 	return soundlatch_word_r(space, offset, 0xff00) >> 8;
 }
@@ -247,7 +247,7 @@ static READ8_HANDLER( soundlatch_hi_r )
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
 static READ16_HANDLER( soundlatch_ack_r )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	if (state->soundbuf_len > 0)
 	{
 		UINT8 data = state->soundbuf_data[0];
@@ -266,7 +266,7 @@ static READ16_HANDLER( soundlatch_ack_r )
 /* Sound CPU: write latch for the main CPU (acknowledge) */
 static WRITE8_HANDLER( soundlatch_ack_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	state->soundbuf_data[state->soundbuf_len] = data;
 	if (state->soundbuf_len < 32)
 		state->soundbuf_len++;
@@ -485,7 +485,7 @@ static READ16_HANDLER( donpachi_videoregs_r )
 #if 0
 WRITE16_HANDLER( donpachi_videoregs_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	COMBINE_DATA(&state->videoregs[offset]);
 
 	switch (offset)
@@ -633,14 +633,14 @@ ADDRESS_MAP_END
 static void show_leds(running_machine *machine)
 {
 #ifdef MAME_DEBUG
-//  cave_state *state = (cave_state *)machine->driver_data;
+//  cave_state *state = machine->driver_data<cave_state>();
 //  popmessage("led %04X eep %02X", state->leds[0], (state->leds[1] >> 8) & ~0x70);
 #endif
 }
 
 static WRITE16_HANDLER( korokoro_leds_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	COMBINE_DATA(&state->leds[0]);
 
 	set_led_status(space->machine, 0, data & 0x8000);
@@ -665,7 +665,7 @@ static WRITE16_HANDLER( korokoro_leds_w )
 
 static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 {
-	cave_state *state = (cave_state *)device->machine->driver_data;
+	cave_state *state = device->machine->driver_data<cave_state>();
 	if (data & ~0x7000)
 	{
 		logerror("%s: Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
@@ -690,7 +690,7 @@ static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 
 static CUSTOM_INPUT( korokoro_hopper_r )
 {
-	cave_state *state = (cave_state *)field->port->machine->driver_data;
+	cave_state *state = field->port->machine->driver_data<cave_state>();
 	return state->hopper ? 1 : 0;
 }
 
@@ -811,10 +811,10 @@ INLINE void vctrl_w(UINT16 *VCTRL, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16
 	}
 	COMBINE_DATA(&VCTRL[offset]);
 }
-static WRITE16_HANDLER( pwrinst2_vctrl_0_w )	{ cave_state *state = (cave_state *)space->machine->driver_data; vctrl_w(state->vctrl_0, offset, data, mem_mask); }
-static WRITE16_HANDLER( pwrinst2_vctrl_1_w )	{ cave_state *state = (cave_state *)space->machine->driver_data; vctrl_w(state->vctrl_1, offset, data, mem_mask); }
-static WRITE16_HANDLER( pwrinst2_vctrl_2_w )	{ cave_state *state = (cave_state *)space->machine->driver_data; vctrl_w(state->vctrl_2, offset, data, mem_mask); }
-static WRITE16_HANDLER( pwrinst2_vctrl_3_w )	{ cave_state *state = (cave_state *)space->machine->driver_data; vctrl_w(state->vctrl_3, offset, data, mem_mask); }
+static WRITE16_HANDLER( pwrinst2_vctrl_0_w )	{ cave_state *state = space->machine->driver_data<cave_state>(); vctrl_w(state->vctrl_0, offset, data, mem_mask); }
+static WRITE16_HANDLER( pwrinst2_vctrl_1_w )	{ cave_state *state = space->machine->driver_data<cave_state>(); vctrl_w(state->vctrl_1, offset, data, mem_mask); }
+static WRITE16_HANDLER( pwrinst2_vctrl_2_w )	{ cave_state *state = space->machine->driver_data<cave_state>(); vctrl_w(state->vctrl_2, offset, data, mem_mask); }
+static WRITE16_HANDLER( pwrinst2_vctrl_3_w )	{ cave_state *state = space->machine->driver_data<cave_state>(); vctrl_w(state->vctrl_3, offset, data, mem_mask); }
 
 static ADDRESS_MAP_START( pwrinst2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM																		// ROM
@@ -906,7 +906,7 @@ static WRITE16_DEVICE_HANDLER( tjumpman_eeprom_lsb_w )
 
 static WRITE16_HANDLER( tjumpman_leds_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		set_led_status(space->machine, 0,	data & 0x0001);	// suru
@@ -924,7 +924,7 @@ static WRITE16_HANDLER( tjumpman_leds_w )
 
 static CUSTOM_INPUT( tjumpman_hopper_r )
 {
-	cave_state *state = (cave_state *)field->port->machine->driver_data;
+	cave_state *state = field->port->machine->driver_data<cave_state>();
 	return (state->hopper && !(field->port->machine->primary_screen->frame_number() % 10)) ? 0 : 1;
 }
 
@@ -1135,13 +1135,13 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mirror_ram_r )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	return state->mirror_ram[offset];
 }
 
 static WRITE8_HANDLER( mirror_ram_w )
 {
-	cave_state *state = (cave_state *)space->machine->driver_data;
+	cave_state *state = space->machine->driver_data<cave_state>();
 	state->mirror_ram[offset] = data;
 }
 
@@ -1710,7 +1710,7 @@ GFXDECODE_END
 
 static MACHINE_START( cave )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -1726,7 +1726,7 @@ static MACHINE_START( cave )
 
 static MACHINE_RESET( cave )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 
 	memset(state->soundbuf_data, 0, 32);
 	state->soundbuf_len = 0;
@@ -4216,7 +4216,7 @@ static void sailormn_unpack_tiles( running_machine *machine, const char *region 
 
 static void init_cave(running_machine *machine)
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 
 	state->spritetype[0] = 0;	// Normal sprites
 	state->kludge = 0;
@@ -4241,7 +4241,7 @@ static DRIVER_INIT( agallet )
 
 static DRIVER_INIT( dfeveron )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	unpack_sprites(machine);
@@ -4250,7 +4250,7 @@ static DRIVER_INIT( dfeveron )
 
 static DRIVER_INIT( feversos )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	unpack_sprites(machine);
@@ -4259,7 +4259,7 @@ static DRIVER_INIT( feversos )
 
 static DRIVER_INIT( ddonpach )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	ddonpach_unpack_sprites(machine);
@@ -4269,7 +4269,7 @@ static DRIVER_INIT( ddonpach )
 
 static DRIVER_INIT( donpachi )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	ddonpach_unpack_sprites(machine);
@@ -4280,7 +4280,7 @@ static DRIVER_INIT( donpachi )
 
 static DRIVER_INIT( esprade )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	esprade_unpack_sprites(machine);
@@ -4296,7 +4296,7 @@ static DRIVER_INIT( esprade )
 
 static DRIVER_INIT( gaia )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	/* No EEPROM */
@@ -4308,7 +4308,7 @@ static DRIVER_INIT( gaia )
 
 static DRIVER_INIT( guwange )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	esprade_unpack_sprites(machine);
@@ -4317,7 +4317,7 @@ static DRIVER_INIT( guwange )
 
 static DRIVER_INIT( hotdogst )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	init_cave(machine);
@@ -4332,7 +4332,7 @@ static DRIVER_INIT( hotdogst )
 
 static DRIVER_INIT( mazinger )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	UINT8 *buffer;
 	UINT8 *src = memory_region(machine, "sprites");
@@ -4365,7 +4365,7 @@ static DRIVER_INIT( mazinger )
 
 static DRIVER_INIT( metmqstr )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	init_cave(machine);
@@ -4382,7 +4382,7 @@ static DRIVER_INIT( metmqstr )
 
 static DRIVER_INIT( pwrinst2j )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	UINT8 *buffer;
 	UINT8 *src = memory_region(machine, "sprites");
@@ -4431,7 +4431,7 @@ static DRIVER_INIT( pwrinst2 )
 
 static DRIVER_INIT( sailormn )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	UINT8 *buffer;
 	UINT8 *src = memory_region(machine, "sprites");
@@ -4465,7 +4465,7 @@ static DRIVER_INIT( sailormn )
 
 static DRIVER_INIT( tjumpman )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	unpack_sprites(machine);
@@ -4479,7 +4479,7 @@ static DRIVER_INIT( tjumpman )
 
 static DRIVER_INIT( uopoko )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	unpack_sprites(machine);
@@ -4489,7 +4489,7 @@ static DRIVER_INIT( uopoko )
 
 static DRIVER_INIT( korokoro )
 {
-	cave_state *state = (cave_state *)machine->driver_data;
+	cave_state *state = machine->driver_data<cave_state>();
 	init_cave(machine);
 
 	state->irq_level = 2;

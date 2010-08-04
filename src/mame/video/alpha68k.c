@@ -10,19 +10,19 @@
 
 void alpha68k_flipscreen_w( running_machine *machine, int flip )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->flipscreen = flip;
 }
 
 void alpha68k_V_video_bank_w( running_machine *machine, int bank )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->bank_base = bank & 0xf;
 }
 
 WRITE16_HANDLER( alpha68k_paletteram_w )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int newword;
 	int r, g, b;
 
@@ -40,7 +40,7 @@ WRITE16_HANDLER( alpha68k_paletteram_w )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	int tile = state->videoram[2 * tile_index] & 0xff;
 	int color = state->videoram[2 * tile_index + 1] & 0x0f;
 
@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE16_HANDLER( alpha68k_videoram_w )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	/* Doh. */
 	if(ACCESSING_BITS_0_7)
 		if(ACCESSING_BITS_8_15)
@@ -66,7 +66,7 @@ WRITE16_HANDLER( alpha68k_videoram_w )
 
 VIDEO_START( alpha68k )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 
 	state->fix_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->fix_tilemap, 0);
@@ -77,7 +77,7 @@ VIDEO_START( alpha68k )
 //AT
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j, int s, int e )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, mx, my, color, tile, fx, fy, i;
 
@@ -130,7 +130,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( alpha68k_II )
 {
-	alpha68k_state *state = (alpha68k_state *)screen->machine->driver_data;
+	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 
 	if (state->last_bank != state->bank_base)
 		tilemap_mark_all_tiles_dirty_all(screen->machine);
@@ -171,7 +171,7 @@ VIDEO_UPDATE( alpha68k_II )
 
 WRITE16_HANDLER( alpha68k_II_video_bank_w )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	switch (offset)
 	{
 		case 0x10: /* Reset */
@@ -223,7 +223,7 @@ WRITE16_HANDLER( alpha68k_V_video_control_w )
 
 static void draw_sprites_V( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, mx, my, color, tile, fx, fy, i;
 
@@ -277,7 +277,7 @@ static void draw_sprites_V( running_machine *machine, bitmap_t *bitmap, const re
 
 VIDEO_UPDATE( alpha68k_V )
 {
-	alpha68k_state *state = (alpha68k_state *)screen->machine->driver_data;
+	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->spriteram;
 
 	if (state->last_bank != state->bank_base)
@@ -318,7 +318,7 @@ VIDEO_UPDATE( alpha68k_V )
 
 VIDEO_UPDATE( alpha68k_V_sb )
 {
-	alpha68k_state *state = (alpha68k_state *)screen->machine->driver_data;
+	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 
 	if (state->last_bank != state->bank_base)
 		tilemap_mark_all_tiles_dirty_all(screen->machine);
@@ -342,7 +342,7 @@ VIDEO_UPDATE( alpha68k_V_sb )
 //AT
 static void draw_sprites_I( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int c, int d, int yshift )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->spriteram;
 	int data, offs, mx, my, tile, color, fy, i;
 	UINT8 *color_prom = memory_region(machine, "user1");
@@ -370,7 +370,7 @@ static void draw_sprites_I( running_machine *machine, bitmap_t *bitmap, const re
 
 VIDEO_UPDATE( alpha68k_I )
 {
-	alpha68k_state *state = (alpha68k_state *)screen->machine->driver_data;
+	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 	int yshift = (state->microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -450,7 +450,7 @@ static void jongbou_video_banking(int *bank, int data)
 
 static void kyros_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int c, int d )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, mx, my, color, tile, i, bank, fy, fx;
 	int data;
@@ -503,7 +503,7 @@ static void kyros_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( kyros )
 {
-	alpha68k_state *state = (alpha68k_state *)screen->machine->driver_data;
+	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 	colortable_entry_set_value(screen->machine->colortable, 0x100, *state->videoram & 0xff);
 	bitmap_fill(bitmap, cliprect, 0x100); //AT
 
@@ -518,7 +518,7 @@ VIDEO_UPDATE( kyros )
 static void sstingry_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int c, int d )
 {
 //AT
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->spriteram;
 	int data, offs, mx, my, color, tile, i, bank, fy, fx;
 
@@ -563,7 +563,7 @@ static void sstingry_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 VIDEO_UPDATE( sstingry )
 {
-	alpha68k_state *state = (alpha68k_state *)screen->machine->driver_data;
+	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 	colortable_entry_set_value(screen->machine->colortable, 0x100, *state->videoram & 0xff);
 	bitmap_fill(bitmap, cliprect, 0x100); //AT
 

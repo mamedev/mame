@@ -226,7 +226,7 @@ const pia6821_interface slither_pia_2_intf =
 
 MACHINE_RESET( qix )
 {
-	qix_state *state = (qix_state *)machine->driver_data;
+	qix_state *state = machine->driver_data<qix_state>();
 
 	/* reset the coin counter register */
 	state->coinctrl = 0x00;
@@ -235,7 +235,7 @@ MACHINE_RESET( qix )
 
 MACHINE_START( qixmcu )
 {
-	qix_state *state = (qix_state *)machine->driver_data;
+	qix_state *state = machine->driver_data<qix_state>();
 
 	/* set up save states */
 	state_save_register_global_array(machine, state->_68705_port_in);
@@ -347,7 +347,7 @@ READ8_HANDLER( qix_video_firq_ack_r )
 
 READ8_DEVICE_HANDLER( qixmcu_coin_r )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *state = device->machine->driver_data<qix_state>();
 
 	logerror("6809:qixmcu_coin_r = %02X\n", state->_68705_port_out[0]);
 	return state->_68705_port_out[0];
@@ -356,7 +356,7 @@ READ8_DEVICE_HANDLER( qixmcu_coin_r )
 
 static WRITE8_DEVICE_HANDLER( qixmcu_coin_w )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *state = device->machine->driver_data<qix_state>();
 
 	logerror("6809:qixmcu_coin_w = %02X\n", data);
 	/* this is a callback called by pia6821_w(), so I don't need to synchronize */
@@ -367,7 +367,7 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coin_w )
 
 static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *state = device->machine->driver_data<qix_state>();
 
 	/* if (!(data & 0x04)) */
 	if (data & 0x04)
@@ -396,7 +396,7 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w )
 
 READ8_HANDLER( qix_68705_portA_r )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	UINT8 ddr = state->_68705_ddr[0];
 	UINT8 out = state->_68705_port_out[0];
@@ -408,7 +408,7 @@ READ8_HANDLER( qix_68705_portA_r )
 
 READ8_HANDLER( qix_68705_portB_r )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	UINT8 ddr = state->_68705_ddr[1];
 	UINT8 out = state->_68705_port_out[1];
@@ -419,7 +419,7 @@ READ8_HANDLER( qix_68705_portB_r )
 
 READ8_HANDLER( qix_68705_portC_r )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	UINT8 ddr = state->_68705_ddr[2];
 	UINT8 out = state->_68705_port_out[2];
@@ -437,7 +437,7 @@ READ8_HANDLER( qix_68705_portC_r )
 
 WRITE8_HANDLER( qix_68705_portA_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	logerror("68705:portA_w = %02X\n", data);
 	state->_68705_port_out[0] = data;
@@ -446,7 +446,7 @@ WRITE8_HANDLER( qix_68705_portA_w )
 
 WRITE8_HANDLER( qix_68705_portB_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	state->_68705_port_out[1] = data;
 	coin_lockout_w(space->machine, 0, (~data >> 6) & 1);
@@ -456,7 +456,7 @@ WRITE8_HANDLER( qix_68705_portB_w )
 
 WRITE8_HANDLER( qix_68705_portC_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	state->_68705_port_out[2] = data;
 }
@@ -536,7 +536,7 @@ static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 
 static READ8_DEVICE_HANDLER( slither_trak_lr_r )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *state = device->machine->driver_data<qix_state>();
 
 	return input_port_read(device->machine, state->flip ? "AN3" : "AN1");
 }
@@ -544,7 +544,7 @@ static READ8_DEVICE_HANDLER( slither_trak_lr_r )
 
 static READ8_DEVICE_HANDLER( slither_trak_ud_r )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *state = device->machine->driver_data<qix_state>();
 
 	return input_port_read(device->machine, state->flip ? "AN2" : "AN0");
 }

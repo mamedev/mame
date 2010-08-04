@@ -14,7 +14,7 @@ PALETTE_INIT( buggychl )
 
 VIDEO_START( buggychl )
 {
-	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	buggychl_state *state = machine->driver_data<buggychl_state>();
 	state->tmp_bitmap1 = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmp_bitmap2 = machine->primary_screen->alloc_compatible_bitmap();
 
@@ -28,7 +28,7 @@ VIDEO_START( buggychl )
 
 WRITE8_HANDLER( buggychl_chargen_w )
 {
-	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	buggychl_state *state = space->machine->driver_data<buggychl_state>();
 	if (state->charram[offset] != data)
 	{
 		state->charram[offset] = data;
@@ -38,19 +38,19 @@ WRITE8_HANDLER( buggychl_chargen_w )
 
 WRITE8_HANDLER( buggychl_sprite_lookup_bank_w )
 {
-	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	buggychl_state *state = space->machine->driver_data<buggychl_state>();
 	state->sl_bank = (data & 0x10) << 8;
 }
 
 WRITE8_HANDLER( buggychl_sprite_lookup_w )
 {
-	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	buggychl_state *state = space->machine->driver_data<buggychl_state>();
 	state->sprite_lookup[offset + state->sl_bank] = data;
 }
 
 WRITE8_HANDLER( buggychl_ctrl_w )
 {
-	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	buggychl_state *state = space->machine->driver_data<buggychl_state>();
 /*
     bit7 = lamp
     bit6 = lockout
@@ -75,7 +75,7 @@ WRITE8_HANDLER( buggychl_ctrl_w )
 
 WRITE8_HANDLER( buggychl_bg_scrollx_w )
 {
-	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	buggychl_state *state = space->machine->driver_data<buggychl_state>();
 	state->bg_scrollx = -(data - 0x12);
 }
 
@@ -92,7 +92,7 @@ static void draw_sky( bitmap_t *bitmap, const rectangle *cliprect )
 
 static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	buggychl_state *state = machine->driver_data<buggychl_state>();
 	int offs;
 	int scroll[256];
 
@@ -136,7 +136,7 @@ static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle
 
 static void draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	buggychl_state *state = machine->driver_data<buggychl_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x400; offs++)
@@ -165,7 +165,7 @@ static void draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	buggychl_state *state = machine->driver_data<buggychl_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 	const UINT8 *gfx;
@@ -238,7 +238,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( buggychl )
 {
-	buggychl_state *state = (buggychl_state *)screen->machine->driver_data;
+	buggychl_state *state = screen->machine->driver_data<buggychl_state>();
 
 	if (state->sky_on)
 		draw_sky(bitmap, cliprect);

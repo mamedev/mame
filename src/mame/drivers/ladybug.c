@@ -67,25 +67,25 @@ TODO:
 /* Sound comm between CPU's */
 static READ8_HANDLER( sraider_sound_low_r )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 	return state->sound_low;
 }
 
 static READ8_HANDLER( sraider_sound_high_r )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 	return state->sound_high;
 }
 
 static WRITE8_HANDLER( sraider_sound_low_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 	state->sound_low = data;
 }
 
 static WRITE8_HANDLER( sraider_sound_high_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 	state->sound_high = data;
 }
 
@@ -100,7 +100,7 @@ static READ8_HANDLER( sraider_8005_r )
 /* Unknown IO */
 static WRITE8_HANDLER( sraider_misc_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 
 	switch(offset)
 	{
@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin1_inserted )
 {
-	ladybug_state *state = (ladybug_state *)field->port->machine->driver_data;
+	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
 
 	/* left coin insertion causes an NMI */
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -197,7 +197,7 @@ static INPUT_CHANGED( coin1_inserted )
 
 static INPUT_CHANGED( coin2_inserted )
 {
-	ladybug_state *state = (ladybug_state *)field->port->machine->driver_data;
+	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
 
 	/* right coin insertion causes an IRQ */
 	if (newval)
@@ -724,13 +724,13 @@ GFXDECODE_END
 
 static MACHINE_START( ladybug )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	state->maincpu = machine->device("maincpu");
 }
 
 static MACHINE_START( sraider )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 
 	state->maincpu = machine->device("maincpu");
 
@@ -752,7 +752,7 @@ static MACHINE_START( sraider )
 
 static MACHINE_RESET( sraider )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 	int i;
 
 	state->grid_color = 0;

@@ -121,7 +121,7 @@ static UINT8 *nvram_stage;
 
 INLINE void schedule_next_irq(running_machine *machine, int curscanline)
 {
-	cloud9_state *state = (cloud9_state *)machine->driver_data;
+	cloud9_state *state = machine->driver_data<cloud9_state>();
 
 	/* IRQ is clocked by /32V, so every 64 scanlines */
 	curscanline = (curscanline + 64) & 255;
@@ -133,7 +133,7 @@ INLINE void schedule_next_irq(running_machine *machine, int curscanline)
 
 static TIMER_CALLBACK( clock_irq )
 {
-	cloud9_state *state = (cloud9_state *)machine->driver_data;
+	cloud9_state *state = machine->driver_data<cloud9_state>();
 	/* assert the IRQ if not already asserted */
 	if (!state->irq_state)
 	{
@@ -151,7 +151,7 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	cloud9_state *state = (cloud9_state *)field->port->machine->driver_data;
+	cloud9_state *state = field->port->machine->driver_data<cloud9_state>();
 	int scanline = field->port->machine->primary_screen->vpos();
 	return (~state->syncprom[scanline & 0xff] >> 1) & 1;
 }
@@ -166,7 +166,7 @@ static CUSTOM_INPUT( get_vblank )
 
 static MACHINE_START( cloud9 )
 {
-	cloud9_state *state = (cloud9_state *)machine->driver_data;
+	cloud9_state *state = machine->driver_data<cloud9_state>();
 	rectangle visarea;
 
 	/* initialize globals */
@@ -211,7 +211,7 @@ static MACHINE_START( cloud9 )
 
 static MACHINE_RESET( cloud9 )
 {
-	cloud9_state *state = (cloud9_state *)machine->driver_data;
+	cloud9_state *state = machine->driver_data<cloud9_state>();
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	state->irq_state = 0;
 }
@@ -226,7 +226,7 @@ static MACHINE_RESET( cloud9 )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cloud9_state *state = (cloud9_state *)space->machine->driver_data;
+	cloud9_state *state = space->machine->driver_data<cloud9_state>();
 	if (state->irq_state)
 	{
 		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);

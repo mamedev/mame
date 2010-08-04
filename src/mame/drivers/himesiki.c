@@ -99,7 +99,7 @@ static WRITE8_HANDLER( himesiki_rombank_w )
 
 static WRITE8_HANDLER( himesiki_sound_w )
 {
-	himesiki_state *state = (himesiki_state *)space->machine->driver_data;
+	himesiki_state *state = space->machine->driver_data<himesiki_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -269,7 +269,7 @@ GFXDECODE_END
 
 static MACHINE_START( himesiki )
 {
-	himesiki_state *state = (himesiki_state *)machine->driver_data;
+	himesiki_state *state = machine->driver_data<himesiki_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
@@ -282,7 +282,7 @@ static MACHINE_START( himesiki )
 
 static MACHINE_RESET( himesiki )
 {
-	himesiki_state *state = (himesiki_state *)machine->driver_data;
+	himesiki_state *state = machine->driver_data<himesiki_state>();
 
 	state->scrollx[0] = 0;
 	state->scrollx[1] = 0;

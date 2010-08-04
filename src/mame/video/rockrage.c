@@ -29,7 +29,7 @@ PALETTE_INIT( rockrage )
 
 static void set_pens( running_machine *machine )
 {
-	rockrage_state *state = (rockrage_state *)machine->driver_data;
+	rockrage_state *state = machine->driver_data<rockrage_state>();
 	int i;
 
 	for (i = 0x00; i < 0x80; i += 2)
@@ -51,7 +51,7 @@ static void set_pens( running_machine *machine )
 
 void rockrage_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags )
 {
-	rockrage_state *state = (rockrage_state *)machine->driver_data;
+	rockrage_state *state = machine->driver_data<rockrage_state>();
 
 	if (layer == 1)
 		*code |= ((*color & 0x40) << 2) | ((bank & 0x01) << 9);
@@ -68,7 +68,7 @@ void rockrage_tile_callback( running_machine *machine, int layer, int bank, int 
 
 void rockrage_sprite_callback( running_machine *machine, int *code, int *color )
 {
-	rockrage_state *state = (rockrage_state *)machine->driver_data;
+	rockrage_state *state = machine->driver_data<rockrage_state>();
 
 	*code |= ((*color & 0x40) << 2) | ((*color & 0x80) << 1) * ((state->vreg & 0x03) << 1);
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
@@ -82,7 +82,7 @@ WRITE8_HANDLER( rockrage_vreg_w )
 	/* bit 3: bit 4 of bank # (layer 0) */
 	/* bit 2: bit 1 of bank # (layer 0) */
 	/* bits 0-1: sprite bank select */
-	rockrage_state *state = (rockrage_state *)space->machine->driver_data;
+	rockrage_state *state = space->machine->driver_data<rockrage_state>();
 
 	if ((data & 0x0c) != (state->vreg & 0x0c))
 		tilemap_mark_all_tiles_dirty_all(space->machine);
@@ -98,7 +98,7 @@ WRITE8_HANDLER( rockrage_vreg_w )
 
 VIDEO_UPDATE( rockrage )
 {
-	rockrage_state *state = (rockrage_state *)screen->machine->driver_data;
+	rockrage_state *state = screen->machine->driver_data<rockrage_state>();
 
 	set_pens(screen->machine);
 

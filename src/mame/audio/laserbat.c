@@ -5,13 +5,13 @@
 
 WRITE8_HANDLER( laserbat_csound1_w )
 {
-	laserbat_state *state = (laserbat_state *)space->machine->driver_data;
+	laserbat_state *state = space->machine->driver_data<laserbat_state>();
 	state->csound1 = data;
 }
 
 WRITE8_HANDLER( laserbat_csound2_w )
 {
-	laserbat_state *state = (laserbat_state *)space->machine->driver_data;
+	laserbat_state *state = space->machine->driver_data<laserbat_state>();
 	int ksound = 0;
 
 	if (data & 0x01)

@@ -49,7 +49,7 @@ forcing all sprites on a row to have an added blue component.
 
 static WRITE8_HANDLER( panic_sound_output_w )
 {
-	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
+	cosmic_state *state = space->machine->driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -125,7 +125,7 @@ static WRITE8_HANDLER( panic_sound_output2_w )
 
 static WRITE8_HANDLER( cosmicg_output_w )
 {
-	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
+	cosmic_state *state = space->machine->driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 12)
@@ -189,7 +189,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 
 static WRITE8_HANDLER( cosmica_sound_output_w )
 {
-	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
+	cosmic_state *state = space->machine->driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -339,7 +339,7 @@ static INTERRUPT_GEN( panic_interrupt )
 
 static INTERRUPT_GEN( cosmica_interrupt )
 {
-	cosmic_state *state = (cosmic_state *)device->machine->driver_data;
+	cosmic_state *state = device->machine->driver_data<cosmic_state>();
 	state->pixel_clock = (state->pixel_clock + 2) & 0x3f;
 
 	if (state->pixel_clock == 0)
@@ -384,7 +384,7 @@ static INTERRUPT_GEN( nomnlnd_interrupt )
 
 static READ8_HANDLER( cosmica_pixel_clock_r )
 {
-	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
+	cosmic_state *state = space->machine->driver_data<cosmic_state>();
 	return state->pixel_clock;
 }
 
@@ -1022,7 +1022,7 @@ static const samples_interface cosmicg_samples_interface =
 
 static MACHINE_START( cosmic )
 {
-	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	cosmic_state *state = machine->driver_data<cosmic_state>();
 
 	state->samples = machine->device("samples");
 	state->dac = machine->device("dac");
@@ -1039,7 +1039,7 @@ static MACHINE_START( cosmic )
 
 static MACHINE_RESET( cosmic )
 {
-	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	cosmic_state *state = machine->driver_data<cosmic_state>();
 
 	state->pixel_clock = 0;
 	state->background_enable = 0;
@@ -1579,7 +1579,7 @@ ROM_END
 static DRIVER_INIT( cosmicg )
 {
 	/* Program ROMs have data pins connected different from normal */
-	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	cosmic_state *state = machine->driver_data<cosmic_state>();
 	offs_t offs, len;
 	UINT8 *rom;
 	len = memory_region_length(machine, "maincpu");
@@ -1604,7 +1604,7 @@ static DRIVER_INIT( cosmicg )
 
 static DRIVER_INIT( cosmica )
 {
-	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	cosmic_state *state = machine->driver_data<cosmic_state>();
 	state->sound_enabled = 1;
 	state->dive_bomb_b_select = 0;
 }
@@ -1627,7 +1627,7 @@ static DRIVER_INIT( nomnlnd )
 
 static DRIVER_INIT( panic )
 {
-	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	cosmic_state *state = machine->driver_data<cosmic_state>();
 	state->sound_enabled = 1;
 }
 

@@ -210,7 +210,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static TIMER_CALLBACK( delayed_command_w	)
 {
-	fromance_state *state = (fromance_state *)machine->driver_data;
+	fromance_state *state = machine->driver_data<fromance_state>();
 	state->sound_command = param & 0xff;
 	state->pending_command = 1;
 
@@ -236,7 +236,7 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 	state->pending_command = 0;
 	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -244,14 +244,14 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static READ8_HANDLER( pending_command_r )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 	return state->pending_command;
 }
 
 
 static READ8_HANDLER( sound_command_r )
 {
-	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	fromance_state *state = space->machine->driver_data<fromance_state>();
 	return state->sound_command;
 }
 
@@ -558,7 +558,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int irq )
 {
-	fromance_state *state = (fromance_state *)device->machine->driver_data;
+	fromance_state *state = device->machine->driver_data<fromance_state>();
 	cpu_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -589,7 +589,7 @@ static const ym2610_interface ym2610_config =
 
 static MACHINE_START( pipedrm )
 {
-	fromance_state *state = (fromance_state *)machine->driver_data;
+	fromance_state *state = machine->driver_data<fromance_state>();
 
 	state->subcpu = machine->device("sub");
 
@@ -610,7 +610,7 @@ static MACHINE_START( pipedrm )
 
 static MACHINE_RESET( pipedrm )
 {
-	fromance_state *state = (fromance_state *)machine->driver_data;
+	fromance_state *state = machine->driver_data<fromance_state>();
 	int i;
 
 	state->pending_command = 0;
@@ -883,7 +883,7 @@ ROM_END
 
 static DRIVER_INIT( pipedrm )
 {
-	fromance_state *state = (fromance_state *)machine->driver_data;
+	fromance_state *state = machine->driver_data<fromance_state>();
 
 	/* sprite RAM lives at the end of palette RAM */
 	state->spriteram = &machine->generic.paletteram.u8[0xc00];

@@ -12,7 +12,7 @@
 
 VIDEO_START( stoneage )
 {
-	cninja_state *state = (cninja_state *)machine->driver_data;
+	cninja_state *state = machine->driver_data<cninja_state>();
 
 	/* The bootleg has broken scroll registers */
 	deco16ic_set_scrolldx(state->deco16ic, 3, 0, -10, -10);	/* pf4 16x16 tilemap */
@@ -391,7 +391,7 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( cninja )
 {
-	cninja_state *state = (cninja_state *)screen->machine->driver_data;
+	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
@@ -412,7 +412,7 @@ VIDEO_UPDATE( cninja )
 
 VIDEO_UPDATE( cninjabl )
 {
-	cninja_state *state = (cninja_state *)screen->machine->driver_data;
+	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
@@ -433,7 +433,7 @@ VIDEO_UPDATE( cninjabl )
 
 VIDEO_UPDATE( edrandy )
 {
-	cninja_state *state = (cninja_state *)screen->machine->driver_data;
+	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
@@ -452,7 +452,7 @@ VIDEO_UPDATE( edrandy )
 
 VIDEO_UPDATE( robocop2 )
 {
-	cninja_state *state = (cninja_state *)screen->machine->driver_data;
+	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 
@@ -503,7 +503,7 @@ VIDEO_UPDATE( robocop2 )
 
 VIDEO_UPDATE( mutantf )
 {
-	cninja_state *state = (cninja_state *)screen->machine->driver_data;
+	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 

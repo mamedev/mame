@@ -94,7 +94,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	ginganin_state *state = machine->driver_data<ginganin_state>();
 	UINT16 code = state->fgram[tile_index];
 	SET_TILE_INFO(
 			FG_GFX,
@@ -105,7 +105,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE16_HANDLER( ginganin_fgram16_w )
 {
-	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	ginganin_state *state = space->machine->driver_data<ginganin_state>();
 	COMBINE_DATA(&state->fgram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
@@ -119,7 +119,7 @@ WRITE16_HANDLER( ginganin_fgram16_w )
 
 static TILE_GET_INFO( get_txt_tile_info )
 {
-	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	ginganin_state *state = machine->driver_data<ginganin_state>();
 	UINT16 code = state->txtram[tile_index];
 	SET_TILE_INFO(
 			TXT_GFX,
@@ -130,7 +130,7 @@ static TILE_GET_INFO( get_txt_tile_info )
 
 WRITE16_HANDLER( ginganin_txtram16_w )
 {
-	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	ginganin_state *state = space->machine->driver_data<ginganin_state>();
 	COMBINE_DATA(&state->txtram[offset]);
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
@@ -138,7 +138,7 @@ WRITE16_HANDLER( ginganin_txtram16_w )
 
 VIDEO_START( ginganin )
 {
-	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	ginganin_state *state = machine->driver_data<ginganin_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, BG_NX, BG_NY);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, FG_NX, FG_NY);
 	state->tx_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows, 8, 8, TXT_NX, TXT_NY);
@@ -150,7 +150,7 @@ VIDEO_START( ginganin )
 
 WRITE16_HANDLER( ginganin_vregs16_w )
 {
-	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	ginganin_state *state = space->machine->driver_data<ginganin_state>();
 	COMBINE_DATA(&state->vregs[offset]);
 	data = state->vregs[offset];
 
@@ -211,7 +211,7 @@ Offset:         Values:         Format:
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	ginganin_state *state = machine->driver_data<ginganin_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs;
 
@@ -247,7 +247,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 VIDEO_UPDATE( ginganin )
 {
-	ginganin_state *state = (ginganin_state *)screen->machine->driver_data;
+	ginganin_state *state = screen->machine->driver_data<ginganin_state>();
 	int layers_ctrl1 = state->layers_ctrl;
 
 #ifdef MAME_DEBUG

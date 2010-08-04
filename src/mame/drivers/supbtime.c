@@ -52,7 +52,7 @@ static READ16_HANDLER( supbtime_controls_r )
 
 static WRITE16_HANDLER( sound_w )
 {
-	supbtime_state *state = (supbtime_state *)space->machine->driver_data;
+	supbtime_state *state = space->machine->driver_data<supbtime_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -311,7 +311,7 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	supbtime_state *driver_state = (supbtime_state *)device->machine->driver_data;
+	supbtime_state *driver_state = device->machine->driver_data<supbtime_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -332,7 +332,7 @@ static const deco16ic_interface supbtime_deco16ic_intf =
 
 static MACHINE_START( supbtime )
 {
-	supbtime_state *state = (supbtime_state *)machine->driver_data;
+	supbtime_state *state = machine->driver_data<supbtime_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");

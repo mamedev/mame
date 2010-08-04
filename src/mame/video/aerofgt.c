@@ -9,7 +9,7 @@
 
 static TILE_GET_INFO( get_pspikes_tile_info )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	UINT16 code = state->bg1videoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
 	SET_TILE_INFO(
@@ -21,7 +21,7 @@ static TILE_GET_INFO( get_pspikes_tile_info )
 
 static TILE_GET_INFO( karatblz_bg1_tile_info )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	UINT16 code = state->bg1videoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -33,7 +33,7 @@ static TILE_GET_INFO( karatblz_bg1_tile_info )
 /* also spinlbrk */
 static TILE_GET_INFO( karatblz_bg2_tile_info )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	UINT16 code = state->bg2videoram[tile_index];
 	SET_TILE_INFO(
 			1,
@@ -44,7 +44,7 @@ static TILE_GET_INFO( karatblz_bg2_tile_info )
 
 static TILE_GET_INFO( spinlbrk_bg1_tile_info )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	UINT16 code = state->bg1videoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -55,7 +55,7 @@ static TILE_GET_INFO( spinlbrk_bg1_tile_info )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	UINT16 code = state->bg1videoram[tile_index];
 	int bank = (code & 0x1800) >> 11;
 	SET_TILE_INFO(
@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	UINT16 code = state->bg2videoram[tile_index];
 	int bank = 4 + ((code & 0x1800) >> 11);
 	SET_TILE_INFO(
@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 static void aerofgt_register_state_globals( running_machine *machine )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	state_save_register_global_array(machine, state->gfxbank);
 	state_save_register_global_array(machine, state->bank);
 	state_save_register_global(machine, state->bg1scrollx);
@@ -99,7 +99,7 @@ static void aerofgt_register_state_globals( running_machine *machine )
 
 VIDEO_START( pspikes )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	state->bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info,tilemap_scan_rows,8,8,64,32);
 	/* no bg2 in this game */
 
@@ -112,7 +112,7 @@ VIDEO_START( pspikes )
 
 VIDEO_START( karatblz )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	state->bg1_tilemap = tilemap_create(machine, karatblz_bg1_tile_info,tilemap_scan_rows,     8,8,64,64);
 	state->bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info,tilemap_scan_rows,8,8,64,64);
 
@@ -125,7 +125,7 @@ VIDEO_START( karatblz )
 
 VIDEO_START( spinlbrk )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int i;
 
 	state->bg1_tilemap = tilemap_create(machine, spinlbrk_bg1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
@@ -156,7 +156,7 @@ VIDEO_START( spinlbrk )
 
 VIDEO_START( turbofrc )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 
@@ -170,7 +170,7 @@ VIDEO_START( turbofrc )
 
 VIDEO_START( wbbc97 )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	state->bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	/* no bg2 in this game */
 
@@ -191,14 +191,14 @@ VIDEO_START( wbbc97 )
 
 WRITE16_HANDLER( aerofgt_bg1videoram_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	COMBINE_DATA(&state->bg1videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg1_tilemap, offset);
 }
 
 WRITE16_HANDLER( aerofgt_bg2videoram_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	COMBINE_DATA(&state->bg2videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg2_tilemap, offset);
 }
@@ -206,7 +206,7 @@ WRITE16_HANDLER( aerofgt_bg2videoram_w )
 
 static void setbank( running_machine *machine, tilemap_t *tmap, int num, int bank )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	if (state->gfxbank[num] != bank)
 	{
 		state->gfxbank[num] = bank;
@@ -216,7 +216,7 @@ static void setbank( running_machine *machine, tilemap_t *tmap, int num, int ban
 
 WRITE16_HANDLER( pspikes_gfxbank_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		setbank(space->machine, state->bg1_tilemap, 0, (data & 0xf0) >> 4);
@@ -226,7 +226,7 @@ WRITE16_HANDLER( pspikes_gfxbank_w )
 
 WRITE16_HANDLER( pspikesb_gfxbank_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	COMBINE_DATA(&state->rasterram[0x200 / 2]);
 
 	setbank(space->machine, state->bg1_tilemap, 0, (data & 0xf000) >> 12);
@@ -235,13 +235,13 @@ WRITE16_HANDLER( pspikesb_gfxbank_w )
 
 WRITE16_HANDLER( spikes91_lookup_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	state->spikes91_lookup = data & 1;
 }
 
 WRITE16_HANDLER( karatblz_gfxbank_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		setbank(space->machine, state->bg1_tilemap, 0, (data & 0x0100) >> 8);
@@ -251,7 +251,7 @@ WRITE16_HANDLER( karatblz_gfxbank_w )
 
 WRITE16_HANDLER( spinlbrk_gfxbank_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		setbank(space->machine, state->bg1_tilemap, 0, (data & 0x07));
@@ -261,7 +261,7 @@ WRITE16_HANDLER( spinlbrk_gfxbank_w )
 
 WRITE16_HANDLER( turbofrc_gfxbank_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	tilemap_t *tmap = (offset == 0) ? state->bg1_tilemap : state->bg2_tilemap;
 
 	data = COMBINE_DATA(&state->bank[offset]);
@@ -274,7 +274,7 @@ WRITE16_HANDLER( turbofrc_gfxbank_w )
 
 WRITE16_HANDLER( aerofgt_gfxbank_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	tilemap_t *tmap = (offset < 2) ? state->bg1_tilemap : state->bg2_tilemap;
 
 	data = COMBINE_DATA(&state->bank[offset]);
@@ -285,31 +285,31 @@ WRITE16_HANDLER( aerofgt_gfxbank_w )
 
 WRITE16_HANDLER( aerofgt_bg1scrollx_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	COMBINE_DATA(&state->bg1scrollx);
 }
 
 WRITE16_HANDLER( aerofgt_bg1scrolly_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	COMBINE_DATA(&state->bg1scrolly);
 }
 
 WRITE16_HANDLER( aerofgt_bg2scrollx_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	COMBINE_DATA(&state->bg2scrollx);
 }
 
 WRITE16_HANDLER( aerofgt_bg2scrolly_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	COMBINE_DATA(&state->bg2scrolly);
 }
 
 WRITE16_HANDLER( pspikes_palette_bank_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->spritepalettebank = data & 0x03;
@@ -323,7 +323,7 @@ WRITE16_HANDLER( pspikes_palette_bank_w )
 
 WRITE16_HANDLER( wbbc97_bitmap_enable_w )
 {
-	aerofgt_state *state = (aerofgt_state *)space->machine->driver_data;
+	aerofgt_state *state = space->machine->driver_data<aerofgt_state>();
 	COMBINE_DATA(&state->wbbc97_bitmap_enable);
 }
 
@@ -335,7 +335,7 @@ WRITE16_HANDLER( wbbc97_bitmap_enable_w )
 
 static void aerofgt_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int offs;
 	priority <<= 12;
 
@@ -406,7 +406,7 @@ static void aerofgt_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 static void turbofrc_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int chip_disabled_pri )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int attr_start, base, first;
 	base = chip * 0x0200;
 	first = 4 * state->spriteram3[0x1fe + base];
@@ -491,7 +491,7 @@ static void turbofrc_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void spinlbrk_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int chip_disabled_pri )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int attr_start, base, first;
 	base = chip * 0x0200;
 	first = 4 * state->spriteram3[0x1fe + base];
@@ -575,7 +575,7 @@ static void spinlbrk_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void aerfboo2_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int chip_disabled_pri )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int attr_start, base, first;
 
 	base = chip * 0x0200;
@@ -660,7 +660,7 @@ static void aerfboo2_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void pspikesb_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int i;
 
 	for (i = 4; i < state->spriteram3_size / 2; i += 4)
@@ -695,7 +695,7 @@ static void pspikesb_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void spikes91_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int i;
 	UINT8 *lookup;
 	lookup = memory_region(machine, "user1");
@@ -737,7 +737,7 @@ static void spikes91_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void aerfboot_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int attr_start, last;
 
 	last = ((state->rasterram[0x404 / 2] << 5) - 0x8000) / 2;
@@ -819,7 +819,7 @@ static void aerfboot_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void wbbc97_draw_bitmap( running_machine *machine, bitmap_t *bitmap )
 {
-	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
+	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 	int x, y, count;
 
 	count = 16; // weird, the bitmap doesn't start at 0?
@@ -840,7 +840,7 @@ static void wbbc97_draw_bitmap( running_machine *machine, bitmap_t *bitmap )
 
 VIDEO_UPDATE( pspikes )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
 
 	tilemap_set_scroll_rows(state->bg1_tilemap, 256);
@@ -859,7 +859,7 @@ VIDEO_UPDATE( pspikes )
 
 VIDEO_UPDATE( pspikesb )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
 
 	tilemap_set_scroll_rows(state->bg1_tilemap, 256);
@@ -875,7 +875,7 @@ VIDEO_UPDATE( pspikesb )
 
 VIDEO_UPDATE( spikes91 )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
 	int y, x;
 	int count;
@@ -916,7 +916,7 @@ VIDEO_UPDATE( spikes91 )
 
 VIDEO_UPDATE( karatblz )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	tilemap_set_scrollx(state->bg1_tilemap, 0, state->bg1scrollx - 8);
 	tilemap_set_scrolly(state->bg1_tilemap, 0, state->bg1scrolly);
 	tilemap_set_scrollx(state->bg2_tilemap, 0, state->bg2scrollx - 4);
@@ -937,7 +937,7 @@ VIDEO_UPDATE( karatblz )
 
 VIDEO_UPDATE( spinlbrk )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
 
 	tilemap_set_scroll_rows(state->bg1_tilemap, 512);
@@ -963,7 +963,7 @@ VIDEO_UPDATE( spinlbrk )
 
 VIDEO_UPDATE( turbofrc )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
 
 	tilemap_set_scroll_rows(state->bg1_tilemap, 512);
@@ -990,7 +990,7 @@ VIDEO_UPDATE( turbofrc )
 
 VIDEO_UPDATE( aerofgt )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	tilemap_set_scrollx(state->bg1_tilemap, 0, state->rasterram[0x0000] - 18);
 	tilemap_set_scrolly(state->bg1_tilemap, 0, state->bg1scrolly);
 	tilemap_set_scrollx(state->bg2_tilemap, 0, state->rasterram[0x0200] - 20);
@@ -1013,7 +1013,7 @@ VIDEO_UPDATE( aerofgt )
 
 VIDEO_UPDATE( aerfboot )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
 
 	tilemap_set_scroll_rows(state->bg1_tilemap, 512);
@@ -1036,7 +1036,7 @@ VIDEO_UPDATE( aerfboot )
 
 VIDEO_UPDATE( aerfboo2 )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
 
 	tilemap_set_scroll_rows(state->bg1_tilemap, 512);
@@ -1063,7 +1063,7 @@ VIDEO_UPDATE( aerfboo2 )
 
 VIDEO_UPDATE( wbbc97 )
 {
-	aerofgt_state *state = (aerofgt_state *)screen->machine->driver_data;
+	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
 
 	tilemap_set_scroll_rows(state->bg1_tilemap, 256);

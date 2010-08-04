@@ -387,7 +387,7 @@ static INTERRUPT_GEN( s2650_interrupt )
 
 static void dkong_init_device_driver_data( running_machine *machine )
 {
-	dkong_state *state = (dkong_state *)machine->driver_data;
+	dkong_state *state = machine->driver_data<dkong_state>();
 
 	state->dev_n2a03a = machine->device("n2a03a");
 	state->dev_n2a03b = machine->device("n2a03b");
@@ -397,7 +397,7 @@ static void dkong_init_device_driver_data( running_machine *machine )
 
 static MACHINE_START( dkong2b )
 {
-	dkong_state *state = (dkong_state *)machine->driver_data;
+	dkong_state *state = machine->driver_data<dkong_state>();
 
 	dkong_init_device_driver_data(machine);
 	state->hardware_type = HARDWARE_TKG04;
@@ -408,7 +408,7 @@ static MACHINE_START( dkong2b )
 
 static MACHINE_START( s2650 )
 {
-    dkong_state *state = (dkong_state *)machine->driver_data;
+    dkong_state *state = machine->driver_data<dkong_state>();
     UINT8   *p = memory_region(machine, "user1");
     const char *game_name = machine->gamedrv->name;
     int i;
@@ -442,7 +442,7 @@ static MACHINE_START( s2650 )
 
 static MACHINE_START( radarscp )
 {
-    dkong_state *state = (dkong_state *)machine->driver_data;
+    dkong_state *state = machine->driver_data<dkong_state>();
 
     MACHINE_START_CALL(dkong2b);
     state->hardware_type = HARDWARE_TRS02;
@@ -450,7 +450,7 @@ static MACHINE_START( radarscp )
 
 static MACHINE_START( radarscp1 )
 {
-    dkong_state *state = (dkong_state *)machine->driver_data;
+    dkong_state *state = machine->driver_data<dkong_state>();
 
     MACHINE_START_CALL(dkong2b);
     state->hardware_type = HARDWARE_TRS01;
@@ -458,7 +458,7 @@ static MACHINE_START( radarscp1 )
 
 static MACHINE_START( dkong3 )
 {
-	dkong_state *state = (dkong_state *)machine->driver_data;
+	dkong_state *state = machine->driver_data<dkong_state>();
 
 	dkong_init_device_driver_data(machine);
 	state->hardware_type = HARDWARE_TKG04;
@@ -471,7 +471,7 @@ static MACHINE_RESET( dkong )
 
 static MACHINE_RESET( strtheat )
 {
-    dkong_state *state = (dkong_state *)machine->driver_data;
+    dkong_state *state = machine->driver_data<dkong_state>();
     UINT8 *ROM = memory_region(machine, "maincpu");
 
     MACHINE_RESET_CALL(dkong);
@@ -484,7 +484,7 @@ static MACHINE_RESET( strtheat )
 
 static MACHINE_RESET( drakton )
 {
-    dkong_state *state = (dkong_state *)machine->driver_data;
+    dkong_state *state = machine->driver_data<dkong_state>();
     UINT8 *ROM = memory_region(machine, "maincpu");
 
     MACHINE_RESET_CALL(dkong);
@@ -504,7 +504,7 @@ static MACHINE_RESET( drakton )
 
 static READ8_HANDLER( hb_dma_read_byte )
 {
-    dkong_state *state = (dkong_state *)space->machine->driver_data;
+    dkong_state *state = space->machine->driver_data<dkong_state>();
     int   bucket = state->rev_map[(offset>>10) & 0x1ff];
     int   addr;
 
@@ -518,7 +518,7 @@ static READ8_HANDLER( hb_dma_read_byte )
 
 static WRITE8_HANDLER( hb_dma_write_byte )
 {
-    dkong_state *state = (dkong_state *)space->machine->driver_data;
+    dkong_state *state = space->machine->driver_data<dkong_state>();
     int   bucket = state->rev_map[(offset>>10) & 0x1ff];
     int   addr;
 
@@ -532,13 +532,13 @@ static WRITE8_HANDLER( hb_dma_write_byte )
 
 static READ8_DEVICE_HANDLER( p8257_ctl_r )
 {
-    dkong_state *state = (dkong_state *)device->machine->driver_data;
+    dkong_state *state = device->machine->driver_data<dkong_state>();
     return state->dma_latch;
 }
 
 static WRITE8_DEVICE_HANDLER( p8257_ctl_w )
 {
-    dkong_state *state = (dkong_state *)device->machine->driver_data;
+    dkong_state *state = device->machine->driver_data<dkong_state>();
     state->dma_latch = data;
 }
 
@@ -562,7 +562,7 @@ static WRITE8_DEVICE_HANDLER( p8257_drq_w )
 
 static READ8_HANDLER( dkong_in2_r )
 {
-	dkong_state *state = (dkong_state *)space->machine->driver_data;
+	dkong_state *state = space->machine->driver_data<dkong_state>();
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
 	UINT8 mcustatus = latch8_bit4_q_r(state->dev_vp2, 0);
 	UINT8 r;
@@ -601,7 +601,7 @@ static WRITE8_HANDLER( s2650_mirror_w )
 
 static READ8_HANDLER( epos_decrypt_rom )
 {
-    dkong_state *state = (dkong_state *)space->machine->driver_data;
+    dkong_state *state = space->machine->driver_data<dkong_state>();
 
     if (offset & 0x01)
     {
@@ -631,7 +631,7 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 static WRITE8_HANDLER( s2650_data_w )
 {
-    dkong_state *state = (dkong_state *)space->machine->driver_data;
+    dkong_state *state = space->machine->driver_data<dkong_state>();
 #if DEBUG_PROTECTION
     logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), data);
 #endif
@@ -641,7 +641,7 @@ static WRITE8_HANDLER( s2650_data_w )
 
 static WRITE8_HANDLER( s2650_fo_w )
 {
-    dkong_state *state = (dkong_state *)space->machine->driver_data;
+    dkong_state *state = space->machine->driver_data<dkong_state>();
 #if DEBUG_PROTECTION
     logerror("write : pc = %04x, FO = %02x\n",cpu_get_pc(space->cpu), data);
 #endif
@@ -654,7 +654,7 @@ static WRITE8_HANDLER( s2650_fo_w )
 
 static READ8_HANDLER( s2650_port0_r )
 {
-    dkong_state *state = (dkong_state *)space->machine->driver_data;
+    dkong_state *state = space->machine->driver_data<dkong_state>();
 #if DEBUG_PROTECTION
     logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
 #endif
@@ -679,7 +679,7 @@ static READ8_HANDLER( s2650_port0_r )
 
 static READ8_HANDLER( s2650_port1_r )
 {
-    dkong_state *state = (dkong_state *)space->machine->driver_data;
+    dkong_state *state = space->machine->driver_data<dkong_state>();
 
 #if DEBUG_PROTECTION
     logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(space->cpu), state->hunchloopback, state->main_fo);
@@ -702,7 +702,7 @@ static READ8_HANDLER( s2650_port1_r )
 
 static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
-     dkong_state *state = (dkong_state *)space->machine->driver_data;
+     dkong_state *state = space->machine->driver_data<dkong_state>();
 
 	if (data & 1)
 	{

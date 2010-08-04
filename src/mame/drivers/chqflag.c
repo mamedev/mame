@@ -28,7 +28,7 @@ static WRITE8_DEVICE_HANDLER( k007232_extvolume_w );
 
 static INTERRUPT_GEN( chqflag_interrupt )
 {
-	chqflag_state *state = (chqflag_state *)device->machine->driver_data;
+	chqflag_state *state = device->machine->driver_data<chqflag_state>();
 
 	if (cpu_getiloops(device) == 0)
 	{
@@ -44,7 +44,7 @@ static INTERRUPT_GEN( chqflag_interrupt )
 
 static WRITE8_HANDLER( chqflag_bankswitch_w )
 {
-	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
+	chqflag_state *state = space->machine->driver_data<chqflag_state>();
 	int bankaddress;
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
@@ -75,7 +75,7 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 
 static WRITE8_HANDLER( chqflag_vreg_w )
 {
-	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
+	chqflag_state *state = space->machine->driver_data<chqflag_state>();
 
 	/* bits 0 & 1 = coin counters */
 	coin_counter_w(space->machine, 1, data & 0x01);
@@ -120,13 +120,13 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 
 static WRITE8_HANDLER( select_analog_ctrl_w )
 {
-	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
+	chqflag_state *state = space->machine->driver_data<chqflag_state>();
 	state->analog_ctrl = data;
 }
 
 static READ8_HANDLER( analog_read_r )
 {
-	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
+	chqflag_state *state = space->machine->driver_data<chqflag_state>();
 	switch (state->analog_ctrl & 0x03)
 	{
 		case 0x00: return (state->accel = input_port_read(space->machine, "IN3"));	/* accelerator */
@@ -140,7 +140,7 @@ static READ8_HANDLER( analog_read_r )
 
 static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
-	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
+	chqflag_state *state = space->machine->driver_data<chqflag_state>();
 	soundlatch2_w(space, 0, data);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( k007232_bankswitch_w )
 {
-	chqflag_state *state = (chqflag_state *)space->machine->driver_data;
+	chqflag_state *state = space->machine->driver_data<chqflag_state>();
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */
@@ -292,7 +292,7 @@ INPUT_PORTS_END
 
 static void chqflag_ym2151_irq_w( running_device *device, int data )
 {
-	chqflag_state *state = (chqflag_state *)device->machine->driver_data;
+	chqflag_state *state = device->machine->driver_data<chqflag_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -354,7 +354,7 @@ static const k051316_interface chqflag_k051316_intf_2 =
 
 static MACHINE_START( chqflag )
 {
-	chqflag_state *state = (chqflag_state *)machine->driver_data;
+	chqflag_state *state = machine->driver_data<chqflag_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
@@ -376,7 +376,7 @@ static MACHINE_START( chqflag )
 
 static MACHINE_RESET( chqflag )
 {
-	chqflag_state *state = (chqflag_state *)machine->driver_data;
+	chqflag_state *state = machine->driver_data<chqflag_state>();
 
 	state->k051316_readroms = 0;
 	state->last_vreg = 0;

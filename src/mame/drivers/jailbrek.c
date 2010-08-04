@@ -94,7 +94,7 @@ Notes:
 
 static WRITE8_HANDLER( ctrl_w )
 {
-	jailbrek_state *state = (jailbrek_state *)space->machine->driver_data;
+	jailbrek_state *state = space->machine->driver_data<jailbrek_state>();
 
 	state->nmi_enable = data & 0x01;
 	state->irq_enable = data & 0x02;
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( ctrl_w )
 
 static INTERRUPT_GEN( jb_interrupt )
 {
-	jailbrek_state *state = (jailbrek_state *)device->machine->driver_data;
+	jailbrek_state *state = device->machine->driver_data<jailbrek_state>();
 
 	if (state->irq_enable)
 		cpu_set_input_line(device, 0, HOLD_LINE);
@@ -111,7 +111,7 @@ static INTERRUPT_GEN( jb_interrupt )
 
 static INTERRUPT_GEN( jb_interrupt_nmi )
 {
-	jailbrek_state *state = (jailbrek_state *)device->machine->driver_data;
+	jailbrek_state *state = device->machine->driver_data<jailbrek_state>();
 
 	if (state->nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -239,14 +239,14 @@ GFXDECODE_END
 
 static MACHINE_START( jailbrek )
 {
-	jailbrek_state *state = (jailbrek_state *)machine->driver_data;
+	jailbrek_state *state = machine->driver_data<jailbrek_state>();
 	state_save_register_global(machine, state->irq_enable);
 	state_save_register_global(machine, state->nmi_enable);
 }
 
 static MACHINE_RESET( jailbrek )
 {
-	jailbrek_state *state = (jailbrek_state *)machine->driver_data;
+	jailbrek_state *state = machine->driver_data<jailbrek_state>();
 	state->irq_enable = 0;
 	state->nmi_enable = 0;
 }

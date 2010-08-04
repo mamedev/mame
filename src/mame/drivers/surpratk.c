@@ -20,14 +20,14 @@ static KONAMI_SETLINES_CALLBACK( surpratk_banking );
 
 static INTERRUPT_GEN( surpratk_interrupt )
 {
-	surpratk_state *state = (surpratk_state *)device->machine->driver_data;
+	surpratk_state *state = device->machine->driver_data<surpratk_state>();
 	if (k052109_is_irq_enabled(state->k052109))
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
 {
-	surpratk_state *state = (surpratk_state *)space->machine->driver_data;
+	surpratk_state *state = space->machine->driver_data<surpratk_state>();
 
 	if (state->videobank & 0x02)
 	{
@@ -44,7 +44,7 @@ static READ8_HANDLER( bankedram_r )
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	surpratk_state *state = (surpratk_state *)space->machine->driver_data;
+	surpratk_state *state = space->machine->driver_data<surpratk_state>();
 
 	if (state->videobank & 0x02)
 	{
@@ -61,7 +61,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( surpratk_videobank_w )
 {
-	surpratk_state *state = (surpratk_state *)space->machine->driver_data;
+	surpratk_state *state = space->machine->driver_data<surpratk_state>();
 
 	logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 = select 053245 at 0000-07ff */
@@ -72,7 +72,7 @@ static WRITE8_HANDLER( surpratk_videobank_w )
 
 static WRITE8_HANDLER( surpratk_5fc0_w )
 {
-	surpratk_state *state = (surpratk_state *)space->machine->driver_data;
+	surpratk_state *state = space->machine->driver_data<surpratk_state>();
 
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
@@ -170,7 +170,7 @@ INPUT_PORTS_END
 
 static void irqhandler( running_device *device, int linestate )
 {
-	surpratk_state *state = (surpratk_state *)device->machine->driver_data;
+	surpratk_state *state = device->machine->driver_data<surpratk_state>();
 	cpu_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, linestate);
 }
 
@@ -200,7 +200,7 @@ static const k05324x_interface surpratk_k05324x_intf =
 
 static MACHINE_START( surpratk )
 {
-	surpratk_state *state = (surpratk_state *)machine->driver_data;
+	surpratk_state *state = machine->driver_data<surpratk_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x2000);
@@ -223,7 +223,7 @@ static MACHINE_START( surpratk )
 
 static MACHINE_RESET( surpratk )
 {
-	surpratk_state *state = (surpratk_state *)machine->driver_data;
+	surpratk_state *state = machine->driver_data<surpratk_state>();
 	int i;
 
 	konami_configure_set_lines(machine->device("maincpu"), surpratk_banking);

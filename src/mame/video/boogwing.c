@@ -4,7 +4,7 @@
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram_base, int gfx_region )
 {
-	boogwing_state *state = (boogwing_state *)machine->driver_data;
+	boogwing_state *state = machine->driver_data<boogwing_state>();
 	int offs;
 	int flipscreen = !flip_screen_get(machine);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
@@ -139,7 +139,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( boogwing )
 {
-	boogwing_state *state = (boogwing_state *)screen->machine->driver_data;
+	boogwing_state *state = screen->machine->driver_data<boogwing_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 

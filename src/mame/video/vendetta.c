@@ -10,14 +10,14 @@
 
 void vendetta_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	vendetta_state *state = (vendetta_state *)machine->driver_data;
+	vendetta_state *state = machine->driver_data<vendetta_state>();
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x30) << 6) | ((*color & 0x0c) << 10) | (bank << 14);
 	*color = state->layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 void esckids_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	vendetta_state *state = (vendetta_state *)machine->driver_data;
+	vendetta_state *state = machine->driver_data<vendetta_state>();
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) <<  9) | (bank << 13);
 	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >>  5);
 }
@@ -31,7 +31,7 @@ void esckids_tile_callback( running_machine *machine, int layer, int bank, int *
 
 void vendetta_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	vendetta_state *state = (vendetta_state *)machine->driver_data;
+	vendetta_state *state = machine->driver_data<vendetta_state>();
 	int pri = (*color & 0x03e0) >> 4;	/* ??????? */
 	if (pri <= state->layerpri[2])
 		*priority_mask = 0;
@@ -54,7 +54,7 @@ void vendetta_sprite_callback( running_machine *machine, int *code, int *color, 
 
 VIDEO_UPDATE( vendetta )
 {
-	vendetta_state *state = (vendetta_state *)screen->machine->driver_data;
+	vendetta_state *state = screen->machine->driver_data<vendetta_state>();
 	int layer[3];
 
 	state->sprite_colorbase = k053251_get_palette_index(state->k053251, K053251_CI1);

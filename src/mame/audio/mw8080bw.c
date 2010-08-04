@@ -19,7 +19,7 @@
 
 static SOUND_START( samples )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
 	state_save_register_global(machine, state->port_1_last);
@@ -165,7 +165,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( seawolf_audio_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	UINT8 rising_bits = data & ~state->port_1_last;
 
 	/* if (data & 0x01)  enable SHIP HIT sound */
@@ -231,7 +231,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( gunfight_audio_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 
 	/* D0 and D1 are just tied to 1k resistors */
 
@@ -1284,7 +1284,7 @@ WRITE8_DEVICE_HANDLER( desertgu_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( desertgu_audio_2_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 
 	discrete_sound_w(device, DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
 
@@ -1593,7 +1593,7 @@ WRITE8_HANDLER( gmissile_audio_1_w )
        reversed (D5=R, D7=L), but the software confirms that
        ours is right */
 
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	UINT8 rising_bits = data & ~state->port_1_last;
 
 	/* D0 and D1 are not connected */
@@ -1688,7 +1688,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( m4_audio_1_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	UINT8 rising_bits = data & ~state->port_1_last;
 
 	/* D0 and D1 are not connected */
@@ -1715,7 +1715,7 @@ WRITE8_HANDLER( m4_audio_1_w )
 
 WRITE8_HANDLER( m4_audio_2_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	UINT8 rising_bits = data & ~state->port_2_last;
 
 	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
@@ -1950,7 +1950,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( clowns_audio_1_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	coin_counter_w(space->machine, 0, (data >> 0) & 0x01);
 
 	state->clowns_controller_select = (data >> 1) & 0x01;
@@ -1961,7 +1961,7 @@ WRITE8_HANDLER( clowns_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 	UINT8 rising_bits = data & ~state->port_2_last;
 
 	discrete_sound_w(device, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
@@ -2317,7 +2317,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( spacwalk_audio_1_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 
 	coin_counter_w(device->machine, 0, (data >> 0) & 0x01);
 
@@ -3165,7 +3165,7 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 
 	/* set WIND SOUND FREQ(data & 0x0f)  0, if no wind */
 
@@ -3181,7 +3181,7 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 
 WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
@@ -3234,7 +3234,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( phantom2_audio_1_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	UINT8 rising_bits = data & ~state->port_1_last;
 
 	/* if (data & 0x01)  enable PLAYER SHOT sound */
@@ -3256,7 +3256,7 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 
 WRITE8_HANDLER( phantom2_audio_2_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	mw8080bw_state *state = space->machine->driver_data<mw8080bw_state>();
 	UINT8 rising_bits = data & ~state->port_2_last;
 
 	/* D0-D2 are not connected */
@@ -4087,7 +4087,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 
 	sn76477_enable_w(state->sn, (~data >> 0) & 0x01);	/* saucer sound */
 
@@ -4104,7 +4104,7 @@ WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
@@ -4720,7 +4720,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 
 	sn76477_enable_w(state->sn1, (~data >> 0) & 0x01);	/* saucer sound */
 
@@ -4746,7 +4746,7 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w )
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w )
 {
-	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	mw8080bw_state *state = device->machine->driver_data<mw8080bw_state>();
 
 	sn76477_enable_w(state->sn2, (~data >> 0) & 0x01);	/* saucer sound */
 

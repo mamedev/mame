@@ -27,7 +27,7 @@
 
 static READ8_HANDLER( deco16_bank_r )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	const UINT8 *ROM = memory_region(space->machine, "user1");
 
 	/* The tilemap bank can be swapped into main memory */
@@ -67,7 +67,7 @@ static READ8_HANDLER( deco16_io_r )
 
 static WRITE8_HANDLER( deco16_bank_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->bank = data;
 
 	if (state->bank)
@@ -78,7 +78,7 @@ static WRITE8_HANDLER( deco16_bank_w )
 
 static READ8_HANDLER( prosoccr_bank_r )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	const UINT8 *ROM = memory_region(space->machine, "user1");
 
 	/* The tilemap bank can be swapped into main memory */
@@ -108,7 +108,7 @@ static READ8_HANDLER( prosoccr_bank_r )
 
 static READ8_HANDLER( prosoccr_charram_r )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	UINT8 *SRC_GFX = memory_region(space->machine, "shared_gfx");
 
 	if (state->gfx_rom_readback)
@@ -130,7 +130,7 @@ static READ8_HANDLER( prosoccr_charram_r )
 
 static WRITE8_HANDLER( prosoccr_charram_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	UINT8 *FG_GFX = memory_region(space->machine, "fg_gfx");
 
 	if (state->bank)
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( prosoccr_charram_w )
 
 static WRITE8_HANDLER( prosoccr_char_bank_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->gfx_rom_readback = data & 1; //enable GFX rom read-back
 
 	if (data & 0xfe)
@@ -177,7 +177,7 @@ static WRITE8_HANDLER( prosoccr_char_bank_w )
 
 static WRITE8_HANDLER( prosoccr_io_bank_w )
 {
-	liberate_state *state = (liberate_state *)space->machine->driver_data;
+	liberate_state *state = space->machine->driver_data<liberate_state>();
 	state->bank = data & 1;
 
 	if (state->bank)
@@ -769,7 +769,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( deco16_interrupt )
 {
-	liberate_state *state = (liberate_state *)device->machine->driver_data;
+	liberate_state *state = device->machine->driver_data<liberate_state>();
 	int p = ~input_port_read(device->machine, "IN3");
 	if ((p & 0x43) && !state->latch)
 	{
@@ -799,7 +799,7 @@ static INTERRUPT_GEN( prosport_interrupt )
 
 static MACHINE_START( liberate )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -815,7 +815,7 @@ static MACHINE_START( liberate )
 
 static MACHINE_RESET( liberate )
 {
-	liberate_state *state = (liberate_state *)machine->driver_data;
+	liberate_state *state = machine->driver_data<liberate_state>();
 
 	memset(state->io_ram, 0, ARRAY_LENGTH(state->io_ram));
 

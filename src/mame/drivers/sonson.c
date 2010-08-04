@@ -57,7 +57,7 @@ TODO:
 
 static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 {
-	sonson_state *state = (sonson_state *)space->machine->driver_data;
+	sonson_state *state = space->machine->driver_data<sonson_state>();
 	data &= 1;
 
 	if (state->last_irq == 0 && data == 1)
@@ -229,7 +229,7 @@ GFXDECODE_END
 
 static MACHINE_START( sonson )
 {
-	sonson_state *state = (sonson_state *)machine->driver_data;
+	sonson_state *state = machine->driver_data<sonson_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -238,7 +238,7 @@ static MACHINE_START( sonson )
 
 static MACHINE_RESET( sonson )
 {
-	sonson_state *state = (sonson_state *)machine->driver_data;
+	sonson_state *state = machine->driver_data<sonson_state>();
 
 	state->last_irq = 0;
 }

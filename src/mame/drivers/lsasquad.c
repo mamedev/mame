@@ -540,7 +540,7 @@ GFXDECODE_END
 
 static void irqhandler(running_device *device, int irq)
 {
-	lsasquad_state *state = (lsasquad_state *)device->machine->driver_data;
+	lsasquad_state *state = device->machine->driver_data<lsasquad_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -566,7 +566,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( lsasquad )
 {
-	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	lsasquad_state *state = machine->driver_data<lsasquad_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
@@ -595,7 +595,7 @@ static MACHINE_START( lsasquad )
 
 static MACHINE_RESET( lsasquad )
 {
-	lsasquad_state *state = (lsasquad_state *)machine->driver_data;
+	lsasquad_state *state = machine->driver_data<lsasquad_state>();
 
 	state->sound_pending = 0;
 	state->sound_nmi_enable = 0;

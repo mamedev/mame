@@ -232,7 +232,7 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 
 static WRITE16_HANDLER( system_control_w )
 {
-	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
+	taitoair_state *state = space->machine->driver_data<taitoair_state>();
 
 	if ((ACCESSING_BITS_0_7 == 0) && ACCESSING_BITS_8_15)
 		data >>= 8;
@@ -246,13 +246,13 @@ static WRITE16_HANDLER( system_control_w )
 
 static READ16_HANDLER( lineram_r )
 {
-	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
+	taitoair_state *state = space->machine->driver_data<taitoair_state>();
 	return state->line_ram[offset];
 }
 
 static WRITE16_HANDLER( lineram_w )
 {
-	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
+	taitoair_state *state = space->machine->driver_data<taitoair_state>();
 
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		state->line_ram[offset] = data;
@@ -260,13 +260,13 @@ static WRITE16_HANDLER( lineram_w )
 
 static READ16_HANDLER( dspram_r )
 {
-	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
+	taitoair_state *state = space->machine->driver_data<taitoair_state>();
 	return state->dsp_ram[offset];
 }
 
 static WRITE16_HANDLER( dspram_w )
 {
-	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
+	taitoair_state *state = space->machine->driver_data<taitoair_state>();
 
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		state->dsp_ram[offset] = data;
@@ -274,7 +274,7 @@ static WRITE16_HANDLER( dspram_w )
 
 static READ16_HANDLER( dsp_HOLD_signal_r )
 {
-	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
+	taitoair_state *state = space->machine->driver_data<taitoair_state>();
 
 	/* HOLD signal is active low */
 	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", cpu_get_previouspc(space->cpu), state->dsp_hold_signal);
@@ -291,7 +291,7 @@ static WRITE16_HANDLER( dsp_HOLDA_signal_w )
 
 static WRITE16_HANDLER( airsys_paletteram16_w )	/* xxBBBBxRRRRxGGGG */
 {
-	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
+	taitoair_state *state = space->machine->driver_data<taitoair_state>();
 	int a;
 
 	COMBINE_DATA(&state->paletteram[offset]);
@@ -347,13 +347,13 @@ static READ16_HANDLER( stick2_input_r )
 
 static void reset_sound_region( running_machine *machine )
 {
-	taitoair_state *state = (taitoair_state *)machine->driver_data;
+	taitoair_state *state = machine->driver_data<taitoair_state>();
 	memory_set_bank(machine, "bank1", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	taitoair_state *state = (taitoair_state *)space->machine->driver_data;
+	taitoair_state *state = space->machine->driver_data<taitoair_state>();
 
 	state->banknum = data & 3;
 	reset_sound_region(space->machine);
@@ -571,7 +571,7 @@ GFXDECODE_END
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	taitoair_state *state = (taitoair_state *)device->machine->driver_data;
+	taitoair_state *state = device->machine->driver_data<taitoair_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -610,7 +610,7 @@ static STATE_POSTLOAD( taitoair_postload )
 
 static MACHINE_START( taitoair )
 {
-	taitoair_state *state = (taitoair_state *)machine->driver_data;
+	taitoair_state *state = machine->driver_data<taitoair_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	int i;
 
@@ -635,7 +635,7 @@ static MACHINE_START( taitoair )
 
 static MACHINE_RESET( taitoair )
 {
-	taitoair_state *state = (taitoair_state *)machine->driver_data;
+	taitoair_state *state = machine->driver_data<taitoair_state>();
 	int i;
 
 	state->dsp_hold_signal = ASSERT_LINE;

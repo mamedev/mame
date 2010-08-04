@@ -22,7 +22,7 @@
 
 READ8_HANDLER( lkage_68705_port_a_r )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 
 	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(space->cpu), state->port_a_in);
 	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
@@ -30,7 +30,7 @@ READ8_HANDLER( lkage_68705_port_a_r )
 
 WRITE8_HANDLER( lkage_68705_port_a_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 
 	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(space->cpu), data);
 	state->port_a_out = data;
@@ -38,7 +38,7 @@ WRITE8_HANDLER( lkage_68705_port_a_w )
 
 WRITE8_HANDLER( lkage_68705_ddr_a_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	state->ddr_a = data;
 }
 
@@ -55,13 +55,13 @@ WRITE8_HANDLER( lkage_68705_ddr_a_w )
 
 READ8_HANDLER( lkage_68705_port_b_r )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 WRITE8_HANDLER( lkage_68705_port_b_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 
 	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(space->cpu), data);
 
@@ -87,7 +87,7 @@ WRITE8_HANDLER( lkage_68705_port_b_w )
 
 WRITE8_HANDLER( lkage_68705_ddr_b_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	state->ddr_b = data;
 }
 
@@ -95,7 +95,7 @@ WRITE8_HANDLER( lkage_68705_ddr_b_w )
 
 READ8_HANDLER( lkage_68705_port_c_r )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 
 	state->port_c_in = 0;
 	if (state->main_sent)
@@ -109,7 +109,7 @@ READ8_HANDLER( lkage_68705_port_c_r )
 
 WRITE8_HANDLER( lkage_68705_port_c_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 
 	logerror("%04x: 68705 port C write %02x\n", cpu_get_pc(space->cpu), data);
 	state->port_c_out = data;
@@ -117,14 +117,14 @@ WRITE8_HANDLER( lkage_68705_port_c_w )
 
 WRITE8_HANDLER( lkage_68705_ddr_c_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	state->ddr_c = data;
 }
 
 
 WRITE8_HANDLER( lkage_mcu_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 
 	logerror("%04x: mcu_w %02x\n", cpu_get_pc(space->cpu), data);
 	state->from_main = data;
@@ -134,7 +134,7 @@ WRITE8_HANDLER( lkage_mcu_w )
 
 READ8_HANDLER( lkage_mcu_r )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 
 	logerror("%04x: mcu_r %02x\n", cpu_get_pc(space->cpu), state->from_mcu);
 	state->mcu_sent = 0;
@@ -143,7 +143,7 @@ READ8_HANDLER( lkage_mcu_r )
 
 READ8_HANDLER( lkage_mcu_status_r )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	int res = 0;
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */

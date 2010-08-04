@@ -60,7 +60,7 @@ static INTERRUPT_GEN( avalnche_interrupt )
 
 static VIDEO_UPDATE( avalnche )
 {
-	avalnche_state *state = (avalnche_state *)screen->machine->driver_data;
+	avalnche_state *state = screen->machine->driver_data<avalnche_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)
@@ -93,7 +93,7 @@ static VIDEO_UPDATE( avalnche )
 
 static WRITE8_HANDLER( avalance_video_invert_w )
 {
-	avalnche_state *state = (avalnche_state *)space->machine->driver_data;
+	avalnche_state *state = space->machine->driver_data<avalnche_state>();
 	state->avalance_video_inverted = data & 0x01;
 }
 
@@ -218,14 +218,14 @@ INPUT_PORTS_END
 
 static MACHINE_START( avalnche )
 {
-	avalnche_state *state = (avalnche_state *)machine->driver_data;
+	avalnche_state *state = machine->driver_data<avalnche_state>();
 
 	state_save_register_global(machine, state->avalance_video_inverted);
 }
 
 static MACHINE_RESET( avalnche )
 {
-	avalnche_state *state = (avalnche_state *)machine->driver_data;
+	avalnche_state *state = machine->driver_data<avalnche_state>();
 
 	state->avalance_video_inverted = 0;
 }

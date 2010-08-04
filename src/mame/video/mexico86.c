@@ -4,7 +4,7 @@
 
 WRITE8_HANDLER( mexico86_bankswitch_w )
 {
-	mexico86_state *state = (mexico86_state *)space->machine->driver_data;
+	mexico86_state *state = space->machine->driver_data<mexico86_state>();
 
 	if ((data & 7) > 5)
 		popmessage("Switching to invalid bank!");
@@ -18,7 +18,7 @@ WRITE8_HANDLER( mexico86_bankswitch_w )
 
 VIDEO_UPDATE( mexico86 )
 {
-	mexico86_state *state = (mexico86_state *)screen->machine->driver_data;
+	mexico86_state *state = screen->machine->driver_data<mexico86_state>();
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
@@ -101,7 +101,7 @@ VIDEO_UPDATE( mexico86 )
 
 VIDEO_UPDATE( kikikai )
 {
-	mexico86_state *state = (mexico86_state *)screen->machine->driver_data;
+	mexico86_state *state = screen->machine->driver_data<mexico86_state>();
 	int offs;
 	int sx, sy, yc;
 	int gfx_num, /*gfx_attr,*/ gfx_offs;

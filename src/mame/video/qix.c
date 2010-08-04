@@ -43,7 +43,7 @@ static WRITE_LINE_DEVICE_HANDLER( display_enable_changed );
 
 static VIDEO_START( qix )
 {
-	qix_state *state = (qix_state *)machine->driver_data;
+	qix_state *state = machine->driver_data<qix_state>();
 
 	/* allocate memory for the full video RAM */
 	state->videoram = auto_alloc_array(machine, UINT8, 256 * 256);
@@ -65,7 +65,7 @@ static VIDEO_START( qix )
 
 static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 {
-	qix_state *driver_state = (qix_state *)device->machine->driver_data;
+	qix_state *driver_state = device->machine->driver_data<qix_state>();
 
 	/* on the rising edge, latch the scanline */
 	if (state)
@@ -88,7 +88,7 @@ static WRITE_LINE_DEVICE_HANDLER( display_enable_changed )
 
 WRITE8_DEVICE_HANDLER( qix_flip_screen_w )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *state = device->machine->driver_data<qix_state>();
 
 	state->flip = data;
 }
@@ -112,7 +112,7 @@ WRITE8_DEVICE_HANDLER( qix_flip_screen_w )
 
 static READ8_HANDLER( qix_videoram_r )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -122,7 +122,7 @@ static READ8_HANDLER( qix_videoram_r )
 
 static WRITE8_HANDLER( qix_videoram_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( qix_videoram_w )
 
 static WRITE8_HANDLER( slither_videoram_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( slither_videoram_w )
 
 static READ8_HANDLER( qix_addresslatch_r )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -180,7 +180,7 @@ static READ8_HANDLER( qix_addresslatch_r )
 
 static WRITE8_HANDLER( qix_addresslatch_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	/* update the screen in case the game is writing "behind" the beam */
 	space->machine->primary_screen->update_now();
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( qix_addresslatch_w )
 
 static WRITE8_HANDLER( slither_addresslatch_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	/* update the screen in case the game is writing "behind" the beam */
 	space->machine->primary_screen->update_now();
@@ -220,7 +220,7 @@ static WRITE8_HANDLER( slither_addresslatch_w )
 
 static WRITE8_HANDLER( qix_paletteram_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	UINT8 old_data = state->paletteram[offset];
 
@@ -236,7 +236,7 @@ static WRITE8_HANDLER( qix_paletteram_w )
 
 WRITE8_HANDLER( qix_palettebank_w )
 {
-	qix_state *state = (qix_state *)space->machine->driver_data;
+	qix_state *state = space->machine->driver_data<qix_state>();
 
 	/* set the bank value */
 	if (state->palette_bank != (data & 3))
@@ -308,7 +308,7 @@ static void get_pens(qix_state *state, pen_t *pens)
 
 static MC6845_BEGIN_UPDATE( begin_update )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *state = device->machine->driver_data<qix_state>();
 
 #if 0
 	// note the confusing bit order!
@@ -326,7 +326,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 static MC6845_UPDATE_ROW( update_row )
 {
-	qix_state *state = (qix_state *)device->machine->driver_data;
+	qix_state *state = device->machine->driver_data<qix_state>();
 	UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 	UINT16 x;
 

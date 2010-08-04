@@ -30,7 +30,7 @@
 
 static VIDEO_START( jedi )
 {
-	jedi_state *state = (jedi_state *)machine->driver_data;
+	jedi_state *state = machine->driver_data<jedi_state>();
 
 	/* register for saving */
 	state_save_register_global(machine, state->vscroll);
@@ -110,7 +110,7 @@ static void do_pen_lookup(jedi_state *state, bitmap_t *bitmap, const rectangle *
 
 WRITE8_HANDLER( jedi_vscroll_w )
 {
-	jedi_state *state = (jedi_state *)space->machine->driver_data;
+	jedi_state *state = space->machine->driver_data<jedi_state>();
 
 	state->vscroll = data | (offset << 8);
 }
@@ -118,7 +118,7 @@ WRITE8_HANDLER( jedi_vscroll_w )
 
 WRITE8_HANDLER( jedi_hscroll_w )
 {
-	jedi_state *state = (jedi_state *)space->machine->driver_data;
+	jedi_state *state = space->machine->driver_data<jedi_state>();
 
 	state->hscroll = data | (offset << 8);
 }
@@ -329,7 +329,7 @@ static void draw_sprites(running_machine *machine, jedi_state *state, bitmap_t *
 
 static VIDEO_UPDATE( jedi )
 {
-	jedi_state *state = (jedi_state *)screen->machine->driver_data;
+	jedi_state *state = screen->machine->driver_data<jedi_state>();
 
 	/* if no video, clear it all to black */
 	if (*state->video_off & 0x01)

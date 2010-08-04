@@ -100,7 +100,7 @@ PALETTE_INIT( robowres )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	appoooh_state *state = (appoooh_state *)machine->driver_data;
+	appoooh_state *state = machine->driver_data<appoooh_state>();
 	int code = state->fg_videoram[tile_index] + 256 * ((state->fg_colorram[tile_index] >> 5) & 7);
 
 	SET_TILE_INFO(
@@ -113,7 +113,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	appoooh_state *state = (appoooh_state *)machine->driver_data;
+	appoooh_state *state = machine->driver_data<appoooh_state>();
 	int code = state->bg_videoram[tile_index] + 256 * ((state->bg_colorram[tile_index] >> 5) & 7);
 
 	SET_TILE_INFO(
@@ -132,7 +132,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( appoooh )
 {
-	appoooh_state *state = (appoooh_state *)machine->driver_data;
+	appoooh_state *state = machine->driver_data<appoooh_state>();
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -147,42 +147,42 @@ VIDEO_START( appoooh )
 
 WRITE8_HANDLER( appoooh_scroll_w )
 {
-	appoooh_state *state = (appoooh_state *)space->machine->driver_data;
+	appoooh_state *state = space->machine->driver_data<appoooh_state>();
 	state->scroll_x = data;
 }
 
 
 WRITE8_HANDLER( appoooh_fg_videoram_w )
 {
-	appoooh_state *state = (appoooh_state *)space->machine->driver_data;
+	appoooh_state *state = space->machine->driver_data<appoooh_state>();
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( appoooh_fg_colorram_w )
 {
-	appoooh_state *state = (appoooh_state *)space->machine->driver_data;
+	appoooh_state *state = space->machine->driver_data<appoooh_state>();
 	state->fg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( appoooh_bg_videoram_w )
 {
-	appoooh_state *state = (appoooh_state *)space->machine->driver_data;
+	appoooh_state *state = space->machine->driver_data<appoooh_state>();
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( appoooh_bg_colorram_w )
 {
-	appoooh_state *state = (appoooh_state *)space->machine->driver_data;
+	appoooh_state *state = space->machine->driver_data<appoooh_state>();
 	state->bg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( appoooh_out_w )
 {
-	appoooh_state *state = (appoooh_state *)space->machine->driver_data;
+	appoooh_state *state = space->machine->driver_data<appoooh_state>();
 	/* bit 0 controls NMI */
 	interrupt_enable_w(space,0,data & 0x01);
 
@@ -272,7 +272,7 @@ static void robowres_draw_sprites( bitmap_t *dest_bmp, const rectangle *cliprect
 
 VIDEO_UPDATE( appoooh )
 {
-	appoooh_state *state = (appoooh_state *)screen->machine->driver_data;
+	appoooh_state *state = screen->machine->driver_data<appoooh_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	if (state->priority == 0)	/* fg behind sprites */
@@ -302,7 +302,7 @@ VIDEO_UPDATE( appoooh )
 
 VIDEO_UPDATE( robowres )
 {
-	appoooh_state *state = (appoooh_state *)screen->machine->driver_data;
+	appoooh_state *state = screen->machine->driver_data<appoooh_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	if (state->priority == 0)	/* fg behind sprites */

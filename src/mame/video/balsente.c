@@ -18,7 +18,7 @@
 
 VIDEO_START( balsente )
 {
-	balsente_state *state = (balsente_state *)machine->driver_data;
+	balsente_state *state = machine->driver_data<balsente_state>();
 
 	/* reset the system */
 	state->palettebank_vis = 0;
@@ -44,7 +44,7 @@ VIDEO_START( balsente )
 
 WRITE8_HANDLER( balsente_videoram_w )
 {
-	balsente_state *state = (balsente_state *)space->machine->driver_data;
+	balsente_state *state = space->machine->driver_data<balsente_state>();
 
 	space->machine->generic.videoram.u8[offset] = data;
 
@@ -63,7 +63,7 @@ WRITE8_HANDLER( balsente_videoram_w )
 
 WRITE8_HANDLER( balsente_palette_select_w )
 {
-	balsente_state *state = (balsente_state *)space->machine->driver_data;
+	balsente_state *state = space->machine->driver_data<balsente_state>();
 
 	/* only update if changed */
 	if (state->palettebank_vis != (data & 3))
@@ -107,7 +107,7 @@ WRITE8_HANDLER( balsente_paletteram_w )
 
 WRITE8_HANDLER( shrike_sprite_select_w )
 {
-	balsente_state *state = (balsente_state *)space->machine->driver_data;
+	balsente_state *state = space->machine->driver_data<balsente_state>();
 	if( state->sprite_data != state->sprite_bank[(data & 0x80 >> 7) ^ 1 ])
 	{
 		logerror( "shrike_sprite_select_w( 0x%02x )\n", data );
@@ -128,7 +128,7 @@ WRITE8_HANDLER( shrike_sprite_select_w )
 
 static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sprite)
 {
-	balsente_state *state = (balsente_state *)machine->driver_data;
+	balsente_state *state = machine->driver_data<balsente_state>();
 	int flags = sprite[0];
 	int image = sprite[1] | ((flags & 7) << 8);
 	int ypos = sprite[2] + 17 + BALSENTE_VBEND;
@@ -212,7 +212,7 @@ static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const re
 
 VIDEO_UPDATE( balsente )
 {
-	balsente_state *state = (balsente_state *)screen->machine->driver_data;
+	balsente_state *state = screen->machine->driver_data<balsente_state>();
 	const pen_t *pens = &screen->machine->pens[state->palettebank_vis * 256];
 	int y, i;
 

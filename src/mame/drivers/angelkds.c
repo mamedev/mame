@@ -489,32 +489,32 @@ sound related ?
 
 static WRITE8_HANDLER( angelkds_main_sound_w )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 	state->sound[offset] = data;
 }
 
 static READ8_HANDLER( angelkds_main_sound_r )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 	return state->sound2[offset];
 }
 
 static WRITE8_HANDLER( angelkds_sub_sound_w )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 	state->sound2[offset] = data;
 }
 
 static READ8_HANDLER( angelkds_sub_sound_r )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 	return state->sound[offset];
 }
 
 
 static void irqhandler( running_device *device, int irq )
 {
-	angelkds_state *state = (angelkds_state *)device->machine->driver_data;
+	angelkds_state *state = device->machine->driver_data<angelkds_state>();
 	cpu_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -575,7 +575,7 @@ GFXDECODE_END
 
 static MACHINE_START( angelkds )
 {
-	angelkds_state *state = (angelkds_state *)machine->driver_data;
+	angelkds_state *state = machine->driver_data<angelkds_state>();
 
 	state->subcpu = machine->device("sub");
 
@@ -589,7 +589,7 @@ static MACHINE_START( angelkds )
 
 static MACHINE_RESET( angelkds )
 {
-	angelkds_state *state = (angelkds_state *)machine->driver_data;
+	angelkds_state *state = machine->driver_data<angelkds_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)

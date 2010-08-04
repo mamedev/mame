@@ -133,35 +133,35 @@ PALETTE_INIT( ringking )
 
 WRITE8_HANDLER( kingofb_videoram_w )
 {
-	kingofb_state *state = (kingofb_state *)space->machine->driver_data;
+	kingofb_state *state = space->machine->driver_data<kingofb_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kingofb_colorram_w )
 {
-	kingofb_state *state = (kingofb_state *)space->machine->driver_data;
+	kingofb_state *state = space->machine->driver_data<kingofb_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kingofb_videoram2_w )
 {
-	kingofb_state *state = (kingofb_state *)space->machine->driver_data;
+	kingofb_state *state = space->machine->driver_data<kingofb_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kingofb_colorram2_w )
 {
-	kingofb_state *state = (kingofb_state *)space->machine->driver_data;
+	kingofb_state *state = space->machine->driver_data<kingofb_state>();
 	state->colorram2[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kingofb_f800_w )
 {
-	kingofb_state *state = (kingofb_state *)space->machine->driver_data;
+	kingofb_state *state = space->machine->driver_data<kingofb_state>();
 	state->nmi_enable = data & 0x20;
 
 	if (state->palette_bank != ((data & 0x18) >> 3))
@@ -179,7 +179,7 @@ WRITE8_HANDLER( kingofb_f800_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	kingofb_state *state = (kingofb_state *)machine->driver_data;
+	kingofb_state *state = machine->driver_data<kingofb_state>();
 	int attr = state->colorram[tile_index];
 	int bank = ((attr & 0x04) >> 2) + 2;
 	int code = (tile_index / 16) ? state->videoram[tile_index] + ((attr & 0x03) << 8) : 0;
@@ -190,7 +190,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	kingofb_state *state = (kingofb_state *)machine->driver_data;
+	kingofb_state *state = machine->driver_data<kingofb_state>();
 	int attr = state->colorram2[tile_index];
 	int bank = (attr & 0x02) >> 1;
 	int code = state->videoram2[tile_index] + ((attr & 0x01) << 8);
@@ -201,7 +201,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( kingofb )
 {
-	kingofb_state *state = (kingofb_state *)machine->driver_data;
+	kingofb_state *state = machine->driver_data<kingofb_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_y, 16, 16, 16, 16);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols_flip_y,  8,  8, 32, 32);
 
@@ -210,7 +210,7 @@ VIDEO_START( kingofb )
 
 static void kingofb_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	kingofb_state *state = (kingofb_state *)machine->driver_data;
+	kingofb_state *state = machine->driver_data<kingofb_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -248,7 +248,7 @@ static void kingofb_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 VIDEO_UPDATE( kingofb )
 {
-	kingofb_state *state = (kingofb_state *)screen->machine->driver_data;
+	kingofb_state *state = screen->machine->driver_data<kingofb_state>();
 
 	tilemap_set_scrolly(state->bg_tilemap, 0, -(*state->scroll_y));
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -261,7 +261,7 @@ VIDEO_UPDATE( kingofb )
 
 static TILE_GET_INFO( ringking_get_bg_tile_info )
 {
-	kingofb_state *state = (kingofb_state *)machine->driver_data;
+	kingofb_state *state = machine->driver_data<kingofb_state>();
 	int code = (tile_index / 16) ? state->videoram[tile_index] : 0;
 	int color = ((state->colorram[tile_index] & 0x70) >> 4) + 8 * state->palette_bank;
 
@@ -270,7 +270,7 @@ static TILE_GET_INFO( ringking_get_bg_tile_info )
 
 VIDEO_START( ringking )
 {
-	kingofb_state *state = (kingofb_state *)machine->driver_data;
+	kingofb_state *state = machine->driver_data<kingofb_state>();
 	state->bg_tilemap = tilemap_create(machine, ringking_get_bg_tile_info, tilemap_scan_cols_flip_y, 16, 16, 16, 16);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols_flip_y, 8, 8, 32, 32);
 
@@ -279,7 +279,7 @@ VIDEO_START( ringking )
 
 static void ringking_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	kingofb_state *state = (kingofb_state *)machine->driver_data;
+	kingofb_state *state = machine->driver_data<kingofb_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -310,7 +310,7 @@ static void ringking_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 VIDEO_UPDATE( ringking )
 {
-	kingofb_state *state = (kingofb_state *)screen->machine->driver_data;
+	kingofb_state *state = screen->machine->driver_data<kingofb_state>();
 
 	tilemap_set_scrolly(state->bg_tilemap, 0, -(*state->scroll_y));
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

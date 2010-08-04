@@ -170,7 +170,7 @@ static READ16_HANDLER( dassault_sub_control_r )
 
 static WRITE16_HANDLER( dassault_sound_w )
 {
-	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	dassault_state *state = space->machine->driver_data<dassault_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE); /* IRQ1 */
 }
@@ -178,7 +178,7 @@ static WRITE16_HANDLER( dassault_sound_w )
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
 static READ16_HANDLER( dassault_irq_r )
 {
-	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	dassault_state *state = space->machine->driver_data<dassault_state>();
 	switch (offset)
 	{
 	case 0: cpu_set_input_line(state->maincpu, 5, CLEAR_LINE); break;
@@ -189,7 +189,7 @@ static READ16_HANDLER( dassault_irq_r )
 
 static WRITE16_HANDLER( dassault_irq_w )
 {
-	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	dassault_state *state = space->machine->driver_data<dassault_state>();
 	switch (offset)
 	{
 	case 0: cpu_set_input_line(state->maincpu, 5, ASSERT_LINE); break;
@@ -201,13 +201,13 @@ static WRITE16_HANDLER( dassault_irq_w )
 
 static WRITE16_HANDLER( shared_ram_w )
 {
-	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	dassault_state *state = space->machine->driver_data<dassault_state>();
 	COMBINE_DATA(&state->shared_ram[offset]);
 }
 
 static READ16_HANDLER( shared_ram_r )
 {
-	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	dassault_state *state = space->machine->driver_data<dassault_state>();
 	return state->shared_ram[offset];
 }
 
@@ -513,13 +513,13 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	dassault_state *driver_state = (dassault_state *)device->machine->driver_data;
+	dassault_state *driver_state = device->machine->driver_data<dassault_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	dassault_state *state = (dassault_state *)device->machine->driver_data;
+	dassault_state *state = device->machine->driver_data<dassault_state>();
 
 	/* the second OKIM6295 ROM is bank switched */
 	state->oki2->set_bank_base((data & 1) * 0x40000);
@@ -812,7 +812,7 @@ ROM_END
 
 static READ16_HANDLER( dassault_main_skip )
 {
-	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	dassault_state *state = space->machine->driver_data<dassault_state>();
 	int ret = state->ram[0];
 
 	if (cpu_get_previouspc(space->cpu) == 0x1170 && ret & 0x8000)
@@ -823,7 +823,7 @@ static READ16_HANDLER( dassault_main_skip )
 
 static READ16_HANDLER( thndzone_main_skip )
 {
-	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	dassault_state *state = space->machine->driver_data<dassault_state>();
 	int ret = state->ram[0];
 
 	if (cpu_get_pc(space->cpu) == 0x114c && ret & 0x8000)

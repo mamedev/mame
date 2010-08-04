@@ -16,7 +16,7 @@ enable / disable tilemap bits might be wrong
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	angelkds_state *state = (angelkds_state *)machine->driver_data;
+	angelkds_state *state = machine->driver_data<angelkds_state>();
 	int tileno;
 
 	tileno = state->txvideoram[tile_index] + (state->txbank * 0x100);
@@ -25,7 +25,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 WRITE8_HANDLER( angelkds_txvideoram_w )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	state->txvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
@@ -33,7 +33,7 @@ WRITE8_HANDLER( angelkds_txvideoram_w )
 
 WRITE8_HANDLER( angelkds_txbank_write )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	if (state->txbank != data)
 	{
@@ -48,7 +48,7 @@ WRITE8_HANDLER( angelkds_txbank_write )
 
 static TILE_GET_INFO( get_bgtop_tile_info )
 {
-	angelkds_state *state = (angelkds_state *)machine->driver_data;
+	angelkds_state *state = machine->driver_data<angelkds_state>();
 	int tileno;
 
 	tileno = state->bgtopvideoram[tile_index];
@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_bgtop_tile_info )
 
 WRITE8_HANDLER( angelkds_bgtopvideoram_w )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	state->bgtopvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bgtop_tilemap, offset);
@@ -67,7 +67,7 @@ WRITE8_HANDLER( angelkds_bgtopvideoram_w )
 
 WRITE8_HANDLER( angelkds_bgtopbank_write )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	if (state->bgtopbank != data)
 	{
@@ -78,7 +78,7 @@ WRITE8_HANDLER( angelkds_bgtopbank_write )
 
 WRITE8_HANDLER( angelkds_bgtopscroll_write )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	tilemap_set_scrollx(state->bgtop_tilemap, 0, data);
 }
@@ -89,7 +89,7 @@ WRITE8_HANDLER( angelkds_bgtopscroll_write )
 
 static TILE_GET_INFO( get_bgbot_tile_info )
 {
-	angelkds_state *state = (angelkds_state *)machine->driver_data;
+	angelkds_state *state = machine->driver_data<angelkds_state>();
 	int tileno;
 
 	tileno = state->bgbotvideoram[tile_index];
@@ -100,7 +100,7 @@ static TILE_GET_INFO( get_bgbot_tile_info )
 
 WRITE8_HANDLER( angelkds_bgbotvideoram_w )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	state->bgbotvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bgbot_tilemap, offset);
@@ -109,7 +109,7 @@ WRITE8_HANDLER( angelkds_bgbotvideoram_w )
 
 WRITE8_HANDLER( angelkds_bgbotbank_write )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	if (state->bgbotbank != data)
 	{
@@ -120,7 +120,7 @@ WRITE8_HANDLER( angelkds_bgbotbank_write )
 
 WRITE8_HANDLER( angelkds_bgbotscroll_write )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	tilemap_set_scrollx(state->bgbot_tilemap, 0, data);
 }
@@ -128,7 +128,7 @@ WRITE8_HANDLER( angelkds_bgbotscroll_write )
 
 WRITE8_HANDLER( angelkds_layer_ctrl_write )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 
 	state->layer_ctrl = data;
 }
@@ -142,7 +142,7 @@ a split down the middle of the screen
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int enable_n)
 {
-	angelkds_state *state = (angelkds_state *)machine->driver_data;
+	angelkds_state *state = machine->driver_data<angelkds_state>();
 	const UINT8 *source = state->spriteram + 0x100 - 4;
 	const UINT8 *finish = state->spriteram;
 	const gfx_element *gfx = machine->gfx[3];
@@ -243,7 +243,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 WRITE8_HANDLER( angelkds_paletteram_w )
 {
-	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	angelkds_state *state = space->machine->driver_data<angelkds_state>();
 	int no;
 
 	state->paletteram[offset] = data;
@@ -258,7 +258,7 @@ WRITE8_HANDLER( angelkds_paletteram_w )
 
 VIDEO_START( angelkds )
 {
-	angelkds_state *state = (angelkds_state *)machine->driver_data;
+	angelkds_state *state = machine->driver_data<angelkds_state>();
 
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->tx_tilemap, 0);
@@ -274,7 +274,7 @@ VIDEO_START( angelkds )
 
 VIDEO_UPDATE( angelkds )
 {
-	angelkds_state *state = (angelkds_state *)screen->machine->driver_data;
+	angelkds_state *state = screen->machine->driver_data<angelkds_state>();
 	const rectangle &visarea = screen->visible_area();
 	rectangle clip;
 

@@ -405,13 +405,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static READ16_HANDLER( sharedram_r )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE16_HANDLER( sharedram_w )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 	COMBINE_DATA(&state->sharedram[offset]);
 }
 
@@ -420,7 +420,7 @@ static void parse_control(running_machine *machine)
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 1 is "vibration" acc. to test mode */
@@ -428,7 +428,7 @@ static void parse_control(running_machine *machine)
 
 static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;	/* for Wgp */
@@ -449,14 +449,14 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 #ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( wgp_interrupt4 )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 #endif
 
 static TIMER_CALLBACK( wgp_interrupt6 )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
@@ -464,7 +464,7 @@ static TIMER_CALLBACK( wgp_interrupt6 )
 
 static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	cpu_set_input_line(state->subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
@@ -510,7 +510,7 @@ static WRITE16_HANDLER( rotate_port_w )
     which contains sets of 4 words (used for ports 0-3).
     NB: port 6 is not written.
     */
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 
 	switch (offset)
 	{
@@ -611,20 +611,20 @@ static WRITE16_HANDLER( wgp_adinput_w )
 
 static void reset_sound_region( running_machine *machine )	/* assumes Z80 sandwiched between the 68Ks */
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( wgp_sound_w )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 
 	if (offset == 0)
 		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
@@ -634,7 +634,7 @@ static WRITE16_HANDLER( wgp_sound_w )
 
 static READ16_HANDLER( wgp_sound_r )
 {
-	wgp_state *state = (wgp_state *)space->machine->driver_data;
+	wgp_state *state = space->machine->driver_data<wgp_state>();
 
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
@@ -905,7 +905,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )	// assumes Z80 sandwiched between 68Ks
 {
-	wgp_state *state = (wgp_state *)device->machine->driver_data;
+	wgp_state *state = device->machine->driver_data<wgp_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -931,7 +931,7 @@ static STATE_POSTLOAD( wgp_postload )
 
 static MACHINE_RESET( wgp )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 	int i;
 
 	state->banknum = 0;
@@ -951,7 +951,7 @@ static MACHINE_RESET( wgp )
 
 static MACHINE_START( wgp )
 {
-	wgp_state *state = (wgp_state *)machine->driver_data;
+	wgp_state *state = machine->driver_data<wgp_state>();
 
 	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
 

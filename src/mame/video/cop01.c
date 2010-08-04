@@ -62,7 +62,7 @@ PALETTE_INIT( cop01 )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	cop01_state *state = (cop01_state *)machine->driver_data;
+	cop01_state *state = machine->driver_data<cop01_state>();
 	int tile = state->bgvideoram[tile_index];
 	int attr = state->bgvideoram[tile_index + 0x800];
 	int pri = (attr & 0x80) >> 7;
@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	cop01_state *state = (cop01_state *)machine->driver_data;
+	cop01_state *state = machine->driver_data<cop01_state>();
 	int tile = state->fgvideoram[tile_index];
 	SET_TILE_INFO(0, tile, 0, 0);
 }
@@ -101,7 +101,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( cop01 )
 {
-	cop01_state *state = (cop01_state *)machine->driver_data;
+	cop01_state *state = machine->driver_data<cop01_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows, 8, 8, 64, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
 
@@ -122,14 +122,14 @@ VIDEO_START( cop01 )
 
 WRITE8_HANDLER( cop01_background_w )
 {
-	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	cop01_state *state = space->machine->driver_data<cop01_state>();
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x7ff);
 }
 
 WRITE8_HANDLER( cop01_foreground_w )
 {
-	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	cop01_state *state = space->machine->driver_data<cop01_state>();
 	state->fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
@@ -147,7 +147,7 @@ WRITE8_HANDLER( cop01_vreg_w )
      *        -------x msb xscroll
      *  0x43: xxxxxxxx yscroll
      */
-	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	cop01_state *state = space->machine->driver_data<cop01_state>();
 	state->vreg[offset] = data;
 
 	if (offset == 0)
@@ -168,7 +168,7 @@ WRITE8_HANDLER( cop01_vreg_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	cop01_state *state = (cop01_state *)machine->driver_data;
+	cop01_state *state = machine->driver_data<cop01_state>();
 	int offs, code, attr, sx, sy, flipx, flipy, color;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -208,7 +208,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( cop01 )
 {
-	cop01_state *state = (cop01_state *)screen->machine->driver_data;
+	cop01_state *state = screen->machine->driver_data<cop01_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->vreg[1] + 256 * (state->vreg[2] & 1));
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->vreg[3]);
 

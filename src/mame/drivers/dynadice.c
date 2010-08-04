@@ -37,12 +37,13 @@ dy_6.bin (near Z80)
 #include "sound/ay8910.h"
 
 
-class dynadice_state
+class dynadice_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dynadice_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, dynadice_state(machine)); }
 
-	dynadice_state(running_machine &machine) { }
+	dynadice_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
@@ -59,7 +60,7 @@ public:
 
 static WRITE8_HANDLER( dynadice_videoram_w )
 {
-	dynadice_state *state = (dynadice_state *)space->machine->driver_data;
+	dynadice_state *state = space->machine->driver_data<dynadice_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 	tilemap_mark_all_tiles_dirty(state->top_tilemap);
@@ -67,13 +68,13 @@ static WRITE8_HANDLER( dynadice_videoram_w )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	dynadice_state *state = (dynadice_state *)space->machine->driver_data;
+	dynadice_state *state = space->machine->driver_data<dynadice_state>();
 	state->ay_data = data;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
-	dynadice_state *state = (dynadice_state *)device->machine->driver_data;
+	dynadice_state *state = device->machine->driver_data<dynadice_state>();
 /*
     AY 3-8910 :
 
@@ -190,14 +191,14 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info )
 {
-	dynadice_state *state = (dynadice_state *)machine->driver_data;
+	dynadice_state *state = machine->driver_data<dynadice_state>();
 	int code = state->videoram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
 static VIDEO_START( dynadice )
 {
-	dynadice_state *state = (dynadice_state *)machine->driver_data;
+	dynadice_state *state = machine->driver_data<dynadice_state>();
 
 	/* pacman - style videoram layout */
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -207,7 +208,7 @@ static VIDEO_START( dynadice )
 
 static VIDEO_UPDATE( dynadice )
 {
-	dynadice_state *state = (dynadice_state *)screen->machine->driver_data;
+	dynadice_state *state = screen->machine->driver_data<dynadice_state>();
 	rectangle myclip = *cliprect;
 	myclip.max_x = 15;
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -224,13 +225,13 @@ static PALETTE_INIT( dynadice )
 
 static MACHINE_START( dynadice )
 {
-	dynadice_state *state = (dynadice_state *)machine->driver_data;
+	dynadice_state *state = machine->driver_data<dynadice_state>();
 	state_save_register_global(machine, state->ay_data);
 }
 
 static MACHINE_RESET( dynadice )
 {
-	dynadice_state *state = (dynadice_state *)machine->driver_data;
+	dynadice_state *state = machine->driver_data<dynadice_state>();
 	state->ay_data = 0;
 }
 

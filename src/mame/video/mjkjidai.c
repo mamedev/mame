@@ -14,7 +14,7 @@ static tilemap_t *bg_tilemap;
 
 static TILE_GET_INFO( get_tile_info )
 {
-	mjkjidai_state *state = (mjkjidai_state *)machine->driver_data;
+	mjkjidai_state *state = machine->driver_data<mjkjidai_state>();
 
 	int attr = state->videoram[tile_index + 0x800];
 	int code = state->videoram[tile_index] + ((attr & 0x1f) << 8);
@@ -45,7 +45,7 @@ VIDEO_START( mjkjidai )
 
 WRITE8_HANDLER( mjkjidai_videoram_w )
 {
-	mjkjidai_state *state = (mjkjidai_state *)space->machine->driver_data;
+	mjkjidai_state *state = space->machine->driver_data<mjkjidai_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
@@ -91,7 +91,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	mjkjidai_state *state = (mjkjidai_state *)machine->driver_data;
+	mjkjidai_state *state = machine->driver_data<mjkjidai_state>();
 	UINT8 *spriteram = state->spriteram1;
 	UINT8 *spriteram_2 = state->spriteram2;
 	UINT8 *spriteram_3 = state->spriteram3;

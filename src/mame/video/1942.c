@@ -90,7 +90,7 @@ PALETTE_INIT( 1942 )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	_1942_state *state = (_1942_state *)machine->driver_data;
+	_1942_state *state = machine->driver_data<_1942_state>();
 	int code, color;
 
 	code = state->fg_videoram[tile_index];
@@ -104,7 +104,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	_1942_state *state = (_1942_state *)machine->driver_data;
+	_1942_state *state = machine->driver_data<_1942_state>();
 	int code, color;
 
 	tile_index = (tile_index & 0x0f) | ((tile_index & 0x01f0) << 1);
@@ -126,7 +126,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 ***************************************************************************/
 VIDEO_START( 1942 )
 {
-	_1942_state *state = (_1942_state *)machine->driver_data;
+	_1942_state *state = machine->driver_data<_1942_state>();
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 16);
 
@@ -142,7 +142,7 @@ VIDEO_START( 1942 )
 
 WRITE8_HANDLER( c1942_fgvideoram_w )
 {
-	_1942_state *state = (_1942_state *)space->machine->driver_data;
+	_1942_state *state = space->machine->driver_data<_1942_state>();
 
 	state->fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
@@ -150,7 +150,7 @@ WRITE8_HANDLER( c1942_fgvideoram_w )
 
 WRITE8_HANDLER( c1942_bgvideoram_w )
 {
-	_1942_state *state = (_1942_state *)space->machine->driver_data;
+	_1942_state *state = space->machine->driver_data<_1942_state>();
 
 	state->bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, (offset & 0x0f) | ((offset >> 1) & 0x01f0));
@@ -159,7 +159,7 @@ WRITE8_HANDLER( c1942_bgvideoram_w )
 
 WRITE8_HANDLER( c1942_palette_bank_w )
 {
-	_1942_state *state = (_1942_state *)space->machine->driver_data;
+	_1942_state *state = space->machine->driver_data<_1942_state>();
 
 	if (state->palette_bank != data)
 	{
@@ -170,7 +170,7 @@ WRITE8_HANDLER( c1942_palette_bank_w )
 
 WRITE8_HANDLER( c1942_scroll_w )
 {
-	_1942_state *state = (_1942_state *)space->machine->driver_data;
+	_1942_state *state = space->machine->driver_data<_1942_state>();
 
 	state->scroll[offset] = data;
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll[0] | (state->scroll[1] << 8));
@@ -179,7 +179,7 @@ WRITE8_HANDLER( c1942_scroll_w )
 
 WRITE8_HANDLER( c1942_c804_w )
 {
-	_1942_state *state = (_1942_state *)space->machine->driver_data;
+	_1942_state *state = space->machine->driver_data<_1942_state>();
 	/* bit 7: flip screen
        bit 4: cpu B reset
        bit 0: coin counter */
@@ -200,7 +200,7 @@ WRITE8_HANDLER( c1942_c804_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	_1942_state *state = (_1942_state *)machine->driver_data;
+	_1942_state *state = machine->driver_data<_1942_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
@@ -242,7 +242,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( 1942 )
 {
-	_1942_state *state = (_1942_state *)screen->machine->driver_data;
+	_1942_state *state = screen->machine->driver_data<_1942_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

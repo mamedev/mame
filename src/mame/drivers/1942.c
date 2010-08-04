@@ -236,7 +236,7 @@ GFXDECODE_END
 
 static MACHINE_START( 1942 )
 {
-	_1942_state *state = (_1942_state *)machine->driver_data;
+	_1942_state *state = machine->driver_data<_1942_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -246,7 +246,7 @@ static MACHINE_START( 1942 )
 
 static MACHINE_RESET( 1942 )
 {
-	_1942_state *state = (_1942_state *)machine->driver_data;
+	_1942_state *state = machine->driver_data<_1942_state>();
 
 	state->palette_bank = 0;
 	state->scroll[0] = 0;

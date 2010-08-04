@@ -84,14 +84,14 @@ static WRITE8_HANDLER( vastar_hold_cpu2_w )
 
 static READ8_HANDLER( vastar_sharedram_r )
 {
-	vastar_state *state = (vastar_state *)space->machine->driver_data;
+	vastar_state *state = space->machine->driver_data<vastar_state>();
 
 	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( vastar_sharedram_w )
 {
-	vastar_state *state = (vastar_state *)space->machine->driver_data;
+	vastar_state *state = space->machine->driver_data<vastar_state>();
 
 	state->sharedram[offset] = data;
 }

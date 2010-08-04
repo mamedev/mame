@@ -1,13 +1,14 @@
 
 #include "sound/okim6295.h"
 
-class drgnmst_state
+class drgnmst_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drgnmst_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drgnmst_state(machine)); }
 
 	drgnmst_state(running_machine &machine)
-		: oki_1(machine.device<okim6295_device>("oki1")),
+		: driver_data_t(machine),
+		  oki_1(machine.device<okim6295_device>("oki1")),
 		  oki_2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */

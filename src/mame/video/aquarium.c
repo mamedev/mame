@@ -6,7 +6,7 @@
 /* gcpinbal.c modified */
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
-	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	aquarium_state *state = machine->driver_data<aquarium_state>();
 	int offs, chain_pos;
 	int x, y, curx, cury;
 	UINT8 col, flipx, flipy, chain;
@@ -88,7 +88,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 /* TXT Layer */
 static TILE_GET_INFO( get_aquarium_txt_tile_info )
 {
-	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	aquarium_state *state = machine->driver_data<aquarium_state>();
 	int tileno, colour;
 
 	tileno = (state->txt_videoram[tile_index] & 0x0fff);
@@ -98,7 +98,7 @@ static TILE_GET_INFO( get_aquarium_txt_tile_info )
 
 WRITE16_HANDLER( aquarium_txt_videoram_w )
 {
-	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
+	aquarium_state *state = space->machine->driver_data<aquarium_state>();
 	state->txt_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->txt_tilemap, offset);
 }
@@ -106,7 +106,7 @@ WRITE16_HANDLER( aquarium_txt_videoram_w )
 /* MID Layer */
 static TILE_GET_INFO( get_aquarium_mid_tile_info )
 {
-	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	aquarium_state *state = machine->driver_data<aquarium_state>();
 	int tileno, colour, flag;
 
 	tileno = (state->mid_videoram[tile_index * 2] & 0x0fff);
@@ -120,7 +120,7 @@ static TILE_GET_INFO( get_aquarium_mid_tile_info )
 
 WRITE16_HANDLER( aquarium_mid_videoram_w )
 {
-	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
+	aquarium_state *state = space->machine->driver_data<aquarium_state>();
 	state->mid_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->mid_tilemap, offset / 2);
 }
@@ -128,7 +128,7 @@ WRITE16_HANDLER( aquarium_mid_videoram_w )
 /* BAK Layer */
 static TILE_GET_INFO( get_aquarium_bak_tile_info )
 {
-	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	aquarium_state *state = machine->driver_data<aquarium_state>();
 	int tileno, colour, flag;
 
 	tileno = (state->bak_videoram[tile_index * 2] & 0x0fff);
@@ -142,14 +142,14 @@ static TILE_GET_INFO( get_aquarium_bak_tile_info )
 
 WRITE16_HANDLER( aquarium_bak_videoram_w )
 {
-	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
+	aquarium_state *state = space->machine->driver_data<aquarium_state>();
 	state->bak_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bak_tilemap, offset / 2);
 }
 
 VIDEO_START(aquarium)
 {
-	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	aquarium_state *state = machine->driver_data<aquarium_state>();
 	state->txt_tilemap = tilemap_create(machine, get_aquarium_txt_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 	state->bak_tilemap = tilemap_create(machine, get_aquarium_bak_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->mid_tilemap = tilemap_create(machine, get_aquarium_mid_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
@@ -160,7 +160,7 @@ VIDEO_START(aquarium)
 
 VIDEO_UPDATE(aquarium)
 {
-	aquarium_state *state = (aquarium_state *)screen->machine->driver_data;
+	aquarium_state *state = screen->machine->driver_data<aquarium_state>();
 	tilemap_set_scrollx(state->mid_tilemap, 0, state->scroll[0]);
 	tilemap_set_scrolly(state->mid_tilemap, 0, state->scroll[1]);
 	tilemap_set_scrollx(state->bak_tilemap, 0, state->scroll[2]);

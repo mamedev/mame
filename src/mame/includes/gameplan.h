@@ -21,12 +21,13 @@ driver by Chris Moore
 #define LEPRECHAUN_MAIN_CPU_CLOCK        (LEPRECHAUN_MAIN_MASTER_CLOCK / 4)
 
 
-class gameplan_state
+class gameplan_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gameplan_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gameplan_state(machine)); }
 
-	gameplan_state(running_machine &machine) { }
+	gameplan_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* machine state */
 	UINT8   current_port;

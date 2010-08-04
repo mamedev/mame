@@ -13,7 +13,7 @@ Atari Drag Race Driver
 
 static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 {
-	dragrace_state *state = (dragrace_state *)timer.machine->driver_data;
+	dragrace_state *state = timer.machine->driver_data<dragrace_state>();
 	int i;
 	static const char *const portnames[] = { "P1", "P2" };
 
@@ -36,7 +36,7 @@ static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 
 static void dragrace_update_misc_flags( running_machine *machine )
 {
-	dragrace_state *state = (dragrace_state *)machine->driver_data;
+	dragrace_state *state = machine->driver_data<dragrace_state>();
 	/* 0x0900 = set 3SPEED1         0x00000001
      * 0x0901 = set 4SPEED1         0x00000002
      * 0x0902 = set 5SPEED1         0x00000004
@@ -90,7 +90,7 @@ static void dragrace_update_misc_flags( running_machine *machine )
 
 static WRITE8_HANDLER( dragrace_misc_w )
 {
-	dragrace_state *state = (dragrace_state *)space->machine->driver_data;
+	dragrace_state *state = space->machine->driver_data<dragrace_state>();
 
 	/* Set/clear individual bit */
 	UINT32 mask = 1 << offset;
@@ -104,7 +104,7 @@ static WRITE8_HANDLER( dragrace_misc_w )
 
 static WRITE8_HANDLER( dragrace_misc_clear_w )
 {
-	dragrace_state *state = (dragrace_state *)space->machine->driver_data;
+	dragrace_state *state = space->machine->driver_data<dragrace_state>();
 
 	/* Clear 8 bits */
 	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( dragrace_misc_clear_w )
 
 static READ8_HANDLER( dragrace_input_r )
 {
-	dragrace_state *state = (dragrace_state *)space->machine->driver_data;
+	dragrace_state *state = space->machine->driver_data<dragrace_state>();
 	int val = input_port_read(space->machine, "IN2");
 	static const char *const portnames[] = { "IN0", "IN1" };
 
@@ -316,7 +316,7 @@ static PALETTE_INIT( dragrace )
 
 static MACHINE_START( dragrace )
 {
-	dragrace_state *state = (dragrace_state *)machine->driver_data;
+	dragrace_state *state = machine->driver_data<dragrace_state>();
 
 	state->discrete = machine->device("discrete");
 
@@ -326,7 +326,7 @@ static MACHINE_START( dragrace )
 
 static MACHINE_RESET( dragrace )
 {
-	dragrace_state *state = (dragrace_state *)machine->driver_data;
+	dragrace_state *state = machine->driver_data<dragrace_state>();
 
 	state->misc_flags = 0;
 	state->gear[0] = 0;

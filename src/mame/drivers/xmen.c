@@ -44,7 +44,7 @@ static const eeprom_interface eeprom_intf =
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	xmen_state *state = (xmen_state *)space->machine->driver_data;
+	xmen_state *state = space->machine->driver_data<xmen_state>();
 
 	logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
@@ -82,7 +82,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	xmen_state *state = (xmen_state *)space->machine->driver_data;
+	xmen_state *state = space->machine->driver_data<xmen_state>();
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -97,13 +97,13 @@ static WRITE16_HANDLER( xmen_18fa00_w )
 
 static void sound_reset_bank( running_machine *machine )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 	memory_set_bank(machine, "bank4", state->sound_curbank & 0x07);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	xmen_state *state = (xmen_state *)space->machine->driver_data;
+	xmen_state *state = space->machine->driver_data<xmen_state>();
 	state->sound_curbank = data;
 	sound_reset_bank(space->machine);
 }
@@ -258,7 +258,7 @@ INPUT_PORTS_END
 
 static CUSTOM_INPUT( xmen_frame_r )
 {
-	xmen_state *state = (xmen_state *)field->port->machine->driver_data;
+	xmen_state *state = field->port->machine->driver_data<xmen_state>();
 	return state->current_frame;
 }
 
@@ -311,7 +311,7 @@ static STATE_POSTLOAD( xmen_postload )
 
 static MACHINE_START( xmen )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank4", 0, 8, &ROM[0x10000], 0x4000);
@@ -335,7 +335,7 @@ static MACHINE_START( xmen )
 
 static MACHINE_RESET( xmen )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)
@@ -416,7 +416,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_START( xmen6p )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 
 	MACHINE_START_CALL(xmen);
 
@@ -425,7 +425,7 @@ static MACHINE_START( xmen6p )
 
 static MACHINE_RESET( xmen6p )
 {
-	xmen_state *state = (xmen_state *)machine->driver_data;
+	xmen_state *state = machine->driver_data<xmen_state>();
 	state->current_frame = 0x00;
 }
 

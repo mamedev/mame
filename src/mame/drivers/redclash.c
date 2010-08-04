@@ -27,7 +27,7 @@ TODO:
 
 static WRITE8_HANDLER( irqack_w )
 {
-	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	ladybug_state *state = space->machine->driver_data<ladybug_state>();
 	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
@@ -78,7 +78,7 @@ ADDRESS_MAP_END
 */
 static INPUT_CHANGED( left_coin_inserted )
 {
-	ladybug_state *state = (ladybug_state *)field->port->machine->driver_data;
+	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
 
 	if(newval)
 		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
@@ -86,7 +86,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 static INPUT_CHANGED( right_coin_inserted )
 {
-	ladybug_state *state = (ladybug_state *)field->port->machine->driver_data;
+	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
 
 	if(newval)
 		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -328,7 +328,7 @@ GFXDECODE_END
 
 static MACHINE_START( redclash )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 
 	state->maincpu = machine->device("maincpu");
 
@@ -343,7 +343,7 @@ static MACHINE_START( redclash )
 
 static MACHINE_RESET( redclash )
 {
-	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	ladybug_state *state = machine->driver_data<ladybug_state>();
 
 	state->star_speed = 0;
 	state->gfxbank = 0;

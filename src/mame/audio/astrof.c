@@ -34,7 +34,7 @@
 
 WRITE8_HANDLER( astrof_audio_1_w )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 	UINT8 rising_bits = data & ~state->port_1_last;
 
 	if (state->astrof_death_playing)
@@ -80,7 +80,7 @@ WRITE8_HANDLER( astrof_audio_1_w )
 
 WRITE8_HANDLER( astrof_audio_2_w )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 	UINT8 rising_bits = data & ~state->port_2_last;
 
 	/* D0-D2 - explosion select (triggered by D2 of the other port */
@@ -184,7 +184,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( tomahawk_audio_w )
 {
-	astrof_state *state = (astrof_state *)space->machine->driver_data;
+	astrof_state *state = space->machine->driver_data<astrof_state>();
 
 	/* D0 - sonar */
 

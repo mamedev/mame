@@ -251,14 +251,14 @@ TODO:
 
 static void update_irq( running_machine *machine )
 {
-	othunder_state *state = (othunder_state *)machine->driver_data;
+	othunder_state *state = machine->driver_data<othunder_state>();
 	cpu_set_input_line(state->maincpu, 6, state->ad_irq ? ASSERT_LINE : CLEAR_LINE);
 	cpu_set_input_line(state->maincpu, 5, state->vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( irq_ack_w )
 {
-	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	othunder_state *state = space->machine->driver_data<othunder_state>();
 
 	switch (offset)
 	{
@@ -276,7 +276,7 @@ static WRITE16_HANDLER( irq_ack_w )
 
 static INTERRUPT_GEN( vblank_interrupt )
 {
-	othunder_state *state = (othunder_state *)device->machine->driver_data;
+	othunder_state *state = device->machine->driver_data<othunder_state>();
 
 	state->vblank_irq = 1;
 	update_irq(device->machine);
@@ -284,7 +284,7 @@ static INTERRUPT_GEN( vblank_interrupt )
 
 static TIMER_CALLBACK( ad_interrupt )
 {
-	othunder_state *state = (othunder_state *)machine->driver_data;
+	othunder_state *state = machine->driver_data<othunder_state>();
 
 	state->ad_irq = 1;
 	update_irq(machine);
@@ -312,7 +312,7 @@ static const eeprom_interface eeprom_intf =
 
 static WRITE16_HANDLER( othunder_tc0220ioc_w )
 {
-	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	othunder_state *state = space->machine->driver_data<othunder_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -354,7 +354,7 @@ static WRITE16_HANDLER( othunder_tc0220ioc_w )
 
 static READ16_HANDLER( othunder_tc0220ioc_r )
 {
-	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	othunder_state *state = space->machine->driver_data<othunder_state>();
 
 	switch (offset)
 	{
@@ -395,21 +395,21 @@ static WRITE16_HANDLER( othunder_lightgun_w )
 
 static void reset_sound_region( running_machine *machine )
 {
-	othunder_state *state = (othunder_state *)machine->driver_data;
+	othunder_state *state = machine->driver_data<othunder_state>();
 	memory_set_bank(machine, "bank10", state->banknum);
 }
 
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	othunder_state *state = space->machine->driver_data<othunder_state>();
 	state->banknum = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( othunder_sound_w )
 {
-	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	othunder_state *state = space->machine->driver_data<othunder_state>();
 	if (offset == 0)
 		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
@@ -418,7 +418,7 @@ static WRITE16_HANDLER( othunder_sound_w )
 
 static READ16_HANDLER( othunder_sound_r )
 {
-	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	othunder_state *state = space->machine->driver_data<othunder_state>();
 	if (offset == 1)
 		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
 	else
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( othunder_TC0310FAM_w )
 {
 	/* there are two TC0310FAM, one for CH1 and one for CH2 from the YM2610. The
        PSG output is routed to both chips. */
-	othunder_state *state = (othunder_state *)space->machine->driver_data;
+	othunder_state *state = space->machine->driver_data<othunder_state>();
 	int voll, volr;
 
 	state->pan[offset] = data & 0x1f;
@@ -636,7 +636,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler( running_device *device, int irq )
 {
-	othunder_state *state = (othunder_state *)device->machine->driver_data;
+	othunder_state *state = device->machine->driver_data<othunder_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -684,7 +684,7 @@ static STATE_POSTLOAD( othunder_postload )
 
 static MACHINE_START( othunder )
 {
-	othunder_state *state = (othunder_state *)machine->driver_data;
+	othunder_state *state = machine->driver_data<othunder_state>();
 
 	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
 
@@ -711,7 +711,7 @@ static MACHINE_START( othunder )
 
 static MACHINE_RESET( othunder )
 {
-	othunder_state *state = (othunder_state *)machine->driver_data;
+	othunder_state *state = machine->driver_data<othunder_state>();
 
 	state->vblank_irq = 0;
 	state->ad_irq = 0;

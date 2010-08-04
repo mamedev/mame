@@ -226,7 +226,7 @@ static INTERRUPT_GEN( commando_interrupt )
 
 static MACHINE_START( commando )
 {
-	commando_state *state = (commando_state *)machine->driver_data;
+	commando_state *state = machine->driver_data<commando_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -236,7 +236,7 @@ static MACHINE_START( commando )
 
 static MACHINE_RESET( commando )
 {
-	commando_state *state = (commando_state *)machine->driver_data;
+	commando_state *state = machine->driver_data<commando_state>();
 
 	state->scroll_x[0] = 0;
 	state->scroll_x[1] = 0;

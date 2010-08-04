@@ -875,7 +875,7 @@ static _snes_spc7110_t snes_spc7110;
 
 static void spc7110_init(running_machine* machine)
 {
-	snes_state *state = (snes_state *)machine->driver_data;
+	snes_state *state = machine->driver_data<snes_state>();
 
 	snes_spc7110.r4801 = 0x00;
 	snes_spc7110.r4802 = 0x00;

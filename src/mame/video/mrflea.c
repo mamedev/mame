@@ -10,7 +10,7 @@ Mr. F. Lea
 
 WRITE8_HANDLER( mrflea_gfx_bank_w )
 {
-	mrflea_state *state = (mrflea_state *)space->machine->driver_data;
+	mrflea_state *state = space->machine->driver_data<mrflea_state>();
 	state->gfx_bank = data;
 
 	if (data & ~0x14)
@@ -19,7 +19,7 @@ WRITE8_HANDLER( mrflea_gfx_bank_w )
 
 WRITE8_HANDLER( mrflea_videoram_w )
 {
-	mrflea_state *state = (mrflea_state *)space->machine->driver_data;
+	mrflea_state *state = space->machine->driver_data<mrflea_state>();
 	int bank = offset / 0x400;
 
 	offset &= 0x3ff;
@@ -31,7 +31,7 @@ WRITE8_HANDLER( mrflea_videoram_w )
 
 WRITE8_HANDLER( mrflea_spriteram_w )
 {
-	mrflea_state *state = (mrflea_state *)space->machine->driver_data;
+	mrflea_state *state = space->machine->driver_data<mrflea_state>();
 
 	if (offset & 2)
 	{
@@ -45,7 +45,7 @@ WRITE8_HANDLER( mrflea_spriteram_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	mrflea_state *state = (mrflea_state *)machine->driver_data;
+	mrflea_state *state = machine->driver_data<mrflea_state>();
 	const gfx_element *gfx = machine->gfx[0];
 	const UINT8 *source = state->spriteram;
 	const UINT8 *finish = source + 0x100;
@@ -76,7 +76,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	mrflea_state *state = (mrflea_state *)machine->driver_data;
+	mrflea_state *state = machine->driver_data<mrflea_state>();
 	const UINT8 *source = state->videoram;
 	const gfx_element *gfx = machine->gfx[1];
 	int sx, sy;

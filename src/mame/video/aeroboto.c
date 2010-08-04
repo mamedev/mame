@@ -23,7 +23,7 @@
 
 static TILE_GET_INFO( get_tile_info )
 {
-	aeroboto_state *state = (aeroboto_state *)machine->driver_data;
+	aeroboto_state *state = machine->driver_data<aeroboto_state>();
 	UINT8 code = state->videoram[tile_index];
 	SET_TILE_INFO(
 			0,
@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( aeroboto )
 {
-	aeroboto_state *state = (aeroboto_state *)machine->driver_data;
+	aeroboto_state *state = machine->driver_data<aeroboto_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 64);
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
@@ -86,7 +86,7 @@ READ8_HANDLER( aeroboto_in0_r )
 
 WRITE8_HANDLER( aeroboto_3000_w )
 {
-	aeroboto_state *state = (aeroboto_state *)space->machine->driver_data;
+	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
 
 	/* bit 0 selects both flip screen and player1/player2 controls */
 	flip_screen_set(space->machine, data & 0x01);
@@ -104,7 +104,7 @@ WRITE8_HANDLER( aeroboto_3000_w )
 
 WRITE8_HANDLER( aeroboto_videoram_w )
 {
-	aeroboto_state *state = (aeroboto_state *)space->machine->driver_data;
+	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -112,7 +112,7 @@ WRITE8_HANDLER( aeroboto_videoram_w )
 
 WRITE8_HANDLER( aeroboto_tilecolor_w )
 {
-	aeroboto_state *state = (aeroboto_state *)space->machine->driver_data;
+	aeroboto_state *state = space->machine->driver_data<aeroboto_state>();
 
 	if (state->tilecolor[offset] != data)
 	{
@@ -131,7 +131,7 @@ WRITE8_HANDLER( aeroboto_tilecolor_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	aeroboto_state *state = (aeroboto_state *)machine->driver_data;
+	aeroboto_state *state = machine->driver_data<aeroboto_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -156,7 +156,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( aeroboto )
 {
-	aeroboto_state *state = (aeroboto_state *)screen->machine->driver_data;
+	aeroboto_state *state = screen->machine->driver_data<aeroboto_state>();
 
 	static const rectangle splitrect1 = { 0, 255, 0, 39 };
 	static const rectangle splitrect2 = { 0, 255, 40, 255 };

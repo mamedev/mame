@@ -97,7 +97,7 @@ static WRITE8_HANDLER( junofrst_bankselect_w )
 
 static READ8_DEVICE_HANDLER( junofrst_portA_r )
 {
-	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+	timeplt_state *state = device->machine->driver_data<timeplt_state>();
 	int timer;
 
 	/* main xtal 14.318MHz, divided by 8 to get the CPU clock, further */
@@ -114,7 +114,7 @@ static READ8_DEVICE_HANDLER( junofrst_portA_r )
 
 static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 {
-	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+	timeplt_state *state = device->machine->driver_data<timeplt_state>();
 	running_device *filter[3] = { state->filter_0_0, state->filter_0_1, state->filter_0_2 };
 	int i;
 
@@ -135,7 +135,7 @@ static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 
 static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 
 	if (state->last_irq == 0 && data == 1)
 	{
@@ -149,14 +149,14 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 	cpu_set_input_line(state->i8039, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
-	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	timeplt_state *state = space->machine->driver_data<timeplt_state>();
 
 	if ((data & 0x80) == 0)
 		cpu_set_input_line(state->i8039, 0, CLEAR_LINE);
@@ -280,7 +280,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( junofrst )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->i8039 = machine->device("mcu");
@@ -298,7 +298,7 @@ static MACHINE_START( junofrst )
 
 static MACHINE_RESET( junofrst )
 {
-	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	timeplt_state *state = machine->driver_data<timeplt_state>();
 
 	state->i8039_status = 0;
 	state->last_irq = 0;

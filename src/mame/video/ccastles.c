@@ -17,7 +17,7 @@
 
 VIDEO_START( ccastles )
 {
-	ccastles_state *state = (ccastles_state *)machine->driver_data;
+	ccastles_state *state = machine->driver_data<ccastles_state>();
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* get pointers to our PROMs */
@@ -51,7 +51,7 @@ VIDEO_START( ccastles )
 
 WRITE8_HANDLER( ccastles_hscroll_w )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	state->hscroll = data;
 }
@@ -59,14 +59,14 @@ WRITE8_HANDLER( ccastles_hscroll_w )
 
 WRITE8_HANDLER( ccastles_vscroll_w )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 	state->vscroll = data;
 }
 
 
 WRITE8_HANDLER( ccastles_video_control_w )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 	/* only D3 matters */
 	state->video_control[offset] = (data >> 3) & 1;
 }
@@ -81,7 +81,7 @@ WRITE8_HANDLER( ccastles_video_control_w )
 
 WRITE8_HANDLER( ccastles_paletteram_w )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 	int bit0, bit1, bit2;
 	int r, g, b;
 
@@ -122,7 +122,7 @@ WRITE8_HANDLER( ccastles_paletteram_w )
 
 INLINE void ccastles_write_vram( running_machine *machine, UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
 {
-	ccastles_state *state = (ccastles_state *)machine->driver_data;
+	ccastles_state *state = machine->driver_data<ccastles_state>();
 	UINT8 *dest = &state->videoram[addr & 0x7ffe];
 	UINT8 promaddr = 0;
 	UINT8 wpbits;
@@ -169,7 +169,7 @@ INLINE void ccastles_write_vram( running_machine *machine, UINT16 addr, UINT8 da
 
 INLINE void bitmode_autoinc( running_machine *machine )
 {
-	ccastles_state *state = (ccastles_state *)machine->driver_data;
+	ccastles_state *state = machine->driver_data<ccastles_state>();
 
 	/* auto increment in the x-direction if it's enabled */
 	if (!state->video_control[0])	/* /AX */
@@ -214,7 +214,7 @@ WRITE8_HANDLER( ccastles_videoram_w )
 
 READ8_HANDLER( ccastles_bitmode_r )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (state->bitmode_addr[1] << 7) | (state->bitmode_addr[0] >> 1);
@@ -232,7 +232,7 @@ READ8_HANDLER( ccastles_bitmode_r )
 
 WRITE8_HANDLER( ccastles_bitmode_w )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (state->bitmode_addr[1] << 7) | (state->bitmode_addr[0] >> 1);
@@ -250,7 +250,7 @@ WRITE8_HANDLER( ccastles_bitmode_w )
 
 WRITE8_HANDLER( ccastles_bitmode_addr_w )
 {
-	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
 
 	/* write through to video RAM and also to the addressing latches */
 	ccastles_write_vram(space->machine, offset, data, 0, 0);
@@ -267,7 +267,7 @@ WRITE8_HANDLER( ccastles_bitmode_addr_w )
 
 VIDEO_UPDATE( ccastles )
 {
-	ccastles_state *state = (ccastles_state *)screen->machine->driver_data;
+	ccastles_state *state = screen->machine->driver_data<ccastles_state>();
 	UINT8 *spriteaddr = &state->spriteram[state->video_control[7] * 0x100];	/* BUF1/BUF2 */
 	int flip = state->video_control[4] ? 0xff : 0x00;	/* PLAYER2 */
 	pen_t black = get_black_pen(screen->machine);

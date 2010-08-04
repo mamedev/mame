@@ -64,7 +64,7 @@ WRITE16_HANDLER( lockon_crtc_w )
 
 static TIMER_CALLBACK( cursor_callback )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 
 	if (state->main_inten)
 		cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
@@ -134,14 +134,14 @@ PALETTE_INIT( lockon )
 
 WRITE16_HANDLER( lockon_char_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	state->char_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->tilemap, offset);
 }
 
 static TILE_GET_INFO( get_lockon_tile_info )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 	UINT32 tileno = state->char_ram[tile_index] & 0x03ff;
 	UINT32 col = (state->char_ram[tile_index] >> 10) & 0x3f;
 
@@ -158,19 +158,19 @@ static TILE_GET_INFO( get_lockon_tile_info )
 
 WRITE16_HANDLER( lockon_scene_h_scr_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	state->scroll_h = data & 0x1ff;
 }
 
 WRITE16_HANDLER( lockon_scene_v_scr_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	state->scroll_v = data & 0x81ff;
 }
 
 static void scene_draw( running_machine *machine )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 	UINT32 y;
 
 	/* 3bpp characters */
@@ -281,13 +281,13 @@ static void scene_draw( running_machine *machine )
 
 WRITE16_HANDLER( lockon_ground_ctrl_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	state->ground_ctrl = data & 0xff;
 }
 
 static TIMER_CALLBACK( bufend_callback )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 	cpu_set_input_line_and_vector(state->ground, 0, HOLD_LINE, 0xff);
 	cpu_set_input_line(state->object, NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
@@ -308,7 +308,7 @@ static TIMER_CALLBACK( bufend_callback )
 
 static void ground_draw( running_machine *machine )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 
 	/* ROM pointers */
 	const UINT8 *const gfx_rom  = memory_region(machine, "gfx4");
@@ -436,7 +436,7 @@ do {                                                     \
 static void objects_draw( running_machine *machine )
 {
 	UINT32 offs;
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 
 	const UINT8  *const romlut = memory_region(machine, "user1");
 	const UINT16 *const chklut = (UINT16*)memory_region(machine, "user2");
@@ -610,7 +610,7 @@ static void objects_draw( running_machine *machine )
 /* The mechanism used by the object CPU to update the object ASICs palette RAM */
 WRITE16_HANDLER( lockon_tza112_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 
 	if (state->iden)
 	{
@@ -622,7 +622,7 @@ WRITE16_HANDLER( lockon_tza112_w )
 
 READ16_HANDLER( lockon_obj_4000_r )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 
 	cpu_set_input_line(state->object, NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
@@ -630,7 +630,7 @@ READ16_HANDLER( lockon_obj_4000_r )
 
 WRITE16_HANDLER( lockon_obj_4000_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	state->iden = data & 1;
 }
 
@@ -668,7 +668,7 @@ WRITE16_HANDLER( lockon_fb_clut_w )
 /* Rotation control register */
 WRITE16_HANDLER( lockon_rotate_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 
 	switch (offset & 7)
 	{
@@ -700,7 +700,7 @@ do {                                     \
 
 static void rotate_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 	UINT32 y;
 
 	/* Counters */
@@ -805,7 +805,7 @@ static void rotate_draw( running_machine *machine, bitmap_t *bitmap, const recta
 
 static void hud_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 	UINT8	*tile_rom = memory_region(machine, "gfx3");
 	UINT32 offs;
 
@@ -905,7 +905,7 @@ static void hud_draw( running_machine *machine, bitmap_t *bitmap, const rectangl
 
 VIDEO_START( lockon )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 
 	state->tilemap = tilemap_create(machine, get_lockon_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_transparent_pen(state->tilemap, 0);
@@ -931,7 +931,7 @@ VIDEO_START( lockon )
 
 VIDEO_UPDATE( lockon )
 {
-	lockon_state *state = (lockon_state *)screen->machine->driver_data;
+	lockon_state *state = screen->machine->driver_data<lockon_state>();
 
 	/* If screen output is disabled, fill with black */
 	if (!BIT(state->ctrl_reg, 7))
@@ -954,7 +954,7 @@ VIDEO_UPDATE( lockon )
 
 VIDEO_EOF( lockon )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 
 	/* Swap the frame buffers */
 	bitmap_t *tmp = state->front_buffer;

@@ -88,7 +88,7 @@ static READ16_HANDLER(fake_4a00a_r)
 
 static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->soundlatch_status = 1;
@@ -121,20 +121,20 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( adpcm_w )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 	state->adpcm_byte = data;
 }
 
 static READ8_HANDLER( sound_latch_r )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 	state->soundlatch_status = 0;
 	return soundlatch_r(space, 0);
 }
 
 static READ8_HANDLER( sound_latch_status_r )
 {
-	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	ashnojoe_state *state = space->machine->driver_data<ashnojoe_state>();
 	return state->soundlatch_status;
 }
 
@@ -276,7 +276,7 @@ GFXDECODE_END
 
 static void ym2203_irq_handler( running_device *device, int irq )
 {
-	ashnojoe_state *state = (ashnojoe_state *)device->machine->driver_data;
+	ashnojoe_state *state = device->machine->driver_data<ashnojoe_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -309,7 +309,7 @@ static const ym2203_interface ym2203_config =
 
 static void ashnojoe_vclk_cb( running_device *device )
 {
-	ashnojoe_state *state = (ashnojoe_state *)device->machine->driver_data;
+	ashnojoe_state *state = device->machine->driver_data<ashnojoe_state>();
 	if (state->msm5205_vclk_toggle == 0)
 	{
 		msm5205_data_w(device, state->adpcm_byte >> 4);
@@ -332,7 +332,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( ashnojoe )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -343,7 +343,7 @@ static MACHINE_START( ashnojoe )
 
 static MACHINE_RESET( ashnojoe )
 {
-	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	ashnojoe_state *state = machine->driver_data<ashnojoe_state>();
 
 	state->adpcm_byte = 0;
 	state->soundlatch_status = 0;

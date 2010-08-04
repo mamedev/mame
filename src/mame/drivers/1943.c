@@ -249,7 +249,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( 1943 )
 {
-	_1943_state *state = (_1943_state *)machine->driver_data;
+	_1943_state *state = machine->driver_data<_1943_state>();
 
 	state->char_on = 0;
 	state->obj_on = 0;

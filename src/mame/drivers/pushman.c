@@ -49,7 +49,7 @@ static WRITE16_HANDLER( pushman_control_w )
 
 static READ16_HANDLER( pushman_68705_r )
 {
-	pushman_state *state = (pushman_state *)space->machine->driver_data;
+	pushman_state *state = space->machine->driver_data<pushman_state>();
 
 	if (offset == 0)
 		return state->latch;
@@ -67,7 +67,7 @@ static READ16_HANDLER( pushman_68705_r )
 
 static WRITE16_HANDLER( pushman_68705_w )
 {
-	pushman_state *state = (pushman_state *)space->machine->driver_data;
+	pushman_state *state = space->machine->driver_data<pushman_state>();
 
 	if (ACCESSING_BITS_8_15)
 		state->shared_ram[2 * offset] = data >> 8;
@@ -85,7 +85,7 @@ static WRITE16_HANDLER( pushman_68705_w )
 /* ElSemi - Bouncing balls protection. */
 static READ16_HANDLER( bballs_68705_r )
 {
-	pushman_state *state = (pushman_state *)space->machine->driver_data;
+	pushman_state *state = space->machine->driver_data<pushman_state>();
 
 	if (offset == 0)
 		return state->latch;
@@ -102,7 +102,7 @@ static READ16_HANDLER( bballs_68705_r )
 
 static WRITE16_HANDLER( bballs_68705_w )
 {
-	pushman_state *state = (pushman_state *)space->machine->driver_data;
+	pushman_state *state = space->machine->driver_data<pushman_state>();
 
 	if (ACCESSING_BITS_8_15)
 		state->shared_ram[2 * offset] = data >> 8;
@@ -131,13 +131,13 @@ static WRITE16_HANDLER( bballs_68705_w )
 
 static READ8_HANDLER( pushman_68000_r )
 {
-	pushman_state *state = (pushman_state *)space->machine->driver_data;
+	pushman_state *state = space->machine->driver_data<pushman_state>();
 	return state->shared_ram[offset];
 }
 
 static WRITE8_HANDLER( pushman_68000_w )
 {
-	pushman_state *state = (pushman_state *)space->machine->driver_data;
+	pushman_state *state = space->machine->driver_data<pushman_state>();
 
 	if (offset == 2 && (state->shared_ram[2] & 2) == 0 && data & 2)
 	{
@@ -403,7 +403,7 @@ GFXDECODE_END
 
 static void irqhandler(running_device *device, int irq)
 {
-	pushman_state *state = (pushman_state *)device->machine->driver_data;
+	pushman_state *state = device->machine->driver_data<pushman_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -420,7 +420,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( pushman )
 {
-	pushman_state *state = (pushman_state *)machine->driver_data;
+	pushman_state *state = machine->driver_data<pushman_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -434,7 +434,7 @@ static MACHINE_START( pushman )
 
 static MACHINE_RESET( pushman )
 {
-	pushman_state *state = (pushman_state *)machine->driver_data;
+	pushman_state *state = machine->driver_data<pushman_state>();
 
 	state->latch = 0;
 	state->new_latch = 0;
@@ -494,7 +494,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( bballs )
 {
-	pushman_state *state = (pushman_state *)machine->driver_data;
+	pushman_state *state = machine->driver_data<pushman_state>();
 
 	MACHINE_RESET_CALL(pushman);
 

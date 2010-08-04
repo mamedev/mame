@@ -17,12 +17,13 @@ struct taitoair_poly {
 };
 
 
-class taitoair_state
+class taitoair_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitoair_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitoair_state(machine)); }
 
-	taitoair_state(running_machine &machine) { }
+	taitoair_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *      m68000_mainram;

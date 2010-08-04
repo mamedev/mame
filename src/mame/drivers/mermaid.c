@@ -122,14 +122,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 static WRITE8_HANDLER( mermaid_ay8910_write_port_w )
 {
-	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	mermaid_state *state = space->machine->driver_data<mermaid_state>();
 	if (state->ay8910_enable[0]) ay8910_data_w(state->ay1, offset, data);
 	if (state->ay8910_enable[1]) ay8910_data_w(state->ay2, offset, data);
 }
 
 static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 {
-	mermaid_state *state = (mermaid_state *)space->machine->driver_data;
+	mermaid_state *state = space->machine->driver_data<mermaid_state>();
 	if (state->ay8910_enable[0]) ay8910_address_w(state->ay1, offset, data);
 	if (state->ay8910_enable[1]) ay8910_address_w(state->ay2, offset, data);
 }
@@ -328,7 +328,7 @@ GFXDECODE_END
 
 static MACHINE_START( mermaid )
 {
-	mermaid_state *state = (mermaid_state *)machine->driver_data;
+	mermaid_state *state = machine->driver_data<mermaid_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->ay1 = machine->device("ay1");
@@ -345,7 +345,7 @@ static MACHINE_START( mermaid )
 
 static MACHINE_RESET( mermaid )
 {
-	mermaid_state *state = (mermaid_state *)machine->driver_data;
+	mermaid_state *state = machine->driver_data<mermaid_state>();
 
 	state->coll_bit0 = 0;
 	state->coll_bit1 = 0;

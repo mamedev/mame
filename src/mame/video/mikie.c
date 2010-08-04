@@ -89,7 +89,7 @@ PALETTE_INIT( mikie )
 
 WRITE8_HANDLER( mikie_videoram_w )
 {
-	mikie_state *state = (mikie_state *)space->machine->driver_data;
+	mikie_state *state = space->machine->driver_data<mikie_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -97,7 +97,7 @@ WRITE8_HANDLER( mikie_videoram_w )
 
 WRITE8_HANDLER( mikie_colorram_w )
 {
-	mikie_state *state = (mikie_state *)space->machine->driver_data;
+	mikie_state *state = space->machine->driver_data<mikie_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -105,7 +105,7 @@ WRITE8_HANDLER( mikie_colorram_w )
 
 WRITE8_HANDLER( mikie_palettebank_w )
 {
-	mikie_state *state = (mikie_state *)space->machine->driver_data;
+	mikie_state *state = space->machine->driver_data<mikie_state>();
 
 	if (state->palettebank != (data & 0x07))
 	{
@@ -125,7 +125,7 @@ WRITE8_HANDLER( mikie_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mikie_state *state = (mikie_state *)machine->driver_data;
+	mikie_state *state = machine->driver_data<mikie_state>();
 	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x20) << 3);
 	int color = (state->colorram[tile_index] & 0x0f) + 16 * state->palettebank;
 	int flags = ((state->colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((state->colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
@@ -141,13 +141,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( mikie )
 {
-	mikie_state *state = (mikie_state *)machine->driver_data;
+	mikie_state *state = machine->driver_data<mikie_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mikie_state *state = (mikie_state *)machine->driver_data;
+	mikie_state *state = machine->driver_data<mikie_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -177,7 +177,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( mikie )
 {
-	mikie_state *state = (mikie_state *)screen->machine->driver_data;
+	mikie_state *state = screen->machine->driver_data<mikie_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_CATEGORY(0), 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_CATEGORY(1), 0);

@@ -28,7 +28,7 @@ TODO:
 
 static WRITE16_HANDLER( soundcommand_w )
 {
-	galspnbl_state *state = (galspnbl_state *)space->machine->driver_data;
+	galspnbl_state *state = space->machine->driver_data<galspnbl_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -190,7 +190,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int linestate )
 {
-	galspnbl_state *state = (galspnbl_state *)device->machine->driver_data;
+	galspnbl_state *state = device->machine->driver_data<galspnbl_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate);
 }
 
@@ -202,7 +202,7 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( galspnbl )
 {
-	galspnbl_state *state = (galspnbl_state *)machine->driver_data;
+	galspnbl_state *state = machine->driver_data<galspnbl_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 }

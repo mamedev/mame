@@ -212,7 +212,7 @@ static WRITE8_HANDLER( control2_w )
 	/* bit 4 bankswitches the 4800-4fff region: 0 = registers, 1 = RAM ("CBNK" on schematics) */
 	/* bit 6 is "SHD0" (some kind of shadow control) */
 	/* bit 7 is "SHD1" (ditto) */
-	lethal_state *state = (lethal_state *)space->machine->driver_data;
+	lethal_state *state = space->machine->driver_data<lethal_state>();
 
 	state->cur_control2 = data;
 
@@ -221,7 +221,7 @@ static WRITE8_HANDLER( control2_w )
 
 static INTERRUPT_GEN(lethalen_interrupt)
 {
-	lethal_state *state = (lethal_state *)device->machine->driver_data;
+	lethal_state *state = device->machine->driver_data<lethal_state>();
 
 	if (k056832_is_irq_enabled(state->k056832, 0))
 		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
@@ -234,7 +234,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	lethal_state *state = (lethal_state *)space->machine->driver_data;
+	lethal_state *state = space->machine->driver_data<lethal_state>();
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -245,7 +245,7 @@ static READ8_HANDLER( sound_status_r )
 
 static void sound_nmi( running_device *device )
 {
-	lethal_state *state = (lethal_state *)device->machine->driver_data;
+	lethal_state *state = device->machine->driver_data<lethal_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -256,7 +256,7 @@ static WRITE8_HANDLER( le_bankswitch_w )
 
 static READ8_HANDLER( le_4800_r )
 {
-	lethal_state *state = (lethal_state *)space->machine->driver_data;
+	lethal_state *state = space->machine->driver_data<lethal_state>();
 
 	if (state->cur_control2 & 0x10)	// RAM enable
 	{
@@ -332,7 +332,7 @@ static READ8_HANDLER( le_4800_r )
 
 static WRITE8_HANDLER( le_4800_w )
 {
-	lethal_state *state = (lethal_state *)space->machine->driver_data;
+	lethal_state *state = space->machine->driver_data<lethal_state>();
 
 	if (state->cur_control2 & 0x10)	// RAM enable
 	{
@@ -579,7 +579,7 @@ static const k054539_interface k054539_config =
 
 static MACHINE_START( lethalen )
 {
-	lethal_state *state = (lethal_state *)machine->driver_data;
+	lethal_state *state = machine->driver_data<lethal_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_configure_bank(machine, "bank1", 0, 0x20, &ROM[0x10000], 0x2000);
@@ -603,7 +603,7 @@ static MACHINE_START( lethalen )
 
 static MACHINE_RESET( lethalen )
 {
-	lethal_state *state = (lethal_state *)machine->driver_data;
+	lethal_state *state = machine->driver_data<lethal_state>();
 	UINT8 *prgrom = (UINT8 *)memory_region(machine, "maincpu");
 	int i;
 

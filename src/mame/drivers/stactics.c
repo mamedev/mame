@@ -55,7 +55,7 @@ Verify Color PROM resistor values (Last 8 colors)
 
 static CUSTOM_INPUT( get_motor_not_ready )
 {
-	stactics_state *state = (stactics_state *)field->port->machine->driver_data;
+	stactics_state *state = field->port->machine->driver_data<stactics_state>();
 
 	/* if the motor is self-centering, but not centered yet */
     return ((*state->motor_on & 0x01) == 0) &&
@@ -65,7 +65,7 @@ static CUSTOM_INPUT( get_motor_not_ready )
 
 static READ8_HANDLER( vert_pos_r )
 {
-	stactics_state *state = (stactics_state *)space->machine->driver_data;
+	stactics_state *state = space->machine->driver_data<stactics_state>();
 
     return 0x70 - state->vert_pos;
 }
@@ -73,7 +73,7 @@ static READ8_HANDLER( vert_pos_r )
 
 static READ8_HANDLER( horiz_pos_r )
 {
-	stactics_state *state = (stactics_state *)space->machine->driver_data;
+	stactics_state *state = space->machine->driver_data<stactics_state>();
 
     return state->horiz_pos + 0x88;
 }
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( stactics_coin_lockout_w )
 
 static INTERRUPT_GEN( stactics_interrupt )
 {
-	stactics_state *state = (stactics_state *)device->machine->driver_data;
+	stactics_state *state = device->machine->driver_data<stactics_state>();
 
 	move_motor(device->machine, state);
 
@@ -287,7 +287,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( stactics )
 {
-	stactics_state *state = (stactics_state *)machine->driver_data;
+	stactics_state *state = machine->driver_data<stactics_state>();
 
 	state->vert_pos = 0;
 	state->horiz_pos = 0;

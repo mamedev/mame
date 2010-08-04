@@ -60,9 +60,12 @@ struct _atarigen_screen_timer
 };
 
 
-typedef struct _atarigen_state atarigen_state;
-struct _atarigen_state
+class atarigen_state : public driver_data_t
 {
+public:
+	atarigen_state(running_machine &machine)
+		: driver_data_t(machine) { }
+
 	UINT8				scanline_int_state;
 	UINT8				sound_int_state;
 	UINT8				video_int_state;

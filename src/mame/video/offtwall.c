@@ -17,9 +17,9 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	offtwall_state *state = (offtwall_state *)machine->driver_data;
-	UINT16 data1 = state->atarigen.playfield[tile_index];
-	UINT16 data2 = state->atarigen.playfield_upper[tile_index] >> 8;
+	offtwall_state *state = machine->driver_data<offtwall_state>();
+	UINT16 data1 = state->playfield[tile_index];
+	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
@@ -71,10 +71,10 @@ VIDEO_START( offtwall )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	offtwall_state *state = (offtwall_state *)machine->driver_data;
+	offtwall_state *state = machine->driver_data<offtwall_state>();
 
 	/* initialize the playfield */
-	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -90,13 +90,13 @@ VIDEO_START( offtwall )
 
 VIDEO_UPDATE( offtwall )
 {
-	offtwall_state *state = (offtwall_state *)screen->machine->driver_data;
+	offtwall_state *state = screen->machine->driver_data<offtwall_state>();
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

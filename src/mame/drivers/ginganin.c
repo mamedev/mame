@@ -89,7 +89,7 @@ static WRITE8_HANDLER( MC6840_control_port_0_w )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	ginganin_state *state = space->machine->driver_data<ginganin_state>();
 	state->MC6840_index0 = data;
 
 	if (state->MC6840_index0 & 0x80)	/* enable timer output */
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( MC6840_control_port_1_w )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	ginganin_state *state = space->machine->driver_data<ginganin_state>();
 	state->MC6840_index1 = data;
 }
 
@@ -125,7 +125,7 @@ static WRITE8_HANDLER( MC6840_write_port_0_w )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	ginganin_state *state = space->machine->driver_data<ginganin_state>();
 	state->MC6840_register0 = data;
 }
 
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( MC6840_write_port_1_w )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	ginganin_state *state = space->machine->driver_data<ginganin_state>();
 	state->MC6840_register1 = data;
 }
 
@@ -278,7 +278,7 @@ static INTERRUPT_GEN( ginganin_sound_interrupt )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	ginganin_state *state = (ginganin_state *)device->machine->driver_data;
+	ginganin_state *state = device->machine->driver_data<ginganin_state>();
 
 	if (state->S_TEMPO_OLD != state->S_TEMPO)
 	{
@@ -304,7 +304,7 @@ static INTERRUPT_GEN( ginganin_sound_interrupt )
 
 static MACHINE_START( ginganin )
 {
-	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	ginganin_state *state = machine->driver_data<ginganin_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -322,7 +322,7 @@ static MACHINE_START( ginganin )
 
 static MACHINE_RESET( ginganin )
 {
-	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	ginganin_state *state = machine->driver_data<ginganin_state>();
 
 	state->layers_ctrl = 0;
 	state->flipscreen = 0;

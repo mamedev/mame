@@ -4,7 +4,7 @@
 
 void xexex_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 	int pri;
 
 	// Xexex doesn't seem to use bit8 and 9 as effect selectors so this should be safe.
@@ -27,13 +27,13 @@ void xexex_sprite_callback( running_machine *machine, int *code, int *color, int
 
 void xexex_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 	*color = state->layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
 VIDEO_START( xexex )
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 
 	assert(machine->primary_screen->format() == BITMAP_FORMAT_RGB32);
 
@@ -49,7 +49,7 @@ VIDEO_START( xexex )
 VIDEO_UPDATE( xexex )
 {
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
-	xexex_state *state = (xexex_state *)screen->machine->driver_data;
+	xexex_state *state = screen->machine->driver_data<xexex_state>();
 	int layer[4];
 	int bg_colorbase, new_colorbase, plane, alpha;
 

@@ -66,7 +66,7 @@ static const eeprom_interface eeprom_intf =
 
 static READ16_HANDLER( rng_sysregs_r )
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 	UINT16 data = 0;
 
 	switch (offset)
@@ -110,7 +110,7 @@ static READ16_HANDLER( rng_sysregs_r )
 
 static WRITE16_HANDLER( rng_sysregs_w )
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 
 	COMBINE_DATA(state->sysreg + offset);
 
@@ -158,7 +158,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 
 	if (ACCESSING_BITS_8_15)
 		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
@@ -166,7 +166,7 @@ static WRITE16_HANDLER( sound_irq_w )
 
 static READ16_HANDLER( sound_status_msb_r )
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 
 	if (ACCESSING_BITS_8_15)
 		return(state->sound_status << 8);
@@ -176,7 +176,7 @@ static READ16_HANDLER( sound_status_msb_r )
 
 static INTERRUPT_GEN(rng_interrupt)
 {
-	rungun_state *state = (rungun_state *)device->machine->driver_data;
+	rungun_state *state = device->machine->driver_data<rungun_state>();
 
 	if (state->sysreg[0x0c / 2] & 0x09)
 		cpu_set_input_line(device, M68K_IRQ_5, ASSERT_LINE);
@@ -215,13 +215,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_status_w )
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 	state->sound_status = data;
 }
 
 static WRITE8_HANDLER( z80ctrl_w )
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 
 	state->z80_control = data;
 
@@ -233,7 +233,7 @@ static WRITE8_HANDLER( z80ctrl_w )
 
 static INTERRUPT_GEN(audio_interrupt)
 {
-	rungun_state *state = (rungun_state *)device->machine->driver_data;
+	rungun_state *state = device->machine->driver_data<rungun_state>();
 
 	if (state->z80_control & 0x80)
 		return;
@@ -361,7 +361,7 @@ static const k053247_interface rng_k055673_intf =
 
 static MACHINE_START( rng )
 {
-	rungun_state *state = (rungun_state *)machine->driver_data;
+	rungun_state *state = machine->driver_data<rungun_state>();
 	UINT8 *ROM = memory_region(machine, "soundcpu");
 
 	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
@@ -382,7 +382,7 @@ static MACHINE_START( rng )
 
 static MACHINE_RESET( rng )
 {
-	rungun_state *state = (rungun_state *)machine->driver_data;
+	rungun_state *state = machine->driver_data<rungun_state>();
 
 	k054539_init_flags(machine->device("k054539_1"), K054539_REVERSE_STEREO);
 

@@ -56,13 +56,13 @@ Sound :
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	_4enraya_state *state = (_4enraya_state *)space->machine->driver_data;
+	_4enraya_state *state = space->machine->driver_data<_4enraya_state>();
 	state->soundlatch = data;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
-	_4enraya_state *state = (_4enraya_state *)device->machine->driver_data;
+	_4enraya_state *state = device->machine->driver_data<_4enraya_state>();
 
 	if ((state->last_snd_ctrl & 0x04) == 0x04 && (data & 0x4) == 0x00)
 		ay8910_data_address_w(device, state->last_snd_ctrl, state->soundlatch);
@@ -149,7 +149,7 @@ GFXDECODE_END
 
 static MACHINE_START( 4enraya )
 {
-	_4enraya_state *state = (_4enraya_state *)machine->driver_data;
+	_4enraya_state *state = machine->driver_data<_4enraya_state>();
 
 	state_save_register_global(machine, state->soundlatch);
 	state_save_register_global(machine, state->last_snd_ctrl);
@@ -157,7 +157,7 @@ static MACHINE_START( 4enraya )
 
 static MACHINE_RESET( 4enraya )
 {
-	_4enraya_state *state = (_4enraya_state *)machine->driver_data;
+	_4enraya_state *state = machine->driver_data<_4enraya_state>();
 
 	state->soundlatch = 0;
 	state->last_snd_ctrl = 0;

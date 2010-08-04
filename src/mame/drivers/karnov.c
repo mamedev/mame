@@ -54,7 +54,7 @@
 /* Emulation of the protected microcontroller - for coins & general protection */
 static void karnov_i8751_w( running_machine *machine, int data )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 
 	/* Pending coin operations may cause protection commands to be queued */
 	if (state->i8751_needs_ack)
@@ -93,7 +93,7 @@ static void karnov_i8751_w( running_machine *machine, int data )
 
 static void wndrplnt_i8751_w( running_machine *machine, int data )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 
 	/* The last command hasn't been ACK'd (probably a conflict with coin command) */
 	if (state->i8751_needs_ack)
@@ -153,7 +153,7 @@ static void wndrplnt_i8751_w( running_machine *machine, int data )
 
 static void chelnov_i8751_w( running_machine *machine, int data )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 
 	/* Pending coin operations may cause protection commands to be queued */
 	if (state->i8751_needs_ack)
@@ -291,7 +291,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 
 static WRITE16_HANDLER( karnov_control_w )
 {
-	karnov_state *state = (karnov_state *)space->machine->driver_data;
+	karnov_state *state = space->machine->driver_data<karnov_state>();
 
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset << 1)
@@ -365,7 +365,7 @@ static WRITE16_HANDLER( karnov_control_w )
 
 static READ16_HANDLER( karnov_control_r )
 {
-	karnov_state *state = (karnov_state *)space->machine->driver_data;
+	karnov_state *state = space->machine->driver_data<karnov_state>();
 
 	switch (offset << 1)
 	{
@@ -717,7 +717,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( karnov_interrupt )
 {
-	karnov_state *state = (karnov_state *)device->machine->driver_data;
+	karnov_state *state = device->machine->driver_data<karnov_state>();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (input_port_read(device->machine, "FAKE") == state->coin_mask)
@@ -745,7 +745,7 @@ static INTERRUPT_GEN( karnov_interrupt )
 
 static void sound_irq( running_device *device, int linestate )
 {
-	karnov_state *state = (karnov_state *)device->machine->driver_data;
+	karnov_state *state = device->machine->driver_data<karnov_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
 }
 
@@ -762,7 +762,7 @@ static const ym3526_interface ym3526_config =
 
 static MACHINE_START( karnov )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -781,7 +781,7 @@ static MACHINE_START( karnov )
 
 static MACHINE_RESET( karnov )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 
 	memset(state->ram, 0, 0x4000 / 2); /* Chelnov likes ram clear on reset.. */
 
@@ -1110,28 +1110,28 @@ ROM_END
 
 static DRIVER_INIT( karnov )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	state->microcontroller_id = KARNOV;
 	state->coin_mask = 0;
 }
 
 static DRIVER_INIT( karnovj )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	state->microcontroller_id = KARNOVJ;
 	state->coin_mask = 0;
 }
 
 static DRIVER_INIT( wndrplnt )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	state->microcontroller_id = WNDRPLNT;
 	state->coin_mask = 0;
 }
 
 static DRIVER_INIT( chelnov )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 
 	state->microcontroller_id = CHELNOV;
@@ -1142,7 +1142,7 @@ static DRIVER_INIT( chelnov )
 
 static DRIVER_INIT( chelnovw )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 
 	state->microcontroller_id = CHELNOVW;
@@ -1153,7 +1153,7 @@ static DRIVER_INIT( chelnovw )
 
 static DRIVER_INIT( chelnovj )
 {
-	karnov_state *state = (karnov_state *)machine->driver_data;
+	karnov_state *state = machine->driver_data<karnov_state>();
 	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 
 	state->microcontroller_id = CHELNOVJ;

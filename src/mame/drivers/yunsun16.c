@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( magicbub_sound_command_w )
 {
-	yunsun16_state *state = (yunsun16_state *)space->machine->driver_data;
+	yunsun16_state *state = space->machine->driver_data<yunsun16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 /*
@@ -557,7 +557,7 @@ GFXDECODE_END
 
 static MACHINE_START( yunsun16 )
 {
-	yunsun16_state *state = (yunsun16_state *)machine->driver_data;
+	yunsun16_state *state = machine->driver_data<yunsun16_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -567,7 +567,7 @@ static MACHINE_START( yunsun16 )
 
 static MACHINE_RESET( yunsun16 )
 {
-	yunsun16_state *state = (yunsun16_state *)machine->driver_data;
+	yunsun16_state *state = machine->driver_data<yunsun16_state>();
 
 	state->sprites_scrolldx = -0x40;
 	state->sprites_scrolldy = -0x0f;
@@ -579,7 +579,7 @@ static MACHINE_RESET( yunsun16 )
 
 static void soundirq(running_device *device, int state)
 {
-	yunsun16_state *yunsun16 = (yunsun16_state *)device->machine->driver_data;
+	yunsun16_state *yunsun16 = device->machine->driver_data<yunsun16_state>();
 	cpu_set_input_line(yunsun16->audiocpu, 0, state);
 }
 

@@ -290,7 +290,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( travrusa )
 {
-	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+	irem_z80_state *state = machine->driver_data<irem_z80_state>();
 
 	state->scrollx[0] = 0;
 	state->scrollx[1] = 0;

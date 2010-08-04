@@ -35,12 +35,13 @@ To do:
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 
-class astrocorp_state
+class astrocorp_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, astrocorp_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, astrocorp_state(machine)); }
 
-	astrocorp_state(running_machine &machine) { }
+	astrocorp_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *   spriteram;
@@ -59,7 +60,7 @@ public:
 
 static VIDEO_START( astrocorp )
 {
-	astrocorp_state *state = (astrocorp_state *)machine->driver_data;
+	astrocorp_state *state = machine->driver_data<astrocorp_state>();
 
 	state->bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
@@ -92,7 +93,7 @@ static VIDEO_START( astrocorp )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	astrocorp_state *state = (astrocorp_state *)machine->driver_data;
+	astrocorp_state *state = machine->driver_data<astrocorp_state>();
 	UINT16 *source = state->spriteram;
 	UINT16 *finish = state->spriteram + state->spriteram_size / 2;
 
@@ -140,7 +141,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static VIDEO_UPDATE(astrocorp)
 {
-	astrocorp_state *state = (astrocorp_state *)screen->machine->driver_data;
+	astrocorp_state *state = screen->machine->driver_data<astrocorp_state>();
 
 	if (state->screen_enable & 1)
 		copybitmap(bitmap, state->bitmap, 0,0,0,0, cliprect);
@@ -157,7 +158,7 @@ static VIDEO_UPDATE(astrocorp)
 
 static WRITE16_HANDLER( astrocorp_draw_sprites_w )
 {
-	astrocorp_state *state = (astrocorp_state *)space->machine->driver_data;
+	astrocorp_state *state = space->machine->driver_data<astrocorp_state>();
 
 	UINT16 old = state->draw_sprites;
 	UINT16 now = COMBINE_DATA(&state->draw_sprites);
@@ -258,7 +259,7 @@ static WRITE16_HANDLER( skilldrp_outputs_w )
 
 static WRITE16_HANDLER( astrocorp_screen_enable_w )
 {
-	astrocorp_state *state = (astrocorp_state *)space->machine->driver_data;
+	astrocorp_state *state = space->machine->driver_data<astrocorp_state>();
 	COMBINE_DATA(&state->screen_enable);
 //  popmessage("%04X",data);
 	if (state->screen_enable & (~1))
@@ -273,7 +274,7 @@ static READ16_HANDLER( astrocorp_unk_r )
 // 5-6-5 Palette: BBBBB-GGGGGG-RRRRR
 static WRITE16_HANDLER( astrocorp_palette_w )
 {
-	astrocorp_state *state = (astrocorp_state *)space->machine->driver_data;
+	astrocorp_state *state = space->machine->driver_data<astrocorp_state>();
 	COMBINE_DATA(&state->paletteram[offset]);
 	palette_set_color_rgb(space->machine, offset,
 		pal5bit((state->paletteram[offset] >>  0) & 0x1f),

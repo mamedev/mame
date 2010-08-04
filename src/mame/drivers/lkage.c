@@ -87,7 +87,7 @@ TODO:
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	lkage_state *state = (lkage_state *)machine->driver_data;
+	lkage_state *state = machine->driver_data<lkage_state>();
 	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -102,13 +102,13 @@ static WRITE8_HANDLER( lkage_sound_command_w )
 
 static WRITE8_HANDLER( lkage_sh_nmi_disable_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
@@ -342,7 +342,7 @@ GFXDECODE_END
 
 static void irqhandler(running_device *device, int irq)
 {
-	lkage_state *state = (lkage_state *)device->machine->driver_data;
+	lkage_state *state = device->machine->driver_data<lkage_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -358,7 +358,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( lkage )
 {
-	lkage_state *state = (lkage_state *)machine->driver_data;
+	lkage_state *state = machine->driver_data<lkage_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -389,7 +389,7 @@ static MACHINE_START( lkage )
 
 static MACHINE_RESET( lkage )
 {
-	lkage_state *state = (lkage_state *)machine->driver_data;
+	lkage_state *state = machine->driver_data<lkage_state>();
 
 	state->bg_tile_bank = state->fg_tile_bank = 0;
 
@@ -674,7 +674,7 @@ ROM_END
 
 static READ8_HANDLER( fake_mcu_r )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	int result = 0;
 
 	switch (state->mcu_val)
@@ -710,13 +710,13 @@ static READ8_HANDLER( fake_mcu_r )
 
 static WRITE8_HANDLER( fake_mcu_w )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	state->mcu_val = data;
 }
 
 static READ8_HANDLER( fake_status_r )
 {
-	lkage_state *state = (lkage_state *)space->machine->driver_data;
+	lkage_state *state = space->machine->driver_data<lkage_state>();
 	return state->mcu_ready;
 }
 

@@ -7,14 +7,14 @@
 #include "machine/atarigen.h"
 
 /* shared with arcadecl hardware */
-class rampart_state
+class rampart_state : public atarigen_state
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, rampart_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, rampart_state(machine)); }
 
-	rampart_state(running_machine &machine) { }
+	rampart_state(running_machine &machine)
+		: atarigen_state(machine) { }
 
-	atarigen_state	atarigen;
 	UINT16 *		bitmap;
 	UINT8			has_mo;
 };

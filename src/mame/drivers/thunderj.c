@@ -33,16 +33,16 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	thunderj_state *state = (thunderj_state *)machine->driver_data;
-	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "extra", 4, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	thunderj_state *state = machine->driver_data<thunderj_state>();
+	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "extra", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static MACHINE_START( thunderj )
 {
-	thunderj_state *state = (thunderj_state *)machine->driver_data;
+	thunderj_state *state = machine->driver_data<thunderj_state>();
 	atarigen_init(machine);
 
 	state_save_register_global(machine, state->alpha_tile_bank);
@@ -51,11 +51,11 @@ static MACHINE_START( thunderj )
 
 static MACHINE_RESET( thunderj )
 {
-	thunderj_state *state = (thunderj_state *)machine->driver_data;
+	thunderj_state *state = machine->driver_data<thunderj_state>();
 
-	atarigen_eeprom_reset(&state->atarigen);
-	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	atarivc_reset(*machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
+	atarigen_eeprom_reset(state);
+	atarigen_interrupt_reset(state, update_interrupts);
+	atarivc_reset(*machine->primary_screen, state->atarivc_eof_data, 2);
 	atarijsa_reset();
 }
 
@@ -69,11 +69,11 @@ static MACHINE_RESET( thunderj )
 
 static READ16_HANDLER( special_port2_r )
 {
-	thunderj_state *state = (thunderj_state *)space->machine->driver_data;
+	thunderj_state *state = space->machine->driver_data<thunderj_state>();
 	int result = input_port_read(space->machine, "260012");
 
-	if (state->atarigen.sound_to_cpu_ready) result ^= 0x0004;
-	if (state->atarigen.cpu_to_sound_ready) result ^= 0x0008;
+	if (state->sound_to_cpu_ready) result ^= 0x0004;
+	if (state->cpu_to_sound_ready) result ^= 0x0008;
 	result ^= 0x0010;
 
 	return result;
@@ -82,7 +82,7 @@ static READ16_HANDLER( special_port2_r )
 
 static WRITE16_HANDLER( latch_w )
 {
-	thunderj_state *state = (thunderj_state *)space->machine->driver_data;
+	thunderj_state *state = space->machine->driver_data<thunderj_state>();
 
 	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)
@@ -97,7 +97,7 @@ static WRITE16_HANDLER( latch_w )
 		if (state->alpha_tile_bank != ((data >> 2) & 7))
 		{
 			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
-			tilemap_mark_all_tiles_dirty(state->atarigen.alpha_tilemap);
+			tilemap_mark_all_tiles_dirty(state->alpha_tilemap);
 			state->alpha_tile_bank = (data >> 2) & 7;
 		}
 	}
@@ -152,7 +152,7 @@ static WRITE16_HANDLER( thunderj_atarivc_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(thunderj_state, atarigen.eeprom, atarigen.eeprom_size)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(thunderj_state, eeprom, eeprom_size)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
@@ -164,13 +164,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360020, 0x360021) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(thunderj_atarivc_r, thunderj_atarivc_w) AM_BASE_MEMBER(thunderj_state, atarigen.atarivc_data)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(thunderj_state, atarigen.playfield2)
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(thunderj_state, atarigen.playfield)
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(thunderj_state, atarigen.playfield_upper)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(thunderj_atarivc_r, thunderj_atarivc_w) AM_BASE_MEMBER(thunderj_state, atarivc_data)
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(thunderj_state, playfield2)
+	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(thunderj_state, playfield)
+	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(thunderj_state, playfield_upper)
 	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
-	AM_RANGE(0x3f8000, 0x3f8eff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(thunderj_state, atarigen.alpha)
-	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_BASE_MEMBER(thunderj_state, atarigen.atarivc_eof_data)
+	AM_RANGE(0x3f8000, 0x3f8eff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(thunderj_state, alpha)
+	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_BASE_MEMBER(thunderj_state, atarivc_eof_data)
 	AM_RANGE(0x3f8f80, 0x3f8fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x3f9000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END

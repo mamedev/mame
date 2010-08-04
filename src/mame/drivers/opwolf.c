@@ -286,13 +286,13 @@ register. So what is controlling priority.
 
 static READ16_HANDLER( cchip_r )
 {
-	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	opwolf_state *state = space->machine->driver_data<opwolf_state>();
 	return state->cchip_ram[offset];
 }
 
 static WRITE16_HANDLER( cchip_w )
 {
-	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	opwolf_state *state = space->machine->driver_data<opwolf_state>();
 	state->cchip_ram[offset] = data &0xff;
 }
 
@@ -317,7 +317,7 @@ static READ16_HANDLER( opwolf_dsw_r )
 
 static READ16_HANDLER( opwolf_lightgun_r )
 {
-	opwolf_state *state = (opwolf_state *)space->machine->driver_data;
+	opwolf_state *state = space->machine->driver_data<opwolf_state>();
 	int scaled;
 
 	switch (offset)
@@ -431,7 +431,7 @@ ADDRESS_MAP_END
 
 static MACHINE_START( opwolf )
 {
-	opwolf_state *state = (opwolf_state *)machine->driver_data;
+	opwolf_state *state = machine->driver_data<opwolf_state>();
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
@@ -451,7 +451,7 @@ static MACHINE_START( opwolf )
 
 static MACHINE_RESET( opwolf )
 {
-	opwolf_state *state = (opwolf_state *)machine->driver_data;
+	opwolf_state *state = machine->driver_data<opwolf_state>();
 
 	state->adpcm_b[0] = state->adpcm_b[1] = 0;
 	state->adpcm_c[0] = state->adpcm_c[1] = 0;
@@ -468,7 +468,7 @@ static MACHINE_RESET( opwolf )
 
 static void opwolf_msm5205_vck( running_device *device )
 {
-	opwolf_state *state = (opwolf_state *)device->machine->driver_data;
+	opwolf_state *state = device->machine->driver_data<opwolf_state>();
 	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (state->adpcm_data[chip] != -1)
 	{
@@ -487,7 +487,7 @@ static void opwolf_msm5205_vck( running_device *device )
 
 static WRITE8_DEVICE_HANDLER( opwolf_adpcm_b_w )
 {
-	opwolf_state *state = (opwolf_state *)device->machine->driver_data;
+	opwolf_state *state = device->machine->driver_data<opwolf_state>();
 	int start;
 	int end;
 
@@ -510,7 +510,7 @@ static WRITE8_DEVICE_HANDLER( opwolf_adpcm_b_w )
 
 static WRITE8_DEVICE_HANDLER( opwolf_adpcm_c_w )
 {
-	opwolf_state *state = (opwolf_state *)device->machine->driver_data;
+	opwolf_state *state = device->machine->driver_data<opwolf_state>();
 	int start;
 	int end;
 
@@ -695,7 +695,7 @@ GFXDECODE_END
 
 static void irq_handler( running_device *device, int irq )
 {
-	opwolf_state *state = (opwolf_state *)device->machine->driver_data;
+	opwolf_state *state = device->machine->driver_data<opwolf_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -991,7 +991,7 @@ ROM_END
 
 static DRIVER_INIT( opwolf )
 {
-	opwolf_state *state = (opwolf_state *)machine->driver_data;
+	opwolf_state *state = machine->driver_data<opwolf_state>();
 	UINT16* rom = (UINT16*)memory_region(machine, "maincpu");
 
 	state->opwolf_region = rom[0x03fffe / 2] & 0xff;
@@ -1008,7 +1008,7 @@ static DRIVER_INIT( opwolf )
 
 static DRIVER_INIT( opwolfb )
 {
-	opwolf_state *state = (opwolf_state *)machine->driver_data;
+	opwolf_state *state = machine->driver_data<opwolf_state>();
 	UINT16* rom = (UINT16*)memory_region(machine, "maincpu");
 
 	state->opwolf_region = rom[0x03fffe / 2] & 0xff;

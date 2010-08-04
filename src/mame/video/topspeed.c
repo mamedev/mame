@@ -28,7 +28,7 @@
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	topspeed_state *state = (topspeed_state *)machine->driver_data;
+	topspeed_state *state = machine->driver_data<topspeed_state>();
 	UINT16 *spriteram = state->spriteram;
 	int offs, map_offset, x, y, curx, cury, sprite_chunk;
 	UINT16 *spritemap = state->spritemap;
@@ -111,7 +111,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( topspeed )
 {
-	topspeed_state *state = (topspeed_state *)screen->machine->driver_data;
+	topspeed_state *state = screen->machine->driver_data<topspeed_state>();
 	UINT8 layer[4];
 
 #ifdef MAME_DEBUG

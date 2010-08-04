@@ -70,7 +70,7 @@ static PALETTE_INIT( fgoal )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	fgoal_state *state = (fgoal_state *)machine->driver_data;
+	fgoal_state *state = machine->driver_data<fgoal_state>();
 	int scanline;
 	int coin = (input_port_read(machine, "IN1") & 2);
 
@@ -92,14 +92,14 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static unsigned video_ram_address( running_machine *machine )
 {
-	fgoal_state *state = (fgoal_state *)machine->driver_data;
+	fgoal_state *state = machine->driver_data<fgoal_state>();
 	return 0x4000 | (state->row << 5) | (state->col >> 3);
 }
 
 
 static READ8_HANDLER( fgoal_analog_r )
 {
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 	return input_port_read(space->machine, state->fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
 }
 
@@ -113,7 +113,7 @@ static CUSTOM_INPUT( fgoal_80_r )
 
 static READ8_HANDLER( fgoal_nmi_reset_r )
 {
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
@@ -122,7 +122,7 @@ static READ8_HANDLER( fgoal_nmi_reset_r )
 
 static READ8_HANDLER( fgoal_irq_reset_r )
 {
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
@@ -131,14 +131,14 @@ static READ8_HANDLER( fgoal_irq_reset_r )
 
 static READ8_HANDLER( fgoal_row_r )
 {
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 	return state->row;
 }
 
 
 static WRITE8_HANDLER( fgoal_row_w )
 {
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 
 	state->row = data;
 	mb14241_shift_data_w(state->mb14241, 0, 0);
@@ -146,7 +146,7 @@ static WRITE8_HANDLER( fgoal_row_w )
 
 static WRITE8_HANDLER( fgoal_col_w )
 {
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 
 	state->col = data;
 	mb14241_shift_count_w(state->mb14241, 0, data);
@@ -164,7 +164,7 @@ static READ8_HANDLER( fgoal_address_lo_r )
 
 static READ8_HANDLER( fgoal_shifter_r )
 {
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 	UINT8 v = mb14241_shift_result_r(state->mb14241, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
@@ -172,7 +172,7 @@ static READ8_HANDLER( fgoal_shifter_r )
 
 static READ8_HANDLER( fgoal_shifter_reverse_r )
 {
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 	UINT8 v = mb14241_shift_result_r(state->mb14241, 0);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( fgoal_sound2_w )
 	/* BIT3 => SX5 */
 	/* BIT4 => SX4 */
 	/* BIT5 => SX3 */
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	fgoal_state *state = space->machine->driver_data<fgoal_state>();
 	state->fgoal_player = data & 1;
 }
 
@@ -338,7 +338,7 @@ GFXDECODE_END
 
 static MACHINE_START( fgoal )
 {
-	fgoal_state *state = (fgoal_state *)machine->driver_data;
+	fgoal_state *state = machine->driver_data<fgoal_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->mb14241 = machine->device("mb14241");
@@ -354,7 +354,7 @@ static MACHINE_START( fgoal )
 
 static MACHINE_RESET( fgoal )
 {
-	fgoal_state *state = (fgoal_state *)machine->driver_data;
+	fgoal_state *state = machine->driver_data<fgoal_state>();
 
 	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, interrupt_callback);
 

@@ -2,13 +2,14 @@
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
 
-class gcpinbal_state
+class gcpinbal_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gcpinbal_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gcpinbal_state(machine)); }
 
 	gcpinbal_state(running_machine &machine)
-		: maincpu(machine.device<cpu_device>("maincpu")),
+		: driver_data_t(machine),
+		  maincpu(machine.device<cpu_device>("maincpu")),
 		  oki(machine.device<okim6295_device>("oki")),
 		  msm(machine.device<msm5205_sound_device>("msm")) { }
 

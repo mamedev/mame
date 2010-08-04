@@ -232,7 +232,7 @@ static READ16_HANDLER( kyros_dip_r )
 
 static READ16_HANDLER( control_1_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 
 	if (state->invert_controls)
 		return ~(input_port_read(space->machine, "IN0") + (input_port_read(space->machine, "IN1") << 8));
@@ -242,7 +242,7 @@ static READ16_HANDLER( control_1_r )
 
 static READ16_HANDLER( control_2_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 
 	if (state->invert_controls)
 		return ~(input_port_read(space->machine, "IN3") + ((~(1 << input_port_read(space->machine, "IN5"))) << 8));
@@ -258,7 +258,7 @@ static READ16_HANDLER( control_2_V_r )
 
 static READ16_HANDLER( control_3_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 
 	if (state->invert_controls)
 		return ~(((~(1 << input_port_read(space->machine, "IN6"))) << 8) & 0xff00);
@@ -269,7 +269,7 @@ static READ16_HANDLER( control_3_r )
 /* High 4 bits of CN1 & CN2 */
 static READ16_HANDLER( control_4_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 
 	if (state->invert_controls)
 		return ~((((~(1 << input_port_read(space->machine, "IN6"))) << 4) & 0xf000)
@@ -313,7 +313,7 @@ static WRITE16_HANDLER( alpha68k_V_sound_w )
 //AT
 static WRITE16_HANDLER( paddlema_soundlatch_w )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -324,7 +324,7 @@ static WRITE16_HANDLER( paddlema_soundlatch_w )
 
 static WRITE16_HANDLER( tnextspc_soundlatch_w )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -343,7 +343,7 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
     */
 	static const UINT8 coinage1[8][2]={{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const UINT8 coinage2[8][2]={{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int source = state->shared_ram[offset];
 
 	switch (offset)
@@ -425,7 +425,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
     */
 	static const UINT8 coinage1[8][2] = {{1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {2,3}, {3,2}};
 	static const UINT8 coinage2[8][2] = {{1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}};
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int source = state->shared_ram[offset];
 
 	switch (offset)
@@ -520,7 +520,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
     */
 	static const UINT8 coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const UINT8 coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int source = state->shared_ram[offset];
 
 	switch (offset)
@@ -1829,7 +1829,7 @@ static const ym2203_interface ym2203_config =
 
 static void YM3812_irq( running_device *device, int param )
 {
-	alpha68k_state *state = (alpha68k_state *)device->machine->driver_data;
+	alpha68k_state *state = device->machine->driver_data<alpha68k_state>();
 	cpu_set_input_line(state->audiocpu, 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
@@ -1852,7 +1852,7 @@ static INTERRUPT_GEN( alpha68k_interrupt )
 
 static MACHINE_START( common )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -1868,7 +1868,7 @@ static MACHINE_START( common )
 
 static MACHINE_RESET( common )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 
 	state->trigstate = 0;
 	state->deposits1 = 0;
@@ -1882,7 +1882,7 @@ static MACHINE_RESET( common )
 
 static MACHINE_START( alpha68k_V )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank7", 0, 32, &ROM[0x10000], 0x4000);
@@ -1895,7 +1895,7 @@ static MACHINE_START( alpha68k_V )
 
 static MACHINE_RESET( alpha68k_V )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -1905,7 +1905,7 @@ static MACHINE_RESET( alpha68k_V )
 
 static MACHINE_RESET( alpha68k_II )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 
 	MACHINE_RESET_CALL(common);
 
@@ -1918,7 +1918,7 @@ static MACHINE_RESET( alpha68k_II )
 
 static MACHINE_START( alpha68k_II )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank7", 0, 28, &ROM[0x10000], 0x4000);
@@ -3130,7 +3130,7 @@ ROM_END
 
 static READ16_HANDLER( timesold_cycle_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int ret = state->shared_ram[0x4];
 
 	if (cpu_get_pc(space->cpu) == 0x9ea2 && (ret & 0xff00) == 0)
@@ -3144,7 +3144,7 @@ static READ16_HANDLER( timesold_cycle_r )
 
 static READ16_HANDLER( timesold1_cycle_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int ret = state->shared_ram[0x4];
 
 	if (cpu_get_pc(space->cpu) == 0x9e20 && (ret & 0xff00) == 0)
@@ -3158,7 +3158,7 @@ static READ16_HANDLER( timesold1_cycle_r )
 
 static READ16_HANDLER( btlfield_cycle_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int ret = state->shared_ram[0x4];
 
 	if (cpu_get_pc(space->cpu) == 0x9e1c && (ret & 0xff00) == 0)
@@ -3172,7 +3172,7 @@ static READ16_HANDLER( btlfield_cycle_r )
 
 static READ16_HANDLER( skysoldr_cycle_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int ret = state->shared_ram[0x4];
 
 	if (cpu_get_pc(space->cpu) == 0x1f4e && (ret & 0xff00) == 0)
@@ -3186,7 +3186,7 @@ static READ16_HANDLER( skysoldr_cycle_r )
 
 static READ16_HANDLER( skyadvnt_cycle_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int ret = state->shared_ram[0x4];
 
 	if (cpu_get_pc(space->cpu) == 0x1f78 && (ret & 0xff00) == 0)
@@ -3200,7 +3200,7 @@ static READ16_HANDLER( skyadvnt_cycle_r )
 
 static READ16_HANDLER( gangwars_cycle_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int ret = state->shared_ram[0x103];
 
 	if (cpu_get_pc(space->cpu) == 0xbbb6)
@@ -3214,7 +3214,7 @@ static READ16_HANDLER( gangwars_cycle_r )
 
 static READ16_HANDLER( gangwarsb_cycle_r )
 {
-	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
+	alpha68k_state *state = space->machine->driver_data<alpha68k_state>();
 	int ret = state->shared_ram[0x103];
 
 	if (cpu_get_pc(space->cpu) == 0xbbca)
@@ -3230,7 +3230,7 @@ static READ16_HANDLER( gangwarsb_cycle_r )
 
 static DRIVER_INIT( sstingry )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x00ff;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3238,7 +3238,7 @@ static DRIVER_INIT( sstingry )
 
 static DRIVER_INIT( kyros )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x0012;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3247,7 +3247,7 @@ static DRIVER_INIT( kyros )
 
 static DRIVER_INIT( jongbou )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0c0001, 0, 0, jongbou_inputs_r);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x00ff;
@@ -3257,14 +3257,14 @@ static DRIVER_INIT( jongbou )
 
 static DRIVER_INIT( paddlema )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->microcontroller_id = 0;
 	state->coin_id = 0;				// Not needed !
 }
 
 static DRIVER_INIT( timesold )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, timesold_cycle_r);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
@@ -3273,7 +3273,7 @@ static DRIVER_INIT( timesold )
 
 static DRIVER_INIT( timesold1 )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, timesold1_cycle_r);
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
@@ -3282,7 +3282,7 @@ static DRIVER_INIT( timesold1 )
 
 static DRIVER_INIT( btlfield )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, btlfield_cycle_r);
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
@@ -3291,7 +3291,7 @@ static DRIVER_INIT( btlfield )
 
 static DRIVER_INIT( btlfieldb )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8); //not checked
@@ -3300,7 +3300,7 @@ static DRIVER_INIT( btlfieldb )
 
 static DRIVER_INIT( skysoldr )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skysoldr_cycle_r);
 	memory_set_bankptr(machine, "bank8", (memory_region(machine, "user1")) + 0x40000);
 	state->invert_controls = 0;
@@ -3310,7 +3310,7 @@ static DRIVER_INIT( skysoldr )
 
 static DRIVER_INIT( goldmedl )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //AT
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3318,7 +3318,7 @@ static DRIVER_INIT( goldmedl )
 
 static DRIVER_INIT( goldmedla )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_set_bankptr(machine, "bank8", memory_region(machine, "maincpu") + 0x20000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
@@ -3327,7 +3327,7 @@ static DRIVER_INIT( goldmedla )
 
 static DRIVER_INIT( skyadvnt )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8814;
@@ -3336,7 +3336,7 @@ static DRIVER_INIT( skyadvnt )
 
 static DRIVER_INIT( skyadvntu )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8814;
@@ -3345,7 +3345,7 @@ static DRIVER_INIT( skyadvntu )
 
 static DRIVER_INIT( gangwars )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwars_cycle_r);
 	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
 	state->invert_controls = 0;
@@ -3355,7 +3355,7 @@ static DRIVER_INIT( gangwars )
 
 static DRIVER_INIT( gangwarsb )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwarsb_cycle_r);
 	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
 	state->invert_controls = 0;
@@ -3365,7 +3365,7 @@ static DRIVER_INIT( gangwarsb )
 
 static DRIVER_INIT( sbasebal )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	/* Game hangs on divide by zero?!  Patch it */
@@ -3389,7 +3389,7 @@ static DRIVER_INIT( sbasebal )
 
 static DRIVER_INIT( tnextspc )
 {
-	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
+	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x890a;
 	state->coin_id = 0;				// Not needed !

@@ -38,7 +38,7 @@ DIP locations verified for:
 
 static INPUT_CHANGED( coin_inserted )
 {
-	lasso_state *state = (lasso_state *)field->port->machine->driver_data;
+	lasso_state *state = field->port->machine->driver_data<lasso_state>();
 
 	/* coin insertion causes an NMI */
 	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -48,14 +48,14 @@ static INPUT_CHANGED( coin_inserted )
 /* Write to the sound latch and generate an IRQ on the sound CPU */
 static WRITE8_HANDLER( sound_command_w )
 {
-	lasso_state *state = (lasso_state *)space->machine->driver_data;
+	lasso_state *state = space->machine->driver_data<lasso_state>();
 	soundlatch_w(space, offset, data);
 	generic_pulse_irq_line(state->audiocpu, 0);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )
 {
-	lasso_state *state = (lasso_state *)space->machine->driver_data;
+	lasso_state *state = space->machine->driver_data<lasso_state>();
 	soundlatch_w(space, offset, data);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -68,7 +68,7 @@ static READ8_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_select_w )
 {
-	lasso_state *state = (lasso_state *)space->machine->driver_data;
+	lasso_state *state = space->machine->driver_data<lasso_state>();
 	UINT8 to_write = BITSWAP8(*state->chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
@@ -464,7 +464,7 @@ GFXDECODE_END
 
 static MACHINE_START( lasso )
 {
-	lasso_state *state = (lasso_state *)machine->driver_data;
+	lasso_state *state = machine->driver_data<lasso_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -476,7 +476,7 @@ static MACHINE_START( lasso )
 
 static MACHINE_START( wwjgtin )
 {
-	lasso_state *state = (lasso_state *)machine->driver_data;
+	lasso_state *state = machine->driver_data<lasso_state>();
 
 	MACHINE_START_CALL(lasso);
 
@@ -485,14 +485,14 @@ static MACHINE_START( wwjgtin )
 
 static MACHINE_RESET( lasso )
 {
-	lasso_state *state = (lasso_state *)machine->driver_data;
+	lasso_state *state = machine->driver_data<lasso_state>();
 
 	state->gfxbank = 0;
 }
 
 static MACHINE_RESET( wwjgtin )
 {
-	lasso_state *state = (lasso_state *)machine->driver_data;
+	lasso_state *state = machine->driver_data<lasso_state>();
 
 	MACHINE_RESET_CALL(lasso);
 

@@ -53,7 +53,7 @@ static READ8_HANDLER( adc_r );
 
 static WRITE16_HANDLER( adrst_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	state->ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
@@ -64,14 +64,14 @@ static WRITE16_HANDLER( adrst_w )
 
 static READ16_HANDLER( main_gnd_r )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	const address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
 	return memory_read_word(gndspace, V30_GND_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_gnd_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	const address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
@@ -82,14 +82,14 @@ static WRITE16_HANDLER( main_gnd_w )
 
 static READ16_HANDLER( main_obj_r )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	const address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
 	return memory_read_word(objspace, V30_OBJ_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_obj_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	const address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
@@ -100,7 +100,7 @@ static WRITE16_HANDLER( main_obj_w )
 
 static WRITE16_HANDLER( tst_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 
 	if (offset < 0x800)
 	{
@@ -121,27 +121,27 @@ static WRITE16_HANDLER( tst_w )
 
 static READ16_HANDLER( main_z80_r )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	const address_space *sndspace = cpu_get_address_space(state->audiocpu, ADDRESS_SPACE_PROGRAM);
 	return 0xff00 | memory_read_byte(sndspace, offset);
 }
 
 static WRITE16_HANDLER( main_z80_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	const address_space *sndspace = cpu_get_address_space(state->audiocpu, ADDRESS_SPACE_PROGRAM);
 	memory_write_byte(sndspace, offset, data);
 }
 
 static WRITE16_HANDLER( inten_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	state->main_inten = 1;
 }
 
 static WRITE16_HANDLER( emres_w )
 {
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 	watchdog_reset(space->machine);
 	state->main_inten = 0;
 }
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( sound_vol )
 #define LO_RI		100000.0
 #define LO_RP		100000.0
 
-	lockon_state *state = (lockon_state *)space->machine->driver_data;
+	lockon_state *state = space->machine->driver_data<lockon_state>();
 
 	static const double gains[16] =
 	{
@@ -428,7 +428,7 @@ static WRITE8_HANDLER( sound_vol )
 
 static void ym2203_irq(running_device *device, int irq)
 {
-	lockon_state *state = (lockon_state *)device->machine->driver_data;
+	lockon_state *state = device->machine->driver_data<lockon_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
@@ -464,7 +464,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( lockon )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -497,7 +497,7 @@ static MACHINE_START( lockon )
 
 static MACHINE_RESET( lockon )
 {
-	lockon_state *state = (lockon_state *)machine->driver_data;
+	lockon_state *state = machine->driver_data<lockon_state>();
 
 	state->ground_ctrl = 0;
 	state->scroll_h = 0;

@@ -20,7 +20,7 @@ change in-between can affect the direction you move.
 
 static int nitedrvr_steering( running_machine *machine )
 {
-	nitedrvr_state *state = (nitedrvr_state *)machine->driver_data;
+	nitedrvr_state *state = machine->driver_data<nitedrvr_state>();
 	int this_val = input_port_read(machine, "STEER");
 	int delta = this_val - state->last_steering_val;
 
@@ -58,14 +58,14 @@ nitedrvr_steering_reset
 
 READ8_HANDLER( nitedrvr_steering_reset_r )
 {
-	nitedrvr_state *state = (nitedrvr_state *)space->machine->driver_data;
+	nitedrvr_state *state = space->machine->driver_data<nitedrvr_state>();
 	state->steering_val = 0;
 	return 0;
 }
 
 WRITE8_HANDLER( nitedrvr_steering_reset_w )
 {
-	nitedrvr_state *state = (nitedrvr_state *)space->machine->driver_data;
+	nitedrvr_state *state = space->machine->driver_data<nitedrvr_state>();
 	state->steering_val = 0;
 }
 
@@ -100,7 +100,7 @@ Fill in the steering and gear bits in a special way.
 
 READ8_HANDLER( nitedrvr_in0_r )
 {
-	nitedrvr_state *state = (nitedrvr_state *)space->machine->driver_data;
+	nitedrvr_state *state = space->machine->driver_data<nitedrvr_state>();
 	int gear = input_port_read(space->machine, "GEARS");
 
 	if (gear & 0x10)				state->gear = 1;
@@ -164,7 +164,7 @@ Fill in the track difficulty switch and special signal in a special way.
 
 READ8_HANDLER( nitedrvr_in1_r )
 {
-	nitedrvr_state *state = (nitedrvr_state *)space->machine->driver_data;
+	nitedrvr_state *state = space->machine->driver_data<nitedrvr_state>();
 	int port = input_port_read(space->machine, "IN0");
 
 	state->ac_line = (state->ac_line + 1) % 3;
@@ -212,7 +212,7 @@ D5 = SKID2
 
 WRITE8_HANDLER( nitedrvr_out0_w )
 {
-	nitedrvr_state *state = (nitedrvr_state *)space->machine->driver_data;
+	nitedrvr_state *state = space->machine->driver_data<nitedrvr_state>();
 
 	discrete_sound_w(state->discrete, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
 	discrete_sound_w(state->discrete, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
@@ -232,7 +232,7 @@ D5 = Spare (Not used)
 
 WRITE8_HANDLER( nitedrvr_out1_w )
 {
-	nitedrvr_state *state = (nitedrvr_state *)space->machine->driver_data;
+	nitedrvr_state *state = space->machine->driver_data<nitedrvr_state>();
 
 	set_led_status(space->machine, 0, data & 0x10);
 
@@ -256,7 +256,7 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 
 TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 {
-	nitedrvr_state *state = (nitedrvr_state *)timer.machine->driver_data;
+	nitedrvr_state *state = timer.machine->driver_data<nitedrvr_state>();
 
 	if (state->crash_en && state->crash_data_en)
 	{
@@ -282,7 +282,7 @@ TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 
 MACHINE_START( nitedrvr )
 {
-	nitedrvr_state *state = (nitedrvr_state *)machine->driver_data;
+	nitedrvr_state *state = machine->driver_data<nitedrvr_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->discrete = machine->device("discrete");
@@ -300,7 +300,7 @@ MACHINE_START( nitedrvr )
 
 MACHINE_RESET( nitedrvr )
 {
-	nitedrvr_state *state = (nitedrvr_state *)machine->driver_data;
+	nitedrvr_state *state = machine->driver_data<nitedrvr_state>();
 
 	state->gear = 1;
 	state->track = 0;

@@ -163,7 +163,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 /* Read/Write Handlers */
 static void idsoccer_adpcm_int( running_device *device )
 {
-	docastle_state *state = (docastle_state *)device->machine->driver_data;
+	docastle_state *state = device->machine->driver_data<docastle_state>();
 
 	if (state->adpcm_pos >= memory_region_length(device->machine, "adpcm"))
 	{
@@ -184,7 +184,7 @@ static void idsoccer_adpcm_int( running_device *device )
 
 static READ8_DEVICE_HANDLER( idsoccer_adpcm_status_r )
 {
-	docastle_state *state = (docastle_state *)device->machine->driver_data;
+	docastle_state *state = device->machine->driver_data<docastle_state>();
 
 	// this is wrong, but the samples work anyway!!
 	state->adpcm_status ^= 0x80;
@@ -193,7 +193,7 @@ static READ8_DEVICE_HANDLER( idsoccer_adpcm_status_r )
 
 static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
 {
-	docastle_state *state = (docastle_state *)device->machine->driver_data;
+	docastle_state *state = device->machine->driver_data<docastle_state>();
 
 	if (data & 0x80)
 	{
@@ -563,7 +563,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_RESET( docastle )
 {
-	docastle_state *state = (docastle_state *)machine->driver_data;
+	docastle_state *state = machine->driver_data<docastle_state>();
 	int i;
 
 	for (i = 0; i < 9; i++)
@@ -579,7 +579,7 @@ static MACHINE_RESET( docastle )
 
 static MACHINE_START( docastle )
 {
-	docastle_state *state = (docastle_state *)machine->driver_data;
+	docastle_state *state = machine->driver_data<docastle_state>();
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->slave = machine->device<cpu_device>("slave");

@@ -50,7 +50,7 @@ PALETTE_INIT( dogfgt )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+	dogfgt_state *state = machine->driver_data<dogfgt_state>();
 	SET_TILE_INFO(
 			0,
 			state->bgvideoram[tile_index],
@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( dogfgt )
 {
-	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+	dogfgt_state *state = machine->driver_data<dogfgt_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
 	state->bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
@@ -86,14 +86,14 @@ VIDEO_START( dogfgt )
 
 WRITE8_HANDLER( dogfgt_plane_select_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 
 	state->bm_plane = data;
 }
 
 READ8_HANDLER( dogfgt_bitmapram_r )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 
 	if (state->bm_plane > 2)
 	{
@@ -106,7 +106,7 @@ READ8_HANDLER( dogfgt_bitmapram_r )
 
 static WRITE8_HANDLER( internal_bitmapram_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 	int x, y, subx;
 
 	state->bitmapram[offset] = data;
@@ -131,7 +131,7 @@ static WRITE8_HANDLER( internal_bitmapram_w )
 
 WRITE8_HANDLER( dogfgt_bitmapram_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 
 	if (state->bm_plane > 2)
 	{
@@ -144,7 +144,7 @@ WRITE8_HANDLER( dogfgt_bitmapram_w )
 
 WRITE8_HANDLER( dogfgt_bgvideoram_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 
 	state->bgvideoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x3ff);
@@ -152,7 +152,7 @@ WRITE8_HANDLER( dogfgt_bgvideoram_w )
 
 WRITE8_HANDLER( dogfgt_scroll_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 
 	state->scroll[offset] = data;
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll[0] + 256 * state->scroll[1] + 256);
@@ -161,7 +161,7 @@ WRITE8_HANDLER( dogfgt_scroll_w )
 
 WRITE8_HANDLER( dogfgt_1800_w )
 {
-	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 
 	/* bits 0 and 1 are probably text color (not verified because PROM is missing) */
 	state->pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
@@ -186,7 +186,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+	dogfgt_state *state = machine->driver_data<dogfgt_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -219,7 +219,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 VIDEO_UPDATE( dogfgt )
 {
-	dogfgt_state *state = (dogfgt_state *)screen->machine->driver_data;
+	dogfgt_state *state = screen->machine->driver_data<dogfgt_state>();
 	int offs;
 
 	if (state->lastflip != flip_screen_get(screen->machine) || state->lastpixcolor != state->pixcolor)

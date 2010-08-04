@@ -68,7 +68,7 @@ static READ16_HANDLER( tumblep_prot_r )
 
 static WRITE16_HANDLER( tumblep_sound_w )
 {
-	tumblep_state *state = (tumblep_state *)space->machine->driver_data;
+	tumblep_state *state = space->machine->driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
@@ -76,7 +76,7 @@ static WRITE16_HANDLER( tumblep_sound_w )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( jumppop_sound_w )
 {
-	tumblep_state *state = (tumblep_state *)space->machine->driver_data;
+	tumblep_state *state = space->machine->driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
 	cputag_set_input_line(state->audiocpu, 0, ASSERT_LINE );
 }
@@ -274,7 +274,7 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	tumblep_state *driver_state = (tumblep_state *)device->machine->driver_data;
+	tumblep_state *driver_state = device->machine->driver_data<tumblep_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
@@ -295,7 +295,7 @@ static const deco16ic_interface tumblep_deco16ic_intf =
 
 static MACHINE_START( tumblep )
 {
-	tumblep_state *state = (tumblep_state *)machine->driver_data;
+	tumblep_state *state = machine->driver_data<tumblep_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");

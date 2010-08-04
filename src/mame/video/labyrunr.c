@@ -42,7 +42,7 @@ PALETTE_INIT( labyrunr )
 
 static void set_pens( running_machine *machine )
 {
-	labyrunr_state *state = (labyrunr_state *)machine->driver_data;
+	labyrunr_state *state = machine->driver_data<labyrunr_state>();
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
@@ -65,7 +65,7 @@ static void set_pens( running_machine *machine )
 
 static TILE_GET_INFO( get_tile_info0 )
 {
-	labyrunr_state *state = (labyrunr_state *)machine->driver_data;
+	labyrunr_state *state = machine->driver_data<labyrunr_state>();
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121, 3);
 	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121, 4);
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121, 5);
@@ -95,7 +95,7 @@ static TILE_GET_INFO( get_tile_info0 )
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	labyrunr_state *state = (labyrunr_state *)machine->driver_data;
+	labyrunr_state *state = machine->driver_data<labyrunr_state>();
 	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121, 3);
 	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121, 4);
 	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121, 5);
@@ -132,7 +132,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( labyrunr )
 {
-	labyrunr_state *state = (labyrunr_state *)machine->driver_data;
+	labyrunr_state *state = machine->driver_data<labyrunr_state>();
 
 	state->layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
 	state->layer1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
@@ -160,14 +160,14 @@ VIDEO_START( labyrunr )
 
 WRITE8_HANDLER( labyrunr_vram1_w )
 {
-	labyrunr_state *state = (labyrunr_state *)space->machine->driver_data;
+	labyrunr_state *state = space->machine->driver_data<labyrunr_state>();
 	state->videoram1[offset] = data;
 	tilemap_mark_tile_dirty(state->layer0, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( labyrunr_vram2_w )
 {
-	labyrunr_state *state = (labyrunr_state *)space->machine->driver_data;
+	labyrunr_state *state = space->machine->driver_data<labyrunr_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->layer1, offset & 0x3ff);
 }
@@ -182,7 +182,7 @@ WRITE8_HANDLER( labyrunr_vram2_w )
 
 VIDEO_UPDATE( labyrunr )
 {
-	labyrunr_state *state = (labyrunr_state *)screen->machine->driver_data;
+	labyrunr_state *state = screen->machine->driver_data<labyrunr_state>();
 	UINT8 ctrl_0 = k007121_ctrlram_r(state->k007121, 0);
 	rectangle finalclip0, finalclip1;
 

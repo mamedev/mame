@@ -15,13 +15,13 @@
 
 void dbz_tile_callback( running_machine *machine, int layer, int *code, int *color, int *flags )
 {
-	dbz_state *state = (dbz_state *)machine->driver_data;
+	dbz_state *state = machine->driver_data<dbz_state>();
 	*color = (state->layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
 }
 
 void dbz_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	dbz_state *state = (dbz_state *)machine->driver_data;
+	dbz_state *state = machine->driver_data<dbz_state>();
 	int pri = (*color & 0x3c0) >> 5;
 
 	if (pri <= state->layerpri[3])
@@ -40,14 +40,14 @@ void dbz_sprite_callback( running_machine *machine, int *code, int *color, int *
 
 WRITE16_HANDLER( dbz_bg2_videoram_w )
 {
-	dbz_state *state = (dbz_state *)space->machine->driver_data;
+	dbz_state *state = space->machine->driver_data<dbz_state>();
 	COMBINE_DATA(&state->bg2_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg2_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_dbz_bg2_tile_info )
 {
-	dbz_state *state = (dbz_state *)machine->driver_data;
+	dbz_state *state = machine->driver_data<dbz_state>();
 	int tileno, colour, flag;
 
 	tileno = state->bg2_videoram[tile_index * 2 + 1] & 0x7fff;
@@ -59,14 +59,14 @@ static TILE_GET_INFO( get_dbz_bg2_tile_info )
 
 WRITE16_HANDLER( dbz_bg1_videoram_w )
 {
-	dbz_state *state = (dbz_state *)space->machine->driver_data;
+	dbz_state *state = space->machine->driver_data<dbz_state>();
 	COMBINE_DATA(&state->bg1_videoram[offset]);
 	tilemap_mark_tile_dirty(state->bg1_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_dbz_bg1_tile_info )
 {
-	dbz_state *state = (dbz_state *)machine->driver_data;
+	dbz_state *state = machine->driver_data<dbz_state>();
 	int tileno, colour, flag;
 
 	tileno = state->bg1_videoram[tile_index * 2 + 1] & 0x7fff;
@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_dbz_bg1_tile_info )
 
 VIDEO_START( dbz )
 {
-	dbz_state *state = (dbz_state *)machine->driver_data;
+	dbz_state *state = machine->driver_data<dbz_state>();
 
 	state->bg1_tilemap = tilemap_create(machine, get_dbz_bg1_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 	state->bg2_tilemap = tilemap_create(machine, get_dbz_bg2_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
@@ -99,7 +99,7 @@ VIDEO_START( dbz )
 
 VIDEO_UPDATE( dbz )
 {
-	dbz_state *state = (dbz_state *)screen->machine->driver_data;
+	dbz_state *state = screen->machine->driver_data<dbz_state>();
 	static const int K053251_CI[6] = { K053251_CI3, K053251_CI4, K053251_CI4, K053251_CI4, K053251_CI2, K053251_CI1 };
 	int layer[5], plane, new_colorbase;
 

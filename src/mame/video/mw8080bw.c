@@ -10,7 +10,7 @@
 
 VIDEO_UPDATE( mw8080bw )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
@@ -77,7 +77,7 @@ VIDEO_UPDATE( mw8080bw )
 
 VIDEO_UPDATE( spcenctr )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	UINT8 line_buf[256]; /* 256x1 bit RAM */
 
 	UINT8 x = 0;
@@ -221,7 +221,7 @@ VIDEO_UPDATE( spcenctr )
 
 VIDEO_UPDATE( phantom2 )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
@@ -313,7 +313,7 @@ VIDEO_UPDATE( phantom2 )
 
 VIDEO_EOF( phantom2 )
 {
-	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	state->phantom2_cloud_counter += MW8080BW_VTOTAL;
 
@@ -333,7 +333,7 @@ VIDEO_EOF( phantom2 )
 
 VIDEO_UPDATE( invaders )
 {
-	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
+	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;

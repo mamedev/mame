@@ -12,14 +12,14 @@
 
 WRITE8_HANDLER( jack_videoram_w )
 {
-	jack_state *state = (jack_state *)space->machine->driver_data;
+	jack_state *state = space->machine->driver_data<jack_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( jack_colorram_w )
 {
-	jack_state *state = (jack_state *)space->machine->driver_data;
+	jack_state *state = space->machine->driver_data<jack_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -43,7 +43,7 @@ WRITE8_HANDLER( jack_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	jack_state *state = (jack_state *)machine->driver_data;
+	jack_state *state = machine->driver_data<jack_state>();
 	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x18) << 5);
 	int color = state->colorram[tile_index] & 0x07;
 
@@ -60,13 +60,13 @@ static UINT32 tilemap_scan_cols_flipy( UINT32 col, UINT32 row, UINT32 num_cols, 
 
 VIDEO_START( jack )
 {
-	jack_state *state = (jack_state *)machine->driver_data;
+	jack_state *state = machine->driver_data<jack_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flipy, 8, 8, 32, 32);
 }
 
 static void jack_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	jack_state *state = (jack_state *)machine->driver_data;
+	jack_state *state = machine->driver_data<jack_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -99,7 +99,7 @@ static void jack_draw_sprites( running_machine *machine, bitmap_t *bitmap, const
 
 VIDEO_UPDATE( jack )
 {
-	jack_state *state = (jack_state *)screen->machine->driver_data;
+	jack_state *state = screen->machine->driver_data<jack_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	jack_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
@@ -136,7 +136,7 @@ PALETTE_INIT( joinem )
 
 static TILE_GET_INFO( joinem_get_bg_tile_info )
 {
-	jack_state *state = (jack_state *)machine->driver_data;
+	jack_state *state = machine->driver_data<jack_state>();
 	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x03) << 8);
 	int color = (state->colorram[tile_index] & 0x38) >> 3;
 
@@ -145,13 +145,13 @@ static TILE_GET_INFO( joinem_get_bg_tile_info )
 
 VIDEO_START( joinem )
 {
-	jack_state *state = (jack_state *)machine->driver_data;
+	jack_state *state = machine->driver_data<jack_state>();
 	state->bg_tilemap = tilemap_create(machine, joinem_get_bg_tile_info, tilemap_scan_cols_flipy, 8, 8, 32, 32);
 }
 
 static void joinem_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	jack_state *state = (jack_state *)machine->driver_data;
+	jack_state *state = machine->driver_data<jack_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 
@@ -184,7 +184,7 @@ static void joinem_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 VIDEO_UPDATE( joinem )
 {
-	jack_state *state = (jack_state *)screen->machine->driver_data;
+	jack_state *state = screen->machine->driver_data<jack_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	joinem_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;

@@ -16,7 +16,7 @@
 /* TTL text plane stuff */
 static TILE_GET_INFO( ttl_get_tile_info )
 {
-	rungun_state *state = (rungun_state *)machine->driver_data;
+	rungun_state *state = machine->driver_data<rungun_state>();
 	UINT8 *lvram = (UINT8 *)state->ttl_vram;
 	int attr, code;
 
@@ -28,33 +28,33 @@ static TILE_GET_INFO( ttl_get_tile_info )
 
 void rng_sprite_callback( running_machine *machine, int *code, int *color, int *priority_mask )
 {
-	rungun_state *state = (rungun_state *)machine->driver_data;
+	rungun_state *state = machine->driver_data<rungun_state>();
 	*color = state->sprite_colorbase | (*color & 0x001f);
 }
 
 READ16_HANDLER( rng_ttl_ram_r )
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 	return state->ttl_vram[offset];
 }
 
 WRITE16_HANDLER( rng_ttl_ram_w )
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 	COMBINE_DATA(&state->ttl_vram[offset]);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
 WRITE16_HANDLER(rng_936_videoram_w)
 {
-	rungun_state *state = (rungun_state *)space->machine->driver_data;
+	rungun_state *state = space->machine->driver_data<rungun_state>();
 	COMBINE_DATA(&state->_936_videoram[offset]);
 	tilemap_mark_tile_dirty(state->_936_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_rng_936_tile_info )
 {
-	rungun_state *state = (rungun_state *)machine->driver_data;
+	rungun_state *state = machine->driver_data<rungun_state>();
 	int tileno, colour, flipx;
 
 	tileno = state->_936_videoram[tile_index * 2 + 1] & 0x3fff;
@@ -78,7 +78,7 @@ VIDEO_START( rng )
 		8*8*4
 	};
 
-	rungun_state *state = (rungun_state *)machine->driver_data;
+	rungun_state *state = machine->driver_data<rungun_state>();
 	int gfx_index;
 
 	state->_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
@@ -105,7 +105,7 @@ VIDEO_START( rng )
 
 VIDEO_UPDATE(rng)
 {
-	rungun_state *state = (rungun_state *)screen->machine->driver_data;
+	rungun_state *state = screen->machine->driver_data<rungun_state>();
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);

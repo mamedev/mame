@@ -25,7 +25,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_trigger_w )
 {
-	ultraman_state *state = (ultraman_state *)space->machine->driver_data;
+	ultraman_state *state = space->machine->driver_data<ultraman_state>();
 
 	if (ACCESSING_BITS_0_7)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -193,7 +193,7 @@ static const k051316_interface ultraman_k051316_intf_2 =
 
 static MACHINE_START( ultraman )
 {
-	ultraman_state *state = (ultraman_state *)machine->driver_data;
+	ultraman_state *state = machine->driver_data<ultraman_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -209,7 +209,7 @@ static MACHINE_START( ultraman )
 
 static MACHINE_RESET( ultraman )
 {
-	ultraman_state *state = (ultraman_state *)machine->driver_data;
+	ultraman_state *state = machine->driver_data<ultraman_state>();
 
 	state->bank0 = -1;
 	state->bank1 = -1;

@@ -16,7 +16,7 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 
 static TILE_GET_INFO( get_mcatadv_tile_info1 )
 {
-	mcatadv_state *state = (mcatadv_state *)machine->driver_data;
+	mcatadv_state *state = machine->driver_data<mcatadv_state>();
 	int tileno = state->videoram1[tile_index * 2 + 1];
 	int colour = (state->videoram1[tile_index * 2] & 0x3f00) >> 8;
 	int pri = (state->videoram1[tile_index * 2] & 0xc000) >> 14;
@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_mcatadv_tile_info1 )
 
 WRITE16_HANDLER( mcatadv_videoram1_w )
 {
-	mcatadv_state *state = (mcatadv_state *)space->machine->driver_data;
+	mcatadv_state *state = space->machine->driver_data<mcatadv_state>();
 
 	COMBINE_DATA(&state->videoram1[offset]);
 	tilemap_mark_tile_dirty(state->tilemap1, offset / 2);
@@ -35,7 +35,7 @@ WRITE16_HANDLER( mcatadv_videoram1_w )
 
 static TILE_GET_INFO( get_mcatadv_tile_info2 )
 {
-	mcatadv_state *state = (mcatadv_state *)machine->driver_data;
+	mcatadv_state *state = machine->driver_data<mcatadv_state>();
 	int tileno = state->videoram2[tile_index * 2 + 1];
 	int colour = (state->videoram2[tile_index * 2] & 0x3f00) >> 8;
 	int pri = (state->videoram2[tile_index * 2] & 0xc000) >> 14;
@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_mcatadv_tile_info2 )
 
 WRITE16_HANDLER( mcatadv_videoram2_w )
 {
-	mcatadv_state *state = (mcatadv_state *)space->machine->driver_data;
+	mcatadv_state *state = space->machine->driver_data<mcatadv_state>();
 
 	COMBINE_DATA(&state->videoram2[offset]);
 	tilemap_mark_tile_dirty(state->tilemap2, offset / 2);
@@ -55,7 +55,7 @@ WRITE16_HANDLER( mcatadv_videoram2_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	mcatadv_state *state = (mcatadv_state *)machine->driver_data;
+	mcatadv_state *state = machine->driver_data<mcatadv_state>();
 	UINT16 *source = state->spriteram_old;
 	UINT16 *finish = source + (state->spriteram_size / 2) / 2;
 	int global_x = state->vidregs[0] - 0x184;
@@ -202,7 +202,7 @@ static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_v
 
 VIDEO_UPDATE( mcatadv )
 {
-	mcatadv_state *state = (mcatadv_state *)screen->machine->driver_data;
+	mcatadv_state *state = screen->machine->driver_data<mcatadv_state>();
 	int i;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -252,7 +252,7 @@ VIDEO_UPDATE( mcatadv )
 
 VIDEO_START( mcatadv )
 {
-	mcatadv_state *state = (mcatadv_state *)machine->driver_data;
+	mcatadv_state *state = machine->driver_data<mcatadv_state>();
 	state->tilemap1 = tilemap_create(machine, get_mcatadv_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
 	tilemap_set_transparent_pen(state->tilemap1, 0);
 
@@ -271,7 +271,7 @@ VIDEO_START( mcatadv )
 
 VIDEO_EOF( mcatadv )
 {
-	mcatadv_state *state = (mcatadv_state *)machine->driver_data;
+	mcatadv_state *state = machine->driver_data<mcatadv_state>();
 	memcpy(state->spriteram_old, state->spriteram, state->spriteram_size);
 	memcpy(state->vidregs_old, state->vidregs, 0xf);
 }

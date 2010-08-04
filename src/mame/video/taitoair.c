@@ -74,7 +74,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
 
-	taitoair_state *state = (taitoair_state *)machine->driver_data;
+	taitoair_state *state = machine->driver_data<taitoair_state>();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -343,7 +343,7 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 
 VIDEO_UPDATE( taitoair )
 {
-	taitoair_state *state = (taitoair_state *)screen->machine->driver_data;
+	taitoair_state *state = screen->machine->driver_data<taitoair_state>();
 
 	tc0080vco_tilemap_update(state->tc0080vco);
 

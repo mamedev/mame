@@ -276,13 +276,13 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	boogwing_state *driver_state = (boogwing_state *)device->machine->driver_data;
+	boogwing_state *driver_state = device->machine->driver_data<boogwing_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	boogwing_state *state = (boogwing_state *)device->machine->driver_data;
+	boogwing_state *state = device->machine->driver_data<boogwing_state>();
 	state->oki2->set_bank_base(((data & 2) >> 1) * 0x40000);
 	state->oki1->set_bank_base((data & 1) * 0x40000);
 }

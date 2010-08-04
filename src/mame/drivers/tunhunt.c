@@ -72,7 +72,7 @@ static WRITE8_HANDLER( tunhunt_control_w )
         0x40    start LED
         0x80    in-game
     */
-	tunhunt_state *state = (tunhunt_state *)space->machine->driver_data;
+	tunhunt_state *state = space->machine->driver_data<tunhunt_state>();
 
 	state->control = data;
 	coin_counter_w( space->machine, 0,data&0x01 );

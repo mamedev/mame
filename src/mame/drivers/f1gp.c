@@ -30,13 +30,13 @@
 
 static READ16_HANDLER( sharedram_r )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	return state->sharedram[offset];
 }
 
 static WRITE16_HANDLER( sharedram_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	COMBINE_DATA(&state->sharedram[offset]);
 }
 
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( f1gp_sh_bankswitch_w )
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -78,13 +78,13 @@ static WRITE16_HANDLER( sound_command_w )
 
 static READ16_HANDLER( command_pending_r )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	return (state->pending_command ? 0xff : 0);
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	state->pending_command = 0;
 }
 
@@ -411,7 +411,7 @@ GFXDECODE_END
 
 static void irqhandler( running_device *device, int irq )
 {
-	f1gp_state *state = (f1gp_state *)device->machine->driver_data;
+	f1gp_state *state = device->machine->driver_data<f1gp_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -433,7 +433,7 @@ static const k053936_interface f1gp2_k053936_intf =
 
 static MACHINE_START( f1gpb )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 
 	state_save_register_global(machine, state->pending_command);
 	state_save_register_global(machine, state->roz_bank);
@@ -444,7 +444,7 @@ static MACHINE_START( f1gpb )
 
 static MACHINE_START( f1gp )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
@@ -457,7 +457,7 @@ static MACHINE_START( f1gp )
 
 static MACHINE_RESET( f1gp )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 
 	state->pending_command = 0;
 	state->roz_bank = 0;

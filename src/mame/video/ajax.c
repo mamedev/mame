@@ -19,7 +19,7 @@
 
 void ajax_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	ajax_state *state = (ajax_state *)machine->driver_data;
+	ajax_state *state = machine->driver_data<ajax_state>();
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
 	*color = state->layer_colorbase[layer] + ((*color & 0xf0) >> 4);
 }
@@ -39,7 +39,7 @@ void ajax_sprite_callback( running_machine *machine, int *code, int *color, int 
        6 over A    (1 = have priority)
        never over F
     */
-	ajax_state *state = (ajax_state *)machine->driver_data;
+	ajax_state *state = machine->driver_data<ajax_state>();
 	*priority = 0xff00;							/* F = 8 */
 	if ( *color & 0x10) *priority |= 0xf0f0;	/* Z = 4 */
 	if (~*color & 0x40) *priority |= 0xcccc;	/* A = 2 */
@@ -56,7 +56,7 @@ void ajax_sprite_callback( running_machine *machine, int *code, int *color, int 
 
 void ajax_zoom_callback( running_machine *machine, int *code, int *color, int *flags )
 {
-	ajax_state *state = (ajax_state *)machine->driver_data;
+	ajax_state *state = machine->driver_data<ajax_state>();
 	*code |= ((*color & 0x07) << 8);
 	*color = state->zoom_colorbase + ((*color & 0x08) >> 3);
 }
@@ -70,7 +70,7 @@ void ajax_zoom_callback( running_machine *machine, int *code, int *color, int *f
 
 VIDEO_START( ajax )
 {
-	ajax_state *state = (ajax_state *)machine->driver_data;
+	ajax_state *state = machine->driver_data<ajax_state>();
 
 	state->layer_colorbase[0] = 64;
 	state->layer_colorbase[1] = 0;
@@ -89,7 +89,7 @@ VIDEO_START( ajax )
 
 VIDEO_UPDATE( ajax )
 {
-	ajax_state *state = (ajax_state *)screen->machine->driver_data;
+	ajax_state *state = screen->machine->driver_data<ajax_state>();
 
 	k052109_tilemap_update(state->k052109);
 

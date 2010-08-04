@@ -183,7 +183,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( carjmbre )
 {
-	carjmbre_state *state = (carjmbre_state *)machine->driver_data;
+	carjmbre_state *state = machine->driver_data<carjmbre_state>();
 
 	state->flipscreen = 0;
 	state->bgcolor = 0;

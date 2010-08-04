@@ -91,7 +91,7 @@ static const eeprom_interface eeprom_intf =
 /* A1, A5 and A6 don't go to the 053247. */
 static READ16_HANDLER( K053247_scattered_word_r )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 
 	if (offset & 0x0031)
 		return state->spriteram[offset];
@@ -104,7 +104,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 
 	if (offset & 0x0031)
 		COMBINE_DATA(state->spriteram + offset);
@@ -120,7 +120,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 
 static void xexex_objdma( running_machine *machine, int limiter )
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
@@ -154,19 +154,19 @@ static void xexex_objdma( running_machine *machine, int limiter )
 
 static READ16_HANDLER( spriteram_mirror_r )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 	return state->spriteram[offset];
 }
 
 static WRITE16_HANDLER( spriteram_mirror_w )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 	COMBINE_DATA(state->spriteram + offset);
 }
 
 static READ16_HANDLER( xexex_waitskip_r )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 
 	if (cpu_get_pc(space->cpu) == 0x1158)
 	{
@@ -180,7 +180,7 @@ static READ16_HANDLER( xexex_waitskip_r )
 
 static void parse_control2( running_machine *machine )
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 
 	/* bit 0  is data */
 	/* bit 1  is cs (active low) */
@@ -199,13 +199,13 @@ static void parse_control2( running_machine *machine )
 
 static READ16_HANDLER( control2_r )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 	return state->cur_control2;
 }
 
 static WRITE16_HANDLER( control2_w )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 	COMBINE_DATA(&state->cur_control2);
 	parse_control2(space->machine);
 }
@@ -213,7 +213,7 @@ static WRITE16_HANDLER( control2_w )
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 
 	if(ACCESSING_BITS_0_7)
 	{
@@ -234,7 +234,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
@@ -245,20 +245,20 @@ static READ16_HANDLER( sound_status_r )
 
 static void reset_sound_region(running_machine *machine)
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 	memory_set_bank(machine, "bank2", state->cur_sound_region & 0x07);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	xexex_state *state = (xexex_state *)space->machine->driver_data;
+	xexex_state *state = space->machine->driver_data<xexex_state>();
 	state->cur_sound_region = data & 7;
 	reset_sound_region(space->machine);
 }
 
 static void ym_set_mixing(running_device *device, double left, double right)
 {
-	xexex_state *state = (xexex_state *)device->machine->driver_data;
+	xexex_state *state = device->machine->driver_data<xexex_state>();
 	flt_volume_set_volume(state->filter1l, (71.0 * left) / 55.0);
 	flt_volume_set_volume(state->filter1r, (71.0 * right) / 55.0);
 	flt_volume_set_volume(state->filter2l, (71.0 * left) / 55.0);
@@ -267,7 +267,7 @@ static void ym_set_mixing(running_device *device, double left, double right)
 
 static TIMER_CALLBACK( dmaend_callback )
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 
 	if (state->cur_control2 & 0x0040)
 	{
@@ -286,7 +286,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 static INTERRUPT_GEN( xexex_interrupt )
 {
-	xexex_state *state = (xexex_state *)device->machine->driver_data;
+	xexex_state *state = device->machine->driver_data<xexex_state>();
 
 	if (state->suspension_active)
 	{
@@ -463,7 +463,7 @@ static STATE_POSTLOAD( xexex_postload )
 
 static MACHINE_START( xexex )
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
@@ -500,7 +500,7 @@ static MACHINE_START( xexex )
 
 static MACHINE_RESET( xexex )
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
@@ -690,7 +690,7 @@ ROM_END
 
 static DRIVER_INIT( xexex )
 {
-	xexex_state *state = (xexex_state *)machine->driver_data;
+	xexex_state *state = machine->driver_data<xexex_state>();
 
 	state->strip_0x1a = 0;
 

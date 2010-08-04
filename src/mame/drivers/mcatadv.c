@@ -146,7 +146,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 static WRITE16_HANDLER( mcat_soundlatch_w )
 {
-	mcatadv_state *state = (mcatadv_state *)space->machine->driver_data;
+	mcatadv_state *state = space->machine->driver_data<mcatadv_state>();
 
 	soundlatch_w(space, 0, data);
 	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
@@ -416,7 +416,7 @@ GFXDECODE_END
 /* Stolen from Psikyo.c */
 static void sound_irq( running_device *device, int irq )
 {
-	mcatadv_state *state = (mcatadv_state *)device->machine->driver_data;
+	mcatadv_state *state = device->machine->driver_data<mcatadv_state>();
 	cpu_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -428,7 +428,7 @@ static const ym2610_interface mcatadv_ym2610_interface =
 
 static MACHINE_START( mcatadv )
 {
-	mcatadv_state *state = (mcatadv_state *)machine->driver_data;
+	mcatadv_state *state = machine->driver_data<mcatadv_state>();
 	UINT8 *ROM = memory_region(machine, "soundcpu");
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);

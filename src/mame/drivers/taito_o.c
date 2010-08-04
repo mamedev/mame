@@ -240,7 +240,7 @@ static const tc0080vco_interface parentj_intf =
 
 static MACHINE_START( taitoo )
 {
-	taitoo_state *state = (taitoo_state *)machine->driver_data;
+	taitoo_state *state = machine->driver_data<taitoo_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->tc0080vco = machine->device("tc0080vco");

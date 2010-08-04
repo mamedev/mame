@@ -23,7 +23,7 @@ sprite_data[8] =
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	nemesis_state *state = (nemesis_state *)machine->driver_data;
+	nemesis_state *state = machine->driver_data<nemesis_state>();
 	int code, color, flags, mask, layer;
 
 	code = state->videoram2[tile_index];
@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	nemesis_state *state = (nemesis_state *)machine->driver_data;
+	nemesis_state *state = machine->driver_data<nemesis_state>();
 	int code, color, flags, mask, layer;
 
 	code = state->videoram1[tile_index];
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -119,7 +119,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 
 WRITE16_HANDLER( nemesis_gfx_flipy_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -135,7 +135,7 @@ WRITE16_HANDLER( nemesis_gfx_flipy_word_w )
 
 WRITE16_HANDLER( salamand_control_port_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -176,7 +176,7 @@ WRITE16_HANDLER( salamand_control_port_word_w )
 
 WRITE16_HANDLER( nemesis_palette_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 	int r, g, b, bit1, bit2, bit3, bit4, bit5;
 
 	COMBINE_DATA(state->paletteram + offset);
@@ -218,7 +218,7 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 
 WRITE16_HANDLER( salamander_palette_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->paletteram + offset);
 	offset &= ~1;
@@ -230,7 +230,7 @@ WRITE16_HANDLER( salamander_palette_word_w )
 
 WRITE16_HANDLER( nemesis_videoram1_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->videoram1 + offset);
 	tilemap_mark_tile_dirty(state->foreground, offset);
@@ -238,7 +238,7 @@ WRITE16_HANDLER( nemesis_videoram1_word_w )
 
 WRITE16_HANDLER( nemesis_videoram2_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->videoram2 + offset);
 	tilemap_mark_tile_dirty(state->background, offset);
@@ -246,7 +246,7 @@ WRITE16_HANDLER( nemesis_videoram2_word_w )
 
 WRITE16_HANDLER( nemesis_colorram1_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->colorram1 + offset);
 	tilemap_mark_tile_dirty(state->foreground, offset);
@@ -254,7 +254,7 @@ WRITE16_HANDLER( nemesis_colorram1_word_w )
 
 WRITE16_HANDLER( nemesis_colorram2_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 
 	COMBINE_DATA(state->colorram2 + offset);
 	tilemap_mark_tile_dirty(state->background, offset);
@@ -264,7 +264,7 @@ WRITE16_HANDLER( nemesis_colorram2_word_w )
 /* we have to straighten out the 16-bit word into bytes for gfxdecode() to work */
 WRITE16_HANDLER( nemesis_charram_word_w )
 {
-	nemesis_state *state = (nemesis_state *)space->machine->driver_data;
+	nemesis_state *state = space->machine->driver_data<nemesis_state>();
 	UINT16 oldword = state->charram[offset];
 
 	COMBINE_DATA(state->charram + offset);
@@ -285,7 +285,7 @@ WRITE16_HANDLER( nemesis_charram_word_w )
 
 static STATE_POSTLOAD( nemesis_postload )
 {
-	nemesis_state *state = (nemesis_state *)machine->driver_data;
+	nemesis_state *state = machine->driver_data<nemesis_state>();
 	int i, offs;
 
 	for (offs = 0; offs < state->charram_size; offs++)
@@ -305,7 +305,7 @@ static STATE_POSTLOAD( nemesis_postload )
 /* claim a palette dirty array */
 VIDEO_START( nemesis )
 {
-	nemesis_state *state = (nemesis_state *)machine->driver_data;
+	nemesis_state *state = machine->driver_data<nemesis_state>();
 
 	state->spriteram_words = state->spriteram_size / 2;
 
@@ -351,7 +351,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
      *  byte    E : not used.
      */
 
-	nemesis_state *state = (nemesis_state *)machine->driver_data;
+	nemesis_state *state = machine->driver_data<nemesis_state>();
 	UINT16 *spriteram = state->spriteram;
 	int adress;	/* start of sprite in spriteram */
 	int sx;	/* sprite X-pos */
@@ -427,7 +427,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( nemesis )
 {
-	nemesis_state *state = (nemesis_state *)screen->machine->driver_data;
+	nemesis_state *state = screen->machine->driver_data<nemesis_state>();
 	int offs;
 	rectangle clip;
 

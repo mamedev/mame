@@ -79,7 +79,7 @@ PALETTE_INIT( mario )
 
 WRITE8_HANDLER( mario_videoram_w )
 {
-	mario_state	*state = (mario_state *)space->machine->driver_data;
+	mario_state	*state = space->machine->driver_data<mario_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -87,7 +87,7 @@ WRITE8_HANDLER( mario_videoram_w )
 
 WRITE8_HANDLER( mario_gfxbank_w )
 {
-	mario_state	*state = (mario_state *)space->machine->driver_data;
+	mario_state	*state = space->machine->driver_data<mario_state>();
 
 	if (state->gfx_bank != (data & 0x01))
 	{
@@ -98,7 +98,7 @@ WRITE8_HANDLER( mario_gfxbank_w )
 
 WRITE8_HANDLER( mario_palettebank_w )
 {
-	mario_state	*state = (mario_state *)space->machine->driver_data;
+	mario_state	*state = space->machine->driver_data<mario_state>();
 
 	if (state->palette_bank != (data & 0x01))
 	{
@@ -109,14 +109,14 @@ WRITE8_HANDLER( mario_palettebank_w )
 
 WRITE8_HANDLER( mario_scroll_w )
 {
-	mario_state	*state = (mario_state *)space->machine->driver_data;
+	mario_state	*state = space->machine->driver_data<mario_state>();
 
 	state->gfx_scroll = data + 17;
 }
 
 WRITE8_HANDLER( mario_flip_w )
 {
-	mario_state	*state = (mario_state *)space->machine->driver_data;
+	mario_state	*state = space->machine->driver_data<mario_state>();
 
 	if (state->flip != (data & 0x01))
 	{
@@ -131,7 +131,7 @@ WRITE8_HANDLER( mario_flip_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mario_state	*state = (mario_state *)machine->driver_data;
+	mario_state	*state = machine->driver_data<mario_state>();
 	int code = state->videoram[tile_index] + 256 * state->gfx_bank;
 	int color;
 
@@ -142,7 +142,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( mario )
 {
-	mario_state	*state = (mario_state *)machine->driver_data;
+	mario_state	*state = machine->driver_data<mario_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
@@ -166,7 +166,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	/* TODO: draw_sprites should adopt the scanline logic from dkong.c
      * The schematics have the same logic for sprite buffering.
      */
-	mario_state	*state = (mario_state *)machine->driver_data;
+	mario_state	*state = machine->driver_data<mario_state>();
 	int offs;
 
 	for (offs = 0;offs < state->spriteram_size;offs += 4)
@@ -210,7 +210,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( mario )
 {
-	mario_state	*state = (mario_state *)screen->machine->driver_data;
+	mario_state	*state = screen->machine->driver_data<mario_state>();
 	int t;
 
 	t = input_port_read(screen->machine, "MONITOR");

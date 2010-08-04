@@ -1155,28 +1155,28 @@ ROM_END
 
 static DRIVER_INIT( sidearms )
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 
 	state->gameid = 0;
 }
 
 static DRIVER_INIT( turtship )
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 
 	state->gameid = 1;
 }
 
 static DRIVER_INIT( dyger )
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 
 	state->gameid = 2;
 }
 
 static DRIVER_INIT( whizz )
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 
 	state->gameid = 3;
 }

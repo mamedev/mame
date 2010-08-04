@@ -20,27 +20,27 @@
 
 static READ8_HANDLER( from_snd_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	state->snd_flag = 0;
 	return state->snd_data;
 }
 
 static READ8_HANDLER( snd_flag_r )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	return state->snd_flag | 0xfd;
 }
 
 static WRITE8_HANDLER( to_main_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	state->snd_data = data;
 	state->snd_flag = 2;
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	flstory_state *state = (flstory_state *)machine->driver_data;
+	flstory_state *state = machine->driver_data<flstory_state>();
 	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -56,13 +56,13 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	flstory_state *state = space->machine->driver_data<flstory_state>();
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
@@ -125,7 +125,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 {
-	flstory_state *state = (flstory_state *)field->port->machine->driver_data;
+	flstory_state *state = field->port->machine->driver_data<flstory_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	return (victnine_mcu_status_r(space, 0) & 3);
@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ta7630 )
 {
-	flstory_state *state = (flstory_state *)machine->driver_data;
+	flstory_state *state = machine->driver_data<flstory_state>();
 	int i;
 
 	double db			= 0.0;
@@ -186,7 +186,7 @@ static MACHINE_RESET( ta7630 )
 
 static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
-	flstory_state *state = (flstory_state *)device->machine->driver_data;
+	flstory_state *state = device->machine->driver_data<flstory_state>();
 
 	state->snd_ctrl0 = data & 0xff;
 	//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
@@ -200,7 +200,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 }
 static WRITE8_DEVICE_HANDLER( sound_control_1_w )
 {
-	flstory_state *state = (flstory_state *)device->machine->driver_data;
+	flstory_state *state = device->machine->driver_data<flstory_state>();
 
 	state->snd_ctrl1 = data & 0xff;
 	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
@@ -212,7 +212,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_1_w )
 
 static WRITE8_DEVICE_HANDLER( sound_control_2_w )
 {
-	flstory_state *state = (flstory_state *)device->machine->driver_data;
+	flstory_state *state = device->machine->driver_data<flstory_state>();
 	int i;
 
 	state->snd_ctrl2 = data & 0xff;
@@ -224,7 +224,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_2_w )
 
 static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 {
-	flstory_state *state = (flstory_state *)device->machine->driver_data;
+	flstory_state *state = device->machine->driver_data<flstory_state>();
 
 	state->snd_ctrl3 = data & 0xff;
 	//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
@@ -656,7 +656,7 @@ static const msm5232_interface msm5232_config =
 
 static MACHINE_START( flstory )
 {
-	flstory_state *state = (flstory_state *)machine->driver_data;
+	flstory_state *state = machine->driver_data<flstory_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -696,7 +696,7 @@ static MACHINE_START( flstory )
 
 static MACHINE_RESET( flstory )
 {
-	flstory_state *state = (flstory_state *)machine->driver_data;
+	flstory_state *state = machine->driver_data<flstory_state>();
 
 	MACHINE_RESET_CALL(ta7630);
 

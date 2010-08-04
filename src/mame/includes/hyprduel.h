@@ -2,12 +2,13 @@
 #define FIRST_VISIBLE_LINE 0
 #define LAST_VISIBLE_LINE 223
 
-class hyprduel_state
+class hyprduel_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hyprduel_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, hyprduel_state(machine)); }
 
-	hyprduel_state(running_machine &machine) { }
+	hyprduel_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT16 *  videoregs;

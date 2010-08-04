@@ -19,7 +19,7 @@
 
 void mainevt_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	mainevt_state *state = (mainevt_state *)machine->driver_data;
+	mainevt_state *state = machine->driver_data<mainevt_state>();
 
 	*flags = (*color & 0x02) ? TILE_FLIPX : 0;
 
@@ -31,7 +31,7 @@ void mainevt_tile_callback( running_machine *machine, int layer, int bank, int *
 
 void dv_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority )
 {
-	mainevt_state *state = (mainevt_state *)machine->driver_data;
+	mainevt_state *state = machine->driver_data<mainevt_state>();
 
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x3c) << 7);
@@ -47,7 +47,7 @@ void dv_tile_callback( running_machine *machine, int layer, int bank, int *code,
 
 void mainevt_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow)
 {
-	mainevt_state *state = (mainevt_state *)machine->driver_data;
+	mainevt_state *state = machine->driver_data<mainevt_state>();
 
 	/* bit 5 = priority over layer B (has precedence) */
 	/* bit 6 = HALF priority over layer B (used for crowd when you get out of the ring) */
@@ -64,7 +64,7 @@ void mainevt_sprite_callback(running_machine *machine, int *code,int *color,int 
 
 void dv_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow)
 {
-	mainevt_state *state = (mainevt_state *)machine->driver_data;
+	mainevt_state *state = machine->driver_data<mainevt_state>();
 
 	/* TODO: the priority/shadow handling (bits 5-7) seems to be quite complex (see PROM) */
 	*color = state->sprite_colorbase + (*color & 0x07);
@@ -75,7 +75,7 @@ void dv_sprite_callback(running_machine *machine, int *code,int *color,int *prio
 
 VIDEO_START( mainevt )
 {
-	mainevt_state *state = (mainevt_state *)machine->driver_data;
+	mainevt_state *state = machine->driver_data<mainevt_state>();
 	state->layer_colorbase[0] = 0;
 	state->layer_colorbase[1] = 8;
 	state->layer_colorbase[2] = 4;
@@ -84,7 +84,7 @@ VIDEO_START( mainevt )
 
 VIDEO_START( dv )
 {
-	mainevt_state *state = (mainevt_state *)machine->driver_data;
+	mainevt_state *state = machine->driver_data<mainevt_state>();
 	state->layer_colorbase[0] = 0;
 	state->layer_colorbase[1] = 0;
 	state->layer_colorbase[2] = 4;
@@ -95,7 +95,7 @@ VIDEO_START( dv )
 
 VIDEO_UPDATE( mainevt )
 {
-	mainevt_state *state = (mainevt_state *)screen->machine->driver_data;
+	mainevt_state *state = screen->machine->driver_data<mainevt_state>();
 
 	k052109_tilemap_update(state->k052109);
 
@@ -111,7 +111,7 @@ VIDEO_UPDATE( mainevt )
 
 VIDEO_UPDATE( dv )
 {
-	mainevt_state *state = (mainevt_state *)screen->machine->driver_data;
+	mainevt_state *state = screen->machine->driver_data<mainevt_state>();
 
 	k052109_tilemap_update(state->k052109);
 

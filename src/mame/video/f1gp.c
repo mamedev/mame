@@ -14,7 +14,7 @@
 
 static TILE_GET_INFO( f1gp_get_roz_tile_info )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 	int code = state->rozvideoram[tile_index];
 
 	SET_TILE_INFO(3, code & 0x7ff, code >> 12, 0);
@@ -22,7 +22,7 @@ static TILE_GET_INFO( f1gp_get_roz_tile_info )
 
 static TILE_GET_INFO( f1gp2_get_roz_tile_info )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 	int code = state->rozvideoram[tile_index];
 
 	SET_TILE_INFO(2, (code & 0x7ff) + (state->roz_bank << 11), code >> 12, 0);
@@ -30,7 +30,7 @@ static TILE_GET_INFO( f1gp2_get_roz_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 	int code = state->fgvideoram[tile_index];
 
 	SET_TILE_INFO(0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( f1gp )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 
 	state->roz_tilemap = tilemap_create(machine, f1gp_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -61,7 +61,7 @@ VIDEO_START( f1gp )
 
 VIDEO_START( f1gpb )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 
 	state->roz_tilemap = tilemap_create(machine, f1gp_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -76,7 +76,7 @@ VIDEO_START( f1gpb )
 
 VIDEO_START( f1gp2 )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 
 	state->roz_tilemap = tilemap_create(machine, f1gp2_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
@@ -97,40 +97,40 @@ VIDEO_START( f1gp2 )
 
 READ16_HANDLER( f1gp_zoomdata_r )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	return state->zoomdata[offset];
 }
 
 WRITE16_HANDLER( f1gp_zoomdata_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	COMBINE_DATA(&state->zoomdata[offset]);
 	gfx_element_mark_dirty(space->machine->gfx[3], offset / 64);
 }
 
 READ16_HANDLER( f1gp_rozvideoram_r )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	return state->rozvideoram[offset];
 }
 
 WRITE16_HANDLER( f1gp_rozvideoram_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	COMBINE_DATA(&state->rozvideoram[offset]);
 	tilemap_mark_tile_dirty(state->roz_tilemap, offset);
 }
 
 WRITE16_HANDLER( f1gp_fgvideoram_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	COMBINE_DATA(&state->fgvideoram[offset]);
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE16_HANDLER( f1gp_fgscroll_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	COMBINE_DATA(&state->scroll[offset]);
 
 	tilemap_set_scrollx(state->fg_tilemap, 0, state->scroll[0]);
@@ -139,7 +139,7 @@ WRITE16_HANDLER( f1gp_fgscroll_w )
 
 WRITE16_HANDLER( f1gp_gfxctrl_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->flipscreen = data & 0x20;
@@ -149,7 +149,7 @@ WRITE16_HANDLER( f1gp_gfxctrl_w )
 
 WRITE16_HANDLER( f1gp2_gfxctrl_w )
 {
-	f1gp_state *state = (f1gp_state *)space->machine->driver_data;
+	f1gp_state *state = space->machine->driver_data<f1gp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		state->flipscreen = data & 0x20;
@@ -179,7 +179,7 @@ WRITE16_HANDLER( f1gp2_gfxctrl_w )
 
 static void f1gp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int primask )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 	int attr_start, first;
 	UINT16 *spram = chip ? state->spr2vram : state->spr1vram;
 
@@ -252,7 +252,7 @@ static void f1gp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const
 
 VIDEO_UPDATE( f1gp )
 {
-	f1gp_state *state = (f1gp_state *)screen->machine->driver_data;
+	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
@@ -277,7 +277,7 @@ VIDEO_UPDATE( f1gp )
 
 static void f1gpb_draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 	UINT16 *spriteram = state->spriteram;
 	int attr_start, start_offset = state->spriteram_size / 2 - 4;
 
@@ -345,7 +345,7 @@ static void f1gpb_draw_sprites( running_machine *machine, bitmap_t *bitmap,const
 
 VIDEO_UPDATE( f1gpb )
 {
-	f1gp_state *state = (f1gp_state *)screen->machine->driver_data;
+	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy;
 
@@ -374,7 +374,7 @@ VIDEO_UPDATE( f1gpb )
 
 static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	f1gp_state *state = (f1gp_state *)machine->driver_data;
+	f1gp_state *state = machine->driver_data<f1gp_state>();
 	int offs;
 
 	offs = 0;
@@ -446,7 +446,7 @@ static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( f1gp2 )
 {
-	f1gp_state *state = (f1gp_state *)screen->machine->driver_data;
+	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
 
 	if (state->gfxctrl & 4)	/* blank screen */
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));

@@ -41,7 +41,7 @@ PALETTE_INIT( cheekyms )
 
 WRITE8_HANDLER( cheekyms_port_40_w )
 {
-	cheekyms_state *state = (cheekyms_state *)space->machine->driver_data;
+	cheekyms_state *state = space->machine->driver_data<cheekyms_state>();
 
 	/* the lower bits probably trigger sound samples */
 	dac_data_w(state->dac, data ? 0x80 : 0);
@@ -50,7 +50,7 @@ WRITE8_HANDLER( cheekyms_port_40_w )
 
 WRITE8_HANDLER( cheekyms_port_80_w )
 {
-	cheekyms_state *state = (cheekyms_state *)space->machine->driver_data;
+	cheekyms_state *state = space->machine->driver_data<cheekyms_state>();
 
 	/* d0-d1 - sound enables, not sure which bit is which */
 	/* d3-d5 - man scroll amount */
@@ -66,7 +66,7 @@ WRITE8_HANDLER( cheekyms_port_80_w )
 
 static TILE_GET_INFO( cheekyms_get_tile_info )
 {
-	cheekyms_state *state = (cheekyms_state *)machine->driver_data;
+	cheekyms_state *state = machine->driver_data<cheekyms_state>();
 	int color;
 
 	int x = tile_index & 0x1f;
@@ -96,7 +96,7 @@ static TILE_GET_INFO( cheekyms_get_tile_info )
 
 VIDEO_START( cheekyms )
 {
-	cheekyms_state *state = (cheekyms_state *)machine->driver_data;
+	cheekyms_state *state = machine->driver_data<cheekyms_state>();
 	int width, height;
 
 	width = machine->primary_screen->width();
@@ -110,7 +110,7 @@ VIDEO_START( cheekyms )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int flip )
 {
-	cheekyms_state *state = (cheekyms_state *)machine->driver_data;
+	cheekyms_state *state = machine->driver_data<cheekyms_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x20; offs += 4)
@@ -150,7 +150,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( cheekyms )
 {
-	cheekyms_state *state = (cheekyms_state *)screen->machine->driver_data;
+	cheekyms_state *state = screen->machine->driver_data<cheekyms_state>();
 	int y, x;
 	int scrolly = ((*state->port_80 >> 3) & 0x07);
 	int flip = *state->port_80 & 0x80;

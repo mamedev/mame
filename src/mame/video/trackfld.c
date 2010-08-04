@@ -91,14 +91,14 @@ PALETTE_INIT( trackfld )
 
 WRITE8_HANDLER( trackfld_videoram_w )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( trackfld_colorram_w )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -114,7 +114,7 @@ WRITE8_HANDLER( trackfld_flipscreen_w )
 
 WRITE8_HANDLER( atlantol_gfxbank_w )
 {
-	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	trackfld_state *state = space->machine->driver_data<trackfld_state>();
 	if (data & 1)
 	{
 		/* male / female sprites switch */
@@ -162,7 +162,7 @@ WRITE8_HANDLER( atlantol_gfxbank_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + 4 * (attr & 0xc0);
 	int color = attr & 0x0f;
@@ -176,14 +176,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( trackfld )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	trackfld_state *state = machine->driver_data<trackfld_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -227,7 +227,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( trackfld )
 {
-	trackfld_state *state = (trackfld_state *)screen->machine->driver_data;
+	trackfld_state *state = screen->machine->driver_data<trackfld_state>();
 	int row, scrollx;
 
 	for (row = 0; row < 32; row++)

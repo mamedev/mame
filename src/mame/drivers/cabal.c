@@ -54,7 +54,7 @@ Dip locations verified with Fabtek manual for the trackball version
 
 static MACHINE_RESET( cabalbl )
 {
-	cabal_state *state = (cabal_state *)machine->driver_data;
+	cabal_state *state = machine->driver_data<cabal_state>();
 	state->sound_command1 = state->sound_command2 = 0xff;
 }
 
@@ -63,7 +63,7 @@ static MACHINE_RESET( cabalbl )
 
 static WRITE16_HANDLER( cabalbl_sndcmd_w )
 {
-	cabal_state *state = (cabal_state *)space->machine->driver_data;
+	cabal_state *state = space->machine->driver_data<cabal_state>();
 
 	switch (offset)
 	{
@@ -81,7 +81,7 @@ static WRITE16_HANDLER( cabalbl_sndcmd_w )
 
 static WRITE16_HANDLER( track_reset_w )
 {
-	cabal_state *state = (cabal_state *)space->machine->driver_data;
+	cabal_state *state = space->machine->driver_data<cabal_state>();
 	int i;
 	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
 
@@ -91,7 +91,7 @@ static WRITE16_HANDLER( track_reset_w )
 
 static READ16_HANDLER( track_r )
 {
-	cabal_state *state = (cabal_state *)space->machine->driver_data;
+	cabal_state *state = space->machine->driver_data<cabal_state>();
 
 	switch (offset)
 	{
@@ -162,14 +162,14 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( cabalbl_snd2_r )
 {
-	cabal_state *state = (cabal_state *)space->machine->driver_data;
+	cabal_state *state = space->machine->driver_data<cabal_state>();
 
 	return BITSWAP8(state->sound_command2, 7,2,4,5,3,6,1,0);
 }
 
 static READ8_HANDLER( cabalbl_snd1_r )
 {
-	cabal_state *state = (cabal_state *)space->machine->driver_data;
+	cabal_state *state = space->machine->driver_data<cabal_state>();
 
 	return BITSWAP8(state->sound_command1, 7,2,4,5,3,6,1,0);
 }

@@ -36,7 +36,7 @@ static WRITE8_HANDLER( xyonix_irqack_w )
 static void handle_coins(running_machine *machine, int coin)
 {
 	static const int coinage_table[4][2] = {{2,3},{2,1},{1,2},{1,1}};
-	xyonix_state *state = (xyonix_state *)machine->driver_data;
+	xyonix_state *state = machine->driver_data<xyonix_state>();
 	int tmp = 0;
 
 	//popmessage("Coin %d", state->coin);
@@ -74,7 +74,7 @@ static void handle_coins(running_machine *machine, int coin)
 
 static READ8_HANDLER ( xyonix_io_r )
 {
-	xyonix_state *state = (xyonix_state *)space->machine->driver_data;
+	xyonix_state *state = space->machine->driver_data<xyonix_state>();
 	int regPC = cpu_get_pc(space->cpu);
 
 	if (regPC == 0x27ba)
@@ -126,7 +126,7 @@ static READ8_HANDLER ( xyonix_io_r )
 
 static WRITE8_HANDLER ( xyonix_io_w )
 {
-	xyonix_state *state = (xyonix_state *)space->machine->driver_data;
+	xyonix_state *state = space->machine->driver_data<xyonix_state>();
 
 	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(space->cpu));
 	state->e0_data = data;

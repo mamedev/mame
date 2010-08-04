@@ -29,7 +29,7 @@
 
 static WRITE8_HANDLER( cbasebal_bankswitch_w )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 
 	/* bits 0-4 select ROM bank */
 	//logerror("%04x: bankswitch %02x\n", cpu_get_pc(space->cpu), data);
@@ -44,7 +44,7 @@ static WRITE8_HANDLER( cbasebal_bankswitch_w )
 
 static READ8_HANDLER( bankedram_r )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 
 	switch (state->rambank)
 	{
@@ -63,7 +63,7 @@ static READ8_HANDLER( bankedram_r )
 
 static WRITE8_HANDLER( bankedram_w )
 {
-	cbasebal_state *state = (cbasebal_state *)space->machine->driver_data;
+	cbasebal_state *state = space->machine->driver_data<cbasebal_state>();
 
 	switch (state->rambank)
 	{
@@ -244,7 +244,7 @@ GFXDECODE_END
 
 static MACHINE_START( cbasebal )
 {
-	cbasebal_state *state = (cbasebal_state *)machine->driver_data;
+	cbasebal_state *state = machine->driver_data<cbasebal_state>();
 
 	memory_configure_bank(machine, "bank1", 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
@@ -261,7 +261,7 @@ static MACHINE_START( cbasebal )
 
 static MACHINE_RESET( cbasebal )
 {
-	cbasebal_state *state = (cbasebal_state *)machine->driver_data;
+	cbasebal_state *state = machine->driver_data<cbasebal_state>();
 
 	state->rambank = 0;
 	state->tilebank = 0;

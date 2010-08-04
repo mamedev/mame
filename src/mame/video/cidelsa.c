@@ -7,7 +7,7 @@
 
 static READ8_DEVICE_HANDLER( cidelsa_pageram_r )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT16 addr = offset & CIDELSA_PAGERAM_MASK;
 
@@ -21,7 +21,7 @@ static READ8_DEVICE_HANDLER( cidelsa_pageram_r )
 
 static WRITE8_DEVICE_HANDLER( cidelsa_pageram_w )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT16 addr = offset & CIDELSA_PAGERAM_MASK;
 
@@ -35,7 +35,7 @@ static WRITE8_DEVICE_HANDLER( cidelsa_pageram_w )
 
 static READ8_DEVICE_HANDLER( draco_pageram_r )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT16 addr = offset & DRACO_PAGERAM_MASK;
 
@@ -44,7 +44,7 @@ static READ8_DEVICE_HANDLER( draco_pageram_r )
 
 static WRITE8_DEVICE_HANDLER( draco_pageram_w )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT16 addr = offset & DRACO_PAGERAM_MASK;
 
@@ -55,7 +55,7 @@ static WRITE8_DEVICE_HANDLER( draco_pageram_w )
 
 static CDP1869_CHAR_RAM_READ( cidelsa_charram_r )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT8 column = BIT(pma, 10) ? 0xff : state->pageram[pma & CIDELSA_PAGERAM_MASK];
 	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
@@ -68,7 +68,7 @@ static CDP1869_CHAR_RAM_READ( cidelsa_charram_r )
 
 static CDP1869_CHAR_RAM_WRITE( cidelsa_charram_w )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT8 column = BIT(pma, 10) ? 0xff : state->pageram[pma & CIDELSA_PAGERAM_MASK];
 	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
@@ -79,7 +79,7 @@ static CDP1869_CHAR_RAM_WRITE( cidelsa_charram_w )
 
 static CDP1869_CHAR_RAM_READ( draco_charram_r )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT8 column = state->pageram[pma & DRACO_PAGERAM_MASK];
 	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
@@ -92,7 +92,7 @@ static CDP1869_CHAR_RAM_READ( draco_charram_r )
 
 static CDP1869_CHAR_RAM_WRITE( draco_charram_w )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT8 column = state->pageram[pma & DRACO_PAGERAM_MASK];
 	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
@@ -105,7 +105,7 @@ static CDP1869_CHAR_RAM_WRITE( draco_charram_w )
 
 static CDP1869_PCB_READ( cidelsa_pcb_r )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT8 column = state->pageram[pma & CIDELSA_PAGERAM_MASK];
 	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
@@ -115,7 +115,7 @@ static CDP1869_PCB_READ( cidelsa_pcb_r )
 
 static CDP1869_PCB_READ( draco_pcb_r )
 {
-	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
 	UINT8 column = state->pageram[pma & DRACO_PAGERAM_MASK];
 	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
@@ -127,7 +127,7 @@ static CDP1869_PCB_READ( draco_pcb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( cidelsa_prd_w )
 {
-	cidelsa_state *driver_state = (cidelsa_state *)device->machine->driver_data;
+	cidelsa_state *driver_state = device->machine->driver_data<cidelsa_state>();
 
 	/* invert PRD signal */
 	cpu_set_input_line(driver_state->cdp1802, INPUT_LINE_IRQ0, !state);
@@ -182,7 +182,7 @@ static CDP1869_INTERFACE( draco_cdp1869_intf )
 
 static void video_start(running_machine *machine, UINT16 pageram_size)
 {
-	cidelsa_state *state = (cidelsa_state *)machine->driver_data;
+	cidelsa_state *state = machine->driver_data<cidelsa_state>();
 
 	/* allocate memory */
 	state->pageram = auto_alloc_array(machine, UINT8, pageram_size);
@@ -213,7 +213,7 @@ static VIDEO_START(draco)
 
 static VIDEO_UPDATE( cidelsa )
 {
-	cidelsa_state *state = (cidelsa_state *)screen->machine->driver_data;
+	cidelsa_state *state = screen->machine->driver_data<cidelsa_state>();
 
 	cdp1869_update(state->cdp1869, bitmap, cliprect);
 

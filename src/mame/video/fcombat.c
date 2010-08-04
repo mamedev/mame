@@ -100,7 +100,7 @@ PALETTE_INIT( fcombat )
 
 VIDEO_START( fcombat )
 {
-	fcombat_state *state = (fcombat_state *)machine->driver_data;
+	fcombat_state *state = machine->driver_data<fcombat_state>();
 	state->bgmap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32 * 8 * 2, 32);
 }
 
@@ -114,7 +114,7 @@ VIDEO_START( fcombat )
 
 WRITE8_HANDLER( fcombat_videoreg_w )
 {
-	fcombat_state *state = (fcombat_state *)space->machine->driver_data;
+	fcombat_state *state = space->machine->driver_data<fcombat_state>();
 
 	/* bit 0 = flip screen and joystick input multiplexor */
 	state->cocktail_flip = data & 1;
@@ -136,7 +136,7 @@ WRITE8_HANDLER( fcombat_videoreg_w )
 
 VIDEO_UPDATE( fcombat )
 {
-	fcombat_state *state = (fcombat_state *)screen->machine->driver_data;
+	fcombat_state *state = screen->machine->driver_data<fcombat_state>();
 	int sx, sy, offs, i;
 
 	/* draw background */

@@ -62,7 +62,7 @@ WRITE8_HANDLER( bwing_spriteram_w )
 
 WRITE8_HANDLER( bwing_videoram_w )
 {
-	bwing_state *state = (bwing_state *)space->machine->driver_data;
+	bwing_state *state = space->machine->driver_data<bwing_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->charmap, offset);
 }
@@ -70,7 +70,7 @@ WRITE8_HANDLER( bwing_videoram_w )
 
 READ8_HANDLER ( bwing_scrollram_r )
 {
-	bwing_state *state = (bwing_state *)space->machine->driver_data;
+	bwing_state *state = space->machine->driver_data<bwing_state>();
 	int offs;
 
 	if (!state->srbank)
@@ -84,7 +84,7 @@ READ8_HANDLER ( bwing_scrollram_r )
 
 WRITE8_HANDLER( bwing_scrollram_w )
 {
-	bwing_state *state = (bwing_state *)space->machine->driver_data;
+	bwing_state *state = space->machine->driver_data<bwing_state>();
 	int offs;
 
 	if (!state->srbank)
@@ -110,7 +110,7 @@ WRITE8_HANDLER( bwing_scrollram_w )
 
 WRITE8_HANDLER( bwing_scrollreg_w )
 {
-	bwing_state *state = (bwing_state *)space->machine->driver_data;
+	bwing_state *state = space->machine->driver_data<bwing_state>();
 	state->sreg[offset] = data;
 
 	switch (offset)
@@ -136,7 +136,7 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 
 WRITE8_HANDLER( bwing_paletteram_w )
 {
-	bwing_state *state = (bwing_state *)space->machine->driver_data;
+	bwing_state *state = space->machine->driver_data<bwing_state>();
 	static const float rgb[4][3] = {
 		{0.85f, 0.95f, 1.00f},
 		{0.90f, 1.00f, 1.00f},
@@ -177,21 +177,21 @@ WRITE8_HANDLER( bwing_paletteram_w )
 
 static TILE_GET_INFO( get_fgtileinfo )
 {
-	bwing_state *state = (bwing_state *)machine->driver_data;
+	bwing_state *state = machine->driver_data<bwing_state>();
 	tileinfo->pen_data = gfx_element_get_data(machine->gfx[2], state->fgdata[tile_index] & (BW_NTILES - 1));
 	tileinfo->palette_base = machine->gfx[2]->color_base + ((state->fgdata[tile_index] >> 7) << 3);
 }
 
 static TILE_GET_INFO( get_bgtileinfo )
 {
-	bwing_state *state = (bwing_state *)machine->driver_data;
+	bwing_state *state = machine->driver_data<bwing_state>();
 	tileinfo->pen_data = gfx_element_get_data(machine->gfx[3], state->bgdata[tile_index] & (BW_NTILES - 1));
 	tileinfo->palette_base = machine->gfx[3]->color_base + ((state->bgdata[tile_index] >> 7) << 3);
 }
 
 static TILE_GET_INFO( get_charinfo )
 {
-	bwing_state *state = (bwing_state *)machine->driver_data;
+	bwing_state *state = machine->driver_data<bwing_state>();
 	SET_TILE_INFO(0, state->videoram[tile_index], 0, 0);
 }
 
@@ -203,7 +203,7 @@ static TILEMAP_MAPPER( bwing_scan_cols )
 
 VIDEO_START( bwing )
 {
-	bwing_state *state = (bwing_state *)machine->driver_data;
+	bwing_state *state = machine->driver_data<bwing_state>();
 	UINT32 *dwptr;
 	int i;
 
@@ -248,7 +248,7 @@ VIDEO_START( bwing )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bmp, const rectangle *clip, UINT8 *ram, int pri )
 {
-	bwing_state *state = (bwing_state *)machine->driver_data;
+	bwing_state *state = machine->driver_data<bwing_state>();
 	int attrib, fx, fy, code, x, y, color, i;
 	gfx_element *gfx = machine->gfx[1];
 
@@ -290,7 +290,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bmp, const rectang
 
 VIDEO_UPDATE( bwing )
 {
-	bwing_state *state = (bwing_state *)screen->machine->driver_data;
+	bwing_state *state = screen->machine->driver_data<bwing_state>();
 	unsigned x, y, shiftx;
 
 	if (state->mapmask & 0x20)

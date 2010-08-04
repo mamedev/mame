@@ -47,12 +47,13 @@ MM63.10N
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
-class chinsan_state
+class chinsan_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, chinsan_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, chinsan_state(machine)); }
 
-	chinsan_state(running_machine &machine) { }
+	chinsan_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory pointers */
 	UINT8 *  video;
@@ -86,7 +87,7 @@ static VIDEO_START( chinsan )
 
 static VIDEO_UPDATE( chinsan )
 {
-	chinsan_state *state = (chinsan_state *)screen->machine->driver_data;
+	chinsan_state *state = screen->machine->driver_data<chinsan_state>();
 	int y, x, count;
 	count = 0;
 	for (y = 0; y < 32; y++)
@@ -143,7 +144,7 @@ static const ym2203_interface ym2203_config =
 
 static WRITE8_HANDLER( chinsan_port00_w )
 {
-	chinsan_state *state = (chinsan_state *)space->machine->driver_data;
+	chinsan_state *state = space->machine->driver_data<chinsan_state>();
 
 	state->port_select = data;
 
@@ -161,7 +162,7 @@ static WRITE8_HANDLER( chinsan_port00_w )
 
 static READ8_HANDLER( chinsan_input_port_0_r )
 {
-	chinsan_state *state = (chinsan_state *)space->machine->driver_data;
+	chinsan_state *state = space->machine->driver_data<chinsan_state>();
 
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
@@ -194,7 +195,7 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 
 static READ8_HANDLER( chinsan_input_port_1_r )
 {
-	chinsan_state *state = (chinsan_state *)space->machine->driver_data;
+	chinsan_state *state = space->machine->driver_data<chinsan_state>();
 
 	switch (state->port_select)
 	{
@@ -225,7 +226,7 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 
 static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
 {
-	chinsan_state *state = (chinsan_state *)device->machine->driver_data;
+	chinsan_state *state = device->machine->driver_data<chinsan_state>();
 	state->adpcm_pos = (data & 0xff) * 0x100;
 	state->adpcm_idle = 0;
 	msm5205_reset_w(device, 0);
@@ -529,7 +530,7 @@ GFXDECODE_END
 
 static void chin_adpcm_int( running_device *device )
 {
-	chinsan_state *state = (chinsan_state *)device->machine->driver_data;
+	chinsan_state *state = device->machine->driver_data<chinsan_state>();
 
 	if (state->adpcm_pos >= 0x10000 || state->adpcm_idle)
 	{
@@ -567,7 +568,7 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( chinsan )
 {
-	chinsan_state *state = (chinsan_state *)machine->driver_data;
+	chinsan_state *state = machine->driver_data<chinsan_state>();
 
 	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
@@ -580,7 +581,7 @@ static MACHINE_START( chinsan )
 
 static MACHINE_RESET( chinsan )
 {
-	chinsan_state *state = (chinsan_state *)machine->driver_data;
+	chinsan_state *state = machine->driver_data<chinsan_state>();
 
 	state->adpcm_idle = 1;
 	state->port_select = 0;

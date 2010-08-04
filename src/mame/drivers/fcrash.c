@@ -42,7 +42,7 @@ from 2.bin to 9.bin program eproms
 
 static WRITE16_HANDLER( fcrash_soundlatch_w )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -53,7 +53,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 
 	sound_set_output_gain(state->msm_1, 0, (data & 0x08) ? 0.0 : 1.0);
 	sound_set_output_gain(state->msm_2, 0, (data & 0x10) ? 0.0 : 1.0);
@@ -63,7 +63,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 
 static void m5205_int1( running_device *device )
 {
-	cps_state *state = (cps_state *)device->machine->driver_data;
+	cps_state *state = device->machine->driver_data<cps_state>();
 
 	msm5205_data_w(device, state->sample_buffer1 & 0x0f);
 	state->sample_buffer1 >>= 4;
@@ -74,7 +74,7 @@ static void m5205_int1( running_device *device )
 
 static void m5205_int2( running_device *device )
 {
-	cps_state *state = (cps_state *)device->machine->driver_data;
+	cps_state *state = device->machine->driver_data<cps_state>();
 
 	msm5205_data_w(device, state->sample_buffer2 & 0x0f);
 	state->sample_buffer2 >>= 4;
@@ -84,13 +84,13 @@ static void m5205_int2( running_device *device )
 
 static WRITE8_HANDLER( fcrash_msm5205_0_data_w )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 	state->sample_buffer1 = data;
 }
 
 static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 {
-	cps_state *state = (cps_state *)space->machine->driver_data;
+	cps_state *state = space->machine->driver_data<cps_state>();
 	state->sample_buffer2 = data;
 }
 
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 
 static void fcrash_update_transmasks( running_machine *machine )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 	int i;
 	int priority[4];
 
@@ -128,7 +128,7 @@ static void fcrash_update_transmasks( running_machine *machine )
 
 static void fcrash_render_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 	int pos;
 	int base = 0x50c8 / 2;
 
@@ -161,7 +161,7 @@ static void fcrash_render_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void fcrash_render_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int primask )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 
 	switch (layer)
 	{
@@ -178,7 +178,7 @@ static void fcrash_render_layer( running_machine *machine, bitmap_t *bitmap, con
 
 static void fcrash_render_high_layer( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 
 	switch (layer)
 	{
@@ -195,7 +195,7 @@ static void fcrash_render_high_layer( running_machine *machine, bitmap_t *bitmap
 
 static void fcrash_build_palette( running_machine *machine )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 	int offset;
 
 	for (offset = 0; offset < 32 * 6 * 16; offset++)
@@ -218,7 +218,7 @@ static void fcrash_build_palette( running_machine *machine )
 
 static VIDEO_UPDATE( fcrash )
 {
-	cps_state *state = (cps_state *)screen->machine->driver_data;
+	cps_state *state = screen->machine->driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = state->cps_a_regs[0x22 / 2];
 
@@ -299,7 +299,7 @@ static VIDEO_UPDATE( fcrash )
 // doesn't have the scroll offsets like fcrash
 static VIDEO_UPDATE( kodb )
 {
-	cps_state *state = (cps_state *)screen->machine->driver_data;
+	cps_state *state = screen->machine->driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = state->cps_a_regs[0x22 / 2];
 
@@ -691,7 +691,7 @@ static const msm5205_interface msm5205_interface2 =
 
 static MACHINE_START( fcrash )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 	UINT8 *ROM = memory_region(machine, "soundcpu");
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
@@ -709,7 +709,7 @@ static MACHINE_START( fcrash )
 
 static MACHINE_START( kodb )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("soundcpu");
@@ -717,7 +717,7 @@ static MACHINE_START( kodb )
 
 static MACHINE_RESET( fcrash )
 {
-	cps_state *state = (cps_state *)machine->driver_data;
+	cps_state *state = machine->driver_data<cps_state>();
 
 	state->sample_buffer1 = 0;
 	state->sample_buffer2 = 0;

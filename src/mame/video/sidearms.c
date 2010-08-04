@@ -11,7 +11,7 @@
 
 WRITE8_HANDLER( sidearms_videoram_w )
 {
-	sidearms_state *state = (sidearms_state *)space->machine->driver_data;
+	sidearms_state *state = space->machine->driver_data<sidearms_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -19,7 +19,7 @@ WRITE8_HANDLER( sidearms_videoram_w )
 
 WRITE8_HANDLER( sidearms_colorram_w )
 {
-	sidearms_state *state = (sidearms_state *)space->machine->driver_data;
+	sidearms_state *state = space->machine->driver_data<sidearms_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -27,7 +27,7 @@ WRITE8_HANDLER( sidearms_colorram_w )
 
 WRITE8_HANDLER( sidearms_c804_w )
 {
-	sidearms_state *state = (sidearms_state *)space->machine->driver_data;
+	sidearms_state *state = space->machine->driver_data<sidearms_state>();
 
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(space->machine, 0, data & 0x01);
@@ -73,14 +73,14 @@ WRITE8_HANDLER( sidearms_c804_w )
 
 WRITE8_HANDLER( sidearms_gfxctrl_w )
 {
-	sidearms_state *state = (sidearms_state *)space->machine->driver_data;
+	sidearms_state *state = space->machine->driver_data<sidearms_state>();
 	state->objon = data & 0x01;
 	state->bgon = data & 0x02;
 }
 
 WRITE8_HANDLER( sidearms_star_scrollx_w )
 {
-	sidearms_state *state = (sidearms_state *)space->machine->driver_data;
+	sidearms_state *state = space->machine->driver_data<sidearms_state>();
 	UINT32 last_state = state->hcount_191;
 
 	state->hcount_191++;
@@ -93,7 +93,7 @@ WRITE8_HANDLER( sidearms_star_scrollx_w )
 
 WRITE8_HANDLER( sidearms_star_scrolly_w )
 {
-	sidearms_state *state = (sidearms_state *)space->machine->driver_data;
+	sidearms_state *state = space->machine->driver_data<sidearms_state>();
 	state->vcount_191++;
 	state->vcount_191 &= 0xff;
 }
@@ -101,7 +101,7 @@ WRITE8_HANDLER( sidearms_star_scrolly_w )
 
 static TILE_GET_INFO( get_sidearms_bg_tile_info )
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 	int code, attr, color, flags;
 
 	code = state->tilerom[tile_index];
@@ -115,7 +115,7 @@ static TILE_GET_INFO( get_sidearms_bg_tile_info )
 
 static TILE_GET_INFO( get_philko_bg_tile_info )
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 	int code, attr, color, flags;
 
 	code = state->tilerom[tile_index];
@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_philko_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index] + (attr<<2 & 0x300);
 	int color = attr & 0x3f;
@@ -148,7 +148,7 @@ static TILEMAP_MAPPER( sidearms_tilemap_scan )
 
 VIDEO_START( sidearms )
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 	state->tilerom = memory_region(machine, "gfx4");
 
 	if (!state->gameid)
@@ -179,7 +179,7 @@ static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, cons
 	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	const gfx_element *gfx = machine->gfx[2];
 	int offs, attr, color, code, x, y, flipx, flipy;
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 
 	flipy = flipx = state->flipon;
 
@@ -214,7 +214,7 @@ static void sidearms_draw_starfield( running_machine *machine, bitmap_t *bitmap 
 	UINT8 *sf_rom;
 	UINT16 *lineptr;
 	int pixadv, lineadv;
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 
 	// clear starfield background
 	lineptr = BITMAP_ADDR16(bitmap, 16, 64);
@@ -333,7 +333,7 @@ static void sidearms_draw_starfield( running_machine *machine, bitmap_t *bitmap 
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	sidearms_state *state = (sidearms_state *)machine->driver_data;
+	sidearms_state *state = machine->driver_data<sidearms_state>();
 
 	if (state->gameid == 2 || state->gameid == 3) // Dyger and Whizz have simple front-to-back sprite priority
 		draw_sprites_region(machine, bitmap, cliprect, 0x0000, 0x1000);
@@ -348,7 +348,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( sidearms )
 {
-	sidearms_state *state = (sidearms_state *)screen->machine->driver_data;
+	sidearms_state *state = screen->machine->driver_data<sidearms_state>();
 
 	sidearms_draw_starfield(screen->machine, bitmap);
 
