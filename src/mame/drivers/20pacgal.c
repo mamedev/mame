@@ -193,6 +193,7 @@ static ADDRESS_MAP_START( 20pacgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)	/* this should be a mirror of 08000-09ffff */
 	AM_RANGE(0x4c000, 0x4dfff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_gfx_ram)
 	AM_RANGE(0x4e000, 0x4e17f) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_ram)
+	AM_RANGE(0x4e180, 0x4feff) AM_NOP
 	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_color_lookup)
 ADDRESS_MAP_END
 
@@ -272,6 +273,44 @@ static INPUT_PORTS_START( 20pacgal )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( 25pacman )
+
+	PORT_INCLUDE(20pacgal)
+
+
+	PORT_MODIFY("P2")
+
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+
+	PORT_MODIFY("SERVICE")
+
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+INPUT_PORTS_END
+
+
+
 
 /*************************************
  *
@@ -306,7 +345,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map)
 	MDRV_CPU_IO_MAP(20pacgal_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) // assert breaks the inputs in 25pacman test mode
 
 	MDRV_MACHINE_START(20pacgal)
 	MDRV_MACHINE_RESET(20pacgal)
@@ -337,10 +376,10 @@ MACHINE_DRIVER_END
 
 
 /*
-     Pacman - 25th Anniversary Edition
+     Pacman 25th Anniversary
 */
 
-ROM_START( 25pacman ) /* Version 2.0 */
+ROM_START( 25pacman ) /* Version 2.00 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) )
 
@@ -388,10 +427,20 @@ ROM_END
 static DRIVER_INIT(20pacgal)
 {
 	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
-
 	state->ram_48000 = auto_alloc_array(machine, UINT8, 0x2000);
+	state->sprite_pal_base = 0x00<<2;
 }
 
+static DRIVER_INIT(25pacman)
+
+{
+
+	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
+
+	state->ram_48000 = auto_alloc_array(machine, UINT8, 0x2000);
+	state->sprite_pal_base = 0x20<<2;
+
+}
 
 
 /*************************************
@@ -400,7 +449,7 @@ static DRIVER_INIT(20pacgal)
  *
  *************************************/
 
-GAME( 2005, 25pacman,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Pacman - 25th Anniversary Edition (V2.0)", GAME_NOT_WORKING)
+GAME( 2000, 25pacman,          0, 20pacgal, 25pacman, 25pacman, ROT90, "Namco", "Pacman - 25th Anniversary Edition (Rev 2.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 
 GAME( 2000, 20pacgal,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
