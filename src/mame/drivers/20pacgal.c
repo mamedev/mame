@@ -35,8 +35,11 @@
 
     Versions known to exist but not dumped: v1.0 & v1.03
 
-    Pacman 25th Anniversary is a program update giving Pacman it's own start button
-        instead of using the above mentioned "joystick maneuver"
+    Pacman 25th Anniversary is a program update which allows the player to choose the
+        game they want to play. You highlight the wanted game and then press the 1 or 2
+        player start button to start the game. There is minor board difference that the
+        program code can detect through the Z80 ports to prevent ROM swaps to upgrade
+        Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion boards.
 
 ***************************************************************************/
 
@@ -274,39 +277,23 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( 25pacman )
-
 	PORT_INCLUDE(20pacgal)
 
-
 	PORT_MODIFY("P2")
-
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-
 	PORT_MODIFY("SERVICE")
-
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-
 INPUT_PORTS_END
 
 
@@ -376,7 +363,7 @@ MACHINE_DRIVER_END
 
 
 /*
-     Pacman 25th Anniversary
+     Pacman - 25th Anniversary Edition
 */
 
 ROM_START( 25pacman ) /* Version 2.00 */
@@ -434,12 +421,9 @@ static DRIVER_INIT(20pacgal)
 static DRIVER_INIT(25pacman)
 
 {
-
 	_20pacgal_state *state = machine->driver_data<_20pacgal_state>();
-
 	state->ram_48000 = auto_alloc_array(machine, UINT8, 0x2000);
 	state->sprite_pal_base = 0x20<<2;
-
 }
 
 
