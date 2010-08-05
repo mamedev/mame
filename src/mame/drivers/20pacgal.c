@@ -1,5 +1,6 @@
 /***************************************************************************
 
+    Pacman - 25th Anniversary Edition
     Ms.Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion
 
     driver by Nicola Salmoria
@@ -40,6 +41,9 @@
         player start button to start the game. There is minor board difference that the
         program code can detect through the Z80 ports to prevent ROM swaps to upgrade
         Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion boards.
+      * The above listed joystick manuver for the built-in speed up still works.
+      * The above listed joystick manuver to enable Pac-Man will still play a
+        tone, but the effect (if any) is unknown.
 
 ***************************************************************************/
 
@@ -210,7 +214,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
+	AM_RANGE(0x00, 0x3f) AM_NOP	/* Z180 internal registers */
 	AM_RANGE(0x40, 0x7f) AM_NOP	/* Z180 internal registers */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
@@ -218,6 +222,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)		/* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
+	AM_RANGE(0x84, 0x84) AM_NOP	/* ?? */
 	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, stars_seed)	/* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
@@ -433,7 +438,7 @@ static DRIVER_INIT(25pacman)
  *
  *************************************/
 
-GAME( 2000, 25pacman,          0, 20pacgal, 25pacman, 25pacman, ROT90, "Namco", "Pacman - 25th Anniversary Edition (Rev 2.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2005, 25pacman,          0, 20pacgal, 25pacman, 25pacman, ROT90, "Namco", "Pacman - 25th Anniversary Edition (Rev 2.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 
 GAME( 2000, 20pacgal,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
