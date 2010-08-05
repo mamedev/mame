@@ -35,15 +35,15 @@ VIDEO_UPDATE( malzak )
 	for (x = 0; x < 16; x++)
 		for (y = 0; y < 16; y++)
 		{
-			sx = ((x * 16 - 48) - state->malzak_x);
-			sy = ((y * 16) - state->malzak_y);
+			sx = ((x * 16 - 48) - state->malzak_x) * 2;
+			sy = ((y * 16) - state->malzak_y) * 2;
 
-			if (sx < -271)
-				sx += 512;
-			if (sx < -15)
-				sx += 256;
+			if (sx < -271*2)
+				sx += 512*2;
+			if (sx < -15*2)
+				sx += 256*2;
 
-			drawgfx_transpen(bitmap,cliprect, screen->machine->gfx[0], state->playfield_code[x * 16 + y], 7, 0, 0, sx, sy, 0);
+			drawgfxzoom_transpen(bitmap,cliprect, screen->machine->gfx[0], state->playfield_code[x * 16 + y], 7*2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
 		}
 
 	/* update the S2636 chips */
@@ -54,20 +54,28 @@ VIDEO_UPDATE( malzak )
 	{
 		int y;
 
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect->min_y; y <= cliprect->max_y / 2; y++)
 		{
 			int x;
 
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect->min_x; x <= cliprect->max_x / 2; x++)
 			{
 				int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
 				int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
 
-				if (S2636_IS_PIXEL_DRAWN(pixel0))
-					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel0);
+				if (S2636_IS_PIXEL_DRAWN(pixel0)) {
+					*BITMAP_ADDR16(bitmap, y*2, x*2) = S2636_PIXEL_COLOR(pixel0);
+					*BITMAP_ADDR16(bitmap, y*2+1, x*2) = S2636_PIXEL_COLOR(pixel0);
+					*BITMAP_ADDR16(bitmap, y*2, x*2+1) = S2636_PIXEL_COLOR(pixel0);
+					*BITMAP_ADDR16(bitmap, y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel0);
+				}
 
-				if (S2636_IS_PIXEL_DRAWN(pixel1))
-					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel1);
+				if (S2636_IS_PIXEL_DRAWN(pixel1)) {
+					*BITMAP_ADDR16(bitmap, y*2, x*2) = S2636_PIXEL_COLOR(pixel1);
+					*BITMAP_ADDR16(bitmap, y*2+1, x*2) = S2636_PIXEL_COLOR(pixel1);
+					*BITMAP_ADDR16(bitmap, y*2, x*2+1) = S2636_PIXEL_COLOR(pixel1);
+					*BITMAP_ADDR16(bitmap, y*2+1, x*2+1) = S2636_PIXEL_COLOR(pixel1);
+				}
 			}
 		}
 	}

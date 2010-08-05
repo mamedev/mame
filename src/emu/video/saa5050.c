@@ -319,12 +319,12 @@ void saa5050_update( running_device *device, bitmap_t *bitmap, const rectangle *
 			{
 				if (saa5050->flags & SAA5050_DBLHI)
 				{
-					drawgfx_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 1], code, colour, 0, 0, sx * 6, ssy * 10);
-					drawgfx_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 2], code, colour, 0, 0, sx * 6, (ssy + 1) * 10);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 1], code, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 2], code, colour, 0, 0, sx * 12, (ssy + 1) * 20, 0x20000, 0x20000);
 				}
 				else
 				{
-					drawgfx_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 0], code, colour, 0, 0, sx * 6, ssy * 10);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine->gfx[saa5050->gfxnum + 0], code, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
 				}
 			}
 		}
