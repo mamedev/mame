@@ -973,6 +973,7 @@ const game_driver * const drivers[] =
 	DRIVER( fghtjam )
 	DRIVER( sukuinuf )
 	DRIVER( zgundmdx )
+	DRIVER( gundzaft )
 	DRIVER( soulclb3 )
 
 	/* Namco System 256 */

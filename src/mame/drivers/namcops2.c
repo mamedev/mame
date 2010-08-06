@@ -293,6 +293,18 @@ ROM_START( zgundmdx )
 	DISK_IMAGE_READONLY( "zdx1vera", 0, SHA1(fa21626f771106e2441c4515a0e5dff478187ccd) )
 ROM_END
 
+ROM_START( gundzaft )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+        ROM_LOAD( "sed1vera.ic002", 0x000000, 0x800000, NO_DUMP )
+        ROM_LOAD( "sed1vera_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "sed1vera", 0, SHA1(0e6db61d94f66a4ddd7d4a3013983a838d256c5d) )
+ROM_END
+
 GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 246 BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
 GAME(2002, dragchrn,   sys246, system246, system246, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, netchu02,   sys246, system246, system246, 0, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
@@ -306,6 +318,7 @@ GAME(2003, zgundm,     sys246, system246, system246, 0, ROT0, "Capcom / Banprest
 GAME(2004, fghtjam,    sys246, system246, system246, 0, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2004, sukuinuf,   sys246, system246, system246, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2004, zgundmdx,   sys246, system246, system246, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2005, gundzaft,   sys246, system246, system246, 0, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2005, soulclb3,   sys246, system246, system246, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 
 GAME(2004, sys256,          0, system256, system246, 0, ROT0, "Namco", "System 256 BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
