@@ -182,10 +182,11 @@ ROM_START( batlgr2 )
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ide" )
+	DISK_IMAGE( "bg2_204j", 0, SHA1(7ac100fba39ae0b93980c0af2f0212a731106912) )
 ROM_END
 
 GAME( 1999, taitotz,  0, taitotz, taitotz, 0, ROT0, "Taito", "Type Zero BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
 GAME( 1999, landhigh, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Landing High Japan", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, batlgear, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2000, batlgr2,  taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear 2", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, batlgr2,  taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear 2 (v2.04J)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
