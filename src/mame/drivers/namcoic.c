@@ -1659,7 +1659,8 @@ namco_road_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cli
 						while( numpixels-- > 0 )
 						{
 							int pen = pSourceGfx[sourcex>>16];
-							if (pen != mRoadTransparentColor)
+
+							if(colortable_entry_get_value(machine->colortable, pen) != mRoadTransparentColor)
 							{
 								if( clut )
 								{
