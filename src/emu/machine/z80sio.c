@@ -362,6 +362,8 @@ z80sio_device::z80sio_device(running_machine &_machine, const z80sio_device_conf
 	  device_z80daisy_interface(_machine, config, *this),
 	  m_config(config)
 {
+	for (int i = 0; i < 8; i++)
+		m_int_state[i] = 0;
 }
 
 
