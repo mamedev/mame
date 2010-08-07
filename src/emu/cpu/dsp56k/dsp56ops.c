@@ -44,7 +44,6 @@ typedef struct _typed_pointer typed_pointer;
 #define ADDRESS(X) (X<<1)
 #define BITS(CUR,MASK) (Dsp56kOpMask(CUR,MASK))
 
-
 /*********************/
 /* Opcode prototypes */
 /*********************/
@@ -240,8 +239,8 @@ static void execute_one(dsp56k_core* cpustate)
 	UINT8 cycle_count = 0;
 
 	/* For MAME */
+	cpustate->op = ROPCODE(ADDRESS(PC));
 	debugger_instruction_hook(cpustate->device, PC);
-	OP = ROPCODE(ADDRESS(PC));
 
 	/* The words we're going to be working with */
 	op = ROPCODE(ADDRESS(PC));

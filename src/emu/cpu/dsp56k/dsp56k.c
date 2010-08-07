@@ -21,7 +21,7 @@
     - 1-9 For fractional arithmetic, the 31-bit product is added to the 40-bit contents of A or B.  No pipeline!
     - 1-10 Two types of rounding: convergent rounding and two's complement rounding.  See status register bit R.
     - 1-10 Logic unit is 16-bits wide and works on MSP portion of accum register
-    - 1-10 The AGU can implement three types of arithmetic: linear, modulo, and reverse carry.
+    - 1-10 The AGU can implement three types of arithmetic: linear, modulo, and reverse carry. 
     - 1-12 "Two external interrupt pins!!!"
     - 1-12 Take care of all interrupt priority (IPR) stuff!
     - 1-19 Memory WAIT states
@@ -29,11 +29,15 @@
     - 1-21 Vectored exception requests on the Host Interface!
 ***************************************************************************/
 
+#include "opcode.h"
+
 #include "emu.h"
 #include "debugger.h"
 #include "dsp56k.h"
 
 #include "dsp56def.h"
+
+using namespace DSP56K;
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -42,30 +46,29 @@ static CPU_RESET( dsp56k );
 
 
 /***************************************************************************
-    ONBOARD MEMORY ALLOCATION
+    ONBOARD MEMORY 
 ***************************************************************************/
-// TODO: Put these in the cpustate!!!
-static UINT16 *dsp56k_peripheral_ram;
-static UINT16 *dsp56k_program_ram;
+UINT16 *dsp56k_peripheral_ram;
+UINT16 *dsp56k_program_ram;
 
 
 /***************************************************************************
     COMPONENT FUNCTIONALITY
 ***************************************************************************/
 /* 1-9 ALU */
-// #include "dsp56alu.c"
+// #include "dsp56alu.h"
 
 /* 1-10 Address Generation Unit (AGU) */
-// #include "dsp56agu.c"
+// #include "dsp56agu.h"
 
 /* 1-11 Program Control Unit (PCU) */
-#include "dsp56pcu.c"
+#include "dsp56pcu.h"
 
 /* 5-1 Host Interface (HI) */
-//#include "dsp56hi.c"
+//#include "dsp56hi.h"
 
 /* 4-8 Memory handlers for on-chip peripheral memory. */
-#include "dsp56mem.c"
+#include "dsp56mem.h"
 
 
 /***************************************************************************
@@ -306,13 +309,30 @@ static CPU_EXIT( dsp56k )
 /***************************************************************************
     CORE INCLUDE
 ***************************************************************************/
-#define OP (cpustate->op)
 #include "dsp56ops.c"
 
 
 /***************************************************************************
     CORE EXECUTION LOOP
 ***************************************************************************/
+// Execute a single opcode and return how many cycles it took.
+static size_t execute_one_new(dsp56k_core* cpustate)
+{
+	// For MAME
+	cpustate->op = ROPCODE(ADDRESS(PC));
+	debugger_instruction_hook(cpustate->device, PC);
+
+	UINT16 w0 = ROPCODE(ADDRESS(PC));
+	UINT16 w1 = ROPCODE(ADDRESS(PC) + ADDRESS(1));
+	
+	Opcode op(w0, w1);
+	op.evaluate(cpustate);
+	PC += op.evalSize();	// Special size function needed to handle jmps, etc.
+
+	// TODO: Currently all operations take up 4 cycles (inst->cycles()).
+	return 4;
+}
+
 static CPU_EXECUTE( dsp56k )
 {
 	dsp56k_core* cpustate = get_safe_token(device);
@@ -331,17 +351,15 @@ static CPU_EXECUTE( dsp56k )
 		return;
 	}
 
-	cpustate->icount -= cpustate->interrupt_cycles;
-	cpustate->interrupt_cycles = 0;
+	//cpustate->icount -= cpustate->interrupt_cycles;
+	//cpustate->interrupt_cycles = 0;
 
 	while(cpustate->icount > 0)
 	{
 		execute_one(cpustate);
-		pcu_service_interrupts(cpustate);		/* TODO: There is definitely something un-right about this */
+		if (0) cpustate->icount -= execute_one_new(cpustate);
+		pcu_service_interrupts(cpustate);	// TODO: Is it incorrect to service after each instruction?
 	}
-
-	cpustate->icount -= cpustate->interrupt_cycles;
-	cpustate->interrupt_cycles = 0;
 }
 
 
@@ -452,18 +470,18 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;	// ?
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;							break;	// ?
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;	// ?					break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;	// ?					break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16;							break;	/* 1-5 */
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 16;							break;	/* 1-5 */
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: 		info->i = -1;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = -1;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 0;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 0;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -1;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = -1;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:	info->i = DSP56K_IRQ_MODA;				break;
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:	info->i = DSP56K_IRQ_MODB;				break;
@@ -503,8 +521,8 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_REGISTER + DSP56K_M2:			info->i = M2;							break;
 		case CPUINFO_INT_REGISTER + DSP56K_M3:			info->i = M3;							break;
 
-		/*  case CPUINFO_INT_REGISTER + DSP56K_TEMP:    info->i = TEMP;                         break;  */
-		/*  case CPUINFO_INT_REGISTER + DSP56K_STATUS:  info->i = STATUS;                       break;  */
+		/* case CPUINFO_INT_REGISTER + DSP56K_TEMP:    info->i = TEMP;                         break;  */
+		/* case CPUINFO_INT_REGISTER + DSP56K_STATUS:  info->i = STATUS;                       break;  */
 
 		/* The CPU stack */
 		case CPUINFO_INT_REGISTER + DSP56K_ST0:			info->i = ST0;							break;
@@ -568,7 +586,7 @@ CPU_GET_INFO( dsp56k )
 				/* Stack Pointer */
 				UF_bit(cpustate) ? "U" : ".",
 				SE_bit(cpustate) ? "S" : ".");
-            break;
+			break;
 
 		case CPUINFO_STR_REGISTER + DSP56K_PC:			sprintf(info->s, "PC : %04x", PC);		break;
 		case CPUINFO_STR_REGISTER + DSP56K_SR:			sprintf(info->s, "SR : %04x", SR);		break;

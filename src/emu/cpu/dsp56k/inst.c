@@ -40,7 +40,8 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 				dynamic_cast<Neg*>(op)  ||
 				dynamic_cast<Sub*>(op)  ||
 				dynamic_cast<Tfr*>(op)  ||
-				dynamic_cast<Tst*>(op))
+				dynamic_cast<Tst*>(op)
+                /* TODO: More? */)
 			{
 				op->m_sizeIncrement = 1;
 				return op;
@@ -48,7 +49,6 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 		}
 
 		global_free(op);
-		//return NULL;
 	}
 
 

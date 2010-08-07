@@ -12,6 +12,7 @@
 #ifndef __DSP56K_H__
 #define __DSP56K_H__
 
+#include "emu.h"
 
 /***************************************************************************
     REGISTER ENUMERATION
@@ -235,6 +236,14 @@ typedef struct
 	const address_space *program;
 	const address_space *data;
 } dsp56k_core;
+
+
+INLINE dsp56k_core *get_safe_token(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type() == DSP56156);
+	return (dsp56k_core *)downcast<legacy_cpu_device *>(device)->token();
+}
 
 
 /***************************************************************************

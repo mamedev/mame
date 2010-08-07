@@ -1,3 +1,12 @@
+#include "dsp56pcu.h"
+#include "dsp56mem.h"
+
+extern UINT16 *dsp56k_peripheral_ram;
+extern UINT16 *dsp56k_program_ram;
+
+namespace DSP56K
+{
+
 /* ************************************************************************* */
 /*                            Status Register                                */
 /* ************************************************************************* */
@@ -7,34 +16,34 @@
 /* |-------------------------------------| |-------------------------------| */
 /*                                                                           */
 /* ************************************************************************* */
-static UINT8 LF_bit(dsp56k_core* cpustate) { return (SR & 0x8000) >> 15; }
-static UINT8 FV_bit(dsp56k_core* cpustate) { return (SR & 0x4000) >> 14; }
-// static UINT8 S_bits(dsp56k_core* cpustate) { return (SR & 0x0c00) >> 10; }
-static UINT8 I_bits(dsp56k_core* cpustate) { return (SR & 0x0300) >> 8;  }
-static UINT8 S_bit (dsp56k_core* cpustate) { return (SR & 0x0080) >> 7;  }
-static UINT8 L_bit (dsp56k_core* cpustate) { return (SR & 0x0040) >> 6;  }
-static UINT8 E_bit (dsp56k_core* cpustate) { return (SR & 0x0020) >> 5;  }
-static UINT8 U_bit (dsp56k_core* cpustate) { return (SR & 0x0010) >> 4;  }
-static UINT8 N_bit (dsp56k_core* cpustate) { return (SR & 0x0008) >> 3;  }
-static UINT8 Z_bit (dsp56k_core* cpustate) { return (SR & 0x0004) >> 2;  }
-static UINT8 V_bit (dsp56k_core* cpustate) { return (SR & 0x0002) >> 1;  }
-static UINT8 C_bit (dsp56k_core* cpustate) { return (SR & 0x0001) >> 0;  }
+UINT8 LF_bit(dsp56k_core* cpustate) { return (SR & 0x8000) >> 15; }
+UINT8 FV_bit(dsp56k_core* cpustate) { return (SR & 0x4000) >> 14; }
+// UINT8 S_bits(dsp56k_core* cpustate) { return (SR & 0x0c00) >> 10; }
+UINT8 I_bits(dsp56k_core* cpustate) { return (SR & 0x0300) >> 8;  }
+UINT8 S_bit (dsp56k_core* cpustate) { return (SR & 0x0080) >> 7;  }
+UINT8 L_bit (dsp56k_core* cpustate) { return (SR & 0x0040) >> 6;  }
+UINT8 E_bit (dsp56k_core* cpustate) { return (SR & 0x0020) >> 5;  }
+UINT8 U_bit (dsp56k_core* cpustate) { return (SR & 0x0010) >> 4;  }
+UINT8 N_bit (dsp56k_core* cpustate) { return (SR & 0x0008) >> 3;  }
+UINT8 Z_bit (dsp56k_core* cpustate) { return (SR & 0x0004) >> 2;  }
+UINT8 V_bit (dsp56k_core* cpustate) { return (SR & 0x0002) >> 1;  }
+UINT8 C_bit (dsp56k_core* cpustate) { return (SR & 0x0001) >> 0;  }
 
 /* MR setters */
-static void LF_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x8000); else (SR &= (~0x8000)); }
-static void FV_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x4000); else (SR &= (~0x4000)); }
-static void S_bits_set(dsp56k_core* cpustate, UINT8 value) { value = value & 0x03;  SR &= ~(0x0c00);  SR |= (value << 10); }
-static void I_bits_set(dsp56k_core* cpustate, UINT8 value) { value = value & 0x03;  SR &= ~(0x0300);  SR |= (value <<  8); }
+void LF_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x8000); else (SR &= (~0x8000)); }
+void FV_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x4000); else (SR &= (~0x4000)); }
+void S_bits_set(dsp56k_core* cpustate, UINT8 value) { value = value & 0x03;  SR &= ~(0x0c00);  SR |= (value << 10); }
+void I_bits_set(dsp56k_core* cpustate, UINT8 value) { value = value & 0x03;  SR &= ~(0x0300);  SR |= (value <<  8); }
 
 /* CCR setters */
-static void S_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0080); else (SR &= (~0x0080)); }
-static void L_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0040); else (SR &= (~0x0040)); }
-static void E_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0020); else (SR &= (~0x0020)); }
-static void U_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0010); else (SR &= (~0x0010)); }
-static void N_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0008); else (SR &= (~0x0008)); }
-static void Z_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0004); else (SR &= (~0x0004)); }
-static void V_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0002); else (SR &= (~0x0002)); }
-static void C_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0001); else (SR &= (~0x0001)); }
+void S_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0080); else (SR &= (~0x0080)); }
+void L_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0040); else (SR &= (~0x0040)); }
+void E_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0020); else (SR &= (~0x0020)); }
+void U_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0010); else (SR &= (~0x0010)); }
+void N_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0008); else (SR &= (~0x0008)); }
+void Z_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0004); else (SR &= (~0x0004)); }
+void V_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0002); else (SR &= (~0x0002)); }
+void C_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x0001); else (SR &= (~0x0001)); }
 
 
 
@@ -47,23 +56,23 @@ static void C_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (SR |= 0x
 /*  |---------------------------------------------------------------------|  */
 /*                                                                           */
 /* ************************************************************************* */
-// static UINT8 CD_bit(dsp56k_core* cpustate) { return ((OMR & 0x0080) != 0); }
-// static UINT8 SD_bit(dsp56k_core* cpustate) { return ((OMR & 0x0040) != 0); }
-// static UINT8  R_bit(dsp56k_core* cpustate) { return ((OMR & 0x0020) != 0); }
-// static UINT8 SA_bit(dsp56k_core* cpustate) { return ((OMR & 0x0010) != 0); }
-// static UINT8 MC_bit(dsp56k_core* cpustate) { return ((OMR & 0x0004) != 0); }
-static UINT8 MB_bit(dsp56k_core* cpustate) { return ((OMR & 0x0002) != 0); }
-static UINT8 MA_bit(dsp56k_core* cpustate) { return ((OMR & 0x0001) != 0); }
+// UINT8 CD_bit(dsp56k_core* cpustate) { return ((OMR & 0x0080) != 0); }
+// UINT8 SD_bit(dsp56k_core* cpustate) { return ((OMR & 0x0040) != 0); }
+// UINT8  R_bit(dsp56k_core* cpustate) { return ((OMR & 0x0020) != 0); }
+// UINT8 SA_bit(dsp56k_core* cpustate) { return ((OMR & 0x0010) != 0); }
+// UINT8 MC_bit(dsp56k_core* cpustate) { return ((OMR & 0x0004) != 0); }
+UINT8 MB_bit(dsp56k_core* cpustate) { return ((OMR & 0x0002) != 0); }
+UINT8 MA_bit(dsp56k_core* cpustate) { return ((OMR & 0x0001) != 0); }
 
-static void CD_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0080); else (OMR &= (~0x0080)); }
-static void SD_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0040); else (OMR &= (~0x0040)); }
-static void  R_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0020); else (OMR &= (~0x0020)); }
-static void SA_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0010); else (OMR &= (~0x0010)); }
-static void MC_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0004); else (OMR &= (~0x0004)); }
-static void MB_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0002); else (OMR &= (~0x0002)); }
-static void MA_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0001); else (OMR &= (~0x0001)); }
+void CD_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0080); else (OMR &= (~0x0080)); }
+void SD_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0040); else (OMR &= (~0x0040)); }
+void  R_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0020); else (OMR &= (~0x0020)); }
+void SA_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0010); else (OMR &= (~0x0010)); }
+void MC_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0004); else (OMR &= (~0x0004)); }
+void MB_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0002); else (OMR &= (~0x0002)); }
+void MA_bit_set(dsp56k_core* cpustate, UINT8 value) { if (value) (OMR |= 0x0001); else (OMR &= (~0x0001)); }
 
-static UINT8 dsp56k_operating_mode(dsp56k_core* cpustate)
+UINT8 dsp56k_operating_mode(dsp56k_core* cpustate)
 {
 	return ((MB_bit(cpustate) << 1) | MA_bit(cpustate));
 }
@@ -79,18 +88,18 @@ static UINT8 dsp56k_operating_mode(dsp56k_core* cpustate)
 /*  |---------------------------------------------------------------------|  */
 /*                                                                           */
 /* ************************************************************************* */
-static UINT8 UF_bit(dsp56k_core* cpustate) { return ((SP & 0x0020) != 0); }
-static UINT8 SE_bit(dsp56k_core* cpustate) { return ((SP & 0x0010) != 0); }
+UINT8 UF_bit(dsp56k_core* cpustate) { return ((SP & 0x0020) != 0); }
+UINT8 SE_bit(dsp56k_core* cpustate) { return ((SP & 0x0010) != 0); }
 
-//static void UF_bit_set(dsp56k_core* cpustate, UINT8 value) {};
-//static void SE_bit_set(dsp56k_core* cpustate, UINT8 value) {};
+//void UF_bit_set(dsp56k_core* cpustate, UINT8 value) {};
+//void SE_bit_set(dsp56k_core* cpustate, UINT8 value) {};
 
 
 
 /***************************************************************************
     INITIALIZATION AND RESET
 ***************************************************************************/
-static void pcu_init(dsp56k_core* cpustate, running_device *device)
+void pcu_init(dsp56k_core* cpustate, running_device *device)
 {
 	/* Init the irq table */
 	dsp56k_irq_table_init();
@@ -107,7 +116,7 @@ static void pcu_init(dsp56k_core* cpustate, running_device *device)
 	state_save_register_device_item(device, 0, cpustate->PCU.reset_vector);
 }
 
-static void pcu_reset(dsp56k_core* cpustate)
+void pcu_reset(dsp56k_core* cpustate)
 {
 	int i;
 
@@ -236,10 +245,10 @@ typedef struct
 	char   irq_source[128];
 } dsp56k_irq_data;
 
-static dsp56k_irq_data dsp56k_interrupt_sources[32];
+dsp56k_irq_data dsp56k_interrupt_sources[32];
 
 /* TODO: Figure out how to switch on level versus edge-triggered. */
-static void pcu_service_interrupts(dsp56k_core* cpustate)
+void pcu_service_interrupts(dsp56k_core* cpustate)
 {
 	int i;
 
@@ -292,7 +301,7 @@ static void pcu_service_interrupts(dsp56k_core* cpustate)
 
 
 /* Register an interrupt  */
-static void dsp56k_add_pending_interrupt(dsp56k_core* cpustate, const char* name)
+void dsp56k_add_pending_interrupt(dsp56k_core* cpustate, const char* name)
 {
 	int i;
 	int irq_index = dsp56k_get_irq_index_by_tag(name);
@@ -308,14 +317,14 @@ static void dsp56k_add_pending_interrupt(dsp56k_core* cpustate, const char* name
 }
 
 /* Utility function to construct IRQ table */
-static void dsp56k_set_irq_source(UINT8 irq_num, UINT16 iv, const char* source)
+void dsp56k_set_irq_source(UINT8 irq_num, UINT16 iv, const char* source)
 {
 	dsp56k_interrupt_sources[irq_num].irq_vector = iv;
 	strcpy(dsp56k_interrupt_sources[irq_num].irq_source, source);
 }
 
 /* Construct a table containing pertient IRQ information */
-static void dsp56k_irq_table_init(void)
+void dsp56k_irq_table_init(void)
 {
 	/* 1-14 + 1-18 */
 	/* TODO: Cull host command stuff appropriately */
@@ -355,7 +364,7 @@ static void dsp56k_irq_table_init(void)
 }
 
 /* Clear all entries from the pending table */
-static void dsp56k_clear_pending_interrupts(dsp56k_core* cpustate)
+void dsp56k_clear_pending_interrupts(dsp56k_core* cpustate)
 {
 	int i;
 	for (i = 0; i < 32; i++)
@@ -365,7 +374,7 @@ static void dsp56k_clear_pending_interrupts(dsp56k_core* cpustate)
 }
 
 /* Recover number of pending irqs */
-static int dsp56k_count_pending_interrupts(dsp56k_core* cpustate)
+int dsp56k_count_pending_interrupts(dsp56k_core* cpustate)
 {
 	int numI = 0;
 	while (cpustate->PCU.pending_interrupts[numI] != -1)
@@ -377,7 +386,7 @@ static int dsp56k_count_pending_interrupts(dsp56k_core* cpustate)
 }
 
 /* Sort the pending irqs by priority */
-static void dsp56k_sort_pending_interrupts(dsp56k_core* cpustate, int num)
+void dsp56k_sort_pending_interrupts(dsp56k_core* cpustate, int num)
 {
 	int i, j;
 
@@ -414,7 +423,7 @@ static void dsp56k_sort_pending_interrupts(dsp56k_core* cpustate, int num)
 }
 
 /* Given an index into the irq table, return the interrupt's current priority */
-static INT8 dsp56k_get_irq_priority(dsp56k_core* cpustate, int index)
+INT8 dsp56k_get_irq_priority(dsp56k_core* cpustate, int index)
 {
 	/* 1-12 */
 	switch (index)
@@ -462,7 +471,7 @@ static INT8 dsp56k_get_irq_priority(dsp56k_core* cpustate, int index)
 }
 
 /* Given an IRQ name, return its index in the irq table */
-static int dsp56k_get_irq_index_by_tag(const char* tag)
+int dsp56k_get_irq_index_by_tag(const char* tag)
 {
 	int i;
 	for (i = 0; i < 32; i++)
@@ -476,3 +485,5 @@ static int dsp56k_get_irq_index_by_tag(const char* tag)
 	fatalerror("DSP56K ERROR : IRQ TAG specified incorrectly (get_vector_by_tag) : %s.\n", tag);
 	return -1;
 }
+
+} // namespace DSP56K

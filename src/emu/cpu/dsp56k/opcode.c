@@ -41,9 +41,9 @@ std::string Opcode::disassemble() const
 }
 
 
-void Opcode::evaluate() const
+void Opcode::evaluate(dsp56k_core* cpustate) const
 {
-	if (m_instruction) m_instruction->evaluate();
+	if (m_instruction) m_instruction->evaluate(cpustate);
 	if (m_parallelMove) m_parallelMove->evaluate();
 }
 
@@ -56,6 +56,16 @@ size_t Opcode::size() const
 	// Opcode failed to decode, so push it past dc
 	return 1;
 }
+
+size_t Opcode::evalSize() const
+{
+	if (m_instruction && m_instruction->valid())
+		return m_instruction->evalSize(); // Probably doesn't matter : + m_instruction->sizeIncrement();
+
+	// Opcode failed to decode, so push it past dc
+	return 1;
+}
+
 
 const std::string& Opcode::instSource() const { return m_instruction->source(); }
 const std::string& Opcode::instDestination() const { return m_instruction->destination(); }

@@ -6,6 +6,9 @@
 #include "opcode.h"
 #include "tables.h"
 
+#include "dsp56k.h"
+#include "dsp56pcu.h"
+
 //
 // An Instruction is the base class all regular ops inherit from.
 //
@@ -27,16 +30,17 @@ public:
 
 	virtual bool decode(const UINT16 word0, const UINT16 word1) = 0;
 	virtual void disassemble(std::string& retString) const = 0;
-	virtual void evaluate() = 0;
+	virtual void evaluate(dsp56k_core* cpustate) = 0;
 
 	virtual size_t size() const = 0;
+    virtual size_t evalSize() const { return size(); }
 	virtual size_t accumulatorBitsModified() const = 0;   // Potentially make this always return ALL (like flags)
 	virtual size_t flags() const { return 0; }
 
 	static Instruction* decodeInstruction(const Opcode* opc, 
-										const UINT16 word0, 
-										const UINT16 word1, 
-										bool shifted=false);
+										  const UINT16 word0, 
+										  const UINT16 word1, 
+										  bool shifted=false);
 
 	const bool valid() const { return m_valid; }
 
@@ -80,7 +84,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -104,7 +108,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -128,7 +132,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -154,7 +158,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -181,7 +185,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -210,7 +214,7 @@ public:
 		sprintf(temp, "#$%x,%s", m_immediate, m_destination.c_str());
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -236,7 +240,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -259,7 +263,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -282,7 +286,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -305,7 +309,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -328,7 +332,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -412,7 +416,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -443,7 +447,7 @@ public:
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (INT16)word1, (INT16)word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -477,7 +481,7 @@ public:
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 1 + relativeInt, relativeInt);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -511,7 +515,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -539,7 +543,7 @@ public:
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + word1, (INT16)word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -570,7 +574,7 @@ public:
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 1 + iVal, iVal);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -601,7 +605,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -626,7 +630,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -659,7 +663,7 @@ public:
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (INT16)word1, (INT16)word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -695,7 +699,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -725,7 +729,7 @@ public:
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (INT16)word1, (INT16)word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -757,7 +761,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -780,7 +784,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -803,7 +807,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -826,7 +830,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -852,7 +856,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_NONE; }
 };
@@ -878,7 +882,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_NONE; }
 };
@@ -900,7 +904,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -925,7 +929,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -948,7 +952,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -971,7 +975,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -995,7 +999,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -1014,11 +1018,11 @@ public:
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
 								 m_source, m_source2, m_destination);
 
-		std::string A;
-		decode_ss_table(BITSn(word0,0x0024), A);
-		if (A == "!!") return false;
+		std::string a;
+		decode_ss_table(BITSn(word0,0x0024), a);
+		if (a == "!!") return false;
 		
-		m_opcode = "dmac" + A;
+		m_opcode = "dmac" + a;
 		// NEW // sprintf(opcode_str, "dmac(%s)", A);
 		return true;
 	}
@@ -1028,7 +1032,7 @@ public:
 					m_source + "," + 
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -1065,7 +1069,7 @@ public:
 		// NEW // sprintf(temp, "X:(R%d),$%02x", Rnum, pc + 2 + word1);
 		retString = m_opcode + " " + m_source + "," + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1098,7 +1102,7 @@ public:
 		// NEW // sprintf(temp, "#$%02x,$%04x", BITSn(word0,0x00ff), pc + 2 + word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -1133,7 +1137,7 @@ public:
 		// NEW // sprintf(temp, "%s,$%04x", S1, pc + 2 + word1);
 		retString = m_opcode + " " + m_source + "," + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -1164,7 +1168,7 @@ public:
 		// NEW // sprintf(temp, "$%04x", pc + 2 + word1);
 		retString = m_opcode + ", " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -1189,7 +1193,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -1213,7 +1217,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -1236,7 +1240,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -1258,7 +1262,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -1285,7 +1289,7 @@ public:
 					m_source + "," + 
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -1315,7 +1319,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1341,7 +1345,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -1364,7 +1368,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -1395,7 +1399,7 @@ public:
 		// NEW // sprintf(temp, "$%04x", word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1429,7 +1433,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -1457,7 +1461,7 @@ public:
 		// NEW // sprintf(temp, "$%04x", word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1488,8 +1492,18 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate)
+	{
+		// Get value from source
+        
+        // Set the PC
+		PC = 0;
+
+	    /* S L E U N Z V C */
+	    /* - - - - - - - - */
+	}
 	size_t size() const { return 1; }
+    size_t evalSize() const { return 0; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
 
@@ -1519,7 +1533,7 @@ public:
 		// NEW // sprintf(temp, "$%04x", word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -1554,7 +1568,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -1583,7 +1597,7 @@ public:
 		// NEW // sprintf(temp, "$%04x", word1);
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -1615,7 +1629,7 @@ public:
 		// NEW // sprintf(temp, "#$%02x", BITSn(word0,0x00ff));
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -1647,7 +1661,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
@@ -1685,7 +1699,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -1723,7 +1737,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -1746,7 +1760,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -1769,7 +1783,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -1802,7 +1816,7 @@ public:
 					m_source + "," + 
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1833,7 +1847,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1863,7 +1877,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1899,7 +1913,7 @@ public:
 					m_source + "," + 
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1929,7 +1943,7 @@ public:
 					m_source + "," + 
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -1952,9 +1966,9 @@ public:
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
 								 m_source, m_source2, m_destination);
 
-		std::string A;
-		decode_s_table(BITSn(word0,0x0004), A);
-		m_opcode = "mac" + A;
+		std::string a;
+		decode_s_table(BITSn(word0,0x0004), a);
+		m_opcode = "mac" + a;
 		// NEW // sprintf(opcode_str, "mac(%s)", A);
 		return true;
 	}
@@ -1964,7 +1978,7 @@ public:
 					m_source + "," + 
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -2007,7 +2021,7 @@ public:
 		else
 			retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_NONE; }
 
@@ -2039,7 +2053,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2069,7 +2083,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2107,7 +2121,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2142,7 +2156,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2175,7 +2189,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2217,7 +2231,7 @@ public:
 	{
 		retString = m_opcode + " " + m_args;	// TODO
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2249,7 +2263,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2280,7 +2294,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2317,7 +2331,7 @@ public:
 		retString = m_opcode + " " + 
 					std::string(temp) + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2353,7 +2367,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2390,7 +2404,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2405,12 +2419,12 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		INT8 B;
-		B = BITSn(word0,0x00ff);
+		INT8 b;
+		b = BITSn(word0,0x00ff);
 
 		std::string SD;
 		decode_HHH_table(BITSn(word1,0x0007), SD);
-		assemble_reg_from_W_table(BITSn(word1,0x0100), 'P', SD, B, 
+		assemble_reg_from_W_table(BITSn(word1,0x0100), 'P', SD, b, 
 								  m_source, m_destination);
 
 		m_opcode = "move";
@@ -2421,7 +2435,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2454,7 +2468,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2493,7 +2507,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2512,11 +2526,11 @@ public:
 		decode_HH_table(BITSn(word0,0x00c0), SD);
 
 		char temp[32];
-		std::string A;
+		std::string a;
 		sprintf(temp, "<$%x", BITSn(word0,0x001f));
-		A = temp;
+		a = temp;
 
-		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, A, 
+		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, a, 
 										m_source, m_destination);
 		
 		m_opcode = "moves";
@@ -2527,7 +2541,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2562,7 +2576,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2593,7 +2607,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2624,7 +2638,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2662,7 +2676,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2693,7 +2707,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2715,9 +2729,9 @@ public:
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
 								 m_source, m_source2, m_destination);
 
-		std::string A;
-		decode_s_table(BITSn(word0,0x0004), A);
-		m_opcode = "mpy" + A;
+		std::string a;
+		decode_s_table(BITSn(word0,0x0004), a);
+		m_opcode = "mpy" + a;
 		// NEW // sprintf(opcode_str, "mpy(%s)", A);
 		return true;
 	}
@@ -2727,7 +2741,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2754,7 +2768,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2777,7 +2791,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2799,7 +2813,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2829,7 +2843,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2853,7 +2867,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -2877,7 +2891,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -2907,7 +2921,7 @@ public:
 		// NEW // sprintf(temp, "#$%02x", BITSn(word0,0x00ff));
 		retString = m_opcode + " " + std::string(temp) + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -2940,7 +2954,7 @@ public:
 		sprintf(temp, "X:(%s)", m_source.c_str());
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -2967,7 +2981,7 @@ public:
 		// NEW // sprintf(temp, "#$%02x (%d)", BITSn(word0,0x00ff), BITSn(word0,0x00ff));
 		retString = m_opcode + " " + std::string(temp);
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -2995,7 +3009,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3020,7 +3034,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3042,7 +3056,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3066,7 +3080,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3090,7 +3104,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -3114,7 +3128,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE; }
 };
@@ -3136,7 +3150,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OUT; }
@@ -3159,7 +3173,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OUT; }
@@ -3185,7 +3199,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3207,7 +3221,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3231,7 +3245,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3256,7 +3270,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3290,7 +3304,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3314,7 +3328,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3336,7 +3350,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3381,7 +3395,7 @@ public:
 		if (m_destination2 != "R0")
 			retString += std::string(" R0,") + m_destination2;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -3409,7 +3423,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3434,7 +3448,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3459,7 +3473,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3503,7 +3517,7 @@ public:
 					m_destination + " " + 
 					m_source2 + "," + m_destination2;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
@@ -3531,7 +3545,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_NONE; }
 };
@@ -3555,7 +3569,7 @@ public:
 	{
 		retString = m_opcode + " " + m_source;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3577,7 +3591,7 @@ public:
 	{
 		retString = m_opcode;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3601,7 +3615,7 @@ public:
 	{
 		retString = m_opcode + " " + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 };
@@ -3644,7 +3658,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
@@ -3690,7 +3704,7 @@ public:
 					m_source + "," +
 					m_source2 + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 

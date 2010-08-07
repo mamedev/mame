@@ -314,13 +314,13 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		INT8 B;
+		INT8 b;
 		std::string SD;
 		std::string args;
 
-		B = (char)(word0 & 0x00ff);
+		b = (char)(word0 & 0x00ff);
 		decode_HHH_table(BITSn(word1,0x0e00), SD);
-		assemble_reg_from_W_table(BITSn(word1,0x0100), 'X', SD, B, m_source, m_destination);
+		assemble_reg_from_W_table(BITSn(word1,0x0100), 'X', SD, b, m_source, m_destination);
 
 		return true;
 	}

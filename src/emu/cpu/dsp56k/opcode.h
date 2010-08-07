@@ -7,6 +7,8 @@
 #include "inst.h"
 #include "pmove.h"
 
+#include "dsp56k.h"
+
 //
 // An Opcode contains an instruction and a parallel move operation.
 //
@@ -23,8 +25,9 @@ public:
 	virtual ~Opcode();
 
 	std::string disassemble() const;
-	void evaluate() const;
+	void evaluate(dsp56k_core* cpustate) const;
 	size_t size() const;
+	size_t evalSize() const;
 
 	// Peek through to the instruction
 	const std::string& instSource() const;
