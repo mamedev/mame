@@ -6109,6 +6109,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Atari polygon games */
 	DRIVER( irobot )	/* 136029           (c) 1983 */
+	/* Atari System IV */
+	DRIVER( laststar )	/* (proto)          (c) 1984 */
+	DRIVER( airrace )	/* (proto)          (c) 1985 */
 	/* Hard Drivin' */
 	DRIVER( harddriv )	/* 136052           (c) 1988 */
 	DRIVER( harddrivb )	/* 136052           (c) 1988 */

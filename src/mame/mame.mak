@@ -385,6 +385,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/atarigt.o $(VIDEO)/atarigt.o \
 	$(DRIVERS)/atarisy1.o $(VIDEO)/atarisy1.o \
 	$(DRIVERS)/atarisy2.o $(VIDEO)/atarisy2.o \
+	$(DRIVERS)/atarisy4.o \
 	$(DRIVERS)/atetris.o $(VIDEO)/atetris.o \
 	$(DRIVERS)/avalnche.o $(AUDIO)/avalnche.o \
 	$(DRIVERS)/badlands.o $(VIDEO)/badlands.o \
