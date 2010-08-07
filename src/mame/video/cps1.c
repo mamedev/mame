@@ -77,6 +77,7 @@ Captain Commando* (World 911202)                        91635B-2   CC63B     CCP
 Captain Commando* (USA 910928)                          91635B-2   CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
 Captain Commando* (Japan 911202)                        91634B-2   CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
 Knights of the Round* (World / USA)               1991  91635B-2   KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+Knights of the Round* (Japan)                     1991  91634B-2   KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
   (alt B-board revision - Japan)                        ?          KR29B?           ?     ?          CPS-B-21  DL-0921-10014
 Street Fighter II' Champion Edition (World /USA)  1992  91635B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
   (alt B-board revision - Japan)                        91634B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
@@ -1263,7 +1264,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"captcommb",  CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"knights",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
-	{"knightsj",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// PAL could be different if B-Board is 90629B
+	{"knightsj",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
+	{"knightsja",  CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// PAL could be different if B-Board is 90629B
 	{"knightsb",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// wrong, knightsb bootleg doesn't use the KR63B PAL
 	{"sf2ce",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceua",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
