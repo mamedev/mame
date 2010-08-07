@@ -69,3 +69,26 @@ WRITE16_HANDLER( pipibibi_videoram16_w );
 READ16_HANDLER ( pipibibi_spriteram16_r );
 WRITE16_HANDLER( pipibibi_spriteram16_w );
 WRITE16_HANDLER( pipibibi_scroll_w );
+
+void toaplan2_videoram16_w(running_machine* machine, offs_t offset, UINT16 data, UINT16 mem_mask, int controller);
+int toaplan2_videoram16_r(running_machine* machine, offs_t offset, int controller);
+extern UINT16 toaplan2_voffs[2];
+
+WRITE16_HANDLER( toaplan2_bg_tilemap_w);
+WRITE16_HANDLER( toaplan2_fg_tilemap_w );
+WRITE16_HANDLER( toaplan2_top_tilemap_w );
+WRITE16_HANDLER( toaplan2_spram_w );
+READ16_HANDLER( toaplan2_bg_tilemap_r );
+READ16_HANDLER( toaplan2_fg_tilemap_r );
+READ16_HANDLER( toaplan2_top_tilemap_r );
+READ16_HANDLER( toaplan2_spram_r );
+
+WRITE16_HANDLER( toaplan2_bg_tilemap1_w);
+WRITE16_HANDLER( toaplan2_fg_tilemap1_w );
+WRITE16_HANDLER( toaplan2_top_tilemap1_w );
+WRITE16_HANDLER( toaplan2_spram1_w );
+READ16_HANDLER( toaplan2_bg_tilemap1_r );
+READ16_HANDLER( toaplan2_fg_tilemap1_r );
+READ16_HANDLER( toaplan2_top_tilemap1_r );
+READ16_HANDLER( toaplan2_spram1_r );
+

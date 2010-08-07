@@ -298,6 +298,92 @@ static READ16_HANDLER( batsugun_share2_r );
 static WRITE16_HANDLER( batsugun_share2_w );
 #endif
 
+
+
+
+/* not used */
+static ADDRESS_MAP_START( toaplan2vdp_map, 0, 16 )
+ADDRESS_MAP_END
+
+class toaplan2vdp_device_config : public device_config,
+								 public device_config_memory_interface
+{
+	friend class toaplan2vdp_device;
+	toaplan2vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+public:
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+protected:
+	virtual void device_config_complete();
+	virtual bool device_validity_check(const game_driver &driver) const;
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+	address_space_config		m_space_config;
+};
+
+class toaplan2vdp_device : public device_t,
+						  public device_memory_interface
+{
+	friend class toaplan2vdp_device_config;
+	toaplan2vdp_device(running_machine &_machine, const toaplan2vdp_device_config &config);
+public:
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+	const toaplan2vdp_device_config &m_config;
+};
+
+const device_type toaplan2vdp_ = toaplan2vdp_device_config::static_alloc_device_config;
+
+toaplan2vdp_device_config::toaplan2vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "toaplan2vdp_", tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("toaplan2vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(toaplan2vdp_map))
+{
+}
+
+device_config *toaplan2vdp_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(toaplan2vdp_device_config(mconfig, tag, owner, clock));
+}
+
+device_t *toaplan2vdp_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, toaplan2vdp_device(machine, *this));
+}
+
+void toaplan2vdp_device_config::device_config_complete()
+{
+//	int address_bits = 14;
+//	m_space_config = address_space_config("toaplan2vdp", ENDIANNESS_BIG, 16,  address_bits, 0, *ADDRESS_MAP_NAME(toaplan2vdp_map));
+}
+
+bool toaplan2vdp_device_config::device_validity_check(const game_driver &driver) const
+{
+	bool error = false;
+	return error;
+}
+
+const address_space_config *toaplan2vdp_device_config::memory_space_config(int spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
+
+
+toaplan2vdp_device::toaplan2vdp_device(running_machine &_machine, const toaplan2vdp_device_config &config)
+	: device_t(_machine, config),
+	  device_memory_interface(_machine, config, *this),
+	  m_config(config)
+{
+}
+
+void toaplan2vdp_device::device_start()
+{
+}
+
+void toaplan2vdp_device::device_reset()
+{
+}
+
 static running_device *sub_cpu = NULL;
 
 /***************************************************************************
@@ -3782,6 +3868,52 @@ static const ymz280b_interface ymz280b_config =
 
 
 
+
+static ADDRESS_MAP_START( toaplan2vdp0_map, 0, 16 )
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(toaplan2_bg_tilemap_r, toaplan2_bg_tilemap_w)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(toaplan2_fg_tilemap_r, toaplan2_fg_tilemap_w)
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(toaplan2_top_tilemap_r, toaplan2_top_tilemap_w)
+	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(toaplan2_spram_r, toaplan2_spram_w)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( toaplan2vdp1_map, 0, 16 )
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(toaplan2_bg_tilemap1_r, toaplan2_bg_tilemap1_w)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(toaplan2_fg_tilemap1_r, toaplan2_fg_tilemap1_w)
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(toaplan2_top_tilemap1_r, toaplan2_top_tilemap1_w)
+	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(toaplan2_spram1_r, toaplan2_spram1_w)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
+ADDRESS_MAP_END
+
+
+int toaplan2_videoram16_r(running_machine* machine, offs_t offset, int controller)
+{
+	int offs = (toaplan2_voffs[controller] &0x1fff);
+	toaplan2_voffs[controller]++;
+
+	const address_space *vdp_space;
+	
+	if (controller==0) vdp_space = machine->device<toaplan2vdp_device>("toaplan2vdp0")->space();
+	else vdp_space = machine->device<toaplan2vdp_device>("toaplan2vdp1")->space();
+
+	return memory_read_word_16be(vdp_space, offs*2);
+}
+
+
+void toaplan2_videoram16_w(running_machine* machine, offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
+{
+	int offs = (toaplan2_voffs[controller] &0x1fff);
+	toaplan2_voffs[controller]++;
+
+	const address_space *vdp_space;
+	
+	if (controller==0) vdp_space = machine->device<toaplan2vdp_device>("toaplan2vdp0")->space();
+	else vdp_space = machine->device<toaplan2vdp_device>("toaplan2vdp1")->space();
+
+	memory_write_word_masked_16be(vdp_space, offs*2, data, mem_mask);
+}
+
+
 static MACHINE_DRIVER_START( tekipaki )
 
 	/* basic machine hardware */
@@ -3807,6 +3939,11 @@ static MACHINE_DRIVER_START( tekipaki )
 
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
+
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3846,6 +3983,9 @@ static MACHINE_DRIVER_START( ghox )
 
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -3908,6 +4048,13 @@ static MACHINE_DRIVER_START( dogyuun )
 
 	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
+	MDRV_DEVICE_ADD("toaplan2vdp1", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp1_map)
+
+
 
 	MDRV_VIDEO_START(toaplan2_1)
 	MDRV_VIDEO_EOF(toaplan2_1)
@@ -3998,6 +4145,9 @@ static MACHINE_DRIVER_START( kbash )
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
+
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
 	MDRV_VIDEO_UPDATE(toaplan2_0)
@@ -4032,6 +4182,9 @@ static MACHINE_DRIVER_START( kbash2 )
 
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4068,6 +4221,9 @@ static MACHINE_DRIVER_START( truxton2 )
 
 	MDRV_GFXDECODE(truxton2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(truxton2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4110,6 +4266,9 @@ static MACHINE_DRIVER_START( pipibibs )
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
+
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
 	MDRV_VIDEO_UPDATE(toaplan2_0)
@@ -4149,6 +4308,9 @@ static MACHINE_DRIVER_START( whoopee )
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
+
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
 	MDRV_VIDEO_UPDATE(toaplan2_0)
@@ -4187,6 +4349,9 @@ static MACHINE_DRIVER_START( pipibibi )
 
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4255,6 +4420,9 @@ static MACHINE_DRIVER_START( fixeight )
 
 	MDRV_GFXDECODE(truxton2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(truxton2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4290,6 +4458,9 @@ static MACHINE_DRIVER_START( fixeighb )
 
 	MDRV_GFXDECODE(fixeighb)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(truxton2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4355,6 +4526,9 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
@@ -4449,6 +4623,11 @@ static MACHINE_DRIVER_START( batsugun )
 	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
+	MDRV_DEVICE_ADD("toaplan2vdp1", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp1_map)
+
 	MDRV_VIDEO_START(toaplan2_1)
 	MDRV_VIDEO_EOF(toaplan2_1)
 	MDRV_VIDEO_UPDATE(batsugun_1)
@@ -4485,6 +4664,9 @@ static MACHINE_DRIVER_START( snowbro2 )
 
 	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(toaplan2_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
@@ -4527,6 +4709,9 @@ static MACHINE_DRIVER_START( mahoudai )
 	MDRV_GFXDECODE(raizing)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
+
 	MDRV_VIDEO_START(bgaregga_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
 	MDRV_VIDEO_UPDATE(mahoudai_0)
@@ -4564,6 +4749,9 @@ static MACHINE_DRIVER_START( shippumd )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_GFXDECODE(raizing)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
@@ -4609,6 +4797,9 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_GFXDECODE(raizing)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
+
 	MDRV_VIDEO_START(bgaregga_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
 	MDRV_VIDEO_UPDATE(truxton2_0)
@@ -4652,6 +4843,9 @@ static MACHINE_DRIVER_START( batrider )
 
 	MDRV_GFXDECODE(batrider)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(batrider_0)
 	MDRV_VIDEO_UPDATE(batrider_0)
@@ -4699,6 +4893,9 @@ static MACHINE_DRIVER_START( bbakraid )
 
 	MDRV_GFXDECODE(batrider)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	
+	MDRV_DEVICE_ADD("toaplan2vdp0", toaplan2vdp_, 0)
+	MDRV_DEVICE_ADDRESS_MAP(0, toaplan2vdp0_map)
 
 	MDRV_VIDEO_START(batrider_0)
 	MDRV_VIDEO_UPDATE(batrider_0)

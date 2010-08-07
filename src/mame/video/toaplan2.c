@@ -176,7 +176,6 @@ size_t batrider_paletteram16_size;
 static UINT16 *bgvideoram16[2];
 static UINT16 *fgvideoram16[2];
 static UINT16 *topvideoram16[2];
-static UINT16 *unusedvideoram16[2];
 static UINT16 *spriteram16_now[2];	/* Sprites to draw this frame */
 static UINT16 *spriteram16_new[2];	/* Sprites to add to next frame */
 static UINT16 *spriteram16_n[2];
@@ -184,10 +183,10 @@ UINT16 *toaplan2_txvideoram16;		/* Video ram for extra text layer */
 UINT16 *toaplan2_txvideoram16_offs;	/* Text layer tile flip and positon ? */
 UINT16 *toaplan2_txscrollram16;		/* Text layer scroll ? */
 UINT16 *toaplan2_tx_gfxram16;			/* Text Layer RAM based tiles */
-static UINT16 *raizing_tx_gfxram16;			/* Text Layer RAM based tiles (Batrider) */
+UINT16 *raizing_tx_gfxram16;			/* Text Layer RAM based tiles (Batrider) */
 
 static UINT16 toaplan2_scroll_reg[2];
-static UINT16 toaplan2_voffs[2];
+UINT16 toaplan2_voffs[2];
 static UINT16 bg_scrollx[2];
 static UINT16 bg_scrolly[2];
 static UINT16 fg_scrollx[2];
@@ -243,6 +242,114 @@ static void defaultOffsets(void)
 		yoffset[1]=0;
 		yoffset[2]=0;
 		yoffset[3]=0;
+}
+
+
+
+WRITE16_HANDLER( toaplan2_bg_tilemap_w)
+{
+	int controller = 0;
+	COMBINE_DATA(&bgvideoram16[controller][offset]);
+	tilemap_mark_tile_dirty(bg_tilemap[controller],offset/2);
+}
+	
+WRITE16_HANDLER( toaplan2_fg_tilemap_w )
+{
+	int controller = 0;
+	COMBINE_DATA(&fgvideoram16[controller][offset]);
+	tilemap_mark_tile_dirty(fg_tilemap[controller],offset/2);
+}
+
+WRITE16_HANDLER( toaplan2_top_tilemap_w )
+{
+	int controller = 0;
+	COMBINE_DATA(&topvideoram16[controller][offset]);
+	tilemap_mark_tile_dirty(top_tilemap[controller],offset/2);
+}
+
+
+WRITE16_HANDLER( toaplan2_spram_w )
+{
+	int controller = 0;
+	COMBINE_DATA(&spriteram16_new[controller][offset]);
+}
+
+READ16_HANDLER( toaplan2_bg_tilemap_r )
+{
+	int controller = 0;
+	return bgvideoram16[controller][offset];
+}
+	
+READ16_HANDLER( toaplan2_fg_tilemap_r )
+{
+	int controller = 0;
+	return fgvideoram16[controller][offset];
+}
+
+READ16_HANDLER( toaplan2_top_tilemap_r )
+{
+	int controller = 0;
+	return topvideoram16[controller][offset];
+}
+
+READ16_HANDLER( toaplan2_spram_r )
+{
+	int controller = 0;
+	return spriteram16_new[controller][offset];
+}
+
+
+
+WRITE16_HANDLER( toaplan2_bg_tilemap1_w)
+{
+	int controller = 1;
+	COMBINE_DATA(&bgvideoram16[controller][offset]);
+	tilemap_mark_tile_dirty(bg_tilemap[controller],offset/2);
+}
+	
+WRITE16_HANDLER( toaplan2_fg_tilemap1_w )
+{
+	int controller = 1;
+	COMBINE_DATA(&fgvideoram16[controller][offset]);
+	tilemap_mark_tile_dirty(fg_tilemap[controller],offset/2);
+}
+
+WRITE16_HANDLER( toaplan2_top_tilemap1_w )
+{
+	int controller = 1;
+	COMBINE_DATA(&topvideoram16[controller][offset]);
+	tilemap_mark_tile_dirty(top_tilemap[controller],offset/2);
+}
+
+
+WRITE16_HANDLER( toaplan2_spram1_w )
+{
+	int controller = 1;
+	COMBINE_DATA(&spriteram16_new[controller][offset]);
+}
+
+READ16_HANDLER( toaplan2_bg_tilemap1_r )
+{
+	int controller = 1;
+	return bgvideoram16[controller][offset];
+}
+	
+READ16_HANDLER( toaplan2_fg_tilemap1_r )
+{
+	int controller = 1;
+	return fgvideoram16[controller][offset];
+}
+
+READ16_HANDLER( toaplan2_top_tilemap1_r )
+{
+	int controller = 1;
+	return topvideoram16[controller][offset];
+}
+
+READ16_HANDLER( toaplan2_spram1_r )
+{
+	int controller = 1;
+	return spriteram16_new[controller][offset];
 }
 
 /***************************************************************************
@@ -461,7 +568,6 @@ static void toaplan2_vram_alloc(running_machine *machine, int controller)
 	topvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_TOP_VRAM_SIZE/2);
 	fgvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_FG_VRAM_SIZE/2);
 	bgvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_BG_VRAM_SIZE/2);
-	unusedvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_UNUSEDRAM_SIZE/2);
 
 	spriteram16_n[controller] = spriteram16_now[controller];
 }
@@ -803,91 +909,26 @@ WRITE16_HANDLER( batrider_objectbank_w )
 
 
 
-static int toaplan2_videoram16_r(offs_t offset, int controller)
-{
-	int offs = (toaplan2_voffs[controller] &0x1fff);
-	toaplan2_voffs[controller]++;
-
-	if (offs<0x0800)
-	{
-		offs&=0x7ff;
-		return bgvideoram16[controller][offs];
-	}
-	else if (offs<0x1000)
-	{
-		offs&=0x7ff;
-		return fgvideoram16[controller][offs];
-	}
-	else if (offs<0x1800)
-	{
-		offs&=0x7ff;
-		return topvideoram16[controller][offs];
-	}
-	else if (offs<0x1c00)
-	{
-		offs&=0x3ff;
-		return spriteram16_new[controller][offs];
-	}
-	else // wouldn't surprise me if this mirrors spriteram on real hw
-	{
-		offs&=0x3ff;
-		return unusedvideoram16[controller][offs];
-	}
-}
 
 READ16_HANDLER( toaplan2_0_videoram16_r )
 {
-	return toaplan2_videoram16_r(offset, 0);
+	return toaplan2_videoram16_r(space->machine, offset, 0);
 }
 
 READ16_HANDLER( toaplan2_1_videoram16_r )
 {
-	return toaplan2_videoram16_r(offset, 1);
+	return toaplan2_videoram16_r(space->machine, offset, 1);
 }
 
-static void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
-{
-	int offs = (toaplan2_voffs[controller] &0x1fff);
-	toaplan2_voffs[controller]++;
-
-	if (offs<0x0800)
-	{
-		offs&=0x7ff;
-		COMBINE_DATA(&bgvideoram16[controller][offs]);
-		tilemap_mark_tile_dirty(bg_tilemap[controller],offs/2);
-	}
-	else if (offs<0x1000)
-	{
-		offs&=0x7ff;
-		COMBINE_DATA(&fgvideoram16[controller][offs]);
-		tilemap_mark_tile_dirty(fg_tilemap[controller],offs/2);
-	}
-	else if (offs<0x1800)
-	{
-		offs&=0x7ff;
-		COMBINE_DATA(&topvideoram16[controller][offs]);
-		tilemap_mark_tile_dirty(top_tilemap[controller],offs/2);
-	}
-	else if (offs<0x1c00)
-	{
-		offs&=0x3ff;
-		COMBINE_DATA(&spriteram16_new[controller][offs]);
-	}
-	else // wouldn't surprise me if this mirrors spriteram on real hw
-	{
-		offs&=0x3ff;
-		COMBINE_DATA(&unusedvideoram16[controller][offs]);
-	}
-}
 
 WRITE16_HANDLER( toaplan2_0_videoram16_w )
 {
-	toaplan2_videoram16_w(offset, data, mem_mask, 0);
+	toaplan2_videoram16_w(space->machine, offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_videoram16_w )
 {
-	toaplan2_videoram16_w(offset, data, mem_mask, 1);
+	toaplan2_videoram16_w(space->machine, offset, data, mem_mask, 1);
 }
 
 
@@ -1155,25 +1196,25 @@ WRITE16_HANDLER( pipibibi_scroll_w )
 READ16_HANDLER( pipibibi_videoram16_r )
 {
 	toaplan2_voffs_w(0, offset, 0xffff, 0);
-	return toaplan2_videoram16_r(0, 0);
+	return toaplan2_videoram16_r(space->machine, 0, 0);
 }
 
 WRITE16_HANDLER( pipibibi_videoram16_w)
 {
 	toaplan2_voffs_w(0, offset, 0xffff, 0);
-	toaplan2_videoram16_w(0, data, mem_mask, 0);
+	toaplan2_videoram16_w(space->machine, 0, data, mem_mask, 0);
 }
 
 READ16_HANDLER( pipibibi_spriteram16_r )
 {
 	toaplan2_voffs_w(0, (0x1800 + offset), 0, 0);
-	return toaplan2_videoram16_r(0, 0);
+	return toaplan2_videoram16_r(space->machine, 0, 0);
 }
 
 WRITE16_HANDLER( pipibibi_spriteram16_w )
 {
 	toaplan2_voffs_w(0, (0x1800 + offset), mem_mask, 0);
-	toaplan2_videoram16_w(0, data, mem_mask, 0);
+	toaplan2_videoram16_w(space->machine, 0, data, mem_mask, 0);
 }
 
 
