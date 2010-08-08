@@ -37,6 +37,7 @@ Willow (USA)                                      1989  89624B-3   WL24B        
   (alt B-board revision - Japan)                        88622B-3   WL22B            LWIO  88622-C-2  CPS-B-03  DL-0411-10003  None
 U.N. Squadron (USA)                               1989  89624B-3   AR24B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
   (alt B-board revision - Japan)                        88622B-3   AR22B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
+  (alt B-board revision - Japan Resale Ver.)            91634B-2   ARA63B    BPRG1  IOB1  92631C-6   ?         ?              C632  IOC1
 Final Fight (World)                               1989  89624B-3   S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
 Final Fight (USA)                                       89624B-3   S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
 Final Fight (USA 900112)                                89624B-3   S224B            IOB1  88622-C-5  CPS-B-04@ DL-0411-10001  None
@@ -1216,7 +1217,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"1941j",      CPS_B_05,     mapper_YI24B },	// PAL used could be YI22B
 	{"unsquad",    CPS_B_11,     mapper_AR24B },
 	{"area88",     CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
-	{"area88r",    CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
+	{"area88r",    CPS_B_11,     mapper_AR22B },	// wrong, this set uses ARA63B, still non dumped
 	{"mercs",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsu",     CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsua",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
