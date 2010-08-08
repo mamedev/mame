@@ -2802,6 +2802,7 @@ src/mame/includes/pk8000.h svneol=native#text/plain
 src/mame/includes/pktgaldx.h svneol=native#text/plain
 src/mame/includes/playch10.h svneol=native#text/plain
 src/mame/includes/playmark.h svneol=native#text/plain
+src/mame/includes/plygonet.h svneol=native#text/plain
 src/mame/includes/polepos.h svneol=native#text/plain
 src/mame/includes/policetr.h svneol=native#text/plain
 src/mame/includes/polyplay.h svneol=native#text/plain
