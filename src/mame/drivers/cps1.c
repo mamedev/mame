@@ -4340,12 +4340,12 @@ ROM_START( area88r )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "ara63b.1a",    0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
-	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
 /* B-Board 89624B-3 */
