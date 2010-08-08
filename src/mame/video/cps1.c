@@ -1216,6 +1216,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"1941j",      CPS_B_05,     mapper_YI24B },	// PAL used could be YI22B
 	{"unsquad",    CPS_B_11,     mapper_AR24B },
 	{"area88",     CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
+	{"area88r",    CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
 	{"mercs",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsu",     CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsua",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
