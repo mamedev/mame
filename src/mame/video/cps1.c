@@ -1314,7 +1314,9 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2jc",      CPS_B_12,     mapper_STF29,  0x36 },
 	{"sf2qp1",     CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2thndr",   CPS_B_17,     mapper_STF29,  0x36 },
+
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
+
 	{"3wonders",   CPS_B_21_BT1, mapper_RT24B },
 	{"3wondersu",  CPS_B_21_BT1, mapper_RT24B },
 	{"wonder3",    CPS_B_21_BT1, mapper_RT22B },	// equivalent to RT24B
@@ -1332,7 +1334,6 @@ static const struct CPS1config cps1_config_table[]=
 	{"knights",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
-	{"knightsja",  CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// PAL could be different if B-Board is 90629B
 	{"knightsb",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },	// wrong, knightsb bootleg doesn't use the KR63B PAL
 	{"sf2ce",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceua",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
