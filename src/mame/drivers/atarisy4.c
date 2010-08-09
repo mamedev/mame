@@ -174,7 +174,7 @@ static inline UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
 
 static void image_mem_to_screen(bool clip)
 {
-	UINT16 y = gpu.gr[1] - 0x200;
+	INT16 y = gpu.gr[1] - 0x200;
 	UINT16 h = gpu.gr[3];
 
 	if (h & 0x8000)
@@ -184,7 +184,7 @@ static void image_mem_to_screen(bool clip)
 	while (h--)
 	{
 		UINT16 w = gpu.gr[2];
-		UINT16 x = gpu.gr[0] - 0x400;
+		INT16 x = gpu.gr[0] - 0x400;
 
 		if (w & 0x8000)
 			w = -w;
