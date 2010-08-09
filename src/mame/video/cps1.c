@@ -19,87 +19,152 @@ Known A-board revisions:
 89626A-4
 89626A-4 DASH
 
-NAME                                              Year  B-board #       B-board PALs      C-board #          CPS-B #          C-board PALs
-------------------------------------------------  ----  ---------  ---------------------  ---------  -----------------------  ------------
-Forgotten Worlds (USA / Japan)                    1988  88618B-2   LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  N/A
-  (alt B-board revision - World)                        88621B-2   LW621            LWIO  None       CPS-B-01  DL-0411-10001  N/A
-Ghouls'n Ghosts (World / USA)                     1988  88620-B-2  DM620            LWIO  None       CPS-B-01  DL-0411-10001  N/A
-  (alt B-board revision - Japan)                        88622B-2   DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
-  (alt B-board revision - Japan Resale Ver.)            91634B-2   DAM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Strider (USA)                                     1989  89624B-2   ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
-  (alt C-board revision - USA)                          89624B-2   ST24M1           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
-  (alt B-board revision - USA)                          89624B-3   ST24B2           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
-  (alt B-board revision - Japan)                        ?          ST22B            ?     ?          CPS-B-01  DL-0411-10001
-  (alt B-board revision - Japan Resale Ver.)            91634B-2   STH63B?   BPRG1  IOB1  ?          ?         ?
-Dynasty Wars (USA)                                1989  89624B-3   TK24B1           LWIO? 88622-C-2  CPS-B-02  DL-0411-10002  None
-  (alt B-board revision - Japan)                        88622B-3   TK22B            LWIO  88622-C-2  CPS-B-02  DL-0411-10002  None
-Willow (USA)                                      1989  89624B-3   WL24B            LWIO  88622-C-4  CPS-B-03  DL-0411-10003  None
-  (alt B-board revision - Japan)                        88622B-3   WL22B            LWIO  88622-C-2  CPS-B-03  DL-0411-10003  None
-U.N. Squadron (USA)                               1989  89624B-3   AR24B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
-  (alt B-board revision - Japan)                        88622B-3   AR22B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
-  (alt B-board revision - Japan Resale Ver.)            91634B-2   ARA63B    BPRG1  IOB1  92631C-6   ?         ?              C632  IOC1
-Final Fight (World)                               1989  89624B-3   S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
-Final Fight (USA)                                       89624B-3   S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
-Final Fight (USA 900112)                                89624B-3   S224B            IOB1  88622-C-5  CPS-B-04@ DL-0411-10001  None
-Final Fight (USA 900613)                                89624B-3   S224B            IOB1  88622-C-5  CPS-B-05  DL-0411-10006  None
-Final Fight (Japan)                                     88622B-?   S222B            ?     ?          CPS-B-04  DL-0411-10005
-Final Fight (Japan 900112)                              88622B-?   S222B            ?     ?          CPS-B-01  DL-0411-10001
-Final Fight (Japan 900305)                              88622B-?   S222B            ?     ?          CPS-B-02  DL-0411-10002
-Street Smart / Final Fight (Japan, hack)                91634B-2   GAL16V8A-15LP    IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-1941 (World)                                      1990  ?          YI24B            ?     88622-C-5  CPS-B-05  DL-0411-10006  None
-  (alt B-board revision - Japan)                        89625B-1   YI22B?           LWIO? 88622-C-5  CPS-B-05  DL-0411-10006  None
-Mercs (World / USA)                               1990  89624B-3   O224B            IOB1  90628-C-1  CPS-B-12  DL-0411-10007  C628
-  (alt B-board revision - Japan)                        89625B-1   O222B            LWIO? 90628-C-1  CPS-B-12  DL-0411-10007  C628
-Mega Twins (World)                                1990  89624B-3   CK24B            IOB1  88622-C-5  CPS-B-14  DL-0411-10009  None
-  (alt B-board revision - Japan)                        ?          CK22B?           ?     ?          CPS-B-14  DL-0411-10009
-Magic Sword (World / USA)                         1990  89624B-3   MS24B            IOB1  88622-C-5  CPS-B-13  DL-0411-10008  None
-  (alt B-board revision - Japan)                        89625B-1   MS22B            IOB1  88622-C-5  CPS-B-13  DL-0411-10008  None
-Carrier Air Wing (World / USA)                    1990  89624B-3   CA24B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
-  (alt B-board revision - Japan)                        89625B-1   CA22B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
-Nemo (World)                                      1990  89624B-3   NM24B            IOB1  88622-C-5  CPS-B-15  DL-0411-10010  None
-  (alt B-board revision - Japan)                        89625B-1   NM22B            ?     ?          CPS-B-15  DL-0411-10010
-Street Fighter II (World 910214)                  1991  90629B-2   STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
-Street Fighter II (World 910522)                        90629B-3   STF29            IOB1  90632C-1   CPS-B-11  DL-0411-10004  C632
-Street Fighter II (USA 910206)                          90629B-?   STF29            IOB1  ?          CPS-B-17  DL-0411-10012  C632
-Street Fighter II (USA 910214)                          90629B-3   STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
-Street Fighter II (USA 910228)                          90629B-3   STF29            IOB2  90632C-1   CPS-B-18  DL-0411-10013  C632B
-Street Fighter II (USA 910318)                          90629B-?   STF29            IOB1  ?          CPS-B-05  DL-0411-10006  C632
-Street Fighter II (USA 910411)                          90629B-?   STF29?           ?     ?          CPS-B-15  DL-0411-10010
-Street Fighter II (USA 910522)                          90629B-3   STF29            IOB1  90632C-1   CPS-B-14  DL-0411-10009  C632
-Street Fighter II (USA 911101)                          90629B-?   STF29?           ?     ?          CPS-B-17  DL-0411-10012
-Street Fighter II (Japan 910214)                        90629B-2   STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
-Street Fighter II (Japan 910306)                        90629B-?   STF29?           IOB1  ?          CPS-B-12  DL-0411-10007  C632
-Street Fighter II (Japan 911210)                        90629B-?   STF29?           IOB1  ?          CPS-B-13  DL-0411-10008  C632
-Three Wonders* (World / USA)                      1991  89624B-3   RT24B            IOB1  90630C-4   CPS-B-21  DL-0921-10014        IOC1
-  (alt B-board revision - Japan)                        89625B-1   RT22B            IOB1  90630C-4   CPS-B-21  DL-0921-10014        IOC1
-The King of Dragons* (World / USA)                1991  90629B-3   KD29B            IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-Captain Commando* (World 911014)                  1991  91635B-2   CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-Captain Commando* (World 911202)                        91635B-2   CC63B     CCPRG1 IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632B IOC1
-Captain Commando* (USA 910928)                          91635B-2   CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-Captain Commando* (Japan 911202)                        91634B-2   CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-Knights of the Round* (World / USA)               1991  91635B-2   KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-Knights of the Round* (Japan)                     1991  91634B-2   KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-  (alt B-board revision - Japan)                        ?          KR29B?           ?     ?          CPS-B-21  DL-0921-10014
-Street Fighter II' Champion Edition (World /USA)  1992  91635B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-  (alt B-board revision - Japan)                        91634B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Capcom World 2* (Japan)                           1992  89625B-1   Q522B            LWIO  92641C-6   CPS-B-21  DL-0921-10014        IOC1
-Varth* (World)                                    1992  89624B-3   VA24B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
-  (alt B-board revision - USA)                          91635B-2   VA63B     BPRG1  IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
-  (alt B-board revision - Japan)                        88622B-3   VA22B            LWIO  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Quiz & Dragons* (USA)                             1992  89625B-1   QD22B            IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-  (alt B-board revision - Japan)                  1994  ?          ?                IOB1  ?          CPS-B-21  DL-0921-10014
-Warriors of Fate* (USA)                           1992  91635B-2   TK263B    BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Street Fighter II' Hyper Fighting (World / USA)   1992  91635B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-  (alt B-board revision - Japan)                        91634B-2   S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Cadillacs and Dinosaurs (World / USA)             1993  91635B-2   CD63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-The Punisher* (World / USA)                       1993  91635B-2   PS63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Saturday Night Slam Masters* (USA)                1993  91635B-2   MB63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Muscle Bomber Duo*                                1993  ?          ?                ?     92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Ken Sei Mogura (Japan)                            1994  ?          ?                ?     ?          ?         ?
-Pnickies (Japan)                                  1994  89625B-1   PKB10B           IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Quiz Tonosama no Yabou 2 (Japan)                  1995  90629B-3   ?                IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Pang! 3 (Euro / Japan)                            1995  94916-10   CP1B1F,CP1B8K,CP1B9KA  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Mega Man / Rockman (Asia / Japan)                 1995  91634B-2   RCM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+NAME                                                     Year  B-board #       B-board PALs      C-board #            CPS-B #          C-board PALs
+-------------------------------------------------------  ----  ---------  ---------------------  -----------  -----------------------  ------------
+Forgotten Worlds (World)                                 1988  88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (USA, B-Board 88618B-?)                       88618B-?   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (USA, B-Board 88621B-2)                       88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Lost Worlds (Japan Old Ver.)                                   88618B-?   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Lost Worlds (Japan)                                            88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+
+Ghouls'n Ghosts (World)                                  1988  88620-B-?  DM620            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Ghouls'n Ghosts (USA)                                          88620-B-2  DM620            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Daimakaimura (Japan)                                           88622B-2   DM22A            LWIO  88622-C-1    CPS-B-01  DL-0411-10001  None
+Daimakaimura (Japan Resale Ver.)                               91634B-2   DAM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Strider (USA, B-Board 89624B-2)                          1989  89624B-2   ST24M1           LWIO  88622-C-1/2  CPS-B-01  DL-0411-10001  None
+Strider (USA, B-Board 89624B-3)                                89624B-3   ST24B2           LWIO  88622-C-2    CPS-B-01  DL-0411-10001  None
+Strider Hiryu (Japan)                                          ?          ST22B            ?     ?            CPS-B-01  DL-0411-10001
+Strider Hiryu (Japan Resale Ver.)                              91634B-2   STH63B?  BPRG1   IOB1  ?            ?         ?              C632    IOC1
+
+Dynasty Wars (USA, B-Board 88622B-3)                     1989  88622B-3   TK22B            LWIO  88622-C-2    CPS-B-02  DL-0411-10002  None
+Dynasty Wars (USA, B-Board 89624B-?)                           89624B-?   TK24B1           LWIO? ?            CPS-B-02  DL-0411-10002
+Tenchi wo Kurau (Japan)                                        88622B-3   TK22B            LWIO  88622-C-2    CPS-B-02  DL-0411-10002  None
+
+Willow (USA)                                             1989  89624B-3   WL24B            LWIO  88622-C-4    CPS-B-03  DL-0411-10003  None
+Willow (Japan, English)                                        89624B-?   WL24B            LWIO  ?            CPS-B-03  DL-0411-10003
+Willow (Japan, Japanese)                                       88622B-3   WL22B            LWIO  88622-C-2    CPS-B-03  DL-0411-10003  None
+
+U.N. Squadron (USA)                                      1989  89624B-3   AR24B            LWIO  88622-C-4    CPS-B-11  DL-0411-10004  None
+Area 88 (Japan)                                                88622B-3   AR22B            LWIO  88622-C-4    CPS-B-11  DL-0411-10004  None
+Area 88 (Japan Resale Ver.)                                    91634B-2   ARA63B   BPRG1   IOB1  ?            ?         ?              C632    IOC1
+
+Final Fight (World)                                      1989  89624B-3   S224B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
+Final Fight (USA)                                              89624B-3   S224B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
+Final Fight (USA 900112)                                       89624B-3   S224B            IOB1  88622-C-5    CPS-B-04@ DL-0411-10001  None
+Final Fight (USA 900613)                                       89624B-3   S224B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
+Final Fight (Japan)                                            88622B-?   S222B            ?     ?            CPS-B-04  DL-0411-10005
+Final Fight (Japan 900112)                                     88622B-?   S222B            ?     ?            CPS-B-01  DL-0411-10001
+Final Fight (Japan 900305)                                     88622B-?   S222B            ?     ?            CPS-B-02  DL-0411-10002
+
+1941: Counter Attack (World)                             1990  ?          YI24B            ?     ?            CPS-B-05  DL-0411-10006
+1941: Counter Attack (Japan)                                   89625B-1   YI22B?           LWIO? 88622-C-5    CPS-B-05  DL-0411-10006  None
+
+Mercs (World 900302)                                     1990  89624B-3   O224B            IOB1  90628-C-1    CPS-B-12  DL-0411-10007  C628
+Mercs (USA 900302)                                             89624B-3   O224B            IOB1  90628-C-1    CPS-B-12  DL-0411-10007  C628
+Mercs (USA 900608)                                             89624B-3   O224B            IOB1  90628-C-1    CPS-B-12  DL-0411-10007  C628
+Senjou no Ookami II (Japan 900302)                             89625B-1   O222B            LWIO? 90628-C-1    CPS-B-12  DL-0411-10007  C628
+
+Mega Twins (World 900619)                                1990  89624B-3   CK24B            IOB1  88622-C-5    CPS-B-14  DL-0411-10009  None
+Chiki Chiki Boys (Japan 900619)                                ?          CK22B?           ?     ?            CPS-B-14  DL-0411-10009
+
+Magic Sword: Heroic Fantasy (World 900623)               1990  89624B-3   MS24B            IOB1  88622-C-5    CPS-B-13  DL-0411-10008  None
+Magic Sword: Heroic Fantasy (World 900725)                     89624B-3   MS24B            IOB1  88622-C-5    CPS-B-13  DL-0411-10008  None
+Magic Sword: Heroic Fantasy (USA 900725)                       89624B-3   MS24B            IOB1  88622-C-5    CPS-B-13  DL-0411-10008  None
+Magic Sword (Japan 900623)                                     89625B-1   MS22B            IOB1  88622-C-5    CPS-B-13  DL-0411-10008  None
+
+Carrier Air Wing (World 901009)                          1990  89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
+Carrier Air Wing (World 901012)                                89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
+Carrier Air Wing (USA 901012)                                  89624B-?   CA24B            IOB1  ?            CPS-B-16  DL-0411-10011
+U.S. Navy (Japan 901012)                                       89625B-1   CA22B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
+
+Nemo (World 901130)                                      1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
+Nemo (Japan 901120)                                            89625B-1   NM22B            ?     ?            CPS-B-15  DL-0411-10010
+
+Street Fighter II: The World Warrior (World 910214)      1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (World 910522)            90629B-3   STF29            IOB1  90632C-1     CPS-B-11  DL-0411-10004  C632
+Street Fighter II: The World Warrior (USA 910206)              90629B-?   STF29            IOB1  ?            CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (USA 910214)              90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (USA 910228)              90629B-3   STF29            IOB2  90632C-1     CPS-B-18  DL-0411-10013  C632B
+Street Fighter II: The World Warrior (USA 910318)              90629B-?   STF29            IOB1  ?            CPS-B-05  DL-0411-10006  C632
+Street Fighter II: The World Warrior (USA 910411)              90629B-?   STF29            IOB1  ?            CPS-B-15  DL-0411-10010  C632
+Street Fighter II: The World Warrior (USA 910522)              90629B-3   STF29            IOB1  90632C-1     CPS-B-14  DL-0411-10009  C632
+Street Fighter II: The World Warrior (USA 911101)              90629B-?   STF29            IOB1  ?            CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (Japan 910214)            90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (Japan 910306)            90629B-?   STF29            IOB1  ?            CPS-B-12  DL-0411-10007  C632
+Street Fighter II: The World Warrior (Japan 911210)            90629B-?   STF29            IOB1  ?            CPS-B-13  DL-0411-10008  C632
+
+Three Wonders* (World 910520)                            1991  89624B-3   RT24B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
+Three Wonders* (USA 910520)                                    89624B-3   RT24B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
+Wonder 3* (Japan 910520)                                       89625B-1   RT22B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
+
+The King of Dragons* (World 910711)                      1991  90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+The King of Dragons* (USA 910910)                              90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+The King of Dragons* (Japan 910805)                            90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Captain Commando* (World 911014)                         1991  91635B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+Captain Commando* (World 911202)                               91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632B   IOC1
+Captain Commando* (USA 910928)                                 91635B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+Captain Commando* (Japan 910928)                               91634B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+Captain Commando* (Japan 911202)                               91634B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Knights of the Round* (World 911127)                     1991  91635B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+Knights of the Round* (USA 911127)                             91635B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+Knights of the Round* (Japan 911127)                           91634B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Street Fighter II': Champion Edition (World 920313)      1992  91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (USA 920313)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (USA 920513)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (USA 920803)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (Japan 920513)            91634B-2   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
+
+Adventure Quiz Capcom World 2* (Japan 920611)            1992  89625B-1   Q522B            LWIO  92641C-6     CPS-B-21  DL-0921-10014          IOC1
+
+Varth: Operation Thunderstorm (World 920612)             1992  89624B-?   VA24B            IOB1  ?            CPS-B-04  DL-0411-10005
+Varth: Operation Thunderstorm (World 920714)                   89624B-3   VA24B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
+Varth: Operation Thunderstorm (USA 920612)                     91635B-2   VA63B    BPRG1   IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
+Varth: Operation Thunderstorm* (Japan 920714)                  88622B-3   VA22B            LWIO  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+
+Quiz & Dragons: Capcom Quiz Game* (USA 920701)           1992  89625B-1   QD22B            IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Quiz & Dragons: Capcom Quiz Game* (Japan 940921)         1994  ?          ?                IOB1  ?            CPS-B-21  DL-0921-10014
+
+Warriors of Fate* (World 921002)                         1992  91635B-?   TK263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014
+Warriors of Fate* (USA 921031)                                 91635B-2   TK263B   BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Sangokushi II* (Asia 921005)                                   91634B-?   TK263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014
+Tenchi wo Kurau II: Sekiheki no Tatakai* (Japan 921031)        91634B-?   TK263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014
+
+Street Fighter II': Hyper Fighting (World 921209)        1992  91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Hyper Fighting (USA 921209)                91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II' Turbo: Hyper Fighting (Japan 921209)        91634B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Cadillacs and Dinosaurs* (World 930201)                  1993  91635B-2   CD63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Cadillacs and Dinosaurs* (USA 930201)                          91635B-2   CD63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Cadillacs: Kyouryuu Shin Seiki* (Japan 930201)                 91634B-?   CD63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+
+The Punisher* (World 930422)                             1993  91635B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+The Punisher* (USA 930422)                                     91635B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+The Punisher* (Japan 930422)                                   91634B-?   PS63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+
+Saturday Night Slam Masters* (World 930713)              1993  91635B-?   MB63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+Saturday Night Slam Masters* (USA 930713)                      91635B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Muscle Bomber: The Body Explosion* (Japan 930713)              91634B-?   MB63B    BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+
+Muscle Bomber Duo: Ultimate Team Battle* (World 931206)  1993  91635B-?   ?        BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+Muscle Bomber Duo: Heat Up Warriors* (Japan 931206)            91634B-?   ?        BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014          IOC1
+
+Ken Sei Mogura (Japan ??????)                            1994  ?          ?                ?     ?            ?         ?
+
+Pnickies (Japan 940608)                                  1994  89625B-1   PKB10B           IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Quiz Tonosama no Yabou 2: Zenkoku-ban (Japan 950123)     1995  90629B-3   ?                IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Pang! 3 (Euro 950511, not encrypted)                     1995  94916-10   CP1B1F,CP1B8K,CP1B9KA  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Pang! 3 (Euro 950601)                                          94916-10   CP1B1F,CP1B8K,CP1B9KA  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Pang! 3: Kaitou Tachi no Karei na Gogo (Japan 950511)          94916-10   CP1B1F,CP1B8K,CP1B9KA  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Mega Man: The Power Battle (CPS1, Asia 951006)           1995  91634B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Rockman: The Power Battle (CPS1, Japan 950922)                 91634B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+
 
 @the original number (CPS-B-01) was scratched out and "04" stamped over it.
 *denotes Suicide Battery
@@ -1187,8 +1252,8 @@ static const struct CPS1config cps1_config_table[]=
 {
 	/* name        CPSB          gfx mapper   in2  in3  out2   kludge */
 	{"forgottn",   CPS_B_01,     mapper_LW621 },
-	{"forgottnua", CPS_B_01,     mapper_LW621 },
-	{"forgottnu",  CPS_B_01,     mapper_LWCHR },
+	{"forgottnu",  CPS_B_01,     mapper_LW621 },
+	{"forgottnua", CPS_B_01,     mapper_LWCHR },
 	{"lostwrld",   CPS_B_01,     mapper_LWCHR },
 	{"lostwrldo",  CPS_B_01,     mapper_LWCHR },
 	{"ghouls",     CPS_B_01,     mapper_DM620 },
@@ -1200,7 +1265,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"striderj",   CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
 	{"striderjr",  CPS_B_01,     mapper_ST24M1 },	// wrong, PAL used could be STH63B, check CPS_B
 	{"dynwar",     CPS_B_02,     mapper_TK22B },	// wrong, this set uses TK24B1, dumped but equations still not added
-	{"dynwaru",    CPS_B_02,     mapper_TK22B },
+	{"dynwara",    CPS_B_02,     mapper_TK22B },
 	{"dynwarj",    CPS_B_02,     mapper_TK22B },
 	{"willow",     CPS_B_03,     mapper_WL24B },
 	{"willowj",    CPS_B_03,     mapper_WL24B },	// wrong, this set uses WL22B, still non dumped
@@ -1301,7 +1366,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"wofa",       CPS_B_21_DEF, mapper_TK263B },
 	{"wofu",       CPS_B_21_QS1, mapper_TK263B },
 	{"wofj",       CPS_B_21_QS1, mapper_TK263B },
-	{"wofhfb",     CPS_B_21_DEF, mapper_TK263B, 0x36 },	/* Chinese bootleg */
+	{"wofhfh",     CPS_B_21_DEF, mapper_TK263B, 0x36 },	/* Chinese bootleg */
 	{"dino",       CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinou",      CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinoj",      CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */

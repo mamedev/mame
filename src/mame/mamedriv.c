@@ -2664,8 +2664,8 @@ V-V                           TP-027
 	DRIVER( striderua )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
 	DRIVER( striderj )	/*  3/1989 (c) 1989 */
 	DRIVER( striderjr )	/*  3/1989 (c) 1989 */
-	DRIVER( dynwar )	/*  4/1989 (c) 1989 (World) */
-	DRIVER( dynwaru )	/*  4/1989 (c) 1989 (US) */
+	DRIVER( dynwar )	/*  4/1989 (c) 1989 (US) */
+	DRIVER( dynwara )	/*  4/1989 (c) 1989 (US) */
 	DRIVER( dynwarj )	/*  4/1989 (c) 1989 (Japan) */
 	DRIVER( willow )	/*  6/1989 (c) 1989 (US) */
 	DRIVER( willowj )	/*  6/1989 (c) 1989 (Japan) */
@@ -2680,7 +2680,7 @@ V-V                           TP-027
 	DRIVER( ffightj )	/* 12/1989 (c) (Japan) */
 	DRIVER( ffightj1 )	/* 12/1989 (c) (Japan) */
 	DRIVER( ffightj2 )	/* 12/1989 (c) (Japan) */
-	DRIVER( ffightjh )	/* 12/1989 (c) (Japan) */
+	DRIVER( ffightjh )	/* hack */
 	DRIVER( 1941 )		/*  2/1990 (c) 1990 (World) */
 	DRIVER( 1941j )		/*  2/1990 (c) 1990 (Japan) */
 	DRIVER( mercs )		/* 02/03/1990 (c) 1990 (World) */
@@ -2717,7 +2717,7 @@ V-V                           TP-027
 	DRIVER( 3wonders )	/* 20/05/1991 (c) 1991 (World) */
 	DRIVER( 3wondersu )	/* 20/05/1991 (c) 1991 (US)    */
 	DRIVER( wonder3 )	/* 20/05/1991 (c) 1991 (Japan) */
-	DRIVER( 3wondersh )	/* hack? */
+	DRIVER( 3wondersh )	/* hack */
 	DRIVER( kod )		/* 11/07/1991 (c) 1991 (World) */
 	DRIVER( kodu )		/* 10/09/1991 (c) 1991 (US)    */
 	DRIVER( kodj )		/* 05/08/1991 (c) 1991 (Japan) */
@@ -2731,7 +2731,6 @@ V-V                           TP-027
 	DRIVER( knights )	/* 27/11/1991 (c) 1991 (World) */
 	DRIVER( knightsu )	/* 27/11/1991 (c) 1991 (US)    */
 	DRIVER( knightsj )	/* 27/11/1991 (c) 1991 (Japan) */
-	DRIVER( knightsja )	/* 27/11/1991 (c) 1991 (Japan) - alt B-Board */
 	DRIVER( knightsb )	/* bootleg */
 	DRIVER( sf2ce )		/* 13/03/1992 (c) 1992 (World) */
 	DRIVER( sf2ceua )	/* 13/03/1992 (c) 1992 (US)    */
@@ -2765,7 +2764,7 @@ V-V                           TP-027
 	DRIVER( wofa )		/* 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound) */
 	DRIVER( wofu )		/* 31/10/1992 (c) 1992 (US) (CPS1 + QSound) */
 	DRIVER( wofj )		/* 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound) */
-	DRIVER( wofhfb )	/* bootleg */
+	DRIVER( wofhfh )	/* bootleg */
 	DRIVER( sf2hf )		/* 09/12/1992 (c) 1992 (World) */
 	DRIVER( sf2hfu )	/* 09/12/1992 (c) 1992 (US)    */
 	DRIVER( sf2hfj )	/* 09/12/1992 (c) 1992 (Japan) */
