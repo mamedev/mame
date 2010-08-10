@@ -45,31 +45,120 @@ is a YM2413 compatible chip.
 static UINT8* sangho_ram;
 static UINT8 sexyboom_bank[8];
 
-static WRITE8_HANDLER(sangho_ram_w)
+static UINT8 pzlestar_mem_bank = 0;
+static UINT8 pzlestar_rom_bank = 0;
+
+static void pzlestar_map_banks(running_machine *machine)
 {
-	sangho_ram[offset]=data;
+	int slot_select;
+
+	// page 0
+	slot_select = (pzlestar_mem_bank >> 0) & 0x03;
+	switch(slot_select)
+	{
+		case 0:
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank5");
+			memory_set_bankptr(machine, "bank1", sangho_ram);
+			memory_set_bankptr(machine, "bank5", sangho_ram);
+			break;
+		case 2:
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
+			memory_set_bankptr(machine, "bank1", memory_region(machine, "user1")+ 0x10000);
+			break;
+		case 1:
+		case 3:
+			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
+			break;
+	}
+
+	// page 1
+	slot_select = (pzlestar_mem_bank >> 2) & 0x03;
+	switch(slot_select)
+	{
+		case 0:
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
+			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank6");
+			memory_set_bankptr(machine, "bank2", sangho_ram + 0x4000);
+			memory_set_bankptr(machine, "bank6", sangho_ram + 0x4000);
+			break;
+		case 2:
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
+			memory_set_bankptr(machine, "bank2", memory_region(machine, "user1")+ 0x18000);
+			break;
+		case 3:
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
+			memory_set_bankptr(machine, "bank2", memory_region(machine, "user1")+ 0x20000 + (pzlestar_rom_bank*0x8000) + 0x4000);
+			break;
+		case 1:
+			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
+			break;
+	}
+
+	// page 2
+	slot_select = (pzlestar_mem_bank >> 4) & 0x03;
+	switch(slot_select)
+	{
+		case 0:
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank3");
+			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank7");
+			memory_set_bankptr(machine, "bank3", sangho_ram + 0x8000);
+			memory_set_bankptr(machine, "bank7", sangho_ram + 0x8000);
+			break;
+		case 3:
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank3");
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			memory_set_bankptr(machine, "bank3", memory_region(machine, "user1")+ 0x20000 + (pzlestar_rom_bank*0x8000));
+			break;
+		case 1:
+		case 2:
+			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			break;
+	}
+
+	// page 3
+	slot_select = (pzlestar_mem_bank >> 6) & 0x03;
+	switch(slot_select)
+	{
+		case 0:
+			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, "bank4");
+			memory_install_write_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, "bank8");
+			memory_set_bankptr(machine, "bank4", sangho_ram + 0xc000);
+			memory_set_bankptr(machine, "bank8", sangho_ram + 0xc000);
+			break;
+		case 1:
+		case 2:
+		case 3:
+			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0);
+			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0);
+			break;
+	}
+
 }
 
-static ADDRESS_MAP_START( pzlestar_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(sangho_ram_w)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sexyboom_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
-	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
-ADDRESS_MAP_END
-
-/* Wrong ! */
 static WRITE8_HANDLER(pzlestar_bank_w)
 {
-	memory_set_bankptr(space->machine, "bank2",&memory_region(space->machine, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
-	memory_set_bankptr(space->machine, "bank3",&memory_region(space->machine, "user1")[  0x18000  ]);
+	logerror("rom bank %02x\n", data);
+	pzlestar_rom_bank = data;
+	pzlestar_map_banks(space->machine);
+}
+
+static WRITE8_HANDLER(pzlestar_mem_bank_w)
+{
+	logerror("mem bank %02x\n", data);
+	pzlestar_mem_bank = data;
+	pzlestar_map_banks(space->machine);
+}
+
+static READ8_HANDLER(pzlestar_mem_bank_r)
+{
+	return pzlestar_mem_bank;
 }
 
 static void sexyboom_map_bank(running_machine *machine, int bank)
@@ -120,6 +209,13 @@ static WRITE8_HANDLER(sexyboom_bank_w)
 	sexyboom_map_bank(space->machine, offset>>1);
 }
 
+static ADDRESS_MAP_START( sangho_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
+	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
+ADDRESS_MAP_END
+
 /* Puzzle Star Ports */
 
 static ADDRESS_MAP_START( pzlestar_io_map, ADDRESS_SPACE_IO, 8 )
@@ -132,6 +228,7 @@ static ADDRESS_MAP_START( pzlestar_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
+	AM_RANGE( 0xa8, 0xa8) AM_READWRITE( pzlestar_mem_bank_r, pzlestar_mem_bank_w )
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
@@ -210,26 +307,12 @@ static INPUT_PORTS_START( sangho )
 INPUT_PORTS_END
 
 
-static void sangho_common_machine_reset(running_machine *machine)
-{
-	memory_set_bankptr(machine, "bank1",&sangho_ram[0]);
-	memory_set_bankptr(machine, "bank2",&sangho_ram[0x4000]);
-	memory_set_bankptr(machine, "bank3",&sangho_ram[0x8000]);
-	memory_set_bankptr(machine, "bank4",&sangho_ram[0xc000]);
-	v9938_reset(0);
-}
-
-
 static MACHINE_RESET(pzlestar)
 {
-	/* give it some code to run, note this isn't at 0 in the rom! */
-	memcpy(sangho_ram,&memory_region(machine, "user1")[0x10000],0x8000);
+	pzlestar_mem_bank = 2;
+	pzlestar_map_banks(machine);
 
-	/* patch out rom check (it fails, due to bad banking) */
-	sangho_ram[0x25c1]=0xaf;
-	sangho_ram[0x25c2]=0xc9;
-
-	sangho_common_machine_reset(machine);
+	v9938_reset(0);
 }
 
 static MACHINE_RESET(sexyboom)
@@ -258,7 +341,7 @@ static void msx_vdp_interrupt(running_machine *machine, int i)
 static INTERRUPT_GEN( sangho_interrupt )
 {
 	v9938_set_sprite_limit(0, 0);
-	v9938_set_resolution(0, 2);
+	v9938_set_resolution(0, RENDER_HIGH);
 	v9938_interrupt(device->machine, 0);
 }
 
@@ -272,7 +355,7 @@ static VIDEO_START( sangho )
 static MACHINE_DRIVER_START(pzlestar)
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(pzlestar_map)
+	MDRV_CPU_PROGRAM_MAP(sangho_map)
 	MDRV_CPU_IO_MAP(pzlestar_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
@@ -305,7 +388,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(sexyboom )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(sexyboom_map)
+	MDRV_CPU_PROGRAM_MAP(sangho_map)
 	MDRV_CPU_IO_MAP(sexyboom_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
@@ -341,8 +424,8 @@ ROM_START( pzlestar )
 	ROM_LOAD( "rom04.bin", 0x060000, 0x20000, CRC(929e7491) SHA1(fb700d3e1d50fefa9b85ccd3702a9854df53a210) )
 	ROM_LOAD( "rom05.bin", 0x080000, 0x20000, CRC(8c6f71e5) SHA1(3597b03fe61216256437c56c583d55c7d59b5525) )
 	ROM_LOAD( "rom06.bin", 0x0a0000, 0x20000, CRC(84599227) SHA1(d47c6cdbf3b64f83627c768059148e31f8de1f36) )
-	ROM_LOAD( "rom07.bin", 0x0c0000, 0x20000, CRC(6f64cc35) SHA1(3e3270834ad31e8240748c2b61f9b8f138d22f68) )
-	ROM_LOAD( "rom08.bin", 0x0e0000, 0x20000, CRC(18d2bfe2) SHA1(cb92ee51d061bc053e296fcba10708f69ba12a61) )
+	ROM_LOAD( "rom08.bin", 0x0c0000, 0x20000, CRC(18d2bfe2) SHA1(cb92ee51d061bc053e296fcba10708f69ba12a61) )
+	ROM_LOAD( "rom07.bin", 0x0e0000, 0x20000, CRC(6f64cc35) SHA1(3e3270834ad31e8240748c2b61f9b8f138d22f68) )
 	ROM_LOAD( "rom09.bin", 0x100000, 0x20000, CRC(19a31115) SHA1(fa6ead5c8bf6be21d07797f74fcba13f0d041937) )
 	ROM_LOAD( "rom10.bin", 0x120000, 0x20000, CRC(c003328b) SHA1(5172e2c48e118ac9f9b9dd4f4df8804245047b33) )
 	ROM_LOAD( "rom11.bin", 0x140000, 0x20000, CRC(d36c1f92) SHA1(42b412c1ab99cb14f2e15bd80fede34c0df414b9) )
