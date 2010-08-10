@@ -18,41 +18,41 @@ void mem_reset(dsp56k_core* cpustate);
 #define O2A(a) (a+0xffc0)
 
 // The memory 'registers'
-#define PBC      (dsp56k_peripheral_ram[A2O(0xffc0)])
-#define PCC      (dsp56k_peripheral_ram[A2O(0xffc1)])
-#define PBDDR    (dsp56k_peripheral_ram[A2O(0xffc2)])
-#define PCDDR    (dsp56k_peripheral_ram[A2O(0xffc3)])
-#define HCR      (dsp56k_peripheral_ram[A2O(0xffc4)])
-#define COCR     (dsp56k_peripheral_ram[A2O(0xffc8)])
-#define CRASSI0  (dsp56k_peripheral_ram[A2O(0xffd0)])
-#define CRBSSI0  (dsp56k_peripheral_ram[A2O(0xffd1)])
-#define CRASSI1  (dsp56k_peripheral_ram[A2O(0xffd8)])
-#define CRBSSI1  (dsp56k_peripheral_ram[A2O(0xffd9)])
-#define PLCR     (dsp56k_peripheral_ram[A2O(0xffdc)])
-#define BCR      (dsp56k_peripheral_ram[A2O(0xffde)])
-#define IPR      (dsp56k_peripheral_ram[A2O(0xffdf)])
-#define PBD      (dsp56k_peripheral_ram[A2O(0xffe2)])
-#define PCD      (dsp56k_peripheral_ram[A2O(0xffe3)])
-#define HSR      (dsp56k_peripheral_ram[A2O(0xffe4)])
-#define HTXHRX   (dsp56k_peripheral_ram[A2O(0xffe5)])
-#define COSR     (dsp56k_peripheral_ram[A2O(0xffe8)])
-#define CRXCTX   (dsp56k_peripheral_ram[A2O(0xffe9)])
-#define TCR      (dsp56k_peripheral_ram[A2O(0xffec)])
-#define TCTR     (dsp56k_peripheral_ram[A2O(0xffed)])
-#define TCPR     (dsp56k_peripheral_ram[A2O(0xffee)])
-#define TPR      (dsp56k_peripheral_ram[A2O(0xffef)])
-#define TSRSSI0  (dsp56k_peripheral_ram[A2O(0xfff0)])
-#define TRXSSI0  (dsp56k_peripheral_ram[A2O(0xfff1)])
-#define RSMA0    (dsp56k_peripheral_ram[A2O(0xfff2)])
-#define RSMB0    (dsp56k_peripheral_ram[A2O(0xfff3)])
-#define TSMA0    (dsp56k_peripheral_ram[A2O(0xfff4)])
-#define TSMB0    (dsp56k_peripheral_ram[A2O(0xfff5)])
-#define TSRSSI1  (dsp56k_peripheral_ram[A2O(0xfff8)])
-#define TRXSSI1  (dsp56k_peripheral_ram[A2O(0xfff9)])
-#define RSMA1    (dsp56k_peripheral_ram[A2O(0xfffa)])
-#define RSMB1    (dsp56k_peripheral_ram[A2O(0xfffb)])
-#define TSMA1    (dsp56k_peripheral_ram[A2O(0xfffc)])
-#define TSMB1    (dsp56k_peripheral_ram[A2O(0xfffd)])
+#define PBC      (cpustate->peripheral_ram[A2O(0xffc0)])
+#define PCC      (cpustate->peripheral_ram[A2O(0xffc1)])
+#define PBDDR    (cpustate->peripheral_ram[A2O(0xffc2)])
+#define PCDDR    (cpustate->peripheral_ram[A2O(0xffc3)])
+#define HCR      (cpustate->peripheral_ram[A2O(0xffc4)])
+#define COCR     (cpustate->peripheral_ram[A2O(0xffc8)])
+#define CRASSI0  (cpustate->peripheral_ram[A2O(0xffd0)])
+#define CRBSSI0  (cpustate->peripheral_ram[A2O(0xffd1)])
+#define CRASSI1  (cpustate->peripheral_ram[A2O(0xffd8)])
+#define CRBSSI1  (cpustate->peripheral_ram[A2O(0xffd9)])
+#define PLCR     (cpustate->peripheral_ram[A2O(0xffdc)])
+#define BCR      (cpustate->peripheral_ram[A2O(0xffde)])
+#define IPR      (cpustate->peripheral_ram[A2O(0xffdf)])
+#define PBD      (cpustate->peripheral_ram[A2O(0xffe2)])
+#define PCD      (cpustate->peripheral_ram[A2O(0xffe3)])
+#define HSR      (cpustate->peripheral_ram[A2O(0xffe4)])
+#define HTXHRX   (cpustate->peripheral_ram[A2O(0xffe5)])
+#define COSR     (cpustate->peripheral_ram[A2O(0xffe8)])
+#define CRXCTX   (cpustate->peripheral_ram[A2O(0xffe9)])
+#define TCR      (cpustate->peripheral_ram[A2O(0xffec)])
+#define TCTR     (cpustate->peripheral_ram[A2O(0xffed)])
+#define TCPR     (cpustate->peripheral_ram[A2O(0xffee)])
+#define TPR      (cpustate->peripheral_ram[A2O(0xffef)])
+#define TSRSSI0  (cpustate->peripheral_ram[A2O(0xfff0)])
+#define TRXSSI0  (cpustate->peripheral_ram[A2O(0xfff1)])
+#define RSMA0    (cpustate->peripheral_ram[A2O(0xfff2)])
+#define RSMB0    (cpustate->peripheral_ram[A2O(0xfff3)])
+#define TSMA0    (cpustate->peripheral_ram[A2O(0xfff4)])
+#define TSMB0    (cpustate->peripheral_ram[A2O(0xfff5)])
+#define TSRSSI1  (cpustate->peripheral_ram[A2O(0xfff8)])
+#define TRXSSI1  (cpustate->peripheral_ram[A2O(0xfff9)])
+#define RSMA1    (cpustate->peripheral_ram[A2O(0xfffa)])
+#define RSMB1    (cpustate->peripheral_ram[A2O(0xfffb)])
+#define TSMA1    (cpustate->peripheral_ram[A2O(0xfffc)])
+#define TSMB1    (cpustate->peripheral_ram[A2O(0xfffd)])
 
 /* Interrupt priority register (IPR) bits */
 void IPR_set(dsp56k_core* cpustate, UINT16 value);
@@ -235,9 +235,11 @@ void PCDDR_set(dsp56k_core* cpustate, UINT16 value);
 /* Port C Dtaa Register (PCD) */
 void PCD_set(dsp56k_core* cpustate, UINT16 value);
 
-} // namespace DSP56K
-
 READ16_HANDLER( peripheral_register_r );
 WRITE16_HANDLER( peripheral_register_w );
+READ16_HANDLER( program_r );
+WRITE16_HANDLER( program_w );
+
+} // namespace DSP56K
 
 #endif

@@ -1,9 +1,6 @@
 #include "dsp56pcu.h"
 #include "dsp56mem.h"
 
-extern UINT16 *dsp56k_peripheral_ram;
-extern UINT16 *dsp56k_program_ram;
-
 namespace DSP56K
 {
 
@@ -149,7 +146,7 @@ void pcu_reset(dsp56k_core* cpustate)
 				/* P:$cfff -> Internal P:$07ff high byte */
 				UINT8 mem_value_low  = memory_read_byte_16le(cpustate->program, mem_offset);		/* TODO: IS THIS READING RIGHT? */
 				UINT8 mem_value_high = memory_read_byte_16be(cpustate->program, mem_offset);
-				dsp56k_program_ram[i] = (mem_value_high << 8) || mem_value_low;
+				cpustate->program_ram[i] = (mem_value_high << 8) || mem_value_low;
 			}
 
 			/* HACK - Set the PC to 0x0000 as per the boot ROM. */

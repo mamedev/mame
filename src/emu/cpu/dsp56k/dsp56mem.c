@@ -4,9 +4,6 @@
 #include "dsp56mem.h"
 #include "dsp56pcu.h"
 
-extern UINT16 *dsp56k_peripheral_ram;
-extern UINT16 *dsp56k_program_ram;
-
 namespace DSP56K
 {
 
@@ -301,9 +298,9 @@ void RXDF_bit_set(dsp56k_core* cpustate, UINT8 value)
 void dsp56k_host_interface_reset(dsp56k_core* cpustate)
 {
 	// Hook up the CPU-side pointers properly.
-	cpustate->HI.hcr = &dsp56k_peripheral_ram[A2O(0xffc4)];
-	cpustate->HI.hsr = &dsp56k_peripheral_ram[A2O(0xffe4)];
-	cpustate->HI.htrx = &dsp56k_peripheral_ram[A2O(0xffe5)];
+	cpustate->HI.hcr = &cpustate->peripheral_ram[A2O(0xffc4)];
+	cpustate->HI.hsr = &cpustate->peripheral_ram[A2O(0xffe4)];
+	cpustate->HI.htrx = &cpustate->peripheral_ram[A2O(0xffe5)];
 
 	// The Bootstrap hack is initialized to write to address 0x0000
 	cpustate->HI.bootstrap_offset = 0x0000;
@@ -486,7 +483,17 @@ void dsp56k_io_reset(dsp56k_core* cpustate)
 	external_p_wait_states_set(cpustate, 0x1f);
 }
 
-} // namespace DSP56K
+READ16_HANDLER( program_r )
+{
+	dsp56k_core* cpustate = get_safe_token(space->cpu);
+	return cpustate->program_ram[offset];
+}
+
+WRITE16_HANDLER( program_w )
+{
+	dsp56k_core* cpustate = get_safe_token(space->cpu);
+	cpustate->program_ram[offset] = data;
+}
 
 /* Work */
 READ16_HANDLER( peripheral_register_r )
@@ -621,7 +628,7 @@ READ16_HANDLER( peripheral_register_r )
 	}
 
 	// Its primary behavior is RAM
-	return dsp56k_peripheral_ram[offset];
+	return cpustate->peripheral_ram[offset];
 }
 
 WRITE16_HANDLER( peripheral_register_w )
@@ -629,7 +636,7 @@ WRITE16_HANDLER( peripheral_register_w )
 	dsp56k_core* cpustate = get_safe_token(space->cpu);
 
 	// Its primary behavior is RAM
-	// COMBINE_DATA(&dsp56k_peripheral_ram[offset]);
+	// COMBINE_DATA(&cpustate->peripheral_ram[offset]);
 
 	// (printf) logerror("Peripheral write 0x%04x = %04x\n", O2A(offset), data);
 
@@ -779,6 +786,7 @@ WRITE16_HANDLER( peripheral_register_w )
 	}
 }
 
+} // namespace DSP56K
 
 /* These two functions are exposed to the outside world */
 /* They represent the host side of the dsp56k's host interface */
@@ -840,8 +848,8 @@ void dsp56k_host_interface_write(running_device* device, UINT8 offset, UINT8 dat
 			// HACK
 			if (cpustate->bootstrap_mode == BOOTSTRAP_HI)
 			{
-				dsp56k_program_ram[cpustate->HI.bootstrap_offset] &= 0x00ff;
-				dsp56k_program_ram[cpustate->HI.bootstrap_offset] |= (data << 8);
+				cpustate->program_ram[cpustate->HI.bootstrap_offset] &= 0x00ff;
+				cpustate->program_ram[cpustate->HI.bootstrap_offset] |= (data << 8);
 				break;	/* Probably the right thing to do, given this is a hack */
 			}
 
@@ -856,8 +864,8 @@ void dsp56k_host_interface_write(running_device* device, UINT8 offset, UINT8 dat
 			// HACK
 			if (cpustate->bootstrap_mode == BOOTSTRAP_HI)
 			{
-				dsp56k_program_ram[cpustate->HI.bootstrap_offset] &= 0xff00;
-				dsp56k_program_ram[cpustate->HI.bootstrap_offset] |= data;
+				cpustate->program_ram[cpustate->HI.bootstrap_offset] &= 0xff00;
+				cpustate->program_ram[cpustate->HI.bootstrap_offset] |= data;
 				cpustate->HI.bootstrap_offset++;
 
 				if (cpustate->HI.bootstrap_offset == 0x800)
@@ -947,8 +955,8 @@ UINT8 dsp56k_host_interface_read(running_device* device, UINT8 offset)
 /* MISC*/
 UINT16 dsp56k_get_peripheral_memory(running_device* device, UINT16 addr)
 {
-	// TODO // THIS COMES BACK dsp56k_core* cpustate = get_safe_token(device);
-	return dsp56k_peripheral_ram[A2O(addr)];
+	dsp56k_core* cpustate = get_safe_token(device);
+	return cpustate->peripheral_ram[A2O(addr)];
 }
 
 

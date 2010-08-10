@@ -46,13 +46,6 @@ static CPU_RESET( dsp56k );
 
 
 /***************************************************************************
-    ONBOARD MEMORY 
-***************************************************************************/
-UINT16 *dsp56k_peripheral_ram;
-UINT16 *dsp56k_program_ram;
-
-
-/***************************************************************************
     COMPONENT FUNCTIONALITY
 ***************************************************************************/
 /* 1-9 ALU */
@@ -78,7 +71,8 @@ static DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
 {
 	if (address >= (0x0000<<1) && address <= (0x07ff<<1))
 	{
-		direct->raw = direct->decrypted = (UINT8 *)(dsp56k_program_ram - (0x0000<<1));
+		dsp56k_core* cpustate = get_safe_token(space->cpu);
+		direct->raw = direct->decrypted = (UINT8 *)(cpustate->program_ram - (0x0000<<1));
 		return ~0;
 	}
 
@@ -374,13 +368,13 @@ extern CPU_DISASSEMBLE( dsp56k );
  *  Internal Memory Maps
  ****************************************************************************/
 static ADDRESS_MAP_START( dsp56156_program_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000,0x07ff) AM_RAM AM_BASE(&dsp56k_program_ram)	/* 1-5 */
+	AM_RANGE(0x0000,0x07ff) AM_READWRITE(DSP56K::program_r, DSP56K::program_w)	/* 1-5 */
 //  AM_RANGE(0x2f00,0x2fff) AM_ROM                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp56156_x_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000,0x07ff) AM_RAM								/* 1-5 */
-	AM_RANGE(0xffc0,0xffff) AM_READWRITE(peripheral_register_r, peripheral_register_w) AM_BASE(&dsp56k_peripheral_ram)	/* 1-5 On-chip peripheral registers memory mapped in data space */
+	AM_RANGE(0xffc0,0xffff) AM_READWRITE(DSP56K::peripheral_register_r, DSP56K::peripheral_register_w)	/* 1-5 On-chip peripheral registers memory mapped in data space */
 ADDRESS_MAP_END
 
 
