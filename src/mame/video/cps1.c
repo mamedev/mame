@@ -91,7 +91,7 @@ Street Fighter II: The World Warrior (USA 910411)              90629B-?   STF29 
 Street Fighter II: The World Warrior (USA 910522)              90629B-3   STF29            IOB1  90632C-1     CPS-B-14  DL-0411-10009  C632
 Street Fighter II: The World Warrior (USA 911101)              90629B-?   STF29            IOB1  ?            CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (Japan 910214)            90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
-Street Fighter II: The World Warrior (Japan 910306)            90629B-?   STF29            IOB1  ?            CPS-B-12  DL-0411-10007  C632
+Street Fighter II: The World Warrior (Japan 910306)            90629B-3   STF29            IOB1  90632C-1     CPS-B-12  DL-0411-10007  C632
 Street Fighter II: The World Warrior (Japan 911210)            90629B-?   STF29            IOB1  ?            CPS-B-13  DL-0411-10008  C632
 
 Three Wonders* (World 910520)                            1991  89624B-3   RT24B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
@@ -1263,7 +1263,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"strider",    CPS_B_01,     mapper_ST24M1 },
 	{"striderua",  CPS_B_01,     mapper_ST24M1 },	// wrong, this set uses ST24B2, still non dumped
 	{"striderj",   CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
-	{"striderjr",  CPS_B_01,     mapper_ST24M1 },	// wrong, PAL used could be STH63B, check CPS_B
+	{"striderjr",  CPS_B_01,     mapper_ST24M1 },	// wrong, this set uses STH63B, still non dumped
 	{"dynwar",     CPS_B_02,     mapper_TK22B },	// wrong, this set uses TK24B1, dumped but equations still not added
 	{"dynwara",    CPS_B_02,     mapper_TK22B },
 	{"dynwarj",    CPS_B_02,     mapper_TK22B },
