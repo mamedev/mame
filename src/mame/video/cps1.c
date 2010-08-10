@@ -35,7 +35,7 @@ Daimakaimura (Japan Resale Ver.)                               91634B-2   DAM63B
 Strider (USA, B-Board 89624B-2)                          1989  89624B-2   ST24M1           LWIO  88622-C-1/2  CPS-B-01  DL-0411-10001  None
 Strider (USA, B-Board 89624B-3)                                89624B-3   ST24B2           LWIO  88622-C-2    CPS-B-01  DL-0411-10001  None
 Strider Hiryu (Japan)                                          ?          ST22B            ?     ?            CPS-B-01  DL-0411-10001
-Strider Hiryu (Japan Resale Ver.)                              91634B-2   STH63B?  BPRG1   IOB1  ?            ?         ?              C632    IOC1
+Strider Hiryu (Japan Resale Ver.)                              91634B-2   STH63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Dynasty Wars (USA, B-Board 88622B-3)                     1989  88622B-3   TK22B            LWIO  88622-C-2    CPS-B-02  DL-0411-10002  None
 Dynasty Wars (USA, B-Board 89624B-?)                           89624B-?   TK24B1           LWIO? ?            CPS-B-02  DL-0411-10002
@@ -47,7 +47,7 @@ Willow (Japan, Japanese)                                       88622B-3   WL22B 
 
 U.N. Squadron (USA)                                      1989  89624B-3   AR24B            LWIO  88622-C-4    CPS-B-11  DL-0411-10004  None
 Area 88 (Japan)                                                88622B-3   AR22B            LWIO  88622-C-4    CPS-B-11  DL-0411-10004  None
-Area 88 (Japan Resale Ver.)                                    91634B-2   ARA63B   BPRG1   IOB1  ?            ?         ?              C632    IOC1
+Area 88 (Japan Resale Ver.)                                    91634B-2   ARA63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Final Fight (World)                                      1989  89624B-3   S224B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
 Final Fight (USA)                                              89624B-3   S224B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
