@@ -4921,7 +4921,7 @@ ROM_START( goldnaxej )
 ROM_END
 
 /**************************************************************************************************************************
-    Golden Axe (Japan), Sega System 16B
+    Golden Axe (World), Sega System 16B
     CPU: FD1094 (317-0120)
     ROM Board: 171-5704
     Sega ID# for ROM board: 834-7002-11
@@ -6627,7 +6627,7 @@ GAME( 1989, fpoint1,    fpoint,   system16b,      fpoint,   generic_5704,       
 GAME( 1989, goldnaxe,   0,        system16b_8751_5248, goldnaxe, goldnaxe_5797, ROT0,   "Sega",           "Golden Axe (set 6, US, 8751 317-123A)", 0 )
 GAME( 1989, goldnaxeu,  goldnaxe, system16b_5248, goldnaxe, generic_5797,       ROT0,   "Sega",           "Golden Axe (set 5, US, FD1094 317-0122)", 0 )
 GAME( 1989, goldnaxej,  goldnaxe, system16b,      goldnaxe, generic_5704,       ROT0,   "Sega",           "Golden Axe (set 4, Japan, FD1094 317-0121)", 0 )
-GAME( 1989, goldnaxe3,  goldnaxe, system16b,      goldnaxe, generic_5704,       ROT0,   "Sega",           "Golden Axe (set 3, World, FD1094 317-0120)" , 0) // set was labeled japan but doesn't seem to be
+GAME( 1989, goldnaxe3,  goldnaxe, system16b,      goldnaxe, generic_5704,       ROT0,   "Sega",           "Golden Axe (set 3, World, FD1094 317-0120)" , 0)
 GAME( 1989, goldnaxe2,  goldnaxe, system16b_8751, goldnaxe, goldnaxe_5704,      ROT0,   "Sega",           "Golden Axe (set 2, US, 8751 317-0112)", 0 )
 GAME( 1989, goldnaxe1,  goldnaxe, system16b_5248, goldnaxe, generic_5797,       ROT0,   "Sega",           "Golden Axe (set 1, World, FD1094 317-0110)", 0 )
 
