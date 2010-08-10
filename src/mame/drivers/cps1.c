@@ -3486,7 +3486,7 @@ ROM_START( lostwrld )
 	ROM_LOAD( "lwio.15e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
 
-/* B-Board 88618B-? */
+/* B-Board 88618B-2 */
 ROM_START( lostwrldo )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lw-11.14f",      0x00000, 0x20000, CRC(61e2cc56) SHA1(bc192e37806129dd00677ca2c2e4287aa670973d) )

@@ -22,9 +22,9 @@ Known A-board revisions:
 NAME                                                     Year  B-board #       B-board PALs      C-board #            CPS-B #          C-board PALs
 -------------------------------------------------------  ----  ---------  ---------------------  -----------  -----------------------  ------------
 Forgotten Worlds (World)                                 1988  88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
-Forgotten Worlds (USA, B-Board 88618B-?)                       88618B-?   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88621B-2)                       88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
-Lost Worlds (Japan Old Ver.)                                   88618B-?   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (USA, B-Board 88618B-?)                       88618B-?   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Lost Worlds (Japan Old Ver.)                                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan)                                            88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 
 Ghouls'n Ghosts (World)                                  1988  88620-B-?  DM620            LWIO  None         CPS-B-01  DL-0411-10001  N/A
@@ -118,7 +118,7 @@ Street Fighter II': Champion Edition (USA 920513)              91635B-?   S9263B
 Street Fighter II': Champion Edition (USA 920803)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (Japan 920513)            91634B-2   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
 
-Adventure Quiz Capcom World 2* (Japan 920611)            1992  89625B-1   Q522B            LWIO  92641C-6     CPS-B-21  DL-0921-10014          IOC1
+Adventure Quiz Capcom World 2* (Japan 920611)            1992  89625B-1   Q522B            LWIO  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 
 Varth: Operation Thunderstorm (World 920612)             1992  89624B-?   VA24B            IOB1  ?            CPS-B-04  DL-0411-10005
 Varth: Operation Thunderstorm (World 920714)                   89624B-3   VA24B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
