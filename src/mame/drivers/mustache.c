@@ -141,7 +141,7 @@ static INPUT_PORTS_START( mustache )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW 1:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-// there is an 8th dipswitch here, which controls screen flip, but it does it via hardware, and is probably not readable by the cpu
+// There is an 8th dipswitch here, which controls screen flip, but the operator sheet implies it does it via hardware, i.e. not readable by cpu. May need further investigation.
 
 	PORT_START(T5182COINPORT)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
