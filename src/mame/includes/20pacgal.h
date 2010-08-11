@@ -35,7 +35,7 @@ public:
 	/* bank support */
 	UINT8 *ram_48000;
 
-	/* differs between 25pacman and 20pacgal, might be a register */
+	/* 25pacman and 20pacgal store the sprite palette at a different address, this is a hardware difference and confirmed NOT to be a register */
 	UINT8 sprite_pal_base;
 };
 
