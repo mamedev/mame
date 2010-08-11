@@ -441,7 +441,7 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		if ((interrupt_enable & 0x01) == 0)
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector & 0xf0);
-			timer_set(machine, machine->primary_screen->time_until_vblank_end(), NULL, 0, interrupt_off);
+			timer_set(machine, machine->primary_screen->time_until_pos(vfeedback), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
