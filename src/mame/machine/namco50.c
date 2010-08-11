@@ -158,14 +158,14 @@ static TIMER_CALLBACK( namco_50xx_latch_callback )
 {
 	namco_50xx_state *state = get_safe_token((running_device *)ptr);
 	state->latched_cmd = param;
-	state->latched_rw = 1;
+	state->latched_rw = 0;
 }
 
 
 static TIMER_CALLBACK( namco_50xx_readrequest_callback )
 {
 	namco_50xx_state *state = get_safe_token((running_device *)ptr);
-	state->latched_rw = 0;
+	state->latched_rw = 1;
 }
 
 
