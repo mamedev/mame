@@ -5,12 +5,12 @@
 
     driver by Nicola Salmoria
 
-    Notes:
+    Notes for Ms.Pac-Man/Galaga - 20th Anniversary:
         * There are four start buttons: the first two are for Ms. Pac-Man, the other two
-          for Galaga.
+          are for Galaga.
         * To play Pac-Man instead of Ms. Pac-Man, insert coins then enter the following
           sequence: U U U D D D L R L R L. A sound will play and the ghost will change
-          from red to pink.
+          from red to pink. Then press the start button for Ms. Pac-Man.
         * To toggle the built-in speedup, insert coins then enter the following sequence:
           L R L R U U U Fire.  A sound will play if you did it correctly.  This will toggle
           the speed in both Ms Pacman & Pacman as well as provide a "Fast Shot" in Galaga
@@ -21,10 +21,22 @@
           (c) 2000 Cosmodog, Ltd.
           >
           and it listens for incoming characters.
+
+    Notes for Pacman - 25th Anniversary:
+        * Pacman 25th Anniversary is a program update which allows the player to choose the
+          game they want to play. You highlight the wanted game and then press the 1 or 2
+          player start button to start the game.
+        * There is a minor board difference that the program code can detect through the Z80
+          ports to prevent ROM swaps to upgrade Ms. Pac-Man/Galaga - 20th Anniversary Class
+          of 1981 Reunion boards.
+        * The above listed joystick manuver for the built-in speed up still works.
+        * The above listed joystick manuver to enable Pac-Man will still play a tone, but
+          the effect (if any) is unknown.
+
         * CPU is a Z8S18020VSC (20MHz part), OSC is 73.728MHz
 
-    Note: The "correct" size of the roms are 27C020 for the program rom & 27C256 for the
-          pallete rom.  However genuine boards have been found with larger roms containing
+    Note: The "correct" size of the roms are 27C020 for the program rom and 27C256 for the
+          graphics rom.  However genuine boards have been found with larger roms containing
           the same data with the extra rom space banked out.
 
     Known issues/to-do's:
@@ -33,17 +45,6 @@
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
-
-    Versions known to exist but not dumped: v1.0 & v1.03
-
-    Pacman 25th Anniversary is a program update which allows the player to choose the
-        game they want to play. You highlight the wanted game and then press the 1 or 2
-        player start button to start the game. There is minor board difference that the
-        program code can detect through the Z80 ports to prevent ROM swaps to upgrade
-        Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion boards.
-      * The above listed joystick manuver for the built-in speed up still works.
-      * The above listed joystick manuver to enable Pac-Man will still play a
-        tone, but the effect (if any) is unknown.
 
 ***************************************************************************/
 
@@ -371,9 +372,9 @@ MACHINE_DRIVER_END
      Pacman - 25th Anniversary Edition
 */
 
-ROM_START( 25pacman ) /* Version 2.00 */
+ROM_START( 25pacman ) /* Revision 2.00 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) )
+	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) ) /* Label printed Rev 2.0, program says Rev 2.00 */
 
 	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
 	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) ) /* Same as the MS. Pacman / Galaga graphics rom */
@@ -399,6 +400,14 @@ ROM_START( 20pacgalr4 ) /* Version 1.04 */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 
+ROM_START( 20pacgalr3 ) /* Version 1.03 */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "ms_pac-galaga_v1.03.u13", 0x00000, 0x40000, CRC(e13dce63) SHA1(c8943f082883c423210fc3c97323222afb00f0a2) )
+
+	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
+ROM_END
+
 ROM_START( 20pacgalr2 ) /* Version 1.02 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.02.u13", 0x00000, 0x40000, CRC(b939f805) SHA1(5fe9470601156dfc2d339c94fd8f0aa4db197760) )
@@ -410,6 +419,14 @@ ROM_END
 ROM_START( 20pacgalr1 ) /* Version 1.01 */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ms_pac-galaga_v1.01.u13", 0x00000, 0x40000, CRC(77159582) SHA1(c05e005a941cbdc806dcd76b315069362c792a72) )
+
+	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
+	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
+ROM_END
+
+ROM_START( 20pacgalr0 ) /* Version 1.00 */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "ms_pac-galaga_v1.0.u13", 0x00000, 0x40000, CRC(3c92a269) SHA1(a616d912393f4e49b95231d72eec48567f46fc00) ) /* Label printed V1.0, program says v1.00 */
 
 	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
 	ROM_LOAD( "ms_pac-galaga.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
@@ -442,5 +459,7 @@ GAME( 2005, 25pacman,          0, 20pacgal, 25pacman, 25pacman, ROT90, "Namco", 
 
 GAME( 2000, 20pacgal,          0, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr4, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr3, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.03)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr2, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.02)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, 20pacgalr1, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.01)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr0, 20pacgal, 20pacgal, 20pacgal, 20pacgal, ROT90, "Namco", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.00)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
