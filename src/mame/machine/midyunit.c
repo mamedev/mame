@@ -213,41 +213,41 @@ static WRITE16_HANDLER( term2_sound_w )
 
 static WRITE16_HANDLER( term2_hack_w )
 {
-    if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce6520)
-    {
-        t2_hack_mem[offset] = 0;
-        return;
-    }
+	if (offset == 1 && cpu_get_pc(space->cpu) == 0xffce6520)
+	{
+		t2_hack_mem[offset] = 0;
+		return;
+	}
 	COMBINE_DATA(&t2_hack_mem[offset]);
 }
 
 static WRITE16_HANDLER( term2la3_hack_w )
 {
-    if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce5230)
-    {
-        t2_hack_mem[offset] = 0;
-        return;
-    }
+	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce5230)
+	{
+		t2_hack_mem[offset] = 0;
+		return;
+	}
 	COMBINE_DATA(&t2_hack_mem[offset]);
 }
 
 static WRITE16_HANDLER( term2la2_hack_w )
 {
-    if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce4b80)
-    {
-        t2_hack_mem[offset] = 0;
-        return;
-    }
+	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce4b80)
+	{
+		t2_hack_mem[offset] = 0;
+		return;
+	}
 	COMBINE_DATA(&t2_hack_mem[offset]);
 }
 
 static WRITE16_HANDLER( term2la1_hack_w )
 {
-    if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce33f0)
-    {
-        t2_hack_mem[offset] = 0;
-        return;
-    }
+	if (offset == 0 && cpu_get_pc(space->cpu) == 0xffce33f0)
+	{
+		t2_hack_mem[offset] = 0;
+		return;
+	}
 	COMBINE_DATA(&t2_hack_mem[offset]);
 }
 
