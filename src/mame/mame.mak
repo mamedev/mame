@@ -1104,7 +1104,6 @@ $(MAMEOBJ)/sanritsu.a: \
 	$(DRIVERS)/mjkjidai.o $(VIDEO)/mjkjidai.o \
 
 $(MAMEOBJ)/sega.a: \
-	$(DRIVERS)/aladbl.o \
 	$(DRIVERS)/angelkds.o $(VIDEO)/angelkds.o \
 	$(DRIVERS)/bingoc.o \
 	$(DRIVERS)/blockade.o $(AUDIO)/blockade.o $(VIDEO)/blockade.o \
@@ -1113,6 +1112,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
 	$(DRIVERS)/dotrikun.o \
 	$(VIDEO)/genesis.o \
+	$(DRIVERS)/genesisb.o \
 	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \
@@ -1140,7 +1140,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segamsys.o $(DRIVERS)/segae.o \
 	$(DRIVERS)/segaxbd.o $(VIDEO)/segaxbd.o \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
-	$(DRIVERS)/ssf2md.o \
 	$(DRIVERS)/ssgbl.o \
 	$(DRIVERS)/sg1000a.o \
 	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \

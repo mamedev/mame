@@ -1,29 +1,37 @@
-#include "emu.h"
-#include "includes/megadriv.h"
+/***************************************************************************
 
-/*
+    Sega Genesis/Mega Drive-based bootlegs
+
+    Games supported:
+        * Aladdin
+        * Mortal Kombat 3
+        * Super Street Fighter II - The New Challengers
+
+
+Aladdin PCB info
+================
 
 CPU
-Main cpu 68000P10
-Work ram 64kb (62256 x2)
-Sound cpu z80B
-Sound ram 8kb (76c88-6264 x1)
-Sound ic Ym2612 (identified by pins,code was been erased.Named on board as TA07)
+Main CPU 68000P10
+Work RAM 64kB (62256 x2)
+Sound CPU Z80B
+Sound RAM 8kB (76c88-6264 x1)
+Sound IC YM2612 (identified by pins,code was been erased.Named on board as TA07)
 
-Other ics
+Other ICs
 Microchip PIC16C57 (probably it contains the MD modified bios)
-Osc 50 Mhz
+Osc 50 MHz
 There are present 3 flat-pack chips with code erased again and named TA04,TA05,TA06 on board,which i have
-identified (generically) by looking the pcb as:
+identified (generically) by looking the PCB as:
 TA04-Intercommunication and sync generator chip
 TA05-Input controller
-TA06-VDP (probably MD clone) Uses 2x D41264 SIL package as video ram
+TA06-VDP (probably MD clone) Uses 2x D41264 SIL package as video RAM
 
 ROMs
 
 M3,M4 main program
 M1,M2 graphics
-All eproms are 27c040
+All EPROMs are 27C040
 
 Notes:
 
@@ -31,10 +39,10 @@ Dip-switch 8 x1
 
 ------------------------
 
-This romset comes from a bootleg pcb.The game is a coin-op conversion of the one developed for the Megadrive
-console.I cannot know gameplay differences since pcb is faulty.
+This romset comes from a bootleg PCB.The game is a coin-op conversion of the one developed for the Megadrive
+console.I cannot know gameplay differences since PCB is faulty.
 
-However,hardware is totally different.It seems to be based on Sega Mega Drive hardware with cpu clock increased,
+However,hardware is totally different.It seems to be based on Sega Mega Drive hardware with CPU clock increased,
 and since exists an "unlicensed" porting of the game for this system probably the "producers" are the same.
 
 
@@ -119,41 +127,17 @@ Stephh's notes (based on the game M68000 code and some tests) :
     Surprisingly, when you are in "demo mode", player can be again be hit 8 times
     before losing a life (this is the purpose of the 0xfff57c "flag") !
 
-*/
+****************************************************************************/
 
-ROM_START( aladbl )
-	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "m1.bin", 0x000001, 0x080000,  CRC(5e2671e4) SHA1(54705c7614fc7b5a1065478fa41f51dd1d8045b7) )
-	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(142a0366) SHA1(6c94aa9936cd11ccda503b52019a6721e64a32f0) )
-	ROM_LOAD16_BYTE( "m3.bin", 0x100001, 0x080000,  CRC(0feeeb19) SHA1(bd567a33077ab9997871d21736066140d50e3d70) )
-	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0))
-ROM_END
+#include "emu.h"
+#include "includes/megadriv.h"
 
-ROM_START( mk3ghw ) // roms are scrambled, we take care of the address descramble in the rom load, and the data descramble in the init
-                    // this is bootlegged from  "Mortal Kombat 3 (4) [!].bin"
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "1.u1", 0x080001, 0x020000,  CRC(0dc01b23) SHA1(f1aa7ac88c8e3deb5a0a065862722e9d27b87b4c) )
-	ROM_CONTINUE(            0x000001, 0x020000)
-	ROM_CONTINUE(            0x0c0001, 0x020000)
-	ROM_CONTINUE(            0x040001, 0x020000)
-	ROM_LOAD16_BYTE( "2.u3", 0x180001, 0x040000,  CRC(50250235) SHA1(9f9e06f26163b92c76397fde43b38b3536bcb637) )
-	ROM_CONTINUE(            0x100001, 0x040000)
-	ROM_LOAD16_BYTE( "3.u9", 0x280001, 0x040000,  CRC(493404c1) SHA1(73f4bd1eeeee3f175f4378ab406a97f94f88880b) )
-	ROM_CONTINUE(            0x200001, 0x040000)
-	ROM_LOAD16_BYTE( "4.u11",0x380001, 0x040000,  CRC(a52156b8) SHA1(0990ef1fb3427a5d3c262e264feb25c1db75ed33) )
-	ROM_CONTINUE(            0x300001, 0x040000)
-	ROM_LOAD16_BYTE( "6.u2", 0x080000, 0x020000,  CRC(9852fd6f) SHA1(348befeca5129c5ea2c142760ec93511f98f23cc) )
-	ROM_CONTINUE(            0x000000, 0x020000)
-	ROM_CONTINUE(            0x0c0000, 0x020000)
-	ROM_CONTINUE(            0x040000, 0x020000)
-	ROM_LOAD16_BYTE( "5.u4", 0x180000, 0x040000,  CRC(ed6a6d13) SHA1(eaab912ee035ece03f7cfceb1b546004399daad5) )
-	ROM_CONTINUE(            0x100000, 0x040000)
-	ROM_LOAD16_BYTE( "7.u10",0x280000, 0x040000,  CRC(a124d8d1) SHA1(d391b130992701d0fae7e827ba314b8368d809de) )
-	ROM_CONTINUE(            0x200000, 0x040000)
-	ROM_LOAD16_BYTE( "8.u12",0x380000, 0x040000,  CRC(8176f7cc) SHA1(375e1e982b97ba709fb160b04f56f6aa2d580104) )
-	ROM_CONTINUE(            0x300000, 0x040000)
-ROM_END
 
+/*************************************
+ *
+ *  Games memory handlers
+ *
+ *************************************/
 
 static WRITE16_HANDLER( aladbl_w )
 {
@@ -196,12 +180,72 @@ static READ16_HANDLER( mk3ghw_dsw_r )
 	return input_port_read(space->machine, dswname[offset]);
 }
 
+static READ16_HANDLER( ssf2ghw_dsw_r )
+{
+	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
+	return input_port_read(space->machine, dswname[offset]);
+}
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
+
+ROM_START( aladbl )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "m1.bin", 0x000001, 0x080000,  CRC(5e2671e4) SHA1(54705c7614fc7b5a1065478fa41f51dd1d8045b7) )
+	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(142a0366) SHA1(6c94aa9936cd11ccda503b52019a6721e64a32f0) )
+	ROM_LOAD16_BYTE( "m3.bin", 0x100001, 0x080000,  CRC(0feeeb19) SHA1(bd567a33077ab9997871d21736066140d50e3d70) )
+	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0))
+ROM_END
+
+ROM_START( mk3ghw ) // roms are scrambled, we take care of the address descramble in the ROM load, and the data descramble in the init
+                    // this is bootlegged from  "Mortal Kombat 3 (4) [!].bin"
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "1.u1", 0x080001, 0x020000,  CRC(0dc01b23) SHA1(f1aa7ac88c8e3deb5a0a065862722e9d27b87b4c) )
+	ROM_CONTINUE(            0x000001, 0x020000)
+	ROM_CONTINUE(            0x0c0001, 0x020000)
+	ROM_CONTINUE(            0x040001, 0x020000)
+	ROM_LOAD16_BYTE( "2.u3", 0x180001, 0x040000,  CRC(50250235) SHA1(9f9e06f26163b92c76397fde43b38b3536bcb637) )
+	ROM_CONTINUE(            0x100001, 0x040000)
+	ROM_LOAD16_BYTE( "3.u9", 0x280001, 0x040000,  CRC(493404c1) SHA1(73f4bd1eeeee3f175f4378ab406a97f94f88880b) )
+	ROM_CONTINUE(            0x200001, 0x040000)
+	ROM_LOAD16_BYTE( "4.u11",0x380001, 0x040000,  CRC(a52156b8) SHA1(0990ef1fb3427a5d3c262e264feb25c1db75ed33) )
+	ROM_CONTINUE(            0x300001, 0x040000)
+	ROM_LOAD16_BYTE( "6.u2", 0x080000, 0x020000,  CRC(9852fd6f) SHA1(348befeca5129c5ea2c142760ec93511f98f23cc) )
+	ROM_CONTINUE(            0x000000, 0x020000)
+	ROM_CONTINUE(            0x0c0000, 0x020000)
+	ROM_CONTINUE(            0x040000, 0x020000)
+	ROM_LOAD16_BYTE( "5.u4", 0x180000, 0x040000,  CRC(ed6a6d13) SHA1(eaab912ee035ece03f7cfceb1b546004399daad5) )
+	ROM_CONTINUE(            0x100000, 0x040000)
+	ROM_LOAD16_BYTE( "7.u10",0x280000, 0x040000,  CRC(a124d8d1) SHA1(d391b130992701d0fae7e827ba314b8368d809de) )
+	ROM_CONTINUE(            0x200000, 0x040000)
+	ROM_LOAD16_BYTE( "8.u12",0x380000, 0x040000,  CRC(8176f7cc) SHA1(375e1e982b97ba709fb160b04f56f6aa2d580104) )
+	ROM_CONTINUE(            0x300000, 0x040000)
+ROM_END
+
+ROM_START( ssf2ghw )
+	ROM_REGION( 0x1400000, "maincpu", 0 ) /* 68000 Code */
+	/* Special Case, custom PCB, linear ROM mapping of 5meg */
+	ROM_LOAD16_BYTE( "rom_a", 0x000000, 0x200000,  CRC(59726521) SHA1(3120bac17f56c01ffb9d3f9e31efa0263e3774af) )
+	ROM_LOAD16_BYTE( "rom_b", 0x000001, 0x200000,  CRC(7dad5540) SHA1(9279068b2218d239fdd557dd959ac70e74853178) )
+	ROM_LOAD16_BYTE( "rom_c", 0x400000, 0x080000,  CRC(deb48624) SHA1(39ffa7de7b808e0b95cb039bb381705d77420933) )
+	ROM_LOAD16_BYTE( "rom_d", 0x400001, 0x080000,  CRC(b99f6a5b) SHA1(adbe28a7522024bc66328ac86fecf9ded3310e8e) )
+ROM_END
+
+/*************************************
+ *
+ *  Game-specific driver inits
+ *
+ *************************************/
+
 #define ENERGY_CONSOLE_MODE 0
 
 static DRIVER_INIT( aladbl )
 {
 	/*
-     * Game does a check @ 1afc00 with work ram fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
+     * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
      */
 	#if ENERGY_CONSOLE_MODE
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
@@ -215,7 +259,7 @@ static DRIVER_INIT( aladbl )
 	DRIVER_INIT_CALL(megadrij);
 }
 
-// this should be correct, the areas of the rom that differ to the original
+// this should be correct, the areas of the ROM that differ to the original
 // after this decode look like intentional changes
 static DRIVER_INIT( mk3ghw )
 {
@@ -264,6 +308,26 @@ static DRIVER_INIT( mk3ghw )
 	DRIVER_INIT_CALL(megadriv);
 }
 
+static DRIVER_INIT( ssf2ghw )
+{
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xA130F0, 0xA130FF, 0, 0); // custom banking is disabled (!)
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x5fffff, 0, 0, "bank5");
+	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x5fffff, 0, 0);
 
-GAME( 1993, aladbl,   0, megadriv, aladbl,   aladbl,   ROT0, "bootleg / Sega", "Aladdin (bootleg of Japanese Megadrive version)", 0)
+	memory_set_bankptr(machine,  "bank5", memory_region( machine, "maincpu" ) + 0x400000 );
+
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, ssf2ghw_dsw_r );
+
+	DRIVER_INIT_CALL(megadrij);
+
+}
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1993, aladbl,   0, megadriv, aladbl,   aladbl,   ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)", 0)
 GAME( 1996, mk3ghw,   0, megadriv, mk3ghw,   mk3ghw,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
+GAME( 1994, ssf2ghw,  0, megadriv, ssf2ghw,  ssf2ghw,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (Arcade bootleg of Japanese MegaDrive version)", 0 )
