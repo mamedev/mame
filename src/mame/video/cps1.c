@@ -116,7 +116,7 @@ Street Fighter II': Champion Edition (World 920313)      1992  91635B-2   S9263B
 Street Fighter II': Champion Edition (USA 920313)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (USA 920513)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (USA 920803)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
-Street Fighter II': Champion Edition (Japan 920513)            91634B-2   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (Japan 920513)            91634B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Adventure Quiz Capcom World 2* (Japan 920611)            1992  89625B-1   Q522B            LWIO  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 
