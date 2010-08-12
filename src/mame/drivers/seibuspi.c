@@ -2866,9 +2866,9 @@ ROM_START( rdftadi ) // Dream Island license
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) )
 	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) )
 
-	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
-	ROM_LOAD24_WORD("raiden-f__fix.u0425", 0x000000, 0x20000, CRC(cc7acfde) SHA1(1f3c40b4d2009e011e135c89aebf2b4bd05fa861) )
-	ROM_LOAD24_BYTE("seibu__7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
+	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */ /* Do we need to specify an "endianess" so this works on all machines? */
+	ROM_LOAD24_WORD_SWAP("raiden-f__fix.u0425", 0x000000, 0x20000, BAD_DUMP CRC(cc7acfde) SHA1(1f3c40b4d2009e011e135c89aebf2b4bd05fa861) ) // Need to verify ROM
+	ROM_LOAD24_BYTE("seibu__7.u048",            0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
 
 	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
 	ROM_LOAD24_WORD("gun_dogs__bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
@@ -2896,9 +2896,9 @@ ROM_START( rdftam ) // Metrotainment license
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) )
 	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) )
 
-	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
-	ROM_LOAD24_WORD("raiden-f__fix.u0425", 0x000000, 0x20000, CRC(cc7acfde) SHA1(1f3c40b4d2009e011e135c89aebf2b4bd05fa861) )
-	ROM_LOAD24_BYTE("seibu__7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
+	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */ /* Do we need to specify an "endianess" so this works on all machines? */
+	ROM_LOAD24_WORD_SWAP("raiden-f__fix.u0425", 0x000000, 0x20000, BAD_DUMP CRC(cc7acfde) SHA1(1f3c40b4d2009e011e135c89aebf2b4bd05fa861) ) // Need to verify ROM
+	ROM_LOAD24_BYTE("seibu__7.u048",            0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
 
 	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
 	ROM_LOAD24_WORD("gun_dogs__bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
