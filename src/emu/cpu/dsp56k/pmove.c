@@ -12,7 +12,7 @@ ParallelMove* ParallelMove::decodeParallelMove(const Opcode* opc, const UINT16 w
 {
 	const UINT16 w0 = word0;
 	const UINT16 w1 = word1;
-	
+
 	/* Dual X Memory Data Read : 011m mKKK .rr. .... : A-142*/
 	if ((w0 & 0xe000) == 0x6000)
 	{

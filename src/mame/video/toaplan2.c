@@ -108,9 +108,9 @@ VIDEO_START( toaplan2 )
 	gp9001_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
 
 	gp9001_displog = 0; // debug flag
-	
+
 	display_tx = 1;
-	
+
 	register_state_save(machine);
 }
 
@@ -130,7 +130,7 @@ VIDEO_START( fixeighb )
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
 	VIDEO_START_CALL( truxton2 );
-	
+
 	/* This bootleg has additional layer offsets on the VDP */
 	state->vdp0->extra_xoffset[0]=-26;
 	state->vdp0->extra_xoffset[1]=-22;
@@ -141,7 +141,7 @@ VIDEO_START( fixeighb )
 	state->vdp0->extra_yoffset[1]=-15;
 	state->vdp0->extra_yoffset[2]=-15;
 	state->vdp0->extra_yoffset[3]=8;
-	
+
 	tilemap_set_scrolldx(tx_tilemap, 0, 0);
 }
 
@@ -167,7 +167,7 @@ VIDEO_START( batrider )
 	gfx_element_set_source(machine->gfx[2], (UINT8 *)raizing_tx_gfxram16);
 	truxton2_create_tx_tilemap(machine);
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
-	
+
 	/* Has special banking */
 	state->vdp0->gp9001_gfxrom_is_banked = 1;
 }
@@ -327,7 +327,7 @@ VIDEO_UPDATE( toaplan2 )
 			state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
 		}
 	}
-	
+
 	/* debug code, render 2nd VDP to 2nd screen if they exist for test */
 #ifdef DUAL_SCREEN_VDPS
 	if (state->vdp1)
@@ -385,7 +385,7 @@ VIDEO_UPDATE( batrider )
    VDP then the priorities for that VDP are correct, however, it is completely unclear how the priorities of the
    two VDPs should actually mix together, as a result these games are broken for now. */
 VIDEO_UPDATE( dogyuun )
-{	
+{
 #ifdef DUAL_SCREEN_VDPS
 	VIDEO_UPDATE_CALL( toaplan2 );
 #else

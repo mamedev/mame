@@ -12,7 +12,7 @@
         - Only memory to memory is tested!
 
     TODO:
-		- rewrite to match documentation
+        - rewrite to match documentation
         - implement missing features
         - implement more asserts
         - implement a INPUT_LINE_BUSREQ for Z80. As a workaround,

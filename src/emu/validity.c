@@ -1237,7 +1237,7 @@ bool mame_validitychecks(const game_driver *curdriver)
 			global_free(config);
 			throw emu_fatalerror("Validating %s (%s): %s", driver->name, driver->source_file, err.string());
 		}
-		
+
 		global_free(config);
 	}
 

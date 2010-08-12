@@ -545,9 +545,9 @@ void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, std::string& D)
 
 	switch(P)
 	{
-		case 0x0: 
-			sprintf(temp, "X:<$%x", ppppp); 
-			// NEW // sprintf(temp, "X:$%02x", ppppp); 
+		case 0x0:
+			sprintf(temp, "X:<$%x", ppppp);
+			// NEW // sprintf(temp, "X:$%02x", ppppp);
 			break;
 		case 0x1:
 			assemble_address_from_IO_short_address(ppppp, fullAddy);
@@ -558,7 +558,7 @@ void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, std::string& D)
 	D = temp;
 }
 
-void assemble_arguments_from_W_table(UINT16 W, char ma, const std::string& SD, const std::string& ea, 
+void assemble_arguments_from_W_table(UINT16 W, char ma, const std::string& SD, const std::string& ea,
 									 std::string& source, std::string& destination)
 {
 	char temp[32];
@@ -642,8 +642,8 @@ bool registerOverlap(const std::string& r0, const size_t bmd, const std::string&
 {
 	if (bmd == BM_NONE)
 		return false;
-	
-	if (r0 == r1) 
+
+	if (r0 == r1)
 		return true;
 
 	if (r0 == "A" && (bmd & BM_LOW)	&& r1 == "A0") return true;

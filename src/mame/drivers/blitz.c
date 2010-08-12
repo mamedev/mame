@@ -154,7 +154,7 @@
 
                                                       CPU  R6502AP (U6)
                                                     .--------\ /--------.
-  MCU (01-05-07), MEGA-2 (14-20), MEGA-3 (14-20) ---|01 VSS   ¨  /RES 40|---
+  MCU (01-05-07), MEGA-2 (14-20), MEGA-3 (14-20) ---|01 VSS   ?  /RES 40|---
                                         MCU (02) ---|02 RDY    PH2(O) 39|---
                                         MCU (04) ---|03 PH1(O)    /SO 38|---
                                                  ---|04 /IRQ   PH0(I) 37|---
@@ -179,7 +179,7 @@
 
                                        MCU MC68705P5S (U1)
                                       .--------\ /--------.
-  MEGA-2 (12, 20), MEGA-3 (12, 20) ---|01 VSS   ¨  /RES 28|---
+  MEGA-2 (12, 20), MEGA-3 (12, 20) ---|01 VSS   ?  /RES 28|---
                           CPU (02) ---|02 /INT      PA7 27|---
   MEGA-2 (01, 28), MEGA-3 (01, 28) ---|03 VCC       PA6 26|---
                           CPU (03) ---|04 EXTAL     PA5 25|---
@@ -198,7 +198,7 @@
 
                                                   MEGA-2 27C256 (U2)
                                                  .-------\ /-------.
-                                              ---|01 VPP  ¨  VCC 28|---
+                                              ---|01 VPP  ?  VCC 28|---
                                               ---|02 A12     A14 27|---
                                               ---|03 A7      A13 26|---
                                               ---|04 A6       A8 25|---
@@ -217,7 +217,7 @@
 
                                                   MEGA-3 27C256 (U3)
                                                  .-------\ /-------.
-                                              ---|01 VPP  ¨  VCC 28|---
+                                              ---|01 VPP  ?  VCC 28|---
                                               ---|02 A12     A14 27|---
                                               ---|03 A7      A13 26|---
                                               ---|04 A6       A8 25|---
@@ -425,16 +425,16 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 
 static WRITE8_DEVICE_HANDLER( lamps_a_w )
 {
-//	output_set_lamp_value(0, 1 - ((data) & 1));			/* Lamp 0 */
-//	output_set_lamp_value(1, 1 - ((data >> 1) & 1));	/* Lamp 1 */
-//	output_set_lamp_value(2, 1 - ((data >> 2) & 1));	/* Lamp 2 */
-//	output_set_lamp_value(3, 1 - ((data >> 3) & 1));	/* Lamp 3 */
-//	output_set_lamp_value(4, 1 - ((data >> 4) & 1));	/* Lamp 4 */
+//  output_set_lamp_value(0, 1 - ((data) & 1));         /* Lamp 0 */
+//  output_set_lamp_value(1, 1 - ((data >> 1) & 1));    /* Lamp 1 */
+//  output_set_lamp_value(2, 1 - ((data >> 2) & 1));    /* Lamp 2 */
+//  output_set_lamp_value(3, 1 - ((data >> 3) & 1));    /* Lamp 3 */
+//  output_set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
 
 //  popmessage("written : %02X", data);
-//	coin_counter_w(device->machine, 0, data & 0x40);	/* counter1 */
-//	coin_counter_w(device->machine, 1, data & 0x80);	/* counter2 */
-//	coin_counter_w(device->machine, 2, data & 0x20);	/* counter3 */
+//  coin_counter_w(device->machine, 0, data & 0x40);    /* counter1 */
+//  coin_counter_w(device->machine, 1, data & 0x80);    /* counter2 */
+//  coin_counter_w(device->machine, 2, data & 0x20);    /* counter3 */
 
 /*  Counters:
 
@@ -453,19 +453,19 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 *********************************************/
 
 static ADDRESS_MAP_START( megadpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	// seems that hardware is playing with A14 & A15 CPU lines...
+//  ADDRESS_MAP_GLOBAL_MASK(0x7fff) // seems that hardware is playing with A14 & A15 CPU lines...
 
-	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
-//	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
-//	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_BASE_SIZE_GENERIC(nvram)   /* battery backed RAM */
+//  AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
+//  AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 
 /*  There is another set of PIAs controlled by the code.
     Maybe they are just mirrors...
 
-	AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
-	AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+    AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+    AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 */
 
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_BASE(&videoram)
@@ -478,7 +478,7 @@ ADDRESS_MAP_END
 
   0844-0847 / 0848-084b --> PIAS?
   10f4-10f7 / 10f8-10fb --> PIAS?
-  
+
   Also 47f4-47f7 & 47f8-47fb are treated as PIA offsets... (code at $6eaf and $6f74)
 
 
@@ -487,9 +487,9 @@ ADDRESS_MAP_END
 
   FE99: 78            sei            ; set IRQ
   FE9A: 4E 2F 02      lsr  $022F
-  FE9D: D8            cld  
+  FE9D: D8            cld
   FE9E: A2 FF         ldx  #$FF
-  FEA0: 9A            txs  
+  FEA0: 9A            txs
   FEA1: A9 00         lda  #$00
   FEA3: 8D 25 02      sta  $0225
   FEA6: A9 F7         lda  #$F7      ; load 0xf7
@@ -529,16 +529,16 @@ ADDRESS_MAP_END
   EEDA: A2 00         ldx  #$00
   EEDC: BD 22 EF      lda  $EF22,x
   EEDF: 9D 00 01      sta  $0100,x
-  EEE2: E8            inx  
+  EEE2: E8            inx
   EEE3: E0 80         cpx  #$80
   EEE5: D0 F5         bne  $EEDC
-  EEE7: 78            sei  
+  EEE7: 78            sei
   EEE8: 20 00 01      jsr  $0100
-  EEEB: 58            cli  
+  EEEB: 58            cli
 
   Here the copied subroutine:
 
-  EF22: 38            sec  
+  EF22: 38            sec
   EF23: B0 08         bcs  $EF2D
   EF25: C5 3A         cmp  $3A
   EF27: A3 5C         lax  ($5C,x)  ------> Indexed LAX???
@@ -550,9 +550,9 @@ ADDRESS_MAP_END
   EF35: A0 08         ldy  #$08
   EF37: 8D F7 47      sta  $47F7
   EF3A: 6A            ror  a
-  EF3B: 88            dey  
+  EF3B: 88            dey
   EF3C: D0 F9         bne  $EF37
-  EF3E: E8            inx  
+  EF3E: E8            inx
   EF3F: E0 08         cpx  #$08
   EF41: D0 EF         bne  $EF32
   EF43: A2 00         ldx  #$00
@@ -560,22 +560,22 @@ ADDRESS_MAP_END
   EF47: AD F7 47      lda  $47F7
   EF4A: 4A            lsr  a
   EF4B: 76 B0         ror  $B0,x
-  EF4D: 88            dey  
+  EF4D: 88            dey
   EF4E: D0 F7         bne  $EF47
-  EF50: E8            inx  
+  EF50: E8            inx
   EF51: E0 08         cpx  #$08
   EF53: D0 F0         bne  $EF45
   EF55: A9 00         lda  #$00
   EF57: 85 B0         sta  $B0
-  EF59: 60            rts  
+  EF59: 60            rts
 
 */
 
 
 /*
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
+    ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+    AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 */
 
@@ -773,10 +773,10 @@ static MACHINE_DRIVER_START( megadpkr )
 	MDRV_CPU_PROGRAM_MAP(megadpkr_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-//	MDRV_CPU_ADD("mcu", M68705, CPU_CLOCK) /* unknown */
-//	MDRV_CPU_PROGRAM_MAP(mcu_map)
+//  MDRV_CPU_ADD("mcu", M68705, CPU_CLOCK) /* unknown */
+//  MDRV_CPU_PROGRAM_MAP(mcu_map)
 
-//	MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_PIA6821_ADD("pia0", megadpkr_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", megadpkr_pia1_intf)

@@ -66,7 +66,7 @@ struct _gpu_
 		INT16 x;
 		INT16 y;
 	} points[16];
-	
+
 	UINT16 pt_idx;
 	bool   poly_open;
 
@@ -157,7 +157,7 @@ static VIDEO_UPDATE( atarisy4 )
 
 static inline UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
 {
-//	UINT32 offset = ((gpu.mcr >> 4) & 3) << 9;
+//  UINT32 offset = ((gpu.mcr >> 4) & 3) << 9;
 	UINT32 offset = 0;
 
 	if (~gpu.bcrw & 0x80)
@@ -196,7 +196,7 @@ static void image_mem_to_screen(bool clip)
 				if (x >= 0 && x <= 511)
 				{
 					UINT16 pix = screen_ram[xy_to_screen_addr(x,y) >> 1];
-					
+
 					if (x & 1)
 						pix = (pix & (0x00ff)) | gpu.idr << 8;
 					else
@@ -221,7 +221,7 @@ static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent,
 	{
 		UINT32 addr = xy_to_screen_addr(x, scanline);
 		UINT16 pix = screen_ram[addr >> 1];
-		
+
 		if (x & 1)
 			pix = (pix & (0x00ff)) | color << 8;
 		else
@@ -263,32 +263,32 @@ static void draw_polygon(UINT16 color)
 }
 
 /*
-	GPU commands
+    GPU commands
 
-	REXP	0x00	Reset expansion
-	SEXP	0x01	Set expansion
-	ROFF	0x02	Reset offset on update
-	SOFF	0x03	Set offset
-	RTPS	0x04	Reset transposition
-	STPS	0x05	Set transposition
-	SIMD	0x06	Load IDR register
-	SICD	0x07	Load partial transfer compare value
-	RCW		0x08	Reset clipping window
-	SCW		0x09	Set clipping window
-	WVB		0x0B	Wait for VBlank
-	FXOT	0x10	Fill x offset table
-	FYOT	0x11	Fill y offset table
-	FERT	0x14	Fill expansion table
-	FCT		0x15	Fill color table
-	SMCT	0x16	Screen memory to color table
-	ITSN	0x20	Image memory to screen memory transfer
-	ITSC	0x21	Image memory to screen memory transfer with clip
-	PPA		0x24	Plot point absolute
-	PFOA	0x28	Polygon open absolute
-	PFOR	0x29	Polygon open relative
-	PFVA	0x2A	Polygon vector absolute
-	PFVR	0x2B	Polygon vector relative
-	PFC		0x2C	Polygon close
+    REXP    0x00    Reset expansion
+    SEXP    0x01    Set expansion
+    ROFF    0x02    Reset offset on update
+    SOFF    0x03    Set offset
+    RTPS    0x04    Reset transposition
+    STPS    0x05    Set transposition
+    SIMD    0x06    Load IDR register
+    SICD    0x07    Load partial transfer compare value
+    RCW     0x08    Reset clipping window
+    SCW     0x09    Set clipping window
+    WVB     0x0B    Wait for VBlank
+    FXOT    0x10    Fill x offset table
+    FYOT    0x11    Fill y offset table
+    FERT    0x14    Fill expansion table
+    FCT     0x15    Fill color table
+    SMCT    0x16    Screen memory to color table
+    ITSN    0x20    Image memory to screen memory transfer
+    ITSC    0x21    Image memory to screen memory transfer with clip
+    PPA     0x24    Plot point absolute
+    PFOA    0x28    Polygon open absolute
+    PFOR    0x29    Polygon open relative
+    PFVA    0x2A    Polygon vector absolute
+    PFVR    0x2B    Polygon vector relative
+    PFC     0x2C    Polygon close
 */
 void execute_gpu_command(running_machine *machine)
 {
@@ -331,13 +331,13 @@ void execute_gpu_command(running_machine *machine)
 		case 0x16:
 		{
 			/*
-				Copy screen RAM to color RAM
-				GR0 : Color start X
-				GR1 : Color start Y
-				GR2 : Color table offset
-				GR3 : Size
-				GR4 : Channels to set (R: 0x10, G: 0x20, B: 0x40)
-			*/
+                Copy screen RAM to color RAM
+                GR0 : Color start X
+                GR1 : Color start Y
+                GR2 : Color table offset
+                GR3 : Size
+                GR4 : Channels to set (R: 0x10, G: 0x20, B: 0x40)
+            */
 			int i;
 			int offset = xy_to_screen_addr(gpu.gr[0] - 0x400, gpu.gr[1] - 0x200);
 			int table_offs = gpu.gr[2];
@@ -754,7 +754,7 @@ ROM_START( airrace )
 
 	ROM_REGION( 0x20000, "dsp", 0 )
 	ROM_LOAD( "mathbs.lda", 0x00000, 0x01e00, CRC(d215acd4) SHA1(853e792b343dc6bcb5b11d455af478a79edfd740) )
-	
+
 	ROM_REGION( 0x20000, "gfx", 0 )
 	ROM_LOAD( "2d_data", 0x00000, 0x077cb, NO_DUMP )
 ROM_END
@@ -799,12 +799,12 @@ void load_ldafile(const address_space *space, const UINT8 *file)
 
 		c = READ_CHAR();
 		len |= c << 8;
-		sum += c; 
+		sum += c;
 
 		/* End of file */
 		if (len == 6)
 			break;
-	
+
 		addr = READ_CHAR();
 		sum += addr;
 
@@ -907,7 +907,7 @@ void load_hexfile(const address_space *space, const UINT8 *file)
 		while (len)
 		{
 			UINT8 data;
-			
+
 			data = READ_HEX_CHAR() << 4;
 			data |= READ_HEX_CHAR();
 			sum += data >> 4;

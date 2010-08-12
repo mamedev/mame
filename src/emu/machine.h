@@ -163,7 +163,7 @@ class driver_data_t
 public:
 	driver_data_t(running_machine &machine);
 	virtual ~driver_data_t();
-	
+
 	running_machine &	m_machine;
 };
 

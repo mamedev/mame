@@ -13,7 +13,7 @@ public:
 
 	toaplan2_state(running_machine &machine)
 		: driver_data_t(machine)
-	{ 
+	{
 		vdp0 = NULL;
 		vdp1 = NULL;
 	}

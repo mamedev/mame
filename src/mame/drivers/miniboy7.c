@@ -43,7 +43,7 @@
   --------------
 
   Board silkscreened on top:
-  be MVX-001-01	 ('be' is a Bonanza Enterprises logo).
+  be MVX-001-01  ('be' is a Bonanza Enterprises logo).
 
   - CPU:            1x R6502P.
   - Sound:          1x AY-3-8910.
@@ -471,7 +471,7 @@ MACHINE_DRIVER_END
 /*
 
   Board silkscreened on top:
-  be MVX-001-01	 ('be' is a Bonanza Enterprises logo).
+  be MVX-001-01  ('be' is a Bonanza Enterprises logo).
 
   1x 6502.
   1x AY-3-8910.

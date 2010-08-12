@@ -2132,23 +2132,23 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
 
-//	AM_RANGE(0x00620, 0x00621) AM_WRITE(scroll_w) // scroll1
-//	AM_RANGE(0x00622, 0x00623) AM_WRITE(scroll_w) // scroll1
+//  AM_RANGE(0x00620, 0x00621) AM_WRITE(scroll_w) // scroll1
+//  AM_RANGE(0x00622, 0x00623) AM_WRITE(scroll_w) // scroll1
 
-//	AM_RANGE(0x00624, 0x00625) AM_WRITE(scroll_w) // scroll2
-//	AM_RANGE(0x00626, 0x00627) AM_WRITE(scroll_w) // scroll2
+//  AM_RANGE(0x00624, 0x00625) AM_WRITE(scroll_w) // scroll2
+//  AM_RANGE(0x00626, 0x00627) AM_WRITE(scroll_w) // scroll2
 
-//	AM_RANGE(0x00628, 0x00629) AM_WRITE(scroll_w) // scroll3
-//	AM_RANGE(0x0062a, 0x0062b) AM_WRITE(scroll_w) // scroll3
+//  AM_RANGE(0x00628, 0x00629) AM_WRITE(scroll_w) // scroll3
+//  AM_RANGE(0x0062a, 0x0062b) AM_WRITE(scroll_w) // scroll3
 
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 	AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-//	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
+//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
 	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
-//	AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
@@ -2250,7 +2250,7 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
- 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)

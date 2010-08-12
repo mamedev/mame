@@ -121,7 +121,7 @@ static void build_decoded_waveform(running_machine *machine, namco_sound *chip, 
 	int v;
 
 	chip->wavedata = (rgnbase != NULL) ? rgnbase : auto_alloc_array_clear(machine, UINT8, 0x400);
-		
+
 	/* 20pacgal has waves in RAM but old sound system */
 	if (rgnbase == NULL && chip->num_voices != 3)
 	{

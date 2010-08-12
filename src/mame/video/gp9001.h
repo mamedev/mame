@@ -52,7 +52,7 @@ public:
 	UINT16 tile_limit; // prevent bad tile in Batsugun, might be something like the CPS1 tile addressing limits?
 	int	   tile_region; // we also use this to figure out which vdp we're using in some debug logging features
 	tilemap_t *top_tilemap, *fg_tilemap, *bg_tilemap;
-	
+
 	// debug
 	int display_bg;
 	int display_fg;

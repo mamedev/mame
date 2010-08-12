@@ -974,7 +974,7 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 //-------------------------------------------------
 
 driver_data_t::driver_data_t(running_machine &machine)
-	: m_machine(machine) 
+	: m_machine(machine)
 {
 }
 

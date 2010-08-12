@@ -391,7 +391,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 
 	/* did we fail to find the file? */
 	if (!is_loaded() && !softload)
-	{		
+	{
 		m_err = IMAGE_ERROR_FILENOTFOUND;
 		goto done;
 	}

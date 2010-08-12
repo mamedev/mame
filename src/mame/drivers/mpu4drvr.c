@@ -2137,7 +2137,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 		// and used by the renderer to render the correct data
 		rowcounter = 0; linecounter = 0;
 
-	//	scn2674_status_register &= ~0x10; // clear vblank
+	//  scn2674_status_register &= ~0x10; // clear vblank
 
 		scn2674_status_register |= 0x02;
 		/* Ready - this triggers for the first scanline of the screen */
@@ -2149,10 +2149,10 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			update_mpu68_interrupts(timer.machine);
 		}
 	}
-	
+
 	// should be triggered at the start of each ROW (line zero for that row)
 	if ((current_scanline%8 == 7) && (current_scanline<296))
-	{	
+	{
 		scn2674_status_register |= 0x08;
 		if (scn2674_irq_mask&0x08)
 		{
@@ -2220,7 +2220,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 		scn2674_status_register |= 0x10;
 	}
 
-//	printf("scanline %d\n",current_scanline);
+//  printf("scanline %d\n",current_scanline);
 }
 
 

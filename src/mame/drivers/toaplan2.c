@@ -4261,7 +4261,7 @@ static MACHINE_DRIVER_START( fixeight )
 
 	MDRV_GFXDECODE(truxton2)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
-	
+
 	MDRV_DEVICE_ADD_VDP0
 
 	MDRV_VIDEO_START(truxton2)
@@ -4712,7 +4712,7 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 	MDRV_DEVICE_ADD_VDP0
-	
+
 	MDRV_VIDEO_START(batrider)
 	MDRV_VIDEO_UPDATE(batrider)
 
@@ -4762,7 +4762,7 @@ static MACHINE_DRIVER_START( bbakraid )
 
 	MDRV_GFXDECODE(batrider)
 	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
-	
+
 	MDRV_DEVICE_ADD_VDP0
 
 	MDRV_VIDEO_START(batrider)

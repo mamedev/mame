@@ -146,7 +146,7 @@ public:
 	// construction/destruction
 	address_map_entry(address_map &map, offs_t start, offs_t end);
 
-	// simple inline setters	
+	// simple inline setters
 	void set_mirror(offs_t _mirror) { m_addrmirror = _mirror; }
 	void set_read_type(map_handler_type _type) { m_read.type = _type; }
 	void set_write_type(map_handler_type _type) { m_write.type = _type; }
@@ -161,11 +161,11 @@ public:
 	// mask setting
 	void set_mask(offs_t _mask);
 
-	// I/O port configuration	
+	// I/O port configuration
 	void set_read_port(const device_config &devconfig, const char *tag);
 	void set_write_port(const device_config &devconfig, const char *tag);
 	void set_readwrite_port(const device_config &devconfig, const char *tag);
-	
+
 	// memory bank configuration
 	void set_read_bank(const device_config &devconfig, const char *tag);
 	void set_write_bank(const device_config &devconfig, const char *tag);
@@ -249,7 +249,7 @@ public:
 	address_map_entry8(address_map &map, offs_t start, offs_t end);
 
 	void set_baseptr(UINT8 **baseptr) { internal_set_baseptr(reinterpret_cast<void **>(baseptr)); }
-	
+
 	// native-size handlers
 	void set_handler(read8_space_func func, const char *string) { internal_set_handler(func, string, 0); }
 	void set_handler(write8_space_func func, const char *string) { internal_set_handler(func, string, 0); }
@@ -269,7 +269,7 @@ public:
 	address_map_entry16(address_map &map, offs_t start, offs_t end);
 
 	void set_baseptr(UINT16 **baseptr) { internal_set_baseptr(reinterpret_cast<void **>(baseptr)); }
-	
+
 	// native-size handlers
 	void set_handler(read16_space_func func, const char *string) { internal_set_handler(func, string, 0); }
 	void set_handler(write16_space_func func, const char *string) { internal_set_handler(func, string, 0); }
@@ -297,7 +297,7 @@ public:
 	address_map_entry32(address_map &map, offs_t start, offs_t end);
 
 	void set_baseptr(UINT32 **baseptr) { internal_set_baseptr(reinterpret_cast<void **>(baseptr)); }
-	
+
 	// native-size handlers
 	void set_handler(read32_space_func func, const char *string) { internal_set_handler(func, string, 0); }
 	void set_handler(write32_space_func func, const char *string) { internal_set_handler(func, string, 0); }
@@ -333,7 +333,7 @@ public:
 	address_map_entry64(address_map &map, offs_t start, offs_t end);
 
 	void set_baseptr(UINT64 **baseptr) { internal_set_baseptr(reinterpret_cast<void **>(baseptr)); }
-	
+
 	// native-size handlers
 	void set_handler(read64_space_func func, const char *string) { internal_set_handler(func, string, 0); }
 	void set_handler(write64_space_func func, const char *string) { internal_set_handler(func, string, 0); }
@@ -377,7 +377,7 @@ public:
 	// construction/destruction
 	address_map(const device_config &devconfig, int spacenum);
 	~address_map();
-	
+
 	// configuration
 	void configure(UINT8 _spacenum, UINT8 _databits);
 

@@ -1768,7 +1768,7 @@ static void memory_init_preflight(running_machine *machine)
 			/* if we have a share entry, add it to our map */
 			if (entry->m_share != NULL)
 				memdata->sharemap.add(entry->m_share, UNMAPPED_SHARE_PTR, FALSE);
-		
+
 			/* computed adjusted addresses first */
 			entry->m_bytestart = entry->m_addrstart;
 			entry->m_byteend = entry->m_addrend;

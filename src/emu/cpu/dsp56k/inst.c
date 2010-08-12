@@ -5,8 +5,8 @@ namespace DSP56K
 {
 
 // Factory
-Instruction* Instruction::decodeInstruction(const Opcode* opc, 
-											const UINT16 word0, 
+Instruction* Instruction::decodeInstruction(const Opcode* opc,
+											const UINT16 word0,
 											const UINT16 word1,
 											bool shifted)
 {
@@ -18,7 +18,7 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 		w0 = w1;
 		w1 = 0x0000;
 	}
-	
+
 	/**************************************************************************/
 	/* The very funky case of the XMemoryDataMoveWithShortDisplacement        */
 	/**************************************************************************/
@@ -112,8 +112,8 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	/* No Parallel Data Move :   0100 1010 .... .... : A-131 */
 	/* Register to Register Data Move : 0100 IIII .... .... : A-133 */
 	/* Address Register Update : 0011 0zRR .... .... : A-135 */
-	/* X Memory Data Move :	  1mRR HHHW .... .... : A-137 */
-	/* X Memory Data Move :	  0101 HHHW .... .... : A-137 */
+	/* X Memory Data Move :   1mRR HHHW .... .... : A-137 */
+	/* X Memory Data Move :   0101 HHHW .... .... : A-137 */
 	/* Quote: (32 General parallel move instructions) */
 	/****************************************************************/
 	else if (((w0 & 0xff00) == 0x4a00) ||

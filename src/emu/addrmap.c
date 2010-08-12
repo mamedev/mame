@@ -139,7 +139,7 @@ void address_map_entry::set_write_port(const device_config &devconfig, const cha
 
 
 //-------------------------------------------------
-//  set_readwrite_port - set up a handler for 
+//  set_readwrite_port - set up a handler for
 //  reading and writing an I/O port
 //-------------------------------------------------
 
@@ -171,21 +171,21 @@ void address_map_entry::set_read_bank(const device_config &devconfig, const char
 
 void address_map_entry::set_write_bank(const device_config &devconfig, const char *tag)
 {
-	m_write.type = AMH_BANK; 
+	m_write.type = AMH_BANK;
 	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
 }
 
 
 //-------------------------------------------------
-//  set_readwrite_bank - set up a handler for 
+//  set_readwrite_bank - set up a handler for
 //  writing to a memory bank
 //-------------------------------------------------
 
 void address_map_entry::set_readwrite_bank(const device_config &devconfig, const char *tag)
 {
-	m_read.type = AMH_BANK; 
+	m_read.type = AMH_BANK;
 	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
-	m_write.type = AMH_BANK; 
+	m_write.type = AMH_BANK;
 	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
 }
 
@@ -607,8 +607,8 @@ void address_map::configure(UINT8 spacenum, UINT8 databits)
 
 void address_map::set_global_mask(offs_t mask)
 {
-//	if (m_entrylist != NULL)
-//		throw emu_fatalerror("AM_GLOBALMASK must be specified before any entries");
+//  if (m_entrylist != NULL)
+//      throw emu_fatalerror("AM_GLOBALMASK must be specified before any entries");
 	m_globalmask = mask;
 }
 

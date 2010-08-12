@@ -33,7 +33,7 @@ public:
 	const std::string& instSource() const;
 	const std::string& instDestination() const;
 	const size_t instAccumulatorBitsModified() const;
-	
+
 private:
 	Instruction* m_instruction;
 	ParallelMove* m_parallelMove;
