@@ -231,6 +231,7 @@ void streams_init(running_machine *machine)
 	/* register global states */
 	state_save_register_global(machine, strdata->last_update.seconds);
 	state_save_register_global(machine, strdata->last_update.attoseconds);
+	state_save_register_postload(machine, stream_postload, strdata);
 }
 
 
@@ -359,7 +360,6 @@ sound_stream *stream_create(device_t *device, int inputs, int outputs, int sampl
 	/* create a unique tag for saving */
 	sprintf(statetag, "%d", stream->index);
 	state_save_register_item(machine, "stream", statetag, 0, stream->sample_rate);
-	state_save_register_postload(machine, stream_postload, stream);
 
 	/* allocate space for the inputs */
 	if (inputs > 0)
@@ -692,21 +692,21 @@ void stream_set_output_gain(sound_stream *stream, int output, float gain)
 
 static STATE_POSTLOAD( stream_postload )
 {
-	streams_private *strdata = machine->streams_data;
-	sound_stream *stream = (sound_stream *)param;
-	int outputnum;
+	streams_private *strdata = reinterpret_cast<streams_private *>(param);
+	for (sound_stream *stream = strdata->stream_head; stream != NULL; stream = stream->next)
+	{
+		/* recompute the same rate information */
+		recompute_sample_rate_data(machine, stream);
 
-	/* recompute the same rate information */
-	recompute_sample_rate_data(machine, stream);
+		/* make sure our output buffers are fully cleared */
+		for (int outputnum = 0; outputnum < stream->outputs; outputnum++)
+			memset(stream->output[outputnum].buffer, 0, stream->output_bufalloc * sizeof(stream->output[outputnum].buffer[0]));
 
-	/* make sure our output buffers are fully cleared */
-	for (outputnum = 0; outputnum < stream->outputs; outputnum++)
-		memset(stream->output[outputnum].buffer, 0, stream->output_bufalloc * sizeof(stream->output[outputnum].buffer[0]));
-
-	/* recompute the sample indexes to make sense */
-	stream->output_sampindex = strdata->last_update.attoseconds / stream->attoseconds_per_sample;
-	stream->output_update_sampindex = stream->output_sampindex;
-	stream->output_base_sampindex = stream->output_sampindex - stream->max_samples_per_update;
+		/* recompute the sample indexes to make sense */
+		stream->output_sampindex = strdata->last_update.attoseconds / stream->attoseconds_per_sample;
+		stream->output_update_sampindex = stream->output_sampindex;
+		stream->output_base_sampindex = stream->output_sampindex - stream->max_samples_per_update;
+	}
 }
 
 
