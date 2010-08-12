@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "sound/s2636.h"
 
 #include "tinv2650.lh"
 
@@ -260,6 +261,10 @@ static MACHINE_DRIVER_START( tinvader )
 	MDRV_VIDEO_UPDATE(tinvader)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("s2636snd", S2636, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( tinvader_sound_w )
@@ -314,6 +319,6 @@ ROM_START( dodgem )
 ROM_END
 
 
-GAME( 1978, sia2650,  0,       tinvader, sinvader, 0, ROT270, "Zelco / Zaccaria", "Super Invader Attack", GAME_NO_SOUND )
-GAMEL(1978, tinv2650, sia2650, tinvader, tinvader, 0, ROT270, "Zelco / Zaccaria", "The Invaders",         GAME_NO_SOUND, layout_tinv2650 )
-GAME( 1979, dodgem,   0,       tinvader, dodgem,   0, ROT0,   "Zaccaria",         "Dodgem",               GAME_NO_SOUND )
+GAME( 1978, sia2650,  0,       tinvader, sinvader, 0, ROT270, "Zelco / Zaccaria", "Super Invader Attack", 0 )
+GAMEL(1978, tinv2650, sia2650, tinvader, tinvader, 0, ROT270, "Zelco / Zaccaria", "The Invaders",         0, layout_tinv2650 )
+GAME( 1979, dodgem,   0,       tinvader, dodgem,   0, ROT0,   "Zaccaria",         "Dodgem",               0 )

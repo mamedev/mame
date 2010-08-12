@@ -5,6 +5,7 @@
 /*************************************************************/
 
 #include "emu.h"
+#include "sound/s2636.h"
 
 UINT8 *zac2650_s2636_0_ram;
 static bitmap_t *spritebitmap;
@@ -38,6 +39,10 @@ WRITE8_HANDLER( zac_s2636_w )
 	zac2650_s2636_0_ram[offset] = data;
 	gfx_element_mark_dirty(space->machine->gfx[1], offset/8);
 	gfx_element_mark_dirty(space->machine->gfx[2], offset/8);
+	if (offset == 0xc7)
+	{
+		s2636_soundport_w(space->machine->device("s2636snd"), 0, data);
+	}
 }
 
 READ8_HANDLER( tinvader_port_0_r )
