@@ -2872,7 +2872,7 @@ ROM_START( rdftadi ) // Dream Island license
 
 
 	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
-	ROM_LOAD24_WORD("raiden-f__fix.u0425", 0x000000, 0x20000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0425 which contains the combined data of the two roms normally at 427 and 428 (423 and 424 on older cart pcbs); pads are silkscreened FIX LH531024
+	ROM_LOAD24_WORD("raiden-f__fix.u0425", 0x000000, 0x20000, NO_DUMP )//the real rom used here is actually a 0x20000 long rom located at u0425 which contains the combined data of the two roms normally at 427 and 428 (423 and 424 on older cart pcbs); pads are silkscreened FIX LH531024
 	ROM_LOAD24_BYTE("gd_5.u0427", 0x000000, 0x10000, BAD_DUMP CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) ) // socket is silkscreened on pcb FIX0
 	ROM_LOAD24_BYTE("gd_6.u0428", 0x000001, 0x10000, BAD_DUMP CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) ) // socket is silkscreened on pcb FIX1
 	ROM_LOAD24_BYTE("seibu__7.u048",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
@@ -2891,7 +2891,7 @@ ROM_START( rdftadi ) // Dream Island license
 	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
 
 	ROM_REGION(0x400000, "user2", ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("raiden-f__pcm.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
+	ROM_LOAD("raiden-f__pcm.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x400000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
 	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom. 
 	ROM_LOAD("gun_dogs__pcm.217", 0x000000, 0x200000, BAD_DUMP CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_LOAD("gd_8.216",   0x200000, 0x080000, BAD_DUMP CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
@@ -2907,7 +2907,7 @@ ROM_START( rdftam ) // Metrotainment license
 
 
 	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
-	ROM_LOAD24_WORD("raiden-f__fix.u0425", 0x000000, 0x20000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0425 which contains the combined data of the two roms normally at 427 and 428 (423 and 424 on older cart pcbs); pads are silkscreened FIX LH531024
+	ROM_LOAD24_WORD("raiden-f__fix.u0425", 0x000000, 0x20000, NO_DUMP )//the real rom used here is actually a 0x20000 long rom located at u0425 which contains the combined data of the two roms normally at 427 and 428 (423 and 424 on older cart pcbs); pads are silkscreened FIX LH531024
 	ROM_LOAD24_BYTE("gd_5.u0427", 0x000000, 0x10000, BAD_DUMP CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) ) // socket is silkscreened on pcb FIX0
 	ROM_LOAD24_BYTE("gd_6.u0428", 0x000001, 0x10000, BAD_DUMP CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) ) // socket is silkscreened on pcb FIX1
 	ROM_LOAD24_BYTE("seibu__7.u048",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
@@ -2926,7 +2926,7 @@ ROM_START( rdftam ) // Metrotainment license
 	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
 
 	ROM_REGION(0x400000, "user2", ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("raiden-f__pcm.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
+	ROM_LOAD("raiden-f__pcm.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x400000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
 	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom. 
 	ROM_LOAD("gun_dogs__pcm.217", 0x000000, 0x200000, BAD_DUMP CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_LOAD("gd_8.216",   0x200000, 0x080000, BAD_DUMP CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
