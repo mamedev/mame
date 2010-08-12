@@ -457,7 +457,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 		logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
 		wd17xx_data_w(fdc, offset&0xf, data&0xff);
 	}
-	else if (offset == 0xd40006)
+	else if (offset == 0xd4006)
 	{
 		// latch A
 		if (data & 1)
@@ -480,7 +480,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 		wd17xx_set_side(fdc,(data & 0x10)>>4);
 
 	}
-	else if (offset == 0xd40010)
+	else if (offset == 0xd4010)
 	{
 		// latch B
 		wd17xx_dden_w(fdc, BIT(data, 1));
